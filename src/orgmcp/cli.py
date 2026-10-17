@@ -76,9 +76,9 @@ def cmd_plan(args) -> None:
 def cmd_apply(args) -> None:
     from . import blueprint
 
-    org = _org(args)
+    org = _org(args, mutating=True)  # says which organization it is about to change, before anything is written
     summary = blueprint.apply(org, blueprint.load(Path(args.blueprint)), allowed_roots=args.allow_root or None)
-    print(f"org: {org.root}\n{summary.text()}")
+    print(summary.text())
 
 
 def cmd_send(args) -> None:

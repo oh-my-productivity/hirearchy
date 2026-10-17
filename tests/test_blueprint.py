@@ -627,8 +627,9 @@ def test_cli_plan_works_without_an_org(base, tmp_path, capsys, monkeypatch):
 def test_cli_apply(base, tmp_path, empty_org, capsys):
     path = write_bp(tmp_path, base)
     main(["--root", str(empty_org.root), "apply", path, "--allow-root", str(tmp_path)])
-    out = capsys.readouterr().out
-    assert f"org: {empty_org.root}" in out and "created 4 agents" in out and "-> lead (budget 22)" in out
+    cap = capsys.readouterr()
+    assert f"org: {empty_org.root}" in cap.err  # announced on stderr before anything is changed
+    assert "created 4 agents" in cap.out and "-> lead (budget 22)" in cap.out
     assert empty_org.exists("lead/factcheck")
     with pytest.raises(SystemExit) as e:  # second apply: names exist
         main(["--root", str(empty_org.root), "apply", path, "--allow-root", str(tmp_path)])
