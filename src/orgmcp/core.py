@@ -45,6 +45,8 @@ DEFAULT_CONFIG = {
     "max_failures": 3,  # consecutive failed runs before an agent is paused
     "run_timeout": 1800,  # seconds per run
     "stall_after": 600,  # seconds of silence on an open task before the next step of the stall ladder
+    "review_every_runs": 25,  # org-wide runs between health reviews (or review_every_seconds, whichever first)
+    "review_every_seconds": 86400,
     "poll_seconds": 2,
     "default_budget": 10,  # runs given with a task when none is specified
     "memory_max_words": 800,  # cap on an agent's MEMORY.md; writes that exceed it are refused
