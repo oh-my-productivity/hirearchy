@@ -12,9 +12,9 @@ needs:
     path: ~/deliverables/competitors.md
   quality_bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts (versions, licenses) come from the live source.
   sources: Web access to official sites, repositories and docs; a source URL per claim.
-  budget_runs: 25
+  budget_runs: 25   # plan: 22 runs; researcher 4, writer 3 and factcheck 3 are handed down (each includes its rework / re-check run), the lead keeps 12
   models: {cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}
-  model_policy: cheap drafting, strong review (research and writing on cheap, fact-check and lead on strong)
+  model_policy: cheap drafting, strong review (research and writing on cheap; the lead and the fact-check on strong, because the lead decides how every other run is spent)
   review: true   # independent fact-check by someone who did not write the report
   approval: Approve this plan before anything is created or started; ask before spending beyond the budget.
   progress: One line when I ask; tell me when it is done. No digging through files.
@@ -22,7 +22,7 @@ agents:
   - name: lead
     template: manager
     role: Research lead
-    model: strong
+    model: strong   # never cheap: a cheap lead misroutes rework and wastes runs
     children:
       - {name: researcher, template: researcher, scale: 1}
       - {name: writer, template: writer}
