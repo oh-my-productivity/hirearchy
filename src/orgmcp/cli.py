@@ -40,7 +40,7 @@ def cmd_hire(args) -> None:
     addr = org.hire(
         args.parent, args.name, args.role, _text(args.charter), model=args.model,
         tools=[t for t in (args.tools or "").split(",") if t], can_hire=args.can_hire,
-        max_children=args.max_children, workspace=args.workspace,
+        max_children=args.max_children, workspace=args.workspace, inputs=args.inputs or None,
     )
     org.commit(f"root: hired {addr}")
     print(f"hired {addr}")
@@ -209,6 +209,8 @@ def main(argv: list[str] | None = None) -> None:
     s.add_argument("--can-hire", action="store_true")
     s.add_argument("--max-children", type=int, default=5)
     s.add_argument("--workspace")
+    s.add_argument("--inputs", action="append", metavar="PATH",
+                   help="absolute folder the agent may only read, never change (repeatable)")
     s.set_defaults(fn=cmd_hire)
 
     s = sub.add_parser("task", help="give a task to an agent (as root)")

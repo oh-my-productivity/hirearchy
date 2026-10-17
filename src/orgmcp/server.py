@@ -257,6 +257,7 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
         can_hire: bool = False,
         max_children: int = 5,
         workspace: str | None = None,
+        inputs: list[str] | None = None,
     ) -> str:
         """Create a direct report (only if your charter allows hiring).
 
@@ -265,11 +266,13 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
         model: kiro model id (optional). tools: kiro built-in tools to grant, only ones you have yourself
         (e.g. "read", "write", "shell"). can_hire: whether the report may build its own team.
         workspace: directory the report works in (must be inside yours).
+        inputs: absolute folders the report may only READ (never change); a manager can give only folders inside its
+        own inputs or workspace. A report with `read` and no workspace/inputs reads nothing outside the org.
         A new report has no budget until you delegate a task to it.
         """
         org = binding.get()
         addr = org.hire(me, name, role, charter, model=model, tools=tools or [], can_hire=can_hire,
-                        max_children=max_children, workspace=workspace)
+                        max_children=max_children, workspace=workspace, inputs=inputs)
         return f"hired {addr}"
 
     @mcp.tool()
