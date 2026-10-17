@@ -78,7 +78,7 @@ assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#
    one. Unless you say otherwise the result goes into a new `deliverables/` folder in your current directory.
    You answer, or say "defaults".
 2. **Plan.** The assistant starts from `blueprint_example(kind)` (`research`: web sources; `documents`: write from your local
-   files, no web; `code`: repo workspace with tests and commits), edits it with your answers and calls `propose_org`. You get
+   files, no web; `code`: repo workspace with tests and commits; `analysis`: your data files, read-only, analysed by a checked script), edits it with your answers and calls `propose_org`. You get
    a block headed **PLAN FOR YOU** that the assistant must show you exactly as written (about 40 lines, plain words): goal,
    needs as understood, the team (role, model, tools, and for each agent what it may touch, worded from the same
    computation as the `Access:` line below, so the plan states what kiro will enforce), the budget and its split, the independent
@@ -147,25 +147,28 @@ they hand down; budget within the user's cap and above the estimate; different m
 depth and children within limits. Over MCP the blueprint is passed as YAML/JSON text and is never read from a file path.
 
 **Budget estimate.** One pass plus one review/rework cycle. A worker's pass costs its template's `base_runs` times `scale`
-(researcher 3, writer 2, engineer 4, fact-checker 2, reviewer 1, tester 2, code-reviewer 2) and its rework costs 1. A manager's
+(researcher 3, writer 2, engineer 4, fact-checker 2, reviewer 1, tester 2, code-reviewer 2, analyst 4, data-checker 2) and its rework costs 1. A manager's
 pass costs 2 plus one per direct report; its rework costs 2. The planned budget is the estimate times 1.25 unless
 `task.budget` is set. Managers get a written budget plan: initial grants equal the reports' pass runs and the rest stays with
 the manager as reserve for rework. Unspent runs return up the tree automatically (see the budget rule above), so the
 planned figure is what you authorize at most, and `progress` shows what was used and returned.
 
 **Role templates** live in `src/orgmcp/roles/*.md`: `manager`, `researcher`, `writer`, `reviewer`, `fact-checker`, `engineer`,
-`tester`, `code-reviewer`. Each has purpose, responsibilities, decision rights, escalation, quality bar, budget discipline and a
+`tester`, `code-reviewer`, `analyst`, `data-checker`. Each has purpose, responsibilities, decision rights, escalation, quality bar, budget discipline and a
 default tool set and model tier. Reviewers report findings and required changes to their manager and never edit another
 agent's file (the manager sends them back to the author with `revises`). `template:` plus a `charter:` adds your own text.
 
 What the templates add for verification and delegation:
 
-- Verifier templates now check exhaustively: the `fact-checker` writes a claim ledger of every factual statement, opens each cited source (the source must state the claim; homepages/repo roots that don't are "unsupported"), reports "n of m claims verified, k wrong, j unsupported" and fails the review unless n = m. The `reviewer` goes through the acceptance criteria one by one ("criteria met: n of m", pass only if n = m).
+- Verifier templates now check exhaustively. Fact-checking separates facts from judgement: a fact is any sentence with a number, name, version, licence, price, date or no/only/all, and it needs the page that states it and a verbatim quote; opinions go in a labelled section, uncited, resting on verified facts. The `fact-checker` writes a ledger of every factual claim, opens each cited source (homepages/repo roots that don't state the claim are "unsupported") and ends with the coverage line `n of m factual claims verified (n = m required); k wrong, u unsupported, p not-checkable; j judgement statements, each resting on verified facts: yes`; the manager pastes it verbatim in every `done`, and the review fails unless n = m. The `reviewer` goes through the acceptance criteria one by one ("criteria met: n of m", pass only if n = m).
+- Unverifiable claims are cut or reframed by the author, never re-sourced from memory; after one failed verification cycle the manager cuts instead of researching again, then escalates with options.
+- Verifiers get the project and the authors' workspaces read-only as `inputs` unless they can already write there; explicit `inputs` that hide the reviewed work raise the warning `verifier-cannot-read`.
+- `blueprint_example("analysis")`: data analysis with read-only data, a scratch workspace, an `analyst` and an independent `data-checker`. The data-checker recomputes the key figures with its own script and checks figures with their label: (label, number) pairs, not numbers alone.
 - `code-reviewer` now has `read` and `shell`: it runs the test suite and the commands named in the criteria and reports each command and result; it still never edits files (charter-enforced, since shell can't be confined). It needs a workspace, like the engineer.
 - `manager` verifies with its own `read` output (never memory or a report's claim), treats the verifier's coverage report as a precondition for `done`, and sends deviations back with `revises` or escalates instead of reporting `done`.
 - `writer`/`researcher`/`engineer`/`tester` got small additions: relevance over length, page-level citations with retrieval date, tests run before reporting, every criterion exercised with commands.
 
-So acceptance criteria should ask for the coverage report ("every claim verified, n = m"), not for "at least N" checks.
+So acceptance criteria should ask for the coverage report ("every factual claim verified, n = m"), not for "at least N" checks.
 
 **The assistant's playbook** is `skills/orgmcp/SKILL.md`: the precondition (use orgmcp or say it is unavailable), the one-message
 checklist, plan and approval, build and run, monitoring, and verification before delivery. The server's own instructions carry
@@ -284,7 +287,7 @@ organization to exist yet:
   `--root`). `status` and `whoami` end with a `scheduler: running (pid, since) / stopped` line.
 - Goal workflow tools (root only; see [Create an org from a goal](#create-an-org-from-a-goal)):
   - `blueprint_example(kind="research")`: a ready-to-edit YAML blueprint with a comment on every field and a schema
-    summary; `kind` is `research`, `documents` or `code`. Paths start in the server's working directory.
+    summary; `kind` is `research`, `documents`, `code` or `analysis`. Paths start in the server's working directory.
   - `propose_org(blueprint)`: blueprint as YAML/JSON text in (its description carries the compact schema), out: the
     **PLAN FOR YOU** block to show the user verbatim, the full details, and `plan_id`; writes nothing; works in setup mode.
   - `apply_org(blueprint, approved=False, plan_id=None)`: refuses unless `approved=True` and `plan_id` equals the id
@@ -422,7 +425,7 @@ without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first pri
 ## Test
 
 ```sh
-uv run pytest -q tests
+uv run pytest -q
 ```
 
 The tests use a deterministic fake agent (`tests/fake_agent.py`) in place of kiro. An autouse fixture

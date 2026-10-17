@@ -33,7 +33,7 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
    starts, and spend beyond budget); progress (default: one line when they ask).
 
 ## 2. Plan (never build before approval)
-1. `blueprint_example(kind)` with kind `research`, `documents` or `code` returns a YAML template with every field explained. Edit
+1. `blueprint_example(kind)` with kind `research`, `documents`, `code` or `analysis` (data from the user's files: read-only data, a checked script) returns a YAML template with every field explained. Edit
    it (replace every <PLACEHOLDER>, keep only what the user said) and call `propose_org(blueprint=<the YAML text>)`. It validates,
    writes nothing and returns the PLAN FOR YOU block, Details and a `plan_id`.
 2. Show the PLAN FOR YOU block to the user **exactly as written** (one plain-words intro line before it is fine). Do not
@@ -80,12 +80,12 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
    stays open/blocked, not done), or you started it with `until_done=False`.
 
 ## Blueprint rules
-Templates: manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer (or give `charter:` text).
+Templates: manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker (or give `charter:` text).
 The validator enforces: exact acceptance criteria and a deliverable; web tools for web needs; write+shell only with a workspace;
 a reviewer separate from the author who never edits others' files; budget within the user's cap and above the estimate; tiered
 models when asked. Criteria must be checkable ("at most 1500 words"), never "good quality". Example criteria: "Covers exactly the
-items the user listed", "A comparison table with one row per item", "The fact-checker's coverage report shows every claim
-verified (n of m, n = m)". The fact-checker and reviewer check everything, not a sample, so never ask for "at least N" checks.
+items the user listed", "A comparison table with one row per item", "The fact-checker's coverage report shows every factual
+claim verified (n of m, n = m)". The fact-checker and reviewer check everything, not a sample, so never ask for "at least N" checks.
 
 ## Files and access
 - `needs.inputs`: the user's folders. Agents may read them and can never change them (kiro enforces it per agent). `needs.workspace`:

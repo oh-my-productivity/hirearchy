@@ -220,7 +220,7 @@ def test_skill_and_instructions_mention_read_only_inputs_within_the_limits(root_
 def test_readme_documents_the_integrated_features():
     readme = (Path(__file__).resolve().parent.parent / "README.md").read_text()
     for needle in ("hire ... --inputs PATH", "`inputs` parameter of the `hire` tool", "`plan_id`", "blueprint_example(kind)",
-                   "progress(wait_seconds=N)", "--until-done", "n of m claims verified, k wrong, j unsupported",
+                   "progress(wait_seconds=N)", "--until-done", "n of m factual claims verified (n = m required); k wrong, u unsupported, p not-checkable; j judgement statements, each resting on verified facts: yes",
                    "`code-reviewer` now has `read` and `shell`", "`manager` verifies with its own `read` output",
                    "relevance over length", "same\n   computation as the `Access:` line"):
         assert needle in readme, needle

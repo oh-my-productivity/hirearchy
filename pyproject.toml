@@ -26,3 +26,6 @@ dev = [
 
 [tool.hatch.build.targets.wheel.force-include]
 "skills/orgmcp/SKILL.md" = "orgmcp/_skill/SKILL.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
