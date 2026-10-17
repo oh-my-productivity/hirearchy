@@ -195,3 +195,18 @@ def test_example_criteria_match_the_exhaustive_verifier_templates(root_server, c
     assert any("n of m claims verified with n = m" in c for c in research["task"]["acceptance"])
     # the wording asks for what the templates report
     assert "n of m claims verified" in bpm.get_role("fact-checker").body and "criteria met: n of m" in bpm.get_role("reviewer").body
+
+
+# ------------------------------------------------------------------------------ skill and instructions
+
+
+def test_skill_and_instructions_mention_read_only_inputs_within_the_limits(root_server):
+    from orgmcp.server import ROOT_INSTRUCTIONS
+    from orgmcp.skill import skill_source
+    skill = skill_source().read_text()
+    assert len(skill.splitlines()) <= 110 and len(ROOT_INSTRUCTIONS) < 2400
+    for needle in ("`needs.inputs`", "can never change them", "never give an agent the built-in `write` tool",
+                   "copy the deliverable", "NOT confined", "n of m, n = m"):
+        assert needle in skill, needle
+    assert "at least 6" not in skill and "never ask for \"at least N\"" in skill
+    assert "`needs.inputs` (read-only)" in root_server.instructions and "built-in `write` only for code" in root_server.instructions

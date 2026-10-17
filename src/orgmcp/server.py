@@ -45,6 +45,7 @@ When the user asks for an org, team or agents for a goal:
    acceptance criteria, sources/web, workspace and tests (code), budget in runs, models, review, approval.
 2. Start the blueprint from `blueprint_example(kind)` (research | documents | code), then call `propose_org`. Show the
    "PLAN FOR YOU" block exactly as returned and wait for the user's explicit approval. Fix errors; revise on feedback.
+   The user's own files go in `needs.inputs` (read-only); built-in `write` only for code.
 3. After approval: `create_org` (if none exists), `apply_org(blueprint, approved=True, plan_id=<from propose_org>)`,
    `start`. Spend beyond the plan needs their OK.
 4. Answer "status?" with `progress`. Never promise to tell the user later (a turn ends when you reply): if they want

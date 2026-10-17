@@ -24,8 +24,8 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
    directory (use the absolute path, e.g. `<cwd>/deliverables/<name>.md`) and say so plainly: "I'll put it in a new folder
    called deliverables here". Default: markdown, <= 1500 words.
 3. Acceptance criteria: the exact checks that decide done (counts, sections, numbers). Default: derived from 1-2, you list them.
-4. Sources: web with a URL per claim (`research`), or only the user's own files (`documents`: ask which folder). Default: web
-   for factual work.
+4. Sources: web with a URL per claim (`research`), or only the user's own files (`documents`: ask which folder; it goes into
+   `needs.inputs` as an absolute path of a folder that exists). Default: web for factual work.
 5. Code only: workspace (one new project directory), tests, packaging, commits. Default: tests per criterion, uv/pytest for
    Python, local commits, never push.
 6. Budget in runs (each agent wake-up is one run) and models. Default: the estimate + 25%; cheap model drafts, strong reviews.
@@ -75,4 +75,12 @@ Templates: manager, researcher, writer, reviewer, fact-checker, engineer, tester
 The validator enforces: exact acceptance criteria and a deliverable; web tools for web needs; write+shell only with a workspace;
 a reviewer separate from the author who never edits others' files; budget within the user's cap and above the estimate; tiered
 models when asked. Criteria must be checkable ("at most 1500 words"), never "good quality". Example criteria: "Covers exactly the
-items the user listed", "A comparison table with one row per item", "The fact-checker verified at least 6 claims".
+items the user listed", "A comparison table with one row per item", "The fact-checker's coverage report shows every claim
+verified (n of m, n = m)". The fact-checker and reviewer check everything, not a sample, so never ask for "at least N" checks.
+
+## Files and access
+- `needs.inputs`: the user's folders. Agents may read them and can never change them (kiro enforces it per agent). `needs.workspace`:
+  the one folder agents may write in, for code.
+- Non-code goals: never give an agent the built-in `write` tool unless the goal needs it. Agents write in their own folders and
+  you copy the deliverable to the requested path (step 5). The plan lists each agent's access; if it shows "NOT confined", that
+  is `shell`: only code goals get it, and they are told to stay in the workspace.
