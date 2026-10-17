@@ -1,0 +1,26 @@
+{
+  "name": "orgmcp-orgmcp-a4-1792270163-org-7c37f7",
+  "description": "internal: used by the orgmcp scheduler for /private/tmp/orgmcp-a4-1792270163/org; not a general-purpose agent",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "/Volumes/workspace/orgmcp/.venv/bin/orgmcp",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/private/tmp/orgmcp-a4-1792270163/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp"
+  ],
+  "allowedTools": [
+    "@orgmcp"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false
+}

@@ -1,0 +1,17 @@
+[tool] Reading analysis-draft.md:1
+[tool] status: Completed
+[tool] Running: set -e
+D=/tmp/orgmcp-a4-1792270163/deliverables
+mkdir -p $D
+cp /private/tmp/orgmcp-a4-1792270163/org/lead/writer/work/analysis-draft.md $D/competitors.md
+cat > $D/competitors-KNOWN-ISSUES.md <<'EOF...
+[tool] status: Completed
+I delivered the draft unchanged to `/tmp/orgmcp-a4-1792270163/deliverables/competitors.md`, but it is not fact-checked and has known errors. I also wrote `competitors-KNOWN-ISSUES.md` in the same folder, listing them.
+
+- **Met:** the five apps you listed, the comparison table with one row per app, and a final section called "Where we can win". The draft is 437 words, under the 1500 limit.
+- **Unmet:** the fact-check never passed. The table and the "Where we can win" section still contain claims the fact-checker flagged as wrong or unsupported:
+  - Joplin is shown as AGPL-3.0 throughout, but Joplin Server is proprietary and non-commercial only.
+  - Joplin sync lists Google Drive, which it doesn't support.
+  - The Logseq and Obsidian sync-service lists and the Trilium "Linux/Windows" claim aren't stated on the cited pages.
+  - Sources are listed per app, not per claim.
+- **Runs:** 23 of the 25 cap, so I stayed under it. The task is still marked blocked, not done, and the scheduler is stopped.
