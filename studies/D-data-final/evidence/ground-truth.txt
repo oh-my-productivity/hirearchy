@@ -1,0 +1,28 @@
+orders 3000 returned 216 rate 7.20%
+category
+  Home Textiles       451   59 13.08%
+  Furniture           239   24 10.04%
+  Outdoor Gear        317   22 6.94%
+  Kitchenware         465   30 6.45%
+  Garden              398   25 6.28%
+  Bath & Body         338   20 5.92%
+  Stationery          371   18 4.85%
+  Candles & Scents    421   18 4.28%
+channel
+  marketplace         901   82 9.10%
+  web                1340   98 7.31%
+  app                 759   36 4.74%
+region
+  East                794   60 7.56%
+  South               728   54 7.42%
+  West                673   47 6.98%
+  North               805   55 6.83%
+reasons [('Not as described', 52), ('Late delivery', 46), ('Wrong size/colour', 45), ('Changed mind', 42), ('Arrived damaged', 31)]
+North [('Wrong size/colour', 17), ('Arrived damaged', 12), ('Not as described', 11)]
+South [('Not as described', 17), ('Wrong size/colour', 14), ('Changed mind', 9)]
+East [('Not as described', 20), ('Changed mind', 15), ('Wrong size/colour', 12)]
+West [('Late delivery', 30), ('Changed mind', 8), ('Not as described', 4)]
+textiles web 207 16 7.73%
+textiles app 122 6 4.92%
+textiles marketplace 122 37 30.33%
+revenue 269787.23 returned value 23960.54 (8.88%)

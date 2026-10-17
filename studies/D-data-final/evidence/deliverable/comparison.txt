@@ -1,0 +1,141 @@
+rows                                               | report: 3000               | mine: 3000               | match
+distinct order_id                                  | report: 3000               | mine: 3000               | match
+blank cells (excl. return_reason)                  | report: 0                  | mine: 0                  | match
+orders dated outside 2025                          | report: 0                  | mine: 0                  | match
+returned orders without reason                     | report: 0                  | mine: 0                  | match
+returned values                                    | report: ['no', 'yes']      | mine: ['no', 'yes']      | match
+overall orders                                     | report: 3000               | mine: 3000               | match
+overall returns                                    | report: 216                | mine: 216                | match
+overall rate                                       | report: 7.2%               | mine: 7.2%               | match
+category Home Textiles orders                      | report: 451                | mine: 451                | match
+category Home Textiles returns                     | report: 59                 | mine: 59                 | match
+category Home Textiles rate                        | report: 13.1%              | mine: 13.1%              | match
+category Furniture orders                          | report: 239                | mine: 239                | match
+category Furniture returns                         | report: 24                 | mine: 24                 | match
+category Furniture rate                            | report: 10.0%              | mine: 10.0%              | match
+category Outdoor Gear orders                       | report: 317                | mine: 317                | match
+category Outdoor Gear returns                      | report: 22                 | mine: 22                 | match
+category Outdoor Gear rate                         | report: 6.9%               | mine: 6.9%               | match
+category Kitchenware orders                        | report: 465                | mine: 465                | match
+category Kitchenware returns                       | report: 30                 | mine: 30                 | match
+category Kitchenware rate                          | report: 6.5%               | mine: 6.5%               | match
+category Garden orders                             | report: 398                | mine: 398                | match
+category Garden returns                            | report: 25                 | mine: 25                 | match
+category Garden rate                               | report: 6.3%               | mine: 6.3%               | match
+category Bath & Body orders                        | report: 338                | mine: 338                | match
+category Bath & Body returns                       | report: 20                 | mine: 20                 | match
+category Bath & Body rate                          | report: 5.9%               | mine: 5.9%               | match
+category Stationery orders                         | report: 371                | mine: 371                | match
+category Stationery returns                        | report: 18                 | mine: 18                 | match
+category Stationery rate                           | report: 4.9%               | mine: 4.9%               | match
+category Candles & Scents orders                   | report: 421                | mine: 421                | match
+category Candles & Scents returns                  | report: 18                 | mine: 18                 | match
+category Candles & Scents rate                     | report: 4.3%               | mine: 4.3%               | match
+number of categories in data                       | report: 8                  | mine: 8                  | match
+sum of category orders                             | report: 3000               | mine: 3000               | match
+channel marketplace orders                         | report: 901                | mine: 901                | match
+channel marketplace returns                        | report: 82                 | mine: 82                 | match
+channel marketplace rate                           | report: 9.1%               | mine: 9.1%               | match
+channel web orders                                 | report: 1340               | mine: 1340               | match
+channel web returns                                | report: 98                 | mine: 98                 | match
+channel web rate                                   | report: 7.3%               | mine: 7.3%               | match
+channel app orders                                 | report: 759                | mine: 759                | match
+channel app returns                                | report: 36                 | mine: 36                 | match
+channel app rate                                   | report: 4.7%               | mine: 4.7%               | match
+number of channels in data                         | report: 3                  | mine: 3                  | match
+highest-rate category                              | report: Home Textiles      | mine: Home Textiles      | match
+highest-rate channel                               | report: marketplace        | mine: marketplace        | match
+F1 HT x marketplace orders                         | report: 122                | mine: 122                | match
+F1 HT x marketplace returns                        | report: 37                 | mine: 37                 | match
+F1 HT x marketplace rate                           | report: 30.3%              | mine: 30.3%              | match
+F1 all other orders orders                         | report: 2878               | mine: 2878               | match
+F1 all other orders returns                        | report: 179                | mine: 179                | match
+F1 all other orders rate                           | report: 6.2%               | mine: 6.2%               | match
+F1 Linen throw x marketplace orders                | report: 33                 | mine: 33                 | match
+F1 Linen throw x marketplace returns               | report: 15                 | mine: 15                 | match
+F1 Linen throw x marketplace rate                  | report: 45.5%              | mine: 45.5%              | match
+F1 Wool blanket x marketplace orders               | report: 26                 | mine: 26                 | match
+F1 Wool blanket x marketplace returns              | report: 10                 | mine: 10                 | match
+F1 Wool blanket x marketplace rate                 | report: 38.5%              | mine: 38.5%              | match
+F1 worst two HT-marketplace products               | report: ['Linen throw', 'Wool blanket'] | mine: ['Linen throw', 'Wool blanket'] | match
+F1 share of returns from slice 37/216              | report: 37                 | mine: 37                 | match
+F2 HT on web/app orders                            | report: 329                | mine: 329                | match
+F2 HT on web/app returns                           | report: 22                 | mine: 22                 | match
+F2 HT on web/app rate                              | report: 6.7%               | mine: 6.7%               | match
+F2 marketplace other categories orders             | report: 779                | mine: 779                | match
+F2 marketplace other categories returns            | report: 45                 | mine: 45                 | match
+F2 marketplace other categories rate               | report: 5.8%               | mine: 5.8%               | match
+F3 price >=100 orders                              | report: 568                | mine: 568                | match
+F3 price >=100 returns                             | report: 55                 | mine: 55                 | match
+F3 price >=100 rate                                | report: 9.7%               | mine: 9.7%               | match
+F3 price <20 orders                                | report: 556                | mine: 556                | match
+F3 price <20 returns                               | report: 27                 | mine: 27                 | match
+F3 price <20 rate                                  | report: 4.9%               | mine: 4.9%               | match
+F3 price >=100 excl hot orders                     | report: 540                | mine: 540                | match
+F3 price >=100 excl hot returns                    | report: 52                 | mine: 52                 | match
+F3 price >=100 excl hot rate                       | report: 9.6%               | mine: 9.6%               | match
+F3 price <20 excl hot orders                       | report: 554                | mine: 554                | match
+F3 price <20 excl hot returns                      | report: 26                 | mine: 26                 | match
+F3 price <20 excl hot rate                         | report: 4.7%               | mine: 4.7%               | match
+F3 web price >=100 orders                          | report: 256                | mine: 256                | match
+F3 web price >=100 returns                         | report: 32                 | mine: 32                 | match
+F3 web price >=100 rate                            | report: 12.5%              | mine: 12.5%              | match
+F3 web price <20 orders                            | report: 261                | mine: 261                | match
+F3 web price <20 returns                           | report: 10                 | mine: 10                 | match
+F3 web price <20 rate                              | report: 3.8%               | mine: 3.8%               | match
+F3 marketplace price >=100 orders                  | report: 169                | mine: 169                | match
+F3 marketplace price >=100 returns                 | report: 16                 | mine: 16                 | match
+F3 marketplace price >=100 rate                    | report: 9.5%               | mine: 9.5%               | match
+F3 marketplace price <20 orders                    | report: 155                | mine: 155                | match
+F3 marketplace price <20 returns                   | report: 11                 | mine: 11                 | match
+F3 marketplace price <20 rate                      | report: 7.1%               | mine: 7.1%               | match
+F3 app price >=100 orders                          | report: 143                | mine: 143                | match
+F3 app price >=100 returns                         | report: 7                  | mine: 7                  | match
+F3 app price >=100 rate                            | report: 4.9%               | mine: 4.9%               | match
+F3 app price <20 orders                            | report: 140                | mine: 140                | match
+F3 app price <20 returns                           | report: 6                  | mine: 6                  | match
+F3 app price <20 rate                              | report: 4.3%               | mine: 4.3%               | match
+F3 Furniture orders                                | report: 239                | mine: 239                | match
+F3 Furniture returns                               | report: 24                 | mine: 24                 | match
+F3 Furniture rate                                  | report: 10.0%              | mine: 10.0%              | match
+F3 region min rate                                 | report: 6.8%               | mine: 6.8%               | match
+F3 region max rate                                 | report: 7.6%               | mine: 7.6%               | match
+F3 quantity 4 orders                               | report: 100                | mine: 100                | match
+F3 quantity 4 returns                              | report: 10                 | mine: 10                 | match
+F3 quantity 4 rate                                 | report: 10.0%              | mine: 10.0%              | match
+reasons total                                      | report: 216                | mine: 216                | match
+reason Not as described count                      | report: 52                 | mine: 52                 | match
+reason Not as described share                      | report: 24.1%              | mine: 24.1%              | match
+reason Late delivery count                         | report: 46                 | mine: 46                 | match
+reason Late delivery share                         | report: 21.3%              | mine: 21.3%              | match
+reason Wrong size/colour count                     | report: 45                 | mine: 45                 | match
+reason Wrong size/colour share                     | report: 20.8%              | mine: 20.8%              | match
+reason Changed mind count                          | report: 42                 | mine: 42                 | match
+reason Changed mind share                          | report: 19.4%              | mine: 19.4%              | match
+reason Arrived damaged count                       | report: 31                 | mine: 31                 | match
+reason Arrived damaged share                       | report: 14.4%              | mine: 14.4%              | match
+HT-mkt reason Not as described count               | report: 13                 | mine: 13                 | match
+HT-mkt reason Not as described share               | report: 35.1%              | mine: 35.1%              | match
+HT-mkt reason Wrong size/colour count              | report: 9                  | mine: 9                  | match
+HT-mkt reason Wrong size/colour share              | report: 24.3%              | mine: 24.3%              | match
+HT-mkt most common reason                          | report: Not as described   | mine: Not as described   | match
+HT-mkt second reason                               | report: Wrong size/colour  | mine: Wrong size/colour  | match
+R2 HT-mkt South orders                             | report: 43                 | mine: 43                 | match
+R2 HT-mkt South returns                            | report: 17                 | mine: 17                 | match
+R2 HT-mkt South rate                               | report: 39.5%              | mine: 39.5%              | match
+R2 HT-mkt West orders                              | report: 27                 | mine: 27                 | match
+R2 HT-mkt West returns                             | report: 10                 | mine: 10                 | match
+R2 HT-mkt West rate                                | report: 37.0%              | mine: 37.0%              | match
+R2 HT-mkt East orders                              | report: 23                 | mine: 23                 | match
+R2 HT-mkt East returns                             | report: 3                  | mine: 3                  | match
+R2 HT-mkt East rate                                | report: 13.0%              | mine: 13.0%              | match
+R2/caveat: regional groups in slice 'range 23 to 43 orders each' (min,max) | report: (23, 43)           | mine: (23, 43)           | match
+R2 HT-mkt North orders                             | report: 29                 | mine: 29                 | match
+R2 HT-mkt North returns                            | report: 7                  | mine: 7                  | match
+R2 HT-mkt North rate                               | report: 24.1%              | mine: 24.1%              | match
+R2 HT-mkt regional orders sum to 122               | report: 122                | mine: 122                | match
+R2 HT-mkt regions are exactly 4                    | report: 4                  | mine: 4                  | match
+R2 South highest, then West, then North, East      | report: ['South', 'West', 'North', 'East'] | mine: ['South', 'West', 'North', 'East'] | match
+R3 price>=100 rate                                 | report: 9.7%               | mine: 9.7%               | match
+
+139 of 139 numbers match

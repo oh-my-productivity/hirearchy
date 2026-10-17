@@ -1,0 +1,11 @@
+[tool] Running: @orgmcp/create_org
+[tool] status: Completed
+[tool] Running: @orgmcp/apply_org
+[tool] status: Completed
+[tool] Running: @orgmcp/start
+[tool] status: Completed
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+[tool] Running: @orgmcp/progress

@@ -1,0 +1,24 @@
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m55pbt1pe07vzzh9n1ywcemb","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+[tool] Reading SKILL.md:1, listing orgmcp-d-1792266290
+[tool] Running: @orgmcp/whoami
+[tool] Running: @orgmcp/status
+[tool] status: Completed
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: head -4 data/orders_2025.csv; wc -l data/orders_2025.csv
+[tool] status: Completed
+I found the export at `data/orders_2025.csv`. It has about 3,000 orders with these columns: category, product, price, quantity, region, channel, returned (yes/no) and return reason. Before I propose a team, I need a few answers. Reply "defaults" to accept everything I've proposed.
+
+1. **Scope.** I'd analyze return rates by category, product, region, channel, price band and quantity, plus the stated return reasons. If you have specific hypotheses, such as a product line or channel you suspect, tell me and I'll add them. Should anything be left out?
+2. **Deliverable.** Default: a markdown report of at most 1,500 words, in a new `deliverables/` folder here (`/private/tmp/orgmcp-d-1792266290/deliverables/returns-drivers.md`). It would have a ranked list of drivers, with the numbers behind each.
+3. **Acceptance criteria.** Default checks:
+   - The report uses only `orders_2025.csv`.
+   - It covers return rate by category, region, channel and price band, plus a breakdown of return reasons.
+   - It names the top drivers, ranked, each with its figures.
+   - Every figure is recomputed and checked by a second agent.
+   - It says plainly where the data can't show a cause (the export shows correlation, not cause).
+4. **Sources.** Only your file (no web). The `data` folder would be read-only for the team.
+5. **Budget and models.** Default: the plan's estimate plus 25%, with a cheaper model drafting and a stronger one reviewing. I'll show the exact number in the plan.
+6. **Review and approval.** Default: a separate agent reviews the work, you approve the plan before anything starts, and I give you a one-line status whenever you ask.
+
+Is the export complete for the whole year, and are there any definitions I should use, such as whether "returned" includes partial returns?
