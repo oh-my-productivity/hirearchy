@@ -105,7 +105,7 @@ def test_qa3_retiring_a_running_agent_does_not_crash_the_scheduler(org):
 
 
 def test_qa4_oversized_message_does_not_wedge_the_agent(org, tmp_path, monkeypatch):
-    monkeypatch.setattr("orgmcp.scheduler.ensure_kiro_profile", lambda tools: "orgmcp")
+    monkeypatch.setattr("orgmcp.scheduler.ensure_kiro_profile", lambda tools, org=None: "orgmcp")
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     org.send(ROOT, "ceo", "x" * 3_000_000)  # a single long result/note is enough
     sched = Scheduler(org, kiro_runner(TRUE), echo=lambda _: None)  # `true` stands in for kiro-cli

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from orgmcp import scheduler as sched_mod
 from orgmcp.core import ROOT, OrgError, utcnow
-from orgmcp.scheduler import Scheduler, ensure_kiro_profile
+from orgmcp.scheduler import Scheduler, ensure_kiro_profile, kiro_profile_name
 
 
 def real_agent_profiles() -> dict[str, int]:
@@ -34,30 +34,31 @@ def test_default_kiro_runner_in_tests_writes_nothing_under_the_real_home(org, is
         run_to_idle(sched)
     finally:
         sched.release()
-    assert (isolated_kiro / ".kiro" / "agents" / "orgmcp.json").is_file()  # the profile went to the sandbox
-    assert "--agent orgmcp" in (isolated_kiro / "kiro-stub.log").read_text()  # and the stub, not kiro, ran
+    name = kiro_profile_name(org.root, [])
+    assert (isolated_kiro / ".kiro" / "agents" / f"{name}.json").is_file()  # the profile went to the sandbox
+    assert f"--agent {name}" in (isolated_kiro / "kiro-stub.log").read_text()  # and the stub, not kiro, ran
     assert real_agent_profiles() == before
 
 
-def test_ensure_kiro_profile_resolves_the_directory_at_call_time(isolated_kiro, tmp_path, monkeypatch):
+def test_ensure_kiro_profile_resolves_the_directory_at_call_time(org, isolated_kiro, tmp_path, monkeypatch):
     elsewhere = tmp_path / "elsewhere"
     monkeypatch.setattr(sched_mod, "KIRO_AGENTS_DIR", elsewhere)
-    ensure_kiro_profile(["read"])
-    assert (elsewhere / "orgmcp-read.json").is_file()
-    assert not (isolated_kiro / ".kiro" / "agents" / "orgmcp-read.json").exists()
+    name = ensure_kiro_profile(["read"], org=org)
+    assert (elsewhere / f"{name}.json").is_file()
+    assert not (isolated_kiro / ".kiro" / "agents" / f"{name}.json").exists()
 
 
-def test_ensure_kiro_profile_is_atomic_and_idempotent(tmp_path):
+def test_ensure_kiro_profile_is_atomic_and_idempotent(org, tmp_path):
     d = tmp_path / "agents"
-    ensure_kiro_profile([], d)
-    path = d / "orgmcp.json"
+    name = ensure_kiro_profile([], d, org=org)
+    path = d / f"{name}.json"
     path.write_text("{ not json")  # a corrupt profile is repaired, not fatal
-    ensure_kiro_profile([], d)
+    ensure_kiro_profile([], d, org=org)
     assert path.read_text().startswith("{") and '"orgmcp"' in path.read_text()
     mtime = path.stat().st_mtime_ns
-    ensure_kiro_profile([], d)
+    ensure_kiro_profile([], d, org=org)
     assert path.stat().st_mtime_ns == mtime  # unchanged profile is not rewritten
-    assert [p.name for p in d.iterdir()] == ["orgmcp.json"]  # no temp files left behind
+    assert [p.name for p in d.iterdir()] == [f"{name}.json"]  # no temp files left behind
 
 
 # ------------------------------------------------------------ QA-5: fault isolation
