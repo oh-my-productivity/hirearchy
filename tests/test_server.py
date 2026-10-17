@@ -43,5 +43,5 @@ def test_rule_violations_are_reported_as_tool_errors(org):
 def test_tool_list(org):
     names = {t.name for t in asyncio.run(build_server(org, "ceo").list_tools())}
     assert names == {
-        "whoami", "inbox", "delegate", "report", "send", "hire", "retire", "read", "write", "status", "health",
+        "whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health",
     }

@@ -33,26 +33,27 @@ Call whoami first if you do not know your role, reports, budget and open tasks.
 
 ROOT_INSTRUCTIONS = """\
 You are connected to ONE orgmcp organization as `root`, the human's seat. {where}
-- Use only this organization. Never look for, create or modify another one (no other paths, shell or CLI
-  workarounds, ORG_ROOT changes).
-- Never claim the organization did work unless orgmcp tools show it (status, progress, inbox, read, health).
-- If an orgmcp tool fails, tell the user what failed instead of substituting another mechanism (e.g. a
-  subagent).
-- `whoami` and `status` show the state; `start` and `stop` control the scheduler that wakes the agents.
+- Use only this organization: never look for, create or modify another (no other paths, workarounds,
+  ORG_ROOT changes).
+- Never claim the organization did work unless orgmcp tools show it.
+- If an orgmcp tool fails, tell the user instead of substituting another mechanism.
+- `whoami` and `status` show the state; `start`/`stop` control the scheduler.
 When the user asks for an org, team or agents for a goal:
-1. Ask what you need in ONE message. Propose defaults only where a generic one exists; a list the user did not give
-   (scope items, competitors, features, source files) you ASK for, never invent. Default deliverable place: a new
-   `deliverables/` folder in the user's current directory, said plainly. Also ask: format, length, exact checkable
-   criteria, sources/web, workspace and tests (code), budget in runs, models, review, approval.
-2. Start the blueprint from `blueprint_example(kind)` (research | documents | code), then call `propose_org`. Show the
+1. Ask what you need in ONE message. Propose defaults only where a generic one exists; ASK for any list the user did not
+   give (scope items, source files), never invent. Default deliverable place: a new
+   `deliverables/` folder in the user's current directory (say so). Also ask: format, length, exact checkable
+   criteria, sources/web, workspace and tests (code), budget in runs, models (if cheap: keep the lead and final verifier
+   strong; the lead decides how every other run is spent), review, approval.
+2. Start the blueprint from `blueprint_example(kind)`, then `propose_org`. Show the
    "PLAN FOR YOU" block exactly as returned. Fix errors; settle its warnings (e.g. model policy) with the user
    or state them; wait for approval. The user's own files go in `needs.inputs` (read-only);
    built-in `write` only for code.
 3. After approval: `create_org` (if none exists), `apply_org(blueprint, approved=True, plan_id=<from propose_org>)`,
-   `start`. Spend beyond the plan needs their OK: ask at the FIRST budget request, not after the reserve is gone.
-4. Answer "status?" with `progress`. Never promise to tell the user later (a turn ends when you reply): to be told when
+   `start`. Spend beyond the plan needs their OK: ask at the FIRST budget request, not after the reserve is gone;
+   first check `status` for stranded runs and `reclaim` them (or tell the lead to).
+4. Answer "status?" with `progress`. Never promise to tell the user later (your turn ends at the reply): to be told when
    it is done, say you will wait now and call `progress(wait_seconds=N)`, repeating as they wish; else tell them to
-   ask "status?". Relay escalations with a recommended decision.
+   ask "status?". Relay escalations with a recommendation.
 5. When it is done: read the deliverable and check it against EVERY acceptance criterion (send it back with
    `delegate(..., revises=...)` if not; never patch it yourself), copy it where the user wants it. `start` ends by
    itself when the work is done (start again after giving it more work); `stop` only if the user cancels, declines
@@ -244,12 +245,29 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
         you reply to (set reply_to to its id). budget: runs to move along with the note (optional): extra runs
         granted to a direct report, or unneeded runs given back to your PARENT (never to a sibling). Runs you
         have left return to your parent by themselves with your final `done`/`failed` report when nothing else
-        is open for you; use this only to give some back earlier.
+        is open for you; use this only to give some back earlier. To pull unspent runs BACK from an idle direct
+        report instead (budget stranded in a team that cannot use it), use `reclaim`.
         """
         org = binding.get()
         msg = org.send(me, to, body, title=title, reply_to=reply_to, budget=budget)
         moved = f" with {msg.budget} run(s) of budget" if msg.budget else ""
         return f"sent {msg.id} to {msg.to}{moved}"
+
+    @mcp.tool()
+    def reclaim(report: str, budget: int | None = None) -> str:
+        """Pull unspent budget back from one of your DIRECT reports (a manager from its team; root from its top agents).
+
+        report: its short name or address. budget: how many runs (default: all it has left). Only an idle report:
+        no open task, nothing delegated and outstanding, not running, no unread mail that would wake it; otherwise the
+        call is refused and says why. Not from deeper down (a manager reclaims from its own reports). The report is
+        not woken and gets no message; you get the runs (they join your budget at once, and then a delegation or
+        `send(..., budget=N)` can move them to whoever needs them). Use it before asking your parent for more runs
+        while a sibling team sits on unspent ones.
+        """
+        org = binding.get()
+        msg = org.reclaim(me, report, budget)
+        left = "" if me == ROOT else f" Your budget is now {org.budget(me)}."
+        return f"reclaimed {msg.budget} run(s) from {msg.sender}.{left}"
 
     @mcp.tool()
     def hire(
@@ -467,12 +485,19 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
         """One plain status line per task you (root) gave, then what needs your decision, then the scheduler. Read-only.
 
         Per task: working / waiting on <agent> / stalled / blocked: <reason> / done / failed, who is busy, runs used
-        of the budget given, time since the last activity, and for finished tasks the artifact paths and the runs
-        returned. task_id: only that task, in any state (default: open tasks and those finished in the last day).
+        of the budget given (all runs of the task's team since it was given, against its budget plus every later grant),
+        time since the last activity, and for finished tasks the artifact paths and the runs returned. "Needs you"
+        lists every unread note, escalation, budget request, blocked/failed result and runtime notice, with its id.
+        task_id: only that task, in any state (default: open tasks and those finished in the last day).
         wait_seconds (0-900, default 0): first wait until a task finishes, fails, blocks or stalls, or something new
-        needs the user, or the time is up, then answer; the answer starts with what changed. Use it when the user
-        wants to be told when the work is done: tell them you will wait now, call progress(wait_seconds=...) and
-        repeat as long as they want (a turn cannot notify them later). Without wait_seconds it answers "status?".
+        needs the user, or the time is up, then answer; the answer starts with what changed. A task counts as in
+        progress, so the wait really waits, while its state is working/waiting, and also while it is blocked or
+        stalled but an agent below it is running or can run (unread mail that wakes it, budget left): for example the
+        lead of a blocked task right after you granted it runs and called start. It answers at once only when nothing
+        in the org can run, and ends early when the last thing that could run stops. Use it when the user wants to be
+        told when the work is done: tell them you will wait now, call progress(wait_seconds=...) and repeat as long
+        as they want (a turn cannot notify them later). Never poll with shell sleeps. Without wait_seconds it answers
+        "status?".
         """
         if binding.peek() is None:
             return setup_state(binding)
