@@ -10,6 +10,16 @@ nothing is happening), ``blocked: <reason>``, ``done``, ``failed``.
 
 ``wait_seconds`` turns the call into a wait: it polls the same files (read-only: no locks, nothing written) until a
 task changes state (done, failed, blocked, stalled), something new needs the human, or the time is up.
+
+A task counts as in progress (so a wait really waits) when its state is ``working`` or ``waiting``, or when it is
+``blocked``/``stalled`` but some agent in its subtree is running, or could run now: unread mail that wakes it, budget
+left, not paused (a root task is ``blocked`` while its lead is about to work on the budget root just granted). Only
+when nothing in the org can run does a wait return at once, and a wait that began with such work also ends as soon as
+the last of it stops, instead of running out the clock.
+
+Runs per task: every run of any agent in the task's subtree from the task's creation to its final result
+(``done``/``failed``; ``blocked`` is not final) or now, against everything root sent into that subtree for the task
+(the task's budget plus later grants).
 """
 
 from __future__ import annotations
@@ -42,10 +52,11 @@ def progress(org: Org, task_id: str | None = None, now: datetime | None = None, 
     if wait <= 0:
         return _render(org, task_id, now)
     before = _snapshot(org, task_id)
-    if not any(c in ("working", "waiting") for c, _, _ in before[0].values()):
+    if not _in_progress(before[0], before[2]):
         return "Nothing to wait for: no listed task is being worked on right now.\n" + _render(org, task_id, now)
     start = clock()
     suspect: set[str] = set()  # tasks seen stalled once: confirmed on the next look, so a hand-over is not a stall
+    idle = 0  # consecutive looks at which nothing in the org could run any more
     while True:
         left = wait - (clock() - start)
         sleep(max(0.0, min(poll, left)))
@@ -54,6 +65,10 @@ def progress(org: Org, task_id: str | None = None, now: datetime | None = None, 
         waited = _duration(max(0.0, clock() - start))
         if changes:
             return f"Changed after waiting {waited}: " + "; ".join(changes) + "\n" + _render(org, task_id, now)
+        idle = 0 if _in_progress(after[0], after[2]) else idle + 1
+        if idle >= 2:  # twice in a row, so the gap between one run ending and the next starting is not mistaken for it
+            return (f"Stopped after waiting {waited}: nothing in the org can run any more and no task finished. "
+                    "It needs a decision, budget or a restart (see below).\n" + _render(org, task_id, now))
         if clock() - start >= wait:
             return (f"Waited {waited}: no task finished, got blocked or stalled, and nothing new needs you. "
                     "Call progress(wait_seconds=...) again to keep waiting.\n" + _render(org, task_id, now))
@@ -84,6 +99,9 @@ def describe_progress(org: Org, task_id: str | None = None, wait_seconds: int = 
         sched += " - open tasks do not move until it is started (start() or `orgmcp run`)"
         if wait_seconds:
             wait_seconds, note = 0, "Not waiting: no scheduler is running, so nothing will change. "
+    elif stopped and wait_seconds and work_in_flight(org, task_id):  # e.g. a blocked task whose lead was just granted runs
+        sched += " - agents have work they could do, but nothing moves until it is started (start() or `orgmcp run`)"
+        wait_seconds, note = 0, "Not waiting: no scheduler is running, so nothing will change. "
     return f"{note}{progress(org, task_id, wait_seconds=wait_seconds)}\n{sched}"
 
 
@@ -105,19 +123,45 @@ def _render(org: Org, task_id: str | None, now: datetime | None) -> str:
     return "\n".join(lines)
 
 
-def _snapshot(org: Org, task_id: str | None) -> tuple[dict[str, tuple[str, str, str]], dict[str, str]]:
-    """(task id -> (state class, title, state text), message id -> line of what needs the human). Read-only."""
+def _can_run(org: Org, addr: str) -> bool:
+    """Is ``addr`` running, or would a scheduler start it now (unread mail that wakes it, budget left, not paused)?"""
+    if org.running(addr):
+        return True
+    return bool(org.unread(addr)) and (org.budget(addr) or 0) > 0 and org.paused(addr) in (None, "budget")
+
+
+def _alive(org: Org, team: list[str]) -> bool:
+    return any(_can_run(org, a) for a in team)
+
+
+def _in_progress(states: dict[str, tuple[str, str, str]], alive: set[str]) -> bool:
+    """Does any listed task still move? working/waiting always; blocked/stalled while someone below can run."""
+    return any(c in ("working", "waiting") or (c in ("blocked", "stalled") and tid in alive) for tid, (c, _, _) in states.items())
+
+
+def work_in_flight(org: Org, task_id: str | None = None) -> bool:
+    """Could anything move for the listed root tasks right now (see :func:`_in_progress`)? Read-only."""
+    states, _, alive = _snapshot(org, task_id)
+    return _in_progress(states, alive)
+
+
+def _snapshot(org: Org, task_id: str | None) -> tuple[dict[str, tuple[str, str, str]], dict[str, str], set[str]]:
+    """(task id -> (state class, title, state text), message id -> line of what needs the human, ids of the tasks that
+    have an agent below them that is running or can run now). Read-only."""
     tasks = [m for m in org.sent(ROOT) if m.type == "task"]
     results = latest_results(org.received(ROOT))
     now = utcnow()
     states: dict[str, tuple[str, str, str]] = {}
+    alive: set[str] = set()
     for t in tasks:
         if (task_id and t.id != task_id) or (not task_id and not _listed(results.get(t.id), now)):
             continue
         team = [a for a in org.subtree(t.to) if a != ROOT] if org.exists(t.to) else []
         state = _state(org, t, results.get(t.id), team)[0]
         states[t.id] = (re.split(r"[ :(]", state, 1)[0], t.title, state)
-    return states, dict(_human_items(org))
+        if _alive(org, team):
+            alive.add(t.id)
+    return states, dict(_human_items(org)), alive
 
 
 def _changes(before, after, suspect: set[str]) -> tuple[list[str], set[str]]:
@@ -192,21 +236,30 @@ def _state(org: Org, task: Message, result: Message | None, team: list[str]) -> 
 
 
 def _runs(org: Org, task: Message, result: Message | None, team: list[str]) -> str:
-    """Runs the team started while this task was open, against the budget root gave for it (task + later grants)."""
-    start, end = _stamp(task.id), (_stamp(result.id) if result is not None else None)
+    """Runs the team made for this task, against everything root put into the team for it.
 
-    def inside(t: datetime | None) -> bool:
-        return t is not None and (start is None or t >= start) and (end is None or t <= end)
+    Runs: every run log of every agent in the subtree from the task's creation to its *final* result (``done`` or
+    ``failed``; a ``blocked`` one is not final: the team may be given more budget and go on) or now. It ends early
+    only where root's next task to the same assignee begins, so overlapping tasks do not count a run twice. Run logs
+    are files, so scheduler restarts and extra grants change nothing. Budget: the task's own plus every later grant
+    (a note from root carrying budget to an agent of the team) in the same window.
+    """
+    start = task.id[:21]
+    end = result.id[:21] if result is not None and result.status in ("done", "failed") else None
+    later = [t.id[:21] for t in org.sent(ROOT) if t.type == "task" and t.to == task.to and t.id > task.id]
+    if later and (end is None or later[0] < end):
+        end = later[0]
+
+    def inside(name: str) -> bool:
+        return name[:21] >= start and (end is None or name[:21] <= end)
 
     used = 0
     for a in team:
         d = org.dir(a) / "runs"
-        used += sum(
-            1 for n in (os.listdir(d) if d.is_dir() else [])
-            if n.endswith(".log") and not n.startswith(".") and inside(_stamp(n))
-        )
+        used += sum(1 for n in (os.listdir(d) if d.is_dir() else []) if n.endswith(".log") and not n.startswith(".") and inside(n))
+    members = set(team)
     given = task.budget + sum(
-        m.budget for m in org.sent(ROOT) if m.to == task.to and m.type == "note" and inside(_stamp(m.id))
+        m.budget for m in org.sent(ROOT) if m.type == "note" and m.to in members and inside(m.id)
     )
     text = f"runs {used} of {given}"
     if result is not None and result.budget:
@@ -266,8 +319,10 @@ def _short(text: str, limit: int = SHORT) -> str:
 
 
 def _human_items(org: Org) -> list[tuple[str, str]]:
-    """(message id, line) for each unread root message that asks for a decision: blocked or failed results, notes,
-    runtime notices."""
+    """(message id, line) for each unread root message that asks for a decision: blocked or failed results and every
+    note or runtime notice (budget requests, questions, escalations), oldest first, each as one line with its id.
+    Not listed: a ``done`` result (the task line already summarises it) and quiet notices (``wake: false``: budget
+    returned or reclaimed, refunds), which only carry runs."""
     out = []
     for m in org.messages(ROOT, "inbox"):
         if not m.wake or (m.type == "result" and m.status == "done"):
@@ -276,7 +331,7 @@ def _human_items(org: Org) -> list[tuple[str, str]]:
             what, text = f"{m.status} result from {m.sender}", _summary(m)
         else:
             what = "runtime notice" if m.sender == "runtime" else f"note from {m.sender}"
-            text = (m.body.splitlines() or [""])[0]
+            text = next((line.strip() for line in m.body.splitlines() if line.strip()), "")
         title = f' "{m.title}"' if m.title else ""
         out.append((m.id, f"Needs you: {what}{title}" + (f": {_short(text)}" if text else "") + f" (message {m.id})"))
     return out
