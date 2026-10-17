@@ -439,7 +439,41 @@ def _resolve(bp: dict, org: Org | None, roots: list[Path], issues: list[Issue]) 
     for a in agents:
         if a.parent is None:
             settle(a)
+    _verifier_inputs(agents, by, project_ws)
     return agents
+
+
+def review_roots(agents: list[Agent], project_ws: Path | None) -> list[Path]:
+    """The folders the work under review lives in: the project workspace and every author's workspace."""
+    roots = [project_ws] if project_ws else []
+    roots += [Path(x.workspace) for x in agents if x.kind == "author" and x.workspace and any(t in x.tools for t in WRITE_TOOLS)]
+    return list(dict.fromkeys(roots))
+
+
+def _verifier_inputs(agents: list[Agent], by: dict[str, Agent], project_ws: Path | None) -> None:
+    """A verifier reads what it reviews: the project workspace and the authors' workspaces become read-only ``inputs``
+    wherever it has no write access to them (orgmcp ``read`` accepts paths inside a caller's inputs; kiro ``read`` too
+    when it holds that tool). An explicit ``inputs`` list is the blueprint's decision; ``validate`` warns when it falls
+    short. Managers hold the union of their reports' inputs, so authority keeps narrowing."""
+    roots = review_roots(agents, project_ws)
+    for a in reversed(agents):  # reports before their manager
+        explicit = "inputs" in a.raw
+        if a.kind == "verifier" and not a.children and not explicit:
+            parent = by.get(a.parent) if a.parent else None
+            own = Path(a.workspace) if a.workspace else None
+            for r in roots:
+                if own and (_within(r, own) or _within(own, r)):
+                    continue  # its own workspace (writable) or a folder around it: no read-only copy of that
+                if parent and ("inputs" in parent.raw or "workspace" in parent.raw):
+                    held = [Path(b) for b in (parent.workspace, *parent.inputs) if b]
+                    if not any(_within(r, b) for b in held):
+                        continue  # the manager could not hand it down; validate warns
+                if str(r) not in a.inputs:
+                    a.inputs.append(str(r))
+        elif a.children and not explicit:
+            base = Path(a.workspace) if a.workspace else None
+            ins = [p for c in a.children for p in by[c].inputs]
+            a.inputs = list(dict.fromkeys(p for p in ins if not (base and _within(Path(p), base))))
 
 
 # ------------------------------------------------------------------------------------------- estimate
@@ -451,7 +485,7 @@ def estimate(agents: list[Agent]) -> dict:
     Per agent, one *pass* of the work and one *rework* cycle (one review finds problems, the author fixes them):
 
     * worker (author or verifier): ``pass = template.base_runs * scale`` (researcher 3, writer 2, engineer 4,
-      fact-checker 2, reviewer 1, tester 2, code-reviewer 2; a custom charter counts 2). ``rework = 1``
+      fact-checker 2, reviewer 1, tester 2, code-reviewer 2, analyst 4, data-checker 2; a custom charter counts 2). ``rework = 1``
       (an author fixes its file; a verifier re-checks).
     * manager: ``pass = 1 (plan and delegate) + 1 per direct report (process its result) + 1 (final check and report)``;
       ``rework = 2`` (send the findings back, process the revised result).
@@ -664,6 +698,20 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
     shells = [a.addr for a in agents if "shell" in a.tools]
     if shells:
         issues.append(Issue("warning", "agents", f"{', '.join(shells)} hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not", "shell-unconfined"))
+
+    # --- a verifier reads what it reviews (the default gives it the project and authors' workspaces read-only)
+    ws_text = _s(needs.get("workspace"))
+    pws = Path(os.path.expanduser(ws_text)).resolve() if ws_text and Path(os.path.expanduser(ws_text)).is_absolute() else None
+    work = review_roots(agents, pws)
+    if any(_within(r, pws) and r != pws for r in work if pws):
+        work = [r for r in work if r != pws]  # the authors' own folders stand for the project folder
+    for a in agents:
+        if a.kind != "verifier" or a.children:
+            continue
+        held = [Path(b) for b in (a.workspace, *a.inputs) if b]
+        blind = [r for r in work if not any(_within(r, b) for b in held)]
+        if blind:
+            issues.append(Issue("warning", a.where, f"{a.addr} reviews work in {', '.join(map(str, blind))} but cannot read it (not in its workspace or inputs), so it would review pasted text, not the files; drop its explicit inputs (by default a verifier gets the project and authors' workspaces read-only) or add the path", "verifier-cannot-read"))
 
     # --- workspace confinement: whoever can write files or run commands is confined to a workspace
     for a in agents:
