@@ -72,30 +72,46 @@ assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#
 (`orgmcp install-skill`), this is the whole story:
 
 1. **Ask.** "Build me an org that produces a competitor analysis of five note apps." The assistant replies with one message
-   of the questions that matter, each with a proposed default: scope, deliverable (format, length, path), exact acceptance
-   criteria, sources and web access, workspace and tests (for code), budget in runs, models, review, approval, progress.
+   of the questions that matter, in plain words, with a proposed default only where a generic one exists: format, length,
+   exact acceptance criteria, sources and web access, workspace and tests (for code), budget in runs, models, review,
+   approval, progress. A list it was not given (apps, competitors, features, source files) it asks for; it does not invent
+   one. Unless you say otherwise the result goes into a new `deliverables/` folder in your current directory.
    You answer, or say "defaults".
-2. **Plan.** The assistant writes your answers as a blueprint (below) and calls `propose_org`. You get the plan: the
-   target organization, goal, needs as understood, the org tree (role, model, tools, workspace per agent), the budget and
-   how it is split, the independent review, the deliverable and where it ends up, checkpoints, and warnings. Errors block
-   the plan until fixed. Nothing has been written yet, not even the organization.
+2. **Plan.** The assistant starts from `blueprint_example(kind)` (`research`: web sources; `documents`: write from your local
+   files, no web; `code`: repo workspace with tests and commits), edits it with your answers and calls `propose_org`. You get
+   a block headed **PLAN FOR YOU** that the assistant must show you exactly as written (about 40 lines, plain words): goal,
+   needs as understood, the team (role, model, tools, what each may touch), the budget and its split, the independent
+   review, the deliverable and where it will be delivered, the checks that decide "done", checkpoints and warnings. Below
+   it come the full details for the assistant and a `plan_id`. Errors block the plan until fixed. Nothing has been
+   written yet, not even the organization.
 3. **Approve.** You say "approve" or ask for changes (then it proposes again). Only after your explicit approval the
-   assistant calls `create_org` (if there is no organization yet), `apply_org(..., approved=True)` and `start`.
-   `apply_org` refuses without `approved=True`, hires the whole tree as root (parents first), gives the first task, and
-   undoes everything if anything fails midway.
+   assistant calls `create_org` (if there is no organization yet), `apply_org(blueprint, approved=True, plan_id=...)` and
+   `start`. `plan_id` is a short hash of the normalized blueprint (the same blueprint always gives the same id, any change
+   gives another; nothing is stored, so it survives restarts). `apply_org` refuses without `approved=True` and without
+   the `plan_id` of exactly that blueprint, so the plan you saw is the plan that is applied. It hires the whole tree as root
+   (parents first), gives the first task, and undoes everything if anything fails midway.
 4. **It runs.** The scheduler wakes the agents. The budget in the plan is a ceiling, not a price: runs a team does not spend
-   come back automatically with each agent's final report, up to you. Spending beyond the plan needs your OK.
+   come back automatically with each agent's final report, up to you. Spending beyond the plan needs your OK. `start`
+   launches it with `until_done`: it exits by itself when you have no open task and nothing is running or runnable
+   (`orgmcp run --until-done` on the command line; `--until-idle` is unchanged) and logs why in `.runtime/scheduler.log`;
+   `status` and `progress` then say `scheduler: stopped (finished: no open tasks)`. Give the org more work later and
+   `start` again; `stop` is only for cancelling.
 5. **Progress.** "Status?" is answered from `progress`: one line per task (working / waiting on an agent / stalled /
    blocked with the reason / done / failed), who is busy, runs used of the budget, time since the last activity, and what
-   needs your decision.
+   needs your decision. An assistant cannot message you between turns, so it never promises to. If you want to be told
+   when the work is done, it says it will wait and calls `progress(wait_seconds=N)` (up to 900; `orgmcp progress --wait N`
+   on the command line): the call returns as soon as a task is done, failed, blocked or stalled, or something new needs
+   you, or when the time is up, with what changed; it only reads files (no locks, nothing written) and does not wait
+   when no scheduler is running. Say how long you are willing to wait and it repeats the call; otherwise ask "status?".
 6. **Delivery.** When the task is done the assistant reads the deliverable, checks it against every acceptance criterion
-   (sending it back for rework if one is unmet, never patching it itself), copies it to the path you chose, tells you
-   which criteria are met and how many runs it cost, and calls `stop`.
+   (sending it back for rework if one is unmet, never patching it itself), copies it to the path you chose, and tells you
+   which criteria are met and how many runs it cost.
 
 The same flow works without an assistant: `orgmcp plan bp.yaml` (exit status 1 on errors), `orgmcp apply bp.yaml`,
 `orgmcp run`, `orgmcp progress`.
 
-The blueprint (YAML or JSON; example: [`examples/blueprint-research.yaml`](examples/blueprint-research.yaml)):
+The blueprint (YAML or JSON; `blueprint_example(kind)` returns a commented template, a longer one is in
+[`examples/blueprint-research.yaml`](examples/blueprint-research.yaml)):
 
 ```yaml
 mission: ...                          # what the organization is for
@@ -248,16 +264,23 @@ organization to exist yet:
   org's scheduler: alive, `run` in its command line, and this org's `--root` or an `orgmcp` program with no other
   `--root`). `status` and `whoami` end with a `scheduler: running (pid, since) / stopped` line.
 - Goal workflow tools (root only; see [Create an org from a goal](#create-an-org-from-a-goal)):
-  - `propose_org(blueprint)`: blueprint as YAML/JSON text in, plan with issues out; writes nothing; works in setup mode.
-  - `apply_org(blueprint, approved=False)`: refuses unless `approved=True` (pass it only after the user approved the
-    plan), refuses in setup mode ("call create_org first") and on validation errors, otherwise hires the team, gives the
-    first task and says to call `start`.
-  - `progress(task_id=None)`: the status lines described above; in setup mode it explains the next step.
+  - `blueprint_example(kind="research")`: a ready-to-edit YAML blueprint with a comment on every field and a schema
+    summary; `kind` is `research`, `documents` or `code`. Paths start in the server's working directory.
+  - `propose_org(blueprint)`: blueprint as YAML/JSON text in (its description carries the compact schema), out: the
+    **PLAN FOR YOU** block to show the user verbatim, the full details, and `plan_id`; writes nothing; works in setup mode.
+  - `apply_org(blueprint, approved=False, plan_id=None)`: refuses unless `approved=True` and `plan_id` equals the id
+    of this blueprint (pass them only after the user approved the plan that `propose_org` returned), refuses in setup mode
+    ("call create_org first") and on validation errors, otherwise hires the team, gives the first task and says to call
+    `start`.
+  - `start(max_runs=None, until_done=True)`: background scheduler that exits by itself when the work is done.
+  - `progress(task_id=None, wait_seconds=0)`: the status lines described above plus the scheduler line; with
+    `wait_seconds` it first waits for a change; in setup mode it explains the next step.
 - Other tools: `whoami`, `inbox`, `delegate`, `report`, `send`, `hire`, `retire`, `read`, `write`, `status`, `health`.
-  Agents get these (not `create_org`, `start`, `stop`, `propose_org`, `apply_org`, `progress`). `report` tells an agent when
+  Agents get these (not `create_org`, `start`, `stop`, `blueprint_example`, `propose_org`, `apply_org`, `progress`). `report` tells an agent when
   budget travelled up with its result; `send(..., budget=N)` to its parent gives runs back early.
-- The server's instructions for root contain the workflow in five lines (ask once with defaults → `propose_org` → wait for
-  explicit approval → `create_org`/`apply_org(approved=True)`/`start` → `progress` → verify, copy, `stop`) next to the safety
+- The server's instructions for root contain the workflow in five lines (ask once → `blueprint_example` + `propose_org` →
+  show the PLAN FOR YOU block, wait for explicit approval → `create_org`/`apply_org(approved=True, plan_id)`/`start` →
+  `progress` (or `progress(wait_seconds)`) → verify, copy) next to the safety
   rules: only the bound organization, no substituting other mechanisms, no claims without tool evidence.
 
 **The assistant skill.** `orgmcp install-skill [--dest DIR] [--force]` copies the skill to `~/.kiro/skills/orgmcp/SKILL.md`

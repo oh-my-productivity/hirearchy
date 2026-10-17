@@ -23,9 +23,9 @@ from orgmcp.server import OrgBinding, build_server, resolve_binding
 
 ROOT_TOOLS = {
     "whoami", "inbox", "delegate", "report", "send", "hire", "retire", "read", "write", "status", "health",
-    "create_org", "start", "stop", "propose_org", "apply_org", "progress",
+    "create_org", "start", "stop", "propose_org", "apply_org", "progress", "blueprint_example",
 }
-AGENT_TOOLS = ROOT_TOOLS - {"create_org", "start", "stop", "propose_org", "apply_org", "progress"}
+AGENT_TOOLS = ROOT_TOOLS - {"create_org", "start", "stop", "propose_org", "apply_org", "progress", "blueprint_example"}
 
 
 def call(server, tool, **args):
@@ -292,7 +292,7 @@ def test_start_and_stop_a_detached_scheduler(org, reap_schedulers, monkeypatch):
     monkeypatch.setenv("ORG_ROOT", str(org.root))
     server = build_server(*resolve_binding())
     assert "scheduler: stopped" in call(server, "status")
-    out = call(server, "start", max_runs=0)  # the real scheduler command; at most 0 runs, so kiro is never started
+    out = call(server, "start", max_runs=0, until_done=False)  # the real scheduler command; at most 0 runs, so kiro is never started
     pid = int(re.search(r"pid (\d+)", out).group(1))
     assert (org.root / ".runtime" / "scheduler.pid").read_text().strip() == str(pid)
     assert re.search(rf"scheduler: running \(pid {pid}, since \d{{4}}-", call(server, "status"))
@@ -310,7 +310,7 @@ def test_start_and_stop_a_detached_scheduler(org, reap_schedulers, monkeypatch):
     assert "scheduler: stopped" in call(server, "status")
     assert call(server, "stop") == "no scheduler is running for this org"
     assert not (org.root / ".runtime" / "scheduler.pid").exists()  # the scheduler shut down cleanly
-    call(server, "start", max_runs=0)  # and can be started again
+    call(server, "start", max_runs=0, until_done=False)  # and can be started again
     call(server, "stop")
 
 

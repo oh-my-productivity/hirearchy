@@ -2,6 +2,7 @@
 
 import asyncio
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -9,6 +10,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from orgmcp import blueprint as blueprint_mod
 from orgmcp import server as server_mod
 from orgmcp.core import ROOT, Org
 from orgmcp.scheduler import Scheduler
@@ -22,6 +24,11 @@ def call(server, tool, **args):
     result = asyncio.run(server.call_tool(tool, args))
     blocks = result[0] if isinstance(result, tuple) else result
     return "\n".join(getattr(b, "text", "") for b in blocks)
+
+
+def pid_of(server, text) -> str:
+    """The plan_id propose_org returns for this blueprint text."""
+    return re.search(r"^plan_id: (\w+)$", call(server, "propose_org", blueprint=text), re.M).group(1)
 
 
 def fails(server, tool, **args) -> str:
@@ -141,7 +148,8 @@ def test_apply_org_refuses_without_approval(setup, tmp_path):
 
 def test_apply_org_in_setup_mode_says_create_org_first(setup, tmp_path):
     server, target = setup
-    msg = fails(server, "apply_org", blueprint=research_text(tmp_path), approved=True)
+    text = research_text(tmp_path)
+    msg = fails(server, "apply_org", blueprint=text, approved=True, plan_id=pid_of(server, text))
     assert "create_org" in msg and not target.exists()
 
 
@@ -149,7 +157,7 @@ def test_apply_org_with_errors_refuses_with_the_issues(setup, tmp_path):
     server, target = setup
     call(server, "create_org", mission="m")
     bad = research_text(tmp_path).replace("factcheck", "extra").replace("template: fact-checker", "template: researcher")
-    msg = fails(server, "apply_org", blueprint=bad, approved=True)
+    msg = fails(server, "apply_org", blueprint=bad, approved=True, plan_id=blueprint_mod.plan_id(blueprint_mod.load_text(bad)))
     assert "nothing was created" in msg and "review" in msg
     assert Org(target).agents() == []
 
@@ -195,7 +203,7 @@ def test_goal_to_delivery_end_to_end(setup, tmp_path):
     assert "user must approve" in fails(server, "apply_org", blueprint=text)  # 3. refused without approval
     assert Org(target).agents() == []
 
-    out = call(server, "apply_org", blueprint=text, approved=True)  # 4. approved
+    out = call(server, "apply_org", blueprint=text, approved=True, plan_id=pid_of(server, text))  # 4. approved
     assert "created 4 agents" in out and "call start()" in out
     org = Org(target)
     assert sorted(org.agents()) == ["lead", "lead/factcheck", "lead/researcher", "lead/writer"]
@@ -223,7 +231,7 @@ def test_code_goal_validates_and_applies(setup, tmp_path):
     plan = call(server, "propose_org", blueprint=text)
     assert "Errors (" not in plan and "Tests / packaging / commits" in plan
     call(server, "create_org", mission="csv2md")
-    out = call(server, "apply_org", blueprint=text, approved=True)
+    out = call(server, "apply_org", blueprint=text, approved=True, plan_id=pid_of(server, text))
     assert "created 4 agents" in out
     org = Org(target)
     for addr in ("lead/dev", "lead/qa", "lead/cr"):
@@ -276,7 +284,8 @@ def test_skill_names_the_final_tools_and_signatures(tmp_path):
 
     text = skill_source().read_text()
     tools = {t.name for t in asyncio.run(build_server(Org.init(tmp_path / "o", "m"), ROOT).list_tools())}
-    for name in ("create_org", "propose_org", "apply_org", "progress", "start", "stop", "whoami", "status", "inbox", "send"):
+    for name in ("create_org", "propose_org", "apply_org", "progress", "start", "stop", "whoami", "status", "inbox", "send",
+                 "blueprint_example"):
         assert name in tools and f"`{name}" in text, name
-    assert "apply_org(blueprint=<the approved YAML, unchanged>, approved=True)" in text
+    assert "apply_org(blueprint=<the approved YAML, unchanged>, approved=True, plan_id=<from propose_org>)" in text
     assert "create_org(mission=" in text and "propose_org(blueprint=" in text

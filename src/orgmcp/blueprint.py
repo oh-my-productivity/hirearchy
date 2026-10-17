@@ -21,6 +21,8 @@ shown in the plan), ``render_plan`` produces the text the user approves, ``apply
 
 from __future__ import annotations
 
+import hashlib
+import json
 import math
 import os
 import re
@@ -975,6 +977,168 @@ def render_plan(bp: dict, issues: list[Issue] | None = None, *, org: Org | None 
     L.append("")
     L.append("Cannot apply yet: tell me what to change." if errs else "Reply 'approve' or tell me what to change.")
     return "\n".join(L)
+
+
+# ------------------------------------------------------------------------------- plan for the user
+
+PLAN_HEADING = "PLAN FOR YOU (show this to the user exactly as written)"
+PLAN_DRAFT_HEADING = "DRAFT - NOT READY (it has errors: fix the blueprint and propose again; do not show this to the user)"
+PLAN_END = "END OF PLAN FOR YOU"
+TOOL_WORDS = {"read": "read files", "write": "write files", "shell": "run commands", "web_search": "search the web",
+              "web_fetch": "read web pages"}
+SHOWN_CRITERIA = 8  # the block stays compact (about 40 lines); the full lists are in the details
+SHOWN_WARNINGS = 5
+HIDDEN_WARNINGS = {"path-delivery", "path-parent", "needs-scope", "needs-approval", "needs-progress"}  # said elsewhere in the block
+PLAN_ID_LENGTH = 12
+
+
+def plan_id(bp: dict) -> str:
+    """A short stable hash of the normalized blueprint: the same blueprint (whatever its YAML layout, comments or
+    key order) always gives the same id; any change to a value gives another. ``apply_org`` requires it, so what is
+    applied is what ``propose_org`` showed. Stateless: nothing is stored, it survives restarts."""
+    canon = json.dumps(_normalize(bp), sort_keys=True, ensure_ascii=True, separators=(",", ":"), default=str)
+    return hashlib.sha256(canon.encode("utf-8")).hexdigest()[:PLAN_ID_LENGTH]
+
+
+def _clip(text: str, limit: int = 220) -> str:
+    text = " ".join(_s(text).split())
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "..."
+
+
+def _agent_access(a: Agent) -> str:
+    """What the agent may touch, in plain words (one phrase; the one place to extend with more access detail)."""
+    tools = ", ".join(TOOL_WORDS.get(t, t) for t in a.tools)
+    if a.kind == "manager" or a.children:
+        return "directs the team; does not produce the work itself"
+    changes = any(t in a.tools for t in WRITE_TOOLS)
+    where = (f"changes files only in {a.workspace}" if a.workspace else "changes files only in its own folder") if changes \
+        else "cannot change your files"
+    return f"can {tools}; {where}" if tools else f"uses no tools; {where}"
+
+
+def _user_tree(agents: list[Agent]) -> list[str]:
+    by = {a.addr: a for a in agents}
+    out: list[str] = []
+
+    def line(a: Agent, indent: int) -> None:
+        out.append(f"{'  ' * indent}- {a.name} ({a.role}, model {a.model or 'org default'}): {_agent_access(a)}")
+        for c in a.children:
+            line(by[c], indent + 1)
+
+    for a in agents:
+        if a.parent is None:
+            line(a, 0)
+    return out
+
+
+def _user_budget(agents: list[Agent], bp: dict) -> list[str]:
+    needs, task = _needs(bp), bp.get("task") if isinstance(bp.get("task"), dict) else {}
+    est = estimate(agents) if agents else {"total": 0, "per": {}}
+    total = planned_total(bp, est["total"]) if agents else 0
+    cap = needs.get("budget_runs")
+    out = [f"Budget: {total} runs planned (one run = one working session of one agent), "
+           + (f"your cap is {cap}" if cap else "you gave no cap") + f"; the minimum for one review and rework is {est['total']}. "
+           "Unspent runs come back to you."]
+    if agents:
+        split = budget_split(agents, total)
+        for a in agents:
+            if a.children:
+                out.append(f"  {a.addr} starts with {split[a.addr]['grant']}, hands down "
+                           + ", ".join(f"{c.rsplit('/', 1)[-1]} {split[c]['grant']}" for c in a.children)
+                           + f" and keeps {split[a.addr]['keeps']} for planning, checking and rework.")
+    return out
+
+
+def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | None = None, allowed_roots: list | None = None) -> str:
+    """The compact, plain-language plan the assistant shows to the user verbatim (about 40 lines at most).
+
+    Goal, needs as understood, the team (role, model, tools, access), budget and its split, review, deliverable and
+    where it will be delivered, the success checks, checkpoints and warnings. ``render_plan`` has the full details.
+    """
+    if issues is None:
+        issues = validate(bp, org=org, allowed_roots=allowed_roots)
+    roots = [Path(r).expanduser().resolve() for r in allowed_roots] if allowed_roots else _default_roots()
+    agents = _resolve(bp, org, roots, [])
+    needs, d = _needs(bp), _deliverable(bp)
+    task = bp.get("task") if isinstance(bp.get("task"), dict) else {}
+    errs = [i for i in issues if i.level == "error"]
+    warns = [i for i in issues if i.level == "warning" and i.code not in HIDDEN_WARNINGS]
+    L: list[str] = [PLAN_DRAFT_HEADING if errs else PLAN_HEADING, f"Goal: {_clip(bp.get('mission')) or '(missing)'}", "What I understood you need:"]
+
+    def need(label: str, value) -> None:
+        L.append(f"- {label}: {_clip(value) or '(not specified)'}")
+
+    need("Scope", needs.get("scope"))
+    if _list(needs.get("inputs")):
+        need("Your files (read-only)", ", ".join(_list(needs.get("inputs"))))
+    need("Quality bar", needs.get("quality_bar"))
+    if _s(needs.get("sources")) or not _is_code(bp):
+        need("Sources", needs.get("sources"))
+    need("Workspace", needs.get("workspace") or "none (nothing writes files or runs commands)")
+    if _is_code(bp):
+        code = needs.get("code") if isinstance(needs.get("code"), dict) else {}
+        need("Tests / packaging / commits", "; ".join(f"{k}: {_s(code.get(k)) or '?'}" for k in ("tests", "packaging", "commits")))
+    need("Models", needs.get("model_policy"))
+
+    L.append(f"Team ({len(agents)} agents):")
+    L += _user_tree(agents) or ["- (none)"]
+    L += _user_budget(agents, bp)
+
+    verifiers = [a for a in agents if a.kind == "verifier"]
+    r = _review_required(needs)
+    if verifiers:
+        L.append("Checking: " + ", ".join(v.name for v in verifiers) + " review"
+                 + ("s" if len(verifiers) == 1 else "") + " the work independently (they did not write it); required changes go back "
+                 "to the author. I then re-check the final result against every success check below.")
+    else:
+        L.append("Checking: no independent reviewer" + (" (you did not ask for one)" if r is False else " (!)")
+                 + ". I still re-check the final result against every success check below.")
+
+    spec = ", ".join(x for x in (_s(d.get("format")), f"max {d['max_words']} words" if d.get("max_words") else "") if x)
+    L.append(f"Deliverable: {_clip(d.get('description')) or '(missing)'}" + (f" [{spec}]" if spec else ""))
+    if _s(d.get("path")):
+        copied = any(i.code == "path-delivery" for i in issues)
+        L.append(f"  Delivered to: {_s(d['path'])}" + (" (I copy it there after checking it)" if copied else " (the team writes it there)"))
+    elif _s(needs.get("workspace")) and _is_code(bp):
+        L.append(f"  Delivered to: the workspace {_s(needs['workspace'])} (the team works and commits there)")
+    else:
+        L.append("  Delivered to: inside the organization folder (no location given)")
+
+    crit = _criteria(bp)
+    L.append("Done when ALL of these hold:" if crit else "Done when: (no success checks given)")
+    L += [f"  {i}. {_clip(c, 200)}" for i, c in enumerate(crit[:SHOWN_CRITERIA], 1)]
+    if len(crit) > SHOWN_CRITERIA:
+        L.append(f"  ... and {len(crit) - SHOWN_CRITERIA} more (see the details)")
+
+    L.append(f"Checkpoints: approval - {_clip(needs.get('approval')).rstrip('.') or 'this plan, before anything is built or started'}; "
+             f"progress - {_clip(needs.get('progress')).rstrip('.') or 'one line when you ask'}; any spend beyond the budget needs your OK.")
+    if warns:
+        L.append(f"Warnings ({len(warns)}):")
+        L += [f"- {_clip(w.message, 200)}" for w in warns[:SHOWN_WARNINGS]]
+        if len(warns) > SHOWN_WARNINGS:
+            L.append(f"- ... and {len(warns) - SHOWN_WARNINGS} more (see the details)")
+    if errs:
+        L.append(f"Errors ({len(errs)}):")
+        L += [f"- {e.path}: {_clip(e.message, 200)}" for e in errs[:SHOWN_WARNINGS]]
+    L.append("Nothing is created or started until you approve. Reply 'approve', or tell me what to change." if not errs
+             else "Cannot apply yet.")
+    L.append(PLAN_END)
+    return "\n".join(L)
+
+
+def propose_text(bp: dict, org: Org | None = None, *, target: str = "", allowed_roots: list | None = None) -> str:
+    """What ``propose_org`` returns: the block for the user, the full details and the plan_id."""
+    issues = validate(bp, org=org, allowed_roots=allowed_roots)
+    block = plan_for_user(bp, issues, org=org, allowed_roots=allowed_roots)
+    details = render_plan(bp, issues, org=org, allowed_roots=allowed_roots)
+    if errors(issues):
+        nxt = "plan_id: none (the blueprint has errors). Fix them and call propose_org again; do not ask the user to approve this."
+    else:
+        pid = plan_id(bp)
+        nxt = (f"plan_id: {pid}\nNext: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line "
+               f"before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, "
+               f"approved=True, plan_id=\"{pid}\"). If you change the blueprint, call propose_org again: the plan_id changes.")
+    return "\n\n".join(x for x in (target, block, "Details (the full plan, for you; the user need not read it):\n" + details, nxt) if x)
 
 
 def propose(source, *, org: Org | None = None, allowed_roots: list | None = None) -> str:
