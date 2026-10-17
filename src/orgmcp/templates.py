@@ -26,7 +26,8 @@ ORG_RULES = """\
    yourself (`read` shows word count and modification time). Do not trust claims. If it falls short, send it back.
 4. Keep reports short: a few lines of summary plus artifact paths. Put detail in files, not messages.
 5. Every task assigned to you gets exactly one `report`. If you cannot finish, report `blocked` or `failed` and say why.
-6. Before you stop, update MEMORY.md with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
+6. Before you stop, rewrite MEMORY.md with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
+   Keep it short: condense instead of appending, and put detail in `work/` files. Writes that make it too long are refused.
 7. Stay within your charter. Escalate anything outside it.
 """
 
