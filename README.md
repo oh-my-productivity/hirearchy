@@ -80,7 +80,7 @@ agent scheduled, and `whoami` lists it as re-reportable.
 | `out_of_budget` | budget <= 0 while it has unread mail or open tasks | - |
 | `paused` | paused for any reason (shown in the reason) | - |
 | `low_quality` | (failed + blocked + rework) / tasks received above the ratio, once enough tasks were received | `max_problem_ratio` (0.5), `min_tasks_for_quality` (3) |
-| `expensive` | runs per completed task above the limit (needs a result), or too many runs since its last result while holding an open task | `max_runs_per_task` (5), `max_runs_without_result` (6) |
+| `expensive` | runs per completed task above the limit (needs a result), or too many runs since its last result while holding an open task; runs that failed or were woken only by runtime notes (stall reminders, reviews, refunds) are not counted, but `runs` and the budget still include them | `max_runs_per_task` (5), `max_runs_without_result` (6) |
 | `wasteful` | empty runs / runs used above the ratio, once enough runs were used | `max_empty_run_ratio` (0.5), `min_runs_for_waste` (4) |
 | `idle` | no open tasks, no delegations, no unread mail and no activity for longer than the limit (measured from hiring if it never ran): a candidate to retire | `idle_after_seconds` (86400) |
 

@@ -213,3 +213,58 @@ def test_guard_is_silent_when_the_upstream_task_is_ambiguous(org, blocked):
     res2 = org.report(ENG, sub2.id, "done", "ok")
     prompt = prompt_with_result(org, other, sub2, res2)
     assert "probably serves" not in prompt and "already reported" not in prompt
+
+
+# -------------------------------------------------------------- D3: expensive
+
+
+def run_log(org, addr, n, senders="root", tail="\n# exit 0 after 2s\n", base=100):
+    d = org.dir(addr) / "runs"
+    d.mkdir(exist_ok=True)
+    start = T0 + timedelta(seconds=base + n * 100)
+    p = d / f"{start:%Y%m%dT%H%M%S%f}.log"
+    p.write_text(f"# run of {addr}, 1 message(s)\n# senders: {senders}\n# cmd: x\n# ---- prompt ----\nP\n# ---- output ----\n{tail}")
+    return p
+
+
+def one_result(org, addr=ENG):
+    t = org.delegate(ROOT, addr, "Job", "g", "a", budget=20)
+    org.begin_run(addr)
+    org.report(addr, t.id, "done", "ok")
+
+
+def test_expensive_ignores_runtime_only_and_failed_runs_per_completed_task(org, clock):
+    one_result(org)
+    for i in range(4):
+        run_log(org, ENG, i)  # four ordinary runs for one completed task: 4.0, under the limit of 5
+    for i in range(4, 8):
+        run_log(org, ENG, i, senders="runtime")  # stall reminders, reviews, refunds
+    for i in range(8, 10):
+        run_log(org, ENG, i, tail="\n# killed after 60s timeout\n")  # failed runs
+    h = agent_health(org, ENG, T0 + timedelta(days=1))
+    assert h.runs_used == 10  # budget truth is unchanged
+    assert h.runs_per_task == 4.0 and "expensive" not in h.flags
+    assert (h.runtime_runs, h.failed_runs) == (4, 2)
+
+
+def test_expensive_still_fires_on_the_agents_own_runs(org, clock):
+    one_result(org)
+    for i in range(6):
+        run_log(org, ENG, i)
+    h = agent_health(org, ENG, T0 + timedelta(days=1))
+    assert h.runs_per_task == 6.0 and "6.0 runs per completed task" in h.flags["expensive"]
+
+
+def test_runs_without_result_ignores_runtime_only_and_failed_runs(org, clock):
+    t = org.delegate(ROOT, ENG, "Job", "g", "a", budget=20)
+    org.begin_run(ENG)
+    for i in range(4):
+        run_log(org, ENG, i)
+    for i in range(4, 9):
+        run_log(org, ENG, i, senders="runtime")
+    run_log(org, ENG, 9, tail="\n# failed to start: nope\n")
+    h = agent_health(org, ENG, T0 + timedelta(days=1))
+    assert t.id and h.runs_used == 10 and "expensive" not in h.flags
+    for i in range(10, 13):
+        run_log(org, ENG, i)  # three more of its own: 7 > 6
+    assert "7 runs without a result" in agent_health(org, ENG, T0 + timedelta(days=1)).flags["expensive"]
