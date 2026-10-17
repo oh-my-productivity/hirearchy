@@ -210,3 +210,13 @@ def test_skill_and_instructions_mention_read_only_inputs_within_the_limits(root_
         assert needle in skill, needle
     assert "at least 6" not in skill and "never ask for \"at least N\"" in skill
     assert "`needs.inputs` (read-only)" in root_server.instructions and "built-in `write` only for code" in root_server.instructions
+
+
+def test_readme_documents_the_integrated_features():
+    readme = (Path(__file__).resolve().parent.parent / "README.md").read_text()
+    for needle in ("hire ... --inputs PATH", "`inputs` parameter of the `hire` tool", "`plan_id`", "blueprint_example(kind)",
+                   "progress(wait_seconds=N)", "--until-done", "n of m claims verified, k wrong, j unsupported",
+                   "`code-reviewer` now has `read` and `shell`", "`manager` verifies with its own `read` output",
+                   "relevance over length", "same\n   computation as the `Access:` line"):
+        assert needle in readme, needle
+    assert readme.count("<<<<<<<") == 0 and "at least 6" not in readme

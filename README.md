@@ -44,12 +44,12 @@ uv run orgmcp init org --mission "..." --model claude-haiku-4.5
 uv run orgmcp hire root ceo --role "Chief of staff" --charter @examples/ceo.md \
     --model claude-sonnet-4.6 --can-hire --max-children 3
 uv run orgmcp task ceo --title "..." --goal @goal.md --acceptance @acceptance.md --budget 14
-uv run orgmcp run --until-idle --max-runs 14     # or plain `run` as a daemon
+uv run orgmcp run --until-idle --max-runs 14     # or plain `run` as a daemon; `--until-done` exits when no task is open
 uv run orgmcp status
 uv run orgmcp inbox
 ```
 
-Other commands: `progress [TASK_ID]`, `plan`/`apply` (blueprints, below), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile).
+Other commands: `hire ... --inputs PATH` (repeatable: read-only folders for the agent), `progress [TASK_ID] [--wait SECONDS]`, `plan`/`apply` (blueprints, below), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile).
 
 ### Progress
 
@@ -80,7 +80,8 @@ assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#
 2. **Plan.** The assistant starts from `blueprint_example(kind)` (`research`: web sources; `documents`: write from your local
    files, no web; `code`: repo workspace with tests and commits), edits it with your answers and calls `propose_org`. You get
    a block headed **PLAN FOR YOU** that the assistant must show you exactly as written (about 40 lines, plain words): goal,
-   needs as understood, the team (role, model, tools, what each may touch), the budget and its split, the independent
+   needs as understood, the team (role, model, tools, and for each agent what it may touch, worded from the same
+   computation as the `Access:` line below, so the plan states what kiro will enforce), the budget and its split, the independent
    review, the deliverable and where it will be delivered, the checks that decide "done", checkpoints and warnings. Below
    it come the full details for the assistant and a `plan_id`. Errors block the plan until fixed. Nothing has been
    written yet, not even the organization.
@@ -147,6 +148,15 @@ planned figure is what you authorize at most, and `progress` shows what was used
 `tester`, `code-reviewer`. Each has purpose, responsibilities, decision rights, escalation, quality bar, budget discipline and a
 default tool set and model tier. Reviewers report findings and required changes to their manager and never edit another
 agent's file (the manager sends them back to the author with `revises`). `template:` plus a `charter:` adds your own text.
+
+What the templates add for verification and delegation:
+
+- Verifier templates now check exhaustively: the `fact-checker` writes a claim ledger of every factual statement, opens each cited source (the source must state the claim; homepages/repo roots that don't are "unsupported"), reports "n of m claims verified, k wrong, j unsupported" and fails the review unless n = m. The `reviewer` goes through the acceptance criteria one by one ("criteria met: n of m", pass only if n = m).
+- `code-reviewer` now has `read` and `shell`: it runs the test suite and the commands named in the criteria and reports each command and result; it still never edits files (charter-enforced, since shell can't be confined). It needs a workspace, like the engineer.
+- `manager` verifies with its own `read` output (never memory or a report's claim), treats the verifier's coverage report as a precondition for `done`, and sends deviations back with `revises` or escalates instead of reporting `done`.
+- `writer`/`researcher`/`engineer`/`tester` got small additions: relevance over length, page-level citations with retrieval date, tests run before reporting, every criterion exercised with commands.
+
+So acceptance criteria should ask for the coverage report ("every claim verified, n = m"), not for "at least N" checks.
 
 **The assistant's playbook** is `skills/orgmcp/SKILL.md`: the precondition (use orgmcp or say it is unavailable), the one-message
 checklist, plan and approval, build and run, monitoring, and verification before delivery. The server's own instructions carry
@@ -275,7 +285,7 @@ organization to exist yet:
   - `start(max_runs=None, until_done=True)`: background scheduler that exits by itself when the work is done.
   - `progress(task_id=None, wait_seconds=0)`: the status lines described above plus the scheduler line; with
     `wait_seconds` it first waits for a change; in setup mode it explains the next step.
-- Other tools: `whoami`, `inbox`, `delegate`, `report`, `send`, `hire`, `retire`, `read`, `write`, `status`, `health`.
+- Other tools: `whoami`, `inbox`, `delegate`, `report`, `send`, `hire` (with `inputs` for read-only folders), `retire`, `read`, `write`, `status`, `health`.
   Agents get these (not `create_org`, `start`, `stop`, `blueprint_example`, `propose_org`, `apply_org`, `progress`). `report` tells an agent when
   budget travelled up with its result; `send(..., budget=N)` to its parent gives runs back early.
 - The server's instructions for root contain the workflow in five lines (ask once → `blueprint_example` + `propose_org` →
@@ -340,7 +350,9 @@ two apart.
 
 Charter fields: `workspace` (read-write, as before) and `inputs: [absolute paths]` (read-only; blueprint: `needs.inputs`
 for the whole project or `inputs` per agent). A report's inputs must be inside its manager's inputs or workspace (authority
-only narrows), inputs are absolute and never overlap the org directory. Charters without `inputs` keep working.
+only narrows), inputs are absolute and never overlap the org directory. Charters without `inputs` keep working. Set them with
+`orgmcp hire ... --inputs PATH` (repeatable) or the `inputs` parameter of the `hire` tool (root, or a manager within its own
+inputs/workspace); `documents`-type goals put the user's folder in `needs.inputs` (it must exist).
 
 **Enforced by kiro** (per-agent profiles, checked against kiro-cli 2.29.1 in `--no-interactive` mode; the experiments are
 in `studies/X1-confinement/EXPERIMENTS.md`). An agent with built-in `read` or `write` gets a profile
@@ -373,7 +385,7 @@ inputs, and the workspace of any agent in its subtree (a manager can verify what
 the org is refused. Root's `read` is unchanged (organization only).
 
 **Only instructed:** `shell` cannot be confined (kiro has no path rule for it; it can write anywhere its OS user can), so an
-agent that holds it is told the rule in its charter and prompt, and the plan says so (`shell-unconfined` warning, "shell NOT
+agent that holds it (engineer, tester, code-reviewer, and a manager that holds what its code team holds) is told the rule in its charter and prompt, and the plan says so (`shell-unconfined` warning, "shell NOT
 confined" in its `Access:` line). The prompt's Files section (workspace, inputs, "never create org files in the workspace",
 "report workspace artifacts by absolute path") is guidance on top of the enforcement above. Symlinks inside a workspace that
 point out were not tested against kiro's own matching; orgmcp's `read`/`report` resolve them and refuse targets outside.
