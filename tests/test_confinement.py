@@ -422,12 +422,25 @@ def test_agent_inputs_must_be_inside_its_managers(bp, tmp_path, dirs):
     assert "authority" in codes(issues_of(mutate(bp, f), tmp_path), "error")
 
 
-def test_a_code_reviewer_reads_the_project_workspace_read_only(tmp_path, dirs):
+def test_a_code_reviewer_works_in_the_project_workspace_without_write(tmp_path, dirs):
     from test_blueprint import code_bp  # same code blueprint the other tests use
     agents = {a.addr: a for a in bpm._resolve(code_bp(tmp_path), None, [tmp_path], [])}
     ws = str((tmp_path / "proj").resolve())
-    assert agents["lead/cr"].workspace is None and agents["lead/cr"].inputs == [ws]
+    # the code-reviewer template holds `shell` (it runs the tests), so like the engineer it needs the workspace; it has
+    # no built-in `write`, so kiro can only let it read there
+    assert agents["lead/cr"].tools == ["read", "shell"]
+    assert agents["lead/cr"].workspace == ws and agents["lead/cr"].inputs == []
     assert agents["lead/dev"].workspace == ws and agents["lead/dev"].inputs == []
+    assert bpm._access(agents["lead/cr"]) == f"kiro read only in {ws}; shell NOT confined (instructed only)"
+
+
+def test_a_reader_without_shell_sees_the_project_read_only(tmp_path, dirs):
+    from test_blueprint import code_bp
+    b = code_bp(tmp_path)
+    b["agents"][0]["children"][2] = {"name": "cr", "template": "reviewer", "tools": ["read"]}
+    agents = {a.addr: a for a in bpm._resolve(b, None, [tmp_path], [])}
+    ws = str((tmp_path / "proj").resolve())
+    assert agents["lead/cr"].workspace is None and agents["lead/cr"].inputs == [ws]
 
 
 def test_warning_for_built_in_write_on_a_non_code_goal(bp, tmp_path, dirs):
@@ -465,7 +478,7 @@ def test_apply_confines_a_reader_without_any_input(tmp_path):
     b["needs"].pop("workspace")
     b["agents"][0]["children"] = [{"name": "dev", "template": "engineer", "workspace": str(tmp_path / "proj")},
                                   {"name": "qa", "template": "tester", "workspace": str(tmp_path / "proj")},
-                                  {"name": "cr", "template": "code-reviewer"}]
+                                  {"name": "cr", "template": "reviewer", "tools": ["read"]}]
     bpm.apply(o, b, allowed_roots=[tmp_path])
     meta, _ = o.charter("lead/cr")
     assert meta["inputs"] == [] and "workspace" not in meta  # confined, reads nothing: no legacy unconfined read
