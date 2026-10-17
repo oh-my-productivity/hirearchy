@@ -46,6 +46,32 @@ def cmd_task(args) -> None:
     print(f"task {msg.id} -> {msg.to} (budget {msg.budget})")
 
 
+def _bp_org(args) -> Org | None:
+    try:
+        return _org(args)
+    except OrgError:
+        return None
+
+
+def cmd_plan(args) -> None:
+    from . import blueprint
+
+    org = _bp_org(args)
+    bp = blueprint.load(Path(args.blueprint))
+    issues = blueprint.validate(bp, org=org, allowed_roots=args.allow_root or None)
+    print(blueprint.render_plan(bp, issues, org=org, allowed_roots=args.allow_root or None))
+    if blueprint.errors(issues):
+        sys.exit(1)
+
+
+def cmd_apply(args) -> None:
+    from . import blueprint
+
+    org = _org(args)
+    summary = blueprint.apply(org, blueprint.load(Path(args.blueprint)), allowed_roots=args.allow_root or None)
+    print(f"org: {org.root}\n{summary.text()}")
+
+
 def cmd_send(args) -> None:
     org = _org(args)
     msg = org.send(ROOT, args.to, _text(args.body), title=args.title, reply_to=args.reply_to, budget=args.budget)
@@ -160,6 +186,16 @@ def main(argv: list[str] | None = None) -> None:
     s.add_argument("--budget", type=int)
     s.add_argument("--revises", metavar="TASK_ID", help="send back for rework: id of an earlier task sent to this agent")
     s.set_defaults(fn=cmd_task)
+
+    s = sub.add_parser("plan", help="validate a blueprint and print the plan for approval (exit 1 on errors)")
+    s.add_argument("blueprint", help="blueprint YAML/JSON file")
+    s.add_argument("--allow-root", action="append", metavar="DIR", help="directory workspaces may be in (repeatable; default: home, temp, cwd)")
+    s.set_defaults(fn=cmd_plan)
+
+    s = sub.add_parser("apply", help="create the agents of a blueprint and give its first task (as root)")
+    s.add_argument("blueprint", help="blueprint YAML/JSON file")
+    s.add_argument("--allow-root", action="append", metavar="DIR", help="directory workspaces may be in (repeatable; default: home, temp, cwd)")
+    s.set_defaults(fn=cmd_apply)
 
     s = sub.add_parser("send", help="send a note to an agent (as root)")
     s.add_argument("to")
