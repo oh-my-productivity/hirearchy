@@ -10,7 +10,8 @@ import os
 
 from mcp.server.fastmcp import FastMCP
 
-from .core import ROOT, Org
+from .core import ROOT, Org, OrgError
+from .health import org_health, render_text
 
 INSTRUCTIONS = """\
 You are a member of a file-based organization of agents. Your identity is fixed by the runtime.
@@ -40,16 +41,23 @@ def build_server(org: Org, me: str) -> FastMCP:
 
     @mcp.tool()
     def delegate(
-        to: str, title: str, goal: str, acceptance: str, inputs: list[str] | None = None, budget: int | None = None
+        to: str,
+        title: str,
+        goal: str,
+        acceptance: str,
+        inputs: list[str] | None = None,
+        budget: int | None = None,
+        revises: str | None = None,
     ) -> str:
         """Assign a task to one of your direct reports.
 
         to: the report's address (e.g. "ceo/cto"). title: a few words. goal: what outcome is needed and why.
         acceptance: concrete, checkable criteria for "done". inputs: paths (relative to the org root) the
         report should read. budget: runs handed to the report from your own budget (default from ORG.md).
+        revises: when sending work back for rework, the id of the earlier task you sent to the same report.
         Returns the task id. Do not wait for the result: end your run, the result will wake you.
         """
-        msg = org.delegate(me, to, title, goal, acceptance, inputs or [], budget)
+        msg = org.delegate(me, to, title, goal, acceptance, inputs or [], budget, revises)
         return f"delegated {msg.id} to {msg.to} with budget {msg.budget}. Your budget is now {org.budget(me)}."
 
     @mcp.tool()
@@ -125,6 +133,18 @@ def build_server(org: Org, me: str) -> FastMCP:
     def status() -> str:
         """The whole organization as a tree: each agent's role, state, budget and workload."""
         return org.tree()
+
+    @mcp.tool()
+    def health(agent: str | None = None) -> str:
+        """Health report (stuck, expensive, low-quality, wasteful, idle, paused) for an agent and its subtree.
+
+        agent: yourself or an agent in your own subtree (root may ask about anyone). Default: your own subtree
+        (root: the whole organization). Use it to decide whom to follow up with, rework, re-budget or retire.
+        """
+        target = org.require(agent or me)
+        if me != ROOT and target not in org.subtree(me):
+            raise OrgError(f"you can only view health for yourself or agents in your own subtree ({me}/...), not {target}")
+        return render_text(org_health(org, target))
 
     return mcp
 

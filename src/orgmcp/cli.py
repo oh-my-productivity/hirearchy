@@ -39,7 +39,9 @@ def cmd_hire(args) -> None:
 
 def cmd_task(args) -> None:
     org = _org(args)
-    msg = org.delegate(ROOT, args.to, args.title, _text(args.goal), _text(args.acceptance), args.input, args.budget)
+    msg = org.delegate(
+        ROOT, args.to, args.title, _text(args.goal), _text(args.acceptance), args.input, args.budget, args.revises
+    )
     org.commit(f"root: task {msg.id} -> {msg.to}")
     print(f"task {msg.id} -> {msg.to} (budget {msg.budget})")
 
@@ -59,6 +61,14 @@ def cmd_status(args) -> None:
         print("\nyour outstanding tasks:")
         for t in out:
             print(f"  {t.id} \"{t.title}\" -> {t.to}")
+
+
+def cmd_health(args) -> None:
+    from .health import org_health, render_text
+
+    org = _org(args)
+    report = org_health(org, args.agent or ROOT)
+    print(json.dumps(report.to_dict(), indent=2) if args.json else render_text(report))
 
 
 def cmd_inbox(args) -> None:
@@ -137,6 +147,7 @@ def main(argv: list[str] | None = None) -> None:
     s.add_argument("--acceptance", required=True, help="text or @file")
     s.add_argument("--input", action="append", default=[], help="path for the agent to read (repeatable)")
     s.add_argument("--budget", type=int)
+    s.add_argument("--revises", metavar="TASK_ID", help="send back for rework: id of an earlier task sent to this agent")
     s.set_defaults(fn=cmd_task)
 
     s = sub.add_parser("send", help="send a note to an agent (as root)")
@@ -149,6 +160,11 @@ def main(argv: list[str] | None = None) -> None:
 
     s = sub.add_parser("status", help="show the organization tree")
     s.set_defaults(fn=cmd_status)
+
+    s = sub.add_parser("health", help="show stuck, expensive, low-quality and idle agents and branches")
+    s.add_argument("--agent", metavar="ADDR", help="only this agent and its subtree (default: whole organization)")
+    s.add_argument("--json", action="store_true", help="print the structured data")
+    s.set_defaults(fn=cmd_health)
 
     s = sub.add_parser("inbox", help="read your (root) messages")
     s.add_argument("--keep", action="store_true", help="do not mark as read")

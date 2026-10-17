@@ -44,6 +44,46 @@ uv run orgmcp inbox
 
 Other commands: `send` (note or budget grant), `resume <agent>`, `run --once`, `mcp`, `kiro-profile`.
 
+## Health
+
+Health is measured from the files alone (message files and `runs/*.log`); nothing extra is stored. A run starts at
+the timestamp in its log file name and ends at the log's mtime; a run is *empty* if the agent sent no message during it.
+
+```sh
+uv run orgmcp health [--agent ADDR] [--json]
+```
+
+Prints a summary line (`3 agents, 1 flagged`), then one line per agent (indented by depth) with state, budget
+(left/received), runs, open tasks and the age of the oldest, results by status, rework, runs per completed task,
+empty runs, time since last activity, branch totals for managers, and any flags with their reasons.
+`--agent` limits it to that agent and its subtree; `--json` prints the structured data.
+
+The MCP tool `health(agent=None)` returns the same report. Root may ask about anyone; any other agent may ask
+about itself or an agent in its own subtree. By default it reports your own subtree (root: the whole organization).
+
+"Rework" counts tasks an agent received with `revises` set: a manager sends work back with
+`delegate(..., revises=<earlier task id>)` (CLI: `orgmcp task ... --revises TASK_ID`). The id must be a task the
+delegator earlier sent to the same assignee.
+
+| Flag | Meaning | Threshold key (default) |
+| --- | --- | --- |
+| `stuck` | open task older than the limit, and the agent is not running, has no unread mail, and is not waiting on a delegation | `stuck_after_seconds` (1800) |
+| `out_of_budget` | budget <= 0 while it has unread mail or open tasks | - |
+| `paused` | paused for any reason (shown in the reason) | - |
+| `low_quality` | (failed + blocked + rework) / tasks received above the ratio, once enough tasks were received | `max_problem_ratio` (0.5), `min_tasks_for_quality` (3) |
+| `expensive` | runs per completed task above the limit (needs a result), or too many runs since its last result while holding an open task | `max_runs_per_task` (5), `max_runs_without_result` (6) |
+| `wasteful` | empty runs / runs used above the ratio, once enough runs were used | `max_empty_run_ratio` (0.5), `min_runs_for_waste` (4) |
+| `idle` | no open tasks, no delegations, no unread mail and no activity for longer than the limit (measured from hiring if it never ran): a candidate to retire | `idle_after_seconds` (86400) |
+
+Branch totals (the agent plus its subtree) sum runs, open tasks, results and rework, and show the worst flag, in the
+order above (`stuck` is worst, `idle` mildest). Override any threshold in the `ORG.md` frontmatter:
+
+```yaml
+health:
+  stuck_after_seconds: 900
+  max_runs_per_task: 8
+```
+
 ## Kiro integration
 
 - Agent runs use `kiro-cli chat --no-interactive --agent orgmcp[-tools]`. The scheduler writes these profiles to
@@ -59,7 +99,7 @@ Other commands: `send` (note or budget grant), `resume <agent>`, `run --once`, `
 }
 ```
 
-MCP tools: `whoami`, `inbox`, `delegate`, `report`, `send`, `hire`, `retire`, `read`, `write`, `status`.
+MCP tools: `whoami`, `inbox`, `delegate`, `report`, `send`, `hire`, `retire`, `read`, `write`, `status`, `health`.
 
 ## Security notes
 

@@ -95,6 +95,7 @@ class Message:
     status: str | None = None
     budget: int = 0
     hops: int = 0
+    revises: str | None = None  # a task sent back for rework: the earlier task it revises
     id: str = ""
     created: str = ""
     path: Path | None = field(default=None, compare=False, repr=False)
@@ -115,6 +116,8 @@ class Message:
             meta["status"] = self.status
         if self.budget:
             meta["budget"] = self.budget
+        if self.revises:
+            meta["revises"] = self.revises
         return meta
 
     def to_text(self) -> str:
@@ -133,6 +136,7 @@ class Message:
             status=meta.get("status"),
             budget=int(meta.get("budget") or 0),
             hops=int(meta.get("hops") or 0),
+            revises=str(meta["revises"]) if meta.get("revises") else None,
             id=str(meta.get("id") or path.stem),
             created=str(meta.get("created") or ""),
             path=path,
@@ -146,6 +150,8 @@ class Message:
             head.append(f"reply_to: {self.reply_to}")
         if self.status:
             head.append(f"status: {self.status}")
+        if self.revises:
+            head.append(f"revises: {self.revises}")
         if self.budget:
             head.append(f"budget: {self.budget} runs")
         return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{self.body}\n"
@@ -394,6 +400,7 @@ class Org:
         reply_to: str | None = None,
         status: str | None = None,
         budget: int = 0,
+        revises: str | None = None,
         _skip_route_check: bool = False,
     ) -> Message:
         actor, to = self.require(actor), self.require(to)
@@ -420,7 +427,7 @@ class Org:
             )
         msg = Message(
             sender=actor, to=to, type=type, body=body.strip(), title=title.strip(),
-            reply_to=reply_to, status=status, budget=budget, hops=hops,
+            reply_to=reply_to, status=status, budget=budget, hops=hops, revises=revises,
         )
         return self.deliver(msg)
 
@@ -433,6 +440,7 @@ class Org:
         acceptance: str,
         inputs: list[str] | None = None,
         budget: int | None = None,
+        revises: str | None = None,
     ) -> Message:
         actor, to = self.require(actor), self.require(to)
         if actor != ROOT and self.parent(to) != actor:
@@ -443,8 +451,10 @@ class Org:
         budget = int(self.config["default_budget"] if budget is None else budget)
         if budget < 1:
             raise OrgError("a task needs a budget of at least 1 run")
+        if revises and not any(m.id == revises and m.type == "task" and m.to == to for m in self.sent(actor)):
+            raise OrgError(f"revises must be the id of an earlier task you sent to {to}: {revises}")
         body = templates.task_body(goal, acceptance, list(inputs or []))
-        return self.send(actor, to, body, type="task", title=title, budget=budget)
+        return self.send(actor, to, body, type="task", title=title, budget=budget, revises=revises or None)
 
     def _normalize_artifact(self, actor: str, path: str, since: str = "") -> str:
         """Resolve an artifact path and annotate it with facts a manager can check claims against."""
