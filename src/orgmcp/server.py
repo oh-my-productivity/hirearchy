@@ -40,16 +40,23 @@ def build_server(org: Org, me: str) -> FastMCP:
 
     @mcp.tool()
     def delegate(
-        to: str, title: str, goal: str, acceptance: str, inputs: list[str] | None = None, budget: int | None = None
+        to: str,
+        title: str,
+        goal: str,
+        acceptance: str,
+        inputs: list[str] | None = None,
+        budget: int | None = None,
+        revises: str | None = None,
     ) -> str:
         """Assign a task to one of your direct reports.
 
         to: the report's address (e.g. "ceo/cto"). title: a few words. goal: what outcome is needed and why.
         acceptance: concrete, checkable criteria for "done". inputs: paths (relative to the org root) the
         report should read. budget: runs handed to the report from your own budget (default from ORG.md).
+        revises: when sending work back for rework, the id of the earlier task you sent to the same report.
         Returns the task id. Do not wait for the result: end your run, the result will wake you.
         """
-        msg = org.delegate(me, to, title, goal, acceptance, inputs or [], budget)
+        msg = org.delegate(me, to, title, goal, acceptance, inputs or [], budget, revises)
         return f"delegated {msg.id} to {msg.to} with budget {msg.budget}. Your budget is now {org.budget(me)}."
 
     @mcp.tool()

@@ -39,7 +39,9 @@ def cmd_hire(args) -> None:
 
 def cmd_task(args) -> None:
     org = _org(args)
-    msg = org.delegate(ROOT, args.to, args.title, _text(args.goal), _text(args.acceptance), args.input, args.budget)
+    msg = org.delegate(
+        ROOT, args.to, args.title, _text(args.goal), _text(args.acceptance), args.input, args.budget, args.revises
+    )
     org.commit(f"root: task {msg.id} -> {msg.to}")
     print(f"task {msg.id} -> {msg.to} (budget {msg.budget})")
 
@@ -136,6 +138,7 @@ def main(argv: list[str] | None = None) -> None:
     s.add_argument("--acceptance", required=True, help="text or @file")
     s.add_argument("--input", action="append", default=[], help="path for the agent to read (repeatable)")
     s.add_argument("--budget", type=int)
+    s.add_argument("--revises", metavar="TASK_ID", help="send back for rework: id of an earlier task sent to this agent")
     s.set_defaults(fn=cmd_task)
 
     s = sub.add_parser("send", help="send a note to an agent (as root)")

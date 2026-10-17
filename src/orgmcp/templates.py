@@ -23,7 +23,8 @@ ORG_RULES = """\
 1. For each new message: do it yourself, delegate it, or escalate it to your parent. Never ignore a message.
 2. Never wait or poll. After delegating, end your run; the result will wake you.
 3. Before reporting delegated work as done, `read` the artifacts and check them against the acceptance criteria
-   yourself (`read` shows word count and modification time). Do not trust claims. If it falls short, send it back.
+   yourself (`read` shows word count and modification time). Do not trust claims. If it falls short, send it back with
+   `delegate(..., revises=<id of the earlier task>)` so the rework is recorded.
 4. Keep reports short: a few lines of summary plus artifact paths. Put detail in files, not messages.
 5. Every task assigned to you gets exactly one `report`. If you cannot finish, report `blocked` or `failed` and say why.
 6. Before you stop, update MEMORY.md with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
