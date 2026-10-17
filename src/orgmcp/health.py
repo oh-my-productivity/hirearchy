@@ -3,7 +3,8 @@
 Everything here is read-only and derived from message files and run logs (nothing is persisted):
 
 * a run starts at the timestamp in its log file name and ends at the log's mtime;
-* an *empty* run is one during which the agent sent no message;
+* an *empty* run is one during which the agent sent no message. Runs that failed (crash, timeout, kiro missing)
+  and runs woken only by runtime notes are not the agent's doing and are left out of the waste statistics;
 * *rework* is a received task that carries ``revises`` (a manager sent earlier work back).
 
 Thresholds come from ``HEALTH_DEFAULTS`` overridden by the ``health:`` mapping in ORG.md frontmatter.
@@ -12,6 +13,7 @@ Thresholds come from ``HEALTH_DEFAULTS`` overridden by the ``health:`` mapping i
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 
@@ -48,10 +50,12 @@ class AgentHealth:
     blocked: int
     runs_per_task: float | None  # runs used / results sent; None without results
     rework: int  # received tasks that revise an earlier one
-    empty_runs: int
+    empty_runs: int  # runs that sent no message (failed runs and runs that only handled runtime notes excluded)
     last_activity: datetime | None
     since_activity: float | None  # seconds
     flags: dict[str, str] = field(default_factory=dict)  # flag -> human reason
+    failed_runs: int = 0  # runs that crashed, failed to start, timed out or were interrupted (not the agent's fault)
+    runtime_runs: int = 0  # runs woken only by runtime notes (budget, stall, review): sending nothing is fine
 
     @property
     def worst_flag(self) -> str | None:
@@ -142,8 +146,14 @@ def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict 
 
     windows = _run_windows(org, a)
     sent_at = [t for t in map(_msg_time, sent) if t]
+    failed, runtime_only = _run_outcomes(org, a)
+    excluded = failed | runtime_only  # run starts that say nothing about the agent's own efficiency
+    judged = sum(1 for start, _ in windows if start not in excluded)
     candidates = windows[:-1] if running else windows  # a run in progress is not (yet) empty
-    empty = sum(1 for start, end in candidates if not any(start <= t <= end for t in sent_at))
+    empty = sum(
+        1 for start, end in candidates
+        if start not in excluded and not any(start <= t <= end for t in sent_at)
+    )
     activity = [end for _, end in windows] + sent_at
     last = max(activity, default=None)
     since = max(0.0, (now - last).total_seconds()) if last else None
@@ -172,8 +182,8 @@ def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict 
         reasons.append(f"{since_result} runs without a result on an open task (max {cfg['max_runs_without_result']})")
     if reasons:
         flags["expensive"] = "; ".join(reasons)
-    if runs_used >= cfg["min_runs_for_waste"] and empty / runs_used > cfg["max_empty_run_ratio"]:
-        flags["wasteful"] = f"{empty} of {runs_used} runs sent no message"
+    if judged and judged >= cfg["min_runs_for_waste"] and empty / judged > cfg["max_empty_run_ratio"]:
+        flags["wasteful"] = f"{empty} of {judged} runs sent no message"
     quiet = (since if last else _since_hired(org, a, now)) or 0.0
     if not (open_tasks or waiting or running or unread) and quiet > cfg["idle_after_seconds"]:
         flags["idle"] = f"no open tasks and no activity for {_duration(quiet)}; candidate to retire"
@@ -183,6 +193,7 @@ def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict 
         budget_received=sum(m.budget for m in received), runs_used=runs_used, tasks_received=len(tasks),
         open_tasks=len(open_tasks), oldest_open_age=oldest, rework=rework, empty_runs=empty,
         runs_per_task=runs_per_task, last_activity=last, since_activity=since, flags=flags, **by_status,
+        failed_runs=len(failed), runtime_runs=len(runtime_only - failed),
     )
 
 
@@ -220,7 +231,7 @@ def render_text(health: OrgHealth) -> str:
             f"open {h.open_tasks}" + (f" (oldest {_duration(h.oldest_open_age)})" if h.oldest_open_age is not None else ""),
             f"done {h.done} failed {h.failed} blocked {h.blocked} rework {h.rework}",
             "runs/task " + ("-" if h.runs_per_task is None else f"{h.runs_per_task:.1f}"),
-            f"empty {h.empty_runs}",
+            f"empty {h.empty_runs}" + (f" (+{h.failed_runs} failed)" if h.failed_runs else ""),
             "last activity " + ("never" if h.since_activity is None else f"{_duration(h.since_activity)} ago"),
         ]
         line = "  " * (h.depth - base) + ", ".join(parts)
@@ -275,6 +286,43 @@ def _run_windows(org: Org, addr: str) -> list[tuple[datetime, datetime]]:
         if start:
             out.append((start, max(start, datetime.fromtimestamp(p.stat().st_mtime, timezone.utc))))
     return out
+
+
+_EXIT_RE = re.compile(r"^# exit (-?\d+) after", re.MULTILINE)
+_FAILED_MARKS = ("# failed to start", "# killed after", "# interrupted by scheduler shutdown")
+_SENDERS_RE = re.compile(r"^# senders: (.*)$", re.MULTILINE)
+
+
+def _run_outcomes(org: Org, addr: str) -> tuple[set[datetime], set[datetime]]:
+    """Starts of the runs that failed, and of the runs whose whole batch came from the runtime.
+
+    Both facts are written into the run log by the scheduler: the ``# senders:`` header, and a closing
+    ``# exit <code>`` / ``# failed to start`` / ``# killed`` / ``# interrupted`` line. Only the first and last
+    few KB of a log are read. Logs without those lines (older runs, hand-made logs) count as ordinary runs.
+    """
+    d = org.dir(addr) / "runs"
+    failed: set[datetime] = set()
+    runtime_only: set[datetime] = set()
+    for p in sorted(d.glob("*.log")) if d.is_dir() else []:
+        start = None if p.name.startswith(".") else _stamp(p.stem)
+        if start is None:
+            continue
+        try:
+            with open(p, "rb") as f:
+                head = f.read(4096).decode("utf-8", "replace")
+                size = f.seek(0, 2)
+                f.seek(max(0, size - 2048))
+                tail = f.read().decode("utf-8", "replace")
+        except OSError:
+            continue
+        exits = _EXIT_RE.findall(tail)
+        if (exits and exits[-1] != "0") or any(f"\n{mark}" in "\n" + tail for mark in _FAILED_MARKS):
+            failed.add(start)
+        header = head.split("# ---- prompt ----", 1)[0]
+        senders = _SENDERS_RE.search(header)
+        if senders and {x.strip() for x in senders.group(1).split(",") if x.strip()} == {"runtime"}:
+            runtime_only.add(start)
+    return failed, runtime_only
 
 
 def _since_hired(org: Org, addr: str, now: datetime) -> float:

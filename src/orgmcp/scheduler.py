@@ -252,9 +252,11 @@ class Scheduler:
         self.total_runs += 1
         prompt = self.org.run_prompt(addr, batch)
         logf = open(log, "a", encoding="utf-8")
+        senders = ", ".join(sorted({m.sender for m in batch}))  # health tells runtime-only runs apart by this
         try:
+            logf.write(f"# run of {addr}, {len(batch)} message(s)\n# senders: {senders}\n")
             cmd, cwd, env = self.runner(self.org, addr, prompt)
-            logf.write(f"# run of {addr}, {len(batch)} message(s)\n# cwd: {cwd}\n# cmd: {' '.join(cmd)} <prompt on stdin>\n")
+            logf.write(f"# cwd: {cwd}\n# cmd: {' '.join(cmd)} <prompt on stdin>\n")
             logf.write(f"# ---- prompt ----\n{prompt}\n# ---- output ----\n")
             logf.flush()
             with tempfile.TemporaryFile() as stdin:  # a file, not a pipe: no deadlock if the child never reads it

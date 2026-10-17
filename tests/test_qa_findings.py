@@ -221,7 +221,6 @@ def test_qa8_review_does_not_spend_the_reserve_of_a_manager(org):
     assert not [n for n in result.notes if n.to == "ceo"], "the note's run would consume the run reserved for eng's result"
 
 
-@pytest.mark.xfail(strict=True, reason="QA-14: crashed/failed runs count as 'empty' runs, so an agent behind a broken kiro is flagged wasteful")
 def test_qa14_failed_runs_are_not_blamed_as_wasteful(org):
     org.send(ROOT, "ceo", "budget", budget=10)
     runs = org.dir("ceo") / "runs"

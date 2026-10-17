@@ -301,3 +301,80 @@ def test_skipped_manager_is_listed_in_roots_summary_and_told_later(org):
     org.send(ROOT, "ceo", "more budget", budget=3)  # the reserve is covered again
     again = review(org, later + timedelta(hours=1))
     assert [n.to for n in again.notes if n.to == "ceo"] == ["ceo"]  # its pending news is delivered now
+
+
+# ------------------------------------------------ QA-14: health vs failed runs
+
+from orgmcp.health import agent_health  # noqa: E402,F811
+
+
+def write_run(org, addr, i, text):
+    (org.dir(addr) / "runs" / f"20260101T{i:012d}.log").write_text(text)
+
+
+HEADER = "# run of ceo, 1 message(s)\n# senders: {senders}\n# cwd: /x\n# cmd: kiro-cli chat <prompt on stdin>\n"
+PROMPT = "# ---- prompt ----\nplease do things\n# ---- output ----\n"
+
+
+def test_failed_runs_do_not_make_an_agent_wasteful(org):
+    org.send(ROOT, "ceo", "budget", budget=20)
+    for i, tail in enumerate(["\n# exit 1 after 2s\n", "\n# failed to start: boom\n", "\n# killed after 5s timeout\n\n# exit -9 after 5s\n",
+                              "\n# interrupted by scheduler shutdown\n", "\n# exit 2 after 1s\n"]):
+        write_run(org, "ceo", i, HEADER.format(senders="root") + PROMPT + tail)
+    h = agent_health(org, "ceo", utcnow())
+    assert "wasteful" not in h.flags and h.empty_runs == 0 and h.failed_runs == 5 and h.runs_used == 5
+
+
+def test_successful_empty_runs_are_still_wasteful(org):
+    org.send(ROOT, "ceo", "budget", budget=20)
+    for i in range(5):
+        write_run(org, "ceo", i, HEADER.format(senders="root") + PROMPT + "\n# exit 0 after 2s\n")
+    h = agent_health(org, "ceo", utcnow())
+    assert "wasteful" in h.flags and h.empty_runs == 5 and "5 of 5" in h.flags["wasteful"]
+
+
+def test_runs_that_only_handled_runtime_notes_are_not_empty(org):
+    org.send(ROOT, "ceo", "budget", budget=20)
+    for i in range(6):
+        write_run(org, "ceo", i, HEADER.format(senders="runtime") + PROMPT + "\n# exit 0 after 2s\n")
+    write_run(org, "ceo", 6, HEADER.format(senders="root, runtime") + PROMPT + "\n# exit 0 after 2s\n")  # mixed: counts
+    h = agent_health(org, "ceo", utcnow())
+    assert h.runtime_runs == 6 and h.empty_runs == 1 and "wasteful" not in h.flags  # 1 judged run < min_runs_for_waste
+
+
+def test_failures_mixed_with_real_empty_runs_judge_only_the_real_ones(org):
+    org.send(ROOT, "ceo", "budget", budget=20)
+    for i in range(10):
+        write_run(org, "ceo", i, HEADER.format(senders="root") + PROMPT + "\n# exit 1 after 1s\n")
+    for i in range(10, 14):
+        write_run(org, "ceo", i, HEADER.format(senders="root") + PROMPT + "\n# exit 0 after 1s\n")
+    h = agent_health(org, "ceo", utcnow())
+    assert h.empty_runs == 4 and "4 of 4" in h.flags["wasteful"]
+
+
+def test_the_scheduler_records_senders_and_exit_in_the_log(org):
+    org.notify("ceo", "fyi", "a runtime note")
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
+    sched = Scheduler(org, lambda o, a, p: (["sh", "-c", "exit 3"], o.dir(a), dict(os.environ)), echo=lambda _: None)
+    sched.acquire()
+    try:
+        run_to_idle(sched)
+    finally:
+        sched.release()
+    log = next((org.dir("ceo") / "runs").glob("*.log")).read_text()
+    assert "# senders: root, runtime\n" in log and "# exit 3 after" in log
+    assert agent_health(org, "ceo", utcnow()).failed_runs >= 1
+
+
+def test_runtime_only_batch_is_recorded_as_such(org):
+    org.send(ROOT, "ceo", "budget", budget=5)
+    org.begin_run("ceo")
+    org.end_run("ceo", ok=True)
+    org.notify("ceo", "fyi", "a runtime note")
+    sched = Scheduler(org, lambda o, a, p: (["true"], o.dir(a), dict(os.environ)), echo=lambda _: None)
+    sched.acquire()
+    try:
+        run_to_idle(sched)
+    finally:
+        sched.release()
+    assert agent_health(org, "ceo", utcnow()).runtime_runs == 1
