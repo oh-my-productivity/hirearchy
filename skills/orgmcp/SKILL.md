@@ -12,7 +12,8 @@ Call `whoami` (or `status`). If the orgmcp tools are not available or error out:
 - Tell the user plainly that orgmcp is not available and why (the error text), and stop.
 - Never substitute subagents, scripts or other mechanisms, and never say the org did work it did not do.
 - Use only the org this server is bound to. Do not look for other orgs, and do not read `~/.kiro/settings/mcp.json` or any
-  config/credential file. If there is no org yet, `create_org` creates one at the bound path.
+  config/credential file. If there is no org yet (`whoami` says "Setup"), `create_org(mission=...)` creates one at the bound
+  path (pass `path=<absolute path>` only if the tool says none is bound).
 
 ## 1. Elicit (one message, then wait)
 Skip anything the request already answers. Send ONE message with this checklist, each item with your proposed default,
@@ -29,20 +30,26 @@ and say "reply 'defaults' to accept all":
 10. Progress: Default: one line when they ask, and a message when done.
 
 ## 2. Plan (never build before approval)
-Write a blueprint (YAML, see below) from the answers and call `propose_org(blueprint)`. It validates and returns the plan.
-Show the plan to the user as returned, including warnings. Errors: fix the blueprint and propose again; do not ask the user to
-approve a plan with errors. Revise on feedback and propose again. Only an explicit "approve" (or equivalent) moves on.
+Write a blueprint (YAML text, see below) from the answers and call `propose_org(blueprint=<the YAML text>)`. It validates, writes
+nothing and returns the plan (with the target organization). Show the plan to the user as returned, including warnings. Errors:
+fix the blueprint and propose again; do not ask the user to approve a plan with errors. Revise on feedback and propose again.
+Only an explicit "approve" (or equivalent) from the user moves on; your own judgment that the plan is good is not approval.
 
 ## 3. Build and run
-`create_org` if the org does not exist, `apply_org(blueprint)` (creates the agents and gives the first task), then `start`
-(the scheduler). Tell the user it is running and how many runs were planned.
+1. `create_org(mission=...)` if the org does not exist yet.
+2. `apply_org(blueprint=<the approved YAML, unchanged>, approved=True)`: creates the agents and gives the first task. Pass
+   `approved=True` only after the user explicitly approved that plan; the call refuses without it. On errors nothing is created.
+3. `start()` (the scheduler; skip it if `apply_org` says one is already running).
+Tell the user it is running and how many runs were planned (a ceiling: runs the team does not spend come back automatically).
 
 ## 4. Monitor
-- "status?": call `progress` and answer in one line (done / working / blocked, runs used of planned, open tasks).
+- "status?": call `progress()` (or `progress(task_id=...)`) and answer from it in one or two lines (done / working / blocked,
+  runs used of planned, what needs the user). Do not answer from memory or from guesses.
 - If a result comes back `blocked`, or `inbox` shows an escalation or budget request: tell the user what happened and give a
-  recommended decision (grant N runs, rework, change criteria). Spend beyond the approved budget needs the user's OK.
-- Never edit the org's artifacts to "fix" them. Send the work back with `delegate(..., revises=<task id>)` to the top agent (listing the required changes), or ask the
-  user. The org's single-writer rule holds for you too.
+  recommended decision (grant N runs with `send(to=<agent>, body=<why>, budget=N)`, rework, change criteria). Spend beyond the
+  approved budget needs the user's OK.
+- Never edit the org's artifacts to "fix" them. Send the work back with `delegate(to=<top agent>, title=..., goal=<required changes>,
+  acceptance=<the criteria, verbatim>, revises=<task id>)`, or ask the user. The org's single-writer rule holds for you too.
 - Do not promise to "check back later": a turn ends when you reply. Check when the user asks or when you are told it finished.
 
 ## 5. Finish
@@ -50,7 +57,7 @@ approve a plan with errors. Revise on feedback and propose again. Only an explic
 2. If something is unmet, send it back with `revises` (do not patch it yourself) and say what you did.
 3. Copy the deliverable to the requested path (the plan lists this step) and check it exists and matches.
 4. Reply briefly: what was produced, where, each criterion met/unmet, runs used vs planned.
-5. `stop` the scheduler when nothing is left to do.
+5. `stop()` the scheduler when nothing is left to do.
 
 ## Blueprint (compact example)
 ```yaml
