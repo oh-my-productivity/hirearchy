@@ -109,10 +109,23 @@ def load(source) -> dict:
                 text = p.read_text(encoding="utf-8")
         if text is None:
             text = str(source)
-        try:
-            bp = yaml.safe_load(text)
-        except yaml.YAMLError as exc:
-            raise BlueprintError(f"blueprint is not valid YAML/JSON: {exc}") from exc
+        bp = _parse(text)
+    return _normalize(bp)
+
+
+def load_text(text: str) -> dict:
+    """A blueprint from YAML/JSON text only. Never reads a file, whatever the text looks like (for text from a tool call)."""
+    return _normalize(_parse(text))
+
+
+def _parse(text: str):
+    try:
+        return yaml.safe_load(text)
+    except yaml.YAMLError as exc:
+        raise BlueprintError(f"blueprint is not valid YAML/JSON: {exc}") from exc
+
+
+def _normalize(bp) -> dict:
     if not isinstance(bp, dict):
         raise BlueprintError("a blueprint is a mapping with mission, needs, agents and task")
     task = bp.get("task")

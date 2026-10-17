@@ -15,8 +15,10 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
+from . import blueprint as blueprint_mod
 from .core import ROOT, Org, OrgError
 from .health import org_health, render_text
+from .progress import progress as org_progress
 from .scheduler import describe_scheduler, start_scheduler, stop_scheduler
 
 INSTRUCTIONS = """\
@@ -29,11 +31,21 @@ ROOT_INSTRUCTIONS = """\
 You are connected to ONE orgmcp organization as `root`, the human's seat. {where}
 - Use only this organization. Never look for, create or modify any other one (no other paths, no shell or CLI
   workarounds, no changing ORG_ROOT).
-- Never claim the organization did work unless orgmcp tools show it (status, inbox, read, health).
+- Never claim the organization did work unless orgmcp tools show it (status, progress, inbox, read, health).
 - If an orgmcp tool fails, tell the user what failed instead of substituting another mechanism (for example a
   generic subagent tool).
 - Work flows down as tasks (delegate), results flow up (report), everything else is a note (send). `whoami` and
   `status` show the current state; `start` and `stop` control the scheduler that wakes the agents.
+When the user asks for an org, team or agents for a goal:
+1. Ask what you need in ONE message, each item with a proposed default: scope, deliverable (format, length, path),
+   exact checkable acceptance criteria, sources/web, workspace and tests (code), budget in runs, models, review,
+   approval, progress.
+2. Write a blueprint (YAML) and call `propose_org`; show the plan as returned. Fix its errors; revise on feedback.
+3. Only after the user explicitly approves the plan: `create_org` (if none exists), `apply_org(blueprint,
+   approved=True)`, `start`. Spend beyond the plan needs their OK.
+4. Answer "status?" with `progress`. Relay escalations with a recommended decision.
+5. When it is done: read the deliverable and check it against EVERY acceptance criterion (send it back with
+   `delegate(..., revises=...)` if not; never patch it yourself), copy it where the user wants it, then `stop`.
 """
 
 DS_STORE = ".DS_Store"
@@ -209,18 +221,23 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
         """
         org = binding.get()
         msg = org.report(me, task_id, status, summary, artifacts or [])
-        return f"reported {status} on {task_id} to {msg.to}"
+        returned = f"; returned {msg.budget} unspent run(s) of budget to {msg.to}" if msg.budget else ""
+        return f"reported {status} on {task_id} to {msg.to}{returned}"
 
     @mcp.tool()
     def send(to: str, body: str, title: str = "", reply_to: str | None = None, budget: int = 0) -> str:
         """Send a note: a question, information, or an escalation.
 
         Allowed recipients: your parent, your direct reports, your siblings, or the sender of the message
-        you reply to (set reply_to to its id). budget: extra runs to grant a direct report (optional).
+        you reply to (set reply_to to its id). budget: runs to move along with the note (optional): extra runs
+        granted to a direct report, or unneeded runs given back to your PARENT (never to a sibling). Runs you
+        have left return to your parent by themselves with your final `done`/`failed` report when nothing else
+        is open for you; use this only to give some back earlier.
         """
         org = binding.get()
         msg = org.send(me, to, body, title=title, reply_to=reply_to, budget=budget)
-        return f"sent {msg.id} to {msg.to}"
+        moved = f" with {msg.budget} run(s) of budget" if msg.budget else ""
+        return f"sent {msg.id} to {msg.to}{moved}"
 
     @mcp.tool()
     def hire(
@@ -345,6 +362,67 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
         """Stop this organization's scheduler (SIGTERM, then wait briefly). Runs in flight are interrupted and
         redelivered on the next start. Only signals a process verified to be this organization's scheduler."""
         return stop_scheduler(binding.get())
+
+
+
+    @mcp.tool()
+    def propose_org(blueprint: str) -> str:
+        """Validate a blueprint and return the plan the user must approve. Writes nothing; safe to call repeatedly.
+
+        blueprint: YAML or JSON text (not a file path) with mission, needs, agents and task (see the orgmcp skill
+        or examples/blueprint-research.yaml). Works before the organization exists (limits then come from the
+        defaults). Returns the plan: target organization, goal, needs, org tree, budget, review, deliverable,
+        checkpoints, warnings and errors. Show it to the user as returned. If it has errors, fix the blueprint and
+        propose again; do not ask the user to approve a plan with errors.
+        """
+        org = binding.peek()
+        bp = blueprint_mod.load_text(blueprint)
+        plan = blueprint_mod.render_plan(bp, blueprint_mod.validate(bp, org=org), org=org)
+        return f"{_target_line(binding, org)}\n\n{plan}"
+
+    @mcp.tool()
+    def apply_org(blueprint: str, approved: bool = False) -> str:
+        """Create the agents of a blueprint and give its first task. Only after the user approved the plan.
+
+        blueprint: the YAML/JSON text the user approved via propose_org (unchanged). approved: pass True only after
+        the user explicitly approved that plan in this conversation; otherwise nothing happens. Needs an existing
+        organization (create_org first if there is none). Refuses with the issues if the blueprint has errors or a
+        name is taken, and undoes everything if it fails midway. Returns what was created; then call start().
+        """
+        if not approved:
+            raise OrgError("not applied: the user must approve the plan first. Call propose_org(blueprint), show the "
+                           "plan to the user, and only after their explicit approval call apply_org(blueprint, "
+                           "approved=True)")
+        org = binding.peek()
+        if org is None:
+            raise OrgError("not applied: there is no organization yet, so call create_org(mission=...) first, then "
+                           "apply_org again with the same blueprint")
+        summary = blueprint_mod.apply(org, blueprint_mod.load_text(blueprint))
+        running = describe_scheduler(org).startswith("scheduler: running")
+        nxt = ("The scheduler is already running and will pick the work up; answer status questions with progress()."
+               if running else "Next step: call start() to run the scheduler, then answer status questions with progress().")
+        return f"applied the blueprint to {org.root}\n{summary.text()}\n{nxt}"
+
+    @mcp.tool()
+    def progress(task_id: str | None = None) -> str:
+        """One plain status line per task you (root) gave, then what needs your decision. Read-only.
+
+        Per task: working / waiting on <agent> / stalled / blocked: <reason> / done / failed, who is busy, runs used
+        of the budget given, time since the last activity, and for finished tasks the artifact paths and the runs
+        returned. task_id: only that task, in any state (default: open tasks and those finished in the last day).
+        Use it to answer "status?"; it is cheaper and clearer than reading status and inbox.
+        """
+        if binding.peek() is None:
+            return setup_state(binding)
+        return org_progress(binding.get(), task_id)
+
+
+def _target_line(binding: OrgBinding, org: Org | None) -> str:
+    if org is not None:
+        agents = len(org.agents())
+        return f"Target organization: {org.root} (exists, {agents} agent(s) besides root; apply_org adds to it)"
+    where = binding.root if binding.root is not None else "(path given to create_org)"
+    return f"Target organization: {where} (none yet: create_org(mission=...) comes first, then apply_org)"
 
 
 def resolve_binding() -> tuple[OrgBinding, str]:

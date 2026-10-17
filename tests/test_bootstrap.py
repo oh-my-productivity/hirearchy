@@ -23,9 +23,9 @@ from orgmcp.server import OrgBinding, build_server, resolve_binding
 
 ROOT_TOOLS = {
     "whoami", "inbox", "delegate", "report", "send", "hire", "retire", "read", "write", "status", "health",
-    "create_org", "start", "stop",
+    "create_org", "start", "stop", "propose_org", "apply_org", "progress",
 }
-AGENT_TOOLS = ROOT_TOOLS - {"create_org", "start", "stop"}
+AGENT_TOOLS = ROOT_TOOLS - {"create_org", "start", "stop", "propose_org", "apply_org", "progress"}
 
 
 def call(server, tool, **args):
