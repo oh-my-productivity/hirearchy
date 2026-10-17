@@ -1,0 +1,28 @@
+# ---- output ----
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m55pv39wedwvxek1a4d9swf1","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+[tool] Running: @orgmcp/read
+[tool] Running: @orgmcp/read
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: @orgmcp/write
+[tool] Running: @orgmcp/write
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: @orgmcp/report
+[tool] status: Completed
+I reported the review as blocked: 10 of 11 criteria met, so it is not a pass. The review is in `lead/reviewer/work/review.md`.
+
+- **Not met:** the word limit as counted by `read`. I can't read the report file at `/private/tmp/orgmcp-d-1792266290/work-area/report.md`, so I couldn't confirm the 759 count. My rough count of the inline text is in the mid-800s, which is under 1000 either way. It clears if you confirm the count yourself or give me read access.
+- **Met:** plain language, exactly three findings, both tables, exactly three concrete recommendations, all three parts of the definition, and the pattern-versus-cause section.
+- **Required changes, most serious first:**
+  - Finding 3 says "mainly on the web and marketplace", but no marketplace price figure is shown.
+  - Recommendation 2 compares South and West only with "13.0% in the East". East has no order count and North is left out.
+  - "No blank values" is wrong, because `return_reason` is blank on every non-returned order.
+  - "Largely disappear" ignores that Furniture stays high at 10.0%.
+  - "Both point at how the product is presented" states a cause that the report's own caveats say the data can't show.
+  - The price-band figures in Finding 3 have no order counts.
+- **Not checked:** I did not check any figure against the data or the script, since that is the checker's job and the data file was truncated for me. I only re-added and re-divided the numbers inside the report, and those were consistent.
+
+I have no runs left, so I can't do a re-review unless more budget is sent.
+
+# exit 0 after 119s

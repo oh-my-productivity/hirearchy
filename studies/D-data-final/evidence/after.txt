@@ -1,0 +1,29 @@
+== mcp.json md5
+MD5 (/Users/aminalizadeh/.kiro/settings/mcp.json) = 3eacba4e4479ae692c3dae8761b14b73
+== agents
+-rw-r--r--@  1 aminalizadeh  staff   961 Oct 17 20:46 orgmcp-orgmcp-a3-1792266280-org-1cbc08-web-fetch-web-search.json
+-rw-r--r--@  1 aminalizadeh  staff   830 Oct 17 20:48 orgmcp-orgmcp-a3-1792266280-org-1cbc08.json
+-rw-r--r--@  1 aminalizadeh  staff  1601 Oct 17 20:48 orgmcp-orgmcp-d-1792266290-org-e97487-read-shell-write-x5a69da47.json
+-rw-r--r--@  1 aminalizadeh  staff   827 Oct 17 20:53 orgmcp-orgmcp-d-1792266290-org-e97487.json
+-rw-r--r--@  1 aminalizadeh  staff   828 Oct 17 15:38 orgmcp-read-shell-web_fetch-web_search-write.json
+-rw-r--r--@  1 aminalizadeh  staff   714 Oct 17 17:51 orgmcp-read-shell-write.json
+-rw-r--r--@  1 aminalizadeh  staff   675 Oct 17 18:03 orgmcp-read-shell.json
+-rw-r--r--@  1 aminalizadeh  staff   715 Oct 17 15:27 orgmcp-web_fetch-web_search.json
+-rw-r--r--@  1 aminalizadeh  staff   597 Oct 17 16:30 orgmcp.json
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-orgmcp-a3-1792266280-org-1cbc08-web-fetch-web-search.json) = a28e166fda049efa58ccd10b8a7f47fe
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-orgmcp-a3-1792266280-org-1cbc08.json) = 6b1d5111f14c6d94e1520e0533d49051
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-orgmcp-d-1792266290-org-e97487-read-shell-write-x5a69da47.json) = d8dd676a7333231f0ae398c9bee49d3a
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-orgmcp-d-1792266290-org-e97487.json) = 8c168dc832761536961e9abac924d113
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-web_fetch-web_search-write.json) = f7ec83d121594de6363c471e3914033a
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-write.json) = e0552b84a9ba7b2725673a04f25ff76e
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read-shell.json) = 362384f01a3030b7209c66acf1316d8d
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-web_fetch-web_search.json) = f669ee6a7f97d249121703c72f935244
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp.json) = ba3ef12494eaa7ea24d4dd2e9465f1f8
+== main status
+== live org
+5b94a6b csv2md-lead: run ok, 1 message(s) [csv2md-lead/runs/20261017T170450874676.log]
+fbc09e8 scifi-editor: run ok, 1 message(s) [scifi-editor/runs/20261017T170352304817.log]
+fa188ee csv2md-lead/reviewer: run ok, 1 message(s) [csv2md-lead/reviewer/runs/20261017T170327934018.log]
+== data md5
+MD5 (/tmp/orgmcp-d-1792266290/data/orders_2025.csv) = e8e79288305b05e3b1a8502f876c6274
+Sat Oct 17 21:10:46 WEST 2026

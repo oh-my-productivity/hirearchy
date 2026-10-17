@@ -1,0 +1,61 @@
+[tool] Running: @orgmcp/blueprint_example
+[tool] Running: @orgmcp/blueprint_example
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+Here is the plan for your approval. Nothing has been created or started.
+
+PLAN FOR YOU
+Goal: Find out what is driving product returns in last year's orders (2025) for the user's shop, using only the user's own orders export. Produce a repeatable analysis script, a plain-language report for a non-statistician, a...
+What I understood you need:
+- Scope: Return drivers in /tmp/orgmcp-d-1792266290/data/orders_2025.csv only: return rate by category, product, region, channel, price band and quantity, and the stated return reasons. No other data, no web.
+- Your files (read-only): /private/tmp/orgmcp-d-1792266290/data
+- Quality bar: Every figure in the report is produced by the analysis script and can be reproduced by running it again; the key numbers are re-checked independently by someone who did not write the script.
+- Sources: Only the file orders_2025.csv in the read-only data folder; no web.
+- Workspace: /private/tmp/orgmcp-d-1792266290/work-area
+- Tests / packaging / commits: tests: python3 -m unittest on a small test file that checks the script's output is deterministic and matches the report figures; no network use; packaging: A single Python 3 script using only the standard library, run w...
+- Models: (not specified)
+Team (4 agents):
+- lead (Manager, model org default): directs the team; does not produce the work itself; can read files in /private/tmp/orgmcp-d-1792266290/work-area, /private/tmp/orgmcp-d-1792266290/data (/private/tmp/orgmcp-d-1792266290/data read-only); changes files only in /private/tmp/orgmcp-d-1792266290/work-area; can run commands, which are NOT confined: it is told to stay in /private/tmp/orgmcp-d-1792266290/work-area, but nothing enforces that
+  - analyst (Engineer, model org default): can read files in /private/tmp/orgmcp-d-1792266290/work-area, /private/tmp/orgmcp-d-1792266290/data (/private/tmp/orgmcp-d-1792266290/data read-only); changes files only in /private/tmp/orgmcp-d-1792266290/work-area; can run commands, which are NOT confined: it is told to stay in /private/tmp/orgmcp-d-1792266290/work-area, but nothing enforces that
+  - checker (Tester, model org default): can read files in /private/tmp/orgmcp-d-1792266290/work-area, /private/tmp/orgmcp-d-1792266290/data (/private/tmp/orgmcp-d-1792266290/data read-only); changes files only in /private/tmp/orgmcp-d-1792266290/work-area; can run commands, which are NOT confined: it is told to stay in /private/tmp/orgmcp-d-1792266290/work-area, but nothing enforces that
+  - reviewer (Independent Reviewer, model org default): can read /private/tmp/orgmcp-d-1792266290/data through the organization's read tool; cannot change your files
+Budget: 20 runs planned (one run = one working session of one agent), your cap is 20; the minimum for one review and rework is 17. Unspent runs come back to you.
+  lead starts with 20, hands down analyst 4, checker 2, reviewer 1 and keeps 13 for planning, checking and rework.
+Checking: checker, reviewer review the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every success check below.
+Deliverable: A plain-language returns report with three key findings, a table of return rate by category, a table of return rate by channel, three concrete recommendations, and a statement of what the return rate is calculated from. [markdown, max 1000 words]
+  Delivered to: /tmp/orgmcp-d-1792266290/report/returns.md (I copy it there after checking it)
+Done when ALL of these hold:
+  1. Uses only the file orders_2025.csv and nothing in the data folder is changed.
+  2. The analysis is a single Python 3 script in the workspace that, run twice, produces identical output.
+  3. The tests pass: `python3 -m unittest` in the workspace passes and checks determinism and that the report figures appear in the script's results.
+  4. Every figure in the report appears in the script's output.
+  5. The report is at most 1000 words as counted by read and is written in plain language.
+  6. The report has exactly three key findings, a table of return rate by category, a table of return rate by channel, and exactly three concrete recommendations.
+  7. The report states in plain words what the return rate is calculated from (returned orders divided by all orders in the group, each row being one order, returned being yes or no).
+  8. The report says where the data shows a pattern but cannot prove a cause.
+  ... and 2 more (see the details)
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (2):
+- lead, lead/analyst, lead/checker hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in...
+- no model policy: decide cheap drafting + strong review, or one model for everyone
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+END OF PLAN FOR YOU
+
+Some points the block cuts off or doesn't spell out:
+- **The two criteria hidden under "2 more":**
+  - The checker recomputes the overall rate, every category and channel rate, and every number in the three findings. Its report must show all of them matching.
+  - The reviewer's report must show every criterion met, and the analyst must have applied every change asked for.
+- **Roles:** The analyst writes the script and the report. The checker recomputes the key numbers on its own, without using the analyst's script. The reviewer checks the report against the criteria.
+- **Budget:** The plan uses a ceiling of 20 runs, and the minimum for one review and rework pass is 17. Runs the team doesn't spend come back.
+- **Shell access:** Three agents can run commands, and the system can't confine that by path. They are instructed to stay in the work folder and leave your data folder alone. The built-in file read and write access is confined, and the data folder is read-only for them.
+- **Models:** I haven't picked specific models, so every agent uses the organization's default.
+
+Reply "approve" to start, or tell me what to change.

@@ -1,0 +1,38 @@
+overall              truth=(216, 3000) report=(216, 3000) OK
+tm                   truth=(37, 122) report=(37, 122) OK
+others               truth=(179, 2878) report=(179, 2878) OK
+linen tm             truth=(15, 33) report=(15, 33) OK
+wool tm              truth=(10, 26) report=(10, 26) OK
+HT web/app           truth=(22, 329) report=(22, 329) OK
+mkt other cats       truth=(45, 779) report=(45, 779) OK
+price>=100           truth=(55, 568) report=(55, 568) OK
+price<20             truth=(27, 556) report=(27, 556) OK
+price>=100 excl tm   truth=(52, 540) report=(52, 540) OK
+price<20 excl tm     truth=(26, 554) report=(26, 554) OK
+web>=100             truth=(32, 256) report=(32, 256) OK
+web<20               truth=(10, 261) report=(10, 261) OK
+mkt>=100             truth=(16, 169) report=(16, 169) OK
+mkt<20               truth=(11, 155) report=(11, 155) OK
+app>=100             truth=(7, 143) report=(7, 143) OK
+app<20               truth=(6, 140) report=(6, 140) OK
+qty4                 truth=(10, 100) report=(10, 100) OK
+furniture            truth=(24, 239) report=(24, 239) OK
+tm South             truth=(17, 43) report=(17, 43) OK
+tm West              truth=(10, 27) report=(10, 27) OK
+tm North             truth=(7, 29) report=(7, 29) OK
+tm East              truth=(3, 23) report=(3, 23) OK
+table Home Textiles (451, 59, 13.1) OK
+table Furniture (239, 24, 10.0) OK
+table Outdoor Gear (317, 22, 6.9) OK
+table Kitchenware (465, 30, 6.5) OK
+table Garden (398, 25, 6.3) OK
+table Bath & Body (338, 20, 5.9) OK
+table Stationery (371, 18, 4.9) OK
+table Candles & Scents (421, 18, 4.3) OK
+table marketplace (901, 82, 9.1) OK
+table web (1340, 98, 7.3) OK
+table app (759, 36, 4.7) OK
+Counter({'Not as described': 52, 'Late delivery': 46, 'Wrong size/colour': 45, 'Changed mind': 42, 'Arrived damaged': 31})
+tm reasons Counter({'Not as described': 13, 'Wrong size/colour': 9, 'Changed mind': 6, 'Late delivery': 5, 'Arrived damaged': 4})
+regions range {'North': 6.8, 'South': 7.4, 'East': 7.6, 'West': 7.0}
+mismatches 0
