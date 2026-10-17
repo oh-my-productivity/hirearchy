@@ -45,7 +45,7 @@ class Review:
         verb = "would send" if dry_run else "sent"
         out = [f"{self.flagged} flagged agent(s); {verb} {len(self.notes)} note(s)"]
         for n in self.notes:
-            out.append(f"\n-> {n.to}: {n.title}\n" + "\n".join("   " + line for line in n.body.splitlines()))
+            out.append(f"\n-> {n.to}: {n.title}\n" + "\n".join(("   " + line).rstrip() for line in n.body.splitlines()))
         return "\n".join(out)
 
 
