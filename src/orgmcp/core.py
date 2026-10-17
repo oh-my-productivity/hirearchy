@@ -57,6 +57,7 @@ DEFAULT_CONFIG = {
     "review_every_runs": 25,  # org-wide runs between health reviews (or review_every_seconds, whichever first)
     "review_every_seconds": 86400,
     "poll_seconds": 2,
+    "until_done_grace_seconds": 300,  # an until-done scheduler that finds nothing can progress without the user exits after this
     "default_budget": 10,  # runs given with a task when none is specified
     "memory_max_words": 800,  # cap on an agent's MEMORY.md; writes that exceed it are refused
     "default_model": None,  # kiro model; None = kiro default
@@ -1191,16 +1192,29 @@ class Org:
         return "\n".join(lines)
 
     def _files_lines(self, addr: str, meta: dict) -> list[str]:
-        """The "Files" part of an agent's state: where each kind of path points. Empty without workspace and inputs."""
+        """The "Files" part of an agent's state: where each kind of path points, and which tool reaches it.
+
+        The orgmcp tools show up in kiro as ``@orgmcp/<tool>``; kiro's built-in ``read``/``write``/``shell`` have
+        the same short names but reach the workspace only, so an agent that has any of them is told the difference.
+        Empty for an agent with no workspace, no inputs and no built-in tools.
+        """
         ws, inputs = self.workspace_of(addr), self.inputs_of(addr)
-        if ws is None and not inputs:
-            return []
         tools = set(meta.get("tools") or [])
+        builtin = sorted(tools & {"read", "write", "shell"})
+        if ws is None and not inputs and not builtin:
+            return []
         lines = [
             "- Files:",
-            f"  - orgmcp tools: paths are relative to the org root; your notes and memory: `{addr}/MEMORY.md`, "
-            f"`{addr}/work/` (orgmcp `write` only).",
+            "  - orgmcp tools (shown as `@orgmcp/write`, `@orgmcp/read`, ...): paths are relative to the org root; your "
+            f"notes and memory: `{addr}/MEMORY.md`, `{addr}/work/` (orgmcp `write` only).",
         ]
+        if builtin:
+            lines.append(
+                "  - Do not mix up the two kinds of tools: kiro's built-in " + ", ".join(f"`{t}`" for t in builtin)
+                + " have the same short names as orgmcp's but work on the workspace only and never reach the org. "
+                f"Org files (`{addr}/MEMORY.md`, `{addr}/work/`, anything under `{addr}/`) are written with "
+                "`@orgmcp/write` and read with `@orgmcp/read`, never with the built-in `write`/`read`."
+            )
         if ws is not None:
             lines.append(
                 f"  - Workspace (kiro read/write/shell, and the working directory of kiro tools): `{ws}`; relative "
@@ -1225,6 +1239,26 @@ class Org:
                 "to inputs, to the org directory, or anywhere else."
             )
         return lines
+
+    def stray_notice(self, addr: str) -> str:
+        """The one-time notice for an agent whose built-in ``write`` put org files in its workspace (see the
+        scheduler's stray detection). Told once per agent: the ledger entry is marked, nothing is moved or deleted."""
+        ledger = self.ledger("strays")
+        entry = ledger.get(addr)
+        if not isinstance(entry, dict) or entry.get("told") or not entry.get("paths"):
+            return ""
+        entry["told"] = True
+        self.save_ledger("strays", ledger)
+        paths = ", ".join(f"`{p}`" for p in entry["paths"][:5])
+        return (
+            "# Notice from the runtime (shown once)\n"
+            f"A previous run of yours used kiro's built-in `write` and created org files in your WORKSPACE: {paths}. "
+            "The organization does not see them, so your org memory and notes are not saved. Move that content into "
+            f"your org files now: read it, then save it with `@orgmcp/write` (e.g. path=\"{addr}/MEMORY.md\" or "
+            f"\"{addr}/work/...\"). Use `@orgmcp/write` for every org file from now on; the built-in `write` is for the "
+            "workspace only. The runtime does not move or delete those files; if they are real workspace "
+            "deliverables, ignore this."
+        )
 
     def _blocked_tasks(self, addr: str) -> list[Message]:
         """Tasks assigned to ``addr`` whose latest result is ``blocked``: answered, but they may be reported again."""
@@ -1302,6 +1336,8 @@ class Org:
             )
         messages = "\n".join(self._render_in_context(a, m) for m in batch) or "(none)"
         shown = {m.id for m in batch if m.type == "task"}
+        notice = self.stray_notice(a)
+        notice = f"\n{notice}\n" if notice else ""
         return f"""# orgmcp run: you are `{a}`
 
 {self.rules()}
@@ -1315,11 +1351,11 @@ class Org:
 # Your state
 {self.state_summary(a, shown)}
 - Paths: every path (read, write, artifacts) is relative to the org root. Yours start with `{a}/`.
-
+{notice}
 # New messages for this run ({len(batch)})
 {messages}
 ---
 Handle every new message above with the orgmcp tools, following the protocol.
 Messages may be redelivered after a crash: if your state shows one was already handled, skip it.
-Before you stop, update your memory with write(path="{a}/MEMORY.md", ...). Do not wait for replies; end the run when done.
+Before you stop, update your memory with `@orgmcp/write`(path="{a}/MEMORY.md", ...) (the orgmcp tool, not a built-in `write`). Do not wait for replies; end the run when done.
 """

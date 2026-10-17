@@ -1066,9 +1066,26 @@ def plan_id(bp: dict) -> str:
     return hashlib.sha256(canon.encode("utf-8")).hexdigest()[:PLAN_ID_LENGTH]
 
 
-def _clip(text: str, limit: int = 220) -> str:
+CLIP = 400  # characters a one-line field of the plan block may take before it is cut at a sentence boundary
+GOAL_CLIP = 800  # the Goal line: the whole mission, unless it is really long
+
+
+def _clip(text: str, limit: int = CLIP) -> str:
+    """One line of ``text`` that never ends mid-sentence.
+
+    Whole sentences are kept while they fit in ``limit`` characters; the first sentence is always kept whole, however
+    long. When sentences were left out, the line says so (the full text is in the details).
+    """
     text = " ".join(_s(text).split())
-    return text if len(text) <= limit else text[: limit - 1].rstrip() + "..."
+    if len(text) <= limit:
+        return text
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    out = sentences[0]
+    for sentence in sentences[1:]:
+        if len(out) + 1 + len(sentence) > limit:
+            break
+        out += " " + sentence
+    return out if out == text else out + " (the rest is in the details)"
 
 
 def _agent_access(a: Agent) -> str:
@@ -1130,7 +1147,21 @@ def _user_budget(agents: list[Agent], bp: dict) -> list[str]:
                 out.append(f"  {a.addr} starts with {split[a.addr]['grant']}, hands down "
                            + ", ".join(f"{c.rsplit('/', 1)[-1]} {split[c]['grant']}" for c in a.children)
                            + f" and keeps {split[a.addr]['keeps']} for planning, checking and rework.")
+        out.append(_failure_policy(total, est["total"]))
     return out
+
+
+def _failure_policy(total: int, minimum: int) -> str:
+    """What happens when the check fails again after the one rework the budget is built for, with the reserve in runs.
+
+    ``minimum`` = runs for one pass plus one rework cycle; what the plan holds above it is the reserve.
+    """
+    reserve = max(0, total - minimum)
+    head = "If the check still fails after one rework, I'll come back to you with options"
+    if reserve:
+        return (f"{head} before spending the reserve (about {reserve} runs); nothing beyond the {total} planned "
+                "runs is spent without your OK.")
+    return f"{head}; the plan has no reserve beyond that rework, and nothing beyond the {total} planned runs is spent without your OK."
 
 
 def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | None = None, allowed_roots: list | None = None) -> str:
@@ -1147,7 +1178,7 @@ def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | Non
     task = bp.get("task") if isinstance(bp.get("task"), dict) else {}
     errs = [i for i in issues if i.level == "error"]
     warns = [i for i in issues if i.level == "warning" and i.code not in HIDDEN_WARNINGS]
-    L: list[str] = [PLAN_DRAFT_HEADING if errs else PLAN_HEADING, f"Goal: {_clip(bp.get('mission')) or '(missing)'}", "What I understood you need:"]
+    L: list[str] = [PLAN_DRAFT_HEADING if errs else PLAN_HEADING, f"Goal: {_clip(bp.get('mission'), GOAL_CLIP) or '(missing)'}", "What I understood you need:"]
 
     def need(label: str, value) -> None:
         L.append(f"- {label}: {_clip(value) or '(not specified)'}")
@@ -1190,7 +1221,7 @@ def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | Non
 
     crit = _criteria(bp)
     L.append("Done when ALL of these hold:" if crit else "Done when: (no success checks given)")
-    L += [f"  {i}. {_clip(c, 200)}" for i, c in enumerate(crit[:SHOWN_CRITERIA], 1)]
+    L += [f"  {i}. {' '.join(_s(c).split())}" for i, c in enumerate(crit[:SHOWN_CRITERIA], 1)]  # the contract: in full
     if len(crit) > SHOWN_CRITERIA:
         L.append(f"  ... and {len(crit) - SHOWN_CRITERIA} more (see the details)")
 
@@ -1198,12 +1229,12 @@ def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | Non
              f"progress - {_clip(needs.get('progress')).rstrip('.') or 'one line when you ask'}; any spend beyond the budget needs your OK.")
     if warns:
         L.append(f"Warnings ({len(warns)}):")
-        L += [f"- {_clip(w.message, 200)}" for w in warns[:SHOWN_WARNINGS]]
+        L += [f"- {_clip(w.message)}" for w in warns[:SHOWN_WARNINGS]]
         if len(warns) > SHOWN_WARNINGS:
             L.append(f"- ... and {len(warns) - SHOWN_WARNINGS} more (see the details)")
     if errs:
         L.append(f"Errors ({len(errs)}):")
-        L += [f"- {e.path}: {_clip(e.message, 200)}" for e in errs[:SHOWN_WARNINGS]]
+        L += [f"- {e.path}: {_clip(e.message)}" for e in errs[:SHOWN_WARNINGS]]
     L.append("Nothing is created or started until you approve. Reply 'approve', or tell me what to change." if not errs
              else "Cannot apply yet.")
     L.append(PLAN_END)

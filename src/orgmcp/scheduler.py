@@ -171,6 +171,7 @@ class Run:
     logf: IO[str]
     started: float
     batch: int
+    strays: dict | None = None  # paths of the agent's workspace that could hold stray org files, before the run
 
 
 def _signal_group(proc: subprocess.Popen, sig: int) -> None:
@@ -351,6 +352,9 @@ def describe_scheduler(org: Org) -> str:
         return (f"scheduler: unknown - .runtime/scheduler.pid names pid {st.pid}, which is alive but not verified "
                 f"to be this org's scheduler ({st.detail}); not trusted")
     reason = _exit_reason(org)
+    if not reason:
+        waiting = waiting_on_user(org)
+        reason = waiting.text if waiting else ""
     return f"scheduler: stopped ({reason})" if reason else "scheduler: stopped"
 
 
@@ -361,6 +365,87 @@ def _exit_reason(org: Org) -> str:
     except OSError:
         return ""
     return reason if reason and not org.outstanding(ROOT) else ""
+
+
+class Waiting(NamedTuple):
+    """Why open root tasks cannot move without the user. ``text``: "waiting on you: ..."; ``options``: what the user can
+    do; ``settled``: False while the stall ladder (reminders to the holder) may still wake someone."""
+    text: str
+    options: str
+    settled: bool = True
+
+
+def _chain(org: Org, addr: str, task) -> list[str]:
+    """Who hears about a stalled task, in order: the assignee, its assigner, then up the tree to root."""
+    chain = [addr]
+    up = task.sender if org.exists(task.sender) else org.parent(addr)
+    while up:
+        chain.append(up)
+        up = org.parent(up)
+    return chain
+
+
+def _startable(org: Org, addr: str) -> bool:
+    """Could a scheduler start a run of ``addr`` now? (unread mail, budget, and not paused for another reason)"""
+    if not org.unread(addr) or (org.budget(addr) or 0) <= 0:
+        return False
+    return org.paused(addr) in (None, "budget")
+
+
+def _names(addrs: list[str]) -> str:
+    shown = ", ".join(addrs[:3])
+    return shown + (f" and {len(addrs) - 3} more" if len(addrs) > 3 else "")
+
+
+def waiting_on_user(org: Org, *, running=None, blocked=(), can_start: bool = True) -> Waiting | None:
+    """Is every open root task unable to progress without the user? None if not (or root has no open task).
+
+    True when nothing runs and no agent could start a run (``running``/``blocked``: the scheduler's own view, default
+    the inflight mailboxes; ``can_start=False``: the run cap is spent), yet root still waits for a result. The holders
+    are then paused for budget or repeated failures, or stalled with nothing happening, or gone. Read-only.
+    """
+    tasks = org.outstanding(ROOT)
+    if not tasks:
+        return None
+    agents = org.agents()
+    if (set(running) if running is not None else {a for a in agents if org.running(a)}) or blocked:
+        return None
+    if can_start and any(_startable(org, a) for a in agents):
+        return None
+    nudges = _nudge_entries(org.ledger("nudges"))
+    texts: list[str] = []
+    options: list[str] = []
+    settled = True
+    for t in tasks:
+        title = f'"{t.title}"'
+        team = [a for a in org.subtree(t.to) if a != ROOT] if org.exists(t.to) else []
+        if not team:
+            texts.append(f"{title} needs a decision ({t.to} no longer exists)")
+            continue
+        holding = [a for a in team if org.unread(a) or org.open_tasks(a)]
+        failing = [a for a in holding if org.paused(a) not in (None, "budget")]
+        short = [a for a in holding if a not in failing and (org.budget(a) or 0) <= 0]
+        if failing:
+            texts.append(f"{title} needs you to resume {_names(failing)} (it keeps failing)")
+            options.append(f"a human runs `orgmcp resume {failing[0]}` and you call start()")
+        elif short:
+            texts.append(f"{title} needs budget ({_names(short)} out of runs)")
+            options.append(f'grant runs with send(to="{t.to}", body="<why>", budget=N), then call start()')
+        else:
+            stalled = [a for a in team if org.open_tasks(a) and not org.outstanding(a)]
+            who = f"{_names(stalled)} holds it and nothing is running" if stalled else "nothing is running"
+            texts.append(f"{title} needs a decision ({who})")
+            options.append(f'send(to="{t.to}", body=<instructions or a changed task>) and call start()')
+            for a in stalled:  # the stall ladder (reminder, then escalation up to root) may still wake the holder
+                for task in org.open_tasks(a):
+                    last = nudges.get(task.id)
+                    if (last["step"] if last else -1) < len(_chain(org, a, task)) - 1:
+                        settled = False
+    if not can_start:
+        texts.append("the run cap (max_runs) was reached")
+        options.append("start() again with a higher max_runs")
+    choices = "; or ".join(dict.fromkeys(options + ["accept what exists so far (the task stays open: tell the user, and stop() the scheduler)"]))
+    return Waiting("waiting on you: " + "; ".join(texts), "Your options: " + choices + ".", settled)
 
 
 def start_scheduler(org: Org, max_runs: int | None = None, until_done: bool = False) -> int:
@@ -471,6 +556,7 @@ class Scheduler:
         self._task_memo: dict[str, tuple[tuple, dict]] = {}  # agent -> (mailbox fingerprint, cached task views)
         self.pidfile = org.root / ".runtime" / "scheduler.pid"
         self._blocked: set[str] = set()  # agents whose orphaned run (of a dead scheduler) is alive and could not be killed
+        self._waiting_since: float | None = None  # until-done: since when nothing can progress without the user
 
     # ------------------------------------------------------------- lifecycle
 
@@ -604,6 +690,10 @@ class Scheduler:
                     self.echo(f"scheduler exiting: {FINISHED}")
                     atomic_write(self.org.root / EXIT_FILE, FINISHED + "\n")
                     break
+                if until_done and (reason := self._check_waiting(max_runs)):
+                    self.echo(f"scheduler exiting: {reason}")
+                    atomic_write(self.org.root / EXIT_FILE, reason + "\n")
+                    break
                 time.sleep(config_number(self.org.config, "poll_seconds"))
         except KeyboardInterrupt:
             pass
@@ -624,6 +714,28 @@ class Scheduler:
         self._guard("stall check", self._check_stalls)  # best-effort phases: a bug or bad data here
         self._guard("health review", self._check_review)  # must never stop agents from running
         return bool(self.runs) or (bool(self._runnable()) and (max_runs is None or self.total_runs < max_runs))
+
+    def waiting_on_user(self, max_runs: int | None = None) -> Waiting | None:
+        """``waiting_on_user`` with this scheduler's own view of what runs (read-only)."""
+        return waiting_on_user(self.org, running=set(self.runs), blocked=self._blocked,
+                               can_start=max_runs is None or self.total_runs < max_runs)
+
+    def _check_waiting(self, max_runs: int | None = None) -> str:
+        """Until-done: the exit reason once nothing has been able to progress without the user for the grace period
+        (``until_done_grace_seconds``), else ''. Anything that changes the picture (a grant, a resume, a new task)
+        starts the count again. A task that is merely stalled also waits for the stall ladder to reach root."""
+        waiting = self.waiting_on_user(max_runs)
+        if waiting is None:
+            self._waiting_since = None
+            return ""
+        now = self.clock()
+        if self._waiting_since is None:
+            self._waiting_since = now
+            self.echo(f"{waiting.text}. Exiting in {config_number(self.org.config, 'until_done_grace_seconds'):.0f}s "
+                      "unless something changes")
+        if not waiting.settled or now - self._waiting_since < config_number(self.org.config, "until_done_grace_seconds"):
+            return ""
+        return waiting.text
 
     def finished(self, max_runs: int | None = None) -> bool:
         """Is there nothing left for this scheduler: root has no open task, no run is in flight, no agent could start?"""
@@ -700,6 +812,7 @@ class Scheduler:
         prompt = self.org.run_prompt(addr, batch)
         logf = open(log, "a", encoding="utf-8")
         senders = ", ".join(sorted({m.sender for m in batch}))  # health tells runtime-only runs apart by this
+        strays = self._guard_value("stray check", lambda: _stray_probe(self.org, addr))
         try:
             logf.write(f"# run of {addr}, {len(batch)} message(s)\n# senders: {senders}\n")
             cmd, cwd, env = self.runner(self.org, addr, prompt)
@@ -718,7 +831,7 @@ class Scheduler:
             self.org.end_run(addr, ok=False)
             self._failed(addr, log)
             return
-        self.runs[addr] = Run(addr, proc, log, logf, time.time(), len(batch))
+        self.runs[addr] = Run(addr, proc, log, logf, time.time(), len(batch), strays)
         self._guard("run record", lambda: self._record_run(addr, self.runs[addr]))
         self.echo(f"{addr}: started run ({len(batch)} message(s))")
 
@@ -738,6 +851,7 @@ class Scheduler:
                 continue
             elapsed = time.time() - run.started
             run.logf.write(f"\n# exit {code} after {elapsed:.0f}s\n")
+            self._guard("stray check", lambda: self._check_strays(run))
             run.logf.close()
             del self.runs[addr]
             self._guard("run record", lambda: self._forget_run(addr))
@@ -754,6 +868,31 @@ class Scheduler:
                 self._failed(addr, run.log)
             rel = run.log.relative_to(self.org.root)
             self.org.commit(f"{addr}: run {'ok' if ok else f'failed ({code})'}, {run.batch} message(s) [{rel}]")
+
+    def _guard_value(self, phase: str, fn: Callable[[], dict]) -> dict | None:
+        """``fn()`` for a best-effort probe: None (and one log line per distinct error) if it fails."""
+        out: list[dict] = []
+        self._guard(phase, lambda: out.append(fn()))
+        return out[0] if out else None
+
+    def _check_strays(self, run: Run) -> None:
+        """After a run: did a built-in ``write`` put org files (the agent's MEMORY.md, its ``<address>/`` tree) into its
+        workspace? Warn in the run log and the scheduler output, and remember it so the agent's next prompt says so once.
+        Nothing is moved or deleted."""
+        if run.strays is None:
+            return
+        found = _strays_since(run.strays, _stray_probe(self.org, run.addr))
+        if not found:
+            return
+        rel = ", ".join(found[:5])
+        run.logf.write(f"\n# warning: {run.addr} created org files in its workspace with the built-in `write` "
+                       f"(not in the org, so they are not its memory): {rel}\n")
+        self.echo(f"{run.addr}: warning: org files in its workspace (built-in write shadows orgmcp write?): {rel}")
+        ledger = self.org.ledger("strays")
+        entry = ledger.get(run.addr) if isinstance(ledger.get(run.addr), dict) else {}
+        if not entry.get("told"):  # told once per agent: later strays are only logged
+            ledger[run.addr] = {"paths": found[:10], "told": False}
+            self.org.save_ledger("strays", ledger)
 
     def _failed(self, addr: str, log: Path) -> None:
         n = self.org.record_failure(addr)
@@ -848,13 +987,7 @@ class Scheduler:
         return cached[1][view]
 
     def _chain(self, addr: str, task) -> list[str]:
-        """Who hears about a stalled task, in order: the assignee, its assigner, then up the tree to root."""
-        chain = [addr]
-        up = task.sender if self.org.exists(task.sender) else self.org.parent(addr)
-        while up:
-            chain.append(up)
-            up = self.org.parent(up)
-        return chain
+        return _chain(self.org, addr, task)
 
     @staticmethod
     def _created(task) -> float:
@@ -866,6 +999,33 @@ class Scheduler:
     def _last_run_end(self, addr: str) -> float:
         logs = (self.org.dir(addr) / "runs").glob("*.log")
         return max((p.stat().st_mtime for p in logs), default=0.0)
+
+
+def _stray_probe(org: Org, addr: str) -> dict:
+    """Where an agent's built-in ``write`` leaves org files in its workspace, and what is there now.
+
+    kiro's ``write`` starts in the workspace, so ``write("lead/analyst/MEMORY.md")`` lands in ``<workspace>/lead/analyst/``.
+    Probed: ``<workspace>/<address>`` (a directory) and ``<workspace>/<address>/MEMORY.md``, each with its mtime.
+    Empty for an agent without built-in ``write`` or without a workspace (then nothing can land there).
+    """
+    meta, _ = org.charter(addr)
+    ws = org.workspace_of(addr)
+    if "write" not in (meta.get("tools") or []) or ws is None:
+        return {}
+    tree = ws.joinpath(*addr.split("/"))
+    out = {}
+    for path in (tree, tree / "MEMORY.md"):
+        try:
+            out[str(path)] = path.stat().st_mtime
+        except OSError:
+            pass
+    return out
+
+
+def _strays_since(before: dict, after: dict) -> list[str]:
+    """Paths of ``after`` that did not exist before the run, and a MEMORY.md written during it."""
+    new = [p for p, mtime in after.items() if p not in before or (p.endswith("MEMORY.md") and mtime > before[p])]
+    return [p for p in new if not (p.endswith("/MEMORY.md") and p.rsplit("/", 1)[0] in new)]  # the tree says it all
 
 
 def nothing_to_do(org: Org) -> bool:

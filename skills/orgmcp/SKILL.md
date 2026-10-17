@@ -40,7 +40,10 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
    summarize or reword it: it is what they approve (team, models, budget, checks, delivery place, warnings).
 3. Errors: fix the blueprint and propose again; never ask the user to approve a plan with errors. Revise on feedback and propose
    again (each change gives a new `plan_id`).
-4. Wait for an explicit "approve" (or equivalent). Your own judgment that the plan is good is not approval.
+4. Warnings in the block (for example no model policy, built-in `write` on a non-code goal): settle them with the user BEFORE you
+   ask for approval (ask which models, then propose again) or state each one plainly in your intro line. Never leave one silent.
+   The Budget lines say what happens if the check still fails after one rework: you will come back to the user first.
+5. Wait for an explicit "approve" (or equivalent). Your own judgment that the plan is good is not approval.
 
 ## 3. Build and run
 1. `create_org(mission=...)` if the org does not exist yet.
@@ -57,7 +60,11 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
   early on done/failed/blocked/stalled or when something needs them). Otherwise tell them to ask "status?".
 - If a result comes back `blocked`, or `inbox` shows an escalation or budget request: tell the user what happened and give a
   recommended decision (grant N runs with `send(to=<agent>, body=<why>, budget=N)`, rework, change criteria). Spend beyond the
-  approved budget needs the user's OK.
+  approved budget needs the user's OK. Ask at the FIRST budget request, with your recommendation; never wait until the reserve
+  is spent.
+- `progress` / `start` saying "waiting on you" means nothing can move without the user (an agent is out of runs or keeps failing,
+  or a task is stalled). Give the options it lists: grant runs, then `start()`; or accept what exists. The scheduler exits by
+  itself a few minutes after that, and `start()` refuses until something changes.
 - Never edit the org's artifacts to "fix" them. Send the work back with `delegate(to=<top agent>, title=..., goal=<required changes>,
   acceptance=<the criteria, verbatim>, revises=<task id>)`, or ask the user. If `progress` says the scheduler is stopped
   ("finished") and you sent more work, call `start()` again.
@@ -66,9 +73,11 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 1. Read the final deliverable and check it yourself against EVERY acceptance criterion (counts, sections, URLs, tests run).
 2. If something is unmet, send it back with `revises` (do not patch it yourself) and say what you did.
 3. Copy the deliverable to the requested path (the plan lists this step) and check it exists and matches.
-4. Reply briefly: what was produced, where, each criterion met/unmet, runs used vs planned.
+4. Reply briefly, and shorter still when the user asks for a short answer: the deliverable path, then one line per criterion
+   (met / unmet), then runs used of planned. Nothing else.
 5. The scheduler exits on its own when nothing is left (`progress` shows "scheduler: stopped (finished: no open tasks)").
-   Call `stop()` only if the user cancels or you started it with `until_done=False`.
+   Call `stop()` only if the user cancels, declines more budget, you hand over an unverified or partial result (say the task
+   stays open/blocked, not done), or you started it with `until_done=False`.
 
 ## Blueprint rules
 Templates: manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer (or give `charter:` text).
