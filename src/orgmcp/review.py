@@ -12,11 +12,12 @@ a direct report has a problem it has not been told about, and each note costs th
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 
 from . import templates
-from .core import ROOT, Org, utcnow
+from .core import BOXES, ROOT, Org, utcnow
 from .health import _aware, _parse_time, config_number, org_health
 
 LEDGER = "reviews"
@@ -67,9 +68,25 @@ def read_ledger(org: Org) -> dict | None:
     }
 
 
+def retired_runs(org: Org) -> int:
+    """Runs used by agents that were retired: their directories (run logs included) live on under ``.retired/``."""
+    count = 0
+    for top in sorted((org.root / ".retired").glob("*")) if (org.root / ".retired").is_dir() else []:
+        for here, dirs, files in os.walk(top):
+            if os.path.basename(here) == "runs":
+                count += sum(1 for f in files if f.endswith(".log") and not f.startswith("."))
+                dirs.clear()
+            else:  # only sub-agent directories can hold more run logs
+                dirs[:] = [d for d in dirs if d not in {*BOXES, "work"}]
+    return count
+
+
 def total_runs(org: Org) -> int:
-    """Runs used across the organization, counted from the run logs (so a restart does not reset it)."""
-    return sum(org.runs_used(a) for a in org.agents())
+    """Runs ever used across the organization, counted from the run logs (so a restart does not reset it).
+
+    Retired agents are included, so retiring never moves the counter backwards (and never postpones a review).
+    """
+    return sum(org.runs_used(a) for a in org.agents()) + retired_runs(org)
 
 
 def review_if_due(org: Org, now: datetime) -> Review | None:
@@ -82,7 +99,11 @@ def review_if_due(org: Org, now: datetime) -> Review | None:
         _save(org, now, total_runs(org), {})
         return None
     cfg, at = org.config, _parse_time(last["at"])
-    runs_due = total_runs(org) - last["runs"] >= config_number(cfg, "review_every_runs", int)
+    used = total_runs(org)
+    if used < last["runs"]:  # logs vanished some other way (e.g. .retired/ deleted): start counting again from here
+        last["runs"] = used
+        _save(org, _parse_time(last["at"]) or now, used, last["notified"])
+    runs_due = used - last["runs"] >= config_number(cfg, "review_every_runs", int)
     time_due = at is None or (_aware(now) - at).total_seconds() >= config_number(cfg, "review_every_seconds")
     return review(org, now) if runs_due or time_due else None
 

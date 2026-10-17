@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 
 from orgmcp import scheduler as sched_mod
-from orgmcp.core import ROOT, OrgError
+from orgmcp.core import ROOT, OrgError, utcnow
 from orgmcp.scheduler import Scheduler, ensure_kiro_profile
 
 
@@ -228,3 +228,44 @@ def test_a_huge_message_in_an_inbox_is_cut_in_the_prompt_with_the_path_to_read_i
 def test_short_messages_render_unchanged(org):
     msg = org.send(ROOT, "ceo", "hello")
     assert msg.render().endswith("\n\nhello\n") and "cut" not in msg.render()
+
+
+# --------------------------------------------------- QA-7: monotonic run counter
+
+from orgmcp.review import review_if_due, total_runs  # noqa: E402
+
+
+def add_runs(org, addr, n, prefix="2026"):
+    d = org.dir(addr) / "runs"
+    start = len(list(d.glob("*.log")))
+    for i in range(n):
+        (d / f"{prefix}0101T{start + i:012d}.log").touch()
+
+
+def test_total_runs_never_goes_down_when_agents_are_retired(org):
+    org.hire("ceo", "sub", "S", "s")  # a sub-team: ceo/sub
+    add_runs(org, "ceo", 2)
+    add_runs(org, "ceo/eng", 3)
+    add_runs(org, "ceo/sub", 4)
+    assert total_runs(org) == 9
+    org.retire("ceo", "eng", "done")
+    assert total_runs(org) == 9
+    org.retire(ROOT, "ceo", "restructure")  # takes the whole team (ceo, ceo/sub) along
+    assert total_runs(org) == 9
+    # unrelated files inside a retired directory are not run logs
+    for d in (org.root / ".retired").glob("ceo-*"):
+        (d / "work" / "runs").mkdir(parents=True, exist_ok=True)
+        (d / "work" / "runs" / "x.log").touch()
+        (d / "inbox" / "y.log").touch()
+    assert total_runs(org) == 9
+
+
+def test_review_baseline_is_rebased_if_the_counter_ever_shrinks(org):
+    configure(org, review_every_runs=2, review_every_seconds=10**9)
+    add_runs(org, "ceo", 5)
+    review_if_due(org, utcnow())  # starts the clock at 5
+    for f in (org.dir("ceo") / "runs").glob("*.log"):
+        f.unlink()
+    assert review_if_due(org, utcnow()) is None  # no spurious review, and no permanent stall:
+    add_runs(org, "ceo", 2, prefix="2027")
+    assert review_if_due(org, utcnow()) is not None

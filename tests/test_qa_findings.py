@@ -198,7 +198,6 @@ def test_qa6_retire_returns_unspent_budget_to_the_parent(org):
     assert org.budget("ceo") == 10
 
 
-@pytest.mark.xfail(strict=True, reason="QA-7: review run counter sums live agents only, so retiring agents suppresses later reviews")
 def test_qa7_retiring_agents_does_not_postpone_the_next_review(org):
     runs = org.dir(ENG) / "runs"
     for i in range(5):
