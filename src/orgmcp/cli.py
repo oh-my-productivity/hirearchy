@@ -71,6 +71,12 @@ def cmd_health(args) -> None:
     print(json.dumps(report.to_dict(), indent=2) if args.json else render_text(report))
 
 
+def cmd_progress(args) -> None:
+    from .progress import progress
+
+    print(progress(_org(args), args.task_id))
+
+
 def cmd_review(args) -> None:
     from .review import review
 
@@ -176,6 +182,10 @@ def main(argv: list[str] | None = None) -> None:
     s.add_argument("--agent", metavar="ADDR", help="only this agent and its subtree (default: whole organization)")
     s.add_argument("--json", action="store_true", help="print the structured data")
     s.set_defaults(fn=cmd_health)
+
+    s = sub.add_parser("progress", help="one line per task you gave: state, who is busy, cost, last activity; what needs you")
+    s.add_argument("task_id", nargs="?", help="only this task (default: open tasks and those finished in the last day)")
+    s.set_defaults(fn=cmd_progress)
 
     s = sub.add_parser("review", help="run a health review now: tell managers (and you) about flagged agents")
     s.add_argument("--dry-run", action="store_true", help="print what would be sent; write nothing")
