@@ -1,0 +1,15 @@
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+The org has finished. It used 9 of 22 planned runs, and 13 came back to the budget. The draft is at `lead/writer/work/competitors.md` inside the org folder. I haven't copied it to `/tmp/orgmcp-a2-1792261126/deliverables/competitors.md` yet. I haven't signed it off either, because the last two checks I started were interrupted before they finished.
+
+I've read the draft, and I don't accept it as it stands. These problems would fail your criteria:
+- **Sourcing:** URLs are listed per section, not next to each claim. Your rule was a source URL for every fact.
+- **Logseq encryption:** The table says "Unverified" for Logseq's E2E encryption, which means the researcher never found an answer.
+- **Joplin:** The draft says sync relies on third-party clouds and isn't self-hostable. I believe that's wrong, since Joplin has its own self-hostable server. The fact-checker didn't catch it.
+- **Logseq mobile:** The draft says Android is "coming". I believe an Android app already exists.
+- **Word count:** The lead reports 820 words. I haven't confirmed that, and I'd want to count the table too.
+- **Fact-checker:** I haven't confirmed that it verified at least 8 claims. The lead only mentions two corrections.
+
+My plan is to read the fact-checker's findings file and count the words. Then I'd send the draft back to the lead for rework with your criteria unchanged. That rework would use some of the 13 spare runs, which is within the 25-run cap. The alternative is to accept the draft as it is. Which do you want?
+
+If the interruptions were deliberate, tell me. If you stopped the file reads and word count on purpose, I'll hold off on them.

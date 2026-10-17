@@ -1,0 +1,5 @@
+[tool] Running: @orgmcp/delegate
+[tool] Running: @orgmcp/start
+[tool] status: Completed
+[tool] status: Completed
+I've sent the draft back to `lead` as a rework of the original task, with your criteria unchanged and the problems I found listed. It has a budget of 10 runs. The scheduler was already running, so it will pick the rework up. When the rework is finished, I'll check the draft, copy it to `/tmp/orgmcp-a2-1792261126/deliverables/competitors.md`, and tell you it's done.

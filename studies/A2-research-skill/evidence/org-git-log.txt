@@ -1,0 +1,16 @@
+d46999e lead: run ok, 1 message(s) [lead/runs/20261017T184426676362.log]
+baf69ee lead/factcheck: run ok, 1 message(s) [lead/factcheck/runs/20261017T184222158309.log]
+971f293 lead: run ok, 1 message(s) [lead/runs/20261017T184117860821.log]
+c67f907 lead/writer: run ok, 1 message(s) [lead/writer/runs/20261017T183943424291.log]
+82bfe98 lead: run ok, 1 message(s) [lead/runs/20261017T183819081036.log]
+d835cd3 lead: run ok, 1 message(s) [lead/runs/20261017T182918411678.log]
+1d192eb lead/writer: run ok, 1 message(s) [lead/writer/runs/20261017T182631806464.log]
+e324954 lead: run ok, 3 message(s) [lead/runs/20261017T182531606242.log]
+71e40cc lead: run ok, 1 message(s) [lead/runs/20261017T182316987264.log]
+adca13a lead/factcheck: run ok, 1 message(s) [lead/factcheck/runs/20261017T182240818054.log]
+6ebc29e lead/writer: run ok, 1 message(s) [lead/writer/runs/20261017T182415233306.log]
+6e5dfe8 lead/researcher: run ok, 1 message(s) [lead/researcher/runs/20261017T182102371443.log]
+0e21dfc lead/writer: run ok, 1 message(s) [lead/writer/runs/20261017T182124475571.log]
+ea7cee9 lead: run ok, 1 message(s) [lead/runs/20261017T182038261495.log]
+3fe0a00 root: applied blueprint (4 agents), task 20261017T182036968358-root-e02b -> lead
+5ec34e6 init organization

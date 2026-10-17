@@ -1,0 +1,3 @@
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+Still working. `lead`, `writer` and `researcher` are running, and `factcheck` has work waiting. 3 of 22 planned runs are used, and nothing needs your decision yet.

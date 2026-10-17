@@ -1,0 +1,9 @@
+[tool] Running: @orgmcp/create_org
+[tool] status: Completed
+[tool] Running: @orgmcp/apply_org
+[tool] status: Completed
+[tool] Running: @orgmcp/start
+[tool] status: Completed
+The org is running. It has 4 agents: `lead`, `researcher`, `writer` and `factcheck`. 22 runs are planned, and the scheduler is capped at 25. Any runs the team doesn't spend come back to you.
+
+Ask me "status?" whenever you like. I'll also report here when it finishes. After it does, I'll check the final file against every criterion and copy it to `/tmp/orgmcp-a2-1792261126/deliverables/competitors.md`.

@@ -1,0 +1,11 @@
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+[tool] Running: @orgmcp/inbox
+[tool] Finding **/competitors.md in org
+[tool] status: Completed
+[tool] status: Completed
+[tool] Reading competitors.md:1
+[tool] Running: wc -w /private/tmp/orgmcp-a2-1792261126/org/lead/writer/work/competitors.md; ls /private/tmp/orgmcp-a2-1792261126/org/lead/factcheck/ /private/tmp/orgmcp-a2-1792261126/org/lead/factcheck/* 2>/dev/null
+[tool] status: Completed
+[tool] status: Completed
+Error: Internal error (code -32603): Encountered an error in the response stream: The request was throttled by the service (request_id: 095ac03a-0157-4925-a3e2-7aeab85afbae)

@@ -1,0 +1,23 @@
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m55hd7d7ekes9hhcj5yg624e","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+[tool] Reading SKILL.md:1
+[tool] Running: @orgmcp/whoami
+[tool] status: Completed
+[tool] status: Completed
+Before I draft a plan, here are the choices I need from you. Each has a default. Reply "defaults" to accept all of them, or change any item.
+
+1. **Scope:** Which apps should I cover? The default is Obsidian Sync alternatives that can be self-hosted: Joplin, Trilium (TriliumNext), Logseq, Standard Notes, Outline, BookStack, SiYuan, and Memos. That's 8 apps. Tell me if you want to add, drop or swap any. Also, should Obsidian itself count? It isn't self-hosted and only works with community sync plugins.
+2. **Angle:** Who is the analysis for? The default is a generic evaluator, such as a small team or a power user choosing a tool. If you're building a competing product, tell me and I'll add a "Where we can win" section.
+3. **Deliverable:** The default is markdown, 1,500 words or fewer, saved to `~/deliverables/self-hosted-notes-competitors.md`.
+4. **Acceptance criteria:** My proposed checks are:
+   - It covers exactly the apps in scope.
+   - It's at most 1,500 words.
+   - It has a comparison table with one row per app. The columns are license, self-hosting method, sync and collaboration, editor and format, mobile apps, and E2E encryption.
+   - It has a short section on strengths, weaknesses and best fit for each app.
+   - It has a final summary section with recommendations.
+   - The fact-checker verified at least 8 claims, and every required change was applied.
+5. **Sources:** Every factual claim cites a primary-source URL, meaning official sites, docs or repos. The agents get web access. Default: yes.
+6. **Workspace:** Agents write only to a new working directory in the org folder, and the final file is copied to the path above. Default: yes.
+7. **Budget and models:** The estimate is about 20 runs, so I'd cap it at 25. A cheaper model does the research and drafting, and a stronger model manages and fact-checks. Default: yes.
+8. **Review:** A separate fact-checker agent who didn't write the draft checks it. Default: yes.
+9. **Approval:** You approve the plan before anything is created or started. I'll ask you before any spend beyond the budget. Default: yes.
+10. **Progress:** I'll give you one line when you ask and a message when it's done. Default: yes.
