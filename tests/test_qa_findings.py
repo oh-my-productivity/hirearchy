@@ -211,7 +211,6 @@ def test_qa7_retiring_agents_does_not_postpone_the_next_review(org):
     assert review.review_if_due(org, utcnow()) is not None
 
 
-@pytest.mark.xfail(strict=True, reason="QA-8: a review note is sent to a manager whose last run is reserved for a pending result")
 def test_qa8_review_does_not_spend_the_reserve_of_a_manager(org):
     org.hire("ceo", "ops", "Ops", "Do ops.")
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=3)

@@ -5,7 +5,8 @@
 a direct report has a problem it has not been told about, and each note costs that manager one run.
 
 * a manager (an agent with direct reports) hears about each (report, flag) pair once; a pair it was already
-  told about in the previous review is not repeated. Paused managers and managers without budget are skipped;
+  told about in the previous review is not repeated. Paused managers and managers whose budget is no more than
+  their outstanding delegations (the reserve for processing results) are skipped and listed in root's note;
 * root hears about every flagged agent in one note, every review (it is free), so nothing is hidden;
 * the only state is ``.runtime/reviews.json``: when, the org-wide run count, and who was told about what.
 """
@@ -122,7 +123,7 @@ def review(org: Org, now: datetime | None = None, dry_run: bool = False) -> Revi
             continue
         known = [k for k in pairs if k in previous.get(manager, [])]
         new = [k for k in pairs if k not in known]
-        why = "paused" if org.paused(manager) else "no budget left" if (org.budget(manager) or 0) <= 0 else ""
+        why = _cannot_afford(org, manager)
         if why:
             result.skipped[manager] = why
             result.notified[manager] = known  # what it already knew and is still true
@@ -153,6 +154,19 @@ def review(org: Org, now: datetime | None = None, dry_run: bool = False) -> Revi
             org.notify(n.to, n.title, n.body)
         _save(org, now, result.runs, result.notified)
     return result
+
+
+def _cannot_afford(org: Org, manager: str) -> str:
+    """Why a note must not be sent to this manager ("" = it may be). A note costs a run; the runs a manager
+    holds in reserve (one per outstanding delegation, to process the result) are not for review notes."""
+    if org.paused(manager):
+        return "paused"
+    budget, owed = org.budget(manager) or 0, len(org.outstanding(manager))
+    if budget <= 0:
+        return "no budget left"
+    if budget <= owed:
+        return f"budget {budget} is reserved for {owed} outstanding delegation(s)"
+    return ""
 
 
 def _pairs(org: Org, health, by_addr: dict, manager: str) -> dict[str, str]:

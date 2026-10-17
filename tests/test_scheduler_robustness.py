@@ -3,6 +3,7 @@
 import os
 import pwd
 import time
+from datetime import timedelta
 from pathlib import Path
 
 from orgmcp import scheduler as sched_mod
@@ -269,3 +270,34 @@ def test_review_baseline_is_rebased_if_the_counter_ever_shrinks(org):
     assert review_if_due(org, utcnow()) is None  # no spurious review, and no permanent stall:
     add_runs(org, "ceo", 2, prefix="2027")
     assert review_if_due(org, utcnow()) is not None
+
+
+# ------------------------------------------------ QA-8: reviews and the reserve
+
+
+def test_manager_with_spare_budget_beyond_its_reserve_still_gets_the_note(org):
+    org.hire("ceo", "ops", "Ops", "Do ops.")
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=4)
+    org.delegate("ceo", "ceo/eng", "work", "g", "a", budget=1)  # budget 2 left, one outstanding
+    configure(org, health={"idle_after_seconds": -1})
+    from orgmcp.review import review
+
+    result = review(org, utcnow() + timedelta(hours=1))
+    assert [n.to for n in result.notes if n.to == "ceo"] == ["ceo"] and "ceo" not in result.skipped
+
+
+def test_skipped_manager_is_listed_in_roots_summary_and_told_later(org):
+    from orgmcp.review import review
+
+    org.hire("ceo", "ops", "Ops", "Do ops.")
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=3)
+    org.delegate("ceo", "ceo/eng", "work", "g", "a", budget=2)
+    configure(org, health={"idle_after_seconds": -1})
+    later = utcnow() + timedelta(hours=1)
+    result = review(org, later)
+    assert "reserved for 1 outstanding" in result.skipped["ceo"]
+    root_note = next(n for n in result.notes if n.to == ROOT)
+    assert "Managers not notified: `ceo` (budget 1 is reserved for 1 outstanding delegation(s))" in root_note.body
+    org.send(ROOT, "ceo", "more budget", budget=3)  # the reserve is covered again
+    again = review(org, later + timedelta(hours=1))
+    assert [n.to for n in again.notes if n.to == "ceo"] == ["ceo"]  # its pending news is delivered now
