@@ -471,7 +471,7 @@ def test_apply_writes_inputs_into_charters_and_confines_readers(bp, tmp_path, di
     assert o.inputs_of("lead/researcher") == [dirs["handbook"]]
 
 
-def test_apply_confines_a_reader_without_any_input(tmp_path):
+def test_apply_confines_a_reader_to_the_authors_workspace_read_only(tmp_path):
     from test_blueprint import code_bp
     o = Org.init(tmp_path / "org", "x", {"poll_seconds": 0.05})
     b = code_bp(tmp_path)
@@ -481,7 +481,8 @@ def test_apply_confines_a_reader_without_any_input(tmp_path):
                                   {"name": "cr", "template": "reviewer", "tools": ["read"]}]
     bpm.apply(o, b, allowed_roots=[tmp_path])
     meta, _ = o.charter("lead/cr")
-    assert meta["inputs"] == [] and "workspace" not in meta  # confined, reads nothing: no legacy unconfined read
+    # confined (no legacy unconfined read) and a verifier reads what it reviews: the authors' workspace, read-only
+    assert meta["inputs"] == [str((tmp_path / "proj").resolve())] and "workspace" not in meta
 
 
 def test_plan_shows_an_access_line_per_agent(bp, tmp_path, dirs):

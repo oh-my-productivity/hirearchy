@@ -11,16 +11,17 @@ from pathlib import Path
 
 from .core import OrgError
 
-KINDS = ("research", "documents", "code")
+KINDS = ("research", "documents", "code", "analysis")
 
 SCHEMA = """\
 # Blueprint schema in one paragraph. A blueprint is YAML with four top-level keys. `mission`: one paragraph on what the
 # organization is for. `needs`: what the user asked for, in their terms: scope (the exact list of items, only what they
 # gave you), deliverable {description, format, max_words, path}, quality_bar, sources, inputs (read-only folders with the
 # user's files), workspace (the one folder agents may write in, for code), budget_runs (the user's cap in runs),
-# models {cheap, strong} and model_policy, review (true/false), approval, progress, kind (research|writing|code), code
+# models {cheap, strong} and model_policy, review (true/false), approval, progress, kind (research|writing|code|analysis), code
 # {tests, packaging, commits}. `agents`: ONE top-level agent (usually template manager) with `children`; each agent has
-# name, template (manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer) or a custom
+# name, template (manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst,
+# data-checker) or a custom
 # `charter`, optional model (cheap|strong|id), tools, workspace, scale. `task`: the first task for the top agent: to,
 # title, goal and `acceptance`, a list of exact, checkable criteria (numbers, sections, paths), never "good quality".
 # Replace every <PLACEHOLDER>; delete what does not apply. Then call propose_org with the edited text.
@@ -35,11 +36,11 @@ needs:
   kind: research
   scope: "<The exact items in scope, as the user listed them. Ask for the list; do not invent one.>"
   deliverable:
-    description: <What the file contains, e.g. a comparison table plus a closing recommendation section>
+    description: <What the file contains, e.g. a comparison table plus a closing recommendation section labelled as our assessment>
     format: markdown               # what the user can open: markdown, plain text, csv, ...
     max_words: 1500                # length limit; also put it in an acceptance criterion
     path: {base}/deliverables/<name>.md   # where the user gets it; the assistant copies the checked file there
-  quality_bar: Every factual claim has a primary-source URL; current facts come from the live source.
+  quality_bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts come from the live source.
   sources: Web access to official sites and documentation; a source URL per claim.
   budget_runs: 25                  # the user's cap in runs (one run = one agent working session)
   models: {{cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}}   # use model ids available to the user
@@ -54,7 +55,7 @@ agents:
     children:
       - {{name: researcher, template: researcher}}   # web_search + web_fetch
       - {{name: writer, template: writer}}
-      - {{name: factcheck, template: fact-checker}}  # independent: checks EVERY claim against its cited source (claim ledger)
+      - {{name: factcheck, template: fact-checker}}  # independent: quotes the source for EVERY factual claim (ledger of facts and judgement)
 task:
   to: lead
   title: <Short title of the work>
@@ -64,9 +65,11 @@ task:
   acceptance:                      # exact and checkable; the assistant checks each one at the end
     - Covers exactly the items listed in the scope and no others.
     - At most 1500 words as counted by read.
-    - Contains <the sections or table the user asked for, named exactly>.
-    - Every factual claim has a source URL that the researcher or fact-checker fetched.
-    - "The fact-checker's coverage report shows every claim verified (n of m claims verified with n = m, none wrong, none unsupported) and the writer applied every required change."
+    - Contains <the sections or table the user asked for, named exactly>, and the closing recommendation section is marked as our assessment (judgement).
+    - Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+    - The recommendation section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
+    - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change."
+    - The final report pastes that coverage line verbatim, with the path of the fact-checker's ledger.
 """
 
 DOCUMENTS = """\
@@ -166,7 +169,55 @@ task:
     - Work is committed locally in the workspace and nothing was pushed.
 """
 
-TEMPLATES = {"research": RESEARCH, "documents": DOCUMENTS, "code": CODE}
+ANALYSIS = """\
+{schema}
+# kind=analysis: the team analyses the user's data files (read-only) with a script, has the key figures recomputed independently and writes the findings.
+mission: >
+  <One paragraph: which question the organization answers from the user's data, and for whom.>
+needs:
+  kind: analysis
+  scope: "<The question and the outcome to explain, e.g. what drives product returns; which file(s) and period.>"
+  inputs:                          # read-only folders with the user's data; the team can read them, never change them
+    - {base}/<folder-with-your-data>
+  workspace: {base}/analysis-work  # a scratch folder OUTSIDE the data folder: scripts and outputs live here
+  deliverable:
+    description: <What the report contains, e.g. the strongest effects with counts, then recommendations labelled as our assessment>
+    format: markdown
+    max_words: 1000
+    path: {base}/deliverables/<name>.md
+  quality_bar: Every number is reproducible from one script and appears with its label in the script's output; no conclusion from a slice under 30 rows.
+  sources: Only the files in needs.inputs; no web.
+  budget_runs: 25
+  models: {{cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}}
+  model_policy: analysis and checking on strong, writing on cheap
+  review: true                     # a checker who did not do the analysis recomputes the figures with its own script
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {{name: analyst, template: analyst, model: strong}}   # read + shell in the workspace; one script, labelled output
+      - {{name: checker, template: data-checker, model: strong}}  # independent: its own script, label-bound figure check
+      - {{name: writer, template: writer, tools: [read]}}   # reads the analyst's output (read-only); writes the report
+task:
+  to: lead
+  title: <Short title of the analysis>
+  goal: >
+    <Analyse the data for the question, explore the outcome against every dimension and pair, have the key figures
+    recomputed independently, write the report from the labelled output, apply every required change and report the final file.>
+  acceptance:
+    - Uses only <the data file(s)> in the data folder, and the checker confirmed the data files are unchanged (same checksums before and after).
+    - One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
+    - The script explores <the outcome> against every available column and against every pair of the strongest dimensions (for example reason x region); the report lists the strongest effects with their counts (n and share).
+    - Each number in the report appears together with its label in the script output; the checker verified every label and number pair, not only that the number occurs.
+    - No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
+    - At most 1000 words as counted by read; the recommendations are in a section labelled as our assessment (judgement), without figures that are not in the script output.
+    - "The checker's line reads 'Figures checked: n of m match' with n = m, and also 'dimensions covered: k of d' with k = d, strongest pairs scanned: yes, reproducible: yes, data unchanged: yes; the writer applied every required change."
+"""
+
+TEMPLATES = {"research": RESEARCH, "documents": DOCUMENTS, "code": CODE, "analysis": ANALYSIS}
 
 
 def example(kind: str = "research", base: Path | str = ".") -> str:
@@ -174,5 +225,5 @@ def example(kind: str = "research", base: Path | str = ".") -> str:
     key = (kind or "research").strip().lower()
     if key not in TEMPLATES:
         raise OrgError(f"unknown kind '{kind}': use one of {', '.join(KINDS)} "
-                       "(research = web sources, documents = write from the user's local files, code = repo workspace with tests)")
+                       "(research = web sources, documents = write from the user's local files, code = repo workspace with tests, analysis = data files analysed with a checked script)")
     return TEMPLATES[key].format(schema=SCHEMA, base=str(base).rstrip("/") or "/")

@@ -44,6 +44,7 @@ def env(monkeypatch, tmp_path):
     monkeypatch.setenv("ORGMCP_WORKSPACE_ROOTS", str(tmp_path))
     work = tmp_path / "cwd"
     (work / "<folder-with-your-files>").mkdir(parents=True)  # the documents example's input folder
+    (work / "<folder-with-your-data>").mkdir()  # the analysis example's input folder
     monkeypatch.chdir(work)
     return work
 

@@ -12,6 +12,7 @@ Show whether the software really meets the criteria, independently of the engine
 ## Responsibilities
 - Work only inside your workspace. Run the documented install/test commands from a clean state and record the exact commands and output.
 - Exercise every acceptance criterion with commands: for each, the command, the expected result and the actual output. Include every edge case and error path the criteria name (for example ragged rows, special characters, missing input, bad options) and then your own. A criterion without a command you ran is `not verified`, not passed. Put any test scripts you write in your own `work/` directory, not in the engineer's tree.
+- Check figures and outputs together with their labels: assert each number next to the label or key it belongs to (for example the line `West: 47`), not that the number appears somewhere in the output. A matching number under the wrong label is a failure.
 - Report to your manager: "criteria passed n of m", per criterion pass/fail with the command and output, then REQUIRED CHANGES (bug, how to reproduce, expected behavior). Pass overall only if n = m.
 
 ## You never edit the engineer's code

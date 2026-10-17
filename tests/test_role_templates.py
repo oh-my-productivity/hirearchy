@@ -58,7 +58,8 @@ def code_bp(tmp_path):
 
 
 def test_all_expected_templates_ship():
-    assert {"manager", "researcher", "writer", "reviewer", "fact-checker", "engineer", "tester", "code-reviewer"} <= set(NAMES)
+    assert {"manager", "researcher", "writer", "reviewer", "fact-checker", "engineer", "tester", "code-reviewer",
+            "analyst", "data-checker"} <= set(NAMES)
 
 
 @pytest.mark.parametrize("name", NAMES)
@@ -124,34 +125,62 @@ def _all(agents):
 # ------------------------------------------------------------------------------------------ fact-checker
 
 
-def test_fact_checker_builds_a_claim_ledger_of_every_claim():
-    has("fact-checker", "claim ledger", "work/ledger.md", "every sentence, table cell and list item",
-        "id", "cited source", "verified", "wrong", "unsupported", "not-checkable", "evidence")
+def test_fact_checker_builds_a_ledger_of_every_statement_split_into_fact_and_judgement():
+    has("fact-checker", "work/ledger.md", "every sentence, table cell and list item", "`fact` or a `judgement`", "id", "type",
+        "cited source", "verified", "wrong", "unsupported", "not-checkable", "evidence")
 
 
-def test_fact_checker_requires_the_source_to_state_the_claim():
-    has("fact-checker", "open and read every cited source", "must state the claim", "homepage, repo root", "unsupported",
-        "points to the file or page the fact actually comes from")
+def test_fact_checker_defines_facts_by_what_they_contain():
+    has("fact-checker", "number, name, version, license, price, date", '"no / only / never / all / every / free"',
+        "a sentence that mixes fact and opinion is a fact row")
 
 
-def test_fact_checker_treats_negative_absolute_and_numeric_claims_as_high_risk():
-    has("fact-checker", "negative and absolute claims", '"only"', '"never"', '"all"', "numbers, dates", "licenses", "prices",
-        "cannot verify a negative claim by finding nothing")
+def test_fact_checker_requires_the_verbatim_sentence_from_the_source():
+    has("fact-checker", "open and read every cited source", "copy the sentence that states the claim, verbatim",
+        "a `verified` row without that quote is not verified", "must state the claim")
+
+
+@pytest.mark.parametrize("weak", ["universally known", "not contradicted", "a homepage, repo root or index page",
+                                  "a page that exists and is on topic", "a search snippet", "memory"])
+def test_fact_checker_names_what_is_not_verification(weak):
+    has("fact-checker", weak)
+
+
+def test_fact_checker_checks_high_risk_claim_types_at_the_specific_page_with_exceptions():
+    has("fact-checker", "high-risk claims get the specific page and an exception check", "license file of the specific package",
+        "sub-packages", "non-commercial", "pricing page", "regional and tier differences", "sync, hosting and encryption models",
+        "platform availability", "negative or absolute claims", "cannot verify a negative claim by finding nothing")
+
+
+def test_fact_checker_checks_judgement_rows_for_label_citations_and_basis():
+    has("fact-checker", "labelled as the author's assessment", "carry no citation", "a citation on an opinion is decoration",
+        "rest on facts that are already verified", "`ok`", "`fix`")
 
 
 def test_fact_checker_checks_arithmetic_and_word_counts_with_read():
     has("fact-checker", "word counts come from `read`", "never from an estimate")
 
 
-def test_fact_checker_reports_coverage_and_fails_unless_every_claim_is_verified():
-    has("fact-checker", "n of m claims verified, k wrong, j unsupported", "ledger path", "pass only if n = m", "fail",
-        "never present a partial check as complete", "a sample")
+def test_fact_checker_coverage_line_separates_facts_from_judgements_and_fails_unless_complete():
+    has("fact-checker", "Coverage: n of m factual claims verified (n = m required)", "k wrong, u unsupported, p not-checkable",
+        "j judgement statements, each resting on verified facts: yes", "pastes verbatim", "ledger path",
+        "pass only if n = m and the judgement answer is yes", "fail", "never present a partial check as complete", "a sample")
+
+
+def test_fact_checker_fixes_unverifiable_claims_by_cutting_or_reframing_never_from_memory():
+    has("fact-checker", "cut it", "restate it as a labelled judgement", "never propose a fix that depends on memory",
+        "a replacement is a new claim")
+
+
+def test_fact_checker_reverifies_every_changed_sentence_after_rework():
+    has("fact-checker", "every changed or new sentence as a new claim", "not only the rows you flagged",
+        "no judgement picked up a citation or a new fact", "a claim is closed only when verified")
 
 
 def test_fact_checker_works_with_web_tools_and_with_local_inputs():
     r = bpm.get_role("fact-checker")
     assert {"web_search", "web_fetch"} <= set(r.tools)
-    has("fact-checker", "`web_fetch` for pages", "`read` for files from the inputs", "no web tools")
+    has("fact-checker", "`web_fetch` for pages", "`read` for files from the inputs")
 
 
 # ------------------------------------------------------------------------------------ reviewer and code-reviewer
@@ -203,8 +232,25 @@ def test_manager_never_reports_done_with_a_known_deviation():
 
 
 def test_manager_requires_the_verifiers_coverage_report_for_done():
-    has("manager", "coverage report is a precondition for `done`", "n of m claims verified, k wrong, j unsupported",
-        "n = m", "a sampled check is not enough")
+    has("manager", "coverage report is a precondition for `done`", "n of m factual claims verified", "n = m",
+        "a sampled check is not enough", "judgement answer yes")
+
+
+def test_manager_pastes_the_coverage_line_verbatim_and_never_calls_changes_claims():
+    has("manager", "every `done` report pastes the verifier's final coverage line verbatim", "path of its ledger",
+        "never describe re-checked changes as claim coverage", '"8 of 8 changes verified" is not "n of m claims verified"',
+        "no coverage line from the latest verification of the final file, no `done`")
+
+
+def test_manager_cuts_instead_of_another_research_cycle_and_escalates_with_options():
+    has("manager", "a verification cycle is: verify, rework, re-verify", "do not start another research cycle",
+        "prefer cutting", "cut every claim the verifier could not verify", "restate it as a labelled judgement",
+        "`send` your parent the position", "options and a recommended decision", "instead of spending the reserve on a second full cycle")
+
+
+def test_manager_template_limits_its_own_overhead():
+    has("manager", "in one batch", "end your run", "do not poll", "only the new messages", "act on everything that arrived in that one run")
+    assert len(bpm.get_role("manager").body.splitlines()) <= 50  # concise: every wake pays for the template
 
 
 def test_manager_keeps_its_budget_reserve_and_does_not_skip_a_review():
@@ -223,9 +269,68 @@ def test_researcher_cites_the_page_that_states_the_claim_with_a_retrieval_date()
     has("researcher", "page that states the claim", "not the homepage or repository root", "retrieval date", "quoted sentence")
 
 
+def test_researcher_quotes_the_sentence_and_checks_exceptions_for_high_risk_claims():
+    has("researcher", "copy the sentence that states the fact word for word", "a search snippet is a pointer, not a source",
+        "neither are memory or \"everyone knows\"", "license file of the specific package", "server, client and sub-packages separately",
+        "pricing page", "tiers, regions", "unverified", "the writer may only state what these entries state")
+
+
+def test_writer_separates_factual_claims_from_labelled_judgement():
+    has("writer", "a factual claim is any sentence, table cell or list item with a number, name, version, license, price, date",
+        '"no / only / never / all / free"', "carries the exact source", "if no finding does, cut the claim",
+        "do not write it from memory", "analysis and recommendations are judgement", "clearly labelled section",
+        "no citations and no new facts", "may only rest on claims you have already stated and cited",
+        "never decorate an opinion with citations")
+
+
+def test_writer_reworks_by_cutting_or_reframing_and_never_swaps_in_facts_from_memory():
+    has("writer", "change as little as possible", "cut it or restate it as a labelled judgement", "never swap in another fact from memory",
+        "every sentence you change is a new claim for the verifier", "which sentences you changed")
+
+
 def test_engineer_runs_the_tests_and_reports_exact_commands():
     has("engineer", "run them before every report", "exact commands", "failing or unrun tests", "do not substitute silently")
 
 
-def test_tester_exercises_every_criterion_with_commands_and_edge_cases():
+def test_tester_checks_each_figure_together_with_its_label_not_just_the_number():
+    has("tester", "together with their labels", "each number next to the label or key it belongs to",
+        "not that the number appears somewhere in the output", "a matching number under the wrong label is a failure")
+
+
+def test_reviewer_opens_the_files_it_reviews_and_checks_figures_with_their_labels():
+    has("reviewer", "start the review with the files you opened", "any you could not open", "report `blocked`",
+        "never review text pasted into a task as if it were the file", "together with its label or subject")
+
+
+# --------------------------------------------------------------------------- analysis roles
+
+
+def test_analyst_template_is_read_and_shell_only_in_a_workspace_and_never_touches_the_data():
+    r = bpm.get_role("analyst")
+    assert set(r.tools) == {"read", "shell"} and r.kind == "author"
+    has("analyst", "read-only input", "never create, edit or delete anything there", "workspace", "orgmcp `write`")
+
+
+def test_analyst_explores_every_dimension_and_pair_and_binds_figures_to_labels():
+    has("analyst", "one script", "run it twice", "every available dimension", "every pair of the strongest dimensions",
+        "return reason x region", "counts and the base rate", "strongest effects", "too small", "fewer rows than the criteria's minimum",
+        "appears with its label in the script's output", "never retype it from memory")
+
+
+def test_data_checker_recomputes_with_its_own_script_and_checks_label_number_pairs():
+    r = bpm.get_role("data-checker")
+    assert set(r.tools) == {"read", "shell"} and r.kind == "verifier"
+    has("data-checker", "your own script", "without copying the analyst's code", "together with their labels, never by presence",
+        "(label, number)", "a number that matches under a different label", "fails", "every pair you checked")
+
+
+def test_data_checker_checks_exploration_coverage_reproducibility_and_the_data():
+    has("data-checker", "every pair of the strongest dimensions", "your own scan over all pairs", "a strong effect the report omits is a required change",
+        "minimum-sample rule", "twice from a clean state", "checksums before and after",
+        "Figures checked: n of m match (each with its label; n = m required)", "dimensions covered: k of d", "pass only if")
+
+
+def test_data_checker_never_edits_the_analysts_work():
+    has("data-checker", "you never edit the analyst's work", "never change the data")
+
     has("tester", "every acceptance criterion with commands", "every edge case and error path the criteria name", "not verified", "criteria passed n of m")
