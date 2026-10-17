@@ -1,0 +1,55 @@
+
+# --- scheduler started 2026-10-17 20:50:47Z: /Volumes/workspace/orgmcp/.venv/bin/orgmcp --root /private/tmp/orgmcp-a4-1792270163/org run --until-done
+org: /private/tmp/orgmcp-a4-1792270163/org
+lead: started run (1 message(s))
+lead/factcheck: started run (1 message(s))
+lead/researcher: started run (1 message(s))
+lead: run finished in 26s
+lead/writer: started run (1 message(s))
+lead/writer: run finished in 22s
+lead: started run (1 message(s))
+lead: run finished in 28s
+lead/writer: started run (1 message(s))
+lead/researcher: run finished in 67s
+lead: started run (1 message(s))
+lead/writer: run finished in 14s
+lead/researcher: started run (1 message(s))
+lead/factcheck: run finished in 75s
+lead/factcheck: started run (1 message(s))
+lead: run finished in 32s
+lead: started run (1 message(s))
+lead/researcher: run finished in 40s
+lead/writer: started run (1 message(s))
+lead: run finished in 38s
+lead: started run (1 message(s))
+lead/writer: run finished in 38s
+lead/writer: out of budget, paused, parent notified
+lead: run finished in 63s
+lead: started run (2 message(s))
+lead/factcheck: run finished in 143s
+lead/factcheck: started run (1 message(s))
+lead: run finished in 67s
+lead: started run (1 message(s))
+lead/researcher: started run (1 message(s))
+lead: run finished in 34s
+lead: started run (1 message(s))
+lead/researcher: run finished in 93s
+lead: run finished in 63s
+lead: started run (1 message(s))
+lead/factcheck: run finished in 212s
+lead/factcheck: started run (1 message(s))
+lead: run finished in 67s
+lead: started run (1 message(s))
+lead/factcheck: run finished in 198s
+lead: run finished in 91s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-17 21:04:32Z: /Volumes/workspace/orgmcp/.venv/bin/orgmcp --root /private/tmp/orgmcp-a4-1792270163/org run --until-done
+org: /private/tmp/orgmcp-a4-1792270163/org
+lead: started run (1 message(s))
+lead/researcher: started run (1 message(s))
+lead: run finished in 67s
+lead: started run (1 message(s))
+lead/researcher: run finished in 67s
+lead: run finished in 36s
+scheduler exiting: finished: no open tasks

@@ -1,0 +1,26 @@
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m55t1335e5psb9b4cbnwwkrh","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+[tool] Reading SKILL.md:1
+[tool] Running: @orgmcp/status
+[tool] status: Completed
+[tool] status: Completed
+Before I draft a plan, I need a few answers. Reply "defaults" to accept every proposed default. I can't propose a default for item 1, so please answer that one.
+
+1. **Which apps should I compare?** Please give me the list, for example the self-hosted note-taking apps you already have in mind. I won't make up a list for you. If you also want specific criteria compared, such as features, licence, ease of install, mobile apps, sync, Markdown support or pricing, add them here. Otherwise I'll use a sensible standard set.
+
+2. **Deliverable:** a markdown report of at most 1500 words. I'll put it in a new folder called `deliverables` here: `/private/tmp/orgmcp-a4-1792270163/deliverables/self-hosted-notes-competitor-analysis.md`.
+
+3. **What counts as done:**
+   - The report covers exactly the apps you listed.
+   - It has a comparison table with one row per app.
+   - It has a short recommendation section.
+   - Every factual claim has a source URL.
+   - A fact-checker confirms every claim is verified.
+   - It is at most 1500 words.
+
+4. **Sources:** the web, with a URL for each claim.
+
+5. **Review:** a separate agent checks the facts and a reviewer checks the report, and neither wrote it. The plan is shown to you before anything starts.
+
+6. **Budget and models:** I'll estimate the number of runs, add 25% headroom, and show you the figure in the plan. A cheaper model drafts and a stronger model reviews. Your approval is needed before the team spends more than the budget.
+
+7. **Progress:** you ask "status?" and I give you a one-line update.
