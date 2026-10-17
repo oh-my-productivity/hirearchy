@@ -1,0 +1,9 @@
+[tool] Running: @orgmcp/progress
+[tool] Reading competitors.md:1
+[tool] status: Completed
+[tool] status: Completed
+[tool] Finding **/*.md in org
+[tool] status: Completed
+[tool] Reading findings.md:1, 20261017T182918166178-lead.writer-80a3.md:1
+[tool] status: Completed
+Error: Internal error (code -32603): Encountered an error in the response stream: The request was throttled by the service (request_id: 11ee8395-11dc-42f7-b66b-e20e74e97624)

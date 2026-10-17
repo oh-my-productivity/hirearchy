@@ -1,0 +1,28 @@
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+Here is the plan. Nothing has been created or started yet.
+
+**Goal:** A sourced competitor analysis of Obsidian, Logseq, Joplin, Trilium Notes and AnyType, written for a team building a competing self-hosted note app.
+
+**Team (4 agents)**
+- `lead` is the manager and uses claude-haiku-4.5. It has web search and fetch.
+- `researcher` gathers the facts and uses claude-haiku-4.5. It has web search and fetch.
+- `writer` drafts the analysis and uses claude-haiku-4.5. It has no tools.
+- `factcheck` is an independent fact-checker and uses claude-sonnet-4.6. It has web search and fetch. This is the only strong-model agent, so it is the only one used for the final review.
+
+**Budget:** 22 runs planned against your cap of 25. The estimate is 17 runs for one pass plus one review and rework cycle. Runs the team doesn't spend come back to you. Anything beyond the cap needs your OK.
+
+**Deliverable:** A markdown file of at most 1,500 words with a comparison table and a final "Where we can win" section. The org can't write to `/tmp/orgmcp-a2-1792261126/deliverables/`, so I'll copy the verified file there myself and check that it matches.
+
+**Acceptance criteria**
+1. It covers exactly Obsidian, Logseq, Joplin, Trilium Notes and AnyType, and no other products.
+2. It is at most 1,500 words.
+3. The comparison table has one row per app. The columns are license, self-hosting method, sync and collaboration, editor and format, mobile apps, and E2E encryption.
+4. Each app has a short section on strengths, weaknesses and best fit.
+5. Every factual claim has a primary-source URL.
+6. The final section is titled "Where we can win".
+7. The fact-checker verified at least 8 claims, and the writer applied every required change.
+
+I'll check the final file against every criterion before I tell you it's done.
+
+Reply "approve" to build and start it, or tell me what to change.
