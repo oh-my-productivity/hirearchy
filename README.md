@@ -26,9 +26,13 @@ org/                      # root = you, the human
 - Task state and budget are derived from the message files, never stored separately.
 - Budget is counted in runs and passes down the tree: a child gets only what its parent hands it, and each delegation keeps a reserve so the parent can process the result. `delegate` without a `budget` hands down `min(default_budget, remaining - reserve)` (one run reserved per outstanding delegation plus one for the new one) and fails with the options if that is below 1.
 - Authority only narrows: a parent cannot grant tools or a workspace it doesn't have.
+- The write guard is the same on case-sensitive and case-insensitive filesystems (`agent.md`, `Memory.md` or a `RUNS` directory are refused, as are names that differ from an existing file only by case), and `AGENT.md` is created only by `hire`. `write` is confined to your own directory, `report` artifacts to the organization; `retire` takes a short name or full address and returns the team's unspent budget to the retired agent's parent as a runtime note (nothing when that parent is root).
 - Guards: hop limit (loops), max depth/children, out-of-budget pause with a parent notice, per-run timeout, one scheduler per org, and a git commit after every run. Also:
   - Stall ladder: checked every tick, per open task. If the assignee is idle (not running, no unread mail, not paused, not waiting on delegations) for `stall_after` seconds (default 600), it gets a reminder; each further `stall_after` the runtime tells the assigner, then each ancestor up to root, then stops. State is in `.runtime/nudges.json`.
   - Consecutive failed runs pause the agent after `max_failures`. The count is kept in `.runtime/failures.json` (survives restarts) and cleared by a successful run or `orgmcp resume`.
+  - Messages are capped at `max_message_chars` (default 20000): longer `send`/`delegate`/`report` bodies are refused (put detail in a file under `work/`). Whatever is shown to an agent (new messages, the contract of open tasks, the task a result answers, `inbox`) is cut at 8000 characters with the path to `read` the rest.
+  - Word counts shown to agents (artifact notes on a `report`, `read`) ignore markdown markers (`#`, `-`, `1.`, `|`, fences); the `MEMORY.md` cap counts plain whitespace-separated words.
+  - A scheduler tick isolates faults per phase (a failing phase is logged and retried next tick), runs start in their own process group so a timeout kills the tools too, and prompts go to `kiro-cli` on stdin. Agent crashes notify the human (`orgmcp resume`); an LLM parent gets a notice with its options instead.
   - `MEMORY.md` is capped at `memory_max_words` (default 800): writes and appends beyond it are refused, and an oversized memory is flagged for condensing in the next run's prompt.
 
 ## Use
@@ -112,6 +116,11 @@ can act on them, so problems get followed up, reworked, re-budgeted or retired i
 | --- | --- | --- |
 | `review_every_runs` | 25 | runs used across the organization between reviews |
 | `review_every_seconds` | 86400 | seconds between reviews |
+| `max_message_chars` | 20000 | longest message body `send`/`delegate`/`report` accept |
+| `default_budget` | 10 | runs a delegation gets when none is given, capped by what the delegator can afford |
+
+Runs that failed, and runs woken only by runtime notes (budget, stall, review, budget refunds), are left out of the
+`wasteful` statistics. The retired agents' runs still count towards `review_every_runs`.
 
 ```sh
 uv run orgmcp review [--dry-run]
@@ -124,7 +133,7 @@ would be sent and writes nothing (no messages, no ledger).
 
 - Agent runs use `kiro-cli chat --no-interactive --agent orgmcp[-tools]`. The scheduler writes these profiles to
   `~/.kiro/agents/`. They load only the orgmcp server (`includeMcpJson: false`), so agents never see your
-  other MCP servers. Identity comes from `ORG_AGENT`, which the scheduler sets per run.
+  other MCP servers. Identity comes from `ORG_AGENT`, which the scheduler sets per run. The prompt is passed on stdin.
 - To talk to the org yourself from any kiro session, register the server globally (you act as `root`):
 
 ```json
@@ -150,4 +159,6 @@ MCP tools: `whoami`, `inbox`, `delegate`, `report`, `send`, `hire`, `retire`, `r
 uv run pytest -q
 ```
 
-The tests use a deterministic fake agent (`tests/fake_agent.py`) in place of kiro.
+The tests use a deterministic fake agent (`tests/fake_agent.py`) in place of kiro. An autouse fixture
+(`tests/conftest.py`) points `$HOME` and the profile directory at a temp dir and puts a stub `kiro-cli` first on
+`PATH`, so running them never touches your real `~/.kiro`.

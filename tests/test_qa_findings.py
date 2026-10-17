@@ -1,8 +1,7 @@
 """QA findings: one minimal reproduction per confirmed defect (see QA_REPORT.md).
 
-Every test is ``xfail(strict=True)``: it documents a bug today (CI stays green) and flips to XPASS, which fails
-the strict run, as soon as the bug is fixed. When that happens, delete the marker and keep the test as a regression.
-Each test is written so it asserts the *correct* behavior.
+Each test asserts the *correct* behavior. They started as ``xfail(strict=True)`` reproductions; every finding is
+fixed now, so they run as plain regression tests.
 """
 
 import os
