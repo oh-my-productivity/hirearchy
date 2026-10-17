@@ -1,0 +1,9 @@
+[tool] Running: @orgmcp/create_org
+[tool] status: Completed
+[tool] Running: @orgmcp/apply_org
+[tool] status: Completed
+[tool] Running: @orgmcp/start
+[tool] status: Completed
+The team is running. The org has four agents (lead, engineer, tester, reviewer) and the scheduler has started. The task has a ceiling of 23 runs, and runs the team doesn't spend come back to you.
+
+Ask me for status whenever you like. I'll verify the result against every acceptance criterion before I tell you it's done.
