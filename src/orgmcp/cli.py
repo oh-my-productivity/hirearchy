@@ -91,9 +91,10 @@ def cmd_inbox(args) -> None:
 
 def cmd_resume(args) -> None:
     org = _org(args)
-    org.resume(org.require(args.agent))
-    org.clear_failures(args.agent)
-    print(f"resumed {args.agent}")
+    addr = org.require(args.agent)  # normalized: "ceo/" and "ceo" are the same agent
+    org.resume(addr)
+    org.clear_failures(addr)
+    print(f"resumed {addr}")
 
 
 def cmd_run(args) -> None:

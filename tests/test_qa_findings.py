@@ -245,7 +245,6 @@ def test_qa9_retire_accepts_the_full_address_of_a_direct_report(org):
     assert org.retire("ceo", ENG, "full address, as printed by status/health/review notes") == ENG
 
 
-@pytest.mark.xfail(strict=True, reason="QA-10: 'orgmcp resume ceo/' (tab completion) clears the pause but not the failure count")
 def test_qa10_resume_with_trailing_slash_clears_failures(org):
     org.pause("ceo", "failures")
     for _ in range(3):
@@ -254,7 +253,6 @@ def test_qa10_resume_with_trailing_slash_clears_failures(org):
     assert org.ledger("failures").get("ceo", 0) == 0
 
 
-@pytest.mark.xfail(strict=True, reason="QA-11: NAME_RE uses '$', so a name with a trailing newline is accepted")
 def test_qa11_hire_rejects_name_with_trailing_newline(org):
     with pytest.raises(OrgError):
         org.hire("ceo", "ops\n", "Ops", "Do ops.")

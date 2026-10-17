@@ -35,7 +35,8 @@ RUNTIME = "runtime"
 BOXES = ("inbox", "inflight", "read", "sent")
 RUNTIME_NAMES = {*BOXES, "runs", ".paused", ".kiro", ".runtime", ".retired", ".git", ".gitignore"}
 RESERVED = RUNTIME_NAMES | {"work", "root", "runtime", "agent", "memory", "org"}
-NAME_RE = re.compile(r"^[a-z][a-z0-9-]{0,31}$")
+# Always use NAME_RE.fullmatch: a "$" anchor would accept a trailing newline ("ops\n"), so \Z is used as well.
+NAME_RE = re.compile(r"[a-z][a-z0-9-]{0,31}\Z")
 MESSAGE_TYPES = ("task", "result", "note")
 RESULT_STATUSES = ("done", "failed", "blocked")
 DEFAULT_CONFIG = {
@@ -230,7 +231,7 @@ class Org:
         if a == ROOT:
             return True
         parts = a.split("/")
-        if not all(NAME_RE.match(p) and p not in RESERVED for p in parts):
+        if not all(NAME_RE.fullmatch(p) and p not in RESERVED for p in parts):
             return False
         return (self.dir(a) / "AGENT.md").is_file()
 
@@ -263,7 +264,7 @@ class Org:
         return [
             self.child_addr(a, p.name)
             for p in sorted(d.iterdir())
-            if p.is_dir() and NAME_RE.match(p.name) and p.name not in RESERVED and (p / "AGENT.md").is_file()
+            if p.is_dir() and NAME_RE.fullmatch(p.name) and p.name not in RESERVED and (p / "AGENT.md").is_file()
         ]
 
     def agents(self) -> list[str]:
@@ -509,7 +510,7 @@ class Org:
         workspace: str | None = None,
     ) -> str:
         actor = self.require(actor)
-        if not NAME_RE.match(name) or name in RESERVED:
+        if not NAME_RE.fullmatch(name) or name in RESERVED:
             raise OrgError("name must be lowercase letters, digits and dashes (max 32), and not a reserved word")
         tools = sorted(set(tools or []))
         meta, _ = self.charter(actor)
