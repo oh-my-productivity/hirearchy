@@ -147,3 +147,51 @@ def test_plan_words_for_each_access_shape():
     manager = line(tools=["read"], inputs=["/in"], kind="manager", children=["a/k"])
     assert manager == "directs the team; does not produce the work itself; can read files only in /in; cannot change your files"
     assert line(tools=[], kind="manager", children=["a/k"]) == "directs the team; does not produce the work itself"
+
+
+# ------------------------------------------------------------- blueprint_example kinds pass propose_org
+
+EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
+
+
+@pytest.fixture
+def root_server(tmp_path, cwd, monkeypatch):
+    from orgmcp.server import resolve_binding
+    for var in ("ORG_AGENT", "ORG_REQUIRE_AGENT"):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("ORG_ROOT", str(tmp_path / "org"))
+    return build_server(*resolve_binding())
+
+
+def fill_text(server, kind: str, base: Path) -> str:
+    """What the assistant does: fetch the example and replace the placeholders it needs with the user's values."""
+    for name in ("docs", "proj", "deliverables"):
+        (base / name).mkdir(exist_ok=True)
+    text = call(server, "blueprint_example", kind=kind)
+    return text.replace("<folder-with-your-files>", "docs").replace("<project-folder>", "proj").replace("<name>", "result")
+
+
+@pytest.mark.parametrize("kind", ex.KINDS)
+def test_every_example_kind_proposes_cleanly_once_filled(kind, root_server, cwd):
+    out = call(root_server, "propose_org", blueprint=fill_text(root_server, kind, cwd))
+    assert bpm.PLAN_HEADING in out and bpm.PLAN_DRAFT_HEADING not in out
+    assert re.search(r"^plan_id: [0-9a-f]{12}$", out, re.M) and "Errors (" not in out
+    codes = {i.code for i in bpm.validate(yaml.safe_load(fill_text(root_server, kind, cwd)), allowed_roots=[cwd.parent])}
+    assert codes <= KNOWN_WARNINGS, codes  # in particular no `unknown-key`: needs.inputs is a known key
+
+
+def test_documents_example_with_its_placeholder_folder_is_a_draft_that_names_the_folder(root_server, cwd):
+    out = call(root_server, "propose_org", blueprint=call(root_server, "blueprint_example", kind="documents"))
+    assert bpm.PLAN_DRAFT_HEADING in out and "folder-with-your-files" in out and re.search(r"^plan_id: none", out, re.M)
+
+
+def test_example_criteria_match_the_exhaustive_verifier_templates(root_server, cwd):
+    for kind, needle in (("research", "n of m claims verified with n = m"), ("documents", "criteria met: n of m with n = m")):
+        criteria = yaml.safe_load(fill_text(root_server, kind, cwd))["task"]["acceptance"]
+        assert any(needle in c for c in criteria), kind
+        assert not any("at least 6" in c for c in criteria), kind
+    assert "at least 6" not in (EXAMPLES_DIR / "blueprint-research.yaml").read_text()
+    research = yaml.safe_load((EXAMPLES_DIR / "blueprint-research.yaml").read_text())
+    assert any("n of m claims verified with n = m" in c for c in research["task"]["acceptance"])
+    # the wording asks for what the templates report
+    assert "n of m claims verified" in bpm.get_role("fact-checker").body and "criteria met: n of m" in bpm.get_role("reviewer").body

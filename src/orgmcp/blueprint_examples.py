@@ -28,7 +28,7 @@ SCHEMA = """\
 
 RESEARCH = """\
 {schema}
-# kind=research: the team gathers facts from the web (with a URL per claim), writes them up and has them fact-checked.
+# kind=research: the team gathers facts from the web (with a URL per claim), writes them up and has every claim fact-checked.
 mission: >
   <One paragraph: what the organization produces and for whom, e.g. a sourced comparison of the items below.>
 needs:
@@ -54,7 +54,7 @@ agents:
     children:
       - {{name: researcher, template: researcher}}   # web_search + web_fetch
       - {{name: writer, template: writer}}
-      - {{name: factcheck, template: fact-checker}}  # independent: re-checks the highest-impact claims on the web
+      - {{name: factcheck, template: fact-checker}}  # independent: checks EVERY claim against its cited source (claim ledger)
 task:
   to: lead
   title: <Short title of the work>
@@ -66,7 +66,7 @@ task:
     - At most 1500 words as counted by read.
     - Contains <the sections or table the user asked for, named exactly>.
     - Every factual claim has a source URL that the researcher or fact-checker fetched.
-    - The fact-checker verified at least 6 high-impact claims and the writer applied every required change.
+    - "The fact-checker's coverage report shows every claim verified (n of m claims verified with n = m, none wrong, none unsupported) and the writer applied every required change."
 """
 
 DOCUMENTS = """\
@@ -119,7 +119,7 @@ task:
     - Covers <the topics the user listed, named exactly> and nothing else.
     - At most 1500 words as counted by read.
     - Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
-    - The reviewer checked at least 6 statements against the files and the writer applied every required change.
+    - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), including each statement checked against its named input file, and the writer applied every required change."
 """
 
 CODE = """\

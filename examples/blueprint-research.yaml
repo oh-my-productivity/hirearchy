@@ -38,5 +38,5 @@ task:
     - At most 1500 words as counted by read.
     - Contains a comparison table with one row per app and a final section titled "Where we can win".
     - Every factual claim has a source URL that the fact-checker or researcher fetched.
-    - The fact-checker verified at least 6 high-impact claims (licenses, versions, E2EE, pricing) and every required change was applied by the writer.
+    - "The fact-checker's coverage report shows every claim verified (n of m claims verified with n = m, none wrong, none unsupported) and every required change was applied by the writer."
     - The final report names the path of the deliverable inside the organization.
