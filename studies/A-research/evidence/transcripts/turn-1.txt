@@ -1,0 +1,73 @@
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m55bw6cde0n9vs01fh3jya56","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+[tool] Spawning agent crew
+[tool] Fetching web content  (x31)
+[tool] Searching the web
+[tool] Fetching web content  (x11)
+[tool] Searching the web  (x2)
+[tool] Fetching web content  (x5)
+[tool] Searching the web  (x3)
+[tool] Fetching web content  (x2)
+[tool] Summarizing
+[tool] Fetching web content  (x25)
+[tool] Searching the web
+[tool] Fetching web content  (x2)
+[tool] Searching the web
+[tool] Fetching web content  (x11)
+[tool] Searching the web  (x4)
+[tool] Fetching web content  (x18)
+[tool] Searching the web  (x2)
+[tool] Fetching web content  (x10)
+[tool] Searching the web  (x6)
+[tool] Fetching web content  (x2)
+[tool] Searching the web  (x7)
+[tool] Fetching web content  (x9)
+[tool] Searching the web  (x3)
+[tool] Fetching web content
+[tool] Searching the web  (x5)
+[tool] Fetching web content
+[tool] Searching the web
+[tool] Fetching web content  (x8)
+[tool] Searching the web
+[tool] Fetching web content  (x6)
+[tool] Summarizing  (x2)
+[tool] Fetching web content
+[tool] Creating self-hosted-notes-competitor-analysis.md
+[tool] Running: ls -l /private/tmp/orgmcp-study-a-1792255329/self-hosted-notes-competitor-analysis.md && grep -c '^## ' /private/tmp/orgmcp-study-a-1792255329/self-hosted-notes-competitor-analysis.md
+[tool] Summarizing
+[tool] Reading self-hosted-notes-competitor-analysis.md:1-300
+[tool] Reading self-hosted-notes-competitor-analysis.md:301
+[tool] Fetching web content  (x18)
+[tool] Searching the web
+[tool] Fetching web content  (x2)
+[tool] Editing self-hosted-notes-competitor-analysis.md  (x14)
+[tool] Running: grep -n -i "mandatory\|SSO required\|requires SSO\|external SSO\|external auth" self-hosted-notes-competitor-analysis.md
+[tool] Summarizing
+[tool] Running: ls -l /private/tmp/orgmcp-study-a-1792255329/self-hosted-notes-competitor-analysis.md && wc -l /private/tmp/orgmcp-study-a-1792255329/self-hosted-notes-competitor-analysis.md && grep -m12 '^#' /pri...
+I set up a five-stage agent organization with orgmcp, and it produced the report. The file is `/private/tmp/orgmcp-study-a-1792255329/self-hosted-notes-competitor-analysis.md` (593 lines).
+
+**The agents**
+- **landscape:** picked the apps worth comparing and shortlisted eight for a deep dive.
+- **features:** compared editors, linking, E2EE, collaboration, plugins and data portability.
+- **operations:** covered deployment, auth and SSO, licensing, project health and release cadence.
+- **writer:** merged the three sets of findings into one report.
+- **reviewer:** checked 11 claims against official sources and fixed what it found.
+
+The first three stages ran in a pipeline (features and operations in parallel after landscape), then the writer and reviewer ran in sequence.
+
+**The report** contains:
+- An executive summary with top recommendations.
+- Methodology and limits.
+- Landscape, feature and ops/licensing comparison tables.
+- A profile for each app.
+- Recommendations by persona.
+- Risks, and a sources list.
+
+**Review result:** the reviewer approved it. It confirmed 10 of the 11 claims it checked. It corrected one: Outline doesn't require an external SSO provider, because it also supports email magic-link sign-in. It also fixed a few smaller points.
+
+**Caveats**
+- The research is based on documentation only, and the report recommends piloting any shortlisted app before committing.
+- Notesnook and Standard Notes were not fully evaluated, so privacy-focused users are less well covered.
+- The BookStack and AppFlowy ops coverage is thin.
+- Some facts are marked as unverified in the report, for example the AppFlowy archive date and the watchlist apps.
+
+I can extend the analysis to the missing apps, or add a pricing or total-cost-of-ownership section.

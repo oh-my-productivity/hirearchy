@@ -1,0 +1,5 @@
+root (human): unread 0, delegated 0
+  ceo [Research lead] idle  budget=0 open=0 delegated=0 unread=0
+    researcher [Research Specialist] idle  budget=7 open=0 delegated=0 unread=0
+    reviewer [Independent Fact-Checker] paused(budget)  budget=0 open=0 delegated=0 unread=1
+    writer [Technical Writer] idle  budget=9 open=0 delegated=0 unread=0

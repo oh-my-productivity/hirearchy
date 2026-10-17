@@ -1,0 +1,17 @@
+[tool] Running: cd /Users/aminalizadeh/workspace/orgmcp && R=/private/tmp/orgmcp-study-a-1792255329/notes-org && uv run orgmcp --root $R status; uv run orgmcp --root $R health 2>&1 | head -8; uv run orgmcp --root ...
+[tool] Running: R=/private/tmp/orgmcp-study-a-1792255329/notes-org/ceo/writer/work/report.md; grep -c "CBC" $R; grep -c "GCM" $R; grep -n -i "UNVERIFIED" $R | wc -l; grep -n -i "magic\|requires.*OIDC\|external OID...
+The org finished and the CEO reported the task as done. I spot-checked the final report, though, and it has at least two claims that I think are wrong.
+
+**Result**
+- **Report:** `/private/tmp/orgmcp-study-a-1792255329/notes-org/ceo/writer/work/report.md`. It is 330 lines and covers 8 apps: Joplin, TriliumNext, Memos, Outline, SiYuan, AFFiNE, AppFlowy and Docmost.
+- **Reviewer's corrections:** the Joplin fix is applied (no "CBC" left, 5 mentions of GCM).
+- **Org state:** idle, with nothing left to do. The CEO is at 0 of 28 runs, so it's fully spent. Health flags the CEO as "expensive" (6 runs per task) and the reviewer as out of budget. Neither matters now that the work is finished.
+
+**Problems in the final report**
+- **Outline authentication:** the report says Outline "requires" an external OIDC/SSO provider and "No built-in email/password". The reviewer in my earlier pipeline checked this against Outline's docs and found that email magic-link sign-in over SMTP is supported. This org's reviewer didn't catch it.
+- **Joplin E2EE:** the report says Joplin is the "only app" with true client-side E2EE. My earlier pipeline's research listed E2EE for SiYuan and Trilium too. I haven't checked this one against sources.
+- **Unverified flags:** there are 44 "UNVERIFIED" flags in the report. Many facts are marked unconfirmed, which is honest but makes it less decision-ready than the first report.
+
+The two reports also differ in depth. The first (`/private/tmp/orgmcp-study-a-1792255329/self-hosted-notes-competitor-analysis.md`) is 593 lines, was reviewed against 11 primary sources, and includes the Outline correction.
+
+I can patch the two wrong claims in the org's report. I'd rather not do that without asking, since the org's files are meant to be written by its agents. Or I can give the org's reviewer more budget for another pass. Which do you prefer?

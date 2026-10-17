@@ -1,0 +1,8 @@
+Done. The pipeline finished, and the reviewer approved the report.
+
+- **File:** `/private/tmp/orgmcp-study-a-1792255329/self-hosted-notes-competitor-analysis.md` (593 lines, about 50 KB, last written at 17:55)
+- **Nothing is still running.** All five stages (landscape, features, operations, writer, reviewer) completed.
+
+The open gaps are the ones I listed earlier: Notesnook and Standard Notes weren't fully evaluated, BookStack and AppFlowy ops coverage is thin, and a few facts are flagged as unverified in the report.
+
+I can fill those gaps if you want.

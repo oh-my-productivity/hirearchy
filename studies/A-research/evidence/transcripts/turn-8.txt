@@ -1,0 +1,24 @@
+[tool] Running: cd /private/tmp/orgmcp-study-a-1792255329; grep -n -i "e2ee\|end-to-end" self-hosted-notes-competitor-analysis.md | head -30; echo ----; grep -n -i "e2ee\|encrypt" notes-org/ceo/writer/work/report....
+[tool] Running: curl -s https://api.github.com/repos/laurent22/joplin/license | python3 -c "import sys,json;d=json.load(sys.stdin);print(d.get('license',{}).get('spdx_id'),d.get('message'))"; curl -s https://raw.g...
+[tool] Fetching web content
+[tool] Fetching web content
+[tool] Fetching web content
+[tool] Running: F=/private/tmp/orgmcp-study-a-1792255329/notes-org/ceo/writer/work/report.md; for n in 16 17 20 48 80 83 101 141 145 199 219; do echo "[$n] $(sed -n ${n}p $F | cut -c1-600)"; done; grep -n "^3\. \|...
+[tool] Running: cd /private/tmp/orgmcp-study-a-1792255329/notes-org/ceo/writer/work && cp report.md report.md.pre-patch && python3 - <<'E'
+p='report.md'; s=open(p).read()
+R=[
+("- **Joplin** is the only app with tr...
+[tool] Running: cd /private/tmp/orgmcp-study-a-1792255329/notes-org/ceo/writer/work && python3 - <<'E'
+p='report.md'; s=open(p).read()
+for a,b in [
+("Requires an external OIDC provider — budget for setup (e.g., ...
+I patched `/private/tmp/orgmcp-study-a-1792255329/notes-org/ceo/writer/work/report.md`, changing 14 lines and adding two sources.
+
+- **Outline login:** the report said an external OIDC provider was mandatory. Outline's SMTP docs say SMTP is also needed for email magic-link sign-in. Its auth docs confirm there's no native email+password. The summary, ops table, profile, caveat and risk table now say it needs either SSO/OIDC or SMTP magic links. I added the Outline docs as source 49.
+- **Joplin "only app with E2EE":** reworded to "best-documented client-side E2EE", with a note that SiYuan's sync is also end-to-end encrypted. The report's own table already said so for SiYuan.
+- **Joplin license (a third error):** the report said MIT. The repo's LICENSE says AGPL-3.0-or-later. The first pipeline's reviewer confirmed Joplin Server uses a non-commercial Personal Use License, and I didn't re-check that. I fixed the license in the tables and the personal-use recommendation, and added a note to check before business use. I added the Joplin repo as source 50.
+- **Docmost:** I changed "no external OIDC dependency" to "no SSO provider needed (built-in email/password)".
+
+I did not re-run the reviewer, and I left the 44 "UNVERIFIED" flags as they were. I removed my backup copy of the report. The reviewer's `corrected_report.md` is unchanged, so it now differs from the final report and is out of date.
+
+The org is idle with all budgets spent. Both reports are at the paths above if you want to compare them.

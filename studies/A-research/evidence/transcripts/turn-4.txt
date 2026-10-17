@@ -1,0 +1,28 @@
+[tool] Running: cd /Users/aminalizadeh/workspace/orgmcp && for c in init hire task run status kiro-profile; do echo "=== $c"; uv run orgmcp $c --help 2>&1; done; ls; sed -n 1,80p README.md 2>/dev/null
+[tool] Running: cd /Users/aminalizadeh/workspace/orgmcp && ls examples org; cat examples/ceo.md; sed -n 80,200p README.md; which kiro-cli
+[tool] Running: cd /Users/aminalizadeh/workspace/orgmcp && grep -n -i "workspace\|web_search\|tools" README.md | head -40; grep -rn "web_search\|web_fetch\|ALLOWED_TOOLS\|KNOWN_TOOLS" src | head; cat org/ORG.md | ...
+[tool] Running: cd /private/tmp/orgmcp-study-a-1792255329 && mkdir -p notes-org-inputs && cat > notes-org-inputs/goal.md <<'E'
+Produce a decision-ready competitor analysis of self-hosted note-taking / knowledge-ba...
+[tool] Running: cd /Users/aminalizadeh/workspace/orgmcp && R=/private/tmp/orgmcp-study-a-1792255329/notes-org && (nohup uv run orgmcp --root $R run --until-idle --max-runs 24 > $R/scheduler.log 2>&1 &) ; sleep 45;...
+The org exists and is running. The CEO agent is working on its first run.
+
+- **Org directory:** `/private/tmp/orgmcp-study-a-1792255329/notes-org`
+- **Setup:** I used `init`, `hire root ceo` and `task ceo`, with a budget of 24 runs. I capped the scheduler at 24 runs with `--until-idle`, and it's running in the background. The model is `claude-sonnet-4.6`. The CEO has web search and web fetch, so it can only hand those tools to the agents it hires.
+- **Team:** I only hired the CEO. Its charter tells it to hire the researchers, writer and reviewer itself, so the team will appear as it works.
+
+To watch it:
+```
+cd /Users/aminalizadeh/workspace/orgmcp
+uv run orgmcp --root /private/tmp/orgmcp-study-a-1792255329/notes-org status   # tree, budgets
+uv run orgmcp --root /private/tmp/orgmcp-study-a-1792255329/notes-org health    # stuck, expensive or idle agents
+uv run orgmcp --root /private/tmp/orgmcp-study-a-1792255329/notes-org inbox     # results reported to you
+tail -f /private/tmp/orgmcp-study-a-1792255329/notes-org/scheduler.log
+```
+
+Each agent is a directory under the org, with its work in `<agent>/work/`. The final report will land in the CEO's `work/` directory.
+
+Two caveats:
+- **No MCP org registered:** the orgmcp entry in `~/.kiro/settings/mcp.json` has `ORG_ROOT` as an environment variable, but I didn't check or change its value. If you want `status` and `inbox` as tools in a Kiro session, point `ORG_ROOT` at this directory. I left the config alone.
+- **Temp location:** `/private/tmp` can get cleared. Copy the org somewhere permanent if you want to keep it.
+
+I'll check back on progress shortly.
