@@ -25,7 +25,7 @@ org/                      # root = you, the human
 - The task contract travels with every run: the prompt carries the full text (goal, acceptance criteria, inputs) of each open task, and next to each `result` the task you delegated that it answers. Protocol: copy criteria verbatim when delegating, report `done` only if every criterion is met, otherwise `blocked`/`failed`.
 - Task state and budget are derived from the message files, never stored separately.
 - Budget is counted in runs and passes down the tree: a child gets only what its parent hands it, and each delegation keeps a reserve so the parent can process the result. It comes back up in two ways, both as one message that is charged to the sender and credited to the recipient (so nothing is minted or lost): with a final result, and by hand. When an agent reports `done` or `failed` and has no other open task, no task it reported `blocked` (that may be re-reported), no outstanding delegation and no mail waiting for a run, everything it has left travels up with the result to whoever assigned it (the result shows "returns N run(s)", and its own reports have already returned theirs, so it cascades up). `blocked` returns nothing. An agent can also give runs back early with `send(to=<parent>, body, budget=N)` (the reserve for its own delegations stays). Budget still goes nowhere else: down to direct reports, up to the parent. Results written before this existed carry no budget and mean what they always did. `delegate` without a `budget` hands down `min(default_budget, remaining - reserve)` (one run reserved per outstanding delegation plus one for the new one) and fails with the options if that is below 1.
-- Reviews follow the single-writer rule (rule 9 of the protocol in `ORG.md`): a reviewer or fact-checker never edits the author's file; it reports its findings and the changes it requires to whoever assigned the review, and the author applies them (`delegate(..., revises=<task id>)`). Acceptance criteria and charters must never require an agent to edit another agent's files. The protocol text is copied into `ORG.md` when an organization is created: existing organizations keep the text they were created with (the runtime rules above apply to them regardless).
+- Reviews follow the single-writer rule (rule 9 of the protocol in `ORG.md`): a reviewer or fact-checker never edits the author's file; it reports its findings and the changes it requires to whoever assigned the review, and the author applies them (`delegate(..., revises=<task id>)`). Acceptance criteria and charters must never require an agent to edit another agent's files. The protocol text is copied into `ORG.md` when an organization is created, so an existing organization keeps the text it was created with (the runtime rules above apply to it regardless). `orgmcp upgrade-rules [--dry-run]` rewrites the body of its `ORG.md` to the current text, keeping the frontmatter and the mission, and prints what changed (each agent sees the new rules from its next run).
 - Authority only narrows: a parent cannot grant tools or a workspace it doesn't have.
 - The write guard is the same on case-sensitive and case-insensitive filesystems (`agent.md`, `Memory.md` or a `RUNS` directory are refused, as are names that differ from an existing file only by case), and `AGENT.md` is created only by `hire`. `write` is confined to your own directory, `report` artifacts to the organization; `retire` takes a short name or full address and returns the team's unspent budget to the retired agent's parent as a runtime note (nothing when that parent is root). That note is non-waking (`wake: false`): it counts towards budget at once and lifts a budget pause, but does not start a run; it is held in the inbox, not counted as unread (scheduling, health), and delivered with the agent's next real batch.
 - Guards: hop limit (loops), max depth/children, out-of-budget pause with a parent notice, per-run timeout, one scheduler per org, and a git commit after every run. Also:
@@ -49,7 +49,7 @@ uv run orgmcp status
 uv run orgmcp inbox
 ```
 
-Other commands: `progress [TASK_ID]`, `plan`/`apply` (blueprints, below), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `mcp`, `kiro-profile` (this org's internal profile).
+Other commands: `progress [TASK_ID]`, `plan`/`apply` (blueprints, below), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile).
 
 ### Progress
 
@@ -67,15 +67,35 @@ Needs you: blocked result from ceo "Second": Need the 2025 sales figures from fi
 
 ## Create an org from a goal
 
-Building an org for a goal goes wrong when it is improvised: scope, deliverable, budget, models and the review step get assumed.
-The workflow below makes the needs explicit and puts them in one reviewable file before anything is created.
+Building an org for a goal goes wrong when it is improvised: scope, deliverable, budget, models and the review step get
+assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#kiro-integration)) and its skill installed
+(`orgmcp install-skill`), this is the whole story:
 
-1. **Elicit.** Ask the user the few questions that matter (scope, deliverable format/length/path, exact acceptance criteria, sources, workspace, tests/commits, budget and models, review, approval, progress), each with a default.
-2. **Blueprint.** Write the answers as a blueprint (YAML/JSON, example: [`examples/blueprint-research.yaml`](examples/blueprint-research.yaml)).
-3. **Plan.** `orgmcp plan bp.yaml` validates it and prints a plan for approval (goal, needs, org tree with role/model/tools/workspace, budget split and estimate, review steps, deliverable, checkpoints, warnings). Exit status 1 if there are errors.
-4. **Approve.** Errors block `apply`; warnings are shown in the plan; the user replies "approve" or asks for changes.
-5. **Apply.** `orgmcp apply bp.yaml` (on an existing org) hires the whole tree as root, parents first, and gives the first task. It refuses on errors or if a name exists, and retires what it created if anything fails midway.
-6. **Start, monitor, deliver.** Run the scheduler, answer progress questions, relay escalations, check the deliverable against every criterion, copy it to its path.
+1. **Ask.** "Build me an org that produces a competitor analysis of five note apps." The assistant replies with one message
+   of the questions that matter, each with a proposed default: scope, deliverable (format, length, path), exact acceptance
+   criteria, sources and web access, workspace and tests (for code), budget in runs, models, review, approval, progress.
+   You answer, or say "defaults".
+2. **Plan.** The assistant writes your answers as a blueprint (below) and calls `propose_org`. You get the plan: the
+   target organization, goal, needs as understood, the org tree (role, model, tools, workspace per agent), the budget and
+   how it is split, the independent review, the deliverable and where it ends up, checkpoints, and warnings. Errors block
+   the plan until fixed. Nothing has been written yet, not even the organization.
+3. **Approve.** You say "approve" or ask for changes (then it proposes again). Only after your explicit approval the
+   assistant calls `create_org` (if there is no organization yet), `apply_org(..., approved=True)` and `start`.
+   `apply_org` refuses without `approved=True`, hires the whole tree as root (parents first), gives the first task, and
+   undoes everything if anything fails midway.
+4. **It runs.** The scheduler wakes the agents. The budget in the plan is a ceiling, not a price: runs a team does not spend
+   come back automatically with each agent's final report, up to you. Spending beyond the plan needs your OK.
+5. **Progress.** "Status?" is answered from `progress`: one line per task (working / waiting on an agent / stalled /
+   blocked with the reason / done / failed), who is busy, runs used of the budget, time since the last activity, and what
+   needs your decision.
+6. **Delivery.** When the task is done the assistant reads the deliverable, checks it against every acceptance criterion
+   (sending it back for rework if one is unmet, never patching it itself), copies it to the path you chose, tells you
+   which criteria are met and how many runs it cost, and calls `stop`.
+
+The same flow works without an assistant: `orgmcp plan bp.yaml` (exit status 1 on errors), `orgmcp apply bp.yaml`,
+`orgmcp run`, `orgmcp progress`.
+
+The blueprint (YAML or JSON; example: [`examples/blueprint-research.yaml`](examples/blueprint-research.yaml)):
 
 ```yaml
 mission: ...                          # what the organization is for
@@ -95,14 +115,16 @@ task: {to: lead, title: ..., goal: ..., acceptance: [exact, checkable items], in
 Validation encodes the lessons of the usability studies: a deliverable and exact acceptance criteria; web tools when sources
 are needed; `write`/`shell` only with a workspace inside an allowed root (default: home, temp, cwd; `--allow-root DIR` or
 `$ORGMCP_WORKSPACE_ROOTS`; never the org itself or `~/.kiro`); code goals need an engineer with a workspace; a reviewer distinct
-from the author whose charter never has it edit others' files; managers hold the tools and workspace they hand down; budget within
-the user's cap and above the estimate; different models for drafting and review when asked; depth and children within limits.
+from the author whose charter never has it edit others' files (rule 9 of the protocol); managers hold the tools and workspace
+they hand down; budget within the user's cap and above the estimate; different models for drafting and review when asked;
+depth and children within limits. Over MCP the blueprint is passed as YAML/JSON text and is never read from a file path.
 
 **Budget estimate.** One pass plus one review/rework cycle. A worker's pass costs its template's `base_runs` times `scale`
 (researcher 3, writer 2, engineer 4, fact-checker 2, reviewer 1, tester 2, code-reviewer 2) and its rework costs 1. A manager's
 pass costs 2 plus one per direct report; its rework costs 2. The planned budget is the estimate times 1.25 unless
 `task.budget` is set. Managers get a written budget plan: initial grants equal the reports' pass runs and the rest stays with
-the manager as reserve for rework.
+the manager as reserve for rework. Unspent runs return up the tree automatically (see the budget rule above), so the
+planned figure is what you authorize at most, and `progress` shows what was used and returned.
 
 **Role templates** live in `src/orgmcp/roles/*.md`: `manager`, `researcher`, `writer`, `reviewer`, `fact-checker`, `engineer`,
 `tester`, `code-reviewer`. Each has purpose, responsibilities, decision rights, escalation, quality bar, budget discipline and a
@@ -110,7 +132,9 @@ default tool set and model tier. Reviewers report findings and required changes 
 agent's file (the manager sends them back to the author with `revises`). `template:` plus a `charter:` adds your own text.
 
 **The assistant's playbook** is `skills/orgmcp/SKILL.md`: the precondition (use orgmcp or say it is unavailable), the one-message
-checklist, plan and approval, build and run, monitoring, and verification before delivery. Install it in your assistant's skills directory.
+checklist, plan and approval, build and run, monitoring, and verification before delivery. The server's own instructions carry
+a compact version of the same workflow, so an assistant without the skill still gets the order of steps. How to install the
+skill: see [Kiro integration](#kiro-integration).
 
 ## Health
 
@@ -222,8 +246,47 @@ organization to exist yet:
   `.runtime/scheduler.log`, returns its pid; refused if one runs), `stop()` (SIGTERM, only to a pid verified to be this
   org's scheduler: alive, `run` in its command line, and this org's `--root` or an `orgmcp` program with no other
   `--root`). `status` and `whoami` end with a `scheduler: running (pid, since) / stopped` line.
+- Goal workflow tools (root only; see [Create an org from a goal](#create-an-org-from-a-goal)):
+  - `propose_org(blueprint)`: blueprint as YAML/JSON text in, plan with issues out; writes nothing; works in setup mode.
+  - `apply_org(blueprint, approved=False)`: refuses unless `approved=True` (pass it only after the user approved the
+    plan), refuses in setup mode ("call create_org first") and on validation errors, otherwise hires the team, gives the
+    first task and says to call `start`.
+  - `progress(task_id=None)`: the status lines described above; in setup mode it explains the next step.
 - Other tools: `whoami`, `inbox`, `delegate`, `report`, `send`, `hire`, `retire`, `read`, `write`, `status`, `health`.
-  Agents get these (not `create_org`, `start`, `stop`).
+  Agents get these (not `create_org`, `start`, `stop`, `propose_org`, `apply_org`, `progress`). `report` tells an agent when
+  budget travelled up with its result; `send(..., budget=N)` to its parent gives runs back early.
+- The server's instructions for root contain the workflow in five lines (ask once with defaults → `propose_org` → wait for
+  explicit approval → `create_org`/`apply_org(approved=True)`/`start` → `progress` → verify, copy, `stop`) next to the safety
+  rules: only the bound organization, no substituting other mechanisms, no claims without tool evidence.
+
+**The assistant skill.** `orgmcp install-skill [--dest DIR] [--force]` copies the skill to `~/.kiro/skills/orgmcp/SKILL.md`
+(`DIR` is the skills directory: the file goes to `DIR/orgmcp/SKILL.md`), prints the path, leaves an identical file alone and
+refuses to replace a different one without `--force`. Kiro loads skills through the `resources` of an agent profile as
+`skill://` entries (a path or a glob): the profiles in `~/.kiro/agents` use `"skill://.kiro/skills/*/SKILL.md"`. To use the skill from a project-local profile without installing it, give the
+absolute path of the checkout's file, for example in `<project>/.kiro/agents/org-assistant.json` (the file validates with
+`kiro-cli agent validate --path <file>`, which checks the shape of the entries, not that the file exists):
+
+```json
+{
+  "name": "org-assistant",
+  "description": "Builds and runs an orgmcp organization for a goal",
+  "prompt": "You manage one orgmcp organization for the user through the orgmcp tools. Follow the orgmcp skill.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "uv",
+      "args": ["--directory", "/path/to/orgmcp", "run", "orgmcp", "mcp"],
+      "env": { "ORG_ROOT": "/path/to/your/org" }
+    }
+  },
+  "tools": ["*"],
+  "resources": ["skill:///path/to/orgmcp/skills/orgmcp/SKILL.md"],
+  "includeMcpJson": false
+}
+```
+
+Run it with `kiro-cli chat --agent org-assistant`. This profile binds the assistant to one organization (and keeps your other
+MCP servers out); `tools: ["*"]` lets it copy the finished deliverable with kiro's own file tools, so narrow it if you prefer
+to copy files yourself. Use a name other than `orgmcp-...`, which the scheduler's internal profiles use.
 
 **Agent runs (the scheduler).** Runs use `kiro-cli chat --no-interactive --agent <profile>`; the prompt is passed
 on stdin. The scheduler writes one *internal* profile per organization (and per set of granted built-in tools) to
@@ -243,8 +306,8 @@ on stdin. The scheduler writes one *internal* profile per organization (and per 
 - Older global profiles (`~/.kiro/agents/orgmcp*.json`) are no longer written or used; they are never deleted or
   rewritten, so remove them yourself when no scheduler that uses them is running.
 
-Every command that changes an organization (`init`, `hire`, `task`, `send`, `resume`, `run`, `review`, `inbox`
-without `--keep`, `kiro-profile`) first prints `org: <path>` to stderr. `python -m orgmcp` is the same as the `orgmcp` script.
+Every command that changes an organization (`init`, `hire`, `task`, `apply`, `send`, `resume`, `run`, `review`, `inbox`
+without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first prints `org: <path>` to stderr. `python -m orgmcp` is the same as the `orgmcp` script.
 
 ## Security notes
 
