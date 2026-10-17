@@ -1,0 +1,21 @@
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m55wwgbnes2aneeqafs9q0sh","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+[tool] Reading SKILL.md:1
+[tool] Running: @orgmcp/status
+[tool] status: Completed
+[tool] status: Completed
+Tools are available, and no org exists yet. Before I draft a plan, I need a few answers from you.
+
+1. **Which apps should it cover?** I won't pick them for you. List the self-hosted note-taking apps you want compared, such as the ones you use now or the ones you're weighing.
+2. **What should the comparison cover?** For example features, licence, how hard each is to deploy, sync and mobile support, the plugin ecosystem, and community activity. Or tell me what matters most to you. If you don't say, I'll use those.
+3. **Deliverable.** The default is a markdown report of 1500 words or fewer. It would go in a new `deliverables/` folder here, at `/private/tmp/orgmcp-a5-1792273159/deliverables/`. It would include a comparison table with one row per app and a short recommendation section.
+4. **Sources.** The default is web research, with a URL for every factual claim.
+5. **Checks for "done".** By default:
+   - It covers exactly your list of apps.
+   - The table has one row per app.
+   - Every factual claim has a source URL.
+   - A fact-checker confirms every claim.
+   - The report is 1500 words or fewer.
+6. **Review.** By default a separate agent fact-checks and reviews the work, so the writer doesn't check its own claims. I'd use a cheaper model for the drafting and a stronger one for the lead and the verifier.
+7. **Budget and approval.** By default I'll estimate the number of runs and add 25%. You'll see the full plan and approve it before anything starts.
+
+Reply "defaults" to accept the proposed ones. You still need to give me the list of apps.

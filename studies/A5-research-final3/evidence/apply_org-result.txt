@@ -1,0 +1,5 @@
+applied the blueprint to /private/tmp/orgmcp-a5-1792273159/org
+created 4 agents: lead, lead/researcher, lead/writer, lead/factcheck
+task 20261017T214038108044-root-f768 -> lead (budget 22)
+warning: needs.deliverable.path: no agent can write to /private/tmp/orgmcp-a5-1792273159/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
+Next step: call start() to run the scheduler, then answer status questions with progress().

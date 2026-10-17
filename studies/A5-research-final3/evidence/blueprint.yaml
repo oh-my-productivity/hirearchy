@@ -1,0 +1,40 @@
+mission: >
+  Produce a sourced competitor analysis of five self-hosted note-taking apps (Obsidian, Logseq, Joplin, Trilium Notes, AnyType), comparing pricing, license and sync model, and ending with a judgement section called "Where we can win".
+needs:
+  kind: research
+  scope: "Exactly these five apps: Obsidian, Logseq, Joplin, Trilium Notes, AnyType. Dimensions: pricing, license, sync model."
+  deliverable:
+    description: A comparison table (one row per app; columns pricing, license, sync model) with a source URL per fact, plus a closing section called "Where we can win" labelled as our assessment
+    format: markdown
+    max_words: 1500
+    path: /tmp/orgmcp-a5-1792273159/deliverables/competitors.md
+  quality_bar: Every factual claim cites a page that actually states it; opinions are labelled as judgement, without citations; current facts come from the live source.
+  sources: Web access to official sites, documentation and repositories; a source URL per claim.
+  budget_runs: 25
+  models: {cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}
+  model_policy: cheap drafting, strong review
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {name: researcher, template: researcher, model: cheap}
+      - {name: writer, template: writer, model: cheap}
+      - {name: factcheck, template: fact-checker, model: strong}
+task:
+  to: lead
+  title: Competitor analysis of self-hosted note-taking apps
+  goal: >
+    Research Obsidian, Logseq, Joplin, Trilium Notes and AnyType (pricing, license, sync model), write the competitor analysis,
+    have every claim independently fact-checked, apply every required change and report the final file.
+  acceptance:
+    - Covers exactly the five apps Obsidian, Logseq, Joplin, Trilium Notes and AnyType, and no others.
+    - At most 1500 words as counted by read.
+    - Contains a comparison table with one row per app and columns for pricing, license and sync model, and a section titled exactly "Where we can win", marked as our assessment (judgement).
+    - Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+    - The "Where we can win" section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
+    - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change."
+    - The final report pastes that coverage line verbatim, with the path of the fact-checker's ledger.
