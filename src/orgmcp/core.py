@@ -234,6 +234,23 @@ class Message:
             path=path,
         )
 
+    def cut_body(self, limit: int = RENDER_BODY_CHARS, where: str | None = None) -> str:
+        """The body, cut to ``limit`` characters with a pointer to the file for the rest.
+
+        ``where`` = path of the file relative to the org root; by default derived from the recipient's box.
+        """
+        body = self.body
+        if limit and len(body) > limit:
+            if where is None:
+                where = f"{self.to}/" if self.to != ROOT else ""
+                where += f"{self.path.parent.name}/{self.path.name}" if self.path else f"<box>/{self.id}.md"
+            body = (
+                body[:limit].rstrip()
+                + f"\n\n[... message cut: {len(self.body) - limit} more of {len(self.body)} characters. "
+                f"Read the rest with read(path=\"{where}\") if you need it.]"
+            )
+        return body
+
     def render(self, limit: int = RENDER_BODY_CHARS) -> str:
         """The message as shown to an agent. A body over ``limit`` characters is cut, with the path to read the rest."""
         head = [f"from: {self.sender}", f"to: {self.to}"]
@@ -247,15 +264,7 @@ class Message:
             head.append(f"revises: {self.revises}")
         if self.budget:
             head.append(f"budget: {self.budget} runs")
-        body = self.body
-        if limit and len(body) > limit:
-            where = f"{self.to}/" if self.to != ROOT else ""
-            where += f"{self.path.parent.name}/{self.path.name}" if self.path else f"<box>/{self.id}.md"
-            body = (
-                body[:limit].rstrip()
-                + f"\n\n[... message cut: {len(self.body) - limit} more of {len(self.body)} characters. "
-                f"Read the rest with read(path=\"{where}\") if you need it.]"
-            )
+        body = self.cut_body(limit)
         return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{body}\n"
 
 
@@ -960,10 +969,12 @@ class Org:
     def _indent(text: str, n: int) -> str:
         return "\n".join(" " * n + line for line in text.splitlines())
 
-    @staticmethod
-    def _quote(text: str) -> str:
-        """Quote a message body verbatim, so its own headings do not mix with the prompt's structure."""
-        return "\n".join(f"> {line}".rstrip() for line in text.strip().splitlines())
+    def _quote(self, m: Message) -> str:
+        """Quote a task's body verbatim, so its own headings do not mix with the prompt's structure.
+
+        A very long body is cut like ``Message.render`` does, with the real path of the file to read the rest."""
+        where = str(m.path.relative_to(self.root)) if m.path and m.path.is_relative_to(self.root) else None
+        return "\n".join(f"> {line}".rstrip() for line in m.cut_body(where=where).strip().splitlines())
 
     def state_summary(self, addr: str, shown: set[str] | None = None) -> str:
         """The agent's situation. ``shown``: ids of tasks whose full text the caller already prints elsewhere."""
@@ -991,7 +1002,7 @@ class Org:
             if t.id in (shown or ()):
                 lines.append("    (full text: see the new messages below)")
             else:  # the contract you are accountable for, verbatim
-                lines.append(self._indent(self._quote(t.body), 4))
+                lines.append(self._indent(self._quote(t), 4))
         out = self.outstanding(a)
         lines.append("- Work you delegated that is still outstanding:" + ("" if out else " none"))
         lines += [f"  - {t.id} \"{t.title}\" -> {t.to} ({self.state(t.to) if self.exists(t.to) else 'gone'})" for t in out]
@@ -1012,7 +1023,7 @@ class Org:
             return text
         out = (
             f"{text}\n[The task you delegated to {task.to} that this result answers ({task.id}). "
-            f"Judge the result against these criteria, verbatim:]\n{self._quote(task.body)}\n"
+            f"Judge the result against these criteria, verbatim:]\n{self._quote(task)}\n"
         )
         # Which of your own open tasks does it serve? Derivable only if exactly one was already yours at the time.
         mine = [t for t in self.open_tasks(addr) if t.id < task.id]
