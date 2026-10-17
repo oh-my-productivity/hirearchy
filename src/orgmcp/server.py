@@ -53,7 +53,11 @@ def build_server(org: Org, me: str) -> FastMCP:
 
         to: the report's address (e.g. "ceo/cto"). title: a few words. goal: what outcome is needed and why.
         acceptance: concrete, checkable criteria for "done". inputs: paths (relative to the org root) the
-        report should read. budget: runs handed to the report from your own budget (default from ORG.md).
+        report should read. budget: runs handed to the report from your own budget. If you omit it, the default is
+        min(default_budget from ORG.md, your budget - reserve), where the reserve keeps one run per outstanding
+        delegation plus one for this one; if that is below 1 the call fails and tells you your options.
+        An explicit budget must leave that same reserve.
+        Copy the relevant acceptance criteria verbatim from the task you are working on; never paraphrase or relax them.
         revises: when sending work back for rework, the id of the earlier task you sent to the same report.
         Returns the task id. Do not wait for the result: end your run, the result will wake you.
         """

@@ -450,13 +450,37 @@ class Org:
             raise OrgError(f"you can only delegate to your direct reports: {reports}")
         if not title.strip() or not goal.strip() or not acceptance.strip():
             raise OrgError("a task needs a title, a goal and acceptance criteria")
-        budget = int(self.config["default_budget"] if budget is None else budget)
+        if budget is None:
+            budget = self._default_budget(actor)
+        budget = int(budget)
         if budget < 1:
             raise OrgError("a task needs a budget of at least 1 run")
         if revises and not any(m.id == revises and m.type == "task" and m.to == to for m in self.sent(actor)):
             raise OrgError(f"revises must be the id of an earlier task you sent to {to}: {revises}")
         body = templates.task_body(goal, acceptance, list(inputs or []))
         return self.send(actor, to, body, type="task", title=title, budget=budget, revises=revises or None)
+
+    def _default_budget(self, actor: str) -> int:
+        """Runs a delegation gets when the caller names none: what the actor can afford, capped at default_budget.
+
+        min(default_budget, remaining - reserve), where the reserve keeps one run per outstanding delegation plus
+        one for the result of this new one. Root has no limit.
+        """
+        default = int(self.config["default_budget"])
+        if actor == ROOT:
+            return default
+        remaining = self.budget(actor) or 0
+        reserve = len(self.outstanding(actor)) + 1
+        affordable = remaining - reserve
+        if affordable < 1:
+            raise OrgError(
+                f"you cannot afford this delegation: you have {remaining} run(s) and must keep {reserve} in reserve "
+                "(one per outstanding delegation, plus one to process the result of this one), so nothing is left "
+                "to hand down. Options: ask your parent for more budget with `send` and end your run; do the work "
+                "yourself; or, if the task cannot be completed without this step, report `blocked` (never `done`) "
+                "and say what is missing."
+            )
+        return min(default, affordable)
 
     def _normalize_artifact(self, actor: str, path: str, since: str = "") -> str:
         """Resolve an artifact path and annotate it with facts a manager can check claims against."""

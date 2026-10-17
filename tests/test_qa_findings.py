@@ -300,7 +300,6 @@ def test_qa17_prompt_shows_acceptance_criteria_of_open_tasks(org):
     assert "exactly 33 words" in prompt, f"prompt for the run closing task {task.id} lacks its acceptance criteria"
 
 
-@pytest.mark.xfail(strict=True, reason="QA-18: delegate() without budget asks for default_budget (10) and fails for any manager holding less")
 def test_qa18_delegate_without_budget_adapts_to_what_the_manager_can_afford(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=6)
     assert org.config["default_budget"] == 10
