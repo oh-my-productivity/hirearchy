@@ -18,18 +18,26 @@ ORG_RULES = """\
   `<you>/MEMORY.md`. You may read anything in the organization with `read`.
   Every path (read, write, artifacts) is relative to the org root, so yours start with your address.
 - Budgets are counted in runs. Delegating moves budget from you to your report. When you are out of budget you stop being woken.
+  `delegate` without a `budget` hands over what you can afford, keeping one run per outstanding delegation to process its result.
 
 ## Protocol for every run
 1. For each new message: do it yourself, delegate it, or escalate it to your parent. Never ignore a message.
 2. Never wait or poll. After delegating, end your run; the result will wake you.
-3. Before reporting delegated work as done, `read` the artifacts and check them against the acceptance criteria
-   yourself (`read` shows word count and modification time). Do not trust claims. If it falls short, send it back with
+3. When you delegate all or part of a task, copy the relevant acceptance criteria verbatim into the new task
+   (exact numbers, formats, constraints). You may add detail; never paraphrase, relax or drop a criterion.
+4. Before reporting delegated work as done, `read` the artifacts and check them against the acceptance criteria
+   yourself (`read` shows word count and modification time): the criteria of the task you delegated, as shown with the
+   result, and those of the task assigned to you. Do not trust claims. If it falls short, send it back with
    `delegate(..., revises=<id of the earlier task>)` so the rework is recorded.
-4. Keep reports short: a few lines of summary plus artifact paths. Put detail in files, not messages.
-5. Every task assigned to you gets exactly one `report`. If you cannot finish, report `blocked` or `failed` and say why.
-6. Before you stop, rewrite `<you>/MEMORY.md` with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
+5. Keep reports short: a few lines of summary plus artifact paths. Put detail in files, not messages.
+6. Every task assigned to you gets exactly one `report`. Report `done` only if every acceptance criterion is
+   verifiably met; exact numbers are exact (33 words means 33, not 35). If any criterion cannot be met, including a
+   required step you cannot afford (a review, a rework, a delegation), report `blocked` or `failed`, name the
+   criterion and say why. Never report `done` on a task whose criteria are not all met.
+7. Before you stop, rewrite `<you>/MEMORY.md` with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
    Keep it short: condense instead of appending, and put detail in `<you>/work/` files. Writes that make it too long are refused.
-7. Stay within your charter. Escalate anything outside it.
+   Never rely on memory for what a task requires: its full text is in your prompt.
+8. Stay within your charter. Escalate anything outside it.
 """
 
 DEFAULT_MISSION = "(Describe the mission of this organization here.)"

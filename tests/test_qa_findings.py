@@ -272,7 +272,6 @@ def test_qa15_report_refuses_artifacts_outside_the_org(org, tmp_path):
 # ---------------------------------------------------------------------- prompts
 
 
-@pytest.mark.xfail(strict=True, reason="QA-17: the run prompt shows an open task by title only, so a manager re-judges results against its own lossy memory")
 def test_qa17_prompt_shows_acceptance_criteria_of_open_tasks(org):
     task = org.delegate(ROOT, "ceo", "Strict blurb", "the goal", "ACCEPT: exactly 33 words", budget=10)
     drain(org, "ceo")  # the task was handled in an earlier run and now sits in read/
@@ -282,7 +281,6 @@ def test_qa17_prompt_shows_acceptance_criteria_of_open_tasks(org):
     assert "exactly 33 words" in prompt, f"prompt for the run closing task {task.id} lacks its acceptance criteria"
 
 
-@pytest.mark.xfail(strict=True, reason="QA-18: delegate() without budget asks for default_budget (10) and fails for any manager holding less")
 def test_qa18_delegate_without_budget_adapts_to_what_the_manager_can_afford(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=6)
     assert org.config["default_budget"] == 10

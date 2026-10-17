@@ -565,13 +565,37 @@ class Org:
             raise OrgError(f"you can only delegate to your direct reports: {reports}")
         if not title.strip() or not goal.strip() or not acceptance.strip():
             raise OrgError("a task needs a title, a goal and acceptance criteria")
-        budget = int(self.config["default_budget"] if budget is None else budget)
+        if budget is None:
+            budget = self._default_budget(actor)
+        budget = int(budget)
         if budget < 1:
             raise OrgError("a task needs a budget of at least 1 run")
         if revises and not any(m.id == revises and m.type == "task" and m.to == to for m in self.sent(actor)):
             raise OrgError(f"revises must be the id of an earlier task you sent to {to}: {revises}")
         body = templates.task_body(goal, acceptance, list(inputs or []))
         return self.send(actor, to, body, type="task", title=title, budget=budget, revises=revises or None)
+
+    def _default_budget(self, actor: str) -> int:
+        """Runs a delegation gets when the caller names none: what the actor can afford, capped at default_budget.
+
+        min(default_budget, remaining - reserve), where the reserve keeps one run per outstanding delegation plus
+        one for the result of this new one. Root has no limit.
+        """
+        default = int(self.config["default_budget"])
+        if actor == ROOT:
+            return default
+        remaining = self.budget(actor) or 0
+        reserve = len(self.outstanding(actor)) + 1
+        affordable = remaining - reserve
+        if affordable < 1:
+            raise OrgError(
+                f"you cannot afford this delegation: you have {remaining} run(s) and must keep {reserve} in reserve "
+                "(one per outstanding delegation, plus one to process the result of this one), so nothing is left "
+                "to hand down. Options: ask your parent for more budget with `send` and end your run; do the work "
+                "yourself; or, if the task cannot be completed without this step, report `blocked` (never `done`) "
+                "and say what is missing."
+            )
+        return min(default, affordable)
 
     def _normalize_artifact(self, actor: str, path: str, since: str = "") -> str:
         """Resolve an artifact path and annotate it with facts a manager can check claims against."""
@@ -932,7 +956,17 @@ class Org:
             )
         return "\n".join(lines)
 
-    def state_summary(self, addr: str) -> str:
+    @staticmethod
+    def _indent(text: str, n: int) -> str:
+        return "\n".join(" " * n + line for line in text.splitlines())
+
+    @staticmethod
+    def _quote(text: str) -> str:
+        """Quote a message body verbatim, so its own headings do not mix with the prompt's structure."""
+        return "\n".join(f"> {line}".rstrip() for line in text.strip().splitlines())
+
+    def state_summary(self, addr: str, shown: set[str] | None = None) -> str:
+        """The agent's situation. ``shown``: ids of tasks whose full text the caller already prints elsewhere."""
         a = self.require(addr)
         meta, _ = self.charter(a)
         lines = [f"- Address: `{a}`; parent: `{self.parent(a) or '-'}`; role: {meta.get('role', '?')}"]
@@ -952,7 +986,12 @@ class Org:
             lines.append("- Siblings: " + ", ".join(siblings))
         tasks = self.open_tasks(a)
         lines.append("- Open tasks assigned to you:" + ("" if tasks else " none"))
-        lines += [f"  - {t.id} \"{t.title}\" from {t.sender}" for t in tasks]
+        for t in tasks:
+            lines.append(f"  - {t.id} \"{t.title}\" from {t.sender}")
+            if t.id in (shown or ()):
+                lines.append("    (full text: see the new messages below)")
+            else:  # the contract you are accountable for, verbatim
+                lines.append(self._indent(self._quote(t.body), 4))
         out = self.outstanding(a)
         lines.append("- Work you delegated that is still outstanding:" + ("" if out else " none"))
         lines += [f"  - {t.id} \"{t.title}\" -> {t.to} ({self.state(t.to) if self.exists(t.to) else 'gone'})" for t in out]
@@ -962,6 +1001,27 @@ class Org:
         a = self.require(addr)
         _, charter = self.charter(a)
         return f"{self.state_summary(a)}\n\n## Charter\n{charter or '(root has no charter)'}"
+
+    def _render_in_context(self, addr: str, m: Message) -> str:
+        """A batch message; a result is followed by the task it answers, so it is judged against what was asked."""
+        text = m.render()
+        if m.type != "result" or not m.reply_to:
+            return text
+        task = next((t for t in self.sent(addr) if t.type == "task" and t.id == m.reply_to), None)
+        if task is None:
+            return text
+        out = (
+            f"{text}\n[The task you delegated to {task.to} that this result answers ({task.id}). "
+            f"Judge the result against these criteria, verbatim:]\n{self._quote(task.body)}\n"
+        )
+        # Which of your own open tasks does it serve? Derivable only if exactly one was already yours at the time.
+        mine = [t for t in self.open_tasks(addr) if t.id < task.id]
+        if len(mine) == 1:
+            out += (
+                f"[It was the only task assigned to you before you delegated this, so it probably serves your open task "
+                f"{mine[0].id} \"{mine[0].title}\": the result must also satisfy that task's criteria (shown in full in this prompt).]\n"
+            )
+        return out
 
     def run_prompt(self, addr: str, batch: list[Message]) -> str:
         a = self.require(addr)
@@ -974,7 +1034,8 @@ class Org:
                 f"the limit are refused. This run, condense it: rewrite {a}/MEMORY.md (not append) with only what "
                 "your next run needs; move detail into files under your work/ directory.**"
             )
-        messages = "\n".join(m.render() for m in batch) or "(none)"
+        messages = "\n".join(self._render_in_context(a, m) for m in batch) or "(none)"
+        shown = {m.id for m in batch if m.type == "task"}
         return f"""# orgmcp run: you are `{a}`
 
 {self.rules()}
@@ -986,7 +1047,7 @@ class Org:
 {memory}
 
 # Your state
-{self.state_summary(a)}
+{self.state_summary(a, shown)}
 - Paths: every path (read, write, artifacts) is relative to the org root. Yours start with `{a}/`.
 
 # New messages for this run ({len(batch)})
