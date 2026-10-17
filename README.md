@@ -22,6 +22,7 @@ org/                      # root = you, the human
 - Address = path (`ceo/writer`). Every path in tools is relative to the org root.
 - An agent writes only inside its own directory. The exception is a direct report's `AGENT.md`, which the parent owns.
 - Tasks go down (`delegate`, direct reports only), results go up (`report`, once per task), and notes go to the parent, reports, siblings, or a reply.
+- The task contract travels with every run: the prompt carries the full text (goal, acceptance criteria, inputs) of each open task, and next to each `result` the task you delegated that it answers. Protocol: copy criteria verbatim when delegating, report `done` only if every criterion is met, otherwise `blocked`/`failed`.
 - Task state and budget are derived from the message files, never stored separately.
 - Budget is counted in runs and passes down the tree: a child gets only what its parent hands it, and each delegation keeps a reserve so the parent can process the result. `delegate` without a `budget` hands down `min(default_budget, remaining - reserve)` (one run reserved per outstanding delegation plus one for the new one) and fails with the options if that is below 1.
 - Authority only narrows: a parent cannot grant tools or a workspace it doesn't have.

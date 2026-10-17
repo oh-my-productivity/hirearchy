@@ -290,7 +290,6 @@ def test_qa15_report_refuses_artifacts_outside_the_org(org, tmp_path):
 # ---------------------------------------------------------------------- prompts
 
 
-@pytest.mark.xfail(strict=True, reason="QA-17: the run prompt shows an open task by title only, so a manager re-judges results against its own lossy memory")
 def test_qa17_prompt_shows_acceptance_criteria_of_open_tasks(org):
     task = org.delegate(ROOT, "ceo", "Strict blurb", "the goal", "ACCEPT: exactly 33 words", budget=10)
     drain(org, "ceo")  # the task was handled in an earlier run and now sits in read/
