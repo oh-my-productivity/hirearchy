@@ -16,18 +16,27 @@ def _text(value: str) -> str:
     return Path(value[1:]).expanduser().read_text(encoding="utf-8") if value.startswith("@") else value
 
 
-def _org(args) -> Org:
-    return Org(args.root or Org.find_root())
+def _announce(path) -> None:
+    """Say which organization a mutating command is about to change (stderr, so output stays clean)."""
+    print(f"org: {Path(path).expanduser().resolve()}", file=sys.stderr, flush=True)
+
+
+def _org(args, mutating: bool = False) -> Org:
+    root = Path(args.root or Org.find_root()).expanduser().resolve()
+    if mutating:
+        _announce(root)  # before anything is read or written; also shown if the path turns out not to be an org
+    return Org(root)
 
 
 def cmd_init(args) -> None:
     cfg = {"default_model": args.model} if args.model else None
+    _announce(args.path)
     org = Org.init(args.path, _text(args.mission) if args.mission else None, cfg)
     print(f"initialized organization at {org.root}\nedit {org.root / 'ORG.md'} to set the mission and limits")
 
 
 def cmd_hire(args) -> None:
-    org = _org(args)
+    org = _org(args, mutating=True)
     addr = org.hire(
         args.parent, args.name, args.role, _text(args.charter), model=args.model,
         tools=[t for t in (args.tools or "").split(",") if t], can_hire=args.can_hire,
@@ -38,7 +47,7 @@ def cmd_hire(args) -> None:
 
 
 def cmd_task(args) -> None:
-    org = _org(args)
+    org = _org(args, mutating=True)
     msg = org.delegate(
         ROOT, args.to, args.title, _text(args.goal), _text(args.acceptance), args.input, args.budget, args.revises
     )
@@ -47,7 +56,7 @@ def cmd_task(args) -> None:
 
 
 def cmd_send(args) -> None:
-    org = _org(args)
+    org = _org(args, mutating=True)
     msg = org.send(ROOT, args.to, _text(args.body), title=args.title, reply_to=args.reply_to, budget=args.budget)
     org.commit(f"root: note {msg.id} -> {msg.to}")
     print(f"sent {msg.id} -> {msg.to}")
@@ -74,7 +83,7 @@ def cmd_health(args) -> None:
 def cmd_review(args) -> None:
     from .review import review
 
-    org = _org(args)
+    org = _org(args, mutating=not args.dry_run)
     result = review(org, dry_run=args.dry_run)
     if result.notes and not args.dry_run:
         org.commit("root: health review")
@@ -82,7 +91,7 @@ def cmd_review(args) -> None:
 
 
 def cmd_inbox(args) -> None:
-    org = _org(args)
+    org = _org(args, mutating=not args.keep)  # reading marks the mail as read
     batch = org.messages(ROOT, "inbox") if args.keep else org.begin_run(ROOT)
     if not args.keep:
         org.end_run(ROOT, ok=True)
@@ -90,7 +99,7 @@ def cmd_inbox(args) -> None:
 
 
 def cmd_resume(args) -> None:
-    org = _org(args)
+    org = _org(args, mutating=True)
     addr = org.require(args.agent)  # normalized: "ceo/" and "ceo" are the same agent
     org.resume(addr)
     org.clear_failures(addr)
@@ -100,7 +109,7 @@ def cmd_resume(args) -> None:
 def cmd_run(args) -> None:
     from .scheduler import Scheduler, kiro_runner
 
-    org = _org(args)
+    org = _org(args, mutating=True)
     sched = Scheduler(org, kiro_runner(args.kiro))
     if args.once:
         sched.acquire()
@@ -124,7 +133,8 @@ def cmd_mcp(args) -> None:
 def cmd_kiro_profile(args) -> None:
     from .scheduler import ensure_kiro_profile, mcp_server_command
 
-    name = ensure_kiro_profile([t for t in (args.tools or "").split(",") if t])
+    org = _org(args, mutating=True)  # the profile belongs to this organization
+    name = ensure_kiro_profile([t for t in (args.tools or "").split(",") if t], org=org)
     print(f"wrote ~/.kiro/agents/{name}.json (mcp server: {json.dumps(mcp_server_command())})")
 
 
@@ -199,7 +209,7 @@ def main(argv: list[str] | None = None) -> None:
     s = sub.add_parser("mcp", help="run the MCP server on stdio (identity from $ORG_AGENT, default root)")
     s.set_defaults(fn=cmd_mcp)
 
-    s = sub.add_parser("kiro-profile", help="write the kiro agent profile used for agent runs")
+    s = sub.add_parser("kiro-profile", help="write this organization's internal kiro profile (the scheduler does this itself)")
     s.add_argument("--tools")
     s.set_defaults(fn=cmd_kiro_profile)
 
