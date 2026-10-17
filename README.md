@@ -24,7 +24,8 @@ org/                      # root = you, the human
 - Tasks go down (`delegate`, direct reports only), results go up (`report`: `done` and `failed` are final, a `blocked` task can be reported again and the new result `supersedes` it), and notes go to the parent, reports, siblings, or a reply.
 - The task contract travels with every run: the prompt carries the full text (goal, acceptance criteria, inputs) of each open task, and next to each `result` the task you delegated that it answers. Protocol: copy criteria verbatim when delegating, report `done` only if every criterion is met, otherwise `blocked`/`failed`.
 - Task state and budget are derived from the message files, never stored separately.
-- Budget is counted in runs and passes down the tree: a child gets only what its parent hands it, and each delegation keeps a reserve so the parent can process the result. `delegate` without a `budget` hands down `min(default_budget, remaining - reserve)` (one run reserved per outstanding delegation plus one for the new one) and fails with the options if that is below 1.
+- Budget is counted in runs and passes down the tree: a child gets only what its parent hands it, and each delegation keeps a reserve so the parent can process the result. It comes back up in two ways, both as one message that is charged to the sender and credited to the recipient (so nothing is minted or lost): with a final result, and by hand. When an agent reports `done` or `failed` and has no other open task, no task it reported `blocked` (that may be re-reported), no outstanding delegation and no mail waiting for a run, everything it has left travels up with the result to whoever assigned it (the result shows "returns N run(s)", and its own reports have already returned theirs, so it cascades up). `blocked` returns nothing. An agent can also give runs back early with `send(to=<parent>, body, budget=N)` (the reserve for its own delegations stays). Budget still goes nowhere else: down to direct reports, up to the parent. Results written before this existed carry no budget and mean what they always did. `delegate` without a `budget` hands down `min(default_budget, remaining - reserve)` (one run reserved per outstanding delegation plus one for the new one) and fails with the options if that is below 1.
+- Reviews follow the single-writer rule (rule 9 of the protocol in `ORG.md`): a reviewer or fact-checker never edits the author's file; it reports its findings and the changes it requires to whoever assigned the review, and the author applies them (`delegate(..., revises=<task id>)`). Acceptance criteria and charters must never require an agent to edit another agent's files. The protocol text is copied into `ORG.md` when an organization is created: existing organizations keep the text they were created with (the runtime rules above apply to them regardless).
 - Authority only narrows: a parent cannot grant tools or a workspace it doesn't have.
 - The write guard is the same on case-sensitive and case-insensitive filesystems (`agent.md`, `Memory.md` or a `RUNS` directory are refused, as are names that differ from an existing file only by case), and `AGENT.md` is created only by `hire`. `write` is confined to your own directory, `report` artifacts to the organization; `retire` takes a short name or full address and returns the team's unspent budget to the retired agent's parent as a runtime note (nothing when that parent is root). That note is non-waking (`wake: false`): it counts towards budget at once and lifts a budget pause, but does not start a run; it is held in the inbox, not counted as unread (scheduling, health), and delivered with the agent's next real batch.
 - Guards: hop limit (loops), max depth/children, out-of-budget pause with a parent notice, per-run timeout, one scheduler per org, and a git commit after every run. Also:
@@ -48,7 +49,21 @@ uv run orgmcp status
 uv run orgmcp inbox
 ```
 
-Other commands: `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `mcp`, `kiro-profile` (this org's internal profile).
+Other commands: `progress [TASK_ID]`, `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `mcp`, `kiro-profile` (this org's internal profile).
+
+### Progress
+
+```sh
+uv run orgmcp progress [TASK_ID]
+```
+
+What to read back to someone who asks "status?": one line per task you gave (open or blocked ones, and those that finished in the last day; with `TASK_ID`, just that task in any state): its state (`working`, `waiting on <agent>` with the reason if it is paused, `stalled`, `blocked: <reason>`, `done`, `failed`), who is running or has unread work in its team, runs used while it was open against the budget given for it, the time since the team's last activity, and for finished tasks the artifact paths and the runs returned. Then one `Needs you:` line for each unread item in your inbox that waits for a decision (blocked or failed results, notes from agents, runtime notices). It only reads; `orgmcp inbox` still shows the messages. The Python entry point is `orgmcp.progress.progress(org, task_id=None)`.
+
+```
+"Competitor report": waiting on ceo/writer. runs 2 of 12. last activity 4m ago. (task 20261017T175121-root-8218)
+"Second": blocked: Need the 2025 sales figures from finance. runs 1 of 5. last activity 1m ago. (task 20261017T175135-root-fc1a)
+Needs you: blocked result from ceo "Second": Need the 2025 sales figures from finance (message 20261017T175135-ceo-a9b7)
+```
 
 ## Health
 
@@ -83,10 +98,11 @@ agent scheduled, and `whoami` lists it as re-reportable.
 | `low_quality` | (failed + blocked + rework) / tasks received above the ratio, once enough tasks were received | `max_problem_ratio` (0.5), `min_tasks_for_quality` (3) |
 | `expensive` | runs per completed task above the limit (needs a result), or too many runs since its last result while holding an open task; runs that failed or were woken only by runtime notes (stall reminders, reviews, refunds) are not counted, but `runs` and the budget still include them | `max_runs_per_task` (5), `max_runs_without_result` (6) |
 | `wasteful` | empty runs / runs used above the ratio, once enough runs were used | `max_empty_run_ratio` (0.5), `min_runs_for_waste` (4) |
+| `stranded_budget` | budget left but no open tasks, no delegations, no unread mail and no activity for longer than the limit; the runs belong with the parent (not raised for root's direct reports: root has no limit). Suggested action: ask the agent to return its budget (a `send` to its parent with `budget=N`), or retire it | `stranded_after_seconds` (1800) |
 | `idle` | no open tasks, no delegations, no unread mail and no activity for longer than the limit (measured from hiring if it never ran): a candidate to retire | `idle_after_seconds` (86400) |
 
 Branch totals (the agent plus its subtree) sum runs, open tasks, results and rework, and show the worst flag, in the
-order above (`stuck` is worst, `idle` mildest). Override any threshold in the `ORG.md` frontmatter:
+order above (`stuck` is worst, `idle` mildest; `stranded_budget` sits just above `idle`). Override any threshold in the `ORG.md` frontmatter:
 
 ```yaml
 health:

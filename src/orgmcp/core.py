@@ -13,7 +13,10 @@ Invariants (everything else is built on these):
   - a task is open until its assignee has sent a result with ``reply_to`` = task id;
   - a task's outcome is its *latest* result: ``blocked`` may be superseded by a later result (``supersedes`` = the
     id of the one it replaces), ``done`` and ``failed`` are final;
-  - budget = budget received - budget handed down - runs consumed (files in ``runs/``).
+  - budget = budget received - budget handed down - runs consumed (files in ``runs/``). Budget flows down with tasks
+    and grants; it comes back up only as the ``budget`` of a final result (``done``/``failed`` of an agent with nothing
+    else open) or of a note to the parent. Every transfer is one message, charged to the sender and credited to the
+    recipient, so the total never changes.
 """
 
 from __future__ import annotations
@@ -274,7 +277,9 @@ class Message:
             head.append(f"revises: {self.revises}")
         if self.supersedes:
             head.append(f"supersedes: {self.supersedes}")
-        if self.budget:
+        if self.budget and self.type == "result":
+            head.append(f"returns {self.budget} run(s)")
+        elif self.budget:
             head.append(f"budget: {self.budget} runs")
         body = self.cut_body(limit)
         return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{body}\n"
@@ -579,8 +584,8 @@ class Org:
         budget = int(budget or 0)
         if budget < 0:
             raise OrgError("budget cannot be negative")
-        if budget and actor != ROOT and self.parent(to) != actor:
-            raise OrgError("budget can only be handed to your direct reports")
+        if budget and actor != ROOT and self.parent(to) != actor and to != self.parent(actor):
+            raise OrgError("budget can only be handed to your direct reports, or returned to your parent")
         self._check_allocation(actor, budget, new_delegation=type == "task")
         hops = self._next_hops(actor)
         if type != "result" and hops > int(self.config["max_hops"]):  # reports always get through
@@ -684,7 +689,28 @@ class Org:
         return self.send(
             actor, task.sender, body, type="result", title=task.title,
             reply_to=task.id, status=status, supersedes=prior.id if prior else None, _skip_route_check=True,
+            budget=self._budget_to_return(actor, task, status),
         )
+
+    def _budget_to_return(self, actor: str, task: Message, status: str) -> int:
+        """Runs that travel up with the final result of ``task``: everything the reporter has left, or 0.
+
+        Only a final result (``done``/``failed``) returns budget, and only when nothing else needs the reporter's
+        runs after it: no other open task, no other task reported ``blocked`` (it may be re-reported), no outstanding
+        delegation (their results need the reserve) and no mail waiting for a run. It goes to the assigner, and only
+        when that is the reporter's parent (the one route budget may travel up). The amount is read from the files
+        at the moment of the report and the transfer is the result message itself, so it is counted exactly once: a
+        redelivered run finds the task already final (a second ``report`` is refused) and nothing left to return.
+        """
+        if status == "blocked" or task.sender != self.parent(actor):
+            return 0
+        busy = (
+            [t for t in self.open_tasks(actor) if t.id != task.id]
+            or [t for t in self._blocked_tasks(actor) if t.id != task.id]
+            or self.outstanding(actor)
+            or self.unread(actor)
+        )
+        return 0 if busy else max(0, self.budget(actor) or 0)
 
     def hire(
         self,

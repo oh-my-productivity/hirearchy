@@ -319,7 +319,7 @@ def test_thresholds_can_be_overridden_in_org_md(org):
 
 
 def test_every_flag_has_a_severity():
-    assert set(FLAGS) == {"stuck", "out_of_budget", "paused", "low_quality", "expensive", "wasteful", "idle"}
+    assert set(FLAGS) == {"stuck", "out_of_budget", "paused", "low_quality", "expensive", "wasteful", "stranded_budget", "idle"}
 
 
 # ---------------------------------------------------------- branches and report
