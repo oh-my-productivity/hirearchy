@@ -1,9 +1,11 @@
+import time
 from datetime import timedelta
 
 from orgmcp import templates
 from orgmcp.core import ROOT, Org, join_frontmatter, split_frontmatter, utcnow
 from orgmcp.health import FLAGS, agent_health
 from orgmcp.review import review, review_if_due, total_runs
+from orgmcp.scheduler import Scheduler
 
 ENG = "ceo/eng"
 
@@ -224,3 +226,64 @@ def test_cadence_comes_from_files_not_memory(org):
     assert review_if_due(org, utcnow()) is None
     add_runs(org, "ceo", 1)  # "after a restart": only the ledger and the run logs carry state
     assert review_if_due(Org(org.root), utcnow()) is not None
+
+
+# ------------------------------------------------------------------ scheduler
+
+
+class Clock:
+    """Real time plus an offset, so a test can move time forward without sleeping."""
+
+    def __init__(self):
+        self.offset = 0.0
+
+    def __call__(self):
+        return time.time() + self.offset
+
+
+def scheduler(org, clock):
+    return Scheduler(org, echo=lambda _: None, clock=clock)  # nothing is unread, so no runner is ever called
+
+
+def test_tick_reviews_when_the_time_is_up_and_not_before(org):
+    flag_idle(org)
+    fund(org)
+    configure(org, review_every_seconds=1000, review_every_runs=1000)
+    clock = Clock()
+    sched = scheduler(org, clock)
+    sched.tick()  # starts the review clock
+    assert org.ledger("reviews") and runtime_notes(org, ROOT) == []
+    clock.offset = 999
+    sched.tick()
+    assert runtime_notes(org, ROOT) == []
+    clock.offset = 3601  # idle needs the agents to be an hour old (config: idle_after_seconds 0)
+    sched.tick()
+    assert len(runtime_notes(org, ROOT)) == 1 and len(runtime_notes(org, "ceo")) == 1
+    sched.tick()
+    assert len(runtime_notes(org, ROOT)) == 1  # not due again
+
+
+def test_tick_reviews_after_enough_runs_and_a_restart_does_not_reset_the_count(org):
+    flag_idle(org)
+    fund(org)
+    configure(org, review_every_runs=3, review_every_seconds=10**9)
+    clock = Clock()
+    scheduler(org, clock).tick()
+    add_runs(org, "ceo", 2)
+    scheduler(org, clock).tick()  # a new scheduler (restart) sees the same two runs
+    assert runtime_notes(org, ROOT) == []
+    add_runs(org, ENG, 1)
+    scheduler(org, clock).tick()
+    assert len(runtime_notes(org, ROOT)) == 1 and org.ledger("reviews")["runs"] == 3
+
+
+def test_tick_on_a_healthy_org_costs_nothing(org):
+    fund(org)
+    configure(org, review_every_seconds=10)
+    clock = Clock()
+    sched = scheduler(org, clock)
+    sched.tick()
+    clock.offset = 11
+    sched.tick()
+    assert all(not runtime_notes(org, a) for a in (ROOT, "ceo", ENG))
+    assert org.ledger("reviews")["notified"] == {}
