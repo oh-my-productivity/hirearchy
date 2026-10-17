@@ -48,7 +48,54 @@ uv run orgmcp status
 uv run orgmcp inbox
 ```
 
-Other commands: `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `mcp`, `kiro-profile`.
+Other commands: `plan`/`apply` (blueprints, below), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `mcp`, `kiro-profile`.
+
+## Create an org from a goal
+
+Building an org for a goal goes wrong when it is improvised: scope, deliverable, budget, models and the review step get assumed.
+The workflow below makes the needs explicit and puts them in one reviewable file before anything is created.
+
+1. **Elicit.** Ask the user the few questions that matter (scope, deliverable format/length/path, exact acceptance criteria, sources, workspace, tests/commits, budget and models, review, approval, progress), each with a default.
+2. **Blueprint.** Write the answers as a blueprint (YAML/JSON, example: [`examples/blueprint-research.yaml`](examples/blueprint-research.yaml)).
+3. **Plan.** `orgmcp plan bp.yaml` validates it and prints a plan for approval (goal, needs, org tree with role/model/tools/workspace, budget split and estimate, review steps, deliverable, checkpoints, warnings). Exit status 1 if there are errors.
+4. **Approve.** Errors block `apply`; warnings are shown in the plan; the user replies "approve" or asks for changes.
+5. **Apply.** `orgmcp apply bp.yaml` (on an existing org) hires the whole tree as root, parents first, and gives the first task. It refuses on errors or if a name exists, and retires what it created if anything fails midway.
+6. **Start, monitor, deliver.** Run the scheduler, answer progress questions, relay escalations, check the deliverable against every criterion, copy it to its path.
+
+```yaml
+mission: ...                          # what the organization is for
+needs:                                # the elicited requirements (free text unless noted)
+  scope: ...
+  deliverable: {description: ..., format: ..., max_words: 1500, path: /abs/path/file.md}
+  quality_bar: ...   sources: ...   workspace: /abs/project/dir   budget_runs: 25   # the user's cap
+  models: {cheap: <model id>, strong: <model id>}   model_policy: ...
+  review: true                        # independent reviewer required
+  approval: ...   progress: ...   kind: research|writing|code   code: {tests: ..., packaging: ..., commits: ...}
+agents:                               # exactly one top-level agent; nested tree
+  - {name: lead, template: manager, model: strong, children: [{name: w, template: writer, model: cheap}]}
+        # per agent: role, template or charter, model (id, or cheap/strong), tools, workspace, can_hire, max_children, scale
+task: {to: lead, title: ..., goal: ..., acceptance: [exact, checkable items], inputs: [...], budget: 22}
+```
+
+Validation encodes the lessons of the usability studies: a deliverable and exact acceptance criteria; web tools when sources
+are needed; `write`/`shell` only with a workspace inside an allowed root (default: home, temp, cwd; `--allow-root DIR` or
+`$ORGMCP_WORKSPACE_ROOTS`; never the org itself or `~/.kiro`); code goals need an engineer with a workspace; a reviewer distinct
+from the author whose charter never has it edit others' files; managers hold the tools and workspace they hand down; budget within
+the user's cap and above the estimate; different models for drafting and review when asked; depth and children within limits.
+
+**Budget estimate.** One pass plus one review/rework cycle. A worker's pass costs its template's `base_runs` times `scale`
+(researcher 3, writer 2, engineer 4, fact-checker 2, reviewer 1, tester 2, code-reviewer 2) and its rework costs 1. A manager's
+pass costs 2 plus one per direct report; its rework costs 2. The planned budget is the estimate times 1.25 unless
+`task.budget` is set. Managers get a written budget plan: initial grants equal the reports' pass runs and the rest stays with
+the manager as reserve for rework.
+
+**Role templates** live in `src/orgmcp/roles/*.md`: `manager`, `researcher`, `writer`, `reviewer`, `fact-checker`, `engineer`,
+`tester`, `code-reviewer`. Each has purpose, responsibilities, decision rights, escalation, quality bar, budget discipline and a
+default tool set and model tier. Reviewers report findings and required changes to their manager and never edit another
+agent's file (the manager sends them back to the author with `revises`). `template:` plus a `charter:` adds your own text.
+
+**The assistant's playbook** is `skills/orgmcp/SKILL.md`: the precondition (use orgmcp or say it is unavailable), the one-message
+checklist, plan and approval, build and run, monitoring, and verification before delivery. Install it in your assistant's skills directory.
 
 ## Health
 
