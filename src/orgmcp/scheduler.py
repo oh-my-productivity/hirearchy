@@ -105,6 +105,76 @@ def _signal_group(proc: subprocess.Popen, sig: int) -> None:
             pass
 
 
+def _ps(pid: int) -> tuple[str, str] | None:
+    """(state, start time) of a process as ``ps`` reports them; None when there is no such process.
+
+    Raises OSError when ``ps`` itself cannot be run (the caller then has to treat the process as unknown).
+    """
+    env = {**os.environ, "LC_ALL": "C", "TZ": "UTC"}  # the same text for the same process, whatever the caller's locale
+    out = subprocess.run(["ps", "-o", "stat=,lstart=", "-p", str(pid)], capture_output=True, text=True,
+                         timeout=10, env=env).stdout.split()
+    return (out[0], " ".join(out[1:])) if len(out) > 1 else None
+
+
+def _start_time(pid: int) -> str | None:
+    try:
+        info = _ps(pid)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return info[1] if info else None
+
+
+def judge_orphan(rec: dict) -> str:
+    """Is the process recorded for a run of a dead scheduler still ours, and alive?
+
+    * ``gone``: no such process (or a zombie): nothing to kill.
+    * ``foreign``: the pid now belongs to something else (other start time, not a session leader): never touched.
+    * ``ours``: alive, started at the recorded time, and the leader of its own session and process group, which is
+      exactly how the scheduler starts runs. Only then may the group be killed.
+    * ``doubt``: alive but unverifiable (no start time recorded, or ``ps`` failed): not killed, and the agent
+      does not get a second run while it lives.
+    """
+    pgid = rec.get("pgid")
+    if not isinstance(pgid, int) or isinstance(pgid, bool) or pgid <= 1 or pgid in (os.getpid(), os.getpgrp()):
+        return "foreign"
+    try:
+        info = _ps(pgid)
+    except (OSError, subprocess.SubprocessError):
+        return "doubt"
+    if info is None or info[0].startswith("Z"):
+        return "gone"
+    recorded = rec.get("lstart")
+    if not isinstance(recorded, str) or not recorded:
+        return "doubt"
+    if recorded != info[1]:
+        return "foreign"
+    try:
+        leader = os.getpgid(pgid) == pgid and os.getsid(pgid) == pgid
+    except (ProcessLookupError, PermissionError):
+        return "doubt"
+    return "ours" if leader else "foreign"
+
+
+def kill_group(pgid: int, wait: float = 5.0) -> bool:
+    """SIGKILL a process group and wait until its leader is gone. True when it is."""
+    try:
+        os.killpg(pgid, signal.SIGKILL)
+    except ProcessLookupError:
+        return True
+    except PermissionError:
+        return False
+    deadline = time.time() + wait
+    while time.time() < deadline:
+        try:
+            info = _ps(pgid)
+        except (OSError, subprocess.SubprocessError):
+            return False
+        if info is None or info[0].startswith("Z"):
+            return True
+        time.sleep(0.05)
+    return False
+
+
 def _nudge_entries(raw) -> dict[str, dict]:
     """Entries of the nudges ledger in the current shape; malformed entries (or a malformed ledger) are dropped."""
     out: dict[str, dict] = {}
@@ -136,6 +206,7 @@ class Scheduler:
         self._phase_errors: dict[str, str] = {}
         self._task_memo: dict[str, tuple[tuple, dict]] = {}  # agent -> (mailbox fingerprint, cached task views)
         self.pidfile = org.root / ".runtime" / "scheduler.pid"
+        self._blocked: set[str] = set()  # agents whose orphaned run (of a dead scheduler) is alive and could not be killed
 
     # ------------------------------------------------------------- lifecycle
 
@@ -154,8 +225,89 @@ class Scheduler:
                 raise OrgError(f"a scheduler is already running for this org (pid {pid})")
             self.pidfile.unlink()  # stale
         self.pidfile.write_text(str(os.getpid()))
+        self._ignore_running_ledger()
+        self._settle_orphans()  # before recover(): never redeliver a batch while its previous run still lives
         for a in self.org.recover():
             self.echo(f"recovered interrupted run of {a}")
+
+    # --------------------------------------------------- runs of a dead scheduler
+
+    def _running_records(self) -> dict[str, dict]:
+        """``.runtime/running.json``: agent -> {pgid, lstart, started, scheduler, log} of every run in flight."""
+        raw = self.org.ledger("running")
+        return {k: v for k, v in (raw.items() if isinstance(raw, dict) else ()) if isinstance(v, dict)}
+
+    def _record_run(self, addr: str, run: Run) -> None:
+        records = self._running_records()
+        records[addr] = {
+            "pgid": run.proc.pid,  # started in its own session, so pgid == pid
+            "lstart": _start_time(run.proc.pid),
+            "started": run.started,
+            "scheduler": os.getpid(),
+            "log": str(run.log.relative_to(self.org.root)),
+        }
+        self.org.save_ledger("running", records)
+
+    def _forget_run(self, *addrs: str) -> None:
+        records = self._running_records()
+        if any(records.pop(a, None) is not None for a in addrs):
+            self.org.save_ledger("running", records)
+
+    def _ignore_running_ledger(self) -> None:
+        """The record changes with every run; keep it out of the org's git snapshots."""
+        path, line = self.org.root / ".gitignore", ".runtime/running.json"
+        try:
+            text = path.read_text(encoding="utf-8")
+            if line not in text.split():
+                path.write_text(text.rstrip("\n") + "\n" + line + "\n", encoding="utf-8")
+        except OSError:
+            pass
+
+    def _settle_orphans(self) -> None:
+        """Kill runs a dead scheduler left behind, and note those that survive.
+
+        Called when a scheduler starts (any record then belongs to a dead one: ``acquire`` has just checked that
+        no other scheduler lives) and every tick while some orphan could not be dealt with. A recorded process is
+        killed only if ``judge_orphan`` says it is ours; one that is alive but cannot be verified or killed keeps
+        its agent from starting a new run until it is gone.
+        """
+        records = self._running_records()
+        keep = {}
+        for addr, rec in records.items():
+            if addr in self.runs or (self._blocked and addr not in self._blocked):
+                keep[addr] = rec
+                continue
+            verdict = judge_orphan(rec)
+            pgid = rec.get("pgid")
+            if verdict == "ours":
+                if kill_group(pgid):
+                    self.echo(f"{addr}: killed the orphaned run of a dead scheduler (process group {pgid})")
+                    self._note_in_log(rec, "killed: orphaned run of a scheduler that died")
+                    verdict = "gone"
+                else:
+                    verdict = "doubt"
+            if verdict == "foreign":
+                self.echo(f"{addr}: recorded process {pgid} is not the run we started; left alone")
+            elif verdict == "doubt":
+                keep[addr] = rec
+                if addr not in self._blocked:
+                    self.echo(f"{addr}: an earlier run (process group {pgid}) may still be alive and cannot be "
+                              "verified or killed; no new run until it is gone")
+                self._blocked.add(addr)
+                continue
+            self._blocked.discard(addr)
+        self._blocked &= set(keep)
+        if keep != records:
+            self.org.save_ledger("running", keep)
+
+    def _note_in_log(self, rec: dict, text: str) -> None:
+        try:
+            log = self.org.root / str(rec["log"])
+            if log.is_file():
+                with open(log, "a", encoding="utf-8") as f:
+                    f.write(f"\n# {text}\n")
+        except (KeyError, OSError):
+            pass
 
     def release(self) -> None:
         for run in list(self.runs.values()):
@@ -170,6 +322,7 @@ class Scheduler:
             run.logf.write("\n# interrupted by scheduler shutdown\n")
             run.logf.close()
             self.org.end_run(addr, ok=False)
+        self._forget_run(*self.runs)
         self.runs.clear()
         self.pidfile.unlink(missing_ok=True)
 
@@ -200,6 +353,8 @@ class Scheduler:
         """One pass: reap finished runs, start new ones, detect stalls, review health. Returns True if work remains."""
         self._repair_failures_ledger()
         self._reap()
+        if self._blocked:
+            self._guard("orphan check", self._settle_orphans)
         self._resume_funded()
         if max_runs is None or self.total_runs < max_runs:
             self._launch(max_runs)
@@ -237,7 +392,7 @@ class Scheduler:
     def _runnable(self) -> list[str]:
         out = []
         for a in self.org.agents():
-            if a in self.runs or not self.org.unread(a):
+            if a in self.runs or a in self._blocked or not self.org.unread(a):
                 continue
             reason = self.org.paused(a)
             if reason == "budget" and (self.org.budget(a) or 0) > 0:
@@ -253,7 +408,7 @@ class Scheduler:
                 return
             if max_runs is not None and self.total_runs >= max_runs:
                 return
-            if addr in self.runs or not self.org.unread(addr):
+            if addr in self.runs or addr in self._blocked or not self.org.unread(addr):
                 continue
             reason = self.org.paused(addr)
             budget = self.org.budget(addr) or 0
@@ -296,6 +451,7 @@ class Scheduler:
             self._failed(addr, log)
             return
         self.runs[addr] = Run(addr, proc, log, logf, time.time(), len(batch))
+        self._guard("run record", lambda: self._record_run(addr, self.runs[addr]))
         self.echo(f"{addr}: started run ({len(batch)} message(s))")
 
     def _reap(self) -> None:
@@ -316,6 +472,7 @@ class Scheduler:
             run.logf.write(f"\n# exit {code} after {elapsed:.0f}s\n")
             run.logf.close()
             del self.runs[addr]
+            self._guard("run record", lambda: self._forget_run(addr))
             ok = code == 0
             if not self.org.exists(addr):  # retired while the run was in flight: nothing left to settle
                 self.echo(f"{addr}: was retired during its run (exit {code}); nothing to settle")

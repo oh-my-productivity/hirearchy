@@ -33,6 +33,7 @@ org/                      # root = you, the human
   - Messages are capped at `max_message_chars` (default 20000): longer `send`/`delegate`/`report` bodies are refused (put detail in a file under `work/`). Whatever is shown to an agent (new messages, the contract of open tasks, the task a result answers, `inbox`) is cut at 8000 characters with the path to `read` the rest.
   - Word counts shown to agents (artifact notes on a `report`, `read`) ignore markdown markers (`#`, `-`, `1.`, `|`, fences); the `MEMORY.md` cap counts plain whitespace-separated words.
   - A scheduler tick isolates faults per phase (a failing phase is logged and retried next tick), runs start in their own process group so a timeout kills the tools too, and prompts go to `kiro-cli` on stdin. Agent crashes notify the human (`orgmcp resume`); an LLM parent gets a notice with its options instead.
+  - Orphaned runs: each run's process group is recorded in `.runtime/running.json` (pgid, start time) while it lives. A scheduler that starts finds the records of a dead one, kills a group only if its leader is still alive with the recorded start time and leads its own session (never anything else), then redelivers the batch; a live orphan that cannot be verified or killed keeps its agent from starting a second run until it is gone.
   - `MEMORY.md` is capped at `memory_max_words` (default 800): writes and appends beyond it are refused, and an oversized memory is flagged for condensing in the next run's prompt.
 
 ## Use
