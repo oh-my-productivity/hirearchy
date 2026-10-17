@@ -731,6 +731,56 @@ class Org:
         )
         return 0 if busy else max(0, self.budget(actor) or 0)
 
+    def reclaim(self, actor: str, report: str, budget: int | None = None) -> Message:
+        """Pull unspent budget back from an idle DIRECT report (short name or full address). Default: all of it.
+
+        Budget is derived from messages, so this is one: a note from the report to ``actor`` carrying the budget,
+        written by the runtime on the report's behalf (it lands in the report's ``sent/``, which charges it, and in the
+        actor's inbox, which credits it). Nothing is minted or destroyed. It does not wake the actor, who is running
+        now. The report receives nothing, so it is not woken either. Root may reclaim from its direct reports (the
+        runs go back to root, who has no limit). Never from deeper down: a manager reclaims from its own reports, and
+        those reclaim from theirs.
+
+        Refused unless the report is idle: it has no open task, nothing delegated and still outstanding, no run in
+        flight and no unread mail that would wake it; its budget has to be above zero.
+        """
+        actor = self.require(actor)
+        short = self.norm(report)
+        addr = short if "/" in short else self.child_addr(actor, short)
+        if addr == ROOT or not self.exists(addr) or self.parent(addr) != actor:
+            reports = ", ".join(self.children(actor)) or "none"
+            raise OrgError(
+                f"you can only reclaim budget from your direct reports (yours: {reports}); {report!r} is not one. "
+                "Ask a manager to reclaim from its own team."
+            )
+        if budget is not None and int(budget) < 1:
+            raise OrgError("budget must be at least 1 run (omit it to reclaim everything the report has left)")
+        why = [
+            text for text in (
+                "it is running now" if self.running(addr) else "",
+                f"it has {len(self.open_tasks(addr))} open task(s)" if self.open_tasks(addr) else "",
+                f"it has {len(self.outstanding(addr))} delegation(s) still outstanding" if self.outstanding(addr) else "",
+                f"it has {self.unread(addr)} unread message(s) that will wake it" if self.unread(addr) else "",
+            ) if text
+        ]
+        if why:
+            raise OrgError(
+                f"{addr} is busy ({'; '.join(why)}), so its runs are not stranded. Wait until it has reported, or "
+                "leave its budget with it."
+            )
+        available = max(0, self.budget(addr) or 0)
+        if available < 1:
+            raise OrgError(f"{addr} has no unspent budget to reclaim ({self.budget(addr)} run(s) left)")
+        amount = available if budget is None else int(budget)
+        if amount > available:
+            raise OrgError(f"{addr} has only {available} unspent run(s); you asked for {amount}")
+        return self.deliver(Message(
+            sender=addr, to=actor, type="note", budget=amount, wake=False, hops=0,
+            title=f"budget reclaimed by {actor}",
+            body=f"{actor} reclaimed {amount} unspent run(s) from {addr} ({available - amount} left with it). "
+                 f"The runtime wrote this note on {addr}'s behalf; {addr} received nothing and was not woken.",
+        ))
+
     def hire(
         self,
         actor: str,

@@ -22,7 +22,7 @@ from orgmcp.scheduler import (
 from orgmcp.server import OrgBinding, build_server, resolve_binding
 
 ROOT_TOOLS = {
-    "whoami", "inbox", "delegate", "report", "send", "hire", "retire", "read", "write", "status", "health",
+    "whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health",
     "create_org", "start", "stop", "propose_org", "apply_org", "progress", "blueprint_example",
 }
 AGENT_TOOLS = ROOT_TOOLS - {"create_org", "start", "stop", "propose_org", "apply_org", "progress", "blueprint_example"}
