@@ -59,7 +59,39 @@ def kiro_profile_name(org_root: str | Path, tools: list[str]) -> str:
     return "-".join(["orgmcp", slug, digest, *(_slug(t) for t in sorted(set(tools)) if _slug(t))])
 
 
-def ensure_kiro_profile(tools: list[str], agents_dir: Path | None = None, *, org: Org) -> str:
+FILE_TOOLS = ("read", "write")  # kiro built-ins whose reach can be limited by path (shell cannot)
+
+
+def file_confinement(
+    org_root: Path, tools: list[str], workspace: Path | None, inputs: list[Path]
+) -> tuple[list[str], dict]:
+    """(allowedTools, toolsSettings) that confine kiro's built-in ``read``/``write`` by path.
+
+    Verified against kiro-cli 2.29.1 (see README, "Workspaces, inputs and confinement"):
+    * ``read``/``write`` must NOT be in ``allowedTools``: a tool there ignores ``allowedPaths``. Left out, a call inside
+      ``allowedPaths`` runs unprompted and any other path asks for an approval, which ``--no-interactive`` cannot
+      give, so it is refused.
+    * ``write``: only under the workspace (``[]`` without one: nowhere). ``read``: workspace + inputs; a directory
+      needs both ``P`` and ``P/**`` to be listable.
+    * ``deniedPaths`` on the org directory is a hard deny even for kiro's own "current directory is readable" rule:
+      the organization is reached through orgmcp tools only. Skipped when the workspace is inside the org.
+    * ``shell`` stays in ``allowedTools`` and is NOT confined (kiro has no path rule for it).
+    """
+    org_root = Path(org_root).resolve()
+    deny = [] if workspace is not None and (workspace == org_root or org_root in workspace.parents) else [str(org_root), f"{org_root}/**"]
+    settings: dict = {}
+    if "write" in tools:
+        settings["write"] = {"allowedPaths": [f"{workspace}/**"] if workspace is not None else [], "deniedPaths": deny}
+    if "read" in tools:
+        bases = [p for p in (workspace, *inputs) if p is not None]
+        settings["read"] = {"allowedPaths": [x for p in bases for x in (str(p), f"{p}/**")], "deniedPaths": deny}
+    return [t for t in tools if t not in FILE_TOOLS], settings
+
+
+def ensure_kiro_profile(
+    tools: list[str], agents_dir: Path | None = None, *, org: Org,
+    workspace: Path | None = None, inputs: list[Path] | None = None, confine: bool = False,
+) -> str:
     """Write the scheduler's profile for ``org`` into ``~/.kiro/agents``: only the orgmcp server plus the granted tools.
 
     The profile is internal to this organization: its MCP server entry carries ``ORG_ROOT`` (this org) and
@@ -68,12 +100,22 @@ def ensure_kiro_profile(tools: list[str], agents_dir: Path | None = None, *, org
     (assumption: kiro starts MCP servers with its own environment plus the profile's ``env``; if it did not, the
     server would fail closed and the run would fail visibly rather than act as root).
 
+    ``confine=False``: the shared profile of the org for this tool set; every granted tool runs unprompted.
+    ``confine=True``: the profile of an agent with built-in ``read``/``write``: they are limited to ``workspace`` (write)
+    and ``workspace`` + ``inputs`` (read), see :func:`file_confinement`. Its name carries a hash of that access, so
+    agents with the same tools and access share a profile and different access never does.
+
     The directory is resolved when called (not when defined), so ``KIRO_AGENTS_DIR`` can be redirected.
     Profiles of other orgs, and the legacy global ``orgmcp[-tools].json`` files, are never touched.
     """
     agents_dir = Path(agents_dir) if agents_dir is not None else Path(KIRO_AGENTS_DIR)
     tools = sorted(set(tools))
     name = kiro_profile_name(org.root, tools)
+    allowed, settings = ["@orgmcp", *tools], {}
+    if confine:
+        allowed, settings = file_confinement(org.root, tools, workspace, list(inputs or []))
+        allowed = ["@orgmcp", *allowed]
+        name += "-x" + hashlib.sha1(json.dumps(settings, sort_keys=True).encode("utf-8")).hexdigest()[:8]
     server = {**mcp_server_command(), "env": {"ORG_ROOT": str(org.root), "ORG_REQUIRE_AGENT": "1"}}
     data = templates.kiro_profile(
         name,
@@ -81,6 +123,8 @@ def ensure_kiro_profile(tools: list[str], agents_dir: Path | None = None, *, org
         + (f" (built-in tools: {', '.join(tools)})" if tools else ""),
         ["@orgmcp", *tools],
         server,
+        allowed_tools=allowed,
+        tools_settings=settings,
     )
     path = agents_dir / f"{name}.json"
     try:
@@ -95,7 +139,16 @@ def ensure_kiro_profile(tools: list[str], agents_dir: Path | None = None, *, org
 def kiro_runner(kiro_bin: str = "kiro-cli") -> Runner:
     def build(org: Org, addr: str, prompt: str) -> tuple[list[str], Path, dict]:
         meta, _ = org.charter(addr)
-        profile = ensure_kiro_profile(list(meta.get("tools") or []), org=org)
+        tools = list(meta.get("tools") or [])
+        # An agent with built-in read/write gets a profile that confines them by path. The one exception is a legacy
+        # charter (built-in `read` only, no workspace, no `inputs` key), which keeps the unconfined profile it always had.
+        legacy = "write" not in tools and org.unconfined_read(meta)
+        if set(tools) & set(FILE_TOOLS) and not legacy:
+            profile = ensure_kiro_profile(
+                tools, org=org, workspace=org.workspace_of(addr), inputs=org.inputs_of(addr), confine=True
+            )
+        else:
+            profile = ensure_kiro_profile(tools, org=org)
         cmd = [kiro_bin, "chat", "--no-interactive", "--agent", profile]
         model = meta.get("model") or org.config.get("default_model")
         if model:
