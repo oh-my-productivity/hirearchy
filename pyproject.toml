@@ -23,3 +23,6 @@ build-backend = "hatchling.build"
 dev = [
     "pytest==8.*",
 ]
+
+[tool.hatch.build.targets.wheel.force-include]
+"skills/orgmcp/SKILL.md" = "orgmcp/_skill/SKILL.md"

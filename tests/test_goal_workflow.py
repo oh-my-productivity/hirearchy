@@ -231,3 +231,52 @@ def test_code_goal_validates_and_applies(setup, tmp_path):
     charter = (target / "lead" / "dev" / "AGENT.md").read_text()
     assert "- write" in charter and "- shell" in charter and f"workspace: {tmp_path / 'proj'}" in charter
     assert (tmp_path / "proj").is_dir()
+
+
+# ------------------------------------------------------------------------------------ install-skill
+
+
+def test_install_skill_to_a_temp_dest(tmp_path, capsys):
+    from orgmcp.cli import main
+    from orgmcp.skill import skill_source
+
+    dest = tmp_path / "skills"
+    main(["install-skill", "--dest", str(dest)])
+    target = dest / "orgmcp" / "SKILL.md"
+    out = capsys.readouterr().out
+    assert str(target.resolve()) in out and target.read_text() == skill_source().read_text()
+    main(["install-skill", "--dest", str(dest)])  # identical: fine, nothing changes
+    assert "up to date" in capsys.readouterr().out
+
+
+def test_install_skill_refuses_to_overwrite_a_different_file_without_force(tmp_path, capsys):
+    from orgmcp.cli import main
+
+    target = tmp_path / "skills" / "orgmcp" / "SKILL.md"
+    target.parent.mkdir(parents=True)
+    target.write_text("my own version\n")
+    with pytest.raises(SystemExit):
+        main(["install-skill", "--dest", str(tmp_path / "skills")])
+    assert "--force" in capsys.readouterr().err and target.read_text() == "my own version\n"
+    main(["install-skill", "--dest", str(tmp_path / "skills"), "--force"])
+    assert target.read_text().startswith("---\nname: orgmcp")
+
+
+def test_install_skill_defaults_to_home_kiro_skills(tmp_path, monkeypatch, capsys):
+    from orgmcp.cli import main
+
+    monkeypatch.setenv("HOME", str(tmp_path))
+    main(["install-skill"])
+    assert (tmp_path / ".kiro" / "skills" / "orgmcp" / "SKILL.md").is_file()
+    assert str((tmp_path / ".kiro" / "skills" / "orgmcp" / "SKILL.md").resolve()) in capsys.readouterr().out
+
+
+def test_skill_names_the_final_tools_and_signatures(tmp_path):
+    from orgmcp.skill import skill_source
+
+    text = skill_source().read_text()
+    tools = {t.name for t in asyncio.run(build_server(Org.init(tmp_path / "o", "m"), ROOT).list_tools())}
+    for name in ("create_org", "propose_org", "apply_org", "progress", "start", "stop", "whoami", "status", "inbox", "send"):
+        assert name in tools and f"`{name}" in text, name
+    assert "apply_org(blueprint=<the approved YAML, unchanged>, approved=True)" in text
+    assert "create_org(mission=" in text and "propose_org(blueprint=" in text

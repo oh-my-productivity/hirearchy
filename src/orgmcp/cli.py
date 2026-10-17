@@ -119,6 +119,12 @@ def cmd_upgrade_rules(args) -> None:
     print(upgrade_rules(org, dry_run=args.dry_run).text())
 
 
+def cmd_install_skill(args) -> None:
+    from .skill import install_skill
+
+    print(install_skill(args.dest, force=args.force))
+
+
 def cmd_review(args) -> None:
     from .review import review
 
@@ -243,6 +249,11 @@ def main(argv: list[str] | None = None) -> None:
     s = sub.add_parser("upgrade-rules", help="rewrite the rules in ORG.md to the current template (keeps settings and mission)")
     s.add_argument("--dry-run", action="store_true", help="print what would change; write nothing")
     s.set_defaults(fn=cmd_upgrade_rules)
+
+    s = sub.add_parser("install-skill", help="copy the orgmcp assistant skill into a kiro skills directory (default ~/.kiro/skills)")
+    s.add_argument("--dest", metavar="DIR", help="skills directory to install into; the file goes to DIR/orgmcp/SKILL.md (default: ~/.kiro/skills)")
+    s.add_argument("--force", action="store_true", help="overwrite a different existing SKILL.md")
+    s.set_defaults(fn=cmd_install_skill)
 
     s = sub.add_parser("review", help="run a health review now: tell managers (and you) about flagged agents")
     s.add_argument("--dry-run", action="store_true", help="print what would be sent; write nothing")
