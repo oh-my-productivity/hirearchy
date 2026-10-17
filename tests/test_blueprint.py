@@ -484,7 +484,7 @@ def test_apply_code_blueprint_sets_workspace_and_tools(tmp_path, roots, empty_or
     meta, body = empty_org.charter("lead/dev")
     assert meta["tools"] == ["read", "shell", "write"] and "Never `git push`" in body and "Engineering rules: tests: pytest" in body
     cr_meta, _ = empty_org.charter("lead/cr")
-    assert cr_meta["tools"] == ["read"] and cr_meta.get("workspace") is None
+    assert cr_meta["tools"] == ["read", "shell"] and cr_meta["workspace"] == ws  # shell, so confined like the engineer
 
 
 def test_apply_extra_charter_text_is_appended(base, roots, empty_org):
