@@ -17,7 +17,7 @@ from datetime import datetime
 
 from . import templates
 from .core import ROOT, Org, utcnow
-from .health import _aware, _parse_time, org_health
+from .health import _aware, _parse_time, config_number, org_health
 
 LEDGER = "reviews"
 
@@ -49,6 +49,24 @@ class Review:
         return "\n".join(out)
 
 
+def read_ledger(org: Org) -> dict | None:
+    """The reviews ledger normalised to {"at", "runs", "notified"}; None when there is none or it is malformed."""
+    ledger = org.ledger(LEDGER)
+    if not isinstance(ledger, dict) or not ledger:
+        return None
+    notified = ledger.get("notified")
+    if isinstance(notified, dict):
+        notified = {k: v for k, v in notified.items() if isinstance(k, str) and isinstance(v, list)}
+    else:
+        notified = {}
+    runs = ledger.get("runs")
+    return {
+        "at": ledger.get("at"),
+        "runs": runs if isinstance(runs, int) and not isinstance(runs, bool) else 0,
+        "notified": notified,
+    }
+
+
 def total_runs(org: Org) -> int:
     """Runs used across the organization, counted from the run logs (so a restart does not reset it)."""
     return sum(org.runs_used(a) for a in org.agents())
@@ -59,13 +77,13 @@ def review_if_due(org: Org, now: datetime) -> Review | None:
 
     With no earlier review the clock starts now (the ledger is created, nothing is reported).
     """
-    last = org.ledger(LEDGER)
-    if not last:
+    last = read_ledger(org)
+    if not last:  # missing, empty or malformed: the clock starts now
         _save(org, now, total_runs(org), {})
         return None
-    cfg, at = org.config, _parse_time(last.get("at"))
-    runs_due = total_runs(org) - int(last.get("runs", 0)) >= int(cfg["review_every_runs"])
-    time_due = at is None or (_aware(now) - at).total_seconds() >= float(cfg["review_every_seconds"])
+    cfg, at = org.config, _parse_time(last["at"])
+    runs_due = total_runs(org) - last["runs"] >= config_number(cfg, "review_every_runs", int)
+    time_due = at is None or (_aware(now) - at).total_seconds() >= config_number(cfg, "review_every_seconds")
     return review(org, now) if runs_due or time_due else None
 
 
@@ -74,7 +92,7 @@ def review(org: Org, now: datetime | None = None, dry_run: bool = False) -> Revi
     now = _aware(now) or utcnow()
     health = org_health(org, ROOT, now)
     by_addr = {h.addr: h for h in health.agents}
-    previous = org.ledger(LEDGER).get("notified", {})
+    previous = (read_ledger(org) or {}).get("notified", {})
     result = Review(at=now, runs=total_runs(org), flagged=len(health.flagged))
 
     for manager in (a for a in by_addr if org.children(a)):

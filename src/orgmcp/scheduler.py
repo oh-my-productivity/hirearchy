@@ -20,6 +20,7 @@ from typing import IO, Callable
 
 from . import review, templates
 from .core import ROOT, Org, OrgError, atomic_write
+from .health import config_number
 
 # (org, agent address, prompt) -> (argv, cwd, env)
 Runner = Callable[[Org, str, str], tuple[list[str], Path, dict]]
@@ -91,6 +92,20 @@ class Run:
     batch: int
 
 
+def _nudge_entries(raw) -> dict[str, dict]:
+    """Entries of the nudges ledger in the current shape; malformed entries (or a malformed ledger) are dropped."""
+    out: dict[str, dict] = {}
+    for key, value in (raw.items() if isinstance(raw, dict) else ()):
+        if isinstance(value, str):  # legacy ledger: "nudged" / "escalated"
+            out[key] = {"step": 0 if value == "nudged" else 1, "at": 0}
+        elif isinstance(value, dict):
+            try:
+                out[key] = {"step": max(0, int(value["step"])), "at": float(value.get("at") or 0)}
+            except (KeyError, TypeError, ValueError):
+                continue
+    return out
+
+
 class Scheduler:
     def __init__(
         self,
@@ -105,6 +120,7 @@ class Scheduler:
         self.clock = clock  # stall detection and review cadence, so tests can move time without sleeping
         self.runs: dict[str, Run] = {}
         self.total_runs = 0
+        self._phase_errors: dict[str, str] = {}
         self.pidfile = org.root / ".runtime" / "scheduler.pid"
 
     # ------------------------------------------------------------- lifecycle
@@ -154,7 +170,7 @@ class Scheduler:
                 if until_idle and not active:
                     self.echo("organization is idle")
                     break
-                time.sleep(float(self.org.config["poll_seconds"]))
+                time.sleep(config_number(self.org.config, "poll_seconds"))
         except KeyboardInterrupt:
             pass
         finally:
@@ -164,12 +180,33 @@ class Scheduler:
 
     def tick(self, max_runs: int | None = None) -> bool:
         """One pass: reap finished runs, start new ones, detect stalls, review health. Returns True if work remains."""
+        self._repair_failures_ledger()
         self._reap()
         if max_runs is None or self.total_runs < max_runs:
             self._launch(max_runs)
-        self._check_stalls()
-        self._check_review()
+        self._guard("stall check", self._check_stalls)  # best-effort phases: a bug or bad data here
+        self._guard("health review", self._check_review)  # must never stop agents from running
         return bool(self.runs) or (bool(self._runnable()) and (max_runs is None or self.total_runs < max_runs))
+
+    def _repair_failures_ledger(self) -> None:
+        """The failure counts drive pausing; a wrong-shaped ledger would raise inside ``record_failure``."""
+        raw = self.org.ledger("failures")
+        clean = {k: v for k, v in raw.items() if isinstance(v, int) and not isinstance(v, bool)} if isinstance(raw, dict) else {}
+        if clean != raw:
+            self.org.save_ledger("failures", clean)
+            self.echo("repaired malformed .runtime/failures.json")
+
+    def _guard(self, phase: str, fn: Callable[[], None]) -> None:
+        """Run a best-effort phase; log (once per distinct error) instead of raising out of the loop."""
+        try:
+            fn()
+        except Exception as exc:
+            message = f"{type(exc).__name__}: {exc}"
+            if self._phase_errors.get(phase) != message:
+                self._phase_errors[phase] = message
+                self.echo(f"{phase} failed (will retry next tick): {message}")
+        else:
+            self._phase_errors.pop(phase, None)
 
     def _runnable(self) -> list[str]:
         out = []
@@ -186,7 +223,7 @@ class Scheduler:
     def _launch(self, max_runs: int | None) -> None:
         cfg = self.org.config
         for addr in self.org.agents():
-            if len(self.runs) >= int(cfg["max_parallel"]):
+            if len(self.runs) >= config_number(cfg, "max_parallel", int):
                 return
             if max_runs is not None and self.total_runs >= max_runs:
                 return
@@ -230,7 +267,7 @@ class Scheduler:
         self.echo(f"{addr}: started run ({len(batch)} message(s))")
 
     def _reap(self) -> None:
-        timeout = float(self.org.config["run_timeout"])
+        timeout = config_number(self.org.config, "run_timeout")
         for addr, run in list(self.runs.items()):
             code = run.proc.poll()
             if code is None and time.time() - run.started > timeout:
@@ -256,7 +293,7 @@ class Scheduler:
     def _failed(self, addr: str, log: Path) -> None:
         n = self.org.record_failure(addr)
         self.echo(f"{addr}: run failed ({n} in a row), log: {log}")
-        if n >= int(self.org.config["max_failures"]):
+        if n >= config_number(self.org.config, "max_failures", int):
             self.org.pause(addr, "failures")
             rel = str(log.relative_to(self.org.root))
             self.org.notify(self.org.parent(addr) or ROOT, f"{addr} keeps failing",
@@ -281,9 +318,9 @@ class Scheduler:
         ``stall_after`` seconds since the latest of: the task's creation, the assignee's last run, the previous
         step. Steps: remind the assignee, then tell the assigner, then each ancestor in turn up to root.
         """
-        after, now = float(self.org.config["stall_after"]), self.clock()
+        after, now = config_number(self.org.config, "stall_after"), self.clock()
         loaded = self.org.ledger("nudges")  # task id -> {"step": last step taken, "at": when}
-        ledger = {k: v if isinstance(v, dict) else {"step": 0 if v == "nudged" else 1, "at": 0} for k, v in loaded.items()}
+        ledger = _nudge_entries(loaded)
         kept: dict[str, dict] = {}  # entries of tasks that are still open
         for addr in self.org.agents():
             tasks = self.org.open_tasks(addr)

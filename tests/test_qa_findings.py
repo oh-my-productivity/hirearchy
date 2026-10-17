@@ -127,14 +127,12 @@ def test_qa4_oversized_message_does_not_wedge_the_agent(org, tmp_path, monkeypat
     assert org.ledger("failures") == {} and not org.paused("ceo")
 
 
-@pytest.mark.xfail(strict=True, reason="QA-5: a non-dict .runtime/nudges.json raises out of tick() and kills the scheduler")
 def test_qa5_corrupt_nudge_ledger_does_not_crash_tick(org):
     (org.root / ".runtime").mkdir(exist_ok=True)
     (org.root / ".runtime" / "nudges.json").write_text("[]")  # valid JSON, wrong shape
     Scheduler(org, quiet_runner(), echo=lambda _: None).tick()
 
 
-@pytest.mark.xfail(strict=True, reason="QA-5: a non-numeric health threshold in ORG.md raises TypeError out of tick() at review time")
 def test_qa5_bad_health_threshold_does_not_crash_tick(org):
     configure(org, review_every_seconds=0, health={"idle_after_seconds": "1h"})
     sched = Scheduler(org, quiet_runner(), echo=lambda _: None)
