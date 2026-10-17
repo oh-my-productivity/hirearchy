@@ -1,0 +1,32 @@
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+The task is done. I'll check the guide against every criterion now.
+[tool] Finding **/onboarding-guide.md in orgmcp-c-1792261179
+[tool] Running: @orgmcp/inbox
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: cd /private/tmp/orgmcp-c-1792261179; for f in out/onboarding-guide.md out/lead/writer/work/onboarding-guide.md out/lead/work/onboarding-guide.md org/lead/work/onboarding-guide.md; do echo "$f: $(wc...
+[tool] Reading onboarding-guide.md:1
+[tool] status: Completed
+[tool] status: Completed
+The guide is within the word limit and the handbook files are unchanged (all six checksums match). But I found things the fact-check missed, so I'm sending it back for rework.
+[tool] Running: @orgmcp/delegate
+[tool] status: Completed
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+The first version of the guide is finished, but it isn't ready to hand over. I found problems the fact-check missed and sent it back to the lead for rework, and that is running now (1 of 5 extra runs used).
+
+What was fine:
+- The guide is 896 words by my count, inside your 800–1200 range. The lead's report claimed 957 and the file note said 843, so I asked for the real count in the next report.
+- The structure is right: Day 1, Week 1 and Month 1 checklists, then the "Who to ask" table.
+- All six handbook files match their original checksums, so none were changed.
+- The agents had only read and write tools, so nothing was fetched from or sent outside this machine.
+
+What I sent back:
+- **Unsupported claims:** The Day 1 laptop line said to "check that it arrived safely and install any updates", which the handbook doesn't say. The security row said "data breach" and "if urgent", also not in the handbook.
+- **Misplaced deadline:** The security course is due by the end of week 2 but sits under Week 1.
+- **Missing source tags:** The "Who to ask" table has no bracketed source files.
+- **Jargon:** "vests immediately" and "PTO" aren't plain language.
+- **Expense tool:** It should be named as Expensify.
+
+Also, the team left some working folders and notes inside your `out/` folder next to the guide. I'll tell you what's there once the rework finishes. Nothing needs your decision right now.

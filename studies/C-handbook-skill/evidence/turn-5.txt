@@ -1,0 +1,3 @@
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+Still working. The lead is running now, and 9 of 15 runs are used. Nothing needs your decision yet.

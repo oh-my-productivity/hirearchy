@@ -1,0 +1,3 @@
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+Still working. The writer is drafting now, and 2 of 15 runs are used. Nothing needs your decision yet.

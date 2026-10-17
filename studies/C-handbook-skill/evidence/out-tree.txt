@@ -1,0 +1,8 @@
+out/onboarding-guide.md
+out/lead/factcheck/MEMORY.md
+out/lead/factcheck/work/findings.md
+out/lead/factcheck/work/factcheck-round2.md
+out/lead/writer/MEMORY.md
+out/lead/writer/work/onboarding-guide.md
+out/lead/MEMORY.md
+out/lead/work/onboarding-guide.md
