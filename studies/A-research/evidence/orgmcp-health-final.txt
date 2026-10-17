@@ -1,0 +1,5 @@
+4 agents, 2 flagged
+ceo idle, budget 0/28, runs 7, open 0, done 1 failed 0 blocked 0 rework 0, runs/task 6.0, empty 1, last activity 4m ago | branch: runs 12, open 0, done 4, failed 0, blocked 1, rework 0, worst out_of_budget | !expensive: 6.0 runs per completed task (max 5)
+  researcher idle, budget 7/8, runs 1, open 0, done 1 failed 0 blocked 0 rework 0, runs/task 1.0, empty 0, last activity 20m ago
+  reviewer paused(budget), budget 0/1, runs 1, open 0, done 0 failed 0 blocked 1 rework 0, runs/task 1.0, empty 0, last activity 10m ago | !out_of_budget: no budget left but has unread mail or open tasks; !paused: paused: budget
+  writer idle, budget 9/12, runs 3, open 0, done 2 failed 0 blocked 0 rework 0, runs/task 1.5, empty 0, last activity 4m ago

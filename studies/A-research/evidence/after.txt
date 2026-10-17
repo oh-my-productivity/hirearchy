@@ -1,0 +1,15 @@
+== after Sat Oct 17 18:28:11 WEST 2026
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-web_fetch-web_search-write.json) = f7ec83d121594de6363c471e3914033a
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-write.json) = e0552b84a9ba7b2725673a04f25ff76e
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read-shell.json) = 362384f01a3030b7209c66acf1316d8d
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-web_fetch-web_search.json) = f669ee6a7f97d249121703c72f935244
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp.json) = ba3ef12494eaa7ea24d4dd2e9465f1f8
+MD5 (/Users/aminalizadeh/.kiro/settings/mcp.json) = 3eacba4e4479ae692c3dae8761b14b73
+-rw-r--r--@ 1 aminalizadeh  staff  828 Oct 17 15:38 /Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-web_fetch-web_search-write.json
+-rw-r--r--@ 1 aminalizadeh  staff  714 Oct 17 17:51 /Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-write.json
+-rw-r--r--@ 1 aminalizadeh  staff  675 Oct 17 18:03 /Users/aminalizadeh/.kiro/agents/orgmcp-read-shell.json
+-rw-r--r--@ 1 aminalizadeh  staff  715 Oct 17 15:27 /Users/aminalizadeh/.kiro/agents/orgmcp-web_fetch-web_search.json
+-rw-r--r--@ 1 aminalizadeh  staff  597 Oct 17 16:30 /Users/aminalizadeh/.kiro/agents/orgmcp.json
+-- main status
+-- live org
+5b94a6b csv2md-lead: run ok, 1 message(s) [csv2md-lead/runs/20261017T170450874676.log]

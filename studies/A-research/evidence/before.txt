@@ -1,0 +1,11 @@
+== before Sat Oct 17 17:42:09 WEST 2026
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-web_fetch-web_search-write.json) = f7ec83d121594de6363c471e3914033a
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-web_fetch-web_search.json) = f669ee6a7f97d249121703c72f935244
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp.json) = ba3ef12494eaa7ea24d4dd2e9465f1f8
+MD5 (/Users/aminalizadeh/.kiro/settings/mcp.json) = 3eacba4e4479ae692c3dae8761b14b73
+-rw-r--r--@ 1 aminalizadeh  staff  828 Oct 17 15:38 /Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-web_fetch-web_search-write.json
+-rw-r--r--@ 1 aminalizadeh  staff  715 Oct 17 15:27 /Users/aminalizadeh/.kiro/agents/orgmcp-web_fetch-web_search.json
+-rw-r--r--@ 1 aminalizadeh  staff  597 Oct 17 16:30 /Users/aminalizadeh/.kiro/agents/orgmcp.json
+-- main status
+-- live org
+5ce6bcb ceo: run ok, 1 message(s) [ceo/runs/20261017T054535251559.log]
