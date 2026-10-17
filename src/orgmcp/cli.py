@@ -112,6 +112,13 @@ def cmd_progress(args) -> None:
     print(progress(_org(args), args.task_id))
 
 
+def cmd_upgrade_rules(args) -> None:
+    from .upgrade import upgrade_rules
+
+    org = _org(args, mutating=not args.dry_run)
+    print(upgrade_rules(org, dry_run=args.dry_run).text())
+
+
 def cmd_review(args) -> None:
     from .review import review
 
@@ -232,6 +239,10 @@ def main(argv: list[str] | None = None) -> None:
     s = sub.add_parser("progress", help="one line per task you gave: state, who is busy, cost, last activity; what needs you")
     s.add_argument("task_id", nargs="?", help="only this task (default: open tasks and those finished in the last day)")
     s.set_defaults(fn=cmd_progress)
+
+    s = sub.add_parser("upgrade-rules", help="rewrite the rules in ORG.md to the current template (keeps settings and mission)")
+    s.add_argument("--dry-run", action="store_true", help="print what would change; write nothing")
+    s.set_defaults(fn=cmd_upgrade_rules)
 
     s = sub.add_parser("review", help="run a health review now: tell managers (and you) about flagged agents")
     s.add_argument("--dry-run", action="store_true", help="print what would be sent; write nothing")
