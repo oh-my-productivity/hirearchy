@@ -449,3 +449,80 @@ def test_stall_view_reparses_only_when_the_mailbox_files_change(org, monkeypatch
     org.end_run("ceo", ok=True)
     org.report("ceo", task.id, "done", "ok")  # a new sent message: recomputed, and the task is closed
     assert sched._task_view("ceo", "open_tasks") == [] and loads
+
+
+# ------------------------------------------------- QA-16: process groups
+
+
+def alive(pid):
+    try:
+        os.kill(pid, 0)
+        return True
+    except ProcessLookupError:
+        return False
+
+
+def wait_for_pid(pidfile, limit=5.0):
+    deadline = time.time() + limit
+    while time.time() < deadline:
+        if pidfile.exists() and pidfile.read_text().strip():
+            return int(pidfile.read_text())
+        time.sleep(0.02)
+    raise AssertionError("child never started")
+
+
+def spawn_tree(org, tmp_path, marker):
+    pidfile = tmp_path / f"{marker}.pid"
+    cmd = ["sh", "-c", f"sleep {marker} & echo $! > {pidfile}; wait"]
+    sched = Scheduler(org, lambda o, a, p: (cmd, o.dir(a), dict(os.environ)), echo=lambda _: None)
+    sched.acquire()
+    sched.tick()
+    return sched, wait_for_pid(pidfile)
+
+
+def test_shutdown_kills_the_whole_process_group(org, tmp_path):
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
+    sched, child = spawn_tree(org, tmp_path, "46")
+    try:
+        sched.release()
+        time.sleep(0.2)
+        assert not alive(child), "tool subprocess outlived the scheduler"
+    finally:
+        if alive(child):
+            os.kill(child, 9)
+
+
+def test_retiring_an_agent_mid_run_kills_its_process_group(org, tmp_path):
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
+    sched, child = spawn_tree(org, tmp_path, "45")
+    try:
+        org.retire(ROOT, "ceo", "gone")
+        sched._reap()
+        time.sleep(0.2)
+        assert sched.runs == {} and not alive(child) and not (org.root / "ceo").exists()
+    finally:
+        sched.release()
+        if alive(child):
+            os.kill(child, 9)
+
+
+def test_runs_are_started_in_their_own_session(org, tmp_path):
+    out = tmp_path / "ids.txt"
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
+    cmd = ["sh", "-c", f"ps -o pid=,pgid= -p $$ > {out}"]
+    sched = Scheduler(org, lambda o, a, p: (cmd, o.dir(a), dict(os.environ)), echo=lambda _: None)
+    sched.acquire()
+    try:
+        run_to_idle(sched)
+    finally:
+        sched.release()
+    pid, pgid = map(int, out.read_text().split())
+    assert pid == pgid != os.getpgid(0)
+
+
+def test_signalling_a_finished_run_is_harmless():
+    import subprocess
+
+    proc = subprocess.Popen(["true"], start_new_session=True)
+    proc.wait()
+    sched_mod._signal_group(proc, 9)

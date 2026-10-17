@@ -94,6 +94,17 @@ class Run:
     batch: int
 
 
+def _signal_group(proc: subprocess.Popen, sig: int) -> None:
+    """Signal a run's whole process group (the run was started in its own session, so pgid == pid)."""
+    try:
+        os.killpg(proc.pid, sig)
+    except (ProcessLookupError, PermissionError):
+        try:  # the group is gone (or not ours): fall back to the top process
+            proc.send_signal(sig)
+        except (ProcessLookupError, PermissionError):
+            pass
+
+
 def _nudge_entries(raw) -> dict[str, dict]:
     """Entries of the nudges ledger in the current shape; malformed entries (or a malformed ledger) are dropped."""
     out: dict[str, dict] = {}
@@ -146,12 +157,14 @@ class Scheduler:
 
     def release(self) -> None:
         for run in list(self.runs.values()):
-            run.proc.terminate()
+            _signal_group(run.proc, signal.SIGTERM)
         for addr, run in list(self.runs.items()):
             try:
                 run.proc.wait(timeout=10)
             except subprocess.TimeoutExpired:
-                run.proc.kill()
+                pass
+            _signal_group(run.proc, signal.SIGKILL)  # also reaps tool subprocesses that ignored SIGTERM
+            run.proc.wait()
             run.logf.write("\n# interrupted by scheduler shutdown\n")
             run.logf.close()
             self.org.end_run(addr, ok=False)
@@ -263,8 +276,9 @@ class Scheduler:
             with tempfile.TemporaryFile() as stdin:  # a file, not a pipe: no deadlock if the child never reads it
                 stdin.write(prompt.encode("utf-8"))
                 stdin.seek(0)
+                # Its own session/process group, so a timeout or shutdown can take the tool subprocesses along.
                 proc = subprocess.Popen(cmd, cwd=cwd, env=env, stdin=stdin, stdout=logf,
-                                        stderr=subprocess.STDOUT, text=True)
+                                        stderr=subprocess.STDOUT, text=True, start_new_session=True)
         except Exception as exc:  # e.g. kiro-cli missing: count it as a failed run
             logf.write(f"\n# failed to start: {exc}\n")
             logf.close()
@@ -279,9 +293,13 @@ class Scheduler:
         for addr, run in list(self.runs.items()):
             code = run.proc.poll()
             if code is None and time.time() - run.started > timeout:
-                run.proc.kill()
+                _signal_group(run.proc, signal.SIGKILL)
                 code = run.proc.wait()
                 run.logf.write(f"\n# killed after {timeout:.0f}s timeout\n")
+            elif code is None and not self.org.exists(addr):  # retired mid-run: nobody will read its output
+                _signal_group(run.proc, signal.SIGKILL)
+                code = run.proc.wait()
+                run.logf.write("\n# killed: the agent was retired during its run\n")
             if code is None:
                 continue
             elapsed = time.time() - run.started

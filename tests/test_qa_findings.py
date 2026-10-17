@@ -152,7 +152,6 @@ def test_qa13_idle_tick_cost_does_not_grow_with_history(org, monkeypatch):
     assert len(loads) < 10, f"an idle tick parsed {len(loads)} message files"
 
 
-@pytest.mark.xfail(strict=True, reason="QA-16: run timeout kills only the top process; its children (tool subprocesses) are orphaned")
 def test_qa16_timeout_kills_the_whole_process_group(org, tmp_path):
     configure(org, run_timeout=1)
     pidfile = tmp_path / "child.pid"
