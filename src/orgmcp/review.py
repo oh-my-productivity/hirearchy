@@ -5,19 +5,21 @@
 a direct report has a problem it has not been told about, and each note costs that manager one run.
 
 * a manager (an agent with direct reports) hears about each (report, flag) pair once; a pair it was already
-  told about in the previous review is not repeated. Paused managers and managers without budget are skipped;
+  told about in the previous review is not repeated. Paused managers and managers whose budget is no more than
+  their outstanding delegations (the reserve for processing results) are skipped and listed in root's note;
 * root hears about every flagged agent in one note, every review (it is free), so nothing is hidden;
 * the only state is ``.runtime/reviews.json``: when, the org-wide run count, and who was told about what.
 """
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 
 from . import templates
-from .core import ROOT, Org, utcnow
-from .health import _aware, _parse_time, org_health
+from .core import BOXES, ROOT, Org, utcnow
+from .health import _aware, _parse_time, config_number, org_health
 
 LEDGER = "reviews"
 
@@ -49,9 +51,43 @@ class Review:
         return "\n".join(out)
 
 
+def read_ledger(org: Org) -> dict | None:
+    """The reviews ledger normalised to {"at", "runs", "notified"}; None when there is none or it is malformed."""
+    ledger = org.ledger(LEDGER)
+    if not isinstance(ledger, dict) or not ledger:
+        return None
+    notified = ledger.get("notified")
+    if isinstance(notified, dict):
+        notified = {k: v for k, v in notified.items() if isinstance(k, str) and isinstance(v, list)}
+    else:
+        notified = {}
+    runs = ledger.get("runs")
+    return {
+        "at": ledger.get("at"),
+        "runs": runs if isinstance(runs, int) and not isinstance(runs, bool) else 0,
+        "notified": notified,
+    }
+
+
+def retired_runs(org: Org) -> int:
+    """Runs used by agents that were retired: their directories (run logs included) live on under ``.retired/``."""
+    count = 0
+    for top in sorted((org.root / ".retired").glob("*")) if (org.root / ".retired").is_dir() else []:
+        for here, dirs, files in os.walk(top):
+            if os.path.basename(here) == "runs":
+                count += sum(1 for f in files if f.endswith(".log") and not f.startswith("."))
+                dirs.clear()
+            else:  # only sub-agent directories can hold more run logs
+                dirs[:] = [d for d in dirs if d not in {*BOXES, "work"}]
+    return count
+
+
 def total_runs(org: Org) -> int:
-    """Runs used across the organization, counted from the run logs (so a restart does not reset it)."""
-    return sum(org.runs_used(a) for a in org.agents())
+    """Runs ever used across the organization, counted from the run logs (so a restart does not reset it).
+
+    Retired agents are included, so retiring never moves the counter backwards (and never postpones a review).
+    """
+    return sum(org.runs_used(a) for a in org.agents()) + retired_runs(org)
 
 
 def review_if_due(org: Org, now: datetime) -> Review | None:
@@ -59,13 +95,17 @@ def review_if_due(org: Org, now: datetime) -> Review | None:
 
     With no earlier review the clock starts now (the ledger is created, nothing is reported).
     """
-    last = org.ledger(LEDGER)
-    if not last:
+    last = read_ledger(org)
+    if not last:  # missing, empty or malformed: the clock starts now
         _save(org, now, total_runs(org), {})
         return None
-    cfg, at = org.config, _parse_time(last.get("at"))
-    runs_due = total_runs(org) - int(last.get("runs", 0)) >= int(cfg["review_every_runs"])
-    time_due = at is None or (_aware(now) - at).total_seconds() >= float(cfg["review_every_seconds"])
+    cfg, at = org.config, _parse_time(last["at"])
+    used = total_runs(org)
+    if used < last["runs"]:  # logs vanished some other way (e.g. .retired/ deleted): start counting again from here
+        last["runs"] = used
+        _save(org, _parse_time(last["at"]) or now, used, last["notified"])
+    runs_due = used - last["runs"] >= config_number(cfg, "review_every_runs", int)
+    time_due = at is None or (_aware(now) - at).total_seconds() >= config_number(cfg, "review_every_seconds")
     return review(org, now) if runs_due or time_due else None
 
 
@@ -74,7 +114,7 @@ def review(org: Org, now: datetime | None = None, dry_run: bool = False) -> Revi
     now = _aware(now) or utcnow()
     health = org_health(org, ROOT, now)
     by_addr = {h.addr: h for h in health.agents}
-    previous = org.ledger(LEDGER).get("notified", {})
+    previous = (read_ledger(org) or {}).get("notified", {})
     result = Review(at=now, runs=total_runs(org), flagged=len(health.flagged))
 
     for manager in (a for a in by_addr if org.children(a)):
@@ -83,7 +123,7 @@ def review(org: Org, now: datetime | None = None, dry_run: bool = False) -> Revi
             continue
         known = [k for k in pairs if k in previous.get(manager, [])]
         new = [k for k in pairs if k not in known]
-        why = "paused" if org.paused(manager) else "no budget left" if (org.budget(manager) or 0) <= 0 else ""
+        why = _cannot_afford(org, manager)
         if why:
             result.skipped[manager] = why
             result.notified[manager] = known  # what it already knew and is still true
@@ -114,6 +154,19 @@ def review(org: Org, now: datetime | None = None, dry_run: bool = False) -> Revi
             org.notify(n.to, n.title, n.body)
         _save(org, now, result.runs, result.notified)
     return result
+
+
+def _cannot_afford(org: Org, manager: str) -> str:
+    """Why a note must not be sent to this manager ("" = it may be). A note costs a run; the runs a manager
+    holds in reserve (one per outstanding delegation, to process the result) are not for review notes."""
+    if org.paused(manager):
+        return "paused"
+    budget, owed = org.budget(manager) or 0, len(org.outstanding(manager))
+    if budget <= 0:
+        return "no budget left"
+    if budget <= owed:
+        return f"budget {budget} is reserved for {owed} outstanding delegation(s)"
+    return ""
 
 
 def _pairs(org: Org, health, by_addr: dict, manager: str) -> dict[str, str]:

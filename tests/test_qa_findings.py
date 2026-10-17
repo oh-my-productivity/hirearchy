@@ -93,7 +93,6 @@ def test_qa2_write_cannot_create_agents_around_hire_rules(org):
 # ------------------------------------------------------------------- scheduler
 
 
-@pytest.mark.xfail(strict=True, reason="QA-3: retiring an agent whose run is in flight crashes Scheduler._reap (end_run mkdir)")
 def test_qa3_retiring_a_running_agent_does_not_crash_the_scheduler(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
     sched = Scheduler(org, quiet_runner(), echo=lambda _: None)
@@ -109,7 +108,6 @@ def test_qa3_retiring_a_running_agent_does_not_crash_the_scheduler(org):
         sched.release()
 
 
-@pytest.mark.xfail(strict=True, reason="QA-4: prompt is passed as one argv string; an oversized message makes the agent unlaunchable (E2BIG)")
 def test_qa4_oversized_message_does_not_wedge_the_agent(org, tmp_path, monkeypatch):
     monkeypatch.setattr("orgmcp.scheduler.ensure_kiro_profile", lambda tools: "orgmcp")
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
@@ -127,14 +125,12 @@ def test_qa4_oversized_message_does_not_wedge_the_agent(org, tmp_path, monkeypat
     assert org.ledger("failures") == {} and not org.paused("ceo")
 
 
-@pytest.mark.xfail(strict=True, reason="QA-5: a non-dict .runtime/nudges.json raises out of tick() and kills the scheduler")
 def test_qa5_corrupt_nudge_ledger_does_not_crash_tick(org):
     (org.root / ".runtime").mkdir(exist_ok=True)
     (org.root / ".runtime" / "nudges.json").write_text("[]")  # valid JSON, wrong shape
     Scheduler(org, quiet_runner(), echo=lambda _: None).tick()
 
 
-@pytest.mark.xfail(strict=True, reason="QA-5: a non-numeric health threshold in ORG.md raises TypeError out of tick() at review time")
 def test_qa5_bad_health_threshold_does_not_crash_tick(org):
     configure(org, review_every_seconds=0, health={"idle_after_seconds": "1h"})
     sched = Scheduler(org, quiet_runner(), echo=lambda _: None)
@@ -143,7 +139,6 @@ def test_qa5_bad_health_threshold_does_not_crash_tick(org):
     org_health(org)  # same for `orgmcp health` / the health tool
 
 
-@pytest.mark.xfail(strict=True, reason="QA-13: every tick re-parses every message ever received/sent by every agent")
 def test_qa13_idle_tick_cost_does_not_grow_with_history(org, monkeypatch):
     for i in range(40):
         org.send(ROOT, "ceo", f"old note {i}")
@@ -157,7 +152,6 @@ def test_qa13_idle_tick_cost_does_not_grow_with_history(org, monkeypatch):
     assert len(loads) < 10, f"an idle tick parsed {len(loads)} message files"
 
 
-@pytest.mark.xfail(strict=True, reason="QA-16: run timeout kills only the top process; its children (tool subprocesses) are orphaned")
 def test_qa16_timeout_kills_the_whole_process_group(org, tmp_path):
     configure(org, run_timeout=1)
     pidfile = tmp_path / "child.pid"
@@ -202,7 +196,6 @@ def test_qa6_retire_returns_unspent_budget_to_the_parent(org):
     assert org.budget("ceo") == 10
 
 
-@pytest.mark.xfail(strict=True, reason="QA-7: review run counter sums live agents only, so retiring agents suppresses later reviews")
 def test_qa7_retiring_agents_does_not_postpone_the_next_review(org):
     runs = org.dir(ENG) / "runs"
     for i in range(5):
@@ -216,7 +209,6 @@ def test_qa7_retiring_agents_does_not_postpone_the_next_review(org):
     assert review.review_if_due(org, utcnow()) is not None
 
 
-@pytest.mark.xfail(strict=True, reason="QA-8: a review note is sent to a manager whose last run is reserved for a pending result")
 def test_qa8_review_does_not_spend_the_reserve_of_a_manager(org):
     org.hire("ceo", "ops", "Ops", "Do ops.")
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=3)
@@ -227,7 +219,6 @@ def test_qa8_review_does_not_spend_the_reserve_of_a_manager(org):
     assert not [n for n in result.notes if n.to == "ceo"], "the note's run would consume the run reserved for eng's result"
 
 
-@pytest.mark.xfail(strict=True, reason="QA-14: crashed/failed runs count as 'empty' runs, so an agent behind a broken kiro is flagged wasteful")
 def test_qa14_failed_runs_are_not_blamed_as_wasteful(org):
     org.send(ROOT, "ceo", "budget", budget=10)
     runs = org.dir("ceo") / "runs"

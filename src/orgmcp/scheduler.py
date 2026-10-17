@@ -12,6 +12,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -19,9 +20,10 @@ from pathlib import Path
 from typing import IO, Callable
 
 from . import review, templates
-from .core import ROOT, Org, OrgError
+from .core import ROOT, Org, OrgError, atomic_write
+from .health import config_number
 
-# (org, agent address, prompt) -> (argv, cwd, env)
+# (org, agent address, prompt) -> (argv, cwd, env). The prompt is delivered on the process's stdin, not in argv.
 Runner = Callable[[Org, str, str], tuple[list[str], Path, dict]]
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
@@ -40,8 +42,12 @@ def kiro_profile_name(tools: list[str]) -> str:
     return "orgmcp" + "".join(f"-{t}" for t in sorted(tools))
 
 
-def ensure_kiro_profile(tools: list[str], agents_dir: Path = KIRO_AGENTS_DIR) -> str:
-    """Write ~/.kiro/agents/orgmcp[-tools].json: only the orgmcp server plus the granted built-in tools."""
+def ensure_kiro_profile(tools: list[str], agents_dir: Path | None = None) -> str:
+    """Write ~/.kiro/agents/orgmcp[-tools].json: only the orgmcp server plus the granted built-in tools.
+
+    The directory is resolved when called (not when defined), so ``KIRO_AGENTS_DIR`` can be redirected.
+    """
+    agents_dir = Path(agents_dir) if agents_dir is not None else Path(KIRO_AGENTS_DIR)
     tools = sorted(set(tools))
     name = kiro_profile_name(tools)
     data = templates.kiro_profile(
@@ -51,9 +57,12 @@ def ensure_kiro_profile(tools: list[str], agents_dir: Path = KIRO_AGENTS_DIR) ->
         mcp_server_command(),
     )
     path = agents_dir / f"{name}.json"
-    if not path.exists() or json.loads(path.read_text(encoding="utf-8")) != data:
-        agents_dir.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    try:
+        current = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):  # missing or corrupt: rewrite it
+        current = None
+    if current != data:
+        atomic_write(path, json.dumps(data, indent=2) + "\n")  # temp file + rename: never a half-written profile
     return name
 
 
@@ -65,7 +74,8 @@ def kiro_runner(kiro_bin: str = "kiro-cli") -> Runner:
         model = meta.get("model") or org.config.get("default_model")
         if model:
             cmd += ["--model", str(model)]
-        cmd.append(prompt)
+        # The prompt is not an argument: it can be arbitrarily long (E2BIG) and visible in `ps`.
+        # `kiro-cli chat --no-interactive` without INPUT reads it from stdin; the scheduler feeds it there.
         ws = meta.get("workspace")
         cwd = Path(ws).expanduser() if ws else org.dir(addr)
         env = {**os.environ, "ORG_ROOT": str(org.root), "ORG_AGENT": addr}
@@ -84,6 +94,31 @@ class Run:
     batch: int
 
 
+def _signal_group(proc: subprocess.Popen, sig: int) -> None:
+    """Signal a run's whole process group (the run was started in its own session, so pgid == pid)."""
+    try:
+        os.killpg(proc.pid, sig)
+    except (ProcessLookupError, PermissionError):
+        try:  # the group is gone (or not ours): fall back to the top process
+            proc.send_signal(sig)
+        except (ProcessLookupError, PermissionError):
+            pass
+
+
+def _nudge_entries(raw) -> dict[str, dict]:
+    """Entries of the nudges ledger in the current shape; malformed entries (or a malformed ledger) are dropped."""
+    out: dict[str, dict] = {}
+    for key, value in (raw.items() if isinstance(raw, dict) else ()):
+        if isinstance(value, str):  # legacy ledger: "nudged" / "escalated"
+            out[key] = {"step": 0 if value == "nudged" else 1, "at": 0}
+        elif isinstance(value, dict):
+            try:
+                out[key] = {"step": max(0, int(value["step"])), "at": float(value.get("at") or 0)}
+            except (KeyError, TypeError, ValueError):
+                continue
+    return out
+
+
 class Scheduler:
     def __init__(
         self,
@@ -98,6 +133,8 @@ class Scheduler:
         self.clock = clock  # stall detection and review cadence, so tests can move time without sleeping
         self.runs: dict[str, Run] = {}
         self.total_runs = 0
+        self._phase_errors: dict[str, str] = {}
+        self._task_memo: dict[str, tuple[tuple, dict]] = {}  # agent -> (mailbox fingerprint, cached task views)
         self.pidfile = org.root / ".runtime" / "scheduler.pid"
 
     # ------------------------------------------------------------- lifecycle
@@ -111,6 +148,8 @@ class Scheduler:
                 alive = True
             except (ValueError, ProcessLookupError):
                 alive = False
+            except PermissionError:  # the pid exists but belongs to another user: it is alive
+                alive = True
             if alive:
                 raise OrgError(f"a scheduler is already running for this org (pid {pid})")
             self.pidfile.unlink()  # stale
@@ -120,12 +159,14 @@ class Scheduler:
 
     def release(self) -> None:
         for run in list(self.runs.values()):
-            run.proc.terminate()
+            _signal_group(run.proc, signal.SIGTERM)
         for addr, run in list(self.runs.items()):
             try:
                 run.proc.wait(timeout=10)
             except subprocess.TimeoutExpired:
-                run.proc.kill()
+                pass
+            _signal_group(run.proc, signal.SIGKILL)  # also reaps tool subprocesses that ignored SIGTERM
+            run.proc.wait()
             run.logf.write("\n# interrupted by scheduler shutdown\n")
             run.logf.close()
             self.org.end_run(addr, ok=False)
@@ -147,7 +188,7 @@ class Scheduler:
                 if until_idle and not active:
                     self.echo("organization is idle")
                     break
-                time.sleep(float(self.org.config["poll_seconds"]))
+                time.sleep(config_number(self.org.config, "poll_seconds"))
         except KeyboardInterrupt:
             pass
         finally:
@@ -157,12 +198,33 @@ class Scheduler:
 
     def tick(self, max_runs: int | None = None) -> bool:
         """One pass: reap finished runs, start new ones, detect stalls, review health. Returns True if work remains."""
+        self._repair_failures_ledger()
         self._reap()
         if max_runs is None or self.total_runs < max_runs:
             self._launch(max_runs)
-        self._check_stalls()
-        self._check_review()
+        self._guard("stall check", self._check_stalls)  # best-effort phases: a bug or bad data here
+        self._guard("health review", self._check_review)  # must never stop agents from running
         return bool(self.runs) or (bool(self._runnable()) and (max_runs is None or self.total_runs < max_runs))
+
+    def _repair_failures_ledger(self) -> None:
+        """The failure counts drive pausing; a wrong-shaped ledger would raise inside ``record_failure``."""
+        raw = self.org.ledger("failures")
+        clean = {k: v for k, v in raw.items() if isinstance(v, int) and not isinstance(v, bool)} if isinstance(raw, dict) else {}
+        if clean != raw:
+            self.org.save_ledger("failures", clean)
+            self.echo("repaired malformed .runtime/failures.json")
+
+    def _guard(self, phase: str, fn: Callable[[], None]) -> None:
+        """Run a best-effort phase; log (once per distinct error) instead of raising out of the loop."""
+        try:
+            fn()
+        except Exception as exc:
+            message = f"{type(exc).__name__}: {exc}"
+            if self._phase_errors.get(phase) != message:
+                self._phase_errors[phase] = message
+                self.echo(f"{phase} failed (will retry next tick): {message}")
+        else:
+            self._phase_errors.pop(phase, None)
 
     def _runnable(self) -> list[str]:
         out = []
@@ -179,7 +241,7 @@ class Scheduler:
     def _launch(self, max_runs: int | None) -> None:
         cfg = self.org.config
         for addr in self.org.agents():
-            if len(self.runs) >= int(cfg["max_parallel"]):
+            if len(self.runs) >= config_number(cfg, "max_parallel", int):
                 return
             if max_runs is not None and self.total_runs >= max_runs:
                 return
@@ -206,13 +268,19 @@ class Scheduler:
         self.total_runs += 1
         prompt = self.org.run_prompt(addr, batch)
         logf = open(log, "a", encoding="utf-8")
+        senders = ", ".join(sorted({m.sender for m in batch}))  # health tells runtime-only runs apart by this
         try:
+            logf.write(f"# run of {addr}, {len(batch)} message(s)\n# senders: {senders}\n")
             cmd, cwd, env = self.runner(self.org, addr, prompt)
-            logf.write(f"# run of {addr}, {len(batch)} message(s)\n# cwd: {cwd}\n# cmd: {' '.join(cmd[:-1])} <prompt>\n")
+            logf.write(f"# cwd: {cwd}\n# cmd: {' '.join(cmd)} <prompt on stdin>\n")
             logf.write(f"# ---- prompt ----\n{prompt}\n# ---- output ----\n")
             logf.flush()
-            proc = subprocess.Popen(cmd, cwd=cwd, env=env, stdin=subprocess.DEVNULL, stdout=logf,
-                                    stderr=subprocess.STDOUT, text=True)
+            with tempfile.TemporaryFile() as stdin:  # a file, not a pipe: no deadlock if the child never reads it
+                stdin.write(prompt.encode("utf-8"))
+                stdin.seek(0)
+                # Its own session/process group, so a timeout or shutdown can take the tool subprocesses along.
+                proc = subprocess.Popen(cmd, cwd=cwd, env=env, stdin=stdin, stdout=logf,
+                                        stderr=subprocess.STDOUT, text=True, start_new_session=True)
         except Exception as exc:  # e.g. kiro-cli missing: count it as a failed run
             logf.write(f"\n# failed to start: {exc}\n")
             logf.close()
@@ -223,13 +291,17 @@ class Scheduler:
         self.echo(f"{addr}: started run ({len(batch)} message(s))")
 
     def _reap(self) -> None:
-        timeout = float(self.org.config["run_timeout"])
+        timeout = config_number(self.org.config, "run_timeout")
         for addr, run in list(self.runs.items()):
             code = run.proc.poll()
             if code is None and time.time() - run.started > timeout:
-                run.proc.kill()
+                _signal_group(run.proc, signal.SIGKILL)
                 code = run.proc.wait()
                 run.logf.write(f"\n# killed after {timeout:.0f}s timeout\n")
+            elif code is None and not self.org.exists(addr):  # retired mid-run: nobody will read its output
+                _signal_group(run.proc, signal.SIGKILL)
+                code = run.proc.wait()
+                run.logf.write("\n# killed: the agent was retired during its run\n")
             if code is None:
                 continue
             elapsed = time.time() - run.started
@@ -237,6 +309,10 @@ class Scheduler:
             run.logf.close()
             del self.runs[addr]
             ok = code == 0
+            if not self.org.exists(addr):  # retired while the run was in flight: nothing left to settle
+                self.echo(f"{addr}: was retired during its run (exit {code}); nothing to settle")
+                self.org.commit(f"{addr}: run ended after retirement (exit {code})")
+                continue
             self.org.end_run(addr, ok)
             if ok:
                 self.org.clear_failures(addr)
@@ -249,12 +325,13 @@ class Scheduler:
     def _failed(self, addr: str, log: Path) -> None:
         n = self.org.record_failure(addr)
         self.echo(f"{addr}: run failed ({n} in a row), log: {log}")
-        if n >= int(self.org.config["max_failures"]):
+        if n >= config_number(self.org.config, "max_failures", int):
             self.org.pause(addr, "failures")
             rel = str(log.relative_to(self.org.root))
-            self.org.notify(self.org.parent(addr) or ROOT, f"{addr} keeps failing",
-                            templates.notice_failures(addr, n, rel))
-            if self.org.parent(addr) != ROOT:  # a human has to look at crashes
+            parent = self.org.parent(addr) or ROOT
+            self.org.notify(parent, f"{addr} keeps failing",
+                            templates.notice_failures(addr, n, rel, to_human=parent == ROOT))
+            if parent != ROOT:  # a human has to look at crashes
                 self.org.notify(ROOT, f"{addr} keeps failing", templates.notice_failures(addr, n, rel))
 
     # --------------------------------------------------------------- reviews
@@ -274,14 +351,18 @@ class Scheduler:
         ``stall_after`` seconds since the latest of: the task's creation, the assignee's last run, the previous
         step. Steps: remind the assignee, then tell the assigner, then each ancestor in turn up to root.
         """
-        after, now = float(self.org.config["stall_after"]), self.clock()
+        after, now = config_number(self.org.config, "stall_after"), self.clock()
         loaded = self.org.ledger("nudges")  # task id -> {"step": last step taken, "at": when}
-        ledger = {k: v if isinstance(v, dict) else {"step": 0 if v == "nudged" else 1, "at": 0} for k, v in loaded.items()}
+        ledger = _nudge_entries(loaded)
         kept: dict[str, dict] = {}  # entries of tasks that are still open
-        for addr in self.org.agents():
-            tasks = self.org.open_tasks(addr)
+        agents = self.org.agents()
+        for gone in set(self._task_memo) - set(agents):
+            del self._task_memo[gone]
+        for addr in agents:
+            tasks = self._task_view(addr, "open_tasks")
             stuck = bool(tasks) and not (
-                self.org.running(addr) or self.org.unread(addr) or self.org.paused(addr) or self.org.outstanding(addr)
+                self.org.running(addr) or self.org.unread(addr) or self.org.paused(addr)
+                or self._task_view(addr, "outstanding")
             )
             for task in tasks:
                 last = ledger.get(task.id)
@@ -306,6 +387,32 @@ class Scheduler:
                 kept[task.id] = {"step": step, "at": now}
         if kept != loaded:
             self.org.save_ledger("nudges", kept)
+
+    def _task_view(self, addr: str, view: str) -> list:
+        """``org.open_tasks`` / ``org.outstanding`` of an agent, recomputed only when its set of message files changes.
+
+        Messages are immutable and named by id, so the file names of an agent's mailboxes (a message moving from
+        inbox to inflight to read stays the same message) determine both views. An idle tick therefore lists a few
+        directories instead of parsing every message ever received or sent.
+        """
+        d = self.org.dir(addr)
+
+        def names(*boxes):
+            out = set()
+            for box in boxes:
+                try:
+                    out.update(n for n in os.listdir(d / box) if n.endswith(".md") and not n.startswith("."))
+                except OSError:
+                    pass
+            return frozenset(out)
+
+        fingerprint = (names("inbox", "inflight", "read"), names("sent"))
+        cached = self._task_memo.get(addr)
+        if cached is None or cached[0] != fingerprint:
+            cached = self._task_memo[addr] = (fingerprint, {})
+        if view not in cached[1]:
+            cached[1][view] = getattr(self.org, view)(addr)
+        return cached[1][view]
 
     def _chain(self, addr: str, task) -> list[str]:
         """Who hears about a stalled task, in order: the assignee, its assigner, then up the tree to root."""

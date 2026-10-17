@@ -22,6 +22,7 @@ import re
 import secrets
 import shutil
 import subprocess
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -51,7 +52,9 @@ DEFAULT_CONFIG = {
     "default_budget": 10,  # runs given with a task when none is specified
     "memory_max_words": 800,  # cap on an agent's MEMORY.md; writes that exceed it are refused
     "default_model": None,  # kiro model; None = kiro default
+    "max_message_chars": 20000,  # longest message body send/delegate/report accept; detail goes in a file
 }
+RENDER_BODY_CHARS = 8000  # longer bodies are cut when shown to an agent (prompt, inbox tool); the file has the rest
 
 
 class OrgError(ValueError):
@@ -62,13 +65,25 @@ def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)  # libyaml when available: same result, ~10x faster
+
+
 def split_frontmatter(text: str) -> tuple[dict, str]:
     if text.startswith("---\n"):
         end = text.find("\n---\n", 4)
         if end != -1:
-            meta = yaml.safe_load(text[4:end]) or {}
+            meta = yaml.load(text[4:end], Loader=_YAML_LOADER) or {}
             return (meta if isinstance(meta, dict) else {}), text[end + 5 :]
     return {}, text
+
+
+def _message_cap(config: dict) -> int:
+    """``max_message_chars`` from ORG.md; a malformed value means the default."""
+    try:
+        cap = int(config["max_message_chars"])
+    except (TypeError, ValueError):
+        return int(DEFAULT_CONFIG["max_message_chars"])
+    return cap if cap > 0 else int(DEFAULT_CONFIG["max_message_chars"])
 
 
 def join_frontmatter(meta: dict, body: str) -> str:
@@ -84,6 +99,10 @@ def atomic_write(path: Path, text: str) -> None:
 
 def _visible(paths) -> list[Path]:
     return sorted(p for p in paths if not p.name.startswith("."))
+
+
+_PARSED: OrderedDict[str, tuple[tuple[int, int], dict, str]] = OrderedDict()  # Message.load cache (LRU)
+_PARSED_MAX = 50_000
 
 
 @dataclass
@@ -127,7 +146,27 @@ class Message:
 
     @classmethod
     def load(cls, path: Path) -> Message:
-        meta, body = split_frontmatter(path.read_text(encoding="utf-8"))
+        """Parse a message file. Messages are immutable, so the parse is cached by path + mtime_ns + size."""
+        key = str(path)
+        with open(path, "rb") as f:
+            st = os.fstat(f.fileno())
+            stamp = (st.st_mtime_ns, st.st_size)
+            hit = _PARSED.get(key)
+            if hit is not None and hit[0] == stamp:
+                try:
+                    _PARSED.move_to_end(key)
+                except KeyError:  # evicted by another thread: harmless
+                    pass
+                meta, body = hit[1], hit[2]
+            else:
+                text = f.read().decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")  # like read_text
+                meta, body = split_frontmatter(text)
+                _PARSED[key] = (stamp, meta, body)
+                while len(_PARSED) > _PARSED_MAX:
+                    try:
+                        _PARSED.popitem(last=False)
+                    except KeyError:
+                        break
         return cls(
             sender=str(meta.get("from", "")),
             to=str(meta.get("to", "")),
@@ -144,7 +183,8 @@ class Message:
             path=path,
         )
 
-    def render(self) -> str:
+    def render(self, limit: int = RENDER_BODY_CHARS) -> str:
+        """The message as shown to an agent. A body over ``limit`` characters is cut, with the path to read the rest."""
         head = [f"from: {self.sender}", f"to: {self.to}"]
         if self.title:
             head.append(f"title: {self.title}")
@@ -156,7 +196,16 @@ class Message:
             head.append(f"revises: {self.revises}")
         if self.budget:
             head.append(f"budget: {self.budget} runs")
-        return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{self.body}\n"
+        body = self.body
+        if limit and len(body) > limit:
+            where = f"{self.to}/" if self.to != ROOT else ""
+            where += f"{self.path.parent.name}/{self.path.name}" if self.path else f"<box>/{self.id}.md"
+            body = (
+                body[:limit].rstrip()
+                + f"\n\n[... message cut: {len(self.body) - limit} more of {len(self.body)} characters. "
+                f"Read the rest with read(path=\"{where}\") if you need it.]"
+            )
+        return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{body}\n"
 
 
 class Org:
@@ -405,6 +454,13 @@ class Org:
         revises: str | None = None,
         _skip_route_check: bool = False,
     ) -> Message:
+        cap = _message_cap(self.config)
+        if len(body.strip()) > cap and self.norm(actor) != ROOT:  # the cap protects agents' runs; the human may paste
+            raise OrgError(
+                f"message is {len(body.strip())} characters; the limit is {cap} (max_message_chars). Messages are "
+                "read in full by the recipient's next run, so keep them short: write the detail to a file inside "
+                "your own directory and send a short message that gives its path."
+            )
         actor, to = self.require(actor), self.require(to)
         if type not in MESSAGE_TYPES:
             raise OrgError(f"type must be one of {MESSAGE_TYPES}")
@@ -651,7 +707,13 @@ class Org:
         return self.messages(addr, "inflight")
 
     def end_run(self, addr: str, ok: bool) -> None:
-        """Success: the batch is processed. Failure: put it back for a retry (at-least-once)."""
+        """Success: the batch is processed. Failure: put it back for a retry (at-least-once).
+
+        A no-op for an agent that no longer exists (retired while its run was in flight): its directory is gone,
+        and creating the mailbox again would leave a ghost directory behind.
+        """
+        if not self.exists(addr):
+            return
         d = self.dir(addr)
         target = d / ("read" if ok else "inbox")
         target.mkdir(exist_ok=True)

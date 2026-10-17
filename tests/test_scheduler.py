@@ -262,7 +262,7 @@ def test_kiro_runner_builds_isolated_command(org, tmp_path, monkeypatch):
     org.write(ROOT, "ceo/AGENT.md", "---\nrole: CEO\nmodel: claude-haiku-4.5\ntools: [read]\n---\nLead.\n")
     cmd, cwd, env = kiro_runner()(org, "ceo", "PROMPT")
     assert cmd[:5] == ["kiro-cli", "chat", "--no-interactive", "--agent", "orgmcp-read"]
-    assert cmd[-3:] == ["--model", "claude-haiku-4.5", "PROMPT"]
+    assert cmd[-2:] == ["--model", "claude-haiku-4.5"] and "PROMPT" not in cmd  # the prompt goes via stdin
     assert cwd == org.dir("ceo") and env["ORG_AGENT"] == "ceo" and env["ORG_ROOT"] == str(org.root)
     profile = json.loads((tmp_path / "agents/orgmcp-read.json").read_text())
     assert profile["includeMcpJson"] is False  # no gmail/whatsapp/etc. inside the org
