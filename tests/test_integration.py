@@ -98,7 +98,8 @@ def test_refund_note_wakes_a_budget_paused_parent_but_not_a_failure_paused_one(o
 
 def test_runtime_only_refund_run_is_not_counted_as_wasteful(org):
     _retire_with_refund(org)
-    assert [m.sender for m in org.messages("ceo", "inbox")] == [core.RUNTIME]
+    org.notify("ceo", "reminder: T", "still open")  # the refund note alone no longer wakes (tests/test_wakes.py)
+    assert [m.sender for m in org.messages("ceo", "inbox")] == [core.RUNTIME] * 2
     sched = Scheduler(org, runner=lambda o, a, p: (["true"], str(o.dir(a)), dict(os.environ)), echo=lambda _: None)
     sched.serve(until_idle=True, max_runs=1)
     h = agent_health(org, "ceo")

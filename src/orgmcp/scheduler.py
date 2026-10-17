@@ -200,6 +200,7 @@ class Scheduler:
         """One pass: reap finished runs, start new ones, detect stalls, review health. Returns True if work remains."""
         self._repair_failures_ledger()
         self._reap()
+        self._resume_funded()
         if max_runs is None or self.total_runs < max_runs:
             self._launch(max_runs)
         self._guard("stall check", self._check_stalls)  # best-effort phases: a bug or bad data here
@@ -225,6 +226,13 @@ class Scheduler:
                 self.echo(f"{phase} failed (will retry next tick): {message}")
         else:
             self._phase_errors.pop(phase, None)
+
+    def _resume_funded(self) -> None:
+        """Lift a budget pause once budget is back (a refund note arrives without waking anyone)."""
+        for addr in self.org.agents():
+            if self.org.paused(addr) == "budget" and (self.org.budget(addr) or 0) > 0:
+                self.org.resume(addr)
+                self.echo(f"{addr}: budget is back, resumed")
 
     def _runnable(self) -> list[str]:
         out = []

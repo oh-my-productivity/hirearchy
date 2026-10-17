@@ -167,6 +167,7 @@ class Message:
     status: str | None = None
     budget: int = 0
     hops: int = 0
+    wake: bool = True  # False: held in the inbox without waking the agent; part of its next real run's batch
     revises: str | None = None  # a task sent back for rework: the earlier task it revises
     id: str = ""
     created: str = ""
@@ -182,6 +183,8 @@ class Message:
             "created": self.created,
             "hops": self.hops,
         }
+        if not self.wake:
+            meta["wake"] = False
         if self.reply_to:
             meta["reply_to"] = self.reply_to
         if self.status:
@@ -228,6 +231,7 @@ class Message:
             status=meta.get("status"),
             budget=int(meta.get("budget") or 0),
             hops=int(meta.get("hops") or 0),
+            wake=meta.get("wake", True) is not False,
             revises=str(meta["revises"]) if meta.get("revises") else None,
             id=str(meta.get("id") or path.stem),
             created=str(meta.get("created") or ""),
@@ -438,8 +442,19 @@ class Org:
         return self.messages(addr, "sent")
 
     def unread(self, addr: str) -> int:
+        """Messages in the inbox that wake the agent: what makes it runnable and what health calls "unread mail".
+
+        Non-waking messages (``wake: false``) sit in the inbox uncounted and join the batch of its next real run.
+        """
         d = self.dir(addr) / "inbox"
-        return len(_visible(d.glob("*.md"))) if d.is_dir() else 0
+        return sum(1 for p in _visible(d.glob("*.md")) if self._wakes(p)) if d.is_dir() else 0
+
+    @staticmethod
+    def _wakes(path: Path) -> bool:
+        try:
+            return Message.load(path).wake
+        except Exception:  # noqa: BLE001 - an unreadable file still counts as mail: a run should look at it
+            return True
 
     def find_received(self, addr: str, msg_id: str) -> Message | None:
         return next((m for m in self.received(addr) if m.id == msg_id), None)
@@ -469,9 +484,9 @@ class Org:
         atomic_write(self.dir(msg.to) / "inbox" / f"{msg.id}.md", text)
         return msg
 
-    def notify(self, to: str, title: str, body: str) -> Message:
-        """A notice from the runtime itself (budget, failures, stalls)."""
-        return self.deliver(Message(sender=RUNTIME, to=self.norm(to), type="note", title=title, body=body))
+    def notify(self, to: str, title: str, body: str, wake: bool = True) -> Message:
+        """A notice from the runtime itself (budget, failures, stalls). ``wake=False``: see :meth:`unread`."""
+        return self.deliver(Message(sender=RUNTIME, to=self.norm(to), type="note", title=title, body=body, wake=wake))
 
     # ----------------------------------------------------------------- budget
 
@@ -711,7 +726,7 @@ class Org:
         """Retire a direct report (short name or full address; root: any agent by full address) and its team.
 
         Open tasks the team owes the outside are closed as failed, and the team's unspent budget is returned to the
-        retired agent's parent as a runtime note carrying the budget (nothing when the parent is root, who has no
+        retired agent's parent as a non-waking runtime note carrying the budget (nothing when the parent is root, who has no
         limit), so budget stays derived from files and is neither destroyed nor minted.
         """
         actor = self.require(actor)
@@ -738,7 +753,7 @@ class Org:
         shutil.move(str(self.dir(addr)), dest)
         if refund:  # after the move: a crash in between loses the refund rather than counting it twice
             self.deliver(Message(
-                sender=RUNTIME, to=parent, type="note", budget=refund, title=f"Budget returned from {addr}",
+                sender=RUNTIME, to=parent, type="note", budget=refund, wake=False, title=f"Budget returned from {addr}",
                 body=templates.notice_budget_returned(addr, refund, actor, reason),
             ))
         return Retired(addr, refund, parent if refund else None)
@@ -828,7 +843,7 @@ class Org:
     # ------------------------------------------------------------ run lifecycle
 
     def begin_run(self, addr: str) -> list[Message]:
-        """Move the inbox into inflight/: that batch is what this run handles."""
+        """Move the inbox into inflight/: that batch is what this run handles (held non-waking messages included)."""
         d = self.dir(addr)
         (d / "inflight").mkdir(exist_ok=True)
         for p in _visible((d / "inbox").glob("*.md")):
