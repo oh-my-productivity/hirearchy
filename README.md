@@ -48,7 +48,7 @@ uv run orgmcp status
 uv run orgmcp inbox
 ```
 
-Other commands: `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `mcp`, `kiro-profile`.
+Other commands: `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `mcp`, `kiro-profile` (this org's internal profile).
 
 ## Health
 
@@ -136,20 +136,52 @@ would be sent and writes nothing (no messages, no ledger).
 
 ## Kiro integration
 
-- Agent runs use `kiro-cli chat --no-interactive --agent orgmcp[-tools]`. The scheduler writes these profiles to
-  `~/.kiro/agents/`. They load only the orgmcp server (`includeMcpJson: false`), so agents never see your
-  other MCP servers. Identity comes from `ORG_AGENT`, which the scheduler sets per run. The prompt is passed on stdin.
-- To talk to the org yourself from any kiro session, register the server globally (you act as `root`):
+**Talking to the org yourself (you act as `root`).** Register the server globally; it does not need an
+organization to exist yet:
 
 ```json
 "orgmcp": {
   "command": "uv",
-  "args": ["--directory", "/Users/aminalizadeh/workspace/orgmcp", "run", "orgmcp", "mcp"],
-  "env": { "ORG_ROOT": "/Users/aminalizadeh/workspace/orgmcp/org" }
+  "args": ["--directory", "/path/to/orgmcp", "run", "orgmcp", "mcp"],
+  "env": { "ORG_ROOT": "/path/to/your/org" }
 }
 ```
 
-MCP tools: `whoami`, `inbox`, `delegate`, `report`, `send`, `hire`, `retire`, `read`, `write`, `status`, `health`.
+- The server is bound to exactly one path for its lifetime: `ORG_ROOT` (or, when it is unset, the organization found
+  from the working directory). It never falls back to another organization.
+- If nothing exists at that path (missing or empty directory), the server still starts in *setup mode*: `whoami` and
+  `status` explain the next step, every other tool answers `no organization at <path> yet: call create_org(mission=...)
+  first`, and `create_org(mission, default_model=None)` creates the organization there. From then on all tools work
+  in the same session, no restart. `create_org` refuses a directory that holds anything else, and an organization that
+  already exists (which is then ready to use). With `ORG_ROOT` unset and no organization in the working directory it
+  needs a `path` (absolute); with `ORG_ROOT` set a different `path` is refused.
+- Root-only tools: `create_org`, `start(max_runs=None)` (launch a detached scheduler for this org, output in
+  `.runtime/scheduler.log`, returns its pid; refused if one runs), `stop()` (SIGTERM, only to a pid verified to be this
+  org's scheduler: alive, `run` in its command line, and this org's `--root` or an `orgmcp` program with no other
+  `--root`). `status` and `whoami` end with a `scheduler: running (pid, since) / stopped` line.
+- Other tools: `whoami`, `inbox`, `delegate`, `report`, `send`, `hire`, `retire`, `read`, `write`, `status`, `health`.
+  Agents get these (not `create_org`, `start`, `stop`).
+
+**Agent runs (the scheduler).** Runs use `kiro-cli chat --no-interactive --agent <profile>`; the prompt is passed
+on stdin. The scheduler writes one *internal* profile per organization (and per set of granted built-in tools) to
+`~/.kiro/agents/`:
+
+- name `orgmcp-<org-slug>-<6-char hash of the org path>[-<tools>]` (lowercase `[a-z0-9-]`), description "internal:
+  used by the orgmcp scheduler for <org path>; not a general-purpose agent". Different orgs never share or overwrite a
+  profile.
+- It loads only the orgmcp server (`includeMcpJson: false`), so agents never see your other MCP servers. The server
+  entry carries `ORG_ROOT=<this org>` and `ORG_REQUIRE_AGENT=1`.
+- Fail closed: with `ORG_REQUIRE_AGENT=1` the server refuses to start unless `ORG_AGENT` names an agent (`root` does not
+  count). If something borrows a profile as a general subagent, it gets an error instead of acting as `root`.
+- `ORG_AGENT` is not baked into the profile: the scheduler sets it per run in the process environment of `kiro-cli`.
+  This relies on kiro starting MCP servers with its own environment plus the profile's `env` (the same inheritance the
+  scheduler always used for `ORG_AGENT`/`ORG_ROOT`). If a kiro version replaced the environment instead, runs would fail
+  visibly with the message above rather than act as root.
+- Older global profiles (`~/.kiro/agents/orgmcp*.json`) are no longer written or used; they are never deleted or
+  rewritten, so remove them yourself when no scheduler that uses them is running.
+
+Every command that changes an organization (`init`, `hire`, `task`, `send`, `resume`, `run`, `review`, `inbox`
+without `--keep`, `kiro-profile`) first prints `org: <path>` to stderr. `python -m orgmcp` is the same as the `orgmcp` script.
 
 ## Security notes
 
