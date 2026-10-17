@@ -490,7 +490,8 @@ def estimate(agents: list[Agent]) -> dict:
     * manager: ``pass = 1 (plan and delegate) + 1 per direct report (process its result) + 1 (final check and report)``;
       ``rework = 2`` (send the findings back, process the revised result).
 
-    ``total`` is the sum over all agents of pass + rework: the minimum budget for a pipeline with one review and one rework cycle.
+    ``total`` is the sum over all agents of pass + rework: the minimum budget for a pipeline with one review and one rework cycle
+    (``budget_split`` hands each worker its pass and its rework/re-check run together).
     The planned budget is ``ceil(total * 1.25)`` unless the task names one; below ``total * 1.1`` is flagged as having no slack.
     """
     per: dict[str, dict] = {}
@@ -516,8 +517,10 @@ def planned_total(bp: dict, est_total: int) -> int:
 def budget_split(agents: list[Agent], total: int) -> dict[str, dict]:
     """addr -> {grant, keeps}: what the parent hands down at first, and what the agent keeps for itself.
 
-    A worker is granted its pass runs (its rework run is kept by its manager); a manager child is granted its whole
-    subtree (pass and rework) so it can run its own review loop. The top agent receives ``total``.
+    Every child is granted its whole subtree, pass AND rework: an author keeps one rework run and a verifier one
+    re-check run on top of its pass (the writer of the research example gets 3, not 2, so an empty first run cannot
+    leave it unable to apply the checker's changes). Unspent runs come back with the child's final report anyway.
+    The agent keeps the rest: its own pass and rework runs plus the reserve. The top agent receives ``total``.
     """
     est = estimate(agents)["per"]
     by = {a.addr: a for a in agents}
@@ -529,7 +532,7 @@ def budget_split(agents: list[Agent], total: int) -> dict[str, dict]:
 
     def fill(addr: str, budget: int) -> None:
         a = by[addr]
-        grants = {c: (sub(c, "pass") + (sub(c, "total") - sub(c, "pass") if by[c].children else 0)) for c in a.children}
+        grants = {c: sub(c, "total") for c in a.children}
         out[addr] = {"grant": budget, "keeps": budget - sum(grants.values())}
         for c in a.children:
             fill(c, grants[c])
@@ -838,6 +841,21 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
             if weak:
                 issues.append(Issue("warning", weak[0].where, "the reviewer uses the same model as the author it checks; the policy asks for a stronger reviewer (model: strong)", "model-review"))
 
+    # --- the lead decides how every other run is spent: it belongs on the strong model (studies A3/A4)
+    mdl = needs.get("models") if isinstance(needs.get("models"), dict) else {}
+    cheap_id, strong_id = _s(mdl.get("cheap")), _s(mdl.get("strong"))
+    drafters = {x.model for x in agents if x.kind == "author" and not x.children and x.model}
+    for a in agents:
+        if a.kind != "manager" and not a.children:
+            continue
+        if strong_id and a.model == strong_id:
+            continue
+        on_cheap = a.tier == "cheap" or bool(cheap_id and a.model == cheap_id)
+        shared = bool(strong_id and a.model and a.model in drafters)
+        if on_cheap or shared:
+            why = "the cheap model" if on_cheap else f"{a.model}, the same model as the drafters, while a strong model ({strong_id}) is available"
+            issues.append(Issue("warning", a.where, f"{a.addr} directs the team but runs on {why}; the lead decides how every other run is spent; cheap leads misroute rework and waste runs (studies A3/A4). Give it model: strong", "manager-cheap-model"))
+
     # --- elicited preferences the org itself does not use but the assistant must honor
     for key, hint in (("scope", "what is in and out of scope"), ("approval", "when the user wants to approve (plan, before start, final)"),
                       ("progress", "how the user wants progress updates")):
@@ -881,7 +899,7 @@ def _charter(a: Agent, agents: list[Agent], bp: dict, split: dict[str, dict]) ->
         grants = [(c, split[c]["grant"]) for c in a.children]
         asg += [
             f"Budget plan: you start with {split[a.addr]['grant']} runs. Initial grants, set explicitly with `budget=`: "
-            + ", ".join(f"{c} {n}" for c, n in grants) + f". You keep {split[a.addr]['keeps']} runs: your own runs plus the reserve for "
+            + ", ".join(f"{c} {n}" for c, n in grants) + f". Each grant already includes that worker's one rework (author) or re-check (verifier) run. You keep {split[a.addr]['keeps']} runs: your own runs plus the reserve for "
             "one review and one rework cycle (rework tasks hand down 1-2 runs each). Do not hand down more than this up front. Runs you do not spend return to your parent automatically with your final report.",
         ]
         vs = [c for c in a.children if by[c].kind == "verifier"]
@@ -994,16 +1012,14 @@ def render_plan(bp: dict, issues: list[Issue] | None = None, *, org: Org | None 
           "  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you."]
     if agents:
         split = budget_split(agents, total)
-        by_addr = {x.addr: x for x in agents}
         for a in agents:
             e = est["per"][a.addr]
             if a.children:
                 keeps = split[a.addr]["keeps"]
-                held = sum(est["per"][c]["rework"] for c in a.children if not by_addr[c].children)
                 L.append(f"  {a.addr}: starts with {split[a.addr]['grant']}, hands down "
                          + ", ".join(f"{c.rsplit('/', 1)[-1]} {split[c]['grant']}" for c in a.children)
-                         + f", keeps {keeps} (own {e['total']} + rework runs for reports {held}"
-                         + (f" + slack {keeps - e['total'] - held})" if keeps - e["total"] - held else ")"))
+                         + f" (each includes its rework/re-check run), keeps {keeps} (own {e['total']}"
+                         + (f" + slack {keeps - e['total']})" if keeps - e["total"] else ")"))
             else:
                 L.append(f"  {a.addr}: {split[a.addr]['grant']} runs ({e['pass']} work + {e['rework']} rework)")
     else:

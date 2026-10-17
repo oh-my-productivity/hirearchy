@@ -44,14 +44,14 @@ needs:
   sources: Web access to official sites and documentation; a source URL per claim.
   budget_runs: 25                  # the user's cap in runs (one run = one agent working session)
   models: {{cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}}   # use model ids available to the user
-  model_policy: cheap drafting, strong review   # or "one model for all" (then give no models)
+  model_policy: cheap drafting, strong review   # drafters cheap; lead and fact-checker strong. Or "one model for all" (then give no models)
   review: true                     # an independent fact-checker who did not write the text
   approval: Plan first; ask before any spend beyond the budget.
   progress: One line when I ask.
 agents:
   - name: lead
     template: manager
-    model: strong
+    model: strong                  # always strong, even with cheap drafters: the lead decides how every other run is spent
     children:
       - {{name: researcher, template: researcher}}   # web_search + web_fetch
       - {{name: writer, template: writer}}

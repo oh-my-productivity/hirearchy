@@ -245,7 +245,8 @@ def test_manager_pastes_the_coverage_line_verbatim_and_never_calls_changes_claim
 def test_manager_cuts_instead_of_another_research_cycle_and_escalates_with_options():
     has("manager", "a verification cycle is: verify, rework, re-verify", "do not start another research cycle",
         "prefer cutting", "cut every claim the verifier could not verify", "restate it as a labelled judgement",
-        "`send` your parent the position", "options and a recommended decision", "instead of spending the reserve on a second full cycle")
+        "report `blocked` to your parent", "the position (what is verified, what is not)", "options and a recommended decision",
+        "instead of spending the reserve on a second full cycle")
 
 
 def test_manager_template_limits_its_own_overhead():

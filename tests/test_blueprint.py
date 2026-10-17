@@ -335,8 +335,9 @@ def test_budget_split_keeps_a_reserve(base, roots):
     agents = bpm._resolve(base, None, roots, [])
     split = bpm.budget_split(agents, 22)
     grants = {a: v["grant"] for a, v in split.items()}
-    assert grants == {"lead": 22, "lead/researcher": 3, "lead/writer": 2, "lead/factcheck": 2}
-    assert split["lead"]["keeps"] == 15 and sum(grants.values()) - 22 + split["lead"]["keeps"] == 22
+    # a worker is granted its pass plus its rework (author) or re-check (verifier) run
+    assert grants == {"lead": 22, "lead/researcher": 4, "lead/writer": 3, "lead/factcheck": 3}
+    assert split["lead"]["keeps"] == 12 and sum(grants.values()) - 22 + split["lead"]["keeps"] == 22
 
 
 def test_nested_manager_gets_its_whole_subtree(roots, tmp_path):
@@ -453,7 +454,7 @@ def test_apply_creates_tree_charters_and_task(base, roots, empty_org):
     meta, body = empty_org.charter("lead")
     assert meta["model"] == "claude-sonnet-4.6" and meta["can_hire"] and meta["max_children"] == 3
     assert meta["tools"] == ["web_fetch", "web_search"] and meta["role"] == "Research lead"
-    assert "Budget plan: you start with 22 runs" in body and "lead/researcher 3, lead/writer 2, lead/factcheck 2" in body and "You keep 15 runs" in body
+    assert "Budget plan: you start with 22 runs" in body and "lead/researcher 4, lead/writer 3, lead/factcheck 3" in body and "You keep 12 runs" in body
     assert "Review loop:" in body and "Never hand down more than the budget plan says" in body
     rmeta, rbody = empty_org.charter("lead/researcher")
     assert rmeta["model"] == "claude-haiku-4.5" and "Cite" not in rbody and "primary-source URL" in rbody
