@@ -38,7 +38,11 @@ def org_rules(mission: str | None) -> str:
 
 
 def charter_body(role: str, charter: str) -> str:
-    return f"# Role: {role}\n\n{charter.strip()}\n"
+    """The charter under a single H1: the hirer's own top-level heading wins over the generated one."""
+    charter = charter.strip()
+    if charter.startswith("# "):
+        return charter + "\n"
+    return f"# Role: {role}\n\n{charter}\n"
 
 
 def task_body(goal: str, acceptance: str, inputs: list[str]) -> str:
