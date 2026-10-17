@@ -27,8 +27,8 @@ ORG_RULES = """\
    `delegate(..., revises=<id of the earlier task>)` so the rework is recorded.
 4. Keep reports short: a few lines of summary plus artifact paths. Put detail in files, not messages.
 5. Every task assigned to you gets exactly one `report`. If you cannot finish, report `blocked` or `failed` and say why.
-6. Before you stop, rewrite MEMORY.md with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
-   Keep it short: condense instead of appending, and put detail in `work/` files. Writes that make it too long are refused.
+6. Before you stop, rewrite `<you>/MEMORY.md` with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
+   Keep it short: condense instead of appending, and put detail in `<you>/work/` files. Writes that make it too long are refused.
 7. Stay within your charter. Escalate anything outside it.
 """
 
@@ -90,6 +90,44 @@ def notice_stalled(agent: str, task_id: str, title: str, told: list[str]) -> str
         f"and has not reported. Already told: {', '.join(f'`{t}`' for t in told)}. "
         "Follow up with it, reassign the work, or escalate further."
     )
+
+
+# What to do about each health flag; {a} is the flagged agent.
+REVIEW_ACTIONS = {
+    "stuck": "follow up with `{a}` or reassign the work",
+    "out_of_budget": 'grant runs with send(to="{a}", body="<why>", budget=N), or report the task failed',
+    "paused": "investigate why `{a}` is paused; failed runs need a human (`orgmcp resume {a}`), so escalate",
+    "low_quality": "tighten `{a}`'s charter and acceptance criteria, rework with delegate(..., revises=<task id>), or replace it",
+    "expensive": "narrow `{a}`'s tasks, or change its charter or model",
+    "wasteful": "fix `{a}`'s charter so every run ends with an action (report or send)",
+    "idle": "retire `{a}` if it is no longer needed",
+}
+
+
+def review_item(addr: str, flag: str, reason: str, act: bool = True, branch: str | None = None) -> str:
+    """One flagged (agent, flag) pair. ``branch`` = the report whose team contains the flagged ``addr``."""
+    if branch:
+        line = f"- `{branch}` team: `{addr}` is {flag}: {reason}"
+        return line + (f"\n  -> ask `{branch}` to deal with it, or step in via its charter" if act else "")
+    line = f"- `{addr}` {flag}: {reason}"
+    return line + (f"\n  -> {REVIEW_ACTIONS[flag].format(a=addr)}" if act else "")
+
+
+def notice_review_manager(manager: str, items: list[str]) -> str:
+    return (
+        f"Health review: {len(items)} new problem(s) among your direct reports.\n"
+        + "\n".join(items)
+        + f"\n\nAct within your charter and record your decisions in `{manager}/MEMORY.md`. "
+        "Problems that persist are not repeated in later reviews."
+    )
+
+
+def notice_review_root(summary: str, items: list[str], skipped: dict[str, str]) -> str:
+    """The org-wide summary for root: every flagged agent, with actions for root's own reports."""
+    lines = [f"Health review: {summary}"] + items
+    if skipped:
+        lines.append("Managers not notified: " + ", ".join(f"`{m}` ({why})" for m, why in skipped.items()) + ".")
+    return "\n".join(lines)
 
 
 def kiro_profile(name: str, description: str, tools: list[str], mcp_server: dict) -> dict:

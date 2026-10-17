@@ -42,7 +42,7 @@ uv run orgmcp status
 uv run orgmcp inbox
 ```
 
-Other commands: `send` (note or budget grant), `resume <agent>`, `run --once`, `mcp`, `kiro-profile`.
+Other commands: `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `mcp`, `kiro-profile`.
 
 ## Health
 
@@ -83,6 +83,41 @@ health:
   stuck_after_seconds: 900
   max_runs_per_task: 8
 ```
+
+### Health reviews
+
+Measuring is not managing. Periodically the runtime turns the flags above into a short note for the manager who
+can act on them, so problems get followed up, reworked, re-budgeted or retired instead of waiting for you to run
+`orgmcp health`.
+
+- **Cadence.** The scheduler runs a review when `review_every_runs` runs have been used across the organization since
+  the last review (counted from the run logs, so a restart does not reset it) or `review_every_seconds` have passed,
+  whichever comes first. The first scheduler tick only starts the clock. The last review (time, run count, who was
+  told about what) is kept in `.runtime/reviews.json`, the only extra state.
+- **Managers.** An agent with direct reports gets one note ("health review: N new problem(s)") listing the flags of
+  its direct reports, each with the reason and a suggested action (follow up or reassign, grant runs, investigate a
+  pause, tighten the charter or rework with `revises`, narrow the tasks, fix a wasteful charter, retire). If a
+  report manages a team, the worst flag raised further down its team is mentioned too. The manager is asked to act
+  within its charter and record decisions in its `MEMORY.md`.
+- **Only what is new.** A (report, flag) pair already sent to that manager in the previous review is not repeated;
+  if it goes away and comes back it is new again. Paused managers and managers with no budget left are skipped
+  (root's summary covers them, and they hear about the problem once they can act).
+- **Root.** Whenever anything is flagged, root gets one note with every flagged agent and reason, plus suggested
+  actions for its own direct reports and the list of managers that were not notified. Root is free to notify.
+- **Cost.** A healthy organization costs nothing: no flags means no notes, only a ledger update. Each manager note
+  wakes the manager for one run of its budget.
+
+| Config key (ORG.md) | Default | Meaning |
+| --- | --- | --- |
+| `review_every_runs` | 25 | runs used across the organization between reviews |
+| `review_every_seconds` | 86400 | seconds between reviews |
+
+```sh
+uv run orgmcp review [--dry-run]
+```
+
+Runs a review immediately through the same code path and prints what was sent to whom. `--dry-run` prints what
+would be sent and writes nothing (no messages, no ledger).
 
 ## Kiro integration
 

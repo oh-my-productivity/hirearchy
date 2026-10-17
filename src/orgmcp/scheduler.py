@@ -14,11 +14,11 @@ import subprocess
 import sys
 import time
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import IO, Callable
 
-from . import templates
+from . import review, templates
 from .core import ROOT, Org, OrgError
 
 # (org, agent address, prompt) -> (argv, cwd, env)
@@ -95,7 +95,7 @@ class Scheduler:
         self.org = org
         self.runner = runner or kiro_runner()
         self.echo = echo
-        self.clock = clock  # only used for stall detection, so tests can move time without sleeping
+        self.clock = clock  # stall detection and review cadence, so tests can move time without sleeping
         self.runs: dict[str, Run] = {}
         self.total_runs = 0
         self.pidfile = org.root / ".runtime" / "scheduler.pid"
@@ -156,11 +156,12 @@ class Scheduler:
     # ------------------------------------------------------------------ tick
 
     def tick(self, max_runs: int | None = None) -> bool:
-        """One pass: reap finished runs, start new ones, detect stalls. Returns True if work remains."""
+        """One pass: reap finished runs, start new ones, detect stalls, review health. Returns True if work remains."""
         self._reap()
         if max_runs is None or self.total_runs < max_runs:
             self._launch(max_runs)
         self._check_stalls()
+        self._check_review()
         return bool(self.runs) or (bool(self._runnable()) and (max_runs is None or self.total_runs < max_runs))
 
     def _runnable(self) -> list[str]:
@@ -255,6 +256,14 @@ class Scheduler:
                             templates.notice_failures(addr, n, rel))
             if self.org.parent(addr) != ROOT:  # a human has to look at crashes
                 self.org.notify(ROOT, f"{addr} keeps failing", templates.notice_failures(addr, n, rel))
+
+    # --------------------------------------------------------------- reviews
+
+    def _check_review(self) -> None:
+        """Start a health review when one is due (see ``review.review_if_due``)."""
+        done = review.review_if_due(self.org, datetime.fromtimestamp(self.clock(), timezone.utc))
+        if done and done.notes:
+            self.echo(f"health review: {done.flagged} flagged, told {', '.join(n.to for n in done.notes)}")
 
     # ---------------------------------------------------------------- stalls
 
