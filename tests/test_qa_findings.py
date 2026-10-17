@@ -269,7 +269,6 @@ def test_qa12_failed_send_does_not_mint_budget(org, monkeypatch):
     assert org.budget("ceo") + org.budget(ENG) <= 10
 
 
-@pytest.mark.xfail(strict=True, reason="QA-15: report() accepts artifacts outside the organization (any readable host file)")
 def test_qa15_report_refuses_artifacts_outside_the_org(org, tmp_path):
     outside = tmp_path / "secret.txt"
     outside.write_text("not part of the org")

@@ -239,3 +239,62 @@ def test_retire_tool_reports_the_refund(org):
     blocks = result[0] if isinstance(result, tuple) else result
     text = "\n".join(getattr(b, "text", "") for b in blocks)
     assert "retired ceo/eng" in text and "4 unspent run(s)" in text and "returned to ceo" in text
+
+
+# ------------------------------------------------------------------- QA-15: artifact scope
+
+
+def _task(org):
+    org.send(ROOT, "ceo", "budget", budget=5)
+    return org.delegate("ceo", ENG, "t", "g", "a", budget=1)
+
+
+def test_report_refuses_artifacts_outside_the_org_in_every_spelling(org, tmp_path):
+    outside = tmp_path / "secret.txt"
+    outside.write_text("not part of the org")
+    (org.dir(ENG) / "work" / "link.txt").symlink_to(outside)  # a symlink must not smuggle it in either
+    task = _task(org)
+    escaping = ["../" * 12 + str(outside).lstrip("/"), str(outside), "~/", "ceo/eng/work/link.txt", "/etc/hosts", "/nonexistent/xyz", "/"]
+    for art in escaping:
+        with pytest.raises(OrgError, match="inside the organization"):
+            org.report(ENG, task.id, "done", "ok", [art])
+    assert org.outstanding("ceo")[0].id == task.id  # nothing was reported
+
+
+def test_report_accepts_artifacts_inside_the_org(org):
+    org.write(ENG, "ceo/eng/work/out.md", "# Title\n\n- one two\n- three\n")
+    task = _task(org)
+    result = org.report(ENG, task.id, "done", "ok", ["work/out.md", "ceo/eng/work", str(org.dir(ENG) / "work" / "out.md")])
+    assert "ceo/eng/work/out.md (4 words" in result.body and "ceo/eng/work/ (directory)" in result.body
+
+
+def test_report_missing_artifact_inside_the_org_is_still_not_found(org):
+    task = _task(org)
+    with pytest.raises(OrgError, match="not found"):
+        org.report(ENG, task.id, "done", "ok", ["work/missing.md"])
+
+
+# ------------------------------------------------------------------- word counts
+
+
+def test_word_count_ignores_markdown_markers():
+    from orgmcp.core import word_count
+
+    text = "\n".join([
+        "# Title here", "", "## Sub", "- one two", "* three", "+ four", "  - nested five", "1. six", "12) seven",
+        "> quoted eight", "- [x] done nine", "| a | b |", "|---|:--:|", "| c | d |", "---", "***", "```python", "ten", "```",
+        "**bold** and `code` -5 degrees", "No marker 3. here",
+    ])
+    # Title here(2) Sub(1) one two(2) three four(2) nested five(2) six seven(2) quoted eight(2) done nine(2)
+    # a b c d(4) ten(1) bold and code -5 degrees(5) No marker 3. here(4)
+    assert word_count(text) == 2 + 1 + 2 + 2 + 2 + 2 + 2 + 2 + 4 + 1 + 5 + 4
+    assert word_count("") == 0 and word_count("plain words stay") == 3 and word_count("- \n#\n") == 0
+
+
+def test_read_and_report_artifacts_share_the_markup_free_count(org):
+    body = "# Blurb\n\n- alpha beta\n- gamma\n1. delta\n"
+    org.write(ENG, "ceo/eng/work/blurb.md", body)
+    assert len(body.split()) == 9
+    assert "5 words" in org.read("ceo/eng/work/blurb.md").splitlines()[0]
+    task = _task(org)
+    assert "(5 words" in org.report(ENG, task.id, "done", "ok", ["ceo/eng/work/blurb.md"]).body

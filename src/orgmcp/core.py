@@ -113,6 +113,26 @@ def _case_twin(parent: Path, name: str) -> str | None:
     return next((n for n in names if _fold(n) == key), None)
 
 
+_FENCE_LINE = re.compile(r"\s*(?:`{3,}|~{3,})\S*\s*")
+_LINE_MARKER = re.compile(r"\s*(?:>|#{1,6}(?=\s)|[-*+\u2022](?=\s)|\d{1,3}[.)](?=\s)|\[[ xX]\](?=\s))")
+_MARKUP_ONLY = re.compile(r"[#*+=_~`>|:\-\u2022]+")
+
+
+def word_count(text: str) -> int:
+    """Words of ``text`` for word limits: markdown markers (``#``, ``-``, ``*``, ``1.``, ``|``, ``---``, fence lines,
+    ``>``, checkboxes) are not words; the words next to them are."""
+    total = 0
+    for line in text.splitlines():
+        if _FENCE_LINE.fullmatch(line):
+            continue
+        if line.lstrip().startswith("|"):  # table row: the pipes are delimiters
+            line = line.replace("|", " ")
+        while (m := _LINE_MARKER.match(line)) and m.end() > 0:
+            line = line[m.end():]
+        total += sum(1 for tok in line.split() if not _MARKUP_ONLY.fullmatch(tok))
+    return total
+
+
 def _visible(paths) -> list[Path]:
     return sorted(p for p in paths if not p.name.startswith("."))
 
@@ -502,17 +522,16 @@ class Org:
         p = Path(path).expanduser()
         if not p.is_absolute():
             p = next((b / p for b in (self.root, self.dir(actor)) if (b / p).exists()), self.root / p)
+        p = p.resolve()
+        if p != self.root and self.root not in p.parents:  # checked before existence: no probing of the host
+            raise OrgError(f"artifacts must be inside the organization: {path} (paths are relative to the org root)")
         if not p.exists():
             raise OrgError(f"artifact not found: {path} (paths are relative to the org root)")
-        p = p.resolve()
-        try:
-            shown = str(p.relative_to(self.root))
-        except ValueError:
-            shown = str(p)
+        shown = str(p.relative_to(self.root))
         if p.is_dir():
             return f"{shown}/ (directory)"
         modified = datetime.fromtimestamp(p.stat().st_mtime, timezone.utc)
-        note = f"{len(p.read_text(encoding='utf-8', errors='replace').split())} words, modified {modified:%H:%M:%S} UTC"
+        note = f"{word_count(p.read_text(encoding='utf-8', errors='replace'))} words, modified {modified:%H:%M:%S} UTC"
         if since and modified.isoformat(timespec="seconds") < since:
             note += ", NOT modified since this task was assigned"
         return f"{shown} ({note})"
@@ -652,7 +671,7 @@ class Org:
             raise OrgError(f"not found: {path} (paths are relative to the org root)")
         text = p.read_text(encoding="utf-8", errors="replace")
         modified = datetime.fromtimestamp(p.stat().st_mtime, timezone.utc)
-        head = f"[{p.relative_to(self.root)}: {len(text.split())} words, {text.count(chr(10))} lines, modified {modified:%H:%M:%S} UTC]\n"
+        head = f"[{p.relative_to(self.root)}: {word_count(text)} words, {text.count(chr(10))} lines, modified {modified:%H:%M:%S} UTC]\n"
         limit = 100_000
         return head + (text if len(text) <= limit else text[:limit] + f"\n... (truncated, {len(text)} chars total)")
 
