@@ -420,7 +420,7 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
         folder agents may write in), budget_runs (the user's cap), models {cheap, strong}, model_policy, review
         (true/false), approval, progress, kind (research|writing|code), code {tests, packaging, commits}}; `agents`:
         ONE top-level agent (template manager) with `children`; each agent has name and a template (manager,
-        researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer) or a charter, and optionally
+        researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker) or a charter, and optionally
         model, tools, workspace, scale; `task` {to, title, goal, acceptance: list of exact, checkable criteria}.
         Works before the organization exists. Returns (1) a block headed "PLAN FOR YOU": show it to the user exactly
         as written and wait for their explicit approval; (2) Details, the full plan for you; (3) a plan_id that
