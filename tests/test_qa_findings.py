@@ -52,14 +52,12 @@ def drain(org, addr, ok=True):
 # ------------------------------------------------------------------ write guard
 
 
-@pytest.mark.xfail(strict=True, reason="QA-1: write guard compares names case-sensitively (Inbox/, agent.md, memory.md)")
 def test_qa1_case_variants_of_protected_names_are_refused(org):
     for path in ("ceo/agent.md", "ceo/Inbox/x.md", "ceo/READ/x.md", "ceo/Runs/x.log", "ceo/memory.md"):
         with pytest.raises(OrgError):
             org.resolve_write("ceo", path)
 
 
-@pytest.mark.xfail(strict=True, reason="QA-1: on a case-insensitive FS an agent can rewrite its own charter and forge inbox mail")
 def test_qa1_case_variant_cannot_rewrite_own_charter_or_mint_budget(org):
     if not case_insensitive_fs(org):
         pytest.skip("needs a case-insensitive filesystem (macOS/Windows default)")
@@ -79,7 +77,6 @@ def test_qa1_case_variant_cannot_rewrite_own_charter_or_mint_budget(org):
     assert org.budget("ceo") == before
 
 
-@pytest.mark.xfail(strict=True, reason="QA-2: write() to <me>/<new>/AGENT.md creates an agent without hire() checks")
 def test_qa2_write_cannot_create_agents_around_hire_rules(org):
     # eng is a leaf (can_hire is false) yet can mint a report that may itself hire 99 people
     charter = "---\nrole: sneaky\ncan_hire: true\nmax_children: 99\n---\n# x"
@@ -187,7 +184,6 @@ def test_qa16_timeout_kills_the_whole_process_group(org, tmp_path):
 # ----------------------------------------------------------- budget and reviews
 
 
-@pytest.mark.xfail(strict=True, reason="QA-6: budget handed to a report vanishes when the report is retired")
 def test_qa6_retire_returns_unspent_budget_to_the_parent(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     org.delegate("ceo", ENG, "t", "g", "a", budget=5)
@@ -231,12 +227,10 @@ def test_qa14_failed_runs_are_not_blamed_as_wasteful(org):
 # --------------------------------------------------------------------- core API
 
 
-@pytest.mark.xfail(strict=True, reason="QA-9: retire() rejects the full address that every other tool and the review notes use")
 def test_qa9_retire_accepts_the_full_address_of_a_direct_report(org):
     assert org.retire("ceo", ENG, "full address, as printed by status/health/review notes") == ENG
 
 
-@pytest.mark.xfail(strict=True, reason="QA-10: 'orgmcp resume ceo/' (tab completion) clears the pause but not the failure count")
 def test_qa10_resume_with_trailing_slash_clears_failures(org):
     org.pause("ceo", "failures")
     for _ in range(3):
@@ -245,13 +239,11 @@ def test_qa10_resume_with_trailing_slash_clears_failures(org):
     assert org.ledger("failures").get("ceo", 0) == 0
 
 
-@pytest.mark.xfail(strict=True, reason="QA-11: NAME_RE uses '$', so a name with a trailing newline is accepted")
 def test_qa11_hire_rejects_name_with_trailing_newline(org):
     with pytest.raises(OrgError):
         org.hire("ceo", "ops\n", "Ops", "Do ops.")
 
 
-@pytest.mark.xfail(strict=True, reason="QA-12: deliver() writes the recipient copy before the sender copy; a failure in between mints budget")
 def test_qa12_failed_send_does_not_mint_budget(org, monkeypatch):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     real = core.atomic_write
@@ -268,7 +260,6 @@ def test_qa12_failed_send_does_not_mint_budget(org, monkeypatch):
     assert org.budget("ceo") + org.budget(ENG) <= 10
 
 
-@pytest.mark.xfail(strict=True, reason="QA-15: report() accepts artifacts outside the organization (any readable host file)")
 def test_qa15_report_refuses_artifacts_outside_the_org(org, tmp_path):
     outside = tmp_path / "secret.txt"
     outside.write_text("not part of the org")

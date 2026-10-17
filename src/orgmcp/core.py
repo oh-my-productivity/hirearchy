@@ -22,10 +22,12 @@ import re
 import secrets
 import shutil
 import subprocess
+import unicodedata
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import NamedTuple
 
 import yaml
 
@@ -36,7 +38,8 @@ RUNTIME = "runtime"
 BOXES = ("inbox", "inflight", "read", "sent")
 RUNTIME_NAMES = {*BOXES, "runs", ".paused", ".kiro", ".runtime", ".retired", ".git", ".gitignore"}
 RESERVED = RUNTIME_NAMES | {"work", "root", "runtime", "agent", "memory", "org"}
-NAME_RE = re.compile(r"^[a-z][a-z0-9-]{0,31}$")
+# Always use NAME_RE.fullmatch: a "$" anchor would accept a trailing newline ("ops\n"), so \Z is used as well.
+NAME_RE = re.compile(r"[a-z][a-z0-9-]{0,31}\Z")
 MESSAGE_TYPES = ("task", "result", "note")
 RESULT_STATUSES = ("done", "failed", "blocked")
 DEFAULT_CONFIG = {
@@ -95,6 +98,54 @@ def atomic_write(path: Path, text: str) -> None:
     tmp = path.parent / f".tmp-{secrets.token_hex(4)}-{path.name}"
     tmp.write_text(text, encoding="utf-8")
     os.replace(tmp, path)
+
+
+def _fold(name: str) -> str:
+    """Key under which two file names count as the same name on *some* filesystem.
+
+    macOS (APFS/HFS+) and Windows ignore letter case (and Unicode form); Windows also ignores trailing dots and
+    spaces. Protected names are compared through this key, so the write guard behaves identically on case-sensitive
+    and case-insensitive filesystems: it never has to ask the filesystem which kind it is.
+    """
+    return unicodedata.normalize("NFKC", name).casefold().rstrip(" .")
+
+
+_FOLDED_RUNTIME_NAMES = {_fold(n) for n in RUNTIME_NAMES}
+# Files an agent may only write under their exact spelling (any other casing is a different name on Linux and the
+# same file on macOS, so it is refused outright).
+_EXACT_FILES = {_fold(n): n for n in ("AGENT.md", "MEMORY.md", "ORG.md")}
+
+
+def _case_twin(parent: Path, name: str) -> str | None:
+    """The existing entry of ``parent`` that equals ``name`` except for case, if there is one."""
+    try:
+        names = os.listdir(parent)
+    except OSError:
+        return None
+    if name in names:
+        return None
+    key = _fold(name)
+    return next((n for n in names if _fold(n) == key), None)
+
+
+_FENCE_LINE = re.compile(r"\s*(?:`{3,}|~{3,})\S*\s*")
+_LINE_MARKER = re.compile(r"\s*(?:>|#{1,6}(?=\s)|[-*+\u2022](?=\s)|\d{1,3}[.)](?=\s)|\[[ xX]\](?=\s))")
+_MARKUP_ONLY = re.compile(r"[#*+=_~`>|:\-\u2022]+")
+
+
+def word_count(text: str) -> int:
+    """Words of ``text`` for word limits: markdown markers (``#``, ``-``, ``*``, ``1.``, ``|``, ``---``, fence lines,
+    ``>``, checkboxes) are not words; the words next to them are."""
+    total = 0
+    for line in text.splitlines():
+        if _FENCE_LINE.fullmatch(line):
+            continue
+        if line.lstrip().startswith("|"):  # table row: the pipes are delimiters
+            line = line.replace("|", " ")
+        while (m := _LINE_MARKER.match(line)) and m.end() > 0:
+            line = line[m.end():]
+        total += sum(1 for tok in line.split() if not _MARKUP_ONLY.fullmatch(tok))
+    return total
 
 
 def _visible(paths) -> list[Path]:
@@ -208,6 +259,12 @@ class Message:
         return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{body}\n"
 
 
+class Retired(NamedTuple):
+    addr: str
+    refunded: int  # runs of unspent team budget returned to ``refunded_to``
+    refunded_to: str | None
+
+
 class Org:
     def __init__(self, root: str | Path):
         self.root = Path(root).expanduser().resolve()
@@ -279,7 +336,7 @@ class Org:
         if a == ROOT:
             return True
         parts = a.split("/")
-        if not all(NAME_RE.match(p) and p not in RESERVED for p in parts):
+        if not all(NAME_RE.fullmatch(p) and p not in RESERVED for p in parts):
             return False
         return (self.dir(a) / "AGENT.md").is_file()
 
@@ -312,7 +369,7 @@ class Org:
         return [
             self.child_addr(a, p.name)
             for p in sorted(d.iterdir())
-            if p.is_dir() and NAME_RE.match(p.name) and p.name not in RESERVED and (p / "AGENT.md").is_file()
+            if p.is_dir() and NAME_RE.fullmatch(p.name) and p.name not in RESERVED and (p / "AGENT.md").is_file()
         ]
 
     def agents(self) -> list[str]:
@@ -396,9 +453,11 @@ class Org:
         msg.id = msg.id or self.new_id(msg.sender)
         msg.created = msg.created or utcnow().isoformat(timespec="seconds")
         text = msg.to_text()
-        atomic_write(self.dir(msg.to) / "inbox" / f"{msg.id}.md", text)
+        # Sender's copy first: it is what charges a budget grant. A failure between the two writes can then only
+        # leave a message charged but undelivered (recover() re-delivers it), never delivered but uncharged.
         if msg.sender != RUNTIME:
             atomic_write(self.dir(msg.sender) / "sent" / f"{msg.id}.md", text)
+        atomic_write(self.dir(msg.to) / "inbox" / f"{msg.id}.md", text)
         return msg
 
     def notify(self, to: str, title: str, body: str) -> Message:
@@ -519,17 +578,16 @@ class Org:
         p = Path(path).expanduser()
         if not p.is_absolute():
             p = next((b / p for b in (self.root, self.dir(actor)) if (b / p).exists()), self.root / p)
+        p = p.resolve()
+        if p != self.root and self.root not in p.parents:  # checked before existence: no probing of the host
+            raise OrgError(f"artifacts must be inside the organization: {path} (paths are relative to the org root)")
         if not p.exists():
             raise OrgError(f"artifact not found: {path} (paths are relative to the org root)")
-        p = p.resolve()
-        try:
-            shown = str(p.relative_to(self.root))
-        except ValueError:
-            shown = str(p)
+        shown = str(p.relative_to(self.root))
         if p.is_dir():
             return f"{shown}/ (directory)"
         modified = datetime.fromtimestamp(p.stat().st_mtime, timezone.utc)
-        note = f"{len(p.read_text(encoding='utf-8', errors='replace').split())} words, modified {modified:%H:%M:%S} UTC"
+        note = f"{word_count(p.read_text(encoding='utf-8', errors='replace'))} words, modified {modified:%H:%M:%S} UTC"
         if since and modified.isoformat(timespec="seconds") < since:
             note += ", NOT modified since this task was assigned"
         return f"{shown} ({note})"
@@ -565,7 +623,7 @@ class Org:
         workspace: str | None = None,
     ) -> str:
         actor = self.require(actor)
-        if not NAME_RE.match(name) or name in RESERVED:
+        if not NAME_RE.fullmatch(name) or name in RESERVED:
             raise OrgError("name must be lowercase letters, digits and dashes (max 32), and not a reserved word")
         tools = sorted(set(tools or []))
         meta, _ = self.charter(actor)
@@ -613,9 +671,22 @@ class Org:
                 raise OrgError(f"a report's workspace must be inside yours ({mine})")
 
     def retire(self, actor: str, name: str, reason: str) -> str:
+        """Remove a direct report and its team; returns the retired address. See :meth:`retire_team`."""
+        return self.retire_team(actor, name, reason).addr
+
+    def retire_team(self, actor: str, name: str, reason: str) -> Retired:
+        """Retire a direct report (short name or full address; root: any agent by full address) and its team.
+
+        Open tasks the team owes the outside are closed as failed, and the team's unspent budget is returned to the
+        retired agent's parent as a runtime note carrying the budget (nothing when the parent is root, who has no
+        limit), so budget stays derived from files and is neither destroyed nor minted.
+        """
         actor = self.require(actor)
-        addr = self.norm(name) if actor == ROOT and "/" in name else self.child_addr(actor, name)
+        short = self.norm(name)
+        addr = short if "/" in short else self.child_addr(actor, short)
         addr = self.require(addr)
+        if addr == ROOT:
+            raise OrgError("the root of the organization cannot be retired")
         if actor != ROOT and self.parent(addr) != actor:
             raise OrgError("you can only retire your direct reports")
         team = set(self.subtree(addr))
@@ -626,10 +697,18 @@ class Org:
                         sender=a, to=task.sender, type="result", title=task.title, reply_to=task.id,
                         status="failed", body=f"## Summary\nAgent {a} was retired by {actor}: {reason}",
                     ))
+        parent = self.parent(addr)
+        # Grants inside the team cancel out, so this is what the parent handed down minus what the team ran.
+        refund = max(0, sum(self.budget(a) or 0 for a in team)) if parent != ROOT else 0
         dest = self.root / ".retired" / f"{addr.replace('/', '.')}-{utcnow():%Y%m%dT%H%M%S}"
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(self.dir(addr)), dest)
-        return addr
+        if refund:  # after the move: a crash in between loses the refund rather than counting it twice
+            self.deliver(Message(
+                sender=RUNTIME, to=parent, type="note", budget=refund, title=f"Budget returned from {addr}",
+                body=templates.notice_budget_returned(addr, refund, actor, reason),
+            ))
+        return Retired(addr, refund, parent if refund else None)
 
     # ------------------------------------------------------------- file access
 
@@ -648,7 +727,7 @@ class Org:
             raise OrgError(f"not found: {path} (paths are relative to the org root)")
         text = p.read_text(encoding="utf-8", errors="replace")
         modified = datetime.fromtimestamp(p.stat().st_mtime, timezone.utc)
-        head = f"[{p.relative_to(self.root)}: {len(text.split())} words, {text.count(chr(10))} lines, modified {modified:%H:%M:%S} UTC]\n"
+        head = f"[{p.relative_to(self.root)}: {word_count(text)} words, {text.count(chr(10))} lines, modified {modified:%H:%M:%S} UTC]\n"
         limit = 100_000
         return head + (text if len(text) <= limit else text[:limit] + f"\n... (truncated, {len(text)} chars total)")
 
@@ -664,11 +743,28 @@ class Org:
                 f"you may only write inside your own directory. Paths are relative to the org root, so yours "
                 f"start with `{prefix}`: e.g. `{prefix}MEMORY.md` or `{prefix}work/notes.md` (got `{path}`)"
             )
-        first = p.relative_to(base).parts[0]
-        if first in RUNTIME_NAMES or first.startswith("."):
+        rel = p.relative_to(base).parts
+        first = rel[0]
+        if _fold(first) in _FOLDED_RUNTIME_NAMES or first.startswith("."):
             raise OrgError(f"{first} is managed by the runtime; use send/delegate/report to communicate")
-        if first == "AGENT.md":
-            raise OrgError("your charter is owned by your parent")
+        exact = _EXACT_FILES.get(_fold(first))
+        if exact and first != exact:
+            raise OrgError(f"that name is reserved: it must be spelled exactly `{exact}`")
+        cur = base
+        for part in rel:  # a spelling that differs only by case from an existing entry would alias it on macOS
+            twin = _case_twin(cur, part)
+            if twin:
+                raise OrgError(f"`{part}` differs only by letter case from the existing `{twin}`; use the exact name `{twin}`")
+            cur = cur / part
+        if any(_fold(part) == "agent.md" for part in rel):
+            if len(rel) == 1:
+                raise OrgError("your charter is owned by your parent")
+            reports = {c.rsplit("/", 1)[-1] for c in self.children(actor)}
+            if rel != (rel[0], "AGENT.md") or rel[0] not in reports:
+                raise OrgError(
+                    "AGENT.md can only be written for an existing direct report; "
+                    "create agents with hire (it enforces hiring rights, limits and authority)"
+                )
         if first == "ORG.md" and actor != ROOT:
             raise OrgError("ORG.md is owned by root")
         if (base / first / "AGENT.md").is_file() and p != base / first / "AGENT.md":
@@ -729,12 +825,47 @@ class Org:
         return p
 
     def recover(self) -> list[str]:
-        """After a crash: return every inflight batch to its inbox."""
+        """After a crash: return every inflight batch to its inbox, and finish interrupted deliveries.
+
+        Returns the agents whose interrupted run was recovered (see :meth:`redeliver_orphans` for the other part).
+        """
         out = []
         for a in self.agents():
             if self.messages(a, "inflight"):
                 self.end_run(a, ok=False)
                 out.append(a)
+        self.redeliver_orphans()
+        return out
+
+    def redeliver_orphans(self) -> list[str]:
+        """Deliver every sent message whose recipient has no copy (``deliver`` writes ``sent/`` first).
+
+        A message is delivered when its id is in the recipient's inbox, inflight or read; ids are unique across the
+        organization, so one scan of the file names finds the orphans without parsing the whole history. Messages
+        to agents that no longer exist are left alone. Returns the ids that were re-delivered.
+        """
+        owners = [ROOT, *self.agents()]
+        have = {
+            p.stem
+            for a in owners
+            for box in ("inbox", "inflight", "read")
+            if (self.dir(a) / box).is_dir()
+            for p in _visible((self.dir(a) / box).glob("*.md"))
+        }
+        out = []
+        for a in owners:
+            d = self.dir(a) / "sent"
+            for p in _visible(d.glob("*.md")) if d.is_dir() else []:
+                if p.stem in have:
+                    continue
+                try:
+                    msg = Message.load(p)
+                except Exception:  # noqa: BLE001 - an unreadable file is not ours to fix here
+                    continue
+                to = self.norm(msg.to)
+                if self.exists(to):
+                    atomic_write(self.dir(to) / "inbox" / p.name, p.read_text(encoding="utf-8"))
+                    out.append(msg.id)
         return out
 
     def running(self, addr: str) -> bool:
