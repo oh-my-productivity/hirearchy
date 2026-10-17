@@ -281,6 +281,10 @@ class Scheduler:
             run.logf.close()
             del self.runs[addr]
             ok = code == 0
+            if not self.org.exists(addr):  # retired while the run was in flight: nothing left to settle
+                self.echo(f"{addr}: was retired during its run (exit {code}); nothing to settle")
+                self.org.commit(f"{addr}: run ended after retirement (exit {code})")
+                continue
             self.org.end_run(addr, ok)
             if ok:
                 self.org.clear_failures(addr)

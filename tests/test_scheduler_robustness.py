@@ -138,3 +138,32 @@ def test_bad_scheduler_settings_fall_back_to_defaults(org):
     sched = Scheduler(org, lambda o, a, p: (["true"], o.dir(a), dict(os.environ)), echo=lambda _: None)
     run_to_idle(sched)
     assert org.runs_used("ceo") == 1
+
+
+# ------------------------------------------------- QA-3: retire during a run
+
+
+def test_end_run_is_a_noop_for_a_vanished_agent(org):
+    org.retire(ROOT, "ceo", "gone")
+    org.end_run("ceo", ok=False)
+    org.end_run("ceo/eng", ok=True)
+    assert not (org.root / "ceo").exists()
+
+
+def test_failed_run_of_a_retired_agent_leaves_no_trace(org):
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
+    messages = []
+    sched = Scheduler(org, lambda o, a, p: (["sh", "-c", "exit 3"], o.dir(a), dict(os.environ)), echo=messages.append)
+    sched.acquire()
+    try:
+        sched.tick()
+        sched.runs["ceo"].proc.wait()
+        org.retire(ROOT, "ceo", "no longer needed")
+        sched._reap()
+    finally:
+        sched.release()
+    assert not (org.root / "ceo").exists() and sched.runs == {}
+    assert org.ledger("failures") == {} and org.paused("ceo") is None
+    assert not [m for m in org.messages(ROOT, "inbox") if "keeps failing" in m.title]
+    retired_logs = list((org.root / ".retired").glob("ceo-*/runs/*.log"))
+    assert retired_logs and "# exit 3" in retired_logs[0].read_text()  # the log handle was closed and flushed

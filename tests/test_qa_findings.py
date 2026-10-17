@@ -93,7 +93,6 @@ def test_qa2_write_cannot_create_agents_around_hire_rules(org):
 # ------------------------------------------------------------------- scheduler
 
 
-@pytest.mark.xfail(strict=True, reason="QA-3: retiring an agent whose run is in flight crashes Scheduler._reap (end_run mkdir)")
 def test_qa3_retiring_a_running_agent_does_not_crash_the_scheduler(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
     sched = Scheduler(org, quiet_runner(), echo=lambda _: None)

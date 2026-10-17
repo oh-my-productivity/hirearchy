@@ -651,7 +651,13 @@ class Org:
         return self.messages(addr, "inflight")
 
     def end_run(self, addr: str, ok: bool) -> None:
-        """Success: the batch is processed. Failure: put it back for a retry (at-least-once)."""
+        """Success: the batch is processed. Failure: put it back for a retry (at-least-once).
+
+        A no-op for an agent that no longer exists (retired while its run was in flight): its directory is gone,
+        and creating the mailbox again would leave a ghost directory behind.
+        """
+        if not self.exists(addr):
+            return
         d = self.dir(addr)
         target = d / ("read" if ok else "inbox")
         target.mkdir(exist_ok=True)
