@@ -66,3 +66,84 @@ def test_cli_hire_inputs_is_repeatable(org, dirs, capsys):
     assert org.inputs_of("reader") == [dirs["docs"], dirs["other"]]
     main(["--root", str(org.root), "hire", "root", "plain", "--role", "P", "--charter", "x"])
     assert "inputs" not in org.charter("plain")[0]
+
+
+# ---------------------------------------------------------------- plan access text == what kiro enforces
+
+import re
+import yaml
+
+from orgmcp import blueprint_examples as ex
+from orgmcp.scheduler import file_confinement
+
+KNOWN_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}
+
+
+@pytest.fixture
+def cwd(tmp_path, monkeypatch):
+    """The 'user's current directory' the examples build their absolute paths from."""
+    monkeypatch.setenv("ORGMCP_WORKSPACE_ROOTS", str(tmp_path))
+    work = tmp_path / "cwd"
+    work.mkdir()
+    monkeypatch.chdir(work)
+    return work
+
+
+def filled(kind: str, base: Path) -> dict:
+    """An example with its path placeholders replaced by real folders (prose placeholders are valid YAML as they are)."""
+    for name in ("docs", "proj", "deliverables"):
+        (base / name).mkdir(exist_ok=True)
+    text = ex.example(kind, base)
+    text = text.replace("<folder-with-your-files>", "docs").replace("<project-folder>", "proj").replace("<name>", "result")
+    return yaml.safe_load(text)
+
+
+def paths_in(text: str) -> set[str]:
+    return {p.rstrip(".") for p in re.findall(r"/[\w./-]+", text)}
+
+
+@pytest.mark.parametrize("kind", ex.KINDS)
+def test_plan_and_access_line_show_exactly_the_applied_confinement(kind, cwd, tmp_path):
+    bp = filled(kind, cwd)
+    roots = [tmp_path]
+    agents = {a.addr: a for a in bpm._resolve(bp, None, roots, [])}
+    o = Org.init(tmp_path / "org", "x", {"poll_seconds": 0.05})
+    bpm.apply(o, bp, allowed_roots=roots)
+    shells = 0
+    for addr, agent in agents.items():
+        tools = o.charter(addr)[0].get("tools") or []
+        _, settings = file_confinement(o.root, tools, o.workspace_of(addr), o.inputs_of(addr))
+        enforced = set()
+        for rule in settings.values():
+            enforced |= {p[:-3] if p.endswith("/**") else p for p in rule["allowedPaths"]}
+        plan, technical = bpm._agent_access(agent), bpm._access(agent)
+        told = {str(o.workspace_of(addr))} if "shell" in tools and o.workspace_of(addr) else set()
+        if "read" not in tools:  # no built-in read: the inputs are opened with orgmcp `read` by absolute path
+            told |= set(map(str, o.inputs_of(addr)))
+        for line in (plan, technical):
+            assert paths_in(line) == enforced | told, (addr, line, enforced)
+            assert ("NOT confined" in line) == ("shell" in tools), (addr, line)
+        shells += "shell" in tools
+        assert ("write" in tools) == ("changes files only in" in plan), (addr, plan)
+        if "write" not in tools and "shell" not in tools:
+            assert "cannot change your files" in plan
+    assert shells == (4 if kind == "code" else 0)  # engineer, tester, code-reviewer, and the manager holding what they hold
+
+
+def test_plan_words_for_each_access_shape():
+    def line(**kw):
+        return bpm._agent_access(bpm.Agent(addr="a", name="a", parent=None, where="agents[a]", **kw))
+    assert line(tools=["read"], inputs=["/in"]) == "can read files only in /in; cannot change your files"
+    assert line(tools=["read"]) == "can read no files outside the organization; cannot change your files"
+    assert line(tools=[]) == "cannot change your files"
+    assert line(tools=["web_search", "web_fetch"]) == "can search the web and read web pages; cannot change your files"
+    assert line(tools=[], inputs=["/in"]) == "can read /in through the organization's read tool; cannot change your files"
+    assert line(tools=["read", "write"], workspace="/ws", inputs=["/in"]) \
+        == "can read files in /ws, /in (/in read-only); changes files only in /ws"
+    assert line(tools=["write"]) == "changes no files (no workspace)"
+    shell = line(tools=["read", "shell", "write"], workspace="/ws")
+    assert shell.startswith("can read files in /ws; changes files only in /ws; can run commands, which are NOT confined")
+    assert "told to stay in /ws" in shell and "cannot change your files" not in shell
+    manager = line(tools=["read"], inputs=["/in"], kind="manager", children=["a/k"])
+    assert manager == "directs the team; does not produce the work itself; can read files only in /in; cannot change your files"
+    assert line(tools=[], kind="manager", children=["a/k"]) == "directs the team; does not produce the work itself"

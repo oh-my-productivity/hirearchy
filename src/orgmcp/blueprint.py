@@ -850,17 +850,35 @@ def _charter(a: Agent, agents: list[Agent], bp: dict, split: dict[str, dict]) ->
 # ----------------------------------------------------------------------------------------------- plan
 
 
+def access_facts(a: Agent) -> dict:
+    """What the runtime lets this agent reach with kiro's file tools: the ONE computation behind both the technical
+    ``Access:`` line (``_access``, in the details and each agent's prompt) and the plain-words line of the PLAN FOR YOU
+    (``_agent_access``), so the user is shown exactly what is enforced. Mirrors ``scheduler.file_confinement``:
+    ``write`` only under the workspace, ``read`` in workspace + inputs, ``shell`` not confined.
+    """
+    read = "read" in a.tools
+    return {
+        "write": ("write" in a.tools, a.workspace),                 # (granted, the only folder it may change)
+        "read": (read, [b for b in (a.workspace, *a.inputs) if b]),  # (granted, every folder kiro lets it read)
+        "inputs": list(a.inputs),                                    # read-only folders
+        "inputs_via_orgmcp": bool(a.inputs) and not read,            # inputs it can only open with orgmcp `read`
+        "shell": ("shell" in a.tools, a.workspace),                  # (granted, where it is told to stay; not enforced)
+        "web": [t for t in a.tools if t in ("web_search", "web_fetch")],
+    }
+
+
 def _access(a: Agent) -> str:
     """One line on what the runtime lets this agent reach with kiro's file tools (and what it only instructs)."""
+    f = access_facts(a)
     bits = []
-    if "write" in a.tools:
+    if f["write"][0]:
         bits.append(f"kiro write only in {a.workspace}" if a.workspace else "kiro write nowhere")
-    if "read" in a.tools:
-        bases = [b for b in (a.workspace, *a.inputs) if b]
+    if f["read"][0]:
+        bases = f["read"][1]
         bits.append("kiro read only in " + ", ".join(bases) if bases else "kiro read nowhere")
-    if a.inputs and "read" not in a.tools:
-        bits.append("read-only inputs (orgmcp read): " + ", ".join(a.inputs))
-    if "shell" in a.tools:
+    if f["inputs_via_orgmcp"]:
+        bits.append("read-only inputs (orgmcp read): " + ", ".join(f["inputs"]))
+    if f["shell"][0]:
         bits.append("shell NOT confined (instructed only)")
     return "; ".join(bits)
 
@@ -1006,14 +1024,32 @@ def _clip(text: str, limit: int = 220) -> str:
 
 
 def _agent_access(a: Agent) -> str:
-    """What the agent may touch, in plain words (one phrase; the one place to extend with more access detail)."""
-    tools = ", ".join(TOOL_WORDS.get(t, t) for t in a.tools)
-    if a.kind == "manager" or a.children:
-        return "directs the team; does not produce the work itself"
-    changes = any(t in a.tools for t in WRITE_TOOLS)
-    where = (f"changes files only in {a.workspace}" if a.workspace else "changes files only in its own folder") if changes \
-        else "cannot change your files"
-    return f"can {tools}; {where}" if tools else f"uses no tools; {where}"
+    """What the agent may touch, in plain words: the same facts as the ``Access:`` line (``access_facts``)."""
+    f = access_facts(a)
+    ws, bits = a.workspace, []
+    if f["web"]:
+        bits.append("can " + " and ".join(TOOL_WORDS[t] for t in f["web"]))
+    if f["read"][0]:
+        bases = f["read"][1]
+        ins = f["inputs"]
+        if f["write"][0] and ws:
+            bits.append("can read files in " + ", ".join(bases) + (f" ({', '.join(ins)} read-only)" if ins else ""))
+        elif bases:
+            bits.append("can read files only in " + ", ".join(bases))
+        else:
+            bits.append("can read no files outside the organization")
+    elif f["inputs_via_orgmcp"]:
+        bits.append("can read " + ", ".join(f["inputs"]) + " through the organization's read tool")
+    if f["write"][0]:
+        bits.append(f"changes files only in {ws}" if ws else "changes no files (no workspace)")
+    if f["shell"][0]:
+        bits.append("can run commands, which are NOT confined: it is told to stay in "
+                    + (str(ws) if ws else "its own folder") + ", but nothing enforces that")
+    if not f["write"][0] and not f["shell"][0]:
+        bits.append("cannot change your files")
+    lead = "directs the team; does not produce the work itself" if (a.kind == "manager" or a.children) else ""
+    text = "; ".join(bits)
+    return f"{lead}; {text}" if lead and text and text != "cannot change your files" else (lead or text)
 
 
 def _user_tree(agents: list[Agent]) -> list[str]:

@@ -22,7 +22,7 @@ from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
 from orgmcp.skill import skill_source
 
 FAKE = str(Path(__file__).with_name("fake_agent.py"))
-ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "unknown-key"}  # unknown-key: needs.inputs before X1 lands
+ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}  # shell-unconfined: the code example grants shell
 
 
 def call(server, tool, **args):
