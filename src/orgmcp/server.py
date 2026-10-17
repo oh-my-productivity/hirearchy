@@ -216,8 +216,9 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
         you may report the task again, once per blocked report (any status; the new report supersedes the old one),
         under the same rules. A `send` note never changes a task's outcome and must not claim criteria are met.
         summary: at most ~10 lines; this is all your manager reads by default. artifacts: paths of the
-        files that hold the work (relative to the org root); they must exist. The runtime annotates each
-        with its word count and whether it changed since the task was assigned.
+        files that hold the work; they must exist. Files in the organization: path relative to the org root.
+        Files in your workspace: the ABSOLUTE path (anything else outside the organization is refused). The runtime
+        annotates each with its word count and whether it changed since the task was assigned.
         """
         org = binding.get()
         msg = org.report(me, task_id, status, summary, artifacts or [])
@@ -277,9 +278,11 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
 
     @mcp.tool()
     def read(path: str = ".") -> str:
-        """Read a file (with word count and modification time) or list a directory anywhere in the
-        organization. Paths are relative to the org root, e.g. "ceo/writer/work/brief.md"."""
-        return binding.get().read(path)
+        """Read a file (with word count and modification time) or list a directory in the organization. Paths are
+        relative to the org root, e.g. "ceo/writer/work/brief.md". Outside the organization only ABSOLUTE paths work,
+        and only inside your workspace, your read-only inputs, or the workspace of an agent in your team (to verify
+        what your reports made); anything else is refused."""
+        return binding.get().read(path, actor=me)
 
     @mcp.tool()
     def write(path: str, content: str, append: bool = False) -> str:

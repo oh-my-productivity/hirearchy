@@ -166,9 +166,18 @@ def notice_review_root(summary: str, items: list[str], skipped: dict[str, str]) 
     return "\n".join(lines)
 
 
-def kiro_profile(name: str, description: str, tools: list[str], mcp_server: dict) -> dict:
-    """A kiro-cli agent profile that loads only the orgmcp server (not the user's global mcp.json)."""
-    return {
+def kiro_profile(
+    name: str, description: str, tools: list[str], mcp_server: dict, *,
+    allowed_tools: list[str] | None = None, tools_settings: dict | None = None,
+) -> dict:
+    """A kiro-cli agent profile that loads only the orgmcp server (not the user's global mcp.json).
+
+    ``allowed_tools`` = the tools kiro runs without asking (default: all of ``tools``). A tool that is NOT in it and has
+    ``tools_settings`` with ``allowedPaths`` runs unprompted only on those paths; anything else needs an approval,
+    which a ``--no-interactive`` run cannot give, so it is refused. A tool in ``allowed_tools`` ignores its
+    ``allowedPaths`` entirely (only ``deniedPaths`` still apply), so confined tools must be left out of it.
+    """
+    data = {
         "name": name,
         "description": description,
         "prompt": (
@@ -178,8 +187,11 @@ def kiro_profile(name: str, description: str, tools: list[str], mcp_server: dict
         ),
         "mcpServers": {"orgmcp": mcp_server},
         "tools": tools,
-        "allowedTools": tools,
+        "allowedTools": tools if allowed_tools is None else allowed_tools,
         "resources": [],
         "hooks": {},
         "includeMcpJson": False,
     }
+    if tools_settings:
+        data["toolsSettings"] = tools_settings
+    return data

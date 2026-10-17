@@ -26,7 +26,7 @@ org/                      # root = you, the human
 - Task state and budget are derived from the message files, never stored separately.
 - Budget is counted in runs and passes down the tree: a child gets only what its parent hands it, and each delegation keeps a reserve so the parent can process the result. It comes back up in two ways, both as one message that is charged to the sender and credited to the recipient (so nothing is minted or lost): with a final result, and by hand. When an agent reports `done` or `failed` and has no other open task, no task it reported `blocked` (that may be re-reported), no outstanding delegation and no mail waiting for a run, everything it has left travels up with the result to whoever assigned it (the result shows "returns N run(s)", and its own reports have already returned theirs, so it cascades up). `blocked` returns nothing. An agent can also give runs back early with `send(to=<parent>, body, budget=N)` (the reserve for its own delegations stays). Budget still goes nowhere else: down to direct reports, up to the parent. Results written before this existed carry no budget and mean what they always did. `delegate` without a `budget` hands down `min(default_budget, remaining - reserve)` (one run reserved per outstanding delegation plus one for the new one) and fails with the options if that is below 1.
 - Reviews follow the single-writer rule (rule 9 of the protocol in `ORG.md`): a reviewer or fact-checker never edits the author's file; it reports its findings and the changes it requires to whoever assigned the review, and the author applies them (`delegate(..., revises=<task id>)`). Acceptance criteria and charters must never require an agent to edit another agent's files. The protocol text is copied into `ORG.md` when an organization is created, so an existing organization keeps the text it was created with (the runtime rules above apply to it regardless). `orgmcp upgrade-rules [--dry-run]` rewrites the body of its `ORG.md` to the current text, keeping the frontmatter and the mission, and prints what changed (each agent sees the new rules from its next run).
-- Authority only narrows: a parent cannot grant tools or a workspace it doesn't have.
+- Authority only narrows: a parent cannot grant tools, a workspace or inputs it doesn't have.
 - The write guard is the same on case-sensitive and case-insensitive filesystems (`agent.md`, `Memory.md` or a `RUNS` directory are refused, as are names that differ from an existing file only by case), and `AGENT.md` is created only by `hire`. `write` is confined to your own directory, `report` artifacts to the organization; `retire` takes a short name or full address and returns the team's unspent budget to the retired agent's parent as a runtime note (nothing when that parent is root). That note is non-waking (`wake: false`): it counts towards budget at once and lifts a budget pause, but does not start a run; it is held in the inbox, not counted as unread (scheduling, health), and delivered with the agent's next real batch.
 - Guards: hop limit (loops), max depth/children, out-of-budget pause with a parent notice, per-run timeout, one scheduler per org, and a git commit after every run. Also:
   - Stall ladder: checked every tick, per open task. If the assignee is idle (not running, no unread mail, not paused, not waiting on delegations) for `stall_after` seconds (default 600), it gets a reminder; each further `stall_after` the runtime tells the assigner, then each ancestor up to root, then stops. State is in `.runtime/nudges.json`.
@@ -103,12 +103,13 @@ needs:                                # the elicited requirements (free text unl
   scope: ...
   deliverable: {description: ..., format: ..., max_words: 1500, path: /abs/path/file.md}
   quality_bar: ...   sources: ...   workspace: /abs/project/dir   budget_runs: 25   # the user's cap
+  inputs: [/abs/read-only/dir]        # sources agents may read but never change (kiro enforces it; see Workspaces, inputs and confinement)
   models: {cheap: <model id>, strong: <model id>}   model_policy: ...
   review: true                        # independent reviewer required
   approval: ...   progress: ...   kind: research|writing|code   code: {tests: ..., packaging: ..., commits: ...}
 agents:                               # exactly one top-level agent; nested tree
   - {name: lead, template: manager, model: strong, children: [{name: w, template: writer, model: cheap}]}
-        # per agent: role, template or charter, model (id, or cheap/strong), tools, workspace, can_hire, max_children, scale
+        # per agent: role, template or charter, model (id, or cheap/strong), tools, workspace, inputs, can_hire, max_children, scale
 task: {to: lead, title: ..., goal: ..., acceptance: [exact, checkable items], inputs: [...], budget: 22}
 ```
 
@@ -306,6 +307,54 @@ on stdin. The scheduler writes one *internal* profile per organization (and per 
 - Older global profiles (`~/.kiro/agents/orgmcp*.json`) are no longer written or used; they are never deleted or
   rewritten, so remove them yourself when no scheduler that uses them is running.
 
+### Workspaces, inputs and confinement
+
+Two path worlds meet in a run: orgmcp tools (`read`, `write`, `report`, `delegate` inputs) use paths relative to the
+**org root**; kiro's own tools (`read`, `write`, `shell`) start in the agent's **workspace** (its charter `workspace`, else
+its org directory) and resolve relative paths there. An agent that writes `lead/writer/work/x.md` with kiro's `write`
+therefore creates that tree inside the user's folder, not in the org. The charter fields and the rules below keep the
+two apart.
+
+Charter fields: `workspace` (read-write, as before) and `inputs: [absolute paths]` (read-only; blueprint: `needs.inputs`
+for the whole project or `inputs` per agent). A report's inputs must be inside its manager's inputs or workspace (authority
+only narrows), inputs are absolute and never overlap the org directory. Charters without `inputs` keep working.
+
+**Enforced by kiro** (per-agent profiles, checked against kiro-cli 2.29.1 in `--no-interactive` mode; the experiments are
+in `studies/X1-confinement/EXPERIMENTS.md`). An agent with built-in `read` or `write` gets a profile
+`orgmcp-<org>-<hash>-<tools>-x<access hash>` (same `ORG_ROOT`/`ORG_REQUIRE_AGENT=1`, same "internal" description; agents with
+equal tools and access share it) whose `toolsSettings` say:
+
+```json
+"tools": ["@orgmcp", "read", "write"],
+"allowedTools": ["@orgmcp"],
+"toolsSettings": {
+  "write": {"allowedPaths": ["/ws/**"], "deniedPaths": ["/org", "/org/**"]},
+  "read":  {"allowedPaths": ["/ws", "/ws/**", "/inputs", "/inputs/**"], "deniedPaths": ["/org", "/org/**"]}
+}
+```
+
+- `read`/`write` are deliberately **not** in `allowedTools`: a trusted tool ignores `allowedPaths`. Left out, a call on an
+  allowed path runs, and any other path needs an approval, which a headless run cannot give: it is refused with "tool
+  permission approval is not supported in non-interactive mode". `..` traversal is refused too.
+- `write` only under the workspace (nowhere without one), so inputs are read-only and nothing is created beside them.
+  `read` under workspace + inputs. Neither reaches the org directory (hard deny, also over kiro's "the working directory is
+  readable" rule); the org is reached through orgmcp tools only.
+- Agents without built-in `read`/`write` keep the shared per-org profile. A legacy charter with only `read`, no workspace and
+  no `inputs` key keeps today's unconfined read; give it `inputs: []` (or real inputs) to confine it. A confined parent never
+  hands down an unconfined `read`.
+
+**Enforced by orgmcp:** `report(artifacts=...)` takes org paths (relative or absolute) and absolute paths inside the
+reporter's **own** workspace, annotated as before (words, modified, "NOT modified since..."); anything else outside the
+org is refused without probing. `read` takes relative org paths, and absolute paths inside the caller's workspace, its
+inputs, and the workspace of any agent in its subtree (a manager can verify what its team made); everything else outside
+the org is refused. Root's `read` is unchanged (organization only).
+
+**Only instructed:** `shell` cannot be confined (kiro has no path rule for it; it can write anywhere its OS user can), so an
+agent that holds it is told the rule in its charter and prompt, and the plan says so (`shell-unconfined` warning, "shell NOT
+confined" in its `Access:` line). The prompt's Files section (workspace, inputs, "never create org files in the workspace",
+"report workspace artifacts by absolute path") is guidance on top of the enforcement above. Symlinks inside a workspace that
+point out were not tested against kiro's own matching; orgmcp's `read`/`report` resolve them and refuse targets outside.
+
 Every command that changes an organization (`init`, `hire`, `task`, `apply`, `send`, `resume`, `run`, `review`, `inbox`
 without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first prints `org: <path>` to stderr. `python -m orgmcp` is the same as the `orgmcp` script.
 
@@ -313,8 +362,9 @@ without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first pri
 
 - Everything is local stdio with no network listener. Identity is enforced by the process environment, not by
   authentication: anything that can run `orgmcp mcp` with `ORG_AGENT` set can act as that agent.
-- The write rules apply to the orgmcp tools only. If a charter grants kiro built-ins (`write`, `shell`), that agent
-  can touch anything its OS user can. Grant them together with a `workspace` and only to agents that need them.
+- The orgmcp write rules apply to the orgmcp tools. kiro's built-in `read`/`write` are confined to the agent's workspace
+  and inputs by its profile (see [Workspaces, inputs and confinement](#workspaces-inputs-and-confinement)); `shell` is not:
+  an agent that holds it can touch anything its OS user can. Grant it only to agents that need it, with a `workspace`.
 
 ## Test
 

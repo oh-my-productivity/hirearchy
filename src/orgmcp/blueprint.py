@@ -7,11 +7,12 @@ A blueprint is a plain dict (YAML or JSON)::
       scope: ...
       deliverable: {description, format, max_words, path}
       quality_bar: ...  sources: ...  workspace: /abs/path  budget_runs: 25
+      inputs: [/abs/read-only/folder]   # read-only sources for the agents (kiro enforces: they cannot write there)
       models: {cheap: <model id>, strong: <model id>}   model_policy: ...
       review: true|false|text   approval: ...   progress: ...
       kind: research|writing|code    code: {tests, packaging, commits}
     agents:                     # exactly one top-level agent (budget flows down from it)
-      - {name, role, template, charter, model, tools, workspace, can_hire, max_children, scale, children: [...]}
+      - {name, role, template, charter, model, tools, workspace, inputs, can_hire, max_children, scale, children: [...]}
     task: {to, title, goal, acceptance: [exact, checkable items], inputs: [...], budget}
 
 ``validate`` encodes what went wrong in the usability studies as checks (errors block ``apply``, warnings are
@@ -155,6 +156,7 @@ class Agent:
     tier: str = ""
     tools: list[str] = field(default_factory=list)
     workspace: str | None = None
+    inputs: list[str] = field(default_factory=list)  # read-only paths (absolute), see ``_input_entries``
     can_hire: bool = False
     max_children: int = 5
     scale: int = 1
@@ -184,9 +186,9 @@ def _unknown(d: dict, known: set[str], where: str, issues: list[Issue]) -> None:
             issues.append(Issue("warning", where, f"unknown key '{k}' is ignored; check the spelling (known: {', '.join(sorted(known))})", "unknown-key"))
 
 
-NEEDS_KEYS = {"scope", "deliverable", "quality_bar", "sources", "workspace", "budget_runs", "models", "model_policy",
-              "review", "approval", "progress", "kind", "code"}
-AGENT_KEYS = {"name", "role", "template", "charter", "model", "tools", "workspace", "can_hire", "max_children",
+NEEDS_KEYS = {"scope", "deliverable", "quality_bar", "sources", "workspace", "inputs", "budget_runs", "models",
+              "model_policy", "review", "approval", "progress", "kind", "code"}
+AGENT_KEYS = {"name", "role", "template", "charter", "model", "tools", "workspace", "inputs", "can_hire", "max_children",
               "children", "scale", "kind"}
 
 
@@ -301,6 +303,46 @@ def _check_path(raw, where: str, issues: list[Issue], org: Org | None, roots: li
     return p
 
 
+def _input_entries(value, where: str, issues: list[Issue]) -> list[tuple[str, bool]]:
+    """``inputs`` as (path, overlap_ok) pairs. An entry is a path or ``{path: ..., allow_overlap: true}``."""
+    if value is None:
+        return []
+    items = [value] if isinstance(value, (str, dict)) else value
+    if not isinstance(items, list):
+        issues.append(Issue("error", where, "inputs must be a list of absolute paths (read-only sources)", "inputs"))
+        return []
+    out: list[tuple[str, bool]] = []
+    for item in items:
+        if isinstance(item, dict) and _s(item.get("path")):
+            out.append((_s(item["path"]), item.get("allow_overlap") is True))
+        elif isinstance(item, str) and item.strip():
+            out.append((item.strip(), False))
+        else:
+            issues.append(Issue("error", where, f"an input is an absolute path or {{path: ..., allow_overlap: true}}, not {item!r}", "inputs"))
+    return out
+
+
+def declared_inputs(bp: dict) -> list[tuple[str, str, bool]]:
+    """(where, path, overlap_ok) for every input the blueprint names: ``needs.inputs`` and each agent's ``inputs``."""
+    out: list[tuple[str, str, bool]] = []
+
+    def add(raw, where: str) -> None:
+        out.extend((where, p, ok) for p, ok in _input_entries(raw, where, []))
+
+    add(_needs(bp).get("inputs"), "needs.inputs")
+
+    def walk(agents, prefix: str) -> None:
+        for raw in agents if isinstance(agents, list) else []:
+            if not isinstance(raw, dict):
+                continue
+            addr = f"{prefix}/{_s(raw.get('name'))}" if prefix else _s(raw.get("name"))
+            add(raw.get("inputs"), f"agents[{addr}]")
+            walk(raw.get("children"), addr)
+
+    walk(bp.get("agents"), "")
+    return out
+
+
 def _resolve(bp: dict, org: Org | None, roots: list[Path], issues: list[Issue]) -> list[Agent]:
     needs = _needs(bp)
     cfg = _cfg(org)
@@ -315,6 +357,20 @@ def _resolve(bp: dict, org: Org | None, roots: list[Path], issues: list[Issue]) 
     if _s(needs.get("workspace")):
         project_ws = _check_path(needs["workspace"], "needs.workspace", issues, org, roots, what="workspace", dir_must_exist=True)
 
+    def check_inputs(raw, where: str) -> list[Path]:
+        """The named inputs that pass the path checks and exist (an input is a source, so it must be there)."""
+        found: list[Path] = []
+        for text, _ in _input_entries(raw, where, issues):
+            p = _check_path(text, where, issues, org, roots, what="input", dir_must_exist=False)
+            if p is None:
+                continue
+            if not p.exists():
+                issues.append(Issue("error", where, f"input {p} does not exist; inputs are read-only sources and must be there already", "inputs"))
+            elif p not in found:
+                found.append(p)
+        return found
+
+    needs_inputs = check_inputs(needs.get("inputs"), "needs.inputs")
     ws_checked: dict[str, Path | None] = {}
 
     def own_workspace(a: Agent) -> str | None:
@@ -349,6 +405,17 @@ def _resolve(bp: dict, org: Org | None, roots: list[Path], issues: list[Issue]) 
             elif project_ws and any(t in a.tools for t in WRITE_TOOLS):
                 ws = str(project_ws)
         a.workspace = ws
+        # inputs: its own list if it names one; a manager holds what its team holds; else the project's
+        if "inputs" in a.raw:
+            ins = check_inputs(a.raw["inputs"], a.where)
+        elif kids:
+            ins = [p for k in kids for p in map(Path, k.inputs)]
+        else:
+            ins = list(needs_inputs)
+            if ws is None and project_ws and "read" in a.tools and not any(t in a.tools for t in WRITE_TOOLS):
+                ins.append(project_ws)  # a reader of the project (e.g. a code reviewer) sees it, read-only
+        base = Path(ws) if ws else None
+        a.inputs = list(dict.fromkeys(str(p) for p in ins if not (base and _within(p, base))))
         a.can_hire = bool(a.raw["can_hire"]) if "can_hire" in a.raw else bool(kids)
         mc = a.raw.get("max_children", len(kids) if kids else 0)
         a.max_children = mc if isinstance(mc, int) and not isinstance(mc, bool) and mc >= 0 else -1
@@ -567,6 +634,34 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
                 issues.append(Issue("error", a.where, f"workspace {a.workspace} but its manager {p.addr} has none; give {p.addr} a workspace that contains it", "authority"))
             elif not _within(Path(a.workspace), Path(p.workspace)):
                 issues.append(Issue("error", a.where, f"workspace {a.workspace} is not inside its manager's workspace {p.workspace}; the runtime requires reports to work inside it", "authority"))
+        bases = [Path(b) for b in (p.workspace, *p.inputs) if b]
+        for i in a.inputs:
+            if not any(_within(Path(i), b) for b in bases):
+                issues.append(Issue("error", a.where, f"input {i} is not inside its manager {p.addr}'s inputs or workspace; a manager can only hand down what it can read: add the path to {p.addr}'s inputs", "authority"))
+
+    # --- inputs are read-only: they must not be inside (or contain) a workspace, or the write fence would not hold
+    spaces = sorted({a.workspace for a in agents if a.workspace})
+    reported: set[tuple[str, str]] = set()
+    for where, raw, ok in declared_inputs(bp):
+        ip = Path(os.path.expanduser(raw))
+        if ok or not ip.is_absolute() or (where, raw) in reported:
+            continue
+        reported.add((where, raw))
+        ip = ip.resolve()
+        hit = next((w for w in spaces if _within(ip, Path(w)) or _within(Path(w), ip)), None)
+        if hit:
+            issues.append(Issue("error", where, f"input {ip} overlaps the workspace {hit}: inside a workspace it would not be read-only, and a workspace inside an input is only writable because it is the workspace. Use separate directories, or mark the input {{path: {ip}, allow_overlap: true}} if the overlap is intended", "inputs-overlap"))
+
+    # --- what the runtime can and cannot confine (kiro limits read/write by path; shell it cannot)
+    for a in agents:
+        if "read" in a.tools and not a.workspace and not a.inputs:
+            issues.append(Issue("warning", a.where, "has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files", "read-nothing"))
+    writers = [a.addr for a in agents if "write" in a.tools]
+    if writers and not _is_code(bp):
+        issues.append(Issue("warning", "agents", f"{', '.join(writers)} hold the built-in write tool for a goal that is not code. kiro confines it to the workspace, but the safer default is orgmcp `write` (agents write in their own directory) plus a deliverable path the assistant copies the final file to; grant write only to an agent that must create files inside the user's own folder", "write-noncode"))
+    shells = [a.addr for a in agents if "shell" in a.tools]
+    if shells:
+        issues.append(Issue("warning", "agents", f"{', '.join(shells)} hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not", "shell-unconfined"))
 
     # --- workspace confinement: whoever can write files or run commands is confined to a workspace
     for a in agents:
@@ -719,7 +814,11 @@ def _charter(a: Agent, agents: list[Agent], bp: dict, split: dict[str, dict]) ->
     if _s(needs.get("scope")):
         asg.append(f"Scope: {_s(needs['scope'])}")
     if a.workspace:
-        asg.append(f"Workspace: {a.workspace}. Everything you read, write or run outside orgmcp stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory.")
+        asg.append(f"Workspace: {a.workspace}. Everything you read, write or run outside orgmcp stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory. Relative paths in kiro tools resolve there; your org files (MEMORY.md, work/) are written with orgmcp `write`, never into the workspace.")
+    if a.inputs:
+        asg.append(f"Read-only inputs: {', '.join(a.inputs)}. Read them (kiro `read`, or orgmcp `read` by absolute path); never create, edit or delete anything there.")
+    if "shell" in a.tools:
+        asg.append("shell is not confined by the runtime: keep every command inside your workspace, and never write to the inputs, the organization directory or anywhere else.")
     code = needs.get("code") if isinstance(needs.get("code"), dict) else {}
     if _is_code(bp) and a.kind != "manager" and code:
         asg.append("Engineering rules: " + "; ".join(f"{k}: {_s(v)}" for k, v in code.items() if _s(v)))
@@ -749,6 +848,21 @@ def _charter(a: Agent, agents: list[Agent], bp: dict, split: dict[str, dict]) ->
 # ----------------------------------------------------------------------------------------------- plan
 
 
+def _access(a: Agent) -> str:
+    """One line on what the runtime lets this agent reach with kiro's file tools (and what it only instructs)."""
+    bits = []
+    if "write" in a.tools:
+        bits.append(f"kiro write only in {a.workspace}" if a.workspace else "kiro write nowhere")
+    if "read" in a.tools:
+        bases = [b for b in (a.workspace, *a.inputs) if b]
+        bits.append("kiro read only in " + ", ".join(bases) if bases else "kiro read nowhere")
+    if a.inputs and "read" not in a.tools:
+        bits.append("read-only inputs (orgmcp read): " + ", ".join(a.inputs))
+    if "shell" in a.tools:
+        bits.append("shell NOT confined (instructed only)")
+    return "; ".join(bits)
+
+
 def _tree_lines(agents: list[Agent]) -> list[str]:
     by = {a.addr: a for a in agents}
     out: list[str] = []
@@ -757,6 +871,9 @@ def _tree_lines(agents: list[Agent]) -> list[str]:
         tpl = f"[{a.template.name}]" if a.template else "[custom]"
         ws = f" ws={a.workspace}" if a.workspace else ""
         out.append(f"{'  ' * indent}- {a.name} {tpl} {a.role}: model={a.model or 'org default'}, tools={','.join(a.tools) or 'none'}{ws}")
+        access = _access(a)
+        if access:
+            out.append(f"{'  ' * indent}  Access: {access}")
         for c in a.children:
             line(by[c], indent + 1)
 
@@ -913,6 +1030,7 @@ def apply(org: Org, bp: dict, *, allowed_roots: list | None = None) -> Summary:
             addr = org.hire(
                 a.parent or ROOT, a.name, a.role, _charter(a, agents, bp, split), model=a.model, tools=a.tools,
                 can_hire=a.can_hire, max_children=a.max_children, workspace=a.workspace,
+                inputs=a.inputs if (a.inputs or "read" in a.tools) else None,
             )
             created.append(addr)
         crit = _criteria(bp)

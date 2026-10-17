@@ -153,6 +153,11 @@ def word_count(text: str) -> int:
     return total
 
 
+def _inside(p: Path, base: Path) -> bool:
+    """``p`` is ``base`` or below it (both already resolved)."""
+    return p == base or base in p.parents
+
+
 def _visible(paths) -> list[Path]:
     return sorted(p for p in paths if not p.name.startswith("."))
 
@@ -650,16 +655,29 @@ class Org:
         return min(default, affordable)
 
     def _normalize_artifact(self, actor: str, path: str, since: str = "") -> str:
-        """Resolve an artifact path and annotate it with facts a manager can check claims against."""
+        """Resolve an artifact path and annotate it with facts a manager can check claims against.
+
+        Inside the organization (paths relative to the org root, or absolute) or, as an absolute path, inside the
+        reporter's own workspace. Anything else is refused before existence is checked: no probing of the host.
+        """
         p = Path(path).expanduser()
+        ws = self.workspace_of(actor)
         if not p.is_absolute():
             p = next((b / p for b in (self.root, self.dir(actor)) if (b / p).exists()), self.root / p)
         p = p.resolve()
-        if p != self.root and self.root not in p.parents:  # checked before existence: no probing of the host
-            raise OrgError(f"artifacts must be inside the organization: {path} (paths are relative to the org root)")
+        in_org = p == self.root or self.root in p.parents
+        if not in_org and not (ws is not None and _inside(p, ws)):
+            where = f"inside your workspace ({ws})" if ws is not None else "(you have no workspace)"
+            raise OrgError(
+                f"artifacts must be inside the organization (paths relative to the org root) or, by absolute path, "
+                f"{where}: {path}"
+            )
         if not p.exists():
-            raise OrgError(f"artifact not found: {path} (paths are relative to the org root)")
-        shown = str(p.relative_to(self.root))
+            hint = ""
+            if ws is not None and not Path(path).expanduser().is_absolute() and (ws / path).exists():
+                hint = f" It exists in your workspace: report it by absolute path ({(ws / path).resolve()})."
+            raise OrgError(f"artifact not found: {path} (relative paths are relative to the org root).{hint}")
+        shown = str(p.relative_to(self.root)) if in_org else str(p)
         if p.is_dir():
             return f"{shown}/ (directory)"
         modified = datetime.fromtimestamp(p.stat().st_mtime, timezone.utc)
@@ -724,18 +742,23 @@ class Org:
         can_hire: bool = False,
         max_children: int = 5,
         workspace: str | None = None,
+        inputs: list[str] | None = None,
     ) -> str:
         actor = self.require(actor)
         if not NAME_RE.fullmatch(name) or name in RESERVED:
             raise OrgError("name must be lowercase letters, digits and dashes (max 32), and not a reserved word")
         tools = sorted(set(tools or []))
         meta, _ = self.charter(actor)
+        if inputs is not None:
+            inputs = self._check_inputs(inputs)
+        elif actor != ROOT and "read" in tools and not workspace and not self.unconfined_read(meta):
+            inputs = []  # a confined hirer never hands down an unconfined `read`: nothing unless it names inputs
         if actor != ROOT:
             if not meta.get("can_hire"):
                 raise OrgError("your charter does not allow hiring")
             if len(self.children(actor)) >= int(meta.get("max_children", 5)):
                 raise OrgError(f"you already have the maximum of {meta.get('max_children', 5)} direct reports")
-            self._check_authority(actor, tools, workspace)
+            self._check_authority(actor, tools, workspace, inputs)
         addr = self.child_addr(actor, name)
         if self.depth(addr) > int(self.config["max_depth"]):
             raise OrgError(f"the organization is limited to depth {self.config['max_depth']}")
@@ -749,6 +772,7 @@ class Org:
             "can_hire": bool(can_hire),
             "max_children": int(max_children),
             "workspace": workspace,
+            "inputs": inputs,
             "hired_by": actor,
             "created": utcnow().isoformat(timespec="seconds"),
         }
@@ -759,7 +783,7 @@ class Org:
         atomic_write(d / "AGENT.md", join_frontmatter(child_meta, templates.charter_body(role, charter)))
         return addr
 
-    def _check_authority(self, actor: str, tools: list[str], workspace: str | None) -> None:
+    def _check_authority(self, actor: str, tools: list[str], workspace: str | None, inputs: list[str] | None = None) -> None:
         """Authority only narrows down the tree: a parent cannot grant what it does not have."""
         meta, _ = self.charter(actor)
         extra = set(tools) - set(meta.get("tools") or [])
@@ -772,6 +796,64 @@ class Org:
             ws, base = Path(workspace).expanduser().resolve(), Path(mine).expanduser().resolve()
             if ws != base and base not in ws.parents:
                 raise OrgError(f"a report's workspace must be inside yours ({mine})")
+        if inputs:
+            bases = [b for b in (self.workspace_of(actor), *self.inputs_of(actor)) if b is not None]
+            if not bases:
+                raise OrgError("you have no workspace or inputs, so you cannot assign inputs")
+            for raw in inputs:
+                if not any(_inside(Path(raw).expanduser().resolve(), b) for b in bases):
+                    raise OrgError(
+                        f"a report's inputs must be inside your inputs or workspace ({', '.join(map(str, bases))}): {raw}"
+                    )
+
+    # ------------------------------------------------------ workspace and inputs
+
+    def workspace_of(self, addr: str) -> Path | None:
+        """The agent's workspace (read-write for its built-in tools) as a resolved path, if its charter has one."""
+        a = self.norm(addr)
+        if a == ROOT or not self.exists(a):
+            return None
+        raw = self.charter(a)[0].get("workspace")
+        return Path(str(raw)).expanduser().resolve() if raw else None
+
+    def inputs_of(self, addr: str) -> list[Path]:
+        """The agent's read-only inputs (charter ``inputs``) as resolved paths."""
+        a = self.norm(addr)
+        if a == ROOT or not self.exists(a):
+            return []
+        raw = self.charter(a)[0].get("inputs")
+        items = [raw] if isinstance(raw, str) else (raw if isinstance(raw, list) else [])
+        return [Path(str(x)).expanduser().resolve() for x in items if str(x).strip()]
+
+    @staticmethod
+    def unconfined_read(meta: dict) -> bool:
+        """Legacy charter: no workspace and no ``inputs`` key. Its built-in ``read`` is not confined (as before)."""
+        return not meta.get("workspace") and "inputs" not in meta
+
+    def _check_inputs(self, inputs) -> list[str]:
+        """Inputs are absolute paths outside the organization directory (kiro reads them; the org owns its own)."""
+        items = [inputs] if isinstance(inputs, str) else list(inputs or [])
+        out = []
+        for raw in items:
+            text = str(raw).strip()
+            if not text:
+                continue
+            p = Path(text).expanduser()
+            if not p.is_absolute():
+                raise OrgError(f"an input must be an absolute path (got `{text}`)")
+            p = p.resolve()
+            if _inside(p, self.root) or _inside(self.root, p):
+                raise OrgError(f"an input must not overlap the organization directory ({self.root}): {text}")
+            out.append(text)
+        return out
+
+    def readable_roots(self, addr: str) -> list[Path]:
+        """Directories outside the org that ``read`` shows to ``addr`` by absolute path: its workspace and inputs, and
+        the workspace of every agent in its subtree (so a manager can verify what its team made)."""
+        a = self.norm(addr)
+        roots = [*self.inputs_of(a)]
+        roots += [w for s in self.subtree(a) if (w := self.workspace_of(s)) is not None]
+        return roots
 
     def retire(self, actor: str, name: str, reason: str) -> str:
         """Remove a direct report and its team; returns the retired address. See :meth:`retire_team`."""
@@ -815,22 +897,33 @@ class Org:
 
     # ------------------------------------------------------------- file access
 
-    def resolve_read(self, path: str) -> Path:
+    def resolve_read(self, path: str, actor: str | None = None) -> Path:
+        """Relative paths are relative to the org root. Absolute paths must be inside the organization or, for an agent,
+        inside its workspace or inputs or the workspace of an agent in its subtree. Root reads the organization only."""
         p = (self.root / path.lstrip("/")).resolve() if not Path(path).is_absolute() else Path(path).resolve()
-        if p != self.root and self.root not in p.parents:
+        if _inside(p, self.root):
+            return p
+        who = self.norm(actor) if actor else ROOT
+        if who != ROOT and any(_inside(p, b) for b in self.readable_roots(who)):
+            return p
+        if who == ROOT:
             raise OrgError("you can only read inside the organization")
-        return p
+        raise OrgError(
+            "you can only read inside the organization (paths relative to the org root), or by absolute path inside "
+            "your workspace, your read-only inputs, or the workspace of an agent in your team"
+        )
 
-    def read(self, path: str) -> str:
-        p = self.resolve_read(path or ".")
+    def read(self, path: str, actor: str | None = None) -> str:
+        p = self.resolve_read(path or ".", self.require(actor) if actor else None)
         if p.is_dir():
             entries = [f"{c.name}/" if c.is_dir() else c.name for c in _visible(p.iterdir())]
             return "\n".join(entries) or "(empty directory)"
         if not p.is_file():
-            raise OrgError(f"not found: {path} (paths are relative to the org root)")
+            raise OrgError(f"not found: {path} (relative paths are relative to the org root)")
         text = p.read_text(encoding="utf-8", errors="replace")
         modified = datetime.fromtimestamp(p.stat().st_mtime, timezone.utc)
-        head = f"[{p.relative_to(self.root)}: {word_count(text)} words, {text.count(chr(10))} lines, modified {modified:%H:%M:%S} UTC]\n"
+        shown = p.relative_to(self.root) if _inside(p, self.root) else p
+        head = f"[{shown}: {word_count(text)} words, {text.count(chr(10))} lines, modified {modified:%H:%M:%S} UTC]\n"
         limit = 100_000
         return head + (text if len(text) <= limit else text[:limit] + f"\n... (truncated, {len(text)} chars total)")
 
@@ -881,7 +974,13 @@ class Org:
             meta, _ = split_frontmatter(content)
             if not meta.get("role"):
                 raise OrgError("a charter needs YAML frontmatter with at least `role:`")
-            self._check_authority(actor, list(meta.get("tools") or []), meta.get("workspace"))
+            mine, _ = self.charter(actor)
+            if "read" in (meta.get("tools") or []) and self.unconfined_read(meta) and not self.unconfined_read(mine):
+                raise OrgError(
+                    "a charter with `read` and no workspace needs an `inputs:` list (it may be empty), otherwise its "
+                    "built-in read is not confined to the workspace and inputs you have yourself"
+                )
+            self._check_authority(actor, list(meta.get("tools") or []), meta.get("workspace"), self._check_inputs(meta.get("inputs")))
         if append and p.exists():
             content = p.read_text(encoding="utf-8") + content
         if p == self.dir(actor) / "MEMORY.md":
@@ -1059,6 +1158,7 @@ class Org:
             tools = ", ".join(meta.get("tools") or []) or "none"
             lines.append(f"- Budget: {self.budget(a)} run(s) left (this run already counted). Hiring: {hiring}")
             lines.append(f"- Tools beyond orgmcp: {tools}" + (f"; workspace: {meta['workspace']}" if meta.get("workspace") else ""))
+            lines += self._files_lines(a, meta)
         kids = self.children(a)
         lines.append("- Direct reports:" + ("" if kids else " none"))
         lines += [f"  - {self._agent_line(k)}" for k in kids]
@@ -1089,6 +1189,42 @@ class Org:
         lines.append("- Work you delegated that is still outstanding:" + ("" if out else " none"))
         lines += [f"  - {t.id} \"{t.title}\" -> {t.to} ({self.state(t.to) if self.exists(t.to) else 'gone'})" for t in out]
         return "\n".join(lines)
+
+    def _files_lines(self, addr: str, meta: dict) -> list[str]:
+        """The "Files" part of an agent's state: where each kind of path points. Empty without workspace and inputs."""
+        ws, inputs = self.workspace_of(addr), self.inputs_of(addr)
+        if ws is None and not inputs:
+            return []
+        tools = set(meta.get("tools") or [])
+        lines = [
+            "- Files:",
+            f"  - orgmcp tools: paths are relative to the org root; your notes and memory: `{addr}/MEMORY.md`, "
+            f"`{addr}/work/` (orgmcp `write` only).",
+        ]
+        if ws is not None:
+            lines.append(
+                f"  - Workspace (kiro read/write/shell, and the working directory of kiro tools): `{ws}`; relative "
+                "paths in kiro tools resolve there."
+            )
+        else:
+            lines.append(f"  - You have no workspace: kiro tools start in your org directory (`{addr}/`) and cannot write.")
+        if inputs:
+            lines.append(
+                "  - Read-only inputs (kiro `read` or orgmcp `read` by absolute path): "
+                + ", ".join(f"`{p}`" for p in inputs) + ". Never modify them."
+            )
+        lines.append(
+            "  - Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by "
+            "absolute path."
+        )
+        if tools & {"read", "write"}:
+            lines.append("  - kiro `write` is limited to the workspace and kiro `read` to workspace + inputs; other paths are refused.")
+        if "shell" in tools:
+            lines.append(
+                "  - You have `shell`, which the runtime cannot confine: use it only inside your workspace; never write "
+                "to inputs, to the org directory, or anywhere else."
+            )
+        return lines
 
     def _blocked_tasks(self, addr: str) -> list[Message]:
         """Tasks assigned to ``addr`` whose latest result is ``blocked``: answered, but they may be reported again."""
