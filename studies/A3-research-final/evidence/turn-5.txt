@@ -1,0 +1,21 @@
+[tool] Running: cd /private/tmp/orgmcp-a3-1792266280; mkdir -p deliverables && cp org/lead/writer/work/competitors.md deliverables/competitors.md && cmp org/lead/writer/work/competitors.md deliverables/competitors...
+[tool] status: Completed
+[tool] Running: cd /private/tmp/orgmcp-a3-1792266280/org/lead/factcheck/work; sed -n 93,110p final_verification.md; sed -n 175,190p final_verification.md; sed -n 8,20p final_verification.md
+[tool] status: Completed
+The draft is at `/tmp/orgmcp-a3-1792266280/deliverables/competitors.md`. It's 1,284 words, has the table and the "Where we can win" section, and used 24 of 25 runs. It is not fully fact-checked, and the fact-checker's last pass (before the final fixes) failed. Of 91 claims examined, 52 were verified, 5 wrong, 13 unsupported, and 21 not checkable.
+
+Unverified or contradicted claims, from that pass:
+- **Logseq:** "uses plaintext Markdown" and "plaintext sync with any file service". Their cited blog posts don't state either, and one contradicts the sync claim. The writer's last fix didn't resolve them.
+- **Obsidian:**
+  - "Markdown in proprietary vaults; plugins create lock-in"
+  - "proprietary cloud creates trust concerns for regulated industries"
+  - "large plugin ecosystem but proprietary marketplace"
+  - The cited license page says nothing on the first and third, and says sync data is encrypted and inaccessible to staff, which cuts against the second.
+- **AnyType:** "collaboration included but proprietary format restricts portability".
+- **Joplin:** "licensing confusion around server".
+- **All competitors:** "support offline access".
+- **Opinion, not fact:** most of the roughly 21 not-checkable claims are judgments in "Where we can win", such as UX quality, ecosystem size, maturity and "mobile feels secondary". Treat them as opinion.
+
+The writer fixed the AnyType discount link and the Joplin Server link after that pass. I haven't confirmed those two fixes.
+
+The 5 wrong claims were not itemised in the report. They are the ones the writer's rework targeted, and I don't know which still remain.

@@ -1,0 +1,4 @@
+{"name":"assistant","description":"user's everyday assistant","tools":["*"],"allowedTools":["*"],
+ "mcpServers":{"orgmcp":{"command":"uv","args":["--directory","/Users/aminalizadeh/workspace/orgmcp","run","orgmcp","mcp"],
+   "env":{"ORG_ROOT":"/tmp/orgmcp-a3-1792266280/org","UV_LINK_MODE":"copy"}}},
+ "includeMcpJson":false,"resources":["skill:///Users/aminalizadeh/workspace/orgmcp/skills/orgmcp/SKILL.md"],"hooks":{},"model":"claude-sonnet-5.5"}

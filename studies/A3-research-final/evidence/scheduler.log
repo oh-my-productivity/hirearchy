@@ -1,0 +1,57 @@
+
+# --- scheduler started 2026-10-17 19:46:05Z: /Volumes/workspace/orgmcp/.venv/bin/orgmcp --root /private/tmp/orgmcp-a3-1792266280/org run --until-done
+org: /private/tmp/orgmcp-a3-1792266280/org
+lead: started run (1 message(s))
+lead/researcher: started run (1 message(s))
+lead: run finished in 20s
+lead: started run (1 message(s))
+lead/researcher: run finished in 105s
+lead/writer: started run (1 message(s))
+lead: run finished in 38s
+lead: started run (1 message(s))
+lead/writer: run finished in 129s
+lead/factcheck: started run (1 message(s))
+lead: run finished in 26s
+lead: started run (1 message(s))
+lead/factcheck: run finished in 195s
+lead/writer: started run (1 message(s))
+lead: run finished in 44s
+lead: started run (1 message(s))
+lead/writer: run finished in 60s
+lead/factcheck: started run (1 message(s))
+lead: run finished in 60s
+lead: started run (1 message(s))
+lead/factcheck: run finished in 123s
+lead: run finished in 40s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-17 19:58:50Z: /Volumes/workspace/orgmcp/.venv/bin/orgmcp --root /private/tmp/orgmcp-a3-1792266280/org run --until-done
+org: /private/tmp/orgmcp-a3-1792266280/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 74s
+lead: started run (1 message(s))
+lead/writer: run finished in 76s
+lead/factcheck: started run (1 message(s))
+lead: run finished in 44s
+lead: started run (1 message(s))
+lead/factcheck: run finished in 328s
+lead/writer: started run (1 message(s))
+lead: run finished in 36s
+lead/writer: run finished in 71s
+lead: started run (1 message(s))
+lead: run finished in 50s
+lead: started run (1 message(s))
+lead/factcheck: started run (1 message(s))
+lead: run finished in 101s
+lead: started run (1 message(s))
+lead/factcheck: run finished in 185s
+lead: run finished in 64s
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 60s
+lead/researcher: out of budget, paused, parent notified
+lead: started run (1 message(s))
+lead: run finished in 24s
+lead: out of budget, paused, parent notified
+lead/writer: run finished in 89s

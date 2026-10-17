@@ -1,0 +1,8 @@
+"Competitor analysis of self-hosted note-taking apps": done. runs 11 of 22 (11 returned). last activity 5m ago. artifacts: lead/writer/work/competitors.md. (task 20261017T194604474705-root-b339)
+"Rework: competitors.md fails 3 acceptance criteria": stalled (lead is paused: budget). runs 13 of 16. last activity 5m ago. (task 20261017T195837142694-root-b354)
+scheduler: running (pid 28857, since 2026-10-17 19:58:50Z)
+4 agents, 2 flagged
+lead paused(budget), budget 0/46, runs 14, open 1 (oldest 24m), done 1 failed 0 blocked 0 rework 1, runs/task 13.0, empty 0, last activity 6m ago | branch: runs 24, open 1, done 9, failed 0, blocked 2, rework 2, worst out_of_budget | !out_of_budget: no budget left but has unread mail or open tasks; !paused: paused: budget; !expensive: 13.0 runs per completed task (max 5); 7 runs without a result on an open task (max 6)
+  factcheck idle, budget 2/8, runs 4, open 0, done 3 failed 0 blocked 1 rework 0, runs/task 1.0, empty 0, last activity 9m ago
+  researcher paused(budget), budget 0/3, runs 1, open 0, done 1 failed 0 blocked 0 rework 0, runs/task 1.0, empty 0, last activity 34m ago | !out_of_budget: no budget left but has unread mail or open tasks; !paused: paused: budget
+  writer idle, budget 1/10, runs 5, open 0, done 4 failed 0 blocked 1 rework 1, runs/task 1.0, empty 0, last activity 5m ago

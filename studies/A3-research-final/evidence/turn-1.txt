@@ -1,0 +1,23 @@
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m55pagcwe5q81qjhehh8dmgd","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+[tool] Reading SKILL.md:1
+[tool] Running: @orgmcp/whoami
+[tool] status: Completed
+[tool] status: Completed
+Before I propose a plan, I need a few answers. Reply "defaults" to accept the proposed ones.
+
+1. **Which apps should I compare?** I won't pick them for you. Please give me the list, for example the self-hosted note-taking apps you already know about or are weighing up. If you only have a rough idea, tell me and I'll ask again after you've narrowed it down.
+2. **What should the comparison cover?** For example features, licensing, ease of self-hosting, mobile and sync support, and community activity.
+   - Proposed default: features, license, how it's hosted and installed, sync and mobile clients, extensibility, and project activity.
+   - Tell me if you care about a particular use case, such as personal use, a team, or Markdown-first notes.
+3. **What should the deliverable look like?**
+   - Proposed default: one markdown file, up to 1500 words, with a comparison table (one row per app) and a short recommendation.
+   - I'd put it in a new `deliverables/` folder in `/private/tmp/orgmcp-a3-1792266280`.
+4. **Which sources should it use?**
+   - Proposed default: the web, with a source URL for every claim.
+   - The alternative is to use only your own files. If so, give me the folder.
+5. **How should it be checked?**
+   - Proposed default: a separate reviewer and fact-checker verify every claim. Done means exactly your apps are covered, there is one table row per app, each claim has a URL, and the fact-checker confirms all claims.
+6. **What budget and models?**
+   - Proposed default: I estimate the runs and add 25%. A cheaper model drafts and a stronger one reviews.
+7. **When do you want to approve things?**
+   - Proposed default: you approve the plan before anything starts, and any spending beyond the budget. You can ask "status?" whenever you want a progress line.
