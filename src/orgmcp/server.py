@@ -13,13 +13,15 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+import anyio
 from mcp.server.fastmcp import FastMCP
 
 from . import blueprint as blueprint_mod
+from . import blueprint_examples
 from .core import ROOT, Org, OrgError
 from .health import org_health, render_text
-from .progress import progress as org_progress
-from .scheduler import describe_scheduler, start_scheduler, stop_scheduler
+from .progress import WAIT_MAX, describe_progress
+from .scheduler import describe_scheduler, nothing_to_do, scheduler_state, start_scheduler, stop_scheduler
 
 INSTRUCTIONS = """\
 You are a member of a file-based organization of agents. Your identity is fixed by the runtime.
@@ -37,15 +39,20 @@ You are connected to ONE orgmcp organization as `root`, the human's seat. {where
 - Work flows down as tasks (delegate), results flow up (report), everything else is a note (send). `whoami` and
   `status` show the current state; `start` and `stop` control the scheduler that wakes the agents.
 When the user asks for an org, team or agents for a goal:
-1. Ask what you need in ONE message, each item with a proposed default: scope, deliverable (format, length, path),
-   exact checkable acceptance criteria, sources/web, workspace and tests (code), budget in runs, models, review,
-   approval, progress.
-2. Write a blueprint (YAML) and call `propose_org`; show the plan as returned. Fix its errors; revise on feedback.
-3. Only after the user explicitly approves the plan: `create_org` (if none exists), `apply_org(blueprint,
-   approved=True)`, `start`. Spend beyond the plan needs their OK.
-4. Answer "status?" with `progress`. Relay escalations with a recommended decision.
+1. Ask what you need in ONE message. Propose defaults only where a generic one exists; a list the user did not give
+   (scope items, competitors, features, source files) you ASK for, never invent. Default deliverable place: a new
+   `deliverables/` folder in the user's current directory, stated plainly. Also ask: format, length, exact checkable
+   acceptance criteria, sources/web, workspace and tests (code), budget in runs, models, review, approval.
+2. Start the blueprint from `blueprint_example(kind)` (research | documents | code), then call `propose_org`. Show the
+   "PLAN FOR YOU" block exactly as returned and wait for the user's explicit approval. Fix errors; revise on feedback.
+3. After approval: `create_org` (if none exists), `apply_org(blueprint, approved=True, plan_id=<from propose_org>)`,
+   `start`. Spend beyond the plan needs their OK.
+4. Answer "status?" with `progress`. Never promise to tell the user later (a turn ends when you reply): if they want
+   to be told when it is done, say you will wait now and call `progress(wait_seconds=N)`, repeating as they wish;
+   otherwise tell them to ask "status?". Relay escalations with a recommended decision.
 5. When it is done: read the deliverable and check it against EVERY acceptance criterion (send it back with
-   `delegate(..., revises=...)` if not; never patch it yourself), copy it where the user wants it, then `stop`.
+   `delegate(..., revises=...)` if not; never patch it yourself), copy it where the user wants it. `start` ends by
+   itself when the work is done (start again after giving it more work); `stop` only if the user cancels.
 """
 
 DS_STORE = ".DS_Store"
@@ -346,16 +353,24 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
                 "start() the scheduler. Use only this organization.")
 
     @mcp.tool()
-    def start(max_runs: int | None = None) -> str:
+    def start(max_runs: int | None = None, until_done: bool = True) -> str:
         """Start the scheduler for this organization in the background; it wakes agents that have mail.
 
-        max_runs: stop starting agent runs after this many (safety cap; default: no cap). Refused if one is
-        already running. Output goes to .runtime/scheduler.log. Returns the scheduler's pid.
+        max_runs: stop starting agent runs after this many (safety cap; default: no cap). until_done (default True):
+        the scheduler exits by itself when you have no open task and nothing is running or can run, so you need not
+        stop it (status and progress then say "scheduler: stopped (finished: no open tasks)"); start it again after
+        giving the org more work. False keeps it running until stop(). Refused if one is already running. Output goes
+        to .runtime/scheduler.log. Returns the scheduler's pid.
         """
         org = binding.get()
-        pid = start_scheduler(org, max_runs)
+        if until_done and scheduler_state(org).state == "stopped" and nothing_to_do(org):
+            return ("not started: there is nothing to run (you have no open task and no agent has work). Give the "
+                    "organization work first (apply_org or delegate), then call start(); until_done=False would "
+                    "keep an idle scheduler running instead")
+        pid = start_scheduler(org, max_runs, until_done)
         cap = f", at most {max_runs} run(s)" if max_runs is not None else ""
-        return f"scheduler started (pid {pid}{cap}); log: {org.root / '.runtime' / 'scheduler.log'}"
+        end = "; it exits by itself when the work is done" if until_done else "; it runs until stop()"
+        return f"scheduler started (pid {pid}{cap}{end}); log: {org.root / '.runtime' / 'scheduler.log'}"
 
     @mcp.tool()
     def stop() -> str:
@@ -366,55 +381,94 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
 
 
     @mcp.tool()
+    def blueprint_example(kind: str = "research") -> str:
+        """A ready-to-edit blueprint (YAML with a comment on every field and a one-paragraph schema summary).
+
+        kind: "research" (facts from the web with source URLs, fact-checked), "documents" (write from the user's local
+        files, no web; uses `needs.inputs`, read-only folders) or "code" (software in a repo workspace, with tests and
+        local commits). Replace every <PLACEHOLDER> with what the user told you (ask for what is missing; do not invent
+        lists), delete what does not apply, then call propose_org with the text. Read-only.
+        """
+        return blueprint_examples.example(kind, _example_base(binding.peek()))
+
+    @mcp.tool()
     def propose_org(blueprint: str) -> str:
         """Validate a blueprint and return the plan the user must approve. Writes nothing; safe to call repeatedly.
 
-        blueprint: YAML or JSON text (not a file path) with mission, needs, agents and task (see the orgmcp skill
-        or examples/blueprint-research.yaml). Works before the organization exists (limits then come from the
-        defaults). Returns the plan: target organization, goal, needs, org tree, budget, review, deliverable,
-        checkpoints, warnings and errors. Show it to the user as returned. If it has errors, fix the blueprint and
-        propose again; do not ask the user to approve a plan with errors.
+        blueprint: YAML or JSON text (never a file path). Start from blueprint_example(kind) for a template with every
+        field explained. Schema: `mission` (one paragraph); `needs` {scope, deliverable {description, format,
+        max_words, path (absolute)}, quality_bar, sources, inputs (read-only folders), workspace (the one absolute
+        folder agents may write in), budget_runs (the user's cap), models {cheap, strong}, model_policy, review
+        (true/false), approval, progress, kind (research|writing|code), code {tests, packaging, commits}}; `agents`:
+        ONE top-level agent (template manager) with `children`; each agent has name and a template (manager,
+        researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer) or a charter, and optionally
+        model, tools, workspace, scale; `task` {to, title, goal, acceptance: list of exact, checkable criteria}.
+        Works before the organization exists. Returns (1) a block headed "PLAN FOR YOU": show it to the user exactly
+        as written and wait for their explicit approval; (2) Details, the full plan for you; (3) a plan_id that
+        apply_org requires. If the plan has errors, fix the blueprint and propose again; never ask the user to approve
+        a plan with errors.
         """
         org = binding.peek()
         bp = blueprint_mod.load_text(blueprint)
-        plan = blueprint_mod.render_plan(bp, blueprint_mod.validate(bp, org=org), org=org)
-        return f"{_target_line(binding, org)}\n\n{plan}"
+        return blueprint_mod.propose_text(bp, org, target=_target_line(binding, org))
 
     @mcp.tool()
-    def apply_org(blueprint: str, approved: bool = False) -> str:
+    def apply_org(blueprint: str, approved: bool = False, plan_id: str | None = None) -> str:
         """Create the agents of a blueprint and give its first task. Only after the user approved the plan.
 
         blueprint: the YAML/JSON text the user approved via propose_org (unchanged). approved: pass True only after
-        the user explicitly approved that plan in this conversation; otherwise nothing happens. Needs an existing
-        organization (create_org first if there is none). Refuses with the issues if the blueprint has errors or a
-        name is taken, and undoes everything if it fails midway. Returns what was created; then call start().
+        the user explicitly approved that plan in this conversation; otherwise nothing happens. plan_id: the id that
+        propose_org returned for exactly this blueprint; a missing or different id is refused (propose again, show the
+        PLAN FOR YOU block, get approval). Needs an existing organization (create_org first if there is none).
+        Refuses with the issues if the blueprint has errors or a name is taken, and undoes everything if it fails
+        midway. Returns what was created; then call start().
         """
         if not approved:
             raise OrgError("not applied: the user must approve the plan first. Call propose_org(blueprint), show the "
-                           "plan to the user, and only after their explicit approval call apply_org(blueprint, "
-                           "approved=True)")
+                           "PLAN FOR YOU block to the user, and only after their explicit approval call "
+                           "apply_org(blueprint, approved=True, plan_id=<the plan_id propose_org returned>)")
+        bp = blueprint_mod.load_text(blueprint)
+        if not plan_id or plan_id.strip() != blueprint_mod.plan_id(bp):
+            raise OrgError(("not applied: plan_id is missing" if not plan_id else "not applied: plan_id does not match this blueprint")
+                           + ", so this is not the plan the user approved. Call propose_org(blueprint), show the PLAN FOR YOU "
+                           "block to the user, get their explicit approval, then call apply_org(blueprint, approved=True, "
+                           "plan_id=<the plan_id from that propose_org>) with the same blueprint")
         org = binding.peek()
         if org is None:
             raise OrgError("not applied: there is no organization yet, so call create_org(mission=...) first, then "
-                           "apply_org again with the same blueprint")
-        summary = blueprint_mod.apply(org, blueprint_mod.load_text(blueprint))
+                           "apply_org again with the same blueprint and plan_id")
+        summary = blueprint_mod.apply(org, bp)
         running = describe_scheduler(org).startswith("scheduler: running")
         nxt = ("The scheduler is already running and will pick the work up; answer status questions with progress()."
                if running else "Next step: call start() to run the scheduler, then answer status questions with progress().")
         return f"applied the blueprint to {org.root}\n{summary.text()}\n{nxt}"
 
     @mcp.tool()
-    def progress(task_id: str | None = None) -> str:
-        """One plain status line per task you (root) gave, then what needs your decision. Read-only.
+    async def progress(task_id: str | None = None, wait_seconds: int = 0) -> str:
+        """One plain status line per task you (root) gave, then what needs your decision, then the scheduler. Read-only.
 
         Per task: working / waiting on <agent> / stalled / blocked: <reason> / done / failed, who is busy, runs used
         of the budget given, time since the last activity, and for finished tasks the artifact paths and the runs
         returned. task_id: only that task, in any state (default: open tasks and those finished in the last day).
-        Use it to answer "status?"; it is cheaper and clearer than reading status and inbox.
+        wait_seconds (0-900, default 0): first wait until a task finishes, fails, blocks or stalls, or something new
+        needs the user, or the time is up, then answer; the answer starts with what changed. Use it when the user
+        wants to be told when the work is done: tell them you will wait now, call progress(wait_seconds=...) and
+        repeat as long as they want (a turn cannot notify them later). Without wait_seconds it answers "status?".
         """
         if binding.peek() is None:
             return setup_state(binding)
-        return org_progress(binding.get(), task_id)
+        org = binding.get()
+        wait = max(0, min(int(wait_seconds or 0), WAIT_MAX))
+        return await anyio.to_thread.run_sync(describe_progress, org, task_id, wait)
+
+
+def _example_base(org: Org | None) -> Path:
+    """Where the examples put deliverables/ and project folders: the user's current directory, unless that is the
+    organization itself or a filesystem root (then the home directory)."""
+    cwd = Path.cwd().resolve()
+    if cwd == cwd.parent or (org is not None and (cwd == org.root or org.root in cwd.parents)):
+        return Path.home()
+    return cwd
 
 
 def _target_line(binding: OrgBinding, org: Org | None) -> str:
