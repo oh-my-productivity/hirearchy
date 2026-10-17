@@ -208,3 +208,16 @@ def test_mcp_tool(team, org, monkeypatch):
     assert text.startswith("reclaimed 2 run(s) from ceo/eng.") and f"Your budget is now {org.budget('ceo')}" in text
     root = build_server(org, ROOT)
     assert "reclaim" in {t.name for t in asyncio.run(root.list_tools())}
+
+
+def test_skill_and_root_instructions_carry_the_reclaim_and_cheap_model_rules():
+    from orgmcp.server import ROOT_INSTRUCTIONS
+    from orgmcp.skill import skill_source
+
+    skill = skill_source().read_text()
+    assert len(skill.splitlines()) <= 110 and len(ROOT_INSTRUCTIONS) < 2400
+    for needle in ("keep the lead (manager) and\n   the final verifier on the strong model", "the lead decides how every other run is spent",
+                   "`reclaim(report=<agent>)`", "stranded runs", "never poll\n  with `sleep`"):
+        assert needle in skill, needle
+    for needle in ("keep the lead and final verifier", "the lead decides how every other run is spent", "`reclaim`", "stranded runs"):
+        assert needle in ROOT_INSTRUCTIONS, needle

@@ -28,7 +28,8 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
    `needs.inputs` as an absolute path of a folder that exists). Default: web for factual work.
 5. Code only: workspace (one new project directory), tests, packaging, commits. Default: tests per criterion, uv/pytest for
    Python, local commits, never push.
-6. Budget in runs (each agent wake-up is one run) and models. Default: the estimate + 25%; cheap model drafts, strong reviews.
+6. Budget in runs (each agent wake-up is one run) and models. Default: the estimate + 25%; cheap model drafts, strong reviews. If they ask for cheap models, keep the lead (manager) and
+   the final verifier on the strong model and say why in one line: "the lead decides how every other run is spent".
 7. Review by an agent that did not write it (default yes); when they want to approve (default: the plan, before anything
    starts, and spend beyond budget); progress (default: one line when they ask).
 
@@ -61,7 +62,11 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 - If a result comes back `blocked`, or `inbox` shows an escalation or budget request: tell the user what happened and give a
   recommended decision (grant N runs with `send(to=<agent>, body=<why>, budget=N)`, rework, change criteria). Spend beyond the
   approved budget needs the user's OK. Ask at the FIRST budget request, with your recommendation; never wait until the reserve
-  is spent.
+  is spent. Before asking for more, look for stranded runs (`status`/`progress`/`health`: an idle team holding unspent runs):
+  `reclaim(report=<agent>)` pulls them back from your direct reports (a lead does the same with `reclaim` on its own team: ask
+  it by note), and only the shortfall goes to the user.
+- `progress(wait_seconds=N)` also waits on a `blocked` task while its lead can still run (after a grant + `start()`); never poll
+  with `sleep` in a shell. Every unread note, budget request and escalation is listed under "Needs you" with its message id.
 - `progress` / `start` saying "waiting on you" means nothing can move without the user (an agent is out of runs or keeps failing,
   or a task is stalled). Give the options it lists: grant runs, then `start()`; or accept what exists. The scheduler exits by
   itself a few minutes after that, and `start()` refuses until something changes.
