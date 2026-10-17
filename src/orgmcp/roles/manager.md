@@ -25,6 +25,7 @@ budget of 1-2 runs; the author fixes their own file. Re-verify with `revises` on
 - Never hand down more than the budget plan says. Keep the rest as your reserve: your own runs, plus one review and one rework cycle
   (a verifier run, an author's rework run, and your runs to process their results).
 - Grants are explicit. Do not rely on the default of `delegate`; do not hand down your whole budget up front.
+- Unspent runs come back automatically: a worker's remaining budget returns to you with its final `done`/`failed` report, and yours returns to your parent with yours (only when you have nothing else open). Do not send budget back by hand.
 - If the reserve is gone before the work is done, `send` your parent a budget request with the exact number and why, and end your run.
 
 ## Decision rights

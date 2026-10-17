@@ -643,7 +643,7 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
         if a.kind == "verifier" or "review" in a.name or "check" in a.name:
             hit = next((h for h in map(edits_others_files, texts) if h), None)
             if hit:
-                issues.append(Issue("error", a.where, f"charter tells the {a.kind or 'reviewer'} to change another agent's file ('{hit}'), which the single-writer rule forbids; make it report findings and required changes to its manager, who sends them to the author", "edits-others"))
+                issues.append(Issue("error", a.where, f"charter tells the {a.kind or 'reviewer'} to change another agent's file ('{hit}'), which the single-writer rule (ORG.md rule 9) forbids; make it report findings and required changes to its manager, who sends them to the author", "edits-others"))
     vwords = re.compile(r"\b(?:review\w*|fact-?check\w*|checker|tester|verif\w+|" + "|".join(re.escape(v.name) for v in verifiers) + r")\b", re.I) if verifiers else None
     for i, c in enumerate(crit, 1):
         hit = edits_others_files(c)
@@ -720,7 +720,7 @@ def _charter(a: Agent, agents: list[Agent], bp: dict, split: dict[str, dict]) ->
         asg += [
             f"Budget plan: you start with {split[a.addr]['grant']} runs. Initial grants, set explicitly with `budget=`: "
             + ", ".join(f"{c} {n}" for c, n in grants) + f". You keep {split[a.addr]['keeps']} runs: your own runs plus the reserve for "
-            "one review and one rework cycle (rework tasks hand down 1-2 runs each). Do not hand down more than this up front.",
+            "one review and one rework cycle (rework tasks hand down 1-2 runs each). Do not hand down more than this up front. Runs you do not spend return to your parent automatically with your final report.",
         ]
         vs = [c for c in a.children if by[c].kind == "verifier"]
         if vs:
@@ -792,7 +792,8 @@ def render_plan(bp: dict, issues: list[Issue] | None = None, *, org: Org | None 
         total = task["budget"]
     cap = needs.get("budget_runs")
     L += ["", f"Budget: {total} runs planned" + (f" (your cap: {cap})" if cap else " (no cap given)")
-          + f", estimate {est['total']} for one pass + one review/rework cycle:"]
+          + f", estimate {est['total']} for one pass + one review/rework cycle:",
+          "  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you."]
     if agents:
         split = budget_split(agents, total)
         by_addr = {x.addr: x for x in agents}

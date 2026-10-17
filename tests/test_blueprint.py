@@ -658,3 +658,12 @@ def test_skill_example_blueprint_validates_and_frontmatter_is_well_formed():
     issues = bpm.validate(bp, allowed_roots=[Path.home()])
     assert not bpm.errors(issues)
     assert len(text.splitlines()) <= 150
+
+
+def test_plan_and_manager_charter_say_unspent_budget_returns_automatically(base, roots, empty_org):
+    plan = bpm.render_plan(base, org=empty_org, allowed_roots=roots)
+    assert "come back automatically" in plan
+    bpm.apply(empty_org, base, allowed_roots=roots)
+    charter = (empty_org.root / "lead" / "AGENT.md").read_text()
+    assert "return to your parent automatically" in charter
+    assert "returns to you with its final" in charter  # from the manager template
