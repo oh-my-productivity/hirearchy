@@ -16,6 +16,7 @@ Invariants (everything else is built on these):
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import secrets
@@ -43,8 +44,10 @@ DEFAULT_CONFIG = {
     "max_parallel": 3,  # concurrent agent runs
     "max_failures": 3,  # consecutive failed runs before an agent is paused
     "run_timeout": 1800,  # seconds per run
+    "stall_after": 600,  # seconds of silence on an open task before the next step of the stall ladder
     "poll_seconds": 2,
     "default_budget": 10,  # runs given with a task when none is specified
+    "memory_max_words": 800,  # cap on an agent's MEMORY.md; writes that exceed it are refused
     "default_model": None,  # kiro model; None = kiro default
 }
 
@@ -614,6 +617,14 @@ class Org:
             self._check_authority(actor, list(meta.get("tools") or []), meta.get("workspace"))
         if append and p.exists():
             content = p.read_text(encoding="utf-8") + content
+        if p == self.dir(actor) / "MEMORY.md":
+            cap, words = int(self.config["memory_max_words"]), len(content.split())
+            if words > cap:
+                raise OrgError(
+                    f"MEMORY.md would be {words} words; the limit is {cap}. Do not append: condense it. "
+                    "Rewrite the whole file (append=false) keeping only what your next run needs, "
+                    "and move detail into files under your work/ directory."
+                )
         atomic_write(p, content)
         return p
 
@@ -665,6 +676,28 @@ class Org:
 
     def resume(self, addr: str) -> None:
         (self.dir(addr) / ".paused").unlink(missing_ok=True)
+
+    def record_failure(self, addr: str) -> int:
+        """Count one more consecutive failed run (kept in .runtime/failures.json, so it survives restarts)."""
+        counts = self.ledger("failures")
+        counts[addr] = int(counts.get(addr, 0)) + 1
+        self.save_ledger("failures", counts)
+        return counts[addr]
+
+    def clear_failures(self, addr: str) -> None:
+        counts = self.ledger("failures")
+        if counts.pop(addr, None) is not None:
+            self.save_ledger("failures", counts)
+
+    def ledger(self, name: str) -> dict:
+        """Runtime-private bookkeeping (``.runtime/<name>.json``): the only state not derived from messages."""
+        try:
+            return json.loads((self.root / ".runtime" / f"{name}.json").read_text(encoding="utf-8"))
+        except (FileNotFoundError, ValueError):
+            return {}
+
+    def save_ledger(self, name: str, data: dict) -> None:
+        atomic_write(self.root / ".runtime" / f"{name}.json", json.dumps(data, indent=2) + "\n")
 
     # ----------------------------------------------------------------- views
 
@@ -729,6 +762,13 @@ class Org:
         a = self.require(addr)
         _, charter = self.charter(a)
         memory = self.memory(a).strip() or "(empty: this may be your first run)"
+        cap, words = int(self.config["memory_max_words"]), len(memory.split())
+        if words > cap:
+            memory += (
+                f"\n\n**Your memory is {words} words, over the {cap}-word limit, and writes that keep it over "
+                f"the limit are refused. This run, condense it: rewrite {a}/MEMORY.md (not append) with only what "
+                "your next run needs; move detail into files under your work/ directory.**"
+            )
         messages = "\n".join(m.render() for m in batch) or "(none)"
         return f"""# orgmcp run: you are `{a}`
 

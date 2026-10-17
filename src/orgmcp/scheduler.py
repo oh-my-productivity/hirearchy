@@ -14,6 +14,7 @@ import subprocess
 import sys
 import time
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import IO, Callable
 
@@ -84,15 +85,20 @@ class Run:
 
 
 class Scheduler:
-    def __init__(self, org: Org, runner: Runner | None = None, echo: Callable[[str], None] = print):
+    def __init__(
+        self,
+        org: Org,
+        runner: Runner | None = None,
+        echo: Callable[[str], None] = print,
+        clock: Callable[[], float] = time.time,
+    ):
         self.org = org
         self.runner = runner or kiro_runner()
         self.echo = echo
+        self.clock = clock  # only used for stall detection, so tests can move time without sleeping
         self.runs: dict[str, Run] = {}
-        self.failures: dict[str, int] = {}
         self.total_runs = 0
         self.pidfile = org.root / ".runtime" / "scheduler.pid"
-        self.nudges_file = org.root / ".runtime" / "nudges.json"
 
     # ------------------------------------------------------------- lifecycle
 
@@ -154,8 +160,7 @@ class Scheduler:
         self._reap()
         if max_runs is None or self.total_runs < max_runs:
             self._launch(max_runs)
-        if not self.runs and not self._runnable():
-            self._check_stalls()
+        self._check_stalls()
         return bool(self.runs) or (bool(self._runnable()) and (max_runs is None or self.total_runs < max_runs))
 
     def _runnable(self) -> list[str]:
@@ -233,7 +238,7 @@ class Scheduler:
             ok = code == 0
             self.org.end_run(addr, ok)
             if ok:
-                self.failures[addr] = 0
+                self.org.clear_failures(addr)
                 self.echo(f"{addr}: run finished in {elapsed:.0f}s")
             else:
                 self._failed(addr, run.log)
@@ -241,8 +246,7 @@ class Scheduler:
             self.org.commit(f"{addr}: run {'ok' if ok else f'failed ({code})'}, {run.batch} message(s) [{rel}]")
 
     def _failed(self, addr: str, log: Path) -> None:
-        n = self.failures.get(addr, 0) + 1
-        self.failures[addr] = n
+        n = self.org.record_failure(addr)
         self.echo(f"{addr}: run failed ({n} in a row), log: {log}")
         if n >= int(self.org.config["max_failures"]):
             self.org.pause(addr, "failures")
@@ -255,26 +259,61 @@ class Scheduler:
     # ---------------------------------------------------------------- stalls
 
     def _check_stalls(self) -> None:
-        """Nothing can run. Nudge whoever holds an open task they are not waiting on; escalate if that fails."""
-        nudges = json.loads(self.nudges_file.read_text()) if self.nudges_file.exists() else {}
-        changed = False
+        """Climb the escalation ladder for every open task whose assignee has gone quiet.
+
+        Stalled = assignee not running, no unread mail, not paused, not waiting on delegated work, and
+        ``stall_after`` seconds since the latest of: the task's creation, the assignee's last run, the previous
+        step. Steps: remind the assignee, then tell the assigner, then each ancestor in turn up to root.
+        """
+        after, now = float(self.org.config["stall_after"]), self.clock()
+        loaded = self.org.ledger("nudges")  # task id -> {"step": last step taken, "at": when}
+        ledger = {k: v if isinstance(v, dict) else {"step": 0 if v == "nudged" else 1, "at": 0} for k, v in loaded.items()}
+        kept: dict[str, dict] = {}  # entries of tasks that are still open
         for addr in self.org.agents():
-            if self.org.paused(addr) or self.org.outstanding(addr):
-                continue
-            for task in self.org.open_tasks(addr):
-                stage = nudges.get(task.id)
-                if stage is None:
-                    self.org.notify(addr, f"reminder: {task.title}", templates.notice_nudge(task.id, task.title))
-                    nudges[task.id] = "nudged"
-                    self.echo(f"{addr}: nudged about open task {task.id}")
-                elif stage == "nudged" and self.org.exists(task.sender):
-                    self.org.notify(task.sender, f"stalled: {task.title}",
-                                    templates.notice_stalled(addr, task.id, task.title))
-                    nudges[task.id] = "escalated"
-                    self.echo(f"{addr}: stalled on {task.id}, escalated to {task.sender}")
-                else:
+            tasks = self.org.open_tasks(addr)
+            stuck = bool(tasks) and not (
+                self.org.running(addr) or self.org.unread(addr) or self.org.paused(addr) or self.org.outstanding(addr)
+            )
+            for task in tasks:
+                last = ledger.get(task.id)
+                if last:
+                    kept[task.id] = last
+                if not stuck:
                     continue
-                changed = True
-        if changed:
-            self.nudges_file.parent.mkdir(parents=True, exist_ok=True)
-            self.nudges_file.write_text(json.dumps(nudges, indent=2))
+                chain = self._chain(addr, task)
+                step = last["step"] + 1 if last else 0
+                if step >= len(chain):  # root has been told: nothing further up
+                    continue
+                since = max(self._created(task), self._last_run_end(addr), last["at"] if last else 0)
+                if now - since < after:
+                    continue
+                if step == 0:
+                    self.org.notify(addr, f"reminder: {task.title}", templates.notice_nudge(task.id, task.title))
+                    self.echo(f"{addr}: reminded about open task {task.id}")
+                else:
+                    self.org.notify(chain[step], f"stalled: {task.title}",
+                                    templates.notice_stalled(addr, task.id, task.title, chain[:step]))
+                    self.echo(f"{addr}: stalled on {task.id}, told {chain[step]}")
+                kept[task.id] = {"step": step, "at": now}
+        if kept != loaded:
+            self.org.save_ledger("nudges", kept)
+
+    def _chain(self, addr: str, task) -> list[str]:
+        """Who hears about a stalled task, in order: the assignee, its assigner, then up the tree to root."""
+        chain = [addr]
+        up = task.sender if self.org.exists(task.sender) else self.org.parent(addr)
+        while up:
+            chain.append(up)
+            up = self.org.parent(up)
+        return chain
+
+    @staticmethod
+    def _created(task) -> float:
+        try:
+            return datetime.fromisoformat(task.created).timestamp()
+        except ValueError:
+            return task.path.stat().st_mtime
+
+    def _last_run_end(self, addr: str) -> float:
+        logs = (self.org.dir(addr) / "runs").glob("*.log")
+        return max((p.stat().st_mtime for p in logs), default=0.0)

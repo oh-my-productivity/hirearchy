@@ -26,7 +26,8 @@ ORG_RULES = """\
    yourself (`read` shows word count and modification time). Do not trust claims. If it falls short, send it back.
 4. Keep reports short: a few lines of summary plus artifact paths. Put detail in files, not messages.
 5. Every task assigned to you gets exactly one `report`. If you cannot finish, report `blocked` or `failed` and say why.
-6. Before you stop, update MEMORY.md with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
+6. Before you stop, rewrite MEMORY.md with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
+   Keep it short: condense instead of appending, and put detail in `work/` files. Writes that make it too long are refused.
 7. Stay within your charter. Escalate anything outside it.
 """
 
@@ -38,7 +39,11 @@ def org_rules(mission: str | None) -> str:
 
 
 def charter_body(role: str, charter: str) -> str:
-    return f"# Role: {role}\n\n{charter.strip()}\n"
+    """The charter under a single H1: the hirer's own top-level heading wins over the generated one."""
+    charter = charter.strip()
+    if charter.startswith("# "):
+        return charter + "\n"
+    return f"# Role: {role}\n\n{charter}\n"
 
 
 def task_body(goal: str, acceptance: str, inputs: list[str]) -> str:
@@ -72,16 +77,17 @@ def notice_failures(agent: str, count: int, log: str) -> str:
 
 def notice_nudge(task_id: str, title: str) -> str:
     return (
-        f"Task {task_id} ({title}) is still open, nothing in the organization is running, "
-        "and you are not waiting on any delegated work. Finish it and `report` done, "
+        f"Task {task_id} ({title}) is still open, you are not running or waiting on any delegated work, "
+        "and nothing has happened for a while. Finish it and `report` done, "
         "or `report` blocked/failed with the reason."
     )
 
 
-def notice_stalled(agent: str, task_id: str, title: str) -> str:
+def notice_stalled(agent: str, task_id: str, title: str, told: list[str]) -> str:
     return (
-        f"`{agent}` is stalled on task {task_id} ({title}): it was nudged once and still has not reported. "
-        "Follow up with it, reassign the work, or report upward."
+        f"`{agent}` is stalled on task {task_id} ({title}): it is not running, not waiting on delegated work, "
+        f"and has not reported. Already told: {', '.join(f'`{t}`' for t in told)}. "
+        "Follow up with it, reassign the work, or escalate further."
     )
 
 
