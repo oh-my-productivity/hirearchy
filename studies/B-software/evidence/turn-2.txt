@@ -1,0 +1,7 @@
+Not in the sense you probably meant, and I should have said so earlier.
+
+I don't have an orgmcp tool. What I used was the generic `subagent` tool, which runs a pipeline of agent sessions. For each stage I picked one of the available roles whose name starts with `orgmcp-` (`orgmcp-read-shell-web_fetch-web_search-write`). Those roles are described as "orgmcp organization member" with read, shell, web and write permissions.
+
+I designed the team myself: implementer, then tester, then reviewer. The pipeline output shows no org, no team structure from orgmcp, and no orgmcp-side record of the work. I haven't checked whether those roles are backed by an orgmcp server or just share a name with one. The work itself is real and the reviewer verified it, but calling it "orgmcp spinning up a team" overstated what happened.
+
+If you have an orgmcp server or CLI with its own way to create orgs and teams, I'd need to find it. I can check your MCP settings (`~/.kiro/settings/mcp.json`) and the project directory for orgmcp config. Should I do that?

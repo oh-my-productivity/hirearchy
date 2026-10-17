@@ -1,0 +1,3 @@
+Build a Python CLI tool named csv2md that converts CSV files to Markdown tables, in your workspace (/private/tmp/orgmcp-study-b-1792255351/csv2md-orgmcp). Standard library only, Python 3.9+, src layout, console script `csv2md`, `python -m csv2md` works.
+Usage: `csv2md [FILE] [-o OUTPUT] [-d DELIMITER] [--no-header] [--align left|center|right] [--pad]`. Reads stdin if FILE is omitted or '-'; writes stdout unless -o is given.
+Must handle: quoted fields, pipe escaping (\|), embedded newlines (<br>), ragged rows (pad with empty cells), UTF-8 with BOM, empty input (non-zero exit, clear stderr message).
