@@ -1,0 +1,4 @@
+- A single markdown file, under about 600 words.
+- A comparison table covering at least: concurrent writes, operations and backups, scaling path, tooling, cost.
+- Ends with a clear recommendation for this scenario and the conditions under which to switch.
+- Reviewed by someone other than its author before it is reported as done.
