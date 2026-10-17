@@ -257,7 +257,7 @@ def test_tick_reviews_when_the_time_is_up_and_not_before(org):
     clock.offset = 999
     sched.tick()
     assert runtime_notes(org, ROOT) == []
-    clock.offset = 3601  # idle needs the agents to be an hour old (config: idle_after_seconds 0)
+    clock.offset = 3601  # idle needs the agents to be an hour old (idle_after_seconds is tiny)
     sched.tick()
     assert len(runtime_notes(org, ROOT)) == 1 and len(runtime_notes(org, "ceo")) == 1
     sched.tick()
