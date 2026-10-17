@@ -7,22 +7,77 @@ happened; then one line per item in root's inbox that waits for a decision.
 States of a task: ``working`` (someone below is running or has unread work), ``waiting on <agent>`` (the work sits
 with an agent that is not running; a paused one says why), ``stalled`` (the assignee itself holds the task and
 nothing is happening), ``blocked: <reason>``, ``done``, ``failed``.
+
+``wait_seconds`` turns the call into a wait: it polls the same files (read-only: no locks, nothing written) until a
+task changes state (done, failed, blocked, stalled), something new needs the human, or the time is up.
 """
 
 from __future__ import annotations
 
 import os
+import re
+import time
 from datetime import datetime, timedelta, timezone
+from typing import Callable
 
 from .core import ROOT, Message, Org, OrgError, latest_results, utcnow
 from .health import _aware, _duration, _stamp
 
 RECENT = timedelta(hours=24)  # without a task id, finished tasks are listed for this long after they finished
 SHORT = 110  # characters of a reason or a note shown on a line
+WAIT_MAX = 900  # longest wait_seconds honored
+POLL = 2.0  # seconds between two looks at the files while waiting
+FINAL = ("done", "failed", "blocked", "stalled")  # the states a wait returns for
 
 
-def progress(org: Org, task_id: str | None = None, now: datetime | None = None) -> str:
-    """Status of root's tasks (``task_id``: just that one, in any state) and of what waits for the human."""
+def progress(org: Org, task_id: str | None = None, now: datetime | None = None, *, wait_seconds: int = 0,
+             poll: float = POLL, sleep: Callable[[float], None] = time.sleep,
+             clock: Callable[[], float] = time.monotonic) -> str:
+    """Status of root's tasks (``task_id``: just that one, in any state) and of what waits for the human.
+
+    ``wait_seconds`` > 0 (at most 900): first block until a listed task changes state (done / failed / blocked /
+    stalled), something new needs the human, or the time is up; the result then starts with a line saying which.
+    """
+    wait = max(0, min(int(wait_seconds or 0), WAIT_MAX))
+    if wait <= 0:
+        return _render(org, task_id, now)
+    before = _snapshot(org, task_id)
+    if not any(c in ("working", "waiting") for c, _, _ in before[0].values()):
+        return "Nothing to wait for: no listed task is being worked on right now.\n" + _render(org, task_id, now)
+    start = clock()
+    suspect: set[str] = set()  # tasks seen stalled once: confirmed on the next look, so a hand-over is not a stall
+    while True:
+        left = wait - (clock() - start)
+        sleep(max(0.0, min(poll, left)))
+        after = _snapshot(org, task_id)
+        changes, suspect = _changes(before, after, suspect)
+        waited = _duration(max(0.0, clock() - start))
+        if changes:
+            return f"Changed after waiting {waited}: " + "; ".join(changes) + "\n" + _render(org, task_id, now)
+        if clock() - start >= wait:
+            return (f"Waited {waited}: no task finished, got blocked or stalled, and nothing new needs you. "
+                    "Call progress(wait_seconds=...) again to keep waiting.\n" + _render(org, task_id, now))
+
+
+def describe_progress(org: Org, task_id: str | None = None, wait_seconds: int = 0) -> str:
+    """``progress`` plus the scheduler line (the same text for the MCP tool and the CLI).
+
+    Without a running scheduler nothing moves, so a wait would only burn time: it returns at once and says so.
+    """
+    from .scheduler import describe_scheduler
+
+    sched = describe_scheduler(org)
+    stopped = not sched.startswith("scheduler: running")
+    open_work = bool(org.outstanding(ROOT))
+    note = ""
+    if stopped and open_work:
+        sched += " - open tasks do not move until it is started (start() or `orgmcp run`)"
+        if wait_seconds:
+            wait_seconds, note = 0, "Not waiting: no scheduler is running, so nothing will change. "
+    return f"{note}{progress(org, task_id, wait_seconds=wait_seconds)}\n{sched}"
+
+
+def _render(org: Org, task_id: str | None, now: datetime | None) -> str:
     now = _aware(now) or utcnow()
     tasks = [m for m in org.sent(ROOT) if m.type == "task"]
     results = latest_results(org.received(ROOT))
@@ -38,6 +93,37 @@ def progress(org: Org, task_id: str | None = None, now: datetime | None = None) 
         ] or ["No open tasks." + _last_finished(org, tasks, results, now)]
     lines += _needs_human(org)
     return "\n".join(lines)
+
+
+def _snapshot(org: Org, task_id: str | None) -> tuple[dict[str, tuple[str, str, str]], dict[str, str]]:
+    """(task id -> (state class, title, state text), message id -> line of what needs the human). Read-only."""
+    tasks = [m for m in org.sent(ROOT) if m.type == "task"]
+    results = latest_results(org.received(ROOT))
+    now = utcnow()
+    states: dict[str, tuple[str, str, str]] = {}
+    for t in tasks:
+        if (task_id and t.id != task_id) or (not task_id and not _listed(results.get(t.id), now)):
+            continue
+        team = [a for a in org.subtree(t.to) if a != ROOT] if org.exists(t.to) else []
+        state = _state(org, t, results.get(t.id), team)[0]
+        states[t.id] = (re.split(r"[ :(]", state, 1)[0], t.title, state)
+    return states, dict(_human_items(org))
+
+
+def _changes(before, after, suspect: set[str]) -> tuple[list[str], set[str]]:
+    """What differs between two snapshots, as short phrases, and the tasks to confirm as stalled on the next look."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for tid, (cls, title, state) in after[0].items():
+        old = before[0].get(tid)
+        if old is None or cls == old[0] or cls not in FINAL:
+            continue
+        if cls == "stalled" and tid not in suspect:
+            seen.add(tid)
+            continue
+        out.append(f'"{title}": {old[0]} -> {state}')
+    out += [f"new item for you: {line}" for mid, line in after[1].items() if mid not in before[1]]
+    return out, seen
 
 
 def _listed(result: Message | None, now: datetime) -> bool:
@@ -169,8 +255,9 @@ def _short(text: str, limit: int = SHORT) -> str:
     return text.rstrip(".")
 
 
-def _needs_human(org: Org) -> list[str]:
-    """One line per unread root message that asks for a decision: blocked or failed results, notes, runtime notices."""
+def _human_items(org: Org) -> list[tuple[str, str]]:
+    """(message id, line) for each unread root message that asks for a decision: blocked or failed results, notes,
+    runtime notices."""
     out = []
     for m in org.messages(ROOT, "inbox"):
         if not m.wake or (m.type == "result" and m.status == "done"):
@@ -181,5 +268,10 @@ def _needs_human(org: Org) -> list[str]:
             what = "runtime notice" if m.sender == "runtime" else f"note from {m.sender}"
             text = (m.body.splitlines() or [""])[0]
         title = f' "{m.title}"' if m.title else ""
-        out.append(f"Needs you: {what}{title}" + (f": {_short(text)}" if text else "") + f" (message {m.id})")
+        out.append((m.id, f"Needs you: {what}{title}" + (f": {_short(text)}" if text else "") + f" (message {m.id})"))
     return out
+
+
+def _needs_human(org: Org) -> list[str]:
+    """One line per item that waits for the human."""
+    return [line for _, line in _human_items(org)]

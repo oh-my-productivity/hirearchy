@@ -209,11 +209,15 @@ def ignore_runtime_files(root: Path) -> None:
     path = Path(root) / ".gitignore"
     try:
         text = path.read_text(encoding="utf-8") if path.exists() else ""
-        missing = [line for line in (".runtime/running.json", ".runtime/scheduler.log") if line not in text.split()]
+        missing = [line for line in (".runtime/running.json", ".runtime/scheduler.log", EXIT_FILE) if line not in text.split()]
         if missing:
             path.write_text((text.rstrip("\n") + "\n" if text else "") + "\n".join(missing) + "\n", encoding="utf-8")
     except OSError:
         pass
+
+
+EXIT_FILE = ".runtime/scheduler.exit"  # why the last scheduler exited by itself (until-done); removed when one starts
+FINISHED = "finished: no open tasks"
 
 
 class SchedulerState(NamedTuple):
@@ -224,11 +228,12 @@ class SchedulerState(NamedTuple):
     detail: str = ""
 
 
-def scheduler_command(root: Path, max_runs: int | None = None) -> list[str]:
-    """``<this venv's orgmcp> --root <org> run [--max-runs N]`` (``python -m orgmcp`` if the script is missing)."""
+def scheduler_command(root: Path, max_runs: int | None = None, until_done: bool = False) -> list[str]:
+    """``<this venv's orgmcp> --root <org> run [--max-runs N] [--until-done]`` (``python -m orgmcp`` if the script is missing)."""
     script = Path(sys.executable).with_name("orgmcp")
     base = [str(script)] if script.exists() else [sys.executable, "-m", "orgmcp"]
-    return [*base, "--root", str(root), "run", *(["--max-runs", str(max_runs)] if max_runs is not None else [])]
+    return [*base, "--root", str(root), "run", *(["--max-runs", str(max_runs)] if max_runs is not None else []),
+            *(["--until-done"] if until_done else [])]
 
 
 def _command_line(pid: int) -> str | None:
@@ -292,11 +297,23 @@ def describe_scheduler(org: Org) -> str:
     if st.state == "unverified":
         return (f"scheduler: unknown - .runtime/scheduler.pid names pid {st.pid}, which is alive but not verified "
                 f"to be this org's scheduler ({st.detail}); not trusted")
-    return "scheduler: stopped"
+    reason = _exit_reason(org)
+    return f"scheduler: stopped ({reason})" if reason else "scheduler: stopped"
 
 
-def start_scheduler(org: Org, max_runs: int | None = None) -> int:
-    """Launch a detached scheduler for ``org`` (own session; output to ``.runtime/scheduler.log``). Returns its pid."""
+def _exit_reason(org: Org) -> str:
+    """Why the scheduler last exited by itself, while that is still true (root has no open task); else ''."""
+    try:
+        reason = (org.root / EXIT_FILE).read_text(encoding="utf-8").strip()
+    except OSError:
+        return ""
+    return reason if reason and not org.outstanding(ROOT) else ""
+
+
+def start_scheduler(org: Org, max_runs: int | None = None, until_done: bool = False) -> int:
+    """Launch a detached scheduler for ``org`` (own session; output to ``.runtime/scheduler.log``). Returns its pid.
+
+    ``until_done``: the scheduler exits by itself when root has no open task and nothing is running or runnable."""
     if max_runs is not None and max_runs < 0:
         raise OrgError("max_runs must be 0 or more")
     st = scheduler_state(org)
@@ -308,11 +325,12 @@ def start_scheduler(org: Org, max_runs: int | None = None) -> int:
     runtime = org.root / ".runtime"
     runtime.mkdir(exist_ok=True)
     ignore_runtime_files(org.root)
+    (org.root / EXIT_FILE).unlink(missing_ok=True)
     log = runtime / "scheduler.log"
     env = {**os.environ, "ORG_ROOT": str(org.root), "PYTHONUNBUFFERED": "1"}
     for var in ("ORG_AGENT", "ORG_REQUIRE_AGENT"):
         env.pop(var, None)
-    cmd = scheduler_command(org.root, max_runs)
+    cmd = scheduler_command(org.root, max_runs, True) if until_done else scheduler_command(org.root, max_runs)
     with open(log, "ab") as out:
         out.write(f"\n# --- scheduler started {datetime.now(timezone.utc):%Y-%m-%d %H:%M:%SZ}: {' '.join(cmd)}\n".encode())
         out.flush()
@@ -323,6 +341,8 @@ def start_scheduler(org: Org, max_runs: int | None = None) -> int:
     deadline = time.time() + 10
     while time.time() < deadline:
         code = proc.poll()
+        if code == 0 and (org.root / EXIT_FILE).is_file():
+            break  # it had nothing left to do and exited by itself (until-done): that is not a failure
         if code is not None:
             tail = "\n".join(log.read_text(encoding="utf-8", errors="replace").splitlines()[-5:])
             raise OrgError(f"the scheduler exited at once (exit {code}); {log} ends with:\n{tail}")
@@ -415,6 +435,7 @@ class Scheduler:
             if alive:
                 raise OrgError(f"a scheduler is already running for this org (pid {pid})")
             self.pidfile.unlink()  # stale
+        (self.org.root / EXIT_FILE).unlink(missing_ok=True)
         self.pidfile.write_text(str(os.getpid()))
         self._ignore_running_ledger()
         self._settle_orphans()  # before recover(): never redeliver a batch while its previous run still lives
@@ -511,7 +532,7 @@ class Scheduler:
         self.runs.clear()
         self.pidfile.unlink(missing_ok=True)
 
-    def serve(self, until_idle: bool = False, max_runs: int | None = None) -> None:
+    def serve(self, until_idle: bool = False, max_runs: int | None = None, until_done: bool = False) -> None:
         self.acquire()
         stop = False
 
@@ -525,6 +546,10 @@ class Scheduler:
                 active = self.tick(max_runs=max_runs)
                 if until_idle and not active:
                     self.echo("organization is idle")
+                    break
+                if until_done and self.finished(max_runs):
+                    self.echo(f"scheduler exiting: {FINISHED}")
+                    atomic_write(self.org.root / EXIT_FILE, FINISHED + "\n")
                     break
                 time.sleep(config_number(self.org.config, "poll_seconds"))
         except KeyboardInterrupt:
@@ -546,6 +571,11 @@ class Scheduler:
         self._guard("stall check", self._check_stalls)  # best-effort phases: a bug or bad data here
         self._guard("health review", self._check_review)  # must never stop agents from running
         return bool(self.runs) or (bool(self._runnable()) and (max_runs is None or self.total_runs < max_runs))
+
+    def finished(self, max_runs: int | None = None) -> bool:
+        """Is there nothing left for this scheduler: root has no open task, no run is in flight, no agent could start?"""
+        can_start = max_runs is None or self.total_runs < max_runs
+        return not self.org.outstanding(ROOT) and not self.runs and not (can_start and self._runnable())
 
     def _repair_failures_ledger(self) -> None:
         """The failure counts drive pausing; a wrong-shaped ledger would raise inside ``record_failure``."""
@@ -783,3 +813,8 @@ class Scheduler:
     def _last_run_end(self, addr: str) -> float:
         logs = (self.org.dir(addr) / "runs").glob("*.log")
         return max((p.stat().st_mtime for p in logs), default=0.0)
+
+
+def nothing_to_do(org: Org) -> bool:
+    """Would an until-done scheduler exit at once? (root has no open task and no agent has work it could start)"""
+    return Scheduler(org, echo=lambda _: None).finished()

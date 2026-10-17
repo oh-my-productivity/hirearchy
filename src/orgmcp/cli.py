@@ -89,6 +89,8 @@ def cmd_send(args) -> None:
 
 
 def cmd_status(args) -> None:
+    from .scheduler import describe_scheduler
+
     org = _org(args)
     print(org.tree())
     out = org.outstanding(ROOT)
@@ -96,6 +98,7 @@ def cmd_status(args) -> None:
         print("\nyour outstanding tasks:")
         for t in out:
             print(f"  {t.id} \"{t.title}\" -> {t.to}")
+    print(f"\n{describe_scheduler(org)}")
 
 
 def cmd_health(args) -> None:
@@ -107,9 +110,9 @@ def cmd_health(args) -> None:
 
 
 def cmd_progress(args) -> None:
-    from .progress import progress
+    from .progress import describe_progress
 
-    print(progress(_org(args), args.task_id))
+    print(describe_progress(_org(args), args.task_id, args.wait))
 
 
 def cmd_upgrade_rules(args) -> None:
@@ -155,6 +158,8 @@ def cmd_run(args) -> None:
     from .scheduler import Scheduler, kiro_runner
 
     org = _org(args, mutating=True)
+    if args.until_done and args.once:
+        raise OrgError("--until-done and --once are different modes: use one of them")
     sched = Scheduler(org, kiro_runner(args.kiro))
     if args.once:
         sched.acquire()
@@ -166,7 +171,7 @@ def cmd_run(args) -> None:
         finally:
             sched.release()
     else:
-        sched.serve(until_idle=args.until_idle, max_runs=args.max_runs)
+        sched.serve(until_idle=args.until_idle, max_runs=args.max_runs, until_done=args.until_done)
 
 
 def cmd_mcp(args) -> None:
@@ -244,6 +249,8 @@ def main(argv: list[str] | None = None) -> None:
 
     s = sub.add_parser("progress", help="one line per task you gave: state, who is busy, cost, last activity; what needs you")
     s.add_argument("task_id", nargs="?", help="only this task (default: open tasks and those finished in the last day)")
+    s.add_argument("--wait", type=int, default=0, metavar="SECONDS",
+                   help="first wait (up to 900) until a task finishes, fails, blocks or stalls, or something needs you")
     s.set_defaults(fn=cmd_progress)
 
     s = sub.add_parser("upgrade-rules", help="rewrite the rules in ORG.md to the current template (keeps settings and mission)")
@@ -270,6 +277,8 @@ def main(argv: list[str] | None = None) -> None:
     s = sub.add_parser("run", help="run the scheduler")
     s.add_argument("--once", action="store_true", help="one pass, wait for those runs, exit")
     s.add_argument("--until-idle", action="store_true", help="exit when nothing is left to do")
+    s.add_argument("--until-done", action="store_true",
+                   help="exit when root has no open task and nothing is running or runnable (logs why, shown by status/progress)")
     s.add_argument("--max-runs", type=int, help="stop starting runs after this many (safety cap)")
     s.add_argument("--kiro", default="kiro-cli", help="kiro-cli binary")
     s.set_defaults(fn=cmd_run)
