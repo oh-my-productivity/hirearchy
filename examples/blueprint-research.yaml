@@ -1,0 +1,42 @@
+# A research org, as the assistant would propose it after eliciting the needs.
+#   orgmcp plan examples/blueprint-research.yaml     # validate + print the plan
+#   orgmcp apply examples/blueprint-research.yaml    # create the agents and give the first task
+mission: >
+  Produce a sourced competitor analysis of five self-hosted note-taking apps for a small team choosing one.
+needs:
+  scope: "Obsidian, Logseq, Joplin, Trilium and AnyType only; self-hosting, licensing, sync/E2EE, mobile support, extensibility."
+  deliverable:
+    description: Competitor analysis with a comparison table and a closing "Where we can win" section
+    format: markdown
+    max_words: 1500
+    path: ~/deliverables/competitors.md
+  quality_bar: Every factual claim has a primary-source URL; current facts (versions, licenses) come from the live source.
+  sources: Web access to official sites, repositories and docs; a source URL per claim.
+  budget_runs: 25
+  models: {cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}
+  model_policy: cheap drafting, strong review (research and writing on cheap, fact-check and lead on strong)
+  review: true   # independent fact-check by someone who did not write the report
+  approval: Approve this plan before anything is created or started; ask before spending beyond the budget.
+  progress: One line when I ask; tell me when it is done. No digging through files.
+agents:
+  - name: lead
+    template: manager
+    role: Research lead
+    model: strong
+    children:
+      - {name: researcher, template: researcher, scale: 1}
+      - {name: writer, template: writer}
+      - {name: factcheck, template: fact-checker}
+task:
+  to: lead
+  title: Competitor analysis of five self-hosted note-taking apps
+  goal: >
+    Research Obsidian, Logseq, Joplin, Trilium and AnyType, write the analysis, have the claims independently
+    fact-checked, apply the required corrections, and report the final file.
+  acceptance:
+    - Covers exactly Obsidian, Logseq, Joplin, Trilium and AnyType, and no other app.
+    - At most 1500 words as counted by read.
+    - Contains a comparison table with one row per app and a final section titled "Where we can win".
+    - Every factual claim has a source URL that the fact-checker or researcher fetched.
+    - The fact-checker verified at least 6 high-impact claims (licenses, versions, E2EE, pricing) and every required change was applied by the writer.
+    - The final report names the path of the deliverable inside the organization.
