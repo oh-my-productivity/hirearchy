@@ -44,7 +44,7 @@ uv run orgmcp init org --mission "..." --model claude-haiku-4.5
 uv run orgmcp hire root ceo --role "Chief of staff" --charter @examples/ceo.md \
     --model claude-sonnet-4.6 --can-hire --max-children 3
 uv run orgmcp task ceo --title "..." --goal @goal.md --acceptance @acceptance.md --budget 14
-uv run orgmcp run --until-idle --max-runs 14     # or plain `run` as a daemon; `--until-done` exits when no task is open
+uv run orgmcp run --until-idle --max-runs 14     # or plain `run` as a daemon; `--until-done` exits when no task is open or all open ones wait on you
 uv run orgmcp status
 uv run orgmcp inbox
 ```
@@ -82,8 +82,11 @@ assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#
    a block headed **PLAN FOR YOU** that the assistant must show you exactly as written (about 40 lines, plain words): goal,
    needs as understood, the team (role, model, tools, and for each agent what it may touch, worded from the same
    computation as the `Access:` line below, so the plan states what kiro will enforce), the budget and its split, the independent
-   review, the deliverable and where it will be delivered, the checks that decide "done", checkpoints and warnings. Below
-   it come the full details for the assistant and a `plan_id`. Errors block the plan until fixed. Nothing has been
+   review, the deliverable and where it will be delivered, the checks that decide "done", checkpoints and warnings. Under
+   the budget it states the failure policy: if the check still fails after one rework, the assistant comes back to you with
+   options before spending the reserve (the planned runs above the minimum for one review and rework, e.g. "about 4 runs").
+   Fields are cut only at sentence ends (the Goal line shows the whole mission up to 800 characters; success checks are
+   always in full). Below it come the full details for the assistant and a `plan_id`. Errors block the plan until fixed. Nothing has been
    written yet, not even the organization.
 3. **Approve.** You say "approve" or ask for changes (then it proposes again). Only after your explicit approval the
    assistant calls `create_org` (if there is no organization yet), `apply_org(blueprint, approved=True, plan_id=...)` and
@@ -96,7 +99,13 @@ assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#
    launches it with `until_done`: it exits by itself when you have no open task and nothing is running or runnable
    (`orgmcp run --until-done` on the command line; `--until-idle` is unchanged) and logs why in `.runtime/scheduler.log`;
    `status` and `progress` then say `scheduler: stopped (finished: no open tasks)`. Give the org more work later and
-   `start` again; `stop` is only for cancelling.
+   `start` again; `stop` is only for cancelling. It also exits by itself when every open task is **waiting on you**:
+   nothing runs and nothing can start because the agents holding the work are out of budget or keep failing (or the task
+   is stalled and the stall ladder has already told root). After `until_done_grace_seconds` (ORG.md, default 300) of that,
+   it exits with `waiting on you: "<task>" needs budget (<agent> out of runs)` (or `needs you to resume <agent>`, or `needs
+   a decision`). `progress` shows the reason and your options (grant runs with `send(to=..., budget=N)` and `start`, or accept
+   what exists, leaving the task open), `progress(wait_seconds=...)` does not wait while it holds, and `start` refuses until
+   something changes. A grant, a resume or new work restarts the count.
 5. **Progress.** "Status?" is answered from `progress`: one line per task (working / waiting on an agent / stalled /
    blocked with the reason / done / failed), who is busy, runs used of the budget, time since the last activity, and what
    needs your decision. An assistant cannot message you between turns, so it never promises to. If you want to be told
@@ -348,6 +357,15 @@ its org directory) and resolve relative paths there. An agent that writes `lead/
 therefore creates that tree inside the user's folder, not in the org. The charter fields and the rules below keep the
 two apart.
 
+The two kinds of tools share short names. In kiro the orgmcp ones appear as `@orgmcp/write`, `@orgmcp/read`, ...; an agent that
+holds the built-in `write`/`read`/`shell` is told in its prompt's Files section (and in ORG.md's rules, for orgs created or
+`upgrade-rules`d since) to use `@orgmcp/write` for org files (`<addr>/MEMORY.md`, `<addr>/work/`, reports) and the built-ins
+for the workspace only; its closing "update your memory" line names `@orgmcp/write` too. The orgmcp `write` tool's description
+and reply say it writes an organization file. **Stray org files:** after each run of an agent with built-in `write` and a
+workspace, the scheduler looks for `<workspace>/<address>/` (new during the run) and a written `<workspace>/<address>/MEMORY.md`.
+If found it logs a `# warning:` in the run log and the scheduler output and records it in `.runtime/strays.json`; the agent's
+next prompt says once to move that content into its org files with `@orgmcp/write`. Nothing is moved or deleted.
+
 Charter fields: `workspace` (read-write, as before) and `inputs: [absolute paths]` (read-only; blueprint: `needs.inputs`
 for the whole project or `inputs` per agent). A report's inputs must be inside its manager's inputs or workspace (authority
 only narrows), inputs are absolute and never overlap the org directory. Charters without `inputs` keep working. Set them with
@@ -404,7 +422,7 @@ without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first pri
 ## Test
 
 ```sh
-uv run pytest -q
+uv run pytest -q tests
 ```
 
 The tests use a deterministic fake agent (`tests/fake_agent.py`) in place of kiro. An autouse fixture
