@@ -1,0 +1,179 @@
+"""Command line for the human (root) and the runtime."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+import time
+from pathlib import Path
+
+from .core import ROOT, Org, OrgError
+
+
+def _text(value: str) -> str:
+    """Accept literal text or @path/to/file."""
+    return Path(value[1:]).expanduser().read_text(encoding="utf-8") if value.startswith("@") else value
+
+
+def _org(args) -> Org:
+    return Org(args.root or Org.find_root())
+
+
+def cmd_init(args) -> None:
+    cfg = {"default_model": args.model} if args.model else None
+    org = Org.init(args.path, _text(args.mission) if args.mission else None, cfg)
+    print(f"initialized organization at {org.root}\nedit {org.root / 'ORG.md'} to set the mission and limits")
+
+
+def cmd_hire(args) -> None:
+    org = _org(args)
+    addr = org.hire(
+        args.parent, args.name, args.role, _text(args.charter), model=args.model,
+        tools=[t for t in (args.tools or "").split(",") if t], can_hire=args.can_hire,
+        max_children=args.max_children, workspace=args.workspace,
+    )
+    org.commit(f"root: hired {addr}")
+    print(f"hired {addr}")
+
+
+def cmd_task(args) -> None:
+    org = _org(args)
+    msg = org.delegate(ROOT, args.to, args.title, _text(args.goal), _text(args.acceptance), args.input, args.budget)
+    org.commit(f"root: task {msg.id} -> {msg.to}")
+    print(f"task {msg.id} -> {msg.to} (budget {msg.budget})")
+
+
+def cmd_send(args) -> None:
+    org = _org(args)
+    msg = org.send(ROOT, args.to, _text(args.body), title=args.title, reply_to=args.reply_to, budget=args.budget)
+    org.commit(f"root: note {msg.id} -> {msg.to}")
+    print(f"sent {msg.id} -> {msg.to}")
+
+
+def cmd_status(args) -> None:
+    org = _org(args)
+    print(org.tree())
+    out = org.outstanding(ROOT)
+    if out:
+        print("\nyour outstanding tasks:")
+        for t in out:
+            print(f"  {t.id} \"{t.title}\" -> {t.to}")
+
+
+def cmd_inbox(args) -> None:
+    org = _org(args)
+    batch = org.messages(ROOT, "inbox") if args.keep else org.begin_run(ROOT)
+    if not args.keep:
+        org.end_run(ROOT, ok=True)
+    print("\n".join(m.render() for m in batch) or "(no new messages)")
+
+
+def cmd_resume(args) -> None:
+    org = _org(args)
+    org.resume(org.require(args.agent))
+    print(f"resumed {args.agent}")
+
+
+def cmd_run(args) -> None:
+    from .scheduler import Scheduler, kiro_runner
+
+    org = _org(args)
+    sched = Scheduler(org, kiro_runner(args.kiro))
+    if args.once:
+        sched.acquire()
+        try:
+            sched.tick(max_runs=args.max_runs)
+            while sched.runs:
+                time.sleep(float(org.config["poll_seconds"]))
+                sched._reap()
+        finally:
+            sched.release()
+    else:
+        sched.serve(until_idle=args.until_idle, max_runs=args.max_runs)
+
+
+def cmd_mcp(args) -> None:
+    from .server import serve
+
+    serve()
+
+
+def cmd_kiro_profile(args) -> None:
+    from .scheduler import ensure_kiro_profile, mcp_server_command
+
+    name = ensure_kiro_profile([t for t in (args.tools or "").split(",") if t])
+    print(f"wrote ~/.kiro/agents/{name}.json (mcp server: {json.dumps(mcp_server_command())})")
+
+
+def main(argv: list[str] | None = None) -> None:
+    p = argparse.ArgumentParser(prog="orgmcp", description="A file-based organization of agents, run over MCP.")
+    p.add_argument("--root", help="organization directory (default: $ORG_ROOT or nearest dir with ORG.md)")
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    s = sub.add_parser("init", help="create a new organization")
+    s.add_argument("path", nargs="?", default="org")
+    s.add_argument("--mission", help="mission text or @file")
+    s.add_argument("--model", help="default kiro model for all agents")
+    s.set_defaults(fn=cmd_init)
+
+    s = sub.add_parser("hire", help="create an agent (as root)")
+    s.add_argument("parent", help="'root' or an agent address")
+    s.add_argument("name")
+    s.add_argument("--role", required=True)
+    s.add_argument("--charter", required=True, help="charter text or @file")
+    s.add_argument("--model")
+    s.add_argument("--tools", help="comma-separated kiro built-in tools, e.g. read,write,shell")
+    s.add_argument("--can-hire", action="store_true")
+    s.add_argument("--max-children", type=int, default=5)
+    s.add_argument("--workspace")
+    s.set_defaults(fn=cmd_hire)
+
+    s = sub.add_parser("task", help="give a task to an agent (as root)")
+    s.add_argument("to")
+    s.add_argument("--title", required=True)
+    s.add_argument("--goal", required=True, help="text or @file")
+    s.add_argument("--acceptance", required=True, help="text or @file")
+    s.add_argument("--input", action="append", default=[], help="path for the agent to read (repeatable)")
+    s.add_argument("--budget", type=int)
+    s.set_defaults(fn=cmd_task)
+
+    s = sub.add_parser("send", help="send a note to an agent (as root)")
+    s.add_argument("to")
+    s.add_argument("body", help="text or @file")
+    s.add_argument("--title", default="")
+    s.add_argument("--reply-to")
+    s.add_argument("--budget", type=int, default=0, help="grant extra runs")
+    s.set_defaults(fn=cmd_send)
+
+    s = sub.add_parser("status", help="show the organization tree")
+    s.set_defaults(fn=cmd_status)
+
+    s = sub.add_parser("inbox", help="read your (root) messages")
+    s.add_argument("--keep", action="store_true", help="do not mark as read")
+    s.set_defaults(fn=cmd_inbox)
+
+    s = sub.add_parser("resume", help="unpause an agent")
+    s.add_argument("agent")
+    s.set_defaults(fn=cmd_resume)
+
+    s = sub.add_parser("run", help="run the scheduler")
+    s.add_argument("--once", action="store_true", help="one pass, wait for those runs, exit")
+    s.add_argument("--until-idle", action="store_true", help="exit when nothing is left to do")
+    s.add_argument("--max-runs", type=int, help="stop starting runs after this many (safety cap)")
+    s.add_argument("--kiro", default="kiro-cli", help="kiro-cli binary")
+    s.set_defaults(fn=cmd_run)
+
+    s = sub.add_parser("mcp", help="run the MCP server on stdio (identity from $ORG_AGENT, default root)")
+    s.set_defaults(fn=cmd_mcp)
+
+    s = sub.add_parser("kiro-profile", help="write the kiro agent profile used for agent runs")
+    s.add_argument("--tools")
+    s.set_defaults(fn=cmd_kiro_profile)
+
+    args = p.parse_args(argv)
+    try:
+        args.fn(args)
+    except OrgError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        sys.exit(1)
