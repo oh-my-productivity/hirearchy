@@ -1,0 +1,32 @@
+e6e1e5b Amin Alizadeh 2026-10-17 19:30:04 +0100 Add pytest tests covering alignment, stdin/file input, errors and escaping
+50ed12f Amin Alizadeh 2026-10-17 19:30:04 +0100 Add csv2md converter and CLI with sample.csv
+25a6478 Amin Alizadeh 2026-10-17 19:30:04 +0100 Add project scaffold: pyproject, README, gitignore, uv lockfile
+
+.gitignore
+.python-version
+README.md
+pyproject.toml
+sample.csv
+src/csv2md/__init__.py
+src/csv2md/__main__.py
+src/csv2md/cli.py
+src/csv2md/converter.py
+tests/test_csv2md.py
+uv.lock
+
+.git
+.gitignore
+.pytest_cache
+.python-version
+.uv-cache
+.venv
+lead
+pyproject.toml
+README.md
+sample.csv
+src
+tests
+uv.lock
+
+# *~
+/lead/

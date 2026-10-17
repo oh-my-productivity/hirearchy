@@ -1,0 +1,9 @@
+1. Scope: only header row, --align left|center|right, input from a file path or stdin, escape | in cells. Drop --delimiter and -o, I don't need them.
+2. Deliverable: not ~/projects. Put it in my existing repo at /tmp/orgmcp-b2-1792261142/repo. Agents must not touch anything outside that repo.
+3. Criteria: ok, plus Python 3.11, stdlib only at runtime, and all pytest tests passing.
+4. fine.
+5. uv + pyproject + csv2md console script, pytest: ok. Commits in that repo with clear messages, never push.
+6. Max about 25 runs total. Default models are fine.
+7. Yes, a separate reviewer must review the code before it counts as done.
+8. ok.
+9. ok. README in the repo with install and usage; and tell me at the end how to run it.

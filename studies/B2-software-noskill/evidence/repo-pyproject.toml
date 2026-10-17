@@ -1,0 +1,23 @@
+[project]
+name = "csv2md"
+version = "0.1.0"
+description = "Convert a CSV file (or stdin) to a Markdown table"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+csv2md = "csv2md.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/csv2md"]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

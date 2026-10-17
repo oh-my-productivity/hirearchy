@@ -1,0 +1,50 @@
+[tool] Running: ls -la /tmp/orgmcp-b2-1792261142/ /tmp/orgmcp-b2-1792261142/repo 2>&1; cd /tmp/orgmcp-b2-1792261142/repo 2>/dev/null && git status 2>&1 | head -5; git log --oneline 2>&1 | head -3; which uv python3...
+[tool] status: Completed
+[tool] Running: cd /Volumes/workspace/orgmcp/src/orgmcp/roles; head -8 code-reviewer.md tester.md manager.md; sed -n 180,200p ../blueprint.py
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+Here is the plan, validated with no errors or warnings. Nothing has been created or started yet.
+
+**Team (4 agents)**
+- `lead` is the project lead. It delegates and verifies but doesn't write code.
+- `engineer` builds csv2md.
+- `tester` runs the tests and the CLI independently and reports failures to the lead.
+- `reviewer` is a separate, read-only code reviewer. The work doesn't count as done until it approves.
+- The engineer, tester and reviewer all work only inside `/tmp/orgmcp-b2-1792261142/repo`. The lead is also confined to that repo, and no agent may touch anything outside it.
+
+**Scope**
+- The first CSV row is the header.
+- `--align left|center|right`, defaulting to left.
+- Input comes from a file path or from stdin (no path, or `-`).
+- `|` in cells is escaped as `\|`.
+- The table is written to stdout.
+- `--delimiter` and `-o` are out.
+
+**Toolchain**
+- Python 3.11 with stdlib only at runtime.
+- uv, `pyproject.toml`, a `csv2md` console script, and pytest as a dev dependency.
+- Local commits with clear messages. Nothing is pushed, and git config is left alone.
+
+**Budget:** 23 runs planned, under your cap of 25. The estimate is 18 runs, which covers one build pass plus one review and rework cycle. Runs the team doesn't spend come back to you.
+
+**Acceptance criteria**
+1. All work stays inside the repo, and nothing outside it is created or changed.
+2. Python 3.11, no runtime dependencies, and pytest only as a dev dependency.
+3. `uv run csv2md sample.csv` prints a valid GFM table: a header row, a separator row, and the same number of columns in every row.
+4. `--align` produces `:---`, `:---:` or `---:` in the separator row, and any other value is rejected with a clear error.
+5. A missing file or empty input exits non-zero with a message on stderr.
+6. `|` is escaped as `\|`, quoted fields with commas work, and ragged rows are padded to the header width.
+7. `uv run pytest` passes, with tests covering each criterion above.
+8. The README documents install and usage (file, stdin, `--align`) with an example.
+9. `git log` shows at least 2 commits with descriptive messages, `git status` is clean, and there was no push and no remote added.
+10. The tester and the reviewer both checked the work, the engineer applied every required change, and the reviewer's final verdict is approve.
+11. The final report gives the exact commands to install and run csv2md.
+
+When the team finishes, I'll check the repo against each criterion myself and tell you how to run it.
+
+The repo currently has no commits. The engineer will make the first commit.
+
+Reply "approve" to start, or tell me what to change.
