@@ -51,7 +51,9 @@ DEFAULT_CONFIG = {
     "default_budget": 10,  # runs given with a task when none is specified
     "memory_max_words": 800,  # cap on an agent's MEMORY.md; writes that exceed it are refused
     "default_model": None,  # kiro model; None = kiro default
+    "max_message_chars": 20000,  # longest message body send/delegate/report accept; detail goes in a file
 }
+RENDER_BODY_CHARS = 8000  # longer bodies are cut when shown to an agent (prompt, inbox tool); the file has the rest
 
 
 class OrgError(ValueError):
@@ -69,6 +71,15 @@ def split_frontmatter(text: str) -> tuple[dict, str]:
             meta = yaml.safe_load(text[4:end]) or {}
             return (meta if isinstance(meta, dict) else {}), text[end + 5 :]
     return {}, text
+
+
+def _message_cap(config: dict) -> int:
+    """``max_message_chars`` from ORG.md; a malformed value means the default."""
+    try:
+        cap = int(config["max_message_chars"])
+    except (TypeError, ValueError):
+        return int(DEFAULT_CONFIG["max_message_chars"])
+    return cap if cap > 0 else int(DEFAULT_CONFIG["max_message_chars"])
 
 
 def join_frontmatter(meta: dict, body: str) -> str:
@@ -144,7 +155,8 @@ class Message:
             path=path,
         )
 
-    def render(self) -> str:
+    def render(self, limit: int = RENDER_BODY_CHARS) -> str:
+        """The message as shown to an agent. A body over ``limit`` characters is cut, with the path to read the rest."""
         head = [f"from: {self.sender}", f"to: {self.to}"]
         if self.title:
             head.append(f"title: {self.title}")
@@ -156,7 +168,16 @@ class Message:
             head.append(f"revises: {self.revises}")
         if self.budget:
             head.append(f"budget: {self.budget} runs")
-        return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{self.body}\n"
+        body = self.body
+        if limit and len(body) > limit:
+            where = f"{self.to}/" if self.to != ROOT else ""
+            where += f"{self.path.parent.name}/{self.path.name}" if self.path else f"<box>/{self.id}.md"
+            body = (
+                body[:limit].rstrip()
+                + f"\n\n[... message cut: {len(self.body) - limit} more of {len(self.body)} characters. "
+                f"Read the rest with read(path=\"{where}\") if you need it.]"
+            )
+        return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{body}\n"
 
 
 class Org:
@@ -405,6 +426,13 @@ class Org:
         revises: str | None = None,
         _skip_route_check: bool = False,
     ) -> Message:
+        cap = _message_cap(self.config)
+        if len(body.strip()) > cap and self.norm(actor) != ROOT:  # the cap protects agents' runs; the human may paste
+            raise OrgError(
+                f"message is {len(body.strip())} characters; the limit is {cap} (max_message_chars). Messages are "
+                "read in full by the recipient's next run, so keep them short: write the detail to a file inside "
+                "your own directory and send a short message that gives its path."
+            )
         actor, to = self.require(actor), self.require(to)
         if type not in MESSAGE_TYPES:
             raise OrgError(f"type must be one of {MESSAGE_TYPES}")

@@ -12,6 +12,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -22,7 +23,7 @@ from . import review, templates
 from .core import ROOT, Org, OrgError, atomic_write
 from .health import config_number
 
-# (org, agent address, prompt) -> (argv, cwd, env)
+# (org, agent address, prompt) -> (argv, cwd, env). The prompt is delivered on the process's stdin, not in argv.
 Runner = Callable[[Org, str, str], tuple[list[str], Path, dict]]
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
@@ -73,7 +74,8 @@ def kiro_runner(kiro_bin: str = "kiro-cli") -> Runner:
         model = meta.get("model") or org.config.get("default_model")
         if model:
             cmd += ["--model", str(model)]
-        cmd.append(prompt)
+        # The prompt is not an argument: it can be arbitrarily long (E2BIG) and visible in `ps`.
+        # `kiro-cli chat --no-interactive` without INPUT reads it from stdin; the scheduler feeds it there.
         ws = meta.get("workspace")
         cwd = Path(ws).expanduser() if ws else org.dir(addr)
         env = {**os.environ, "ORG_ROOT": str(org.root), "ORG_AGENT": addr}
@@ -252,11 +254,14 @@ class Scheduler:
         logf = open(log, "a", encoding="utf-8")
         try:
             cmd, cwd, env = self.runner(self.org, addr, prompt)
-            logf.write(f"# run of {addr}, {len(batch)} message(s)\n# cwd: {cwd}\n# cmd: {' '.join(cmd[:-1])} <prompt>\n")
+            logf.write(f"# run of {addr}, {len(batch)} message(s)\n# cwd: {cwd}\n# cmd: {' '.join(cmd)} <prompt on stdin>\n")
             logf.write(f"# ---- prompt ----\n{prompt}\n# ---- output ----\n")
             logf.flush()
-            proc = subprocess.Popen(cmd, cwd=cwd, env=env, stdin=subprocess.DEVNULL, stdout=logf,
-                                    stderr=subprocess.STDOUT, text=True)
+            with tempfile.TemporaryFile() as stdin:  # a file, not a pipe: no deadlock if the child never reads it
+                stdin.write(prompt.encode("utf-8"))
+                stdin.seek(0)
+                proc = subprocess.Popen(cmd, cwd=cwd, env=env, stdin=stdin, stdout=logf,
+                                        stderr=subprocess.STDOUT, text=True)
         except Exception as exc:  # e.g. kiro-cli missing: count it as a failed run
             logf.write(f"\n# failed to start: {exc}\n")
             logf.close()

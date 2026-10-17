@@ -108,7 +108,6 @@ def test_qa3_retiring_a_running_agent_does_not_crash_the_scheduler(org):
         sched.release()
 
 
-@pytest.mark.xfail(strict=True, reason="QA-4: prompt is passed as one argv string; an oversized message makes the agent unlaunchable (E2BIG)")
 def test_qa4_oversized_message_does_not_wedge_the_agent(org, tmp_path, monkeypatch):
     monkeypatch.setattr("orgmcp.scheduler.ensure_kiro_profile", lambda tools: "orgmcp")
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)

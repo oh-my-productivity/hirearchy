@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 
 from orgmcp import scheduler as sched_mod
-from orgmcp.core import ROOT
+from orgmcp.core import ROOT, OrgError
 from orgmcp.scheduler import Scheduler, ensure_kiro_profile
 
 
@@ -167,3 +167,64 @@ def test_failed_run_of_a_retired_agent_leaves_no_trace(org):
     assert not [m for m in org.messages(ROOT, "inbox") if "keeps failing" in m.title]
     retired_logs = list((org.root / ".retired").glob("ceo-*/runs/*.log"))
     assert retired_logs and "# exit 3" in retired_logs[0].read_text()  # the log handle was closed and flushed
+
+
+# ------------------------------------------------------- QA-4: long prompts
+
+
+def test_prompt_is_delivered_on_stdin_not_in_argv(org, tmp_path):
+    out = tmp_path / "stdin.txt"
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
+    argv = ["sh", "-c", f"cat > {out}"]
+    sched = Scheduler(org, lambda o, a, p: (argv, o.dir(a), dict(os.environ)), echo=lambda _: None)
+    sched.acquire()
+    try:
+        run_to_idle(sched)
+    finally:
+        sched.release()
+    text = out.read_text()
+    assert text.startswith("# orgmcp run: you are `ceo`") and "### task " in text
+
+
+def test_kiro_command_has_no_prompt_argument(org):
+    cmd, _, _ = sched_mod.kiro_runner()(org, "ceo", "THE PROMPT")
+    assert "THE PROMPT" not in cmd
+
+
+def test_oversized_message_from_an_agent_is_refused_with_advice(org):
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
+    cap = org.config["max_message_chars"]
+    assert cap == 20000
+    org.send("ceo", "root", "x" * cap)  # exactly at the cap is fine
+    with pytest.raises(OrgError, match="write the detail to a file"):
+        org.send("ceo", "root", "x" * (cap + 1))
+    task = org.delegate("ceo", "ceo/eng", "t", "g", "a", budget=2)
+    with pytest.raises(OrgError, match="max_message_chars"):
+        org.report("ceo/eng", task.id, "done", "y" * (cap + 1))
+    with pytest.raises(OrgError, match="max_message_chars"):
+        org.delegate("ceo", "ceo/eng", "t2", "g" * (cap + 1), "a", budget=1)
+
+
+def test_the_cap_is_configurable_and_a_bad_value_means_the_default(org):
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
+    configure(org, max_message_chars=50)
+    with pytest.raises(OrgError):
+        org.send("ceo", "root", "x" * 51)
+    configure(org, max_message_chars="lots")
+    org.send("ceo", "root", "x" * 5000)
+
+
+def test_a_huge_message_in_an_inbox_is_cut_in_the_prompt_with_the_path_to_read_it(org):
+    org.send(ROOT, "ceo", "BEGIN " + "x" * 3_000_000 + " END")  # root (the human) is not capped
+    batch = org.messages("ceo", "inbox")
+    prompt = org.run_prompt("ceo", batch)
+    assert len(prompt) < 40_000 and "BEGIN" in prompt and "END" not in prompt
+    assert f'read(path="ceo/inbox/{batch[0].id}.md")' in prompt
+    org.begin_run("ceo")  # the pointer stays right while the message is being handled
+    assert f"ceo/inflight/{batch[0].id}.md" in org.run_prompt("ceo", org.messages("ceo", "inflight"))
+    assert "cut" not in batch[0].render(limit=0) and batch[0].render(limit=0).endswith(" END\n")
+
+
+def test_short_messages_render_unchanged(org):
+    msg = org.send(ROOT, "ceo", "hello")
+    assert msg.render().endswith("\n\nhello\n") and "cut" not in msg.render()
