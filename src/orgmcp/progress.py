@@ -62,15 +62,25 @@ def progress(org: Org, task_id: str | None = None, now: datetime | None = None, 
 def describe_progress(org: Org, task_id: str | None = None, wait_seconds: int = 0) -> str:
     """``progress`` plus the scheduler line (the same text for the MCP tool and the CLI).
 
-    Without a running scheduler nothing moves, so a wait would only burn time: it returns at once and says so.
+    Without a running scheduler nothing moves, so a wait would only burn time: it returns at once and says so. The same
+    when every open task waits for the user (budget, a crashing agent, a decision): the line then says so and lists the
+    user's options.
     """
-    from .scheduler import describe_scheduler
+    from .scheduler import describe_scheduler, waiting_on_user
 
     sched = describe_scheduler(org)
     stopped = not sched.startswith("scheduler: running")
     open_work = bool(org.outstanding(ROOT))
+    waiting = waiting_on_user(org) if open_work else None
     note = ""
-    if stopped and open_work:
+    if waiting is not None and sched.startswith(("scheduler: running", "scheduler: stopped")):
+        if stopped:  # the line already says why ("stopped (waiting on you: ...)")
+            sched += f" - nothing moves until you act. {waiting.options}"
+        else:
+            sched += f" - {waiting.text}. {waiting.options} A scheduler started with until_done exits by itself soon."
+        if wait_seconds:
+            wait_seconds, note = 0, "Not waiting: nothing can progress without you. "
+    elif stopped and open_work:
         sched += " - open tasks do not move until it is started (start() or `orgmcp run`)"
         if wait_seconds:
             wait_seconds, note = 0, "Not waiting: no scheduler is running, so nothing will change. "

@@ -10,12 +10,13 @@ ORG_RULES = """\
 
 ## How this organization works
 - Every agent is a directory; its address is the path (e.g. `ceo/cto`). The human at the top is `root`.
-- You act ONLY through the orgmcp tools:
+- You act ONLY through the orgmcp tools (kiro shows them as `@orgmcp/<tool>`, e.g. `@orgmcp/write`; if you were also
+  given kiro's built-in `write`/`read`/`shell`, those are different tools that reach the workspace only, never the org):
   - `delegate` gives a task (a contract) to one of your direct reports.
   - `report` answers a task assigned to you: done, failed, or blocked.
   - `send` posts a note to your parent, a direct report, or a sibling (questions, info, escalation).
-- You may write only inside your own directory: artifacts go in `<you>/work/`, notes for your future self in
-  `<you>/MEMORY.md`. You may read anything in the organization with `read`.
+- You may write only inside your own directory, with `@orgmcp/write`: artifacts go in `<you>/work/`, notes for your
+  future self in `<you>/MEMORY.md`. You may read anything in the organization with `@orgmcp/read`.
   Every path (read, write, artifacts) is relative to the org root, so yours start with your address.
 - Budgets are counted in runs. Delegating moves budget from you to your report. When you are out of budget you stop being woken.
   `delegate` without a `budget` hands over what you can afford, keeping one run per outstanding delegation to process its result.
@@ -40,7 +41,7 @@ ORG_RULES = """\
    `blocked` is not final: once the blocker is resolved you may `report` that task again (once per blocked report; it
    supersedes the earlier one), under the same rules. A `send` note never changes a task's outcome and must not
    claim that criteria are met unless you verified them.
-7. Before you stop, rewrite `<you>/MEMORY.md` with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
+7. Before you stop, rewrite `<you>/MEMORY.md` (with `@orgmcp/write`, never the built-in `write`) with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
    Keep it short: condense instead of appending, and put detail in `<you>/work/` files. Writes that make it too long are refused.
    Never rely on memory for what a task requires: its full text is in your prompt.
 8. Stay within your charter. Escalate anything outside it.

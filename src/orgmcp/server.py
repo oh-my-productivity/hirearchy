@@ -21,7 +21,9 @@ from . import blueprint_examples
 from .core import ROOT, Org, OrgError
 from .health import org_health, render_text
 from .progress import WAIT_MAX, describe_progress
-from .scheduler import describe_scheduler, nothing_to_do, scheduler_state, start_scheduler, stop_scheduler
+from .scheduler import (
+    describe_scheduler, nothing_to_do, scheduler_state, start_scheduler, stop_scheduler, waiting_on_user,
+)
 
 INSTRUCTIONS = """\
 You are a member of a file-based organization of agents. Your identity is fixed by the runtime.
@@ -31,29 +33,30 @@ Call whoami first if you do not know your role, reports, budget and open tasks.
 
 ROOT_INSTRUCTIONS = """\
 You are connected to ONE orgmcp organization as `root`, the human's seat. {where}
-- Use only this organization. Never look for, create or modify any other one (no other paths, no shell or CLI
-  workarounds, no changing ORG_ROOT).
+- Use only this organization. Never look for, create or modify another one (no other paths, shell or CLI
+  workarounds, ORG_ROOT changes).
 - Never claim the organization did work unless orgmcp tools show it (status, progress, inbox, read, health).
-- If an orgmcp tool fails, tell the user what failed instead of substituting another mechanism (for example a
-  generic subagent tool).
-- Work flows down as tasks (delegate), results flow up (report), everything else is a note (send). `whoami` and
-  `status` show the current state; `start` and `stop` control the scheduler that wakes the agents.
+- If an orgmcp tool fails, tell the user what failed instead of substituting another mechanism (e.g. a
+  subagent).
+- `whoami` and `status` show the state; `start` and `stop` control the scheduler that wakes the agents.
 When the user asks for an org, team or agents for a goal:
 1. Ask what you need in ONE message. Propose defaults only where a generic one exists; a list the user did not give
    (scope items, competitors, features, source files) you ASK for, never invent. Default deliverable place: a new
-   `deliverables/` folder in the user's current directory, stated plainly. Also ask: format, length, exact checkable
-   acceptance criteria, sources/web, workspace and tests (code), budget in runs, models, review, approval.
+   `deliverables/` folder in the user's current directory, said plainly. Also ask: format, length, exact checkable
+   criteria, sources/web, workspace and tests (code), budget in runs, models, review, approval.
 2. Start the blueprint from `blueprint_example(kind)` (research | documents | code), then call `propose_org`. Show the
-   "PLAN FOR YOU" block exactly as returned and wait for the user's explicit approval. Fix errors; revise on feedback.
-   The user's own files go in `needs.inputs` (read-only); built-in `write` only for code.
+   "PLAN FOR YOU" block exactly as returned. Fix errors; settle its warnings (e.g. model policy) with the user
+   or state them; wait for approval. The user's own files go in `needs.inputs` (read-only);
+   built-in `write` only for code.
 3. After approval: `create_org` (if none exists), `apply_org(blueprint, approved=True, plan_id=<from propose_org>)`,
-   `start`. Spend beyond the plan needs their OK.
-4. Answer "status?" with `progress`. Never promise to tell the user later (a turn ends when you reply): if they want
-   to be told when it is done, say you will wait now and call `progress(wait_seconds=N)`, repeating as they wish;
-   otherwise tell them to ask "status?". Relay escalations with a recommended decision.
+   `start`. Spend beyond the plan needs their OK: ask at the FIRST budget request, not after the reserve is gone.
+4. Answer "status?" with `progress`. Never promise to tell the user later (a turn ends when you reply): to be told when
+   it is done, say you will wait now and call `progress(wait_seconds=N)`, repeating as they wish; else tell them to
+   ask "status?". Relay escalations with a recommended decision.
 5. When it is done: read the deliverable and check it against EVERY acceptance criterion (send it back with
    `delegate(..., revises=...)` if not; never patch it yourself), copy it where the user wants it. `start` ends by
-   itself when the work is done (start again after giving it more work); `stop` only if the user cancels.
+   itself when the work is done (start again after giving it more work); `stop` only if the user cancels, declines
+   more budget or you hand over an unverified result (say the task stays open). Final answer: as short as asked.
 """
 
 DS_STORE = ".DS_Store"
@@ -289,23 +292,26 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
 
     @mcp.tool()
     def read(path: str = ".") -> str:
-        """Read a file (with word count and modification time) or list a directory in the organization. Paths are
-        relative to the org root, e.g. "ceo/writer/work/brief.md". Outside the organization only ABSOLUTE paths work,
+        """The ORGANIZATION's read tool (kiro shows it as @orgmcp/read; not kiro's built-in `read`, which reads the
+        workspace). Reads a file (with word count and modification time) or lists a directory in the organization. Paths
+        are relative to the org root, e.g. "ceo/writer/work/brief.md". Outside the organization only ABSOLUTE paths work,
         and only inside your workspace, your read-only inputs, or the workspace of an agent in your team (to verify
         what your reports made); anything else is refused."""
         return binding.get().read(path, actor=me)
 
     @mcp.tool()
     def write(path: str, content: str, append: bool = False) -> str:
-        """Write a file inside your own directory. Paths are relative to the org root, like every path here,
-        so they start with your address: e.g. "<you>/MEMORY.md" or "<you>/work/plan.md".
+        """Write an ORGANIZATION file (kiro shows this tool as @orgmcp/write; it is NOT kiro's built-in `write`, which
+        writes the workspace). Use it for your memory, notes and artifacts inside your own org directory. Paths are
+        relative to the org root, like every path here, so they start with your address: e.g. "<you>/MEMORY.md" or
+        "<you>/work/plan.md".
 
         You may also rewrite a direct report's charter ("<you>/<name>/AGENT.md"). Inboxes, logs and your own
         charter are managed by the runtime; use send/delegate/report to communicate.
         """
         org = binding.get()
         p = org.write(me, path, content, append=append)
-        return f"wrote {p.relative_to(org.root)}"
+        return f"wrote {p.relative_to(org.root)} (organization file)"
 
     @mcp.tool()
     def status() -> str:
@@ -366,14 +372,20 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
         max_runs: stop starting agent runs after this many (safety cap; default: no cap). until_done (default True):
         the scheduler exits by itself when you have no open task and nothing is running or can run, so you need not
         stop it (status and progress then say "scheduler: stopped (finished: no open tasks)"); start it again after
-        giving the org more work. False keeps it running until stop(). Refused if one is already running. Output goes
-        to .runtime/scheduler.log. Returns the scheduler's pid.
+        giving the org more work. It also exits by itself, after a few minutes (`until_done_grace_seconds`), when every
+        open task is waiting for YOU (an agent is out of budget or keeps failing, or a task is stalled): status and
+        progress then say "stopped (waiting on you: ...)" with your options. start() refuses while that is the case:
+        grant runs first (send(to=<agent>, body=<why>, budget=N)). False keeps it running until stop(). Refused if one
+        is already running. Output goes to .runtime/scheduler.log. Returns the scheduler's pid.
         """
         org = binding.get()
         if until_done and scheduler_state(org).state == "stopped" and nothing_to_do(org):
             return ("not started: there is nothing to run (you have no open task and no agent has work). Give the "
                     "organization work first (apply_org or delegate), then call start(); until_done=False would "
                     "keep an idle scheduler running instead")
+        if scheduler_state(org).state == "stopped" and (waiting := waiting_on_user(org)):
+            return (f"not started: nothing can progress without you, so a scheduler would only sit idle. {waiting.text}. "
+                    f"{waiting.options}")
         pid = start_scheduler(org, max_runs, until_done)
         cap = f", at most {max_runs} run(s)" if max_runs is not None else ""
         end = "; it exits by itself when the work is done" if until_done else "; it runs until stop()"
