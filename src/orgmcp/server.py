@@ -392,9 +392,9 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
         """A ready-to-edit blueprint (YAML with a comment on every field and a one-paragraph schema summary).
 
         kind: "research" (facts from the web with source URLs, fact-checked), "documents" (write from the user's local
-        files, no web; uses `needs.inputs`, read-only folders) or "code" (software in a repo workspace, with tests and
-        local commits). Replace every <PLACEHOLDER> with what the user told you (ask for what is missing; do not invent
-        lists), delete what does not apply, then call propose_org with the text. Read-only.
+        files, no web; uses `needs.inputs`, read-only folders), "code" (software in a repo workspace, with tests and
+        local commits) or "analysis" (the user's data files, read-only, analysed by a checked script). Replace every
+        <PLACEHOLDER> with what the user told you (ask for what is missing; do not invent lists), delete what does not apply, then call propose_org with the text. Read-only.
         """
         return blueprint_examples.example(kind, _example_base(binding.peek()))
 

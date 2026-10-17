@@ -462,7 +462,7 @@ def test_apply_creates_tree_charters_and_task(base, roots, empty_org):
     assert "You never edit the deliverable" in fbody and empty_org.charter("lead/factcheck")[0]["model"] == "claude-sonnet-4.6"
     task = empty_org.find_received("lead", s.task_id)
     assert task.budget == 22 and task.sender == ROOT and task.title.startswith("Competitor analysis")
-    assert "1. Covers exactly Obsidian" in task.body and "6. The final report names the path" in task.body
+    assert "1. Covers exactly Obsidian" in task.body and "7. The final report names the path" in task.body
     assert "at most 1500 words" in task.body and "Report its path as an artifact" in task.body
     assert empty_org.budget("lead") == 22
 

@@ -91,10 +91,11 @@ def cwd(tmp_path, monkeypatch):
 
 def filled(kind: str, base: Path) -> dict:
     """An example with its path placeholders replaced by real folders (prose placeholders are valid YAML as they are)."""
-    for name in ("docs", "proj", "deliverables"):
+    for name in ("docs", "data", "proj", "deliverables"):
         (base / name).mkdir(exist_ok=True)
     text = ex.example(kind, base)
-    text = text.replace("<folder-with-your-files>", "docs").replace("<project-folder>", "proj").replace("<name>", "result")
+    text = (text.replace("<folder-with-your-files>", "docs").replace("<folder-with-your-data>", "data")
+            .replace("<project-folder>", "proj").replace("<name>", "result"))
     return yaml.safe_load(text)
 
 
@@ -127,7 +128,8 @@ def test_plan_and_access_line_show_exactly_the_applied_confinement(kind, cwd, tm
         assert ("write" in tools) == ("changes files only in" in plan), (addr, plan)
         if "write" not in tools and "shell" not in tools:
             assert "cannot change your files" in plan
-    assert shells == (4 if kind == "code" else 0)  # engineer, tester, code-reviewer, and the manager holding what they hold
+    # code: engineer, tester, code-reviewer; analysis: analyst, data-checker; and the manager holding what they hold
+    assert shells == {"code": 4, "analysis": 3}.get(kind, 0)
 
 
 def test_plan_words_for_each_access_shape():
@@ -165,10 +167,11 @@ def root_server(tmp_path, cwd, monkeypatch):
 
 def fill_text(server, kind: str, base: Path) -> str:
     """What the assistant does: fetch the example and replace the placeholders it needs with the user's values."""
-    for name in ("docs", "proj", "deliverables"):
+    for name in ("docs", "data", "proj", "deliverables"):
         (base / name).mkdir(exist_ok=True)
     text = call(server, "blueprint_example", kind=kind)
-    return text.replace("<folder-with-your-files>", "docs").replace("<project-folder>", "proj").replace("<name>", "result")
+    return (text.replace("<folder-with-your-files>", "docs").replace("<folder-with-your-data>", "data")
+            .replace("<project-folder>", "proj").replace("<name>", "result"))
 
 
 @pytest.mark.parametrize("kind", ex.KINDS)
@@ -186,15 +189,17 @@ def test_documents_example_with_its_placeholder_folder_is_a_draft_that_names_the
 
 
 def test_example_criteria_match_the_exhaustive_verifier_templates(root_server, cwd):
-    for kind, needle in (("research", "n of m claims verified with n = m"), ("documents", "criteria met: n of m with n = m")):
+    for kind, needle in (("research", "n of m factual claims verified' with n = m"), ("documents", "criteria met: n of m with n = m"),
+                         ("analysis", "Figures checked: n of m match' with n = m")):
         criteria = yaml.safe_load(fill_text(root_server, kind, cwd))["task"]["acceptance"]
         assert any(needle in c for c in criteria), kind
         assert not any("at least 6" in c for c in criteria), kind
     assert "at least 6" not in (EXAMPLES_DIR / "blueprint-research.yaml").read_text()
     research = yaml.safe_load((EXAMPLES_DIR / "blueprint-research.yaml").read_text())
-    assert any("n of m claims verified with n = m" in c for c in research["task"]["acceptance"])
+    assert any("n of m factual claims verified' with n = m" in c for c in research["task"]["acceptance"])
     # the wording asks for what the templates report
-    assert "n of m claims verified" in bpm.get_role("fact-checker").body and "criteria met: n of m" in bpm.get_role("reviewer").body
+    assert "n of m factual claims verified" in bpm.get_role("fact-checker").body and "criteria met: n of m" in bpm.get_role("reviewer").body
+    assert "Figures checked: n of m match" in bpm.get_role("data-checker").body
 
 
 # ------------------------------------------------------------------------------ skill and instructions

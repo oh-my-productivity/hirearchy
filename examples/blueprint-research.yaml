@@ -6,11 +6,11 @@ mission: >
 needs:
   scope: "Obsidian, Logseq, Joplin, Trilium and AnyType only; self-hosting, licensing, sync/E2EE, mobile support, extensibility."
   deliverable:
-    description: Competitor analysis with a comparison table and a closing "Where we can win" section
+    description: Competitor analysis with a comparison table and a closing "Where we can win" section marked as our assessment
     format: markdown
     max_words: 1500
     path: ~/deliverables/competitors.md
-  quality_bar: Every factual claim has a primary-source URL; current facts (versions, licenses) come from the live source.
+  quality_bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts (versions, licenses) come from the live source.
   sources: Web access to official sites, repositories and docs; a source URL per claim.
   budget_runs: 25
   models: {cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}
@@ -36,7 +36,8 @@ task:
   acceptance:
     - Covers exactly Obsidian, Logseq, Joplin, Trilium and AnyType, and no other app.
     - At most 1500 words as counted by read.
-    - Contains a comparison table with one row per app and a final section titled "Where we can win".
-    - Every factual claim has a source URL that the fact-checker or researcher fetched.
-    - "The fact-checker's coverage report shows every claim verified (n of m claims verified with n = m, none wrong, none unsupported) and every required change was applied by the writer."
-    - The final report names the path of the deliverable inside the organization.
+    - Contains a comparison table with one row per app and a final section titled "Where we can win" that is marked as our assessment (judgement).
+    - Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+    - The "Where we can win" section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
+    - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change."
+    - The final report names the path of the deliverable inside the organization, and pastes that coverage line verbatim.
