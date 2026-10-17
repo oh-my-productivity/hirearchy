@@ -149,9 +149,11 @@ depth and children within limits. Over MCP the blueprint is passed as YAML/JSON 
 **Budget estimate.** One pass plus one review/rework cycle. A worker's pass costs its template's `base_runs` times `scale`
 (researcher 3, writer 2, engineer 4, fact-checker 2, reviewer 1, tester 2, code-reviewer 2, analyst 4, data-checker 2) and its rework costs 1. A manager's
 pass costs 2 plus one per direct report; its rework costs 2. The planned budget is the estimate times 1.25 unless
-`task.budget` is set. Managers get a written budget plan: initial grants equal the reports' pass runs and the rest stays with
-the manager as reserve for rework. Unspent runs return up the tree automatically (see the budget rule above), so the
-planned figure is what you authorize at most, and `progress` shows what was used and returned.
+`task.budget` is set. Managers get a written budget plan: each report's grant is its whole subtree, pass and its one rework (author)
+or re-check (verifier) run, and the lead keeps the rest (its own runs plus a reserve). For `examples/blueprint-research.yaml`
+(`orgmcp plan` prints it): 22 runs, researcher 4, writer 3, fact-checker 3, lead keeps 12. Unspent runs return up the tree on each
+final report (see the budget rule above; a lead can pull them back from an idle report with `reclaim`), so the planned figure is
+what you authorize at most, and `progress` shows what was used and returned.
 
 **Role templates** live in `src/orgmcp/roles/*.md`: `manager`, `researcher`, `writer`, `reviewer`, `fact-checker`, `engineer`,
 `tester`, `code-reviewer`, `analyst`, `data-checker`. Each has purpose, responsibilities, decision rights, escalation, quality bar, budget discipline and a
@@ -165,6 +167,9 @@ What the templates add for verification and delegation:
 - Verifiers get the project and the authors' workspaces read-only as `inputs` unless they can already write there; explicit `inputs` that hide the reviewed work raise the warning `verifier-cannot-read`.
 - `blueprint_example("analysis")`: data analysis with read-only data, a scratch workspace, an `analyst` and an independent `data-checker`. The data-checker recomputes the key figures with its own script and checks figures with their label: (label, number) pairs, not numbers alone.
 - `code-reviewer` now has `read` and `shell`: it runs the test suite and the commands named in the criteria and reports each command and result; it still never edits files (charter-enforced, since shell can't be confined). It needs a workspace, like the engineer.
+- The lead (`manager`) runs on the strong model by default, even when the drafters are cheap, because it decides how every other run is spent; the plan warns `manager-cheap-model` if it is put on a cheap one.
+- The lead delegates a step only when its inputs exist (research, then write, then check) and never sends status messages; results wake it.
+- A failed check goes back to the author of the failing file (`delegate(revises=...)`, required changes quoted verbatim), with one cut-or-reframe rework and one re-check of that same file. If it still fails, the lead reports `blocked` with options and the coverage line.
 - `manager` verifies with its own `read` output (never memory or a report's claim), treats the verifier's coverage report as a precondition for `done`, and sends deviations back with `revises` or escalates instead of reporting `done`.
 - `writer`/`researcher`/`engineer`/`tester` got small additions: relevance over length, page-level citations with retrieval date, tests run before reporting, every criterion exercised with commands.
 
