@@ -52,14 +52,12 @@ def drain(org, addr, ok=True):
 # ------------------------------------------------------------------ write guard
 
 
-@pytest.mark.xfail(strict=True, reason="QA-1: write guard compares names case-sensitively (Inbox/, agent.md, memory.md)")
 def test_qa1_case_variants_of_protected_names_are_refused(org):
     for path in ("ceo/agent.md", "ceo/Inbox/x.md", "ceo/READ/x.md", "ceo/Runs/x.log", "ceo/memory.md"):
         with pytest.raises(OrgError):
             org.resolve_write("ceo", path)
 
 
-@pytest.mark.xfail(strict=True, reason="QA-1: on a case-insensitive FS an agent can rewrite its own charter and forge inbox mail")
 def test_qa1_case_variant_cannot_rewrite_own_charter_or_mint_budget(org):
     if not case_insensitive_fs(org):
         pytest.skip("needs a case-insensitive filesystem (macOS/Windows default)")
@@ -79,7 +77,6 @@ def test_qa1_case_variant_cannot_rewrite_own_charter_or_mint_budget(org):
     assert org.budget("ceo") == before
 
 
-@pytest.mark.xfail(strict=True, reason="QA-2: write() to <me>/<new>/AGENT.md creates an agent without hire() checks")
 def test_qa2_write_cannot_create_agents_around_hire_rules(org):
     # eng is a leaf (can_hire is false) yet can mint a report that may itself hire 99 people
     charter = "---\nrole: sneaky\ncan_hire: true\nmax_children: 99\n---\n# x"

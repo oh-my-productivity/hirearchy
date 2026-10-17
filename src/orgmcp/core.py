@@ -22,6 +22,7 @@ import re
 import secrets
 import shutil
 import subprocess
+import unicodedata
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -81,6 +82,34 @@ def atomic_write(path: Path, text: str) -> None:
     tmp = path.parent / f".tmp-{secrets.token_hex(4)}-{path.name}"
     tmp.write_text(text, encoding="utf-8")
     os.replace(tmp, path)
+
+
+def _fold(name: str) -> str:
+    """Key under which two file names count as the same name on *some* filesystem.
+
+    macOS (APFS/HFS+) and Windows ignore letter case (and Unicode form); Windows also ignores trailing dots and
+    spaces. Protected names are compared through this key, so the write guard behaves identically on case-sensitive
+    and case-insensitive filesystems: it never has to ask the filesystem which kind it is.
+    """
+    return unicodedata.normalize("NFKC", name).casefold().rstrip(" .")
+
+
+_FOLDED_RUNTIME_NAMES = {_fold(n) for n in RUNTIME_NAMES}
+# Files an agent may only write under their exact spelling (any other casing is a different name on Linux and the
+# same file on macOS, so it is refused outright).
+_EXACT_FILES = {_fold(n): n for n in ("AGENT.md", "MEMORY.md", "ORG.md")}
+
+
+def _case_twin(parent: Path, name: str) -> str | None:
+    """The existing entry of ``parent`` that equals ``name`` except for case, if there is one."""
+    try:
+        names = os.listdir(parent)
+    except OSError:
+        return None
+    if name in names:
+        return None
+    key = _fold(name)
+    return next((n for n in names if _fold(n) == key), None)
 
 
 def _visible(paths) -> list[Path]:
@@ -609,11 +638,28 @@ class Org:
                 f"you may only write inside your own directory. Paths are relative to the org root, so yours "
                 f"start with `{prefix}`: e.g. `{prefix}MEMORY.md` or `{prefix}work/notes.md` (got `{path}`)"
             )
-        first = p.relative_to(base).parts[0]
-        if first in RUNTIME_NAMES or first.startswith("."):
+        rel = p.relative_to(base).parts
+        first = rel[0]
+        if _fold(first) in _FOLDED_RUNTIME_NAMES or first.startswith("."):
             raise OrgError(f"{first} is managed by the runtime; use send/delegate/report to communicate")
-        if first == "AGENT.md":
-            raise OrgError("your charter is owned by your parent")
+        exact = _EXACT_FILES.get(_fold(first))
+        if exact and first != exact:
+            raise OrgError(f"that name is reserved: it must be spelled exactly `{exact}`")
+        cur = base
+        for part in rel:  # a spelling that differs only by case from an existing entry would alias it on macOS
+            twin = _case_twin(cur, part)
+            if twin:
+                raise OrgError(f"`{part}` differs only by letter case from the existing `{twin}`; use the exact name `{twin}`")
+            cur = cur / part
+        if any(_fold(part) == "agent.md" for part in rel):
+            if len(rel) == 1:
+                raise OrgError("your charter is owned by your parent")
+            reports = {c.rsplit("/", 1)[-1] for c in self.children(actor)}
+            if rel != (rel[0], "AGENT.md") or rel[0] not in reports:
+                raise OrgError(
+                    "AGENT.md can only be written for an existing direct report; "
+                    "create agents with hire (it enforces hiring rights, limits and authority)"
+                )
         if first == "ORG.md" and actor != ROOT:
             raise OrgError("ORG.md is owned by root")
         if (base / first / "AGENT.md").is_file() and p != base / first / "AGENT.md":
