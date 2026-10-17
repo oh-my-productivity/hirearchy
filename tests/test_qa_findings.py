@@ -190,7 +190,6 @@ def test_qa16_timeout_kills_the_whole_process_group(org, tmp_path):
 # ----------------------------------------------------------- budget and reviews
 
 
-@pytest.mark.xfail(strict=True, reason="QA-6: budget handed to a report vanishes when the report is retired")
 def test_qa6_retire_returns_unspent_budget_to_the_parent(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     org.delegate("ceo", ENG, "t", "g", "a", budget=5)
@@ -237,7 +236,6 @@ def test_qa14_failed_runs_are_not_blamed_as_wasteful(org):
 # --------------------------------------------------------------------- core API
 
 
-@pytest.mark.xfail(strict=True, reason="QA-9: retire() rejects the full address that every other tool and the review notes use")
 def test_qa9_retire_accepts_the_full_address_of_a_direct_report(org):
     assert org.retire("ceo", ENG, "full address, as printed by status/health/review notes") == ENG
 

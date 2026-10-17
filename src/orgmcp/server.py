@@ -108,9 +108,13 @@ def build_server(org: Org, me: str) -> FastMCP:
 
     @mcp.tool()
     def retire(name: str, reason: str) -> str:
-        """Remove a direct report and its team. Their open tasks are reported to you as failed."""
-        addr = org.retire(me, name, reason)
-        return f"retired {addr}"
+        """Remove a direct report and its team (name: its short name or full address, e.g. "eng" or "ceo/eng").
+
+        Their open tasks are reported to you as failed, and the team's unspent budget is returned to you.
+        """
+        r = org.retire_team(me, name, reason)
+        refund = f"; {r.refunded} unspent run(s) of budget returned to {r.refunded_to}" if r.refunded else ""
+        return f"retired {r.addr}{refund}"
 
     @mcp.tool()
     def read(path: str = ".") -> str:

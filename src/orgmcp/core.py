@@ -26,6 +26,7 @@ import unicodedata
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import NamedTuple
 
 import yaml
 
@@ -187,6 +188,12 @@ class Message:
         if self.budget:
             head.append(f"budget: {self.budget} runs")
         return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{self.body}\n"
+
+
+class Retired(NamedTuple):
+    addr: str
+    refunded: int  # runs of unspent team budget returned to ``refunded_to``
+    refunded_to: str | None
 
 
 class Org:
@@ -589,9 +596,22 @@ class Org:
                 raise OrgError(f"a report's workspace must be inside yours ({mine})")
 
     def retire(self, actor: str, name: str, reason: str) -> str:
+        """Remove a direct report and its team; returns the retired address. See :meth:`retire_team`."""
+        return self.retire_team(actor, name, reason).addr
+
+    def retire_team(self, actor: str, name: str, reason: str) -> Retired:
+        """Retire a direct report (short name or full address; root: any agent by full address) and its team.
+
+        Open tasks the team owes the outside are closed as failed, and the team's unspent budget is returned to the
+        retired agent's parent as a runtime note carrying the budget (nothing when the parent is root, who has no
+        limit), so budget stays derived from files and is neither destroyed nor minted.
+        """
         actor = self.require(actor)
-        addr = self.norm(name) if actor == ROOT and "/" in name else self.child_addr(actor, name)
+        short = self.norm(name)
+        addr = short if "/" in short else self.child_addr(actor, short)
         addr = self.require(addr)
+        if addr == ROOT:
+            raise OrgError("the root of the organization cannot be retired")
         if actor != ROOT and self.parent(addr) != actor:
             raise OrgError("you can only retire your direct reports")
         team = set(self.subtree(addr))
@@ -602,10 +622,18 @@ class Org:
                         sender=a, to=task.sender, type="result", title=task.title, reply_to=task.id,
                         status="failed", body=f"## Summary\nAgent {a} was retired by {actor}: {reason}",
                     ))
+        parent = self.parent(addr)
+        # Grants inside the team cancel out, so this is what the parent handed down minus what the team ran.
+        refund = max(0, sum(self.budget(a) or 0 for a in team)) if parent != ROOT else 0
         dest = self.root / ".retired" / f"{addr.replace('/', '.')}-{utcnow():%Y%m%dT%H%M%S}"
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(self.dir(addr)), dest)
-        return addr
+        if refund:  # after the move: a crash in between loses the refund rather than counting it twice
+            self.deliver(Message(
+                sender=RUNTIME, to=parent, type="note", budget=refund, title=f"Budget returned from {addr}",
+                body=templates.notice_budget_returned(addr, refund, actor, reason),
+            ))
+        return Retired(addr, refund, parent if refund else None)
 
     # ------------------------------------------------------------- file access
 

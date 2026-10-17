@@ -69,6 +69,13 @@ def notice_budget(agent: str, unread: int) -> str:
     )
 
 
+def notice_budget_returned(agent: str, amount: int, retired_by: str, reason: str) -> str:
+    return (
+        f"`{agent}` and its team were retired by {retired_by} ({reason}). "
+        f"Their unspent budget, {amount} run(s), is returned to you with this note."
+    )
+
+
 def notice_failures(agent: str, count: int, log: str) -> str:
     return (
         f"`{agent}` failed {count} runs in a row and is paused. Last run log: {log}\n"
