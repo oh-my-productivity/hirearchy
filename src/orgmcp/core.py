@@ -377,9 +377,11 @@ class Org:
         msg.id = msg.id or self.new_id(msg.sender)
         msg.created = msg.created or utcnow().isoformat(timespec="seconds")
         text = msg.to_text()
-        atomic_write(self.dir(msg.to) / "inbox" / f"{msg.id}.md", text)
+        # Sender's copy first: it is what charges a budget grant. A failure between the two writes can then only
+        # leave a message charged but undelivered (recover() re-delivers it), never delivered but uncharged.
         if msg.sender != RUNTIME:
             atomic_write(self.dir(msg.sender) / "sent" / f"{msg.id}.md", text)
+        atomic_write(self.dir(msg.to) / "inbox" / f"{msg.id}.md", text)
         return msg
 
     def notify(self, to: str, title: str, body: str) -> Message:
@@ -714,12 +716,47 @@ class Org:
         return p
 
     def recover(self) -> list[str]:
-        """After a crash: return every inflight batch to its inbox."""
+        """After a crash: return every inflight batch to its inbox, and finish interrupted deliveries.
+
+        Returns the agents whose interrupted run was recovered (see :meth:`redeliver_orphans` for the other part).
+        """
         out = []
         for a in self.agents():
             if self.messages(a, "inflight"):
                 self.end_run(a, ok=False)
                 out.append(a)
+        self.redeliver_orphans()
+        return out
+
+    def redeliver_orphans(self) -> list[str]:
+        """Deliver every sent message whose recipient has no copy (``deliver`` writes ``sent/`` first).
+
+        A message is delivered when its id is in the recipient's inbox, inflight or read; ids are unique across the
+        organization, so one scan of the file names finds the orphans without parsing the whole history. Messages
+        to agents that no longer exist are left alone. Returns the ids that were re-delivered.
+        """
+        owners = [ROOT, *self.agents()]
+        have = {
+            p.stem
+            for a in owners
+            for box in ("inbox", "inflight", "read")
+            if (self.dir(a) / box).is_dir()
+            for p in _visible((self.dir(a) / box).glob("*.md"))
+        }
+        out = []
+        for a in owners:
+            d = self.dir(a) / "sent"
+            for p in _visible(d.glob("*.md")) if d.is_dir() else []:
+                if p.stem in have:
+                    continue
+                try:
+                    msg = Message.load(p)
+                except Exception:  # noqa: BLE001 - an unreadable file is not ours to fix here
+                    continue
+                to = self.norm(msg.to)
+                if self.exists(to):
+                    atomic_write(self.dir(to) / "inbox" / p.name, p.read_text(encoding="utf-8"))
+                    out.append(msg.id)
         return out
 
     def running(self, addr: str) -> bool:

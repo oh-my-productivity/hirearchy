@@ -255,7 +255,6 @@ def test_qa11_hire_rejects_name_with_trailing_newline(org):
         org.hire("ceo", "ops\n", "Ops", "Do ops.")
 
 
-@pytest.mark.xfail(strict=True, reason="QA-12: deliver() writes the recipient copy before the sender copy; a failure in between mints budget")
 def test_qa12_failed_send_does_not_mint_budget(org, monkeypatch):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     real = core.atomic_write
