@@ -97,7 +97,6 @@ class Scheduler:
         self.echo = echo
         self.clock = clock  # only used for stall detection, so tests can move time without sleeping
         self.runs: dict[str, Run] = {}
-        self.failures: dict[str, int] = {}
         self.total_runs = 0
         self.pidfile = org.root / ".runtime" / "scheduler.pid"
 
@@ -239,7 +238,7 @@ class Scheduler:
             ok = code == 0
             self.org.end_run(addr, ok)
             if ok:
-                self.failures[addr] = 0
+                self.org.clear_failures(addr)
                 self.echo(f"{addr}: run finished in {elapsed:.0f}s")
             else:
                 self._failed(addr, run.log)
@@ -247,8 +246,7 @@ class Scheduler:
             self.org.commit(f"{addr}: run {'ok' if ok else f'failed ({code})'}, {run.batch} message(s) [{rel}]")
 
     def _failed(self, addr: str, log: Path) -> None:
-        n = self.failures.get(addr, 0) + 1
-        self.failures[addr] = n
+        n = self.org.record_failure(addr)
         self.echo(f"{addr}: run failed ({n} in a row), log: {log}")
         if n >= int(self.org.config["max_failures"]):
             self.org.pause(addr, "failures")

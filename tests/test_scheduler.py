@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from orgmcp.cli import main
 from orgmcp.core import ROOT, OrgError
 from orgmcp.scheduler import Scheduler, ensure_kiro_profile, kiro_runner
 
@@ -207,6 +208,43 @@ def test_ladder_state_is_dropped_when_the_task_closes(org):
     org.report("ceo", task.id, "done", "finally")
     run_until_idle(sched)
     assert ledger(org) == {}
+
+
+def failures(org):
+    return json.loads((org.root / ".runtime/failures.json").read_text())
+
+
+def test_failure_count_survives_a_scheduler_restart(org):
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
+    first = Scheduler(org, fake_runner("crash"), echo=lambda _: None)
+    first.acquire()
+    try:
+        for _ in range(500):
+            first.tick(max_runs=2)
+            if org.runs_used("ceo") == 2 and not first.runs:
+                break
+            time.sleep(0.02)
+    finally:
+        first.release()
+    assert failures(org) == {"ceo": 2} and org.paused("ceo") is None
+
+    run_until_idle(Scheduler(org, fake_runner("crash"), echo=lambda _: None))  # a fresh process: 3rd strike
+    assert org.paused("ceo") == "failures" and org.runs_used("ceo") == 3
+
+
+def test_failure_count_resets_on_success(org):
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
+    org.save_ledger("failures", {"ceo": 2, "ceo/eng": 1})
+    run_until_idle(Scheduler(org, fake_runner("idle"), echo=lambda _: None))
+    assert failures(org) == {"ceo/eng": 1}
+    assert org.paused("ceo") is None
+
+
+def test_resume_resets_the_failure_count(org):
+    org.save_ledger("failures", {"ceo": 3, "ceo/eng": 1})
+    org.pause("ceo", "failures")
+    main(["--root", str(org.root), "resume", "ceo"])
+    assert org.paused("ceo") is None and failures(org) == {"ceo/eng": 1}
 
 
 def test_single_scheduler_per_org(org):

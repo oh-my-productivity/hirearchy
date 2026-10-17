@@ -668,6 +668,18 @@ class Org:
     def resume(self, addr: str) -> None:
         (self.dir(addr) / ".paused").unlink(missing_ok=True)
 
+    def record_failure(self, addr: str) -> int:
+        """Count one more consecutive failed run (kept in .runtime/failures.json, so it survives restarts)."""
+        counts = self.ledger("failures")
+        counts[addr] = int(counts.get(addr, 0)) + 1
+        self.save_ledger("failures", counts)
+        return counts[addr]
+
+    def clear_failures(self, addr: str) -> None:
+        counts = self.ledger("failures")
+        if counts.pop(addr, None) is not None:
+            self.save_ledger("failures", counts)
+
     def ledger(self, name: str) -> dict:
         """Runtime-private bookkeeping (``.runtime/<name>.json``): the only state not derived from messages."""
         try:
