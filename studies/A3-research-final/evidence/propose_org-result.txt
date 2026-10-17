@@ -1,0 +1,86 @@
+Target organization: /private/tmp/orgmcp-a3-1792266280/org (none yet: create_org(mission=...) comes first, then apply_org)
+
+PLAN FOR YOU (show this to the user exactly as written)
+Goal: Produce a sourced competitor analysis of five self-hosted-capable note-taking apps (Obsidian, Logseq, Joplin, Trilium Notes, AnyType) for a team building a competing self-hosted notes app. Focus on pricing, license and...
+What I understood you need:
+- Scope: Exactly these five apps: Obsidian, Logseq, Joplin, Trilium Notes, AnyType. Mainly pricing, license, and sync model. Plus a 'Where we can win' section for a team building a competing self-hosted notes app.
+- Quality bar: Every factual claim has a source URL that actually states the claim; current facts come from the live source.
+- Sources: Web access to official sites, documentation and repositories; a source URL per claim.
+- Workspace: none (nothing writes files or runs commands)
+- Models: cheap drafting, strong review
+Team (4 agents):
+- lead (Manager, model claude-haiku-4.5): directs the team; does not produce the work itself; can read web pages and search the web; cannot change your files
+  - researcher (Researcher, model claude-haiku-4.5): can read web pages and search the web; cannot change your files
+  - writer (Writer, model claude-haiku-4.5): cannot change your files
+  - factcheck (Independent Fact-Checker, model claude-sonnet-4.6): can read web pages and search the web; cannot change your files
+Budget: 22 runs planned (one run = one working session of one agent), your cap is 25; the minimum for one review and rework is 17. Unspent runs come back to you.
+  lead starts with 22, hands down researcher 3, writer 2, factcheck 2 and keeps 15 for planning, checking and rework.
+Checking: factcheck reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every success check below.
+Deliverable: A comparison table (one row per app; columns for pricing, license, sync model) plus a 'Where we can win' section [markdown, max 1500 words]
+  Delivered to: /tmp/orgmcp-a3-1792266280/deliverables/competitors.md (I copy it there after checking it)
+Done when ALL of these hold:
+  1. Covers exactly Obsidian, Logseq, Joplin, Trilium Notes and AnyType and no other apps.
+  2. At most 1500 words as counted by read.
+  3. Contains a comparison table with exactly one row per app (5 rows) and columns for pricing, license and sync model.
+  4. Contains a section headed exactly 'Where we can win'.
+  5. Every factual claim has a source URL that actually states that claim, fetched by the researcher or fact-checker.
+  6. The fact-checker's coverage report shows every claim verified (n of m claims verified with n = m, none wrong, none unsupported) and the writer applied every required change.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+END OF PLAN FOR YOU
+
+Details (the full plan, for you; the user need not read it):
+# Plan for approval
+
+Goal: Produce a sourced competitor analysis of five self-hosted-capable note-taking apps (Obsidian, Logseq, Joplin, Trilium Notes, AnyType) for a team building a competing self-hosted notes app. Focus on pricing, license and sync model, and finish with a "Where we can win" section.
+
+Needs as understood:
+- Scope: Exactly these five apps: Obsidian, Logseq, Joplin, Trilium Notes, AnyType. Mainly pricing, license, and sync model. Plus a 'Where we can win' section for a team building a competing self-hosted notes app.
+- Deliverable: A comparison table (one row per app; columns for pricing, license, sync model) plus a 'Where we can win' section [markdown, max 1500 words]
+- Quality bar: Every factual claim has a source URL that actually states the claim; current facts come from the live source.
+- Sources / tools: Web access to official sites, documentation and repositories; a source URL per claim.
+- Workspace: none (no agent writes files or runs commands)
+- Model policy: cheap drafting, strong review
+- Review: required
+
+Organization (4 agents):
+- lead [manager] Manager: model=claude-haiku-4.5, tools=web_fetch,web_search
+  - researcher [researcher] Researcher: model=claude-haiku-4.5, tools=web_fetch,web_search
+  - writer [writer] Writer: model=claude-haiku-4.5, tools=none
+  - factcheck [fact-checker] Independent Fact-Checker: model=claude-sonnet-4.6, tools=web_fetch,web_search
+
+Budget: 22 runs planned (your cap: 25), estimate 17 for one pass + one review/rework cycle:
+  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you.
+  lead: starts with 22, hands down researcher 3, writer 2, factcheck 2, keeps 15 (own 7 + rework runs for reports 3 + slack 5)
+  lead/researcher: 3 runs (3 work + 1 rework)
+  lead/writer: 2 runs (2 work + 1 rework)
+  lead/factcheck: 2 runs (2 work + 1 rework)
+
+Review / verification:
+- lead/factcheck checks the work of lead/researcher, lead/writer independently; findings go to their manager, who sends required changes back to the author (nobody edits another agent's file).
+- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done
+
+Deliverable:
+- A comparison table (one row per app; columns for pricing, license, sync model) plus a 'Where we can win' section (markdown, max 1500 words)
+- Final location: /tmp/orgmcp-a3-1792266280/deliverables/competitors.md (copied there by the assistant after verification)
+
+First task: to lead: Competitor analysis of self-hosted note-taking apps
+  1. Covers exactly Obsidian, Logseq, Joplin, Trilium Notes and AnyType and no other apps.
+  2. At most 1500 words as counted by read.
+  3. Contains a comparison table with exactly one row per app (5 rows) and columns for pricing, license and sync model.
+  4. Contains a section headed exactly 'Where we can win'.
+  5. Every factual claim has a source URL that actually states that claim, fetched by the researcher or fact-checker.
+  6. The fact-checker's coverage report shows every claim verified (n of m claims verified with n = m, none wrong, none unsupported) and the writer applied every required change.
+
+Checkpoints:
+- Approval: Plan first; ask before any spend beyond the budget.
+- Progress: One line when I ask.
+- Any spend beyond the budget needs your OK.
+
+Warnings (1):
+- needs.deliverable.path: no agent can write to /private/tmp/orgmcp-a3-1792266280/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
+
+Reply 'approve' or tell me what to change.
+
+plan_id: bc1ec8d8c673
+Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="bc1ec8d8c673"). If you change the blueprint, call propose_org again: the plan_id changes.
