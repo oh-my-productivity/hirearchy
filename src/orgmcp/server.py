@@ -10,7 +10,8 @@ import os
 
 from mcp.server.fastmcp import FastMCP
 
-from .core import ROOT, Org
+from .core import ROOT, Org, OrgError
+from .health import org_health, render_text
 
 INSTRUCTIONS = """\
 You are a member of a file-based organization of agents. Your identity is fixed by the runtime.
@@ -132,6 +133,18 @@ def build_server(org: Org, me: str) -> FastMCP:
     def status() -> str:
         """The whole organization as a tree: each agent's role, state, budget and workload."""
         return org.tree()
+
+    @mcp.tool()
+    def health(agent: str | None = None) -> str:
+        """Health report (stuck, expensive, low-quality, wasteful, idle, paused) for an agent and its subtree.
+
+        agent: yourself or an agent in your own subtree (root may ask about anyone). Default: your own subtree
+        (root: the whole organization). Use it to decide whom to follow up with, rework, re-budget or retire.
+        """
+        target = org.require(agent or me)
+        if me != ROOT and target not in org.subtree(me):
+            raise OrgError(f"you can only view health for yourself or agents in your own subtree ({me}/...), not {target}")
+        return render_text(org_health(org, target))
 
     return mcp
 

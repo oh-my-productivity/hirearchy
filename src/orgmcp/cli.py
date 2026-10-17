@@ -63,6 +63,14 @@ def cmd_status(args) -> None:
             print(f"  {t.id} \"{t.title}\" -> {t.to}")
 
 
+def cmd_health(args) -> None:
+    from .health import org_health, render_text
+
+    org = _org(args)
+    report = org_health(org, args.agent or ROOT)
+    print(json.dumps(report.to_dict(), indent=2) if args.json else render_text(report))
+
+
 def cmd_inbox(args) -> None:
     org = _org(args)
     batch = org.messages(ROOT, "inbox") if args.keep else org.begin_run(ROOT)
@@ -151,6 +159,11 @@ def main(argv: list[str] | None = None) -> None:
 
     s = sub.add_parser("status", help="show the organization tree")
     s.set_defaults(fn=cmd_status)
+
+    s = sub.add_parser("health", help="show stuck, expensive, low-quality and idle agents and branches")
+    s.add_argument("--agent", metavar="ADDR", help="only this agent and its subtree (default: whole organization)")
+    s.add_argument("--json", action="store_true", help="print the structured data")
+    s.set_defaults(fn=cmd_health)
 
     s = sub.add_parser("inbox", help="read your (root) messages")
     s.add_argument("--keep", action="store_true", help="do not mark as read")
