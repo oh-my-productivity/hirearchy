@@ -72,16 +72,17 @@ def notice_failures(agent: str, count: int, log: str) -> str:
 
 def notice_nudge(task_id: str, title: str) -> str:
     return (
-        f"Task {task_id} ({title}) is still open, nothing in the organization is running, "
-        "and you are not waiting on any delegated work. Finish it and `report` done, "
+        f"Task {task_id} ({title}) is still open, you are not running or waiting on any delegated work, "
+        "and nothing has happened for a while. Finish it and `report` done, "
         "or `report` blocked/failed with the reason."
     )
 
 
-def notice_stalled(agent: str, task_id: str, title: str) -> str:
+def notice_stalled(agent: str, task_id: str, title: str, told: list[str]) -> str:
     return (
-        f"`{agent}` is stalled on task {task_id} ({title}): it was nudged once and still has not reported. "
-        "Follow up with it, reassign the work, or report upward."
+        f"`{agent}` is stalled on task {task_id} ({title}): it is not running, not waiting on delegated work, "
+        f"and has not reported. Already told: {', '.join(f'`{t}`' for t in told)}. "
+        "Follow up with it, reassign the work, or escalate further."
     )
 
 

@@ -16,6 +16,7 @@ Invariants (everything else is built on these):
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import secrets
@@ -43,6 +44,7 @@ DEFAULT_CONFIG = {
     "max_parallel": 3,  # concurrent agent runs
     "max_failures": 3,  # consecutive failed runs before an agent is paused
     "run_timeout": 1800,  # seconds per run
+    "stall_after": 600,  # seconds of silence on an open task before the next step of the stall ladder
     "poll_seconds": 2,
     "default_budget": 10,  # runs given with a task when none is specified
     "default_model": None,  # kiro model; None = kiro default
@@ -665,6 +667,16 @@ class Org:
 
     def resume(self, addr: str) -> None:
         (self.dir(addr) / ".paused").unlink(missing_ok=True)
+
+    def ledger(self, name: str) -> dict:
+        """Runtime-private bookkeeping (``.runtime/<name>.json``): the only state not derived from messages."""
+        try:
+            return json.loads((self.root / ".runtime" / f"{name}.json").read_text(encoding="utf-8"))
+        except (FileNotFoundError, ValueError):
+            return {}
+
+    def save_ledger(self, name: str, data: dict) -> None:
+        atomic_write(self.root / ".runtime" / f"{name}.json", json.dumps(data, indent=2) + "\n")
 
     # ----------------------------------------------------------------- views
 
