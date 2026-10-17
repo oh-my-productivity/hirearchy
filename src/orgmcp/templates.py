@@ -69,10 +69,19 @@ def notice_budget(agent: str, unread: int) -> str:
     )
 
 
-def notice_failures(agent: str, count: int, log: str) -> str:
+def notice_failures(agent: str, count: int, log: str, to_human: bool = True) -> str:
+    """Tell someone that ``agent`` keeps crashing. The human gets the fix; an LLM parent gets its options."""
+    head = f"`{agent}` failed {count} runs in a row and is paused. Last run log: {log}\n"
+    if to_human:
+        return head + f"A human must inspect it and run `orgmcp resume {agent}`."
     return (
-        f"`{agent}` failed {count} runs in a row and is paused. Last run log: {log}\n"
-        f"A human must inspect it and run `orgmcp resume {agent}`."
+        head
+        + "Its unread messages and open tasks are stuck until then. A human will inspect the crash and resume it; "
+        "you cannot. Meanwhile you can keep your own work moving:\n"
+        f"- reassign: `delegate` the work to another direct report (or `hire` one), and `retire` `{agent}` if it "
+        "is not needed (its open tasks are closed as failed);\n"
+        "- or, if you cannot go on without it, `report` the affected task to whoever assigned it with status "
+        "`blocked` (or `failed`) and say that `" + agent + "` is crashing, so they can plan around it."
     )
 
 

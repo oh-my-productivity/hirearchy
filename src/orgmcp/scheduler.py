@@ -148,6 +148,8 @@ class Scheduler:
                 alive = True
             except (ValueError, ProcessLookupError):
                 alive = False
+            except PermissionError:  # the pid exists but belongs to another user: it is alive
+                alive = True
             if alive:
                 raise OrgError(f"a scheduler is already running for this org (pid {pid})")
             self.pidfile.unlink()  # stale
@@ -326,9 +328,10 @@ class Scheduler:
         if n >= config_number(self.org.config, "max_failures", int):
             self.org.pause(addr, "failures")
             rel = str(log.relative_to(self.org.root))
-            self.org.notify(self.org.parent(addr) or ROOT, f"{addr} keeps failing",
-                            templates.notice_failures(addr, n, rel))
-            if self.org.parent(addr) != ROOT:  # a human has to look at crashes
+            parent = self.org.parent(addr) or ROOT
+            self.org.notify(parent, f"{addr} keeps failing",
+                            templates.notice_failures(addr, n, rel, to_human=parent == ROOT))
+            if parent != ROOT:  # a human has to look at crashes
                 self.org.notify(ROOT, f"{addr} keeps failing", templates.notice_failures(addr, n, rel))
 
     # --------------------------------------------------------------- reviews

@@ -526,3 +526,65 @@ def test_signalling_a_finished_run_is_harmless():
     proc = subprocess.Popen(["true"], start_new_session=True)
     proc.wait()
     sched_mod._signal_group(proc, 9)
+
+
+# ------------------------------------------------------------------ small extras
+
+
+def test_acquire_treats_a_pid_owned_by_someone_else_as_alive(org, monkeypatch):
+    (org.root / ".runtime").mkdir(exist_ok=True)
+    (org.root / ".runtime" / "scheduler.pid").write_text("1")
+
+    def deny(pid, sig):
+        raise PermissionError(1, "Operation not permitted")
+
+    monkeypatch.setattr(os, "kill", deny)
+    with pytest.raises(OrgError, match="already running"):
+        Scheduler(org, echo=lambda _: None).acquire()
+    assert (org.root / ".runtime" / "scheduler.pid").read_text() == "1"  # and the pidfile is left alone
+
+
+def test_a_stale_or_garbled_pidfile_is_replaced(org):
+    (org.root / ".runtime").mkdir(exist_ok=True)
+    (org.root / ".runtime" / "scheduler.pid").write_text("not a pid")
+    sched = Scheduler(org, echo=lambda _: None)
+    sched.acquire()
+    assert (org.root / ".runtime" / "scheduler.pid").read_text() == str(os.getpid())
+    sched.release()
+
+
+def failing_org(org):
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
+    org.delegate("ceo", "ceo/eng", "work", "g", "a", budget=5)
+    sched = Scheduler(org, lambda o, a, p: (["sh", "-c", "exit 1"], o.dir(a), dict(os.environ)), echo=lambda _: None)
+    configure(org, max_failures=1)
+    sched.acquire()
+    try:
+        deadline = time.time() + 10
+        while org.paused("ceo/eng") != "failures" and time.time() < deadline:
+            sched.tick()
+            time.sleep(0.02)
+    finally:
+        sched.release()
+
+
+def test_an_llm_parent_is_told_what_it_can_do_about_a_crashing_report(org):
+    failing_org(org)
+    parent_note = next(m for m in org.messages("ceo", "inbox", "read") if m.title == "ceo/eng keeps failing")
+    assert "delegate" in parent_note.body and "retire" in parent_note.body and "`blocked`" in parent_note.body
+    assert "A human will inspect" in parent_note.body and "orgmcp resume" not in parent_note.body
+    human_note = next(m for m in org.messages(ROOT, "inbox") if m.title == "ceo/eng keeps failing")
+    assert "A human must inspect it and run `orgmcp resume ceo/eng`." in human_note.body
+
+
+def test_root_as_parent_gets_only_the_human_text(org):
+    org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
+    configure(org, max_failures=1)
+    sched = Scheduler(org, lambda o, a, p: (["sh", "-c", "exit 1"], o.dir(a), dict(os.environ)), echo=lambda _: None)
+    sched.acquire()
+    try:
+        run_to_idle(sched)
+    finally:
+        sched.release()
+    notes = [m for m in org.messages(ROOT, "inbox") if m.title == "ceo keeps failing"]
+    assert len(notes) == 1 and "orgmcp resume ceo" in notes[0].body
