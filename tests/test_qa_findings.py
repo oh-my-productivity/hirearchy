@@ -162,14 +162,14 @@ def test_qa16_timeout_kills_the_whole_process_group(org, tmp_path):
     configure(org, run_timeout=1)
     pidfile = tmp_path / "child.pid"
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
-    cmd = ["sh", "-c", f"sleep 60 & echo $! > {pidfile}; wait"]
+    cmd = ["sh", "-c", f"sleep 47 & echo $! > {pidfile}; wait"]
     sched = Scheduler(org, quiet_runner(cmd), echo=lambda _: None)
     sched.acquire()
     child = None
     try:
         sched.tick()
         deadline = time.time() + 5
-        while not pidfile.exists() and time.time() < deadline:
+        while not (pidfile.exists() and pidfile.read_text().strip()) and time.time() < deadline:
             time.sleep(0.02)
         child = int(pidfile.read_text())
         time.sleep(1.2)
