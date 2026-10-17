@@ -6,8 +6,10 @@ process (kiro-cli by default) whose orgmcp MCP server is bound to the agent via 
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import re
 import shutil
 import signal
 import subprocess
@@ -17,7 +19,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import IO, Callable
+from typing import IO, Callable, NamedTuple
 
 from . import review, templates
 from .core import ROOT, Org, OrgError, atomic_write
@@ -38,23 +40,47 @@ def mcp_server_command() -> dict:
     return {"command": shutil.which("uv") or "uv", "args": ["--directory", str(PROJECT_DIR), "run", "orgmcp", "mcp"]}
 
 
-def kiro_profile_name(tools: list[str]) -> str:
-    return "orgmcp" + "".join(f"-{t}" for t in sorted(tools))
+def _slug(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
 
 
-def ensure_kiro_profile(tools: list[str], agents_dir: Path | None = None) -> str:
-    """Write ~/.kiro/agents/orgmcp[-tools].json: only the orgmcp server plus the granted built-in tools.
+def kiro_profile_name(org_root: str | Path, tools: list[str]) -> str:
+    """``orgmcp-<org-slug>-<6-char hash of the org root path>[-<tools>]``, lowercase ``[a-z0-9-]``.
+
+    The hash makes the name unique per organization (two ``.../org`` dirs never share a profile); the slug only
+    makes it recognizable. Profiles of different orgs therefore never overwrite each other.
+    """
+    root = Path(org_root).expanduser().resolve()
+    base = root.name
+    if base.lower() == "org" and root.parent.name:  # "org" alone says nothing: use "<parent>-org"
+        base = f"{root.parent.name}-org"
+    slug = _slug(base)[:24].strip("-") or "org"
+    digest = hashlib.sha1(str(root).encode("utf-8")).hexdigest()[:6]
+    return "-".join(["orgmcp", slug, digest, *(_slug(t) for t in sorted(set(tools)) if _slug(t))])
+
+
+def ensure_kiro_profile(tools: list[str], agents_dir: Path | None = None, *, org: Org) -> str:
+    """Write the scheduler's profile for ``org`` into ``~/.kiro/agents``: only the orgmcp server plus the granted tools.
+
+    The profile is internal to this organization: its MCP server entry carries ``ORG_ROOT`` (this org) and
+    ``ORG_REQUIRE_AGENT=1``, so used outside the scheduler (no ``ORG_AGENT``) the server refuses to start instead of
+    acting as ``root``. ``ORG_AGENT`` itself is NOT baked in: it comes from the scheduler's process environment
+    (assumption: kiro starts MCP servers with its own environment plus the profile's ``env``; if it did not, the
+    server would fail closed and the run would fail visibly rather than act as root).
 
     The directory is resolved when called (not when defined), so ``KIRO_AGENTS_DIR`` can be redirected.
+    Profiles of other orgs, and the legacy global ``orgmcp[-tools].json`` files, are never touched.
     """
     agents_dir = Path(agents_dir) if agents_dir is not None else Path(KIRO_AGENTS_DIR)
     tools = sorted(set(tools))
-    name = kiro_profile_name(tools)
+    name = kiro_profile_name(org.root, tools)
+    server = {**mcp_server_command(), "env": {"ORG_ROOT": str(org.root), "ORG_REQUIRE_AGENT": "1"}}
     data = templates.kiro_profile(
         name,
-        "orgmcp organization member" + (f" with {', '.join(tools)}" if tools else ""),
+        f"internal: used by the orgmcp scheduler for {org.root}; not a general-purpose agent"
+        + (f" (built-in tools: {', '.join(tools)})" if tools else ""),
         ["@orgmcp", *tools],
-        mcp_server_command(),
+        server,
     )
     path = agents_dir / f"{name}.json"
     try:
@@ -69,7 +95,7 @@ def ensure_kiro_profile(tools: list[str], agents_dir: Path | None = None) -> str
 def kiro_runner(kiro_bin: str = "kiro-cli") -> Runner:
     def build(org: Org, addr: str, prompt: str) -> tuple[list[str], Path, dict]:
         meta, _ = org.charter(addr)
-        profile = ensure_kiro_profile(list(meta.get("tools") or []))
+        profile = ensure_kiro_profile(list(meta.get("tools") or []), org=org)
         cmd = [kiro_bin, "chat", "--no-interactive", "--agent", profile]
         model = meta.get("model") or org.config.get("default_model")
         if model:
@@ -175,6 +201,171 @@ def kill_group(pgid: int, wait: float = 5.0) -> bool:
     return False
 
 
+# ------------------------------------------------------- start/stop (used by the MCP tools of root)
+
+
+def ignore_runtime_files(root: Path) -> None:
+    """Keep files that change constantly out of the org's git snapshots (``git add -A`` after every run)."""
+    path = Path(root) / ".gitignore"
+    try:
+        text = path.read_text(encoding="utf-8") if path.exists() else ""
+        missing = [line for line in (".runtime/running.json", ".runtime/scheduler.log") if line not in text.split()]
+        if missing:
+            path.write_text((text.rstrip("\n") + "\n" if text else "") + "\n".join(missing) + "\n", encoding="utf-8")
+    except OSError:
+        pass
+
+
+class SchedulerState(NamedTuple):
+    """``state``: stopped | running (verified to be this org's scheduler) | unverified (pid alive, not trusted)."""
+    state: str
+    pid: int | None = None
+    since: str | None = None
+    detail: str = ""
+
+
+def scheduler_command(root: Path, max_runs: int | None = None) -> list[str]:
+    """``<this venv's orgmcp> --root <org> run [--max-runs N]`` (``python -m orgmcp`` if the script is missing)."""
+    script = Path(sys.executable).with_name("orgmcp")
+    base = [str(script)] if script.exists() else [sys.executable, "-m", "orgmcp"]
+    return [*base, "--root", str(root), "run", *(["--max-runs", str(max_runs)] if max_runs is not None else [])]
+
+
+def _command_line(pid: int) -> str | None:
+    try:
+        out = subprocess.run(["ps", "-o", "command=", "-p", str(pid)], capture_output=True, text=True, timeout=10,
+                             env={**os.environ, "LC_ALL": "C"}).stdout
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return out.strip() or None
+
+
+def _looks_like_scheduler_of(command: str, root: Path) -> bool:
+    """Does this command line plausibly start the scheduler of the organization at ``root``?
+
+    Needs the ``run`` subcommand and either the org's root path or an ``orgmcp`` program. A ``--root`` that is not
+    this org (or cannot be compared, being relative) is a no.
+    """
+    tokens = command.split()
+    names_root = str(root) in command
+    has_root_flag = any(t == "--root" or t.startswith("--root=") for t in tokens)
+    has_orgmcp = any(Path(t).name == "orgmcp" for t in tokens)
+    return "run" in tokens and (names_root or (has_orgmcp and not has_root_flag))
+
+
+_children: dict[int, subprocess.Popen] = {}  # schedulers this process started: reaped so they never linger as zombies
+
+
+def _reap_children() -> None:
+    for pid, proc in list(_children.items()):
+        if proc.poll() is not None:
+            del _children[pid]
+
+
+def scheduler_state(org: Org) -> SchedulerState:
+    """Is a scheduler running for ``org``? Read from ``.runtime/scheduler.pid`` and checked against the process table."""
+    _reap_children()
+    pidfile = org.root / ".runtime" / "scheduler.pid"
+    try:
+        pid = int(pidfile.read_text().strip())
+        since = datetime.fromtimestamp(pidfile.stat().st_mtime, timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
+    except (OSError, ValueError):
+        return SchedulerState("stopped")
+    if pid <= 1:
+        return SchedulerState("stopped")
+    try:
+        info = _ps(pid)
+    except (OSError, subprocess.SubprocessError):
+        return SchedulerState("unverified", pid, since, "the process table could not be read")
+    if info is None or info[0].startswith("Z"):
+        return SchedulerState("stopped")  # stale pidfile: the process is gone
+    command = _command_line(pid)
+    if command and _looks_like_scheduler_of(command, org.root):
+        return SchedulerState("running", pid, since)
+    return SchedulerState("unverified", pid, since, f"its command line is {command!r}" if command else "its command line is unknown")
+
+
+def describe_scheduler(org: Org) -> str:
+    st = scheduler_state(org)
+    if st.state == "running":
+        return f"scheduler: running (pid {st.pid}, since {st.since})"
+    if st.state == "unverified":
+        return (f"scheduler: unknown - .runtime/scheduler.pid names pid {st.pid}, which is alive but not verified "
+                f"to be this org's scheduler ({st.detail}); not trusted")
+    return "scheduler: stopped"
+
+
+def start_scheduler(org: Org, max_runs: int | None = None) -> int:
+    """Launch a detached scheduler for ``org`` (own session; output to ``.runtime/scheduler.log``). Returns its pid."""
+    if max_runs is not None and max_runs < 0:
+        raise OrgError("max_runs must be 0 or more")
+    st = scheduler_state(org)
+    if st.state == "running":
+        raise OrgError(f"a scheduler is already running for this org (pid {st.pid}, since {st.since}); call stop() first to restart it")
+    if st.state == "unverified":
+        raise OrgError(f"not starting: .runtime/scheduler.pid names pid {st.pid}, which is alive but not verified to be "
+                       f"this org's scheduler ({st.detail}). Check that process; if it is stale, remove that file")
+    runtime = org.root / ".runtime"
+    runtime.mkdir(exist_ok=True)
+    ignore_runtime_files(org.root)
+    log = runtime / "scheduler.log"
+    env = {**os.environ, "ORG_ROOT": str(org.root), "PYTHONUNBUFFERED": "1"}
+    for var in ("ORG_AGENT", "ORG_REQUIRE_AGENT"):
+        env.pop(var, None)
+    cmd = scheduler_command(org.root, max_runs)
+    with open(log, "ab") as out:
+        out.write(f"\n# --- scheduler started {datetime.now(timezone.utc):%Y-%m-%d %H:%M:%SZ}: {' '.join(cmd)}\n".encode())
+        out.flush()
+        proc = subprocess.Popen(cmd, cwd=org.root, env=env, stdin=subprocess.DEVNULL, stdout=out,
+                                stderr=subprocess.STDOUT, start_new_session=True)
+    _children[proc.pid] = proc
+    pidfile = runtime / "scheduler.pid"
+    deadline = time.time() + 10
+    while time.time() < deadline:
+        code = proc.poll()
+        if code is not None:
+            tail = "\n".join(log.read_text(encoding="utf-8", errors="replace").splitlines()[-5:])
+            raise OrgError(f"the scheduler exited at once (exit {code}); {log} ends with:\n{tail}")
+        try:
+            if int(pidfile.read_text().strip()) == proc.pid:
+                break
+        except (OSError, ValueError):
+            pass
+        time.sleep(0.05)
+    return proc.pid
+
+
+def stop_scheduler(org: Org, wait: float = 15.0) -> str:
+    """SIGTERM the org's scheduler (pid from the pidfile), only after checking that it is really that scheduler.
+
+    The scheduler shuts down cleanly: runs in flight are interrupted (their batch is redelivered later).
+    """
+    st = scheduler_state(org)
+    if st.state == "stopped":
+        return "no scheduler is running for this org"
+    if st.state == "unverified":
+        raise OrgError(f"not signalling pid {st.pid}: it is alive but not verified to be this org's scheduler "
+                       f"({st.detail}). If it is, stop it yourself (kill {st.pid})")
+    try:
+        os.kill(st.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        return f"scheduler (pid {st.pid}) was already gone"
+    except PermissionError:
+        raise OrgError(f"not allowed to signal pid {st.pid}")
+    deadline = time.time() + wait
+    while time.time() < deadline:
+        _reap_children()
+        try:
+            info = _ps(st.pid)
+        except (OSError, subprocess.SubprocessError):
+            break
+        if info is None or info[0].startswith("Z"):
+            return f"scheduler stopped (pid {st.pid})"
+        time.sleep(0.1)
+    return (f"sent SIGTERM to the scheduler (pid {st.pid}); it is still shutting down (it interrupts agent runs first). "
+            "Check status() shortly")
+
+
 def _nudge_entries(raw) -> dict[str, dict]:
     """Entries of the nudges ledger in the current shape; malformed entries (or a malformed ledger) are dropped."""
     out: dict[str, dict] = {}
@@ -255,13 +446,7 @@ class Scheduler:
 
     def _ignore_running_ledger(self) -> None:
         """The record changes with every run; keep it out of the org's git snapshots."""
-        path, line = self.org.root / ".gitignore", ".runtime/running.json"
-        try:
-            text = path.read_text(encoding="utf-8")
-            if line not in text.split():
-                path.write_text(text.rstrip("\n") + "\n" + line + "\n", encoding="utf-8")
-        except OSError:
-            pass
+        ignore_runtime_files(self.org.root)
 
     def _settle_orphans(self) -> None:
         """Kill runs a dead scheduler left behind, and note those that survive.
