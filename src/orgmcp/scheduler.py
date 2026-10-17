@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import IO, Callable
 
 from . import review, templates
-from .core import ROOT, Org, OrgError
+from .core import ROOT, Org, OrgError, atomic_write
 
 # (org, agent address, prompt) -> (argv, cwd, env)
 Runner = Callable[[Org, str, str], tuple[list[str], Path, dict]]
@@ -40,8 +40,12 @@ def kiro_profile_name(tools: list[str]) -> str:
     return "orgmcp" + "".join(f"-{t}" for t in sorted(tools))
 
 
-def ensure_kiro_profile(tools: list[str], agents_dir: Path = KIRO_AGENTS_DIR) -> str:
-    """Write ~/.kiro/agents/orgmcp[-tools].json: only the orgmcp server plus the granted built-in tools."""
+def ensure_kiro_profile(tools: list[str], agents_dir: Path | None = None) -> str:
+    """Write ~/.kiro/agents/orgmcp[-tools].json: only the orgmcp server plus the granted built-in tools.
+
+    The directory is resolved when called (not when defined), so ``KIRO_AGENTS_DIR`` can be redirected.
+    """
+    agents_dir = Path(agents_dir) if agents_dir is not None else Path(KIRO_AGENTS_DIR)
     tools = sorted(set(tools))
     name = kiro_profile_name(tools)
     data = templates.kiro_profile(
@@ -51,9 +55,12 @@ def ensure_kiro_profile(tools: list[str], agents_dir: Path = KIRO_AGENTS_DIR) ->
         mcp_server_command(),
     )
     path = agents_dir / f"{name}.json"
-    if not path.exists() or json.loads(path.read_text(encoding="utf-8")) != data:
-        agents_dir.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    try:
+        current = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):  # missing or corrupt: rewrite it
+        current = None
+    if current != data:
+        atomic_write(path, json.dumps(data, indent=2) + "\n")  # temp file + rename: never a half-written profile
     return name
 
 
