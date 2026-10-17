@@ -123,6 +123,7 @@ class Scheduler:
         self.runs: dict[str, Run] = {}
         self.total_runs = 0
         self._phase_errors: dict[str, str] = {}
+        self._task_memo: dict[str, tuple[tuple, dict]] = {}  # agent -> (mailbox fingerprint, cached task views)
         self.pidfile = org.root / ".runtime" / "scheduler.pid"
 
     # ------------------------------------------------------------- lifecycle
@@ -333,10 +334,14 @@ class Scheduler:
         loaded = self.org.ledger("nudges")  # task id -> {"step": last step taken, "at": when}
         ledger = _nudge_entries(loaded)
         kept: dict[str, dict] = {}  # entries of tasks that are still open
-        for addr in self.org.agents():
-            tasks = self.org.open_tasks(addr)
+        agents = self.org.agents()
+        for gone in set(self._task_memo) - set(agents):
+            del self._task_memo[gone]
+        for addr in agents:
+            tasks = self._task_view(addr, "open_tasks")
             stuck = bool(tasks) and not (
-                self.org.running(addr) or self.org.unread(addr) or self.org.paused(addr) or self.org.outstanding(addr)
+                self.org.running(addr) or self.org.unread(addr) or self.org.paused(addr)
+                or self._task_view(addr, "outstanding")
             )
             for task in tasks:
                 last = ledger.get(task.id)
@@ -361,6 +366,32 @@ class Scheduler:
                 kept[task.id] = {"step": step, "at": now}
         if kept != loaded:
             self.org.save_ledger("nudges", kept)
+
+    def _task_view(self, addr: str, view: str) -> list:
+        """``org.open_tasks`` / ``org.outstanding`` of an agent, recomputed only when its set of message files changes.
+
+        Messages are immutable and named by id, so the file names of an agent's mailboxes (a message moving from
+        inbox to inflight to read stays the same message) determine both views. An idle tick therefore lists a few
+        directories instead of parsing every message ever received or sent.
+        """
+        d = self.org.dir(addr)
+
+        def names(*boxes):
+            out = set()
+            for box in boxes:
+                try:
+                    out.update(n for n in os.listdir(d / box) if n.endswith(".md") and not n.startswith("."))
+                except OSError:
+                    pass
+            return frozenset(out)
+
+        fingerprint = (names("inbox", "inflight", "read"), names("sent"))
+        cached = self._task_memo.get(addr)
+        if cached is None or cached[0] != fingerprint:
+            cached = self._task_memo[addr] = (fingerprint, {})
+        if view not in cached[1]:
+            cached[1][view] = getattr(self.org, view)(addr)
+        return cached[1][view]
 
     def _chain(self, addr: str, task) -> list[str]:
         """Who hears about a stalled task, in order: the assignee, its assigner, then up the tree to root."""

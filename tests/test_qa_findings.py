@@ -139,7 +139,6 @@ def test_qa5_bad_health_threshold_does_not_crash_tick(org):
     org_health(org)  # same for `orgmcp health` / the health tool
 
 
-@pytest.mark.xfail(strict=True, reason="QA-13: every tick re-parses every message ever received/sent by every agent")
 def test_qa13_idle_tick_cost_does_not_grow_with_history(org, monkeypatch):
     for i in range(40):
         org.send(ROOT, "ceo", f"old note {i}")

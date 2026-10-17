@@ -378,3 +378,74 @@ def test_runtime_only_batch_is_recorded_as_such(org):
     finally:
         sched.release()
     assert agent_health(org, "ceo", utcnow()).runtime_runs == 1
+
+
+# --------------------------------------------------------- QA-13: parse caching
+
+from orgmcp import core  # noqa: E402
+
+
+def test_message_load_is_cached_by_path_mtime_and_size(org, monkeypatch):
+    msg = org.send(ROOT, "ceo", "hello")
+    path = org.dir("ceo") / "inbox" / f"{msg.id}.md"
+    parses = []
+    real = core.split_frontmatter
+    monkeypatch.setattr(core, "split_frontmatter", lambda t: (parses.append(1), real(t))[1])
+    first = core.Message.load(path)
+    second = core.Message.load(path)
+    assert len(parses) == 1 and first == second and first is not second and second.path == path
+    first.body = "mutated"  # the cache hands out fresh objects
+    assert core.Message.load(path).body == "hello"
+    path.write_text(path.read_text().replace("hello", "HELLO!"))  # same path, new content: reparsed
+    assert core.Message.load(path).body == "HELLO!" and len(parses) == 2
+
+
+def test_cached_load_equals_uncached_parse(org):
+    msg = org.delegate(ROOT, "ceo", "Title: with colon", "goal\nline2", "acc", budget=3)
+    path = org.dir("ceo") / "inbox" / f"{msg.id}.md"
+    core._PARSED.clear()
+    cold = core.Message.load(path)
+    assert core.Message.load(path) == cold and cold.title == "Title: with colon" and cold.budget == 3
+    meta, body = core.split_frontmatter(path.read_text(encoding="utf-8"))
+    assert cold.body == body.strip() and meta["id"] == cold.id
+
+
+def test_crlf_files_parse_like_read_text(tmp_path):
+    p = tmp_path / "20260101T000000000000-root-aaaa.md"
+    p.write_bytes(b"---\r\nfrom: root\r\nto: ceo\r\ntype: note\r\n---\r\nline1\r\nline2\r\n")
+    assert core.Message.load(p).body == "line1\nline2" and core.Message.load(p).sender == "root"
+
+
+def test_cache_is_bounded(org, monkeypatch):
+    monkeypatch.setattr(core, "_PARSED_MAX", 5)
+    core._PARSED.clear()
+    for i in range(12):
+        org.send(ROOT, "ceo", f"n{i}")
+    org.messages("ceo", "inbox")
+    assert len(core._PARSED) == 5
+
+
+def test_yaml_uses_the_c_loader_when_present():
+    import yaml
+
+    assert core._YAML_LOADER is getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    assert core.split_frontmatter("---\na: 1\nb: [x, y]\n---\nbody\n") == ({"a": 1, "b": ["x", "y"]}, "body\n")
+
+
+def test_stall_view_reparses_only_when_the_mailbox_files_change(org, monkeypatch):
+    org.send(ROOT, "ceo", "budget", budget=10)
+    task = org.delegate(ROOT, "ceo", "T", "g", "a", budget=2)
+    sched = Scheduler(org, echo=lambda _: None)
+    assert [t.id for t in sched._task_view("ceo", "open_tasks")] == [task.id]
+    loads = []
+    real = core.Message.load.__func__
+    monkeypatch.setattr(core.Message, "load", classmethod(lambda cls, p: (loads.append(p), real(cls, p))[1]))
+    for _ in range(3):
+        sched._task_view("ceo", "open_tasks")
+    assert loads == []  # unchanged mailbox: nothing is parsed
+    org.begin_run("ceo")  # inbox -> inflight is the same set of messages
+    loads.clear()  # (begin_run itself parses the batch)
+    assert [t.id for t in sched._task_view("ceo", "open_tasks")] == [task.id] and loads == []
+    org.end_run("ceo", ok=True)
+    org.report("ceo", task.id, "done", "ok")  # a new sent message: recomputed, and the task is closed
+    assert sched._task_view("ceo", "open_tasks") == [] and loads

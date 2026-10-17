@@ -22,6 +22,7 @@ import re
 import secrets
 import shutil
 import subprocess
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -64,11 +65,14 @@ def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)  # libyaml when available: same result, ~10x faster
+
+
 def split_frontmatter(text: str) -> tuple[dict, str]:
     if text.startswith("---\n"):
         end = text.find("\n---\n", 4)
         if end != -1:
-            meta = yaml.safe_load(text[4:end]) or {}
+            meta = yaml.load(text[4:end], Loader=_YAML_LOADER) or {}
             return (meta if isinstance(meta, dict) else {}), text[end + 5 :]
     return {}, text
 
@@ -95,6 +99,10 @@ def atomic_write(path: Path, text: str) -> None:
 
 def _visible(paths) -> list[Path]:
     return sorted(p for p in paths if not p.name.startswith("."))
+
+
+_PARSED: OrderedDict[str, tuple[tuple[int, int], dict, str]] = OrderedDict()  # Message.load cache (LRU)
+_PARSED_MAX = 50_000
 
 
 @dataclass
@@ -138,7 +146,27 @@ class Message:
 
     @classmethod
     def load(cls, path: Path) -> Message:
-        meta, body = split_frontmatter(path.read_text(encoding="utf-8"))
+        """Parse a message file. Messages are immutable, so the parse is cached by path + mtime_ns + size."""
+        key = str(path)
+        with open(path, "rb") as f:
+            st = os.fstat(f.fileno())
+            stamp = (st.st_mtime_ns, st.st_size)
+            hit = _PARSED.get(key)
+            if hit is not None and hit[0] == stamp:
+                try:
+                    _PARSED.move_to_end(key)
+                except KeyError:  # evicted by another thread: harmless
+                    pass
+                meta, body = hit[1], hit[2]
+            else:
+                text = f.read().decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")  # like read_text
+                meta, body = split_frontmatter(text)
+                _PARSED[key] = (stamp, meta, body)
+                while len(_PARSED) > _PARSED_MAX:
+                    try:
+                        _PARSED.popitem(last=False)
+                    except KeyError:
+                        break
         return cls(
             sender=str(meta.get("from", "")),
             to=str(meta.get("to", "")),
