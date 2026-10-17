@@ -30,10 +30,13 @@ ORG_RULES = """\
    result, and those of the task assigned to you. Do not trust claims. If it falls short, send it back with
    `delegate(..., revises=<id of the earlier task>)` so the rework is recorded.
 5. Keep reports short: a few lines of summary plus artifact paths. Put detail in files, not messages.
-6. Every task assigned to you gets exactly one `report`. Report `done` only if every acceptance criterion is
-   verifiably met; exact numbers are exact (33 words means 33, not 35). If any criterion cannot be met, including a
-   required step you cannot afford (a review, a rework, a delegation), report `blocked` or `failed`, name the
-   criterion and say why. Never report `done` on a task whose criteria are not all met.
+6. Every task assigned to you gets a `report`; `done` and `failed` are final. Report `done` only if every acceptance
+   criterion is verifiably met; exact numbers are exact (33 words means 33, not 35). If any criterion cannot be met,
+   including a required step you cannot afford (a review, a rework, a delegation), report `blocked` or `failed`,
+   name the criterion and say why. Never report `done` on a task whose criteria are not all met.
+   `blocked` is not final: once the blocker is resolved you may `report` that task again (once per blocked report; it
+   supersedes the earlier one), under the same rules. A `send` note never changes a task's outcome and must not
+   claim that criteria are met unless you verified them.
 7. Before you stop, rewrite `<you>/MEMORY.md` with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
    Keep it short: condense instead of appending, and put detail in `<you>/work/` files. Writes that make it too long are refused.
    Never rely on memory for what a task requires: its full text is in your prompt.

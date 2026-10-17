@@ -11,6 +11,8 @@ Invariants (everything else is built on these):
   direct report's AGENT.md, which the parent owns.
 * State is derived, never stored:
   - a task is open until its assignee has sent a result with ``reply_to`` = task id;
+  - a task's outcome is its *latest* result: ``blocked`` may be superseded by a later result (``supersedes`` = the
+    id of the one it replaces), ``done`` and ``failed`` are final;
   - budget = budget received - budget handed down - runs consumed (files in ``runs/``).
 """
 
@@ -168,6 +170,7 @@ class Message:
     budget: int = 0
     hops: int = 0
     revises: str | None = None  # a task sent back for rework: the earlier task it revises
+    supersedes: str | None = None  # a result that replaces an earlier ``blocked`` result of the same task
     id: str = ""
     created: str = ""
     path: Path | None = field(default=None, compare=False, repr=False)
@@ -190,6 +193,8 @@ class Message:
             meta["budget"] = self.budget
         if self.revises:
             meta["revises"] = self.revises
+        if self.supersedes:
+            meta["supersedes"] = self.supersedes
         return meta
 
     def to_text(self) -> str:
@@ -229,6 +234,7 @@ class Message:
             budget=int(meta.get("budget") or 0),
             hops=int(meta.get("hops") or 0),
             revises=str(meta["revises"]) if meta.get("revises") else None,
+            supersedes=str(meta["supersedes"]) if meta.get("supersedes") else None,
             id=str(meta.get("id") or path.stem),
             created=str(meta.get("created") or ""),
             path=path,
@@ -262,10 +268,25 @@ class Message:
             head.append(f"status: {self.status}")
         if self.revises:
             head.append(f"revises: {self.revises}")
+        if self.supersedes:
+            head.append(f"supersedes: {self.supersedes}")
         if self.budget:
             head.append(f"budget: {self.budget} runs")
         body = self.cut_body(limit)
         return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{body}\n"
+
+
+def latest_results(results) -> dict[str, Message]:
+    """The latest result per task id (``reply_to``): the task's current outcome.
+
+    Ids start with a microsecond timestamp, so the highest id is the latest. A ``blocked`` result can be superseded by
+    a later one; ``done`` and ``failed`` are final, so anything derived from "the status of a task" uses this.
+    """
+    out: dict[str, Message] = {}
+    for m in results:
+        if m.type == "result" and m.reply_to and (m.reply_to not in out or m.id > out[m.reply_to].id):
+            out[m.reply_to] = m
+    return out
 
 
 class Retired(NamedTuple):
@@ -520,6 +541,7 @@ class Org:
         status: str | None = None,
         budget: int = 0,
         revises: str | None = None,
+        supersedes: str | None = None,
         _skip_route_check: bool = False,
     ) -> Message:
         cap = _message_cap(self.config)
@@ -554,6 +576,7 @@ class Org:
         msg = Message(
             sender=actor, to=to, type=type, body=body.strip(), title=title.strip(),
             reply_to=reply_to, status=status, budget=budget, hops=hops, revises=revises,
+            supersedes=supersedes,
         )
         return self.deliver(msg)
 
@@ -633,13 +656,19 @@ class Org:
         if task is None or task.type != "task":
             open_ids = ", ".join(t.id for t in self.open_tasks(actor)) or "none"
             raise OrgError(f"no task {task_id} assigned to you. Your open tasks: {open_ids}")
-        if any(m.type == "result" and m.reply_to == task_id for m in self.sent(actor)):
-            raise OrgError(f"task {task_id} was already reported")
+        prior = latest_results(self.sent(actor)).get(task_id)
+        if prior is not None and prior.status != "blocked":
+            raise OrgError(
+                f"task {task_id} was already reported {prior.status}, and {prior.status} is final (rule 6): it cannot be "
+                "reported again or changed by a note. Only a task reported `blocked` can be reported again. If you have "
+                "information for whoever assigned it, use `send`, as information only: a note does not change the "
+                "task's outcome and must not claim that criteria are met."
+            )
         arts = [self._normalize_artifact(actor, a, task.created) for a in (artifacts or [])]
         body = templates.result_body(summary, arts)
         return self.send(
             actor, task.sender, body, type="result", title=task.title,
-            reply_to=task.id, status=status, _skip_route_check=True,
+            reply_to=task.id, status=status, supersedes=prior.id if prior else None, _skip_route_check=True,
         )
 
     def hire(
@@ -1003,10 +1032,27 @@ class Org:
                 lines.append("    (full text: see the new messages below)")
             else:  # the contract you are accountable for, verbatim
                 lines.append(self._indent(self._quote(t), 4))
+        blocked = self._blocked_tasks(a)
+        if blocked:
+            lines.append("- Tasks you reported blocked (not final):")
+            for t in blocked:
+                lines.append(
+                    f"  - {t.id} \"{t.title}\" from {t.sender}: reported blocked; "
+                    "you may re-report it once the blocker is resolved"
+                )
+                if t.id in (shown or ()):
+                    lines.append("    (full text: see the new messages below)")
+                else:
+                    lines.append(self._indent(self._quote(t), 4))
         out = self.outstanding(a)
         lines.append("- Work you delegated that is still outstanding:" + ("" if out else " none"))
         lines += [f"  - {t.id} \"{t.title}\" -> {t.to} ({self.state(t.to) if self.exists(t.to) else 'gone'})" for t in out]
         return "\n".join(lines)
+
+    def _blocked_tasks(self, addr: str) -> list[Message]:
+        """Tasks assigned to ``addr`` whose latest result is ``blocked``: answered, but they may be reported again."""
+        latest = latest_results(self.sent(addr))
+        return [t for t in self.received(addr) if t.type == "task" and (r := latest.get(t.id)) and r.status == "blocked"]
 
     def whoami(self, addr: str) -> str:
         a = self.require(addr)
@@ -1025,14 +1071,46 @@ class Org:
             f"{text}\n[The task you delegated to {task.to} that this result answers ({task.id}). "
             f"Judge the result against these criteria, verbatim:]\n{self._quote(task)}\n"
         )
-        # Which of your own open tasks does it serve? Derivable only if exactly one was already yours at the time.
-        mine = [t for t in self.open_tasks(addr) if t.id < task.id]
-        if len(mine) == 1:
-            out += (
-                f"[It was the only task assigned to you before you delegated this, so it probably serves your open task "
-                f"{mine[0].id} \"{mine[0].title}\": the result must also satisfy that task's criteria (shown in full in this prompt).]\n"
-            )
+        # Which of your own tasks does it serve? Derivable only if exactly one was already yours at the time.
+        up = self._upstream(addr, task)
+        if up is not None:
+            mine, reported = up
+            if reported is None:
+                out += (
+                    f"[It was the only task assigned to you before you delegated this, so it probably serves your open task "
+                    f"{mine.id} \"{mine.title}\": the result must also satisfy that task's criteria (shown in full in this prompt).]\n"
+                )
+            elif reported.status == "blocked":
+                out += (
+                    f"[It was the only task assigned to you before you delegated this, so it probably serves your task "
+                    f"{mine.id} \"{mine.title}\", which you already reported blocked. That is not final: you may `report` "
+                    "it again, once, if the blocker is resolved (its criteria are shown in your state). The new report must meet "
+                    "rule 6: `done` only if every criterion is met and verified by you, including any required review of "
+                    "the FINAL version, not an earlier draft; otherwise report `blocked` or `failed`. Do not claim in a note "
+                    "that criteria are met.]\n"
+                )
+            else:
+                out += (
+                    f"[It was the only task assigned to you before you delegated this, so it probably serves your task "
+                    f"{mine.id} \"{mine.title}\", which you already reported {reported.status}: that is final. Do not claim "
+                    "in a note that its criteria are met or try to change its outcome; if you have information for "
+                    f"{mine.sender}, send it as information only, saying what was and was not verified.]\n"
+                )
         return out
+
+    def _upstream(self, addr: str, delegated: Message) -> tuple[Message, Message | None] | None:
+        """The one task of ``addr`` that a delegation probably serves, with its latest result (None = still open).
+
+        A candidate was assigned before the delegation and is open, reported ``blocked`` or was reported only after
+        the delegation. None when there is not exactly one candidate.
+        """
+        latest = latest_results(self.sent(addr))
+        found = [
+            (t, latest.get(t.id)) for t in self.received(addr)
+            if t.type == "task" and t.id < delegated.id
+            and ((r := latest.get(t.id)) is None or r.status == "blocked" or r.id > delegated.id)
+        ]
+        return found[0] if len(found) == 1 else None
 
     def run_prompt(self, addr: str, batch: list[Message]) -> str:
         a = self.require(addr)

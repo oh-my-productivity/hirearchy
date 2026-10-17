@@ -66,9 +66,12 @@ def build_server(org: Org, me: str) -> FastMCP:
 
     @mcp.tool()
     def report(task_id: str, status: str, summary: str, artifacts: list[str] | None = None) -> str:
-        """Answer a task assigned to you, exactly once. Goes to whoever assigned it.
+        """Answer a task assigned to you. Goes to whoever assigned it.
 
-        status: "done" (acceptance criteria met), "failed", or "blocked" (say what would unblock it).
+        status: "done" (every acceptance criterion verifiably met), "failed", or "blocked" (say what would unblock it).
+        `done` and `failed` are final: a second report is refused. `blocked` is not: once the blocker is resolved
+        you may report the task again, once per blocked report (any status; the new report supersedes the old one),
+        under the same rules. A `send` note never changes a task's outcome and must not claim criteria are met.
         summary: at most ~10 lines; this is all your manager reads by default. artifacts: paths of the
         files that hold the work (relative to the org root); they must exist. The runtime annotates each
         with its word count and whether it changed since the task was assigned.
