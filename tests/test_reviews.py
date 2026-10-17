@@ -2,6 +2,7 @@ import time
 from datetime import timedelta
 
 from orgmcp import templates
+from orgmcp.cli import main
 from orgmcp.core import ROOT, Org, join_frontmatter, split_frontmatter, utcnow
 from orgmcp.health import FLAGS, agent_health
 from orgmcp.review import review, review_if_due, total_runs
@@ -11,7 +12,7 @@ ENG = "ceo/eng"
 
 
 def now():
-    """Late enough that freshly hired agents count as idle when `idle_after_seconds` is 0."""
+    """Late enough that freshly hired agents count as idle when `idle_after_seconds` is tiny."""
     return utcnow() + timedelta(hours=1)
 
 
@@ -22,7 +23,7 @@ def configure(org, **changes):
 
 
 def flag_idle(org):
-    configure(org, health={"idle_after_seconds": 0})
+    configure(org, health={"idle_after_seconds": -1})
 
 
 def fund(org, addr="ceo", budget=10):
@@ -287,3 +288,29 @@ def test_tick_on_a_healthy_org_costs_nothing(org):
     sched.tick()
     assert all(not runtime_notes(org, a) for a in (ROOT, "ceo", ENG))
     assert org.ledger("reviews")["notified"] == {}
+
+
+# ------------------------------------------------------------------ CLI
+
+
+def test_cli_review_dry_run_then_real(org, capsys):
+    flag_idle(org)
+    fund(org)
+    root = ["--root", str(org.root)]
+    before = snapshot(org)
+    main([*root, "review", "--dry-run"])
+    out = capsys.readouterr().out
+    assert "would send 2 note(s)" in out and "-> ceo: health review" in out and "-> root: health review" in out
+    assert snapshot(org) == before
+
+    main([*root, "review"])
+    out = capsys.readouterr().out
+    assert " sent 2 note(s)" in out and "would" not in out
+    assert len(runtime_notes(org, "ceo")) == 1 and len(runtime_notes(org, ROOT)) == 1
+    assert org.ledger("reviews")["notified"]["ceo"] == [f"{ENG}:idle"]
+
+
+def test_cli_review_on_a_healthy_org(org, capsys):
+    main(["--root", str(org.root), "review"])
+    assert "0 flagged agent(s); nothing to send" in capsys.readouterr().out
+    assert org.ledger("reviews")

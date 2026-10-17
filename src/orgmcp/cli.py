@@ -71,6 +71,16 @@ def cmd_health(args) -> None:
     print(json.dumps(report.to_dict(), indent=2) if args.json else render_text(report))
 
 
+def cmd_review(args) -> None:
+    from .review import review
+
+    org = _org(args)
+    result = review(org, dry_run=args.dry_run)
+    if result.notes and not args.dry_run:
+        org.commit("root: health review")
+    print(result.render(args.dry_run))
+
+
 def cmd_inbox(args) -> None:
     org = _org(args)
     batch = org.messages(ROOT, "inbox") if args.keep else org.begin_run(ROOT)
@@ -165,6 +175,10 @@ def main(argv: list[str] | None = None) -> None:
     s.add_argument("--agent", metavar="ADDR", help="only this agent and its subtree (default: whole organization)")
     s.add_argument("--json", action="store_true", help="print the structured data")
     s.set_defaults(fn=cmd_health)
+
+    s = sub.add_parser("review", help="run a health review now: tell managers (and you) about flagged agents")
+    s.add_argument("--dry-run", action="store_true", help="print what would be sent; write nothing")
+    s.set_defaults(fn=cmd_review)
 
     s = sub.add_parser("inbox", help="read your (root) messages")
     s.add_argument("--keep", action="store_true", help="do not mark as read")
