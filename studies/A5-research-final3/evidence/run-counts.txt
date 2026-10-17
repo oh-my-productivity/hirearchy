@@ -1,0 +1,11 @@
+runs per agent (logs):
+lead       13
+lead/researcher        1
+lead/writer        4
+lead/factcheck        4
+
+4 agents, 1 flagged
+lead idle, budget 0/45, runs 13, open 0, done 3 failed 0 blocked 0 rework 2, runs/task 4.3, empty 1, last activity 6m ago | branch: runs 22, open 0, done 12, failed 0, blocked 0, rework 4, worst low_quality | !low_quality: 2 of 3 tasks failed, blocked or were sent back
+  factcheck idle, budget 0/9, runs 4, open 0, done 4 failed 0 blocked 0 rework 1, runs/task 1.0, empty 0, last activity 7m ago
+  researcher idle, budget 0/4, runs 1, open 0, done 1 failed 0 blocked 0 rework 0, runs/task 1.0, empty 0, last activity 22m ago
+  writer idle, budget 0/8, runs 4, open 0, done 4 failed 0 blocked 0 rework 1, runs/task 1.0, empty 0, last activity 9m ago

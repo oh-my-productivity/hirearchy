@@ -1,0 +1,30 @@
+{
+  "name": "orgmcp-orgmcp-a5-1792273159-org-27cc27-web-fetch-web-search",
+  "description": "internal: used by the orgmcp scheduler for /private/tmp/orgmcp-a5-1792273159/org; not a general-purpose agent (built-in tools: web_fetch, web_search)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "/Volumes/workspace/orgmcp/.venv/bin/orgmcp",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/private/tmp/orgmcp-a5-1792273159/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "web_fetch",
+    "web_search"
+  ],
+  "allowedTools": [
+    "@orgmcp",
+    "web_fetch",
+    "web_search"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false
+}
