@@ -5,6 +5,7 @@ Everything here is read-only and derived from message files and run logs (nothin
 * a run starts at the timestamp in its log file name and ends at the log's mtime;
 * an *empty* run is one during which the agent sent no message. Runs that failed (crash, timeout, kiro missing)
   and runs woken only by runtime notes are not the agent's doing and are left out of the waste statistics;
+* a task counts once, by its *latest* result: a ``blocked`` that was superseded by ``done`` is a ``done``;
 * *rework* is a received task that carries ``revises`` (a manager sent earlier work back).
 
 Thresholds come from ``HEALTH_DEFAULTS`` overridden by the ``health:`` mapping in ORG.md frontmatter.
@@ -17,7 +18,7 @@ import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 
-from .core import DEFAULT_CONFIG, ROOT, Message, Org, OrgError, utcnow
+from .core import DEFAULT_CONFIG, ROOT, Message, Org, OrgError, latest_results, utcnow
 
 HEALTH_DEFAULTS: dict[str, float] = {
     "stuck_after_seconds": 1800,  # open task older than this, with nothing in progress -> stuck
@@ -134,12 +135,12 @@ def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict 
 
     received, sent = org.received(a), org.sent(a)
     tasks = [m for m in received if m.type == "task"]
-    results = [m for m in sent if m.type == "result"]
-    answered = {m.reply_to for m in results}
+    results = latest_results(sent)  # task id -> its latest result: each task counts once, by its latest status
+    answered = set(results)
     open_tasks = [t for t in tasks if t.id not in answered]
     answered_out = {m.reply_to for m in received if m.type == "result"}
     waiting = any(m.type == "task" and m.id not in answered_out for m in sent)
-    by_status = {s: sum(1 for r in results if r.status == s) for s in ("done", "failed", "blocked")}
+    by_status = {s: sum(1 for r in results.values() if r.status == s) for s in ("done", "failed", "blocked")}
     rework = sum(1 for t in tasks if t.revises)
     unread, running, paused = org.unread(a), org.running(a), org.paused(a)
     budget_left, runs_used = org.budget(a), org.runs_used(a)
@@ -160,7 +161,7 @@ def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict 
 
     ages = [max(0.0, (now - c).total_seconds()) for t in open_tasks if (c := _parse_time(t.created))]
     oldest = max(ages, default=None)
-    result_times = [t for t in map(_msg_time, results) if t]
+    result_times = [t for t in map(_msg_time, (m for m in sent if m.type == "result")) if t]
     last_result = max(result_times, default=None)
     since_result = sum(1 for start, _ in windows if last_result is None or start > last_result)
     runs_per_task = runs_used / len(results) if results else None

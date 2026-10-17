@@ -21,7 +21,7 @@ org/                      # root = you, the human
 
 - Address = path (`ceo/writer`). Every path in tools is relative to the org root.
 - An agent writes only inside its own directory. The exception is a direct report's `AGENT.md`, which the parent owns.
-- Tasks go down (`delegate`, direct reports only), results go up (`report`, once per task), and notes go to the parent, reports, siblings, or a reply.
+- Tasks go down (`delegate`, direct reports only), results go up (`report`: `done` and `failed` are final, a `blocked` task can be reported again and the new result `supersedes` it), and notes go to the parent, reports, siblings, or a reply.
 - The task contract travels with every run: the prompt carries the full text (goal, acceptance criteria, inputs) of each open task, and next to each `result` the task you delegated that it answers. Protocol: copy criteria verbatim when delegating, report `done` only if every criterion is met, otherwise `blocked`/`failed`.
 - Task state and budget are derived from the message files, never stored separately.
 - Budget is counted in runs and passes down the tree: a child gets only what its parent hands it, and each delegation keeps a reserve so the parent can process the result. `delegate` without a `budget` hands down `min(default_budget, remaining - reserve)` (one run reserved per outstanding delegation plus one for the new one) and fails with the options if that is below 1.
@@ -69,6 +69,10 @@ about itself or an agent in its own subtree. By default it reports your own subt
 "Rework" counts tasks an agent received with `revises` set: a manager sends work back with
 `delegate(..., revises=<earlier task id>)` (CLI: `orgmcp task ... --revises TASK_ID`). The id must be a task the
 delegator earlier sent to the same assignee.
+
+A task counts once, by its latest result: a `blocked` that was superseded by a later `done` is a `done` in the counts
+(and in `low_quality` and the health reviews). A task reported `blocked` is answered, not open: it does not keep the
+agent scheduled, and `whoami` lists it as re-reportable.
 
 | Flag | Meaning | Threshold key (default) |
 | --- | --- | --- |
