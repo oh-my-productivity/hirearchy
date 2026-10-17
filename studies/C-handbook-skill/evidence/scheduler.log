@@ -1,0 +1,31 @@
+
+# --- scheduler started 2026-10-17 18:22:56Z: /Volumes/workspace/orgmcp/.venv/bin/orgmcp --root /private/tmp/orgmcp-c-1792261179/org run
+org: /private/tmp/orgmcp-c-1792261179/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 86s
+lead: started run (1 message(s))
+lead/writer: run finished in 514s
+lead/writer: started run (1 message(s))
+lead: run finished in 60s
+lead: started run (1 message(s))
+lead/factcheck: started run (1 message(s))
+lead/writer: run finished in 269s
+lead: run finished in 40s
+lead: started run (1 message(s))
+lead/factcheck: run finished in 293s
+lead/writer: started run (1 message(s))
+lead: run finished in 76s
+lead: started run (1 message(s))
+lead/writer: run finished in 159s
+lead: run finished in 247s
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 82s
+lead: started run (1 message(s))
+lead/writer: run finished in 207s
+lead/factcheck: started run (1 message(s))
+lead: run finished in 86s
+lead: started run (1 message(s))
+lead/factcheck: run finished in 133s
+lead: run finished in 127s

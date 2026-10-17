@@ -1,0 +1,36 @@
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m55hf4s3e318y9xzptgtsnta","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+I'll start by reading the orgmcp skill and looking at the handbook folder.
+[tool] Reading SKILL.md:1, listing orgmcp-c-1792261179
+[tool] Running: @orgmcp/whoami
+[tool] status: Completed
+[tool] status: Completed
+[tool] Reading first-week.md:1, tools-and-accounts.md:1, time-off.md:1, code-of-conduct.md:1, security-policy.md:1, benefits.md:1
+[tool] status: Completed
+I've read the six handbook files (first week, tools and accounts, time off, code of conduct, security policy, benefits). Nothing is created yet. These are my proposed defaults, and you can reply "defaults" to accept them all.
+
+1. **Scope:** An onboarding guide for new remote hires at Larkspur Labs, built only from `handbook/`. It covers all six topics. Agents must not invent policy, names or numbers, and anything the handbook doesn't cover is flagged as a gap rather than filled in.
+2. **Deliverable:** One markdown file, at most 1800 words, saved to `/private/tmp/orgmcp-c-1792261179/deliverables/onboarding-guide.md`. It would include:
+   - a day-by-day plan for week 1 (before you start, day 1, days 2–5)
+   - the first month
+   - a "who to ask" table
+   - a deadlines checklist (2FA within 48h, security course within 2 weeks, health plan within 30 days, stipend receipts within 60 days, and so on)
+   - a short "things to know" section on core hours, communication norms and security basics
+3. **Acceptance criteria:** I'd check these:
+   - Every deadline and number in the guide matches the handbook.
+   - It names the correct contact for each topic.
+   - It has the sections listed above.
+   - It's within the word limit.
+   - A fact-checker has verified at least 15 claims against the handbook and the writer has applied every required change.
+4. **Sources and web access:** The handbook only, with no web access. Each factual claim cites its source file, such as `(security-policy.md)`.
+5. **Workspace:** Agents can read `handbook/` and write only to `deliverables/` and the org's own folder. The handbook stays read-only.
+6. **Code and tests:** Not applicable.
+7. **Team and budget:** A lead, a writer and a fact-checker, about 12 runs in total. The writer drafts on a cheap model, and the lead and fact-checker use a strong model.
+8. **Review:** Yes. The fact-checker did not write the draft and sends back required changes without editing the file.
+9. **Approval:** You approve the plan before anything is created or started, and any spend beyond the budget needs your OK.
+10. **Progress:** One line when you ask, and a message when it's done.
+
+Two things I noticed in the handbook that the agents will have to handle:
+- **Expense tool:** `tools-and-accounts.md` names Expensify, but `benefits.md` only says "expense tool". The guide should say Expensify.
+- **Who to contact:** Different topics list different contacts (Tomas Lindqvist, Dev Anand, Marguerite Osei, Ingrid Bauer). The guide needs to route each question to the right one.
+
+Do you also want a short welcome tone ("Welcome to Larkspur Labs!"), or should the guide stay purely factual?

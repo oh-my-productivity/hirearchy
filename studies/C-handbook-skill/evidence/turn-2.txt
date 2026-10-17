@@ -1,0 +1,32 @@
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+Here's the plan in plain words. Nothing has been created or started yet.
+
+**What gets made**
+One friendly guide for new remote hires at `/tmp/orgmcp-c-1792261179/out/onboarding-guide.md`, 800–1200 words. It has a Day 1 checklist, a Week 1 checklist, a Month 1 checklist and a "Who to ask" table, and nothing else. The tone is welcoming and plain. Every policy statement ends with the handbook file it came from, like [time-off.md]. It uses only your six handbook files, with nothing invented. If the handbook has a gap, the team flags it instead of filling it in.
+
+**Who does what (3 agents)**
+- **lead** (strong model) coordinates and checks the result against your criteria.
+- **writer** (cheaper model) drafts the guide and applies any corrections.
+- **factcheck** (strong model, separate from the writer) checks every fact, number, deadline and contact against the handbook. It sends a list of required changes back and doesn't edit the guide itself.
+
+**Budget**
+About 15 runs in total, with a hard ceiling of 20. Unused runs come back to you. I'll ask before going past 15.
+
+**Privacy**
+- The agents have only read and write tools. They have no web access and no shell, so they can't fetch or send anything.
+- They work from a folder that contains only the output. The handbook is outside it.
+- The tools can't technically stop an agent from writing to the handbook, so the instruction not to change it is the only block. After the run I'll compare the handbook files against the checksums in `safety/handbook-before.md5` and tell you if any differ.
+
+**When it's done**
+I'll read the guide and check it against each of your criteria. That covers the word count, the structure, the bracketed file references, the tone and the fact-check. I'll then copy it to the final path if needed and send you a short note with the runs used.
+
+Reply "approve" to start, or tell me what to change.

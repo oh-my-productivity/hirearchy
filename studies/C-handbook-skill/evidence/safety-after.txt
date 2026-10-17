@@ -1,0 +1,18 @@
+3eacba4e4479ae692c3dae8761b14b73 /Users/aminalizadeh/.kiro/settings/mcp.json
+-rw-r--r--@ 1 aminalizadeh  staff  918 Oct 17 19:22 /Users/aminalizadeh/.kiro/agents/orgmcp-orgmcp-c-1792261179-org-866561-read-write.json
+-rw-r--r--@ 1 aminalizadeh  staff  828 Oct 17 15:38 /Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-web_fetch-web_search-write.json
+-rw-r--r--@ 1 aminalizadeh  staff  714 Oct 17 17:51 /Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-write.json
+-rw-r--r--@ 1 aminalizadeh  staff  675 Oct 17 18:03 /Users/aminalizadeh/.kiro/agents/orgmcp-read-shell.json
+-rw-r--r--@ 1 aminalizadeh  staff  715 Oct 17 15:27 /Users/aminalizadeh/.kiro/agents/orgmcp-web_fetch-web_search.json
+-rw-r--r--@ 1 aminalizadeh  staff  597 Oct 17 16:30 /Users/aminalizadeh/.kiro/agents/orgmcp.json
+6cf2ff4953b1825ec6bf5d32893bd834 /Users/aminalizadeh/.kiro/agents/orgmcp-orgmcp-c-1792261179-org-866561-read-write.json
+f7ec83d121594de6363c471e3914033a /Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-web_fetch-web_search-write.json
+e0552b84a9ba7b2725673a04f25ff76e /Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-write.json
+362384f01a3030b7209c66acf1316d8d /Users/aminalizadeh/.kiro/agents/orgmcp-read-shell.json
+f669ee6a7f97d249121703c72f935244 /Users/aminalizadeh/.kiro/agents/orgmcp-web_fetch-web_search.json
+ba3ef12494eaa7ea24d4dd2e9465f1f8 /Users/aminalizadeh/.kiro/agents/orgmcp.json
+---
+---
+5b94a6b csv2md-lead: run ok, 1 message(s) [csv2md-lead/runs/20261017T170450874676.log]
+fbc09e8 scifi-editor: run ok, 1 message(s) [scifi-editor/runs/20261017T170352304817.log]
+fa188ee csv2md-lead/reviewer: run ok, 1 message(s) [csv2md-lead/reviewer/runs/20261017T170327934018.log]
