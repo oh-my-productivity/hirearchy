@@ -19,6 +19,9 @@ ORG_RULES = """\
   Every path (read, write, artifacts) is relative to the org root, so yours start with your address.
 - Budgets are counted in runs. Delegating moves budget from you to your report. When you are out of budget you stop being woken.
   `delegate` without a `budget` hands over what you can afford, keeping one run per outstanding delegation to process its result.
+  Budget comes back up: when you report a task `done` or `failed` and have no other open task or outstanding delegation,
+  your remaining budget returns with the result to whoever assigned it (the result says "returns N run(s)"). To give runs
+  back earlier, `send` your parent a note with `budget=N`. Hand down what a task needs, not everything you hold.
 
 ## Protocol for every run
 1. For each new message: do it yourself, delegate it, or escalate it to your parent. Never ignore a message.
@@ -41,6 +44,11 @@ ORG_RULES = """\
    Keep it short: condense instead of appending, and put detail in `<you>/work/` files. Writes that make it too long are refused.
    Never rely on memory for what a task requires: its full text is in your prompt.
 8. Stay within your charter. Escalate anything outside it.
+9. Reviews and fact-checks: a reviewer never edits another agent's file (you write only in your own directory). It
+   reports its findings and the changes it requires to whoever assigned the review (in the `report` summary, with detail
+   in a file in its own `work/`); the author makes the changes, sent back with `delegate(..., revises=<task id>)`.
+   Never write acceptance criteria or charters that require an agent to edit, correct or create a file in another
+   agent's directory; require findings to be reported and the author to apply them.
 """
 
 DEFAULT_MISSION = "(Describe the mission of this organization here.)"
@@ -127,6 +135,7 @@ REVIEW_ACTIONS = {
     "low_quality": "tighten `{a}`'s charter and acceptance criteria, rework with delegate(..., revises=<task id>), or replace it",
     "expensive": "narrow `{a}`'s tasks, or change its charter or model",
     "wasteful": "fix `{a}`'s charter so every run ends with an action (report or send)",
+    "stranded_budget": "ask `{a}` to return its budget (it can `send` its parent a note with `budget=N`), or retire it",
     "idle": "retire `{a}` if it is no longer needed",
 }
 

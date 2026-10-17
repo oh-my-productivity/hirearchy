@@ -44,7 +44,8 @@ def test_task_flows_down_and_result_flows_up(org):
     assert (org.root / "ceo/eng/work/out.md").read_text() == "done: Ship it"
     # ceo ran twice (task, then result); eng ran once
     assert org.runs_used("ceo") == 2 and org.runs_used("ceo/eng") == 1
-    assert org.budget("ceo") == 6 - 2 - 2 and org.budget("ceo/eng") == 2 - 1
+    # eng returned its unspent run with its result, ceo (nothing else open) returned all it had left with its own
+    assert results[0].budget == (6 - 2 + 1) - 2 and org.budget("ceo") == 0 and org.budget("ceo/eng") == 0
     log = subprocess.run(["git", "log", "--oneline"], cwd=org.root, capture_output=True, text=True).stdout
     assert "ceo/eng: run ok" in log
 

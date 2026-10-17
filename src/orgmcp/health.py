@@ -30,9 +30,10 @@ HEALTH_DEFAULTS: dict[str, float] = {
     "max_empty_run_ratio": 0.5,  # empty runs / runs used -> wasteful
     "min_runs_for_waste": 4,  # runs used before wasteful can fire
     "idle_after_seconds": 86400,  # no work and no activity for this long -> idle (candidate to retire)
+    "stranded_after_seconds": 1800,  # budget left, no work and no activity for this long -> stranded_budget
 }
 
-FLAGS = ("stuck", "out_of_budget", "paused", "low_quality", "expensive", "wasteful", "idle")  # worst first
+FLAGS = ("stuck", "out_of_budget", "paused", "low_quality", "expensive", "wasteful", "stranded_budget", "idle")  # worst first
 _STAMP = "%Y%m%dT%H%M%S%f"  # prefix of message ids and run log names
 
 
@@ -190,6 +191,14 @@ def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict 
     if judged and judged >= cfg["min_runs_for_waste"] and empty / judged > cfg["max_empty_run_ratio"]:
         flags["wasteful"] = f"{empty} of {judged} runs sent no message"
     quiet = (since if last else _since_hired(org, a, now)) or 0.0
+    if (
+        budget_left is not None and budget_left > 0 and org.parent(a) != ROOT and quiet > cfg["stranded_after_seconds"]
+        and not (open_tasks or waiting or running or unread)
+    ):  # root has no limit, so budget parked in its direct reports starves nobody
+        flags["stranded_budget"] = (
+            f"{budget_left} unused run(s) and no work or activity for {_duration(quiet)}; "
+            "they belong with its parent"
+        )
     if not (open_tasks or waiting or running or unread) and quiet > cfg["idle_after_seconds"]:
         flags["idle"] = f"no open tasks and no activity for {_duration(quiet)}; candidate to retire"
 

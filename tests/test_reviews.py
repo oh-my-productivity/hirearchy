@@ -151,6 +151,7 @@ def test_root_summary_lists_every_flagged_agent_every_review(org):
 def test_a_team_problem_is_reported_to_the_manager_of_the_team_lead(org):
     org.hire("ceo", "cto", "CTO", "Lead tech.", can_hire=True)
     org.hire("ceo/cto", "dev", "Developer", "Code.")
+    configure(org, health={"stranded_after_seconds": 10**9})  # funded and quiet is not what this test is about
     fund(org)
     fund(org, "ceo/cto")
     org.pause("ceo/cto/dev", "failures")
