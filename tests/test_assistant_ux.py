@@ -239,7 +239,7 @@ def test_tool_descriptions_and_instructions_point_at_no_repo_files(setup):
 def test_skill_and_instructions_carry_the_new_rules(setup):
     server, _ = setup
     skill = skill_source().read_text()
-    assert len(skill.splitlines()) <= 110
+    assert len(skill.splitlines()) <= 125
     for needle in ("PLAN FOR YOU", "exactly as written", "plan_id=<from propose_org>", "blueprint_example(kind)",
                    "Never invent a default", "deliverables/", "Never say \"I'll tell you when it's done\"",
                    "progress(wait_seconds=", "ask \"status?\"", "ends by itself", "`stop()` only if the user cancels"):

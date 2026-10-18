@@ -15,7 +15,14 @@ Call `whoami` (or `status`). If the orgmcp tools are not available or error out:
   config/credential file. If there is no org yet (`whoami` says "Setup"), `create_org(mission=...)` creates one at the bound
   path (pass `path=<absolute path>` only if the tool says none is bound).
 
+## 0b. The org already exists: look for a service first
+Before building anything, call `services()`. If one fits the ask, never build a new org or team: `request(service, inputs)` (tell the
+user the inputs and the per-request budget in one line; their asking for it within the approved per-request budget is the approval),
+then `start()`, monitor and finish as below.
+
 ## 1. Elicit (one message, then wait)
+Once, or repeatedly? Recurring work ("every week", "whenever I...", "for each new ...") is a **service**, not a one-off: also ask which
+inputs change per request and what stays fixed (criteria, format, place), and use `blueprint_example(kind, service=True)` in step 2.
 Skip anything the request already answers. Send ONE message in plain words (the user may not be technical), each item with a
 proposed default where a generic default exists, and say "reply 'defaults' to accept the proposed ones":
 1. Scope: what is in and out. **If it is a list (apps, competitors, features, topics, files), ask for it. Never invent a default
@@ -39,6 +46,7 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
    writes nothing and returns the PLAN FOR YOU block, Details and a `plan_id`.
 2. Show the PLAN FOR YOU block to the user **exactly as written** (one plain-words intro line before it is fine). Do not
    summarize or reword it: it is what they approve (team, models, budget, checks, delivery place, warnings).
+   A services-only plan says "Nothing runs until you ask for a request": after approval tell the user they can ask any time.
 3. Errors: fix the blueprint and propose again; never ask the user to approve a plan with errors. Revise on feedback and propose
    again (each change gives a new `plan_id`).
 4. Warnings in the block (for example no model policy, built-in `write` on a non-code goal): settle them with the user BEFORE you
@@ -50,7 +58,7 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
 1. `create_org(mission=...)` if the org does not exist yet.
 2. `apply_org(blueprint=<the approved YAML, unchanged>, approved=True, plan_id=<from propose_org>)`: creates the agents and gives
    the first task. It refuses a missing or different `plan_id`, so you cannot apply something the user did not see.
-3. `start()` (skip it if `apply_org` says a scheduler is already running). It ends by itself when the work is done.
+3. `start()` (skip it if `apply_org` says a scheduler is already running or that nothing runs yet). It ends by itself when the work is done.
 Tell the user it is running and how many runs were planned (a ceiling: runs the team does not spend come back automatically).
 
 ## 4. Monitor
@@ -80,7 +88,11 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 3. Copy the deliverable to the requested path (the plan lists this step) and check it exists and matches.
 4. Reply briefly, and shorter still when the user asks for a short answer: the deliverable path, then one line per criterion
    (met / unmet), then runs used of planned. Nothing else.
-5. The scheduler exits on its own when nothing is left (`progress` shows "scheduler: stopped (finished: no open tasks)").
+5. A service request: after the delivery ask ONE short question ("Keep it, or what should change?") and record
+   `feedback(task_id, accept|reject, note)`; reject needs the user's reason in their words. If the reason is a lasting requirement
+   ("always", "never", "from now on"), propose adding it to the contract as a checkable criterion; on yes call `define_service`
+   with the full contract (from `services()`) plus the new criterion; the playbook stays. Never edit SERVICE.md or PLAYBOOK.md yourself.
+6. The scheduler exits on its own when nothing is left (`progress` shows "scheduler: stopped (finished: no open tasks)").
    Call `stop()` only if the user cancels, declines more budget, you hand over an unverified or partial result (say the task
    stays open/blocked, not done), or you started it with `until_done=False`.
 
@@ -89,8 +101,7 @@ Templates: manager, researcher, writer, reviewer, fact-checker, engineer, tester
 The validator enforces: exact acceptance criteria and a deliverable; web tools for web needs; write+shell only with a workspace;
 a reviewer separate from the author who never edits others' files; budget within the user's cap and above the estimate; tiered
 models when asked. Criteria must be checkable ("at most 1500 words"), never "good quality". Example criteria: "Covers exactly the
-items the user listed", "A comparison table with one row per item", "The fact-checker's coverage report shows every factual
-claim verified (n of m, n = m)". The fact-checker and reviewer check everything, not a sample, so never ask for "at least N" checks.
+items the user listed", "The fact-checker's coverage report shows every factual claim verified (n of m, n = m)". The fact-checker and reviewer check everything, not a sample, so never ask for "at least N" checks.
 
 ## Files and access
 - `needs.inputs`: the user's folders. Agents may read them and can never change them (kiro enforces it per agent). `needs.workspace`:
