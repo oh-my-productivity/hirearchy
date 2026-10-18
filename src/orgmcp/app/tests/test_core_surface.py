@@ -1,0 +1,52 @@
+"""What does not change for anyone who uses ``orgmcp.core``: characterization that passes before and after the pre-split."""
+
+from __future__ import annotations
+
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+import pytest
+
+from orgmcp import core
+from orgmcp.app.tests import _signatures
+from orgmcp.app.tests._mixins import MIXINS
+from orgmcp.kernel import Message
+
+FIXED = datetime(2031, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
+
+FILE = "---\nid: 20260101T000000000000-root-aaaa\nfrom: root\nto: ceo\ntype: note\n---\nhello\n"
+
+
+def test_org_ids_and_files_follow_the_patch_points(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    org = getattr(core, "Org").init(tmp_path / "org", "mission")
+    monkeypatch.setattr(core, "utcnow", lambda: FIXED)
+    assert org.new_id("ceo").startswith("20310506T070809000000-ceo-")
+    written: list[Path] = []
+    monkeypatch.setattr(core, "atomic_write", lambda path, text: written.append(path))
+    org.save_ledger("probe", {})
+    assert written == [org.root / ".runtime" / "probe.json"]
+
+
+def test_every_def_of_the_old_org_is_in_exactly_one_mixin() -> None:
+    recorded = set(json.loads(_signatures.SIGNATURES.read_text(encoding="utf-8"))["Org"])
+    held = [m for _, _, methods in MIXINS for m in methods.split()]
+    assert len(held) == len(set(held)) == len(recorded) == 98 and set(held) == recorded
+
+
+def test_the_module_level_names_that_core_exported_are_still_there() -> None:
+    for name in ("DEFAULT_CONFIG", "DEFAULT_MODEL", "LESSONS_MAX_CHARS", "Retired", "config_default_model", "charter_change_note",
+                 "utcnow", "atomic_write", "_message_cap", "_short", "_fold", "_case_twin", "_FOLDED_RUNTIME_NAMES", "_EXACT_FILES",
+                 "_PARSED", "_PARSED_MAX", "Message", "OrgError", "ROOT", "split_frontmatter", "join_frontmatter", "_visible", "_inside"):
+        assert hasattr(core, name), name
+    assert getattr(core, "Retired")._fields == ("addr", "refunded", "refunded_to")
+
+
+def test_message_load_builds_the_class_it_is_called_on(tmp_path: Path) -> None:
+    class Special(Message):
+        pass
+
+    path = tmp_path / "20260101T000000000000-root-aaaa.md"
+    path.write_text(FILE, encoding="utf-8")
+    assert type(Special.load(path)) is Special  # type: ignore[attr-defined]
+    assert type(Message.load(path)) is Message  # type: ignore[attr-defined]

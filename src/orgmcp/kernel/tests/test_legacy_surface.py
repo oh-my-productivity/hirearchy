@@ -43,7 +43,7 @@ def test_health_private_helpers_are_the_kernel_functions(old: str, new: str) -> 
 def test_the_patch_points_stay_in_core() -> None:
     core = legacy("core")
     assert core.utcnow.__module__ == "orgmcp.core" and core.atomic_write.__module__ == "orgmcp.core"
-    assert "load" in vars(kernel.Message) and kernel.Message.load.__func__.__module__ == "orgmcp.core"  # type: ignore[attr-defined]
+    assert "load" in vars(kernel.Message) and kernel.Message.load.__func__.__module__ == "orgmcp.app._compat"  # type: ignore[attr-defined]
 
 
 def test_org_address_helpers_agree_with_the_kernel(org: Any) -> None:

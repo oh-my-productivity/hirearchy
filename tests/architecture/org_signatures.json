@@ -1,0 +1,2439 @@
+{
+ "Org": {
+  "__init__": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "root",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, root: 'str | Path')"
+  },
+  "_agent_line": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'str'"
+  },
+  "_blocked_tasks": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[Message]'"
+  },
+  "_budget_to_return": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "task",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "status",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, actor: 'str', task: 'Message', status: 'str') -> 'int'"
+  },
+  "_check_allocation": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "amount",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "new_delegation",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, actor: 'str', amount: 'int', new_delegation: 'bool') -> 'None'"
+  },
+  "_check_authority": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "tools",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "workspace",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "inputs",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, actor: 'str', tools: 'list[str]', workspace: 'str | None', inputs: 'list[str] | None' = None) -> 'None'"
+  },
+  "_check_inputs": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "inputs",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, inputs) -> 'list[str]'"
+  },
+  "_check_lessons": {
+   "kind": "staticmethod",
+   "params": [
+    {
+     "name": "task",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "status",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "lessons",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(task: 'Message', status: 'str', lessons: 'str | None') -> 'str'"
+  },
+  "_default_budget": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, actor: 'str') -> 'int'"
+  },
+  "_files_lines": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "meta",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str', meta: 'dict') -> 'list[str]'"
+  },
+  "_indent": {
+   "kind": "staticmethod",
+   "params": [
+    {
+     "name": "text",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "n",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(text: 'str', n: 'int') -> 'str'"
+  },
+  "_next_hops": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, actor: 'str') -> 'int'"
+  },
+  "_normalize_artifact": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "since",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "''"
+    }
+   ],
+   "annotated": "(self, actor: 'str', path: 'str', since: 'str' = '') -> 'str'"
+  },
+  "_quote": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "m",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, m: 'Message') -> 'str'"
+  },
+  "_render_in_context": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "m",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str', m: 'Message') -> 'str'"
+  },
+  "_upstream": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "delegated",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str', delegated: 'Message') -> 'tuple[Message, Message | None] | None'"
+  },
+  "_wakes": {
+   "kind": "staticmethod",
+   "params": [
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(path: 'Path') -> 'bool'"
+  },
+  "agents": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self) -> 'list[str]'"
+  },
+  "begin_run": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[Message]'"
+  },
+  "budget": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'int | None'"
+  },
+  "can_message": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "sender",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "to",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "reply_to",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, sender: 'str', to: 'str', reply_to: 'str | None' = None) -> 'bool'"
+  },
+  "charter": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'tuple[dict, str]'"
+  },
+  "child_addr": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "parent",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "name",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, parent: 'str', name: 'str') -> 'str'"
+  },
+  "children": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[str]'"
+  },
+  "clear_failures": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'None'"
+  },
+  "commit": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "message",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, message: 'str') -> 'None'"
+  },
+  "config": {
+   "kind": "property",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self) -> 'dict'"
+  },
+  "context_trace": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'tuple[str | None, str, list[str]]'"
+  },
+  "default_model": {
+   "kind": "property",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self) -> 'str'"
+  },
+  "define_service": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "owner",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "name",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "description",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "inputs",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "acceptance",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "deliverable",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "budget",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "playbook",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "locked",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "notes",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "add_acceptance",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "remove_acceptance",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, actor: 'str', owner: 'str', name: 'str', *, description: 'str | None' = None, inputs=None, acceptance=None, deliverable: 'dict | None' = None, budget: 'int | None' = None, playbook: 'str | None' = None, locked: 'bool | None' = None, notes: 'str | None' = None, add_acceptance=None, remove_acceptance=None) -> 'str'"
+  },
+  "delegable": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'tuple[int, int, int]'"
+  },
+  "delegate": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "to",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "title",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "goal",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "acceptance",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "inputs",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "budget",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "revises",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, actor: 'str', to: 'str', title: 'str', goal: 'str', acceptance: 'str', inputs: 'list[str] | None' = None, budget: 'int | None' = None, revises: 'str | None' = None) -> 'Message'"
+  },
+  "deliver": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "msg",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, msg: 'Message') -> 'Message'"
+  },
+  "depth": {
+   "kind": "classmethod",
+   "params": [
+    {
+     "name": "cls",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(cls, addr: 'str') -> 'int'"
+  },
+  "dir": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'Path'"
+  },
+  "emit": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "kind",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "fields",
+     "kind": "VAR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, kind: 'str', **fields) -> 'None'"
+  },
+  "end_run": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "ok",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str', ok: 'bool') -> 'None'"
+  },
+  "exists": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'bool'"
+  },
+  "feedback": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "task_id",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "verdict",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "note",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "''"
+    }
+   ],
+   "annotated": "(self, actor: 'str', task_id: 'str', verdict: 'str', note: 'str' = '') -> 'Message'"
+  },
+  "find_received": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "msg_id",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str', msg_id: 'str') -> 'Message | None'"
+  },
+  "find_root": {
+   "kind": "staticmethod",
+   "params": [
+    {
+     "name": "start",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(start: 'str | Path | None' = None) -> 'Path'"
+  },
+  "grant_hint": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'str'"
+  },
+  "hire": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "name",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "role",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "charter",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "model",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "tools",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "can_hire",
+     "kind": "KEYWORD_ONLY",
+     "default": "False"
+    },
+    {
+     "name": "max_children",
+     "kind": "KEYWORD_ONLY",
+     "default": "5"
+    },
+    {
+     "name": "workspace",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "inputs",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, actor: 'str', name: 'str', role: 'str', charter: 'str', *, model: 'str | None' = None, tools: 'list[str] | None' = None, can_hire: 'bool' = False, max_children: 'int' = 5, workspace: 'str | None' = None, inputs: 'list[str] | None' = None) -> 'str'"
+  },
+  "init": {
+   "kind": "classmethod",
+   "params": [
+    {
+     "name": "cls",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "root",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "mission",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "config",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(cls, root: 'str | Path', mission: 'str | None' = None, config: 'dict | None' = None) -> 'Org'"
+  },
+  "inputs_of": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[Path]'"
+  },
+  "ledger": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "name",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, name: 'str') -> 'dict'"
+  },
+  "memory": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'str'"
+  },
+  "messages": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "boxes",
+     "kind": "VAR_POSITIONAL",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str', *boxes: 'str') -> 'list[Message]'"
+  },
+  "model_for": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'str'"
+  },
+  "new_id": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "sender",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, sender: 'str') -> 'str'"
+  },
+  "norm": {
+   "kind": "staticmethod",
+   "params": [
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(addr: 'str | None') -> 'str'"
+  },
+  "notify": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "to",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "title",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "body",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "wake",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "True"
+    },
+    {
+     "name": "trace",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, to: 'str', title: 'str', body: 'str', wake: 'bool' = True, trace: 'str | None' = None) -> 'Message'"
+  },
+  "open_task_traces": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[str | None]'"
+  },
+  "open_tasks": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[Message]'"
+  },
+  "outstanding": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[Message]'"
+  },
+  "parent": {
+   "kind": "classmethod",
+   "params": [
+    {
+     "name": "cls",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(cls, addr: 'str') -> 'str | None'"
+  },
+  "pause": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "reason",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "by",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, addr: 'str', reason: 'str', by: 'str | None' = None) -> 'None'"
+  },
+  "paused": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'str | None'"
+  },
+  "read": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, path: 'str', actor: 'str | None' = None) -> 'str'"
+  },
+  "readable_roots": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[Path]'"
+  },
+  "received": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[Message]'"
+  },
+  "reclaim": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "report",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "budget",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, actor: 'str', report: 'str', budget: 'int | None' = None) -> 'Message'"
+  },
+  "record_failure": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'int'"
+  },
+  "recover": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self) -> 'list[str]'"
+  },
+  "redeliver_orphans": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self) -> 'list[str]'"
+  },
+  "report": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "task_id",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "status",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "summary",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "artifacts",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "lessons",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, actor: 'str', task_id: 'str', status: 'str', summary: 'str', artifacts: 'list[str] | None' = None, lessons: 'str | None' = None) -> 'Message'"
+  },
+  "request": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "service",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "inputs",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "title",
+     "kind": "KEYWORD_ONLY",
+     "default": "''"
+    },
+    {
+     "name": "note",
+     "kind": "KEYWORD_ONLY",
+     "default": "''"
+    },
+    {
+     "name": "extra_acceptance",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "budget",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "revises",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, actor: 'str', service: 'str', inputs: 'dict | None', *, title: 'str' = '', note: 'str' = '', extra_acceptance: 'list[str] | None' = None, budget: 'int | None' = None, revises: 'str | None' = None) -> 'Message'"
+  },
+  "require": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'str'"
+  },
+  "resolve_read": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, path: 'str', actor: 'str | None' = None) -> 'Path'"
+  },
+  "resolve_write": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, actor: 'str', path: 'str') -> 'Path'"
+  },
+  "resume": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "reason",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "''"
+    },
+    {
+     "name": "by",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, addr: 'str', reason: 'str' = '', by: 'str | None' = None) -> 'None'"
+  },
+  "retire": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "name",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "reason",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, actor: 'str', name: 'str', reason: 'str') -> 'str'"
+  },
+  "retire_service": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "owner",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "name",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "reason",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, actor: 'str', owner: 'str', name: 'str', reason: 'str') -> 'str'"
+  },
+  "retire_team": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "name",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "reason",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, actor: 'str', name: 'str', reason: 'str') -> 'Retired'"
+  },
+  "revise_playbook": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "service",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "content",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "reason",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, actor: 'str', service: 'str', content: 'str', reason: 'str') -> 'int'"
+  },
+  "rules": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self) -> 'str'"
+  },
+  "run_prompt": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "batch",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str', batch: 'list[Message]') -> 'str'"
+  },
+  "running": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'bool'"
+  },
+  "runs_used": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'int'"
+  },
+  "save_ledger": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "name",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "data",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, name: 'str', data: 'dict') -> 'None'"
+  },
+  "send": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "to",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "body",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "type",
+     "kind": "KEYWORD_ONLY",
+     "default": "'note'"
+    },
+    {
+     "name": "title",
+     "kind": "KEYWORD_ONLY",
+     "default": "''"
+    },
+    {
+     "name": "reply_to",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "status",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "budget",
+     "kind": "KEYWORD_ONLY",
+     "default": "0"
+    },
+    {
+     "name": "revises",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "supersedes",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "service",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "contract",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "playbook",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "feedback",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "wake",
+     "kind": "KEYWORD_ONLY",
+     "default": "True"
+    },
+    {
+     "name": "_skip_route_check",
+     "kind": "KEYWORD_ONLY",
+     "default": "False"
+    }
+   ],
+   "annotated": "(self, actor: 'str', to: 'str', body: 'str', *, type: 'str' = 'note', title: 'str' = '', reply_to: 'str | None' = None, status: 'str | None' = None, budget: 'int' = 0, revises: 'str | None' = None, supersedes: 'str | None' = None, service: 'str | None' = None, contract: 'int | None' = None, playbook: 'int | None' = None, feedback: 'str | None' = None, wake: 'bool' = True, _skip_route_check: 'bool' = False) -> 'Message'"
+  },
+  "sent": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[Message]'"
+  },
+  "service_names": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[str]'"
+  },
+  "stamp_trace": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "msg",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, msg: 'Message') -> 'tuple[str, list[str]]'"
+  },
+  "start_run_log": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'Path'"
+  },
+  "state": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'str'"
+  },
+  "state_summary": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "shown",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, addr: 'str', shown: 'set[str] | None' = None) -> 'str'"
+  },
+  "stray_notice": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'str'"
+  },
+  "subtree": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'list[str]'"
+  },
+  "tool_names": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'dict[str, str]'"
+  },
+  "trace_of": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "msg_id",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str', msg_id: 'str | None') -> 'str | None'"
+  },
+  "tree": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self) -> 'str'"
+  },
+  "unconfined_read": {
+   "kind": "staticmethod",
+   "params": [
+    {
+     "name": "meta",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(meta: 'dict') -> 'bool'"
+  },
+  "unread": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'int'"
+  },
+  "whoami": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'str'"
+  },
+  "workspace_of": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "addr",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self, addr: 'str') -> 'Path | None'"
+  },
+  "write": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "content",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "append",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "False"
+    }
+   ],
+   "annotated": "(self, actor: 'str', path: 'str', content: 'str', append: 'bool' = False) -> 'Path'"
+  },
+  "write_noted": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "content",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "append",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "False"
+    }
+   ],
+   "annotated": "(self, actor: 'str', path: 'str', content: 'str', append: 'bool' = False) -> 'tuple[Path, str]'"
+  }
+ },
+ "Message": {
+  "__init__": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "sender",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "to",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "type",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "body",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "title",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "''"
+    },
+    {
+     "name": "reply_to",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "status",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "budget",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "0"
+    },
+    {
+     "name": "hops",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "0"
+    },
+    {
+     "name": "wake",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "True"
+    },
+    {
+     "name": "revises",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "supersedes",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "service",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "contract",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "playbook",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "feedback",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "trace",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "id",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "''"
+    },
+    {
+     "name": "created",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "''"
+    },
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, sender: 'str', to: 'str', type: 'str', body: 'str', title: 'str' = '', reply_to: 'str | None' = None, status: 'str | None' = None, budget: 'int' = 0, hops: 'int' = 0, wake: 'bool' = True, revises: 'str | None' = None, supersedes: 'str | None' = None, service: 'str | None' = None, contract: 'int | None' = None, playbook: 'int | None' = None, feedback: 'str | None' = None, trace: 'str | None' = None, id: 'str' = '', created: 'str' = '', path: 'Path | None' = None) -> None"
+  },
+  "cut_body": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "limit",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "8000"
+    },
+    {
+     "name": "where",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, limit: 'int' = 8000, where: 'str | None' = None) -> 'str'"
+  },
+  "from_parts": {
+   "kind": "classmethod",
+   "params": [
+    {
+     "name": "cls",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "meta",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "body",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(cls, meta: 'JsonObject', body: 'str', path: 'Path | None' = None) -> 'Self'"
+  },
+  "load": {
+   "kind": "classmethod",
+   "params": [
+    {
+     "name": "cls",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(cls: 'type[Message]', path: 'Path') -> 'Message'"
+  },
+  "meta": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self) -> 'JsonObject'"
+  },
+  "parse": {
+   "kind": "classmethod",
+   "params": [
+    {
+     "name": "cls",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "text",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "path",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    }
+   ],
+   "annotated": "(cls, text: 'str', path: 'Path | None' = None) -> 'Self'"
+  },
+  "render": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "limit",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "8000"
+    }
+   ],
+   "annotated": "(self, limit: 'int' = 8000) -> 'str'"
+  },
+  "to_text": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    }
+   ],
+   "annotated": "(self) -> 'str'"
+  }
+ },
+ "MessageFields": [
+  {
+   "name": "sender",
+   "type": "str",
+   "has_default": false,
+   "compare": true
+  },
+  {
+   "name": "to",
+   "type": "str",
+   "has_default": false,
+   "compare": true
+  },
+  {
+   "name": "type",
+   "type": "str",
+   "has_default": false,
+   "compare": true
+  },
+  {
+   "name": "body",
+   "type": "str",
+   "has_default": false,
+   "compare": true
+  },
+  {
+   "name": "title",
+   "type": "str",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "reply_to",
+   "type": "str | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "status",
+   "type": "str | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "budget",
+   "type": "int",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "hops",
+   "type": "int",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "wake",
+   "type": "bool",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "revises",
+   "type": "str | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "supersedes",
+   "type": "str | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "service",
+   "type": "str | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "contract",
+   "type": "int | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "playbook",
+   "type": "int | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "feedback",
+   "type": "str | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "trace",
+   "type": "str | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "id",
+   "type": "str",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "created",
+   "type": "str",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "path",
+   "type": "Path | None",
+   "has_default": true,
+   "compare": false
+  }
+ ]
+}

@@ -27,7 +27,11 @@ MAX_PROTOCOL_METHODS = 8
 WRITE_CALLS = frozenset({"write_text", "write_bytes", "atomic_write", "replace", "rename", "move", "mkdir", "touch", "unlink",
                          "rmdir", "rmtree", "write", "open", "copy", "copyfile", "copytree", "symlink_to", "hardlink_to"})
 # Files and directories a package may hold besides __init__.py, api.py, testing.py, tests/ and _*.py.
-PACKAGE_DATA: dict[str, tuple[str, ...]] = {"blueprint": ("roles",), "dashboard": ("*.tcss",)}
+PACKAGE_DATA: dict[str, tuple[str, ...]] = {
+    "blueprint": ("roles",),
+    "dashboard": ("*.tcss",),
+    "app": ("wiring.py", "runtime.py", "facade.py", "wire_*.py"),  # the composition root's public modules (ARCHITECTURE.md 6.1)
+}
 MUTABLE_FACTORIES = frozenset({"OrderedDict", "defaultdict", "deque", "Counter", "local", "Lock", "RLock", "dict", "list", "set"})
 
 

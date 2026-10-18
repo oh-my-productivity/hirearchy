@@ -75,6 +75,95 @@ module = ["orgmcp.*.tests.*", "orgmcp.*.testing"]
 disallow_untyped_decorators = false
 
 [[tool.mypy.overrides]]
+# The builder is a registry keyed by Protocol classes (`b.get(Clock)`): mypy refuses a Protocol where `type[T]` is expected unless
+# this check is off (its documented remedy). Only the composition root has such a registry.
+module = ["orgmcp.app", "orgmcp.app.*"]
+disable_error_code = ["type-abstract"]
+
+# DEBT, only shrinks (ARCHITECTURE.md 8.1): the 20 mixins of the Org facade are the former core.Org moved verbatim (step M2) and still carry its
+# untyped legacy bodies. One table per mixin, so that each feature step deletes exactly its own when it turns the bodies into typed calls to
+# the interfaces of `self.runtime`; the last one goes with the facade slimming (E2).
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_core"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_settings"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_snapshots"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_bootstrap"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_agents"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_runs"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_mail"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_telemetry"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_access"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_traces"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_delivery"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_files"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_strays"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_budget"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_eligibility"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_hierarchy"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_dispatch"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_services"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_overview"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["orgmcp.app._facade_prompts"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
 # PyYAML ships no type stubs and the stubs package is deliberately not a dev dependency (exact pins only):
 # a strict package wraps yaml behind its own typed function instead of letting Any leak through its API.
 module = ["yaml", "yaml.*"]
