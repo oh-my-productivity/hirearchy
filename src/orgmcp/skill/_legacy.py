@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .core import OrgError
+from ..kernel import OrgError
 
 SKILL_NAME = "orgmcp"
 
 
 def skill_source() -> Path:
     """The SKILL.md that ships with this install: inside the package (wheel) or in the source checkout."""
-    here = Path(__file__).resolve().parent
+    here = Path(__file__).resolve().parent.parent  # the package directory (orgmcp/): this file is one level deeper than skill.py was
     for candidate in (here / "_skill" / "SKILL.md", here.parent.parent / "skills" / SKILL_NAME / "SKILL.md"):
         if candidate.is_file():
             return candidate
