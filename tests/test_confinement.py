@@ -342,8 +342,8 @@ def test_prompt_has_a_files_section_with_workspace_and_inputs(team, dirs):
     text = team.run_prompt("lead/writer", [])
     assert "- Files:" in text
     assert f"Workspace (kiro read/write/shell, and the working directory of kiro tools): `{dirs['proj/out']}`" in text
-    assert f"Read-only inputs (kiro `read` or orgmcp `read` by absolute path): `{dirs['handbook/hr']}`" in text
-    assert "`lead/writer/MEMORY.md`" in text and "`lead/writer/work/` (orgmcp `write` only)" in text
+    assert f"Read-only inputs (kiro `read` or orgmcp `org_read` by absolute path): `{dirs['handbook/hr']}`" in text
+    assert "`lead/writer/MEMORY.md`" in text and "`lead/writer/work/` (orgmcp `org_write` only)" in text
     assert "Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path." in text
     assert "kiro `write` is limited to the workspace" in text and "cannot confine" not in text.split("# New messages")[0].split("- Files:")[1]
 

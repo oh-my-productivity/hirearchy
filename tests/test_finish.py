@@ -330,19 +330,22 @@ def test_prompt_of_an_agent_with_built_ins_separates_the_two_kinds_of_tools(org,
     hire_writer(org, tmp_path, ["read", "write", "shell"])
     text = org.run_prompt("dev", [])
     files = text.split("- Files:")[1].split("# New messages")[0]
-    assert "orgmcp tools (shown as `@orgmcp/write`, `@orgmcp/read`, ...)" in files
+    # the built-ins `read`/`write` hide orgmcp's tools of the same name (studies/F-read-experiment, F2-tool-names):
+    # this agent has them as `org_read` / `org_write`
+    assert "orgmcp tools (shown as `@orgmcp/org_write`, `@orgmcp/org_read`, ...)" in files
     assert "kiro's built-in `read`, `shell`, `write`" in files and "they write and run only in the workspace and never change the org" in files
     assert "`dev/MEMORY.md`, `dev/work/`" in files
-    # built-in `read` hides orgmcp's `read` (same short name; studies/F-read-experiment): it reads org files by absolute path
-    assert "written with `@orgmcp/write`, never with the built-in `write`. Your `read` is kiro's built-in (it hides `@orgmcp/read`)" in files
+    assert "written with `@orgmcp/org_write`, never with the built-in `write`" in files
+    assert "the orgmcp write tool is `@orgmcp/org_write` for you: use it for MEMORY.md and org files" in files
+    assert "Your `read` is kiro's built-in: it reads org files too" in files and "`@orgmcp/org_read` for you" in files
     assert f"ABSOLUTE path, `{org.root}/<path in the org>`" in files
-    assert '`@orgmcp/write`(path="dev/MEMORY.md", ...) (the orgmcp tool, not a built-in `write`)' in text
+    assert '`@orgmcp/org_write`(path="dev/MEMORY.md", ...) (the orgmcp tool, not a built-in `write`)' in text
 
 
 def test_agent_with_only_a_built_in_read_and_no_workspace_gets_the_naming_text(org):
     org.hire(ROOT, "rd", "Reader", "Read.", tools=["read"])
     files = org.run_prompt("rd", []).split("- Files:")[1]
-    assert "kiro's built-in `read`" in files and "`@orgmcp/read`" in files
+    assert "kiro's built-in `read`" in files and "`@orgmcp/org_read`" in files
 
 
 def test_agent_without_built_ins_has_no_files_section_but_the_orgmcp_memory_line(org):
@@ -407,7 +410,7 @@ def test_stray_memory_in_the_workspace_is_logged_and_noticed_once(org, tmp_path)
 
     prompt = org.run_prompt("dev", [])
     assert "# Notice from the runtime (shown once)" in prompt and str(ws / "dev") in prompt
-    assert '`@orgmcp/write` (e.g. path="dev/MEMORY.md"' in prompt and "does not move or delete" in prompt
+    assert '`@orgmcp/org_write` (e.g. path="dev/MEMORY.md"' in prompt and "does not move or delete" in prompt
     assert "# Notice from the runtime" not in org.run_prompt("dev", [])  # once
     assert org.ledger("strays")["dev"]["told"] is True
 
