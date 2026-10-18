@@ -60,12 +60,11 @@ def test_loading_a_message_gives_a_kernel_message(org: Any) -> None:
     assert type(loaded) is kernel.Message and loaded == msg and loaded.path is not None
 
 
-def test_a_message_file_is_parsed_once_however_often_it_is_read(org: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_a_message_file_is_parsed_once_however_often_it_is_read(org: Any) -> None:
     """The parse cache keeps its hit rate: N files read R times cost N parses, not N * R."""
-    core = legacy("core")
+    core, mail = legacy("core"), legacy("mail")
     sent = [org.send("root", "ceo", f"note {i}") for i in range(40)]
     paths: list[Path] = [org.dir("ceo") / "inbox" / f"{m.id}.md" for m in sent]
-    core._PARSED.clear()
     parses: list[int] = []
     real = core.split_frontmatter
 
@@ -73,10 +72,11 @@ def test_a_message_file_is_parsed_once_however_often_it_is_read(org: Any, monkey
         parses.append(1)
         return real(text)
 
-    monkeypatch.setattr(core, "split_frontmatter", counting)
+    parser = legacy("mail.testing").CountingMessageParser(split=counting)
+    org.runtime = legacy("app").open_runtime(org.root, {mail.MessageParser: parser})
     for _ in range(5):
         for p in paths:
-            core.Message.load(p)
+            parser.parse(p)
     assert len(parses) == 40
     for _ in range(3):
         assert len(org.messages("ceo", "inbox")) == 40

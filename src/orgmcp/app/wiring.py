@@ -8,10 +8,9 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import get_type_hints
 
-from . import _compat
-from ._builder import Builder
 from ..mail._index import StampCachedMetaReader
 from ..mail._parser import CachingMessageParser
+from ._builder import Builder
 from ._resources import ProcessResources
 from .runtime import OrgRuntime
 
@@ -21,9 +20,8 @@ _ports: dict[str, type] | None = None  # field name -> port, read once from the 
 
 
 def new_process_resources() -> ProcessResources:
-    """A fresh set of process resources (the plain ones, or the patch-point ones while ``_compat.ENABLED``)."""
-    parser = _compat.PatchPointMessageParser() if _compat.ENABLED else CachingMessageParser()
-    return ProcessResources(parser, StampCachedMetaReader())
+    """A fresh set of process resources: the parse cache and the front-matter cache (50 000 entries each)."""
+    return ProcessResources(CachingMessageParser(), StampCachedMetaReader())
 
 
 def process_resources() -> ProcessResources:

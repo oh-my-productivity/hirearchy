@@ -84,8 +84,9 @@ def atomic_write(path: Path, text: str) -> None:
     os.replace(tmp, path)
 
 
-# Patch points of the parse cache. The cache itself is a process resource (orgmcp.app, ARCHITECTURE.md 2.4): `_PARSED` is the very
-# dict of the process parser, `_PARSED_MAX` and `split_frontmatter` are read from here by the parser at call time. The legacy
-# classmethod `Message.load` is attached to the kernel's `Message` by orgmcp.app, not by this module.
+# The parse cache is a process resource (orgmcp.app, ARCHITECTURE.md 2.4): `_PARSED` is the very dict of the process parser (a
+# `mail.CachingMessageParser`). The legacy classmethod `Message.load` is attached to the kernel's `Message` by orgmcp.app, not by this
+# module. `_PARSED_MAX` is the limit the process parser is built with: kept as a name of the compatibility surface, but nothing reads it
+# at call time any more (tests that need another limit or a counting splitter inject a parser through `open_runtime`, since A-mail).
 _PARSED = process_resources().message_parser.cache
 _PARSED_MAX = 50_000

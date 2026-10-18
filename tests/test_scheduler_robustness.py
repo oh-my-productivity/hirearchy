@@ -384,29 +384,32 @@ def test_runtime_only_batch_is_recorded_as_such(org):
 # --------------------------------------------------------- QA-13: parse caching
 
 from orgmcp import core  # noqa: E402
+from orgmcp.app import wiring  # noqa: E402
+from orgmcp.mail import MessageParser  # noqa: E402
+from orgmcp.mail.testing import CountingMessageParser  # noqa: E402
 
 
-def test_message_load_is_cached_by_path_mtime_and_size(org, monkeypatch):
+def test_message_load_is_cached_by_path_mtime_and_size(org):
     msg = org.send(ROOT, "ceo", "hello")
     path = org.dir("ceo") / "inbox" / f"{msg.id}.md"
     parses = []
     real = core.split_frontmatter
-    monkeypatch.setattr(core, "split_frontmatter", lambda t: (parses.append(1), real(t))[1])
-    first = core.Message.load(path)
-    second = core.Message.load(path)
+    parser = CountingMessageParser(split=lambda t: (parses.append(1), real(t))[1])
+    first = parser.parse(path)
+    second = parser.parse(path)
     assert len(parses) == 1 and first == second and first is not second and second.path == path
     first.body = "mutated"  # the cache hands out fresh objects
-    assert core.Message.load(path).body == "hello"
+    assert parser.parse(path).body == "hello"
     path.write_text(path.read_text().replace("hello", "HELLO!"))  # same path, new content: reparsed
-    assert core.Message.load(path).body == "HELLO!" and len(parses) == 2
+    assert parser.parse(path).body == "HELLO!" and len(parses) == 2
 
 
 def test_cached_load_equals_uncached_parse(org):
     msg = org.delegate(ROOT, "ceo", "Title: with colon", "goal\nline2", "acc", budget=3)
     path = org.dir("ceo") / "inbox" / f"{msg.id}.md"
-    core._PARSED.clear()
-    cold = core.Message.load(path)
-    assert core.Message.load(path) == cold and cold.title == "Title: with colon" and cold.budget == 3
+    parser = CountingMessageParser()
+    cold = parser.parse(path)
+    assert parser.parse(path) == cold and cold.title == "Title: with colon" and cold.budget == 3
     meta, body = core.split_frontmatter(path.read_text(encoding="utf-8"))
     assert cold.body == body.strip() and meta["id"] == cold.id
 
@@ -417,23 +420,23 @@ def test_crlf_files_parse_like_read_text(tmp_path):
     assert core.Message.load(p).body == "line1\nline2" and core.Message.load(p).sender == "root"
 
 
-def test_cache_is_bounded(org, monkeypatch):
-    monkeypatch.setattr(core, "_PARSED_MAX", 5)
-    core._PARSED.clear()
+def test_cache_is_bounded(org):
+    parser = CountingMessageParser(max_entries=5)
+    org.runtime = wiring.open_runtime(org.root, {MessageParser: parser})
     for i in range(12):
         org.send(ROOT, "ceo", f"n{i}")
     org.messages("ceo", "inbox")
-    assert len(core._PARSED) == 5
+    assert len(parser.cache) == 5
 
 
-def test_stall_view_reparses_only_when_the_mailbox_files_change(org, monkeypatch):
+def test_stall_view_reparses_only_when_the_mailbox_files_change(org):
     org.send(ROOT, "ceo", "budget", budget=10)
     task = org.delegate(ROOT, "ceo", "T", "g", "a", budget=2)
     sched = Scheduler(org, echo=lambda _: None)
     assert [t.id for t in sched._task_view("ceo", "open_tasks")] == [task.id]
-    loads = []
-    real = core.Message.load.__func__
-    monkeypatch.setattr(core.Message, "load", classmethod(lambda cls, p: (loads.append(p), real(cls, p))[1]))
+    counting = CountingMessageParser()
+    org.runtime = wiring.open_runtime(org.root, {MessageParser: counting})
+    loads = counting.loaded
     for _ in range(3):
         sched._task_view("ceo", "open_tasks")
     assert loads == []  # unchanged mailbox: nothing is parsed
