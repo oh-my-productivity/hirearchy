@@ -99,7 +99,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "notice_review_root kiro_profile"
     ),
     "upgrade": _e3(
-        "MISSION_HEADING RULES_HEADING Upgrade extract_mission upgrade_rules"
+        "MISSION_HEADING RULES_HEADING extract_mission upgrade_rules"
     ),
     "skill": _e3(
         "SKILL_NAME skill_source install_skill"
