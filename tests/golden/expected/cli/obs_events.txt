@@ -1,0 +1,32 @@
+29 of 29 matching event(s), oldest first
+09:01:00 cli root agent.hire agent=ceo by=root role=Chief executive model=claude-sonnet-5.5
+09:02:00 cli ceo agent.hire agent=ceo/eng by=ceo role=Engineer model=claude-sonnet-5.5
+09:03:00 cli ceo agent.hire agent=ceo/qa by=ceo role=Quality assurance model=claude-sonnet-5.5
+09:04:00 cli root service.define owner=ceo service=weekly-brief version=1 by=root amendment=False
+09:04:00 cli root service.revise owner=ceo service=weekly-brief version=1 by=root
+09:04:00 cli root agent.hire agent=ops by=root role=Operations model=claude-sonnet-5.5
+09:05:00 cli root msg.deliver id=20260115T090500000000-root-0000 type=task from=root to=ceo title=Plan the launch budget=8 wake=True hops=0 chars=84 trace_rule=new trace=20260115T090500000000-root-0000
+09:06:00 cli root msg.deliver id=20260115T090600000000-root-0001 type=task from=root to=ops title=Rotate the logs budget=2 wake=True hops=0 chars=61 trace_rule=new trace=20260115T090600000000-root-0001
+09:07:00.005 scheduler runtime run.start agent=ceo batch=20260115T090500000000-root-0000 traces=20260115T090500000000-root-0000 pgid=1 budget_before=3 run=ceo@20260115T090700000000
+09:07:01 mcp ceo tool.call whoami ok 7ms run=ceo@20260115T090700000000 trace=20260115T090500000000-root-0000
+09:07:02 mcp ceo tool.call delegate ok 8ms run=ceo@20260115T090700000000 trace=20260115T090500000000-root-0000
+09:07:03 mcp ceo tool.call delegate ok 9ms run=ceo@20260115T090700000000 trace=20260115T090500000000-root-0000
+09:07:30 cli ceo msg.deliver id=20260115T090730000000-ceo-0002 type=task from=ceo to=ceo/eng title=Draft the plan budget=3 wake=True hops=1 chars=61 trace_rule=open-task trace=20260115T090500000000-root-0000
+09:07:30 scheduler runtime run.end ok 30s agent=ceo exit_code=0 budget_after=2 run=ceo@20260115T090700000000
+09:08:30 cli ceo msg.deliver id=20260115T090830000000-ceo-0003 type=task from=ceo to=ceo/qa title=Review the plan budget=2 wake=True hops=1 chars=68 trace_rule=open-task trace=20260115T090500000000-root-0000
+09:09:30.005 scheduler runtime run.start agent=ceo/eng batch=20260115T090730000000-ceo-0002 traces=20260115T090500000000-root-0000 pgid=1 budget_before=3 run=ceo/eng@20260115T090930000000
+09:09:31 mcp ceo/eng tool.call report REFUSED 7ms error="status must be one of ('done', 'failed', 'blocked')" error_type=OrgError run=ceo/eng@20260115T090930000000 trace=20260115T090500000000-root-0000
+09:09:32 mcp ceo/eng tool.call write ok 8ms run=ceo/eng@20260115T090930000000 trace=20260115T090500000000-root-0000
+09:09:33 mcp ceo/eng tool.call report ok 9ms run=ceo/eng@20260115T090930000000 trace=20260115T090500000000-root-0000
+09:10:15 cli ceo/eng msg.deliver id=20260115T091015000000-ceo.eng-0004 type=result from=ceo/eng to=ceo title=Draft the plan status=done budget=2 reply_to=20260115T090730000000-ceo-0002 wake=True hops=2 chars=94 trace_rule=link trace=20260115T090500000000-root-0000
+09:10:15 scheduler runtime run.end ok 45s agent=ceo/eng exit_code=0 budget_after=2 run=ceo/eng@20260115T090930000000
+09:11:15.005 scheduler runtime run.start agent=ceo/qa batch=20260115T090830000000-ceo-0003 traces=20260115T090500000000-root-0000 pgid=1 budget_before=3 run=ceo/qa@20260115T091115000000
+09:11:27 scheduler runtime run.end FAILED 12s agent=ceo/qa exit_code=1 budget_after=2 error="exit code 1" run=ceo/qa@20260115T091115000000
+09:12:27.005 scheduler runtime run.start agent=ops batch=20260115T090600000000-root-0001 traces=20260115T090600000000-root-0001 pgid=1 budget_before=3 run=ops@20260115T091227000000
+09:12:28 mcp ops tool.call whoami ok 7ms run=ops@20260115T091227000000 trace=20260115T090600000000-root-0001
+09:12:29 mcp ops tool.call report ok 8ms run=ops@20260115T091227000000 trace=20260115T090600000000-root-0001
+09:12:47 cli ops msg.deliver id=20260115T091247000000-ops-0005 type=result from=ops to=root title=Rotate the logs status=done budget=1 reply_to=20260115T090600000000-root-0001 wake=True hops=1 chars=24 trace_rule=link trace=20260115T090600000000-root-0001
+09:12:47 scheduler runtime run.end ok 20s agent=ops exit_code=0 budget_after=2 run=ops@20260115T091227000000
+09:13:47 cli root msg.deliver id=20260115T091347000000-root-0006 type=task from=root to=ceo title=Brief on AI chips budget=10 service=weekly-brief wake=True hops=0 chars=284 trace_rule=new trace=20260115T091347000000-root-0006
+
+[exit 0]

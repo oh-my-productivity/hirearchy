@@ -1,0 +1,65 @@
+# Blueprint schema in one paragraph. A blueprint is YAML with these top-level keys. `mission`: one paragraph on what the
+# organization is for. `needs`: what the user asked for, in their terms: scope (the exact list of items, only what they
+# gave you), quality_bar, sources, inputs (read-only folders with the user's files), workspace (the one folder agents may
+# write in, for code), budget_runs (the user's cap in runs for ONE request), models {cheap, strong} and model_policy,
+# review (true/false), approval, progress, kind (research|writing|code|analysis), code {tests, packaging, commits}.
+# `agents`: ONE top-level agent (usually template manager) with `children`; each agent has name, template (manager,
+# researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker) or a custom
+# `charter`, optional model (cheap|strong|id), tools, workspace, scale. `services`: what the top agent offers again and
+# again, each with name, description, inputs (what changes per request), acceptance (exact, checkable criteria: the
+# contract, which only the user can change), deliverable {description, format, max_words, path}, budget (runs per request),
+# optional playbook (the workflow; left out, one is generated) and locked. After every request the lead records lessons and
+# may improve the playbook, never the checks. `task` is optional: leave it out to build the team now and request later, or
+# make it a first request {service, inputs, title}. Replace every <PLACEHOLDER>; delete what does not apply. Then call
+# propose_org with the edited text.
+
+# kind=code: engineers build software in one workspace folder (tests, local commits), testers and reviewers check it.
+mission: >
+  <One paragraph: what software the organization builds and for whom.>
+needs:
+  kind: code
+  scope: "<What the software does and what it deliberately does not do, in the user's words.>"
+  quality_bar: Tests pass from a clean checkout; no network use at runtime.
+  workspace: <CWD>/<project-folder>   # the ONLY folder agents may write in or run commands in; created if missing
+  budget_runs: 30
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+  code:
+    tests: pytest, at least one test per acceptance criterion
+    packaging: uv with a pyproject.toml
+    commits: local commits per feature; never push
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {name: dev, template: engineer}          # write + shell, confined to the workspace
+      - {name: qa, template: tester}             # independent: runs the software against the criteria
+      - {name: cr, template: code-reviewer}      # read-only review of correctness and safety
+services:                          # work the lead offers again and again; each request becomes one task built from this contract
+  - name: <service-name>           # lowercase-dashed, e.g. weekly-brief; requests name the service only
+    owner: lead                    # optional: the top-level agent (the only owner allowed for now)
+    description: <One line saying what one request delivers>
+    inputs:                        # what changes with each request; everything else is fixed by this contract
+      - name: <input-name>         # lowercase letters, digits, underscores, e.g. topic
+        description: <What the requester gives>
+        required: true             # false = optional
+    acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
+      - "`uv run pytest -q` passes, including at least one new test for the requested change."
+      - <The exact command or behavior that shows the requested change works, e.g. a command and its expected output.>
+      - The tester ran the software against every criterion and the engineer applied every required change.
+      - The change is committed locally in the workspace and nothing was pushed.
+    deliverable:
+      description: <What one request produces, e.g. the requested change, tested and committed in the workspace>
+      format: code and tests in the workspace   # no path needed: the result is the workspace folder itself
+    budget: 23                     # runs handed down with each request; within needs.budget_runs (the cap for ONE request); leave out for the estimate + 25%
+    locked: false                  # true: the lead may not improve the playbook (default false: it may, but never lower the checks above)
+    # playbook: |                  # optional first workflow (steps, budget plan, pitfalls); leave out and one is generated from the team
+# task:                            # OPTIONAL first request, started on approval. Leave it out to build the team now and request later
+#   service: <service-name>        # (nothing runs until then); uncomment it to start with one request.
+#   inputs:
+#     <input-name>: <value>
+#   title: <Short title of this request>

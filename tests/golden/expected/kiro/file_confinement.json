@@ -1,0 +1,97 @@
+{
+  "confined_read_inputs_only": {
+    "allowedTools": [],
+    "toolsSettings": {
+      "read": {
+        "allowedPaths": [
+          "/golden/in-a",
+          "/golden/in-a/**",
+          "/golden/org",
+          "/golden/org/**"
+        ],
+        "deniedPaths": []
+      }
+    }
+  },
+  "confined_read_workspace_inside_the_org": {
+    "allowedTools": [],
+    "toolsSettings": {
+      "read": {
+        "allowedPaths": [
+          "/golden/org/ws",
+          "/golden/org/ws/**",
+          "/golden/org",
+          "/golden/org/**"
+        ],
+        "deniedPaths": []
+      },
+      "write": {
+        "allowedPaths": [
+          "/golden/org/ws/**"
+        ],
+        "deniedPaths": []
+      }
+    }
+  },
+  "confined_read_write_shell": {
+    "allowedTools": [
+      "shell"
+    ],
+    "toolsSettings": {
+      "read": {
+        "allowedPaths": [
+          "/golden/ws",
+          "/golden/ws/**",
+          "/golden/in-a",
+          "/golden/in-a/**",
+          "/golden/in-b",
+          "/golden/in-b/**",
+          "/golden/org",
+          "/golden/org/**"
+        ],
+        "deniedPaths": []
+      },
+      "write": {
+        "allowedPaths": [
+          "/golden/ws/**"
+        ],
+        "deniedPaths": [
+          "/golden/org",
+          "/golden/org/**"
+        ]
+      }
+    }
+  },
+  "confined_shell_only": {
+    "allowedTools": [
+      "shell"
+    ],
+    "toolsSettings": {}
+  },
+  "confined_write_only": {
+    "allowedTools": [],
+    "toolsSettings": {
+      "write": {
+        "allowedPaths": [
+          "/golden/ws/**"
+        ],
+        "deniedPaths": [
+          "/golden/org",
+          "/golden/org/**"
+        ]
+      }
+    }
+  },
+  "confined_write_without_workspace": {
+    "allowedTools": [],
+    "toolsSettings": {
+      "write": {
+        "allowedPaths": [],
+        "deniedPaths": [
+          "/golden/org",
+          "/golden/org/**"
+        ]
+      }
+    }
+  }
+}

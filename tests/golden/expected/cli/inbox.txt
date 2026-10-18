@@ -1,0 +1,11 @@
+### result 20260115T091247000000-ops-0005
+from: ops | to: root | title: Rotate the logs | reply_to: 20260115T090600000000-root-0001 | status: done | returns 1 run(s)
+
+## Summary
+Logs rotated.
+
+
+[stderr]
+org: <ORG>
+
+[exit 0]

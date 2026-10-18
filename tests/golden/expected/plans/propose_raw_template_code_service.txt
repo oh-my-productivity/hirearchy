@@ -1,0 +1,131 @@
+Target organization: <ORG> (exists, 0 agent(s) besides root; apply_org adds to it)
+
+DRAFT - NOT READY (it has errors: fix the blueprint and propose again; do not show this to the user)
+Goal: <One paragraph: what software the organization builds and for whom.>
+What I understood you need:
+- Scope: <What the software does and what it deliberately does not do, in the user's words.>
+- Quality bar: Tests pass from a clean checkout; no network use at runtime.
+- Workspace: <CWD>/<project-folder>
+- Tests / packaging / commits: tests: pytest, at least one test per acceptance criterion; packaging: uv with a pyproject.toml; commits: local commits per feature; never push
+- Models: claude-sonnet-5.5 for every agent
+Team (4 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files in <CWD>/<project-folder> and the organization's own files; changes files only in <CWD>/<project-folder>; can run commands, which are NOT confined: it is told to stay in <CWD>/<project-folder>, but nothing enforces that
+  - dev (Engineer, model claude-sonnet-5.5): can read files in <CWD>/<project-folder> and the organization's own files; changes files only in <CWD>/<project-folder>; can run commands, which are NOT confined: it is told to stay in <CWD>/<project-folder>, but nothing enforces that
+  - qa (Tester, model claude-sonnet-5.5): can read files in <CWD>/<project-folder> and the organization's own files; changes files only in <CWD>/<project-folder>; can run commands, which are NOT confined: it is told to stay in <CWD>/<project-folder>, but nothing enforces that
+  - cr (Code Reviewer, model claude-sonnet-5.5): can read files only in <CWD>/<project-folder> and the organization's own files; can run commands, which are NOT confined: it is told to stay in <CWD>/<project-folder>, but nothing enforces that
+Budget: up to 23 runs per request (one run = one working session of one agent), your cap per request is 30; the minimum for one review and rework is 18. Unspent runs come back to you.
+  lead starts with 23, hands down dev 5, qa 3, cr 3 and keeps 12 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: qa, cr review the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- <service-name>: <One line saying what one request delivers>
+  You provide: (see the errors)
+  Each request: up to 23 runs
+  Checks:
+    1. `uv run pytest -q` passes, including at least one new test for the requested change.
+    2. <The exact command or behavior that shows the requested change works, e.g. a command and its expected output.>
+    3. The tester ran the software against every criterion and the engineer applied every required change.
+    4. The change is committed locally in the workspace and nothing was pushed.
+  Delivered to: the workspace <CWD>/<project-folder> (the team works and commits there)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+Nothing runs until you ask for a request: approving only creates the team and the services.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (2):
+- <CWD>/<project-folder> does not exist yet; apply will create it
+- lead, lead/dev, lead/qa, lead/cr hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not
+Errors (2):
+- services[<service-name>]: invalid service name '<service-name>': use lowercase letters, digits and dashes (max 32, starting with a letter), e.g. weekly-brief
+- services[<service-name>].inputs: input name must be lowercase letters, digits and underscores, starting with a letter (max 32): '<input-name>'
+Cannot apply yet.
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+# Plan for approval
+
+Goal: <One paragraph: what software the organization builds and for whom.>
+
+Needs as understood:
+- Scope: <What the software does and what it deliberately does not do, in the user's words.>
+- Deliverable: per service (see Services below)
+- Quality bar: Tests pass from a clean checkout; no network use at runtime.
+- Sources / tools: (not specified)
+- Workspace: <CWD>/<project-folder>
+- Tests / packaging / commits: tests: pytest, at least one test per acceptance criterion; packaging: uv with a pyproject.toml; commits: local commits per feature; never push
+- Model policy: one model for all
+- Review: required
+
+Organization (4 agents):
+- lead [manager] Manager: model=claude-sonnet-5.5, tools=read,shell,write ws=<CWD>/<project-folder>
+  Access: kiro write only in <CWD>/<project-folder>; kiro read only in <CWD>/<project-folder> and in the organization's own files (read-only); shell NOT confined (instructed only)
+  - dev [engineer] Engineer: model=claude-sonnet-5.5, tools=read,shell,write ws=<CWD>/<project-folder>
+    Access: kiro write only in <CWD>/<project-folder>; kiro read only in <CWD>/<project-folder> and in the organization's own files (read-only); shell NOT confined (instructed only)
+  - qa [tester] Tester: model=claude-sonnet-5.5, tools=read,shell,write ws=<CWD>/<project-folder>
+    Access: kiro write only in <CWD>/<project-folder>; kiro read only in <CWD>/<project-folder> and in the organization's own files (read-only); shell NOT confined (instructed only)
+  - cr [code-reviewer] Code Reviewer: model=claude-sonnet-5.5, tools=read,shell ws=<CWD>/<project-folder>
+    Access: kiro read only in <CWD>/<project-folder> and in the organization's own files (read-only); shell NOT confined (instructed only)
+
+Budget per request (your cap: 30), estimate 18 for one pass + one review/rework cycle:
+  A ceiling: runs the team does not spend come back automatically with the final report of each request.
+  service <service-name>: 23 runs per request
+    lead: starts with 23, hands down dev 5, qa 3, cr 3 (each includes its rework/re-check run), keeps 12 (own 7 + slack 5)
+    lead/dev: 5 runs (4 work + 1 rework)
+    lead/qa: 3 runs (2 work + 1 rework)
+    lead/cr: 3 runs (2 work + 1 rework)
+
+Review / verification:
+- lead/qa, lead/cr check the work of lead/dev independently; findings go to their manager, who sends required changes back to the author (nobody edits another agent's file).
+- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done
+
+Deliverable:
+- per service (see Services below)
+
+Services (1), offered by lead and defined by root (the contract: only root can change it):
+- <service-name>: <One line saying what one request delivers>
+  inputs: (see the errors)
+  budget: 23 runs per request
+  deliverable: <What one request produces, e.g. the requested change, tested and committed in the workspace> [code and tests in the workspace]; delivered to: the workspace <CWD>/<project-folder> (the team works and commits there)
+  acceptance (the contract, travels with every request):
+    1. `uv run pytest -q` passes, including at least one new test for the requested change.
+    2. <The exact command or behavior that shows the requested change works, e.g. a command and its expected output.>
+    3. The tester ran the software against every criterion and the engineer applied every required change.
+    4. The change is committed locally in the workspace and nothing was pushed.
+  playbook v1: generated from the team (steps, budget plan, pitfalls):
+    ## Steps
+    1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.
+    2. Delegate to `dev` (Engineer) with `budget=5`: its part of the request, with the criteria it must meet. On this first run delegate only the steps that need nothing from a teammate.
+    3. When the work exists, delegate to `qa` (Tester) with `budget=3` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.
+    4. When the work exists, delegate to `cr` (Code Reviewer) with `budget=3` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.
+    5. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `dev`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.
+    6. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.
+    7. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).
+    
+    ## Budget plan
+    Request budget: 23 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
+    - dev: 5 runs (4 work + 1 rework or re-check)
+    - qa: 3 runs (2 work + 1 rework or re-check)
+    - cr: 3 runs (2 work + 1 rework or re-check)
+    - you (lead): keep 12 runs: your own 7 (plan, process each result, final check, report, one rework cycle) and 5 of slack.
+    Unspent runs return to your parent with your final report.
+    
+    ## Pitfalls
+    none yet: add them from lessons and feedback
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+No first task: nothing runs until you ask for a request (request(service, inputs), then start()).
+
+Checkpoints:
+- Approval: Plan first; ask before any spend beyond the budget.
+- Progress: One line when I ask.
+- Any spend beyond the budget needs your OK.
+
+Warnings (2):
+- needs.workspace: <CWD>/<project-folder> does not exist yet; apply will create it
+- agents: lead, lead/dev, lead/qa, lead/cr hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not
+
+Errors (2) - must be fixed before this can be applied:
+- services[<service-name>]: invalid service name '<service-name>': use lowercase letters, digits and dashes (max 32, starting with a letter), e.g. weekly-brief
+- services[<service-name>].inputs: input name must be lowercase letters, digits and underscores, starting with a letter (max 32): '<input-name>'
+
+Cannot apply yet: tell me what to change.
+
+plan_id: none (the blueprint has errors). Fix them and call propose_org again; do not ask the user to approve this.

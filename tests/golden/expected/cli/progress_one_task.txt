@@ -1,0 +1,4 @@
+"Plan the launch": working. unread work: ceo, ceo/qa. runs 3 of 8. last activity 5m ago. (task 20260115T090500000000-root-0000)
+scheduler: stopped - open tasks do not move until it is started (start() or `orgmcp run`)
+
+[exit 0]

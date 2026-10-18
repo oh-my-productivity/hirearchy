@@ -1,0 +1,1002 @@
+### server instructions
+You are a member of a file-based organization of agents. Your identity is fixed by the runtime.
+Work flows down as tasks (delegate), results flow up (report), everything else is a note (send).
+Call whoami first if you do not know your role, reports, budget and open tasks.
+
+
+### tool: whoami
+input: {
+  "properties": {},
+  "title": "whoamiArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "whoamiOutput",
+  "type": "object"
+}
+other: {}
+description:
+Your address, role, budget, direct reports, open tasks, outstanding delegations and charter.
+
+### tool: inbox
+input: {
+  "properties": {},
+  "title": "inboxArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "inboxOutput",
+  "type": "object"
+}
+other: {}
+description:
+The messages for this run. For root (the human) this lists unread messages and marks them read.
+
+### tool: delegate
+input: {
+  "properties": {
+    "to": {
+      "title": "To",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "goal": {
+      "title": "Goal",
+      "type": "string"
+    },
+    "acceptance": {
+      "title": "Acceptance",
+      "type": "string"
+    },
+    "inputs": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inputs"
+    },
+    "budget": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Budget"
+    },
+    "revises": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Revises"
+    }
+  },
+  "required": [
+    "to",
+    "title",
+    "goal",
+    "acceptance"
+  ],
+  "title": "delegateArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "delegateOutput",
+  "type": "object"
+}
+other: {}
+description:
+Assign a task to one of your direct reports.
+
+        to: the report's address (e.g. "ceo/cto"). title: a few words. goal: what outcome is needed and why.
+        acceptance: concrete, checkable criteria for "done". inputs: paths (relative to the org root) the
+        report should read. budget: runs handed to the report from your own budget. If you omit it, the default is
+        min(default_budget from ORG.md, your budget - reserve), where the reserve keeps one run per outstanding
+        delegation plus one for this one; if that is below 1 the call fails and tells you your options.
+        An explicit budget must leave that same reserve.
+        Copy the relevant acceptance criteria verbatim from the task you are working on; never paraphrase or relax them.
+        revises: when sending work back for rework, the id of the earlier task you sent to the same report.
+        Returns the task id. Do not wait for the result: end your run, the result will wake you.
+        
+
+### tool: report
+input: {
+  "properties": {
+    "task_id": {
+      "title": "Task Id",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    },
+    "summary": {
+      "title": "Summary",
+      "type": "string"
+    },
+    "artifacts": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Artifacts"
+    },
+    "lessons": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Lessons"
+    }
+  },
+  "required": [
+    "task_id",
+    "status",
+    "summary"
+  ],
+  "title": "reportArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "reportOutput",
+  "type": "object"
+}
+other: {}
+description:
+Answer a task assigned to you. Goes to whoever assigned it.
+
+        status: "done" (every acceptance criterion verifiably met), "failed", or "blocked" (say what would unblock it).
+        `done` and `failed` are final: a second report is refused. `blocked` is not: once the blocker is resolved
+        you may report the task again, once per blocked report (any status; the new report supersedes the old one),
+        under the same rules. A `send` note never changes a task's outcome and must not claim criteria are met.
+        summary: at most ~10 lines; this is all your manager reads by default. artifacts: paths of the
+        files that hold the work; they must exist. Files in the organization: path relative to the org root.
+        Files in your workspace: the ABSOLUTE path (anything else outside the organization is refused). The runtime
+        annotates each with its word count and whether it changed since the task was assigned.
+        lessons: required when the task is a request for a service, whatever the status - done, failed or blocked
+        (1-3 lines, at most 800 characters: what worked or went wrong, what to change in the playbook, the evidence:
+        runs, rework, review findings); it is recorded in the result and reviewed before the next request. Optional
+        otherwise.
+        
+
+### tool: send
+input: {
+  "properties": {
+    "to": {
+      "title": "To",
+      "type": "string"
+    },
+    "body": {
+      "title": "Body",
+      "type": "string"
+    },
+    "title": {
+      "default": "",
+      "title": "Title",
+      "type": "string"
+    },
+    "reply_to": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reply To"
+    },
+    "budget": {
+      "default": 0,
+      "title": "Budget",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "to",
+    "body"
+  ],
+  "title": "sendArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "sendOutput",
+  "type": "object"
+}
+other: {}
+description:
+Send a note: a question, information, or an escalation.
+
+        Allowed recipients: your parent, your direct reports, your siblings, or the sender of the message
+        you reply to (set reply_to to its id). budget: runs to move along with the note (optional): extra runs
+        granted to a direct report, or unneeded runs given back to your PARENT (never to a sibling). Runs you
+        have left return to your parent by themselves with your final `done`/`failed` report when nothing else
+        is open for you; use this only to give some back earlier. To pull unspent runs BACK from an idle direct
+        report instead (budget stranded in a team that cannot use it), use `reclaim`.
+        
+
+### tool: reclaim
+input: {
+  "properties": {
+    "report": {
+      "title": "Report",
+      "type": "string"
+    },
+    "budget": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Budget"
+    }
+  },
+  "required": [
+    "report"
+  ],
+  "title": "reclaimArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "reclaimOutput",
+  "type": "object"
+}
+other: {}
+description:
+Pull unspent budget back from one of your DIRECT reports (a manager from its team; root from its top agents).
+
+        report: its short name or address. budget: how many runs (default: all it has left). Only an idle report:
+        no open task, nothing delegated and outstanding, not running, no unread mail that would wake it; otherwise the
+        call is refused and says why. Not from deeper down (a manager reclaims from its own reports). The report is
+        not woken and gets no message; you get the runs (they join your budget at once, and then a delegation or
+        `send(..., budget=N)` can move them to whoever needs them). Use it before asking your parent for more runs
+        while a sibling team sits on unspent ones.
+        
+
+### tool: hire
+input: {
+  "properties": {
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "role": {
+      "title": "Role",
+      "type": "string"
+    },
+    "charter": {
+      "title": "Charter",
+      "type": "string"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model"
+    },
+    "tools": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tools"
+    },
+    "can_hire": {
+      "default": false,
+      "title": "Can Hire",
+      "type": "boolean"
+    },
+    "max_children": {
+      "default": 5,
+      "title": "Max Children",
+      "type": "integer"
+    },
+    "workspace": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Workspace"
+    },
+    "inputs": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inputs"
+    }
+  },
+  "required": [
+    "name",
+    "role",
+    "charter"
+  ],
+  "title": "hireArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "hireOutput",
+  "type": "object"
+}
+other: {}
+description:
+Create a direct report (only if your charter allows hiring).
+
+        name: lowercase-dashed (becomes the address <you>/<name>). role: a short job title.
+        charter: markdown with purpose, responsibilities, decision rights, what to escalate, quality bar.
+        model: kiro model id (optional; unset = the organization's default model, claude-sonnet-5.5). tools: kiro built-in tools to grant, only ones you have yourself
+        (e.g. "read", "write", "shell"). can_hire: whether the report may build its own team.
+        workspace: directory the report works in (must be inside yours).
+        inputs: absolute folders the report may only READ (never change); a manager can give only folders inside its
+        own inputs or workspace. A report with `read` and no workspace/inputs reads nothing outside the org.
+        A new report has no budget until you delegate a task to it.
+        
+
+### tool: retire
+input: {
+  "properties": {
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "reason"
+  ],
+  "title": "retireArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "retireOutput",
+  "type": "object"
+}
+other: {}
+description:
+Remove a direct report and its team (name: its short name or full address, e.g. "eng" or "ceo/eng").
+
+        Their open tasks are reported to you as failed, and the team's unspent budget is returned to you.
+        
+
+### tool: read
+input: {
+  "properties": {
+    "path": {
+      "default": ".",
+      "title": "Path",
+      "type": "string"
+    }
+  },
+  "title": "readArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "readOutput",
+  "type": "object"
+}
+other: {}
+description:
+The ORGANIZATION's read tool (kiro shows it as @orgmcp/read; not kiro's built-in `read`, which reads the
+        workspace). Reads a file (with word count and modification time) or lists a directory in the organization. Paths
+        are relative to the org root, e.g. "ceo/writer/work/brief.md". Outside the organization only ABSOLUTE paths work,
+        and only inside your workspace, your read-only inputs, or the workspace of an agent in your team (to verify
+        what your reports made); anything else is refused.
+
+### tool: write
+input: {
+  "properties": {
+    "path": {
+      "title": "Path",
+      "type": "string"
+    },
+    "content": {
+      "title": "Content",
+      "type": "string"
+    },
+    "append": {
+      "default": false,
+      "title": "Append",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "path",
+    "content"
+  ],
+  "title": "writeArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "writeOutput",
+  "type": "object"
+}
+other: {}
+description:
+Write an ORGANIZATION file (kiro shows this tool as @orgmcp/write; it is NOT kiro's built-in `write`, which
+        writes the workspace). Use it for your memory, notes and artifacts inside your own org directory. Paths are
+        relative to the org root, like every path here, so they start with your address: e.g. "<you>/MEMORY.md" or
+        "<you>/work/plan.md".
+
+        You may also rewrite a direct report's charter ("<you>/<name>/AGENT.md"). Inboxes, logs and your own
+        charter are managed by the runtime; use send/delegate/report to communicate. A charter rewrite keeps every
+        frontmatter key (tools, inputs, model, ...) that your new text does not set; the reply lists what was kept
+        and what changed.
+        
+
+### tool: status
+input: {
+  "properties": {},
+  "title": "statusArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "statusOutput",
+  "type": "object"
+}
+other: {}
+description:
+The whole organization as a tree: each agent's role, state, budget and workload.
+
+### tool: health
+input: {
+  "properties": {
+    "agent": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Agent"
+    }
+  },
+  "title": "healthArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "healthOutput",
+  "type": "object"
+}
+other: {}
+description:
+Health report (stuck, expensive, low-quality, wasteful, idle, paused) for an agent and its subtree.
+
+        agent: yourself or an agent in your own subtree (root may ask about anyone). Default: your own subtree
+        (root: the whole organization). Use it to decide whom to follow up with, rework, re-budget or retire.
+        
+
+### tool: services
+input: {
+  "properties": {},
+  "title": "servicesArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "servicesOutput",
+  "type": "object"
+}
+other: {}
+description:
+The standing services you can request from your direct reports and the ones you offer, with contract and
+        playbook versions, inputs, budget per request and the record so far (requests, outcomes, runs, feedback).
+
+### tool: define_service
+input: {
+  "properties": {
+    "owner": {
+      "title": "Owner",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Description"
+    },
+    "acceptance": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Acceptance"
+    },
+    "deliverable": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Deliverable"
+    },
+    "budget": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Budget"
+    },
+    "inputs": {
+      "anyOf": [
+        {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inputs"
+    },
+    "playbook": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Playbook"
+    },
+    "locked": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Locked"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "add_acceptance": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Add Acceptance"
+    },
+    "remove_acceptance": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Remove Acceptance"
+    }
+  },
+  "required": [
+    "owner",
+    "name"
+  ],
+  "title": "define_serviceArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "define_serviceOutput",
+  "type": "object"
+}
+other: {}
+description:
+Define a standing service of one of your direct reports (root: a top-level agent), or amend its contract.
+
+        You are the client: the contract is yours; the owner cannot change it. owner: the report. name: lowercase-dashed,
+        unique among your reports' services. FIRST definition needs description (one line), acceptance (concrete,
+        checkable criteria that travel with every request), deliverable ({description, format?, max_words?, path?
+        (absolute)}) and budget (runs handed down with each request); optional: inputs ([{name, description, required
+        (default true)}] the requester fills in), playbook (markdown workflow, first definition only), locked (true = the
+        owner may not revise the playbook), notes (free text for the owner).
+        AMENDMENT (the service exists): pass only what changes, the rest stays. To add a lasting requirement:
+        `add_acceptance=[<criterion>]`; to drop one: `remove_acceptance=[<its exact text>]`; `acceptance` replaces
+        all (not together with add/remove). The old contract is archived and the owner quietly told what changed; the
+        reply lists the criteria now in force. An amendment that changes nothing is refused.
+        
+
+### tool: request
+input: {
+  "properties": {
+    "service": {
+      "title": "Service",
+      "type": "string"
+    },
+    "inputs": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inputs"
+    },
+    "title": {
+      "default": "",
+      "title": "Title",
+      "type": "string"
+    },
+    "note": {
+      "default": "",
+      "title": "Note",
+      "type": "string"
+    },
+    "extra_acceptance": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Extra Acceptance"
+    },
+    "budget": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Budget"
+    },
+    "revises": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Revises"
+    }
+  },
+  "required": [
+    "service"
+  ],
+  "title": "requestArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "requestOutput",
+  "type": "object"
+}
+other: {}
+description:
+Ask a direct report for one of its services (see `services`): a task built from the contract.
+
+        inputs: {input name: value}; required ones must be present. note: free text for the owner. extra_acceptance:
+        criteria added after the contract's (the contract's always apply). budget: runs handed down (default: the
+        contract's; the usual reserve rule applies). revises: id of an earlier request of this service to send back for
+        rework; the reply then states the case total (runs used by the whole chain, runs handed down, the contract's
+        budget per request) and tells you to inform the user when the case exceeds that budget. Returns the task id;
+        the result comes back like any result, then rate it with `feedback`.
+        
+
+### tool: feedback
+input: {
+  "properties": {
+    "task_id": {
+      "title": "Task Id",
+      "type": "string"
+    },
+    "verdict": {
+      "title": "Verdict",
+      "type": "string"
+    },
+    "note": {
+      "default": "",
+      "title": "Note",
+      "type": "string"
+    }
+  },
+  "required": [
+    "task_id",
+    "verdict"
+  ],
+  "title": "feedbackArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "feedbackOutput",
+  "type": "object"
+}
+other: {}
+description:
+Tell the owner of a service whether a delivered request was good: verdict "accept" or "reject".
+
+        task_id: a service request (or rework) you sent that has a result. note: required for reject (what was wrong),
+        optional for accept. It costs no run and does not wake the owner; it shows up in the evidence the owner reviews
+        before its next request (and the moment a rejection arrives). Give it on your own judgement of each delivery,
+        also on a rework: every verdict stays in the case's history, the latest one is the final verdict, and an
+        earlier reject is still shown to the owner with your words. Feedback is for reflection only: it never waives an
+        acceptance criterion or changes the outcome of the request.
+        

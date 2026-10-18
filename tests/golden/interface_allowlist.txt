@@ -1,0 +1,20 @@
+# Classes with behaviour that do not yet subclass a typing.Protocol (see test_class_interfaces.py).
+# One module.Qualname per line. Refactor steps REMOVE entries; the end state is an empty list.
+orgmcp.blueprint.Issue
+orgmcp.blueprint.Summary
+orgmcp.core.Message
+orgmcp.core.Org
+orgmcp.dashboard_data.DashData
+orgmcp.dashboard_data.EventFeed
+orgmcp.dashboard_data.LenientOrg
+orgmcp.dashboard_data.Snapshot
+orgmcp.health.OrgHealth
+orgmcp.observe.Follower
+orgmcp.observe.RunRec
+orgmcp.observe.Traces
+orgmcp.review.Review
+orgmcp.scheduler.Scheduler
+orgmcp.server.OrgBinding
+orgmcp.services.Stats
+orgmcp.telemetry._Writer
+orgmcp.upgrade.Upgrade

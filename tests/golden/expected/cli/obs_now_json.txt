@@ -1,0 +1,78 @@
+{
+  "now": "2026-01-15T09:18:47+00:00",
+  "scheduler": {
+    "state": "stopped",
+    "pid": null,
+    "since": null,
+    "detail": "",
+    "mode": null,
+    "uptime_s": null,
+    "last_heartbeat_age_s": null,
+    "last_exit": null,
+    "heartbeats": false
+  },
+  "max_parallel": 3,
+  "runs_in_flight": [],
+  "queued": [
+    {
+      "agent": "ceo",
+      "unread": 2,
+      "reason": "scheduler is not running",
+      "waiting_s": 512.0
+    },
+    {
+      "agent": "ceo/qa",
+      "unread": 1,
+      "reason": "scheduler is not running",
+      "waiting_s": 617.0
+    }
+  ],
+  "waiting_on_you": [],
+  "open_root_tasks": 2,
+  "paused": {},
+  "errors_15m": {
+    "count": 2,
+    "events": [
+      {
+        "v": 1,
+        "ts": "2026-01-15T09:09:31+00:00",
+        "seq": 4,
+        "proc": "mcp",
+        "pid": 4242,
+        "kind": "tool.call",
+        "actor": "ceo/eng",
+        "run": "ceo/eng@20260115T090930000000",
+        "trace": "20260115T090500000000-root-0000",
+        "tool": "report",
+        "ok": false,
+        "ms": 7,
+        "error": "status must be one of ('done', 'failed', 'blocked')",
+        "error_type": "OrgError",
+        "args": {}
+      },
+      {
+        "v": 1,
+        "ts": "2026-01-15T09:11:27+00:00",
+        "seq": 6,
+        "proc": "scheduler",
+        "pid": 7000,
+        "kind": "run.end",
+        "actor": "runtime",
+        "run": "ceo/qa@20260115T091115000000",
+        "trace": null,
+        "agent": "ceo/qa",
+        "ok": false,
+        "exit_code": 1,
+        "duration_ms": 12000,
+        "timed_out": false,
+        "killed": false,
+        "budget_after": 2,
+        "error": "exit code 1"
+      }
+    ]
+  },
+  "last_event": "2026-01-15T09:13:47+00:00",
+  "events_seen": true
+}
+
+[exit 0]

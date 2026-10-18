@@ -1,0 +1,20 @@
+metrics 2026-01-08T09:18:47Z .. 2026-01-15T09:18:47Z (29 event(s) in the window)
+runs 4: ok 3, failed 1, timeout 0, killed 0 | duration p50 20s p95 45s max 45s (n=4) | queue p50 2m00s p95 6m27s (n=4)
+budget spent 4 run(s)
+tool calls 8, refused 1 (12.5%)
+  report               3 calls   1 refused (33%) p50 8ms p95 9ms
+  delegate             2 calls   0 refused (0%) p50 8ms p95 9ms
+  whoami               2 calls   0 refused (0%) p50 7ms p95 7ms
+  write                1 calls   0 refused (0%) p50 8ms p95 8ms
+top refusals:
+  1x status must be one of (<text>, <text>, <text>)  (reportx1)
+messages: result 2, task 5
+scheduler: 0 start(s); errors: none; exits: none
+stalls 0, pauses 0, agent failures 0, orphaned runs 0
+by agent:
+  ceo                                              runs   1 (ok 1, bad 0) run p50 30s p95 30s | calls    3 refused 0 (0%) p50 8ms p95 9ms
+  ceo/eng                                          runs   1 (ok 1, bad 0) run p50 45s p95 45s | calls    3 refused 1 (33%) p50 8ms p95 9ms
+  ceo/qa                                           runs   1 (ok 0, bad 1) run p50 12s p95 12s | calls    0 refused 0 (0%) p50 ? p95 ?
+  ops                                              runs   1 (ok 1, bad 0) run p50 20s p95 20s | calls    2 refused 0 (0%) p50 7ms p95 8ms
+
+[exit 0]

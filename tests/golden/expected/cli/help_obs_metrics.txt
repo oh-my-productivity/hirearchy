@@ -1,0 +1,11 @@
+usage: orgmcp obs metrics [-h] [--since SINCE] [--by {agent,tool,service,trace}] [--agent ADDR]
+                          [--limit LIMIT] [--json]
+
+options:
+  -h, --help            show this help message and exit
+  --since SINCE         15m, 24h, 7d or an ISO timestamp (default 24h)
+  --by {agent,tool,service,trace}
+                        also group by this
+  --agent ADDR          only this agent
+  --limit LIMIT         rows shown per table
+  --json

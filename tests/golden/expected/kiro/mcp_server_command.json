@@ -1,0 +1,6 @@
+{
+  "command": "<VENV_BIN>/orgmcp",
+  "args": [
+    "mcp"
+  ]
+}

@@ -1,0 +1,68 @@
+# Blueprint schema in one paragraph. A blueprint is YAML with these top-level keys. `mission`: one paragraph on what the
+# organization is for. `needs`: what the user asked for, in their terms: scope (the exact list of items, only what they
+# gave you), quality_bar, sources, inputs (read-only folders with the user's files), workspace (the one folder agents may
+# write in, for code), budget_runs (the user's cap in runs for ONE request), models {cheap, strong} and model_policy,
+# review (true/false), approval, progress, kind (research|writing|code|analysis), code {tests, packaging, commits}.
+# `agents`: ONE top-level agent (usually template manager) with `children`; each agent has name, template (manager,
+# researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker) or a custom
+# `charter`, optional model (cheap|strong|id), tools, workspace, scale. `services`: what the top agent offers again and
+# again, each with name, description, inputs (what changes per request), acceptance (exact, checkable criteria: the
+# contract, which only the user can change), deliverable {description, format, max_words, path}, budget (runs per request),
+# optional playbook (the workflow; left out, one is generated) and locked. After every request the lead records lessons and
+# may improve the playbook, never the checks. `task` is optional: leave it out to build the team now and request later, or
+# make it a first request {service, inputs, title}. Replace every <PLACEHOLDER>; delete what does not apply. Then call
+# propose_org with the edited text.
+
+# kind=analysis: the team analyses the user's data files (read-only) with a script, has the key figures recomputed independently and writes the findings.
+mission: >
+  <One paragraph: which question the organization answers from the user's data, and for whom.>
+needs:
+  kind: analysis
+  scope: "<The question and the outcome to explain, e.g. what drives product returns; which file(s) and period.>"
+  inputs:                          # read-only folders with the user's data; the team can read them, never change them
+    - <CWD>/<folder-with-your-data>
+  workspace: <CWD>/analysis-work  # a scratch folder OUTSIDE the data folder: scripts and outputs live here
+  quality_bar: Every number is reproducible from one script and appears with its label in the script's output; no conclusion from a slice under 30 rows.
+  sources: Only the files in needs.inputs; no web.
+  budget_runs: 25
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
+  review: true                     # a checker who did not do the analysis recomputes the figures with its own script
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {name: analyst, template: analyst, model: strong}   # read + shell in the workspace; one script, labelled output
+      - {name: checker, template: data-checker, model: strong}  # independent: its own script, label-bound figure check
+      - {name: writer, template: writer, tools: [read]}   # reads the analyst's output (read-only); writes the report
+services:                          # work the lead offers again and again; each request becomes one task built from this contract
+  - name: <service-name>           # lowercase-dashed, e.g. weekly-brief; requests name the service only
+    owner: lead                    # optional: the top-level agent (the only owner allowed for now)
+    description: <One line saying what one request delivers>
+    inputs:                        # what changes with each request; everything else is fixed by this contract
+      - name: <input-name>         # lowercase letters, digits, underscores, e.g. topic
+        description: <What the requester gives>
+        required: true             # false = optional
+    acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
+      - Uses only the data files in the data folder, and the checker confirmed they are unchanged (same checksums before and after).
+      - One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
+      - Each number in the report appears together with its label in the script output; the checker verified every label and number pair.
+      - No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
+      - At most 1000 words as counted by read; recommendations are in a section labelled as our assessment (judgement).
+      - "The checker's line reads 'Figures checked: n of m match' with n = m, and the writer applied every required change."
+    deliverable:
+      description: <What one request produces, e.g. a report on the question of the request>
+      format: markdown
+      max_words: 1000              # also put it in an acceptance criterion
+      path: <CWD>/deliverables/<name>   # a FOLDER: the assistant copies each checked result into it
+    budget: 23                     # runs handed down with each request; within needs.budget_runs (the cap for ONE request); leave out for the estimate + 25%
+    locked: false                  # true: the lead may not improve the playbook (default false: it may, but never lower the checks above)
+    # playbook: |                  # optional first workflow (steps, budget plan, pitfalls); leave out and one is generated from the team
+# task:                            # OPTIONAL first request, started on approval. Leave it out to build the team now and request later
+#   service: <service-name>        # (nothing runs until then); uncomment it to start with one request.
+#   inputs:
+#     <input-name>: <value>
+#   title: <Short title of this request>

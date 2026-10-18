@@ -1,0 +1,95 @@
+Target organization: <ORG> (exists, 0 agent(s) besides root; apply_org adds to it)
+
+Show the block below to the user exactly as written, from its first line up to (not including) the marker line; one plain-words intro line before it is fine.
+
+PLAN FOR YOU
+Goal: <One paragraph: what software the organization builds and for whom.>
+What I understood you need:
+- Scope: <What the software does and what it deliberately does not do, in the user's words.>
+- Quality bar: Tests pass from a clean checkout; no network use at runtime.
+- Workspace: <CWD>/<project-folder>
+- Tests / packaging / commits: tests: pytest, at least one test per acceptance criterion; packaging: uv with a pyproject.toml; commits: local commits per feature; never push
+- Models: claude-sonnet-5.5 for every agent
+Team (4 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files in <CWD>/<project-folder> and the organization's own files; changes files only in <CWD>/<project-folder>; can run commands, which are NOT confined: it is told to stay in <CWD>/<project-folder>, but nothing enforces that
+  - dev (Engineer, model claude-sonnet-5.5): can read files in <CWD>/<project-folder> and the organization's own files; changes files only in <CWD>/<project-folder>; can run commands, which are NOT confined: it is told to stay in <CWD>/<project-folder>, but nothing enforces that
+  - qa (Tester, model claude-sonnet-5.5): can read files in <CWD>/<project-folder> and the organization's own files; changes files only in <CWD>/<project-folder>; can run commands, which are NOT confined: it is told to stay in <CWD>/<project-folder>, but nothing enforces that
+  - cr (Code Reviewer, model claude-sonnet-5.5): can read files only in <CWD>/<project-folder> and the organization's own files; can run commands, which are NOT confined: it is told to stay in <CWD>/<project-folder>, but nothing enforces that
+Budget: 23 runs planned (one run = one working session of one agent), your cap is 30; the minimum for one review and rework is 18. Unspent runs come back to you.
+  lead starts with 23, hands down dev 5, qa 3, cr 3 and keeps 12 for planning, checking and rework.
+If the check still fails after one rework, I'll come back to you with options before spending the reserve (about 5 runs); nothing beyond the 23 planned runs is spent without your OK.
+Checking: qa, cr review the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every success check below.
+Deliverable: <What is delivered, e.g. a Python package with a command-line tool> [python package]
+  Delivered to: the workspace <CWD>/<project-folder> (the team works and commits there)
+Done when ALL of these hold:
+  1. `uv run pytest -q` passes with at least 5 tests.
+  2. <The exact command or behavior that shows the main feature works, e.g. a command and its expected output.>
+  3. The tester ran the software against every criterion and the engineer applied every required change.
+  4. Work is committed locally in the workspace and nothing was pushed.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (2):
+- <CWD>/<project-folder> does not exist yet; apply will create it
+- lead, lead/dev, lead/qa, lead/cr hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+# Plan for approval
+
+Goal: <One paragraph: what software the organization builds and for whom.>
+
+Needs as understood:
+- Scope: <What the software does and what it deliberately does not do, in the user's words.>
+- Deliverable: <What is delivered, e.g. a Python package with a command-line tool> [python package]
+- Quality bar: Tests pass from a clean checkout; no network use at runtime.
+- Sources / tools: (not specified)
+- Workspace: <CWD>/<project-folder>
+- Tests / packaging / commits: tests: pytest, at least one test per acceptance criterion; packaging: uv with a pyproject.toml; commits: local commits per feature; never push
+- Model policy: one model for all
+- Review: required
+
+Organization (4 agents):
+- lead [manager] Manager: model=claude-sonnet-5.5, tools=read,shell,write ws=<CWD>/<project-folder>
+  Access: kiro write only in <CWD>/<project-folder>; kiro read only in <CWD>/<project-folder> and in the organization's own files (read-only); shell NOT confined (instructed only)
+  - dev [engineer] Engineer: model=claude-sonnet-5.5, tools=read,shell,write ws=<CWD>/<project-folder>
+    Access: kiro write only in <CWD>/<project-folder>; kiro read only in <CWD>/<project-folder> and in the organization's own files (read-only); shell NOT confined (instructed only)
+  - qa [tester] Tester: model=claude-sonnet-5.5, tools=read,shell,write ws=<CWD>/<project-folder>
+    Access: kiro write only in <CWD>/<project-folder>; kiro read only in <CWD>/<project-folder> and in the organization's own files (read-only); shell NOT confined (instructed only)
+  - cr [code-reviewer] Code Reviewer: model=claude-sonnet-5.5, tools=read,shell ws=<CWD>/<project-folder>
+    Access: kiro read only in <CWD>/<project-folder> and in the organization's own files (read-only); shell NOT confined (instructed only)
+
+Budget: 23 runs planned (your cap: 30), estimate 18 for one pass + one review/rework cycle:
+  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you.
+  lead: starts with 23, hands down dev 5, qa 3, cr 3 (each includes its rework/re-check run), keeps 12 (own 7 + slack 5)
+  lead/dev: 5 runs (4 work + 1 rework)
+  lead/qa: 3 runs (2 work + 1 rework)
+  lead/cr: 3 runs (2 work + 1 rework)
+
+Review / verification:
+- lead/qa, lead/cr check the work of lead/dev independently; findings go to their manager, who sends required changes back to the author (nobody edits another agent's file).
+- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done
+
+Deliverable:
+- <What is delivered, e.g. a Python package with a command-line tool> (python package)
+- Final location: inside the organization (no path given)
+
+First task: to lead: <Short title of the software>
+  1. `uv run pytest -q` passes with at least 5 tests.
+  2. <The exact command or behavior that shows the main feature works, e.g. a command and its expected output.>
+  3. The tester ran the software against every criterion and the engineer applied every required change.
+  4. Work is committed locally in the workspace and nothing was pushed.
+
+Checkpoints:
+- Approval: Plan first; ask before any spend beyond the budget.
+- Progress: One line when I ask.
+- Any spend beyond the budget needs your OK.
+
+Warnings (2):
+- needs.workspace: <CWD>/<project-folder> does not exist yet; apply will create it
+- agents: lead, lead/dev, lead/qa, lead/cr hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not
+
+Reply 'approve' or tell me what to change.
+
+plan_id: <PLAN_ID>
+Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="<PLAN_ID>"). If you change the blueprint, call propose_org again: the plan_id changes.

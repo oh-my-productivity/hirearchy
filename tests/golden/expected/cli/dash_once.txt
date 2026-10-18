@@ -1,0 +1,19 @@
+orgmcp dash - org (<ORG>)  2026-01-15 09:18:47Z
+scheduler stopped | running 0/3 · queued 2 · waiting on you 0 · errors 15m 2
+
+AGENTS
+★ root (you)
+  ◔ ceo [Chief executive]  queued: scheduler is not running, 2 unread  budget 14  claude-sonnet-5.5
+    ○ eng [Engineer]  idle  budget 0  claude-sonnet-5.5
+    ◔ qa [Quality assurance]  queued: scheduler is not running, 1 unread  budget 1  claude-sonnet-5.5
+  ○ ops [Operations]  idle  budget 0  claude-sonnet-5.5
+
+REQUESTS
+  "Brief on AI chips" -> ceo: working (unread work: ceo, ceo/qa); runs 0 of 10, last activity 5m00s ago
+  "Rotate the logs" -> ops: done; runs 1 of 2 (1 returned), last activity 6m00s ago
+  "Plan the launch" -> ceo: working (unread work: ceo, ceo/qa); runs 3 of 8, last activity 5m00s ago
+
+SERVICES
+  ceo/weekly-brief  contract v1 playbook v1  1 request(s): 0 done, 0 failed, 1 open; 0 reworked; no feedback
+
+[exit 0]

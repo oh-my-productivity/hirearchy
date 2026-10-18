@@ -1,0 +1,5 @@
+
+[stderr]
+error: no message no-such-task. Root's tasks (latest): 20260115T090500000000-root-0000, 20260115T090600000000-root-0001, 20260115T091347000000-root-0006
+
+[exit 1]

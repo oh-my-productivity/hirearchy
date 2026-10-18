@@ -716,12 +716,52 @@ without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first pri
 ## Test
 
 ```sh
-uv run pytest -q                      # unit tests: no LLM, no network, never touches your ~/.kiro
+scripts/check.sh                      # EVERYTHING: pytest (unit + golden + class-interface check) + mypy + lint-imports
+uv run pytest -q                      # unit tests: no LLM, no network, never touches your ~/.kiro (also runs mypy + lint-imports)
 uv run pytest -q tests/integration --run-integration    # + the real-kiro tests (or ORGMCP_RUN_INTEGRATION=1)
+uv run pytest -q tests/golden         # only the golden (characterization) snapshots, about 15 s
+ORGMCP_UPDATE_GOLDEN=1 uv run pytest -q tests/golden    # regenerate them, deliberately (review the git diff)
+uv run python scripts/static_checks.py mypy|imports     # one static check
 ```
 
+**Where tests live.** `tests/` holds the cross-feature, end-to-end and golden tests and the helper modules (`fake_agent.py`,
+`kiro_sandbox.py`, ...; `tests/` is on `sys.path`). A feature package keeps its own tests next to its code, in
+`src/orgmcp/<feature>/tests/` (give that directory an `__init__.py`, so two features may both have a `test_api.py`;
+`tests/test_static_checks.py` checks it). `pytest` collects both (`testpaths`). The shared fixtures and hooks (`org`,
+`isolated_kiro`, the telemetry reset, the integration marker, `real_kiro`) are in the root `conftest.py`, so colocated tests
+get them too. The wheel contains no `tests/` directory (`[tool.hatch.build.targets.wheel] exclude`).
+
+**Golden tests (`tests/golden/`).** Byte-for-byte snapshots, in `tests/golden/expected/`, of everything the refactor must not
+change: run prompts, `ORG.md`, message files, charters, `SERVICE.md`/`PLAYBOOK.md`, kiro profiles and command lines, the
+`propose_org` plans for every example and template, the MCP tool surface (names, parameters, defaults, docstrings, server
+instructions) for root, a manager, a worker, a service owner and agents with built-in tools, the output of the CLI
+(`status`, `progress`, `services`, `health`, `inbox`, `obs ...`, `check`, `dash --once`, every `--help`) and the shape of
+every event line. They use a fixed clock, counter-based ids and placeholders for tmp paths (`<ORG>`, `<TMP>`, `<HOME>`,
+`<VENV_BIN>`), all in the tests (`tests/golden/golden_support.py`), never in the production code. A failing golden test
+prints a unified diff. **A diff in `expected/` means observable behaviour changed**: a refactor step must leave the
+directory untouched; a deliberate change regenerates the files with `ORGMCP_UPDATE_GOLDEN=1` and commits them with it.
+
+**Class-interface check (`tests/golden/test_class_interfaces.py`).** Every class with behaviour defined in `src/orgmcp`
+should subclass a `typing.Protocol` (data classes, exceptions, Protocols and Textual classes are exempt). The classes that
+do not yet are listed in `tests/golden/interface_allowlist.txt`; the check fails for a class that is not on the list, the
+list only shrinks, and its end state is empty (until then `test_every_class_has_an_interface` is reported as xfail,
+`ORGMCP_INTERFACE_REPORT=1 pytest -s` prints every offender).
+
+**Static checks (pinned dev dependencies `mypy==2.4.0`, `import-linter==2.15`, config in `pyproject.toml`).**
+`uv run python scripts/static_checks.py` runs both; `scripts/check.sh` runs them after the tests, and
+`tests/test_static_checks.py` runs them inside plain `pytest` (skipped only when a tool is not installed).
+
+* *mypy, strict, package by package:* `[tool.mypy] packages` lists the refactored packages that must pass `strict = true`
+  (empty today: nothing is checked yet). To put a package under strict checking, add it to that list, e.g.
+  `packages = ["orgmcp.kernel"]`. Everything else is only followed, never reported.
+* *import-linter contracts:* each `[[tool.importlinter.contracts]]` block in `pyproject.toml` is one rule over the import
+  graph (today: the library does not import the entry points; `templates` is a leaf). To add one, append a block with a
+  `name`, a `type` (`layers`, `forbidden`, `independence`, ...) and its modules, run `uv run lint-imports` until it is
+  kept, and commit it with the code it protects. The planned contracts for the packages to come are listed in the comment
+  above `[tool.importlinter]`.
+
 **Unit tests (default).** They use a deterministic fake agent (`tests/fake_agent.py`) in place of kiro. An autouse
-fixture (`tests/conftest.py`) points `$HOME` and the profile directory at a temp dir and puts a stub `kiro-cli` first
+fixture (the root `conftest.py`) points `$HOME` and the profile directory at a temp dir and puts a stub `kiro-cli` first
 on `PATH`. A default run starts zero real-LLM runs: tests marked `@pytest.mark.integration` (and everything under
 `tests/integration/`, marked or not) are reported as skipped, and `tests/test_integration_marker.py` proves it.
 

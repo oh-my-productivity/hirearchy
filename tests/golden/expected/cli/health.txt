@@ -1,0 +1,7 @@
+4 agents, 0 flagged
+ceo pending, budget 14/20, runs 1, open 2 (oldest 13m), done 0 failed 0 blocked 0 rework 0, runs/task -, empty 0, last activity 10m ago | branch: runs 3, open 3, done 1, failed 0, blocked 0, rework 0, worst none
+  eng idle, budget 0/3, runs 1, open 0, done 1 failed 0 blocked 0 rework 0, runs/task 1.0, empty 0, last activity 8m ago
+  qa pending, budget 1/2, runs 1, open 1 (oldest 10m), done 0 failed 0 blocked 0 rework 0, runs/task -, empty 1, last activity 7m ago
+ops idle, budget 0/2, runs 1, open 0, done 1 failed 0 blocked 0 rework 0, runs/task 1.0, empty 0, last activity 6m ago
+
+[exit 0]

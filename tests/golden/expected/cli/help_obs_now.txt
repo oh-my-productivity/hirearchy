@@ -1,0 +1,6 @@
+usage: orgmcp obs now [-h] [--watch SECONDS] [--json]
+
+options:
+  -h, --help       show this help message and exit
+  --watch SECONDS  repeat every SECONDS until Ctrl-C
+  --json

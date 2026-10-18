@@ -1,0 +1,52 @@
+# Blueprint schema in one paragraph. A blueprint is YAML with four top-level keys. `mission`: one paragraph on what the
+# organization is for. `needs`: what the user asked for, in their terms: scope (the exact list of items, only what they
+# gave you), deliverable {description, format, max_words, path}, quality_bar, sources, inputs (read-only folders with the
+# user's files), workspace (the one folder agents may write in, for code), budget_runs (the user's cap in runs),
+# models {cheap, strong} and model_policy, review (true/false), approval, progress, kind (research|writing|code|analysis), code
+# {tests, packaging, commits}. `agents`: ONE top-level agent (usually template manager) with `children`; each agent has
+# name, template (manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst,
+# data-checker) or a custom
+# `charter`, optional model (cheap|strong|id), tools, workspace, scale. `task`: the first task for the top agent: to,
+# title, goal and `acceptance`, a list of exact, checkable criteria (numbers, sections, paths), never "good quality".
+# Replace every <PLACEHOLDER>; delete what does not apply. Then call propose_org with the edited text.
+
+# kind=code: engineers build software in one workspace folder (tests, local commits), testers and reviewers check it.
+mission: >
+  <One paragraph: what software the organization builds and for whom.>
+needs:
+  kind: code
+  scope: "<What the software does and what it deliberately does not do, in the user's words.>"
+  deliverable:
+    description: <What is delivered, e.g. a Python package with a command-line tool>
+    format: python package         # no path needed: the result is the workspace folder itself
+  quality_bar: Tests pass from a clean checkout; no network use at runtime.
+  workspace: <CWD>/<project-folder>   # the ONLY folder agents may write in or run commands in; created if missing
+  budget_runs: 30
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+  code:
+    tests: pytest, at least one test per acceptance criterion
+    packaging: uv with a pyproject.toml
+    commits: local commits per feature; never push
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {name: dev, template: engineer}          # write + shell, confined to the workspace
+      - {name: qa, template: tester}             # independent: runs the software against the criteria
+      - {name: cr, template: code-reviewer}      # read-only review of correctness and safety
+task:
+  to: lead
+  title: <Short title of the software>
+  goal: >
+    <Implement the software in the workspace with tests, have it tested and reviewed independently, apply every
+    required change and report.>
+  acceptance:
+    - "`uv run pytest -q` passes with at least 5 tests."
+    - <The exact command or behavior that shows the main feature works, e.g. a command and its expected output.>
+    - The tester ran the software against every criterion and the engineer applied every required change.
+    - Work is committed locally in the workspace and nothing was pushed.

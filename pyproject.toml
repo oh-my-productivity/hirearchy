@@ -22,14 +22,83 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "import-linter==2.15",
+    "mypy==2.4.0",
     "pytest==8.*",
 ]
+
+[tool.hatch.build.targets.wheel]
+# Colocated tests (src/orgmcp/**/tests/) are development files: never shipped.
+exclude = ["**/tests/**"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "skills/orgmcp/SKILL.md" = "orgmcp/_skill/SKILL.md"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Tests live in tests/ (cross-feature, end-to-end, golden) and next to the code in src/orgmcp/**/tests/ (see README, "Test").
+# The shared fixtures and hooks are in the root conftest.py, so they reach both places; tests/ is on sys.path so tests can
+# import the helper modules that live there (fake_agent, kiro_sandbox, dash_fixtures, ...).
+testpaths = ["tests", "src/orgmcp"]
+pythonpath = ["tests"]
 markers = [
     "integration: uses the real kiro-cli / a real LLM; skipped unless --run-integration (or ORGMCP_RUN_INTEGRATION=1)",
+]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Static checks (dev tooling, pinned in [dependency-groups]). One command runs everything: scripts/check.sh
+# (pytest, which includes tests/test_static_checks.py, + mypy + lint-imports). README, "Test".
+# ---------------------------------------------------------------------------------------------------------------------
+
+[tool.mypy]
+# STRICT CHECKING, PACKAGE BY PACKAGE. `packages` is the list of refactored packages that must pass `strict = true`;
+# it is EMPTY until the first one exists. To put a package under strict checking add it here, e.g.
+#     packages = ["orgmcp.kernel", "orgmcp.messaging"]
+# Everything not listed is only *followed* (its types are used, its errors are not reported), so today's untyped
+# modules never fail the run. Run it with `uv run python scripts/static_checks.py mypy` (an empty list is a no-op).
+python_version = "3.11"
+mypy_path = "src"
+namespace_packages = true
+explicit_package_bases = true
+strict = true
+follow_imports = "silent"
+packages = []
+
+[[tool.mypy.overrides]]
+# PyYAML ships no type stubs and the stubs package is deliberately not a dev dependency (exact pins only):
+# a strict package wraps yaml behind its own typed function instead of letting Any leak through its API.
+module = ["yaml", "yaml.*"]
+ignore_missing_imports = true
+
+[tool.importlinter]
+# CONTRACTS over the import graph. `uv run lint-imports` (or scripts/static_checks.py imports) checks them all.
+# To add one, append a `[[tool.importlinter.contracts]]` block below: a `name`, a `type` (layers, forbidden, independence,
+# acyclic_siblings ...) and its modules; run lint-imports; it must pass before the commit. Docs: import-linter.readthedocs.io.
+# Planned for the refactor, to be added with the packages they talk about (refactor-principles.md, "Enforcement"):
+#   (a) layers: entry points (cli, mcp server, scheduler loop, dashboard) -> features -> orgmcp.kernel
+#   (b) forbidden: no package imports another package's `_*` modules (only orgmcp.app.wiring may)
+#   (c) independence/acyclic_siblings: no cycles between features
+#   (d) forbidden: orgmcp.kernel imports nothing else from orgmcp
+#   (e) forbidden: no feature imports the Org facade (orgmcp.core.Org)
+root_package = "orgmcp"
+include_external_packages = false
+
+[[tool.importlinter.contracts]]
+name = "The library does not import the entry points (cli, mcp server, dashboard)"
+type = "forbidden"
+source_modules = [
+    "orgmcp.blueprint", "orgmcp.blueprint_examples", "orgmcp.core", "orgmcp.dashboard_data", "orgmcp.dashboard_events",
+    "orgmcp.health", "orgmcp.observe", "orgmcp.progress", "orgmcp.review", "orgmcp.scheduler", "orgmcp.services",
+    "orgmcp.skill", "orgmcp.telemetry", "orgmcp.templates", "orgmcp.upgrade",
+]
+forbidden_modules = ["orgmcp.cli", "orgmcp.cli_obs", "orgmcp.server", "orgmcp.dashboard"]
+
+[[tool.importlinter.contracts]]
+name = "orgmcp.templates is a leaf: it imports nothing else from orgmcp"
+type = "forbidden"
+source_modules = ["orgmcp.templates"]
+forbidden_modules = [
+    "orgmcp.blueprint", "orgmcp.blueprint_examples", "orgmcp.cli", "orgmcp.cli_obs", "orgmcp.core", "orgmcp.dashboard",
+    "orgmcp.dashboard_data", "orgmcp.dashboard_events", "orgmcp.health", "orgmcp.observe", "orgmcp.progress",
+    "orgmcp.review", "orgmcp.scheduler", "orgmcp.server", "orgmcp.services", "orgmcp.skill", "orgmcp.telemetry",
+    "orgmcp.upgrade",
 ]

@@ -1,0 +1,74 @@
+# Blueprint schema in one paragraph. A blueprint is YAML with these top-level keys. `mission`: one paragraph on what the
+# organization is for. `needs`: what the user asked for, in their terms: scope (the exact list of items, only what they
+# gave you), quality_bar, sources, inputs (read-only folders with the user's files), workspace (the one folder agents may
+# write in, for code), budget_runs (the user's cap in runs for ONE request), models {cheap, strong} and model_policy,
+# review (true/false), approval, progress, kind (research|writing|code|analysis), code {tests, packaging, commits}.
+# `agents`: ONE top-level agent (usually template manager) with `children`; each agent has name, template (manager,
+# researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker) or a custom
+# `charter`, optional model (cheap|strong|id), tools, workspace, scale. `services`: what the top agent offers again and
+# again, each with name, description, inputs (what changes per request), acceptance (exact, checkable criteria: the
+# contract, which only the user can change), deliverable {description, format, max_words, path}, budget (runs per request),
+# optional playbook (the workflow; left out, one is generated) and locked. After every request the lead records lessons and
+# may improve the playbook, never the checks. `task` is optional: leave it out to build the team now and request later, or
+# make it a first request {service, inputs, title}. Replace every <PLACEHOLDER>; delete what does not apply. Then call
+# propose_org with the edited text.
+
+# kind=documents: the team reads the user's own local files (read-only, no web) and writes a new document from them.
+mission: >
+  <One paragraph: what document the organization writes from the user's files, and for whom.>
+needs:
+  kind: writing
+  scope: "<What the document covers and what it leaves out, in the user's words.>"
+  inputs:                          # read-only folders with the user's files; the team can read them, never change them
+    - <CWD>/<folder-with-your-files>
+  quality_bar: Every statement comes from the input files; where the files disagree or are silent, the document says so.
+  sources: Only the files in needs.inputs; no web.
+  budget_runs: 25
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
+  review: true                     # a reviewer who did not write it checks it against the files
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - name: reader                # reads the input files and extracts what the document needs
+        role: Reader of the user's files
+        model: cheap
+        tools: [read]
+        charter: >
+          Read the files in the input folders. Extract the facts the document needs, each with the file it came from.
+          Note every place where files disagree or are silent. Never change the input files.
+      - {name: writer, template: writer}
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]               # needs read access to check the text against the files
+services:                          # work the lead offers again and again; each request becomes one task built from this contract
+  - name: <service-name>           # lowercase-dashed, e.g. weekly-brief; requests name the service only
+    owner: lead                    # optional: the top-level agent (the only owner allowed for now)
+    description: <One line saying what one request delivers>
+    inputs:                        # what changes with each request; everything else is fixed by this contract
+      - name: <input-name>         # lowercase letters, digits, underscores, e.g. topic
+        description: <What the requester gives>
+        required: true             # false = optional
+    acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
+      - Covers <the topic of the request> and nothing else.
+      - At most 1500 words as counted by read.
+      - Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: <What one request produces, e.g. one markdown section for the topic>
+      format: markdown
+      max_words: 1500              # also put it in an acceptance criterion
+      path: <CWD>/deliverables/<name>   # a FOLDER: the assistant copies each checked result into it
+    budget: 19                     # runs handed down with each request; within needs.budget_runs (the cap for ONE request); leave out for the estimate + 25%
+    locked: false                  # true: the lead may not improve the playbook (default false: it may, but never lower the checks above)
+    # playbook: |                  # optional first workflow (steps, budget plan, pitfalls); leave out and one is generated from the team
+# task:                            # OPTIONAL first request, started on approval. Leave it out to build the team now and request later
+#   service: <service-name>        # (nothing runs until then); uncomment it to start with one request.
+#   inputs:
+#     <input-name>: <value>
+#   title: <Short title of this request>

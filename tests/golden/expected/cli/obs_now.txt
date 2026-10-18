@@ -1,0 +1,11 @@
+scheduler: stopped
+runs in flight 0/3
+queued, not running (2):
+  ceo: 2 unread, oldest 8m32s - scheduler is not running
+  ceo/qa: 1 unread, oldest 10m17s - scheduler is not running
+waiting on you: nothing
+errors in the last 15 min: 2
+  09:09:31 mcp ceo/eng tool.call report REFUSED 7ms error="status must be one of ('done', 'failed', 'blocked')" error_type=OrgError run=ceo/eng@20260115T090930000000 trace=20260115T090500000000-root-00…
+  09:11:27 scheduler runtime run.end FAILED 12s agent=ceo/qa exit_code=1 budget_after=2 error="exit code 1" run=ceo/qa@20260115T091115000000
+
+[exit 0]

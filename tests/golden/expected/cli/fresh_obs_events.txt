@@ -1,0 +1,10 @@
+7 of 7 matching event(s), oldest first
+09:00:00 cli root cli.command command=status ok=True
+09:00:00 cli root cli.command command=progress ok=True
+09:00:00 cli root cli.command command=health ok=True
+09:00:00 cli root cli.command command=services ok=True
+09:00:00 cli root cli.command command=check ok=True
+09:00:00 cli root cli.command command=obs ok=True
+09:00:00 cli root cli.command command=obs ok=True
+
+[exit 0]
