@@ -408,6 +408,17 @@ def test_the_feed_picks_up_new_events_and_filters(demo):
     assert data.feed.matching("heartbeat")[0]["kind"] == "scheduler.heartbeat"
 
 
+def test_the_demo_org_has_the_same_ids_every_time_so_filters_cannot_hit_random_hex(tmp_path):
+    """Message ids end in random hex ('<stamp>-root-1657'); a filter word like 'T-1' is a substring of 'roo|t-1|657', so a
+    demo whose ids differ per run made the feed tests fail now and then. The fixture must be deterministic."""
+    ids = []
+    for n in (1, 2):
+        ns = demo_org(tmp_path / f"d{n}")
+        ids.append(sorted(m.id for a in (ROOT, *ns.org.agents()) for m in ns.org.received(a)))
+    assert ids[0] and ids[0] == ids[1]
+    assert not any("t-1" in i.lower() for i in ids[0])  # nothing a filter for 'T-1' could hit by accident
+
+
 def test_errors_older_than_15_minutes_drop_out(demo):
     clock = {"t": DEMO_NOW}
     data = dd.DashData(demo.org.root, now=lambda: clock["t"])
