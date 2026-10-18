@@ -11,3 +11,7 @@ wheels/
 
 # The live organization is its own git repo
 org/
+
+# Tool caches
+.mypy_cache/
+.import_linter_cache/
