@@ -295,15 +295,20 @@ def _check_actor_owns(org: Org, actor: str, name: str) -> Contract:
 
 
 def define_service(
-    org: Org, actor: str, owner: str, name: str, *, description: str, inputs, acceptance, deliverable: dict,
-    budget: int, playbook: str | None = None, locked: bool = False, notes: str = "",
+    org: Org, actor: str, owner: str, name: str, *, description: str | None = None, inputs=None, acceptance=None,
+    deliverable: dict | None = None, budget: int | None = None, playbook: str | None = None, locked: bool | None = None,
+    notes: str | None = None, add_acceptance=None, remove_acceptance=None,
 ) -> str:
-    """Define a service for ``owner`` (first definition), or replace its contract (redefinition). Returns a confirmation.
+    """Define a service for ``owner`` (first definition), or amend its contract (the service exists). Returns a confirmation.
 
     Only ``owner``'s parent (root for a top-level agent) may call it: the contract is the client's. ``name`` is unique
-    among the services of the owner's siblings. A first definition writes ``SERVICE.md`` v1 (and ``PLAYBOOK.md`` v1
-    when ``playbook`` is given). A redefinition archives the old contract to ``history/SERVICE.v<n>.md``, writes
-    ``n+1`` and sends the owner a non-waking note with a short diff; ``playbook`` is refused then (the owner's).
+    among the services of the owner's siblings. A first definition needs ``description``, ``acceptance``,
+    ``deliverable`` and ``budget`` (``inputs`` default to none, ``locked`` to false) and writes ``SERVICE.md`` v1 (and
+    ``PLAYBOOK.md`` v1 when ``playbook`` is given). On an existing service every field but ``owner`` and ``name`` is
+    optional and an omitted (None) one keeps its value: ``add_acceptance`` appends criteria, ``remove_acceptance``
+    drops criteria (exact text), ``acceptance`` replaces them all (not with add/remove). The old contract is archived
+    to ``history/SERVICE.v<n>.md``, ``n+1`` written, and the owner gets a non-waking note saying exactly what changed.
+    A change that changes nothing is refused; ``playbook`` is refused (the owner's).
     """
     actor = org.require(actor)
     owner = _owner_addr(org, actor, owner)
@@ -323,36 +328,67 @@ def define_service(
                 f"a service called `{name}` already exists at {sibling}. Requests name the service only, so names "
                 f"must be unique among the agents that report to {client}: pick another name."
             )
-    description = (description or "").strip()
-    if not description or len(description) > DESCRIPTION_MAX or "\n" in description:
-        raise OrgError(f"description is one line of at most {DESCRIPTION_MAX} characters saying what the service delivers")
-    inputs_n = _inputs(inputs)
-    accept_n = _lines(acceptance, "acceptance", required=True)
-    deliverable_n = _deliverable(deliverable)
-    if isinstance(budget, bool) or not isinstance(budget, int) or budget < 1:
-        raise OrgError("budget is the number of runs handed down with each request: a whole number, at least 1")
-    if not isinstance(locked, bool):
-        raise OrgError("locked must be true or false")
     old = read_contract(org, owner, name)
     if old is not None and playbook is not None:
         raise OrgError(
             f"the playbook belongs to {owner}, which revises it with revise_playbook: do not pass `playbook` when "
             "you redefine the contract. Leave it out; the existing playbook stays."
         )
+    if acceptance is not None and (add_acceptance is not None or remove_acceptance is not None):
+        raise OrgError(
+            "`acceptance` replaces all criteria; do not combine it with add_acceptance / remove_acceptance. Use "
+            "add_acceptance / remove_acceptance alone to change single criteria."
+        )
+    if old is None:
+        if add_acceptance is not None or remove_acceptance is not None:
+            raise OrgError(
+                f"service `{name}` does not exist yet: add_acceptance / remove_acceptance amend an existing contract. "
+                "Give the full `acceptance` list for a first definition."
+            )
+        missing = [k for k, v in (("description", description), ("acceptance", acceptance), ("deliverable", deliverable),
+                                  ("budget", budget)) if v is None]
+        if missing:
+            raise OrgError(f"a first definition of `{name}` needs {', '.join(missing)} (it does not exist yet, so there is nothing to keep)")
+
+    if description is not None:
+        description = description.strip() if isinstance(description, str) else ""
+        if not description or len(description) > DESCRIPTION_MAX or "\n" in description:
+            raise OrgError(f"description is one line of at most {DESCRIPTION_MAX} characters saying what the service delivers")
+    if budget is not None and (isinstance(budget, bool) or not isinstance(budget, int) or budget < 1):
+        raise OrgError("budget is the number of runs handed down with each request: a whole number, at least 1")
+    if locked is not None and not isinstance(locked, bool):
+        raise OrgError("locked must be true or false")
+    inputs_n = _inputs(inputs) if inputs is not None or old is None else old.inputs
+    deliverable_n = _deliverable(deliverable) if deliverable is not None else (old.deliverable if old else {})
+    if acceptance is not None:
+        accept_n = _lines(acceptance, "acceptance", required=True)
+    elif old is None:
+        accept_n = []
+    else:
+        accept_n = _amended_criteria(name, old.acceptance, add_acceptance, remove_acceptance)
     playbook_body = _playbook_text(org, playbook) if playbook is not None else None
 
     sdir = service_dir(org, owner, name)
     now = _stamp_now()
+    notes_n = (notes if notes is not None else (old.notes if old else "") or "").strip()
     meta = {
-        "name": name, "description": description, "inputs": inputs_n, "acceptance": accept_n,
-        "deliverable": deliverable_n, "budget": budget, "locked": locked,
+        "name": name, "description": description if description is not None else (old.description if old else ""),
+        "inputs": inputs_n, "acceptance": accept_n, "deliverable": deliverable_n,
+        "budget": budget if budget is not None else (old.budget if old else 1),
+        "locked": locked if locked is not None else (old.locked if old else False),
         "version": 1 if old is None else old.version + 1, "defined_by": actor, "defined": now,
         "created": now if old is None or old.created is None else old.created.isoformat(timespec="microseconds"),
     }
-    if old is not None:
-        atomic_write(sdir / "history" / f"SERVICE.v{old.version}.md", (sdir / "SERVICE.md").read_text(encoding="utf-8"))
-    atomic_write(sdir / "SERVICE.md", join_frontmatter(meta, (notes or "").strip()))
     where = _rel(org, sdir / "SERVICE.md")
+    if old is not None:
+        changes = _contract_changes(old, meta, notes_n)
+        if not changes:
+            raise OrgError(
+                f"no change: the amendment leaves the contract of `{name}` exactly as it is (v{old.version}). "
+                f"Current criteria:\n{_numbered(old.acceptance)}"
+            )
+        atomic_write(sdir / "history" / f"SERVICE.v{old.version}.md", (sdir / "SERVICE.md").read_text(encoding="utf-8"))
+    atomic_write(sdir / "SERVICE.md", join_frontmatter(meta, notes_n))
     if old is None:
         text = f"defined service `{name}` (contract v1) for {owner}: {where}"
         if playbook_body is not None:
@@ -363,18 +399,54 @@ def define_service(
         return text
     org.notify(
         owner, f"contract of service {name} changed to v{meta['version']}",
-        _contract_diff(old, meta, where), wake=False,
+        _contract_diff(old, meta, changes, where), wake=False,
     )
     return (
         f"redefined service `{name}` of {owner}: contract v{old.version} -> v{meta['version']} ({where}); the old one "
-        f"is kept at {_rel(org, sdir / 'history' / f'SERVICE.v{old.version}.md')}. {owner} was told (without waking it)."
+        f"is kept at {_rel(org, sdir / 'history' / f'SERVICE.v{old.version}.md')}. {owner} was told (without waking it).\n"
+        "Changed:\n" + "\n".join(changes) + f"\nAcceptance criteria now ({len(accept_n)}):\n{_numbered(accept_n)}"
     )
 
 
-def _contract_diff(old: Contract, new: dict, where: str) -> str:
-    """A short line diff of what the client changed in the contract (acceptance, inputs, budget, locked)."""
-    out = [f"{old.defined_by or 'your parent'} changed the contract of service `{old.name}` (v{old.version} -> v{new['version']}). "
-           "Read it, and follow the new criteria from the next request on:"]
+def _numbered(items: list[str], indent: str = "") -> str:
+    return "\n".join(f"{indent}{i}. {x}" for i, x in enumerate(items, 1))
+
+
+def _amended_criteria(name: str, current: list[str], add, remove) -> list[str]:
+    """``current`` without the ``remove`` criteria (exact text) and with the ``add`` ones appended; errors say why."""
+    if add is None and remove is None:
+        return list(current)
+    add_n, remove_n = _lines(add, "add_acceptance", required=False), _lines(remove, "remove_acceptance", required=False)
+    listing = f"Current criteria of `{name}`:\n{_numbered(current)}"
+    unknown = [x for x in remove_n if x not in current]
+    if unknown:
+        raise OrgError(
+            "remove_acceptance must be the exact text of existing criteria; not found: "
+            + "; ".join(f'"{x}"' for x in unknown) + f".\n{listing}"
+        )
+    dup = [x for x in add_n if x in current]
+    if dup:
+        raise OrgError(
+            "add_acceptance: already a criterion: " + "; ".join(f'"{x}"' for x in dup)
+            + f". Add only new criteria (to reword one, remove it and add the new text in two calls).\n{listing}"
+        )
+    twice = sorted({x for x in add_n if add_n.count(x) > 1})
+    if twice:
+        raise OrgError("add_acceptance lists the same criterion twice: " + "; ".join(f'"{x}"' for x in twice))
+    result = [x for x in current if x not in remove_n] + add_n
+    if not result:
+        raise OrgError(f"that would leave `{name}` without acceptance criteria: a service needs at least one.\n{listing}")
+    return result
+
+
+def _fmt_deliverable(d: dict) -> str:
+    extra = [f"{k}: {d[k]}" for k in ("format", "max_words", "path") if d.get(k)]
+    return f'"{d.get("description", "")}"' + (f" ({'; '.join(extra)})" if extra else "")
+
+
+def _contract_changes(old: Contract, new: dict, notes: str) -> list[str]:
+    """What differs between the old contract and the new one, one line each (criteria verbatim, others old -> new)."""
+    out: list[str] = []
 
     def listing(label: str, before: list[str], after: list[str]) -> None:
         out.extend(f"- {label} removed: {x}" for x in before if x not in after)
@@ -389,12 +461,21 @@ def _contract_diff(old: Contract, new: dict, where: str) -> str:
         out.append(f"locked: {str(old.locked).lower()} -> {str(new['locked']).lower()}"
                    + (" (you may no longer revise the playbook)" if new["locked"] else ""))
     if old.description != new["description"]:
-        out.append("description changed")
+        out.append(f'description: "{old.description}" -> "{new["description"]}"')
     if old.deliverable != new["deliverable"]:
-        out.append("deliverable changed")
-    out.append(f"Contract: {where}")
-    return "\n".join(out)
+        out.append(f"deliverable: {_fmt_deliverable(old.deliverable)} -> {_fmt_deliverable(new['deliverable'])}")
+    if old.notes != notes:
+        out.append(f'notes: "{old.notes}" -> "{notes}"')
+    if not out and old.acceptance != new["acceptance"]:
+        out.append("acceptance: order changed")
+    return out
 
+
+def _contract_diff(old: Contract, new: dict, changes: list[str], where: str) -> str:
+    """The note to the owner: who changed the contract, exactly what, and where to read it."""
+    head = (f"{old.defined_by or 'your parent'} changed the contract of service `{old.name}` (v{old.version} -> v{new['version']}). "
+            "Read it, and follow the new criteria from the next request on:")
+    return "\n".join([head, *changes, f"Contract: {where}"])
 
 
 def retire_service(org: Org, actor: str, owner: str, name: str, reason: str) -> str:
@@ -847,7 +928,8 @@ def _service_block(org: Org, c: Contract, *, offered: bool) -> list[str]:
     lines = [
         f"{head}: {c.description}",
         f"  inputs: {inputs}   (* required)",
-        f"  each request: {c.budget} runs; {len(c.acceptance)} acceptance criteria ({_rel(org, c.path)})" if c.path else "",
+        f"  each request: {c.budget} runs; acceptance criteria ({_rel(org, c.path)}):" if c.path else "",
+        *(f"    {i}. {x}" for i, x in enumerate(c.acceptance, 1)),
         f"  record: {summarize(items).line() if items else 'no requests yet'}",
     ]
     if pb.version:
