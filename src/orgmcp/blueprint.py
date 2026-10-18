@@ -1417,9 +1417,11 @@ def render_plan(bp: dict, issues: list[Issue] | None = None, *, org: Org | None 
 
 # ------------------------------------------------------------------------------- plan for the user
 
-PLAN_HEADING = "PLAN FOR YOU (show this to the user exactly as written)"
+PLAN_HEADING = "PLAN FOR YOU"  # the first line of the block the user sees: no instruction inside the block
 PLAN_DRAFT_HEADING = "DRAFT - NOT READY (it has errors: fix the blueprint and propose again; do not show this to the user)"
-PLAN_END = "END OF PLAN FOR YOU"
+PLAN_END = "--- machine marker: the user block ends above; do not show this line or anything below it ---"
+PLAN_SHOW = ("Show the block below to the user exactly as written, from its first line up to (not including) the marker line; "
+             "one plain-words intro line before it is fine.")
 TOOL_WORDS = {"read": "read files", "write": "write files", "shell": "run commands", "web_search": "search the web",
               "web_fetch": "read web pages"}
 SHOWN_CRITERIA = 8  # the block stays compact (about 40 lines); the full lists are in the details
@@ -1690,7 +1692,6 @@ def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | Non
         L += [f"- {e.path}: {_clip(e.message)}" for e in errs[:SHOWN_WARNINGS]]
     L.append("Nothing is created or started until you approve. Reply 'approve', or tell me what to change." if not errs
              else "Cannot apply yet.")
-    L.append(PLAN_END)
     return "\n".join(L)
 
 
@@ -1706,7 +1707,8 @@ def propose_text(bp: dict, org: Org | None = None, *, target: str = "", allowed_
         nxt = (f"plan_id: {pid}\nNext: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line "
                f"before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, "
                f"approved=True, plan_id=\"{pid}\"). If you change the blueprint, call propose_org again: the plan_id changes.")
-    return "\n\n".join(x for x in (target, block, "Details (the full plan, for you; the user need not read it):\n" + details, nxt) if x)
+    show = "" if errors(issues) else PLAN_SHOW
+    return "\n\n".join(x for x in (target, show, block, PLAN_END, "Details (the full plan, for you; the user need not read it):\n" + details, nxt) if x)
 
 
 def propose(source, *, org: Org | None = None, allowed_roots: list | None = None) -> str:

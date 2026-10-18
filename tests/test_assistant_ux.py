@@ -67,7 +67,7 @@ def plan_id_in(text: str) -> str:
 
 
 def block(text: str) -> str:
-    return text[text.index(bp_mod.PLAN_HEADING):text.index(bp_mod.PLAN_END) + len(bp_mod.PLAN_END)]
+    return text[text.index(bp_mod.PLAN_HEADING):text.index(bp_mod.PLAN_END)].rstrip()
 
 
 # ----------------------------------------------------------------------------------- plan for you

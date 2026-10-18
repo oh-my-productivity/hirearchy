@@ -336,7 +336,7 @@ def test_optional_inputs_may_stay_out_and_a_service_without_inputs_takes_none(sv
 
 def test_the_block_has_a_compact_services_part(svc_bp, roots):
     text = block(svc_bp, roots)
-    assert text.startswith(bpm.PLAN_HEADING) and text.rstrip().endswith(bpm.PLAN_END)
+    assert text.startswith(bpm.PLAN_HEADING) and bpm.PLAN_END not in text
     lines = text.splitlines()
     i = lines.index("Services (kept ready, requested whenever you want):")
     part = lines[i:i + 12]
