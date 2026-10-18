@@ -992,7 +992,7 @@ class DashData:
     def request_line(self, task_id: str) -> str:
         """The ``progress`` line of one request."""
         try:
-            return prog.progress(self.org, task_id, self.now())
+            return prog.progress(self.org, task_id, self.now()).splitlines()[0]
         except Exception as exc:  # noqa: BLE001
             return f"(no progress line: {exc})"
 
