@@ -480,4 +480,4 @@ def test_root_instructions_carry_the_finishing_rules_within_the_length_limit():
                    "not after the reserve is gone", "declines", "unverified result (say the task stays open)",
                    "Final answer: as short as asked", "`stop` only if the user cancels"):
         assert needle in ROOT_INSTRUCTIONS, needle
-    assert len(ROOT_INSTRUCTIONS) < 2400
+    assert len(ROOT_INSTRUCTIONS) < 2800

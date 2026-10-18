@@ -24,6 +24,7 @@ from orgmcp.server import OrgBinding, build_server, resolve_binding
 ROOT_TOOLS = {
     "whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health",
     "create_org", "start", "stop", "propose_org", "apply_org", "progress", "blueprint_example",
+    "services", "define_service", "request", "feedback",  # the client's service tools: root and managers
 }
 AGENT_TOOLS = ROOT_TOOLS - {"create_org", "start", "stop", "propose_org", "apply_org", "progress", "blueprint_example"}
 

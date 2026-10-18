@@ -50,6 +50,10 @@ ORG_RULES = """\
    in a file in its own `work/`); the author makes the changes, sent back with `delegate(..., revises=<task id>)`.
    Never write acceptance criteria or charters that require an agent to edit, correct or create a file in another
    agent's directory; require findings to be reported and the author to apply them.
+10. Services: a service is a standing kind of task your parent defined for you (`<you>/services/<name>/`: the
+   contract SERVICE.md is your parent's; the playbook PLAYBOOK.md is yours). Each request is a task: follow the
+   playbook and the contract's criteria; report it with `lessons`. Improve the playbook with `revise_playbook` when the
+   evidence shown before a new request calls for it; never lower the bar, and propose contract changes to your parent.
 """
 
 DEFAULT_MISSION = "(Describe the mission of this organization here.)"
@@ -74,8 +78,10 @@ def task_body(goal: str, acceptance: str, inputs: list[str]) -> str:
     return "\n\n".join(parts)
 
 
-def result_body(summary: str, artifacts: list[str]) -> str:
+def result_body(summary: str, artifacts: list[str], lessons: str = "") -> str:
     parts = [f"## Summary\n{summary.strip()}"]
+    if lessons.strip():
+        parts.append(f"## Lessons\n{lessons.strip()}")
     if artifacts:
         parts.append("## Artifacts\n" + "\n".join(f"- {p}" for p in artifacts))
     return "\n\n".join(parts)
