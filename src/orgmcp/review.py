@@ -153,6 +153,7 @@ def review(org: Org, now: datetime | None = None, dry_run: bool = False) -> Revi
         for n in result.notes:
             org.notify(n.to, n.title, n.body)
         _save(org, now, result.runs, result.notified)
+        org.emit("review.run", flagged=result.flagged, notes=[n.to for n in result.notes])
     return result
 
 

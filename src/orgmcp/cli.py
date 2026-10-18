@@ -8,6 +8,7 @@ import sys
 import time
 from pathlib import Path
 
+from . import telemetry
 from .core import ROOT, Org, OrgError
 
 
@@ -219,6 +220,7 @@ def cmd_run(args) -> None:
         raise OrgError("--until-done and --once are different modes: use one of them")
     sched = Scheduler(org, kiro_runner(args.kiro))
     if args.once:
+        sched.mode, sched.max_runs, sched.exit_reason = "once", args.max_runs, "once: one pass done"
         sched.acquire()
         try:
             sched.tick(max_runs=args.max_runs)
@@ -243,6 +245,25 @@ def cmd_kiro_profile(args) -> None:
     org = _org(args, mutating=True)  # the profile belongs to this organization
     name = ensure_kiro_profile([t for t in (args.tools or "").split(",") if t], org=org)
     print(f"wrote ~/.kiro/agents/{name}.json (mcp server: {json.dumps(mcp_server_command())})")
+
+
+def _record_command(args, started: float, failure: BaseException | None) -> None:
+    """Emit the ``cli.command`` event of a finished command. Never raises."""
+    try:
+        if args.cmd == "mcp":  # a long-lived server: it records its tool calls itself
+            return
+        root = Path(args.path if args.cmd == "init" else args.root or Org.find_root()).expanduser().resolve()
+        error = None
+        if failure is not None:
+            error = str(failure) or type(failure).__name__
+        telemetry.emit(
+            root, "cli.command", proc="cli", actor=ROOT, command=args.cmd, ok=failure is None,
+            ms=round((time.perf_counter() - started) * 1000, 2),
+            error=telemetry.clip(error, telemetry.ERROR_MAX) if error else None,
+            error_type=type(failure).__name__ if failure is not None else None,
+        )
+    except Exception:  # noqa: BLE001
+        pass
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -398,8 +419,19 @@ def main(argv: list[str] | None = None) -> None:
     s.set_defaults(fn=cmd_kiro_profile)
 
     args = p.parse_args(argv)
+    telemetry.set_process("cli")
+    started = time.perf_counter()
     try:
         args.fn(args)
     except OrgError as exc:
+        _record_command(args, started, exc)
         print(f"error: {exc}", file=sys.stderr)
         sys.exit(1)
+    except SystemExit as exc:  # a command that exits by itself (e.g. plan with errors): a non-zero code is a failure
+        _record_command(args, started, None if exc.code in (None, 0) else RuntimeError(f"exit {exc.code}"))
+        raise
+    except BaseException as exc:
+        _record_command(args, started, exc)
+        raise
+    else:
+        _record_command(args, started, None)

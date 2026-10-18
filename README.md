@@ -343,6 +343,9 @@ can act on them, so problems get followed up, reworked, re-budgeted or retired i
 | `review_every_seconds` | 86400 | seconds between reviews |
 | `max_message_chars` | 20000 | longest message body `send`/`delegate`/`report` accept |
 | `default_budget` | 10 | runs a delegation gets when none is given, capped by what the delegator can afford |
+| `events` | true | write the event log (`.runtime/events/<day>/<proc>-<pid>-<start>.jsonl`, git-ignored); `false` = no emission |
+| `events_keep_days` | 30 | the scheduler deletes event-log days older than this (at most once a day) |
+| `heartbeat_seconds` | 60 | how often the scheduler writes a `scheduler.heartbeat` event |
 
 Runs that failed, and runs woken only by runtime notes (budget, stall, review, budget refunds), are left out of the
 `wasteful` statistics. The retired agents' runs still count towards `review_every_runs`.
