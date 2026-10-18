@@ -10,7 +10,7 @@ import pytest
 
 from . import document, graph, ownership
 
-pytestmark = [pytest.mark.architecture, pytest.mark.xfail(strict=True, reason="red: M0")]
+pytestmark = pytest.mark.architecture
 
 
 def test_there_are_42_packages():

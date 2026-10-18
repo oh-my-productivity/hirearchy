@@ -2,17 +2,19 @@
 
 from __future__ import annotations
 
+import importlib.util
 import os
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
 
 from . import checks, gen_importlinter, graph, mapping_status
-from .conftest import REPO
+from .paths import REPO
 
-pytestmark = [pytest.mark.architecture, pytest.mark.xfail(strict=True, reason="red: M0")]
+pytestmark = pytest.mark.architecture
 
 MAPPING = """\
 ### 5.1 `core.py` — module-level symbols
@@ -64,8 +66,7 @@ def test_the_generated_config_describes_only_the_packages_that_exist(tmp_path):
     assert "root_package = orgmcp" in text and "include_external_packages = True" in text
     layers = text.split("[importlinter:contract:layers]")[1].split("[importlinter:contract:")[0]
     lines = [line.strip() for line in layers.splitlines() if line.strip().startswith("orgmcp.")]
-    assert lines == ["orgmcp.core", "orgmcp.agents | orgmcp.settings", "orgmcp.mail", "orgmcp.kernel"] or \
-        lines == ["orgmcp.core", "orgmcp.mail", "orgmcp.agents | orgmcp.settings", "orgmcp.kernel"], lines
+    assert lines == ["orgmcp.core", "orgmcp.mail", "orgmcp.agents | orgmcp.settings", "orgmcp.kernel"], lines
     assert "orgmcp.telemetry" not in text and "orgmcp.dashboard" not in text  # not on disk
 
 
@@ -98,11 +99,16 @@ def test_testing_modules_are_protected_from_production_code(tmp_path):
     assert "orgmcp.agents.testing" in section and "orgmcp.*.tests" in section and "orgmcp.*.testing" in section
 
 
-def test_framework_contracts_name_the_allowed_package(tmp_path):
-    text = gen_importlinter.generate(synthetic_tree(tmp_path))
-    assert "[importlinter:contract:textual-only-in-dashboard]" in text
+def test_framework_contracts_exist_for_the_frameworks_the_code_imports(tmp_path):
+    tree = synthetic_tree(tmp_path)
+    assert "textual-only-in-dashboard" not in gen_importlinter.generate(tree)  # nothing imports textual: import-linter would reject it
+    (tree.directory / "mail" / "_parser.py").write_text("import textual\nimport mcp.server\nimport yaml\n", encoding="utf-8")
+    text = gen_importlinter.generate(tree)
+    textual = text.split("[importlinter:contract:textual-only-in-dashboard]")[1].split("[importlinter:contract:")[0]
+    assert "forbidden_modules =\n    textual\n" in textual and "orgmcp.mail" in textual and "orgmcp.dashboard" not in textual
     assert "[importlinter:contract:mcp-only-in-mcp-server]" in text
-    assert "[importlinter:contract:yaml-only-where-needed]" in text
+    yaml_section = text.split("[importlinter:contract:yaml-only-where-needed]")[1].split("[importlinter:contract:")[0]
+    assert "orgmcp.mail" in yaml_section and "orgmcp.kernel" not in yaml_section  # the kernel may use yaml
 
 
 def test_nothing_is_generated_when_no_package_exists(tmp_path):
@@ -156,3 +162,23 @@ def test_mapping_status_command_exits_1_while_symbols_are_unmoved_and_2_for_an_u
     result = run("hierarchy")
     assert result.returncode == 1 and "Retired" in result.stdout and "unmoved" in result.stdout
     assert run("nonsense").returncode == 2
+
+
+# ------------------------------------------------------------------------------------------------------------ mypy strictness
+
+
+def test_every_package_directory_is_checked_with_mypy_strict(tmp_path):
+    spec = importlib.util.spec_from_file_location("static_checks", REPO / "scripts" / "static_checks.py")
+    assert spec and spec.loader
+    static_checks = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(static_checks)
+    tree = synthetic_tree(tmp_path)
+    (tree.directory / "roles").mkdir()  # packaged data, not a package
+    (tree.directory / "roles" / "analyst.md").write_text("", encoding="utf-8")
+    assert static_checks.discover_packages(tree.directory) == ["orgmcp.agents", "orgmcp.kernel", "orgmcp.mail", "orgmcp.settings"]
+
+
+def test_the_public_surface_of_a_package_may_not_use_any():
+    config = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))["tool"]["mypy"]
+    api = next(o for o in config["overrides"] if o["module"] == ["orgmcp.*.api"])
+    assert api["disallow_any_explicit"] is True and config["strict"] is True

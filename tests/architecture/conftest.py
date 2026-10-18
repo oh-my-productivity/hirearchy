@@ -3,15 +3,11 @@
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 
 import pytest
 
 from .checks import Tree
-
-REPO = Path(__file__).resolve().parents[2]
-SRC = REPO / "src" / "orgmcp"
-FIXTURES = Path(__file__).parent / "fixtures"
+from .paths import DOCUMENT, FIXTURES, SRC
 
 
 @pytest.fixture(scope="session")
@@ -30,4 +26,4 @@ def bad_tree(monkeypatch: pytest.MonkeyPatch):
 
 @pytest.fixture(scope="session")
 def architecture_text() -> str:
-    return (REPO / "ARCHITECTURE.md").read_text(encoding="utf-8")
+    return DOCUMENT.read_text(encoding="utf-8")

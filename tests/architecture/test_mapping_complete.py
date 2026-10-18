@@ -13,9 +13,9 @@ from pathlib import Path
 import pytest
 
 from . import document, legacy_symbols
-from .conftest import SRC
+from .paths import SRC
 
-pytestmark = [pytest.mark.architecture, pytest.mark.xfail(strict=True, reason="red: M0")]
+pytestmark = pytest.mark.architecture
 
 
 def test_the_mapping_table_mentions_every_symbol_of_the_legacy_modules(architecture_text):

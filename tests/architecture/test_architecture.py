@@ -7,16 +7,17 @@ packages that are there). The seeded tests prove each checker CAN fail: ``fixtur
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
 
-from . import checks, class_interfaces, gen_importlinter, graph, legacy_exports, lint
-from .conftest import FIXTURES, REPO
+from . import checks, class_interfaces, contract_debt, gen_importlinter, graph, legacy_exports, lint
+from .paths import FIXTURES, REPO
 
-pytestmark = [pytest.mark.architecture, pytest.mark.xfail(strict=True, reason="red: M0")]
+pytestmark = pytest.mark.architecture
 
 # What the seeded package is allowed to import: nothing but the kernel.
 BAD_GRAPH = {name: graph.Package(name, "feature", (graph.KERNEL,)) for name in ("settings", "mail", "rogue", "wide")}
@@ -62,6 +63,10 @@ def test_every_protocol_has_a_contract_suite(real_tree):
     assert not (found := checks.contract_suites(real_tree)), report(found)
 
 
+def test_the_pending_contract_suites_name_the_step_that_owes_them():
+    assert all(step for step in contract_debt.PENDING.values())
+
+
 def test_imports_follow_the_dependency_graph(real_tree):
     assert not (found := checks.imports_against_graph(real_tree)), report(found)
 
@@ -77,7 +82,7 @@ def test_a_protocol_with_nine_methods_is_flagged(bad_tree):
 def test_a_module_level_singleton_and_a_global_cache_are_flagged(bad_tree):
     found = checks.module_singletons(bad_tree)
     assert len(found) == 2 and all("rogue._singleton" in v.where for v in found), report(found)
-    assert any("REGISTRY = Registry()" in v.message for v in found) and any("CACHE" in v.message for v in found)
+    assert any("REGISTRY = Registry(" in v.message for v in found) and any("CACHE" in v.message for v in found)
 
 
 def test_a_second_writer_of_ORG_md_is_flagged_and_the_owner_is_not(bad_tree):
@@ -116,6 +121,20 @@ def test_a_protocol_without_a_contract_suite_is_flagged(bad_tree):
     assert "mail.api.Mailbox" in messages and "no contract suite" in messages
 
 
+def test_a_pending_contract_suite_is_tolerated_only_while_it_is_missing(bad_tree, tmp_path):
+    owed = {"mail.Mailbox": "A-mail"}
+    messages = report(checks.contract_suites(bad_tree, pending=owed))
+    assert "mail.api.Mailbox" not in messages and "wide.api.Wide" in messages  # the debt is listed, the rest still fails
+    copy = tmp_path / "bad_pkg"
+    shutil.copytree(bad_tree.directory, copy, ignore=shutil.ignore_patterns("__pycache__"))
+    (copy / "mail" / "tests").mkdir()
+    (copy / "mail" / "tests" / "test_contract_mailbox.py").write_text("from ..testing import IMPLEMENTATIONS\n", encoding="utf-8")
+    (copy / "mail" / "testing.py").write_text("IMPLEMENTATIONS = {Mailbox: [real, fake]}\n", encoding="utf-8")
+    now_covered = checks.Tree(copy)
+    assert "remove it from contract_debt.PENDING" in report(checks.contract_suites(now_covered, pending=owed))
+    assert "mail.api.Mailbox" not in report(checks.contract_suites(now_covered, pending={}))
+
+
 def test_an_import_the_graph_does_not_allow_is_flagged(bad_tree):
     found = checks.imports_against_graph(bad_tree, BAD_GRAPH)
     assert sorted(v.message.split()[1].rstrip(",") for v in found) == ["mail", "settings"], report(found)
@@ -136,7 +155,8 @@ def test_an_import_of_a_private_module_of_another_package_breaks_the_contract(ba
     result = lint.run_lint_imports(config, cwd=REPO, pythonpath=FIXTURES)
     output = result.stdout + result.stderr
     assert result.returncode != 0, output
-    assert "private-modules-mail" in output and "bad_pkg.rogue._imports_private" in output and "bad_pkg.mail._mailbox" in output
+    assert "import the private modules of bad_pkg.mail" in output
+    assert "bad_pkg.rogue._imports_private -> bad_pkg.mail._mailbox" in output
 
 
 # ------------------------------------------------------------------------------------------------------- the commands run

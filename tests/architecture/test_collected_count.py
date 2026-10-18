@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from .conftest import REPO
+from .paths import REPO
 
 pytestmark = pytest.mark.architecture
 

@@ -5,9 +5,9 @@ from __future__ import annotations
 import pytest
 
 from . import legacy_exports
-from .conftest import SRC
+from .paths import SRC
 
-pytestmark = [pytest.mark.architecture, pytest.mark.xfail(strict=True, reason="red: M0")]
+pytestmark = pytest.mark.architecture
 
 # Every legacy name leaves in E3 (ARCHITECTURE.md 6.4) except the permanent compatibility surface.
 STEPS = {"E3", "permanent"}
