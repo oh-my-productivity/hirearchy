@@ -1,0 +1,7 @@
+would rewrite the rules in ORG.md: +35 -0 lines (frontmatter and mission unchanged)
+@@ -20 +20,36 @@
+   `delegate` without a `budget` hands over what you can afford, keeping one run per outstanding delegation to process its result.
++  Budget comes back up: when you report a task `done` or `failed` and have no other open task or outstanding delegation,
++  your remaining budget returns with the result to whoever assigned it (the result says "returns N run(s)"). To give runs
++  back earlier, `send` your parent a note with `budget=N`. Hand down what a task needs, not everything you hold.
+... 32 more diff lines
