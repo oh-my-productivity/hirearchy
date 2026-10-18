@@ -233,6 +233,19 @@ def cmd_run(args) -> None:
         sched.serve(until_idle=args.until_idle, max_runs=args.max_runs, until_done=args.until_done)
 
 
+def cmd_dash(args) -> None:
+    """The terminal dashboard. Read-only: no file is written in the org and no event is emitted."""
+    org = _org(args)
+    if args.once or not (sys.stdin.isatty() and sys.stdout.isatty()):
+        from .dashboard_data import DashData, render_once
+
+        print(render_once(DashData(org.root)))
+        return
+    from .dashboard import run_dashboard
+
+    run_dashboard(org.root, interval=args.interval)
+
+
 def cmd_mcp(args) -> None:
     from .server import serve
 
@@ -250,7 +263,7 @@ def cmd_kiro_profile(args) -> None:
 def _record_command(args, started: float, failure: BaseException | None) -> None:
     """Emit the ``cli.command`` event of a finished command. Never raises."""
     try:
-        if args.cmd == "mcp":  # a long-lived server: it records its tool calls itself
+        if args.cmd in ("mcp", "dash"):  # a long-lived server records its tool calls itself; the dashboard is read-only
             return
         root = Path(args.path if args.cmd == "init" else args.root or Org.find_root()).expanduser().resolve()
         error = None
@@ -413,6 +426,12 @@ def main(argv: list[str] | None = None) -> None:
 
     s = sub.add_parser("mcp", help="run the MCP server on stdio (identity from $ORG_AGENT, default root)")
     s.set_defaults(fn=cmd_mcp)
+
+    s = sub.add_parser("dash", help="terminal dashboard: agents, workflows, services, events, health (read-only)")
+    s.add_argument("--root", dest="root", default=argparse.SUPPRESS, help="organization directory (same as the global --root)")
+    s.add_argument("--interval", type=float, default=2.0, metavar="SECONDS", help="refresh every SECONDS (default 2)")
+    s.add_argument("--once", action="store_true", help="print a plain-text snapshot and exit (also used when there is no terminal)")
+    s.set_defaults(fn=cmd_dash)
 
     from .cli_obs import register_obs
 
