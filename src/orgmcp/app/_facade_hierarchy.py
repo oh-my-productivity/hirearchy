@@ -6,12 +6,11 @@ to the interfaces of the package named above."""
 
 from __future__ import annotations
 
-import shutil
 from typing import NamedTuple
 
 from .. import telemetry, templates
-from ..kernel import BOXES, join_frontmatter, Message, NAME_RE, OrgError, RESERVED, ROOT, RUNTIME
-from ._compat import atomic_write, utcnow
+from ..kernel import Message, NAME_RE, OrgError, RESERVED, ROOT, RUNTIME
+from ._compat import utcnow
 
 
 class Retired(NamedTuple):
@@ -70,10 +69,7 @@ class HierarchyMixin:
             "created": utcnow().isoformat(timespec="seconds"),
         }
         child_meta = {k: v for k, v in child_meta.items() if v is not None}
-        for sub in (*BOXES, "work", "runs"):
-            (d / sub).mkdir(parents=True, exist_ok=True)
-        atomic_write(d / "MEMORY.md", "")
-        atomic_write(d / "AGENT.md", join_frontmatter(child_meta, templates.charter_body(role, charter)))
+        self.runtime.agent_registry.create(addr, child_meta, templates.charter_body(role, charter))
         self.emit("agent.hire", actor=actor, agent=addr, by=actor, role=telemetry.clip(role.strip()),
                   model=self.model_for(addr), tools=tools)
         return addr
@@ -108,9 +104,7 @@ class HierarchyMixin:
         parent = self.parent(addr)
         # Grants inside the team cancel out, so this is what the parent handed down minus what the team ran.
         refund = max(0, sum(self.budget(a) or 0 for a in team)) if parent != ROOT else 0
-        dest = self.root / ".retired" / f"{addr.replace('/', '.')}-{utcnow():%Y%m%dT%H%M%S}"
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.move(str(self.dir(addr)), dest)
+        self.runtime.agent_registry.archive(addr, f"{utcnow():%Y%m%dT%H%M%S}")
         if refund:  # after the move: a crash in between loses the refund rather than counting it twice
             self.deliver(Message(
                 sender=RUNTIME, to=parent, type="note", budget=refund, wake=False, title=f"Budget returned from {addr}",

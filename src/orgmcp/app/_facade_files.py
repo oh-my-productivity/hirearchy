@@ -198,5 +198,8 @@ class FilesMixin:
                     "Rewrite the whole file (append=false) keeping only what your next run needs, "
                     "and move detail into files under your work/ directory."
                 )
-        atomic_write(p, content)
+        if p.name == "AGENT.md":  # a report's charter: the registry of the agents writes it
+            self.runtime.agent_registry.rewrite_charter(p.parent.relative_to(self.root).as_posix(), content)
+        else:
+            atomic_write(p, content)
         return p, note

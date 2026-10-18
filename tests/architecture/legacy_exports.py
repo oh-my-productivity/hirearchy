@@ -79,7 +79,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "render_text"
     ),
     "review": _e3(
-        "LEDGER Note Review read_ledger retired_runs total_runs review_if_due review"
+        "LEDGER Note Review read_ledger total_runs review_if_due review"
     ),
     "blueprint": _e3(
         "ROLES_DIR WEB_TOOLS WRITE_TOOLS SLACK TIGHT REWORK_RUNS KINDS BlueprintError Issue errors Role role_names "

@@ -36,7 +36,6 @@ from .core import BOXES, ROOT, RUNTIME, Org, OrgError, split_frontmatter, utcnow
 from .eventlog import ENVELOPE as _ENVELOPE
 from .eventlog import EVENTS_REL, EventFollower, event_file
 from .health import _aware, _stamp, config_number
-from .review import retired_runs
 from .runs import RunLogReader
 from .scheduler import EXIT_FILE, judge_orphan, scheduler_state
 
@@ -1289,59 +1288,13 @@ def _check_messages(org: Org, files: list[FileRec], now: float) -> dict:
                   f"{n} message(s) checked")
 
 
-def _retired_trees(org: Org) -> list[tuple[Path, bool]]:
-    """(directory, was a top-level agent) of every retired tree; the top-level ones are named without a dot before
-    the ``-<timestamp>`` suffix (the address with ``/`` turned into ``.``)."""
-    base = org.root / ".retired"
-    try:
-        names = sorted(os.listdir(base))
-    except OSError:
-        return []
-    out = []
-    for n in names:
-        if (base / n).is_dir():
-            out.append((base / n, "." not in re.sub(r"-\d{8}T\d{6}$", "", n)))
-    return out
-
-
-def _sum_budget(d: Path) -> int:
-    total = 0
-    try:
-        names = os.listdir(d)
-    except OSError:
-        return 0
-    for n in names:
-        if n.endswith(".md") and not n.startswith("."):
-            meta, err, _ = _read_meta(d / n)
-            if meta and not err:
-                total += int(meta.get("budget") or 0)
-    return total
-
-
-def _tree_unspent(top: Path) -> int:
-    """Budget a retired tree still held when it was retired: for each agent directory in it, what it received (inbox,
-    inflight, read) - what it sent - its run logs."""
-    total = 0
-    for here, dirs, files in os.walk(top):
-        base = os.path.basename(here)
-        if base in (*BOXES, "runs", "work", "services") or base.startswith("."):
-            dirs.clear()
-            continue
-        if "AGENT.md" in files:
-            h = Path(here)
-            total += sum(_sum_budget(h / b) for b in RECV_BOXES) - _sum_budget(h / "sent")
-            runs = h / "runs"
-            total -= sum(1 for n in (os.listdir(runs) if runs.is_dir() else []) if n.endswith(".log") and not n.startswith("."))
-    return total
-
-
 def _check_budget(org: Org, files: list[FileRec], now: float) -> dict:
     """Budget conservation.
 
     Budget is derived from messages and run logs (``Org.budget`` = received - handed down - run logs). Runs of budget
     enter only from root (a task's or a note's ``budget`` in root's ``sent/``); they leave in four ways, and nothing
     else: held by an agent now (the sum of ``Org.budget``), consumed (run logs of live agents, and of retired
-    agents, see ``review.retired_runs``), returned to root (the ``budget`` of messages root received: results and
+    agents, see ``RetiredArchive.run_count``), returned to root (the ``budget`` of messages root received: results and
     notes), or dropped when a top-level agent was retired (root has no limit, so its team's unspent runs are not
     refunded; retired deeper in the tree they are refunded to the parent by a runtime note, which cancels out).
     Hence::
@@ -1358,8 +1311,9 @@ def _check_budget(org: Org, files: list[FileRec], now: float) -> dict:
     except Exception as exc:  # noqa: BLE001 - a corrupt message makes the arithmetic impossible; (a) names the file
         return _check("b", "budget conserved", [f"cannot compute the agents' budgets: {type(exc).__name__}: {exc}"])
     used_live = sum(org.runs_used(a) for a in org.agents())
-    used_retired = retired_runs(org)
-    dropped = sum(_tree_unspent(top) for top, is_top in _retired_trees(org) if is_top)
+    archive = org.runtime.retired_archive
+    used_retired = archive.run_count()
+    dropped = sum(archive.unspent_budget(tree) for tree in archive.trees() if tree.top_level)
     delivered = {f.id for f in files if not f.error and f.box in RECV_BOXES}
     pending = sum(int((f.meta or {}).get("budget") or 0) for f in files if not f.error and f.box == "sent"
                   and f.id not in delivered and now - f.mtime <= COPY_GRACE and org.exists(Org.norm(str(f.meta.get("to")))))

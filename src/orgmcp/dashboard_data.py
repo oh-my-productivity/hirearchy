@@ -30,6 +30,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import core, observe, progress as prog, services
+from .app import wire_agents
 from .core import BOXES, DEFAULT_CONFIG, ROOT, Message, Org, OrgError, _visible, latest_results, split_frontmatter
 from .dashboard_events import EventLine, describe, event_lines
 from .health import _aware, _stamp, config_number, org_health
@@ -80,15 +81,15 @@ class LenientOrg(Org):
         super().__init__(root)
         self._box_cache: dict[tuple[str, str], tuple[int, bool, list[Message]]] = {}
         self._bad_boxes: dict[tuple[str, str], dict[str, str]] = {}
-        self._charters: dict[str, tuple[tuple[int, int], tuple[dict, str]]] = {}
         self._cfg: tuple[tuple[int, int], dict] | None = None
         self._bad_misc: dict[str, str] = {}
         self._merged: dict[tuple, tuple[list, list[Message]]] = {}
         self._runs_cache: dict[str, tuple[int, bool, int]] = {}
-        self._kids: dict[str, tuple[int, bool, list[str]]] = {}
         self._stat_memo: dict[tuple[str, str], int] = {}
         self._pause_cache: dict[str, tuple[int, str | None]] = {}
         self._root_s = str(self.root)
+        # the caching of the agent tree and the reading of charters (reported in ``bad``) are the decorators of the agents package
+        self.runtime = wire_agents.lenient(self.runtime, self, self._bad_misc)
 
     @property
     def bad(self) -> dict[str, str]:
@@ -208,46 +209,13 @@ class LenientOrg(Org):
         self._runs_cache[key] = (mtime, self._trusted(listed_at, mtime), n)
         return n
 
-    def children(self, addr: str) -> list[str]:
-        a = self.norm(addr)
-        mtime = self.mtime(a, "")
-        if mtime < 0:
-            return []
-        hit = self._kids.get(a)
-        if hit is not None and hit[0] == mtime and hit[1]:
-            return hit[2]
-        listed_at = time.time_ns()
-        kids = super().children(a)
-        self._kids[a] = (mtime, self._trusted(listed_at, mtime), kids)
-        return kids
-
     def _rel(self, p: Path) -> str:
         try:
             return str(p.relative_to(self.root))
         except ValueError:
             return str(p)
 
-    # -- charter and config
-    def charter(self, addr: str) -> tuple[dict, str]:
-        a = self.norm(addr)
-        if a == ROOT:
-            return {"role": "human (root of the organization)"}, ""
-        p = self.dir(a) / "AGENT.md"
-        try:
-            st = p.stat()
-            stamp = (st.st_mtime_ns, st.st_size)
-            hit = self._charters.get(a)
-            if hit is not None and hit[0] == stamp:
-                return hit[1]
-            meta, body = split_frontmatter(p.read_text(encoding="utf-8"))
-            value = (meta if isinstance(meta, dict) else {}, body.strip())
-            self._charters[a] = (stamp, value)
-            self._bad_misc.pop(f"{a}/AGENT.md", None)
-            return value
-        except Exception as exc:  # noqa: BLE001
-            self._bad_misc[f"{a}/AGENT.md"] = type(exc).__name__
-            return {"role": "?"}, ""
-
+    # -- config
     @property
     def config(self) -> dict:
         p = self.root / "ORG.md"
