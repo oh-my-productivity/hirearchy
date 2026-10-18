@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..kernel import AtomicWriter, Clock, Environment, IdGenerator, LedgerStore, OrgLayout
+from ..locator import OrgLocator
+from ..settings import EventSwitch, OrgDocumentStore, OrgSettings
 from ._resources import ProcessResources
 
 
@@ -22,3 +24,7 @@ class OrgRuntime:
     atomic_writer: AtomicWriter
     ledgers: LedgerStore
     environment: Environment
+    settings: OrgSettings
+    documents: OrgDocumentStore
+    event_switch: EventSwitch
+    locator: OrgLocator

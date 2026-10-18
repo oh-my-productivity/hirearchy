@@ -75,7 +75,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "progress": "permanent",  # orgmcp.progress.progress(org, task_id=None) is documented in the README
     },
     "health": _e3(
-        "HEALTH_DEFAULTS FLAGS AgentHealth BranchHealth OrgHealth thresholds config_number agent_health org_health "
+        "HEALTH_DEFAULTS FLAGS AgentHealth BranchHealth OrgHealth thresholds agent_health org_health "
         "render_text"
     ),
     "review": _e3(
