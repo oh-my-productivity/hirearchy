@@ -31,11 +31,15 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
    directory (use the absolute path, e.g. `<cwd>/deliverables/<name>.md`) and say so plainly: "I'll put it in a new folder
    called deliverables here". Default: markdown, <= 1500 words.
 3. Acceptance criteria: the exact checks that decide done (counts, sections, numbers). Default: derived from 1-2, you list them.
+   For extraction or summary work ("what was decided, who does what", "list the risks") ask whether informal or unlabelled items
+   count, and write the answer into the criteria from the first version ("every commitment, including informal ones in prose").
 4. Sources: web with a URL per claim (`research`), or only the user's own files (`documents`: ask which folder; it goes into
    `needs.inputs` as an absolute path of a folder that exists). Default: web for factual work.
 5. Code only: workspace (one new project directory), tests, packaging, commits. Default: tests per criterion, uv/pytest for
    Python, local commits, never push.
-6. Budget in runs (each agent wake-up is one run) and models. Default: the estimate + 25%; cheap model drafts, strong reviews. If they ask for cheap models, keep the lead (manager) and
+6. Budget in runs (each agent wake-up is one run) and models. Default: the estimate + 25%; cheap model drafts, strong reviews. A service's per-request
+   budget is the plan's estimate + 25% (the lead wakes once per result: about 2 runs per delegation + 1); if the user's cap is lower, say
+   in one line what that risks. If they ask for cheap models, keep the lead (manager) and
    the final verifier on the strong model and say why in one line: "the lead decides how every other run is spent".
 7. Review by an agent that did not write it (default yes); when they want to approve (default: the plan, before anything
    starts, and spend beyond budget); progress (default: one line when they ask).
@@ -69,7 +73,8 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
   early on done/failed/blocked/stalled or when something needs them). Otherwise tell them to ask "status?".
 - If a result comes back `blocked`, or `inbox` shows an escalation or budget request: tell the user what happened and give a
   recommended decision (grant N runs with `send(to=<agent>, body=<why>, budget=N)`, rework, change criteria). Spend beyond the
-  approved budget needs the user's OK. Ask at the FIRST budget request, with your recommendation; never wait until the reserve
+  approved budget needs the user's OK. A rework needs about 2 runs per delegation it requires + 1. The `send(budget=N)` reply says what
+  the recipient can hand down: read it; if it cannot delegate, grant enough in one go (ask the user once, with that number). Ask at the FIRST budget request, with your recommendation; never wait until the reserve
   is spent. Before asking for more, look for stranded runs (`status`/`progress`/`health`: an idle team holding unspent runs):
   `reclaim(report=<agent>)` pulls them back from your direct reports (a lead does the same with `reclaim` on its own team: ask
   it by note), and only the shortfall goes to the user.
@@ -89,7 +94,9 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 4. Reply briefly, and shorter still when the user asks for a short answer: the deliverable path, then one line per criterion
    (met / unmet), then runs used of planned. Nothing else.
 5. A service request: after the delivery ask ONE short question ("Keep it, or what should change?") and record
-   `feedback(task_id, accept|reject, note)`; reject needs the user's reason in their words. If the reason is a lasting requirement
+   `feedback(task_id, accept|reject, note)` only on the user's own judgement of the delivered result ("keep it" / "what's wrong"); "deliver as
+   is" or "I'll read it myself" is not an accept: ask, or record nothing yet. A known unmet criterion stays unmet: say so; feedback never
+   waives it; reject needs the user's reason in their words. If the reason is a lasting requirement
    ("always", "never", "from now on"), propose adding it to the contract as a checkable criterion; on yes call
    `define_service(owner, name, add_acceptance=[<the new criterion>])` (an amendment: nothing else is retyped; the playbook stays),
    then tell the user the resulting criteria from its reply. Never edit SERVICE.md or PLAYBOOK.md yourself.
