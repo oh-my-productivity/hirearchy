@@ -1,0 +1,15 @@
+total runs (runs/*.log): 35
+lead: runs=      21 completed_tool_calls=90 failed=1 denied_lines=1 org_read=10 org_write=0 orgmcp_write=23
+lead/writer: runs=       7 completed_tool_calls=40 failed=0 denied_lines=0 org_read=0 org_write=0 orgmcp_write=14
+lead/reviewer: runs=       7 completed_tool_calls=34 failed=0 denied_lines=0 org_read=3 org_write=0 orgmcp_write=14
+
+per memo chain (by task time): R1 first pass 9, rework1 5, rework2 5 = 19; R2 5; R3 first pass 6, rework 5 = 11
+progress (final):
+#### progress
+"Memo for 2026-10-05 meeting" [service meeting-memo v1]: done. runs 9 of 15 (6 returned). last activity 3m ago. artifacts: lead/writer/work/
+"Rework memo 2026-10-05: unclear due dates" [service meeting-memo v1]: done. runs 5 of 6 (1 returned). last activity 3m ago. artifacts: lead
+"Rework memo 2026-10-05: user's date and summary changes" [service meeting-memo v2]: done. runs 5 of 6 (1 returned). last activity 3m ago. a
+"Memo for 2026-10-12 meeting" [service meeting-memo v2]: done. runs 5 of 15 (10 returned). last activity 3m ago. artifacts: lead/writer/work
+"Memo for 2026-10-19 meeting" [service meeting-memo v3]: done. runs 6 of 15 (9 returned). last activity 3m ago. artifacts: lead/writer/work/
+"Rework memo 2026-10-19: remove non-action row" [service meeting-memo v3]: done. runs 5 of 6 (1 returned). last activity 3m ago. artifacts: 
+scheduler: stopped (finished: no open tasks)

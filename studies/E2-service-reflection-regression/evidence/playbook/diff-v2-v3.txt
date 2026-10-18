@@ -1,0 +1,34 @@
+--- playbook/PLAYBOOK.v2.md	2026-10-18 05:15:08
++++ playbook/PLAYBOOK.v3-current.md	2026-10-18 05:15:08
+@@ -1,11 +1,12 @@
+ ---
+ service: meeting-memo
+-version: 2
+-revised: '2026-10-18T03:57:03.642331+00:00'
++version: 3
++revised: '2026-10-18T04:01:47.731192+00:00'
+ by: lead
+-reason: 'Lesson from 2026-10-05 request: writer converted "before Friday" and "for
+-  Oct 14 [event date]" into ISO dates on first pass, requiring a rework cycle. Adding
+-  explicit pitfall guidance to prevent recurrence.'
++reason: 'Contract updated to v2: "before &lt;weekday&gt;" must resolve to the date
++  of that weekday in the meeting''s week, and "for &lt;date&gt;" must resolve to that
++  date — both as ISO dates, not none. Previous pitfall said the opposite. Case: contract-v2
++  note 20261018T040115445402-runtime-788d and task 20261018T040120119761-root-55ff.'
+ ---
+ ## Steps
+ 1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.
+@@ -23,4 +24,12 @@
+ Unspent runs return to your parent with your final report.
+ 
+ ## Pitfalls
+-- **Informal time references are not ISO dates.** Phrases like "before Friday", "this week", "for Oct 14" (where Oct 14 is the event date, not a deadline) must not be resolved to an ISO date. The Due column must be `none`, and the phrase must appear in an Open questions entry explaining why no ISO date was assigned. Instruct the writer explicitly: treat any date reference that is not a plain "YYYY-MM-DD" or "Oct N" deadline stated for the action itself as non-date → Due=none + Open questions.
++- **Date resolution rules (contract v2):**
++  - "before <weekday>" → resolve to the ISO date of that weekday in the meeting's week (e.g. meeting is Monday Oct 12; "before Friday" → Oct 16, i.e. 2026-10-16). Write it as an ISO date; do NOT use `none`.
++  - "for <date>" → resolve to that date as an ISO date (e.g. "for Oct 14" → 2026-10-14). Write it as an ISO date; do NOT use `none`.
++  - "by <date>" → that date as an ISO date (e.g. "by Oct 14" → 2026-10-14).
++  - Only use `none` when the notes give absolutely no date indicator whatsoever for that commitment.
++  - Neither "before <weekday>" nor "for <date>" entries belong in Open questions — they have resolved ISO dates.
++- **Informal commitments count.** Phrases like "I'll sort it out", "he'll swap shifts", "will probably sort it out himself" are action items. Include them in the Action items table.
++- **Summary line is required.** The memo's first content line after the title must be `Summary: <one sentence>`. Then Decisions, then Action items, then Open questions (if any).
++- **Open questions only for genuinely unclear items.** An owner or date the notes leave truly unclear belongs in Open questions. A resolved ISO date does not.

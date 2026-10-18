@@ -1,0 +1,38 @@
+{
+  "name": "orgmcp-orgmcp-e2-1792295253-org-8e1731-read-x4650fc0a",
+  "description": "internal: used by the orgmcp scheduler for /private/tmp/orgmcp-e2-1792295253/org; not a general-purpose agent (built-in tools: read)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "/Volumes/workspace/orgmcp-wt/e2-study/.venv/bin/orgmcp",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/private/tmp/orgmcp-e2-1792295253/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "read"
+  ],
+  "allowedTools": [
+    "@orgmcp"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false,
+  "toolsSettings": {
+    "read": {
+      "allowedPaths": [
+        "/private/tmp/orgmcp-e2-1792295253/notes",
+        "/private/tmp/orgmcp-e2-1792295253/notes/**",
+        "/private/tmp/orgmcp-e2-1792295253/org",
+        "/private/tmp/orgmcp-e2-1792295253/org/**"
+      ],
+      "deniedPaths": []
+    }
+  }
+}

@@ -1,0 +1,28 @@
+--- service/SERVICE.v1.md	2026-10-18 05:15:08
++++ service/SERVICE.v2.md	2026-10-18 05:15:08
+@@ -23,6 +23,13 @@
+ - 'The reviewer''s report shows every criterion met (criteria met: n of m with n =
+   m) and every decision and commitment in the notes file checked against the memo
+   (n of m, n = m), and the writer applied every required change.'
++- The memo's first content line (right after the title, if any) is a single line starting
++  with 'Summary:' that summarises the meeting in one sentence; then come the Decisions
++  section, then the Action items section, then Open questions (when there is anything
++  to list).
++- When the notes say a commitment is due 'before <weekday>', its Due is the date of
++  that weekday in the meeting's week; when the notes say it is 'for <date>', its Due
++  is that date; both are written as ISO dates and are not listed in Open questions.
+ deliverable:
+   description: One markdown memo named after the meeting notes file (for example 2026-10-19.md)
+   format: markdown
+@@ -30,9 +37,9 @@
+   path: /tmp/orgmcp-e2-1792295253/deliverables
+ budget: 15
+ locked: false
+-version: 1
++version: 2
+ defined_by: root
+-defined: '2026-10-18T03:49:53.825607+00:00'
++defined: '2026-10-18T04:01:15.443424+00:00'
+ created: '2026-10-18T03:49:53.825607+00:00'
+ ---
+ 

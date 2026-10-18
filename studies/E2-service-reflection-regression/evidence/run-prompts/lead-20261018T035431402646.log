@@ -1,0 +1,235 @@
+# run of lead, 1 message(s)
+# senders: root
+# cwd: /private/tmp/orgmcp-e2-1792295253/org/lead
+# cmd: kiro-cli chat --no-interactive --agent orgmcp-orgmcp-e2-1792295253-org-8e1731-read-x4650fc0a --model claude-sonnet-4.6 <prompt on stdin>
+# ---- prompt ----
+# orgmcp run: you are `lead`
+
+# Organization
+
+## Mission
+Each week, turn the user's notes from one team meeting into a short memo stating what was decided and who does what, for the user's platform team. Works only from the user's own notes files.
+
+## How this organization works
+- Every agent is a directory; its address is the path (e.g. `ceo/cto`). The human at the top is `root`.
+- You act ONLY through the orgmcp tools (kiro shows them as `@orgmcp/<tool>`, e.g. `@orgmcp/write`; if you were also
+  given kiro's built-in `write`/`read`/`shell`, those are different tools that reach the workspace only, never the org):
+  - `delegate` gives a task (a contract) to one of your direct reports.
+  - `report` answers a task assigned to you: done, failed, or blocked.
+  - `send` posts a note to your parent, a direct report, or a sibling (questions, info, escalation).
+- You may write only inside your own directory, with `@orgmcp/write`: artifacts go in `<you>/work/`, notes for your
+  future self in `<you>/MEMORY.md`. You may read anything in the organization with `@orgmcp/read`.
+  Every path (read, write, artifacts) is relative to the org root, so yours start with your address.
+- Budgets are counted in runs. Delegating moves budget from you to your report. When you are out of budget you stop being woken.
+  `delegate` without a `budget` hands over what you can afford, keeping one run per outstanding delegation to process its result.
+  Budget comes back up: when you report a task `done` or `failed` and have no other open task or outstanding delegation,
+  your remaining budget returns with the result to whoever assigned it (the result says "returns N run(s)"). To give runs
+  back earlier, `send` your parent a note with `budget=N`. Hand down what a task needs, not everything you hold.
+
+## Protocol for every run
+1. For each new message: do it yourself, delegate it, or escalate it to your parent. Never ignore a message.
+2. Never wait or poll. After delegating, end your run; the result will wake you.
+3. When you delegate all or part of a task, copy the relevant acceptance criteria verbatim into the new task
+   (exact numbers, formats, constraints). You may add detail; never paraphrase, relax or drop a criterion.
+4. Before reporting delegated work as done, `read` the artifacts and check them against the acceptance criteria
+   yourself (`read` shows word count and modification time): the criteria of the task you delegated, as shown with the
+   result, and those of the task assigned to you. Do not trust claims. If it falls short, send it back with
+   `delegate(..., revises=<id of the earlier task>)` so the rework is recorded.
+5. Keep reports short: a few lines of summary plus artifact paths. Put detail in files, not messages.
+6. Every task assigned to you gets a `report`; `done` and `failed` are final. Report `done` only if every acceptance
+   criterion is verifiably met; exact numbers are exact (33 words means 33, not 35). If any criterion cannot be met,
+   including a required step you cannot afford (a review, a rework, a delegation), report `blocked` or `failed`,
+   name the criterion and say why. Never report `done` on a task whose criteria are not all met.
+   `blocked` is not final: once the blocker is resolved you may `report` that task again (once per blocked report; it
+   supersedes the earlier one), under the same rules. A `send` note never changes a task's outcome and must not
+   claim that criteria are met unless you verified them.
+7. Before you stop, rewrite `<you>/MEMORY.md` (with `@orgmcp/write`, never the built-in `write`) with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
+   Keep it short: condense instead of appending, and put detail in `<you>/work/` files. Writes that make it too long are refused.
+   Never rely on memory for what a task requires: its full text is in your prompt.
+8. Stay within your charter. Escalate anything outside it.
+9. Reviews and fact-checks: a reviewer never edits another agent's file (you write only in your own directory). It
+   reports its findings and the changes it requires to whoever assigned the review (in the `report` summary, with detail
+   in a file in its own `work/`); the author makes the changes, sent back with `delegate(..., revises=<task id>)`.
+   Never write acceptance criteria or charters that require an agent to edit, correct or create a file in another
+   agent's directory; require findings to be reported and the author to apply them.
+10. Services: a service is a standing kind of task your parent defined for you (`<you>/services/<name>/`: the
+   contract SERVICE.md is your parent's; the playbook PLAYBOOK.md is yours). Each request is a task: follow the
+   playbook and the contract's criteria; report it with `lessons`. Improve the playbook with `revise_playbook` when the
+   evidence shown before a new request calls for it; never lower the bar (client feedback never waives a criterion),
+   and propose contract changes to your parent.
+
+# Your charter (lead/AGENT.md, owned by your parent)
+# Role: Manager
+
+## Purpose
+Turn the task you receive into the deliverable by directing your team. You coordinate and verify; you do not write the deliverable yourself.
+
+## Responsibilities
+- Read the "Assignment" section below: team, budget plan, deliverable and review loop are decided and approved. Follow them.
+- Sequence: delegate a step only when its inputs exist: research, then write, then check. On the first run delegate in one batch only the steps that need nothing from a teammate (usually the first), each with `budget=` set explicitly and the relevant acceptance criteria copied verbatim. Never pre-delegate a downstream step "to get ready": it spends a run on nothing. Keep the task id each `delegate` returns.
+- Then end your run. Results wake you. Never send status, waiting or "are you done" messages and do not poll: each costs a run for you and for the recipient.
+- Each wake: read only the new messages and the artifacts they name, and act on everything that arrived in that one run (verify, delegate the next step, route rework, or report).
+- When results arrive, `read` the artifacts yourself and check them against every criterion of the task you delegated and every criterion of the task assigned to you. Do not trust claims, summaries or reports.
+- Report to your parent: a few lines plus the path of the final deliverable.
+
+## Verification before you report
+- Quote counts and facts from your own `read` output (word count, modification time, text), never from memory or from what a report says; check that the artifact is the final file, not a stale copy.
+- Go through the criteria one by one and note for each: met, with the evidence you read. A criterion you did not check is not met.
+- Where a verifier is part of the plan, its coverage report is a precondition for `done`: the fact-checker's "n of m factual claims verified" with n = m (a sampled check is not enough) and its judgement answer yes, the reviewer's "criteria met n of m", the tester's and code reviewer's commands and results, the data checker's figures line. Missing, partial or failing: it is a failed check (see Rework).
+- Every `done` report pastes the verifier's final coverage line verbatim, with the path of its ledger or review. Never describe re-checked changes as claim coverage ("8 of 8 changes verified" is not "n of m claims verified"), and never write "fact-checked" or "every claim has a URL" in its place. No coverage line from the latest verification of the final file, no `done`.
+- Client feedback (a note with `feedback:`) is input for reflection. It never waives an acceptance criterion and is never a reason to report `done` with a criterion unmet; the contract and the criteria of your task stay as written.
+- A result that deviates from a criterion is not accepted: route it as rework, or `send` your parent the deviation with a recommended decision. Never report `done` with a known deviation; disclosing it afterwards does not make the criterion met.
+
+## Rework (single-writer rule)
+Every agent writes only in its own directory; a verifier never edits the author's file. A verification cycle is: verify, rework, re-verify.
+- You never rewrite the author's deliverable yourself, for a service request as for any task: not to fix it, not to save a run. Required changes go back to the author with `revises`.
+- Required changes go to the AUTHOR of the failing artifact, the agent whose file failed: `delegate(to=<author>, revises=<that author's task id>, budget=1-2)`, quoting the checker's REQUIRED CHANGES verbatim. Never send a deliverable's fixes to the researcher; the researcher gets work only when its own findings file is the one that failed.
+- The re-check is `delegate(to=<checker>, revises=<checker's task id>)` and names the SAME file that failed, not an earlier or upstream one. Tell the author to cut every claim the verifier could not verify, or restate it as a labelled judgement, using only what the verifier's quoted sources state.
+- Failure policy: after one failed check, exactly one cut-or-reframe rework by the author and one re-check of that file. If it still fails, do not start another research cycle (prefer cutting) and make no extra re-checks: report `blocked` to your parent with options and a recommended decision (for example accept the deliverable without the unverifiable claims, narrow the scope, or fund another cycle), the position (what is verified, what is not) and the checker's coverage line, instead of spending the reserve on a second full cycle.
+
+## Budget discipline
+- Never hand down more than the budget plan says. Keep your own runs plus the reserve for one review and one rework cycle: for each author one rework run, for each checker one re-check run. Grants are explicit; do not rely on the default of `delegate`.
+- Unspent runs come back automatically: a worker's remaining budget returns to you with its final `done`/`failed` report, and yours returns to your parent with yours. Do not send budget back by hand.
+- If a report needs more than it has and a sibling holds unspent runs with no open task, `reclaim(report=<sibling>, budget=N)` pulls them back before you ask your parent. If the reserve is still short, `send` your parent the exact number and why, and end your run. A review or rework step you cannot afford is not skipped: report `blocked` and say what is missing.
+
+## Decision rights
+The task breakdown and the order of work inside the plan. Not the team, the tools, the models or the deliverable; escalate if the plan does not fit reality.
+
+## Escalation
+Ambiguous scope, a criterion that cannot be met, missing budget, or an agent that is blocked twice: `send` to your parent with a recommended decision.
+
+## Quality bar
+Accurate, concrete, skimmable. Exact numbers are exact. No filler.
+
+## Assignment (from the approved plan)
+Mission: Each week, turn the user's notes from one team meeting into a short memo stating what was decided and who does what, for the user's platform team. Works only from the user's own notes files.
+Quality bar: Every statement comes from the requested notes file; where the notes are silent or unclear (for example an owner or a date), the memo says so.
+Scope: One memo per request, from one named notes file: the decisions made and the action items (who does what, by when), including informal commitments stated in prose. Nothing from other meetings.
+Read-only inputs: /private/tmp/orgmcp-e2-1792295253/notes. Read them (kiro `read`, or orgmcp `read` by absolute path); never create, edit or delete anything there.
+Reports to: root (the human)
+Your team (fixed by the plan; you cannot change it):
+- lead/writer: Writer (author; tools: none; model: claude-haiku-4.5)
+- lead/reviewer: Independent Reviewer (verifier; tools: read; model: claude-sonnet-4.6)
+Budget plan: each request arrives with the budget of its service, and its split between you and your team is in the playbook (`## Budget plan`). Hand down no more than that plan says, with `budget=` set explicitly; keep the reserve for one review and rework cycle. Runs you do not spend return to your parent automatically with your final report.
+Review loop: lead/writer produce; lead/reviewer verifies independently and report findings and required changes to you; you send them to the author with `revises`; verifiers never edit the author's file.
+Services you offer: meeting-memo (the runtime shows them, with their contract, in your prompt). A task with a `service:` header is a request for one: for it the playbook shown in your prompt is the procedure (steps, who does what, budget plan), and wherever this charter's general procedure differs, the playbook wins. You own the playbook and improve it with `revise_playbook` from the evidence shown before a new request. The acceptance criteria come from the request and the contract; improving the playbook may raise the bar, never lower it.
+
+# Your memory (lead/MEMORY.md)
+# Memory
+
+## Last completed task
+- Task id: 20261018T034955412135-root-d22b (meeting-memo for 2026-10-05.md) — reported done
+- Deliverable: lead/writer/work/2026-10-05.md
+- One rework cycle: reviewer caught Sam's due date wrong (2026-10-08 → 2026-10-09); fixed and re-checked, passed.
+- Reviewer final line: "Criteria met: 8 of 8. Decisions checked: 2 of 2. Commitments checked: 5 of 5."
+
+## Lesson for next playbook revision
+- Instruct writer to double-check every ISO date against the source notes before submitting.
+
+## Outstanding
+None.
+
+# Your state
+- Address: `lead`; parent: `root`; role: Manager
+- Budget: 5 run(s) left (this run already counted). Hiring: allowed (2/2 reports)
+- Tools beyond orgmcp: read
+- Files:
+  - orgmcp tools (shown as `@orgmcp/write`, `@orgmcp/org_read`, ...): paths are relative to the org root; your notes and memory: `lead/MEMORY.md`, `lead/work/` (orgmcp `write` only).
+  - Do not mix up the two kinds of tools: kiro's built-in `read` are not orgmcp's tools: they write and run only in the workspace and never change the org. Org files (`lead/MEMORY.md`, `lead/work/`, anything under `lead/`) are written with `@orgmcp/write`, never with the built-in `write`. Your `read` is kiro's built-in: it reads org files too, but only by ABSOLUTE path, `/private/tmp/orgmcp-e2-1792295253/org/<path in the org>` (a relative path starts in your working directory); the orgmcp read tool is `@orgmcp/org_read` for you (relative org paths; wherever ORG.md says `@orgmcp/read`, use that name).
+  - You have no workspace: kiro tools start in your org directory (`lead/`) and cannot write.
+  - Read-only inputs (kiro `read` or orgmcp `org_read` by absolute path): `/private/tmp/orgmcp-e2-1792295253/notes`. Never modify them.
+  - Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path.
+  - kiro `write` is limited to the workspace and kiro `read` to workspace + inputs + the organization (read-only); other paths are refused.
+- Direct reports:
+  - lead/reviewer [Independent Reviewer] idle, budget 0, open tasks 0, delegated 0, unread 0
+  - lead/writer [Writer] idle, budget 0, open tasks 0, delegated 0, unread 0
+- Open tasks assigned to you:
+  - 20261018T035429740646-root-d90e "Rework memo 2026-10-05: unclear due dates" from root
+    (full text: see the new messages below)
+- Work you delegated that is still outstanding: none
+- Paths: every path (read, write, artifacts) is relative to the org root. Yours start with `lead/`.
+
+# Your services
+The contract (SERVICE.md) is your parent's; the playbook (PLAYBOOK.md) is yours.
+- meeting-memo: contract v1, playbook v1, 1 request(s) so far; contract: lead/services/meeting-memo/SERVICE.md; playbook: lead/services/meeting-memo/PLAYBOOK.md
+
+# Playbook: meeting-memo (v1, yours to improve)
+> ## Steps
+> 1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.
+> 2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet. On this first run delegate only the steps that need nothing from a teammate.
+> 3. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.
+> 4. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.
+> 5. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.
+> 6. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /tmp/orgmcp-e2-1792295253/deliverables) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).
+>
+> ## Budget plan
+> Request budget: 15 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
+> - writer: 3 runs (2 work + 1 rework or re-check)
+> - reviewer: 2 runs (1 work + 1 rework or re-check)
+> - you (lead): keep 10 runs: your own 6 (plan, process each result, final check, report, one rework cycle) and 4 of slack.
+> Unspent runs return to your parent with your final report.
+>
+> ## Pitfalls
+> none yet: add them from lessons and feedback
+
+# New messages for this run (1)
+### task 20261018T035429740646-root-d90e
+from: root | to: lead | title: Rework memo 2026-10-05: unclear due dates | revises: 20261018T034955412135-root-d22b | service: meeting-memo (contract v1, playbook v1) | budget: 6 runs
+
+## Goal
+Deliver the service `meeting-memo`: One short memo of the decisions and the who-does-what from one weekly meeting's notes file
+
+## Request
+- notes_file: 2026-10-05.md
+
+## Acceptance criteria
+- The memo is based only on the requested notes file and covers that meeting only.
+- At most 400 words as counted by read.
+- Format is markdown with a section "Decisions" and a section "Action items".
+- The Decisions section lists every decision stated in the notes file, each in one line, and no decision that is not in the notes.
+- The Action items section is a markdown table with exactly the columns Owner | Action | Due, with one row for every commitment in the notes file, including informal ones stated in prose (for example 'I'll sort it out'); no row for something nobody committed to.
+- Every Due value is an ISO date (YYYY-MM-DD) or the word none when the notes give no date; a date is never invented, and an owner or date that the notes leave unclear is listed in a final section titled 'Open questions'.
+- The reviewer's report shows every criterion met (criteria met: n of m with n = m) and every decision and commitment in the notes file checked against the memo (n of m, n = m), and the writer applied every required change.
+
+## Deliverable
+One markdown memo named after the meeting notes file (for example 2026-10-19.md) (format: markdown; at most 400 words; path: /tmp/orgmcp-e2-1792295253/deliverables)
+
+## Note from the requester
+Rework needed on two Due values that the notes do not state as dates. (1) Sam, flaky CI: the notes say "before Friday"; the memo has 2026-10-09, which is Friday itself, not "before" it. Either use the last day before Friday if you resolve it (2026-10-08, a Thursday) and say how it was derived in Open questions, or use none and put "before Friday" in Open questions; do not leave an ambiguous resolved date silently in the table. (2) Marta, on-call training room: the notes say "book the room for Oct 14", and Oct 14 is the date of the training, not a stated deadline for booking; the memo wrongly shows 2026-10-14 as her Due. Use none and list in Open questions that 14 Oct is the training date and no booking deadline is given. Keep everything else that already passes. Have the reviewer re-check every Due value against the notes text, not only the changed rows.
+
+---
+Handle every new message above with the orgmcp tools, following the protocol.
+Messages may be redelivered after a crash: if your state shows one was already handled, skip it.
+Before you stop, update your memory with `@orgmcp/write`(path="lead/MEMORY.md", ...) (the orgmcp tool, not a built-in `write`). Do not wait for replies; end the run when done.
+
+# ---- output ----
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m56jb8xre2gth68jah0s3cgz","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+I'll handle this rework task. Let me first read the current memo and the notes file to understand what needs to be changed.
+[tool] Reading 2026-10-05.md:1, 2026-10-05.md:1
+[tool] status: Completed
+Now I have a clear picture. The rework needed is:
+1. Sam's due date: `2026-10-09` → either `2026-10-08` (Thursday before Friday) with note in Open questions, or `none` with "before Friday" in Open questions
+2. Marta's due date: `2026-10-14` → `none` with note that Oct 14 is training date, not booking deadline
+
+Per the requester's note, I need to delegate rework to the writer with specific required changes, then have the reviewer re-check. Let me delegate to the writer now.
+[tool] Running: @orgmcp/delegate
+[tool] status: Completed
+I need to use the correct task id for the earlier writer task, not the root task id. Let me check the org for the writer's previous task id.
+[tool] Running: @orgmcp/org_read
+[tool] status: Completed
+[tool] Running: @orgmcp/org_read
+[tool] status: Completed
+Now I have the writer's last task id: `20261018T035224629849-lead-e896`. Let me delegate the rework with this id.
+[tool] Running: @orgmcp/delegate
+[tool] status: Completed
+Writer task delegated. Now update memory and end this run.
+[tool] Running: @orgmcp/write
+[tool] status: Completed
+Done for this run. I've delegated the rework to the writer (task `20261018T035459695346-lead-331a`, budget 2) with the two required changes:
+
+1. **Sam's Due**: `2026-10-09` → `none`, with an Open questions entry explaining "before Friday"
+2. **Marta's Due**: `2026-10-14` → `none`, with an Open questions entry explaining Oct 14 is the training date, not a booking deadline
+
+When the writer completes the rework, I'll verify the file myself, then delegate a re-check to the reviewer before reporting to root.
+
+# exit 0 after 38s
