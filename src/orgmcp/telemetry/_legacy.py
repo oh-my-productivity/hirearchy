@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """The event log: one append-only, structured record of what the runtime did (emission side).
 
 Files: ``<org>/.runtime/events/<YYYY-MM-DD>/<proc>-<pid>-<start_epoch_ms>.jsonl``, one per process per UTC day, written
@@ -20,6 +21,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import shutil
 import sys
 import threading
@@ -28,7 +30,11 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from .eventlog import DAY_RE, ENVELOPE, EVENTS_REL, LINE_MAX, PROCS, SCHEMA_VERSION  # noqa: F401 - the format, defined by eventlog
+from ..eventlog import DAY_RE, ENVELOPE, EVENTS_REL, LINE_MAX, PROCS, SCHEMA_VERSION  # noqa: F401 - the format, defined by eventlog
+
+__all__ = ["DAY_RE", "ENVELOPE", "ERROR_MAX", "EVENTS_REL", "LINE_MAX", "PROCS", "RETRY_AFTER", "SCHEMA_VERSION", "TITLE_MAX", "clip", "datetime",
+           "dropped", "emit", "ensure_ignored", "note_trace", "process", "prune", "reset", "set_process", "single", "summarize_args",
+           "traces_seen"]
 
 RETRY_AFTER = 5.0  # seconds before an unwritable events directory is tried again
 TITLE_MAX = 80
@@ -151,7 +157,7 @@ class _Writer:
             return False
         stamp = (st.st_mtime_ns, st.st_size)
         if stamp != self.stamp:
-            from .core import split_frontmatter  # late: core imports this module
+            from ..kernel import split_frontmatter
 
             try:
                 with open(os.path.join(self.root, "ORG.md"), encoding="utf-8") as f:
@@ -177,9 +183,9 @@ class _Writer:
 def ensure_ignored(root: str | Path) -> None:
     """Keep the events out of the organization's git snapshots (same mechanism as the other runtime files)."""
     try:
-        from .app.wiring import open_runtime  # late: the app package imports the facade, which imports this module
+        import importlib  # the interim: the hook that replaces this arrives with the real classes
 
-        open_runtime(Path(root)).ignore_list.ensure_runtime_files()
+        importlib.import_module("orgmcp.app.wiring").open_runtime(Path(root)).ignore_list.ensure_runtime_files()
     except Exception:  # noqa: BLE001
         pass
 
@@ -209,7 +215,7 @@ def _emit(root: str, kind: str, actor, run, trace, proc: str, fields: dict) -> N
             w = _writers.setdefault(key, _Writer(root, proc, pid))
     if not w.active():
         return
-    ts = datetime.now(timezone.utc).isoformat(timespec="microseconds")
+    ts = sys.modules["orgmcp.telemetry"].datetime.now(timezone.utc).isoformat(timespec="microseconds")  # interim: the package holds the patch point
     env = os.environ
     record = {
         "v": SCHEMA_VERSION, "ts": ts, "seq": 0, "proc": proc, "pid": pid, "kind": kind,
@@ -230,7 +236,7 @@ def _emit(root: str, kind: str, actor, run, trace, proc: str, fields: dict) -> N
                 w.open(ts[:10])
             except OSError:
                 w.close()
-                w.retry_at = time.monotonic() + RETRY_AFTER
+                w.retry_at = time.monotonic() + sys.modules["orgmcp.telemetry"].RETRY_AFTER
                 raise
             record["seq"] = w.seq = 1
         data = _encode(record)
@@ -238,7 +244,7 @@ def _emit(root: str, kind: str, actor, run, trace, proc: str, fields: dict) -> N
             os.write(w.fd, data)
         except OSError:
             w.close()
-            w.retry_at = time.monotonic() + RETRY_AFTER
+            w.retry_at = time.monotonic() + sys.modules["orgmcp.telemetry"].RETRY_AFTER
             raise
 
 
@@ -331,7 +337,7 @@ def prune(root: str | Path, keep_days: int, today: datetime | None = None) -> li
     removed: list[str] = []
     try:
         base = Path(root) / EVENTS_REL
-        cutoff = ((today or datetime.now(timezone.utc)) - timedelta(days=max(1, int(keep_days)))).strftime("%Y-%m-%d")
+        cutoff = ((today or sys.modules["orgmcp.telemetry"].datetime.now(timezone.utc)) - timedelta(days=max(1, int(keep_days)))).strftime("%Y-%m-%d")
         for d in sorted(base.iterdir()) if base.is_dir() else []:
             if d.is_dir() and DAY_RE.match(d.name) and d.name < cutoff:
                 shutil.rmtree(d, ignore_errors=True)
