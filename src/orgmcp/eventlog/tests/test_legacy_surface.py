@@ -6,8 +6,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
 from orgmcp.eventlog import DAY_RE, ENVELOPE, EVENTS_REL, LINE_MAX, PROCS, SCHEMA_VERSION, event_file
 from orgmcp.eventlog._reader import FsEventReader
 from orgmcp.kernel import OrgPaths
@@ -15,7 +13,6 @@ from orgmcp.kernel import OrgPaths
 from ._legacy import legacy
 
 
-@pytest.mark.xfail(strict=True, reason="red: A-eventlog")
 def test_the_writer_takes_the_format_constants_from_the_package() -> None:
     telemetry = legacy("telemetry")
     assert telemetry.SCHEMA_VERSION == SCHEMA_VERSION and telemetry.LINE_MAX == LINE_MAX

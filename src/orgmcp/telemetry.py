@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import shutil
 import sys
 import threading
@@ -29,15 +28,11 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-SCHEMA_VERSION = 1
-LINE_MAX = 8192  # bytes per line
-EVENTS_REL = Path(".runtime") / "events"
+from .eventlog import DAY_RE, ENVELOPE, EVENTS_REL, LINE_MAX, PROCS, SCHEMA_VERSION  # noqa: F401 - the format, defined by eventlog
+
 RETRY_AFTER = 5.0  # seconds before an unwritable events directory is tried again
 TITLE_MAX = 80
 ERROR_MAX = 500
-DAY_RE = re.compile(r"\d{4}-\d{2}-\d{2}\Z")
-ENVELOPE = ("v", "ts", "seq", "proc", "pid", "kind", "actor", "run", "trace")
-PROCS = ("scheduler", "mcp", "cli")
 
 _proc = "cli"  # which process this is, unless an emission names one
 _lock = threading.Lock()

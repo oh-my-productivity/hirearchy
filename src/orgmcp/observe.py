@@ -20,8 +20,6 @@ an organization that has no events at all (then ``trace`` falls back to the mess
 
 from __future__ import annotations
 
-import heapq
-import json
 import math
 import os
 import re
@@ -33,19 +31,21 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable, Iterator
 
+from .app import wire_eventlog
 from .core import BOXES, ROOT, RUNTIME, Org, OrgError, split_frontmatter, utcnow
+from .eventlog import ENVELOPE as _ENVELOPE
+from .eventlog import EVENTS_REL, EventFollower, event_file
 from .health import _aware, _stamp, config_number
 from .review import retired_runs
 from .scheduler import EXIT_FILE, judge_orphan, scheduler_state
 
-EVENTS_DIR = Path(".runtime") / "events"
+EVENTS_DIR = EVENTS_REL
 ERROR_WINDOW = timedelta(minutes=15)
 COPY_GRACE = 5.0  # seconds a freshly written message may lack its other copy (delivery writes two files)
 INFLIGHT_GRACE = 30.0  # seconds an inflight batch may exist before the run record is written
 RECV_BOXES = ("inbox", "inflight", "read")
-ENVELOPE = {"v", "ts", "seq", "proc", "pid", "kind", "actor", "run", "trace"}
+ENVELOPE = set(_ENVELOPE)
 READ_ONLY_TOOLS = {"inbox", "read", "status", "health", "progress", "whoami", "services", "observe", "org_read"}
-_DAY = re.compile(r"\d{4}-\d{2}-\d{2}")
 _EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 VIEWS = ("now", "trace", "metrics", "events", "check")
 
@@ -164,71 +164,20 @@ def _cap(lines: list[str], max_lines: int | None, hint: str) -> list[str]:
 # ============================================================================================ the event log
 
 
-def _day_dirs(org: Org, since: datetime | None, until: datetime | None) -> list[Path]:
-    base = org.root / EVENTS_DIR
-    try:
-        names = sorted(n for n in os.listdir(base) if _DAY.fullmatch(n) and (base / n).is_dir())
-    except OSError:
-        return []
-    lo = since.astimezone(timezone.utc).date().isoformat() if since else None
-    hi = until.astimezone(timezone.utc).date().isoformat() if until else None
-    return [base / n for n in names if (lo is None or n >= lo) and (hi is None or n <= hi)]
-
-
 def event_files(org: Org, since: datetime | None = None, until: datetime | None = None) -> list[Path]:
-    """The event files that can hold events in ``[since, until]``: day directories first, then files by mtime
+    """The event files that can hold events in ``[since, until]``: day directories first, then files by name
     (a file not written since ``since`` has nothing newer)."""
-    out = []
-    for d in _day_dirs(org, since, until):
-        try:
-            names = sorted(n for n in os.listdir(d) if n.endswith(".jsonl") and not n.startswith("."))
-        except OSError:
-            continue
-        for n in names:
-            p = d / n
-            try:
-                if since is not None and p.stat().st_mtime < since.timestamp():
-                    continue
-            except OSError:
-                continue
-            out.append(p)
-    return out
-
-
-def _read_events(path: Path) -> Iterator[tuple[datetime, dict]]:
-    """(time, event) of every parsable line of one file; partial and foreign lines are skipped."""
-    try:
-        f = open(path, "rb")
-    except OSError:
-        return
-    with f:
-        for raw in f:
-            try:
-                ev = json.loads(raw)
-            except ValueError:
-                continue
-            if not isinstance(ev, dict):
-                continue
-            t = _ts(ev.get("ts"))
-            if t is not None:
-                yield t, ev
+    return [f.path for f in org.runtime.event_reader.files(since, until)]
 
 
 def timed_events(org: Org, since: datetime | None = None, until: datetime | None = None) -> Iterator[tuple[datetime, dict]]:
     """Events in ``[since, until]`` as (time, event), merged over all process files in time order (a heap merge:
     every file is time-ordered by its single writer)."""
-    streams = [_read_events(p) for p in event_files(org, since, until)]
-    for t, ev in heapq.merge(*streams, key=lambda item: item[0]):
-        if since is not None and t < since:
-            continue
-        if until is not None and t > until:
-            continue
-        yield t, ev
+    return org.runtime.event_reader.timed(since, until)
 
 
 def iter_events(org: Org, since: datetime | None = None, until: datetime | None = None) -> Iterator[dict]:
-    for _, ev in timed_events(org, since, until):
-        yield ev
+    return org.runtime.event_reader.events(since, until)
 
 
 def is_error(ev: dict) -> bool:
@@ -288,54 +237,17 @@ def events(org: Org, since=None, until=None, agent=None, kind=None, trace=None, 
     return events_view(org, since, until, agent, kind, trace, errors, limit, now)["events"]
 
 
-class Follower:
+class Follower(EventFollower):
     """Tails the event files: ``poll()`` returns the complete new lines of all files (today's and yesterday's day
-    directories) since the last call, in time order. Files that appear later (a new process) are read from the start."""
+    directories) since the last call, in time order. Files that appear later (a new process) are read from the start.
+    The tailing is ``eventlog``'s; this keeps the old signature and takes the time from ``utcnow`` of this module."""
 
     def __init__(self, org: Org, match: Callable[[dict], bool] | None = None, now: datetime | None = None):
         self.org, self.match = org, match or (lambda ev: True)
-        self.offsets: dict[Path, int] = {}
-        self._seen_first = False
-        self.poll(emit=False, now=now)
-        self._seen_first = True
-
-    def _files(self, now: datetime | None) -> list[Path]:
-        now = _aware(now) or utcnow()
-        return event_files(self.org, now - timedelta(days=1), now + timedelta(days=1))
+        self._follower = org.runtime.event_followers.follow(self.match, now or utcnow())
 
     def poll(self, emit: bool = True, now: datetime | None = None) -> list[dict]:
-        out: list[tuple[datetime, dict]] = []
-        for p in self._files(now):
-            try:
-                size = p.stat().st_size
-            except OSError:
-                continue
-            if p not in self.offsets:
-                self.offsets[p] = size if not self._seen_first else 0
-                if not self._seen_first:
-                    continue
-            if size <= self.offsets[p]:
-                continue
-            try:
-                with open(p, "rb") as f:
-                    f.seek(self.offsets[p])
-                    data = f.read(size - self.offsets[p])
-            except OSError:
-                continue
-            end = data.rfind(b"\n")
-            if end < 0:
-                continue  # no complete line yet
-            self.offsets[p] += end + 1
-            for raw in data[: end + 1].splitlines():
-                try:
-                    ev = json.loads(raw)
-                except ValueError:
-                    continue
-                t = _ts(ev.get("ts")) if isinstance(ev, dict) else None
-                if t is not None and self.match(ev):
-                    out.append((t, ev))
-        out.sort(key=lambda item: item[0])
-        return [ev for _, ev in out] if emit else []
+        return self._follower.poll(emit, now or utcnow())
 
 
 def follow_events(org: Org, agent=None, kind=None, trace=None, errors=False, poll: float = 0.5,
@@ -1189,39 +1101,12 @@ def render_metrics(m: dict, limit: int = 50) -> str:
 
 
 def _tail_events(path: Path, nbytes: int = 65536) -> list[dict]:
-    try:
-        with open(path, "rb") as f:
-            size = f.seek(0, 2)
-            f.seek(max(0, size - nbytes))
-            data = f.read()
-    except OSError:
-        return []
-    lines = data.splitlines()
-    if size > nbytes and lines:
-        lines = lines[1:]  # the first line is cut
-    out = []
-    for raw in lines:
-        try:
-            ev = json.loads(raw)
-        except ValueError:
-            continue
-        if isinstance(ev, dict):
-            out.append(ev)
-    return out
+    return wire_eventlog.system_reader().tail(event_file(path), nbytes)
 
 
 def _scheduler_files(org: Org) -> list[tuple[int, int, Path]]:
     """(start_epoch_ms, pid, path) of every scheduler event file, newest process first."""
-    out = []
-    for d in reversed(_day_dirs(org, None, None)):
-        try:
-            names = os.listdir(d)
-        except OSError:
-            continue
-        for n in names:
-            m = re.fullmatch(r"scheduler-(\d+)-(\d+)\.jsonl", n)
-            if m:
-                out.append((int(m.group(2)), int(m.group(1)), d / n))
+    out = [(f.start_ms, f.pid, f.path) for f in org.runtime.event_reader.files() if f.proc == "scheduler"]
     return sorted(out, key=lambda x: (x[0], str(x[2])), reverse=True)
 
 
@@ -1264,13 +1149,7 @@ def _scheduler_info(org: Org, now: datetime) -> dict:
 
 
 def _head_event(path: Path) -> dict | None:
-    try:
-        with open(path, "rb") as f:
-            line = f.readline()
-        ev = json.loads(line)
-        return ev if isinstance(ev, dict) else None
-    except (OSError, ValueError):
-        return None
+    return wire_eventlog.system_reader().head(event_file(path))
 
 
 def now_view(org: Org, now: datetime | None = None) -> dict:
@@ -1338,8 +1217,9 @@ def now_view(org: Org, now: datetime | None = None) -> dict:
     since = now - ERROR_WINDOW
     errs = [ev for ev in iter_events(org, since, now) if is_error(ev)]
     last_event = None
-    for p in event_files(org, now - timedelta(days=2), None)[-3:]:
-        for ev in _tail_events(p, 8192)[-1:]:
+    reader = org.runtime.event_reader
+    for f in reader.files(now - timedelta(days=2), None)[-3:]:
+        for ev in reader.tail(f, 8192)[-1:]:
             t = _ts(ev.get("ts"))
             if t and (last_event is None or t > last_event):
                 last_event = t
@@ -1586,15 +1466,16 @@ def _check_runs(org: Org) -> dict:
 def _check_seq(org: Org) -> dict:
     """``seq`` counts the lines of ONE file and restarts at 1 in each day's file: every file is gapless from 1 on its own."""
     problems: list[str] = []
-    files = event_files(org)
-    for p in sorted(files, key=lambda x: (x.parent.name, x.name)):
+    reader = org.runtime.event_reader
+    files = reader.files()
+    for f in sorted(files, key=lambda x: (x.day, x.path.name)):
         expect = 1
-        for _, ev in _read_events(p):
+        for _, ev in reader.read_file(f):
             seq = ev.get("seq")
             if not isinstance(seq, int) or isinstance(seq, bool):
                 continue
             if seq != expect:
-                where = f"{p.parent.name}/{p.name}"
+                where = f"{f.day}/{f.path.name}"
                 problems.append(f"{where}: first seq is {seq}, expected 1" if expect == 1 else
                                 f"{where}: seq jumps from {expect - 1} to {seq} ({seq - expect} line(s) lost)" if seq > expect else
                                 f"{where}: seq goes back from {expect - 1} to {seq}")

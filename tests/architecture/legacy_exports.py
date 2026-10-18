@@ -58,7 +58,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "case_total services_text prompt_sections"
     ),
     "telemetry": _e3(
-        "SCHEMA_VERSION LINE_MAX EVENTS_REL RETRY_AFTER TITLE_MAX ERROR_MAX DAY_RE ENVELOPE PROCS clip set_process "
+        "RETRY_AFTER TITLE_MAX ERROR_MAX clip set_process "
         "process dropped reset traces_seen note_trace single ensure_ignored emit summarize_args prune"
     ),
     "observe": _e3(
