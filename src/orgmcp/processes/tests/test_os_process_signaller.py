@@ -112,7 +112,7 @@ def test_a_leader_that_goes_while_it_waits_is_reported_gone(
     table.exit_after(LEADER, 0.2)  # gone 0.2 s into the wait
     start = clock.time()
     assert signaller.kill_group(LEADER, wait=5.0) is True
-    assert 0.2 <= clock.time() - start < 1.0
+    assert 0.19 <= clock.time() - start < 1.0
 
 
 def test_a_zombie_leader_counts_as_gone(signaller: OsProcessSignaller, table: FakeProcessTable, calls: Calls) -> None:

@@ -13,12 +13,10 @@ import pytest
 from orgmcp.processes import OrphanJudge
 from orgmcp.processes.testing import IMPLEMENTATIONS, ProcessWorld
 
-from ._support import make_world
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-processes")
+from ._support import implementations, make_world
 
 
-@pytest.fixture(params=IMPLEMENTATIONS[OrphanJudge], ids=lambda factory: factory.__name__)
+@pytest.fixture(params=implementations(OrphanJudge, IMPLEMENTATIONS[OrphanJudge]))
 def world(request: pytest.FixtureRequest, tmp_path: Path) -> Iterator[ProcessWorld]:
     yield from make_world(request, tmp_path)
 

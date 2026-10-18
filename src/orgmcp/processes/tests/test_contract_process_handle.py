@@ -12,12 +12,10 @@ import pytest
 from orgmcp.processes import ProcessHandle
 from orgmcp.processes.testing import IMPLEMENTATIONS, ProcessWorld
 
-from ._support import eventually, make_world
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-processes")
+from ._support import implementations, eventually, make_world
 
 
-@pytest.fixture(params=IMPLEMENTATIONS[ProcessHandle], ids=lambda factory: factory.__name__)
+@pytest.fixture(params=implementations(ProcessHandle, IMPLEMENTATIONS[ProcessHandle]))
 def world(request: pytest.FixtureRequest, tmp_path: Path) -> Iterator[ProcessWorld]:
     yield from make_world(request, tmp_path)
 

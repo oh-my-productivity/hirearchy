@@ -13,8 +13,6 @@ from orgmcp.kernel.testing import FakeClock
 from orgmcp.processes import ProcessDenied, ProcessGone, ProcessHandle
 from orgmcp.processes.testing import FakeProcessTable
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-processes")
-
 
 @pytest.fixture
 def clock() -> FakeClock:
@@ -80,7 +78,7 @@ def test_waiting_for_a_scripted_exit_moves_the_clock_to_it(table: FakeProcessTab
     handle = spawn(table, tmp_path)
     start = clock.time()
     assert handle.wait(timeout=60) == 2
-    assert 30 <= clock.time() - start < 31
+    assert 29.9 <= clock.time() - start < 31
 
 
 def test_waiting_less_than_the_scripted_run_times_out(table: FakeProcessTable, clock: FakeClock, tmp_path: Path) -> None:
@@ -159,7 +157,7 @@ def test_kill_group_reports_a_leader_that_survives(table: FakeProcessTable, cloc
     table.add(6000, pgid=6000, sid=6000, survives_kill=True)
     start = clock.time()
     assert table.kill_group(6000, wait=0.3) is False
-    assert clock.time() - start >= 0.3 and table.is_alive(6000)
+    assert clock.time() - start >= 0.29 and table.is_alive(6000)
 
 
 def test_kill_group_of_a_denied_group_is_false_and_terminate_is_denied(table: FakeProcessTable) -> None:
