@@ -16,8 +16,6 @@ from orgmcp.kernel.testing import FakeClock
 
 from ._support import at, day
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-eventlog")
-
 NOW = at(60)
 
 

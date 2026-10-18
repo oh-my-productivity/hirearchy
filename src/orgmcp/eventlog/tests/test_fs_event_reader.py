@@ -16,8 +16,6 @@ from orgmcp.kernel import OrgPaths
 
 from ._support import at, day
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-eventlog")
-
 
 @pytest.fixture
 def h(tmp_path: Path) -> EventLogHarness:

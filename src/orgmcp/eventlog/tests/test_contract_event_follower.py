@@ -11,10 +11,10 @@ from orgmcp.eventlog import EventFollower, EventFollowers
 from orgmcp.eventlog.testing import IMPLEMENTATIONS, EventLogHarness
 from orgmcp.kernel import JsonObject
 
-from ._support import at, day, implementations
+from ._support import at, day
 
 
-@pytest.fixture(params=implementations(EventFollower, IMPLEMENTATIONS[EventFollower]))
+@pytest.fixture(params=IMPLEMENTATIONS[EventFollower], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> EventLogHarness:
     made = cast(EventLogHarness, request.param(tmp_path))
     assert isinstance(made.followers, EventFollowers)

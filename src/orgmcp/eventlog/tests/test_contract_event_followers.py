@@ -10,10 +10,10 @@ import pytest
 from orgmcp.eventlog import EventFollower, EventFollowers
 from orgmcp.eventlog.testing import IMPLEMENTATIONS, EventLogHarness
 
-from ._support import at, implementations
+from ._support import at
 
 
-@pytest.fixture(params=implementations(EventFollowers, IMPLEMENTATIONS[EventFollowers]))
+@pytest.fixture(params=IMPLEMENTATIONS[EventFollowers], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> EventLogHarness:
     made = cast(EventLogHarness, request.param(tmp_path))
     assert isinstance(made.followers, EventFollowers)

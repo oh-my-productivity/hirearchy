@@ -28,7 +28,6 @@ def test_the_query_module_keeps_its_old_names_for_the_constants() -> None:
     assert observe.EVENTS_DIR == EVENTS_REL and observe.ENVELOPE == set(ENVELOPE)
 
 
-@pytest.mark.xfail(strict=True, reason="red: A-eventlog")
 def test_what_the_writer_writes_the_reader_reads(tmp_path: Path) -> None:
     core, telemetry = legacy("core"), legacy("telemetry")
     org = core.Org.init(tmp_path / "org", "Mission", {"events": True})
