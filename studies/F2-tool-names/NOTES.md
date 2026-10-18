@@ -1,5 +1,7 @@
 # F2: tool names when the agent holds kiro's built-in `read` / `write`
 
+> Repeatable form: `tests/integration/test_real_kiro.py::test_builtin_write_and_org_write_side_by_side` (opt-in, `pytest --run-integration`).
+
 Problem (F-read-experiment, study D F1): kiro lists MCP tools by their plain names, so a built-in `read`/`write` shadows
 the orgmcp tool of the same name. Round F worked around it for `read` (the built-in may read the org by absolute path).
 For `write` nothing worked: an agent with built-in `write` (code orgs) could not call orgmcp `write`, so it could not

@@ -19,6 +19,8 @@ def pytest_collection_modifyitems(config, items):
         return
     skip = pytest.mark.skip(reason="real-LLM integration test: pass --run-integration (or ORGMCP_RUN_INTEGRATION=1) to run it")
     for item in items:
+        if "integration" not in item.keywords and item.path.parent.name == "integration":
+            item.add_marker(pytest.mark.integration)  # whatever lives in tests/integration/ is one: a forgotten mark cannot leak
         if "integration" in item.keywords:
             item.add_marker(skip)
 
@@ -32,12 +34,17 @@ def fresh_telemetry():
 
 
 @pytest.fixture(autouse=True)
-def isolated_kiro(tmp_path_factory, monkeypatch):
-    """No test may touch the real ~/.kiro or start the real kiro-cli.
+def isolated_kiro(request, tmp_path_factory, monkeypatch):
+    """No unmarked test may touch the real ~/.kiro or start the real kiro-cli.
 
     * ``orgmcp.scheduler.KIRO_AGENTS_DIR`` and ``$HOME`` point into a throwaway directory;
     * a stub ``kiro-cli`` (exits 0 and appends its argv to ``$KIRO_STUB_LOG``) shadows the real binary on PATH.
+
+    Tests marked ``integration`` get none of this (real kiro needs the user's auth): they must use the ``real_kiro``
+    fixture, which fences what they may touch in ``~/.kiro`` (see ``tests/kiro_sandbox.py``).
     """
+    if request.node.get_closest_marker("integration"):
+        return None
     base = tmp_path_factory.mktemp("kiro-home")
     stub_dir = base / "bin"
     stub_dir.mkdir()
@@ -58,3 +65,27 @@ def org(tmp_path):
     o.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)
     o.hire("ceo", "eng", "Engineer", "Build things.")
     return o
+
+
+@pytest.fixture
+def real_kiro(request, tmp_path):
+    """Sandbox for a test that uses the REAL kiro-cli (and so a real LLM); only for tests marked ``integration``.
+
+    Skips (does not fail) when ``kiro-cli`` is not on PATH. Afterwards, pass or fail: deletes only the per-org profiles
+    whose ``ORG_ROOT`` is inside the test's tmp dir, kills any process that mentions it, and fails the test if the md5
+    of any file in ``~/.kiro/agents`` or of ``~/.kiro/settings/mcp.json`` changed.
+    """
+    import kiro_sandbox
+
+    if not request.node.get_closest_marker("integration"):
+        pytest.fail("real_kiro is only for tests marked @pytest.mark.integration (unmarked tests run against a stub kiro-cli)")
+    kiro_sandbox.real_kiro_or_skip()
+    from orgmcp import scheduler
+
+    assert scheduler.KIRO_AGENTS_DIR == kiro_sandbox.kiro_dirs()[0], "profile directory is not the real ~/.kiro/agents"
+    sandbox = kiro_sandbox.RealKiro(tmp_path)
+    try:
+        yield sandbox
+    finally:
+        problems = sandbox.cleanup()
+    assert not problems, "; ".join(problems)
