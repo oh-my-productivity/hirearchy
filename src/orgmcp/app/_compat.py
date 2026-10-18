@@ -35,6 +35,18 @@ def atomic_write(path: Path, text: str) -> None:
     _core().atomic_write(path, text)
 
 
+class CoreSecrets:
+    """The ``secrets`` module of ``orgmcp.core`` (patch point ``core.secrets``: the golden suite replaces it with a counter so message
+    ids are stable); ``token_hex`` is looked up at call time."""
+
+    @staticmethod
+    def token_hex(nbytes: int | None = None) -> str:
+        return cast(str, _core().secrets.token_hex(nbytes))
+
+
+secrets = CoreSecrets()  # what the mixins' `secrets.token_hex(...)` resolves to
+
+
 class PatchPointClock(SystemClock):
     """The system clock whose ``now`` is whatever ``orgmcp.core.utcnow`` is at the time of the call."""
 

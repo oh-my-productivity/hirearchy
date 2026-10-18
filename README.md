@@ -775,6 +775,13 @@ list only shrinks, and its end state is empty (until then `test_every_class_has_
   `ownership.py` is the table 2.3, `legacy_exports.py` the ledger of legacy names (it only shrinks), `test_mapping_complete.py`
   proves every legacy symbol appears in ARCHITECTURE.md section 5, and `test_collected_count.py` that no test is lost.
 
+**The `Org` facade (`src/orgmcp/app/`).** `orgmcp.core.Org` is assembled in `orgmcp.app` from 20 mixins (`_facade_<pkg>.py`, one per
+package it is being split into; the MRO is documented in `app/facade.py`) and `orgmcp.core` re-exports it, so every caller and every
+`monkeypatch.setattr(core, ...)` keeps working. `app/tests/test_facade_signatures.py` compares the facade with
+`tests/architecture/org_signatures.json` (names, kinds, parameters and defaults of all 98 `Org` defs and of `Message`; regenerating it
+is a deliberate change of what callers can rely on: `uv run python -m orgmcp.app.tests._signatures --write`), and
+`app/tests/test_import_order.py` imports every module in a fresh interpreter in two orders.
+
 **Unit tests (default).** They use a deterministic fake agent (`tests/fake_agent.py`) in place of kiro. An autouse
 fixture (`tests/testkit/fixtures.py`) points `$HOME` and the profile directory at a temp dir and puts a stub `kiro-cli` first
 on `PATH`. A default run starts zero real-LLM runs: tests marked `@pytest.mark.integration` (and everything under

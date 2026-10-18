@@ -12,8 +12,6 @@ import pytest
 from orgmcp.app.tests import _signatures
 from orgmcp.app.tests._mixins import MIXINS
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: M2")
-
 APP = Path(__file__).resolve().parents[1]
 CORE = APP.parent / "core.py"
 
@@ -46,11 +44,10 @@ def test_org_is_the_composition_of_the_mixins_in_the_documented_order() -> None:
     assert Org.__module__ == "orgmcp.app.facade"
 
 
-def test_org_documents_its_mro() -> None:
-    from orgmcp.app.facade import Org
-
-    doc = Org.__doc__ or ""
-    assert all(name in doc for _, name, _ in MIXINS)
+def test_the_facade_module_documents_the_mro() -> None:
+    doc = importlib.import_module("orgmcp.app.facade").__doc__ or ""
+    positions = [doc.find(name) for _, name, _ in MIXINS]
+    assert -1 not in positions and positions == sorted(positions)  # every mixin, in the order of the bases
 
 
 def test_core_py_has_no_class_body_and_gets_org_from_the_facade() -> None:

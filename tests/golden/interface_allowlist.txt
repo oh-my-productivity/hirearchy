@@ -2,7 +2,6 @@
 # One module.Qualname per line. Refactor steps REMOVE entries; the end state is an empty list.
 orgmcp.blueprint.Issue
 orgmcp.blueprint.Summary
-orgmcp.core.Org
 orgmcp.dashboard_data.DashData
 orgmcp.dashboard_data.EventFeed
 orgmcp.dashboard_data.LenientOrg

@@ -54,7 +54,7 @@ def test_an_override_replaces_a_port_for_everyone_who_needs_it(tmp_path: Path) -
 
 
 def test_the_kernel_ports_read_and_write_the_files_the_org_methods_do(tmp_path: Path) -> None:
-    from orgmcp.core import Org
+    from orgmcp.app import Org
 
     org = Org.init(tmp_path / "org", "mission")
     runtime = wiring.open_runtime(org.root)
@@ -67,7 +67,7 @@ def test_the_kernel_ports_read_and_write_the_files_the_org_methods_do(tmp_path: 
 
 
 def test_the_ids_have_the_format_of_org_new_id(tmp_path: Path) -> None:
-    from orgmcp.core import Org
+    from orgmcp.app import Org
 
     org = Org.init(tmp_path / "org", "mission")
     pattern = r"\d{8}T\d{12}-ceo\.eng-[0-9a-f]{4}"

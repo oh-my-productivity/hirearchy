@@ -19,7 +19,7 @@ FILE = "---\nid: 20260101T000000000000-root-aaaa\nfrom: root\nto: ceo\ntype: not
 
 
 def test_org_ids_and_files_follow_the_patch_points(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    org = core.Org.init(tmp_path / "org", "mission")
+    org = getattr(core, "Org").init(tmp_path / "org", "mission")
     monkeypatch.setattr(core, "utcnow", lambda: FIXED)
     assert org.new_id("ceo").startswith("20310506T070809000000-ceo-")
     written: list[Path] = []
@@ -39,7 +39,7 @@ def test_the_module_level_names_that_core_exported_are_still_there() -> None:
                  "utcnow", "atomic_write", "_message_cap", "_short", "_fold", "_case_twin", "_FOLDED_RUNTIME_NAMES", "_EXACT_FILES",
                  "_PARSED", "_PARSED_MAX", "Message", "OrgError", "ROOT", "split_frontmatter", "join_frontmatter", "_visible", "_inside"):
         assert hasattr(core, name), name
-    assert core.Retired._fields == ("addr", "refunded", "refunded_to")
+    assert getattr(core, "Retired")._fields == ("addr", "refunded", "refunded_to")
 
 
 def test_message_load_builds_the_class_it_is_called_on(tmp_path: Path) -> None:
