@@ -8,6 +8,7 @@ from pathlib import Path
 from ..kernel import AtomicWriter, Clock, Environment, IdGenerator, LedgerStore, OrgLayout
 from ..locator import OrgLocator
 from ..settings import EventSwitch, OrgDocumentStore, OrgSettings
+from ..snapshots import GitClient, IgnoreList, OrgSnapshotter
 from ..templates import DocumentTemplates, Notices
 from ._resources import ProcessResources
 
@@ -31,3 +32,6 @@ class OrgRuntime:
     locator: OrgLocator
     document_templates: DocumentTemplates
     notices: Notices
+    git: GitClient
+    snapshotter: OrgSnapshotter
+    ignore_list: IgnoreList

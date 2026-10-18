@@ -5,8 +5,6 @@ to the interfaces of the package named above."""
 
 from __future__ import annotations
 
-import shutil
-import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -14,9 +12,14 @@ from .. import templates
 from ..kernel import BOXES, join_frontmatter, OrgError
 from ._compat import atomic_write
 from ._facade_settings import DEFAULT_CONFIG
+from .wiring import open_runtime
 
 if TYPE_CHECKING:
     from .facade import Org
+
+
+# What a new organization's .gitignore starts with (``IgnoreList.ensure_runtime_files`` adds the rest when a scheduler or an event needs it).
+INITIAL_IGNORE_LINES = (".tmp-*", "runs/", ".kiro/", ".runtime/scheduler.pid", ".runtime/events/")
 
 
 class BootstrapMixin:
@@ -33,9 +36,9 @@ class BootstrapMixin:
         for box in BOXES:
             (root / box).mkdir(exist_ok=True)
         (root / ".runtime").mkdir(exist_ok=True)
-        (root / ".gitignore").write_text(".tmp-*\nruns/\n.kiro/\n.runtime/scheduler.pid\n.runtime/events/\n", encoding="utf-8")
-        if shutil.which("git") and not (root / ".git").exists():
-            subprocess.run(["git", "init", "-q"], cwd=root, check=False)
+        snapshots = open_runtime(root)  # the ports of the new organization: the org itself is built after its ORG.md exists
+        snapshots.ignore_list.write_initial(INITIAL_IGNORE_LINES)
+        snapshots.snapshotter.init_repository()
         org = cls(root)
         org.commit("init organization")
         return org

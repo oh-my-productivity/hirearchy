@@ -88,10 +88,6 @@ module = ["orgmcp.app._facade_core"]
 ignore_errors = true
 
 [[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_snapshots"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
 module = ["orgmcp.app._facade_bootstrap"]
 ignore_errors = true
 
