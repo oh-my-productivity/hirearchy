@@ -92,31 +92,38 @@ class SwitchHarness:
     remove: Callable[[], None]
 
 
+@dataclass(frozen=True)
 class _Disk:
-    """ORG.md of a temporary organization directory, with modification times that the tests control: every ``put`` moves the time
-    forward by a millisecond (so the stamp changes whatever the filesystem's clock granularity), ``put_unnoticed`` keeps it."""
+    """ORG.md of a temporary organization directory, with modification times that the tests control."""
 
-    def __init__(self, root: Path) -> None:
-        self.path = root / "ORG.md"
-        self._mtime_ns = 1_700_000_000_000_000_000
+    put: Callable[[str], None]  # moves the time forward by a millisecond (so the stamp changes whatever the filesystem's granularity)
+    put_unnoticed: Callable[[str], None]  # keeps the modification time
+    remove: Callable[[], None]
+    text: Callable[[], str | None]
 
-    def put(self, text: str) -> None:
-        self._mtime_ns += 1_000_000
-        self.put_unnoticed(text)
 
-    def put_unnoticed(self, text: str) -> None:
-        self.path.write_text(text, encoding="utf-8")
-        os.utime(self.path, ns=(self._mtime_ns, self._mtime_ns))
+def _disk(root: Path) -> _Disk:
+    path, clock = root / "ORG.md", [1_700_000_000_000_000_000]
 
-    def remove(self) -> None:
-        self.path.unlink(missing_ok=True)
+    def put_unnoticed(text: str) -> None:
+        path.write_text(text, encoding="utf-8")
+        os.utime(path, ns=(clock[0], clock[0]))
 
-    def text(self) -> str | None:
-        return self.path.read_text(encoding="utf-8") if self.path.is_file() else None
+    def put(text: str) -> None:
+        clock[0] += 1_000_000
+        put_unnoticed(text)
+
+    def remove() -> None:
+        path.unlink(missing_ok=True)
+
+    def text() -> str | None:
+        return path.read_text(encoding="utf-8") if path.is_file() else None
+
+    return _Disk(put, put_unnoticed, remove, text)
 
 
 def fs_org_settings(tmp_path: Path) -> SettingsHarness:
-    disk = _Disk(tmp_path)
+    disk = _disk(tmp_path)
     return SettingsHarness(FsOrgSettings(OrgPaths(tmp_path), fs_atomic_writer(tmp_path).writer), disk.put, disk.remove)
 
 
@@ -126,13 +133,13 @@ def memory_org_settings(tmp_path: Path) -> SettingsHarness:
 
 
 def caching_org_settings(tmp_path: Path) -> SettingsHarness:
-    disk, paths = _Disk(tmp_path), OrgPaths(tmp_path)
+    disk, paths = _disk(tmp_path), OrgPaths(tmp_path)
     inner = FsOrgSettings(paths, fs_atomic_writer(tmp_path).writer)
     return SettingsHarness(CachingOrgSettings(inner, FsOrgDocumentStamp(paths), {}), disk.put, disk.remove, lenient=True)
 
 
 def fs_org_document_store(tmp_path: Path) -> DocumentHarness:
-    disk = _Disk(tmp_path)
+    disk = _disk(tmp_path)
     return DocumentHarness(FsOrgSettings(OrgPaths(tmp_path), fs_atomic_writer(tmp_path).writer), disk.text, disk.put)
 
 
@@ -142,7 +149,7 @@ def memory_org_document_store(tmp_path: Path) -> DocumentHarness:
 
 
 def fs_event_switch(tmp_path: Path) -> SwitchHarness:
-    disk, paths = _Disk(tmp_path), OrgPaths(tmp_path)
+    disk, paths = _disk(tmp_path), OrgPaths(tmp_path)
     documents = FsOrgSettings(paths, fs_atomic_writer(tmp_path).writer)
     return SwitchHarness(StampedEventSwitch(FsOrgDocumentStamp(paths), documents), disk.put, disk.put_unnoticed, disk.remove)
 
