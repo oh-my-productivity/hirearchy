@@ -12,8 +12,6 @@ from orgmcp.agents._registry import FsAgentRegistry
 from orgmcp.kernel import AtomicWriter, OrgPaths
 from orgmcp.kernel.testing import FailingAtomicWriter, MemoryAtomicWriter
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
-
 
 class RecordingWriter(AtomicWriter):
     """Writes through to the disk and remembers what it was asked."""
@@ -37,17 +35,24 @@ def test_building_it_writes_nothing(tmp_path: Path) -> None:
     assert writer.calls == [] and not (tmp_path / "nowhere").exists()
 
 
-def test_create_writes_the_memory_first_and_the_charter_last(tmp_path: Path) -> None:
-    writer = RecordingWriter()
+def test_create_makes_the_empty_memory_before_the_charter_is_written_through_the_writer(tmp_path: Path) -> None:
+    seen: list[bool] = []
+
+    class Spy(RecordingWriter):
+        def write(self, path: Path, text: str) -> None:
+            seen.append((path.parent / "MEMORY.md").read_text(encoding="utf-8") == "")
+            super().write(path, text)
+
+    writer = Spy()
     FsAgentRegistry(OrgPaths(tmp_path), writer).create("ceo", {"role": "R"}, "text")
-    assert writer.calls == [(tmp_path / "ceo" / "MEMORY.md", ""), (tmp_path / "ceo" / "AGENT.md", "---\nrole: R\n---\ntext\n")]
+    assert writer.calls == [(tmp_path / "ceo" / "AGENT.md", "---\nrole: R\n---\ntext\n")] and seen == [True]
 
 
 def test_the_skeleton_is_made_by_the_registry_not_by_the_writer(tmp_path: Path) -> None:
     writer = MemoryAtomicWriter()
     FsAgentRegistry(OrgPaths(tmp_path), writer).create("ceo", {"role": "R"}, "x")
-    assert sorted(p.name for p in (tmp_path / "ceo").iterdir()) == ["inbox", "inflight", "read", "runs", "sent", "work"]
-    assert set(writer.files) == {tmp_path / "ceo" / "MEMORY.md", tmp_path / "ceo" / "AGENT.md"}
+    assert sorted(p.name for p in (tmp_path / "ceo").iterdir()) == ["MEMORY.md", "inbox", "inflight", "read", "runs", "sent", "work"]
+    assert set(writer.files) == {tmp_path / "ceo" / "AGENT.md"}
 
 
 def test_a_failed_charter_write_leaves_a_directory_that_is_no_agent(tmp_path: Path) -> None:
@@ -59,12 +64,20 @@ def test_a_failed_charter_write_leaves_a_directory_that_is_no_agent(tmp_path: Pa
     assert FsAgentDirectory(paths).exists("ceo") is False and FsAgentDirectory(paths).agents() == []
 
 
-def test_a_failed_memory_write_stops_before_the_charter(tmp_path: Path) -> None:
-    inner = RecordingWriter()
-    writer = FailingAtomicWriter(inner, fails=lambda path: path.name == "MEMORY.md")
+def test_a_memory_that_cannot_be_made_stops_before_the_charter(tmp_path: Path) -> None:
+    (tmp_path / "ceo" / "MEMORY.md").mkdir(parents=True)  # a directory where the file should go
+    writer = RecordingWriter()
     with pytest.raises(OSError):
         FsAgentRegistry(OrgPaths(tmp_path), writer).create("ceo", {"role": "R"}, "x")
-    assert inner.calls == [] and not (tmp_path / "ceo" / "AGENT.md").exists()
+    assert writer.calls == [] and not (tmp_path / "ceo" / "AGENT.md").exists()
+
+
+def test_creating_over_an_agent_empties_its_memory(tmp_path: Path) -> None:
+    """What ``hire`` always did when it got that far; the callers refuse to hire over an existing agent."""
+    (tmp_path / "ceo").mkdir()
+    (tmp_path / "ceo" / "MEMORY.md").write_text("notes", encoding="utf-8")
+    FsAgentRegistry(OrgPaths(tmp_path), RecordingWriter()).create("ceo", {"role": "R"}, "x")
+    assert (tmp_path / "ceo" / "MEMORY.md").read_text(encoding="utf-8") == ""
 
 
 def test_the_directories_of_an_existing_agent_directory_are_kept(tmp_path: Path) -> None:

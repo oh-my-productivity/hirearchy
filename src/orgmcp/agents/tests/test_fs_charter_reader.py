@@ -10,8 +10,6 @@ from orgmcp.agents import CharterReader
 from orgmcp.agents._charters import FsCharterReader
 from orgmcp.kernel import OrgPaths
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
-
 
 def test_it_is_a_charter_reader(tmp_path: Path) -> None:
     assert isinstance(FsCharterReader(OrgPaths(tmp_path)), CharterReader)

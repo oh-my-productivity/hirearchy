@@ -9,8 +9,6 @@ from orgmcp.agents import CharterReader
 from orgmcp.agents._caching import CharterStamps, LenientCharterReader
 from orgmcp.kernel import JsonObject
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
-
 
 class ScriptedCharters(CharterReader):
     def __init__(self) -> None:
@@ -119,13 +117,18 @@ def test_a_charter_that_recovers_is_no_longer_reported() -> None:
     assert reader.charter("ceo") == ({"role": "ceo"}, "body") and problems == {}
 
 
-def test_a_cached_charter_stays_when_the_file_is_gone_until_it_is_asked_about_again() -> None:
+def test_a_cached_charter_is_served_again_when_the_file_is_back_unchanged_and_the_old_problem_stays_listed() -> None:
+    """What ``LenientOrg.charter`` always did: a cache hit returns before the problem of the failure in between is cleared."""
     reader, inner, stamps, problems = make()
     good = reader.charter("ceo")
     stamps.values["ceo"] = FileNotFoundError("gone")
     assert reader.charter("ceo") == ({"role": "?"}, "") and problems == {"ceo/AGENT.md": "FileNotFoundError"}
-    stamps.values["ceo"] = (1, 10)  # the file is back, unchanged: the entry of before is still good
-    assert reader.charter("ceo") is good and problems == {}
+    stamps.values["ceo"] = (1, 10)
+    assert reader.charter("ceo") is good and inner.reads == ["ceo"]
+    assert problems == {"ceo/AGENT.md": "FileNotFoundError"}
+    stamps.values["ceo"] = (2, 10)  # it is read again, and the problem is gone
+    reader.charter("ceo")
+    assert problems == {}
 
 
 def test_other_problems_in_the_mapping_are_left_alone() -> None:

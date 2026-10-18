@@ -9,13 +9,12 @@ import pytest
 from orgmcp.agents import CharterReader
 from orgmcp.agents.testing import IMPLEMENTATIONS, AgentsHarness
 
-from . import _red as red
 from ._support import agent, make
 
 ROOT_CHARTER = ({"role": "human (root of the organization)"}, "")
 
 
-@pytest.fixture(params=red.params(IMPLEMENTATIONS[CharterReader]))
+@pytest.fixture(params=IMPLEMENTATIONS[CharterReader], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> AgentsHarness:
     made = make(request, tmp_path)
     assert isinstance(made.charters, CharterReader)

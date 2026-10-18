@@ -10,14 +10,13 @@ from orgmcp.agents import AgentRegistry
 from orgmcp.agents.testing import IMPLEMENTATIONS, AgentsHarness
 from orgmcp.kernel import join_frontmatter
 
-from . import _red as red
 from ._support import agent, make
 
 SKELETON = ["AGENT.md", "MEMORY.md", "inbox", "inflight", "read", "runs", "sent", "work"]
 META = {"role": "Engineer", "model": "m-1", "tools": ["read", "write"], "can_hire": False, "max_children": 5, "hired_by": "ceo"}
 
 
-@pytest.fixture(params=red.params(IMPLEMENTATIONS[AgentRegistry]))
+@pytest.fixture(params=IMPLEMENTATIONS[AgentRegistry], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> AgentsHarness:
     made = make(request, tmp_path)
     assert isinstance(made.registry, AgentRegistry)

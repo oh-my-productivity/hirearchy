@@ -11,8 +11,6 @@ from orgmcp.agents._tree import TreeDirectory
 from orgmcp.kernel import OrgError
 from orgmcp.kernel.testing import FakeClock
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
-
 SECOND = 1_000_000_000
 
 

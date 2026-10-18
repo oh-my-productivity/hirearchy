@@ -10,8 +10,6 @@ from orgmcp.agents import AgentDirectory
 from orgmcp.agents._directory import FsAgentDirectory
 from orgmcp.kernel import OrgLayout, OrgPaths
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
-
 
 class RecordingLayout(OrgLayout):
     """The paths of a real organization directory, remembering which agent directories were asked for."""
