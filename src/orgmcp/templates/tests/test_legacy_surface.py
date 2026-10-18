@@ -18,10 +18,6 @@ from orgmcp.templates._notices import StaticNotices
 from ._cases import CASES, KIRO_PROFILE_ARGS, LEGACY_NAME, Case
 from ._golden import expected, render
 
-red = pytest.mark.xfail(strict=True, reason="red: A-templates", raises=NotImplementedError)
-
-
-@red
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
 def test_an_old_function_returns_what_the_new_method_returns(case: Case) -> None:
     implementation = StaticDocumentTemplates() if case.port == "documents" else StaticNotices()

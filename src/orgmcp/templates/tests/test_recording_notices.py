@@ -7,14 +7,10 @@ import pytest
 from orgmcp.templates import Notices
 from orgmcp.templates.testing import RecordingNotices
 
-red = pytest.mark.xfail(strict=True, reason="red: A-templates", raises=NotImplementedError)
-
-
 def test_it_is_a_notices() -> None:
     assert isinstance(RecordingNotices(), Notices)
 
 
-@red
 def test_it_records_every_call_with_its_defaults_filled_in() -> None:
     notices = RecordingNotices()
     notices.failures("a", 3, "log")
@@ -27,7 +23,6 @@ def test_it_records_every_call_with_its_defaults_filled_in() -> None:
     ]
 
 
-@red
 def test_the_text_it_returns_names_the_method_and_the_arguments() -> None:
     notices = RecordingNotices()
     assert notices.budget("ceo/eng", 3) == "budget: ceo/eng | 3"
@@ -35,7 +30,6 @@ def test_the_text_it_returns_names_the_method_and_the_arguments() -> None:
     assert notices.stalled("ceo", "T-1", "Build", ["ceo", "root"]) == "stalled: ceo | T-1 | Build | ['ceo', 'root']"
 
 
-@red
 def test_two_recorders_do_not_share_their_calls() -> None:
     first, second = RecordingNotices(), RecordingNotices()
     first.nudge("T-1", "t")
