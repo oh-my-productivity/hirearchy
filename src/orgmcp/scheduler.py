@@ -71,10 +71,13 @@ def file_confinement(
     * ``read``/``write`` must NOT be in ``allowedTools``: a tool there ignores ``allowedPaths``. Left out, a call inside
       ``allowedPaths`` runs unprompted and any other path asks for an approval, which ``--no-interactive`` cannot
       give, so it is refused.
-    * ``write``: only under the workspace (``[]`` without one: nowhere). ``read``: workspace + inputs; a directory
+    * ``write``: only under the workspace (``[]`` without one: nowhere). ``read``: workspace + inputs + the organization
+      (read-only: orgmcp's own ``read`` may read anything in the org, and an agent that holds the built-in ``read``
+      sees only that one: it hides orgmcp's ``read``, same short name, see studies/F-read-experiment); a directory
       needs both ``P`` and ``P/**`` to be listable.
     * ``deniedPaths`` on the org directory is a hard deny even for kiro's own "current directory is readable" rule:
-      the organization is reached through orgmcp tools only. Skipped when the workspace is inside the org.
+      the org is never written with kiro's tools (orgmcp ``write`` does that), so ``write`` keeps the deny. ``read``
+      has none: a deny would beat the allow above. Skipped when the workspace is inside the org.
     * ``shell`` stays in ``allowedTools`` and is NOT confined (kiro has no path rule for it).
     """
     org_root = Path(org_root).resolve()
@@ -83,8 +86,8 @@ def file_confinement(
     if "write" in tools:
         settings["write"] = {"allowedPaths": [f"{workspace}/**"] if workspace is not None else [], "deniedPaths": deny}
     if "read" in tools:
-        bases = [p for p in (workspace, *inputs) if p is not None]
-        settings["read"] = {"allowedPaths": [x for p in bases for x in (str(p), f"{p}/**")], "deniedPaths": deny}
+        bases = [p for p in (workspace, *inputs, org_root) if p is not None]
+        settings["read"] = {"allowedPaths": list(dict.fromkeys(x for p in bases for x in (str(p), f"{p}/**"))), "deniedPaths": []}
     return [t for t in tools if t not in FILE_TOOLS], settings
 
 
@@ -102,7 +105,7 @@ def ensure_kiro_profile(
 
     ``confine=False``: the shared profile of the org for this tool set; every granted tool runs unprompted.
     ``confine=True``: the profile of an agent with built-in ``read``/``write``: they are limited to ``workspace`` (write)
-    and ``workspace`` + ``inputs`` (read), see :func:`file_confinement`. Its name carries a hash of that access, so
+    and ``workspace`` + ``inputs`` + the org itself (read), see :func:`file_confinement`. Its name carries a hash of that access, so
     agents with the same tools and access share a profile and different access never does.
 
     The directory is resolved when called (not when defined), so ``KIRO_AGENTS_DIR`` can be redirected.

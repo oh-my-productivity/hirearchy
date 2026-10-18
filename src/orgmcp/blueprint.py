@@ -926,6 +926,12 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
         blind = [r for r in work if not any(_within(r, b) for b in held)]
         if blind:
             issues.append(Issue("warning", a.where, f"{a.addr} reviews work in {', '.join(map(str, blind))} but cannot read it (not in its workspace or inputs), so it would review pasted text, not the files; drop its explicit inputs (by default a verifier gets the project and authors' workspaces read-only) or add the path", "verifier-cannot-read"))
+    # an author without a write tool leaves its work in its org folder (`<addr>/work/`): the verifier must be able to open it
+    org_authors = [a.addr for a in agents if a.kind == "author" and not any(t in a.tools for t in WRITE_TOOLS)]
+    if org_authors:
+        for a in agents:
+            if a.kind == "verifier" and not a.children and not org_files_readable(a):
+                issues.append(Issue("warning", a.where, f"{a.addr} reviews work that {', '.join(org_authors)} leave in the organization's folders, but its tools cannot read the organization's files, so it would review pasted text, not the files; give it orgmcp read (leave out the built-in read) or make the files reachable", "verifier-cannot-read"))
 
     # --- workspace confinement: whoever can write files or run commands is confined to a workspace
     for a in agents:
@@ -1205,16 +1211,40 @@ def default_playbook(owner: Agent, agents: list[Agent], service: dict, budget: i
 # ----------------------------------------------------------------------------------------------- plan
 
 
+_ORG_PLACEHOLDER = Path("/orgmcp-org-root")  # stands for the org directory, which does not exist at plan time
+
+
+def org_files_readable(a: Agent) -> bool:
+    """Can this agent open files in the organization (its own and its teammates' ``work/``) with the tools it holds?
+
+    Without built-in ``read`` it uses orgmcp's ``read``. With it, the built-in ``read`` is the only ``read`` the model
+    sees (it hides orgmcp's, same short name), so the answer comes from what the runtime really allows it: the same
+    ``scheduler.file_confinement`` that writes the profile, asked about a stand-in org directory.
+    """
+    if "read" not in a.tools:
+        return True
+    from . import scheduler  # late: the scheduler is the one place that knows what kiro is allowed to read
+
+    ws = Path(a.workspace) if a.workspace else None
+    _, settings = scheduler.file_confinement(_ORG_PLACEHOLDER, list(a.tools), ws, [Path(p) for p in a.inputs])
+    rule = settings.get("read", {})
+    root = str(_ORG_PLACEHOLDER)
+    denied = any(root == d or root.startswith(d.removesuffix("/**").rstrip("/") + "/") for d in rule.get("deniedPaths", []))
+    return f"{root}/**" in rule.get("allowedPaths", []) and not denied
+
+
 def access_facts(a: Agent) -> dict:
     """What the runtime lets this agent reach with kiro's file tools: the ONE computation behind both the technical
     ``Access:`` line (``_access``, in the details and each agent's prompt) and the plain-words line of the PLAN FOR YOU
     (``_agent_access``), so the user is shown exactly what is enforced. Mirrors ``scheduler.file_confinement``:
-    ``write`` only under the workspace, ``read`` in workspace + inputs, ``shell`` not confined.
+    ``write`` only under the workspace, ``read`` in workspace + inputs + the organization (read-only), ``shell`` not
+    confined.
     """
     read = "read" in a.tools
     return {
         "write": ("write" in a.tools, a.workspace),                 # (granted, the only folder it may change)
         "read": (read, [b for b in (a.workspace, *a.inputs) if b]),  # (granted, every folder kiro lets it read)
+        "org": org_files_readable(a),                                # can open the organization's own files (any tool)
         "inputs": list(a.inputs),                                    # read-only folders
         "inputs_via_orgmcp": bool(a.inputs) and not read,            # inputs it can only open with orgmcp `read`
         "shell": ("shell" in a.tools, a.workspace),                  # (granted, where it is told to stay; not enforced)
@@ -1230,7 +1260,8 @@ def _access(a: Agent) -> str:
         bits.append(f"kiro write only in {a.workspace}" if a.workspace else "kiro write nowhere")
     if f["read"][0]:
         bases = f["read"][1]
-        bits.append("kiro read only in " + ", ".join(bases) if bases else "kiro read nowhere")
+        org = " and in the organization's own files (read-only)" if f["org"] else ""
+        bits.append("kiro read only in " + ", ".join(bases) + org if bases else ("kiro read only in the organization's own files (read-only)" if f["org"] else "kiro read nowhere"))
     if f["inputs_via_orgmcp"]:
         bits.append("read-only inputs (orgmcp read): " + ", ".join(f["inputs"]))
     if f["shell"][0]:
@@ -1437,10 +1468,11 @@ def _agent_access(a: Agent) -> str:
     if f["read"][0]:
         bases = f["read"][1]
         ins = f["inputs"]
+        org = " and the organization's own files" if f["org"] else ""
         if f["write"][0] and ws:
-            bits.append("can read files in " + ", ".join(bases) + (f" ({', '.join(ins)} read-only)" if ins else ""))
+            bits.append("can read files in " + ", ".join(bases) + (f" ({', '.join(ins)} read-only)" if ins else "") + org)
         elif bases:
-            bits.append("can read files only in " + ", ".join(bases))
+            bits.append("can read files only in " + ", ".join(bases) + org)
         else:
             bits.append("can read no files outside the organization")
     elif f["inputs_via_orgmcp"]:
