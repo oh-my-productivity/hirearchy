@@ -15,7 +15,7 @@ import pytest
 import yaml
 
 from orgmcp import blueprint as bpm
-from orgmcp.core import ROOT, Org, OrgError
+from orgmcp.core import ROOT, Org, OrgError, atomic_write
 from orgmcp.scheduler import ensure_kiro_profile, kiro_profile_name, kiro_runner
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "blueprint-research.yaml"
@@ -174,9 +174,14 @@ def test_a_manager_cannot_widen_a_charter_by_editing_it(team, dirs):
     wide = f"---\nrole: Writer\ntools: [read]\ninputs: ['{dirs['elsewhere']}']\n---\nW.\n"
     with pytest.raises(OrgError, match="inputs must be inside"):
         team.write("lead", "lead/writer/AGENT.md", wide)
-    unconfined = "---\nrole: Writer\ntools: [read]\n---\nW.\n"  # dropping `inputs` would unconfine its read
+    omitted = "---\nrole: Writer\ntools: [read]\n---\nW.\n"  # leaving `inputs` out keeps the old (confined) list
+    team.write("lead", "lead/writer/AGENT.md", omitted)
+    assert team.charter("lead/writer")[0]["inputs"] == [str(dirs["handbook/hr"])]
+    # a legacy charter (read, no workspace, no `inputs` key) cannot be rewritten by a confined manager
+    legacy = "---\nrole: Writer\ntools: [read]\n---\nW.\n"
+    atomic_write(team.dir("lead/writer") / "AGENT.md", legacy)
     with pytest.raises(OrgError, match="needs an `inputs:` list"):
-        team.write("lead", "lead/writer/AGENT.md", unconfined)
+        team.write("lead", "lead/writer/AGENT.md", omitted)
 
 
 def test_a_confined_hirer_never_hands_down_an_unconfined_read(team):

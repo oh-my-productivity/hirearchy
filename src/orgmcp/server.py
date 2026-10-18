@@ -335,11 +335,13 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
         "<you>/work/plan.md".
 
         You may also rewrite a direct report's charter ("<you>/<name>/AGENT.md"). Inboxes, logs and your own
-        charter are managed by the runtime; use send/delegate/report to communicate.
+        charter are managed by the runtime; use send/delegate/report to communicate. A charter rewrite keeps every
+        frontmatter key (tools, inputs, model, ...) that your new text does not set; the reply lists what was kept
+        and what changed.
         """
         org = binding.get()
-        p = org.write(me, path, content, append=append)
-        return f"wrote {p.relative_to(org.root)} (organization file)"
+        p, note = org.write_noted(me, path, content, append=append)
+        return f"wrote {p.relative_to(org.root)} (organization file)" + (f". {note}" if note else "")
 
     @mcp.tool()
     def status() -> str:
