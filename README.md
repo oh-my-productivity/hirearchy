@@ -728,6 +728,10 @@ uv run python -m tests.architecture.gen_importlinter    # print the generated co
 uv run pytest -q tests/architecture                     # the structural rules (or `-m "not architecture"` to leave them out)
 ```
 
+**Parallel steps.** A refactor step adds the fields of its package to its own `src/orgmcp/app/fields_<pkg>.py` (`OrgRuntime` is composed of those parts and
+`runtime.py` is never edited), marks itself done there with `STEP = "<step>"`, and keeps its tests' count in its own `tests/count.txt`
+(`uv run python -m tests.architecture.collected_count --write`; `tests/architecture/baseline_test_count.txt` is fixed). See ARCHITECTURE.md 9.2.
+
 **Where tests live.** `tests/` holds the cross-feature, end-to-end and golden tests and the helper modules (`fake_agent.py`,
 `kiro_sandbox.py`, ...; `tests/` is on `sys.path`). A feature package keeps its own tests next to its code, in
 `src/orgmcp/<feature>/tests/` (give that directory an `__init__.py`, so two features may both have a `test_api.py`;

@@ -80,81 +80,10 @@ disallow_untyped_decorators = false
 module = ["orgmcp.app", "orgmcp.app.*"]
 disable_error_code = ["type-abstract"]
 
-# DEBT, only shrinks (ARCHITECTURE.md 8.1): the 20 mixins of the Org facade are the former core.Org moved verbatim (step M2) and still carry its
-# untyped legacy bodies. One table per mixin, so that each feature step deletes exactly its own when it turns the bodies into typed calls to
-# the interfaces of `self.runtime`; the last one goes with the facade slimming (E2).
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_core"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_bootstrap"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_agents"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_runs"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_mail"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_telemetry"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_access"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_traces"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_delivery"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_files"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_strays"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_budget"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_eligibility"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_hierarchy"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_dispatch"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_services"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_overview"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = ["orgmcp.app._facade_prompts"]
-ignore_errors = true
-
+# DEBT, only shrinks (ARCHITECTURE.md 8.1): the mixins of the Org facade are the former core.Org moved verbatim (step M2) and still carry its
+# untyped legacy bodies. The debt is the first line `# mypy: ignore-errors` of each `app/_facade_<pkg>.py` (not a table here: identical
+# neighbouring tables cannot be told apart by git, so two steps deleting neighbours conflicted); a feature step deletes that line of its own mixin
+# when it turns the bodies into typed calls to the interfaces of `self.runtime`; the last one goes with the facade slimming (E2).
 [[tool.mypy.overrides]]
 # PyYAML ships no type stubs and the stubs package is deliberately not a dev dependency (exact pins only):
 # a strict package wraps yaml behind its own typed function instead of letting Any leak through its API.

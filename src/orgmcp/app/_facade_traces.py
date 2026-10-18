@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Which request trace a message belongs to (traces).
 
 Moved verbatim from ``core.Org`` in step M2 (ARCHITECTURE.md 5.3 and 6.4); a later step replaces the bodies by calls

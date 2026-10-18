@@ -1,7 +1,7 @@
 """``OrgRuntime`` has one field per port of ARCHITECTURE.md section 3 (3.1-3.35; 3.36 are the entry points' own ports).
 
-The ports whose step has not run yet are listed in ``PENDING`` with that step, as strict xfails: the step that adds the field turns
-its test into an unexpected pass, which fails until the step deletes the entry. The list only shrinks.
+The ports whose step has not run yet are strict xfails (``STEP`` below names the step): the step that adds the field marks itself done in
+its ``app/fields_<pkg>.py``, which turns the xfail into a requirement. The pending set only shrinks.
 """
 
 from __future__ import annotations
@@ -15,6 +15,8 @@ import pytest
 
 from orgmcp.app.runtime import OrgRuntime
 
+from . import _parts
+
 DOCUMENT = Path(__file__).resolve().parents[4] / "ARCHITECTURE.md"
 
 # section of ARCHITECTURE.md -> the step that adds the fields of its ports
@@ -26,10 +28,10 @@ STEP = {
     "3.24": "C-prompts", "3.25": "C-health", "3.26": "C-review", "3.27": "C-stalls", "3.28": "C-attention", "3.29": "C-daemon",
     "3.30": "C-progress", "3.31": "C-obs-2", "3.32": "C-blueprint-2", "3.33": "A-bootstrap", "3.34": "B-kiro", "3.35": "C-dashdata",
 }
-# steps that are done: their ports have a field (or are listed in NOT_A_FIELD)
-DONE = {"M2", "A-settings", "A-templates", "A-snapshots", "A-processes"}
-NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a step that finds one lists it here)
-NOT_A_FIELD["ProcessHandle"] = "a value that ProcessSpawner.spawn returns for each process, not a port that is built once"  # A-processes
+# Steps that are done: their ports have a field (or are in NOT_A_FIELD). Neither is listed here: a step marks itself in the part it fills
+# (``STEP = "<step>"`` and ``NOT_A_FIELD = {port: why}`` of ``app/fields_<pkg>.py``), so that no two steps edit the same line.
+DONE = _parts.done_steps()
+NOT_A_FIELD = _parts.not_a_field()
 # kernel ports whose real implementation another step writes (kernel/tests: contract_debt.PENDING)
 ELSEWHERE = {"EventSink": "A-telemetry", "TraceTap": "A-telemetry"}
 

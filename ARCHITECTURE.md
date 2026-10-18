@@ -2365,11 +2365,30 @@ safety-net track (assumed to live under `tests/golden/`; if the track chooses an
 
 ### 9.2 Why parallel steps do not collide
 
-A step touches only: (a) its own package directory (new files), (b) its own `app/wire_<pkg>.py` (providers are discovered by scanning `app/wire_*.py`, so
-**no shared registry line**), (c) its own `app/_facade_<pkg>.py` mixin, (d) the legacy module(s) it converts in place and the legacy call sites inside
-*those* modules, (e) the tests it converts (7.4) and its own `tests/` directories, (f) one `[[tool.mypy.overrides]]` table in `pyproject.toml` (deleted/replaced; disjoint hunks).
-`tests/architecture/graph.py`, `.importlinter` (generated) and `ARCHITECTURE.md` are not edited by feature steps. The only remaining conflict candidates are
-(f) and the `Org` mixins' imports at the top of `app/facade.py` (fixed by M2: the base list of all 20 mixins is final), so merges are mechanical.
+A step touches only: (a) its own package directory (new files), (b) its own `app/wire_<pkg>.py` (providers are discovered by scanning `app/wire_*.py`),
+(c) its own `app/fields_<pkg>.py` (see below), (d) its own `app/_facade_<pkg>.py` mixin, (e) the legacy module(s) it converts in place and the legacy call
+sites inside *those* modules, (f) the tests it converts (7.4) and its own `tests/` directories. Everything else that used to be a shared registry is now
+one file or one line per package, so merges are mechanical. **A step never edits** `app/runtime.py`, `app/wiring.py`, `app/facade.py`, `pyproject.toml`,
+`tests/architecture/baseline_test_count.txt`, `tests/architecture/graph.py`, `.importlinter` (generated) or this document. What replaced each shared line:
+
+* **`OrgRuntime` fields.** `OrgRuntime` is `class OrgRuntime(fields_app.Fields, fields_kernel.Fields, fields_mail.Fields, ...)`: one frozen dataclass
+  `Fields` per package in `app/fields_<pkg>.py`, all of them (39: `app`, `kernel`, the 36 features, `scheduler`) already listed in `runtime.py`, empty
+  until their step. A step adds `name: Port` lines to *its* `Fields` (imports of its own package's `api` at the top of *its* file) and builds them in
+  its `wire_<pkg>.py`; `runtime.<field>` stays a plain attribute that mypy checks. Field names are unique across parts (`test_runtime_composition`
+  fails on a clash; name the field after what it is, `document_templates`, not `documents`), and a part declares only ports of its own package.
+  A new part (an entry point that needs a field, ...) is one new `fields_<pkg>.py` plus one line in `runtime.py`, made by the manager.
+* **Done steps.** `test_runtime_fields` takes the done steps from the parts: a step sets `STEP = "<its step id>"` in each `fields_<pkg>.py` it filled, and
+  lists in that part's `NOT_A_FIELD = {port: why}` every port of its section that is not a field (e.g. `ProcessHandle`). No set literal is shared.
+* **mypy debt.** The first line of an `app/_facade_<pkg>.py` mixin is `# mypy: ignore-errors` (it replaced the `[[tool.mypy.overrides]]` tables of 8.1,
+  which were identical neighbouring blocks that git could not tell apart); the step deletes that line from its own mixin when it types the bodies.
+* **Test count.** `baseline_test_count.txt` is fixed at the pre-refactor count and is never edited. Each colocated `src/orgmcp/<pkg>/tests/` directory
+  records its own floor in `count.txt` beside its tests (a new package's step creates it with
+  `uv run python -m tests.architecture.collected_count --write`; the check is `collected >= floor` per directory). Do not raise the floor of `app/tests`
+  (shared by all steps); a floor is raised only by the step that owns the directory.
+
+Still shared, so still a possible textual conflict, and resolved by hand when two steps edit neighbours: the legacy modules that several steps convert in
+place (`scheduler.py`, `server.py`, `cli.py`, ...: imports at the top), the entries of `tests/golden/interface_allowlist.txt` (one line per class; delete
+only your own) and the per-module rows of `tests/architecture/legacy_exports.py`.
 
 ### 9.3 Schedule
 

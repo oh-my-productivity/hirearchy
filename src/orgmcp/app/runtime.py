@@ -1,42 +1,97 @@
-"""``OrgRuntime``: the objects of one organization, one field per port (ARCHITECTURE.md 6.2)."""
+"""``OrgRuntime``: the objects of one organization, one field per port (ARCHITECTURE.md 6.2).
+
+The fields are declared by the parts ``app/fields_<pkg>.py`` (one per package, 9.2) and only composed here: the list of bases is final,
+so a step that gives its package ports never edits this file.
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 
-from ..kernel import AtomicWriter, Clock, Environment, IdGenerator, LedgerStore, OrgLayout
-from ..locator import OrgLocator
-from ..processes import OrphanJudge, ProcessInspector, ProcessSignaller, ProcessSpawner
-from ..settings import EventSwitch, OrgDocumentStore, OrgSettings
-from ..snapshots import GitClient, IgnoreList, OrgSnapshotter
-from ..templates import DocumentTemplates, Notices
-from ._resources import ProcessResources
+from . import (
+    fields_access,
+    fields_agents,
+    fields_app,
+    fields_attention,
+    fields_blueprint,
+    fields_bootstrap,
+    fields_budget,
+    fields_daemon,
+    fields_dashdata,
+    fields_delivery,
+    fields_dispatch,
+    fields_eligibility,
+    fields_eventlog,
+    fields_health,
+    fields_hierarchy,
+    fields_kernel,
+    fields_kiro,
+    fields_locator,
+    fields_mail,
+    fields_observability,
+    fields_orgfiles,
+    fields_overview,
+    fields_processes,
+    fields_progress,
+    fields_prompts,
+    fields_reflection,
+    fields_review,
+    fields_runs,
+    fields_scheduler,
+    fields_services,
+    fields_settings,
+    fields_skill,
+    fields_snapshots,
+    fields_stalls,
+    fields_strays,
+    fields_telemetry,
+    fields_templates,
+    fields_traces,
+    fields_upgrade,
+)
 
 
 @dataclass(frozen=True)
-class OrgRuntime:
-    """Data only: the ports of one organization root, built by ``wiring.open_runtime``. A step that gives a package its
-    interfaces adds the field(s) here and the providers in its ``wire_<pkg>.py``."""
-
-    root: Path
-    resources: ProcessResources
-    paths: OrgLayout
-    clock: Clock
-    ids: IdGenerator
-    atomic_writer: AtomicWriter
-    ledgers: LedgerStore
-    environment: Environment
-    settings: OrgSettings
-    documents: OrgDocumentStore
-    event_switch: EventSwitch
-    locator: OrgLocator
-    document_templates: DocumentTemplates
-    notices: Notices
-    git: GitClient
-    snapshotter: OrgSnapshotter
-    ignore_list: IgnoreList
-    process_spawner: ProcessSpawner
-    process_inspector: ProcessInspector
-    process_signaller: ProcessSignaller
-    orphan_judge: OrphanJudge
+class OrgRuntime(
+    fields_access.Fields,
+    fields_agents.Fields,
+    fields_app.Fields,
+    fields_attention.Fields,
+    fields_blueprint.Fields,
+    fields_bootstrap.Fields,
+    fields_budget.Fields,
+    fields_daemon.Fields,
+    fields_dashdata.Fields,
+    fields_delivery.Fields,
+    fields_dispatch.Fields,
+    fields_eligibility.Fields,
+    fields_eventlog.Fields,
+    fields_health.Fields,
+    fields_hierarchy.Fields,
+    fields_kernel.Fields,
+    fields_kiro.Fields,
+    fields_locator.Fields,
+    fields_mail.Fields,
+    fields_observability.Fields,
+    fields_orgfiles.Fields,
+    fields_overview.Fields,
+    fields_processes.Fields,
+    fields_progress.Fields,
+    fields_prompts.Fields,
+    fields_reflection.Fields,
+    fields_review.Fields,
+    fields_runs.Fields,
+    fields_scheduler.Fields,
+    fields_services.Fields,
+    fields_settings.Fields,
+    fields_skill.Fields,
+    fields_snapshots.Fields,
+    fields_stalls.Fields,
+    fields_strays.Fields,
+    fields_telemetry.Fields,
+    fields_templates.Fields,
+    fields_traces.Fields,
+    fields_upgrade.Fields,
+):
+    """Data only: the ports of one organization root, built by ``wiring.open_runtime``. The fields come from the parts; each is typed by a
+    Protocol of its package, and ``runtime.<field>`` is checked by mypy as if it were declared here."""

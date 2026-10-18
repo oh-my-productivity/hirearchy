@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Run budget: held, handed down, taken back (budget).
 
 Moved verbatim from ``core.Org`` in step M2 (ARCHITECTURE.md 5.3 and 6.4); a later step replaces the bodies by calls

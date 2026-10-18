@@ -30,7 +30,7 @@ WRITE_CALLS = frozenset({"write_text", "write_bytes", "atomic_write", "replace",
 PACKAGE_DATA: dict[str, tuple[str, ...]] = {
     "blueprint": ("roles",),
     "dashboard": ("*.tcss",),
-    "app": ("wiring.py", "runtime.py", "facade.py", "wire_*.py"),  # the composition root's public modules (ARCHITECTURE.md 6.1)
+    "app": ("wiring.py", "runtime.py", "facade.py", "wire_*.py", "fields_*.py"),  # the composition root's public modules (6.1; fields_*: the parts of OrgRuntime, 9.2)
 }
 MUTABLE_FACTORIES = frozenset({"OrderedDict", "defaultdict", "deque", "Counter", "local", "Lock", "RLock", "dict", "list", "set"})
 
