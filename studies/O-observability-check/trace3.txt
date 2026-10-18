@@ -1,0 +1,5 @@
+trace 20261018T093211981048-root-723b "Third check" -> worker: done
+     +0s  root -> worker task "Third check" +2 run(s)
+     +0s    run 20261018T093212082897 ok, ran 16s, queued 105ms, 3 call(s) [report×1 whoami×1 write×1]
+    +11s    worker -> root result (done) "Third check" +1 run(s)
+totals: wall 11s | runs 1 (budget given 2, returned 1) | run time 16s | queue 105ms | waiting on you 0s | tool calls 3 (0 refused)

@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import IO, Callable, NamedTuple
 
-from . import review, templates
+from . import review, telemetry, templates
 from .core import ROOT, Org, OrgError, atomic_write
 from .health import config_number
 
@@ -175,6 +175,11 @@ class Run:
     started: float
     batch: int
     strays: dict | None = None  # paths of the agent's workspace that could hold stray org files, before the run
+    run_id: str = ""  # "<agent>@<run log stem>": the id events and the agent's MCP server (ORG_RUN_ID) carry
+    traces: tuple = ()  # distinct traces of the batch
+    budget_before: int | None = None
+    killed: bool = False
+    timed_out: bool = False
 
 
 def _signal_group(proc: subprocess.Popen, sig: int) -> None:
@@ -266,7 +271,8 @@ def ignore_runtime_files(root: Path) -> None:
     path = Path(root) / ".gitignore"
     try:
         text = path.read_text(encoding="utf-8") if path.exists() else ""
-        missing = [line for line in (".runtime/running.json", ".runtime/scheduler.log", EXIT_FILE) if line not in text.split()]
+        missing = [line for line in (".runtime/running.json", ".runtime/scheduler.log", EXIT_FILE, ".runtime/events/")
+                   if line not in text.split()]
         if missing:
             path.write_text((text.rstrip("\n") + "\n" if text else "") + "\n".join(missing) + "\n", encoding="utf-8")
     except OSError:
@@ -302,6 +308,21 @@ def _command_line(pid: int) -> str | None:
     return out.strip() or None
 
 
+def _root_arguments(tokens: list[str]) -> list[str]:
+    """The values given to ``--root`` in a command line."""
+    return [tokens[i + 1] for i, t in enumerate(tokens[:-1]) if t == "--root"] + [t[7:] for t in tokens if t.startswith("--root=")]
+
+
+def _same_dir(path: str, root: Path) -> bool:
+    """Is ``path`` the directory ``root`` under another spelling (a symlink such as macOS /tmp -> /private/tmp, ``~``)?"""
+    if not path.startswith(("/", "~")):
+        return False  # relative to the other process's working directory: cannot be compared
+    try:
+        return Path(path).expanduser().resolve() == root.resolve()
+    except (OSError, RuntimeError, ValueError):
+        return False
+
+
 def _looks_like_scheduler_of(command: str, root: Path) -> bool:
     """Does this command line plausibly start the scheduler of the organization at ``root``?
 
@@ -309,7 +330,7 @@ def _looks_like_scheduler_of(command: str, root: Path) -> bool:
     this org (or cannot be compared, being relative) is a no.
     """
     tokens = command.split()
-    names_root = str(root) in command
+    names_root = str(root) in command or any(_same_dir(t, root) for t in _root_arguments(tokens))
     has_root_flag = any(t == "--root" or t.startswith("--root=") for t in tokens)
     has_orgmcp = any(Path(t).name == "orgmcp" for t in tokens)
     return "run" in tokens and (names_root or (has_orgmcp and not has_root_flag))
@@ -527,6 +548,20 @@ def stop_scheduler(org: Org, wait: float = 15.0) -> str:
             "Check status() shortly")
 
 
+def run_id_of(addr: str, log: Path | str) -> str:
+    """The id of a run: ``<agent>@<run log stem>`` (the stem is the start timestamp)."""
+    return f"{addr}@{Path(log).stem}"
+
+
+def _version() -> str:
+    try:
+        from importlib.metadata import version
+
+        return version("orgmcp")
+    except Exception:  # noqa: BLE001
+        return "unknown"
+
+
 def _nudge_entries(raw) -> dict[str, dict]:
     """Entries of the nudges ledger in the current shape; malformed entries (or a malformed ledger) are dropped."""
     out: dict[str, dict] = {}
@@ -560,10 +595,21 @@ class Scheduler:
         self.pidfile = org.root / ".runtime" / "scheduler.pid"
         self._blocked: set[str] = set()  # agents whose orphaned run (of a dead scheduler) is alive and could not be killed
         self._waiting_since: float | None = None  # until-done: since when nothing can progress without the user
+        self.mode = "daemon"  # daemon | until_done | until_idle | once (for the scheduler.start event)
+        self.max_runs: int | None = None
+        self.exit_reason = "stopped"
+        self._heartbeat_at: float | None = None
+        self._pruned_at: float | None = None
+        self._error_emitted: dict[str, tuple[str, float]] = {}
 
     # ------------------------------------------------------------- lifecycle
 
+    def _emit(self, kind: str, **fields) -> None:
+        """An event of the scheduler itself (never raises)."""
+        telemetry.emit(self.org.root, kind, proc="scheduler", actor="runtime", **fields)
+
     def acquire(self) -> None:
+        telemetry.set_process("scheduler")
         self.pidfile.parent.mkdir(parents=True, exist_ok=True)
         if self.pidfile.exists():
             try:
@@ -580,6 +626,8 @@ class Scheduler:
         (self.org.root / EXIT_FILE).unlink(missing_ok=True)
         self.pidfile.write_text(str(os.getpid()))
         self._ignore_running_ledger()
+        self._emit("scheduler.start", mode=self.mode, max_runs=self.max_runs,
+                   max_parallel=config_number(self.org.config, "max_parallel", int), version=_version())
         self._settle_orphans()  # before recover(): never redeliver a batch while its previous run still lives
         for a in self.org.recover():
             self.echo(f"recovered interrupted run of {a}")
@@ -627,16 +675,27 @@ class Scheduler:
                 continue
             verdict = judge_orphan(rec)
             pgid = rec.get("pgid")
+            rid = run_id_of(addr, rec["log"]) if rec.get("log") else None
             if verdict == "ours":
                 if kill_group(pgid):
                     self.echo(f"{addr}: killed the orphaned run of a dead scheduler (process group {pgid})")
                     self._note_in_log(rec, "killed: orphaned run of a scheduler that died")
+                    self._emit("run.orphan", agent=addr, run=rid, action="killed",
+                               detail=f"process group {pgid} of a dead scheduler killed; its batch is redelivered")
                     verdict = "gone"
                 else:
                     verdict = "doubt"
+            elif verdict == "gone":
+                self._emit("run.orphan", agent=addr, run=rid, action="redelivered",
+                           detail="the process of a dead scheduler's run is gone; its batch is redelivered")
             if verdict == "foreign":
                 self.echo(f"{addr}: recorded process {pgid} is not the run we started; left alone")
+                self._emit("run.orphan", agent=addr, run=rid, action="redelivered",
+                           detail=f"pid {pgid} now belongs to another process (left alone); the run's batch is redelivered")
             elif verdict == "doubt":
+                if addr not in self._blocked:
+                    self._emit("run.orphan", agent=addr, run=rid, action="kept",
+                               detail=f"process group {pgid} may be alive and cannot be verified or killed; no new run until it is gone")
                 keep[addr] = rec
                 if addr not in self._blocked:
                     self.echo(f"{addr}: an earlier run (process group {pgid}) may still be alive and cannot be "
@@ -670,11 +729,17 @@ class Scheduler:
             run.logf.write("\n# interrupted by scheduler shutdown\n")
             run.logf.close()
             self.org.end_run(addr, ok=False)
+            run.killed = True
+            self._emit_run_end(run, run.proc.returncode, error="interrupted by scheduler shutdown")
         self._forget_run(*self.runs)
         self.runs.clear()
         self.pidfile.unlink(missing_ok=True)
+        self._emit("scheduler.exit", reason=telemetry.clip(self.exit_reason, telemetry.ERROR_MAX),
+                   runs_started=self.total_runs)
 
     def serve(self, until_idle: bool = False, max_runs: int | None = None, until_done: bool = False) -> None:
+        self.mode = "until_done" if until_done else "until_idle" if until_idle else "daemon"
+        self.max_runs = max_runs
         self.acquire()
         stop = False
 
@@ -688,18 +753,26 @@ class Scheduler:
                 active = self.tick(max_runs=max_runs)
                 if until_idle and not active:
                     self.echo("organization is idle")
+                    self.exit_reason = "idle: nothing left to do"
                     break
                 if until_done and self.finished(max_runs):
                     self.echo(f"scheduler exiting: {FINISHED}")
                     atomic_write(self.org.root / EXIT_FILE, FINISHED + "\n")
+                    self.exit_reason = FINISHED
                     break
                 if until_done and (reason := self._check_waiting(max_runs)):
                     self.echo(f"scheduler exiting: {reason}")
                     atomic_write(self.org.root / EXIT_FILE, reason + "\n")
+                    self.exit_reason = reason
                     break
                 time.sleep(config_number(self.org.config, "poll_seconds"))
+            else:
+                self.exit_reason = "stopped by SIGTERM"
         except KeyboardInterrupt:
-            pass
+            self.exit_reason = "interrupted (KeyboardInterrupt)"
+        except Exception as exc:
+            self.exit_reason = f"error: {type(exc).__name__}: {exc}"
+            raise
         finally:
             self.release()
 
@@ -716,7 +789,24 @@ class Scheduler:
             self._launch(max_runs)
         self._guard("stall check", self._check_stalls)  # best-effort phases: a bug or bad data here
         self._guard("health review", self._check_review)  # must never stop agents from running
+        self._guard("event log upkeep", lambda: self._upkeep_events(max_runs))
         return bool(self.runs) or (bool(self._runnable()) and (max_runs is None or self.total_runs < max_runs))
+
+    def _upkeep_events(self, max_runs: int | None) -> None:
+        """The heartbeat event (every ``heartbeat_seconds``) and the daily pruning of old event-log days."""
+        now = self.clock()
+        cfg = self.org.config
+        if self._heartbeat_at is None or now - self._heartbeat_at >= config_number(cfg, "heartbeat_seconds"):
+            self._heartbeat_at = now
+            from .progress import _human_items
+
+            self._emit("scheduler.heartbeat", running=sorted(r.run_id for r in self.runs.values()),
+                       runnable=len(self._runnable()), waiting_on_you=len(_human_items(self.org)))
+        if self._pruned_at is None or now - self._pruned_at >= 86400:
+            self._pruned_at = now
+            removed = telemetry.prune(self.org.root, config_number(cfg, "events_keep_days", int))
+            if removed:
+                self._emit("prune", removed_days=removed)
 
     def waiting_on_user(self, max_runs: int | None = None) -> Waiting | None:
         """``waiting_on_user`` with this scheduler's own view of what runs (read-only)."""
@@ -762,6 +852,10 @@ class Scheduler:
             if self._phase_errors.get(phase) != message:
                 self._phase_errors[phase] = message
                 self.echo(f"{phase} failed (will retry next tick): {message}")
+            last = self._error_emitted.get(phase)  # a fault that persists is recorded when it changes, then every minute
+            if last is None or last[0] != message or self.clock() - last[1] >= 60:
+                self._error_emitted[phase] = (message, self.clock())
+                self._emit("scheduler.error", phase=phase, error=telemetry.clip(message, telemetry.ERROR_MAX))
         else:
             self._phase_errors.pop(phase, None)
 
@@ -769,7 +863,7 @@ class Scheduler:
         """Lift a budget pause once budget is back (a refund note arrives without waking anyone)."""
         for addr in self.org.agents():
             if self.org.paused(addr) == "budget" and (self.org.budget(addr) or 0) > 0:
-                self.org.resume(addr)
+                self.org.resume(addr, "budget is back", by="runtime")
                 self.echo(f"{addr}: budget is back, resumed")
 
     def _runnable(self) -> list[str]:
@@ -796,21 +890,25 @@ class Scheduler:
             reason = self.org.paused(addr)
             budget = self.org.budget(addr) or 0
             if reason == "budget" and budget > 0:
-                self.org.resume(addr)
+                self.org.resume(addr, "budget is back", by="runtime")
                 reason = None
             if reason:
                 continue
             if budget <= 0:
-                self.org.pause(addr, "budget")
+                self.org.pause(addr, "budget", by="runtime")
+                waiting = [m.trace for m in self.org.messages(addr, "inbox")]
                 self.org.notify(self.org.parent(addr) or ROOT, f"{addr} is out of budget",
-                                templates.notice_budget(addr, self.org.unread(addr)))
+                                templates.notice_budget(addr, self.org.unread(addr)), trace=telemetry.single(waiting))
                 self.echo(f"{addr}: out of budget, paused, parent notified")
                 continue
             self._start(addr)
 
     def _start(self, addr: str) -> None:
         batch = self.org.begin_run(addr)
+        budget_before = self.org.budget(addr)  # before the run log exists: that is what consumes the run
         log = self.org.start_run_log(addr)
+        run_id = run_id_of(addr, log)
+        traces = sorted({m.trace for m in batch if m.trace})
         self.total_runs += 1
         prompt = self.org.run_prompt(addr, batch)
         logf = open(log, "a", encoding="utf-8")
@@ -819,6 +917,7 @@ class Scheduler:
         try:
             logf.write(f"# run of {addr}, {len(batch)} message(s)\n# senders: {senders}\n")
             cmd, cwd, env = self.runner(self.org, addr, prompt)
+            env = {**env, "ORG_RUN_ID": run_id}  # the agent's MCP server tags its events with it
             logf.write(f"# cwd: {cwd}\n# cmd: {' '.join(cmd)} <prompt on stdin>\n")
             logf.write(f"# ---- prompt ----\n{prompt}\n# ---- output ----\n")
             logf.flush()
@@ -832,24 +931,50 @@ class Scheduler:
             logf.write(f"\n# failed to start: {exc}\n")
             logf.close()
             self.org.end_run(addr, ok=False)
-            self._failed(addr, log)
+            self._emit_run_start(addr, run_id, batch, traces, None, budget_before)
+            self._emit("run.end", agent=addr, run=run_id, ok=False, exit_code=None, duration_ms=0, timed_out=False,
+                       killed=False, budget_after=self.org.budget(addr),
+                       error=telemetry.clip(f"failed to start: {exc}", telemetry.ERROR_MAX))
+            self._failed(addr, log, traces)
             return
-        self.runs[addr] = Run(addr, proc, log, logf, time.time(), len(batch), strays)
+        self.runs[addr] = Run(addr, proc, log, logf, time.time(), len(batch), strays, run_id, tuple(traces), budget_before)
+        self._emit_run_start(addr, run_id, batch, traces, proc.pid, budget_before)
         self._guard("run record", lambda: self._record_run(addr, self.runs[addr]))
         self.echo(f"{addr}: started run ({len(batch)} message(s))")
+
+    def _emit_run_start(self, addr: str, run_id: str, batch, traces: list, pid: int | None, budget_before) -> None:
+        meta, _ = self.org.charter(addr)
+        self._emit("run.start", agent=addr, run=run_id, trace=telemetry.single(traces), batch=[m.id for m in batch],
+                   traces=traces, child_pid=pid, pgid=pid, model=meta.get("model") or self.org.config.get("default_model"),
+                   budget_before=budget_before)
+
+    def _emit_run_end(self, run: Run, code, error: str | None = None) -> None:
+        """The ``run.end`` event; ``error`` None = derived from the exit code."""
+        ok = code == 0 and not run.killed
+        if error is None and not ok:
+            error = f"exit code {code}"
+        self._emit("run.end", agent=run.addr, run=run.run_id, trace=telemetry.single(run.traces), ok=ok, exit_code=code,
+                   duration_ms=int((time.time() - run.started) * 1000), timed_out=run.timed_out, killed=run.killed,
+                   budget_after=self.org.budget(run.addr) if self.org.exists(run.addr) else None,
+                   error=telemetry.clip(error, telemetry.ERROR_MAX) if error else None)
 
     def _reap(self) -> None:
         timeout = config_number(self.org.config, "run_timeout")
         for addr, run in list(self.runs.items()):
             code = run.proc.poll()
+            why = None
             if code is None and time.time() - run.started > timeout:
                 _signal_group(run.proc, signal.SIGKILL)
                 code = run.proc.wait()
                 run.logf.write(f"\n# killed after {timeout:.0f}s timeout\n")
+                run.killed = run.timed_out = True
+                why = f"timed out: killed after {timeout:.0f}s"
             elif code is None and not self.org.exists(addr):  # retired mid-run: nobody will read its output
                 _signal_group(run.proc, signal.SIGKILL)
                 code = run.proc.wait()
                 run.logf.write("\n# killed: the agent was retired during its run\n")
+                run.killed = True
+                why = "killed: the agent was retired during its run"
             if code is None:
                 continue
             elapsed = time.time() - run.started
@@ -860,15 +985,17 @@ class Scheduler:
             self._guard("run record", lambda: self._forget_run(addr))
             ok = code == 0
             if not self.org.exists(addr):  # retired while the run was in flight: nothing left to settle
+                self._emit_run_end(run, code, why or ("agent retired during its run" if not ok else None))
                 self.echo(f"{addr}: was retired during its run (exit {code}); nothing to settle")
                 self.org.commit(f"{addr}: run ended after retirement (exit {code})")
                 continue
             self.org.end_run(addr, ok)
+            self._emit_run_end(run, code, why)
             if ok:
                 self.org.clear_failures(addr)
                 self.echo(f"{addr}: run finished in {elapsed:.0f}s")
             else:
-                self._failed(addr, run.log)
+                self._failed(addr, run.log, run.traces)
             rel = run.log.relative_to(self.org.root)
             self.org.commit(f"{addr}: run {'ok' if ok else f'failed ({code})'}, {run.batch} message(s) [{rel}]")
 
@@ -897,17 +1024,19 @@ class Scheduler:
             ledger[run.addr] = {"paths": found[:10], "told": False}
             self.org.save_ledger("strays", ledger)
 
-    def _failed(self, addr: str, log: Path) -> None:
+    def _failed(self, addr: str, log: Path, traces=()) -> None:
         n = self.org.record_failure(addr)
+        self._emit("agent.failure", agent=addr, count=n, trace=telemetry.single(traces))
         self.echo(f"{addr}: run failed ({n} in a row), log: {log}")
         if n >= config_number(self.org.config, "max_failures", int):
-            self.org.pause(addr, "failures")
+            self.org.pause(addr, "failures", by="runtime")
             rel = str(log.relative_to(self.org.root))
             parent = self.org.parent(addr) or ROOT
+            trace = telemetry.single(traces)
             self.org.notify(parent, f"{addr} keeps failing",
-                            templates.notice_failures(addr, n, rel, to_human=parent == ROOT))
+                            templates.notice_failures(addr, n, rel, to_human=parent == ROOT), trace=trace)
             if parent != ROOT:  # a human has to look at crashes
-                self.org.notify(ROOT, f"{addr} keeps failing", templates.notice_failures(addr, n, rel))
+                self.org.notify(ROOT, f"{addr} keeps failing", templates.notice_failures(addr, n, rel), trace=trace)
 
     # --------------------------------------------------------------- reviews
 
@@ -953,12 +1082,14 @@ class Scheduler:
                 if now - since < after:
                     continue
                 if step == 0:
-                    self.org.notify(addr, f"reminder: {task.title}", templates.notice_nudge(task.id, task.title))
+                    self.org.notify(addr, f"reminder: {task.title}", templates.notice_nudge(task.id, task.title),
+                                    trace=task.trace)
                     self.echo(f"{addr}: reminded about open task {task.id}")
                 else:
                     self.org.notify(chain[step], f"stalled: {task.title}",
-                                    templates.notice_stalled(addr, task.id, task.title, chain[:step]))
+                                    templates.notice_stalled(addr, task.id, task.title, chain[:step]), trace=task.trace)
                     self.echo(f"{addr}: stalled on {task.id}, told {chain[step]}")
+                self._emit("stall.nudge", trace=task.trace, task=task.id, to=chain[step] if step else addr, step=step)
                 kept[task.id] = {"step": step, "at": now}
         if kept != loaded:
             self.org.save_ledger("nudges", kept)

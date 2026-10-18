@@ -1,0 +1,6 @@
+scheduler: stopped (last exit: idle: nothing left to do)
+runs in flight 0/3
+queued, not running: none
+waiting on you: nothing
+errors in the last 15 min: 1
+  09:30:40.112 cli root cli.command command=check ok=False error="exit 1" error_type=RuntimeError

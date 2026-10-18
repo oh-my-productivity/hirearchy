@@ -1,0 +1,3 @@
+2 of 2 matching event(s), oldest first
+09:29:12.861 scheduler runtime run.start agent=worker batch=20261018T092904624658-root-a621 traces=20261018T092904624658-root-a621 child_pid=94568 pgid=94568 model=claude-haiku-4.5 budget_before=2 run=worker@20261018T092912856677 trace=20261018T092904624658-root-a621
+09:29:26.905 scheduler runtime run.end ok 14s agent=worker exit_code=0 budget_after=0 run=worker@20261018T092912856677 trace=20261018T092904624658-root-a621

@@ -3,7 +3,16 @@ import stat
 
 import pytest
 
+from orgmcp import telemetry
 from orgmcp.core import ROOT, Org
+
+
+@pytest.fixture(autouse=True)
+def fresh_telemetry():
+    """Each test starts with no open event files, no drop counter and the default process name."""
+    telemetry.reset()
+    yield
+    telemetry.reset()
 
 
 @pytest.fixture(autouse=True)

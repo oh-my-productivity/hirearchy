@@ -38,7 +38,7 @@ def test_the_tools_the_skill_names_exist_for_root(tmp_path):
     assert "service" in tools["blueprint_example"].inputSchema["properties"]
     instructions = build_server(Org.init(tmp_path / "o2", "m"), ROOT).instructions
     assert "`service=True` for recurring work" in instructions and "check it before building a new org" in instructions
-    assert len(instructions) < 2800
+    assert len(instructions) < 2700  # sent on every connection; the limit is 2800: keep 100 characters of headroom for a long path
 
 
 def test_the_skill_ships_in_the_wheel_and_the_installed_copy_is_this_one(tmp_path):

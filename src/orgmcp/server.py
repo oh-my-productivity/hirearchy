@@ -10,7 +10,10 @@ falls back to another organization. Agent servers (ORG_AGENT set) still fail fas
 
 from __future__ import annotations
 
+import functools
+import inspect
 import os
+import time
 from pathlib import Path
 
 import anyio
@@ -21,6 +24,7 @@ from . import blueprint_examples
 from .core import ROOT, Org, OrgError
 from .health import org_health, render_text
 from . import services as services_mod
+from . import telemetry
 from .progress import WAIT_MAX, describe_progress
 from .scheduler import (
     describe_scheduler, nothing_to_do, scheduler_state, start_scheduler, stop_scheduler, waiting_on_user,
@@ -34,19 +38,17 @@ Call whoami first if you do not know your role, reports, budget and open tasks.
 
 ROOT_INSTRUCTIONS = """\
 You are connected to ONE orgmcp organization as `root`, the human's seat. {where}
-- Use only this organization: never look for, create or modify another (no other paths, workarounds,
-  ORG_ROOT changes).
+- Use only this organization: never look for, create or modify another (no other paths or ORG_ROOT).
 - Never claim the organization did work unless orgmcp tools show it.
 - If an orgmcp tool fails, tell the user instead of substituting another mechanism.
-- `whoami` and `status` show the state; `start`/`stop` control the scheduler.
-- Standing services: `services` lists them (check it before building a new org), `request` uses one, `feedback` rates a
-  delivery, `define_service` adds one.
+- `whoami` and `status` show the state; `start`/`stop` control the scheduler. `observe` (read-only): what ran or failed.
+- Services: `services` (check it before building a new org), `request`, `feedback` (rate a delivery), `define_service`.
 When the user asks for an org, team or agents for a goal:
-1. Ask what you need in ONE message. Propose defaults only where a generic one exists; ASK for any list the user did not
-   give (scope items, source files), never invent. Default deliverable place: a new
-   `deliverables/` folder in the user's current directory (say so). Also ask: format, length, exact checkable
-   criteria, sources/web, workspace and tests (code), budget in runs, models (if cheap: keep the lead and final verifier
-   strong; the lead decides how every other run is spent), review, approval.
+1. Ask what you need in ONE message. Propose defaults only where a generic one exists; ASK for any list not
+   given (scope items, source files), never invent. Default deliverable place: a new
+   `deliverables/` folder in the current directory (say so). Also ask: format, length, exact checkable criteria,
+   sources/web, workspace and tests (code), budget in runs, models (if cheap: keep the lead and final verifier strong;
+   the lead decides how every other run is spent), review, approval.
 2. Start the blueprint from `blueprint_example(kind)` (`service=True` for recurring work), then `propose_org`. Show the
    "PLAN FOR YOU" block exactly as returned. Fix errors; settle its warnings (e.g. model policy) with the user
    or state them; wait for approval. The user's own files go in `needs.inputs` (read-only);
@@ -55,11 +57,11 @@ When the user asks for an org, team or agents for a goal:
    `start`. Spend beyond the plan needs their OK: ask at the FIRST budget request, not after the reserve is gone;
    first check `status` for stranded runs and `reclaim` them (or tell the lead to).
 4. Answer "status?" with `progress`. Never promise to tell the user later (your turn ends at the reply): to be told when
-   it is done, say you will wait now and call `progress(wait_seconds=N)`, repeating as they wish; else tell them to
-   ask "status?". Relay escalations with a recommendation.
+   it is done, say you will wait now and call `progress(wait_seconds=N)`, repeat if asked; else tell them to ask
+   "status?". Relay escalations with a recommendation.
 5. When it is done: read the deliverable and check it against EVERY acceptance criterion (send it back with
-   `delegate(..., revises=...)` if not; never patch it yourself), copy it where the user wants it. `start` ends by
-   itself when the work is done (start again after giving it more work); `stop` only if the user cancels, declines
+   `delegate(..., revises=...)` if not; never patch it yourself), copy it where they want it. `start` ends by
+   itself when the work is done (start again for more work); `stop` only if the user cancels, declines
    more budget or you hand over an unverified result (say the task stays open). Final answer: as short as asked.
 """
 
@@ -152,6 +154,96 @@ def _entries(directory: Path) -> list[str]:
         return []
 
 
+def _tool_trace(binding: OrgBinding, me: str, arguments: dict, seen: list) -> str | None:
+    """The request a tool call belongs to: the trace of the message it delivered, else of the message it names
+    (task_id / reply_to / revises), else the one trace of the caller's current batch. None when unknown."""
+    trace = telemetry.single(seen)
+    org = binding.peek()
+    if trace or org is None:
+        return trace
+    for key in ("task_id", "reply_to", "revises"):
+        value = arguments.get(key)
+        if isinstance(value, str) and (trace := org.trace_of(me, value)):
+            return trace
+    if me != ROOT and org.exists(me):
+        return telemetry.single(m.trace for m in org.messages(me, "inflight"))
+    return None
+
+
+def _record_tool_call(binding: OrgBinding, me: str, tool: str, sig: inspect.Signature, args: tuple, kwargs: dict,
+                      started: float, exc: BaseException | None, seen: list) -> None:
+    """Emit the ``tool.call`` event of one finished call. Never raises."""
+    try:
+        root = binding.root
+        if root is None:
+            return
+        try:
+            arguments = dict(sig.bind_partial(*args, **kwargs).arguments)
+        except TypeError:
+            arguments = dict(kwargs)
+        try:
+            trace = _tool_trace(binding, me, arguments, seen)
+        except Exception:  # noqa: BLE001
+            trace = None
+        telemetry.emit(
+            root, "tool.call", proc="mcp", actor=me, trace=trace, tool=tool, ok=exc is None,
+            ms=round((time.perf_counter() - started) * 1000, 2),
+            error=telemetry.clip(str(exc) or type(exc).__name__, telemetry.ERROR_MAX) if exc is not None else None,
+            error_type=type(exc).__name__ if exc is not None else None,
+            args=telemetry.summarize_args(arguments),
+        )
+    except Exception:  # noqa: BLE001 - recording a call must never change its outcome
+        pass
+
+
+def _recorded(fn, tool: str, binding: OrgBinding, me: str):
+    """``fn`` wrapped so that each call emits a ``tool.call`` event (ok or refused/failed, with its duration and an
+    argument summary without bodies). Name, signature and docstring are those of ``fn``; the outcome is unchanged."""
+    sig = inspect.signature(fn)
+
+    if inspect.iscoroutinefunction(fn):
+        @functools.wraps(fn)
+        async def wrapper(*args, **kwargs):
+            started, failure = time.perf_counter(), None
+            with telemetry.traces_seen() as seen:
+                try:
+                    return await fn(*args, **kwargs)
+                except Exception as exc:
+                    failure = exc
+                    raise
+                finally:
+                    _record_tool_call(binding, me, tool, sig, args, kwargs, started, failure, seen)
+    else:
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+            started, failure = time.perf_counter(), None
+            with telemetry.traces_seen() as seen:
+                try:
+                    return fn(*args, **kwargs)
+                except Exception as exc:
+                    failure = exc
+                    raise
+                finally:
+                    _record_tool_call(binding, me, tool, sig, args, kwargs, started, failure, seen)
+    return wrapper
+
+
+def instrument_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
+    """Make ``mcp.tool`` record every tool registered through it: new tools get the ``tool.call`` event automatically."""
+    register = mcp.tool
+
+    def tool(*args, **kwargs):
+        decorate = register(*args, **kwargs)
+        named = kwargs.get("name") or (args[0] if args and isinstance(args[0], str) else None)
+
+        def wrap(fn):
+            return decorate(_recorded(fn, named or fn.__name__, binding, me))
+
+        return wrap
+
+    mcp.tool = tool
+
+
 def root_instructions(binding: OrgBinding) -> str:
     org = binding.peek()
     if org is not None:
@@ -175,6 +267,7 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
     else:
         raise OrgError(binding.missing_message())  # agents never run without their organization
     mcp = FastMCP("orgmcp", instructions=root_instructions(binding) if me == ROOT else INSTRUCTIONS)
+    instrument_tools(mcp, binding, me)  # every tool registered below (and by the register_* functions) is recorded
 
     @mcp.tool()
     def whoami() -> str:
@@ -514,6 +607,9 @@ def setup_state(binding: OrgBinding) -> str:
 def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
     """The tools only the human's (root) server has. Add new root-only tools here, resolving the organization
     with ``binding.get()`` at call time (it may not exist yet when the server starts)."""
+    from .observe import register_observe_tool
+
+    register_observe_tool(mcp, binding)
 
     @mcp.tool()
     def create_org(mission: str, default_model: str | None = None, path: str | None = None) -> str:
@@ -707,5 +803,6 @@ def resolve_binding() -> tuple[OrgBinding, str]:
 
 
 def serve() -> None:
+    telemetry.set_process("mcp")
     binding, me = resolve_binding()
     build_server(binding, me).run()

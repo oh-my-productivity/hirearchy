@@ -23,10 +23,10 @@ from orgmcp.server import OrgBinding, build_server, resolve_binding
 
 ROOT_TOOLS = {
     "whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health",
-    "create_org", "start", "stop", "propose_org", "apply_org", "progress", "blueprint_example",
+    "create_org", "start", "stop", "propose_org", "apply_org", "progress", "blueprint_example", "observe",
     "services", "define_service", "request", "feedback",  # the client's service tools: root and managers
 }
-AGENT_TOOLS = ROOT_TOOLS - {"create_org", "start", "stop", "propose_org", "apply_org", "progress", "blueprint_example"}
+AGENT_TOOLS = ROOT_TOOLS - {"create_org", "start", "stop", "propose_org", "apply_org", "progress", "blueprint_example", "observe"}
 
 
 def call(server, tool, **args):
@@ -406,6 +406,19 @@ def test_command_line_verification():
     ]
     assert all(_looks_like_scheduler_of(c, root) for c in ok)
     assert not any(_looks_like_scheduler_of(c, root) for c in bad)
+
+
+def test_command_line_verification_follows_symlinks_and_rejects_other_dirs(tmp_path):
+    real = tmp_path / "real" / "org"
+    real.mkdir(parents=True)
+    link = tmp_path / "link"
+    link.symlink_to(tmp_path / "real")  # like /tmp -> /private/tmp: the command line has one spelling, the org another
+    other = tmp_path / "other"
+    other.mkdir()
+    assert _looks_like_scheduler_of(f"/v/bin/orgmcp --root {link}/org run --until-idle", real)
+    assert _looks_like_scheduler_of(f"/v/bin/orgmcp --root={link}/org run", real)
+    assert not _looks_like_scheduler_of(f"/v/bin/orgmcp --root {other} run", real)
+    assert not _looks_like_scheduler_of(f"/v/bin/orgmcp --root {link}/org mcp", real)
 
 
 # --------------------------------------------------------- isolated profiles

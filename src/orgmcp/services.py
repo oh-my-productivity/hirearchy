@@ -394,6 +394,8 @@ def define_service(
             )
         atomic_write(sdir / "history" / f"SERVICE.v{old.version}.md", (sdir / "SERVICE.md").read_text(encoding="utf-8"))
     atomic_write(sdir / "SERVICE.md", join_frontmatter(meta, notes_n))
+    org.emit("service.define", actor=actor, owner=owner, service=name, version=meta["version"], by=actor,
+             amendment=old is not None)
     if old is None:
         text = f"defined service `{name}` (contract v1) for {owner}: {where}"
         if playbook_body is not None:
@@ -502,6 +504,7 @@ def retire_service(org: Org, actor: str, owner: str, name: str, reason: str) -> 
     dest = service_dir(org, owner, ".retired") / f"{name}-{utcnow():%Y%m%dT%H%M%S%f}"
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.move(str(service_dir(org, owner, name)), dest)
+    org.emit("service.retire", actor=actor, owner=owner, service=name, by=actor)
     org.notify(
         owner, f"service {name} retired",
         f"{actor} retired the service `{name}`: {reason.strip()}. It cannot be requested any more; its files are kept at "
@@ -517,6 +520,7 @@ def _write_playbook(org: Org, owner: str, name: str, version: int, body: str, by
     path = service_dir(org, owner, name) / "PLAYBOOK.md"
     meta = {"service": name, "version": version, "revised": _stamp_now(), "by": by, "reason": reason}
     atomic_write(path, join_frontmatter(meta, body))
+    org.emit("service.revise", actor=by, owner=owner, service=name, version=version, by=by)
     return path
 
 

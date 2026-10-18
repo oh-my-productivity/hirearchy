@@ -1,0 +1,6 @@
+scheduler: unverified - pid file names pid 516 (its command line is '/Volumes/workspace/orgmcp-wt/o-integration/.venv/bin/python /Volumes/workspace/orgmcp-wt/o-integration/.venv/bin/orgmcp --root /tmp/orgmcp-obs-1792315728/org run --until-idle --max-runs 2')
+runs in flight 1/3:
+  worker 9.0s Second check trace 20261018T093030906999-root-8dd2
+queued, not running: none
+waiting on you: nothing
+errors in the last 15 min: 0
