@@ -53,7 +53,8 @@ ORG_RULES = """\
 10. Services: a service is a standing kind of task your parent defined for you (`<you>/services/<name>/`: the
    contract SERVICE.md is your parent's; the playbook PLAYBOOK.md is yours). Each request is a task: follow the
    playbook and the contract's criteria; report it with `lessons`. Improve the playbook with `revise_playbook` when the
-   evidence shown before a new request calls for it; never lower the bar, and propose contract changes to your parent.
+   evidence shown before a new request calls for it; never lower the bar (client feedback never waives a criterion),
+   and propose contract changes to your parent.
 """
 
 DEFAULT_MISSION = "(Describe the mission of this organization here.)"
@@ -139,8 +140,12 @@ REVIEW_ACTIONS = {
     "stuck": "follow up with `{a}` or reassign the work",
     "out_of_budget": 'grant runs with send(to="{a}", body="<why>", budget=N), or report the task failed',
     "paused": "investigate why `{a}` is paused; failed runs need a human (`orgmcp resume {a}`), so escalate",
-    "low_quality": "tighten `{a}`'s charter and acceptance criteria, rework with delegate(..., revises=<task id>), or replace it",
-    "expensive": "narrow `{a}`'s tasks, or change its charter or model",
+    "low_quality": (
+        "edit the BODY of `{a}`'s charter (its frontmatter - tools, inputs, model - is kept automatically), sharpen "
+        "the acceptance criteria in your next delegation, rework with delegate(..., revises=<task id>), or replace it; "
+        "if you own a service, record the fix in its playbook with `revise_playbook`"
+    ),
+    "expensive": "narrow `{a}`'s tasks, or edit the body of its charter (its frontmatter is kept) or change its model",
     "wasteful": "fix `{a}`'s charter so every run ends with an action (report or send)",
     "stranded_budget": "ask `{a}` to return its budget (it can `send` its parent a note with `budget=N`), or retire it",
     "idle": "retire `{a}` if it is no longer needed",

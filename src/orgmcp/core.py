@@ -101,6 +101,31 @@ def join_frontmatter(meta: dict, body: str) -> str:
     return "---\n" + yaml.safe_dump(meta, sort_keys=False, allow_unicode=True) + "---\n" + body.rstrip() + "\n"
 
 
+def _short(value: object, limit: int = 80) -> str:
+    text = yaml.safe_dump(value, default_flow_style=True, allow_unicode=True, width=10_000).strip()
+    if text.endswith("\n..."):
+        text = text[:-4].strip()
+    text = " ".join(text.split())
+    return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
+def charter_change_note(addr: str, old: dict, written: dict, merged: dict) -> str:
+    """What a charter rewrite did to the frontmatter: keys kept from the old one, keys changed (old -> new), added."""
+    kept = [k for k in old if k not in written]
+    changed = [f"{k}: {_short(old[k])} -> {_short(written[k])}" for k in old if k in written and old[k] != written[k]]
+    added = [f"{k}: {_short(written[k])}" for k in written if k not in old]
+    parts = [f"charter frontmatter of `{addr}`:"]
+    parts.append(f"kept from the old frontmatter (not in your text): {', '.join(kept)}." if kept else "nothing kept from the old frontmatter (your text set every key).")
+    if changed:
+        parts.append("changed (old -> new): " + "; ".join(changed) + ".")
+    if added:
+        parts.append("added: " + "; ".join(added) + ".")
+    if not changed and not added:
+        parts.append("no key changed.")
+    parts.append("A key you leave out is kept; to remove one, set it explicitly (e.g. `tools: []`).")
+    return " ".join(parts)
+
+
 def atomic_write(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.parent / f".tmp-{secrets.token_hex(4)}-{path.name}"
@@ -566,6 +591,31 @@ class Org:
         given = sum(m.budget for m in self.sent(a))
         return got - given - self.runs_used(a)
 
+    def delegable(self, addr: str) -> tuple[int, int, int]:
+        """(budget, outstanding delegations, the most ``addr`` can hand down with one more delegation).
+
+        The most is ``budget - outstanding - 1`` (one run kept per outstanding delegation to process its result, one
+        for the new delegation's own result), never below 0.
+        """
+        budget = self.budget(addr) or 0
+        out = len(self.outstanding(addr))
+        return budget, out, max(0, budget - out - 1)
+
+    def grant_hint(self, addr: str) -> str:
+        """What a direct report can do with its budget now (shown to whoever just granted it runs); "" if it cannot hire."""
+        if not self.exists(addr) or not self.charter(addr)[0].get("can_hire"):
+            return ""
+        budget, out, most = self.delegable(addr)
+        head = f"`{addr}` now has {budget} run(s) and {out} outstanding delegation(s)"
+        if most > 0:
+            return f"{head}; with one more delegation it can hand down at most {most} run(s)."
+        need = out + 2  # budget - out - 1 >= 1
+        return (
+            f"{head}: with {budget} run(s) and {out} outstanding delegation(s) it cannot delegate anything; it can "
+            f"only process results or work itself - grant at least {max(0, need - budget)} more (a budget of {need}) "
+            "to allow one delegation of 1 run."
+        )
+
     def _check_allocation(self, actor: str, amount: int, new_delegation: bool) -> None:
         if actor == ROOT or amount == 0:
             return
@@ -764,12 +814,14 @@ class Org:
 
     @staticmethod
     def _check_lessons(task: Message, status: str, lessons: str | None) -> str:
-        """The lessons text for a report: required for a final result on a service request, 1..800 characters."""
+        """The lessons text for a report: required on a service request (done, failed or blocked), 1..800 characters."""
         text = (lessons or "").strip()
-        if task.service and status in ("done", "failed") and not text:
+        if task.service and status in ("done", "failed", "blocked") and not text:
             raise OrgError(
                 f"task {task.id} is a request for service `{task.service}`: pass `lessons` - 1-3 lines for the next "
-                "request: what worked, what to change in the playbook, and the evidence (runs, rework, review findings)"
+                "request: what worked, what to change in the playbook, and the evidence (runs, rework, review "
+                "findings). Required for done, failed and blocked alike: a blocker is the most informative case, so "
+                "say what went wrong and what would have prevented it"
             )
         if len(text) > LESSONS_MAX_CHARS:
             raise OrgError(
@@ -1147,12 +1199,29 @@ class Org:
         return p
 
     def write(self, actor: str, path: str, content: str, append: bool = False) -> Path:
+        return self.write_noted(actor, path, content, append)[0]
+
+    def write_noted(self, actor: str, path: str, content: str, append: bool = False) -> tuple[Path, str]:
+        """:meth:`write`, plus a note for the writer (non-empty only for a charter rewrite: what was kept/changed).
+
+        A parent rewriting a report's charter does not strip its frontmatter: every key of the old frontmatter that
+        the new text does not set is kept (a key the new text sets, even to an empty value, wins). The authority
+        checks run on the merged frontmatter.
+        """
         actor = self.require(actor)
         p = self.resolve_write(actor, path)
+        note = ""
         if p.name == "AGENT.md" and actor != ROOT:  # a parent editing a report's charter
-            meta, _ = split_frontmatter(content)
+            meta, body = split_frontmatter(content)
             if not meta.get("role"):
                 raise OrgError("a charter needs YAML frontmatter with at least `role:`")
+            if not append and p.is_file():
+                old, _ = split_frontmatter(p.read_text(encoding="utf-8"))
+                merged = {**meta, **{k: v for k, v in old.items() if k not in meta}}
+                note = charter_change_note(p.parent.relative_to(self.root).as_posix(), old, meta, merged)
+                if len(merged) != len(meta):
+                    content = join_frontmatter(merged, body)
+                meta = merged
             mine, _ = self.charter(actor)
             if "read" in (meta.get("tools") or []) and self.unconfined_read(meta) and not self.unconfined_read(mine):
                 raise OrgError(
@@ -1171,7 +1240,7 @@ class Org:
                     "and move detail into files under your work/ directory."
                 )
         atomic_write(p, content)
-        return p
+        return p, note
 
     # ------------------------------------------------------------ run lifecycle
 
