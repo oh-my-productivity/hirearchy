@@ -10,12 +10,12 @@ from typing import cast
 import pytest
 
 from orgmcp.kernel import IdGenerator, stamp_of
-from orgmcp.kernel.tests._red import impls
+from orgmcp.kernel.testing import IMPLEMENTATIONS
 
 SHAPE = re.compile(r"\d{8}T\d{12}-(?P<sender>[^-]+)-[0-9a-f]{4}")
 
 
-@pytest.fixture(params=impls(IdGenerator))
+@pytest.fixture(params=IMPLEMENTATIONS[IdGenerator], ids=lambda factory: factory.__name__)
 def ids(request: pytest.FixtureRequest, tmp_path: Path) -> IdGenerator:
     made = cast(Callable[[Path], IdGenerator], request.param)(tmp_path)
     assert isinstance(made, IdGenerator)

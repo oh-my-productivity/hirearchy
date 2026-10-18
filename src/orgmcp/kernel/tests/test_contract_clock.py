@@ -10,10 +10,10 @@ from typing import cast
 import pytest
 
 from orgmcp.kernel import Clock
-from orgmcp.kernel.tests._red import impls
+from orgmcp.kernel.testing import IMPLEMENTATIONS
 
 
-@pytest.fixture(params=impls(Clock))
+@pytest.fixture(params=IMPLEMENTATIONS[Clock], ids=lambda factory: factory.__name__)
 def clock(request: pytest.FixtureRequest, tmp_path: Path) -> Clock:
     made = cast(Callable[[Path], Clock], request.param)(tmp_path)
     assert isinstance(made, Clock)

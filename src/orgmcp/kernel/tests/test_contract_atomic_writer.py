@@ -10,11 +10,10 @@ from typing import cast
 import pytest
 
 from orgmcp.kernel import AtomicWriter
-from orgmcp.kernel.testing import WriterHarness
-from orgmcp.kernel.tests._red import impls
+from orgmcp.kernel.testing import IMPLEMENTATIONS, WriterHarness
 
 
-@pytest.fixture(params=impls(AtomicWriter))
+@pytest.fixture(params=IMPLEMENTATIONS[AtomicWriter], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> WriterHarness:
     made = cast(Callable[[Path], WriterHarness], request.param)(tmp_path)
     assert isinstance(made.writer, AtomicWriter)

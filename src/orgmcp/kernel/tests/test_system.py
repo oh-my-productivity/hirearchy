@@ -17,9 +17,6 @@ from orgmcp.kernel import OrgPaths
 from orgmcp.kernel._system import FsAtomicWriter, FsLedgerStore, OsEnvironment, SystemClock, TimestampIdGenerator
 from orgmcp.kernel.testing import FakeClock, MemoryAtomicWriter, MemoryLedgerStore
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: K1")
-
-
 # ----------------------------------------------------------------------------------------------- FsAtomicWriter
 
 

@@ -9,13 +9,12 @@ from typing import cast
 import pytest
 
 from orgmcp.kernel import Environment
-from orgmcp.kernel.testing import EnvHarness
-from orgmcp.kernel.tests._red import impls
+from orgmcp.kernel.testing import IMPLEMENTATIONS, EnvHarness
 
 VAR = "ORGMCP_KERNEL_CONTRACT_VAR"
 
 
-@pytest.fixture(params=impls(Environment))
+@pytest.fixture(params=IMPLEMENTATIONS[Environment], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> Iterator[EnvHarness]:
     harness = cast(Callable[[Path], EnvHarness], request.param)(tmp_path)
     assert isinstance(harness.env, Environment)

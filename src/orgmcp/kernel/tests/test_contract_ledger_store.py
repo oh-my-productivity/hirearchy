@@ -9,11 +9,10 @@ from typing import cast
 import pytest
 
 from orgmcp.kernel import JsonObject, LedgerStore
-from orgmcp.kernel.testing import LedgerHarness
-from orgmcp.kernel.tests._red import impls
+from orgmcp.kernel.testing import IMPLEMENTATIONS, LedgerHarness
 
 
-@pytest.fixture(params=impls(LedgerStore))
+@pytest.fixture(params=IMPLEMENTATIONS[LedgerStore], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> LedgerHarness:
     made = cast(Callable[[Path], LedgerHarness], request.param)(tmp_path)
     assert isinstance(made.store, LedgerStore)

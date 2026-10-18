@@ -9,10 +9,10 @@ from typing import cast
 import pytest
 
 from orgmcp.kernel import TraceTap
-from orgmcp.kernel.tests._red import impls
+from orgmcp.kernel.testing import IMPLEMENTATIONS
 
 
-@pytest.fixture(params=impls(TraceTap))
+@pytest.fixture(params=IMPLEMENTATIONS[TraceTap], ids=lambda factory: factory.__name__)
 def tap(request: pytest.FixtureRequest, tmp_path: Path) -> TraceTap:
     made = cast(Callable[[Path], TraceTap], request.param)(tmp_path)
     assert isinstance(made, TraceTap)

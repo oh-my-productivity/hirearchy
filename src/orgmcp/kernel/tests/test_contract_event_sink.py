@@ -12,10 +12,10 @@ from typing import cast
 import pytest
 
 from orgmcp.kernel import EventSink
-from orgmcp.kernel.tests._red import impls
+from orgmcp.kernel.testing import IMPLEMENTATIONS
 
 
-@pytest.fixture(params=impls(EventSink))
+@pytest.fixture(params=IMPLEMENTATIONS[EventSink], ids=lambda factory: factory.__name__)
 def sink(request: pytest.FixtureRequest, tmp_path: Path) -> EventSink:
     made = cast(Callable[[Path], EventSink], request.param)(tmp_path)
     assert isinstance(made, EventSink)

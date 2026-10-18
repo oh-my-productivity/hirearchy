@@ -2,27 +2,32 @@
 
 from __future__ import annotations
 
+import contextlib
+import json
+import os
 import secrets
+import time
 from collections.abc import Callable, Mapping
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from ._paths import OrgLayout
 from ._ports import AtomicWriter, Clock, Environment, IdGenerator, JsonObject, LedgerStore
+from ._timeutil import STAMP_FORMAT
 
 
 class SystemClock(Clock):
     def now(self) -> datetime:
-        raise NotImplementedError("red: K1")
+        return datetime.now(timezone.utc)
 
     def time(self) -> float:
-        raise NotImplementedError("red: K1")
+        return time.time()
 
     def monotonic(self) -> float:
-        raise NotImplementedError("red: K1")
+        return time.monotonic()
 
     def sleep(self, seconds: float) -> None:
-        raise NotImplementedError("red: K1")
+        time.sleep(seconds)
 
 
 class TimestampIdGenerator(IdGenerator):
@@ -31,7 +36,7 @@ class TimestampIdGenerator(IdGenerator):
         self._token_hex = token_hex
 
     def message_id(self, sender: str) -> str:
-        raise NotImplementedError("red: K1")
+        return f"{self._clock.now():{STAMP_FORMAT}}-{sender.replace('/', '.')}-{self._token_hex(2)}"
 
 
 class FsAtomicWriter(AtomicWriter):
@@ -39,7 +44,15 @@ class FsAtomicWriter(AtomicWriter):
         self._token_hex = token_hex
 
     def write(self, path: Path, text: str) -> None:
-        raise NotImplementedError("red: K1")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.parent / f".tmp-{self._token_hex(4)}-{path.name}"
+        try:
+            tmp.write_text(text, encoding="utf-8")
+            os.replace(tmp, path)
+        except BaseException:
+            with contextlib.suppress(OSError):  # the original failure is the one to report
+                tmp.unlink(missing_ok=True)
+            raise
 
 
 class FsLedgerStore(LedgerStore):
@@ -48,21 +61,25 @@ class FsLedgerStore(LedgerStore):
         self._writer = writer
 
     def read(self, name: str) -> JsonObject:
-        raise NotImplementedError("red: K1")
+        try:
+            data = json.loads(self._paths.ledger_file(name).read_text(encoding="utf-8"))
+        except (FileNotFoundError, ValueError):
+            return {}
+        return data if isinstance(data, dict) else {}
 
     def write(self, name: str, data: JsonObject) -> None:
-        raise NotImplementedError("red: K1")
+        self._writer.write(self._paths.ledger_file(name), json.dumps(data, indent=2) + "\n")
 
 
 class OsEnvironment(Environment):
     def get(self, name: str) -> str | None:
-        raise NotImplementedError("red: K1")
+        return os.environ.get(name)
 
     def cwd(self) -> Path:
-        raise NotImplementedError("red: K1")
+        return Path.cwd()
 
     def home(self) -> Path:
-        raise NotImplementedError("red: K1")
+        return Path.home()
 
     def variables(self) -> Mapping[str, str]:
-        raise NotImplementedError("red: K1")
+        return dict(os.environ)
