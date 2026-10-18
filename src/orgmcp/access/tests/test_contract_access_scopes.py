@@ -9,9 +9,7 @@ import pytest
 from orgmcp.access import AccessScopes
 from orgmcp.access.testing import IMPLEMENTATIONS, AccessHarness
 
-from ._support import RED, make
-
-pytestmark = pytest.mark.xfail(strict=True, reason=RED)
+from ._support import make
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[AccessScopes], ids=lambda factory: factory.__name__)

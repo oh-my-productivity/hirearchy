@@ -10,9 +10,6 @@ import pytest
 
 from orgmcp.access.testing import AccessHarness
 
-RED = "red: B-access"
-red = pytest.mark.xfail(strict=True, reason=RED)  # the red tests of a unit file that also has tests which already pass
-
 
 def make(request: pytest.FixtureRequest, tmp_path: Path) -> AccessHarness:
     """The fixture body of every contract suite: the harness of one implementation."""

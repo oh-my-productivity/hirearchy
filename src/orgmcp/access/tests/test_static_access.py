@@ -4,12 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from orgmcp.access import AccessScopes, AuthorityPolicy, ModelResolver, ToolNaming
 from orgmcp.access.testing import StaticAccess
-
-from ._support import red
 
 
 def test_it_is_all_four_ports() -> None:
@@ -18,7 +14,6 @@ def test_it_is_all_four_ports() -> None:
     assert isinstance(fake, ToolNaming) and isinstance(fake, ModelResolver)
 
 
-@red
 def test_agents_and_the_configuration_are_prepared_in_memory() -> None:
     fake = StaticAccess(Path("/the/org"), "---\ndefault_model: m-org\n---\n")
     fake.put_agent("ceo", {"role": "R", "tools": ["read"], "workspace": "/w/ceo", "model": "m-1"})
@@ -31,7 +26,6 @@ def test_agents_and_the_configuration_are_prepared_in_memory() -> None:
     assert fake.check_inputs(["/elsewhere/x"]) == ["/elsewhere/x"]
 
 
-@red
 def test_it_touches_no_file(tmp_path: Path) -> None:
     fake = StaticAccess()
     fake.put_agent("ceo", {"role": "R", "workspace": str(tmp_path / "ws")})

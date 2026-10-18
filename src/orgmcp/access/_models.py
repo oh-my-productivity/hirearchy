@@ -13,7 +13,8 @@ class CharterModelResolver(ModelResolver):
         self._settings = settings
 
     def default_model(self) -> str:
-        raise NotImplementedError
+        return self._settings.default_model()
 
     def model_for(self, addr: str) -> str:
-        raise NotImplementedError
+        meta, _ = self._charters.charter(addr)
+        return str(meta.get("model") or "").strip() or self.default_model()

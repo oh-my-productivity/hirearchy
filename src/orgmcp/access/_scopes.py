@@ -6,6 +6,8 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from ..agents import AgentDirectory, CharterReader
+from ..kernel import ROOT, norm
+from ._rules import unconfined_read
 from .api import AccessScopes
 
 
@@ -15,13 +17,25 @@ class CharterAccessScopes(AccessScopes):
         self._charters = charters
 
     def workspace_of(self, addr: str) -> Path | None:
-        raise NotImplementedError
+        a = norm(addr)
+        if a == ROOT or not self._agents.exists(a):
+            return None
+        raw = self._charters.charter(a)[0].get("workspace")
+        return Path(str(raw)).expanduser().resolve() if raw else None
 
     def inputs_of(self, addr: str) -> list[Path]:
-        raise NotImplementedError
+        a = norm(addr)
+        if a == ROOT or not self._agents.exists(a):
+            return []
+        raw = self._charters.charter(a)[0].get("inputs")
+        items = [raw] if isinstance(raw, str) else (raw if isinstance(raw, list) else [])
+        return [Path(str(x)).expanduser().resolve() for x in items if str(x).strip()]
 
     def readable_roots(self, addr: str) -> list[Path]:
-        raise NotImplementedError
+        a = norm(addr)
+        roots = [*self.inputs_of(a)]
+        roots += [w for s in self._agents.subtree(a) if (w := self.workspace_of(s)) is not None]
+        return roots
 
     def unconfined_read(self, meta: Mapping[str, object]) -> bool:
-        raise NotImplementedError
+        return unconfined_read(meta)

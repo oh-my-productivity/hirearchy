@@ -6,4 +6,5 @@ from collections.abc import Mapping
 
 
 def unconfined_read(meta: Mapping[str, object]) -> bool:
-    raise NotImplementedError
+    """Legacy charter: no workspace and no ``inputs`` key. Its built-in ``read`` is not confined (as before)."""
+    return not meta.get("workspace") and "inputs" not in meta

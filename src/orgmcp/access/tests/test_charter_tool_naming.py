@@ -2,15 +2,11 @@
 
 from __future__ import annotations
 
-import pytest
-
 from orgmcp.access import ToolNaming
 from orgmcp.access._naming import CharterToolNaming
 from orgmcp.agents import CharterReader
 from orgmcp.agents.testing import MemoryAgents
 from orgmcp.kernel import JsonObject
-
-from ._support import red
 
 
 class RecordingCharters(CharterReader):
@@ -30,14 +26,12 @@ def test_it_is_a_tool_naming() -> None:
     assert isinstance(CharterToolNaming(MemoryAgents()), ToolNaming)
 
 
-@red
 def test_root_is_answered_without_reading_a_charter() -> None:
     charters = RecordingCharters(MemoryAgents())
     assert CharterToolNaming(charters).tool_names("root") == {"read": "read", "write": "write"}
     assert charters.asked == []
 
 
-@red
 def test_the_charter_asked_for_is_the_one_of_the_address_as_given() -> None:
     agents = MemoryAgents()
     agents.put("dev/AGENT.md", "---\nrole: R\ntools: [read]\n---\nb\n")

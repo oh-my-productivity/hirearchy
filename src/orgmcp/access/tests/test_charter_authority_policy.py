@@ -12,7 +12,6 @@ from orgmcp.access._authority import CharterAuthorityPolicy
 from orgmcp.agents.testing import MemoryAgents
 from orgmcp.kernel import OrgError, OrgPaths
 
-from ._support import red
 
 ROOT = Path("/memory/org")
 
@@ -47,7 +46,6 @@ def test_it_is_an_authority_policy() -> None:
     assert isinstance(policy(FixedScopes(None, [])), AuthorityPolicy)
 
 
-@red
 def test_the_bases_of_the_inputs_are_the_workspace_then_the_inputs_the_scopes_name() -> None:
     scopes = FixedScopes(Path("/a/ws"), [Path("/a/in")])
     policy(scopes).check_authority("ceo", [], None, ["/a/ws/x", "/a/in/y"])
@@ -55,13 +53,11 @@ def test_the_bases_of_the_inputs_are_the_workspace_then_the_inputs_the_scopes_na
         policy(scopes).check_authority("ceo", [], None, ["/a/other"])
 
 
-@red
 def test_without_bases_nothing_can_be_assigned() -> None:
     with pytest.raises(OrgError, match="^you have no workspace or inputs, so you cannot assign inputs$"):
         policy(FixedScopes(None, [])).check_authority("ceo", [], None, ["/a/x"])
 
 
-@red
 def test_the_scopes_are_not_asked_when_there_are_no_inputs_to_check() -> None:
     class Refusing(FixedScopes):
         def workspace_of(self, addr: str) -> Path | None:
@@ -71,7 +67,6 @@ def test_the_scopes_are_not_asked_when_there_are_no_inputs_to_check() -> None:
     policy(Refusing(None, [])).check_authority("ceo", ["read"], None, None)
 
 
-@red
 def test_the_workspace_of_the_grantor_is_the_one_of_the_charter_not_the_scopes() -> None:
     charter = "---\nrole: R\nworkspace: /c/ws\n---\nbody\n"
     policy(FixedScopes(Path("/other"), []), charter).check_authority("ceo", [], "/c/ws/sub")
@@ -79,7 +74,6 @@ def test_the_workspace_of_the_grantor_is_the_one_of_the_charter_not_the_scopes()
         policy(FixedScopes(Path("/other"), []), charter).check_authority("ceo", [], "/other/sub")
 
 
-@red
 def test_the_organization_directory_is_the_one_of_the_layout() -> None:
     with pytest.raises(OrgError, match=r"^an input must not overlap the organization directory \(/memory/org\): /memory/org/x$"):
         policy(FixedScopes(None, [])).check_inputs(["/memory/org/x"])

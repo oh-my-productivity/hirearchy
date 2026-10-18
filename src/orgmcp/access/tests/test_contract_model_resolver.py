@@ -10,9 +10,7 @@ from orgmcp.access import ModelResolver
 from orgmcp.access.testing import IMPLEMENTATIONS, AccessHarness
 from orgmcp.settings import DEFAULT_MODEL
 
-from ._support import RED, make
-
-pytestmark = pytest.mark.xfail(strict=True, reason=RED)
+from ._support import make
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[ModelResolver], ids=lambda factory: factory.__name__)

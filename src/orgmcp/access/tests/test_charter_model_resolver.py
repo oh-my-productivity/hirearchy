@@ -2,16 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
-
 from orgmcp.access import ModelResolver
 from orgmcp.access._models import CharterModelResolver
 from orgmcp.agents.testing import MemoryAgents
 from orgmcp.kernel import JsonObject
 from orgmcp.settings import DEFAULT_MODEL, OrgSettings
 from orgmcp.settings.testing import MemoryOrgSettings
-
-from ._support import red
 
 
 class BrokenSettings(MemoryOrgSettings):
@@ -40,7 +36,6 @@ def test_it_is_a_model_resolver() -> None:
     assert isinstance(CharterModelResolver(MemoryAgents(), MemoryOrgSettings("x")), ModelResolver)
 
 
-@red
 def test_the_default_model_is_the_one_the_settings_port_reports() -> None:
     class Fixed(MemoryOrgSettings):
         def default_model(self) -> str:
@@ -50,7 +45,6 @@ def test_the_default_model_is_the_one_the_settings_port_reports() -> None:
     assert CharterModelResolver(MemoryAgents(), MemoryOrgSettings("x")).default_model() == DEFAULT_MODEL
 
 
-@red
 def test_a_charter_with_a_model_never_consults_the_settings() -> None:
     settings = BrokenSettings()
     resolver = CharterModelResolver(agents_with("---\nrole: R\nmodel: m-1\n---\nb\n"), settings)
@@ -58,7 +52,6 @@ def test_a_charter_with_a_model_never_consults_the_settings() -> None:
     assert settings.asked == 0
 
 
-@red
 def test_a_charter_without_a_model_consults_the_settings_once() -> None:
     class Counting(MemoryOrgSettings):
         asked = 0

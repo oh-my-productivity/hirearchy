@@ -10,9 +10,7 @@ from orgmcp.access import AuthorityPolicy
 from orgmcp.access.testing import IMPLEMENTATIONS, AccessHarness
 from orgmcp.kernel import OrgError
 
-from ._support import RED, make, outside
-
-pytestmark = pytest.mark.xfail(strict=True, reason=RED)
+from ._support import make, outside
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[AuthorityPolicy], ids=lambda factory: factory.__name__)

@@ -6,10 +6,6 @@ import pytest
 
 from orgmcp.access import unconfined_read
 
-from ._support import RED
-
-pytestmark = pytest.mark.xfail(strict=True, reason=RED)
-
 
 @pytest.mark.parametrize(
     ("meta", "expected"),
