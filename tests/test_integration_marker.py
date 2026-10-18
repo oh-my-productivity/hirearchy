@@ -69,6 +69,7 @@ def nested(tmp_path):
         base_env["PATH"] = os.pathsep.join(d for d in base_env["PATH"].split(os.pathsep) if "kiro-home" not in d)  # the outer stub
         full = {**base_env, "REAL_HOME_FOR_TEST": str(tmp_path / "pretend-real-home"), "HOME": str(tmp_path / "pretend-real-home"),
                 "MARKER_OUT": str(out), **(env or {})}
+        full["PYTHONPATH"] = os.pathsep.join(filter(None, [str(HERE), full.get("PYTHONPATH", "")]))  # root conftest's plugin: testkit.fixtures
         p = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", "--rootdir", str(proj), *args],
                            cwd=proj, env=full, capture_output=True, text=True, timeout=120)
         return p, sorted(x.name for x in out.iterdir())

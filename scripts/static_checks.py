@@ -5,9 +5,12 @@
     uv run python scripts/static_checks.py mypy       # only mypy
     uv run python scripts/static_checks.py imports    # only import-linter
 
-* mypy checks the packages listed in ``[tool.mypy] packages`` of pyproject.toml with ``strict = true`` (the list is
-  empty until the first refactored package exists: then there is nothing to check and the run only proves that mypy works).
-* import-linter checks every ``[[tool.importlinter.contracts]]`` of pyproject.toml.
+* mypy checks with ``strict = true`` (a) every package directory under ``src/orgmcp/`` (a directory with ``__init__.py``: kernel, the
+  features, the entry points, app -- a package is a refactored package, ARCHITECTURE.md R10, so nobody has to remember to opt in) and
+  (b) the packages listed in ``[tool.mypy] packages`` of pyproject.toml (for a flat legacy module that is made strict early). With
+  neither there is nothing to check and the run only proves that mypy works.
+* import-linter checks the contracts generated from the packages that exist (``python -m tests.architecture.lint``: layers, private
+  modules, kernel independence, ...) and the hand-written ``[[tool.importlinter.contracts]]`` of pyproject.toml.
 
 Exit status: 0 when everything that ran passed, 1 otherwise, 2 when a tool is not installed.
 """
@@ -29,9 +32,15 @@ def tool(name: str) -> str | None:
     return str(beside) if beside.exists() else shutil.which(name)
 
 
+def discover_packages(source: Path) -> list[str]:
+    """``orgmcp.<dir>`` for every package directory of ``source`` (a directory with an __init__.py)."""
+    return sorted(f"{source.name}.{d.name}" for d in source.iterdir() if d.is_dir() and (d / "__init__.py").is_file())
+
+
 def strict_packages() -> list[str]:
     config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    return list(config.get("tool", {}).get("mypy", {}).get("packages", []))
+    configured = list(config.get("tool", {}).get("mypy", {}).get("packages", []))
+    return sorted(set(configured) | set(discover_packages(ROOT / "src" / "orgmcp")))
 
 
 def run_mypy() -> int:
@@ -43,18 +52,15 @@ def run_mypy() -> int:
     if not packages:
         version = subprocess.run([exe, "--version"], capture_output=True, text=True, cwd=ROOT, check=False)
         print(f"mypy: {version.stdout.strip()}; no package is under strict checking yet "
-              "(add it to [tool.mypy] packages in pyproject.toml)", flush=True)
+              "(a src/orgmcp/<pkg>/ directory with __init__.py is checked automatically)", flush=True)
         return version.returncode
     print(f"mypy --strict on: {', '.join(packages)}", flush=True)
-    return subprocess.run([exe], cwd=ROOT, check=False).returncode  # targets come from [tool.mypy] packages
+    return subprocess.run([exe, *(arg for package in packages for arg in ("-p", package))], cwd=ROOT, check=False).returncode
 
 
 def run_imports() -> int:
-    exe = tool("lint-imports")
-    if exe is None:
-        print("import-linter is not installed (uv sync installs the dev dependencies)", file=sys.stderr)
-        return 2
-    return subprocess.run([exe], cwd=ROOT, check=False).returncode
+    """The generated and the hand-written import contracts: one implementation, ``tests/architecture/lint.py``."""
+    return subprocess.run([sys.executable, "-m", "tests.architecture.lint"], cwd=ROOT, check=False).returncode
 
 
 def main(argv: list[str]) -> int:
