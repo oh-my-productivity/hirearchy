@@ -476,6 +476,66 @@ trace 20261018T091640455395-root-5160 "Ship it" -> ceo: done
 
 Each is PASS or FAIL with details naming the defect: **(a)** every message file parses, ids are unique, every sender copy has a recipient copy and vice versa; **(b)** budget is conserved (everything root handed down = budgets held + runs used, live and retired, + returned to root + dropped at retirement); **(c)** nothing is in `inflight/` without a live run; **(d)** every `run.start` has a `run.end` or a live process, and every run log since events began has a `run.start`; **(e)** each event file has no `seq` gaps (it counts from 1 in each file); **(f)** the scheduler pid file matches a live scheduler of this org.
 
+## Dashboard
+
+`orgmcp dash` is a read-only terminal dashboard for a running org: the agent hierarchy with what every agent is doing, its run log, messages and activity, your requests with their traces, services, the live event stream and health. It never writes inside the organization and emits no event; grants, start/stop and feedback stay with the assistant and the CLI.
+
+```sh
+orgmcp --root ORG dash [--interval SECONDS]   # the interactive dashboard (default refresh: 2 s)
+orgmcp --root ORG dash --once                  # a plain-text snapshot, then exit (also used without a terminal)
+```
+
+The state words are derived from the same files as `status`, `progress` and `obs now`: `running 1m12s`; `queued: <why>` (no budget, paused, `max_parallel` busy, scheduler not running, ready, or its current run still going); `working on N task(s)`; `waiting on N report(s)`; `idle`; `paused: <reason>`; `out of budget`. The header shows the org, the scheduler (running pid / uptime / last heartbeat, or stopped and why) and the counts running, queued, waiting on you and errors in the last 15 minutes. Screenshots of every screen of a demo org are in `studies/DASH-screens/` (`make_screens.py` regenerates them).
+
+| Key | Does |
+| --- | --- |
+| `1` `2` `3` `4` `5` | Org · Workflows · Services · Events · Health |
+| `↑` `↓` / `j` `k`, `g` `G` | move, top / bottom |
+| `←` `→` / `h` `l` | fold / unfold a node, or switch pane (`h` returns to the tree) |
+| `Enter` | open: agent → its details, request → its trace, service → cases, playbook and contract, message → its text |
+| `Esc` / `Backspace` | back (close an overlay, leave a trace or a service) |
+| `Tab` / `Shift+Tab` | cycle focus between the panes |
+| `[` `]` | previous / next tab of an agent: Overview, Activity, Messages, Run log, Memory, Charter |
+| `r` / `p` | refresh now / pause and resume the automatic refresh |
+| `e` `/` `f` | Events: errors only, filter (words matched against agent, kind, trace, tool), follow on/off |
+| `c` | Health: run the consistency check (`obs check`) on demand |
+| `?` / `q` | all keys / quit |
+
+Refreshes keep the selection, the scroll position and the folded nodes; the Run log tab follows a growing log (it shows the last 2000 lines). A refresh that fails is shown in a red status line above the footer and the dashboard keeps running. The traces and the check are computed when opened, not on every tick.
+
+What `--once` prints (the demo org of `studies/DASH-screens`):
+
+```text
+orgmcp dash - acme (/path/to/acme)  2026-10-18 10:06:40Z
+scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago) | running 2/2 · queued 2 · waiting on you 1 · errors 15m 2
+
+AGENTS
+★ root (you)  needs you: 1
+  ○ archivist [Archivist]  idle  budget 0  claude-sonnet-5.5
+  ▶ ceo [Chief executive]  running 1m12s  budget 3  claude-sonnet-5.5
+    ◔ analyst [Competitor analyst]  queued: max_parallel (2) runs are busy  budget 4  claude-opus-5.5
+    ◆ writer [Report writer]  working on 1 task(s)  budget 2  claude-sonnet-5.5
+  ◇ ops [Operations lead]  waiting on 1 report(s)  budget 3  claude-sonnet-5.5
+    ‖ audit [Auditor]  paused: paused by the user: audit window closed  budget 0  claude-sonnet-5.5
+    ◔ deploy [Deploy engineer]  queued: paused: 2 consecutive failed runs  budget 1  claude-sonnet-5.5
+  ▶ research [Research lead]  running 2m05s  budget 4  claude-sonnet-5.5
+    ! crawler [Web crawler]  out of budget  budget 0  claude-sonnet-5.5
+
+NEEDS YOU
+  Needs you: note from ops "Need approval for downtime": The key rotation needs a maintenance window. May I take the API down o...
+
+REQUESTS
+  "Brief: heat pumps" -> research: working (running: research); runs 2 of 6, last activity 5.0s ago
+  "Brief: EV chargers (shorter)" -> research: done; runs 1 of 4 (3 returned), last activity 5.0s ago
+  "Brief: EV chargers" -> research: done; runs 1 of 6 (5 returned), last activity 5.0s ago
+  "Rotate API keys" -> ops: waiting on ops/deploy (paused: 2 consecutive failed runs); runs 2 of 6, last activity 4m10s ago
+  "Quarterly market report" -> ceo: working (running: ceo; unread work: ceo/analyst); runs 3 of 12, last activity 0s ago
+  "Archive old reports" -> archivist: done; runs 1 of 3 (2 returned), last activity 6m18s ago
+
+SERVICES
+  research/market-brief  contract v1 playbook v1  2 request(s): 1 done, 0 failed, 1 open; 1 reworked; avg 2 runs; feedback 1 ac...
+```
+
 ## Kiro integration
 
 **Talking to the org yourself (you act as `root`).** Register the server globally; it does not need an
@@ -661,4 +721,6 @@ uv run pytest -q
 
 The tests use a deterministic fake agent (`tests/fake_agent.py`) in place of kiro. An autouse fixture
 (`tests/conftest.py`) points `$HOME` and the profile directory at a temp dir and puts a stub `kiro-cli` first on
-`PATH`, so running them never touches your real `~/.kiro`.
+`PATH`, so running them never touches your real `~/.kiro`. A test that would call a real LLM through `kiro-cli` must be
+marked `@pytest.mark.integration`: those are skipped unless you ask for them (`uv run pytest --run-integration`, or
+`ORGMCP_RUN_INTEGRATION=1`). None of the current tests needs one.
