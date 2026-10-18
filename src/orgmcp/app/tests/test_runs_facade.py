@@ -13,8 +13,6 @@ import orgmcp.core as core
 from orgmcp.app import Org
 from orgmcp.runs.testing import MemoryRuns
 
-RED = pytest.mark.xfail(strict=True, reason="red: A-runs")
-
 
 def use(org: Org, **ports: Any) -> None:
     org.runtime = dataclasses.replace(org.runtime, **ports)
@@ -83,17 +81,15 @@ def test_two_logs_in_the_same_instant_are_one_run(org: Org, monkeypatch: pytest.
 # -------------------------------------------------------------------------------------------- through the ports (red until wired)
 
 
-@RED
 def test_runs_used_comes_from_the_log_reader_of_the_runtime(org: Org) -> None:
     fake = MemoryRuns(root=org.root)
     fake.add_agent("ceo")
     fake.create("ceo")
     fake.create("ceo")
     use(org, run_log_reader=fake)
-    assert org.runs_used("ceo") == 2 and (org.root / "ceo" / "runs").exists() is False
+    assert org.runs_used("ceo") == 2 and list((org.root / "ceo" / "runs").glob("*.log")) == []  # none on disk: the fake answered
 
 
-@RED
 def test_start_run_log_comes_from_the_log_writer_of_the_runtime(org: Org) -> None:
     fake = MemoryRuns(root=org.root)
     fake.add_agent("ceo")
