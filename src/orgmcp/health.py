@@ -17,13 +17,14 @@ Thresholds come from ``HEALTH_DEFAULTS`` overridden by the ``health:`` mapping i
 
 from __future__ import annotations
 
-import math
 import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 
-from .core import DEFAULT_CONFIG, ROOT, Message, Org, OrgError, latest_results, utcnow
+from .core import ROOT, Message, Org, OrgError, latest_results, utcnow
 from .kernel import aware, fmt_duration, msg_time, parse_time, stamp_of
+from .settings import config_number  # noqa: F401 - re-export (legacy name health.config_number)
+from .settings import finite_number as _number
 
 HEALTH_DEFAULTS: dict[str, float] = {
     "stuck_after_seconds": 1800,  # open task older than this, with nothing in progress -> stuck
@@ -98,21 +99,6 @@ class OrgHealth:
         return _plain(asdict(self) | {"flagged": [a.addr for a in self.flagged]})
 
 
-def _number(value) -> float | None:
-    """``value`` as a finite int/float, or None. Numeric strings are accepted ("1800"); booleans are not."""
-    if isinstance(value, bool):
-        return None
-    if isinstance(value, str):
-        try:
-            value = float(value)
-        except ValueError:
-            return None
-        value = int(value) if value.is_integer() else value
-    if isinstance(value, (int, float)) and math.isfinite(value):
-        return value
-    return None
-
-
 def thresholds(org: Org) -> dict:
     """HEALTH_DEFAULTS merged with the ``health:`` mapping of ORG.md.
 
@@ -124,12 +110,6 @@ def thresholds(org: Org) -> dict:
         number = _number(merged[key])
         merged[key] = default if number is None else number
     return merged
-
-
-def config_number(config: dict, key: str, kind=float):
-    """A numeric setting of ORG.md as ``kind``; a missing or malformed value falls back to the default."""
-    number = _number(config.get(key))
-    return kind(number if number is not None else DEFAULT_CONFIG[key])
 
 
 def _client_rework(

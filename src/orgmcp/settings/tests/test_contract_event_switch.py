@@ -10,10 +10,9 @@ import pytest
 
 from orgmcp.settings import EventSwitch
 from orgmcp.settings.testing import IMPLEMENTATIONS, SwitchHarness
-from orgmcp.settings.tests._red import impls
 
 
-@pytest.fixture(params=impls(IMPLEMENTATIONS[EventSwitch]))
+@pytest.fixture(params=IMPLEMENTATIONS[EventSwitch], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> SwitchHarness:
     made = cast(Callable[[Path], SwitchHarness], request.param)(tmp_path)
     assert isinstance(made.switch, EventSwitch)

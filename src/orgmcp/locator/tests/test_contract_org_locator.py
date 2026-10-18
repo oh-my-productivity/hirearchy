@@ -11,12 +11,11 @@ import pytest
 from orgmcp.kernel import OrgError
 from orgmcp.locator import OrgLocator
 from orgmcp.locator.testing import IMPLEMENTATIONS, LocatorHarness
-from orgmcp.locator.tests._red import impls
 
 MESSAGE = "no organization found: set ORG_ROOT or run inside an org directory"
 
 
-@pytest.fixture(params=impls(IMPLEMENTATIONS[OrgLocator]))
+@pytest.fixture(params=IMPLEMENTATIONS[OrgLocator], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> LocatorHarness:
     made = cast(Callable[[Path], LocatorHarness], request.param)(tmp_path)
     assert isinstance(made.locator, OrgLocator)

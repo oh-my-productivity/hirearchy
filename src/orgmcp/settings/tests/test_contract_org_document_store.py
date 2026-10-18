@@ -10,12 +10,11 @@ import pytest
 
 from orgmcp.settings import OrgDocumentStore
 from orgmcp.settings.testing import IMPLEMENTATIONS, DocumentHarness
-from orgmcp.settings.tests._red import impls
 
 TEXT = "---\nevents: false\nmax_depth: 3\n---\n# Mission é ✓\n\n  two trailing spaces  \n\n1. Rule.\n"
 
 
-@pytest.fixture(params=impls(IMPLEMENTATIONS[OrgDocumentStore]))
+@pytest.fixture(params=IMPLEMENTATIONS[OrgDocumentStore], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> DocumentHarness:
     made = cast(Callable[[Path], DocumentHarness], request.param)(tmp_path)
     assert isinstance(made.store, OrgDocumentStore)

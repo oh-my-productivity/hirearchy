@@ -15,8 +15,6 @@ from orgmcp.kernel import OrgError
 from orgmcp.settings import DEFAULT_CONFIG, DEFAULT_MODEL
 from orgmcp.settings.testing import MemoryOrgSettings
 
-red = pytest.mark.xfail(strict=True, raises=(AttributeError, TypeError, ImportError, AssertionError), reason="red: A-settings")
-
 DOCUMENTS = [
     ("---\nmax_depth: 7\nflavour: mint\n---\n# Mission\n\nStudy octopuses.\n\n", {"max_depth": 7, "flavour": "mint"}, "# Mission\n\nStudy octopuses."),
     ("no frontmatter\n", {}, "no frontmatter"),
@@ -87,8 +85,7 @@ def test_find_root_is_a_static_method() -> None:
     assert isinstance(inspect.getattr_static(Org, "find_root"), staticmethod)
 
 
-@red
 def test_config_and_rules_come_from_the_settings_port_of_the_runtime(org: Org) -> None:
-    org.runtime = dataclasses.replace(org.runtime, settings=MemoryOrgSettings("---\nmax_depth: 8\n---\nfrom the fake\n"))  # type: ignore[call-arg]
+    org.runtime = dataclasses.replace(org.runtime, settings=MemoryOrgSettings("---\nmax_depth: 8\n---\nfrom the fake\n"))
     assert org.config["max_depth"] == 8 and org.rules() == "from the fake"
 

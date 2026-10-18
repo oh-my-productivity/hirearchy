@@ -11,10 +11,9 @@ import pytest
 from orgmcp.settings import DEFAULT_CONFIG, DEFAULT_MODEL, OrgSettings
 from orgmcp.settings.testing import IMPLEMENTATIONS, SettingsHarness
 from orgmcp.settings.tests._legacy import yaml_error
-from orgmcp.settings.tests._red import impls
 
 
-@pytest.fixture(params=impls(IMPLEMENTATIONS[OrgSettings]))
+@pytest.fixture(params=IMPLEMENTATIONS[OrgSettings], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> SettingsHarness:
     made = cast(Callable[[Path], SettingsHarness], request.param)(tmp_path)
     assert isinstance(made.settings, OrgSettings)
