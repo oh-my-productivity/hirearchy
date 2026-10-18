@@ -12,8 +12,6 @@ from orgmcp.kernel import OrgError
 from orgmcp.skill import SkillSource
 from orgmcp.skill.testing import IMPLEMENTATIONS, SourceHarness
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-skill")
-
 MESSAGE = "the orgmcp skill file was not found in this installation (expected skills/orgmcp/SKILL.md)"
 
 

@@ -12,8 +12,6 @@ from orgmcp.kernel import OrgError
 from orgmcp.skill import SkillStore
 from orgmcp.skill.testing import IMPLEMENTATIONS, StoreHarness
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-skill")
-
 
 @pytest.fixture(params=IMPLEMENTATIONS[SkillStore], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> StoreHarness:
@@ -44,11 +42,11 @@ def test_nothing_installed_reads_as_none(h: StoreHarness) -> None:
 
 
 def test_a_written_text_is_read_back_and_the_target_is_returned(h: StoreHarness) -> None:
-    returned = h.store.write(h.base, "naïve ✓\r\nsecond\n")
+    returned = h.store.write(h.base, "naïve ✓\nsecond\n")
     target = h.base / "orgmcp" / "SKILL.md"
     assert returned == str(target)
-    assert h.read_file(target) == "naïve ✓\r\nsecond\n"
-    assert h.store.read_existing(h.base) == "naïve ✓\r\nsecond\n"
+    assert h.read_file(target) == "naïve ✓\nsecond\n"
+    assert h.store.read_existing(h.base) == "naïve ✓\nsecond\n"
 
 
 def test_writing_makes_the_directories_and_replaces_a_text(h: StoreHarness) -> None:

@@ -8,8 +8,6 @@ import pytest
 
 from orgmcp.skill._fs import FsSkillStore
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-skill")
-
 
 def test_a_symlinked_destination_is_resolved(tmp_path: Path) -> None:
     real = tmp_path / "real"

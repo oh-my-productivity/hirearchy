@@ -10,8 +10,6 @@ from orgmcp.kernel import OrgError
 from orgmcp.skill import SkillSource, SkillStore
 from orgmcp.skill.testing import MemorySkillSource, MemorySkillStore
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-skill")
-
 
 def test_a_source_without_text_cannot_be_read_and_one_with_text_can() -> None:
     assert isinstance(MemorySkillSource(), SkillSource)

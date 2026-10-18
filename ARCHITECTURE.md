@@ -947,7 +947,8 @@ class RulesUpgrader(Protocol):       # upgrade
 class SkillSource(Protocol):         # skill (port)
     def read(self) -> str: """The packaged SKILL.md (wheel `_skill/` or checkout `skills/orgmcp/`); OrgError if missing."""
 class SkillStore(Protocol):          # skill (port)
-    def read_existing(self, dest: Path | None) -> str | None: ...
+    def target(self, dest: Path | None) -> Path: """<dest>/orgmcp/SKILL.md (~ expanded, resolved; None: ~/.kiro/skills); the installer names it in its messages."""
+    def read_existing(self, dest: Path | None) -> str | None: """None when absent; OrgError when the target exists and is not a file."""
     def write(self, dest: Path | None, text: str) -> str: """Returns the target path."""
 class SkillInstaller(Protocol):
     def install_skill(self, dest: str | Path | None = None, force: bool = False) -> str: ...

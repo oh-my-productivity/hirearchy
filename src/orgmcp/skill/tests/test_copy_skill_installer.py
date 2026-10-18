@@ -10,8 +10,6 @@ from orgmcp.kernel import OrgError
 from orgmcp.skill import SkillSource, SkillStore
 from orgmcp.skill._install import CopySkillInstaller
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-skill")
-
 
 class Source(SkillSource):
     def __init__(self, calls: list[str], text: str | None) -> None:

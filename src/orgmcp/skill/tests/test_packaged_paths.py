@@ -13,8 +13,6 @@ import shutil
 import tomllib
 from pathlib import Path
 
-import pytest
-
 from orgmcp.skill import skill_source
 from orgmcp.skill._source import PackagedSkillSource
 
@@ -47,12 +45,10 @@ def test_the_wheel_ships_the_skill_beside_the_package() -> None:
     assert force_include() == {"skills/orgmcp/SKILL.md": "orgmcp/_skill/SKILL.md"}
 
 
-@pytest.mark.xfail(strict=True, reason="red: A-skill")
 def test_the_source_of_a_checkout_resolves_to_the_value_of_main() -> None:
     assert PackagedSkillSource(PACKAGE).path() == PACKAGE.parent.parent / "skills" / "orgmcp" / "SKILL.md"
 
 
-@pytest.mark.xfail(strict=True, reason="red: A-skill")
 def test_the_source_of_a_wheel_resolves_to_the_forced_file(tmp_path: Path) -> None:
     site = tmp_path / "site-packages"
     for shipped, destination in force_include().items():
@@ -64,7 +60,6 @@ def test_the_source_of_a_wheel_resolves_to_the_forced_file(tmp_path: Path) -> No
     assert source.read() == SHIPPED.read_text(encoding="utf-8")
 
 
-@pytest.mark.xfail(strict=True, reason="red: A-skill")
 def test_the_wheel_copy_is_found_even_when_no_checkout_is_above_it(tmp_path: Path) -> None:
     site = tmp_path / "a" / "b" / "c" / "site-packages"
     (site / "orgmcp" / "_skill").mkdir(parents=True)

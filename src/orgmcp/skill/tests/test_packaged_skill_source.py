@@ -9,8 +9,6 @@ import pytest
 from orgmcp.kernel import OrgError
 from orgmcp.skill._source import PackagedSkillSource
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-skill")
-
 
 def layout(tmp_path: Path) -> tuple[Path, Path, Path]:
     """(package directory, the wheel's copy, the checkout's copy) of a source tree that is also a site-packages."""

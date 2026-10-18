@@ -6,12 +6,13 @@
 
 from __future__ import annotations
 
+import os
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
 from ..kernel import OrgError
-from ._fs import FsSkillStore
+from ._fs import NOT_A_FILE, FsSkillStore
 from ._install import CopySkillInstaller
 from ._source import NOT_FOUND, PackagedSkillSource
 from ._target import SKILL_FILE, SKILL_NAME, default_base, target_in
@@ -24,41 +25,70 @@ class MemorySkillSource(SkillSource):
     """The packaged text, or nothing (``read`` then fails as the real source does)."""
 
     def __init__(self, text: str | None = None) -> None:
-        raise NotImplementedError
+        self._text = text
 
     def provide(self, text: str) -> None:
-        raise NotImplementedError
+        """The packaged file exists with this text."""
+        self._text = text
 
     def remove(self) -> None:
-        raise NotImplementedError
+        """The packaged file is gone."""
+        self._text = None
 
     def read(self) -> str:
-        raise NotImplementedError
+        if self._text is None:
+            raise OrgError(NOT_FOUND)
+        return self._text
 
 
 class MemorySkillStore(SkillStore):
-    """Skills directories as a dictionary of files and a set of directories; paths are resolved lexically."""
+    """Skills directories as a dictionary of files and a set of directories; paths are resolved lexically (no symlinks)."""
 
     def __init__(self, home: Path = Path("/home/user"), cwd: Path = Path("/work")) -> None:
-        raise NotImplementedError
+        self._home = home
+        self._cwd = cwd
+        self._files: dict[Path, str] = {}
+        self._directories: set[Path] = set()
 
     def put_file(self, path: Path, text: str) -> None:
-        raise NotImplementedError
+        """A file with this text (its parents are directories)."""
+        self._files[path] = text
 
     def put_directory(self, path: Path) -> None:
-        raise NotImplementedError
+        """A directory (its parents are directories too)."""
+        self._directories.add(path)
 
     def read_file(self, path: Path) -> str | None:
-        raise NotImplementedError
+        """The text of a file; ``None`` when ``path`` is no file."""
+        return self._files.get(path)
+
+    def _is_directory(self, path: Path) -> bool:
+        return path in self._directories or any(path in file.parents for file in self._files) or any(
+            path in directory.parents for directory in self._directories)
+
+    def _base(self, dest: Path | None) -> Path:
+        base = default_base(self._home) if dest is None else dest
+        if base.parts[:1] == ("~",):
+            base = self._home.joinpath(*base.parts[1:])
+        return Path(os.path.normpath(base if base.is_absolute() else self._cwd / base))
 
     def target(self, dest: Path | None) -> Path:
-        raise NotImplementedError
+        return target_in(self._base(dest))
 
     def read_existing(self, dest: Path | None) -> str | None:
-        raise NotImplementedError
+        target = self.target(dest)
+        if target in self._files:
+            return self._files[target]
+        if self._is_directory(target):
+            raise OrgError(NOT_A_FILE.format(target=target))
+        return None
 
     def write(self, dest: Path | None, text: str) -> str:
-        raise NotImplementedError
+        target = self.target(dest)
+        if self._is_directory(target):
+            raise IsADirectoryError(str(target))
+        self._files[target] = text
+        return str(target)
 
 
 # ------------------------------------------------------------------------------ harnesses and the registry
@@ -162,8 +192,3 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     SkillStore: [fs_store, memory_store],
     SkillInstaller: [fs_installer, memory_installer],
 }
-
-__all__ = [
-    "IMPLEMENTATIONS", "InstallerHarness", "MemorySkillSource", "MemorySkillStore", "PACKAGED_TEXT", "SourceHarness", "StoreHarness",
-    "SKILL_FILE", "SKILL_NAME", "default_base", "target_in", "OrgError", "NOT_FOUND",
-]
