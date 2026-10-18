@@ -7,6 +7,8 @@ from pathlib import Path
 import pytest
 
 import orgmcp.core as core
+from orgmcp.agents import AgentDirectory
+from orgmcp.agents.testing import MemoryAgents
 from orgmcp.app import wire_mail, wiring
 from orgmcp.kernel import Message, OrgLayout, OrgPaths
 from orgmcp.mail import BatchStore, MailboxReader, MailboxWriter, MailFingerprint, MessageIndex, MessageParser, TaskQuery
@@ -122,9 +124,20 @@ def test_lenient_puts_the_decorator_on_the_reader_and_derives_the_task_views_fro
     assert lenient.mailbox is mailbox and isinstance(mailbox, DirMtimeCachingMailbox)
     assert isinstance(lenient.task_query, DerivedTaskQuery) and lenient.task_query is not runtime.task_query
     assert lenient.mailbox_writer is runtime.mailbox_writer and lenient.batches is runtime.batches
-    assert lenient.message_index is runtime.message_index and lenient.message_parser is runtime.message_parser
+    assert lenient.message_parser is runtime.message_parser and isinstance(lenient.message_index, FsMessageIndex)
     assert lenient.root == runtime.root and lenient.clock is runtime.clock
     assert lenient.mailbox.messages("anyone", "inbox") == []  # the probe says there is no such directory
+
+
+def test_the_lenient_index_walks_the_agents_of_the_runtime_it_is_given(tmp_path: Path) -> None:
+    (tmp_path / "ceo" / "inbox").mkdir(parents=True)
+    (tmp_path / "ceo" / "AGENT.md").write_text("---\nrole: R\n---\nx\n", encoding="utf-8")
+    msg = note(1, sender="root", to="ceo")
+    (tmp_path / "ceo" / "inbox" / f"{msg.id}.md").write_text(msg.to_text(), encoding="utf-8")
+    runtime = wiring.open_runtime(tmp_path)
+    assert [f.id for f in runtime.message_index.scan()] == [msg.id]
+    quiet_agents = wiring.open_runtime(tmp_path, {AgentDirectory: MemoryAgents()})  # an agent directory that knows nobody
+    assert [f.id for f in wire_mail.lenient(quiet_agents, FixedProbe(-1))[0].message_index.scan()] == []
 
 
 def test_what_the_probe_says_is_quiet_is_read_once(tmp_path: Path) -> None:

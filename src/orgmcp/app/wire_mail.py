@@ -35,6 +35,8 @@ def register(b: Builder) -> None:
 
 def lenient(runtime: OrgRuntime, probe: DirectoryProbe) -> tuple[OrgRuntime, DirMtimeCachingMailbox]:
     """``runtime`` with the dashboard's decorator on the mailbox reader (the boxes read per change of their directory, ``probe`` tells
-    when; files that do not parse are left out and listed in the decorator's ``bad``), and the task views derived from it."""
+    when; files that do not parse are left out and listed in the decorator's ``bad``), the task views derived from it, and the index
+    walking the agents of ``runtime`` (so the lenient ones, when ``wire_agents.lenient`` was applied first)."""
     mailbox = DirMtimeCachingMailbox(runtime.mailbox, runtime.paths, runtime.message_parser, probe, runtime.clock)
-    return dataclasses.replace(runtime, mailbox=mailbox, task_query=DerivedTaskQuery(mailbox)), mailbox
+    index = FsMessageIndex(runtime.paths, runtime.agents, runtime.resources.meta_cache)
+    return dataclasses.replace(runtime, mailbox=mailbox, task_query=DerivedTaskQuery(mailbox), message_index=index), mailbox
