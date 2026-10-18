@@ -49,7 +49,7 @@ uv run orgmcp status
 uv run orgmcp inbox
 ```
 
-Other commands: `hire ... --inputs PATH` (repeatable: read-only folders for the agent), `progress [TASK_ID] [--wait SECONDS]`, `plan`/`apply` (blueprints, below), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile).
+Other commands: `hire ... --inputs PATH` (repeatable: read-only folders for the agent), `progress [TASK_ID] [--wait SECONDS]`, `plan`/`apply` (blueprints, below), `services`, `define-service`, `request`, `feedback`, `retire-service` ([services](#services-and-reflection)), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile).
 
 ### Progress
 
@@ -179,6 +179,86 @@ So acceptance criteria should ask for the coverage report ("every factual claim 
 checklist, plan and approval, build and run, monitoring, and verification before delivery. The server's own instructions carry
 a compact version of the same workflow, so an assistant without the skill still gets the order of steps. How to install the
 skill: see [Kiro integration](#kiro-integration).
+
+## Services and reflection
+
+A one-off task is planned from scratch and teaches the org nothing. Work you want again and again is better offered as a **service**,
+and a team should get better at it. Two concepts:
+
+- A **service** is a standing task one agent (the owner, usually the lead of a team) offers. Its **contract** (`SERVICE.md`) is the
+  client's: what may be asked (inputs), what is guaranteed (exact acceptance criteria, deliverable), the runs handed down with each
+  request, and `locked`. Its **playbook** (`PLAYBOOK.md`) is the owner's: how the team does it (steps, budget plan, pitfalls).
+- **Reflection** is the default loop that improves the playbook. After each request the owner reports with `lessons`; the client gives
+  `feedback`; before the next request the owner's prompt shows the evidence since the playbook's last revision and it may
+  `revise_playbook`. The owner cannot touch the contract, so "improving" can never mean "lowering the bar".
+
+```
+ceo/services/weekly-brief/
+├── SERVICE.md      # contract, written by the client (root for a top-level agent) with define_service; versioned
+├── PLAYBOOK.md     # workflow, written by the owner with revise_playbook only; versioned by the runtime
+└── history/        # SERVICE.v<n>.md and PLAYBOOK.v<n>.md: every earlier version (restore one by revising back to it)
+```
+
+Cases (a request plus its rework chain), their statistics and the digest are never stored; they are derived from the message files
+and run logs like all state. `services` is a reserved name; plain `write` into it is refused. Retiring the owner takes its services along.
+
+**Tools** (workers see none of them but `report`'s `lessons`):
+
+| who | tools |
+|---|---|
+| root, and an agent with reports or `can_hire` | `services`, `define_service` (contract of a direct report's service; redefining archives the old one and quietly tells the owner what changed), `request(service, inputs, ...)`, `feedback(task_id, accept\|reject, note)` |
+| an agent that owns a service | `services`, `revise_playbook(service, content, reason)` |
+| every agent | `report(..., lessons)`: required for `done`/`failed` on a service request |
+
+A request is a task built from the contract (inputs, the contract's criteria plus any `extra_acceptance`, the deliverable, its budget),
+so every rule of tasks applies: direct reports only, budget moves down, `done`/`failed` are final, rework is `revises`.
+
+CLI (as root): `orgmcp services`; `define-service OWNER NAME --description T --input 'topic*:what it is about' --acceptance T|@file
+--deliverable T [--format F --max-words N --path DIR] --budget N [--playbook @file] [--locked]`; `request SERVICE --input key=value
+[--title --note --budget --revises]`; `feedback TASK_ID accept|reject [--note]`; `retire-service OWNER NAME --reason T` (the only way to
+retire one: there is no MCP tool for it).
+
+**What the owner sees.** Only an agent that owns a service gets more in its prompt (everyone else's is byte-identical): `# Your services`
+(versions, requests so far, file paths) every run; `# Playbook: <service> (v<n>)` while it holds an open request for it; and, when the
+batch holds a NEW request and there is evidence since the playbook's last revision, `# Reflect before you start: <service>`: the cases with
+new evidence (state, runs used of budget, rework, the client's verdict and note, its own lessons), statistics per playbook version, and
+the steps: look for what repeats or was rejected, revise if a change would prevent it, restore an older version if the current one did worse,
+else leave it alone. The `report` reply and ORG.md rule 10 carry the rest.
+
+**Guardrails.** The contract belongs to the client; the playbook may only raise the bar (a lasting requirement from feedback goes to the
+parent, who adds it to the contract with `define_service`). A playbook is capped at `playbook_max_words` (default 1000), must differ from the
+current one and needs a reason naming its cases; every version is kept in `history/`. `locked: true` takes revising away (the evidence is
+still shown). Playbook and contract notices to root are quiet (not under "Needs you"); feedback costs no run and wakes nobody.
+`progress` tags service tasks `[service <name> v<playbook>]` and says "no feedback yet" once one is finished; `status` shows `services:`.
+
+**In a blueprint.** `services:` next to `agents:` (any of the four kinds: `blueprint_example(kind, service=True)`; a filled research one is
+[`examples/blueprint-service.yaml`](examples/blueprint-service.yaml)):
+
+```yaml
+services:
+  - name: weekly-brief                # unique; requests name the service only
+    owner: lead                       # optional; must be the top-level agent in this version
+    description: A one-page, sourced brief on the past week's news about a topic.
+    inputs: [{name: topic, description: what it is about, required: true}]   # what changes per request
+    acceptance: [exact, checkable criteria]    # the contract: only the user changes it, through define_service
+    deliverable: {description: one markdown file, format: markdown, max_words: 600, path: /abs/folder}
+    budget: 22                        # runs per request; default = estimate + 25%
+    playbook: |                       # optional initial workflow; default generated from the team (steps, budget plan, pitfalls)
+    locked: false
+task: {service: weekly-brief, inputs: {topic: solid-state batteries}}   # optional: a first request; or omit and request later
+```
+
+`task` becomes optional; `needs.deliverable` and the task's acceptance are only required for a plain task, and `needs.budget_runs` is the
+cap for ONE request (each service's budget must be within it and above the estimate). The PLAN FOR YOU block gains a compact Services part
+(what you provide, runs per request, the first checks, where it is delivered), one line on reflection, and "nothing runs until you ask for
+a request" when there is no first task. `apply` hires the team, defines each service (a given or generated playbook v1) and sends the first
+request; with none it says the services are ready (`request(service, inputs)`, then `start()`). The assistant skill uses `services()` before
+building anything for an existing org, and asks "Keep it, or what should change?" after each delivery to record `feedback`.
+
+**Limitations.** No schedules (a request is made when someone asks). Only a parent requests from its direct reports: no sibling or
+cross-team requests, and a blueprint service is owned by the top-level agent. Runs of concurrent requests to one owner are attributed by
+the same progress window rule as tasks (a case's window ends where the client's next task to that owner begins), so overlapping cases
+are not double counted but can be misattributed. Statistics are counts and averages, not scores; quality is the client's verdict.
 
 ## Health
 

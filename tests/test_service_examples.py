@@ -177,3 +177,62 @@ def test_apply_with_a_first_request_says_to_start(root_server):
     call(server, "create_org", mission="services")
     reply = call(server, "apply_org", blueprint=text, approved=True, plan_id=pid)
     assert "first request: service my-service, task " in reply and "Next step: call start()" in reply
+
+
+# ------------------------------------------------------------------------------ skill, README, example
+
+
+SKILL = ROOT_DIR / "skills" / "orgmcp" / "SKILL.md"
+README = ROOT_DIR / "README.md"
+EXAMPLE = ROOT_DIR / "examples" / "blueprint-service.yaml"
+
+
+def test_the_readme_documents_services_and_reflection():
+    text = README.read_text()
+    assert text.index("## Create an org from a goal") < text.index("## Services and reflection") < text.index("## Health")
+    section = text.split("## Services and reflection")[1].split("\n## Health")[0]
+    for needle in (
+        "**service**", "**Reflection**", "`SERVICE.md`", "`PLAYBOOK.md`", "history/", "never stored", "`define_service`",
+        "`revise_playbook(service, content, reason)`", "`request(service, inputs, ...)`", "`feedback(task_id, accept", "`report(..., lessons)`",
+        "orgmcp services", "define-service OWNER NAME", "retire-service OWNER NAME", "no MCP tool for it",
+        "# Your services", "# Playbook: <service>", "# Reflect before you start: <service>", "byte-identical",
+        "can never mean \"lowering the bar\"", "`playbook_max_words`", "`locked: true`", "quiet", "`services:`",
+        "blueprint_example(kind, service=True)", "examples/blueprint-service.yaml", "cap for ONE request", "nothing runs until you ask for",
+        "**Limitations.**", "No schedules", "sibling or\ncross-team requests", "progress window rule",
+    ):
+        assert needle in section, needle
+    assert "`services`, `define-service`, `request`, `feedback`, `retire-service`" in text.split("## Use")[1].split("### Progress")[0]
+    assert len(section.splitlines()) < 90
+
+
+def test_the_shipped_service_example_validates_plans_and_applies(tmp_path):
+    (tmp_path / "deliverables").mkdir()
+    text = EXAMPLE.read_text().replace("~/deliverables/weekly-briefs", str(tmp_path / "deliverables" / "weekly-briefs"))
+    bp = bpm.load_text(text)
+    found = bpm.validate(bp, allowed_roots=[tmp_path])
+    assert not bpm.errors(found), [i.render() for i in found]
+    assert codes(found) <= {"path-delivery", "path-parent"}, [i.render() for i in found]
+    assert bpm._is_request(bp) and bp["services"][0]["name"] == "weekly-brief" and not bpm._plain(bp)
+    block = bpm.plan_for_user(bp, found, allowed_roots=[tmp_path])
+    assert len(block.splitlines()) <= 42 and "Services (kept ready" in block
+    assert "First request, started on approval: weekly-brief (topic: solid-state batteries)." in block
+    org = Org.init(tmp_path / "org", "x", {"poll_seconds": 0.05})
+    s = bpm.apply(org, bp, allowed_roots=[tmp_path])
+    assert s.services == ["weekly-brief"] and s.budget == 22 and s.service_request == "weekly-brief"
+    task = org.find_received("lead", s.task_id)
+    assert task.service == "weekly-brief" and task.playbook == 1 and "- topic: solid-state batteries" in task.body
+    assert services_mod.read_playbook(org, "lead", "weekly-brief").body.startswith("## Steps")
+
+
+def test_the_shipped_service_example_as_a_services_only_blueprint(tmp_path):
+    (tmp_path / "deliverables").mkdir()
+    bp = bpm.load_text(EXAMPLE.read_text().replace("~/deliverables/weekly-briefs", str(tmp_path / "deliverables" / "weekly-briefs")))
+    bp.pop("task")
+    assert not bpm.errors(bpm.validate(bp, allowed_roots=[tmp_path]))
+    assert "Nothing runs until you ask for a request" in bpm.plan_for_user(bp, allowed_roots=[tmp_path])
+
+
+def test_the_shipped_service_example_header_commands_are_real():
+    head = EXAMPLE.read_text().split("mission:")[0]
+    for command in ("orgmcp plan examples/blueprint-service.yaml", "orgmcp apply examples/blueprint-service.yaml", "orgmcp request weekly-brief"):
+        assert command in head, command
