@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import threading
 
-import pytest
-
 from orgmcp.kernel import TraceTap
 from orgmcp.telemetry import TraceScope
 from orgmcp.telemetry._trace_scope import ThreadLocalTraceScope

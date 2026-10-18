@@ -5,8 +5,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-import pytest
-
 from orgmcp.eventlog import EVENTS_REL
 from orgmcp.kernel import OrgPaths
 from orgmcp.kernel.testing import FakeClock
