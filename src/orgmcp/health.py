@@ -7,7 +7,10 @@ Everything here is read-only and derived from message files and run logs (nothin
   and runs woken only by runtime notes (stall reminders, reviews, refunds) are not the agent's doing and are left
   out of the waste and cost statistics (``expensive``); ``runs_used`` itself still counts every run (it is the budget);
 * a task counts once, by its *latest* result: a ``blocked`` that was superseded by ``done`` is a ``done``;
-* *rework* is a received task that carries ``revises`` (a manager sent earlier work back).
+* *rework* is a received task that carries ``revises`` (a manager sent earlier work back). Rework that comes from
+  the client of a service case - a rework request after a delivery that was reported ``done``, and the re-checks
+  the owner sends its team while it handles such a request - is counted apart (``client_rework``) and is not held
+  against the agent: the client's rejection says nothing about the reviewer's or the writer's own quality.
 
 Thresholds come from ``HEALTH_DEFAULTS`` overridden by the ``health:`` mapping in ORG.md frontmatter.
 """
@@ -52,13 +55,14 @@ class AgentHealth:
     failed: int
     blocked: int
     runs_per_task: float | None  # runs used / results sent; None without results
-    rework: int  # received tasks that revise an earlier one
+    rework: int  # received tasks that revise an earlier one (client-driven ones excluded: see client_rework)
     empty_runs: int  # runs that sent no message (failed runs and runs that only handled runtime notes excluded)
     last_activity: datetime | None
     since_activity: float | None  # seconds
     flags: dict[str, str] = field(default_factory=dict)  # flag -> human reason
     failed_runs: int = 0  # runs that crashed, failed to start, timed out or were interrupted (not the agent's fault)
     runtime_runs: int = 0  # runs woken only by runtime notes (budget, stall, review): sending nothing is fine
+    client_rework: int = 0  # received reworks that stem from the client of a service case (not counted in ``rework``)
 
     @property
     def worst_flag(self) -> str | None:
@@ -128,6 +132,41 @@ def config_number(config: dict, key: str, kind=float):
     return kind(number if number is not None else DEFAULT_CONFIG[key])
 
 
+def _client_rework(
+    org: Org, addr: str, tasks: list[Message], results: dict[str, Message], _depth: int = 0,
+) -> set[str]:
+    """Ids of the received reworks (tasks with ``revises``) that stem from the client of a service case.
+
+    * a rework *request* of a service (``service`` set) whose revised task had already been reported ``done``: the
+      client looked at a delivery and sent it back;
+    * a rework the sender sent its team (e.g. "check the memo again") while it held such a client rework as an open
+      task: a consequence of the client's rejection, not of the receiver's own work.
+
+    A rework sent in answer to a failed, blocked or still open task is the manager's own quality control and counts.
+    """
+    out: set[str] = set()
+    for t in tasks:
+        if not t.revises:
+            continue
+        prior = results.get(t.revises)
+        if t.service and prior is not None and prior.status == "done" and prior.id < t.id:
+            out.add(t.id)
+        elif _depth < 8 and t.sender != ROOT and org.exists(t.sender) and _holds_client_rework(org, t, _depth):
+            out.add(t.id)
+    return out
+
+
+def _holds_client_rework(org: Org, task: Message, depth: int) -> bool:
+    """Did ``task``'s sender hold a client-driven rework as an open task when it sent ``task``?"""
+    sender = task.sender
+    mine = [m for m in org.received(sender) if m.type == "task"]
+    answers = latest_results(org.sent(sender))
+    driven = _client_rework(org, sender, mine, answers, depth + 1)
+    return any(
+        m.id in driven and m.id < task.id and (m.id not in answers or answers[m.id].id > task.id) for m in mine
+    )
+
+
 def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict | None = None) -> AgentHealth:
     """Metrics and flags for one agent. ``now`` defaults to the current time; ``limits`` to ``thresholds(org)``."""
     a = org.require(addr)
@@ -143,7 +182,8 @@ def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict 
     answered_out = {m.reply_to for m in received if m.type == "result"}
     waiting = any(m.type == "task" and m.id not in answered_out for m in sent)
     by_status = {s: sum(1 for r in results.values() if r.status == s) for s in ("done", "failed", "blocked")}
-    rework = sum(1 for t in tasks if t.revises)
+    client_driven = _client_rework(org, a, tasks, results)
+    rework = sum(1 for t in tasks if t.revises and t.id not in client_driven)
     unread, running, paused = org.unread(a), org.running(a), org.paused(a)
     budget_left, runs_used = org.budget(a), org.runs_used(a)
 
@@ -205,7 +245,7 @@ def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict 
     return AgentHealth(
         addr=a, depth=org.depth(a), state=org.state(a), budget_left=budget_left,
         budget_received=sum(m.budget for m in received), runs_used=runs_used, tasks_received=len(tasks),
-        open_tasks=len(open_tasks), oldest_open_age=oldest, rework=rework, empty_runs=empty,
+        open_tasks=len(open_tasks), oldest_open_age=oldest, rework=rework, client_rework=len(client_driven), empty_runs=empty,
         runs_per_task=runs_per_task, last_activity=last, since_activity=since, flags=flags, **by_status,
         failed_runs=len(failed), runtime_runs=len(runtime_only - failed),
     )
@@ -243,7 +283,8 @@ def render_text(health: OrgHealth) -> str:
             f"budget {left}/{h.budget_received}",
             f"runs {h.runs_used}",
             f"open {h.open_tasks}" + (f" (oldest {_duration(h.oldest_open_age)})" if h.oldest_open_age is not None else ""),
-            f"done {h.done} failed {h.failed} blocked {h.blocked} rework {h.rework}",
+            f"done {h.done} failed {h.failed} blocked {h.blocked} rework {h.rework}"
+            + (f" (+{h.client_rework} by the client)" if h.client_rework else ""),
             "runs/task " + ("-" if h.runs_per_task is None else f"{h.runs_per_task:.1f}"),
             f"empty {h.empty_runs}" + (f" (+{h.failed_runs} failed)" if h.failed_runs else ""),
             "last activity " + ("never" if h.since_activity is None else f"{_duration(h.since_activity)} ago"),

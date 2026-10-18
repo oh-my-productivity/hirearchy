@@ -50,6 +50,7 @@ FEEDBACK_HEADER = (
 )
 CLIP_LESSON = 220
 CLIP_NOTE = 160
+MAX_VERDICTS = 4  # verdicts of one case shown in a digest line
 
 
 # ------------------------------------------------------------------------------------------------ files
@@ -672,7 +673,8 @@ def feedback(org: Org, actor: str, task_id: str, verdict: str, note: str = "") -
 
     ``task_id``: any task of the case (the request or a rework) that ``actor`` sent and that has a result. ``verdict``
     is ``accept`` or ``reject``; a rejection needs a ``note`` saying what was wrong. The owner sees it with its next
-    batch and in the reflection digest; a later feedback on the same case replaces this one in the statistics.
+    batch and in the reflection digest. Every verdict stays in the case's history: the latest one is the final
+    verdict of the statistics, and an earlier ``reject`` is still shown (and counted as "after a reject").
     """
     actor = org.require(actor)
     task = next((m for m in org.sent(actor) if m.id == task_id and m.type == "task"), None)
@@ -716,23 +718,51 @@ class Case:
     budget: int  # sum of the budgets of the tasks
     runs: int  # runs of the owner's subtree from the first request to the final result (or now)
     lessons: list[str]  # from the `## Lessons` sections of the results, oldest first
-    feedback: Message | None  # the latest feedback note
+    verdicts: list[Verdict]  # every client verdict on the case, oldest first (the latest is the final one)
     started: datetime | None
     finished: datetime | None  # when it ended done/failed
+    lesson_ids: list[str] = field(default_factory=list)  # id of the result each lesson came from (parallel to lessons)
 
     @property
     def title(self) -> str:
         return self.tasks[0].title
 
     @property
+    def feedback(self) -> Message | None:
+        """The latest feedback note (the final verdict), None when the client has not rated the case."""
+        return self.verdicts[-1].message if self.verdicts else None
+
+    @property
     def verdict(self) -> str | None:
-        return self.feedback.feedback if self.feedback else None
+        """The final verdict: that of the latest feedback."""
+        return self.verdicts[-1].verdict if self.verdicts else None
+
+    @property
+    def rejected(self) -> bool:
+        """Was the case rejected at least once, whatever came after?"""
+        return any(v.verdict == "reject" for v in self.verdicts)
+
+    @property
+    def accepted_after_reject(self) -> bool:
+        return self.verdict == "accept" and self.rejected
 
     @property
     def evidence_at(self) -> datetime | None:
-        """The latest moment this case produced evidence: its final result or its feedback."""
+        """The latest moment this case produced evidence: its final result or its latest feedback."""
         times = [t for t in (self.finished, _msg_time(self.feedback) if self.feedback else None) if t]
         return max(times) if times else None
+
+
+@dataclass
+class Verdict:
+    """One client verdict on a case: ``step`` is 0 for the first delivery, n for the n-th rework."""
+
+    verdict: str
+    note: str  # the client's own words ("" for a bare accept)
+    created: datetime | None
+    task_id: str  # the task of the chain the feedback was given on
+    step: int
+    message: Message
 
 
 @dataclass
@@ -742,8 +772,9 @@ class Stats:
     failed: int = 0
     open: int = 0
     reworked: int = 0
-    accept: int = 0
-    reject: int = 0
+    accept: int = 0  # final verdict accept (including the ones that came after a reject)
+    reject: int = 0  # final verdict reject
+    accept_after_reject: int = 0  # of the accepts: cases the client had rejected at least once before
     finished_runs: int = 0
 
     @property
@@ -759,7 +790,8 @@ class Stats:
         if self.avg_runs is not None:
             text += f"; avg {self.avg_runs:g} runs"
         if self.accept or self.reject:
-            text += f"; feedback {self.accept} accept, {self.reject} reject"
+            after = f" ({self.accept_after_reject} after a reject)" if self.accept_after_reject else ""
+            text += f"; feedback {self.accept} accept{after}, {self.reject} reject"
         else:
             text += "; no feedback"
         return text
@@ -851,7 +883,11 @@ def cases(org: Org, owner: str, service: str) -> list[Case]:
         later = next((i for i in others if i > last.id and i not in ids), None)
         if later and (end is None or later[:21] < end):
             end = later[:21]
-        fb = [n for n in notes if n.reply_to in ids]
+        step = {t.id: i for i, t in enumerate(tasks)}
+        verdicts = [
+            Verdict(n.feedback or "", feedback_text(n), _msg_time(n), n.reply_to or "", step[n.reply_to], n)
+            for n in notes if n.reply_to in ids
+        ]
         out.append(Case(
             id=first, service=service, owner=owner, tasks=tasks, result=res, state=state,
             playbook=tasks[0].playbook or 0,
@@ -859,7 +895,8 @@ def cases(org: Org, owner: str, service: str) -> list[Case]:
             reworks=len(tasks) - 1, budget=sum(t.budget for t in tasks),
             runs=_count_runs(org, team, tasks[0].id[:21], end),
             lessons=[x for t in tasks if (r := results.get(t.id)) is not None and (x := lessons_of(r))],
-            feedback=fb[-1] if fb else None, started=_msg_time(tasks[0]),
+            lesson_ids=[r.id for t in tasks if (r := results.get(t.id)) is not None and lessons_of(r)],
+            verdicts=verdicts, started=_msg_time(tasks[0]),
             finished=_msg_time(res) if final else None,
         ))
     return out
@@ -875,6 +912,7 @@ def summarize(items: list[Case]) -> Stats:
         s.reworked += c.reworks > 0
         s.accept += c.verdict == "accept"
         s.reject += c.verdict == "reject"
+        s.accept_after_reject += c.accepted_after_reject
         s.finished_runs += c.runs if c.state in ("done", "failed") else 0
     return s
 
@@ -913,22 +951,58 @@ def reflection_digest(org: Org, owner: str, service: str) -> str | None:
         shown = shown[:-1]
 
 
+def _verdict_chain(c: Case) -> str:
+    """The client's verdicts in order, each with her words: ``reject "too long" -> accept "this one is right"``."""
+    shown = c.verdicts[-MAX_VERDICTS:]
+    clip = CLIP_NOTE if len(shown) <= 2 else CLIP_NOTE // 2
+    parts = [f"{v.verdict}" + (f' "{_clip(v.note, clip)}"' if v.note else "") for v in shown]
+    if len(c.verdicts) > len(shown):
+        parts.insert(0, "…")
+    return " -> ".join(parts)
+
+
 def _case_line(c: Case) -> str:
     bits = [f'case {c.id} "{_clip(c.title, 40)}": {c.state}', f"playbook v{c.used}", f"{c.runs} of {c.budget} runs"]
     if c.reworks:
         bits.append(f"{c.reworks} rework(s)")
     line = ", ".join(bits)
-    if c.feedback:
-        note = feedback_text(c.feedback)
-        line += f"; client feedback: {c.verdict}" + (f' "{_clip(note, CLIP_NOTE)}"' if note else "")
+    if c.verdicts:  # the client's verdicts come before the lessons: her words outrank the owner's own conclusions
+        line += f"; client feedback: {_verdict_chain(c)}"
     if c.lessons:
         # The latest result is the final word on the case; earlier lessons only where room remains.
         latest, earlier = c.lessons[-1], " / ".join(c.lessons[:-1])
-        line += f'; lessons: "{_clip(latest, CLIP_LESSON)}"'
+        first_reject = next((v.message.id for v in c.verdicts if v.verdict == "reject"), None)
+        after = first_reject is not None and bool(c.lesson_ids) and c.lesson_ids[-1] > first_reject
+        mark = " (written after the reject: check it against her words)" if after else ""
+        line += f'; lessons{mark}: "{_clip(latest, CLIP_LESSON)}"'
         room = CLIP_LESSON - len(latest)
         if earlier and room > 40:
             line += f'; earlier: "{_clip(earlier, room)}"'
     return "- " + line
+
+
+def case_of(org: Org, task: Message) -> Case | None:
+    """The case a service task belongs to (None for a task that is not a service request, or an unknown one)."""
+    if not task.service or not org.exists(task.to):
+        return None
+    return next((c for c in cases(org, task.to, task.service) if task.id in {t.id for t in c.tasks}), None)
+
+
+def case_total(org: Org, task: Message) -> str:
+    """The whole case in one sentence: runs used by the chain against the runs handed down, and the contract's budget.
+
+    ``case total: 19 runs used of 27 handed down (contract: 15 per request)``; when the chain was handed down more than
+    the contract gives one request, it adds that the case exceeds the budget and that the user must be told. Empty for a
+    task that is not a service request.
+    """
+    c = case_of(org, task)
+    contract = read_contract(org, task.to, task.service) if task.service and org.exists(task.to) else None
+    if c is None or contract is None:
+        return ""
+    text = f"case total: {c.runs} runs used of {c.budget} handed down (contract: {contract.budget} per request)"
+    if c.budget > contract.budget:
+        text += f". This case now exceeds the per-request budget of {contract.budget}: tell the user."
+    return text
 
 
 # --------------------------------------------------------------------------------------------- listings
@@ -993,7 +1067,8 @@ def _quoted(org: Org, text: str, where: str) -> str:
 
 def prompt_sections(org: Org, addr: str, batch: list[Message]) -> str:
     """The sections of an owner's run prompt: its services, the playbook of each service it has an open request for,
-    and (when the batch holds a new request) what to reflect on first. Empty for an agent that owns no service.
+    and (when the batch holds a new request, or the client's rejection of a delivery) what to reflect on first. Empty
+    for an agent that owns no service.
 
     Each section starts and ends with a newline, to be appended after the notice and before "# New messages".
     """
@@ -1012,14 +1087,28 @@ def prompt_sections(org: Org, addr: str, batch: list[Message]) -> str:
     sections[0] += "\n" + "\n".join(lines)
     working = {t.service for t in org.open_tasks(addr) if t.service}
     new = {m.service for m in batch if m.type == "task" and m.service and not m.revises and m.to == addr}
-    digests = {c.name: d for c in owned if c.name in new and (d := reflection_digest(org, addr, c.name)) is not None}
+    rejected = _rejected_services(org, addr, batch)
+    digests = {
+        c.name: d for c in owned if c.name in new | rejected and (d := reflection_digest(org, addr, c.name)) is not None
+    }
     for c in owned:
         if c.name in working:
             sections.append(_playbook_section(org, addr, c, reflecting=c.name in digests))
     for c in owned:
         if c.name in digests:
-            sections.append(_reflect_section(org, addr, c, digests[c.name]))
+            sections.append(_reflect_section(
+                org, addr, c, digests[c.name], rejected=c.name in rejected, new_request=c.name in new,
+            ))
     return "".join(f"\n{s}\n" for s in sections)
+
+
+def _rejected_services(org: Org, addr: str, batch: list[Message]) -> set[str]:
+    """The services of ``addr`` for which the batch holds a ``feedback: reject`` note (the client rejected a delivery)."""
+    notes = [m for m in batch if m.type == "note" and m.feedback == "reject" and m.to == addr and m.reply_to]
+    if not notes:
+        return set()
+    service_of = {m.id: m.service for m in org.received(addr) if m.type == "task" and m.service}
+    return {svc for n in notes if (svc := service_of.get(n.reply_to or ""))}
 
 
 def _playbook_section(org: Org, addr: str, c: Contract, *, reflecting: bool = False) -> str:
@@ -1043,7 +1132,7 @@ def _playbook_section(org: Org, addr: str, c: Contract, *, reflecting: bool = Fa
     return f"{head}\n{_quoted(org, pb.body, _rel(org, pb.path))}"
 
 
-def _reflect_section(org: Org, addr: str, c: Contract, digest: str) -> str:
+def _reflect_section(org: Org, addr: str, c: Contract, digest: str, *, rejected: bool = False, new_request: bool = True) -> str:
     pb = read_playbook(org, addr, c.name)
     cap = _word_cap(org)
     since = f"Evidence since v{pb.version}:" if pb.version else "Evidence so far (there is no playbook yet):"
@@ -1051,11 +1140,16 @@ def _reflect_section(org: Org, addr: str, c: Contract, digest: str) -> str:
         "Look for what repeats, and for anything the client rejected. A rejection or a failure is enough on its own; "
         "a single slow case is not."
     )
+    client_wins = (
+        "When a lesson of yours conflicts with the client's feedback, the client is right: fix the playbook to match "
+        "the feedback (and say so in the reason)."
+    )
     raise_bar = (
         "The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel "
         "with every request. If the client's feedback is a lasting requirement, also tell your parent (`send`) so it "
         "can add it to the contract."
     )
+    what = "rework" if rejected and not new_request else "request"
     if c.locked:
         intro = (
             "Your playbook is how your team delivers this service. The contract is locked by your parent, so you may "
@@ -1063,16 +1157,23 @@ def _reflect_section(org: Org, addr: str, c: Contract, digest: str) -> str:
         )
         steps = [
             first,
-            "You cannot change the playbook, but apply what the evidence shows when you plan this request. " + raise_bar,
-            "Then handle the request following the playbook.",
+            "When a lesson of yours conflicts with the client's feedback, the client is right: follow the feedback.",
+            f"You cannot change the playbook, but apply what the evidence shows when you plan this {what}. " + raise_bar,
+            f"Then handle the {what} following the playbook.",
         ]
+        lead = (
+            "The client rejected a delivery. The contract is locked, so you cannot revise the playbook: apply what the "
+            f"feedback shows, then handle the {what}."
+            if rejected else "Before working on the new request:"
+        )
     else:
         intro = f"Your playbook is how your team delivers this service; you own it and improve it. {since}"
         steps = [
             first,
+            client_wins,
             "If a change to how the team works would prevent it, call `revise_playbook(service, content, reason)` with "
             f"the whole new playbook (at most {cap} words): concrete steps (who does what, in which order, which "
-            "check), not slogans. Name the cases in the reason. The new version applies to this request.",
+            f"check), not slogans. Name the cases in the reason. The new version applies to this {what}.",
             raise_bar,
         ]
         if pb.version >= 2:
@@ -1080,6 +1181,11 @@ def _reflect_section(org: Org, addr: str, c: Contract, digest: str) -> str:
                 "If the current version did worse than an earlier one, restore that one "
                 f"(read {_rel(org, service_dir(org, addr, c.name))}/history/PLAYBOOK.v<k>.md)."
             )
-        steps.append("If nothing needs to change, do not revise. Then handle the request following the playbook.")
+        steps.append(f"If nothing needs to change, do not revise. Then handle the {what} following the playbook.")
+        lead = (
+            "The client rejected a delivery: decide now whether the playbook must change so this does not happen "
+            f"again (revise_playbook), then handle the {what}."
+            if rejected else "Before working on the new request:"
+        )
     numbered = "\n".join(f"{i}. {s}" for i, s in enumerate(steps, 1))
-    return f"# Reflect before you start: {c.name}\n{intro}\n{digest}\nBefore working on the new request:\n{numbered}"
+    return f"# Reflect before you start: {c.name}\n{intro}\n{digest}\n{lead}\n{numbered}"

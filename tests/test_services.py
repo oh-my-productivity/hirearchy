@@ -470,7 +470,7 @@ def test_only_the_requester_gives_feedback_on_a_service_request(org):
     assert org.feedback("ceo", task.id, "accept").to == ENG
 
 
-def test_feedback_on_a_rework_belongs_to_the_case_and_the_latest_wins(svc):
+def test_feedback_on_a_rework_belongs_to_the_case_and_the_latest_is_the_final_verdict(svc):
     org = svc
     first = request(org)
     deliver(org, "ceo", first)
@@ -698,7 +698,7 @@ def test_the_reflect_section_comes_before_a_new_request_when_there_is_evidence(s
     assert "A rejection or a failure is enough on its own" in section and "never lower it" in section
     assert "restore" not in section  # nothing earlier to restore at v0
     assert section.rstrip().endswith("Then handle the request following the playbook.")
-    assert [line[:2] for line in section.splitlines() if line[:1].isdigit()] == ["1.", "2.", "3.", "4."]
+    assert [line[:2] for line in section.splitlines() if line[:1].isdigit()] == ["1.", "2.", "3.", "4.", "5."]
     assert prompt.index("# Reflect before") < prompt.index("# New messages") < prompt.index(new.id, prompt.index("# New messages"))
     org.end_run("ceo", ok=True)
 
