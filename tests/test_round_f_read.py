@@ -138,7 +138,7 @@ def test_a_profile_file_with_stale_content_is_rewritten(org, tmp_path, isolated_
 
 def test_the_prompt_tells_a_built_in_read_agent_to_read_org_files_by_absolute_path(org):
     files = org.run_prompt("lead/writer", []).split("- Files:")[1].split("# New messages")[0]
-    assert "Your `read` is kiro's built-in (it hides `@orgmcp/read`)" in files
+    assert "Your `read` is kiro's built-in: it reads org files too" in files and "`@orgmcp/org_read` for you" in files
     assert f"`{org.root}/<path in the org>`" in files and "ABSOLUTE" in files
     assert "never with the built-in `write`/`read`" not in files
     assert "kiro `read` to workspace + inputs + the organization (read-only)" in files
