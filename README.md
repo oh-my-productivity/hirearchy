@@ -206,7 +206,7 @@ and run logs like all state. `services` is a reserved name; plain `write` into i
 
 | who | tools |
 |---|---|
-| root, and an agent with reports or `can_hire` | `services`, `define_service` (contract of a direct report's service; redefining archives the old one and quietly tells the owner what changed), `request(service, inputs, ...)`, `feedback(task_id, accept\|reject, note)` |
+| root, and an agent with reports or `can_hire` | `services`, `define_service` (contract of a direct report's service; on an existing one it is an amendment: pass only what changes, e.g. `add_acceptance=[...]` / `remove_acceptance=[...]`; the old contract is archived and the owner quietly told exactly what changed), `request(service, inputs, ...)`, `feedback(task_id, accept\|reject, note)` |
 | an agent that owns a service | `services`, `revise_playbook(service, content, reason)` |
 | every agent | `report(..., lessons)`: required for `done`/`failed` on a service request |
 
@@ -214,7 +214,7 @@ A request is a task built from the contract (inputs, the contract's criteria plu
 so every rule of tasks applies: direct reports only, budget moves down, `done`/`failed` are final, rework is `revises`.
 
 CLI (as root): `orgmcp services`; `define-service OWNER NAME --description T --input 'topic*:what it is about' --acceptance T|@file
---deliverable T [--format F --max-words N --path DIR] --budget N [--playbook @file] [--locked]`; `request SERVICE --input key=value
+--deliverable T [--format F --max-words N --path DIR] --budget N [--playbook @file] [--locked]`; to amend, pass only what changes: `define-service OWNER NAME --add-acceptance T [--remove-acceptance EXACT_TEXT]` (also `--no-locked`; `--acceptance` replaces all and excludes add/remove); `request SERVICE --input key=value
 [--title --note --budget --revises]`; `feedback TASK_ID accept|reject [--note]`; `retire-service OWNER NAME --reason T` (the only way to
 retire one: there is no MCP tool for it).
 

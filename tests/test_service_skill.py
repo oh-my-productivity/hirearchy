@@ -22,7 +22,7 @@ def test_the_skill_teaches_the_service_workflow_within_its_line_limit():
         "Nothing runs until you ask for a request",  # plan with no first task
         'ask ONE short question ("Keep it, or what should change?")', "`feedback(task_id, accept|reject, note)`",  # finish
         "reject needs the user's reason in their words", '("always", "never", "from now on")',
-        "propose adding it to the contract as a checkable criterion", "`define_service`", "the full contract", "plus the new criterion",
+        "propose adding it to the contract as a checkable criterion", "`define_service(owner, name, add_acceptance=[<the new criterion>])`", "the resulting criteria",
         "Never edit SERVICE.md or PLAYBOOK.md yourself",
     )
     for needle in needles:

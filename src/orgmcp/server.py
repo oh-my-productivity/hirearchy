@@ -397,28 +397,34 @@ def register_client_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
     def define_service(
         owner: str,
         name: str,
-        description: str,
-        acceptance: list[str],
-        deliverable: dict,
-        budget: int,
+        description: str | None = None,
+        acceptance: list[str] | None = None,
+        deliverable: dict | None = None,
+        budget: int | None = None,
         inputs: list[dict] | None = None,
         playbook: str | None = None,
-        locked: bool = False,
-        notes: str = "",
+        locked: bool | None = None,
+        notes: str | None = None,
+        add_acceptance: list[str] | None = None,
+        remove_acceptance: list[str] | None = None,
     ) -> str:
-        """Define a standing service of one of your direct reports (root: a top-level agent), or change its contract.
+        """Define a standing service of one of your direct reports (root: a top-level agent), or amend its contract.
 
         You are the client: the contract is yours; the owner cannot change it. owner: the report. name: lowercase-dashed,
-        unique among your reports' services. description: one line. acceptance: concrete, checkable criteria that travel
-        with every request. deliverable: {description, format?, max_words?, path? (absolute)}. budget: runs handed down
-        with each request. inputs: [{name, description, required (default true)}] the requester fills in.
-        playbook: markdown workflow for a first definition only (the owner revises it later); without it the owner writes
-        v1 after its first request. locked: true = the owner may not revise the playbook. notes: free text for the owner.
-        Redefining an existing service archives the old contract and quietly tells the owner what changed.
+        unique among your reports' services. FIRST definition needs description (one line), acceptance (concrete,
+        checkable criteria that travel with every request), deliverable ({description, format?, max_words?, path?
+        (absolute)}) and budget (runs handed down with each request); optional: inputs ([{name, description, required
+        (default true)}] the requester fills in), playbook (markdown workflow, first definition only), locked (true = the
+        owner may not revise the playbook), notes (free text for the owner).
+        AMENDMENT (the service exists): pass only what changes, the rest stays. To add a lasting requirement:
+        `add_acceptance=[<criterion>]`; to drop one: `remove_acceptance=[<its exact text>]`; `acceptance` replaces
+        all (not together with add/remove). The old contract is archived and the owner quietly told what changed; the
+        reply lists the criteria now in force. An amendment that changes nothing is refused.
         """
         return binding.get().define_service(
             me, owner, name, description=description, inputs=inputs, acceptance=acceptance,
             deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,
+            add_acceptance=add_acceptance, remove_acceptance=remove_acceptance,
         )
 
     @mcp.tool()

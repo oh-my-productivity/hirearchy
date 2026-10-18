@@ -66,12 +66,21 @@ def cmd_define_service(args) -> None:
 
     org = _org(args, mutating=True)
     deliverable = {"description": args.deliverable, "format": args.format, "max_words": args.max_words, "path": args.path}
+    given = {k: v for k, v in deliverable.items() if v}
+    if given and "description" not in given:  # an amendment of single deliverable parts: the rest stays
+        from .services import read_contract
+
+        old = read_contract(org, org.norm(args.owner), args.name)
+        if old is not None:
+            given = {**old.deliverable, **given}
     text = org.define_service(
         ROOT, args.owner, args.name, description=args.description,
-        inputs=[parse_input_spec(i) for i in args.input or []],
-        acceptance=[_text(a) for a in args.acceptance], deliverable={k: v for k, v in deliverable.items() if v},
-        budget=args.budget, playbook=_text(args.playbook) if args.playbook else None, locked=args.locked,
-        notes=_text(args.notes) if args.notes else "",
+        inputs=[parse_input_spec(i) for i in args.input] if args.input is not None else None,
+        acceptance=[_text(a) for a in args.acceptance] if args.acceptance is not None else None,
+        deliverable=given or None, budget=args.budget, playbook=_text(args.playbook) if args.playbook else None,
+        locked=args.locked, notes=_text(args.notes) if args.notes else None,
+        add_acceptance=[_text(a) for a in args.add_acceptance] if args.add_acceptance is not None else None,
+        remove_acceptance=[_text(a) for a in args.remove_acceptance] if args.remove_acceptance is not None else None,
     )
     org.commit(f"root: service {args.name} of {args.owner}")
     print(text)
@@ -274,21 +283,27 @@ def main(argv: list[str] | None = None) -> None:
     s = sub.add_parser("services", help="list the services you can request from your direct reports, with their record")
     s.set_defaults(fn=cmd_services)
 
-    s = sub.add_parser("define-service", help="define (or change the contract of) a standing service of a top-level agent (as root)")
+    s = sub.add_parser("define-service", help="define a standing service of a top-level agent, or amend its contract (as root): "
+                       "on an existing service pass only what changes")
     s.add_argument("owner", help="the top-level agent that offers the service")
     s.add_argument("name", help="lowercase-dashed service name")
-    s.add_argument("--description", required=True, help="one line: what the service delivers")
+    s.add_argument("--description", help="one line: what the service delivers (a first definition needs it)")
     s.add_argument("--input", action="append", metavar="'name*:description'",
                    help="an input of a request; a trailing * on the name = required (repeatable)")
-    s.add_argument("--acceptance", action="append", required=True, metavar="TEXT|@FILE",
-                   help="a criterion, or @file with one criterion per line (repeatable)")
-    s.add_argument("--deliverable", required=True, help="what is handed back")
+    s.add_argument("--acceptance", action="append", metavar="TEXT|@FILE",
+                   help="a criterion, or @file with one criterion per line (repeatable); replaces all existing ones")
+    s.add_argument("--add-acceptance", action="append", metavar="TEXT|@FILE",
+                   help="amendment: add a criterion (repeatable); not with --acceptance")
+    s.add_argument("--remove-acceptance", action="append", metavar="TEXT|@FILE",
+                   help="amendment: drop a criterion, by its exact text (repeatable); not with --acceptance")
+    s.add_argument("--deliverable", help="what is handed back (a first definition needs it)")
     s.add_argument("--format")
     s.add_argument("--max-words", type=int)
     s.add_argument("--path", help="absolute folder for the deliverable")
-    s.add_argument("--budget", type=int, required=True, help="runs handed down with each request")
+    s.add_argument("--budget", type=int, help="runs handed down with each request (a first definition needs it)")
     s.add_argument("--playbook", metavar="@FILE", help="initial playbook (first definition only)")
-    s.add_argument("--locked", action="store_true", help="the owner may not revise the playbook")
+    s.add_argument("--locked", action=argparse.BooleanOptionalAction, default=None,
+                   help="--locked: the owner may not revise the playbook; --no-locked undoes it")
     s.add_argument("--notes", help="free text for the owner, or @file")
     s.set_defaults(fn=cmd_define_service)
 

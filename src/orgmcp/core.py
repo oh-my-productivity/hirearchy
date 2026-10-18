@@ -860,15 +860,18 @@ class Org:
         return [p.name for p in _visible(d.iterdir()) if p.is_dir() and (p / "SERVICE.md").is_file()]
 
     def define_service(
-        self, actor: str, owner: str, name: str, *, description: str, inputs, acceptance, deliverable: dict,
-        budget: int, playbook: str | None = None, locked: bool = False, notes: str = "",
+        self, actor: str, owner: str, name: str, *, description: str | None = None, inputs=None, acceptance=None,
+        deliverable: dict | None = None, budget: int | None = None, playbook: str | None = None,
+        locked: bool | None = None, notes: str | None = None, add_acceptance=None, remove_acceptance=None,
     ) -> str:
-        """Define (or redefine) a service of a direct report. See :func:`orgmcp.services.define_service`."""
+        """Define a service of a direct report, or amend it (omitted fields keep their value). See
+        :func:`orgmcp.services.define_service`."""
         from . import services
 
         return services.define_service(
             self, actor, owner, name, description=description, inputs=inputs, acceptance=acceptance,
             deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,
+            add_acceptance=add_acceptance, remove_acceptance=remove_acceptance,
         )
 
     def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
