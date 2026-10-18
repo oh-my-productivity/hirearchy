@@ -11,10 +11,9 @@ import pytest
 from orgmcp.kernel import TraceTap
 from orgmcp.telemetry.testing import IMPLEMENTATIONS
 
-from ._red import params as red_params
 
 
-@pytest.fixture(params=red_params(IMPLEMENTATIONS[TraceTap], green=("recording_trace_tap",)))
+@pytest.fixture(params=IMPLEMENTATIONS[TraceTap], ids=lambda factory: factory.__name__)
 def tap(request: pytest.FixtureRequest, tmp_path: Path) -> TraceTap:
     made = cast(Callable[[Path], TraceTap], request.param)(tmp_path)
     assert isinstance(made, TraceTap)

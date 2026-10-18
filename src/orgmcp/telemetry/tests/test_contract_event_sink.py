@@ -12,10 +12,9 @@ import pytest
 from orgmcp.kernel import EventSink
 from orgmcp.telemetry.testing import IMPLEMENTATIONS, SinkHarness
 
-from ._red import params as red_params
 
 
-@pytest.fixture(params=red_params(IMPLEMENTATIONS[EventSink], green=("list_event_sink",)))
+@pytest.fixture(params=IMPLEMENTATIONS[EventSink], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> SinkHarness:
     made = cast(Callable[[Path], SinkHarness], request.param)(tmp_path)
     assert isinstance(made.sink, EventSink)

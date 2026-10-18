@@ -15,10 +15,9 @@ from orgmcp.kernel import JsonObject
 from orgmcp.telemetry import ArgumentSummarizer
 from orgmcp.telemetry.testing import IMPLEMENTATIONS
 
-from ._red import params as red_params
 
 
-@pytest.fixture(params=red_params(IMPLEMENTATIONS[ArgumentSummarizer], green=()))
+@pytest.fixture(params=IMPLEMENTATIONS[ArgumentSummarizer], ids=lambda factory: factory.__name__)
 def summarize(request: pytest.FixtureRequest, tmp_path: Path) -> Callable[[dict[str, object]], JsonObject]:
     made = cast(Callable[[Path], ArgumentSummarizer], request.param)(tmp_path)
     assert isinstance(made, ArgumentSummarizer)

@@ -12,10 +12,9 @@ from orgmcp.kernel import TraceTap
 from orgmcp.telemetry import TraceScope
 from orgmcp.telemetry.testing import IMPLEMENTATIONS
 
-from ._red import params as red_params
 
 
-@pytest.fixture(params=red_params(IMPLEMENTATIONS[TraceScope], green=("stack_trace_scope",)))
+@pytest.fixture(params=IMPLEMENTATIONS[TraceScope], ids=lambda factory: factory.__name__)
 def scope(request: pytest.FixtureRequest, tmp_path: Path) -> TraceScope:
     made = cast(Callable[[Path], TraceScope], request.param)(tmp_path)
     assert isinstance(made, TraceScope) and isinstance(made, TraceTap)  # the scope is the tap the deliveries note into

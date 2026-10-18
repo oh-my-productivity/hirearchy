@@ -10,10 +10,8 @@ import pytest
 
 from orgmcp.kernel import JsonObject
 from orgmcp.kernel.testing import FakeClock
-from orgmcp.telemetry._pool import LineWriter
+from orgmcp.telemetry._ports import LineWriter
 from orgmcp.telemetry._writer import FileLineWriter
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
 
 DAY, NEXT_DAY = "2026-10-18", "2026-10-19"
 

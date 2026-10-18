@@ -18,8 +18,6 @@ from orgmcp.kernel.testing import T0
 from orgmcp.snapshots.testing import MemoryIgnoreList
 from orgmcp.telemetry.testing import ORG_MD, SinkKit, build_sink, sink_kit
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
-
 
 def test_it_is_an_event_sink(tmp_path: Path) -> None:
     assert isinstance(sink_kit(tmp_path).sink, EventSink)
@@ -58,9 +56,10 @@ def test_the_line_is_byte_for_byte_what_the_legacy_writer_wrote(tmp_path: Path) 
 
 def test_a_free_field_never_replaces_an_envelope_field(tmp_path: Path) -> None:
     kit = sink_kit(tmp_path)
-    kit.sink.emit("custom.kind", v=99, ts="x", seq=7, proc="p", pid=1, kind="k", actor_x=1)
+    kit.sink.emit("custom.kind", v=99, ts="x", seq=7, pid=1, kind="k", actor_x=1)
     event = kit.events()[0]
-    assert (event["v"], event["seq"], event["proc"], event["kind"]) == (1, 1, "cli", "custom.kind") and event["actor_x"] == 1
+    assert (event["v"], event["seq"], event["pid"], event["kind"]) == (1, 1, os.getpid(), "custom.kind") and event["actor_x"] == 1
+    assert event["ts"] != "x"
 
 
 def test_a_none_free_field_is_written_as_null(tmp_path: Path) -> None:

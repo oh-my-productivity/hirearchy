@@ -12,8 +12,6 @@ from orgmcp.telemetry import EventSinks
 from orgmcp.telemetry._pool import EventWriterPool
 from orgmcp.telemetry._sink import FsEventSinks
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
-
 
 def make() -> tuple[FsEventSinks, EventWriterPool, list[Path]]:
     pool, made = EventWriterPool(FakeClock()), []

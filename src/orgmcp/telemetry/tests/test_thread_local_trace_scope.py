@@ -10,8 +10,6 @@ from orgmcp.kernel import TraceTap
 from orgmcp.telemetry import TraceScope
 from orgmcp.telemetry._trace_scope import ThreadLocalTraceScope
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
-
 
 def test_it_is_both_the_scope_and_the_tap() -> None:
     scope = ThreadLocalTraceScope()

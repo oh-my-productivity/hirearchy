@@ -12,7 +12,6 @@ import pytest
 from orgmcp.telemetry import EventRetention
 from orgmcp.telemetry.testing import IMPLEMENTATIONS, RetentionHarness
 
-from ._red import params as red_params
 
 TODAY = datetime(2026, 10, 18, tzinfo=timezone.utc)
 
@@ -21,7 +20,7 @@ def day(offset: int) -> str:
     return (TODAY - timedelta(days=offset)).strftime("%Y-%m-%d")
 
 
-@pytest.fixture(params=red_params(IMPLEMENTATIONS[EventRetention], green=("memory_event_retention",)))
+@pytest.fixture(params=IMPLEMENTATIONS[EventRetention], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> RetentionHarness:
     made = cast(Callable[[Path], RetentionHarness], request.param)(tmp_path)
     assert isinstance(made.retention, EventRetention)

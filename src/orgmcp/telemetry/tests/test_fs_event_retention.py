@@ -14,8 +14,6 @@ from orgmcp.telemetry._pool import EventWriterPool
 from orgmcp.telemetry._retention import FsEventRetention
 from orgmcp.telemetry.testing import sink_kit
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
-
 
 def test_the_cutoff_is_the_day_keep_days_before_today_and_that_day_stays(tmp_path: Path) -> None:
     retention = FsEventRetention(OrgPaths(tmp_path), FakeClock(), EventWriterPool(FakeClock()))

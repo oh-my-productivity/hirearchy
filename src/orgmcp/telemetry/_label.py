@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
+from ..eventlog import PROCS
 from .api import ProcessLabel
 
 
 class MutableProcessLabel(ProcessLabel):
+    """``cli`` until named; a name that is not one of ``PROCS`` means ``cli``."""
+
+    def __init__(self) -> None:
+        self._name = "cli"
+
     def get(self) -> str:
-        raise NotImplementedError("red: A-telemetry")
+        return self._name
 
     def set(self, name: str) -> None:
-        raise NotImplementedError("red: A-telemetry")
+        self._name = name if name in PROCS else "cli"

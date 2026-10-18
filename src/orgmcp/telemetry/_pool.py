@@ -1,57 +1,54 @@
-"""The open files of a process and what it could not write."""
+"""The open files of a process and the count of what it could not write."""
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Protocol, runtime_checkable
+import os
+import sys
+import threading
 
-from ..kernel import Clock, JsonObject
-
-
-@runtime_checkable
-class LineWriter(Protocol):
-    """The open file of one process for one organization."""
-
-    def append(self, record: JsonObject, day: str, clock: Clock, retry_after: float, on_fresh: Callable[[], None]) -> None:
-        """Number the record, open the day's file if needed, write the line. Raises ``OSError`` when it cannot."""
-        ...
-
-    def close(self) -> None:
-        """Close the file (it is opened again by the next ``append``)."""
-        ...
-
-
-@runtime_checkable
-class LineWriters(Protocol):
-    def writer(self, root: str, proc: str, pid: int) -> LineWriter:
-        """The writer of this process for the organization at ``root`` (the same object every time)."""
-        ...
-
-
-@runtime_checkable
-class DropLog(Protocol):
-    def drop(self, why: BaseException | str) -> None:
-        """Count an event that could not be written; the first one per process is reported on stderr."""
-        ...
-
-    def dropped(self) -> int:
-        """How many were counted."""
-        ...
+from ..eventlog import EVENTS_REL
+from ..kernel import Clock
+from ._ports import DropLog, LineWriter, LineWriters
+from ._writer import FileLineWriter
 
 
 class EventWriterPool(LineWriters, DropLog):
+    """One writer per (organization root, process name, pid), whatever number of sinks and runtimes write through it: that is what keeps
+    one file per process and day. Created once per process by the composition root."""
+
     def __init__(self, clock: Clock) -> None:
-        raise NotImplementedError("red: A-telemetry")
+        self._clock = clock
+        self._lock = threading.Lock()
+        self._writers: dict[tuple[str, str, int], LineWriter] = {}
+        self._dropped = 0
+        self._warned = False
 
     def writer(self, root: str, proc: str, pid: int) -> LineWriter:
-        raise NotImplementedError("red: A-telemetry")
+        key = (root, proc, pid)
+        found = self._writers.get(key)
+        if found is None:
+            with self._lock:
+                stem = f"{proc}-{pid}-{int(self._clock.time() * 1000)}"
+                found = self._writers.setdefault(key, FileLineWriter(os.path.join(root, str(EVENTS_REL)), stem, self._lock))
+        return found
 
     def drop(self, why: BaseException | str) -> None:
-        raise NotImplementedError("red: A-telemetry")
+        self._dropped += 1
+        if not self._warned:
+            self._warned = True
+            try:
+                print(f"orgmcp: the event log is unavailable ({why}); events are being dropped "
+                      "(the operation itself is not affected)", file=sys.stderr, flush=True)
+            except Exception:  # noqa: BLE001 - even a closed stderr must not matter
+                pass
 
     def dropped(self) -> int:
-        raise NotImplementedError("red: A-telemetry")
+        return self._dropped
 
     def reset(self) -> None:
         """Close every file and forget the counters (tests; also what a fork child would need)."""
-        raise NotImplementedError("red: A-telemetry")
+        with self._lock:
+            for writer in self._writers.values():
+                writer.close()
+            self._writers.clear()
+        self._dropped, self._warned = 0, False

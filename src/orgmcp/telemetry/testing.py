@@ -163,7 +163,7 @@ class SinkKit:
     org_md: SwitchHarness  # put / remove ORG.md
     retry_after: float
     files: Callable[[], list[Path]]  # every event file of the organization, by day then name
-    events: Callable[[], list[JsonObject]]  # every event line of every file, parsed, in the order of the files
+    events: Callable[[], list[JsonObject]]  # every event line of every file, parsed, merged by time
     sink_for_root: Callable[..., FsEventSink]  # another sink of the same organization over the same pool (a second runtime)
 
 
@@ -193,7 +193,8 @@ def sink_kit(tmp_path: Path, org_md: str | None = ORG_MD, retry_after: float = 5
         return sorted((tmp_path / EVENTS_REL).glob("*/*.jsonl"))
 
     def events() -> list[JsonObject]:
-        return [json.loads(line) for f in files() for line in f.read_text(encoding="utf-8").splitlines()]
+        found = [json.loads(line) for f in files() for line in f.read_text(encoding="utf-8").splitlines()]
+        return sorted(found, key=lambda e: str(e["ts"]))  # merged by time, the way a reader would
 
     def sink_for_root(retry: float | None = None) -> FsEventSink:
         return build_sink(tmp_path, pool, clock, environment, label, ignore, switch.switch, retry_after if retry is None else retry)

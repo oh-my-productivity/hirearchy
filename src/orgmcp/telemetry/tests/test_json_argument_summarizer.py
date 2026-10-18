@@ -12,8 +12,6 @@ from orgmcp.telemetry._summarize import JsonArgumentSummarizer
 
 from . import _oracle
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
-
 NAMES = ["to", "task_id", "status", "name", "title", "path", "inputs", "artifacts", "tools", "body", "goal", "acceptance", "budget",
          "force", "inputs_map", "tags", "blob", "workspace", "kind", "plan_id", "verdict", "since", "view", "reply_to", "report", "x"]
 

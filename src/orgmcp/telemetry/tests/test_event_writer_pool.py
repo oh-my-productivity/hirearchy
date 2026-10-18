@@ -8,9 +8,8 @@ from pathlib import Path
 import pytest
 
 from orgmcp.kernel.testing import FakeClock
-from orgmcp.telemetry._pool import DropLog, EventWriterPool, LineWriters
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
+from orgmcp.telemetry._pool import EventWriterPool
+from orgmcp.telemetry._ports import DropLog, LineWriters
 
 
 def test_the_pool_is_a_pool_of_writers_and_a_drop_log() -> None:

@@ -15,8 +15,6 @@ from orgmcp.telemetry._encode import encode_line
 
 from . import _oracle
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
-
 
 def record(**fields: object) -> JsonObject:
     return {"v": 1, "ts": "2026-10-18T10:00:00.000001+00:00", "seq": 1, "proc": "cli", "pid": 42, "kind": "custom.kind",
