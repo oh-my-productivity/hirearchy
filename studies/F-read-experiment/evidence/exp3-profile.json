@@ -1,0 +1,38 @@
+{
+  "name": "orgmcp-fread-exp3-sandbox",
+  "description": "internal: used by the orgmcp scheduler for /private/tmp/orgmcp-fread-1792293071/org; not a general-purpose agent (built-in tools: read)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "/Volumes/workspace/orgmcp-wt/f-read/.venv/bin/orgmcp",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "<sandbox org>",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "read"
+  ],
+  "allowedTools": [
+    "@orgmcp"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false,
+  "toolsSettings": {
+    "read": {
+      "allowedPaths": [
+        "/private/tmp/orgmcp-fread-1792293071/inputs",
+        "/private/tmp/orgmcp-fread-1792293071/inputs/**",
+        "/private/tmp/orgmcp-fread-1792293071/org",
+        "/private/tmp/orgmcp-fread-1792293071/org/**"
+      ],
+      "deniedPaths": []
+    }
+  }
+}

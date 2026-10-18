@@ -1,0 +1,13 @@
+469663a50de0219d33236817c4529564 agent_config.json.example
+4067177e78606be3c9f1cad422e74749 claude-opus-5.5.json
+dc760943047953826f80957f377789af claude-sonnet-5.5.json
+064b1e0cf4d9f6879be4163ebd752a9e evolve.json
+ad6915a974c18c2474feb9634c9517e2 orgmcp-orgmcp-org-bac0ec-read-x8f9169ec.json
+f7ec83d121594de6363c471e3914033a orgmcp-read-shell-web_fetch-web_search-write.json
+e0552b84a9ba7b2725673a04f25ff76e orgmcp-read-shell-write.json
+362384f01a3030b7209c66acf1316d8d orgmcp-read-shell.json
+83362b1a91d02283f33d8f34be982ce9 orgmcp-read.json
+f669ee6a7f97d249121703c72f935244 orgmcp-web_fetch-web_search.json
+ba3ef12494eaa7ea24d4dd2e9465f1f8 orgmcp.json
+a8b6eef2889e7307a40f73a9e172f4d6 telegram_bot.json
+aa9c2e76fb7b319ba6ef671402661ad3 /Users/aminalizadeh/.kiro/settings/mcp.json
