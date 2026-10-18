@@ -913,23 +913,31 @@ def prompt_sections(org: Org, addr: str, batch: list[Message]) -> str:
         )
     sections[0] += "\n" + "\n".join(lines)
     working = {t.service for t in org.open_tasks(addr) if t.service}
+    new = {m.service for m in batch if m.type == "task" and m.service and not m.revises and m.to == addr}
+    digests = {c.name: d for c in owned if c.name in new and (d := reflection_digest(org, addr, c.name)) is not None}
     for c in owned:
         if c.name in working:
-            sections.append(_playbook_section(org, addr, c))
-    new = {m.service for m in batch if m.type == "task" and m.service and not m.revises and m.to == addr}
+            sections.append(_playbook_section(org, addr, c, reflecting=c.name in digests))
     for c in owned:
-        if c.name in new and (digest := reflection_digest(org, addr, c.name)) is not None:
-            sections.append(_reflect_section(org, addr, c, digest))
+        if c.name in digests:
+            sections.append(_reflect_section(org, addr, c, digests[c.name]))
     return "".join(f"\n{s}\n" for s in sections)
 
 
-def _playbook_section(org: Org, addr: str, c: Contract) -> str:
+def _playbook_section(org: Org, addr: str, c: Contract, *, reflecting: bool = False) -> str:
+    """The playbook of a service with an open request. ``reflecting``: the batch holds a new request and the prompt
+    carries a "Reflect before you start" section (evidence to write the first playbook from)."""
     pb = read_playbook(org, addr, c.name)
     who = "locked by your parent" if c.locked else "yours to improve"
     head = f"# Playbook: {c.name} (v{pb.version}, {who})"
     if not pb.version:
         if c.locked:
             return f"{head}\nNo playbook yet, and the contract is locked: plan as usual."
+        if reflecting:
+            return (
+                f"{head}\nNo playbook yet: write v1 now from the evidence below (Reflect before you start), then "
+                "follow it."
+            )
         return (
             f"{head}\nNo playbook yet: plan as usual; when you report this request, write v1 with revise_playbook "
             "from how it went."
