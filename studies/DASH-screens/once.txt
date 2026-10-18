@@ -1,20 +1,20 @@
-orgmcp dash - acme (/private/var/folders/1j/8dh3hcps5_bfr1pr48jqxt0w0000gn/T/dash-demo-mvl0f40o/acme)  2026-10-18 10:06:40Z
-scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago) | running 2/2 · queued 2 · waiting on you 1 · errors 15m 2
+orgmcp dash - acme (/path/to/acme)  2026-10-18 10:06:40Z
+scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago) | running 2/2 · queued 1 · waiting on you 1 · errors 15m 2
 
 AGENTS
 ★ root (you)  needs you: 1
   ○ archivist [Archivist]  idle  budget 0  claude-sonnet-5.5
   ▶ ceo [Chief executive]  running 1m12s  budget 3  claude-sonnet-5.5
-    ◔ analyst [Competitor analyst]  queued: max_parallel (2) runs are busy  budget 4  claude-opus-5.5
+    ◔ analyst [Competitor analyst]  queued: max_parallel (2) runs are busy, 1 unread  budget 4  claude-opus-5.5
     ◆ writer [Report writer]  working on 1 task(s)  budget 2  claude-sonnet-5.5
   ◇ ops [Operations lead]  waiting on 1 report(s)  budget 3  claude-sonnet-5.5
-    ‖ audit [Auditor]  paused: paused by the user: audit window closed  budget 0  claude-sonnet-5.5
-    ◔ deploy [Deploy engineer]  queued: paused: 2 consecutive failed runs  budget 1  claude-sonnet-5.5
+    ‖ audit [Auditor]  paused by the user: audit window closed  budget 0  claude-sonnet-5.5
+    ‖ deploy [Deploy engineer]  paused: 2 consecutive failed runs, 1 unread  budget 1  claude-sonnet-5.5
   ▶ research [Research lead]  running 2m05s  budget 4  claude-sonnet-5.5
     ! crawler [Web crawler]  out of budget  budget 0  claude-sonnet-5.5
 
 NEEDS YOU
-  Needs you: note from ops "Need approval for downtime": The key rotation needs a maintenance window. May I take the API down on Saturday 02:00? (mess
+  Needs you: note from ops "Need approval for downtime": The key rotation needs a maintenance window. May I take the API down on Saturday 02:00? (message 20261018T100200000003-ops-007b)
 
 REQUESTS
   "Brief: heat pumps" -> research: working (running: research); runs 2 of 6, last activity 5.0s ago
@@ -25,4 +25,4 @@ REQUESTS
   "Archive old reports" -> archivist: done; runs 1 of 3 (2 returned), last activity 6m18s ago
 
 SERVICES
-  research/market-brief  contract v1 playbook v1  2 request(s): 1 done, 0 failed, 1 open; 1 reworked; avg 2 runs; feedback 1 accept (1 after a reject)
+  research/market-brief  contract v1 playbook v1  2 request(s): 1 done, 0 failed, 1 open; 1 reworked; avg 2 runs; feedback 1 accept (1 after a reject), 0 reject
