@@ -1,0 +1,10 @@
+metrics 2026-10-18T08:32:54Z .. 2026-10-18T09:32:54Z (51 event(s) in the window)
+runs 3: ok 3, failed 0, timeout 0, killed 0 | duration p50 14s p95 16s max 16s (n=3) | queue p50 126ms p95 8.2s (n=3)
+budget spent 3 run(s)
+tool calls 9, refused 0 (0.0%)
+  report               3 calls   0 refused (0%) p50 3ms p95 3ms
+  whoami               3 calls   0 refused (0%) p50 2ms p95 2ms
+  write                3 calls   0 refused (0%) p50 1ms p95 1ms
+messages: result 3, task 3
+scheduler: 3 start(s); errors: none; exits: idle: nothing left to do x3
+stalls 0, pauses 0, agent failures 0, orphaned runs 0

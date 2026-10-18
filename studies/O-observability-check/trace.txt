@@ -1,0 +1,5 @@
+trace 20261018T092904624658-root-a621 "Tool check" -> worker: done
+     +0s  root -> worker task "Tool check" +2 run(s)
+     +8s    run 20261018T092912856677 ok, ran 14s, queued 8.2s, 3 call(s) [report×1 whoami×1 write×1]
+    +20s    worker -> root result (done) "Tool check" +1 run(s)
+totals: wall 20s | runs 1 (budget given 2, returned 1) | run time 14s | queue 8.2s | waiting on you 0s | tool calls 3 (0 refused)
