@@ -36,7 +36,7 @@ from typing import NamedTuple
 
 import yaml
 
-from . import templates
+from . import telemetry, templates
 
 ROOT = "root"
 RUNTIME = "runtime"
@@ -63,6 +63,9 @@ DEFAULT_CONFIG = {
     "playbook_max_words": 1000,  # cap on a service playbook (revise_playbook refuses longer ones)
     "default_model": None,  # kiro model; None = kiro default
     "max_message_chars": 20000,  # longest message body send/delegate/report accept; detail goes in a file
+    "events": True,  # write the structured event log (.runtime/events/); false = no emission at all
+    "events_keep_days": 30,  # the scheduler deletes event-log days older than this (at most once a day)
+    "heartbeat_seconds": 60,  # the scheduler writes a heartbeat event this often
 }
 LESSONS_MAX_CHARS = 800  # longest `lessons` text a report on a service request may carry
 RENDER_BODY_CHARS = 8000  # longer bodies are cut when shown to an agent (prompt, inbox tool); the file has the rest
@@ -220,6 +223,7 @@ class Message:
     contract: int | None = None  # version of the service contract the request was built from
     playbook: int | None = None  # version of the playbook current when the request was sent (0 = none)
     feedback: str | None = None  # "accept" | "reject" on the note that carries the client's verdict
+    trace: str | None = None  # id of the root task (request) this message belongs to; stamped by the runtime at send time
     id: str = ""
     created: str = ""
     path: Path | None = field(default=None, compare=False, repr=False)
@@ -254,6 +258,8 @@ class Message:
             meta["playbook"] = self.playbook
         if self.feedback:
             meta["feedback"] = self.feedback
+        if self.trace:
+            meta["trace"] = self.trace
         return meta
 
     def to_text(self) -> str:
@@ -299,6 +305,7 @@ class Message:
             contract=_opt_int(meta.get("contract")),
             playbook=_opt_int(meta.get("playbook")),
             feedback=str(meta["feedback"]) if meta.get("feedback") else None,
+            trace=str(meta["trace"]) if meta.get("trace") else None,
             id=str(meta.get("id") or path.stem),
             created=str(meta.get("created") or ""),
             path=path,
@@ -385,7 +392,7 @@ class Org:
         for box in BOXES:
             (root / box).mkdir(exist_ok=True)
         (root / ".runtime").mkdir(exist_ok=True)
-        (root / ".gitignore").write_text(".tmp-*\nruns/\n.kiro/\n.runtime/scheduler.pid\n", encoding="utf-8")
+        (root / ".gitignore").write_text(".tmp-*\nruns/\n.kiro/\n.runtime/scheduler.pid\n.runtime/events/\n", encoding="utf-8")
         if shutil.which("git") and not (root / ".git").exists():
             subprocess.run(["git", "init", "-q"], cwd=root, check=False)
         org = cls(root)
@@ -560,21 +567,106 @@ class Org:
     def new_id(self, sender: str) -> str:
         return f"{utcnow():%Y%m%dT%H%M%S%f}-{sender.replace('/', '.')}-{secrets.token_hex(2)}"
 
+    # ------------------------------------------------------------------ traces and events
+
+    def emit(self, kind: str, **fields) -> None:
+        """Append an event to the org's event log (see :mod:`orgmcp.telemetry`). Never raises."""
+        telemetry.emit(self.root, kind, **fields)
+
+    def trace_of(self, addr: str, msg_id: str | None) -> str | None:
+        """The trace stamped on message ``msg_id``, looked up in ``addr``'s own boxes (None: not there or unstamped)."""
+        if not msg_id or not re.fullmatch(r"[\w.\-]+", str(msg_id)):
+            return None
+        d = self.dir(addr)
+        for box in ("inbox", "inflight", "read", "sent"):
+            p = d / box / f"{msg_id}.md"
+            if p.is_file():
+                try:
+                    return Message.load(p).trace
+                except Exception:  # noqa: BLE001
+                    return None
+        return None
+
+    def open_task_traces(self, addr: str) -> list[str | None]:
+        """Traces of the tasks ``addr`` received and has not finished (no result, or only a ``blocked`` one)."""
+        a = self.norm(addr)
+        if a in (ROOT, RUNTIME) or not self.exists(a):
+            return []
+        latest = latest_results(self.sent(a))
+        return [
+            t.trace for t in self.received(a)
+            if t.type == "task" and ((r := latest.get(t.id)) is None or r.status == "blocked")
+        ]
+
+    def context_trace(self, addr: str) -> tuple[str | None, str, list[str]]:
+        """(trace, rule, candidates) from what ``addr`` is working on: rule 3 (its open tasks all share one trace),
+        else rule 4 (its current batch has exactly one), else (None, "ambiguous", every trace it could be)."""
+        a = self.norm(addr)
+        open_traces = self.open_task_traces(a)
+        distinct = {t for t in open_traces if t}
+        if len(distinct) == 1 and None not in open_traces:
+            return next(iter(distinct)), "open-task", []
+        batch = {m.trace for m in self.messages(a, "inflight")} if a not in (ROOT, RUNTIME) and self.exists(a) else set()
+        batch_distinct = {t for t in batch if t}
+        if len(batch_distinct) == 1:
+            return next(iter(batch_distinct)), "batch", []
+        return None, "ambiguous", sorted(distinct | batch_distinct)
+
+    def stamp_trace(self, msg: Message) -> tuple[str, list[str]]:
+        """Set ``msg.trace`` (first matching rule wins) and return (rule, candidates). Rules:
+
+        ``given`` already set (runtime notices about a known task); ``new`` root sends a task without ``revises``: its
+        own id; ``link`` it answers (``reply_to``) or reworks (``revises``) a message that has a trace; ``open-task``
+        the sender's unfinished tasks share one trace; ``batch`` the sender's current batch has one; else
+        ``ambiguous`` (``trace`` stays None; the candidates are returned for the event).
+        """
+        if msg.trace:
+            return "given", []
+        sender = self.norm(msg.sender)
+        if sender == ROOT and msg.type == "task" and not msg.revises:
+            msg.trace = msg.id
+            return "new", []
+        for ref in (msg.reply_to, msg.revises):
+            linked = self.trace_of(sender, ref) if sender != RUNTIME else None
+            if linked:
+                msg.trace = linked
+                return "link", []
+        if sender == RUNTIME:
+            return "ambiguous", []
+        trace, rule, candidates = self.context_trace(sender)
+        msg.trace = trace
+        return rule, candidates
+
     def deliver(self, msg: Message) -> Message:
-        """Low level: assign an id and write the message. Policy is checked by the callers."""
+        """Low level: assign an id, stamp the trace and write the message. Policy is checked by the callers."""
         msg.id = msg.id or self.new_id(msg.sender)
         msg.created = msg.created or utcnow().isoformat(timespec="seconds")
+        try:
+            rule, candidates = self.stamp_trace(msg)
+        except Exception:  # noqa: BLE001 - a trace is bookkeeping: never worth failing a message for
+            rule, candidates = "error", []
         text = msg.to_text()
         # Sender's copy first: it is what charges a budget grant. A failure between the two writes can then only
         # leave a message charged but undelivered (recover() re-delivers it), never delivered but uncharged.
         if msg.sender != RUNTIME:
             atomic_write(self.dir(msg.sender) / "sent" / f"{msg.id}.md", text)
         atomic_write(self.dir(msg.to) / "inbox" / f"{msg.id}.md", text)
+        telemetry.note_trace(msg.trace)
+        extra = {"trace_candidates": candidates} if candidates else {}
+        self.emit(
+            "msg.deliver", actor=msg.sender, trace=msg.trace, id=msg.id, type=msg.type, **{"from": msg.sender},
+            to=msg.to, title=telemetry.clip(msg.title), status=msg.status, budget=msg.budget, reply_to=msg.reply_to,
+            revises=msg.revises, supersedes=msg.supersedes, service=msg.service, feedback=msg.feedback,
+            wake=msg.wake, hops=msg.hops, chars=len(msg.body), trace_rule=rule, **extra,
+        )
         return msg
 
-    def notify(self, to: str, title: str, body: str, wake: bool = True) -> Message:
-        """A notice from the runtime itself (budget, failures, stalls). ``wake=False``: see :meth:`unread`."""
-        return self.deliver(Message(sender=RUNTIME, to=self.norm(to), type="note", title=title, body=body, wake=wake))
+    def notify(self, to: str, title: str, body: str, wake: bool = True, trace: str | None = None) -> Message:
+        """A notice from the runtime itself (budget, failures, stalls). ``wake=False``: see :meth:`unread`.
+        ``trace``: the request the notice is about, when known."""
+        return self.deliver(Message(
+            sender=RUNTIME, to=self.norm(to), type="note", title=title, body=body, wake=wake, trace=trace or None,
+        ))
 
     # ----------------------------------------------------------------- budget
 
@@ -1007,6 +1099,8 @@ class Org:
             (d / sub).mkdir(parents=True, exist_ok=True)
         atomic_write(d / "MEMORY.md", "")
         atomic_write(d / "AGENT.md", join_frontmatter(child_meta, templates.charter_body(role, charter)))
+        self.emit("agent.hire", actor=actor, agent=addr, by=actor, role=telemetry.clip(role.strip()),
+                  model=model, tools=tools)
         return addr
 
     def _check_authority(self, actor: str, tools: list[str], workspace: str | None, inputs: list[str] | None = None) -> None:
@@ -1119,6 +1213,8 @@ class Org:
                 sender=RUNTIME, to=parent, type="note", budget=refund, wake=False, title=f"Budget returned from {addr}",
                 body=templates.notice_budget_returned(addr, refund, actor, reason),
             ))
+        self.emit("agent.retire", actor=actor, agent=addr, by=actor, reason=telemetry.clip(reason, telemetry.ERROR_MAX),
+                  returned_budget=refund, team=sorted(team))
         return Retired(addr, refund, parent if refund else None)
 
     # ------------------------------------------------------------- file access
@@ -1328,9 +1424,13 @@ class Org:
 
     def pause(self, addr: str, reason: str) -> None:
         (self.dir(addr) / ".paused").write_text(reason, encoding="utf-8")
+        self.emit("agent.pause", agent=addr, reason=telemetry.clip(reason, telemetry.ERROR_MAX))
 
-    def resume(self, addr: str) -> None:
+    def resume(self, addr: str, reason: str = "") -> None:
+        was = self.paused(addr)
         (self.dir(addr) / ".paused").unlink(missing_ok=True)
+        if was is not None:
+            self.emit("agent.resume", agent=addr, reason=reason or "resumed", previous=telemetry.clip(was, 200))
 
     def record_failure(self, addr: str) -> int:
         """Count one more consecutive failed run (kept in .runtime/failures.json, so it survives restarts)."""

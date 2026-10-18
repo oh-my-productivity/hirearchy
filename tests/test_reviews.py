@@ -46,7 +46,8 @@ def runtime_notes(org, addr):
 
 
 def snapshot(org):
-    return {p: p.read_bytes() for p in org.root.rglob("*") if p.is_file() and ".git" not in p.parts}
+    # the event log (.runtime/events) records even a dry run, so it is not part of the organization's content
+    return {p: p.read_bytes() for p in org.root.rglob("*") if p.is_file() and ".git" not in p.parts and "events" not in p.parts}
 
 
 # ------------------------------------------------------------------ who hears what
