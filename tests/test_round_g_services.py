@@ -245,3 +245,35 @@ def test_a_single_request_case_has_no_case_total_line(svc):
     first = request(svc, "ai")
     deliver(svc, "ceo", first)
     assert "case total" not in progress(svc)
+
+
+# ------------------------------------------------------------------------------------------ 5. escaping
+
+
+def test_angle_brackets_and_ampersands_are_stored_exactly_as_given(svc):
+    reason = 'Cases rejected for <weekday> & "dates"; keep &lt;literal&gt; -> done'
+    content = "## Steps\n1. Resolve <weekday> and <date> & check \"quotes\" and &amp; entities.\n"
+    server = build_server(svc, "ceo")
+    call(server, "revise_playbook", service=WEEKDAY, content=content, reason=reason)
+    pb = services.read_playbook(svc, "ceo", WEEKDAY)
+    assert pb.reason == reason and pb.body == content.strip()
+    raw = (svc.dir("ceo") / "services" / WEEKDAY / "PLAYBOOK.md").read_text()
+    assert "<weekday>" in raw and "&lt;literal&gt;" in raw and "&amp;lt;" not in raw
+    # the notice to the client, the listing and the owner's prompt carry the same characters
+    assert reason in [m.body for m in svc.messages(ROOT, "inbox")][-1]
+    assert f'"{reason}"' in services.services_text(svc, ROOT)
+    request(svc, "ai")
+    assert "Resolve <weekday> and <date> & check" in svc.run_prompt("ceo", svc.begin_run("ceo"))
+
+    # the same through the Org API, and in the archived history
+    svc.revise_playbook("ceo", WEEKDAY, "## Steps\n1. Other <b>.", "second <i> & more")
+    assert services.read_playbook(svc, "ceo", WEEKDAY).reason == "second <i> & more"
+    assert "<weekday>" in (svc.dir("ceo") / "services" / WEEKDAY / "history" / "PLAYBOOK.v1.md").read_text()
+
+
+def test_messages_between_agents_keep_angle_brackets_too(svc):
+    svc.delegate(ROOT, "ceo", "Plan", "Plan", "a plan", budget=10)
+    msg = svc.delegate("ceo", ENG, "T", "Resolve 'before <weekday>' & \"for <date>\"", "c", budget=1)
+    assert "before <weekday>" in msg.body and "&lt;" not in msg.body
+    sent = svc.sent("ceo")[-1]
+    assert "before <weekday>" in sent.body and "&lt;" not in sent.body
