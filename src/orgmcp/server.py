@@ -38,7 +38,7 @@ You are connected to ONE orgmcp organization as `root`, the human's seat. {where
   ORG_ROOT changes).
 - Never claim the organization did work unless orgmcp tools show it.
 - If an orgmcp tool fails, tell the user instead of substituting another mechanism.
-- `whoami` and `status` show the state; `start`/`stop` control the scheduler.
+- `whoami` and `status` show the state; `start`/`stop` control the scheduler. `observe` (read-only): what ran or failed.
 - Standing services: `services` lists them (check it before building a new org), `request` uses one, `feedback` rates a
   delivery, `define_service` adds one.
 When the user asks for an org, team or agents for a goal:
@@ -514,6 +514,9 @@ def setup_state(binding: OrgBinding) -> str:
 def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
     """The tools only the human's (root) server has. Add new root-only tools here, resolving the organization
     with ``binding.get()`` at call time (it may not exist yet when the server starts)."""
+    from .observe import register_observe_tool
+
+    register_observe_tool(mcp, binding)
 
     @mcp.tool()
     def create_org(mission: str, default_model: str | None = None, path: str | None = None) -> str:

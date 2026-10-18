@@ -393,6 +393,10 @@ def main(argv: list[str] | None = None) -> None:
     s = sub.add_parser("mcp", help="run the MCP server on stdio (identity from $ORG_AGENT, default root)")
     s.set_defaults(fn=cmd_mcp)
 
+    from .cli_obs import register_obs
+
+    register_obs(sub)  # obs now|trace|metrics|events, check
+
     s = sub.add_parser("kiro-profile", help="write this organization's internal kiro profile (the scheduler does this itself)")
     s.add_argument("--tools")
     s.set_defaults(fn=cmd_kiro_profile)
