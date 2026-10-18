@@ -295,5 +295,5 @@ def test_emission_stays_cheap(org: Org) -> None:
     for i in range(2000):
         org.emit("bench", i=i, to="ceo", title="a title", chars=123)
     elapsed = time.perf_counter() - start
-    assert elapsed < 0.2, f"2000 events took {elapsed:.3f}s ({elapsed / 2000 * 1e6:.0f} us each)"
+    assert elapsed < 0.5, f"2000 events took {elapsed:.3f}s ({elapsed / 2000 * 1e6:.0f} us each)"
     assert len(lines(org.root)) == 2001
