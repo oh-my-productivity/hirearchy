@@ -1,5 +1,7 @@
 # F-read experiment: why a reviewer with `read` cannot open the writer's file
 
+> Repeatable form: `tests/integration/test_real_kiro.py::test_builtin_read_reads_the_org_but_not_outside` (opt-in, `pytest --run-integration`).
+
 Question (study E, finding F3): in a documents org every agent holds kiro's built-in `read`, confined to the user's
 input folder. The writer's memo lives in `lead/writer/work/`; the reviewer could not read it, and the agents said
 "the @orgmcp/read tool does not appear as a callable function". Is orgmcp's `read` hidden behind the built-in one

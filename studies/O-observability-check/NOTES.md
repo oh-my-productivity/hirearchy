@@ -1,5 +1,7 @@
 # O-observability-check: observability against real kiro
 
+> Repeatable form: `tests/integration/test_real_kiro.py::test_agent_and_run_id_reach_the_mcp_server` (opt-in, `pytest --run-integration`).
+
 Question: with the real emitter and a real `kiro-cli`, does an agent's MCP server write events tagged with the agent and
 the scheduler's run id (i.e. does `ORG_RUN_ID` pass through kiro to the MCP server it spawns), and do the four views
 (`trace`, `now`, `metrics`, `check`) tell the truth about it?

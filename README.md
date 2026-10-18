@@ -716,11 +716,26 @@ without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first pri
 ## Test
 
 ```sh
-uv run pytest -q
+uv run pytest -q                      # unit tests: no LLM, no network, never touches your ~/.kiro
+uv run pytest -q tests/integration --run-integration    # + the real-kiro tests (or ORGMCP_RUN_INTEGRATION=1)
 ```
 
-The tests use a deterministic fake agent (`tests/fake_agent.py`) in place of kiro. An autouse fixture
-(`tests/conftest.py`) points `$HOME` and the profile directory at a temp dir and puts a stub `kiro-cli` first on
-`PATH`, so running them never touches your real `~/.kiro`. A test that would call a real LLM through `kiro-cli` must be
-marked `@pytest.mark.integration`: those are skipped unless you ask for them (`uv run pytest --run-integration`, or
-`ORGMCP_RUN_INTEGRATION=1`). None of the current tests needs one.
+**Unit tests (default).** They use a deterministic fake agent (`tests/fake_agent.py`) in place of kiro. An autouse
+fixture (`tests/conftest.py`) points `$HOME` and the profile directory at a temp dir and puts a stub `kiro-cli` first
+on `PATH`. A default run starts zero real-LLM runs: tests marked `@pytest.mark.integration` (and everything under
+`tests/integration/`, marked or not) are reported as skipped, and `tests/test_integration_marker.py` proves it.
+
+**Integration tests (opt-in).** `tests/integration/test_real_kiro.py` runs tiny orgs (3 tests, one agent run each,
+about 45 s and 3 LLM calls in total) against the real `kiro-cli` and your kiro login: that the agent and the scheduler's
+run id reach the MCP server's events (`ORG_RUN_ID`), that the built-in `read` reads the org but nothing outside it, and
+that the built-in `write` and orgmcp's `org_write` work side by side. They assert on files and events, not on wording.
+
+* Cost: real model calls, billed to your kiro account like any other run. `ORGMCP_IT_MODEL=<model>` picks a cheaper one
+  (default: the system default model, `claude-sonnet-5.5`).
+* Skipped (not failed) when `kiro-cli` is not on `PATH`. Each run is killed after 300 s, the scheduler after 480 s.
+* Safety (`tests/kiro_sandbox.py`): the org lives in the test's tmp dir. Before the test the md5 of every file in
+  `~/.kiro/agents/` and of `~/.kiro/settings/mcp.json` is taken (hashed only, never read out or printed). After it, pass or
+  fail, only the per-org profiles whose `ORG_ROOT` is inside that tmp dir are deleted, every process whose command line
+  mentions the tmp dir is killed, and the test fails if any of those md5s changed. No other organization is touched.
+* Possible flakiness: model behaviour (a run that does not follow the task fails the test, the run log tail is in the
+  assertion message), kiro or network outages, a machine so loaded that a run exceeds its timeout.
