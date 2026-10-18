@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import IO, Callable, NamedTuple
 
 from . import review, telemetry, templates
+from .app.wiring import open_runtime
 from .core import ROOT, Org, OrgError, atomic_write
 from .health import config_number
 
@@ -266,15 +267,7 @@ def kill_group(pgid: int, wait: float = 5.0) -> bool:
 
 def ignore_runtime_files(root: Path) -> None:
     """Keep files that change constantly out of the org's git snapshots (``git add -A`` after every run)."""
-    path = Path(root) / ".gitignore"
-    try:
-        text = path.read_text(encoding="utf-8") if path.exists() else ""
-        missing = [line for line in (".runtime/running.json", ".runtime/scheduler.log", EXIT_FILE, ".runtime/events/")
-                   if line not in text.split()]
-        if missing:
-            path.write_text((text.rstrip("\n") + "\n" if text else "") + "\n".join(missing) + "\n", encoding="utf-8")
-    except OSError:
-        pass
+    open_runtime(Path(root)).ignore_list.ensure_runtime_files()
 
 
 EXIT_FILE = ".runtime/scheduler.exit"  # why the last scheduler exited by itself (until-done); removed when one starts
@@ -484,7 +477,7 @@ def start_scheduler(org: Org, max_runs: int | None = None, until_done: bool = Fa
                        f"this org's scheduler ({st.detail}). Check that process; if it is stale, remove that file")
     runtime = org.root / ".runtime"
     runtime.mkdir(exist_ok=True)
-    ignore_runtime_files(org.root)
+    org.runtime.ignore_list.ensure_runtime_files()
     (org.root / EXIT_FILE).unlink(missing_ok=True)
     log = runtime / "scheduler.log"
     env = {**os.environ, "ORG_ROOT": str(org.root), "PYTHONUNBUFFERED": "1"}
@@ -655,7 +648,7 @@ class Scheduler:
 
     def _ignore_running_ledger(self) -> None:
         """The record changes with every run; keep it out of the org's git snapshots."""
-        ignore_runtime_files(self.org.root)
+        self.org.runtime.ignore_list.ensure_runtime_files()
 
     def _settle_orphans(self) -> None:
         """Kill runs a dead scheduler left behind, and note those that survive.

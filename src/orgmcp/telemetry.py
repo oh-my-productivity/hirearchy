@@ -182,9 +182,9 @@ class _Writer:
 def ensure_ignored(root: str | Path) -> None:
     """Keep the events out of the organization's git snapshots (same mechanism as the other runtime files)."""
     try:
-        from .scheduler import ignore_runtime_files  # late: the scheduler imports core, which imports this module
+        from .app.wiring import open_runtime  # late: the app package imports the facade, which imports this module
 
-        ignore_runtime_files(Path(root))
+        open_runtime(Path(root)).ignore_list.ensure_runtime_files()
     except Exception:  # noqa: BLE001
         pass
 

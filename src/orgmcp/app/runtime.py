@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..kernel import AtomicWriter, Clock, Environment, IdGenerator, LedgerStore, OrgLayout
+from ..snapshots import GitClient, IgnoreList, OrgSnapshotter
 from ._resources import ProcessResources
 
 
@@ -22,3 +23,6 @@ class OrgRuntime:
     atomic_writer: AtomicWriter
     ledgers: LedgerStore
     environment: Environment
+    git: GitClient
+    snapshotter: OrgSnapshotter
+    ignore_list: IgnoreList

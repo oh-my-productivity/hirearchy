@@ -30,12 +30,11 @@ def log(root: Path) -> list[str]:
     return out.splitlines()
 
 
-@pytest.mark.xfail(strict=True, reason="red: A-snapshots")
 def test_the_runtime_has_the_three_snapshot_ports(tmp_path: Path) -> None:
     runtime = wiring.open_runtime(tmp_path)
-    assert isinstance(runtime.git, SubprocessGit) and isinstance(runtime.git, GitClient)  # type: ignore[attr-defined]
-    assert isinstance(runtime.snapshotter, GitOrgSnapshotter) and isinstance(runtime.snapshotter, OrgSnapshotter)  # type: ignore[attr-defined]
-    assert isinstance(runtime.ignore_list, FsIgnoreList) and isinstance(runtime.ignore_list, IgnoreList)  # type: ignore[attr-defined]
+    assert isinstance(runtime.git, SubprocessGit) and isinstance(runtime.git, GitClient)
+    assert isinstance(runtime.snapshotter, GitOrgSnapshotter) and isinstance(runtime.snapshotter, OrgSnapshotter)
+    assert isinstance(runtime.ignore_list, FsIgnoreList) and isinstance(runtime.ignore_list, IgnoreList)
 
 
 def test_opening_a_runtime_touches_nothing_of_the_snapshots(tmp_path: Path) -> None:
@@ -43,16 +42,14 @@ def test_opening_a_runtime_touches_nothing_of_the_snapshots(tmp_path: Path) -> N
     assert not (tmp_path / "nowhere").exists()
 
 
-@pytest.mark.xfail(strict=True, reason="red: A-snapshots")
 def test_a_git_override_reaches_the_snapshotter(tmp_path: Path) -> None:
     git = RecordingGit()
     runtime = wiring.open_runtime(tmp_path, {GitClient: git})
-    runtime.snapshotter.init_repository()  # type: ignore[attr-defined]
-    runtime.snapshotter.commit("x")  # type: ignore[attr-defined]
-    assert git.calls == [("init", str(tmp_path))] and git.has_repository(tmp_path)
+    runtime.snapshotter.init_repository()
+    runtime.snapshotter.commit("x")
+    assert git.calls == [("init", str(tmp_path)), ("commit_all", str(tmp_path), "x")] and git.has_repository(tmp_path)
 
 
-@pytest.mark.xfail(strict=True, reason="red: A-snapshots")
 def test_org_commit_goes_through_the_snapshotter(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     org = Org.init(tmp_path / "org", "m")
     git = RecordingGit()
