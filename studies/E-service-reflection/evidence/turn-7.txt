@@ -1,0 +1,21 @@
+[tool] Running: @orgmcp/delegate
+[tool] status: Completed
+[tool] Running: @orgmcp/start
+[tool] status: Completed
+Sent it back for rework with 5 more runs, which brings the total to about 12 for this memo. I'll wait for it to finish.
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+[tool] Running: @orgmcp/inbox
+[tool] Running: @orgmcp/status
+[tool] status: Completed
+[tool] status: Completed
+The lead has run out of runs before the final independent check, so I need your OK to spend more.
+
+- **Memo:** it now has all 5 action items, including Sam's and Lee's, and Decisions come before Action items. It hasn't been through the independent review yet.
+- **Cost so far:** the first pass used 7 runs and the rework has used 7 of the 5 I gave it. That's about 14 in total, already over your "about 12" for one memo. The lead spent more than I gave it on the rework.
+- **What it asks for:** 3 more runs. Two are for the reviewer (one check plus one reserve for fixes) and one for the lead to report. That would bring this memo to about 17.
+- **Stranded runs:** none to reclaim. The writer and reviewer both have 0 left.
+
+I recommend granting the 3 runs. Without the review, the memo can't meet the contract's check that the reviewer's report shows every criterion met, so I couldn't hand it over as verified. Reply "grant 3" to do that, or tell me to stop. If you stop, I'd deliver the memo marked as not independently reviewed, which I'd only do if you ask for it.

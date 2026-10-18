@@ -1,0 +1,10 @@
+21a22
+> - In the memo, the "Decisions" section comes before the "Action items" section.
+29c30
+< version: 1
+---
+> version: 2
+31c32
+< defined: '2026-10-18T02:16:43.197036+00:00'
+---
+> defined: '2026-10-18T02:23:27.041459+00:00'

@@ -1,0 +1,12 @@
+22a23,25
+> - Every commitment someone makes in the notes counts as an action item, whether or
+>   not it is labelled ACTION, including ones buried in a paragraph; the reviewer re-reads
+>   the whole notes file for such commitments and confirms each one has a row.
+30c33
+< version: 2
+---
+> version: 3
+32c35
+< defined: '2026-10-18T02:23:27.041459+00:00'
+---
+> defined: '2026-10-18T02:42:20.124460+00:00'

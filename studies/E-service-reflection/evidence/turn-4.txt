@@ -1,0 +1,7 @@
+[tool] Running: @orgmcp/feedback
+[tool] status: Completed
+I've recorded the memo as accepted.
+
+I'd like to make your ordering rule a permanent check on every memo. The wording would be: "In the memo, the 'Decisions' section comes before the 'Action items' section."
+
+The reviewer and I would then check it every week. Should I add it? Reply "yes" and I will.

@@ -1,0 +1,21 @@
+[tool] Running: @orgmcp/send
+[tool] status: Completed
+[tool] Running: @orgmcp/start
+[tool] status: Completed
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+[tool] Running: @orgmcp/inbox
+[tool] Running: @orgmcp/health
+[tool] status: Completed
+[tool] status: Completed
+I'm stopping to ask before spending anything more. The extra run I granted wasn't enough, and that's my miscalculation.
+
+Every time the lead wakes up it uses one run. To hand the review to the reviewer, it needs 3 runs going into a wake-up: one for the wake-up, one for the reviewer and one to process the result. It has 1 now.
+
+This memo has used about 19 runs so far, against your "about 12". The memo itself is finished. I've read the notes and the memo myself, and it has all 5 action items with Decisions first.
+
+Your options:
+1. **Grant 2 more runs** (my recommendation). The review would happen, and the memo would come to about 21 runs. This is the only way to get the independent check. If the review finds a problem, I'd come back to you before spending anything else.
+2. **Stop spending and deliver as is.** The memo would be marked "not independently reviewed". It would fail the contract check that needs the reviewer's report, so I'd say so plainly. My own read-through is not an independent check.
+
+Which one: "grant 2", or "deliver as is"?

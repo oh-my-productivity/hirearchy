@@ -1,0 +1,17 @@
+[tool] Running: @orgmcp/stop
+[tool] Running: cd /private/tmp/orgmcp-e-1792289694; cat org/lead/work/memo-2026-10-12.md; wc -w org/lead/work/memo-2026-10-12.md
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: cd /private/tmp/orgmcp-e-1792289694; cp org/lead/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && ls deliverables
+[tool] Running: @orgmcp/feedback
+[tool] status: Completed
+[tool] status: Completed
+The 2026-10-12 memo is saved at `/tmp/orgmcp-e-1792289694/deliverables/memo-2026-10-12.md`. It has not been independently reviewed. No further runs were spent, and nothing is running now.
+
+- **What I checked myself:** it is 131 words. Decisions come before Action items. The table has 5 rows with ISO dates or "none": Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21 and Lee "none". I read it against the notes and found nothing missing.
+- **Contract check 7:** the check that needs the reviewer's report is unmet. It is the only check I can't vouch for.
+- **Cost:** about 19 runs, against your "about 12". The lead overspent on the rework, and my last grant wasn't enough because each wake-up uses a run.
+
+I recorded the memo as accepted. If you find a problem when you read it, tell me and I'll change that.
+
+You said implicit action items count. Should I add that to the contract as a permanent check? The wording would be: "Every commitment someone makes in the notes counts as an action item, whether or not it is labelled ACTION, including ones buried in a paragraph." It would make the reviewer look for them each week, and it would have caught the problem in this memo's first version. Reply "yes" and I'll add it.

@@ -1,0 +1,26 @@
+date: Sun Oct 18 03:15:09 WEST 2026
+mcp.json md5: aa9c2e76fb7b319ba6ef671402661ad3
+MD5 (/Users/aminalizadeh/.kiro/agents/agent_config.json.example) = 469663a50de0219d33236817c4529564
+MD5 (/Users/aminalizadeh/.kiro/agents/claude-opus-5.5.json) = 4067177e78606be3c9f1cad422e74749
+MD5 (/Users/aminalizadeh/.kiro/agents/claude-sonnet-5.5.json) = dc760943047953826f80957f377789af
+MD5 (/Users/aminalizadeh/.kiro/agents/evolve.json) = 064b1e0cf4d9f6879be4163ebd752a9e
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-orgmcp-org-bac0ec-read-x8f9169ec.json) = ad6915a974c18c2474feb9634c9517e2
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-web_fetch-web_search-write.json) = f7ec83d121594de6363c471e3914033a
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read-shell-write.json) = e0552b84a9ba7b2725673a04f25ff76e
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read-shell.json) = 362384f01a3030b7209c66acf1316d8d
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-read.json) = 83362b1a91d02283f33d8f34be982ce9
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp-web_fetch-web_search.json) = f669ee6a7f97d249121703c72f935244
+MD5 (/Users/aminalizadeh/.kiro/agents/orgmcp.json) = ba3ef12494eaa7ea24d4dd2e9465f1f8
+MD5 (/Users/aminalizadeh/.kiro/agents/telegram_bot.json) = a8b6eef2889e7307a40f73a9e172f4d6
+skills:
+autoresearch
+commit
+gmail
+orgmcp
+reverse-engineer-anything
+skill-generation
+test-driven-development
+workflow-suggest
+main checkout status:
+       0
+9ed60500d82614848089d6e4de0244f4b3f9ef30
