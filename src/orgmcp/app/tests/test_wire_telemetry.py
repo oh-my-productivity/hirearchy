@@ -33,8 +33,6 @@ from orgmcp.telemetry._sink import FsEventSink, FsEventSinks
 from orgmcp.telemetry._summarize import JsonArgumentSummarizer
 from orgmcp.telemetry._trace_scope import ThreadLocalTraceScope
 
-RED = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
-
 
 def lines(root: Path) -> list[dict[str, object]]:
     return [json.loads(line) for f in sorted((root / EVENTS_REL).glob("*/*.jsonl")) for line in f.read_text(encoding="utf-8").splitlines()]
@@ -55,7 +53,6 @@ def org(tmp_path: Path) -> Org:
 # ------------------------------------------------------------------------------------------------------------ the runtime
 
 
-@RED
 def test_the_runtime_has_the_real_telemetry_ports(tmp_path: Path) -> None:
     runtime = wiring.open_runtime(tmp_path)
     assert isinstance(runtime.events, FsEventSink) and isinstance(runtime.events, EventSink)
@@ -67,7 +64,6 @@ def test_the_runtime_has_the_real_telemetry_ports(tmp_path: Path) -> None:
     assert isinstance(runtime.trace_tap, TraceTap)
 
 
-@RED
 def test_the_process_owns_the_pool_the_label_the_scope_and_the_sinks(tmp_path: Path) -> None:
     resources = wiring.process_resources()
     runtime = wiring.open_runtime(tmp_path)
@@ -76,14 +72,12 @@ def test_the_process_owns_the_pool_the_label_the_scope_and_the_sinks(tmp_path: P
     assert runtime.trace_scope is resources.trace_scope and runtime.trace_tap is resources.trace_scope
 
 
-@RED
 def test_two_runtimes_have_their_own_sink_over_the_same_pool(tmp_path: Path) -> None:
     one, two = wiring.open_runtime(tmp_path), wiring.open_runtime(tmp_path)
     assert one.events is not two.events and one.event_retention is not two.event_retention
     assert one.process_label is two.process_label and one.trace_scope is two.trace_scope
 
 
-@RED
 def test_the_sink_is_built_from_the_ports_of_its_runtime(tmp_path: Path) -> None:
     ignore, text = MemoryIgnoreList(), MemoryOrgSettings("---\nevents: true\n---\n")
     runtime = wiring.open_runtime(tmp_path, {IgnoreList: ignore, EventSwitch: _switch(text)})
@@ -97,14 +91,12 @@ def _switch(settings: MemoryOrgSettings) -> EventSwitch:
     return StampedEventSwitch(settings, settings)
 
 
-@RED
 def test_the_event_switch_of_the_runtime_decides(tmp_path: Path) -> None:
     off = MemoryOrgSettings("---\nevents: false\n---\n")
     wiring.open_runtime(tmp_path, {EventSwitch: _switch(off)}).events.emit("custom.kind")
     assert not (tmp_path / EVENTS_REL).exists()
 
 
-@RED
 def test_a_sink_override_replaces_the_port(tmp_path: Path) -> None:
     sink = ListEventSink()
     assert wiring.open_runtime(tmp_path, {EventSink: sink}).events is sink
@@ -124,7 +116,6 @@ def test_the_event_clock_follows_the_patch_point_of_the_telemetry_module(org: Or
     assert isinstance(org.runtime.clock, Clock)  # the clock of the runtime is another one: only the events follow the patch point
 
 
-@RED
 def test_the_event_clock_is_the_system_clock_once_the_patch_points_are_disabled(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(_compat, "ENABLED", False)
     monkeypatch.setattr(telemetry, "datetime", type("Never", (), {"now": staticmethod(lambda tz=None: 1 / 0)}))
@@ -144,7 +135,6 @@ def test_core_utcnow_does_not_move_the_events(org: Org, monkeypatch: pytest.Monk
 # ------------------------------------------------------------------------------------------------------------ the facade
 
 
-@RED
 def test_org_emit_goes_through_the_sink_of_its_runtime(org: Org) -> None:
     sink = ListEventSink()
     org.runtime = dataclasses.replace(org.runtime, events=sink)
@@ -176,7 +166,6 @@ def test_the_process_label_is_global_so_org_code_in_the_scheduler_says_scheduler
     assert (event["proc"], event["actor"]) == ("scheduler", "runtime") and files(org.root)[0].name.startswith("scheduler-")
 
 
-@RED
 def test_one_file_per_process_and_day_across_several_runtimes_of_the_same_root(org: Org) -> None:
     other = Org(org.root)
     org.emit("a")
@@ -197,7 +186,6 @@ def test_a_second_process_writes_its_own_file(org: Org) -> None:
 # ----------------------------------------------------------------------------------------------- the process resources
 
 
-@RED
 def test_reset_closes_the_files_and_forgets_the_counters_the_label_and_the_sinks(org: Org) -> None:
     resources = wiring.process_resources()
     org.emit("custom.kind")
@@ -209,7 +197,6 @@ def test_reset_closes_the_files_and_forgets_the_counters_the_label_and_the_sinks
     assert resources.event_sinks.for_root(org.root) is not cached
 
 
-@RED
 def test_reset_keeps_the_objects_of_the_resources() -> None:
     resources = wiring.process_resources()
     before = (resources.event_pool, resources.process_label, resources.trace_scope, resources.event_sinks, resources.message_parser)
@@ -217,7 +204,6 @@ def test_reset_keeps_the_objects_of_the_resources() -> None:
     assert before == (resources.event_pool, resources.process_label, resources.trace_scope, resources.event_sinks, resources.message_parser)
 
 
-@RED
 def test_the_resources_can_be_made_without_arguments_for_the_telemetry_part() -> None:
     from orgmcp.app._resources import CachingMessageParser
 
@@ -226,7 +212,6 @@ def test_the_resources_can_be_made_without_arguments_for_the_telemetry_part() ->
     assert resources.process_label.get() == "cli" and isinstance(resources.trace_scope, ThreadLocalTraceScope)
 
 
-@RED
 def test_the_sinks_of_a_custom_set_of_resources_use_that_set(tmp_path: Path) -> None:
     from orgmcp.app._resources import CachingMessageParser
 
@@ -251,7 +236,6 @@ def test_emit_by_root_accepts_a_string_and_never_raises(org: Org, tmp_path: Path
     assert len(lines(org.root)) == 1 and not (tmp_path / "nowhere").exists() and telemetry.dropped() == 0
 
 
-@RED
 def test_the_process_name_functions(org: Org) -> None:
     assert telemetry.process() == "cli"
     telemetry.set_process("mcp")
@@ -268,7 +252,6 @@ def test_reset_is_the_reset_of_the_resources(org: Org) -> None:
     assert telemetry.process() == "cli" and telemetry.dropped() == 0
 
 
-@RED
 def test_traces_seen_and_note_trace_are_the_scope_and_the_tap_of_the_runtime(org: Org) -> None:
     with telemetry.traces_seen() as seen:
         org.runtime.trace_tap.note("a")

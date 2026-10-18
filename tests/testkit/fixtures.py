@@ -1,7 +1,7 @@
 """Shared pytest fixtures (registered by the root conftest.py as the ``testkit.fixtures`` plugin).
 
-``isolated_kiro`` and ``fresh_telemetry`` are autouse: no unmarked test touches the real ~/.kiro or starts the real kiro-cli, and each
-test starts with no open event files. ``org`` is a ready team; ``real_kiro`` is the sandbox of the (skipped by default) integration tests.
+``isolated_kiro`` and ``fresh_process_resources`` are autouse: no unmarked test touches the real ~/.kiro or starts the real kiro-cli, and each
+test starts with the process resources empty (no open event files, no drop counter, the default process name, no cached parse). ``org`` is a ready team; ``real_kiro`` is the sandbox of the (skipped by default) integration tests.
 """
 
 import os
@@ -9,7 +9,7 @@ import stat
 
 import pytest
 
-from orgmcp import telemetry
+from orgmcp.app import wiring
 from orgmcp.core import ROOT, Org
 
 from . import process_state
@@ -26,11 +26,11 @@ def process_state_guard(request):
 
 
 @pytest.fixture(autouse=True)
-def fresh_telemetry():
-    """Each test starts with no open event files, no drop counter and the default process name."""
-    telemetry.reset()
+def fresh_process_resources():
+    """Each test starts with the process resources empty: no open event files, no drop counter, the default process name, no sinks."""
+    wiring.process_resources().reset()
     yield
-    telemetry.reset()
+    wiring.process_resources().reset()
 
 
 @pytest.fixture(autouse=True)

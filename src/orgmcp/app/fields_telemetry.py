@@ -4,10 +4,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-STEP: str | None = None  # set to the step's name when the step fills this part (see test_runtime_fields)
+from ..telemetry import ArgumentSummarizer, EventRetention, EventSinks, ProcessLabel, TraceScope
+
+STEP: str | None = "A-telemetry"  # the step that filled this part (see test_runtime_fields)
+# (the fields ``events: EventSink`` and ``trace_tap: TraceTap`` are the kernel's ports: they are in fields_kernel.py, built by wire_telemetry.py)
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
 
 
 @dataclass(frozen=True)
 class Fields:
-    """No field yet: the step that gives the package its ports adds them here."""
+    event_sinks: EventSinks
+    process_label: ProcessLabel
+    event_retention: EventRetention
+    argument_summarizer: ArgumentSummarizer
+    trace_scope: TraceScope

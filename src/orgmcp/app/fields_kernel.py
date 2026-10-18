@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..kernel import AtomicWriter, Clock, Environment, IdGenerator, LedgerStore, OrgLayout
+from ..kernel import AtomicWriter, Clock, Environment, EventSink, IdGenerator, LedgerStore, OrgLayout, TraceTap
 
 STEP: str | None = "M2"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
@@ -18,3 +18,5 @@ class Fields:
     atomic_writer: AtomicWriter
     ledgers: LedgerStore
     environment: Environment
+    events: EventSink  # provided by wire_telemetry (the real sink is telemetry's)
+    trace_tap: TraceTap  # provided by wire_telemetry (the real tap is telemetry's)

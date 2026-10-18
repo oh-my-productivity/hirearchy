@@ -8,7 +8,12 @@ import os
 from pathlib import Path
 from typing import Protocol, TypeVar
 
-from ..kernel import JsonObject, Message, split_frontmatter
+from ..kernel import EventSink, JsonObject, Message, split_frontmatter
+from ..kernel._system import SystemClock
+from ..telemetry._label import MutableProcessLabel
+from ..telemetry._pool import EventWriterPool
+from ..telemetry._sink import FsEventSinks
+from ..telemetry._trace_scope import ThreadLocalTraceScope
 
 M = TypeVar("M", bound=Message)
 
@@ -79,9 +84,28 @@ class CachingMessageParser(MessageParser):
 class ProcessResources:
     """The objects that exist once per process and are shared by every organization runtime in it."""
 
-    def __init__(self, message_parser: CachingMessageParser) -> None:
+    def __init__(
+        self,
+        message_parser: CachingMessageParser,
+        event_pool: EventWriterPool | None = None,
+        process_label: MutableProcessLabel | None = None,
+        trace_scope: ThreadLocalTraceScope | None = None,
+        event_sinks: FsEventSinks | None = None,
+    ) -> None:
         self.message_parser = message_parser
+        self.event_pool = event_pool or EventWriterPool(SystemClock())  # the open event files of the process and its drop counter
+        self.process_label = process_label or MutableProcessLabel()  # which process this is: scheduler, mcp or cli
+        self.trace_scope = trace_scope or ThreadLocalTraceScope()  # the traces delivered by the tool call of a thread
+        self.event_sinks = event_sinks or FsEventSinks(self.event_pool, self._runtime_events)  # the sink of each root, for callers without a runtime
+
+    def _runtime_events(self, root: Path) -> EventSink:
+        from .wiring import open_runtime  # late: wiring imports this module
+
+        return open_runtime(root, {ProcessResources: self}).events
 
     def reset(self) -> None:
         """Empty every resource (tests start from a clean process); the objects themselves stay."""
         self.message_parser.clear()
+        self.event_pool.reset()
+        self.process_label.set("cli")
+        self.event_sinks.reset()
