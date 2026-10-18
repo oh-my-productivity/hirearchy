@@ -7,6 +7,22 @@ from orgmcp import telemetry
 from orgmcp.core import ROOT, Org
 
 
+def pytest_addoption(parser):
+    parser.addoption("--run-integration", action="store_true", default=False,
+                     help="also run tests marked 'integration' (they use the real kiro-cli / a real LLM)")
+
+
+def pytest_collection_modifyitems(config, items):
+    """Tests marked ``integration`` call a real LLM through kiro-cli: skipped unless asked for
+    (``pytest --run-integration`` or ``ORGMCP_RUN_INTEGRATION=1``)."""
+    if config.getoption("--run-integration") or os.environ.get("ORGMCP_RUN_INTEGRATION"):
+        return
+    skip = pytest.mark.skip(reason="real-LLM integration test: pass --run-integration (or ORGMCP_RUN_INTEGRATION=1) to run it")
+    for item in items:
+        if "integration" in item.keywords:
+            item.add_marker(skip)
+
+
 @pytest.fixture(autouse=True)
 def fresh_telemetry():
     """Each test starts with no open event files, no drop counter and the default process name."""
