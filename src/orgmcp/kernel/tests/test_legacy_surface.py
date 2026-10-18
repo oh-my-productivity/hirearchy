@@ -23,19 +23,16 @@ def test_core_constants_that_were_always_shared_stay_so(name: str) -> None:
     assert getattr(legacy("core"), name) is getattr(kernel, name)  # interned string / cached pattern: true before and after the move
 
 
-@pytest.mark.xfail(strict=True, reason="red: K1")
 @pytest.mark.parametrize("name", MOVED_FROM_CORE)
 def test_core_exposes_the_kernel_objects_themselves(name: str) -> None:
     assert getattr(legacy("core"), name) is getattr(kernel, name)
 
 
-@pytest.mark.xfail(strict=True, reason="red: K1")
 def test_core_private_helpers_are_the_kernel_functions() -> None:
     core = legacy("core")
     assert core._inside is kernel.inside and core._visible is kernel.visible
 
 
-@pytest.mark.xfail(strict=True, reason="red: K1")
 @pytest.mark.parametrize(("old", "new"), [
     ("_aware", "aware"), ("_parse_time", "parse_time"), ("_stamp", "stamp_of"), ("_msg_time", "msg_time"), ("_duration", "fmt_duration"),
 ])
@@ -43,7 +40,6 @@ def test_health_private_helpers_are_the_kernel_functions(old: str, new: str) -> 
     assert getattr(legacy("health"), old) is getattr(kernel, new)
 
 
-@pytest.mark.xfail(strict=True, reason="red: K1")
 def test_the_patch_points_stay_in_core() -> None:
     core = legacy("core")
     assert core.utcnow.__module__ == "orgmcp.core" and core.atomic_write.__module__ == "orgmcp.core"
@@ -58,7 +54,6 @@ def test_org_address_helpers_agree_with_the_kernel(org: Any) -> None:
     assert org.child_addr("ceo", "eng") == kernel.child_addr("ceo", "eng") and org.child_addr("root", "ceo") == "ceo"
 
 
-@pytest.mark.xfail(strict=True, reason="red: K1")
 def test_loading_a_message_gives_a_kernel_message(org: Any) -> None:
     msg = org.send("root", "ceo", "hello")
     loaded = legacy("core").Message.load(org.dir("ceo") / "inbox" / f"{msg.id}.md")

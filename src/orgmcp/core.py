@@ -29,7 +29,6 @@ import shutil
 import subprocess
 import unicodedata
 from collections import OrderedDict
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import NamedTuple
@@ -38,15 +37,31 @@ import yaml
 
 from . import telemetry, templates
 
-ROOT = "root"
-RUNTIME = "runtime"
-BOXES = ("inbox", "inflight", "read", "sent")
-RUNTIME_NAMES = {*BOXES, "runs", "services", ".paused", ".kiro", ".runtime", ".retired", ".git", ".gitignore"}
-RESERVED = RUNTIME_NAMES | {"work", "root", "runtime", "agent", "memory", "org"}
-# Always use NAME_RE.fullmatch: a "$" anchor would accept a trailing newline ("ops\n"), so \Z is used as well.
-NAME_RE = re.compile(r"[a-z][a-z0-9-]{0,31}\Z")
-MESSAGE_TYPES = ("task", "result", "note")
-RESULT_STATUSES = ("done", "failed", "blocked")
+# The shared vocabulary lives in orgmcp.kernel; these names stay importable from here (`core.Message is kernel.Message`).
+from .kernel import (  # noqa: F401 - re-exports
+    BOXES,
+    MESSAGE_TYPES,
+    NAME_RE,
+    RENDER_BODY_CHARS,
+    RESERVED,
+    RESULT_STATUSES,
+    ROOT,
+    RUNTIME,
+    RUNTIME_NAMES,
+    Message,
+    OrgError,
+    child_addr as _child_addr,
+    depth as _depth,
+    inside as _inside,
+    join_frontmatter,
+    latest_results,
+    norm as _norm,
+    parent as _parent,
+    split_frontmatter,
+    visible as _visible,
+    word_count,
+)
+
 DEFAULT_MODEL = "claude-sonnet-5.5"  # the model every agent runs on unless its charter or the org config names another
 DEFAULT_CONFIG = {
     "max_depth": 4,  # deepest allowed agent (ceo = 1)
@@ -69,27 +84,10 @@ DEFAULT_CONFIG = {
     "heartbeat_seconds": 60,  # the scheduler writes a heartbeat event this often
 }
 LESSONS_MAX_CHARS = 800  # longest `lessons` text a report on a service request may carry
-RENDER_BODY_CHARS = 8000  # longer bodies are cut when shown to an agent (prompt, inbox tool); the file has the rest
-
-
-class OrgError(ValueError):
-    """A rule of the organization was violated. The message is shown to the agent."""
 
 
 def utcnow() -> datetime:
     return datetime.now(timezone.utc)
-
-
-_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)  # libyaml when available: same result, ~10x faster
-
-
-def split_frontmatter(text: str) -> tuple[dict, str]:
-    if text.startswith("---\n"):
-        end = text.find("\n---\n", 4)
-        if end != -1:
-            meta = yaml.load(text[4:end], Loader=_YAML_LOADER) or {}
-            return (meta if isinstance(meta, dict) else {}), text[end + 5 :]
-    return {}, text
 
 
 def _message_cap(config: dict) -> int:
@@ -99,10 +97,6 @@ def _message_cap(config: dict) -> int:
     except (TypeError, ValueError):
         return int(DEFAULT_CONFIG["max_message_chars"])
     return cap if cap > 0 else int(DEFAULT_CONFIG["max_message_chars"])
-
-
-def join_frontmatter(meta: dict, body: str) -> str:
-    return "---\n" + yaml.safe_dump(meta, sort_keys=False, allow_unicode=True) + "---\n" + body.rstrip() + "\n"
 
 
 def _short(value: object, limit: int = 80) -> str:
@@ -170,207 +164,38 @@ def _case_twin(parent: Path, name: str) -> str | None:
     return next((n for n in names if _fold(n) == key), None)
 
 
-_FENCE_LINE = re.compile(r"\s*(?:`{3,}|~{3,})\S*\s*")
-_LINE_MARKER = re.compile(r"\s*(?:>|#{1,6}(?=\s)|[-*+\u2022](?=\s)|\d{1,3}[.)](?=\s)|\[[ xX]\](?=\s))")
-_MARKUP_ONLY = re.compile(r"[#*+=_~`>|:\-\u2022]+")
-
-
-def word_count(text: str) -> int:
-    """Words of ``text`` for word limits: markdown markers (``#``, ``-``, ``*``, ``1.``, ``|``, ``---``, fence lines,
-    ``>``, checkboxes) are not words; the words next to them are."""
-    total = 0
-    for line in text.splitlines():
-        if _FENCE_LINE.fullmatch(line):
-            continue
-        if line.lstrip().startswith("|"):  # table row: the pipes are delimiters
-            line = line.replace("|", " ")
-        while (m := _LINE_MARKER.match(line)) and m.end() > 0:
-            line = line[m.end():]
-        total += sum(1 for tok in line.split() if not _MARKUP_ONLY.fullmatch(tok))
-    return total
-
-
-def _opt_int(value) -> int | None:
-    """An optional integer frontmatter field; anything that is not a whole number reads as absent."""
-    try:
-        return None if value is None or isinstance(value, bool) else int(value)
-    except (TypeError, ValueError):
-        return None
-
-
-def _inside(p: Path, base: Path) -> bool:
-    """``p`` is ``base`` or below it (both already resolved)."""
-    return p == base or base in p.parents
-
-
-def _visible(paths) -> list[Path]:
-    return sorted(p for p in paths if not p.name.startswith("."))
-
-
 _PARSED: OrderedDict[str, tuple[tuple[int, int], dict, str]] = OrderedDict()  # Message.load cache (LRU)
 _PARSED_MAX = 50_000
 
 
-@dataclass
-class Message:
-    sender: str
-    to: str
-    type: str
-    body: str
-    title: str = ""
-    reply_to: str | None = None
-    status: str | None = None
-    budget: int = 0
-    hops: int = 0
-    wake: bool = True  # False: held in the inbox without waking the agent; part of its next real run's batch
-    revises: str | None = None  # a task sent back for rework: the earlier task it revises
-    supersedes: str | None = None  # a result that replaces an earlier ``blocked`` result of the same task
-    service: str | None = None  # a task that is a request for this service (and its rework tasks)
-    contract: int | None = None  # version of the service contract the request was built from
-    playbook: int | None = None  # version of the playbook current when the request was sent (0 = none)
-    feedback: str | None = None  # "accept" | "reject" on the note that carries the client's verdict
-    trace: str | None = None  # id of the root task (request) this message belongs to; stamped by the runtime at send time
-    id: str = ""
-    created: str = ""
-    path: Path | None = field(default=None, compare=False, repr=False)
-
-    def meta(self) -> dict:
-        meta = {
-            "id": self.id,
-            "from": self.sender,
-            "to": self.to,
-            "type": self.type,
-            "title": self.title,
-            "created": self.created,
-            "hops": self.hops,
-        }
-        if not self.wake:
-            meta["wake"] = False
-        if self.reply_to:
-            meta["reply_to"] = self.reply_to
-        if self.status:
-            meta["status"] = self.status
-        if self.budget:
-            meta["budget"] = self.budget
-        if self.revises:
-            meta["revises"] = self.revises
-        if self.supersedes:
-            meta["supersedes"] = self.supersedes
-        if self.service:
-            meta["service"] = self.service
-        if self.contract is not None:
-            meta["contract"] = self.contract
-        if self.playbook is not None:
-            meta["playbook"] = self.playbook
-        if self.feedback:
-            meta["feedback"] = self.feedback
-        if self.trace:
-            meta["trace"] = self.trace
-        return meta
-
-    def to_text(self) -> str:
-        return join_frontmatter(self.meta(), self.body)
-
-    @classmethod
-    def load(cls, path: Path) -> Message:
-        """Parse a message file. Messages are immutable, so the parse is cached by path + mtime_ns + size."""
-        key = str(path)
-        with open(path, "rb") as f:
-            st = os.fstat(f.fileno())
-            stamp = (st.st_mtime_ns, st.st_size)
-            hit = _PARSED.get(key)
-            if hit is not None and hit[0] == stamp:
+def _load_message(cls: type[Message], path: Path) -> Message:
+    """Parse a message file. Messages are immutable, so the parse is cached by path + mtime_ns + size."""
+    key = str(path)
+    with open(path, "rb") as f:
+        st = os.fstat(f.fileno())
+        stamp = (st.st_mtime_ns, st.st_size)
+        hit = _PARSED.get(key)
+        if hit is not None and hit[0] == stamp:
+            try:
+                _PARSED.move_to_end(key)
+            except KeyError:  # evicted by another thread: harmless
+                pass
+            meta, body = hit[1], hit[2]
+        else:
+            text = f.read().decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")  # like read_text
+            meta, body = split_frontmatter(text)
+            _PARSED[key] = (stamp, meta, body)
+            while len(_PARSED) > _PARSED_MAX:
                 try:
-                    _PARSED.move_to_end(key)
-                except KeyError:  # evicted by another thread: harmless
-                    pass
-                meta, body = hit[1], hit[2]
-            else:
-                text = f.read().decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")  # like read_text
-                meta, body = split_frontmatter(text)
-                _PARSED[key] = (stamp, meta, body)
-                while len(_PARSED) > _PARSED_MAX:
-                    try:
-                        _PARSED.popitem(last=False)
-                    except KeyError:
-                        break
-        return cls(
-            sender=str(meta.get("from", "")),
-            to=str(meta.get("to", "")),
-            type=str(meta.get("type", "note")),
-            body=body.strip(),
-            title=str(meta.get("title") or ""),
-            reply_to=meta.get("reply_to"),
-            status=meta.get("status"),
-            budget=int(meta.get("budget") or 0),
-            hops=int(meta.get("hops") or 0),
-            wake=meta.get("wake", True) is not False,
-            revises=str(meta["revises"]) if meta.get("revises") else None,
-            supersedes=str(meta["supersedes"]) if meta.get("supersedes") else None,
-            service=str(meta["service"]) if meta.get("service") else None,
-            contract=_opt_int(meta.get("contract")),
-            playbook=_opt_int(meta.get("playbook")),
-            feedback=str(meta["feedback"]) if meta.get("feedback") else None,
-            trace=str(meta["trace"]) if meta.get("trace") else None,
-            id=str(meta.get("id") or path.stem),
-            created=str(meta.get("created") or ""),
-            path=path,
-        )
-
-    def cut_body(self, limit: int = RENDER_BODY_CHARS, where: str | None = None) -> str:
-        """The body, cut to ``limit`` characters with a pointer to the file for the rest.
-
-        ``where`` = path of the file relative to the org root; by default derived from the recipient's box.
-        """
-        body = self.body
-        if limit and len(body) > limit:
-            if where is None:
-                where = f"{self.to}/" if self.to != ROOT else ""
-                where += f"{self.path.parent.name}/{self.path.name}" if self.path else f"<box>/{self.id}.md"
-            body = (
-                body[:limit].rstrip()
-                + f"\n\n[... message cut: {len(self.body) - limit} more of {len(self.body)} characters. "
-                f"Read the rest with read(path=\"{where}\") if you need it.]"
-            )
-        return body
-
-    def render(self, limit: int = RENDER_BODY_CHARS) -> str:
-        """The message as shown to an agent. A body over ``limit`` characters is cut, with the path to read the rest."""
-        head = [f"from: {self.sender}", f"to: {self.to}"]
-        if self.title:
-            head.append(f"title: {self.title}")
-        if self.reply_to:
-            head.append(f"reply_to: {self.reply_to}")
-        if self.status:
-            head.append(f"status: {self.status}")
-        if self.revises:
-            head.append(f"revises: {self.revises}")
-        if self.supersedes:
-            head.append(f"supersedes: {self.supersedes}")
-        if self.service:
-            versions = [f"{k} v{v}" for k, v in (("contract", self.contract), ("playbook", self.playbook)) if v is not None]
-            head.append(f"service: {self.service}" + (f" ({', '.join(versions)})" if versions else ""))
-        if self.feedback:
-            head.append(f"feedback: {self.feedback}")
-        if self.budget and self.type == "result":
-            head.append(f"returns {self.budget} run(s)")
-        elif self.budget:
-            head.append(f"budget: {self.budget} runs")
-        body = self.cut_body(limit)
-        return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{body}\n"
+                    _PARSED.popitem(last=False)
+                except KeyError:
+                    break
+    return cls.from_parts(meta, body, path)
 
 
-def latest_results(results) -> dict[str, Message]:
-    """The latest result per task id (``reply_to``): the task's current outcome.
-
-    Ids start with a microsecond timestamp, so the highest id is the latest. A ``blocked`` result can be superseded by
-    a later one; ``done`` and ``failed`` are final, so anything derived from "the status of a task" uses this.
-    """
-    out: dict[str, Message] = {}
-    for m in results:
-        if m.type == "result" and m.reply_to and (m.reply_to not in out or m.id > out[m.reply_to].id):
-            out[m.reply_to] = m
-    return out
+# The file reader (with its parse cache) is the one piece of Message that touches the filesystem; the kernel's Message is pure
+# data, so the legacy classmethod is attached here until the mail package takes it over (patch point `core.Message.load`).
+Message.load = classmethod(_load_message)  # type: ignore[attr-defined]
 
 
 class Retired(NamedTuple):
@@ -438,8 +263,7 @@ class Org:
 
     @staticmethod
     def norm(addr: str | None) -> str:
-        a = (addr or "").strip().strip("/")
-        return ROOT if a in ("", ROOT) else a
+        return _norm(addr)
 
     def dir(self, addr: str) -> Path:
         a = self.norm(addr)
@@ -462,18 +286,14 @@ class Org:
 
     @classmethod
     def parent(cls, addr: str) -> str | None:
-        a = cls.norm(addr)
-        if a == ROOT:
-            return None
-        return a.rsplit("/", 1)[0] if "/" in a else ROOT
+        return _parent(addr)
 
     @classmethod
     def depth(cls, addr: str) -> int:
-        a = cls.norm(addr)
-        return 0 if a == ROOT else a.count("/") + 1
+        return _depth(addr)
 
     def child_addr(self, parent: str, name: str) -> str:
-        return name if self.norm(parent) == ROOT else f"{self.norm(parent)}/{name}"
+        return _child_addr(parent, name)
 
     def children(self, addr: str) -> list[str]:
         a = self.norm(addr)
