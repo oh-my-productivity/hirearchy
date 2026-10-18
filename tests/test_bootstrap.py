@@ -408,6 +408,19 @@ def test_command_line_verification():
     assert not any(_looks_like_scheduler_of(c, root) for c in bad)
 
 
+def test_command_line_verification_follows_symlinks_and_rejects_other_dirs(tmp_path):
+    real = tmp_path / "real" / "org"
+    real.mkdir(parents=True)
+    link = tmp_path / "link"
+    link.symlink_to(tmp_path / "real")  # like /tmp -> /private/tmp: the command line has one spelling, the org another
+    other = tmp_path / "other"
+    other.mkdir()
+    assert _looks_like_scheduler_of(f"/v/bin/orgmcp --root {link}/org run --until-idle", real)
+    assert _looks_like_scheduler_of(f"/v/bin/orgmcp --root={link}/org run", real)
+    assert not _looks_like_scheduler_of(f"/v/bin/orgmcp --root {other} run", real)
+    assert not _looks_like_scheduler_of(f"/v/bin/orgmcp --root {link}/org mcp", real)
+
+
 # --------------------------------------------------------- isolated profiles
 
 
