@@ -85,15 +85,16 @@ def test_start_shows_the_header_and_the_whole_tree(demo):
         header = app.query_one("#header-counts").render().plain if hasattr(app.query_one("#header-counts").render(), "plain") else ""
         text = str(app.query_one("#header-title").render()) + str(app.query_one("#header-counts").render())
         assert "acme" in text and "scheduler running pid 7000" in text
-        assert "running 2/2" in text and "queued 2" in text and "waiting on you 1" in text and "errors 15m 2" in text
+        assert "running 2/2" in text and "queued 1" in text and "waiting on you 1" in text and "errors 15m 2" in text
         got = labels(app)
         assert got[ROOT].startswith("★ root (you)") and "needs you: 1" in got[ROOT]
         assert "▶ ceo  running 1m12s  3 left" == got["ceo"]
-        assert got["ceo/analyst"].startswith("◔ analyst  queued: max_parallel (2) runs are busy")
+        assert got["ceo/analyst"].startswith("◔ analyst  queued: ") and ", 1 unread" in got["ceo/analyst"]
         assert got["ceo/writer"].startswith("◆ writer  working on 1 task(s)")
         assert got["ops"].startswith("◇ ops  waiting on 1 report(s)")
-        assert got["ops/deploy"].startswith("◔ deploy  queued: paused: 2 consecutive failed runs")
-        assert got["ops/audit"].startswith("‖ audit  paused: paused by the user")
+        assert got["ops/deploy"].startswith("‖ deploy  paused: 2 consec") and got["ops/deploy"].endswith(", 1 unread") and "queued" not in got["ops/deploy"]  # paused, not 'queued: paused'
+        assert not any("queued: paused" in v or "queued: no budget" in v for v in got.values())
+        assert got["ops/audit"].startswith("‖ audit  paused by the user")
         assert got["research"].startswith("▶ research  running 2m05s")
         assert got["research/crawler"].startswith("! crawler  out of budget")
         assert got["archivist"].startswith("○ archivist  idle")
@@ -141,10 +142,11 @@ def test_a_paused_agent_and_a_queued_agent_are_explained(demo):
         tree = app.query_one("#agent-tree")
         tree.move_cursor(tree.nodes["ops/audit"])
         await app.settle(pilot)
-        assert "paused   paused by the user: audit window closed" in pane(app, "pane-overview")
+        assert "state    ‖ paused by the user: audit window closed" in pane(app, "pane-overview")
         tree.move_cursor(tree.nodes["ops/deploy"])
         await app.settle(pilot)
-        assert "queued: paused: 2 consecutive failed runs" in pane(app, "pane-overview")
+        assert "state    ‖ paused: 2 consecutive failed runs, 1 unread" in pane(app, "pane-overview")
+        assert "queued" not in pane(app, "pane-overview").split("Latest activity")[0]
 
     scenario(demo, fn)
 
@@ -156,7 +158,7 @@ def test_left_and_right_fold_unfold_and_switch_pane(demo):
         assert app.selected == "ceo" and tree.nodes["ceo"].is_expanded
         await press(app, pilot, "h")
         assert not tree.nodes["ceo"].is_expanded
-        assert labels(app)["ceo"].endswith("[0 running, 1 queued below]")
+        assert labels(app)["ceo"].endswith("[1 queued below]")
         await press(app, pilot, "left")  # already folded: go to the parent (root)
         assert app.selected == ROOT
         await press(app, pilot, "down", "down", "l")  # unfold ceo
@@ -192,7 +194,9 @@ def test_the_tabs_of_an_agent(demo):
         await press(app, pilot, "]")
         assert tabs.active == "tab-activity"
         act = pane(app, "pane-activity")
-        assert "tool.call delegate REFUSED" in act and "tool.call inbox ok" in act and "run.start agent=ceo" in act
+        assert "10:05:40 delegate → ceo/analyst REFUSED: not enough budget" in act and "10:05:30 inbox ok 5ms" in act
+        assert '10:05:27 run started (batch: note "Scope change" from root)' in act
+        assert "pgid" not in act and "budget_before" not in act and "tool.call" not in act and "run=ceo@" not in act
         await press(app, pilot, "]")
         assert tabs.active == "tab-messages"
         rows = table_rows(app, "pane-messages")
@@ -330,10 +334,10 @@ def test_events_errors_filter_and_follow(demo):
     async def fn(app, pilot):
         await press(app, pilot, "4")
         body = lambda: pane(app, "events-body")  # noqa: E731
-        assert body().count("\n") >= 10 and "scheduler.heartbeat" in body()
+        assert body().count("\n") >= 10 and "scheduler heartbeat" in body() and "scheduler.heartbeat" not in body()
         assert "11 of 11 event(s)" in str(app.query_one("#events-bar").render())
         await press(app, pilot, "e")
-        assert app.event_errors and "tool.call delegate REFUSED" in body() and "run.end FAILED" in body()
+        assert app.event_errors and "ceo            delegate → ceo/analyst REFUSED" in body() and "run ended FAILED after 10s" in body()
         assert "heartbeat" not in body() and body().strip().count("\n") == 1
         assert "errors only" in str(app.query_one("#events-bar").render())
         await press(app, pilot, "e")
@@ -348,7 +352,12 @@ def test_events_errors_filter_and_follow(demo):
         assert app.event_text == "" and "heartbeat" in body()
         await press(app, pilot, "slash")
         await press(app, pilot, *"ceo delegate")
-        assert body().count("\n") == 1 and "tool.call delegate REFUSED" in body()  # agent ceo AND tool delegate
+        # the filter matches what the lines say: root's delegate to ceo and ceo's refused delegate
+        assert body().count("\n") == 2 and "delegate → ceo/analyst REFUSED" in body() and all("delegate" in l for l in body().splitlines())
+        for _ in range(12):
+            await press(app, pilot, "backspace")
+        await press(app, pilot, *"refused")  # words of the readable line are matched too
+        assert body().count("\n") == 1 and "REFUSED" in body()
         await press(app, pilot, "escape")
         assert app.event_follow
         await press(app, pilot, "f")
@@ -364,7 +373,7 @@ def test_the_filter_matches_agent_kind_and_trace(demo):
         await press(app, pilot, "4", "slash")
         await press(app, pilot, *"run.start")
         lines = pane(app, "events-body").splitlines()
-        assert len(lines) == 3 and all("run.start" in l for l in lines)
+        assert len(lines) == 3 and all("run started" in l for l in lines)  # the kind is matched, though the line says it in words
         for _ in range(9):
             await press(app, pilot, "backspace")
         await press(app, pilot, *demo.report_task.id[-8:])
@@ -380,7 +389,7 @@ def test_events_new_lines_follow_and_old_ones_stay(demo):
         EventLog(demo.org).tool(stamp(399), "ceo/writer", "write", ok=False, error="denied", trace="T-9")
         await press(app, pilot, "r")
         after = pane(app, "events-body")
-        assert after.startswith(before.rstrip("\n").splitlines()[0]) and "ceo/writer tool.call write REFUSED" in after
+        assert after.startswith(before.rstrip("\n").splitlines()[0]) and "ceo/writer     write REFUSED: denied" in after
         assert "errors 15m 3" in str(app.query_one("#header-counts").render())
 
     scenario(demo, fn)
@@ -412,7 +421,7 @@ def test_pause_stops_the_automatic_refresh_but_not_r(demo):
             await app.settle(pilot)
             assert app.refreshes > n  # it refreshes by itself
             await press(app, pilot, "p")
-            assert app.paused and "PAUSED" in str(app.query_one("#header-title").render())
+            assert app.paused and "refresh paused" in str(app.query_one("#header-title").render())
             n = app.refreshes
             await asyncio.sleep(1.0)
             await app.settle(pilot)
@@ -421,7 +430,8 @@ def test_pause_stops_the_automatic_refresh_but_not_r(demo):
             assert app.refreshes > n
             n = app.refreshes
             await press(app, pilot, "p")
-            assert not app.paused and "PAUSED" not in str(app.query_one("#header-title").render())
+            assert not app.paused and "refresh paused" not in str(app.query_one("#header-title").render())
+            assert "refresh 0.3s" in str(app.query_one("#header-title").render())
             await asyncio.sleep(1.0)
             await app.settle(pilot)
             assert app.refreshes > n
@@ -569,10 +579,108 @@ def test_automatic_refresh_shows_a_state_change(demo):
                 await app.settle(pilot)
                 if labels(app)["ceo/writer"].startswith("◔"):
                     break
-            assert labels(app)["ceo/writer"].startswith("◔ writer  queued: max_parallel (2) runs are busy")
-            assert "queued 3" in str(app.query_one("#header-counts").render())
+            assert labels(app)["ceo/writer"].startswith("◔ writer  queued: ")
+            assert "queued 2" in str(app.query_one("#header-counts").render())
 
     run(go())
+
+
+# ------------------------------------------------------------------------------------------ readable text
+
+
+def test_x_shows_the_events_raw_on_the_activity_tab_and_on_the_events_screen(demo):
+    async def fn(app, pilot):
+        await press(app, pilot, "down", "down", "]")  # ceo, Activity
+        assert "x" in footer_keys(app)
+        act = pane(app, "pane-activity")
+        assert "run started (batch: note" in act and "pgid" not in act
+        await press(app, pilot, "x")
+        raw = pane(app, "pane-activity")
+        assert app.raw_events and "pgid=1" in raw and "budget_before=9" in raw and "tool.call delegate REFUSED" in raw
+        await press(app, pilot, "x")
+        assert not app.raw_events and "pgid" not in pane(app, "pane-activity")
+        await press(app, pilot, "[")  # Overview: no raw toggle there
+        assert "x" not in footer_keys(app)
+        await press(app, pilot, "x")
+        assert not app.raw_events
+        await press(app, pilot, "4")
+        assert "x" in footer_keys(app) and "readable" in str(app.query_one("#events-bar").render())
+        await press(app, pilot, "x")
+        body = pane(app, "events-body")
+        assert "scheduler.heartbeat" in body and "pgid=1" in body and "raw" in str(app.query_one("#events-bar").render())
+        await press(app, pilot, "e")  # errors only, still raw
+        assert "tool.call delegate REFUSED" in pane(app, "events-body")
+        await press(app, pilot, "x")
+        assert "delegate → ceo/analyst REFUSED" in pane(app, "events-body")
+
+    scenario(demo, fn)
+
+
+def test_refusals_and_failures_are_red_and_the_header_says_how_it_refreshes(demo):
+    async def fn(app, pilot):
+        header = lambda: str(app.query_one("#header-title").render())  # noqa: E731
+        assert "refresh 60s" in header() and "every" not in header()
+        await press(app, pilot, "4")
+        pane_ = app.query_one("#events-body", TextPane)
+        reds = [ln for ln in pane_.body.render().plain.splitlines() if "REFUSED" in ln or "FAILED" in ln]
+        assert len(reds) == 2
+        spans = [str(sp.style) for sp in pane_.body.render().spans]
+        assert sum("red" in sp for sp in spans) >= 2
+        await press(app, pilot, "p")
+        assert "refresh paused" in header()
+        await press(app, pilot, "p")
+        real = app.data.snapshot
+        app.data.snapshot = lambda: (_ for _ in ()).throw(RuntimeError("disk on fire"))
+        await press(app, pilot, "r")
+        assert "refresh failed" in header() and "disk on fire" in str(app.query_one("#statusline").render())
+        app.data.snapshot = real
+        await press(app, pilot, "r")
+        assert "refresh failed" not in header() and "refresh 60s" in header()
+
+    scenario(demo, fn)
+
+
+def test_long_lines_wrap_instead_of_running_off_the_screen(demo):
+    async def fn(app, pilot):
+        await press(app, pilot, "2")
+        await press(app, pilot, "enter")
+        await asyncio.sleep(0.5)
+        await app.settle(pilot)
+        detail = app.query_one("#flows-detail", TextPane)
+        text = detail.text_now
+        first = text.splitlines()[0]
+        assert first.startswith('"Brief: heat pumps"') and len(first) > 60  # the request line is the long one
+        assert detail.max_scroll_x == 0 and detail.body.size.width <= detail.size.width  # it wraps; no sideways scroll
+        assert detail.body.size.height > len(text.splitlines())  # at least one line took two rows
+        await press(app, pilot, "escape", "1", "down", "down", "]")
+        act = app.query_one("#pane-activity", TextPane)
+        assert act.max_scroll_x == 0 and act.body.size.height > len(act.text_now.splitlines())  # the refusal wraps
+        await press(app, pilot, "4")
+        assert app.query_one("#events-body", TextPane).max_scroll_x == 0
+
+    scenario(demo, fn, size=(100, 34))
+
+
+@pytest.mark.parametrize("size", [(80, 24), (100, 30), (150, 42)])
+def test_the_agent_tree_never_scrolls_sideways_and_keeps_the_state_readable(demo, size):
+    async def fn(app, pilot):
+        tree = app.query_one("#agent-tree")
+        assert tree.max_scroll_x == 0 and tree.virtual_size.width <= tree.scrollable_content_region.width
+        got = labels(app)
+        for addr, text in got.items():
+            assert len(text) <= tree.scrollable_content_region.width, (addr, text)
+        # the contradictory words are gone at every width, and what is cut is cut with an ellipsis
+        assert not any("queued: paused" in t or "queued: no budget" in t for t in got.values())
+        assert got["ops/deploy"].startswith("‖ deploy  paused") and got["research/crawler"].startswith("! crawler  out of budget")
+        assert got["ceo/analyst"].startswith("◔ analyst  queued: ")
+        for addr in ("ops/audit", "ops/deploy"):
+            assert got[addr].endswith("…") or "paused" in got[addr]
+        # the full state is in the Overview
+        tree.move_cursor(tree.nodes["ops/deploy"])
+        await app.settle(pilot)
+        assert "state    ‖ paused: 2 consecutive failed runs, 1 unread" in pane(app, "pane-overview")
+
+    scenario(demo, fn, size=size)
 
 
 # ------------------------------------------------------------------------------------------ failures
@@ -658,7 +766,7 @@ def test_the_app_writes_nothing(demo, capsys):
     async def fn(app, pilot):
         tree = app.query_one("#agent-tree")
         for key in ("down", "down", "]", "]", "enter", "escape", "]", "]", "[", "5", "c", "r", "2", "enter", "escape", "3",
-                    "enter", "escape", "4", "e", "slash", "x", "escape", "f", "p", "r", "p", "question_mark", "escape", "1"):
+                    "enter", "escape", "4", "x", "x", "e", "slash", "x", "escape", "f", "p", "r", "p", "question_mark", "escape", "1"):
             await press(app, pilot, key)
             if key == "c":
                 await asyncio.sleep(0.4)
@@ -739,7 +847,7 @@ def test_a_real_run_with_fake_agents_shows_up(tmp_path, monkeypatch):
         text = pane(app, "flows-detail")
         assert f"trace {task.id}" in text and "ceo/eng" in text and "REFUSED" in text or "refused" in text
         await press(app, pilot, "escape", "4")
-        assert "tool.call" in pane(app, "events-body") and "run.end" in pane(app, "events-body")
+        assert " ok " in pane(app, "events-body") and "run ended ok" in pane(app, "events-body")
         await press(app, pilot, "e")
         assert "REFUSED" in pane(app, "events-body")
         await press(app, pilot, "1", "down", "down", "]", "]", "]")
@@ -779,8 +887,8 @@ def test_a_real_running_agent_is_shown_running_with_its_live_log(tmp_path, monke
 
         async def fn(app, pilot):
             got = labels(app)
-            assert got["ceo"].startswith("▶ ceo  running ") and "(+1 queued)" in got["ceo"]
-            assert got["ops"].startswith("◔ ops  queued: paused: manual pause")
+            assert got["ceo"].startswith("▶ ceo  running ") and ", +1 unread" in got["ceo"]
+            assert got["ops"].startswith("‖ ops  paused: manual pause, 1 unread")
             await press(app, pilot, "down", "]", "]", "]")
             assert app.selected == "ceo" or True
             tree = app.query_one("#agent-tree")

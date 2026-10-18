@@ -56,11 +56,11 @@ def test_every_state_word_of_the_demo_org(demo):
     got = {a: (r.kind, r.word) for a, r in snap.agents.items() if a != ROOT}
     assert got["ceo"] == ("running", "running 1m12s")
     assert got["research"] == ("running", "running 2m05s")
-    assert got["ceo/analyst"] == ("queued", "queued: max_parallel (2) runs are busy")
+    assert got["ceo/analyst"] == ("queued", "queued: max_parallel (2) runs are busy, 1 unread")
     assert got["ceo/writer"] == ("working", "working on 1 task(s)")
     assert got["ops"] == ("waiting", "waiting on 1 report(s)")
-    assert got["ops/deploy"] == ("queued", "queued: paused: 2 consecutive failed runs")
-    assert got["ops/audit"] == ("paused", "paused: paused by the user: audit window closed")
+    assert got["ops/deploy"] == ("paused", "paused: 2 consecutive failed runs, 1 unread")
+    assert got["ops/audit"] == ("paused", "paused by the user: audit window closed")
     assert got["research/crawler"] == ("budget", "out of budget")
     assert got["archivist"] == ("idle", "idle")
     assert snap.agents[ROOT].kind == "you"
@@ -73,17 +73,19 @@ def test_the_tree_order_and_rollups(demo):
     assert snap.order.index("ceo") < snap.order.index("ceo/analyst") < snap.order.index("ops")
     assert snap.agents["ceo"].children == ["ceo/analyst", "ceo/writer"]
     assert snap.agents["ceo"].below_queued == 1  # analyst
-    assert snap.agents["ops"].below_queued == 1 and snap.agents["ops"].below_running == 0
+    assert snap.agents["ops"].below_queued == 0 and snap.agents["ops"].below_running == 0  # deploy is paused, not queued
 
 
 def test_queued_matches_observe_now(demo):
     """Same agents, same reasons as ``observe.now_view`` (the acceptance bar: one source of truth)."""
     snap = demo.data.snapshot()
     view = observe.now_view(demo.org, DEMO_NOW)
-    assert {q["agent"]: q["reason"] for q in view["queued"]} == {a: r.reason or "its current run is still going; the next run starts after it"
-                                                                  for a, r in snap.agents.items() if r.unread and a != ROOT}
+    def reason(r):  # observe lists every agent with mail; the dashboard sorts them into paused / out of budget / queued
+        return {"paused": f"paused: {r.paused}", "budget": "no budget"}.get(r.kind) or r.reason
+
+    assert {q["agent"]: q["reason"] for q in view["queued"]} == {a: reason(r) for a, r in snap.agents.items() if r.unread and a != ROOT}
     assert snap.running == len(view["runs_in_flight"]) == 2
-    assert snap.queued == len(view["queued"])
+    assert snap.queued == len([q for q in view["queued"] if not q["reason"].startswith("paused") and q["reason"] != "no budget"]) == 1
     assert len(snap.needs_you) == len(view["waiting_on_you"]) == 1
     assert snap.errors_15m == view["errors_15m"]["count"] == 2
     ceo = next(r for r in view["runs_in_flight"] if r["agent"] == "ceo")
@@ -111,20 +113,21 @@ def test_queue_reasons_one_by_one(tmp_path, monkeypatch):
     set_scheduler(monkeypatch, SchedulerState("stopped"))
     data = dd.DashData(org.root)
     s = data.snapshot()
-    assert s.agents["a"].word == "queued: scheduler is not running"
-    assert s.agents["b"].word == "queued: no budget"
-    assert s.agents["c"].word == "queued: paused: broken"
-    assert s.agents["d"].word.startswith("running") and "(+1 queued)" in s.agents["d"].word and "scheduler not running" in s.agents["d"].word
+    assert (s.agents["a"].kind, s.agents["a"].main) == ("queued", "queued: scheduler is not running")
+    assert (s.agents["b"].kind, s.agents["b"].main) == ("budget", "out of budget") and s.agents["b"].word.endswith(" unread")
+    assert (s.agents["c"].kind, s.agents["c"].main) == ("paused", "paused: broken") and "queued" not in s.agents["c"].word
+    assert s.agents["d"].word.startswith("running") and ", +1 unread" in s.agents["d"].word and "scheduler not running" in s.agents["d"].word
     set_scheduler(monkeypatch, SchedulerState("running", 1, "x"))
     data = dd.DashData(org.root)
     s = data.snapshot()
-    assert s.agents["a"].word == "queued: max_parallel (1) runs are busy"
+    assert s.agents["a"].main == "queued: max_parallel (1) runs are busy"
     org.resume("c")
     org.end_run("d", True)
     s = dd.DashData(org.root).snapshot()
-    assert s.agents["a"].word == "queued: ready: starts on the next tick"
+    assert s.agents["a"].main == "queued: starts on the next tick"
     view = observe.now_view(org)
-    assert {q["agent"]: q["reason"] for q in view["queued"]} == {a: r.reason for a, r in s.agents.items() if r.unread and a != ROOT}
+    assert {q["agent"]: q["reason"] for q in view["queued"] if q["reason"] != "no budget"} == {
+        a: r.reason for a, r in s.agents.items() if r.unread and a != ROOT and r.kind != "budget"}
 
 
 def test_header_scheduler_text(demo, monkeypatch):
@@ -133,7 +136,7 @@ def test_header_scheduler_text(demo, monkeypatch):
     assert snap.scheduler.mode == "until_done" and snap.scheduler.uptime_s == pytest.approx(400, abs=1)
     assert snap.scheduler.heartbeat_age_s == pytest.approx(3, abs=1)
     assert "scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)" == snap.scheduler.text
-    assert snap.counts_text == "running 2/2 · queued 2 · waiting on you 1 · errors 15m 2"
+    assert snap.counts_text == "running 2/2 · queued 1 · waiting on you 1 · errors 15m 2"
     set_scheduler(monkeypatch, SchedulerState("stopped"))
     d2 = dd.DashData(demo.org.root, now=lambda: DEMO_NOW)
     s2 = d2.snapshot()
@@ -158,16 +161,20 @@ def test_overview_of_a_running_agent(demo):
     assert "state    ▶ running 1m12s" in text
     assert "Current run" in text and "elapsed 1m12s" in text and 'note "Scope change" from root' in text
     assert '"Quarterly market report"  from root  budget 12' in text and "Covers 5 competitors" in text
-    assert '-> ceo/analyst  [queued: max_parallel (2) runs are busy]' in text
+    assert '-> ceo/analyst  [queued: max_parallel (2) runs are busy, 1 unread]' in text
     assert '-> ceo/writer  [working on 1 task(s)]' in text
-    assert "delegate REFUSED" in text  # the latest activity
+    assert "delegate → ceo/analyst REFUSED: not enough budget" in text  # the latest activity, readable
+    assert "pgid" not in text and "budget_before" not in text and "run started (batch: note \"Scope change\" from root)" in text
 
 
 def test_overview_of_a_queued_and_a_paused_agent(demo):
     text = dd.doc_text(demo.data.agent_detail("ops/deploy").overview)
-    assert "queued: paused: 2 consecutive failed runs" in text and "1 unread message(s) wait: paused: 2 consecutive failed runs" in text
+    assert "state    ‖ paused: 2 consecutive failed runs, 1 unread" in text and "queued" not in text
+    assert "## Paused" in text and "1 unread message(s) wait; nothing starts until it is resumed" in text
     text = dd.doc_text(demo.data.agent_detail("ops/audit").overview)
-    assert "paused   paused by the user: audit window closed" in text
+    assert "state    ‖ paused by the user: audit window closed" in text and "## Paused" in text
+    text = dd.doc_text(demo.data.agent_detail("research/crawler").overview)
+    assert "state    ! out of budget" in text and "## Out of budget" in text and "queued" not in text
 
 
 def test_root_overview_has_needs_you_and_requests(demo):
@@ -451,9 +458,11 @@ def test_once_output_sample(demo):
     lines = text.splitlines()
     assert lines[0].startswith("orgmcp dash - acme (")
     assert lines[1] == ("scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago) | "
-                        "running 2/2 · queued 2 · waiting on you 1 · errors 15m 2")
+                        "running 2/2 · queued 1 · waiting on you 1 · errors 15m 2")
     assert "  ▶ ceo [Chief executive]  running 1m12s  budget 3  claude-sonnet-5.5" in text
-    assert "    ◔ analyst [Competitor analyst]  queued: max_parallel (2) runs are busy  budget 4  claude-opus-5.5" in text
+    assert "    ◔ analyst [Competitor analyst]  queued: max_parallel (2) runs are busy, 1 unread  budget 4  claude-opus-5.5" in text
+    assert "    ‖ deploy [Deploy engineer]  paused: 2 consecutive failed runs, 1 unread  budget 1" in text
+    assert "queued: paused" not in text
     assert "NEEDS YOU" in text and "SERVICES" in text and "research/market-brief" in text
 
 
@@ -507,3 +516,81 @@ def test_a_refresh_tick_of_50_agents_and_2000_messages(tmp_path, monkeypatch, ca
               f"requests+services {heavy_ms:.0f} ms")
     assert len(cold.agents) - 1 == 50
     assert med < 200, f"warm tick {med:.0f} ms"
+
+
+# ------------------------------------------------------------------------------------------ one state per agent
+
+
+def test_an_agent_is_in_exactly_one_state_for_every_combination():
+    """``classify`` over every combination of its inputs: one state; the words never contradict each other."""
+    import itertools
+
+    n = 0
+    for running, unread, paused, budget, open_n, out_n, up, free in itertools.product(
+            (True, False), (0, 2), (None, "broken", "paused by the user: x", "budget"), (0, 3), (0, 1), (0, 1), (True, False), (0, 1)):
+        st = dd.classify(running=running, unread=unread, paused=paused, budget=budget, open_tasks=open_n, delegated=out_n,
+                         scheduler_up=up, free_slots=free, max_parallel=2, elapsed_s=72.0 if running else None)
+        n += 1
+        word, ctx = st.word, (running, unread, paused, budget, open_n, out_n, up, free)
+        assert st.kind in dd.STATE_KINDS and word == st.main + st.note, ctx
+        effective_pause = paused is not None and not (paused == "budget" and budget > 0)
+        has_pause_word, has_queued_word, has_budget_word = "paused" in word, "queued" in word, "out of budget" in word
+        if running:
+            assert st.kind == "running" and word.startswith("running 1m12s") and not has_queued_word, ctx
+            assert (f"+{unread} unread" in word) == bool(unread), ctx
+            assert (up or "scheduler not running" in word) and (not up or "scheduler not running" not in word), ctx
+            assert (st.reason != "") == bool(unread), ctx
+        elif effective_pause and paused != "budget":  # paused wins over mail, budget, tasks
+            assert st.kind == "paused" and word.startswith(dd.pause_text(paused)), ctx
+            assert not has_queued_word and not has_budget_word and word.endswith(f", {unread} unread" if unread else word), ctx
+        elif effective_pause or (budget <= 0 and (unread or open_n or out_n)):  # out of budget wins over queued
+            assert st.kind == "budget" and word == "out of budget" + (f", {unread} unread" if unread else ""), ctx
+            assert not has_pause_word and not has_queued_word, ctx
+        elif unread:  # queued: it would run, and why it has not yet
+            assert st.kind == "queued" and word.startswith("queued: ") and not has_pause_word and not has_budget_word, ctx
+            assert budget > 0 and not effective_pause, ctx
+            expected = ("scheduler is not running" if not up else "max_parallel (2) runs are busy" if free <= 0
+                        else "starts on the next tick")
+            assert st.main == f"queued: {expected}" and word.endswith(f", {unread} unread"), ctx
+        else:
+            assert st.kind in ("waiting", "working", "idle") and not (has_queued_word or has_pause_word or has_budget_word), ctx
+            assert st.kind == ("waiting" if out_n else "working" if open_n else "idle"), ctx
+    assert n == 2 * 2 * 4 * 2 * 2 * 2 * 2 * 2
+
+
+def test_specific_state_words():
+    kw = dict(open_tasks=0, delegated=0, scheduler_up=True, free_slots=1, max_parallel=2)
+    # paused wins over queued: the old 'queued: paused: ...' is gone
+    st = dd.classify(running=False, unread=1, paused="2 consecutive failed runs", budget=1, **kw)
+    assert st.word == "paused: 2 consecutive failed runs, 1 unread" and st.kind == "paused"
+    # a reason that already says 'paused' is not prefixed again
+    assert dd.classify(running=False, unread=0, paused="paused by the user: window closed", budget=1, **kw).word == "paused by the user: window closed"
+    # out of budget wins over queued
+    st = dd.classify(running=False, unread=3, paused=None, budget=0, **kw)
+    assert (st.kind, st.word) == ("budget", "out of budget, 3 unread")
+    # and over a pause that only says 'budget'
+    assert dd.classify(running=False, unread=1, paused="budget", budget=0, **kw).word == "out of budget, 1 unread"
+    # a stale 'budget' pause with budget granted since: the scheduler starts it -> queued
+    assert dd.classify(running=False, unread=1, paused="budget", budget=2, **kw).kind == "queued"
+    # a running agent keeps running; mail waits for the next run; a pause is announced
+    st = dd.classify(running=True, unread=2, paused="broken", budget=1, elapsed_s=61, **kw)
+    assert (st.kind, st.word) == ("running", "running 1m01s, +2 unread, then paused: broken")
+    assert st.reason == "its current run is still going; the next run starts after it"
+    # queued, with each reason
+    assert dd.classify(running=False, unread=1, paused=None, budget=1, **{**kw, "scheduler_up": False}).main == "queued: scheduler is not running"
+    assert dd.classify(running=False, unread=1, paused=None, budget=1, **{**kw, "free_slots": 0}).main == "queued: max_parallel (2) runs are busy"
+    assert dd.classify(running=False, unread=1, paused=None, budget=1, **kw).main == "queued: starts on the next tick"
+
+
+def test_every_state_in_a_real_org_has_one_word(demo):
+    """The tree, the delegations list and the header agree: nothing 'queued' is also paused or out of budget."""
+    snap = demo.data.snapshot()
+    for a, r in snap.agents.items():
+        if a == ROOT:
+            continue
+        assert ("queued" in r.word) == (r.kind == "queued"), (a, r.word)
+        assert ("paused" in r.word.split(", then")[0]) == (r.kind == "paused"), (a, r.word)
+        assert ("out of budget" in r.word) == (r.kind == "budget"), (a, r.word)
+    assert snap.queued == sum(1 for r in snap.agents.values() if r.kind == "queued")
+    text = dd.render_once(demo.data)
+    assert "queued: paused" not in text and "queued: no budget" not in text
