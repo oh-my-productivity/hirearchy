@@ -248,7 +248,7 @@ def test_skill_and_instructions_carry_the_new_rules(setup):
     for needle in ("PLAN FOR YOU", "plan_id=<from propose_org>", "blueprint_example(kind)", "never invent", "`deliverables/`",
                    "Never promise to tell the user later", "progress(wait_seconds=N)", "\"status?\"", "`stop` only if the user cancels"):
         assert needle in text, needle
-    assert len(ROOT_INSTRUCTIONS) < 2400
+    assert len(ROOT_INSTRUCTIONS) < 2800
 
 
 # -------------------------------------------------------------------------------------- progress wait

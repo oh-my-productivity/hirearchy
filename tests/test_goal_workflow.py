@@ -106,7 +106,7 @@ def test_root_instructions_describe_the_workflow_and_keep_safety_lines(setup):
     for needle in ("ONE orgmcp organization", "Never claim", "instead of substituting", "propose_org", "apply_org",
                    "approved=True", "start", "progress", "stop", "create_org", "EVERY acceptance criterion", str(target)):
         assert needle in text, needle
-    assert len(ROOT_INSTRUCTIONS) < 2400  # sent on every connection: keep it short
+    assert len(ROOT_INSTRUCTIONS) < 2800  # sent on every connection: keep it short
 
 
 def test_agents_get_none_of_the_goal_tools(tmp_path):

@@ -41,7 +41,7 @@ from . import templates
 ROOT = "root"
 RUNTIME = "runtime"
 BOXES = ("inbox", "inflight", "read", "sent")
-RUNTIME_NAMES = {*BOXES, "runs", ".paused", ".kiro", ".runtime", ".retired", ".git", ".gitignore"}
+RUNTIME_NAMES = {*BOXES, "runs", "services", ".paused", ".kiro", ".runtime", ".retired", ".git", ".gitignore"}
 RESERVED = RUNTIME_NAMES | {"work", "root", "runtime", "agent", "memory", "org"}
 # Always use NAME_RE.fullmatch: a "$" anchor would accept a trailing newline ("ops\n"), so \Z is used as well.
 NAME_RE = re.compile(r"[a-z][a-z0-9-]{0,31}\Z")
@@ -60,9 +60,11 @@ DEFAULT_CONFIG = {
     "until_done_grace_seconds": 300,  # an until-done scheduler that finds nothing can progress without the user exits after this
     "default_budget": 10,  # runs given with a task when none is specified
     "memory_max_words": 800,  # cap on an agent's MEMORY.md; writes that exceed it are refused
+    "playbook_max_words": 1000,  # cap on a service playbook (revise_playbook refuses longer ones)
     "default_model": None,  # kiro model; None = kiro default
     "max_message_chars": 20000,  # longest message body send/delegate/report accept; detail goes in a file
 }
+LESSONS_MAX_CHARS = 800  # longest `lessons` text a report on a service request may carry
 RENDER_BODY_CHARS = 8000  # longer bodies are cut when shown to an agent (prompt, inbox tool); the file has the rest
 
 
@@ -154,6 +156,14 @@ def word_count(text: str) -> int:
     return total
 
 
+def _opt_int(value) -> int | None:
+    """An optional integer frontmatter field; anything that is not a whole number reads as absent."""
+    try:
+        return None if value is None or isinstance(value, bool) else int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _inside(p: Path, base: Path) -> bool:
     """``p`` is ``base`` or below it (both already resolved)."""
     return p == base or base in p.parents
@@ -181,6 +191,10 @@ class Message:
     wake: bool = True  # False: held in the inbox without waking the agent; part of its next real run's batch
     revises: str | None = None  # a task sent back for rework: the earlier task it revises
     supersedes: str | None = None  # a result that replaces an earlier ``blocked`` result of the same task
+    service: str | None = None  # a task that is a request for this service (and its rework tasks)
+    contract: int | None = None  # version of the service contract the request was built from
+    playbook: int | None = None  # version of the playbook current when the request was sent (0 = none)
+    feedback: str | None = None  # "accept" | "reject" on the note that carries the client's verdict
     id: str = ""
     created: str = ""
     path: Path | None = field(default=None, compare=False, repr=False)
@@ -207,6 +221,14 @@ class Message:
             meta["revises"] = self.revises
         if self.supersedes:
             meta["supersedes"] = self.supersedes
+        if self.service:
+            meta["service"] = self.service
+        if self.contract is not None:
+            meta["contract"] = self.contract
+        if self.playbook is not None:
+            meta["playbook"] = self.playbook
+        if self.feedback:
+            meta["feedback"] = self.feedback
         return meta
 
     def to_text(self) -> str:
@@ -248,6 +270,10 @@ class Message:
             wake=meta.get("wake", True) is not False,
             revises=str(meta["revises"]) if meta.get("revises") else None,
             supersedes=str(meta["supersedes"]) if meta.get("supersedes") else None,
+            service=str(meta["service"]) if meta.get("service") else None,
+            contract=_opt_int(meta.get("contract")),
+            playbook=_opt_int(meta.get("playbook")),
+            feedback=str(meta["feedback"]) if meta.get("feedback") else None,
             id=str(meta.get("id") or path.stem),
             created=str(meta.get("created") or ""),
             path=path,
@@ -283,6 +309,11 @@ class Message:
             head.append(f"revises: {self.revises}")
         if self.supersedes:
             head.append(f"supersedes: {self.supersedes}")
+        if self.service:
+            versions = [f"{k} v{v}" for k, v in (("contract", self.contract), ("playbook", self.playbook)) if v is not None]
+            head.append(f"service: {self.service}" + (f" ({', '.join(versions)})" if versions else ""))
+        if self.feedback:
+            head.append(f"feedback: {self.feedback}")
         if self.budget and self.type == "result":
             head.append(f"returns {self.budget} run(s)")
         elif self.budget:
@@ -568,6 +599,11 @@ class Org:
         budget: int = 0,
         revises: str | None = None,
         supersedes: str | None = None,
+        service: str | None = None,
+        contract: int | None = None,
+        playbook: int | None = None,
+        feedback: str | None = None,
+        wake: bool = True,
         _skip_route_check: bool = False,
     ) -> Message:
         cap = _message_cap(self.config)
@@ -602,7 +638,8 @@ class Org:
         msg = Message(
             sender=actor, to=to, type=type, body=body.strip(), title=title.strip(),
             reply_to=reply_to, status=status, budget=budget, hops=hops, revises=revises,
-            supersedes=supersedes,
+            supersedes=supersedes, service=service, contract=contract, playbook=playbook, feedback=feedback,
+            wake=wake,
         )
         return self.deliver(msg)
 
@@ -631,7 +668,12 @@ class Org:
         if revises and not any(m.id == revises and m.type == "task" and m.to == to for m in self.sent(actor)):
             raise OrgError(f"revises must be the id of an earlier task you sent to {to}: {revises}")
         body = templates.task_body(goal, acceptance, list(inputs or []))
-        return self.send(actor, to, body, type="task", title=title, budget=budget, revises=revises or None)
+        fields: dict = {}
+        if revises:  # rework of a service request is still part of its case
+            from . import services
+
+            fields = services.rework_fields(self, actor, revises)
+        return self.send(actor, to, body, type="task", title=title, budget=budget, revises=revises or None, **fields)
 
     def _default_budget(self, actor: str) -> int:
         """Runs a delegation gets when the caller names none: what the actor can afford, capped at default_budget.
@@ -687,7 +729,15 @@ class Org:
             note += ", NOT modified since this task was assigned"
         return f"{shown} ({note})"
 
-    def report(self, actor: str, task_id: str, status: str, summary: str, artifacts: list[str] | None = None) -> Message:
+    def report(
+        self,
+        actor: str,
+        task_id: str,
+        status: str,
+        summary: str,
+        artifacts: list[str] | None = None,
+        lessons: str | None = None,
+    ) -> Message:
         actor = self.require(actor)
         if status not in RESULT_STATUSES:
             raise OrgError(f"status must be one of {RESULT_STATUSES}")
@@ -703,13 +753,30 @@ class Org:
                 "information for whoever assigned it, use `send`, as information only: a note does not change the "
                 "task's outcome and must not claim that criteria are met."
             )
+        lessons = self._check_lessons(task, status, lessons)
         arts = [self._normalize_artifact(actor, a, task.created) for a in (artifacts or [])]
-        body = templates.result_body(summary, arts)
+        body = templates.result_body(summary, arts, lessons)
         return self.send(
             actor, task.sender, body, type="result", title=task.title,
             reply_to=task.id, status=status, supersedes=prior.id if prior else None, _skip_route_check=True,
             budget=self._budget_to_return(actor, task, status),
         )
+
+    @staticmethod
+    def _check_lessons(task: Message, status: str, lessons: str | None) -> str:
+        """The lessons text for a report: required for a final result on a service request, 1..800 characters."""
+        text = (lessons or "").strip()
+        if task.service and status in ("done", "failed") and not text:
+            raise OrgError(
+                f"task {task.id} is a request for service `{task.service}`: pass `lessons` - 1-3 lines for the next "
+                "request: what worked, what to change in the playbook, and the evidence (runs, rework, review findings)"
+            )
+        if len(text) > LESSONS_MAX_CHARS:
+            raise OrgError(
+                f"lessons are {len(text)} characters; the limit is {LESSONS_MAX_CHARS}. Keep 1-3 lines: what worked, "
+                "what to change in the playbook, and the evidence; put detail in a file under your work/ directory."
+            )
+        return text
 
     def _budget_to_return(self, actor: str, task: Message, status: str) -> int:
         """Runs that travel up with the final result of ``task``: everything the reporter has left, or 0.
@@ -780,6 +847,59 @@ class Org:
             body=f"{actor} reclaimed {amount} unspent run(s) from {addr} ({available - amount} left with it). "
                  f"The runtime wrote this note on {addr}'s behalf; {addr} received nothing and was not woken.",
         ))
+
+    # ---------------------------------------------------------------- services
+    # Thin wrappers: the rules live in :mod:`orgmcp.services` (imported late: it builds on this module).
+
+    def service_names(self, addr: str) -> list[str]:
+        """Names of the (non-retired) services ``addr`` offers: the directories of ``<addr>/services`` with a SERVICE.md."""
+        a = self.norm(addr)
+        d = self.dir(a) / "services"
+        if a == ROOT or not d.is_dir():
+            return []
+        return [p.name for p in _visible(d.iterdir()) if p.is_dir() and (p / "SERVICE.md").is_file()]
+
+    def define_service(
+        self, actor: str, owner: str, name: str, *, description: str, inputs, acceptance, deliverable: dict,
+        budget: int, playbook: str | None = None, locked: bool = False, notes: str = "",
+    ) -> str:
+        """Define (or redefine) a service of a direct report. See :func:`orgmcp.services.define_service`."""
+        from . import services
+
+        return services.define_service(
+            self, actor, owner, name, description=description, inputs=inputs, acceptance=acceptance,
+            deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,
+        )
+
+    def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
+        """Take a service out of use (its files are kept). See :func:`orgmcp.services.retire_service`."""
+        from . import services
+
+        return services.retire_service(self, actor, owner, name, reason)
+
+    def request(
+        self, actor: str, service: str, inputs: dict | None, *, title: str = "", note: str = "",
+        extra_acceptance: list[str] | None = None, budget: int | None = None, revises: str | None = None,
+    ) -> Message:
+        """Ask a direct report for one of its services. See :func:`orgmcp.services.request`."""
+        from . import services
+
+        return services.request(
+            self, actor, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance,
+            budget=budget, revises=revises,
+        )
+
+    def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
+        """Write the next version of the playbook of a service you own; returns the version."""
+        from . import services
+
+        return services.revise_playbook(self, actor, service, content, reason)
+
+    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
+        """Tell the owner whether a delivered service request was accepted or rejected."""
+        from . import services
+
+        return services.feedback(self, actor, task_id, verdict, note)
 
     def hire(
         self,
@@ -992,6 +1112,11 @@ class Org:
             )
         rel = p.relative_to(base).parts
         first = rel[0]
+        if _fold(first) == "services":
+            raise OrgError(
+                "services/ is managed by the runtime: the contract (SERVICE.md) is written by your parent with "
+                "define_service, and you change your playbook (PLAYBOOK.md) with revise_playbook"
+            )
         if _fold(first) in _FOLDED_RUNTIME_NAMES or first.startswith("."):
             raise OrgError(f"{first} is managed by the runtime; use send/delegate/report to communicate")
         exact = _EXACT_FILES.get(_fold(first))
@@ -1179,9 +1304,11 @@ class Org:
         for a in self.agents():
             meta, _ = self.charter(a)
             name = a.rsplit("/", 1)[-1]
+            offered = self.service_names(a)
             lines.append(
                 "  " * self.depth(a) + f"{name} [{meta.get('role', '?')}] {self.state(a)}  budget={self.budget(a)} "
                 f"open={len(self.open_tasks(a))} delegated={len(self.outstanding(a))} unread={self.unread(a)}"
+                + (f" services: {', '.join(offered)}" if offered else "")
             )
         return "\n".join(lines)
 
@@ -1388,6 +1515,10 @@ class Org:
         shown = {m.id for m in batch if m.type == "task"}
         notice = self.stray_notice(a)
         notice = f"\n{notice}\n" if notice else ""
+        if self.service_names(a):  # only agents that offer a service get these sections
+            from . import services
+
+            notice += services.prompt_sections(self, a, batch)
         return f"""# orgmcp run: you are `{a}`
 
 {self.rules()}

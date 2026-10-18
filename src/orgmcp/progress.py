@@ -196,7 +196,8 @@ def _last_finished(org: Org, tasks: list[Message], results: dict[str, Message], 
 def _task_line(org: Org, task: Message, result: Message | None, now: datetime) -> str:
     team = [a for a in org.subtree(task.to) if a != ROOT] if org.exists(task.to) else []
     state, who = _state(org, task, result, team)
-    parts = [f'"{task.title}": {state}']
+    tag = f" [service {task.service} v{task.playbook or 0}]" if task.service else ""
+    parts = [f'"{task.title}"{tag}: {state}']
     if who:
         parts.append(who)
     parts.append(_runs(org, task, result, team))
@@ -206,7 +207,17 @@ def _task_line(org: Org, task: Message, result: Message | None, now: datetime) -
     if result is not None and result.status in ("done", "failed"):
         arts = _artifacts(result)
         parts.append("artifacts: " + ", ".join(arts) if arts else "no artifacts")
+        if task.service and _no_feedback(org, task):
+            parts.append("no feedback yet")
     return ". ".join(parts) + f". (task {task.id})"
+
+
+def _no_feedback(org: Org, task: Message) -> bool:
+    """A finished service request that the client has not rated yet (feedback on any task of its case counts)."""
+    from . import services
+
+    case = next((c for c in services.cases(org, task.to, task.service) if task.id in {t.id for t in c.tasks}), None)
+    return case is None or case.feedback is None
 
 
 def _state(org: Org, task: Message, result: Message | None, team: list[str]) -> tuple[str, str]:

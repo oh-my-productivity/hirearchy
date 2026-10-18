@@ -55,6 +55,54 @@ def cmd_task(args) -> None:
     print(f"task {msg.id} -> {msg.to} (budget {msg.budget})")
 
 
+def cmd_services(args) -> None:
+    from . import services
+
+    print(services.services_text(_org(args), ROOT))
+
+
+def cmd_define_service(args) -> None:
+    from .services import parse_input_spec
+
+    org = _org(args, mutating=True)
+    deliverable = {"description": args.deliverable, "format": args.format, "max_words": args.max_words, "path": args.path}
+    text = org.define_service(
+        ROOT, args.owner, args.name, description=args.description,
+        inputs=[parse_input_spec(i) for i in args.input or []],
+        acceptance=[_text(a) for a in args.acceptance], deliverable={k: v for k, v in deliverable.items() if v},
+        budget=args.budget, playbook=_text(args.playbook) if args.playbook else None, locked=args.locked,
+        notes=_text(args.notes) if args.notes else "",
+    )
+    org.commit(f"root: service {args.name} of {args.owner}")
+    print(text)
+
+
+def cmd_request(args) -> None:
+    org = _org(args, mutating=True)
+    inputs = {}
+    for item in args.input or []:
+        key, sep, value = item.partition("=")
+        if not sep:
+            raise OrgError(f"--input must be key=value (got {item!r})")
+        inputs[key.strip()] = value
+    msg = org.request(ROOT, args.service, inputs, title=args.title, note=args.note, budget=args.budget, revises=args.revises)
+    org.commit(f"root: request {msg.id} -> {msg.to}")
+    print(f"request {msg.id} -> {msg.to} (service {msg.service}, budget {msg.budget})")
+
+
+def cmd_feedback(args) -> None:
+    org = _org(args, mutating=True)
+    msg = org.feedback(ROOT, args.task_id, args.verdict, args.note)
+    org.commit(f"root: feedback {msg.id} -> {msg.to}")
+    print(f"feedback {args.verdict} on {args.task_id} -> {msg.to}")
+
+
+def cmd_retire_service(args) -> None:
+    org = _org(args, mutating=True)
+    print(org.retire_service(ROOT, args.owner, args.name, args.reason))
+    org.commit(f"root: retired service {args.name} of {args.owner}")
+
+
 def _bp_org(args) -> Org | None:
     try:
         return _org(args)
@@ -222,6 +270,48 @@ def main(argv: list[str] | None = None) -> None:
     s.add_argument("--budget", type=int)
     s.add_argument("--revises", metavar="TASK_ID", help="send back for rework: id of an earlier task sent to this agent")
     s.set_defaults(fn=cmd_task)
+
+    s = sub.add_parser("services", help="list the services you can request from your direct reports, with their record")
+    s.set_defaults(fn=cmd_services)
+
+    s = sub.add_parser("define-service", help="define (or change the contract of) a standing service of a top-level agent (as root)")
+    s.add_argument("owner", help="the top-level agent that offers the service")
+    s.add_argument("name", help="lowercase-dashed service name")
+    s.add_argument("--description", required=True, help="one line: what the service delivers")
+    s.add_argument("--input", action="append", metavar="'name*:description'",
+                   help="an input of a request; a trailing * on the name = required (repeatable)")
+    s.add_argument("--acceptance", action="append", required=True, metavar="TEXT|@FILE",
+                   help="a criterion, or @file with one criterion per line (repeatable)")
+    s.add_argument("--deliverable", required=True, help="what is handed back")
+    s.add_argument("--format")
+    s.add_argument("--max-words", type=int)
+    s.add_argument("--path", help="absolute folder for the deliverable")
+    s.add_argument("--budget", type=int, required=True, help="runs handed down with each request")
+    s.add_argument("--playbook", metavar="@FILE", help="initial playbook (first definition only)")
+    s.add_argument("--locked", action="store_true", help="the owner may not revise the playbook")
+    s.add_argument("--notes", help="free text for the owner, or @file")
+    s.set_defaults(fn=cmd_define_service)
+
+    s = sub.add_parser("request", help="ask a top-level agent for one of its services (as root)")
+    s.add_argument("service")
+    s.add_argument("--input", action="append", metavar="KEY=VALUE", help="a value for an input of the service (repeatable)")
+    s.add_argument("--title", default="")
+    s.add_argument("--note", default="", help="free text for the owner")
+    s.add_argument("--budget", type=int, help="runs handed down (default: the contract's)")
+    s.add_argument("--revises", metavar="TASK_ID", help="send back an earlier request of this service for rework")
+    s.set_defaults(fn=cmd_request)
+
+    s = sub.add_parser("feedback", help="accept or reject a delivered service request (as root)")
+    s.add_argument("task_id")
+    s.add_argument("verdict", choices=["accept", "reject"])
+    s.add_argument("--note", default="", help="what was wrong (required for reject)")
+    s.set_defaults(fn=cmd_feedback)
+
+    s = sub.add_parser("retire-service", help="take a service out of use (its files are kept)")
+    s.add_argument("owner")
+    s.add_argument("name")
+    s.add_argument("--reason", required=True)
+    s.set_defaults(fn=cmd_retire_service)
 
     s = sub.add_parser("plan", help="validate a blueprint and print the plan for approval (exit 1 on errors)")
     s.add_argument("blueprint", help="blueprint YAML/JSON file")

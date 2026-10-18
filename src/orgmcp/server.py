@@ -20,6 +20,7 @@ from . import blueprint as blueprint_mod
 from . import blueprint_examples
 from .core import ROOT, Org, OrgError
 from .health import org_health, render_text
+from . import services as services_mod
 from .progress import WAIT_MAX, describe_progress
 from .scheduler import (
     describe_scheduler, nothing_to_do, scheduler_state, start_scheduler, stop_scheduler, waiting_on_user,
@@ -38,6 +39,7 @@ You are connected to ONE orgmcp organization as `root`, the human's seat. {where
 - Never claim the organization did work unless orgmcp tools show it.
 - If an orgmcp tool fails, tell the user instead of substituting another mechanism.
 - `whoami` and `status` show the state; `start`/`stop` control the scheduler.
+- Standing services: `services` lists them, `request` uses one, `feedback` rates a delivery, `define_service` adds one.
 When the user asks for an org, team or agents for a goal:
 1. Ask what you need in ONE message. Propose defaults only where a generic one exists; ASK for any list the user did not
    give (scope items, source files), never invent. Default deliverable place: a new
@@ -220,7 +222,9 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
         return f"delegated {msg.id} to {msg.to} with budget {msg.budget}. Your budget is now {org.budget(me)}."
 
     @mcp.tool()
-    def report(task_id: str, status: str, summary: str, artifacts: list[str] | None = None) -> str:
+    def report(
+        task_id: str, status: str, summary: str, artifacts: list[str] | None = None, lessons: str | None = None
+    ) -> str:
         """Answer a task assigned to you. Goes to whoever assigned it.
 
         status: "done" (every acceptance criterion verifiably met), "failed", or "blocked" (say what would unblock it).
@@ -231,11 +235,16 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
         files that hold the work; they must exist. Files in the organization: path relative to the org root.
         Files in your workspace: the ABSOLUTE path (anything else outside the organization is refused). The runtime
         annotates each with its word count and whether it changed since the task was assigned.
+        lessons: required when the task is a request for a service and the status is done or failed (1-3 lines, at
+        most 800 characters: what worked, what to change in the playbook, the evidence: runs, rework, review findings);
+        it is recorded in the result and reviewed before the next request. Optional otherwise.
         """
         org = binding.get()
-        msg = org.report(me, task_id, status, summary, artifacts or [])
+        msg = org.report(me, task_id, status, summary, artifacts or [], lessons)
         returned = f"; returned {msg.budget} unspent run(s) of budget to {msg.to}" if msg.budget else ""
-        return f"reported {status} on {task_id} to {msg.to}{returned}"
+        task = org.find_received(me, task_id)
+        hint = services_mod.report_hint(org, me, task, status) if task is not None else ""
+        return f"reported {status} on {task_id} to {msg.to}{returned}" + (f". {hint}" if hint else "")
 
     @mcp.tool()
     def send(to: str, body: str, title: str = "", reply_to: str | None = None, budget: int = 0) -> str:
@@ -352,9 +361,116 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
             raise OrgError(f"you can only view health for yourself or agents in your own subtree ({me}/...), not {target}")
         return render_text(org_health(org, target))
 
+    register_service_tools(mcp, binding, me)
     if me == ROOT:
         register_root_tools(mcp, binding)
     return mcp
+
+
+def register_service_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
+    """Service tools by role, so a plain worker sees none of them: root and every agent that has direct reports or may
+    hire get `services`, `define_service`, `request`, `feedback`; an agent that offers a service gets `services` and
+    `revise_playbook`. (Decided when the server starts, which is at the start of each run.)"""
+    org = binding.peek()
+    manager = me == ROOT or (
+        org is not None and bool(org.children(me) or org.charter(me)[0].get("can_hire"))
+    )
+    owner = org is not None and me != ROOT and bool(org.service_names(me))
+    if not (manager or owner):
+        return
+
+    @mcp.tool()
+    def services() -> str:
+        """The standing services you can request from your direct reports and the ones you offer, with contract and
+        playbook versions, inputs, budget per request and the record so far (requests, outcomes, runs, feedback)."""
+        return services_mod.services_text(binding.get(), me)
+
+    if manager:
+        register_client_tools(mcp, binding, me)
+    if owner:
+        register_owner_tools(mcp, binding, me)
+
+
+def register_client_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
+    @mcp.tool()
+    def define_service(
+        owner: str,
+        name: str,
+        description: str,
+        acceptance: list[str],
+        deliverable: dict,
+        budget: int,
+        inputs: list[dict] | None = None,
+        playbook: str | None = None,
+        locked: bool = False,
+        notes: str = "",
+    ) -> str:
+        """Define a standing service of one of your direct reports (root: a top-level agent), or change its contract.
+
+        You are the client: the contract is yours; the owner cannot change it. owner: the report. name: lowercase-dashed,
+        unique among your reports' services. description: one line. acceptance: concrete, checkable criteria that travel
+        with every request. deliverable: {description, format?, max_words?, path? (absolute)}. budget: runs handed down
+        with each request. inputs: [{name, description, required (default true)}] the requester fills in.
+        playbook: markdown workflow for a first definition only (the owner revises it later); without it the owner writes
+        v1 after its first request. locked: true = the owner may not revise the playbook. notes: free text for the owner.
+        Redefining an existing service archives the old contract and quietly tells the owner what changed.
+        """
+        return binding.get().define_service(
+            me, owner, name, description=description, inputs=inputs, acceptance=acceptance,
+            deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,
+        )
+
+    @mcp.tool()
+    def request(
+        service: str,
+        inputs: dict | None = None,
+        title: str = "",
+        note: str = "",
+        extra_acceptance: list[str] | None = None,
+        budget: int | None = None,
+        revises: str | None = None,
+    ) -> str:
+        """Ask a direct report for one of its services (see `services`): a task built from the contract.
+
+        inputs: {input name: value}; required ones must be present. note: free text for the owner. extra_acceptance:
+        criteria added after the contract's (the contract's always apply). budget: runs handed down (default: the
+        contract's; the usual reserve rule applies). revises: id of an earlier request of this service to send back for
+        rework. Returns the task id; the result comes back like any result, then rate it with `feedback`.
+        """
+        org = binding.get()
+        msg = org.request(me, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance,
+                          budget=budget, revises=revises)
+        tail = "Call start() if the scheduler is not running." if me == ROOT else f"Your budget is now {org.budget(me)}."
+        return (f"requested service `{service}` from {msg.to}: task {msg.id}, budget {msg.budget} "
+                f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}")
+
+    @mcp.tool()
+    def feedback(task_id: str, verdict: str, note: str = "") -> str:
+        """Tell the owner of a service whether a delivered request was good: verdict "accept" or "reject".
+
+        task_id: a service request (or rework) you sent that has a result. note: required for reject (what was wrong),
+        optional for accept. It costs no run and does not wake the owner; it shows up in the evidence the owner reviews
+        before its next request. A later feedback on the same case replaces this one in the statistics.
+        """
+        msg = binding.get().feedback(me, task_id, verdict, note)
+        return f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}); it does not wake {msg.to}"
+
+
+def register_owner_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
+    @mcp.tool()
+    def revise_playbook(service: str, content: str, reason: str) -> str:
+        """Write the next version of the playbook of a service you offer: how your team delivers it.
+
+        Only the owner can; refused when the contract is locked. content: the WHOLE new playbook in markdown (steps: who
+        does what, in which order, which check; budget plan; pitfalls), at most playbook_max_words (default 1000) words,
+        and different from the current one. reason: 1-400 characters naming the cases it rests on. The old version is
+        archived; your parent is told quietly. The playbook may raise the bar, never lower it: the acceptance criteria
+        come from the contract. Returns the new version, which applies from now on.
+        """
+        org = binding.get()
+        version = org.revise_playbook(me, service, content, reason)
+        client = org.parent(me)
+        return f"playbook of `{service}` is now v{version}; {client} was told without being woken"
 
 
 def setup_state(binding: OrgBinding) -> str:
