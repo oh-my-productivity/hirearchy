@@ -20,7 +20,7 @@ from ._batch import FsBatchStore
 from ._caching import DirMtimeCachingMailbox, FsDirectoryProbe
 from ._index import FsMessageIndex, StampCachedMetaReader, describe
 from ._mailbox import FsMailbox
-from ._parser import CachingMessageParser, M
+from ._parser import CachingMessageParser, M, Split
 from ._reads import DerivedMailboxReads
 from ._rules import RECEIVED_BOXES, is_message_name, is_plain_id
 from ._tasks import DerivedTaskQuery
@@ -41,8 +41,8 @@ AGENT_FILE = "---\nrole: Worker\n---\n# Role: Worker\n\nDo the work.\n"  # the c
 class CountingMessageParser(CachingMessageParser):
     """A ``CachingMessageParser`` that counts: ``loaded`` lists every file asked for, ``parses`` counts the files actually parsed."""
 
-    def __init__(self, max_entries: int = 50_000) -> None:
-        super().__init__(max_entries)
+    def __init__(self, max_entries: int = 50_000, split: Split = split_frontmatter) -> None:
+        super().__init__(max_entries, split)
         self.loaded: list[Path] = []
         self.parses = 0
 

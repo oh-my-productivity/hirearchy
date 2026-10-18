@@ -10,7 +10,9 @@ from typing import get_type_hints
 
 from . import _compat
 from ._builder import Builder
-from ._resources import CachingMessageParser, ProcessResources
+from ..mail._index import StampCachedMetaReader
+from ..mail._parser import CachingMessageParser
+from ._resources import ProcessResources
 from .runtime import OrgRuntime
 
 _process: ProcessResources | None = None  # the one set of process resources (app is the only place for such a global)
@@ -21,7 +23,7 @@ _ports: dict[str, type] | None = None  # field name -> port, read once from the 
 def new_process_resources() -> ProcessResources:
     """A fresh set of process resources (the plain ones, or the patch-point ones while ``_compat.ENABLED``)."""
     parser = _compat.PatchPointMessageParser() if _compat.ENABLED else CachingMessageParser()
-    return ProcessResources(parser)
+    return ProcessResources(parser, StampCachedMetaReader())
 
 
 def process_resources() -> ProcessResources:

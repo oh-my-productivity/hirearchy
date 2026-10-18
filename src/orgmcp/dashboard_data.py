@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import core, observe, progress as prog, services
-from .app import wire_agents
+from .app import wire_agents, wire_mail
 from .core import BOXES, DEFAULT_CONFIG, ROOT, Message, Org, OrgError, _visible, latest_results, split_frontmatter
 from .dashboard_events import EventLine, describe, event_lines
 from .health import _aware, _stamp, config_number, org_health
@@ -79,24 +79,22 @@ class LenientOrg(Org):
 
     def __init__(self, root: str | Path):
         super().__init__(root)
-        self._box_cache: dict[tuple[str, str], tuple[int, bool, list[Message]]] = {}
-        self._bad_boxes: dict[tuple[str, str], dict[str, str]] = {}
         self._cfg: tuple[tuple[int, int], dict] | None = None
         self._bad_misc: dict[str, str] = {}
-        self._merged: dict[tuple, tuple[list, list[Message]]] = {}
         self._runs_cache: dict[str, tuple[int, bool, int]] = {}
         self._stat_memo: dict[tuple[str, str], int] = {}
         self._pause_cache: dict[str, tuple[int, str | None]] = {}
         self._root_s = str(self.root)
-        # the caching of the agent tree and the reading of charters (reported in ``bad``) are the decorators of the agents package
+        # the caching of the agent tree and the reading of charters (reported in ``bad``) are the decorators of the agents package,
+        # the caching of the mailboxes (their unreadable files reported in ``bad`` too) the one of the mail package
         self.runtime = wire_agents.lenient(self.runtime, self, self._bad_misc)
+        self.runtime, self._mailbox = wire_mail.lenient(self.runtime, self)
 
     @property
     def bad(self) -> dict[str, str]:
         """Files that could not be read: path (relative to the org) -> why."""
         out = dict(self._bad_misc)
-        for d in self._bad_boxes.values():
-            out.update(d)
+        out.update(self._mailbox.bad)
         return out
 
     # -- one stat per directory per tick
@@ -130,71 +128,9 @@ class LenientOrg(Org):
         self._pause_cache[a] = (m, value)
         return value
 
-    # -- messages
-    def messages(self, addr: str, *boxes: str) -> list[Message]:
-        key = (self.norm(addr), boxes)
-        lists = [self._box(addr, box) for box in boxes]
-        hit = self._merged.get(key)
-        if hit is not None and len(hit[0]) == len(lists) and all(a is b for a, b in zip(hit[0], lists)):
-            return hit[1]
-        merged = sorted((m for lst in lists for m in lst), key=lambda m: m.id)
-        self._merged[key] = (lists, merged)
-        return merged
-
     def _trusted(self, listed_at: int, mtime: int) -> bool:
         """A listing is reused only if the directory had been quiet for a while when it was made (coarse-mtime safe)."""
         return (listed_at - mtime) > CACHE_TRUST * 1e9
-
-    def _box(self, addr: str, box: str) -> list[Message]:
-        key = (self.norm(addr), box)
-        mtime = self.mtime(addr, box)
-        if mtime < 0:
-            self._box_cache.pop(key, None)
-            self._bad_boxes.pop(key, None)
-            return []
-        hit = self._box_cache.get(key)
-        if hit is not None and hit[0] == mtime and hit[1]:
-            return hit[2]
-        d = self.dir(addr) / box
-        listed_at = time.time_ns()
-        previous = {m.path.name: m for m in hit[2] if m.path is not None} if hit is not None else {}
-        out: list[Message] = []
-        bad: dict[str, str] = {}
-        try:
-            names = sorted(e.name for e in os.scandir(d) if e.name.endswith(".md") and not e.name.startswith("."))
-        except OSError:
-            names = []
-        for n in names:
-            old = previous.get(n)
-            if old is not None:  # messages are immutable: a file seen before is the same message
-                out.append(old)
-                continue
-            p = d / n
-            try:
-                out.append(Message.load(p))
-            except FileNotFoundError:
-                continue  # moved between the listing and the read: the next tick sees it where it went
-            except Exception as exc:  # noqa: BLE001 - yaml errors, bad numbers, bad encoding, ...
-                bad[self._rel(p)] = f"{type(exc).__name__}: {str(exc).splitlines()[0][:80] if str(exc) else ''}".rstrip(": ")
-        if hit is not None and len(out) == len(hit[2]) and all(a is b for a, b in zip(out, hit[2])):
-            out = hit[2]  # unchanged: the same list object, so everything derived from it stays valid
-        self._box_cache[key] = (mtime, self._trusted(listed_at, mtime), out)
-        if bad:
-            self._bad_boxes[key] = bad
-        else:
-            self._bad_boxes.pop(key, None)
-        return out
-
-    def _bad_in(self, addr: str, box: str) -> int:
-        return len(self._bad_boxes.get((self.norm(addr), box), ()))
-
-    def unread(self, addr: str) -> int:
-        """Inbox messages that wake the agent (an unreadable file still counts as mail, like in ``Org.unread``)."""
-        msgs = self._box(addr, "inbox")
-        return sum(1 for m in msgs if m.wake) + self._bad_in(addr, "inbox")
-
-    def running(self, addr: str) -> bool:
-        return bool(self._box(addr, "inflight")) or self._bad_in(addr, "inflight") > 0
 
     def runs_used(self, addr: str) -> int:
         mtime = self.mtime(addr, "runs")

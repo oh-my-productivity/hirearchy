@@ -15,7 +15,7 @@ import pytest
 
 from orgmcp import core
 from orgmcp.app import _compat, wiring
-from orgmcp.app._resources import CachingMessageParser
+from orgmcp.mail._parser import CachingMessageParser
 from orgmcp.kernel import JsonObject, Message, split_frontmatter
 
 

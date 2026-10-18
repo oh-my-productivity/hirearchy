@@ -32,10 +32,11 @@ from pathlib import Path
 from typing import Callable, Iterator
 
 from .app import wire_eventlog
-from .core import BOXES, ROOT, RUNTIME, Org, OrgError, split_frontmatter, utcnow
+from .core import ROOT, RUNTIME, Org, OrgError, utcnow
 from .eventlog import ENVELOPE as _ENVELOPE
 from .eventlog import EVENTS_REL, EventFollower, event_file
 from .health import _aware, _stamp, config_number
+from .mail import MessageFile
 from .runs import RunLogReader
 from .scheduler import EXIT_FILE, judge_orphan, scheduler_state
 
@@ -307,68 +308,12 @@ def render_events(view: dict, max_lines: int | None = None) -> str:
 # ============================================================================================ message files
 
 
-@dataclass
-class FileRec:
-    path: Path
-    owner: str
-    box: str
-    meta: dict | None
-    error: str | None
-    id: str
-    mtime: float
-
-
-_META_CACHE: dict[tuple, tuple[dict | None, str | None]] = {}
-_META_MAX = 50_000
-
-
-def _read_meta(path: Path) -> tuple[dict | None, str | None, float]:
-    try:
-        st = path.stat()
-        key = (str(path), st.st_mtime_ns, st.st_size)
-        hit = _META_CACHE.get(key)
-        if hit is not None:
-            return hit[0], hit[1], st.st_mtime
-        text = path.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
-    except (OSError, UnicodeDecodeError) as exc:
-        return None, f"unreadable ({type(exc).__name__})", 0.0
-    try:
-        meta, _ = split_frontmatter(text)
-    except Exception as exc:  # noqa: BLE001 - yaml errors of any kind
-        meta, error = None, f"frontmatter does not parse ({type(exc).__name__})"
-    else:
-        error = None
-        if not meta:
-            error = "no frontmatter"
-        elif not all(meta.get(k) for k in ("from", "to", "type")):
-            error = "frontmatter lacks from/to/type"
-        else:
-            try:
-                int(meta.get("budget") or 0)
-            except (TypeError, ValueError):
-                error = f"budget is not a number: {meta.get('budget')!r}"
-    if len(_META_CACHE) > _META_MAX:
-        _META_CACHE.clear()
-    _META_CACHE[key] = (meta, error)
-    return meta, error, st.st_mtime
+FileRec = MessageFile  # a message file as the index of the mail package sees it (data)
 
 
 def scan_messages(org: Org) -> list[FileRec]:
     """Every message file of every mailbox of root and the live agents, parsed once (cached by path + mtime)."""
-    out: list[FileRec] = []
-    for owner in (ROOT, *org.agents()):
-        for box in BOXES:
-            d = org.dir(owner) / box
-            try:
-                names = sorted(n for n in os.listdir(d) if n.endswith(".md") and not n.startswith("."))
-            except OSError:
-                continue
-            for n in names:
-                p = d / n
-                meta, error, mtime = _read_meta(p)
-                mid = str((meta or {}).get("id") or p.stem)
-                out.append(FileRec(p, owner, box, meta, error, mid, mtime))
-    return out
+    return org.runtime.message_index.scan()
 
 
 @dataclass
@@ -1138,7 +1083,7 @@ def now_view(org: Org, now: datetime | None = None) -> dict:
         recs = []
         for n in sorted(os.listdir(d)) if d.is_dir() else []:
             if n.endswith(".md") and not n.startswith("."):
-                meta, err, _ = _read_meta(d / n)
+                meta, err, _ = org.runtime.resources.meta_cache.read(d / n)
                 if meta:
                     recs.append({"id": str(meta.get("id") or n[:-3]), "title": str(meta.get("title") or ""),
                                  "from": str(meta.get("from") or ""), "trace": str(meta["trace"]) if meta.get("trace") else None})

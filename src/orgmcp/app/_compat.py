@@ -15,7 +15,7 @@ from typing import cast
 
 from ..kernel import AtomicWriter, JsonObject, Message
 from ..kernel._system import SystemClock
-from ._resources import CachingMessageParser
+from ..mail._parser import CachingMessageParser
 
 ENABLED = True  # False: open_runtime wires the plain system adapters (what the module will do once the tests are converted)
 
