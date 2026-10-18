@@ -672,7 +672,9 @@ def _make_run(agent: str, log: Path | None, stem: str, start: datetime, ev: dict
         run.source = "events"
         run.batch = [str(b) for b in s.get("batch") or []]
         run.traces = [str(t) for t in s.get("traces") or []]
-        run.pid = s.get("pid") if isinstance(s.get("pid"), int) else None
+        # the envelope ``pid`` is the EMITTER's (the scheduler); the kiro process is ``child_pid`` (its group: ``pgid``)
+        child = s.get("child_pid") if isinstance(s.get("child_pid"), int) else s.get("pgid")
+        run.pid = child if isinstance(child, int) and not isinstance(child, bool) else None
         st = _ts(s.get("ts"))
         run.queue_ms = _queue_ms(st or start, run.batch)
     if e:
@@ -802,28 +804,43 @@ def trace(org: Org, task_id: str, now: datetime | None = None) -> dict:
         known = ", ".join(t.id for t in root_tasks[-5:]) or "none"
         raise OrgError(f"no message {task_id}. Root's tasks (latest): {known}")
     notes: list[str] = []
+    redirect = None  # informational only: it does not make the trace partial
     tid = task_id
-    if task_id not in {t.id for t in root_tasks}:
-        resolved = Traces(org, msgs).of(task_id)[0]
-        if not resolved:
-            raise OrgError(f"{task_id} is not a root task and its request cannot be determined. Root's tasks (latest): "
-                           + (", ".join(t.id for t in root_tasks[-5:]) or "none"))
-        notes.append(f"{task_id} belongs to the request {resolved}; showing that")
+    is_root_task = task_id in {t.id for t in root_tasks}
+    resolved = Traces(org, msgs).of(task_id)[0]
+    if not is_root_task and not resolved:
+        raise OrgError(f"{task_id} is not a root task and its request cannot be determined. Root's tasks (latest): "
+                       + (", ".join(t.id for t in root_tasks[-5:]) or "none"))
+    if resolved and resolved != task_id and resolved in msgs:  # a message of the request, or a rework of an earlier task
+        redirect = f"{task_id} belongs to the request {resolved}; showing that"
+        notes.append(redirect)
         tid = resolved
     evs = list(timed_events(org, msgs[tid].t - timedelta(seconds=2), None))
     batches = {str(ev["run"]): [str(b) for b in ev["batch"]] for _, ev in evs
                if ev.get("kind") == "run.start" and ev.get("run") and isinstance(ev.get("batch"), list)}
     traces = Traces(org, msgs, batches)
     task = msgs[tid]
-    result = max((m for m in msgs.values() if m.to == ROOT and m.type == "result" and m.reply_to == tid),
-                 key=lambda m: m.id, default=None)
+    # the request = the root task and every rework of it (a rework's `revises` keeps it in the same trace)
+    traces_of_root = {t.id: traces.of(t.id)[0] for t in root_tasks}
+    chain = [t for t in root_tasks if t.id == tid or (traces_of_root.get(t.id) == tid and t.id > tid)]
+
+    def result_of(t: Msg) -> Msg | None:
+        return max((m for m in msgs.values() if m.to == ROOT and m.type == "result" and m.reply_to == t.id),
+                   key=lambda m: m.id, default=None)
+
+    steps = [(t, result_of(t)) for t in chain]
+    windows = [run_window(org, t, r, root_tasks) for t, r in steps]
+    result = steps[-1][1]  # the request's state is its latest task's
     final = result is not None and result.status in ("done", "failed")
     state = result.status if result is not None else "open"
     team = _team(org, task)
     members = set(team)
-    start21, end21 = run_window(org, task, result, root_tasks)
+    start21, end21 = windows[0][0], windows[-1][1]
     t0 = task.t
     t_end = (_stamp(result.id) if final and result is not None else None) or now
+
+    def in_windows(name: str) -> bool:
+        return any(_in_window(name, a, b) for a, b in windows)
 
     # ---- messages of the request
     items: list[dict] = []
@@ -832,7 +849,7 @@ def trace(org: Org, task_id: str, now: datetime | None = None) -> dict:
         t, src = traces.of(m.id)
         if t == tid:
             in_trace[m.id] = (m, src)
-        elif t is None and m.sender == ROOT and m.to in members and start21 <= m.id[:21] and (end21 is None or m.id[:21] <= end21):
+        elif t is None and m.sender == ROOT and m.to in members and in_windows(m.id):
             in_trace[m.id] = (m, "window")  # root's grants/notes into the team inside the window carry no trace
     for m, src in in_trace.values():
         items.append({"t": m.t, "order": 1, "kind": "message", "agent": m.sender, "id": m.id, "type": m.type,
@@ -852,7 +869,7 @@ def trace(org: Org, task_id: str, now: datetime | None = None) -> dict:
         running_stem = Path(str(rec.get("log", ""))).stem if rec else None
         logs = _run_logs(org, agent)
         for stem, path in logs:
-            if not _in_window(stem, start21, end21):
+            if not in_windows(stem):
                 continue
             start = _stamp(stem)
             if start is None:
@@ -894,7 +911,7 @@ def trace(org: Org, task_id: str, now: datetime | None = None) -> dict:
             continue
         who = ev.get("agent") or ev.get("to")
         stamp = t.strftime("%Y%m%dT%H%M%S%f")
-        if ev.get("trace") == tid or (who in members and _in_window(stamp, start21, end21)):
+        if ev.get("trace") == tid or (who in members and in_windows(stamp)):
             items.append({"t": t, "order": 4, "kind": "event", "agent": who or "runtime", "event": k,
                           "detail": {x: y for x, y in ev.items() if x not in ENVELOPE}})
     items.sort(key=lambda i: (i["t"], i["order"]))
@@ -904,16 +921,22 @@ def trace(org: Org, task_id: str, now: datetime | None = None) -> dict:
     run_ms = sum(r.duration_ms or 0 for r in runs)
     queue_ms = sum(r.queue_ms or 0 for r in runs)
     all_calls = [c for rid in by_run for c in by_run[rid]] + outside
-    given = task.budget + sum(m.budget for m in msgs.values() if m.sender == ROOT and m.type == "note" and m.to in members
-                              and _in_window(m.id, start21, end21))
+    given = sum(t.budget for t in chain) + sum(m.budget for m in msgs.values() if m.sender == ROOT and m.type == "note"
+                                               and m.to in members and in_windows(m.id))
+    per_task = []
+    for (t, r), (a, b) in zip(steps, windows):
+        mine = [x for x in runs if _in_window(x.run.rpartition("@")[2], a, b)]
+        per_task.append({"task": t.id, "title": t.title, "state": r.status if r is not None else "open", "runs": len(mine),
+                         "budget": t.budget})
+    returned = sum(r.budget for _, r in steps if r is not None and r.status in ("done", "failed"))
     totals = {
         "wall_ms": max(0.0, _ms(t0, t_end)), "runs": len(runs), "run_ms": run_ms, "queue_ms": queue_ms,
         "user_wait_ms": user_ms, "tool_calls": len(all_calls),
         "refusals": sum(1 for c in all_calls if c.get("ok") is False),
         "outcomes": dict(Counter(r.outcome for r in runs)),
-        "budget_given": given, "budget_used": len(runs), "budget_returned": result.budget if result and final else 0,
+        "budget_given": given, "budget_used": len(runs), "budget_returned": returned, "tasks": per_task,
     }
-    return {"task": tid, "title": task.title, "assignee": task.to, "state": state, "partial": bool(notes),
+    return {"task": tid, "title": task.title, "assignee": task.to, "state": state, "partial": any(n != redirect for n in notes),
             "notes": notes, "start": _iso(t0), "end": _iso(t_end) if final else None, "team": team,
             "window": {"start": start21, "end": end21}, "items": [_plain(i) | {"rel_ms": max(0.0, _ms(t0, i["t"]))} for i in items],
             "totals": totals}
@@ -988,7 +1011,10 @@ def render_trace(tr: dict, max_lines: int | None = None) -> str:
     foot = (f'totals: wall {fmt_dur(t["wall_ms"])} | runs {t["runs"]} (budget given {t["budget_given"]}, '
             f'returned {t["budget_returned"]}) | run time {fmt_dur(t["run_ms"])} | queue {fmt_dur(t["queue_ms"])} | '
             f'waiting on you {fmt_dur(t["user_wait_ms"])} | tool calls {t["tool_calls"]} ({t["refusals"]} refused)')
-    out = [head, *_cap(lines, max_lines, f"observe events --trace {tr['task']} (agent=/kind=/errors)"), foot]
+    out = [head, *_cap(lines, max_lines, f"observe events --trace {tr['task']} (agent=/kind=/errors)")]
+    if len(t.get("tasks") or ()) > 1:  # reworks: each task's runs are what `progress` reports for it
+        out.append("tasks: " + " | ".join(f'{x["task"]} "{_clip(x["title"], 30)}" {x["state"]} {x["runs"]} run(s)' for x in t["tasks"]))
+    out.append(foot)
     out += [f"note: {n}" for n in tr["notes"]]
     return "\n".join(out)
 
@@ -1290,10 +1316,12 @@ def now_view(org: Org, now: datetime | None = None) -> dict:
     sched_up = sched["state"] == "running"
     for a in agents:
         n = org.unread(a)
-        if org.running(a) or not n:
+        if not n:
             continue
         paused, budget = org.paused(a), org.budget(a) or 0
-        if paused and not (paused == "budget" and budget > 0):
+        if org.running(a):  # mail that arrived during a run waits for the next one (one run per agent at a time)
+            reason = "its current run is still going; the next run starts after it"
+        elif paused and not (paused == "budget" and budget > 0):
             reason = f"paused: {paused}"
         elif budget <= 0:
             reason = "no budget"
@@ -1556,27 +1584,24 @@ def _check_runs(org: Org) -> dict:
 
 
 def _check_seq(org: Org) -> dict:
+    """``seq`` counts the lines of ONE file and restarts at 1 in each day's file: every file is gapless from 1 on its own."""
     problems: list[str] = []
-    by_name: dict[str, list[Path]] = defaultdict(list)
-    for p in event_files(org):
-        by_name[p.name].append(p)
-    for name, paths in sorted(by_name.items()):
-        m = re.fullmatch(r"\w+-\d+-(\d+)\.jsonl", name)
-        began = datetime.fromtimestamp(int(m.group(1)) / 1000, timezone.utc).date().isoformat() if m else None
-        expect: int | None = None
-        for p in sorted(paths, key=lambda x: x.parent.name):
-            for _, ev in _read_events(p):
-                seq = ev.get("seq")
-                if not isinstance(seq, int) or isinstance(seq, bool):
-                    continue
-                if expect is None:
-                    if p.parent.name == began and seq != 1:
-                        problems.append(f"{p.parent.name}/{name}: first seq is {seq}, expected 1")
-                elif seq != expect:
-                    problems.append(f"{p.parent.name}/{name}: seq jumps from {expect - 1} to {seq} ({seq - expect} line(s) lost)"
-                                    if seq > expect else f"{p.parent.name}/{name}: seq goes back from {expect - 1} to {seq}")
-                expect = seq + 1
-    return _check("e", "event files have no seq gaps", problems, f"{sum(len(v) for v in by_name.values())} event file(s) checked")
+    files = event_files(org)
+    for p in sorted(files, key=lambda x: (x.parent.name, x.name)):
+        expect = 1
+        for _, ev in _read_events(p):
+            seq = ev.get("seq")
+            if not isinstance(seq, int) or isinstance(seq, bool):
+                continue
+            if seq != expect:
+                where = f"{p.parent.name}/{p.name}"
+                problems.append(f"{where}: first seq is {seq}, expected 1" if expect == 1 else
+                                f"{where}: seq jumps from {expect - 1} to {seq} ({seq - expect} line(s) lost)" if seq > expect else
+                                f"{where}: seq goes back from {expect - 1} to {seq}")
+                if len(problems) >= 50:
+                    break
+            expect = seq + 1
+    return _check("e", "event files have no seq gaps", problems, f"{len(files)} event file(s) checked")
 
 
 def _check_pidfile(org: Org) -> dict:

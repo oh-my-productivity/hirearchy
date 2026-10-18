@@ -46,12 +46,12 @@ def stamp(offset_s: float) -> datetime:
 
 
 class EventLog:
-    """Writes event lines the way the runtime does: one file per (proc, pid) per UTC day, append-only, ``seq`` per
-    process starting at 1."""
+    """Writes event lines the way the runtime does: one file per (proc, pid) per UTC day, append-only, ``seq`` counting
+    the lines of ONE file (it restarts at 1 in each day's file)."""
 
     def __init__(self, org: Org):
         self.org = org
-        self.seq: dict[tuple[str, int], int] = {}
+        self.seq: dict[Path, int] = {}
         self.started: dict[tuple[str, int], int] = {}
         self.mtimes: dict[Path, float] = {}
 
@@ -62,11 +62,10 @@ class EventLog:
 
     def emit(self, kind: str, ts: datetime, *, proc: str = "mcp", pid: int = 4242, actor: str = "runtime",
              run: str | None = None, trace: str | None = None, skip_seq: int = 0, **fields) -> dict:
-        key = (proc, pid)
-        self.seq[key] = self.seq.get(key, 0) + 1 + skip_seq
-        ev = {"v": 1, "ts": ts.isoformat(), "seq": self.seq[key], "proc": proc, "pid": pid, "kind": kind,
-              "actor": actor, "run": run, "trace": trace, **fields}
         p = self.path(proc, pid, ts.strftime("%Y-%m-%d"))
+        self.seq[p] = self.seq.get(p, 0) + 1 + skip_seq
+        ev = {"v": 1, "ts": ts.isoformat(), "seq": self.seq[p], "proc": proc, "pid": pid, "kind": kind,
+              "actor": actor, "run": run, "trace": trace, **fields}
         p.parent.mkdir(parents=True, exist_ok=True)
         with open(p, "a", encoding="utf-8") as f:
             f.write(json.dumps(ev) + "\n")
@@ -110,6 +109,19 @@ def stamp_trace(org: Org, trace_id: str, *message_ids: str) -> None:
                 if p.stem in wanted:
                     meta, body = split_frontmatter(p.read_text(encoding="utf-8"))
                     meta["trace"] = trace_id
+                    p.write_text(join_frontmatter(meta, body), encoding="utf-8")
+
+
+def strip_trace(org: Org) -> None:
+    """Remove the ``trace`` frontmatter field from every message (an org created before traces existed)."""
+    for a in (ROOT, *org.agents()):
+        for box in ("inbox", "inflight", "read", "sent"):
+            d = org.dir(a) / box
+            if not d.is_dir():
+                continue
+            for p in d.glob("*.md"):
+                meta, body = split_frontmatter(p.read_text(encoding="utf-8"))
+                if meta.pop("trace", None) is not None:
                     p.write_text(join_frontmatter(meta, body), encoding="utf-8")
 
 
@@ -170,6 +182,8 @@ class Story:
         log3.write_text("# exit 0 after 15s\n")
         if record:
             stamp_trace(o, tid, *self.ids)
+        else:
+            strip_trace(o)  # the runtime stamps at send time; an old org has no such field
         if self.log:
             self._events(tid, batch, batch2, batch3)
 

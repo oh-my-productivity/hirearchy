@@ -17,13 +17,24 @@ from obs_fixtures import T0, EventLog, Story, freeze, run_ids, stamp, stamp_trac
 
 from orgmcp import observe
 from orgmcp.cli import main
-from orgmcp.core import ROOT, Message, OrgError
+from orgmcp.core import ROOT, Message, Org, OrgError
 from orgmcp.progress import progress
 from orgmcp.scheduler import Scheduler, SchedulerState
 from orgmcp.server import build_server
 
 FAKE = str(Path(__file__).with_name("fake_agent.py"))
 NOW = stamp(200)
+
+
+@pytest.fixture
+def org(tmp_path):
+    """root -> ceo -> eng with emission OFF (``events: false``): the event files in these tests are written by hand
+    (tests/obs_fixtures.py) so each test controls exactly which events exist. The real emitter is exercised against
+    this query layer in tests/test_observability_e2e.py."""
+    o = Org.init(tmp_path / "org", "Test mission", {"poll_seconds": 0.05, "events": False})
+    o.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)
+    o.hire("ceo", "eng", "Engineer", "Build things.")
+    return o
 
 
 @pytest.fixture
@@ -331,8 +342,36 @@ def test_trace_of_a_rework_stays_in_the_trace_of_its_task(org, clock):
     tr = observe.trace(org, task.id, now=stamp(100))
     ids = [i["id"] for i in tr["items"] if i["kind"] == "message"]
     assert ids == [task.id, done.id, rework.id]
-    again = observe.trace(org, rework.id, now=stamp(100))  # its own root task: a trace of its own
-    assert again["task"] == rework.id
+    assert [t["task"] for t in tr["totals"]["tasks"]] == [task.id, rework.id]  # the request spans the rework
+    assert [t["runs"] for t in tr["totals"]["tasks"]] == [1, 0] and tr["totals"]["budget_given"] == 8
+    again = observe.trace(org, rework.id, now=stamp(100))  # a rework IS the request it revises (spec section 3)
+    assert again["task"] == task.id and again["partial"] == tr["partial"] and any(f"{rework.id} belongs to the request" in n for n in again["notes"])
+    assert again["items"] == tr["items"]
+
+
+def test_trace_of_a_rework_counts_the_runs_of_the_whole_request(org, clock):
+    """progress reports each root task on its own; the request's totals are the sum of its tasks' runs."""
+    clock.at(0)
+    first = org.delegate(ROOT, "ceo", "Write", "g", "a", budget=5)
+    clock.at(10)
+    org.begin_run("ceo")
+    org.start_run_log("ceo")
+    org.report("ceo", first.id, "done", "ok")
+    org.end_run("ceo", True)
+    clock.at(60)
+    second = org.delegate(ROOT, "ceo", "Write again", "g2", "a2", budget=3, revises=first.id)
+    clock.at(70)
+    org.begin_run("ceo")
+    org.start_run_log("ceo")
+    org.report("ceo", second.id, "done", "better")
+    org.end_run("ceo", True)
+    tr = observe.trace(org, first.id, now=stamp(100))
+    per = {t["task"]: t["runs"] for t in tr["totals"]["tasks"]}
+    for task in (first, second):
+        m = re.search(r"runs (\d+) of", progress(org, task.id).splitlines()[0])
+        assert per[task.id] == int(m.group(1))
+    assert tr["totals"]["runs"] == sum(per.values()) == org.runs_used("ceo") and tr["state"] == "done"
+    assert "tasks: " in observe.render_trace(tr)
 
 
 # ------------------------------------------------------------------------------------------------ metrics
@@ -713,11 +752,17 @@ def test_check_seq_gap(org):
     assert not res["ok"] and "seq jumps from 2 to 5 (2 line(s) lost)" in res["details"][0]
 
 
-def test_check_seq_continues_across_days_and_must_start_at_one(org):
+def test_check_seq_restarts_at_one_in_each_days_file(org):
     log = EventLog(org)
     log.tool(stamp(1), "ceo", "read")
-    log.tool(stamp(86400 + 1), "ceo", "read")  # the same process, next day: seq continues in the new file
+    log.tool(stamp(2), "ceo", "read")
+    log.tool(stamp(86400 + 1), "ceo", "read")  # the same process, next day: a new file, seq restarts at 1
     assert by_id(observe.check(org, now=NOW))["e"]["ok"]
+    log.tool(stamp(86400 + 2), "ceo", "read")
+    assert by_id(observe.check(org, now=NOW))["e"]["ok"]
+    log.emit("tool.call", stamp(86400 + 3), actor="ceo", tool="read", ok=True, ms=1, skip_seq=1)  # one line lost on day 2
+    res = by_id(observe.check(org, now=NOW))["e"]
+    assert not res["ok"] and "seq jumps from 2 to 4" in res["details"][0] and res["details"][0].startswith("2026-10-19/")
     other = EventLog(org)
     other.started[("mcp", 9)] = int(T0.timestamp() * 1000)
     other.emit("tool.call", stamp(5), pid=9, actor="ceo", tool="read", ok=True, ms=1, skip_seq=3)  # its first line has seq 4
