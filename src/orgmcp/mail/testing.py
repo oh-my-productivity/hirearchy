@@ -217,16 +217,6 @@ class MailHarness:
     parser: MessageParser | None = None  # the parser behind the reader, when there is one
 
 
-@dataclass
-class _Failures:
-    """Which writes fail, switched by the test through ``MailHarness.fail_writes`` after the writer was built."""
-
-    when: Callable[[str], bool] | None = None
-
-    def decide(self, path: str) -> bool:
-        return self.when is not None and self.when(path)
-
-
 @dataclass(frozen=True)
 class _Fs:
     """The mailboxes on disk with their collaborators (shared by the real harness and by the decorator's)."""
@@ -260,8 +250,14 @@ def _disk(root: Path) -> tuple[
 
 
 def _fs(tmp_path: Path) -> _Fs:
-    paths, failures = OrgPaths(tmp_path), _Failures()
-    writer = FailingAtomicWriter(fs_atomic_writer(tmp_path).writer, fails=lambda path: failures.decide(paths.rel(path)))
+    paths = OrgPaths(tmp_path)
+    failing: list[Callable[[str], bool] | None] = [None]  # which writes fail, switched by the test through ``MailHarness.fail_writes``
+
+    def fails(path: Path) -> bool:
+        when = failing[0]
+        return when is not None and when(paths.rel(path))
+
+    writer = FailingAtomicWriter(fs_atomic_writer(tmp_path).writer, fails=fails)
     parser, meta = CountingMessageParser(), StampCachedMetaReader()
     directory = fs_agents(tmp_path).directory  # the real directory of agents
     mailbox = FsMailbox(paths, parser, writer)
@@ -270,7 +266,7 @@ def _fs(tmp_path: Path) -> _Fs:
     put, read, listing = _disk(tmp_path)
 
     def fail_writes(when: Callable[[str], bool] | None) -> None:
-        failures.when = when
+        failing[0] = when
 
     harness = MailHarness(
         mailbox, mailbox, batches, mailbox, index, DerivedTaskQuery(mailbox),
