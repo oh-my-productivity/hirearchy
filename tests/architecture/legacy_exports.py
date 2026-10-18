@@ -58,8 +58,9 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "case_total services_text prompt_sections"
     ),
     "telemetry": _e3(
-        "RETRY_AFTER TITLE_MAX ERROR_MAX clip set_process "
-        "process dropped reset traces_seen note_trace single ensure_ignored emit summarize_args prune"
+        "TITLE_MAX ERROR_MAX clip set_process "
+        "process dropped reset traces_seen note_trace single ensure_ignored emit summarize_args prune "
+        "SCHEMA_VERSION LINE_MAX EVENTS_REL DAY_RE ENVELOPE PROCS datetime"  # imported by the flat module, used by tests/golden: public names
     ),
     "observe": _e3(
         "EVENTS_DIR ERROR_WINDOW COPY_GRACE INFLIGHT_GRACE RECV_BOXES ENVELOPE READ_ONLY_TOOLS VIEWS fmt_dur fmt_rel "

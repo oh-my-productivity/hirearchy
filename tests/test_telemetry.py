@@ -1,6 +1,7 @@
 """The event log (emission side): files, envelope, safety, retention, trace stamping and every emitted kind."""
 
 import asyncio
+import dataclasses
 import json
 import os
 import re
@@ -17,8 +18,10 @@ import pytest
 from orgmcp import telemetry
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Message, Org, join_frontmatter, split_frontmatter
+from orgmcp.kernel.testing import FakeClock
 from orgmcp.scheduler import Scheduler, ignore_runtime_files
 from orgmcp.server import build_server
+from orgmcp.telemetry._sink import FsEventSink
 
 FAKE = str(Path(__file__).with_name("fake_agent.py"))
 SILENT = {"echo": lambda _: None}
@@ -134,17 +137,21 @@ def test_the_process_name_is_in_the_file_name(org):
     assert [e for e in read_events(org) if e["proc"] == "scheduler"][0]["actor"] == "runtime"
 
 
-def test_seq_restarts_in_the_next_days_file(org, monkeypatch):
+def sink_of(org, **injected):
+    """``org`` emits through a sink of its runtime whose collaborators are replaced (the injected ports instead of module patch points)."""
+    resources, runtime = org.runtime.resources, org.runtime
+    parts = {"clock": runtime.clock, "retry_after": 5.0, **injected}
+    sink = FsEventSink(runtime.paths, resources.event_pool, resources.event_pool, runtime.event_switch, resources.process_label,
+                       parts["clock"], runtime.environment, runtime.ignore_list, parts["retry_after"])
+    org.runtime = dataclasses.replace(runtime, events=sink)
+
+
+def test_seq_restarts_in_the_next_days_file(org):
+    clock = FakeClock(datetime.now(timezone.utc))
+    sink_of(org, clock=clock)
     org.emit("custom.kind")
     org.emit("custom.kind")
-    real = telemetry.datetime
-
-    class Tomorrow(real):
-        @classmethod
-        def now(cls, tz=None):
-            return real.now(tz) + timedelta(days=1)
-
-    monkeypatch.setattr(telemetry, "datetime", Tomorrow)
+    clock.advance(86400)
     org.emit("custom.kind")
     org.emit("custom.kind")
     days = sorted(f.parent.name for f in event_files(org))
@@ -243,12 +250,12 @@ def test_a_failing_serializer_and_circular_values_are_swallowed(org):
     assert [e.get("fine") for e in read_events(org)] == [1]
 
 
-def test_the_log_recovers_when_the_directory_becomes_writable(org, monkeypatch):
+def test_the_log_recovers_when_the_directory_becomes_writable(org):
     runtime = org.root / ".runtime"
     runtime.mkdir(exist_ok=True)
     blocker = runtime / "events"
     blocker.write_text("x")
-    monkeypatch.setattr(telemetry, "RETRY_AFTER", 0.0)
+    sink_of(org, retry_after=0.0)
     org.emit("custom.kind")
     blocker.unlink()
     org.emit("custom.kind", after=True)

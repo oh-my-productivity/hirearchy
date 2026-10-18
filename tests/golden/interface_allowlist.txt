@@ -13,4 +13,3 @@ orgmcp.review.Review
 orgmcp.scheduler.Scheduler
 orgmcp.server.OrgBinding
 orgmcp.services.Stats
-orgmcp.telemetry._Writer

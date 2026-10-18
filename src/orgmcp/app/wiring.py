@@ -20,7 +20,7 @@ _ports: dict[str, type] | None = None  # field name -> port, read once from the 
 
 
 def new_process_resources() -> ProcessResources:
-    """A fresh set of process resources: the parse cache and the front-matter cache (50 000 entries each)."""
+    """A fresh set of process resources: the parse and front-matter caches, the event pool, process label, trace scope and event sinks."""
     return ProcessResources(CachingMessageParser(), StampCachedMetaReader())
 
 

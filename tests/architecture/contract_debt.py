@@ -10,7 +10,4 @@ suite exists (the step that adds it deletes the entry). An entry for a Protocol 
 
 from __future__ import annotations
 
-PENDING: dict[str, str] = {
-    "kernel.EventSink": "A-telemetry",  # real FsEventSink is written there; kernel has the port and a recording fake
-    "kernel.TraceTap": "A-telemetry",  # real ThreadLocalTraceScope is written there
-}
+PENDING: dict[str, str] = {}  # (kernel.EventSink and kernel.TraceTap were owed by A-telemetry: its suites run the real classes and the fakes)

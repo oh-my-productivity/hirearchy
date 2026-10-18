@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-# The shared fixtures (org, isolated_kiro, fresh_telemetry, real_kiro) live in tests/testkit/fixtures.py; they are registered here, at
+# The shared fixtures (org, isolated_kiro, fresh_process_resources, real_kiro) live in tests/testkit/fixtures.py; they are registered here, at
 # the repository root, so they reach tests/ AND the colocated tests in src/orgmcp/**/tests/ (pytest resolves conftest.py by ancestry).
 pytest_plugins = ["testkit.fixtures"]
 
