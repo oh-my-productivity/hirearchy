@@ -24,9 +24,6 @@ from orgmcp.runs import (
 from orgmcp.runs._reader import FsRunLogReader
 
 from . import _oracle
-from ._red import red
-
-pytestmark = red
 
 STAMPS = [f"2026101{day}T{hour:02d}0000{micro:06d}" for day in (7, 8) for hour in (9, 10, 11) for micro in (1, 999999)]
 def footers() -> list[str]:

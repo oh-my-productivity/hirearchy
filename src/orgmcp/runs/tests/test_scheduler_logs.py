@@ -1,8 +1,8 @@
 """Format golden: the logs the scheduler writes (with a stand-in agent) are exactly what the package reads.
 
 The scheduler and the readers of the logs were written apart and agree on a text format (header, closing lines). These tests run the
-real ``Scheduler`` with ``tests/fake_agent.py`` through every way a run can end, and pin both sides: the text of the log (green before and
-after the scheduler writes it through the package) and what ``RunLogReader`` makes of it (red until the package exists).
+real ``Scheduler`` with ``tests/fake_agent.py`` through every way a run can end, and pin both sides: the text of the log (written before
+the scheduler used the package, and unchanged since) and what ``RunLogReader`` makes of it.
 """
 
 from __future__ import annotations
@@ -23,7 +23,6 @@ from orgmcp.runs import RunOutcomes
 from orgmcp.runs._reader import FsRunLogReader
 
 from ._legacy import legacy
-from ._red import red
 
 FAKE = str(Path(__file__).resolve().parents[4] / "tests" / "fake_agent.py")
 MISSING = "/nonexistent/orgmcp-binary"
@@ -133,7 +132,6 @@ def test_the_log_of_the_scheduler_has_always_had_this_text(name: str, tmp_path: 
 
 
 @pytest.mark.parametrize("name", list(SCENARIOS))
-@red
 def test_the_package_reads_what_the_scheduler_wrote(name: str, tmp_path: Path) -> None:
     scenario = SCENARIOS[name]
     org, log = produce(name, tmp_path)

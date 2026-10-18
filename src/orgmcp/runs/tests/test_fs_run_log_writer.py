@@ -15,10 +15,6 @@ from orgmcp.kernel.testing import FakeClock
 from orgmcp.runs import RunLogSink, RunLogWriter
 from orgmcp.runs._writer import FileRunLogSink, FsRunLogWriter
 
-from ._red import red
-
-pytestmark = red
-
 
 class StillClock(FakeClock):
     """A clock that does not move between two readings (what ``core.utcnow`` patched to a constant is)."""

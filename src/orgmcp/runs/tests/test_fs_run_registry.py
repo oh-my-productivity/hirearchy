@@ -10,9 +10,6 @@ from orgmcp.kernel.testing import MemoryLedgerStore, fs_ledger_store
 from orgmcp.runs import RunRegistry
 from orgmcp.runs._registry import FsRunRegistry
 
-from ._red import red
-
-pytestmark = red
 
 RECORD: JsonObject = {"pgid": 5, "lstart": "Sun Oct 18 10:00:00 2026", "started": 1.5, "scheduler": 9, "log": "ceo/runs/x.log"}
 

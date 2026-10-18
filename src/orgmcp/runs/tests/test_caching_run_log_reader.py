@@ -15,9 +15,6 @@ from orgmcp.runs._caching import CachingRunLogReader, DirectoryStamps, FsDirecto
 from orgmcp.runs._reader import FsRunLogReader
 
 from ._legacy import legacy
-from ._red import red
-
-pytestmark = red
 
 NS = 1_000_000_000
 QUIET = 10 * NS  # a directory that was last modified this long before it was listed is trusted
