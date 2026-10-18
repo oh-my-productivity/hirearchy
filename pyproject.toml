@@ -75,6 +75,12 @@ module = ["orgmcp.*.tests.*", "orgmcp.*.testing"]
 disallow_untyped_decorators = false
 
 [[tool.mypy.overrides]]
+# The builder is a registry keyed by Protocol classes (`b.get(Clock)`): mypy refuses a Protocol where `type[T]` is expected unless
+# this check is off (its documented remedy). Only the composition root has such a registry.
+module = ["orgmcp.app", "orgmcp.app.*"]
+disable_error_code = ["type-abstract"]
+
+[[tool.mypy.overrides]]
 # PyYAML ships no type stubs and the stubs package is deliberately not a dev dependency (exact pins only):
 # a strict package wraps yaml behind its own typed function instead of letting Any leak through its API.
 module = ["yaml", "yaml.*"]
