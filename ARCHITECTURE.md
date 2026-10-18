@@ -1,7 +1,7 @@
 # orgmcp — target architecture and migration plan
 
 Status: **design (phase R0)**. Input to the refactor of the whole system. Nothing in `src/` or `tests/` changes in this phase.
-Binding rules: `refactor-principles.md` (decided by the project manager with the user; restated in section 1 as checkable rules).
+Binding rules: `docs/refactor-principles.md` (decided by the project manager with the user; restated in section 1 as checkable rules).
 Facts below were verified against the code at commit `01a6277` (main) by reading every module in `src/orgmcp/` and the tests;
 `file:function` references are to that commit.
 
