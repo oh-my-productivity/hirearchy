@@ -49,7 +49,7 @@ uv run orgmcp status
 uv run orgmcp inbox
 ```
 
-Other commands: `hire ... --inputs PATH` (repeatable: read-only folders for the agent), `progress [TASK_ID] [--wait SECONDS]`, `plan`/`apply` (blueprints, below), `services`, `define-service`, `request`, `feedback`, `retire-service` ([services](#services-and-reflection)), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile).
+Other commands: `hire ... --inputs PATH` (repeatable: read-only folders for the agent), `progress [TASK_ID] [--wait SECONDS]`, `plan`/`apply` (blueprints, below), `services`, `define-service`, `request`, `feedback`, `retire-service` ([services](#services-and-reflection)), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile), and the read-only views of [Observability](#observability): `obs now [--watch S]`, `obs trace TASK_ID`, `obs metrics [--since 24h] [--by agent|tool|service|trace]`, `obs events [--since] [--until] [--agent] [--kind] [--trace] [--errors] [--limit N] [--follow]` (each with `--json`) and `check [--json]`.
 
 ### Progress
 
@@ -356,6 +356,113 @@ uv run orgmcp review [--dry-run]
 
 Runs a review immediately through the same code path and prints what was sent to whom. `--dry-run` prints what
 would be sent and writes nothing (no messages, no ledger).
+
+## Observability
+
+Questions an operator can answer from the org directory alone, each with one command (or one call of the root-only MCP tool `observe`):
+
+| Question | View |
+| --- | --- |
+| What is happening right now? Is the scheduler alive, what runs, what is queued and why is it not running, what waits on me, what broke in the last 15 minutes? | `obs now` |
+| What exactly happened to request X, in order, and why? Every message, run, tool call and refusal, with who, when and how long. | `obs trace TASK_ID` |
+| Where did time and runs go (queue wait vs run time vs waiting on me; runs and budget per agent)? | `obs trace` totals, `obs metrics` |
+| Is the system healthy or degrading (error and refusal rates by tool and reason, failed or timed-out runs, stalls, pauses, scheduler faults, latency percentiles)? | `obs metrics` |
+| Show me the raw record (filter by time, agent, kind, trace, errors; follow live). | `obs events` |
+| Is the runtime itself consistent (budget conserved, messages intact, nothing stuck, runs accounted for)? | `check` |
+
+Everything is derived from **one append-only event log** written by the runtime (never by agents) plus the message files and run logs that already exist. There is no metrics store, no daemon, no network and no new dependency. Orgs created before this keep working: with no events the views fall back to messages and run logs and say `[partial]`.
+
+### The event log
+
+- **Files.** `.runtime/events/<YYYY-MM-DD>/<proc>-<pid>-<start_epoch_ms>.jsonl`, one file per process per UTC day, written only by that process (`proc` is `scheduler`, `mcp` for an MCP server, or `cli`). Readers glob and merge by `ts`. The directory is git-ignored (`.runtime/events/` is added to `.gitignore` by the first event of an org that lacks it).
+- **Envelope** (every line is one JSON object): `v` (1), `ts` (UTC, microseconds), `seq` (lines of this file, from 1 in each day's file: a gap means a lost line), `proc`, `pid` (the emitting process), `kind`, `actor` (`root`, an agent address, or `runtime`), `run` (`<agent>@<run log stem>`, null outside a run) and `trace`. The scheduler hands the run id to the kiro process as `ORG_RUN_ID`; the MCP server kiro spawns inherits it, so an agent's tool calls carry its run id.
+- **Emission never breaks an operation.** A failure is swallowed, counted and reported once per process on stderr; a line is one `write()` on an append-mode file (flushed, no fsync) and at most 8 KB (longer ones are shrunk and marked `"truncated": true`).
+
+| Kind | When (extra fields) |
+| --- | --- |
+| `scheduler.start` / `scheduler.exit` | `mode`, `max_runs`, `max_parallel`, `version` / `reason`, `runs_started` |
+| `scheduler.heartbeat` | every `heartbeat_seconds`: `running` (run ids), `runnable`, `waiting_on_you` |
+| `scheduler.error` | a tick phase raised (`phase`, `error`); the tick goes on |
+| `run.start` | `agent`, `run`, `batch` (message ids), `traces`, `child_pid`/`pgid` (the kiro process; the envelope `pid` is the scheduler's), `model`, `budget_before` |
+| `run.end` | `ok`, `exit_code`, `duration_ms`, `timed_out`, `killed`, `budget_after`, `error` |
+| `run.orphan` | recovery at startup of a dead scheduler's run: `killed`, `redelivered` or `kept` |
+| `agent.pause` / `agent.resume` / `agent.failure` | reason / failure count |
+| `stall.nudge` | each step of the stall ladder (`task`, `to`, `step`) |
+| `review.run`, `prune` | health review sent (`flagged`, `notes`); event-log days removed |
+| `tool.call` | every orgmcp tool, agents and root: `tool`, `ok`, `ms`, `error` (the refusal text), `error_type` (`OrgError` or the exception class), `args` (a summary, below) |
+| `cli.command` | `command`, `ok`, `ms`, `error` |
+| `msg.deliver` | every message: `id`, `type`, `from`, `to`, `title`, `status`, `budget`, `reply_to`, `revises`, `service`, `wake`, `hops`, `chars`, `trace_rule` (+ `trace_candidates` when ambiguous) |
+| `agent.hire` / `agent.retire`, `service.define` / `service.revise` / `service.retire` | who, what, returned budget |
+
+**Never recorded:** message bodies, file contents, environment values, secrets. `tool.call` `args` keeps ids, addresses, clipped titles (80 characters), status, budget, paths, service names, verdicts and numbers; long text fields only as their length (`"summary_chars": 1234`); unset arguments are omitted. Errors are clipped to 500 characters. **Out of scope:** the provider is a black box. We observe a run's boundaries (start, end, exit, duration, batch) and every orgmcp tool call it makes, never kiro's internals (tokens, built-in tool calls, model reasoning). There are no exporters, dashboards, sampling or alerting; the field names are OTel-friendly so a file exporter can be added later as a pure function over the events.
+
+Config (`ORG.md`): `events` (default `true`; `false` disables emission entirely), `events_keep_days` (30; the scheduler prunes older day directories at most once a day), `heartbeat_seconds` (60).
+
+### Traces
+
+A **trace** is one request from root. Its id is the id of root's task; a rework (`revises`) stays in the trace of the task it revises. Every message gets a `trace` frontmatter field stamped by the runtime at send time; the first matching rule wins and is recorded as `trace_rule` in the `msg.deliver` event:
+
+1. `new`: root sends a task without `revises`: its own id.
+2. `link`: the message has `reply_to` or `revises` and that message has a trace: that trace (otherwise the next rules apply).
+3. `open-task`: the sender's open tasks (received, no final result; a `blocked` result is not final) all share one trace.
+4. `batch`: the sender's current batch (its `inflight/` messages) has exactly one distinct trace.
+5. `ambiguous`: no trace is stamped (the event lists `trace_candidates`). Root's plain notes and grants have no `reply_to`, so they may be untraced; the trace view attributes them to the request by the same window rule `progress` uses.
+
+Runtime notices carry the trace of the task they are about when known. Messages of orgs created before traces are traced by the views (walking `reply_to`/`revises` and the same rules over the files), marked `~`. `trace` accepts a root task id, a rework of it, or any message of the request.
+
+### Views
+
+```sh
+uv run orgmcp obs now [--watch SECONDS]
+uv run orgmcp obs trace TASK_ID [--json]
+uv run orgmcp obs metrics [--since 24h] [--by agent|tool|service|trace] [--json]
+uv run orgmcp obs events [--since 24h] [--until T] [--agent ADDR] [--kind KIND] [--trace TASK_ID] [--errors] [--limit N] [--follow] [--json]
+uv run orgmcp check [--json]        # exit 1 when an invariant fails
+```
+
+Durations are `15m`, `24h`, `7d` or an ISO timestamp. The MCP tool `observe(view="now"|"trace"|"metrics"|"events"|"check", target=None, since="24h", by=None, errors_only=False, limit=50)` is offered to root only and returns the same text. Sample output from a real kiro run (`claude-haiku-4.5`, one agent that calls `whoami`, `write` and `report`; the full record is in `studies/O-observability-check/`):
+
+```
+$ orgmcp obs trace 20261018T092904624658-root-a621
+trace 20261018T092904624658-root-a621 "Tool check" -> worker: done
+     +0s  root -> worker task "Tool check" +2 run(s)
+     +8s    run 20261018T092912856677 ok, ran 14s, queued 8.2s, 3 call(s) [report×1 whoami×1 write×1]
+    +20s    worker -> root result (done) "Tool check" +1 run(s)
+totals: wall 20s | runs 1 (budget given 2, returned 1) | run time 14s | queue 8.2s | waiting on you 0s | tool calls 3 (0 refused)
+
+$ orgmcp obs now                      # while the scheduler runs
+scheduler: running pid 5585 (until_idle, up 9.0s, last heartbeat 9.0s ago)
+runs in flight 1/3:
+  worker 9.0s Third check trace 20261018T093211981048-root-723b
+queued, not running: none
+waiting on you: nothing
+errors in the last 15 min: 0
+
+$ orgmcp obs metrics --since 1h
+metrics 2026-10-18T08:30:20Z .. 2026-10-18T09:30:20Z (18 event(s) in the window)
+runs 1: ok 1, failed 0, timeout 0, killed 0 | duration p50 14s p95 14s max 14s (n=1) | queue p50 8.2s p95 8.2s (n=1)
+budget spent 1 run(s)
+tool calls 3, refused 0 (0.0%)
+  report               1 calls   0 refused (0%) p50 3ms p95 3ms
+...
+```
+
+A refusal and a crashed run, from the test organization (`tests/test_observability_e2e.py`: a manager and a report, real scheduler, fake agent):
+
+```
+trace 20261018T091640455395-root-5160 "Ship it" -> ceo: done
+     +0s    run 20261018T091640456990 ok, ran 341ms, queued 6ms, 3 call(s) [delegate×1 whoami×1 write×1]
+     +0s      run 20261018T091640766755 failed, ran 71ms, queued 29ms, 0 call(s), error: exit code 1
+     +0s      * agent.failure agent=ceo/eng count=1
+     +0s      run 20261018T091640875315 ok, ran 264ms, queued 137ms, 4 call(s) [report×2 whoami×1 write×1], 1 refused
+                ! report: status must be one of ('done', 'failed', 'blocked')
+```
+
+`trace` lists, in time order and indented by agent depth, every message (delegations, results, notes, grants), every run (queue wait = run start minus its earliest batch message; duration; ok, failed, timeout or killed with the cause) with its tool-call counts and every refusal's text, and the totals: wall time, runs (equal to what `progress` reports for the task; a request with reworks lists each task's runs), run time, queue time, time waiting on you (from a blocked or needs-you item to your next action), tool calls, refusals, budget given and returned. Without events it works from messages and run logs and is marked `[partial]`. `obs events --errors` shows every refused call with its text, every failed or killed run and every scheduler fault.
+
+### `check` invariants
+
+Each is PASS or FAIL with details naming the defect: **(a)** every message file parses, ids are unique, every sender copy has a recipient copy and vice versa; **(b)** budget is conserved (everything root handed down = budgets held + runs used, live and retired, + returned to root + dropped at retirement); **(c)** nothing is in `inflight/` without a live run; **(d)** every `run.start` has a `run.end` or a live process, and every run log since events began has a `run.start`; **(e)** each event file has no `seq` gaps (it counts from 1 in each file); **(f)** the scheduler pid file matches a live scheduler of this org.
 
 ## Kiro integration
 

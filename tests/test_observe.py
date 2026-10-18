@@ -953,3 +953,13 @@ def test_runs_of_agents_that_no_longer_exist_are_known_from_events(org, clock):
     m = observe.metrics(org, since="2026-10-18T00:00:00Z", by="agent", now=stamp(500))
     assert m["runs"]["total"] == 1 and m["by"]["rows"][0]["key"] == "gone/agent"
     assert m["runs"]["duration_ms"]["p50"] == 12_000 and m["runs"]["queue_ms"]["p50"] == pytest.approx(60_005, abs=10)
+
+
+def test_the_skill_sends_the_assistant_to_observe_instead_of_guessing():
+    from orgmcp.skill import skill_source
+
+    skill = skill_source().read_text()
+    assert len(skill.splitlines()) <= 125
+    for needle in ("why something failed or took long, or what it cost", "use `observe` (read-only), never guesses",
+                   '`view="trace"` with\n  the task id', '"now"', '"metrics"', "`errors_only=True`"):
+        assert needle in skill, needle

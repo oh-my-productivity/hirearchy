@@ -77,17 +77,18 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 - If a result comes back `blocked`, or `inbox` shows an escalation or budget request: tell the user what happened and give a
   recommended decision (grant N runs with `send(to=<agent>, body=<why>, budget=N)`, rework, change criteria). Spend beyond the
   approved budget needs the user's OK. A service request plus its reworks is one case: before a rework that would take the case past
-  the approved per-request budget, ask the user, with the number. A rework needs about 2 runs per delegation it requires + 1. The `send(budget=N)` reply says what
-  the recipient can hand down: read it; if it cannot delegate, grant enough in one go (ask the user once, with that number). Ask at the FIRST budget request, with your recommendation; never wait until the reserve
-  is spent. Before asking for more, look for stranded runs (`status`/`progress`/`health`: an idle team holding unspent runs):
-  `reclaim(report=<agent>)` pulls them back from your direct reports (a lead does the same with `reclaim` on its own team: ask
-  it by note), and only the shortfall goes to the user.
+  the approved per-request budget, ask the user, with the number. A rework needs about 2 runs per delegation it requires + 1. The
+  `send(budget=N)` reply says what the recipient can hand down: read it; if it cannot delegate, grant enough in one go (ask the user
+  once, with that number). Ask at the FIRST budget request, with your recommendation; never wait until the reserve is spent. Before
+  asking for more, look for stranded runs (`status`/`progress`/`health`: an idle team holding unspent runs): `reclaim(report=<agent>)`
+  pulls them back from your direct reports (a lead does it on its own team); only the shortfall goes to the user.
 - `progress(wait_seconds=N)` also waits on a `blocked` task while its lead can still run (after a grant + `start()`); never poll
   with `sleep` in a shell. Every unread note, budget request and escalation is listed under "Needs you" with its message id.
-- `progress` / `start` saying "waiting on you" means nothing can move without the user (an agent is out of runs or keeps failing,
-  or a task is stalled). Give the options it lists: grant runs, then `start()`; or accept what exists. The scheduler exits by
-  itself a few minutes after that, and `start()` refuses until something changes.
-- Never edit the org's artifacts to "fix" them. Send the work back with `delegate(to=<top agent>, title=..., goal=<required changes>,
+- `progress` / `start` saying "waiting on you" means nothing can move without the user (an agent is out of runs or keeps failing, or
+  a task is stalled): give the options it lists (grant runs, then `start()`; or accept what exists). `start()` refuses until something changes.
+- What happened, why something failed or took long, or what it cost: use `observe` (read-only), never guesses: `view="trace"` with
+  the task id (every message, run, tool call, refusal; queue/run/wait times), `"now"`, `"metrics"`, `"events"` + `errors_only=True`.
+- Never edit the org's artifacts to "fix" them: send the work back with `delegate(to=<top agent>, title=..., goal=<required changes>,
   acceptance=<the criteria, verbatim>, revises=<task id>)`, or ask the user. If `progress` says the scheduler is stopped
   ("finished") and you sent more work, call `start()` again.
 
@@ -118,8 +119,7 @@ models when asked. Criteria must be checkable ("at most 1500 words"), never "goo
 items the user listed", "The fact-checker's coverage report shows every factual claim verified (n of m, n = m)". The fact-checker and reviewer check everything, not a sample, so never ask for "at least N" checks.
 
 ## Files and access
-- `needs.inputs`: the user's folders. Agents may read them and can never change them (kiro enforces it per agent). `needs.workspace`:
-  the one folder agents may write in, for code.
-- Non-code goals: never give an agent the built-in `write` tool unless the goal needs it. Agents write in their own folders and
-  you copy the deliverable to the requested path (step 5). The plan lists each agent's access; if it shows "NOT confined", that
-  is `shell`: only code goals get it, and they are told to stay in the workspace.
+- `needs.inputs`: the user's folders; agents can read them and can never change them (kiro enforces it). `needs.workspace`: the one
+  folder agents may write in, for code.
+- Non-code goals: never give an agent the built-in `write` tool unless the goal needs it; you copy the deliverable to the requested
+  path (step 5). The plan lists each agent's access; "NOT confined" means `shell`: only code goals get it, told to stay in the workspace.
