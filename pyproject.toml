@@ -61,7 +61,7 @@ namespace_packages = true
 explicit_package_bases = true
 strict = true
 follow_imports = "silent"
-packages = []
+packages = ["orgmcp.kernel"]
 
 [[tool.mypy.overrides]]
 # PyYAML ships no type stubs and the stubs package is deliberately not a dev dependency (exact pins only):
