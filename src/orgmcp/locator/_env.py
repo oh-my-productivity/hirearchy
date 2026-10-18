@@ -7,6 +7,8 @@ from pathlib import Path
 from ..kernel import Environment
 from .api import OrgLocator
 
+NOT_FOUND = "no organization found: set ORG_ROOT or run inside an org directory"
+
 
 class EnvOrgLocator(OrgLocator):
     def __init__(self, environment: Environment) -> None:

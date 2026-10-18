@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping
+from typing import cast
 
-from ..kernel import JsonObject
+from ..kernel import JsonObject, split_frontmatter
 
 DEFAULT_MODEL = "claude-sonnet-5.5"  # the model every agent runs on unless its charter or the org config names another
 
@@ -33,19 +35,45 @@ DEFAULT_CONFIG: JsonObject = {
 
 def finite_number(value: object) -> float | None:
     """``value`` as a finite int/float, or None. Numeric strings are accepted ("1800"); booleans are not."""
-    raise NotImplementedError("red: A-settings")
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, str):
+        try:
+            number = float(value)
+        except ValueError:
+            return None
+        value = int(number) if number.is_integer() else number
+    if isinstance(value, (int, float)) and math.isfinite(value):
+        return value
+    return None
 
 
 def config_default_model(config: Mapping[str, object] | None) -> str:
     """The default model of a config mapping (``null``, empty or missing = DEFAULT_MODEL)."""
-    raise NotImplementedError("red: A-settings")
+    return str((config or {}).get("default_model") or "").strip() or DEFAULT_MODEL
 
 
 def config_number(config: Mapping[str, object], key: str, kind: type[float] | type[int] = float) -> float:
     """A numeric setting of ORG.md as ``kind``; a missing or malformed value falls back to the default."""
-    raise NotImplementedError("red: A-settings")
+    number = finite_number(config.get(key))
+    return kind(number if number is not None else cast(float, DEFAULT_CONFIG[key]))
 
 
 def config_message_cap(config: Mapping[str, object]) -> int:
     """``max_message_chars`` from ORG.md; a malformed value means the default."""
-    raise NotImplementedError("red: A-settings")
+    try:
+        cap = int(cast("int | str", config["max_message_chars"]))
+    except (TypeError, ValueError):
+        return int(cast(int, DEFAULT_CONFIG["max_message_chars"]))
+    return cap if cap > 0 else int(cast(int, DEFAULT_CONFIG["max_message_chars"]))
+
+
+def parse_config(text: str) -> JsonObject:
+    """The settings of an ORG.md text: its frontmatter merged over the defaults (a new mapping every time)."""
+    meta, _ = split_frontmatter(text)
+    return {**DEFAULT_CONFIG, **meta}
+
+
+def parse_rules(text: str) -> str:
+    """The rules of an ORG.md text: its body, stripped."""
+    return split_frontmatter(text)[1].strip()

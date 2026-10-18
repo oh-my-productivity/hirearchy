@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-RED: frozenset[str] = frozenset({"env_org_locator", "memory_org_locator"})
+RED: frozenset[str] = frozenset({"env_org_locator"})
 
 red = pytest.mark.xfail(strict=True, raises=NotImplementedError, reason="red: A-settings")
 

@@ -6,8 +6,9 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..kernel import Environment
-from ._env import EnvOrgLocator
+from ..kernel import Environment, OrgError
+from ..kernel.testing import DictEnvironment
+from ._env import NOT_FOUND, EnvOrgLocator
 from .api import OrgLocator
 
 
@@ -19,7 +20,16 @@ class MemoryOrgLocator(OrgLocator):
         self.organizations = organizations if organizations is not None else set()
 
     def find_root(self, start: Path | None = None) -> Path:
-        raise NotImplementedError("red: A-settings")
+        env = self._environment.get("ORG_ROOT")
+        if env:
+            return Path(env).expanduser().resolve()
+        here = Path(start or self._environment.cwd()).resolve()
+        for d in (here, *here.parents):
+            if d in self.organizations:
+                return d
+        if here / "org" in self.organizations:
+            return here / "org"
+        raise OrgError(NOT_FOUND)
 
 
 class FixedOrgLocator(OrgLocator):
@@ -29,7 +39,7 @@ class FixedOrgLocator(OrgLocator):
         self._root = root
 
     def find_root(self, start: Path | None = None) -> Path:
-        raise NotImplementedError("red: A-settings")
+        return self._root
 
 
 @dataclass(frozen=True)
@@ -41,12 +51,32 @@ class LocatorHarness:
     set_env: Callable[[str, str], None]  # define a variable of the locator's environment
 
 
+def _workdir(tmp_path: Path) -> Path:
+    cwd = tmp_path / "a" / "b" / "c"
+    cwd.mkdir(parents=True)
+    return cwd
+
+
+def _decoy(path: Path) -> None:
+    (path / "ORG.md").mkdir(parents=True, exist_ok=True)
+
+
 def env_org_locator(tmp_path: Path) -> LocatorHarness:
-    raise NotImplementedError("red: A-settings")
+    cwd = _workdir(tmp_path)
+    environment = DictEnvironment(cwd=cwd)
+
+    def make_org(path: Path) -> None:
+        path.mkdir(parents=True, exist_ok=True)
+        (path / "ORG.md").write_text("---\n---\n", encoding="utf-8")
+
+    return LocatorHarness(EnvOrgLocator(environment), cwd, make_org, _decoy, environment.set)
 
 
 def memory_org_locator(tmp_path: Path) -> LocatorHarness:
-    raise NotImplementedError("red: A-settings")
+    cwd = _workdir(tmp_path)
+    environment = DictEnvironment(cwd=cwd)
+    locator = MemoryOrgLocator(environment)
+    return LocatorHarness(locator, cwd, locator.organizations.add, _decoy, environment.set)
 
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {

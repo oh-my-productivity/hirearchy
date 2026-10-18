@@ -7,7 +7,6 @@ import pytest
 from orgmcp.settings import DEFAULT_CONFIG, OrgDocumentStore, OrgSettings
 from orgmcp.settings._stamp import OrgDocumentStamp
 from orgmcp.settings.testing import MemoryOrgSettings
-from orgmcp.settings.tests._red import red
 
 
 def test_the_fake_is_the_settings_the_store_and_the_stamp() -> None:
@@ -15,13 +14,11 @@ def test_the_fake_is_the_settings_the_store_and_the_stamp() -> None:
     assert isinstance(fake, OrgSettings) and isinstance(fake, OrgDocumentStore) and isinstance(fake, OrgDocumentStamp)
 
 
-@red
 def test_a_fake_made_with_a_text_has_that_document() -> None:
     fake = MemoryOrgSettings("---\nmax_depth: 8\n---\nrules\n")
     assert fake.exists() and fake.config()["max_depth"] == 8 and fake.rules() == "rules"
 
 
-@red
 def test_a_fake_without_a_text_has_no_document() -> None:
     fake = MemoryOrgSettings()
     assert not fake.exists()
@@ -31,7 +28,6 @@ def test_a_fake_without_a_text_has_no_document() -> None:
         fake.read_raw()
 
 
-@red
 def test_every_write_changes_the_stamp_unless_it_is_unnoticed() -> None:
     fake = MemoryOrgSettings("aaa")
     first = fake.stamp()
@@ -44,7 +40,6 @@ def test_every_write_changes_the_stamp_unless_it_is_unnoticed() -> None:
     assert fake.stamp() != second  # the size is part of the stamp
 
 
-@red
 def test_the_fake_config_is_a_new_mapping_every_time() -> None:
     fake = MemoryOrgSettings("rules only")
     fake.config()["max_depth"] = 1

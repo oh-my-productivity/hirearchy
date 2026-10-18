@@ -7,10 +7,7 @@ from pathlib import Path
 
 import pytest
 
-RED: frozenset[str] = frozenset({
-    "fs_org_settings", "memory_org_settings", "caching_org_settings", "fs_org_document_store", "memory_org_document_store",
-    "fs_event_switch", "memory_event_switch",
-})
+RED: frozenset[str] = frozenset({"fs_org_settings", "caching_org_settings", "fs_org_document_store", "fs_event_switch", "memory_event_switch"})
 
 red = pytest.mark.xfail(strict=True, raises=NotImplementedError, reason="red: A-settings")
 red_surface = pytest.mark.xfail(strict=True, raises=AssertionError, reason="red: A-settings")
