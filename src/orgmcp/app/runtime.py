@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..kernel import AtomicWriter, Clock, Environment, IdGenerator, LedgerStore, OrgLayout
+from ..processes import OrphanJudge, ProcessInspector, ProcessSignaller, ProcessSpawner
 from ._resources import ProcessResources
 
 
@@ -22,3 +23,7 @@ class OrgRuntime:
     atomic_writer: AtomicWriter
     ledgers: LedgerStore
     environment: Environment
+    process_spawner: ProcessSpawner
+    process_inspector: ProcessInspector
+    process_signaller: ProcessSignaller
+    orphan_judge: OrphanJudge
