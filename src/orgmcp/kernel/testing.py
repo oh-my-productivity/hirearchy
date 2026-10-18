@@ -6,14 +6,17 @@ use it instead of the filesystem, the system clock or the process environment.
 
 from __future__ import annotations
 
+import json
+import os
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from ._paths import OrgLayout, OrgPaths
+from ._paths import OrgPaths
 from ._ports import AtomicWriter, Clock, Environment, EventSink, IdGenerator, JsonObject, LedgerStore, TraceTap
 from ._system import FsAtomicWriter, FsLedgerStore, OsEnvironment, SystemClock, TimestampIdGenerator
+from ._timeutil import STAMP_FORMAT
 
 T0 = datetime(2026, 10, 18, 10, 0, 0, tzinfo=timezone.utc)
 
@@ -27,24 +30,28 @@ class FakeClock(Clock):
         self.origin = start
 
     def now(self) -> datetime:
-        raise NotImplementedError("red: K1")
+        self.t += timedelta(microseconds=1)
+        return self.t
 
     def time(self) -> float:
-        raise NotImplementedError("red: K1")
+        return self.t.timestamp()
 
     def monotonic(self) -> float:
-        raise NotImplementedError("red: K1")
+        return (self.t - self.origin).total_seconds()
 
     def sleep(self, seconds: float) -> None:
-        raise NotImplementedError("red: K1")
+        self.advance(seconds)
 
     def advance(self, seconds: float) -> None:
         """Move time forward."""
-        raise NotImplementedError("red: K1")
+        self.t += timedelta(seconds=seconds)
 
     def at(self, offset_s: float) -> datetime:
         """Jump to ``start + offset_s`` seconds (never backwards)."""
-        raise NotImplementedError("red: K1")
+        target = self.origin + timedelta(seconds=offset_s)
+        if target > self.t:
+            self.t = target
+        return self.t
 
 
 class SequenceIdGenerator(IdGenerator):
@@ -55,7 +62,9 @@ class SequenceIdGenerator(IdGenerator):
         self._count = 0
 
     def message_id(self, sender: str) -> str:
-        raise NotImplementedError("red: K1")
+        n = self._count
+        self._count = (n + 1) % 0x10000  # four hex digits, like the random part of a real id
+        return f"{self._clock.now():{STAMP_FORMAT}}-{sender.replace('/', '.')}-{n:04x}"
 
 
 @dataclass
@@ -83,7 +92,7 @@ class ListEventSink(EventSink):
         proc: str | None = None,
         **fields: object,
     ) -> None:
-        raise NotImplementedError("red: K1")
+        self.events.append(RecordedEvent(kind, actor, run, trace, proc, dict(fields)))
 
 
 class RecordingTraceTap(TraceTap):
@@ -91,7 +100,7 @@ class RecordingTraceTap(TraceTap):
         self.notes: list[str | None] = []
 
     def note(self, trace: str | None) -> None:
-        raise NotImplementedError("red: K1")
+        self.notes.append(trace)
 
 
 class MemoryAtomicWriter(AtomicWriter):
@@ -99,7 +108,7 @@ class MemoryAtomicWriter(AtomicWriter):
         self.files: dict[Path, str] = {}
 
     def write(self, path: Path, text: str) -> None:
-        raise NotImplementedError("red: K1")
+        self.files[path] = text
 
 
 class FailingAtomicWriter(AtomicWriter):
@@ -117,7 +126,10 @@ class FailingAtomicWriter(AtomicWriter):
         self.attempts: list[Path] = []
 
     def write(self, path: Path, text: str) -> None:
-        raise NotImplementedError("red: K1")
+        self.attempts.append(path)
+        if self._fails(path):
+            raise self._error
+        self._inner.write(path, text)
 
 
 class MemoryLedgerStore(LedgerStore):
@@ -127,10 +139,14 @@ class MemoryLedgerStore(LedgerStore):
         self.texts: dict[str, str] = {}
 
     def read(self, name: str) -> JsonObject:
-        raise NotImplementedError("red: K1")
+        try:
+            data = json.loads(self.texts[name])
+        except (KeyError, ValueError):
+            return {}
+        return data if isinstance(data, dict) else {}
 
     def write(self, name: str, data: JsonObject) -> None:
-        raise NotImplementedError("red: K1")
+        self.texts[name] = json.dumps(data, indent=2) + "\n"
 
 
 class DictEnvironment(Environment):
@@ -146,19 +162,19 @@ class DictEnvironment(Environment):
 
     def set(self, name: str, value: str) -> None:
         """Define a variable."""
-        raise NotImplementedError("red: K1")
+        self._variables[name] = value
 
     def get(self, name: str) -> str | None:
-        raise NotImplementedError("red: K1")
+        return self._variables.get(name)
 
     def cwd(self) -> Path:
-        raise NotImplementedError("red: K1")
+        return self._cwd
 
     def home(self) -> Path:
-        raise NotImplementedError("red: K1")
+        return self._home
 
     def variables(self) -> Mapping[str, str]:
-        raise NotImplementedError("red: K1")
+        return dict(self._variables)
 
 
 # ------------------------------------------------------------------------------ harnesses and the registry
@@ -208,28 +224,54 @@ def recording_trace_tap(tmp_path: Path) -> TraceTap:
     return RecordingTraceTap()
 
 
+def _read_file(path: Path) -> str | None:
+    return path.read_bytes().decode("utf-8") if path.is_file() else None
+
+
 def fs_atomic_writer(tmp_path: Path) -> WriterHarness:
-    raise NotImplementedError("red: K1")
+    return WriterHarness(FsAtomicWriter(), tmp_path, _read_file)
 
 
 def memory_atomic_writer(tmp_path: Path) -> WriterHarness:
-    raise NotImplementedError("red: K1")
+    writer = MemoryAtomicWriter()
+    return WriterHarness(writer, tmp_path, writer.files.get)
 
 
 def fs_ledger_store(tmp_path: Path) -> LedgerHarness:
-    raise NotImplementedError("red: K1")
+    paths = OrgPaths(tmp_path)
+
+    def put_raw(name: str, raw: str) -> None:
+        paths.runtime_dir().mkdir(parents=True, exist_ok=True)
+        paths.ledger_file(name).write_text(raw, encoding="utf-8")
+
+    return LedgerHarness(FsLedgerStore(paths, FsAtomicWriter()), put_raw)
 
 
 def memory_ledger_store(tmp_path: Path) -> LedgerHarness:
-    raise NotImplementedError("red: K1")
+    store = MemoryLedgerStore()
+    return LedgerHarness(store, store.texts.__setitem__)
 
 
 def os_environment(tmp_path: Path) -> EnvHarness:
-    raise NotImplementedError("red: K1")
+    before: dict[str, str | None] = {}
+
+    def put(name: str, value: str) -> None:
+        before.setdefault(name, os.environ.get(name))
+        os.environ[name] = value
+
+    def close() -> None:
+        for name, old in before.items():
+            if old is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = old
+
+    return EnvHarness(OsEnvironment(), put, close)
 
 
 def dict_environment(tmp_path: Path) -> EnvHarness:
-    raise NotImplementedError("red: K1")
+    env = DictEnvironment()
+    return EnvHarness(env, env.set, lambda: None)
 
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {

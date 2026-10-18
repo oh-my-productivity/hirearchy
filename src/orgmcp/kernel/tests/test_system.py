@@ -15,7 +15,7 @@ import pytest
 
 from orgmcp.kernel import OrgPaths
 from orgmcp.kernel._system import FsAtomicWriter, FsLedgerStore, OsEnvironment, SystemClock, TimestampIdGenerator
-from orgmcp.kernel.testing import FakeClock, MemoryAtomicWriter
+from orgmcp.kernel.testing import FakeClock, MemoryAtomicWriter, MemoryLedgerStore
 
 pytestmark = pytest.mark.xfail(strict=True, reason="red: K1")
 
@@ -99,6 +99,14 @@ def test_the_ledger_is_written_through_the_injected_writer(tmp_path: Path) -> No
     FsLedgerStore(OrgPaths(tmp_path), writer).write("running", {"a": 1})
     assert writer.files == {tmp_path / ".runtime" / "running.json": '{\n  "a": 1\n}\n'}
     assert not (tmp_path / ".runtime").exists()
+
+
+def test_the_memory_ledger_keeps_the_text_the_real_store_writes(tmp_path: Path) -> None:
+    data = {"ceo": 2, "names": ["é"], "nested": {"a": None}}
+    memory = MemoryLedgerStore()
+    memory.write("failures", data)
+    FsLedgerStore(OrgPaths(tmp_path), FsAtomicWriter()).write("failures", data)
+    assert memory.texts == {"failures": (tmp_path / ".runtime" / "failures.json").read_text(encoding="utf-8")}
 
 
 def test_a_ledger_file_written_by_hand_is_read(tmp_path: Path) -> None:

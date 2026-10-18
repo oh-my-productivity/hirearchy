@@ -27,6 +27,7 @@ def test_what_was_written_is_read_back(h: WriterHarness) -> None:
 
 
 def test_a_path_never_written_reads_as_nothing(h: WriterHarness) -> None:
+    h.writer.write(h.base / "other.txt", "x")
     assert h.read(h.base / "nope.txt") is None
 
 

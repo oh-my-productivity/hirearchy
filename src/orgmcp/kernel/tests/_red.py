@@ -7,9 +7,7 @@ import pytest
 from orgmcp.kernel.testing import IMPLEMENTATIONS
 
 RED: frozenset[str] = frozenset({
-    "system_clock", "fake_clock", "timestamp_id_generator", "sequence_id_generator", "list_event_sink",
-    "recording_trace_tap", "fs_atomic_writer", "memory_atomic_writer", "fs_ledger_store", "memory_ledger_store",
-    "os_environment", "dict_environment",
+    "system_clock", "timestamp_id_generator", "fs_atomic_writer", "fs_ledger_store", "os_environment",
 })
 
 

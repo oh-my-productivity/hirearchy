@@ -9,8 +9,6 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp.kernel import OrgPaths
-from orgmcp.kernel._system import FsAtomicWriter, FsLedgerStore
 from orgmcp.kernel.testing import (
     T0,
     DictEnvironment,
@@ -23,8 +21,6 @@ from orgmcp.kernel.testing import (
     RecordingTraceTap,
     SequenceIdGenerator,
 )
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: K1")
 
 
 def test_fake_clock_starts_at_t0_and_ticks_one_microsecond_per_reading() -> None:
@@ -109,14 +105,6 @@ def test_failing_writer_can_fail_selected_paths_with_a_chosen_error() -> None:
     writer.write(Path("/x/good2"), "ok2")
     assert inner.files == {Path("/x/good"): "ok", Path("/x/good2"): "ok2"}
     assert writer.attempts == [Path("/x/good"), Path("/x/bad"), Path("/x/good2")]
-
-
-def test_memory_ledgers_keep_the_text_the_real_store_writes(tmp_path: Path) -> None:
-    data = {"ceo": 2, "names": ["é"], "nested": {"a": None}}
-    memory = MemoryLedgerStore()
-    memory.write("failures", data)
-    FsLedgerStore(OrgPaths(tmp_path), FsAtomicWriter()).write("failures", data)
-    assert memory.texts == {"failures": (tmp_path / ".runtime" / "failures.json").read_text(encoding="utf-8")}
 
 
 def test_memory_ledgers_refuse_what_json_refuses() -> None:
