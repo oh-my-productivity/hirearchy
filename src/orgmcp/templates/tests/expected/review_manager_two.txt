@@ -1,0 +1,5 @@
+Health review: 2 new problem(s) among your direct reports.
+- `ceo/eng` idle: x
+- `ceo/qa` stuck: y
+
+Act within your charter and record your decisions in `ceo/MEMORY.md`. Problems that persist are not repeated in later reviews.

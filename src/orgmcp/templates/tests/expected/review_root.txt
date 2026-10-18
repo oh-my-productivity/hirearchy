@@ -1,0 +1,3 @@
+Health review: 2 agents flagged
+- `ceo/eng` idle: x
+- `ceo/qa` stuck: y

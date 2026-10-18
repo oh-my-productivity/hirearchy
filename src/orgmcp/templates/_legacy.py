@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from ..kernel import JsonObject
+
 ORG_RULES = """\
 # Organization
 
@@ -179,9 +181,9 @@ def notice_review_root(summary: str, items: list[str], skipped: dict[str, str]) 
 
 
 def kiro_profile(
-    name: str, description: str, tools: list[str], mcp_server: dict, *,
-    allowed_tools: list[str] | None = None, tools_settings: dict | None = None,
-) -> dict:
+    name: str, description: str, tools: list[str], mcp_server: JsonObject, *,
+    allowed_tools: list[str] | None = None, tools_settings: JsonObject | None = None,
+) -> JsonObject:
     """A kiro-cli agent profile that loads only the orgmcp server (not the user's global mcp.json).
 
     ``allowed_tools`` = the tools kiro runs without asking (default: all of ``tools``). A tool that is NOT in it and has

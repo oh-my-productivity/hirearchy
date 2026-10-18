@@ -1,0 +1,2 @@
+- `ceo/eng` idle: no result for 2h
+  -> retire `ceo/eng` if it is no longer needed
