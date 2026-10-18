@@ -15,7 +15,6 @@ from orgmcp.upgrade.testing import IMPLEMENTATIONS, UpgradeHarness
 
 from ._cases import COMMIT, expected
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-bootstrap", raises=NotImplementedError)
 
 
 def frontmatter(text: str | None) -> str:

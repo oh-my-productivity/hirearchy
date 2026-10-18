@@ -14,7 +14,6 @@ from orgmcp.upgrade._upgrader import TemplateRulesUpgrader
 
 from ._cases import COMMIT
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-bootstrap", raises=NotImplementedError)
 
 FRONT = "---\n# kept\npoll_seconds:   1\n---\n"
 OLD = FRONT + "# Org\n\n## Mission\nStudy things.\n\n## How this organization works\nold rules\n"
@@ -58,7 +57,7 @@ class Templates(DocumentTemplates):
 
     def org_rules(self, mission: str | None) -> str:
         self.missions.append(mission)
-        return f"# Org\n\n## Mission\n{mission}\n\n{self.rules}\n\n\n"
+        return f"# Org\n\n## Mission\n{mission}\n\n## How this organization works\n{self.rules}\n\n\n"
 
     def charter_body(self, role: str, charter: str) -> str:
         raise AssertionError("not used")
@@ -79,7 +78,7 @@ def test_the_rules_come_from_the_templates_with_the_mission_that_the_file_has() 
     upgrader, documents, templates = make()
     upgrader.upgrade_rules()
     assert templates.missions == ["Study things."]
-    assert documents.text == FRONT + "# Org\n\n## Mission\nStudy things.\n\nNEW RULES\n"  # frontmatter as written, one trailing newline
+    assert documents.text == FRONT + "# Org\n\n## Mission\nStudy things.\n\n## How this organization works\nNEW RULES\n"  # frontmatter as written, one trailing newline
 
 
 def test_it_reads_then_writes_then_commits() -> None:
@@ -96,13 +95,13 @@ def test_a_dry_run_only_reads() -> None:
 
 
 def test_nothing_is_written_or_committed_when_the_rules_are_current() -> None:
-    upgrader, documents, _ = make(rules="old rules")
+    upgrader, documents, _ = make(rules="old rules")  # the stub gives back what the file has
     upgrader.upgrade_rules()
     assert documents.calls == ["read"]
 
 
 def test_the_comparison_ignores_trailing_whitespace() -> None:
-    current = FRONT + "# Org\n\n## Mission\nStudy things.\n\nNEW RULES\n\n\n\n"
+    current = FRONT + "# Org\n\n## Mission\nStudy things.\n\n## How this organization works\nNEW RULES\n\n\n\n"
     upgrader, documents, _ = make(current)
     assert upgrader.upgrade_rules().changed is False
     assert documents.calls == ["read"]
