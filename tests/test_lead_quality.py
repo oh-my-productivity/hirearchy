@@ -31,6 +31,13 @@ def base(tmp_path):
     return bp
 
 
+def tiered(bp):
+    """The tiering a user gets only by asking for cheaper drafting models."""
+    bp["needs"]["models"] = {"cheap": "claude-haiku-4.5", "strong": "claude-sonnet-4.6"}
+    bp["needs"]["model_policy"] = "cheap drafting, strong review"
+    return bp
+
+
 def mutate(bp, fn):
     out = copy.deepcopy(bp)
     fn(out)
@@ -154,7 +161,7 @@ def test_charter_and_plan_carry_the_new_numbers(base, tmp_path):
 
 
 def test_cheap_manager_gets_a_warning_not_an_error(base, tmp_path):
-    bp = mutate(base, lambda b: b["agents"][0].update(model="cheap"))
+    bp = mutate(tiered(base), lambda b: b["agents"][0].update(model="cheap"))
     found = issues(bp, tmp_path)
     hit = [i for i in found if i.code == "manager-cheap-model"]
     assert len(hit) == 1 and hit[0].level == "warning" and hit[0].path == "agents[lead]"
@@ -163,7 +170,7 @@ def test_cheap_manager_gets_a_warning_not_an_error(base, tmp_path):
 
 
 def test_manager_on_the_cheap_model_id_is_flagged(base, tmp_path):
-    bp = mutate(base, lambda b: b["agents"][0].update(model="claude-haiku-4.5"))
+    bp = mutate(tiered(base), lambda b: b["agents"][0].update(model="claude-haiku-4.5"))
     assert "manager-cheap-model" in codes(issues(bp, tmp_path), "warning")
 
 
@@ -178,6 +185,7 @@ def test_manager_sharing_the_drafters_model_while_strong_is_available_is_flagged
 
 
 def test_strong_manager_is_not_flagged(base, tmp_path):
+    base = tiered(base)
     assert "manager-cheap-model" not in codes(issues(base, tmp_path))
     by_id = mutate(base, lambda b: b["agents"][0].update(model="claude-sonnet-4.6"))
     assert "manager-cheap-model" not in codes(issues(by_id, tmp_path))
@@ -196,7 +204,25 @@ def test_one_model_for_all_is_not_flagged(base, tmp_path):
 # ------------------------------------------------------------------------------------------- research example
 
 
+def test_default_single_model_policy_never_warns_about_the_lead(base, tmp_path):
+    for bp in (base, mutate(base, lambda b: b["agents"][0].update(model="cheap")),  # the cheap tier IS the strong model here
+               mutate(base, lambda b: b["needs"].pop("models"))):
+        found = issues(bp, tmp_path)
+        assert not codes(found, "error") and not codes(found) & {"manager-cheap-model", "model-policy", "model-review", "model-single"}
+    only_cheap = mutate(base, lambda b: b["needs"].update(models={"cheap": "claude-sonnet-5.5"}))
+    assert not codes(issues(only_cheap, tmp_path)) & {"manager-cheap-model"}
+
+
+def test_tiering_on_request_still_warns_when_the_lead_is_cheap(base, tmp_path):
+    cheap_lead = mutate(tiered(base), lambda b: b["agents"][0].update(model="cheap"))
+    assert "manager-cheap-model" in codes(issues(cheap_lead, tmp_path), "warning")
+    assert "manager-cheap-model" not in codes(issues(tiered(base), tmp_path))
+    equal = mutate(tiered(base), lambda b: b["needs"].update(models={"cheap": "m", "strong": "m"}))
+    assert "manager-cheap-model" not in codes(issues(mutate(equal, lambda b: b["agents"][0].update(model="cheap")), tmp_path))
+
+
 def test_research_example_proposes_cleanly_under_25(base, tmp_path):
+    base = tiered(base)
     found = issues(base, tmp_path)
     assert not bpm.errors(found) and "manager-cheap-model" not in codes(found)
     agents = agents_of(base, tmp_path)

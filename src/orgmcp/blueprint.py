@@ -8,7 +8,7 @@ A blueprint is a plain dict (YAML or JSON)::
       deliverable: {description, format, max_words, path}
       quality_bar: ...  sources: ...  workspace: /abs/path  budget_runs: 25
       inputs: [/abs/read-only/folder]   # read-only sources for the agents (kiro enforces: they cannot write there)
-      models: {cheap: <model id>, strong: <model id>}   model_policy: ...
+      models: {cheap: <model id>, strong: <model id>}   model_policy: ...   # optional: no models = every agent on the org default (claude-sonnet-5.5)
       review: true|false|text   approval: ...   progress: ...
       kind: research|writing|code    code: {tests, packaging, commits}
     agents:                     # exactly one top-level agent (budget flows down from it)
@@ -37,7 +37,7 @@ from pathlib import Path
 import yaml
 
 from . import services as services_mod
-from .core import DEFAULT_CONFIG, NAME_RE, RESERVED, ROOT, Org, OrgError, split_frontmatter
+from .core import DEFAULT_CONFIG, NAME_RE, RESERVED, ROOT, Org, OrgError, DEFAULT_MODEL, config_default_model, split_frontmatter
 
 ROLES_DIR = Path(__file__).parent / "roles"
 WEB_TOOLS = ("web_search", "web_fetch")
@@ -168,7 +168,7 @@ class Agent:
     template: Role | None = None
     kind: str = "author"
     extra: str = ""  # charter text from the blueprint (appended to the template, or the whole charter)
-    model: str | None = None  # resolved model id (None = org default)
+    model: str = ""  # resolved model id (never empty once resolved: the org default fills in)
     tier: str = ""
     tools: list[str] = field(default_factory=list)
     workspace: str | None = None
@@ -421,7 +421,7 @@ def _resolve(bp: dict, org: Org | None, roots: list[Path], issues: list[Issue]) 
     _walk(bp.get("agents"), None, agents, issues, "agents", org)
     by = {a.addr: a for a in agents}
     models = needs.get("models") if isinstance(needs.get("models"), dict) else {}
-    default_model = cfg.get("default_model")
+    default_model = config_default_model(cfg)  # every tier without a mapped id resolves to this
 
     # workspace of the whole project: used by agents that write or run commands and name no workspace
     project_ws = None
@@ -493,17 +493,15 @@ def _resolve(bp: dict, org: Org | None, roots: list[Path], issues: list[Issue]) 
         if a.max_children < 0:
             issues.append(Issue("error", a.where, "max_children must be a whole number >= 0", "children"))
             a.max_children = len(kids)
-        # model: explicit id or tier name, else the template's tier if the blueprint maps tiers, else the org default
+        # model: explicit id or tier name, else the template's tier; a tier needs.models does not map resolves to the org default
         m = _s(a.raw.get("model"))
         a.tier = a.template.tier if a.template else ""
         if m in ("cheap", "strong"):
             a.tier = m
             m = _s(models.get(m))
-            if not m:
-                issues.append(Issue("error", a.where, f"model '{a.tier}' is a tier but needs.models.{a.tier} is not set; add needs.models: {{cheap: <id>, strong: <id>}}", "model-tier"))
-        elif not m and a.tier and _s(models.get(a.tier)):
-            m = _s(models[a.tier])
-        a.model = m or (_s(default_model) or None)
+        elif not m and a.tier:
+            m = _s(models.get(a.tier))
+        a.model = m or default_model
 
     for a in agents:
         if a.parent is None:
@@ -1052,7 +1050,9 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
     # --- models
     pol = _s(needs.get("model_policy"))
     if not pol:
-        issues.append(Issue("warning", "needs.model_policy", "no model policy: decide cheap drafting + strong review, or one model for everyone", "model-policy"))
+        # the default is one model for every agent (nothing to decide); only a team on different models needs a stated policy
+        if len({a.model for a in agents}) > 1:
+            issues.append(Issue("warning", "needs.model_policy", "the agents run on different models but no model policy says why: state it (for example cheap drafting + strong review)", "model-policy"))
     elif _TIERED.search(pol) and not re.match(r"\s*(?:single|same|one|default)\b", pol, re.I) and len(agents) > 1:
         if len({a.model for a in agents}) < 2:
             issues.append(Issue("error", "agents", f"model policy '{pol}' asks for different models for drafting and review, but all agents use the same one; set needs.models {{cheap, strong}} (and give reviewers model: strong)", "model-single"))
@@ -1063,15 +1063,16 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
 
     # --- the lead decides how every other run is spent: it belongs on the strong model (studies A3/A4)
     mdl = needs.get("models") if isinstance(needs.get("models"), dict) else {}
-    cheap_id, strong_id = _s(mdl.get("cheap")), _s(mdl.get("strong"))
+    dflt = config_default_model(_cfg(org))
+    cheap_id, strong_id = _s(mdl.get("cheap")) or dflt, _s(mdl.get("strong")) or dflt  # a tier without an id is the org default
     drafters = {x.model for x in agents if x.kind == "author" and not x.children and x.model}
     for a in agents:
-        if a.kind != "manager" and not a.children:
+        if cheap_id == strong_id or (a.kind != "manager" and not a.children):
+            continue  # one model for both tiers: there is no cheaper model to be on
+        if a.model == strong_id:
             continue
-        if strong_id and a.model == strong_id:
-            continue
-        on_cheap = a.tier == "cheap" or bool(cheap_id and a.model == cheap_id)
-        shared = bool(strong_id and a.model and a.model in drafters)
+        on_cheap = a.tier == "cheap" or a.model == cheap_id
+        shared = bool(a.model and a.model in drafters)
         if on_cheap or shared:
             why = "the cheap model" if on_cheap else f"{a.model}, the same model as the drafters, while a strong model ({strong_id}) is available"
             issues.append(Issue("warning", a.where, f"{a.addr} directs the team but runs on {why}; the lead decides how every other run is spent; cheap leads misroute rework and waste runs (studies A3/A4). Give it model: strong", "manager-cheap-model"))
@@ -1121,7 +1122,7 @@ def _charter(a: Agent, agents: list[Agent], bp: dict, split: dict[str, dict]) ->
         asg.append("Your team (fixed by the plan; you cannot change it):")
         for c in a.children:
             k = by[c]
-            asg.append(f"- {c}: {k.role} ({k.kind}; tools: {', '.join(k.tools) or 'none'}; model: {k.model or 'org default'})")
+            asg.append(f"- {c}: {k.role} ({k.kind}; tools: {', '.join(k.tools) or 'none'}; model: {k.model})")
         grants = [(c, split[c]["grant"]) for c in a.children]
         if offers and not _has_plain_task(bp):
             asg.append("Budget plan: each request arrives with the budget of its service, and its split between you and your team is in the playbook (`## Budget plan`). "
@@ -1276,7 +1277,7 @@ def _tree_lines(agents: list[Agent]) -> list[str]:
     def line(a: Agent, indent: int) -> None:
         tpl = f"[{a.template.name}]" if a.template else "[custom]"
         ws = f" ws={a.workspace}" if a.workspace else ""
-        out.append(f"{'  ' * indent}- {a.name} {tpl} {a.role}: model={a.model or 'org default'}, tools={','.join(a.tools) or 'none'}{ws}")
+        out.append(f"{'  ' * indent}- {a.name} {tpl} {a.role}: model={a.model}, tools={','.join(a.tools) or 'none'}{ws}")
         access = _access(a)
         if access:
             out.append(f"{'  ' * indent}  Access: {access}")
@@ -1496,7 +1497,7 @@ def _user_tree(agents: list[Agent]) -> list[str]:
     out: list[str] = []
 
     def line(a: Agent, indent: int) -> None:
-        out.append(f"{'  ' * indent}- {a.name} ({a.role}, model {a.model or 'org default'}): {_agent_access(a)}")
+        out.append(f"{'  ' * indent}- {a.name} ({a.role}, model {a.model}): {_agent_access(a)}")
         for c in a.children:
             line(by[c], indent + 1)
 
@@ -1615,6 +1616,20 @@ def _user_services(bp: dict, agents: list[Agent]) -> list[str]:
     return out
 
 
+def _models_line(agents: list[Agent], needs: dict) -> str:
+    """The plan's Models line: what the agents will really run on (the resolved ids), plus the stated policy if they differ."""
+    used: dict[str, int] = {}
+    for a in agents:
+        used[a.model] = used.get(a.model, 0) + 1
+    if not used:
+        return f"{DEFAULT_MODEL} (no agents yet)"
+    if len(used) == 1:
+        return f"{next(iter(used))} for every agent"
+    parts = ", ".join(f"{m} for {n} agent{'s' if n != 1 else ''}" for m, n in used.items())
+    pol = _clip(needs.get("model_policy")).rstrip(".")
+    return f"{parts}" + (f" ({pol})" if pol else "")
+
+
 def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | None = None, allowed_roots: list | None = None) -> str:
     """The compact, plain-language plan the assistant shows to the user verbatim (about 40 lines at most).
 
@@ -1645,7 +1660,7 @@ def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | Non
     if _is_code(bp):
         code = needs.get("code") if isinstance(needs.get("code"), dict) else {}
         need("Tests / packaging / commits", "; ".join(f"{k}: {_s(code.get(k)) or '?'}" for k in ("tests", "packaging", "commits")))
-    need("Models", needs.get("model_policy"))
+    L.append(f"- Models: {_models_line(agents, needs)}")
 
     L.append(f"Team ({len(agents)} agents):")
     L += _user_tree(agents) or ["- (none)"]
