@@ -51,13 +51,15 @@ if mode == "tools":
         if msg.type == "task":
             if kids:
                 call("delegate", to=kids[0], title=msg.title, goal=msg.body, acceptance="same as parent", budget=2)
-                call("write", path=f"{me}/MEMORY.md", content=f"{msg.id}\n", append=True)
+                sub = max(m.id for m in org.sent(me) if m.type == "task")
+                call("write", path=f"{me}/MEMORY.md", content=f"{sub}={msg.id}\n", append=True)
             else:
                 call("write", path=f"{me}/work/out.md", content=f"done: {msg.title}")
                 call("report", task_id=msg.id, status="bogus", summary="x" * 5000)  # refused
                 call("report", task_id=msg.id, status="done", summary="Did it.", artifacts=[f"{me}/work/out.md"])
         elif msg.type == "result":
-            call("report", task_id=org.memory(me).split()[0], status=msg.status, summary=f"Team result: {msg.status}")
+            mapping = dict(line.split("=") for line in org.memory(me).split())
+            call("report", task_id=mapping[msg.reply_to], status=msg.status, summary=f"Team result: {msg.status}")
     sys.exit(0)
 
 for msg in org.messages(me, "inflight"):
