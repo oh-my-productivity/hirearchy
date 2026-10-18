@@ -262,7 +262,8 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
         org = binding.get()
         msg = org.send(me, to, body, title=title, reply_to=reply_to, budget=budget)
         moved = f" with {msg.budget} run(s) of budget" if msg.budget else ""
-        return f"sent {msg.id} to {msg.to}{moved}"
+        hint = org.grant_hint(msg.to) if msg.budget and org.parent(msg.to) == me else ""
+        return f"sent {msg.id} to {msg.to}{moved}" + (f". {hint}" if hint else "")
 
     @mcp.tool()
     def reclaim(report: str, budget: int | None = None) -> str:

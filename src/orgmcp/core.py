@@ -591,6 +591,31 @@ class Org:
         given = sum(m.budget for m in self.sent(a))
         return got - given - self.runs_used(a)
 
+    def delegable(self, addr: str) -> tuple[int, int, int]:
+        """(budget, outstanding delegations, the most ``addr`` can hand down with one more delegation).
+
+        The most is ``budget - outstanding - 1`` (one run kept per outstanding delegation to process its result, one
+        for the new delegation's own result), never below 0.
+        """
+        budget = self.budget(addr) or 0
+        out = len(self.outstanding(addr))
+        return budget, out, max(0, budget - out - 1)
+
+    def grant_hint(self, addr: str) -> str:
+        """What a direct report can do with its budget now (shown to whoever just granted it runs); "" if it cannot hire."""
+        if not self.exists(addr) or not self.charter(addr)[0].get("can_hire"):
+            return ""
+        budget, out, most = self.delegable(addr)
+        head = f"`{addr}` now has {budget} run(s) and {out} outstanding delegation(s)"
+        if most > 0:
+            return f"{head}; with one more delegation it can hand down at most {most} run(s)."
+        need = out + 2  # budget - out - 1 >= 1
+        return (
+            f"{head}: with {budget} run(s) and {out} outstanding delegation(s) it cannot delegate anything; it can "
+            f"only process results or work itself - grant at least {max(0, need - budget)} more (a budget of {need}) "
+            "to allow one delegation of 1 run."
+        )
+
     def _check_allocation(self, actor: str, amount: int, new_delegation: bool) -> None:
         if actor == ROOT or amount == 0:
             return
