@@ -47,7 +47,7 @@ When the user asks for an org, team or agents for a goal:
 1. Ask what you need in ONE message. Propose defaults only where a generic one exists; ASK for any list not
    given (scope items, source files), never invent. Default deliverable place: a new
    `deliverables/` folder in the current directory (say so). Also ask: format, length, exact checkable criteria,
-   sources/web, workspace and tests (code), budget in runs, models (if cheap: keep the lead and final verifier strong;
+   sources/web, workspace and tests (code), budget in runs, models (all claude-sonnet-5.5; if cheaper: keep the lead and final verifier strong;
    the lead decides how every other run is spent), review, approval.
 2. Start the blueprint from `blueprint_example(kind)` (`service=True` for recurring work), then `propose_org`. Show the
    "PLAN FOR YOU" block exactly as returned. Fix errors; settle its warnings (e.g. model policy) with the user
@@ -390,7 +390,7 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
 
         name: lowercase-dashed (becomes the address <you>/<name>). role: a short job title.
         charter: markdown with purpose, responsibilities, decision rights, what to escalate, quality bar.
-        model: kiro model id (optional). tools: kiro built-in tools to grant, only ones you have yourself
+        model: kiro model id (optional; unset = the organization's default model, claude-sonnet-5.5). tools: kiro built-in tools to grant, only ones you have yourself
         (e.g. "read", "write", "shell"). can_hire: whether the report may build its own team.
         workspace: directory the report works in (must be inside yours).
         inputs: absolute folders the report may only READ (never change); a manager can give only folders inside its
@@ -616,7 +616,7 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
         """Create the organization this server is bound to (only possible while none exists).
 
         mission: what the organization is for, in a few sentences. default_model: kiro model for all agents
-        (optional). path: absolute directory; only needed (and only accepted) when the server is not bound to
+        (optional; unset = claude-sonnet-5.5). path: absolute directory; only needed (and only accepted) when the server is not bound to
         one by ORG_ROOT. The directory must be missing or empty. Afterwards every tool works, no restart needed.
         """
         org = binding.create(mission, default_model, path)
@@ -679,7 +679,7 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
         blueprint: YAML or JSON text (never a file path). Start from blueprint_example(kind) for a template with every
         field explained. Schema: `mission` (one paragraph); `needs` {scope, deliverable {description, format,
         max_words, path (absolute)}, quality_bar, sources, inputs (read-only folders), workspace (the one absolute
-        folder agents may write in), budget_runs (the user's cap), models {cheap, strong}, model_policy, review
+        folder agents may write in), budget_runs (the user's cap), models {cheap, strong} (optional: none = every agent on claude-sonnet-5.5), model_policy, review
         (true/false), approval, progress, kind (research|writing|code), code {tests, packaging, commits}}; `agents`:
         ONE top-level agent (template manager) with `children`; each agent has name and a template (manager,
         researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker) or a charter, and optionally

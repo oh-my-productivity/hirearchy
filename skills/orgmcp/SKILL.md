@@ -39,10 +39,10 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
    `needs.inputs` as an absolute path of a folder that exists). Default: web for factual work.
 5. Code only: workspace (one new project directory), tests, packaging, commits. Default: tests per criterion, uv/pytest for
    Python, local commits, never push.
-6. Budget in runs (each agent wake-up is one run) and models. Default: the estimate + 25%; cheap model drafts, strong reviews. A service's per-request
+6. Budget in runs (each agent wake-up is one run) and models. Default: the estimate + 25%; every agent on claude-sonnet-5.5, no tiers. A service's per-request
    budget is the plan's estimate + 25% (the lead wakes once per result: about 2 runs per delegation + 1); if the user's cap is lower, say
-   in one line what that risks. If they ask for cheap models, keep the lead (manager) and
-   the final verifier on the strong model and say why in one line: "the lead decides how every other run is spent".
+   in one line what that risks. Only if they ask for cheaper models, use cheap/strong tiers and keep the lead (manager) and
+   the final verifier on the strong model, and say why in one line: "the lead decides how every other run is spent".
 7. Review by an agent that did not write it (default yes); when they want to approve (default: the plan, before anything
    starts, and spend beyond budget); progress (default: one line when they ask).
 
@@ -56,7 +56,7 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
    A services-only plan says "Nothing runs until you ask for a request": after approval tell the user they can ask any time.
 3. Errors: fix the blueprint and propose again; never ask the user to approve a plan with errors. Revise on feedback and propose
    again (each change gives a new `plan_id`).
-4. Warnings in the block (for example no model policy, built-in `write` on a non-code goal): settle them with the user BEFORE you
+4. Warnings in the block (for example mixed models without a stated policy, built-in `write` on a non-code goal): settle them with the user BEFORE you
    ask for approval (ask which models, then propose again) or state each one plainly in your intro line. Never leave one silent.
    The Budget lines say what happens if the check still fails after one rework: you will come back to the user first.
 5. Wait for an explicit "approve" (or equivalent). Your own judgment that the plan is good is not approval.
