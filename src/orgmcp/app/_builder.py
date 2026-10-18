@@ -1,10 +1,10 @@
-"""The builder: lazy singletons per runtime, resolved by port (ARCHITECTURE.md 6.2). RED skeleton (M2)."""
+"""The builder: lazy singletons per runtime, resolved by port (ARCHITECTURE.md 6.2)."""
 
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeVar, cast
 
 T = TypeVar("T")
 
@@ -29,17 +29,36 @@ class Builder:
     """Providers register a factory per port; ``get`` builds each port once and hands out the same object afterwards."""
 
     def __init__(self, root: Path, overrides: Mapping[type, object] | None = None) -> None:
-        raise NotImplementedError("red: M2")
+        self._root = root
+        self._objects: dict[type, object] = dict(overrides or {})  # an override is an object that is already built
+        self._factories: dict[type, Callable[[Builder], object]] = {}
+        self._building: list[type] = []
 
     @property
     def root(self) -> Path:
         """The organization directory the runtime is built for."""
-        raise NotImplementedError("red: M2")
+        return self._root
 
     def provide(self, port: type[T], factory: Callable[[Builder], T]) -> None:
         """Register how ``port`` is built; the factory runs on the first ``get``, not now."""
-        raise NotImplementedError("red: M2")
+        if port in self._factories:
+            raise DuplicateProvider(f"{port.__name__} is provided twice")
+        self._factories[port] = factory
 
     def get(self, port: type[T]) -> T:
         """The one object of ``port`` of this builder (an override wins over the provider)."""
-        raise NotImplementedError("red: M2")
+        if port in self._objects:
+            return cast(T, self._objects[port])
+        if port in self._building:
+            path = " -> ".join(p.__name__ for p in (*self._building[self._building.index(port) :], port))
+            raise DependencyCycle(f"dependency cycle: {path}")
+        factory = self._factories.get(port)
+        if factory is None:
+            raise NotProvided(f"no provider for {port.__name__}")
+        self._building.append(port)
+        try:
+            built = factory(self)
+        finally:
+            self._building.pop()
+        self._objects[port] = built
+        return cast(T, built)

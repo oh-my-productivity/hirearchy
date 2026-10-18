@@ -10,8 +10,6 @@ from orgmcp.app import wiring
 from orgmcp.app._resources import CachingMessageParser, ProcessResources
 from orgmcp.kernel import Message
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: M2")
-
 
 def message_file(directory: Path, name: str = "20260101T000000000000-root-aaaa.md", body: str = "hello") -> Path:
     path = directory / name

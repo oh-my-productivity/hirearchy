@@ -14,8 +14,6 @@ from orgmcp.app.runtime import OrgRuntime
 from orgmcp.kernel import Clock, OrgPaths
 from orgmcp.kernel.testing import FakeClock
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: M2")
-
 
 def test_the_wire_modules_are_discovered_and_sorted() -> None:
     names = wiring.wire_modules()

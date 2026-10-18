@@ -9,8 +9,6 @@ import pytest
 
 from orgmcp.app._builder import Builder, BuilderError, DependencyCycle, DuplicateProvider, NotProvided
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: M2")
-
 
 class Greeter(Protocol):
     def greet(self) -> str: ...

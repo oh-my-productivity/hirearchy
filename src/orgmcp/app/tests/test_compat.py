@@ -11,8 +11,6 @@ from orgmcp import core
 from orgmcp.app import _compat, wiring
 from orgmcp.kernel._system import FsAtomicWriter, SystemClock
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: M2")
-
 FIXED = datetime(2031, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
 
 

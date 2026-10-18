@@ -18,7 +18,7 @@ from orgmcp.app import _compat, wiring
 from orgmcp.app._resources import CachingMessageParser
 from orgmcp.kernel import JsonObject, Message, split_frontmatter
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: M2")
+RED = pytest.mark.xfail(strict=True, reason="red: M2")  # until the facade attaches Message.load and core aliases the cache
 
 FILE = "---\nid: 20260101T000000000000-root-aaaa\nfrom: root\nto: ceo\ntype: task\ntitle: 'Title: with colon'\nbudget: 3\n---\nline1\nline2\n"
 
@@ -127,25 +127,30 @@ def test_the_process_parser_reads_the_limit_and_the_splitter_from_core_at_call_t
     assert split.calls == 4 and len(parser.cache) == 2 and parser.max_entries == 2
 
 
+@RED
 def test_core_parsed_is_the_cache_of_the_process_parser() -> None:
     assert core._PARSED is wiring.process_resources().message_parser.cache
 
 
+@RED
 def test_message_load_is_served_by_the_process_parser(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     path, split = write(tmp_path), CountingSplit()
     monkeypatch.setattr(core, "split_frontmatter", split)
     wiring.process_resources().reset()
     first, second = Message.load(path), Message.load(path)  # type: ignore[attr-defined]
     assert split.calls == 1 and first == second and first is not second and type(first) is Message
+    assert str(path) in wiring.process_resources().message_parser.cache
 
 
 
+@RED
 def test_message_load_is_attached_by_the_composition_root_not_by_core() -> None:
     load = vars(Message)["load"]
     assert isinstance(load, classmethod) and load.__func__.__module__ == "orgmcp.app._compat"
     assert not hasattr(core, "_load_message")
 
 
+@RED
 def test_a_fresh_interpreter_that_imports_only_the_kernel_message_can_load(tmp_path: Path) -> None:
     path = write(tmp_path)
     code = (
