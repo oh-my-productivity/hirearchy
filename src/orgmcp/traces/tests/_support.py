@@ -12,9 +12,6 @@ from orgmcp.kernel import ROOT, Message, join_frontmatter
 from orgmcp.traces.testing import TraceHarness
 
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-traces")
-
-
 def make(request: pytest.FixtureRequest, tmp_path: Path) -> TraceHarness:
     """The fixture body of every contract suite: the harness of one implementation, with the agents ``ceo`` and ``ceo/eng``."""
     h = cast(Callable[[Path], TraceHarness], request.param)(tmp_path)

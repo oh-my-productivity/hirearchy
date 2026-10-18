@@ -12,7 +12,7 @@ from orgmcp.traces._ports import AgentPresence
 
 from orgmcp.traces.testing import TraceHarness, memory_traces
 
-from ._support import RED, put
+from ._support import put
 
 class Presence(AgentPresence):
     """Says who exists, and remembers whom it was asked about."""
@@ -71,7 +71,6 @@ def test_it_is_a_trace_lookup(tmp_path: Path) -> None:
     assert isinstance(lookup, TraceLookup)
 
 
-@RED
 def test_trace_of_is_one_lookup_by_name_in_the_mailbox_and_asks_nobody_whether_the_agent_exists(tmp_path: Path) -> None:
     lookup, reader, presence, h = over(tmp_path)
     msg_id = put(h, "ceo", "sent", 1, trace="T1")
@@ -79,21 +78,18 @@ def test_trace_of_is_one_lookup_by_name_in_the_mailbox_and_asks_nobody_whether_t
     assert reader.calls == [("find_anywhere", f"ceo:{msg_id}")] and presence.asked == []
 
 
-@RED
 def test_an_empty_id_is_answered_without_reading_anything(tmp_path: Path) -> None:
     lookup, reader, _, _ = over(tmp_path)
     assert lookup.trace_of("ceo", None) is None and lookup.trace_of("ceo", "") is None
     assert reader.calls == []
 
 
-@RED
 def test_open_task_traces_ask_the_directory_first_and_read_nothing_for_a_stranger(tmp_path: Path) -> None:
     lookup, reader, presence, h = over(tmp_path)
     put(h, "ceo", "inbox", 1, trace="T1")
     assert lookup.open_task_traces("ceo") == [] and presence.asked == ["ceo"] and reader.calls == []
 
 
-@RED
 def test_open_task_traces_of_an_agent_read_its_sent_and_received_boxes(tmp_path: Path) -> None:
     lookup, reader, presence, h = over(tmp_path, "ceo")
     put(h, "ceo", "inbox", 1, trace="T1")
@@ -101,7 +97,6 @@ def test_open_task_traces_of_an_agent_read_its_sent_and_received_boxes(tmp_path:
     assert sorted(reader.calls) == [("received", "ceo"), ("sent", "ceo")]
 
 
-@RED
 def test_root_and_the_runtime_are_not_asked_about(tmp_path: Path) -> None:
     lookup, reader, presence, _ = over(tmp_path, "root", "runtime")
     assert lookup.open_task_traces("root") == [] and lookup.open_task_traces("runtime") == []
@@ -109,17 +104,15 @@ def test_root_and_the_runtime_are_not_asked_about(tmp_path: Path) -> None:
     assert presence.asked == [] and reader.calls == []
 
 
-@RED
 def test_the_batch_is_the_inflight_box_and_only_for_an_agent_that_exists(tmp_path: Path) -> None:
     lookup, reader, _, h = over(tmp_path, "ceo")
-    put(h, "ceo", "inflight", 1, trace="T1")
-    put(h, "ghost", "inflight", 2, trace="T2")
+    put(h, "ceo", "inflight", 1, trace="T1", kind="note")
+    put(h, "ghost", "inflight", 2, trace="T2", kind="note")
     assert lookup.context_trace("ceo") == ("T1", "batch", [])
     assert lookup.context_trace("ghost") == (None, "ambiguous", [])
     assert ("messages", "ceo:inflight") in reader.calls and not any("ghost" in arg for _, arg in reader.calls)
 
 
-@RED
 def test_the_address_is_normalized_before_the_directory_is_asked(tmp_path: Path) -> None:
     lookup, _, presence, h = over(tmp_path, "ceo/eng")
     put(h, "ceo/eng", "inbox", 1, trace="T1")

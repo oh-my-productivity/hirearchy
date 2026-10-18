@@ -13,10 +13,7 @@ from orgmcp.kernel import Message
 from orgmcp.traces import TraceStamper
 from orgmcp.traces.testing import IMPLEMENTATIONS, TraceHarness
 
-from ._support import RED, make, message, put, result
-
-pytestmark = RED
-
+from ._support import make, message, put, result
 
 @pytest.fixture(params=IMPLEMENTATIONS[TraceStamper], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> TraceHarness:

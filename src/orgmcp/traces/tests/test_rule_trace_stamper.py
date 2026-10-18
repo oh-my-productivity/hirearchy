@@ -7,7 +7,7 @@ from orgmcp.traces import TraceStamper
 from orgmcp.traces._stamper import RuleTraceStamper
 from orgmcp.traces.api import TraceLookup
 
-from ._support import RED, message
+from ._support import message
 
 class ScriptedLookup(TraceLookup):
     """Answers from a script and records the questions."""
@@ -38,7 +38,6 @@ def test_it_is_a_trace_stamper() -> None:
     assert isinstance(stamper(ScriptedLookup()), TraceStamper)
 
 
-@RED
 def test_given_and_new_ask_nothing() -> None:
     lookup = ScriptedLookup()
     assert stamper(lookup).stamp(message("runtime", "ceo", "note", trace="T")) == ("given", [])
@@ -46,7 +45,6 @@ def test_given_and_new_ask_nothing() -> None:
     assert lookup.asked == []
 
 
-@RED
 def test_link_asks_for_reply_to_then_revises_in_the_boxes_of_the_normalized_sender_and_stops_at_the_first_trace() -> None:
     lookup = ScriptedLookup({("ceo", "B"): "TB"})
     msg = message(" ceo/ ", "root", "task", reply_to="A", revises="B")
@@ -57,14 +55,12 @@ def test_link_asks_for_reply_to_then_revises_in_the_boxes_of_the_normalized_send
     assert lookup.asked == [("trace_of", "ceo", "A")]
 
 
-@RED
 def test_a_message_without_references_asks_the_lookup_for_the_context_of_the_sender() -> None:
     lookup = ScriptedLookup()
     stamper(lookup).stamp(message("ceo", "root", "note"))
     assert lookup.asked == [("context_trace", "ceo")]
 
 
-@RED
 def test_the_rule_and_the_candidates_are_those_of_the_context() -> None:
     contexts: list[tuple[str | None, str, list[str]]] = [("T", "open-task", []), ("T", "batch", []), (None, "ambiguous", ["A", "B"])]
     for context in contexts:
@@ -72,7 +68,6 @@ def test_the_rule_and_the_candidates_are_those_of_the_context() -> None:
         assert stamper(ScriptedLookup(context=context)).stamp(msg) == (context[1], context[2]) and msg.trace == context[0]
 
 
-@RED
 def test_the_runtime_asks_nothing_and_is_ambiguous() -> None:
     lookup = ScriptedLookup({("runtime", "A"): "TA"}, context=("T", "batch", []))
     msg: Message = message("runtime", "ceo", "note", reply_to="A")

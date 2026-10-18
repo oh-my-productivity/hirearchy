@@ -9,10 +9,7 @@ import pytest
 from orgmcp.traces import TraceLookup
 from orgmcp.traces.testing import IMPLEMENTATIONS, TraceHarness
 
-from ._support import RED, make, mid, put, result
-
-pytestmark = RED
-
+from ._support import make, mid, put, result
 
 @pytest.fixture(params=IMPLEMENTATIONS[TraceLookup], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> TraceHarness:
