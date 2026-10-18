@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-RED: frozenset[str] = frozenset({"fs_runs", "memory_runs", "caching_fs_runs"})
+RED: frozenset[str] = frozenset({"fs_runs", "caching_fs_runs"})
 
 red = pytest.mark.xfail(strict=True, raises=NotImplementedError, reason="red: A-runs")
 red_surface = pytest.mark.xfail(strict=True, reason="red: A-runs")

@@ -7,85 +7,193 @@ was given (a ``FakeClock``: it moves only when told). It obeys the same contract
 
 from __future__ import annotations
 
+import copy
+import json
 import os
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 from pathlib import Path
 
-from ..kernel import Clock, JsonObject, OrgPaths
+from ..kernel import STAMP_FORMAT, Clock, JsonObject, OrgPaths, stamp_of
 from ..kernel.testing import FakeClock, fs_ledger_store
 from ._caching import CachingRunLogReader, FsDirectoryStamps
+from ._format import FACTS_BYTES, HEAD_BYTES, TAIL_BYTES, cut_tail, is_failed, is_runtime_only, log_note, parse_facts
 from ._reader import FsRunLogReader
 from ._registry import FsRunRegistry
 from ._writer import FsRunLogWriter
 from .api import RunLogFile, RunLogReader, RunLogSink, RunLogWriter, RunOutcomes, RunRegistry, RunWindow
 
 
+@dataclass
+class _Log:
+    data: bytearray
+    mtime: float  # epoch seconds, as ``st_mtime``
+
+
+class _MemorySink(RunLogSink):
+    def __init__(self, runs: MemoryRuns, path: Path) -> None:
+        self._runs = runs
+        self._path = path
+        self._closed = False
+
+    @property
+    def path(self) -> Path:
+        return self._path
+
+    def write(self, text: str) -> None:
+        if self._closed:
+            raise ValueError("I/O operation on closed file.")
+        self._runs._append(self._path, text.encode("utf-8"))
+
+    def flush(self) -> None:
+        pass
+
+    def close(self) -> None:
+        self._closed = True
+
+
 class MemoryRuns(RunLogWriter, RunLogReader, RunRegistry):
     """Run logs and the registry kept in memory. An agent's directory exists once ``add_agent`` said so (``create`` needs it)."""
 
     def __init__(self, clock: Clock | None = None, root: Path = Path("/org")) -> None:
-        raise NotImplementedError("red: A-runs")
+        self._clock: Clock = clock or FakeClock()
+        self._paths = OrgPaths(root)
+        self._agents: set[Path] = {self._paths.root}  # the directories that exist: the organization's, and those of the agents added
+        self._logs: dict[Path, _Log] = {}
+        self._records: dict[str, object] = {}  # the content of running.json: whatever was put there
+
+    # ------------------------------------------------------------------------------------------------------- setting up
 
     def add_agent(self, addr: str) -> None:
-        raise NotImplementedError("red: A-runs")
+        """The directory of the agent exists."""
+        self._agents.add(self._paths.agent_dir(addr))
 
     def put_log(self, addr: str, name: str, content: str | bytes) -> Path:
-        raise NotImplementedError("red: A-runs")
+        """A log as the scheduler may have left it (any file name, hidden ones included), written now."""
+        directory = self._paths.agent_dir(addr)
+        self._agents.add(directory)
+        path = directory / "runs" / name
+        data = content.encode("utf-8") if isinstance(content, str) else content
+        self._logs[path] = _Log(bytearray(data), self._clock.time())
+        return path
 
     def set_mtime(self, path: Path, epoch: float) -> None:
-        raise NotImplementedError("red: A-runs")
+        """When the log was last written."""
+        self._logs[path].mtime = epoch
 
     def read_log(self, path: Path) -> bytes | None:
-        raise NotImplementedError("red: A-runs")
+        """The content of a log, None when there is none."""
+        log = self._logs.get(path)
+        return None if log is None else bytes(log.data)
 
     def put_ledger(self, text: str) -> None:
-        raise NotImplementedError("red: A-runs")
+        """The raw text of ``running.json`` (an unreadable one means no records)."""
+        try:
+            data = json.loads(text)
+        except ValueError:
+            data = {}
+        self._records = data if isinstance(data, dict) else {}
+
+    def _append(self, path: Path, data: bytes) -> None:
+        log = self._logs.setdefault(path, _Log(bytearray(), 0.0))
+        log.data += data
+        log.mtime = self._clock.time()
+
+    def _visible(self, addr: str) -> list[Path]:
+        directory = self._paths.agent_dir(addr) / "runs"
+        return sorted(p for p in self._logs if p.parent == directory and p.name.endswith(".log") and not p.name.startswith("."))
+
+    # ---------------------------------------------------------------------------------------------------------- writer
 
     def create(self, addr: str) -> Path:
-        raise NotImplementedError("red: A-runs")
+        directory = self._paths.agent_dir(addr)
+        if directory not in self._agents:
+            raise FileNotFoundError(f"no directory for {addr}: {directory}")
+        path = directory / "runs" / f"{self._clock.now():{STAMP_FORMAT}}.log"
+        log = self._logs.setdefault(path, _Log(bytearray(), 0.0))
+        log.mtime = self._clock.time()  # like touch: an existing log keeps its content
+        return path
 
     def open_sink(self, path: Path) -> RunLogSink:
-        raise NotImplementedError("red: A-runs")
+        self._logs.setdefault(path, _Log(bytearray(), self._clock.time()))
+        return _MemorySink(self, path)
 
     def append_note(self, rel_path: str, text: str) -> None:
-        raise NotImplementedError("red: A-runs")
+        path = self._paths.root / rel_path
+        if path in self._logs:
+            self._append(path, log_note(text).encode("utf-8"))
+
+    # ---------------------------------------------------------------------------------------------------------- reader
 
     def count(self, addr: str) -> int:
-        raise NotImplementedError("red: A-runs")
+        return len(self._visible(addr))
 
     def files(self, addr: str) -> list[RunLogFile]:
-        raise NotImplementedError("red: A-runs")
+        return [RunLogFile(p.stem, p, stamp_of(p.stem)) for p in self._visible(addr)]
 
     def windows(self, addr: str) -> list[RunWindow]:
-        raise NotImplementedError("red: A-runs")
+        out = []
+        for path in self._visible(addr):
+            start = stamp_of(path.stem)
+            if start:
+                out.append(RunWindow(start, max(start, datetime.fromtimestamp(self._logs[path].mtime, timezone.utc))))
+        return out
 
     def outcomes(self, addr: str) -> RunOutcomes:
-        raise NotImplementedError("red: A-runs")
+        failed: set[datetime] = set()
+        runtime_only: set[datetime] = set()
+        for path in self._visible(addr):
+            start = stamp_of(path.stem)
+            if start is None:
+                continue
+            data = bytes(self._logs[path].data)
+            if is_failed(data[max(0, len(data) - TAIL_BYTES):].decode("utf-8", "replace")):
+                failed.add(start)
+            if is_runtime_only(data[:HEAD_BYTES].decode("utf-8", "replace")):
+                runtime_only.add(start)
+        return RunOutcomes(frozenset(failed), frozenset(runtime_only))
 
     def last_end(self, addr: str) -> float:
-        raise NotImplementedError("red: A-runs")
+        directory = self._paths.agent_dir(addr) / "runs"
+        return max((log.mtime for p, log in self._logs.items() if p.parent == directory and p.name.endswith(".log")), default=0.0)
 
     def facts(self, path: Path) -> JsonObject:
-        raise NotImplementedError("red: A-runs")
+        log = self._logs.get(path)
+        if log is None:
+            return {}
+        return parse_facts(bytes(log.data[max(0, len(log.data) - FACTS_BYTES):]).decode("utf-8", "replace"))
 
     def tail(self, path: Path, max_bytes: int, max_lines: int) -> tuple[str, bool]:
-        raise NotImplementedError("red: A-runs")
+        data = self._existing(path)
+        return cut_tail(data[max(0, len(data) - max_bytes):], len(data), max_lines)
 
     def head(self, path: Path, max_bytes: int) -> str:
-        raise NotImplementedError("red: A-runs")
+        return self._existing(path)[:max_bytes].decode("utf-8", "replace")
+
+    def _existing(self, path: Path) -> bytes:
+        log = self._logs.get(path)
+        if log is None:
+            raise FileNotFoundError(f"no such log: {path}")
+        return bytes(log.data)
+
+    # -------------------------------------------------------------------------------------------------------- registry
 
     def all(self) -> dict[str, JsonObject]:
-        raise NotImplementedError("red: A-runs")
+        return {k: copy.deepcopy(v) for k, v in self._records.items() if isinstance(v, dict)}
 
     def record(self, addr: str, record: JsonObject) -> None:
-        raise NotImplementedError("red: A-runs")
+        records: dict[str, object] = dict(self.all())
+        records[addr] = copy.deepcopy(record)
+        self._records = records
 
     def forget(self, *addrs: str) -> None:
-        raise NotImplementedError("red: A-runs")
+        records = self.all()
+        if any(records.pop(a, None) is not None for a in addrs):  # stops at the first record found, like the scheduler always did
+            self._records = dict(records)
 
     def replace(self, records: Mapping[str, JsonObject]) -> None:
-        raise NotImplementedError("red: A-runs")
+        self._records = copy.deepcopy(dict(records))
 
 
 # ------------------------------------------------------------------------------ harnesses and the registry

@@ -22,10 +22,6 @@ from orgmcp.runs import (
 )
 from orgmcp.runs._format import cut_tail, is_failed, is_runtime_only, parse_facts
 
-from ._red import red
-
-pytestmark = red
-
 
 # ---------------------------------------------------------------------------------------------------- what is written
 

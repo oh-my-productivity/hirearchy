@@ -8,10 +8,6 @@ from orgmcp.kernel.testing import FakeClock
 from orgmcp.runs import RunLogReader, RunLogWriter, RunRegistry
 from orgmcp.runs.testing import MemoryRuns
 
-from ._red import red
-
-pytestmark = red
-
 
 def test_one_object_is_the_writer_the_reader_and_the_registry(tmp_path: Path) -> None:
     memory = MemoryRuns(FakeClock(), tmp_path)
