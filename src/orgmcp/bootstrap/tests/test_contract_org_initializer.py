@@ -15,7 +15,6 @@ from orgmcp.kernel import OrgError
 
 from ._cases import CASES, DIRECTORIES, Case, expected
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-bootstrap", raises=NotImplementedError)
 
 
 def build(request: pytest.FixtureRequest, tmp_path: Path) -> InitHarness:

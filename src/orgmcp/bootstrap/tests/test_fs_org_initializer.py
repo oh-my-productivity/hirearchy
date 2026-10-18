@@ -14,7 +14,6 @@ from orgmcp.snapshots import IgnoreList, OrgSnapshotter
 from orgmcp.templates import DocumentTemplates
 from orgmcp.templates.testing import static_document_templates
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-bootstrap", raises=NotImplementedError)
 
 
 def test_an_existing_empty_directory_becomes_the_organization(tmp_path: Path) -> None:
@@ -132,7 +131,7 @@ def test_the_text_is_the_config_over_the_defaults_with_the_rules_of_the_mission(
     assert templates.missions == ["the mission"]
     front, _, body = text.partition("\n---\n")
     assert body == "RULES for the mission\n"  # one trailing newline, as every frontmatter file
-    assert "max_depth: 9\n" in front and "extra: x\n" in front and "max_hops: 40\n" in front
+    assert "max_depth: 9\n" in front and "extra: x" in front and "max_hops: 40\n" in front
 
 
 def test_an_existing_org_md_is_refused_before_anything_is_touched(tmp_path: Path) -> None:

@@ -19,10 +19,8 @@ from ..snapshots import OrgSnapshotter
 from ..snapshots.testing import MemoryIgnoreList
 from ..templates import DocumentTemplates
 from ..templates.testing import static_document_templates
-from ._initializer import FsOrgInitializer
+from ._initializer import FIRST_COMMIT, FsOrgInitializer
 from .api import INITIAL_IGNORE_LINES, OrgInitializer
-
-FIRST_COMMIT = "init organization"
 
 
 @dataclass
@@ -45,7 +43,16 @@ class MemoryOrgInitializer(OrgInitializer):
         self.organizations: dict[Path, MemoryOrganization] = {}
 
     def init(self, root: Path, mission: str | None = None, config: Mapping[str, object] | None = None) -> None:
-        raise NotImplementedError
+        if root in self.organizations:
+            raise OrgError(f"already an organization: {root}")
+        text = join_frontmatter({**DEFAULT_CONFIG, **(config or {})}, self._templates.org_rules(mission))
+        made = MemoryOrganization(
+            text, frozenset({*(f"{box}/" for box in BOXES), ".runtime/"}), "".join(f"{line}\n" for line in INITIAL_IGNORE_LINES),
+            repository=self._git_available,
+        )
+        if made.repository:
+            made.commits.append(FIRST_COMMIT)
+        self.organizations[root] = made
 
 
 @dataclass(frozen=True)

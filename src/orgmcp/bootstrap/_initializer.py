@@ -5,10 +5,13 @@ from __future__ import annotations
 from collections.abc import Mapping
 from pathlib import Path
 
-from ..settings import OrgDocumentStore
+from ..kernel import BOXES, OrgError, join_frontmatter
+from ..settings import DEFAULT_CONFIG, OrgDocumentStore
 from ..snapshots import IgnoreList, OrgSnapshotter
 from ..templates import DocumentTemplates
-from .api import OrgInitializer
+from .api import INITIAL_IGNORE_LINES, OrgInitializer
+
+FIRST_COMMIT = "init organization"
 
 
 class FsOrgInitializer(OrgInitializer):
@@ -22,4 +25,14 @@ class FsOrgInitializer(OrgInitializer):
         self._ignore_list = ignore_list
 
     def init(self, root: Path, mission: str | None = None, config: Mapping[str, object] | None = None) -> None:
-        raise NotImplementedError
+        if self._documents.exists():
+            raise OrgError(f"already an organization: {root}")
+        root.mkdir(parents=True, exist_ok=True)
+        cfg = {**DEFAULT_CONFIG, **(config or {})}
+        self._documents.write_raw(join_frontmatter(cfg, self._templates.org_rules(mission)))
+        for box in BOXES:
+            (root / box).mkdir(exist_ok=True)
+        (root / ".runtime").mkdir(exist_ok=True)
+        self._ignore_list.write_initial(INITIAL_IGNORE_LINES)
+        self._snapshotter.init_repository()
+        self._snapshotter.commit(FIRST_COMMIT)
