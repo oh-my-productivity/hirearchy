@@ -26,7 +26,7 @@ from textual.widgets import ContentSwitcher, DataTable, Footer, Input, Static, T
 
 from . import observe
 from .core import ROOT
-from .dashboard_data import (AgentDetail, DashData, HealthView, MsgRow, RequestRow, RunLog, Section, ServiceRow, Snapshot,
+from .dashboard_data import (AgentDetail, EventLine, DashData, HealthView, MsgRow, RequestRow, RunLog, Section, ServiceRow, Snapshot,
                              doc_text)
 from .observe import fmt_dur
 
@@ -60,6 +60,7 @@ GLOBAL
 3 SERVICES    one line per service; Enter opens its record, cases, playbook and contract
 4 EVENTS      the live merged event stream
   e             errors only    /   filter (words: agent, kind, trace, tool)    f   follow on / off
+  x             raw events: ids, process groups, budgets, arguments (also on the Org > Activity tab)
 5 HEALTH      observe now, health flags;  c  runs the consistency check (on demand)
 
 The dashboard is read-only: grants, start/stop and feedback stay with the assistant and the CLI.
@@ -78,16 +79,16 @@ def doc_renderable(doc: list[Section]) -> Text:
             out.append("\n")
         if s.title:
             out.append(s.title + "\n", style="bold underline")
-        for line in s.lines:
-            out.append(line + "\n")
+        for n, line in enumerate(s.lines):
+            out.append(line + "\n", style="red" if n in s.errors else "")
     return out
 
 
-def event_text(events: list[dict], width: int = 220) -> Text:
-    out = Text(no_wrap=True, overflow="ignore")
-    for ev in events:
-        line = observe.format_event(ev, width)
-        out.append(line + "\n", style="red" if observe.is_error(ev) else "")
+def event_text(lines: list[EventLine]) -> Text:
+    """The event lines; refusals and failures in red. Long lines wrap in the pane (nothing is cut)."""
+    out = Text()
+    for line in lines:
+        out.append(line.text + "\n", style="red" if line.error else "")
     return out
 
 
@@ -249,26 +250,65 @@ class AgentTree(Tree[str]):
             self.app.action_pane()  # type: ignore[attr-defined]
 
     @staticmethod
-    def label_for(snap: Snapshot, addr: str, collapsed: bool) -> Text:
+    def label_for(snap: Snapshot, addr: str, collapsed: bool, avail: int | None = None) -> Text:
+        """The label of a node. ``avail``: cells the label may take (the pane width less the guides); a state that is
+        longer is cut with an ellipsis in its main text - the mail count and the budget at the end always stay, the
+        whole state is in the Overview tab."""
         r = snap.agents[addr]
+        below = ""
+        if collapsed and (r.below_running or r.below_queued):  # what a folded node hides: "[2 running, 1 queued below]"
+            below = "  [" + ", ".join(f"{n} {w}" for n, w in ((r.below_running, "running"), (r.below_queued, "queued")) if n) + " below]"
         if addr == ROOT:
             t = Text.assemble(("★ ", "bold yellow"), ("root", "bold"), (" (you)", "dim"))
             if snap.needs_you:
                 t.append(f"  needs you: {len(snap.needs_you)}", style="bold yellow")
-            if collapsed and (r.below_running or r.below_queued):
-                t.append(f"  [{r.below_running} running, {r.below_queued} queued below]", style="dim")
+            if below:
+                t.append(below, style="dim")
             return t
         style = KIND_STYLE.get(r.kind, "")
-        t = Text.assemble((r.glyph + " ", style), (r.name, "bold"), ("  " + r.word, style))
-        if r.budget is not None:
-            t.append(f"  {r.budget} left", style="dim" if r.budget > 0 else "red")
-        if collapsed and (r.below_running or r.below_queued):
-            t.append(f"  [{r.below_running} running, {r.below_queued} queued below]", style="dim")
+        budget = f"  {r.budget} left" if r.budget is not None else ""
+        main = r.main or r.word
+        if avail is not None:
+            def room_for(tail: str, with_budget: bool = True) -> int:
+                return avail - (len(r.glyph) + 1 + len(r.name) + 2 + len(r.note) + (len(budget) if with_budget else 0) + len(tail))
+
+            short = r.short or main
+            # in order of preference: everything; the shorter wording; without the fold summary; without the budget; cut
+            for text, tail, with_budget in ((main, below, True), (short, below, True), (short, "", True), (short, "", False)):
+                if room_for(tail, with_budget) >= len(text):
+                    main, below = text, tail
+                    if not with_budget:
+                        budget = ""
+                    break
+            else:
+                main, below, budget = short, "", ""
+                room = room_for("", False)
+                main = main[: max(room - 1, 0)].rstrip() + "…" if room > 1 else "…"
+        t = Text.assemble((r.glyph + " ", style), (r.name, "bold"), ("  " + main + r.note, style))
+        if budget and r.budget is not None:
+            t.append(budget, style="dim" if r.budget > 0 else "red")
+        if below:
+            t.append(below, style="dim")
+        if avail:
+            t.truncate(avail, overflow="ellipsis")
         return t
+
+    def avail(self, addr: str) -> int | None:
+        """Cells a node's label may take: the content width less the guides (and the fold icon) of its depth."""
+        width = self.scrollable_content_region.width
+        if width <= 0 or self._snap is None or addr not in self._snap.agents:
+            return None
+        level = self._snap.agents[addr].depth
+        return max(12, width - level * self.guide_depth - 2)
+
+    def on_resize(self, event) -> None:
+        self._labels = {}  # widths changed: every label is made again
+        if self._snap is not None:
+            self.sync(self._snap)
 
     def _relabel(self, node) -> None:
         if self._snap is not None and node.data in self._snap.agents:
-            label = self.label_for(self._snap, node.data, collapsed=not node.is_expanded)
+            label = self.label_for(self._snap, node.data, collapsed=not node.is_expanded, avail=self.avail(node.data))
             self._labels[node.data] = label
             node.set_label(label)
 
@@ -285,7 +325,7 @@ class AgentTree(Tree[str]):
             self._rebuild(snap, order)
         for addr, node in self.nodes.items():
             if addr in snap.agents:
-                label = self.label_for(snap, addr, collapsed=not node.is_expanded)
+                label = self.label_for(snap, addr, collapsed=not node.is_expanded, avail=self.avail(addr))
                 if self._labels.get(addr) != label:  # unchanged labels are not touched: no redraw
                     self._labels[addr] = label
                     node.set_label(label)  # type: ignore[attr-defined]
@@ -305,7 +345,7 @@ class AgentTree(Tree[str]):
                 row = snap.agents[addr]
                 parent = self.nodes.get(row.parent or ROOT, self.root)
                 new = addr not in self._known
-                node = parent.add(self.label_for(snap, addr, False), data=addr, expand=(new or addr in expanded),  # type: ignore[attr-defined]
+                node = parent.add(self.label_for(snap, addr, False, self.avail(addr)), data=addr, expand=(new or addr in expanded),  # type: ignore[attr-defined]
                                   allow_expand=bool(row.children))
                 self.nodes[addr] = node
             self._known = set(order)
@@ -348,7 +388,7 @@ class StatusBar(Vertical):
         yield Static("", id="header-title", markup=False)
         yield Static("", id="header-counts", markup=False)
 
-    def show(self, snap: Snapshot | None, view: str, paused: bool, interval: float) -> None:
+    def show(self, snap: Snapshot | None, view: str, paused: bool, interval: float, error: str | None = None) -> None:
         title = Text.assemble(("orgmcp dash ", "bold"))
         if snap is not None:
             title.append(snap.org_name, style="bold cyan")
@@ -358,9 +398,11 @@ class StatusBar(Vertical):
             on_it = v == view
             title.append(f" {i} {VIEW_NAMES[v]} ", style="reverse bold" if on_it else "dim")
         if paused:
-            title.append("  PAUSED (p resumes)", style="bold black on yellow")
+            title.append("  refresh paused (p resumes)", style="bold black on yellow")
         else:
-            title.append(f"  every {interval:g}s", style="dim")
+            title.append(f"  refresh {interval:g}s", style="dim")
+        if error:
+            title.append("  refresh failed - see below", style="bold white on red")
         self._set("#header-title", title)
         counts = Text()
         if snap is None:
@@ -428,6 +470,7 @@ class Ctx:
     service_open: tuple[str, str] | None
     event_text: str
     event_errors: bool
+    raw: bool = False
 
 
 @dataclass
@@ -438,6 +481,7 @@ class Tick:
     services: list[ServiceRow] | None = None
     service_doc: list[Section] | None = None
     events: list[dict] | None = None
+    event_lines: list[EventLine] | None = None
     health: HealthView | None = None
     error: str | None = None
     ms: float = 0.0
@@ -465,6 +509,7 @@ class DashApp(App):
         Binding("e", "toggle_errors", "Errors only"),
         Binding("slash", "filter", "Filter", key_display="/"),
         Binding("f", "toggle_follow", "Follow"),
+        Binding("x", "toggle_raw", "Raw events"),
         Binding("c", "check", "Check"),
         Binding("h", "focus_tree", "Agents", show=False),
         Binding("left_square_bracket", "tab(-1)", "Tab", key_display="[", group=TAB_KEYS),
@@ -487,6 +532,7 @@ class DashApp(App):
         self.event_text = ""
         self.event_errors = False
         self.event_follow = True
+        self.raw_events = False  # x: events as the log has them (ids, pgids, budgets) instead of readable lines
         self._busy = False
         self._again = False
         self._timer = None
@@ -507,7 +553,7 @@ class DashApp(App):
                     with TabPane("Overview", id="tab-overview"):
                         yield TextPane(id="pane-overview")
                     with TabPane("Activity", id="tab-activity"):
-                        yield TextPane(id="pane-activity", sticky=True, wrap=False)
+                        yield TextPane(id="pane-activity", sticky=True)
                     with TabPane("Messages", id="tab-messages"):
                         yield Static("Enter opens a message", id="msg-hint", markup=False)
                         yield NavTable(id="pane-messages")
@@ -520,7 +566,7 @@ class DashApp(App):
             with Vertical(id="flows-view", classes="list-detail"):
                 yield NavTable(id="flows-table")
                 yield Static("", id="flows-title", classes="detail-title hidden", markup=False)
-                yield _hidden(TextPane(id="flows-detail", wrap=False))
+                yield _hidden(TextPane(id="flows-detail"))
             with Vertical(id="services-view", classes="list-detail"):
                 yield NavTable(id="services-table")
                 yield Static("", id="services-title", classes="detail-title hidden", markup=False)
@@ -529,7 +575,7 @@ class DashApp(App):
                 yield Input(placeholder="filter: words that must appear in agent / kind / trace / tool  (Enter keeps it, Esc clears)",
                             id="events-filter", classes="hidden")
                 yield Static("", id="events-bar", markup=False)
-                yield TextPane(id="events-body", sticky=True, wrap=False)
+                yield TextPane(id="events-body", sticky=True)
             with Vertical(id="health-view"):
                 yield TextPane(id="health-body")
         yield Static("", id="statusline", classes="hidden", markup=False)
@@ -548,7 +594,7 @@ class DashApp(App):
             self._again = True
             return
         self._busy = True
-        ctx = Ctx(self.view, self.selected, self.flow_open, self.service_open, self.event_text, self.event_errors)
+        ctx = Ctx(self.view, self.selected, self.flow_open, self.service_open, self.event_text, self.event_errors, self.raw_events)
         self.run_worker(lambda: self._compute(ctx), thread=True, group="tick", exit_on_error=False)
 
     def _compute(self, ctx: Ctx) -> None:
@@ -558,7 +604,7 @@ class DashApp(App):
             d = self.data
             snap = tick.snap = d.snapshot()
             if ctx.view == "org":
-                tick.detail = d.agent_detail(ctx.selected if ctx.selected in snap.agents else ROOT, snap)
+                tick.detail = d.agent_detail(ctx.selected if ctx.selected in snap.agents else ROOT, snap, raw=ctx.raw)
             elif ctx.view == "flows":
                 tick.requests = d.requests(snap)
             elif ctx.view == "services":
@@ -567,6 +613,7 @@ class DashApp(App):
                     tick.service_doc = d.service_detail(*ctx.service_open)
             elif ctx.view == "events":
                 tick.events = d.feed.matching(ctx.event_text, ctx.event_errors, limit=1500) if d.feed else []
+                tick.event_lines = d.event_lines(tick.events, actor=True, raw=ctx.raw)
             elif ctx.view == "health":
                 tick.health = d.health(snap)
         except Exception as exc:  # noqa: BLE001 - shown in the status line; the app keeps running
@@ -601,7 +648,7 @@ class DashApp(App):
             if tick.services is not None:
                 self._show_services(tick.services, tick.service_doc)
             if tick.events is not None:
-                self._show_events(tick.events)
+                self._show_events(tick.events, tick.event_lines or [])
             if tick.health is not None:
                 self._show_health(tick.health)
         except Exception as exc:  # noqa: BLE001 - a display bug must not stop the dashboard
@@ -618,9 +665,10 @@ class DashApp(App):
             line.remove_class("hidden")
         else:
             line.add_class("hidden")
+        self._show_header()
 
     def _show_header(self) -> None:
-        self.query_one("#header", StatusBar).show(self.snap, self.view, self.paused, self.interval)
+        self.query_one("#header", StatusBar).show(self.snap, self.view, self.paused, self.interval, self.last_error)
 
     async def settle(self, pilot=None) -> None:
         """Wait until no refresh is running and everything it produced is on the screen (for tests and scripts)."""
@@ -660,6 +708,12 @@ class DashApp(App):
         if self.view == "org":
             self.query_one("#agent-tree").focus()
 
+    def _active_tab(self) -> str:
+        try:
+            return (self.query_one("#agent-tabs", TabbedContent).active or "tab-overview").removeprefix("tab-")
+        except Exception:  # noqa: BLE001
+            return "overview"
+
     def action_tab(self, step: int) -> None:
         if self.view != "org":
             return
@@ -677,6 +731,7 @@ class DashApp(App):
     @on(TabbedContent.TabActivated, "#agent-tabs")
     def _tab_activated(self, event: TabbedContent.TabActivated) -> None:
         self._show_tab(event.pane.id or "")
+        self.refresh_bindings()
 
     def _show_tab(self, tab_id: str) -> None:
         """Fill the visible tab only (the others are filled when they are opened)."""
@@ -690,9 +745,13 @@ class DashApp(App):
             self.query_one("#pane-overview", TextPane).set_content(text, key=text.plain, subject=subject)
         elif name == "activity":
             last = d.events[-1].get("seq") if d.events else None
+            hint = "raw events (x: readable)" if self.raw_events else "x: raw events (ids, budgets, arguments)"
+            body = Text(hint + "\n", style="dim")
+            if d.events:
+                body.append_text(event_text(d.activity))
             self.query_one("#pane-activity", TextPane).set_content(
-                event_text(d.events) if d.events else Text("(no events for this agent yet)", style="dim"),
-                key=(len(d.events), last, d.events[-1].get("ts") if d.events else None), subject=subject)
+                body if d.events else Text("(no events for this agent yet)", style="dim"),
+                key=(len(d.events), last, d.events[-1].get("ts") if d.events else None, self.raw_events), subject=subject)
         elif name == "messages":
             self._show_messages(d)
         elif name == "runlog":
@@ -802,7 +861,7 @@ class DashApp(App):
         if self.flow_open != rid:
             return
         pane = self.query_one("#flows-detail", TextPane)
-        pane.set_content(Text(body, no_wrap=True, overflow="ignore"), key=None, subject=rid)
+        pane.set_content(Text(body), key=None, subject=rid)
 
     # ---------------------------------------------------------------- services
     def _show_services(self, rows: list[ServiceRow], doc: list[Section] | None) -> None:
@@ -841,19 +900,20 @@ class DashApp(App):
         self.request_refresh()
 
     # ---------------------------------------------------------------- events
-    def _show_events(self, events: list[dict]) -> None:
+    def _show_events(self, events: list[dict], lines: list[EventLine]) -> None:
         pane = self.query_one("#events-body", TextPane)
         last = events[-1] if events else None
         key = (len(events), last.get("seq") if last else None, last.get("ts") if last else None, last.get("pid") if last else None,
-               self.event_text, self.event_errors)
-        pane.set_content(event_text(events) if events else Text("(no matching events)", style="dim"), key=key,
+               self.event_text, self.event_errors, self.raw_events)
+        pane.set_content(event_text(lines) if events else Text("(no matching events)", style="dim"), key=key,
                          subject=(self.event_text, self.event_errors), follow=self.event_follow)
         total = len(self.data.feed.events) if self.data.feed else 0
         bits = [f"{len(events)} of {total} event(s) in memory", "errors only" if self.event_errors else "all kinds",
-                f"filter: {self.event_text!r}" if self.event_text else "no filter", "following" if self.event_follow else "not following"]
+                f"filter: {self.event_text!r}" if self.event_text else "no filter", "following" if self.event_follow else "not following",
+                "raw" if self.raw_events else "readable"]
         if self.data.feed is not None and not self.data.feed.any:
             bits.append("this organization has no event files yet")
-        self.query_one("#events-bar", Static).update(Text("  ·  ".join(bits) + "      e errors · / filter · f follow", style="dim"))
+        self.query_one("#events-bar", Static).update(Text("  ·  ".join(bits) + "      e errors · / filter · f follow · x raw", style="dim"))
 
     def action_toggle_errors(self) -> None:
         self.event_errors = not self.event_errors
@@ -863,6 +923,11 @@ class DashApp(App):
         box = self.query_one("#events-filter", Input)
         box.remove_class("hidden")
         box.focus()
+
+    def action_toggle_raw(self) -> None:
+        """Events as the log has them (ids, process groups, budgets before/after, arguments) or as readable lines."""
+        self.raw_events = not self.raw_events
+        self.request_refresh()
 
     def action_toggle_follow(self) -> None:
         self.event_follow = not self.event_follow
@@ -891,6 +956,7 @@ class DashApp(App):
             for addr, flags in h.flagged:
                 out.append(f"{addr}\n", style="bold")
                 for flag, why in flags:
+                    why = why.removeprefix(flag.replace("_", " ") + ": ")  # "!paused: paused: ..." says it once
                     out.append(f"   !{flag}: {why}\n", style="yellow")
         else:
             out.append("no agent is flagged\n")
@@ -926,6 +992,7 @@ class DashApp(App):
                  "events": "#events-body", "health": "#health-body"}[name]
         self.query_one(focus).focus()
         self._show_header()
+        self.refresh_bindings()
         self.request_refresh()
 
     def action_refresh(self) -> None:
@@ -977,6 +1044,8 @@ class DashApp(App):
             return False
         if action in ("toggle_errors", "filter", "toggle_follow"):
             return self.view == "events" and not modal
+        if action == "toggle_raw":
+            return not modal and (self.view == "events" or (self.view == "org" and self._active_tab() == "activity"))
         if action == "check":
             return self.view == "health" and not modal
         if action in ("tab", "focus_tree"):

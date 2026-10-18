@@ -31,7 +31,7 @@ from typing import Callable
 
 from . import core, observe, progress as prog, services
 from .core import BOXES, DEFAULT_CONFIG, ROOT, Message, Org, OrgError, _visible, latest_results, split_frontmatter
-from .dashboard_events import EventLine, event_lines
+from .dashboard_events import EventLine, describe, event_lines
 from .health import _aware, _stamp, config_number, org_health
 from .observe import fmt_dur
 from .scheduler import EXIT_FILE, SchedulerState, scheduler_state
@@ -277,6 +277,7 @@ class AgentState:
     main: str
     note: str = ""
     reason: str = ""  # why mail waits (running: for the next run; queued: why it does not run yet)
+    short: str = ""  # ``main`` in fewer characters, for a narrow tree (empty: no shorter form)
 
     @property
     def word(self) -> str:
@@ -319,12 +320,12 @@ def classify(*, running: bool, unread: int, paused: str | None, budget: int, ope
         return AgentState("budget", "out of budget", f", {unread} unread" if unread else "")
     if unread:
         if not scheduler_up:
-            reason = "scheduler is not running"
+            reason, short = "scheduler is not running", "scheduler off"
         elif free_slots <= 0:
-            reason = f"max_parallel ({max_parallel}) runs are busy"
+            reason, short = f"max_parallel ({max_parallel}) runs are busy", "all slots busy"
         else:
-            reason = "ready: starts on the next tick"  # the wording of observe.now_view
-        return AgentState("queued", f"queued: {reason.removeprefix('ready: ')}", f", {unread} unread", reason)
+            reason, short = "ready: starts on the next tick", "next tick"  # the reason has the wording of observe.now_view
+        return AgentState("queued", f"queued: {reason.removeprefix('ready: ')}", f", {unread} unread", reason, f"queued: {short}")
     if delegated:
         return AgentState("waiting", f"waiting on {delegated} report(s)")
     if open_tasks:
@@ -373,6 +374,7 @@ class AgentRow:
     reason: str = ""  # why it is queued (see observe.now_view)
     queued_behind: int = 0  # running agent: mail waiting for the next run
     main: str = ""  # ``word`` without the trailing ", N unread" note
+    short: str = ""  # ``main`` in fewer characters (the tree uses it when the pane is narrow)
     note: str = ""
     children: list[str] = field(default_factory=list)
     below_running: int = 0
@@ -601,7 +603,8 @@ class EventFeed:
                 continue
             if words:
                 hay = " ".join(str(x) for x in (ev.get("kind"), ev.get("actor"), ev.get("agent"), ev.get("from"), ev.get("to"),
-                                                ev.get("trace"), ev.get("run"), ev.get("tool"), *(ev.get("traces") or ()))
+                                                ev.get("trace"), ev.get("run"), ev.get("tool"), *(ev.get("traces") or ()),
+                                                describe(ev))  # what the readable line says: 'refused', a title, ...
                                if x not in (None, "")).lower()
                 if not all(w in hay for w in words):
                     continue
@@ -736,7 +739,7 @@ class DashData:
             addr=a, name=a.rsplit("/", 1)[-1], depth=org.depth(a), parent=org.parent(a), role=role, model=model, kind=kind,
             glyph=GLYPHS[kind], word=word, budget=budget, unread=unread, open_tasks=open_n, delegated=out_n,
             runs_used=org.runs_used(a), paused=paused, elapsed_s=elapsed, reason=reason, queued_behind=behind,
-            services=org.service_names(a), main=st.main, note=st.note,
+            services=org.service_names(a), main=st.main, note=st.note, short=st.short,
         )
 
     def _elapsed(self, a: str, rec: dict | None, now: datetime) -> float | None:
@@ -895,7 +898,7 @@ class DashData:
         lines = []
         for t in out:
             target = snap.row(t.to)
-            lines.append(f'"{t.title}" -> {t.to}  [{target.word if target else "gone"}]  budget {t.budget}  ({t.id})')
+            lines.append(f'"{t.title}" -> {t.to}  [{target.word if target else "gone"}]  budget {t.budget}')
         doc.append(Section(f"Delegated, outstanding ({len(out)})", lines or ["none"]))
         recent = event_lines(events[-8:], me=addr, lookup=self.message_lookup)
         doc.append(Section("Latest activity", [x.text for x in recent] or ["(no events for this agent)"],
@@ -905,7 +908,7 @@ class DashData:
     def _task_lines(self, tasks: list[Message]) -> list[str]:
         lines: list[str] = []
         for t in tasks:
-            lines.append(f'"{t.title}"  from {t.sender}  budget {t.budget}  ({t.id})')
+            lines.append(f'"{t.title}"  from {t.sender}  budget {t.budget}')
             crit = prog._section(t.body, "acceptance criteria")
             for c in crit[:6]:
                 lines.append(f"    · {observe._clip(c.lstrip('-* '), 110)}")
@@ -915,9 +918,8 @@ class DashData:
 
     def _current_run(self, addr: str, row: AgentRow) -> list[str]:
         org = self.org
-        rec = observe._running_ledger(org).get(addr) or {}
         batch = org.messages(addr, "inflight")
-        lines = [f"elapsed {fmt_dur((row.elapsed_s or 0) * 1000)}" + (f"  (run {addr}@{Path(str(rec['log'])).stem})" if rec.get("log") else "")]
+        lines = [f"elapsed {fmt_dur((row.elapsed_s or 0) * 1000)}"]
         lines.append(f"batch of {len(batch)} message(s):")
         for m in batch:
             lines.append(f'  {m.type} "{m.title or m.id}" from {m.sender}' + (f"  [{m.status}]" if m.status else ""))
@@ -1267,4 +1269,4 @@ def render_once(data: DashData, width: int = 110) -> str:
         out.append("  none")
     if snap.bad_files:
         out += ["", f"UNREADABLE FILES ({len(snap.bad_files)})"] + [f"  {p}: {w}" for p, w in list(snap.bad_files.items())[:5]]
-    return "\n".join(line[: width + 40] for line in out)
+    return "\n".join(out)  # whole lines: this output is read by people and scripts, never cut
