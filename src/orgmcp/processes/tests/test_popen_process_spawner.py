@@ -14,8 +14,6 @@ from orgmcp.processes._spawn import PopenProcessSpawner
 
 from ._support import env
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-processes")
-
 
 class Spawned:
     """A spawner whose children are all killed (their own groups only) when the test ends."""

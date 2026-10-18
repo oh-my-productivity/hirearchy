@@ -13,8 +13,6 @@ from orgmcp.kernel.testing import DictEnvironment
 from orgmcp.processes import ProcessInfo, ProcessInspector, ProcessTableError
 from orgmcp.processes._inspect import PsProcessInspector
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-processes")
-
 CALLS: list[dict[str, Any]] = []
 
 

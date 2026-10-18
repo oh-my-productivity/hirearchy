@@ -8,8 +8,6 @@ from orgmcp.processes import OrphanJudge, ProcessInfo, ProcessTableError
 from orgmcp.processes._judge import PsOrphanJudge
 from orgmcp.processes.testing import FakeProcessTable
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-processes")
-
 STARTED = "Sun Oct 18 10:00:00 2026"
 PID = 5000
 

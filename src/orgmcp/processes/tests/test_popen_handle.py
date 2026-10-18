@@ -13,8 +13,6 @@ import pytest
 from orgmcp.processes import ProcessHandle
 from orgmcp.processes._spawn import PopenHandle
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-processes")
-
 PID = 4_242_424  # never signalled: os.killpg is replaced in every test that signals
 
 

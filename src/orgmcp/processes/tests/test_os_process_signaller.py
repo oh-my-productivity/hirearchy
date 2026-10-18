@@ -13,8 +13,6 @@ from orgmcp.processes import ProcessDenied, ProcessGone, ProcessSignaller
 from orgmcp.processes._signal import OsProcessSignaller
 from orgmcp.processes.testing import FakeProcessTable
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-processes")
-
 OWN_PID, OWN_PGID = 4000, 3990
 LEADER = 5000
 

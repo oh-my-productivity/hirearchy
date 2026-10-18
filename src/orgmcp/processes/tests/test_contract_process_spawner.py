@@ -11,10 +11,10 @@ import pytest
 from orgmcp.processes import ProcessSpawner
 from orgmcp.processes.testing import IMPLEMENTATIONS, ProcessWorld
 
-from ._support import implementations, env, make_world
+from ._support import env, make_world
 
 
-@pytest.fixture(params=implementations(ProcessSpawner, IMPLEMENTATIONS[ProcessSpawner]))
+@pytest.fixture(params=IMPLEMENTATIONS[ProcessSpawner], ids=lambda factory: factory.__name__)
 def world(request: pytest.FixtureRequest, tmp_path: Path) -> Iterator[ProcessWorld]:
     yield from make_world(request, tmp_path)
 

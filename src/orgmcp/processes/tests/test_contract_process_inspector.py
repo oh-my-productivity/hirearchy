@@ -11,10 +11,10 @@ import pytest
 from orgmcp.processes import ProcessInfo, ProcessInspector, ProcessTableError
 from orgmcp.processes.testing import IMPLEMENTATIONS, ProcessWorld
 
-from ._support import implementations, eventually, make_world
+from ._support import eventually, make_world
 
 
-@pytest.fixture(params=implementations(ProcessInspector, IMPLEMENTATIONS[ProcessInspector]))
+@pytest.fixture(params=IMPLEMENTATIONS[ProcessInspector], ids=lambda factory: factory.__name__)
 def world(request: pytest.FixtureRequest, tmp_path: Path) -> Iterator[ProcessWorld]:
     yield from make_world(request, tmp_path)
 

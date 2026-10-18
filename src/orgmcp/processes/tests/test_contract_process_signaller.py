@@ -15,10 +15,10 @@ import pytest
 from orgmcp.processes import ProcessGone, ProcessSignaller
 from orgmcp.processes.testing import IMPLEMENTATIONS, ProcessWorld
 
-from ._support import implementations, eventually, make_world
+from ._support import eventually, make_world
 
 
-@pytest.fixture(params=implementations(ProcessSignaller, IMPLEMENTATIONS[ProcessSignaller]))
+@pytest.fixture(params=IMPLEMENTATIONS[ProcessSignaller], ids=lambda factory: factory.__name__)
 def world(request: pytest.FixtureRequest, tmp_path: Path) -> Iterator[ProcessWorld]:
     yield from make_world(request, tmp_path)
 

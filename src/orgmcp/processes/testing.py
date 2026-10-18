@@ -9,15 +9,21 @@ from __future__ import annotations
 
 import copy
 import itertools
+import os
 import signal
 import subprocess
+import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
 from orgmcp.kernel import Clock
-from orgmcp.kernel.testing import FakeClock
+from orgmcp.kernel.testing import DictEnvironment, FakeClock, os_environment, system_clock
 
+from ._inspect import PsProcessInspector
+from ._judge import PsOrphanJudge
+from ._signal import OsProcessSignaller
+from ._spawn import PopenProcessSpawner
 from .api import (
     OrphanJudge,
     ProcessDenied,
@@ -172,7 +178,7 @@ class FakeProcessTable(ProcessSpawner, ProcessInspector, ProcessSignaller):
             pid, group, group if sid is None else sid, state, started or self._lstart(), command,
             running=not state.startswith("Z"), code=None if not state.startswith("Z") else 0,
             denied=denied, ignores_term=ignores_term, survives_kill=survives_kill,
-        )  # fmt: skip
+        )
         return pid
 
     def add_member(self, group: int) -> int:
@@ -396,15 +402,112 @@ class ProcessWorld:
     close: Callable[[], None]  # kills what the world started (only that)
 
 
-class _RedJudge(OrphanJudge):
-    """Stands in for ``PsOrphanJudge`` until it is written (red: A-processes)."""
+class _TrackingSpawner(PopenProcessSpawner):
+    """The real spawner that remembers every process it started, so that the world can kill those and only those."""
 
-    def judge(self, record: Mapping[str, object]) -> str:
-        raise NotImplementedError("red: PsOrphanJudge is not written yet")
+    def __init__(self) -> None:
+        self.started: list[ProcessHandle] = []
+
+    def spawn(
+        self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], stdin: object | None, stdout: object | None
+    ) -> ProcessHandle:
+        handle = super().spawn(argv, cwd=cwd, env=env, stdin=stdin, stdout=stdout)
+        self.started.append(handle)
+        return handle
+
+    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> ProcessHandle:
+        handle = super().spawn_detached(argv, cwd=cwd, env=env, log=log)
+        self.started.append(handle)
+        return handle
+
+
+def _wait_for(condition: Callable[[], bool], what: str, timeout: float = 10.0) -> None:
+    deadline = time.monotonic() + timeout
+    while not condition():
+        if time.monotonic() > deadline:
+            raise TimeoutError(f"gave up waiting for {what}")
+        time.sleep(0.01)
 
 
 def real_world(tmp_path: Path) -> ProcessWorld:
-    raise NotImplementedError("red: the real implementations are not written yet")
+    """Real processes. They are all started by this world, and ``close`` signals those and nothing else."""
+    environment = os_environment(tmp_path).env
+    inspector = PsProcessInspector(environment)
+    blind = PsProcessInspector(DictEnvironment({"PATH": str(tmp_path / "no-ps-here")}))  # ``ps`` is not found
+    spawner = _TrackingSpawner()
+    own: list[subprocess.Popen[bytes]] = []  # children that are not run through the spawner
+    grandchildren: list[tuple[int, int]] = []  # (pid of the leader we started, pid of a process it started)
+    counter = itertools.count()
+
+    def env() -> dict[str, str]:
+        return dict(os.environ)
+
+    def spawn(*argv: str) -> ProcessHandle:
+        return spawner.spawn(list(argv), cwd=tmp_path, env=env(), stdin=None, stdout=None)
+
+    def leader() -> ProcessHandle:
+        return spawn("sleep", "60")
+
+    def group() -> tuple[ProcessHandle, int]:
+        pidfile = tmp_path / f"grandchild-{next(counter)}.pid"
+        handle = spawn("sh", "-c", f"sleep 60 & echo $! > '{pidfile}'; wait")
+        _wait_for(lambda: pidfile.is_file() and pidfile.read_text().endswith("\n"), "the grandchild to start")
+        grandchild = int(pidfile.read_text())
+        grandchildren.append((handle.pid, grandchild))
+        return handle, grandchild
+
+    def term_proof() -> ProcessHandle:
+        ready = tmp_path / f"ready-{next(counter)}"
+        handle = spawn("sh", "-c", f"trap '' TERM; touch '{ready}'; while :; do sleep 1; done")
+        _wait_for(ready.is_file, "the shell to ignore SIGTERM")
+        return handle
+
+    def exiting(code: int) -> ProcessHandle:
+        return spawn("sh", "-c", f"exit {code}")
+
+    def echo(text: str, log: Path) -> ProcessHandle:
+        handle = spawner.spawn_detached(["sh", "-c", 'printf %s "$0"', text], cwd=tmp_path, env=env(), log=log)
+        return handle
+
+    def bystander() -> int:
+        proc = subprocess.Popen(["sleep", "60"])  # same session and group as the test run itself
+        own.append(proc)
+        return proc.pid
+
+    def zombie() -> int:
+        proc = subprocess.Popen(["true"], start_new_session=True)  # reaped by ``close``, not before
+        own.append(proc)
+        _wait_for(lambda: (info := inspector.info(proc.pid)) is not None and info.state.startswith("Z"), "the child to exit")
+        return proc.pid
+
+    def gone() -> int:
+        proc = subprocess.Popen(["true"], start_new_session=True)
+        proc.wait()
+        return proc.pid
+
+    def close() -> None:
+        for handle in spawner.started:
+            if handle.poll() is None:  # not yet reaped, so the pid is still ours
+                handle.signal_group(signal.SIGKILL)
+        for leader_pid, member in grandchildren:
+            try:  # the leader may be reaped: only a member that is still in the leader's group is signalled
+                if os.getpgid(member) == leader_pid:
+                    os.kill(member, signal.SIGKILL)
+            except OSError:
+                pass
+        for handle in spawner.started:
+            handle.wait(timeout=10)
+        for proc in own:
+            if proc.poll() is None:
+                proc.kill()
+            proc.wait()
+
+    return ProcessWorld(
+        spawner=spawner, inspector=inspector, signaller=OsProcessSignaller(inspector, system_clock(tmp_path)),
+        judge=PsOrphanJudge(inspector), blind_inspector=blind, blind_judge=PsOrphanJudge(blind), directory=tmp_path,
+        start_leader=leader, start_group=group, start_term_proof=term_proof, start_exiting=exiting, start_echo=echo,
+        start_bystander=bystander, start_zombie=zombie, gone_pid=gone, close=close,
+    )
 
 
 def fake_world(tmp_path: Path) -> ProcessWorld:
@@ -443,10 +546,10 @@ def fake_world(tmp_path: Path) -> ProcessWorld:
         return table._new_pid()
 
     return ProcessWorld(
-        spawner=table, inspector=table, signaller=table, judge=_RedJudge(), blind_inspector=blind, blind_judge=_RedJudge(),
+        spawner=table, inspector=table, signaller=table, judge=PsOrphanJudge(table), blind_inspector=blind, blind_judge=PsOrphanJudge(blind),
         directory=tmp_path, start_leader=leader, start_group=group, start_term_proof=term_proof, start_exiting=exiting,
         start_echo=echo, start_bystander=bystander, start_zombie=zombie, gone_pid=gone, close=lambda: None,
-    )  # fmt: skip
+    )
 
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
