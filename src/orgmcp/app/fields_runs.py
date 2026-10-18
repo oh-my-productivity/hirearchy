@@ -4,10 +4,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-STEP: str | None = None  # set to the step's name when the step fills this part (see test_runtime_fields)
-NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
+from ..runs import RunLogReader, RunLogWriter, RunRegistry
+
+STEP: str | None = "A-runs"  # the step that filled this part (see test_runtime_fields)
+NOT_A_FIELD: dict[str, str] = {
+    "RunLogSink": "a value that RunLogWriter.open_sink returns for each log, not a port that is built once",
+}
 
 
 @dataclass(frozen=True)
 class Fields:
-    """No field yet: the step that gives the package its ports adds them here."""
+    run_log_writer: RunLogWriter
+    run_log_reader: RunLogReader
+    run_registry: RunRegistry

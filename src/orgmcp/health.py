@@ -17,7 +17,6 @@ Thresholds come from ``HEALTH_DEFAULTS`` overridden by the ``health:`` mapping i
 
 from __future__ import annotations
 
-import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 
@@ -167,9 +166,11 @@ def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict 
     unread, running, paused = org.unread(a), org.running(a), org.paused(a)
     budget_left, runs_used = org.budget(a), org.runs_used(a)
 
-    windows = _run_windows(org, a)
+    log_reader = org.runtime.run_log_reader
+    windows = log_reader.windows(a)
     sent_at = [t for t in map(_msg_time, sent) if t]
-    failed, runtime_only = _run_outcomes(org, a)
+    outcomes = log_reader.outcomes(a)
+    failed, runtime_only = outcomes.failed, outcomes.runtime_only
     excluded = failed | runtime_only  # run starts that say nothing about the agent's own efficiency
     judged = sum(1 for start, _ in windows if start not in excluded)
     candidates = windows[:-1] if running else windows  # a run in progress is not (yet) empty
@@ -291,54 +292,6 @@ _aware = aware
 _parse_time = parse_time
 _stamp = stamp_of
 _msg_time = msg_time
-
-
-def _run_windows(org: Org, addr: str) -> list[tuple[datetime, datetime]]:
-    """(start, end) of every run, oldest first: start = log file name, end = log mtime."""
-    d = org.dir(addr) / "runs"
-    out = []
-    for p in sorted(d.glob("*.log")) if d.is_dir() else []:
-        start = None if p.name.startswith(".") else _stamp(p.stem)
-        if start:
-            out.append((start, max(start, datetime.fromtimestamp(p.stat().st_mtime, timezone.utc))))
-    return out
-
-
-_EXIT_RE = re.compile(r"^# exit (-?\d+) after", re.MULTILINE)
-_FAILED_MARKS = ("# failed to start", "# killed after", "# interrupted by scheduler shutdown")
-_SENDERS_RE = re.compile(r"^# senders: (.*)$", re.MULTILINE)
-
-
-def _run_outcomes(org: Org, addr: str) -> tuple[set[datetime], set[datetime]]:
-    """Starts of the runs that failed, and of the runs whose whole batch came from the runtime.
-
-    Both facts are written into the run log by the scheduler: the ``# senders:`` header, and a closing
-    ``# exit <code>`` / ``# failed to start`` / ``# killed`` / ``# interrupted`` line. Only the first and last
-    few KB of a log are read. Logs without those lines (older runs, hand-made logs) count as ordinary runs.
-    """
-    d = org.dir(addr) / "runs"
-    failed: set[datetime] = set()
-    runtime_only: set[datetime] = set()
-    for p in sorted(d.glob("*.log")) if d.is_dir() else []:
-        start = None if p.name.startswith(".") else _stamp(p.stem)
-        if start is None:
-            continue
-        try:
-            with open(p, "rb") as f:
-                head = f.read(4096).decode("utf-8", "replace")
-                size = f.seek(0, 2)
-                f.seek(max(0, size - 2048))
-                tail = f.read().decode("utf-8", "replace")
-        except OSError:
-            continue
-        exits = _EXIT_RE.findall(tail)
-        if (exits and exits[-1] != "0") or any(f"\n{mark}" in "\n" + tail for mark in _FAILED_MARKS):
-            failed.add(start)
-        header = head.split("# ---- prompt ----", 1)[0]
-        senders = _SENDERS_RE.search(header)
-        if senders and {x.strip() for x in senders.group(1).split(",") if x.strip()} == {"runtime"}:
-            runtime_only.add(start)
-    return failed, runtime_only
 
 
 def _since_hired(org: Org, addr: str, now: datetime) -> float:
