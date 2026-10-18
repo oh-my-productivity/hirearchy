@@ -32,8 +32,8 @@ STEP = {
 # (``STEP = "<step>"`` and ``NOT_A_FIELD = {port: why}`` of ``app/fields_<pkg>.py``), so that no two steps edit the same line.
 DONE = _parts.done_steps()
 NOT_A_FIELD = _parts.not_a_field()
-# kernel ports whose real implementation another step writes (kernel/tests: contract_debt.PENDING)
-ELSEWHERE = {"EventSink": "A-telemetry", "TraceTap": "A-telemetry"}
+# kernel ports whose real implementation another step writes (kernel/tests: contract_debt.PENDING), and the ports of 3.33 that A-skill (not A-bootstrap) adds
+ELSEWHERE = {"EventSink": "A-telemetry", "TraceTap": "A-telemetry", "SkillSource": "A-skill", "SkillStore": "A-skill", "SkillInstaller": "A-skill"}
 
 
 def protocols() -> list[tuple[str, str]]:
