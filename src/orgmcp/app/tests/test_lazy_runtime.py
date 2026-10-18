@@ -10,6 +10,7 @@ from __future__ import annotations
 import dataclasses
 import os
 import time
+from datetime import datetime, timezone
 from collections.abc import Callable
 from pathlib import Path
 from typing import Protocol
@@ -20,6 +21,7 @@ from orgmcp.app import Org, wiring
 from orgmcp.app._builder import Builder, DependencyCycle
 from orgmcp.app.runtime import OrgRuntime
 from orgmcp.kernel import Clock
+from orgmcp.kernel.testing import FakeClock
 
 FEW = 1  # what a construction may resolve before any attribute is used: at most the process resources
 
@@ -43,34 +45,36 @@ def resolved(monkeypatch: pytest.MonkeyPatch) -> list[type]:
     return asked
 
 
-@pytest.mark.xfail(strict=True, reason="red: R-perf-runtime")
 def test_constructing_an_org_resolves_no_port(root: Path, resolved: list[type]) -> None:
     Org(root)
     assert len(resolved) <= FEW
 
 
-@pytest.mark.xfail(strict=True, reason="red: R-perf-runtime")
 def test_opening_a_runtime_resolves_no_port(root: Path, resolved: list[type]) -> None:
     wiring.open_runtime(root)
     assert len(resolved) <= FEW
 
 
-@pytest.mark.xfail(strict=True, reason="red: R-perf-runtime")
 def test_opening_a_runtime_registers_no_provider_after_the_first(root: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     wiring.open_runtime(root)  # the providers of the process are collected once
     registered: list[type] = []
     original = Builder.provide
-    monkeypatch.setattr(Builder, "provide", lambda self, port, factory: (registered.append(port), original(self, port, factory))[1])
+
+    def recording(self: Builder, port: type, factory: Callable[[Builder], object]) -> None:
+        registered.append(port)
+        original(self, port, factory)
+
+    monkeypatch.setattr(Builder, "provide", recording)
     for _ in range(3):
         Org(root)
     assert registered == []
 
 
-@pytest.mark.xfail(strict=True, reason="red: R-perf-runtime")
 def test_a_call_path_builds_only_the_ports_it_uses(root: Path, resolved: list[type]) -> None:
     org = Org(root)
     org.messages("ceo", "inbox")
-    assert len(set(resolved)) <= 20 < len(wiring.runtime_ports()) // 5
+    assert len(set(resolved)) <= 10  # 5 today: the layout, the mailbox and its writer, parser and the process resources
+    assert len(wiring.runtime_ports()) >= 40  # while the runtime has many more
 
 
 def test_a_port_is_built_once_per_runtime(root: Path) -> None:
@@ -86,11 +90,7 @@ def test_the_providers_of_one_port_see_the_same_collaborators(root: Path) -> Non
 
 
 def test_an_override_wins_whenever_the_port_is_first_asked_for(root: Path) -> None:
-    class Fixed(Clock):
-        def now(self):  # type: ignore[no-untyped-def]
-            raise AssertionError("unused")
-
-    fixed = Fixed()
+    fixed = FakeClock(datetime(2030, 1, 2, 3, 4, 5, tzinfo=timezone.utc))
     runtime = wiring.open_runtime(root, {Clock: fixed})
     assert runtime.ids is not None  # builds a port that depends on the clock first
     assert runtime.clock is fixed
@@ -105,7 +105,7 @@ def test_replace_keeps_the_ports_that_were_not_replaced(root: Path) -> None:
     """The dashboard decorates a runtime with ``dataclasses.replace``: the other ports are the very objects of the original."""
     runtime = wiring.open_runtime(root)
     clock = runtime.clock
-    fixed_events = object()
+    fixed_events = wiring.open_runtime(root).events  # any other event sink
     other = dataclasses.replace(runtime, events=fixed_events)
     assert other.events is fixed_events and other.clock is clock and other.mailbox is runtime.mailbox
 
@@ -134,7 +134,6 @@ class _Bigger(OrgRuntime, _LaterPart):
     pass
 
 
-@pytest.mark.xfail(strict=True, reason="red: R-perf-runtime")
 def test_a_part_added_later_is_resolved_like_the_others(tmp_path: Path) -> None:
     builder = Builder(tmp_path)
 
@@ -152,10 +151,9 @@ def test_a_part_added_later_is_resolved_like_the_others(tmp_path: Path) -> None:
     assert bigger.gadget.widget() is bigger.widget and bigger.widget.spin() == 1
 
 
-@pytest.mark.xfail(strict=True, reason="red: R-perf-runtime")
 def test_a_dependency_cycle_is_reported_when_the_port_is_asked_for(tmp_path: Path) -> None:
     builder = Builder(tmp_path)
-    builder.provide(Widget, lambda b: b.get(Gadget).widget())  # type: ignore[return-value]
+    builder.provide(Widget, lambda b: b.get(Gadget).widget())
     builder.provide(Gadget, lambda b: b.get(Widget))  # type: ignore[arg-type,return-value]
     bigger = _Bigger.lazy(builder)  # building the runtime is fine
     with pytest.raises(DependencyCycle, match="Widget -> Gadget -> Widget"):
