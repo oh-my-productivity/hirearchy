@@ -14,7 +14,6 @@ from orgmcp.mail.testing import IMPLEMENTATIONS, ParserHarness
 from ._support import make_parser, message_text, mid, raises_a_parse_error
 
 
-
 FILE = message_text(mid(1), title="Title: with colon", budget=3, body="line1\nline2")
 
 

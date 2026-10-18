@@ -9,7 +9,6 @@ import ast
 from pathlib import Path
 
 
-
 ORGMCP = Path(__file__).resolve().parents[2]
 OWN = "orgmcp.mail"
 

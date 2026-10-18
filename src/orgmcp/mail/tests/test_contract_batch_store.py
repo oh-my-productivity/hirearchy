@@ -9,12 +9,10 @@ import pytest
 from orgmcp.mail import BatchStore
 from orgmcp.mail.testing import IMPLEMENTATIONS, MailHarness
 
-from ._support import BAD_YAML, agents, make, message_text, mid, put, still_red, where
+from ._support import BAD_YAML, agents, make, message_text, mid, put, where
 
 
-
-
-@pytest.fixture(params=still_red(IMPLEMENTATIONS[BatchStore]), ids=lambda factory: factory.__name__)
+@pytest.fixture(params=IMPLEMENTATIONS[BatchStore], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> MailHarness:
     made = make(request, tmp_path)
     assert isinstance(made.batches, BatchStore)

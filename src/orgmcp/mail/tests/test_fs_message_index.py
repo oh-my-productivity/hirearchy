@@ -16,8 +16,6 @@ from orgmcp.mail._index import FsMessageIndex, StampCachedMetaReader
 from ._support import message_text, mid
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-mail")
-
 BAD_ENCODING = b"\xff\xfe not text"
 
 

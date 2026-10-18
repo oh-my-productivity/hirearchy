@@ -10,12 +10,10 @@ from orgmcp.kernel import Message
 from orgmcp.mail import TaskQuery
 from orgmcp.mail.testing import IMPLEMENTATIONS, MailHarness
 
-from ._support import agents, make, mid, put, still_red
+from ._support import agents, make, mid, put
 
 
-
-
-@pytest.fixture(params=still_red(IMPLEMENTATIONS[TaskQuery]), ids=lambda factory: factory.__name__)
+@pytest.fixture(params=IMPLEMENTATIONS[TaskQuery], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> MailHarness:
     made = make(request, tmp_path)
     assert isinstance(made.tasks, TaskQuery)

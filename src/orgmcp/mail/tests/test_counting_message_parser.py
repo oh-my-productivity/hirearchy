@@ -12,8 +12,6 @@ from orgmcp.mail.testing import CountingMessageParser
 from ._support import message_text, mid
 
 
-
-
 def write(directory: Path, n: int) -> Path:
     path = directory / f"{mid(n)}.md"
     path.write_text(message_text(mid(n)), encoding="utf-8")

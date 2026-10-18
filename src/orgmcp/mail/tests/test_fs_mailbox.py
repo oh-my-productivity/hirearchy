@@ -17,8 +17,6 @@ from orgmcp.mail.testing import CountingMessageParser
 from ._support import BAD_BUDGET, BAD_YAML, message_text, mid, note, raises_a_parse_error
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-mail")
-
 CEO_INBOX = "ceo/inbox"
 
 

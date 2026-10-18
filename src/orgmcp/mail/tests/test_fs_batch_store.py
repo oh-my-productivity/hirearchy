@@ -17,9 +17,6 @@ from orgmcp.mail.testing import CountingMessageParser
 from ._support import message_text, mid
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-mail")
-
-
 def store(root: Path, agents: list[str], writer: MemoryAtomicWriter | FailingAtomicWriter | None = None) -> tuple[FsBatchStore, CountingMessageParser]:
     directory = MemoryAgents()
     for addr in agents:

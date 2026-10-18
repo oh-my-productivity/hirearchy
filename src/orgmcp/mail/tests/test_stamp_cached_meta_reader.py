@@ -12,9 +12,6 @@ from orgmcp.mail._index import MetaReader, StampCachedMetaReader
 from ._support import BAD_BUDGET, message_text, mid
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-mail")
-
-
 def write(directory: Path, n: int = 1, text: str | None = None) -> Path:
     path = directory / f"{mid(n)}.md"
     path.write_text(text if text is not None else message_text(mid(n)), encoding="utf-8")

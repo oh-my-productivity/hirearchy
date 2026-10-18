@@ -22,8 +22,6 @@ from orgmcp.mail.testing import CountingMessageParser
 from ._support import BAD_BUDGET, BAD_YAML, message_text, mid
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-mail")
-
 NS = 1_000_000_000
 
 
@@ -87,7 +85,9 @@ def test_a_quiet_box_is_read_once(s: Setup) -> None:
 
 def test_an_unchanged_box_gives_the_very_same_list_so_that_what_is_derived_from_it_stays_valid(s: Setup) -> None:
     s.put(1)
+    s.put(2, box="read")
     s.quiet()
+    s.quiet("read")
     assert s.box.messages("ceo", "inbox") is s.box.messages("ceo", "inbox")
     assert s.box.messages("ceo", "inbox", "read") is s.box.messages("ceo", "inbox", "read")
 

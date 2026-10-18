@@ -15,8 +15,6 @@ from orgmcp.mail._parser import CachingMessageParser
 from ._support import message_text, mid
 
 
-
-
 class CountingSplit:
     def __init__(self) -> None:
         self.calls = 0
