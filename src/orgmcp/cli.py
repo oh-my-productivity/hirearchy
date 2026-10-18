@@ -274,7 +274,7 @@ def main(argv: list[str] | None = None) -> None:
     s = sub.add_parser("init", help="create a new organization")
     s.add_argument("path", nargs="?", default="org")
     s.add_argument("--mission", help="mission text or @file")
-    s.add_argument("--model", help="default kiro model for all agents")
+    s.add_argument("--model", help="default kiro model for all agents (default: claude-sonnet-5.5)")
     s.set_defaults(fn=cmd_init)
 
     s = sub.add_parser("hire", help="create an agent (as root)")
@@ -282,7 +282,7 @@ def main(argv: list[str] | None = None) -> None:
     s.add_argument("name")
     s.add_argument("--role", required=True)
     s.add_argument("--charter", required=True, help="charter text or @file")
-    s.add_argument("--model")
+    s.add_argument("--model", help="kiro model for this agent (default: the org's default model, claude-sonnet-5.5)")
     s.add_argument("--tools", help="comma-separated kiro built-in tools, e.g. read,write,shell")
     s.add_argument("--can-hire", action="store_true")
     s.add_argument("--max-children", type=int, default=5)

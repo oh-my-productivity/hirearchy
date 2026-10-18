@@ -635,6 +635,8 @@ def test_check_a_missing_sender_copy_and_unparsable_and_duplicate_ids(org, story
     (org.dir("ceo") / "read" / "broken.md").write_text("no frontmatter at all\n")
     dup = next((org.dir("ceo/eng") / "read").glob("*.md"))
     (org.dir("ceo/eng") / "inbox" / dup.name).write_text(dup.read_text())
+    for f in org.dir("ceo/eng").rglob(f"{sent_id}.md"):
+        os.utime(f, (0, 0))  # every received copy is old whatever the real clock says (NOW is a fixed 2026-10-18 instant)
     res = by_id(observe.check(org, now=NOW))["a"]
     text = "\n".join(res["details"])
     assert not res["ok"] and "has no sent copy" in text and "ceo/read/broken.md: no frontmatter" in text and "appears 2 times" in text
