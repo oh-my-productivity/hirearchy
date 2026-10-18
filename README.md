@@ -454,14 +454,25 @@ its org directory) and resolve relative paths there. An agent that writes `lead/
 therefore creates that tree inside the user's folder, not in the org. The charter fields and the rules below keep the
 two apart.
 
-The two kinds of tools share short names. In kiro the orgmcp ones appear as `@orgmcp/write`, `@orgmcp/read`, ...; an agent that
-holds the built-in `write`/`read`/`shell` is told in its prompt's Files section (and in ORG.md's rules, for orgs created or
-`upgrade-rules`d since) to use `@orgmcp/write` for org files (`<addr>/MEMORY.md`, `<addr>/work/`, reports) and the built-ins
-for the workspace only; its closing "update your memory" line names `@orgmcp/write` too. The orgmcp `write` tool's description
-and reply say it writes an organization file. **Stray org files:** after each run of an agent with built-in `write` and a
-workspace, the scheduler looks for `<workspace>/<address>/` (new during the run) and a written `<workspace>/<address>/MEMORY.md`.
-If found it logs a `# warning:` in the run log and the scheduler output and records it in `.runtime/strays.json`; the agent's
-next prompt says once to move that content into its org files with `@orgmcp/write`. Nothing is moved or deleted.
+The two kinds of tools share short names, and kiro lists MCP tools by their plain names, so a built-in `read` or `write`
+**shadows** the orgmcp tool of the same name: an agent that holds it sees one `read` / one `write`, kiro's, and cannot call
+orgmcp's (verified in `studies/F-read-experiment` and `studies/F2-tool-names`). The server therefore registers the orgmcp
+tools by what the charter's `tools` hold:
+
+- charter `tools` holds `write`: the orgmcp write tool is **`org_write`** (else `write`);
+- charter `tools` holds `read`: the orgmcp read tool is **`org_read`** (else `read`).
+
+(`shell` alone changes nothing; root and agents without built-in `read`/`write` keep `read` / `write` exactly.) In kiro the
+orgmcp tools appear as `@orgmcp/org_write`, `@orgmcp/org_read`, `@orgmcp/report`, ... The agent's prompt (Files section,
+"update your memory" line, stray-file notice) names the tool *it* has: `@orgmcp/org_write` for `<addr>/MEMORY.md`,
+`<addr>/work/` and reports, and the built-in `write` for the workspace only. ORG.md's shared rules say `@orgmcp/write`
+generically; the per-agent line says to use the `org_` name wherever it appears. `org_read` takes **relative** org paths
+(and the absolute workspace/inputs paths below). The built-in `read` reaches the org too, but only by **absolute** path
+`<org root>/<path>`: a relative path starts in the agent's working directory (its workspace, else its org directory).
+**Stray org files:** after each run of an agent with built-in `write` and a workspace, the scheduler looks for
+`<workspace>/<address>/` (new during the run) and a written `<workspace>/<address>/MEMORY.md`. If found it logs a
+`# warning:` in the run log and the scheduler output and records it in `.runtime/strays.json`; the agent's next prompt says
+once to move that content into its org files with its orgmcp write tool. Nothing is moved or deleted.
 
 Charter fields: `workspace` (read-write, as before) and `inputs: [absolute paths]` (read-only; blueprint: `needs.inputs`
 for the whole project or `inputs` per agent). A report's inputs must be inside its manager's inputs or workspace (authority
@@ -479,16 +490,20 @@ equal tools and access share it) whose `toolsSettings` say:
 "allowedTools": ["@orgmcp"],
 "toolsSettings": {
   "write": {"allowedPaths": ["/ws/**"], "deniedPaths": ["/org", "/org/**"]},
-  "read":  {"allowedPaths": ["/ws", "/ws/**", "/inputs", "/inputs/**"], "deniedPaths": ["/org", "/org/**"]}
+  "read":  {"allowedPaths": ["/ws", "/ws/**", "/inputs", "/inputs/**", "/org", "/org/**"], "deniedPaths": []}
 }
 ```
 
 - `read`/`write` are deliberately **not** in `allowedTools`: a trusted tool ignores `allowedPaths`. Left out, a call on an
   allowed path runs, and any other path needs an approval, which a headless run cannot give: it is refused with "tool
   permission approval is not supported in non-interactive mode". `..` traversal is refused too.
-- `write` only under the workspace (nowhere without one), so inputs are read-only and nothing is created beside them.
-  `read` under workspace + inputs. Neither reaches the org directory (hard deny, also over kiro's "the working directory is
-  readable" rule); the org is reached through orgmcp tools only.
+- `write` only under the workspace (nowhere without one), so inputs are read-only and nothing is created beside them. The
+  org directory is a hard deny for it (also over kiro's "the working directory is readable" rule): org files are written
+  with the orgmcp tool (`org_write`) only.
+- `read` under workspace + inputs + the organization (read-only), with **no** `deniedPaths` (a deny would beat the allow).
+  Other paths, e.g. `/etc/hosts`, are refused. The built-in `read` is the only `read` such an agent sees, so this is how it
+  reads a teammate's file by absolute path; `org_read` is the relative-path alternative. The deny is skipped for `write`
+  too when the workspace is inside the org.
 - Agents without built-in `read`/`write` keep the shared per-org profile. A legacy charter with only `read`, no workspace and
   no `inputs` key keeps today's unconfined read; give it `inputs: []` (or real inputs) to confine it. A confined parent never
   hands down an unconfined `read`.
@@ -512,8 +527,8 @@ without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first pri
 
 - Everything is local stdio with no network listener. Identity is enforced by the process environment, not by
   authentication: anything that can run `orgmcp mcp` with `ORG_AGENT` set can act as that agent.
-- The orgmcp write rules apply to the orgmcp tools. kiro's built-in `read`/`write` are confined to the agent's workspace
-  and inputs by its profile (see [Workspaces, inputs and confinement](#workspaces-inputs-and-confinement)); `shell` is not:
+- The orgmcp write rules apply to the orgmcp tools. kiro's built-in `write` is confined to the agent's workspace and its
+  `read` to workspace, inputs and the organization (read-only) by its profile (see [Workspaces, inputs and confinement](#workspaces-inputs-and-confinement)); `shell` is not:
   an agent that holds it can touch anything its OS user can. Grant it only to agents that need it, with a `workspace`.
 
 ## Test
