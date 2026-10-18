@@ -174,7 +174,6 @@ class _CountingLayout:
         return self._root
 
 
-@pytest.mark.xfail(strict=True, reason="red: R-perf-runtime")
 def test_the_document_stamp_does_not_rebuild_the_path_per_call(tmp_path: Path) -> None:
     from orgmcp.settings._stamp import FsOrgDocumentStamp
 
