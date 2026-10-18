@@ -13,12 +13,11 @@ a direct report has a problem it has not been told about, and each note costs th
 
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass, field
 from datetime import datetime
 
 from . import templates
-from .core import BOXES, ROOT, Org, utcnow
+from .core import ROOT, Org, utcnow
 from .health import _aware, _parse_time, config_number, org_health
 
 LEDGER = "reviews"
@@ -69,25 +68,12 @@ def read_ledger(org: Org) -> dict | None:
     }
 
 
-def retired_runs(org: Org) -> int:
-    """Runs used by agents that were retired: their directories (run logs included) live on under ``.retired/``."""
-    count = 0
-    for top in sorted((org.root / ".retired").glob("*")) if (org.root / ".retired").is_dir() else []:
-        for here, dirs, files in os.walk(top):
-            if os.path.basename(here) == "runs":
-                count += sum(1 for f in files if f.endswith(".log") and not f.startswith("."))
-                dirs.clear()
-            else:  # only sub-agent directories can hold more run logs
-                dirs[:] = [d for d in dirs if d not in {*BOXES, "work"}]
-    return count
-
-
 def total_runs(org: Org) -> int:
     """Runs ever used across the organization, counted from the run logs (so a restart does not reset it).
 
     Retired agents are included, so retiring never moves the counter backwards (and never postpones a review).
     """
-    return sum(org.runs_used(a) for a in org.agents()) + retired_runs(org)
+    return sum(org.runs_used(a) for a in org.agents()) + org.runtime.retired_archive.run_count()
 
 
 def review_if_due(org: Org, now: datetime) -> Review | None:
