@@ -1,0 +1,24 @@
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m56hyvn7ehhaqxf0te33jw7w","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+[tool] Reading SKILL.md:1, listing notes
+[tool] status: Completed
+[tool] Running: @orgmcp/services
+[tool] Running: @orgmcp/whoami
+[tool] status: Completed
+[tool] status: Completed
+[tool] Reading 2026-10-12.md:1
+[tool] status: Completed
+Yes. Since this repeats every week, I'd set it up as a standing service. Each week you ask for a memo and name the notes file. I've looked at one of your notes, and it has a few things worth settling first.
+
+1. **Informal commitments.** Some of the notes put commitments in plain prose with no "ACTION:" label. For example, "Sam will probably sort out staging test data before the freeze" and "Lee will swap pager shifts with Dev". Should the memo include these as well, marked as informal or unconfirmed? I'd suggest yes. Every decision and every commitment would be listed, labelled or not, each with an owner and a date where the notes give one.
+2. **Input each week.** You tell me which notes file to use, for example `2026-10-19.md`. I'll treat the notes folder as read-only, so nothing in your notes is ever changed.
+3. **Memo format.** I'd suggest markdown, no more than 400 words, with these sections:
+   - Decisions
+   - Action items (who, what, by when)
+   - Open or unclear items (anything with no clear owner or date)
+
+   The memos would go in a new `deliverables` folder here, `/tmp/orgmcp-e2-1792295253/deliverables/`, named by meeting date.
+4. **Checks.** I'd suggest a second agent that didn't write the memo checks every decision and action against your notes. It would confirm nothing is missing and nothing is invented, and that the memo has no names or dates that aren't in the notes.
+5. **Budget and models.** I'd suggest about 8 runs per memo, with a cheaper model drafting and a stronger one reviewing. I'll show the exact numbers in the plan.
+6. **Approval.** You'd approve the plan before anything is built. After that, each memo request would run within that per-request budget.
+
+Reply "defaults" to accept my suggestions, or tell me what to change. Tell me too if you want the first memo for a specific meeting, for instance 19 October, as soon as the team exists.

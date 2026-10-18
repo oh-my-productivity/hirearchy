@@ -1,0 +1,24 @@
+--- playbook/PLAYBOOK.v1.md	2026-10-18 05:15:08
++++ playbook/PLAYBOOK.v2.md	2026-10-18 05:15:08
+@@ -1,9 +1,11 @@
+ ---
+ service: meeting-memo
+-version: 1
+-revised: '2026-10-18T03:49:53.826674+00:00'
+-by: root
+-reason: initial playbook
++version: 2
++revised: '2026-10-18T03:57:03.642331+00:00'
++by: lead
++reason: 'Lesson from 2026-10-05 request: writer converted "before Friday" and "for
++  Oct 14 [event date]" into ISO dates on first pass, requiring a rework cycle. Adding
++  explicit pitfall guidance to prevent recurrence.'
+ ---
+ ## Steps
+ 1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.
+@@ -21,4 +23,4 @@
+ Unspent runs return to your parent with your final report.
+ 
+ ## Pitfalls
+-none yet: add them from lessons and feedback
++- **Informal time references are not ISO dates.** Phrases like "before Friday", "this week", "for Oct 14" (where Oct 14 is the event date, not a deadline) must not be resolved to an ISO date. The Due column must be `none`, and the phrase must appear in an Open questions entry explaining why no ISO date was assigned. Instruct the writer explicitly: treat any date reference that is not a plain "YYYY-MM-DD" or "Oct N" deadline stated for the action itself as non-date → Due=none + Open questions.

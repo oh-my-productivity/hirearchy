@@ -1,0 +1,33 @@
+[tool] Running: @orgmcp/feedback
+[tool] Running: @orgmcp/request
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: @orgmcp/start
+[tool] status: Completed
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+[tool] Reading 2026-10-05.md:1, review-2026-10-05-v4.md:1
+[tool] Running: @orgmcp/inbox
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: cp /private/tmp/orgmcp-e2-1792295253/org/lead/writer/work/2026-10-05.md /tmp/orgmcp-e2-1792295253/deliverables/2026-10-05.md && cmp /private/tmp/orgmcp-e2-1792295253/org/lead/writer/work/2026-10-05...
+[tool] status: Completed
+I've reworked the 5 October memo to your corrections, and it's at `/tmp/orgmcp-e2-1792295253/deliverables/2026-10-05.md` (207 words).
+
+- **Summary line:** the memo opens with a one-line "Summary:", then Decisions, then Action items, then Open questions.
+- **Sam:** his Due is 2026-10-09, and he's no longer in Open questions.
+- **Marta:** her Due is 2026-10-14, and she's no longer in Open questions.
+- **Lee:** his Due stays `none`, because the notes give him no date. He's still in Open questions.
+- **Review:** the reviewer's final line reads "criteria met: 8 of 8. Decisions checked: 2 of 2. Commitments checked: 5 of 5."
+
+I applied your changes to this memo only, so they aren't yet in the service contract. Two things need your decision:
+
+1. **Make the rules permanent?** I'd add these as checks for every future memo:
+   - The memo starts with a one-line "Summary:", then Decisions, then Action items, then Open questions.
+   - When the notes say "before <weekday>", the Due is that weekday's date.
+   - When the notes say "for <date>", the Due is that date.
+
+   Reply "yes" and I'll add them as contract criteria. Tell me if you'd word the date rules differently.
+2. **The team's playbook currently says the opposite.** The lead's own notes now say "before Friday" and "for Oct 14" must always be `none`, and one of its lessons says "before Friday" means Thursday. Contract criteria override the playbook, so adding your rules fixes this for future memos. Until then the team could repeat the mistake.
+
+Runs: this rework used 5 of 6. Is this version right?

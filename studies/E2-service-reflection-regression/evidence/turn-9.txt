@@ -1,0 +1,7 @@
+[tool] Running: @orgmcp/define_service
+[tool] Running: @orgmcp/feedback
+[tool] status: Completed
+[tool] status: Completed
+The rule is added, so the `meeting-memo` contract is now v3 with 10 checks. The new check says the Action items table has no row for something that merely stays as it is or that nobody has to do, such as "keep the agenda as sent". I recorded the 19 October memo as accepted.
+
+All three memos are in `/tmp/orgmcp-e2-1792295253/deliverables/`: `2026-10-05.md`, `2026-10-12.md` and `2026-10-19.md`. Each week, just tell me the notes file name, for example "memo for 2026-10-26.md".

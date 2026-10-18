@@ -1,0 +1,24 @@
+--- service/SERVICE.v2.md	2026-10-18 05:15:08
++++ service/SERVICE.v3-current.md	2026-10-18 05:15:08
+@@ -30,6 +30,9 @@
+ - When the notes say a commitment is due 'before <weekday>', its Due is the date of
+   that weekday in the meeting's week; when the notes say it is 'for <date>', its Due
+   is that date; both are written as ISO dates and are not listed in Open questions.
++- The Action items table has no row for something that merely stays as it is or that
++  nobody has to do (for example 'keep the agenda as sent'); only things someone commits
++  to do get a row.
+ deliverable:
+   description: One markdown memo named after the meeting notes file (for example 2026-10-19.md)
+   format: markdown
+@@ -37,9 +40,9 @@
+   path: /tmp/orgmcp-e2-1792295253/deliverables
+ budget: 15
+ locked: false
+-version: 2
++version: 3
+ defined_by: root
+-defined: '2026-10-18T04:01:15.443424+00:00'
++defined: '2026-10-18T04:12:36.509545+00:00'
+ created: '2026-10-18T03:49:53.825607+00:00'
+ ---
+ 

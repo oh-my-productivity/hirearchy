@@ -1,0 +1,23 @@
+[tool] Running: @orgmcp/feedback
+[tool] Running: @orgmcp/request
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: @orgmcp/start
+[tool] status: Completed
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+[tool] Reading 2026-10-19.md:1
+[tool] Running: @orgmcp/inbox
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: cp /private/tmp/orgmcp-e2-1792295253/org/lead/writer/work/2026-10-19.md /tmp/orgmcp-e2-1792295253/deliverables/2026-10-19.md && cmp /private/tmp/orgmcp-e2-1792295253/org/lead/writer/work/2026-10-19...
+[tool] status: Completed
+I took the "Marta keeps the agenda as sent" row out. The updated memo is at `/tmp/orgmcp-e2-1792295253/deliverables/2026-10-19.md` (179 words).
+
+- **Action items table:** now 5 rows (Marta 2026-10-23, Dev 2026-10-24, Priya 2026-10-26, Lee 2026-10-30, Sam `none`).
+- **Everything else:** the Summary line, the 3 decisions and the other rows are unchanged, and all other criteria still hold.
+- **Review:** the reviewer's final line reads "criteria met: 10 of 10. Decisions checked: 3 of 3. Commitments checked: 5 of 5."
+
+Runs: 5 of 6 on this rework, 11 in total for this memo against the 15 cap.
+
+Do you want "something that stays as it is isn't an action item" as a permanent rule? I'd add it as a contract criterion for every future memo. The current criterion already says no row for something nobody committed to, but it didn't stop this one. Is this version right?
