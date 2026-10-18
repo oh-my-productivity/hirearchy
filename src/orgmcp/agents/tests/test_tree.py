@@ -6,8 +6,6 @@ import pytest
 
 from orgmcp.agents._tree import parse_charter, valid_address, walk_agents, walk_subtree
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
-
 
 @pytest.mark.parametrize("addr", ["ceo", "ceo/eng", "a", "a1-b2", "a" * 32, "ceo/eng/qa", "x/" * 3 + "y"])
 def test_valid_addresses(addr: str) -> None:

@@ -12,8 +12,6 @@ from orgmcp.kernel import OrgPaths
 
 from ._support import message
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
-
 
 def archive(tmp_path: Path) -> FsRetiredArchive:
     return FsRetiredArchive(OrgPaths(tmp_path), OsArchiveFiles())

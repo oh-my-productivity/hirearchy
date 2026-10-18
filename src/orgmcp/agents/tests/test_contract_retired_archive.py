@@ -9,14 +9,13 @@ import pytest
 from orgmcp.agents import RetiredArchive, RetiredTree
 from orgmcp.agents.testing import IMPLEMENTATIONS, AgentsHarness
 
+from . import _red as red
 from ._support import agent, make, message
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
 
 STAMP = "20261018T101500"
 
 
-@pytest.fixture(params=IMPLEMENTATIONS[RetiredArchive], ids=lambda factory: factory.__name__)
+@pytest.fixture(params=red.params(IMPLEMENTATIONS[RetiredArchive]))
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> AgentsHarness:
     made = make(request, tmp_path)
     assert isinstance(made.archive, RetiredArchive)

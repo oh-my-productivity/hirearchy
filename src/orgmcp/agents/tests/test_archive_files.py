@@ -11,8 +11,6 @@ import pytest
 from orgmcp.agents._retired import ArchiveFiles, OsArchiveFiles
 from orgmcp.agents.testing import MemoryAgents, MemoryArchiveFiles
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
-
 
 @dataclass(frozen=True)
 class World:

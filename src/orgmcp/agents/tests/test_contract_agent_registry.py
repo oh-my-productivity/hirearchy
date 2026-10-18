@@ -10,15 +10,14 @@ from orgmcp.agents import AgentRegistry
 from orgmcp.agents.testing import IMPLEMENTATIONS, AgentsHarness
 from orgmcp.kernel import join_frontmatter
 
+from . import _red as red
 from ._support import agent, make
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
 
 SKELETON = ["AGENT.md", "MEMORY.md", "inbox", "inflight", "read", "runs", "sent", "work"]
 META = {"role": "Engineer", "model": "m-1", "tools": ["read", "write"], "can_hire": False, "max_children": 5, "hired_by": "ceo"}
 
 
-@pytest.fixture(params=IMPLEMENTATIONS[AgentRegistry], ids=lambda factory: factory.__name__)
+@pytest.fixture(params=red.params(IMPLEMENTATIONS[AgentRegistry]))
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> AgentsHarness:
     made = make(request, tmp_path)
     assert isinstance(made.registry, AgentRegistry)
@@ -67,7 +66,7 @@ def test_an_agent_is_created_below_its_parent(h: AgentsHarness) -> None:
     h.registry.create("ceo/eng", {"role": "Eng"}, "y")
     assert h.listing("ceo/eng") == SKELETON
     assert h.directory.children("ceo") == ["ceo/eng"] and h.directory.agents() == ["ceo", "ceo/eng"]
-    assert h.listing("ceo") == [*SKELETON, "eng"]
+    assert h.listing("ceo") == sorted([*SKELETON, "eng"])
 
 
 def test_the_address_is_normalized(h: AgentsHarness) -> None:
@@ -103,7 +102,7 @@ def test_a_rewrite_touches_nothing_else(h: AgentsHarness) -> None:
     h.put("ceo/work/draft.md", "draft\n")
     h.registry.create("ceo/eng", {"role": "E"}, "e")
     h.registry.rewrite_charter("ceo", "---\nrole: New\n---\nx\n")
-    assert h.listing("ceo") == [*SKELETON, "eng"]
+    assert h.listing("ceo") == sorted([*SKELETON, "eng"])
     assert (h.read("ceo/MEMORY.md"), h.read("ceo/work/draft.md")) == ("notes\n", "draft\n")
     assert h.read("ceo/eng/AGENT.md") == "---\nrole: E\n---\ne\n"
 

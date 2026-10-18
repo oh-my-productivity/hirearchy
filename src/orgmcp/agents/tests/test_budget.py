@@ -8,8 +8,6 @@ from orgmcp.agents._budget import message_budget
 
 from ._support import message
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
-
 
 @pytest.mark.parametrize(
     ("text", "budget"),

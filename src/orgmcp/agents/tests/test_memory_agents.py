@@ -9,8 +9,6 @@ import pytest
 from orgmcp.agents import AgentDirectory, AgentRegistry, CharterReader, RetiredArchive
 from orgmcp.agents.testing import MemoryAgents, MemoryArchiveFiles
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-agents")
-
 
 def test_it_is_all_four_ports() -> None:
     fake = MemoryAgents()
