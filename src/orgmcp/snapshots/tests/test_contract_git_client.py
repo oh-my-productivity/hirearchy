@@ -11,12 +11,8 @@ import pytest
 from orgmcp.snapshots import GitClient
 from orgmcp.snapshots.testing import AUTHOR, IMPLEMENTATIONS, GitHarness
 
-RED = pytest.mark.xfail(strict=True, reason="red: A-snapshots")  # the real implementation is still to come
 
-
-@pytest.fixture(
-    params=[pytest.param(f, marks=RED if f.__name__ == "real_git" else []) for f in IMPLEMENTATIONS[GitClient]], ids=lambda factory: factory.__name__
-)
+@pytest.fixture(params=IMPLEMENTATIONS[GitClient], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> GitHarness:
     made = cast(Callable[[Path], GitHarness], request.param)(tmp_path)
     assert isinstance(made.git, GitClient)

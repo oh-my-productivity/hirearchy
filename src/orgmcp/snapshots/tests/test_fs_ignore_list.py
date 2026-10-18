@@ -10,8 +10,6 @@ from orgmcp.kernel import OrgPaths
 from orgmcp.kernel.testing import FailingAtomicWriter, MemoryAtomicWriter, fs_atomic_writer
 from orgmcp.snapshots._ignore import FsIgnoreList
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-snapshots")
-
 ROOT = Path("/org")
 
 

@@ -11,14 +11,10 @@ import pytest
 from orgmcp.snapshots import RUNTIME_IGNORE_LINES, IgnoreList
 from orgmcp.snapshots.testing import IMPLEMENTATIONS, IgnoreHarness
 
-RED = pytest.mark.xfail(strict=True, reason="red: A-snapshots")  # the real implementation is still to come
-
 INITIAL = [".tmp-*", "runs/", ".kiro/", ".runtime/scheduler.pid", ".runtime/events/"]
 
 
-@pytest.fixture(
-    params=[pytest.param(f, marks=RED if f.__name__ == "fs_ignore_list" else []) for f in IMPLEMENTATIONS[IgnoreList]], ids=lambda factory: factory.__name__
-)
+@pytest.fixture(params=IMPLEMENTATIONS[IgnoreList], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> IgnoreHarness:
     made = cast(Callable[[Path], IgnoreHarness], request.param)(tmp_path)
     assert isinstance(made.ignore, IgnoreList)

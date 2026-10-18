@@ -10,8 +10,6 @@ import pytest
 from orgmcp.snapshots._git import SubprocessGit
 from orgmcp.snapshots.testing import NO_GIT
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-snapshots")
-
 
 def run(root: Path, *args: str) -> str:
     return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, check=True).stdout

@@ -11,8 +11,6 @@ from orgmcp.snapshots import GitClient
 from orgmcp.snapshots._git import GitOrgSnapshotter
 from orgmcp.snapshots.testing import RecordingGit
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-snapshots")
-
 ROOT = Path("/org")
 
 

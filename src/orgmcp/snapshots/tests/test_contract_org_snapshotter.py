@@ -12,8 +12,6 @@ import pytest
 from orgmcp.snapshots import OrgSnapshotter
 from orgmcp.snapshots.testing import AUTHOR, IMPLEMENTATIONS, WITHOUT_GIT, SnapshotHarness
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-snapshots")
-
 
 def build(request: pytest.FixtureRequest, tmp_path: Path) -> SnapshotHarness:
     made = cast(Callable[[Path], SnapshotHarness], request.param)(tmp_path)
