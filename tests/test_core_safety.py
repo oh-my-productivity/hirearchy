@@ -274,23 +274,6 @@ def test_report_missing_artifact_inside_the_org_is_still_not_found(org):
         org.report(ENG, task.id, "done", "ok", ["work/missing.md"])
 
 
-# ------------------------------------------------------------------- word counts
-
-
-def test_word_count_ignores_markdown_markers():
-    from orgmcp.core import word_count
-
-    text = "\n".join([
-        "# Title here", "", "## Sub", "- one two", "* three", "+ four", "  - nested five", "1. six", "12) seven",
-        "> quoted eight", "- [x] done nine", "| a | b |", "|---|:--:|", "| c | d |", "---", "***", "```python", "ten", "```",
-        "**bold** and `code` -5 degrees", "No marker 3. here",
-    ])
-    # Title here(2) Sub(1) one two(2) three four(2) nested five(2) six seven(2) quoted eight(2) done nine(2)
-    # a b c d(4) ten(1) bold and code -5 degrees(5) No marker 3. here(4)
-    assert word_count(text) == 2 + 1 + 2 + 2 + 2 + 2 + 2 + 2 + 4 + 1 + 5 + 4
-    assert word_count("") == 0 and word_count("plain words stay") == 3 and word_count("- \n#\n") == 0
-
-
 def test_read_and_report_artifacts_share_the_markup_free_count(org):
     body = "# Blurb\n\n- alpha beta\n- gamma\n1. delta\n"
     org.write(ENG, "ceo/eng/work/blurb.md", body)

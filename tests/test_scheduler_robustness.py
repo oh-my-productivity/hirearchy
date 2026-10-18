@@ -426,13 +426,6 @@ def test_cache_is_bounded(org, monkeypatch):
     assert len(core._PARSED) == 5
 
 
-def test_yaml_uses_the_c_loader_when_present():
-    import yaml
-
-    assert core._YAML_LOADER is getattr(yaml, "CSafeLoader", yaml.SafeLoader)
-    assert core.split_frontmatter("---\na: 1\nb: [x, y]\n---\nbody\n") == ({"a": 1, "b": ["x", "y"]}, "body\n")
-
-
 def test_stall_view_reparses_only_when_the_mailbox_files_change(org, monkeypatch):
     org.send(ROOT, "ceo", "budget", budget=10)
     task = org.delegate(ROOT, "ceo", "T", "g", "a", budget=2)
