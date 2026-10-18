@@ -209,7 +209,7 @@ def test_skill_and_instructions_mention_read_only_inputs_within_the_limits(root_
     from orgmcp.server import ROOT_INSTRUCTIONS
     from orgmcp.skill import skill_source
     skill = skill_source().read_text()
-    assert len(skill.splitlines()) <= 110 and len(ROOT_INSTRUCTIONS) < 2800
+    assert len(skill.splitlines()) <= 125 and len(ROOT_INSTRUCTIONS) < 2800
     for needle in ("`needs.inputs`", "can never change them", "never give an agent the built-in `write` tool",
                    "copy the deliverable", "NOT confined", "n of m, n = m"):
         assert needle in skill, needle

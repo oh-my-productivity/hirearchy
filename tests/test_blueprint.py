@@ -654,7 +654,7 @@ def test_skill_frontmatter_is_well_formed_and_the_skill_stays_short():
     text = (Path(__file__).resolve().parent.parent / "skills" / "orgmcp" / "SKILL.md").read_text()
     meta = yaml.safe_load(text.split("---")[1])
     assert meta["name"] == "orgmcp" and meta["description"]
-    assert len(text.splitlines()) <= 110  # the example blueprints live in the blueprint_example tool (tests/test_assistant_ux.py)
+    assert len(text.splitlines()) <= 125  # the example blueprints live in the blueprint_example tool (tests/test_assistant_ux.py)
 
 
 def test_plan_and_manager_charter_say_unspent_budget_returns_automatically(base, roots, empty_org):

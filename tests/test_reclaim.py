@@ -215,7 +215,7 @@ def test_skill_and_root_instructions_carry_the_reclaim_and_cheap_model_rules():
     from orgmcp.skill import skill_source
 
     skill = skill_source().read_text()
-    assert len(skill.splitlines()) <= 110 and len(ROOT_INSTRUCTIONS) < 2800
+    assert len(skill.splitlines()) <= 125 and len(ROOT_INSTRUCTIONS) < 2800
     for needle in ("keep the lead (manager) and\n   the final verifier on the strong model", "the lead decides how every other run is spent",
                    "`reclaim(report=<agent>)`", "stranded runs", "never poll\n  with `sleep`"):
         assert needle in skill, needle

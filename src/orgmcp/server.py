@@ -39,14 +39,15 @@ You are connected to ONE orgmcp organization as `root`, the human's seat. {where
 - Never claim the organization did work unless orgmcp tools show it.
 - If an orgmcp tool fails, tell the user instead of substituting another mechanism.
 - `whoami` and `status` show the state; `start`/`stop` control the scheduler.
-- Standing services: `services` lists them, `request` uses one, `feedback` rates a delivery, `define_service` adds one.
+- Standing services: `services` lists them (check it before building a new org), `request` uses one, `feedback` rates a
+  delivery, `define_service` adds one.
 When the user asks for an org, team or agents for a goal:
 1. Ask what you need in ONE message. Propose defaults only where a generic one exists; ASK for any list the user did not
    give (scope items, source files), never invent. Default deliverable place: a new
    `deliverables/` folder in the user's current directory (say so). Also ask: format, length, exact checkable
    criteria, sources/web, workspace and tests (code), budget in runs, models (if cheap: keep the lead and final verifier
    strong; the lead decides how every other run is spent), review, approval.
-2. Start the blueprint from `blueprint_example(kind)`, then `propose_org`. Show the
+2. Start the blueprint from `blueprint_example(kind)` (`service=True` for recurring work), then `propose_org`. Show the
    "PLAN FOR YOU" block exactly as returned. Fix errors; settle its warnings (e.g. model policy) with the user
    or state them; wait for approval. The user's own files go in `needs.inputs` (read-only);
    built-in `write` only for code.
@@ -534,15 +535,19 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
 
 
     @mcp.tool()
-    def blueprint_example(kind: str = "research") -> str:
+    def blueprint_example(kind: str = "research", service: bool = False) -> str:
         """A ready-to-edit blueprint (YAML with a comment on every field and a one-paragraph schema summary).
 
         kind: "research" (facts from the web with source URLs, fact-checked), "documents" (write from the user's local
         files, no web; uses `needs.inputs`, read-only folders), "code" (software in a repo workspace, with tests and
         local commits) or "analysis" (the user's data files, read-only, analysed by a checked script). Replace every
         <PLACEHOLDER> with what the user told you (ask for what is missing; do not invent lists), delete what does not apply, then call propose_org with the text. Read-only.
+
+        service: true for work the user wants again and again ("every week", "whenever I..."): the template then offers it
+        as a standing service (`services:` with inputs, acceptance, deliverable and budget per request, and an optional
+        first request) instead of a one-off `task:`.
         """
-        return blueprint_examples.example(kind, _example_base(binding.peek()))
+        return blueprint_examples.example(kind, _example_base(binding.peek()), service=service)
 
     @mcp.tool()
     def propose_org(blueprint: str) -> str:
@@ -555,7 +560,10 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
         (true/false), approval, progress, kind (research|writing|code), code {tests, packaging, commits}}; `agents`:
         ONE top-level agent (template manager) with `children`; each agent has name and a template (manager,
         researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker) or a charter, and optionally
-        model, tools, workspace, scale; `task` {to, title, goal, acceptance: list of exact, checkable criteria}.
+        model, tools, workspace, scale; `task` {to, title, goal, acceptance: list of exact, checkable criteria}; optional
+        `services` (recurring work the top agent offers on request): [{name, description, inputs: [{name, description,
+        required}], acceptance, deliverable {description, format, max_words, path}, budget (runs per request), playbook,
+        locked}], in which case `task` may be omitted or be a first request {service, inputs: {name: value}, title}.
         Works before the organization exists. Returns (1) a block headed "PLAN FOR YOU": show it to the user exactly
         as written and wait for their explicit approval; (2) Details, the full plan for you; (3) a plan_id that
         apply_org requires. If the plan has errors, fix the blueprint and propose again; never ask the user to approve
@@ -574,7 +582,8 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
         propose_org returned for exactly this blueprint; a missing or different id is refused (propose again, show the
         PLAN FOR YOU block, get approval). Needs an existing organization (create_org first if there is none).
         Refuses with the issues if the blueprint has errors or a name is taken, and undoes everything if it fails
-        midway. Returns what was created; then call start().
+        midway. Returns what was created (agents, services, the first task or request); then call start() (not when
+        the blueprint gave no first task: the services wait for request(service, inputs)).
         """
         if not approved:
             raise OrgError("not applied: the user must approve the plan first. Call propose_org(blueprint), show the "
@@ -592,8 +601,12 @@ def register_root_tools(mcp: FastMCP, binding: OrgBinding) -> None:
                            "apply_org again with the same blueprint and plan_id")
         summary = blueprint_mod.apply(org, bp)
         running = describe_scheduler(org).startswith("scheduler: running")
-        nxt = ("The scheduler is already running and will pick the work up; answer status questions with progress()."
-               if running else "Next step: call start() to run the scheduler, then answer status questions with progress().")
+        if not summary.task_id:
+            nxt = ("Nothing runs yet: the services are ready. When the user asks for one, call request(service, inputs) "
+                   "(see services()), then start() if the scheduler is not running.")
+        else:
+            nxt = ("The scheduler is already running and will pick the work up; answer status questions with progress()."
+                   if running else "Next step: call start() to run the scheduler, then answer status questions with progress().")
         return f"applied the blueprint to {org.root}\n{summary.text()}\n{nxt}"
 
     @mcp.tool()

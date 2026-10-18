@@ -662,6 +662,20 @@ def test_a_service_without_a_playbook_says_how_to_start_one(svc):
     assert "# Reflect" not in prompt  # no evidence yet
 
 
+def test_v0_playbook_section_agrees_with_the_reflect_section(svc):
+    org = svc
+    first = request(org, "ai")
+    deliver(org, "ceo", first, lessons="Thin on sources.")
+    request(org, "chips")  # a new request with evidence from an earlier case and still no playbook
+    prompt = org.run_prompt("ceo", org.begin_run("ceo"))
+    playbook = prompt.split("# Playbook: weekly-brief")[1].split("\n# ")[0]
+    assert "# Reflect before you start: weekly-brief" in prompt
+    assert "No playbook yet: write v1 now from the evidence below (Reflect before you start), then follow it." in playbook
+    assert "when you report this request" not in prompt  # the old text would contradict the reflect section
+    assert prompt.index("# Playbook: weekly-brief") < prompt.index("# Reflect before you start")  # "below" is true
+    org.end_run("ceo", ok=True)
+
+
 def test_a_long_playbook_is_cut_with_a_pointer_to_the_file(org):
     define(org, playbook="wordwordword " * 700)  # under the word cap, over the render limit (8000 characters)
     request(org)

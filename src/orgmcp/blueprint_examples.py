@@ -1,8 +1,11 @@
-"""Ready-to-edit blueprint templates, served by the root tool ``blueprint_example(kind)``.
+"""Ready-to-edit blueprint templates, served by the root tool ``blueprint_example(kind, service=False)``.
 
 Each text is valid YAML (the schema summary is a comment header), so it can be passed to ``propose_org`` as is. Text
 in <ANGLE BRACKETS> is a placeholder the assistant must replace with what the user said; paths start from ``base``
 (the server's working directory) so they are absolute, as the validator requires.
+
+With ``service=True`` the template offers the work as a standing service (``services:``, one service with every field
+commented) for something the user wants again and again; ``task:`` becomes an optional, commented first request.
 """
 
 from __future__ import annotations
@@ -219,11 +222,132 @@ task:
 
 TEMPLATES = {"research": RESEARCH, "documents": DOCUMENTS, "code": CODE, "analysis": ANALYSIS}
 
+# ------------------------------------------------------------------------------------------------ services
 
-def example(kind: str = "research", base: Path | str = ".") -> str:
-    """The template text for ``kind`` with absolute paths under ``base``."""
+SERVICE_SCHEMA = """\
+# Blueprint schema in one paragraph. A blueprint is YAML with these top-level keys. `mission`: one paragraph on what the
+# organization is for. `needs`: what the user asked for, in their terms: scope (the exact list of items, only what they
+# gave you), quality_bar, sources, inputs (read-only folders with the user's files), workspace (the one folder agents may
+# write in, for code), budget_runs (the user's cap in runs for ONE request), models {cheap, strong} and model_policy,
+# review (true/false), approval, progress, kind (research|writing|code|analysis), code {tests, packaging, commits}.
+# `agents`: ONE top-level agent (usually template manager) with `children`; each agent has name, template (manager,
+# researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker) or a custom
+# `charter`, optional model (cheap|strong|id), tools, workspace, scale. `services`: what the top agent offers again and
+# again, each with name, description, inputs (what changes per request), acceptance (exact, checkable criteria: the
+# contract, which only the user can change), deliverable {description, format, max_words, path}, budget (runs per request),
+# optional playbook (the workflow; left out, one is generated) and locked. After every request the lead records lessons and
+# may improve the playbook, never the checks. `task` is optional: leave it out to build the team now and request later, or
+# make it a first request {service, inputs, title}. Replace every <PLACEHOLDER>; delete what does not apply. Then call
+# propose_org with the edited text.
+"""
+
+SERVICE_HEAD = """\
+services:                          # work the lead offers again and again; each request becomes one task built from this contract
+  - name: <service-name>           # lowercase-dashed, e.g. weekly-brief; requests name the service only
+    owner: lead                    # optional: the top-level agent (the only owner allowed for now)
+    description: <One line saying what one request delivers>
+    inputs:                        # what changes with each request; everything else is fixed by this contract
+      - name: <input-name>         # lowercase letters, digits, underscores, e.g. topic
+        description: <What the requester gives>
+        required: true             # false = optional
+"""
+
+SERVICE_TAIL = """\
+    budget: {budget}                     # runs handed down with each request; within needs.budget_runs (the cap for ONE request); leave out for the estimate + 25%
+    locked: false                  # true: the lead may not improve the playbook (default false: it may, but never lower the checks above)
+    # playbook: |                  # optional first workflow (steps, budget plan, pitfalls); leave out and one is generated from the team
+# task:                            # OPTIONAL first request, started on approval. Leave it out to build the team now and request later
+#   service: <service-name>        # (nothing runs until then); uncomment it to start with one request.
+#   inputs:
+#     <input-name>: <value>
+#   title: <Short title of this request>
+"""
+
+SERVICE_BODIES = {
+    "research": """\
+    acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
+      - At most 600 words as counted by read.
+      - Contains <the sections or table the user asked for, named exactly>.
+      - Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+      - Judgement is in a section labelled as our assessment, with no citations or new facts, and rests only on claims verified elsewhere in the document.
+      - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim."
+    deliverable:
+      description: <What one request produces, e.g. one markdown file with the brief>
+      format: markdown
+      max_words: 600               # also put it in an acceptance criterion
+      path: {base}/deliverables/<name>   # a FOLDER: the assistant copies each checked result into it
+""",
+    "documents": """\
+    acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
+      - Covers <the topic of the request> and nothing else.
+      - At most 1500 words as counted by read.
+      - Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: <What one request produces, e.g. one markdown section for the topic>
+      format: markdown
+      max_words: 1500              # also put it in an acceptance criterion
+      path: {base}/deliverables/<name>   # a FOLDER: the assistant copies each checked result into it
+""",
+    "code": """\
+    acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
+      - "`uv run pytest -q` passes, including at least one new test for the requested change."
+      - <The exact command or behavior that shows the requested change works, e.g. a command and its expected output.>
+      - The tester ran the software against every criterion and the engineer applied every required change.
+      - The change is committed locally in the workspace and nothing was pushed.
+    deliverable:
+      description: <What one request produces, e.g. the requested change, tested and committed in the workspace>
+      format: code and tests in the workspace   # no path needed: the result is the workspace folder itself
+""",
+    "analysis": """\
+    acceptance:                    # the contract: exact and checkable; only the user can change it, the lead can never lower it
+      - Uses only the data files in the data folder, and the checker confirmed they are unchanged (same checksums before and after).
+      - One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
+      - Each number in the report appears together with its label in the script output; the checker verified every label and number pair.
+      - No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
+      - At most 1000 words as counted by read; recommendations are in a section labelled as our assessment (judgement).
+      - "The checker's line reads 'Figures checked: n of m match' with n = m, and the writer applied every required change."
+    deliverable:
+      description: <What one request produces, e.g. a report on the question of the request>
+      format: markdown
+      max_words: 1000              # also put it in an acceptance criterion
+      path: {base}/deliverables/<name>   # a FOLDER: the assistant copies each checked result into it
+""",
+}
+SERVICE_BUDGETS = {"research": 22, "documents": 19, "code": 23, "analysis": 23}
+
+
+def _without_block(text: str, header: str) -> str:
+    """``text`` minus the YAML block that starts at the line ``header`` (its more deeply indented lines go too)."""
+    out, skipping = [], False
+    indent = len(header) - len(header.lstrip())
+    for line in text.split("\n"):
+        if line.rstrip() == header.rstrip():
+            skipping = True
+            continue
+        if skipping and (not line.strip() or len(line) - len(line.lstrip()) > indent):
+            continue
+        skipping = False
+        out.append(line)
+    return "\n".join(out)
+
+
+def _service_template(kind: str) -> str:
+    """The template of ``kind`` as a standing service: no needs.deliverable (the service has its own), ``services:``
+    with one commented service, and ``task`` reduced to an optional commented first request."""
+    head = TEMPLATES[kind].split("\ntask:\n")[0]
+    head = _without_block(head, "  deliverable:").replace("{schema}", "{service_schema}", 1)
+    body = SERVICE_HEAD + SERVICE_BODIES[kind] + SERVICE_TAIL.format(budget=SERVICE_BUDGETS[kind], base="{base}")
+    return head.rstrip("\n") + "\n" + body
+
+
+def example(kind: str = "research", base: Path | str = ".", service: bool = False) -> str:
+    """The template text for ``kind`` with absolute paths under ``base``; ``service=True``: as a standing service."""
     key = (kind or "research").strip().lower()
     if key not in TEMPLATES:
         raise OrgError(f"unknown kind '{kind}': use one of {', '.join(KINDS)} "
                        "(research = web sources, documents = write from the user's local files, code = repo workspace with tests, analysis = data files analysed with a checked script)")
-    return TEMPLATES[key].format(schema=SCHEMA, base=str(base).rstrip("/") or "/")
+    base_text = str(base).rstrip("/") or "/"
+    if service:
+        return _service_template(key).format(service_schema=SERVICE_SCHEMA, base=base_text)
+    return TEMPLATES[key].format(schema=SCHEMA, base=base_text)

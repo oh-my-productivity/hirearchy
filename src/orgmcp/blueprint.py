@@ -14,6 +14,10 @@ A blueprint is a plain dict (YAML or JSON)::
     agents:                     # exactly one top-level agent (budget flows down from it)
       - {name, role, template, charter, model, tools, workspace, inputs, can_hire, max_children, scale, children: [...]}
     task: {to, title, goal, acceptance: [exact, checkable items], inputs: [...], budget}
+    services:                   # optional: standing tasks the top-level agent offers (see ``orgmcp.services``)
+      - {name, owner, description, inputs: [{name, description, required}], acceptance: [...],
+         deliverable: {description, format, max_words, path}, budget, playbook, locked}
+    # with services, ``task`` is optional; it may be a first request: {service, inputs: {...}, title, note}
 
 ``validate`` encodes what went wrong in the usability studies as checks (errors block ``apply``, warnings are
 shown in the plan), ``render_plan`` produces the text the user approves, ``apply`` builds the organization.
@@ -32,6 +36,7 @@ from pathlib import Path
 
 import yaml
 
+from . import services as services_mod
 from .core import DEFAULT_CONFIG, NAME_RE, RESERVED, ROOT, Org, OrgError, split_frontmatter
 
 ROLES_DIR = Path(__file__).parent / "roles"
@@ -138,6 +143,15 @@ def _normalize(bp) -> dict:
             lines = [re.sub(r"^\s*(?:[-*+]|\d{1,2}[.)])\s+", "", ln).strip() for ln in acc.splitlines()]
             task = {**task, "acceptance": [ln for ln in lines if ln]}
             bp = {**bp, "task": task}
+    svcs = bp.get("services")
+    if isinstance(svcs, list):  # the same leniency for a service's acceptance
+        fixed = []
+        for sv in svcs:
+            if isinstance(sv, dict) and isinstance(sv.get("acceptance"), str):
+                lines = [re.sub(r"^\s*(?:[-*+]|\d{1,2}[.)])\s+", "", ln).strip() for ln in sv["acceptance"].splitlines()]
+                sv = {**sv, "acceptance": [ln for ln in lines if ln]}
+            fixed.append(sv)
+        bp = {**bp, "services": fixed}
     return bp
 
 
@@ -210,6 +224,61 @@ def _criteria(bp: dict) -> list[str]:
     t = bp.get("task")
     acc = t.get("acceptance") if isinstance(t, dict) else None
     return [_s(c) for c in acc] if isinstance(acc, list) else []
+
+
+SERVICE_KEYS = {"name", "owner", "description", "inputs", "acceptance", "deliverable", "budget", "playbook", "locked"}
+TASK_KEYS = {"to", "title", "goal", "acceptance", "inputs", "budget"}
+REQUEST_KEYS = {"service", "inputs", "title", "note", "to"}  # a task that is a first request for a service
+
+
+def _services(bp: dict) -> list[dict]:
+    """The service items of the blueprint that are mappings (``validate`` reports the others)."""
+    raw = bp.get("services")
+    return [x for x in raw if isinstance(x, dict)] if isinstance(raw, list) else []
+
+
+def _is_request(bp: dict) -> bool:
+    """The task is a first request for a service (``task.service``), not a plain task."""
+    t = bp.get("task")
+    return isinstance(t, dict) and "service" in t
+
+
+def _plain(bp: dict) -> bool:
+    """Plain-task rules apply: no services, or a task that is not a request (deliverable, acceptance, goal required)."""
+    t = bp.get("task")
+    return not _services(bp) or (isinstance(t, dict) and "service" not in t)
+
+
+def _svc_deliverable(s: dict) -> dict:
+    d = s.get("deliverable")
+    if isinstance(d, str):
+        return {"description": d}
+    return d if isinstance(d, dict) else {}
+
+
+def _svc_criteria(s: dict) -> list[str]:
+    acc = s.get("acceptance")
+    return [_s(c) for c in acc if _s(c)] if isinstance(acc, list) else []
+
+
+def _cap(needs: dict) -> int | None:
+    c = needs.get("budget_runs")
+    return c if isinstance(c, int) and not isinstance(c, bool) and c >= 1 else None
+
+
+def service_budget(s: dict, est_total: int, cap: int | None) -> int:
+    """Runs handed down with each request of service ``s``: its own ``budget``, else the estimate plus slack within the cap."""
+    b = s.get("budget")
+    if isinstance(b, int) and not isinstance(b, bool):
+        return b
+    plan = math.ceil(est_total * SLACK)
+    return min(plan, cap) if cap is not None else plan
+
+
+def _svc_budgets(bp: dict, agents: list[Agent]) -> dict[str, int]:
+    est = estimate(agents)["total"] if agents else 0
+    cap = _cap(_needs(bp))
+    return {_s(x.get("name")): service_budget(x, est, cap) for x in _services(bp)}
 
 
 def _cfg(org: Org | None) -> dict:
@@ -583,8 +652,11 @@ def _is_code(bp: dict) -> bool:
     if kind:
         return kind == "code"
     d = _deliverable(bp)
-    return bool(_CODE.search(" ".join(_s(x) for x in (bp.get("mission"), d.get("description"), d.get("format"),
-                                                       (bp.get("task") or {}).get("goal") if isinstance(bp.get("task"), dict) else ""))))
+    parts = [bp.get("mission"), d.get("description"), d.get("format"),
+             (bp.get("task") or {}).get("goal") if isinstance(bp.get("task"), dict) else ""]
+    for x in _services(bp):
+        parts += [x.get("description"), _svc_deliverable(x).get("description"), _svc_deliverable(x).get("format")]
+    return bool(_CODE.search(" ".join(_s(x) for x in parts)))
 
 
 def _blob(bp: dict) -> str:
@@ -592,6 +664,10 @@ def _blob(bp: dict) -> str:
     t = bp.get("task") if isinstance(bp.get("task"), dict) else {}
     parts = [bp.get("mission"), n.get("scope"), n.get("sources"), n.get("quality_bar"), d.get("description"),
              d.get("format"), t.get("goal"), *_criteria(bp)]
+    for x in _services(bp):  # what a service promises needs the same tools as what a task asks for
+        sd = _svc_deliverable(x)
+        parts += [x.get("description"), sd.get("description"), sd.get("format"), *_svc_criteria(x)]
+        parts += [i.get("description") for i in x.get("inputs") or [] if isinstance(i, dict)]
     return "\n".join(_s(p) for p in parts if p)
 
 
@@ -611,6 +687,138 @@ def _has_ws_tools(a: Agent) -> bool:
 # ------------------------------------------------------------------------------------------- validation
 
 
+def _vague(crit: list[str], where: str, issues: list[Issue]) -> None:
+    """Warn about acceptance criteria that no one could check (too short, or vague words without a number or format)."""
+    for i, c in enumerate(crit, 1):
+        checkable = re.search(r"\d|[`\"'/]|\b(?:every|each|all|none|only|exactly)\b", c)
+        if len(c.split()) < 4 or (_VAGUE.search(c) and not checkable):
+            issues.append(Issue("warning", f"{where}[{i}]", f"'{c}' is not checkable; state the exact number, section, format or path that decides pass/fail", "vague-criterion"))
+
+
+def _delivers_directly(agents: list[Agent], p: Path) -> bool:
+    """Some author with write+shell can put files at ``p`` itself (otherwise the assistant copies the result there)."""
+    return any(_has_ws_tools(a) and a.workspace and _within(p, Path(a.workspace)) and a.kind == "author" for a in agents)
+
+
+def _validate_services(bp: dict, agents: list[Agent], tops: list[Agent], cap, est_total: int, org: Org | None,
+                       roots: list[Path], issues: list[Issue]) -> None:
+    """The ``services:`` list and a first request in ``task``. Errors here block apply; they are written for the LLM."""
+    raw = bp.get("services")
+    if raw is None:
+        if _is_request(bp):
+            issues.append(Issue("error", "task.service", "the task names a service but the blueprint has no `services:`; add the service, or give a plain task (to, title, goal, acceptance)", "service"))
+        return
+    if not isinstance(raw, list):
+        issues.append(Issue("error", "services", "services must be a list: each item has name, description, inputs, acceptance, deliverable and budget", "service"))
+        return
+    top = tops[0] if len(tops) == 1 else None
+    pcap = max(1, int(_cfg(org).get("playbook_max_words") or 1000))
+    taken: set[str] = set()
+    other_names: set[str] = set()
+    if org is not None:
+        other_names = {n for kid in org.children(ROOT) for n in org.service_names(kid)}
+    by_name: dict[str, dict] = {}
+    for i, sv in enumerate(raw):
+        if not isinstance(sv, dict):
+            issues.append(Issue("error", f"services[{i}]", "a service is a mapping with name, description, inputs, acceptance, deliverable and budget", "service"))
+            continue
+        name = _s(sv.get("name"))
+        where = f"services[{name or i}]"
+        _unknown(sv, SERVICE_KEYS, where, issues)
+        if not NAME_RE.fullmatch(name):
+            issues.append(Issue("error", where, f"invalid service name '{name}': use lowercase letters, digits and dashes (max 32, starting with a letter), e.g. weekly-brief", "service-name"))
+        elif name in taken:
+            issues.append(Issue("error", where, f"duplicate service name '{name}'; requests name the service only, so each name must be unique", "service-name"))
+        elif name in other_names:
+            issues.append(Issue("error", where, f"a service called '{name}' already exists in this organization; requests name the service only, so pick another name", "service-name"))
+        else:
+            by_name[name] = sv
+        taken.add(name)
+        owner = _s(sv.get("owner"))
+        if owner and top is not None and owner != top.addr:
+            issues.append(Issue("error", f"{where}.owner", f"owner '{owner}' must be the top-level agent ({top.addr}): root defines services only for its direct reports, so in this version a service is offered by the head of the team. Set owner: {top.addr} or leave it out", "service-owner"))
+        desc = _s(sv.get("description"))
+        if not desc or len(desc) > services_mod.DESCRIPTION_MAX or "\n" in desc:
+            issues.append(Issue("error", f"{where}.description", f"description is one line of at most {services_mod.DESCRIPTION_MAX} characters saying what the service delivers", "service"))
+        try:
+            services_mod._inputs(sv.get("inputs"))
+        except OrgError as exc:
+            issues.append(Issue("error", f"{where}.inputs", f"{exc}", "service-inputs"))
+        crit = _svc_criteria(sv)
+        if not isinstance(sv.get("acceptance"), list) or not crit:
+            issues.append(Issue("error", f"{where}.acceptance", "list the exact, checkable acceptance criteria (numbers, sections, formats, paths) as a YAML list: they are the contract of every request, and only the user can change them", "criteria"))
+        else:
+            _vague(crit, f"{where}.acceptance", issues)
+        d = _svc_deliverable(sv)
+        try:
+            services_mod._deliverable(d)
+        except OrgError as exc:
+            issues.append(Issue("error", f"{where}.deliverable", f"{exc}", "deliverable"))
+        else:
+            if not _s(d.get("format")):
+                issues.append(Issue("warning", f"{where}.deliverable.format", "no format given (e.g. markdown with a comparison table); the writer will guess", "deliverable-format"))
+            mw = d.get("max_words")
+            if mw and not any(str(mw) in c for c in crit):
+                issues.append(Issue("warning", f"{where}.acceptance", f"the {mw}-word limit is not in any criterion; add an exact criterion such as 'at most {mw} words (as counted by read)'", "limit-criterion"))
+            if _s(d.get("path")):
+                p = _check_path(d["path"], f"{where}.deliverable.path", issues, org, roots, what="deliverable path", dir_must_exist=False)
+                if p is not None:
+                    if not _delivers_directly(agents, p):
+                        issues.append(Issue("warning", f"{where}.deliverable.path", f"no agent can write to {p} (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)", "path-delivery"))
+                    if not p.parent.exists():
+                        issues.append(Issue("warning", f"{where}.deliverable.path", f"{p.parent} does not exist; the copy step will create it", "path-parent"))
+        b = sv.get("budget")
+        if b is not None and (not isinstance(b, int) or isinstance(b, bool) or b < 1):
+            issues.append(Issue("error", f"{where}.budget", "budget is the number of runs handed down with each request: a whole number >= 1", "service"))
+        elif agents:
+            total = service_budget(sv, est_total, cap)
+            if cap is not None and total > cap:
+                issues.append(Issue("error", f"{where}.budget", f"planned budget {total} runs per request is above the user's cap of {cap} (the cap is for ONE request); lower the service's budget or shrink the team", "budget-cap"))
+            if total < est_total:
+                issues.append(Issue("error", f"{where}.budget" if b is not None else "needs.budget_runs", f"{total} runs per request cannot cover the pipeline: the estimate with one review and one rework cycle is {est_total} (see estimate()); raise the budget or drop a role", "budget-low"))
+            elif total < math.ceil(est_total * TIGHT):
+                issues.append(Issue("warning", f"{where}.budget", f"{total} runs per request leaves almost no slack over the estimate of {est_total}; expect a stall on the first surprise", "budget-tight"))
+        if sv.get("playbook") is not None:
+            pb = sv["playbook"]
+            words = len(pb.split()) if isinstance(pb, str) else 0
+            if not isinstance(pb, str) or not pb.strip():
+                issues.append(Issue("error", f"{where}.playbook", "playbook is the workflow as markdown text (steps: who does what, in which order, which check); leave it out to get a generated one", "playbook"))
+            elif words > pcap:
+                issues.append(Issue("error", f"{where}.playbook", f"the playbook is {words} words; the limit is {pcap} (playbook_max_words): condense it to the steps that matter", "playbook"))
+        if "locked" in sv and not isinstance(sv["locked"], bool):
+            issues.append(Issue("error", f"{where}.locked", "locked is true or false (true: the team lead may not improve the playbook)", "service"))
+    if not any(isinstance(x, dict) for x in raw):
+        issues.append(Issue("error", "services", "services is empty: add at least one service, or remove the key", "service"))
+    if _is_request(bp):
+        _validate_request(bp["task"], by_name, top, issues)
+
+
+def _validate_request(task: dict, by_name: dict[str, dict], top: Agent | None, issues: list[Issue]) -> None:
+    """``task: {service, inputs, title, note}``: a first request, checked like ``request()`` checks it."""
+    name = _s(task.get("service"))
+    sv = by_name.get(name)
+    if sv is None:
+        issues.append(Issue("error", "task.service", f"'{name}' is not one of the blueprint's services ({', '.join(by_name) or 'none'}); name one of them", "service"))
+        return
+    if _s(task.get("to")) and top is not None and _s(task.get("to")) != top.addr:
+        issues.append(Issue("error", "task.to", f"'{_s(task.get('to'))}' must be the top-level agent ({top.addr}), the owner of the service; leave `to` out", "task"))
+    given = task.get("inputs")
+    if given is not None and not isinstance(given, dict):
+        issues.append(Issue("error", "task.inputs", "for a request, inputs is a mapping {input name: value}", "service-request"))
+        return
+    given = {str(k).strip(): ("" if v is None else str(v).strip()) for k, v in (given or {}).items()}
+    try:
+        known = {i["name"]: i for i in services_mod._inputs(sv.get("inputs"))}
+    except OrgError:
+        return  # reported on the service itself
+    unknown = [k for k in given if k not in known]
+    if unknown:
+        issues.append(Issue("error", "task.inputs", f"unknown input(s) for `{name}`: {', '.join(unknown)}. Its inputs: {', '.join(known) or 'none'}", "service-request"))
+    missing = [n for n, i in known.items() if i["required"] and not given.get(n)]
+    if missing:
+        issues.append(Issue("error", "task.inputs", f"missing required input(s) for `{name}`: {', '.join(missing)}; give them under task.inputs", "service-request"))
+
+
 def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = None) -> list[Issue]:
     """All problems with a blueprint. Errors block ``apply``; warnings are shown in the plan.
 
@@ -624,7 +832,9 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
     roots = [Path(r).expanduser().resolve() for r in allowed_roots] if allowed_roots else _default_roots()
     cfg = _cfg(org)
     needs, task = bp.get("needs"), bp.get("task")
-    _unknown(bp, {"mission", "needs", "agents", "task"}, "blueprint", issues)
+    _unknown(bp, {"mission", "needs", "agents", "task", "services"}, "blueprint", issues)
+    services = _services(bp)
+    plain = _plain(bp)
 
     if not _s(bp.get("mission")):
         issues.append(Issue("error", "mission", "write the mission: one paragraph on what the organization is for", "mission"))
@@ -634,10 +844,11 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
     else:
         _unknown(needs, NEEDS_KEYS, "needs", issues)
     if not isinstance(task, dict):
-        issues.append(Issue("error", "task", "task is missing: the first task for root to give (to, title, goal, acceptance)", "task"))
+        if task is not None or not services:
+            issues.append(Issue("error", "task", "task is missing: the first task for root to give (to, title, goal, acceptance). For recurring work, offer it as a standing service instead: add `services:` (see blueprint_example(kind, service=True))", "task"))
         task = {}
     else:
-        _unknown(task, {"to", "title", "goal", "acceptance", "inputs", "budget"}, "task", issues)
+        _unknown(task, REQUEST_KEYS if "service" in task else TASK_KEYS, "task", issues)
 
     agents = _resolve(bp, org, roots, issues)
     by = {a.addr: a for a in agents}
@@ -721,11 +932,12 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
         if any(t in a.tools for t in WRITE_TOOLS) and not a.workspace:
             issues.append(Issue("error", a.where, f"has {'/'.join(t for t in WRITE_TOOLS if t in a.tools)} but no workspace, so nothing confines what it may touch; set needs.workspace or the agent's workspace", "workspace-confinement"))
 
-    # --- deliverable and exact acceptance criteria
+    # --- deliverable and exact acceptance criteria (a services-only blueprint states them per service, below)
     d = _deliverable(bp)
     crit = _criteria(bp)
     if not _s(d.get("description")):
-        issues.append(Issue("error", "needs.deliverable", "state the deliverable: description, format, length and where it should end up (needs.deliverable.description)", "deliverable"))
+        if plain:
+            issues.append(Issue("error", "needs.deliverable", "state the deliverable: description, format, length and where it should end up (needs.deliverable.description)", "deliverable"))
     else:
         _unknown(d, {"description", "format", "max_words", "path"}, "needs.deliverable", issues)
         if not _s(d.get("format")):
@@ -733,24 +945,22 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
         mw = d.get("max_words")
         if mw is not None and (not isinstance(mw, int) or isinstance(mw, bool) or mw < 1):
             issues.append(Issue("error", "needs.deliverable.max_words", "max_words must be a whole number > 0", "deliverable"))
-        elif mw and not any(str(mw) in c for c in crit):
+        elif mw and plain and not any(str(mw) in c for c in crit):
             issues.append(Issue("warning", "task.acceptance", f"the {mw}-word limit is not in any criterion; add an exact criterion such as 'at most {mw} words (as counted by read)'", "limit-criterion"))
-    if not isinstance(task.get("acceptance"), list) or not crit:
-        issues.append(Issue("error", "task.acceptance", "list the exact, checkable acceptance criteria (numbers, sections, formats, paths) as a YAML list", "criteria"))
-    else:
-        for i, c in enumerate(crit, 1):
-            checkable = re.search(r"\d|[`\"'/]|\b(?:every|each|all|none|only|exactly)\b", c)
-            if len(c.split()) < 4 or (_VAGUE.search(c) and not checkable):
-                issues.append(Issue("warning", f"task.acceptance[{i}]", f"'{c}' is not checkable; state the exact number, section, format or path that decides pass/fail", "vague-criterion"))
-    for k in ("title", "goal"):
-        if not _s(task.get(k)):
-            issues.append(Issue("error", f"task.{k}", f"task needs a {k}", "task"))
-    if task.get("budget") is not None and (not isinstance(task["budget"], int) or isinstance(task["budget"], bool) or task["budget"] < 1):
-        issues.append(Issue("error", "task.budget", "budget must be a whole number of runs >= 1", "task"))
-    if tops:
-        to = _s(task.get("to")) or tops[0].addr
-        if to not in by or by[to].parent is not None:
-            issues.append(Issue("error", "task.to", f"'{to}' must be the top-level agent ({tops[0].addr}); tasks go to the head of the tree and flow down", "task"))
+    if plain:
+        if not isinstance(task.get("acceptance"), list) or not crit:
+            issues.append(Issue("error", "task.acceptance", "list the exact, checkable acceptance criteria (numbers, sections, formats, paths) as a YAML list", "criteria"))
+        else:
+            _vague(crit, "task.acceptance", issues)
+        for k in ("title", "goal"):
+            if not _s(task.get(k)):
+                issues.append(Issue("error", f"task.{k}", f"task needs a {k}", "task"))
+        if task.get("budget") is not None and (not isinstance(task["budget"], int) or isinstance(task["budget"], bool) or task["budget"] < 1):
+            issues.append(Issue("error", "task.budget", "budget must be a whole number of runs >= 1", "task"))
+        if tops:
+            to = _s(task.get("to")) or tops[0].addr
+            if to not in by or by[to].parent is not None:
+                issues.append(Issue("error", "task.to", f"'{to}' must be the top-level agent ({tops[0].addr}); tasks go to the head of the tree and flow down", "task"))
 
     # --- deliverable path: how does it get there?
     path = _s(d.get("path"))
@@ -785,8 +995,9 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
                           ("commits", "commit policy (e.g. commit locally per feature, never push)")):
             if not _s(code.get(key)):
                 issues.append(Issue("warning", f"needs.code.{key}", f"not decided: {what}", "code-needs"))
-        if crit and not any(re.search(r"\btests?\b|pytest", c, re.I) for c in crit):
-            issues.append(Issue("warning", "task.acceptance", "a code goal has no criterion about tests; add one (which command runs them, that they pass)", "code-criteria"))
+        for where_c, cs in [("task.acceptance", crit if plain else []), *((f"services[{_s(x.get('name'))}].acceptance", _svc_criteria(x)) for x in services)]:
+            if cs and not any(re.search(r"\btests?\b|pytest", c, re.I) for c in cs):
+                issues.append(Issue("warning", where_c, "a code goal has no criterion about tests; add one (which command runs them, that they pass)", "code-criteria"))
 
     # --- review step
     review = _review_required(needs)
@@ -806,12 +1017,13 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
             if hit:
                 issues.append(Issue("error", a.where, f"charter tells the {a.kind or 'reviewer'} to change another agent's file ('{hit}'), which the single-writer rule (ORG.md rule 9) forbids; make it report findings and required changes to its manager, who sends them to the author", "edits-others"))
     vwords = re.compile(r"\b(?:review\w*|fact-?check\w*|checker|tester|verif\w+|" + "|".join(re.escape(v.name) for v in verifiers) + r")\b", re.I) if verifiers else None
-    for i, c in enumerate(crit, 1):
-        hit = edits_others_files(c)
-        if hit and vwords and vwords.search(c):
-            issues.append(Issue("error", f"task.acceptance[{i}]", f"'{hit}': a reviewer cannot change another agent's file; say that the reviewer reports findings and the author applies them", "edits-others"))
+    for where_c, cs in [("task.acceptance", crit if plain else []), *((f"services[{_s(x.get('name'))}].acceptance", _svc_criteria(x)) for x in services)]:
+        for i, c in enumerate(cs, 1):
+            hit = edits_others_files(c)
+            if hit and vwords and vwords.search(c):
+                issues.append(Issue("error", f"{where_c}[{i}]", f"'{hit}': a reviewer cannot change another agent's file; say that the reviewer reports findings and the author applies them", "edits-others"))
 
-    # --- budget
+    # --- budget (the user's cap is for ONE request: the one task, or each request of a service)
     est = estimate(agents) if agents else {"total": 0, "per": {}}
     cap = needs.get("budget_runs")
     total = planned_total(bp, est["total"]) if agents else 0
@@ -820,14 +1032,16 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
     elif not isinstance(cap, int) or isinstance(cap, bool) or cap < 1:
         issues.append(Issue("error", "needs.budget_runs", "budget_runs must be a whole number of runs >= 1", "budget"))
         cap = None
-    if agents and isinstance(task.get("budget"), int) and not isinstance(task.get("budget"), bool):
-        total = task["budget"]
-    if cap is not None and total > cap:
-        issues.append(Issue("error", "task.budget", f"planned budget {total} runs is above the user's cap of {cap}; lower task.budget or shrink the team", "budget-cap"))
-    if agents and total < est["total"]:
-        issues.append(Issue("error", "task.budget" if task.get("budget") else "needs.budget_runs", f"{total} runs cannot cover the pipeline: the estimate with one review and one rework cycle is {est['total']} (see estimate()); raise the budget or drop a role", "budget-low"))
-    elif agents and total < math.ceil(est["total"] * TIGHT):
-        issues.append(Issue("warning", "task.budget", f"{total} runs leaves almost no slack over the estimate of {est['total']}; expect a stall on the first surprise", "budget-tight"))
+    if plain:
+        if agents and isinstance(task.get("budget"), int) and not isinstance(task.get("budget"), bool):
+            total = task["budget"]
+        if cap is not None and total > cap:
+            issues.append(Issue("error", "task.budget", f"planned budget {total} runs is above the user's cap of {cap}; lower task.budget or shrink the team", "budget-cap"))
+        if agents and total < est["total"]:
+            issues.append(Issue("error", "task.budget" if task.get("budget") else "needs.budget_runs", f"{total} runs cannot cover the pipeline: the estimate with one review and one rework cycle is {est['total']} (see estimate()); raise the budget or drop a role", "budget-low"))
+        elif agents and total < math.ceil(est["total"] * TIGHT):
+            issues.append(Issue("warning", "task.budget", f"{total} runs leaves almost no slack over the estimate of {est['total']}; expect a stall on the first surprise", "budget-tight"))
+    _validate_services(bp, agents, tops, cap, est["total"], org, roots, issues)
 
     # --- models
     pol = _s(needs.get("model_policy"))
@@ -867,9 +1081,15 @@ def validate(bp: dict, *, org: Org | None = None, allowed_roots: list | None = N
 # --------------------------------------------------------------------------------------------- charters
 
 
+def _has_plain_task(bp: dict) -> bool:
+    t = bp.get("task")
+    return isinstance(t, dict) and "service" not in t
+
+
 def _charter(a: Agent, agents: list[Agent], bp: dict, split: dict[str, dict]) -> str:
     by = {x.addr: x for x in agents}
     needs, d = _needs(bp), _deliverable(bp)
+    offers = [_s(x.get("name")) for x in _services(bp)] if a.parent is None else []
     parts = [a.template.body] if a.template else []
     asg = ["## Assignment (from the approved plan)", f"Mission: {_s(bp.get('mission'))}"]
     if d.get("description"):
@@ -897,20 +1117,89 @@ def _charter(a: Agent, agents: list[Agent], bp: dict, split: dict[str, dict]) ->
             k = by[c]
             asg.append(f"- {c}: {k.role} ({k.kind}; tools: {', '.join(k.tools) or 'none'}; model: {k.model or 'org default'})")
         grants = [(c, split[c]["grant"]) for c in a.children]
-        asg += [
-            f"Budget plan: you start with {split[a.addr]['grant']} runs. Initial grants, set explicitly with `budget=`: "
-            + ", ".join(f"{c} {n}" for c, n in grants) + f". Each grant already includes that worker's one rework (author) or re-check (verifier) run. You keep {split[a.addr]['keeps']} runs: your own runs plus the reserve for "
-            "one review and one rework cycle (rework tasks hand down 1-2 runs each). Do not hand down more than this up front. Runs you do not spend return to your parent automatically with your final report.",
-        ]
+        if offers and not _has_plain_task(bp):
+            asg.append("Budget plan: each request arrives with the budget of its service, and its split between you and your team is in the playbook (`## Budget plan`). "
+                       "Hand down no more than that plan says, with `budget=` set explicitly; keep the reserve for one review and rework cycle. "
+                       "Runs you do not spend return to your parent automatically with your final report.")
+        else:
+            asg.append(
+                f"Budget plan: you start with {split[a.addr]['grant']} runs. Initial grants, set explicitly with `budget=`: "
+                + ", ".join(f"{c} {n}" for c, n in grants) + f". Each grant already includes that worker's one rework (author) or re-check (verifier) run. You keep {split[a.addr]['keeps']} runs: your own runs plus the reserve for "
+                "one review and one rework cycle (rework tasks hand down 1-2 runs each). Do not hand down more than this up front. Runs you do not spend return to your parent automatically with your final report.")
         vs = [c for c in a.children if by[c].kind == "verifier"]
         if vs:
             au = [c for c in a.children if by[c].kind == "author"]
             asg.append(f"Review loop: {', '.join(au) or 'the authors'} produce; {', '.join(vs)} verif{'ies' if len(vs) == 1 else 'y'} independently and report findings and required changes to you; "
                        "you send them to the author with `revises`; verifiers never edit the author's file.")
+    if offers:
+        asg.append(
+            f"Services you offer: {', '.join(offers)} (the runtime shows them, with their contract, in your prompt). A task with a `service:` "
+            "header is a request for one: for it the playbook shown in your prompt is the procedure (steps, who does what, budget plan), "
+            "and wherever this charter's general procedure differs, the playbook wins. You own the playbook and improve it with `revise_playbook` "
+            "from the evidence shown before a new request. The acceptance criteria come from the request and the contract; improving the playbook "
+            "may raise the bar, never lower it.")
     parts.append("\n".join(asg))
     if a.extra:
         parts.append(("## Additional instructions\n" if a.template else "") + a.extra)
     return "\n\n".join(parts)
+
+
+# ---------------------------------------------------------------------------------------- default playbook
+
+
+def default_playbook(owner: Agent, agents: list[Agent], service: dict, budget: int) -> str:
+    """Playbook v1 of a service when the blueprint gives none: the lead charter's procedure for THIS team, as steps.
+
+    Built from the same facts as ``_charter`` and the manager template: who produces, who verifies, the sequencing
+    (a step is delegated when its inputs exist), author-routed rework with ``revises``, the runs held back for one
+    rework cycle, the final check of every criterion and the report with ``lessons``. The owner improves it later.
+    """
+    by = {x.addr: x for x in agents}
+    split = budget_split(agents, budget)
+    est = estimate(agents)["per"]
+    kids = [by[c] for c in owner.children]
+    makers = [k for k in kids if k.kind != "verifier"]
+    checkers = [k for k in kids if k.kind == "verifier"]
+    path = _s(_svc_deliverable(service).get("path"))
+    grant = lambda k: split[k.addr]["grant"]  # noqa: E731
+    steps = ["Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract "
+             "and can only be met, never changed; copy the relevant ones verbatim into every task you delegate."]
+    if not kids:
+        steps.append("Do the work yourself, following the request's deliverable and criteria exactly.")
+    for i, k in enumerate(makers):
+        what = f"`{k.name}` ({k.role})"
+        if i == 0:
+            steps.append(f"Delegate to {what} with `budget={grant(k)}`: its part of the request, with the criteria it must meet. On this first run delegate only the steps that need nothing from a teammate.")
+        else:
+            steps.append(f"When the previous result is in, read its artifact yourself, then delegate to {what} with `budget={grant(k)}`, naming the artifact it builds on. "
+                         "Never delegate a step before its inputs exist, and send no status messages: results wake you.")
+    for k in checkers:
+        steps.append(f"When the work exists, delegate to `{k.name}` ({k.role}) with `budget={grant(k)}` to check the final file independently against every criterion. "
+                     "It reports findings and required changes to you and never edits the author's file.")
+    if checkers:
+        usual = f"; for the deliverable usually `{makers[-1].name}`" if makers else ""
+        steps.append("If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file "
+                     f"(`delegate(to=<author>, revises=<that author's task id>, budget=1)`{usual}), then have the checker re-check that same file "
+                     "(`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options "
+                     "and the checker's final line instead of starting another cycle.")
+    steps.append("Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output"
+                 + (", and paste the checker's final coverage line verbatim." if checkers else "."))
+    steps.append("Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path"
+                 + (f" (the assistant copies it to {path})" if path else "")
+                 + " and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).")
+    budget_lines = [f"Request budget: {budget} runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:"]
+    for k in kids:
+        e = est[k.addr]
+        budget_lines.append(f"- {k.name}: {grant(k)} runs ({e['pass']} work + {e['rework']} rework or re-check" + (", plus its team" if k.children else "") + ")")
+    own = est[owner.addr]["total"]
+    keeps = split[owner.addr]["keeps"]
+    budget_lines.append(f"- you ({owner.name}): keep {keeps} runs: your own {own} (plan, process each result, final check, report, one rework cycle)"
+                        + (f" and {keeps - own} of slack" if keeps - own > 0 else "") + ".")
+    budget_lines.append("Unspent runs return to your parent with your final report.")
+    text = ("## Steps\n" + "\n".join(f"{i}. {x}" for i, x in enumerate(steps, 1))
+            + "\n\n## Budget plan\n" + "\n".join(budget_lines)
+            + "\n\n## Pitfalls\nnone yet: add them from lessons and feedback")
+    return text
 
 
 # ----------------------------------------------------------------------------------------------- plan
@@ -988,7 +1277,8 @@ def render_plan(bp: dict, issues: list[Issue] | None = None, *, org: Org | None 
 
     need("Scope", needs.get("scope"))
     spec = ", ".join(x for x in (_s(d.get("format")), f"max {d['max_words']} words" if d.get("max_words") else "") if x)
-    need("Deliverable", (_s(d.get("description")) + (f" [{spec}]" if spec else "")) if d.get("description") else "")
+    need("Deliverable", (_s(d.get("description")) + (f" [{spec}]" if spec else "")) if d.get("description")
+         else ("per service (see Services below)" if not _plain(bp) else ""))
     need("Quality bar", needs.get("quality_bar"))
     need("Sources / tools", needs.get("sources"))
     need("Workspace", needs.get("workspace") or "none (no agent writes files or runs commands)")
@@ -1003,27 +1293,39 @@ def render_plan(bp: dict, issues: list[Issue] | None = None, *, org: Org | None 
     L += _tree_lines(agents) or ["- (none)"]
 
     est = estimate(agents) if agents else {"total": 0, "per": {}}
+    plain = _plain(bp)
     total = planned_total(bp, est["total"]) if agents else 0
-    if isinstance(task.get("budget"), int):
+    if isinstance(task.get("budget"), int) and plain:
         total = task["budget"]
     cap = needs.get("budget_runs")
-    L += ["", f"Budget: {total} runs planned" + (f" (your cap: {cap})" if cap else " (no cap given)")
-          + f", estimate {est['total']} for one pass + one review/rework cycle:",
-          "  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you."]
-    if agents:
+    svc_budgets = _svc_budgets(bp, agents)
+
+    def split_lines(total: int, indent: str = "  ") -> None:
         split = budget_split(agents, total)
         for a in agents:
             e = est["per"][a.addr]
             if a.children:
                 keeps = split[a.addr]["keeps"]
-                L.append(f"  {a.addr}: starts with {split[a.addr]['grant']}, hands down "
+                L.append(f"{indent}{a.addr}: starts with {split[a.addr]['grant']}, hands down "
                          + ", ".join(f"{c.rsplit('/', 1)[-1]} {split[c]['grant']}" for c in a.children)
                          + f" (each includes its rework/re-check run), keeps {keeps} (own {e['total']}"
                          + (f" + slack {keeps - e['total']})" if keeps - e["total"] else ")"))
             else:
-                L.append(f"  {a.addr}: {split[a.addr]['grant']} runs ({e['pass']} work + {e['rework']} rework)")
+                L.append(f"{indent}{a.addr}: {split[a.addr]['grant']} runs ({e['pass']} work + {e['rework']} rework)")
+
+    if plain:
+        L += ["", f"Budget: {total} runs planned" + (f" (your cap: {cap})" if cap else " (no cap given)")
+              + f", estimate {est['total']} for one pass + one review/rework cycle:",
+              "  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you."]
+        if agents:
+            split_lines(total)
     else:
-        split = {}
+        L += ["", "Budget per request" + (f" (your cap: {cap})" if cap else " (no cap given)") + f", estimate {est['total']} for one pass + one review/rework cycle:",
+              "  A ceiling: runs the team does not spend come back automatically with the final report of each request."]
+        for name, n in svc_budgets.items():
+            L.append(f"  service {name}: {n} runs per request")
+            if agents:
+                split_lines(n, "    ")
 
     verifiers = [a for a in agents if a.kind == "verifier"]
     L += ["", "Review / verification:"]
@@ -1036,16 +1338,37 @@ def render_plan(bp: dict, issues: list[Issue] | None = None, *, org: Org | None 
     L.append("- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done")
 
     L += ["", "Deliverable:"]
-    L.append(f"- {_s(d.get('description')) or '(missing)'}" + (f" ({spec})" if spec else ""))
+    L.append(f"- {_s(d.get('description')) or ('per service (see Services below)' if not plain else '(missing)')}" + (f" ({spec})" if spec else ""))
     if _s(d.get("path")):
-        copy = any(i.code == "path-delivery" for i in issues)
+        copy = any(i.code == "path-delivery" and i.path.startswith("needs.") for i in issues)
         L.append(f"- Final location: {_s(d['path'])}" + (" (copied there by the assistant after verification)" if copy else " (written there by the team)"))
-    else:
+    elif plain or d.get("description"):
         L.append("- Final location: inside the organization (no path given)")
 
-    L += ["", f"First task: to {_s(task.get('to')) or (agents[0].addr if agents else '?')}: {_s(task.get('title')) or '(missing)'}"]
-    crit = _criteria(bp)
-    L += [f"  {i}. {c}" for i, c in enumerate(crit, 1)] or ["  (no acceptance criteria)"]
+    if plain:
+        L += ["", f"First task: to {_s(task.get('to')) or (agents[0].addr if agents else '?')}: {_s(task.get('title')) or '(missing)'}"]
+        crit = _criteria(bp)
+        L += [f"  {i}. {c}" for i, c in enumerate(crit, 1)] or ["  (no acceptance criteria)"]
+    if _services(bp):
+        L += ["", f"Services ({len(_services(bp))}), offered by {agents[0].addr if agents else '?'} and defined by root (the contract: only root can change it):"]
+        for sv in _services(bp):
+            name = _s(sv.get("name"))
+            sd = _svc_deliverable(sv)
+            ssp = ", ".join(x for x in (_s(sd.get("format")), f"max {sd['max_words']} words" if sd.get("max_words") else "") if x)
+            L += [f"- {name}: {_s(sv.get('description')) or '(missing)'}", f"  inputs: {_input_words(sv)}",
+                  f"  budget: {svc_budgets.get(name, 0)} runs per request" + (", locked (the lead may not revise the playbook)" if sv.get("locked") is True else ""),
+                  f"  deliverable: {_s(sd.get('description')) or '(missing)'}" + (f" [{ssp}]" if ssp else "") + f"; delivered to: {_svc_delivery(sv, agents, bp)}",
+                  "  acceptance (the contract, travels with every request):"]
+            L += [f"    {i}. {c}" for i, c in enumerate(_svc_criteria(sv), 1)] or ["    (none)"]
+            pb = sv.get("playbook")
+            L.append("  playbook v1: " + (f"given in the blueprint ({len(pb.split())} words)" if isinstance(pb, str) and pb.strip() else "generated from the team (steps, budget plan, pitfalls):"))
+            if not (isinstance(pb, str) and pb.strip()) and agents:
+                L += ["    " + ln for ln in default_playbook(agents[0], agents, sv, svc_budgets.get(name, 0)).splitlines()]
+        L.append(_reflection_line(agents[0].name if agents else "lead"))
+        if _is_request(bp):
+            L.append(f"First request: service {_s(task.get('service'))}" + (f": {_request_words(bp)}" if _request_words(bp) else "") + (f"; title: {_s(task.get('title'))}" if _s(task.get("title")) else ""))
+        elif not plain:
+            L.append("No first task: nothing runs until you ask for a request (request(service, inputs), then start()).")
 
     L += ["", "Checkpoints:",
           f"- Approval: {_s(needs.get('approval')) or 'plan approval before anything is built or started (default)'}",
@@ -1072,6 +1395,7 @@ SHOWN_CRITERIA = 8  # the block stays compact (about 40 lines); the full lists a
 SHOWN_WARNINGS = 5
 HIDDEN_WARNINGS = {"path-delivery", "path-parent", "needs-scope", "needs-approval", "needs-progress"}  # said elsewhere in the block
 PLAN_ID_LENGTH = 12
+SHOWN_SERVICE_CRITERIA = 5  # per service in the block; the details have them all
 
 
 def plan_id(bp: dict) -> str:
@@ -1151,8 +1475,25 @@ def _user_tree(agents: list[Agent]) -> list[str]:
 def _user_budget(agents: list[Agent], bp: dict) -> list[str]:
     needs, task = _needs(bp), bp.get("task") if isinstance(bp.get("task"), dict) else {}
     est = estimate(agents) if agents else {"total": 0, "per": {}}
-    total = planned_total(bp, est["total"]) if agents else 0
     cap = needs.get("budget_runs")
+    if not _plain(bp):  # services only: the budget is per request
+        budgets = _svc_budgets(bp, agents)
+        top = max(budgets.values(), default=0)
+        out = [f"Budget: up to {top} runs per request (one run = one working session of one agent), "
+               + (f"your cap per request is {cap}" if cap else "you gave no cap") + f"; the minimum for one review and rework is {est['total']}. "
+               "Unspent runs come back to you."]
+        if agents and len(budgets) == 1:
+            split = budget_split(agents, top)
+            for a in agents:
+                if a.children:
+                    out.append(f"  {a.addr} starts with {split[a.addr]['grant']}, hands down "
+                               + ", ".join(f"{c.rsplit('/', 1)[-1]} {split[c]['grant']}" for c in a.children)
+                               + f" and keeps {split[a.addr]['keeps']} for planning, checking and rework.")
+        if agents:
+            out.append("If a check still fails after one rework, I'll come back to you with options before spending the reserve; "
+                       "nothing beyond a request's budget is spent without your OK.")
+        return out
+    total = planned_total(bp, est["total"]) if agents else 0
     out = [f"Budget: {total} runs planned (one run = one working session of one agent), "
            + (f"your cap is {cap}" if cap else "you gave no cap") + f"; the minimum for one review and rework is {est['total']}. "
            "Unspent runs come back to you."]
@@ -1180,6 +1521,66 @@ def _failure_policy(total: int, minimum: int) -> str:
     return f"{head}; the plan has no reserve beyond that rework, and nothing beyond the {total} planned runs is spent without your OK."
 
 
+def _input_words(sv: dict) -> str:
+    try:
+        ins = services_mod._inputs(sv.get("inputs"))
+    except OrgError:
+        return "(see the errors)"
+    return ", ".join(f"{i['name']} ({'required' if i['required'] else 'optional'})" for i in ins) or "nothing: every request is the same"
+
+
+def _svc_delivery(sv: dict, agents: list[Agent], bp: dict) -> str:
+    path = _s(_svc_deliverable(sv).get("path"))
+    if not path:
+        ws = _s(_needs(bp).get("workspace"))
+        if ws and _is_code(bp):
+            return f"the workspace {ws} (the team works and commits there)"
+        return "inside the organization folder (no location given)"
+    p = Path(os.path.expanduser(path))
+    direct = p.is_absolute() and _delivers_directly(agents, p.resolve())
+    return f"{path} " + ("(the team writes it there)" if direct else "(I copy each result there after checking it)")
+
+
+def _request_words(bp: dict) -> str:
+    t = bp.get("task") if isinstance(bp.get("task"), dict) else {}
+    ins = t.get("inputs") if isinstance(t.get("inputs"), dict) else {}
+    return ", ".join(f"{k}: {_clip(v, 80)}" for k, v in ins.items() if _s(v))
+
+
+def _reflection_line(owner: str) -> str:
+    who = "the lead" if owner == "lead" else f"the lead ({owner})"
+    return (f"After each request {who} records lessons; before the next one it reviews them with your feedback and may improve how the team "
+            "works (its playbook). It cannot change these checks: only you can, through me.")
+
+
+def _user_services(bp: dict, agents: list[Agent]) -> list[str]:
+    """The compact Services part of the plan for the user: per service what it is, what you provide, its budget,
+    its checks (the contract, first few in full), where it is delivered; then the reflection rule and what runs now."""
+    svcs = _services(bp)
+    if not svcs:
+        return []
+    budgets = _svc_budgets(bp, agents)
+    top = next((a for a in agents if a.parent is None), None)
+    out = ["Services (kept ready, requested whenever you want):"]
+    for sv in svcs:
+        name = _s(sv.get("name"))
+        crit = _svc_criteria(sv)
+        out.append(f"- {name}: {_clip(sv.get('description'), 200) or '(missing)'}")
+        out.append(f"  You provide: {_input_words(sv)}")
+        out.append(f"  Each request: up to {budgets[name]} runs")
+        out.append("  Checks:" if crit else "  Checks: (none given)")
+        out += [f"    {i}. {' '.join(c.split())}" for i, c in enumerate(crit[:SHOWN_SERVICE_CRITERIA], 1)]
+        if len(crit) > SHOWN_SERVICE_CRITERIA:
+            out.append(f"    ... and {len(crit) - SHOWN_SERVICE_CRITERIA} more (see the details)")
+        out.append(f"  Delivered to: {_svc_delivery(sv, agents, bp)}")
+    out.append(_reflection_line(top.name if top else "the lead"))
+    if _is_request(bp):
+        out.append(f"First request, started on approval: {_s(bp['task'].get('service'))}" + (f" ({_request_words(bp)})" if _request_words(bp) else "") + ".")
+    elif not _has_plain_task(bp):
+        out.append("Nothing runs until you ask for a request: approving only creates the team and the services.")
+    return out
+
+
 def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | None = None, allowed_roots: list | None = None) -> str:
     """The compact, plain-language plan the assistant shows to the user verbatim (about 40 lines at most).
 
@@ -1194,6 +1595,7 @@ def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | Non
     task = bp.get("task") if isinstance(bp.get("task"), dict) else {}
     errs = [i for i in issues if i.level == "error"]
     warns = [i for i in issues if i.level == "warning" and i.code not in HIDDEN_WARNINGS]
+    plain = _plain(bp)
     L: list[str] = [PLAN_DRAFT_HEADING if errs else PLAN_HEADING, f"Goal: {_clip(bp.get('mission'), GOAL_CLIP) or '(missing)'}", "What I understood you need:"]
 
     def need(label: str, value) -> None:
@@ -1220,26 +1622,29 @@ def plan_for_user(bp: dict, issues: list[Issue] | None = None, *, org: Org | Non
     if verifiers:
         L.append("Checking: " + ", ".join(v.name for v in verifiers) + " review"
                  + ("s" if len(verifiers) == 1 else "") + " the work independently (they did not write it); required changes go back "
-                 "to the author. I then re-check the final result against every success check below.")
+                 f"to the author. I then re-check the final result against every {'success check' if plain else 'service check'} below.")
     else:
         L.append("Checking: no independent reviewer" + (" (you did not ask for one)" if r is False else " (!)")
-                 + ". I still re-check the final result against every success check below.")
+                 + f". I still re-check the final result against every {'success check' if plain else 'service check'} below.")
 
     spec = ", ".join(x for x in (_s(d.get("format")), f"max {d['max_words']} words" if d.get("max_words") else "") if x)
-    L.append(f"Deliverable: {_clip(d.get('description')) or '(missing)'}" + (f" [{spec}]" if spec else ""))
-    if _s(d.get("path")):
-        copied = any(i.code == "path-delivery" for i in issues)
-        L.append(f"  Delivered to: {_s(d['path'])}" + (" (I copy it there after checking it)" if copied else " (the team writes it there)"))
-    elif _s(needs.get("workspace")) and _is_code(bp):
-        L.append(f"  Delivered to: the workspace {_s(needs['workspace'])} (the team works and commits there)")
-    else:
-        L.append("  Delivered to: inside the organization folder (no location given)")
+    if plain or d.get("description"):
+        L.append(f"Deliverable: {_clip(d.get('description')) or '(missing)'}" + (f" [{spec}]" if spec else ""))
+        if _s(d.get("path")):
+            copied = any(i.code == "path-delivery" and i.path.startswith("needs.") for i in issues)
+            L.append(f"  Delivered to: {_s(d['path'])}" + (" (I copy it there after checking it)" if copied else " (the team writes it there)"))
+        elif _s(needs.get("workspace")) and _is_code(bp):
+            L.append(f"  Delivered to: the workspace {_s(needs['workspace'])} (the team works and commits there)")
+        else:
+            L.append("  Delivered to: inside the organization folder (no location given)")
 
-    crit = _criteria(bp)
-    L.append("Done when ALL of these hold:" if crit else "Done when: (no success checks given)")
-    L += [f"  {i}. {' '.join(_s(c).split())}" for i, c in enumerate(crit[:SHOWN_CRITERIA], 1)]  # the contract: in full
-    if len(crit) > SHOWN_CRITERIA:
-        L.append(f"  ... and {len(crit) - SHOWN_CRITERIA} more (see the details)")
+    if plain:
+        crit = _criteria(bp)
+        L.append("Done when ALL of these hold:" if crit else "Done when: (no success checks given)")
+        L += [f"  {i}. {' '.join(_s(c).split())}" for i, c in enumerate(crit[:SHOWN_CRITERIA], 1)]  # the contract: in full
+        if len(crit) > SHOWN_CRITERIA:
+            L.append(f"  ... and {len(crit) - SHOWN_CRITERIA} more (see the details)")
+    L += _user_services(bp, agents)
 
     L.append(f"Checkpoints: approval - {_clip(needs.get('approval')).rstrip('.') or 'this plan, before anything is built or started'}; "
              f"progress - {_clip(needs.get('progress')).rstrip('.') or 'one line when you ask'}; any spend beyond the budget needs your OK.")
@@ -1284,23 +1689,34 @@ def propose(source, *, org: Org | None = None, allowed_roots: list | None = None
 @dataclass
 class Summary:
     agents: list[str]
-    task_id: str
+    task_id: str  # "" when the blueprint gave no first task (services only)
     to: str
     budget: int
     warnings: list[Issue] = field(default_factory=list)
+    services: list[str] = field(default_factory=list)
+    service_request: str = ""  # the service the first task requested, if it is a request
 
     def text(self) -> str:
-        lines = [f"created {len(self.agents)} agents: {', '.join(self.agents)}",
-                 f"task {self.task_id} -> {self.to} (budget {self.budget})"]
+        lines = [f"created {len(self.agents)} agents: {', '.join(self.agents)}"]
+        if self.services:
+            lines.append(f"defined {len(self.services)} service(s) of {self.to}: {', '.join(self.services)} (contract and playbook v1)")
+        if self.task_id and self.service_request:
+            lines.append(f"first request: service {self.service_request}, task {self.task_id} -> {self.to} (budget {self.budget})")
+        elif self.task_id:
+            lines.append(f"task {self.task_id} -> {self.to} (budget {self.budget})")
+        else:
+            lines.append("no task was given: the services are ready and nothing runs yet. To use one: request(service, inputs) "
+                         "(or `orgmcp request SERVICE --input key=value`), then start()")
         lines += [f"warning: {w.path}: {w.message}" for w in self.warnings]
         return "\n".join(lines)
 
 
 def apply(org: Org, bp: dict, *, allowed_roots: list | None = None) -> Summary:
-    """Create the agents (parents first, as root through each parent) and give the first task.
+    """Create the agents (parents first, as root through each parent), define the services, and give the first task.
 
-    Refuses on any validation error or existing name, before writing anything. If a hire or the delegation fails
-    midway, everything created is retired again and the error is raised.
+    The first task is a plain task, a first request for a service (``task.service``), or none (services only: they
+    are ready to be requested). Refuses on any validation error or existing name, before writing anything. If a hire,
+    a service definition or the delegation fails midway, everything created is retired again and the error is raised.
     """
     issues = validate(bp, org=org, allowed_roots=allowed_roots)
     errs = errors(issues)
@@ -1308,13 +1724,15 @@ def apply(org: Org, bp: dict, *, allowed_roots: list | None = None) -> Summary:
         raise BlueprintError("blueprint has errors, nothing was created:\n" + "\n".join(f"- {i.path}: {i.message}" for i in errs))
     roots = [Path(r).expanduser().resolve() for r in allowed_roots] if allowed_roots else _default_roots()
     agents = _resolve(bp, org, roots, [])
-    task = bp["task"]
+    task = bp["task"] if isinstance(bp.get("task"), dict) else None
     est = estimate(agents)
     total = planned_total(bp, est["total"])
     split = budget_split(agents, total)
     top = agents[0]
     made_dirs: list[Path] = []
     created: list[str] = []
+    defined: list[str] = []
+    msg = None
     try:
         for a in agents:  # parents before children
             if a.workspace and not Path(a.workspace).exists():
@@ -1328,14 +1746,29 @@ def apply(org: Org, bp: dict, *, allowed_roots: list | None = None) -> Summary:
                 inputs=a.inputs if (a.inputs or "read" in a.tools) else None,
             )
             created.append(addr)
-        crit = _criteria(bp)
-        acceptance = "\n".join(f"{i}. {c}" for i, c in enumerate(crit, 1))
-        goal = _s(task.get("goal"))
-        d = _deliverable(bp)
-        if d.get("description"):
-            spec = ", ".join(x for x in (_s(d.get("format")), f"at most {d['max_words']} words" if d.get("max_words") else "") if x)
-            goal += f"\n\nDeliverable: {_s(d['description'])}" + (f" ({spec})" if spec else "") + ". Report its path as an artifact."
-        msg = org.delegate(ROOT, top.addr, _s(task["title"]), goal, acceptance, _list(task.get("inputs")), total)
+        budgets = _svc_budgets(bp, agents)
+        for sv in _services(bp):
+            name = _s(sv.get("name"))
+            d = dict(services_mod._deliverable(_svc_deliverable(sv)))
+            if d.get("path"):
+                d["path"] = os.path.expanduser(d["path"])
+            playbook = sv["playbook"].strip() if isinstance(sv.get("playbook"), str) and sv["playbook"].strip() else default_playbook(top, agents, sv, budgets[name])
+            org.define_service(
+                ROOT, top.addr, name, description=_s(sv.get("description")), inputs=services_mod._inputs(sv.get("inputs")),
+                acceptance=_svc_criteria(sv), deliverable=d, budget=budgets[name], playbook=playbook, locked=sv.get("locked") is True,
+            )
+            defined.append(name)
+        if task is not None and "service" in task:
+            msg = org.request(ROOT, _s(task["service"]), task.get("inputs") or {}, title=_s(task.get("title")), note=_s(task.get("note")))
+        elif task is not None:
+            crit = _criteria(bp)
+            acceptance = "\n".join(f"{i}. {c}" for i, c in enumerate(crit, 1))
+            goal = _s(task.get("goal"))
+            d = _deliverable(bp)
+            if d.get("description"):
+                spec = ", ".join(x for x in (_s(d.get("format")), f"at most {d['max_words']} words" if d.get("max_words") else "") if x)
+                goal += f"\n\nDeliverable: {_s(d['description'])}" + (f" ({spec})" if spec else "") + ". Report its path as an artifact."
+            msg = org.delegate(ROOT, top.addr, _s(task["title"]), goal, acceptance, _list(task.get("inputs")), total)
     except Exception:
         for addr in reversed(created):
             if org.exists(addr) and Org.depth(addr) == 1:
@@ -1349,5 +1782,7 @@ def apply(org: Org, bp: dict, *, allowed_roots: list | None = None) -> Summary:
             except OSError:
                 break
         raise
-    org.commit(f"root: applied blueprint ({len(created)} agents), task {msg.id} -> {top.addr}")
-    return Summary(created, msg.id, top.addr, total, [i for i in issues if i.level == "warning"])
+    what = (f"task {msg.id} -> {top.addr}" if msg is not None else "no task") + (f", services: {', '.join(defined)}" if defined else "")
+    org.commit(f"root: applied blueprint ({len(created)} agents), {what}")
+    return Summary(created, msg.id if msg is not None else "", top.addr, msg.budget if msg is not None else 0,
+                   [i for i in issues if i.level == "warning"], defined, _s(task["service"]) if msg is not None and task and "service" in task else "")

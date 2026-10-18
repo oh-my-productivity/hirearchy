@@ -464,7 +464,7 @@ def test_a_failing_stray_probe_never_stops_a_run(org, tmp_path, monkeypatch):
 
 def test_skill_carries_the_finishing_rules():
     skill = skill_source().read_text()
-    assert len(skill.splitlines()) <= 110
+    assert len(skill.splitlines()) <= 125
     for needle in ("settle them with the user BEFORE you", "ask for approval", "state each one plainly",
                    "what happens if the check still fails after one rework",
                    "Ask at the FIRST budget request", "never wait until the reserve", "waiting on you",

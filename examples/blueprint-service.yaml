@@ -1,0 +1,52 @@
+# A research org that offers its work as a standing SERVICE: asked for again and again, and improving each time.
+#   orgmcp plan examples/blueprint-service.yaml     # validate + print the plan
+#   orgmcp apply examples/blueprint-service.yaml    # create the agents, define the service, give the first request
+#   orgmcp request weekly-brief --input topic="solid-state batteries"   # ask for another one later (then `orgmcp run`)
+# `services:` is what changes with a plain blueprint (see blueprint-research.yaml): the service carries its own
+# acceptance criteria, deliverable and budget (per request); `task:` is optional and here is a first request.
+mission: >
+  Offer a weekly, sourced one-page brief on a topic the requester names, and get better at it with every request.
+needs:
+  scope: "One topic per request; news and developments of the past week only; sources are public web pages."
+  quality_bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations.
+  sources: Web access to news sites, official sites and documentation; a source URL per claim.
+  budget_runs: 25   # the user's cap for ONE request; the service below asks for 22
+  models: {cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}
+  model_policy: cheap drafting, strong review (research and writing on cheap; the lead and the fact-check on strong, because the lead decides how every other run is spent)
+  review: true   # independent fact-check by someone who did not write the brief
+  approval: Approve this plan before anything is created or started; ask before spending beyond a request's budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    role: Research lead
+    model: strong   # never cheap: a cheap lead misroutes rework and wastes runs
+    children:
+      - {name: researcher, template: researcher}
+      - {name: writer, template: writer}
+      - {name: factcheck, template: fact-checker}
+services:
+  - name: weekly-brief                 # lowercase-dashed; requests name the service only
+    owner: lead                        # optional; the top-level agent (the only owner allowed in this version)
+    description: A one-page, sourced brief on the past week's news about a topic.
+    inputs:                            # what changes with each request
+      - {name: topic, description: what the brief is about, required: true}
+      - {name: week, description: ISO week such as 2026-W43; default the current one, required: false}
+    acceptance:                        # the contract: only the user can change it; the lead may not lower it
+      - At most 600 words as counted by read.
+      - Has exactly the sections "This week", "Changes since last week" and "Our assessment", in that order.
+      - Every sentence with a number, name, version, date, price or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+      - The "Our assessment" section is judgement, with no citations or new facts, and rests only on claims verified elsewhere in the brief.
+      - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim."
+    deliverable:
+      description: One markdown file with the brief
+      format: markdown
+      max_words: 600
+      path: ~/deliverables/weekly-briefs   # a folder; the assistant copies each checked brief into it
+    budget: 22                         # runs per request; leave it out for the estimate + 25%
+    locked: false                      # true: the lead may not revise the playbook
+    # playbook: |                      # optional first workflow; left out, one is generated from the team
+task:                                  # optional: a first request, started on approval
+  service: weekly-brief
+  inputs: {topic: solid-state batteries}
+  title: Weekly brief - solid-state batteries
