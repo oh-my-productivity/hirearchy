@@ -7,6 +7,7 @@ from pathlib import Path
 
 from ..kernel import AtomicWriter, Clock, Environment, IdGenerator, LedgerStore, OrgLayout
 from ..locator import OrgLocator
+from ..processes import OrphanJudge, ProcessInspector, ProcessSignaller, ProcessSpawner
 from ..settings import EventSwitch, OrgDocumentStore, OrgSettings
 from ..snapshots import GitClient, IgnoreList, OrgSnapshotter
 from ..templates import DocumentTemplates, Notices
@@ -35,3 +36,7 @@ class OrgRuntime:
     git: GitClient
     snapshotter: OrgSnapshotter
     ignore_list: IgnoreList
+    process_spawner: ProcessSpawner
+    process_inspector: ProcessInspector
+    process_signaller: ProcessSignaller
+    orphan_judge: OrphanJudge

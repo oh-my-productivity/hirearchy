@@ -22,9 +22,11 @@ from pathlib import Path
 from typing import IO, Callable, NamedTuple
 
 from . import review, telemetry, templates
+from .app import wire_processes
 from .app.wiring import open_runtime
 from .core import ROOT, Org, OrgError, atomic_write
 from .health import config_number
+from .processes import ProcessTableError
 
 # (org, agent address, prompt) -> (argv, cwd, env). The prompt is delivered on the process's stdin, not in argv.
 Runner = Callable[[Org, str, str], tuple[list[str], Path, dict]]
@@ -183,13 +185,7 @@ class Run:
 
 def _signal_group(proc: subprocess.Popen, sig: int) -> None:
     """Signal a run's whole process group (the run was started in its own session, so pgid == pid)."""
-    try:
-        os.killpg(proc.pid, sig)
-    except (ProcessLookupError, PermissionError):
-        try:  # the group is gone (or not ours): fall back to the top process
-            proc.send_signal(sig)
-        except (ProcessLookupError, PermissionError):
-            pass
+    wire_processes.adopt(proc).signal_group(sig)
 
 
 def _ps(pid: int) -> tuple[str, str] | None:
@@ -197,18 +193,15 @@ def _ps(pid: int) -> tuple[str, str] | None:
 
     Raises OSError when ``ps`` itself cannot be run (the caller then has to treat the process as unknown).
     """
-    env = {**os.environ, "LC_ALL": "C", "TZ": "UTC"}  # the same text for the same process, whatever the caller's locale
-    out = subprocess.run(["ps", "-o", "stat=,lstart=", "-p", str(pid)], capture_output=True, text=True,
-                         timeout=10, env=env).stdout.split()
-    return (out[0], " ".join(out[1:])) if len(out) > 1 else None
+    try:
+        info = wire_processes.system_inspector().info(pid)
+    except ProcessTableError as exc:
+        raise OSError(str(exc)) from exc
+    return (info.state, info.started) if info else None
 
 
 def _start_time(pid: int) -> str | None:
-    try:
-        info = _ps(pid)
-    except (OSError, subprocess.SubprocessError):
-        return None
-    return info[1] if info else None
+    return wire_processes.system_inspector().start_time(pid)
 
 
 def judge_orphan(rec: dict) -> str:
@@ -221,45 +214,12 @@ def judge_orphan(rec: dict) -> str:
     * ``doubt``: alive but unverifiable (no start time recorded, or ``ps`` failed): not killed, and the agent
       does not get a second run while it lives.
     """
-    pgid = rec.get("pgid")
-    if not isinstance(pgid, int) or isinstance(pgid, bool) or pgid <= 1 or pgid in (os.getpid(), os.getpgrp()):
-        return "foreign"
-    try:
-        info = _ps(pgid)
-    except (OSError, subprocess.SubprocessError):
-        return "doubt"
-    if info is None or info[0].startswith("Z"):
-        return "gone"
-    recorded = rec.get("lstart")
-    if not isinstance(recorded, str) or not recorded:
-        return "doubt"
-    if recorded != info[1]:
-        return "foreign"
-    try:
-        leader = os.getpgid(pgid) == pgid and os.getsid(pgid) == pgid
-    except (ProcessLookupError, PermissionError):
-        return "doubt"
-    return "ours" if leader else "foreign"
+    return wire_processes.system_judge().judge(rec)
 
 
 def kill_group(pgid: int, wait: float = 5.0) -> bool:
     """SIGKILL a process group and wait until its leader is gone. True when it is."""
-    try:
-        os.killpg(pgid, signal.SIGKILL)
-    except ProcessLookupError:
-        return True
-    except PermissionError:
-        return False
-    deadline = time.time() + wait
-    while time.time() < deadline:
-        try:
-            info = _ps(pgid)
-        except (OSError, subprocess.SubprocessError):
-            return False
-        if info is None or info[0].startswith("Z"):
-            return True
-        time.sleep(0.05)
-    return False
+    return wire_processes.system_signaller().kill_group(pgid, wait)
 
 
 # ------------------------------------------------------- start/stop (used by the MCP tools of root)
@@ -291,12 +251,7 @@ def scheduler_command(root: Path, max_runs: int | None = None, until_done: bool 
 
 
 def _command_line(pid: int) -> str | None:
-    try:
-        out = subprocess.run(["ps", "-o", "command=", "-p", str(pid)], capture_output=True, text=True, timeout=10,
-                             env={**os.environ, "LC_ALL": "C"}).stdout
-    except (OSError, subprocess.SubprocessError):
-        return None
-    return out.strip() or None
+    return wire_processes.system_inspector().command_line(pid)
 
 
 def _root_arguments(tokens: list[str]) -> list[str]:
