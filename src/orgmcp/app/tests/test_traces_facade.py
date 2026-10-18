@@ -13,9 +13,6 @@ from orgmcp.app import Org
 from orgmcp.kernel import Message
 from orgmcp.traces import TraceLookup, TraceStamper
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-traces")
-
-
 def use(org: Org, **ports: Any) -> None:
     org.runtime = dataclasses.replace(org.runtime, **ports)
 
@@ -86,7 +83,6 @@ class FixedStamper(TraceStamper):
         return "given", ["c"]
 
 
-@RED
 def test_the_lookups_come_from_the_trace_lookup_of_the_runtime(org: Org) -> None:
     use(org, trace_lookup=FixedLookup())
     assert org.trace_of("ceo", "m") == "ceo:m"
@@ -94,7 +90,6 @@ def test_the_lookups_come_from_the_trace_lookup_of_the_runtime(org: Org) -> None
     assert org.context_trace("ceo") == ("ctx:ceo", "batch", ["x"])
 
 
-@RED
 def test_stamp_trace_comes_from_the_trace_stamper_of_the_runtime(org: Org) -> None:
     use(org, trace_stamper=FixedStamper())
     msg = Message(sender="root", to="ceo", type="task", body="b", id="20260101T000000000009-root-aaaa")
