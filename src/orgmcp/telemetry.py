@@ -303,7 +303,9 @@ def summarize_args(arguments: dict) -> dict:
     dicts as their keys (``inputs_keys``); other lists as their length (``acceptance_n``). Never a body."""
     out: dict = {}
     for name, value in arguments.items():
-        if value is None or isinstance(value, (bool, int, float)):
+        if value is None:
+            continue  # an argument left at its default says nothing
+        if isinstance(value, (bool, int, float)):
             out[name] = value
         elif isinstance(value, str):
             if name in _KEEP_STR:

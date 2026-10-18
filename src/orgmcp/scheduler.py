@@ -848,7 +848,7 @@ class Scheduler:
         """Lift a budget pause once budget is back (a refund note arrives without waking anyone)."""
         for addr in self.org.agents():
             if self.org.paused(addr) == "budget" and (self.org.budget(addr) or 0) > 0:
-                self.org.resume(addr, "budget is back")
+                self.org.resume(addr, "budget is back", by="runtime")
                 self.echo(f"{addr}: budget is back, resumed")
 
     def _runnable(self) -> list[str]:
@@ -875,12 +875,12 @@ class Scheduler:
             reason = self.org.paused(addr)
             budget = self.org.budget(addr) or 0
             if reason == "budget" and budget > 0:
-                self.org.resume(addr, "budget is back")
+                self.org.resume(addr, "budget is back", by="runtime")
                 reason = None
             if reason:
                 continue
             if budget <= 0:
-                self.org.pause(addr, "budget")
+                self.org.pause(addr, "budget", by="runtime")
                 waiting = [m.trace for m in self.org.messages(addr, "inbox")]
                 self.org.notify(self.org.parent(addr) or ROOT, f"{addr} is out of budget",
                                 templates.notice_budget(addr, self.org.unread(addr)), trace=telemetry.single(waiting))
@@ -930,7 +930,7 @@ class Scheduler:
     def _emit_run_start(self, addr: str, run_id: str, batch, traces: list, pid: int | None, budget_before) -> None:
         meta, _ = self.org.charter(addr)
         self._emit("run.start", agent=addr, run=run_id, trace=telemetry.single(traces), batch=[m.id for m in batch],
-                   traces=traces, pid=pid, pgid=pid, model=meta.get("model") or self.org.config.get("default_model"),
+                   traces=traces, child_pid=pid, pgid=pid, model=meta.get("model") or self.org.config.get("default_model"),
                    budget_before=budget_before)
 
     def _emit_run_end(self, run: Run, code, error: str | None = None) -> None:
@@ -1014,7 +1014,7 @@ class Scheduler:
         self._emit("agent.failure", agent=addr, count=n, trace=telemetry.single(traces))
         self.echo(f"{addr}: run failed ({n} in a row), log: {log}")
         if n >= config_number(self.org.config, "max_failures", int):
-            self.org.pause(addr, "failures")
+            self.org.pause(addr, "failures", by="runtime")
             rel = str(log.relative_to(self.org.root))
             parent = self.org.parent(addr) or ROOT
             trace = telemetry.single(traces)

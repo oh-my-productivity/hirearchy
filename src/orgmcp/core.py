@@ -1422,15 +1422,16 @@ class Org:
         p = self.dir(addr) / ".paused"
         return (p.read_text(encoding="utf-8").strip() or "paused") if p.exists() else None
 
-    def pause(self, addr: str, reason: str) -> None:
+    def pause(self, addr: str, reason: str, by: str | None = None) -> None:
+        """Pause an agent. ``by`` names who did it in the event (default: the acting process)."""
         (self.dir(addr) / ".paused").write_text(reason, encoding="utf-8")
-        self.emit("agent.pause", agent=addr, reason=telemetry.clip(reason, telemetry.ERROR_MAX))
+        self.emit("agent.pause", actor=by, agent=addr, reason=telemetry.clip(reason, telemetry.ERROR_MAX))
 
-    def resume(self, addr: str, reason: str = "") -> None:
+    def resume(self, addr: str, reason: str = "", by: str | None = None) -> None:
         was = self.paused(addr)
         (self.dir(addr) / ".paused").unlink(missing_ok=True)
         if was is not None:
-            self.emit("agent.resume", agent=addr, reason=reason or "resumed", previous=telemetry.clip(was, 200))
+            self.emit("agent.resume", actor=by, agent=addr, reason=reason or "resumed", previous=telemetry.clip(was, 200))
 
     def record_failure(self, addr: str) -> int:
         """Count one more consecutive failed run (kept in .runtime/failures.json, so it survives restarts)."""
