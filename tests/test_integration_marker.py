@@ -3,7 +3,7 @@
 * unmarked tests run against a stub ``kiro-cli`` and a fake ``$HOME`` (checked here, in-process);
 * tests marked ``integration`` (or living in ``tests/integration/``) are skipped unless asked for, and when asked for
   they get the real ``$HOME`` / ``PATH`` (no stub). Checked in a nested pytest run on a throwaway project that reuses
-  this directory's ``conftest.py``, so nothing here can start a real kiro.
+  the root ``conftest.py``, so nothing here can start a real kiro.
 * the safety harness (``tests/kiro_sandbox.py``) deletes only the sandbox's own profiles and detects ~/.kiro changes.
 """
 
@@ -58,7 +58,7 @@ def test_unmarked_but_in_integration_dir():
 def nested(tmp_path):
     proj = tmp_path / "proj"
     (proj / "integration").mkdir(parents=True)
-    shutil.copy(HERE / "conftest.py", proj / "conftest.py")
+    shutil.copy(HERE.parent / "conftest.py", proj / "conftest.py")  # the root conftest.py (it moved out of tests/)
     (proj / "test_inner.py").write_text(INNER)
     (proj / "integration" / "test_dir.py").write_text(INNER_DIR)
     out = tmp_path / "out"

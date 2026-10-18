@@ -25,11 +25,19 @@ dev = [
     "pytest==8.*",
 ]
 
+[tool.hatch.build.targets.wheel]
+# Colocated tests (src/orgmcp/**/tests/) are development files: never shipped.
+exclude = ["**/tests/**"]
+
 [tool.hatch.build.targets.wheel.force-include]
 "skills/orgmcp/SKILL.md" = "orgmcp/_skill/SKILL.md"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Tests live in tests/ (cross-feature, end-to-end, golden) and next to the code in src/orgmcp/**/tests/ (see README, "Test").
+# The shared fixtures and hooks are in the root conftest.py, so they reach both places; tests/ is on sys.path so tests can
+# import the helper modules that live there (fake_agent, kiro_sandbox, dash_fixtures, ...).
+testpaths = ["tests", "src/orgmcp"]
+pythonpath = ["tests"]
 markers = [
     "integration: uses the real kiro-cli / a real LLM; skipped unless --run-integration (or ORGMCP_RUN_INTEGRATION=1)",
 ]
