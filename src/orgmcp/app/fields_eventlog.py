@@ -4,10 +4,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-STEP: str | None = None  # set to the step's name when the step fills this part (see test_runtime_fields)
-NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
+from ..eventlog import EventFollowers, EventReader
+
+STEP: str | None = "A-eventlog"  # the step that filled this part (see test_runtime_fields)
+NOT_A_FIELD: dict[str, str] = {
+    "EventFollower": "a value that EventFollowers.follow returns for each tail (it has its own position), not a port built once",
+}
 
 
 @dataclass(frozen=True)
 class Fields:
-    """No field yet: the step that gives the package its ports adds them here."""
+    event_reader: EventReader
+    event_followers: EventFollowers
