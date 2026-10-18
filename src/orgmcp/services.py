@@ -150,7 +150,9 @@ def requestable_services(org: Org, actor: str) -> list[Contract]:
 def _owner_addr(org: Org, actor: str, owner: str) -> str:
     """``owner`` as a full address; a manager may give the short name of a direct report."""
     short = org.norm(owner)
-    return short if "/" in short or org.norm(actor) == ROOT else org.child_addr(actor, short)
+    if "/" in short or org.norm(actor) == ROOT or org.exists(short):
+        return short
+    return org.child_addr(actor, short)
 
 
 def _word_cap(org: Org) -> int:
@@ -191,7 +193,7 @@ def _lines(value, what: str, *, required: bool) -> list[str]:
             line = line.strip()
             if line.startswith(("- ", "* ")):
                 line = line[2:].strip()
-            if line:
+            if line and line not in ("-", "*"):
                 out.append(line)
     if required and not out:
         raise OrgError(
@@ -617,6 +619,7 @@ class Case:
     result: Message | None  # latest result of the latest task
     state: str  # open | done | failed | blocked
     playbook: int  # version of the playbook when the first request was sent
+    used: int  # version in force when the case was first answered (now, if still unanswered): what the stats group by
     reworks: int
     budget: int  # sum of the budgets of the tasks
     runs: int  # runs of the owner's subtree from the first request to the final result (or now)
@@ -668,6 +671,25 @@ class Stats:
         else:
             text += "; no feedback"
         return text
+
+
+def playbook_timeline(org: Org, owner: str, service: str) -> list[tuple[int, datetime]]:
+    """(version, when it was written) of every playbook version the service has had, oldest first."""
+    sdir = service_dir(org, owner, service)
+    paths = [*sorted((sdir / "history").glob("PLAYBOOK.v*.md")), sdir / "PLAYBOOK.md"]
+    out = []
+    for p in paths:
+        if p.is_file():
+            meta = split_frontmatter(p.read_text(encoding="utf-8"))[0]
+            when = _when(meta.get("revised"))
+            if when is not None and _int(meta.get("version")) > 0:
+                out.append((_int(meta.get("version")), when))
+    return sorted(out)
+
+
+def version_at(timeline: list[tuple[int, datetime]], when: datetime | None) -> int:
+    """The playbook version in force at ``when`` (None = now): the latest written at or before it; 0 if none yet."""
+    return max((v for v, t in timeline if when is None or t <= when), default=0)
 
 
 def lessons_of(result: Message) -> str:
@@ -725,6 +747,7 @@ def cases(org: Org, owner: str, service: str) -> list[Case]:
     notes = sorted((m for m in sent if m.type == "note" and m.feedback and m.reply_to in by_id), key=lambda m: m.id)
     others = sorted(m.id for m in sent if m.type == "task" and m.to == owner)
     team = org.subtree(owner)
+    timeline = playbook_timeline(org, owner, service)
     out = []
     for first, tasks in chains.items():
         ids = {t.id for t in tasks}
@@ -739,7 +762,9 @@ def cases(org: Org, owner: str, service: str) -> list[Case]:
         fb = [n for n in notes if n.reply_to in ids]
         out.append(Case(
             id=first, service=service, owner=owner, tasks=tasks, result=res, state=state,
-            playbook=tasks[0].playbook or 0, reworks=len(tasks) - 1, budget=sum(t.budget for t in tasks),
+            playbook=tasks[0].playbook or 0,
+            used=version_at(timeline, _msg_time(first_result) if (first_result := results.get(tasks[0].id)) else None),
+            reworks=len(tasks) - 1, budget=sum(t.budget for t in tasks),
             runs=_count_runs(org, team, tasks[0].id[:21], end),
             lessons=[x for t in tasks if (r := results.get(t.id)) is not None and (x := lessons_of(r))],
             feedback=fb[-1] if fb else None, started=_msg_time(tasks[0]),
@@ -763,8 +788,12 @@ def summarize(items: list[Case]) -> Stats:
 
 
 def stats_by_version(items: list[Case]) -> dict[int, Stats]:
-    """:func:`summarize` per playbook version (the one current when each case's first request was sent)."""
-    return {v: summarize([c for c in items if c.playbook == v]) for v in sorted({c.playbook for c in items})}
+    """:func:`summarize` per playbook version, grouped by the version in force when each case was first answered.
+
+    (Not the version current when the request was sent: the owner typically revises the playbook right after the
+    request arrives, and that request is then delivered under the new version.)
+    """
+    return {v: summarize([c for c in items if c.used == v]) for v in sorted({c.used for c in items})}
 
 
 def reflection_digest(org: Org, owner: str, service: str) -> str | None:
@@ -793,7 +822,7 @@ def reflection_digest(org: Org, owner: str, service: str) -> str | None:
 
 
 def _case_line(c: Case) -> str:
-    bits = [f'case {c.id} "{_clip(c.title, 40)}": {c.state}', f"playbook v{c.playbook}", f"{c.runs} of {c.budget} runs"]
+    bits = [f'case {c.id} "{_clip(c.title, 40)}": {c.state}', f"playbook v{c.used}", f"{c.runs} of {c.budget} runs"]
     if c.reworks:
         bits.append(f"{c.reworks} rework(s)")
     line = ", ".join(bits)
