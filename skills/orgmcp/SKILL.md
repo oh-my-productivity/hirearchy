@@ -90,8 +90,9 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
    (met / unmet), then runs used of planned. Nothing else.
 5. A service request: after the delivery ask ONE short question ("Keep it, or what should change?") and record
    `feedback(task_id, accept|reject, note)`; reject needs the user's reason in their words. If the reason is a lasting requirement
-   ("always", "never", "from now on"), propose adding it to the contract as a checkable criterion; on yes call `define_service`
-   with the full contract (from `services()`) plus the new criterion; the playbook stays. Never edit SERVICE.md or PLAYBOOK.md yourself.
+   ("always", "never", "from now on"), propose adding it to the contract as a checkable criterion; on yes call
+   `define_service(owner, name, add_acceptance=[<the new criterion>])` (an amendment: nothing else is retyped; the playbook stays),
+   then tell the user the resulting criteria from its reply. Never edit SERVICE.md or PLAYBOOK.md yourself.
 6. The scheduler exits on its own when nothing is left (`progress` shows "scheduler: stopped (finished: no open tasks)").
    Call `stop()` only if the user cancels, declines more budget, you hand over an unverified or partial result (say the task
    stays open/blocked, not done), or you started it with `until_done=False`.
