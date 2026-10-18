@@ -18,7 +18,7 @@ from ..kernel import OrgPaths
 from ..kernel.testing import fs_atomic_writer
 from ._git import GitOrgSnapshotter, SubprocessGit
 from ._ignore import FsIgnoreList
-from .api import GitClient, IgnoreList, OrgSnapshotter
+from .api import RUNTIME_IGNORE_LINES, GitClient, IgnoreList, OrgSnapshotter
 
 AUTHOR = "orgmcp <orgmcp@localhost>"
 NO_GIT = "orgmcp-test-no-such-git-program"  # an executable name that exists nowhere
@@ -32,48 +32,73 @@ class GitCommit:
 
 
 class RecordingGit(GitClient):
-    """git in memory: ``init`` makes a repository, ``commit_all`` commits what ``touch`` marked as changed since the last commit."""
+    """git in memory: ``init`` makes a repository, ``commit_all`` commits what ``touch`` marked as changed since the last commit.
 
-    calls: list[tuple[str, ...]]  # ("init", root) and ("commit_all", root, message), in order
-    repositories: set[Path]
-    commits: dict[Path, list[GitCommit]]
+    Like the real program it refuses (without raising) a directory that is no repository or whose repository is in ``broken``, makes no
+    commit when nothing changed, and raises ``FileNotFoundError`` for every command when it is not ``available``."""
 
     def __init__(self, available: bool = True) -> None:
-        raise NotImplementedError
+        self._available = available
+        self.calls: list[tuple[str, ...]] = []  # ("init", root) and ("commit_all", root, message), in order
+        self.repositories: set[Path] = set()
+        self.commits: dict[Path, list[GitCommit]] = {}
+        self.broken: set[Path] = set()  # repositories git refuses to work in
+        self._pending: dict[Path, set[str]] = {}
 
     def touch(self, root: Path, name: str) -> None:
         """Change a file of ``root`` (it will be part of the next commit)."""
-        raise NotImplementedError
+        self._pending.setdefault(root, set()).add(name)
 
     def available(self) -> bool:
-        raise NotImplementedError
+        return self._available
 
     def has_repository(self, root: Path) -> bool:
-        raise NotImplementedError
+        return root in self.repositories
 
     def init(self, root: Path) -> None:
-        raise NotImplementedError
+        self.calls.append(("init", str(root)))
+        self._run()
+        self.repositories.add(root)
+        self.commits.setdefault(root, [])
 
     def commit_all(self, root: Path, message: str) -> None:
-        raise NotImplementedError
+        self.calls.append(("commit_all", str(root), message))
+        self._run()
+        if root not in self.repositories or root in self.broken:
+            return  # git: "not a git repository" (exit status 128), ignored
+        files = self._pending.pop(root, set())
+        if files:
+            self.commits[root].append(GitCommit(message, AUTHOR, frozenset(files)))
+
+    def _run(self) -> None:
+        if not self._available:
+            raise FileNotFoundError(2, "No such file or directory: 'git'")
 
 
 class MemoryIgnoreList(IgnoreList):
     """``.gitignore`` as one text (``None``: no file); ``directory_exists=False``: the organization directory is gone."""
 
-    text: str | None
-
     def __init__(self, text: str | None = None, directory_exists: bool = True) -> None:
-        raise NotImplementedError
+        self.text = text
+        self.directory_exists = directory_exists
+        self.broken = False  # the file cannot be read or written
 
     def write_initial(self, lines: Sequence[str]) -> None:
-        raise NotImplementedError
+        if self.broken:
+            raise OSError(21, "Is a directory")
+        self.text = "".join(f"{line}\n" for line in lines)
 
     def ensure(self, lines: Sequence[str]) -> None:
-        raise NotImplementedError
+        if self.broken or not self.directory_exists:
+            return
+        text = self.text or ""
+        words = text.split()
+        missing = list(dict.fromkeys(line for line in lines if line not in words))
+        if missing:
+            self.text = (text.rstrip("\n") + "\n" if text else "") + "\n".join(missing) + "\n"
 
     def ensure_runtime_files(self) -> None:
-        raise NotImplementedError
+        self.ensure(RUNTIME_IGNORE_LINES)
 
 
 # ------------------------------------------------------------------------------ harnesses and the registry
@@ -150,7 +175,9 @@ def real_git(tmp_path: Path) -> GitHarness:
 
 
 def recording_git(tmp_path: Path) -> GitHarness:
-    raise NotImplementedError
+    root = _organization(tmp_path)
+    git = RecordingGit()
+    return GitHarness(git, root, lambda name: git.touch(root, name), lambda: list(git.commits.get(root, [])), lambda: git.broken.add(root))
 
 
 def _real_snapshotter(tmp_path: Path, executable: str) -> SnapshotHarness:
@@ -175,12 +202,31 @@ def real_snapshotter_without_git(tmp_path: Path) -> SnapshotHarness:
     return _real_snapshotter(tmp_path, NO_GIT)
 
 
+def _recording_snapshotter(tmp_path: Path, available: bool) -> SnapshotHarness:
+    root = _organization(tmp_path)
+    git = RecordingGit(available)
+
+    def make_repository() -> None:  # made outside the snapshotter: whether git is "present" for it does not matter
+        git.repositories.add(root)
+        git.commits.setdefault(root, [])
+
+    return SnapshotHarness(
+        GitOrgSnapshotter(OrgPaths(root), git),
+        root,
+        lambda name: git.touch(root, name),
+        lambda: list(git.commits.get(root, [])),
+        lambda: git.has_repository(root),
+        make_repository,
+        lambda: git.broken.add(root),
+    )
+
+
 def recording_snapshotter(tmp_path: Path) -> SnapshotHarness:
-    raise NotImplementedError
+    return _recording_snapshotter(tmp_path, True)
 
 
 def recording_snapshotter_without_git(tmp_path: Path) -> SnapshotHarness:
-    raise NotImplementedError
+    return _recording_snapshotter(tmp_path, False)
 
 
 def fs_ignore_list(tmp_path: Path) -> IgnoreHarness:
@@ -204,7 +250,18 @@ def fs_ignore_list(tmp_path: Path) -> IgnoreHarness:
 
 
 def memory_ignore_list(tmp_path: Path) -> IgnoreHarness:
-    raise NotImplementedError
+    ignore = MemoryIgnoreList()
+
+    def put(text: str) -> None:
+        ignore.text = text
+
+    def break_storage() -> None:
+        ignore.broken = True
+
+    def remove_directory() -> None:
+        ignore.directory_exists = False
+
+    return IgnoreHarness(ignore, lambda: ignore.text, put, break_storage, remove_directory)
 
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {

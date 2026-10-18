@@ -8,8 +8,6 @@ import pytest
 
 from orgmcp.snapshots.testing import AUTHOR, GitCommit, MemoryIgnoreList, RecordingGit
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-snapshots")
-
 ROOT = Path("/org")
 
 
