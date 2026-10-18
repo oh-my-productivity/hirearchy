@@ -31,6 +31,7 @@ from typing import Callable
 
 from . import core, observe, progress as prog, services
 from .core import BOXES, DEFAULT_CONFIG, ROOT, Message, Org, OrgError, _visible, latest_results, split_frontmatter
+from .dashboard_events import EventLine, event_lines
 from .health import _aware, _stamp, config_number, org_health
 from .observe import fmt_dur
 from .scheduler import EXIT_FILE, SchedulerState, scheduler_state
@@ -264,6 +265,73 @@ class LenientOrg(Org):
             return dict(DEFAULT_CONFIG)
 
 
+# ================================================================================================ agent states
+
+
+@dataclass(frozen=True)
+class AgentState:
+    """The one state of an agent, in words. ``main`` + ``note`` is the whole text (``word``); the tree may shorten
+    ``main`` to fit and always keeps ``note`` (the mail waiting)."""
+
+    kind: str  # one of STATE_KINDS
+    main: str
+    note: str = ""
+    reason: str = ""  # why mail waits (running: for the next run; queued: why it does not run yet)
+
+    @property
+    def word(self) -> str:
+        return self.main + self.note
+
+
+def pause_text(paused: str) -> str:
+    """'paused: <reason>' - without saying 'paused' twice when the reason already does ('paused by the user: ...')."""
+    return paused if paused.lower().startswith("paused") else f"paused: {paused}"
+
+
+def classify(*, running: bool, unread: int, paused: str | None, budget: int, open_tasks: int, delegated: int,
+             scheduler_up: bool, free_slots: int, max_parallel: int, elapsed_s: float | None = None) -> AgentState:
+    """The state of one agent. Exactly one applies, in this precedence (an agent is never two of them):
+
+    1. running - a run is in flight (mail that arrived meanwhile waits for the next run; a pause is noted);
+    2. paused - ``paused: <reason>`` (+ ``N unread``): a paused agent is not started, whatever else is true;
+    3. out of budget - no runs left (``out of budget`` + ``N unread``): it is not started either;
+    4. queued - it has mail, may run, and has not started yet - the reason says why: the scheduler is not running,
+       all ``max_parallel`` slots are busy, or it starts on the next tick;
+    5. waiting on its reports / working on tasks / idle.
+
+    A ``budget`` pause with budget granted since is no pause (the scheduler starts such an agent)."""
+    pause = paused if (paused and not (paused == "budget" and budget > 0)) else None
+    if running:
+        main = "running" + (f" {fmt_dur(elapsed_s * 1000)}" if elapsed_s is not None else "")
+        if not scheduler_up:
+            main += " (scheduler not running)"
+        notes = []
+        reason = ""
+        if unread:
+            notes.append(f"+{unread} unread")
+            reason = "its current run is still going; the next run starts after it"
+        if pause:
+            notes.append("then out of budget" if pause == "budget" else "then " + pause_text(pause))
+        return AgentState("running", main, "".join(f", {n}" for n in notes), reason)
+    if pause and pause != "budget":
+        return AgentState("paused", pause_text(pause), f", {unread} unread" if unread else "")
+    if pause == "budget" or (budget <= 0 and (unread or open_tasks or delegated)):
+        return AgentState("budget", "out of budget", f", {unread} unread" if unread else "")
+    if unread:
+        if not scheduler_up:
+            reason = "scheduler is not running"
+        elif free_slots <= 0:
+            reason = f"max_parallel ({max_parallel}) runs are busy"
+        else:
+            reason = "ready: starts on the next tick"  # the wording of observe.now_view
+        return AgentState("queued", f"queued: {reason.removeprefix('ready: ')}", f", {unread} unread", reason)
+    if delegated:
+        return AgentState("waiting", f"waiting on {delegated} report(s)")
+    if open_tasks:
+        return AgentState("working", f"working on {open_tasks} task(s)")
+    return AgentState("idle", "idle")
+
+
 # ================================================================================================ small structures
 
 
@@ -271,6 +339,7 @@ class LenientOrg(Org):
 class Section:
     title: str
     lines: list[str]
+    errors: frozenset[int] = frozenset()  # indexes of the lines that are errors (shown in red)
 
 
 def doc_text(doc: list[Section]) -> str:
@@ -303,6 +372,8 @@ class AgentRow:
     elapsed_s: float | None = None
     reason: str = ""  # why it is queued (see observe.now_view)
     queued_behind: int = 0  # running agent: mail waiting for the next run
+    main: str = ""  # ``word`` without the trailing ", N unread" note
+    note: str = ""
     children: list[str] = field(default_factory=list)
     below_running: int = 0
     below_queued: int = 0
@@ -406,6 +477,7 @@ class AgentDetail:
     memory: str
     charter: str
     events: list[dict]
+    activity: list[EventLine] = field(default_factory=list)  # ``events`` as lines (readable, or raw when asked)
 
 
 @dataclass
@@ -565,6 +637,7 @@ class DashData:
         self._memo: dict[str, tuple[tuple, float, object]] = {}
         self._logs: dict[Path, tuple[tuple, RunLog]] = {}
         self._texts: dict[Path, tuple[tuple, str]] = {}
+        self._msg_index: dict[str, tuple[list, dict]] = {}
         self.check_result: tuple[datetime, str, bool] | None = None
 
     # ---------------------------------------------------------------------------------------- time and memo
@@ -611,7 +684,7 @@ class DashData:
             p = rows.get(r.parent or ROOT)
             if p is not None and p.addr != a:
                 p.below_running += r.below_running + (r.kind == "running")
-                p.below_queued += r.below_queued + (r.unread > 0 and r.kind != "running")
+                p.below_queued += r.below_queued + (r.kind == "queued")
         order = [ROOT]
         stack = list(reversed(rows[ROOT].children))
         while stack:
@@ -628,7 +701,7 @@ class DashData:
         sig = self._signature(agents)
         snap = Snapshot(
             org_name=org.root.name, root=str(org.root), at=now, scheduler=sched, max_parallel=max_parallel, agents=rows,
-            order=order, running=len(inflight), queued=sum(1 for a in agents if rows[a].unread), needs_you=needs,
+            order=order, running=len(inflight), queued=sum(1 for a in agents if rows[a].kind == "queued"), needs_you=needs,
             errors_15m=self.feed.error_count(now), last_event=self.feed.last_ts, events_seen=self.feed.any,
             bad_files=org.bad, retired=retired, sig=sig,
         )
@@ -654,49 +727,17 @@ class DashData:
         budget = org.budget(a) or 0
         open_n = len(org.open_tasks(a))
         out_n = len(org.outstanding(a))
-        elapsed = None
-        reason = ""
-        behind = 0
-        if running:
-            elapsed = self._elapsed(a, records.get(a), now)
-            kind, word = "running", "running" + (f" {fmt_dur(elapsed * 1000)}" if elapsed is not None else "")
-            behind = unread
-            if behind:
-                word += f" (+{behind} queued)"
-            if not sched_up:
-                word += " - scheduler not running"
-        elif unread:
-            reason = self._queue_reason(paused, budget, sched_up, free, max_parallel)
-            kind, word = "queued", f"queued: {reason}"
-        elif paused and not (paused == "budget" and budget > 0):
-            kind, word = ("budget", "out of budget") if paused == "budget" else ("paused", f"paused: {paused}")
-        elif budget <= 0 and (open_n or out_n):
-            kind, word = "budget", "out of budget"
-        elif out_n:
-            kind, word = "waiting", f"waiting on {out_n} report(s)"
-        elif open_n:
-            kind, word = "working", f"working on {open_n} task(s)"
-        else:
-            kind, word = "idle", "idle"
+        elapsed = self._elapsed(a, records.get(a), now) if running else None
+        st = classify(running=running, unread=unread, paused=paused, budget=budget, open_tasks=open_n, delegated=out_n,
+                      scheduler_up=sched_up, free_slots=free, max_parallel=max_parallel, elapsed_s=elapsed)
+        kind, word, reason = st.kind, st.word, st.reason
+        behind = unread if running else 0
         return AgentRow(
             addr=a, name=a.rsplit("/", 1)[-1], depth=org.depth(a), parent=org.parent(a), role=role, model=model, kind=kind,
             glyph=GLYPHS[kind], word=word, budget=budget, unread=unread, open_tasks=open_n, delegated=out_n,
             runs_used=org.runs_used(a), paused=paused, elapsed_s=elapsed, reason=reason, queued_behind=behind,
-            services=org.service_names(a),
+            services=org.service_names(a), main=st.main, note=st.note,
         )
-
-    @staticmethod
-    def _queue_reason(paused, budget, sched_up, free, max_parallel) -> str:
-        """Why an agent with mail is not running: the wording of ``observe.now_view``."""
-        if paused and not (paused == "budget" and budget > 0):
-            return f"paused: {paused}"
-        if budget <= 0:
-            return "no budget"
-        if not sched_up:
-            return "scheduler is not running"
-        if free <= 0:
-            return f"max_parallel ({max_parallel}) runs are busy"
-        return "ready: starts on the next tick"
 
     def _elapsed(self, a: str, rec: dict | None, now: datetime) -> float | None:
         rec = rec or {}
@@ -710,6 +751,26 @@ class DashData:
                 stem = logs[-1][0] if logs else None
             t0 = _stamp(stem) if stem else None
         return max(0.0, (now - t0).total_seconds()) if t0 else None
+
+    # ---------------------------------------------------------------------------------------- readable events
+    def message_lookup(self, agent: str, mid: str) -> tuple[str, str, str] | None:
+        """(type, title, sender) of a message in the mailbox of ``agent`` (inbox, in flight or read), for the batch of a
+        'run started' line. One dict per mailbox listing, rebuilt only when the listing changed."""
+        try:
+            merged = self.org.messages(agent, "inbox", "inflight", "read")
+        except Exception:  # noqa: BLE001
+            return None
+        hit = self._msg_index.get(agent)
+        if hit is None or hit[0] is not merged:
+            hit = (merged, {m.id: m for m in merged})
+            self._msg_index[agent] = hit
+            if len(self._msg_index) > 200:
+                self._msg_index.pop(next(iter(self._msg_index)))
+        m = hit[1].get(mid)
+        return (m.type, m.title, m.sender) if m is not None else None
+
+    def event_lines(self, events: list[dict], me: str | None = None, actor: bool = False, raw: bool = False) -> list[EventLine]:
+        return event_lines(events, me=me, actor=actor, raw=raw, lookup=self.message_lookup)
 
     # ---------------------------------------------------------------------------------------- scheduler
     def _scheduler_view(self, now: datetime) -> SchedulerView:
@@ -784,7 +845,7 @@ class DashData:
         return facts
 
     # ---------------------------------------------------------------------------------------- agent detail
-    def agent_detail(self, addr: str, snap: Snapshot | None = None) -> AgentDetail:
+    def agent_detail(self, addr: str, snap: Snapshot | None = None, raw: bool = False) -> AgentDetail:
         self.org.tick()
         snap = snap or self.snap or self.snapshot()
         org = self.org
@@ -796,6 +857,7 @@ class DashData:
             addr=addr, row=row, overview=self._overview(addr, row, snap, events), messages=self._messages(addr),
             runlog=self.run_log(addr, row.kind == "running") if addr != ROOT else RunLog(note="root is the human: no runs"),
             memory=self._memory(addr), charter=self._charter(addr), events=events,
+            activity=self.event_lines(events, me=addr, raw=raw),
         )
 
     def _overview(self, addr: str, row: AgentRow, snap: Snapshot, events: list[dict]) -> list[Section]:
@@ -809,8 +871,6 @@ class DashData:
                 f"mailbox  {row.unread} unread, {row.open_tasks} open task(s), {row.delegated} delegated and outstanding"]
         if row.parent:
             head.insert(1, f"parent   {row.parent}")
-        if row.paused:
-            head.append(f"paused   {row.paused}")
         if row.services:
             head.append("offers   " + ", ".join(row.services))
         if meta.get("tools"):
@@ -822,6 +882,13 @@ class DashData:
             doc.append(Section("Current run", self._current_run(addr, row)))
         elif row.kind == "queued":
             doc.append(Section("Queued", [f"{row.unread} unread message(s) wait: {row.reason}"]))
+        elif row.kind == "paused":
+            doc.append(Section("Paused", [row.main, *([f"{row.unread} unread message(s) wait; nothing starts until it is resumed"]
+                                                       if row.unread else [])]))
+        elif row.kind == "budget":
+            doc.append(Section("Out of budget", [
+                "no runs left" + (f"; {row.unread} unread message(s) wait until budget is granted" if row.unread
+                                  else "; it has work but cannot run until budget is granted")]))
         tasks = org.open_tasks(addr)
         doc.append(Section(f"Open tasks ({len(tasks)})", self._task_lines(tasks) or ["none"]))
         out = org.outstanding(addr)
@@ -830,8 +897,9 @@ class DashData:
             target = snap.row(t.to)
             lines.append(f'"{t.title}" -> {t.to}  [{target.word if target else "gone"}]  budget {t.budget}  ({t.id})')
         doc.append(Section(f"Delegated, outstanding ({len(out)})", lines or ["none"]))
-        recent = [observe.format_event(e, 160) for e in events[-8:]]
-        doc.append(Section("Latest activity", recent or ["(no events for this agent)"]))
+        recent = event_lines(events[-8:], me=addr, lookup=self.message_lookup)
+        doc.append(Section("Latest activity", [x.text for x in recent] or ["(no events for this agent)"],
+                           frozenset(i for i, x in enumerate(recent) if x.error)))
         return doc
 
     def _task_lines(self, tasks: list[Message]) -> list[str]:
@@ -1076,7 +1144,7 @@ class DashData:
     def _health(self, snap: Snapshot) -> HealthView:
         org, now = self.org, snap.at
         try:
-            now_text = observe.render_now(observe.now_view(org, now))
+            now_text = self._now_text(observe.now_view(org, now))
         except Exception as exc:  # noqa: BLE001
             now_text = f"(observe now failed: {type(exc).__name__}: {exc})"
         flagged: list[tuple[str, list[tuple[str, str]]]] = []
@@ -1087,6 +1155,29 @@ class DashData:
         except Exception as exc:  # noqa: BLE001
             summary = f"health failed: {type(exc).__name__}: {exc}"
         return HealthView(clean_text(now_text), flagged, summary, now)
+
+    def _now_text(self, v: dict) -> str:
+        """``observe.render_now`` with the two things that differ from the rest of the dashboard put right: agents that
+        are paused / out of budget are not 'queued' (they are listed apart), and the recent errors are readable lines."""
+        queued = v.get("queued") or []
+        held = [q for q in queued if str(q["reason"]).startswith("paused") or q["reason"] == "no budget"]
+        errs = (v.get("errors_15m") or {}).get("events") or []
+        v2 = {**v, "queued": [q for q in queued if q not in held],
+              "errors_15m": {**(v.get("errors_15m") or {}), "events": []}}
+        lines = observe.render_now(v2).split("\n")
+        if held:
+            at = next((i for i, ln in enumerate(lines) if ln.startswith("waiting on you")), len(lines))
+            extra = [f"not started, with unread mail ({len(held)}):"]
+            for q in held:
+                why = pause_text(q["reason"].removeprefix("paused: ")) if q["reason"].startswith("paused") else "out of budget"
+                age = f", oldest {fmt_dur(q['waiting_s'] * 1000)}" if q.get("waiting_s") is not None else ""
+                extra.append(f"  {q['agent']}: {q['unread']} unread{age} - {why}")
+            lines[at:at] = extra
+        if errs:
+            at = next((i for i, ln in enumerate(lines) if ln.startswith("errors in the last 15 min")), None)
+            if at is not None:
+                lines[at + 1:at + 1] = ["  " + x.text for x in self.event_lines(errs, actor=True)]
+        return "\n".join(lines)
 
     def run_check(self) -> tuple[datetime, str, bool]:
         """``observe.check`` (on demand): (when, rendered text, all passed)."""
