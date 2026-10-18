@@ -13,7 +13,6 @@ from orgmcp.mail.testing import MemoryMailbox
 from ._support import message_text, mid, note, raises_a_parse_error
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-mail")
 
 
 def agent(box: MemoryMailbox, addr: str) -> None:

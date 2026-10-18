@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from collections.abc import MutableMapping
 from pathlib import Path
-from typing import Protocol, runtime_checkable
+from typing import Protocol, SupportsInt, cast, runtime_checkable
 
 from ..agents import AgentDirectory
-from ..kernel import JsonObject, OrgLayout
+from ..kernel import JsonObject, OrgLayout, split_frontmatter
 from .api import MessageFile, MessageIndex
 
 MetaRead = tuple[JsonObject | None, str | None, float]  # (front matter, why it is unusable, mtime in epoch seconds)
@@ -22,7 +22,21 @@ class MetaReader(Protocol):
 
 def describe(text: str) -> tuple[JsonObject | None, str | None]:
     """The front matter of the text of a message file and what is wrong with it (None when nothing is)."""
-    raise NotImplementedError
+    try:
+        meta, _ = split_frontmatter(text)
+    except Exception as exc:  # noqa: BLE001 - yaml errors of any kind
+        return None, f"frontmatter does not parse ({type(exc).__name__})"
+    error = None
+    if not meta:
+        error = "no frontmatter"
+    elif not all(meta.get(k) for k in ("from", "to", "type")):
+        error = "frontmatter lacks from/to/type"
+    else:
+        try:
+            int(cast("SupportsInt | str", meta.get("budget") or 0))
+        except (TypeError, ValueError):
+            error = f"budget is not a number: {meta.get('budget')!r}"
+    return meta, error
 
 
 class StampCachedMetaReader(MetaReader):

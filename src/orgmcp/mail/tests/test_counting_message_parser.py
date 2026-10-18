@@ -12,7 +12,6 @@ from orgmcp.mail.testing import CountingMessageParser
 from ._support import message_text, mid
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-mail")
 
 
 def write(directory: Path, n: int) -> Path:

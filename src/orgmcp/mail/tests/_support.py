@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import cast
 
@@ -10,6 +10,15 @@ import pytest
 
 from orgmcp.kernel import ROOT, Message, join_frontmatter
 from orgmcp.mail.testing import MailHarness, ParserHarness
+
+STILL_RED = {"fs_mailbox", "caching_mailbox"}  # implementations that are skeletons until the commit that moves the real classes
+
+
+def still_red(factories: Sequence[Callable[[Path], object]]) -> list[object]:
+    """The factories of ``IMPLEMENTATIONS`` for a fixture's params, those not written yet as strict xfails."""
+    red = pytest.mark.xfail(strict=True, reason="red: A-mail")
+    return [pytest.param(f, marks=red) if f.__name__ in STILL_RED else f for f in factories]
+
 
 BAD_YAML = "---\nfrom: [unclosed\nto: ceo\n---\nbody\n"  # the front matter does not parse
 BAD_BUDGET = "---\nfrom: root\nto: ceo\ntype: task\nbudget: lots\n---\nbody\n"  # parses, but the message does not build

@@ -13,13 +13,12 @@ import pytest
 from orgmcp.mail import MailboxWriter
 from orgmcp.mail.testing import IMPLEMENTATIONS, MailHarness
 
-from ._support import agents, make, mid, note, where
+from ._support import agents, make, mid, note, still_red, where
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-mail")
 
 
-@pytest.fixture(params=IMPLEMENTATIONS[MailboxWriter], ids=lambda factory: factory.__name__)
+@pytest.fixture(params=still_red(IMPLEMENTATIONS[MailboxWriter]), ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> MailHarness:
     made = make(request, tmp_path)
     assert isinstance(made.writer, MailboxWriter)

@@ -15,7 +15,6 @@ from orgmcp.mail._parser import CachingMessageParser
 from ._support import message_text, mid
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-mail")
 
 
 class CountingSplit:

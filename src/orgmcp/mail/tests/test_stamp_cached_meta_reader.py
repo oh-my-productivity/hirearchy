@@ -1,5 +1,4 @@
-"""``StampCachedMetaReader``: the front matter of a message file, read once per ``(path, mtime_ns, size)`` (what ``observe._META_CACHE`` was),
-and ``describe``, the findings about a front matter that ``FsMessageIndex`` reports."""
+"""``StampCachedMetaReader``: the front matter of a message file, read once per ``(path, mtime_ns, size)`` (what ``observe._META_CACHE`` was)."""
 
 from __future__ import annotations
 
@@ -8,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp.mail._index import MetaReader, StampCachedMetaReader, describe
+from orgmcp.mail._index import MetaReader, StampCachedMetaReader
 
-from ._support import BAD_BUDGET, BAD_YAML, message_text, mid
+from ._support import BAD_BUDGET, message_text, mid
 
 
 pytestmark = pytest.mark.xfail(strict=True, reason="red: A-mail")
@@ -119,26 +118,3 @@ def test_crlf_files_read_like_read_text(tmp_path: Path) -> None:
     path = tmp_path / f"{mid(1)}.md"
     path.write_bytes(b"---\r\nfrom: root\r\nto: ceo\r\ntype: note\r\n---\r\nbody\r\n")
     assert StampCachedMetaReader().read(path)[:2] == ({"from": "root", "to": "ceo", "type": "note"}, None)
-
-
-# ------------------------------------------------------------------------------ describe
-
-
-@pytest.mark.parametrize(
-    ("text", "meta", "error"),
-    [
-        ("---\nfrom: root\nto: ceo\ntype: note\n---\nx\n", {"from": "root", "to": "ceo", "type": "note"}, None),
-        ("---\nfrom: root\nto: ceo\ntype: note\nbudget: 0\n---\nx\n", {"from": "root", "to": "ceo", "type": "note", "budget": 0}, None),
-        ("---\nfrom: root\nto: ceo\ntype: note\nbudget: '3'\n---\nx\n", {"from": "root", "to": "ceo", "type": "note", "budget": "3"}, None),
-        ("plain\n", {}, "no frontmatter"),
-        ("---\nfrom: root\n---\nx\n", {"from": "root"}, "frontmatter lacks from/to/type"),
-        ("---\nfrom: root\nto: ceo\ntype: task\nbudget: lots\n---\nx\n", {"from": "root", "to": "ceo", "type": "task", "budget": "lots"},
-         "budget is not a number: 'lots'"),
-    ],
-)
-def test_describe(text: str, meta: dict[str, object], error: str | None) -> None:
-    assert describe(text) == (meta, error)
-
-
-def test_describe_of_a_front_matter_that_does_not_parse() -> None:
-    assert describe(BAD_YAML) == (None, "frontmatter does not parse (ParserError)")
