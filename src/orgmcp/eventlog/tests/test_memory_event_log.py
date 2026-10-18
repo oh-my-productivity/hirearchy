@@ -12,8 +12,6 @@ from orgmcp.kernel.testing import FakeClock
 
 from ._support import at, day
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-eventlog")
-
 
 def test_the_fake_is_the_reader_and_the_followers() -> None:
     log = MemoryEventLog()

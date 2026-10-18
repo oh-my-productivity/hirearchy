@@ -14,9 +14,9 @@ from orgmcp.kernel.testing import T0
 
 # While a step is red: the implementations (by factory name) whose contract tests are expected to fail, per Protocol.
 RED: dict[str, frozenset[str]] = {
-    "EventReader": frozenset({"fs_event_log", "memory_event_log"}),
-    "EventFollower": frozenset({"fs_event_log", "memory_event_log"}),
-    "EventFollowers": frozenset({"fs_event_log", "memory_event_log"}),
+    "EventReader": frozenset({"fs_event_log"}),
+    "EventFollower": frozenset({"fs_event_log"}),
+    "EventFollowers": frozenset({"fs_event_log"}),
 }
 
 

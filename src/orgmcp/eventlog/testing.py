@@ -8,18 +8,20 @@ one file) into whichever of the two the suite is checking: the tests never impor
 
 from __future__ import annotations
 
+import io
 import json
 import os
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Protocol
 
-from orgmcp.kernel import Clock, JsonObject, OrgPaths
+from orgmcp.kernel import Clock, JsonObject, OrgPaths, aware
 from orgmcp.kernel.testing import T0, FakeClock
 
 from ._follower import FsEventFollowers
+from ._lines import days_of, event_of, is_event_name, merged, new_events, tail_of, timed_of
 from ._reader import FsEventReader
 from .api import EVENTS_REL, EventFile, EventFollower, EventFollowers, EventReader, event_file
 
@@ -36,38 +38,88 @@ class EventStore(Protocol):
         ...
 
 
+class MemoryEventFollower(EventFollower):
+    """Tails a ``MemoryEventLog``: the same positions and windows as the disk follower, over byte strings."""
+
+    def __init__(self, log: MemoryEventLog, match: Callable[[JsonObject], bool] | None = None, now: datetime | None = None) -> None:
+        self._log = log
+        self._match = match or (lambda ev: True)
+        self._offsets: dict[tuple[str, str], int] = {}
+        self._seen_first = False
+        self.poll(emit=False, now=now)
+        self._seen_first = True
+
+    def poll(self, emit: bool = True, now: datetime | None = None) -> list[JsonObject]:
+        moment = aware(now) or self._log.clock.now()
+        out: list[tuple[datetime, JsonObject]] = []
+        for file in self._log.files(moment - timedelta(days=1), moment + timedelta(days=1)):
+            key = (file.day, file.path.name)
+            data = self._log.content(*key)
+            if key not in self._offsets:
+                self._offsets[key] = len(data) if not self._seen_first else 0
+                if not self._seen_first:
+                    continue
+            if len(data) <= self._offsets[key]:
+                continue
+            consumed, events = new_events(data[self._offsets[key] :])
+            self._offsets[key] += consumed
+            out.extend((t, ev) for t, ev in events if self._match(ev))
+        out.sort(key=lambda item: item[0])
+        return [ev for _, ev in out] if emit else []
+
+
 class MemoryEventLog(EventReader, EventFollowers, EventStore):
-    """The event log in memory: ``files`` of ``day -> name -> bytes``, each with a modification time."""
+    """The event log in memory: day directory -> file name -> bytes, each file with the time it was last written."""
 
     def __init__(self, clock: Clock | None = None) -> None:
-        raise NotImplementedError("red: the in-memory event log is not written yet")
+        self.clock = clock or FakeClock()
+        self._days: dict[str, dict[str, bytearray]] = {}
+        self._written: dict[tuple[str, str], float] = {}
 
+    # ---- the store (how tests put bytes in)
     def append(self, day: str, name: str, data: bytes) -> None:
-        raise NotImplementedError
+        self._days.setdefault(day, {}).setdefault(name, bytearray()).extend(data)
+        self._written[(day, name)] = self.clock.time()
 
     def touch(self, day: str, name: str, when: datetime) -> None:
-        raise NotImplementedError
+        if name not in self._days.get(day, {}):
+            raise FileNotFoundError(f"{day}/{name}")
+        self._written[(day, name)] = when.timestamp()
 
+    def content(self, day: str, name: str) -> bytes:
+        """The bytes of ``<day>/<name>`` (none when there is no such file)."""
+        return bytes(self._days.get(day, {}).get(name, b""))
+
+    # ---- the reader
     def files(self, since: datetime | None = None, until: datetime | None = None) -> list[EventFile]:
-        raise NotImplementedError
+        out = []
+        for day in days_of(self._days, since, until):
+            for name in sorted(n for n in self._days[day] if is_event_name(n)):
+                if since is not None and self._written[(day, name)] < since.timestamp():
+                    continue
+                out.append(event_file(EVENTS_REL / day / name))
+        return out
 
     def read_file(self, file: EventFile) -> Iterator[tuple[datetime, JsonObject]]:
-        raise NotImplementedError
+        return timed_of(io.BytesIO(self.content(file.day, file.path.name)))
 
     def timed(self, since: datetime | None = None, until: datetime | None = None) -> Iterator[tuple[datetime, JsonObject]]:
-        raise NotImplementedError
+        yield from merged([self.read_file(f) for f in self.files(since, until)], since, until)
 
     def events(self, since: datetime | None = None, until: datetime | None = None) -> Iterator[JsonObject]:
-        raise NotImplementedError
+        for _, ev in self.timed(since, until):
+            yield ev
 
     def tail(self, file: EventFile, nbytes: int = 65536) -> list[JsonObject]:
-        raise NotImplementedError
+        data = self.content(file.day, file.path.name)
+        return tail_of(data[max(0, len(data) - nbytes) :], len(data), nbytes)
 
     def head(self, file: EventFile) -> JsonObject | None:
-        raise NotImplementedError
+        return event_of(self.content(file.day, file.path.name).split(b"\n", 1)[0])
 
+    # ---- the followers
     def follow(self, match: Callable[[JsonObject], bool] | None = None, now: datetime | None = None) -> EventFollower:
-        raise NotImplementedError
+        return MemoryEventFollower(self, match, now)
 
 
 class DiskEventStore(EventStore):
