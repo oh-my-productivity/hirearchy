@@ -9,14 +9,12 @@ import pytest
 
 from orgmcp.kernel import OrgPaths
 from orgmcp.settings._stamp import FsOrgDocumentStamp, OrgDocumentStamp
-from orgmcp.settings.tests._red import red
 
 
 def test_it_is_a_stamp(tmp_path: Path) -> None:
     assert isinstance(FsOrgDocumentStamp(OrgPaths(tmp_path)), OrgDocumentStamp)
 
 
-@red
 def test_the_stamp_is_the_modification_time_and_the_size(tmp_path: Path) -> None:
     path = tmp_path / "ORG.md"
     path.write_text("12345", encoding="utf-8")
@@ -24,7 +22,6 @@ def test_the_stamp_is_the_modification_time_and_the_size(tmp_path: Path) -> None
     assert FsOrgDocumentStamp(OrgPaths(tmp_path)).stamp() == (1_700_000_000_123_456_789, 5)
 
 
-@red
 def test_the_stamp_follows_the_file(tmp_path: Path) -> None:
     path = tmp_path / "ORG.md"
     stamps = FsOrgDocumentStamp(OrgPaths(tmp_path))
@@ -38,7 +35,6 @@ def test_the_stamp_follows_the_file(tmp_path: Path) -> None:
     assert stamps.stamp() == (2_000, 4)
 
 
-@red
 def test_a_missing_document_is_an_os_error(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
         FsOrgDocumentStamp(OrgPaths(tmp_path)).stamp()

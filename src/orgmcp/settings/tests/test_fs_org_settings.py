@@ -11,7 +11,6 @@ from orgmcp.kernel import AtomicWriter
 from orgmcp.kernel.testing import FailingAtomicWriter, MemoryAtomicWriter, fs_atomic_writer
 from orgmcp.settings import DEFAULT_CONFIG, OrgDocumentStore, OrgSettings
 from orgmcp.settings._fs import FsOrgSettings
-from orgmcp.settings.tests._red import red
 
 
 def make(root: Path, writer: AtomicWriter | None = None) -> FsOrgSettings:
@@ -29,7 +28,6 @@ def test_building_it_touches_nothing(tmp_path: Path) -> None:
     assert not root.exists()
 
 
-@red
 def test_it_reads_and_writes_the_file_ORG_md_of_the_root(tmp_path: Path) -> None:
     fs = make(tmp_path)
     fs.write_raw("---\nmax_depth: 9\n---\nbody\n")
@@ -38,13 +36,11 @@ def test_it_reads_and_writes_the_file_ORG_md_of_the_root(tmp_path: Path) -> None
     assert fs.config()["max_depth"] == 2 and fs.rules() == "other"
 
 
-@red
 def test_a_directory_called_ORG_md_is_not_a_document(tmp_path: Path) -> None:
     (tmp_path / "ORG.md").mkdir()
     assert make(tmp_path).exists() is False
 
 
-@red
 def test_the_write_goes_through_the_injected_writer(tmp_path: Path) -> None:
     writer = MemoryAtomicWriter()
     make(tmp_path, writer).write_raw("text\n")
@@ -52,7 +48,6 @@ def test_the_write_goes_through_the_injected_writer(tmp_path: Path) -> None:
     assert not (tmp_path / "ORG.md").exists()
 
 
-@red
 def test_a_failed_write_leaves_the_old_document_and_no_temporary_file(tmp_path: Path) -> None:
     (tmp_path / "ORG.md").write_text("old\n", encoding="utf-8")
     broken = FailingAtomicWriter(fs_atomic_writer(tmp_path).writer)
@@ -63,7 +58,6 @@ def test_a_failed_write_leaves_the_old_document_and_no_temporary_file(tmp_path: 
     assert [p.name for p in tmp_path.iterdir()] == ["ORG.md"]
 
 
-@red
 def test_the_settings_never_change_the_file(tmp_path: Path) -> None:
     (tmp_path / "ORG.md").write_text("---\nmax_depth: 2\n---\nbody\n", encoding="utf-8")
     fs = make(tmp_path)
@@ -72,7 +66,6 @@ def test_the_settings_never_change_the_file(tmp_path: Path) -> None:
     assert (tmp_path / "ORG.md").stat().st_mtime_ns == before
 
 
-@red
 def test_the_config_is_a_new_mapping_every_time(tmp_path: Path) -> None:
     (tmp_path / "ORG.md").write_text("---\nmax_depth: 2\n---\nbody\n", encoding="utf-8")
     fs = make(tmp_path)
@@ -82,7 +75,6 @@ def test_the_config_is_a_new_mapping_every_time(tmp_path: Path) -> None:
     assert first is not DEFAULT_CONFIG
 
 
-@red
 def test_windows_line_ends_are_read_like_every_text_file_here(tmp_path: Path) -> None:
     """The legacy readers open ORG.md in text mode (``read_text``): a CRLF file reads with LF, so its frontmatter is found."""
     (tmp_path / "ORG.md").write_bytes(b"---\r\nmax_depth: 2\r\n---\r\nbody\r\n")

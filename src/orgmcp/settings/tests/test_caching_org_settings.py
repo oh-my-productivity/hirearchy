@@ -14,7 +14,6 @@ from orgmcp.settings._caching import CachingOrgSettings
 from orgmcp.settings._fs import FsOrgSettings
 from orgmcp.settings._stamp import FsOrgDocumentStamp, OrgDocumentStamp
 from orgmcp.settings.tests._legacy import legacy
-from orgmcp.settings.tests._red import red
 
 
 class ScriptedStamp(OrgDocumentStamp):
@@ -70,7 +69,6 @@ def test_building_it_reads_nothing() -> None:
     assert inner.reads == 0 and problems == {}
 
 
-@red
 def test_the_config_is_read_once_per_stamp_and_the_cached_mapping_is_handed_out() -> None:
     caching, inner, stamp, _ = make()
     first = caching.config()
@@ -81,7 +79,6 @@ def test_the_config_is_read_once_per_stamp_and_the_cached_mapping_is_handed_out(
     assert caching.config()["max_depth"] == 3 and inner.reads == 2
 
 
-@red
 def test_a_failing_read_means_the_defaults_and_is_reported_by_the_name_of_the_error() -> None:
     caching, inner, stamp, problems = make()
     inner.answer = ValueError("mapping values are not allowed here")
@@ -91,7 +88,6 @@ def test_a_failing_read_means_the_defaults_and_is_reported_by_the_name_of_the_er
     assert problems == {"ORG.md": "ValueError"}
 
 
-@red
 def test_a_missing_document_means_the_defaults_and_is_reported() -> None:
     caching, inner, stamp, problems = make()
     stamp.value = FileNotFoundError("ORG.md")
@@ -100,7 +96,6 @@ def test_a_missing_document_means_the_defaults_and_is_reported() -> None:
     assert inner.reads == 0
 
 
-@red
 def test_a_document_that_recovers_is_no_longer_reported() -> None:
     caching, inner, stamp, problems = make()
     stamp.value = PermissionError("ORG.md")
@@ -111,7 +106,6 @@ def test_a_document_that_recovers_is_no_longer_reported() -> None:
     assert problems == {}
 
 
-@red
 def test_other_problems_in_the_mapping_are_left_alone() -> None:
     caching, _, stamp, problems = make()
     problems["x/AGENT.md"] = "ScannerError"
@@ -123,7 +117,6 @@ def test_other_problems_in_the_mapping_are_left_alone() -> None:
     assert problems == {"x/AGENT.md": "ScannerError"}
 
 
-@red
 def test_a_failure_is_read_again_at_the_next_stamp_and_not_cached_as_a_success() -> None:
     caching, inner, stamp, problems = make()
     inner.answer = RuntimeError("boom")
@@ -133,7 +126,6 @@ def test_a_failure_is_read_again_at_the_next_stamp_and_not_cached_as_a_success()
     assert inner.reads == 2 and problems == {"ORG.md": "RuntimeError"}  # nothing was cached: it tries again
 
 
-@red
 def test_the_rest_is_derived_from_the_cached_config() -> None:
     caching, inner, _, _ = make()
     inner.answer = {**DEFAULT_CONFIG, "default_model": " m9 ", "max_message_chars": "77", "poll_seconds": "0.25"}
@@ -144,7 +136,6 @@ def test_the_rest_is_derived_from_the_cached_config() -> None:
     assert inner.reads == 1
 
 
-@red
 def test_the_rules_are_not_cached_and_not_lenient() -> None:
     caching, inner, _, _ = make()
     assert caching.rules() == "the rules"
@@ -155,7 +146,6 @@ def test_the_rules_are_not_cached_and_not_lenient() -> None:
         caching.rules()
 
 
-@red
 def test_it_does_what_the_lenient_org_of_the_dashboard_did(tmp_path: Path) -> None:
     """Characterization: the same document gives the same config and the same ``bad`` entry as ``LenientOrg.config``."""
     org = legacy("core").Org.init(tmp_path / "org", "mission", {"max_depth": 3})

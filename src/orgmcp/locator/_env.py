@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ..kernel import Environment
+from ..kernel import Environment, OrgError
 from .api import OrgLocator
 
 NOT_FOUND = "no organization found: set ORG_ROOT or run inside an org directory"
@@ -15,4 +15,13 @@ class EnvOrgLocator(OrgLocator):
         self._environment = environment
 
     def find_root(self, start: Path | None = None) -> Path:
-        raise NotImplementedError("red: A-settings")
+        env = self._environment.get("ORG_ROOT")
+        if env:
+            return Path(env).expanduser().resolve()
+        here = Path(start or self._environment.cwd()).resolve()
+        for d in (here, *here.parents):
+            if (d / "ORG.md").is_file():
+                return d
+        if (here / "org" / "ORG.md").is_file():  # e.g. running from the orgmcp project dir
+            return here / "org"
+        raise OrgError(NOT_FOUND)

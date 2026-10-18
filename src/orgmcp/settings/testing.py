@@ -6,6 +6,7 @@ instead of an ORG.md on disk.
 
 from __future__ import annotations
 
+import os
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -91,8 +92,32 @@ class SwitchHarness:
     remove: Callable[[], None]
 
 
+class _Disk:
+    """ORG.md of a temporary organization directory, with modification times that the tests control: every ``put`` moves the time
+    forward by a millisecond (so the stamp changes whatever the filesystem's clock granularity), ``put_unnoticed`` keeps it."""
+
+    def __init__(self, root: Path) -> None:
+        self.path = root / "ORG.md"
+        self._mtime_ns = 1_700_000_000_000_000_000
+
+    def put(self, text: str) -> None:
+        self._mtime_ns += 1_000_000
+        self.put_unnoticed(text)
+
+    def put_unnoticed(self, text: str) -> None:
+        self.path.write_text(text, encoding="utf-8")
+        os.utime(self.path, ns=(self._mtime_ns, self._mtime_ns))
+
+    def remove(self) -> None:
+        self.path.unlink(missing_ok=True)
+
+    def text(self) -> str | None:
+        return self.path.read_text(encoding="utf-8") if self.path.is_file() else None
+
+
 def fs_org_settings(tmp_path: Path) -> SettingsHarness:
-    raise NotImplementedError("red: A-settings")
+    disk = _Disk(tmp_path)
+    return SettingsHarness(FsOrgSettings(OrgPaths(tmp_path), fs_atomic_writer(tmp_path).writer), disk.put, disk.remove)
 
 
 def memory_org_settings(tmp_path: Path) -> SettingsHarness:
@@ -101,11 +126,14 @@ def memory_org_settings(tmp_path: Path) -> SettingsHarness:
 
 
 def caching_org_settings(tmp_path: Path) -> SettingsHarness:
-    raise NotImplementedError("red: A-settings")
+    disk, paths = _Disk(tmp_path), OrgPaths(tmp_path)
+    inner = FsOrgSettings(paths, fs_atomic_writer(tmp_path).writer)
+    return SettingsHarness(CachingOrgSettings(inner, FsOrgDocumentStamp(paths), {}), disk.put, disk.remove, lenient=True)
 
 
 def fs_org_document_store(tmp_path: Path) -> DocumentHarness:
-    raise NotImplementedError("red: A-settings")
+    disk = _Disk(tmp_path)
+    return DocumentHarness(FsOrgSettings(OrgPaths(tmp_path), fs_atomic_writer(tmp_path).writer), disk.text, disk.put)
 
 
 def memory_org_document_store(tmp_path: Path) -> DocumentHarness:
@@ -114,11 +142,16 @@ def memory_org_document_store(tmp_path: Path) -> DocumentHarness:
 
 
 def fs_event_switch(tmp_path: Path) -> SwitchHarness:
-    raise NotImplementedError("red: A-settings")
+    disk, paths = _Disk(tmp_path), OrgPaths(tmp_path)
+    documents = FsOrgSettings(paths, fs_atomic_writer(tmp_path).writer)
+    return SwitchHarness(StampedEventSwitch(FsOrgDocumentStamp(paths), documents), disk.put, disk.put_unnoticed, disk.remove)
 
 
 def memory_event_switch(tmp_path: Path) -> SwitchHarness:
-    raise NotImplementedError("red: A-settings")
+    fake = MemoryOrgSettings()
+    return SwitchHarness(
+        StampedEventSwitch(fake, fake), fake.write_raw, lambda text: fake.set_text(text, notice=False), lambda: fake.set_text(None)
+    )
 
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {

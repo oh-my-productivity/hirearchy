@@ -19,4 +19,5 @@ class FsOrgDocumentStamp(OrgDocumentStamp):
         self._paths = paths
 
     def stamp(self) -> tuple[int, int]:
-        raise NotImplementedError("red: A-settings")
+        st = (self._paths.root / "ORG.md").stat()
+        return (st.st_mtime_ns, st.st_size)

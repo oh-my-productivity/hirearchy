@@ -5,7 +5,6 @@ from __future__ import annotations
 from orgmcp.settings import EventSwitch, OrgDocumentStore
 from orgmcp.settings._stamp import OrgDocumentStamp
 from orgmcp.settings._switch import StampedEventSwitch
-from orgmcp.settings.tests._red import red
 
 
 class ScriptedStamp(OrgDocumentStamp):
@@ -52,7 +51,6 @@ def test_building_it_looks_at_nothing() -> None:
     assert (stamp.looks, document.reads) == (0, 0)
 
 
-@red
 def test_the_document_is_read_once_per_stamp() -> None:
     switch, stamp, document = make("---\nevents: false\n---\n")
     assert [switch.enabled() for _ in range(5)] == [False] * 5
@@ -63,7 +61,6 @@ def test_the_document_is_read_once_per_stamp() -> None:
     assert (stamp.looks, document.reads) == (8, 2)
 
 
-@red
 def test_a_stamp_that_cannot_be_looked_at_means_off_and_the_document_is_not_read() -> None:
     switch, stamp, document = make("---\nevents: true\n---\n")
     stamp.value = FileNotFoundError("ORG.md")
@@ -73,7 +70,6 @@ def test_a_stamp_that_cannot_be_looked_at_means_off_and_the_document_is_not_read
     assert document.reads == 0
 
 
-@red
 def test_what_was_read_stays_in_force_while_the_stamp_cannot_be_looked_at_and_is_not_forgotten() -> None:
     switch, stamp, document = make("---\nevents: false\n---\n")
     assert switch.enabled() is False
@@ -84,7 +80,6 @@ def test_what_was_read_stays_in_force_while_the_stamp_cannot_be_looked_at_and_is
     assert document.reads == 1
 
 
-@red
 def test_a_document_that_cannot_be_read_leaves_events_on_and_is_not_read_again_for_the_same_stamp() -> None:
     switch, stamp, document = make(OSError("unreadable"))
     assert switch.enabled() is True
@@ -95,7 +90,6 @@ def test_a_document_that_cannot_be_read_leaves_events_on_and_is_not_read_again_f
     assert switch.enabled() is False
 
 
-@red
 def test_a_document_that_is_not_text_leaves_events_on() -> None:
     switch, _, _ = make(UnicodeDecodeError("utf-8", b"\xff", 0, 1, "invalid start byte"))
     assert switch.enabled() is True
