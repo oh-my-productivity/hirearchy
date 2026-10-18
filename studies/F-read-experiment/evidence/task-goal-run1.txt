@@ -1,0 +1,7 @@
+This is a tool experiment. Do these in order and report exactly:
+1. List the tool names available to you EXACTLY as they appear in your tool list (all of them, verbatim).
+2. Read /tmp/orgmcp-fread-1792293071/inputs/in.txt with the built-in file reader and say what it contains.
+3. Read the file /tmp/orgmcp-fread-1792293071/org/b/work/memo.md using the built-in file reader (kiro read). Report the result or the exact error.
+4. Read the same file /tmp/orgmcp-fread-1792293071/org/b/work/memo.md using the orgmcp read tool (the one from the orgmcp MCP server, probably named @orgmcp/read or orgmcp___read or similar). Report the exact tool name you called and the result or exact error.
+5. If either of 3/4 failed, say which tool name you tried and whether the orgmcp read tool is visible to you at all.
+Then report done with these findings as the summary.

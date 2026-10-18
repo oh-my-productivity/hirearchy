@@ -331,9 +331,11 @@ def test_prompt_of_an_agent_with_built_ins_separates_the_two_kinds_of_tools(org,
     text = org.run_prompt("dev", [])
     files = text.split("- Files:")[1].split("# New messages")[0]
     assert "orgmcp tools (shown as `@orgmcp/write`, `@orgmcp/read`, ...)" in files
-    assert "kiro's built-in `read`, `shell`, `write`" in files and "work on the workspace only and never reach the org" in files
+    assert "kiro's built-in `read`, `shell`, `write`" in files and "they write and run only in the workspace and never change the org" in files
     assert "`dev/MEMORY.md`, `dev/work/`" in files
-    assert "written with `@orgmcp/write` and read with `@orgmcp/read`, never with the built-in `write`/`read`" in files
+    # built-in `read` hides orgmcp's `read` (same short name; studies/F-read-experiment): it reads org files by absolute path
+    assert "written with `@orgmcp/write`, never with the built-in `write`. Your `read` is kiro's built-in (it hides `@orgmcp/read`)" in files
+    assert f"ABSOLUTE path, `{org.root}/<path in the org>`" in files
     assert '`@orgmcp/write`(path="dev/MEMORY.md", ...) (the orgmcp tool, not a built-in `write`)' in text
 
 

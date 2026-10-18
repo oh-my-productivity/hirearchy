@@ -65,7 +65,10 @@ def test_agent_with_file_tools_gets_a_confining_profile(team, dirs, isolated_kir
     out, hb = dirs["proj/out"], dirs["handbook/hr"]
     deny = [str(team.root), f"{team.root}/**"]
     assert prof["toolsSettings"]["write"] == {"allowedPaths": [f"{out}/**"], "deniedPaths": deny}
-    assert prof["toolsSettings"]["read"] == {"allowedPaths": [str(out), f"{out}/**", str(hb), f"{hb}/**"], "deniedPaths": deny}
+    # read also reaches the organization itself (read-only), exactly what orgmcp `read` may open: no deny to beat the allow
+    org = team.root
+    assert prof["toolsSettings"]["read"] == {
+        "allowedPaths": [str(out), f"{out}/**", str(hb), f"{hb}/**", str(org), f"{org}/**"], "deniedPaths": []}
     # the env contract is unchanged
     assert prof["mcpServers"]["orgmcp"]["env"] == {"ORG_ROOT": str(team.root), "ORG_REQUIRE_AGENT": "1"}
     assert prof["includeMcpJson"] is False and cwd == out
@@ -105,7 +108,9 @@ def test_write_without_workspace_is_allowed_nowhere(team, isolated_kiro):
 def test_read_with_empty_inputs_reads_nothing(team, isolated_kiro):
     team.hire("lead", "peek", "Peek", "x", tools=["read"], inputs=[])
     prof, *_ = run_profile(team, isolated_kiro, "lead/peek")
-    assert prof["toolsSettings"]["read"]["allowedPaths"] == [] and prof["allowedTools"] == ["@orgmcp"]
+    # nothing outside the organization; the organization itself is readable (it is what orgmcp `read` serves)
+    assert prof["toolsSettings"]["read"]["allowedPaths"] == [str(team.root), f"{team.root}/**"]
+    assert prof["allowedTools"] == ["@orgmcp"]
 
 
 def test_agents_without_built_in_file_tools_keep_the_shared_profile(team, isolated_kiro):
@@ -436,7 +441,7 @@ def test_a_code_reviewer_works_in_the_project_workspace_without_write(tmp_path, 
     assert agents["lead/cr"].tools == ["read", "shell"]
     assert agents["lead/cr"].workspace == ws and agents["lead/cr"].inputs == []
     assert agents["lead/dev"].workspace == ws and agents["lead/dev"].inputs == []
-    assert bpm._access(agents["lead/cr"]) == f"kiro read only in {ws}; shell NOT confined (instructed only)"
+    assert bpm._access(agents["lead/cr"]) == f"kiro read only in {ws} and in the organization's own files (read-only); shell NOT confined (instructed only)"
 
 
 def test_a_reader_without_shell_sees_the_project_read_only(tmp_path, dirs):
@@ -494,7 +499,7 @@ def test_plan_shows_an_access_line_per_agent(bp, tmp_path, dirs):
     bp = mutate(bp, lambda b: (b["needs"].update(workspace=str(dirs["proj"]), inputs=[str(dirs["handbook"])]),
                                b["agents"][0]["children"][1].update(tools=["read", "write", "shell"])))
     plan = bpm.render_plan(bp, bpm.validate(bp, allowed_roots=[tmp_path]), allowed_roots=[tmp_path])
-    assert f"Access: kiro write only in {dirs['proj']}; kiro read only in {dirs['proj']}, {dirs['handbook']}; shell NOT confined (instructed only)" in plan
+    assert f"Access: kiro write only in {dirs['proj']}; kiro read only in {dirs['proj']}, {dirs['handbook']} and in the organization's own files (read-only); shell NOT confined (instructed only)" in plan
     assert f"Access: read-only inputs (orgmcp read): {dirs['handbook']}" in plan
 
 

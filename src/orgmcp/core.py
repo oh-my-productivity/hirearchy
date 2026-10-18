@@ -1458,11 +1458,21 @@ class Org:
             f"notes and memory: `{addr}/MEMORY.md`, `{addr}/work/` (orgmcp `write` only).",
         ]
         if builtin:
+            names = ", ".join(f"`{t}`" for t in builtin)
+            if "read" in tools:  # the built-in `read` is the only `read` the model sees: it hides orgmcp's (same short name)
+                reach = "they write and run only in the workspace and never change the org. "
+                how = (
+                    "`@orgmcp/write`, never with the built-in `write`. Your `read` is kiro's built-in (it hides "
+                    "`@orgmcp/read`): it reads org files too, but only by ABSOLUTE path, "
+                    f"`{self.root}/<path in the org>` (a relative path starts in your working directory)."
+                )
+            else:
+                reach = "they work on the workspace only and never reach the org. "
+                how = "`@orgmcp/write` and read with `@orgmcp/read`, never with the built-in `write`/`read`."
             lines.append(
-                "  - Do not mix up the two kinds of tools: kiro's built-in " + ", ".join(f"`{t}`" for t in builtin)
-                + " have the same short names as orgmcp's but work on the workspace only and never reach the org. "
-                f"Org files (`{addr}/MEMORY.md`, `{addr}/work/`, anything under `{addr}/`) are written with "
-                "`@orgmcp/write` and read with `@orgmcp/read`, never with the built-in `write`/`read`."
+                f"  - Do not mix up the two kinds of tools: kiro's built-in {names} have the same short names as "
+                f"orgmcp's but are not the same tools: {reach}"
+                f"Org files (`{addr}/MEMORY.md`, `{addr}/work/`, anything under `{addr}/`) are written with " + how
             )
         if ws is not None:
             lines.append(
@@ -1481,7 +1491,7 @@ class Org:
             "absolute path."
         )
         if tools & {"read", "write"}:
-            lines.append("  - kiro `write` is limited to the workspace and kiro `read` to workspace + inputs; other paths are refused.")
+            lines.append("  - kiro `write` is limited to the workspace and kiro `read` to workspace + inputs + the organization (read-only); other paths are refused.")
         if "shell" in tools:
             lines.append(
                 "  - You have `shell`, which the runtime cannot confine: use it only inside your workspace; never write "

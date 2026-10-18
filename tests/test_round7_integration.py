@@ -117,7 +117,12 @@ def test_plan_and_access_line_show_exactly_the_applied_confinement(kind, cwd, tm
         enforced = set()
         for rule in settings.values():
             enforced |= {p[:-3] if p.endswith("/**") else p for p in rule["allowedPaths"]}
+        # built-in read also reaches the organization's own files; the plan says so in words (no path: it does not exist yet)
+        assert ("read" in tools) == (str(o.root) in enforced), addr
+        enforced.discard(str(o.root))
         plan, technical = bpm._agent_access(agent), bpm._access(agent)
+        if "read" in tools:
+            assert "organization" in plan and "organization" in technical, (addr, plan, technical)
         told = {str(o.workspace_of(addr))} if "shell" in tools and o.workspace_of(addr) else set()
         if "read" not in tools:  # no built-in read: the inputs are opened with orgmcp `read` by absolute path
             told |= set(map(str, o.inputs_of(addr)))
@@ -135,19 +140,19 @@ def test_plan_and_access_line_show_exactly_the_applied_confinement(kind, cwd, tm
 def test_plan_words_for_each_access_shape():
     def line(**kw):
         return bpm._agent_access(bpm.Agent(addr="a", name="a", parent=None, where="agents[a]", **kw))
-    assert line(tools=["read"], inputs=["/in"]) == "can read files only in /in; cannot change your files"
+    assert line(tools=["read"], inputs=["/in"]) == "can read files only in /in and the organization's own files; cannot change your files"
     assert line(tools=["read"]) == "can read no files outside the organization; cannot change your files"
     assert line(tools=[]) == "cannot change your files"
     assert line(tools=["web_search", "web_fetch"]) == "can search the web and read web pages; cannot change your files"
     assert line(tools=[], inputs=["/in"]) == "can read /in through the organization's read tool; cannot change your files"
     assert line(tools=["read", "write"], workspace="/ws", inputs=["/in"]) \
-        == "can read files in /ws, /in (/in read-only); changes files only in /ws"
+        == "can read files in /ws, /in (/in read-only) and the organization's own files; changes files only in /ws"
     assert line(tools=["write"]) == "changes no files (no workspace)"
     shell = line(tools=["read", "shell", "write"], workspace="/ws")
-    assert shell.startswith("can read files in /ws; changes files only in /ws; can run commands, which are NOT confined")
+    assert shell.startswith("can read files in /ws and the organization's own files; changes files only in /ws; can run commands, which are NOT confined")
     assert "told to stay in /ws" in shell and "cannot change your files" not in shell
     manager = line(tools=["read"], inputs=["/in"], kind="manager", children=["a/k"])
-    assert manager == "directs the team; does not produce the work itself; can read files only in /in; cannot change your files"
+    assert manager == "directs the team; does not produce the work itself; can read files only in /in and the organization's own files; cannot change your files"
     assert line(tools=[], kind="manager", children=["a/k"]) == "directs the team; does not produce the work itself"
 
 
