@@ -1,0 +1,200 @@
+{
+  "since": "2026-01-08T09:18:47+00:00",
+  "until": "2026-01-15T09:18:47+00:00",
+  "events": 29,
+  "agent": null,
+  "runs": {
+    "total": 4,
+    "ok": 3,
+    "failed": 1,
+    "timeout": 0,
+    "killed": 0,
+    "running": 0,
+    "unknown": 0,
+    "duration_ms": {
+      "n": 4,
+      "p50": 20000.0,
+      "p95": 45000.0,
+      "max": 45000.0
+    },
+    "queue_ms": {
+      "n": 4,
+      "p50": 120005.0,
+      "p95": 387005.0,
+      "max": 387005.0
+    }
+  },
+  "tool_calls": {
+    "total": 8,
+    "refused": 1,
+    "refusal_rate": 0.125,
+    "by_tool": {
+      "delegate": {
+        "calls": 2,
+        "refused": 0,
+        "refusal_rate": 0.0,
+        "ms": {
+          "n": 2,
+          "p50": 8.0,
+          "p95": 9.0,
+          "max": 9.0
+        },
+        "exceptions": 0
+      },
+      "report": {
+        "calls": 3,
+        "refused": 1,
+        "refusal_rate": 0.3333333333333333,
+        "ms": {
+          "n": 3,
+          "p50": 8.0,
+          "p95": 9.0,
+          "max": 9.0
+        },
+        "exceptions": 0
+      },
+      "whoami": {
+        "calls": 2,
+        "refused": 0,
+        "refusal_rate": 0.0,
+        "ms": {
+          "n": 2,
+          "p50": 7.0,
+          "p95": 7.0,
+          "max": 7.0
+        },
+        "exceptions": 0
+      },
+      "write": {
+        "calls": 1,
+        "refused": 0,
+        "refusal_rate": 0.0,
+        "ms": {
+          "n": 1,
+          "p50": 8.0,
+          "p95": 8.0,
+          "max": 8.0
+        },
+        "exceptions": 0
+      }
+    }
+  },
+  "top_refusals": [
+    {
+      "message": "status must be one of (<text>, <text>, <text>)",
+      "count": 1,
+      "example": "status must be one of ('done', 'failed', 'blocked')",
+      "tools": {
+        "report": 1
+      }
+    }
+  ],
+  "messages": {
+    "result": 2,
+    "task": 5
+  },
+  "stalls": 0,
+  "pauses": {
+    "total": 0,
+    "by_reason": {}
+  },
+  "agent_failures": 0,
+  "orphans": 0,
+  "scheduler": {
+    "starts": 0,
+    "errors": {},
+    "exits": {}
+  },
+  "budget_spent": 4,
+  "by": {
+    "dimension": "tool",
+    "rows": [
+      {
+        "key": "delegate",
+        "runs": 0,
+        "ok": 0,
+        "failed": 0,
+        "run_ms": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "max": null
+        },
+        "calls": 2,
+        "refused": 0,
+        "refusal_rate": 0.0,
+        "call_ms": {
+          "n": 2,
+          "p50": 8.0,
+          "p95": 9.0,
+          "max": 9.0
+        }
+      },
+      {
+        "key": "report",
+        "runs": 0,
+        "ok": 0,
+        "failed": 0,
+        "run_ms": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "max": null
+        },
+        "calls": 3,
+        "refused": 1,
+        "refusal_rate": 0.3333333333333333,
+        "call_ms": {
+          "n": 3,
+          "p50": 8.0,
+          "p95": 9.0,
+          "max": 9.0
+        }
+      },
+      {
+        "key": "whoami",
+        "runs": 0,
+        "ok": 0,
+        "failed": 0,
+        "run_ms": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "max": null
+        },
+        "calls": 2,
+        "refused": 0,
+        "refusal_rate": 0.0,
+        "call_ms": {
+          "n": 2,
+          "p50": 7.0,
+          "p95": 7.0,
+          "max": 7.0
+        }
+      },
+      {
+        "key": "write",
+        "runs": 0,
+        "ok": 0,
+        "failed": 0,
+        "run_ms": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "max": null
+        },
+        "calls": 1,
+        "refused": 0,
+        "refusal_rate": 0.0,
+        "call_ms": {
+          "n": 1,
+          "p50": 8.0,
+          "p95": 8.0,
+          "max": 8.0
+        }
+      }
+    ]
+  }
+}
+
+[exit 0]

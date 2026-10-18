@@ -1,0 +1,34 @@
+`ceo/eng` has 3 unread message(s) but no budget left, so it is paused.
+To continue, grant runs: send(to="ceo/eng", body="<why>", budget=<runs>). Otherwise decide whether its work should be reported as failed or reassigned.
+=====
+`ceo/eng` and its team were retired by ceo (finished). Their unspent budget, 4 run(s), is returned to you with this note.
+=====
+`ceo/eng` failed 3 runs in a row and is paused. Last run log: ceo/eng/runs/20260115T090000000000.log
+A human must inspect it and run `orgmcp resume ceo/eng`.
+=====
+`ceo/eng` failed 3 runs in a row and is paused. Last run log: ceo/eng/runs/20260115T090000000000.log
+Its unread messages and open tasks are stuck until then. A human will inspect the crash and resume it; you cannot. Meanwhile you can keep your own work moving:
+- reassign: `delegate` the work to another direct report (or `hire` one), and `retire` `ceo/eng` if it is not needed (its open tasks are closed as failed);
+- or, if you cannot go on without it, `report` the affected task to whoever assigned it with status `blocked` (or `failed`) and say that `ceo/eng` is crashing, so they can plan around it.
+=====
+Task T-1 (Build the API) is still open, you are not running or waiting on any delegated work, and nothing has happened for a while. Finish it and `report` done, or `report` blocked/failed with the reason.
+=====
+`ceo` is stalled on task T-1 (Build the API): it is not running, not waiting on delegated work, and has not reported. Already told: `ceo`, `root`. Follow up with it, reassign the work, or escalate further.
+=====
+- `ceo/eng` stuck: no result for 2h
+  -> follow up with `ceo/eng` or reassign the work
+=====
+- `ceo/eng` low_quality: 2 of 3 reports rejected
+=====
+- `ceo` team: `ceo/eng` is expensive: 9 runs
+  -> ask `ceo` to deal with it, or step in via its charter
+=====
+Health review: 1 new problem(s) among your direct reports.
+- `ceo/eng` idle: nothing for 3 days
+  -> retire `ceo/eng` if it is no longer needed
+
+Act within your charter and record your decisions in `ceo/MEMORY.md`. Problems that persist are not repeated in later reviews.
+=====
+Health review: 1 agent flagged
+- `ceo/eng` idle: nothing for 3 days
+Managers not notified: `ceo` (paused).

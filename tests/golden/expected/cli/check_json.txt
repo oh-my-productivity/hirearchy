@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "id": "a",
+      "name": "messages intact: files parse, ids unique, sender and recipient copies match",
+      "ok": true,
+      "details": [
+        "7 message(s) checked"
+      ]
+    },
+    {
+      "id": "b",
+      "name": "budget conserved: handed down = held + used + returned (+ dropped at retirement)",
+      "ok": true,
+      "details": [
+        "handed down 20 = held 15 + used 4 live + 0 retired + returned 1 + dropped 0"
+      ]
+    },
+    {
+      "id": "c",
+      "name": "nothing inflight without a live run",
+      "ok": true,
+      "details": [
+        "no agent has an unfinished batch without a run"
+      ]
+    },
+    {
+      "id": "d",
+      "name": "runs accounted for: run.start has run.end or a live process; run logs have run.start",
+      "ok": true,
+      "details": [
+        "4 run.start event(s) checked"
+      ]
+    },
+    {
+      "id": "e",
+      "name": "event files have no seq gaps",
+      "ok": true,
+      "details": [
+        "3 event file(s) checked"
+      ]
+    },
+    {
+      "id": "f",
+      "name": "scheduler pid file matches a live scheduler",
+      "ok": true,
+      "details": [
+        "no pid file: no scheduler claims to run"
+      ]
+    }
+  ]
+}
+
+[exit 0]

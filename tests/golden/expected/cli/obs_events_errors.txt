@@ -1,0 +1,5 @@
+2 of 2 matching event(s), oldest first
+09:09:31 mcp ceo/eng tool.call report REFUSED 7ms error="status must be one of ('done', 'failed', 'blocked')" error_type=OrgError run=ceo/eng@20260115T090930000000 trace=20260115T090500000000-root-0000
+09:11:27 scheduler runtime run.end FAILED 12s agent=ceo/qa exit_code=1 budget_after=2 error="exit code 1" run=ceo/qa@20260115T091115000000
+
+[exit 0]

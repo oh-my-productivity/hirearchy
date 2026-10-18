@@ -1,0 +1,100 @@
+Target organization: <ORG> (exists, 0 agent(s) besides root; apply_org adds to it)
+
+DRAFT - NOT READY (it has errors: fix the blueprint and propose again; do not show this to the user)
+Goal: <One paragraph: what document the organization writes from the user's files, and for whom.>
+What I understood you need:
+- Scope: <What the document covers and what it leaves out, in the user's words.>
+- Your files (read-only): <CWD>/<folder-with-your-files>
+- Quality bar: Every statement comes from the input files; where the files disagree or are silent, the document says so.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 for every agent
+Team (4 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read no files outside the organization; cannot change your files
+  - reader (Reader of the user's files, model claude-sonnet-5.5): can read no files outside the organization; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read no files outside the organization; cannot change your files
+Budget: 19 runs planned (one run = one working session of one agent), your cap is 25; the minimum for one review and rework is 15. Unspent runs come back to you.
+  lead starts with 19, hands down reader 3, writer 3, reviewer 2 and keeps 11 for planning, checking and rework.
+If the check still fails after one rework, I'll come back to you with options before spending the reserve (about 4 runs); nothing beyond the 19 planned runs is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every success check below.
+Deliverable: <What the document is, e.g. an onboarding guide with one section per topic> [markdown, max 1500 words]
+  Delivered to: <CWD>/deliverables/<name>.md (I copy it there after checking it)
+Done when ALL of these hold:
+  1. Covers <the topics the user listed, named exactly> and nothing else.
+  2. At most 1500 words as counted by read.
+  3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+  4. The reviewer's report shows every criterion met (criteria met: n of m with n = m), including each statement checked against its named input file, and the writer applied every required change.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (3):
+- has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
+- has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
+- has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
+Errors (1):
+- needs.inputs: input <CWD>/<folder-with-your-files> does not exist; inputs are read-only sources and must be there already
+Cannot apply yet.
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+# Plan for approval
+
+Goal: <One paragraph: what document the organization writes from the user's files, and for whom.>
+
+Needs as understood:
+- Scope: <What the document covers and what it leaves out, in the user's words.>
+- Deliverable: <What the document is, e.g. an onboarding guide with one section per topic> [markdown, max 1500 words]
+- Quality bar: Every statement comes from the input files; where the files disagree or are silent, the document says so.
+- Sources / tools: Only the files in needs.inputs; no web.
+- Workspace: none (no agent writes files or runs commands)
+- Model policy: one model for all
+- Review: required
+
+Organization (4 agents):
+- lead [manager] Manager: model=claude-sonnet-5.5, tools=read
+  Access: kiro read only in the organization's own files (read-only)
+  - reader [custom] Reader of the user's files: model=claude-sonnet-5.5, tools=read
+    Access: kiro read only in the organization's own files (read-only)
+  - writer [writer] Writer: model=claude-sonnet-5.5, tools=none
+  - reviewer [reviewer] Independent Reviewer: model=claude-sonnet-5.5, tools=read
+    Access: kiro read only in the organization's own files (read-only)
+
+Budget: 19 runs planned (your cap: 25), estimate 15 for one pass + one review/rework cycle:
+  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you.
+  lead: starts with 19, hands down reader 3, writer 3, reviewer 2 (each includes its rework/re-check run), keeps 11 (own 7 + slack 4)
+  lead/reader: 3 runs (2 work + 1 rework)
+  lead/writer: 3 runs (2 work + 1 rework)
+  lead/reviewer: 2 runs (1 work + 1 rework)
+
+Review / verification:
+- lead/reviewer checks the work of lead/reader, lead/writer independently; findings go to their manager, who sends required changes back to the author (nobody edits another agent's file).
+- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done
+
+Deliverable:
+- <What the document is, e.g. an onboarding guide with one section per topic> (markdown, max 1500 words)
+- Final location: <CWD>/deliverables/<name>.md (copied there by the assistant after verification)
+
+First task: to lead: <Short title of the document>
+  1. Covers <the topics the user listed, named exactly> and nothing else.
+  2. At most 1500 words as counted by read.
+  3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+  4. The reviewer's report shows every criterion met (criteria met: n of m with n = m), including each statement checked against its named input file, and the writer applied every required change.
+
+Checkpoints:
+- Approval: Plan first; ask before any spend beyond the budget.
+- Progress: One line when I ask.
+- Any spend beyond the budget needs your OK.
+
+Warnings (5):
+- agents[lead]: has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
+- agents[lead/reader]: has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
+- agents[lead/reviewer]: has built-in read but no workspace or inputs, so it can read nothing outside the organization; set needs.inputs or needs.workspace if it must read files
+- needs.deliverable.path: no agent can write to <CWD>/deliverables/<name>.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
+- needs.deliverable.path: <CWD>/deliverables does not exist; the copy step will create it
+
+Errors (1) - must be fixed before this can be applied:
+- needs.inputs: input <CWD>/<folder-with-your-files> does not exist; inputs are read-only sources and must be there already
+
+Cannot apply yet: tell me what to change.
+
+plan_id: none (the blueprint has errors). Fix them and call propose_org again; do not ask the user to approve this.

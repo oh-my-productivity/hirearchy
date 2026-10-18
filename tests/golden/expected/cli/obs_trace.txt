@@ -1,0 +1,12 @@
+trace 20260115T090500000000-root-0000 "Plan the launch" -> ceo: open
+     +0s  root -> ceo task "Plan the launch" +8 run(s)
+  +2m00s    run 20260115T090700000000 ok, ran 30s, queued 2m00s, 3 call(s) [delegate×2 whoami×1]
+  +2m30s    ceo -> ceo/eng task "Draft the plan" +3 run(s)
+  +3m30s    ceo -> ceo/qa task "Review the plan" +2 run(s)
+  +4m30s      run 20260115T090930000000 ok, ran 45s, queued 2m00s, 3 call(s) [report×2 write×1], 1 refused
+                ! report: status must be one of ('done', 'failed', 'blocked')
+  +5m15s      ceo/eng -> ceo result (done) "Draft the plan" +2 run(s)
+  +6m15s      run 20260115T091115000000 failed, ran 12s, queued 2m45s, 0 call(s), error: exit code 1
+totals: wall 13m47s | runs 3 (budget given 8, returned 0) | run time 1m27s | queue 6m45s | waiting on you 0s | tool calls 6 (1 refused)
+
+[exit 0]

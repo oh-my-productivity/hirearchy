@@ -1,0 +1,16 @@
+### note 20260115T090900000000-root-0004
+from: root | to: ceo | title: feedback on "Brief on AI chips": reject | reply_to: 20260115T090700000000-root-0002 | feedback: reject
+
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+Too long: cut to 600 words.
+
+### note 20260115T091000000000-runtime-0005
+from: runtime | to: ceo | title: Budget returned
+
+`ceo/eng` and its team were retired by ceo (done early). Their unspent budget, 3 run(s), is returned to you with this note.
+
+### note 20260115T091100000000-runtime-0006
+from: runtime | to: ceo | title: FYI
+
+Nothing to do.

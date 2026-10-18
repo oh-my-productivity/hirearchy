@@ -1,0 +1,92 @@
+Target organization: <ORG> (exists, 0 agent(s) besides root; apply_org adds to it)
+
+Show the block below to the user exactly as written, from its first line up to (not including) the marker line; one plain-words intro line before it is fine.
+
+PLAN FOR YOU
+Goal: Sample text
+What I understood you need:
+- Scope: Sample text
+- Your files (read-only): <CWD>/docs
+- Quality bar: Every statement comes from the input files; where the files disagree or are silent, the document says so.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 for every agent
+Team (4 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in <CWD>/docs and the organization's own files; cannot change your files
+  - reader (Reader of the user's files, model claude-sonnet-5.5): can read files only in <CWD>/docs and the organization's own files; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): can read <CWD>/docs through the organization's read tool; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read files only in <CWD>/docs and the organization's own files; cannot change your files
+Budget: 19 runs planned (one run = one working session of one agent), your cap is 25; the minimum for one review and rework is 15. Unspent runs come back to you.
+  lead starts with 19, hands down reader 3, writer 3, reviewer 2 and keeps 11 for planning, checking and rework.
+If the check still fails after one rework, I'll come back to you with options before spending the reserve (about 4 runs); nothing beyond the 19 planned runs is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every success check below.
+Deliverable: Sample text [markdown, max 1500 words]
+  Delivered to: <CWD>/deliverables/briefs.md (I copy it there after checking it)
+Done when ALL of these hold:
+  1. Covers <the topics the user listed, named exactly> and nothing else.
+  2. At most 1500 words as counted by read.
+  3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+  4. The reviewer's report shows every criterion met (criteria met: n of m with n = m), including each statement checked against its named input file, and the writer applied every required change.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+# Plan for approval
+
+Goal: Sample text
+
+Needs as understood:
+- Scope: Sample text
+- Deliverable: Sample text [markdown, max 1500 words]
+- Quality bar: Every statement comes from the input files; where the files disagree or are silent, the document says so.
+- Sources / tools: Only the files in needs.inputs; no web.
+- Workspace: none (no agent writes files or runs commands)
+- Model policy: one model for all
+- Review: required
+
+Organization (4 agents):
+- lead [manager] Manager: model=claude-sonnet-5.5, tools=read
+  Access: kiro read only in <CWD>/docs and in the organization's own files (read-only)
+  - reader [custom] Reader of the user's files: model=claude-sonnet-5.5, tools=read
+    Access: kiro read only in <CWD>/docs and in the organization's own files (read-only)
+  - writer [writer] Writer: model=claude-sonnet-5.5, tools=none
+    Access: read-only inputs (orgmcp read): <CWD>/docs
+  - reviewer [reviewer] Independent Reviewer: model=claude-sonnet-5.5, tools=read
+    Access: kiro read only in <CWD>/docs and in the organization's own files (read-only)
+
+Budget: 19 runs planned (your cap: 25), estimate 15 for one pass + one review/rework cycle:
+  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you.
+  lead: starts with 19, hands down reader 3, writer 3, reviewer 2 (each includes its rework/re-check run), keeps 11 (own 7 + slack 4)
+  lead/reader: 3 runs (2 work + 1 rework)
+  lead/writer: 3 runs (2 work + 1 rework)
+  lead/reviewer: 2 runs (1 work + 1 rework)
+
+Review / verification:
+- lead/reviewer checks the work of lead/reader, lead/writer independently; findings go to their manager, who sends required changes back to the author (nobody edits another agent's file).
+- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done
+
+Deliverable:
+- Sample text (markdown, max 1500 words)
+- Final location: <CWD>/deliverables/briefs.md (copied there by the assistant after verification)
+
+First task: to lead: Sample text
+  1. Covers <the topics the user listed, named exactly> and nothing else.
+  2. At most 1500 words as counted by read.
+  3. Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+  4. The reviewer's report shows every criterion met (criteria met: n of m with n = m), including each statement checked against its named input file, and the writer applied every required change.
+
+Checkpoints:
+- Approval: Plan first; ask before any spend beyond the budget.
+- Progress: One line when I ask.
+- Any spend beyond the budget needs your OK.
+
+Warnings (2):
+- needs.deliverable.path: no agent can write to <CWD>/deliverables/briefs.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
+- needs.deliverable.path: <CWD>/deliverables does not exist; the copy step will create it
+
+Reply 'approve' or tell me what to change.
+
+plan_id: <PLAN_ID>
+Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="<PLAN_ID>"). If you change the blueprint, call propose_org again: the plan_id changes.

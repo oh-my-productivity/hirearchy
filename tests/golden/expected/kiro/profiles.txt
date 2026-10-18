@@ -1,0 +1,338 @@
+##### shared_no_tools: orgmcp-golden-org-26994b.json
+{
+  "name": "orgmcp-golden-org-26994b",
+  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "<ORGMCP_BIN>",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/golden/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp"
+  ],
+  "allowedTools": [
+    "@orgmcp"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false
+}
+
+##### shared_shell: orgmcp-golden-org-26994b-shell.json
+{
+  "name": "orgmcp-golden-org-26994b-shell",
+  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: shell)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "<ORGMCP_BIN>",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/golden/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "shell"
+  ],
+  "allowedTools": [
+    "@orgmcp",
+    "shell"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false
+}
+
+##### shared_read_unconfined: orgmcp-golden-org-26994b-read.json
+{
+  "name": "orgmcp-golden-org-26994b-read",
+  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: read)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "<ORGMCP_BIN>",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/golden/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "read"
+  ],
+  "allowedTools": [
+    "@orgmcp",
+    "read"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false
+}
+
+##### confined_read_write_shell: orgmcp-golden-org-26994b-read-shell-write-x6fbf3700.json
+{
+  "name": "orgmcp-golden-org-26994b-read-shell-write-x6fbf3700",
+  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: read, shell, write)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "<ORGMCP_BIN>",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/golden/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "read",
+    "shell",
+    "write"
+  ],
+  "allowedTools": [
+    "@orgmcp",
+    "shell"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false,
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "/golden/ws/**"
+      ],
+      "deniedPaths": [
+        "/golden/org",
+        "/golden/org/**"
+      ]
+    },
+    "read": {
+      "allowedPaths": [
+        "/golden/ws",
+        "/golden/ws/**",
+        "/golden/in-a",
+        "/golden/in-a/**",
+        "/golden/in-b",
+        "/golden/in-b/**",
+        "/golden/org",
+        "/golden/org/**"
+      ],
+      "deniedPaths": []
+    }
+  }
+}
+
+##### confined_write_only: orgmcp-golden-org-26994b-write-x841da205.json
+{
+  "name": "orgmcp-golden-org-26994b-write-x841da205",
+  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: write)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "<ORGMCP_BIN>",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/golden/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "write"
+  ],
+  "allowedTools": [
+    "@orgmcp"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false,
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "/golden/ws/**"
+      ],
+      "deniedPaths": [
+        "/golden/org",
+        "/golden/org/**"
+      ]
+    }
+  }
+}
+
+##### confined_write_without_workspace: orgmcp-golden-org-26994b-write-x05257e14.json
+{
+  "name": "orgmcp-golden-org-26994b-write-x05257e14",
+  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: write)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "<ORGMCP_BIN>",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/golden/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "write"
+  ],
+  "allowedTools": [
+    "@orgmcp"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false,
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [],
+      "deniedPaths": [
+        "/golden/org",
+        "/golden/org/**"
+      ]
+    }
+  }
+}
+
+##### confined_read_inputs_only: orgmcp-golden-org-26994b-read-x8a3e7f11.json
+{
+  "name": "orgmcp-golden-org-26994b-read-x8a3e7f11",
+  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: read)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "<ORGMCP_BIN>",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/golden/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "read"
+  ],
+  "allowedTools": [
+    "@orgmcp"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false,
+  "toolsSettings": {
+    "read": {
+      "allowedPaths": [
+        "/golden/in-a",
+        "/golden/in-a/**",
+        "/golden/org",
+        "/golden/org/**"
+      ],
+      "deniedPaths": []
+    }
+  }
+}
+
+##### confined_read_workspace_inside_the_org: orgmcp-golden-org-26994b-read-write-xdcd24551.json
+{
+  "name": "orgmcp-golden-org-26994b-read-write-xdcd24551",
+  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: read, write)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "<ORGMCP_BIN>",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/golden/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "read",
+    "write"
+  ],
+  "allowedTools": [
+    "@orgmcp"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false,
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "/golden/org/ws/**"
+      ],
+      "deniedPaths": []
+    },
+    "read": {
+      "allowedPaths": [
+        "/golden/org/ws",
+        "/golden/org/ws/**",
+        "/golden/org",
+        "/golden/org/**"
+      ],
+      "deniedPaths": []
+    }
+  }
+}
+
+##### confined_shell_only: orgmcp-golden-org-26994b-shell-xbf21a9e8.json
+{
+  "name": "orgmcp-golden-org-26994b-shell-xbf21a9e8",
+  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: shell)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "<ORGMCP_BIN>",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/golden/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "shell"
+  ],
+  "allowedTools": [
+    "@orgmcp",
+    "shell"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false
+}

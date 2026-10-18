@@ -1,0 +1,93 @@
+Target organization: <FUTURE_ORG> (none yet: create_org(mission=...) comes first, then apply_org)
+
+Show the block below to the user exactly as written, from its first line up to (not including) the marker line; one plain-words intro line before it is fine.
+
+PLAN FOR YOU
+Goal: Produce a sourced competitor analysis of five self-hosted note-taking apps for a small team choosing one.
+What I understood you need:
+- Scope: Obsidian, Logseq, Joplin, Trilium and AnyType only; self-hosting, licensing, sync/E2EE, mobile support, extensibility.
+- Quality bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts (versions, licenses) come from the live source.
+- Sources: Web access to official sites, repositories and docs; a source URL per claim.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 for every agent
+Team (4 agents):
+- lead (Research lead, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read web pages and search the web; cannot change your files
+  - researcher (Researcher, model claude-sonnet-5.5): can read web pages and search the web; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): cannot change your files
+  - factcheck (Independent Fact-Checker, model claude-sonnet-5.5): can read web pages and search the web; cannot change your files
+Budget: 22 runs planned (one run = one working session of one agent), your cap is 25; the minimum for one review and rework is 17. Unspent runs come back to you.
+  lead starts with 22, hands down researcher 4, writer 3, factcheck 3 and keeps 12 for planning, checking and rework.
+If the check still fails after one rework, I'll come back to you with options before spending the reserve (about 5 runs); nothing beyond the 22 planned runs is spent without your OK.
+Checking: factcheck reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every success check below.
+Deliverable: Competitor analysis with a comparison table and a closing "Where we can win" section marked as our assessment [markdown, max 1500 words]
+  Delivered to: ~/deliverables/competitors.md (I copy it there after checking it)
+Done when ALL of these hold:
+  1. Covers exactly Obsidian, Logseq, Joplin, Trilium and AnyType, and no other app.
+  2. At most 1500 words as counted by read.
+  3. Contains a comparison table with one row per app and a final section titled "Where we can win" that is marked as our assessment (judgement).
+  4. Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+  5. The "Where we can win" section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
+  6. The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change.
+  7. The final report names the path of the deliverable inside the organization, and pastes that coverage line verbatim.
+Checkpoints: approval - Approve this plan before anything is created or started; ask before spending beyond the budget; progress - One line when I ask; tell me when it is done. No digging through files; any spend beyond the budget needs your OK.
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+# Plan for approval
+
+Goal: Produce a sourced competitor analysis of five self-hosted note-taking apps for a small team choosing one.
+
+Needs as understood:
+- Scope: Obsidian, Logseq, Joplin, Trilium and AnyType only; self-hosting, licensing, sync/E2EE, mobile support, extensibility.
+- Deliverable: Competitor analysis with a comparison table and a closing "Where we can win" section marked as our assessment [markdown, max 1500 words]
+- Quality bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts (versions, licenses) come from the live source.
+- Sources / tools: Web access to official sites, repositories and docs; a source URL per claim.
+- Workspace: none (no agent writes files or runs commands)
+- Model policy: one model for all (claude-sonnet-5.5 for every agent; a cheaper drafting model only if the user asks, with the lead and the fact-check staying strong)
+- Review: required
+
+Organization (4 agents):
+- lead [manager] Research lead: model=claude-sonnet-5.5, tools=web_fetch,web_search
+  - researcher [researcher] Researcher: model=claude-sonnet-5.5, tools=web_fetch,web_search
+  - writer [writer] Writer: model=claude-sonnet-5.5, tools=none
+  - factcheck [fact-checker] Independent Fact-Checker: model=claude-sonnet-5.5, tools=web_fetch,web_search
+
+Budget: 22 runs planned (your cap: 25), estimate 17 for one pass + one review/rework cycle:
+  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you.
+  lead: starts with 22, hands down researcher 4, writer 3, factcheck 3 (each includes its rework/re-check run), keeps 12 (own 7 + slack 5)
+  lead/researcher: 4 runs (3 work + 1 rework)
+  lead/writer: 3 runs (2 work + 1 rework)
+  lead/factcheck: 3 runs (2 work + 1 rework)
+
+Review / verification:
+- lead/factcheck checks the work of lead/researcher, lead/writer independently; findings go to their manager, who sends required changes back to the author (nobody edits another agent's file).
+- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done
+
+Deliverable:
+- Competitor analysis with a comparison table and a closing "Where we can win" section marked as our assessment (markdown, max 1500 words)
+- Final location: ~/deliverables/competitors.md (copied there by the assistant after verification)
+
+First task: to lead: Competitor analysis of five self-hosted note-taking apps
+  1. Covers exactly Obsidian, Logseq, Joplin, Trilium and AnyType, and no other app.
+  2. At most 1500 words as counted by read.
+  3. Contains a comparison table with one row per app and a final section titled "Where we can win" that is marked as our assessment (judgement).
+  4. Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+  5. The "Where we can win" section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
+  6. The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change.
+  7. The final report names the path of the deliverable inside the organization, and pastes that coverage line verbatim.
+
+Checkpoints:
+- Approval: Approve this plan before anything is created or started; ask before spending beyond the budget.
+- Progress: One line when I ask; tell me when it is done. No digging through files.
+- Any spend beyond the budget needs your OK.
+
+Warnings (2):
+- needs.deliverable.path: no agent can write to <HOME>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
+- needs.deliverable.path: <HOME>/deliverables does not exist; the copy step will create it
+
+Reply 'approve' or tell me what to change.
+
+plan_id: 79ee3ad33ef8
+Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="79ee3ad33ef8"). If you change the blueprint, call propose_org again: the plan_id changes.

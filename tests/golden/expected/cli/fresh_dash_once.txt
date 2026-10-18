@@ -1,0 +1,13 @@
+orgmcp dash - org (<ORG>)  2026-01-15 09:00:00Z
+scheduler stopped | running 0/3 · queued 0 · waiting on you 0 · errors 15m 0
+
+AGENTS
+★ root (you)
+
+REQUESTS
+  none
+
+SERVICES
+  none
+
+[exit 0]

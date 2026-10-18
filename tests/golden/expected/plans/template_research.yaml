@@ -1,0 +1,53 @@
+# Blueprint schema in one paragraph. A blueprint is YAML with four top-level keys. `mission`: one paragraph on what the
+# organization is for. `needs`: what the user asked for, in their terms: scope (the exact list of items, only what they
+# gave you), deliverable {description, format, max_words, path}, quality_bar, sources, inputs (read-only folders with the
+# user's files), workspace (the one folder agents may write in, for code), budget_runs (the user's cap in runs),
+# models {cheap, strong} and model_policy, review (true/false), approval, progress, kind (research|writing|code|analysis), code
+# {tests, packaging, commits}. `agents`: ONE top-level agent (usually template manager) with `children`; each agent has
+# name, template (manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst,
+# data-checker) or a custom
+# `charter`, optional model (cheap|strong|id), tools, workspace, scale. `task`: the first task for the top agent: to,
+# title, goal and `acceptance`, a list of exact, checkable criteria (numbers, sections, paths), never "good quality".
+# Replace every <PLACEHOLDER>; delete what does not apply. Then call propose_org with the edited text.
+
+# kind=research: the team gathers facts from the web (with a URL per claim), writes them up and has every claim fact-checked.
+mission: >
+  <One paragraph: what the organization produces and for whom, e.g. a sourced comparison of the items below.>
+needs:
+  kind: research
+  scope: "<The exact items in scope, as the user listed them. Ask for the list; do not invent one.>"
+  deliverable:
+    description: <What the file contains, e.g. a comparison table plus a closing recommendation section labelled as our assessment>
+    format: markdown               # what the user can open: markdown, plain text, csv, ...
+    max_words: 1500                # length limit; also put it in an acceptance criterion
+    path: <CWD>/deliverables/<name>.md   # where the user gets it; the assistant copies the checked file there
+  quality_bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts come from the live source.
+  sources: Web access to official sites and documentation; a source URL per claim.
+  budget_runs: 25                  # the user's cap in runs (one run = one agent working session)
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}   # same model for both tiers; set a cheaper cheap id ONLY if the user asks for cheaper drafting
+  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
+  review: true                     # an independent fact-checker who did not write the text
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong                  # if a cheaper drafting model is ever set, the lead stays strong: it decides how every other run is spent
+    children:
+      - {name: researcher, template: researcher}   # web_search + web_fetch
+      - {name: writer, template: writer}
+      - {name: factcheck, template: fact-checker}  # independent: quotes the source for EVERY factual claim (ledger of facts and judgement)
+task:
+  to: lead
+  title: <Short title of the work>
+  goal: >
+    <Research the scope, write the deliverable, have the claims independently fact-checked, apply every required
+    change and report the final file.>
+  acceptance:                      # exact and checkable; the assistant checks each one at the end
+    - Covers exactly the items listed in the scope and no others.
+    - At most 1500 words as counted by read.
+    - Contains <the sections or table the user asked for, named exactly>, and the closing recommendation section is marked as our assessment (judgement).
+    - Every sentence with a number, name, version, license, price, date or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+    - The recommendation section is judgement. It has no citations or new facts and rests only on claims verified elsewhere in the document.
+    - "The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m (none wrong, unsupported or not-checkable) and 'each resting on verified facts: yes' for its judgement statements, and the writer applied every required change."
+    - The final report pastes that coverage line verbatim, with the path of the fact-checker's ledger.

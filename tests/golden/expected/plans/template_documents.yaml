@@ -1,0 +1,61 @@
+# Blueprint schema in one paragraph. A blueprint is YAML with four top-level keys. `mission`: one paragraph on what the
+# organization is for. `needs`: what the user asked for, in their terms: scope (the exact list of items, only what they
+# gave you), deliverable {description, format, max_words, path}, quality_bar, sources, inputs (read-only folders with the
+# user's files), workspace (the one folder agents may write in, for code), budget_runs (the user's cap in runs),
+# models {cheap, strong} and model_policy, review (true/false), approval, progress, kind (research|writing|code|analysis), code
+# {tests, packaging, commits}. `agents`: ONE top-level agent (usually template manager) with `children`; each agent has
+# name, template (manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst,
+# data-checker) or a custom
+# `charter`, optional model (cheap|strong|id), tools, workspace, scale. `task`: the first task for the top agent: to,
+# title, goal and `acceptance`, a list of exact, checkable criteria (numbers, sections, paths), never "good quality".
+# Replace every <PLACEHOLDER>; delete what does not apply. Then call propose_org with the edited text.
+
+# kind=documents: the team reads the user's own local files (read-only, no web) and writes a new document from them.
+mission: >
+  <One paragraph: what document the organization writes from the user's files, and for whom.>
+needs:
+  kind: writing
+  scope: "<What the document covers and what it leaves out, in the user's words.>"
+  inputs:                          # read-only folders with the user's files; the team can read them, never change them
+    - <CWD>/<folder-with-your-files>
+  deliverable:
+    description: <What the document is, e.g. an onboarding guide with one section per topic>
+    format: markdown
+    max_words: 1500
+    path: <CWD>/deliverables/<name>.md   # a new folder in the user's current directory; stated plainly in the plan
+  quality_bar: Every statement comes from the input files; where the files disagree or are silent, the document says so.
+  sources: Only the files in needs.inputs; no web.
+  budget_runs: 25
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
+  review: true                     # a reviewer who did not write it checks it against the files
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - name: reader                # reads the input files and extracts what the document needs
+        role: Reader of the user's files
+        model: cheap
+        tools: [read]
+        charter: >
+          Read the files in the input folders. Extract the facts the document needs, each with the file it came from.
+          Note every place where files disagree or are silent. Never change the input files.
+      - {name: writer, template: writer}
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]               # needs read access to check the text against the files
+task:
+  to: lead
+  title: <Short title of the document>
+  goal: >
+    <Read the input files, write the document, have it checked against the files, apply every required change and
+    report the final file.>
+  acceptance:
+    - Covers <the topics the user listed, named exactly> and nothing else.
+    - At most 1500 words as counted by read.
+    - Every statement is traceable to a named input file, and gaps or conflicts between files are listed in a final section titled "Open questions".
+    - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), including each statement checked against its named input file, and the writer applied every required change."

@@ -1,0 +1,105 @@
+Target organization: <ORG> (exists, 0 agent(s) besides root; apply_org adds to it)
+
+DRAFT - NOT READY (it has errors: fix the blueprint and propose again; do not show this to the user)
+Goal: <One paragraph: which question the organization answers from the user's data, and for whom.>
+What I understood you need:
+- Scope: <The question and the outcome to explain, e.g. what drives product returns; which file(s) and period.>
+- Your files (read-only): <CWD>/<folder-with-your-data>
+- Quality bar: Every number is reproducible from one script and appears with its label in the script's output; no conclusion from a slice under 30 rows.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: <CWD>/analysis-work
+- Models: claude-sonnet-5.5 for every agent
+Team (4 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in <CWD>/analysis-work and the organization's own files; can run commands, which are NOT confined: it is told to stay in <CWD>/analysis-work, but nothing enforces that
+  - analyst (Data Analyst, model claude-sonnet-5.5): can read files only in <CWD>/analysis-work and the organization's own files; can run commands, which are NOT confined: it is told to stay in <CWD>/analysis-work, but nothing enforces that
+  - checker (Independent Data Checker, model claude-sonnet-5.5): can read files only in <CWD>/analysis-work and the organization's own files; can run commands, which are NOT confined: it is told to stay in <CWD>/analysis-work, but nothing enforces that
+  - writer (Writer, model claude-sonnet-5.5): can read files only in <CWD>/analysis-work and the organization's own files; cannot change your files
+Budget: 23 runs planned (one run = one working session of one agent), your cap is 25; the minimum for one review and rework is 18. Unspent runs come back to you.
+  lead starts with 23, hands down analyst 5, checker 3, writer 3 and keeps 12 for planning, checking and rework.
+If the check still fails after one rework, I'll come back to you with options before spending the reserve (about 5 runs); nothing beyond the 23 planned runs is spent without your OK.
+Checking: checker reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every success check below.
+Deliverable: <What the report contains, e.g. the strongest effects with counts, then recommendations labelled as our assessment> [markdown, max 1000 words]
+  Delivered to: <CWD>/deliverables/<name>.md (I copy it there after checking it)
+Done when ALL of these hold:
+  1. Uses only <the data file(s)> in the data folder, and the checker confirmed the data files are unchanged (same checksums before and after).
+  2. One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
+  3. The script explores <the outcome> against every available column and against every pair of the strongest dimensions (for example reason x region); the report lists the strongest effects with their counts (n and share).
+  4. Each number in the report appears together with its label in the script output; the checker verified every label and number pair, not only that the number occurs.
+  5. No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
+  6. At most 1000 words as counted by read; the recommendations are in a section labelled as our assessment (judgement), without figures that are not in the script output.
+  7. The checker's line reads 'Figures checked: n of m match' with n = m, and also 'dimensions covered: k of d' with k = d, strongest pairs scanned: yes, reproducible: yes, data unchanged: yes; the writer applied every required change.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (2):
+- <CWD>/analysis-work does not exist yet; apply will create it
+- lead, lead/analyst, lead/checker hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not
+Errors (1):
+- needs.inputs: input <CWD>/<folder-with-your-data> does not exist; inputs are read-only sources and must be there already
+Cannot apply yet.
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+# Plan for approval
+
+Goal: <One paragraph: which question the organization answers from the user's data, and for whom.>
+
+Needs as understood:
+- Scope: <The question and the outcome to explain, e.g. what drives product returns; which file(s) and period.>
+- Deliverable: <What the report contains, e.g. the strongest effects with counts, then recommendations labelled as our assessment> [markdown, max 1000 words]
+- Quality bar: Every number is reproducible from one script and appears with its label in the script's output; no conclusion from a slice under 30 rows.
+- Sources / tools: Only the files in needs.inputs; no web.
+- Workspace: <CWD>/analysis-work
+- Model policy: one model for all
+- Review: required
+
+Organization (4 agents):
+- lead [manager] Manager: model=claude-sonnet-5.5, tools=read,shell ws=<CWD>/analysis-work
+  Access: kiro read only in <CWD>/analysis-work and in the organization's own files (read-only); shell NOT confined (instructed only)
+  - analyst [analyst] Data Analyst: model=claude-sonnet-5.5, tools=read,shell ws=<CWD>/analysis-work
+    Access: kiro read only in <CWD>/analysis-work and in the organization's own files (read-only); shell NOT confined (instructed only)
+  - checker [data-checker] Independent Data Checker: model=claude-sonnet-5.5, tools=read,shell ws=<CWD>/analysis-work
+    Access: kiro read only in <CWD>/analysis-work and in the organization's own files (read-only); shell NOT confined (instructed only)
+  - writer [writer] Writer: model=claude-sonnet-5.5, tools=read
+    Access: kiro read only in <CWD>/analysis-work and in the organization's own files (read-only)
+
+Budget: 23 runs planned (your cap: 25), estimate 18 for one pass + one review/rework cycle:
+  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you.
+  lead: starts with 23, hands down analyst 5, checker 3, writer 3 (each includes its rework/re-check run), keeps 12 (own 7 + slack 5)
+  lead/analyst: 5 runs (4 work + 1 rework)
+  lead/checker: 3 runs (2 work + 1 rework)
+  lead/writer: 3 runs (2 work + 1 rework)
+
+Review / verification:
+- lead/checker checks the work of lead/analyst, lead/writer independently; findings go to their manager, who sends required changes back to the author (nobody edits another agent's file).
+- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done
+
+Deliverable:
+- <What the report contains, e.g. the strongest effects with counts, then recommendations labelled as our assessment> (markdown, max 1000 words)
+- Final location: <CWD>/deliverables/<name>.md (copied there by the assistant after verification)
+
+First task: to lead: <Short title of the analysis>
+  1. Uses only <the data file(s)> in the data folder, and the checker confirmed the data files are unchanged (same checksums before and after).
+  2. One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
+  3. The script explores <the outcome> against every available column and against every pair of the strongest dimensions (for example reason x region); the report lists the strongest effects with their counts (n and share).
+  4. Each number in the report appears together with its label in the script output; the checker verified every label and number pair, not only that the number occurs.
+  5. No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
+  6. At most 1000 words as counted by read; the recommendations are in a section labelled as our assessment (judgement), without figures that are not in the script output.
+  7. The checker's line reads 'Figures checked: n of m match' with n = m, and also 'dimensions covered: k of d' with k = d, strongest pairs scanned: yes, reproducible: yes, data unchanged: yes; the writer applied every required change.
+
+Checkpoints:
+- Approval: Plan first; ask before any spend beyond the budget.
+- Progress: One line when I ask.
+- Any spend beyond the budget needs your OK.
+
+Warnings (4):
+- needs.workspace: <CWD>/analysis-work does not exist yet; apply will create it
+- agents: lead, lead/analyst, lead/checker hold shell. kiro cannot confine shell by path: staying inside the workspace (and leaving inputs alone) is instructed in the charter and prompt, not enforced. Built-in read/write ARE confined; only shell is not
+- needs.deliverable.path: no agent can write to <CWD>/deliverables/<name>.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)
+- needs.deliverable.path: <CWD>/deliverables does not exist; the copy step will create it
+
+Errors (1) - must be fixed before this can be applied:
+- needs.inputs: input <CWD>/<folder-with-your-data> does not exist; inputs are read-only sources and must be there already
+
+Cannot apply yet: tell me what to change.
+
+plan_id: none (the blueprint has errors). Fix them and call propose_org again; do not ask the user to approve this.

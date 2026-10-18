@@ -1,0 +1,7 @@
+usage: orgmcp install-skill [-h] [--dest DIR] [--force]
+
+options:
+  -h, --help  show this help message and exit
+  --dest DIR  skills directory to install into; the file goes to DIR/orgmcp/SKILL.md (default:
+              ~/.kiro/skills)
+  --force     overwrite a different existing SKILL.md
