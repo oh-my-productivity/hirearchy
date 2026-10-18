@@ -1,0 +1,25 @@
+3,6c3,8
+< version: 1
+< revised: '2026-10-18T02:16:43.197844+00:00'
+< by: root
+< reason: initial playbook
+---
+> version: 2
+> revised: '2026-10-18T02:24:09.070806+00:00'
+> by: lead
+> reason: 'case 20261018T022310913851-root-f538: client feedback "Wants decisions always
+>   before action items" and contract v2 now requires it. Also codifying the known workaround
+>   for reviewer file access and the deliverable path constraint from prior case lessons.'
+10,11c12,13
+< 2. Delegate to `writer` (Memo writer) with `budget=3`: its part of the request, with the criteria it must meet. On this first run delegate only the steps that need nothing from a teammate.
+< 3. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.
+---
+> 2. Delegate to `writer` (Memo writer) with `budget=3`: its part of the request, with the criteria it must meet. On this first run delegate only the steps that need nothing from a teammate. Remind the writer that the "Decisions" section MUST come before the "Action items" section.
+> 3. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. Pass the memo text inline to the reviewer (as the reviewer cannot read the writer's folder directly). It reports findings and required changes to you and never edits the author's file.
+24c26,29
+< none yet: add them from lessons and feedback
+---
+> - Reviewer cannot read the writer's work folder (lead/writer/work/) via kiro read. Always pass the memo text inline to the reviewer task — do not rely on the reviewer reading the file path directly.
+> - The deliverable path in the contract (/tmp/orgmcp-e-1792289694/deliverables) is unreachable by @orgmcp/write; put the deliverable in lead/work/ and report that path. The assistant copies it.
+> - The "Decisions" section must always come before the "Action items" section (standing client requirement, contract v2). Always state this explicitly in the writer's task.
+> - Relative dates in the notes must be converted to ISO format (YYYY-MM-DD) using the meeting date in the file name.

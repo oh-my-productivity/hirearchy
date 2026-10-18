@@ -1,0 +1,3 @@
+[tool] Running: @orgmcp/define_service
+[tool] status: Completed
+Done. The `weekly-memo` contract now has 8 checks. The new one is number 8: "In the memo, the 'Decisions' section comes before the 'Action items' section." It applies to every memo from now on, and the lead has been told.

@@ -1,0 +1,12 @@
+# Reflect before you start: weekly-memo
+Your playbook is how your team delivers this service; you own it and improve it. Evidence since v1:
+Cases with new evidence (most recent first):
+- case 20261018T021644679563-root-b495 "Memo for 2026-10-05 meeting": done, playbook v1, 8 of 12 runs; client feedback: accept "User happy, all items present. Wants decisions always before action items."; lessons: "Inline memo review works when writer's file is inaccessible to reviewer via kiro read. Passing memo text inline to the reviewer task is a reliable workaround. The deliverable path /tmp/orgmcp-e-1792289694/deliverables i…"
+By playbook version:
+- v1: 2 request(s): 1 done, 0 failed, 1 open; 0 reworked; avg 8 runs; feedback 1 accept, 0 reject
+Before working on the new request:
+1. Look for what repeats, and for anything the client rejected. A rejection or a failure is enough on its own; a single slow case is not.
+2. If a change to how the team works would prevent it, call `revise_playbook(service, content, reason)` with the whole new playbook (at most 1000 words): concrete steps (who does what, in which order, which check), not slogans. Name the cases in the reason. The new version applies to this request.
+3. The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. If the client's feedback is a lasting requirement, also tell your parent (`send`) so it can add it to the contract.
+4. If nothing needs to change, do not revise. Then handle the request following the playbook.
+

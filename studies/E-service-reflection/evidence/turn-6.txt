@@ -1,0 +1,32 @@
+[tool] Running: @orgmcp/request
+[tool] status: Completed
+[tool] Running: @orgmcp/start
+[tool] status: Completed
+Started the memo for 2026-10-12.md, with up to 12 runs planned. I'll wait for it to finish.
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+[tool] Running: @orgmcp/inbox
+[tool] Running: cd /private/tmp/orgmcp-e-1792289694; cat org/lead/work/memo-2026-10-12.md; echo; echo ---- NOTES; cat notes/2026-10-12.md; echo; wc -w org/lead/work/memo-2026-10-12.md; ls org/lead/reviewer/work
+[tool] status: Completed
+[tool] status: Completed
+[tool] Running: cd /private/tmp/orgmcp-e-1792289694/org/lead; cat reviewer/work/review-memo-2026-10-12.md | head -80; echo ----; cat services/weekly-memo/PLAYBOOK.md | head -60
+[tool] Running: @orgmcp/whoami
+[tool] status: Completed
+[tool] status: Completed
+The 2026-10-12 memo passed review, but I haven't delivered it, because I think it leaves out two items from the notes. I need your call before spending more runs.
+
+The notes have three lines marked "ACTION:", and the memo covers those three correctly. Two other commitments in the notes aren't marked that way, and the reviewer left them out as "not stated as an action item":
+- **Sam:** he said he'd sort out the out-of-date staging test data himself, "so that it's ready the day before the freeze starts". That would be 2026-10-21, but he said "probably".
+- **Lee and Dev:** Lee will swap pager shifts with Dev for demo week, so Dev is free to present the demo. Nobody objected. There's no date.
+
+You asked for who does what, and you liked last week's memo because all the items were there. I'd add both as rows, with the due date "none" for Lee and 2026-10-21 for Sam.
+
+The memo is currently at `org/lead/work/memo-2026-10-12.md`. It's 75 words and has the decisions before the action items. Its three decisions are: approve the rate limiter RFC, run a blameless company-wide postmortem, and freeze deploys on Oct 22–23.
+
+So far it has used 7 of 12 runs. A rework plus re-review would take about 4 more, which fits inside the 12.
+
+Do you want me to:
+1. **Add both rows** (my recommendation). I'll send it back for rework.
+2. **Keep it as is.** Only the three explicit "ACTION:" items go in the table, and I deliver it now.
+
+If you want the Lee and Dev swap or Sam's staging task handled differently, say so. For example, you might want them as rows with "owner not stated" for the date, or only in a short "Other commitments" line.

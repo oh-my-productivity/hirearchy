@@ -1,0 +1,48 @@
+[tool] Running: @orgmcp/blueprint_example
+[tool] status: Completed
+[tool] Running: @orgmcp/propose_org
+[tool] status: Completed
+Here's the plan. One warning first: 12 runs is only 1 above the estimate of 11 for a draft, a review and one rework. If something goes wrong, the memo will stall and I'll come back to you before spending more. I can raise it to about 14 if you'd rather have slack, but you asked for 12 at most, so I've kept it there.
+
+PLAN FOR YOU
+Goal: Turn the user's notes from each weekly team meeting into a short memo of what was decided and who does what. The notes are read-only, one file per meeting; the memo goes to the user as a markdown file.
+What I understood you need:
+- Scope: One short memo per request, from exactly one meeting notes file: the decisions made and the action items (owner, action, due date). Nothing else from the notes, no other files, no web.
+- Your files (read-only): /tmp/orgmcp-e-1792289694/notes
+- Quality bar: Every statement comes from the named notes file; nothing is invented; where the notes are silent (owner, date) the memo says so.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: cheap drafting, strong lead and strong review
+Team (3 agents):
+- lead (Manager, model claude-sonnet-4.6): directs the team; does not produce the work itself; can read files only in /private/tmp/orgmcp-e-1792289694/notes; cannot change your files
+  - writer (Memo writer, model claude-haiku-4.5): can read files only in /private/tmp/orgmcp-e-1792289694/notes; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-4.6): can read files only in /private/tmp/orgmcp-e-1792289694/notes; cannot change your files
+Budget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 11. Unspent runs come back to you.
+  lead starts with 12, hands down writer 3, reviewer 2 and keeps 7 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-memo: One short memo (decisions and action items) from one meeting notes file.
+  You provide: notes_file (required)
+  Each request: up to 12 runs
+  Checks:
+    1. Uses only the notes file named in the request and nothing else.
+    2. The memo is markdown with at most 400 words as counted by read.
+    3. It has a section titled "Decisions" that lists every decision stated in the notes file and no decision that is not in it.
+    4. It has a section titled "Action items" containing a markdown table with exactly the columns Owner | Action | Due, with one row for every action item in the notes file and no row that is not in it.
+    5. Every Due cell is an ISO date (YYYY-MM-DD) or the word none; a relative date in the notes is converted to ISO using the meeting date in the file name.
+    ... and 2 more (see the details)
+  Delivered to: /tmp/orgmcp-e-1792289694/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+Nothing runs until you ask for a request: approving only creates the team and the services.
+Checkpoints: approval - Plan first; each memo request within the per-request budget counts as approved; ask before any spend beyond it; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (1):
+- 12 runs per request leaves almost no slack over the estimate of 11; expect a stall on the first surprise
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+END OF PLAN FOR YOU
+
+The two checks hidden behind "... and 2 more" are:
+- Where the notes name no owner, the Owner cell says "owner not stated".
+- The reviewer's report shows every criterion met (n of m, with n = m), checked against the notes file, and the writer applied every required change.
+
+Reply "approve" to build the team, or tell me what to change.

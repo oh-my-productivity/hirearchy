@@ -1,0 +1,11 @@
+[tool] Running: @orgmcp/feedback
+[tool] status: Completed
+I've recorded the memo as accepted and left it as it is.
+
+Your two notes sound like lasting rules, so I'd add them to the contract as checks:
+1. "A statement that something stays as it is (for example 'keep the agenda as sent') is not an action item and gets no row."
+2. "A Due date is an ISO date only if the notes give a date or a deadline that can be converted. A vague timing, or a period with no deadline of its own, gets 'none'."
+
+The second rule goes further than "none if the notes give no date". Lee's "probably by end of next week" would also become "none", because it's only a guess. That's different from "by Friday", which does convert to an ISO date.
+
+If you'd rather keep Lee's "end of next week" as 2026-10-30, I'll word the second check differently. Should I add both as written, or change the second one?

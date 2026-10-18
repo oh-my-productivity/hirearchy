@@ -1,0 +1,22 @@
+[tool] Running: @orgmcp/send
+[tool] status: Completed
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+[tool] Running: @orgmcp/inbox
+[tool] status: Completed
+[tool] Running: @orgmcp/send
+[tool] status: Completed
+[tool] Running: @orgmcp/progress
+[tool] status: Completed
+The memo is still waiting on its independent check, and the lead can't start it without one more run. The lead had 1 run left, but it must keep 1 in reserve whenever it hands work down. That means it can't give the reviewer its run unless it holds 2.
+
+Here is the position:
+- The memo is written and has all 5 action items, with Decisions first.
+- This memo has used about 17 runs so far, against your "about 12".
+- The review hasn't happened yet.
+
+Your options:
+1. **Grant 1 more run** (my recommendation). It's the smallest amount that lets the review happen, and that review is the independent check you asked for. Nothing is left over for a rework, though. If the review finds a problem, I'd come back to you before spending anything else.
+2. **Stop here.** I deliver the memo as it is, marked as not independently reviewed. I've read the notes and the memo myself and think they match, but I'm not the independent check.
+
+Reply "grant 1" or "stop".

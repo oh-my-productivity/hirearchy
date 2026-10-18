@@ -1,0 +1,18 @@
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m56cnpqbec9vn7dx85zx34k1","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+[tool] Reading SKILL.md:1, listing notes
+[tool] status: Completed
+[tool] Running: @orgmcp/whoami
+[tool] Running: @orgmcp/services
+[tool] status: Completed
+[tool] status: Completed
+Before I draft a plan, I need a few answers. Since this repeats every week, I'll set it up as a standing service that you ask for once per meeting.
+
+1. **Input each week:** which notes file to use. Your notes are in `/tmp/orgmcp-e-1792289694/notes`, with one file per meeting (for example `2026-10-19.md`). I'd have you give the file name each time. Does that work?
+2. **Memo content:** the decisions made, and who does what (owner, task, deadline if the notes mention one). I'd leave out anything the notes don't say, and flag unclear items as "owner not stated" instead of guessing. Is there anything else you want in it, such as open questions or the next meeting date?
+3. **Format and place:** markdown, at most 300 words. I'll save it in a new folder called `deliverables` in `/tmp/orgmcp-e-1792289694`, as `memo-<meeting date>.md`.
+4. **Sources:** only your notes folder, read-only, with no web.
+5. **Checks:** every decision and action item in the notes appears in the memo. Every action item has an owner, or is marked "owner not stated". The memo adds nothing that isn't in the notes. It has a "Decisions" section and an "Action items" section, and stays under the word limit.
+6. **Review:** a second agent that didn't write the memo checks it against the notes. I'd suggest 8 runs per memo, with a cheaper model drafting and a stronger one reviewing. The lead agent stays on the strong model because it decides how every other run is spent.
+7. **Approval:** you approve the plan first. After that, each time you ask for a memo counts as approval, within the per-memo budget.
+
+Reply "defaults" to accept all of the above. Otherwise, tell me what to change.
