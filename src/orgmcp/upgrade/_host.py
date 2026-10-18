@@ -4,16 +4,15 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from ..settings import OrgDocumentStore
+from .api import RulesUpgrader
 
 
 class UpgradedRuntime(Protocol):
     @property
-    def documents(self) -> OrgDocumentStore: ...
+    def rules_upgrader(self) -> RulesUpgrader: ...
 
 
 class UpgradedOrg(Protocol):
     @property
     def runtime(self) -> UpgradedRuntime: ...
 
-    def commit(self, message: str) -> None: ...
