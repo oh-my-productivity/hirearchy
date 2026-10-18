@@ -208,7 +208,7 @@ and run logs like all state. `services` is a reserved name; plain `write` into i
 |---|---|
 | root, and an agent with reports or `can_hire` | `services`, `define_service` (contract of a direct report's service; on an existing one it is an amendment: pass only what changes, e.g. `add_acceptance=[...]` / `remove_acceptance=[...]`; the old contract is archived and the owner quietly told exactly what changed), `request(service, inputs, ...)`, `feedback(task_id, accept\|reject, note)` |
 | an agent that owns a service | `services`, `revise_playbook(service, content, reason)` |
-| every agent | `report(..., lessons)`: required for `done`/`failed` on a service request |
+| every agent | `report(..., lessons)`: required for `done`, `failed` and `blocked` on a service request |
 
 A request is a task built from the contract (inputs, the contract's criteria plus any `extra_acceptance`, the deliverable, its budget),
 so every rule of tasks applies: direct reports only, budget moves down, `done`/`failed` are final, rework is `revises`.
@@ -230,6 +230,15 @@ parent, who adds it to the contract with `define_service`). A playbook is capped
 current one and needs a reason naming its cases; every version is kept in `history/`. `locked: true` takes revising away (the evidence is
 still shown). Playbook and contract notices to root are quiet (not under "Needs you"); feedback costs no run and wakes nobody.
 `progress` tags service tasks `[service <name> v<playbook>]` and says "no feedback yet" once one is finished; `status` shows `services:`.
+
+**What study E changed.** A parent's rewrite of a report's `AGENT.md` keeps every frontmatter key the new text does not set (`tools`,
+`inputs`, `model`, ...), and the write reply lists the kept and changed keys. The feedback note says it is for reflection only and never
+waives an acceptance criterion (ORG.md rule 10 too); the assistant records `feedback` only on the user's own judgement, not on "deliver as
+is". `lessons` are required for `done`, `failed` and `blocked` service reports, and the digest shows each case's latest lessons first.
+`send(budget=N)` replies with what the recipient can now hand down (size a request at the estimate + 25%, about 2 runs per delegation + 1).
+Agents with the built-in `read` can also read the organization's files (read-only; the org root is in their allowedPaths), so a reviewer
+opens an author's `work/` file directly. Verifier templates enumerate independently: a reviewer first lists the source's decisions and
+commitments itself (informal ones in prose too), then compares the deliverable item by item, and reports doubtful items as `ambiguous`.
 
 **In a blueprint.** `services:` next to `agents:` (any of the four kinds: `blueprint_example(kind, service=True)`; a filled research one is
 [`examples/blueprint-service.yaml`](examples/blueprint-service.yaml)):
