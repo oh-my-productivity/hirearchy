@@ -13,7 +13,6 @@ from orgmcp.kernel import stamp_of
 from orgmcp.runs import RunLogFile, RunLogReader, RunOutcomes, RunWindow
 from orgmcp.runs.testing import IMPLEMENTATIONS, RunsHarness
 
-from ._red import impls
 
 T1, T2, T3 = "20261018T100000000001", "20261018T110000000002", "20261018T120000000003"
 START = {t: cast(datetime, stamp_of(t)) for t in (T1, T2, T3)}
@@ -22,7 +21,7 @@ PROMPT = "# ---- prompt ----\nDo the thing.\n# ---- output ----\n"
 OK = HEADER + PROMPT + "all good\n\n# exit 0 after 3s\n"
 
 
-@pytest.fixture(params=impls(IMPLEMENTATIONS[RunLogReader]), ids=lambda factory: factory.__name__)
+@pytest.fixture(params=IMPLEMENTATIONS[RunLogReader], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> RunsHarness:
     made = cast(Callable[[Path], RunsHarness], request.param)(tmp_path)
     assert isinstance(made.reader, RunLogReader)

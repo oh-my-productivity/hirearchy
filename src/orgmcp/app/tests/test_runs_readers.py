@@ -30,7 +30,6 @@ from orgmcp.runs.tests._legacy import legacy
 
 dashboard_data, health, observe, sched_module = legacy("dashboard_data"), legacy("health"), legacy("observe"), legacy("scheduler")
 
-RED = pytest.mark.xfail(strict=True, reason="red: A-runs")
 SILENT = {"echo": lambda _: None}
 T1, T2, T3 = "20261018T100000000001", "20261018T110000000002", "20261018T120000000003"
 
@@ -56,7 +55,6 @@ def use(org: Org, **ports: Any) -> None:
 # ----------------------------------------------------------------------------------------------------------------- health
 
 
-@RED
 def test_health_reads_the_windows_and_outcomes_from_the_log_reader(org: Org, memory: MemoryRuns) -> None:
     memory.put_log("ceo", f"{T1}.log", "# run of ceo, 1 message(s)\n# senders: root\n# ---- prompt ----\nx\n# ---- output ----\n\n# exit 0 after 3s\n")
     memory.put_log("ceo", f"{T2}.log", "# run of ceo, 1 message(s)\n# senders: root\n# ---- prompt ----\nx\n# ---- output ----\n\n# exit 1 after 3s\n")
@@ -64,13 +62,12 @@ def test_health_reads_the_windows_and_outcomes_from_the_log_reader(org: Org, mem
     use(org, run_log_reader=memory)
     report = health.agent_health(org, "ceo", datetime(2026, 10, 18, 13, 0, tzinfo=timezone.utc))
     assert (report.runs_used, report.failed_runs, report.runtime_runs, report.empty_runs) == (3, 1, 1, 1)
-    assert not (org.root / "ceo" / "runs").exists()
+    assert list((org.root / "ceo" / "runs").glob("*.log")) == []  # none on disk: the fake answered
 
 
 # ----------------------------------------------------------------------------------------------------------------- observe
 
 
-@RED
 def test_observe_reads_the_registry_the_log_files_and_the_facts_from_the_ports(org: Org, memory: MemoryRuns) -> None:
     path = memory.put_log("ceo", f"{T1}.log", "# run of ceo, 1 message(s)\n\n# exit 3 after 7s\n")
     memory.record("ceo", {"pgid": 5, "lstart": "x", "started": 1.0, "scheduler": 1, "log": f"ceo/runs/{T1}.log"})
@@ -81,7 +78,6 @@ def test_observe_reads_the_registry_the_log_files_and_the_facts_from_the_ports(o
     assert (run.run, run.outcome, run.exit_code, run.duration_ms) == (f"ceo@{T1}", "failed", 3, 7000.0)
 
 
-@RED
 def test_observe_finds_a_start_that_failed_through_the_reader(org: Org, memory: MemoryRuns) -> None:
     path = memory.put_log("ceo", f"{T1}.log", "# run of ceo, 1 message(s)\n" + log_failed_start("no kiro"))
     use(org, run_log_reader=memory)
@@ -106,7 +102,6 @@ def sleeper(seconds: str) -> Runner:
     return runner
 
 
-@RED
 def test_a_run_in_flight_is_recorded_and_forgotten_through_the_registry(org: Org, memory: MemoryRuns) -> None:
     a_task(org)
     use(org, run_registry=memory)
@@ -128,7 +123,6 @@ def test_a_run_in_flight_is_recorded_and_forgotten_through_the_registry(org: Org
     assert memory.all() == {}
 
 
-@RED
 def test_orphans_of_a_dead_scheduler_are_settled_through_the_registry(org: Org, memory: MemoryRuns) -> None:
     memory.record("ceo", {"pgid": 4_000_000, "lstart": "x", "started": 0.0, "scheduler": 1, "log": ""})
     memory.record("gone/agent", {"pgid": 0})
@@ -139,7 +133,6 @@ def test_orphans_of_a_dead_scheduler_are_settled_through_the_registry(org: Org, 
     assert memory.all() == {}
 
 
-@RED
 def test_the_note_on_an_orphaned_run_goes_through_the_log_writer(org: Org, memory: MemoryRuns) -> None:
     path = memory.put_log("ceo", f"{T1}.log", "# run of ceo, 1 message(s)\n")
     use(org, run_log_writer=memory)
@@ -149,7 +142,6 @@ def test_the_note_on_an_orphaned_run_goes_through_the_log_writer(org: Org, memor
     assert memory.read_log(path) == b"# run of ceo, 1 message(s)\n\n# killed: orphaned run of a scheduler that died\n"
 
 
-@RED
 def test_the_end_of_the_last_run_comes_from_the_log_reader(org: Org, memory: MemoryRuns) -> None:
     memory.set_mtime(memory.put_log("ceo", f"{T1}.log", ""), 1_800_000_000.0)
     use(org, run_log_reader=memory)
@@ -172,7 +164,6 @@ class SpyWriter(FsRunLogWriter):
         self.inner.append_note(rel_path, text)
 
 
-@RED
 def test_the_scheduler_writes_its_logs_through_the_log_writer(org: Org) -> None:
     a_task(org)
     spy = SpyWriter(FsRunLogWriter(OrgPaths(org.root), org.runtime.clock))
@@ -225,7 +216,6 @@ def tail_corpus() -> Iterator[tuple[str, bytes]]:
 
 @pytest.mark.parametrize("name, content", list(tail_corpus()), ids=[name for name, _ in tail_corpus()])
 @pytest.mark.parametrize("live", [False, True])
-@RED
 def test_the_tail_of_a_log_is_what_the_dashboard_always_showed(tmp_path: Path, name: str, content: bytes, live: bool) -> None:
     path = tmp_path / f"{T1}.log"
     path.write_bytes(content)
@@ -233,7 +223,6 @@ def test_the_tail_of_a_log_is_what_the_dashboard_always_showed(tmp_path: Path, n
     assert dashboard_data._read_tail(reader, path, f"x/{path.name}", live) == _oracle.read_tail(path, f"x/{path.name}", live)
 
 
-@RED
 def test_the_tail_of_a_log_that_cannot_be_read_is_a_note(tmp_path: Path) -> None:
     path = tmp_path / f"{T1}.log"
     reader = FsRunLogReader(OrgPaths(tmp_path))
@@ -241,7 +230,6 @@ def test_the_tail_of_a_log_that_cannot_be_read_is_a_note(tmp_path: Path) -> None
     assert got == _oracle.read_tail(path, "x/missing.log", False) and got.note == "the run log could not be read"
 
 
-@RED
 def test_the_tail_of_a_log_that_is_a_directory_is_a_note(tmp_path: Path) -> None:
     path = tmp_path / f"{T1}.log"
     path.mkdir()
@@ -259,7 +247,6 @@ class TailSpy(FsRunLogReader):
         return super().tail(path, max_bytes, max_lines)
 
 
-@RED
 def test_the_dashboard_reads_the_tail_through_the_log_reader_of_the_runtime(org: Org) -> None:
     path = org.start_run_log("ceo")
     path.write_text("# run of ceo, 1 message(s)\n# senders: root\nthe output\n\n# exit 0 after 3s\n", encoding="utf-8")

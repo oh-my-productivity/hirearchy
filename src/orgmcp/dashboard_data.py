@@ -34,6 +34,7 @@ from .core import BOXES, DEFAULT_CONFIG, ROOT, Message, Org, OrgError, _visible,
 from .dashboard_events import EventLine, describe, event_lines
 from .health import _aware, _stamp, config_number, org_health
 from .observe import fmt_dur
+from .runs import RunLogReader
 from .scheduler import EXIT_FILE, SchedulerState, scheduler_state
 
 ERROR_WINDOW = timedelta(minutes=15)
@@ -1017,7 +1018,7 @@ class DashData:
         hit = self._logs.get(path)
         if hit is not None and hit[0] == key:
             return hit[1]
-        log = _read_tail(path, org._rel(path), live)
+        log = _read_tail(org.runtime.run_log_reader, path, org._rel(path), live)
         self._logs[path] = (key, log)
         if len(self._logs) > 40:
             self._logs.pop(next(iter(self._logs)))
@@ -1192,25 +1193,18 @@ class DashData:
         return self.check_result
 
 
-def _read_tail(path: Path, rel: str, live: bool) -> RunLog:
+def _read_tail(reader: RunLogReader, path: Path, rel: str, live: bool) -> RunLog:
     log = RunLog(path=path, rel=rel, running=live)
     try:
-        with open(path, "rb") as f:
-            size = f.seek(0, 2)
-            log.size = size
-            f.seek(max(0, size - LOG_BYTES))
-            data = f.read()
-            head_raw = b""
-            if size > len(data):
-                f.seek(0)
-                head_raw = f.read(4096)
+        size = path.stat().st_size
+        # Two lines more than are shown: the last line may be nothing but escape codes, which ``clean_text`` empties and the pop
+        # below drops, and the lines are counted after that (as they always were).
+        text, cut = reader.tail(path, LOG_BYTES, LOG_LINES + 2)
+        head_raw = reader.head(path, 4096)
     except OSError:
         log.note = "the run log could not be read"
         return log
-    text = data.decode("utf-8", errors="replace")
-    cut = size > len(data)
-    if cut and "\n" in text:
-        text = text.split("\n", 1)[1]  # the first line is cut
+    log.size = size
     lines = clean_text(text).split("\n")
     if lines and lines[-1] == "":
         lines.pop()  # no trailing empty line (a partial last line is kept as it is)
@@ -1219,7 +1213,7 @@ def _read_tail(path: Path, rel: str, live: bool) -> RunLog:
         cut = True
     log.truncated = cut
     log.lines = lines
-    head_text = clean_text((head_raw or data[:4096]).decode("utf-8", errors="replace"))
+    head_text = clean_text(head_raw)
     stem_time = _stamp(path.stem)
     header = [f"started {stem_time:%Y-%m-%d %H:%M:%S}Z" if stem_time else f"log {path.name}"]
     for ln in head_text.split("\n")[:8]:

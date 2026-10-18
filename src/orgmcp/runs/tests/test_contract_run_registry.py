@@ -12,10 +12,8 @@ from orgmcp.kernel import JsonObject
 from orgmcp.runs import RunRegistry
 from orgmcp.runs.testing import IMPLEMENTATIONS, RunsHarness
 
-from ._red import impls
 
-
-@pytest.fixture(params=impls(IMPLEMENTATIONS[RunRegistry]), ids=lambda factory: factory.__name__)
+@pytest.fixture(params=IMPLEMENTATIONS[RunRegistry], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> RunsHarness:
     made = cast(Callable[[Path], RunsHarness], request.param)(tmp_path)
     assert isinstance(made.registry, RunRegistry)

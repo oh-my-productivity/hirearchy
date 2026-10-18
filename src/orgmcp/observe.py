@@ -36,6 +36,7 @@ from typing import Callable, Iterator
 from .core import BOXES, ROOT, RUNTIME, Org, OrgError, split_frontmatter, utcnow
 from .health import _aware, _stamp, config_number
 from .review import retired_runs
+from .runs import RunLogReader
 from .scheduler import EXIT_FILE, judge_orphan, scheduler_state
 
 EVENTS_DIR = Path(".runtime") / "events"
@@ -597,33 +598,7 @@ class Traces:
 
 
 def _running_ledger(org: Org) -> dict[str, dict]:
-    raw = org.ledger("running")
-    return {k: v for k, v in (raw.items() if isinstance(raw, dict) else ()) if isinstance(v, dict)}
-
-
-_EXIT = re.compile(r"^# exit (-?\d+) after (\d+)s", re.M)
-
-
-def _log_facts(path: Path) -> dict:
-    """What the scheduler wrote at the end of a run log (the last ~4 KB): exit code, seconds, how it ended."""
-    try:
-        with open(path, "rb") as f:
-            size = f.seek(0, 2)
-            f.seek(max(0, size - 4096))
-            tail = f.read().decode("utf-8", "replace")
-    except OSError:
-        return {}
-    facts: dict = {}
-    m = list(_EXIT.finditer(tail))
-    if m:
-        facts["exit_code"], facts["seconds"] = int(m[-1].group(1)), int(m[-1].group(2))
-    if re.search(r"^# killed after \d+s timeout", tail, re.M):
-        facts["timed_out"] = True
-    if re.search(r"^# (killed:|interrupted by scheduler shutdown)", tail, re.M):
-        facts["killed"] = True
-    if re.search(r"^# failed to start", tail, re.M):
-        facts["failed_start"] = True
-    return facts
+    return org.runtime.run_registry.all()
 
 
 @dataclass
@@ -664,7 +639,7 @@ def _queue_ms(start: datetime, batch: list[str] | None) -> float | None:
     return max(0.0, _ms(min(stamps), start)) if stamps else None
 
 
-def _make_run(agent: str, log: Path | None, stem: str, start: datetime, ev: dict[str, dict],
+def _make_run(reader: RunLogReader, agent: str, log: Path | None, stem: str, start: datetime, ev: dict[str, dict],
               running_stem: str | None, is_live: bool) -> RunRec:
     run = RunRec(agent=agent, run=f"{agent}@{stem}", start=start, log=log)
     s, e, o = ev.get("start"), ev.get("end"), ev.get("orphan")
@@ -690,7 +665,7 @@ def _make_run(agent: str, log: Path | None, stem: str, start: datetime, ev: dict
         run.outcome, run.ok = "killed", False
         run.error = _clip(f"orphan: {o.get('action')} {o.get('detail') or ''}", 200)
     elif log is not None:
-        facts = _log_facts(log)
+        facts = reader.facts(log)
         if facts.get("timed_out"):
             run.outcome, run.ok = "timeout", False
         elif facts.get("killed"):
@@ -711,12 +686,7 @@ def _make_run(agent: str, log: Path | None, stem: str, start: datetime, ev: dict
 
 
 def _run_logs(org: Org, agent: str) -> list[tuple[str, Path]]:
-    d = org.dir(agent) / "runs"
-    try:
-        names = sorted(n for n in os.listdir(d) if n.endswith(".log") and not n.startswith("."))
-    except OSError:
-        return []
-    return [(n[:-4], d / n) for n in names]
+    return [(f.stem, f.path) for f in org.runtime.run_log_reader.files(agent)]
 
 
 def collect_runs(org: Org, since: datetime | None, until: datetime | None, evs: dict[str, dict[str, dict]] | None = None,
@@ -740,8 +710,8 @@ def collect_runs(org: Org, since: datetime | None, until: datetime | None, evs: 
             rid = f"{agent}@{stem}"
             seen.add(rid)
             latest = stem == logs[-1][0]
-            out.append(_make_run(agent, path, stem, start, evs.get(rid, {}), running_stem or (stem if latest else None),
-                                 agent in live))
+            out.append(_make_run(org.runtime.run_log_reader, agent, path, stem, start, evs.get(rid, {}),
+                                 running_stem or (stem if latest else None), agent in live))
     if agents is None:  # runs of agents that no longer exist: only the events know them
         for rid, ev in evs.items():
             s = ev.get("start")
@@ -751,7 +721,7 @@ def collect_runs(org: Org, since: datetime | None, until: datetime | None, evs: 
             start = _stamp(stem) or _ts(s.get("ts"))
             if start is None or (since and start < since) or (until and start > until) or org.exists(agent):
                 continue
-            out.append(_make_run(agent, None, stem, start, ev, None, False))
+            out.append(_make_run(org.runtime.run_log_reader, agent, None, stem, start, ev, None, False))
     return sorted(out, key=lambda r: (r.start, r.run))
 
 
@@ -874,7 +844,7 @@ def trace(org: Org, task_id: str, now: datetime | None = None) -> dict:
             start = _stamp(stem)
             if start is None:
                 continue
-            runs.append(_make_run(agent, path, stem, start, revs.get(f"{agent}@{stem}", {}),
+            runs.append(_make_run(org.runtime.run_log_reader, agent, path, stem, start, revs.get(f"{agent}@{stem}", {}),
                                   running_stem or (stem if stem == logs[-1][0] else None), org.running(agent)))
     runs.sort(key=lambda r: (r.start, r.run))
     have_events = any(r.source == "events" for r in runs)
@@ -1576,7 +1546,7 @@ def _check_runs(org: Org) -> dict:
             t = _stamp(stem)
             if t is None or t < first or f"{agent}@{stem}" in started:
                 continue
-            if _log_facts(path).get("failed_start"):
+            if org.runtime.run_log_reader.facts(path).get("failed_start"):
                 continue  # a run that never started has no run.start by design
             problems.append(f"{agent}@{stem}: run log without a run.start event (events began {first.isoformat(timespec='seconds')})")
     return _check("d", "runs accounted for: run.start has run.end or a live process; run logs have run.start", problems,

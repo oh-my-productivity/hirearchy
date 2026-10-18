@@ -19,7 +19,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import IO, Callable, NamedTuple
+from typing import Callable, NamedTuple
 
 from . import review, telemetry, templates
 from .app import wire_processes
@@ -27,6 +27,20 @@ from .app.wiring import open_runtime
 from .core import ROOT, Org, OrgError, atomic_write
 from .health import config_number
 from .processes import ProcessTableError
+from .runs import (
+    RunLogSink,
+    log_exit,
+    log_failed_start,
+    log_header,
+    log_interrupted,
+    log_invocation,
+    log_note,
+    log_prompt,
+    log_retired,
+    log_timeout,
+    run_id_of,
+    run_record,
+)
 
 # (org, agent address, prompt) -> (argv, cwd, env). The prompt is delivered on the process's stdin, not in argv.
 Runner = Callable[[Org, str, str], tuple[list[str], Path, dict]]
@@ -172,7 +186,7 @@ class Run:
     addr: str
     proc: subprocess.Popen
     log: Path
-    logf: IO[str]
+    logf: RunLogSink
     started: float
     batch: int
     strays: dict | None = None  # paths of the agent's workspace that could hold stray org files, before the run
@@ -494,11 +508,6 @@ def stop_scheduler(org: Org, wait: float = 15.0) -> str:
             "Check status() shortly")
 
 
-def run_id_of(addr: str, log: Path | str) -> str:
-    """The id of a run: ``<agent>@<run log stem>`` (the stem is the start timestamp)."""
-    return f"{addr}@{Path(log).stem}"
-
-
 def _version() -> str:
     try:
         from importlib.metadata import version
@@ -580,26 +589,15 @@ class Scheduler:
 
     # --------------------------------------------------- runs of a dead scheduler
 
-    def _running_records(self) -> dict[str, dict]:
-        """``.runtime/running.json``: agent -> {pgid, lstart, started, scheduler, log} of every run in flight."""
-        raw = self.org.ledger("running")
-        return {k: v for k, v in (raw.items() if isinstance(raw, dict) else ()) if isinstance(v, dict)}
-
     def _record_run(self, addr: str, run: Run) -> None:
-        records = self._running_records()
-        records[addr] = {
-            "pgid": run.proc.pid,  # started in its own session, so pgid == pid
-            "lstart": _start_time(run.proc.pid),
-            "started": run.started,
-            "scheduler": os.getpid(),
-            "log": str(run.log.relative_to(self.org.root)),
-        }
-        self.org.save_ledger("running", records)
-
-    def _forget_run(self, *addrs: str) -> None:
-        records = self._running_records()
-        if any(records.pop(a, None) is not None for a in addrs):
-            self.org.save_ledger("running", records)
+        """``.runtime/running.json``: agent -> {pgid, lstart, started, scheduler, log} of every run in flight."""
+        self.org.runtime.run_registry.record(addr, run_record(
+            pgid=run.proc.pid,  # started in its own session, so pgid == pid
+            lstart=_start_time(run.proc.pid),
+            started=run.started,
+            scheduler=os.getpid(),
+            log=str(run.log.relative_to(self.org.root)),
+        ))
 
     def _ignore_running_ledger(self) -> None:
         """The record changes with every run; keep it out of the org's git snapshots."""
@@ -613,7 +611,7 @@ class Scheduler:
         killed only if ``judge_orphan`` says it is ours; one that is alive but cannot be verified or killed keeps
         its agent from starting a new run until it is gone.
         """
-        records = self._running_records()
+        records = self.org.runtime.run_registry.all()
         keep = {}
         for addr, rec in records.items():
             if addr in self.runs or (self._blocked and addr not in self._blocked):
@@ -651,16 +649,14 @@ class Scheduler:
             self._blocked.discard(addr)
         self._blocked &= set(keep)
         if keep != records:
-            self.org.save_ledger("running", keep)
+            self.org.runtime.run_registry.replace(keep)
 
     def _note_in_log(self, rec: dict, text: str) -> None:
         try:
-            log = self.org.root / str(rec["log"])
-            if log.is_file():
-                with open(log, "a", encoding="utf-8") as f:
-                    f.write(f"\n# {text}\n")
-        except (KeyError, OSError):
-            pass
+            rel = str(rec["log"])
+        except KeyError:
+            return
+        self.org.runtime.run_log_writer.append_note(rel, text)
 
     def release(self) -> None:
         for run in list(self.runs.values()):
@@ -672,12 +668,12 @@ class Scheduler:
                 pass
             _signal_group(run.proc, signal.SIGKILL)  # also reaps tool subprocesses that ignored SIGTERM
             run.proc.wait()
-            run.logf.write("\n# interrupted by scheduler shutdown\n")
+            run.logf.write(log_interrupted())
             run.logf.close()
             self.org.end_run(addr, ok=False)
             run.killed = True
             self._emit_run_end(run, run.proc.returncode, error="interrupted by scheduler shutdown")
-        self._forget_run(*self.runs)
+        self.org.runtime.run_registry.forget(*self.runs)
         self.runs.clear()
         self.pidfile.unlink(missing_ok=True)
         self._emit("scheduler.exit", reason=telemetry.clip(self.exit_reason, telemetry.ERROR_MAX),
@@ -857,15 +853,14 @@ class Scheduler:
         traces = sorted({m.trace for m in batch if m.trace})
         self.total_runs += 1
         prompt = self.org.run_prompt(addr, batch)
-        logf = open(log, "a", encoding="utf-8")
-        senders = ", ".join(sorted({m.sender for m in batch}))  # health tells runtime-only runs apart by this
+        logf = self.org.runtime.run_log_writer.open_sink(log)
         strays = self._guard_value("stray check", lambda: _stray_probe(self.org, addr))
         try:
-            logf.write(f"# run of {addr}, {len(batch)} message(s)\n# senders: {senders}\n")
+            logf.write(log_header(addr, len(batch), (m.sender for m in batch)))  # health tells runtime-only runs apart by the senders
             cmd, cwd, env = self.runner(self.org, addr, prompt)
             env = {**env, "ORG_RUN_ID": run_id}  # the agent's MCP server tags its events with it
-            logf.write(f"# cwd: {cwd}\n# cmd: {' '.join(cmd)} <prompt on stdin>\n")
-            logf.write(f"# ---- prompt ----\n{prompt}\n# ---- output ----\n")
+            logf.write(log_invocation(cwd, cmd))
+            logf.write(log_prompt(prompt))
             logf.flush()
             with tempfile.TemporaryFile() as stdin:  # a file, not a pipe: no deadlock if the child never reads it
                 stdin.write(prompt.encode("utf-8"))
@@ -874,7 +869,7 @@ class Scheduler:
                 proc = subprocess.Popen(cmd, cwd=cwd, env=env, stdin=stdin, stdout=logf,
                                         stderr=subprocess.STDOUT, text=True, start_new_session=True)
         except Exception as exc:  # e.g. kiro-cli missing: count it as a failed run
-            logf.write(f"\n# failed to start: {exc}\n")
+            logf.write(log_failed_start(exc))
             logf.close()
             self.org.end_run(addr, ok=False)
             self._emit_run_start(addr, run_id, batch, traces, None, budget_before)
@@ -911,23 +906,23 @@ class Scheduler:
             if code is None and time.time() - run.started > timeout:
                 _signal_group(run.proc, signal.SIGKILL)
                 code = run.proc.wait()
-                run.logf.write(f"\n# killed after {timeout:.0f}s timeout\n")
+                run.logf.write(log_timeout(timeout))
                 run.killed = run.timed_out = True
                 why = f"timed out: killed after {timeout:.0f}s"
             elif code is None and not self.org.exists(addr):  # retired mid-run: nobody will read its output
                 _signal_group(run.proc, signal.SIGKILL)
                 code = run.proc.wait()
-                run.logf.write("\n# killed: the agent was retired during its run\n")
+                run.logf.write(log_retired())
                 run.killed = True
                 why = "killed: the agent was retired during its run"
             if code is None:
                 continue
             elapsed = time.time() - run.started
-            run.logf.write(f"\n# exit {code} after {elapsed:.0f}s\n")
+            run.logf.write(log_exit(code, elapsed))
             self._guard("stray check", lambda: self._check_strays(run))
             run.logf.close()
             del self.runs[addr]
-            self._guard("run record", lambda: self._forget_run(addr))
+            self._guard("run record", lambda: self.org.runtime.run_registry.forget(addr))
             ok = code == 0
             if not self.org.exists(addr):  # retired while the run was in flight: nothing left to settle
                 self._emit_run_end(run, code, why or ("agent retired during its run" if not ok else None))
@@ -960,8 +955,8 @@ class Scheduler:
         if not found:
             return
         rel = ", ".join(found[:5])
-        run.logf.write(f"\n# warning: {run.addr} created org files in its workspace with the built-in `write` "
-                       f"(not in the org, so they are not its memory): {rel}\n")
+        run.logf.write(log_note(f"warning: {run.addr} created org files in its workspace with the built-in `write` "
+                                f"(not in the org, so they are not its memory): {rel}"))
         self.echo(f"{run.addr}: warning: org files in its workspace (built-in write shadows orgmcp write?): {rel}")
         ledger = self.org.ledger("strays")
         entry = ledger.get(run.addr) if isinstance(ledger.get(run.addr), dict) else {}
@@ -1076,8 +1071,7 @@ class Scheduler:
             return task.path.stat().st_mtime
 
     def _last_run_end(self, addr: str) -> float:
-        logs = (self.org.dir(addr) / "runs").glob("*.log")
-        return max((p.stat().st_mtime for p in logs), default=0.0)
+        return self.org.runtime.run_log_reader.last_end(addr)
 
 
 def _stray_probe(org: Org, addr: str) -> dict:
