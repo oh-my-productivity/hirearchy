@@ -21,7 +21,7 @@ def day(offset: int) -> str:
     return (TODAY - timedelta(days=offset)).strftime("%Y-%m-%d")
 
 
-@pytest.fixture(params=red_params(IMPLEMENTATIONS[EventRetention], green=()))
+@pytest.fixture(params=red_params(IMPLEMENTATIONS[EventRetention], green=("memory_event_retention",)))
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> RetentionHarness:
     made = cast(Callable[[Path], RetentionHarness], request.param)(tmp_path)
     assert isinstance(made.retention, EventRetention)
@@ -48,10 +48,10 @@ def test_pruning_again_removes_nothing(h: RetentionHarness) -> None:
 
 
 def test_at_least_one_day_is_kept_whatever_keep_days_says(h: RetentionHarness) -> None:
-    fill(h, 0, 1, 2)
+    fill(h, 0, 1)
     for keep in (0, -5):
-        assert h.retention.prune(keep, today=TODAY) == [day(2)]
         fill(h, 2)
+        assert h.retention.prune(keep, today=TODAY) == [day(2)]
     assert h.days() == sorted([day(0), day(1)])
 
 

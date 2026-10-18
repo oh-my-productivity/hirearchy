@@ -14,7 +14,7 @@ from orgmcp.telemetry.testing import IMPLEMENTATIONS
 from ._red import params as red_params
 
 
-@pytest.fixture(params=red_params(IMPLEMENTATIONS[ProcessLabel], green=()))
+@pytest.fixture(params=red_params(IMPLEMENTATIONS[ProcessLabel], green=("memory_process_label",)))
 def label(request: pytest.FixtureRequest, tmp_path: Path) -> ProcessLabel:
     made = cast(Callable[[Path], ProcessLabel], request.param)(tmp_path)
     assert isinstance(made, ProcessLabel)

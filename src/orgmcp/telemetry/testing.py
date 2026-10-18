@@ -42,7 +42,7 @@ class MemoryProcessLabel(ProcessLabel):
     """The name of a process, kept in a variable."""
 
     def __init__(self) -> None:
-        raise NotImplementedError("red: the in-memory process label is not written yet")
+        self._name = "cli"
 
     def get(self) -> str:
         return self._name
@@ -58,7 +58,8 @@ class _CountingSink(EventSink):
     _owner: MemoryEventSinks
 
     def __init__(self, owner: MemoryEventSinks) -> None:
-        raise NotImplementedError("red: the in-memory sinks are not written yet")
+        self.recorder = ListEventSink()
+        self._owner = owner
 
     def emit(
         self,
@@ -85,7 +86,9 @@ class MemoryEventSinks(EventSinks):
     lost: int
 
     def __init__(self) -> None:
-        raise NotImplementedError("red: the in-memory sinks are not written yet")
+        self.sinks: dict[Path, _CountingSink] = {}
+        self.broken = False
+        self.lost = 0
 
     def for_root(self, root: Path) -> EventSink:
         return self.sinks.setdefault(root, _CountingSink(self))
@@ -107,7 +110,9 @@ class MemoryEventRetention(EventRetention):
     _clock: FakeClock
 
     def __init__(self, clock: FakeClock | None = None, days: Sequence[str] = (), others: Sequence[str] = ()) -> None:
-        raise NotImplementedError("red: the in-memory retention is not written yet")
+        self._clock = clock or FakeClock()
+        self.days = set(days)
+        self.others = set(others)
 
     def prune(self, keep_days: int, today: datetime | None = None) -> list[str]:
         cutoff = ((today or self._clock.now()) - timedelta(days=max(1, int(keep_days)))).strftime("%Y-%m-%d")
@@ -122,7 +127,7 @@ class StackTraceScope(TraceScope, TraceTap):
     _seen: list[list[str | None]]
 
     def __init__(self) -> None:
-        raise NotImplementedError("red: the in-memory trace scope is not written yet")
+        self._seen: list[list[str | None]] = []
 
     def collect(self) -> AbstractContextManager[list[str | None]]:
         return self._collect()

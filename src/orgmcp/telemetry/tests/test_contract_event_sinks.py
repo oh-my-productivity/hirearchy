@@ -15,7 +15,7 @@ from orgmcp.telemetry.testing import IMPLEMENTATIONS, SinksHarness
 from ._red import params as red_params
 
 
-@pytest.fixture(params=red_params(IMPLEMENTATIONS[EventSinks], green=()))
+@pytest.fixture(params=red_params(IMPLEMENTATIONS[EventSinks], green=("memory_event_sinks",)))
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> SinksHarness:
     made = cast(Callable[[Path], SinksHarness], request.param)(tmp_path)
     assert isinstance(made.sinks, EventSinks)

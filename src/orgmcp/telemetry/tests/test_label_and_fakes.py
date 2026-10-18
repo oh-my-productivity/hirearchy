@@ -13,13 +13,14 @@ from orgmcp.telemetry import ProcessLabel
 from orgmcp.telemetry._label import MutableProcessLabel
 from orgmcp.telemetry.testing import MemoryEventRetention, MemoryEventSinks, MemoryProcessLabel, StackTraceScope
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
+RED = pytest.mark.xfail(strict=True, reason="red: A-telemetry")
 
 
 def test_the_labels_are_labels() -> None:
     assert isinstance(MutableProcessLabel(), ProcessLabel) and isinstance(MemoryProcessLabel(), ProcessLabel)
 
 
+@RED
 def test_two_labels_are_independent() -> None:
     a, b = MutableProcessLabel(), MutableProcessLabel()
     a.set("mcp")
