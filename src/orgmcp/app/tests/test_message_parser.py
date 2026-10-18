@@ -1,7 +1,7 @@
 """``CachingMessageParser`` (the parse cache that was ``core._PARSED``) and the legacy ``Message.load`` that is served by it.
 
-The cache tests are the ones of ``test_scheduler_robustness`` (QA-13) restated against the class; those themselves keep running
-against ``core.Message.load`` and ``core._PARSED`` until step A-mail converts them.
+The cache tests are the ones of ``test_scheduler_robustness`` (QA-13) restated against the class (A-mail converted those to inject a
+parser through ``open_runtime``; the legacy ``Message.load`` and ``core._PARSED`` stay, served by the process parser).
 """
 
 from __future__ import annotations
@@ -14,9 +14,9 @@ from pathlib import Path
 import pytest
 
 from orgmcp import core
-from orgmcp.app import _compat, wiring
-from orgmcp.app._resources import CachingMessageParser
+from orgmcp.app import wiring
 from orgmcp.kernel import JsonObject, Message, split_frontmatter
+from orgmcp.mail._parser import CachingMessageParser
 
 
 FILE = "---\nid: 20260101T000000000000-root-aaaa\nfrom: root\nto: ceo\ntype: task\ntitle: 'Title: with colon'\nbudget: 3\n---\nline1\nline2\n"
@@ -114,30 +114,24 @@ def test_a_missing_file_raises_like_open(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------------------------- the legacy patch points
 
 
-def test_the_process_parser_reads_the_limit_and_the_splitter_from_core_at_call_time(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_the_process_parser_is_a_plain_caching_parser_with_the_limit_core_names(tmp_path: Path) -> None:
+    """Nothing reads ``core._PARSED_MAX`` or ``core.split_frontmatter`` at call time any more (A-mail): the parser is what it is built as."""
     parser = wiring.process_resources().message_parser
-    assert isinstance(parser, _compat.PatchPointMessageParser)
-    split = CountingSplit()
-    monkeypatch.setattr(core, "split_frontmatter", split)
-    monkeypatch.setattr(core, "_PARSED_MAX", 2)
-    parser.clear()
-    for i in range(4):
-        parser.parse(write(tmp_path, f"20260101T00000000000{i}-root-aaaa.md"))
-    assert split.calls == 4 and len(parser.cache) == 2 and parser.max_entries == 2
+    assert type(parser) is CachingMessageParser and parser.max_entries == core._PARSED_MAX == 50_000
 
 
 def test_core_parsed_is_the_cache_of_the_process_parser() -> None:
     assert core._PARSED is wiring.process_resources().message_parser.cache
 
 
-def test_message_load_is_served_by_the_process_parser(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    path, split = write(tmp_path), CountingSplit()
-    monkeypatch.setattr(core, "split_frontmatter", split)
+def test_message_load_is_served_by_the_process_parser(tmp_path: Path) -> None:
+    path = write(tmp_path)
     wiring.process_resources().reset()
-    first, second = Message.load(path), Message.load(path)  # type: ignore[attr-defined]
-    assert split.calls == 1 and first == second and first is not second and type(first) is Message
-    assert str(path) in wiring.process_resources().message_parser.cache
-
+    first = Message.load(path)  # type: ignore[attr-defined]
+    entry = wiring.process_resources().message_parser.cache[str(path)]
+    second = Message.load(path)  # type: ignore[attr-defined]
+    assert wiring.process_resources().message_parser.cache[str(path)] is entry  # served from the cache: not parsed again
+    assert first == second and first is not second and type(first) is Message
 
 
 def test_message_load_is_attached_by_the_composition_root_not_by_core() -> None:

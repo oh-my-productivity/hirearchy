@@ -15,9 +15,12 @@ from datetime import timedelta
 import pytest
 
 from orgmcp import core, review
+from orgmcp.app import wiring
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Org, OrgError, join_frontmatter, split_frontmatter, utcnow
 from orgmcp.health import agent_health, org_health
+from orgmcp.mail import MessageParser
+from orgmcp.mail.testing import CountingMessageParser
 from orgmcp.scheduler import Scheduler, kiro_runner
 
 ENG = "ceo/eng"
@@ -135,15 +138,15 @@ def test_qa5_bad_health_threshold_does_not_crash_tick(org):
     org_health(org)  # same for `orgmcp health` / the health tool
 
 
-def test_qa13_idle_tick_cost_does_not_grow_with_history(org, monkeypatch):
+def test_qa13_idle_tick_cost_does_not_grow_with_history(org):
     for i in range(40):
         org.send(ROOT, "ceo", f"old note {i}")
     drain(org, "ceo")
     sched = Scheduler(org, quiet_runner(), echo=lambda _: None)
     sched.tick()  # warm up (creates the review ledger)
-    loads = []
-    real = core.Message.load.__func__
-    monkeypatch.setattr(core.Message, "load", classmethod(lambda cls, p: (loads.append(p), real(cls, p))[1]))
+    counting = CountingMessageParser()
+    org.runtime = wiring.open_runtime(org.root, {MessageParser: counting})
+    loads = counting.loaded
     sched.tick()
     assert len(loads) < 10, f"an idle tick parsed {len(loads)} message files"
 
