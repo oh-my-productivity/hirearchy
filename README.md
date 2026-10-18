@@ -40,9 +40,9 @@ org/                      # root = you, the human
 ## Use
 
 ```sh
-uv run orgmcp init org --mission "..." --model claude-haiku-4.5
+uv run orgmcp init org --mission "..."           # every agent runs on claude-sonnet-5.5; --model X sets another org default
 uv run orgmcp hire root ceo --role "Chief of staff" --charter @examples/ceo.md \
-    --model claude-sonnet-4.6 --can-hire --max-children 3
+    --can-hire --max-children 3                  # no --model: the org default (add --model X to pin this agent)
 uv run orgmcp task ceo --title "..." --goal @goal.md --acceptance @acceptance.md --budget 14
 uv run orgmcp run --until-idle --max-runs 14     # or plain `run` as a daemon; `--until-done` exits when no task is open or all open ones wait on you
 uv run orgmcp status
@@ -50,6 +50,18 @@ uv run orgmcp inbox
 ```
 
 Other commands: `hire ... --inputs PATH` (repeatable: read-only folders for the agent), `progress [TASK_ID] [--wait SECONDS]`, `plan`/`apply` (blueprints, below), `services`, `define-service`, `request`, `feedback`, `retire-service` ([services](#services-and-reflection)), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile), and the read-only views of [Observability](#observability): `obs now [--watch S]`, `obs trace TASK_ID`, `obs metrics [--since 24h] [--by agent|tool|service|trace]`, `obs events [--since] [--until] [--agent] [--kind] [--trace] [--errors] [--limit N] [--follow]` (each with `--json`) and `check [--json]`.
+
+### Models
+
+Every agent runs on **claude-sonnet-5.5** unless it is told otherwise. The scheduler always passes `--model` to `kiro-cli`, chosen in this order:
+
+1. the agent's charter (`model:` in its `AGENT.md`, set by `hire --model` or a blueprint),
+2. the organization's `default_model` in `ORG.md` (`init --model`, `create_org(default_model=...)`),
+3. `claude-sonnet-5.5` (`orgmcp.core.DEFAULT_MODEL`).
+
+`hire` without a model leaves the charter unpinned, so the agent follows the org default. **Existing organizations** whose `ORG.md` says `default_model: null` (or has no such key) used to run on kiro's own default; they now run on claude-sonnet-5.5. A model named explicitly in a charter or in `ORG.md` is kept, and to get another model org-wide, set `default_model` in `ORG.md`. The `run.start` event records the model each run used.
+
+Blueprints follow the same rule: without `needs.models`, or for a tier it does not map, `cheap` and `strong` both resolve to the org's default model, and the plan says `Models: claude-sonnet-5.5 for every agent`. Cheaper drafting is only used when you ask for it (`needs.models: {cheap: <id>, strong: <id>}`); then the lead and the final verifier stay on `strong`, and the plan lists which model each group of agents runs on.
 
 ### Progress
 
@@ -130,7 +142,7 @@ needs:                                # the elicited requirements (free text unl
   deliverable: {description: ..., format: ..., max_words: 1500, path: /abs/path/file.md}
   quality_bar: ...   sources: ...   workspace: /abs/project/dir   budget_runs: 25   # the user's cap
   inputs: [/abs/read-only/dir]        # sources agents may read but never change (kiro enforces it; see Workspaces, inputs and confinement)
-  models: {cheap: <model id>, strong: <model id>}   model_policy: ...
+  models: {cheap: <model id>, strong: <model id>}   model_policy: ...   # optional; without models every agent runs on the org default
   review: true                        # independent reviewer required
   approval: ...   progress: ...   kind: research|writing|code   code: {tests: ..., packaging: ..., commits: ...}
 agents:                               # exactly one top-level agent; nested tree
@@ -167,7 +179,7 @@ What the templates add for verification and delegation:
 - Verifiers get the project and the authors' workspaces read-only as `inputs` unless they can already write there; explicit `inputs` that hide the reviewed work raise the warning `verifier-cannot-read`.
 - `blueprint_example("analysis")`: data analysis with read-only data, a scratch workspace, an `analyst` and an independent `data-checker`. The data-checker recomputes the key figures with its own script and checks figures with their label: (label, number) pairs, not numbers alone.
 - `code-reviewer` now has `read` and `shell`: it runs the test suite and the commands named in the criteria and reports each command and result; it still never edits files (charter-enforced, since shell can't be confined). It needs a workspace, like the engineer.
-- The lead (`manager`) runs on the strong model by default, even when the drafters are cheap, because it decides how every other run is spent; the plan warns `manager-cheap-model` if it is put on a cheap one.
+- The lead (`manager`) runs on the strong model, even when the drafters are cheap, because it decides how every other run is spent; the plan warns `manager-cheap-model` if it is put on a cheap one. By default there is no cheap model (see Models): every tier is claude-sonnet-5.5 and the warning cannot fire.
 - The lead delegates a step only when its inputs exist (research, then write, then check) and never sends status messages; results wake it.
 - A failed check goes back to the author of the failing file (`delegate(revises=...)`, required changes quoted verbatim), with one cut-or-reframe rework and one re-check of that same file. If it still fails, the lead reports `blocked` with options and the coverage line.
 - `manager` verifies with its own `read` output (never memory or a report's claim), treats the verifier's coverage report as a precondition for `done`, and sends deviations back with `revises` or escalates instead of reporting `done`.
@@ -481,7 +493,7 @@ organization to exist yet:
   from the working directory). It never falls back to another organization.
 - If nothing exists at that path (missing or empty directory), the server still starts in *setup mode*: `whoami` and
   `status` explain the next step, every other tool answers `no organization at <path> yet: call create_org(mission=...)
-  first`, and `create_org(mission, default_model=None)` creates the organization there. From then on all tools work
+  first`, and `create_org(mission, default_model=None)` (None = claude-sonnet-5.5) creates the organization there. From then on all tools work
   in the same session, no restart. `create_org` refuses a directory that holds anything else, and an organization that
   already exists (which is then ready to use). With `ORG_ROOT` unset and no organization in the working directory it
   needs a `path` (absolute); with `ORG_ROOT` set a different `path` is refused.

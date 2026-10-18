@@ -1,0 +1,282 @@
+"""Every agent runs on claude-sonnet-5.5 unless its charter or the org config names another model."""
+
+import copy
+import json
+import os
+import sys
+import time
+from pathlib import Path
+
+import pytest
+import yaml
+
+from orgmcp import blueprint as bpm
+from orgmcp import blueprint_examples as ex
+from orgmcp import observe
+from orgmcp.cli import main
+from orgmcp.core import DEFAULT_CONFIG, DEFAULT_MODEL, ROOT, Org
+from orgmcp.scheduler import Scheduler, kiro_runner
+
+FAKE = str(Path(__file__).with_name("fake_agent.py"))
+EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
+CHARTER = "---\nrole: CEO\n{model}tools: [read]\n---\nLead.\n"
+
+
+def set_config(org: Org, **kw) -> None:
+    """Rewrite ORG.md's frontmatter (a legacy org: ``default_model: null`` or no key at all)."""
+    path = org.root / "ORG.md"
+    meta, body = path.read_text().split("---\n", 2)[1:]
+    cfg = yaml.safe_load(meta)
+    cfg.update(kw)
+    for k in [k for k, v in kw.items() if v == "<missing>"]:
+        cfg.pop(k)
+    path.write_text("---\n" + yaml.safe_dump(cfg) + "---\n" + body)
+
+
+def charter_model(org: Org, model: str | None) -> None:
+    org.write(ROOT, "ceo/AGENT.md", CHARTER.format(model=f"model: {model}\n" if model else ""))
+
+
+def model_arg(cmd: list[str]) -> str:
+    assert cmd.count("--model") == 1
+    return cmd[cmd.index("--model") + 1]
+
+
+def fake_runner():
+    def build(org, addr, prompt):
+        return [sys.executable, FAKE], org.dir(addr), {**os.environ, "ORG_ROOT": str(org.root), "ORG_AGENT": addr, "FAKE_MODE": "work"}
+
+    return build
+
+
+# ------------------------------------------------------------------------------------------ the constant
+
+
+def test_the_default_is_one_constant_used_by_the_default_config():
+    assert DEFAULT_MODEL == "claude-sonnet-5.5" and DEFAULT_CONFIG["default_model"] == DEFAULT_MODEL
+
+
+# ------------------------------------------------------------------------------------------ resolution order
+
+
+def test_charter_model_beats_org_config_beats_default(org):
+    assert org.model_for("ceo") == DEFAULT_MODEL  # no model anywhere
+    set_config(org, default_model="org-model")
+    assert org.model_for("ceo") == "org-model" and org.model_for("ceo/eng") == "org-model"
+    charter_model(org, "charter-model")
+    assert org.model_for("ceo") == "charter-model" and org.model_for("ceo/eng") == "org-model"
+
+
+@pytest.mark.parametrize("value", [None, "", "<missing>"])
+def test_an_org_without_an_explicit_default_model_runs_on_the_default(org, value):
+    set_config(org, default_model=value)  # ORG.md says `default_model: null`, an empty value, or has no such key
+    assert org.default_model == DEFAULT_MODEL and org.model_for("ceo") == DEFAULT_MODEL
+    charter_model(org, "kept-explicit")
+    assert org.model_for("ceo") == "kept-explicit"
+
+
+def test_a_new_org_writes_the_default_and_an_explicit_one_is_kept(tmp_path):
+    fresh = Org.init(tmp_path / "a", "m")
+    assert fresh.config["default_model"] == DEFAULT_MODEL and "default_model: claude-sonnet-5.5" in (fresh.root / "ORG.md").read_text()
+    other = Org.init(tmp_path / "b", "m", {"default_model": "claude-haiku-4.5"})
+    assert other.default_model == "claude-haiku-4.5"
+
+
+def test_hire_without_a_model_leaves_the_charter_unpinned_so_the_org_default_applies(org):
+    org.hire(ROOT, "ops", "Ops", "Do ops.")
+    assert "model" not in org.charter("ops")[0] and org.model_for("ops") == DEFAULT_MODEL
+    set_config(org, default_model="later")
+    assert org.model_for("ops") == "later"  # a later org-wide choice reaches the agent
+    org.hire(ROOT, "pinned", "Pinned", "Pinned.", model="m-x")
+    assert org.model_for("pinned") == "m-x"
+
+
+def test_the_cli_init_and_hire_without_model_use_the_default(tmp_path, capsys):
+    target = tmp_path / "org"
+    main(["init", str(target), "--mission", "m"])
+    assert Org(target).default_model == DEFAULT_MODEL
+    main(["--root", str(target), "hire", "root", "ceo", "--role", "CEO", "--charter", "Lead."])
+    assert Org(target).model_for("ceo") == DEFAULT_MODEL
+    main(["init", str(tmp_path / "o2"), "--mission", "m", "--model", "claude-haiku-4.5"])
+    assert Org(tmp_path / "o2").config["default_model"] == "claude-haiku-4.5"
+    capsys.readouterr()
+
+
+def test_create_org_without_a_model_uses_the_default(tmp_path, monkeypatch):
+    from orgmcp.server import resolve_binding
+
+    monkeypatch.setenv("ORG_ROOT", str(tmp_path / "new"))
+    binding, _ = resolve_binding()
+    org = binding.create("A mission")
+    assert org.config["default_model"] == DEFAULT_MODEL
+
+
+# ------------------------------------------------------------------------------------------ the run command
+
+
+def test_the_scheduler_command_always_carries_the_model(org):
+    cmd, _, _ = kiro_runner()(org, "ceo", "P")
+    assert model_arg(cmd) == "claude-sonnet-5.5" and cmd[-2:] == ["--model", "claude-sonnet-5.5"]
+    cmd, _, _ = kiro_runner()(org, "ceo/eng", "P")
+    assert model_arg(cmd) == "claude-sonnet-5.5"
+
+
+def test_the_scheduler_command_keeps_an_explicit_model(org):
+    set_config(org, default_model="org-model")
+    charter_model(org, "charter-model")
+    assert model_arg(kiro_runner()(org, "ceo", "P")[0]) == "charter-model"
+    assert model_arg(kiro_runner()(org, "ceo/eng", "P")[0]) == "org-model"
+
+
+@pytest.mark.parametrize("value", [None, "<missing>"])
+def test_the_scheduler_command_for_a_legacy_org_config_uses_the_default(org, value):
+    set_config(org, default_model=value)
+    assert model_arg(kiro_runner()(org, "ceo", "P")[0]) == DEFAULT_MODEL
+
+
+def run_start_models(org: Org) -> dict[str, str]:
+    org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
+    sched = Scheduler(org, fake_runner(), echo=lambda _: None)
+    sched.acquire()
+    try:
+        for _ in range(500):
+            if not sched.tick():
+                break
+            time.sleep(0.02)
+    finally:
+        sched.release()
+    return {e["agent"]: e["model"] for e in observe.events(org, kind="run.start", since="1h")}
+
+
+def test_the_run_start_event_reports_the_resolved_model(org):
+    assert run_start_models(org) == {"ceo": DEFAULT_MODEL, "ceo/eng": DEFAULT_MODEL}
+
+
+def test_the_run_start_event_reports_explicit_models(org):
+    set_config(org, default_model="org-model")
+    charter_model(org, "charter-model")
+    assert run_start_models(org) == {"ceo": "charter-model", "ceo/eng": "org-model"}
+
+
+# ------------------------------------------------------------------------------------------ blueprints
+
+
+@pytest.fixture
+def research(tmp_path):
+    (tmp_path / "deliverables").mkdir(exist_ok=True)
+    bp = yaml.safe_load((EXAMPLES / "blueprint-research.yaml").read_text())
+    bp["needs"]["deliverable"]["path"] = str(tmp_path / "deliverables" / "competitors.md")
+    return bp
+
+
+def tiered(bp):
+    bp["needs"]["models"] = {"cheap": "claude-haiku-4.5", "strong": "claude-sonnet-4.6"}
+    bp["needs"]["model_policy"] = "cheap drafting, strong review"
+    return bp
+
+
+def codes(found, level=None):
+    return {i.code for i in found if level is None or i.level == level}
+
+
+def models_of(bp, tmp_path, org=None):
+    return {a.addr: a.model for a in bpm._resolve(bp, org, [tmp_path], [])}
+
+
+def test_without_needs_models_every_tier_is_the_default(research, tmp_path):
+    for drop in (lambda b: b["needs"].pop("models"), lambda b: b["needs"].update(models={}),
+                 lambda b: b["needs"].update(models={"cheap": "claude-sonnet-5.5"})):
+        bp = copy.deepcopy(research)
+        drop(bp)
+        assert set(models_of(bp, tmp_path).values()) == {DEFAULT_MODEL}
+
+
+def test_a_tier_missing_from_needs_models_uses_the_orgs_default_model(research, tmp_path):
+    org = Org.init(tmp_path / "org", "m", {"default_model": "org-model"})
+    research["needs"].pop("models")
+    assert set(models_of(research, tmp_path, org).values()) == {"org-model"}
+    research["needs"]["models"] = {"cheap": "claude-haiku-4.5"}  # strong is not mapped: the org default
+    got = models_of(research, tmp_path, org)
+    assert got["lead"] == "org-model" and got["lead/writer"] == "claude-haiku-4.5"
+
+
+def test_the_default_policy_is_single_model_and_raises_no_warning(research, tmp_path):
+    found = bpm.validate(research, allowed_roots=[tmp_path])
+    assert not bpm.errors(found)
+    assert codes(found) <= {"path-delivery"}  # only the delivery note of the example; nothing about models
+    unmapped = copy.deepcopy(research)
+    unmapped["needs"].pop("models")
+    unmapped["needs"].pop("model_policy")
+    assert not codes(bpm.validate(unmapped, allowed_roots=[tmp_path])) - {"path-delivery"}
+    assert set(models_of(research, tmp_path).values()) == {DEFAULT_MODEL}
+
+
+def test_the_plan_says_plainly_that_every_agent_runs_on_the_default(research, tmp_path):
+    plan = bpm.plan_for_user(research, allowed_roots=[tmp_path])
+    assert "- Models: claude-sonnet-5.5 for every agent" in plan.splitlines()
+    assert "lead (Research lead, model claude-sonnet-5.5)" in plan and "haiku" not in plan and "sonnet-4" not in plan
+    assert "model=claude-sonnet-5.5" in bpm.render_plan(research, allowed_roots=[tmp_path])
+
+
+def test_tiering_on_request_resolves_each_tier_and_the_plan_names_them(research, tmp_path):
+    bp = tiered(research)
+    assert models_of(bp, tmp_path) == {"lead": "claude-sonnet-4.6", "lead/researcher": "claude-haiku-4.5",
+                                       "lead/writer": "claude-haiku-4.5", "lead/factcheck": "claude-sonnet-4.6"}
+    plan = bpm.plan_for_user(bp, allowed_roots=[tmp_path])
+    assert "- Models: claude-sonnet-4.6 for 2 agents, claude-haiku-4.5 for 2 agents (cheap drafting, strong review)" in plan.splitlines()
+    assert "for every agent" not in plan
+
+
+def test_tiering_still_warns_when_the_lead_is_cheap_and_never_when_the_tiers_are_equal(research, tmp_path):
+    cheap_lead = tiered(research)
+    cheap_lead["agents"][0]["model"] = "cheap"
+    assert "manager-cheap-model" in codes(bpm.validate(cheap_lead, allowed_roots=[tmp_path]), "warning")
+    equal = copy.deepcopy(cheap_lead)
+    equal["needs"]["models"] = {"cheap": "claude-sonnet-5.5", "strong": "claude-sonnet-5.5"}
+    equal["needs"]["model_policy"] = "one model for all"
+    assert not codes(bpm.validate(equal, allowed_roots=[tmp_path])) & {"manager-cheap-model", "model-policy", "model-single"}
+
+
+def test_a_tiered_policy_without_two_models_is_still_an_error(research, tmp_path):
+    research["needs"]["model_policy"] = "cheap drafting, strong review"
+    assert "model-single" in codes(bpm.validate(research, allowed_roots=[tmp_path]), "error")
+
+
+def test_apply_pins_the_resolved_model_in_the_charters(research, tmp_path):
+    org = Org.init(tmp_path / "org", "m", {"poll_seconds": 0.05})
+    bpm.apply(org, research, allowed_roots=[tmp_path])
+    assert {a: org.model_for(a) for a in org.agents()} == {a: DEFAULT_MODEL for a in org.agents()}
+    assert model_arg(kiro_runner()(org, "lead", "P")[0]) == DEFAULT_MODEL
+
+
+# ------------------------------------------------------------------------------------------ templates and examples
+
+
+def fill(text: str, base: Path) -> str:
+    for n in ("docs", "data", "proj", "deliverables"):
+        (base / n).mkdir(exist_ok=True)
+    return (text.replace("<folder-with-your-files>", "docs").replace("<folder-with-your-data>", "data")
+            .replace("<project-folder>", "proj").replace("<name>", "briefs").replace("<service-name>", "my-service")
+            .replace("<input-name>", "topic"))
+
+
+@pytest.mark.parametrize("service", [False, True])
+@pytest.mark.parametrize("kind", ex.KINDS)
+def test_every_template_defaults_to_the_default_model_and_validates(kind, service, tmp_path):
+    text = ex.example(kind, tmp_path, service=service)
+    assert "haiku" not in text and "sonnet-4" not in text
+    bp = bpm.load_text(fill(text, tmp_path))
+    assert bp["needs"]["models"] == {"cheap": DEFAULT_MODEL, "strong": DEFAULT_MODEL}
+    assert not bpm.errors(bpm.validate(bp, allowed_roots=[tmp_path]))
+    assert set(models_of(bp, tmp_path).values()) == {DEFAULT_MODEL}
+    assert "claude-sonnet-5.5 for every agent" in bpm.plan_for_user(bp, allowed_roots=[tmp_path])
+    assert not codes(bpm.validate(bp, allowed_roots=[tmp_path])) & {"model-policy", "model-single", "manager-cheap-model", "model-review"}
+
+
+@pytest.mark.parametrize("name", sorted(p.name for p in EXAMPLES.glob("*.yaml")))
+def test_shipped_example_blueprints_default_to_the_default_model(name, tmp_path):
+    raw = (EXAMPLES / name).read_text()
+    assert "haiku" not in raw and "sonnet-4" not in raw
+    bp = yaml.safe_load(raw)
+    if "models" in bp.get("needs", {}):
+        assert bp["needs"]["models"] == {"cheap": DEFAULT_MODEL, "strong": DEFAULT_MODEL}

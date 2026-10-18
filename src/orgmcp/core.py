@@ -47,6 +47,7 @@ RESERVED = RUNTIME_NAMES | {"work", "root", "runtime", "agent", "memory", "org"}
 NAME_RE = re.compile(r"[a-z][a-z0-9-]{0,31}\Z")
 MESSAGE_TYPES = ("task", "result", "note")
 RESULT_STATUSES = ("done", "failed", "blocked")
+DEFAULT_MODEL = "claude-sonnet-5.5"  # the model every agent runs on unless its charter or the org config names another
 DEFAULT_CONFIG = {
     "max_depth": 4,  # deepest allowed agent (ceo = 1)
     "max_hops": 40,  # longest message chain before sends are refused (loop guard)
@@ -61,7 +62,7 @@ DEFAULT_CONFIG = {
     "default_budget": 10,  # runs given with a task when none is specified
     "memory_max_words": 800,  # cap on an agent's MEMORY.md; writes that exceed it are refused
     "playbook_max_words": 1000,  # cap on a service playbook (revise_playbook refuses longer ones)
-    "default_model": None,  # kiro model; None = kiro default
+    "default_model": DEFAULT_MODEL,  # kiro model for agents whose charter names none; null/missing = DEFAULT_MODEL
     "max_message_chars": 20000,  # longest message body send/delegate/report accept; detail goes in a file
     "events": True,  # write the structured event log (.runtime/events/); false = no emission at all
     "events_keep_days": 30,  # the scheduler deletes event-log days older than this (at most once a day)
@@ -110,6 +111,11 @@ def _short(value: object, limit: int = 80) -> str:
         text = text[:-4].strip()
     text = " ".join(text.split())
     return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
+def config_default_model(config: dict | None) -> str:
+    """The default model of a config mapping (``null``, empty or missing = DEFAULT_MODEL)."""
+    return str((config or {}).get("default_model") or "").strip() or DEFAULT_MODEL
 
 
 def charter_change_note(addr: str, old: dict, written: dict, merged: dict) -> str:
@@ -503,6 +509,16 @@ class Org:
             return {"role": "human (root of the organization)"}, ""
         meta, body = split_frontmatter((self.dir(a) / "AGENT.md").read_text(encoding="utf-8"))
         return meta, body.strip()
+
+    @property
+    def default_model(self) -> str:
+        """The org-wide model: the config's ``default_model``, else DEFAULT_MODEL (also for ``null`` or a missing key)."""
+        return config_default_model(self.config)
+
+    def model_for(self, addr: str) -> str:
+        """The model a run of ``addr`` uses: its charter's ``model``, else the org config's ``default_model``, else DEFAULT_MODEL."""
+        meta, _ = self.charter(addr)
+        return str(meta.get("model") or "").strip() or self.default_model
 
     def memory(self, addr: str) -> str:
         p = self.dir(addr) / "MEMORY.md"
@@ -1055,7 +1071,7 @@ class Org:
         role: str,
         charter: str,
         *,
-        model: str | None = None,
+        model: str | None = None,  # None = the org's default model (DEFAULT_MODEL unless ORG.md sets another)
         tools: list[str] | None = None,
         can_hire: bool = False,
         max_children: int = 5,
@@ -1100,7 +1116,7 @@ class Org:
         atomic_write(d / "MEMORY.md", "")
         atomic_write(d / "AGENT.md", join_frontmatter(child_meta, templates.charter_body(role, charter)))
         self.emit("agent.hire", actor=actor, agent=addr, by=actor, role=telemetry.clip(role.strip()),
-                  model=model, tools=tools)
+                  model=self.model_for(addr), tools=tools)
         return addr
 
     def _check_authority(self, actor: str, tools: list[str], workspace: str | None, inputs: list[str] | None = None) -> None:

@@ -153,9 +153,7 @@ def kiro_runner(kiro_bin: str = "kiro-cli") -> Runner:
         else:
             profile = ensure_kiro_profile(tools, org=org)
         cmd = [kiro_bin, "chat", "--no-interactive", "--agent", profile]
-        model = meta.get("model") or org.config.get("default_model")
-        if model:
-            cmd += ["--model", str(model)]
+        cmd += ["--model", org.model_for(addr)]  # always explicit: charter model > org default_model > DEFAULT_MODEL
         # The prompt is not an argument: it can be arbitrarily long (E2BIG) and visible in `ps`.
         # `kiro-cli chat --no-interactive` without INPUT reads it from stdin; the scheduler feeds it there.
         ws = meta.get("workspace")
@@ -943,9 +941,8 @@ class Scheduler:
         self.echo(f"{addr}: started run ({len(batch)} message(s))")
 
     def _emit_run_start(self, addr: str, run_id: str, batch, traces: list, pid: int | None, budget_before) -> None:
-        meta, _ = self.org.charter(addr)
         self._emit("run.start", agent=addr, run=run_id, trace=telemetry.single(traces), batch=[m.id for m in batch],
-                   traces=traces, child_pid=pid, pgid=pid, model=meta.get("model") or self.org.config.get("default_model"),
+                   traces=traces, child_pid=pid, pgid=pid, model=self.org.model_for(addr),
                    budget_before=budget_before)
 
     def _emit_run_end(self, run: Run, code, error: str | None = None) -> None:

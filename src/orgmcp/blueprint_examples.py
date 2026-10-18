@@ -46,15 +46,15 @@ needs:
   quality_bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts come from the live source.
   sources: Web access to official sites and documentation; a source URL per claim.
   budget_runs: 25                  # the user's cap in runs (one run = one agent working session)
-  models: {{cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}}   # use model ids available to the user
-  model_policy: cheap drafting, strong review   # drafters cheap; lead and fact-checker strong. Or "one model for all" (then give no models)
+  models: {{cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}}   # same model for both tiers; set a cheaper cheap id ONLY if the user asks for cheaper drafting
+  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
   review: true                     # an independent fact-checker who did not write the text
   approval: Plan first; ask before any spend beyond the budget.
   progress: One line when I ask.
 agents:
   - name: lead
     template: manager
-    model: strong                  # always strong, even with cheap drafters: the lead decides how every other run is spent
+    model: strong                  # if a cheaper drafting model is ever set, the lead stays strong: it decides how every other run is spent
     children:
       - {{name: researcher, template: researcher}}   # web_search + web_fetch
       - {{name: writer, template: writer}}
@@ -93,8 +93,8 @@ needs:
   quality_bar: Every statement comes from the input files; where the files disagree or are silent, the document says so.
   sources: Only the files in needs.inputs; no web.
   budget_runs: 25
-  models: {{cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}}
-  model_policy: cheap drafting, strong review
+  models: {{cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}}
+  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
   review: true                     # a reviewer who did not write it checks it against the files
   approval: Plan first; ask before any spend beyond the budget.
   progress: One line when I ask.
@@ -142,8 +142,8 @@ needs:
   quality_bar: Tests pass from a clean checkout; no network use at runtime.
   workspace: {base}/<project-folder>   # the ONLY folder agents may write in or run commands in; created if missing
   budget_runs: 30
-  models: {{cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}}
-  model_policy: cheap implementation, strong review
+  models: {{cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}}
+  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
   review: true
   approval: Plan first; ask before any spend beyond the budget.
   progress: One line when I ask.
@@ -191,8 +191,8 @@ needs:
   quality_bar: Every number is reproducible from one script and appears with its label in the script's output; no conclusion from a slice under 30 rows.
   sources: Only the files in needs.inputs; no web.
   budget_runs: 25
-  models: {{cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}}
-  model_policy: analysis and checking on strong, writing on cheap
+  models: {{cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}}
+  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
   review: true                     # a checker who did not do the analysis recomputes the figures with its own script
   approval: Plan first; ask before any spend beyond the budget.
   progress: One line when I ask.

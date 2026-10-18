@@ -13,8 +13,8 @@ needs:
   quality_bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts (versions, licenses) come from the live source.
   sources: Web access to official sites, repositories and docs; a source URL per claim.
   budget_runs: 25   # plan: 22 runs; researcher 4, writer 3 and factcheck 3 are handed down (each includes its rework / re-check run), the lead keeps 12
-  models: {cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}
-  model_policy: cheap drafting, strong review (research and writing on cheap; the lead and the fact-check on strong, because the lead decides how every other run is spent)
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}   # same model for both tiers; set a cheaper cheap id only if the user asks for one
+  model_policy: one model for all (claude-sonnet-5.5 for every agent; a cheaper drafting model only if the user asks, with the lead and the fact-check staying strong)
   review: true   # independent fact-check by someone who did not write the report
   approval: Approve this plan before anything is created or started; ask before spending beyond the budget.
   progress: One line when I ask; tell me when it is done. No digging through files.
@@ -22,7 +22,7 @@ agents:
   - name: lead
     template: manager
     role: Research lead
-    model: strong   # never cheap: a cheap lead misroutes rework and wastes runs
+    model: strong   # if a cheaper drafting model is ever set, the lead stays strong: a cheap lead misroutes rework and wastes runs
     children:
       - {name: researcher, template: researcher, scale: 1}
       - {name: writer, template: writer}

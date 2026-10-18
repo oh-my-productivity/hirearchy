@@ -8,7 +8,7 @@ import yaml
 from orgmcp import blueprint as bpm
 from orgmcp.blueprint import BlueprintError, Issue
 from orgmcp.cli import main
-from orgmcp.core import ROOT, Org, OrgError
+from orgmcp.core import DEFAULT_MODEL, ROOT, Org, OrgError
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "blueprint-research.yaml"
 
@@ -19,6 +19,13 @@ def base(tmp_path):
     (tmp_path / "deliverables").mkdir()
     bp = yaml.safe_load(EXAMPLE.read_text())
     bp["needs"]["deliverable"]["path"] = str(tmp_path / "deliverables" / "competitors.md")
+    return bp
+
+
+def tiered(bp):
+    """The example blueprint with the cheap-drafting / strong-review tiers the user asked for."""
+    bp["needs"]["models"] = {"cheap": "claude-haiku-4.5", "strong": "claude-sonnet-4.6"}
+    bp["needs"]["model_policy"] = "cheap drafting, strong review"
     return bp
 
 
@@ -352,19 +359,24 @@ def test_nested_manager_gets_its_whole_subtree(roots, tmp_path):
 
 def test_single_model_with_tiered_policy_is_error(base, roots):
     def one_model(b):
+        tiered(b)
         b["needs"].pop("models")
         for a in (b["agents"][0], *b["agents"][0]["children"]):
             a["model"] = "claude-sonnet-4.6"
 
     assert "model-single" in codes(check(mutate(base, one_model), roots), "error")
-    assert "model-single" not in codes(check(base, roots))
-    same_review = mutate(base, lambda b: b["agents"][0]["children"][2].update(model="claude-haiku-4.5"))
+    assert "model-single" not in codes(check(tiered(copy.deepcopy(base)), roots))
+    same_review = mutate(tiered(copy.deepcopy(base)), lambda b: b["agents"][0]["children"][2].update(model="claude-haiku-4.5"))
     assert "model-review" in codes(check(same_review, roots), "warning")
 
 
-def test_tier_without_mapping_is_error_and_no_policy_warns(base, roots):
-    assert "model-tier" in codes(check(mutate(base, lambda b: b["needs"].pop("models")), roots), "error")
-    assert "model-policy" in codes(check(mutate(base, lambda b: b["needs"].pop("model_policy")), roots), "warning")
+def test_tier_without_mapping_is_the_default_model_and_no_policy_warns_only_when_models_differ(base, roots):
+    unmapped = mutate(base, lambda b: b["needs"].pop("models"))
+    assert "model-tier" not in codes(check(unmapped, roots)) and "model-policy" not in codes(check(unmapped, roots))
+    assert {a.model for a in bpm._resolve(unmapped, None, roots, [])} == {DEFAULT_MODEL}
+    assert "model-policy" not in codes(check(mutate(base, lambda b: b["needs"].pop("model_policy")), roots))  # one model: nothing to state
+    no_policy = mutate(tiered(copy.deepcopy(base)), lambda b: b["needs"].pop("model_policy"))
+    assert "model-policy" in codes(check(no_policy, roots), "warning")
     single = mutate(base, lambda b: (b["needs"].update(model_policy="one model for everyone"), b["needs"].pop("models"),
                                      [a.pop("model", None) for a in (b["agents"][0], *b["agents"][0]["children"])]))
     assert not bpm.errors(check(single, roots))
@@ -417,6 +429,7 @@ def test_unelicited_preferences_warn(base, roots):
 
 
 def test_render_plan_contents(base, roots):
+    base = tiered(base)
     text = bpm.render_plan(base, bpm.validate(base, allowed_roots=roots), allowed_roots=roots)
     for expected in ("Goal:", "Obsidian, Logseq, Joplin", "max 1500 words", "lead/researcher", "model=claude-haiku-4.5",
                      "model=claude-sonnet-4.6", "tools=web_fetch,web_search", "Budget: 22 runs planned (your cap: 25), estimate 17",
@@ -448,6 +461,7 @@ def test_propose_is_load_validate_render(base, roots):
 
 
 def test_apply_creates_tree_charters_and_task(base, roots, empty_org):
+    base = tiered(base)
     s = bpm.apply(empty_org, base, allowed_roots=roots)
     assert s.agents == ["lead", "lead/researcher", "lead/writer", "lead/factcheck"] and s.to == "lead" and s.budget == 22
     assert empty_org.agents() == ["lead", "lead/factcheck", "lead/researcher", "lead/writer"]
