@@ -13,8 +13,6 @@ from orgmcp.kernel import Message, aware, fmt_dur, fmt_duration, msg_time, parse
 from orgmcp.kernel.tests import _oracle
 from orgmcp.kernel.tests._legacy import legacy
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: K1")
-
 UTC = timezone.utc
 
 
@@ -35,7 +33,7 @@ def same(new: Callable[..., object], old: Callable[..., object], table: list[obj
 def _datetimes() -> list[datetime]:
     rnd = random.Random(20261018)
     base = [datetime(2026, 10, 18, 10, 0, 0), datetime(1970, 1, 1), datetime(2000, 2, 29, 23, 59, 59, 999999), datetime(9999, 12, 31, 23, 59, 59)]
-    base += [datetime(2020, 1, 1) + timedelta(seconds=rnd.randrange(0, 10**9), microseconds=rnd.randrange(10**6)) for _ in range(30)]
+    base += [datetime(2020, 1, 1) + timedelta(seconds=rnd.randrange(0, 10**9), microseconds=rnd.randrange(10**6)) for _ in range(60)]
     return base
 
 
@@ -147,7 +145,7 @@ def _millis() -> list[object]:
     rnd = random.Random(5)
     out: list[object] = [None, 0, 0.0, 0.4, 0.5, 1, 999, 999.4, 999.5, 1000, 1049, 1050, 9949, 9950, 9999, 10000, 10499, 10500, 59499,
                          59500, 59999, 60000, 65000, 3599499, 3599500, 3600000, 7380000, 10**9, -1, -1000, "850", True, float("nan"), float("inf")]
-    out += [rnd.uniform(0, 5000) for _ in range(50)] + [rnd.uniform(0, 10**7) for _ in range(80)] + [rnd.uniform(-10, 10) for _ in range(10)]
+    out += [rnd.uniform(0, 5000) for _ in range(50)] + [rnd.uniform(0, 10**7) for _ in range(120)] + [rnd.uniform(-10, 10) for _ in range(10)]
     return out
 
 

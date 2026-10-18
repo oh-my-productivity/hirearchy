@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
+from ._address import ROOT, norm
+
 
 @runtime_checkable
 class OrgLayout(Protocol):
@@ -46,32 +48,33 @@ class OrgPaths(OrgLayout):
     root: Path
 
     def agent_dir(self, addr: str) -> Path:
-        raise NotImplementedError("red: K1")
+        a = norm(addr)
+        return self.root if a == ROOT else self.root / a
 
     def box(self, addr: str, box: str) -> Path:
-        raise NotImplementedError("red: K1")
+        return self.agent_dir(addr) / box
 
     def runtime_dir(self) -> Path:
-        raise NotImplementedError("red: K1")
+        return self.root / ".runtime"
 
     def ledger_file(self, name: str) -> Path:
-        raise NotImplementedError("red: K1")
+        return self.runtime_dir() / f"{name}.json"
 
     def events_dir(self) -> Path:
-        raise NotImplementedError("red: K1")
+        return self.runtime_dir() / "events"
 
     def retired_dir(self) -> Path:
-        raise NotImplementedError("red: K1")
+        return self.root / ".retired"
 
     def rel(self, path: Path) -> str:
-        raise NotImplementedError("red: K1")
+        return str(path.relative_to(self.root))
 
 
 def inside(p: Path, base: Path) -> bool:
     """``p`` is ``base`` or below it (both already resolved)."""
-    raise NotImplementedError("red: K1")
+    return p == base or base in p.parents
 
 
 def visible(paths: Iterable[Path]) -> list[Path]:
     """The entries that are not hidden (no leading dot), sorted."""
-    raise NotImplementedError("red: K1")
+    return sorted(p for p in paths if not p.name.startswith("."))

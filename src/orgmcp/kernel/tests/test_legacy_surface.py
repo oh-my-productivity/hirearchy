@@ -50,7 +50,6 @@ def test_the_patch_points_stay_in_core() -> None:
     assert "load" in vars(kernel.Message) and kernel.Message.load.__func__.__module__ == "orgmcp.core"  # type: ignore[attr-defined]
 
 
-@pytest.mark.xfail(strict=True, reason="red: K1")
 def test_org_address_helpers_agree_with_the_kernel(org: Any) -> None:
     for raw in (None, "", "root", " /ceo/ ", "ceo/eng", "ceo\n"):
         assert type(org).norm(raw) == org.norm(raw) == kernel.norm(raw)

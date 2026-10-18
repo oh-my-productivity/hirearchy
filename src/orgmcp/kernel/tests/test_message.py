@@ -16,8 +16,6 @@ from orgmcp.kernel import (
 )
 from orgmcp.kernel.tests._legacy import legacy
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: K1")
-
 MID = "20261018T100000000001-ceo-ab12"
 
 

@@ -6,8 +6,6 @@ import pytest
 
 from orgmcp.kernel import ROOT, child_addr, depth, norm, parent
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: K1")
-
 
 @pytest.mark.parametrize("raw", [None, "", " ", "\t", "root", " root ", "/", "//", "/root/", "root/", "\nroot\n"])
 def test_every_spelling_of_the_root_is_root(raw: str | None) -> None:

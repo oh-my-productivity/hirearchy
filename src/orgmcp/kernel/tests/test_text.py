@@ -9,8 +9,6 @@ import pytest
 from orgmcp.kernel import TITLE_MAX, clip, clip_line, single, word_count
 from orgmcp.kernel.tests._legacy import legacy
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: K1")
-
 
 def test_word_count_ignores_markdown_markers() -> None:  # moved from tests/test_core_safety.py (assertions unchanged)
     text = "\n".join([

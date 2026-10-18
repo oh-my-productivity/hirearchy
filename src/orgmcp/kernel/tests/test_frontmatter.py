@@ -7,8 +7,6 @@ import yaml
 
 from orgmcp.kernel import join_frontmatter, split_frontmatter
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: K1")
-
 
 def test_round_trip() -> None:
     meta: dict[str, object] = {"id": "x", "n": 3, "flag": False, "items": ["a", "b"], "nested": {"k": "v"}, "text": "é: ü"}

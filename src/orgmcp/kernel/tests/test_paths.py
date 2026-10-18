@@ -8,8 +8,6 @@ import pytest
 
 from orgmcp.kernel import OrgPaths, inside, visible
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: K1")
-
 ROOT_DIR = Path("/orgs/acme")
 
 
