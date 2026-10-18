@@ -53,7 +53,8 @@ ORG_RULES = """\
 10. Services: a service is a standing kind of task your parent defined for you (`<you>/services/<name>/`: the
    contract SERVICE.md is your parent's; the playbook PLAYBOOK.md is yours). Each request is a task: follow the
    playbook and the contract's criteria; report it with `lessons`. Improve the playbook with `revise_playbook` when the
-   evidence shown before a new request calls for it; never lower the bar, and propose contract changes to your parent.
+   evidence shown before a new request calls for it; never lower the bar (client feedback never waives a criterion),
+   and propose contract changes to your parent.
 """
 
 DEFAULT_MISSION = "(Describe the mission of this organization here.)"

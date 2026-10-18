@@ -337,15 +337,15 @@ def test_report_on_a_service_request_requires_lessons(svc):
     org = svc
     task = request(org)
     work(org, "ceo")
-    for status in ("done", "failed"):
+    for status in ("done", "failed", "blocked"):
         with pytest.raises(OrgError, match="request for service `weekly-brief`: pass `lessons`"):
             org.report("ceo", task.id, status, "Delivered.")
         with pytest.raises(OrgError, match="pass `lessons`"):
             org.report("ceo", task.id, status, "Delivered.", lessons="   ")
     with pytest.raises(OrgError, match="limit is 800"):
         org.report("ceo", task.id, "done", "Delivered.", lessons="x" * 801)
-    blocked = org.report("ceo", task.id, "blocked", "Waiting for sources.")  # optional for blocked
-    assert "## Lessons" not in blocked.body
+    blocked = org.report("ceo", task.id, "blocked", "Waiting for sources.", lessons="Sources were not provided.")
+    assert services.lessons_of(blocked) == "Sources were not provided."  # required for blocked too
     org.write("ceo", "ceo/work/brief.md", "# Brief")
     final = org.report("ceo", task.id, "done", "Delivered.", ["ceo/work/brief.md"], lessons="Search first.\nTwo runs.")
     assert final.body.index("## Summary") < final.body.index("## Lessons") < final.body.index("## Artifacts")
@@ -448,10 +448,11 @@ def test_feedback_is_a_quiet_note_from_the_requester(svc):
     ceo_unread = org.unread("ceo")
     note = org.feedback(ROOT, task.id, "reject", "No week-over-week changes.")
     assert (note.type, note.to, note.reply_to, note.feedback, note.wake) == ("note", "ceo", task.id, "reject", False)
-    assert note.title == f'feedback on "{task.title}": reject' and note.body == "No week-over-week changes."
+    assert note.title == f'feedback on "{task.title}": reject'
+    assert note.body == services.FEEDBACK_HEADER + "\n\nNo week-over-week changes."
     assert org.unread("ceo") == ceo_unread and note.budget == 0
     assert "feedback: reject" in Message.load(org.dir("ceo") / "inbox" / f"{note.id}.md").render()
-    assert org.feedback(ROOT, task.id, "accept").body == "accepted"
+    assert org.feedback(ROOT, task.id, "accept").body == services.FEEDBACK_HEADER + "\n\naccepted"
 
 
 def test_only_the_requester_gives_feedback_on_a_service_request(org):
@@ -510,7 +511,7 @@ def test_a_blocked_case_is_not_finished_and_a_failed_one_counts_as_failed(svc):
     org = svc
     a, b = request(org, "a"), request(org, "b")
     work(org, "ceo")
-    org.report("ceo", a.id, "blocked", "Need data.")
+    org.report("ceo", a.id, "blocked", "Need data.", lessons="Input was missing.")
     org.report("ceo", b.id, "failed", "Could not.", lessons="Source was down.")
     org.end_run("ceo", ok=True)
     blocked, failed = services.cases(org, "ceo", "weekly-brief")

@@ -789,12 +789,14 @@ class Org:
 
     @staticmethod
     def _check_lessons(task: Message, status: str, lessons: str | None) -> str:
-        """The lessons text for a report: required for a final result on a service request, 1..800 characters."""
+        """The lessons text for a report: required on a service request (done, failed or blocked), 1..800 characters."""
         text = (lessons or "").strip()
-        if task.service and status in ("done", "failed") and not text:
+        if task.service and status in ("done", "failed", "blocked") and not text:
             raise OrgError(
                 f"task {task.id} is a request for service `{task.service}`: pass `lessons` - 1-3 lines for the next "
-                "request: what worked, what to change in the playbook, and the evidence (runs, rework, review findings)"
+                "request: what worked, what to change in the playbook, and the evidence (runs, rework, review "
+                "findings). Required for done, failed and blocked alike: a blocker is the most informative case, so "
+                "say what went wrong and what would have prevented it"
             )
         if len(text) > LESSONS_MAX_CHARS:
             raise OrgError(

@@ -44,6 +44,10 @@ TITLE_MAX = 80
 DELIVERABLE_KEYS = ("description", "format", "max_words", "path")
 DIGEST_CASES = 6  # cases with new evidence shown in the digest
 DIGEST_CHARS = 3000  # soft limit of the whole digest
+FEEDBACK_HEADER = (
+    "Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; "
+    "report `done` only if every criterion is met."
+)
 CLIP_LESSON = 220
 CLIP_NOTE = 160
 
@@ -657,6 +661,12 @@ def rework_fields(org: Org, actor: str, revises: str) -> dict:
     return {"service": task.service, "contract": task.contract, "playbook": version}
 
 
+def feedback_text(msg: Message) -> str:
+    """The client's own words in a feedback note ("" for a bare accept); the fixed header is not part of them."""
+    body = msg.body.removeprefix(FEEDBACK_HEADER).strip()
+    return "" if body == "accepted" else body
+
+
 def feedback(org: Org, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
     """The client's verdict on a delivered service request: a quiet note to the owner (it costs no run).
 
@@ -680,8 +690,9 @@ def feedback(org: Org, actor: str, task_id: str, verdict: str, note: str = "") -
         raise OrgError(f"the note is {len(note)} characters; the limit is {FEEDBACK_MAX}. Keep it to what was wrong or good.")
     if task.id not in latest_results(org.received(actor)):
         raise OrgError(f"task {task_id} has no result yet: wait for the result, then give feedback.")
+    body = FEEDBACK_HEADER + "\n\n" + (note or "accepted")
     return org.send(
-        actor, task.to, note or "accepted", type="note", title=f'feedback on "{task.title}": {verdict}',
+        actor, task.to, body, type="note", title=f'feedback on "{task.title}": {verdict}',
         reply_to=task.id, feedback=verdict, wake=False,
     )
 
@@ -908,10 +919,15 @@ def _case_line(c: Case) -> str:
         bits.append(f"{c.reworks} rework(s)")
     line = ", ".join(bits)
     if c.feedback:
-        note = "" if c.feedback.body == "accepted" else c.feedback.body
+        note = feedback_text(c.feedback)
         line += f"; client feedback: {c.verdict}" + (f' "{_clip(note, CLIP_NOTE)}"' if note else "")
     if c.lessons:
-        line += f'; lessons: "{_clip(" / ".join(c.lessons), CLIP_LESSON)}"'
+        # The latest result is the final word on the case; earlier lessons only where room remains.
+        latest, earlier = c.lessons[-1], " / ".join(c.lessons[:-1])
+        line += f'; lessons: "{_clip(latest, CLIP_LESSON)}"'
+        room = CLIP_LESSON - len(latest)
+        if earlier and room > 40:
+            line += f'; earlier: "{_clip(earlier, room)}"'
     return "- " + line
 
 

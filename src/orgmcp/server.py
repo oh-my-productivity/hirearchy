@@ -236,9 +236,10 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
         files that hold the work; they must exist. Files in the organization: path relative to the org root.
         Files in your workspace: the ABSOLUTE path (anything else outside the organization is refused). The runtime
         annotates each with its word count and whether it changed since the task was assigned.
-        lessons: required when the task is a request for a service and the status is done or failed (1-3 lines, at
-        most 800 characters: what worked, what to change in the playbook, the evidence: runs, rework, review findings);
-        it is recorded in the result and reviewed before the next request. Optional otherwise.
+        lessons: required when the task is a request for a service, whatever the status - done, failed or blocked
+        (1-3 lines, at most 800 characters: what worked or went wrong, what to change in the playbook, the evidence:
+        runs, rework, review findings); it is recorded in the result and reviewed before the next request. Optional
+        otherwise.
         """
         org = binding.get()
         msg = org.report(me, task_id, status, summary, artifacts or [], lessons)
@@ -459,7 +460,8 @@ def register_client_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
 
         task_id: a service request (or rework) you sent that has a result. note: required for reject (what was wrong),
         optional for accept. It costs no run and does not wake the owner; it shows up in the evidence the owner reviews
-        before its next request. A later feedback on the same case replaces this one in the statistics.
+        before its next request. A later feedback on the same case replaces this one in the statistics. Feedback is
+        for reflection only: it never waives an acceptance criterion or changes the outcome of the request.
         """
         msg = binding.get().feedback(me, task_id, verdict, note)
         return f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}); it does not wake {msg.to}"
