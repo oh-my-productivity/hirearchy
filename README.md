@@ -79,7 +79,7 @@ assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#
    You answer, or say "defaults".
 2. **Plan.** The assistant starts from `blueprint_example(kind)` (`research`: web sources; `documents`: write from your local
    files, no web; `code`: repo workspace with tests and commits; `analysis`: your data files, read-only, analysed by a checked script), edits it with your answers and calls `propose_org`. You get
-   a block headed **PLAN FOR YOU** that the assistant must show you exactly as written (about 40 lines, plain words): goal,
+   a block headed **PLAN FOR YOU** that the assistant must show you exactly as written (about 40 lines, plain words; the instruction to show it and the end-of-block marker sit outside it): goal,
    needs as understood, the team (role, model, tools, and for each agent what it may touch, worded from the same
    computation as the `Access:` line below, so the plan states what kiro will enforce), the budget and its split, the independent
    review, the deliverable and where it will be delivered, the checks that decide "done", checkpoints and warnings. Under
@@ -182,8 +182,8 @@ skill: see [Kiro integration](#kiro-integration).
 
 ## Services and reflection
 
-A one-off task is planned from scratch and teaches the org nothing. Work you want again and again is better offered as a **service**,
-and a team should get better at it. Two concepts:
+A one-off task teaches the org nothing. Work you want again and again is better offered as a **service**, and a team should get better at
+it. Two concepts:
 
 - A **service** is a standing task one agent (the owner, usually the lead of a team) offers. Its **contract** (`SERVICE.md`) is the
   client's: what may be asked (inputs), what is guaranteed (exact acceptance criteria, deliverable), the runs handed down with each
@@ -192,12 +192,8 @@ and a team should get better at it. Two concepts:
   `feedback`; before the next request the owner's prompt shows the evidence since the playbook's last revision and it may
   `revise_playbook`. The owner cannot touch the contract, so "improving" can never mean "lowering the bar".
 
-```
-ceo/services/weekly-brief/
-├── SERVICE.md      # contract, written by the client (root for a top-level agent) with define_service; versioned
-├── PLAYBOOK.md     # workflow, written by the owner with revise_playbook only; versioned by the runtime
-└── history/        # SERVICE.v<n>.md and PLAYBOOK.v<n>.md: every earlier version (restore one by revising back to it)
-```
+On disk, `ceo/services/weekly-brief/` holds `SERVICE.md` (the contract, written with `define_service`), `PLAYBOOK.md` (the owner's, via
+`revise_playbook` only) and `history/` (every earlier version of both; restore one by revising back to it).
 
 Cases (a request plus its rework chain), their statistics and the digest are never stored; they are derived from the message files
 and run logs like all state. `services` is a reserved name; plain `write` into it is refused. Retiring the owner takes its services along.
@@ -210,8 +206,8 @@ and run logs like all state. `services` is a reserved name; plain `write` into i
 | an agent that owns a service | `services`, `revise_playbook(service, content, reason)` |
 | every agent | `report(..., lessons)`: required for `done`, `failed` and `blocked` on a service request |
 
-A request is a task built from the contract (inputs, the contract's criteria plus any `extra_acceptance`, the deliverable, its budget),
-so every rule of tasks applies: direct reports only, budget moves down, `done`/`failed` are final, rework is `revises`.
+A request is a task built from the contract (inputs, its criteria plus any `extra_acceptance`, the deliverable, its budget), so every
+rule of tasks applies: direct reports only, budget moves down, `done`/`failed` are final, rework is `revises`.
 
 CLI (as root): `orgmcp services`; `define-service OWNER NAME --description T --input 'topic*:what it is about' --acceptance T|@file
 --deliverable T [--format F --max-words N --path DIR] --budget N [--playbook @file] [--locked]`; to amend, pass only what changes: `define-service OWNER NAME --add-acceptance T [--remove-acceptance EXACT_TEXT]` (also `--no-locked`; `--acceptance` replaces all and excludes add/remove); `request SERVICE --input key=value
@@ -222,14 +218,14 @@ retire one: there is no MCP tool for it).
 (versions, requests so far, file paths) every run; `# Playbook: <service> (v<n>)` while it holds an open request for it; and, when the
 batch holds a NEW request and there is evidence since the playbook's last revision, `# Reflect before you start: <service>`: the cases with
 new evidence (state, runs used of budget, rework, the client's verdict and note, its own lessons), statistics per playbook version, and
-the steps: look for what repeats or was rejected, revise if a change would prevent it, restore an older version if the current one did worse,
-else leave it alone. The `report` reply and ORG.md rule 10 carry the rest.
+the steps: revise if a change would prevent what repeats or was rejected, restore an older version if the current one did worse, else leave it
+alone (`report` reply and ORG.md rule 10 carry the rest).
 
 **Guardrails.** The contract belongs to the client; the playbook may only raise the bar (a lasting requirement from feedback goes to the
 parent, who adds it to the contract with `define_service`). A playbook is capped at `playbook_max_words` (default 1000), must differ from the
 current one and needs a reason naming its cases; every version is kept in `history/`. `locked: true` takes revising away (the evidence is
 still shown). Playbook and contract notices to root are quiet (not under "Needs you"); feedback costs no run and wakes nobody.
-`progress` tags service tasks `[service <name> v<playbook>]` and says "no feedback yet" once one is finished; `status` shows `services:`.
+`progress` tags service tasks `[service <name> v<playbook>]` and says "no feedback yet" when finished; `status` shows `services:`.
 
 **What study E changed.** A parent's rewrite of a report's `AGENT.md` keeps every frontmatter key the new text does not set (`tools`,
 `inputs`, `model`, ...), and the write reply lists the kept and changed keys. The feedback note says it is for reflection only and never
@@ -237,8 +233,14 @@ waives an acceptance criterion (ORG.md rule 10 too); the assistant records `feed
 is". `lessons` are required for `done`, `failed` and `blocked` service reports, and the digest shows each case's latest lessons first.
 `send(budget=N)` replies with what the recipient can now hand down (size a request at the estimate + 25%, about 2 runs per delegation + 1).
 Agents with the built-in `read` can also read the organization's files (read-only; the org root is in their allowedPaths), so a reviewer
-opens an author's `work/` file directly. Verifier templates enumerate independently: a reviewer first lists the source's decisions and
-commitments itself (informal ones in prose too), then compares the deliverable item by item, and reports doubtful items as `ambiguous`.
+opens an author's `work/` file directly. Verifiers report doubtful items as `ambiguous`.
+
+**What study E2 changed.** Every feedback verdict of a case is kept: the digest shows `reject "<words>" -> accept "<words>"` and the statistics
+count accepts that came after a reject. The Reflect section also appears when a reject arrives, telling the owner to decide then whether the
+playbook must change; the client's feedback outranks the owner's own lessons. A request plus its reworks is one case: rework replies and
+`progress` show the case total against the per-request budget; client-driven reworks no longer count against an agent's `low_quality` health. The skill asks the user (not the team) when a reviewer evidenced a PASS and only the reading of a criterion is in doubt, asks about
+relative or vague values ("before Friday") up front, says so when it adds a criterion unasked, asks before a rework passes the budget and states the case total at delivery. The plan block starts at a bare `PLAN FOR YOU` line; the show-verbatim instruction and a marker
+line sit outside it.
 
 **In a blueprint.** `services:` next to `agents:` (any of the four kinds: `blueprint_example(kind, service=True)`; a filled research one is
 [`examples/blueprint-service.yaml`](examples/blueprint-service.yaml)):
@@ -251,9 +253,8 @@ services:
     inputs: [{name: topic, description: what it is about, required: true}]   # what changes per request
     acceptance: [exact, checkable criteria]    # the contract: only the user changes it, through define_service
     deliverable: {description: one markdown file, format: markdown, max_words: 600, path: /abs/folder}
-    budget: 22                        # runs per request; default = estimate + 25%
+    budget: 22                        # runs per request; default = estimate + 25%; also optional: locked: true
     playbook: |                       # optional initial workflow; default generated from the team (steps, budget plan, pitfalls)
-    locked: false
 task: {service: weekly-brief, inputs: {topic: solid-state batteries}}   # optional: a first request; or omit and request later
 ```
 
@@ -261,13 +262,12 @@ task: {service: weekly-brief, inputs: {topic: solid-state batteries}}   # option
 cap for ONE request (each service's budget must be within it and above the estimate). The PLAN FOR YOU block gains a compact Services part
 (what you provide, runs per request, the first checks, where it is delivered), one line on reflection, and "nothing runs until you ask for
 a request" when there is no first task. `apply` hires the team, defines each service (a given or generated playbook v1) and sends the first
-request; with none it says the services are ready (`request(service, inputs)`, then `start()`). The assistant skill uses `services()` before
-building anything for an existing org, and asks "Keep it, or what should change?" after each delivery to record `feedback`.
+request (or says the services are ready: `request(service, inputs)`, then `start()`). The skill uses `services()` before building anything
+and asks "Keep it, or what should change?" after each delivery to record `feedback`.
 
 **Limitations.** No schedules (a request is made when someone asks). Only a parent requests from its direct reports: no sibling or
 cross-team requests, and a blueprint service is owned by the top-level agent. Runs of concurrent requests to one owner are attributed by
-the same progress window rule as tasks (a case's window ends where the client's next task to that owner begins), so overlapping cases
-are not double counted but can be misattributed. Statistics are counts and averages, not scores; quality is the client's verdict.
+the same progress window rule as tasks, so overlapping cases can be misattributed. Statistics are counts, not scores: quality is the client's verdict.
 
 ## Health
 
