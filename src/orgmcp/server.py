@@ -10,7 +10,10 @@ falls back to another organization. Agent servers (ORG_AGENT set) still fail fas
 
 from __future__ import annotations
 
+import functools
+import inspect
 import os
+import time
 from pathlib import Path
 
 import anyio
@@ -21,6 +24,7 @@ from . import blueprint_examples
 from .core import ROOT, Org, OrgError
 from .health import org_health, render_text
 from . import services as services_mod
+from . import telemetry
 from .progress import WAIT_MAX, describe_progress
 from .scheduler import (
     describe_scheduler, nothing_to_do, scheduler_state, start_scheduler, stop_scheduler, waiting_on_user,
@@ -152,6 +156,96 @@ def _entries(directory: Path) -> list[str]:
         return []
 
 
+def _tool_trace(binding: OrgBinding, me: str, arguments: dict, seen: list) -> str | None:
+    """The request a tool call belongs to: the trace of the message it delivered, else of the message it names
+    (task_id / reply_to / revises), else the one trace of the caller's current batch. None when unknown."""
+    trace = telemetry.single(seen)
+    org = binding.peek()
+    if trace or org is None:
+        return trace
+    for key in ("task_id", "reply_to", "revises"):
+        value = arguments.get(key)
+        if isinstance(value, str) and (trace := org.trace_of(me, value)):
+            return trace
+    if me != ROOT and org.exists(me):
+        return telemetry.single(m.trace for m in org.messages(me, "inflight"))
+    return None
+
+
+def _record_tool_call(binding: OrgBinding, me: str, tool: str, sig: inspect.Signature, args: tuple, kwargs: dict,
+                      started: float, exc: BaseException | None, seen: list) -> None:
+    """Emit the ``tool.call`` event of one finished call. Never raises."""
+    try:
+        root = binding.root
+        if root is None:
+            return
+        try:
+            arguments = dict(sig.bind_partial(*args, **kwargs).arguments)
+        except TypeError:
+            arguments = dict(kwargs)
+        try:
+            trace = _tool_trace(binding, me, arguments, seen)
+        except Exception:  # noqa: BLE001
+            trace = None
+        telemetry.emit(
+            root, "tool.call", proc="mcp", actor=me, trace=trace, tool=tool, ok=exc is None,
+            ms=round((time.perf_counter() - started) * 1000, 2),
+            error=telemetry.clip(str(exc) or type(exc).__name__, telemetry.ERROR_MAX) if exc is not None else None,
+            error_type=type(exc).__name__ if exc is not None else None,
+            args=telemetry.summarize_args(arguments),
+        )
+    except Exception:  # noqa: BLE001 - recording a call must never change its outcome
+        pass
+
+
+def _recorded(fn, tool: str, binding: OrgBinding, me: str):
+    """``fn`` wrapped so that each call emits a ``tool.call`` event (ok or refused/failed, with its duration and an
+    argument summary without bodies). Name, signature and docstring are those of ``fn``; the outcome is unchanged."""
+    sig = inspect.signature(fn)
+
+    if inspect.iscoroutinefunction(fn):
+        @functools.wraps(fn)
+        async def wrapper(*args, **kwargs):
+            started, failure = time.perf_counter(), None
+            with telemetry.traces_seen() as seen:
+                try:
+                    return await fn(*args, **kwargs)
+                except Exception as exc:
+                    failure = exc
+                    raise
+                finally:
+                    _record_tool_call(binding, me, tool, sig, args, kwargs, started, failure, seen)
+    else:
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+            started, failure = time.perf_counter(), None
+            with telemetry.traces_seen() as seen:
+                try:
+                    return fn(*args, **kwargs)
+                except Exception as exc:
+                    failure = exc
+                    raise
+                finally:
+                    _record_tool_call(binding, me, tool, sig, args, kwargs, started, failure, seen)
+    return wrapper
+
+
+def instrument_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
+    """Make ``mcp.tool`` record every tool registered through it: new tools get the ``tool.call`` event automatically."""
+    register = mcp.tool
+
+    def tool(*args, **kwargs):
+        decorate = register(*args, **kwargs)
+        named = kwargs.get("name") or (args[0] if args and isinstance(args[0], str) else None)
+
+        def wrap(fn):
+            return decorate(_recorded(fn, named or fn.__name__, binding, me))
+
+        return wrap
+
+    mcp.tool = tool
+
+
 def root_instructions(binding: OrgBinding) -> str:
     org = binding.peek()
     if org is not None:
@@ -175,6 +269,7 @@ def build_server(org: Org | OrgBinding, me: str) -> FastMCP:
     else:
         raise OrgError(binding.missing_message())  # agents never run without their organization
     mcp = FastMCP("orgmcp", instructions=root_instructions(binding) if me == ROOT else INSTRUCTIONS)
+    instrument_tools(mcp, binding, me)  # every tool registered below (and by the register_* functions) is recorded
 
     @mcp.tool()
     def whoami() -> str:
@@ -707,5 +802,6 @@ def resolve_binding() -> tuple[OrgBinding, str]:
 
 
 def serve() -> None:
+    telemetry.set_process("mcp")
     binding, me = resolve_binding()
     build_server(binding, me).run()
