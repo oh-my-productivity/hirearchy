@@ -205,7 +205,7 @@ def test_reset_keeps_the_objects_of_the_resources() -> None:
 
 
 def test_the_resources_can_be_made_without_arguments_for_the_telemetry_part() -> None:
-    from orgmcp.app._resources import CachingMessageParser
+    from orgmcp.mail._parser import CachingMessageParser
 
     resources = ProcessResources(CachingMessageParser())
     assert isinstance(resources.event_pool, EventWriterPool) and isinstance(resources.event_sinks, FsEventSinks)
@@ -213,7 +213,7 @@ def test_the_resources_can_be_made_without_arguments_for_the_telemetry_part() ->
 
 
 def test_the_sinks_of_a_custom_set_of_resources_use_that_set(tmp_path: Path) -> None:
-    from orgmcp.app._resources import CachingMessageParser
+    from orgmcp.mail._parser import CachingMessageParser
 
     (tmp_path / "ORG.md").write_text("---\nevents: true\n---\n", encoding="utf-8")
     resources = ProcessResources(CachingMessageParser())

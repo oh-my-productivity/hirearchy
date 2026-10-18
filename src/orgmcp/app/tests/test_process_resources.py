@@ -87,3 +87,15 @@ def test_every_runtime_of_the_process_scans_through_the_same_front_matter_cache(
     assert len(wiring.process_resources().meta_cache.cache) == 1
     wiring.open_runtime(tmp_path).message_index.scan()
     assert len(wiring.process_resources().meta_cache.cache) == 1
+
+
+def test_reset_empties_the_resources_of_both_the_mail_and_the_telemetry_parts_in_place(tmp_path: Path) -> None:
+    resources = ProcessResources(CachingMessageParser(), StampCachedMetaReader())
+    parse_cache, meta_cache, pool, label = resources.message_parser.cache, resources.meta_cache.cache, resources.event_pool, resources.process_label
+    path = message_file(tmp_path)
+    resources.message_parser.parse(path)
+    resources.meta_cache.read(path)
+    label.set("mcp")
+    resources.reset()
+    assert (resources.message_parser.cache, resources.meta_cache.cache, resources.event_pool, resources.process_label) == (parse_cache, meta_cache, pool, label)
+    assert len(parse_cache) == 0 and len(meta_cache) == 0 and label.get() == "cli"
