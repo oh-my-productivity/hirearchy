@@ -1745,7 +1745,10 @@ A TTY check (`sys.stdin.isatty() and sys.stdout.isatty()`) is the one terminal d
 | `_default`, `_encode`, `_shrink` | `telemetry/_encode.py` (private pure functions) |
 | `summarize_args`, `_KEEP_STR`, `_KEEP_LIST` | `telemetry.ArgumentSummarizer.summarize` |
 | `prune` | `telemetry.EventRetention.prune` |
-| `SCHEMA_VERSION LINE_MAX EVENTS_REL RETRY_AFTER TITLE_MAX ERROR_MAX DAY_RE ENVELOPE PROCS` | `eventlog` (format constants); `RETRY_AFTER` stays in `telemetry/_sink.py` |
+| `SCHEMA_VERSION LINE_MAX EVENTS_REL DAY_RE ENVELOPE PROCS` | `eventlog` (format constants) |
+| `RETRY_AFTER` | `telemetry/_sink.py` (stays with the sink that retries) |
+| `TITLE_MAX` | `kernel` (`kernel/_text.py`: the one default title length) |
+| `ERROR_MAX` | `telemetry/_legacy.py` (the longest error text of an event; re-exported as `telemetry.ERROR_MAX`) |
 
 ### 5.10 `observe.py`
 
