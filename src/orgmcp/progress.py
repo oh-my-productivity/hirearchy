@@ -30,6 +30,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import Callable
 
+from . import services
 from .core import ROOT, Message, Org, OrgError, latest_results, utcnow
 from .health import _aware, _duration, _stamp
 
@@ -207,17 +208,21 @@ def _task_line(org: Org, task: Message, result: Message | None, now: datetime) -
     if result is not None and result.status in ("done", "failed"):
         arts = _artifacts(result)
         parts.append("artifacts: " + ", ".join(arts) if arts else "no artifacts")
-        if task.service and _no_feedback(org, task):
+    if task.service:
+        case = services.case_of(org, task)
+        if result is not None and result.status in ("done", "failed") and not _rated(case, task):
             parts.append("no feedback yet")
+        if case is not None and case.reworks:  # a rework chain: the line above is one request, this is the whole case
+            parts.append(services.case_total(org, task).rstrip("."))
     return ". ".join(parts) + f". (task {task.id})"
 
 
-def _no_feedback(org: Org, task: Message) -> bool:
-    """A finished service request that the client has not rated yet (feedback on any task of its case counts)."""
-    from . import services
-
-    case = next((c for c in services.cases(org, task.to, task.service) if task.id in {t.id for t in c.tasks}), None)
-    return case is None or case.feedback is None
+def _rated(case: services.Case | None, task: Message) -> bool:
+    """Has the client given feedback on this delivery (or on a later rework of it)? An earlier verdict does not count."""
+    if case is None:
+        return False
+    step = next((i for i, t in enumerate(case.tasks) if t.id == task.id), 0)
+    return any(v.step >= step for v in case.verdicts)
 
 
 def _state(org: Org, task: Message, result: Message | None, team: list[str]) -> tuple[str, str]:

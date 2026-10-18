@@ -457,14 +457,17 @@ def register_client_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
         inputs: {input name: value}; required ones must be present. note: free text for the owner. extra_acceptance:
         criteria added after the contract's (the contract's always apply). budget: runs handed down (default: the
         contract's; the usual reserve rule applies). revises: id of an earlier request of this service to send back for
-        rework. Returns the task id; the result comes back like any result, then rate it with `feedback`.
+        rework; the reply then states the case total (runs used by the whole chain, runs handed down, the contract's
+        budget per request) and tells you to inform the user when the case exceeds that budget. Returns the task id;
+        the result comes back like any result, then rate it with `feedback`.
         """
         org = binding.get()
         msg = org.request(me, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance,
                           budget=budget, revises=revises)
         tail = "Call start() if the scheduler is not running." if me == ROOT else f"Your budget is now {org.budget(me)}."
+        total = services_mod.case_total(org, msg) if revises else ""
         return (f"requested service `{service}` from {msg.to}: task {msg.id}, budget {msg.budget} "
-                f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}")
+                f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}" + (f"\n{total}" if total else ""))
 
     @mcp.tool()
     def feedback(task_id: str, verdict: str, note: str = "") -> str:
@@ -472,8 +475,10 @@ def register_client_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
 
         task_id: a service request (or rework) you sent that has a result. note: required for reject (what was wrong),
         optional for accept. It costs no run and does not wake the owner; it shows up in the evidence the owner reviews
-        before its next request. A later feedback on the same case replaces this one in the statistics. Feedback is
-        for reflection only: it never waives an acceptance criterion or changes the outcome of the request.
+        before its next request (and the moment a rejection arrives). Give it on your own judgement of each delivery,
+        also on a rework: every verdict stays in the case's history, the latest one is the final verdict, and an
+        earlier reject is still shown to the owner with your words. Feedback is for reflection only: it never waives an
+        acceptance criterion or changes the outcome of the request.
         """
         msg = binding.get().feedback(me, task_id, verdict, note)
         return f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}); it does not wake {msg.to}"
