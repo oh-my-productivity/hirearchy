@@ -1,0 +1,4 @@
+`ceo/eng` failed 3 runs in a row and is paused. Last run log: ceo/eng/runs/20260115T090000000000.log
+Its unread messages and open tasks are stuck until then. A human will inspect the crash and resume it; you cannot. Meanwhile you can keep your own work moving:
+- reassign: `delegate` the work to another direct report (or `hire` one), and `retire` `ceo/eng` if it is not needed (its open tasks are closed as failed);
+- or, if you cannot go on without it, `report` the affected task to whoever assigned it with status `blocked` (or `failed`) and say that `ceo/eng` is crashing, so they can plan around it.

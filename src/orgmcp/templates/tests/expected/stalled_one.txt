@@ -1,0 +1,1 @@
+`ceo/eng` is stalled on task T-1 (Build the API): it is not running, not waiting on delegated work, and has not reported. Already told: `ceo`. Follow up with it, reassign the work, or escalate further.

@@ -1,0 +1,2 @@
+`ceo/eng` failed 3 runs in a row and is paused. Last run log: ceo/eng/runs/20260115T090000000000.log
+A human must inspect it and run `orgmcp resume ceo/eng`.

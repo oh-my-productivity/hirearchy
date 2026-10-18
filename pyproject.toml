@@ -185,14 +185,3 @@ source_modules = [
     "orgmcp.skill", "orgmcp.telemetry", "orgmcp.templates", "orgmcp.upgrade",
 ]
 forbidden_modules = ["orgmcp.cli", "orgmcp.cli_obs", "orgmcp.server", "orgmcp.dashboard"]
-
-[[tool.importlinter.contracts]]
-name = "orgmcp.templates is a leaf: it imports nothing else from orgmcp"
-type = "forbidden"
-source_modules = ["orgmcp.templates"]
-forbidden_modules = [
-    "orgmcp.blueprint", "orgmcp.blueprint_examples", "orgmcp.cli", "orgmcp.cli_obs", "orgmcp.core", "orgmcp.dashboard",
-    "orgmcp.dashboard_data", "orgmcp.dashboard_events", "orgmcp.health", "orgmcp.observe", "orgmcp.progress",
-    "orgmcp.review", "orgmcp.scheduler", "orgmcp.server", "orgmcp.services", "orgmcp.skill", "orgmcp.telemetry",
-    "orgmcp.upgrade",
-]

@@ -765,8 +765,8 @@ list only shrinks, and its end state is empty (until then `test_every_class_has_
   MCP / PyYAML only at the edge) are **generated** by `tests/architecture/gen_importlinter.py` from `tests/architecture/graph.py` (the
   42 packages and their allowed dependencies, equal to ARCHITECTURE.md 2.2/4.3) and the packages that exist, so a new package brings its
   contracts without editing a config; `python -m tests.architecture.lint` writes `.importlinter` (git-ignored) and runs it. The
-  hand-written `[[tool.importlinter.contracts]]` in `pyproject.toml` (today: the library does not import the entry points; `templates`
-  is a leaf) cover the flat legacy modules and disappear with them. A plain `lint-imports` would read only `.importlinter`; use
+  hand-written `[[tool.importlinter.contracts]]` in `pyproject.toml` (today: the library does not import the entry points)
+  cover the flat legacy modules and disappear with them. A plain `lint-imports` would read only `.importlinter`; use
   `lint` or `scripts/static_checks.py imports`, which run both.
 * *Structural rules (`tests/architecture/`, marker `architecture`):* one test per rule of ARCHITECTURE.md 1.2 (R1 `api`/`__init__`,
   R4 imports match the graph, R6 no module-level singletons, R7 Protocols have at most 8 methods, R8 contract suite per Protocol, R9

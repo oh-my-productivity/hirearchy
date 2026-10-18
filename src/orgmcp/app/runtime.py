@@ -8,6 +8,7 @@ from pathlib import Path
 from ..kernel import AtomicWriter, Clock, Environment, IdGenerator, LedgerStore, OrgLayout
 from ..locator import OrgLocator
 from ..settings import EventSwitch, OrgDocumentStore, OrgSettings
+from ..templates import DocumentTemplates, Notices
 from ._resources import ProcessResources
 
 
@@ -28,3 +29,5 @@ class OrgRuntime:
     documents: OrgDocumentStore
     event_switch: EventSwitch
     locator: OrgLocator
+    document_templates: DocumentTemplates
+    notices: Notices

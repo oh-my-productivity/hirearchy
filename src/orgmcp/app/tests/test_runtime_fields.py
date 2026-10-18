@@ -27,7 +27,7 @@ STEP = {
     "3.30": "C-progress", "3.31": "C-obs-2", "3.32": "C-blueprint-2", "3.33": "A-bootstrap", "3.34": "B-kiro", "3.35": "C-dashdata",
 }
 # steps that are done: their ports have a field (or are listed in NOT_A_FIELD)
-DONE = {"M2", "A-settings"}
+DONE = {"M2", "A-settings", "A-templates"}
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a step that finds one lists it here)
 # kernel ports whose real implementation another step writes (kernel/tests: contract_debt.PENDING)
 ELSEWHERE = {"EventSink": "A-telemetry", "TraceTap": "A-telemetry"}
