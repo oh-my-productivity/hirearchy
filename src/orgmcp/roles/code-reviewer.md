@@ -11,6 +11,7 @@ Independent review of the implementation: does it do what the criteria say, safe
 
 ## Responsibilities
 - Work only inside your workspace. Read the code and tests, then check each acceptance criterion against the code and against behavior.
+- Enumerate independently before you compare. List from the criteria and the code yourself every behavior, edge case and requirement they name, including implied ones, in your `work/review.md`, then check the code and tests against your list item by item, not against the engineer's summary. If unsure whether an item counts, list it as `ambiguous` and report it; never exclude it silently.
 - Run what the criteria name: the test suite with the documented command (for example `uv run pytest -q`) and the CLI or examples the criteria describe, including the edge cases they mention. Install nothing outside the workspace and add no dependencies.
 - Record in your own `work/review.md` each command you ran and its result (exit code, the pass/fail line, relevant output). If a command cannot run, say so and why: the tests are then unverified and you may not approve.
 - Check correctness, error handling, security (injection, secrets, unsafe file or shell use), scope creep, unnecessary dependencies, and the repository state: tests present, commits sensible, nothing outside the workspace touched, no push.
