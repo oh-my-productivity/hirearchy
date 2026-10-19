@@ -1,0 +1,42 @@
+ orgmcp dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |  running 2/2  queued 1  waiting on you 1  errors 15m 2
+▼ ★ root (you)  needs you: 1                                              │ Overview  Activity  Messages  Run log  Memory  Charter
+├─ ○ archivist  idle  0 left                                              │━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╸━━━━━━━╺━━━━━━━━━━━━━━━━━━━
+├─ ▼ ▶ ceo  running 1m12s  3 left                                         │ ---
+│  ├─ ◔ analyst  queued: all slots busy, 1 unread  4 left                 │ role: Chief executive
+│  └─ ◆ writer  working on 1 task(s)  2 left                              │ tools: []
+├─ ▼ ◇ ops  waiting on 1 report(s)  3 left                                │ can_hire: true
+│  ├─ ‖ audit  paused by the user: audit window closed  0 left            │ max_children: 3
+│  └─ ‖ deploy  paused: 2 consecutive failed runs, 1 unread  1 left       │ hired_by: root
+└─ ▼ ▶ research  running 2m05s  4 left                                    │ created: '2026-10-18T10:00:00+00:00'
+   └─ ! crawler  out of budget  0 left                                    │ ---
+                                                                          │ # Role: Chief executive
+                                                                          │
+                                                                          │ Run the report pipeline.
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+ ←/h Fold  →/l Unfold/pane  ⏎ Open  12345 Screen  r Refresh  p Pause  ? Help  q Quit  [] Tab

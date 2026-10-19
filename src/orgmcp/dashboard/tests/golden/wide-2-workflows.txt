@@ -1,0 +1,42 @@
+ orgmcp dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |  running 2/2  queued 1  waiting on you 1  errors 15m 2
+ state                               request                                               to         runs  last activity  needs you
+ working                             Brief: heat pumps [market-brief]                      research   2/6   5.0s ago
+ done                                Brief: EV chargers (shorter) (rework) [market-brief]  research   1/4   5.0s ago
+ done                                Brief: EV chargers [market-brief]                     research   1/6   5.0s ago
+ waiting on ops/deploy (paused: 2 …  Rotate API keys                                       ops        2/6   4m10s ago      1 for you
+ working                             Quarterly market report                               ceo        3/12  0s ago
+ done                                Archive old reports                                   archivist  1/3   6m18s ago
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ ⏎ Open  12345 Screen  r Refresh  p Pause  ? Help  q Quit

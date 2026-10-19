@@ -1,0 +1,24 @@
+ orgmcp dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |
+▼ ★ root (you)  needs you: 1               │ Overview  Activity  Messages  Run l
+├─ ○ archivist  idle  0 left               │╸━━━━━━━━╺━━━━━━━━━━━━━━━━━━━━━━━━━━
+├─ ▼ ▶ ceo  running 1m12s  3 left          │ You (root)
+│  ├─ ◔ analyst  queued: all…, 1 unread    │ 9 agent(s); 2 running, 1 queued
+│  └─ ◆ writer  working on 1 task(s)       │ scheduler running pid 7000
+├─ ▼ ◇ ops  waiting on 1 report(s)  3 left │ (until_done, up 6m40s, heartbeat
+│  ├─ ‖ audit  paused by the user: audi…   │ 3.0s ago)
+│  └─ ‖ deploy  paused: 2 con…, 1 unread   │
+└─ ▼ ▶ research  running 2m05s  4 left     │ Needs you (1)
+   └─ ! crawler  out of budget  0 left     │ Needs you: note from ops "Need
+                                           │ approval for downtime": The key
+                                           │ rotation needs a maintenance    ▇▇
+                                           │ window. May I take the API down
+                                           │ on Saturday 02:00? (message
+                                           │ 20261018T100200000003-ops-0021)
+                                           │
+                                           │ Requests
+                                           │ "Brief: heat pumps" -> research:
+                                           │ working (running: research).
+                                           │ runs 2 of 6. last activity 5.0s
+                                           │ ago
+ ←/h Fold  →/l Unfold/pane  ⏎ Open  12345 Screen  r Refresh  p Pause  ? Help  q
