@@ -1,34 +1,53 @@
-"""Fakes for the run lifecycle: scripted roles for the unit tests of the classes that are made of them, and a world over the in-memory fakes of the
-packages the lifecycle takes from (``LifecycleWorld``), whose processes are rows of a ``FakeProcessTable`` and whose time moves only when told."""
+"""Fakes for the scheduler: scripted roles for the unit tests of the classes that are made of them, a world over the in-memory fakes of the packages
+the run lifecycle takes from (``LifecycleWorld``), whose processes are rows of a ``FakeProcessTable`` and whose time moves only when told, and the loop
+over that world (``heartbeat_world``) next to an in-memory loop (``memory_world``): the two implementations of ``SchedulerLoop``."""
 
 from __future__ import annotations
 
 from collections.abc import Callable, Collection, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 from ..access.testing import StaticAccess
+from ..attention import Waiting
+from ..attention.testing import FixedOpenWork, FixedWaiting, ListHumanQueue
+from ..attention._waiting import RootTaskWaitingOnUser
+from ..attention._work import RunnableOpenWork
 from ..budget.testing import FixedBudget
+from ..daemon.testing import MemoryExitMarker, MemorySchedulerLock
 from ..delivery.testing import RecordingDelivery
-from ..eligibility.testing import MemoryFailureCounter, MemoryPauseStore
+from ..eligibility import RunnableQuery
+from ..eligibility.testing import MemoryFailureCounter, MemoryPauseStore, runnable_over
 from ..kernel import Message, OrgPaths
 from ..kernel.testing import FakeClock, ListEventSink, SequenceIdGenerator
 from ..kiro import RunCommand, RunCommandBuilder
+from ..mail import TaskQuery
 from ..mail.testing import MemoryMailbox, memory_mailbox
-from ..processes import ProcessHandle, ProcessSpawner
+from ..processes import OrphanJudge, ProcessHandle, ProcessSpawner
+from ..processes._judge import PsOrphanJudge
 from ..processes.testing import FakeProcessTable
 from ..prompts.testing import FixedRunPrompt
+from ..review import HealthReviewer, Review
+from ..review.testing import ScriptedHealthReviewer
 from ..runs import RunLogSink
 from ..runs.testing import MemoryRuns
 from ..snapshots import OrgSnapshotter
+from ..snapshots.testing import MemoryIgnoreList
+from ..stalls import StallLadder
+from ..stalls.testing import MemoryNudges
 from ..strays.testing import MemoryStrays
+from ..telemetry.testing import MemoryEventRetention, MemoryProcessLabel
 from ..templates.testing import RecordingNotices
-from ._assembly import Lifecycle, LifecyclePorts, assemble
+from ._assembly import Lifecycle, LifecyclePorts, LoopPorts, assemble, assemble_loop
+from ._loop import HeartbeatLoop
 from ._ports import (
-    Console, PhaseGuard, RunAdmission, RunEvents, RunFailures, RunInitiation, RunPreparation, RunRecords, RunSettling, RunSpawning,
-    RunTerminating, RunWatching, StartAnnouncing, StartFailures, StrayWatch,
+    Claim, Console, ExitPolicy, InterruptedRuns, OrphanSettler, Pacing, PhaseGuard, RunAdmission, RunEvents, RunFailures, RunInitiation,
+    RunNotes, RunPreparation, RunReaper, RunRecords, RunSettling, RunSpawning, RunStarter, RunTerminating, RunWatching, SchedulerSession,
+    SessionEvents, StartAnnouncing, StartFailures, StrayWatch, TickPhase, WaitGrace, WorkLeft,
 )
-from ._run import Exit, PreparedRun, RunCount, RunRecord, RunTable
+from ._run import Exit, LoopMemory, LoopState, PreparedRun, RunCount, RunRecord, RunTable, Standing, StopWhen
+from .api import SchedulerLoop
 
 PROMPT = "THE PROMPT"
 
@@ -335,6 +354,7 @@ class LifecycleWorld:
     retire: Callable[[str], None]  # the agent's files are gone
     mail_to: Callable[..., Message]  # (addr, title="t", sender="root", trace=None, wake=True): a task in the inbox
     events_of: Callable[[str], list[dict[str, object]]]  # the events of this kind: envelope and fields in one dictionary
+    tasks: TaskQuery  # the task views of the mailboxes
 
 
 def lifecycle_world(tmp: Path = Path("/memory")) -> LifecycleWorld:
@@ -384,5 +404,382 @@ def lifecycle_world(tmp: Path = Path("/memory")) -> LifecycleWorld:
 
     return LifecycleWorld(
         clock, table, spawner, box, runs_store, pauses, counter, budgets, delivery, notices, events, access, strays, snapshots, prompts, commands,
-        console, guard, count, ports, assemble(ports, clock, console, guard, count), hire, retire, mail_to, events_of,
+        console, guard, count, ports, assemble(ports, clock, console, guard, count), hire, retire, mail_to, events_of, mail.tasks,
     )
+
+
+# ------------------------------------------------------------------------------ scripted roles of the loop
+
+
+class RecordingPhase(TickPhase):
+    """Writes its name in the ``journal`` it shares with the others; ``fail`` makes it raise."""
+
+    def __init__(self, name: str, journal: list[str], fail: Exception | None = None) -> None:
+        self.name, self.journal, self.fail = name, journal, fail
+        self.seen: list[tuple[Standing, int | None]] = []
+
+    def run(self, standing: Standing, max_runs: int | None) -> None:
+        self.journal.append(self.name)
+        self.seen.append((standing, max_runs))
+        if self.fail is not None:
+            raise self.fail
+
+
+class RecordingStarter(RunStarter):
+    def __init__(self, journal: list[str] | None = None) -> None:
+        self.journal = journal if journal is not None else []
+        self.launched: list[tuple[set[str], int | None]] = []
+        self.started: list[str] = []
+
+    def launch(self, runs: RunTable, blocked: Collection[str], max_runs: int | None) -> int:
+        self.journal.append("launch")
+        self.launched.append((set(blocked), max_runs))
+        return 0
+
+    def start(self, runs: RunTable, addr: str) -> None:
+        self.journal.append(f"start {addr}")
+        self.started.append(addr)
+
+
+class RecordingReaper(RunReaper):
+    def __init__(self, journal: list[str] | None = None) -> None:
+        self.journal = journal if journal is not None else []
+        self.reaped = 0
+        self.terminated = 0
+        self.on_reap: Callable[[RunTable], None] | None = None
+
+    def reap(self, runs: RunTable) -> None:
+        self.journal.append("reap")
+        self.reaped += 1
+        if self.on_reap is not None:
+            self.on_reap(runs)
+
+    def terminate_all(self, runs: RunTable) -> None:
+        self.journal.append("terminate")
+        self.terminated += 1
+
+
+class ScriptedWork(WorkLeft):
+    """The answers it is told to give; ``asked`` keeps the standings it was asked about, as ``(question, runs, blocked, can_start)``."""
+
+    def __init__(self, remains: bool = False, finished: bool = False, waiting: Waiting | None = None) -> None:
+        self.remains_answer, self.finished_answer, self.waiting_answer = remains, finished, waiting
+        self.asked: list[tuple[str, frozenset[str], frozenset[str], bool]] = []
+
+    def _ask(self, question: str, standing: Standing) -> None:
+        self.asked.append((question, frozenset(standing.runs), frozenset(standing.blocked), standing.can_start))
+
+    def remains(self, standing: Standing) -> bool:
+        self._ask("remains", standing)
+        return self.remains_answer
+
+    def finished(self, standing: Standing) -> bool:
+        self._ask("finished", standing)
+        return self.finished_answer
+
+    def waiting(self, standing: Standing) -> Waiting | None:
+        self._ask("waiting", standing)
+        return self.waiting_answer
+
+
+class ScriptedGrace(WaitGrace):
+    def __init__(self, *reasons: str) -> None:
+        self.reasons = list(reasons)
+        self.asked = 0
+
+    def check(self, standing: Standing) -> str:
+        self.asked += 1
+        return self.reasons.pop(0) if self.reasons else ""
+
+
+class ScriptedExit(ExitPolicy):
+    """Answers the reasons it is given, one per pass (``None`` once they are used up)."""
+
+    def __init__(self, *reasons: str | None) -> None:
+        self.reasons = list(reasons)
+        self.asked: list[tuple[StopWhen, bool]] = []
+
+    def after_tick(self, stop: StopWhen, active: bool, standing: Standing) -> str | None:
+        self.asked.append((stop, active))
+        return self.reasons.pop(0) if self.reasons else None
+
+
+class RecordingPacing(Pacing):
+    def __init__(self, journal: list[str] | None = None) -> None:
+        self.journal = journal if journal is not None else []
+        self.pauses = 0
+        self.on_pause: Callable[[], None] | None = None
+
+    def pause(self) -> None:
+        self.journal.append("pause")
+        self.pauses += 1
+        if self.on_pause is not None:
+            self.on_pause()
+
+
+class RecordingSession(SchedulerSession):
+    def __init__(self, journal: list[str] | None = None) -> None:
+        self.journal = journal if journal is not None else []
+        self.opened: list[tuple[str, int | None]] = []
+        self.closed: list[tuple[str, int, int]] = []  # (reason, runs in flight, runs started)
+        self.fail: Exception | None = None
+
+    def open(self, mode: str, max_runs: int | None, runs: RunTable, blocked: set[str]) -> None:
+        self.journal.append("open")
+        self.opened.append((mode, max_runs))
+        if self.fail is not None:
+            raise self.fail
+
+    def close(self, exit_reason: str, runs: RunTable, started: int) -> None:
+        self.journal.append("close")
+        self.closed.append((exit_reason, len(runs), started))
+
+
+class RecordingClaim(Claim):
+    def __init__(self, journal: list[str] | None = None) -> None:
+        self.journal = journal if journal is not None else []
+        self.fail: Exception | None = None
+
+    def take(self) -> None:
+        self.journal.append("take")
+        if self.fail is not None:
+            raise self.fail
+
+    def give_up(self) -> None:
+        self.journal.append("give up")
+
+
+class RecordingSessionEvents(SessionEvents):
+    def __init__(self, journal: list[str] | None = None) -> None:
+        self.journal = journal if journal is not None else []
+        self.starts: list[tuple[str, int | None]] = []
+        self.exits: list[tuple[str, int]] = []
+
+    def started(self, mode: str, max_runs: int | None) -> None:
+        self.journal.append("started")
+        self.starts.append((mode, max_runs))
+
+    def exited(self, reason: str, runs_started: int) -> None:
+        self.journal.append("exited")
+        self.exits.append((reason, runs_started))
+
+
+class RecordingRecovery(InterruptedRuns):
+    def __init__(self, journal: list[str] | None = None) -> None:
+        self.journal = journal if journal is not None else []
+
+    def recover(self) -> None:
+        self.journal.append("recover")
+
+
+class RecordingSettler(OrphanSettler):
+    """Settles nothing; ``blocks`` are the agents it blocks the first time it is asked."""
+
+    def __init__(self, journal: list[str] | None = None, blocks: Collection[str] = ()) -> None:
+        self.journal = journal if journal is not None else []
+        self.blocks = set(blocks)
+        self.calls = 0
+        self.fail: Exception | None = None
+
+    def settle(self, runs: RunTable, blocked: set[str]) -> None:
+        self.journal.append("settle")
+        self.calls += 1
+        if self.fail is not None:
+            raise self.fail
+        blocked |= self.blocks
+        self.blocks = set()
+
+
+class RecordingNotes(RunNotes):
+    def __init__(self) -> None:
+        self.notes: list[tuple[dict[str, object], str]] = []
+
+    def note(self, rec: Mapping[str, object], text: str) -> None:
+        self.notes.append((dict(rec), text))
+
+
+class ScriptedOrphanJudge(OrphanJudge):
+    """The verdict for the record of a group (``verdicts[pgid]``; ``gone`` for one it knows nothing of)."""
+
+    def __init__(self, verdicts: Mapping[object, str] | None = None) -> None:
+        self.verdicts = dict(verdicts or {})
+        self.asked: list[dict[str, object]] = []
+
+    def judge(self, record: Mapping[str, object]) -> str:
+        self.asked.append(dict(record))
+        return self.verdicts.get(record.get("pgid"), "gone")
+
+
+class FixedRunnable(RunnableQuery):
+    """These agents could start (but for the ones excluded); ``asked`` keeps the exclusions it was asked with."""
+
+    def __init__(self, *agents: str) -> None:
+        self.agents = list(agents)
+        self.asked: list[frozenset[str]] = []
+
+    def runnable(self, exclude: Collection[str] = ()) -> list[str]:
+        self.asked.append(frozenset(exclude))
+        return [a for a in self.agents if a not in exclude]
+
+    def startable(self, addr: str) -> bool:
+        return addr in self.agents
+
+
+class ScriptedLadder(StallLadder):
+    """Climbs nothing; answers the lines it is told to; ``fail`` makes it raise."""
+
+    def __init__(self, *lines: str) -> None:
+        self.lines = list(lines)
+        self.checks = 0
+        self.fail: Exception | None = None
+
+    def check(self) -> list[str]:
+        self.checks += 1
+        if self.fail is not None:
+            raise self.fail
+        lines, self.lines = self.lines, []
+        return lines
+
+
+# ------------------------------------------------------------------------------ the loop over the world, and in memory
+
+
+@dataclass
+class LoopWorld:
+    """A loop and the means to give it work, finish the work and let the runs end; ``started`` is how many runs it started. The same for every implementation."""
+
+    loop: SchedulerLoop
+    give_work: Callable[[], None]  # an agent has a task of root's in its inbox
+    finish_work: Callable[[], None]  # the agent answered: root's task is closed (a run in flight still ends by itself)
+    let_runs_end: Callable[[], None]  # the runs in flight are over
+    started: Callable[[], int]
+    detail: object = None  # the world behind it, for the tests of the one implementation
+
+
+@dataclass
+class HeartbeatWorld:
+    """The real ``HeartbeatLoop`` over the lifecycle world and in-memory ports: ``clock`` is the run clock and the cadence clock."""
+
+    life: LifecycleWorld
+    loop: HeartbeatLoop
+    state: LoopState
+    memory: LoopMemory
+    ports: LoopPorts
+    label: MemoryProcessLabel
+    lock: MemorySchedulerLock
+    marker: MemoryExitMarker
+    ignore: MemoryIgnoreList
+    retention: MemoryEventRetention
+    queue: ListHumanQueue
+    ladder: ScriptedLadder
+    reviewer: ScriptedHealthReviewer
+    judge: OrphanJudge
+    nudges: MemoryNudges
+
+
+def build_heartbeat_world(tmp: Path = Path("/memory"), config: str = "") -> HeartbeatWorld:
+    w = lifecycle_world(tmp)
+    if config:
+        w.access.put_config(f"---\n{config}\n---\n# Organization\n")
+    runnable = runnable_over(w.access.agents, w.box, w.pauses, w.budgets)
+    nudges = MemoryNudges(w.access.agents)
+    label, lock, marker, ignore = MemoryProcessLabel(), MemorySchedulerLock(w.table), MemoryExitMarker(), MemoryIgnoreList()
+    retention, queue, ladder = MemoryEventRetention(w.clock), ListHumanQueue(), ScriptedLadder()
+    reviewer = ScriptedHealthReviewer(Review(at=w.clock.now(), runs=0, flagged=0))
+    judge = PsOrphanJudge(w.table)
+    ports = LoopPorts(
+        w.ports, label, lock, marker, ignore, judge, w.table, retention, queue, runnable, RunnableOpenWork(w.tasks, runnable),
+        RootTaskWaitingOnUser(w.tasks, w.access.agents, w.box, w.pauses, w.budgets, runnable, nudges), ladder, reviewer, lambda: "test",
+    )
+    state, memory = LoopState(count=w.count), LoopMemory()
+    loop = assemble_loop(ports, w.clock, w.clock, w.console, state, memory)
+    return HeartbeatWorld(w, loop, state, memory, ports, label, lock, marker, ignore, retention, queue, ladder, reviewer, judge, nudges)
+
+
+def heartbeat_world(tmp: Path) -> LoopWorld:
+    """The real loop: work is a task of root's for ``ceo``, whose runs are rows of a process table that end when told."""
+    h = build_heartbeat_world(tmp)
+    w = h.life
+    task: list[Message] = []
+
+    def give_work() -> None:
+        w.hire("ceo", 3)
+        w.table.will_exit(0, after=5)
+        task.append(w.mail_to("ceo", trace="t1"))
+
+    def finish_work() -> None:
+        w.box.store(Message(sender="ceo", to="root", type="result", title="re: t", body="ok", reply_to=task[0].id, status="done",
+                            id="20260101T000099000000-ceo-aaaa", created="2026-01-01T00:00:00+00:00"))
+
+    def let_runs_end() -> None:
+        w.clock.advance(6)
+
+    return LoopWorld(h.loop, give_work, finish_work, let_runs_end, lambda: w.count.total, h)
+
+
+class MemoryLoop(SchedulerLoop):
+    """A scheduler with one kind of work: ``queued`` agents that could start, ``running`` runs, and ``open_task`` (root waits for a result).
+
+    A pass ends the runs in flight (they run for one pass) and starts the queued ones (up to the cap on runs started)."""
+
+    def __init__(self) -> None:
+        self.queued = 0
+        self.running = 0
+        self.open_task = False
+        self.started = 0
+        self.passes = 0
+        self.entered = 0  # acquired and not yet released
+
+    def _can_start(self, max_runs: int | None) -> bool:
+        return max_runs is None or self.started < max_runs
+
+    def tick(self, max_runs: int | None = None) -> bool:
+        self.passes += 1
+        self.running = 0
+        while self.queued and self._can_start(max_runs):
+            self.queued -= 1
+            self.running += 1
+            self.started += 1
+        return bool(self.running) or (bool(self.queued) and self._can_start(max_runs))
+
+    def finished(self, max_runs: int | None = None) -> bool:
+        return not self.open_task and not self.running and not (self.queued and self._can_start(max_runs))
+
+    def serve(self, until_idle: bool = False, max_runs: int | None = None, until_done: bool = False) -> None:
+        self.entered += 1
+        try:
+            while True:
+                active = self.tick(max_runs)
+                if (until_idle and not active) or (until_done and self.finished(max_runs)):
+                    break
+        finally:
+            self.entered -= 1
+
+    def run_once(self, max_runs: int | None = None) -> None:
+        self.entered += 1
+        try:
+            self.tick(max_runs)
+            self.running = 0
+        finally:
+            self.entered -= 1
+
+
+def memory_world(tmp: Path) -> LoopWorld:
+    loop = MemoryLoop()
+
+    def give_work() -> None:
+        loop.queued += 1
+        loop.open_task = True
+
+    def finish_work() -> None:
+        loop.open_task = False
+
+    def let_runs_end() -> None:
+        loop.running = 0
+
+    return LoopWorld(loop, give_work, finish_work, let_runs_end, lambda: loop.started, loop)
+
+
+IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], LoopWorld]]] = {
+    SchedulerLoop: [heartbeat_world, memory_world],
+}

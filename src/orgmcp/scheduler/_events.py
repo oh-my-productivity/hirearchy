@@ -5,8 +5,9 @@ from __future__ import annotations
 from ..access import ModelResolver
 from ..agents import AgentDirectory
 from ..budget import BudgetQuery
-from ..kernel import Clock, EventSink, clip, single
-from ._ports import RunEvents
+from ..kernel import Clock, EventSink, Provider, clip, single
+from ..settings import OrgSettings
+from ._ports import RunEvents, SessionEvents
 from ._run import PreparedRun, RunRecord
 
 ERROR_MAX = 500  # the longest error text that goes into an event
@@ -49,3 +50,16 @@ class LifecycleEvents(RunEvents):
         self.started(prepared, None)
         self._events.emit("run.end", agent=prepared.addr, run=prepared.run_id, ok=False, exit_code=None, duration_ms=0, timed_out=False,
                           killed=False, budget_after=self._budgets.budget(prepared.addr), error=clip(f"failed to start: {error}", ERROR_MAX))
+
+
+class SessionAnnouncer(SessionEvents):
+    """``scheduler.start`` and ``scheduler.exit``."""
+
+    def __init__(self, events: EventSink, settings: OrgSettings, version: Provider[str]) -> None:
+        raise NotImplementedError("red: D-sched-2")
+
+    def started(self, mode: str, max_runs: int | None) -> None:
+        raise NotImplementedError("red: D-sched-2")
+
+    def exited(self, reason: str, runs_started: int) -> None:
+        raise NotImplementedError("red: D-sched-2")
