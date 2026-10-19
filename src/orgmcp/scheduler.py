@@ -18,8 +18,9 @@ from pathlib import Path
 from typing import Callable, NamedTuple
 
 from . import review, telemetry, templates
-from .app import wire_kiro, wire_processes, wire_stalls
+from .app import wire_attention, wire_kiro, wire_processes, wire_stalls
 from .app.wiring import open_runtime
+from .attention import Waiting
 from .core import ROOT, Org, OrgError, atomic_write
 from .health import config_number
 from .processes import ProcessTableError
@@ -265,24 +266,6 @@ def _exit_reason(org: Org) -> str:
     return reason if reason and not org.outstanding(ROOT) else ""
 
 
-class Waiting(NamedTuple):
-    """Why open root tasks cannot move without the user. ``text``: "waiting on you: ..."; ``options``: what the user can
-    do; ``settled``: False while the stall ladder (reminders to the holder) may still wake someone."""
-    text: str
-    options: str
-    settled: bool = True
-
-
-def _startable(org: Org, addr: str) -> bool:
-    """Could a scheduler start a run of ``addr`` now? (unread mail, budget, and not paused for another reason)"""
-    return org.runtime.runnable_query.startable(addr)
-
-
-def _names(addrs: list[str]) -> str:
-    shown = ", ".join(addrs[:3])
-    return shown + (f" and {len(addrs) - 3} more" if len(addrs) > 3 else "")
-
-
 def waiting_on_user(org: Org, *, running=None, blocked=(), can_start: bool = True) -> Waiting | None:
     """Is every open root task unable to progress without the user? None if not (or root has no open task).
 
@@ -290,49 +273,7 @@ def waiting_on_user(org: Org, *, running=None, blocked=(), can_start: bool = Tru
     the inflight mailboxes; ``can_start=False``: the run cap is spent), yet root still waits for a result. The holders
     are then paused for budget or repeated failures, or stalled with nothing happening, or gone. Read-only.
     """
-    tasks = org.outstanding(ROOT)
-    if not tasks:
-        return None
-    agents = org.agents()
-    if (set(running) if running is not None else {a for a in agents if org.running(a)}) or blocked:
-        return None
-    if can_start and any(_startable(org, a) for a in agents):
-        return None
-    nudges = org.runtime.nudge_ledger
-    steps = nudges.entries()
-    texts: list[str] = []
-    options: list[str] = []
-    settled = True
-    for t in tasks:
-        title = f'"{t.title}"'
-        team = [a for a in org.subtree(t.to) if a != ROOT] if org.exists(t.to) else []
-        if not team:
-            texts.append(f"{title} needs a decision ({t.to} no longer exists)")
-            continue
-        holding = [a for a in team if org.unread(a) or org.open_tasks(a)]
-        failing = [a for a in holding if org.paused(a) not in (None, "budget")]
-        short = [a for a in holding if a not in failing and (org.budget(a) or 0) <= 0]
-        if failing:
-            texts.append(f"{title} needs you to resume {_names(failing)} (it keeps failing)")
-            options.append(f"a human runs `orgmcp resume {failing[0]}` and you call start()")
-        elif short:
-            texts.append(f"{title} needs budget ({_names(short)} out of runs)")
-            options.append(f'grant runs with send(to="{t.to}", body="<why>", budget=N), then call start()')
-        else:
-            stalled = [a for a in team if org.open_tasks(a) and not org.outstanding(a)]
-            who = f"{_names(stalled)} holds it and nothing is running" if stalled else "nothing is running"
-            texts.append(f"{title} needs a decision ({who})")
-            options.append(f'send(to="{t.to}", body=<instructions or a changed task>) and call start()')
-            for a in stalled:  # the stall ladder (reminder, then escalation up to root) may still wake the holder
-                for task in org.open_tasks(a):
-                    last = steps.get(task.id)
-                    if (last["step"] if last else -1) < len(nudges.chain(a, task)) - 1:
-                        settled = False
-    if not can_start:
-        texts.append("the run cap (max_runs) was reached")
-        options.append("start() again with a higher max_runs")
-    choices = "; or ".join(dict.fromkeys(options + ["accept what exists so far (the task stays open: tell the user, and stop() the scheduler)"]))
-    return Waiting("waiting on you: " + "; ".join(texts), "Your options: " + choices + ".", settled)
+    return wire_attention.waiting_on_user_of(org.runtime).analyze(running=running, blocked=blocked, can_start=can_start)
 
 
 def start_scheduler(org: Org, max_runs: int | None = None, until_done: bool = False) -> int:
@@ -883,4 +824,4 @@ def _stray_probe(org: Org, addr: str) -> dict:
 
 def nothing_to_do(org: Org) -> bool:
     """Would an until-done scheduler exit at once? (root has no open task and no agent has work it could start)"""
-    return Scheduler(org, echo=lambda _: None).finished()
+    return wire_attention.open_work_of(org.runtime).nothing_to_do()

@@ -878,7 +878,13 @@ class HumanQueue(Protocol):
 class OpenWork(Protocol):
     def nothing_to_do(self) -> bool: """Root has no open task and no agent could start."""
 ```
-Impl: `RootTaskWaitingOnUser`, `InboxHumanQueue`, `RunnableOpenWork`.
+Impl: `RootTaskWaitingOnUser(TaskQuery, AgentDirectory, MailboxReader, PauseStore, BudgetQuery, RunnableQuery, NudgeLedger)`, `InboxHumanQueue(MailboxReader)`,
+`RunnableOpenWork(TaskQuery, RunnableQuery)`; private `_text` (`section`, `summary`, `short`: the line of a message, copied from `progress` whose own
+copies stay until C-progress). `OpenWork` does not look at runs in flight (a fresh scheduler has none); `WaitingOnUser`'s default `running` is the agents
+with a batch in flight. `testing.py`: `AttentionWorld` (the real budgets and runnable query over disk and over memory; `eligibility.testing.runnable_over`
+builds the query over a consumer's own ports), `FixedWaiting`, `ListHumanQueue`, `FixedOpenWork`. The legacy functions (`scheduler.waiting_on_user`,
+`nothing_to_do`, `progress._human_items`) build the objects over the ports of the runtime in force (`wire_attention.*_of`), since tests and the dashboard's
+lenient `Org` replace parts of `org.runtime`.
 
 ### 3.29 `daemon`
 

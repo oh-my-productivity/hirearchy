@@ -17,9 +17,11 @@ from typing import cast
 
 from ..agents import AgentDirectory, CharterReader
 from ..agents.testing import fs_agents
+from ..budget import BudgetQuery
 from ..budget.testing import FixedBudget
 from ..kernel import RUNTIME, EventSink, Message, OrgPaths, clip, norm
 from ..kernel.testing import ListEventSink, MemoryLedgerStore, fs_ledger_store
+from ..mail import MailboxReader
 from ..mail.testing import MailHarness, MemoryMailbox, fs_mailbox, memory_mailbox
 from ._caching import CachingPauseStore
 from ._failures import LedgerFailureCounter
@@ -248,6 +250,11 @@ def memory_world(tmp_path: Path) -> EligibilityWorld:
     box = mail.reader
     assert isinstance(box, MemoryMailbox)
     return _world(mail, box.agents, box.agents, memory_pauses(tmp_path))
+
+
+def runnable_over(agents: AgentDirectory, mail: MailboxReader, pauses: PauseStore, budgets: BudgetQuery) -> RunnableQuery:
+    """The real ``RunnableQuery`` over the given ports: what a consumer's test (``attention``) needs to ask what may start in its own organization."""
+    return DerivedRunnableQuery(agents, mail, pauses, budgets)
 
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
