@@ -661,9 +661,17 @@ def test_a_refusal_keeps_the_trace_of_the_task_it_names(org):
     assert bad[0]["trace"] == task.id and "final" in bad[0]["error"]
 
 
-def test_unexpected_exceptions_are_recorded_by_class(org, monkeypatch):
+def test_unexpected_exceptions_are_recorded_by_class(org):
+    import dataclasses
+
+    from orgmcp.overview import OrgTree
+
+    class BrokenTree(OrgTree):  # the tree of the status tool is the port of the runtime, not a method of the facade
+        def tree(self) -> str:
+            return 1 / 0
+
+    org.runtime = dataclasses.replace(org.runtime, org_tree=BrokenTree())
     server = agent_server(org)
-    monkeypatch.setattr(Org, "tree", lambda self: 1 / 0)
     with pytest.raises(Exception):
         call(server, "status")
     (bad,) = [c for c in read_events(org, "tool.call") if not c["ok"]]

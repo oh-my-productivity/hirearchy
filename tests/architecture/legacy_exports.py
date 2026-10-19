@@ -38,9 +38,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "datetime"  # imported by the flat module, replaced by the golden fixtures (tests/golden/conftest.py): a public name of the package
     ),
     "server": _e3(
-        "INSTRUCTIONS ROOT_INSTRUCTIONS DS_STORE OrgBinding instrument_tools root_instructions build_server "
-        "register_service_tools register_client_tools register_owner_tools setup_state register_root_tools "
-        "resolve_binding serve"
+        "INSTRUCTIONS ROOT_INSTRUCTIONS DS_STORE OrgBinding build_server resolve_binding serve"
     ),
     "cli": _e3(
         "cmd_init cmd_hire cmd_task cmd_services cmd_define_service cmd_request cmd_feedback cmd_retire_service "

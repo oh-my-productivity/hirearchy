@@ -1,0 +1,154 @@
+"""Standing services, by role, so a plain worker sees none of them: root and every agent that has direct reports or may hire get ``services``,
+``define_service``, ``request`` and ``feedback``; an agent that offers a service gets ``services`` and ``revise_playbook``."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from ..agents import AgentDirectory, CharterReader
+from ..budget import BudgetQuery
+from ..kernel import ROOT, Provider, parent
+from ..reflection import ServiceReports
+from ..services import ServiceCatalog, ServiceCommands
+from ._ports import ServiceRoles, SetupMode, ToolGroup
+
+if TYPE_CHECKING:
+    from mcp.server.fastmcp import FastMCP
+
+
+class DirectoryServiceRoles(ServiceRoles):
+    """Who needs the service tools, from the directory, the charters and the catalog of services (decided when the server starts)."""
+
+    def __init__(
+        self, setup: SetupMode, directory: Provider[AgentDirectory], charters: Provider[CharterReader], catalog: Provider[ServiceCatalog],
+    ) -> None:
+        self._setup = setup
+        self._directory = directory
+        self._charters = charters
+        self._catalog = catalog
+
+    def manager(self, me: str) -> bool:
+        if me == ROOT:
+            return True
+        if self._setup.active():
+            return False
+        return bool(self._directory().children(me) or self._charters().charter(me)[0].get("can_hire"))
+
+    def owner(self, me: str) -> bool:
+        return not self._setup.active() and me != ROOT and bool(self._catalog().service_names(me))
+
+
+class ServiceTools(ToolGroup):
+    def __init__(
+        self, roles: ServiceRoles, reports: Provider[ServiceReports], commands: Provider[ServiceCommands], budgets: Provider[BudgetQuery],
+    ) -> None:
+        self._roles = roles
+        self._reports = reports
+        self._commands = commands
+        self._budgets = budgets
+
+    def register(self, mcp: FastMCP, me: str) -> None:
+        manager, owner = self._roles.manager(me), self._roles.owner(me)
+        if not (manager or owner):
+            return
+
+        @mcp.tool()
+        def services() -> str:
+            """The standing services you can request from your direct reports and the ones you offer, with contract and
+        playbook versions, inputs, budget per request and the record so far (requests, outcomes, runs, feedback)."""
+            return self._reports().services_text(me)
+
+        if manager:
+            self._register_client_tools(mcp, me)
+        if owner:
+            self._register_owner_tools(mcp, me)
+
+    def _register_client_tools(self, mcp: FastMCP, me: str) -> None:
+        @mcp.tool()
+        def define_service(
+            owner: str,
+            name: str,
+            description: str | None = None,
+            acceptance: list[str] | None = None,
+            deliverable: dict | None = None,  # type: ignore[type-arg]
+            budget: int | None = None,
+            inputs: list[dict] | None = None,  # type: ignore[type-arg]
+            playbook: str | None = None,
+            locked: bool | None = None,
+            notes: str | None = None,
+            add_acceptance: list[str] | None = None,
+            remove_acceptance: list[str] | None = None,
+        ) -> str:
+            """Define a standing service of one of your direct reports (root: a top-level agent), or amend its contract.
+
+        You are the client: the contract is yours; the owner cannot change it. owner: the report. name: lowercase-dashed,
+        unique among your reports' services. FIRST definition needs description (one line), acceptance (concrete,
+        checkable criteria that travel with every request), deliverable ({description, format?, max_words?, path?
+        (absolute)}) and budget (runs handed down with each request); optional: inputs ([{name, description, required
+        (default true)}] the requester fills in), playbook (markdown workflow, first definition only), locked (true = the
+        owner may not revise the playbook), notes (free text for the owner).
+        AMENDMENT (the service exists): pass only what changes, the rest stays. To add a lasting requirement:
+        `add_acceptance=[<criterion>]`; to drop one: `remove_acceptance=[<its exact text>]`; `acceptance` replaces
+        all (not together with add/remove). The old contract is archived and the owner quietly told what changed; the
+        reply lists the criteria now in force. An amendment that changes nothing is refused.
+        """
+            return self._commands().define_service(
+                me, owner, name, description=description, inputs=inputs, acceptance=acceptance,
+                deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,
+                add_acceptance=add_acceptance, remove_acceptance=remove_acceptance,
+            )
+
+        @mcp.tool()
+        def request(
+            service: str,
+            inputs: dict | None = None,  # type: ignore[type-arg]
+            title: str = "",
+            note: str = "",
+            extra_acceptance: list[str] | None = None,
+            budget: int | None = None,
+            revises: str | None = None,
+        ) -> str:
+            """Ask a direct report for one of its services (see `services`): a task built from the contract.
+
+        inputs: {input name: value}; required ones must be present. note: free text for the owner. extra_acceptance:
+        criteria added after the contract's (the contract's always apply). budget: runs handed down (default: the
+        contract's; the usual reserve rule applies). revises: id of an earlier request of this service to send back for
+        rework; the reply then states the case total (runs used by the whole chain, runs handed down, the contract's
+        budget per request) and tells you to inform the user when the case exceeds that budget. Returns the task id;
+        the result comes back like any result, then rate it with `feedback`.
+        """
+            msg = self._commands().request(me, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance,
+                                           budget=budget, revises=revises)
+            tail = "Call start() if the scheduler is not running." if me == ROOT else f"Your budget is now {self._budgets().budget(me)}."
+            total = self._reports().case_total(msg) if revises else ""
+            return (f"requested service `{service}` from {msg.to}: task {msg.id}, budget {msg.budget} "
+                    f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}" + (f"\n{total}" if total else ""))
+
+        @mcp.tool()
+        def feedback(task_id: str, verdict: str, note: str = "") -> str:
+            """Tell the owner of a service whether a delivered request was good: verdict "accept" or "reject".
+
+        task_id: a service request (or rework) you sent that has a result. note: required for reject (what was wrong),
+        optional for accept. It costs no run and does not wake the owner; it shows up in the evidence the owner reviews
+        before its next request (and the moment a rejection arrives). Give it on your own judgement of each delivery,
+        also on a rework: every verdict stays in the case's history, the latest one is the final verdict, and an
+        earlier reject is still shown to the owner with your words. Feedback is for reflection only: it never waives an
+        acceptance criterion or changes the outcome of the request.
+        """
+            msg = self._commands().feedback(me, task_id, verdict, note)
+            return f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}); it does not wake {msg.to}"
+
+    def _register_owner_tools(self, mcp: FastMCP, me: str) -> None:
+        @mcp.tool()
+        def revise_playbook(service: str, content: str, reason: str) -> str:
+            """Write the next version of the playbook of a service you offer: how your team delivers it.
+
+        Only the owner can; refused when the contract is locked. content: the WHOLE new playbook in markdown (steps: who
+        does what, in which order, which check; budget plan; pitfalls), at most playbook_max_words (default 1000) words,
+        and different from the current one. reason: 1-400 characters naming the cases it rests on. The old version is
+        archived; your parent is told quietly. The playbook may raise the bar, never lower it: the acceptance criteria
+        come from the contract. Returns the new version, which applies from now on.
+        """
+            version = self._commands().revise_playbook(me, service, content, reason)
+            client = parent(me)
+            return f"playbook of `{service}` is now v{version}; {client} was told without being woken"

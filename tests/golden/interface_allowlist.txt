@@ -1,3 +1,2 @@
 # Classes with behaviour that do not yet subclass a typing.Protocol (see test_class_interfaces.py).
 # One module.Qualname per line. Refactor steps REMOVE entries; the end state is an empty list.
-orgmcp.server.OrgBinding
