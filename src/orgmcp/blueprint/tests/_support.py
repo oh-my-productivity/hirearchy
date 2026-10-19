@@ -11,8 +11,11 @@ from _pytest.mark import ParameterSet
 
 from orgmcp.blueprint.api import Role
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-blueprint-1")
-PENDING: set[str] = set()  # contract-suite implementations that are not green yet (expected to fail)
+RED = pytest.mark.xfail(strict=True, reason="red: C-blueprint-2")
+PENDING: set[str] = {
+    "renderer_over_packaged_roles", "renderer_over_memory_roles", "applier_over_memory_directories", "applier_over_disk_directories",
+    "provisioner_on_disk",
+}  # contract-suite implementations that are not green yet (expected to fail)
 T = TypeVar("T")
 
 
