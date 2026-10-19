@@ -11,6 +11,7 @@ from typing import Any
 import pytest
 
 from orgmcp.app import Org
+from orgmcp.app.wiring import open_runtime
 from orgmcp.budget import AllocationPolicy, BudgetQuery, BudgetReclaimer
 from orgmcp.kernel import Message, OrgError
 
@@ -124,7 +125,7 @@ def test_reclaim_comes_from_the_reclaimer_of_the_runtime(org: Org) -> None:
 
 def test_what_the_dispatch_slice_hands_down_goes_through_the_policy(org: Org) -> None:
     policy = Policy()
-    use(org, allocation_policy=policy)
+    org.runtime = open_runtime(org.root, {AllocationPolicy: policy})  # `send` and `delegate` are rules built from the policy: it is replaced where built
     task = org.delegate("root", "ceo", "T", "g", "a")
     assert task.budget == 4 and ("default_budget", "root") in policy.calls
     org.delegate("ceo", "ceo/eng", "t", "g", "a", budget=1)
