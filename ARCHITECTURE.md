@@ -680,7 +680,13 @@ class Retirement(Protocol):
     def retire(self, actor: str, name: str, reason: str) -> str: """retire_team(...).addr."""
     def retire_team(self, actor: str, name: str, reason: str) -> Retired: """Fail the team's open tasks upward, refund unspent budget to the parent, archive, emit agent.retire."""
 ```
-Impl: `RuleHiring`, `RuleRetirement`.
+Impl: `RuleHiring(AgentDirectory, CharterReader, AgentRegistry, AgentSlots, OrgSettings, DocumentTemplates, AccessScopes, AuthorityPolicy, ModelResolver,
+Clock, EventSink)`, `RuleRetirement(AgentDirectory, AgentRegistry, TaskQuery, BudgetQuery, MessageDelivery, Notices, Clock, EventSink)`; `Retired` is defined in
+`hierarchy/api.py` (the facade mixin and `orgmcp.core` re-export it). `AgentSlots` (`occupied(addr) -> bool`; `FsAgentSlots(OrgLayout)`) is hierarchy's own,
+narrower port for the one thing `hire` needs that `AgentDirectory.exists` does not say: something is at the place of the agent (a directory without
+`AGENT.md`, a stray file) and hiring there would collide ("`<addr>` already exists" as it always was). It is built by `wire_hierarchy`, not a runtime field.
+Test support: `HierarchyWorld` over disk (`fs_world`) and over memory (`memory_world`) with a `FixedBudget`; no run logs are needed, so hierarchy does not depend
+on `runs`.
 
 ### 3.20 `dispatch`
 

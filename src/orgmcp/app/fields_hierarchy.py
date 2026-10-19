@@ -4,10 +4,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-STEP: str | None = None  # set to the step's name when the step fills this part (see test_runtime_fields)
+from ..hierarchy import Hiring, Retirement
+
+STEP: str | None = "B-hierarchy"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
 
 
 @dataclass(frozen=True)
 class Fields:
-    """No field yet: the step that gives the package its ports adds them here."""
+    hiring: Hiring
+    retirement: Retirement
