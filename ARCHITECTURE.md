@@ -1241,8 +1241,8 @@ queries as one object, plus `feed`, the event log the state keeps), `QueriesOpen
 organization is refused before the terminal is switched; `TextualScreenRunner` makes the Textual app and runs it. `DashApp(queries, interval)` (`_app.py`) is the moved code of
 `dashboard.py` with only its constructor changed; `_widgets.py`, `_render.py` and `_state.py` hold the rest of the module unchanged (typed for mypy strict). The stylesheet
 `dashboard.tcss` lives in the package (`DashApp.CSS_PATH` is relative to `_app.py`; the wheel carries it). `app/wire_dashboard.py` makes the queries from the `dashdata` fields of a
-`dashboard_runtime` (`RuntimeQueriesOpener`, `queries_of`) and the launcher (`dashboard_launcher`); the dashboard has no runtime field (`NOT_A_FIELD`), but its part
-`fields_dashboard` must be one of the bases of `OrgRuntime`. Legacy until E3: `DashApp(root, interval, now)` and `run_dashboard(root, interval)` in `_legacy.py` (thin over the wiring, found
+`dashboard_runtime` (`queries_of`, over `RuntimeQueriesOpener` of the private `app/_dashboard_queries.py`) and the launcher (`dashboard_launcher`); it imports the dashboard package (which loads Textual) only inside those
+functions, because every runtime loads every `wire_*` module; the dashboard has no runtime field (`NOT_A_FIELD`), but its part `fields_dashboard` must be one of the bases of `OrgRuntime`. Legacy until E3: `DashApp(root, interval, now)` and `run_dashboard(root, interval)` in `_legacy.py` (thin over the wiring, found
 late because an entry point may not import `orgmcp.app`) and `dashboard_data.DashData` / `render_once`, which the command line (`dash --once`) and the older tests still use.
 Screen goldens (`dashboard/tests/golden`, 34 plain-text screens) were taken from the flat module before it moved; the package draws the same text over both constructors.
 
