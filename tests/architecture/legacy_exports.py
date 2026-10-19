@@ -91,8 +91,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "plan_id CLIP GOAL_CLIP plan_for_user propose_text propose apply"
     ),
     "blueprint_examples": _e3(
-        "KINDS SCHEMA RESEARCH DOCUMENTS CODE ANALYSIS TEMPLATES SERVICE_SCHEMA SERVICE_HEAD SERVICE_TAIL "
-        "SERVICE_BODIES SERVICE_BUDGETS example"
+        "KINDS example"
     ),
     "templates": _e3(
         "ORG_RULES DEFAULT_MISSION org_rules charter_body task_body result_body notice_budget notice_budget_returned "

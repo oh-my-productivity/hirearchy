@@ -14,9 +14,7 @@ from orgmcp.blueprint.testing import plan_parts_over, role_library_of, StaticOrg
 from orgmcp.kernel.testing import DictEnvironment
 
 from ._plans import LABELS, base_dir, golden, scrub, template_at
-from ._support import RED, role
-
-pytestmark = RED
+from ._support import role
 
 
 def agents_of(label: str, tmp: Path) -> tuple[dict[str, object], list[Agent], dict[str, Split], Path]:

@@ -1,4 +1,4 @@
-"""What the skeletons already satisfy, and must keep satisfying: the classes of the second half subclass the interface they implement."""
+"""The classes of the second half subclass the interface they implement (rule D: every class with behaviour is a Protocol's)."""
 
 from __future__ import annotations
 
@@ -6,7 +6,6 @@ from orgmcp.blueprint import EXAMPLE_KINDS, api
 from orgmcp.blueprint._accesswords import PlainAccessWords
 from orgmcp.blueprint._applier import HiringBlueprintApplier
 from orgmcp.blueprint._basis import ValidatedPlanBasis
-from orgmcp.blueprint._budgeting import BudgetPlanner
 from orgmcp.blueprint._charters import CharterWriter
 from orgmcp.blueprint._details import TextPlanDetails
 from orgmcp.blueprint._examples import TemplateBlueprintExamples
@@ -39,12 +38,12 @@ CLASSES: list[tuple[type, type]] = [
     (TextPlanDetails, PlanDetailing), (TemplateBlueprintExamples, api.BlueprintExamples), (FirstTaskGiver, FirstTasking),
     (HashPlanIdentity, api.PlanIdentity), (StepsPlaybookWriter, PlaybookWriting), (FsWorkspaceProvisioner, api.WorkspaceProvisioner),
     (TextPlanRenderer, api.PlanRenderer), (PlaybookServiceDefiner, ServiceDefining), (CharterTeamBuilder, TeamBuilding),
-    (RetiringRollback, BuildUndoing), (TextUserPlan, UserPlanning), (ServiceWords, PlanWords), (BudgetPlanner, object),
+    (RetiringRollback, BuildUndoing), (TextUserPlan, UserPlanning), (ServiceWords, PlanWords),
 ]
 
 
 def test_every_class_of_the_second_half_subclasses_the_interface_it_implements() -> None:
-    assert [cls.__name__ for cls, port in CLASSES if port is not object and port not in cls.__mro__] == []
+    assert [cls.__name__ for cls, port in CLASSES if port not in cls.__mro__] == []
 
 
 def test_the_kinds_of_example_are_the_four_the_templates_come_in() -> None:

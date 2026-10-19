@@ -14,13 +14,28 @@ import pytest
 
 import orgmcp
 import orgmcp.blueprint as bpm
+from orgmcp import blueprint_examples
 import orgmcp.scheduler as scheduler
 from orgmcp.app import wire_blueprint, wiring
 from orgmcp.app._builder import Builder
-from orgmcp.blueprint import BlueprintLoader, BlueprintValidator, RoleLibrary
+from orgmcp.blueprint import (
+    BlueprintApplier,
+    BlueprintExamples,
+    BlueprintLoader,
+    BlueprintValidator,
+    PlanIdentity,
+    PlanRenderer,
+    RoleLibrary,
+    WorkspaceProvisioner,
+)
 from orgmcp.blueprint import _assembly
+from orgmcp.blueprint._applier import HiringBlueprintApplier
+from orgmcp.blueprint._examples import TemplateBlueprintExamples
 from orgmcp.blueprint._files import FsTextFiles
+from orgmcp.blueprint._identity import HashPlanIdentity
 from orgmcp.blueprint._loader import YamlBlueprintLoader
+from orgmcp.blueprint._provision import FsWorkspaceProvisioner
+from orgmcp.blueprint._render import TextPlanRenderer
 from orgmcp.blueprint._roles import PackagedRoleLibrary
 from orgmcp.blueprint._validator import RuleBlueprintValidator
 from orgmcp.kernel import Environment
@@ -113,3 +128,52 @@ def test_the_legacy_roots_use_the_temp_directory_of_the_moment(monkeypatch: pyte
     monkeypatch.setattr(tempfile, "gettempdir", lambda: str(tmp_path / "t"))
     assembly = _assembly.assembly_of(None)
     assert (tmp_path / "t").resolve() in assembly.roots.roots()
+
+
+def test_the_runtime_has_the_eight_ports_of_blueprint(tmp_path: Path) -> None:
+    runtime = wiring.open_runtime(tmp_path)
+    assert isinstance(runtime.role_library, PackagedRoleLibrary) and isinstance(runtime.blueprint_loader, YamlBlueprintLoader)
+    assert isinstance(runtime.blueprint_validator, RuleBlueprintValidator) and isinstance(runtime.plan_renderer, TextPlanRenderer)
+    assert isinstance(runtime.plan_identity, HashPlanIdentity) and isinstance(runtime.blueprint_applier, HiringBlueprintApplier)
+    assert isinstance(runtime.blueprint_examples, TemplateBlueprintExamples) and isinstance(runtime.workspace_provisioner, FsWorkspaceProvisioner)
+    for port, made in ((RoleLibrary, runtime.role_library), (BlueprintLoader, runtime.blueprint_loader), (BlueprintValidator, runtime.blueprint_validator),
+                       (PlanRenderer, runtime.plan_renderer), (PlanIdentity, runtime.plan_identity), (BlueprintApplier, runtime.blueprint_applier),
+                       (BlueprintExamples, runtime.blueprint_examples), (WorkspaceProvisioner, runtime.workspace_provisioner)):
+        assert isinstance(made, port)
+    assert list(tmp_path.iterdir()) == []  # building the ports does no I/O
+
+
+def test_the_renderer_and_the_applier_of_the_runtime_are_for_the_organization_it_is_built_for(tmp_path: Path) -> None:
+    from orgmcp.app import Org
+
+    org = Org.init(tmp_path / "org", "mission")
+    org.hire("root", "lead", "Lead", "charter", can_hire=True)
+    base = tmp_path / "base"
+    (base / "deliverables").mkdir(parents=True)
+    bp = bpm.load_text(blueprint_examples.example("research", str(base)))
+    plan = org.runtime.plan_renderer.render_plan(bp, allowed_roots=[base])
+    assert "already exists" in plan  # the runtime knows the agents of its organization: the name of the lead is taken
+    with pytest.raises(bpm.BlueprintError, match="already exists"):
+        org.runtime.blueprint_applier.apply(bp, allowed_roots=[base])
+
+
+def test_the_applier_of_the_runtime_builds_with_the_ports_it_is_given(tmp_path: Path) -> None:
+    from orgmcp.app import Org
+    from orgmcp.blueprint.testing import FlakyHiring
+    from orgmcp.hierarchy import Hiring
+    from orgmcp.kernel import OrgError
+
+    org = Org.init(tmp_path / "org", "mission")
+    flaky = FlakyHiring(org.runtime.hiring, fail_on=2)
+    runtime = wiring.open_runtime(org.root, {Hiring: flaky})
+    base = tmp_path / "base"
+    (base / "deliverables").mkdir(parents=True)
+    bp = bpm.load_text(blueprint_examples.example("research", str(base)))
+    with pytest.raises(OrgError, match="disk full"):
+        runtime.blueprint_applier.apply(bp, allowed_roots=[base])
+    assert org.agents() == []  # the first hire was taken back
+
+
+def test_the_legacy_examples_module_is_given_the_templates_when_the_application_package_is_loaded() -> None:
+    assert isinstance(blueprint_examples._installed, TemplateBlueprintExamples)
+    assert blueprint_examples.example("code", "/b") == TemplateBlueprintExamples().example("code", "/b")

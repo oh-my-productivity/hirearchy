@@ -10,6 +10,8 @@ from .api import Agent, BlueprintValidator, Issue
 
 
 class ValidatedPlanBasis(PlanBasis):
+    """The organization counts when it exists (it has a directory); before it does, the defaults apply and no name is taken."""
+
     def __init__(self, validator: BlueprintValidator, resolver: AgentResolution, roots: WorkspaceRoots, org: OrgContext) -> None:
         self._validator = validator
         self._resolver = resolver
@@ -17,7 +19,7 @@ class ValidatedPlanBasis(PlanBasis):
         self._org = org
 
     def issues(self, bp: Mapping[str, object], allowed_roots: Sequence[str | Path] | None) -> list[Issue]:
-        raise NotImplementedError
+        return self._validator.validate(bp, org_exists=self._org.root() is not None, allowed_roots=allowed_roots)
 
     def agents(self, bp: Mapping[str, object], allowed_roots: Sequence[str | Path] | None) -> list[Agent]:
-        raise NotImplementedError
+        return self._resolver.resolve(bp, self._org, self._roots.roots(allowed_roots), [])

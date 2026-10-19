@@ -6,9 +6,13 @@ import pytest
 import yaml
 
 from orgmcp import blueprint as bpm
+from orgmcp.app import wiring
 from orgmcp.blueprint import BlueprintError, Issue
+from orgmcp.blueprint.testing import FlakyHiring, FlakyTaskAssigner
 from orgmcp.cli import main
 from orgmcp.core import DEFAULT_MODEL, ROOT, Org, OrgError
+from orgmcp.dispatch import TaskAssigner
+from orgmcp.hierarchy import Hiring
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "blueprint-research.yaml"
 
@@ -37,6 +41,11 @@ def roots(tmp_path):
 @pytest.fixture
 def empty_org(tmp_path):
     return Org.init(tmp_path / "org", "bp tests", {"poll_seconds": 0.05})
+
+
+def apply_through(org, overrides):
+    """``org`` applied through other ports (the tests make one step fail this way): its runtime is opened again with the ports in ``overrides``."""
+    org.runtime = wiring.open_runtime(org.root, overrides)
 
 
 def code_bp(tmp_path):
@@ -540,33 +549,22 @@ def test_apply_twice_is_refused(base, roots, empty_org):
 
 
 @pytest.mark.parametrize("fail_on", [1, 3, 4])
-def test_apply_midway_hire_failure_leaves_no_agents(base, roots, empty_org, monkeypatch, fail_on):
-    real, calls = Org.hire, []
-
-    def flaky(self, *a, **kw):
-        calls.append(a)
-        if len(calls) == fail_on:
-            raise OrgError("disk full")
-        return real(self, *a, **kw)
-
-    monkeypatch.setattr(Org, "hire", flaky)
+def test_apply_midway_hire_failure_leaves_no_agents(base, roots, empty_org, fail_on):
+    apply_through(empty_org, {Hiring: FlakyHiring(empty_org.runtime.hiring, fail_on=fail_on)})
     with pytest.raises(OrgError, match="disk full"):
         bpm.apply(empty_org, base, allowed_roots=roots)
     assert empty_org.agents() == [] and empty_org.messages(ROOT, "inbox") == []
     assert not any(empty_org.exists(a) for a in ("lead", "lead/writer"))
 
 
-def test_apply_delegate_failure_rolls_back(base, roots, empty_org, monkeypatch):
-    def boom(self, *a, **kw):
-        raise OrgError("delegate failed")
-
-    monkeypatch.setattr(Org, "delegate", boom)
+def test_apply_delegate_failure_rolls_back(base, roots, empty_org):
+    apply_through(empty_org, {TaskAssigner: FlakyTaskAssigner(empty_org.runtime.task_assigner)})
     with pytest.raises(OrgError, match="delegate failed"):
         bpm.apply(empty_org, base, allowed_roots=roots)
     assert empty_org.agents() == []
 
 
-def test_apply_creates_missing_workspace_and_removes_it_on_failure(tmp_path, roots, empty_org, monkeypatch):
+def test_apply_creates_missing_workspace_and_removes_it_on_failure(tmp_path, roots, empty_org):
     bp = code_bp(tmp_path)
     bp["needs"]["workspace"] = str(tmp_path / "fresh")
     bpm.apply(empty_org, bp, allowed_roots=roots)
@@ -574,7 +572,7 @@ def test_apply_creates_missing_workspace_and_removes_it_on_failure(tmp_path, roo
 
     org2 = Org.init(tmp_path / "org2")
     bp["needs"]["workspace"] = str(tmp_path / "fresh2")
-    monkeypatch.setattr(Org, "delegate", lambda self, *a, **k: (_ for _ in ()).throw(OrgError("nope")))
+    apply_through(org2, {TaskAssigner: FlakyTaskAssigner(org2.runtime.task_assigner, error="nope")})
     with pytest.raises(OrgError):
         bpm.apply(org2, bp, allowed_roots=roots)
     assert not (tmp_path / "fresh2").exists() and org2.agents() == []

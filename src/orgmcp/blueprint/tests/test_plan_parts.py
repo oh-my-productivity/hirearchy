@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -16,9 +17,6 @@ from orgmcp.kernel.testing import DictEnvironment
 from orgmcp.services.testing import normalizer
 
 from ._plans import base_dir, template_at
-from ._support import RED
-
-pytestmark = RED
 
 
 def basis_over(tmp: Path, org: StaticOrgContext) -> PlanBasis:
@@ -45,7 +43,7 @@ def test_the_agents_are_the_resolved_ones_parents_first(tmp_path: Path) -> None:
 def test_the_agents_of_a_blueprint_with_problems_are_those_that_can_be_resolved(tmp_path: Path) -> None:
     base = base_dir(tmp_path)
     bp = load_text(template_at("research", "filled", base))
-    bp["agents"][0]["children"][0]["template"] = "wizard"
+    cast(list[dict[str, object]], cast(list[dict[str, object]], bp["agents"])[0]["children"])[0]["template"] = "wizard"
     agents = basis_over(tmp_path, StaticOrgContext()).agents(bp, [base])
     assert [a.addr for a in agents] == ["lead", "lead/researcher", "lead/writer", "lead/factcheck"]  # (the problem is told by the issues, not by dropping the agent)
 

@@ -10,9 +10,6 @@ from orgmcp.blueprint._examples import TemplateBlueprintExamples
 from orgmcp.kernel import OrgError
 
 from ._plans import FIXED_BASE, LABELS, golden
-from ._support import RED
-
-pytestmark = RED
 
 
 @pytest.fixture

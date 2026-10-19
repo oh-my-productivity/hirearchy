@@ -13,10 +13,7 @@ from orgmcp.blueprint._playbooks import StepsPlaybookWriter
 from orgmcp.blueprint._protocols import PlaybookWriting
 
 from ._plans import base_dir, golden, scrub
-from ._support import RED
 from .test_charters import agents_of
-
-pytestmark = RED
 
 SERVICES = [key for key in golden()["playbooks"]]
 

@@ -57,8 +57,8 @@ def test_a_plain_task_hires_the_team_parents_first_and_gives_the_task_to_the_top
 def test_the_agents_are_hired_with_what_the_plan_gave_them(h: ApplierHarness) -> None:
     h.applier.apply(bp_of("research/filled", h), allowed_roots=[base_dir(h.tmp)])
     researcher = next(c for c in h.log.of("hire") if c.args[1] == "researcher")
-    assert researcher.args[2] == "Researcher" and researcher.kwargs["tools"] == ["web_search", "web_fetch"]
-    assert researcher.kwargs["model"] and researcher.kwargs["can_hire"] is False and researcher.kwargs["max_children"] == 5
+    assert researcher.args[2] == "Researcher" and researcher.kwargs["tools"] == ["web_fetch", "web_search"]  # (sorted)
+    assert researcher.kwargs["model"] and researcher.kwargs["can_hire"] is False and researcher.kwargs["max_children"] == 0
     assert researcher.kwargs["workspace"] is None and researcher.kwargs["inputs"] is None
     lead = h.log.of("hire")[0]
     assert lead.kwargs["can_hire"] is True
@@ -88,7 +88,7 @@ def test_services_are_defined_for_the_top_agent_with_their_contract_and_playbook
     assert scrub(str(define.kwargs["playbook"]), base) == golden()["playbooks"]["research-service/my-service"]
     assert summary.services == ["my-service"] and summary.task_id == "" and summary.budget == 0 and summary.to == "lead"
     assert h.log.of("commit")[0].args == ("root: applied blueprint (4 agents), no task, services: my-service",)
-    assert summary.text().splitlines()[-1].startswith("no task was given: the services are ready")
+    assert "no task was given: the services are ready and nothing runs yet." in summary.text()
 
 
 def test_a_playbook_the_blueprint_gives_is_used_stripped_and_the_lock_is_kept(h: ApplierHarness) -> None:
@@ -202,17 +202,17 @@ def code_bp(h: ApplierHarness, workspace: Path) -> dict[str, object]:
 
 
 def test_a_workspace_that_is_not_there_is_made_before_the_hire_that_needs_it(h: ApplierHarness) -> None:
-    workspace = base_dir(h.tmp) / "fresh" / "ws"
+    workspace = base_dir(h.tmp) / "fresh"
     h.applier.apply(code_bp(h, workspace), allowed_roots=[base_dir(h.tmp)])
-    assert h.dir_exists(workspace) and h.dir_exists(workspace.parent)
+    assert h.dir_exists(workspace)
 
 
-def test_a_workspace_made_by_a_call_that_failed_is_removed_again_with_the_parents_it_made(h: ApplierHarness) -> None:
-    workspace = base_dir(h.tmp) / "fresh2" / "ws"
+def test_a_workspace_made_by_a_call_that_failed_is_removed_again(h: ApplierHarness) -> None:
+    workspace = base_dir(h.tmp) / "fresh2"
     applier = h.with_ports(tasks=FlakyTaskAssigner(h.ports.tasks, error="nope"))
     with pytest.raises(OrgError, match="nope"):
         applier.apply(code_bp(h, workspace), allowed_roots=[base_dir(h.tmp)])
-    assert not h.dir_exists(workspace) and not h.dir_exists(workspace.parent) and h.dir_exists(base_dir(h.tmp)) and h.agents.children("root") == []
+    assert not h.dir_exists(workspace) and h.dir_exists(base_dir(h.tmp)) and h.agents.children("root") == []
 
 
 def test_a_workspace_that_was_there_stays(h: ApplierHarness) -> None:

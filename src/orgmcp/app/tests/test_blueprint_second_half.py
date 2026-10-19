@@ -20,7 +20,6 @@ from orgmcp.kernel import OrgError
 from orgmcp.services import ServiceCommands
 
 from orgmcp.blueprint.tests._plans import KEYS, base_dir, golden, scrub, template_at
-from orgmcp.blueprint.tests._support import RED
 
 
 def bp_of(key: str, base: Path) -> dict[str, object]:
@@ -86,7 +85,6 @@ def test_the_examples_module_serves_the_templates_of_the_package() -> None:
         assert blueprint_examples.example(kind, "/golden/base", bool(service)) == golden()["examples"][name]
 
 
-@RED
 def test_the_examples_module_defines_no_template_text() -> None:
     names = set(vars(blueprint_examples))
     assert not {"SCHEMA", "RESEARCH", "DOCUMENTS", "CODE", "ANALYSIS", "TEMPLATES", "SERVICE_SCHEMA", "SERVICE_HEAD", "SERVICE_TAIL", "SERVICE_BODIES",

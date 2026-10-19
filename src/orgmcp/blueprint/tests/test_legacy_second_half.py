@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import ast
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -14,7 +15,6 @@ import orgmcp.blueprint as bpm
 from orgmcp.blueprint import _legacy, api
 
 from ._plans import base_dir, golden, scrub, template_at
-from ._support import RED
 
 
 def bp_of(key: str, base: Path) -> dict[str, object]:
@@ -37,8 +37,9 @@ def test_the_playbook_function_is_the_class_text(tmp_path: Path) -> None:
     base = base_dir(tmp_path)
     bp = bp_of("research-service/filled", base)
     agents = bpm._resolve(bp, None, [base], [])
-    budget = bpm.service_budget(bp["services"][0], bpm.estimate(agents)["total"], 25)  # type: ignore[index]
-    assert scrub(bpm.default_playbook(agents[0], agents, bp["services"][0], budget), base) == golden()["playbooks"]["research-service/my-service"]  # type: ignore[index]
+    service = cast(list[dict[str, object]], bp["services"])[0]
+    budget = bpm.service_budget(service, cast(int, bpm.estimate(agents)["total"]), 25)
+    assert scrub(bpm.default_playbook(agents[0], agents, service, budget), base) == golden()["playbooks"]["research-service/my-service"]
 
 
 def test_the_private_helper_of_the_user_block_is_the_words_of_the_access_report() -> None:
@@ -61,17 +62,14 @@ def defined_in_legacy() -> set[str]:
 
 
 @pytest.mark.parametrize("name", MOVED)
-@RED
 def test_a_helper_that_a_class_replaced_is_not_defined_in_the_legacy_module_any_more(name: str) -> None:
     assert name not in defined_in_legacy()
 
 
-@RED
 def test_the_summary_is_the_one_of_the_api() -> None:
     assert bpm.Summary is api.Summary and "Summary" not in defined_in_legacy()
 
 
-@RED
 def test_the_legacy_module_is_nothing_but_adapters_and_constants() -> None:
     tree = ast.parse(Path(_legacy.__file__).read_text(encoding="utf-8"))
     assert not [n.name for n in tree.body if isinstance(n, ast.ClassDef)]

@@ -13,30 +13,46 @@ import importlib
 import sys
 import tempfile
 from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
+from .. import blueprint_examples
 from ..agents import AgentDirectory
-from ..blueprint import BlueprintLoader, BlueprintValidator, RoleLibrary
+from ..blueprint import (
+    BlueprintApplier,
+    BlueprintExamples,
+    BlueprintLoader,
+    BlueprintValidator,
+    PlanIdentity,
+    PlanRenderer,
+    RoleLibrary,
+    WorkspaceProvisioner,
+)
 from ..blueprint._access import PolicyAccessReport
-from ..blueprint._assembly import LegacyParts
+from ..blueprint._assembly import LegacyParts, PlanParts, applier_over, plan_parts
 from ..blueprint._assembly import install_legacy_parts as install
 from ..blueprint._budgeting import BudgetPlanner
+from ..blueprint._examples import TemplateBlueprintExamples
 from ..blueprint._files import FsTextFiles
 from ..blueprint._loader import YamlBlueprintLoader
 from ..blueprint._org import NoOrgContext, PresentOrAbsentOrg, RuntimeOrgContext
 from ..blueprint._pathcheck import RootedPathChecker
+from ..blueprint._provision import FsWorkspaceProvisioner
 from ..blueprint._resolver import AgentResolver
 from ..blueprint._roles import PackagedRoleLibrary
 from ..blueprint._roots import EnvironmentWorkspaceRoots
 from ..blueprint._service_rules import ServiceBlueprintRules
 from ..blueprint._validator import RuleBlueprintValidator
+from ..dispatch import TaskAssigner
+from ..hierarchy import Hiring, Retirement
 from ..kernel import Environment, OrgLayout
 from ..kernel._system import OsEnvironment
 from ..kiro import ConfinementPolicy
-from ..services import ContractNormalizer, ServiceCatalog
+from ..services import ContractNormalizer, ServiceCatalog, ServiceCommands
 from ..services._normalizer import TextContractNormalizer
 from ..settings import OrgSettings
+from ..snapshots import OrgSnapshotter
 from ._builder import Builder
 
 
@@ -80,23 +96,60 @@ def legacy_parts() -> LegacyParts:
 
 
 def install_legacy_parts() -> None:
-    """Hand the legacy parts to ``blueprint``; ``fields_blueprint`` calls this when the application package is loaded."""
+    """Hand the legacy parts to ``blueprint`` (and the templates to the legacy ``blueprint_examples``); ``fields_blueprint`` calls this when the
+    application package is loaded."""
     install(legacy_parts())
+    blueprint_examples._install(TemplateBlueprintExamples())
 
 
 def register(b: Builder) -> None:
     b.provide(RoleLibrary, lambda b: PackagedRoleLibrary(roles_dir()))
     b.provide(BlueprintLoader, lambda b: YamlBlueprintLoader(FsTextFiles()))
     b.provide(BlueprintValidator, _validator)
+    b.provide(PlanRenderer, lambda b: _plan(b).renderer)
+    b.provide(PlanIdentity, lambda b: _plan(b).identity)
+    b.provide(WorkspaceProvisioner, lambda b: FsWorkspaceProvisioner())
+    b.provide(BlueprintExamples, lambda b: TemplateBlueprintExamples())
+    b.provide(BlueprintApplier, _applier)
+
+
+@dataclass(frozen=True)
+class Checking:
+    """The parts that check a blueprint, made over the ports of the runtime: the validator and the plan side are made of the same ones."""
+
+    paths: RootedPathChecker
+    budgets: BudgetPlanner
+    access: PolicyAccessReport
+    resolver: AgentResolver
+    roots: EnvironmentWorkspaceRoots
+    org: RuntimeOrgContext
+
+
+def _checking(b: Builder) -> Checking:
+    environment = b.get(Environment)
+    paths = RootedPathChecker(environment)
+    org = RuntimeOrgContext(b.get(OrgSettings), b.get(AgentDirectory), b.get(ServiceCatalog), b.get(OrgLayout))
+    return Checking(
+        paths, BudgetPlanner(), PolicyAccessReport(b.get(ConfinementPolicy)), AgentResolver(b.get(RoleLibrary), paths),
+        EnvironmentWorkspaceRoots(environment, temp_dir), org,
+    )
 
 
 def _validator(b: Builder) -> BlueprintValidator:
-    environment = b.get(Environment)
-    paths = RootedPathChecker(environment)
-    budgets = BudgetPlanner()
-    org = RuntimeOrgContext(b.get(OrgSettings), b.get(AgentDirectory), b.get(ServiceCatalog), b.get(OrgLayout))
+    c = _checking(b)
     return RuleBlueprintValidator(
-        AgentResolver(b.get(RoleLibrary), paths), paths, budgets, PolicyAccessReport(b.get(ConfinementPolicy)),
-        ServiceBlueprintRules(b.get(ContractNormalizer), paths, budgets), EnvironmentWorkspaceRoots(environment, temp_dir),
-        PresentOrAbsentOrg(org, NoOrgContext()),
+        c.resolver, c.paths, c.budgets, c.access, ServiceBlueprintRules(b.get(ContractNormalizer), c.paths, c.budgets), c.roots,
+        PresentOrAbsentOrg(c.org, NoOrgContext()),
+    )
+
+
+def _plan(b: Builder) -> PlanParts:
+    c = _checking(b)
+    return plan_parts(b.get(BlueprintLoader), b.get(BlueprintValidator), c.resolver, c.roots, c.budgets, c.access, b.get(ContractNormalizer), c.org)
+
+
+def _applier(b: Builder) -> BlueprintApplier:
+    return applier_over(
+        _plan(b), BudgetPlanner(), b.get(ContractNormalizer), b.get(Hiring), b.get(Retirement), b.get(AgentDirectory), b.get(ServiceCommands),
+        b.get(TaskAssigner), b.get(OrgSnapshotter), b.get(WorkspaceProvisioner),
     )

@@ -14,9 +14,6 @@ from orgmcp.blueprint._identity import HashPlanIdentity
 
 from . import _corpus
 from ._plans import LABELS, fill, golden
-from ._support import RED
-
-pytestmark = RED
 
 
 @pytest.fixture

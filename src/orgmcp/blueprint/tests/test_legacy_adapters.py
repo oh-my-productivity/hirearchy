@@ -107,10 +107,11 @@ def test_a_private_helper_that_a_class_replaced_is_not_defined_in_the_legacy_mod
     assert name not in defined_in_legacy()
 
 
-def test_what_the_legacy_module_still_defines_are_the_adapters_and_the_second_half() -> None:
+def test_what_the_legacy_module_defines_are_the_adapters_of_the_classes() -> None:
     adapters = {"role_names", "get_role", "load", "load_text", "_resolve", "validate", "org_files_readable", "access_facts", "_access", "estimate",
-                "planned_total", "budget_split", "service_budget", "_svc_budgets"}
-    assert adapters <= defined_in_legacy() and {"ROLES_DIR", "plan_id", "render_plan", "apply", "Summary"} <= defined_in_legacy()
+                "planned_total", "budget_split", "service_budget", "_svc_budgets", "default_playbook", "plan_id", "_agent_access", "render_plan",
+                "plan_for_user", "propose_text", "propose", "apply"}
+    assert defined_in_legacy() == adapters | {"ROLES_DIR"}
 
 
 def test_the_constants_the_legacy_module_exports_are_the_ones_of_the_classes() -> None:

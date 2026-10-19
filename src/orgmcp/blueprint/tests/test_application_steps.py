@@ -27,9 +27,6 @@ from orgmcp.blueprint.testing import (
 from orgmcp.kernel import OrgError
 from orgmcp.services.testing import normalizer
 
-from ._support import RED
-
-pytestmark = RED
 
 
 class FixedCharters:
@@ -90,9 +87,9 @@ def test_a_workspace_that_is_not_there_is_made_first_and_remembered_deepest_firs
 
 def test_a_workspace_that_is_there_is_left_alone(tmp_path: Path) -> None:
     builder, _, dirs, _ = team(tmp_path)
-    built = Built()
+    built, before = Built(), set(dirs.dirs)
     builder.build([agent("a", workspace=str(tmp_path))], {}, {}, built)
-    assert built.made_dirs == [] and dirs.dirs == {Path("/"), tmp_path}
+    assert built.made_dirs == [] and dirs.dirs == before
 
 
 def test_what_was_made_before_a_failure_is_recorded_for_the_rollback(tmp_path: Path) -> None:
