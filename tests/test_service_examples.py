@@ -10,7 +10,7 @@ import yaml
 from orgmcp import blueprint as bpm
 from orgmcp import blueprint_examples as ex
 from orgmcp import services as services_mod
-from orgmcp.core import ROOT, Org
+from orgmcp.core import ROOT, Org, OrgError
 from orgmcp.server import build_server, resolve_binding
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -95,7 +95,7 @@ def test_the_plain_templates_are_unchanged_by_the_service_option(tmp_path):
 
 
 def test_example_rejects_an_unknown_kind_with_service_too(tmp_path):
-    with pytest.raises(bpm.OrgError, match="unknown kind 'poetry'"):
+    with pytest.raises(OrgError, match="unknown kind 'poetry'"):
         ex.example("poetry", tmp_path, service=True)
 
 

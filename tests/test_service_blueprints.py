@@ -10,7 +10,7 @@ import yaml
 from orgmcp import blueprint as bpm
 from orgmcp import services as services_mod
 from orgmcp.cli import main
-from orgmcp.core import ROOT, Org
+from orgmcp.core import ROOT, Org, OrgError
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 RESEARCH = ROOT_DIR / "examples" / "blueprint-research.yaml"
@@ -498,9 +498,9 @@ def test_apply_two_services_and_the_default_budget(svc_bp, roots, empty_org):
 
 def test_apply_rolls_back_agents_when_a_service_cannot_be_defined(svc_bp, roots, empty_org, monkeypatch):
     def boom(*a, **k):
-        raise bpm.OrgError("disk full")
+        raise OrgError("disk full")
     monkeypatch.setattr(Org, "define_service", boom)
-    with pytest.raises(bpm.OrgError, match="disk full"):
+    with pytest.raises(OrgError, match="disk full"):
         bpm.apply(empty_org, svc_bp, allowed_roots=roots)
     assert empty_org.agents() == []  # the hires were undone
 

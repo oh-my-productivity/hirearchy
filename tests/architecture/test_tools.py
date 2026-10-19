@@ -159,8 +159,8 @@ def test_mapping_status_command_exits_1_while_symbols_are_unmoved_and_2_for_an_u
         return subprocess.run([sys.executable, "-m", "tests.architecture.mapping_status", *args], capture_output=True, text=True,
                               cwd=REPO, env={**os.environ, "PYTHONPATH": str(REPO)}, timeout=120)
 
-    result = run("blueprint")  # no package yet: every symbol of its rows is unmoved (was "hierarchy" until B-hierarchy moved ``Retired``)
-    assert result.returncode == 1 and "BlueprintError" in result.stdout and "unmoved" in result.stdout
+    result = run("cli")  # no package yet: every symbol of its rows is unmoved (was "blueprint" until C-blueprint-1 moved ``BlueprintError``)
+    assert result.returncode == 1 and "_announce" in result.stdout and "unmoved" in result.stdout
     assert run("nonsense").returncode == 2
 
 

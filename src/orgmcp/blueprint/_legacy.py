@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Blueprints: a whole organization for one goal as a reviewable document.
 
 A blueprint is a plain dict (YAML or JSON)::
@@ -26,6 +27,7 @@ shown in the plan), ``render_plan`` produces the text the user approves, ``apply
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 import math
 import os
@@ -36,10 +38,13 @@ from pathlib import Path
 
 import yaml
 
-from . import services as services_mod
-from .core import DEFAULT_CONFIG, NAME_RE, RESERVED, ROOT, Org, OrgError, DEFAULT_MODEL, config_default_model, split_frontmatter
+from .. import services as services_mod
+from ..kernel import NAME_RE, RESERVED, ROOT, OrgError, depth as org_depth, split_frontmatter
+from ..settings import DEFAULT_CONFIG, DEFAULT_MODEL, config_default_model
+from ._host import OrgFacts as Org  # the legacy functions are duck-typed (a feature may not import the facade); step C-blueprint-2 names what ``apply`` needs
+from .api import Agent, BlueprintError, Issue, Role, errors
 
-ROLES_DIR = Path(__file__).parent / "roles"
+ROLES_DIR = Path(__file__).parent.parent / "roles"
 WEB_TOOLS = ("web_search", "web_fetch")
 WRITE_TOOLS = ("write", "shell")
 SLACK = 1.25  # planned budget = estimate * SLACK when the task names no budget
@@ -48,41 +53,10 @@ REWORK_RUNS = {"manager": 2, "author": 1, "verifier": 1}  # one rework cycle, se
 KINDS = ("manager", "author", "verifier")
 
 
-class BlueprintError(OrgError):
-    pass
-
-
 # ------------------------------------------------------------------------------------------------ issues
 
 
-@dataclass(frozen=True)
-class Issue:
-    level: str  # "error" blocks apply; "warning" is shown in the plan
-    path: str  # where in the blueprint, e.g. "needs.deliverable" or "agents[ceo/writer]"
-    message: str  # what is wrong and how to fix it
-    code: str = ""  # stable short name of the rule
-
-    def render(self) -> str:
-        return f"{self.level}: {self.path}: {self.message}"
-
-
-def errors(issues: list[Issue]) -> list[Issue]:
-    return [i for i in issues if i.level == "error"]
-
-
 # ------------------------------------------------------------------------------------------- role library
-
-
-@dataclass(frozen=True)
-class Role:
-    name: str
-    title: str
-    kind: str  # manager | author | verifier
-    tier: str  # cheap | strong: the model tier the role needs
-    tools: tuple[str, ...]
-    base_runs: int  # runs for one pass of the work (managers: see ``estimate``)
-    summary: str
-    body: str
 
 
 def role_names() -> list[str]:
@@ -156,32 +130,6 @@ def _normalize(bp) -> dict:
 
 
 # --------------------------------------------------------------------------------------- resolved agents
-
-
-@dataclass
-class Agent:
-    addr: str
-    name: str
-    parent: str | None  # address of the parent; None for the top-level agent
-    where: str  # issue path
-    role: str = ""
-    template: Role | None = None
-    kind: str = "author"
-    extra: str = ""  # charter text from the blueprint (appended to the template, or the whole charter)
-    model: str = ""  # resolved model id (never empty once resolved: the org default fills in)
-    tier: str = ""
-    tools: list[str] = field(default_factory=list)
-    workspace: str | None = None
-    inputs: list[str] = field(default_factory=list)  # read-only paths (absolute), see ``_input_entries``
-    can_hire: bool = False
-    max_children: int = 5
-    scale: int = 1
-    children: list[str] = field(default_factory=list)
-    raw: dict = field(default_factory=dict)
-
-    @property
-    def depth(self) -> int:
-        return self.addr.count("/") + 1
 
 
 def _s(value) -> str:
@@ -1224,7 +1172,7 @@ def org_files_readable(a: Agent) -> bool:
     """
     if "read" not in a.tools:
         return True
-    from . import scheduler  # late: the scheduler is the one place that knows what kiro is allowed to read
+    scheduler = importlib.import_module("orgmcp.scheduler")  # late, by name: the scheduler is the one place that knows what kiro is allowed to read (goes with the adapters)
 
     ws = Path(a.workspace) if a.workspace else None
     _, settings = scheduler.file_confinement(_ORG_PLACEHOLDER, list(a.tools), ws, [Path(p) for p in a.inputs])
@@ -1820,7 +1768,7 @@ def apply(org: Org, bp: dict, *, allowed_roots: list | None = None) -> Summary:
             msg = org.delegate(ROOT, top.addr, _s(task["title"]), goal, acceptance, _list(task.get("inputs")), total)
     except Exception:
         for addr in reversed(created):
-            if org.exists(addr) and Org.depth(addr) == 1:
+            if org.exists(addr) and org_depth(addr) == 1:
                 try:
                     org.retire(ROOT, addr, "blueprint apply failed midway; rolled back")
                 except OrgError:
