@@ -908,7 +908,25 @@ class ExitMarker(Protocol):
 class SchedulerCommand(Protocol):
     def argv(self, max_runs: int | None, until_done: bool) -> list[str]: """`<venv orgmcp> --root <org> run [--max-runs N] [--until-done]`."""
 ```
-Impl: `PidFileSchedulerStatus`, `DetachedSchedulerControl`, `PidFileSchedulerLock`, `FileExitMarker`, `VenvSchedulerCommand`.
+Impl: `PidFileSchedulerStatus(OrgLayout, ProcessInspector, SchedulerRecognizer, Children, ExitMarker, TaskQuery, WaitingOnUser)`, `DetachedSchedulerControl(SchedulerLauncher, SchedulerStopper)`,
+`PidFileSchedulerLock(OrgLayout, ProcessInspector)`, `FileExitMarker(OrgLayout, AtomicWriter)`, `VenvSchedulerCommand(OrgLayout, executable)`.
+`SchedulerControl` is composed of consumer-owned private ports (`_ports.py`, not in the api): `DetachedLauncher(SchedulerStatus, LaunchSite, LaunchEnvironment, SchedulerCommand,
+ProcessSpawner, Children, StartupWatch)` is `start`; `SignalSchedulerStopper(SchedulerStatus, ProcessSignaller, ProcessInspector, Children, Clock)` is `stop`. `RuntimeLaunchSite(OrgLayout,
+IgnoreList, ExitMarker, Clock)` readies `.runtime`, keeps the runtime files out of the snapshots (`IgnoreList.ensure_runtime_files`), forgets the last exit reason and writes the
+`# --- scheduler started <time>: <argv>` line of the log; `ScrubbedLaunchEnvironment(OrgLayout, Environment)` is the environment bound to the org without `ORG_AGENT` /
+`ORG_REQUIRE_AGENT`; `PidFileStartupWatch(OrgLayout, ExitMarker, Clock)` waits up to ten seconds (every 0.05) for the scheduler to write its pid. `SchedulerIdentity`
+(`SchedulerRecognizer`, `_identity.py`) is `_looks_like_scheduler_of` with `--root X` / `--root=X`, symlinked and `~` roots and the old `orgmcp --root X run` command lines;
+`ChildRegistry` (`Children`, `_children.py`) is `ProcessResources.children`, which only reaps and is never reset. Pure private helpers: `_describe.describe_state` (the line of
+`describe`, shared with the fake), `_refusals.check_startable` / `check_stoppable` and the texts `NO_SCHEDULER`, `SINCE_FORMAT` (shared with the fake), `_files` (the three file names).
+`SchedulerLock` is for the scheduler process: it writes `ProcessInspector.own_ids()[0]`, and a pidfile that names no usable pid (not a number, or 1 or less) is stale.
+`testing.py`: `FakeSchedulerStatus` (state, exit reason, open tasks and what `attention` says are attributes; answers like the real one), `FakeSchedulerControl` (refuses like
+the real one, records `starts` / `stops` / `signalled`), `FixedSchedulerCommand` (exactly the argv it was given), `FakeSchedulerCommand` (the flags of the real one, another program),
+`RecordingSchedulerCommand(inner)`, `MemoryExitMarker`, `MemorySchedulerLock`, `FixedTasks`, `ScriptedSchedulerSpawner` (plays the scheduler that writes its pid / leaves an exit
+reason as it starts), and the worlds the contract suites iterate over: each over files and a `FakeProcessTable` (`pidfile_*`), over the machine's processes (`real_*`: only
+processes the world started are touched, and `close` kills those) and over the fake (`memory_*`). `wire_daemon` provides the five ports (`exit_marker`, `scheduler_command`,
+`scheduler_lock`, `scheduler_status`, `scheduler_control`) and, for the legacy functions (`scheduler.scheduler_state` / `describe_scheduler` / `start_scheduler` /
+`stop_scheduler` / `scheduler_command`, `Scheduler.acquire` / `release` and the exit marker of `serve`), builds them over the ports of the runtime in force (`status_of`,
+`control_of`, `command_at`), since tests and the dashboard's lenient `Org` replace parts of `org.runtime`. The "waiting on you" refusal of `start()` stays in the MCP tool (`mcp_server`).
 
 ### 3.30 `progress`
 
