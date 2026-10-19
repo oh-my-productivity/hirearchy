@@ -804,7 +804,9 @@ class Whoami(Protocol):
 class RunPromptBuilder(Protocol):
     def run_prompt(self, addr: str, batch: Sequence[Message]) -> str: """The complete prompt (byte-identical to today)."""
 ```
-Impl: `TextStateSummarizer`, `TextWhoami`, `TextRunPromptBuilder`; private `FilesGuide` (today's `_files_lines`), `BatchRenderer` (`_render_in_context`, `_upstream`, `_quote`).
+Impl: `TextStateSummarizer`, `TextWhoami`, `TextRunPromptBuilder`. Runtime fields `state_summarizer`, `agent_whoami` (not `whoami`: a verb of the facade) and `run_prompt_builder`.
+
+The texts are composed of small roles (private ports in `_ports.py`, consumer-owned; `_assembly.py` is the one place that puts them together, called by `wire_prompts` and by `testing`; none is a runtime field, the facade makes the one a legacy private method asks for over the ports of the runtime): `TaskQuoter` -> `LiteralQuoter` (`_quote`), `AgentLines` -> `StatusAgentLine` (`_agent_line`), `FilesLines` -> `FilesGuide` (`_files_lines`, with the `org_read`/`org_write` wording and the shadowing lines), `UpstreamTasks` -> `SoleUpstreamTask` (`_upstream`), `ContextRenderer` -> `BatchRenderer` (`_render_in_context`: a result followed by the task it answers, verbatim, then the link to the task it serves in its three variants), `HeldTaskLines` -> `HeldTasks` and `DelegationLines` -> `OutstandingDelegations` (the open / blocked / outstanding blocks of the state summary, headings included), `MemoryText` -> `CappedMemory` (the memory and the notice over the cap), `Briefing` -> `PromptBriefing` (rules, charter and memory), `RunNotices` -> `RuntimeNotices` (the stray notice, taken once, and `ServicePromptSections` for a service owner), `ServiceNames` (the one question - `service_names` - it asks of `services.ServiceCatalog`); `indent` is a pure function (`_text.py`). `TextStateSummarizer` takes seven collaborators and `TextRunPromptBuilder` six; no class of the package takes more. The fakes are `testing.FixedStateSummary`, `FixedWhoami`, `FixedRunPrompt` (the text a test of `cli` / `mcp_server` / `scheduler` puts in) and one `Fixed*` per role, `FixedStates`, `NamedServices`, `FixedSections`, `ToldOnce`; `testing.disk_world` / `memory_world` run the contract suites. Two small differences from the old body, neither visible in a text: the rules are read together with the charter and the memory (before the messages are rendered, not after), and an unreadable ORG.md therefore fails before the stray notice is taken, not after.
 
 ### 3.25 `health`
 
@@ -1629,9 +1631,12 @@ in the table of its module. Constants move with the code that uses them (listed 
 | `ledger`, `save_ledger` | `kernel.LedgerStore.read / write` (the facade keeps them; ledger names are owned per 2.3) |
 | `state` | `eligibility.AgentStates.state` |
 | `tree` | `overview.OrgTree.tree` |
-| `_agent_line` | `prompts/_state.py::TextStateSummarizer._agent_line` (private) |
+| `_agent_line` | `prompts/_agent_line.py::StatusAgentLine.agent_line` (private) |
 | `state_summary` | `prompts.StateSummarizer.state_summary` |
-| `_indent`, `_quote`, `_render_in_context`, `_upstream` | `prompts/_batch.py::BatchRenderer` (private) |
+| `_indent` | `prompts/_text.py::indent` (private) |
+| `_quote` | `prompts/_quote.py::LiteralQuoter.quote` (private) |
+| `_render_in_context` | `prompts/_batch.py::BatchRenderer.render` (private) |
+| `_upstream` | `prompts/_upstream.py::SoleUpstreamTask.upstream` (private) |
 | `_files_lines` | `prompts/_files.py::FilesGuide.lines` (private) |
 | `stray_notice` | `strays.StrayRegistry.take_notice` |
 | `whoami` | `prompts.Whoami.whoami` |

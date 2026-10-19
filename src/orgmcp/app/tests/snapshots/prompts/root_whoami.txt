@@ -1,0 +1,18 @@
+- Address: `root`; parent: `-`; role: human (root of the organization)
+- Direct reports:
+  - ceo [Chief executive] pending, budget 8, open tasks 2, delegated 0, unread 2
+- Open tasks assigned to you: none
+- Work you delegated that is still outstanding:
+  - <ID1> "Plan" -> ceo (pending)
+  - <ID2> "Second" -> ceo (pending)
+
+## Charter
+(root has no charter)
+=====
+- Address: `root`; parent: `-`; role: human (root of the organization)
+- Direct reports:
+  - ceo [Chief executive] pending, budget 8, open tasks 2, delegated 0, unread 2
+- Open tasks assigned to you: none
+- Work you delegated that is still outstanding:
+  - <ID1> "Plan" -> ceo (pending)
+  - <ID2> "Second" -> ceo (pending)
