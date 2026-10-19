@@ -18,12 +18,33 @@ MAX_VERDICTS = 4  # verdicts of one case shown in a digest line
 
 def verdict_chain(c: Case) -> str:
     """The client's verdicts in order, each with her words: ``reject "too long" -> accept "this one is right"``."""
-    raise NotImplementedError  # red: C-reflection
+    shown = c.verdicts[-MAX_VERDICTS:]
+    clip = CLIP_NOTE if len(shown) <= 2 else CLIP_NOTE // 2
+    parts = [f"{v.verdict}" + (f' "{clip_line(v.note, clip)}"' if v.note else "") for v in shown]
+    if len(c.verdicts) > len(shown):
+        parts.insert(0, "…")
+    return " -> ".join(parts)
 
 
 def case_line(c: Case) -> str:
     """One case in one line: state, playbook, runs, reworks, the client's verdicts, then the lessons (the latest first)."""
-    raise NotImplementedError  # red: C-reflection
+    bits = [f'case {c.id} "{clip_line(c.title, 40)}": {c.state}', f"playbook v{c.used}", f"{c.runs} of {c.budget} runs"]
+    if c.reworks:
+        bits.append(f"{c.reworks} rework(s)")
+    line = ", ".join(bits)
+    if c.verdicts:  # the client's verdicts come before the lessons: her words outrank the owner's own conclusions
+        line += f"; client feedback: {verdict_chain(c)}"
+    if c.lessons:
+        # The latest result is the final word on the case; earlier lessons only where room remains.
+        latest, earlier = c.lessons[-1], " / ".join(c.lessons[:-1])
+        first_reject = next((v.message.id for v in c.verdicts if v.verdict == "reject"), None)
+        after = first_reject is not None and bool(c.lesson_ids) and c.lesson_ids[-1] > first_reject
+        mark = " (written after the reject: check it against her words)" if after else ""
+        line += f'; lessons{mark}: "{clip_line(latest, CLIP_LESSON)}"'
+        room = CLIP_LESSON - len(latest)
+        if earlier and room > 40:
+            line += f'; earlier: "{clip_line(earlier, room)}"'
+    return "- " + line
 
 
 class DigestBuilder(ReflectionDigest):
@@ -34,4 +55,18 @@ class DigestBuilder(ReflectionDigest):
         self._history = history
 
     def reflection_digest(self, owner: str, service: str) -> str | None:
-        raise NotImplementedError  # red: C-reflection
+        pb = self._catalog.read_playbook(owner, service)
+        items = self._history.cases(owner, service)
+        since = pb.revised if pb.version else None
+        fresh = [c for c in items if c.evidence_at and (since is None or c.evidence_at > since)]
+        if not fresh:
+            return None
+        fresh.sort(key=lambda c: cast(datetime, c.evidence_at))  # every case in ``fresh`` has evidence
+        shown = fresh[-DIGEST_CASES:][::-1]
+        per_version = [f"- v{v}: {s.line()}" for v, s in stats_by_version(items).items()]
+        while True:
+            lines = [case_line(c) for c in shown]
+            text = "Cases with new evidence (most recent first):\n" + "\n".join(lines) + "\nBy playbook version:\n" + "\n".join(per_version)
+            if len(text) <= DIGEST_CHARS or len(shown) == 1:
+                return text if len(text) <= DIGEST_CHARS else text[: DIGEST_CHARS - 1].rstrip() + "…"
+            shown = shown[:-1]

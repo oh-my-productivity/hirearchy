@@ -10,14 +10,11 @@ from types import SimpleNamespace
 import pytest
 
 import orgmcp.reflection as reflection
-from orgmcp.mail.testing import MemoryMailbox
 from orgmcp.reflection.testing import ReflectionWorld, fs_world, memory_world
 
 from . import _stories
 from ._golden import expected
 from ._support import SERVICE, STEPS, define, org_of, populated
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-reflection")
 
 
 @pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
@@ -75,7 +72,7 @@ def test_the_functions_use_the_ports_the_org_has_now(w: ReflectionWorld) -> None
     _stories.delivered_and_accepted(w)
     org = org_of(w)
     assert len(reflection.cases(org, "ceo", SERVICE)) == 1
-    org.runtime.mailbox = MemoryMailbox(w.s.d.agents) if isinstance(w.s.d.mail, MemoryMailbox) else SimpleNamespace(sent=lambda addr: [], received=lambda addr: [])
+    org.runtime.mailbox = SimpleNamespace(sent=lambda addr: [], received=lambda addr: [])
     assert reflection.cases(org, "ceo", SERVICE) == []  # a lenient org with other mailboxes is not ignored
 
 

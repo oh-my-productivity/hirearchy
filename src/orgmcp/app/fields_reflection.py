@@ -4,10 +4,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-STEP: str | None = None  # set to the step's name when the step fills this part (see test_runtime_fields)
-NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
+from ..reflection import CaseHistory, ReflectionDigest, ServicePromptSections, ServiceReports
+
+STEP: str | None = "C-reflection"  # the step that filled this part (see test_runtime_fields)
+NOT_A_FIELD: dict[str, str] = {
+    "StatsReport": "what a set of counts can say of itself (``finished``, ``avg_runs``, ``line``): ``Stats`` is data that ``summarize`` returns, not a port built once",
+}
 
 
 @dataclass(frozen=True)
 class Fields:
-    """No field yet: the step that gives the package its ports adds them here."""
+    case_history: CaseHistory
+    reflection_digest: ReflectionDigest
+    service_reports: ServiceReports
+    service_prompt_sections: ServicePromptSections

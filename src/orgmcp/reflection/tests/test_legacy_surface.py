@@ -10,8 +10,6 @@ import pytest
 import orgmcp.reflection as reflection
 from orgmcp import services
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-reflection")
-
 MOVED = """
 CLIP_LESSON CLIP_NOTE DIGEST_CASES DIGEST_CHARS MAX_VERDICTS Case Verdict Stats playbook_timeline version_at lessons_of cases summarize
 stats_by_version reflection_digest case_of case_total services_text prompt_sections _case_line _verdict_chain
@@ -30,7 +28,7 @@ def test_services_answers_to_the_old_name_of_a_constant_with_the_same_value(name
     assert getattr(services, name) == getattr(reflection, name)
 
 
-@RED
+@pytest.mark.xfail(strict=True, reason="red: C-reflection (services still holds its own copies until the next commit)")
 @pytest.mark.parametrize("name", [n for n in MOVED if not n.isupper()])
 def test_services_answers_to_the_old_name_with_the_same_object(name: str) -> None:
     assert getattr(services, name) is getattr(reflection, name)

@@ -15,10 +15,10 @@ class OrgServicePaths(ServicePaths):
         self._layout = layout
 
     def rel(self, path: Path | None) -> str:
-        raise NotImplementedError  # red: C-reflection
+        return self._layout.rel(path) if path is not None else ""
 
     def service_dir(self, owner: str, name: str) -> str:
-        raise NotImplementedError  # red: C-reflection
+        return self._layout.rel(self._layout.agent_dir(owner) / "services" / name)
 
     def playbook_file(self, owner: str, name: str) -> str:
-        raise NotImplementedError  # red: C-reflection
+        return self._layout.rel(self._layout.agent_dir(owner) / "services" / name / "PLAYBOOK.md")

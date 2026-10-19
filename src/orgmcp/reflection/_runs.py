@@ -14,4 +14,10 @@ class LogRunCounter(RunCounter):
         self._logs = logs
 
     def runs_between(self, team: Sequence[str], start: str, end: str | None) -> int:
-        raise NotImplementedError  # red: C-reflection
+        used = 0
+        for addr in team:
+            for log in self._logs.files(addr):
+                name = f"{log.stem}.log"[:21]
+                if name >= start and (end is None or name <= end):
+                    used += 1
+        return used

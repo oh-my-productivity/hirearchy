@@ -14,8 +14,6 @@ from . import _stories
 from ._golden import expected
 from ._support import SERVICE, STEPS, ask, define, deliver, implementations, populated, revise
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-reflection")
-
 NO_SERVICES = (
     "No services yet. A parent defines a standing service for a direct report with define_service(owner, "
     "name, description, acceptance, deliverable, budget, inputs): the contract. Then request(service, inputs) "

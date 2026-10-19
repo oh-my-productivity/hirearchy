@@ -15,4 +15,10 @@ class StorePlaybookTimelines(PlaybookTimelines):
         self._store = store
 
     def timeline(self, owner: str, service: str) -> list[tuple[int, datetime]]:
-        raise NotImplementedError  # red: C-reflection
+        out: list[tuple[int, datetime]] = []
+        for version, meta in self._store.playbook_history(owner, service):
+            revised = meta.get("revised")
+            when = parse_time(revised) if revised else None
+            if when is not None and version > 0:
+                out.append((version, when))
+        return sorted(out)

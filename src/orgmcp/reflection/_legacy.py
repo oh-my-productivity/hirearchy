@@ -31,7 +31,7 @@ __all__ = [
 
 def playbook_timeline(org: Org, owner: str, service: str) -> list[tuple[int, datetime]]:
     """(version, when it was written) of every playbook version the service has had, oldest first."""
-    raise NotImplementedError  # red: C-reflection
+    return history_of(org).playbook_timeline(owner, service)
 
 
 def cases(org: Org, owner: str, service: str) -> list[Case]:
@@ -41,7 +41,7 @@ def cases(org: Org, owner: str, service: str) -> list[Case]:
     the client's next task to the same owner begins - the same window rule as ``progress`` - so overlapping cases do
     not count a run twice. Requests from before the service was (last) created from scratch are not part of it.
     """
-    raise NotImplementedError  # red: C-reflection
+    return history_of(org).cases(owner, service)
 
 
 def reflection_digest(org: Org, owner: str, service: str) -> str | None:
@@ -52,12 +52,12 @@ def reflection_digest(org: Org, owner: str, service: str) -> str | None:
     used of the budget given, reworks, the client's verdict and note, lessons - each clipped), then one line of
     statistics per playbook version. About 3000 characters at most.
     """
-    raise NotImplementedError  # red: C-reflection
+    return digest_of(org).reflection_digest(owner, service)
 
 
 def case_of(org: Org, task: Message) -> Case | None:
     """The case a service task belongs to (None for a task that is not a service request, or an unknown one)."""
-    raise NotImplementedError  # red: C-reflection
+    return history_of(org).case_of(task)
 
 
 def case_total(org: Org, task: Message) -> str:
@@ -67,12 +67,12 @@ def case_total(org: Org, task: Message) -> str:
     the contract gives one request, it adds that the case exceeds the budget and that the user must be told. Empty for a
     task that is not a service request.
     """
-    raise NotImplementedError  # red: C-reflection
+    return reports_of(org).case_total(task)
 
 
 def services_text(org: Org, actor: str) -> str:
     """The `services` tool/CLI output: what ``actor`` can request from its direct reports, and what it offers."""
-    raise NotImplementedError  # red: C-reflection
+    return reports_of(org).services_text(actor)
 
 
 def prompt_sections(org: Org, addr: str, batch: Sequence[Message]) -> str:
@@ -82,4 +82,4 @@ def prompt_sections(org: Org, addr: str, batch: Sequence[Message]) -> str:
 
     Each section starts and ends with a newline, to be appended after the notice and before "# New messages".
     """
-    raise NotImplementedError  # red: C-reflection
+    return sections_of(org).prompt_sections(addr, batch)

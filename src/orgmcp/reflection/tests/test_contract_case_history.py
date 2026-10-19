@@ -12,8 +12,6 @@ from orgmcp.reflection.testing import IMPLEMENTATIONS, ReflectionWorld, fs_world
 
 from ._support import SERVICE, STEPS, ask, define, deliver, implementations, populated, rate, revise, rework
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-reflection")
-
 
 @pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> ReflectionWorld:

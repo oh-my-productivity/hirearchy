@@ -16,8 +16,6 @@ from orgmcp.reflection._reports import TextServiceReports
 from orgmcp.reflection._sections import OwnerPromptSections
 from orgmcp.reflection.testing import FixedCaseHistory
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-reflection")
-
 
 def test_the_runtime_has_the_reflection_ports(tmp_path: Path) -> None:
     runtime = wiring.open_runtime(tmp_path)

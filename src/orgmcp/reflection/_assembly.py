@@ -28,20 +28,30 @@ class CallableConfig(ConfigSource):
         self._config = config
 
     def config(self) -> JsonObject:
-        raise NotImplementedError  # red: C-reflection
+        return self._config()
 
 
 def history_of(org: Any) -> DerivedCaseHistory:
-    raise NotImplementedError  # red: C-reflection
+    rt = org.runtime
+    return DerivedCaseHistory(
+        rt.service_catalog, rt.agents, rt.mailbox, rt.service_hints, StorePlaybookTimelines(rt.service_store), LogRunCounter(rt.run_log_reader),
+    )
 
 
 def digest_of(org: Any) -> DigestBuilder:
-    raise NotImplementedError  # red: C-reflection
+    return DigestBuilder(org.runtime.service_catalog, history_of(org))
 
 
 def reports_of(org: Any) -> TextServiceReports:
-    raise NotImplementedError  # red: C-reflection
+    rt = org.runtime
+    return TextServiceReports(rt.agents, rt.service_catalog, history_of(org), OrgServicePaths(rt.paths))
 
 
 def sections_of(org: Any) -> OwnerPromptSections:
-    raise NotImplementedError  # red: C-reflection
+    rt = org.runtime
+    paths = OrgServicePaths(rt.paths)
+    return OwnerPromptSections(
+        rt.service_catalog, history_of(org), digest_of(org), rt.task_query, MailRejectedServices(rt.mailbox),
+        QuotedPlaybookSection(rt.service_catalog, paths),
+        EvidenceReflectSection(rt.service_catalog, CallableConfig(lambda: cast(JsonObject, org.config)), paths), paths,
+    )
