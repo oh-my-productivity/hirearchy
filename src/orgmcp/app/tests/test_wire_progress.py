@@ -23,8 +23,6 @@ from orgmcp.progress._reporter import DerivedProgressReporter
 from orgmcp.progress.testing import FixedProgressReporter
 from orgmcp.reflection import CaseHistory, ServiceReports
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-progress", raises=NotImplementedError)
-
 
 def test_the_runtime_has_the_reporter_and_the_parts(tmp_path: Path) -> None:
     runtime = wiring.open_runtime(tmp_path)
@@ -47,7 +45,6 @@ def test_every_runtime_has_its_own_reporter(tmp_path: Path) -> None:
     assert wiring.open_runtime(tmp_path).progress_reporter is not wiring.open_runtime(tmp_path).progress_reporter
 
 
-@RED
 def test_every_collaborator_of_the_reporter_comes_from_the_runtime(tmp_path: Path) -> None:
     """The whole reporter over fakes: nothing of the organization directory is read or written."""
     runtime = wiring.open_runtime(tmp_path, {

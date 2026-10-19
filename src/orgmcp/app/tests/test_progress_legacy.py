@@ -18,8 +18,6 @@ from orgmcp.eligibility import RunnableQuery
 from orgmcp.kernel import ROOT
 from orgmcp.progress import describe_progress, progress, work_in_flight
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-progress")
-
 
 class Runnable(RunnableQuery):
     """What may start is what the test says."""
@@ -48,7 +46,6 @@ def test_the_permanent_function_keeps_its_signature() -> None:
     assert parameters["wait_seconds"].kind is inspect.Parameter.KEYWORD_ONLY and parameters["org"].default is inspect.Parameter.empty
 
 
-@RED
 def test_the_function_says_what_the_reporter_of_the_runtime_says(org: Org) -> None:
     org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=3)
     assert progress(org) == org.runtime.progress_reporter.progress() and "working" in progress(org)
@@ -87,7 +84,6 @@ def test_a_running_agent_could_run_whatever_the_runnable_query_says(org: Org) ->
     assert progress_module._can_run(org, "ceo") is True
 
 
-@RED
 def test_human_items_are_the_queue_of_the_package(org: Org) -> None:
     sent = org.send("ceo", ROOT, "I need 2 more runs", title="Budget request")
     assert progress_module._human_items(org) == [

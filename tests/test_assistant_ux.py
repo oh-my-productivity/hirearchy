@@ -12,11 +12,15 @@ import yaml
 
 from orgmcp import blueprint as bp_mod
 from orgmcp import blueprint_examples
-from orgmcp import progress as progress_mod
 from orgmcp import scheduler as sched_mod
+from orgmcp.app import wire_attention
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Org, OrgError
+from orgmcp.daemon import SchedulerState
+from orgmcp.daemon.testing import FakeSchedulerStatus
 from orgmcp.progress import WAIT_MAX, describe_progress, progress
+from orgmcp.progress._reporter import DerivedProgressReporter
+from orgmcp.progress.testing import FixedSnapshots, SpyProgressView
 from orgmcp.scheduler import EXIT_FILE, Scheduler, describe_scheduler, nothing_to_do
 from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
 from orgmcp.skill import skill_source
@@ -394,12 +398,12 @@ def test_describe_progress_adds_the_scheduler_line_and_does_not_wait_without_one
     assert out.splitlines()[-1].startswith("scheduler: stopped - open tasks do not move until it is started")
 
 
-def test_describe_progress_waits_when_a_scheduler_runs(org, task, monkeypatch):
-    monkeypatch.setattr(sched_mod, "describe_scheduler", lambda o: "scheduler: running (pid 1, since x)")
-    seen = {}
-    monkeypatch.setattr(progress_mod, "progress", lambda o, t, **kw: seen.update(kw) or "lines")
-    assert describe_progress(org, None, 30) == "lines\nscheduler: running (pid 1, since x)"
-    assert seen == {"wait_seconds": 30}
+def test_describe_progress_waits_when_a_scheduler_runs(org, task):
+    scheduler = FakeSchedulerStatus(SchedulerState("running", 1, "x"))
+    view = SpyProgressView("lines")
+    reporter = DerivedProgressReporter(view, FixedSnapshots(), scheduler, wire_attention.waiting_on_user_of(org.runtime), org.runtime.task_query)
+    assert reporter.describe_progress(None, 30) == "lines\nscheduler: running (pid 1, since x)"
+    assert view.kwargs == {"wait_seconds": 30}
 
 
 def test_progress_tool_and_cli_take_the_wait(org, task, capsys, tmp_path, monkeypatch):

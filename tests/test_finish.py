@@ -2,6 +2,7 @@
 orgmcp vs built-in tool names in the prompts, stray org files in a workspace, and the skill/instruction rules."""
 
 import asyncio
+import dataclasses
 import os
 import re
 import sys
@@ -14,8 +15,12 @@ from orgmcp import blueprint as bp_mod
 from orgmcp import blueprint_examples
 from orgmcp import scheduler as sched_mod
 from orgmcp import templates
+from orgmcp.app import wire_attention
 from orgmcp.core import ROOT, Org
+from orgmcp.daemon import SchedulerState
+from orgmcp.daemon.testing import FakeSchedulerStatus
 from orgmcp.progress import describe_progress
+from orgmcp.progress.testing import FixedLegacyParts
 from orgmcp.scheduler import EXIT_FILE, Scheduler, describe_scheduler, waiting_on_user
 from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
 from orgmcp.skill import skill_source
@@ -204,7 +209,11 @@ def test_progress_shows_the_reason_and_the_options_and_does_not_wait(org, stalle
 
 
 def test_progress_while_the_scheduler_runs_still_says_so(org, stalled_on_budget, monkeypatch):
-    monkeypatch.setattr(sched_mod, "describe_scheduler", lambda o: "scheduler: running (pid 1, since x)")
+    rt = org.runtime
+    running = FixedLegacyParts(
+        rt.human_queue, rt.case_history, rt.service_reports, FakeSchedulerStatus(SchedulerState("running", 1, "x")), wire_attention.waiting_on_user_of(rt),
+    )
+    monkeypatch.setattr(org, "runtime", dataclasses.replace(rt, progress_parts=running))
     out = describe_progress(org)
     assert 'waiting on you: "Rework the report" needs budget' in out and "exits by itself soon" in out
 

@@ -1,4 +1,4 @@
-"""The legacy functions of ``scheduler`` and ``progress`` that ask ``attention``: ``waiting_on_user``, ``nothing_to_do``, ``_human_items``, ``_needs_human``
+"""The legacy functions of ``scheduler`` and ``progress`` that ask ``attention``: ``waiting_on_user``, ``nothing_to_do``, ``_human_items``
 and the check of whether an agent could run. The texts, the options and the decisions are pinned by ``tests/test_finish``, ``test_progress`` and
 ``test_progress_wait`` (unchanged); here are the seams."""
 
@@ -72,7 +72,7 @@ def test_human_items_are_the_queue_of_the_package(org: Org) -> None:
     assert progress_module._human_items(org) == [
         (sent.id, f'Needs you: note from ceo "Budget request": I need 2 more runs (message {sent.id})')
     ]
-    assert progress_module._needs_human(org) == [line for _, line in progress_module._human_items(org)]
+    assert org.runtime.human_queue.lines() == [line for _, line in progress_module._human_items(org)]
 
 
 def test_the_progress_checks_whether_an_agent_could_run_through_the_runnable_query(org: Org) -> None:

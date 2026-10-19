@@ -17,7 +17,6 @@ from ._legacy import (
     _can_run as _can_run,
     _human_items as _human_items,
     _last_activity as _last_activity,
-    _needs_human as _needs_human,
     _runs as _runs,
     _section as _section,
     _state as _state,
