@@ -15,7 +15,12 @@ What a move is:
   ``testkit.REPO / "examples"``, ...), because the file is no longer where they point from. Any other use of ``__file__`` is an error;
 * a test takes with it the module-level helpers, constants, fixtures (found by parameter name, ``usefixtures`` and ``name=``) and the
   autouse fixtures of its module; each destination gets its own copy, and imports are written only for the names the destination uses;
-* an existing destination is extended, never overwritten; a test or helper of the same name that differs there is an error;
+* an existing destination is extended, never overwritten; a test or helper of the same name that differs there is an error, and so is a name
+  that would mean something else in the merged module (a fixture of the destination that the moved tests get from conftest, an autouse fixture,
+  a module-level pytestmark, a helper that two sources of one destination define differently): the manifest then names another file;
+* an import the import contracts forbid in the package of the destination (facade, server, scheduler, yaml ...) is written as
+  ``testkit.legacy.<module>`` (tests/testkit/legacy: the same module object, invisible to import-linter);
+* a new file under src/orgmcp starts with ``# mypy: ignore-errors`` (moved tests are untyped), a new test directory gets an ``__init__.py``;
 * the source loses the moved tests and then everything nothing needs any more (helpers, fixtures, imports); a source without tests is deleted.
 
 ``apply`` and ``prune`` are deterministic and idempotent, and the result does not depend on the order in which the groups are run: what a source
