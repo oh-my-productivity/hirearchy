@@ -4,6 +4,9 @@ A tool group is one class with one Protocol (``ToolGroup``); it receives what it
 call the binding at tool-call time, so a server opens the runtime of its organization on its first tool call and a root server may start before there
 is one. The rest are the small roles around the groups: the texts, the recorder of tool calls, the resolution of the request a call belongs to, who
 gets the service tools, and where the examples of blueprints go.
+
+The docstring of a tool is the description the client is shown, byte for byte (golden): the continuation lines of the docstrings in ``_tools_*`` keep the column
+they had when the tools were the closures of one function, which is why they do not line up with the ``def`` above them.
 """
 
 from __future__ import annotations
