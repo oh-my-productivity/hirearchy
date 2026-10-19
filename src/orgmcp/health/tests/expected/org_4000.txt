@@ -1,0 +1,8 @@
+7 agents, 5 flagged
+ceo idle, budget 28/55, runs 3, open 2 (oldest 1h), done 1 failed 0 blocked 0 rework 0 (+1 by the client), runs/task 3.0, empty 3, last activity 1h ago | branch: runs 14, open 4, done 2, failed 2, blocked 1, rework 1, worst stuck
+  eng idle, budget 2/10, runs 8, open 1 (oldest 1h), done 0 failed 0 blocked 0 rework 0, runs/task -, empty 7 (+1 failed), last activity 51m ago | !stuck: open task is 1h old and nothing is in progress; !expensive: 7 runs without a result on an open task (max 6); !wasteful: 7 of 7 runs sent no message
+  qa idle, budget 0/11, runs 2, open 1 (oldest 1h), done 1 failed 2 blocked 0 rework 1, runs/task 0.7, empty 2, last activity 1h ago | !stuck: open task is 1h old and nothing is in progress; !out_of_budget: no budget left but has unread mail or open tasks; !low_quality: 3 of 4 tasks failed, blocked or were sent back
+  spare idle, budget 2/3, runs 1, open 0, done 0 failed 0 blocked 1 rework 0, runs/task 0.0, empty 0, last activity 1h ago | !stranded_budget: 2 unused run(s) and no work or activity for 1h; they belong with its parent
+dormant idle, budget 0/0, runs 0, open 0, done 0 failed 0 blocked 0 rework 0, runs/task -, empty 0, last activity never
+ops pending, budget 0/2, runs 2, open 1 (oldest 1h), done 0 failed 0 blocked 0 rework 0, runs/task -, empty 2, last activity 56m ago | branch: runs 2, open 1, done 0, failed 0, blocked 0, rework 0, worst out_of_budget | !out_of_budget: no budget left but has unread mail or open tasks
+  dev paused(taking a break), budget 0/0, runs 0, open 0, done 0 failed 0 blocked 0 rework 0, runs/task -, empty 0, last activity never | !paused: paused: taking a break

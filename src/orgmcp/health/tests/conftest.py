@@ -1,0 +1,33 @@
+"""The organization with every flag in it (``_scenario``), built once per test with a clock that only moves when told."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from orgmcp.health import HealthAnalyzer
+from orgmcp.health.testing import IMPLEMENTATIONS, HealthWorld
+
+from . import _scenario
+from ._support import implementations
+
+
+@pytest.fixture
+def scenario(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Any:
+    """The legacy ``Org`` of ``_scenario.build``; ``core.utcnow`` and ``core.secrets`` are patched for the length of the test."""
+    clock = _scenario.install(monkeypatch)
+    return _scenario.build(tmp_path, clock)
+
+
+@pytest.fixture(params=implementations(IMPLEMENTATIONS[HealthAnalyzer]))
+def w(request: pytest.FixtureRequest, tmp_path: Path) -> HealthWorld:
+    """An organization of ``ceo`` and ``ceo/eng`` (both hired at the origin of time, 10 runs left each), over disk and over memory."""
+    made: HealthWorld = request.param(tmp_path)
+    assert isinstance(made.analyzer, HealthAnalyzer)
+    made.agent("ceo", 0)
+    made.agent("ceo/eng", 0)
+    made.set_budget("ceo", 10)
+    made.set_budget("ceo/eng", 10)  # budget left, so that out_of_budget does not mix into the other flags
+    return made

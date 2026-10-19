@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from orgmcp import core, health as health_module
+from orgmcp import core
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Message, OrgError, join_frontmatter, split_frontmatter
 from orgmcp.health import FLAGS, HEALTH_DEFAULTS, agent_health, org_health, render_text, thresholds
@@ -36,7 +36,6 @@ class Clock:
 def clock(monkeypatch):
     c = Clock()
     monkeypatch.setattr(core, "utcnow", c)
-    monkeypatch.setattr(health_module, "utcnow", c)  # the default for `now`
     return c
 
 

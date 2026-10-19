@@ -804,6 +804,10 @@ Impl: `TextStateSummarizer`, `TextWhoami`, `TextRunPromptBuilder`; private `File
 Data: `AgentHealth BranchHealth OrgHealth`, `HEALTH_DEFAULTS`, `FLAGS`.
 
 ```python
+class HealthReport(Protocol):  # what OrgHealth can do besides holding numbers (it subclasses it: no allow-list entry)
+    @property
+    def flagged(self) -> list[AgentHealth]: ...
+    def to_dict(self) -> JsonObject: """JSON-able structure, datetimes as ISO strings, plus 'flagged' (the addresses)."""
 class HealthThresholds(Protocol):
     def thresholds(self) -> dict[str, float]: """HEALTH_DEFAULTS merged with ORG.md health:, non-numbers fall back."""
 class HealthAnalyzer(Protocol):
@@ -812,7 +816,12 @@ class HealthAnalyzer(Protocol):
 class HealthRenderer(Protocol):
     def render_text(self, health: OrgHealth) -> str: ...
 ```
-Impl: `SettingsHealthThresholds`, `FileHealthAnalyzer`, `TextHealthRenderer`.
+Impl: `SettingsHealthThresholds`, `FileHealthAnalyzer`, `TextHealthRenderer`; private `MailClientRework` (`_client_rework`, `_holds_client_rework`), `CharterHireDates`
+(`_since_hired`), `branch_totals` (the roll-up). They consume four ports the package owns (`_ports.py`, narrower than the providers'): `RunCount` (`RunLogReader.count`, or the
+dashboard's cached count), `ConfigSource` (`OrgSettings.config`, or the dashboard's lenient `Org.config`), `ClientRework`, `HireDates`/`CharterStamp`. `HealthRenderer` and
+`HealthReport` are pure (`testing.PURE`); the fakes are `testing.FixedHealthAnalyzer` (the health a test puts in, with the real guards and branch totals - for `review` and `dashdata`)
+and the memory `HealthWorld`. Runtime fields: `health_thresholds`, `health_analyzer`, `health_renderer`. The legacy functions (`health/_legacy.py`) build the analyzer over the
+ports of the `Org` they are given *at the call* (`_assembly.analyzer_of`), so that the dashboard's lenient `Org` keeps its tolerant mailboxes, config and run count.
 
 ### 3.26 `review`
 
@@ -1307,7 +1316,7 @@ flowchart BT
 | `hierarchy` | `mail` | TaskQuery |
 | `hierarchy` | `delivery` | MessageDelivery |
 | `hierarchy` | `budget` | BudgetQuery |
-| `health` | `agents` | AgentDirectory |
+| `health` | `agents` | AgentDirectory, CharterReader |
 | `health` | `runs` | RunLogReader |
 | `health` | `settings` | OrgSettings |
 | `health` | `mail` | MailboxReader |
