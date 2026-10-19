@@ -81,17 +81,3 @@ NOTICE_CASES = [
 ]
 
 CASES = [*DOCUMENT_CASES, *NOTICE_CASES]
-
-# kiro_profile stays in templates until step B-kiro moves it; its output is golden too (as indented JSON, keys in insertion order).
-KIRO_PROFILE_ARGS: dict[str, tuple[tuple[object, ...], dict[str, object]]] = {
-    "kiro_profile_plain": (
-        ("orgmcp-ceo", "agent ceo", ["@orgmcp"], {"command": "orgmcp", "args": ["mcp"], "env": {"ORG_ROOT": "/org", "ORG_AGENT": "ceo"}}), {},
-    ),
-    "kiro_profile_allowed": (
-        ("orgmcp-ceo-eng", "agent ceo/eng", ["@orgmcp", "read", "write"], {"command": "orgmcp", "args": ["mcp"]}),
-        {"allowed_tools": ["@orgmcp"], "tools_settings": {"write": {"allowedPaths": ["/ws"]}, "read": {"allowedPaths": ["/ws", "/org"]}}},
-    ),
-    "kiro_profile_empty_settings": (
-        ("orgmcp-ceo", "agent ceo", ["@orgmcp"], {"command": "orgmcp"}), {"allowed_tools": [], "tools_settings": {}},
-    ),
-}

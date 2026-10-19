@@ -31,7 +31,7 @@ PERMANENT_MODULES = {"core"}  # every name of these modules stays: the ledger ho
 LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "core": {"*": "permanent"},
     "scheduler": _e3(
-        "Runner PROJECT_DIR KIRO_AGENTS_DIR mcp_server_command kiro_profile_name FILE_TOOLS file_confinement "
+        "Runner PROJECT_DIR KIRO_AGENTS_DIR mcp_server_command kiro_profile_name file_confinement "
         "ensure_kiro_profile kiro_runner Run judge_orphan kill_group ignore_runtime_files EXIT_FILE FINISHED "
         "SchedulerState scheduler_command scheduler_state describe_scheduler Waiting waiting_on_user start_scheduler "
         "stop_scheduler Scheduler nothing_to_do"
@@ -97,7 +97,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "templates": _e3(
         "ORG_RULES DEFAULT_MISSION org_rules charter_body task_body result_body notice_budget notice_budget_returned "
         "notice_failures notice_nudge notice_stalled REVIEW_ACTIONS review_item notice_review_manager "
-        "notice_review_root kiro_profile"
+        "notice_review_root"
     ),
     "upgrade": _e3(
         "MISSION_HEADING RULES_HEADING extract_mission upgrade_rules"
