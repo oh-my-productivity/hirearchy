@@ -1,0 +1,12 @@
+trace 20261018T100000000003-root-0005 "Ship it" -> ceo: done  [partial]
+     +0s  ~root -> ceo task "Ship it" +6 run(s)
+     +0s  root delegate ok
+     +2s    run 20261018T100003000001 ok, ran 42s, queued 3.0s, 3 call(s) [delegate×2 inbox×1], 1 refused
+              ! delegate: not enough budget: you have 5 run(s) and must keep 2 in reserve
+    +19s    ~ceo -> ceo/eng task "Build" +3 run(s)
+  +1m09s      run 20261018T100110000001 ok, ran 30s, queued 50s, 2 call(s) [report×1 write×1]
+  +1m34s      ~ceo/eng -> ceo result (done) "Build" +2 run(s)
+  +1m54s    run 20261018T100155000001 ok, ran 15s, queued 20s, 1 call(s) [report×1]
+  +2m04s    ~ceo -> root result (done) "Ship it" +3 run(s)
+totals: wall 2m05s | runs 3 (budget given 6, returned 3) | run time 1m27s | queue 1m13s | waiting on you 0s | tool calls 7 (1 refused)
+note: 4 message(s) have no recorded trace: their request was derived from reply_to/revises/open tasks (marked ~)

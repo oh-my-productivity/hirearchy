@@ -16,28 +16,42 @@ The event files are written by the runtime (see the observability spec, section 
 process per UTC day, ``.runtime/events/<YYYY-MM-DD>/<proc>-<pid>-<start_epoch_ms>.jsonl``. The readers tolerate what
 a live system produces: a partial last line, unknown kinds and fields, missing directories, files of other days, and
 an organization that has no events at all (then ``trace`` falls back to the message files and run logs and says so).
+
+THE BOUNDARY (step C-obs-1 of the refactor, ARCHITECTURE.md 3.31 and 5.10). The first half of this module - the events, the
+runs, the traces and the metrics - is the package ``orgmcp.observability``: ``events_view`` / ``events`` / ``follow_events`` /
+``trace`` / ``metrics`` / ``collect_runs`` / ``Traces`` below only ask it (through ``app.wire_observability``, over the ports
+of ``org.runtime``), and the pure functions are its api. What is still here is the second half, which step C-obs-2 moves:
+
+* ``now``: ``_scheduler_files`` ``_scheduler_info`` ``_tail_events`` ``_head_event`` ``now_view`` (``scheduler_state`` is still read
+  from ``orgmcp.scheduler``, ``judge_orphan`` likewise: the tests that replace them are C-obs-2's);
+* ``check``: ``_check`` ... ``_check_pidfile`` ``check`` (and ``_live_run``);
+* the text: ``render_events`` ``render_trace`` ``render_metrics`` ``render_now`` ``render_check`` ``_cap``;
+* the entry points: ``observe_text`` and ``register_observe_tool``.
+
+``now_view`` reads the front matter of a single inflight message from ``org.runtime.resources.meta_cache`` directly (``MessageIndex``
+has no single-file method; a method that answers it belongs to ``now`` and goes in with it). Everything else it needs of the first half it
+takes from the names below, which are the package's. The default time of every view is the clock of the runtime (``org.runtime.clock``).
 """
 
 from __future__ import annotations
 
-import math
 import os
 import re
 import time
-from bisect import bisect_right
-from collections import Counter, defaultdict
-from dataclasses import dataclass, field
+from collections import defaultdict
+from collections.abc import Callable, Iterator
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Callable, Iterator
 
+from . import kernel as _kernel
 from .app import wire_eventlog
-from .core import ROOT, RUNTIME, Org, OrgError, utcnow
+from .app import wire_observability as _wired
+from .core import ROOT, RUNTIME, Org, OrgError
 from .eventlog import ENVELOPE as _ENVELOPE
 from .eventlog import EVENTS_REL, EventFollower, event_file
 from .health import _aware, _stamp, config_number
 from .mail import MessageFile
-from .runs import RunLogReader
+from .observability import api as _api
 from .scheduler import EXIT_FILE, judge_orphan, scheduler_state
 
 EVENTS_DIR = EVENTS_REL
@@ -46,121 +60,24 @@ COPY_GRACE = 5.0  # seconds a freshly written message may lack its other copy (d
 INFLIGHT_GRACE = 30.0  # seconds an inflight batch may exist before the run record is written
 RECV_BOXES = ("inbox", "inflight", "read")
 ENVELOPE = set(_ENVELOPE)
-READ_ONLY_TOOLS = {"inbox", "read", "status", "health", "progress", "whoami", "services", "observe", "org_read"}
-_EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
+READ_ONLY_TOOLS = _wired.READ_ONLY_TOOLS
 VIEWS = ("now", "trace", "metrics", "events", "check")
 
+# ============================================================================================ the vocabulary (the package's)
 
-# ============================================================================================ small helpers
-
-
-def fmt_dur(ms: float | None) -> str:
-    """A duration: ``850ms``, ``4.2s``, ``42s``, ``1m05s``, ``2h03m``."""
-    if ms is None:
-        return "?"
-    ms = max(0.0, float(ms))
-    if ms == 0:
-        return "0s"
-    if ms < 1000:
-        return f"{ms:.0f}ms"
-    s = ms / 1000
-    if s < 10:
-        return f"{s:.1f}s"
-    s = int(round(s))
-    if s < 60:
-        return f"{s}s"
-    if s < 3600:
-        return f"{s // 60}m{s % 60:02d}s"
-    return f"{s // 3600}h{(s % 3600) // 60:02d}m"
-
-
-def fmt_rel(ms: float) -> str:
-    """Time relative to the start of a request: ``+0s``, ``+42s``, ``+1m05s``, ``+2h03m``."""
-    s = int(max(0.0, ms) // 1000)
-    if s < 60:
-        return f"+{s}s"
-    if s < 3600:
-        return f"+{s // 60}m{s % 60:02d}s"
-    return f"+{s // 3600}h{(s % 3600) // 60:02d}m"
-
-
-def _clip(text: object, limit: int) -> str:
-    text = " ".join(str(text).split())
-    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
-
-
-def _iso(t: datetime | None) -> str | None:
-    return t.astimezone(timezone.utc).isoformat() if t else None
-
-
-def _ms(a: datetime, b: datetime) -> float:
-    return (b - a).total_seconds() * 1000
-
-
-def _plain(value):
-    """JSON-able copy: datetimes as ISO strings, tuples/sets as lists, Paths as strings."""
-    if isinstance(value, dict):
-        return {str(k): _plain(v) for k, v in value.items()}
-    if isinstance(value, (list, tuple, set)):
-        return [_plain(v) for v in value]
-    if isinstance(value, datetime):
-        return _iso(value)
-    if isinstance(value, Path):
-        return str(value)
-    return value
-
-
-def percentile(values: list[float], p: float) -> float | None:
-    """Nearest-rank percentile: the ``ceil(p/100 * n)``-th smallest value (exact, no interpolation); None if empty."""
-    if not values:
-        return None
-    ordered = sorted(values)
-    rank = max(1, math.ceil(p / 100 * len(ordered)))
-    return ordered[min(rank, len(ordered)) - 1]
-
-
-def _stats(values: list[float]) -> dict:
-    return {"n": len(values), "p50": percentile(values, 50), "p95": percentile(values, 95),
-            "max": max(values) if values else None}
-
-
-_UNITS = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
-_SPAN = re.compile(r"(\d+(?:\.\d+)?)\s*([smhdw])")
-
-
-def parse_when(text: str | datetime | None, now: datetime | None = None) -> datetime | None:
-    """A point in time from ``15m`` / ``24h`` / ``7d`` (that long before ``now``), ``now``, or an ISO timestamp
-    (a naive one is UTC). None for None or an empty string."""
-    if text is None or text == "":
-        return None
-    if isinstance(text, datetime):
-        return _aware(text)
-    now = _aware(now) or utcnow()
-    raw = str(text).strip()
-    m = _SPAN.fullmatch(raw.lower())
-    if m:
-        return now - timedelta(seconds=float(m.group(1)) * _UNITS[m.group(2)])
-    if raw.lower() == "now":
-        return now
-    try:
-        return _aware(datetime.fromisoformat(raw.replace("Z", "+00:00")))
-    except ValueError:
-        raise OrgError(f"cannot read {raw!r} as a time: use a duration like 15m, 24h, 7d or an ISO timestamp "
-                       "like 2026-10-18T10:00:00Z") from None
-
-
-def _ts(value) -> datetime | None:
-    try:
-        return _aware(datetime.fromisoformat(str(value)))
-    except ValueError:
-        return None
-
-
-def _cap(lines: list[str], max_lines: int | None, hint: str) -> list[str]:
-    if max_lines is None or len(lines) <= max_lines:
-        return lines
-    return lines[:max_lines] + [f"... {len(lines) - max_lines} more line(s), narrow with {hint}"]
-
+fmt_dur = _kernel.fmt_dur
+fmt_rel = _api.fmt_rel
+percentile = _api.percentile
+parse_when = _api.parse_when
+normalize_refusal = _api.normalize_refusal
+is_error = _api.is_error
+format_event = _api.format_event
+_clip = _kernel.clip_line
+_ts = _kernel.parse_time
+_iso = _wired.iso
+_plain = _wired.plain
+_cap = _wired.cap
+_matcher = _wired.matcher
 
 # ============================================================================================ the event log
 
@@ -181,134 +98,44 @@ def iter_events(org: Org, since: datetime | None = None, until: datetime | None 
     return org.runtime.event_reader.events(since, until)
 
 
-def is_error(ev: dict) -> bool:
-    """Events that mean something went wrong: a refused or failed tool call, a failed command, a run that did not end
-    cleanly, a scheduler phase that raised, an orphaned run, an agent failure."""
-    kind = ev.get("kind")
-    if kind in ("tool.call", "cli.command"):
-        return ev.get("ok") is False
-    if kind == "run.end":
-        return ev.get("ok") is False or bool(ev.get("timed_out") or ev.get("killed"))
-    return kind in ("scheduler.error", "run.orphan", "agent.failure")
-
-
-def _matcher(agent: str | None = None, kind: str | None = None, trace: str | None = None,
-             errors: bool = False) -> Callable[[dict], bool]:
-    agent = Org.norm(agent) if agent else None
-    kind = kind.rstrip("*").rstrip(".") if kind else None
-
-    def match(ev: dict) -> bool:
-        if kind:
-            k = str(ev.get("kind", ""))
-            if k != kind and not k.startswith(kind + "."):
-                return False
-        if agent and agent not in (ev.get("actor"), ev.get("agent"), ev.get("from"), ev.get("to")):
-            return False
-        if trace and trace != ev.get("trace") and trace not in (ev.get("traces") or ()):
-            return False
-        return not errors or is_error(ev)
-
-    return match
-
-
 def events_view(org: Org, since=None, until=None, agent: str | None = None, kind: str | None = None,
                 trace: str | None = None, errors: bool = False, limit: int | None = None,
                 now: datetime | None = None) -> dict:
-    """The merged raw stream, filtered by time window first, then by fields. With ``limit`` the LAST ``limit`` events
-    of the window are kept (``total`` counts all that matched)."""
-    now = _aware(now) or utcnow()
-    lo, hi = parse_when(since, now), parse_when(until, now)
-    match = _matcher(agent, kind, trace, errors)
-    keep: list[dict] = []
-    total = 0
-    for _, ev in timed_events(org, lo, hi):
-        if match(ev):
-            total += 1
-            keep.append(ev)
-            if limit and len(keep) > limit * 2:  # bounded memory on big windows
-                del keep[: len(keep) - limit]
-    if limit and len(keep) > limit:
-        keep = keep[-limit:]
-    return {"events": keep, "total": total, "shown": len(keep), "since": _iso(lo), "until": _iso(hi)}
+    """The merged raw stream, filtered by time window first, then by fields (``EventQueries.events_view``)."""
+    return _wired.event_queries_of(org.runtime).events_view(since, until, agent, kind, trace, errors, limit, now)
 
 
 def events(org: Org, since=None, until=None, agent=None, kind=None, trace=None, errors=False, limit=None,
            now: datetime | None = None) -> list[dict]:
     """The matching events (the last ``limit`` of them), oldest first."""
-    return events_view(org, since, until, agent, kind, trace, errors, limit, now)["events"]
+    return _wired.event_queries_of(org.runtime).events(since, until, agent, kind, trace, errors, limit, now)
 
 
 class Follower(EventFollower):
     """Tails the event files: ``poll()`` returns the complete new lines of all files (today's and yesterday's day
     directories) since the last call, in time order. Files that appear later (a new process) are read from the start.
-    The tailing is ``eventlog``'s; this keeps the old signature and takes the time from ``utcnow`` of this module."""
+    The tailing is ``eventlog``'s; this keeps the old signature and takes the time from the clock of the runtime."""
 
     def __init__(self, org: Org, match: Callable[[dict], bool] | None = None, now: datetime | None = None):
         self.org, self.match = org, match or (lambda ev: True)
-        self._follower = org.runtime.event_followers.follow(self.match, now or utcnow())
+        self._follower = org.runtime.event_followers.follow(self.match, now or org.runtime.clock.now())
 
     def poll(self, emit: bool = True, now: datetime | None = None) -> list[dict]:
-        return self._follower.poll(emit, now or utcnow())
+        return self._follower.poll(emit, now or self.org.runtime.clock.now())
 
 
 def follow_events(org: Org, agent=None, kind=None, trace=None, errors=False, poll: float = 0.5,
                   sleep: Callable[[float], None] = time.sleep, max_polls: int | None = None) -> Iterator[dict]:
     """Yield new matching events as they are written (polling). Stops after ``max_polls`` polls if given."""
-    follower = Follower(org, _matcher(agent, kind, trace, errors))
-    n = 0
-    while max_polls is None or n < max_polls:
-        yield from follower.poll()
-        n += 1
-        if max_polls is None or n < max_polls:
-            sleep(poll)
-
-
-def format_event(ev: dict, width: int = 300) -> str:
-    """One line: time, process, actor, kind, then the interesting fields."""
-    t = _ts(ev.get("ts"))
-    clock = (t.strftime("%H:%M:%S") + (f".{t.microsecond // 1000:03d}" if t.microsecond else "")) if t else str(ev.get("ts", ""))[:12]
-    kind = str(ev.get("kind", "?"))
-    parts = [f"{clock} {str(ev.get('proc', '?')):<9} {str(ev.get('actor') or '-'):<14} {kind}"]
-    if kind == "tool.call":
-        parts.append(f"{ev.get('tool')} {'ok' if ev.get('ok') else 'REFUSED' if ev.get('error_type') in (None, 'OrgError') else 'FAILED'}"
-                     f" {fmt_dur(ev.get('ms'))}")
-    elif kind == "run.end":
-        parts.append(f"{'ok' if ev.get('ok') else 'FAILED'} {fmt_dur(ev.get('duration_ms'))}"
-                     + (" timed-out" if ev.get("timed_out") else "") + (" killed" if ev.get("killed") else ""))
-    for key, value in ev.items():
-        if key in ENVELOPE or key in ("tool", "ms", "duration_ms") or (kind == "tool.call" and key == "ok"):
-            continue
-        if kind == "run.end" and key in ("ok", "timed_out", "killed"):
-            continue
-        if value in (None, "", [], {}):
-            continue
-        if isinstance(value, dict):
-            value = ",".join(f"{k}={v}" for k, v in value.items())
-        elif isinstance(value, list):
-            value = ",".join(str(v) for v in value)
-        parts.append(f"{key}={value}" if key != "error" else f'error="{value}"')
-    if ev.get("run"):
-        parts.append(f"run={ev['run']}")
-    if ev.get("trace"):
-        parts.append(f"trace={ev['trace']}")
-    return _clip(" ".join(parts), width)
-
-
-def render_events(view: dict, max_lines: int | None = None) -> str:
-    evs = view["events"]
-    if not evs:
-        return "(no matching events)" + ("" if view.get("any", True) else " - this organization has no event files yet")
-    lines = [format_event(ev) for ev in evs]
-    head = f"{view['shown']} of {view['total']} matching event(s), oldest first"
-    if view["total"] > view["shown"]:
-        head += f" - {view['total'] - view['shown']} earlier one(s) not shown: narrow with since/agent/kind/trace or raise the limit"
-    return "\n".join([head, *_cap(lines, max_lines, "since/agent/kind/trace")])
+    return _wired.event_queries_sleeping(org.runtime, sleep).follow(agent, kind, trace, errors, poll, max_polls)
 
 
 # ============================================================================================ message files
 
 
 FileRec = MessageFile  # a message file as the index of the mail package sees it (data)
+Msg = _wired.Msg
+build_messages = _wired.build_messages
 
 
 def scan_messages(org: Org) -> list[FileRec]:
@@ -316,138 +143,9 @@ def scan_messages(org: Org) -> list[FileRec]:
     return org.runtime.message_index.scan()
 
 
-@dataclass
-class Msg:
-    id: str
-    sender: str
-    to: str
-    type: str
-    title: str
-    status: str | None
-    budget: int
-    reply_to: str | None
-    revises: str | None
-    service: str | None
-    feedback: str | None
-    wake: bool
-    trace: str | None  # as recorded in the frontmatter
-    t: datetime
-    boxes: list[tuple[str, str]] = field(default_factory=list)  # (owner, box) of every copy
-
-
-def _msg_time(mid: str, meta: dict) -> datetime:
-    return _stamp(mid) or _ts(meta.get("created")) or _EPOCH
-
-
-def build_messages(files: list[FileRec]) -> dict[str, Msg]:
-    out: dict[str, Msg] = {}
-    for f in files:
-        meta = f.meta
-        if not meta or f.error:
-            continue
-        m = out.get(f.id)
-        if m is None:
-            try:
-                budget = int(meta.get("budget") or 0)
-            except (TypeError, ValueError):
-                budget = 0
-            m = out[f.id] = Msg(
-                id=f.id, sender=str(meta["from"]), to=str(meta["to"]), type=str(meta["type"]),
-                title=str(meta.get("title") or ""), status=meta.get("status"), budget=budget,
-                reply_to=str(meta["reply_to"]) if meta.get("reply_to") else None,
-                revises=str(meta["revises"]) if meta.get("revises") else None,
-                service=str(meta["service"]) if meta.get("service") else None,
-                feedback=str(meta["feedback"]) if meta.get("feedback") else None,
-                wake=meta.get("wake", True) is not False,
-                trace=str(meta["trace"]) if meta.get("trace") else None,
-                t=_msg_time(f.id, meta),
-            )
-        elif not m.trace and meta.get("trace"):
-            m.trace = str(meta["trace"])
-        m.boxes.append((f.owner, f.box))
-    return out
-
-
-class Traces:
-    """The trace of every message: as recorded in its frontmatter (``trace``), else derived from the files with the
-    same rules the runtime applies at send time (spec section 3), best effort:
-
-    1. root sends a task without ``revises``: its own id (``new``);
-    2. ``reply_to`` / ``revises``: the trace of that message (``link``);
-    3. the sender's open tasks at that moment (received, no final result yet) all share one trace (``open-task``);
-    4. the sender's batch of that run (from ``run.start`` events, else the messages that arrived between its
-       previous run and this one) has exactly one distinct trace (``batch``);
-    5. otherwise unknown.
-    """
-
-    def __init__(self, org: Org, msgs: dict[str, Msg], batches: dict[str, list[str]] | None = None):
-        self.org, self.msgs, self.batches = org, msgs, batches or {}
-        self._memo: dict[str, tuple[str | None, str]] = {}
-        self._received: dict[str, list[Msg]] = defaultdict(list)
-        self._final: dict[tuple[str, str], str] = {}  # (reporter, task id) -> id of its first final result
-        for m in sorted(msgs.values(), key=lambda x: x.id):
-            self._received[m.to].append(m)
-            if m.type == "result" and m.reply_to and m.status in ("done", "failed"):
-                self._final.setdefault((m.sender, m.reply_to), m.id)
-        self._starts: dict[str, list[tuple[datetime, str]]] = {}
-
-    def of(self, mid: str) -> tuple[str | None, str]:
-        """(trace id or None, source) with source ``recorded``, ``derived:<rule>`` or ``unknown``."""
-        hit = self._memo.get(mid)
-        if hit is not None:
-            return hit
-        self._memo[mid] = (None, "unknown")  # recursion guard
-        m = self.msgs.get(mid)
-        res = self._derive(m) if m is not None else (None, "unknown")
-        self._memo[mid] = res
-        return res
-
-    def _derive(self, m: Msg) -> tuple[str | None, str]:
-        if m.trace:
-            return m.trace, "recorded"
-        if m.sender == ROOT and m.type == "task" and not m.revises:
-            return m.id, "derived:new"
-        for link in (m.reply_to, m.revises):
-            if link and link in self.msgs:
-                t = self.of(link)[0]
-                if t:
-                    return t, "derived:link"
-        open_traces = {
-            self.of(t.id)[0] for t in self._received.get(m.sender, ())
-            if t.type == "task" and t.id < m.id and self._final.get((m.sender, t.id), "~") > m.id
-        }
-        if len(open_traces) == 1 and None not in open_traces:
-            return next(iter(open_traces)), "derived:open-task"
-        batch = self._batch_traces(m)
-        if len(batch) == 1:
-            return next(iter(batch)), "derived:batch"
-        return None, "unknown"
-
-    def _run_starts(self, agent: str) -> list[tuple[datetime, str]]:
-        if agent not in self._starts:
-            d = self.org.dir(agent) / "runs"
-            try:
-                names = sorted(n for n in os.listdir(d) if n.endswith(".log") and not n.startswith("."))
-            except OSError:
-                names = []
-            self._starts[agent] = [(t, f"{agent}@{n[:-4]}") for n in names if (t := _stamp(n))]
-        return self._starts[agent]
-
-    def _batch_traces(self, m: Msg) -> set[str]:
-        if m.sender in (ROOT, RUNTIME):
-            return set()
-        starts = self._run_starts(m.sender)
-        i = bisect_right([t for t, _ in starts], m.t) - 1
-        if i < 0:
-            return set()
-        start, rid = starts[i]
-        batch = self.batches.get(rid)
-        if batch is None:
-            lo = starts[i - 1][0] if i > 0 else _EPOCH
-            batch = [x.id for x in self._received.get(m.sender, ()) if lo < x.t < start]
-        found = {self.of(b)[0] for b in batch if b != m.id and b in self.msgs}
-        found.discard(None)
-        return found  # type: ignore[return-value]
+def Traces(org: Org, msgs: dict, batches: dict[str, list[str]] | None = None):  # noqa: N802 - it was the class of the trace of every message
+    """The trace of every message (``MessageTraceDeriver``): ``.of(message id)`` is ``(trace id or None, source)``."""
+    return _wired.trace_derivers_of(org.runtime).derive(msgs, batches)
 
 
 # ============================================================================================ runs
@@ -457,88 +155,8 @@ def _running_ledger(org: Org) -> dict[str, dict]:
     return org.runtime.run_registry.all()
 
 
-@dataclass
-class RunRec:
-    agent: str
-    run: str  # <agent>@<log stem>
-    start: datetime
-    outcome: str = "unknown"  # ok | failed | timeout | killed | running | unknown
-    ok: bool | None = None
-    end: datetime | None = None
-    duration_ms: float | None = None
-    exit_code: int | None = None
-    error: str | None = None
-    batch: list[str] | None = None
-    traces: list[str] | None = None
-    queue_ms: float | None = None
-    source: str = "log"  # log | events
-    log: Path | None = None
-    pid: int | None = None
-
-    def to_dict(self) -> dict:
-        return _plain({k: v for k, v in self.__dict__.items() if k != "log"})
-
-
-def run_events(evs) -> dict[str, dict[str, dict]]:
-    """run id -> {"start": run.start, "end": run.end, "orphan": run.orphan} from an iterable of events or (t, event)."""
-    out: dict[str, dict[str, dict]] = defaultdict(dict)
-    for item in evs:
-        ev = item[1] if isinstance(item, tuple) else item
-        kind = ev.get("kind")
-        if kind in ("run.start", "run.end", "run.orphan") and ev.get("run"):
-            out[str(ev["run"])][kind.split(".")[1]] = ev
-    return out
-
-
-def _queue_ms(start: datetime, batch: list[str] | None) -> float | None:
-    stamps = [t for b in batch or () if (t := _stamp(str(b)))]
-    return max(0.0, _ms(min(stamps), start)) if stamps else None
-
-
-def _make_run(reader: RunLogReader, agent: str, log: Path | None, stem: str, start: datetime, ev: dict[str, dict],
-              running_stem: str | None, is_live: bool) -> RunRec:
-    run = RunRec(agent=agent, run=f"{agent}@{stem}", start=start, log=log)
-    s, e, o = ev.get("start"), ev.get("end"), ev.get("orphan")
-    if s:
-        run.source = "events"
-        run.batch = [str(b) for b in s.get("batch") or []]
-        run.traces = [str(t) for t in s.get("traces") or []]
-        # the envelope ``pid`` is the EMITTER's (the scheduler); the kiro process is ``child_pid`` (its group: ``pgid``)
-        child = s.get("child_pid") if isinstance(s.get("child_pid"), int) else s.get("pgid")
-        run.pid = child if isinstance(child, int) and not isinstance(child, bool) else None
-        st = _ts(s.get("ts"))
-        run.queue_ms = _queue_ms(st or start, run.batch)
-    if e:
-        run.source = "events"
-        run.ok = bool(e.get("ok"))
-        run.exit_code = e.get("exit_code") if isinstance(e.get("exit_code"), int) else None
-        run.duration_ms = float(e["duration_ms"]) if isinstance(e.get("duration_ms"), (int, float)) else None
-        run.error = _clip(e["error"], 500) if e.get("error") else None
-        run.end = _ts(e.get("ts"))
-        run.outcome = ("timeout" if e.get("timed_out") else "killed" if e.get("killed")
-                       else "ok" if run.ok else "failed")
-    elif o:
-        run.outcome, run.ok = "killed", False
-        run.error = _clip(f"orphan: {o.get('action')} {o.get('detail') or ''}", 200)
-    elif log is not None:
-        facts = reader.facts(log)
-        if facts.get("timed_out"):
-            run.outcome, run.ok = "timeout", False
-        elif facts.get("killed"):
-            run.outcome, run.ok = "killed", False
-        elif facts.get("failed_start"):
-            run.outcome, run.ok = "failed", False
-        elif "exit_code" in facts:
-            run.exit_code = facts["exit_code"]
-            run.ok = facts["exit_code"] == 0
-            run.outcome = "ok" if run.ok else "failed"
-        if "seconds" in facts:
-            run.duration_ms = facts["seconds"] * 1000.0
-        if run.outcome == "unknown" and is_live and running_stem == stem:
-            run.outcome = "running"
-    if run.outcome == "unknown" and is_live and running_stem == stem:
-        run.outcome = "running"
-    return run
+RunRec = _wired.RunRec
+run_events = _wired.run_events
 
 
 def _run_logs(org: Org, agent: str) -> list[tuple[str, Path]]:
@@ -550,250 +168,42 @@ def collect_runs(org: Org, since: datetime | None, until: datetime | None, evs: 
     """Every run that STARTED in ``[since, until]``: the run logs of the live agents (the file truth: one log = one
     run = one run of budget), completed with ``run.start/run.end`` events where there are some, plus runs known only
     from events (agents retired since). Oldest first."""
-    evs = evs if evs is not None else run_events(timed_events(org, since, None))
-    running = _running_ledger(org)
-    live = {a for a in org.agents() if org.running(a)}
-    out: list[RunRec] = []
-    seen: set[str] = set()
-    for agent in agents if agents is not None else org.agents():
-        rec = running.get(agent)
-        running_stem = Path(str(rec.get("log", ""))).stem if rec else None
-        logs = _run_logs(org, agent)
-        for stem, path in logs:
-            start = _stamp(stem)
-            if start is None or (since and start < since) or (until and start > until):
-                continue
-            rid = f"{agent}@{stem}"
-            seen.add(rid)
-            latest = stem == logs[-1][0]
-            out.append(_make_run(org.runtime.run_log_reader, agent, path, stem, start, evs.get(rid, {}),
-                                 running_stem or (stem if latest else None), agent in live))
-    if agents is None:  # runs of agents that no longer exist: only the events know them
-        for rid, ev in evs.items():
-            s = ev.get("start")
-            if rid in seen or not s or "@" not in rid:
-                continue
-            agent, _, stem = rid.rpartition("@")
-            start = _stamp(stem) or _ts(s.get("ts"))
-            if start is None or (since and start < since) or (until and start > until) or org.exists(agent):
-                continue
-            out.append(_make_run(org.runtime.run_log_reader, agent, None, stem, start, ev, None, False))
-    return sorted(out, key=lambda r: (r.start, r.run))
+    return _wired.run_collection_of(org.runtime).collect(since, until, evs, agents)
 
 
 # ============================================================================================ trace
 
 
-def _team(org: Org, task: Msg) -> list[str]:
-    return [a for a in org.subtree(task.to) if a != ROOT] if org.exists(task.to) else []
-
-
 def run_window(org: Org, task: Msg, result: Msg | None, root_tasks: list[Msg]) -> tuple[str, str | None]:
-    """(start, end) of a root task's run window, as 21-character timestamps, exactly as ``progress`` counts runs:
-    from the task's creation to its final result (``done``/``failed``) or now, cut where root's next task to the same
-    assignee begins."""
-    start = task.id[:21]
-    end = result.id[:21] if result is not None and result.status in ("done", "failed") else None
-    later = [t.id[:21] for t in root_tasks if t.to == task.to and t.id > task.id]
-    if later and (end is None or later[0] < end):
-        end = later[0]
-    return start, end
-
-
-def _in_window(name: str, start: str, end: str | None) -> bool:
-    return name[:21] >= start and (end is None or name[:21] <= end)
-
-
-def _calls_summary(calls: list[dict]) -> dict:
-    by_tool = Counter(str(c.get("tool")) for c in calls)
-    refused = [{"t": c.get("ts"), "tool": c.get("tool"), "error": _clip(c.get("error") or "", 500),
-                "error_type": c.get("error_type"), "actor": c.get("actor")} for c in calls if c.get("ok") is False]
-    return {"total": len(calls), "by_tool": dict(by_tool), "refused": refused}
+    """(start, end) of a root task's run window, as 21-character timestamps, exactly as ``progress`` counts runs."""
+    return _wired.run_window(task, result, root_tasks)
 
 
 def trace(org: Org, task_id: str, now: datetime | None = None) -> dict:
-    """One request as a tree, in time order, with totals. ``task_id`` is a root task id (a message of the request is
-    accepted too and resolved to its request). Works from the message files and run logs alone (then ``partial``);
-    run/tool-call events add queue wait, durations, tool calls and refusals.
-
-    Totals: ``runs`` is what ``progress`` reports for the task (run logs of the task's team inside the task's window,
-    see :func:`run_window`); ``run_ms`` the sum of their durations, ``queue_ms`` the sum of queue waits (run start -
-    earliest message of the batch), ``user_wait_ms`` the time items that needed the human (a blocked/failed result or
-    a note to root that wakes it) waited for root's next action on the request, ``wall_ms`` task creation to the final
-    result (or now).
-    """
-    now = _aware(now) or utcnow()
-    files = scan_messages(org)
-    msgs = build_messages(files)
-    root_tasks = sorted((m for m in msgs.values() if m.sender == ROOT and m.type == "task"), key=lambda m: m.id)
-    if task_id not in msgs:
-        known = ", ".join(t.id for t in root_tasks[-5:]) or "none"
-        raise OrgError(f"no message {task_id}. Root's tasks (latest): {known}")
-    notes: list[str] = []
-    redirect = None  # informational only: it does not make the trace partial
-    tid = task_id
-    is_root_task = task_id in {t.id for t in root_tasks}
-    resolved = Traces(org, msgs).of(task_id)[0]
-    if not is_root_task and not resolved:
-        raise OrgError(f"{task_id} is not a root task and its request cannot be determined. Root's tasks (latest): "
-                       + (", ".join(t.id for t in root_tasks[-5:]) or "none"))
-    if resolved and resolved != task_id and resolved in msgs:  # a message of the request, or a rework of an earlier task
-        redirect = f"{task_id} belongs to the request {resolved}; showing that"
-        notes.append(redirect)
-        tid = resolved
-    evs = list(timed_events(org, msgs[tid].t - timedelta(seconds=2), None))
-    batches = {str(ev["run"]): [str(b) for b in ev["batch"]] for _, ev in evs
-               if ev.get("kind") == "run.start" and ev.get("run") and isinstance(ev.get("batch"), list)}
-    traces = Traces(org, msgs, batches)
-    task = msgs[tid]
-    # the request = the root task and every rework of it (a rework's `revises` keeps it in the same trace)
-    traces_of_root = {t.id: traces.of(t.id)[0] for t in root_tasks}
-    chain = [t for t in root_tasks if t.id == tid or (traces_of_root.get(t.id) == tid and t.id > tid)]
-
-    def result_of(t: Msg) -> Msg | None:
-        return max((m for m in msgs.values() if m.to == ROOT and m.type == "result" and m.reply_to == t.id),
-                   key=lambda m: m.id, default=None)
-
-    steps = [(t, result_of(t)) for t in chain]
-    windows = [run_window(org, t, r, root_tasks) for t, r in steps]
-    result = steps[-1][1]  # the request's state is its latest task's
-    final = result is not None and result.status in ("done", "failed")
-    state = result.status if result is not None else "open"
-    team = _team(org, task)
-    members = set(team)
-    start21, end21 = windows[0][0], windows[-1][1]
-    t0 = task.t
-    t_end = (_stamp(result.id) if final and result is not None else None) or now
-
-    def in_windows(name: str) -> bool:
-        return any(_in_window(name, a, b) for a, b in windows)
-
-    # ---- messages of the request
-    items: list[dict] = []
-    in_trace: dict[str, tuple[Msg, str]] = {}
-    for m in msgs.values():
-        t, src = traces.of(m.id)
-        if t == tid:
-            in_trace[m.id] = (m, src)
-        elif t is None and m.sender == ROOT and m.to in members and in_windows(m.id):
-            in_trace[m.id] = (m, "window")  # root's grants/notes into the team inside the window carry no trace
-    for m, src in in_trace.values():
-        items.append({"t": m.t, "order": 1, "kind": "message", "agent": m.sender, "id": m.id, "type": m.type,
-                      "from": m.sender, "to": m.to, "title": m.title, "status": m.status, "budget": m.budget,
-                      "trace_source": src})
-    derived = sum(1 for _, s in in_trace.values() if s != "recorded")
-    if derived:
-        notes.append(f"{derived} message(s) have no recorded trace: their request was derived from reply_to/revises/open "
-                     "tasks (marked ~)")
-
-    # ---- runs (file truth) enriched with events
-    revs = run_events(evs)
-    runs: list[RunRec] = []
-    running = _running_ledger(org)
-    for agent in team:
-        rec = running.get(agent)
-        running_stem = Path(str(rec.get("log", ""))).stem if rec else None
-        logs = _run_logs(org, agent)
-        for stem, path in logs:
-            if not in_windows(stem):
-                continue
-            start = _stamp(stem)
-            if start is None:
-                continue
-            runs.append(_make_run(org.runtime.run_log_reader, agent, path, stem, start, revs.get(f"{agent}@{stem}", {}),
-                                  running_stem or (stem if stem == logs[-1][0] else None), org.running(agent)))
-    runs.sort(key=lambda r: (r.start, r.run))
-    have_events = any(r.source == "events" for r in runs)
-    if runs and not have_events:
-        notes.append("partial: no run events for this request (queue waits, tool calls and refusals unknown); "
-                     "runs and durations come from the run logs")
-    elif any(r.source == "log" for r in runs):
-        notes.append("partial: some runs have no events (older runs or events disabled)")
-
-    # ---- tool calls
-    calls = [ev for _, ev in evs if ev.get("kind") == "tool.call"]
-    run_ids = {r.run for r in runs}
-    by_run: dict[str, list[dict]] = defaultdict(list)
-    outside: list[dict] = []
-    for c in calls:
-        if c.get("run") in run_ids and c.get("trace") in (None, tid):
-            by_run[str(c["run"])].append(c)
-        elif c.get("trace") == tid:
-            outside.append(c)
-    for r in runs:
-        mine = by_run.get(r.run, [])
-        shared = [t for t in (r.traces or []) if t != tid]
-        items.append({"t": r.start, "order": 2, "kind": "run", "agent": r.agent, **r.to_dict(),
-                      "tool_calls": _calls_summary(mine), "shared_with": shared})
-    for c in outside:
-        t = _ts(c.get("ts")) or t0
-        items.append({"t": t, "order": 3, "kind": "tool", "agent": c.get("actor") or ROOT, "tool": c.get("tool"),
-                      "ok": c.get("ok"), "ms": c.get("ms"), "error": _clip(c.get("error") or "", 500),
-                      "error_type": c.get("error_type"), "run": c.get("run")})
-    # ---- lifecycle events that explain waits (a pause, a stall nudge, an orphaned run) of the request or its team
-    for t, ev in evs:
-        k = ev.get("kind")
-        if k not in ("agent.pause", "agent.resume", "agent.failure", "stall.nudge", "run.orphan"):
-            continue
-        who = ev.get("agent") or ev.get("to")
-        stamp = t.strftime("%Y%m%dT%H%M%S%f")
-        if ev.get("trace") == tid or (who in members and in_windows(stamp)):
-            items.append({"t": t, "order": 4, "kind": "event", "agent": who or "runtime", "event": k,
-                          "detail": {x: y for x, y in ev.items() if x not in ENVELOPE}})
-    items.sort(key=lambda i: (i["t"], i["order"]))
-
-    # ---- totals
-    user_ms = _user_wait(org, [m for m, _ in in_trace.values()], evs, tid, t_end)
-    run_ms = sum(r.duration_ms or 0 for r in runs)
-    queue_ms = sum(r.queue_ms or 0 for r in runs)
-    all_calls = [c for rid in by_run for c in by_run[rid]] + outside
-    given = sum(t.budget for t in chain) + sum(m.budget for m in msgs.values() if m.sender == ROOT and m.type == "note"
-                                               and m.to in members and in_windows(m.id))
-    per_task = []
-    for (t, r), (a, b) in zip(steps, windows):
-        mine = [x for x in runs if _in_window(x.run.rpartition("@")[2], a, b)]
-        per_task.append({"task": t.id, "title": t.title, "state": r.status if r is not None else "open", "runs": len(mine),
-                         "budget": t.budget})
-    returned = sum(r.budget for _, r in steps if r is not None and r.status in ("done", "failed"))
-    totals = {
-        "wall_ms": max(0.0, _ms(t0, t_end)), "runs": len(runs), "run_ms": run_ms, "queue_ms": queue_ms,
-        "user_wait_ms": user_ms, "tool_calls": len(all_calls),
-        "refusals": sum(1 for c in all_calls if c.get("ok") is False),
-        "outcomes": dict(Counter(r.outcome for r in runs)),
-        "budget_given": given, "budget_used": len(runs), "budget_returned": returned, "tasks": per_task,
-    }
-    return {"task": tid, "title": task.title, "assignee": task.to, "state": state, "partial": any(n != redirect for n in notes),
-            "notes": notes, "start": _iso(t0), "end": _iso(t_end) if final else None, "team": team,
-            "window": {"start": start21, "end": end21}, "items": [_plain(i) | {"rel_ms": max(0.0, _ms(t0, i["t"]))} for i in items],
-            "totals": totals}
+    """One request as a tree, in time order, with totals (``TraceQueries.trace``)."""
+    return _wired.trace_queries_of(org.runtime).trace(task_id, now)
 
 
-def _user_wait(org: Org, in_trace: list[Msg], evs, tid: str, t_end: datetime) -> float:
-    """Milliseconds the request spent waiting on root: from each item that needed the human (an unread-and-waking
-    blocked/failed result or any waking note/notice addressed to root) to root's next action on the request (a message
-    root sent into it, or a state-changing tool call it made for it); open ends run to the end of the request."""
-    asks = sorted(m.t for m in in_trace if m.to == ROOT and m.wake and not (m.type == "result" and m.status == "done")
-                  and m.type in ("result", "note"))
-    acts = sorted([m.t for m in in_trace if m.sender == ROOT]
-                  + [t for t, ev in evs if ev.get("kind") == "tool.call" and ev.get("actor") == ROOT and ev.get("trace") == tid
-                     and ev.get("tool") not in READ_ONLY_TOOLS])
-    spans: list[tuple[datetime, datetime]] = []
-    for a in asks:
-        nxt = next((x for x in acts if x > a), None)
-        spans.append((a, min(nxt, t_end) if nxt else t_end))
-    total, cur_lo, cur_hi = 0.0, None, None
-    for lo, hi in sorted(spans):
-        if hi <= lo:
-            continue
-        if cur_hi is None or lo > cur_hi:
-            if cur_hi is not None:
-                total += _ms(cur_lo, cur_hi)
-            cur_lo, cur_hi = lo, hi
-        else:
-            cur_hi = max(cur_hi, hi)
-    if cur_hi is not None:
-        total += _ms(cur_lo, cur_hi)
-    return total
+# ============================================================================================ metrics
+
+
+def metrics(org: Org, since="24h", by: str | None = None, now: datetime | None = None, agent: str | None = None) -> dict:
+    """Counts, rates and percentiles over ``[since, now]`` (``MetricQueries.metrics``)."""
+    return _wired.metric_queries_of(org.runtime).metrics(since, by, now, agent)
+
+
+# ============================================================================================ the text of events, traces and metrics (C-obs-2)
+
+
+def render_events(view: dict, max_lines: int | None = None) -> str:
+    evs = view["events"]
+    if not evs:
+        return "(no matching events)" + ("" if view.get("any", True) else " - this organization has no event files yet")
+    lines = [format_event(ev) for ev in evs]
+    head = f"{view['shown']} of {view['total']} matching event(s), oldest first"
+    if view["total"] > view["shown"]:
+        head += f" - {view['total'] - view['shown']} earlier one(s) not shown: narrow with since/agent/kind/trace or raise the limit"
+    return "\n".join([head, *_cap(lines, max_lines, "since/agent/kind/trace")])
 
 
 def render_trace(tr: dict, max_lines: int | None = None) -> str:
@@ -843,130 +253,6 @@ def render_trace(tr: dict, max_lines: int | None = None) -> str:
     out.append(foot)
     out += [f"note: {n}" for n in tr["notes"]]
     return "\n".join(out)
-
-
-# ============================================================================================ metrics
-
-_ID = re.compile(r"\b\d{8}T\d{6,}[\w.-]*")
-_PATH = re.compile(r"(?<![\w.])(?:/[\w.@+~-]+){2,}/?|(?<![\w/])[\w.-]+(?:/[\w.-]+)*\.\w{1,6}\b")
-_QUOTED = re.compile(r'"[^"]*"|\'[^\']*\'')
-_HEX = re.compile(r"\b[0-9a-f]{8,}\b")
-_NUM = re.compile(r"\b\d+\b")
-
-
-def normalize_refusal(text: str) -> str:
-    """A refusal text with what varies removed (message ids, paths, quoted titles, hashes, numbers), so identical
-    reasons group together."""
-    t = _ID.sub("<id>", str(text))
-    t = _QUOTED.sub("<text>", t)
-    t = _PATH.sub("<path>", t)
-    t = _HEX.sub("<hex>", t)
-    t = _NUM.sub("N", t)
-    return _clip(t, 160)
-
-
-def _group_key(by: str, kind: str, obj, msgs: dict[str, Msg]) -> list[str]:
-    """Group keys of a run (``kind='run'``) or a tool call (``'call'``) for ``by``; [] means no row."""
-    if by == "agent":
-        return [obj.agent] if kind == "run" else [str(obj.get("actor") or "-")]
-    if by == "tool":
-        return [str(obj.get("tool"))] if kind == "call" else []
-    if by == "service":
-        if kind == "call":
-            svc = (obj.get("args") or {}).get("service")
-            return [str(svc)] if svc else ["-"]
-        svcs = {msgs[b].service for b in obj.batch or () if b in msgs and msgs[b].service}
-        return sorted(svcs) or ["-"]
-    if by == "trace":
-        if kind == "call":
-            return [str(obj.get("trace") or "-")]
-        return list(obj.traces or []) or ["-"]
-    raise OrgError("by must be one of agent, tool, service, trace")
-
-
-def metrics(org: Org, since="24h", by: str | None = None, now: datetime | None = None, agent: str | None = None) -> dict:
-    """Counts, rates and percentiles over ``[since, now]``.
-
-    Runs are the run logs of the window (so counts equal what the files say), with outcome and duration from
-    ``run.end`` events (else from the log's closing lines). Percentiles are nearest-rank on the raw durations.
-    ``by``: agent | tool | service | trace adds a table grouped that way. ``agent`` restricts to one agent.
-    """
-    now = _aware(now) or utcnow()
-    lo = parse_when(since, now) or (now - timedelta(hours=24))
-    if by is not None and by not in ("agent", "tool", "service", "trace"):
-        raise OrgError("by must be one of agent, tool, service, trace")
-    agent = Org.norm(agent) if agent else None
-    later = list(timed_events(org, lo, None))  # run.end of a run that started in the window may come after it
-    evs = [(t, ev) for t, ev in later if t <= now]
-    runs = collect_runs(org, lo, now, run_events(later))
-    if agent:
-        runs = [r for r in runs if r.agent == agent]
-    calls = [ev for _, ev in evs if ev.get("kind") == "tool.call" and (not agent or ev.get("actor") == agent)]
-    outcomes = Counter(r.outcome for r in runs)
-    run_ms = [r.duration_ms for r in runs if r.duration_ms is not None]
-    queue = [r.queue_ms for r in runs if r.queue_ms is not None]
-
-    tools: dict[str, dict] = {}
-    for name in sorted({str(c.get("tool")) for c in calls}):
-        mine = [c for c in calls if str(c.get("tool")) == name]
-        bad = [c for c in mine if c.get("ok") is False]
-        ms = [float(c["ms"]) for c in mine if isinstance(c.get("ms"), (int, float))]
-        tools[name] = {"calls": len(mine), "refused": len(bad), "refusal_rate": len(bad) / len(mine),
-                       "ms": _stats(ms), "exceptions": sum(1 for c in bad if c.get("error_type") not in (None, "OrgError"))}
-    refused = [c for c in calls if c.get("ok") is False]
-    groups: dict[str, dict] = {}
-    for c in refused:
-        g = groups.setdefault(normalize_refusal(c.get("error") or "(no text)"), {"count": 0, "example": c.get("error"), "tools": Counter()})
-        g["count"] += 1
-        g["tools"][str(c.get("tool"))] += 1
-    top = sorted(groups.items(), key=lambda kv: (-kv[1]["count"], kv[0]))[:10]
-
-    kinds = Counter(str(ev.get("kind")) for _, ev in evs)
-    msgs = build_messages(scan_messages(org))
-    in_window = [m for m in msgs.values() if lo <= m.t <= now]
-    sched_err = Counter(str(ev.get("phase")) for _, ev in evs if ev.get("kind") == "scheduler.error")
-    exits = Counter(_clip(ev.get("reason"), 80) for _, ev in evs if ev.get("kind") == "scheduler.exit")
-    pauses = Counter(_clip(ev.get("reason"), 40) for _, ev in evs if ev.get("kind") == "agent.pause")
-    out: dict = {
-        "since": _iso(lo), "until": _iso(now), "events": sum(kinds.values()), "agent": agent,
-        "runs": {"total": len(runs), **{k: outcomes.get(k, 0) for k in ("ok", "failed", "timeout", "killed", "running", "unknown")},
-                 "duration_ms": _stats(run_ms), "queue_ms": _stats(queue)},
-        "tool_calls": {"total": len(calls), "refused": len(refused), "refusal_rate": (len(refused) / len(calls)) if calls else 0.0,
-                       "by_tool": tools},
-        "top_refusals": [{"message": k, "count": v["count"], "example": _clip(v["example"] or "", 300),
-                          "tools": dict(v["tools"])} for k, v in top],
-        "messages": dict(Counter(m.type for m in in_window)),
-        "stalls": kinds.get("stall.nudge", 0), "pauses": {"total": sum(pauses.values()), "by_reason": dict(pauses)},
-        "agent_failures": kinds.get("agent.failure", 0), "orphans": kinds.get("run.orphan", 0),
-        "scheduler": {"starts": kinds.get("scheduler.start", 0), "errors": dict(sched_err), "exits": dict(exits)},
-        "budget_spent": len(runs),
-    }
-    if by:
-        rows: dict[str, dict] = {}
-
-        def row(key: str) -> dict:
-            return rows.setdefault(key, {"key": key, "runs": [], "ok": 0, "bad": 0, "calls": [], "refused": 0})
-
-        for r in runs:
-            for key in _group_key(by, "run", r, msgs):
-                x = row(key)
-                x["runs"].append(r)
-                x["ok"] += r.outcome == "ok"
-                x["bad"] += r.outcome in ("failed", "timeout", "killed")
-        for c in calls:
-            for key in _group_key(by, "call", c, msgs):
-                x = row(key)
-                x["calls"].append(c)
-                x["refused"] += c.get("ok") is False
-        table = []
-        for key, x in sorted(rows.items()):
-            durs = [r.duration_ms for r in x["runs"] if r.duration_ms is not None]
-            ms = [float(c["ms"]) for c in x["calls"] if isinstance(c.get("ms"), (int, float))]
-            table.append({"key": key, "runs": len(x["runs"]), "ok": x["ok"], "failed": x["bad"],
-                          "run_ms": _stats(durs), "calls": len(x["calls"]), "refused": x["refused"],
-                          "refusal_rate": (x["refused"] / len(x["calls"])) if x["calls"] else 0.0, "call_ms": _stats(ms)})
-        out["by"] = {"dimension": by, "rows": table}
-    return out
 
 
 def render_metrics(m: dict, limit: int = 50) -> str:
@@ -1070,7 +356,7 @@ def now_view(org: Org, now: datetime | None = None) -> dict:
     """What is happening right now. Works with no events (then the event-derived parts are empty)."""
     from .progress import _human_items
 
-    now = _aware(now) or utcnow()
+    now = _aware(now) or org.runtime.clock.now()
     cfg = org.config
     max_parallel = config_number(cfg, "max_parallel", int)
     sched = _scheduler_info(org, now)
@@ -1378,7 +664,7 @@ def check(org: Org, now: datetime | None = None) -> dict:
     (e) per-file ``seq`` has no gaps;
     (f) the scheduler pid file matches a live scheduler process.
     """
-    at = (_aware(now) or utcnow()).timestamp()
+    at = (_aware(now) or org.runtime.clock.now()).timestamp()
     files = scan_messages(org)
     checks = [_check_messages(org, files, at), _check_budget(org, files, at), _check_inflight(org, at),
               _check_runs(org), _check_seq(org), _check_pidfile(org)]

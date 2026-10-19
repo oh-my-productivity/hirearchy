@@ -4,6 +4,7 @@ Event files are written by hand (tests/obs_fixtures.py) exactly per the spec; th
 """
 
 import asyncio
+import dataclasses
 import json
 import os
 import re
@@ -18,6 +19,7 @@ from obs_fixtures import T0, EventLog, Story, freeze, run_ids, stamp, stamp_trac
 from orgmcp import observe
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Message, Org, OrgError
+from orgmcp.kernel.testing import FakeClock
 from orgmcp.progress import progress
 from orgmcp.scheduler import Scheduler, SchedulerState
 from orgmcp.server import build_server
@@ -827,7 +829,7 @@ def test_trace_text_cap_says_how_to_narrow(org, story):
 
 def test_cli_views_and_json(org, story, capsys, monkeypatch):
     root = str(org.root)
-    monkeypatch.setattr(observe, "utcnow", lambda: NOW)
+    monkeypatch.setattr("orgmcp.core.utcnow", lambda: NOW)  # the command line opens its own Org: the clock of its runtime is the patch point
     main(["--root", root, "obs", "trace", story.task.id])
     assert "totals: wall" in capsys.readouterr().out
     main(["--root", root, "obs", "trace", story.task.id, "--json"])
@@ -897,8 +899,8 @@ def call(server, tool, **args):
     return "\n".join(getattr(b, "text", "") for b in blocks)
 
 
-def test_observe_tool_is_root_only_and_read_only(org, story, monkeypatch):
-    monkeypatch.setattr(observe, "utcnow", lambda: NOW)
+def test_observe_tool_is_root_only_and_read_only(org, story):
+    org.runtime = dataclasses.replace(org.runtime, clock=FakeClock(NOW))
     root = build_server(org, ROOT)
     names = {t.name for t in asyncio.run(root.list_tools())}
     assert "observe" in names

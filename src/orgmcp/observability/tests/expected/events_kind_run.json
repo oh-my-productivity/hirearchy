@@ -1,0 +1,223 @@
+{
+  "events": [
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:03.005000+00:00",
+      "seq": 2,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.start",
+      "actor": "runtime",
+      "run": "ceo@20261018T100003000001",
+      "trace": null,
+      "agent": "ceo",
+      "batch": [
+        "20261018T100000000003-root-0005"
+      ],
+      "traces": [
+        "20261018T100000000003-root-0005"
+      ],
+      "pgid": 1,
+      "model": null,
+      "budget_before": 3
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:45+00:00",
+      "seq": 3,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.end",
+      "actor": "runtime",
+      "run": "ceo@20261018T100003000001",
+      "trace": null,
+      "agent": "ceo",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 42000,
+      "timed_out": false,
+      "killed": false,
+      "budget_after": 2,
+      "error": null
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:00.005000+00:00",
+      "seq": 1,
+      "proc": "scheduler",
+      "pid": 1,
+      "kind": "run.start",
+      "actor": "runtime",
+      "run": "gone/agent@20261018T100100000000",
+      "trace": null,
+      "agent": "gone/agent",
+      "batch": [
+        "20261018T100000000000-root-ab12"
+      ],
+      "traces": [
+        "20261018T100000000003-root-0005"
+      ],
+      "pgid": 1,
+      "model": null,
+      "budget_before": 3
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:10.005000+00:00",
+      "seq": 4,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.start",
+      "actor": "runtime",
+      "run": "ceo/eng@20261018T100110000001",
+      "trace": null,
+      "agent": "ceo/eng",
+      "batch": [
+        "20261018T100020000001-ceo-0008"
+      ],
+      "traces": [
+        "20261018T100000000003-root-0005"
+      ],
+      "pgid": 1,
+      "model": null,
+      "budget_before": 3
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:12+00:00",
+      "seq": 2,
+      "proc": "scheduler",
+      "pid": 1,
+      "kind": "run.end",
+      "actor": "runtime",
+      "run": "gone/agent@20261018T100100000000",
+      "trace": null,
+      "agent": "gone/agent",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 12000,
+      "timed_out": false,
+      "killed": false,
+      "budget_after": 2,
+      "error": null
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:40+00:00",
+      "seq": 5,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.end",
+      "actor": "runtime",
+      "run": "ceo/eng@20261018T100110000001",
+      "trace": null,
+      "agent": "ceo/eng",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 30000,
+      "timed_out": false,
+      "killed": false,
+      "budget_after": 2,
+      "error": null
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:55.005000+00:00",
+      "seq": 6,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.start",
+      "actor": "runtime",
+      "run": "ceo@20261018T100155000001",
+      "trace": null,
+      "agent": "ceo",
+      "batch": [
+        "20261018T100135000001-ceo.eng-000c"
+      ],
+      "traces": [
+        "20261018T100000000003-root-0005"
+      ],
+      "pgid": 1,
+      "model": null,
+      "budget_before": 3
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:02:10+00:00",
+      "seq": 7,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.end",
+      "actor": "runtime",
+      "run": "ceo@20261018T100155000001",
+      "trace": null,
+      "agent": "ceo",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 15000,
+      "timed_out": false,
+      "killed": false,
+      "budget_after": 2,
+      "error": null
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:02:22.005000+00:00",
+      "seq": 9,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.start",
+      "actor": "runtime",
+      "run": "ceo@20261018T100222000001",
+      "trace": null,
+      "agent": "ceo",
+      "batch": [
+        "20261018T100220000001-root-0013"
+      ],
+      "traces": [
+        "20261018T100220000001-root-0013",
+        "20261018T100000000003-root-0005"
+      ],
+      "pgid": 1,
+      "model": null,
+      "budget_before": 4
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:02:35+00:00",
+      "seq": 10,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.end",
+      "actor": "runtime",
+      "run": "ceo@20261018T100222000001",
+      "trace": null,
+      "agent": "ceo",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 13000,
+      "timed_out": false,
+      "killed": false,
+      "budget_after": 3,
+      "error": null
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:40+00:00",
+      "seq": 14,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.orphan",
+      "actor": "runtime",
+      "run": "ceo/eng@20261018T100500000000",
+      "trace": null,
+      "agent": "ceo/eng",
+      "action": "killed",
+      "detail": "no process"
+    }
+  ],
+  "total": 11,
+  "shown": 11,
+  "since": "2026-10-18T00:00:00+00:00",
+  "until": null
+}

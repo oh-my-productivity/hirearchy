@@ -1,0 +1,48 @@
+{
+  "events": [
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:30+00:00",
+      "seq": 11,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "agent.pause",
+      "actor": "runtime",
+      "run": null,
+      "trace": "20261018T100000000003-root-0005",
+      "agent": "ceo/eng",
+      "reason": "failures"
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:31+00:00",
+      "seq": 12,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "agent.failure",
+      "actor": "runtime",
+      "run": null,
+      "trace": null,
+      "agent": "ceo/eng",
+      "count": 3
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:40+00:00",
+      "seq": 14,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.orphan",
+      "actor": "runtime",
+      "run": "ceo/eng@20261018T100500000000",
+      "trace": null,
+      "agent": "ceo/eng",
+      "action": "killed",
+      "detail": "no process"
+    }
+  ],
+  "total": 8,
+  "shown": 3,
+  "since": "2026-10-18T00:00:00+00:00",
+  "until": null
+}

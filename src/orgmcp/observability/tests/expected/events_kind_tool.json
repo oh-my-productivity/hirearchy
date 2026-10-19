@@ -1,0 +1,109 @@
+{
+  "events": [
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:02:05+00:00",
+      "seq": 6,
+      "proc": "mcp",
+      "pid": 4242,
+      "kind": "tool.call",
+      "actor": "ceo",
+      "run": "ceo@20261018T100155000001",
+      "trace": "20261018T100000000003-root-0005",
+      "tool": "report",
+      "ok": true,
+      "ms": 5,
+      "error": null,
+      "error_type": null,
+      "args": {
+        "task_id": "20261018T100000000003-root-0005",
+        "status": "done"
+      }
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:02:25+00:00",
+      "seq": 7,
+      "proc": "mcp",
+      "pid": 4242,
+      "kind": "tool.call",
+      "actor": "ceo",
+      "run": "ceo@20261018T100222000001",
+      "trace": "20261018T100220000001-root-0013",
+      "tool": "report",
+      "ok": true,
+      "ms": 5,
+      "error": null,
+      "error_type": null,
+      "args": {
+        "task_id": "20261018T100220000001-root-0013",
+        "status": "done"
+      }
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:02:26+00:00",
+      "seq": 8,
+      "proc": "mcp",
+      "pid": 4242,
+      "kind": "tool.call",
+      "actor": "ceo",
+      "run": "ceo@20261018T100222000001",
+      "trace": "20261018T100220000001-root-0013",
+      "tool": "delegate",
+      "ok": false,
+      "ms": 2,
+      "error": "not enough budget: you have 9 run(s) and must keep 2 in reserve",
+      "error_type": "OrgError",
+      "args": {
+        "to": "ceo/eng",
+        "budget": 9,
+        "service": "memo"
+      }
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:12+00:00",
+      "seq": 9,
+      "proc": "mcp",
+      "pid": 4242,
+      "kind": "tool.call",
+      "actor": "ceo",
+      "run": null,
+      "trace": null,
+      "tool": "delegate",
+      "ok": false,
+      "ms": 4,
+      "error": "not enough budget: you have 7 run(s) and must keep 3 in reserve",
+      "error_type": "OrgError",
+      "args": {
+        "to": "ceo/eng",
+        "budget": 9,
+        "service": "memo"
+      }
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:13+00:00",
+      "seq": 10,
+      "proc": "mcp",
+      "pid": 4242,
+      "kind": "tool.call",
+      "actor": "ceo/eng",
+      "run": null,
+      "trace": null,
+      "tool": "write",
+      "ok": false,
+      "ms": 1,
+      "error": "ceo/eng cannot write ceo/work/x.md",
+      "error_type": "OrgError",
+      "args": {
+        "path": "ceo/work/x.md"
+      }
+    }
+  ],
+  "total": 11,
+  "shown": 5,
+  "since": "2026-10-18T00:00:00+00:00",
+  "until": null
+}
