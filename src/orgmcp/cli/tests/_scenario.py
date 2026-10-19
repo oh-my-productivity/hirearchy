@@ -9,6 +9,7 @@ run the same scenarios against the package).
 from __future__ import annotations
 
 import contextlib
+import importlib.util
 import io
 import os
 import re
@@ -354,10 +355,11 @@ class Normalizer:
 
 
 def normalizer(tmp: Path, home: Path | None) -> Normalizer:
-    import orgmcp
+    spec = importlib.util.find_spec("orgmcp")  # (the location of the package, without running its __init__)
+    assert spec is not None and spec.origin is not None
 
     n = Normalizer()
-    n.add(Path(orgmcp.__file__).resolve().parents[2], "<PROJECT>")
+    n.add(Path(spec.origin).resolve().parents[2], "<PROJECT>")
     n.add(Path(sys.executable).parent, "<VENV_BIN>")
     if home is not None:
         n.add(home, "<HOME>")

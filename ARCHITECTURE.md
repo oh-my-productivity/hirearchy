@@ -1230,6 +1230,27 @@ class DashboardLauncher(Protocol):
     def run_dashboard(self, root: Path, interval: float = 2.0) -> None: """Run the Textual app until quit."""
 ```
 
+**D-cli (the command line) as built.** `api.py` publishes `CliApp` (`main`); `_ports.py` holds what the commands consume, each a small Protocol: `Command` (`add_arguments`, `run`),
+`Output` (`say`, `write`, `warn`: the standard output and error, looked up at each call), `Terminal` (`is_interactive`, `stdout_is_tty`), `TextSource` (`@file` or literal text:
+`AtFileText`), `OrgSession` (`named`, `open(args, mutating)`, `present`, `create`, `ports`: `AnnouncingOrgSession` over an `OrgLocator` and an `OrgOpener`, which says `org: <root>` on
+the standard error before the organization is opened, for a mutating command only, also when the path is no organization), `CommandRecording` (`EventCommandRecorder`: `cli.command`),
+the launchers `SchedulerRunner`, `McpRunner`, `DashboardRunner` (as in the sketch), `EventTails` / `EventTail` (the tail of the event files, started before the listing of `obs events --follow`)
+and `JsonDump`. The 25 commands are classes of `_commands_org` (`init hire task send inbox resume`), `_commands_services` (`services define-service request feedback retire-service`),
+`_commands_blueprint` (`plan apply`), `_commands_views` (`status health progress dash`), `_commands_ops` (`upgrade-rules install-skill review run mcp kiro-profile`) and `_commands_obs`
+(`ObsCommand` with `NowCommand TraceCommand MetricsCommand EventsCommand`, and `CheckCommand`), each taking the features it uses as `Provider` thunks (`Provider[Hiring]`,
+`Provider[OrgSnapshotter]`, ...): the organization is named by the arguments of the command line, so a command is built before any runtime exists and its thunks ask the organization
+the session opened last. No command takes more than 7 collaborators. `ArgparseCliApp(commands, recorder, label, clock, out)` makes the parser (the commands add their sub-parsers in the
+order of the old one: names, flags, help texts and defaults are byte-for-byte the old ones, `src/orgmcp/cli/tests/expected`), runs the chosen command and records it. The composition root
+is `app/wire_cli.py` (`cli_app()`, `run_cli(argv)`; `fields_cli.py` declares `CliApp` as not a runtime field): `RuntimeOrgOpener` over `open_runtime`, `LoopSchedulerRunner`
+(`wire_scheduler.loop_of` over the runtime; `run --once` is `SchedulerLoop.run_once`, `--kiro BIN` goes through `wire_kiro.run_command_builder`), `LazyMcpRunner`
+(`wire_mcp_server.mcp_server_runner`), `LazyDashboardRunner` (`orgmcp.dashboard.run_dashboard`, imported when it runs), `RuntimeEventTails`, `PlainJson`, `PlanTime` (the plan side of
+`blueprint` for the time before the organization exists) and the snapshot of `dash --once` from `wire_dashdata.dashboard_runtime`. Deviations from the sketch: `_open.py::OrgOpener` is
+`_session.py::AnnouncingOrgSession` (it also serves the recorder: the root a `cli.command` event goes to), `_record.py::CommandRecorder` is `EventCommandRecorder`, `register_obs` is
+`ObsCommand`, `Terminal` has the second question `cmd_now` asks (`stdout_is_tty`), and `main` is built by `app.wire_cli.run_cli` (not `app.wiring.run_cli`: `wiring.py` is the manager's).
+`orgmcp.cli.main` (legacy, E3) asks it when it runs, so the package imports nothing of the application; `orgmcp/__init__.py` keeps `main` and still loads `orgmcp.core`, because
+fresh interpreters that import only `orgmcp.kernel` or `orgmcp.telemetry` rely on the application having been loaded (`Message.load`, the process defaults of `telemetry`).
+`orgmcp.cli_obs` is left as a shim with the one name `tests/test_observe.py` patches (`time`). `CliApp` is declared `PURE` in `testing.py` (an orchestrator over fakes of its ports).
+
 `DashApp` and the Textual widgets (`TextPane NavTable AgentTree ContextFooter StatusBar TextScreen`) are framework subclasses
 (exempt from R6) that depend only on the `dashdata` Protocols (`DashApp.__init__(self, data: DashboardQueries, ...)`, where
 `DashboardQueries` is a structural intersection of the `dashdata` query Protocols it uses).
@@ -1854,7 +1875,7 @@ Tool -> group (names, signatures and docstrings are golden-tested and must not c
 | `_record_command` | `cli/_record.py::CommandRecorder` (`EventSinks`) |
 | `main` | `cli.CliApp.main` (`ArgparseCliApp`) |
 | `cli_obs._org`, `_dump`, `cmd_now`, `cmd_trace`, `cmd_metrics`, `cmd_events`, `cmd_check`, `register_obs` | `cli/_commands_obs.py`: `NowCommand`, `TraceCommand`, `MetricsCommand`, `EventsCommand`, `CheckCommand` (`ObservabilityText`, `EventQueries`); `register_obs` is `ObservabilityCommands.add_arguments` |
-| `orgmcp/__init__.py::main`, `__main__.py` | `orgmcp/__init__.py` keeps `main` = `app.wiring.run_cli` (console script `orgmcp:main` unchanged) |
+| `orgmcp/__init__.py::main`, `__main__.py` | `orgmcp/__init__.py` keeps `main` (= `orgmcp.cli.main`, which runs `app.wire_cli.run_cli`; console script `orgmcp:main` unchanged) and loads `orgmcp.core` (3.36, D-cli) |
 
 A TTY check (`sys.stdin.isatty() and sys.stdout.isatty()`) is the one terminal dependency: port `Terminal.is_interactive()` in `cli/_ports.py`.
 
