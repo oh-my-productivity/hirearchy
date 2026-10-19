@@ -871,6 +871,7 @@ def build_destination(path: str, existing: Module | None, parts: Sequence[Part],
     infos: dict[str, ImportInfo] = {}
     future = False
     taken: dict[str, Item] = {}
+    seen: list[Seen] = []
     for part in parts:
         module = part.module
         roots, selected = module.select(part.tests)
@@ -878,6 +879,14 @@ def build_destination(path: str, existing: Module | None, parts: Sequence[Part],
         if any("pytestmark" in u.defines for u in standing) and (existing is not None or len(parts) > 1):
             errors.append(f"{path}: {module.path} has a module-level pytestmark, which cannot be merged into a destination that holds other "
                           "tests: give this source a destination of its own in the manifest")
+            continue
+        autouse = [u for u in standing if u.autouse]
+        if autouse and (existing is not None or len(parts) > 1):
+            errors.append(f"{path}: {module.path} has the autouse fixture {autouse[0].defines[0]}, which would apply to the tests of the "
+                          "other sources in this destination: give this source a destination of its own in the manifest")
+            continue
+        if existing is not None and any(u.autouse for u in existing.units):
+            errors.append(f"{path}: the destination has an autouse fixture, which would apply to the moved tests: name another destination")
             continue
         needed, strangers = module.closure([*roots, *standing], selected)
         errors += [f"{path}: {module.path}: a moved test uses the test {name}, which must move with it" for name in strangers]
@@ -914,11 +923,47 @@ def build_destination(path: str, existing: Module | None, parts: Sequence[Part],
             if problem:
                 errors.append(f"{path}: {module.path}: {problem}" if isinstance(info, str) else problem)
         future = future or any(u.kind == "future" for u in module.units)
+        seen.append(Seen(module.path, {n.arg for root in included for n in ast.walk(root) if isinstance(n, ast.arg)},
+                         loaded_names(included) - set(module.defs) - set(module.bindings), set(module.fixtures),
+                         {key: item.dump for item in items if item.where == module.path for key in item.keys},
+                         {i.binding for i in wanted if isinstance(i, ImportInfo)}))
+    errors += _crossed(path, seen)
     if errors:
         return sorted(set(errors))
     if existing is not None:
         return _extend(existing, items, [i for i in infos.values() if existing.bindings.get(i.binding) != i])
     return _new_file(items, list(infos.values()), future, header=path.startswith("src/orgmcp/"))
+
+
+@dataclass
+class Seen:
+    """What one source of a destination asks for and provides, to find the names that would mean something else in the merged module."""
+
+    source: str
+    requested: set[str]  # parameter names (fixture requests) of the included functions
+    free: set[str]  # names used that the source does not define itself
+    fixtures: set[str]  # the fixtures the source defines
+    defined: dict[str, str]  # name -> its definition (ast dump), of the statements it contributes
+    imported: set[str]  # names it imports
+
+
+def _crossed(path: str, seen: Sequence[Seen]) -> list[str]:
+    """Names that one source of the destination defines or imports and another source gets from elsewhere (conftest, builtins) or means differently."""
+    errors = []
+    for one in seen:
+        for other in seen:
+            if one is other:
+                continue
+            for name in sorted((other.requested & one.fixtures) - other.fixtures):
+                errors.append(f"{path}: {other.source} gets the fixture {name!r} from conftest, but {one.source} defines one of that name "
+                              "(the module would use it for both): name another destination")
+            for name in sorted(other.free & (set(one.defined) | one.imported)):
+                if name not in other.requested:
+                    errors.append(f"{path}: {other.source} uses {name!r} from elsewhere, but {one.source} defines or imports one of that name: "
+                                  "name another destination")
+            for name in sorted(one.imported & set(other.defined)):
+                errors.append(f"{path}: {name!r} is imported by {one.source} and defined by {other.source}: name another destination")
+    return errors
 
 
 def _captured(path: str, module: Module, existing: Module, nodes: Sequence[ast.AST]) -> list[str]:

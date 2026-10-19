@@ -129,7 +129,7 @@ destinations:
         - test_delegated_task_is_shown_once
         - test_note_and_task_messages_get_no_extra_block
 
-  # new file; 8 tests
+  # new file; 7 tests
   #   subject: the files section of the prompt [the file of that name exists and is typed: the moved tests get a file of their own]
   #   7.3: the files section of the prompt [the file of that name exists and is typed: the moved tests get a file of their own]
   src/orgmcp/prompts/tests/test_files_guide_behaviour.py:
@@ -144,6 +144,12 @@ destinations:
         - test_prompt_of_an_agent_with_built_ins_separates_the_two_kinds_of_tools
         - test_agent_with_only_a_built_in_read_and_no_workspace_gets_the_naming_text
         - test_agent_without_built_ins_has_no_files_section_but_the_orgmcp_memory_line
+
+  # new file; 1 tests
+  #   subject: the files section of the prompt [test_round_f_read defines its own `org` fixture; the other sources use conftest's]
+  src/orgmcp/prompts/tests/test_files_guide_read.py:
+    group: a
+    sources:
       tests/test_round_f_read.py:
         - test_the_prompt_tells_a_built_in_read_agent_to_read_org_files_by_absolute_path
 
@@ -920,10 +926,17 @@ destinations:
         - test_workspace_inside_the_org_is_not_denied
         - test_ensure_kiro_profile_is_idempotent_for_confined_profiles
 
-  # new file; 5 tests
-  #   7.3: kiro profiles
+  # new file; 1 tests
   #   7.3: kiro_runner / profiles are kiro
   src/orgmcp/kiro/tests/test_profiles.py:
+    group: c
+    sources:
+      tests/test_scheduler.py:
+        - test_kiro_runner_builds_isolated_command
+
+  # new file; 4 tests
+  #   7.3: kiro profiles [the source has an autouse fixture (clean_env), which may not apply to other sources' tests: its tests get a destination of their own]
+  src/orgmcp/kiro/tests/test_profiles_bootstrap.py:
     group: c
     sources:
       tests/test_bootstrap.py:
@@ -931,8 +944,6 @@ destinations:
         - test_profile_is_internal_and_bound_to_its_org
         - test_kiro_runner_uses_the_per_org_profile_and_keeps_the_scheduler_env
         - test_cli_kiro_profile_writes_the_org_profile
-      tests/test_scheduler.py:
-        - test_kiro_runner_builds_isolated_command
 
   # new file; 8 tests
   #   7.3: kiro/tests/test_read_confinement.py (all other tests)
@@ -961,18 +972,23 @@ destinations:
         - test_prompt_is_delivered_on_stdin_not_in_argv
         - test_kiro_command_has_no_prompt_argument
 
-  # new file; 4 tests
-  #   subject: the scheduler command line is kiro
+  # new file; 3 tests
   #   7.3: kiro run command
   src/orgmcp/kiro/tests/test_run_command.py:
     group: c
     sources:
-      tests/test_assistant_ux.py:
-        - test_scheduler_command_adds_the_flag_only_when_asked
       tests/test_default_model.py:
         - test_the_scheduler_command_always_carries_the_model
         - test_the_scheduler_command_keeps_an_explicit_model
         - test_the_scheduler_command_for_a_legacy_org_config_uses_the_default: 2
+
+  # new file; 1 tests
+  #   subject: the scheduler command line is kiro [the source has an autouse fixture, which may not apply to other sources' tests: its tests get a destination of their own]
+  src/orgmcp/kiro/tests/test_run_command_assistant.py:
+    group: c
+    sources:
+      tests/test_assistant_ux.py:
+        - test_scheduler_command_adds_the_flag_only_when_asked
 
   # new file; 17 tests
   #   7.3: check
@@ -1133,10 +1149,9 @@ destinations:
         - test_progress_tags_service_tasks_and_notes_missing_feedback
         - test_playbook_revisions_are_quiet_notices_for_root
 
-  # new file; 31 tests
-  #   7.3: `wait_*` is progress/test_wait.py (the other waiting tests of the same section go with them)
-  #   7.3: waiting for progress (whole file)
-  src/orgmcp/progress/tests/test_wait_behaviour.py:
+  # new file; 12 tests
+  #   7.3: `wait_*` is progress/test_wait.py (the other waiting tests of the same section go with them) [the source has an autouse fixture, which may not apply to other sources' tests: its tests get a destination of their own]
+  src/orgmcp/progress/tests/test_wait_assistant.py:
     group: c
     sources:
       tests/test_assistant_ux.py:
@@ -1152,6 +1167,12 @@ destinations:
         - test_a_hand_over_that_looks_like_a_stall_once_is_ignored
         - test_waiting_only_reads_files
         - test_wait_for_one_task_ignores_the_others
+
+  # new file; 19 tests
+  #   7.3: waiting for progress (whole file)
+  src/orgmcp/progress/tests/test_wait_behaviour.py:
+    group: c
+    sources:
       tests/test_progress_wait.py:
         - test_a_blocked_task_whose_lead_has_a_grant_waiting_is_waited_for
         - test_it_keeps_waiting_while_the_lead_works_and_times_out_with_the_lines
@@ -1696,15 +1717,21 @@ destinations:
         - test_org_line_uses_the_discovered_org_and_comes_before_errors
         - test_module_entry_point_matches_the_script
 
-  # new file; 2 tests
+  # new file; 1 tests
   #   7.3: `main([...])` tests are cli
   src/orgmcp/cli/tests/test_progress_command.py:
     group: e
     sources:
-      tests/test_assistant_ux.py:
-        - test_cli_status_shows_the_scheduler
       tests/test_progress.py:
         - test_cli_progress
+
+  # new file; 1 tests
+  #   7.3: `main([...])` tests are cli [the source has an autouse fixture, which may not apply to other sources' tests: its tests get a destination of their own]
+  src/orgmcp/cli/tests/test_progress_command_assistant.py:
+    group: e
+    sources:
+      tests/test_assistant_ux.py:
+        - test_cli_status_shows_the_scheduler
 
   # new file; 1 tests
   #   7.3: qa10 is cli
@@ -1732,14 +1759,19 @@ destinations:
         - test_cli_review_dry_run_then_real
         - test_cli_review_on_a_healthy_org
 
-  # new file; 2 tests
-  #   7.3: `main([...])` tests are cli [the file of that name exists and is typed: the moved tests get a file of their own]
-  #   7.3: tests that drive `main([...])` are cli (extends the existing file) [the file of that name exists and is typed: the moved tests get a file of their own]
-  src/orgmcp/cli/tests/test_run_command_behaviour.py:
+  # new file; 1 tests
+  #   7.3: `main([...])` tests are cli [the source has an autouse fixture, which may not apply to other sources' tests: its tests get a destination of their own]
+  src/orgmcp/cli/tests/test_run_command_assistant.py:
     group: e
     sources:
       tests/test_assistant_ux.py:
         - test_cli_run_until_done_exits_and_logs_the_reason
+
+  # new file; 1 tests
+  #   7.3: tests that drive `main([...])` are cli (extends the existing file) [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/cli/tests/test_run_command_behaviour.py:
+    group: e
+    sources:
       tests/test_scheduler.py:
         - test_resume_resets_the_failure_count
 
@@ -2039,18 +2071,23 @@ destinations:
       tests/test_health.py:
         - test_revises_through_the_mcp_tool_and_cli
 
-  # new file; 4 tests
-  #   7.3: scheduler control tools (build_server)
+  # new file; 2 tests
   #   7.3: scheduler control tools
   src/orgmcp/mcp_server/tests/test_scheduler_tools.py:
+    group: e
+    sources:
+      tests/test_finish.py:
+        - test_start_refuses_when_nothing_can_progress
+        - test_start_tool_description_mentions_the_waiting_exit
+
+  # new file; 2 tests
+  #   7.3: scheduler control tools (build_server) [the source has an autouse fixture, which may not apply to other sources' tests: its tests get a destination of their own]
+  src/orgmcp/mcp_server/tests/test_scheduler_tools_assistant.py:
     group: e
     sources:
       tests/test_assistant_ux.py:
         - test_start_tool_defaults_to_until_done
         - test_start_tool_passes_until_done_to_the_scheduler
-      tests/test_finish.py:
-        - test_start_refuses_when_nothing_can_progress
-        - test_start_tool_description_mentions_the_waiting_exit
 
   # new file; 3 tests
   #   7.3: mcp_server/tests/test_server.py
@@ -2062,7 +2099,15 @@ destinations:
         - test_rule_violations_are_reported_as_tool_errors
         - test_tool_list
 
-  # new file; 9 tests
+  # new file; 1 tests
+  #   7.3: tool-level tests (build_server) [test_service_amend defines its own `svc` fixture; test_round_g_services uses the shared one]
+  src/orgmcp/mcp_server/tests/test_service_amend_tool.py:
+    group: e
+    sources:
+      tests/test_service_amend.py:
+        - test_the_mcp_tool_amends_with_optional_fields
+
+  # new file; 8 tests
   #   7.3: tool-level tests (build_server)
   src/orgmcp/mcp_server/tests/test_service_tools.py:
     group: e
@@ -2072,8 +2117,6 @@ destinations:
         - test_the_rework_reply_states_the_case_total_and_warns_when_it_exceeds_the_contract
         - test_a_rework_within_the_contract_budget_gets_no_warning
         - test_angle_brackets_and_ampersands_are_stored_exactly_as_given
-      tests/test_service_amend.py:
-        - test_the_mcp_tool_amends_with_optional_fields
       tests/test_services.py:
         - test_tools_are_registered_by_role
         - test_the_services_tool_describes_what_you_can_request_and_offer
@@ -2145,10 +2188,9 @@ destinations:
         - test_a_refund_alone_lifts_a_budget_pause_without_a_run
         - test_a_failure_pause_is_not_lifted_by_a_refund
 
-  # new file; 10 tests
-  #   subject: the --until-done exit of the scheduler
-  #   7.3: the exit of the serve loop
-  src/orgmcp/scheduler/tests/test_exit_behaviour.py:
+  # new file; 6 tests
+  #   subject: the --until-done exit of the scheduler [the source has an autouse fixture, which may not apply to other sources' tests: its tests get a destination of their own]
+  src/orgmcp/scheduler/tests/test_exit_assistant.py:
     group: e
     sources:
       tests/test_assistant_ux.py:
@@ -2158,6 +2200,12 @@ destinations:
         - test_work_still_runnable_keeps_an_until_done_scheduler_alive
         - test_until_done_does_not_exit_early_when_the_run_cap_blocks_open_work
         - test_a_real_until_done_scheduler_process_exits_by_itself
+
+  # new file; 4 tests
+  #   7.3: the exit of the serve loop
+  src/orgmcp/scheduler/tests/test_exit_behaviour.py:
+    group: e
+    sources:
       tests/test_finish.py:
         - test_serve_until_done_exits_when_budget_stalled_and_records_the_reason
         - test_serve_until_done_exits_when_a_worker_keeps_failing

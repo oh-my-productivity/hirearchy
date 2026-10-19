@@ -721,3 +721,21 @@ def test_a_destination_may_not_shadow_a_fixture_the_moved_tests_get_from_elsewhe
     manifest = tool.Manifest.from_dict(manifest_dict({BUDGET: ("b", {"tests/test_shadow.py": ["test_alpha"]})}))
     with pytest.raises(tool.RelocationError, match="'org'"):
         tool.apply_group(repo, manifest, "b")
+
+
+def test_tests_of_one_module_may_not_share_a_destination_with_those_of_a_module_that_means_a_name_differently(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    """A fixture, an autouse fixture or a helper of one source would silently apply to / replace the one of the other in a merged module."""
+    plain = "def test_plain(org):\n    assert org\n"
+    shadow = "import pytest\n\n\n@pytest.fixture\ndef org():\n    return 1\n\n\ndef test_shadow(org):\n    assert org\n"
+    auto = "import pytest\n\n\n@pytest.fixture(autouse=True)\ndef env():\n    return 1\n\n\ndef test_auto():\n    assert True\n"
+    repo = make_repo(tmp_path, {"test_plain.py": plain, "test_shadow.py": shadow, "test_auto.py": auto})
+    shared = tool.Manifest.from_dict(manifest_dict({BUDGET: ("b", {"tests/test_plain.py": ["test_plain"], "tests/test_shadow.py": ["test_shadow"]}),
+                                                     KERNEL: ("a", {"tests/test_auto.py": ["test_auto"]})}))
+    with pytest.raises(tool.RelocationError, match="'org'"):
+        tool.apply_group(repo, shared, "b")
+    both = tool.Manifest.from_dict(manifest_dict({BUDGET: ("b", {"tests/test_plain.py": ["test_plain"], "tests/test_auto.py": ["test_auto"]}),
+                                                   KERNEL: ("a", {"tests/test_shadow.py": ["test_shadow"]})}))
+    with pytest.raises(tool.RelocationError, match="autouse fixture env"):
+        tool.apply_group(repo, both, "b")
+    tool.apply_group(repo, tool.Manifest.from_dict(manifest_dict({BUDGET: ("b", {"tests/test_shadow.py": ["test_shadow"]}),
+                                                                   KERNEL: ("a", {"tests/test_plain.py": ["test_plain"], "tests/test_auto.py": ["test_auto"]})})), "b")
