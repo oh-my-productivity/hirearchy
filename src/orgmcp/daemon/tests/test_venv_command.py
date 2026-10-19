@@ -9,8 +9,6 @@ import pytest
 from orgmcp.daemon._command import VenvSchedulerCommand
 from orgmcp.kernel import OrgPaths
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 
 def test_the_console_script_next_to_the_interpreter_is_the_program(tmp_path: Path) -> None:
     bin_dir = tmp_path / "venv" / "bin"

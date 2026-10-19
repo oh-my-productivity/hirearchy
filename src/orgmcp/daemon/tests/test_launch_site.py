@@ -13,8 +13,6 @@ from orgmcp.kernel.testing import DictEnvironment, FakeClock
 from orgmcp.snapshots import RUNTIME_IGNORE_LINES
 from orgmcp.snapshots.testing import MemoryIgnoreList
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 
 def site(tmp_path: Path) -> tuple[RuntimeLaunchSite, MemoryIgnoreList, MemoryExitMarker, Path]:
     root = tmp_path / "org"

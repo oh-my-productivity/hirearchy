@@ -10,8 +10,6 @@ from orgmcp.daemon._children import ChildRegistry
 from orgmcp.processes import ProcessHandle
 from orgmcp.processes.testing import FakeProcessTable
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 
 def spawn(table: FakeProcessTable, tmp_path: Path) -> ProcessHandle:
     return table.spawn_detached(["orgmcp", "run"], cwd=tmp_path, env={}, log=tmp_path / "scheduler.log")

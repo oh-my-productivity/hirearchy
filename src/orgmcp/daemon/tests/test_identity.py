@@ -12,8 +12,6 @@ import pytest
 
 from orgmcp.daemon._identity import SchedulerIdentity
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 ROOT = Path("/orgs/one")
 
 OK = [

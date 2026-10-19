@@ -30,6 +30,10 @@ class Children(Protocol):
 
 @runtime_checkable
 class LaunchSite(Protocol):
+    def directory(self) -> Path:
+        """The organization directory: where the scheduler is started."""
+        ...
+
     def prepare(self) -> Path:
         """Get the organization ready for a scheduler: ``.runtime`` exists, the files that change constantly are kept out of its git snapshots,
         and the reason of the last exit is forgotten. Returns the log the scheduler's output is appended to."""

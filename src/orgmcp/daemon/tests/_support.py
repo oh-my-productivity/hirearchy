@@ -12,15 +12,7 @@ from _pytest.mark.structures import ParameterSet
 W = TypeVar("W")
 
 RED = "red: C-daemon"
-PENDING: frozenset[str] = frozenset(
-    {
-        "pidfile_status_world", "real_status_world",
-        "pidfile_control_world", "real_control_world",
-        "pidfile_lock_world", "real_lock_world",
-        "file_exit_marker_world",
-        "venv_command_world",
-    }
-)  # the worlds whose classes are not written yet: their contract tests are expected to fail
+PENDING: frozenset[str] = frozenset()  # the worlds whose classes are not written yet: their contract tests are expected to fail
 
 
 def worlds(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:

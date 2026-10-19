@@ -7,8 +7,6 @@ import pytest
 from orgmcp.daemon._control import DetachedSchedulerControl
 from orgmcp.daemon._ports import SchedulerLauncher, SchedulerStopper
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 
 class Launcher(SchedulerLauncher):
     def __init__(self) -> None:

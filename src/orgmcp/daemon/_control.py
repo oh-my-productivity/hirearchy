@@ -12,7 +12,7 @@ class DetachedSchedulerControl(SchedulerControl):
         self._stopper = stopper
 
     def start(self, max_runs: int | None = None, until_done: bool = False) -> int:
-        raise NotImplementedError
+        return self._launcher.start(max_runs, until_done)
 
     def stop(self, wait: float = 15.0) -> str:
-        raise NotImplementedError
+        return self._stopper.stop(wait)

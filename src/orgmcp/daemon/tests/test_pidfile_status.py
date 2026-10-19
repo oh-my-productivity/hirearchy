@@ -20,8 +20,6 @@ from orgmcp.kernel import OrgPaths
 from orgmcp.kernel.testing import FakeClock, fs_atomic_writer
 from orgmcp.processes.testing import FakeProcessTable
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 
 class Rig:
     def __init__(self, tmp_path: Path, root: Path | None = None) -> None:

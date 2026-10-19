@@ -13,8 +13,6 @@ from orgmcp.kernel.testing import FakeClock
 from orgmcp.processes import ProcessHandle
 from orgmcp.processes.testing import FakeProcessTable
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 
 class WritesPidAt(FakeClock):
     """A clock that, when it has moved on ``after`` seconds, lets the scheduler write ``text`` to the pidfile."""

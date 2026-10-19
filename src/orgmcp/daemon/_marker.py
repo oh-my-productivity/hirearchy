@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from ..kernel import AtomicWriter, OrgLayout
+from ._files import exit_file_of
 from .api import ExitMarker
 
 
@@ -12,10 +13,13 @@ class FileExitMarker(ExitMarker):
         self._writer = writer
 
     def write(self, reason: str) -> None:
-        raise NotImplementedError
+        self._writer.write(exit_file_of(self._layout), reason + "\n")
 
     def clear(self) -> None:
-        raise NotImplementedError
+        exit_file_of(self._layout).unlink(missing_ok=True)
 
     def read(self) -> str:
-        raise NotImplementedError
+        try:
+            return exit_file_of(self._layout).read_text(encoding="utf-8").strip()
+        except OSError:
+            return ""

@@ -16,8 +16,6 @@ from orgmcp.kernel import OrgError, OrgPaths
 from orgmcp.processes import ProcessHandle, ProcessSpawner
 from orgmcp.processes.testing import FakeProcessTable
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 
 class Calls:
     """What the launcher did, in order."""
@@ -30,8 +28,12 @@ class SpySite(LaunchSite):
     def __init__(self, calls: Calls, log: Path) -> None:
         self._calls, self._log = calls, log
 
+    def directory(self) -> Path:
+        return self._log.parent.parent
+
     def prepare(self) -> Path:
         self._calls.events.append("prepare")
+        self._log.parent.mkdir(exist_ok=True)
         return self._log
 
     def announce(self, log: Path, argv: Sequence[str]) -> None:

@@ -16,8 +16,6 @@ from orgmcp.kernel.testing import FakeClock
 from orgmcp.processes import ProcessDenied, ProcessGone, ProcessHandle, ProcessSignaller
 from orgmcp.processes.testing import FakeProcessTable
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 RUNNING = "2026-10-18 10:00:00Z"
 
 
