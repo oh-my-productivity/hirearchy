@@ -5,6 +5,7 @@ and over the in-memory loop."""
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -14,7 +15,7 @@ from orgmcp.scheduler.testing import IMPLEMENTATIONS, LoopWorld
 
 @pytest.fixture(params=IMPLEMENTATIONS[SchedulerLoop], ids=lambda factory: factory.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> LoopWorld:
-    made = request.param(tmp_path)
+    made = cast(LoopWorld, request.param(tmp_path))
     assert isinstance(made.loop, SchedulerLoop)
     return made
 

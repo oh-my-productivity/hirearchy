@@ -102,16 +102,13 @@ def test_malformed_reviews_ledger_restarts_the_review_clock(org):
     assert json.loads((org.root / ".runtime" / "reviews.json").read_text())["at"]  # a real timestamp again
 
 
-def test_a_crashing_phase_is_logged_once_and_the_loop_continues(org, monkeypatch):
+def test_a_crashing_phase_is_logged_once_and_the_loop_continues(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
     messages = []
-    sched = Scheduler(org, lambda o, a, p: (["true"], o.dir(a), dict(os.environ)), echo=messages.append)
-
-    def boom():
-        raise RuntimeError("kaput")
-
-    monkeypatch.setattr(sched, "_check_stalls", boom)
-    monkeypatch.setattr(sched, "_check_review", boom)
+    ladder = ScriptedLadder()
+    ladder.fail = RuntimeError("kaput")
+    sched = Scheduler(org, lambda o, a, p: (["true"], o.dir(a), dict(os.environ)), echo=messages.append,
+                      ports={StallLadder: ladder, HealthReviewer: FailingHealthReviewer(RuntimeError("kaput"))})
     sched.tick()
     sched.tick()
     assert "ceo" in sched.runs or org.runs_used("ceo") == 1  # launching still happened
@@ -387,6 +384,10 @@ from orgmcp import core  # noqa: E402
 from orgmcp.app import wire_processes, wiring  # noqa: E402
 from orgmcp.mail import MessageParser  # noqa: E402
 from orgmcp.mail.testing import CountingMessageParser  # noqa: E402
+from orgmcp.review import HealthReviewer  # noqa: E402
+from orgmcp.scheduler.testing import FailingHealthReviewer, ScriptedLadder  # noqa: E402
+from orgmcp.stalls import StallLadder  # noqa: E402
+from orgmcp.stalls._views import FingerprintTaskViews  # noqa: E402
 
 
 def test_message_load_is_cached_by_path_mtime_and_size(org):
@@ -432,20 +433,21 @@ def test_cache_is_bounded(org):
 def test_stall_view_reparses_only_when_the_mailbox_files_change(org):
     org.send(ROOT, "ceo", "budget", budget=10)
     task = org.delegate(ROOT, "ceo", "T", "g", "a", budget=2)
-    sched = Scheduler(org, echo=lambda _: None)
-    assert [t.id for t in sched._task_view("ceo", "open_tasks")] == [task.id]
+    views = FingerprintTaskViews(org.runtime.task_query, org.runtime.mail_fingerprint)
+    assert [t.id for t in views.open_tasks("ceo")] == [task.id]
     counting = CountingMessageParser()
     org.runtime = wiring.open_runtime(org.root, {MessageParser: counting})
+    views = views.rebound(org.runtime.task_query, org.runtime.mail_fingerprint)  # the ladder of a scheduler goes on with its memo over the new runtime
     loads = counting.loaded
     for _ in range(3):
-        sched._task_view("ceo", "open_tasks")
+        views.open_tasks("ceo")
     assert loads == []  # unchanged mailbox: nothing is parsed
     org.begin_run("ceo")  # inbox -> inflight is the same set of messages
     loads.clear()  # (begin_run itself parses the batch)
-    assert [t.id for t in sched._task_view("ceo", "open_tasks")] == [task.id] and loads == []
+    assert [t.id for t in views.open_tasks("ceo")] == [task.id] and loads == []
     org.end_run("ceo", ok=True)
     org.report("ceo", task.id, "done", "ok")  # a new sent message: recomputed, and the task is closed
-    assert sched._task_view("ceo", "open_tasks") == [] and loads
+    assert views.open_tasks("ceo") == [] and loads
 
 
 # ------------------------------------------------- QA-16: process groups

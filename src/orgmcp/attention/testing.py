@@ -14,15 +14,19 @@ from collections.abc import Callable, Collection, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..agents import AgentRegistry
+from ..agents import AgentDirectory, AgentRegistry
 from ..agents.testing import fs_agents
+from ..budget import BudgetQuery
 from ..budget.testing import BudgetWorld
 from ..budget.testing import fs_world as fs_budget_world
 from ..budget.testing import memory_world as memory_budget_world
+from ..eligibility import PauseStore, RunnableQuery
 from ..eligibility.testing import PauseHarness, fs_pauses, memory_pauses, runnable_over
 from ..kernel import ROOT, Message
 from ..kernel.testing import FakeClock
+from ..mail import MailboxReader, TaskQuery
 from ..mail.testing import MemoryMailbox
+from ..stalls import NudgeLedger
 from ..stalls.testing import MemoryNudges
 from ._queue import InboxHumanQueue
 from ._waiting import RootTaskWaitingOnUser
@@ -65,6 +69,21 @@ class FixedOpenWork(OpenWork):
     def nothing_to_do(self, *, running: Collection[str] = (), blocked: Collection[str] = (), can_start: bool = True) -> bool:
         self.asked.append((running, blocked, can_start))
         return self.idle
+
+
+# ------------------------------------------------------------------------------ over the parts of a consumer's own world
+
+
+def open_work_over(tasks: TaskQuery, runnable: RunnableQuery) -> OpenWork:
+    """The real ``OpenWork`` over these task views and this runnable query (for a consumer, like the scheduler's tests, that has a world of its own)."""
+    return RunnableOpenWork(tasks, runnable)
+
+
+def waiting_over(
+    tasks: TaskQuery, agents: AgentDirectory, mail: MailboxReader, pauses: PauseStore, budgets: BudgetQuery, runnable: RunnableQuery, nudges: NudgeLedger,
+) -> WaitingOnUser:
+    """The real ``WaitingOnUser`` over these parts."""
+    return RootTaskWaitingOnUser(tasks, agents, mail, pauses, budgets, runnable, nudges)
 
 
 # ------------------------------------------------------------------------------ the world

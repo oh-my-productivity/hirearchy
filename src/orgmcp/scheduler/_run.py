@@ -126,3 +126,4 @@ class LoopMemory:
     grace: GraceMemory = field(default_factory=GraceMemory)
     upkeep: UpkeepMemory = field(default_factory=UpkeepMemory)
     guard: GuardMemory = field(default_factory=GuardMemory)
+    stall_views: object | None = None  # the memo of the task views of the stall ladder: the wiring keeps it here (the scheduler does not look into it)

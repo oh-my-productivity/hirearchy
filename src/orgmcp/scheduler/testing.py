@@ -11,9 +11,7 @@ from pathlib import Path
 
 from ..access.testing import StaticAccess
 from ..attention import Waiting
-from ..attention.testing import FixedOpenWork, FixedWaiting, ListHumanQueue
-from ..attention._waiting import RootTaskWaitingOnUser
-from ..attention._work import RunnableOpenWork
+from ..attention.testing import FixedOpenWork, FixedWaiting, ListHumanQueue, open_work_over, waiting_over
 from ..budget.testing import FixedBudget
 from ..daemon.testing import MemoryExitMarker, MemorySchedulerLock
 from ..delivery.testing import RecordingDelivery
@@ -25,8 +23,7 @@ from ..kiro import RunCommand, RunCommandBuilder
 from ..mail import TaskQuery
 from ..mail.testing import MemoryMailbox, memory_mailbox
 from ..processes import OrphanJudge, ProcessHandle, ProcessSpawner
-from ..processes._judge import PsOrphanJudge
-from ..processes.testing import FakeProcessTable
+from ..processes.testing import FakeProcessTable, judge_over
 from ..prompts.testing import FixedRunPrompt
 from ..review import HealthReviewer, Review
 from ..review.testing import ScriptedHealthReviewer
@@ -39,10 +36,10 @@ from ..stalls.testing import MemoryNudges
 from ..strays.testing import MemoryStrays
 from ..telemetry.testing import MemoryEventRetention, MemoryProcessLabel
 from ..templates.testing import RecordingNotices
-from ._assembly import Lifecycle, LifecyclePorts, LoopPorts, assemble, assemble_loop
+from ._assembly import LifecyclePorts, LoopPorts, assemble, assemble_loop
 from ._loop import HeartbeatLoop
 from ._ports import (
-    Claim, Console, ExitPolicy, InterruptedRuns, OrphanSettler, Pacing, PhaseGuard, RunAdmission, RunEvents, RunFailures, RunInitiation,
+    Claim, Console, ExitPolicy, InterruptedRuns, Lifecycle, OrphanSettler, Pacing, PhaseGuard, RunAdmission, RunEvents, RunFailures, RunInitiation,
     RunNotes, RunPreparation, RunReaper, RunRecords, RunSettling, RunSpawning, RunStarter, RunTerminating, RunWatching, SchedulerSession,
     SessionEvents, StartAnnouncing, StartFailures, StrayWatch, TickPhase, WaitGrace, WorkLeft,
 )
@@ -417,7 +414,7 @@ def lifecycle_world(tmp: Path = Path("/memory")) -> LifecycleWorld:
 class RecordingPhase(TickPhase):
     """Writes its name in the ``journal`` it shares with the others; ``fail`` makes it raise."""
 
-    def __init__(self, name: str, journal: list[str], fail: Exception | None = None) -> None:
+    def __init__(self, name: str, journal: list[str], fail: BaseException | None = None) -> None:
         self.name, self.journal, self.fail = name, journal, fail
         self.seen: list[tuple[Standing, int | None]] = []
 
@@ -613,6 +610,17 @@ class ScriptedOrphanJudge(OrphanJudge):
         return self.verdicts.get(record.get("pgid"), "gone")
 
 
+class FailingHealthReviewer(ScriptedHealthReviewer):
+    """A reviewer whose ``review_if_due`` raises ``error``."""
+
+    def __init__(self, error: Exception) -> None:
+        super().__init__(Review(at=FakeClock().now(), runs=0, flagged=0))
+        self.error = error
+
+    def review_if_due(self, now: datetime) -> Review | None:
+        raise self.error
+
+
 class FixedRunnable(RunnableQuery):
     """These agents could start (but for the ones excluded); ``asked`` keeps the exclusions it was asked with."""
 
@@ -689,10 +697,10 @@ def build_heartbeat_world(tmp: Path = Path("/memory"), config: str = "") -> Hear
     label, lock, marker, ignore = MemoryProcessLabel(), MemorySchedulerLock(w.table), MemoryExitMarker(), MemoryIgnoreList()
     retention, queue, ladder = MemoryEventRetention(w.clock), ListHumanQueue(), ScriptedLadder()
     reviewer = ScriptedHealthReviewer(Review(at=w.clock.now(), runs=0, flagged=0))
-    judge = PsOrphanJudge(w.table)
+    judge = judge_over(w.table)
     ports = LoopPorts(
-        w.ports, label, lock, marker, ignore, judge, w.table, retention, queue, runnable, RunnableOpenWork(w.tasks, runnable),
-        RootTaskWaitingOnUser(w.tasks, w.access.agents, w.box, w.pauses, w.budgets, runnable, nudges), ladder, reviewer, lambda: "test",
+        w.ports, label, lock, marker, ignore, judge, w.table, retention, queue, runnable, open_work_over(w.tasks, runnable),
+        waiting_over(w.tasks, w.access.agents, w.box, w.pauses, w.budgets, runnable, nudges), ladder, reviewer, lambda: "test",
     )
     state, memory = LoopState(count=w.count), LoopMemory()
     loop = assemble_loop(ports, w.clock, w.clock, w.console, state, memory)

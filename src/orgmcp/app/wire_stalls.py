@@ -1,15 +1,11 @@
-"""Providers of the ``stalls`` ports (ARCHITECTURE.md 6.1), and the ladder of the legacy scheduler.
+"""Providers of the ``stalls`` ports (ARCHITECTURE.md 6.1), the ladder on another clock, and a resolver over a runtime.
 
-``RuntimeStalls`` and ``CallableClock`` serve ``scheduler.Scheduler`` until D-sched-2 converts its loop: it is given its clock as a function and its org
-as an object whose ``runtime`` tests replace, and it keeps the memo of the task views for as long as it lives. The stall check is a phase of the loop, which D-sched-2
-builds (``StallLadder`` with the cadence clock): both are deleted then.
+The stall check is a phase of the scheduler's loop (D-sched-2), which times it by its cadence clock: ``ladder_on``. ``RuntimePorts`` resolves a port to the
+field of a runtime that has its type, for the objects that are made over a runtime in force and not by the builder.
 """
 
 from __future__ import annotations
 
-import time
-from collections.abc import Callable
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import TypeVar, cast
 
@@ -50,26 +46,15 @@ def register(b: Builder) -> None:
     b.provide(StallLadder, lambda b: ladder(b, b.get(Clock), FingerprintTaskViews(b.get(TaskQuery), b.get(MailFingerprint))))
 
 
-# ------------------------------------------------------------------------------ the legacy scheduler's ladder
+def ladder_on(b: PortResolver, clock: Clock, views: TaskViews | None = None) -> StallLadder:
+    """The ladder timed by ``clock``: the one of the runtime when that is the clock of the runtime, else one made over the same ports with this clock (the
+    cadence of a scheduler, which a test may move without sleeping) and these task views (default: new ones)."""
+    if clock is b.get(Clock):
+        return b.get(StallLadder)
+    return ladder(b, clock, views or FingerprintTaskViews(b.get(TaskQuery), b.get(MailFingerprint)))
 
 
-class CallableClock(Clock):
-    """A ``Clock`` whose time is a function (``Scheduler(clock=...)``): ``now`` and ``time`` follow it, waits are the system's."""
-
-    def __init__(self, seconds: Callable[[], float]) -> None:
-        self._seconds = seconds
-
-    def now(self) -> datetime:
-        return datetime.fromtimestamp(self._seconds(), timezone.utc)
-
-    def time(self) -> float:
-        return self._seconds()
-
-    def monotonic(self) -> float:
-        return time.monotonic()
-
-    def sleep(self, seconds: float) -> None:
-        time.sleep(seconds)
+# ------------------------------------------------------------------------------ a resolver over a runtime
 
 
 T = TypeVar("T")
@@ -88,40 +73,3 @@ class RuntimePorts(PortResolver):
 
     def get(self, port: type[T]) -> T:
         return cast(T, getattr(self._runtime, self._fields[port]))
-
-
-class RuntimeStalls:
-    """The ladder of a legacy scheduler, over the ports of the runtime in force at each call.
-
-    Tests replace ``org.runtime`` under a running scheduler, so the ports are not fixed when the scheduler is made; the memo of the task views, which the
-    scheduler always kept for itself, is carried over to the ladder of the new runtime."""
-
-    def __init__(self, runtime: Callable[[], OrgRuntime], clock: Callable[[], float]) -> None:
-        self._runtime = runtime
-        self._clock = CallableClock(clock)
-        self._seen: OrgRuntime | None = None
-        self._views: FingerprintTaskViews | None = None
-        self._ladder: StallLadder | None = None
-
-    def _current(self) -> tuple[StallLadder, FingerprintTaskViews]:
-        runtime = self._runtime()
-        if runtime is not self._seen or self._ladder is None or self._views is None:
-            views = (
-                FingerprintTaskViews(runtime.task_query, runtime.mail_fingerprint)
-                if self._views is None
-                else self._views.rebound(runtime.task_query, runtime.mail_fingerprint)
-            )
-            self._ladder, self._views, self._seen = ladder(RuntimePorts(runtime), self._clock, views), views, runtime
-        return self._ladder, self._views
-
-    def check(self) -> list[str]:
-        return self._current()[0].check()
-
-    def task_view(self, addr: str, view: str) -> list[Message]:
-        """``open_tasks`` or ``outstanding`` of an agent, as the ladder sees them (``Scheduler._task_view``)."""
-        views = self._current()[1]
-        if view == "open_tasks":
-            return views.open_tasks(addr)
-        if view == "outstanding":
-            return views.outstanding(addr)
-        raise ValueError(f"no such task view: {view}")

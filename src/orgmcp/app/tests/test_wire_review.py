@@ -51,5 +51,5 @@ def test_the_scheduler_asks_the_reviewer_of_the_runtime_in_force(tmp_path: Path)
     seen: list[str] = []
     sched = Scheduler(org, echo=seen.append, clock=lambda: AT.timestamp())
     org.runtime = dataclasses.replace(org.runtime, health_reviewer=fake)  # tests replace the runtime under a running scheduler
-    sched._check_review()
+    sched.tick()
     assert fake.calls == [("review_if_due", AT, False)] and seen == ["health review: 2 flagged, told ceo, root"]
