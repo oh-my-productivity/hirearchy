@@ -6,8 +6,6 @@ import pytest
 
 from orgmcp.reflection import Stats, StatsReport
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-reflection")
-
 
 def test_the_counts_are_a_stats_report() -> None:
     assert isinstance(Stats(), StatsReport)

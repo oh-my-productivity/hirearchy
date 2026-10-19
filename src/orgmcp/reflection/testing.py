@@ -40,13 +40,13 @@ class FixedCaseHistory(CaseHistory):
         self._timelines = {key: list(value) for key, value in (timelines or {}).items()}
 
     def cases(self, owner: str, service: str) -> list[Case]:
-        raise NotImplementedError  # red: C-reflection
+        return [c for c in self._cases if c.owner == owner and c.service == service]
 
     def case_of(self, task: Message) -> Case | None:
-        raise NotImplementedError  # red: C-reflection
+        return next((c for c in self._cases if task.id in {t.id for t in c.tasks}), None)
 
     def playbook_timeline(self, owner: str, service: str) -> list[tuple[int, datetime]]:
-        raise NotImplementedError  # red: C-reflection
+        return list(self._timelines.get((owner, service), []))
 
 
 # ------------------------------------------------------------------------------ the worlds

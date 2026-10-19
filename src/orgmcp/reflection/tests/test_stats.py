@@ -7,8 +7,6 @@ import pytest
 from orgmcp.kernel import Message
 from orgmcp.reflection import Case, Stats, Verdict, stats_by_version, summarize
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-reflection")
-
 
 def verdict(kind: str) -> Verdict:
     note = Message(sender="root", to="ceo", type="note", body="b", feedback=kind)

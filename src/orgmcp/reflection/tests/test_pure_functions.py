@@ -9,8 +9,6 @@ import pytest
 from orgmcp.kernel import Message
 from orgmcp.reflection import lessons_of, version_at
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-reflection")
-
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
 TIMELINE = [(1, T), (2, T + timedelta(days=1)), (3, T + timedelta(days=2))]
 

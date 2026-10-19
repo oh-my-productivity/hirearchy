@@ -72,31 +72,32 @@ class Case:
 
     @property
     def title(self) -> str:
-        raise NotImplementedError  # red: C-reflection
+        return self.tasks[0].title
 
     @property
     def feedback(self) -> Message | None:
         """The latest feedback note (the final verdict), None when the client has not rated the case."""
-        raise NotImplementedError  # red: C-reflection
+        return self.verdicts[-1].message if self.verdicts else None
 
     @property
     def verdict(self) -> str | None:
         """The final verdict: that of the latest feedback."""
-        raise NotImplementedError  # red: C-reflection
+        return self.verdicts[-1].verdict if self.verdicts else None
 
     @property
     def rejected(self) -> bool:
         """Was the case rejected at least once, whatever came after?"""
-        raise NotImplementedError  # red: C-reflection
+        return any(v.verdict == "reject" for v in self.verdicts)
 
     @property
     def accepted_after_reject(self) -> bool:
-        raise NotImplementedError  # red: C-reflection
+        return self.verdict == "accept" and self.rejected
 
     @property
     def evidence_at(self) -> datetime | None:
         """The latest moment this case produced evidence: its final result or its latest feedback."""
-        raise NotImplementedError  # red: C-reflection
+        times = [t for t in (self.finished, msg_time(self.feedback) if self.feedback else None) if t]
+        return max(times) if times else None
 
 
 @runtime_checkable
@@ -132,19 +133,37 @@ class Stats(StatsReport):
 
     @property
     def finished(self) -> int:
-        raise NotImplementedError  # red: C-reflection
+        return self.done + self.failed
 
     @property
     def avg_runs(self) -> float | None:
-        raise NotImplementedError  # red: C-reflection
+        return round(self.finished_runs / self.finished, 1) if self.finished else None
 
     def line(self) -> str:
-        raise NotImplementedError  # red: C-reflection
+        text = f"{self.requests} request(s): {self.done} done, {self.failed} failed, {self.open} open; {self.reworked} reworked"
+        if self.avg_runs is not None:
+            text += f"; avg {self.avg_runs:g} runs"
+        if self.accept or self.reject:
+            after = f" ({self.accept_after_reject} after a reject)" if self.accept_after_reject else ""
+            text += f"; feedback {self.accept} accept{after}, {self.reject} reject"
+        else:
+            text += "; no feedback"
+        return text
 
 
 def summarize(items: Sequence[Case]) -> Stats:
     """Counts over cases: requests, done, failed, open (incl. blocked), reworked, average runs of finished, verdicts."""
-    raise NotImplementedError  # red: C-reflection
+    s = Stats(requests=len(items))
+    for c in items:
+        s.done += c.state == "done"
+        s.failed += c.state == "failed"
+        s.open += c.state in ("open", "blocked")
+        s.reworked += c.reworks > 0
+        s.accept += c.verdict == "accept"
+        s.reject += c.verdict == "reject"
+        s.accept_after_reject += c.accepted_after_reject
+        s.finished_runs += c.runs if c.state in ("done", "failed") else 0
+    return s
 
 
 def stats_by_version(items: Sequence[Case]) -> dict[int, Stats]:
@@ -153,17 +172,23 @@ def stats_by_version(items: Sequence[Case]) -> dict[int, Stats]:
     (Not the version current when the request was sent: the owner typically revises the playbook right after the
     request arrives, and that request is then delivered under the new version.)
     """
-    raise NotImplementedError  # red: C-reflection
+    return {v: summarize([c for c in items if c.used == v]) for v in sorted({c.used for c in items})}
 
 
 def version_at(timeline: Sequence[tuple[int, datetime]], when: datetime | None) -> int:
     """The playbook version in force at ``when`` (None = now): the latest written at or before it; 0 if none yet."""
-    raise NotImplementedError  # red: C-reflection
+    return max((v for v, t in timeline if when is None or t <= when), default=0)
 
 
 def lessons_of(result: Message) -> str:
     """The text of the ``## Lessons`` section of a result body ("" if there is none)."""
-    raise NotImplementedError  # red: C-reflection
+    out, inside = [], False
+    for line in result.body.splitlines():
+        if line.startswith("## "):
+            inside = line[3:].strip().lower() == "lessons"
+        elif inside:
+            out.append(line)
+    return "\n".join(out).strip()
 
 
 @runtime_checkable

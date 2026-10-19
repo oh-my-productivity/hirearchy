@@ -9,8 +9,6 @@ import pytest
 from orgmcp.kernel import Message
 from orgmcp.reflection import Case, Verdict
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-reflection")
-
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 
