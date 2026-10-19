@@ -23,7 +23,7 @@ from ._fakes import (
     LoggingStamper,
     LoggingTap,
 )
-from ._support import RED, task
+from ._support import task
 
 
 class Rig:
@@ -47,21 +47,18 @@ def test_it_is_a_message_delivery() -> None:
 # ------------------------------------------------------------------------------ the order
 
 
-@RED
 def test_the_order_is_id_then_time_then_stamp_then_store_then_note_then_event() -> None:
     rig = Rig()
     rig.delivery.deliver(task())
     assert rig.log == ["id", "clock", "stamp", "store", "note", "emit"]
 
 
-@RED
 def test_nothing_is_asked_for_an_id_and_a_time_that_are_set() -> None:
     rig = Rig()
     rig.delivery.deliver(task(id="I", created="C"))
     assert rig.log == ["stamp", "store", "note", "emit"]
 
 
-@RED
 def test_only_the_missing_one_of_the_two_is_made() -> None:
     rig = Rig()
     rig.delivery.deliver(task(id="I"))
@@ -71,40 +68,34 @@ def test_only_the_missing_one_of_the_two_is_made() -> None:
     assert other.log[:2] == ["id", "stamp"] and other.clock.calls == 0
 
 
-@RED
 def test_the_id_is_made_for_the_sender_as_written() -> None:
     rig = Rig()
     msg = rig.delivery.deliver(task("ceo/eng", "ceo"))
     assert rig.ids.asked == ["ceo/eng"] and msg.id == "ID-ceo/eng"
 
 
-@RED
 def test_the_time_is_the_clock_to_the_second() -> None:
     assert Rig().delivery.deliver(task()).created == "2030-05-06T07:08:09+00:00"
 
 
-@RED
 def test_the_stamper_sees_the_message_with_its_id_and_time() -> None:
     rig = Rig()
     rig.delivery.deliver(task())
     assert isinstance(rig.stamper, LoggingStamper) and rig.stamper.saw == [("ID-root", "2030-05-06T07:08:09+00:00")]
 
 
-@RED
 def test_what_is_stored_carries_the_stamped_trace() -> None:
     rig = Rig(lambda log: LoggingStamper(log, trace="T-STAMPED"))
     rig.delivery.deliver(task())
     assert rig.mail.traces_seen == ["T-STAMPED"] and rig.mail.stored[0].trace == "T-STAMPED"
 
 
-@RED
 def test_the_trace_noted_on_the_tool_call_is_the_one_stamped() -> None:
     rig = Rig(lambda log: LoggingStamper(log, trace="T-STAMPED"))
     rig.delivery.deliver(task())
     assert rig.tap.notes == ["T-STAMPED"]
 
 
-@RED
 def test_an_unstamped_message_notes_none() -> None:
     rig = Rig(lambda log: LoggingStamper(log, trace=None, rule="ambiguous"))
     rig.delivery.deliver(task())
@@ -114,7 +105,6 @@ def test_an_unstamped_message_notes_none() -> None:
 # ------------------------------------------------------------------------------ a stamping exception never blocks a message
 
 
-@RED
 def test_a_stamping_exception_does_not_stop_the_message() -> None:
     rig = Rig(FailingStamper)
     msg = rig.delivery.deliver(task())
@@ -122,7 +112,6 @@ def test_a_stamping_exception_does_not_stop_the_message() -> None:
     assert rig.log == ["id", "clock", "stamp", "store", "note", "emit"]
 
 
-@RED
 def test_a_stamping_exception_is_the_rule_error_without_candidates() -> None:
     rig = Rig(FailingStamper)
     rig.delivery.deliver(task())
@@ -131,7 +120,6 @@ def test_a_stamping_exception_is_the_rule_error_without_candidates() -> None:
     assert rig.tap.notes == [None]
 
 
-@RED
 @pytest.mark.parametrize("error", [ValueError("x"), OSError("disk"), KeyError("k"), RuntimeError("r")])
 def test_any_ordinary_exception_while_stamping_is_swallowed(error: Exception) -> None:
     rig = Rig(lambda log: FailingStamper(log, error))
@@ -141,7 +129,6 @@ def test_any_ordinary_exception_while_stamping_is_swallowed(error: Exception) ->
 # ------------------------------------------------------------------------------ a write that fails
 
 
-@RED
 def test_a_failing_store_raises_and_nothing_follows_it() -> None:
     rig = Rig(store_fails=OSError(28, "No space left on device"))
     with pytest.raises(OSError):
@@ -150,7 +137,6 @@ def test_a_failing_store_raises_and_nothing_follows_it() -> None:
     assert rig.events.events == [] and rig.tap.notes == []
 
 
-@RED
 def test_the_message_is_completed_in_place_even_when_the_store_fails() -> None:
     rig = Rig(store_fails=OSError("disk"))
     msg = task()
@@ -162,7 +148,6 @@ def test_the_message_is_completed_in_place_even_when_the_store_fails() -> None:
 # ------------------------------------------------------------------------------ notify
 
 
-@RED
 def test_notify_delivers_a_note_of_the_runtime_through_the_same_pipeline() -> None:
     rig = Rig(lambda log: GivenStamper())
     msg = rig.delivery.notify(" /ceo/ ", "Title", "Body", wake=False, trace="T9")
@@ -172,7 +157,6 @@ def test_notify_delivers_a_note_of_the_runtime_through_the_same_pipeline() -> No
     assert rig.ids.asked == [RUNTIME] and rig.tap.notes == ["T9"]
 
 
-@RED
 def test_notify_without_a_trace_leaves_the_decision_to_the_stamper() -> None:
     rig = Rig(lambda log: GivenStamper())
     for trace in (None, ""):
@@ -180,6 +164,5 @@ def test_notify_without_a_trace_leaves_the_decision_to_the_stamper() -> None:
     assert [e.fields["trace_rule"] for e in rig.events.events] == ["ambiguous", "ambiguous"]
 
 
-@RED
 def test_notify_wakes_by_default() -> None:
     assert Rig().delivery.notify("ceo", "t", "b").wake is True

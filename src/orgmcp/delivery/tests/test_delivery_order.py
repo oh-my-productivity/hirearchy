@@ -12,9 +12,7 @@ import pytest
 from orgmcp.delivery.testing import DeliveryHarness, fs_pipeline, memory_pipeline
 from orgmcp.kernel import RUNTIME, Message
 
-from ._support import RED, make, task
-
-pytestmark = RED
+from ._support import make, task
 
 
 @pytest.fixture(params=[fs_pipeline, memory_pipeline], ids=lambda factory: factory.__name__)

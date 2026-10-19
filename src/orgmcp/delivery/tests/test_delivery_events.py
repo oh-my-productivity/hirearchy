@@ -13,7 +13,7 @@ from orgmcp.delivery._pipeline import PipelineMessageDelivery
 from orgmcp.kernel import RUNTIME, Message
 
 from ._fakes import Log, LoggingEvents, LoggingMailbox, LoggingStamper, LoggingTap, CountingClock, CountingIds
-from ._support import RED, make, task
+from ._support import make, task
 
 # the keys of the event, in this order (the order of the JSON line in the event files)
 KEYS = [
@@ -29,20 +29,17 @@ def deliver_with(stamper: LoggingStamper, msg: Message) -> LoggingEvents:
     return events
 
 
-@RED
 def test_the_event_has_the_golden_fields_in_the_golden_order() -> None:
     events = deliver_with(LoggingStamper([], trace="T1", rule="link"), task("ceo", "root", type="result", status="done"))
     (event,) = events.events
     assert event.kind == "msg.deliver" and list(event.fields) == KEYS
 
 
-@RED
 def test_the_event_says_who_delivered_in_which_request() -> None:
     (event,) = deliver_with(LoggingStamper([], trace="T1"), task("ceo/eng", "ceo")).events
     assert (event.actor, event.trace) == ("ceo/eng", "T1")
 
 
-@RED
 def test_the_values_are_those_of_the_message() -> None:
     msg = task(
         "ceo", "ceo/eng", type="task", title="Draft the plan", status=None, budget=3, reply_to="R", revises="V", supersedes="S", service="svc",
@@ -56,33 +53,28 @@ def test_the_values_are_those_of_the_message() -> None:
     }
 
 
-@RED
 def test_the_title_is_clipped_to_eighty_characters_and_the_body_is_only_counted() -> None:
     (event,) = deliver_with(LoggingStamper([]), task(title="t" * 100, body="b" * 5000)).events
     assert event.fields["title"] == "t" * 79 + "…" and event.fields["chars"] == 5000
     assert "body" not in event.fields
 
 
-@RED
 def test_the_candidates_of_an_ambiguous_message_come_last() -> None:
     stamper = LoggingStamper([], trace=None, rule="ambiguous", candidates=["T1", "T2"])
     (event,) = deliver_with(stamper, task("ceo", "root", type="note")).events
     assert list(event.fields) == [*KEYS, "trace_candidates"] and event.fields["trace_candidates"] == ["T1", "T2"] and event.trace is None
 
 
-@RED
 def test_without_candidates_the_key_is_absent() -> None:
     (event,) = deliver_with(LoggingStamper([]), task()).events
     assert "trace_candidates" not in event.fields
 
 
-@RED
 def test_a_notice_of_the_runtime_is_an_event_of_the_runtime() -> None:
     (event,) = deliver_with(LoggingStamper([], trace=None, rule="ambiguous"), task(RUNTIME, "ceo", type="note")).events
     assert (event.actor, event.fields["from"]) == (RUNTIME, RUNTIME)
 
 
-@RED
 def test_one_event_per_message() -> None:
     log: Log = []
     events = LoggingEvents(log)
@@ -100,7 +92,6 @@ def h(request: pytest.FixtureRequest, tmp_path: Path) -> DeliveryHarness:
     return make(request, tmp_path)
 
 
-@RED
 def test_a_task_of_the_human_starts_a_trace_and_the_event_says_so(h: DeliveryHarness) -> None:
     assert h.events is not None and h.tap is not None
     msg = h.delivery.deliver(task("root", "ceo"))
@@ -109,7 +100,6 @@ def test_a_task_of_the_human_starts_a_trace_and_the_event_says_so(h: DeliveryHar
     assert h.tap.notes == [msg.id]
 
 
-@RED
 def test_an_answer_joins_the_trace_of_the_task_it_answers(h: DeliveryHarness) -> None:
     assert h.events is not None
     first = h.delivery.deliver(task("root", "ceo"))
@@ -118,7 +108,6 @@ def test_an_answer_joins_the_trace_of_the_task_it_answers(h: DeliveryHarness) ->
     assert [e.fields["trace_rule"] for e in h.events.events] == ["new", "link"]
 
 
-@RED
 def test_a_notice_about_a_task_keeps_the_trace_it_is_given(h: DeliveryHarness) -> None:
     assert h.events is not None
     h.delivery.notify("ceo", "t", "b", trace="T5")

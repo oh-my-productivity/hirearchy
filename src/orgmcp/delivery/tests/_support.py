@@ -11,8 +11,6 @@ import pytest
 from orgmcp.delivery.testing import DeliveryHarness
 from orgmcp.kernel import Message
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-delivery")
-
 
 def make(request: pytest.FixtureRequest, tmp_path: Path) -> DeliveryHarness:
     """The fixture body of the contract suite: the harness of one implementation, with the agents ``ceo`` and ``ceo/eng``."""
