@@ -1,5 +1,9 @@
+import os
+import sys
 import time
 from datetime import timedelta
+
+import pytest
 
 from orgmcp import templates
 from orgmcp.cli import main
@@ -235,17 +239,41 @@ def test_cadence_comes_from_files_not_memory(org):
 
 
 class Clock:
-    """Real time plus an offset, so a test can move time forward without sleeping."""
+    """A fixed starting time plus an offset, so a test can move time forward without sleeping, and the wall clock (a loaded machine) cannot move it."""
 
     def __init__(self):
+        self.base = time.time()
         self.offset = 0.0
 
     def __call__(self):
-        return time.time() + self.offset
+        return self.base + self.offset
+
+
+def no_agent(org, addr, prompt):
+    """The run of an agent woken by a review note: a process that does nothing (never the real kiro-cli)."""
+    return [sys.executable, "-c", "pass"], org.dir(addr), {**os.environ}
+
+
+SCHEDULERS = []
+
+
+@pytest.fixture(autouse=True)
+def settled():
+    """Let the runs a test's schedulers started end and be reaped, so no process and no run log is left open."""
+    yield
+    for sched in SCHEDULERS:
+        for _ in range(500):
+            if not sched.runs:
+                break
+            time.sleep(0.02)
+            sched._reap()
+    SCHEDULERS.clear()
 
 
 def scheduler(org, clock):
-    return Scheduler(org, echo=lambda _: None, clock=clock)  # nothing is unread, so no runner is ever called
+    sched = Scheduler(org, no_agent, echo=lambda _: None, clock=clock)  # a review note wakes its manager: that run does nothing
+    SCHEDULERS.append(sched)
+    return sched
 
 
 def test_tick_reviews_when_the_time_is_up_and_not_before(org):

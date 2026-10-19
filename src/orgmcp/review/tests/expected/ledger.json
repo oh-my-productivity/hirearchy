@@ -1,0 +1,22 @@
+{
+  "at": "2026-01-01T18:00:00+00:00",
+  "runs": 0,
+  "notified": {
+    "ceo": [
+      "ceo/eng:idle",
+      "ceo/qa:idle",
+      "ceo/cto:branch:paused"
+    ],
+    "ceo/cto": [
+      "ceo/cto/dev:paused",
+      "ceo/cto/dev:idle"
+    ],
+    "root": [
+      "ceo/cto/dev:paused",
+      "ceo/cto/dev:idle",
+      "ceo/eng:idle",
+      "ceo/qa:idle",
+      "ops/dev:stuck"
+    ]
+  }
+}

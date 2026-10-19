@@ -832,16 +832,26 @@ ports of the `Org` they are given *at the call* (`_assembly.analyzer_of`), so th
 
 ### 3.26 `review`
 
-Data: `Note`, `Review` (with pure `render`).
+Data: `Note`, `Review` (it subclasses `ReviewReport`, so it is no allow-list entry).
 
 ```python
+class ReviewReport(Protocol):  # what a Review can show of itself (pure; Review subclasses it)
+    def render(self, dry_run: bool = False) -> str: """What was (or, for a dry run, would be) sent to whom."""
 class HealthReviewer(Protocol):
     def review(self, now: datetime | None = None, dry_run: bool = False) -> Review: ...
     def review_if_due(self, now: datetime) -> Review | None: """Due by review_every_runs or review_every_seconds; the first call starts the clock."""
     def total_runs(self) -> int: """Runs ever used, retired agents included."""
     def read_ledger(self) -> JsonObject | None: ...
 ```
-Impl: `LedgerHealthReviewer`.
+Impl: `LedgerHealthReviewer`, composed (7 collaborators) of six small private role classes behind the package's own narrow ports (`_ports.py`): `ReviewPlanner`
+(`HealthReviewPlanner`: who is told what, from the health report and the previous ledger; asks `HealthAnalyzer`, `Notices`, `ReserveCheck` and `RunTotal`),
+`ReviewLedger` (`StoreReviewLedger`: `.runtime/reviews.json` over `kernel.LedgerStore`, read as a `LedgerRecord`), `RunTotal` (`ArchivedRunTotal`: run logs of the
+agents + `RetiredArchive.run_count`), `ReviewCadence` (`LedgerReviewCadence`: due by `review_every_runs` / `review_every_seconds`, starts the clock, rebases a shrunk
+counter), `ReserveCheck` (`BudgetReserveCheck`: paused / no budget / reserved for outstanding delegations) and `NoteOutbox` (`DeliveryNoteOutbox`: one non-quiet
+`MessageDelivery.notify` per note). `ReviewReport` is pure (`testing.PURE`); the fakes are the memory `ReviewWorld` (the reviewer over `FixedHealthAnalyzer`,
+`FixedBudget` and the in-memory mailboxes, runs, pause flags, settings and ledger; the same suite runs over disk) and `testing.ScriptedHealthReviewer` (the reviews a
+test puts in and the calls made, for `scheduler` and `cli`). Runtime field: `health_reviewer`. The legacy functions (`review/_legacy.py`) ask
+`org.runtime.health_reviewer` at the call.
 
 ### 3.27 `stalls`
 
