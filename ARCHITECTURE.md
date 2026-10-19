@@ -1153,10 +1153,8 @@ class RunReaper(Protocol):
     def reap(self, runs: RunTable) -> None: """Collect finished, timed-out and retired runs; settle their batches."""
 class OrphanSettler(Protocol):
     def settle(self, runs: RunTable, blocked: set[str]) -> None: """Kill or note runs of a dead scheduler (running.json)."""
-class UpkeepPhase(Protocol):
-    def run(self, runs: RunTable, runnable: int) -> None: """Heartbeat event + daily event-log pruning."""
 class ExitPolicy(Protocol):
-    def after_tick(self, active: bool, max_runs: int | None) -> str | None: """Reason to exit (idle, finished, waiting on the user), or None."""
+    def after_tick(self, stop: StopWhen, active: bool, standing: Standing) -> str | None: """Reason to exit (idle, finished, waiting on the user), or None."""
 class PhaseGuard(Protocol):
     def guard(self, phase: str, fn: Callable[[], None]) -> None: """Run a best-effort phase; log once per distinct error."""
 
@@ -1170,6 +1168,24 @@ counted in a `RunCount` the loop and the preparation share (`max_runs` is compar
 before. `_assembly.assemble(LifecyclePorts, run_clock, console, guard, count) -> Lifecycle(starter, reaper)` is the one place that puts them together (wiring and
 `testing.lifecycle_world` call it); `app/wire_scheduler.lifecycle_of(runtime, ...)` makes it over a runtime. The boundary for D-sched-2: `HeartbeatLoop` takes a `Lifecycle`
 (or the two ports) and a `cadence_clock`; it owns `RunTable`, `RunCount` and `blocked`; `Scheduler._launch/_start/_reap/release` are delegators until it replaces them.
+
+**D-sched-2 (the loop) as built.** `api.py` publishes `SchedulerLoop` (`serve`, `run_once`, `tick`, `finished`); the legacy `Scheduler` subclasses it. `_ports.py` adds the
+roles the loop is made of, each a small Protocol: `OrphanSettler` (`LedgerOrphanSettler`, with `RunNotes`: `LogRunNotes`), `TickPhase` (`run(standing, max_runs)`: one step of a pass;
+`FailureLedgerRepair`, `ReapPhase`, `OrphanCheck`, `FundedResume`, `RunLaunch`, `StallCheck`, `ReviewCheck`, `HeartbeatUpkeep`, and `GuardedPhase(name, phase, guard)` for the
+best-effort ones), `WorkLeft` (`QueriedWork`: `remains`, `finished`, `waiting` over `attention.OpenWork`, `eligibility.RunnableQuery` and `attention.WaitingOnUser`), `WaitGrace`
+(`GraceWait`), `ExitPolicy` (`GraceExitPolicy`), `Pacing` (`PollPacing`), and the session: `Claim` (`ProcessClaim`: process label, `SchedulerLock`, `ExitMarker`, `IgnoreList`),
+`SessionEvents` (`SessionAnnouncer` in `_events.py`), `InterruptedRuns` (`BatchRecovery`), `SchedulerSession` (`ClaimedSession`: `open` = claim, `scheduler.start`, orphans,
+recover; `close` = terminate the runs, give up the claim, `scheduler.exit`). `PhaseGuard` is `LoggingPhaseGuard`. `HeartbeatLoop(session, phases, lifecycle, work, exits, pacing,
+state)` owns a `LoopState` (the `RunTable`, the `blocked` set, the `RunCount`, `mode`, `max_runs`, `exit_reason`) and passes it to the phases as a `Standing` (the live runs and
+blocked set, and whether `max_runs` allows another run); what the collaborators remember between two ticks (the guard's last errors, the heartbeat and prune times, the start of
+the grace count, the memo of the stall ladder's task views) is a `LoopMemory` handed to them, so a loop made again over another runtime goes on where the old one was.
+`_assembly.assemble_loop(LoopPorts, run_clock, cadence, console, state, memory)` is the one place that puts everything together (wiring and `testing.heartbeat_world` call it);
+`app/wire_scheduler.loop_of(runtime, commands, console, cadence, state, memory, overrides)` makes it over a runtime (`overrides`: ports put in the place of the runtime's, as
+`open_runtime` overrides do; `SchedulerLoop` is `NOT_A_FIELD`). Deviations from the sketch above: the upkeep is a `TickPhase`, not a port of its own, and counts the runnable
+agents itself (lazily, when a heartbeat is due) instead of taking `runnable: int`; `ExitPolicy.after_tick` takes the modes and the standing because the policy is stateless and
+the loop owns the runs; the tick order is the order of the list in `assemble_loop`. `finished()` asks `attention.OpenWork.nothing_to_do(running=, blocked=, can_start=)` (the port
+gained those keyword arguments, defaulting to the old question) instead of keeping a copy of its rule. The two clocks: the loop times runs by the run clock (`SystemClock`) and
+the stall ladder, the review, the heartbeat, the grace count and the guard by the cadence clock (`wire_stalls.ladder_on(ports, cadence)`).
 
 ```python
 # mcp_server/api.py
@@ -1760,32 +1776,33 @@ in the table of its module. Constants move with the code that uses them (listed 
 | `_strays_since` | `strays.StrayProbe.found_since` |
 | `nothing_to_do` | `attention.OpenWork.nothing_to_do` |
 | `Scheduler` | `scheduler.SchedulerLoop` + collaborators, per the method table in 5.5 |
-| `_RunnerCommands`, `_EchoConsole`, `_SchedulerGuard`, `_Lifecycles` | `scheduler/_legacy.py`: the adapters of the legacy `Scheduler` to the lifecycle (its runner -> `RunCommandBuilder`, its `echo` -> `Console`, its `_guard` -> `PhaseGuard`, and the starter and the reaper built by `app/wire_scheduler.lifecycle_of` over the runtime `org.runtime` is now); they go with the class (D-sched-2) |
+| `_RunnerCommands`, `_EchoConsole`, `FunctionClock`, `_Loops` | `scheduler/_legacy.py`: the adapters of the legacy `Scheduler` to the loop (its runner -> `RunCommandBuilder`, its `echo` -> `Console`, its `clock` function -> the cadence `Clock`, `FunctionClock`, replacing `app/wire_stalls.CallableClock`), and `_Loops`, which makes the `HeartbeatLoop` by `app/wire_scheduler.loop_of` over the runtime `org.runtime` is now and again when tests replace it, with the state and the memory of the old loop (replacing `_Lifecycles`); `_SchedulerGuard` is deleted (the guard is `LoggingPhaseGuard`). They go with the class (E3) |
 | `_patched`, `_wire` | the late lookups the legacy surface of `scheduler/_legacy.py` keeps until E3 (`_patched`: an attribute of the package `orgmcp.scheduler`, which tests replace; `_wire`: a module of `orgmcp.app`, which an entry point may not import) |
 
 ### 5.5 `scheduler.Scheduler` — method distribution (class is split)
 
 | Method(s) | Target |
 |---|---|
-| `__init__` | composition in `wiring.build_scheduler`; state moves to `scheduler/_loop.py::HeartbeatLoop` (`runs`, `total_runs`, `mode`, `max_runs`, `exit_reason`) |
-| `_emit` | `kernel.EventSink.emit` on the scheduler's sink (`proc="scheduler"`, `actor="runtime"`), wrapped by `scheduler/_events.py::SchedulerEvents` |
-| `acquire` | `HeartbeatLoop._acquire`: `ProcessLabel.set("scheduler")`, `SchedulerLock.acquire`, `IgnoreList.ensure_runtime_files`, `scheduler.start` event, `OrphanSettler.settle`, `BatchStore.recover` |
-| `release` | `HeartbeatLoop._shutdown`: `RunReaper.terminate_all` (SIGTERM, wait 10 s, SIGKILL group, log note, `BatchStore.end(ok=False)`, `run.end` events), `RunRegistry.forget`, `SchedulerLock.release`, `scheduler.exit` event |
-| `serve`, `tick`, `finished` | `scheduler.SchedulerLoop.serve / tick / finished` |
-| `waiting_on_user`, `_check_waiting` | `HeartbeatLoop.waiting_on_user` -> `attention.WaitingOnUser.analyze(running=..., blocked=..., can_start=...)`; `_check_waiting` -> `scheduler/_exit.py::GraceExitPolicy` (`ExitPolicy`) |
+| `__init__` | composition in `app/wire_scheduler.loop_of` -> `_assembly.assemble_loop`; what the collaborators remember is `LoopMemory`; the legacy `Scheduler` keeps `org`, `runner`, `echo`, `clock` (and takes `ports=`, ports to put in place of the runtime's) |
+| `runs`, `mode`, `max_runs`, `exit_reason`, `total_runs`, `_count`, `_blocked` | `scheduler/_run.py::LoopState` (`runs`, `blocked`, `count`, `mode`, `max_runs`, `exit_reason`), owned by `HeartbeatLoop`; on the legacy `Scheduler` they are properties over it |
+| `_emit` | `kernel.EventSink.emit` on the scheduler's sink (`proc=scheduler`, `actor=runtime`), wrapped by `scheduler/_events.py::SchedulerEvents`; `scheduler.start` / `scheduler.exit` are `_events.py::SessionAnnouncer` |
+| `acquire` | `HeartbeatLoop.acquire` -> `_session.py::ClaimedSession.open`: `ProcessClaim.take` (`ProcessLabel.set("scheduler")`, `SchedulerLock.acquire`, `ExitMarker.clear`, `IgnoreList.ensure_runtime_files`), `scheduler.start` event, `OrphanSettler.settle`, `BatchRecovery.recover` (`BatchStore.recover`) |
+| `release` | `HeartbeatLoop.release` -> `ClaimedSession.close`: `RunReaper.terminate_all` (SIGTERM, wait 10 s, SIGKILL group, log note, `BatchStore.end(ok=False)`, `run.end` events), `ProcessClaim.give_up` (`SchedulerLock.release`), `scheduler.exit` event |
+| `serve`, `tick`, `finished`, `run_once` | `scheduler/_loop.py::HeartbeatLoop.serve / tick / finished / run_once` (`SchedulerLoop`); `run_once` is the body of `cli.cmd_run --once`, which D-cli replaces by the call |
+| `waiting_on_user`, `_check_waiting` | `HeartbeatLoop.waiting_on_user` -> `WorkLeft.waiting` (`_work.py::QueriedWork` -> `attention.WaitingOnUser.analyze(running=..., blocked=..., can_start=...)`); `_check_waiting` / `_waiting_since` -> `_exit.py::GraceWait.check` (memory: `GraceMemory`), used by `GraceExitPolicy` (`ExitPolicy`) |
 | `_running_records`, `_record_run`, `_forget_run` | `runs.RunRegistry.all / record / forget` (via `scheduler/_tracker.py::RunTracker`, `RunRecords`) |
 | `_ignore_running_ledger` | `snapshots.IgnoreList.ensure_runtime_files` |
-| `_settle_orphans`, `_note_in_log` | `scheduler/_orphans.py::LedgerOrphanSettler` (`OrphanSettler`) using `OrphanJudge`, `ProcessSignaller`, `RunLogWriter.append_note` |
-| `_upkeep_events` | `scheduler/_upkeep.py::HeartbeatUpkeep` (`UpkeepPhase`): `attention.HumanQueue.items` for `waiting_on_you`, `EventRetention.prune` |
-| `_repair_failures_ledger` | `eligibility.FailureCounter.repair` |
-| `_guard`, `_guard_value` | `scheduler/_guard.py::LoggingPhaseGuard` (`PhaseGuard`) |
-| `_resume_funded` | `HeartbeatLoop._resume_funded` using `PauseStore`, `BudgetQuery` |
-| `_runnable` | `eligibility.RunnableQuery.runnable` |
+| `_settle_orphans`, `_note_in_log` | `scheduler/_orphans.py::LedgerOrphanSettler` (`OrphanSettler`) using `OrphanJudge`, `ProcessSignaller`, `RunNotes` (`LogRunNotes` over `RunLogWriter.append_note`); the `OrphanCheck` phase runs it while an agent is blocked |
+| `_upkeep_events` | `scheduler/_upkeep.py::HeartbeatUpkeep` (a `TickPhase`): `attention.HumanQueue.items` for `waiting_on_you`, `EventRetention.prune`; memory: `UpkeepMemory` |
+| `_repair_failures_ledger` | `_phases.py::FailureLedgerRepair` (`eligibility.FailureCounter.repair`) |
+| `_guard`, `_guard_value`, `_phase_errors`, `_error_emitted` | `scheduler/_guard.py::LoggingPhaseGuard` (`PhaseGuard`; memory: `GuardMemory`); `_phases.py::GuardedPhase` puts a phase behind it |
+| `_resume_funded` | `_phases.py::FundedResume` using `AgentDirectory`, `PauseStore`, `BudgetQuery` |
+| `_runnable` | `eligibility.RunnableQuery.runnable` (the loop asks it through `QueriedWork` and `HeartbeatUpkeep`; the legacy `Scheduler._runnable` stays a delegator until the tests that poke it move) |
 | `_launch`, `_start`, `_emit_run_start` | D-sched-1, in `scheduler/_starter.py`: `AgentRunLauncher` (`RunStarter`; `_launch`) over `BudgetGate` (`_admission.py`, `RunAdmission`: unread, pauses, the budget pause and its notice) and `SingleRunStarter` (`RunInitiation`; `_start`) made of `BatchPreparer` (`BatchStore.begin`, `RunLogWriter.create/open_sink`, `RunPromptBuilder`, counts the run in `RunCount`), `CommandSpawner` (`RunCommandBuilder`, `ProcessSpawner`: log header, command, prompt on a temp-file stdin), `StartFailureHandler`, `StartAnnouncer` (`_emit_run_start` is `_events.py::LifecycleEvents.started`) and `StrayCheck.before` |
 | `_emit_run_end`, `_reap`, `_check_strays`, `_failed` | D-sched-1, in `scheduler/_reaper.py`: `PollingRunReaper` (`RunReaper`; `_reap`) over `ExitWatcher` (poll, timeout by the run clock, retired agent; kills the group), `RunSettlement` (`BatchStore.end`, `OrgSnapshotter.commit`), `ShutdownTerminator` (the run half of `release`); `_emit_run_end` is `LifecycleEvents.ended`; `_check_strays` is `_strays.py::StrayCheck.after`; `_failed` is `_failures.py::CountingFailures` + `PausingEscalation` (`FailureCounter`, `PauseStore`, `MessageDelivery`, `Notices.failures`) |
 | `total_runs` | `scheduler/_run.py::RunCount.total` (the loop reads it; the preparation of a run counts it, as the old `_start` did, before the prompt is written) |
-| `_check_review` | `HeartbeatLoop` phase -> `review.HealthReviewer.review_if_due` |
-| `_check_stalls`, `_task_view`, `_chain`, `_created`, `_last_run_end` | `stalls.StallLadder.check` (`EscalationStallLadder`; memo keyed by `MailFingerprint`; `_last_run_end` -> `RunLogReader.last_end`) |
+| `_check_review` | `_phases.py::ReviewCheck` (a guarded phase) -> `review.HealthReviewer.review_if_due(cadence_clock.now())` |
+| `_check_stalls`, `_task_view`, `_chain`, `_created`, `_last_run_end` | `_phases.py::StallCheck` (a guarded phase) -> `stalls.StallLadder.check` (`EscalationStallLadder`, timed by the cadence clock: `app/wire_stalls.ladder_on`; its task-view memo is `LoopMemory.stall_views`); `_task_view` -> `stalls.FingerprintTaskViews`; `_last_run_end` -> `RunLogReader.last_end` (the three poking tests were converted) |
 
 ### 5.6 `server.py`
 

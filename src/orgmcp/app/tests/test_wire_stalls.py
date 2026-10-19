@@ -1,5 +1,5 @@
-"""``wire_stalls``: the runtime has the ladder and the nudge ledger, built from the ports of the runtime; and the ladder of the legacy scheduler follows
-the runtime in force, with its clock, and keeps its memo of the task views."""
+"""``wire_stalls``: the runtime has the ladder and the nudge ledger, built from the ports of the runtime; and the ladder of a scheduler is timed by the
+cadence clock it is given and keeps its memo of the task views when the loop is made again over another runtime."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from orgmcp.agents import AgentDirectory
-from orgmcp.app import Org, wire_stalls, wiring
+from orgmcp.app import Org, wire_scheduler, wire_stalls, wiring
 from orgmcp.delivery import MessageDelivery
 from orgmcp.delivery.testing import RecordingDelivery
 from orgmcp.eligibility import PauseStore
@@ -22,6 +22,10 @@ from orgmcp.mail._tasks import DerivedTaskQuery
 from orgmcp.mail.testing import CountingMessageParser, MemoryMailbox
 from orgmcp.runs import RunLogReader
 from orgmcp.runs.testing import MemoryRuns
+from orgmcp.scheduler._legacy import FunctionClock
+from orgmcp.scheduler._loop import HeartbeatLoop
+from orgmcp.scheduler._run import LoopMemory, LoopState
+from orgmcp.scheduler.testing import RecordingConsole, ScriptedCommands
 from orgmcp.settings import OrgSettings
 from orgmcp.settings.testing import MemoryOrgSettings
 from orgmcp.stalls import NudgeLedger, StallLadder
@@ -92,12 +96,12 @@ def test_the_nudge_ledger_is_the_one_the_ladder_writes(tmp_path: Path) -> None:
     assert runtime.nudge_ledger.entries() == {"T-1": {"step": 0, "at": at}}
 
 
-# ------------------------------------------------------------------------------ the legacy scheduler's seam
+# ------------------------------------------------------------------------------ the scheduler's seam
 
 
 def test_a_clock_made_of_a_function_follows_it() -> None:
     now = [1_800_000_000.0]
-    clock = wire_stalls.CallableClock(lambda: now[0])
+    clock = FunctionClock(lambda: now[0])
     assert isinstance(clock, Clock) and clock.time() == 1_800_000_000.0 and clock.now().timestamp() == 1_800_000_000.0
     now[0] += 5
     assert clock.time() == 1_800_000_005.0 and clock.now().timestamp() == 1_800_000_005.0
@@ -117,12 +121,17 @@ def org(tmp_path: Path) -> Org:
     return made
 
 
+def test_the_runtime_ladder_is_the_ladder_on_the_clock_of_the_runtime(org: Org) -> None:
+    ports = wire_stalls.RuntimePorts(org.runtime)
+    assert wire_stalls.ladder_on(ports, org.runtime.clock) is org.runtime.stall_ladder
+
+
 def test_the_scheduler_ladder_uses_the_clock_it_is_given(org: Org) -> None:
     task = org.delegate("root", "ceo", "T", "g", "a", budget=3)
     org.begin_run("ceo")
     org.end_run("ceo", ok=True)
     now = [time.time()]
-    stalls = wire_stalls.RuntimeStalls(lambda: org.runtime, lambda: now[0])
+    stalls = wire_stalls.ladder_on(wire_stalls.RuntimePorts(org.runtime), FunctionClock(lambda: now[0]))
     assert stalls.check() == []
     now[0] += 601
     assert stalls.check() == [f"ceo: reminded about open task {task.id}"]
@@ -132,15 +141,23 @@ def test_the_scheduler_ladder_follows_the_runtime_and_keeps_its_memo(org: Org) -
     task = org.delegate("root", "ceo", "T", "g", "a", budget=3)
     org.begin_run("ceo")
     org.end_run("ceo", ok=True)
-    stalls = wire_stalls.RuntimeStalls(lambda: org.runtime, time.time)
-    assert [t.id for t in stalls.task_view("ceo", "open_tasks")] == [task.id]
+    memory = LoopMemory()
+
+    def make() -> HeartbeatLoop:
+        return wire_scheduler.loop_of(org.runtime, ScriptedCommands(), RecordingConsole(), FunctionClock(time.time), LoopState(), memory)
+
+    make()
+    views = memory.stall_views
+    assert [t.id for t in views.open_tasks("ceo")] == [task.id]  # type: ignore[attr-defined]
     counting = CountingMessageParser()
     org.runtime = wiring.open_runtime(org.root, {MessageParser: counting})  # tests replace the runtime under a running scheduler
+    make()  # the loop is made again over the runtime in force, and goes on with the memo of the old
+    views = memory.stall_views
     for _ in range(3):
-        stalls.task_view("ceo", "open_tasks")
+        views.open_tasks("ceo")  # type: ignore[attr-defined]
     assert counting.loaded == []  # the mailbox did not change: what was remembered is still good
     org.report("ceo", task.id, "done", "ok")
-    assert stalls.task_view("ceo", "open_tasks") == [] and counting.loaded  # a change is read through the ports of the runtime in force
+    assert views.open_tasks("ceo") == [] and counting.loaded  # type: ignore[attr-defined]  # a change is read through the ports of the runtime in force
 
 
 def test_the_scheduler_ladder_asks_the_notices_of_the_runtime_in_force(org: Org) -> None:
@@ -150,5 +167,5 @@ def test_the_scheduler_ladder_asks_the_notices_of_the_runtime_in_force(org: Org)
     notices = RecordingNotices()
     org.runtime = dataclasses.replace(org.runtime, notices=notices)
     now = [time.time() + 601]
-    wire_stalls.RuntimeStalls(lambda: org.runtime, lambda: now[0]).check()
+    wire_stalls.ladder_on(wire_stalls.RuntimePorts(org.runtime), FunctionClock(lambda: now[0])).check()
     assert [call[0] for call in notices.calls] == ["nudge"]

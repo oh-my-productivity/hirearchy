@@ -1,4 +1,4 @@
-"""The scheduler's stall check goes through the stall ports of the runtime: the ladder for ``_check_stalls`` and ``_task_view``, the nudge ledger for
+"""The scheduler's stall check goes through the stall ports of the runtime: the ladder for the stall phase of a pass and the task views, the nudge ledger for
 ``waiting_on_user``. The operator lines, the notes, the events and the ledger are covered by ``tests/test_scheduler`` (unchanged)."""
 
 from __future__ import annotations
@@ -13,6 +13,7 @@ from orgmcp.app import Org
 from orgmcp.kernel import Message
 from orgmcp.scheduler import Scheduler, waiting_on_user
 from orgmcp.stalls import NudgeLedger
+from orgmcp.stalls._views import FingerprintTaskViews
 from orgmcp.templates.testing import RecordingNotices
 
 
@@ -45,15 +46,15 @@ def test_the_scheduler_climbs_the_ladder_of_the_runtime(org: Org) -> None:
     notices, lines = RecordingNotices(), list[str]()
     org.runtime = dataclasses.replace(org.runtime, notices=notices)
     sched = Scheduler(org, echo=lines.append, clock=lambda: 4_000_000_000.0)
-    sched._check_stalls()
+    sched.tick()
     assert [call[0] for call in notices.calls] == ["nudge"] and len(lines) == 1 and lines[0].startswith("ceo: reminded about open task ")
 
 
-def test_the_task_view_of_the_scheduler_is_remembered(org: Org) -> None:
+def test_the_task_view_of_the_ladder_is_remembered(org: Org) -> None:
     task = org.delegate("root", "ceo", "T", "g", "a", budget=3)
-    sched = Scheduler(org, echo=lambda _: None)
-    assert [t.id for t in sched._task_view("ceo", "open_tasks")] == [task.id]
-    assert sched._task_view("ceo", "open_tasks") is sched._task_view("ceo", "open_tasks")  # remembered: the very same list
+    views = FingerprintTaskViews(org.runtime.task_query, org.runtime.mail_fingerprint)
+    assert [t.id for t in views.open_tasks("ceo")] == [task.id]
+    assert views.open_tasks("ceo") is views.open_tasks("ceo")  # remembered: the very same list
 
 
 def test_waiting_on_user_reads_the_steps_taken_and_the_chain_from_the_nudge_ledger(org: Org) -> None:

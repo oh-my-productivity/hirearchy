@@ -22,6 +22,11 @@ from orgmcp.daemon.testing import FakeSchedulerStatus
 from orgmcp.progress import describe_progress
 from orgmcp.progress.testing import FixedLegacyParts
 from orgmcp.scheduler import EXIT_FILE, Scheduler, describe_scheduler, waiting_on_user
+from orgmcp.scheduler._exit import GraceWait
+from orgmcp.scheduler._legacy import FunctionClock
+from orgmcp.scheduler._ports import Console
+from orgmcp.scheduler._run import GraceMemory, Standing
+from orgmcp.scheduler._work import QueriedWork
 from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
 from orgmcp.skill import skill_source
 from orgmcp.strays import StrayProbe
@@ -50,6 +55,27 @@ def never_runner(org, addr, prompt):
 
 def quiet(org, **kw):
     return Scheduler(org, never_runner, echo=lambda _: None, **kw)
+
+
+class Waiting:
+    """The grace period of an until-done scheduler (what ``Scheduler._check_waiting`` was): ``waiting()`` is the exit reason once nothing has progressed
+    without the user for ``until_done_grace_seconds``, else ''; ``waiting.since`` is when the count began. It looks at the scheduler's own runs, its blocked
+    agents and its clock, over the ports of the org's runtime."""
+
+    def __init__(self, sched):
+        rt = sched.org.runtime
+        self.sched, self.memory = sched, GraceMemory()
+        console = type("Console", (Console,), {"say": lambda _, line: sched.echo(line)})()
+        work = QueriedWork(rt.open_work, rt.runnable_query, rt.waiting_on_user)
+        self.grace = GraceWait(work, rt.settings, FunctionClock(lambda: sched.clock()), console, self.memory)
+
+    @property
+    def since(self):
+        return self.memory.since
+
+    def __call__(self, max_runs=None):
+        s = self.sched
+        return self.grace.check(Standing(s.runs, s._blocked, max_runs is None or s.total_runs < max_runs))
 
 
 # ------------------------------------------------------------------------------- until-done: waiting on the user
@@ -116,28 +142,29 @@ def test_the_run_cap_counts_as_waiting(org):
 def test_grace_period_with_a_fake_clock(org, stalled_on_budget):
     clock, lines = Clock(), []
     sched = Scheduler(org, never_runner, echo=lines.append, clock=clock)
-    assert sched._check_waiting() == ""  # first sight: the count starts
+    waiting = Waiting(sched)
+    assert waiting() == ""  # first sight: the count starts
     assert any("Exiting in 300s unless something changes" in x for x in lines)
     clock.t += 299
-    assert sched._check_waiting() == ""
+    assert waiting() == ""
     clock.t += 1
-    assert sched._check_waiting() == 'waiting on you: "Rework the report" needs budget (ceo out of runs)'
+    assert waiting() == 'waiting on you: "Rework the report" needs budget (ceo out of runs)'
 
 
 def test_a_change_restarts_the_grace_period(org, stalled_on_budget):
     clock = Clock()
-    sched = Scheduler(org, never_runner, echo=lambda _: None, clock=clock)
-    sched._check_waiting()
+    waiting = Waiting(Scheduler(org, never_runner, echo=lambda _: None, clock=clock))
+    waiting()
     clock.t += 250
     org.send(ROOT, "ceo", "more", budget=1)  # the user acts: runnable
-    assert sched._check_waiting() == "" and sched._waiting_since is None
+    assert waiting() == "" and waiting.since is None
     org.start_run_log("ceo")  # ...and it is stuck again
     clock.t += 100
-    assert sched._check_waiting() == "" and sched._waiting_since is not None
+    assert waiting() == "" and waiting.since is not None
     clock.t += 299
-    assert sched._check_waiting() == ""
+    assert waiting() == ""
     clock.t += 2
-    assert sched._check_waiting().startswith("waiting on you:")
+    assert waiting().startswith("waiting on you:")
 
 
 def test_the_grace_is_configurable(tmp_path):
@@ -146,10 +173,10 @@ def test_the_grace_is_configurable(tmp_path):
     o.delegate(ROOT, "ceo", "T", "G", "A", budget=1)
     o.start_run_log("ceo")
     clock = Clock()
-    sched = Scheduler(o, never_runner, echo=lambda _: None, clock=clock)
-    sched._check_waiting()
+    waiting = Waiting(Scheduler(o, never_runner, echo=lambda _: None, clock=clock))
+    waiting()
     clock.t += 5
-    assert sched._check_waiting().startswith("waiting on you:")
+    assert waiting().startswith("waiting on you:")
 
 
 def test_serve_until_done_exits_when_budget_stalled_and_records_the_reason(org, stalled_on_budget):
@@ -172,11 +199,12 @@ def test_serve_until_done_exits_when_a_worker_keeps_failing(org):
 
 def test_serve_without_until_done_keeps_going(org, stalled_on_budget):
     sched = Scheduler(org, never_runner, echo=lambda _: None, clock=Clock(step=40))
+    waiting = Waiting(sched)
     sched.acquire()
     try:
         for _ in range(12):  # well past the grace period
             sched.tick()
-            assert sched._check_waiting() in ("", sched.waiting_on_user().text)
+            assert waiting() in ("", sched.waiting_on_user().text)
     finally:
         sched.release()
     assert not (org.root / EXIT_FILE).exists()
@@ -188,17 +216,17 @@ def test_a_plain_stall_waits_for_the_stall_ladder_before_the_exit(org):
     org.begin_run("ceo")
     org.end_run("ceo", ok=True)  # read it, never reports
     clock = Clock()
-    sched = Scheduler(org, never_runner, echo=lambda _: None, clock=clock)
+    waiting = Waiting(Scheduler(org, never_runner, echo=lambda _: None, clock=clock))
     w = waiting_on_user(org)
     assert w.text == 'waiting on you: "Ship it" needs a decision (ceo holds it and nothing is running)' and not w.settled
-    sched._check_waiting()
+    waiting()
     clock.t += 5000
-    assert sched._check_waiting() == ""  # not told root yet: the ladder may still wake ceo
+    assert waiting() == ""  # not told root yet: the ladder may still wake ceo
     org.save_ledger("nudges", {task.id: {"step": 0, "at": clock.t}})  # reminded
-    assert sched._check_waiting() == ""
+    assert waiting() == ""
     org.save_ledger("nudges", {task.id: {"step": 1, "at": clock.t}})  # root told: nothing else will happen
     assert waiting_on_user(org).settled
-    assert sched._check_waiting().startswith('waiting on you: "Ship it" needs a decision')
+    assert waiting().startswith('waiting on you: "Ship it" needs a decision')
 
 
 def test_progress_shows_the_reason_and_the_options_and_does_not_wait(org, stalled_on_budget):

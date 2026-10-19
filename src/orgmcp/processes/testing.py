@@ -429,6 +429,11 @@ def _wait_for(condition: Callable[[], bool], what: str, timeout: float = 10.0) -
         time.sleep(0.01)
 
 
+def judge_over(inspector: ProcessInspector) -> OrphanJudge:
+    """The real judge over this process table (for a consumer that has a table of its own and judges the runs a dead scheduler left)."""
+    return PsOrphanJudge(inspector)
+
+
 def real_world(tmp_path: Path) -> ProcessWorld:
     """Real processes. They are all started by this world, and ``close`` signals those and nothing else."""
     environment = os_environment(tmp_path).env

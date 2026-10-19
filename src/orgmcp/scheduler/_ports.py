@@ -5,12 +5,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Collection, Sequence
+from collections.abc import Callable, Collection, Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
+from ..attention import Waiting
 from ..processes import ProcessHandle
-from ._run import Exit, PreparedRun, RunRecord, RunTable
+from ._run import Exit, PreparedRun, RunRecord, RunTable, Standing, StopWhen
 
 
 class Console(Protocol):
@@ -149,7 +151,106 @@ class RunReaper(Protocol):
         ...
 
 
+@dataclass(frozen=True)
+class Lifecycle:
+    """The two halves of a run's life, which the loop holds."""
+
+    starter: RunStarter
+    reaper: RunReaper
+
+
+# ------------------------------------------------------------------------------ the loop (D-sched-2)
+
+
+class OrphanSettler(Protocol):
+    def settle(self, runs: RunTable, blocked: set[str]) -> None:
+        """Deal with the runs a dead scheduler left in the registry: kill (only what is verified to be ours), redeliver, or keep and block the agent."""
+        ...
+
+
+class RunNotes(Protocol):
+    def note(self, rec: Mapping[str, object], text: str) -> None:
+        """Add a note to the log of the run a registry record names (nothing happens when it names none)."""
+        ...
+
+
+class TickPhase(Protocol):
+    def run(self, standing: Standing, max_runs: int | None) -> None:
+        """One step of a pass of the loop."""
+        ...
+
+
+class WorkLeft(Protocol):
+    def remains(self, standing: Standing) -> bool:
+        """Is anything in flight, or could an agent start a run (and the cap on runs allow it)?"""
+        ...
+
+    def finished(self, standing: Standing) -> bool:
+        """Is there nothing left for this scheduler: root has no open task, no run is in flight, no agent could start?"""
+        ...
+
+    def waiting(self, standing: Standing) -> Waiting | None:
+        """Is every open root task unable to progress without the user (with this scheduler's view of what runs)?"""
+        ...
+
+
+class WaitGrace(Protocol):
+    def check(self, standing: Standing) -> str:
+        """Until-done: the exit reason once nothing has been able to progress without the user for the grace period, else ``""``."""
+        ...
+
+
+class ExitPolicy(Protocol):
+    def after_tick(self, stop: StopWhen, active: bool, standing: Standing) -> str | None:
+        """The reason a serving scheduler stops by itself after a pass (idle, finished, waiting on the user), or None; says it and leaves the marker."""
+        ...
+
+
+class Pacing(Protocol):
+    def pause(self) -> None:
+        """Wait between two passes (``poll_seconds``)."""
+        ...
+
+
+class Claim(Protocol):
+    def take(self) -> None:
+        """Become the scheduler of the organization: name the process, take the pidfile (refused while another lives), forget the last exit reason."""
+        ...
+
+    def give_up(self) -> None:
+        """Let go of the pidfile."""
+        ...
+
+
+class SessionEvents(Protocol):
+    def started(self, mode: str, max_runs: int | None) -> None:
+        """The ``scheduler.start`` event."""
+        ...
+
+    def exited(self, reason: str, runs_started: int) -> None:
+        """The ``scheduler.exit`` event."""
+        ...
+
+
+class InterruptedRuns(Protocol):
+    def recover(self) -> None:
+        """Return the batches of runs a crash interrupted to their inboxes, saying so."""
+        ...
+
+
+class SchedulerSession(Protocol):
+    def open(self, mode: str, max_runs: int | None, runs: RunTable, blocked: set[str]) -> None:
+        """Become the scheduler, announce it, settle the runs of a dead one and recover interrupted batches."""
+        ...
+
+    def close(self, exit_reason: str, runs: RunTable, started: int) -> None:
+        """Interrupt the runs in flight, let go of the pidfile and announce the exit."""
+        ...
+
+
 __all__ = [
-    "Console", "FailureEscalation", "PhaseGuard", "RunAdmission", "RunEvents", "RunFailures", "RunInitiation", "RunPreparation", "RunReaper",
-    "RunRecords", "RunSettling", "RunSpawning", "RunStarter", "RunTerminating", "RunWatching", "StartAnnouncing", "StartFailures", "StrayWatch",
+    "Claim", "Console", "ExitPolicy", "FailureEscalation", "InterruptedRuns", "Lifecycle", "OrphanSettler", "Pacing", "PhaseGuard", "RunAdmission", "RunEvents",
+    "RunFailures", "RunInitiation", "RunNotes", "RunPreparation", "RunReaper", "RunRecords", "RunSettling", "RunSpawning", "RunStarter",
+    "RunTerminating", "RunWatching", "SchedulerSession", "SessionEvents", "StartAnnouncing", "StartFailures", "StrayWatch", "TickPhase", "WaitGrace",
+    "WorkLeft",
 ]

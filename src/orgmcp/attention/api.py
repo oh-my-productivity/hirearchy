@@ -65,6 +65,11 @@ class HumanQueue(Protocol):
 
 @runtime_checkable
 class OpenWork(Protocol):
-    def nothing_to_do(self) -> bool:
-        """Would an until-done scheduler exit at once: root has no open task and no agent has work it could start."""
+    def nothing_to_do(self, *, running: Collection[str] = (), blocked: Collection[str] = (), can_start: bool = True) -> bool:
+        """Would an until-done scheduler exit at once: root has no open task and no agent has work it could start.
+
+        ``running`` / ``blocked`` / ``can_start`` are the scheduler's own view, as for ``WaitingOnUser.analyze``: a scheduler with runs in flight has
+        something to do; the agents whose orphaned run may still be alive (and those running) do not count as able to start; and with
+        ``can_start=False`` (the run cap is spent) no agent could start whatever its mail. The defaults ask the question of a scheduler with none of
+        its own."""
         ...

@@ -4,6 +4,7 @@ the runtime in force (one the dashboard's lenient ``Org`` or a test replaced a p
 from __future__ import annotations
 
 import dataclasses
+from collections.abc import Collection
 from pathlib import Path
 
 import pytest
@@ -45,7 +46,7 @@ def test_building_the_ports_does_no_io(tmp_path: Path) -> None:
 
 def test_an_override_replaces_a_port(tmp_path: Path) -> None:
     class Idle(OpenWork):
-        def nothing_to_do(self) -> bool:
+        def nothing_to_do(self, *, running: Collection[str] = (), blocked: Collection[str] = (), can_start: bool = True) -> bool:
             return True
 
     fake = Idle()
