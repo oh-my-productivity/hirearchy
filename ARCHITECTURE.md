@@ -709,8 +709,8 @@ class TaskReporter(Protocol):
 class ReworkContext(Protocol):   # port, implemented by `services`
     def fields_for(self, actor: str, revises: str) -> Mapping[str, object]: """service/contract/playbook a rework inherits ({} for an ordinary task)."""
 ```
-Impl: `RuleMessageSender`, `RuleTaskAssigner(MessageSender, ReworkContext, ...)`, `RuleTaskReporter`; private `ParentSiblingRoutePolicy`, `ArtifactAnnotator`, `LessonsPolicy`.
-Fakes: `RecordingSender`, `NoReworkContext`.
+Impl: `RuleMessageSender`, `RuleTaskAssigner` (consumes a `MessageSender` and a `ReworkContext`), `RuleTaskReporter` (consumes a `MessageSender`); private collaborators (in `_protocols.py`, made by `wire_dispatch`, not runtime fields): `RoutePolicy` -> `ParentSiblingRoutePolicy`, `HopCounter` -> `InflightHopCounter`, `ArtifactNormalizer` -> `ArtifactAnnotator`, `LessonsCheck` -> `LessonsPolicy`.
+Fakes: `RecordingSender`, `NoReworkContext`, `FixedReworkContext`. Until C-services `ReworkContext` is provided by `wire_dispatch.LegacyReworkContext` (it wraps the legacy `services.rework_fields` over an `Org` of the same root); `wire_services` takes the provider over with `ServiceReworkContext`.
 
 ### 3.21 `services`
 
@@ -1568,7 +1568,7 @@ in the table of its module. Constants move with the code that uses them (listed 
 | `budget`, `delegable`, `grant_hint` | `budget.BudgetQuery` |
 | `_check_allocation`, `_default_budget`, `_budget_to_return` | `budget.AllocationPolicy.check_allocation / default_budget / budget_to_return` |
 | `reclaim` | `budget.BudgetReclaimer.reclaim` |
-| `_next_hops` | `dispatch/_sender.py::RuleMessageSender._next_hops` (private; reads inflight hops via `MailboxReader`) |
+| `_next_hops` | `dispatch/_hops.py::InflightHopCounter.next_hops` (private `HopCounter`; reads inflight hops via `MailboxReader`; `RuleMessageSender` consumes it) |
 | `send` | `dispatch.MessageSender.send` |
 | `delegate` | `dispatch.TaskAssigner.delegate` (+ `ReworkContext.fields_for` replaces the late `import services`) |
 | `report` | `dispatch.TaskReporter.report` |
@@ -2556,7 +2556,7 @@ RED: `PauseStore` (events `agent.pause` / `agent.resume` fields; resume of a non
 **B-hierarchy** (needs B-budget, B-access; touches `hierarchy/`, `wire_hierarchy.py`, `_facade_hierarchy.py`).
 RED: `Hiring` (name rule + reserved, trailing newline refused, tools sorted/deduped, `inputs` defaulting for confined hirers, `can_hire`/`max_children`/depth limits, authority via `AuthorityPolicy`, charter bytes, `agent.hire` event incl. resolved model), `Retirement` (direct-report rule, root exception, open tasks failed upward with today's body, refund = max(0, sum of team budgets) unless parent is root, **move before refund** order, non-waking refund note, `agent.retire` event, returns `Retired`). GREEN: from `Org.hire/retire/retire_team`. Stays green: `test_core` hire/retire, `test_core_safety` retire tests, `test_qa_findings` qa6/qa9/qa11, `test_wakes` refund tests.
 
-**B-dispatch** (needs B-budget, B-delivery, B-access; touches `dispatch/`, `wire_dispatch.py`, `_facade_dispatch.py`; `_compat.LegacyReworkContext` wraps `services.rework_fields` until C-services).
+**B-dispatch** (needs B-budget, B-delivery, B-access; touches `dispatch/`, `wire_dispatch.py`, `_facade_dispatch.py`; `wire_dispatch.LegacyReworkContext` wraps `services.rework_fields` until C-services).
 RED: `MessageSender` (cap `max_message_chars` except for root, type/body/route/budget checks with today's texts, hops rule and `report` exemption, `wake`, field pass-through), `TaskAssigner` (direct reports only, required fields, default budget, `revises` rule, rework fields from `ReworkContext`), `TaskReporter` (status set, task lookup error lists open ids, final results are final, `blocked` re-reportable with `supersedes`, lessons policy 1..800 and mandatory on service requests, artifact annotation: org-relative or own workspace, words/mtime/"NOT modified since" note, refusal texts; budget travels with final results), `RoutePolicy` (parent/children/siblings/reply_to). GREEN: from `Org.send/delegate/report/can_message/_next_hops/_normalize_artifact/_check_lessons`. Stays green: `test_final_word`, `test_core` routing, `test_budget_return`, `test_qa_findings` qa4/qa12/qa15/qa18, `test_core_safety` artifact tests, `test_scheduler_robustness` message-cap tests.
 
 **I3** — integration merge. Exit criterion: `grep -n "def " app/_facade_*.py` shows only delegations for the slices of waves A and B; `Org` still implements prompt/view methods via legacy bodies.

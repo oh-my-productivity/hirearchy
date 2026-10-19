@@ -11,6 +11,7 @@ from typing import Any
 import pytest
 
 from orgmcp.app import Org
+from orgmcp.app.wiring import open_runtime
 from orgmcp.delivery import MessageDelivery
 from orgmcp.kernel import RUNTIME, Message
 from orgmcp.kernel.testing import FakeClock, SequenceIdGenerator
@@ -94,7 +95,7 @@ def test_notify_comes_from_the_delivery_port_of_the_runtime(org: Org) -> None:
 
 def test_what_the_other_slices_deliver_goes_through_the_port(org: Org) -> None:
     fake = Recorded()
-    use(org, delivery=fake)
+    org.runtime = open_runtime(org.root, {MessageDelivery: fake})  # `send` is a rule built from the delivery: the port is replaced where it is built
     org.send("root", "ceo", "hello")
     assert [c[0] for c in fake.calls] == ["deliver"]
 
