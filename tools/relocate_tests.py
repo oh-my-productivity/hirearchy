@@ -205,6 +205,7 @@ class Rules:
     """For each package: the packages it may import."""
 
     allowed: Mapping[str, frozenset[str]]
+    flat: frozenset[str] = frozenset()  # the flat legacy modules of src/orgmcp (core, server, observe ...): they import the facade and the composition root
 
     def redirects(self, place: str | None, module: str) -> bool:
         """Whether ``place`` (a package name; None for a destination outside src/orgmcp) must import ``module`` through ``testkit.legacy``."""
@@ -218,8 +219,8 @@ class Rules:
         package = parts[1]
         if package == place:
             return False
-        if package not in self.allowed and package not in FACADES and package != "app":
-            return False  # a flat legacy module (orgmcp.observe ...): no contract covers it
+        if package not in self.allowed and package not in FACADES and package not in self.flat and package != "app":
+            return False  # a module the contracts know nothing about
         return package not in self.allowed[place] or any(part.startswith("_") for part in parts[2:])
 
 
@@ -231,7 +232,8 @@ def load_rules(root: Path) -> Rules | None:
     sys.modules.setdefault("relocate_graph", ModuleType("relocate_graph"))
     exec(compile(graph.read_text(encoding="utf-8"), str(graph), "exec"), namespace)  # noqa: S102 - the repository's own, dependency-free module
     allowed = {name: frozenset(namespace["allowed_imports"](name)) for name in namespace["PACKAGES"]}
-    return Rules(allowed)
+    flat = frozenset(p.stem for p in (root / "src" / "orgmcp").glob("*.py") if p.stem not in ("__init__", "__main__"))
+    return Rules(allowed, flat)
 
 
 class _UniqueKeyLoader(yaml.SafeLoader):  # type: ignore[misc]  # PyYAML has no stubs: its classes are Any

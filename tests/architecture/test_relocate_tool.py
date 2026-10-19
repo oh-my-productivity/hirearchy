@@ -651,18 +651,19 @@ from orgmcp.health import agent_health
 from orgmcp.kernel import Message
 from orgmcp.budget._private import secret
 from orgmcp.observe import events
+from orgmcp.unknown import nothing
 
 
 def test_one():
     from orgmcp.server import build_server
     import orgmcp.scheduler as sched
 
-    assert [yaml, core, kernel, ROOT, Org, agent_health, Message, secret, events, build_server, sched]
+    assert [yaml, core, kernel, ROOT, Org, agent_health, Message, secret, events, nothing, build_server, sched]
 '''
 
 
 def contract_repo(tmp_path: Path, tool):  # type: ignore[no-untyped-def]
-    repo = make_repo(tmp_path, {"test_contracts.py": CONTRACTS}, {"tests/architecture/graph.py": GRAPH})
+    repo = make_repo(tmp_path, {"test_contracts.py": CONTRACTS}, {"tests/architecture/graph.py": GRAPH, "src/orgmcp/observe.py": ""})
     return repo, tool.Manifest.from_dict(manifest_dict({BUDGET: ("b", {"tests/test_contracts.py": ["test_one"]})}))
 
 
@@ -676,7 +677,8 @@ def test_imports_that_the_contracts_forbid_are_written_through_testkit_legacy(to
     assert "from testkit.legacy.orgmcp.health import agent_health" in text  # budget does not depend on health
     assert "from orgmcp.kernel import Message" in text  # budget depends on the kernel
     assert "from testkit.legacy.orgmcp.budget._private import secret" not in text and "from orgmcp.budget._private import secret" in text  # its own
-    assert "from orgmcp.observe import events" in text  # a flat legacy module: no contract
+    assert "from testkit.legacy.orgmcp.observe import events" in text  # a flat legacy module of src/orgmcp imports the facade (indirectly)
+    assert "from orgmcp.unknown import nothing" in text  # a module nobody knows is left alone
     assert "    from testkit.legacy.orgmcp.server import build_server" in text  # inside the test
     assert "    import testkit.legacy.orgmcp.scheduler as sched" in text
     compile(text, BUDGET, "exec")
