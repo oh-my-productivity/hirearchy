@@ -7,10 +7,6 @@ from pathlib import Path
 from orgmcp.kernel import OrgPaths
 from orgmcp.services._places import OrgServicePlaces
 
-from ._support import RED
-
-pytestmark = RED
-
 ROOT = Path("/org")
 PLACES = OrgServicePlaces(OrgPaths(ROOT))
 

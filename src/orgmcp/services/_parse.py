@@ -13,24 +13,45 @@ from .api import Contract, Playbook
 
 def as_int(value: object, default: int = 0) -> int:
     """``value`` as a whole number; ``default`` for what is none (absent, a bool, text that is no number)."""
-    raise NotImplementedError
+    if value is None or isinstance(value, bool):
+        return default
+    try:
+        return int(cast("SupportsInt | str", value))
+    except (TypeError, ValueError):
+        return default
 
 
 def as_time(value: object) -> datetime | None:
     """The time a frontmatter field holds; None when it is empty or unreadable."""
-    raise NotImplementedError
+    return parse_time(value) if value else None
 
 
 def _items(value: object) -> list[object]:
     """What a list-valued field holds, as the files have always been read: an empty field has no items, anything else is iterated."""
-    raise NotImplementedError
+    return list(cast("Iterable[object]", value or []))
 
 
 def contract_of(owner: str, name: str, meta: JsonObject, body: str, path: Path | None) -> Contract:
     """The contract a ``SERVICE.md`` describes."""
-    raise NotImplementedError
+    inputs: list[JsonObject] = [
+        {"name": str(i.get("name", "")), "description": str(i.get("description") or ""), "required": i.get("required", True) is not False}
+        for i in _items(meta.get("inputs")) if isinstance(i, dict) and i.get("name")
+    ]
+    deliverable = meta.get("deliverable")
+    return Contract(
+        name=name, owner=owner, description=str(meta.get("description") or ""), inputs=inputs,
+        acceptance=[str(a) for a in _items(meta.get("acceptance"))],
+        deliverable=dict(deliverable) if isinstance(deliverable, dict) else {},
+        budget=max(1, as_int(meta.get("budget"), 1)), locked=meta.get("locked") is True,
+        version=max(1, as_int(meta.get("version"), 1)), defined_by=str(meta.get("defined_by") or ""),
+        defined=as_time(meta.get("defined")), created=as_time(meta.get("created") or meta.get("defined")),
+        notes=body.strip(), path=path,
+    )
 
 
 def playbook_of(meta: JsonObject, body: str, path: Path | None) -> Playbook:
     """The playbook a ``PLAYBOOK.md`` describes."""
-    raise NotImplementedError
+    return Playbook(
+        version=as_int(meta.get("version")), revised=as_time(meta.get("revised")), by=str(meta.get("by") or ""),
+        reason=str(meta.get("reason") or ""), body=body.strip(), path=path,
+    )

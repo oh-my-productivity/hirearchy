@@ -17,22 +17,22 @@ class OrgServicePlaces(ServicePlaces):
         self._layout = layout
 
     def services_dir(self, owner: str) -> Path:
-        raise NotImplementedError
+        return self._layout.agent_dir(owner) / "services"
 
     def service_dir(self, owner: str, name: str) -> Path:
-        raise NotImplementedError
+        return self.services_dir(owner) / name
 
     def contract_file(self, owner: str, name: str) -> Path:
-        raise NotImplementedError
+        return self.service_dir(owner, name) / "SERVICE.md"
 
     def playbook_file(self, owner: str, name: str) -> Path:
-        raise NotImplementedError
+        return self.service_dir(owner, name) / "PLAYBOOK.md"
 
     def history_file(self, owner: str, name: str, kind: str, version: int) -> Path:
-        raise NotImplementedError
+        return self.service_dir(owner, name) / "history" / f"{kind}.v{version}.md"
 
     def retired_dir(self, owner: str, name: str, stamp: str) -> Path:
-        raise NotImplementedError
+        return self.service_dir(owner, RETIRED_DIR) / f"{name}-{stamp}"
 
     def rel(self, path: Path) -> str:
-        raise NotImplementedError
+        return self._layout.rel(path)

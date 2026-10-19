@@ -48,30 +48,52 @@ class MemoryServiceStore(ServiceStore):
         self.files: dict[Path, str] = {}
 
     def names(self, owner: str) -> list[str]:
-        raise NotImplementedError
+        if norm(owner) == ROOT:
+            return []
+        directory = self._places.services_dir(owner)
+        found = {p.parent.name for p in self.files if p.name == "SERVICE.md" and p.parent.parent == directory}
+        return sorted(n for n in found if not n.startswith("."))
 
     def read_contract(self, owner: str, name: str) -> tuple[JsonObject, str] | None:
-        raise NotImplementedError
+        return self._read(self._places.contract_file(owner, name))
 
     def read_playbook(self, owner: str, name: str) -> tuple[JsonObject, str] | None:
-        raise NotImplementedError
+        return self._read(self._places.playbook_file(owner, name))
 
     def write_contract(self, owner: str, name: str, meta: JsonObject, body: str, archive_version: int | None) -> str:
-        raise NotImplementedError
+        path = self._places.contract_file(owner, name)
+        if archive_version is not None:
+            self.files[self._places.history_file(owner, name, "SERVICE", archive_version)] = self.files[path]
+        self.files[path] = join_frontmatter(meta, body)
+        return self._places.rel(path)
 
     def write_playbook(
         self, owner: str, name: str, version: int, meta: JsonObject, body: str, archive_version: int | None = None,
     ) -> str:
-        raise NotImplementedError
+        path = self._places.playbook_file(owner, name)
+        if archive_version is not None:
+            self.files[self._places.history_file(owner, name, "PLAYBOOK", archive_version)] = self.files[path]
+        self.files[path] = join_frontmatter(meta, body)
+        return self._places.rel(path)
 
     def retire(self, owner: str, name: str, stamp: str) -> str:
-        raise NotImplementedError
+        source, dest = self._places.service_dir(owner, name), self._places.retired_dir(owner, name, stamp)
+        for path in [p for p in self.files if source in p.parents]:
+            self.files[dest / path.relative_to(source)] = self.files.pop(path)
+        return self._places.rel(dest)
 
     def playbook_history(self, owner: str, name: str) -> list[tuple[int, JsonObject]]:
-        raise NotImplementedError
+        directory = self._places.service_dir(owner, name) / "history"
+        paths = [*sorted(p for p in self.files if p.parent == directory and fnmatch(p.name, "PLAYBOOK.v*.md")), self._places.playbook_file(owner, name)]
+        found: list[tuple[int, JsonObject]] = []
+        for path in paths:
+            if path in self.files:
+                meta = split_frontmatter(self.files[path])[0]
+                found.append((as_int(meta.get("version")), meta))
+        return found
 
     def _read(self, path: Path) -> tuple[JsonObject, str] | None:
-        raise NotImplementedError
+        return split_frontmatter(self.files[path]) if path in self.files else None
 
 
 # ------------------------------------------------------------------------------ the worlds

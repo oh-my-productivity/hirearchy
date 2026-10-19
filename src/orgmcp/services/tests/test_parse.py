@@ -10,10 +10,6 @@ import pytest
 from orgmcp.kernel import JsonObject
 from orgmcp.services._parse import as_int, as_time, contract_of, playbook_of
 
-from ._support import RED
-
-pytestmark = RED
-
 
 @pytest.mark.parametrize("value, default, expected", [
     (None, 0, 0), (None, 7, 7), (True, 3, 3), (False, 3, 3), (5, 0, 5), ("12", 0, 12), (" 7 ", 0, 7), ("x", 4, 4), (2.9, 0, 2), ([1], 9, 9),
