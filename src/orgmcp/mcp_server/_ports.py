@@ -1,0 +1,143 @@
+"""The roles the server is made of (private: this package is their only consumer).
+
+A tool group is one class with one Protocol (``ToolGroup``); it receives what it needs as ``Provider`` thunks of the narrow ports of the features, which
+call the binding at tool-call time, so a server opens the runtime of its organization on its first tool call and a root server may start before there
+is one. The rest are the small roles around the groups: the texts, the recorder of tool calls, the resolution of the request a call belongs to, who
+gets the service tools, and where the examples of blueprints go.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping, Sequence
+from pathlib import Path
+from typing import TYPE_CHECKING, Protocol, TypeVar, runtime_checkable
+
+from .api import McpServerFactory, OrgBindingPort
+
+if TYPE_CHECKING:
+    from mcp.server.fastmcp import FastMCP
+
+T = TypeVar("T")
+
+
+@runtime_checkable
+class OrgPorts(Protocol):
+    """An opened organization: its root and the one object of each port (the runtime of the composition root answers so)."""
+
+    @property
+    def root(self) -> Path: ...
+
+    def get(self, port: type[T]) -> T: ...
+
+
+@runtime_checkable
+class OrgOpener(Protocol):
+    def open(self, root: Path) -> OrgPorts:
+        """The ports of the organization at ``root``; an ``OrgError`` ("not an organization (no ORG.md)") when there is none."""
+        ...
+
+    def initialize(self, root: Path, mission: str, config: Mapping[str, object] | None) -> None:
+        """Make ``root`` an organization (``OrgError`` if it already is; ``OSError`` if it cannot be written)."""
+        ...
+
+
+@runtime_checkable
+class BindingFactory(Protocol):
+    def bind(self, root: Path | None, ports: OrgPorts | None = None, pinned: bool = False) -> OrgBindingPort:
+        """The binding of a server to ``root`` (``ports``: the organization there, if it is known to exist)."""
+        ...
+
+
+@runtime_checkable
+class ServerFactories(Protocol):
+    def factory_for(self, binding: OrgBindingPort) -> McpServerFactory:
+        """The factory of servers bound to ``binding``."""
+        ...
+
+
+@runtime_checkable
+class ToolGroup(Protocol):
+    def register(self, mcp: FastMCP, me: str) -> None:
+        """Register this group's tools for ``me`` (decided when the server starts, which is at the start of each run)."""
+        ...
+
+
+@runtime_checkable
+class ToolRecorder(Protocol):
+    def instrument(self, mcp: FastMCP, me: str) -> None:
+        """Make every tool registered afterwards (by anyone) emit a ``tool.call`` event."""
+        ...
+
+
+@runtime_checkable
+class CallTrace(Protocol):
+    def of(self, me: str, arguments: Mapping[str, object], seen: Sequence[str | None]) -> str | None:
+        """The request a tool call belongs to: the trace of the message it delivered (``seen``), else of the message it names (``task_id`` /
+        ``reply_to`` / ``revises``), else the one trace of the caller's current batch. None when unknown."""
+        ...
+
+
+@runtime_checkable
+class ServerInstructions(Protocol):
+    def for_identity(self, me: str) -> str:
+        """The instructions the server sends on every connection: the short ones for an agent, the workflow of the human's seat for root."""
+        ...
+
+
+@runtime_checkable
+class SetupMode(Protocol):
+    def active(self) -> bool:
+        """No organization exists (yet): a root server offers ``create_org`` and the other tools say so."""
+        ...
+
+    def state(self) -> str:
+        """What ``whoami`` / ``status`` / ``progress`` say before an organization exists."""
+        ...
+
+
+@runtime_checkable
+class ServiceRoles(Protocol):
+    def manager(self, me: str) -> bool:
+        """``me`` is root, or has direct reports, or may hire: it gets the tools of a client of services."""
+        ...
+
+    def owner(self, me: str) -> bool:
+        """``me`` offers a service: it gets the tool that revises its playbook."""
+        ...
+
+
+@runtime_checkable
+class ExampleLocation(Protocol):
+    def base(self) -> Path:
+        """Where the examples put ``deliverables/`` and project folders: the user's current directory, unless that is the organization itself or a
+        filesystem root (then the home directory)."""
+        ...
+
+
+@runtime_checkable
+class ExampleText(Protocol):
+    def example(self, kind: str, service: bool) -> str:
+        """``blueprint_example``: the template of ``kind`` with its paths under the base of the examples."""
+        ...
+
+
+@runtime_checkable
+class PlanProposal(Protocol):
+    def propose(self, blueprint: str) -> str:
+        """``propose_org``: validate the blueprint text and return the plan the user must approve (works before the organization exists)."""
+        ...
+
+
+@runtime_checkable
+class PlanApplication(Protocol):
+    def apply(self, blueprint: str, approved: bool, plan_id: str | None) -> str:
+        """``apply_org``: create what the approved blueprint describes. Refuses, with what to do, unless the user approved it, the ``plan_id`` is
+        the one of this blueprint, and the organization exists."""
+        ...
+
+
+@runtime_checkable
+class PlanTarget(Protocol):
+    def line(self) -> str:
+        """The ``Target organization:`` line of a proposal: where it will be applied, and whether that exists."""
+        ...
