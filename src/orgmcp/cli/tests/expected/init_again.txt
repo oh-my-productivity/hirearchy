@@ -1,0 +1,6 @@
+
+[stderr]
+org: <ORG>
+error: already an organization: <ORG>
+
+[exit 1]

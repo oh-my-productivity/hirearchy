@@ -1,0 +1,10 @@
+usage: orgmcp run [-h] [--once] [--until-idle] [--until-done] [--max-runs MAX_RUNS] [--kiro KIRO]
+
+options:
+  -h, --help           show this help message and exit
+  --once               one pass, wait for those runs, exit
+  --until-idle         exit when nothing is left to do
+  --until-done         exit when root has no open task and nothing is running or runnable (logs
+                       why, shown by status/progress)
+  --max-runs MAX_RUNS  stop starting runs after this many (safety cap)
+  --kiro KIRO          kiro-cli binary

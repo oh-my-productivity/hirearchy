@@ -1,0 +1,7 @@
+initialized organization at <TMP>/new
+edit <TMP>/new/ORG.md to set the mission and limits
+
+[stderr]
+org: <TMP>/new
+
+[exit 0]

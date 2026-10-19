@@ -1,0 +1,6 @@
+
+[stderr]
+org: <ORG>
+error: ceo offers no service called `nothing`. Its services: weekly
+
+[exit 1]

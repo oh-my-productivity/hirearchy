@@ -1,0 +1,6 @@
+
+[stderr]
+org: <ORG>
+error: you cannot grant tools you do not have yourself: read, write
+
+[exit 1]

@@ -1,0 +1,6 @@
+trace 20260115T090200000000-root-0000 "Ship it" -> ceo: open
+     +0s  root -> ceo task "Ship it" +8 run(s)
+  +1m00s    ceo -> root note "Greeting"
+totals: wall 3m00s | runs 0 (budget given 8, returned 0) | run time 0s | queue 0s | waiting on you 2m00s | tool calls 0 (0 refused)
+
+[exit 0]

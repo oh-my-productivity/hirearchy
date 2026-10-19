@@ -1,0 +1,45 @@
+usage: orgmcp [-h] [--root ROOT]
+              {init,hire,task,services,define-service,request,feedback,retire-service,plan,apply,send,status,health,progress,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
+              ...
+
+A file-based organization of agents, run over MCP.
+
+positional arguments:
+  {init,hire,task,services,define-service,request,feedback,retire-service,plan,apply,send,status,health,progress,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
+    init                create a new organization
+    hire                create an agent (as root)
+    task                give a task to an agent (as root)
+    services            list the services you can request from your direct reports, with their
+                        record
+    define-service      define a standing service of a top-level agent, or amend its contract (as
+                        root): on an existing service pass only what changes
+    request             ask a top-level agent for one of its services (as root)
+    feedback            accept or reject a delivered service request (as root)
+    retire-service      take a service out of use (its files are kept)
+    plan                validate a blueprint and print the plan for approval (exit 1 on errors)
+    apply               create the agents of a blueprint and give its first task (as root)
+    send                send a note to an agent (as root)
+    status              show the organization tree
+    health              show stuck, expensive, low-quality and idle agents and branches
+    progress            one line per task you gave: state, who is busy, cost, last activity; what
+                        needs you
+    upgrade-rules       rewrite the rules in ORG.md to the current template (keeps settings and
+                        mission)
+    install-skill       copy the orgmcp assistant skill into a kiro skills directory (default
+                        ~/.kiro/skills)
+    review              run a health review now: tell managers (and you) about flagged agents
+    inbox               read your (root) messages
+    resume              unpause an agent
+    run                 run the scheduler
+    mcp                 run the MCP server on stdio (identity from $ORG_AGENT, default root)
+    dash                terminal dashboard: agents, workflows, services, events, health (read-
+                        only)
+    obs                 read-only views of how the organization runs: now, trace, metrics, events
+    check               invariants of the runtime: messages intact, budget conserved, nothing
+                        stuck (exit 1 on FAIL)
+    kiro-profile        write this organization's internal kiro profile (the scheduler does this
+                        itself)
+
+options:
+  -h, --help            show this help message and exit
+  --root ROOT           organization directory (default: $ORG_ROOT or nearest dir with ORG.md)

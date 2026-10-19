@@ -1,0 +1,6 @@
+ORG.md rules are already up to date; nothing to change.
+
+[stderr]
+org: <ORG>
+
+[exit 0]

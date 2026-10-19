@@ -1,0 +1,9 @@
+usage: orgmcp progress [-h] [--wait SECONDS] [task_id]
+
+positional arguments:
+  task_id         only this task (default: open tasks and those finished in the last day)
+
+options:
+  -h, --help      show this help message and exit
+  --wait SECONDS  first wait (up to 900) until a task finishes, fails, blocks or stalls, or
+                  something needs you

@@ -1,0 +1,11 @@
+created 2 agents: lead, lead/writer
+task 20260115T090000000000-root-0000 -> lead (budget 10)
+warning: task.acceptance: the 300-word limit is not in any criterion; add an exact criterion such as 'at most 300 words (as counted by read)'
+warning: needs.review: review not decided: set needs.review to true (independent check) or false; no independent verifier is planned
+warning: needs.approval: not elicited: when the user wants to approve (plan, before start, final)
+warning: needs.progress: not elicited: how the user wants progress updates
+
+[stderr]
+org: <ORG>
+
+[exit 0]

@@ -1,0 +1,6 @@
+0 flagged agent(s); nothing to send
+
+[stderr]
+org: <ORG>
+
+[exit 0]

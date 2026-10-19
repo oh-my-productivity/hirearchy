@@ -1,0 +1,6 @@
+
+[stderr]
+org: <ORG>
+error: --input must be key=value (got 'topic')
+
+[exit 1]

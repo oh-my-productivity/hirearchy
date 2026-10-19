@@ -1,0 +1,6 @@
+hired ceo/qa
+
+[stderr]
+org: <ORG>
+
+[exit 0]

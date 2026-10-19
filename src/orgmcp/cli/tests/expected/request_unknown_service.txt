@@ -1,0 +1,6 @@
+
+[stderr]
+org: <ORG>
+error: no service `nothing` among your direct reports. Services you can request: weekly (offered by ceo). A parent defines one with define_service.
+
+[exit 1]

@@ -1,0 +1,6 @@
+
+[stderr]
+usage: orgmcp feedback [-h] [--note NOTE] task_id {accept,reject}
+orgmcp feedback: error: argument verdict: invalid choice: 'maybe' (choose from 'accept', 'reject')
+
+[exit 2]

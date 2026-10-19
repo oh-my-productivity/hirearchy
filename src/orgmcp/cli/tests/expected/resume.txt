@@ -1,0 +1,6 @@
+resumed ceo
+
+[stderr]
+org: <ORG>
+
+[exit 0]

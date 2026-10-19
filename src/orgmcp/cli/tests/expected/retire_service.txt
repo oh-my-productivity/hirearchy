@@ -1,0 +1,6 @@
+retired service `weekly` of ceo; files kept at ceo/services/.retired/weekly-20260115T090500000000
+
+[stderr]
+org: <ORG>
+
+[exit 0]

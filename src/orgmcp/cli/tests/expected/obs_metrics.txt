@@ -1,0 +1,10 @@
+metrics 2026-01-08T09:05:00Z .. 2026-01-15T09:05:00Z (5 event(s) in the window)
+runs 0: ok 0, failed 0, timeout 0, killed 0 | duration p50 ? p95 ? max ? (n=0) | queue p50 ? p95 ? (n=0)
+budget spent 0 run(s)
+tool calls 0, refused 0 (0.0%)
+messages: note 1, task 1
+scheduler: 0 start(s); errors: none; exits: none
+stalls 0, pauses 0, agent failures 0, orphaned runs 0
+by agent:
+
+[exit 0]

@@ -1,0 +1,16 @@
+usage: orgmcp obs events [-h] [--since SINCE] [--until UNTIL] [--agent ADDR] [--kind KIND]
+                         [--trace TASK_ID] [--errors] [--limit LIMIT] [--follow] [--poll POLL]
+                         [--json]
+
+options:
+  -h, --help       show this help message and exit
+  --since SINCE    15m, 24h, 7d or an ISO timestamp (default 24h)
+  --until UNTIL
+  --agent ADDR
+  --kind KIND      an event kind or a prefix: tool.call, run, scheduler
+  --trace TASK_ID
+  --errors         only refusals, failures, faults
+  --limit LIMIT    show the last N matching events
+  --follow         keep printing new events until Ctrl-C
+  --poll POLL      seconds between looks when following
+  --json           one JSON object per line

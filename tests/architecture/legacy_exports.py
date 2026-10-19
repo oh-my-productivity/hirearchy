@@ -41,12 +41,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "INSTRUCTIONS ROOT_INSTRUCTIONS DS_STORE OrgBinding build_server resolve_binding serve"
     ),
     "cli": _e3(
-        "cmd_init cmd_hire cmd_task cmd_services cmd_define_service cmd_request cmd_feedback cmd_retire_service "
-        "cmd_plan cmd_apply cmd_send cmd_status cmd_health cmd_progress cmd_upgrade_rules cmd_install_skill "
-        "cmd_review cmd_inbox cmd_resume cmd_run cmd_dash cmd_mcp cmd_kiro_profile main"
-    ),
-    "cli_obs": _e3(
-        "cmd_now cmd_trace cmd_metrics cmd_events cmd_check register_obs"
+        "main"
     ),
     "services": _e3(
         "TITLE_MAX service_dir read_contract read_playbook owned_services requestable_services parse_input_spec define_service "

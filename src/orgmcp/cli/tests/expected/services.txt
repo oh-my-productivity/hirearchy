@@ -1,0 +1,9 @@
+Services you can request (from your direct reports):
+- weekly (offered by ceo; contract v1, playbook v0): A weekly note
+  inputs: topic* (what to write about)   (* required)
+  each request: 4 runs; acceptance criteria (ceo/services/weekly/SERVICE.md):
+    1. The note has a title.
+  record: no requests yet
+  playbook: none yet
+
+[exit 0]
