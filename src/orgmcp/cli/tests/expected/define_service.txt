@@ -1,0 +1,6 @@
+defined service `monthly` (contract v1) for ceo: ceo/services/monthly/SERVICE.md. It has no playbook yet: ceo writes v1 with revise_playbook after its first request.
+
+[stderr]
+org: <ORG>
+
+[exit 0]

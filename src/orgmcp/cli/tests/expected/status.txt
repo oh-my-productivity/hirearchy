@@ -1,0 +1,10 @@
+root (human): unread 1, delegated 1
+  ceo [Chief executive] pending  budget=8 open=1 delegated=0 unread=1 services: weekly
+    eng [Engineer] idle  budget=0 open=0 delegated=0 unread=0
+
+your outstanding tasks:
+  20260115T090200000000-root-0000 "Ship it" -> ceo
+
+scheduler: stopped
+
+[exit 0]

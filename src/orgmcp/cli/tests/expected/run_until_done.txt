@@ -1,0 +1,6 @@
+scheduler exiting: finished: no open tasks
+
+[stderr]
+org: <ORG>
+
+[exit 0]

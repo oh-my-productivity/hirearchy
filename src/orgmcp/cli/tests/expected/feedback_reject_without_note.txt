@@ -1,0 +1,6 @@
+
+[stderr]
+org: <ORG>
+error: a rejection needs a note: say what was wrong, so the owner can change its playbook
+
+[exit 1]

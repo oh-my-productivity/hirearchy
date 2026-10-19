@@ -1,0 +1,6 @@
+feedback accept on 20260115T090500000000-root-0002 -> ceo
+
+[stderr]
+org: <ORG>
+
+[exit 0]

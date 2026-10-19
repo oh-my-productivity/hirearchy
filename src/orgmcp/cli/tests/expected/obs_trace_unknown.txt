@@ -1,0 +1,5 @@
+
+[stderr]
+error: no message nope. Root's tasks (latest): 20260115T090200000000-root-0000
+
+[exit 1]

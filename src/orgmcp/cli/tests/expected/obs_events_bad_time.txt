@@ -1,0 +1,5 @@
+
+[stderr]
+error: cannot read 'yesterday-ish' as a time: use a duration like 15m, 24h, 7d or an ISO timestamp like 2026-10-18T10:00:00Z
+
+[exit 1]

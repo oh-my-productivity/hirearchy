@@ -1,0 +1,6 @@
+(no new messages)
+
+[stderr]
+org: <ORG>
+
+[exit 0]

@@ -1,0 +1,6 @@
+
+[stderr]
+org: <ORG>
+error: no such agent: nobody
+
+[exit 1]

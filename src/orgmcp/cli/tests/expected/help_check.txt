@@ -1,0 +1,5 @@
+usage: orgmcp check [-h] [--json]
+
+options:
+  -h, --help  show this help message and exit
+  --json

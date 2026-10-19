@@ -1,0 +1,6 @@
+request 20260115T090500000000-root-0002 -> ceo (service weekly, budget 3)
+
+[stderr]
+org: <ORG>
+
+[exit 0]

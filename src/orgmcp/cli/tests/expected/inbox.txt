@@ -1,0 +1,10 @@
+### note 20260115T090300000000-ceo-0001
+from: ceo | to: root | title: Greeting
+
+Hello from the ceo.
+
+
+[stderr]
+org: <ORG>
+
+[exit 0]
