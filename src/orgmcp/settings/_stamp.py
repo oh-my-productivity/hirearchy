@@ -16,8 +16,8 @@ class OrgDocumentStamp(Protocol):
 
 class FsOrgDocumentStamp(OrgDocumentStamp):
     def __init__(self, paths: OrgLayout) -> None:
-        self._paths = paths
+        self._document = paths.root / "ORG.md"  # joined once: ``stamp`` runs on every emitted event
 
     def stamp(self) -> tuple[int, int]:
-        st = (self._paths.root / "ORG.md").stat()
+        st = self._document.stat()
         return (st.st_mtime_ns, st.st_size)

@@ -42,6 +42,7 @@ testpaths = ["tests", "src/orgmcp"]
 pythonpath = ["tests"]
 markers = [
     "integration: uses the real kiro-cli / a real LLM; skipped unless --run-integration (or ORGMCP_RUN_INTEGRATION=1)",
+    "perf: timing guards; opt-in with ORGMCP_RUN_PERF=1 (the deterministic, count-based guards run by default)",
     "architecture: structural checks of the refactor (tests/architecture); deselect with -m 'not architecture' for a quick loop",
 ]
 

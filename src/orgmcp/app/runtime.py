@@ -1,7 +1,7 @@
 """``OrgRuntime``: the objects of one organization, one field per port (ARCHITECTURE.md 6.2).
 
 The fields are declared by the parts ``app/fields_<pkg>.py`` (one per package, 9.2) and only composed here: the list of bases is final,
-so a step that gives its package ports never edits this file.
+so a step that gives its package ports never edits this file. A field is built when it is first read (``fields_app.LazyPorts``).
 """
 
 from __future__ import annotations
@@ -51,8 +51,9 @@ from . import (
 )
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class OrgRuntime(
+    fields_app.LazyPorts,
     fields_access.Fields,
     fields_agents.Fields,
     fields_app.Fields,
@@ -93,5 +94,5 @@ class OrgRuntime(
     fields_traces.Fields,
     fields_upgrade.Fields,
 ):
-    """Data only: the ports of one organization root, built by ``wiring.open_runtime``. The fields come from the parts; each is typed by a
-    Protocol of its package, and ``runtime.<field>`` is checked by mypy as if it were declared here."""
+    """The ports of one organization root, built by ``wiring.open_runtime`` when they are first read. The fields come from the parts; each is
+    typed by a Protocol of its package, and ``runtime.<field>`` is checked by mypy as if it were declared here."""

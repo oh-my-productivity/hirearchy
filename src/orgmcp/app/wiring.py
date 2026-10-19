@@ -6,17 +6,17 @@ import importlib
 import pkgutil
 from collections.abc import Callable, Mapping
 from pathlib import Path
-from typing import get_type_hints
 
 from ..mail._index import StampCachedMetaReader
 from ..mail._parser import CachingMessageParser
 from ._builder import Builder
+from ._lazy import ports_of
 from ._resources import ProcessResources
 from .runtime import OrgRuntime
 
 _process: ProcessResources | None = None  # the one set of process resources (app is the only place for such a global)
 _registrars: list[Callable[[Builder], None]] | None = None
-_ports: dict[str, type] | None = None  # field name -> port, read once from the annotations of OrgRuntime
+_providers: Mapping[type, Callable[[Builder], object]] | None = None  # the factory of every port, collected once for the process
 
 
 def new_process_resources() -> ProcessResources:
@@ -49,19 +49,25 @@ def registrars() -> list[Callable[[Builder], None]]:
 
 def runtime_ports() -> dict[str, type]:
     """The port of every field of ``OrgRuntime`` except ``root`` (the one field that is not built by a provider)."""
-    global _ports
-    if _ports is None:
-        _ports = {name: port for name, port in get_type_hints(OrgRuntime).items() if name != "root"}
-    return _ports
+    return ports_of(OrgRuntime)
+
+
+def providers() -> Mapping[type, Callable[[Builder], object]]:
+    """The factory of every port: the process resources and what each ``wire_*`` module registers, collected on the first call.
+
+    The factories only name the ports they need (they read nothing of the runtime that uses them), so every builder starts from this one table."""
+    global _providers
+    if _providers is None:
+        collected = Builder(Path("."))
+        collected.provide(ProcessResources, lambda _: process_resources())
+        for register in registrars():
+            register(collected)
+        _providers = collected.providers
+    return _providers
 
 
 def open_runtime(root: Path, overrides: Mapping[type, object] | None = None) -> OrgRuntime:
-    """The runtime of the organization at ``root`` (resolved by the caller). Constructors do no I/O; ``overrides`` replace ports."""
-    builder = Builder(root, overrides)
-    builder.provide(ProcessResources, lambda _: process_resources())
-    for register in registrars():
-        register(builder)
-    values: dict[str, object] = {"root": root}
-    for name, port in runtime_ports().items():
-        values[name] = builder.get(port)
-    return OrgRuntime(**values)  # type: ignore[arg-type]
+    """The runtime of the organization at ``root`` (resolved by the caller). Constructors do no I/O; ``overrides`` replace ports.
+
+    Nothing is built here: each port is built, once, when the runtime is first asked for it (``org.runtime.mailbox``)."""
+    return OrgRuntime.lazy(Builder(root, overrides, providers()))
