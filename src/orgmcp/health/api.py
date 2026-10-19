@@ -12,16 +12,18 @@ Everything here is read-only and derived from message files and run logs (nothin
   handles such a request - is counted apart (``client_rework``) and is not held against the agent: the client's rejection says nothing
   about the reviewer's or the writer's own quality.
 
-Thresholds come from ``HEALTH_DEFAULTS`` overridden by the ``health:`` mapping in ORG.md frontmatter.
+Thresholds come from ``HEALTH_DEFAULTS`` overridden by the ``health:`` mapping in ORG.md frontmatter. ``HealthAnalyzer`` measures,
+``HealthRenderer`` writes the report as text (``OrgHealth.to_dict`` is the JSON form), ``HealthThresholds`` says where the flags start.
 """
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from typing import Protocol, cast, runtime_checkable
 
-from ..kernel import JsonObject
+from ..kernel import ROOT, JsonObject
 from ._json import plain
 
 __all__ = [
@@ -29,7 +31,10 @@ __all__ = [
     "HEALTH_DEFAULTS",
     "AgentHealth",
     "BranchHealth",
+    "HealthAnalyzer",
+    "HealthRenderer",
     "HealthReport",
+    "HealthThresholds",
     "OrgHealth",
 ]
 
@@ -118,3 +123,31 @@ class OrgHealth(HealthReport):
     def to_dict(self) -> JsonObject:
         """Plain JSON-able structure (datetimes as ISO strings)."""
         return cast(JsonObject, plain(asdict(self) | {"flagged": [a.addr for a in self.flagged]}))
+
+
+@runtime_checkable
+class HealthThresholds(Protocol):
+    def thresholds(self) -> dict[str, float]:
+        """``HEALTH_DEFAULTS`` merged with the ``health:`` mapping of ORG.md. A value that is not a finite number (a typo, a boolean, a
+        word) falls back to its default, so that a mistake in ORG.md cannot break health. Numeric strings count as numbers."""
+        ...
+
+
+@runtime_checkable
+class HealthAnalyzer(Protocol):
+    def agent_health(self, addr: str, now: datetime | None = None, limits: Mapping[str, float] | None = None) -> AgentHealth:
+        """Metrics and flags for one agent. ``now`` defaults to the clock (a naive one is taken as UTC), ``limits`` to the thresholds.
+        Raises ``OrgError`` for ``root`` (the human has no health data) and for an agent that does not exist."""
+        ...
+
+    def org_health(self, root: str = ROOT, now: datetime | None = None) -> OrgHealth:
+        """Health of ``root`` and everything below it (``root`` = the whole organization, the human excluded), with the totals of every
+        branch: parents before children."""
+        ...
+
+
+@runtime_checkable
+class HealthRenderer(Protocol):
+    def render_text(self, health: OrgHealth) -> str:
+        """The human report: a summary line, then one line per agent (indented by depth) with its branch totals, flags and reasons."""
+        ...
