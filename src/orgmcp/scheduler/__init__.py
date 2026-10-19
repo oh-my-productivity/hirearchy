@@ -37,7 +37,6 @@ from ._legacy import (
 from ._legacy import _command_line as _command_line  # (private names the legacy callers and tests still use)
 from ._legacy import _looks_like_scheduler_of as _looks_like_scheduler_of
 from ._legacy import _ps as _ps
-from ._legacy import _signal_group as _signal_group
 from ._legacy import _start_time as _start_time
 
 __all__ = [

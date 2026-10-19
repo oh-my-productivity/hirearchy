@@ -3,7 +3,9 @@
 The module-level functions of ``scheduler.py`` (``kiro_profile_name``, ``ensure_kiro_profile``, ``file_confinement``, ``kiro_runner``,
 ``mcp_server_command``) have no runtime to take the ports from, and tests replace them one by one (``scheduler.mcp_server_command``,
 ``scheduler.ensure_kiro_profile``, ``scheduler.file_confinement``), so they ask this module for the real parts and hand it the functions
-that are in force at the time of the call. They go away with ``scheduler.py`` (D-sched-1).
+that are in force at the time of the call. D-sched-1 kept them: the golden kiro tests (``tests/golden/test_golden_kiro.py``, which a refactor step may not
+edit) and ``tests/test_qa_findings`` / ``test_scheduler`` still replace ``scheduler.mcp_server_command`` / ``ensure_kiro_profile`` / ``file_confinement`` and read
+``scheduler.KIRO_AGENTS_DIR`` / ``PROJECT_DIR``, so the legacy ``kiro_runner`` still builds its command through them. They go with the legacy functions (E1/E3).
 """
 
 from __future__ import annotations

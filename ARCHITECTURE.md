@@ -1702,6 +1702,7 @@ in the table of its module. Constants move with the code that uses them (listed 
 | `_strays_since` | `strays.StrayProbe.found_since` |
 | `nothing_to_do` | `attention.OpenWork.nothing_to_do` |
 | `Scheduler` | `scheduler.SchedulerLoop` + collaborators, per the method table in 5.5 |
+| `_RunnerCommands`, `_EchoConsole`, `_SchedulerGuard`, `_Lifecycles` | `scheduler/_legacy.py`: the adapters of the legacy `Scheduler` to the lifecycle (its runner -> `RunCommandBuilder`, its `echo` -> `Console`, its `_guard` -> `PhaseGuard`, and the starter and the reaper built by `app/wire_scheduler.lifecycle_of` over the runtime `org.runtime` is now); they go with the class (D-sched-2) |
 | `_patched`, `_wire` | the late lookups the legacy surface of `scheduler/_legacy.py` keeps until E3 (`_patched`: an attribute of the package `orgmcp.scheduler`, which tests replace; `_wire`: a module of `orgmcp.app`, which an entry point may not import) |
 
 ### 5.5 `scheduler.Scheduler` — method distribution (class is split)
@@ -1714,7 +1715,7 @@ in the table of its module. Constants move with the code that uses them (listed 
 | `release` | `HeartbeatLoop._shutdown`: `RunReaper.terminate_all` (SIGTERM, wait 10 s, SIGKILL group, log note, `BatchStore.end(ok=False)`, `run.end` events), `RunRegistry.forget`, `SchedulerLock.release`, `scheduler.exit` event |
 | `serve`, `tick`, `finished` | `scheduler.SchedulerLoop.serve / tick / finished` |
 | `waiting_on_user`, `_check_waiting` | `HeartbeatLoop.waiting_on_user` -> `attention.WaitingOnUser.analyze(running=..., blocked=..., can_start=...)`; `_check_waiting` -> `scheduler/_exit.py::GraceExitPolicy` (`ExitPolicy`) |
-| `_running_records`, `_record_run`, `_forget_run` | `runs.RunRegistry.all / record / forget` (via `scheduler/_registry.py::RunTracker`) |
+| `_running_records`, `_record_run`, `_forget_run` | `runs.RunRegistry.all / record / forget` (via `scheduler/_tracker.py::RunTracker`, `RunRecords`) |
 | `_ignore_running_ledger` | `snapshots.IgnoreList.ensure_runtime_files` |
 | `_settle_orphans`, `_note_in_log` | `scheduler/_orphans.py::LedgerOrphanSettler` (`OrphanSettler`) using `OrphanJudge`, `ProcessSignaller`, `RunLogWriter.append_note` |
 | `_upkeep_events` | `scheduler/_upkeep.py::HeartbeatUpkeep` (`UpkeepPhase`): `attention.HumanQueue.items` for `waiting_on_you`, `EventRetention.prune` |
@@ -1722,8 +1723,9 @@ in the table of its module. Constants move with the code that uses them (listed 
 | `_guard`, `_guard_value` | `scheduler/_guard.py::LoggingPhaseGuard` (`PhaseGuard`) |
 | `_resume_funded` | `HeartbeatLoop._resume_funded` using `PauseStore`, `BudgetQuery` |
 | `_runnable` | `eligibility.RunnableQuery.runnable` |
-| `_launch`, `_start`, `_emit_run_start` | `scheduler/_starter.py::SubprocessRunStarter` (`RunStarter`) using `BatchStore.begin`, `RunLogWriter.create/open_sink`, `RunPromptBuilder`, `RunCommandBuilder`, `ProcessSpawner`, `StrayProbe`, `PauseStore`, `MessageDelivery.notify`, `Notices.budget` |
-| `_emit_run_end`, `_reap`, `_check_strays`, `_failed` | `scheduler/_reaper.py::PollingRunReaper` (`RunReaper`) using `ProcessHandle`, `BatchStore.end`, `FailureCounter`, `PauseStore`, `MessageDelivery.notify`, `Notices.failures`, `StrayRegistry`, `OrgSnapshotter.commit` |
+| `_launch`, `_start`, `_emit_run_start` | D-sched-1, in `scheduler/_starter.py`: `AgentRunLauncher` (`RunStarter`; `_launch`) over `BudgetGate` (`_admission.py`, `RunAdmission`: unread, pauses, the budget pause and its notice) and `SingleRunStarter` (`RunInitiation`; `_start`) made of `BatchPreparer` (`BatchStore.begin`, `RunLogWriter.create/open_sink`, `RunPromptBuilder`, counts the run in `RunCount`), `CommandSpawner` (`RunCommandBuilder`, `ProcessSpawner`: log header, command, prompt on a temp-file stdin), `StartFailureHandler`, `StartAnnouncer` (`_emit_run_start` is `_events.py::LifecycleEvents.started`) and `StrayCheck.before` |
+| `_emit_run_end`, `_reap`, `_check_strays`, `_failed` | D-sched-1, in `scheduler/_reaper.py`: `PollingRunReaper` (`RunReaper`; `_reap`) over `ExitWatcher` (poll, timeout by the run clock, retired agent; kills the group), `RunSettlement` (`BatchStore.end`, `OrgSnapshotter.commit`), `ShutdownTerminator` (the run half of `release`); `_emit_run_end` is `LifecycleEvents.ended`; `_check_strays` is `_strays.py::StrayCheck.after`; `_failed` is `_failures.py::CountingFailures` + `PausingEscalation` (`FailureCounter`, `PauseStore`, `MessageDelivery`, `Notices.failures`) |
+| `total_runs` | `scheduler/_run.py::RunCount.total` (the loop reads it; the preparation of a run counts it, as the old `_start` did, before the prompt is written) |
 | `_check_review` | `HeartbeatLoop` phase -> `review.HealthReviewer.review_if_due` |
 | `_check_stalls`, `_task_view`, `_chain`, `_created`, `_last_run_end` | `stalls.StallLadder.check` (`EscalationStallLadder`; memo keyed by `MailFingerprint`; `_last_run_end` -> `RunLogReader.last_end`) |
 
