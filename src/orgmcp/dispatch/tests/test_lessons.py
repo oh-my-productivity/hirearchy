@@ -9,9 +9,6 @@ from orgmcp.dispatch._lessons import LessonsPolicy
 from orgmcp.dispatch._protocols import LessonsCheck
 from orgmcp.kernel import Message, OrgError
 
-from ._support import RED
-
-pytestmark = RED
 
 
 def task(service: str | None = None) -> Message:

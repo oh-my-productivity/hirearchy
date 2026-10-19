@@ -15,13 +15,11 @@ from orgmcp.kernel import Message
 HIRERS = ("ceo", "ceo/ops")
 WORKERS = ("ceo/eng", "ceo/qa", "ceo/ops/dev")
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-dispatch")
-PENDING: set[str] = {"fs_world", "memory_world", "fixed_world"}  # implementations not green yet
 
 
 def implementations(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:
-    """The implementations a contract suite iterates over, ``IMPLEMENTATIONS[<protocol>]`` (those that are not green yet are expected to fail)."""
-    return [pytest.param(f, id=f.__name__, marks=RED if f.__name__ in PENDING else ()) for f in factories]
+    """The implementations a contract suite iterates over, ``IMPLEMENTATIONS[<protocol>]``, with their names as ids."""
+    return [pytest.param(f, id=f.__name__) for f in factories]
 
 
 def populated(world: DispatchWorld) -> DispatchWorld:

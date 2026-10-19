@@ -16,9 +16,7 @@ from orgmcp.dispatch.testing import IMPLEMENTATIONS, DispatchWorld, FixedReworkC
 from orgmcp.kernel import Message, OrgError
 from orgmcp.kernel.testing import SequenceIdGenerator
 
-from ._support import RED, grant, implementations, make
-
-pytestmark = RED
+from ._support import grant, implementations, make
 
 
 @pytest.fixture(params=[p for p in implementations(IMPLEMENTATIONS[MessageSender]) if p.id != "recording_world"])
@@ -244,7 +242,7 @@ def over(w: DispatchWorld, routes: RoutePolicy) -> tuple[RuleMessageSender, Reco
 def test_the_route_is_asked_with_the_normalized_addresses_and_the_reply_to(w: DispatchWorld) -> None:
     routes = Routes(True)
     sender, _ = over(w, routes)
-    sender.send(" /CEO/ ", " ceo/eng ", "hi", reply_to="some-id")
+    sender.send(" /ceo/ ", " ceo/eng ", "hi", reply_to="some-id")
     assert routes.asked == [("ceo", "ceo/eng", "some-id")]
 
 

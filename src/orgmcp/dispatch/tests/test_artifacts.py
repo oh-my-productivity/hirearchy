@@ -14,9 +14,7 @@ from orgmcp.dispatch._protocols import ArtifactNormalizer
 from orgmcp.dispatch.testing import DispatchWorld, fs_world
 from orgmcp.kernel import OrgError, OrgPaths
 
-from ._support import RED, populated
-
-pytestmark = RED
+from ._support import populated
 
 
 class Place:

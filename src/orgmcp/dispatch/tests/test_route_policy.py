@@ -12,9 +12,7 @@ from orgmcp.dispatch._routes import ParentSiblingRoutePolicy
 from orgmcp.dispatch.testing import DispatchWorld, fs_world, memory_world
 from orgmcp.kernel import Message
 
-from ._support import RED, populated
-
-pytestmark = RED
+from ._support import populated
 
 
 @pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)

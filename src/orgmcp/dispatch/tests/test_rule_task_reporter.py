@@ -15,9 +15,7 @@ from orgmcp.dispatch.testing import IMPLEMENTATIONS, DispatchWorld
 from orgmcp.kernel import Message, OrgError
 from orgmcp.templates import DocumentTemplates
 
-from ._support import RED, assigned, implementations, make
-
-pytestmark = RED
+from ._support import assigned, implementations, make
 
 
 class Sender(MessageSender):
