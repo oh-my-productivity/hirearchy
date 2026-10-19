@@ -10,8 +10,6 @@ from typing import TypeVar, cast
 import pytest
 
 RED = "red: B-kiro"
-red = pytest.mark.xfail(strict=True, reason=RED)
-
 GOLDEN = Path(__file__).resolve().parent / "golden"
 T = TypeVar("T")
 

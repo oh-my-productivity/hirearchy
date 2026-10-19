@@ -9,7 +9,7 @@ import pytest
 from orgmcp.kernel import JsonObject
 from orgmcp.kiro._profile_document import kiro_profile
 
-from ._support import GOLDEN, RED
+from ._support import GOLDEN
 
 CASES: dict[str, tuple[tuple[object, ...], dict[str, object]]] = {
     "kiro_profile_plain": (
@@ -24,43 +24,35 @@ CASES: dict[str, tuple[tuple[object, ...], dict[str, object]]] = {
     ),
 }
 
-red = pytest.mark.xfail(strict=True, reason=RED)
-
 
 def profile(name: str) -> JsonObject:
     args, kwargs = CASES[name]
     return kiro_profile(*args, **kwargs)  # type: ignore[arg-type]  # the cases pass keyword arguments from a table
 
 
-@red
 @pytest.mark.parametrize("name", sorted(CASES))
 def test_the_kiro_profile_is_unchanged(name: str) -> None:
     assert json.dumps(profile(name), indent=2) + "\n" == (GOLDEN / f"{name}.json").read_bytes().decode("utf-8")
 
 
-@red
 def test_the_keys_come_in_the_order_kiro_documents_them() -> None:
     assert list(profile("kiro_profile_plain")) == ["name", "description", "prompt", "mcpServers", "tools", "allowedTools", "resources", "hooks", "includeMcpJson"]
     assert list(profile("kiro_profile_allowed")) == [
         "name", "description", "prompt", "mcpServers", "tools", "allowedTools", "resources", "hooks", "includeMcpJson", "toolsSettings"]
 
 
-@red
 def test_without_allowed_tools_every_tool_is_allowed() -> None:
     data = profile("kiro_profile_plain")
     assert data["tools"] == data["allowedTools"] == ["@orgmcp"]
 
 
-@red
 def test_an_empty_list_of_allowed_tools_is_not_the_default() -> None:
     assert profile("kiro_profile_empty_settings")["allowedTools"] == []
 
 
-@red
 def test_empty_tool_settings_are_left_out() -> None:
     assert "toolsSettings" not in profile("kiro_profile_empty_settings")
 
 
-@red
 def test_the_user_s_global_mcp_json_is_not_loaded() -> None:
     assert profile("kiro_profile_plain")["includeMcpJson"] is False

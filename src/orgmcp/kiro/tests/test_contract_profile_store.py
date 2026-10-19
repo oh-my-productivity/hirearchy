@@ -10,9 +10,7 @@ import pytest
 from orgmcp.kiro import ProfileStore
 from orgmcp.kiro.testing import IMPLEMENTATIONS, StoreHarness
 
-from ._support import RED, make
-
-pytestmark = pytest.mark.xfail(strict=True, reason=RED)
+from ._support import make
 
 PROFILE = {"name": "orgmcp-a-123456", "tools": ["@orgmcp", "read"], "hooks": {}, "includeMcpJson": False, "näme": "ü ✓"}
 

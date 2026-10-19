@@ -16,4 +16,8 @@ class VenvMcpServerLocator(McpServerLocator):
         self._which = which
 
     def command(self) -> dict[str, object]:
-        raise NotImplementedError
+        """How kiro should start the orgmcp MCP server (prefer the venv's console script)."""
+        script = self._executable().with_name("orgmcp")
+        if script.exists():
+            return {"command": str(script), "args": ["mcp"]}
+        return {"command": self._which("uv") or "uv", "args": ["--directory", str(self._project_dir), "run", "orgmcp", "mcp"]}

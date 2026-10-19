@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable, Mapping, Sequence
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,6 +19,7 @@ from ..kernel import JsonObject, OrgPaths
 from ..kernel.testing import DictEnvironment, fs_atomic_writer
 from ._confinement import KiroConfinementPolicy
 from ._mcp_locator import VenvMcpServerLocator
+from ._profile_document import parse_profile, render_profile
 from ._profiles import FsProfileStore
 from ._provisioner import OrgProfileProvisioner
 from ._runner import KiroRunCommandBuilder
@@ -39,20 +41,21 @@ class MemoryProfileStore(ProfileStore):
         self.files[name] = text
 
     def read(self, name: str) -> dict[str, object] | None:
-        raise NotImplementedError
+        text = self.files.get(name)
+        return None if text is None else parse_profile(text)
 
     def write(self, name: str, data: Mapping[str, object]) -> None:
-        raise NotImplementedError
+        self.files[name] = render_profile(data)
 
 
 class StaticMcpServerLocator(McpServerLocator):
     """Always the same ``command``/``args`` (a fresh copy on every call)."""
 
     def __init__(self, command: Mapping[str, object] | None = None) -> None:
-        self._command = dict(SERVER if command is None else command)
+        self._command = deepcopy(dict(SERVER if command is None else command))
 
     def command(self) -> dict[str, object]:
-        raise NotImplementedError
+        return deepcopy(self._command)
 
 
 class CountingProfileStore(ProfileStore):

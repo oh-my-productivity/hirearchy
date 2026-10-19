@@ -12,9 +12,7 @@ import pytest
 from orgmcp.kiro import FILE_TOOLS, ConfinementPolicy
 from orgmcp.kiro.testing import IMPLEMENTATIONS
 
-from ._support import RED, golden
-
-pytestmark = pytest.mark.xfail(strict=True, reason=RED)
+from ._support import golden
 
 ORG = Path("/golden/org")
 CASES = cast(list[dict[str, object]], golden("confinement.json"))

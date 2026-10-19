@@ -13,9 +13,7 @@ import pytest
 from orgmcp.kiro import ProfileProvisioner
 from orgmcp.kiro.testing import IMPLEMENTATIONS, ProvisionerHarness
 
-from ._support import RED, make
-
-pytestmark = pytest.mark.xfail(strict=True, reason=RED)
+from ._support import make
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[ProfileProvisioner], ids=lambda factory: factory.__name__)

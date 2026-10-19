@@ -9,9 +9,7 @@ import pytest
 from orgmcp.kiro import McpServerLocator
 from orgmcp.kiro.testing import IMPLEMENTATIONS, LocatorHarness
 
-from ._support import RED, make
-
-pytestmark = pytest.mark.xfail(strict=True, reason=RED)
+from ._support import make
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[McpServerLocator], ids=lambda factory: factory.__name__)
