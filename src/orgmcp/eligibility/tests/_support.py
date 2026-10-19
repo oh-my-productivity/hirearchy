@@ -9,7 +9,7 @@ import pytest
 from _pytest.mark.structures import ParameterSet
 
 RED = pytest.mark.xfail(strict=True, reason="red: B-eligibility")
-PASSING: frozenset[str] = frozenset()  # the implementations that already pass their contract suite; the others are red
+PASSING: frozenset[str] = frozenset({"memory_pauses", "memory_failures"})  # the implementations that already pass their contract suite; the others are red
 
 
 def implementations(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:

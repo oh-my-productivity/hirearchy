@@ -9,6 +9,7 @@ flags for ``AgentStates`` and ``RunnableQuery``, whose budgets are the numbers a
 from __future__ import annotations
 
 import itertools
+import json
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,12 +17,12 @@ from pathlib import Path
 from ..agents import AgentDirectory, CharterReader
 from ..agents.testing import fs_agents
 from ..budget.testing import FixedBudget
-from ..kernel import RUNTIME, EventSink, Message, OrgPaths
+from ..kernel import RUNTIME, EventSink, Message, OrgPaths, clip, norm
 from ..kernel.testing import ListEventSink, MemoryLedgerStore, fs_ledger_store
 from ..mail.testing import MailHarness, MemoryMailbox, fs_mailbox, memory_mailbox
 from ._caching import CachingPauseStore
 from ._failures import LedgerFailureCounter
-from ._pause import FsPauseStore
+from ._pause import PREVIOUS_MAX, REASON_MAX, FsPauseStore
 from ._ports import FsDirectoryProbe, FsLedgerShape, LedgerShape
 from ._runnable import DerivedRunnableQuery
 from ._states import DerivedAgentStates
@@ -32,17 +33,22 @@ class MemoryPauseStore(PauseStore):
     """The flag files in a table: ``flags`` holds the text of each, as the file would."""
 
     def __init__(self, events: EventSink) -> None:
+        self._events = events
         self.flags: dict[str, str] = {}
-        raise NotImplementedError("red: B-eligibility")
 
     def paused(self, addr: str) -> str | None:
-        raise NotImplementedError("red: B-eligibility")
+        text = self.flags.get(norm(addr))
+        return None if text is None else (text.strip() or "paused")
 
     def pause(self, addr: str, reason: str, by: str | None = None) -> None:
-        raise NotImplementedError("red: B-eligibility")
+        self.flags[norm(addr)] = reason
+        self._events.emit("agent.pause", actor=by, agent=addr, reason=clip(reason, REASON_MAX))
 
     def resume(self, addr: str, reason: str = "", by: str | None = None) -> None:
-        raise NotImplementedError("red: B-eligibility")
+        was = self.paused(addr)
+        self.flags.pop(norm(addr), None)
+        if was is not None:
+            self._events.emit("agent.resume", actor=by, agent=addr, reason=reason or "resumed", previous=clip(was, PREVIOUS_MAX))
 
 
 class MemoryFailureCounter(FailureCounter):
@@ -50,16 +56,38 @@ class MemoryFailureCounter(FailureCounter):
 
     def __init__(self) -> None:
         self.text: str | None = None
-        raise NotImplementedError("red: B-eligibility")
+
+    def _load(self) -> tuple[dict[str, object], bool]:
+        """``(the counts, the text is JSON but not an object)``; a text that cannot be parsed reads as no counts."""
+        if self.text is None:
+            return {}, False
+        try:
+            data = json.loads(self.text)
+        except ValueError:
+            return {}, False
+        return (data, False) if isinstance(data, dict) else ({}, True)
+
+    def _save(self, counts: Mapping[str, object]) -> None:
+        self.text = json.dumps(counts, indent=2) + "\n"
 
     def record(self, addr: str) -> int:
-        raise NotImplementedError("red: B-eligibility")
+        counts, _ = self._load()
+        counts[addr] = int(str(counts.get(addr, 0))) + 1
+        self._save(counts)
+        return int(str(counts[addr]))
 
     def clear(self, addr: str) -> None:
-        raise NotImplementedError("red: B-eligibility")
+        counts, _ = self._load()
+        if counts.pop(addr, None) is not None:
+            self._save(counts)
 
     def repair(self) -> bool:
-        raise NotImplementedError("red: B-eligibility")
+        counts, damaged = self._load()
+        clean = {k: v for k, v in counts.items() if isinstance(v, int) and not isinstance(v, bool)}
+        if damaged or clean != counts:
+            self._save(clean)
+            return True
+        return False
 
 
 class MemoryLedgerShape(LedgerShape):
@@ -69,7 +97,10 @@ class MemoryLedgerShape(LedgerShape):
         self._texts = texts
 
     def damaged(self, name: str) -> bool:
-        raise NotImplementedError("red: B-eligibility")
+        try:
+            return not isinstance(json.loads(self._texts[name]), dict)
+        except (KeyError, ValueError):
+            return False
 
 
 # ------------------------------------------------------------------------------ harnesses
