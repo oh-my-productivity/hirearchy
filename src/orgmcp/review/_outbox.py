@@ -14,4 +14,5 @@ class DeliveryNoteOutbox(NoteOutbox):
         self._delivery = delivery
 
     def deliver(self, notes: Sequence[Note]) -> None:
-        raise NotImplementedError("red: C-review")
+        for n in notes:
+            self._delivery.notify(n.to, n.title, n.body)

@@ -3,20 +3,29 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol, runtime_checkable
 
-from ..kernel import JsonObject
 from .api import Note, Review
+
+
+@dataclass(frozen=True)
+class LedgerRecord:
+    """What ``.runtime/reviews.json`` says, normalised."""
+
+    at: object  # when the last review ran, as the file has it (an ISO time; anything else is unreadable and counts as no time)
+    runs: int  # the organization-wide run count then
+    notified: dict[str, list[str]]  # recipient -> "agent:flag" pairs it knows about
 
 
 @runtime_checkable
 class ReviewLedger(Protocol):
     """``.runtime/reviews.json``: when the last review ran, the run count then, and who was told about what."""
 
-    def read(self) -> JsonObject | None:
-        """The ledger as ``{"at", "runs", "notified"}`` (a ``runs`` that is not an int counts as 0, a ``notified`` entry that is not a list is
-        dropped); ``None`` when it is missing, empty or not an object."""
+    def read(self) -> LedgerRecord | None:
+        """The ledger (a ``runs`` that is not an int counts as 0, a ``notified`` entry that is not a list is dropped); ``None`` when it is
+        missing, empty or not an object."""
         ...
 
     def save(self, at: datetime, runs: int, notified: Mapping[str, list[str]]) -> None:

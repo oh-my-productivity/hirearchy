@@ -14,4 +14,8 @@ class ArchivedRunTotal(RunTotal):
         self._archive = archive
 
     def total(self) -> int:
-        raise NotImplementedError("red: C-review")
+        """Runs ever used across the organization, counted from the run logs (so a restart does not reset it).
+
+        Retired agents are included, so retiring never moves the counter backwards (and never postpones a review).
+        """
+        return sum(self._runs.count(a) for a in self._agents.agents()) + self._archive.run_count()

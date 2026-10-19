@@ -10,11 +10,9 @@ import pytest
 
 from orgmcp.kernel.testing import LedgerHarness, fs_ledger_store, memory_ledger_store
 from orgmcp.review._ledger import StoreReviewLedger
-from orgmcp.review._ports import ReviewLedger
+from orgmcp.review._ports import LedgerRecord, ReviewLedger
 
 from ._support import implementations
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-review")
 
 AT = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 
@@ -34,7 +32,7 @@ def test_nothing_stored_reads_as_none(stores: tuple[ReviewLedger, LedgerHarness]
 def test_what_is_saved_reads_back_normalised(stores: tuple[ReviewLedger, LedgerHarness]) -> None:
     ledger, _ = stores
     ledger.save(AT, 7, {"ceo": ["ceo/eng:idle"]})
-    assert ledger.read() == {"at": "2026-01-01T12:00:00+00:00", "runs": 7, "notified": {"ceo": ["ceo/eng:idle"]}}
+    assert ledger.read() == LedgerRecord("2026-01-01T12:00:00+00:00", 7, {"ceo": ["ceo/eng:idle"]})
 
 
 def test_the_ledger_is_written_with_its_keys_in_order_two_space_indented(stores: tuple[ReviewLedger, LedgerHarness]) -> None:
@@ -49,7 +47,7 @@ def test_the_ledger_is_written_with_its_keys_in_order_two_space_indented(stores:
 def test_a_naive_time_is_saved_as_utc(stores: tuple[ReviewLedger, LedgerHarness]) -> None:
     ledger, _ = stores
     ledger.save(datetime(2026, 1, 1, 12, 0, 0), 0, {})
-    assert ledger.read() == {"at": "2026-01-01T12:00:00+00:00", "runs": 0, "notified": {}}
+    assert ledger.read() == LedgerRecord("2026-01-01T12:00:00+00:00", 0, {})
 
 
 @pytest.mark.parametrize("raw", ["not json", "[]", "{}", "3", ""])
@@ -62,7 +60,7 @@ def test_runs_that_are_not_an_int_count_as_zero_and_notified_keeps_only_lists(st
     ledger, harness = stores
     for runs in (True, "7", 1.5, None):
         harness.put_raw("reviews", json.dumps({"at": "x", "runs": runs, "notified": {"a": ["k"], "b": "no", "c": 3}}))
-        assert ledger.read() == {"at": "x", "runs": 0, "notified": {"a": ["k"]}}
+        assert ledger.read() == LedgerRecord("x", 0, {"a": ["k"]})
     harness.put_raw("reviews", json.dumps({"runs": 4, "notified": ["not", "a", "mapping"]}))
-    assert ledger.read() == {"at": None, "runs": 4, "notified": {}}
+    assert ledger.read() == LedgerRecord(None, 4, {})
 

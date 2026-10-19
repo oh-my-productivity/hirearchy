@@ -4,14 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from orgmcp.delivery.testing import DeliveryHarness, RecordingDelivery, recording_delivery
 from orgmcp.review import Note
 from orgmcp.review._outbox import DeliveryNoteOutbox
 from orgmcp.review._ports import NoteOutbox
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-review")
 
 
 def made(tmp_path: Path) -> tuple[NoteOutbox, RecordingDelivery]:

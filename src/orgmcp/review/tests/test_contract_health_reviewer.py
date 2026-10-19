@@ -18,8 +18,6 @@ from orgmcp.review.testing import IMPLEMENTATIONS, ReviewWorld, later, org_md
 
 from ._support import IDLE, implementations, ledger, ledger_of, staffed, stamp, told
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-review")
-
 
 @pytest.fixture(params=implementations(IMPLEMENTATIONS[HealthReviewer]))
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> ReviewWorld:

@@ -19,8 +19,6 @@ from orgmcp.review._ports import ReserveCheck, ReviewPlanner, RunTotal
 from orgmcp.review.testing import healthy
 from orgmcp.templates.testing import RecordingNotices
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-review")
-
 NOW = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 
 

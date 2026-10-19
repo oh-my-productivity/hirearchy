@@ -13,8 +13,6 @@ from orgmcp.mail.testing import MailHarness, MemoryMailbox, memory_mailbox
 from orgmcp.review._ports import ReserveCheck
 from orgmcp.review._reserve import BudgetReserveCheck
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-review")
-
 
 class Parts:
     def __init__(self, tmp_path: Path) -> None:

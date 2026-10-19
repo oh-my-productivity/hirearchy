@@ -11,8 +11,6 @@ from orgmcp.review._ports import RunTotal
 from orgmcp.review._runs import ArchivedRunTotal
 from orgmcp.runs.testing import RunsHarness, fs_runs, memory_runs
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-review")
-
 
 @pytest.fixture(params=["fs", "memory"])
 def parts(request: pytest.FixtureRequest, tmp_path: Path) -> tuple[RunTotal, AgentsHarness, RunsHarness]:

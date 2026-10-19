@@ -15,4 +15,13 @@ class BudgetReserveCheck(ReserveCheck):
         self._tasks = tasks
 
     def why_not(self, manager: str) -> str:
-        raise NotImplementedError("red: C-review")
+        """Why a note must not be sent to this manager ("" = it may be). A note costs a run; the runs a manager
+        holds in reserve (one per outstanding delegation, to process the result) are not for review notes."""
+        if self._pauses.paused(manager):
+            return "paused"
+        budget, owed = self._budgets.budget(manager) or 0, len(self._tasks.outstanding(manager))
+        if budget <= 0:
+            return "no budget left"
+        if budget <= owed:
+            return f"budget {budget} is reserved for {owed} outstanding delegation(s)"
+        return ""
