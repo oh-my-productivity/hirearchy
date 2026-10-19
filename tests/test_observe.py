@@ -168,7 +168,7 @@ def test_every_refused_tool_call_is_in_errors_with_its_text(org, clock):
     assert "FAILED" in observe.format_event(errs[1])
 
 
-def test_follow_prints_only_new_lines_across_files(org):
+def test_follow_prints_only_new_lines_across_files(org, clock):
     log = EventLog(org)
     log.tool(stamp(1), "ceo", "read")
     seen = []
@@ -187,7 +187,7 @@ def test_follow_prints_only_new_lines_across_files(org):
     assert seen == ["tool.call", "run.start"] and "read" not in str(seen)
 
 
-def test_follow_filters(org):
+def test_follow_filters(org, clock):
     log = EventLog(org)
     out = []
 
@@ -875,7 +875,7 @@ def test_cli_watch_and_follow_exit_cleanly_on_ctrl_c(org, story, capsys, monkeyp
     assert "matching event" in capsys.readouterr().out
 
 
-def test_cli_follow_prints_new_events(org, capsys, monkeypatch):
+def test_cli_follow_prints_new_events(org, clock, capsys, monkeypatch):
     log = EventLog(org)
     log.tool(stamp(1), "ceo", "read")
     calls = []
