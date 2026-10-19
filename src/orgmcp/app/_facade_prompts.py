@@ -228,9 +228,7 @@ class PromptsMixin:
         notice = self.stray_notice(a)
         notice = f"\n{notice}\n" if notice else ""
         if self.service_names(a):  # only agents that offer a service get these sections
-            from .. import services
-
-            notice += services.prompt_sections(self, a, batch)
+            notice += self.runtime.service_prompt_sections.prompt_sections(a, batch)
         return f"""# orgmcp run: you are `{a}`
 
 {self.rules()}

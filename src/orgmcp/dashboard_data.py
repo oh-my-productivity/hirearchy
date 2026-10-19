@@ -2,7 +2,7 @@
 
 Everything here is *derived from the files*, with the same functions ``status`` / ``progress`` / ``observe`` use
 (``Org.running/unread/paused/budget/open_tasks/outstanding``, ``progress._state/_runs/_last_activity/_human_items``,
-``observe.trace/now_view/check/events``, ``services.cases/summarize/stats_by_version``, ``health.org_health``), so the
+``observe.trace/now_view/check/events``, ``reflection.cases/summarize/stats_by_version``, ``health.org_health``), so the
 dashboard cannot disagree with them. Nothing is written inside the organization and no event is emitted.
 
 What is added on top is only what a screen that refreshes every second needs:
@@ -29,7 +29,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable
 
-from . import core, observe, progress as prog, services
+from . import core, observe, progress as prog, reflection, services
 from .app import wire_agents, wire_budget, wire_eligibility, wire_mail
 from .core import BOXES, DEFAULT_CONFIG, ROOT, Message, Org, OrgError, _visible, latest_results, split_frontmatter
 from .dashboard_events import EventLine, describe, event_lines
@@ -405,7 +405,7 @@ class ServiceRow:
     contract_version: int
     playbook_version: int
     locked: bool
-    stats: services.Stats
+    stats: reflection.Stats
     playbook_reason: str
     description: str
 
@@ -988,9 +988,9 @@ class DashData:
                     if c is None:
                         continue
                     pb = services.read_playbook(org, owner, name)
-                    stats = services.summarize(services.cases(org, owner, name))
+                    stats = reflection.summarize(reflection.cases(org, owner, name))
                 except Exception as exc:  # noqa: BLE001
-                    rows.append(ServiceRow(owner, name, 0, 0, False, services.Stats(), f"unreadable: {type(exc).__name__}", ""))
+                    rows.append(ServiceRow(owner, name, 0, 0, False, reflection.Stats(), f"unreadable: {type(exc).__name__}", ""))
                     continue
                 rows.append(ServiceRow(owner, name, c.version, pb.version, c.locked, stats, pb.reason, c.description))
         return rows
@@ -1002,10 +1002,10 @@ class DashData:
             if c is None:
                 return [Section("", [f"{owner}/{name}: no such service (retired?)"])]
             pb = services.read_playbook(org, owner, name)
-            items = services.cases(org, owner, name)
+            items = reflection.cases(org, owner, name)
         except Exception as exc:  # noqa: BLE001
             return [Section("", [f"cannot read the service: {type(exc).__name__}: {exc}"])]
-        stats = services.summarize(items)
+        stats = reflection.summarize(items)
         doc = [Section(f"{name} (owner {owner})", [
             c.description or "(no description)",
             f"contract v{c.version}" + (" (locked)" if c.locked else "") + f", budget {c.budget} per request"
@@ -1013,7 +1013,7 @@ class DashData:
             f"playbook v{pb.version}" + (f" revised by {pb.by or '?'}: {pb.reason}" if pb.version else " (none yet)"),
         ])]
         doc.append(Section("Record", [stats.line()]))
-        by_v = services.stats_by_version(items)
+        by_v = reflection.stats_by_version(items)
         if by_v:
             doc.append(Section("By playbook version", [f"v{v}: {s.line()}" for v, s in by_v.items()]))
         lines = []
@@ -1023,7 +1023,7 @@ class DashData:
             if case.reworks:
                 bits.append(f"{case.reworks} rework(s)")
             if case.verdicts:
-                bits.append("feedback: " + services._verdict_chain(case))
+                bits.append("feedback: " + reflection._verdict_chain(case))
             lines.append(", ".join(bits))
         doc.append(Section(f"Cases ({len(items)})", lines or ["none yet"]))
         doc.append(Section("Contract", [

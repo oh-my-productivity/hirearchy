@@ -28,7 +28,6 @@ def test_services_answers_to_the_old_name_of_a_constant_with_the_same_value(name
     assert getattr(services, name) == getattr(reflection, name)
 
 
-@pytest.mark.xfail(strict=True, reason="red: C-reflection (services still holds its own copies until the next commit)")
 @pytest.mark.parametrize("name", [n for n in MOVED if not n.isupper()])
 def test_services_answers_to_the_old_name_with_the_same_object(name: str) -> None:
     assert getattr(services, name) is getattr(reflection, name)
