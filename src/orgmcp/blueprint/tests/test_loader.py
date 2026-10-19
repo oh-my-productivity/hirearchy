@@ -10,9 +10,7 @@ from orgmcp.blueprint import BlueprintError
 from orgmcp.blueprint._loader import PATH_NAME_MAX, YamlBlueprintLoader
 from orgmcp.blueprint.testing import MemoryTextFiles
 
-from ._support import RED
 
-pytestmark = RED
 
 TEXT = "mission: a mission\n"
 

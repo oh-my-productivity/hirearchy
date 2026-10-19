@@ -23,6 +23,7 @@ from ._support import RED
 
 pytestmark = RED
 
+
 OPEN = {"read": {"allowedPaths": ["/orgmcp-org-root", "/orgmcp-org-root/**"], "deniedPaths": []}}
 
 

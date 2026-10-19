@@ -18,9 +18,7 @@ from orgmcp.blueprint._rules import (
 )
 from orgmcp.blueprint.api import Agent, Issue
 
-from ._support import RED
 
-pytestmark = RED
 
 
 def agent(**kw: object) -> Agent:

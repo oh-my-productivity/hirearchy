@@ -8,9 +8,8 @@ from orgmcp.blueprint._budgeting import KINDS, REWORK_RUNS, SLACK, TIGHT, Budget
 from orgmcp.blueprint._protocols import BudgetPlanning
 from orgmcp.blueprint.api import Agent
 
-from ._support import RED, role
+from ._support import role
 
-pytestmark = RED
 
 
 def agent(addr: str, kind: str, children: tuple[str, ...] = (), runs: int | None = None, scale: int = 1) -> Agent:
@@ -78,5 +77,5 @@ def test_a_service_costs_its_own_budget_else_the_estimate_plus_slack_within_the_
 
 def test_every_service_of_the_blueprint_has_its_budget_by_name() -> None:
     bp = {"needs": {"budget_runs": 25}, "services": [{"name": "a", "budget": 9}, {"name": "b"}, "junk"]}
-    assert BudgetPlanner().service_budgets(bp, TEAM) == {"a": 9, "b": 17}
+    assert BudgetPlanner().service_budgets(bp, TEAM) == {"a": 9, "b": 22}  # b: ceil(17 * 1.25), under the cap of 25
     assert BudgetPlanner().service_budgets(bp, []) == {"a": 9, "b": 0}

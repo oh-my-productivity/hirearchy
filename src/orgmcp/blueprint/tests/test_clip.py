@@ -4,9 +4,7 @@ from __future__ import annotations
 
 from orgmcp.blueprint._text import CLIP, GOAL_CLIP, clip
 
-from ._support import RED
 
-pytestmark = RED
 
 
 def test_a_short_text_is_one_line_unchanged() -> None:

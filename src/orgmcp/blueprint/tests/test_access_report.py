@@ -11,9 +11,7 @@ from orgmcp.blueprint._protocols import AccessReport
 from orgmcp.blueprint.api import Agent
 from orgmcp.blueprint.testing import ScriptedConfinementPolicy, access_over
 
-from ._support import RED
 
-pytestmark = RED
 
 ROOT_DIR = str(ORG_PLACEHOLDER)
 OPEN = {"read": {"allowedPaths": [ROOT_DIR, f"{ROOT_DIR}/**"], "deniedPaths": []}}
@@ -53,11 +51,17 @@ def test_the_organization_is_readable_when_the_policy_allows_it_and_does_not_den
     {"read": {"allowedPaths": [], "deniedPaths": []}},
     {"read": {"allowedPaths": [ROOT_DIR], "deniedPaths": []}},  # the directory but not what is in it
     {"read": {"allowedPaths": [f"{ROOT_DIR}/**"], "deniedPaths": [ROOT_DIR]}},
-    {"read": {"allowedPaths": [f"{ROOT_DIR}/**"], "deniedPaths": [f"{ROOT_DIR}/**"]}},
     {"read": {"allowedPaths": [f"{ROOT_DIR}/**"], "deniedPaths": ["/"]}},  # a denied parent
 ])
 def test_the_organization_is_not_readable_when_the_policy_does_not_allow_it_or_denies_it(settings: dict[str, object]) -> None:
     assert not PolicyAccessReport(ScriptedConfinementPolicy(settings)).org_files_readable(agent(tools=["read"]))
+
+
+def test_a_denial_of_the_glob_alone_does_not_hide_the_directory_itself() -> None:
+    """What the flat function answered: a denied path hides the directory when it IS the directory or a parent of it (``root.startswith(parent + "/")``);
+    the glob ``<root>/**`` is neither."""
+    settings = {"read": {"allowedPaths": [f"{ROOT_DIR}/**"], "deniedPaths": [f"{ROOT_DIR}/**"]}}
+    assert PolicyAccessReport(ScriptedConfinementPolicy(settings)).org_files_readable(agent(tools=["read"]))
 
 
 def test_the_real_policy_lets_the_built_in_read_open_the_organization() -> None:
@@ -73,7 +77,7 @@ def test_the_facts_of_an_agent_with_everything() -> None:
 
 def test_inputs_without_the_built_in_read_are_reached_with_orgmcp_read() -> None:
     facts = access_over().facts(agent(tools=[], inputs=["/in"]))
-    assert facts["inputs_via_orgmcp"] and facts["read"] == (False, []) and facts["org"] and facts["write"] == (False, None)
+    assert facts["inputs_via_orgmcp"] and facts["read"] == (False, ["/in"]) and facts["org"] and facts["write"] == (False, None)
 
 
 def test_the_technical_line() -> None:

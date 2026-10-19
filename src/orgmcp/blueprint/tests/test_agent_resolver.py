@@ -13,9 +13,8 @@ from orgmcp.blueprint.api import Agent, Issue
 from orgmcp.blueprint.testing import MemoryRoleLibrary, StaticOrgContext, paths_over, role_library_of
 from orgmcp.kernel.testing import DictEnvironment
 
-from ._support import RED, role
+from ._support import role
 
-pytestmark = RED
 
 
 class World:

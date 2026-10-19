@@ -14,9 +14,8 @@ from orgmcp.blueprint import BlueprintValidator, Issue
 from orgmcp.blueprint.testing import IMPLEMENTATIONS, StaticOrgContext, ValidatorHarness
 
 from . import _corpus
-from ._support import make, RED
+from ._support import make
 
-pytestmark = RED
 
 GOLDEN: dict[str, list[list[str]]] = json.loads(_corpus.GOLDEN.read_text(encoding="utf-8"))
 NAMES = [name for name, _, _ in _corpus.MUTATIONS] + list(_corpus.ORG_SPECS)

@@ -12,7 +12,7 @@ from _pytest.mark import ParameterSet
 from orgmcp.blueprint.api import Role
 
 RED = pytest.mark.xfail(strict=True, reason="red: C-blueprint-1")
-PENDING: set[str] = {'packaged_roles', 'loader_over_memory', 'loader_over_disk', 'validator_over_packaged_roles', 'validator_over_memory_roles'}  # contract-suite implementations that are not green yet (expected to fail)
+PENDING: set[str] = set()  # contract-suite implementations that are not green yet (expected to fail)
 T = TypeVar("T")
 
 

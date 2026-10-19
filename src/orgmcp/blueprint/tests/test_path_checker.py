@@ -12,9 +12,7 @@ from orgmcp.blueprint.api import Issue
 from orgmcp.blueprint.testing import StaticOrgContext
 from orgmcp.kernel.testing import DictEnvironment
 
-from ._support import RED
 
-pytestmark = RED
 
 
 class Case:

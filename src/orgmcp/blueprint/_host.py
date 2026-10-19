@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Protocol
 
-from ..kernel import JsonObject
+from ..kernel import ROOT, JsonObject
 from ._protocols import OrgContext
 
 
@@ -33,13 +33,13 @@ class HostOrgContext(OrgContext):
         self._org = org
 
     def config(self) -> JsonObject:
-        raise NotImplementedError("red: C-blueprint-1")
+        return dict(self._org.config)
 
     def root(self) -> Path | None:
-        raise NotImplementedError("red: C-blueprint-1")
+        return self._org.root
 
     def exists(self, addr: str) -> bool:
-        raise NotImplementedError("red: C-blueprint-1")
+        return self._org.exists(addr)
 
     def service_names(self) -> set[str]:
-        raise NotImplementedError("red: C-blueprint-1")
+        return {n for kid in self._org.children(ROOT) for n in self._org.service_names(kid)}

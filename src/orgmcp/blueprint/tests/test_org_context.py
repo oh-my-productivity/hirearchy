@@ -13,9 +13,7 @@ from orgmcp.kernel import OrgPaths
 from orgmcp.services import ServiceCatalog
 from orgmcp.settings import DEFAULT_CONFIG, OrgSettings
 
-from ._support import RED
 
-pytestmark = RED
 
 
 class Settings(OrgSettings):
@@ -90,7 +88,7 @@ def test_the_defaults_are_a_copy_nobody_can_change_for_the_next_caller() -> None
 
 
 def test_the_organization_is_its_settings_its_directory_its_agents_and_the_services_of_its_top_level_agents(tmp_path: Path) -> None:
-    org = RuntimeOrgContext(Settings({"max_depth": 2}), Agents({"ceo": [], "ops": []}), Catalog({"ceo": ["brief"], "ops": ["digest", "brief"], "ceo/x": ["hidden"]}), OrgPaths(tmp_path))
+    org = RuntimeOrgContext(Settings({"max_depth": 2}), Agents({"root": ["ceo", "ops"], "ceo": [], "ops": []}), Catalog({"ceo": ["brief"], "ops": ["digest", "brief"], "ceo/x": ["hidden"]}), OrgPaths(tmp_path))
     assert isinstance(org, OrgContext)
     assert org.config() == {"max_depth": 2} and org.root() == tmp_path and org.exists("ceo") and not org.exists("cto")
     assert org.service_names() == {"brief", "digest"}

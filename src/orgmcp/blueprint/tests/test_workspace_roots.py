@@ -9,9 +9,7 @@ from orgmcp.blueprint._protocols import WorkspaceRoots
 from orgmcp.blueprint._roots import EnvironmentWorkspaceRoots
 from orgmcp.kernel.testing import DictEnvironment
 
-from ._support import RED
 
-pytestmark = RED
 
 
 def roots(tmp: Path, variables: dict[str, str] | None = None) -> EnvironmentWorkspaceRoots:

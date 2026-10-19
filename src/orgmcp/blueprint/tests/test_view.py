@@ -26,9 +26,7 @@ from orgmcp.blueprint._view import (
 from orgmcp.blueprint.api import Issue
 from orgmcp.kernel import inside
 
-from ._support import RED
 
-pytestmark = RED
 
 
 def test_text_is_stripped_and_none_is_empty() -> None:
