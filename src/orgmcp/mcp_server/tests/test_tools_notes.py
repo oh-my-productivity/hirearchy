@@ -6,9 +6,7 @@ from orgmcp.kernel import ROOT
 from orgmcp.mcp_server._tools_notes import NoteTools
 from orgmcp.mcp_server.testing import HeldBudgets, ScriptedReclaimer, ScriptedSender
 
-from ._support import call, red, serve
-
-pytestmark = red
+from ._support import call, serve
 
 
 def tools(hints: dict[str, str] | None = None) -> tuple[NoteTools, ScriptedSender, ScriptedReclaimer]:

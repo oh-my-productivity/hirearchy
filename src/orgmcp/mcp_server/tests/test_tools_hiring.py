@@ -5,9 +5,7 @@ from __future__ import annotations
 from orgmcp.mcp_server._tools_hiring import HiringTools
 from orgmcp.mcp_server.testing import ScriptedHiring, ScriptedRetirement
 
-from ._support import call, red, serve
-
-pytestmark = red
+from ._support import call, serve
 
 
 def test_hire_passes_everything_and_says_the_address() -> None:

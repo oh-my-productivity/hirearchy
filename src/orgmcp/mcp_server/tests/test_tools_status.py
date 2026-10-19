@@ -12,9 +12,7 @@ from orgmcp.mcp_server._tools_status import StatusTools
 from orgmcp.mcp_server.testing import MemoryBinding, ScriptedHealth, agents_in
 from orgmcp.overview.testing import FixedOrgTree
 
-from ._support import call, fails, red, serve
-
-pytestmark = red
+from ._support import call, fails, serve
 
 
 def tools(exists: bool = True) -> tuple[StatusTools, ScriptedHealth]:

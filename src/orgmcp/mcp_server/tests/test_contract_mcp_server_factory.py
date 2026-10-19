@@ -13,11 +13,9 @@ from orgmcp.kernel import ROOT, OrgError
 from orgmcp.mcp_server import McpServerFactory
 from orgmcp.mcp_server.testing import IMPLEMENTATIONS, FactoryWorld
 
-from ._support import red
 
 
-
-@pytest.fixture(params=[pytest.param(factory, id=factory.__name__, marks=red if n == 0 else []) for n, factory in enumerate(IMPLEMENTATIONS[McpServerFactory])])
+@pytest.fixture(params=IMPLEMENTATIONS[McpServerFactory], ids=lambda factory: factory.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> FactoryWorld:
     made = cast(FactoryWorld, request.param(tmp_path))
     assert isinstance(made.factory, McpServerFactory)

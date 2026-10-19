@@ -11,11 +11,9 @@ import pytest
 from orgmcp.mcp_server import McpServerRunner
 from orgmcp.mcp_server.testing import IMPLEMENTATIONS, RunnerWorld
 
-from ._support import red
 
 
-
-@pytest.fixture(params=[pytest.param(factory, id=factory.__name__, marks=red if n == 0 else []) for n, factory in enumerate(IMPLEMENTATIONS[McpServerRunner])])
+@pytest.fixture(params=IMPLEMENTATIONS[McpServerRunner], ids=lambda factory: factory.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> RunnerWorld:
     made = cast(RunnerWorld, request.param(tmp_path))
     assert isinstance(made.runner, McpServerRunner)

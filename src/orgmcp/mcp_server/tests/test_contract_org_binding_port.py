@@ -12,11 +12,9 @@ from orgmcp.kernel import OrgError
 from orgmcp.mcp_server import OrgBindingPort
 from orgmcp.mcp_server.testing import IMPLEMENTATIONS, BindingWorld
 
-from ._support import red
 
 
-
-@pytest.fixture(params=[pytest.param(factory, id=factory.__name__, marks=red if n == 0 else []) for n, factory in enumerate(IMPLEMENTATIONS[OrgBindingPort])])
+@pytest.fixture(params=IMPLEMENTATIONS[OrgBindingPort], ids=lambda factory: factory.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> BindingWorld:
     made = cast(BindingWorld, request.param(tmp_path))
     assert isinstance(made.binding, OrgBindingPort)

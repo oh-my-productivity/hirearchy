@@ -9,9 +9,7 @@ from orgmcp.mail.testing import memory_mailbox
 from orgmcp.mcp_server._tools_tasks import TaskTools
 from orgmcp.mcp_server.testing import HeldBudgets, ScriptedHints, ScriptedTasks
 
-from ._support import call, fails, red, serve
-
-pytestmark = red
+from ._support import call, fails, serve
 
 
 def tools(tmp_path: Path, tasks: ScriptedTasks | None = None, hints: ScriptedHints | None = None) -> tuple[TaskTools, ScriptedTasks, ScriptedHints]:

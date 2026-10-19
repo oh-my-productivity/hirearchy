@@ -12,11 +12,9 @@ from orgmcp.kernel import ROOT
 from orgmcp.mcp_server import BindingResolver, OrgBindingPort
 from orgmcp.mcp_server.testing import IMPLEMENTATIONS, ResolverWorld
 
-from ._support import red
 
 
-
-@pytest.fixture(params=[pytest.param(factory, id=factory.__name__, marks=red if n == 0 else []) for n, factory in enumerate(IMPLEMENTATIONS[BindingResolver])])
+@pytest.fixture(params=IMPLEMENTATIONS[BindingResolver], ids=lambda factory: factory.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> ResolverWorld:
     made = cast(ResolverWorld, request.param(tmp_path))
     assert isinstance(made.resolver, BindingResolver)

@@ -17,9 +17,7 @@ from orgmcp.mcp_server.testing import MemoryBinding, NoTraces, agents_in
 from orgmcp.telemetry.testing import MemoryEventSinks, StackTraceScope, json_argument_summarizer
 from orgmcp.traces import TraceLookup
 
-from ._support import call, fails, red
-
-pytestmark = red
+from ._support import call, fails
 
 ROOT_DIR = Path("/memory/org")
 

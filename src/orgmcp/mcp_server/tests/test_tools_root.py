@@ -22,9 +22,7 @@ from orgmcp.observability.testing import FixedObservabilityText
 from orgmcp.progress import WAIT_MAX
 from orgmcp.progress.testing import FixedProgressReporter
 
-from ._support import call, fails, red, serve
-
-pytestmark = red
+from ._support import call, fails, serve
 
 HERE = Path("/memory/org")
 

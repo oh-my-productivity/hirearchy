@@ -11,9 +11,7 @@ from orgmcp.mcp_server._tools_services import DirectoryServiceRoles, ServiceTool
 from orgmcp.mcp_server.testing import HeldBudgets, MemoryBinding, ScriptedReports, agents_in
 from orgmcp.services import Contract, ServiceCatalog, ServiceCommands
 
-from ._support import call, fails, names, red, serve
-
-pytestmark = red
+from ._support import call, fails, names, serve
 
 
 class Catalog(ServiceCatalog):

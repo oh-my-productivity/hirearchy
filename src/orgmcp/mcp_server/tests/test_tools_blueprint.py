@@ -23,9 +23,7 @@ from orgmcp.mcp_server._tools_blueprint import (
 )
 from orgmcp.mcp_server.testing import MemoryBinding, agents_in
 
-from ._support import call, described, fails, names, red, serve
-
-pytestmark = red
+from ._support import call, described, fails, names, serve
 
 HERE = Path("/memory/org")
 

@@ -16,9 +16,7 @@ from orgmcp.mcp_server._recorder import BatchCallTrace, ToolCallRecorder
 from orgmcp.mcp_server.testing import MemoryBinding, NoTraces, RecordingGroup, agents_in
 from orgmcp.telemetry.testing import MemoryEventSinks, StackTraceScope, json_argument_summarizer
 
-from ._support import call, names, red
-
-pytestmark = red
+from ._support import call, names
 
 HERE = Path("/memory/org")
 

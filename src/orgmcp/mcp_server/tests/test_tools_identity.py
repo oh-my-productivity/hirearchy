@@ -14,9 +14,7 @@ from orgmcp.mcp_server._tools_identity import IdentityTools
 from orgmcp.mcp_server.testing import MemoryBinding
 from orgmcp.prompts.testing import FixedWhoami
 
-from ._support import call, fails, names, red, serve
-
-pytestmark = red
+from ._support import call, fails, names, serve
 
 
 def tools(tmp_path: Path, exists: bool = True, state: SchedulerState = SchedulerState("stopped")) -> tuple[IdentityTools, FixedWhoami, MailHarness]:

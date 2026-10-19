@@ -8,9 +8,7 @@ from orgmcp.kernel import ROOT, OrgPaths
 from orgmcp.mcp_server._tools_files import FileTools
 from orgmcp.mcp_server.testing import ScriptedFiles, StaticNaming
 
-from ._support import call, described, names, red, serve
-
-pytestmark = red
+from ._support import call, described, names, serve
 
 HERE = Path("/memory/org")
 

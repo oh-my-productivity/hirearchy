@@ -1,62 +1,162 @@
 """The assistant's way to an organization: ``blueprint_example``, ``propose_org`` and ``apply_org``.
 
 The tools only hand over to three roles (the example, the proposal, the application), which hold the rules and the refusal texts."""
+
 from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING
+
 from ..agents import AgentDirectory
 from ..blueprint import BlueprintApplier, BlueprintExamples, BlueprintLoader, PlanIdentity, PlanRenderer
 from ..daemon import SchedulerStatus
 from ..kernel import Environment, OrgError, OrgLayout, Provider
 from ._ports import ExampleLocation, ExampleText, PlanApplication, PlanProposal, PlanTarget, SetupMode, ToolGroup
 from .api import OrgBindingPort
+
 if TYPE_CHECKING:
     from mcp.server.fastmcp import FastMCP
 
-class EnvironmentExampleLocation(ExampleLocation):
 
+class EnvironmentExampleLocation(ExampleLocation):
     def __init__(self, environment: Environment, binding: OrgBindingPort) -> None:
-        raise NotImplementedError('red: D-mcp')
+        self._environment = environment
+        self._binding = binding
 
     def base(self) -> Path:
-        raise NotImplementedError('red: D-mcp')
+        cwd = self._environment.cwd().resolve()
+        located = self._binding.location()
+        if cwd == cwd.parent or (located is not None and (cwd == located or located in cwd.parents)):
+            return self._environment.home()
+        return cwd
+
 
 class TemplateExampleText(ExampleText):
-
     def __init__(self, examples: Provider[BlueprintExamples], location: ExampleLocation) -> None:
-        raise NotImplementedError('red: D-mcp')
+        self._examples = examples
+        self._location = location
 
     def example(self, kind: str, service: bool) -> str:
-        raise NotImplementedError('red: D-mcp')
+        return self._examples().example(kind, self._location.base(), service=service)
+
 
 class BindingPlanTarget(PlanTarget):
-
     def __init__(self, binding: OrgBindingPort, directory: Provider[AgentDirectory]) -> None:
-        raise NotImplementedError('red: D-mcp')
+        self._binding = binding
+        self._directory = directory
 
     def line(self) -> str:
-        raise NotImplementedError('red: D-mcp')
+        located = self._binding.location()
+        if located is not None:
+            agents = len(self._directory().agents())
+            return f"Target organization: {located} (exists, {agents} agent(s) besides root; apply_org adds to it)"
+        root = self._binding.root
+        where = root if root is not None else "(path given to create_org)"
+        return f"Target organization: {where} (none yet: create_org(mission=...) comes first, then apply_org)"
+
 
 class RenderedPlanProposal(PlanProposal):
-
     def __init__(self, loader: Provider[BlueprintLoader], renderer: Provider[PlanRenderer], target: PlanTarget) -> None:
-        raise NotImplementedError('red: D-mcp')
+        self._loader = loader
+        self._renderer = renderer
+        self._target = target
 
     def propose(self, blueprint: str) -> str:
-        raise NotImplementedError('red: D-mcp')
+        bp = self._loader().load_text(blueprint)
+        return self._renderer().propose_text(bp, target=self._target.line())
+
 
 class ApprovedPlanApplication(PlanApplication):
-
-    def __init__(self, setup: SetupMode, loader: Provider[BlueprintLoader], identity: Provider[PlanIdentity], applier: Provider[BlueprintApplier], scheduler: Provider[SchedulerStatus], layout: Provider[OrgLayout]) -> None:
-        raise NotImplementedError('red: D-mcp')
+    def __init__(
+        self, setup: SetupMode, loader: Provider[BlueprintLoader], identity: Provider[PlanIdentity], applier: Provider[BlueprintApplier],
+        scheduler: Provider[SchedulerStatus], layout: Provider[OrgLayout],
+    ) -> None:
+        self._setup = setup
+        self._loader = loader
+        self._identity = identity
+        self._applier = applier
+        self._scheduler = scheduler
+        self._layout = layout
 
     def apply(self, blueprint: str, approved: bool, plan_id: str | None) -> str:
-        raise NotImplementedError('red: D-mcp')
+        if not approved:
+            raise OrgError("not applied: the user must approve the plan first. Call propose_org(blueprint), show the "
+                           "PLAN FOR YOU block to the user, and only after their explicit approval call "
+                           "apply_org(blueprint, approved=True, plan_id=<the plan_id propose_org returned>)")
+        bp = self._loader().load_text(blueprint)
+        if not plan_id or plan_id.strip() != self._identity().plan_id(bp):
+            raise OrgError(("not applied: plan_id is missing" if not plan_id else "not applied: plan_id does not match this blueprint")
+                           + ", so this is not the plan the user approved. Call propose_org(blueprint), show the PLAN FOR YOU "
+                           "block to the user, get their explicit approval, then call apply_org(blueprint, approved=True, "
+                           "plan_id=<the plan_id from that propose_org>) with the same blueprint")
+        if self._setup.active():
+            raise OrgError("not applied: there is no organization yet, so call create_org(mission=...) first, then "
+                           "apply_org again with the same blueprint and plan_id")
+        summary = self._applier().apply(bp)
+        running = self._scheduler().describe().startswith("scheduler: running")
+        if not summary.task_id:
+            nxt = ("Nothing runs yet: the services are ready. When the user asks for one, call request(service, inputs) "
+                   "(see services()), then start() if the scheduler is not running.")
+        else:
+            nxt = ("The scheduler is already running and will pick the work up; answer status questions with progress()."
+                   if running else "Next step: call start() to run the scheduler, then answer status questions with progress().")
+        return f"applied the blueprint to {self._layout().root}\n{summary.text()}\n{nxt}"
+
 
 class BlueprintTools(ToolGroup):
-
     def __init__(self, examples: ExampleText, proposal: PlanProposal, application: PlanApplication) -> None:
-        raise NotImplementedError('red: D-mcp')
+        self._examples = examples
+        self._proposal = proposal
+        self._application = application
 
     def register(self, mcp: FastMCP, me: str) -> None:
-        raise NotImplementedError('red: D-mcp')
+        @mcp.tool()
+        def blueprint_example(kind: str = "research", service: bool = False) -> str:
+            """A ready-to-edit blueprint (YAML with a comment on every field and a one-paragraph schema summary).
+
+        kind: "research" (facts from the web with source URLs, fact-checked), "documents" (write from the user's local
+        files, no web; uses `needs.inputs`, read-only folders), "code" (software in a repo workspace, with tests and
+        local commits) or "analysis" (the user's data files, read-only, analysed by a checked script). Replace every
+        <PLACEHOLDER> with what the user told you (ask for what is missing; do not invent lists), delete what does not apply, then call propose_org with the text. Read-only.
+
+        service: true for work the user wants again and again ("every week", "whenever I..."): the template then offers it
+        as a standing service (`services:` with inputs, acceptance, deliverable and budget per request, and an optional
+        first request) instead of a one-off `task:`.
+        """
+            return self._examples.example(kind, service)
+
+        @mcp.tool()
+        def propose_org(blueprint: str) -> str:
+            """Validate a blueprint and return the plan the user must approve. Writes nothing; safe to call repeatedly.
+
+        blueprint: YAML or JSON text (never a file path). Start from blueprint_example(kind) for a template with every
+        field explained. Schema: `mission` (one paragraph); `needs` {scope, deliverable {description, format,
+        max_words, path (absolute)}, quality_bar, sources, inputs (read-only folders), workspace (the one absolute
+        folder agents may write in), budget_runs (the user's cap), models {cheap, strong} (optional: none = every agent on claude-sonnet-5.5), model_policy, review
+        (true/false), approval, progress, kind (research|writing|code), code {tests, packaging, commits}}; `agents`:
+        ONE top-level agent (template manager) with `children`; each agent has name and a template (manager,
+        researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker) or a charter, and optionally
+        model, tools, workspace, scale; `task` {to, title, goal, acceptance: list of exact, checkable criteria}; optional
+        `services` (recurring work the top agent offers on request): [{name, description, inputs: [{name, description,
+        required}], acceptance, deliverable {description, format, max_words, path}, budget (runs per request), playbook,
+        locked}], in which case `task` may be omitted or be a first request {service, inputs: {name: value}, title}.
+        Works before the organization exists. Returns (1) a block headed "PLAN FOR YOU": show it to the user exactly
+        as written and wait for their explicit approval; (2) Details, the full plan for you; (3) a plan_id that
+        apply_org requires. If the plan has errors, fix the blueprint and propose again; never ask the user to approve
+        a plan with errors.
+        """
+            return self._proposal.propose(blueprint)
+
+        @mcp.tool()
+        def apply_org(blueprint: str, approved: bool = False, plan_id: str | None = None) -> str:
+            """Create the agents of a blueprint and give its first task. Only after the user approved the plan.
+
+        blueprint: the YAML/JSON text the user approved via propose_org (unchanged). approved: pass True only after
+        the user explicitly approved that plan in this conversation; otherwise nothing happens. plan_id: the id that
+        propose_org returned for exactly this blueprint; a missing or different id is refused (propose again, show the
+        PLAN FOR YOU block, get approval). Needs an existing organization (create_org first if there is none).
+        Refuses with the issues if the blueprint has errors or a name is taken, and undoes everything if it fails
+        midway. Returns what was created (agents, services, the first task or request); then call start() (not when
+        the blueprint gave no first task: the services wait for request(service, inputs)).
+        """
+            return self._application.apply(blueprint, approved, plan_id)

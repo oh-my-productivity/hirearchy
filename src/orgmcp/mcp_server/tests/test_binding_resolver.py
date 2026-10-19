@@ -13,9 +13,6 @@ from orgmcp.mcp_server._binding import OpenerBindings
 from orgmcp.mcp_server._resolver import EnvBindingResolver
 from orgmcp.mcp_server.testing import MemoryOrgOpener
 
-from ._support import red
-
-pytestmark = red
 
 REFUSAL = (
     "ORG_REQUIRE_AGENT is set but ORG_AGENT does not name an agent: this is an internal profile of the "

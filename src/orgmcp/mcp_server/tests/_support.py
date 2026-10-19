@@ -11,9 +11,6 @@ from mcp.server.fastmcp import FastMCP
 
 from orgmcp.mcp_server._ports import ToolGroup
 
-red = pytest.mark.xfail(strict=True, reason="red: D-mcp")
-
-
 def call(server: FastMCP, tool: str, **arguments: Any) -> str:
     """The text a client gets from calling ``tool``."""
     result = asyncio.run(server.call_tool(tool, arguments))

@@ -10,9 +10,6 @@ from orgmcp.kernel import OrgError
 from orgmcp.mcp_server._binding import OpenerBindings, OrgBinding
 from orgmcp.mcp_server.testing import MemoryOrgOpener
 
-from ._support import red
-
-pytestmark = red
 
 
 def bound(root: Path | None, opener: MemoryOrgOpener | None = None, pinned: bool = False) -> tuple[OrgBinding, MemoryOrgOpener]:
