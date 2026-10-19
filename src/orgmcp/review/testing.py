@@ -27,7 +27,6 @@ from ..health import AgentHealth
 from ..health.testing import FixedHealthAnalyzer
 from ..kernel import RUNTIME, JsonObject, LedgerStore, Message, OrgPaths
 from ..kernel.testing import FakeClock, ListEventSink, MemoryLedgerStore, fs_ledger_store
-from ..mail import TaskQuery
 from ..mail.testing import MemoryMailbox
 from ..runs.testing import RunsHarness, fs_runs, memory_runs
 from ..settings.testing import SettingsHarness, fs_org_settings, memory_org_settings
@@ -71,19 +70,27 @@ class ScriptedHealthReviewer(HealthReviewer):
     calls: list[tuple[str, datetime | None, bool]]
 
     def __init__(self, review: Review, due: Review | None = None, runs: int = 0, ledger: JsonObject | None = None) -> None:
-        raise NotImplementedError("red: C-review")
+        self._review = review
+        self._due = due
+        self._runs = runs
+        self._ledger = ledger
+        self.calls = []
 
     def review(self, now: datetime | None = None, dry_run: bool = False) -> Review:
-        raise NotImplementedError("red: C-review")
+        self.calls.append(("review", now, dry_run))
+        return self._review
 
     def review_if_due(self, now: datetime) -> Review | None:
-        raise NotImplementedError("red: C-review")
+        self.calls.append(("review_if_due", now, False))
+        return self._due
 
     def total_runs(self) -> int:
-        raise NotImplementedError("red: C-review")
+        self.calls.append(("total_runs", None, False))
+        return self._runs
 
     def read_ledger(self) -> JsonObject | None:
-        raise NotImplementedError("red: C-review")
+        self.calls.append(("read_ledger", None, False))
+        return self._ledger
 
 
 # ------------------------------------------------------------------------------ the worlds

@@ -4,12 +4,8 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-import pytest
-
 from orgmcp.review import HealthReviewer, Note, Review
 from orgmcp.review.testing import ScriptedHealthReviewer
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-review")
 
 AT = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 DONE = Review(at=AT, runs=3, flagged=1, notes=[Note("root", "t", "b")])
