@@ -7,14 +7,11 @@ from pathlib import Path
 
 from orgmcp.strays._ports import FsMtimeReader, MtimeReader
 
-from ._support import RED
-
 
 def test_it_is_an_mtime_reader() -> None:
     assert isinstance(FsMtimeReader(), MtimeReader)
 
 
-@RED
 def test_a_file_and_a_directory_have_their_mtime(tmp_path: Path) -> None:
     (tmp_path / "f").write_text("x")
     (tmp_path / "d").mkdir()
@@ -24,12 +21,10 @@ def test_a_file_and_a_directory_have_their_mtime(tmp_path: Path) -> None:
     assert reader.mtime(tmp_path / "f") == 1234.5 and reader.mtime(tmp_path / "d") == 99.0
 
 
-@RED
 def test_a_path_that_is_not_there_has_none(tmp_path: Path) -> None:
     assert FsMtimeReader().mtime(tmp_path / "missing") is None
 
 
-@RED
 def test_a_path_below_a_file_has_none(tmp_path: Path) -> None:
     (tmp_path / "f").write_text("x")
     assert FsMtimeReader().mtime(tmp_path / "f" / "child") is None

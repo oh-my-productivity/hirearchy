@@ -10,9 +10,6 @@ import pytest
 
 from orgmcp.strays.testing import StraysHarness
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-strays")
-
-
 def make(request: pytest.FixtureRequest, tmp_path: Path) -> StraysHarness:
     """The fixture body of every contract suite: the harness of one implementation."""
     return cast(Callable[[Path], StraysHarness], request.param)(tmp_path)

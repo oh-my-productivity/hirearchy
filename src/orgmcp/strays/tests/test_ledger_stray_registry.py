@@ -12,8 +12,6 @@ from orgmcp.kernel.testing import MemoryLedgerStore
 from orgmcp.strays import StrayRegistry
 from orgmcp.strays._registry import LedgerStrayRegistry
 
-from ._support import RED
-
 
 class Naming(ToolNaming):
     """Names the write tool as it is told, and runs ``on_ask`` (to look at the ledger at that moment) when asked."""
@@ -50,14 +48,12 @@ def test_it_is_a_stray_registry() -> None:
     assert isinstance(LedgerStrayRegistry(Ledgers(), Naming()), StrayRegistry)
 
 
-@RED
 def test_a_record_reads_and_writes_the_strays_ledger_once() -> None:
     ledgers = Ledgers()
     LedgerStrayRegistry(ledgers, Naming()).record("dev", ["/a"])
     assert ledgers.reads == ["strays"] and ledgers.writes == [("strays", {"dev": {"paths": ["/a"], "told": False}})]
 
 
-@RED
 def test_a_record_after_the_notice_writes_nothing() -> None:
     ledgers = Ledgers()
     registry = LedgerStrayRegistry(ledgers, Naming())
@@ -68,7 +64,6 @@ def test_a_record_after_the_notice_writes_nothing() -> None:
     assert ledgers.writes == []
 
 
-@RED
 def test_a_notice_is_written_with_the_tool_name_of_that_agent() -> None:
     ledgers, naming = Ledgers(), Naming(write="write")
     registry = LedgerStrayRegistry(ledgers, naming)
@@ -76,14 +71,12 @@ def test_a_notice_is_written_with_the_tool_name_of_that_agent() -> None:
     assert "`@orgmcp/write`" in registry.take_notice("dev") and naming.asked == ["dev"]
 
 
-@RED
 def test_nothing_to_tell_asks_for_no_tool_name_and_writes_nothing() -> None:
     ledgers, naming = Ledgers(), Naming()
     assert LedgerStrayRegistry(ledgers, naming).take_notice("dev") == ""
     assert naming.asked == [] and ledgers.writes == []
 
 
-@RED
 def test_the_agent_is_marked_told_before_the_name_of_the_tool_is_asked() -> None:
     ledgers = Ledgers()
     seen: list[object] = []
@@ -94,7 +87,6 @@ def test_the_agent_is_marked_told_before_the_name_of_the_tool_is_asked() -> None
     assert seen == [{"paths": ["/a"], "told": True}]
 
 
-@RED
 def test_an_agent_whose_tool_name_cannot_be_found_is_still_marked_told() -> None:
     class Missing(ToolNaming):
         def tool_names(self, addr: str) -> dict[str, str]:

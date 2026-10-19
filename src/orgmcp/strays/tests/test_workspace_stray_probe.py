@@ -14,8 +14,6 @@ from orgmcp.strays import StrayProbe
 from orgmcp.strays._ports import MtimeReader
 from orgmcp.strays._probe import WorkspaceStrayProbe
 
-from ._support import RED
-
 
 class Scopes(AccessScopes):
     """Gives each agent the workspace it is told, and remembers whom it was asked about."""
@@ -77,7 +75,6 @@ def test_it_is_a_stray_probe() -> None:
     assert isinstance(probe, StrayProbe)
 
 
-@RED
 def test_it_asks_for_the_tree_of_the_address_and_then_its_memory_file() -> None:
     tree = WS / "lead" / "an"
     probe, scopes, mtimes = probe_of(["read", "write"], WS, {tree: 3.0, tree / "MEMORY.md": 4.0})
@@ -85,7 +82,6 @@ def test_it_asks_for_the_tree_of_the_address_and_then_its_memory_file() -> None:
     assert scopes.asked == ["lead/an"] and mtimes.asked == [tree, tree / "MEMORY.md"]
 
 
-@RED
 def test_a_path_that_cannot_be_statted_is_left_out() -> None:
     tree = WS / "lead" / "an"
     probe, _, _ = probe_of(["write"], WS, {tree / "MEMORY.md": 4.0})
@@ -93,26 +89,22 @@ def test_a_path_that_cannot_be_statted_is_left_out() -> None:
 
 
 @pytest.mark.parametrize("tools", [None, [], ["read"], ["Write"]])
-@RED
 def test_without_the_built_in_write_no_file_is_looked_at(tools: object) -> None:
     probe, _, mtimes = probe_of(tools, WS, {WS / "lead" / "an": 3.0})
     assert probe.probe("lead/an") == {} and mtimes.asked == []
 
 
-@RED
 def test_without_a_workspace_no_file_is_looked_at() -> None:
     probe, _, mtimes = probe_of(["write"], None, {})
     assert probe.probe("lead/an") == {} and mtimes.asked == []
 
 
-@RED
 def test_an_agent_the_charters_do_not_know_is_an_error() -> None:
     probe, _, _ = probe_of(["write"], WS, {})
     with pytest.raises(FileNotFoundError):
         probe.probe("ghost")
 
 
-@RED
 def test_a_file_whose_name_only_ends_in_memory_md_counts_as_a_memory_file() -> None:
     probe, _, _ = probe_of(["write"], WS, {})
     old, new = str(WS / "OLD_MEMORY.md"), str(WS / "NEW_MEMORY.md")

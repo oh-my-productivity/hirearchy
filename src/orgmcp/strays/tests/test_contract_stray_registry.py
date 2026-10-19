@@ -10,9 +10,7 @@ import pytest
 from orgmcp.strays import StrayRegistry
 from orgmcp.strays.testing import IMPLEMENTATIONS, StraysHarness
 
-from ._support import RED, make
-
-pytestmark = RED
+from ._support import make
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[StrayRegistry], ids=lambda factory: factory.__name__)

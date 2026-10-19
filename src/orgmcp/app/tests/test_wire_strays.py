@@ -15,9 +15,6 @@ from orgmcp.strays import StrayProbe, StrayRegistry
 from orgmcp.strays._probe import WorkspaceStrayProbe
 from orgmcp.strays._registry import LedgerStrayRegistry
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-strays")
-
-
 class FixedProbe(StrayProbe):
     def probe(self, addr: str) -> dict[str, float]:
         return {"/fixed": 1.0}
@@ -42,14 +39,12 @@ def test_the_runtime_has_the_stray_ports(tmp_path: Path) -> None:
     assert isinstance(runtime.stray_registry, LedgerStrayRegistry) and isinstance(runtime.stray_registry, StrayRegistry)
 
 
-@RED
 def test_building_the_stray_ports_does_no_io(tmp_path: Path) -> None:
     runtime = wiring.open_runtime(tmp_path)
     assert runtime.stray_registry.take_notice("dev") == ""
     assert list(tmp_path.iterdir()) == []
 
 
-@RED
 def test_the_probe_reads_the_charters_and_the_workspace_of_the_runtime(tmp_path: Path) -> None:
     ws = (tmp_path / "ws").resolve()
     (ws / "dev").mkdir(parents=True)
@@ -60,7 +55,6 @@ def test_the_probe_reads_the_charters_and_the_workspace_of_the_runtime(tmp_path:
     assert wiring.open_runtime(tmp_path / "org2").stray_probe.probe("dev") == {}
 
 
-@RED
 def test_the_registry_writes_the_strays_ledger_of_the_organization(tmp_path: Path) -> None:
     org = tmp_path / "org"
     hire(org, "write", tmp_path / "ws")
@@ -76,7 +70,6 @@ def test_an_override_replaces_the_port(tmp_path: Path) -> None:
     assert runtime.stray_probe is fake and isinstance(runtime.stray_registry, LedgerStrayRegistry)
 
 
-@RED
 def test_the_registry_uses_the_ledger_and_the_naming_of_the_runtime(tmp_path: Path) -> None:
     ledgers = MemoryLedgerStore()
     runtime = wiring.open_runtime(tmp_path, {LedgerStore: ledgers, ToolNaming: Names()})
@@ -84,7 +77,6 @@ def test_the_registry_uses_the_ledger_and_the_naming_of_the_runtime(tmp_path: Pa
     assert "dev" in ledgers.texts["strays"] and "`@orgmcp/w!`" in runtime.stray_registry.take_notice("dev")
 
 
-@RED
 def test_the_probe_uses_the_access_scopes_of_the_runtime(tmp_path: Path) -> None:
     class Elsewhere(AccessScopes):
         def workspace_of(self, addr: str) -> Path | None:

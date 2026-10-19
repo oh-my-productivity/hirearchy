@@ -17,4 +17,7 @@ class FsMtimeReader(MtimeReader):
     """``stat`` on the real filesystem."""
 
     def mtime(self, path: Path) -> float | None:
-        raise NotImplementedError("red: B-strays")
+        try:
+            return path.stat().st_mtime
+        except OSError:
+            return None

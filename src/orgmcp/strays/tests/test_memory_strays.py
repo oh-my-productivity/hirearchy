@@ -7,15 +7,12 @@ from pathlib import Path
 from orgmcp.strays import StrayProbe, StrayRegistry
 from orgmcp.strays.testing import MemoryStrays
 
-from ._support import RED
-
 
 def test_it_is_both_ports() -> None:
     fake = MemoryStrays()
     assert isinstance(fake, StrayProbe) and isinstance(fake, StrayRegistry)
 
 
-@RED
 def test_a_stray_goes_from_the_workspace_to_the_notice() -> None:
     fake = MemoryStrays()
     ws = Path("/w/dev").resolve()
@@ -29,7 +26,6 @@ def test_a_stray_goes_from_the_workspace_to_the_notice() -> None:
     assert f"`{ws / 'dev'}`" in fake.take_notice("dev") and fake.take_notice("dev") == ""
 
 
-@RED
 def test_it_touches_no_file(tmp_path: Path) -> None:
     fake = MemoryStrays()
     fake.put_agent("dev", {"role": "R", "tools": ["write"], "workspace": str(tmp_path / "ws")})

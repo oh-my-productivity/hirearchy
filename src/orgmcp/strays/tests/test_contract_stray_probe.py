@@ -9,9 +9,7 @@ import pytest
 from orgmcp.strays import StrayProbe
 from orgmcp.strays.testing import IMPLEMENTATIONS, StraysHarness
 
-from ._support import RED, make, writer
-
-pytestmark = RED
+from ._support import make, writer
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[StrayProbe], ids=lambda factory: factory.__name__)
@@ -37,8 +35,8 @@ def test_the_tree_of_the_address_is_probed_with_its_mtime(h: StraysHarness) -> N
 
 def test_the_memory_file_of_the_address_is_probed_too(h: StraysHarness) -> None:
     ws = writer(h, "dev")
-    h.touch_dir(ws / "dev", 1000.0)
     h.touch(ws / "dev" / "MEMORY.md", 2000.0)
+    h.touch_dir(ws / "dev", 1000.0)  # after the file: making a file changes the mtime of its directory
     assert h.probe.probe("dev") == {str(ws / "dev"): 1000.0, str(ws / "dev" / "MEMORY.md"): 2000.0}
 
 
