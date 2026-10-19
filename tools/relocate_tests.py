@@ -33,6 +33,7 @@ import sys
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
+from types import ModuleType
 from typing import Any
 
 import yaml
@@ -185,6 +186,52 @@ def place_of(destination: str) -> str | None:
     if len(parts) == 3 and parts[0] == SOURCE_DIR:
         return f"{parts[0]}/{parts[1]}"
     return None
+
+
+# What the import contracts forbid a test of package P to import (ARCHITECTURE.md 8.2): another orgmcp package that P does not depend on, a
+# private module of another package, and the frameworks outside their entry points. A moved test that does so imports the module as
+# ``testkit.legacy.<module>`` instead: the same module object (tests/testkit/legacy), invisible to the contracts. The graph is read from
+# ``tests/architecture/graph.py`` of the repository; without it nothing is redirected.
+LEGACY = "testkit.legacy"
+EXTERNAL_HOMES: Mapping[str, frozenset[str]] = {
+    "yaml": frozenset({"kernel", "blueprint"}), "mcp": frozenset({"mcp_server"}), "anyio": frozenset({"mcp_server"}),
+    "textual": frozenset({"dashboard"}),
+}
+FACADES = frozenset({"core", "server"})  # orgmcp.core and orgmcp.server: top layer, no package below may import them
+
+
+@dataclass(frozen=True)
+class Rules:
+    """For each package: the packages it may import."""
+
+    allowed: Mapping[str, frozenset[str]]
+
+    def redirects(self, place: str | None, module: str) -> bool:
+        """Whether ``place`` (a package name; None for a destination outside src/orgmcp) must import ``module`` through ``testkit.legacy``."""
+        if place is None or place not in self.allowed:
+            return False
+        parts = module.split(".")
+        if parts[0] in EXTERNAL_HOMES:
+            return place not in EXTERNAL_HOMES[parts[0]]
+        if parts[0] != "orgmcp" or len(parts) < 2:
+            return False
+        package = parts[1]
+        if package == place:
+            return False
+        if package not in self.allowed and package not in FACADES and package != "app":
+            return False  # a flat legacy module (orgmcp.observe ...): no contract covers it
+        return package not in self.allowed[place] or any(part.startswith("_") for part in parts[2:])
+
+
+def load_rules(root: Path) -> Rules | None:
+    graph = root / "tests" / "architecture" / "graph.py"
+    if not graph.is_file():
+        return None
+    namespace: dict[str, Any] = {"__name__": "relocate_graph"}
+    sys.modules.setdefault("relocate_graph", ModuleType("relocate_graph"))
+    exec(compile(graph.read_text(encoding="utf-8"), str(graph), "exec"), namespace)  # noqa: S102 - the repository's own, dependency-free module
+    allowed = {name: frozenset(namespace["allowed_imports"](name)) for name in namespace["PACKAGES"]}
+    return Rules(allowed)
 
 
 class _UniqueKeyLoader(yaml.SafeLoader):  # type: ignore[misc]  # PyYAML has no stubs: its classes are Any
@@ -556,6 +603,28 @@ class Module:
                 edits.setdefault(target.lineno, []).append((target.col_offset, target.end_col_offset, replacement))
         return edits, errors
 
+    def import_rewrites(self, nodes: Iterable[ast.AST], place: str | None, rules: Rules | None) -> tuple[dict[int, list[tuple[int, int, str]]], list[str]]:
+        """Replacements of the imports inside the statements ``nodes`` (inside a test, say) that the contracts forbid in package ``place``."""
+        edits: dict[int, list[tuple[int, int, str]]] = {}
+        errors: list[str] = []
+        if rules is None or place is None:
+            return edits, errors
+        for root in nodes:
+            for node in ast.walk(root):
+                if not isinstance(node, (ast.Import, ast.ImportFrom)):
+                    continue
+                outcome = redirected_statement(node, place, rules)
+                if outcome is None:
+                    continue
+                where = f"{self.path}:{node.lineno}"
+                if isinstance(outcome, str) and outcome.startswith("!"):
+                    errors.append(f"{where}: {outcome[1:]}")
+                elif node.lineno != node.end_lineno or node.end_col_offset is None:
+                    errors.append(f"{where}: an import over several lines inside a test cannot be redirected")
+                else:
+                    edits.setdefault(node.lineno, []).append((node.col_offset, node.end_col_offset, outcome.replace("\n", "\n" + " " * node.col_offset)))
+        return edits, errors
+
     def _file_expression(self, name: ast.Name) -> tuple[ast.expr, str] | str:
         call = self.parents.get(name)
         if not (isinstance(call, ast.Call) and call.args == [name] and not call.keywords and _is_path(call.func)):
@@ -669,6 +738,39 @@ def blanks(previous: Shape | None, following: Shape, *, top: bool = True) -> int
     return 2
 
 
+def redirected_statement(node: ast.Import | ast.ImportFrom, place: str, rules: Rules) -> str | None:
+    """The text that replaces an import statement the contracts forbid in package ``place``; None if it is fine; ``!reason`` if it cannot be done."""
+    if isinstance(node, ast.Import):
+        if not any(rules.redirects(place, a.name) for a in node.names):
+            return None
+        if any(a.asname is None and "." in a.name for a in node.names if rules.redirects(place, a.name)):
+            return "!`import a.b` without `as` of a module the contracts forbid here cannot be redirected: write `import a.b as <name>`"
+        return "\n".join(f"import {LEGACY}.{a.name} as {a.asname or a.name}" if rules.redirects(place, a.name) else _plain(a) for a in node.names)
+    if node.level or node.module is None:
+        return None
+    module = node.module
+    if module == "orgmcp":
+        away = [a for a in node.names if rules.redirects(place, f"orgmcp.{a.name}")]
+        if not away:
+            return None
+        stay = [a for a in node.names if a not in away]
+        lines = [f"from {LEGACY}.orgmcp import {', '.join(_alias_text(a) for a in away)}"]
+        if stay:
+            lines.insert(0, f"from orgmcp import {', '.join(_alias_text(a) for a in stay)}")
+        return "\n".join(lines)
+    if not rules.redirects(place, module):
+        return None
+    return f"from {LEGACY}.{module} import {', '.join(_alias_text(a) for a in node.names)}"
+
+
+def _alias_text(alias: ast.alias) -> str:
+    return f"{alias.name} as {alias.asname}" if alias.asname else alias.name
+
+
+def _plain(alias: ast.alias) -> str:
+    return f"import {_alias_text(alias)}"
+
+
 def _walk_targets(targets: Sequence[ast.expr]) -> Iterator[ast.expr]:
     for target in targets:
         if isinstance(target, (ast.Tuple, ast.List)):
@@ -759,8 +861,9 @@ class Part:
     tests: list[str]
 
 
-def build_destination(path: str, existing: Module | None, parts: Sequence[Part]) -> str | list[str]:
+def build_destination(path: str, existing: Module | None, parts: Sequence[Part], rules: Rules | None = None) -> str | list[str]:
     """The new text of a destination file that receives the tests of ``parts`` (a new file, or ``existing`` extended), or the errors."""
+    place = place_of(path) if path.startswith("src/orgmcp/") else None
     errors: list[str] = []
     items: list[Item] = []
     infos: dict[str, ImportInfo] = {}
@@ -776,8 +879,16 @@ def build_destination(path: str, existing: Module | None, parts: Sequence[Part])
             continue
         needed, strangers = module.closure([*roots, *standing], selected)
         errors += [f"{path}: {module.path}: a moved test uses the test {name}, which must move with it" for name in strangers]
-        edits, problems = module.file_rewrites([n for u in needed for n in module.nodes_of(u, selected.get(u.index))])
+        included = [n for u in needed for n in module.nodes_of(u, selected.get(u.index))]
+        edits, problems = module.file_rewrites(included)
         errors += [f"{path}: {p}" for p in problems]
+        if existing is not None:
+            errors += _captured(path, module, existing, included)
+        uses_testkit = bool(edits)
+        nested, problems = module.import_rewrites(included, place, rules)
+        errors += [f"{path}: {p}" for p in problems]
+        for line, found in nested.items():
+            edits.setdefault(line, []).extend(found)
         used: set[str] = set()
         for unit in needed:
             lines = module.render_unit(unit, selected.get(unit.index), edits)
@@ -792,19 +903,48 @@ def build_destination(path: str, existing: Module | None, parts: Sequence[Part])
                 continue
             items.append(item)
             taken.update({key: item for key in item.keys})
-        wanted = [module.bindings[name] for name in sorted(used) if name in module.bindings and module.bindings[name].module != FUTURE]
-        if edits:
+        wanted = [_through_legacy(module.bindings[name], place, rules) for name in sorted(used)
+                  if name in module.bindings and module.bindings[name].module != FUTURE]
+        if uses_testkit:
             wanted.append(ImportInfo("import", "testkit", ""))
         for info in wanted:
-            problem = _bind(infos, info, existing, path)
+            problem = info if isinstance(info, str) else _bind(infos, info, existing, path)
             if problem:
-                errors.append(problem)
+                errors.append(f"{path}: {module.path}: {problem}" if isinstance(info, str) else problem)
         future = future or any(u.kind == "future" for u in module.units)
     if errors:
         return sorted(set(errors))
     if existing is not None:
         return _extend(existing, items, [i for i in infos.values() if existing.bindings.get(i.binding) != i])
-    return _new_file(items, list(infos.values()), future)
+    return _new_file(items, list(infos.values()), future, header=path.startswith("src/orgmcp/"))
+
+
+def _captured(path: str, module: Module, existing: Module, nodes: Sequence[ast.AST]) -> list[str]:
+    """Names the moved tests use but their source does not define (a conftest fixture, a builtin) that the existing destination does define:
+    the tests would silently get the destination's object instead."""
+    requested = {n.arg for root in nodes for n in ast.walk(root) if isinstance(n, ast.arg)}
+    loaded = loaded_names(nodes)
+    clash = {name for name in requested if name in existing.fixtures and name not in module.fixtures}
+    clash |= {name for name in loaded if name in existing.defs and name not in module.defs and name not in module.bindings}
+    return [f"{path}: {module.path}: the moved tests use {name!r}, which comes from elsewhere (conftest, builtins) there but is defined in the "
+            "destination: they would pick up the destination's; name another destination in the manifest" for name in sorted(clash)]
+
+
+def _through_legacy(info: ImportInfo, place: str | None, rules: Rules | None) -> ImportInfo | str:
+    """The import a destination of package ``place`` writes for ``info``: through ``testkit.legacy`` if the contracts forbid the original."""
+    if rules is None or place is None or info.level:
+        return info
+    if info.kind == "from" and info.module == "orgmcp":
+        if rules.redirects(place, f"orgmcp.{info.name}"):
+            return ImportInfo("from", f"{LEGACY}.orgmcp", info.name, info.asname)
+        return info
+    if rules.redirects(place, info.module):
+        if info.kind == "import":
+            if info.asname is None and "." in info.module:
+                return f"`import {info.module}` is forbidden in package {place} and cannot be redirected without `as`: write `import {info.module} as <name>`"
+            return ImportInfo("import", f"{LEGACY}.{info.module}", "", info.asname or info.module)
+        return ImportInfo("from", f"{LEGACY}.{info.module}", info.name, info.asname)
+    return info
 
 
 def _bind(infos: dict[str, ImportInfo], info: ImportInfo, existing: Module | None, path: str) -> str | None:
@@ -844,12 +984,20 @@ def _clash(item: Item, taken: Mapping[str, Item], existing: Module | None, path:
     return None
 
 
-def _new_file(items: list[Item], infos: list[ImportInfo], future: bool) -> str:
-    lines: list[str] = ["from __future__ import annotations"] if future else []
+MYPY_DEBT = [
+    "# mypy: ignore-errors",
+    "# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.",
+]
+
+
+def _new_file(items: list[Item], infos: list[ImportInfo], future: bool, *, header: bool = False) -> str:
+    lines: list[str] = list(MYPY_DEBT) if header else []
+    if future:
+        lines += ([""] if lines else []) + ["from __future__ import annotations"]
     block = render_imports(infos)
     if block:
         lines += ([""] if lines else []) + block
-    previous = Shape("future" if future and not block else "import", 0, 3) if lines else None
+    previous = Shape("import", 0, 3) if lines else None
     for item in items:
         lines += [""] * blanks(previous, item.shape) + item.lines
         previous = item.shape
@@ -930,6 +1078,7 @@ def _group_entries(manifest: Manifest, group: str) -> list[Destination]:
 def run_group(root: Path, manifest: Manifest, group: str, *, destinations: bool) -> tuple[list[Change], list[str]]:
     """The changes that applying (``destinations=True``) or only pruning a group makes, and the errors; writes nothing."""
     repo = Repo(root)
+    rules = load_rules(root)
     errors: list[str] = []
     changes: list[Change] = []
     removals: dict[str, list[str]] = {}
@@ -952,7 +1101,7 @@ def run_group(root: Path, manifest: Manifest, group: str, *, destinations: bool)
         if not destinations or not parts:
             continue
         existing = repo.module(destination.path, strict=False)
-        built = build_destination(destination.path, existing, parts)
+        built = build_destination(destination.path, existing, parts, rules)
         if isinstance(built, list):
             errors += built
             continue

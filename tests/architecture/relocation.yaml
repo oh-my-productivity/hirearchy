@@ -19,27 +19,27 @@ groups:
   e: [scheduler, mcp_server, cli, dashboard, dashdata, tests/e2e, tests/meta, tests/architecture]
 
 destinations:
-  # EXTENDS the existing file; 1 tests
-  #   7.3: delivery events
-  src/orgmcp/delivery/tests/test_delivery_events.py:
+  # new file; 1 tests
+  #   7.3: delivery events [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/delivery/tests/test_delivery_events_behaviour.py:
     group: a
     sources:
       tests/test_telemetry.py:
         - test_a_message_delivery_with_events_is_not_noticeably_slower
 
-  # EXTENDS the existing file; 2 tests
-  #   7.3: the order of the two copies of a message is delivery
-  src/orgmcp/delivery/tests/test_delivery_order.py:
+  # new file; 2 tests
+  #   7.3: the order of the two copies of a message is delivery [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/delivery/tests/test_delivery_order_behaviour.py:
     group: a
     sources:
       tests/test_core_safety.py:
         - test_sender_copy_is_written_before_the_recipient_copy
         - test_recipient_write_failure_is_repaired_by_recover_without_minting_or_losing_budget
 
-  # EXTENDS the existing file; 2 tests
-  #   7.3: rendering a short message is kernel
-  #   7.3: the wake flag of a Message is kernel
-  src/orgmcp/kernel/tests/test_message.py:
+  # new file; 2 tests
+  #   7.3: rendering a short message is kernel [the file of that name exists and is typed: the moved tests get a file of their own]
+  #   7.3: the wake flag of a Message is kernel [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/kernel/tests/test_message_behaviour.py:
     group: a
     sources:
       tests/test_scheduler_robustness.py:
@@ -129,10 +129,10 @@ destinations:
         - test_delegated_task_is_shown_once
         - test_note_and_task_messages_get_no_extra_block
 
-  # EXTENDS the existing file; 8 tests
-  #   subject: the files section of the prompt
-  #   7.3: the files section of the prompt
-  src/orgmcp/prompts/tests/test_files_guide.py:
+  # new file; 8 tests
+  #   subject: the files section of the prompt [the file of that name exists and is typed: the moved tests get a file of their own]
+  #   7.3: the files section of the prompt [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/prompts/tests/test_files_guide_behaviour.py:
     group: a
     sources:
       tests/test_confinement.py:
@@ -548,9 +548,9 @@ destinations:
       tests/test_confinement.py:
         - test_a_manager_cannot_widen_a_charter_by_editing_it
 
-  # EXTENDS the existing file; 8 tests
-  #   7.3: the write guard (protected names, case twins, memory cap, agent.md) is orgfiles
-  src/orgmcp/orgfiles/tests/test_guard.py:
+  # new file; 8 tests
+  #   7.3: the write guard (protected names, case twins, memory cap, agent.md) is orgfiles [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/orgfiles/tests/test_guard_behaviour.py:
     group: b
     sources:
       tests/test_core_safety.py:
@@ -797,9 +797,9 @@ destinations:
         - test_stop_refuses_a_scheduler_of_another_org
         - test_stale_or_garbage_pidfile_means_stopped_and_does_not_block_start
 
-  # EXTENDS the existing file; 2 tests
-  #   7.3: daemon identity checks (_looks_like_scheduler_of)
-  src/orgmcp/daemon/tests/test_identity.py:
+  # new file; 2 tests
+  #   7.3: daemon identity checks (_looks_like_scheduler_of) [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/daemon/tests/test_identity_behaviour.py:
     group: c
     sources:
       tests/test_bootstrap.py:
@@ -1714,9 +1714,9 @@ destinations:
       tests/test_qa_findings.py:
         - test_qa10_resume_with_trailing_slash_clears_failures
 
-  # EXTENDS the existing file; 2 tests
-  #   7.3: cli command events
-  src/orgmcp/cli/tests/test_record.py:
+  # new file; 2 tests
+  #   7.3: cli command events [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/cli/tests/test_record_behaviour.py:
     group: e
     sources:
       tests/test_telemetry.py:
@@ -1732,10 +1732,10 @@ destinations:
         - test_cli_review_dry_run_then_real
         - test_cli_review_on_a_healthy_org
 
-  # EXTENDS the existing file; 2 tests
-  #   7.3: `main([...])` tests are cli
-  #   7.3: tests that drive `main([...])` are cli (extends the existing file)
-  src/orgmcp/cli/tests/test_run_command.py:
+  # new file; 2 tests
+  #   7.3: `main([...])` tests are cli [the file of that name exists and is typed: the moved tests get a file of their own]
+  #   7.3: tests that drive `main([...])` are cli (extends the existing file) [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/cli/tests/test_run_command_behaviour.py:
     group: e
     sources:
       tests/test_assistant_ux.py:
@@ -2164,9 +2164,9 @@ destinations:
         - test_serve_without_until_done_keeps_going
         - test_a_plain_stall_waits_for_the_stall_ladder_before_the_exit
 
-  # EXTENDS the existing file; 11 tests
-  #   7.3: the scheduler loop (all other tests)
-  src/orgmcp/scheduler/tests/test_loop.py:
+  # new file; 11 tests
+  #   7.3: the scheduler loop (all other tests) [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/scheduler/tests/test_loop_behaviour.py:
     group: e
     sources:
       tests/test_scheduler.py:
@@ -2182,9 +2182,9 @@ destinations:
         - test_failure_count_resets_on_success
         - test_single_scheduler_per_org
 
-  # EXTENDS the existing file; 7 tests
-  #   7.3: orphan recovery in the scheduler
-  src/orgmcp/scheduler/tests/test_orphans.py:
+  # new file; 7 tests
+  #   7.3: orphan recovery in the scheduler [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/scheduler/tests/test_orphans_behaviour.py:
     group: e
     sources:
       tests/test_wakes.py:
@@ -2267,9 +2267,9 @@ destinations:
         - test_the_run_start_event_reports_the_resolved_model
         - test_the_run_start_event_reports_explicit_models
 
-  # EXTENDS the existing file; 4 tests
-  #   all four run a real Scheduler and read what it logs: scheduler (7.3 also names strays)
-  src/orgmcp/scheduler/tests/test_strays.py:
+  # new file; 4 tests
+  #   all four run a real Scheduler and read what it logs: scheduler (7.3 also names strays) [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/scheduler/tests/test_strays_behaviour.py:
     group: e
     sources:
       tests/test_finish.py:
@@ -2278,9 +2278,9 @@ destinations:
         - test_no_warning_for_clean_runs_pre_existing_folders_or_agents_without_write
         - test_a_failing_stray_probe_never_stops_a_run
 
-  # EXTENDS the existing file; 1 tests
-  #   7.3: scheduler upkeep
-  src/orgmcp/scheduler/tests/test_upkeep.py:
+  # new file; 1 tests
+  #   7.3: scheduler upkeep [the file of that name exists and is typed: the moved tests get a file of their own]
+  src/orgmcp/scheduler/tests/test_upkeep_behaviour.py:
     group: e
     sources:
       tests/test_telemetry.py:

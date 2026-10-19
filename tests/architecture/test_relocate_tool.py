@@ -628,3 +628,94 @@ def test_the_tool_is_dev_tooling_that_nothing_in_src_imports() -> None:
             if any(m.split(".")[0] in ("tools", "relocate_tests") for m in modules):
                 offenders.append(str(path.relative_to(REPO)))
     assert offenders == []
+
+
+# ----------------------------------------------------------------------------------------------------------------------------------
+# imports the contracts forbid
+
+
+GRAPH = '''\
+PACKAGES = {"kernel": 0, "budget": 0, "health": 0, "scheduler": 0}
+ALLOWED = {"kernel": set(), "budget": {"kernel"}, "health": {"kernel", "budget"}, "scheduler": {"kernel", "budget", "health"}}
+
+
+def allowed_imports(name):
+    return ALLOWED[name]
+'''
+
+CONTRACTS = '''\
+import yaml
+from orgmcp import core, kernel
+from orgmcp.core import ROOT, Org
+from orgmcp.health import agent_health
+from orgmcp.kernel import Message
+from orgmcp.budget._private import secret
+from orgmcp.observe import events
+
+
+def test_one():
+    from orgmcp.server import build_server
+    import orgmcp.scheduler as sched
+
+    assert [yaml, core, kernel, ROOT, Org, agent_health, Message, secret, events, build_server, sched]
+'''
+
+
+def contract_repo(tmp_path: Path, tool):  # type: ignore[no-untyped-def]
+    repo = make_repo(tmp_path, {"test_contracts.py": CONTRACTS}, {"tests/architecture/graph.py": GRAPH})
+    return repo, tool.Manifest.from_dict(manifest_dict({BUDGET: ("b", {"tests/test_contracts.py": ["test_one"]})}))
+
+
+def test_imports_that_the_contracts_forbid_are_written_through_testkit_legacy(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    repo, manifest = contract_repo(tmp_path, tool)
+    tool.apply_group(repo, manifest, "b")
+    text = (repo / BUDGET).read_text(encoding="utf-8")
+    assert "import testkit.legacy.yaml as yaml" in text
+    assert "from testkit.legacy.orgmcp import core" in text and "from orgmcp import kernel" in text  # one name each way
+    assert "from testkit.legacy.orgmcp.core import ROOT, Org" in text
+    assert "from testkit.legacy.orgmcp.health import agent_health" in text  # budget does not depend on health
+    assert "from orgmcp.kernel import Message" in text  # budget depends on the kernel
+    assert "from testkit.legacy.orgmcp.budget._private import secret" not in text and "from orgmcp.budget._private import secret" in text  # its own
+    assert "from orgmcp.observe import events" in text  # a flat legacy module: no contract
+    assert "    from testkit.legacy.orgmcp.server import build_server" in text  # inside the test
+    assert "    import testkit.legacy.orgmcp.scheduler as sched" in text
+    compile(text, BUDGET, "exec")
+
+
+def test_nothing_is_redirected_for_a_destination_outside_src_or_a_repository_without_a_graph(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    repo = make_repo(tmp_path / "a", {"test_contracts.py": CONTRACTS}, {"tests/architecture/graph.py": GRAPH})
+    manifest = tool.Manifest.from_dict(manifest_dict({E2E: ("e", {"tests/test_contracts.py": ["test_one"]})}))
+    tool.apply_group(repo, manifest, "e")
+    assert "testkit.legacy" not in (repo / E2E).read_text(encoding="utf-8")
+    bare = make_repo(tmp_path / "b", {"test_contracts.py": CONTRACTS})
+    tool.apply_group(bare, tool.Manifest.from_dict(manifest_dict({BUDGET: ("b", {"tests/test_contracts.py": ["test_one"]})})), "b")
+    assert "testkit.legacy" not in (bare / BUDGET).read_text(encoding="utf-8")
+
+
+def test_a_bare_import_of_a_forbidden_module_cannot_be_redirected(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    source = "import orgmcp.core\n\n\ndef test_one():\n    assert orgmcp.core\n"
+    repo = make_repo(tmp_path, {"test_bare.py": source}, {"tests/architecture/graph.py": GRAPH})
+    manifest = tool.Manifest.from_dict(manifest_dict({BUDGET: ("b", {"tests/test_bare.py": ["test_one"]})}))
+    plan = tool.make_plan(repo, manifest)
+    assert any("without `as`" in e for e in plan.errors), plan.errors
+    with pytest.raises(tool.RelocationError, match="without `as`"):
+        tool.apply_group(repo, manifest, "b")
+    assert not (repo / BUDGET).exists()
+
+
+def test_a_new_file_under_src_carries_the_mypy_debt_line(tool, synth) -> None:  # type: ignore[no-untyped-def]
+    repo, manifest = synth
+    tool.apply_group(repo, manifest, "b")
+    assert (repo / BUDGET).read_text(encoding="utf-8").startswith("# mypy: ignore-errors\n")
+    tool.apply_group(repo, manifest, "e")
+    assert not (repo / E2E).read_text(encoding="utf-8").startswith("# mypy")  # tests/ is not under strict checking
+
+
+def test_a_destination_may_not_shadow_a_fixture_the_moved_tests_get_from_elsewhere(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    """Extending a file that defines its own ``org`` fixture would make a test that means the shared ``org`` fixture pick up that one."""
+    existing = "import pytest\n\n\n@pytest.fixture\ndef org():\n    return 1\n\n\ndef test_there(org):\n    assert org\n"
+    source = "def test_alpha(org):\n    assert org.root\n"
+    repo = make_repo(tmp_path, {"test_shadow.py": source}, {BUDGET: existing, "src/orgmcp/budget/tests/__init__.py": ""})
+    manifest = tool.Manifest.from_dict(manifest_dict({BUDGET: ("b", {"tests/test_shadow.py": ["test_alpha"]})}))
+    with pytest.raises(tool.RelocationError, match="'org'"):
+        tool.apply_group(repo, manifest, "b")
