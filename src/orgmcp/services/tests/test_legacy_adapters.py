@@ -13,9 +13,7 @@ from orgmcp.kernel import Message, OrgError
 from orgmcp.services._host import ServicesOrg
 from orgmcp.services.testing import ServicesWorld, memory_world
 
-from ._support import answer, BRIEF, define, populated, RED, request, STEPS
-
-pytestmark = RED
+from ._support import BRIEF, STEPS, answer, define, populated, request
 
 
 @pytest.fixture

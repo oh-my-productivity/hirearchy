@@ -48,7 +48,6 @@ from ._legacy import _case_line as _case_line
 from ._legacy import _clip as _clip  # (private names the legacy callers and tests still use)
 from ._legacy import _deliverable as _deliverable
 from ._legacy import _inputs as _inputs
-from ._legacy import _playbook_text as _playbook_text
 from ._legacy import _verdict_chain as _verdict_chain
 
 __all__ = [

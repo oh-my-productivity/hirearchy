@@ -107,7 +107,11 @@ def test_the_generated_playbook_fits_the_word_cap_for_every_team_shape(kind, tmp
     agents = bpm._resolve(bp, None, [tmp_path], [])
     text = bpm.default_playbook(agents[0], agents, bp["services"][0], 25)
     assert 120 < len(text.split()) < 600, len(text.split())
-    services_mod._playbook_text(Org.init(tmp_path / "o", "x"), text)  # accepted by the runtime's own check
+    org = Org.init(tmp_path / "o", "x")
+    org.hire(ROOT, "lead", "Lead", "Lead the team.")
+    org.define_service(  # the runtime's own check of a playbook: a text over the word cap is refused here
+        ROOT, "lead", "my-service", description="d", acceptance=["a"], deliverable={"description": "d"}, budget=1, playbook=text,
+    )
 
 
 

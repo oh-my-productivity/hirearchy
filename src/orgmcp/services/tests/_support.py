@@ -28,13 +28,9 @@ BRIEF: dict[str, object] = dict(
 STEPS = "## Steps\n1. Search.\n2. Write.\n3. Check every claim."
 
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-services")
-PENDING: set[str] = set()  # implementations that are not green yet
-
-
 def implementations(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:
-    """The implementations a contract suite iterates over, ``IMPLEMENTATIONS[<protocol>]`` (those that are not green yet are expected to fail)."""
-    return [pytest.param(f, id=f.__name__, marks=RED if f.__name__ in PENDING else ()) for f in factories]
+    """The implementations a contract suite iterates over, ``IMPLEMENTATIONS[<protocol>]``, with their names as ids."""
+    return [pytest.param(f, id=f.__name__) for f in factories]
 
 
 def populated(world: ServicesWorld) -> ServicesWorld:
