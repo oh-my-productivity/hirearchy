@@ -31,6 +31,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Callable
 
 from . import services
+from .app import wire_attention
 from .core import ROOT, Message, Org, OrgError, latest_results, utcnow
 from .health import _aware, _duration, _stamp
 
@@ -126,9 +127,7 @@ def _render(org: Org, task_id: str | None, now: datetime | None) -> str:
 
 def _can_run(org: Org, addr: str) -> bool:
     """Is ``addr`` running, or would a scheduler start it now (unread mail that wakes it, budget left, not paused)?"""
-    if org.running(addr):
-        return True
-    return bool(org.unread(addr)) and (org.budget(addr) or 0) > 0 and org.paused(addr) in (None, "budget")
+    return org.running(addr) or org.runtime.runnable_query.startable(addr)
 
 
 def _alive(org: Org, team: list[str]) -> bool:
@@ -338,21 +337,10 @@ def _human_items(org: Org) -> list[tuple[str, str]]:
     """(message id, line) for each unread root message that asks for a decision: blocked or failed results and every
     note or runtime notice (budget requests, questions, escalations), oldest first, each as one line with its id.
     Not listed: a ``done`` result (the task line already summarises it) and quiet notices (``wake: false``: budget
-    returned or reclaimed, refunds), which only carry runs."""
-    out = []
-    for m in org.messages(ROOT, "inbox"):
-        if not m.wake or (m.type == "result" and m.status == "done"):
-            continue
-        if m.type == "result":
-            what, text = f"{m.status} result from {m.sender}", _summary(m)
-        else:
-            what = "runtime notice" if m.sender == "runtime" else f"note from {m.sender}"
-            text = next((line.strip() for line in m.body.splitlines() if line.strip()), "")
-        title = f' "{m.title}"' if m.title else ""
-        out.append((m.id, f"Needs you: {what}{title}" + (f": {_short(text)}" if text else "") + f" (message {m.id})"))
-    return out
+    returned or reclaimed, refunds), which only carry runs (``attention.HumanQueue.items``)."""
+    return wire_attention.human_queue_of(org.runtime).items()
 
 
 def _needs_human(org: Org) -> list[str]:
-    """One line per item that waits for the human."""
-    return [line for _, line in _human_items(org)]
+    """One line per item that waits for the human (``attention.HumanQueue.lines``)."""
+    return wire_attention.human_queue_of(org.runtime).lines()

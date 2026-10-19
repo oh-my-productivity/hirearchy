@@ -17,8 +17,6 @@ from orgmcp.attention import Waiting
 from orgmcp.eligibility import RunnableQuery
 from orgmcp.kernel import ROOT
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-attention")
-
 
 class Runnable(RunnableQuery):
     """What may start is what the test says."""
@@ -40,12 +38,10 @@ def org(tmp_path: Path) -> Org:
     return made
 
 
-@RED
 def test_the_scheduler_exports_the_waiting_of_the_package() -> None:
     assert getattr(sched_module, "Waiting") is Waiting
 
 
-@RED
 def test_waiting_on_user_is_a_waiting_of_the_package(org: Org) -> None:
     org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=1)
     org.start_run_log("ceo")
@@ -67,7 +63,6 @@ def test_nothing_to_do_asks_the_runnable_query_of_the_runtime_in_force(org: Org)
     assert sched_module.nothing_to_do(org) is False
 
 
-@RED
 def test_the_helpers_of_the_decision_are_gone_from_the_scheduler() -> None:
     assert not hasattr(sched_module, "_startable") and not hasattr(sched_module, "_names")
 
@@ -80,7 +75,6 @@ def test_human_items_are_the_queue_of_the_package(org: Org) -> None:
     assert progress_module._needs_human(org) == [line for _, line in progress_module._human_items(org)]
 
 
-@RED
 def test_the_progress_checks_whether_an_agent_could_run_through_the_runnable_query(org: Org) -> None:
     org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=1)
     org.start_run_log("ceo")
