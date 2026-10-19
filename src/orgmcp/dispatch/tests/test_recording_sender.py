@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from orgmcp.delivery.testing import RecordingDelivery
-from orgmcp.dispatch import MessageSender
 from orgmcp.dispatch.testing import FixedReworkContext, NoReworkContext, RecordingSender
 from orgmcp.kernel.testing import FakeClock, SequenceIdGenerator
 

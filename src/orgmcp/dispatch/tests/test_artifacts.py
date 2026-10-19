@@ -10,7 +10,6 @@ from pathlib import Path
 import pytest
 
 from orgmcp.dispatch._artifacts import ArtifactAnnotator
-from orgmcp.dispatch._protocols import ArtifactNormalizer
 from orgmcp.dispatch.testing import DispatchWorld, fs_world
 from orgmcp.kernel import OrgError, OrgPaths
 

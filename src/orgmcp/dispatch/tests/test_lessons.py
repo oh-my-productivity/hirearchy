@@ -6,7 +6,6 @@ import pytest
 
 from orgmcp.dispatch import LESSONS_MAX_CHARS
 from orgmcp.dispatch._lessons import LessonsPolicy
-from orgmcp.dispatch._protocols import LessonsCheck
 from orgmcp.kernel import Message, OrgError
 
 

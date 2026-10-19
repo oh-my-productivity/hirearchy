@@ -12,7 +12,7 @@ from orgmcp.delivery.testing import RecordingDelivery
 from orgmcp.dispatch import MessageSender
 from orgmcp.dispatch._protocols import RoutePolicy
 from orgmcp.dispatch._sender import RuleMessageSender
-from orgmcp.dispatch.testing import IMPLEMENTATIONS, DispatchWorld, FixedReworkContext
+from orgmcp.dispatch.testing import IMPLEMENTATIONS, DispatchWorld
 from orgmcp.kernel import Message, OrgError
 from orgmcp.kernel.testing import SequenceIdGenerator
 
