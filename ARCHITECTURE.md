@@ -946,16 +946,16 @@ Pure public: `percentile`, `parse_when`, `fmt_rel`, `normalize_refusal`, `is_err
 
 ```python
 class EventQueries(Protocol):
-    def events_view(self, since: object = None, until: object = None, agent: str | None = None, kind: str | None = None,
+    def events_view(self, since: str | datetime | None = None, until: str | datetime | None = None, agent: str | None = None, kind: str | None = None,
                     trace: str | None = None, errors: bool = False, limit: int | None = None, now: datetime | None = None) -> JsonObject: ...
-    def events(self, since: object = None, until: object = None, agent: str | None = None, kind: str | None = None,
+    def events(self, since: str | datetime | None = None, until: str | datetime | None = None, agent: str | None = None, kind: str | None = None,
                trace: str | None = None, errors: bool = False, limit: int | None = None, now: datetime | None = None) -> list[JsonObject]: """The matching events, oldest first."""
     def follow(self, agent: str | None = None, kind: str | None = None, trace: str | None = None, errors: bool = False,
                poll: float = 0.5, max_polls: int | None = None) -> Iterator[JsonObject]: ...
 class TraceQueries(Protocol):
     def trace(self, task_id: str, now: datetime | None = None) -> JsonObject: ...
 class MetricQueries(Protocol):
-    def metrics(self, since: object = "24h", by: str | None = None, now: datetime | None = None, agent: str | None = None) -> JsonObject: ...
+    def metrics(self, since: str | datetime | None = "24h", by: str | None = None, now: datetime | None = None, agent: str | None = None) -> JsonObject: ...
 class NowQueries(Protocol):
     def now_view(self, now: datetime | None = None) -> JsonObject: ...
 class IntegrityChecks(Protocol):
@@ -971,6 +971,31 @@ class ObservabilityText(Protocol):
                      errors_only: bool = False, limit: int = 50, now: datetime | None = None, max_lines: int | None = None) -> str: ...
 ```
 Impl: `LogEventQueries`, `DerivedTraceQueries` (+ private `MessageTraceDeriver` = today's `Traces`, `RunCollector`), `DerivedMetricQueries`, `FileNowQueries`, `FileIntegrityChecks`, `TextObservabilityRenderer`, `ViewDispatcher(ObservabilityText)`.
+
+**The first half (C-obs-1)**: `api.py` has `EventQueries`, `TraceQueries`, `MetricQueries` and the six pure functions (`since`/`until` are `str | datetime | None`:
+what `parse_when` reads); `NowQueries`, `IntegrityChecks`, `ObservabilityRenderer`, `ObservabilityText` arrive with C-obs-2. Classes and what each is given:
+`LogEventQueries(EventReader, EventFollowers, Clock)` (`follow` waits with `Clock.sleep`; `now` defaults to `Clock.now()`), `DerivedTraceQueries(MessageHistory,
+TraceDerivers, EventReader, RunCollection, AgentDirectory, Clock)`, `DerivedMetricQueries(EventReader, RunCollection, MessageHistory, Clock)`. The ports they
+are made of are owned by the package (`_ports.py`, not in the api): `MessageHistory` (`IndexedMessageHistory(MessageIndex)`: `build_messages` of the index's scan),
+`TraceDeriver` / `TraceDerivers` (`MessageTraceDeriver(msgs, batches, RunLogReader)` is today's `Traces`; `LogTraceDerivers(RunLogReader)` makes one) and `RunCollection`
+(`RunCollector(RunLogReader, RunRegistry, AgentDirectory, MailboxReader, EventReader)`: `collect` = `collect_runs`, `team_runs` = the run loop of `trace`). Private
+modules: `_pure` (the six public functions), `_util` (`iso ms_between stats plain cap matcher`), `_messages` (`Msg msg_time build_messages`), `_history`, `_derive`,
+`_runs` (`RunRec` is data; `run_dict` replaces `RunRec.to_dict`; `run_events`; `_make_run`), `_events`, `_trace` (`run_window in_window calls_summary user_wait`; the
+window is the rule `progress` counts runs by, pinned by `app/tests/test_observability_legacy`: the trace's runs per task equal `progress`'s), `_metrics` (`group_key`).
+Decisions that keep the behaviour: `_ts` is `kernel.parse_time` (`test_time_equality` proves it equal to the old `_ts` for strings, None, datetimes and garbage);
+the start of a run in `MessageTraceDeriver` is still read from the file name WITH its `.log` suffix (`stamp_of(path.name)`, 21 characters of it: a stem shorter than a
+timestamp has none), not from `RunLogFile.start`; `MessageTraceDeriver` is not unified with `traces.RuleTraceStamper` (`test_trace_parity` pins where they agree - new,
+link, open-task, batch, ambiguous/unknown - and the two places they differ on purpose); `parse_when(text)` without `now` counts from the wall clock, the views from
+their `Clock`; `observe.utcnow` is gone, the default time of every view is `org.runtime.clock`. `testing.py`: `FixedEventQueries`, `FixedTraceQueries`,
+`FixedMetricQueries` (answer what they were told, remember what they were asked) and `ObservabilityWorld` over event files, messages, run logs and agents on disk and in
+memory (`disk_world`, `memory_world`: the contract suites iterate over them). `wire_observability` provides the three queries to a builder and, for the functions of
+`observe.py` that remain, builds them over the runtime in force (`event_queries_of`, `trace_queries_of`, `metric_queries_of`, `message_history_of`, `trace_derivers_of`,
+`run_collection_of`); the runtime has no field for them until C-obs-2 (`test_runtime_fields` takes all of 3.31 as that step).
+**The boundary for C-obs-2**: `observe.py` still holds `now` (`_scheduler_files _scheduler_info _tail_events _head_event now_view`, with `scheduler_state` and `judge_orphan`
+read from `orgmcp.scheduler` and the front matter of the inflight messages read from `org.runtime.resources.meta_cache`: `MessageIndex` has no single-file method, add one
+with `now`), `check` (`_check ... check`, `_live_run`), the text (`render_events render_trace render_metrics render_now render_check _cap`) and `observe_text`;
+its top documents the list. The names the second half takes from the first (`Traces`, `build_messages`, `scan_messages`, `format_event`, `is_error`, `iter_events`,
+`_running_ledger`, `_run_logs`, `_iso`, `_cap`, `_clip`, `_ts`) are the package's or small adapters over the runtime.
 
 ### 3.32 `blueprint`
 
