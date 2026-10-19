@@ -12,9 +12,8 @@ from orgmcp.kernel import JsonObject, stamp_of
 from orgmcp.observability._messages import Msg
 from orgmcp.observability._trace import calls_summary, in_window, run_window, user_wait
 
-from ._support import RED, stamp
+from ._support import stamp
 
-pytestmark = RED
 
 
 def task(n: int, to: str = "ceo", **fields: object) -> Msg:

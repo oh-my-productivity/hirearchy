@@ -10,7 +10,7 @@ from orgmcp.kernel import OrgError
 from orgmcp.observability import EventQueries, MetricQueries, TraceQueries
 from orgmcp.observability.testing import FixedEventQueries, FixedMetricQueries, FixedTraceQueries, disk_world, memory_world, stamp
 
-from ._support import RED, implementations, items
+from ._support import implementations, items
 
 
 def test_fixed_event_queries_answer_the_view_they_were_given() -> None:
@@ -49,7 +49,6 @@ def test_fixed_metric_queries_answer_their_result() -> None:
     assert fake.asked == [{"since": "7d", "by": "tool", "now": None, "agent": "ceo"}] and FixedMetricQueries().metrics() == {}
 
 
-@RED  # the worlds are made of the real queries
 @pytest.mark.parametrize("make", implementations([disk_world, memory_world]))
 def test_a_world_puts_events_messages_and_logs_where_the_queries_look(make: object, tmp_path: Path) -> None:
     w = make(tmp_path)  # type: ignore[operator]
@@ -60,4 +59,4 @@ def test_a_world_puts_events_messages_and_logs_where_the_queries_look(make: obje
     stem = w.run_log("ceo", 5, "# exit 0 after 3s\n")
     assert stem == "20261018T100005000000"
     assert [e["kind"] for e in w.events.events(since="2026-10-18T00:00:00Z", now=stamp(100))] == ["tool.call"]
-    assert items(w.traces.trace(task.id, now=stamp(100)))[0]["id"] == task.id
+    assert items(w.traces.trace(task.id, now=stamp(100)), "items")[0]["id"] == task.id

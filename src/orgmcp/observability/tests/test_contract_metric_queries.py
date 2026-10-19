@@ -14,9 +14,8 @@ from orgmcp.observability import MetricQueries
 from orgmcp.observability.testing import IMPLEMENTATIONS, ObservabilityWorld
 
 from . import _support
-from ._support import RED, items, request, stamp, table
+from ._support import items, request, stamp, table
 
-pytestmark = RED
 
 SINCE = "2026-10-18T00:00:00Z"
 NOW = stamp(500)

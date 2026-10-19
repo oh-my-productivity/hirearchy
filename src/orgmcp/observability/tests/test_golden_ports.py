@@ -21,9 +21,8 @@ from orgmcp.observability._util import plain
 
 from . import _scenario
 from ._scenario import NOW, SINCE, stamp
-from ._support import RED, expected
+from ._support import expected
 
-pytestmark = RED
 
 
 def dump(data: object) -> str:

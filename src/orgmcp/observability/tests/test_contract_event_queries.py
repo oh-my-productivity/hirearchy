@@ -15,9 +15,8 @@ from orgmcp.observability import EventQueries
 from orgmcp.observability.testing import IMPLEMENTATIONS, ObservabilityWorld
 
 from . import _support
-from ._support import RED, at, items, kinds, stamp
+from ._support import at, items, kinds, stamp
 
-pytestmark = RED
 
 SINCE = "2026-10-18T00:00:00Z"
 NOW = stamp(500)

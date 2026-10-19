@@ -20,9 +20,8 @@ from orgmcp.observability._messages import Msg
 from orgmcp.runs.testing import MemoryRuns
 from orgmcp.traces.testing import TraceHarness, fs_traces, memory_traces
 
-from ._support import RED, implementations
+from ._support import implementations
 
-pytestmark = RED
 
 RULES = {"given": "recorded", "new": "derived:new", "link": "derived:link", "open-task": "derived:open-task", "batch": "derived:batch",
          "ambiguous": "unknown"}

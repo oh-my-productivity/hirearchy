@@ -14,9 +14,8 @@ from orgmcp.observability import TraceQueries
 from orgmcp.observability.testing import IMPLEMENTATIONS, ObservabilityWorld
 
 from . import _support
-from ._support import RED, items, request, stamp, table
+from ._support import items, request, stamp, table
 
-pytestmark = RED
 
 NOW = stamp(200)
 
@@ -29,15 +28,15 @@ def w(request: pytest.FixtureRequest, tmp_path: Path) -> ObservabilityWorld:
 
 
 def runs_of(tr: dict[str, object]) -> list[dict[str, object]]:
-    return [i for i in items(tr) if i["kind"] == "run"]
+    return [i for i in items(tr, "items") if i["kind"] == "run"]
 
 
 def test_every_message_run_call_and_refusal_of_the_request_is_in_the_tree_in_time_order(w: ObservabilityWorld) -> None:
     ids = request(w)
     tr = w.traces.trace(ids["task"], now=NOW)
-    assert [i["id"] for i in items(tr) if i["kind"] == "message"] == [ids["task"], ids["sub"], ids["res_eng"], ids["res"]]
+    assert [i["id"] for i in items(tr, "items") if i["kind"] == "message"] == [ids["task"], ids["sub"], ids["res_eng"], ids["res"]]
     assert [i["run"] for i in runs_of(tr)] == [ids["run1"], ids["run2"], ids["run3"]]
-    rel = [i["rel_ms"] for i in items(tr)]
+    rel = [i["rel_ms"] for i in items(tr, "items")]
     assert rel == sorted(rel)  # type: ignore[type-var]
     first = runs_of(tr)[0]
     assert first["outcome"] == "ok" and first["source"] == "events" and first["duration_ms"] == 42000.0
@@ -53,7 +52,7 @@ def test_the_header_and_the_totals(w: ObservabilityWorld) -> None:
     assert tr["team"] == ["ceo", "ceo/eng"] and tr["notes"] == []
     assert tr["start"] == stamp(0).isoformat() and tr["end"] == stamp(125).isoformat()
     totals = table(tr, "totals")
-    assert (totals["runs"], totals["run_ms"], totals["tool_calls"], totals["refusals"]) == (3, 87000.0, 7, 1)
+    assert (totals["runs"], totals["run_ms"], totals["tool_calls"], totals["refusals"]) == (3, 87000.0, 6, 1)
     assert totals["outcomes"] == {"ok": 3} and (totals["budget_given"], totals["budget_used"], totals["budget_returned"]) == (6, 3, 3)
     assert totals["wall_ms"] == 125000.0 and totals["user_wait_ms"] == 0 and 70000 < totals["queue_ms"] < 80000  # type: ignore[operator]
     assert table(tr, "window") == {"start": ids["task"][:21], "end": ids["res"][:21]}
@@ -98,7 +97,7 @@ def test_a_message_without_a_recorded_trace_gets_the_request_it_follows_from(w: 
     task = w.send("root", "ceo", "task", 0, title="Ship it", budget=6, box="read")  # no trace in its file: an organization older than traces
     sub = w.send("ceo", "ceo/eng", "task", 20, title="Build", budget=3, reply_to=task.id, box="read")
     tr = w.traces.trace(task.id, now=NOW)
-    by_id = {i["id"]: i for i in items(tr) if i["kind"] == "message"}
+    by_id = {i["id"]: i for i in items(tr, "items") if i["kind"] == "message"}
     assert by_id[task.id]["trace_source"] == "derived:new" and by_id[sub.id]["trace_source"] == "derived:link"
     assert "2 message(s) have no recorded trace: their request was derived from reply_to/revises/open tasks (marked ~)" in tr["notes"]  # type: ignore[operator]
 

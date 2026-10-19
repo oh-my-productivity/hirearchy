@@ -12,9 +12,8 @@ from orgmcp.mail.testing import MailHarness, fs_mailbox, memory_mailbox
 from orgmcp.observability._history import IndexedMessageHistory
 from orgmcp.observability._ports import MessageHistory
 
-from ._support import RED, implementations
+from ._support import implementations
 
-pytestmark = RED
 
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 ID1 = "20261018T100000000001-root-0001"

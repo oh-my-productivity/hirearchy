@@ -19,9 +19,8 @@ from orgmcp.observability._ports import RunCollection
 from orgmcp.observability._runs import RunCollector, RunRec, run_dict, run_events
 from orgmcp.runs.testing import RunsHarness, memory_runs
 
-from ._support import RED, stamp
+from ._support import stamp
 
-pytestmark = RED
 
 Events = dict[str, dict[str, JsonObject]]
 

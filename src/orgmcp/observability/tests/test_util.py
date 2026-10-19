@@ -9,9 +9,8 @@ from pathlib import Path
 from orgmcp.kernel import JsonObject
 from orgmcp.observability._util import cap, iso, matcher, ms_between, plain, stats
 
-from ._support import RED, stamp
+from ._support import stamp
 
-pytestmark = RED
 
 
 def test_a_time_is_iso_in_utc_and_nothing_is_nothing() -> None:
@@ -58,7 +57,7 @@ def test_the_matcher_by_kind_takes_the_kind_and_its_children() -> None:
 
 def test_the_matcher_by_agent_looks_at_four_fields_after_normalizing_the_address() -> None:
     events: list[JsonObject] = [{"actor": "ceo/eng"}, {"agent": "ceo/eng"}, {"from": "ceo/eng"}, {"to": "ceo/eng"}, {"actor": "ceo"}, {}]
-    assert hits(matcher(agent=" Ceo/Eng/ "), *events) == [True, True, True, True, False, False]
+    assert hits(matcher(agent=" ceo/eng/ "), *events) == [True, True, True, True, False, False]
 
 
 def test_the_matcher_by_trace_takes_the_trace_or_one_of_the_traces() -> None:

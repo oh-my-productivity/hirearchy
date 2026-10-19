@@ -14,9 +14,8 @@ from orgmcp.observability._messages import Msg
 from orgmcp.observability._ports import TraceDeriver, TraceDerivers
 from orgmcp.runs.testing import MemoryRuns
 
-from ._support import RED
 
-pytestmark = RED
+
 
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 

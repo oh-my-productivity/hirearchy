@@ -14,11 +14,10 @@ from _pytest.mark.structures import ParameterSet
 from orgmcp.kernel import JsonObject
 from orgmcp.observability.testing import ObservabilityWorld, stamp
 
-__all__ = ["RED", "at", "dump", "expected", "implementations", "items", "kinds", "request", "stamp", "table"]
+__all__ = ["at", "dump", "expected", "implementations", "items", "kinds", "request", "stamp", "table"]
 
 EXPECTED = Path(__file__).with_name("expected")
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-obs-1")  # the tests of this step before the code was moved (removed in GREEN)
 
 
 def implementations(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:
