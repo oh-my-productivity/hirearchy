@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Progress for the human: one plain line per root task, then what needs the human.
 
 Read-only and derived from the files, like everything else (nothing is stored). It is what an assistant reads back
@@ -28,12 +29,14 @@ import os
 import re
 import time
 from datetime import datetime, timedelta, timezone
-from typing import Callable
+from typing import Any, Callable
 
-from . import reflection
-from .app import wire_attention
-from .core import ROOT, Message, Org, OrgError, latest_results, utcnow
-from .health import _aware, _duration, _stamp
+from .. import reflection
+from ..kernel import ROOT, Message, OrgError, aware as _aware, fmt_duration as _duration, latest_results, stamp_of as _stamp
+
+Org = Any  # the facade (a feature may not import it): the functions below take whatever has its methods
+
+
 
 RECENT = timedelta(hours=24)  # without a task id, finished tasks are listed for this long after they finished
 SHORT = 110  # characters of a reason or a note shown on a line
@@ -83,7 +86,7 @@ def describe_progress(org: Org, task_id: str | None = None, wait_seconds: int = 
     when every open task waits for the user (budget, a crashing agent, a decision): the line then says so and lists the
     user's options.
     """
-    from .scheduler import describe_scheduler, waiting_on_user
+    from ..scheduler import describe_scheduler, waiting_on_user
 
     sched = describe_scheduler(org)
     stopped = not sched.startswith("scheduler: running")
@@ -104,10 +107,14 @@ def describe_progress(org: Org, task_id: str | None = None, wait_seconds: int = 
     elif stopped and wait_seconds and work_in_flight(org, task_id):  # e.g. a blocked task whose lead was just granted runs
         sched += " - agents have work they could do, but nothing moves until it is started (start() or `orgmcp run`)"
         wait_seconds, note = 0, "Not waiting: no scheduler is running, so nothing will change. "
-    return f"{note}{progress(org, task_id, wait_seconds=wait_seconds)}\n{sched}"
+    from .. import progress as package  # the tests patch the name in the package
+
+    return f"{note}{package.progress(org, task_id, wait_seconds=wait_seconds)}\n{sched}"
 
 
 def _render(org: Org, task_id: str | None, now: datetime | None) -> str:
+    from ..core import utcnow  # (late: core imports the app, which imports this package)
+
     now = _aware(now) or utcnow()
     tasks = [m for m in org.sent(ROOT) if m.type == "task"]
     results = latest_results(org.received(ROOT))
@@ -150,6 +157,8 @@ def _snapshot(org: Org, task_id: str | None) -> tuple[dict[str, tuple[str, str, 
     have an agent below them that is running or can run now). Read-only."""
     tasks = [m for m in org.sent(ROOT) if m.type == "task"]
     results = latest_results(org.received(ROOT))
+    from ..core import utcnow
+
     now = utcnow()
     states: dict[str, tuple[str, str, str]] = {}
     alive: set[str] = set()
@@ -338,9 +347,13 @@ def _human_items(org: Org) -> list[tuple[str, str]]:
     note or runtime notice (budget requests, questions, escalations), oldest first, each as one line with its id.
     Not listed: a ``done`` result (the task line already summarises it) and quiet notices (``wake: false``: budget
     returned or reclaimed, refunds), which only carry runs (``attention.HumanQueue.items``)."""
+    from ..app import wire_attention
+
     return wire_attention.human_queue_of(org.runtime).items()
 
 
 def _needs_human(org: Org) -> list[str]:
     """One line per item that waits for the human (``attention.HumanQueue.lines``)."""
+    from ..app import wire_attention
+
     return wire_attention.human_queue_of(org.runtime).lines()

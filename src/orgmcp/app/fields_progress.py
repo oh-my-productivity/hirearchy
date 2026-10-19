@@ -4,10 +4,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-STEP: str | None = None  # set to the step's name when the step fills this part (see test_runtime_fields)
+from ..progress import LegacyParts, ProgressReporter
+
+STEP: str | None = "C-progress"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
 
 
 @dataclass(frozen=True)
 class Fields:
-    """No field yet: the step that gives the package its ports adds them here."""
+    progress_reporter: ProgressReporter
+    progress_parts: LegacyParts  # the objects the legacy functions of ``progress`` build over the runtime in force (goes with them, E3)

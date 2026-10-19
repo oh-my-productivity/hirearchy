@@ -71,7 +71,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     ),
     "progress": {
         **_e3(
-        "RECENT SHORT WAIT_MAX POLL FINAL progress describe_progress work_in_flight"
+        "RECENT SHORT POLL FINAL progress describe_progress work_in_flight"
         ),
         "progress": "permanent",  # orgmcp.progress.progress(org, task_id=None) is documented in the README
     },

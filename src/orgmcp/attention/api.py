@@ -3,6 +3,9 @@
 Root is the human's seat. Three questions about it are asked all over the system (the scheduler's exit, ``progress``, ``observe now``, the dashboard,
 the MCP ``start`` tool): *what waits for a decision* (``HumanQueue``), *can anything still move without the human* (``WaitingOnUser``) and *is there
 anything left to run at all* (``OpenWork``). All three only read.
+
+The words of a message as one line (``section`` of a body, ``summary`` of a result, ``short`` cut to ``SHORT`` characters) are the pure helpers the queue is
+made of; ``progress`` shows the same words on its task lines.
 """
 
 from __future__ import annotations
@@ -11,11 +14,17 @@ from collections.abc import Collection
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
+from ._text import SHORT, section, short, summary
+
 __all__ = [
     "HumanQueue",
     "OpenWork",
+    "SHORT",
     "Waiting",
     "WaitingOnUser",
+    "section",
+    "short",
+    "summary",
 ]
 
 
