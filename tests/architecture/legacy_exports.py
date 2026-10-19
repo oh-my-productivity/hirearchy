@@ -110,7 +110,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     ),
     "dashboard_data": _e3(
         "ERROR_WINDOW ERROR_WINDOW_TEXT LOG_LINES LOG_BYTES FEED_KEEP FEED_BACKFILL TEXT_CAP CACHE_TRUST SERVICES_TTL "
-        "HEALTH_TTL REQUESTS_TTL STATE_KINDS GLYPHS clean_text LenientOrg AgentState pause_text classify Section "
+        "HEALTH_TTL REQUESTS_TTL STATE_KINDS GLYPHS clean_text AgentState pause_text classify Section "
         "doc_text AgentRow SchedulerView Snapshot MsgRow RunLog AgentDetail RequestRow ServiceRow HealthView "
         "EventFeed DashData render_once"
     ),

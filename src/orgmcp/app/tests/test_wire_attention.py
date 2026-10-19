@@ -17,7 +17,7 @@ from orgmcp.attention._waiting import RootTaskWaitingOnUser
 from orgmcp.attention._work import RunnableOpenWork
 from orgmcp.budget import BudgetQuery
 from orgmcp.budget.testing import FixedBudget
-from orgmcp.dashboard_data import LenientOrg
+from ._lenient_org import LenientOrg
 from orgmcp.eligibility import PauseStore, RunnableQuery
 from orgmcp.eligibility.testing import MemoryPauseStore, runnable_over
 from orgmcp.kernel import ROOT, RUNTIME, Message

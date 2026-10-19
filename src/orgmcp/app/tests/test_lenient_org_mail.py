@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from orgmcp.app import Org
-from orgmcp.dashboard_data import LenientOrg
+from ._lenient_org import LenientOrg
 from orgmcp.mail._caching import DirMtimeCachingMailbox
 
 

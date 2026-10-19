@@ -881,7 +881,6 @@ def test_a_real_running_agent_is_shown_running_with_its_live_log(tmp_path, monke
         org.send(ROOT, "ceo", "second", title="Second job")  # waits behind the run
         org.delegate(ROOT, "ops", "Ops job", "g", "a", budget=2)
         org.pause("ops", "manual pause")
-        monkeypatch.setattr(dd, "scheduler_state", lambda o: SchedulerState("running", os.getpid(), "now"))
         scheduler_is(monkeypatch, SchedulerState("running", os.getpid(), "now"), org)
         time.sleep(0.3)
 

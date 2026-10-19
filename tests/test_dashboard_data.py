@@ -23,7 +23,6 @@ from orgmcp.scheduler import SchedulerState
 @pytest.fixture
 def sched_up(monkeypatch):
     up = lambda o: SchedulerState("running", 7000, "2026-10-18 10:00:00Z")  # noqa: E731
-    monkeypatch.setattr(dd, "scheduler_state", up)
     scheduler_is(monkeypatch, up(None))
 
 
@@ -35,7 +34,6 @@ def demo(tmp_path, sched_up):
 
 
 def set_scheduler(monkeypatch, state, *orgs):
-    monkeypatch.setattr(dd, "scheduler_state", lambda o: state)
     scheduler_is(monkeypatch, state, *orgs)
 
 
@@ -148,7 +146,7 @@ def test_header_scheduler_text(demo, monkeypatch):
 
 
 def test_an_unverified_scheduler_is_not_trusted(demo, monkeypatch):
-    monkeypatch.setattr(dd, "scheduler_state", lambda o: SchedulerState("unverified", 5, "x", "its command line is 'vim'"))
+    scheduler_is(monkeypatch, SchedulerState("unverified", 5, "x", "its command line is 'vim'"))
     s = dd.DashData(demo.org.root, now=lambda: DEMO_NOW).snapshot()
     assert s.scheduler.state == "unverified" and "unverified" in s.scheduler.text
     assert s.agents["ceo/analyst"].reason == "scheduler is not running"
@@ -490,7 +488,7 @@ def test_dash_on_something_that_is_not_an_org(tmp_path, capsys):
 
 @pytest.mark.skipif(os.environ.get("ORGMCP_SKIP_PERF"), reason="perf measurement skipped")
 def test_a_refresh_tick_of_50_agents_and_2000_messages(tmp_path, monkeypatch, capsys):
-    monkeypatch.setattr(dd, "scheduler_state", lambda o: SchedulerState("running", 7000, "x"))
+    scheduler_is(monkeypatch, SchedulerState("running", 7000, "x"))
     org = big_org(tmp_path, agents=50, messages=2000)
     old = time.time() - 3600  # an organization that has existed for a while: its mailboxes are not being written now
     for dirpath, dirnames, _ in os.walk(org.root):

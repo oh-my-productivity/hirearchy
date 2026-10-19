@@ -19,9 +19,9 @@ from typing import Any
 
 import pytest
 
-from orgmcp.app import Org
+from orgmcp.app import Org, wire_dashdata
 from orgmcp.kernel import OrgPaths
-from orgmcp.runs import RunLogSink, log_failed_start
+from orgmcp.runs import RunLogReader, RunLogSink, log_failed_start
 from orgmcp.runs._reader import FsRunLogReader
 from orgmcp.runs._writer import FsRunLogWriter
 from orgmcp.runs.testing import MemoryRuns
@@ -251,8 +251,7 @@ class TailSpy(FsRunLogReader):
 def test_the_dashboard_reads_the_tail_through_the_log_reader_of_the_runtime(org: Org) -> None:
     path = org.start_run_log("ceo")
     path.write_text("# run of ceo, 1 message(s)\n# senders: root\nthe output\n\n# exit 0 after 3s\n", encoding="utf-8")
-    data = dashboard_data.DashData(org.root)
     spy = TailSpy(OrgPaths(org.root))
-    data.org.runtime = dataclasses.replace(data.org.runtime, run_log_reader=spy)
+    data = wire_dashdata.dashboard_runtime(org.root, overrides={RunLogReader: spy}).agent_detail_query
     got = data.run_log("ceo", False)
     assert spy.tails == [path] and got.path == path and got.lines[-1] == "# exit 0 after 3s" and got.header[-1] == "exit 0 after 3s"
