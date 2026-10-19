@@ -1,0 +1,21 @@
+(a) FAIL messages intact: files parse, ids unique, sender and recipient copies match
+      ceo/read/broken.md: no frontmatter
+      ceo/read/renamed.md: file name differs from its id 20261018T100001000000-root-aaaa
+      ceo/eng/inflight/20261018T100002000000-root-bbbb.md: in the inflight/ of ceo/eng but addressed to ceo
+      id 20261018T100003000000-root-cccc appears 2 times among received copies (ceo/inbox, ceo/read)
+      20261018T100004000000-ceo-dddd: sent by ceo to ceo/eng but ceo/eng has no copy (recover() or a run start re-delivers it)
+      20261018T100003000000-root-cccc: in ceo/inbox from root but root has no sent copy
+      20261018T100001000000-root-aaaa: in ceo/read from root but root has no sent copy
+      20261018T100002000000-root-bbbb: in ceo/eng/inflight from root but root has no sent copy
+(b) FAIL budget conserved: handed down = held + used + returned (+ dropped at retirement)
+      handed down 11 = held 5 + used 5 live + 0 retired + returned 3 + dropped 0: 2 run(s) appeared from nowhere (difference -2)
+(c) FAIL nothing inflight without a live run
+      ceo/eng: 2 message(s) inflight for 1m40s but no live run (no scheduler is running)
+(d) FAIL runs accounted for: run.start has run.end or a live process; run logs have run.start
+      ceo@20261018T100230000000: run.start at 2026-10-18T10:02:30+00:00 has no run.end and no live process
+      ceo/eng@20261018T100310000003: run log without a run.start event (events began 2026-10-18T10:00:00+00:00)
+(e) FAIL event files have no seq gaps
+      2026-10-18/mcp-4242-1792317600001.jsonl: seq jumps from 10 to 13 (2 line(s) lost)
+(f) FAIL scheduler pid file matches a live scheduler
+      .runtime/scheduler.pid is stale: its process is gone (a scheduler start replaces it; remove it if none will start)
+FAILED: a, b, c, d, e, f

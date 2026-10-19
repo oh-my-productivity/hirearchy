@@ -10,7 +10,8 @@ from pathlib import Path
 
 ORGMCP = Path(__file__).resolve().parents[2]
 OWN = "orgmcp.observability"
-ALLOWED = (OWN, "orgmcp.kernel", "orgmcp.agents", "orgmcp.eventlog", "orgmcp.runs", "orgmcp.mail")
+ALLOWED = (OWN, "orgmcp.kernel", "orgmcp.agents", "orgmcp.eventlog", "orgmcp.processes", "orgmcp.runs", "orgmcp.settings", "orgmcp.mail", "orgmcp.budget",
+           "orgmcp.eligibility", "orgmcp.attention", "orgmcp.daemon")  # ARCHITECTURE.md 4
 TESTS_ALSO = ("orgmcp.traces",)  # the parity test asks the stamper of the runtime what it would have stamped (test_trace_parity)
 
 
@@ -52,7 +53,7 @@ def test_the_package_imports_only_itself_and_the_packages_it_may_depend_on() -> 
         bad = foreign(mods, ALLOWED + TESTS_ALSO if "tests" in path.relative_to(ORGMCP / "observability").parts else ALLOWED)
         if bad:
             offenders[str(path.relative_to(ORGMCP))] = bad
-    assert not offenders, f"observability may import only the kernel, agents, eventlog, runs and mail (its tests also traces): {offenders}"
+    assert not offenders, f"observability may import only what ARCHITECTURE.md 4 lists (its tests also traces): {offenders}"
 
 
 def test_no_private_module_of_another_package_is_imported() -> None:

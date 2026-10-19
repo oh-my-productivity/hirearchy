@@ -32,6 +32,7 @@ from .api import (
     MessageFile,
     MessageIndex,
     MessageParser,
+    MetaRead,
     TaskQuery,
 )
 
@@ -190,6 +191,9 @@ class MemoryMailbox(DerivedMailboxReads, MailboxWriter, BatchStore, MailFingerpr
                     meta, error = describe(self.agents.files[key])
                     out.append(MessageFile(self.agents.root / key, owner, box, meta, error, str((meta or {}).get("id") or n.removesuffix(".md")), 1.0))
         return out
+
+    def meta_of(self, path: Path) -> MetaRead:
+        raise NotImplementedError("red: C-obs-2")
 
 
 # ------------------------------------------------------------------------------ harnesses and the registry
