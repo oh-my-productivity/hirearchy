@@ -21,8 +21,9 @@ sys.path.insert(0, str(HERE.parents[1] / "tests"))
 
 from dash_fixtures import DEMO_NOW, demo_org  # noqa: E402
 
+from testkit.scheduler import scheduler_is  # noqa: E402
+
 from orgmcp import dashboard_data as dd  # noqa: E402
-from orgmcp import observe  # noqa: E402
 from orgmcp.dashboard import DashApp  # noqa: E402
 from orgmcp.scheduler import SchedulerState  # noqa: E402
 
@@ -40,9 +41,12 @@ def save(app: DashApp, name: str) -> None:
 
 
 async def main() -> None:
-    up = lambda org: SchedulerState("running", 7000, "2026-10-18 10:00:00Z")  # noqa: E731 - the demo has no real scheduler
-    dd.scheduler_state = up
-    observe.scheduler_state = up
+    class Patch:  # the one thing scheduler_is asks of a monkeypatch; the script ends with the process, nothing is undone
+        @staticmethod
+        def setattr(target: object, name: str, value: object) -> None:
+            setattr(target, name, value)
+
+    scheduler_is(Patch(), SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))  # type: ignore[arg-type]  # the demo has no real scheduler
     ns = demo_org(Path(tempfile.mkdtemp(prefix="dash-demo-")))
     once = dd.render_once(dd.DashData(ns.org.root, now=lambda: DEMO_NOW)).replace(str(ns.org.root), "/path/to/acme")
     (HERE / "once.txt").write_text(once + "\n", encoding="utf-8")

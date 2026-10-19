@@ -1,0 +1,61 @@
+orgmcp dash - big (<ROOT>)  2026-10-18 10:06:40Z
+scheduler running pid 7000 | running 2/4 · queued 43 · waiting on you 0 · errors 15m 0
+
+AGENTS
+★ root (you)
+  ! lead0 [Lead]  out of budget, 12 unread  budget -100  claude-sonnet-5.5
+    ▶ w0 [Worker]  running 6m20s  budget 21  claude-sonnet-5.5
+    ◔ w10 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+    ◔ w15 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+    ◔ w20 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+    ◔ w25 [Worker]  queued: starts on the next tick, 2 unread  budget 22  claude-sonnet-5.5
+    ◔ w30 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w35 [Worker]  queued: starts on the next tick, 2 unread  budget 22  claude-sonnet-5.5
+    ◔ w40 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w5 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+  ! lead1 [Lead]  out of budget, 12 unread  budget -100  claude-sonnet-5.5
+    ▶ w1 [Worker]  running 6m20s  budget 19  claude-sonnet-5.5
+    ◔ w11 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+    ◔ w16 [Worker]  queued: starts on the next tick, 1 unread  budget 21  claude-sonnet-5.5
+    ◔ w21 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+    ◔ w26 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w31 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w36 [Worker]  queued: starts on the next tick, 2 unread  budget 22  claude-sonnet-5.5
+    ◔ w41 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w6 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+  ! lead2 [Lead]  out of budget, 12 unread  budget -100  claude-sonnet-5.5
+    ◔ w12 [Worker]  queued: starts on the next tick, 2 unread  budget 21  claude-sonnet-5.5
+    ◔ w17 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+    ◔ w2 [Worker]  queued: starts on the next tick, 2 unread  budget 19  claude-sonnet-5.5
+    ◔ w22 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w27 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w32 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w37 [Worker]  queued: starts on the next tick, 2 unread  budget 22  claude-sonnet-5.5
+    ◔ w42 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w7 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+  ! lead3 [Lead]  out of budget, 11 unread  budget -100  claude-sonnet-5.5
+    ◔ w13 [Worker]  queued: starts on the next tick, 2 unread  budget 19  claude-sonnet-5.5
+    ◔ w18 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+    ◔ w23 [Worker]  queued: starts on the next tick, 2 unread  budget 22  claude-sonnet-5.5
+    ◔ w28 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w3 [Worker]  queued: starts on the next tick, 2 unread  budget 19  claude-sonnet-5.5
+    ◔ w33 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w38 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w43 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w8 [Worker]  queued: starts on the next tick, 1 unread  budget 21  claude-sonnet-5.5
+  ! lead4 [Lead]  out of budget, 12 unread  budget -100  claude-sonnet-5.5
+    ◔ w14 [Worker]  queued: starts on the next tick, 2 unread  budget 19  claude-sonnet-5.5
+    ◔ w19 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+    ◔ w24 [Worker]  queued: starts on the next tick, 2 unread  budget 22  claude-sonnet-5.5
+    ◔ w29 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w34 [Worker]  queued: starts on the next tick, 2 unread  budget 22  claude-sonnet-5.5
+    ◔ w39 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w4 [Worker]  queued: starts on the next tick, 1 unread  budget 21  claude-sonnet-5.5
+    ◔ w44 [Worker]  queued: starts on the next tick, 1 unread  budget 22  claude-sonnet-5.5
+    ◔ w9 [Worker]  queued: starts on the next tick, 1 unread  budget 19  claude-sonnet-5.5
+
+REQUESTS
+  none
+
+SERVICES
+  none
