@@ -13,8 +13,6 @@ import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
-import orgmcp
-
 from ..access import AccessScopes, ModelResolver
 from ..agents import CharterReader
 from ..kernel import AtomicWriter, Environment, OrgLayout, OrgPaths, Provider
@@ -32,10 +30,13 @@ KIRO_BIN = "kiro-cli"  # the binary of the runtime's run command builder (``orgm
 
 
 def package_dir() -> Path:
-    """The directory of the ``orgmcp`` package (not the directory of the file that holds the code): the one entry of its ``__path__``, which
-    is ``Path(orgmcp.__file__).parent`` for a regular package, and also exists for the bare package object that stands in for it when a module is
-    imported first (``test_import_order``), where there is no ``__file__`` and no spec."""
-    return Path(next(iter(orgmcp.__path__))).resolve()
+    """The directory of the ``orgmcp`` package, from the location of this module (``orgmcp/app/wire_kiro.py``: two levels up).
+
+    It is not read from the ``orgmcp`` package object (``import orgmcp`` runs the package ``__init__``, which imports the CLI and so
+    every entry point, and ``scheduler`` evaluates ``PROJECT_DIR`` at import time: the library would import the entry points). This module
+    sits in a fixed place of the package in a checkout and in a wheel alike, and ``test_kiro_packaged_paths`` pins the result to
+    ``Path(orgmcp.__file__).parent`` so that moving this file cannot go unnoticed."""
+    return Path(__file__).resolve().parent.parent
 
 
 def project_dir_of(package: Path) -> Path:

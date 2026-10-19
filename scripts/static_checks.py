@@ -10,7 +10,8 @@
   (b) the packages listed in ``[tool.mypy] packages`` of pyproject.toml (for a flat legacy module that is made strict early). With
   neither there is nothing to check and the run only proves that mypy works.
 * import-linter checks the contracts generated from the packages that exist (``python -m tests.architecture.lint``: layers, private
-  modules, kernel independence, ...) and the hand-written ``[[tool.importlinter.contracts]]`` of pyproject.toml.
+  modules, kernel independence, ...) and the hand-written ``[[tool.importlinter.contracts]]`` of pyproject.toml. ``lint-imports`` always runs with
+  ``--no-cache`` (tests/architecture/lint.py): the cached graph is keyed by mtimes and can say "kept" for a tree that breaks a contract.
 
 Exit status: 0 when everything that ran passed, 1 otherwise, 2 when a tool is not installed.
 """
