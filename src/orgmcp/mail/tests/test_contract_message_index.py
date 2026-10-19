@@ -123,10 +123,6 @@ def test_a_changed_file_is_read_again(h: MailHarness) -> None:
 
 # ------------------------------------------------------------------------------ meta_of: the front matter of one file (C-obs-2)
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-obs-2")
-
-
-@RED
 def test_the_front_matter_of_one_file_is_what_the_scan_found(h: MailHarness) -> None:
     put(h, "ceo", "inbox", 1, title="Hello", budget=2)
     put(h, "ceo", "sent", 2, sender="ceo", to="root")
@@ -135,7 +131,6 @@ def test_the_front_matter_of_one_file_is_what_the_scan_found(h: MailHarness) -> 
         assert (meta, error, mtime) == (f.meta, f.error, f.mtime)
 
 
-@RED
 def test_a_file_that_cannot_be_used_has_its_finding_and_its_front_matter_if_any(h: MailHarness) -> None:
     h.put(f"ceo/inbox/{mid(1)}.md", "---\nfrom: root\nto: ceo\ntype: task\nbudget: lots\n---\nx\n")
     h.put(f"ceo/inbox/{mid(2)}.md", "---\nfrom: [unclosed\n---\nx\n")
@@ -145,15 +140,13 @@ def test_a_file_that_cannot_be_used_has_its_finding_and_its_front_matter_if_any(
     assert h.index.meta_of(two)[:2] == (None, "frontmatter does not parse (ParserError)")
 
 
-@RED
 def test_a_file_that_is_not_there_is_unreadable(h: MailHarness) -> None:
     assert h.index.meta_of(h.path_of(where("ceo", "inbox", mid(9)))) == (None, "unreadable (FileNotFoundError)", 0.0)
 
 
-@RED
 def test_a_changed_file_is_read_again_by_meta_of(h: MailHarness) -> None:
     put(h, "ceo", "inbox", 1)
     path = h.path_of(where("ceo", "inbox", mid(1)))
     assert h.index.meta_of(path)[1] is None
     h.put(f"ceo/inbox/{mid(1)}.md", "no front matter any more, and a different size\n")
-    assert h.index.meta_of(path)[:2] == (None, "no frontmatter")
+    assert h.index.meta_of(path)[:2] == ({}, "no frontmatter")  # what the scan reads of such a file (the RED test said None: wrong)

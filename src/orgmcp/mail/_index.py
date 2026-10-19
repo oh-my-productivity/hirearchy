@@ -100,4 +100,4 @@ class FsMessageIndex(MessageIndex):
         return out
 
     def meta_of(self, path: Path) -> MetaRead:
-        raise NotImplementedError("red: C-obs-2")
+        return self._meta.read(path)

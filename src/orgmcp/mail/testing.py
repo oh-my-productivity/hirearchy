@@ -193,7 +193,14 @@ class MemoryMailbox(DerivedMailboxReads, MailboxWriter, BatchStore, MailFingerpr
         return out
 
     def meta_of(self, path: Path) -> MetaRead:
-        raise NotImplementedError("red: C-obs-2")
+        try:
+            key = path.relative_to(self.agents.root).as_posix()
+        except ValueError:
+            return None, "unreadable (FileNotFoundError)", 0.0
+        if key not in self.agents.files:
+            return None, "unreadable (FileNotFoundError)", 0.0
+        meta, error = describe(self.agents.files[key])
+        return meta, error, 1.0
 
 
 # ------------------------------------------------------------------------------ harnesses and the registry
