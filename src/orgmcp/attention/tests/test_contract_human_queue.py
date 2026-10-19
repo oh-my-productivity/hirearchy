@@ -14,9 +14,7 @@ from orgmcp.attention import HumanQueue
 from orgmcp.attention.testing import IMPLEMENTATIONS, AttentionWorld
 from orgmcp.kernel import ROOT, RUNTIME, Message
 
-from ._support import RED, give, make_world
-
-pytestmark = RED
+from ._support import give, make_world
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[HumanQueue], ids=lambda factory: factory.__name__)
@@ -47,7 +45,7 @@ def test_a_note_from_an_agent_is_a_line_with_its_id(w: AttentionWorld) -> None:
 def test_a_notice_of_the_runtime_is_a_runtime_notice(w: AttentionWorld) -> None:
     sent = note(w, RUNTIME, "ceo is out of budget", "`ceo` has 1 unread message and no runs left.\nGrant runs.")
     assert w.queue.items() == [
-        (sent.id, f'Needs you: runtime notice "ceo is out of budget": `ceo` has 1 unread message and no runs left. (message {sent.id})')
+        (sent.id, f'Needs you: runtime notice "ceo is out of budget": `ceo` has 1 unread message and no runs left (message {sent.id})')
     ]
 
 

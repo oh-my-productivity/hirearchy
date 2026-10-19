@@ -6,10 +6,8 @@ import pytest
 
 from orgmcp.attention._waiting import names
 
-from ._support import RED
 
 
-@RED
 @pytest.mark.parametrize(
     ("addrs", "expected"),
     [

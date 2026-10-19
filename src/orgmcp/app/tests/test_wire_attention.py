@@ -27,7 +27,6 @@ from orgmcp.mail.testing import MemoryMailbox
 from orgmcp.stalls import NudgeLedger
 from orgmcp.stalls.testing import MemoryNudges
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-attention")
 CHARTER = "---\nrole: R\n---\nx\n"
 
 
@@ -58,7 +57,6 @@ def test_every_runtime_has_its_own_ports(tmp_path: Path) -> None:
     assert wiring.open_runtime(tmp_path).human_queue is not wiring.open_runtime(tmp_path).human_queue
 
 
-@RED
 def test_every_collaborator_of_the_decision_comes_from_the_runtime(tmp_path: Path) -> None:
     """The whole decision over fakes: nothing of the organization directory is read or written."""
     box, events = MemoryMailbox(), ListEventSink()
@@ -99,7 +97,6 @@ def test_the_legacy_objects_are_the_classes_of_the_package(org: Org) -> None:
     assert isinstance(wire_attention.open_work_of(org.runtime), RunnableOpenWork)
 
 
-@RED
 def test_the_legacy_queue_reads_the_mailboxes_of_the_runtime_in_force(org: Org) -> None:
     org.send("ceo", ROOT, "kept apart", title="hello")
     other = MemoryMailbox()
@@ -110,7 +107,6 @@ def test_the_legacy_queue_reads_the_mailboxes_of_the_runtime_in_force(org: Org) 
     ]
 
 
-@RED
 def test_the_legacy_queue_of_a_lenient_org_skips_what_it_cannot_read(org: Org) -> None:
     good = org.send("ceo", ROOT, "I need 2 more runs", title="Budget request")
     (org.root / "inbox" / "20260101T000000000000-ceo-bad0.md").write_text("---\nfrom: [oops\n---\nx\n", encoding="utf-8")

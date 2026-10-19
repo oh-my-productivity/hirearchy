@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from ..eligibility import RunnableQuery
+from ..kernel import ROOT
 from ..mail import TaskQuery
 from .api import OpenWork
 
@@ -13,4 +14,4 @@ class RunnableOpenWork(OpenWork):
         self._runnable = runnable
 
     def nothing_to_do(self) -> bool:
-        raise NotImplementedError("red: C-attention")
+        return not self._tasks.outstanding(ROOT) and not self._runnable.runnable()

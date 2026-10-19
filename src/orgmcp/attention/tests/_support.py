@@ -12,9 +12,6 @@ from orgmcp.attention.testing import AttentionWorld
 from orgmcp.kernel import ROOT, Message
 
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-attention")
-
-
 def make_world(request: pytest.FixtureRequest, tmp_path: Path) -> AttentionWorld:
     """The fixture body of a contract suite: the world of one implementation."""
     return cast(Callable[[Path], AttentionWorld], request.param)(tmp_path)

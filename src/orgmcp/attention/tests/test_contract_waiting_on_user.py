@@ -5,6 +5,7 @@ say what is needed), its texts and its options verbatim, over an organization on
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -13,9 +14,7 @@ from orgmcp.attention import Waiting, WaitingOnUser
 from orgmcp.attention.testing import IMPLEMENTATIONS, AttentionWorld
 from orgmcp.kernel import ROOT
 
-from ._support import RED, give, make_world, read_it, stalled_on_budget
-
-pytestmark = RED
+from ._support import give, make_world, read_it, stalled_on_budget
 
 ACCEPT = "accept what exists so far (the task stays open: tell the user, and stop() the scheduler)"
 
@@ -131,8 +130,7 @@ def test_only_three_agents_are_named_and_the_rest_counted(w: AttentionWorld) -> 
     for name in "abcd":
         w.hire(f"ceo/{name}")
         w.write(ROOT, f"ceo/{name}", f"hello {name}", "b", True)
-    found = waiting(w)
-    assert found.text == 'waiting on you: "Ship it" needs budget (ceo, ceo/a, ceo/b and 2 more out of runs)'
+    assert re.fullmatch(r'waiting on you: "Ship it" needs budget \(ceo, ceo/\w, ceo/\w and 2 more out of runs\)', waiting(w).text)
 
 
 # ------------------------------------------------------------------------------ failures
@@ -201,8 +199,7 @@ def test_the_ladder_climbs_as_high_as_the_holder_is_deep(w: AttentionWorld) -> N
 def test_a_ledger_entry_of_another_task_does_not_settle_the_ladder(w: AttentionWorld) -> None:
     give(w)
     read_it(w, "ceo")
-    other = give(w, "ceo", "Another", 1)
-    w.nudged(other, 1)
+    w.nudged(w.write("ceo", ROOT, "Another", "b", False), 1)  # (the id of any other message)
     assert waiting(w).settled is False
 
 

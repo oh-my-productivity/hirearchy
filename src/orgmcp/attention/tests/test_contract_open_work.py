@@ -13,9 +13,7 @@ from orgmcp.attention import OpenWork
 from orgmcp.attention.testing import IMPLEMENTATIONS, AttentionWorld
 from orgmcp.kernel import ROOT
 
-from ._support import RED, give, make_world, read_it, stalled_on_budget
-
-pytestmark = RED
+from ._support import give, make_world, read_it, stalled_on_budget
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[OpenWork], ids=lambda factory: factory.__name__)
