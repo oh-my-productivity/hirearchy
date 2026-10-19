@@ -2,9 +2,9 @@
 
 The module ``blueprint.py`` became this package in place (ARCHITECTURE.md 1.3 decision 2): ``api`` is the public surface; the old function and
 constant names are still exported (``LEGACY_EXPORTS`` in ``tests/architecture/legacy_exports.py``) by the private ``_legacy`` module until step E3
-removes them. The first part of the old module (the role library, loading, the agents, the rules of ``validate``, the access report, the budget
-estimate) is classes behind the interfaces of ``api`` (step C-blueprint-1); ``_legacy`` keeps what step C-blueprint-2 moves next: the charters, the
-plan and its identity, ``apply``, and the budget split.
+removes them. Everything the old module did is classes behind the interfaces of ``api`` now (steps C-blueprint-1: the role library, loading, the
+agents, ``validate`` and its rules, the access report, the budget estimate; C-blueprint-2: the charters, the plan and its identity, ``apply`` and the
+examples); ``_legacy`` holds the old names as adapters over them.
 """
 
 from . import _access as _access_module  # noqa: F401 - loaded first: the legacy FUNCTION ``_access`` below must not be replaced by its module's name
@@ -30,7 +30,6 @@ from ._legacy import (
     SHOWN_SERVICE_CRITERIA,
     SHOWN_WARNINGS,
     SLACK,
-    Summary,
     TASK_KEYS,
     TIGHT,
     TOOL_WORDS,
@@ -88,7 +87,6 @@ __all__ = [
     "SHOWN_SERVICE_CRITERIA",
     "SHOWN_WARNINGS",
     "SLACK",
-    "Summary",
     "TASK_KEYS",
     "TIGHT",
     "TOOL_WORDS",

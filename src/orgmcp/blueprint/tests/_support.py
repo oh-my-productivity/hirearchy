@@ -11,7 +11,7 @@ from _pytest.mark import ParameterSet
 
 from orgmcp.blueprint.api import Role
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-blueprint-1")
+RED = pytest.mark.xfail(strict=True, reason="red: C-blueprint-2")
 PENDING: set[str] = set()  # contract-suite implementations that are not green yet (expected to fail)
 T = TypeVar("T")
 

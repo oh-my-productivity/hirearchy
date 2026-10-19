@@ -6,7 +6,12 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Protocol
 
+from ..agents import AgentDirectory
+from ..dispatch import TaskAssigner
+from ..hierarchy import Hiring, Retirement
 from ..kernel import ROOT, JsonObject
+from ..services import ServiceCommands
+from ..snapshots import OrgSnapshotter
 from ._protocols import OrgContext
 
 
@@ -24,6 +29,35 @@ class OrgFacts(Protocol):
     def children(self, addr: str) -> list[str]: ...
 
     def service_names(self, addr: str) -> list[str]: ...
+
+
+class OrgPorts(Protocol):
+    """The ports of the runtime that an application builds with."""
+
+    @property
+    def hiring(self) -> Hiring: ...
+
+    @property
+    def retirement(self) -> Retirement: ...
+
+    @property
+    def agents(self) -> AgentDirectory: ...
+
+    @property
+    def service_commands(self) -> ServiceCommands: ...
+
+    @property
+    def task_assigner(self) -> TaskAssigner: ...
+
+    @property
+    def snapshotter(self) -> OrgSnapshotter: ...
+
+
+class OrgWithPorts(OrgFacts, Protocol):
+    """An ``Org`` that can be applied to: it has the ports of its runtime."""
+
+    @property
+    def runtime(self) -> OrgPorts: ...
 
 
 class HostOrgContext(OrgContext):

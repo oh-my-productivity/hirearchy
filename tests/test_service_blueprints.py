@@ -9,8 +9,11 @@ import yaml
 
 from orgmcp import blueprint as bpm
 from orgmcp import services as services_mod
+from orgmcp.app import wiring
+from orgmcp.blueprint.testing import FlakyServiceCommands
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Org, OrgError
+from orgmcp.services import ServiceCommands
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 RESEARCH = ROOT_DIR / "examples" / "blueprint-research.yaml"
@@ -496,10 +499,8 @@ def test_apply_two_services_and_the_default_budget(svc_bp, roots, empty_org):
     assert "Request budget: 19 runs" in digest and "you (lead): keep 9 runs" in digest
 
 
-def test_apply_rolls_back_agents_when_a_service_cannot_be_defined(svc_bp, roots, empty_org, monkeypatch):
-    def boom(*a, **k):
-        raise OrgError("disk full")
-    monkeypatch.setattr(Org, "define_service", boom)
+def test_apply_rolls_back_agents_when_a_service_cannot_be_defined(svc_bp, roots, empty_org):
+    empty_org.runtime = wiring.open_runtime(empty_org.root, {ServiceCommands: FlakyServiceCommands(empty_org.runtime.service_commands, fail_define_on=1)})
     with pytest.raises(OrgError, match="disk full"):
         bpm.apply(empty_org, svc_bp, allowed_roots=roots)
     assert empty_org.agents() == []  # the hires were undone
