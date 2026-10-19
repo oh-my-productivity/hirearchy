@@ -37,7 +37,7 @@ exclude = ["**/tests/**"]
 [tool.pytest.ini_options]
 # Tests live in tests/ (cross-feature, end-to-end, golden) and next to the code in src/orgmcp/**/tests/ (see README, "Test").
 # The shared fixtures and hooks are in the root conftest.py, so they reach both places; tests/ is on sys.path so tests can
-# import the helper modules that live there (fake_agent, kiro_sandbox, dash_fixtures, ...).
+# import the shared helpers (`import testkit`: fixtures, the stand-in agents fake_agent / fake_team_agent, kiro_sandbox, dash_fixtures, ...).
 testpaths = ["tests", "src/orgmcp"]
 pythonpath = ["tests"]
 markers = [

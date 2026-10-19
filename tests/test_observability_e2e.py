@@ -18,6 +18,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import testkit
 from testkit.scheduler import scheduler_is
 
 from orgmcp import observe, telemetry
@@ -27,7 +28,7 @@ from orgmcp.progress import progress
 from orgmcp.scheduler import Scheduler, SchedulerState
 from orgmcp.server import build_server
 
-FAKE = str(Path(__file__).with_name("fake_agent.py"))
+FAKE = str(testkit.FAKE_AGENT)
 REFUSAL = "status must be one of ('done', 'failed', 'blocked')"
 
 

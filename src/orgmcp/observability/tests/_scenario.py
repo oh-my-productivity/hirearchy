@@ -1,4 +1,4 @@
-"""Organizations with a request in them, built by the legacy ``Org`` with the story and the writers of ``tests/obs_fixtures.py``.
+"""Organizations with a request in them, built by the legacy ``Org`` with the story and the writers of ``tests/testkit/obs_fixtures.py``.
 
 The expected files in ``expected/`` were captured from the module ``observe.py`` (the code before the package existed) on exactly these
 organizations, so the tests that compare them prove the move changed no key, no number and no character. ``orgmcp.core`` and ``obs_fixtures``
@@ -44,8 +44,8 @@ class CountingSecrets:
 
 
 def fixtures() -> ModuleType:
-    """``tests/obs_fixtures.py``: the clock, the event-file writer and the story."""
-    return importlib.import_module("obs_fixtures")
+    """``tests/testkit/obs_fixtures.py``: the clock, the event-file writer and the story."""
+    return importlib.import_module("testkit.obs_fixtures")
 
 
 def install(monkeypatch: Any) -> Any:

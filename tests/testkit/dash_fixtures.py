@@ -14,7 +14,8 @@ from datetime import timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
-from obs_fixtures import T0, Clock, EventLog, stamp
+from .obs_fixtures import T0, Clock, EventLog, stamp
+from .scheduler import scheduler_is
 
 from orgmcp.core import ROOT, Message, Org, atomic_write
 
@@ -302,3 +303,17 @@ def write_running_json(org: Org, addr: str, seconds_ago: float = 72.0, import_ti
         "pgid": 999_999, "lstart": "x", "started": (import_time or time.time()) - seconds_ago, "scheduler": 7000,
         "log": str(log.relative_to(org.root))}})
     return log
+
+
+def set_scheduler(monkeypatch, state, *orgs):
+    scheduler_is(monkeypatch, state, *orgs)
+
+
+def snapshot_files(root: Path) -> dict:
+    out = {}
+    for dirpath, dirnames, filenames in os.walk(root):
+        for n in filenames + dirnames:
+            p = Path(dirpath) / n
+            st = p.lstat()
+            out[str(p)] = (st.st_mtime_ns, st.st_size)
+    return out

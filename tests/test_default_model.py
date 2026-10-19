@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 
 import pytest
+import testkit
 import yaml
 
 from orgmcp import blueprint as bpm
@@ -17,7 +18,7 @@ from orgmcp.cli import main
 from orgmcp.core import DEFAULT_CONFIG, DEFAULT_MODEL, ROOT, Org
 from orgmcp.scheduler import Scheduler, kiro_runner
 
-FAKE = str(Path(__file__).with_name("fake_agent.py"))
+FAKE = str(testkit.FAKE_AGENT)
 EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
 CHARTER = "---\nrole: CEO\n{model}tools: [read]\n---\nLead.\n"
 

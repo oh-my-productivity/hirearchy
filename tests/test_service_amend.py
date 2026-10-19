@@ -6,7 +6,7 @@ from orgmcp import services
 from orgmcp.core import ROOT, OrgError, split_frontmatter
 from orgmcp.server import build_server
 
-from test_services import BRIEF, call, cli, contract_meta, define, fails, playbook_meta  # noqa: F401  (org fixture: conftest)
+from testkit.services_world import BRIEF, call, cli, contract_meta, define, fails, playbook_meta  # noqa: F401
 
 
 def amend(org, **kw):

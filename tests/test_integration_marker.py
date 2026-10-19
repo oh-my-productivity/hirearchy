@@ -4,7 +4,7 @@
 * tests marked ``integration`` (or living in ``tests/integration/``) are skipped unless asked for, and when asked for
   they get the real ``$HOME`` / ``PATH`` (no stub). Checked in a nested pytest run on a throwaway project that reuses
   the root ``conftest.py``, so nothing here can start a real kiro.
-* the safety harness (``tests/kiro_sandbox.py``) deletes only the sandbox's own profiles and detects ~/.kiro changes.
+* the safety harness (``tests/testkit/kiro_sandbox.py``) deletes only the sandbox's own profiles and detects ~/.kiro changes.
 """
 
 import json
@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-import kiro_sandbox
+from testkit import kiro_sandbox
 from orgmcp import scheduler
 
 HERE = Path(__file__).parent

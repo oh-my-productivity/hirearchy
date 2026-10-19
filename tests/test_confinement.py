@@ -433,7 +433,7 @@ def test_agent_inputs_must_be_inside_its_managers(bp, tmp_path, dirs):
 
 
 def test_a_code_reviewer_works_in_the_project_workspace_without_write(tmp_path, dirs):
-    from test_blueprint import code_bp  # same code blueprint the other tests use
+    from testkit.blueprints import code_bp  # same code blueprint the other tests use
     agents = {a.addr: a for a in bpm._resolve(code_bp(tmp_path), None, [tmp_path], [])}
     ws = str((tmp_path / "proj").resolve())
     # the code-reviewer template holds `shell` (it runs the tests), so like the engineer it needs the workspace; it has
@@ -445,7 +445,7 @@ def test_a_code_reviewer_works_in_the_project_workspace_without_write(tmp_path, 
 
 
 def test_a_reader_without_shell_sees_the_project_read_only(tmp_path, dirs):
-    from test_blueprint import code_bp
+    from testkit.blueprints import code_bp
     b = code_bp(tmp_path)
     b["agents"][0]["children"][2] = {"name": "cr", "template": "reviewer", "tools": ["read"]}
     agents = {a.addr: a for a in bpm._resolve(b, None, [tmp_path], [])}
@@ -465,7 +465,7 @@ def test_warning_for_built_in_write_on_a_non_code_goal(bp, tmp_path, dirs):
 
 
 def test_warning_when_shell_is_granted(tmp_path):
-    from test_blueprint import code_bp
+    from testkit.blueprints import code_bp
     issues = bpm.validate(code_bp(tmp_path), allowed_roots=[tmp_path])
     warn = next(i for i in issues if i.code == "shell-unconfined")
     assert warn.level == "warning" and "lead/dev" in warn.message and "instructed in the charter and prompt, not enforced" in warn.message
@@ -482,7 +482,7 @@ def test_apply_writes_inputs_into_charters_and_confines_readers(bp, tmp_path, di
 
 
 def test_apply_confines_a_reader_to_the_authors_workspace_read_only(tmp_path):
-    from test_blueprint import code_bp
+    from testkit.blueprints import code_bp
     o = Org.init(tmp_path / "org", "x", {"poll_seconds": 0.05})
     b = code_bp(tmp_path)
     b["needs"].pop("workspace")
@@ -504,7 +504,7 @@ def test_plan_shows_an_access_line_per_agent(bp, tmp_path, dirs):
 
 
 def test_charter_states_inputs_and_the_shell_rule(tmp_path):
-    from test_blueprint import code_bp
+    from testkit.blueprints import code_bp
     o = Org.init(tmp_path / "org", "x", {"poll_seconds": 0.05})
     b = code_bp(tmp_path)
     hb = tmp_path / "docs"

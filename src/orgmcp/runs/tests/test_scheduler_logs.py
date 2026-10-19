@@ -1,7 +1,7 @@
 """Format golden: the logs the scheduler writes (with a stand-in agent) are exactly what the package reads.
 
 The scheduler and the readers of the logs were written apart and agree on a text format (header, closing lines). These tests run the
-real ``Scheduler`` with ``tests/fake_agent.py`` through every way a run can end, and pin both sides: the text of the log (written before
+real ``Scheduler`` with ``tests/testkit/fake_agent.py`` through every way a run can end, and pin both sides: the text of the log (written before
 the scheduler used the package, and unchanged since) and what ``RunLogReader`` makes of it.
 """
 
@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import testkit
 
 from orgmcp.kernel import OrgPaths, stamp_of
 from orgmcp.runs import RunOutcomes
@@ -24,7 +25,7 @@ from orgmcp.runs._reader import FsRunLogReader
 
 from ._legacy import legacy
 
-FAKE = str(Path(__file__).resolve().parents[4] / "tests" / "fake_agent.py")
+FAKE = str(testkit.FAKE_AGENT)
 MISSING = "/nonexistent/orgmcp-binary"
 HEADER = re.compile(
     r"\A# run of ceo, (?P<messages>\d+) message\(s\)\n# senders: (?P<senders>[^\n]*)\n# cwd: (?P<cwd>[^\n]+)\n"

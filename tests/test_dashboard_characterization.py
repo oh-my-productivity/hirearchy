@@ -1,7 +1,7 @@
 """The dashboard tick is cheap because of its caches, and the dashboard is read-only: both pinned by counts and by bytes, not by clocks.
 
 * ``render_once`` of the demo and of the big organization is byte-equal to what ``dashboard_data.py`` printed before it became ``dashdata``
-  (``tests/expected_dash/*.txt``, made from the legacy module on the same fixtures; the root path is replaced by ``<ROOT>``).
+  (``tests/testkit/expected_dash/*.txt``, made from the legacy module on the same fixtures; the root path is replaced by ``<ROOT>``).
 * A second ``snapshot()`` reads no message file, and the directory of a mailbox is looked at (``stat``) at most once per tick.
 * Every query, run over a writer and an event sink that raise, writes nothing: not a byte, not a modification time, not a new file.
 * The data of a dashboard is not thread-safe and the app serialises its refreshes: that rule is written down, and a refresh from a worker thread
@@ -22,8 +22,9 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from dash_fixtures import DEMO_NOW, big_org, demo_org
-from obs_fixtures import T0
+import testkit
+from testkit.dash_fixtures import DEMO_NOW, big_org, demo_org
+from testkit.obs_fixtures import T0
 from testkit.scheduler import scheduler_is
 
 from orgmcp import dashboard_data as dd
@@ -33,7 +34,7 @@ from orgmcp.daemon import SchedulerState
 from orgmcp.kernel import BOXES, AtomicWriter, EventSink
 from orgmcp.mail import MessageParser
 
-EXPECTED = Path(__file__).parent / "expected_dash"
+EXPECTED = testkit.EXPECTED_DASH
 BIG_NOW = T0 + timedelta(seconds=400)
 
 

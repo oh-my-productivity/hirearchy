@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 
 import pytest
+import testkit
 import yaml
 
 from orgmcp import blueprint as bp_mod
@@ -25,7 +26,7 @@ from orgmcp.scheduler import EXIT_FILE, Scheduler, describe_scheduler, nothing_t
 from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
 from orgmcp.skill import skill_source
 
-FAKE = str(Path(__file__).with_name("fake_agent.py"))
+FAKE = str(testkit.FAKE_AGENT)
 ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}  # shell-unconfined: the code example grants shell
 
 

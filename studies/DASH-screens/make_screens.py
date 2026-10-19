@@ -3,7 +3,7 @@
     cd <repo> && uv run python studies/DASH-screens/make_screens.py
 
 Writes one SVG per screen into this directory (and a PNG next to it when ``rsvg-convert`` is on PATH), plus
-``once.txt`` (the output of ``orgmcp dash --once``). The demo org is built under ``$TMPDIR`` by ``tests/dash_fixtures.py``
+``once.txt`` (the output of ``orgmcp dash --once``). The demo org is built under ``$TMPDIR`` by ``tests/testkit/dash_fixtures.py``
 with a frozen clock, so the pictures are the same every time.
 """
 
@@ -19,8 +19,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[1] / "tests"))
 
-from dash_fixtures import DEMO_NOW, demo_org  # noqa: E402
-
+from testkit.dash_fixtures import DEMO_NOW, demo_org  # noqa: E402
 from testkit.scheduler import scheduler_is  # noqa: E402
 
 from orgmcp import dashboard_data as dd  # noqa: E402

@@ -14,6 +14,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
+import testkit
 
 from orgmcp import telemetry
 from orgmcp.cli import main
@@ -27,7 +28,7 @@ from orgmcp.stalls import StallLadder
 from orgmcp.server import build_server
 from orgmcp.telemetry._sink import FsEventSink
 
-FAKE = str(Path(__file__).with_name("fake_agent.py"))
+FAKE = str(testkit.FAKE_AGENT)
 SILENT = {"echo": lambda _: None}
 
 

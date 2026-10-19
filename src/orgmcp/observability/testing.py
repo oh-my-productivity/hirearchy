@@ -5,7 +5,7 @@ when its test is not about what the files say: they answer what they were told t
 
 ``disk_world`` and ``memory_world`` are the real queries over event files, messages, run logs and agents on disk and in memory. The world is a
 bundle of the three ports and of the means to put a story where they look: an agent, a message (both copies), a run log, an event line. Time is
-``stamp(seconds)`` after the origin of the clock, the way ``tests/obs_fixtures.py`` has always written it.
+``stamp(seconds)`` after the origin of the clock, the way ``tests/testkit/obs_fixtures.py`` has always written it.
 """
 
 from __future__ import annotations

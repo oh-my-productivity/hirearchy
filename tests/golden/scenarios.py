@@ -79,7 +79,7 @@ def busy_org(tmp_path: Path, clock) -> Org:
     a refused tool call. Built through the public API plus hand-written scheduler/MCP events (``obs_fixtures.EventLog``),
     all on the fixed clock. Event emission is then switched off in ORG.md, so reading commands add no ``cli.command`` events.
     """
-    from obs_fixtures import EventLog
+    from testkit.obs_fixtures import EventLog
 
     org = company(tmp_path, clock)
     log = EventLog(org)

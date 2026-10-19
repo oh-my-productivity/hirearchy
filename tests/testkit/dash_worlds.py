@@ -15,11 +15,12 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from dash_fixtures import DEMO_NOW, demo_org
-from testkit.scheduler import scheduler_is
 
 from orgmcp.core import Org
 from orgmcp.daemon import SchedulerState
+
+from .dash_fixtures import DEMO_NOW, demo_org
+from .scheduler import scheduler_is
 
 __all__ = ["DEMO_NOW", "demo", "empty", "scratch"]
 

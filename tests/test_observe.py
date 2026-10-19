@@ -1,6 +1,6 @@
 """The query half of observability: events, now, trace, metrics, check, the CLI and the MCP tool.
 
-Event files are written by hand (tests/obs_fixtures.py) exactly per the spec; the emitting module is not imported.
+Event files are written by hand (tests/testkit/obs_fixtures.py) exactly per the spec; the emitting module is not imported.
 """
 
 import asyncio
@@ -11,10 +11,10 @@ import re
 import sys
 import time
 from datetime import timedelta
-from pathlib import Path
 
 import pytest
-from obs_fixtures import T0, EventLog, Story, freeze, run_ids, stamp, stamp_trace
+import testkit
+from testkit.obs_fixtures import T0, EventLog, Story, freeze, run_ids, stamp, stamp_trace
 from testkit.scheduler import scheduler_is
 
 from orgmcp import observe
@@ -26,14 +26,14 @@ from orgmcp.progress import progress
 from orgmcp.scheduler import Scheduler, SchedulerState
 from orgmcp.server import build_server
 
-FAKE = str(Path(__file__).with_name("fake_agent.py"))
+FAKE = str(testkit.FAKE_AGENT)
 NOW = stamp(200)
 
 
 @pytest.fixture
 def org(tmp_path):
     """root -> ceo -> eng with emission OFF (``events: false``): the event files in these tests are written by hand
-    (tests/obs_fixtures.py) so each test controls exactly which events exist. The real emitter is exercised against
+    (tests/testkit/obs_fixtures.py) so each test controls exactly which events exist. The real emitter is exercised against
     this query layer in tests/test_observability_e2e.py."""
     o = Org.init(tmp_path / "org", "Test mission", {"poll_seconds": 0.05, "events": False})
     o.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)
