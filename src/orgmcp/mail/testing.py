@@ -32,6 +32,7 @@ from .api import (
     MessageFile,
     MessageIndex,
     MessageParser,
+    MetaRead,
     TaskQuery,
 )
 
@@ -190,6 +191,16 @@ class MemoryMailbox(DerivedMailboxReads, MailboxWriter, BatchStore, MailFingerpr
                     meta, error = describe(self.agents.files[key])
                     out.append(MessageFile(self.agents.root / key, owner, box, meta, error, str((meta or {}).get("id") or n.removesuffix(".md")), 1.0))
         return out
+
+    def meta_of(self, path: Path) -> MetaRead:
+        try:
+            key = path.relative_to(self.agents.root).as_posix()
+        except ValueError:
+            return None, "unreadable (FileNotFoundError)", 0.0
+        if key not in self.agents.files:
+            return None, "unreadable (FileNotFoundError)", 0.0
+        meta, error = describe(self.agents.files[key])
+        return meta, error, 1.0
 
 
 # ------------------------------------------------------------------------------ harnesses and the registry

@@ -49,6 +49,11 @@ def built(tmp_path: Path, clock: Any) -> Any:
     return made
 
 
+@pytest.fixture
+def bare(tmp_path: Path, clock: Any) -> Any:
+    return _scenario.make_org(tmp_path)
+
+
 @pytest.mark.parametrize("name", EVENTS)
 def test_events_view_and_its_text(built: Any, name: str) -> None:
     view = observe.events_view(built.org, now=NOW, **EVENTS[name])
@@ -124,3 +129,58 @@ def test_the_clock_of_the_runtime_is_what_a_default_now_is_made_of(built: Any) -
     assert observe.metrics(built.org, since=SINCE)["until"].startswith("2026-10-18T10:03:20")
     assert 199999.0 < observe.trace(built.org, built.task.id)["totals"]["wall_ms"] <= 200000.0  # the request is open (reworked): it lasts until now
     assert observe.events_view(built.org, since="1h")["until"] is None
+
+
+# ------------------------------------------------------------------------------ the second half (C-obs-2): now, check, the text
+
+@pytest.mark.parametrize("name", list(_scenario.SCENARIOS))
+def test_now_and_check_and_their_text(built: Any, name: str) -> None:
+    setup, state, verdict = _scenario.SCENARIOS[name]
+    setup(built)
+    _scenario.settle(built.org)
+    _scenario.follow_ports(built.org, state, verdict)
+    view = observe.now_view(built.org, NOW)
+    assert dump(view) == expected(f"now_{name}.json") and observe.render_now(view) + "\n" == expected(f"now_{name}.txt")
+    result = observe.check(built.org, NOW)
+    assert dump(result) == expected(f"check_{name}.json") and observe.render_check(result) + "\n" == expected(f"check_{name}.txt")
+
+
+def test_now_and_check_of_an_organization_nothing_happened_in(bare: Any) -> None:
+    _scenario.follow_ports(bare, ("stopped", None, None, ""), "gone")
+    assert dump(observe.now_view(bare, NOW)) == expected("now_bare.json")
+    assert dump(observe.check(bare, NOW)) == expected("check_bare.json")
+    assert observe.observe_text(bare, "events", since=SINCE, now=NOW) + "\n" == expected("text_events_none.txt")
+
+
+def test_observe_text(built: Any) -> None:
+    setup, state, verdict = _scenario.SCENARIOS["busy"]
+    setup(built)
+    _scenario.settle(built.org)
+    _scenario.follow_ports(built.org, state, verdict)
+    cases: dict[str, dict[str, Any]] = {
+        "now": dict(view="now"), "check": dict(view="check"), "trace": dict(view="trace", target=built.task.id), "metrics": dict(view="metrics"),
+        "metrics_agent": dict(view="metrics", target="ceo", by="tool"), "events": dict(view="events"), "events_agent": dict(view="events", target="ceo/eng"),
+        "events_trace": dict(view="events", target=built.task.id), "events_kind": dict(view="events", target="tool.call"),
+        "events_errors": dict(view="events", errors_only=True, limit=3), "events_root": dict(view="events", target="root"), "now_small": dict(view="now", limit=2),
+    }
+    for label, kw in cases.items():
+        assert observe.observe_text(built.org, since=SINCE, now=NOW, **kw) + "\n" == expected(f"text_{label}.txt"), label
+    assert observe.observe_text(built.org, " NOW ", since=SINCE, now=NOW) + "\n" == expected("text_view_upper.txt")
+    assert observe.render_now(observe.now_view(built.org, NOW), 12) + "\n" == expected("now_busy_capped.txt")
+
+
+def test_the_scheduler_and_the_judge_are_those_of_the_runtime_in_force(built: Any) -> None:
+    setup, _, _ = _scenario.SCENARIOS["busy"]
+    setup(built)
+    _scenario.settle(built.org)
+    _scenario.follow_ports(built.org, _scenario.RUNNING, "ours")
+    assert observe.now_view(built.org, NOW)["scheduler"]["state"] == "running"
+    _scenario.follow_ports(built.org, _scenario.STOPPED, "gone")
+    assert observe.now_view(built.org, NOW)["scheduler"]["state"] == "stopped"
+    assert not observe.check(built.org, NOW)["ok"]
+
+
+def test_the_legacy_names_that_stay(built: Any) -> None:
+    assert observe.VIEWS == ("now", "trace", "metrics", "events", "check") and observe.COPY_GRACE == 5.0 and observe.INFLIGHT_GRACE == 30.0
+    assert observe.ERROR_WINDOW.total_seconds() == 900 and observe.RECV_BOXES == ("inbox", "inflight", "read")
+    assert observe._scheduler_files(built.org) and observe._tail_events(observe._scheduler_files(built.org)[0][2]) is not None

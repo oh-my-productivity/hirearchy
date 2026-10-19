@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 from dash_fixtures import DEMO_NOW, big_org, demo_org, write_running_json
 from obs_fixtures import T0, EventLog, stamp
+from testkit.scheduler import scheduler_is
 
 from orgmcp import dashboard_data as dd
 from orgmcp import observe
@@ -23,7 +24,7 @@ from orgmcp.scheduler import SchedulerState
 def sched_up(monkeypatch):
     up = lambda o: SchedulerState("running", 7000, "2026-10-18 10:00:00Z")  # noqa: E731
     monkeypatch.setattr(dd, "scheduler_state", up)
-    monkeypatch.setattr(observe, "scheduler_state", up)
+    scheduler_is(monkeypatch, up(None))
 
 
 @pytest.fixture
@@ -33,9 +34,9 @@ def demo(tmp_path, sched_up):
     return ns
 
 
-def set_scheduler(monkeypatch, state):
+def set_scheduler(monkeypatch, state, *orgs):
     monkeypatch.setattr(dd, "scheduler_state", lambda o: state)
-    monkeypatch.setattr(observe, "scheduler_state", lambda o: state)
+    scheduler_is(monkeypatch, state, *orgs)
 
 
 def snapshot_files(root: Path) -> dict:
@@ -117,7 +118,7 @@ def test_queue_reasons_one_by_one(tmp_path, monkeypatch):
     assert (s.agents["b"].kind, s.agents["b"].main) == ("budget", "out of budget") and s.agents["b"].word.endswith(" unread")
     assert (s.agents["c"].kind, s.agents["c"].main) == ("paused", "paused: broken") and "queued" not in s.agents["c"].word
     assert s.agents["d"].word.startswith("running") and ", +1 unread" in s.agents["d"].word and "scheduler not running" in s.agents["d"].word
-    set_scheduler(monkeypatch, SchedulerState("running", 1, "x"))
+    set_scheduler(monkeypatch, SchedulerState("running", 1, "x"), org)
     data = dd.DashData(org.root)
     s = data.snapshot()
     assert s.agents["a"].main == "queued: max_parallel (1) runs are busy"

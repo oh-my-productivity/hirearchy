@@ -1,0 +1,149 @@
+{
+  "now": "2026-10-18T10:03:20+00:00",
+  "scheduler": {
+    "state": "running",
+    "pid": 7000,
+    "since": "2026-10-18 10:00:00Z",
+    "detail": "",
+    "mode": "until_done",
+    "uptime_s": 200.0,
+    "last_heartbeat_age_s": 10.0,
+    "last_exit": null,
+    "heartbeats": true,
+    "heartbeat_running": [
+      "ceo"
+    ]
+  },
+  "max_parallel": 1,
+  "runs_in_flight": [
+    {
+      "agent": "ceo",
+      "run": "ceo@20261018T100300000003",
+      "elapsed_s": 19.0,
+      "batch": [
+        "Memo",
+        "Another"
+      ],
+      "traces": [
+        "20261018T100230000001-root-0016",
+        "20261018T100300000001-root-0019"
+      ]
+    }
+  ],
+  "queued": [
+    {
+      "agent": "ceo",
+      "unread": 1,
+      "reason": "its current run is still going; the next run starts after it",
+      "waiting_s": 14.999999
+    },
+    {
+      "agent": "ceo/eng",
+      "unread": 1,
+      "reason": "paused: failures",
+      "waiting_s": 14.999991
+    },
+    {
+      "agent": "ops",
+      "unread": 1,
+      "reason": "max_parallel (1) runs are busy",
+      "waiting_s": 14.999996
+    },
+    {
+      "agent": "poor",
+      "unread": 1,
+      "reason": "no budget",
+      "waiting_s": 14.999993
+    }
+  ],
+  "waiting_on_you": [
+    "Needs you: note from ceo \"Logo\": Blocked on the logo (message 20261018T100310000001-ceo-002b)"
+  ],
+  "open_root_tasks": 4,
+  "paused": {
+    "ceo/eng": "failures"
+  },
+  "errors_15m": {
+    "count": 8,
+    "events": [
+      {
+        "v": 1,
+        "ts": "2026-10-18T10:00:13+00:00",
+        "seq": 10,
+        "proc": "mcp",
+        "pid": 4242,
+        "kind": "tool.call",
+        "actor": "ceo/eng",
+        "run": null,
+        "trace": null,
+        "tool": "write",
+        "ok": false,
+        "ms": 1,
+        "error": "ceo/eng cannot write ceo/work/x.md",
+        "error_type": "OrgError",
+        "args": {
+          "path": "ceo/work/x.md"
+        }
+      },
+      {
+        "v": 1,
+        "ts": "2026-10-18T10:00:31+00:00",
+        "seq": 12,
+        "proc": "scheduler",
+        "pid": 7000,
+        "kind": "agent.failure",
+        "actor": "runtime",
+        "run": null,
+        "trace": null,
+        "agent": "ceo/eng",
+        "count": 3
+      },
+      {
+        "v": 1,
+        "ts": "2026-10-18T10:01:40+00:00",
+        "seq": 14,
+        "proc": "scheduler",
+        "pid": 7000,
+        "kind": "run.orphan",
+        "actor": "runtime",
+        "run": "ceo/eng@20261018T100500000000",
+        "trace": null,
+        "agent": "ceo/eng",
+        "action": "killed",
+        "detail": "no process"
+      },
+      {
+        "v": 1,
+        "ts": "2026-10-18T10:00:05+00:00",
+        "seq": 15,
+        "proc": "scheduler",
+        "pid": 7000,
+        "kind": "scheduler.error",
+        "actor": "runtime",
+        "run": null,
+        "trace": null,
+        "phase": "stall check",
+        "error": "boom"
+      },
+      {
+        "v": 1,
+        "ts": "2026-10-18T10:03:15+00:00",
+        "seq": 11,
+        "proc": "mcp",
+        "pid": 4242,
+        "kind": "tool.call",
+        "actor": "ceo",
+        "run": "ceo@20261018T100300000003",
+        "trace": null,
+        "tool": "send",
+        "ok": false,
+        "ms": 5,
+        "error": "ceo cannot message nobody",
+        "error_type": "OrgError",
+        "args": {}
+      }
+    ]
+  },
+  "last_event": "2026-10-18T10:03:10+00:00",
+  "events_seen": true
+}

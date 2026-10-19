@@ -9,9 +9,7 @@ from typing import Protocol, SupportsInt, cast, runtime_checkable
 from ..agents import AgentDirectory
 from ..kernel import BOXES, ROOT, JsonObject, OrgLayout, split_frontmatter
 from ._rules import is_message_name
-from .api import MessageFile, MessageIndex
-
-MetaRead = tuple[JsonObject | None, str | None, float]  # (front matter, why it is unusable, mtime in epoch seconds)
+from .api import MessageFile, MessageIndex, MetaRead
 
 
 @runtime_checkable
@@ -100,3 +98,6 @@ class FsMessageIndex(MessageIndex):
                     mid = str((meta or {}).get("id") or p.stem)
                     out.append(MessageFile(p, owner, box, meta, error, mid, mtime))
         return out
+
+    def meta_of(self, path: Path) -> MetaRead:
+        return self._meta.read(path)

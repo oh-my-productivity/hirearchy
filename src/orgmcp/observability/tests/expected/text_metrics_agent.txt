@@ -1,0 +1,20 @@
+metrics 2026-10-18T00:00:00Z .. 2026-10-18T10:03:20Z agent=ceo (32 event(s) in the window)
+runs 4: ok 3, failed 0, timeout 0, killed 0, running 1 | duration p50 15s p95 42s max 42s (n=3) | queue p50 3.0s p95 20s (n=3)
+budget spent 4 run(s)
+tool calls 9, refused 5 (55.6%)
+  delegate             4 calls   3 refused (75%) p50 3ms p95 5ms
+  report               2 calls   0 refused (0%) p50 5ms p95 5ms
+  send                 2 calls   2 refused (100%) p50 5ms p95 5ms
+  inbox                1 calls   0 refused (0%) p50 5ms p95 5ms
+top refusals:
+  3x not enough budget: you have N run(s) and must keep N in reserve  (delegatex3)
+  1x an old refusal  (sendx1)
+  1x ceo cannot message nobody  (sendx1)
+messages: note 4, result 2, task 6
+scheduler: 2 start(s); errors: stall check x1; exits: finished: no open tasks x1
+stalls 1, pauses 1 (failures x1), agent failures 1, orphaned runs 1
+by tool:
+  delegate                                         calls    4 refused 3 (75%) p50 3ms p95 5ms
+  inbox                                            calls    1 refused 0 (0%) p50 5ms p95 5ms
+  report                                           calls    2 refused 0 (0%) p50 5ms p95 5ms
+  send                                             calls    2 refused 2 (100%) p50 5ms p95 5ms

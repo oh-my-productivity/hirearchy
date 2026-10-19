@@ -11,9 +11,9 @@ import pytest
 from dash_fixtures import DEMO_NOW, demo_org
 from obs_fixtures import EventLog, stamp
 from test_dashboard_data import set_scheduler, snapshot_files
+from testkit.scheduler import scheduler_is
 
 from orgmcp import dashboard_data as dd
-from orgmcp import observe
 from orgmcp.core import ROOT, Org
 from orgmcp.dashboard import DashApp, NavTable, TextPane, TextScreen
 from orgmcp.scheduler import SchedulerState
@@ -882,7 +882,7 @@ def test_a_real_running_agent_is_shown_running_with_its_live_log(tmp_path, monke
         org.delegate(ROOT, "ops", "Ops job", "g", "a", budget=2)
         org.pause("ops", "manual pause")
         monkeypatch.setattr(dd, "scheduler_state", lambda o: SchedulerState("running", os.getpid(), "now"))
-        monkeypatch.setattr(observe, "scheduler_state", lambda o: SchedulerState("running", os.getpid(), "now"))
+        scheduler_is(monkeypatch, SchedulerState("running", os.getpid(), "now"), org)
         time.sleep(0.3)
 
         async def fn(app, pilot):

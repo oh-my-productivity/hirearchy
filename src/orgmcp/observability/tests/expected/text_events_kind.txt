@@ -1,0 +1,14 @@
+13 of 13 matching event(s), oldest first
+10:00:00.000 cli root tool.call delegate ok 5ms args=to=ceo,title=Ship it,budget=6 trace=20261018T100000000003-root-0005
+10:00:05 mcp ceo tool.call inbox ok 5ms run=ceo@20261018T100003000001
+10:00:10 mcp ceo tool.call delegate REFUSED 3ms error="not enough budget: you have 5 run(s) and must keep 2 in reserve" error_type=OrgError args=to=ceo/eng,budget=9 run=ceo@20261018T100003000001 trace=20261018T100000000003-root-0005
+10:00:20 mcp ceo tool.call delegate ok 5ms args=to=ceo/eng,title=Build,budget=3 run=ceo@20261018T100003000001 trace=20261018T100000000003-root-0005
+10:01:30 mcp ceo/eng tool.call write ok 5ms args=path=ceo/eng/work/out.md,content_chars=5 run=ceo/eng@20261018T100110000001 trace=20261018T100000000003-root-0005
+10:01:35 mcp ceo/eng tool.call report ok 5ms args=task_id=20261018T100020000001-ceo-0008,status=done run=ceo/eng@20261018T100110000001 trace=20261018T100000000003-root-0005
+10:02:05 mcp ceo tool.call report ok 5ms args=task_id=20261018T100000000003-root-0005,status=done run=ceo@20261018T100155000001 trace=20261018T100000000003-root-0005
+10:02:25 mcp ceo tool.call report ok 5ms args=task_id=20261018T100220000001-root-0013,status=done run=ceo@20261018T100222000001 trace=20261018T100220000001-root-0013
+10:02:26 mcp ceo tool.call delegate REFUSED 2ms error="not enough budget: you have 9 run(s) and must keep 2 in reserve" error_type=OrgError args=to=ceo/eng,budget=9,service=memo run=ceo@20261018T100222000001 trace=20261018T100220000001-root-0013
+10:00:12 mcp ceo tool.call delegate REFUSED 4ms error="not enough budget: you have 7 run(s) and must keep 3 in reserve" error_type=OrgError args=to=ceo/eng,budget=9,service=memo
+10:00:13 mcp ceo/eng tool.call write REFUSED 1ms error="ceo/eng cannot write ceo/work/x.md" error_type=OrgError args=path=ceo/work/x.md
+10:03:15 mcp ceo tool.call send REFUSED 5ms error="ceo cannot message nobody" error_type=OrgError run=ceo@20261018T100300000003
+09:26:40 mcp ceo tool.call send REFUSED 5ms error="an old refusal" error_type=OrgError

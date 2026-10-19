@@ -60,3 +60,40 @@ def test_a_world_puts_events_messages_and_logs_where_the_queries_look(make: obje
     assert stem == "20261018T100005000000"
     assert [e["kind"] for e in w.events.events(since="2026-10-18T00:00:00Z", now=stamp(100))] == ["tool.call"]
     assert items(w.traces.trace(task.id, now=stamp(100)), "items")[0]["id"] == task.id
+
+
+# ------------------------------------------------------------------------------ the fakes of the second half (C-obs-2)
+
+
+def test_fixed_now_queries_answer_the_view_they_were_given() -> None:
+    from orgmcp.observability import NowQueries
+    from orgmcp.observability.testing import FixedNowQueries
+
+    fake = FixedNowQueries({"scheduler": {"state": "stopped"}})
+    assert isinstance(fake, NowQueries)
+    assert fake.now_view(stamp(5)) == {"scheduler": {"state": "stopped"}} and fake.now_view() == fake.view and fake.asked == [stamp(5), None]
+    fake.now_view()["scheduler"] = 1
+    assert fake.view == {"scheduler": {"state": "stopped"}} and FixedNowQueries().now_view() == {}
+
+
+def test_fixed_integrity_checks_pass_unless_told_otherwise() -> None:
+    from orgmcp.observability import IntegrityChecks
+    from orgmcp.observability.testing import FixedIntegrityChecks
+
+    fake = FixedIntegrityChecks()
+    assert isinstance(fake, IntegrityChecks)
+    assert fake.check(stamp(1)) == {"ok": True, "checks": []} and fake.asked == [stamp(1)]
+    failing = FixedIntegrityChecks({"ok": False, "checks": [{"id": "a", "ok": False}]})
+    assert failing.check()["ok"] is False
+
+
+def test_fixed_observability_text_answers_what_it_was_told_and_remembers_the_questions() -> None:
+    from orgmcp.observability import ObservabilityText
+    from orgmcp.observability.testing import FixedObservabilityText
+
+    fake = FixedObservabilityText("the text")
+    assert isinstance(fake, ObservabilityText)
+    assert fake.observe_text("trace", "T-1", limit=3, max_lines=9) == "the text"
+    assert fake.asked == [dict(view="trace", target="T-1", since="24h", by=None, errors_only=False, limit=3, now=None, max_lines=9)]
+    with pytest.raises(OrgError, match="no way"):
+        FixedObservabilityText(fails=OrgError("no way")).observe_text("check")

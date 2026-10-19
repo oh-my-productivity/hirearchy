@@ -1,0 +1,2 @@
+1 of 1 matching event(s), oldest first
+10:00:00.000 cli root tool.call delegate ok 5ms args=to=ceo,title=Ship it,budget=6 trace=20261018T100000000003-root-0005

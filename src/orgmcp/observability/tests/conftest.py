@@ -21,3 +21,9 @@ def built(tmp_path: Path, clock: Any) -> Any:
     made = _scenario.story(tmp_path, clock)
     _scenario.extend(made)
     return made
+
+
+@pytest.fixture
+def bare(tmp_path: Path, clock: Any) -> Any:
+    """An organization nothing has happened in: root, ceo, eng; no events, no mail."""
+    return _scenario.make_org(tmp_path)

@@ -1,0 +1,12 @@
+scheduler: unverified - pid file names pid 4242 (its command line is 'vim')
+runs in flight 1/3:
+  ceo/eng 10.0s n, 20261018T100310000001-root-0019
+queued, not running (1):
+  ceo: 2 unread, oldest 3m17s - scheduler is not running
+waiting on you: nothing
+errors in the last 15 min: 7
+  10:00:12 mcp ceo tool.call delegate REFUSED 4ms error="not enough budget: you have 7 run(s) and must keep 3 in reserve" error_type=OrgError args=to=ceo/eng,budget=9,service=memo
+  10:00:13 mcp ceo/eng tool.call write REFUSED 1ms error="ceo/eng cannot write ceo/work/x.md" error_type=OrgError args=path=ceo/work/x.md
+  10:00:31 scheduler runtime agent.failure agent=ceo/eng count=3
+  10:01:40 scheduler runtime run.orphan agent=ceo/eng action=killed detail=no process run=ceo/eng@20261018T100500000000
+  10:00:05 scheduler runtime scheduler.error phase=stall check error="boom"

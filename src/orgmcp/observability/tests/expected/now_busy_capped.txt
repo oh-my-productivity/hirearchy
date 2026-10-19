@@ -1,0 +1,13 @@
+scheduler: running pid 7000 (until_done, up 3m20s, last heartbeat 10s ago)
+runs in flight 1/3:
+  ceo 19s Memo, Another trace 20261018T100230000001-root-0016, 20261018T100300000001-root-0019
+queued, not running (4):
+  ceo: 1 unread, oldest 15s - its current run is still going; the next run starts after it
+  ceo/eng: 1 unread, oldest 15s - paused: failures
+  ops: 1 unread, oldest 15s - ready: starts on the next tick
+  poor: 1 unread, oldest 15s - no budget
+waiting on you (1):
+  Needs you: note from ceo "Logo": Blocked on the logo (message 20261018T100310000001-ceo-002b)
+errors in the last 15 min: 8
+  10:00:13 mcp ceo/eng tool.call write REFUSED 1ms error="ceo/eng cannot write ceo/work/x.md" error_type=OrgError args=path=ceo/work/x.md
+... 5 more line(s), narrow with observe events errors_only=true

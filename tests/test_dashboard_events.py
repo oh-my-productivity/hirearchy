@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import pytest
-
 from dash_fixtures import DEMO_NOW, demo_org
+from testkit.scheduler import scheduler_is
+
 from orgmcp import dashboard_data as dd
-from orgmcp import observe
 from orgmcp.dashboard_events import describe, event_lines, humanize
 
 TS = "2026-10-18T10:05:27.000000Z"
@@ -122,6 +122,6 @@ def demo_data(tmp_path, monkeypatch):
 
     up = lambda org: SchedulerState("running", 7000, "2026-10-18 10:00:00Z")  # noqa: E731
     monkeypatch.setattr(dd, "scheduler_state", up)
-    monkeypatch.setattr(observe, "scheduler_state", up)
+    scheduler_is(monkeypatch, up(None))
     ns = demo_org(tmp_path)
     return dd.DashData(ns.org.root, now=lambda: DEMO_NOW)

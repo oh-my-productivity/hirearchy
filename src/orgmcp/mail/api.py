@@ -21,9 +21,13 @@ __all__ = [
     "MailboxWriter",
     "MessageFile",
     "MessageIndex",
+    "MetaRead",
     "MessageParser",
     "TaskQuery",
 ]
+
+
+MetaRead = tuple[JsonObject | None, str | None, float]  # (front matter, why it is unusable (None when it is usable), mtime in epoch seconds)
 
 
 @dataclass(frozen=True)
@@ -136,4 +140,9 @@ class MailFingerprint(Protocol):
 class MessageIndex(Protocol):
     def scan(self) -> list[MessageFile]:
         """Every message file of root and of the live agents, in box order, front matter parsed once (cached by path + mtime + size)."""
+        ...
+
+    def meta_of(self, path: Path) -> MetaRead:
+        """The front matter of ONE message file, as ``scan`` reads it (same cache, same findings): ``(front matter, why it is unusable, mtime)``;
+        ``(None, "unreadable (<error type>)", 0.0)`` for a file that cannot be read."""
         ...
