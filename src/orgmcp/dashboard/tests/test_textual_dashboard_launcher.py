@@ -12,7 +12,6 @@ from orgmcp.dashboard._launcher import TextualDashboardLauncher, TextualScreenRu
 from orgmcp.dashboard.testing import MemoryQueriesOpener, RecordingScreens, fixed_queries
 from orgmcp.kernel import OrgError
 
-red = pytest.mark.xfail(strict=True, reason="red: D-dashboard")  # (until the app takes its queries: the next commit)
 
 ROOT = Path("/memory/org")
 
@@ -50,7 +49,6 @@ def test_what_is_not_an_organization_never_reaches_the_screen() -> None:
     assert opener.opened == [] and screens.runs == []
 
 
-@red
 def test_the_screen_runs_a_textual_app_on_the_queries(monkeypatch: pytest.MonkeyPatch) -> None:
     ran: list[DashApp] = []
     monkeypatch.setattr(DashApp, "run", lambda self, **_: ran.append(self))
@@ -60,7 +58,6 @@ def test_the_screen_runs_a_textual_app_on_the_queries(monkeypatch: pytest.Monkey
     assert app.data is queries and app.interval == 0.5
 
 
-@red
 def test_the_app_refreshes_at_least_five_times_a_second() -> None:
     assert DashApp(fixed_queries(), 0.01).interval == 0.2
     assert DashApp(fixed_queries(), 60).interval == 60.0

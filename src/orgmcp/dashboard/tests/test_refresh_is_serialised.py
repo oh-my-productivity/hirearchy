@@ -14,8 +14,6 @@ from orgmcp.dashboard._app import DashApp
 from orgmcp.dashboard.testing import fixed_queries
 from orgmcp.dashdata import Snapshot
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-dashboard")
-
 
 class Gate:
     """A ``snapshot`` that waits at the door until it is opened, and counts how many are inside at once."""

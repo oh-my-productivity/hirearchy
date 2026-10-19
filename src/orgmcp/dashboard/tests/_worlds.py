@@ -15,6 +15,8 @@ from typing import Protocol, cast
 
 import pytest
 
+from orgmcp.dashboard._ports import DashboardQueries
+
 
 class Organization(Protocol):
     """What the screens need of an organization: where it is."""
@@ -40,6 +42,12 @@ def shown() -> datetime:
 def scratch() -> AbstractContextManager[Path]:
     """A directory with a short path for one organization (see ``dash_worlds.scratch``)."""
     return cast("Callable[[], AbstractContextManager[Path]]", getattr(_fixtures(), "scratch"))()
+
+
+def queries_of(root: Path, now: Callable[[], datetime] | None = None) -> DashboardQueries:
+    """The queries of the dashboard of the organization at ``root``, as the composition root makes them (looked up by name: a package may not import it)."""
+    wiring = importlib.import_module("orgmcp.app.wire_dashboard")
+    return cast("DashboardQueries", getattr(wiring, "queries_of")(root, now))
 
 
 def demo(patch: pytest.MonkeyPatch, base: Path) -> DemoWorld:

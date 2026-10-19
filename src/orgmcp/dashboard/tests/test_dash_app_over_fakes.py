@@ -26,8 +26,6 @@ from orgmcp.dashdata import Section, ServiceRow
 from orgmcp.dashdata.testing import MemoryEventFeed
 from orgmcp.reflection import Stats
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-dashboard")
-
 TOUCHING = {"open", "os.listdir", "os.scandir", "os.mkdir", "os.rename", "os.remove", "os.rmdir", "os.chmod", "shutil.copyfile"}
 touched: list[str] = []
 watching: list[bool] = []
@@ -99,7 +97,7 @@ def test_the_details_of_the_selected_agent_come_from_the_detail_query(untouched:
         await pilot.press("down")
         await app.settle(pilot)
         assert app.selected == "ops" and "state    ▶ running 1m12s" in text(app, "#pane-overview")
-        await pilot.press("]", "]", "]", "]")
+        await pilot.press("]", "]", "]", "]", "]")
         await app.settle(pilot)
         assert app.query_one("#agent-tabs", TabbedContent).active == "tab-charter"  # (the details of the others are filled when their tab is opened)
         assert text(app, "#pane-charter") == "role: ops"

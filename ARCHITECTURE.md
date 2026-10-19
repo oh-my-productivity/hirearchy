@@ -2031,6 +2031,7 @@ A TTY check (`sys.stdin.isatty() and sys.stdout.isatty()`) is the one terminal d
 | `Ctx`, `Tick` | `dashboard/_state.py` (private dataclasses) |
 | `DashApp` | `dashboard/_app.py::DashApp(App)` (Textual; receives the `dashdata` queries in its constructor) |
 | `run_dashboard` | `dashboard.DashboardLauncher.run_dashboard` (`TextualDashboardLauncher`) |
+| `_wire` (`dashboard/_legacy.py`) | the late lookup of `orgmcp.app.wire_dashboard` that the legacy surface keeps until E3 (`DashApp(root, interval, now)` and `run_dashboard(root, interval)` ask it for the queries / the launcher: an entry point may not import `orgmcp.app`) |
 
 ### 5.15 Data that has no home yet (constants and files)
 

@@ -16,7 +16,6 @@ from orgmcp.dashboard._ports import DashboardQueries
 from orgmcp.dashboard.testing import FakeDashboardLauncher, RecordingScreens
 from orgmcp.kernel import ROOT, OrgError
 
-red = pytest.mark.xfail(strict=True, reason="red: D-dashboard")
 
 
 def wire() -> ModuleType:
@@ -31,7 +30,6 @@ def team(tmp_path: Path) -> Org:
     return made
 
 
-@red
 def test_the_queries_are_those_of_the_organization(team: Org) -> None:
     queries = wire().queries_of(team.root)
     assert isinstance(queries, DashboardQueries)
@@ -40,7 +38,6 @@ def test_the_queries_are_those_of_the_organization(team: Org) -> None:
     assert queries.feed is not None  # (made by the first snapshot)
 
 
-@red
 def test_the_time_shown_can_be_given(team: Org) -> None:
     from datetime import datetime, timezone
 
@@ -48,13 +45,11 @@ def test_the_time_shown_can_be_given(team: Org) -> None:
     assert wire().queries_of(team.root, lambda: then).snapshot().at == then
 
 
-@red
 def test_a_directory_that_is_not_an_organization_is_refused(tmp_path: Path) -> None:
     with pytest.raises(OrgError, match=r"not an organization \(no ORG.md\): "):
         wire().queries_of(tmp_path)
 
 
-@red
 def test_the_launcher_shows_the_queries_of_the_root_at_the_interval(team: Org) -> None:
     screens = RecordingScreens()
     launcher = wire().dashboard_launcher(screens)
@@ -64,7 +59,6 @@ def test_the_launcher_shows_the_queries_of_the_root_at_the_interval(team: Org) -
     assert interval == 0.5 and isinstance(queries, DashboardQueries) and "ceo/eng" in queries.snapshot().agents
 
 
-@red
 def test_the_launcher_refuses_a_directory_that_is_not_an_organization_before_the_screen(tmp_path: Path) -> None:
     screens = RecordingScreens()
     with pytest.raises(OrgError, match="not an organization"):
@@ -72,7 +66,6 @@ def test_the_launcher_refuses_a_directory_that_is_not_an_organization_before_the
     assert screens.runs == []
 
 
-@red
 def test_run_dashboard_is_the_launcher_of_the_wiring(team: Org, monkeypatch: pytest.MonkeyPatch) -> None:
     from orgmcp.dashboard import run_dashboard
 
@@ -98,7 +91,6 @@ def test_the_old_constructor_of_the_app_asks_the_wiring_for_its_queries(team: Or
     assert isinstance(app.data, DashboardQueries) and "ceo" in app.data.snapshot().agents and app.interval == 60.0
 
 
-@red
 def test_the_stylesheet_travels_with_the_package() -> None:
     from orgmcp.dashboard._app import DashApp
 
