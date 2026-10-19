@@ -1,0 +1,45 @@
+=== ceo | wake=True | health review: 3 new problem(s)
+Health review: 3 new problem(s) among your direct reports.
+- `ceo/cto` stuck: open task is 4h old and nothing is in progress
+  -> follow up with `ceo/cto` or reassign the work
+- `ceo/eng` idle: no open tasks and no activity for 5h; candidate to retire
+  -> retire `ceo/eng` if it is no longer needed
+- `ceo/qa` idle: no open tasks and no activity for 5h; candidate to retire
+  -> retire `ceo/qa` if it is no longer needed
+
+Act within your charter and record your decisions in `ceo/MEMORY.md`. Problems that persist are not repeated in later reviews.
+
+=== ceo | wake=True | health review: 1 new problem(s)
+Health review: 1 new problem(s) among your direct reports.
+- `ceo/cto` team: `ceo/cto/dev` is paused: paused: failures
+  -> ask `ceo/cto` to deal with it, or step in via its charter
+
+Act within your charter and record your decisions in `ceo/MEMORY.md`. Problems that persist are not repeated in later reviews.
+
+=== ceo/cto | wake=True | health review: 2 new problem(s)
+Health review: 2 new problem(s) among your direct reports.
+- `ceo/cto/dev` paused: paused: failures
+  -> investigate why `ceo/cto/dev` is paused; failed runs need a human (`orgmcp resume ceo/cto/dev`), so escalate
+- `ceo/cto/dev` idle: no open tasks and no activity for 5h; candidate to retire
+  -> retire `ceo/cto/dev` if it is no longer needed
+
+Act within your charter and record your decisions in `ceo/cto/MEMORY.md`. Problems that persist are not repeated in later reviews.
+
+=== root | wake=True | health review: 5 of 7 agents flagged
+Health review: 7 agents, 5 flagged.
+- `ceo/cto` stuck: open task is 4h old and nothing is in progress
+- `ceo/cto/dev` paused: paused: failures
+- `ceo/cto/dev` idle: no open tasks and no activity for 5h; candidate to retire
+- `ceo/eng` idle: no open tasks and no activity for 5h; candidate to retire
+- `ceo/qa` idle: no open tasks and no activity for 5h; candidate to retire
+- `ops/dev` stuck: open task is 4h old and nothing is in progress
+Managers not notified: `ops` (budget 1 is reserved for 1 outstanding delegation(s)).
+
+=== root | wake=True | health review: 4 of 7 agents flagged
+Health review: 7 agents, 4 flagged.
+- `ceo/cto/dev` paused: paused: failures
+- `ceo/cto/dev` idle: no open tasks and no activity for 6h; candidate to retire
+- `ceo/eng` idle: no open tasks and no activity for 6h; candidate to retire
+- `ceo/qa` idle: no open tasks and no activity for 6h; candidate to retire
+- `ops/dev` stuck: open task is 5h old and nothing is in progress
+Managers not notified: `ops` (budget 1 is reserved for 1 outstanding delegation(s)).

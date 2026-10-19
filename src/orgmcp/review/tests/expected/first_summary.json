@@ -1,0 +1,26 @@
+{
+  "runs": 0,
+  "flagged": 5,
+  "notified": {
+    "ceo": [
+      "ceo/cto:stuck",
+      "ceo/eng:idle",
+      "ceo/qa:idle"
+    ],
+    "ceo/cto": [
+      "ceo/cto/dev:paused",
+      "ceo/cto/dev:idle"
+    ],
+    "root": [
+      "ceo/cto:stuck",
+      "ceo/cto/dev:paused",
+      "ceo/cto/dev:idle",
+      "ceo/eng:idle",
+      "ceo/qa:idle",
+      "ops/dev:stuck"
+    ]
+  },
+  "skipped": {
+    "ops": "budget 1 is reserved for 1 outstanding delegation(s)"
+  }
+}
