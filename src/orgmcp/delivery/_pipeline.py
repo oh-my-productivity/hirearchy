@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from ..kernel import RUNTIME, Clock, EventSink, IdGenerator, Message, TraceTap, clip, norm
 from ..mail import MailboxWriter
 from ..traces import TraceStamper
@@ -32,7 +34,7 @@ class PipelineMessageDelivery(MessageDelivery):
         # only leave a message charged but undelivered (BatchStore.recover re-delivers it), never delivered but uncharged.
         self._mail.store(msg)
         self._tap.note(msg.trace)
-        extra = {"trace_candidates": candidates} if candidates else {}
+        extra: dict[str, Any] = {"trace_candidates": candidates} if candidates else {}  # Any: only so that mypy lets ** meet the named parameters
         self._events.emit(
             "msg.deliver", actor=msg.sender, trace=msg.trace, id=msg.id, type=msg.type, **{"from": msg.sender},
             to=msg.to, title=clip(msg.title), status=msg.status, budget=msg.budget, reply_to=msg.reply_to,
