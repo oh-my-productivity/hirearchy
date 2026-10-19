@@ -38,7 +38,8 @@ class FixedWaiting(WaitingOnUser):
         self.asked: list[tuple[Collection[str] | None, Collection[str], bool]] = []
 
     def analyze(self, *, running: Collection[str] | None = None, blocked: Collection[str] = (), can_start: bool = True) -> Waiting | None:
-        raise NotImplementedError("red: C-attention")
+        self.asked.append((running, blocked, can_start))
+        return self.waiting
 
 
 class ListHumanQueue(HumanQueue):
@@ -48,10 +49,10 @@ class ListHumanQueue(HumanQueue):
         self.entries = list(entries)
 
     def items(self) -> list[tuple[str, str]]:
-        raise NotImplementedError("red: C-attention")
+        return list(self.entries)
 
     def lines(self) -> list[str]:
-        raise NotImplementedError("red: C-attention")
+        return [line for _, line in self.entries]
 
 
 class FixedOpenWork(OpenWork):
@@ -61,7 +62,7 @@ class FixedOpenWork(OpenWork):
         self.idle = idle
 
     def nothing_to_do(self) -> bool:
-        raise NotImplementedError("red: C-attention")
+        return self.idle
 
 
 # ------------------------------------------------------------------------------ the world
