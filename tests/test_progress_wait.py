@@ -2,10 +2,13 @@
 
 import pytest
 
-from orgmcp import progress as progress_mod
-from orgmcp import scheduler as sched_mod
+from orgmcp.app import wire_attention
 from orgmcp.core import ROOT
+from orgmcp.daemon import SchedulerState
+from orgmcp.daemon.testing import FakeSchedulerStatus
 from orgmcp.progress import describe_progress, progress, work_in_flight
+from orgmcp.progress._reporter import DerivedProgressReporter
+from orgmcp.progress.testing import FixedSnapshots, SpyProgressView
 
 ENG = "ceo/eng"
 
@@ -166,13 +169,13 @@ def test_describe_progress_does_not_wait_for_a_stopped_scheduler_even_for_a_bloc
     assert "agents have work they could do" in out.splitlines()[-1] and "start()" in out.splitlines()[-1]
 
 
-def test_describe_progress_waits_for_a_running_scheduler_on_a_blocked_task(org, blocked, monkeypatch):
+def test_describe_progress_waits_for_a_running_scheduler_on_a_blocked_task(org, blocked):
     grant(org)
-    monkeypatch.setattr(sched_mod, "describe_scheduler", lambda o: "scheduler: running (pid 1, since x)")
-    seen = {}
-    monkeypatch.setattr(progress_mod, "progress", lambda o, t, **kw: seen.update(kw) or "lines")
-    assert describe_progress(org, None, 30).endswith("scheduler: running (pid 1, since x)")
-    assert seen == {"wait_seconds": 30}
+    scheduler = FakeSchedulerStatus(SchedulerState("running", 1, "x"))
+    view = SpyProgressView("lines")
+    reporter = DerivedProgressReporter(view, FixedSnapshots(), scheduler, wire_attention.waiting_on_user_of(org.runtime), org.runtime.task_query)
+    assert reporter.describe_progress(None, 30).endswith("scheduler: running (pid 1, since x)")
+    assert view.kwargs == {"wait_seconds": 30}
 
 
 # ------------------------------------------------------------------------------------------ Needs you

@@ -937,8 +937,29 @@ class ProgressReporter(Protocol):
     def progress(self, task_id: str | None = None, now: datetime | None = None, *, wait_seconds: int = 0) -> str: ...
     def describe_progress(self, task_id: str | None = None, wait_seconds: int = 0) -> str: """progress + scheduler line."""
     def work_in_flight(self, task_id: str | None = None) -> bool: ...
+
+class LegacyParts(Protocol):  # the seam of the legacy functions; goes with them (E3)
+    def human_queue(self, runtime: object) -> HumanQueue: ...
+    def case_history(self, runtime: object) -> CaseHistory: ...
+    def service_reports(self, runtime: object) -> ServiceReports: ...
+    def scheduler_status(self, runtime: object) -> SchedulerStatus: ...
+    def waiting_on_user(self, runtime: object) -> WaitingOnUser: ...
 ```
-Constant `WAIT_MAX=900`. Impl: `DerivedProgressReporter(Clock, ...)`.
+Constant `WAIT_MAX=900`. `DerivedProgressReporter(view, snapshots, scheduler: SchedulerStatus, waiting: WaitingOnUser, tasks: TaskQuery)` is made of small role classes
+(private interfaces in `_ports.py`, each with one implementation): `MailRootTasks(MailboxReader)` (the tasks root gave, their latest results, `listed`: open and blocked
+always, finished ones for `RECENT` = 24 h), `AgentTaskTeams(AgentDirectory)`, `MailTaskStates(MailboxReader, PauseStore, TaskQuery)` (the state words and who is busy),
+`LogRunCounts(MailboxReader, RunLogReader)` (the run-window rule: logs from the task's creation to its final result or the next task to the same assignee; budget =
+the task's own plus the later grants), `FsTeamActivity(OrgLayout)` (names and mtimes, no parsing), `RunnableTeams(MailboxReader, RunnableQuery)`,
+`CaseTaskLines(teams, states, runs, activity, CaseHistory, ServiceReports)` (the line: `[service <name> v<n>]`, artifacts, "no feedback yet", the case total of a rework chain),
+`RootTaskReport(roots, lines, HumanQueue, Clock)`, `TeamSnapshots(roots, teams, states, liveness, HumanQueue, Clock)` + `moving(snapshot)` (does anything move: working/waiting, or
+blocked/stalled while an agent below can run) and `PollingProgress(text, snapshots, Clock, poll)` (the wait: `Clock.sleep/monotonic`, `changes`, the stall seen twice, stop after two
+idle looks, `WAIT_MAX`). The words of a message on a line are `attention`'s public helpers (`section`, `summary`, `short`, `SHORT`): `progress` keeps no copy.
+Fakes (`testing`): `ProgressWorld` over files and over memory (`fs_world`, `memory_world`), `FixedProgressReporter`, `SpyProgressView`, `FixedSnapshots`, `FixedTeamActivity`,
+`FixedCaseTotals`, `FixedLegacyParts`, `ScriptedClock`. `wire_progress` provides `ProgressReporter` and `LegacyParts` (`RuntimeParts`: the queue, the case history and the reports,
+the scheduler status and the decision of the user, built over the ports of the runtime in force). The legacy functions (`progress(org, task_id, now, *, wait_seconds, poll, sleep,
+clock)` - permanent -, `describe_progress`, `work_in_flight`, and the private `_human_items`, `_can_run`, `_state`, `_runs`, `_last_activity` that the dashboard, the scheduler and
+`observe` still import) build the reporter at each call over `org.runtime` (`_assembly.reporter_of`: the package takes what it can from the ports and asks `LegacyParts` for
+the rest, since it may not import the composition root), with the waits of their caller as the clock of the wait.
 
 ### 3.31 `observability`
 
@@ -1438,10 +1459,10 @@ flowchart BT
 | `progress` | `agents` | AgentDirectory |
 | `progress` | `runs` | RunLogReader |
 | `progress` | `mail` | MailboxReader, TaskQuery |
-| `progress` | `budget` | BudgetQuery |
-| `progress` | `eligibility` | PauseStore |
+| `progress` | `budget` | BudgetQuery (in `testing` only: the budget of its worlds) |
+| `progress` | `eligibility` | PauseStore, RunnableQuery |
 | `progress` | `attention` | WaitingOnUser, HumanQueue |
-| `progress` | `reflection` | CaseHistory |
+| `progress` | `reflection` | CaseHistory, ServiceReports |
 | `progress` | `daemon` | SchedulerStatus |
 | `dashdata` | `agents` | AgentDirectory, CharterReader |
 | `dashdata` | `eventlog` | EventFollowers |
@@ -1867,12 +1888,19 @@ A TTY check (`sys.stdin.isatty() and sys.stdout.isatty()`) is the one terminal d
 
 | Symbol | Target |
 |---|---|
-| `progress.progress`, `describe_progress`, `work_in_flight` | `progress.ProgressReporter` (`DerivedProgressReporter`); `orgmcp.progress.progress(org, task_id=None)` stays as a permanent legacy export (documented in README) |
-| `_render`, `_listed`, `_last_finished`, `_task_line`, `_section`, `_summary`, `_artifacts`, `_short` | `progress/_render.py` (private) |
-| `_can_run`, `_alive`, `_in_progress`, `_snapshot`, `_changes` | `progress/_wait.py` (private; `time.sleep`/`monotonic` -> `Clock`) |
-| `_rated`, `_state`, `_runs`, `_last_activity` | `progress/_state.py` (private; uses `reflection.CaseHistory`, `RunLogReader`) |
-| `_human_items` | `attention.HumanQueue.items` |
-| `_needs_human` | `attention.HumanQueue.lines` |
+| `progress.progress`, `describe_progress`, `work_in_flight` | `progress.ProgressReporter` (`DerivedProgressReporter`); `orgmcp.progress.progress(org, task_id=None)` stays as a permanent legacy export (documented in README): `progress/_legacy.py` over `_assembly.reporter_of`; the others go with the legacy layer (E3) |
+| `_render`, `_listed`, `_last_finished`, `_task_line` | `progress/_render.py` (`RootTaskReport`), `_listing.py` (`MailRootTasks`, `listed`), `_lines.py` (`CaseTaskLines`) (private) |
+| `_section`, `_summary`, `_short` (`SHORT`) | `attention.section`, `attention.summary`, `attention.short` (`SHORT`): public pure helpers, `progress` keeps no copy; `_section` stays a legacy alias for the dashboard until C-dashdata |
+| `_artifacts` | `progress/_lines.py::artifacts_of` (private); `_artifacts` stays a legacy alias for the dashboard until C-dashdata |
+| `_can_run`, `_alive` | `progress/_liveness.py` (`RunnableTeams`); `_can_run` stays a legacy adapter until E3 (private) |
+| `_in_progress`, `_snapshot` | `progress/_snapshot.py` (`TeamSnapshots`, `moving`) (private) |
+| `_changes`, the wait loop of `progress` | `progress/_wait.py` (`changes`, `PollingProgress`; `time.sleep`/`monotonic` -> `Clock`) (private) |
+| `_rated` | `progress/_lines.py::rated` (uses `reflection.CaseHistory`) (private) |
+| `_state` | `progress/_states.py` (`MailTaskStates`); `_state` stays a legacy adapter for the dashboard until C-dashdata (private) |
+| `_runs` | `progress/_counts.py` (`LogRunCounts`); `_runs` stays a legacy adapter for the dashboard until C-dashdata (private; not `_runs.py`: the legacy name would be shadowed) |
+| `_last_activity` | `progress/_activity.py` (`FsTeamActivity`); `_last_activity` stays a legacy adapter for the dashboard until C-dashdata (private) |
+| `_human_items` | `attention.HumanQueue.items`; `_human_items` stays a legacy adapter (`LegacyParts.human_queue`) for `scheduler`, `observe` and the dashboard until D-sched-1, C-obs-1 and C-dashdata call the port |
+| `_needs_human` | `attention.HumanQueue.lines` (the wrapper is gone) |
 | `AgentHealth`, `BranchHealth`, `OrgHealth` | `health` (data) |
 | `_number` | `settings.finite_number` (pure, public) |
 | `thresholds` | `health.HealthThresholds.thresholds` |
