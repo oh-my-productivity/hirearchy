@@ -710,11 +710,11 @@ class ReworkContext(Protocol):   # port, implemented by `services`
     def fields_for(self, actor: str, revises: str) -> Mapping[str, object]: """service/contract/playbook a rework inherits ({} for an ordinary task)."""
 ```
 Impl: `RuleMessageSender`, `RuleTaskAssigner` (consumes a `MessageSender` and a `ReworkContext`), `RuleTaskReporter` (consumes a `MessageSender`); private collaborators (in `_protocols.py`, made by `wire_dispatch`, not runtime fields): `RoutePolicy` -> `ParentSiblingRoutePolicy`, `HopCounter` -> `InflightHopCounter`, `ArtifactNormalizer` -> `ArtifactAnnotator`, `LessonsCheck` -> `LessonsPolicy`.
-Fakes: `RecordingSender`, `NoReworkContext`, `FixedReworkContext`. Until C-services `ReworkContext` is provided by `wire_dispatch.LegacyReworkContext` (it wraps the legacy `services.rework_fields` over an `Org` of the same root); `wire_services` takes the provider over with `ServiceReworkContext`.
+Fakes: `RecordingSender`, `NoReworkContext`, `FixedReworkContext`. `ReworkContext` is provided by `wire_services` (`ServiceReworkContext`, step C-services); `wire_dispatch` has no provider of it (two providers of one port are refused), but its `RuleTaskAssigner` takes it from the runtime.
 
 ### 3.21 `services`
 
-Data: `Contract`, `Playbook` (as today), constants `VERDICTS FEEDBACK_HEADER ...`.
+Data: `Contract`, `Playbook` (as today; `inputs` is a `list[JsonObject]`, `deliverable` a `JsonObject`), constants `INPUT_RE VERDICTS DESCRIPTION_MAX REASON_MAX FEEDBACK_MAX DELIVERABLE_KEYS FEEDBACK_HEADER`.
 
 ```python
 class ServiceStore(Protocol):   # port: the files of one owner's services
@@ -722,7 +722,7 @@ class ServiceStore(Protocol):   # port: the files of one owner's services
     def read_contract(self, owner: str, name: str) -> tuple[JsonObject, str] | None: """(frontmatter, body) of SERVICE.md."""
     def read_playbook(self, owner: str, name: str) -> tuple[JsonObject, str] | None: ...
     def write_contract(self, owner: str, name: str, meta: JsonObject, body: str, archive_version: int | None) -> str: """Archive the old one as history/SERVICE.v<n>.md; returns the relative path."""
-    def write_playbook(self, owner: str, name: str, version: int, meta: JsonObject, body: str) -> str: ...
+    def write_playbook(self, owner: str, name: str, version: int, meta: JsonObject, body: str, archive_version: int | None = None) -> str: """Archive the old one as history/PLAYBOOK.v<n>.md when archive_version is given; returns the relative path."""
     def retire(self, owner: str, name: str, stamp: str) -> str: """Move to services/.retired/<name>-<stamp>."""
     def playbook_history(self, owner: str, name: str) -> list[tuple[int, JsonObject]]: ...
 
@@ -749,11 +749,13 @@ class ServiceHints(Protocol):
     def feedback_text(self, msg: Message) -> str: """The client's own words in a feedback note."""
 
 class ContractNormalizer(Protocol):
-    def parse_input_spec(self, spec: str) -> dict[str, object]: """'name*:description' -> input dict."""
-    def inputs(self, value: object) -> list[dict[str, object]]: ...
-    def deliverable(self, value: object) -> dict[str, object]: ...
+    def parse_input_spec(self, spec: str) -> JsonObject: """'name*:description' -> input dict."""
+    def inputs(self, value: object) -> list[JsonObject]: ...
+    def deliverable(self, value: object) -> JsonObject: ...
 ```
 Impl: `FsServiceStore`, `ContractServiceCatalog`, `RuleServiceCommands`, `ServiceReportHints`, `TextContractNormalizer`, `ServiceReworkContext(ReworkContext)`; fake `MemoryServiceStore`.
+`RuleServiceCommands` only offers the five commands together; each rule is a part with its own private Protocol (in `_protocols.py`, made by `wire_services`, not runtime fields): `ContractDefinitions` -> `RuleContractDefiner`, `ServiceRetirement` -> `RuleServiceRetirement`, `PlaybookRevisions` -> `RulePlaybookReviser`, `ServiceRequests` -> `RuleServiceRequester`, `ClientFeedback` -> `RuleClientFeedback`. Their collaborators, also private: `ServicePlaces` -> `OrgServicePlaces` (where the files are; `Contract.path` and the relative paths in the texts come from it), `OwnerAddresses` -> `DirectReportOwners`, `PlaybookTexts` -> `CappedPlaybookTexts` (the cap is read from `OrgSettings.config()["playbook_max_words"]` exactly as the old `_word_cap` did: `OrgSettings.number` would read a bool as the default and an infinity as a crash), `PlaybookWriter` -> `EventedPlaybookWriter` (writes through the store and emits `service.revise`), `ContractAmendment` -> `ContractAmender`, `RequestBodies` -> `TextRequestBodies`. `ServiceStore.write_contract` / `write_playbook` write the file, `archive_version` names the old version to keep; the events (`service.define`, `service.revise`, `service.retire`) and the quiet notes (`MessageDelivery.notify(..., wake=False)`) are the commands'. Requests and feedback go through the runtime's `MessageSender`.
+The part of the old `services.py` that is derived from the message files (cases, statistics, digest, `services_text`, `case_total`, the prompt sections) stays, until C-reflection, in `services/_legacy.py` as the seam: it reads contracts and playbooks through `org.runtime.service_catalog` and the history of the playbook through `ServiceStore.playbook_history`, and it still reads the mailboxes through the `Org` it is given (the dashboard's `LenientOrg` caches them). `Stats` is moved there with it (the class-interface check skips `_legacy`). `services._clip` is left as an alias of `kernel.clip_line` for `kernel/tests/test_text.py`, which compares the three copies; it goes with that test in E3.
 
 ### 3.22 `reflection`
 
@@ -1725,17 +1727,17 @@ A TTY check (`sys.stdin.isatty() and sys.stdout.isatty()`) is the one terminal d
 |---|---|
 | `Contract`, `Playbook` | `services` (data) |
 | `service_dir`, `_rel` | `services/_store.py::FsServiceStore` (private) / `kernel.OrgPaths.rel` |
-| `_int`, `_when` | `services/_parse.py` (private; `_when` uses `kernel.parse_time`) |
+| `_int`, `_when` | `services/_parse.py` (private; `as_int`, `as_time` uses `kernel.parse_time`) |
 | `read_contract`, `read_playbook`, `owned_services`, `requestable_services` | `services.ServiceCatalog` |
-| `_owner_addr`, `_check_actor_owns`, `_playbook_text`, `_word_cap` | `services/_commands.py::RuleServiceCommands` (private; `_word_cap` -> `OrgSettings.number("playbook_max_words")`) |
-| `_clip` | `kernel.clip_line` (**deleted: duplicate of** `observe._clip`; identical code) |
+| `_owner_addr`, `_check_actor_owns`, `_playbook_text`, `_word_cap` | `services/_texts.py::DirectReportOwners`, `RulePlaybookReviser._owned`, `CappedPlaybookTexts` (private; `_word_cap` -> `_cap.playbook_word_cap(OrgSettings.config())`, same reading as before) |
+| `_clip` | `kernel.clip_line` (**duplicate of** `observe._clip`, identical code; C-services keeps the name as an alias of `kernel.clip_line` for `kernel/tests/test_text.py`, deleted with that test in E3) |
 | `_stamp_now` | deleted: `Clock.now().isoformat(timespec="microseconds")` |
 | `_lines`, `parse_input_spec`, `_inputs`, `_deliverable` | `services.ContractNormalizer` (`TextContractNormalizer`; `_lines` private) |
 | `define_service`, `retire_service`, `revise_playbook`, `request`, `feedback` | `services.ServiceCommands` |
 | `_numbered`, `_amended_criteria`, `_fmt_deliverable`, `_contract_changes`, `_contract_diff` | `services/_amend.py::ContractAmender` (private) |
-| `_write_playbook` | `services.ServiceStore.write_playbook` |
+| `_write_playbook` | `services.ServiceStore.write_playbook` (+ the `service.revise` event: `services/_texts.py::EventedPlaybookWriter`) |
 | `report_hint`, `feedback_text` | `services.ServiceHints` |
-| `_request_body` | `services/_commands.py::RequestBodyBuilder` (private) |
+| `_request_body` | `services/_request.py::TextRequestBodies` (private) |
 | `rework_fields` | `dispatch.ReworkContext.fields_for` implemented by `services/_rework.py::ServiceReworkContext` |
 | `Case`, `Verdict`, `Stats` | `reflection` (data) |
 | `playbook_timeline`, `cases`, `case_of` | `reflection.CaseHistory` |
