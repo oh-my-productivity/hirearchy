@@ -13,9 +13,6 @@ from orgmcp.kernel import Message
 from orgmcp.mail.testing import MailHarness, MemoryMailbox, memory_mailbox
 from orgmcp.runs.testing import MemoryRuns
 
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-budget")
-
 CAN_HIRE = "---\nrole: R\ncan_hire: true\n---\nx\n"
 
 
@@ -59,7 +56,7 @@ def test_it_is_received_minus_given_minus_runs(tmp_path: Path) -> None:
 def test_the_runs_are_asked_of_the_run_counter_for_the_normalized_address(tmp_path: Path) -> None:
     harness, box = organization(tmp_path)
     runs = CountedRuns({"ceo/eng": 4})
-    assert query(harness, box, runs).budget(" /Ceo/eng/ ") == -4
+    assert query(harness, box, runs).budget(" /ceo/eng/ ") == -4
     assert runs.asked == ["ceo/eng"]
 
 

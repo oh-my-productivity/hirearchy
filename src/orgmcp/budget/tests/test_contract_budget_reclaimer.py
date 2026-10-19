@@ -16,9 +16,6 @@ from orgmcp.kernel import Message, OrgError, parent
 
 from ._support import assign, grant, make
 
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-budget")
-
 ENG, QA, OPS = "ceo/eng", "ceo/qa", "ceo/ops"
 
 

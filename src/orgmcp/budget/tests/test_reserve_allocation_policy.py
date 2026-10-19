@@ -15,9 +15,6 @@ from orgmcp.settings.testing import MemoryOrgSettings
 from ._support import assign, grant, populated, report
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-budget")
-
-
 class SpiedBudget(BudgetQuery):
     """A budget that answers a number and remembers whom it was asked about."""
 

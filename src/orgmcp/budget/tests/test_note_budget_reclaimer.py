@@ -15,9 +15,6 @@ from orgmcp.kernel.testing import FakeClock, SequenceIdGenerator
 
 from ._support import grant, make, populated
 
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-budget")
-
 ENG = "ceo/eng"
 
 

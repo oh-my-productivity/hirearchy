@@ -17,9 +17,6 @@ from orgmcp.kernel import Message, OrgError
 from ._support import assign, grant, make, report
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-budget")
-
-
 @pytest.fixture(params=IMPLEMENTATIONS[AllocationPolicy], ids=lambda factory: factory.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> BudgetWorld:
     made = make(request, tmp_path)
