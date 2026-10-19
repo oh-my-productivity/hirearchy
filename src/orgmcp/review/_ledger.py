@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime
 
-from ..kernel import LedgerStore, aware
+from ..kernel import JsonObject, LedgerStore, aware
 from ._ports import LedgerRecord, ReviewLedger
 
 LEDGER = "reviews"  # .runtime/reviews.json
@@ -28,4 +28,5 @@ class StoreReviewLedger(ReviewLedger):
     def save(self, at: datetime, runs: int, notified: Mapping[str, list[str]]) -> None:
         aware_at = aware(at)
         assert aware_at is not None
-        self._ledgers.write(LEDGER, {"at": aware_at.isoformat(timespec="seconds"), "runs": runs, "notified": {k: list(v) for k, v in notified.items()}})
+        record: JsonObject = {"at": aware_at.isoformat(timespec="seconds"), "runs": runs, "notified": {k: list(v) for k, v in notified.items()}}
+        self._ledgers.write(LEDGER, record)
