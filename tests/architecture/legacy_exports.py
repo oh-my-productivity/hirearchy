@@ -57,6 +57,10 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "playbook_timeline version_at lessons_of cases summarize stats_by_version reflection_digest case_of "
         "case_total services_text prompt_sections"
     ),
+    "reflection": _e3(
+        "CLIP_LESSON CLIP_NOTE DIGEST_CASES DIGEST_CHARS MAX_VERDICTS cases case_of case_total playbook_timeline prompt_sections "
+        "reflection_digest services_text"
+    ),
     "telemetry": _e3(
         "TITLE_MAX ERROR_MAX clip set_process "
         "process dropped reset traces_seen note_trace single ensure_ignored emit summarize_args prune "

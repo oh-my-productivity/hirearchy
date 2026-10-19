@@ -1,5 +1,4 @@
-"""The old module-level functions of ``orgmcp.services`` are thin adapters of the ports of ``org.runtime`` (until step E3), and the part that
-``reflection`` takes over (the timeline of the playbook) reads through the store."""
+"""The old module-level functions of ``orgmcp.services`` are thin adapters of the ports of ``org.runtime`` (until step E3)."""
 
 from __future__ import annotations
 
@@ -72,18 +71,3 @@ def test_the_rework_fields_are_a_plain_dict_of_the_port(w: ServicesWorld) -> Non
     task = request(w)
     fields = services.rework_fields(org_of(w), "root", task.id)
     assert fields == {"service": "weekly-brief", "contract": 1, "playbook": 0} and type(fields) is dict
-
-
-# ------------------------------------------------------------------------------ the seam for reflection
-
-
-def test_the_timeline_of_the_playbook_is_made_of_the_history_of_the_store(w: ServicesWorld) -> None:
-    org = org_of(w)
-    define(w)
-    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "one")
-    w.d.clock.advance(60)
-    w.commands.revise_playbook("ceo", "weekly-brief", STEPS + "\n4. More.", "two")
-    timeline = services.playbook_timeline(org, "ceo", "weekly-brief")
-    assert [v for v, _ in timeline] == [1, 2] and timeline[0][1] < timeline[1][1]
-    assert services.version_at(timeline, None) == 2 and services.version_at(timeline, timeline[0][1]) == 1
-    assert services.version_at(timeline, timeline[0][1].replace(year=2000)) == 0

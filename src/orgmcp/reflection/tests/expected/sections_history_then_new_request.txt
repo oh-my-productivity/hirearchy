@@ -1,0 +1,20 @@
+
+# Your services
+The contract (SERVICE.md) is your parent's; the playbook (PLAYBOOK.md) is yours.
+- weekly-brief: contract v1, no playbook yet, 2 request(s) so far; contract: ceo/services/weekly-brief/SERVICE.md; playbook: ceo/services/weekly-brief/PLAYBOOK.md
+
+# Playbook: weekly-brief (v0, yours to improve)
+No playbook yet: write v1 now from the evidence below (Reflect before you start), then follow it.
+
+# Reflect before you start: weekly-brief
+Your playbook is how your team delivers this service; you own it and improve it. Evidence so far (there is no playbook yet):
+Cases with new evidence (most recent first):
+- case {ask0} "weekly-brief: ai": done, playbook v0, 5 of 16 runs, 1 rework(s); client feedback: reject "Sam's 'before Friday' needs a date." -> accept "this version is right"; lessons (written after the reject: check it against her words): "Applied the date rule."; earlier: "Clean run; no issues."
+By playbook version:
+- v0: 2 request(s): 1 done, 0 failed, 1 open; 1 reworked; avg 5 runs; feedback 1 accept (1 after a reject), 0 reject
+The client rejected a delivery: decide now whether the playbook must change so this does not happen again (revise_playbook), then handle the request.
+1. Look for what repeats, and for anything the client rejected. A rejection or a failure is enough on its own; a single slow case is not.
+2. When a lesson of yours conflicts with the client's feedback, the client is right: fix the playbook to match the feedback (and say so in the reason).
+3. If a change to how the team works would prevent it, call `revise_playbook(service, content, reason)` with the whole new playbook (at most 1000 words): concrete steps (who does what, in which order, which check), not slogans. Name the cases in the reason. The new version applies to this request.
+4. The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. If the client's feedback is a lasting requirement, also tell your parent (`send`) so it can add it to the contract.
+5. If nothing needs to change, do not revise. Then handle the request following the playbook.
