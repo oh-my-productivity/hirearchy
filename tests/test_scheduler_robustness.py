@@ -384,7 +384,7 @@ def test_runtime_only_batch_is_recorded_as_such(org):
 # --------------------------------------------------------- QA-13: parse caching
 
 from orgmcp import core  # noqa: E402
-from orgmcp.app import wiring  # noqa: E402
+from orgmcp.app import wire_processes, wiring  # noqa: E402
 from orgmcp.mail import MessageParser  # noqa: E402
 from orgmcp.mail.testing import CountingMessageParser  # noqa: E402
 
@@ -522,7 +522,7 @@ def test_signalling_a_finished_run_is_harmless():
 
     proc = subprocess.Popen(["true"], start_new_session=True)
     proc.wait()
-    sched_mod._signal_group(proc, 9)
+    wire_processes.adopt(proc).signal_group(9)
 
 
 # ------------------------------------------------------------------ small extras

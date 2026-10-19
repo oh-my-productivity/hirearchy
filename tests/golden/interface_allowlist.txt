@@ -4,5 +4,4 @@ orgmcp.dashboard_data.DashData
 orgmcp.dashboard_data.EventFeed
 orgmcp.dashboard_data.LenientOrg
 orgmcp.dashboard_data.Snapshot
-orgmcp.scheduler.Scheduler
 orgmcp.server.OrgBinding

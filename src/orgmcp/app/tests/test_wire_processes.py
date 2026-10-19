@@ -106,5 +106,5 @@ def test_judge_orphan_never_calls_the_judging_process_ours() -> None:
 
 
 def test_signal_group_takes_a_popen_and_its_group(child: subprocess.Popen[bytes]) -> None:
-    sched._signal_group(child, signal.SIGTERM)
+    PopenHandle(child).signal_group(signal.SIGTERM)  # (the scheduler's own wrapper of it is gone: the lifecycle signals its handles)
     assert child.wait(timeout=10) == -signal.SIGTERM

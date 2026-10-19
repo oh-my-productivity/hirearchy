@@ -1,7 +1,8 @@
 """Providers of the ``stalls`` ports (ARCHITECTURE.md 6.1), and the ladder of the legacy scheduler.
 
-``RuntimeStalls`` and ``CallableClock`` serve ``scheduler.Scheduler`` until D-sched-1 converts it: it is given its clock as a function and its org
-as an object whose ``runtime`` tests replace, and it keeps the memo of the task views for as long as it lives. Both are deleted then.
+``RuntimeStalls`` and ``CallableClock`` serve ``scheduler.Scheduler`` until D-sched-2 converts its loop: it is given its clock as a function and its org
+as an object whose ``runtime`` tests replace, and it keeps the memo of the task views for as long as it lives. The stall check is a phase of the loop, which D-sched-2
+builds (``StallLadder`` with the cadence clock): both are deleted then.
 """
 
 from __future__ import annotations
