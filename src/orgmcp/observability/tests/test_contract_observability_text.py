@@ -13,9 +13,8 @@ from orgmcp.observability import ObservabilityText
 from orgmcp.observability.testing import IMPLEMENTATIONS, ObservabilityWorld
 
 from . import _support
-from ._support import RED, stamp
+from ._support import stamp
 
-pytestmark = RED
 
 NOW = stamp(500)
 SINCE = "2026-10-18T00:00:00Z"

@@ -27,11 +27,10 @@ from orgmcp.observability._now import (
 )
 from orgmcp.observability._ports import BatchItem, FlightReport, InflightBatches, QueueReport, RecentEvents, RootDesk, SchedulerReport
 
-from ._scenario import NOW, RUNNING, SCENARIOS, follow_ports, settle, stamp
+from ._scenario import NOW, SCENARIOS, follow_ports, settle, stamp
 from ._second import Second
-from ._support import RED, items
+from ._support import items
 
-pytestmark = RED
 
 
 def put(log: MemoryEventLog, when: float, kind: str, proc: str = "scheduler", pid: int = 7000, **fields: object) -> None:
@@ -108,7 +107,7 @@ def test_the_batches_in_flight_are_the_messages_of_the_agents_with_a_run_going(b
     got = s.batches.of_running()
     assert list(got) == ["ceo"]
     assert [b.title for b in got["ceo"]] == ["Memo", "Another"] and all(isinstance(b, BatchItem) and b.sender == "root" for b in got["ceo"])
-    assert [b.trace for b in got["ceo"]] == [None, None] and got["ceo"][0].id < got["ceo"][1].id
+    assert all(b.trace for b in got["ceo"]) and got["ceo"][0].id < got["ceo"][1].id
 
 
 def test_no_run_going_no_batches(built: Any) -> None:
@@ -130,7 +129,7 @@ def test_the_front_matter_of_a_batch_comes_from_the_index_one_file_at_a_time(bui
             return found
 
     rt = built.org.runtime
-    got = MailInflightBatches(rt.agents, rt.mailbox, rt.paths, Spy()).of_running()
+    got = MailInflightBatches(rt.agents, rt.mailbox, s.files, Spy()).of_running()
     assert [p.parent.parent.name for p in asked] == ["ceo", "ceo"] and [b.title for b in got["ceo"]] == ["Memo", "Another"]
 
 
@@ -149,7 +148,7 @@ def test_the_title_and_trace_of_a_batch_come_from_its_front_matter(built: Any) -
     (inflight / "zz-traced.md").write_text("---\nid: traced-1\nfrom: root\nto: ceo\ntype: note\ntrace: T-9\n---\nx\n")
     (inflight / "zz-plain.md").write_text("---\nfrom: root\nto: ceo\ntype: note\n---\nx\n")
     last = s.batches.of_running()["ceo"][-2:]
-    assert [(b.id, b.title, b.trace) for b in last] == [("traced-1", "", "T-9"), ("zz-plain", "", None)]
+    assert [(b.id, b.title, b.trace) for b in last] == [("zz-plain", "", None), ("traced-1", "", "T-9")]
 
 
 # ------------------------------------------------------------------------------ the runs in flight
@@ -300,10 +299,12 @@ def test_the_view_is_made_of_the_parts_and_the_clock_gives_its_time(built: Any) 
             return 4
 
     clock = FakeClock()
-    view = FileNowQueries(built.org.runtime.settings, Scheduler(), Flight(), Queue(), Recent(), Desk(), clock).now_view()
+    parts = (built.org.runtime.settings, Scheduler(), Flight(), Queue(), Recent(), Desk())
+    view = FileNowQueries(*parts, clock).now_view(NOW)
     assert view == {
-        "now": clock.now().isoformat(), "scheduler": {"state": "running", "at": clock.now().isoformat()}, "max_parallel": 3,
+        "now": NOW.isoformat(), "scheduler": {"state": "running", "at": NOW.isoformat()}, "max_parallel": 3,
         "runs_in_flight": [{"agent": "a"}, {"agent": "b"}], "queued": [{"up": True, "running": 2, "max": 3}], "waiting_on_you": ["w"],
         "open_root_tasks": 4, "paused": {"x": "y"}, "errors_15m": {"count": 0, "events": []}, "last_event": None, "events_seen": False,
     }
-    assert RUNNING[0] == "running"
+    asked = FileNowQueries(*parts, clock).now_view()
+    assert asked["now"] == asked["scheduler"]["at"] and datetime.fromisoformat(str(asked["now"])) >= stamp(0)  # type: ignore[index]

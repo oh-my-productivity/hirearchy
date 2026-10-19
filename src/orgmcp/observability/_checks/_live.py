@@ -9,8 +9,12 @@ from .._ports import LiveRuns
 
 
 class JudgedLiveRuns(LiveRuns):
+    """A recorded process is live when the judge calls it ours (alive and ours to kill) or leaves it in doubt (alive, unverifiable)."""
+
     def __init__(self, judge: OrphanJudge) -> None:
         self._judge = judge
 
     def live(self, record: Mapping[str, object] | None) -> bool:
-        raise NotImplementedError("red: C-obs-2")
+        if not record:
+            return False
+        return self._judge.judge(record) in ("ours", "doubt")

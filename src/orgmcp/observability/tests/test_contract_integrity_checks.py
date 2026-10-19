@@ -16,9 +16,8 @@ from orgmcp.observability import IntegrityChecks
 from orgmcp.observability.testing import IMPLEMENTATIONS, ObservabilityWorld
 
 from . import _support
-from ._support import RED, items, stamp
+from ._support import items, stamp
 
-pytestmark = RED
 
 NOW = stamp(500)
 RUNNING = SchedulerState("running", 7000, "2026-10-18 10:00:00Z")

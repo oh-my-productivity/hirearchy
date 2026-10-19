@@ -16,9 +16,8 @@ from orgmcp.observability._ports import IntegrityCheck, LiveRuns
 from . import _scenario
 from ._scenario import NOW, SCENARIOS, VerdictJudge, follow_ports, old, settle, stamp
 from ._second import Second
-from ._support import RED, items
+from ._support import items
 
-pytestmark = RED
 
 STOPPED = ("stopped", None, None, "")
 

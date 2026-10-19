@@ -11,9 +11,8 @@ import pytest
 
 from orgmcp.observability._render import TextObservabilityRenderer
 
-from ._support import RED, expected
+from ._support import expected
 
-pytestmark = RED
 
 R = TextObservabilityRenderer()
 

@@ -14,7 +14,6 @@ from orgmcp.observability._files import FsMailboxFiles, FsSchedulerPidFile
 from orgmcp.observability._ports import MailboxFiles, SchedulerPidFile
 from orgmcp.observability.testing import MemoryMailboxFiles, MemorySchedulerPidFile
 
-from ._support import RED
 
 Put = Callable[[str, str], None]
 
@@ -34,7 +33,7 @@ def memory(tmp_path: Path) -> tuple[MailboxFiles, SchedulerPidFile, Put]:
     return MemoryMailboxFiles(tree, 1000.0), MemorySchedulerPidFile(tree), tree.put
 
 
-@pytest.fixture(params=[pytest.param(disk, marks=RED, id="disk"), pytest.param(memory, id="memory")])
+@pytest.fixture(params=[pytest.param(disk, id="disk"), pytest.param(memory, id="memory")])
 def world(request: pytest.FixtureRequest, tmp_path: Path) -> tuple[MailboxFiles, SchedulerPidFile, Put, Path]:
     files, pid, put = request.param(tmp_path)
     root = tmp_path if request.param is disk else MemoryAgents().root

@@ -13,9 +13,8 @@ from orgmcp.observability import IntegrityChecks, NowQueries, ObservabilityRende
 
 from ._scenario import NOW, SCENARIOS, SINCE, follow_ports, settle
 from ._second import Second, dump
-from ._support import RED, expected
+from ._support import expected
 
-pytestmark = RED
 
 
 @pytest.fixture(params=list(SCENARIOS))

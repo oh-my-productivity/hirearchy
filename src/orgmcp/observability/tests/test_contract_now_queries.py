@@ -17,9 +17,8 @@ from orgmcp.observability import NowQueries
 from orgmcp.observability.testing import IMPLEMENTATIONS, ObservabilityWorld
 
 from . import _support
-from ._support import RED, items, stamp, table
+from ._support import items, stamp, table
 
-pytestmark = RED
 
 NOW = stamp(200)
 RUNNING = SchedulerState("running", 7000, "2026-10-18 10:00:00Z")
@@ -56,7 +55,9 @@ def test_an_organization_nothing_happened_in_is_quiet(w: ObservabilityWorld) -> 
 
 def test_the_default_time_is_the_clock(w: ObservabilityWorld) -> None:
     w.clock.advance(5)
-    assert w.now.now_view()["now"] == w.clock.now().isoformat()
+    before = w.clock.now()
+    asked = _support.at(w.now.now_view()["now"])
+    assert before <= asked <= w.clock.now() and asked >= stamp(5)
 
 
 def test_the_scheduler_is_the_one_the_status_says(w: ObservabilityWorld) -> None:

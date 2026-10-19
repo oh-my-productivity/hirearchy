@@ -16,9 +16,7 @@ from orgmcp.observability._dispatch import AgentTargetedEvents, ViewDispatcher
 from orgmcp.observability._ports import TargetedEvents
 from orgmcp.observability.testing import FixedEventQueries, FixedIntegrityChecks, FixedMetricQueries, FixedNowQueries, FixedTraceQueries, stamp
 
-from ._support import RED
 
-pytestmark = RED
 
 NOW = stamp(200)
 
@@ -111,7 +109,7 @@ def test_another_view_is_an_error_that_lists_the_views() -> None:
 
 def targeted(tmp_path: Any, files: bool = False) -> tuple[AgentTargetedEvents, FixedEventQueries, MemoryEventLog]:
     agents = fs_agents(tmp_path)
-    agents.put("ceo/ROLE.md", "---\nrole: ceo\n---\nc\n")
+    agents.put("ceo/AGENT.md", "---\nrole: ceo\n---\nc\n")
     log = MemoryEventLog(FakeClock())
     if files:
         log.append("2026-10-18", "mcp-1-1.jsonl", b"{}\n")
