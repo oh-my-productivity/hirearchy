@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from ._address import BOXES, NAME_RE, RESERVED, ROOT, RUNTIME, RUNTIME_NAMES, child_addr, depth, norm, parent
 from ._errors import OrgError
-from ._frontmatter import join_frontmatter, split_frontmatter
+from ._frontmatter import flow_text, join_frontmatter, split_frontmatter
 from ._message import (
     MESSAGE_TYPES,
     RENDER_BODY_CHARS,
@@ -52,6 +52,7 @@ __all__ = [
     "clip",
     "clip_line",
     "depth",
+    "flow_text",
     "fmt_dur",
     "fmt_duration",
     "inside",
