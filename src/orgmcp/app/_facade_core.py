@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 
 from ..kernel import child_addr as _child_addr, depth as _depth, norm as _norm, OrgError, parent as _parent, ROOT
-from ._compat import atomic_write, secrets, utcnow
+from ._compat import atomic_write
 from .wiring import open_runtime
 
 
@@ -43,7 +43,7 @@ class CoreMixin:
         return _child_addr(parent, name)
 
     def new_id(self, sender: str) -> str:
-        return f"{utcnow():%Y%m%dT%H%M%S%f}-{sender.replace('/', '.')}-{secrets.token_hex(2)}"
+        return self.runtime.ids.message_id(sender)
 
     def ledger(self, name: str) -> dict:
         """Runtime-private bookkeeping (``.runtime/<name>.json``): the only state not derived from messages."""
