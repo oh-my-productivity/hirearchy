@@ -19,8 +19,6 @@ from .paths import REPO
 
 pytestmark = pytest.mark.architecture
 
-RED = pytest.mark.xfail(strict=True, reason="red: E0")
-
 # One source file that exercises everything: imports, a constant, a __file__ path, helpers, fixtures (one needs the other), a comment,
 # a parametrized test. Its tests go to four destinations in four groups.
 SOURCE = '''\
@@ -84,8 +82,12 @@ SPLIT = {
 }
 
 
+GROUPS = {"a": ["kernel"], "b": ["budget"], "c": ["health"], "d": ["blueprint"], "e": ["scheduler", "tests/e2e"]}
+
+
 def manifest_dict(destinations: dict[str, tuple[str, dict[str, list[Any]]]]) -> dict[str, Any]:
-    return {"version": 1, "destinations": {dest: {"group": group, "sources": sources} for dest, (group, sources) in destinations.items()}}
+    return {"version": 1, "groups": GROUPS,
+            "destinations": {dest: {"group": group, "sources": sources} for dest, (group, sources) in destinations.items()}}
 
 
 def make_repo(tmp_path: Path, sources: dict[str, str], existing: dict[str, str] | None = None) -> Path:
@@ -151,7 +153,6 @@ def run(tool, repo: Path, manifest, verb: str, *groups: str) -> None:  # type: i
 # plan
 
 
-@RED
 def test_the_plan_counts_tests_per_group_and_destination(tool, synth) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
     plan = tool.make_plan(repo, manifest)
@@ -163,7 +164,6 @@ def test_the_plan_counts_tests_per_group_and_destination(tool, synth) -> None:  
     assert f"{BUDGET} (new, 1 tests, 1 collected) <- tests/test_synth.py" in text
 
 
-@RED
 def test_a_test_that_no_destination_claims_is_an_error(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     repo = make_repo(tmp_path, {"test_synth.py": SOURCE})
     partial = {BUDGET: SPLIT[BUDGET], KERNEL: SPLIT[KERNEL], HEALTH: SPLIT[HEALTH]}
@@ -171,7 +171,6 @@ def test_a_test_that_no_destination_claims_is_an_error(tool, tmp_path) -> None: 
     assert any("unassigned" in e and "tests/test_synth.py::test_delta" in e for e in plan.errors), plan.errors
 
 
-@RED
 def test_a_test_claimed_twice_is_an_error(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     repo = make_repo(tmp_path, {"test_synth.py": SOURCE})
     twice = {**SPLIT, "src/orgmcp/budget/tests/test_again.py": ("b", {"tests/test_synth.py": ["test_alpha"]})}
@@ -179,7 +178,6 @@ def test_a_test_claimed_twice_is_an_error(tool, tmp_path) -> None:  # type: igno
     assert any("twice" in e and "test_alpha" in e for e in plan.errors), plan.errors
 
 
-@RED
 def test_a_test_that_exists_nowhere_is_an_error(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     repo = make_repo(tmp_path, {"test_synth.py": SOURCE})
     ghost = {**SPLIT, "src/orgmcp/budget/tests/test_ghost.py": ("b", {"tests/test_synth.py": ["test_vanished"]})}
@@ -187,7 +185,6 @@ def test_a_test_that_exists_nowhere_is_an_error(tool, tmp_path) -> None:  # type
     assert any("test_vanished" in e and "nowhere" in e for e in plan.errors), plan.errors
 
 
-@RED
 def test_the_group_of_a_destination_is_the_group_of_its_package(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     repo = make_repo(tmp_path, {"test_synth.py": SOURCE})
     wrong = {**SPLIT, BUDGET: ("a", SPLIT[BUDGET][1])}
@@ -195,7 +192,6 @@ def test_the_group_of_a_destination_is_the_group_of_its_package(tool, tmp_path) 
     assert any(BUDGET in e and "group" in e and "'b'" in e for e in plan.errors), plan.errors
 
 
-@RED
 def test_a_destination_outside_the_known_places_is_an_error(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     repo = make_repo(tmp_path, {"test_synth.py": SOURCE})
     bad = {**SPLIT, E2E: ("e", SPLIT[E2E][1]), "src/orgmcp/nowhere/tests/test_x.py": ("a", {"tests/test_synth.py": ["test_beta"]})}
@@ -204,7 +200,6 @@ def test_a_destination_outside_the_known_places_is_an_error(tool, tmp_path) -> N
     assert any("nowhere" in e for e in plan.errors), plan.errors
 
 
-@RED
 def test_a_manifest_that_repeats_a_key_is_refused(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     path = tmp_path / "m.yaml"
     path.write_text("version: 1\ndestinations:\n  a/b.py: {group: a, sources: {}}\n  a/b.py: {group: a, sources: {}}\n", encoding="utf-8")
@@ -216,7 +211,6 @@ def test_a_manifest_that_repeats_a_key_is_refused(tool, tmp_path) -> None:  # ty
 # apply: what moves and what goes with it
 
 
-@RED
 def test_a_test_takes_its_fixtures_and_helpers_with_it_and_keeps_source_order(tool, synth) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
     run(tool, repo, manifest, "apply", "b")
@@ -226,7 +220,6 @@ def test_a_test_takes_its_fixtures_and_helpers_with_it_and_keeps_source_order(to
     assert "def test_alpha(tall):\n    assert triple(LIMIT) == 9 and tall\n" in text  # moved verbatim
 
 
-@RED
 def test_the_destination_imports_only_what_it_uses(tool, synth) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
     run(tool, repo, manifest, "apply", "b", "a", "c")
@@ -235,7 +228,6 @@ def test_the_destination_imports_only_what_it_uses(tool, synth) -> None:  # type
     assert imports((repo / HEALTH).read_text(encoding="utf-8")) == {"os", "pytest"}
 
 
-@RED
 def test_decorators_comments_and_parametrize_move_with_the_test(tool, synth) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
     run(tool, repo, manifest, "apply", "c", "a")
@@ -243,7 +235,6 @@ def test_decorators_comments_and_parametrize_move_with_the_test(tool, synth) -> 
     assert "# a comment that belongs to beta\ndef test_beta():" in (repo / KERNEL).read_text(encoding="utf-8")
 
 
-@RED
 def test_a_helper_that_several_destinations_need_is_copied_to_each(tool, synth) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
     run(tool, repo, manifest, "apply", "b", "c")
@@ -251,7 +242,6 @@ def test_a_helper_that_several_destinations_need_is_copied_to_each(tool, synth) 
     assert "def double(x):" in (repo / HEALTH).read_text(encoding="utf-8")
 
 
-@RED
 def test_the_source_loses_what_nothing_needs_any_more(tool, synth) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
     run(tool, repo, manifest, "apply", "b")
@@ -264,14 +254,12 @@ def test_the_source_loses_what_nothing_needs_any_more(tool, synth) -> None:  # t
     assert imports((repo / "tests/test_synth.py").read_text(encoding="utf-8")) == {"Path"}
 
 
-@RED
 def test_a_source_without_tests_is_deleted(tool, synth) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
     run(tool, repo, manifest, "apply", "a", "b", "c", "e")
     assert not (repo / "tests/test_synth.py").exists()
 
 
-@RED
 def test_an_autouse_fixture_goes_with_every_test_of_its_module(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     source = textwrap.dedent('''\
         import pytest
@@ -299,7 +287,6 @@ def test_an_autouse_fixture_goes_with_every_test_of_its_module(tool, tmp_path) -
     assert "def clean_env(monkeypatch):" in (repo / KERNEL).read_text(encoding="utf-8")
 
 
-@RED
 def test_a_fixture_given_a_name_is_found_by_that_name(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     source = textwrap.dedent('''\
         import pytest
@@ -319,7 +306,6 @@ def test_a_fixture_given_a_name_is_found_by_that_name(tool, tmp_path) -> None:  
     assert 'name="thing"' in (repo / BUDGET).read_text(encoding="utf-8")
 
 
-@RED
 def test_a_test_class_is_split_by_method_and_keeps_its_other_members(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     source = textwrap.dedent('''\
         import pytest
@@ -351,7 +337,6 @@ def test_a_test_class_is_split_by_method_and_keeps_its_other_members(tool, tmp_p
     assert "def test_two(self):" in (repo / KERNEL).read_text(encoding="utf-8") and not (repo / "tests/test_cls.py").exists()
 
 
-@RED
 def test_an_async_test_moves_like_any_other(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     source = "async def press(app):\n    return app\n\n\nasync def test_one():\n    assert await press(1)\n"
     repo = make_repo(tmp_path, {"test_async.py": source})
@@ -360,7 +345,6 @@ def test_an_async_test_moves_like_any_other(tool, tmp_path) -> None:  # type: ig
     assert names((repo / BUDGET).read_text(encoding="utf-8")) == {"press", "test_one"}
 
 
-@RED
 def test_the_module_marks_go_with_a_source_that_has_its_destination_to_itself(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     source = "import pytest\n\npytestmark = pytest.mark.integration\n\n\ndef test_one():\n    assert True\n\n\ndef test_two():\n    assert True\n"
     repo = make_repo(tmp_path, {"test_marked.py": source})
@@ -371,7 +355,6 @@ def test_the_module_marks_go_with_a_source_that_has_its_destination_to_itself(to
     assert "pytestmark = pytest.mark.integration" in (repo / KERNEL).read_text(encoding="utf-8")
 
 
-@RED
 def test_module_marks_cannot_be_merged_into_a_destination_that_holds_other_tests(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     marked = "import pytest\n\npytestmark = pytest.mark.integration\n\n\ndef test_one():\n    assert True\n"
     repo = make_repo(tmp_path, {"test_marked.py": marked, "test_plain.py": "def test_two():\n    assert True\n"})
@@ -382,7 +365,6 @@ def test_module_marks_cannot_be_merged_into_a_destination_that_holds_other_tests
     assert (repo / "tests/test_marked.py").exists() and not (repo / BUDGET).exists()
 
 
-@RED
 def test_two_sources_share_a_destination_and_a_helper_with_the_same_text(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     one = "def helper():\n    return 1\n\n\ndef test_one():\n    assert helper()\n"
     two = "def helper():\n    return 1\n\n\ndef test_two():\n    assert helper()\n"
@@ -394,7 +376,6 @@ def test_two_sources_share_a_destination_and_a_helper_with_the_same_text(tool, t
     assert text.count("def helper") == 1 and order(text, "test_one", "test_two") == ["test_one", "test_two"]
 
 
-@RED
 def test_two_sources_with_different_helpers_of_one_name_cannot_share_a_destination(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     one = "def helper():\n    return 1\n\n\ndef test_one():\n    assert helper()\n"
     two = "def helper():\n    return 2\n\n\ndef test_two():\n    assert helper()\n"
@@ -410,7 +391,6 @@ def test_two_sources_with_different_helpers_of_one_name_cannot_share_a_destinati
 # apply: paths, existing destinations, clashes
 
 
-@RED
 def test_paths_relative_to_the_source_file_become_testkit_constants(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     source = textwrap.dedent('''\
         from pathlib import Path
@@ -437,7 +417,6 @@ def test_paths_relative_to_the_source_file_become_testkit_constants(tool, tmp_pa
     assert "__file__" not in text and imports(text) == {"testkit"}
 
 
-@RED
 def test_the_old_places_of_the_support_modules_are_known_too(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     """Before the support modules moved into tests/testkit/ the same constants were spelled with the old file names."""
     source = 'from pathlib import Path\n\nFAKE = str(Path(__file__).with_name("fake_agent.py"))\n\n\ndef test_one():\n    assert FAKE\n'
@@ -447,7 +426,6 @@ def test_the_old_places_of_the_support_modules_are_known_too(tool, tmp_path) -> 
     assert "FAKE = str(testkit.FAKE_AGENT)" in (repo / E2E).read_text(encoding="utf-8")
 
 
-@RED
 @pytest.mark.parametrize("expression", [
     "os.path.dirname(__file__)", "Path(__file__).read_text()", "Path(__file__).parent.parent.parent / 'elsewhere'", "open(__file__)"])
 def test_a_use_of_file_the_tool_cannot_rewrite_is_an_error(tool, tmp_path, expression) -> None:  # type: ignore[no-untyped-def]
@@ -459,14 +437,12 @@ def test_a_use_of_file_the_tool_cannot_rewrite_is_an_error(tool, tmp_path, expre
     assert not (repo / E2E).exists() and (repo / "tests/test_odd.py").read_text(encoding="utf-8") == source
 
 
-@RED
 def test_new_test_directories_become_packages(tool, synth) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
     run(tool, repo, manifest, "apply", "b", "e")
     assert (repo / "src/orgmcp/budget/tests/__init__.py").is_file() and (repo / "tests/e2e/__init__.py").is_file()
 
 
-@RED
 def test_an_existing_destination_is_extended_never_overwritten(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     existing = "import os\n\n\ndef helper_there():\n    return os.sep\n\n\ndef test_existing():\n    assert helper_there()\n"
     repo = make_repo(tmp_path, {"test_synth.py": SOURCE}, {BUDGET: existing, "src/orgmcp/budget/tests/__init__.py": ""})
@@ -478,7 +454,6 @@ def test_an_existing_destination_is_extended_never_overwritten(tool, tmp_path) -
     assert imports(text) == {"os", "pytest"}
 
 
-@RED
 def test_a_test_name_that_the_destination_already_has_is_an_error(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     existing = "def test_alpha():\n    assert False\n"
     repo = make_repo(tmp_path, {"test_synth.py": SOURCE}, {BUDGET: existing, "src/orgmcp/budget/tests/__init__.py": ""})
@@ -489,7 +464,6 @@ def test_a_test_name_that_the_destination_already_has_is_an_error(tool, tmp_path
     assert "already" in str(caught.value) and tree(repo) == before  # nothing was written
 
 
-@RED
 def test_a_helper_name_that_the_destination_defines_differently_is_an_error(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     existing = "def double(x):\n    return x * 3\n"
     repo = make_repo(tmp_path, {"test_synth.py": SOURCE}, {BUDGET: existing, "src/orgmcp/budget/tests/__init__.py": ""})
@@ -498,7 +472,6 @@ def test_a_helper_name_that_the_destination_defines_differently_is_an_error(tool
         tool.apply_group(repo, manifest, "b")
 
 
-@RED
 def test_a_top_level_statement_the_tool_does_not_understand_is_an_error(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     source = "import os\n\nif os.name == 'nt':\n    X = 1\n\n\ndef test_one():\n    assert os\n"
     repo = make_repo(tmp_path, {"test_if.py": source})
@@ -511,7 +484,6 @@ def test_a_top_level_statement_the_tool_does_not_understand_is_an_error(tool, tm
 # prune, idempotence, order
 
 
-@RED
 def test_prune_removes_from_the_source_and_writes_no_destination(tool, synth) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
     run(tool, repo, manifest, "prune", "b")
@@ -519,7 +491,6 @@ def test_prune_removes_from_the_source_and_writes_no_destination(tool, synth) ->
     assert "test_alpha" not in (repo / "tests/test_synth.py").read_text(encoding="utf-8")
 
 
-@RED
 def test_prune_gives_the_source_that_apply_gives(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     """The manager resolves a merge conflict in a shared source by taking the integration version and re-running ``prune``."""
     applied = make_repo(tmp_path / "applied", {"test_synth.py": SOURCE})
@@ -530,7 +501,6 @@ def test_prune_gives_the_source_that_apply_gives(tool, tmp_path) -> None:  # typ
     assert tree(pruned)["tests/test_synth.py"] == tree(applied)["tests/test_synth.py"]
 
 
-@RED
 @pytest.mark.parametrize("verb", ["apply", "prune"])
 def test_running_a_group_twice_changes_nothing(tool, synth, verb) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
@@ -540,7 +510,6 @@ def test_running_a_group_twice_changes_nothing(tool, synth, verb) -> None:  # ty
     assert tree(repo) == once
 
 
-@RED
 def test_the_groups_can_be_applied_in_any_order(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     manifest = tool.Manifest.from_dict(manifest_dict(SPLIT))
     results = []
@@ -551,7 +520,6 @@ def test_the_groups_can_be_applied_in_any_order(tool, tmp_path) -> None:  # type
     assert all(result == results[0] for result in results)
 
 
-@RED
 def test_the_groups_can_be_pruned_in_any_order_and_half_way(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     manifest = tool.Manifest.from_dict(manifest_dict(SPLIT))
     first = make_repo(tmp_path / "x", {"test_synth.py": SOURCE})
@@ -562,7 +530,6 @@ def test_the_groups_can_be_pruned_in_any_order_and_half_way(tool, tmp_path) -> N
     assert "test_delta" in tree(first)["tests/test_synth.py"]  # groups a and e were not touched
 
 
-@RED
 def test_a_dry_run_changes_nothing(tool, synth) -> None:  # type: ignore[no-untyped-def]
     repo, manifest = synth
     before = tree(repo)
@@ -574,7 +541,6 @@ def test_a_dry_run_changes_nothing(tool, synth) -> None:  # type: ignore[no-unty
 # command line
 
 
-@RED
 def test_the_command_line_plans_applies_and_prunes(tool, synth, tmp_path, capsys) -> None:  # type: ignore[no-untyped-def]
     repo, _ = synth
     manifest_path = tmp_path / "relocation.yaml"
@@ -590,7 +556,6 @@ def test_the_command_line_plans_applies_and_prunes(tool, synth, tmp_path, capsys
     assert not (repo / HEALTH).exists() and "test_gamma" not in (repo / "tests/test_synth.py").read_text(encoding="utf-8")
 
 
-@RED
 def test_the_command_line_exits_non_zero_and_says_why(tool, tmp_path, capsys) -> None:  # type: ignore[no-untyped-def]
     repo = make_repo(tmp_path, {"test_synth.py": SOURCE})
     import yaml
@@ -624,13 +589,11 @@ def real_copy(tool, tmp_path: Path) -> tuple[Path, Any]:  # type: ignore[no-unty
     return repo, manifest
 
 
-@RED
 def test_the_real_manifest_makes_a_clean_plan(tool) -> None:  # type: ignore[no-untyped-def]
     plan = tool.make_plan(REPO, tool.load_manifest(relocate_tool.MANIFEST))
     assert plan.errors == []
 
 
-@RED
 def test_applying_the_real_groups_in_two_orders_gives_the_same_tree(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     forward, manifest = real_copy(tool, tmp_path / "forward")
     backward, _ = real_copy(tool, tmp_path / "backward")
@@ -646,7 +609,6 @@ def test_applying_the_real_groups_in_two_orders_gives_the_same_tree(tool, tmp_pa
             compile(text, path, "exec")  # every produced file is valid Python
 
 
-@RED
 def test_pruning_the_real_sources_in_two_orders_gives_the_same_tree(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
     one, manifest = real_copy(tool, tmp_path / "one")
     two, _ = real_copy(tool, tmp_path / "two")

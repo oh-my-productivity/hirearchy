@@ -58,7 +58,7 @@ markers = [
 # Everything else is only *followed* (its types are used, its errors are not reported), so today's untyped modules never fail the run.
 # Run it with `uv run python scripts/static_checks.py mypy` (nothing to check yet is a no-op that proves mypy runs).
 python_version = "3.11"
-mypy_path = "src"
+mypy_path = "src:tests"  # tests/ too: a colocated test may `import testkit`
 namespace_packages = true
 explicit_package_bases = true
 strict = true

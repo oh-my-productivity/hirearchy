@@ -19,8 +19,6 @@ from .paths import REPO
 
 pytestmark = pytest.mark.architecture
 
-RED = pytest.mark.xfail(strict=True, reason="red: E0")
-
 
 @pytest.fixture(scope="module")
 def tool():  # type: ignore[no-untyped-def]
@@ -32,7 +30,6 @@ def manifest(tool):  # type: ignore[no-untyped-def]
     return tool.load_manifest(relocate_tool.MANIFEST)
 
 
-@RED
 def test_the_manifest_assigns_every_remaining_test_to_exactly_one_destination(tool, manifest) -> None:  # type: ignore[no-untyped-def]
     assigned = manifest.assignments()
     remaining = tool.source_inventory(REPO)
@@ -40,12 +37,10 @@ def test_the_manifest_assigns_every_remaining_test_to_exactly_one_destination(to
     assert not unassigned, "not in tests/architecture/relocation.yaml (add them to the destination of their subject):\n  " + "\n  ".join(unassigned)
 
 
-@RED
 def test_the_manifest_names_no_test_twice_and_every_destination_in_the_group_of_its_package(tool, manifest) -> None:  # type: ignore[no-untyped-def]
     assert manifest.problems() == []
 
 
-@RED
 def test_a_group_that_was_applied_is_collected_at_its_destinations_as_the_manifest_says(tool, manifest) -> None:  # type: ignore[no-untyped-def]
     remaining = tool.source_inventory(REPO)
     moved = [t for t in manifest.tests() if t.test not in remaining.get(t.source, ())]
@@ -60,7 +55,6 @@ def test_a_group_that_was_applied_is_collected_at_its_destinations_as_the_manife
     assert not wrong, "tests lost or duplicated by a move:\n  " + "\n  ".join(wrong)
 
 
-@RED
 def test_the_collected_total_never_drops_below_the_floor(manifest) -> None:  # type: ignore[no-untyped-def]
     total = sum(sum(tests.values()) for tests in collected_count.collect_ids().values())
     baseline = int(collected_count.BASELINE.read_text(encoding="utf-8").split()[0])
