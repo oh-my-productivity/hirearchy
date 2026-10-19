@@ -63,14 +63,23 @@ class RecordingSender(MessageSender):
         service: str | None = None, contract: int | None = None, playbook: int | None = None, feedback: str | None = None,
         wake: bool = True, skip_route_check: bool = False,
     ) -> Message:
-        raise NotImplementedError
+        msg = Message(
+            sender=norm(actor), to=norm(to), type=type, body=body.strip(), title=title.strip(), reply_to=reply_to, status=status,
+            budget=int(budget or 0), revises=revises, supersedes=supersedes, service=service, contract=contract, playbook=playbook,
+            feedback=feedback, wake=wake,
+        )
+        done = self._delivery.deliver(msg)
+        self.messages.append(done)
+        if skip_route_check:
+            self.route_check_skipped.append(done.id)
+        return done
 
 
 class NoReworkContext(ReworkContext):
     """Every task is an ordinary task: a rework inherits nothing."""
 
     def fields_for(self, actor: str, revises: str) -> Mapping[str, object]:
-        raise NotImplementedError
+        return {}
 
 
 class FixedReworkContext(ReworkContext):
@@ -80,7 +89,7 @@ class FixedReworkContext(ReworkContext):
         self._fields = {task_id: dict(given) for task_id, given in fields.items()}
 
     def fields_for(self, actor: str, revises: str) -> Mapping[str, object]:
-        raise NotImplementedError
+        return dict(self._fields.get(revises, {}))
 
 
 class PostedDelivery(MessageDelivery):

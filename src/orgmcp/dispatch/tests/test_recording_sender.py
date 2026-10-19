@@ -7,10 +7,6 @@ from orgmcp.dispatch import MessageSender
 from orgmcp.dispatch.testing import FixedReworkContext, NoReworkContext, RecordingSender
 from orgmcp.kernel.testing import FakeClock, SequenceIdGenerator
 
-from ._support import RED
-
-pytestmark = RED
-
 
 def fake() -> RecordingSender:
     clock = FakeClock()

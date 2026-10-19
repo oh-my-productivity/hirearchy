@@ -11,7 +11,7 @@ import pytest
 from orgmcp.dispatch import ReworkContext
 from orgmcp.dispatch.testing import IMPLEMENTATIONS, FixedReworkContext
 
-from ._support import RED, implementations
+from ._support import implementations
 
 KNOWN = "20260101T000000000001-ceo-aaaa"
 
@@ -42,7 +42,6 @@ def test_what_the_caller_does_with_the_answer_does_not_change_the_next_one(conte
     assert context.fields_for("ceo", KNOWN).get("service") != "changed"
 
 
-@RED
 def test_a_fixed_context_answers_with_what_it_was_given() -> None:
     fixed = FixedReworkContext({KNOWN: {"service": "weekly-brief", "contract": 3, "playbook": 2}})
     assert dict(fixed.fields_for("ceo", KNOWN)) == {"service": "weekly-brief", "contract": 3, "playbook": 2}

@@ -16,7 +16,7 @@ HIRERS = ("ceo", "ceo/ops")
 WORKERS = ("ceo/eng", "ceo/qa", "ceo/ops/dev")
 
 RED = pytest.mark.xfail(strict=True, reason="red: B-dispatch")
-PENDING: set[str] = {"fs_world", "memory_world", "fixed_world", "recording_world", "no_rework", "fixed_rework"}  # implementations not green yet
+PENDING: set[str] = {"fs_world", "memory_world", "fixed_world"}  # implementations not green yet
 
 
 def implementations(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:
