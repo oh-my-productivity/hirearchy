@@ -15,8 +15,6 @@ from orgmcp.delivery import MessageDelivery
 from orgmcp.kernel import RUNTIME, Message
 from orgmcp.kernel.testing import FakeClock, SequenceIdGenerator
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-delivery")
-
 
 def use(org: Org, **ports: Any) -> None:
     org.runtime = dataclasses.replace(org.runtime, **ports)
@@ -79,7 +77,6 @@ class Recorded(MessageDelivery):
         return Message(sender=RUNTIME, to=to, type="note", body=body, id="NOTIFIED")
 
 
-@RED
 def test_deliver_comes_from_the_delivery_port_of_the_runtime(org: Org) -> None:
     fake = Recorded()
     use(org, delivery=fake)
@@ -88,7 +85,6 @@ def test_deliver_comes_from_the_delivery_port_of_the_runtime(org: Org) -> None:
     assert not list((org.dir("ceo") / "sent").glob("*.md"))
 
 
-@RED
 def test_notify_comes_from_the_delivery_port_of_the_runtime(org: Org) -> None:
     fake = Recorded()
     use(org, delivery=fake)
@@ -96,7 +92,6 @@ def test_notify_comes_from_the_delivery_port_of_the_runtime(org: Org) -> None:
     assert fake.calls == [("notify", "ceo", "t", "b", False, "T")]
 
 
-@RED
 def test_what_the_other_slices_deliver_goes_through_the_port(org: Org) -> None:
     fake = Recorded()
     use(org, delivery=fake)
@@ -104,7 +99,6 @@ def test_what_the_other_slices_deliver_goes_through_the_port(org: Org) -> None:
     assert [c[0] for c in fake.calls] == ["deliver"]
 
 
-@RED
 def test_new_id_comes_from_the_id_generator_of_the_runtime(org: Org) -> None:
     use(org, ids=SequenceIdGenerator(FakeClock()))
     assert org.new_id("ceo") == "20261018T100000000001-ceo-0000"
