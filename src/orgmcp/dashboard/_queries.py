@@ -25,57 +25,61 @@ from ..dashdata import (
 from ..kernel import JsonObject
 from ._ports import DashboardQueries
 
-RED = "red: D-dashboard"
-
 
 class ComposedQueries(DashboardQueries):
-    """RED skeleton."""
+    """The five queries of one dashboard and the state they share, asked as one object (what ``DashData`` was). Each question goes to the query that
+    answers it, unchanged. NOT THREAD-SAFE, like the cache the queries share: the app asks from one thread at a time (``DashCache``)."""
 
     def __init__(
         self, snapshots: SnapshotQuery, details: AgentDetailQuery, requests: RequestQuery, services: ServiceQuery, health: HealthQuery,
         state: DashboardState,
     ) -> None:
-        raise NotImplementedError(RED)
+        self._snapshots = snapshots
+        self._details = details
+        self._requests = requests
+        self._services = services
+        self._health = health
+        self._state = state
 
     @property
     def feed(self) -> EventFeed | None:
-        raise NotImplementedError(RED)
+        return self._state.feed
 
     def snapshot(self) -> Snapshot:
-        raise NotImplementedError(RED)
+        return self._snapshots.snapshot()
 
     def agent_detail(self, addr: str, snap: Snapshot | None = None, raw: bool = False) -> AgentDetail:
-        raise NotImplementedError(RED)
+        return self._details.agent_detail(addr, snap, raw)
 
     def run_log(self, addr: str, live: bool) -> RunLog:
-        raise NotImplementedError(RED)
+        return self._details.run_log(addr, live)
 
     def message_text(self, row: MsgRow) -> str:
-        raise NotImplementedError(RED)
+        return self._details.message_text(row)
 
     def message_lookup(self, agent: str, mid: str) -> tuple[str, str, str] | None:
-        raise NotImplementedError(RED)
+        return self._details.message_lookup(agent, mid)
 
     def event_lines(self, events: list[JsonObject], me: str | None = None, actor: bool = False, raw: bool = False) -> list[EventLine]:
-        raise NotImplementedError(RED)
+        return self._details.event_lines(events, me, actor, raw)
 
     def requests(self, snap: Snapshot | None = None) -> list[RequestRow]:
-        raise NotImplementedError(RED)
+        return self._requests.requests(snap)
 
     def trace_text(self, task_id: str) -> str:
-        raise NotImplementedError(RED)
+        return self._requests.trace_text(task_id)
 
     def request_line(self, task_id: str) -> str:
-        raise NotImplementedError(RED)
+        return self._requests.request_line(task_id)
 
     def services(self, snap: Snapshot | None = None) -> list[ServiceRow]:
-        raise NotImplementedError(RED)
+        return self._services.services(snap)
 
     def service_detail(self, owner: str, name: str) -> list[Section]:
-        raise NotImplementedError(RED)
+        return self._services.service_detail(owner, name)
 
     def health(self, snap: Snapshot | None = None) -> HealthView:
-        raise NotImplementedError(RED)
+        return self._health.health(snap)
 
     def run_check(self) -> tuple[datetime, str, bool]:
-        raise NotImplementedError(RED)
+        return self._health.run_check()

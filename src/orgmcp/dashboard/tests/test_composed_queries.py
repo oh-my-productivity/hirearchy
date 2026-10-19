@@ -28,7 +28,6 @@ from orgmcp.dashdata.testing import (
 )
 from orgmcp.kernel.testing import FakeClock
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-dashboard")
 
 
 class Parts:

@@ -10,7 +10,7 @@ does not exist). ``DashboardWorld`` is the app on top of them with the means to 
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
@@ -27,6 +27,7 @@ from ..dashdata.testing import (
 )
 from ..kernel import OrgError
 from ..kernel.testing import FakeClock
+from ._launcher import TextualDashboardLauncher
 from ._ports import DashboardQueries, QueriesOpener, ScreenRunner
 from ._queries import ComposedQueries
 from .api import DashboardLauncher
@@ -104,7 +105,11 @@ class MemoryQueriesOpener(QueriesOpener):
         self.opened: list[tuple[Path, DashboardQueries]] = []
 
     def open(self, root: Path) -> DashboardQueries:
-        raise NotImplementedError("red: D-dashboard")
+        if root not in self.organizations:
+            raise OrgError(f"not an organization (no ORG.md): {root}")
+        queries = fixed_queries(small_snapshot(root))
+        self.opened.append((root, queries))
+        return queries
 
 
 class RecordingScreens(ScreenRunner):
@@ -114,7 +119,7 @@ class RecordingScreens(ScreenRunner):
         self.runs: list[tuple[DashboardQueries, float]] = []
 
     def run(self, queries: DashboardQueries, interval: float) -> None:
-        raise NotImplementedError("red: D-dashboard")
+        self.runs.append((queries, interval))
 
 
 class FakeDashboardLauncher(DashboardLauncher):
@@ -125,7 +130,9 @@ class FakeDashboardLauncher(DashboardLauncher):
         self.launched: list[tuple[Path, float]] = []
 
     def run_dashboard(self, root: Path, interval: float = 2.0) -> None:
-        raise NotImplementedError("red: D-dashboard")
+        if root not in self.organizations:
+            raise OrgError(f"not an organization (no ORG.md): {root}")
+        self.launched.append((root, interval))
 
 
 # ------------------------------------------------------------------------------ the worlds the contract suite iterates over
@@ -139,15 +146,24 @@ class LauncherWorld:
     root: Path
     elsewhere: Path
     shown: Callable[[], list[tuple[Path, float]]]
-    cleanup: list[Callable[[], None]] = field(default_factory=list)
 
 
 def textual_launcher(tmp_path: Path) -> LauncherWorld:
-    raise NotImplementedError("red: D-dashboard")
+    """The Textual launcher over an opener of queries (a set of directories) and a screen that records what it was asked to show."""
+    root, elsewhere = tmp_path / "org", tmp_path / "elsewhere"
+    opener, screens = MemoryQueriesOpener({root}), RecordingScreens()
+
+    def shown() -> list[tuple[Path, float]]:
+        return [(next(path for path, made in opener.opened if made is queries), interval) for queries, interval in screens.runs]
+
+    return LauncherWorld(TextualDashboardLauncher(opener, screens), root, elsewhere, shown)
 
 
 def fake_launcher(tmp_path: Path) -> LauncherWorld:
-    raise NotImplementedError("red: D-dashboard")
+    """The launcher that only records."""
+    root, elsewhere = tmp_path / "org", tmp_path / "elsewhere"
+    fake = FakeDashboardLauncher({root})
+    return LauncherWorld(fake, root, elsewhere, lambda: list(fake.launched))
 
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {

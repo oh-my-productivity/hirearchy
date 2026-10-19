@@ -12,7 +12,6 @@ from orgmcp.dashboard import DashboardLauncher
 from orgmcp.dashboard.testing import IMPLEMENTATIONS, LauncherWorld
 from orgmcp.kernel import OrgError
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-dashboard")
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[DashboardLauncher], ids=lambda factory: factory.__name__)
