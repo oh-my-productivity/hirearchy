@@ -56,12 +56,14 @@ class ListHumanQueue(HumanQueue):
 
 
 class FixedOpenWork(OpenWork):
-    """``nothing_to_do`` answers ``idle`` whatever it is asked."""
+    """``nothing_to_do`` answers ``idle`` whatever it is asked, and keeps what it was asked in ``asked`` as ``(running, blocked, can_start)``."""
 
     def __init__(self, idle: bool = False) -> None:
         self.idle = idle
+        self.asked: list[tuple[Collection[str], Collection[str], bool]] = []
 
-    def nothing_to_do(self) -> bool:
+    def nothing_to_do(self, *, running: Collection[str] = (), blocked: Collection[str] = (), can_start: bool = True) -> bool:
+        self.asked.append((running, blocked, can_start))
         return self.idle
 
 
