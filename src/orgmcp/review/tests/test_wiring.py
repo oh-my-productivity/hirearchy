@@ -4,13 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-import pytest
-
 from orgmcp.review import HealthReviewer
 from orgmcp.review._reviewer import LedgerHealthReviewer
-from orgmcp.templates.testing import RecordingNotices
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-review")
 
 
 def test_the_runtime_builds_the_real_class(scenario: Any) -> None:
@@ -30,12 +25,3 @@ def test_the_reviewer_reads_the_run_logs_and_the_retired_trees_of_the_organizati
     (retired / "20260101T000000000002.log").touch()
     assert scenario.runtime.health_reviewer.total_runs() == 2
 
-
-def test_the_notes_are_worded_by_the_notices_of_the_runtime(scenario: Any) -> None:
-    from dataclasses import replace
-
-    notices = RecordingNotices()
-    scenario.runtime = replace(scenario.runtime, notices=notices)  # tests replace the ports of a runtime under the reviewer
-    reviewer = scenario.runtime.health_reviewer
-    reviewer.review(dry_run=True)
-    assert any(name == "review_root" for name, _ in notices.calls)

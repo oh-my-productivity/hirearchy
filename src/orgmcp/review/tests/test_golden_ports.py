@@ -11,8 +11,6 @@ from . import _scenario
 from ._golden import expected
 from .test_golden_notes import NAMES
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-review")
-
 
 def through_the_ports(org: Any, now: datetime, dry_run: bool = False) -> Any:
     return org.runtime.health_reviewer.review(now, dry_run)

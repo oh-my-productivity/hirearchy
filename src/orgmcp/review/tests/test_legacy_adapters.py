@@ -12,8 +12,6 @@ import pytest
 from orgmcp.review import Note, Review
 from orgmcp.review.testing import ScriptedHealthReviewer
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-review")
-
 review = importlib.import_module("orgmcp.review")
 AT = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 DONE = Review(at=AT, runs=3, flagged=1, notes=[Note("root", "t", "b")])
