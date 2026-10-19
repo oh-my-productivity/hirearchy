@@ -7,7 +7,7 @@ from collections.abc import Sequence
 from ..kernel import RENDER_BODY_CHARS, Message
 from ..mail import MailboxReader, TaskQuery
 from ..services import Contract, ServiceCatalog, playbook_word_cap
-from ._ports import ConfigSource, PlaybookSection, RejectedServices, ReflectSection, ServicePaths
+from ._ports import ConfigSource, PlaybookSection, RejectedServices, ReflectSection, ServicePaths, ServicesListing
 from .api import CaseHistory, ReflectionDigest, ServicePromptSections
 
 
@@ -130,27 +130,15 @@ class EvidenceReflectSection(ReflectSection):
         return f"# Reflect before you start: {c.name}\n{intro}\n{digest}\n{lead}\n{numbered}"
 
 
-class OwnerPromptSections(ServicePromptSections):
-    """The services an agent owns, the playbook of each it is working on, and the reflection a new request or a rejection calls for."""
+class OwnedServicesListing(ServicesListing):
+    """The services an agent owns, one line each, under the reminder of who owns the contract and who the playbook."""
 
-    def __init__(
-        self, catalog: ServiceCatalog, history: CaseHistory, digest: ReflectionDigest, tasks: TaskQuery, rejections: RejectedServices,
-        playbooks: PlaybookSection, reflections: ReflectSection, paths: ServicePaths,
-    ) -> None:
+    def __init__(self, catalog: ServiceCatalog, history: CaseHistory, paths: ServicePaths) -> None:
         self._catalog = catalog
         self._history = history
-        self._digest = digest
-        self._tasks = tasks
-        self._rejections = rejections
-        self._playbooks = playbooks
-        self._reflections = reflections
         self._paths = paths
 
-    def prompt_sections(self, addr: str, batch: Sequence[Message]) -> str:
-        owned = self._catalog.owned_services(addr)
-        if not owned:
-            return ""
-        sections = ["# Your services\nThe contract (SERVICE.md) is your parent's; the playbook (PLAYBOOK.md) is yours."]
+    def listing(self, addr: str, owned: Sequence[Contract]) -> str:
         lines = []
         for c in owned:
             pb = self._catalog.read_playbook(addr, c.name)
@@ -159,7 +147,29 @@ class OwnerPromptSections(ServicePromptSections):
                 f"{'playbook v' + str(pb.version) if pb.version else 'no playbook yet'}, {len(self._history.cases(addr, c.name))} request(s) so far; "
                 f"contract: {self._paths.rel(c.path)}; playbook: {self._paths.playbook_file(addr, c.name)}"
             )
-        sections[0] += "\n" + "\n".join(lines)
+        return "# Your services\nThe contract (SERVICE.md) is your parent's; the playbook (PLAYBOOK.md) is yours.\n" + "\n".join(lines)
+
+
+class OwnerPromptSections(ServicePromptSections):
+    """The services an agent owns, the playbook of each it is working on, and the reflection a new request or a rejection calls for."""
+
+    def __init__(
+        self, catalog: ServiceCatalog, listing: ServicesListing, digest: ReflectionDigest, tasks: TaskQuery, rejections: RejectedServices,
+        playbooks: PlaybookSection, reflections: ReflectSection,
+    ) -> None:
+        self._catalog = catalog
+        self._listing = listing
+        self._digest = digest
+        self._tasks = tasks
+        self._rejections = rejections
+        self._playbooks = playbooks
+        self._reflections = reflections
+
+    def prompt_sections(self, addr: str, batch: Sequence[Message]) -> str:
+        owned = self._catalog.owned_services(addr)
+        if not owned:
+            return ""
+        sections = [self._listing.listing(addr, owned)]
         working = {t.service for t in self._tasks.open_tasks(addr) if t.service}
         new = {m.service for m in batch if m.type == "task" and m.service and not m.revises and m.to == addr}
         rejected = self._rejections.among(addr, batch)

@@ -94,3 +94,10 @@ class ReflectSection(Protocol):
     def section(self, addr: str, contract: Contract, digest: str, *, rejected: bool = False, new_request: bool = True) -> str:
         """What to reflect on before the work starts, with the digest of the evidence."""
         ...
+
+
+@runtime_checkable
+class ServicesListing(Protocol):
+    def listing(self, addr: str, owned: Sequence[Contract]) -> str:
+        """The opening of the prompt's services: who writes what, then one line per service ``addr`` owns (contract, playbook, requests so far, files)."""
+        ...

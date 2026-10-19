@@ -25,7 +25,7 @@ from ._files import OrgServicePaths
 from ._ports import RejectedServices, ServicePaths
 from ._reports import TextServiceReports
 from ._runs import LogRunCounter
-from ._sections import EvidenceReflectSection, MailRejectedServices, OwnerPromptSections, QuotedPlaybookSection
+from ._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection
 from ._timeline import StorePlaybookTimelines
 from .api import Case, CaseHistory, ReflectionDigest, ServicePromptSections, ServiceReports
 
@@ -74,8 +74,8 @@ def _world(s: ServicesWorld, runs: RunsHarness) -> ReflectionWorld:
     digest = DigestBuilder(s.catalog, history)
     rejections = MailRejectedServices(d.mail)
     sections = OwnerPromptSections(
-        s.catalog, history, digest, d.tasks, rejections, QuotedPlaybookSection(s.catalog, paths),
-        EvidenceReflectSection(s.catalog, d.settings, paths), paths,
+        s.catalog, OwnedServicesListing(s.catalog, history, paths), digest, d.tasks, rejections, QuotedPlaybookSection(s.catalog, paths),
+        EvidenceReflectSection(s.catalog, d.settings, paths),
     )
 
     def use_run(addr: str) -> None:

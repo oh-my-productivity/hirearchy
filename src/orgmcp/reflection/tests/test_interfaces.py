@@ -23,10 +23,11 @@ from orgmcp.reflection._ports import (
     ReflectSection,
     RunCounter,
     ServicePaths,
+    ServicesListing,
 )
 from orgmcp.reflection._reports import TextServiceReports
 from orgmcp.reflection._runs import LogRunCounter
-from orgmcp.reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnerPromptSections, QuotedPlaybookSection
+from orgmcp.reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection
 from orgmcp.reflection._timeline import StorePlaybookTimelines
 from orgmcp.reflection._assembly import CallableConfig
 from orgmcp.reflection.testing import FixedCaseHistory
@@ -51,6 +52,7 @@ def test_each_role_inside_the_package_has_its_implementation() -> None:
     assert PlaybookSection in QuotedPlaybookSection.__mro__
     assert ReflectSection in EvidenceReflectSection.__mro__
     assert ConfigSource in CallableConfig.__mro__
+    assert ServicesListing in OwnedServicesListing.__mro__
 
 
 def test_the_package_exports_the_api_and_the_legacy_names_only() -> None:

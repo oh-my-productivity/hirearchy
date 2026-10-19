@@ -17,7 +17,7 @@ from ._files import OrgServicePaths
 from ._ports import ConfigSource
 from ._reports import TextServiceReports
 from ._runs import LogRunCounter
-from ._sections import EvidenceReflectSection, MailRejectedServices, OwnerPromptSections, QuotedPlaybookSection
+from ._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection
 from ._timeline import StorePlaybookTimelines
 
 
@@ -51,7 +51,7 @@ def sections_of(org: Any) -> OwnerPromptSections:
     rt = org.runtime
     paths = OrgServicePaths(rt.paths)
     return OwnerPromptSections(
-        rt.service_catalog, history_of(org), digest_of(org), rt.task_query, MailRejectedServices(rt.mailbox),
-        QuotedPlaybookSection(rt.service_catalog, paths),
-        EvidenceReflectSection(rt.service_catalog, CallableConfig(lambda: cast(JsonObject, org.config)), paths), paths,
+        rt.service_catalog, OwnedServicesListing(rt.service_catalog, history_of(org), paths), digest_of(org), rt.task_query,
+        MailRejectedServices(rt.mailbox), QuotedPlaybookSection(rt.service_catalog, paths),
+        EvidenceReflectSection(rt.service_catalog, CallableConfig(lambda: cast(JsonObject, org.config)), paths),
     )
