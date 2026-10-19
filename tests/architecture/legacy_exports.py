@@ -108,8 +108,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "EventFeed DashData render_once"
     ),
     "dashboard": _e3(
-        "VIEWS VIEW_NAMES TABS TAB_NAMES KIND_STYLE HELP doc_renderable event_text TextPane NavTable AgentTree "
-        "ContextFooter StatusBar TextScreen Ctx Tick SCREENS TAB_KEYS DashApp run_dashboard"
+        "TextPane NavTable TextScreen DashApp run_dashboard"
     ),
 }
 

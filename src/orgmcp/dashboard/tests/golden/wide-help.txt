@@ -1,0 +1,42 @@
+ orgmcp dash acme  10:06:40Z   1 Org orgmcp dash - keys
+ scheduler running pid 7000 (until_d GLOBAL                                                                         errors 15m 2
+ observe now                           1 2 3 4 5     Org · Workflows · Services · Events · Health
+ scheduler: running pid 7000 (until_   Tab / Shift+Tab   cycle focus between the panes
+ runs in flight 2/2:                   ↑ ↓  j k      move            g / G   top / bottom
+   ceo 1m12s Scope change              ← →  h l      fold / unfold a node, or switch pane
+   research 2m05s feedback on "Brief   Enter         open (agent -> its details, request -> trace, service ->     1-root-0026,
+ 20261018T100410000001-root-003a     cases, message -> text)
+ queued, not running (1):              Esc / Backspace   back (close an overlay, leave a trace or a service,
+   ceo/analyst: 1 unread, oldest 5m4 return to the agent list)
+ not started, with unread mail (1):    r             refresh now     p   pause / resume the automatic refresh
+   ops/deploy: 1 unread, oldest 4m40   ?             this help       q   quit
+ waiting on you (1):
+   Needs you: note from ops "Need ap 1 ORG  (agent tree on the left, details of the selected agent on the         the API down on Saturday 02:00?
+ (message 20261018T100200000003-ops- right)
+ errors in the last 15 min: 2          [ ]           previous / next tab: Overview · Activity · Messages · Run
+   10:02:30 ops/deploy     run ended log · Memory · Charter
+   10:05:40 ceo            delegate    Space         fold / unfold the selected node                               reserve
+ paused: ops/audit (paused by the us   root selected: what needs you and your requests; an agent: its run,
+                                     tasks, delegations, latest activity
+ Health flags (9 agent(s), 3 flagged   Messages tab: Enter opens the message.   Run log tab: follows the log
+ ops/audit                           while it grows (scroll up to stop).
+    !paused: paused by the user: aud
+ ops/deploy                          2 WORKFLOWS   one line per request you gave; Enter opens its trace
+    !paused: 2 consecutive failed ru (messages, runs, tool calls, timings)
+ research/crawler                    3 SERVICES    one line per service; Enter opens its record, cases,
+    !out_of_budget: no budget left b playbook and contract
+                                     4 EVENTS      the live merged event stream
+ Consistency check (c runs it)         e             errors only    /   filter (words: agent, kind, trace,
+ checked at 10:06:40Z                tool)    f   follow on / off
+ (a) PASS messages intact: files par   x             raw events: ids, process groups, budgets, arguments (also
+       17 message(s) checked         on the Org > Activity tab)
+ (b) PASS budget conserved: handed d 5 HEALTH      observe now, health flags;  c  runs the consistency check                                       ▄▄
+       handed down 37 = held 17 + us (on demand)
+ (c) PASS nothing inflight without a
+       no agent has an unfinished ba The dashboard is read-only: grants, start/stop and feedback stay with the
+ (d) FAIL runs accounted for: run.st assistant and the CLI.
+       research@20261018T10043500000
+       ceo@20261018T100527000001: ru
+       archivist@20261018T1000050000
+       ceo@20261018T100040000001: ru
+ p Pause  ? Help  q Quit

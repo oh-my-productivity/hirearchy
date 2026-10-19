@@ -1,0 +1,24 @@
+ orgmcp dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |
+ service       owner     versions  requests  done/failed/open  reworked  feedbac
+ market-brief  research  c1 p1     2         1/0/1             1         1✓ 0✗
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                       ▎
+ ⏎ Open  12345 Screen  r Refresh  p Pause  ? Help  q Quit

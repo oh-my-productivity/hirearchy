@@ -1,0 +1,30 @@
+ orgmcp dash empty  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler stopped  |  running 0/3  queued 0  waiting on you 0  errors 15m 0
+ 0 of 0 event(s) in memory  ·  all kinds  ·  no filter  ·  following  ·  readable  ·  this
+ (no matching events)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 12345 Screen  r Refresh  p Pause  ? Help  q Quit  e Errors only  / Filter  f Follow  x Raw events

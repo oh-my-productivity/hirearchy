@@ -1,0 +1,42 @@
+ orgmcp dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |  running 2/2  queued 1  waiting on you 1  errors 15m 2
+ 2 of 11 event(s) in memory  ·  errors only  ·  no filter  ·  following  ·  raw      e errors · / filter · f follow · x raw
+ 10:02:30 scheduler runtime run.end FAILED 10s agent=ops/deploy exit_code=1 budget_after=2 error="exit code 1" run=ops/deploy@20261018T100220000001
+ 10:05:40 mcp ceo tool.call delegate REFUSED 5ms error="not enough budget: you have 5 run(s) and must keep 2 in reserve" error_type=OrgError
+ args=to=ceo/analyst,budget=9 run=ceo@20261018T100527000001 trace=20261018T100030000001-root-0012
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 12345 Screen  r Refresh  p Pause  ? Help  q Quit  e Errors only  / Filter  f Follow  x Raw events
