@@ -16,9 +16,6 @@ from orgmcp.prompts.testing import FixedRunPrompt, FixedStateSummary, FixedWhoam
 
 
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-prompts")
-
-
 def use(org: Org, **ports: Any) -> None:
     org.runtime = dataclasses.replace(org.runtime, **ports)
 
@@ -35,7 +32,6 @@ def test_the_real_ports_are_the_ones_the_architecture_names(org: Org) -> None:
     assert isinstance(org.runtime.run_prompt_builder, RunPromptBuilder)
 
 
-@RED
 def test_the_state_summary_is_the_text_of_the_port_and_the_shown_ids_travel_with_it(org: Org) -> None:
     fixed = FixedStateSummary("state")
     use(org, state_summarizer=fixed)
@@ -43,14 +39,12 @@ def test_the_state_summary_is_the_text_of_the_port_and_the_shown_ids_travel_with
     assert fixed.asked == [("ceo", None), ("ceo", {"x"})]
 
 
-@RED
 def test_whoami_is_the_text_of_the_port(org: Org) -> None:
     fixed = FixedWhoami("who")
     use(org, agent_whoami=fixed)
     assert org.whoami("ceo") == "who" and fixed.asked == ["ceo"]
 
 
-@RED
 def test_the_run_prompt_is_the_text_of_the_port_and_the_batch_travels_with_it(org: Org) -> None:
     fixed = FixedRunPrompt("prompt")
     use(org, run_prompt_builder=fixed)
