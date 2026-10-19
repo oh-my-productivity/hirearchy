@@ -159,7 +159,6 @@ def test_an_import_of_a_private_module_of_another_package_breaks_the_contract(ba
     assert "bad_pkg.rogue._imports_private -> bad_pkg.mail._mailbox" in output
 
 
-@pytest.mark.xfail(strict=True, reason="red: r-fix-contract")
 def test_lint_imports_is_never_given_the_cache(monkeypatch, tmp_path):
     """A cached graph can say "kept" for a tree that breaks a contract: every run of the linter must ask for ``--no-cache``."""
     seen: list[list[str]] = []
@@ -174,7 +173,6 @@ def test_lint_imports_is_never_given_the_cache(monkeypatch, tmp_path):
     assert len(seen) == 1 and "--no-cache" in seen[0], seen
 
 
-@pytest.mark.xfail(strict=True, reason="red: r-fix-contract")
 def test_a_stale_cache_cannot_hide_a_broken_contract(tmp_path):
     """Seeded: a clean run fills the cache, then a forbidden import is added to a file whose mtime is put back (the cache is keyed by it)."""
     package = tmp_path / "stale_pkg"

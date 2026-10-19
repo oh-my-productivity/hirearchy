@@ -4,7 +4,8 @@
    ``lint-imports`` on it; when no package of the map exists yet there is nothing to generate and that step is skipped;
 2. runs ``lint-imports`` on the hand-written contracts of ``[tool.importlinter]`` in pyproject.toml (the flat legacy modules).
 
-``lint-imports`` is always given ``--config`` explicitly: a plain ``lint-imports`` would read the generated ``.importlinter`` only.
+``lint-imports`` is always given ``--config`` explicitly: a plain ``lint-imports`` would read the generated ``.importlinter`` only,
+and always ``--no-cache``: the cached import graph is keyed by file mtimes and can report "kept" for a tree that breaks a contract.
 Exit status: 0 when every contract is kept, 1 when one is broken, 2 when import-linter is not installed.
 """
 
@@ -31,14 +32,14 @@ def executable() -> str | None:
 
 
 def run_lint_imports(config: Path, cwd: Path, pythonpath: Path | None = None) -> subprocess.CompletedProcess[str]:
-    """``lint-imports --config <config>`` in ``cwd``; ``pythonpath`` makes a package outside the environment importable."""
+    """``lint-imports --config <config> --no-cache`` in ``cwd``; ``pythonpath`` makes a package outside the environment importable."""
     exe = executable()
     if exe is None:
         return subprocess.CompletedProcess([], 2, "", "import-linter is not installed (uv sync installs the dev dependencies)")
     env = dict(os.environ)
     if pythonpath is not None:
         env["PYTHONPATH"] = os.pathsep.join(filter(None, [str(pythonpath), env.get("PYTHONPATH", "")]))
-    return subprocess.run([exe, "--config", str(config)], capture_output=True, text=True, cwd=cwd, env=env, check=False)
+    return subprocess.run([exe, "--config", str(config), "--no-cache"], capture_output=True, text=True, cwd=cwd, env=env, check=False)
 
 
 def main(argv: list[str]) -> int:
