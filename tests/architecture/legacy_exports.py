@@ -88,7 +88,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "declared_inputs review_roots estimate planned_total budget_split edits_others_files validate "
         "default_playbook org_files_readable access_facts render_plan PLAN_HEADING PLAN_DRAFT_HEADING PLAN_END "
         "PLAN_SHOW TOOL_WORDS SHOWN_CRITERIA SHOWN_WARNINGS HIDDEN_WARNINGS PLAN_ID_LENGTH SHOWN_SERVICE_CRITERIA "
-        "plan_id CLIP GOAL_CLIP plan_for_user propose_text propose Summary apply"
+        "plan_id CLIP GOAL_CLIP plan_for_user propose_text propose apply"
     ),
     "blueprint_examples": _e3(
         "KINDS SCHEMA RESEARCH DOCUMENTS CODE ANALYSIS TEMPLATES SERVICE_SCHEMA SERVICE_HEAD SERVICE_TAIL "

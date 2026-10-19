@@ -6,8 +6,8 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from ..kernel import JsonObject
-from ._shapes import AccessFacts, Estimate, Split
+from ..kernel import JsonObject, Message
+from ._shapes import AccessFacts, Built, Estimate, Split
 from .api import Agent, Issue
 
 
@@ -122,4 +122,101 @@ class ServiceRules(Protocol):
         roots: Sequence[Path], issues: list[Issue],
     ) -> None:
         """The ``services:`` list and a first request in ``task``; the problems are added to ``issues``."""
+        ...
+
+
+@runtime_checkable
+class PlanBasis(Protocol):
+    """What the plan and the application are made from: the blueprint's problems and its agents, for the organization they are planned against."""
+
+    def issues(self, bp: Mapping[str, object], allowed_roots: Sequence[str | Path] | None) -> list[Issue]:
+        """All problems with the blueprint (the organization counts when it exists)."""
+        ...
+
+    def agents(self, bp: Mapping[str, object], allowed_roots: Sequence[str | Path] | None) -> list[Agent]:
+        """The agents of the blueprint, parents first (what ``issues`` says about them is not repeated)."""
+        ...
+
+
+@runtime_checkable
+class PlanWords(Protocol):
+    """The sentences about services that the block for the user and the details have in common."""
+
+    def input_words(self, sv: Mapping[str, object]) -> str:
+        """What the requester provides, in words (``(see the errors)`` when the inputs are not valid)."""
+        ...
+
+    def delivery(self, sv: Mapping[str, object], agents: Sequence[Agent], bp: Mapping[str, object]) -> str:
+        """Where each result of the service is delivered, and who puts it there."""
+        ...
+
+    def request_words(self, bp: Mapping[str, object]) -> str:
+        """The inputs of the first request, in words."""
+        ...
+
+    def reflection_line(self, owner: str) -> str:
+        """What the lead does after each request."""
+        ...
+
+
+@runtime_checkable
+class Charters(Protocol):
+    def charter(self, a: Agent, agents: Sequence[Agent], bp: Mapping[str, object], split: Mapping[str, Split]) -> str:
+        """The charter of an agent: its template, then the assignment from the approved plan, then the additional instructions."""
+        ...
+
+
+@runtime_checkable
+class PlaybookWriting(Protocol):
+    def default_playbook(self, owner: Agent, agents: Sequence[Agent], service: Mapping[str, object], budget: int) -> str:
+        """Playbook v1 of a service when the blueprint gives none: the lead's procedure for this team, as steps, a budget plan and pitfalls."""
+        ...
+
+
+@runtime_checkable
+class PlanDetailing(Protocol):
+    def render(self, bp: Mapping[str, object], issues: Sequence[Issue] | None, allowed_roots: Sequence[str | Path] | None) -> str:
+        """The details of the plan (for the assistant)."""
+        ...
+
+
+@runtime_checkable
+class UserPlanning(Protocol):
+    def render(self, bp: Mapping[str, object], issues: Sequence[Issue] | None, allowed_roots: Sequence[str | Path] | None) -> str:
+        """The block for the user."""
+        ...
+
+
+@runtime_checkable
+class TeamBuilding(Protocol):
+    def build(self, agents: Sequence[Agent], bp: Mapping[str, object], split: Mapping[str, Split], built: Built) -> None:
+        """Make the workspaces and hire the agents, parents first; ``built`` records each one the moment it exists."""
+        ...
+
+
+@runtime_checkable
+class ServiceDefining(Protocol):
+    def define(self, bp: Mapping[str, object], agents: Sequence[Agent], built: Built) -> None:
+        """Define the services of the blueprint for the top-level agent; ``built`` records each one the moment it is defined."""
+        ...
+
+
+@runtime_checkable
+class FirstTasking(Protocol):
+    def give(self, bp: Mapping[str, object], top: Agent, total: int) -> Message | None:
+        """The first request or task of the blueprint, delivered; None when the blueprint gives none."""
+        ...
+
+
+@runtime_checkable
+class BuildUndoing(Protocol):
+    def undo(self, built: Built) -> None:
+        """Retire the top-level agents that were hired and remove the directories that were made (while empty); never raises."""
+        ...
+
+
+@runtime_checkable
+class AccessWording(Protocol):
+    def describe(self, a: Agent) -> str:
+        """What the agent may touch, in plain words: the same facts as the ``Access:`` line of the details."""
         ...

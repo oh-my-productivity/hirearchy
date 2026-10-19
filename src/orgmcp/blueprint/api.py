@@ -19,10 +19,11 @@ A blueprint is a plain mapping (YAML or JSON)::
          deliverable: {description, format, max_words, path}, budget, playbook, locked}
     # with services, ``task`` is optional; it may be a first request: {service, inputs: {...}, title, note}
 
-This part of the package turns text into a *checked* blueprint: ``RoleLibrary`` is the packaged role templates (``roles/*.md``),
-``BlueprintLoader`` reads a blueprint from a path, a dict or YAML/JSON text and normalizes it, ``BlueprintValidator`` lists everything wrong with it
-(errors block ``apply``, warnings are shown in the plan). The plan the user approves, its identity and the application of a blueprint come with
-the second half of the package.
+The package turns text into a *checked* blueprint and a checked blueprint into an organization: ``RoleLibrary`` is the packaged role templates
+(``roles/*.md``), ``BlueprintLoader`` reads a blueprint from a path, a dict or YAML/JSON text and normalizes it, ``BlueprintValidator`` lists
+everything wrong with it (errors block ``apply``, warnings are shown in the plan), ``PlanRenderer`` writes the plan the user approves (and the details
+for the assistant), ``PlanIdentity`` says which blueprint a plan was made for, ``BlueprintApplier`` builds the organization (and undoes it when a step
+fails) and ``BlueprintExamples`` are the ready-to-edit templates. ``WorkspaceProvisioner`` is the port to the directories the plan asks for.
 """
 
 from __future__ import annotations
@@ -35,16 +36,26 @@ from typing import Protocol, runtime_checkable
 from ..kernel import JsonObject, OrgError
 
 __all__ = [
+    "EXAMPLE_KINDS",
     "Agent",
+    "BlueprintApplier",
     "BlueprintError",
+    "BlueprintExamples",
     "BlueprintLoader",
     "BlueprintValidator",
     "Issue",
     "IssueText",
+    "PlanIdentity",
+    "PlanRenderer",
     "Role",
     "RoleLibrary",
+    "Summary",
+    "SummaryText",
+    "WorkspaceProvisioner",
     "errors",
 ]
+
+EXAMPLE_KINDS = ("research", "documents", "code", "analysis")  # the kinds of ready-to-edit blueprint templates
 
 
 class BlueprintError(OrgError):
@@ -150,4 +161,101 @@ class BlueprintValidator(Protocol):
         ``org_exists``: the organization exists, so its settings (``max_depth``, ``playbook_max_words``) apply and the names it already uses
         (agents, services) are taken; otherwise the defaults apply and nothing is taken. ``allowed_roots``: the directories agents' workspaces
         and the deliverable path may be in (default: home, the temp dir and the current directory, or ``$ORGMCP_WORKSPACE_ROOTS``)."""
+        ...
+
+
+@runtime_checkable
+class SummaryText(Protocol):
+    """What a summary can tell of itself."""
+
+    def text(self) -> str:
+        """What ``apply`` reports: the agents created, the services defined, the first task or request, and the warnings."""
+        ...
+
+
+@dataclass
+class Summary(SummaryText):
+    """What ``apply`` did."""
+
+    agents: list[str]
+    task_id: str  # "" when the blueprint gave no first task (services only)
+    to: str
+    budget: int
+    warnings: list[Issue] = field(default_factory=list)
+    services: list[str] = field(default_factory=list)
+    service_request: str = ""  # the service the first task requested, if it is a request
+
+    def text(self) -> str:
+        lines = [f"created {len(self.agents)} agents: {', '.join(self.agents)}"]
+        if self.services:
+            lines.append(f"defined {len(self.services)} service(s) of {self.to}: {', '.join(self.services)} (contract and playbook v1)")
+        if self.task_id and self.service_request:
+            lines.append(f"first request: service {self.service_request}, task {self.task_id} -> {self.to} (budget {self.budget})")
+        elif self.task_id:
+            lines.append(f"task {self.task_id} -> {self.to} (budget {self.budget})")
+        else:
+            lines.append("no task was given: the services are ready and nothing runs yet. To use one: request(service, inputs) "
+                         "(or `orgmcp request SERVICE --input key=value`), then start()")
+        lines += [f"warning: {w.path}: {w.message}" for w in self.warnings]
+        return "\n".join(lines)
+
+
+@runtime_checkable
+class PlanRenderer(Protocol):
+    def render_plan(
+        self, bp: Mapping[str, object], issues: Sequence[Issue] | None = None, *, allowed_roots: Sequence[str | Path] | None = None,
+    ) -> str:
+        """The details: goal, needs, organization tree, budget, review, deliverable, checkpoints, warnings and errors. ``issues`` default to what
+        the validator finds."""
+        ...
+
+    def plan_for_user(
+        self, bp: Mapping[str, object], issues: Sequence[Issue] | None = None, *, allowed_roots: Sequence[str | Path] | None = None,
+    ) -> str:
+        """The compact, plain-language block the assistant shows to the user verbatim (about 40 lines at most)."""
+        ...
+
+    def propose_text(self, bp: Mapping[str, object], *, target: str = "", allowed_roots: Sequence[str | Path] | None = None) -> str:
+        """What ``propose_org`` returns: ``target`` line, the block for the user, the details and the ``plan_id`` (none when the blueprint has errors)."""
+        ...
+
+    def propose(self, source: object, *, allowed_roots: Sequence[str | Path] | None = None) -> str:
+        """Load a blueprint (text, path or dict), validate it and return the details. Writes nothing."""
+        ...
+
+
+@runtime_checkable
+class PlanIdentity(Protocol):
+    def plan_id(self, bp: Mapping[str, object]) -> str:
+        """12 hex digits of the normalized blueprint: the same blueprint (whatever its YAML layout, comments or key order) always gives the same id,
+        any change to a value gives another, and the organization it is planned against does not matter. Nothing is stored."""
+        ...
+
+
+@runtime_checkable
+class BlueprintApplier(Protocol):
+    def apply(self, bp: Mapping[str, object], *, allowed_roots: Sequence[str | Path] | None = None) -> Summary:
+        """Create the agents (parents first, as root through each parent), define the services and give the first task: a plain task, a first
+        request for a service (``task.service``) or none. A ``BlueprintError`` on any validation error, before anything is written; if a hire, a
+        service definition or the delegation fails midway, the top-level agents created are retired again, the workspace directories this call made
+        are removed when empty, and the error is raised."""
+        ...
+
+
+@runtime_checkable
+class BlueprintExamples(Protocol):
+    def example(self, kind: str = "research", base: Path | str = ".", service: bool = False) -> str:
+        """The template text for ``kind`` (``EXAMPLE_KINDS``) with absolute paths under ``base``; ``service``: as a standing service. An ``OrgError``
+        for another kind."""
+        ...
+
+
+@runtime_checkable
+class WorkspaceProvisioner(Protocol):
+    def ensure(self, path: Path) -> list[Path]:
+        """``mkdir -p``; the directories that did not exist and were made, the deepest first (none when ``path`` exists)."""
+        ...
+
+    def remove_if_empty(self, path: Path) -> bool:
+        """Remove the directory when it is empty; False (and nothing removed) when it cannot be removed."""
         ...
