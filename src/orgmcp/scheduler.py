@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Callable, NamedTuple
 
 from . import review, telemetry, templates
-from .app import wire_kiro, wire_processes
+from .app import wire_kiro, wire_processes, wire_stalls
 from .app.wiring import open_runtime
 from .core import ROOT, Org, OrgError, atomic_write
 from .health import config_number
@@ -273,16 +273,6 @@ class Waiting(NamedTuple):
     settled: bool = True
 
 
-def _chain(org: Org, addr: str, task) -> list[str]:
-    """Who hears about a stalled task, in order: the assignee, its assigner, then up the tree to root."""
-    chain = [addr]
-    up = task.sender if org.exists(task.sender) else org.parent(addr)
-    while up:
-        chain.append(up)
-        up = org.parent(up)
-    return chain
-
-
 def _startable(org: Org, addr: str) -> bool:
     """Could a scheduler start a run of ``addr`` now? (unread mail, budget, and not paused for another reason)"""
     return org.runtime.runnable_query.startable(addr)
@@ -308,7 +298,8 @@ def waiting_on_user(org: Org, *, running=None, blocked=(), can_start: bool = Tru
         return None
     if can_start and any(_startable(org, a) for a in agents):
         return None
-    nudges = _nudge_entries(org.ledger("nudges"))
+    nudges = org.runtime.nudge_ledger
+    steps = nudges.entries()
     texts: list[str] = []
     options: list[str] = []
     settled = True
@@ -334,8 +325,8 @@ def waiting_on_user(org: Org, *, running=None, blocked=(), can_start: bool = Tru
             options.append(f'send(to="{t.to}", body=<instructions or a changed task>) and call start()')
             for a in stalled:  # the stall ladder (reminder, then escalation up to root) may still wake the holder
                 for task in org.open_tasks(a):
-                    last = nudges.get(task.id)
-                    if (last["step"] if last else -1) < len(_chain(org, a, task)) - 1:
+                    last = steps.get(task.id)
+                    if (last["step"] if last else -1) < len(nudges.chain(a, task)) - 1:
                         settled = False
     if not can_start:
         texts.append("the run cap (max_runs) was reached")
@@ -429,20 +420,6 @@ def _version() -> str:
         return "unknown"
 
 
-def _nudge_entries(raw) -> dict[str, dict]:
-    """Entries of the nudges ledger in the current shape; malformed entries (or a malformed ledger) are dropped."""
-    out: dict[str, dict] = {}
-    for key, value in (raw.items() if isinstance(raw, dict) else ()):
-        if isinstance(value, str):  # legacy ledger: "nudged" / "escalated"
-            out[key] = {"step": 0 if value == "nudged" else 1, "at": 0}
-        elif isinstance(value, dict):
-            try:
-                out[key] = {"step": max(0, int(value["step"])), "at": float(value.get("at") or 0)}
-            except (KeyError, TypeError, ValueError):
-                continue
-    return out
-
-
 class Scheduler:
     def __init__(
         self,
@@ -458,7 +435,7 @@ class Scheduler:
         self.runs: dict[str, Run] = {}
         self.total_runs = 0
         self._phase_errors: dict[str, str] = {}
-        self._task_memo: dict[str, tuple[tuple, dict]] = {}  # agent -> (mailbox fingerprint, cached task views)
+        self._stalls = wire_stalls.RuntimeStalls(lambda: self.org.runtime, lambda: self.clock())  # the stall ladder, over the runtime in force
         self.pidfile = org.root / ".runtime" / "scheduler.pid"
         self._blocked: set[str] = set()  # agents whose orphaned run (of a dead scheduler) is alive and could not be killed
         self._waiting_since: float | None = None  # until-done: since when nothing can progress without the user
@@ -885,86 +862,13 @@ class Scheduler:
     # ---------------------------------------------------------------- stalls
 
     def _check_stalls(self) -> None:
-        """Climb the escalation ladder for every open task whose assignee has gone quiet.
-
-        Stalled = assignee not running, no unread mail, not paused, not waiting on delegated work, and
-        ``stall_after`` seconds since the latest of: the task's creation, the assignee's last run, the previous
-        step. Steps: remind the assignee, then tell the assigner, then each ancestor in turn up to root.
-        """
-        after, now = config_number(self.org.config, "stall_after"), self.clock()
-        loaded = self.org.ledger("nudges")  # task id -> {"step": last step taken, "at": when}
-        ledger = _nudge_entries(loaded)
-        kept: dict[str, dict] = {}  # entries of tasks that are still open
-        agents = self.org.agents()
-        for gone in set(self._task_memo) - set(agents):
-            del self._task_memo[gone]
-        for addr in agents:
-            tasks = self._task_view(addr, "open_tasks")
-            stuck = bool(tasks) and not (
-                self.org.running(addr) or self.org.unread(addr) or self.org.paused(addr)
-                or self._task_view(addr, "outstanding")
-            )
-            for task in tasks:
-                last = ledger.get(task.id)
-                if last:
-                    kept[task.id] = last
-                if not stuck:
-                    continue
-                chain = self._chain(addr, task)
-                step = last["step"] + 1 if last else 0
-                if step >= len(chain):  # root has been told: nothing further up
-                    continue
-                since = max(self._created(task), self._last_run_end(addr), last["at"] if last else 0)
-                if now - since < after:
-                    continue
-                if step == 0:
-                    self.org.notify(addr, f"reminder: {task.title}", templates.notice_nudge(task.id, task.title),
-                                    trace=task.trace)
-                    self.echo(f"{addr}: reminded about open task {task.id}")
-                else:
-                    self.org.notify(chain[step], f"stalled: {task.title}",
-                                    templates.notice_stalled(addr, task.id, task.title, chain[:step]), trace=task.trace)
-                    self.echo(f"{addr}: stalled on {task.id}, told {chain[step]}")
-                self._emit("stall.nudge", trace=task.trace, task=task.id, to=chain[step] if step else addr, step=step)
-                kept[task.id] = {"step": step, "at": now}
-        if kept != loaded:
-            self.org.save_ledger("nudges", kept)
+        """Climb the escalation ladder for every open task whose assignee has gone quiet (``stalls.StallLadder``)."""
+        for line in self._stalls.check():
+            self.echo(line)
 
     def _task_view(self, addr: str, view: str) -> list:
-        """``org.open_tasks`` / ``org.outstanding`` of an agent, recomputed only when its set of message files changes.
-
-        Messages are immutable and named by id, so the file names of an agent's mailboxes (a message moving from
-        inbox to inflight to read stays the same message) determine both views. An idle tick therefore lists a few
-        directories instead of parsing every message ever received or sent.
-        """
-        d = self.org.dir(addr)
-
-        def names(*boxes):
-            out = set()
-            for box in boxes:
-                try:
-                    out.update(n for n in os.listdir(d / box) if n.endswith(".md") and not n.startswith("."))
-                except OSError:
-                    pass
-            return frozenset(out)
-
-        fingerprint = (names("inbox", "inflight", "read"), names("sent"))
-        cached = self._task_memo.get(addr)
-        if cached is None or cached[0] != fingerprint:
-            cached = self._task_memo[addr] = (fingerprint, {})
-        if view not in cached[1]:
-            cached[1][view] = getattr(self.org, view)(addr)
-        return cached[1][view]
-
-    def _chain(self, addr: str, task) -> list[str]:
-        return _chain(self.org, addr, task)
-
-    @staticmethod
-    def _created(task) -> float:
-        try:
-            return datetime.fromisoformat(task.created).timestamp()
-        except ValueError:
-            return task.path.stat().st_mtime
+        """``open_tasks`` / ``outstanding`` of an agent as the stall ladder sees them (kept until the tests that read it move: D-sched-1)."""
+        return self._stalls.task_view(addr, view)
 
     def _last_run_end(self, addr: str) -> float:
         return self.org.runtime.run_log_reader.last_end(addr)
