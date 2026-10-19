@@ -17,8 +17,8 @@ from pathlib import Path
 from ..access.testing import DEFAULT_ORG_MD, StaticAccess, charters_on_disk
 from ..agents import AgentRegistry
 from ..agents.testing import MemoryAgents, fs_agents
-from ..kernel import JsonObject, OrgPaths
-from ..kernel.testing import fs_atomic_writer
+from ..kernel import Clock, JsonObject, OrgPaths
+from ..kernel.testing import T0, FakeClock, fs_atomic_writer
 from ..settings.testing import fs_org_settings
 from ._charter_merge import CharterMerger
 from ._guard import PathGuard
@@ -30,45 +30,92 @@ from .api import FileKind, OrgFileReader, OrgFileStore, OrgFileWriter
 
 class MemoryOrgFileStore(OrgFileStore):
     """Files kept in memory. The files below ``agents.root`` are the file tree of ``agents`` (so the agents and the store see the same
-    files); the others are kept apart, for the workspaces and inputs outside the organization. There are no symbolic links."""
+    files); the others are kept apart, for the workspaces and inputs outside the organization. There are no symbolic links.
 
-    def __init__(self, agents: MemoryAgents | None = None) -> None:
+    ``write_text`` stamps the file with the time of the clock, ``put`` (behind the store's back) with a fixed one."""
+
+    def __init__(self, agents: MemoryAgents | None = None, clock: Clock | None = None) -> None:
         self.agents = agents if agents is not None else MemoryAgents()
         self.root = self.agents.root
+        self._clock = clock if clock is not None else FakeClock()
+        self._files: dict[Path, str] = {}  # outside the organization
+        self._dirs: set[Path] = set()
+        self._times: dict[Path, datetime] = {}
+
+    def _inside(self, path: Path) -> str | None:
+        """The key of ``path`` in the tree of the agents (``""`` is the organization itself), None when it is outside."""
+        try:
+            relative = path.relative_to(self.root)
+        except ValueError:
+            return None
+        return "" if relative == Path(".") else relative.as_posix()
+
+    def _make_dirs(self, path: Path) -> None:
+        for directory in (path, *path.parents):
+            self._files.pop(directory, None)
+            self._dirs.add(directory)
 
     def resolve(self, path: Path) -> Path:
-        raise NotImplementedError
+        return Path(os.path.normpath(path if path.is_absolute() else self.root / path))
 
     def kind(self, path: Path) -> FileKind:
-        raise NotImplementedError
+        key = self._inside(path)
+        if key is None:
+            return "dir" if path in self._dirs else "file" if path in self._files else "missing"
+        return "dir" if key in self.agents.dirs else "file" if key in self.agents.files else "missing"
 
     def entries(self, path: Path) -> list[str]:
-        raise NotImplementedError
+        key = self._inside(path)
+        if key is not None:
+            return self.agents.listing(key) or []
+        return [p.name for p in (*self._dirs, *self._files) if p.parent == path and p != path]
 
     def read_text(self, path: Path, errors: str = "strict") -> str:
-        raise NotImplementedError
+        text = self.read(path)
+        if text is not None:
+            return text
+        if self.kind(path) == "dir":
+            raise IsADirectoryError(21, "Is a directory", str(path))
+        raise FileNotFoundError(2, "No such file or directory", str(path))
 
     def modified(self, path: Path) -> datetime:
-        raise NotImplementedError
+        if self.kind(path) == "missing":
+            raise FileNotFoundError(2, "No such file or directory", str(path))
+        return self._times.get(path, T0)
 
     def write_text(self, path: Path, text: str) -> None:
-        raise NotImplementedError
+        self.put(path, text)
+        self._times[path] = self._clock.now()
 
     def put(self, path: Path, text: str) -> None:
         """A file with this text, made behind the store's back (its parent directories too)."""
-        raise NotImplementedError
+        self._times[path] = T0
+        key = self._inside(path)
+        if key is not None:
+            self.agents.put(key, text)
+            return
+        self._make_dirs(path.parent)
+        self._dirs.discard(path)
+        self._files[path] = text
 
     def put_dir(self, path: Path) -> None:
         """An empty directory (an existing one keeps its content), made behind the store's back."""
-        raise NotImplementedError
+        key = self._inside(path)
+        if key is not None:
+            self.agents.put_dir(key)
+        else:
+            self._make_dirs(path)
 
     def read(self, path: Path) -> str | None:
         """The text of a file, None when there is none."""
-        raise NotImplementedError
+        key = self._inside(path)
+        return self._files.get(path) if key is None else self.agents.files.get(key)
 
     def touch(self, path: Path, when: datetime) -> None:
         """The modification time of a file or directory becomes ``when``."""
-        raise NotImplementedError
+        if self.kind(path) == "missing":
+            raise FileNotFoundError(2, "No such file or directory", str(path))
+        self._times[path] = when
 
 
 # ------------------------------------------------------------------------------ harnesses and the registry

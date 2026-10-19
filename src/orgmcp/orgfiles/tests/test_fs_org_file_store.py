@@ -16,8 +16,6 @@ from orgmcp.orgfiles import OrgFileStore
 from orgmcp.orgfiles._store import FsOrgFileStore
 from orgmcp.orgfiles.testing import StoreHarness, fs_org_file_store
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
-
 
 @pytest.fixture
 def h(tmp_path: Path) -> StoreHarness:

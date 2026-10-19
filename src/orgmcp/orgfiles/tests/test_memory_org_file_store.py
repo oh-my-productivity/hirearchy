@@ -13,8 +13,6 @@ import pytest
 from orgmcp.agents.testing import MemoryAgents
 from orgmcp.orgfiles.testing import MemoryOrgFileStore
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
-
 
 def test_it_touches_no_file(tmp_path: Path) -> None:
     store = MemoryOrgFileStore()

@@ -15,8 +15,6 @@ from orgmcp.orgfiles.testing import IMPLEMENTATIONS, StoreHarness
 
 from ._support import make_store
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
-
 
 @pytest.fixture(params=IMPLEMENTATIONS[OrgFileStore], ids=lambda factory: factory.__name__)
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> StoreHarness:
