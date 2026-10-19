@@ -217,7 +217,7 @@ from orgmcp.kernel import JsonObject, Message, OrgError
 
 Data and pure vocabulary (not Protocols): `ROOT="root"`, `RUNTIME="runtime"`, `BOXES`, `RUNTIME_NAMES`, `RESERVED`, `NAME_RE`,
 `MESSAGE_TYPES`, `RESULT_STATUSES`, `RENDER_BODY_CHARS`, `JsonObject = dict[str, object]`, `Provider[T] = Callable[[], T]`;
-`class OrgError(ValueError)`; address helpers `norm parent depth child_addr`; `split_frontmatter join_frontmatter`;
+`class OrgError(ValueError)`; address helpers `norm parent depth child_addr`; `split_frontmatter join_frontmatter flow_text`;
 `word_count clip clip_line single`; time helpers `aware parse_time stamp_of msg_time fmt_duration fmt_dur`; `inside visible`;
 `latest_results`; `@dataclass class Message` (fields as today; `meta() to_text() render(limit) cut_body(limit, where)` and the
 new pure `Message.parse(text, path=None)`; **no file I/O**); `@dataclass(frozen=True) class OrgPaths(root)` with pure path
@@ -617,9 +617,9 @@ Impl: `CharterAccessScopes`, `CharterAuthorityPolicy`, `CharterToolNaming`, `Cha
 ```python
 class OrgFileStore(Protocol):   # port: the files below the org root as the guard sees them
     def resolve(self, path: Path) -> Path: """Absolute, symlinks resolved."""
-    def kind(self, path: Path) -> str: """'dir', 'file' or 'missing'."""
+    def kind(self, path: Path) -> FileKind: """'dir', 'file' or 'missing' (a Literal)."""
     def entries(self, path: Path) -> list[str]: """Directory entry names including hidden ones; [] if missing."""
-    def read_text(self, path: Path) -> str: ...
+    def read_text(self, path: Path, errors: str = "strict") -> str: """UTF-8; errors='replace' is how `read` shows a file."""
     def modified(self, path: Path) -> datetime: ...
     def write_text(self, path: Path, text: str) -> None: """Atomic."""
 
@@ -1499,7 +1499,7 @@ in the table of its module. Constants move with the code that uses them (listed 
 | `utcnow` | `kernel.Clock.now` (`SystemClock`); `orgmcp.core.utcnow` stays as a **patch point** adapter until step E1 (see 6.4) |
 | `split_frontmatter`, `join_frontmatter`, `_YAML_LOADER` | `kernel/_frontmatter.py` (public functions of `kernel`) |
 | `_message_cap` | `settings.OrgSettings.message_cap` (`FsOrgSettings`) |
-| `_short`, `charter_change_note` | `orgfiles/_charter_merge.py::CharterMerger` (private; used only by `write_noted`) |
+| `_short`, `charter_change_note` | `orgfiles/_charter_merge.py::CharterMerger` (private; used only by `write_noted`); the YAML flow dump inside `_short` is `kernel.flow_text` (the import contract keeps PyYAML in the kernel and blueprint) |
 | `config_default_model` | `settings.config_default_model` (pure, public) |
 | `atomic_write` | `kernel.AtomicWriter.write` (`FsAtomicWriter`); `core.atomic_write` stays as a patch point until E1 |
 | `_fold`, `_case_twin`, `_FOLDED_RUNTIME_NAMES`, `_EXACT_FILES` | `orgfiles/_guard.py::PathGuard` (private) |

@@ -23,3 +23,11 @@ def join_frontmatter(meta: JsonObject, body: str) -> str:
     """The text of a file with ``meta`` as frontmatter and ``body`` (one trailing newline)."""
     dumped: str = yaml.safe_dump(meta, sort_keys=False, allow_unicode=True)
     return "---\n" + dumped + "---\n" + body.rstrip() + "\n"
+
+
+def flow_text(value: object) -> str:
+    """``value`` as YAML in flow style on one line (``[read, write]``, ``{a: 1}``): blanks collapsed, never wrapped, without the document-end marker."""
+    text: str = yaml.safe_dump(value, default_flow_style=True, allow_unicode=True, width=10_000).strip()
+    if text.endswith("\n..."):
+        text = text[:-4].strip()
+    return " ".join(text.split())
