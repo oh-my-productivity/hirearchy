@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from orgmcp.agents import AgentDirectory, CharterReader
 from orgmcp.app import wiring
 from orgmcp.budget import BudgetQuery
@@ -37,7 +35,6 @@ def test_an_override_replaces_the_port(tmp_path: Path) -> None:
     assert wiring.open_runtime(tmp_path, {OrgTree: fake}).org_tree is fake
 
 
-@pytest.mark.xfail(strict=True, reason="red: C-overview")
 def test_every_collaborator_of_the_tree_comes_from_the_runtime(tmp_path: Path) -> None:
     """The whole tree over fakes: nothing of the organization directory is read or written."""
     box, states = MemoryMailbox(), FixedStates()

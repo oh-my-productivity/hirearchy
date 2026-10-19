@@ -4,13 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from orgmcp.overview import OrgTree
 from orgmcp.overview._tree import TextOrgTree
 from orgmcp.overview.testing import OverviewWorld, memory_world
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-overview")
 
 
 def world(tmp_path: Path) -> OverviewWorld:

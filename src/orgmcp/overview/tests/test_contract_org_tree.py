@@ -18,8 +18,6 @@ from ._support import implementations
 
 ROOT_LINE = "root (human): unread 0, delegated 0"
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-overview")
-
 
 @pytest.fixture(params=implementations(IMPLEMENTATIONS[OrgTree]))
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> OverviewWorld:
