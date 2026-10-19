@@ -13,7 +13,6 @@ from orgmcp.kernel import OrgError
 from ._fakes import FakeBlueprints, new_blueprints
 from ._support import Fixture, go
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 WARNING = Issue("warning", "needs.review", "review not decided")
 ERROR = Issue("error", "agents[lead]", "unknown template")

@@ -14,7 +14,6 @@ from orgmcp.kernel import Message
 from ._fakes import FakeReadings, agent_health, new_readings
 from ._support import Fixture, go
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 
 def test_status_shows_the_tree_then_the_tasks_root_gave_then_the_scheduler(tmp_path: Path) -> None:
@@ -46,7 +45,7 @@ def test_health_of_one_agent_as_structured_data(tmp_path: Path) -> None:
     go(HealthCommand(f.session, lambda: readings, lambda: readings, f.out), "health", "--agent", "ceo", "--json")
     assert readings.last("org_health") == (("ceo",), {}) and "render_text" not in readings.names()
     data = json.loads(f.out.stdout)
-    assert data["root"] == "root" and data["flagged"] == []
+    assert data["root"] == "ceo" and data["flagged"] == []
 
 
 def test_progress_asks_for_one_task_and_how_long_to_wait(tmp_path: Path) -> None:

@@ -24,10 +24,18 @@ class PlanCommand(Command):
         self._out = out
 
     def add_arguments(self, sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
-        raise NotImplementedError
+        s = sub.add_parser("plan", help="validate a blueprint and print the plan for approval (exit 1 on errors)")
+        s.add_argument("blueprint", help="blueprint YAML/JSON file")
+        s.add_argument("--allow-root", action="append", metavar="DIR", help="directory workspaces may be in (repeatable; default: home, temp, cwd)")
+        s.set_defaults(fn=self.run)
 
     def run(self, args: Arguments) -> None:
-        raise NotImplementedError
+        exists = self._session.present(args)
+        bp = self._loader().load(Path(args.blueprint))
+        issues = self._validator().validate(bp, org_exists=exists, allowed_roots=args.allow_root or None)
+        self._out.say(self._renderer().render_plan(bp, issues, allowed_roots=args.allow_root or None))
+        if errors(issues):
+            raise SystemExit(1)
 
 
 class ApplyCommand(Command):
@@ -38,7 +46,12 @@ class ApplyCommand(Command):
         self._out = out
 
     def add_arguments(self, sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
-        raise NotImplementedError
+        s = sub.add_parser("apply", help="create the agents of a blueprint and give its first task (as root)")
+        s.add_argument("blueprint", help="blueprint YAML/JSON file")
+        s.add_argument("--allow-root", action="append", metavar="DIR", help="directory workspaces may be in (repeatable; default: home, temp, cwd)")
+        s.set_defaults(fn=self.run)
 
     def run(self, args: Arguments) -> None:
-        raise NotImplementedError
+        self._session.open(args, mutating=True)  # says which organization it is about to change, before anything is written
+        summary = self._applier().apply(self._loader().load(Path(args.blueprint)), allowed_roots=args.allow_root or None)
+        self._out.say(summary.text())

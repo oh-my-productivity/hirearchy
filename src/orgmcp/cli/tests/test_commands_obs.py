@@ -15,7 +15,6 @@ from orgmcp.kernel.testing import FakeClock
 from ._fakes import FakeViews, new_views
 from ._support import Fixture, go, parse, view
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 
 class InterruptedClock(FakeClock):

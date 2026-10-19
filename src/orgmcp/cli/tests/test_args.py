@@ -8,7 +8,6 @@ import pytest
 
 from orgmcp.cli._args import AtFileText
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 
 def test_a_path_with_a_home_directory_is_expanded(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

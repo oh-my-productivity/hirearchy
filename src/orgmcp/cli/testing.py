@@ -302,7 +302,7 @@ class CliWorld:
 
 
 def cli_world(tmp_path: Path) -> CliWorld:
-    """Three commands: ``ok`` (does nothing), ``bad`` (an ``OrgError``) and ``exit`` (``SystemExit`` with the code of its flag ``--code``)."""
+    """Three commands: ``ok`` (does nothing; takes ``--code`` as a flag it ignores), ``bad`` (an ``OrgError``) and ``exit`` (``SystemExit`` with the code of its flag ``--code``)."""
     from ..kernel.testing import FakeClock
 
     def refuse(args: Arguments) -> None:
@@ -311,7 +311,7 @@ def cli_world(tmp_path: Path) -> CliWorld:
     def leave(args: Arguments) -> None:
         raise SystemExit(None if args.code is None else int(args.code))
 
-    commands = [ScriptedCommand("ok"), ScriptedCommand("bad", refuse), ScriptedCommand("exit", leave, ("code",))]
+    commands = [ScriptedCommand("ok", flags=("code",)), ScriptedCommand("bad", refuse), ScriptedCommand("exit", leave, ("code",))]
     out, recorder, label, clock = MemoryOutput(), RecordingRecorder(), MemoryProcessLabel(), FakeClock()
     return CliWorld(ArgparseCliApp(commands, recorder, label, clock, out), {c.name: c for c in commands}, out, recorder, label, clock)
 

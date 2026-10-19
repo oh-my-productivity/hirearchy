@@ -11,7 +11,6 @@ from orgmcp.cli.testing import RecordedWorld, recorded_world
 from orgmcp.kernel import OrgError
 from orgmcp.kernel.testing import FakeClock
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 
 @pytest.fixture
@@ -20,7 +19,7 @@ def w(tmp_path: Path) -> RecordedWorld:
 
 
 def line(cmd: str = "status", **given: object) -> argparse.Namespace:
-    return argparse.Namespace(cmd=cmd, root=None, path=None, **given)
+    return argparse.Namespace(**{"cmd": cmd, "root": None, "path": None, **given})
 
 
 def test_a_success_is_an_event_of_root_in_the_process_cli(w: RecordedWorld, tmp_path: Path) -> None:

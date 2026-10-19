@@ -20,19 +20,32 @@ class AnnouncingOrgSession(OrgSession):
         self._opened: OrgPorts | None = None
 
     def named(self, args: Arguments) -> Path:
-        raise NotImplementedError
+        return Path(args.root or self._locator.find_root()).expanduser().resolve()
 
     def open(self, args: Arguments, mutating: bool = False) -> Path:
-        raise NotImplementedError
+        root = self.named(args)
+        if mutating:
+            self._announce(root)
+        self._opened = self._opener.open(root)
+        return self._opened.root
 
     def present(self, args: Arguments) -> bool:
-        raise NotImplementedError
+        try:
+            self._opened = self._opener.open(self.named(args))
+        except OrgError:
+            return False
+        return True
 
     def create(self, path: str) -> Path:
-        raise NotImplementedError
+        root = Path(path).expanduser().resolve()
+        self._announce(root)
+        self._opened = self._opener.prepare(root)
+        return root
 
     def ports(self) -> OrgPorts:
-        raise NotImplementedError
+        if self._opened is None:
+            raise OrgError("no organization is open")
+        return self._opened
 
     def _announce(self, root: Path) -> None:
-        raise NotImplementedError
+        self._out.warn(f"org: {root}")

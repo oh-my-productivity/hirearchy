@@ -13,7 +13,6 @@ from orgmcp.kernel import Message, OrgError
 from ._fakes import FakeMail, FakeOffice, new_mail, new_office
 from ._support import Fixture, go, parse
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 TEXT = MemoryText({"charter.md": "Check the work.\n", "goal.md": "The goal.\n", "body.md": "A long note.\n", "mission.md": "The mission.\n"})
 

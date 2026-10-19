@@ -14,7 +14,6 @@ from orgmcp.services import Contract
 from ._fakes import FakeOffice, FakeReadings, FakeServices, new_office, new_readings, new_services
 from ._support import Fixture, go, parse
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 TEXT = MemoryText({"criterion.md": "Has a title.\n", "notes.md": "For the owner.\n", "playbook.md": "Step one.\n"})
 

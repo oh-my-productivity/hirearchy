@@ -11,4 +11,4 @@ class AtFileText(TextSource):
     """``value`` as it is, or the text of the file named after an ``@``."""
 
     def read(self, value: str) -> str:
-        raise NotImplementedError
+        return Path(value[1:]).expanduser().read_text(encoding="utf-8") if value.startswith("@") else value

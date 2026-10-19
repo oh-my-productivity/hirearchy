@@ -10,10 +10,7 @@ import pytest
 from orgmcp.cli._ports import TextSource
 from orgmcp.cli.testing import IMPLEMENTATIONS, TextWorld
 
-RED = pytest.mark.xfail(strict=True, reason="red: D-cli")  # (the fake passes already: only the real reader is owed)
-
-
-@pytest.fixture(params=[pytest.param(factory, id=factory.__name__, marks=RED if factory.__name__ == "_fs_text" else ()) for factory in IMPLEMENTATIONS[TextSource]])
+@pytest.fixture(params=IMPLEMENTATIONS[TextSource], ids=lambda factory: factory.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> TextWorld:
     made = cast(TextWorld, request.param(tmp_path))
     assert isinstance(made.reader, TextSource)

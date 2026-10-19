@@ -12,7 +12,6 @@ from orgmcp.cli import CliApp
 from orgmcp.cli._ports import Arguments
 from orgmcp.cli.testing import IMPLEMENTATIONS, CliWorld
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[CliApp], ids=lambda factory: factory.__name__)
@@ -23,10 +22,10 @@ def w(request: pytest.FixtureRequest, tmp_path: Path) -> CliWorld:
 
 
 def test_the_command_the_line_names_runs_with_the_arguments_of_the_line(w: CliWorld) -> None:
-    w.app.main(["--root", "/some/org", "exit", "--code", "0"])
-    ran = w.commands["exit"].ran
-    assert len(ran) == 1 and ran[0].root == "/some/org" and ran[0].cmd == "exit" and ran[0].code == "0"
-    assert w.commands["ok"].ran == [] and w.commands["bad"].ran == []
+    w.app.main(["--root", "/some/org", "ok", "--code", "7"])
+    ran = w.commands["ok"].ran
+    assert len(ran) == 1 and ran[0].root == "/some/org" and ran[0].cmd == "ok" and ran[0].code == "7"
+    assert w.commands["exit"].ran == [] and w.commands["bad"].ran == []
 
 
 def test_the_process_is_named_cli_and_the_end_of_a_command_is_recorded(w: CliWorld) -> None:

@@ -14,7 +14,6 @@ from orgmcp.kernel import OrgError
 from orgmcp.locator.testing import MemoryOrgLocator
 from orgmcp.kernel.testing import DictEnvironment
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 
 def args(root: str | None = None) -> Arguments:

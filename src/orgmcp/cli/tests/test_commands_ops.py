@@ -22,7 +22,6 @@ from orgmcp.review import Note
 from ._fakes import FakeOffice, FakeUpkeep, new_office, new_upkeep
 from ._support import Fixture, go
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 
 def test_upgrade_rules_announces_only_when_it_writes(tmp_path: Path) -> None:
