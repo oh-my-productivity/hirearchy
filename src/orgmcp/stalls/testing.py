@@ -71,7 +71,9 @@ class MemoryNudges(NudgeLedger, NudgeRecorder):
         return chain_of(self._agents, addr, task)
 
     def save(self, entries: Mapping[str, Mapping[str, float]]) -> None:
-        raise NotImplementedError("red: C-stalls")
+        data, damaged = self._load()
+        if damaged or entries != data:
+            self.text = json.dumps(entries, indent=2) + "\n"
 
 
 class CountingTasks(TaskQuery):

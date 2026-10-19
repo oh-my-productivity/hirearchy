@@ -13,7 +13,6 @@ from orgmcp.stalls._ports import TaskViews
 from orgmcp.stalls._views import FingerprintTaskViews
 from orgmcp.stalls.testing import CountingTasks
 
-from ._support import RED
 
 Make = Callable[[Path], MailHarness]
 
@@ -48,7 +47,6 @@ def test_it_is_a_task_views_port(v: Views) -> None:
     assert isinstance(v.views, TaskViews)
 
 
-@RED
 def test_the_views_are_the_tasks_of_the_task_query(v: Views) -> None:
     task = v.send("root", "ceo")
     v.send("ceo", "ceo/eng")
@@ -56,7 +54,6 @@ def test_the_views_are_the_tasks_of_the_task_query(v: Views) -> None:
     assert [t.to for t in v.views.outstanding("ceo")] == ["ceo/eng"]
 
 
-@RED
 def test_an_unchanged_mailbox_is_not_asked_again(v: Views) -> None:
     v.send("root", "ceo")
     v.views.open_tasks("ceo")
@@ -68,14 +65,12 @@ def test_an_unchanged_mailbox_is_not_asked_again(v: Views) -> None:
     assert len(v.tasks.computed) == 2
 
 
-@RED
 def test_a_view_nobody_asked_for_is_not_computed(v: Views) -> None:
     v.send("root", "ceo")
     v.views.open_tasks("ceo")
     assert v.tasks.computed == [("open_tasks", "ceo")]
 
 
-@RED
 def test_a_message_that_only_moves_between_the_received_boxes_changes_nothing(v: Views) -> None:
     v.send("root", "ceo")
     v.views.open_tasks("ceo")
@@ -86,7 +81,6 @@ def test_a_message_that_only_moves_between_the_received_boxes_changes_nothing(v:
     assert len(v.tasks.computed) == 1
 
 
-@RED
 def test_a_new_received_message_recomputes_both_views(v: Views) -> None:
     v.send("root", "ceo")
     v.views.open_tasks("ceo")
@@ -97,7 +91,6 @@ def test_a_new_received_message_recomputes_both_views(v: Views) -> None:
     assert v.tasks.computed[2:] == [("open_tasks", "ceo"), ("outstanding", "ceo")]
 
 
-@RED
 def test_a_new_sent_message_recomputes_and_shows_the_task_closed(v: Views) -> None:
     task = v.send("root", "ceo")
     assert [t.id for t in v.views.open_tasks("ceo")] == [task.id]
@@ -106,7 +99,6 @@ def test_a_new_sent_message_recomputes_and_shows_the_task_closed(v: Views) -> No
     assert len(v.tasks.computed) == 2
 
 
-@RED
 def test_agents_are_remembered_apart(v: Views) -> None:
     v.send("root", "ceo")
     v.send("root", "dev")
@@ -118,7 +110,6 @@ def test_agents_are_remembered_apart(v: Views) -> None:
     assert v.tasks.computed == [("open_tasks", "ceo"), ("open_tasks", "dev"), ("open_tasks", "dev")]
 
 
-@RED
 def test_retain_forgets_the_agents_that_are_gone(v: Views) -> None:
     v.send("root", "ceo")
     v.send("root", "dev")
@@ -130,13 +121,11 @@ def test_retain_forgets_the_agents_that_are_gone(v: Views) -> None:
     assert v.tasks.computed == [("open_tasks", "ceo"), ("open_tasks", "dev"), ("open_tasks", "dev")]
 
 
-@RED
 def test_retain_of_an_agent_that_was_never_asked_about_is_harmless(v: Views) -> None:
     v.views.retain(["nobody"])
     v.views.retain([])
 
 
-@RED
 def test_the_files_of_an_unchanged_mailbox_are_not_even_opened_again(tmp_path: Path) -> None:
     v = Views(fs_mailbox(tmp_path))
     parser = v.mail.parser
@@ -151,7 +140,6 @@ def test_the_files_of_an_unchanged_mailbox_are_not_even_opened_again(tmp_path: P
     assert len(parser.loaded) == asked
 
 
-@RED
 def test_rebound_views_keep_what_is_remembered_and_ask_the_new_ports(tmp_path: Path) -> None:
     v = Views(fs_mailbox(tmp_path))
     v.send("root", "ceo")

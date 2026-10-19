@@ -96,11 +96,31 @@ class RuntimeStalls:
     scheduler always kept for itself, is carried over to the ladder of the new runtime."""
 
     def __init__(self, runtime: Callable[[], OrgRuntime], clock: Callable[[], float]) -> None:
-        raise NotImplementedError("red: C-stalls")
+        self._runtime = runtime
+        self._clock = CallableClock(clock)
+        self._seen: OrgRuntime | None = None
+        self._views: FingerprintTaskViews | None = None
+        self._ladder: StallLadder | None = None
+
+    def _current(self) -> tuple[StallLadder, FingerprintTaskViews]:
+        runtime = self._runtime()
+        if runtime is not self._seen or self._ladder is None or self._views is None:
+            views = (
+                FingerprintTaskViews(runtime.task_query, runtime.mail_fingerprint)
+                if self._views is None
+                else self._views.rebound(runtime.task_query, runtime.mail_fingerprint)
+            )
+            self._ladder, self._views, self._seen = ladder(RuntimePorts(runtime), self._clock, views), views, runtime
+        return self._ladder, self._views
 
     def check(self) -> list[str]:
-        raise NotImplementedError("red: C-stalls")
+        return self._current()[0].check()
 
     def task_view(self, addr: str, view: str) -> list[Message]:
         """``open_tasks`` or ``outstanding`` of an agent, as the ladder sees them (``Scheduler._task_view``)."""
-        raise NotImplementedError("red: C-stalls")
+        views = self._current()[1]
+        if view == "open_tasks":
+            return views.open_tasks(addr)
+        if view == "outstanding":
+            return views.outstanding(addr)
+        raise ValueError(f"no such task view: {view}")

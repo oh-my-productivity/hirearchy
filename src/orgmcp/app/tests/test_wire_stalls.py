@@ -30,8 +30,6 @@ from orgmcp.stalls._nudges import LedgerNudgeLedger
 from orgmcp.templates import Notices
 from orgmcp.templates.testing import RecordingNotices
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-stalls")
-
 
 def test_the_runtime_has_the_ladder_and_the_nudge_ledger(tmp_path: Path) -> None:
     runtime = wiring.open_runtime(tmp_path)
@@ -55,7 +53,6 @@ def test_an_override_replaces_the_port(tmp_path: Path) -> None:
     assert runtime.stall_ladder is fake and isinstance(runtime.nudge_ledger, LedgerNudgeLedger)
 
 
-@RED
 def test_every_collaborator_of_the_ladder_comes_from_the_runtime(tmp_path: Path) -> None:
     """The whole ladder over fakes: nothing of the organization directory is read or written."""
     clock, box, events = FakeClock(), MemoryMailbox(), ListEventSink()
@@ -77,7 +74,6 @@ def test_every_collaborator_of_the_ladder_comes_from_the_runtime(tmp_path: Path)
     assert list(tmp_path.iterdir()) == []
 
 
-@RED
 def test_the_nudge_ledger_is_the_one_the_ladder_writes(tmp_path: Path) -> None:
     ledgers, clock, events = MemoryLedgerStore(), FakeClock(), ListEventSink()
     box = MemoryMailbox()
@@ -91,8 +87,9 @@ def test_the_nudge_ledger_is_the_one_the_ladder_writes(tmp_path: Path) -> None:
         MessageDelivery: RecordingDelivery(clock, SequenceIdGenerator(clock)), EventSink: events, LedgerStore: ledgers,
     })
     clock.advance(600)
+    at = clock.time()  # (delivering the note moves the fake clock on by a microsecond)
     runtime.stall_ladder.check()
-    assert runtime.nudge_ledger.entries() == {"T-1": {"step": 0, "at": clock.time()}}
+    assert runtime.nudge_ledger.entries() == {"T-1": {"step": 0, "at": at}}
 
 
 # ------------------------------------------------------------------------------ the legacy scheduler's seam
@@ -120,7 +117,6 @@ def org(tmp_path: Path) -> Org:
     return made
 
 
-@RED
 def test_the_scheduler_ladder_uses_the_clock_it_is_given(org: Org) -> None:
     task = org.delegate("root", "ceo", "T", "g", "a", budget=3)
     org.begin_run("ceo")
@@ -132,7 +128,6 @@ def test_the_scheduler_ladder_uses_the_clock_it_is_given(org: Org) -> None:
     assert stalls.check() == [f"ceo: reminded about open task {task.id}"]
 
 
-@RED
 def test_the_scheduler_ladder_follows_the_runtime_and_keeps_its_memo(org: Org) -> None:
     task = org.delegate("root", "ceo", "T", "g", "a", budget=3)
     org.begin_run("ceo")
@@ -148,7 +143,6 @@ def test_the_scheduler_ladder_follows_the_runtime_and_keeps_its_memo(org: Org) -
     assert stalls.task_view("ceo", "open_tasks") == [] and counting.loaded  # a change is read through the ports of the runtime in force
 
 
-@RED
 def test_the_scheduler_ladder_asks_the_notices_of_the_runtime_in_force(org: Org) -> None:
     org.delegate("root", "ceo", "T", "g", "a", budget=3)
     org.begin_run("ceo")

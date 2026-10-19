@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Collection, Mapping
+from datetime import datetime
 from typing import Protocol, runtime_checkable
 
 from ..kernel import Message, OrgLayout
@@ -47,7 +49,12 @@ class LedgerShape(Protocol):
 
 class FsCreationTimes(CreationTimes):
     def of(self, task: Message) -> float:
-        raise NotImplementedError("red: C-stalls")
+        try:
+            return datetime.fromisoformat(task.created).timestamp()
+        except ValueError:
+            if task.path is None:
+                raise ValueError(f"task {task.id} has no creation stamp and no file") from None
+            return task.path.stat().st_mtime
 
 
 class FsLedgerShape(LedgerShape):
@@ -55,5 +62,7 @@ class FsLedgerShape(LedgerShape):
         self._paths = paths
 
     def damaged(self, name: str) -> bool:
-        raise NotImplementedError("red: C-stalls")
-
+        try:
+            return not isinstance(json.loads(self._paths.ledger_file(name).read_text(encoding="utf-8")), dict)
+        except (OSError, ValueError):
+            return False

@@ -11,8 +11,6 @@ import pytest
 from orgmcp.kernel import Message
 from orgmcp.stalls.testing import STALL_AFTER, NudgesHarness, StallsWorld
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-stalls")
-
 
 def make_world(request: pytest.FixtureRequest, tmp_path: Path) -> StallsWorld:
     """The fixture body of the ladder's contract suite: the world of one implementation."""
@@ -43,3 +41,10 @@ def stall(w: StallsWorld) -> list[str]:
     """Let ``stall_after`` pass and run one pass of the ladder."""
     w.clock.advance(STALL_AFTER)
     return w.ladder.check()
+
+
+def stall_at(w: StallsWorld) -> tuple[list[str], float]:
+    """Like ``stall``, and the time the pass read from the clock (delivering a note moves the fake clock on by a microsecond)."""
+    w.clock.advance(STALL_AFTER)
+    at = w.clock.time()
+    return w.ladder.check(), at

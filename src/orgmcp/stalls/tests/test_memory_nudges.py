@@ -7,7 +7,6 @@ from orgmcp.stalls import NudgeLedger
 from orgmcp.stalls._ports import NudgeRecorder
 from orgmcp.stalls.testing import MemoryNudges
 
-from ._support import RED
 
 
 def test_the_fake_is_both_ports() -> None:
@@ -15,7 +14,6 @@ def test_the_fake_is_both_ports() -> None:
     assert isinstance(fake, NudgeLedger) and isinstance(fake, NudgeRecorder)
 
 
-@RED
 def test_the_fake_keeps_the_text_the_file_would_hold() -> None:
     fake = MemoryNudges(MemoryMailbox().agents)
     assert fake.text is None
