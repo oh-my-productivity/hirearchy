@@ -10,9 +10,7 @@ from orgmcp.blueprint._protocols import OrgContext
 from orgmcp.blueprint.testing import MemoryRoleLibrary, MemoryTextFiles, ScriptedConfinementPolicy, StaticOrgContext
 from orgmcp.settings import DEFAULT_CONFIG
 
-from ._support import RED, role
-
-pytestmark = RED
+from ._support import role
 
 
 def test_memory_files_answer_what_they_hold_and_remember_what_was_read(tmp_path: Path) -> None:
