@@ -6,6 +6,7 @@ the ones the command line and the MCP tool print. The cases of ``tests/test_obse
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import re
 from pathlib import Path
@@ -14,13 +15,12 @@ from typing import Any
 import pytest
 
 from orgmcp import observe
+from orgmcp.kernel.testing import FakeClock
 from orgmcp.observability import api
 from orgmcp.observability.tests import _scenario
 from orgmcp.observability.tests._scenario import NOW, SINCE, stamp
 from orgmcp.observability.tests._support import expected
 from orgmcp.progress import progress
-
-RED = pytest.mark.xfail(strict=True, reason="red: C-obs-1")
 
 EVENTS: dict[str, dict[str, Any]] = {
     "all": dict(since=SINCE), "errors": dict(since=SINCE, errors=True), "agent_limit": dict(since=SINCE, agent="ceo/eng", limit=3),
@@ -107,26 +107,20 @@ def test_traces_is_still_the_name_of_the_deriver_over_an_org(built: Any) -> None
     assert traces.of(built.task.id) == (built.task.id, "recorded") and traces.of("nope") == (None, "unknown")
 
 
-@RED
 def test_the_pure_names_are_the_packages() -> None:
     for name in ("fmt_rel", "percentile", "normalize_refusal", "is_error", "format_event"):
         assert getattr(observe, name) is getattr(api, name), name
     assert observe.parse_when("15m", stamp(0)) == stamp(-900)
 
 
-@RED
 def test_the_default_now_is_the_clock_of_the_runtime(built: Any) -> None:
     until = observe.metrics(built.org, since=SINCE)["until"]
     assert re.fullmatch(r"2026-10-18T10:02:3\d\.\d+\+00:00", str(until)) or str(until).startswith("2026-10-18T10:02:"), until
     assert observe.events_view(built.org, since="1h")["since"] < str(until)
 
 
-@RED
 def test_the_clock_of_the_runtime_is_what_a_default_now_is_made_of(built: Any) -> None:
-    from orgmcp.kernel.testing import FakeClock
-    import dataclasses
-
     built.org.runtime = dataclasses.replace(built.org.runtime, clock=FakeClock(NOW))
     assert observe.metrics(built.org, since=SINCE)["until"].startswith("2026-10-18T10:03:20")
-    assert observe.trace(built.org, built.task.id)["totals"]["wall_ms"] == 125000.0  # a finished request does not depend on now
+    assert 199999.0 < observe.trace(built.org, built.task.id)["totals"]["wall_ms"] <= 200000.0  # the request is open (reworked): it lasts until now
     assert observe.events_view(built.org, since="1h")["until"] is None

@@ -9,8 +9,6 @@ import dataclasses
 from datetime import datetime, timezone
 from pathlib import Path
 
-import pytest
-
 from orgmcp.app import wire_observability, wiring
 from orgmcp.app._builder import Builder
 from orgmcp.app.runtime import OrgRuntime
@@ -22,8 +20,6 @@ from orgmcp.observability import EventQueries, MetricQueries, TraceQueries
 from orgmcp.observability._events import LogEventQueries
 from orgmcp.observability._metrics import DerivedMetricQueries
 from orgmcp.observability._trace import DerivedTraceQueries
-
-RED = pytest.mark.xfail(strict=True, reason="red: C-obs-1")
 
 
 def builder(tmp_path: Path, overrides: dict[type, object] | None = None) -> Builder:
@@ -49,7 +45,6 @@ def test_the_runtime_has_no_field_for_them_before_the_second_half() -> None:
     assert not {"event_queries", "trace_queries", "metric_queries"} & names
 
 
-@RED
 def test_the_events_are_read_through_the_event_reader_and_the_clock_of_the_builder(tmp_path: Path) -> None:
     clock, log = FakeClock(), MemoryEventLog(FakeClock())
     queries = builder(tmp_path, {Clock: clock, EventReader: log, **{}}).get(EventQueries)
@@ -57,7 +52,6 @@ def test_the_events_are_read_through_the_event_reader_and_the_clock_of_the_build
     assert [e["kind"] for e in queries.events(since="2026-10-18T00:00:00Z", now=datetime(2026, 10, 18, 12, tzinfo=timezone.utc))] == ["tool.call"]
 
 
-@RED
 def test_the_objects_of_the_legacy_functions_follow_the_runtime_in_force(tmp_path: Path) -> None:
     runtime = wiring.open_runtime(tmp_path)
     first = wire_observability.event_queries_of(runtime)

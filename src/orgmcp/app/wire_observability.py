@@ -14,6 +14,9 @@ The second half of ``observe.py`` also needs a few pure helpers of the package t
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from datetime import datetime
+
 from ..agents import AgentDirectory
 from ..eventlog import EventFollowers, EventReader
 from ..kernel import Clock
@@ -29,6 +32,7 @@ from ..observability._ports import MessageHistory, RunCollection, TraceDerivers
 from ..observability._runs import RunCollector
 from ..observability._runs import RunRec as RunRec  # re-exported for observe.py
 from ..observability._runs import run_events as run_events  # re-exported for observe.py
+from ..observability._trace import READ_ONLY_TOOLS as READ_ONLY_TOOLS  # re-exported for observe.py
 from ..observability._trace import DerivedTraceQueries
 from ..observability._trace import run_window as run_window  # re-exported for observe.py
 from ..observability._util import cap as cap  # re-exported for observe.py
@@ -84,6 +88,30 @@ def register(b: Builder) -> None:
 def event_queries_of(runtime: OrgRuntime) -> EventQueries:
     """``EventQueries`` over the ports ``runtime`` has now."""
     return event_queries(RuntimePorts(runtime))
+
+
+class SleepingClock(Clock):
+    """``clock`` that sleeps by the function it was given (``observe.follow_events`` has always taken one)."""
+
+    def __init__(self, clock: Clock, sleep: Callable[[float], None]) -> None:
+        self._clock, self._sleep = clock, sleep
+
+    def now(self) -> datetime:
+        return self._clock.now()
+
+    def time(self) -> float:
+        return self._clock.time()
+
+    def monotonic(self) -> float:
+        return self._clock.monotonic()
+
+    def sleep(self, seconds: float) -> None:
+        self._sleep(seconds)
+
+
+def event_queries_sleeping(runtime: OrgRuntime, sleep: Callable[[float], None]) -> EventQueries:
+    """``EventQueries`` over the ports ``runtime`` has now that waits between polls with ``sleep`` (``follow_events``)."""
+    return LogEventQueries(runtime.event_reader, runtime.event_followers, SleepingClock(runtime.clock, sleep))
 
 
 def trace_queries_of(runtime: OrgRuntime) -> TraceQueries:
