@@ -6,6 +6,7 @@ and the command lines of the old ``orgmcp --root X run ...`` form are still reco
 
 from __future__ import annotations
 
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -77,3 +78,15 @@ def test_a_root_that_cannot_be_resolved_is_not_the_organization(tmp_path: Path) 
 
 def test_a_flag_without_a_value_does_not_name_a_root() -> None:
     assert SchedulerIdentity().recognises("/v/bin/orgmcp run --root", ROOT) is False
+
+
+@pytest.mark.skipif(not Path("/tmp").is_symlink(), reason="/tmp is not a symlink on this system (it is on macOS: /tmp -> /private/tmp)")
+def test_the_system_tmp_directory_and_its_real_path_are_the_same_organization() -> None:
+    with tempfile.TemporaryDirectory(dir="/tmp") as made:
+        spelled = Path(made)  # /tmp/tmpabc
+        org = spelled.resolve() / "org"  # /private/tmp/tmpabc/org
+        org.mkdir()
+        assert str(org) != str(spelled / "org")
+        assert SchedulerIdentity().recognises(f"/v/bin/orgmcp --root {spelled}/org run --until-idle", org) is True
+        assert SchedulerIdentity().recognises(f"/v/bin/orgmcp --root={spelled}/org run", org) is True
+        assert SchedulerIdentity().recognises(f"/v/bin/orgmcp --root {spelled}/other run", org) is False

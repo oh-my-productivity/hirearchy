@@ -11,16 +11,10 @@ from _pytest.mark.structures import ParameterSet
 
 W = TypeVar("W")
 
-RED = "red: C-daemon"
-PENDING: frozenset[str] = frozenset()  # the worlds whose classes are not written yet: their contract tests are expected to fail
-
 
 def worlds(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:
     """One parameter per implementation (the worlds of ``testing.IMPLEMENTATIONS`` for a port)."""
-    return [
-        pytest.param(factory, id=factory.__name__, marks=[pytest.mark.xfail(strict=True, reason=RED)] if factory.__name__ in PENDING else [])
-        for factory in factories
-    ]
+    return [pytest.param(factory, id=factory.__name__) for factory in factories]
 
 
 def build(request: pytest.FixtureRequest, tmp_path: Path, kind: type[W]) -> W:
