@@ -98,6 +98,20 @@ def _pane(app: App[None], selector: str) -> str:
     return str(getattr(app.query_one(selector), "text_now", ""))
 
 
+async def stable(app: App[None], pilot: Pilot[None], tries: int = 200) -> str:
+    """The screen once it has stopped changing: a table or a pane is painted a turn after the refresh that filled it, and on a loaded machine that turn can
+    come late. No time is waited; the loop ends when two reads, with the app idle in between, are the same."""
+    before = plain(app)
+    for _ in range(tries):
+        await settled(app, pilot)
+        await pilot.pause()
+        after = plain(app)
+        if after == before:
+            return after
+        before = after
+    raise AssertionError("the screen never stopped changing")
+
+
 async def press(app: App[None], pilot: Pilot[None], keys: tuple[str, ...]) -> None:
     for key in keys:
         if key.startswith(FOCUS):
@@ -128,7 +142,9 @@ def capture(make_app: Callable[[], App[None]], steps: tuple[tuple[str, tuple[str
             for name, keys in steps:
                 await press(app, pilot, keys)
                 await arrived(app, pilot, name)
-                text = plain(app)
+                text = await stable(app, pilot)
+                failed = getattr(app, "last_error", None)
+                assert failed is None, f"{name}: the refresh failed: {failed}\n{text}"
                 for path in sorted(hidden, key=len, reverse=True):
                     text = text.replace(path, SHOWN_AS)
                 seen[name] = text
