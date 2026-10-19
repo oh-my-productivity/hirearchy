@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Services and reflection: a standing task an agent offers, and the loop that improves how it is done.
 
 A *service* is a standing offer by one agent (the owner, usually a team lead) to do one kind of task on request:
@@ -23,69 +24,37 @@ Files::
 from __future__ import annotations
 
 import os
-import re
 import shutil
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-from .core import (
-    RENDER_BODY_CHARS, ROOT, Message, Org, OrgError, NAME_RE, atomic_write, join_frontmatter, latest_results,
-    split_frontmatter, utcnow,
+from ..kernel import NAME_RE, RENDER_BODY_CHARS, ROOT, Message, OrgError, join_frontmatter, latest_results, split_frontmatter
+from ..kernel import msg_time as _msg_time
+from ..kernel import parse_time as _parse_time
+from typing import Any as Org  # (the duck-typed Org: a feature may not import the facade)
+from ._places import RETIRED_DIR
+from .api import (
+    DELIVERABLE_KEYS,
+    DESCRIPTION_MAX,
+    FEEDBACK_HEADER,
+    FEEDBACK_MAX,
+    INPUT_RE,
+    REASON_MAX,
+    VERDICTS,
+    Contract,
+    Playbook,
 )
-from .health import _msg_time, _parse_time
 
-INPUT_RE = re.compile(r"[a-z][a-z0-9_]{0,31}\Z")
-VERDICTS = ("accept", "reject")
-DESCRIPTION_MAX = 300
-REASON_MAX = 400
-FEEDBACK_MAX = 1000
 TITLE_MAX = 80
-DELIVERABLE_KEYS = ("description", "format", "max_words", "path")
 DIGEST_CASES = 6  # cases with new evidence shown in the digest
 DIGEST_CHARS = 3000  # soft limit of the whole digest
-FEEDBACK_HEADER = (
-    "Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; "
-    "report `done` only if every criterion is met."
-)
 CLIP_LESSON = 220
 CLIP_NOTE = 160
 MAX_VERDICTS = 4  # verdicts of one case shown in a digest line
 
 
 # ------------------------------------------------------------------------------------------------ files
-
-
-@dataclass
-class Contract:
-    """A parsed ``SERVICE.md``."""
-
-    name: str
-    owner: str
-    description: str = ""
-    inputs: list[dict] = field(default_factory=list)  # {"name", "description", "required"}
-    acceptance: list[str] = field(default_factory=list)
-    deliverable: dict = field(default_factory=dict)
-    budget: int = 1
-    locked: bool = False
-    version: int = 1
-    defined_by: str = ""
-    defined: datetime | None = None
-    created: datetime | None = None  # when the service was first defined (requests before it belong to an older service)
-    notes: str = ""  # free text body: notes from the client
-    path: Path | None = None
-
-
-@dataclass
-class Playbook:
-    """A parsed ``PLAYBOOK.md``; ``version`` 0 = there is none."""
-
-    version: int = 0
-    revised: datetime | None = None
-    by: str = ""
-    reason: str = ""
-    body: str = ""
-    path: Path | None = None
 
 
 def service_dir(org: Org, owner: str, name: str) -> Path:
@@ -173,8 +142,8 @@ def _clip(text: str, limit: int) -> str:
     return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
 
 
-def _stamp_now() -> str:
-    return utcnow().isoformat(timespec="microseconds")
+def _stamp_now(org: Org) -> str:
+    return org.runtime.clock.now().isoformat(timespec="microseconds")
 
 
 # ------------------------------------------------------------------------------------- validation helpers
@@ -374,7 +343,7 @@ def define_service(
     playbook_body = _playbook_text(org, playbook) if playbook is not None else None
 
     sdir = service_dir(org, owner, name)
-    now = _stamp_now()
+    now = _stamp_now(org)
     notes_n = (notes if notes is not None else (old.notes if old else "") or "").strip()
     meta = {
         "name": name, "description": description if description is not None else (old.description if old else ""),
@@ -392,8 +361,8 @@ def define_service(
                 f"no change: the amendment leaves the contract of `{name}` exactly as it is (v{old.version}). "
                 f"Current criteria:\n{_numbered(old.acceptance)}"
             )
-        atomic_write(sdir / "history" / f"SERVICE.v{old.version}.md", (sdir / "SERVICE.md").read_text(encoding="utf-8"))
-    atomic_write(sdir / "SERVICE.md", join_frontmatter(meta, notes_n))
+        org.runtime.atomic_writer.write(sdir / "history" / f"SERVICE.v{old.version}.md", (sdir / "SERVICE.md").read_text(encoding="utf-8"))
+    org.runtime.atomic_writer.write(sdir / "SERVICE.md", join_frontmatter(meta, notes_n))
     org.emit("service.define", actor=actor, owner=owner, service=name, version=meta["version"], by=actor,
              amendment=old is not None)
     if old is None:
@@ -501,7 +470,7 @@ def retire_service(org: Org, actor: str, owner: str, name: str, reason: str) -> 
         raise OrgError(f"{owner} offers no service called `{name}`. Its services: {known}")
     if not (reason or "").strip():
         raise OrgError("say why the service is retired (reason)")
-    dest = service_dir(org, owner, ".retired") / f"{name}-{utcnow():%Y%m%dT%H%M%S%f}"
+    dest = service_dir(org, owner, RETIRED_DIR) / f"{name}-{org.runtime.clock.now():%Y%m%dT%H%M%S%f}"
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.move(str(service_dir(org, owner, name)), dest)
     org.emit("service.retire", actor=actor, owner=owner, service=name, by=actor)
@@ -518,8 +487,8 @@ def retire_service(org: Org, actor: str, owner: str, name: str, reason: str) -> 
 
 def _write_playbook(org: Org, owner: str, name: str, version: int, body: str, by: str, reason: str) -> Path:
     path = service_dir(org, owner, name) / "PLAYBOOK.md"
-    meta = {"service": name, "version": version, "revised": _stamp_now(), "by": by, "reason": reason}
-    atomic_write(path, join_frontmatter(meta, body))
+    meta = {"service": name, "version": version, "revised": _stamp_now(org), "by": by, "reason": reason}
+    org.runtime.atomic_writer.write(path, join_frontmatter(meta, body))
     org.emit("service.revise", actor=by, owner=owner, service=name, version=version, by=by)
     return path
 
@@ -554,7 +523,7 @@ def revise_playbook(org: Org, actor: str, service: str, content: str, reason: st
         )
     sdir = service_dir(org, actor, service)
     if current.version:
-        atomic_write(sdir / "history" / f"PLAYBOOK.v{current.version}.md", (sdir / "PLAYBOOK.md").read_text(encoding="utf-8"))
+        org.runtime.atomic_writer.write(sdir / "history" / f"PLAYBOOK.v{current.version}.md", (sdir / "PLAYBOOK.md").read_text(encoding="utf-8"))
     version = current.version + 1
     path = _write_playbook(org, actor, service, version, body, actor, reason)
     org.notify(

@@ -12,4 +12,3 @@ orgmcp.observe.Traces
 orgmcp.review.Review
 orgmcp.scheduler.Scheduler
 orgmcp.server.OrgBinding
-orgmcp.services.Stats

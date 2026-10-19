@@ -78,20 +78,19 @@ def demo_org(base: Path, clock: Clock | None = None) -> SimpleNamespace:
     """
     clock = clock or Clock()
     import orgmcp.core as core
-    import orgmcp.services as svc
 
     counter = iter(range(1 << 30))
 
     def token_hex(nbytes: int = 32) -> str:  # 0000, 0001, ...: never 1xxx, so no id contains e.g. 't-1' ('roo|t-1|657')
         return f"{next(counter):0{2 * nbytes}x}"
 
-    real, real_svc, real_secrets = core.utcnow, svc.utcnow, core.secrets
-    core.utcnow = svc.utcnow = clock
+    real, real_secrets = core.utcnow, core.secrets
+    core.utcnow = clock
     core.secrets = SimpleNamespace(token_hex=token_hex)  # message ids end in random hex; the demo must be the same every time
     try:
         return _build_demo(base, clock)
     finally:
-        core.utcnow, svc.utcnow, core.secrets = real, real_svc, real_secrets
+        core.utcnow, core.secrets = real, real_secrets
 
 
 def _build_demo(base: Path, clock: Clock) -> SimpleNamespace:
