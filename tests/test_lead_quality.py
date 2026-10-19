@@ -9,6 +9,7 @@ import yaml
 
 from orgmcp import blueprint as bpm
 from orgmcp.blueprint_examples import example
+from orgmcp.core import split_frontmatter
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "blueprint-research.yaml"
 
@@ -92,7 +93,7 @@ def test_manager_still_pastes_the_coverage_line_verbatim():
 def test_manager_default_tier_is_strong_and_says_why():
     role = bpm.get_role("manager")
     assert role.tier == "strong"
-    meta = bpm.split_frontmatter((bpm.ROLES_DIR / "manager.md").read_text(encoding="utf-8"))[0]
+    meta = split_frontmatter((bpm.ROLES_DIR / "manager.md").read_text(encoding="utf-8"))[0]
     assert "strong" in meta["model_note"] and "studies A3/A4" in meta["model_note"]
 
 
