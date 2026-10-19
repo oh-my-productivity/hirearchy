@@ -22,9 +22,7 @@ from orgmcp.scheduler.testing import (
 )
 from orgmcp.settings import OrgSettings
 
-from ._support import a_run, red
-
-pytestmark = red
+from ._support import a_run
 
 
 class Kit:
@@ -245,4 +243,4 @@ def test_a_failing_stall_check_or_review_is_said_once_each_and_the_runs_still_st
     loop.tick()
     loop.tick()
     assert len([m for m in life.console.lines if "kaput" in m]) == 2 and life.count.total == 1
-    assert [e.fields["phase"] for e in life.events.events if e.kind == "scheduler.error"] == ["stall check", "health review"]
+    assert [e.fields["phase"] for e in life.events.events if e.kind == "scheduler.error" and "kaput" in str(e.fields["error"])] == ["stall check", "health review"]

@@ -14,10 +14,7 @@ from orgmcp.scheduler.testing import IMPLEMENTATIONS, LoopWorld
 
 @pytest.fixture(params=IMPLEMENTATIONS[SchedulerLoop], ids=lambda factory: factory.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> LoopWorld:
-    try:
-        made = request.param(tmp_path)
-    except NotImplementedError:  # red: removed with the implementation
-        pytest.xfail("red: D-sched-2")
+    made = request.param(tmp_path)
     assert isinstance(made.loop, SchedulerLoop)
     return made
 
@@ -52,14 +49,12 @@ def test_an_open_task_keeps_the_scheduler_from_being_finished_even_when_nothing_
 
 def test_the_cap_on_runs_started_stops_the_work_from_remaining(w: LoopWorld) -> None:
     w.give_work()
+    w.give_work()
     assert w.loop.tick(max_runs=1) is True and w.started() == 1
     w.let_runs_end()
-    w.give_work()
-    w.loop.tick(max_runs=1)
-    assert w.started() == 1  # the cap is spent: no second run
-    w.let_runs_end()
+    assert w.loop.tick(max_runs=1) is False and w.started() == 1  # the first run is over; the cap is spent, so the second agent never starts
     w.finish_work()
-    assert w.loop.finished(max_runs=1) is True  # nobody could start, nothing runs; the cap is what makes it so
+    assert w.loop.finished(max_runs=1) is True  # nothing runs and nobody could start: the cap is what makes it so
 
 
 def test_serve_until_idle_returns_once_everything_is_done(w: LoopWorld) -> None:

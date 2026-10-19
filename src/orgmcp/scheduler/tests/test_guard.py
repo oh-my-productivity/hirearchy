@@ -8,10 +8,6 @@ from orgmcp.scheduler._guard import LoggingPhaseGuard
 from orgmcp.scheduler._run import GuardMemory
 from orgmcp.scheduler.testing import RecordingConsole
 
-from ._support import red
-
-pytestmark = red
-
 
 def make() -> tuple[LoggingPhaseGuard, RecordingConsole, ListEventSink, FakeClock, GuardMemory]:
     clock, console, sink, memory = FakeClock(), RecordingConsole(), ListEventSink(), GuardMemory()

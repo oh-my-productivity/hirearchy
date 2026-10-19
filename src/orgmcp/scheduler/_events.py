@@ -56,10 +56,11 @@ class SessionAnnouncer(SessionEvents):
     """``scheduler.start`` and ``scheduler.exit``."""
 
     def __init__(self, events: EventSink, settings: OrgSettings, version: Provider[str]) -> None:
-        raise NotImplementedError("red: D-sched-2")
+        self._events, self._settings, self._version = events, settings, version
 
     def started(self, mode: str, max_runs: int | None) -> None:
-        raise NotImplementedError("red: D-sched-2")
+        self._events.emit("scheduler.start", mode=mode, max_runs=max_runs, max_parallel=self._settings.number("max_parallel", int),
+                          version=self._version())
 
     def exited(self, reason: str, runs_started: int) -> None:
-        raise NotImplementedError("red: D-sched-2")
+        self._events.emit("scheduler.exit", reason=clip(reason, ERROR_MAX), runs_started=runs_started)

@@ -13,9 +13,7 @@ from orgmcp.scheduler._exit import GraceExitPolicy, GraceWait
 from orgmcp.scheduler._run import GraceMemory, Standing, StopWhen
 from orgmcp.scheduler.testing import RecordingConsole, ScriptedGrace, ScriptedWork
 
-from ._support import ROOT_DIR, red
-
-pytestmark = red
+from ._support import ROOT_DIR
 
 TEXT = 'waiting on you: "Rework the report" needs budget (ceo out of runs)'
 STANDING = Standing({}, set())

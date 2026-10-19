@@ -16,10 +16,6 @@ from orgmcp.scheduler.testing import (
 )
 from orgmcp.eligibility.testing import MemoryFailureCounter
 
-from ._support import red
-
-pytestmark = red
-
 STANDING = Standing({}, set())
 
 

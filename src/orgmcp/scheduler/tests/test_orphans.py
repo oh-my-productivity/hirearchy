@@ -16,9 +16,7 @@ from orgmcp.scheduler._orphans import LedgerOrphanSettler, LogRunNotes
 from orgmcp.scheduler._run import RunTable
 from orgmcp.scheduler.testing import RecordingConsole, RecordingNotes, ScriptedOrphanJudge
 
-from ._support import a_run, red
-
-pytestmark = red
+from ._support import a_run
 
 LOG = "ceo/runs/20260101T000000000000.log"
 

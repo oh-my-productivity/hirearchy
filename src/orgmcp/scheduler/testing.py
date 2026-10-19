@@ -119,6 +119,7 @@ class CapturingSpawner(ProcessSpawner):
         self.table = table
         self.fail: Exception | None = None
         self.spawned: list[Spawned] = []
+        self.default_exit: tuple[int, float] | None = None  # (code, seconds): every process it starts exits so, unless the table was told otherwise
 
     def spawn(
         self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], stdin: object | None, stdout: object | None
@@ -130,6 +131,8 @@ class CapturingSpawner(ProcessSpawner):
             text = stdin.read().decode("utf-8")  # a binary temporary file, read from where the caller left it
             stdin.seek(0)
         self.spawned.append(Spawned(tuple(argv), cwd, dict(env), text, stdout))
+        if self.default_exit is not None:
+            self.table.will_exit(self.default_exit[0], after=self.default_exit[1])
         return self.table.spawn(argv, cwd=cwd, env=env, stdin=stdin, stdout=stdout)
 
     def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> ProcessHandle:
@@ -697,19 +700,22 @@ def build_heartbeat_world(tmp: Path = Path("/memory"), config: str = "") -> Hear
 
 
 def heartbeat_world(tmp: Path) -> LoopWorld:
-    """The real loop: work is a task of root's for ``ceo``, whose runs are rows of a process table that end when told."""
+    """The real loop: a unit of work is a task of root's for a new agent (``ceo``, ``ops``, ...), whose run is a row of a process table that ends five
+    seconds after it started."""
     h = build_heartbeat_world(tmp)
     w = h.life
-    task: list[Message] = []
+    w.spawner.default_exit = (0, 5.0)
+    names, tasks = iter(["ceo", "ops", "dev", "qa", "ux"]), list[Message]()
 
     def give_work() -> None:
-        w.hire("ceo", 3)
-        w.table.will_exit(0, after=5)
-        task.append(w.mail_to("ceo", trace="t1"))
+        addr = next(names)
+        w.hire(addr, 3)
+        tasks.append(w.mail_to(addr, trace=f"t-{addr}"))
 
     def finish_work() -> None:
-        w.box.store(Message(sender="ceo", to="root", type="result", title="re: t", body="ok", reply_to=task[0].id, status="done",
-                            id="20260101T000099000000-ceo-aaaa", created="2026-01-01T00:00:00+00:00"))
+        for i, task in enumerate(tasks):
+            w.box.store(Message(sender=task.to, to="root", type="result", title="re: t", body="ok", reply_to=task.id, status="done",
+                                id=f"20260101T0001{i:02d}000000-{task.to}-aaaa", created="2026-01-01T00:00:00+00:00"))
 
     def let_runs_end() -> None:
         w.clock.advance(6)

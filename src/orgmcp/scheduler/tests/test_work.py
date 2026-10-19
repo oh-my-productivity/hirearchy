@@ -10,9 +10,7 @@ from orgmcp.scheduler._run import RunRecord, Standing
 from orgmcp.scheduler._work import QueriedWork
 from orgmcp.scheduler.testing import FixedRunnable
 
-from ._support import a_run, red
-
-pytestmark = red
+from ._support import a_run
 
 
 def make(*runnable: str, idle: bool = False, waiting: Waiting | None = None) -> tuple[QueriedWork, FixedOpenWork, FixedRunnable, FixedWaiting]:

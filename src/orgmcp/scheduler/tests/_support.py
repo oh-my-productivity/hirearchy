@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from orgmcp.kernel import Message
 from orgmcp.kernel.testing import FakeClock
 from orgmcp.processes.testing import FakeProcessTable
@@ -13,8 +11,6 @@ from orgmcp.scheduler._run import PreparedRun, RunRecord
 from orgmcp.scheduler.testing import NullSink
 
 ROOT_DIR = Path("/memory/org")
-
-red = pytest.mark.xfail(strict=True, reason="red: D-sched-2", raises=NotImplementedError)  # removed with the implementation
 
 
 def message(id: str = "20260101T000000000000-root-aaaa", sender: str = "root", trace: str | None = None, title: str = "t") -> Message:

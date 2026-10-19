@@ -17,9 +17,7 @@ from orgmcp.scheduler.testing import (
 from orgmcp.snapshots.testing import MemoryIgnoreList
 from orgmcp.telemetry.testing import MemoryProcessLabel
 
-from ._support import ROOT_DIR, red
-
-pytestmark = red
+from ._support import ROOT_DIR
 
 
 def test_taking_the_claim_names_the_process_takes_the_pidfile_forgets_the_last_exit_and_ignores_the_runtime_files() -> None:

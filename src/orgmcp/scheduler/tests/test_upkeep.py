@@ -16,9 +16,7 @@ from orgmcp.scheduler._upkeep import HeartbeatUpkeep
 from orgmcp.scheduler.testing import FixedRunnable, NullSink
 from orgmcp.telemetry.testing import MemoryEventRetention
 
-from ._support import ROOT_DIR, a_run, red
-
-pytestmark = red
+from ._support import ROOT_DIR, a_run
 
 
 class Kit:
