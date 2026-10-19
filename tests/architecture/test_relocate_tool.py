@@ -739,3 +739,15 @@ def test_tests_of_one_module_may_not_share_a_destination_with_those_of_a_module_
         tool.apply_group(repo, both, "b")
     tool.apply_group(repo, tool.Manifest.from_dict(manifest_dict({BUDGET: ("b", {"tests/test_shadow.py": ["test_shadow"]}),
                                                                    KERNEL: ("a", {"tests/test_plain.py": ["test_plain"], "tests/test_auto.py": ["test_auto"]})})), "b")
+
+
+def test_the_merge_recipe_on_the_real_sources(tool, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    """The integration tree has applied group a; a branch applied b. Taking the integration's sources and running ``prune --group b`` on them
+    leaves the sources that applying a and b leaves (the destinations of b come from the branch)."""
+    both, manifest = real_copy(tool, tmp_path / "both")
+    integration, _ = real_copy(tool, tmp_path / "integration")
+    run(tool, both, manifest, "apply", "a", "b")
+    run(tool, integration, manifest, "apply", "a")
+    run(tool, integration, manifest, "prune", "b")
+    sources = {path: text for path, text in tree(both).items() if path.startswith("tests/test_")}
+    assert sources and sources == {path: text for path, text in tree(integration).items() if path.startswith("tests/test_")}
