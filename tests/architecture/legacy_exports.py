@@ -50,8 +50,8 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "cmd_now cmd_trace cmd_metrics cmd_events cmd_check register_obs"
     ),
     "services": _e3(
-        "INPUT_RE VERDICTS DESCRIPTION_MAX REASON_MAX FEEDBACK_MAX TITLE_MAX DELIVERABLE_KEYS DIGEST_CASES "
-        "DIGEST_CHARS FEEDBACK_HEADER CLIP_LESSON CLIP_NOTE MAX_VERDICTS Contract Playbook service_dir read_contract "
+        "TITLE_MAX DIGEST_CASES "
+        "DIGEST_CHARS CLIP_LESSON CLIP_NOTE MAX_VERDICTS service_dir read_contract "
         "read_playbook owned_services requestable_services parse_input_spec define_service retire_service "
         "revise_playbook report_hint request rework_fields feedback_text feedback Case Verdict Stats "
         "playbook_timeline version_at lessons_of cases summarize stats_by_version reflection_digest case_of "

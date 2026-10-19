@@ -1,16 +1,14 @@
 """``wire_dispatch``: the runtime has the four dispatch ports, built from the agents, settings, mailboxes, delivery, allocation policy, templates and
-access of the runtime; the rework fields come from the legacy ``services.rework_fields`` until ``services`` implements the port (C-services)."""
+access of the runtime; the rework fields come from ``services``, which implements the port (``wire_services``)."""
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
 
 from orgmcp.agents import AgentDirectory
-from orgmcp.app import Org, wire_dispatch, wiring
-from orgmcp.app.wire_dispatch import LegacyReworkContext
+from orgmcp.app import Org, wiring
 from orgmcp.budget import AllocationPolicy
 from orgmcp.delivery import MessageDelivery
 from orgmcp.delivery.testing import RecordingDelivery
@@ -25,6 +23,7 @@ from orgmcp.mail import MailboxReader, TaskQuery
 from orgmcp.mail._tasks import DerivedTaskQuery
 from orgmcp.mail.testing import MemoryMailbox
 from orgmcp.settings import OrgSettings
+from orgmcp.services._rework import ServiceReworkContext
 from orgmcp.settings.testing import MemoryOrgSettings
 
 CHARTER = "---\nrole: R\ncan_hire: true\n---\nx\n"
@@ -35,7 +34,7 @@ def test_the_runtime_has_the_four_dispatch_ports(tmp_path: Path) -> None:
     assert isinstance(runtime.message_sender, RuleMessageSender) and isinstance(runtime.message_sender, MessageSender)
     assert isinstance(runtime.task_assigner, RuleTaskAssigner) and isinstance(runtime.task_assigner, TaskAssigner)
     assert isinstance(runtime.task_reporter, RuleTaskReporter) and isinstance(runtime.task_reporter, TaskReporter)
-    assert isinstance(runtime.rework_context, LegacyReworkContext) and isinstance(runtime.rework_context, ReworkContext)
+    assert isinstance(runtime.rework_context, ServiceReworkContext) and isinstance(runtime.rework_context, ReworkContext)
 
 
 def test_building_the_ports_does_no_io(tmp_path: Path) -> None:
@@ -108,32 +107,7 @@ def test_every_runtime_has_its_own_ports(tmp_path: Path) -> None:
     assert wiring.open_runtime(tmp_path).message_sender is not wiring.open_runtime(tmp_path).message_sender
 
 
-# ------------------------------------------------------------------------------------------------------------ the legacy rework fields
-
-
-def test_the_rework_fields_are_those_of_the_legacy_services_module(tmp_path: Path) -> None:
-    asked: list[tuple[object, str, str]] = []
-
-    def legacy(org: object, actor: str, revises: str) -> Mapping[str, object]:
-        asked.append((org, actor, revises))
-        return {"service": "weekly-brief", "contract": 2, "playbook": 1}
-
-    context = LegacyReworkContext(lambda: "THE-ORG", legacy)
-    assert dict(context.fields_for("ceo", "T1")) == {"service": "weekly-brief", "contract": 2, "playbook": 1}
-    assert asked == [("THE-ORG", "ceo", "T1")]
-
-
-def test_the_org_is_made_when_a_rework_is_asked_for_not_before(tmp_path: Path) -> None:
-    made: list[str] = []
-
-    def open_org() -> object:
-        made.append("org")
-        return object()
-
-    context = LegacyReworkContext(open_org, lambda org, actor, revises: {})
-    assert made == []
-    context.fields_for("ceo", "T1")
-    assert made == ["org"]
+# ------------------------------------------------------------------------------------------------------------ the rework fields
 
 
 def test_over_a_real_organization_a_service_request_gives_its_service_fields(tmp_path: Path) -> None:
@@ -145,6 +119,6 @@ def test_over_a_real_organization_a_service_request_gives_its_service_fields(tmp
     )
     request = org.request("root", "weekly-brief", {"topic": "ai"})
     plain = org.delegate("root", "ceo", "Other", "g", "a", budget=2)
-    context = wire_dispatch.legacy_rework_context(org.root)
+    context = wiring.open_runtime(org.root).rework_context
     assert dict(context.fields_for("root", request.id)) == {"service": "weekly-brief", "contract": 1, "playbook": 1}
     assert dict(context.fields_for("root", plain.id)) == {} and dict(context.fields_for("root", "nope")) == {}
