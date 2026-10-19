@@ -159,6 +159,46 @@ def test_an_import_of_a_private_module_of_another_package_breaks_the_contract(ba
     assert "bad_pkg.rogue._imports_private -> bad_pkg.mail._mailbox" in output
 
 
+@pytest.mark.xfail(strict=True, reason="red: r-fix-contract")
+def test_lint_imports_is_never_given_the_cache(monkeypatch, tmp_path):
+    """A cached graph can say "kept" for a tree that breaks a contract: every run of the linter must ask for ``--no-cache``."""
+    seen: list[list[str]] = []
+
+    def fake_run(command, **kwargs):
+        seen.append(list(command))
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.setattr(lint, "executable", lambda: "lint-imports")
+    monkeypatch.setattr(lint.subprocess, "run", fake_run)
+    lint.run_lint_imports(tmp_path / "importlinter.ini", cwd=tmp_path)
+    assert len(seen) == 1 and "--no-cache" in seen[0], seen
+
+
+@pytest.mark.xfail(strict=True, reason="red: r-fix-contract")
+def test_a_stale_cache_cannot_hide_a_broken_contract(tmp_path):
+    """Seeded: a clean run fills the cache, then a forbidden import is added to a file whose mtime is put back (the cache is keyed by it)."""
+    package = tmp_path / "stale_pkg"
+    package.mkdir()
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "low.py").write_text("X = 1\n", encoding="utf-8")
+    (package / "high.py").write_text("Y = 2\n", encoding="utf-8")
+    config = tmp_path / "importlinter.ini"
+    config.write_text(
+        "[importlinter]\nroot_package = stale_pkg\n\n[importlinter:contract:c]\nname = low must not import high\n"
+        "type = forbidden\nsource_modules =\n    stale_pkg.low\nforbidden_modules =\n    stale_pkg.high\n", encoding="utf-8")
+    env = {**os.environ, "PYTHONPATH": str(tmp_path)}
+    cached = subprocess.run([lint.executable() or "lint-imports", "--config", str(config)], capture_output=True, text=True, cwd=tmp_path, env=env)
+    assert cached.returncode == 0, cached.stdout + cached.stderr
+    low = package / "low.py"
+    before = low.stat()
+    low.write_text("import stale_pkg.high\n", encoding="utf-8")
+    os.utime(low, ns=(before.st_atime_ns, before.st_mtime_ns))
+    stale = subprocess.run([lint.executable() or "lint-imports", "--config", str(config)], capture_output=True, text=True, cwd=tmp_path, env=env)
+    assert stale.returncode == 0, "the premise: with the cache the broken import is not seen\n" + stale.stdout + stale.stderr
+    result = lint.run_lint_imports(config, cwd=tmp_path, pythonpath=tmp_path)
+    assert result.returncode != 0 and "stale_pkg.low -> stale_pkg.high" in result.stdout + result.stderr
+
+
 # ------------------------------------------------------------------------------------------------------- the commands run
 
 
