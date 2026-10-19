@@ -14,9 +14,7 @@ from orgmcp.kernel import Message, OrgError, split_frontmatter
 from orgmcp.services import FEEDBACK_HEADER, ServiceCommands
 from orgmcp.services.testing import IMPLEMENTATIONS, ServicesWorld
 
-from ._support import amend, answer, BRIEF, define, grant, implementations, make, RED, request, STEPS
-
-pytestmark = RED
+from ._support import BRIEF, STEPS, amend, answer, define, grant, implementations, make, request
 
 CONTRACT = "ceo/services/weekly-brief/SERVICE.md"
 PLAYBOOK = "ceo/services/weekly-brief/PLAYBOOK.md"

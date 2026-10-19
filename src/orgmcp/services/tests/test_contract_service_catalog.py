@@ -12,9 +12,7 @@ import pytest
 from orgmcp.services import ServiceCatalog
 from orgmcp.services.testing import IMPLEMENTATIONS, ServicesWorld
 
-from ._support import BRIEF, define, implementations, make, RED, STEPS
-
-pytestmark = RED
+from ._support import BRIEF, STEPS, define, implementations, make
 
 
 @pytest.fixture(params=implementations(IMPLEMENTATIONS[ServiceCatalog]))

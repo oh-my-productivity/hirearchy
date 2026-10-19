@@ -7,10 +7,6 @@ import pytest
 from orgmcp.kernel import OrgError
 from orgmcp.services._lines import criteria_lines
 
-from ._support import RED
-
-pytestmark = RED
-
 
 def test_nothing_is_no_criteria() -> None:
     assert criteria_lines(None, "acceptance", required=False) == []

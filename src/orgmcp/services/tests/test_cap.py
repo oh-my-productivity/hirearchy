@@ -6,10 +6,6 @@ import pytest
 
 from orgmcp.services._cap import DEFAULT_PLAYBOOK_WORDS, playbook_word_cap
 
-from ._support import RED
-
-pytestmark = RED
-
 
 def test_the_cap_is_the_setting() -> None:
     assert playbook_word_cap({"playbook_max_words": 250}) == 250

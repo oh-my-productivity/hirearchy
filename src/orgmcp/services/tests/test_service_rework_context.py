@@ -18,9 +18,7 @@ from orgmcp.dispatch.tests.test_contract_rework_context import (  # noqa: F401  
     test_what_the_caller_does_with_the_answer_does_not_change_the_next_one,
 )
 
-from ._support import answer, define, implementations, populated, RED, request, STEPS
-
-pytestmark = RED
+from ._support import STEPS, answer, define, implementations, populated, request
 
 
 @pytest.fixture(params=implementations(IMPLEMENTATIONS[ReworkContext]))

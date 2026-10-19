@@ -5,10 +5,6 @@ from __future__ import annotations
 from orgmcp.services import Contract
 from orgmcp.services._request import TextRequestBodies
 
-from ._support import RED
-
-pytestmark = RED
-
 BODIES = TextRequestBodies()
 
 

@@ -19,4 +19,8 @@ class ServiceReworkContext(ReworkContext):
         self._catalog = catalog
 
     def fields_for(self, actor: str, revises: str) -> Mapping[str, object]:
-        raise NotImplementedError
+        task = next((m for m in self._mail.sent(actor) if m.id == revises and m.type == "task"), None)
+        if task is None or not task.service:
+            return {}
+        version = self._catalog.read_playbook(task.to, task.service).version if self._agents.exists(task.to) else 0
+        return {"service": task.service, "contract": task.contract, "playbook": version}

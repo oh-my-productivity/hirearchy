@@ -8,10 +8,6 @@ from orgmcp.kernel import OrgError
 from orgmcp.services import Contract
 from orgmcp.services._amend import ContractAmender
 
-from ._support import RED
-
-pytestmark = RED
-
 A = ContractAmender()
 
 

@@ -27,19 +27,24 @@ class RuleServiceCommands(ServiceCommands):
         deliverable: Mapping[str, object] | None = None, budget: int | None = None, playbook: str | None = None, locked: bool | None = None,
         notes: str | None = None, add_acceptance: object = None, remove_acceptance: object = None,
     ) -> str:
-        raise NotImplementedError
+        return self._definitions.define_service(
+            actor, owner, name, description=description, inputs=inputs, acceptance=acceptance, deliverable=deliverable, budget=budget,
+            playbook=playbook, locked=locked, notes=notes, add_acceptance=add_acceptance, remove_acceptance=remove_acceptance,
+        )
 
     def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
-        raise NotImplementedError
+        return self._retirement.retire_service(actor, owner, name, reason)
 
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",
         extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None,
     ) -> Message:
-        raise NotImplementedError
+        return self._requests.request(
+            actor, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance, budget=budget, revises=revises,
+        )
 
     def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
-        raise NotImplementedError
+        return self._revisions.revise_playbook(actor, service, content, reason)
 
     def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
-        raise NotImplementedError
+        return self._ratings.feedback(actor, task_id, verdict, note)

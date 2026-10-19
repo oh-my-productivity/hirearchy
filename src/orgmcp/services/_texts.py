@@ -17,7 +17,10 @@ class DirectReportOwners(OwnerAddresses):
         self._agents = agents
 
     def resolve(self, actor: str, owner: str) -> str:
-        raise NotImplementedError
+        short = norm(owner)
+        if "/" in short or norm(actor) == ROOT or self._agents.exists(short):
+            return short
+        return child_addr(actor, short)
 
 
 class CappedPlaybookTexts(PlaybookTexts):
@@ -27,7 +30,17 @@ class CappedPlaybookTexts(PlaybookTexts):
         self._settings = settings
 
     def body(self, content: str | None) -> str:
-        raise NotImplementedError
+        text = (content or "").replace("\r\n", "\n")
+        body = (split_frontmatter(text)[1] if text.startswith("---\n") else text).strip()
+        if not body:
+            raise OrgError("the playbook is empty: write the workflow (steps: who does what, in which order, which check)")
+        cap, words = playbook_word_cap(self._settings.config()), len(body.split())
+        if words > cap:
+            raise OrgError(
+                f"the playbook is {words} words; the limit is {cap} (playbook_max_words). Condense it to the steps that "
+                "matter and move detail into a file under your work/ directory."
+            )
+        return body
 
 
 class EventedPlaybookWriter(PlaybookWriter):
@@ -39,4 +52,7 @@ class EventedPlaybookWriter(PlaybookWriter):
         self._events = events
 
     def write(self, owner: str, name: str, version: int, body: str, by: str, reason: str, archive_version: int | None = None) -> str:
-        raise NotImplementedError
+        meta = {"service": name, "version": version, "revised": self._clock.now().isoformat(timespec="microseconds"), "by": by, "reason": reason}
+        path = self._store.write_playbook(owner, name, version, meta, body, archive_version)
+        self._events.emit("service.revise", actor=by, owner=owner, service=name, version=version, by=by)
+        return path

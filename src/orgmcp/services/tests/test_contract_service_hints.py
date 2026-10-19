@@ -10,9 +10,7 @@ from orgmcp.kernel import Message
 from orgmcp.services import FEEDBACK_HEADER, ServiceHints
 from orgmcp.services.testing import IMPLEMENTATIONS, ServicesWorld, fs_world, memory_world
 
-from ._support import define, implementations, populated, RED, request, STEPS
-
-pytestmark = RED
+from ._support import STEPS, define, implementations, populated, request
 
 
 @pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)

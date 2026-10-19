@@ -12,9 +12,7 @@ from orgmcp.services._places import OrgServicePlaces
 from orgmcp.services._texts import CappedPlaybookTexts, DirectReportOwners, EventedPlaybookWriter
 from orgmcp.services.testing import MemoryServiceStore, ServicesWorld, memory_world
 
-from ._support import populated, RED
-
-pytestmark = RED
+from ._support import populated
 
 
 @pytest.fixture

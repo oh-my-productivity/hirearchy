@@ -29,7 +29,7 @@ STEPS = "## Steps\n1. Search.\n2. Write.\n3. Check every claim."
 
 
 RED = pytest.mark.xfail(strict=True, reason="red: C-services")
-PENDING: set[str] = {'hints_memory', 'normalizer', 'fs_rework', 'fs_world', 'memory_world', 'memory_rework', 'fs_store', 'hints_fs'}  # implementations that are not green yet
+PENDING: set[str] = set()  # implementations that are not green yet
 
 
 def implementations(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:

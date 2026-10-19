@@ -10,9 +10,7 @@ from orgmcp.kernel import OrgError
 from orgmcp.services import ContractNormalizer
 from orgmcp.services.testing import IMPLEMENTATIONS
 
-from ._support import implementations, RED
-
-pytestmark = RED
+from ._support import implementations
 
 
 @pytest.fixture(params=implementations(IMPLEMENTATIONS[ContractNormalizer]))
