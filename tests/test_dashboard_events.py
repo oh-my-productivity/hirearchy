@@ -121,7 +121,6 @@ def demo_data(tmp_path, monkeypatch):
     from orgmcp.scheduler import SchedulerState
 
     up = lambda org: SchedulerState("running", 7000, "2026-10-18 10:00:00Z")  # noqa: E731
-    monkeypatch.setattr(dd, "scheduler_state", up)
     scheduler_is(monkeypatch, up(None))
     ns = demo_org(tmp_path)
     return dd.DashData(ns.org.root, now=lambda: DEMO_NOW)

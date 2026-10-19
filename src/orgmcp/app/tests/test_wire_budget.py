@@ -13,7 +13,7 @@ from orgmcp.budget import AllocationPolicy, BudgetQuery, BudgetReclaimer
 from orgmcp.budget._policy import ReserveAllocationPolicy
 from orgmcp.budget._query import DerivedBudgetQuery
 from orgmcp.budget._reclaim import NoteBudgetReclaimer
-from orgmcp.dashboard_data import LenientOrg
+from ._lenient_org import LenientOrg
 from orgmcp.delivery import MessageDelivery
 from orgmcp.delivery.testing import RecordingDelivery
 from orgmcp.kernel import Message, OrgError

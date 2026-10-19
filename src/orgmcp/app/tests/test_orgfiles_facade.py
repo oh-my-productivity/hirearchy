@@ -10,7 +10,7 @@ import pytest
 
 from orgmcp import core
 from orgmcp.app import Org
-from orgmcp.dashboard_data import LenientOrg
+from ._lenient_org import LenientOrg
 from orgmcp.kernel import OrgError
 from orgmcp.orgfiles import OrgFileReader, OrgFileWriter
 

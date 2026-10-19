@@ -11,7 +11,7 @@ import pytest
 from orgmcp.app import Org, wire_progress, wiring
 from orgmcp.attention import HumanQueue, Waiting, WaitingOnUser
 from orgmcp.attention.testing import FixedWaiting, ListHumanQueue
-from orgmcp.dashboard_data import LenientOrg
+from ._lenient_org import LenientOrg
 from orgmcp.daemon import SchedulerState, SchedulerStatus
 from orgmcp.daemon.testing import FakeSchedulerStatus
 from orgmcp.kernel import ROOT, Clock

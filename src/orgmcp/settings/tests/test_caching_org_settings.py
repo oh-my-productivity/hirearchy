@@ -149,7 +149,7 @@ def test_the_rules_are_not_cached_and_not_lenient() -> None:
 def test_it_does_what_the_lenient_org_of_the_dashboard_did(tmp_path: Path) -> None:
     """Characterization: the same document gives the same config and the same ``bad`` entry as ``LenientOrg.config``."""
     org = legacy("core").Org.init(tmp_path / "org", "mission", {"max_depth": 3})
-    lenient = legacy("dashboard_data").LenientOrg(org.root)
+    lenient = legacy("app.tests._lenient_org").LenientOrg(org.root)
     paths = OrgPaths(org.root)
     problems: dict[str, str] = {}
     caching = CachingOrgSettings(FsOrgSettings(paths, fs_atomic_writer(tmp_path).writer), FsOrgDocumentStamp(paths), problems)

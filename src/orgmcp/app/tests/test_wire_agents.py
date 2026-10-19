@@ -15,7 +15,7 @@ from orgmcp.agents._registry import FsAgentRegistry
 from orgmcp.agents._retired import FsRetiredArchive
 from orgmcp.agents.testing import MemoryAgents
 from orgmcp.app import Org, wire_agents, wiring
-from orgmcp.dashboard_data import LenientOrg
+from ._lenient_org import LenientOrg
 from orgmcp.kernel import OrgLayout, OrgPaths
 
 

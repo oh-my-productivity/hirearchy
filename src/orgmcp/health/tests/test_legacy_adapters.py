@@ -20,7 +20,7 @@ NOW = _scenario.at(4000)
 
 
 def lenient(org: Any) -> Any:
-    return legacy("dashboard_data").LenientOrg(org.root)
+    return legacy("app.tests._lenient_org").LenientOrg(org.root)
 
 
 def test_a_lenient_org_reports_the_same_as_the_plain_one_when_nothing_is_damaged(scenario: Any) -> None:

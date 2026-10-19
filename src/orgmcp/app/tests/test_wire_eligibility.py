@@ -10,7 +10,7 @@ from orgmcp.agents import AgentDirectory
 from orgmcp.app import Org, wire_eligibility, wiring
 from orgmcp.budget import BudgetQuery
 from orgmcp.budget.testing import FixedBudget
-from orgmcp.dashboard_data import LenientOrg
+from ._lenient_org import LenientOrg
 from orgmcp.eligibility import AgentStates, FailureCounter, PauseStore, RunnableQuery
 from orgmcp.eligibility._caching import CachingPauseStore
 from orgmcp.eligibility._failures import LedgerFailureCounter
