@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import core, observe, progress as prog, services
-from .app import wire_agents, wire_budget, wire_mail
+from .app import wire_agents, wire_budget, wire_eligibility, wire_mail
 from .core import BOXES, DEFAULT_CONFIG, ROOT, Message, Org, OrgError, _visible, latest_results, split_frontmatter
 from .dashboard_events import EventLine, describe, event_lines
 from .health import _aware, _stamp, config_number, org_health
@@ -83,7 +83,6 @@ class LenientOrg(Org):
         self._bad_misc: dict[str, str] = {}
         self._runs_cache: dict[str, tuple[int, bool, int]] = {}
         self._stat_memo: dict[tuple[str, str], int] = {}
-        self._pause_cache: dict[str, tuple[int, str | None]] = {}
         self._root_s = str(self.root)
         # the caching of the agent tree and the reading of charters (reported in ``bad``) are the decorators of the agents package,
         # the caching of the mailboxes (their unreadable files reported in ``bad`` too) the one of the mail package
@@ -91,6 +90,9 @@ class LenientOrg(Org):
         self.runtime, self._mailbox = wire_mail.lenient(self.runtime, self)
         # the budget is derived from those boxes and agents, and its run count is the cached ``runs_used`` of this class
         self.runtime = wire_budget.lenient(self.runtime, self.runs_used)
+        # the pause flags are read per change of their file (the decorator of the eligibility package, asking this class for the mtime), and
+        # the state words and what may run are derived from the boxes, the budgets and those flags
+        self.runtime = wire_eligibility.lenient(self.runtime, self)
 
     @property
     def bad(self) -> dict[str, str]:
@@ -117,18 +119,6 @@ class LenientOrg(Org):
                 v = -1
             self._stat_memo[key] = v
         return v
-
-    def paused(self, addr: str) -> str | None:
-        a = self.norm(addr)
-        m = self.mtime(a, ".paused")
-        if m < 0:
-            return None
-        hit = self._pause_cache.get(a)
-        if hit is not None and hit[0] == m:
-            return hit[1]
-        value = super().paused(a)
-        self._pause_cache[a] = (m, value)
-        return value
 
     def _trusted(self, listed_at: int, mtime: int) -> bool:
         """A listing is reused only if the directory had been quiet for a while when it was made (coarse-mtime safe)."""

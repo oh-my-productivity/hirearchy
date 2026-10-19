@@ -285,9 +285,7 @@ def _chain(org: Org, addr: str, task) -> list[str]:
 
 def _startable(org: Org, addr: str) -> bool:
     """Could a scheduler start a run of ``addr`` now? (unread mail, budget, and not paused for another reason)"""
-    if not org.unread(addr) or (org.budget(addr) or 0) <= 0:
-        return False
-    return org.paused(addr) in (None, "budget")
+    return org.runtime.runnable_query.startable(addr)
 
 
 def _names(addrs: list[str]) -> str:
@@ -693,10 +691,7 @@ class Scheduler:
 
     def _repair_failures_ledger(self) -> None:
         """The failure counts drive pausing; a wrong-shaped ledger would raise inside ``record_failure``."""
-        raw = self.org.ledger("failures")
-        clean = {k: v for k, v in raw.items() if isinstance(v, int) and not isinstance(v, bool)} if isinstance(raw, dict) else {}
-        if clean != raw:
-            self.org.save_ledger("failures", clean)
+        if self.org.runtime.failure_counter.repair():
             self.echo("repaired malformed .runtime/failures.json")
 
     def _guard(self, phase: str, fn: Callable[[], None]) -> None:
@@ -723,16 +718,7 @@ class Scheduler:
                 self.echo(f"{addr}: budget is back, resumed")
 
     def _runnable(self) -> list[str]:
-        out = []
-        for a in self.org.agents():
-            if a in self.runs or a in self._blocked or not self.org.unread(a):
-                continue
-            reason = self.org.paused(a)
-            if reason == "budget" and (self.org.budget(a) or 0) > 0:
-                reason = None
-            if not reason and (self.org.budget(a) or 0) > 0:
-                out.append(a)
-        return out
+        return self.org.runtime.runnable_query.runnable(exclude=set(self.runs) | self._blocked)
 
     def _launch(self, max_runs: int | None) -> None:
         cfg = self.org.config

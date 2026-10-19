@@ -551,7 +551,14 @@ class RunnableQuery(Protocol):
     def runnable(self, exclude: Collection[str] = ()) -> list[str]: """Agents with waking mail and budget, not paused (a budget pause with budget back counts), not excluded."""
     def startable(self, addr: str) -> bool: """Waking mail, budget > 0, paused for nothing or only for budget."""
 ```
-Impl: `FsPauseStore(OrgPaths, EventSink)`, `LedgerFailureCounter(LedgerStore)`, `DerivedAgentStates`, `DerivedRunnableQuery`; dashboard decorator `CachingPauseStore` (replaces `LenientOrg.paused`); fakes `MemoryPauseStore`, `MemoryFailureCounter`.
+Impl: `FsPauseStore(OrgLayout, EventSink)`, `LedgerFailureCounter(LedgerStore, LedgerShape)`, `DerivedAgentStates(MailboxReader, PauseStore)`,
+`DerivedRunnableQuery(AgentDirectory, MailboxReader, PauseStore, BudgetQuery)`; dashboard decorator `CachingPauseStore(PauseStore, DirectoryProbe)`
+(replaces `LenientOrg.paused`, built by `wire_eligibility.lenient`, which also rebuilds the states and the runnable query over the decorated flags); fakes
+`MemoryPauseStore`, `MemoryFailureCounter`; `EligibilityWorld` is the harness of the `AgentStates` / `RunnableQuery` suites (budgets from
+`budget.testing.FixedBudget`). `DirectoryProbe` (`mtime(addr, name) -> int`) and `LedgerShape` (`damaged(name) -> bool`) are eligibility's own narrow ports.
+`LedgerStore.read` shows a ledger that holds JSON which is not an object as `{}`, so `FailureCounter.repair` asks `LedgerShape` whether the file is damaged
+and keeps rewriting it (and the scheduler keeps saying so) as before. `RunnableQuery.runnable(exclude)` takes what the scheduler used to read from its own
+state (`runs`, `_blocked`): whether an agent already runs is the caller's to say.
 
 ### 3.13 `strays`
 
