@@ -195,16 +195,6 @@ def test_the_digest_shows_the_latest_lessons_first_and_earlier_ones_after(svc):
     assert line.index('lessons: "Two items were missed') < line.index('earlier: "Ran cleanly; no changes needed.')
 
 
-def test_case_line_drops_earlier_lessons_when_there_is_no_room_and_never_clips_the_latest_first(svc):
-    task = svc.request(ROOT, "brief", {"topic": "ai"})
-    deliver(svc, task, lessons="Only one.")
-    case = services.cases(svc, "ceo", "brief")[0]
-    assert "earlier:" not in services._case_line(case)
-    case.lessons = ["old lesson", "x" * 400]
-    line = services._case_line(case)
-    assert "earlier:" not in line and "old lesson" not in line and "x" * 100 in line
-
-
 # ------------------------------------------------------------------------------------------ 6. grant hint
 
 

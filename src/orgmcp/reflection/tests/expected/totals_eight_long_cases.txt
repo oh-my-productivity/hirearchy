@@ -1,0 +1,8 @@
+ask0: case total: 1 runs used of 10 handed down (contract: 10 per request)
+ask1: case total: 1 runs used of 10 handed down (contract: 10 per request)
+ask2: case total: 1 runs used of 10 handed down (contract: 10 per request)
+ask3: case total: 1 runs used of 10 handed down (contract: 10 per request)
+ask4: case total: 1 runs used of 10 handed down (contract: 10 per request)
+ask5: case total: 1 runs used of 10 handed down (contract: 10 per request)
+ask6: case total: 1 runs used of 10 handed down (contract: 10 per request)
+ask7: case total: 1 runs used of 10 handed down (contract: 10 per request)

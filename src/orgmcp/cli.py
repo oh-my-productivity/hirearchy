@@ -57,9 +57,9 @@ def cmd_task(args) -> None:
 
 
 def cmd_services(args) -> None:
-    from . import services
+    from . import reflection
 
-    print(services.services_text(_org(args), ROOT))
+    print(reflection.services_text(_org(args), ROOT))
 
 
 def cmd_define_service(args) -> None:

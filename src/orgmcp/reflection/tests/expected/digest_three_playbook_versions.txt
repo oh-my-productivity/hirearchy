@@ -1,0 +1,6 @@
+Cases with new evidence (most recent first):
+- case {ask2} "weekly-brief: bio": done, playbook v2, 1 of 10 runs; lessons: "Lesson about bio."
+By playbook version:
+- v0: 1 request(s): 1 done, 0 failed, 0 open; 0 reworked; avg 1 runs; no feedback
+- v1: 1 request(s): 1 done, 0 failed, 0 open; 0 reworked; avg 1 runs; no feedback
+- v2: 2 request(s): 1 done, 0 failed, 1 open; 0 reworked; avg 1 runs; no feedback

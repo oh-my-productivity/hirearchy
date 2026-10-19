@@ -755,11 +755,11 @@ class ContractNormalizer(Protocol):
 ```
 Impl: `FsServiceStore`, `ContractServiceCatalog`, `RuleServiceCommands`, `ServiceReportHints`, `TextContractNormalizer`, `ServiceReworkContext(ReworkContext)`; fake `MemoryServiceStore`.
 `RuleServiceCommands` only offers the five commands together; each rule is a part with its own private Protocol (in `_protocols.py`, made by `wire_services`, not runtime fields): `ContractDefinitions` -> `RuleContractDefiner`, `ServiceRetirement` -> `RuleServiceRetirement`, `PlaybookRevisions` -> `RulePlaybookReviser`, `ServiceRequests` -> `RuleServiceRequester`, `ClientFeedback` -> `RuleClientFeedback`. Their collaborators, also private: `ServicePlaces` -> `OrgServicePlaces` (where the files are; `Contract.path` and the relative paths in the texts come from it), `OwnerAddresses` -> `DirectReportOwners`, `PlaybookTexts` -> `CappedPlaybookTexts` (the cap is read from `OrgSettings.config()["playbook_max_words"]` exactly as the old `_word_cap` did: `OrgSettings.number` would read a bool as the default and an infinity as a crash), `PlaybookWriter` -> `EventedPlaybookWriter` (writes through the store and emits `service.revise`), `ContractAmendment` -> `ContractAmender`, `RequestBodies` -> `TextRequestBodies`. `ServiceStore.write_contract` / `write_playbook` write the file, `archive_version` names the old version to keep; the events (`service.define`, `service.revise`, `service.retire`) and the quiet notes (`MessageDelivery.notify(..., wake=False)`) are the commands'. Requests and feedback go through the runtime's `MessageSender`.
-The part of the old `services.py` that is derived from the message files (cases, statistics, digest, `services_text`, `case_total`, the prompt sections) stays, until C-reflection, in `services/_legacy.py` as the seam: it reads contracts and playbooks through `org.runtime.service_catalog` and the history of the playbook through `ServiceStore.playbook_history`, and it still reads the mailboxes through the `Org` it is given (the dashboard's `LenientOrg` caches them). `Stats` is moved there with it (the class-interface check skips `_legacy`). `services._clip` is left as an alias of `kernel.clip_line` for `kernel/tests/test_text.py`, which compares the three copies; it goes with that test in E3.
+The part of the old `services.py` that is derived from the message files (cases, statistics, digest, `services_text`, `case_total`, the prompt sections) was the seam in `services/_legacy.py` until C-reflection; it is `reflection` now (3.22). `services._clip` is left as an alias of `kernel.clip_line` for `kernel/tests/test_text.py`, which compares the three copies; it goes with that test in E3. `services.api` also exports the pure `playbook_word_cap(config)` (C-reflection), so that the sections of the run prompt read the setting exactly as the commands do.
 
 ### 3.22 `reflection`
 
-Data: `Case Verdict Stats` (as today). Pure public functions (no collaborators): `summarize(items) -> Stats`, `stats_by_version(items) -> dict[int, Stats]`, `version_at(timeline, when) -> int`, `lessons_of(result) -> str`.
+Data: `Case Verdict Stats` (as today; `Stats` subclasses the pure port `StatsReport`: `finished`, `avg_runs`, `line()`). Pure public functions in `api.py` (no collaborators): `summarize(items) -> Stats`, `stats_by_version(items) -> dict[int, Stats]`, `version_at(timeline, when) -> int`, `lessons_of(result) -> str`.
 
 ```python
 class CaseHistory(Protocol):
@@ -777,7 +777,11 @@ class ServiceReports(Protocol):
 class ServicePromptSections(Protocol):
     def prompt_sections(self, addr: str, batch: Sequence[Message]) -> str: """Playbook + reflect sections of an owner's run prompt ('' if it owns no service)."""
 ```
-Impl: `DerivedCaseHistory`, `DigestBuilder`, `TextServiceReports`, `OwnerPromptSections`.
+Impl: `DerivedCaseHistory`, `DigestBuilder`, `TextServiceReports`, `OwnerPromptSections`; runtime fields `case_history`, `reflection_digest`, `service_reports`, `service_prompt_sections`. `StatsReport` is `testing.PURE` and `NOT_A_FIELD`.
+
+The collaborators among the rules are private ports of the package (`_ports.py`, consumer-owned and narrower than the providers': `ServiceStore` is read only through `PlaybookHistory`, `RunLogReader` only through `RunLogNames`, `OrgSettings` only through `ConfigSource`, `ServiceHints` only through `FeedbackWords`, `OrgLayout` through `ServicePaths`), made by `wire_reflection` and not runtime fields: `PlaybookTimelines` -> `StorePlaybookTimelines` (when each version was written), `RunCounter` -> `LogRunCounter` (the old `_count_runs`: the logs of a team whose name, cut at 21 characters, lies in a window; it reads `RunLogReader.files`, not `windows`, because the old rule compares names, also for logs whose name is no timestamp), `ServicePaths` -> `OrgServicePaths` (relative paths in the texts), `ServicesListing` -> `OwnedServicesListing` (the opening paragraph), `RejectedServices` -> `MailRejectedServices`, `PlaybookSection` -> `QuotedPlaybookSection`, `ReflectSection` -> `EvidenceReflectSection`. `DerivedCaseHistory` takes six collaborators and `OwnerPromptSections` seven (the catalog, the digest, the task query and the four parts it composes); no class of the package takes more.
+
+The legacy functions (`reflection/_legacy.py`: `cases(org, owner, service)`, `reflection_digest`, `case_of`, `case_total`, `services_text`, `prompt_sections`, `playbook_timeline`, and the private `_case_line`, `_verdict_chain`) build the classes over the ports of the `Org` they are given *at the call* (`_assembly`), so that the dashboard's lenient `Org` keeps its cached, tolerant mailboxes, agents and config. The callers (`progress`, `dashboard_data`, `server`, `cli`, the run prompt of the prompts mixin) call them, or the runtime ports, directly. `services` answers to the old names (`services.cases`, ...) through a module `__getattr__` that looks them up in `reflection` at the first use (the tests, among them the golden suite, still say them; `services` sits below `reflection` and may not import it): it goes with the legacy names in E3.
 
 ### 3.23 `overview`
 
@@ -1751,10 +1755,10 @@ A TTY check (`sys.stdin.isatty() and sys.stdout.isatty()`) is the one terminal d
 | `Case`, `Verdict`, `Stats` | `reflection` (data) |
 | `playbook_timeline`, `cases`, `case_of` | `reflection.CaseHistory` |
 | `version_at`, `lessons_of`, `summarize`, `stats_by_version` | `reflection` (pure public functions) |
-| `_count_runs` | `reflection/_cases.py` (private; uses `RunLogReader.windows`) |
+| `_count_runs` | `reflection/_runs.py::LogRunCounter` (private; uses `RunLogReader.files`: the old rule compares the first 21 characters of the log names) |
 | `reflection_digest`, `_verdict_chain`, `_case_line` | `reflection.ReflectionDigest` (`DigestBuilder`; helpers private) |
 | `case_total`, `services_text`, `_service_block` | `reflection.ServiceReports` (`TextServiceReports`) |
-| `prompt_sections`, `_quoted`, `_rejected_services`, `_playbook_section`, `_reflect_section` | `reflection.ServicePromptSections` (`OwnerPromptSections`) |
+| `prompt_sections`, `_quoted`, `_rejected_services`, `_playbook_section`, `_reflect_section` | `reflection.ServicePromptSections` (`OwnerPromptSections`, composing `OwnedServicesListing`, `MailRejectedServices`, `QuotedPlaybookSection` (`_quoted` private to it) and `EvidenceReflectSection`) |
 
 ### 5.9 `telemetry.py`
 

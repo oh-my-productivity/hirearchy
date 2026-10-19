@@ -30,7 +30,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import Callable
 
-from . import services
+from . import reflection
 from .core import ROOT, Message, Org, OrgError, latest_results, utcnow
 from .health import _aware, _duration, _stamp
 
@@ -209,15 +209,15 @@ def _task_line(org: Org, task: Message, result: Message | None, now: datetime) -
         arts = _artifacts(result)
         parts.append("artifacts: " + ", ".join(arts) if arts else "no artifacts")
     if task.service:
-        case = services.case_of(org, task)
+        case = reflection.case_of(org, task)
         if result is not None and result.status in ("done", "failed") and not _rated(case, task):
             parts.append("no feedback yet")
         if case is not None and case.reworks:  # a rework chain: the line above is one request, this is the whole case
-            parts.append(services.case_total(org, task).rstrip("."))
+            parts.append(reflection.case_total(org, task).rstrip("."))
     return ". ".join(parts) + f". (task {task.id})"
 
 
-def _rated(case: services.Case | None, task: Message) -> bool:
+def _rated(case: reflection.Case | None, task: Message) -> bool:
     """Has the client given feedback on this delivery (or on a later rework of it)? An earlier verdict does not count."""
     if case is None:
         return False

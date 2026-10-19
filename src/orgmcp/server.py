@@ -23,7 +23,7 @@ from . import blueprint as blueprint_mod
 from . import blueprint_examples
 from .core import ROOT, Org, OrgError
 from .health import org_health, render_text
-from . import services as services_mod
+from . import reflection, services as services_mod
 from . import telemetry
 from .progress import WAIT_MAX, describe_progress
 from .scheduler import (
@@ -492,7 +492,7 @@ def register_service_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
     def services() -> str:
         """The standing services you can request from your direct reports and the ones you offer, with contract and
         playbook versions, inputs, budget per request and the record so far (requests, outcomes, runs, feedback)."""
-        return services_mod.services_text(binding.get(), me)
+        return reflection.services_text(binding.get(), me)
 
     if manager:
         register_client_tools(mcp, binding, me)
@@ -558,7 +558,7 @@ def register_client_tools(mcp: FastMCP, binding: OrgBinding, me: str) -> None:
         msg = org.request(me, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance,
                           budget=budget, revises=revises)
         tail = "Call start() if the scheduler is not running." if me == ROOT else f"Your budget is now {org.budget(me)}."
-        total = services_mod.case_total(org, msg) if revises else ""
+        total = reflection.case_total(org, msg) if revises else ""
         return (f"requested service `{service}` from {msg.to}: task {msg.id}, budget {msg.budget} "
                 f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}" + (f"\n{total}" if total else ""))
 

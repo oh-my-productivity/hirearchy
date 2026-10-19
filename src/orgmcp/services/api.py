@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..kernel import JsonObject, Message
+from ._cap import playbook_word_cap
 
 __all__ = [
     "Contract",
@@ -43,6 +44,7 @@ __all__ = [
     "ServiceHints",
     "ServiceStore",
     "VERDICTS",
+    "playbook_word_cap",
 ]
 
 INPUT_RE = re.compile(r"[a-z][a-z0-9_]{0,31}\Z")
