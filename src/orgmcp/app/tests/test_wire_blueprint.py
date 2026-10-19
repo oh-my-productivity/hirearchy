@@ -27,8 +27,6 @@ from orgmcp.kernel import Environment
 from orgmcp.kiro import ConfinementPolicy
 from orgmcp.services import ContractNormalizer
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-blueprint-1")
-
 REPO = Path(__file__).resolve().parents[4]
 
 

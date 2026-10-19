@@ -60,12 +60,12 @@ from ._legacy import (
 )
 from ._legacy import _access as _access
 from ._legacy import _agent_access as _agent_access
-from ._legacy import _blob as _blob
-from ._legacy import _clip as _clip
-from ._legacy import _is_code as _is_code
-from ._legacy import _is_request as _is_request
-from ._legacy import _plain as _plain
 from ._legacy import _resolve as _resolve
+from ._rules import blob as _blob  # (the private names the tests still reach for, from where they live now)
+from ._rules import is_code as _is_code
+from ._text import clip as _clip
+from ._view import is_plain as _plain
+from ._view import is_request as _is_request
 
 __all__ = [
     *api.__all__,
