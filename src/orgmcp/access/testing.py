@@ -26,8 +26,9 @@ CHARTER_BODY = "# Role\n\nDo the work."
 class StaticAccess(AccessScopes, AuthorityPolicy, ToolNaming, ModelResolver):
     """The four ports over agents and an ORG.md kept in memory: ``put_agent`` makes an agent, ``put_config`` replaces ORG.md."""
 
-    def __init__(self, root: Path | None = None, org_md: str = DEFAULT_ORG_MD) -> None:
-        self.agents = MemoryAgents()
+    def __init__(self, root: Path | None = None, org_md: str = DEFAULT_ORG_MD, agents: MemoryAgents | None = None) -> None:
+        """``agents``: the agent files this access reads, when a consumer's world keeps them for other ports too (default: its own)."""
+        self.agents = agents if agents is not None else MemoryAgents()
         if root is not None:
             self.agents.root = root
         self.settings = MemoryOrgSettings(org_md)
