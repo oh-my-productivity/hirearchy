@@ -1702,6 +1702,7 @@ in the table of its module. Constants move with the code that uses them (listed 
 | `_strays_since` | `strays.StrayProbe.found_since` |
 | `nothing_to_do` | `attention.OpenWork.nothing_to_do` |
 | `Scheduler` | `scheduler.SchedulerLoop` + collaborators, per the method table in 5.5 |
+| `_patched`, `_wire` | the late lookups the legacy surface of `scheduler/_legacy.py` keeps until E3 (`_patched`: an attribute of the package `orgmcp.scheduler`, which tests replace; `_wire`: a module of `orgmcp.app`, which an entry point may not import) |
 
 ### 5.5 `scheduler.Scheduler` — method distribution (class is split)
 

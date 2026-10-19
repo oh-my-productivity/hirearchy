@@ -26,7 +26,7 @@ def main_project_dir(package: Path) -> Path:
 
 
 def test_the_package_directory_is_the_one_of_the_orgmcp_module() -> None:
-    assert wire_kiro.package_dir() == Path(orgmcp.__file__).resolve().parent == Path(scheduler.__file__).resolve().parent
+    assert wire_kiro.package_dir() == Path(orgmcp.__file__).resolve().parent == Path(scheduler.__file__).resolve().parent.parent  # the package directory of orgmcp.scheduler
 
 
 def test_the_project_directory_of_the_checkout_is_the_value_of_main() -> None:
@@ -46,7 +46,7 @@ def test_the_uv_fallback_of_the_command_runs_in_the_value_of_main(tmp_path: Path
     monkeypatch.setattr(sys, "executable", str(tmp_path / "bin" / "python"))  # no console script beside it
     monkeypatch.setattr(shutil, "which", lambda name: f"/opt/{name}")
     assert scheduler.mcp_server_command() == {
-        "command": "/opt/uv", "args": ["--directory", str(Path(scheduler.__file__).resolve().parents[2]), "run", "orgmcp", "mcp"]}
+        "command": "/opt/uv", "args": ["--directory", str(main_project_dir(Path(orgmcp.__file__).resolve().parent)), "run", "orgmcp", "mcp"]}
     assert wire_kiro.mcp_locator().command() == scheduler.mcp_server_command()
 
 

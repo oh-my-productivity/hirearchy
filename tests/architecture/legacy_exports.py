@@ -34,7 +34,8 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "Runner PROJECT_DIR KIRO_AGENTS_DIR mcp_server_command kiro_profile_name file_confinement "
         "ensure_kiro_profile kiro_runner Run judge_orphan kill_group ignore_runtime_files "
         "scheduler_command scheduler_state describe_scheduler waiting_on_user start_scheduler "
-        "stop_scheduler Scheduler nothing_to_do"
+        "stop_scheduler Scheduler nothing_to_do "
+        "datetime"  # imported by the flat module, replaced by the golden fixtures (tests/golden/conftest.py): a public name of the package
     ),
     "server": _e3(
         "INSTRUCTIONS ROOT_INSTRUCTIONS DS_STORE OrgBinding instrument_tools root_instructions build_server "

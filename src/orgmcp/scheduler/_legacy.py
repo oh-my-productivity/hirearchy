@@ -6,25 +6,26 @@ process (kiro-cli by default) whose orgmcp MCP server is bound to the agent via 
 
 from __future__ import annotations
 
+import importlib
 import os
 import signal
 import subprocess
+import sys
 import tempfile
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable
+from collections.abc import Collection, Mapping
+from typing import Any, Callable, cast
 
-from . import review, telemetry, templates
-from .app import wire_attention, wire_daemon, wire_kiro, wire_processes, wire_stalls
-from .app.wiring import open_runtime
-from .attention import Waiting
-from .core import ROOT, Org
-from .daemon import EXIT_FILE, FINISHED, SchedulerState  # noqa: F401  (EXIT_FILE is still read from here by the callers that are not converted yet)
-from .health import config_number
-from .processes import ProcessTableError
-from .runs import (
+from .. import review, telemetry, templates
+from ..attention import Waiting
+from ..daemon import FINISHED, SchedulerState
+from ..kernel import ROOT
+from ..processes import ProcessTableError
+from ..settings import config_number
+from ..runs import (
     RunLogSink,
     log_exit,
     log_failed_start,
@@ -39,11 +40,30 @@ from .runs import (
     run_record,
 )
 
+Org = Any  # the facade: an entry point may not import it, so the legacy class takes whatever has a ``runtime`` (as the callers pass it)
+
+
+def _wire(name: str) -> Any:
+    """The composition root's module ``orgmcp.app.<name>``, looked up late: an entry point may not import ``orgmcp.app`` (the layers contract), and
+    these legacy functions have no runtime to take their ports from. They go with the legacy surface (E3)."""
+    return importlib.import_module(f"orgmcp.app.{name}")
+
+
+wire_attention, wire_daemon, wire_kiro, wire_processes, wire_stalls = (
+    _wire("wire_attention"), _wire("wire_daemon"), _wire("wire_kiro"), _wire("wire_processes"), _wire("wire_stalls"))
+
 # (org, agent address, prompt) -> (argv, cwd, env). The prompt is delivered on the process's stdin, not in argv.
-Runner = Callable[[Org, str, str], tuple[list[str], Path, dict]]
+Runner = Callable[[Org, str, str], tuple[list[str], Path, dict[str, str]]]
 
 PROJECT_DIR = wire_kiro.project_dir()  # two levels above the package, as `Path(__file__).resolve().parents[2]` was
 KIRO_AGENTS_DIR = Path.home() / ".kiro" / "agents"  # evaluated at import, as before; tests patch it (the wrappers read it at call time)
+
+
+def _patched(name: str) -> Any:
+    """The attribute ``name`` of the package ``orgmcp.scheduler`` as it is now: tests replace ``mcp_server_command``, ``file_confinement``,
+    ``ensure_kiro_profile``, ``kiro_profile_name`` and ``KIRO_AGENTS_DIR`` there (the golden kiro tests do), and the code that reads them
+    lives in this module."""
+    return getattr(sys.modules["orgmcp.scheduler"], name)
 
 
 # The kiro functions below are thin wrappers over `orgmcp.kiro` (B-kiro) until the scheduler is converted (D-sched-1): they stay module
@@ -51,21 +71,21 @@ KIRO_AGENTS_DIR = Path.home() / ".kiro" / "agents"  # evaluated at import, as be
 # (`KIRO_AGENTS_DIR`), and each wrapper uses whatever is in force when it is called.
 
 
-def mcp_server_command() -> dict:
+def mcp_server_command() -> dict[str, object]:
     """How kiro should start the orgmcp MCP server (prefer the venv's console script)."""
-    return wire_kiro.mcp_locator().command()
+    return cast("dict[str, object]", wire_kiro.mcp_locator().command())
 
 
 def kiro_profile_name(org_root: str | Path, tools: list[str]) -> str:
     """``orgmcp-<org-slug>-<6-char hash of the org root path>[-<tools>]``, lowercase ``[a-z0-9-]`` (see ``OrgProfileProvisioner``)."""
-    return wire_kiro.profile_name(Path(org_root), tools)
+    return cast(str, wire_kiro.profile_name(Path(org_root), tools))
 
 
 def file_confinement(
     org_root: Path, tools: list[str], workspace: Path | None, inputs: list[Path]
-) -> tuple[list[str], dict]:
+) -> tuple[list[str], dict[str, object]]:
     """(allowedTools, toolsSettings) that confine kiro's built-in ``read``/``write`` by path (see ``KiroConfinementPolicy``)."""
-    return wire_kiro.confinement_policy().file_confinement(org_root, tools, workspace, inputs)
+    return cast("tuple[list[str], dict[str, object]]", wire_kiro.confinement_policy().file_confinement(org_root, tools, workspace, inputs))
 
 
 def ensure_kiro_profile(
@@ -77,18 +97,19 @@ def ensure_kiro_profile(
     The directory is resolved when called (not when defined), so ``KIRO_AGENTS_DIR`` can be redirected.
     Profiles of other orgs, and the legacy global ``orgmcp[-tools].json`` files, are never touched.
     """
-    agents_dir = Path(agents_dir) if agents_dir is not None else Path(KIRO_AGENTS_DIR)
+    agents_dir = Path(agents_dir) if agents_dir is not None else Path(_patched("KIRO_AGENTS_DIR"))
     provisioner = wire_kiro.provisioner_at(
-        org.root, agents_dir, wire_kiro.FunctionMcpServerLocator(mcp_server_command),
-        wire_kiro.FunctionConfinementPolicy(file_confinement),
+        org.root, agents_dir, wire_kiro.FunctionMcpServerLocator(_patched("mcp_server_command")),
+        wire_kiro.FunctionConfinementPolicy(_patched("file_confinement")),
     )
-    return provisioner.ensure_profile(tools, workspace=workspace, inputs=inputs, confine=confine)
+    return cast(str, provisioner.ensure_profile(tools, workspace=workspace, inputs=inputs, confine=confine))
 
 
 def kiro_runner(kiro_bin: str = "kiro-cli") -> Runner:
-    def build(org: Org, addr: str, prompt: str) -> tuple[list[str], Path, dict]:
+    def build(org: Org, addr: str, prompt: str) -> tuple[list[str], Path, dict[str, str]]:
         provisioner = wire_kiro.FunctionProfileProvisioner(
-            lambda tools, **kw: ensure_kiro_profile(tools, org=org, **kw), lambda tools: kiro_profile_name(org.root, list(tools))
+            lambda tools, **kw: _patched("ensure_kiro_profile")(tools, org=org, **kw),
+            lambda tools: _patched("kiro_profile_name")(org.root, list(tools)),
         )
         command = wire_kiro.run_command_builder(org.runtime, kiro_bin, provisioner).build(addr, prompt)
         return list(command.argv), command.cwd, dict(command.env)
@@ -99,20 +120,20 @@ def kiro_runner(kiro_bin: str = "kiro-cli") -> Runner:
 @dataclass
 class Run:
     addr: str
-    proc: subprocess.Popen
+    proc: subprocess.Popen[str]
     log: Path
     logf: RunLogSink
     started: float
     batch: int
-    strays: dict | None = None  # paths of the agent's workspace that could hold stray org files, before the run
+    strays: dict[str, float] | None = None  # paths of the agent's workspace that could hold stray org files, before the run
     run_id: str = ""  # "<agent>@<run log stem>": the id events and the agent's MCP server (ORG_RUN_ID) carry
-    traces: tuple = ()  # distinct traces of the batch
+    traces: tuple[str, ...] = ()  # distinct traces of the batch
     budget_before: int | None = None
     killed: bool = False
     timed_out: bool = False
 
 
-def _signal_group(proc: subprocess.Popen, sig: int) -> None:
+def _signal_group(proc: subprocess.Popen[Any], sig: int) -> None:
     """Signal a run's whole process group (the run was started in its own session, so pgid == pid)."""
     wire_processes.adopt(proc).signal_group(sig)
 
@@ -130,10 +151,10 @@ def _ps(pid: int) -> tuple[str, str] | None:
 
 
 def _start_time(pid: int) -> str | None:
-    return wire_processes.system_inspector().start_time(pid)
+    return cast("str | None", wire_processes.system_inspector().start_time(pid))
 
 
-def judge_orphan(rec: dict) -> str:
+def judge_orphan(rec: Mapping[str, object]) -> str:
     """Is the process recorded for a run of a dead scheduler still ours, and alive?
 
     * ``gone``: no such process (or a zombie): nothing to kill.
@@ -143,12 +164,12 @@ def judge_orphan(rec: dict) -> str:
     * ``doubt``: alive but unverifiable (no start time recorded, or ``ps`` failed): not killed, and the agent
       does not get a second run while it lives.
     """
-    return wire_processes.system_judge().judge(rec)
+    return cast(str, wire_processes.system_judge().judge(rec))
 
 
 def kill_group(pgid: int, wait: float = 5.0) -> bool:
     """SIGKILL a process group and wait until its leader is gone. True when it is."""
-    return wire_processes.system_signaller().kill_group(pgid, wait)
+    return cast(bool, wire_processes.system_signaller().kill_group(pgid, wait))
 
 
 # ------------------------------------------------------- start/stop (used by the MCP tools of root)
@@ -156,7 +177,7 @@ def kill_group(pgid: int, wait: float = 5.0) -> bool:
 
 def ignore_runtime_files(root: Path) -> None:
     """Keep files that change constantly out of the org's git snapshots (``git add -A`` after every run)."""
-    open_runtime(Path(root)).ignore_list.ensure_runtime_files()
+    _wire("wiring").open_runtime(Path(root)).ignore_list.ensure_runtime_files()
 
 
 # EXIT_FILE, FINISHED and SchedulerState are the ones of ``orgmcp.daemon``; the functions below are thin adapters over the ``SchedulerStatus``,
@@ -166,42 +187,44 @@ def ignore_runtime_files(root: Path) -> None:
 
 def scheduler_command(root: Path, max_runs: int | None = None, until_done: bool = False) -> list[str]:
     """``<this venv's orgmcp> --root <org> run [--max-runs N] [--until-done]`` (``python -m orgmcp`` if the script is missing)."""
-    return wire_daemon.command_at(Path(root)).argv(max_runs, until_done)
+    return cast("list[str]", wire_daemon.command_at(Path(root)).argv(max_runs, until_done))
 
 
 def _command_line(pid: int) -> str | None:
-    return wire_processes.system_inspector().command_line(pid)
+    return cast("str | None", wire_processes.system_inspector().command_line(pid))
 
 
 def _looks_like_scheduler_of(command: str, root: Path) -> bool:
     """Does this command line plausibly start the scheduler of the organization at ``root``? (see ``SchedulerIdentity``)"""
-    return wire_daemon.identity().recognises(command, root)
+    return cast(bool, wire_daemon.identity().recognises(command, root))
 
 
 def scheduler_state(org: Org) -> SchedulerState:
     """Is a scheduler running for ``org``? Read from ``.runtime/scheduler.pid`` and checked against the process table."""
-    return wire_daemon.status_of(org.runtime).state()
+    return cast(SchedulerState, wire_daemon.status_of(org.runtime).state())
 
 
 def describe_scheduler(org: Org) -> str:
-    return wire_daemon.status_of(org.runtime).describe()
+    return cast(str, wire_daemon.status_of(org.runtime).describe())
 
 
-def waiting_on_user(org: Org, *, running=None, blocked=(), can_start: bool = True) -> Waiting | None:
+def waiting_on_user(
+    org: Org, *, running: Collection[str] | None = None, blocked: Collection[str] = (), can_start: bool = True
+) -> Waiting | None:
     """Is every open root task unable to progress without the user? None if not (or root has no open task).
 
     True when nothing runs and no agent could start a run (``running``/``blocked``: the scheduler's own view, default
     the inflight mailboxes; ``can_start=False``: the run cap is spent), yet root still waits for a result. The holders
     are then paused for budget or repeated failures, or stalled with nothing happening, or gone. Read-only.
     """
-    return wire_attention.waiting_on_user_of(org.runtime).analyze(running=running, blocked=blocked, can_start=can_start)
+    return cast("Waiting | None", wire_attention.waiting_on_user_of(org.runtime).analyze(running=running, blocked=blocked, can_start=can_start))
 
 
 def start_scheduler(org: Org, max_runs: int | None = None, until_done: bool = False) -> int:
     """Launch a detached scheduler for ``org`` (own session; output to ``.runtime/scheduler.log``). Returns its pid.
 
     ``until_done``: the scheduler exits by itself when root has no open task and nothing is running or runnable."""
-    return wire_daemon.control_of(org.runtime).start(max_runs, until_done)
+    return cast(int, wire_daemon.control_of(org.runtime).start(max_runs, until_done))
 
 
 def stop_scheduler(org: Org, wait: float = 15.0) -> str:
@@ -209,7 +232,7 @@ def stop_scheduler(org: Org, wait: float = 15.0) -> str:
 
     The scheduler shuts down cleanly: runs in flight are interrupted (their batch is redelivered later).
     """
-    return wire_daemon.control_of(org.runtime).stop(wait)
+    return cast(str, wire_daemon.control_of(org.runtime).stop(wait))
 
 
 def _version() -> str:
@@ -248,7 +271,7 @@ class Scheduler:
 
     # ------------------------------------------------------------- lifecycle
 
-    def _emit(self, kind: str, **fields) -> None:
+    def _emit(self, kind: str, **fields: Any) -> None:
         """An event of the scheduler itself (never raises)."""
         telemetry.emit(self.org.root, kind, proc="scheduler", actor="runtime", **fields)
 
@@ -327,7 +350,7 @@ class Scheduler:
         if keep != records:
             self.org.runtime.run_registry.replace(keep)
 
-    def _note_in_log(self, rec: dict, text: str) -> None:
+    def _note_in_log(self, rec: dict[str, object], text: str) -> None:
         try:
             rel = str(rec["log"])
         except KeyError:
@@ -361,7 +384,7 @@ class Scheduler:
         self.acquire()
         stop = False
 
-        def on_signal(*_):
+        def on_signal(*_: object) -> None:
             nonlocal stop
             stop = True
 
@@ -416,13 +439,13 @@ class Scheduler:
         cfg = self.org.config
         if self._heartbeat_at is None or now - self._heartbeat_at >= config_number(cfg, "heartbeat_seconds"):
             self._heartbeat_at = now
-            from .progress import _human_items
+            _human_items = importlib.import_module("orgmcp.progress")._human_items  # late: the legacy module is above the entry points
 
             self._emit("scheduler.heartbeat", running=sorted(r.run_id for r in self.runs.values()),
                        runnable=len(self._runnable()), waiting_on_you=len(_human_items(self.org)))
         if self._pruned_at is None or now - self._pruned_at >= 86400:
             self._pruned_at = now
-            removed = telemetry.prune(self.org.root, config_number(cfg, "events_keep_days", int))
+            removed = telemetry.prune(self.org.root, int(config_number(cfg, "events_keep_days", int)))
             if removed:
                 self._emit("prune", removed_days=removed)
 
@@ -482,7 +505,7 @@ class Scheduler:
                 self.echo(f"{addr}: budget is back, resumed")
 
     def _runnable(self) -> list[str]:
-        return self.org.runtime.runnable_query.runnable(exclude=set(self.runs) | self._blocked)
+        return cast("list[str]", self.org.runtime.runnable_query.runnable(exclude=set(self.runs) | self._blocked))
 
     def _launch(self, max_runs: int | None) -> None:
         cfg = self.org.config
@@ -518,7 +541,7 @@ class Scheduler:
         self.total_runs += 1
         prompt = self.org.run_prompt(addr, batch)
         logf = self.org.runtime.run_log_writer.open_sink(log)
-        strays = self._guard_value("stray check", lambda: _stray_probe(self.org, addr))
+        strays = self._guard_value("stray check", lambda: self.org.runtime.stray_probe.probe(addr))
         try:
             logf.write(log_header(addr, len(batch), (m.sender for m in batch)))  # health tells runtime-only runs apart by the senders
             cmd, cwd, env = self.runner(self.org, addr, prompt)
@@ -547,12 +570,12 @@ class Scheduler:
         self._guard("run record", lambda: self._record_run(addr, self.runs[addr]))
         self.echo(f"{addr}: started run ({len(batch)} message(s))")
 
-    def _emit_run_start(self, addr: str, run_id: str, batch, traces: list, pid: int | None, budget_before) -> None:
+    def _emit_run_start(self, addr: str, run_id: str, batch: Any, traces: list[str], pid: int | None, budget_before: int | None) -> None:
         self._emit("run.start", agent=addr, run=run_id, trace=telemetry.single(traces), batch=[m.id for m in batch],
                    traces=traces, child_pid=pid, pgid=pid, model=self.org.model_for(addr),
                    budget_before=budget_before)
 
-    def _emit_run_end(self, run: Run, code, error: str | None = None) -> None:
+    def _emit_run_end(self, run: Run, code: int | None, error: str | None = None) -> None:
         """The ``run.end`` event; ``error`` None = derived from the exit code."""
         ok = code == 0 and not run.killed
         if error is None and not ok:
@@ -603,9 +626,9 @@ class Scheduler:
             rel = run.log.relative_to(self.org.root)
             self.org.commit(f"{addr}: run {'ok' if ok else f'failed ({code})'}, {run.batch} message(s) [{rel}]")
 
-    def _guard_value(self, phase: str, fn: Callable[[], dict]) -> dict | None:
+    def _guard_value(self, phase: str, fn: Callable[[], dict[str, float]]) -> dict[str, float] | None:
         """``fn()`` for a best-effort probe: None (and one log line per distinct error) if it fails."""
-        out: list[dict] = []
+        out: list[dict[str, float]] = []
         self._guard(phase, lambda: out.append(fn()))
         return out[0] if out else None
 
@@ -615,7 +638,7 @@ class Scheduler:
         Nothing is moved or deleted."""
         if run.strays is None:
             return
-        found = self.org.runtime.stray_probe.found_since(run.strays, _stray_probe(self.org, run.addr))
+        found = self.org.runtime.stray_probe.found_since(run.strays, self.org.runtime.stray_probe.probe(run.addr))
         if not found:
             return
         rel = ", ".join(found[:5])
@@ -624,7 +647,7 @@ class Scheduler:
         self.echo(f"{run.addr}: warning: org files in its workspace (built-in write shadows orgmcp write?): {rel}")
         self.org.runtime.stray_registry.record(run.addr, found)  # told once per agent: later strays are only logged
 
-    def _failed(self, addr: str, log: Path, traces=()) -> None:
+    def _failed(self, addr: str, log: Path, traces: Collection[str] = ()) -> None:
         n = self.org.record_failure(addr)
         self._emit("agent.failure", agent=addr, count=n, trace=telemetry.single(traces))
         self.echo(f"{addr}: run failed ({n} in a row), log: {log}")
@@ -653,21 +676,14 @@ class Scheduler:
         for line in self._stalls.check():
             self.echo(line)
 
-    def _task_view(self, addr: str, view: str) -> list:
+    def _task_view(self, addr: str, view: str) -> list[Any]:
         """``open_tasks`` / ``outstanding`` of an agent as the stall ladder sees them (kept until the tests that read it move: D-sched-1)."""
-        return self._stalls.task_view(addr, view)
+        return cast("list[Any]", self._stalls.task_view(addr, view))
 
     def _last_run_end(self, addr: str) -> float:
-        return self.org.runtime.run_log_reader.last_end(addr)
-
-
-def _stray_probe(org: Org, addr: str) -> dict:
-    """Where an agent's built-in ``write`` leaves org files in its workspace, and what is there now (``strays.StrayProbe.probe``).
-
-    Kept as the module's patch point for the tests until D-sched-1 moves the stray check out of the scheduler."""
-    return org.runtime.stray_probe.probe(addr)
+        return cast(float, self.org.runtime.run_log_reader.last_end(addr))
 
 
 def nothing_to_do(org: Org) -> bool:
     """Would an until-done scheduler exit at once? (root has no open task and no agent has work it could start)"""
-    return wire_attention.open_work_of(org.runtime).nothing_to_do()
+    return cast(bool, wire_attention.open_work_of(org.runtime).nothing_to_do())

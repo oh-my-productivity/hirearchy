@@ -1,5 +1,5 @@
 """The scheduler's stray check goes through the stray ports of the runtime: the probe before and after a run, ``found_since`` for what is new,
-the registry for what is remembered. The log line, the echo and the legacy patch point ``scheduler._stray_probe`` stay (tests/test_finish)."""
+the registry for what is remembered. The log line, the echo and a probe that fails never stops a run (tests/test_finish)."""
 
 from __future__ import annotations
 
@@ -12,7 +12,6 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp import scheduler as sched_mod
 from orgmcp.app import Org
 from orgmcp.scheduler import Scheduler
 from orgmcp.strays import StrayProbe, StrayRegistry
@@ -97,11 +96,10 @@ def test_nothing_found_records_nothing(org: Org) -> None:
     assert registry.recorded == []
 
 
-def test_the_legacy_patch_point_still_wins(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
-    probe = ScriptedProbe(["/ws/dev"])
+def test_a_failing_probe_of_the_runtime_is_logged_once_and_records_nothing(org: Org) -> None:
+    probe = ScriptedProbe(["/ws/dev"], fail=True)
     registry = RecordingRegistry()
     org.runtime = dataclasses.replace(org.runtime, stray_probe=probe, stray_registry=registry)
-    monkeypatch.setattr(sched_mod, "_stray_probe", lambda o, a: (_ for _ in ()).throw(OSError("boom")))
     lines: list[str] = []
     run_once(org, lines)
-    assert any("stray check failed" in x for x in lines) and probe.probes == [] and registry.recorded == []
+    assert any("stray check failed" in x for x in lines) and probe.probes == ["dev"] and registry.recorded == []

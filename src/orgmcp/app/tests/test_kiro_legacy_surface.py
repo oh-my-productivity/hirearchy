@@ -15,7 +15,7 @@ from orgmcp import scheduler
 from orgmcp.app import Org
 from orgmcp.kernel import ROOT
 
-GOLDEN = Path(scheduler.__file__).resolve().parent / "kiro" / "tests" / "golden"
+GOLDEN = Path(scheduler.__file__).resolve().parent.parent / "kiro" / "tests" / "golden"
 SERVER = {"command": "<BIN>", "args": ["mcp"]}
 
 

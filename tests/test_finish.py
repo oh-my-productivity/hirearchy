@@ -2,6 +2,7 @@
 orgmcp vs built-in tool names in the prompts, stray org files in a workspace, and the skill/instruction rules."""
 
 import asyncio
+import dataclasses
 import os
 import re
 import sys
@@ -19,6 +20,7 @@ from orgmcp.progress import describe_progress
 from orgmcp.scheduler import EXIT_FILE, Scheduler, describe_scheduler, waiting_on_user
 from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
 from orgmcp.skill import skill_source
+from orgmcp.strays import StrayProbe
 
 
 def call(server, tool, **args):
@@ -451,14 +453,24 @@ def test_no_warning_for_clean_runs_pre_existing_folders_or_agents_without_write(
     assert "# warning:" not in log
     # an agent with a workspace but no built-in write cannot have written there: no probe at all
     org.hire(ROOT, "rd", "Reader", "Read.", tools=["read"], workspace=str(ws))
-    assert sched_mod._stray_probe(org, "rd") == {}
+    assert org.runtime.stray_probe.probe("rd") == {}
 
 
-def test_a_failing_stray_probe_never_stops_a_run(org, tmp_path, monkeypatch):
+class BrokenProbe(StrayProbe):
+    """A probe of the workspace that cannot read it."""
+
+    def probe(self, addr):
+        raise OSError("boom")
+
+    def found_since(self, before, after):
+        return []
+
+
+def test_a_failing_stray_probe_never_stops_a_run(org, tmp_path):
     hire_writer(org, tmp_path, ["write"])
     org.send(ROOT, "dev", "go", budget=5)
     lines = []
-    monkeypatch.setattr(sched_mod, "_stray_probe", lambda o, a: (_ for _ in ()).throw(OSError("boom")))
+    org.runtime = dataclasses.replace(org.runtime, stray_probe=BrokenProbe())
     sched = Scheduler(org, script_runner("pass"), echo=lines.append)
     run_to_end(sched, "dev")
     assert any("stray check failed" in x for x in lines) and org.ledger("failures") == {}
