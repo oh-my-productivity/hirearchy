@@ -10,8 +10,6 @@ from orgmcp.daemon import EXIT_FILE
 from orgmcp.daemon._files import exit_file_of, log_of, pidfile_of
 from orgmcp.kernel import OrgPaths
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 
 def test_the_three_files_are_in_the_runtime_directory(tmp_path: Path) -> None:
     layout = OrgPaths(tmp_path)

@@ -20,7 +20,7 @@ from pathlib import Path
 
 from ..attention import Waiting, WaitingOnUser
 from ..attention.testing import FixedWaiting
-from ..kernel import ROOT, Clock, Message, OrgLayout, OrgPaths
+from ..kernel import ROOT, Clock, Message, OrgError, OrgLayout, OrgPaths
 from ..kernel.testing import FakeClock, fs_atomic_writer, os_environment, system_clock
 from ..mail import TaskQuery
 from ..processes import ProcessHandle, ProcessInspector, ProcessSignaller, ProcessSpawner
@@ -29,11 +29,13 @@ from ..snapshots.testing import MemoryIgnoreList
 from ._children import ChildRegistry
 from ._command import VenvSchedulerCommand
 from ._control import DetachedSchedulerControl
+from ._describe import describe_state
 from ._files import exit_file_of, pidfile_of
 from ._identity import SchedulerIdentity
 from ._launch import DetachedLauncher
 from ._lock import PidFileSchedulerLock
 from ._marker import FileExitMarker
+from ._refusals import NO_SCHEDULER, SINCE_FORMAT, check_startable, check_stoppable
 from ._site import RuntimeLaunchSite, ScrubbedLaunchEnvironment
 from ._status import PidFileSchedulerStatus
 from ._stop import SignalSchedulerStopper
@@ -62,13 +64,14 @@ class FakeSchedulerStatus(SchedulerStatus):
         self.asked = 0  # how often ``state`` was asked
 
     def state(self) -> SchedulerState:
-        raise NotImplementedError
+        self.asked += 1
+        return self.current
 
     def describe(self) -> str:
-        raise NotImplementedError
+        return describe_state(self.current, self.exit_reason, self.waiting)
 
     def exit_reason(self) -> str:
-        raise NotImplementedError
+        return self.reason if self.reason and not self.open_tasks else ""
 
 
 class FakeSchedulerControl(SchedulerControl):
@@ -83,10 +86,24 @@ class FakeSchedulerControl(SchedulerControl):
         self.signalled: list[int] = []
 
     def start(self, max_runs: int | None = None, until_done: bool = False) -> int:
-        raise NotImplementedError
+        if max_runs is not None and max_runs < 0:
+            raise OrgError("max_runs must be 0 or more")
+        check_startable(self.status.state())
+        self.starts.append((max_runs, until_done))
+        pid, self.next_pid = self.next_pid, self.next_pid + 1
+        self.status.current = SchedulerState("running", pid, self.clock.now().strftime(SINCE_FORMAT))
+        return pid
 
     def stop(self, wait: float = 15.0) -> str:
-        raise NotImplementedError
+        self.stops.append(wait)
+        state = self.status.state()
+        if state.state == "stopped":
+            return NO_SCHEDULER
+        check_stoppable(state)
+        assert state.pid is not None
+        self.signalled.append(state.pid)
+        self.status.current = SchedulerState("stopped")
+        return f"scheduler stopped (pid {state.pid})"
 
 
 class FixedSchedulerCommand(SchedulerCommand):
@@ -97,7 +114,8 @@ class FixedSchedulerCommand(SchedulerCommand):
         self.calls: list[tuple[int | None, bool]] = []
 
     def argv(self, max_runs: int | None, until_done: bool) -> list[str]:
-        raise NotImplementedError
+        self.calls.append((max_runs, until_done))
+        return list(self.fixed)
 
 
 class FakeSchedulerCommand(SchedulerCommand):
@@ -109,7 +127,11 @@ class FakeSchedulerCommand(SchedulerCommand):
         self.calls: list[tuple[int | None, bool]] = []
 
     def argv(self, max_runs: int | None, until_done: bool) -> list[str]:
-        raise NotImplementedError
+        self.calls.append((max_runs, until_done))
+        return [
+            *self.program, "--root", str(self._layout.root), "run",
+            *(["--max-runs", str(max_runs)] if max_runs is not None else []), *(["--until-done"] if until_done else []),
+        ]
 
 
 class RecordingSchedulerCommand(SchedulerCommand):
@@ -121,7 +143,10 @@ class RecordingSchedulerCommand(SchedulerCommand):
         self.issued: list[list[str]] = []
 
     def argv(self, max_runs: int | None, until_done: bool) -> list[str]:
-        raise NotImplementedError
+        self.calls.append((max_runs, until_done))
+        answer = self._inner.argv(max_runs, until_done)
+        self.issued.append(list(answer))
+        return answer
 
 
 class MemoryExitMarker(ExitMarker):
@@ -131,13 +156,13 @@ class MemoryExitMarker(ExitMarker):
         self.text = text
 
     def write(self, reason: str) -> None:
-        raise NotImplementedError
+        self.text = reason + "\n"
 
     def clear(self) -> None:
-        raise NotImplementedError
+        self.text = None
 
     def read(self) -> str:
-        raise NotImplementedError
+        return (self.text or "").strip()
 
 
 class MemorySchedulerLock(SchedulerLock):
@@ -148,10 +173,17 @@ class MemorySchedulerLock(SchedulerLock):
         self.text = text
 
     def acquire(self) -> None:
-        raise NotImplementedError
+        if self.text is not None:
+            try:
+                pid = int(self.text.strip())
+            except ValueError:
+                pid = 0  # garbled: nobody holds it
+            if pid > 0 and self._inspector.is_alive(pid):
+                raise OrgError(f"a scheduler is already running for this org (pid {pid})")
+        self.text = str(self._inspector.own_ids()[0])
 
     def release(self) -> None:
-        raise NotImplementedError
+        self.text = None
 
 
 class FixedTasks(TaskQuery):

@@ -14,11 +14,11 @@ W = TypeVar("W")
 RED = "red: C-daemon"
 PENDING: frozenset[str] = frozenset(
     {
-        "pidfile_status_world", "real_status_world", "memory_status_world",
-        "pidfile_control_world", "real_control_world", "memory_control_world",
-        "pidfile_lock_world", "real_lock_world", "memory_lock_world",
-        "file_exit_marker_world", "memory_exit_marker_world",
-        "venv_command_world", "fake_command_world",
+        "pidfile_status_world", "real_status_world",
+        "pidfile_control_world", "real_control_world",
+        "pidfile_lock_world", "real_lock_world",
+        "file_exit_marker_world",
+        "venv_command_world",
     }
 )  # the worlds whose classes are not written yet: their contract tests are expected to fail
 

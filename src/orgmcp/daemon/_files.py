@@ -9,14 +9,14 @@ from ..kernel import OrgLayout
 
 def pidfile_of(layout: OrgLayout) -> Path:
     """``.runtime/scheduler.pid``: the pid of the running scheduler, written by the scheduler process itself."""
-    raise NotImplementedError
+    return layout.runtime_dir() / "scheduler.pid"
 
 
 def exit_file_of(layout: OrgLayout) -> Path:
     """``.runtime/scheduler.exit``: why the last scheduler exited by itself."""
-    raise NotImplementedError
+    return layout.runtime_dir() / "scheduler.exit"
 
 
 def log_of(layout: OrgLayout) -> Path:
     """``.runtime/scheduler.log``: the output of the schedulers that were started detached."""
-    raise NotImplementedError
+    return layout.runtime_dir() / "scheduler.log"

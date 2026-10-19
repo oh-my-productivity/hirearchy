@@ -9,8 +9,6 @@ from orgmcp.attention.testing import FixedWaiting
 from orgmcp.daemon import SchedulerState
 from orgmcp.daemon._describe import describe_state
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-daemon")
-
 
 def never() -> str:
     raise AssertionError("not needed")

@@ -23,7 +23,6 @@ from orgmcp.daemon.testing import (
 from orgmcp.kernel import OrgError, OrgPaths
 from orgmcp.processes.testing import FakeProcessTable
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-daemon")
 RUNNING = SchedulerState("running", 7000, "2026-10-18 10:00:00Z")
 
 
@@ -40,13 +39,11 @@ def test_the_fakes_are_the_ports(tmp_path: Path) -> None:
 # ------------------------------------------------------------------------------ FakeSchedulerStatus
 
 
-@RED
 def test_the_status_is_stopped_until_it_is_told_otherwise() -> None:
     fake = FakeSchedulerStatus()
     assert fake.state() == SchedulerState("stopped") and fake.describe() == "scheduler: stopped" and fake.exit_reason() == ""
 
 
-@RED
 def test_the_status_answers_the_state_it_holds_and_counts_the_questions() -> None:
     fake = FakeSchedulerStatus(RUNNING)
     assert fake.state() is RUNNING and fake.state() is RUNNING and fake.asked == 2
@@ -55,7 +52,6 @@ def test_the_status_answers_the_state_it_holds_and_counts_the_questions() -> Non
     assert fake.describe().startswith("scheduler: unknown - .runtime/scheduler.pid names pid 5,")
 
 
-@RED
 def test_the_status_explains_a_stop_by_the_reason_then_by_what_waits_for_the_user() -> None:
     fake = FakeSchedulerStatus(waiting=FixedWaiting(Waiting("waiting on you: x", "o")))
     assert fake.describe() == "scheduler: stopped (waiting on you: x)"
@@ -68,7 +64,6 @@ def test_the_status_explains_a_stop_by_the_reason_then_by_what_waits_for_the_use
 # ------------------------------------------------------------------------------ FakeSchedulerControl
 
 
-@RED
 def test_a_start_makes_the_status_running_and_is_recorded() -> None:
     control = FakeSchedulerControl(pid=100)
     assert control.start(3, True) == 100
@@ -77,7 +72,6 @@ def test_a_start_makes_the_status_running_and_is_recorded() -> None:
     assert control.status.state().since == "2026-10-18 10:00:00Z"
 
 
-@RED
 def test_pids_count_up_from_the_first() -> None:
     control = FakeSchedulerControl(pid=100)
     control.start()
@@ -85,7 +79,6 @@ def test_pids_count_up_from_the_first() -> None:
     assert control.start() == 101
 
 
-@RED
 def test_a_start_is_refused_as_the_real_one_refuses_it() -> None:
     control = FakeSchedulerControl(FakeSchedulerStatus(RUNNING))
     with pytest.raises(OrgError, match="already running"):
@@ -98,7 +91,6 @@ def test_a_start_is_refused_as_the_real_one_refuses_it() -> None:
     assert control.starts == []
 
 
-@RED
 def test_a_stop_signals_the_scheduler_and_is_recorded() -> None:
     control = FakeSchedulerControl(FakeSchedulerStatus(RUNNING))
     assert control.stop(2.0) == "scheduler stopped (pid 7000)"
@@ -106,7 +98,6 @@ def test_a_stop_signals_the_scheduler_and_is_recorded() -> None:
     assert control.stop() == "no scheduler is running for this org" and control.stops == [2.0, 15.0]
 
 
-@RED
 def test_a_stop_never_signals_a_process_that_is_not_trusted() -> None:
     control = FakeSchedulerControl(FakeSchedulerStatus(SchedulerState("unverified", 5, "x", "d")))
     with pytest.raises(OrgError, match="^not signalling pid 5"):
@@ -117,7 +108,6 @@ def test_a_stop_never_signals_a_process_that_is_not_trusted() -> None:
 # ------------------------------------------------------------------------------ the commands
 
 
-@RED
 def test_the_fixed_command_is_what_it_was_given_whatever_it_is_asked() -> None:
     command = FixedSchedulerCommand(["python", "-c", "pass"])
     got = command.argv(3, True)
@@ -125,14 +115,12 @@ def test_the_fixed_command_is_what_it_was_given_whatever_it_is_asked() -> None:
     assert command.argv(None, False) == ["python", "-c", "pass"] and command.calls == [(3, True), (None, False)]
 
 
-@RED
 def test_the_fake_command_has_the_flags_of_the_real_one(tmp_path: Path) -> None:
     command = FakeSchedulerCommand(OrgPaths(tmp_path), ["/v/orgmcp"])
     assert command.argv(2, True) == ["/v/orgmcp", "--root", str(tmp_path), "run", "--max-runs", "2", "--until-done"]
     assert command.calls == [(2, True)]
 
 
-@RED
 def test_the_recording_command_passes_the_question_on_and_keeps_both() -> None:
     inner = FixedSchedulerCommand(["a", "b"])
     command = RecordingSchedulerCommand(inner)
@@ -143,7 +131,6 @@ def test_the_recording_command_passes_the_question_on_and_keeps_both() -> None:
 # ------------------------------------------------------------------------------ the rest
 
 
-@RED
 def test_the_memory_marker_holds_the_text_of_its_file() -> None:
     marker = MemoryExitMarker()
     assert marker.read() == "" and marker.text is None
@@ -161,7 +148,6 @@ def test_only_root_waits_in_the_fixed_tasks() -> None:
     assert tasks.asked == ["root", "root", "ceo"]
 
 
-@RED
 def test_the_scripted_spawner_plays_the_scheduler_that_comes_up(tmp_path: Path) -> None:
     layout = OrgPaths(tmp_path)
     table = FakeProcessTable()
@@ -171,7 +157,6 @@ def test_the_scripted_spawner_plays_the_scheduler_that_comes_up(tmp_path: Path) 
     assert table.spawned[0].argv == ("orgmcp", "run") and table.is_alive(handle.pid)
 
 
-@RED
 def test_the_scripted_spawner_can_play_a_scheduler_that_ends_at_once_with_a_reason(tmp_path: Path) -> None:
     layout = OrgPaths(tmp_path)
     table = FakeProcessTable()
