@@ -13,10 +13,6 @@ from orgmcp.kernel.testing import ListEventSink
 from orgmcp.mail import MailboxReader
 from orgmcp.mail.testing import MemoryMailbox
 
-from ._support import RED
-
-pytestmark = RED
-
 
 class RecordingBudget(BudgetQuery):
     """Every agent has 3 runs; the questions are kept."""

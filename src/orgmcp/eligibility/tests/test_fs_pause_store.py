@@ -10,10 +10,6 @@ from orgmcp.eligibility._pause import FsPauseStore
 from orgmcp.kernel import OrgPaths
 from orgmcp.kernel.testing import ListEventSink
 
-from ._support import RED
-
-pytestmark = RED
-
 
 def build(tmp_path: Path) -> tuple[FsPauseStore, ListEventSink]:
     events = ListEventSink()

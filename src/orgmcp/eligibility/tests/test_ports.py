@@ -8,10 +8,6 @@ from pathlib import Path
 from orgmcp.eligibility._ports import DirectoryProbe, FsDirectoryProbe, FsLedgerShape, LedgerShape
 from orgmcp.kernel import OrgPaths
 
-from ._support import RED
-
-pytestmark = RED
-
 
 def test_the_probe_is_a_directory_probe() -> None:
     assert isinstance(FsDirectoryProbe(OrgPaths(Path("/nowhere"))), DirectoryProbe)
@@ -47,7 +43,7 @@ def test_the_shape_is_a_ledger_shape() -> None:
 
 
 def write(tmp_path: Path, raw: str) -> FsLedgerShape:
-    (tmp_path / ".runtime").mkdir()
+    (tmp_path / ".runtime").mkdir(exist_ok=True)
     (tmp_path / ".runtime" / "failures.json").write_text(raw)
     return FsLedgerShape(OrgPaths(tmp_path))
 

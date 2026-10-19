@@ -8,10 +8,7 @@ from pathlib import Path
 import pytest
 from _pytest.mark.structures import ParameterSet
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-eligibility")
-PASSING: frozenset[str] = frozenset({"memory_pauses", "memory_failures"})  # the implementations that already pass their contract suite; the others are red
-
 
 def implementations(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:
-    """The factories of one port as test parameters: the ones not in ``PASSING`` are expected to fail for now."""
-    return [pytest.param(f, id=f.__name__, marks=[] if f.__name__ in PASSING else [RED]) for f in factories]
+    """The factories of one port as test parameters, named by the factory."""
+    return [pytest.param(f, id=f.__name__) for f in factories]

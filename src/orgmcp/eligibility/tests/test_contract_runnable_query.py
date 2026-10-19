@@ -71,6 +71,7 @@ def test_runnable_follows_the_same_table(w: EligibilityWorld, name: str) -> None
 
 
 def test_startable_and_runnable_agree_for_every_agent_at_once(w: EligibilityWorld) -> None:
+    w.agent("ceo")
     for n, name in enumerate(TABLE):
         prepare(w, f"ceo/a{n:02d}", TABLE[name])
     startable = [f"ceo/a{n:02d}" for n in range(len(TABLE)) if w.runnable.startable(f"ceo/a{n:02d}")]

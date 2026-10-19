@@ -8,10 +8,6 @@ from orgmcp.eligibility._ports import DirectoryProbe
 from orgmcp.eligibility.testing import MemoryPauseStore
 from orgmcp.kernel.testing import ListEventSink
 
-from ._support import RED
-
-pytestmark = RED
-
 
 class ScriptedProbe(DirectoryProbe):
     """The mtime of each flag file is what the test says (-1: no such file); every question is kept."""

@@ -13,6 +13,7 @@ import json
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 from ..agents import AgentDirectory, CharterReader
 from ..agents.testing import fs_agents
@@ -72,9 +73,9 @@ class MemoryFailureCounter(FailureCounter):
 
     def record(self, addr: str) -> int:
         counts, _ = self._load()
-        counts[addr] = int(str(counts.get(addr, 0))) + 1
+        counts[addr] = int(cast(int, counts.get(addr, 0))) + 1
         self._save(counts)
-        return int(str(counts[addr]))
+        return cast(int, counts[addr])
 
     def clear(self, addr: str) -> None:
         counts, _ = self._load()

@@ -25,15 +25,22 @@ class LedgerShape(Protocol):
 
 class FsDirectoryProbe(DirectoryProbe):
     def __init__(self, paths: OrgLayout) -> None:
-        raise NotImplementedError("red: B-eligibility")
+        self._paths = paths
 
     def mtime(self, addr: str, name: str) -> int:
-        raise NotImplementedError("red: B-eligibility")
+        path = self._paths.agent_dir(addr)
+        try:
+            return os.stat(path / name if name else path).st_mtime_ns
+        except OSError:
+            return -1
 
 
 class FsLedgerShape(LedgerShape):
     def __init__(self, paths: OrgLayout) -> None:
-        raise NotImplementedError("red: B-eligibility")
+        self._paths = paths
 
     def damaged(self, name: str) -> bool:
-        raise NotImplementedError("red: B-eligibility")
+        try:
+            return not isinstance(json.loads(self._paths.ledger_file(name).read_text(encoding="utf-8")), dict)
+        except (OSError, ValueError):
+            return False

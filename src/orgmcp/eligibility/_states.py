@@ -8,7 +8,13 @@ from .api import AgentStates, PauseStore
 
 class DerivedAgentStates(AgentStates):
     def __init__(self, mail: MailboxReader, pauses: PauseStore) -> None:
-        raise NotImplementedError("red: B-eligibility")
+        self._mail = mail
+        self._pauses = pauses
 
     def state(self, addr: str) -> str:
-        raise NotImplementedError("red: B-eligibility")
+        if self._mail.has_inflight(addr):
+            return "running"
+        reason = self._pauses.paused(addr)
+        if reason:
+            return f"paused({reason})"
+        return "pending" if self._mail.unread(addr) else "idle"
