@@ -11,7 +11,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import TypeVar
+from typing import Protocol, TypeVar
 
 from mcp.server.fastmcp import FastMCP
 
@@ -184,24 +184,23 @@ class FixedServerFactory(McpServerFactory):
         return mcp
 
 
-class ServedMcp(FastMCP):
-    """A server that records that it was run, and does not read stdin."""
-
-    ran = 0
-
-    def run(self, *args: object, **kwargs: object) -> None:
-        ServedMcp.ran += 1
-
-
 class ServedServerFactory(McpServerFactory):
-    """Builds a ``ServedMcp`` for the identity it is asked for, and keeps the identities."""
+    """Builds a server for the identity it is asked for that does not read stdin when it is run, and keeps the identities (``built``) and how often a
+    server was run (``runs``)."""
 
     def __init__(self) -> None:
         self.built: list[str] = []
+        self.runs = 0
 
     def build(self, me: str) -> FastMCP:
         self.built.append(me)
-        return ServedMcp("orgmcp")
+        server = FastMCP("orgmcp")
+
+        def run(*args: object, **kwargs: object) -> None:
+            self.runs += 1
+
+        server.run = run  # type: ignore[method-assign]
+        return server
 
 
 class ServedFactories(ServerFactories):
@@ -233,7 +232,17 @@ class RecordingRunner(McpServerRunner):
 # ------------------------------------------------------------------------------ scripted ports of the tool groups
 
 
-class CallLog:
+class CallRecording(Protocol):
+    """What a scripted port needs of its log: to add a call, and to read back the calls of one name."""
+
+    calls: list[tuple[str, tuple[object, ...], dict[str, object]]]
+
+    def add(self, name: str, *args: object, **kwargs: object) -> None: ...
+
+    def of(self, name: str) -> list[tuple[tuple[object, ...], dict[str, object]]]: ...
+
+
+class CallLog(CallRecording):
     """The calls a scripted port was asked, as ``(name, args, kwargs)``."""
 
     def __init__(self) -> None:
