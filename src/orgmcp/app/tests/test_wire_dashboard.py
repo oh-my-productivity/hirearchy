@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import importlib
 import inspect
+import subprocess
+import sys
 from pathlib import Path
 from types import ModuleType
 
@@ -95,3 +97,17 @@ def test_the_stylesheet_travels_with_the_package() -> None:
     from orgmcp.dashboard._app import DashApp
 
     assert Path(str(DashApp.CSS_PATH)).is_file() and Path(str(DashApp.CSS_PATH)).name == "dashboard.tcss"
+
+
+def test_loading_the_wiring_does_not_load_the_dashboard_or_textual() -> None:
+    """Every runtime loads every ``wire_*`` module; the terminal framework is for ``orgmcp dash`` only (``Org(root)`` and ``status`` must not pay for it)."""
+    probe = (
+        "import sys\n"
+        "from orgmcp.app import wiring\n"
+        "wiring.providers()\n"
+        "assert 'orgmcp.app.wire_dashboard' in sys.modules\n"
+        "loaded = sorted(m for m in sys.modules if m == 'textual' or m.startswith(('textual.', 'orgmcp.dashboard')))\n"
+        "assert not loaded, loaded\n"
+    )
+    done = subprocess.run([sys.executable, "-c", probe], capture_output=True, text=True, check=False)
+    assert done.returncode == 0, done.stderr
