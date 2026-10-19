@@ -22,8 +22,6 @@ from orgmcp.observability.tests._scenario import NOW, SINCE, stamp
 from orgmcp.observability.tests._support import expected
 from orgmcp.progress import progress
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-obs-2")
-
 EVENTS: dict[str, dict[str, Any]] = {
     "all": dict(since=SINCE), "errors": dict(since=SINCE, errors=True), "agent_limit": dict(since=SINCE, agent="ceo/eng", limit=3),
     "kind_run": dict(since=SINCE, kind="run"), "kind_tool": dict(since=SINCE, kind="tool.call", limit=5),
@@ -135,13 +133,7 @@ def test_the_clock_of_the_runtime_is_what_a_default_now_is_made_of(built: Any) -
 
 # ------------------------------------------------------------------------------ the second half (C-obs-2): now, check, the text
 
-def scenarios() -> list[Any]:
-    """The scenarios; those where the scheduler or the judge is not what the real ones say here are red until the legacy functions read the runtime."""
-    real = {"stopped", "story", "retired", "corrupt"}
-    return [pytest.param(name, marks=[] if name in real else RED, id=name) for name in _scenario.SCENARIOS]
-
-
-@pytest.mark.parametrize("name", scenarios())
+@pytest.mark.parametrize("name", list(_scenario.SCENARIOS))
 def test_now_and_check_and_their_text(built: Any, name: str) -> None:
     setup, state, verdict = _scenario.SCENARIOS[name]
     setup(built)
@@ -160,7 +152,6 @@ def test_now_and_check_of_an_organization_nothing_happened_in(bare: Any) -> None
     assert observe.observe_text(bare, "events", since=SINCE, now=NOW) + "\n" == expected("text_events_none.txt")
 
 
-@RED
 def test_observe_text(built: Any) -> None:
     setup, state, verdict = _scenario.SCENARIOS["busy"]
     setup(built)
@@ -178,7 +169,6 @@ def test_observe_text(built: Any) -> None:
     assert observe.render_now(observe.now_view(built.org, NOW), 12) + "\n" == expected("now_busy_capped.txt")
 
 
-@RED
 def test_the_scheduler_and_the_judge_are_those_of_the_runtime_in_force(built: Any) -> None:
     setup, _, _ = _scenario.SCENARIOS["busy"]
     setup(built)

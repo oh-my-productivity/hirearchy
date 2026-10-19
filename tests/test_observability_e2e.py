@@ -18,6 +18,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from testkit.scheduler import scheduler_is
 
 from orgmcp import observe, telemetry
 from orgmcp.cli import main
@@ -390,7 +391,7 @@ def test_now_reflects_a_running_and_a_queued_state(tmp_path, capsys):
         call(root, "delegate", to="ceo", title="Second job", goal="g", acceptance="a", budget=2)  # waits behind the run
         sched.tick()
         # this pytest process stands in for the scheduler process: tell the view its pid file is verified
-        mp.setattr(observe, "scheduler_state", lambda o: SchedulerState("running", os.getpid(), "now"))
+        scheduler_is(mp, SchedulerState("running", os.getpid(), "now"), org)
         time.sleep(0.3)
         v = observe.now_view(org)
         assert v["scheduler"]["state"] == "running" and v["scheduler"]["mode"] == "daemon"

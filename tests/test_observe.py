@@ -15,11 +15,13 @@ from pathlib import Path
 
 import pytest
 from obs_fixtures import T0, EventLog, Story, freeze, run_ids, stamp, stamp_trace
+from testkit.scheduler import scheduler_is
 
 from orgmcp import observe
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Message, Org, OrgError
 from orgmcp.kernel.testing import FakeClock
+from orgmcp.processes.testing import fake_world
 from orgmcp.progress import progress
 from orgmcp.scheduler import Scheduler, SchedulerState
 from orgmcp.server import build_server
@@ -515,7 +517,7 @@ def test_now_works_with_no_events_and_explains_the_queue(org, clock):
 
 
 def test_now_queue_reasons(org, clock, monkeypatch):
-    monkeypatch.setattr(observe, "scheduler_state", lambda o: SchedulerState("running", 4242, "2026-10-18 10:00:00Z"))
+    scheduler_is(monkeypatch, SchedulerState("running", 4242, "2026-10-18 10:00:00Z"), org)
     clock.at(0)
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=3)
     assert observe.now_view(org, now=stamp(5))["queued"][0]["reason"].startswith("ready")
@@ -541,7 +543,7 @@ def test_now_queue_reasons(org, clock, monkeypatch):
 def test_now_shows_scheduler_runs_in_flight_and_errors(org, story, monkeypatch):
     log = story.log
     # a live scheduler with a heartbeat and a run in flight on eng
-    monkeypatch.setattr(observe, "scheduler_state", lambda o: SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))
+    scheduler_is(monkeypatch, SchedulerState("running", 7000, "2026-10-18 10:00:00Z"), org)
     log.emit("scheduler.heartbeat", stamp(190), proc="scheduler", pid=7000, running=["ceo/eng"], runnable=0, waiting_on_you=0)
     story.clock.at(180)
     org.delegate(ROOT, "ceo", "Another", "g", "a", budget=2)
@@ -701,7 +703,7 @@ def test_check_stuck_inflight_without_a_live_run(org, clock):
     assert not res["ok"] and "ceo: 1 message(s) inflight" in res["details"][0] and "no scheduler is running" in res["details"][0]
 
 
-def test_check_inflight_with_a_live_recorded_process_passes(org, clock, monkeypatch):
+def test_check_inflight_with_a_live_recorded_process_passes(org, clock, monkeypatch, tmp_path):
     clock.at(0)
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=3)
     org.begin_run("ceo")
@@ -710,9 +712,12 @@ def test_check_inflight_with_a_live_recorded_process_passes(org, clock, monkeypa
     for f in (org.dir("ceo") / "inflight").glob("*.md"):
         os.utime(f, (old, old))
     org.save_ledger("running", {"ceo": {"pgid": 99999, "lstart": "x", "started": 0, "scheduler": 1, "log": str(p.relative_to(org.root))}})
-    monkeypatch.setattr(observe, "judge_orphan", lambda rec: "ours")
+    world = fake_world(tmp_path)  # the process 99999 of the record is a session leader that started at "x": ours; then it is gone
+    table = world.spawner
+    table.add(99999, started="x")
+    monkeypatch.setattr(org, "runtime", dataclasses.replace(org.runtime, orphan_judge=world.judge))
     assert by_id(observe.check(org, now=stamp(10)))["c"]["ok"]
-    monkeypatch.setattr(observe, "judge_orphan", lambda rec: "gone")
+    table.exit(99999)
     assert not by_id(observe.check(org, now=stamp(10)))["c"]["ok"]
 
 

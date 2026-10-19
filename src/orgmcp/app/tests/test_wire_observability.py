@@ -10,8 +10,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import cast
 
-import pytest
-
 from orgmcp.app import wire_observability, wiring
 from orgmcp.app._builder import Builder
 from orgmcp.app.runtime import OrgRuntime
@@ -93,8 +91,8 @@ def test_the_runtime_builds_them_over_its_own_ports(tmp_path: Path) -> None:
     assert isinstance(runtime.observability_renderer, ObservabilityRenderer) and isinstance(runtime.observability_text, ObservabilityText)
 
 
-@pytest.mark.xfail(strict=True, reason="red: C-obs-2")
 def test_the_objects_of_the_legacy_functions_follow_the_scheduler_of_the_runtime_in_force(tmp_path: Path) -> None:
+    (tmp_path / "ORG.md").write_text("---\nmission: test\n---\nrules\n")
     runtime = wiring.open_runtime(tmp_path)
     swapped = dataclasses.replace(runtime, scheduler_status=FakeSchedulerStatus(SchedulerState("running", 7, "x")))
     at = datetime(2026, 10, 18, 12, tzinfo=timezone.utc)

@@ -58,6 +58,7 @@ from ..observability._history import IndexedMessageHistory
 from ..observability._messages import Msg as Msg  # re-exported for observe.py
 from ..observability._messages import build_messages as build_messages  # re-exported for observe.py
 from ..observability._metrics import DerivedMetricQueries
+from ..observability._now import ERROR_WINDOW as ERROR_WINDOW  # re-exported for observe.py
 from ..observability._now import (
     BatchRunsInFlight,
     EventSchedulerReport,
@@ -75,8 +76,6 @@ from ..observability._runs import run_events as run_events  # re-exported for ob
 from ..observability._trace import READ_ONLY_TOOLS as READ_ONLY_TOOLS  # re-exported for observe.py
 from ..observability._trace import DerivedTraceQueries
 from ..observability._trace import run_window as run_window  # re-exported for observe.py
-from ..observability._util import cap as cap  # re-exported for observe.py (until it renders no more)
-from ..observability._util import iso as iso  # re-exported for observe.py (until it builds no view)
 from ..observability._util import matcher as matcher  # re-exported for observe.py
 from ..observability._util import plain as plain  # re-exported for observe.py
 from ..processes import OrphanJudge
@@ -239,6 +238,11 @@ def integrity_checks_of(runtime: OrgRuntime) -> IntegrityChecks:
 def renderer_of(runtime: OrgRuntime) -> ObservabilityRenderer:
     """``ObservabilityRenderer`` (the text of the views does not depend on the runtime)."""
     return renderer(RuntimePorts(runtime))
+
+
+def system_renderer() -> ObservabilityRenderer:
+    """``ObservabilityRenderer`` for the legacy ``render_*`` functions, which are given a view and no organization."""
+    return TextObservabilityRenderer()
 
 
 def observe_text_of(runtime: OrgRuntime) -> ObservabilityText:
