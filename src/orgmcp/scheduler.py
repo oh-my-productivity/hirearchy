@@ -9,19 +9,19 @@ from __future__ import annotations
 import os
 import signal
 import subprocess
-import sys
 import tempfile
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, NamedTuple
+from typing import Callable
 
 from . import review, telemetry, templates
-from .app import wire_attention, wire_kiro, wire_processes, wire_stalls
+from .app import wire_attention, wire_daemon, wire_kiro, wire_processes, wire_stalls
 from .app.wiring import open_runtime
 from .attention import Waiting
-from .core import ROOT, Org, OrgError, atomic_write
+from .core import ROOT, Org
+from .daemon import EXIT_FILE, FINISHED, SchedulerState  # noqa: F401  (EXIT_FILE is still read from here by the callers that are not converted yet)
 from .health import config_number
 from .processes import ProcessTableError
 from .runs import (
@@ -159,111 +159,32 @@ def ignore_runtime_files(root: Path) -> None:
     open_runtime(Path(root)).ignore_list.ensure_runtime_files()
 
 
-EXIT_FILE = ".runtime/scheduler.exit"  # why the last scheduler exited by itself (until-done); removed when one starts
-FINISHED = "finished: no open tasks"
-
-
-class SchedulerState(NamedTuple):
-    """``state``: stopped | running (verified to be this org's scheduler) | unverified (pid alive, not trusted)."""
-    state: str
-    pid: int | None = None
-    since: str | None = None
-    detail: str = ""
+# EXIT_FILE, FINISHED and SchedulerState are the ones of ``orgmcp.daemon``; the functions below are thin adapters over the ``SchedulerStatus``,
+# ``SchedulerControl`` and ``SchedulerCommand`` of the runtime in force (``wire_daemon``) until the scheduler itself (D-sched-1) and the callers of the
+# status (C-obs-2, C-progress, C-dashdata) are converted. Each call uses the ports ``org.runtime`` has when it is made.
 
 
 def scheduler_command(root: Path, max_runs: int | None = None, until_done: bool = False) -> list[str]:
     """``<this venv's orgmcp> --root <org> run [--max-runs N] [--until-done]`` (``python -m orgmcp`` if the script is missing)."""
-    script = Path(sys.executable).with_name("orgmcp")
-    base = [str(script)] if script.exists() else [sys.executable, "-m", "orgmcp"]
-    return [*base, "--root", str(root), "run", *(["--max-runs", str(max_runs)] if max_runs is not None else []),
-            *(["--until-done"] if until_done else [])]
+    return wire_daemon.command_at(Path(root)).argv(max_runs, until_done)
 
 
 def _command_line(pid: int) -> str | None:
     return wire_processes.system_inspector().command_line(pid)
 
 
-def _root_arguments(tokens: list[str]) -> list[str]:
-    """The values given to ``--root`` in a command line."""
-    return [tokens[i + 1] for i, t in enumerate(tokens[:-1]) if t == "--root"] + [t[7:] for t in tokens if t.startswith("--root=")]
-
-
-def _same_dir(path: str, root: Path) -> bool:
-    """Is ``path`` the directory ``root`` under another spelling (a symlink such as macOS /tmp -> /private/tmp, ``~``)?"""
-    if not path.startswith(("/", "~")):
-        return False  # relative to the other process's working directory: cannot be compared
-    try:
-        return Path(path).expanduser().resolve() == root.resolve()
-    except (OSError, RuntimeError, ValueError):
-        return False
-
-
 def _looks_like_scheduler_of(command: str, root: Path) -> bool:
-    """Does this command line plausibly start the scheduler of the organization at ``root``?
-
-    Needs the ``run`` subcommand and either the org's root path or an ``orgmcp`` program. A ``--root`` that is not
-    this org (or cannot be compared, being relative) is a no.
-    """
-    tokens = command.split()
-    names_root = str(root) in command or any(_same_dir(t, root) for t in _root_arguments(tokens))
-    has_root_flag = any(t == "--root" or t.startswith("--root=") for t in tokens)
-    has_orgmcp = any(Path(t).name == "orgmcp" for t in tokens)
-    return "run" in tokens and (names_root or (has_orgmcp and not has_root_flag))
-
-
-_children: dict[int, subprocess.Popen] = {}  # schedulers this process started: reaped so they never linger as zombies
-
-
-def _reap_children() -> None:
-    for pid, proc in list(_children.items()):
-        if proc.poll() is not None:
-            del _children[pid]
+    """Does this command line plausibly start the scheduler of the organization at ``root``? (see ``SchedulerIdentity``)"""
+    return wire_daemon.identity().recognises(command, root)
 
 
 def scheduler_state(org: Org) -> SchedulerState:
     """Is a scheduler running for ``org``? Read from ``.runtime/scheduler.pid`` and checked against the process table."""
-    _reap_children()
-    pidfile = org.root / ".runtime" / "scheduler.pid"
-    try:
-        pid = int(pidfile.read_text().strip())
-        since = datetime.fromtimestamp(pidfile.stat().st_mtime, timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
-    except (OSError, ValueError):
-        return SchedulerState("stopped")
-    if pid <= 1:
-        return SchedulerState("stopped")
-    try:
-        info = _ps(pid)
-    except (OSError, subprocess.SubprocessError):
-        return SchedulerState("unverified", pid, since, "the process table could not be read")
-    if info is None or info[0].startswith("Z"):
-        return SchedulerState("stopped")  # stale pidfile: the process is gone
-    command = _command_line(pid)
-    if command and _looks_like_scheduler_of(command, org.root):
-        return SchedulerState("running", pid, since)
-    return SchedulerState("unverified", pid, since, f"its command line is {command!r}" if command else "its command line is unknown")
+    return wire_daemon.status_of(org.runtime).state()
 
 
 def describe_scheduler(org: Org) -> str:
-    st = scheduler_state(org)
-    if st.state == "running":
-        return f"scheduler: running (pid {st.pid}, since {st.since})"
-    if st.state == "unverified":
-        return (f"scheduler: unknown - .runtime/scheduler.pid names pid {st.pid}, which is alive but not verified "
-                f"to be this org's scheduler ({st.detail}); not trusted")
-    reason = _exit_reason(org)
-    if not reason:
-        waiting = waiting_on_user(org)
-        reason = waiting.text if waiting else ""
-    return f"scheduler: stopped ({reason})" if reason else "scheduler: stopped"
-
-
-def _exit_reason(org: Org) -> str:
-    """Why the scheduler last exited by itself, while that is still true (root has no open task); else ''."""
-    try:
-        reason = (org.root / EXIT_FILE).read_text(encoding="utf-8").strip()
-    except OSError:
-        return ""
-    return reason if reason and not org.outstanding(ROOT) else ""
+    return wire_daemon.status_of(org.runtime).describe()
 
 
 def waiting_on_user(org: Org, *, running=None, blocked=(), can_start: bool = True) -> Waiting | None:
@@ -280,45 +201,7 @@ def start_scheduler(org: Org, max_runs: int | None = None, until_done: bool = Fa
     """Launch a detached scheduler for ``org`` (own session; output to ``.runtime/scheduler.log``). Returns its pid.
 
     ``until_done``: the scheduler exits by itself when root has no open task and nothing is running or runnable."""
-    if max_runs is not None and max_runs < 0:
-        raise OrgError("max_runs must be 0 or more")
-    st = scheduler_state(org)
-    if st.state == "running":
-        raise OrgError(f"a scheduler is already running for this org (pid {st.pid}, since {st.since}); call stop() first to restart it")
-    if st.state == "unverified":
-        raise OrgError(f"not starting: .runtime/scheduler.pid names pid {st.pid}, which is alive but not verified to be "
-                       f"this org's scheduler ({st.detail}). Check that process; if it is stale, remove that file")
-    runtime = org.root / ".runtime"
-    runtime.mkdir(exist_ok=True)
-    org.runtime.ignore_list.ensure_runtime_files()
-    (org.root / EXIT_FILE).unlink(missing_ok=True)
-    log = runtime / "scheduler.log"
-    env = {**os.environ, "ORG_ROOT": str(org.root), "PYTHONUNBUFFERED": "1"}
-    for var in ("ORG_AGENT", "ORG_REQUIRE_AGENT"):
-        env.pop(var, None)
-    cmd = scheduler_command(org.root, max_runs, True) if until_done else scheduler_command(org.root, max_runs)
-    with open(log, "ab") as out:
-        out.write(f"\n# --- scheduler started {datetime.now(timezone.utc):%Y-%m-%d %H:%M:%SZ}: {' '.join(cmd)}\n".encode())
-        out.flush()
-        proc = subprocess.Popen(cmd, cwd=org.root, env=env, stdin=subprocess.DEVNULL, stdout=out,
-                                stderr=subprocess.STDOUT, start_new_session=True)
-    _children[proc.pid] = proc
-    pidfile = runtime / "scheduler.pid"
-    deadline = time.time() + 10
-    while time.time() < deadline:
-        code = proc.poll()
-        if code == 0 and (org.root / EXIT_FILE).is_file():
-            break  # it had nothing left to do and exited by itself (until-done): that is not a failure
-        if code is not None:
-            tail = "\n".join(log.read_text(encoding="utf-8", errors="replace").splitlines()[-5:])
-            raise OrgError(f"the scheduler exited at once (exit {code}); {log} ends with:\n{tail}")
-        try:
-            if int(pidfile.read_text().strip()) == proc.pid:
-                break
-        except (OSError, ValueError):
-            pass
-        time.sleep(0.05)
-    return proc.pid
+    return wire_daemon.control_of(org.runtime).start(max_runs, until_done)
 
 
 def stop_scheduler(org: Org, wait: float = 15.0) -> str:
@@ -326,30 +209,7 @@ def stop_scheduler(org: Org, wait: float = 15.0) -> str:
 
     The scheduler shuts down cleanly: runs in flight are interrupted (their batch is redelivered later).
     """
-    st = scheduler_state(org)
-    if st.state == "stopped":
-        return "no scheduler is running for this org"
-    if st.state == "unverified":
-        raise OrgError(f"not signalling pid {st.pid}: it is alive but not verified to be this org's scheduler "
-                       f"({st.detail}). If it is, stop it yourself (kill {st.pid})")
-    try:
-        os.kill(st.pid, signal.SIGTERM)
-    except ProcessLookupError:
-        return f"scheduler (pid {st.pid}) was already gone"
-    except PermissionError:
-        raise OrgError(f"not allowed to signal pid {st.pid}")
-    deadline = time.time() + wait
-    while time.time() < deadline:
-        _reap_children()
-        try:
-            info = _ps(st.pid)
-        except (OSError, subprocess.SubprocessError):
-            break
-        if info is None or info[0].startswith("Z"):
-            return f"scheduler stopped (pid {st.pid})"
-        time.sleep(0.1)
-    return (f"sent SIGTERM to the scheduler (pid {st.pid}); it is still shutting down (it interrupts agent runs first). "
-            "Check status() shortly")
+    return wire_daemon.control_of(org.runtime).stop(wait)
 
 
 def _version() -> str:
@@ -377,7 +237,6 @@ class Scheduler:
         self.total_runs = 0
         self._phase_errors: dict[str, str] = {}
         self._stalls = wire_stalls.RuntimeStalls(lambda: self.org.runtime, lambda: self.clock())  # the stall ladder, over the runtime in force
-        self.pidfile = org.root / ".runtime" / "scheduler.pid"
         self._blocked: set[str] = set()  # agents whose orphaned run (of a dead scheduler) is alive and could not be killed
         self._waiting_since: float | None = None  # until-done: since when nothing can progress without the user
         self.mode = "daemon"  # daemon | until_done | until_idle | once (for the scheduler.start event)
@@ -395,21 +254,8 @@ class Scheduler:
 
     def acquire(self) -> None:
         telemetry.set_process("scheduler")
-        self.pidfile.parent.mkdir(parents=True, exist_ok=True)
-        if self.pidfile.exists():
-            try:
-                pid = int(self.pidfile.read_text().strip())
-                os.kill(pid, 0)
-                alive = True
-            except (ValueError, ProcessLookupError):
-                alive = False
-            except PermissionError:  # the pid exists but belongs to another user: it is alive
-                alive = True
-            if alive:
-                raise OrgError(f"a scheduler is already running for this org (pid {pid})")
-            self.pidfile.unlink()  # stale
-        (self.org.root / EXIT_FILE).unlink(missing_ok=True)
-        self.pidfile.write_text(str(os.getpid()))
+        self.org.runtime.scheduler_lock.acquire()  # refuses while another live scheduler holds the pidfile
+        self.org.runtime.exit_marker.clear()
         self._ignore_running_ledger()
         self._emit("scheduler.start", mode=self.mode, max_runs=self.max_runs,
                    max_parallel=config_number(self.org.config, "max_parallel", int), version=_version())
@@ -505,7 +351,7 @@ class Scheduler:
             self._emit_run_end(run, run.proc.returncode, error="interrupted by scheduler shutdown")
         self.org.runtime.run_registry.forget(*self.runs)
         self.runs.clear()
-        self.pidfile.unlink(missing_ok=True)
+        self.org.runtime.scheduler_lock.release()
         self._emit("scheduler.exit", reason=telemetry.clip(self.exit_reason, telemetry.ERROR_MAX),
                    runs_started=self.total_runs)
 
@@ -529,12 +375,12 @@ class Scheduler:
                     break
                 if until_done and self.finished(max_runs):
                     self.echo(f"scheduler exiting: {FINISHED}")
-                    atomic_write(self.org.root / EXIT_FILE, FINISHED + "\n")
+                    self.org.runtime.exit_marker.write(FINISHED)
                     self.exit_reason = FINISHED
                     break
                 if until_done and (reason := self._check_waiting(max_runs)):
                     self.echo(f"scheduler exiting: {reason}")
-                    atomic_write(self.org.root / EXIT_FILE, reason + "\n")
+                    self.org.runtime.exit_marker.write(reason)
                     self.exit_reason = reason
                     break
                 time.sleep(config_number(self.org.config, "poll_seconds"))
