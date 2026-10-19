@@ -11,7 +11,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..kernel import RUNTIME, Clock, IdGenerator, Message
+from ..kernel import RUNTIME, Clock, IdGenerator, Message, norm
 from ..kernel.testing import FakeClock, ListEventSink, RecordingTraceTap, SequenceIdGenerator
 from ..mail.testing import MailHarness
 from ..traces.testing import TraceHarness, fs_traces, memory_traces
@@ -20,7 +20,8 @@ from .api import MessageDelivery
 
 
 class RecordingDelivery(MessageDelivery):
-    """RED skeleton (B-delivery): delivery that keeps the messages in a list."""
+    """Completes a message like the pipeline (id from the id generator, creation time from the clock) and keeps it in ``messages``, in order of
+    delivery. It stamps no trace, writes no file and emits no event: a consumer's test sets the trace it needs on the message."""
 
     def __init__(self, clock: Clock, ids: IdGenerator) -> None:
         self._clock = clock
@@ -28,10 +29,13 @@ class RecordingDelivery(MessageDelivery):
         self.messages: list[Message] = []
 
     def deliver(self, msg: Message) -> Message:
-        raise NotImplementedError("red: B-delivery")
+        msg.id = msg.id or self._ids.message_id(msg.sender)
+        msg.created = msg.created or self._clock.now().isoformat(timespec="seconds")
+        self.messages.append(msg)
+        return msg
 
     def notify(self, to: str, title: str, body: str, wake: bool = True, trace: str | None = None) -> Message:
-        raise NotImplementedError("red: B-delivery")
+        return self.deliver(Message(sender=RUNTIME, to=norm(to), type="note", title=title, body=body, wake=wake, trace=trace or None))
 
 
 @dataclass(frozen=True)

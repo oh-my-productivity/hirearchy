@@ -6,20 +6,22 @@ file text, the runtime has no sent copy, and ``notify`` is a note from the runti
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
 
 from orgmcp.delivery import MessageDelivery
-from orgmcp.delivery.testing import IMPLEMENTATIONS, DeliveryHarness
+from orgmcp.delivery.testing import IMPLEMENTATIONS, DeliveryHarness, recording_delivery
 from orgmcp.kernel import RUNTIME, Message
 
 from ._support import RED, make, task
 
-pytestmark = RED
+def pending(factory: Callable[[Path], object]) -> object:
+    return pytest.param(factory, id=factory.__name__, marks=() if factory is recording_delivery else RED)
 
 
-@pytest.fixture(params=IMPLEMENTATIONS[MessageDelivery], ids=lambda factory: factory.__name__)
+@pytest.fixture(params=[pending(factory) for factory in IMPLEMENTATIONS[MessageDelivery]])
 def h(request: pytest.FixtureRequest, tmp_path: Path) -> DeliveryHarness:
     made = make(request, tmp_path)
     assert isinstance(made.delivery, MessageDelivery)

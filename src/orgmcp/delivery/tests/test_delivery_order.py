@@ -46,7 +46,12 @@ def test_the_sent_copy_is_written_before_the_inbox_copy(h: DeliveryHarness) -> N
 def test_the_runtime_writes_only_the_inbox_copy(h: DeliveryHarness) -> None:
     assert h.mail is not None
     order: list[str] = []
-    h.mail.fail_writes(lambda rel: (order.append(rel.split("/")[-2]), False)[1])
+
+    def spy(rel: str) -> bool:
+        order.append(rel.split("/")[-2])
+        return False
+
+    h.mail.fail_writes(spy)
     h.delivery.deliver(Message(sender=RUNTIME, to="ceo", type="note", body="b"))
     assert order == ["inbox"]
 
