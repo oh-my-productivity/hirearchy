@@ -785,7 +785,10 @@ Impl: `DerivedCaseHistory`, `DigestBuilder`, `TextServiceReports`, `OwnerPromptS
 class OrgTree(Protocol):
     def tree(self) -> str: """root line + one indented line per agent (role, state, budget, open, delegated, unread, services)."""
 ```
-Impl: `TextOrgTree`.
+Impl: `TextOrgTree` (7 collaborators: `AgentDirectory`, `CharterReader`, `MailboxReader`, `TaskQuery`, `BudgetQuery`, `AgentStates` and `ServiceNames`, the one question - `service_names` - it asks of
+`services.ServiceCatalog`, defined in the package's own `_ports.py`). Runtime field: `org_tree`. The tree prints no model: the line is `<name> [<role>] <state>  budget=.. open=.. delegated=.. unread=..`
+(`status` is golden). `Org._agent_line` and `Org._indent` are the prompts' (5 maps them to `prompts`), not the tree's: they stay in `PromptsMixin` until C-prompts. The fakes are `testing.FixedStates`,
+`testing.NamedServices` and `testing.FixedOrgTree` (the text a test of `cli` / `mcp_server` puts in); `testing.disk_world` / `memory_world` run the contract suite.
 
 ### 3.24 `prompts`
 

@@ -79,7 +79,6 @@ def test_a_retired_service_is_no_longer_listed(org: Org) -> None:
 # ----------------------------------------------------------------------------------- through the port of the runtime
 
 
-@pytest.mark.xfail(strict=True, reason="red: C-overview")
 def test_the_tree_is_the_text_of_the_port(org: Org) -> None:
     use(org, org_tree=FixedOrgTree("exactly this"))
     assert org.tree() == "exactly this"
