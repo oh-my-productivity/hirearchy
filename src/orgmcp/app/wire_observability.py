@@ -4,8 +4,8 @@ The seven ports of the package (the event, trace, metric and now queries, the in
 runtime. The parts they are made of (the scheduler report, the batches in flight, the queue, the recent events, the desk of root, one class per
 invariant, the targeted events) are private to the package and made here, inside the provider of the port that uses them.
 
-``event_queries_of``, ``trace_queries_of``, ``metric_queries_of``, ``now_queries_of``, ``integrity_checks_of``, ``renderer_of``, ``observe_text_of``,
-``trace_derivers_of``, ``message_history_of`` and ``run_collection_of`` serve the functions of ``observe.py`` that are still there (the legacy
+``event_queries_of``, ``trace_queries_of``, ``metric_queries_of``, ``now_queries_of``, ``integrity_checks_of``, ``renderer_of``, ``observe_text_of``, ``event_queries_sleeping``,
+``system_renderer``, ``trace_derivers_of`` and ``run_collection_of`` serve the functions of ``observe.py`` that are still there (the legacy
 module, the dashboard): they are handed an ``Org`` whose ``runtime`` tests replace (the clock, the scheduler status, the processes) and the
 dashboard's lenient ``Org`` replaces the mailboxes of, so each call builds the objects over the ports the runtime has *now*, as the functions they
 replace read them through the ``Org``. They go when the legacy functions do.
@@ -208,11 +208,6 @@ def trace_queries_of(runtime: OrgRuntime) -> TraceQueries:
 def metric_queries_of(runtime: OrgRuntime) -> MetricQueries:
     """``MetricQueries`` over the ports ``runtime`` has now."""
     return metric_queries(RuntimePorts(runtime))
-
-
-def message_history_of(runtime: OrgRuntime) -> MessageHistory:
-    """``MessageHistory`` over the message index ``runtime`` has now."""
-    return message_history(RuntimePorts(runtime))
 
 
 def trace_derivers_of(runtime: OrgRuntime) -> TraceDerivers:
