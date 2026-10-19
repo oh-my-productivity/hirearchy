@@ -9,7 +9,6 @@ from orgmcp.prompts._briefing import CappedMemory, PromptBriefing
 from orgmcp.prompts.testing import FixedMemory
 from orgmcp.settings.testing import MemoryOrgSettings
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 def world(cap: int | str = 5, memory: str | None = None) -> tuple[MemoryAgents, MemoryOrgSettings]:

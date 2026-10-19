@@ -26,7 +26,6 @@ from orgmcp.services import ServiceCatalog
 from orgmcp.settings import OrgSettings
 from orgmcp.strays import StrayRegistry
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 def test_the_runtime_has_the_three_texts(tmp_path: Path) -> None:
@@ -48,7 +47,6 @@ def test_an_override_replaces_the_port(tmp_path: Path) -> None:
     assert runtime.state_summarizer is summary and runtime.agent_whoami is who and runtime.run_prompt_builder is prompt
 
 
-@RED
 def test_whoami_is_built_over_the_summary_of_the_runtime(tmp_path: Path) -> None:
     box = MemoryMailbox()
     box.agents.put("ceo/AGENT.md", "---\nrole: Chief\n---\nRun.\n")
@@ -56,7 +54,6 @@ def test_whoami_is_built_over_the_summary_of_the_runtime(tmp_path: Path) -> None
     assert runtime.agent_whoami.whoami("ceo") == "S\n\n## Charter\nRun."
 
 
-@RED
 def test_every_collaborator_of_the_prompts_comes_from_the_runtime(tmp_path: Path) -> None:
     """The whole run prompt over fakes: nothing of the organization directory is read or written."""
     mail = memory_mailbox(tmp_path)

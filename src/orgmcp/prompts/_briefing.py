@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from ..agents import CharterReader
 from ..settings import OrgSettings
 from ._ports import Briefing, MemoryText
@@ -13,7 +15,15 @@ class CappedMemory(MemoryText):
         self._settings = settings
 
     def memory_text(self, addr: str) -> str:
-        raise NotImplementedError("red: C-prompts")
+        memory = self._charters.memory(addr).strip() or "(empty: this may be your first run)"
+        cap, words = int(cast("int | str", self._settings.config()["memory_max_words"])), len(memory.split())
+        if words > cap:
+            memory += (
+                f"\n\n**Your memory is {words} words, over the {cap}-word limit, and writes that keep it over "
+                f"the limit are refused. This run, condense it: rewrite {addr}/MEMORY.md (not append) with only what "
+                "your next run needs; move detail into files under your work/ directory.**"
+            )
+        return memory
 
 
 class PromptBriefing(Briefing):
@@ -23,4 +33,9 @@ class PromptBriefing(Briefing):
         self._memory = memory
 
     def briefing(self, addr: str) -> str:
-        raise NotImplementedError("red: C-prompts")
+        _, charter = self._charters.charter(addr)
+        memory = self._memory.memory_text(addr)
+        return (
+            f"{self._settings.rules()}\n\n# Your charter ({addr}/AGENT.md, owned by your parent)\n{charter}\n\n"
+            f"# Your memory ({addr}/MEMORY.md)\n{memory}"
+        )

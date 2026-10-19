@@ -6,7 +6,6 @@ import pytest
 
 from orgmcp.prompts._text import indent
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 def test_every_line_is_indented() -> None:

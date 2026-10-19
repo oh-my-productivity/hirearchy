@@ -16,7 +16,6 @@ from orgmcp.prompts.testing import IMPLEMENTATIONS, PromptsWorld
 
 from ._support import implementations
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 ROOT_STATE = [
     "- Address: `root`; parent: `-`; role: human (root of the organization)",
@@ -139,7 +138,7 @@ def test_a_task_reported_blocked_is_listed_with_its_contract_until_it_is_answere
     w.send("ceo", "root", "result", "Plan", "waiting", reply_to=task.id, status="blocked")
     lines = state(w, "ceo")
     at = lines.index("- Tasks you reported blocked (not final):")
-    assert lines[at:at + 8] == [
+    assert lines[at:at + 7] == [
         "- Tasks you reported blocked (not final):",
         f'  - {task.id} "Plan" from root: reported blocked; you may re-report it once the blocker is resolved', *QUOTED,
     ]

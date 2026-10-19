@@ -14,7 +14,6 @@ from orgmcp.prompts.testing import IMPLEMENTATIONS, PromptsWorld
 
 from ._support import implementations
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 @pytest.fixture(params=implementations(IMPLEMENTATIONS[Whoami]))

@@ -13,7 +13,6 @@ from orgmcp.prompts.testing import FixedAgentLines, FixedDelegations, FixedFiles
 
 from ._support import memory_box
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 class Parts:
@@ -22,7 +21,7 @@ class Parts:
         self.agents = box.agents
         self.budgets = FixedBudget(tasks, self.agents, self.agents)
         self.files, self.agent_line = FixedFiles(["- Files:", "  - F"]), FixedAgentLines()
-        self.held, self.delegations = FixedHeld(["  - T1", "    quoted"]), FixedDelegations(["  - D1"])
+        self.held, self.delegations = FixedHeld(["- Open tasks assigned to you:", "  - T1", "    quoted"]), FixedDelegations(["- Work you delegated that is still outstanding:", "  - D1"])
         self.summary = TextStateSummarizer(self.agents, self.agents, self.budgets, self.files, self.agent_line, self.held, self.delegations)
 
     def agent(self, addr: str, text: str) -> None:
@@ -63,19 +62,12 @@ def test_the_shown_ids_reach_the_held_tasks_and_none_means_an_empty_set(tmp_path
     assert p.held.asked == [("ceo", {"a", "b"}), ("ceo", frozenset())]
 
 
-def test_an_agent_with_no_tasks_says_none(tmp_path: Path) -> None:
+def test_the_task_blocks_are_the_lines_of_the_roles_after_the_reports_and_siblings(tmp_path: Path) -> None:
     p = Parts(tmp_path)
     p.agent("ceo", "---\nrole: Chief\n---\nx\n")
-    p.held.found, p.delegations.found = [], []
-    lines = p.summary.state_summary("ceo").split("\n")
-    assert lines[-2:] == ["- Open tasks assigned to you: none", "- Work you delegated that is still outstanding: none"]
-
-
-def test_blocked_tasks_follow_the_open_ones_in_the_same_block(tmp_path: Path) -> None:
-    p = Parts(tmp_path)
-    p.agent("ceo", "---\nrole: Chief\n---\nx\n")
-    p.held.found = ["  - T1", "- Tasks you reported blocked (not final):", "  - T2"]
-    assert p.summary.state_summary("ceo").split("\n")[-4:-1] == p.held.found
+    p.held.found = ["- Open tasks assigned to you: none", "- Tasks you reported blocked (not final):", "  - T2"]
+    p.delegations.found = ["- Work you delegated that is still outstanding: none"]
+    assert p.summary.state_summary("ceo").split("\n")[-4:] == [*p.held.found, *p.delegations.found]
 
 
 def test_root_has_no_budget_hiring_tools_or_files_and_no_siblings(tmp_path: Path) -> None:

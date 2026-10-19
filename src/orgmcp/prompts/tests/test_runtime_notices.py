@@ -8,7 +8,6 @@ from orgmcp.kernel import Message
 from orgmcp.prompts._notices import RuntimeNotices
 from orgmcp.prompts.testing import FixedSections, NamedServices, ToldOnce
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 BATCH = [Message(sender="root", to="ceo", type="note", title="t", body="b", id="20260101T000000000001-root-aaaa")]
 

@@ -61,7 +61,8 @@ class ContextRenderer(Protocol):
 @runtime_checkable
 class HeldTaskLines(Protocol):
     def lines(self, addr: str, shown: Collection[str]) -> list[str]:
-        """The bullet lines of the tasks ``addr`` holds: the open ones, and those it reported ``blocked`` (not final). A task in ``shown`` gets a
+        """The block of the tasks ``addr`` holds: ``- Open tasks assigned to you:`` (``none`` when there are none) with a line per open task and
+        the quote of its contract, then, when there are any, ``- Tasks you reported blocked (not final):`` the same way. A task in ``shown`` gets a
         pointer to the new messages instead of its quoted text."""
         ...
 
@@ -69,7 +70,8 @@ class HeldTaskLines(Protocol):
 @runtime_checkable
 class DelegationLines(Protocol):
     def lines(self, addr: str) -> list[str]:
-        """The bullet lines of the work ``addr`` delegated that is still outstanding, with the state of the report it went to."""
+        """The block ``- Work you delegated that is still outstanding:`` (``none`` when there is none) with a line per delegation and the state of
+        the report it went to."""
         ...
 
 

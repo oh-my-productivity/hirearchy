@@ -9,7 +9,6 @@ from orgmcp.kernel import OrgError
 from orgmcp.prompts._whoami import TextWhoami
 from orgmcp.prompts.testing import FixedStateSummary
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 def made(summary: FixedStateSummary) -> TextWhoami:

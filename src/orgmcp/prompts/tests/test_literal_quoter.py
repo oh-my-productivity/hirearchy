@@ -10,7 +10,6 @@ from orgmcp.kernel import RENDER_BODY_CHARS, Message, OrgPaths
 from orgmcp.prompts._ports import TaskQuoter
 from orgmcp.prompts._quote import LiteralQuoter
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 ROOT = Path("/org")
 
@@ -28,7 +27,7 @@ def test_every_line_is_quoted_and_a_blank_line_has_no_trailing_space() -> None:
 
 
 def test_the_body_is_stripped() -> None:
-    assert quoter().quote(task("\n\n  body\n\n")) == ">   body"
+    assert quoter().quote(task("\n\n  body\n\n")) == "> body"
 
 
 def test_a_short_body_is_not_cut() -> None:

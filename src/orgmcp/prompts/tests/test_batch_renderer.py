@@ -10,7 +10,6 @@ from orgmcp.prompts._batch import BatchRenderer
 from orgmcp.prompts._ports import ContextRenderer, TaskQuoter, UpstreamTasks
 from orgmcp.prompts.testing import FixedQuote, FixedUpstream
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 def at(n: int, sender: str) -> str:

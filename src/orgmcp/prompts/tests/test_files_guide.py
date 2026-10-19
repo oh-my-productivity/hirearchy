@@ -13,7 +13,6 @@ from orgmcp.kernel import OrgPaths
 from orgmcp.prompts._files import FilesGuide
 from orgmcp.prompts._ports import FilesLines
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 WORKSPACE_LINE = "  - Workspace (kiro read/write/shell, and the working directory of kiro tools): `{ws}`; relative paths in kiro tools resolve there."
 INPUTS_LINE = "  - Read-only inputs (kiro `read` or orgmcp `{read}` by absolute path): `{inputs}`. Never modify them."

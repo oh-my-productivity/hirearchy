@@ -17,4 +17,8 @@ class RuntimeNotices(RunNotices):
         self._sections = sections
 
     def notices(self, addr: str, batch: Sequence[Message]) -> str:
-        raise NotImplementedError("red: C-prompts")
+        notice = self._strays.take_notice(addr)
+        notice = f"\n{notice}\n" if notice else ""
+        if self._services.service_names(addr):  # only agents that offer a service get these sections
+            notice += self._sections.prompt_sections(addr, batch)
+        return notice

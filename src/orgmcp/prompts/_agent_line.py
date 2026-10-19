@@ -18,4 +18,8 @@ class StatusAgentLine(AgentLines):
         self._mail = mail
 
     def agent_line(self, addr: str) -> str:
-        raise NotImplementedError("red: C-prompts")
+        meta, _ = self._charters.charter(addr)
+        return (
+            f"{addr} [{meta.get('role', '?')}] {self._states.state(addr)}, budget {self._budgets.budget(addr)}, "
+            f"open tasks {len(self._tasks.open_tasks(addr))}, delegated {len(self._tasks.outstanding(addr))}, unread {self._mail.unread(addr)}"
+        )

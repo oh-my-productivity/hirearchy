@@ -16,7 +16,6 @@ from orgmcp.prompts.testing import IMPLEMENTATIONS, PromptsWorld
 
 from ._support import implementations
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 ORG_MD = "---\nmemory_max_words: 12\n---\nThe rules of this organization.\n"
 HEADINGS = ["# orgmcp run: you are", "# Your charter (", "# Your memory (", "# Your state", "# New messages for this run", "---\nHandle every new message"]

@@ -14,7 +14,6 @@ from orgmcp.prompts.testing import FixedStates
 
 from ._support import memory_box
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 def message(sender: str, to: str, kind: str, n: int, wake: bool = True) -> Message:

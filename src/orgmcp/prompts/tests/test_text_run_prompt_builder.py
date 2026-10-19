@@ -9,7 +9,6 @@ from orgmcp.kernel import Message, OrgError
 from orgmcp.prompts._run import TextRunPromptBuilder
 from orgmcp.prompts.testing import FixedBriefing, FixedNotices, FixedRenderer, FixedStateSummary
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 def message(n: int) -> Message:

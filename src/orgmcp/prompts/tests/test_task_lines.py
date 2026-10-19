@@ -14,11 +14,10 @@ from orgmcp.prompts.testing import FixedQuote, FixedStates
 
 from ._support import memory_box
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 def at(n: int, sender: str) -> str:
-    return f"20260101T0000000000{n:02d}-{sender}-aaaa"
+    return f"20260101T0000000000{n:02d}-{sender.replace('/', '-')}-aaaa"
 
 
 class Desk:
@@ -41,21 +40,23 @@ class Desk:
 # ---------------------------------------------------------------------------------------------------------------------- HeldTasks
 
 
-def test_no_task_no_line(tmp_path: Path) -> None:
-    assert Desk(tmp_path).held.lines("ceo", set()) == []
+def test_no_task_says_none(tmp_path: Path) -> None:
+    assert Desk(tmp_path).held.lines("ceo", set()) == ["- Open tasks assigned to you: none"]
 
 
 def test_an_open_task_has_a_line_and_its_quote_indented_by_four(tmp_path: Path) -> None:
     d = Desk(tmp_path)
     t = d.task(1, "root", "ceo", "Plan")
-    assert d.held.lines("ceo", set()) == [f'  - {t.id} "Plan" from root', "    QUOTE"]
+    assert d.held.lines("ceo", set()) == ["- Open tasks assigned to you:", f'  - {t.id} "Plan" from root', "    QUOTE"]
     assert d.quote.asked == [t]
 
 
 def test_a_task_in_the_new_messages_has_a_pointer_and_is_not_quoted(tmp_path: Path) -> None:
     d = Desk(tmp_path)
     t = d.task(1, "root", "ceo", "Plan")
-    assert d.held.lines("ceo", {t.id}) == [f'  - {t.id} "Plan" from root', "    (full text: see the new messages below)"]
+    assert d.held.lines("ceo", {t.id}) == [
+        "- Open tasks assigned to you:", f'  - {t.id} "Plan" from root', "    (full text: see the new messages below)",
+    ]
     assert d.quote.asked == []
 
 
@@ -71,7 +72,7 @@ def test_a_task_reported_blocked_follows_under_its_own_heading(tmp_path: Path) -
     blocked = d.task(2, "root", "ceo", "Stuck")
     d.result(3, blocked, "blocked")
     assert d.held.lines("ceo", set()) == [
-        f'  - {open_.id} "Open" from root', "    QUOTE",
+        "- Open tasks assigned to you:", f'  - {open_.id} "Open" from root', "    QUOTE",
         "- Tasks you reported blocked (not final):",
         f'  - {blocked.id} "Stuck" from root: reported blocked; you may re-report it once the blocker is resolved', "    QUOTE",
     ]
@@ -88,7 +89,13 @@ def test_a_blocked_task_in_the_new_messages_has_the_pointer(tmp_path: Path) -> N
 def test_a_task_reported_done_is_not_held(tmp_path: Path) -> None:
     d = Desk(tmp_path)
     d.result(2, d.task(1, "root", "ceo", "Done"), "done")
-    assert d.held.lines("ceo", set()) == []
+    assert d.held.lines("ceo", set()) == ["- Open tasks assigned to you: none"]
+
+
+def test_blocked_tasks_alone_leave_the_open_block_at_none(tmp_path: Path) -> None:
+    d = Desk(tmp_path)
+    d.result(2, d.task(1, "root", "ceo", "Stuck"), "blocked")
+    assert d.held.lines("ceo", set())[0] == "- Open tasks assigned to you: none"
 
 
 # ------------------------------------------------------------------------------------------------------------ OutstandingDelegations
@@ -104,11 +111,11 @@ def test_a_delegation_names_the_state_of_its_report_or_says_it_is_gone(tmp_path:
     states.words["ceo/eng"] = "running"
     a, b = d.task(1, "ceo", "ceo/eng", "Build"), d.task(2, "ceo", "ceo/old", "Gone")
     assert delegations(d, d.box.agents, states).lines("ceo") == [
-        f'  - {a.id} "Build" -> ceo/eng (running)', f'  - {b.id} "Gone" -> ceo/old (gone)',
+        "- Work you delegated that is still outstanding:", f'  - {a.id} "Build" -> ceo/eng (running)', f'  - {b.id} "Gone" -> ceo/old (gone)',
     ]
 
 
 def test_a_delegation_that_was_answered_is_not_outstanding(tmp_path: Path) -> None:
     d = Desk(tmp_path)
     d.result(2, d.task(1, "ceo", "ceo/eng", "Build"), "done")
-    assert delegations(d, d.box.agents, FixedStates()).lines("ceo") == []
+    assert delegations(d, d.box.agents, FixedStates()).lines("ceo") == ["- Work you delegated that is still outstanding: none"]

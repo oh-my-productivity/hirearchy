@@ -14,6 +14,8 @@ from orgmcp.kernel import Message
 from orgmcp.prompts import RunPromptBuilder, StateSummarizer, Whoami
 from orgmcp.prompts.testing import FixedRunPrompt, FixedStateSummary, FixedWhoami
 
+
+
 RED = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 

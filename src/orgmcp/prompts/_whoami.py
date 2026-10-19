@@ -13,4 +13,6 @@ class TextWhoami(Whoami):
         self._summary = summary
 
     def whoami(self, addr: str) -> str:
-        raise NotImplementedError("red: C-prompts")
+        a = self._agents.require(addr)
+        _, charter = self._charters.charter(a)
+        return f"{self._summary.state_summary(a)}\n\n## Charter\n{charter or '(root has no charter)'}"

@@ -9,7 +9,6 @@ from orgmcp.mail.testing import MemoryMailbox
 from orgmcp.prompts._ports import UpstreamTasks
 from orgmcp.prompts._upstream import SoleUpstreamTask
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: C-prompts")
 
 
 def at(n: int, sender: str = "root") -> str:
