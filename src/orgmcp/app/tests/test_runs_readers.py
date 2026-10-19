@@ -27,6 +27,7 @@ from orgmcp.runs._writer import FsRunLogWriter
 from orgmcp.runs.testing import MemoryRuns
 from orgmcp.runs.tests import _oracle
 from orgmcp.runs.tests._legacy import legacy
+from orgmcp.scheduler._orphans import LogRunNotes
 
 dashboard_data, health, observe, sched_module = legacy("dashboard_data"), legacy("health"), legacy("observe"), legacy("scheduler")
 
@@ -136,16 +137,16 @@ def test_orphans_of_a_dead_scheduler_are_settled_through_the_registry(org: Org, 
 def test_the_note_on_an_orphaned_run_goes_through_the_log_writer(org: Org, memory: MemoryRuns) -> None:
     path = memory.put_log("ceo", f"{T1}.log", "# run of ceo, 1 message(s)\n")
     use(org, run_log_writer=memory)
-    sched = sched_module.Scheduler(org, sleeper("0"), **SILENT)
-    sched._note_in_log({"log": str(path.relative_to(org.root))}, "killed: orphaned run of a scheduler that died")
-    sched._note_in_log({"pgid": 1}, "no log recorded: nothing to note")
+    notes = LogRunNotes(org.runtime.run_log_writer)
+    notes.note({"log": str(path.relative_to(org.root))}, "killed: orphaned run of a scheduler that died")
+    notes.note({"pgid": 1}, "no log recorded: nothing to note")
     assert memory.read_log(path) == b"# run of ceo, 1 message(s)\n\n# killed: orphaned run of a scheduler that died\n"
 
 
 def test_the_end_of_the_last_run_comes_from_the_log_reader(org: Org, memory: MemoryRuns) -> None:
     memory.set_mtime(memory.put_log("ceo", f"{T1}.log", ""), 1_800_000_000.0)
     use(org, run_log_reader=memory)
-    assert sched_module.Scheduler(org, sleeper("0"), **SILENT)._last_run_end("ceo") == 1_800_000_000.0
+    assert org.runtime.run_log_reader.last_end("ceo") == 1_800_000_000.0
 
 
 class SpyWriter(FsRunLogWriter):

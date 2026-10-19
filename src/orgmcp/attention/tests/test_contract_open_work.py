@@ -97,3 +97,32 @@ def test_a_run_in_flight_is_not_looked_at(w: AttentionWorld) -> None:
     w.begin_run("ceo")
     w.answer(task, "done", "ok")
     assert w.work.nothing_to_do() is True
+
+
+# ------------------------------------------------------------------------------ the scheduler's own view (D-sched-2)
+
+
+def test_a_run_of_the_scheduler_in_flight_is_something_to_do(w: AttentionWorld) -> None:
+    task = give(w)
+    w.begin_run("ceo")
+    w.answer(task, "done", "ok")
+    assert w.work.nothing_to_do(running={"ceo"}) is False
+
+
+def test_the_agents_running_or_blocked_do_not_count_as_able_to_start(w: AttentionWorld) -> None:
+    task = give(w)
+    w.answer(task, "done", "ok")  # answered before it was read: ceo still has the task in its inbox
+    assert w.work.nothing_to_do() is False
+    assert w.work.nothing_to_do(blocked={"ceo"}) is True  # an orphaned run of ceo may still be alive: it cannot start
+
+
+def test_with_the_cap_on_runs_spent_nobody_could_start(w: AttentionWorld) -> None:
+    task = give(w)
+    w.answer(task, "done", "ok")
+    assert w.work.nothing_to_do(can_start=False) is True
+    assert w.work.nothing_to_do(can_start=True) is False
+
+
+def test_an_open_root_task_is_work_whatever_the_scheduler_sees(w: AttentionWorld) -> None:
+    stalled_on_budget(w)
+    assert w.work.nothing_to_do(blocked={"ceo"}, can_start=False) is False

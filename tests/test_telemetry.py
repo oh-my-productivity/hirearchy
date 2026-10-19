@@ -19,7 +19,11 @@ from orgmcp import telemetry
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Message, Org, join_frontmatter, split_frontmatter
 from orgmcp.kernel.testing import FakeClock
+from orgmcp.eligibility import FailureCounter
+from orgmcp.eligibility.testing import MemoryFailureCounter
 from orgmcp.scheduler import Scheduler, ignore_runtime_files
+from orgmcp.scheduler.testing import ScriptedLadder
+from orgmcp.stalls import StallLadder
 from orgmcp.server import build_server
 from orgmcp.telemetry._sink import FsEventSink
 
@@ -957,9 +961,12 @@ def test_until_idle_and_once_modes(org):
     assert read_events(org, "scheduler.start")[-1]["mode"] == "once"
 
 
-def test_an_error_in_serve_is_the_exit_reason(org, monkeypatch):
-    sched = Scheduler(org, fake_runner("work"), **SILENT)
-    monkeypatch.setattr(sched, "tick", lambda max_runs=None: 1 / 0)
+def test_an_error_in_serve_is_the_exit_reason(org):
+    class Broken(MemoryFailureCounter):
+        def repair(self):
+            return 1 / 0
+
+    sched = Scheduler(org, fake_runner("work"), ports={FailureCounter: Broken()}, **SILENT)
     previous = signal.getsignal(signal.SIGTERM)
     try:
         with pytest.raises(ZeroDivisionError):
@@ -1000,13 +1007,10 @@ def test_heartbeat_interval_is_configurable(org):
     assert len(read_events(org, "scheduler.heartbeat")) == 2
 
 
-def test_a_failing_phase_is_an_error_event_once_per_change(org, monkeypatch):
-    sched = Scheduler(org, fake_runner("idle"), **SILENT)
-
-    def boom():
-        raise RuntimeError("kaput")
-
-    monkeypatch.setattr(sched, "_check_stalls", boom)
+def test_a_failing_phase_is_an_error_event_once_per_change(org):
+    ladder = ScriptedLadder()
+    ladder.fail = RuntimeError("kaput")
+    sched = Scheduler(org, fake_runner("idle"), ports={StallLadder: ladder}, **SILENT)
     for _ in range(4):
         sched.tick()
     errors = read_events(org, "scheduler.error")
