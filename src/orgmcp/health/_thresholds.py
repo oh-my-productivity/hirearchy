@@ -2,13 +2,19 @@
 
 from __future__ import annotations
 
+from ..settings import finite_number
 from ._ports import ConfigSource
-from .api import HealthThresholds
+from .api import HEALTH_DEFAULTS, HealthThresholds
 
 
 class SettingsHealthThresholds(HealthThresholds):
     def __init__(self, settings: ConfigSource) -> None:
-        pass  # red: C-health
+        self._settings = settings
 
     def thresholds(self) -> dict[str, float]:
-        raise NotImplementedError("red: C-health")
+        custom = self._settings.config().get("health")
+        merged = {**HEALTH_DEFAULTS, **(custom if isinstance(custom, dict) else {})}
+        for key, default in HEALTH_DEFAULTS.items():
+            number = finite_number(merged[key])
+            merged[key] = default if number is None else number
+        return merged

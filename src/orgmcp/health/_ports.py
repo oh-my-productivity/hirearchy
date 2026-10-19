@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import os
 from collections.abc import Mapping, Sequence
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Protocol, runtime_checkable
 
 from ..kernel import JsonObject, Message, OrgLayout
@@ -47,7 +48,7 @@ class ClientRework(Protocol):
 
 class FsCharterStamp(CharterStamp):
     def __init__(self, paths: OrgLayout) -> None:
-        pass  # red: C-health
+        self._paths = paths
 
     def modified(self, addr: str) -> datetime:
-        raise NotImplementedError("red: C-health")
+        return datetime.fromtimestamp(os.stat(self._paths.agent_dir(addr) / "AGENT.md").st_mtime, timezone.utc)

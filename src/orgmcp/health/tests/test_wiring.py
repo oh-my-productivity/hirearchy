@@ -9,8 +9,6 @@ from orgmcp.health._analyzer import FileHealthAnalyzer
 from orgmcp.health._render import TextHealthRenderer
 from orgmcp.health._thresholds import SettingsHealthThresholds
 
-from ._support import RED
-
 
 def test_the_runtime_builds_the_real_classes(scenario: Any) -> None:
     runtime = scenario.runtime
@@ -24,6 +22,5 @@ def test_each_port_is_built_once_per_organization(scenario: Any) -> None:
     assert runtime.health_analyzer is runtime.health_analyzer and runtime.health_thresholds is runtime.health_thresholds
 
 
-@RED
 def test_the_analyzer_reads_the_thresholds_of_the_runtime(scenario: Any) -> None:
     assert scenario.runtime.health_thresholds.thresholds()["stuck_after_seconds"] == 1800

@@ -10,10 +10,6 @@ from orgmcp.health import agent_health, org_health, render_text
 
 from . import _scenario
 from ._golden import expected
-from ._support import RED
-
-pytestmark = RED
-
 NOW = {"4000": _scenario.at(4000), "3d": _scenario.at(3 * 86400)}
 
 

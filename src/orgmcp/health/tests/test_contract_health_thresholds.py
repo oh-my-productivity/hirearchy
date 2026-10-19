@@ -13,9 +13,7 @@ import pytest
 from orgmcp.health import HEALTH_DEFAULTS, HealthThresholds
 from orgmcp.health.testing import IMPLEMENTATIONS, ThresholdsHarness
 
-from ._support import RED, implementations
-
-pytestmark = RED
+from ._support import implementations
 
 
 @pytest.fixture(params=implementations(IMPLEMENTATIONS[HealthThresholds]))

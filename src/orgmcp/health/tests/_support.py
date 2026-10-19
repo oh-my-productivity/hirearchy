@@ -10,15 +10,12 @@ from _pytest.mark.structures import ParameterSet
 
 from orgmcp.health.testing import HealthWorld, at
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-health", raises=NotImplementedError)  # removed from each file by the step that makes it pass
+__all__ = ["answer", "at", "give", "implementations", "runs"]
 
 
 def implementations(factories: Sequence[Callable[[Path], object]]) -> list[ParameterSet]:
     """The factories of one port as test parameters, named by the factory."""
     return [pytest.param(f, id=f.__name__) for f in factories]
-
-
-__all__ = ["RED", "answer", "at", "give", "implementations", "runs"]
 
 
 def give(w: HealthWorld, to: str = "ceo/eng", when: float = 10, *, budget: int = 5, sender: str = "root", revises: str | None = None,

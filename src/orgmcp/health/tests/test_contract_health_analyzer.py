@@ -1,6 +1,6 @@
 """Contract of ``HealthAnalyzer``: the metrics of an agent and the totals of a branch, over mailboxes, run logs and flag files on disk and in memory.
 
-The flags and their thresholds are in ``test_flags_*.py`` and ``test_client_rework.py``; they run over the same two worlds."""
+The ``w`` fixture (``conftest.py``) is an organization of ``ceo`` and ``ceo/eng`` over each of ``testing.IMPLEMENTATIONS[HealthAnalyzer]``. The flags and their thresholds are in ``test_flags_*.py`` and ``test_client_rework.py``; they run over the same two worlds."""
 
 from __future__ import annotations
 
@@ -15,18 +15,7 @@ from orgmcp.health import HEALTH_DEFAULTS, FLAGS, AgentHealth, HealthAnalyzer, O
 from orgmcp.health.testing import IMPLEMENTATIONS, HealthWorld, org_md
 from orgmcp.kernel import OrgError
 
-from ._support import RED, answer, at, give, implementations, runs
-
-pytestmark = RED
-
-
-@pytest.fixture(params=implementations(IMPLEMENTATIONS[HealthAnalyzer]))
-def w(request: pytest.FixtureRequest, tmp_path: Path) -> HealthWorld:
-    made = cast(Callable[[Path], HealthWorld], request.param)(tmp_path)
-    assert isinstance(made.analyzer, HealthAnalyzer)
-    made.agent("ceo", 0)
-    made.agent("ceo/eng", 0)
-    return made
+from ._support import answer, at, give, implementations, runs
 
 
 # ------------------------------------------------------------------------------------------------------------------------ the guards
@@ -54,7 +43,7 @@ def test_the_address_is_normalized(w: HealthWorld) -> None:
 
 def test_an_agent_that_has_done_nothing(w: HealthWorld) -> None:
     assert w.analyzer.agent_health("ceo/eng", at(100)) == AgentHealth(
-        addr="ceo/eng", depth=2, state="idle", budget_left=0, budget_received=0, runs_used=0, tasks_received=0, open_tasks=0,
+        addr="ceo/eng", depth=2, state="idle", budget_left=10, budget_received=0, runs_used=0, tasks_received=0, open_tasks=0,
         oldest_open_age=None, done=0, failed=0, blocked=0, runs_per_task=None, rework=0, empty_runs=0, last_activity=None,
         since_activity=None, flags={}, failed_runs=0, runtime_runs=0, client_rework=0,
     )

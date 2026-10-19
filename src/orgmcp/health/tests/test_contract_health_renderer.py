@@ -10,10 +10,6 @@ import pytest
 from orgmcp.health import AgentHealth, BranchHealth, HealthRenderer, OrgHealth
 from orgmcp.health._render import TextHealthRenderer
 
-from ._support import RED
-
-pytestmark = RED
-
 NOW = datetime(2026, 1, 1, 12, 0, tzinfo=timezone.utc)
 
 

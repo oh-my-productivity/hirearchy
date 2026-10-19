@@ -10,10 +10,6 @@ from orgmcp.health._rework import MailClientRework
 from orgmcp.kernel import Message, latest_results
 from orgmcp.mail.testing import MailHarness, MemoryMailbox, memory_mailbox
 
-from ._support import RED
-
-pytestmark = RED
-
 
 def build(tmp_path: Path) -> tuple[MailHarness, MailClientRework]:
     mail = memory_mailbox(tmp_path)

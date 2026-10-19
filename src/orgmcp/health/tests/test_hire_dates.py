@@ -14,10 +14,6 @@ from orgmcp.health._ports import CharterStamp, FsCharterStamp, HireDates
 from orgmcp.health.testing import MemoryCharterStamps, at
 from orgmcp.kernel import OrgPaths
 
-from ._support import RED
-
-pytestmark = RED
-
 WRITTEN = datetime(2026, 3, 4, 5, 6, 7, tzinfo=timezone.utc)
 
 

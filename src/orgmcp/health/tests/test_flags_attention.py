@@ -7,9 +7,7 @@ from __future__ import annotations
 from orgmcp.health import FLAGS
 from orgmcp.health.testing import HealthWorld
 
-from ._support import RED, at, give, runs
-
-pytestmark = RED
+from ._support import at, give, runs
 
 ENG = "ceo/eng"
 

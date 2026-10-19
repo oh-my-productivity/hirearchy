@@ -7,9 +7,7 @@ from __future__ import annotations
 
 from orgmcp.health.testing import HealthWorld, org_md
 
-from ._support import RED, answer, at, give, runs
-
-pytestmark = RED
+from ._support import answer, at, give, runs
 
 ENG = "ceo/eng"
 FAILED = "# run of ceo/eng, 1 message(s)\n# senders: root\n\n# exit 1 after 3s\n"
