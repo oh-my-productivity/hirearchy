@@ -11,6 +11,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from orgmcp.app import Org
+from orgmcp.kernel import Message
 
 ROOT = "root"
 ENG = "ceo/eng"
@@ -48,7 +49,7 @@ def drain(org: Org, addr: str) -> None:
     org.end_run(addr, ok=True)
 
 
-def served(org: Org) -> tuple[object, object]:
+def served(org: Org) -> tuple[Message, Message]:
     """root -> ceo task (handled in an earlier run) -> ceo delegated to eng; returns (the ceo's task, the delegation)."""
     task = org.delegate(ROOT, "ceo", "Strict blurb", "Write a blurb about plants.", CRITERIA, ["ceo/work/brief.md"], budget=20)
     drain(org, "ceo")
@@ -56,9 +57,11 @@ def served(org: Org) -> tuple[object, object]:
     return task, sub
 
 
-def _answer(org: Org, sub: object) -> str:
-    result = org.report(ENG, sub.id, "done", "35 words, acrostic ok")  # type: ignore[attr-defined]
-    return org.run_prompt("ceo", [org.find_received("ceo", result.id)])  # type: ignore[list-item]
+def _answer(org: Org, sub: Message) -> str:
+    result = org.report(ENG, sub.id, "done", "35 words, acrostic ok")
+    received = org.find_received("ceo", result.id)
+    assert received is not None
+    return org.run_prompt("ceo", [received])
 
 
 def root_whoami(org: Org) -> str:
@@ -77,19 +80,19 @@ def link_to_the_open_task(org: Org) -> str:
 
 def link_to_a_blocked_task(org: Org) -> str:
     task, sub = served(org)
-    org.report("ceo", task.id, "blocked", "waiting for the draft")  # type: ignore[attr-defined]
+    org.report("ceo", task.id, "blocked", "waiting for the draft")
     return _answer(org, sub)
 
 
 def link_to_a_done_task(org: Org) -> str:
     task, sub = served(org)
-    org.report("ceo", task.id, "done", "all good")  # type: ignore[attr-defined]
+    org.report("ceo", task.id, "done", "all good")
     return _answer(org, sub)
 
 
 def link_to_a_failed_task(org: Org) -> str:
     task, sub = served(org)
-    org.report("ceo", task.id, "failed", "gave up")  # type: ignore[attr-defined]
+    org.report("ceo", task.id, "failed", "gave up")
     return _answer(org, sub)
 
 
@@ -103,15 +106,15 @@ def no_link_when_ambiguous(org: Org) -> str:
 
 def a_blocked_task_shown_in_the_batch(org: Org) -> str:
     task, _ = served(org)
-    org.report("ceo", task.id, "blocked", "waiting for the draft")  # type: ignore[attr-defined]
-    return org.state_summary("ceo") + "\n=====\n" + org.state_summary("ceo", {task.id})  # type: ignore[attr-defined]
+    org.report("ceo", task.id, "blocked", "waiting for the draft")
+    return org.state_summary("ceo") + "\n=====\n" + org.state_summary("ceo", {task.id})
 
 
 def a_long_task_is_cut(org: Org) -> str:
     big = org.delegate(ROOT, "ceo", "Huge", "goal", "HEAD\n" + "filler line\n" * 2500 + "TAIL-MARKER", budget=20)
     first = org.run_prompt("ceo", org.begin_run("ceo"))
     org.end_run("ceo", ok=True)
-    return first + "\n=====\n" + org.run_prompt("ceo", []) + f"\n=====\n{big.id}"  # type: ignore[attr-defined]
+    return first + "\n=====\n" + org.run_prompt("ceo", []) + f"\n=====\n{big.id}"
 
 
 def a_redelivered_batch(org: Org) -> str:
