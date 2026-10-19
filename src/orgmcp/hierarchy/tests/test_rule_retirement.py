@@ -23,9 +23,6 @@ from orgmcp.templates.testing import RecordingNotices
 WORKER = "---\nrole: W\n---\n# Role\n"
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-hierarchy")
-
-
 class Log:
     """The order in which the spies were asked."""
 
@@ -154,7 +151,7 @@ def test_the_archive_stamp_is_the_injected_clock_s() -> None:
     rig = Rig()
     rig.clock.advance(86400)
     rig.retirement.retire("ceo", "eng", "why")
-    assert rig.log.entries == ["archive ceo/eng 20310103T030405"]
+    assert rig.log.entries == ["budget ceo/eng", "archive ceo/eng 20310103T030405"]
 
 
 def test_a_task_the_team_owes_to_somebody_outside_is_failed_and_one_inside_is_not() -> None:

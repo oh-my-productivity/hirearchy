@@ -20,9 +20,6 @@ MGR, W = "ceo/mgr", "ceo/mgr/w"
 STAMP = "20261018T100000"  # the clock of the worlds, as the archive names it
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-hierarchy")
-
-
 @pytest.fixture(params=IMPLEMENTATIONS[Retirement], ids=lambda factory: factory.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> HierarchyWorld:
     made = make(request, tmp_path)
@@ -88,7 +85,8 @@ def test_nobody_else_can_be_retired(w: HierarchyWorld) -> None:
     team(w)
     direct = "you can only retire your direct reports"
     assert refusal(w, "ceo", W) == direct
-    assert refusal(w, ENG, "ceo") == direct
+    assert refusal(w, ENG, "ceo") == "no such agent: ceo/eng/ceo"  # a short name is a report of the actor
+    assert refusal(w, MGR, "root") == "no such agent: ceo/mgr/root"
     assert refusal(w, MGR, ENG) == direct
     assert refusal(w, "ceo", "mgr/w") == "no such agent: mgr/w"
     assert refusal(w, "ceo", "ceo") == "no such agent: ceo/ceo"
@@ -185,7 +183,7 @@ def test_the_unspent_runs_of_the_whole_team_go_back_to_the_parent(w: HierarchyWo
 
 def test_the_refund_is_one_note_from_the_runtime_that_wakes_nobody(w: HierarchyWorld) -> None:
     team(w)
-    before = len(w.delivered)
+    before, unread = len(w.delivered), w.mail.unread("ceo")  # the grant of root is still unread
     w.retirement.retire_team("ceo", "mgr", "restructuring")
     (note,) = w.delivered[before:]
     assert (note.sender, note.to, note.type, note.budget, note.wake) == (RUNTIME, "ceo", "note", 7, False)
@@ -193,7 +191,7 @@ def test_the_refund_is_one_note_from_the_runtime_that_wakes_nobody(w: HierarchyW
     assert note.body == (
         "`ceo/mgr` and its team were retired by ceo (restructuring). Their unspent budget, 7 run(s), is returned to you with this note."
     )
-    assert note.id in [m.id for m in w.inbox("ceo")] and w.mail.unread("ceo") == 0 and not w.mail.has_inflight("ceo")
+    assert note.id in [m.id for m in w.inbox("ceo")] and w.mail.unread("ceo") == unread and not w.mail.has_inflight("ceo")
 
 
 def test_the_actor_named_in_the_note_is_the_one_who_retired(w: HierarchyWorld) -> None:
