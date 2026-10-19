@@ -652,8 +652,12 @@ class AllocationPolicy(Protocol):
 class BudgetReclaimer(Protocol):
     def reclaim(self, actor: str, report: str, budget: int | None = None) -> Message: """Pull unspent budget back from an idle direct report."""
 ```
-Impl: `DerivedBudgetQuery(MailboxReader, RunLogReader, AgentDirectory, CharterReader, TaskQuery)`, `ReserveAllocationPolicy`,
-`NoteBudgetReclaimer(MessageDelivery, BudgetQuery, TaskQuery, MailboxReader, AgentDirectory)`; fakes `FixedBudget`.
+Impl: `DerivedBudgetQuery(MailboxReader, RunCounter, AgentDirectory, CharterReader, TaskQuery)`, `ReserveAllocationPolicy(BudgetQuery, TaskQuery,
+MailboxReader, OrgSettings)`, `NoteBudgetReclaimer(MessageDelivery, BudgetQuery, TaskQuery, MailboxReader, AgentDirectory)`; fakes `FixedBudget`
+(numbers a test sets; `MovingDelivery` moves them with the messages delivered through it) and `BudgetWorld`, the harness of the contract suites.
+`RunCounter` (`count(addr) -> int`) is budget's own, narrower port for the one thing it needs of `RunLogReader` (any `RunLogReader` is one); the
+dashboard's `LenientOrg` hands its per-refresh cache of the run count through it (`wire_budget.lenient`). The arithmetic and the words of
+`delegable` / `grant_hint` are the pure functions of `budget/_hint.py`, shared by `DerivedBudgetQuery` and `FixedBudget`.
 
 ### 3.19 `hierarchy`
 
@@ -1267,7 +1271,7 @@ flowchart BT
 | `delivery` | `mail` | MailboxWriter |
 | `delivery` | `traces` | TraceStamper |
 | `budget` | `agents` | AgentDirectory, CharterReader |
-| `budget` | `runs` | RunLogReader |
+| `budget` | `runs` | RunLogReader (as the narrower `RunCounter`) |
 | `budget` | `settings` | OrgSettings |
 | `budget` | `mail` | MailboxReader, TaskQuery |
 | `budget` | `delivery` | MessageDelivery |
