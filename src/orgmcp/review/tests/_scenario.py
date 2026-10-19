@@ -98,7 +98,8 @@ def notes_text(org: Any) -> str:
 
 
 def ledger_text(org: Any) -> str:
-    return (org.root / ".runtime" / "reviews.json").read_text(encoding="utf-8")
+    text: str = (org.root / ".runtime" / "reviews.json").read_text(encoding="utf-8")
+    return text
 
 
 def observed(org: Any, review: Any) -> dict[str, str]:

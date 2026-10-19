@@ -13,44 +13,21 @@ a direct report has a problem it has not been told about, and each note costs th
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Any
 
-from . import templates
-from .core import ROOT, Org, utcnow
-from .health import _aware, _parse_time, config_number, org_health
+from .. import templates
+from ..health import AgentHealth, OrgHealth, config_number, org_health
+from ..kernel import ROOT
+from ..kernel import aware as _aware
+from ..kernel import parse_time as _parse_time
+from .api import Note, Review
 
+Org = Any  # the facade (a feature may not import it): the functions below take whatever has its methods
 LEDGER = "reviews"
 
 
-@dataclass
-class Note:
-    to: str
-    title: str
-    body: str
-
-
-@dataclass
-class Review:
-    at: datetime
-    runs: int  # runs used across the organization when the review ran
-    flagged: int  # agents with at least one flag
-    notes: list[Note] = field(default_factory=list)
-    notified: dict[str, list[str]] = field(default_factory=dict)  # recipient -> "agent:flag" pairs it knows about
-    skipped: dict[str, str] = field(default_factory=dict)  # manager with news -> why it was not written to
-
-    def render(self, dry_run: bool = False) -> str:
-        """What was (or, for a dry run, would be) sent to whom."""
-        if not self.notes:
-            return f"{self.flagged} flagged agent(s); nothing to send"
-        verb = "would send" if dry_run else "sent"
-        out = [f"{self.flagged} flagged agent(s); {verb} {len(self.notes)} note(s)"]
-        for n in self.notes:
-            out.append(f"\n-> {n.to}: {n.title}\n" + "\n".join(("   " + line).rstrip() for line in n.body.splitlines()))
-        return "\n".join(out)
-
-
-def read_ledger(org: Org) -> dict | None:
+def read_ledger(org: Org) -> dict[str, Any] | None:
     """The reviews ledger normalised to {"at", "runs", "notified"}; None when there is none or it is malformed."""
     ledger = org.ledger(LEDGER)
     if not isinstance(ledger, dict) or not ledger:
@@ -73,7 +50,7 @@ def total_runs(org: Org) -> int:
 
     Retired agents are included, so retiring never moves the counter backwards (and never postpones a review).
     """
-    return sum(org.runs_used(a) for a in org.agents()) + org.runtime.retired_archive.run_count()
+    return int(sum(org.runs_used(a) for a in org.agents()) + org.runtime.retired_archive.run_count())
 
 
 def review_if_due(org: Org, now: datetime) -> Review | None:
@@ -97,7 +74,7 @@ def review_if_due(org: Org, now: datetime) -> Review | None:
 
 def review(org: Org, now: datetime | None = None, dry_run: bool = False) -> Review:
     """Review the organization now. With ``dry_run`` nothing is sent and the ledger is left alone."""
-    now = _aware(now) or utcnow()
+    now = _aware(now) or datetime.now(timezone.utc)
     health = org_health(org, ROOT, now)
     by_addr = {h.addr: h for h in health.agents}
     previous = (read_ledger(org) or {}).get("notified", {})
@@ -156,7 +133,7 @@ def _cannot_afford(org: Org, manager: str) -> str:
     return ""
 
 
-def _pairs(org: Org, health, by_addr: dict, manager: str) -> dict[str, str]:
+def _pairs(org: Org, health: OrgHealth, by_addr: dict[str, AgentHealth], manager: str) -> dict[str, str]:
     """Problems of a manager's direct reports: "agent:flag" -> rendered item. Teams add their worst flag."""
     out: dict[str, str] = {}
     for report in org.children(manager):
