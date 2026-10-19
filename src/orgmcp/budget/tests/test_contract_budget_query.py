@@ -16,10 +16,10 @@ from orgmcp.kernel import Message
 from ._support import assign, grant, make, report
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-budget")
+RED = pytest.mark.xfail(strict=True, reason="red: B-budget")  # the derived query is not there yet; the fake passes
 
 
-@pytest.fixture(params=IMPLEMENTATIONS[BudgetQuery], ids=lambda factory: factory.__name__)
+@pytest.fixture(params=[pytest.param(f, id=f.__name__, marks=[] if f.__name__ == "fixed_world" else [RED]) for f in IMPLEMENTATIONS[BudgetQuery]])
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> BudgetWorld:
     made = make(request, tmp_path)
     assert isinstance(made.query, BudgetQuery)

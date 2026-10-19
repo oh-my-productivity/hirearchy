@@ -53,13 +53,19 @@ class FixedBudget(BudgetQuery):
         self.transfer(addr, RUNTIME, runs)
 
     def budget(self, addr: str) -> int | None:
-        raise NotImplementedError
+        a = norm(addr)
+        return None if a == ROOT else self.held.get(a, 0)
 
     def delegable(self, addr: str) -> tuple[int, int, int]:
-        raise NotImplementedError
+        budget = self.budget(addr) or 0
+        out = len(self._tasks.outstanding(addr))
+        return budget, out, most_delegable(budget, out)
 
     def grant_hint(self, addr: str) -> str:
-        raise NotImplementedError
+        if not self._agents.exists(addr) or not self._charters.charter(addr)[0].get("can_hire"):
+            return ""
+        budget, out, _ = self.delegable(addr)
+        return grant_hint_text(addr, budget, out)
 
 
 class MovingDelivery(MessageDelivery):

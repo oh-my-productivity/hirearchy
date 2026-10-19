@@ -7,9 +7,6 @@ import pytest
 from orgmcp.budget._hint import grant_hint_text, most_delegable
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-budget")
-
-
 @pytest.mark.parametrize(
     ("budget", "outstanding", "most"),
     [(3, 0, 2), (2, 1, 0), (3, 1, 1), (1, 0, 0), (0, 0, 0), (-2, 0, 0), (5, 3, 1), (4, 2, 1), (10, 0, 9)],
