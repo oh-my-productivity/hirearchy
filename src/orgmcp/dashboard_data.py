@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import core, observe, progress as prog, services
-from .app import wire_agents, wire_mail
+from .app import wire_agents, wire_budget, wire_mail
 from .core import BOXES, DEFAULT_CONFIG, ROOT, Message, Org, OrgError, _visible, latest_results, split_frontmatter
 from .dashboard_events import EventLine, describe, event_lines
 from .health import _aware, _stamp, config_number, org_health
@@ -89,6 +89,8 @@ class LenientOrg(Org):
         # the caching of the mailboxes (their unreadable files reported in ``bad`` too) the one of the mail package
         self.runtime = wire_agents.lenient(self.runtime, self, self._bad_misc)
         self.runtime, self._mailbox = wire_mail.lenient(self.runtime, self)
+        # the budget is derived from those boxes and agents, and its run count is the cached ``runs_used`` of this class
+        self.runtime = wire_budget.lenient(self.runtime, self.runs_used)
 
     @property
     def bad(self) -> dict[str, str]:
