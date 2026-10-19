@@ -2,8 +2,8 @@
 
 The expected texts in ``expected/`` were captured from the flat module ``cli.py`` (and ``cli_obs.py``) before the package existed: for every command
 line of ``SCENARIOS`` the standard output, the standard error and the exit code of the command, with the machine-specific parts of the text replaced
-by placeholders. This module has no relative import and imports ``orgmcp`` only inside functions, so that the capture could run against the tree
-of that commit; the tests (``test_golden_commands``) run the same scenarios against the package.
+by placeholders (the capture ran this module against the tree of that commit, where the worlds were built with ``orgmcp.app.Org`` directly; the tests
+run the same scenarios against the package).
 """
 
 from __future__ import annotations
@@ -117,9 +117,11 @@ class World:
 
 def _team(tmp: Path, clock: FixedClock) -> Path:
     """root -> ceo (manager) -> eng, an open task of root, a note in root's inbox, a service of ceo."""
-    from orgmcp.core import ROOT, Org
+    from orgmcp.kernel import ROOT
 
-    org = Org.init(tmp / "org", "Golden mission: ship the thing.", {"poll_seconds": 0.05})
+    from ._org import facade
+
+    org = facade().init(tmp / "org", "Golden mission: ship the thing.", {"poll_seconds": 0.05})
     clock.tick()
     org.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)
     org.hire("ceo", "eng", "Engineer", "Build things.")
@@ -133,15 +135,17 @@ def _team(tmp: Path, clock: FixedClock) -> Path:
         acceptance=["The note has a title."], deliverable={"description": "The note", "format": "markdown"}, budget=4,
     )
     clock.tick()
-    return org.root
+    return Path(org.root)
 
 
 def _delivered(tmp: Path, clock: FixedClock) -> Path:
     """``_team`` plus a request of the service that the ceo has answered: something to give feedback on."""
-    from orgmcp.core import ROOT, Org
+    from orgmcp.kernel import ROOT
+
+    from ._org import facade
 
     root = _team(tmp, clock)
-    org = Org(root)
+    org = facade()(root)
     request = org.request(ROOT, "weekly", {"topic": "tests"}, title="Weekly")
     clock.tick()
     org.begin_run("ceo")
@@ -163,9 +167,9 @@ def _old_rules(tmp: Path, clock: FixedClock) -> Path:
 
 
 def _fresh(tmp: Path, clock: FixedClock) -> Path:
-    from orgmcp.core import Org
+    from ._org import facade
 
-    return Org.init(tmp / "org", "Fresh mission.", {"poll_seconds": 0.05}).root
+    return Path(facade().init(tmp / "org", "Fresh mission.", {"poll_seconds": 0.05}).root)
 
 
 def _none(tmp: Path, clock: FixedClock) -> Path:
@@ -379,9 +383,11 @@ def _extras(world: World) -> dict[str, str]:
     if request.is_file():
         extras["request_id"] = request.read_text(encoding="utf-8")
     if (world.org / "ORG.md").is_file():
-        from orgmcp.core import ROOT, Org
+        from orgmcp.kernel import ROOT
 
-        tasks = [m.id for m in Org(world.org).sent(ROOT) if m.type == "task"]
+        from ._org import facade
+
+        tasks = [m.id for m in facade()(world.org).sent(ROOT) if m.type == "task"]
         extras["task_id"] = min(tasks) if tasks else "no-task"
     return extras
 
@@ -393,14 +399,14 @@ def argv_of(scenario: Scenario, world: World) -> list[str]:
 
 def execute(label: str, base: Path, main: Callable[[list[str]], None]) -> str:
     """The golden text of the command line ``SCENARIOS[label]`` run by ``main`` in a new world below the empty directory ``base``."""
-    from orgmcp.app import wiring
+    from ._org import process_resources
 
     scenario = SCENARIOS[label]
     tmp, home = base / "t", base / "home"
     tmp.mkdir()
     home.mkdir()
     before = Path.cwd()
-    wiring.process_resources().reset()
+    process_resources().reset()
     try:
         with pytest.MonkeyPatch.context() as mp:
             clock = install(mp)
@@ -418,7 +424,7 @@ def execute(label: str, base: Path, main: Callable[[list[str]], None]) -> str:
             return text_of(outcome, normalizer(tmp, home))
     finally:
         os.chdir(before)
-        wiring.process_resources().reset()
+        process_resources().reset()
 
 
 def help_text(main: Callable[[list[str]], None], *command: str) -> str:

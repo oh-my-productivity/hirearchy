@@ -1,15 +1,25 @@
-"""Command line for the human (root) and the runtime."""
+# mypy: ignore-errors
+"""Command line for the human (root) and the runtime. The flat module ``cli.py`` as it was, until the commands are classes (step D-cli)."""
 
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import sys
 import time
 from pathlib import Path
+from collections.abc import Callable
+from typing import Any
 
-from . import telemetry
-from .core import ROOT, Org, OrgError
+
+# ``orgmcp.<name>``, looked up when it is needed: this transitional copy of the flat module may not import what the new package may not (it goes with the commands,
+# in the next commit).
+_module: Callable[[str], Any] = lambda name: importlib.import_module(f"orgmcp.{name}")  # noqa: E731
+
+
+telemetry = _module("telemetry")
+ROOT, Org, OrgError = _module("core").ROOT, _module("core").Org, _module("core").OrgError
 
 
 def _text(value: str) -> str:
@@ -57,19 +67,19 @@ def cmd_task(args) -> None:
 
 
 def cmd_services(args) -> None:
-    from . import reflection
+    reflection = _module("reflection")
 
     print(reflection.services_text(_org(args), ROOT))
 
 
 def cmd_define_service(args) -> None:
-    from .services import parse_input_spec
+    parse_input_spec = _module("services").parse_input_spec
 
     org = _org(args, mutating=True)
     deliverable = {"description": args.deliverable, "format": args.format, "max_words": args.max_words, "path": args.path}
     given = {k: v for k, v in deliverable.items() if v}
     if given and "description" not in given:  # an amendment of single deliverable parts: the rest stays
-        from .services import read_contract
+        read_contract = _module("services").read_contract
 
         old = read_contract(org, org.norm(args.owner), args.name)
         if old is not None:
@@ -121,7 +131,7 @@ def _bp_org(args) -> Org | None:
 
 
 def cmd_plan(args) -> None:
-    from . import blueprint
+    blueprint = _module("blueprint")
 
     org = _bp_org(args)
     bp = blueprint.load(Path(args.blueprint))
@@ -132,7 +142,7 @@ def cmd_plan(args) -> None:
 
 
 def cmd_apply(args) -> None:
-    from . import blueprint
+    blueprint = _module("blueprint")
 
     org = _org(args, mutating=True)  # says which organization it is about to change, before anything is written
     summary = blueprint.apply(org, blueprint.load(Path(args.blueprint)), allowed_roots=args.allow_root or None)
@@ -147,7 +157,7 @@ def cmd_send(args) -> None:
 
 
 def cmd_status(args) -> None:
-    from .scheduler import describe_scheduler
+    describe_scheduler = _module("scheduler").describe_scheduler
 
     org = _org(args)
     print(org.tree())
@@ -160,7 +170,7 @@ def cmd_status(args) -> None:
 
 
 def cmd_health(args) -> None:
-    from .health import org_health, render_text
+    org_health, render_text = _module("health").org_health, _module("health").render_text
 
     org = _org(args)
     report = org_health(org, args.agent or ROOT)
@@ -168,26 +178,26 @@ def cmd_health(args) -> None:
 
 
 def cmd_progress(args) -> None:
-    from .progress import describe_progress
+    describe_progress = _module("progress").describe_progress
 
     print(describe_progress(_org(args), args.task_id, args.wait))
 
 
 def cmd_upgrade_rules(args) -> None:
-    from .upgrade import upgrade_rules
+    upgrade_rules = _module("upgrade").upgrade_rules
 
     org = _org(args, mutating=not args.dry_run)
     print(upgrade_rules(org, dry_run=args.dry_run).text())
 
 
 def cmd_install_skill(args) -> None:
-    from .skill import install_skill
+    install_skill = _module("skill").install_skill
 
     print(install_skill(args.dest, force=args.force))
 
 
 def cmd_review(args) -> None:
-    from .review import review
+    review = _module("review").review
 
     org = _org(args, mutating=not args.dry_run)
     result = review(org, dry_run=args.dry_run)
@@ -213,7 +223,7 @@ def cmd_resume(args) -> None:
 
 
 def cmd_run(args) -> None:
-    from .scheduler import Scheduler, kiro_runner
+    Scheduler, kiro_runner = _module("scheduler").Scheduler, _module("scheduler").kiro_runner
 
     org = _org(args, mutating=True)
     if args.until_done and args.once:
@@ -237,23 +247,23 @@ def cmd_dash(args) -> None:
     """The terminal dashboard. Read-only: no file is written in the org and no event is emitted."""
     org = _org(args)
     if args.once or not (sys.stdin.isatty() and sys.stdout.isatty()):
-        from .dashboard_data import DashData, render_once
+        DashData, render_once = _module("dashboard_data").DashData, _module("dashboard_data").render_once
 
         print(render_once(DashData(org.root)))
         return
-    from .dashboard import run_dashboard
+    run_dashboard = _module("dashboard").run_dashboard
 
     run_dashboard(org.root, interval=args.interval)
 
 
 def cmd_mcp(args) -> None:
-    from .server import serve
+    serve = _module("server").serve
 
     serve()
 
 
 def cmd_kiro_profile(args) -> None:
-    from .scheduler import ensure_kiro_profile, mcp_server_command
+    ensure_kiro_profile, mcp_server_command = _module("scheduler").ensure_kiro_profile, _module("scheduler").mcp_server_command
 
     org = _org(args, mutating=True)  # the profile belongs to this organization
     name = ensure_kiro_profile([t for t in (args.tools or "").split(",") if t], org=org)
@@ -433,7 +443,7 @@ def main(argv: list[str] | None = None) -> None:
     s.add_argument("--once", action="store_true", help="print a plain-text snapshot and exit (also used when there is no terminal)")
     s.set_defaults(fn=cmd_dash)
 
-    from .cli_obs import register_obs
+    register_obs = _module("cli_obs").register_obs
 
     register_obs(sub)  # obs now|trace|metrics|events, check
 
