@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 """What the screens are made of that is not a widget: the names of the screens and tabs, the colours of the states, the help text, and the two records the refresh
 passes around (``Ctx``: what the worker needs to know about the screen, captured on the UI thread; ``Tick``: what the worker found, shown on the UI thread)."""
 
@@ -7,6 +6,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ..dashdata import AgentDetail, EventLine, HealthView, RequestRow, Section, ServiceRow, Snapshot
+from ..kernel import JsonObject
 
 VIEWS = ("org", "flows", "services", "events", "health")
 VIEW_NAMES = {"org": "Org", "flows": "Workflows", "services": "Services", "events": "Events", "health": "Health"}
@@ -65,7 +65,7 @@ class Tick:
     requests: list[RequestRow] | None = None
     services: list[ServiceRow] | None = None
     service_doc: list[Section] | None = None
-    events: list[dict] | None = None
+    events: list[JsonObject] | None = None
     event_lines: list[EventLine] | None = None
     health: HealthView | None = None
     error: str | None = None

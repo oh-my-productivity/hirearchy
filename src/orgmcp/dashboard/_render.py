@@ -1,11 +1,15 @@
-# mypy: ignore-errors
 """Text for the panes: sections and event lines as styled ``Text``."""
 
 from __future__ import annotations
 
+from typing import TypeVar
+
 from rich.text import Text
+from textual.widget import Widget
 
 from ..dashdata import EventLine, Section
+
+W = TypeVar("W", bound=Widget)
 
 
 def _plain(value: str) -> Text:
@@ -33,6 +37,6 @@ def event_text(lines: list[EventLine]) -> Text:
     return out
 
 
-def _hidden(widget):
+def _hidden(widget: W) -> W:
     widget.add_class("hidden")
     return widget

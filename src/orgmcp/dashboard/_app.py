@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 """The Textual app of the dashboard: the layout, the refresh machinery (one worker at a time), the screens and the keys.
 
 It is given its queries (``DashboardQueries``) and asks them only from the worker thread, one refresh at a time: the five queries share one cache that is not
@@ -14,11 +13,13 @@ from textual import on
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
+from textual.pilot import Pilot
 from textual.screen import ModalScreen
+from textual.timer import Timer
 from textual.widgets import ContentSwitcher, DataTable, Input, Static, TabbedContent, TabPane, Tree
 
 from ..dashdata import AgentDetail, EventLine, HealthView, MsgRow, RequestRow, Section, ServiceRow, Snapshot
-from ..kernel import ROOT, fmt_dur
+from ..kernel import ROOT, JsonObject, fmt_dur
 from ._ports import DashboardQueries
 from ._render import _hidden, doc_renderable, event_text
 from ._state import HELP, TABS, VIEWS, Ctx, Tick
@@ -29,7 +30,7 @@ SCREENS = Binding.Group("Screen", compact=True)
 TAB_KEYS = Binding.Group("Tab", compact=True)
 
 
-class DashApp(App):
+class DashApp(App[None]):
     TITLE = "orgmcp dash"
     ENABLE_COMMAND_PALETTE = False
     CSS_PATH = Path(__file__).with_name("dashboard.tcss")
@@ -73,7 +74,7 @@ class DashApp(App):
         self.raw_events = False  # x: events as the log has them (ids, pgids, budgets) instead of readable lines
         self._busy = False
         self._again = False
-        self._timer = None
+        self._timer: Timer | None = None
         self._msg_rows: dict[str, MsgRow] = {}
         self._req_rows: dict[str, RequestRow] = {}
         self._svc_rows: dict[str, ServiceRow] = {}
@@ -208,7 +209,7 @@ class DashApp(App):
     def _show_header(self) -> None:
         self.query_one("#header", StatusBar).show(self.snap, self.view, self.paused, self.interval, self.last_error)
 
-    async def settle(self, pilot=None) -> None:
+    async def settle(self, pilot: Pilot[None] | None = None) -> None:
         """Wait until no refresh is running and everything it produced is on the screen (for tests and scripts)."""
         import asyncio
 
@@ -222,7 +223,7 @@ class DashApp(App):
 
     # ---------------------------------------------------------------- org view
     @on(Tree.NodeHighlighted, "#agent-tree")
-    def _highlighted(self, event: Tree.NodeHighlighted) -> None:
+    def _highlighted(self, event: Tree.NodeHighlighted[str]) -> None:
         tree = self.query_one("#agent-tree", AgentTree)
         if tree.quiet:
             return
@@ -232,7 +233,7 @@ class DashApp(App):
             self.request_refresh()
 
     @on(Tree.NodeSelected, "#agent-tree")
-    def _selected(self, event: Tree.NodeSelected) -> None:
+    def _selected(self, event: Tree.NodeSelected[str]) -> None:
         self.action_pane()
 
     def action_pane(self) -> None:
@@ -438,7 +439,7 @@ class DashApp(App):
         self.request_refresh()
 
     # ---------------------------------------------------------------- events
-    def _show_events(self, events: list[dict], lines: list[EventLine]) -> None:
+    def _show_events(self, events: list[JsonObject], lines: list[EventLine]) -> None:
         pane = self.query_one("#events-body", TextPane)
         last = events[-1] if events else None
         key = (len(events), last.get("seq") if last else None, last.get("ts") if last else None, last.get("pid") if last else None,
@@ -549,7 +550,7 @@ class DashApp(App):
             return
         self.push_screen(TextScreen("orgmcp dash - keys", HELP, box_id="help-box"))
 
-    def action_back(self) -> None:
+    def action_back(self) -> None:  # type: ignore[override]  # (Textual's is a coroutine that goes back in a history this app does not have)
         if isinstance(self.screen, ModalScreen):
             return
         if self.view == "flows" and self.flow_open:
@@ -576,7 +577,7 @@ class DashApp(App):
                 self.request_refresh()
 
     # the keys of one screen are only active on that screen
-    def check_action(self, action: str, parameters: tuple) -> bool | None:
+    def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
         modal = isinstance(self.screen, ModalScreen)
         if action in ("view", "refresh", "back", "tab") and modal:
             return False

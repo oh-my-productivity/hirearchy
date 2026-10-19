@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 """The widgets of the dashboard: the scrollable text pane, the row table, the agent tree, the footer, the two header lines and the overlay.
 
 Textual subclasses (they must inherit the framework's types, so they are exempt from the Protocol rule); they depend only on the data classes of
@@ -6,12 +5,16 @@ Textual subclasses (they must inherit the framework's types, so they are exempt 
 
 from __future__ import annotations
 
+from typing import Any
+
 from rich.text import Text
+from textual import events
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Vertical, VerticalScroll
-from textual.screen import ModalScreen
+from textual.screen import ModalScreen, Screen
 from textual.widgets import DataTable, Footer, Static, Tree
+from textual.widgets.tree import TreeNode
 
 from ..dashdata import Snapshot
 from ..kernel import ROOT
@@ -60,7 +63,7 @@ class TextPane(VerticalScroll, can_focus=True):
 
 
 
-class NavTable(DataTable):
+class NavTable(DataTable[Text]):
     """A row table with vim keys that updates in place: the cursor row (by key) and the scroll position survive."""
 
     BINDINGS = [
@@ -73,7 +76,7 @@ class NavTable(DataTable):
 
     def __init__(self, *, id: str | None = None):
         super().__init__(id=id, cursor_type="row", zebra_stripes=True)
-        self._cells: dict[str, list] = {}
+        self._cells: dict[str, list[Text]] = {}
         self._keys: list[str] = []
         self._columns: list[tuple[str, str]] = []
 
@@ -93,7 +96,7 @@ class NavTable(DataTable):
         except Exception:  # noqa: BLE001
             return None
 
-    def sync(self, columns: list[tuple[str, str]], rows: list[tuple[str, list]]) -> None:
+    def sync(self, columns: list[tuple[str, str]], rows: list[tuple[str, list[Text]]]) -> None:
         if not self.columns:
             for key, label in columns:
                 self.add_column(label, key=key)
@@ -137,7 +140,7 @@ class AgentTree(Tree[str]):
         self.show_root = True
         self.auto_expand = False
         self.guide_depth = 3
-        self.nodes: dict[str, object] = {}
+        self.nodes: dict[str, TreeNode[str]] = {}
         self._order: list[str] = []
         self._known: set[str] = set()
         self.quiet = False  # True while the tree is being rebuilt: no highlight events for the app
@@ -220,21 +223,21 @@ class AgentTree(Tree[str]):
         level = self._snap.agents[addr].depth
         return max(12, width - level * self.guide_depth - 2)
 
-    def on_resize(self, event) -> None:
+    def on_resize(self, event: events.Resize) -> None:
         self._labels = {}  # widths changed: every label is made again
         if self._snap is not None:
             self.sync(self._snap)
 
-    def _relabel(self, node) -> None:
+    def _relabel(self, node: TreeNode[str]) -> None:
         if self._snap is not None and node.data in self._snap.agents:
             label = self.label_for(self._snap, node.data, collapsed=not node.is_expanded, avail=self.avail(node.data))
             self._labels[node.data] = label
             node.set_label(label)
 
-    def on_tree_node_collapsed(self, event: Tree.NodeCollapsed) -> None:
+    def on_tree_node_collapsed(self, event: Tree.NodeCollapsed[str]) -> None:
         self._relabel(event.node)
 
-    def on_tree_node_expanded(self, event: Tree.NodeExpanded) -> None:
+    def on_tree_node_expanded(self, event: Tree.NodeExpanded[str]) -> None:
         self._relabel(event.node)
 
     def sync(self, snap: Snapshot) -> None:
@@ -247,11 +250,11 @@ class AgentTree(Tree[str]):
                 label = self.label_for(snap, addr, collapsed=not node.is_expanded, avail=self.avail(addr))
                 if self._labels.get(addr) != label:  # unchanged labels are not touched: no redraw
                     self._labels[addr] = label
-                    node.set_label(label)  # type: ignore[attr-defined]
+                    node.set_label(label)
 
     def _rebuild(self, snap: Snapshot, order: list[str]) -> None:
         keep = self.cursor_node.data if self.cursor_node is not None else ROOT
-        expanded = {a for a, n in self.nodes.items() if n.is_expanded}  # type: ignore[attr-defined]
+        expanded = {a for a, n in self.nodes.items() if n.is_expanded}
         first = not self._known
         self.quiet = True
         try:
@@ -264,12 +267,12 @@ class AgentTree(Tree[str]):
                 row = snap.agents[addr]
                 parent = self.nodes.get(row.parent or ROOT, self.root)
                 new = addr not in self._known
-                node = parent.add(self.label_for(snap, addr, False, self.avail(addr)), data=addr, expand=(new or addr in expanded),  # type: ignore[attr-defined]
+                node = parent.add(self.label_for(snap, addr, False, self.avail(addr)), data=addr, expand=(new or addr in expanded),
                                   allow_expand=bool(row.children))
                 self.nodes[addr] = node
             self._known = set(order)
             self._order = list(order)
-            target = self.nodes.get(keep, self.root)
+            target = self.nodes.get(keep, self.root) if keep is not None else self.root
             try:
                 _ = self._tree_lines  # build the lines so that node.line is valid
             except Exception:  # noqa: BLE001
@@ -283,9 +286,9 @@ class ContextFooter(Footer):
     """The footer, rebuilt only when the keys it shows actually change (Textual rebuilds it on every binding refresh,
     which is far too costly for a screen that updates every few seconds)."""
 
-    _shown: tuple | None = None
+    _shown: tuple[tuple[str, str, str, bool], ...] | None = None
 
-    def bindings_changed(self, screen) -> None:
+    def bindings_changed(self, screen: Screen[Any]) -> None:
         try:
             shown = tuple((b.key, b.action, b.description, enabled) for (_, b, enabled, _) in screen.active_bindings.values() if b.show)
         except Exception:  # noqa: BLE001
@@ -299,7 +302,7 @@ class ContextFooter(Footer):
 class StatusBar(Vertical):
     """The two header lines: the title with the screen switcher, and the scheduler + counts."""
 
-    def __init__(self, **kw):
+    def __init__(self, **kw: Any) -> None:
         super().__init__(**kw)
         self._last = {}
 
@@ -346,7 +349,7 @@ class StatusBar(Vertical):
             self._last[selector] = text
             self.query_one(selector, Static).update(text)
 
-    _last: dict
+    _last: dict[str, Text]
 
 
 class TextScreen(ModalScreen[None]):
