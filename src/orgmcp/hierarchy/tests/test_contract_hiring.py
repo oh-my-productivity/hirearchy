@@ -16,9 +16,6 @@ from orgmcp.kernel import RESERVED, OrgError
 from ._support import make, outside
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-hierarchy")
-
-
 @pytest.fixture(params=IMPLEMENTATIONS[Hiring], ids=lambda factory: factory.__name__)
 def w(request: pytest.FixtureRequest, tmp_path: Path) -> HierarchyWorld:
     made = make(request, tmp_path)
@@ -68,7 +65,7 @@ def test_every_key_is_written_in_its_order_when_everything_is_given(w: Hierarchy
                   workspace=ws, inputs=[data])
     assert w.read("dev/AGENT.md") == (
         f"---\nrole: Developer\nmodel: m-x\ntools:\n- read\n- shell\ncan_hire: true\nmax_children: 3\nworkspace: {ws}\ninputs:\n- {data}\n"
-        "hired_by: root\ncreated: '2026-10-18T10:00:00+00:00'\n---\n# Role: Developer\n\nWrite code.\n"
+        "hired_by: root\ncreated: '2026-10-18T10:00:00+00:00'\n---\n# Role:  Developer \n\nWrite code.\n"  # the heading has the role as given
     )
 
 
@@ -139,7 +136,8 @@ def test_a_reserved_word_is_not_a_name(w: HierarchyWorld, name: str) -> None:
 
 
 def test_a_name_of_32_characters_is_fine(w: HierarchyWorld) -> None:
-    assert w.hiring.hire("root", "a" + "b-1" * 10 + "cd", "R", "c") == "a" + "b-1" * 10 + "cd"
+    name = "a" + "b-1" * 10 + "c"
+    assert len(name) == 32 and w.hiring.hire("root", name, "R", "c") == name
 
 
 def test_a_name_that_is_taken_is_refused(w: HierarchyWorld) -> None:

@@ -25,9 +25,6 @@ from orgmcp.templates import DocumentTemplates
 CHIEF = {"role": "Chief", "tools": ["read"], "can_hire": True, "max_children": 2, "inputs": ["/data"]}
 
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-hierarchy")
-
-
 class Calls:
     """The order in which the spies were asked."""
 
