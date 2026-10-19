@@ -7,10 +7,6 @@ from datetime import datetime, timezone
 from orgmcp.health import FLAGS, AgentHealth
 from orgmcp.health._branches import branch_totals
 
-from ._support import RED
-
-pytestmark = RED
-
 NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 

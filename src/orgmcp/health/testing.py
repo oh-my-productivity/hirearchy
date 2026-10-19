@@ -23,12 +23,13 @@ from ..agents.testing import fs_agents
 from ..budget.testing import FixedBudget
 from ..eligibility import AgentStates
 from ..eligibility.testing import PauseHarness, fs_pauses, memory_pauses
-from ..kernel import ROOT, Clock, Message, OrgPaths
+from ..kernel import ROOT, Clock, Message, OrgError, OrgPaths, aware
 from ..kernel.testing import FakeClock
 from ..mail.testing import MailHarness, MemoryMailbox, fs_mailbox, memory_mailbox
 from ..runs.testing import RunsHarness, fs_runs, memory_runs
 from ..settings.testing import SettingsHarness, fs_org_settings, memory_org_settings
 from ._analyzer import FileHealthAnalyzer
+from ._branches import branch_totals
 from ._hired import CharterHireDates
 from ._ports import CharterStamp, FsCharterStamp
 from ._rework import MailClientRework
@@ -58,23 +59,29 @@ def org_md(**limits: float | str) -> str:
 class MemoryCharterStamps(CharterStamp):
     """When each ``AGENT.md`` was written, in a table (an agent that is not in it has no charter file)."""
 
-    times: dict[str, datetime]
-
     def __init__(self) -> None:
-        raise NotImplementedError("red: C-health")
+        self.times: dict[str, datetime] = {}
 
     def modified(self, addr: str) -> datetime:
-        raise NotImplementedError("red: C-health")
+        if addr not in self.times:
+            raise FileNotFoundError(2, "No such file or directory", f"{addr}/AGENT.md")
+        return self.times[addr]
 
 
 class StateWords(AgentStates):
     """The state word from the boxes and the flag files: running, paused(reason), pending, idle - in that order of precedence."""
 
     def __init__(self, mail: MailHarness, pauses: PauseHarness) -> None:
-        raise NotImplementedError("red: C-health")
+        self._mail = mail
+        self._pauses = pauses
 
     def state(self, addr: str) -> str:
-        raise NotImplementedError("red: C-health")
+        if self._mail.reader.has_inflight(addr):
+            return "running"
+        reason = self._pauses.store.paused(addr)
+        if reason:
+            return f"paused({reason})"
+        return "pending" if self._mail.reader.unread(addr) else "idle"
 
 
 class FixedHealthAnalyzer(HealthAnalyzer):
@@ -82,17 +89,27 @@ class FixedHealthAnalyzer(HealthAnalyzer):
     ``root`` and unknown agents are refused, a branch is the roll-up of its members, ``now`` is the one given or the clock's."""
 
     def __init__(self, agents: AgentDirectory, clock: Clock) -> None:
-        raise NotImplementedError("red: C-health")
+        self._agents = agents
+        self._clock = clock
+        self._health: dict[str, AgentHealth] = {}
 
     def put(self, health: AgentHealth) -> None:
         """What the analyzer will say about this agent."""
-        raise NotImplementedError("red: C-health")
+        self._health[health.addr] = health
 
     def agent_health(self, addr: str, now: datetime | None = None, limits: Mapping[str, float] | None = None) -> AgentHealth:
-        raise NotImplementedError("red: C-health")
+        a = self._agents.require(addr)
+        if a == ROOT:
+            raise OrgError("root is the human; only agents have health data")
+        if a not in self._health:
+            raise OrgError(f"no health was put in for {a}")
+        return self._health[a]
 
     def org_health(self, root: str = ROOT, now: datetime | None = None) -> OrgHealth:
-        raise NotImplementedError("red: C-health")
+        top = self._agents.require(root)
+        addrs = self._agents.agents() if top == ROOT else self._agents.subtree(top)
+        agents = [self.agent_health(a) for a in addrs]
+        return OrgHealth(top, aware(now) or self._clock.now(), agents, branch_totals(top, addrs, {h.addr: h for h in agents}))
 
 
 # ------------------------------------------------------------------------------ the worlds

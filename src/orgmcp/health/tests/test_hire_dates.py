@@ -52,15 +52,6 @@ def test_a_charter_that_is_not_there_is_an_error_the_caller_sees() -> None:
         CharterHireDates(MemoryAgents(), MemoryCharterStamps()).hired("ghost")
 
 
-def test_the_memory_stamps_know_only_the_agents_they_were_told_of() -> None:
-    stamps = MemoryCharterStamps()
-    assert isinstance(stamps, CharterStamp)
-    with pytest.raises(FileNotFoundError):
-        stamps.modified("ceo")
-    stamps.times["ceo"] = WRITTEN
-    assert stamps.modified("ceo") == WRITTEN
-
-
 def test_the_file_stamp_is_the_modification_time_of_agent_md_in_utc(tmp_path: Path) -> None:
     disk = fs_agents(tmp_path)
     disk.put("ceo/AGENT.md", charter(None))

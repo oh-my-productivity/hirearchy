@@ -13,10 +13,6 @@ from orgmcp.health.testing import FixedHealthAnalyzer, at
 from orgmcp.kernel import OrgError
 from orgmcp.kernel.testing import FakeClock
 
-from ._support import RED
-
-pytestmark = RED
-
 CHARTER = "---\nrole: Worker\n---\n# Role: Worker\n\nDo the work.\n"
 
 
