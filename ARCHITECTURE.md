@@ -931,17 +931,17 @@ Impl: `LogEventQueries`, `DerivedTraceQueries` (+ private `MessageTraceDeriver` 
 
 ### 3.32 `blueprint`
 
-Data: `Issue`, `Role`, `Agent`, `Summary`, `BlueprintError(OrgError)`; pure `errors(issues)`.
+Data: `Issue` (implements `IssueText.render`, a pure view of its data), `Role`, `Agent` (`raw` is a `JsonObject`), `Summary` (second half), `BlueprintError(OrgError)`; pure `errors(issues)`.
 
 ```python
 class RoleLibrary(Protocol):
     def role_names(self) -> list[str]: ...
     def get_role(self, name: str) -> Role | None: ...
 class BlueprintLoader(Protocol):
-    def load(self, source: object) -> dict[str, object]: """Path, dict or YAML/JSON text."""
-    def load_text(self, text: str) -> dict[str, object]: """Text only; never reads a file."""
+    def load(self, source: object) -> JsonObject: """Path, dict or YAML/JSON text; acceptance given as bullet text becomes a list."""
+    def load_text(self, text: str) -> JsonObject: """Text only; never reads a file."""
 class BlueprintValidator(Protocol):
-    def validate(self, bp: Mapping[str, object], *, org_exists: bool = False, allowed_roots: Sequence[object] | None = None) -> list[Issue]: ...
+    def validate(self, bp: Mapping[str, object], *, org_exists: bool = False, allowed_roots: Sequence[str | Path] | None = None) -> list[Issue]: """`org_exists`: the organization's settings apply and its names are taken; otherwise the defaults."""
 class PlanRenderer(Protocol):
     def render_plan(self, bp: Mapping[str, object], issues: Sequence[Issue] | None = None, *, allowed_roots: Sequence[object] | None = None) -> str: """Details."""
     def plan_for_user(self, bp: Mapping[str, object], issues: Sequence[Issue] | None = None, *, allowed_roots: Sequence[object] | None = None) -> str: """PLAN FOR YOU block."""
@@ -959,6 +959,8 @@ class WorkspaceProvisioner(Protocol):   # port
 ```
 `org: Org | None` of today's signatures becomes the injected `AgentDirectory`/`OrgPaths` (plan time without an org = a `NoOrg` null object injected by wiring).
 Impl: `PackagedRoleLibrary`, `YamlBlueprintLoader`, `RuleBlueprintValidator`, `TextPlanRenderer`, `HashPlanIdentity`, `HiringBlueprintApplier`, `TemplateBlueprintExamples`, `FsWorkspaceProvisioner`.
+First half (C-blueprint-1): `PackagedRoleLibrary` (given `orgmcp/roles` by `wire_blueprint.roles_dir()`: risk 8, `test_wire_blueprint` pins it to the value of `main` for a checkout and any wheel layout), `YamlBlueprintLoader(TextFiles)` (+ `FsTextFiles`), `RuleBlueprintValidator` (7 collaborators, all private Protocols of `_protocols.py`: `AgentResolution` -> `AgentResolver`, `PathChecking` -> `RootedPathChecker`, `BudgetPlanning` -> `BudgetPlanner`, `AccessReport` -> `PolicyAccessReport`, `ServiceRules` -> `ServiceBlueprintRules`, `WorkspaceRoots` -> `EnvironmentWorkspaceRoots`, `OrgContexts` -> `PresentOrAbsentOrg`); the organization a blueprint is planned against is an `OrgContext` (`RuntimeOrgContext` from the ports of the runtime, `NoOrgContext` = plan time before it exists, `HostOrgContext` = what a legacy `Org` object says). `BudgetPlanner` is in the first half because the validator needs the estimate. Fakes (`testing.py`): `MemoryRoleLibrary`, `MemoryTextFiles`, `StaticOrgContext`, `ScriptedConfinementPolicy`. `wire_blueprint` provides `RoleLibrary`, `BlueprintLoader` and `BlueprintValidator` to a builder; they are runtime fields with the rest of 3.32 in C-blueprint-2 (`test_runtime_fields` counts 3.32 as one step).
+The legacy functions (`validate`, `get_role`, `_resolve`, ...) are adapters in `blueprint/_legacy.py` over `_assembly.assembly_of(org)`, which builds the classes from the *legacy parts* that `fields_blueprint` installs when `orgmcp.app` is loaded (`wire_blueprint.legacy_parts()`: the process environment, a confinement policy that is whatever `scheduler.file_confinement` is at the time of the call - the patch point `test_round_f_read` replaces -, the contract normalizer, the roles directory), because a legacy function with no `Org` (plan time) has no runtime to take them from. `_legacy.py` still holds, verbatim, the second half for C-blueprint-2 (its header says which functions); it reaches the first half through the aliases and adapters at its top. `blueprint/_access.py` shares its name with the legacy function `_access`: `__init__` loads the module before it binds the function, so the function wins whichever is imported first.
 
 ### 3.33 `bootstrap`, `upgrade`, `skill`
 
@@ -1845,8 +1847,8 @@ A TTY check (`sys.stdin.isatty() and sys.stdout.isatty()`) is the one terminal d
 | `role_names`, `get_role`, `ROLES_DIR` | `blueprint.RoleLibrary` (`PackagedRoleLibrary`; `roles/*.md` stay packaged data) |
 | `load`, `load_text`, `_parse`, `_normalize` | `blueprint.BlueprintLoader` (`YamlBlueprintLoader`) |
 | `_s`, `_list`, `_unknown`, `_needs`, `_deliverable`, `_criteria`, `_services`, `_is_request`, `_plain`, `_svc_deliverable`, `_svc_criteria`, `_cap`, `_has_plain_task` | `blueprint/_view.py` (private accessors over the normalized dict) |
-| `service_budget`, `_svc_budgets`, `estimate`, `planned_total`, `budget_split` | `blueprint/_budgeting.py::BudgetPlanner` (private) |
-| `_cfg` | `blueprint/_validator.py` (reads `OrgSettings.config`; defaults when no org) |
+| `service_budget`, `_svc_budgets`, `estimate`, `planned_total`, `budget_split` | `blueprint/_budgeting.py::BudgetPlanner` (private; moved in C-blueprint-1: the validator needs the estimate) |
+| `_cfg` | `blueprint/_org.py::OrgContext.config` (`RuntimeOrgContext` reads `OrgSettings.config`; `NoOrgContext` gives the defaults) |
 | `_walk`, `_within`, `_default_roots`, `_check_path`, `_input_entries`, `declared_inputs`, `_resolve`, `review_roots`, `_verifier_inputs` | `blueprint/_resolver.py::AgentResolver` (private; `_within` **deleted: duplicate of** `kernel.inside`; `_default_roots` uses `Environment`; tests that call `bpm._resolve` move to `blueprint/tests/`) |
 | `edits_others_files`, `_is_code`, `_blob`, `_review_required`, `_has_ws_tools`, `_vague`, `_delivers_directly`, the regex constants | `blueprint/_rules.py` (private) |
 | `_validate_services`, `_validate_request`, `validate` | `blueprint.BlueprintValidator.validate` (`RuleBlueprintValidator`) |
