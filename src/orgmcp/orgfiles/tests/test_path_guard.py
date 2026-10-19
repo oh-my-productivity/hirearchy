@@ -8,8 +8,6 @@ from orgmcp.kernel import RUNTIME_NAMES
 from orgmcp.orgfiles import _guard
 from orgmcp.orgfiles._guard import case_twin
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
-
 
 @pytest.mark.parametrize(
     ("name", "key"),

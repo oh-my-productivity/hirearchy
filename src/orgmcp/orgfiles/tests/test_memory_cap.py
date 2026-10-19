@@ -15,8 +15,6 @@ from orgmcp.orgfiles.testing import IMPLEMENTATIONS, OrgFilesHarness
 
 from ._support import make, refusal, team, written
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
-
 
 def words(n: int) -> str:
     return " ".join(["word"] * n)

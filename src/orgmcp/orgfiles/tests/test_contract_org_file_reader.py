@@ -17,7 +17,6 @@ from orgmcp.orgfiles.testing import IMPLEMENTATIONS, OrgFilesHarness
 
 from ._support import make, refusal
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
 
 INSIDE_ONLY = "you can only read inside the organization"
 AGENT_RULE = (

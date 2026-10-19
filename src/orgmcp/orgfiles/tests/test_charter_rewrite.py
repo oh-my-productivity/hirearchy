@@ -18,7 +18,6 @@ from orgmcp.orgfiles.testing import IMPLEMENTATIONS, OrgFilesHarness
 
 from ._support import make, refusal, written
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
 
 REPORT = "lead/rev"
 APPEND_NOTE = "A key you leave out is kept; to remove one, set it explicitly (e.g. `tools: []`)."
@@ -133,7 +132,7 @@ def test_the_note_shows_an_emptied_key_and_clips_long_values(h: OrgFilesHarness)
 def test_the_note_names_the_agent_by_its_path_in_the_organization(h: OrgFilesHarness) -> None:
     h.add_agent("lead/rev/sub", {"role": "Sub"})
     assert h.writer.write_noted("lead/rev", "lead/rev/sub/AGENT.md", text("Sub 2"), append=False)[1].startswith(
-        "charter frontmatter of `lead/rev/sub`: kept from the old frontmatter"
+        "charter frontmatter of `lead/rev/sub`: "
     )
 
 

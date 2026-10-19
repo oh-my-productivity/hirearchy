@@ -16,8 +16,6 @@ from orgmcp.orgfiles.testing import IMPLEMENTATIONS, OrgFilesHarness
 
 from ._support import make, refusal, team, written
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
-
 
 def outside_text(prefix: str, path: str) -> str:
     return (

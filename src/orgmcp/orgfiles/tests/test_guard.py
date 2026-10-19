@@ -15,7 +15,6 @@ from orgmcp.orgfiles.testing import IMPLEMENTATIONS, OrgFilesHarness
 
 from ._support import make, refusal, team, written
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
 
 SERVICES = (
     "services/ is managed by the runtime: the contract (SERVICE.md) is written by your parent with define_service, "

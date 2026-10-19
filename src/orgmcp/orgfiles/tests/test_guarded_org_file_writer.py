@@ -21,8 +21,6 @@ from orgmcp.orgfiles._writer import GuardedOrgFileWriter
 from orgmcp.orgfiles.testing import MemoryOrgFileStore
 from orgmcp.settings.testing import MemoryOrgSettings
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
-
 
 class RecordingAgents(MemoryAgents):
     def __init__(self) -> None:

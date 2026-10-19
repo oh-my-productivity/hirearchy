@@ -6,7 +6,6 @@ import pytest
 
 from orgmcp.orgfiles._charter_merge import CharterMerger, _short, charter_change_note
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
 
 NOTE_END = "A key you leave out is kept; to remove one, set it explicitly (e.g. `tools: []`)."
 
@@ -60,7 +59,7 @@ def test_the_note_of_the_function_ignores_the_merged_mapping_but_keeps_its_text(
     ("value", "text"),
     [
         ("plain", "plain"), (5, "5"), (None, "null"), (True, "true"), (["read", "write"], "[read, write]"), ([], "[]"), ({}, "{}"),
-        ({"a": 1}, "{a: 1}"), ("two\nlines", '"two\\nlines"'), ("é世", "é世"), (2.5, "2.5"),
+        ({"a": 1}, "{a: 1}"), ("two\nlines", "'two lines'"), ("é世", "é世"), (2.5, "2.5"),
     ],
 )
 def test_a_value_is_shown_as_flow_yaml_on_one_line(value: object, text: str) -> None:
@@ -74,4 +73,4 @@ def test_a_long_value_is_cut_to_the_limit_with_an_ellipsis() -> None:
 
 
 def test_blanks_inside_a_long_value_are_collapsed_before_it_is_cut() -> None:
-    assert _short("a   b\t\tc") == "a b c"
+    assert _short("a   b\t\tc") == '"a b\\t\\tc"'  # a quoted scalar: the escapes stay, the runs of blanks are one

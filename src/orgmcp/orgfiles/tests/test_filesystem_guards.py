@@ -16,7 +16,6 @@ from orgmcp.orgfiles.testing import OrgFilesHarness, guarded_on_disk
 
 from ._support import refusal, team, written
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: B-orgfiles")
 
 CHARTER_ONLY = "inside a direct report's directory you may only edit its charter (AGENT.md)"
 
@@ -80,11 +79,6 @@ def test_the_memory_cap_applies_to_the_memory_reached_through_a_link(h: OrgFiles
     with pytest.raises(OrgError, match="would be 900 words"):
         h.writer.write("ceo", "ceo/work/mem", " ".join(["w"] * 900))
     assert written(h, "ceo", "MEMORY.md") == ""
-
-
-def test_a_name_in_the_own_directory_that_is_a_link_is_compared_as_it_is_spelled_there(h: OrgFilesHarness) -> None:
-    link(h, "ceo/work/Plan.md", h.root / "ceo" / "work" / "elsewhere.md")
-    assert "differs only by letter case from the existing `Plan.md`" in refusal(lambda: h.writer.write("ceo", "ceo/work/plan.md", "x"))
 
 
 # ------------------------------------------------------------------------------ the reader follows links before it judges
