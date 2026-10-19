@@ -773,7 +773,7 @@ destinations:
         - test_report_on_a_service_request_requires_lessons
         - test_lessons_are_optional_for_plain_tasks_and_kept_when_given
 
-  # new file; 9 tests
+  # new file; 6 tests
   #   7.3: what the user is waited for is attention
   src/orgmcp/attention/tests/test_waiting.py:
     group: c
@@ -785,9 +785,6 @@ destinations:
         - test_nothing_is_waiting_while_something_can_run_or_runs
         - test_a_grant_makes_the_task_runnable_again
         - test_the_run_cap_counts_as_waiting
-        - test_grace_period_with_a_fake_clock
-        - test_a_change_restarts_the_grace_period
-        - test_the_grace_is_configurable
 
   # new file; 7 tests
   #   7.3: starting and stopping the detached scheduler
@@ -802,15 +799,6 @@ destinations:
         - test_stop_never_signals_a_foreign_pid
         - test_stop_refuses_a_scheduler_of_another_org
         - test_stale_or_garbage_pidfile_means_stopped_and_does_not_block_start
-
-  # new file; 2 tests
-  #   7.3: daemon identity checks (_looks_like_scheduler_of) [the file of that name exists and is typed: the moved tests get a file of their own]
-  src/orgmcp/daemon/tests/test_identity_behaviour.py:
-    group: c
-    sources:
-      tests/test_bootstrap.py:
-        - test_command_line_verification
-        - test_command_line_verification_follows_symlinks_and_rejects_other_dirs
 
   # new file; 26 tests
   #   7.3: health (whole file)
@@ -2188,6 +2176,15 @@ destinations:
         - test_a_refund_alone_lifts_a_budget_pause_without_a_run
         - test_a_failure_pause_is_not_lifted_by_a_refund
 
+  # new file; 2 tests
+  #   subject: scheduler._looks_like_scheduler_of lives in orgmcp.scheduler (a private name of another package is not importable from daemon/tests; 7.3 said daemon)
+  src/orgmcp/scheduler/tests/test_command_line_verification.py:
+    group: e
+    sources:
+      tests/test_bootstrap.py:
+        - test_command_line_verification
+        - test_command_line_verification_follows_symlinks_and_rejects_other_dirs
+
   # new file; 6 tests
   #   subject: the --until-done exit of the scheduler [the source has an autouse fixture, which may not apply to other sources' tests: its tests get a destination of their own]
   src/orgmcp/scheduler/tests/test_exit_assistant.py:
@@ -2211,6 +2208,16 @@ destinations:
         - test_serve_until_done_exits_when_a_worker_keeps_failing
         - test_serve_without_until_done_keeps_going
         - test_a_plain_stall_waits_for_the_stall_ladder_before_the_exit
+
+  # new file; 3 tests
+  #   subject: the grace period of the until-done exit is scheduler.GraceWait (the tests build it from scheduler._exit; 7.3 said attention)
+  src/orgmcp/scheduler/tests/test_grace.py:
+    group: e
+    sources:
+      tests/test_finish.py:
+        - test_grace_period_with_a_fake_clock
+        - test_a_change_restarts_the_grace_period
+        - test_the_grace_is_configurable
 
   # new file; 11 tests
   #   7.3: the scheduler loop (all other tests) [the file of that name exists and is typed: the moved tests get a file of their own]
