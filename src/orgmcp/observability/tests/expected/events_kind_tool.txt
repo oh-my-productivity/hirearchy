@@ -1,0 +1,6 @@
+5 of 11 matching event(s), oldest first - 6 earlier one(s) not shown: narrow with since/agent/kind/trace or raise the limit
+10:02:05 mcp ceo tool.call report ok 5ms args=task_id=20261018T100000000003-root-0005,status=done run=ceo@20261018T100155000001 trace=20261018T100000000003-root-0005
+10:02:25 mcp ceo tool.call report ok 5ms args=task_id=20261018T100220000001-root-0013,status=done run=ceo@20261018T100222000001 trace=20261018T100220000001-root-0013
+10:02:26 mcp ceo tool.call delegate REFUSED 2ms error="not enough budget: you have 9 run(s) and must keep 2 in reserve" error_type=OrgError args=to=ceo/eng,budget=9,service=memo run=ceo@20261018T100222000001 trace=20261018T100220000001-root-0013
+10:00:12 mcp ceo tool.call delegate REFUSED 4ms error="not enough budget: you have 7 run(s) and must keep 3 in reserve" error_type=OrgError args=to=ceo/eng,budget=9,service=memo
+10:00:13 mcp ceo/eng tool.call write REFUSED 1ms error="ceo/eng cannot write ceo/work/x.md" error_type=OrgError args=path=ceo/work/x.md

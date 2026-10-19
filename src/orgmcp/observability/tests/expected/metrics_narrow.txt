@@ -1,0 +1,12 @@
+metrics 2026-10-18T10:01:20Z .. 2026-10-18T10:03:20Z (13 event(s) in the window)
+runs 2: ok 2, failed 0, timeout 0, killed 0 | duration p50 13s p95 15s max 15s (n=2) | queue p50 2.0s p95 20s (n=2)
+budget spent 2 run(s)
+tool calls 5, refused 1 (20.0%)
+  report               3 calls   0 refused (0%) p50 5ms p95 5ms
+  delegate             1 calls   1 refused (100%) p50 2ms p95 2ms
+  write                1 calls   0 refused (0%) p50 5ms p95 5ms
+top refusals:
+  1x not enough budget: you have N run(s) and must keep N in reserve  (delegatex1)
+messages: result 2, task 2
+scheduler: 1 start(s); errors: none; exits: finished: no open tasks x1
+stalls 0, pauses 0, agent failures 0, orphaned runs 1

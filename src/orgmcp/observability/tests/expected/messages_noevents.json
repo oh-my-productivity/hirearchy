@@ -1,0 +1,106 @@
+{
+  "20261018T100205000001-ceo-0010": {
+    "id": "20261018T100205000001-ceo-0010",
+    "sender": "ceo",
+    "to": "root",
+    "type": "result",
+    "title": "Ship it",
+    "status": "done",
+    "budget": 3,
+    "reply_to": "20261018T100000000003-root-0005",
+    "revises": null,
+    "service": null,
+    "feedback": null,
+    "wake": true,
+    "trace": "20261018T100000000003-root-0005",
+    "t": "2026-10-18T10:02:05.000001+00:00",
+    "boxes": [
+      [
+        "root",
+        "inbox"
+      ],
+      [
+        "ceo",
+        "sent"
+      ]
+    ]
+  },
+  "20261018T100000000003-root-0005": {
+    "id": "20261018T100000000003-root-0005",
+    "sender": "root",
+    "to": "ceo",
+    "type": "task",
+    "title": "Ship it",
+    "status": null,
+    "budget": 6,
+    "reply_to": null,
+    "revises": null,
+    "service": null,
+    "feedback": null,
+    "wake": true,
+    "trace": "20261018T100000000003-root-0005",
+    "t": "2026-10-18T10:00:00.000003+00:00",
+    "boxes": [
+      [
+        "root",
+        "sent"
+      ],
+      [
+        "ceo",
+        "read"
+      ]
+    ]
+  },
+  "20261018T100135000001-ceo.eng-000c": {
+    "id": "20261018T100135000001-ceo.eng-000c",
+    "sender": "ceo/eng",
+    "to": "ceo",
+    "type": "result",
+    "title": "Build",
+    "status": "done",
+    "budget": 2,
+    "reply_to": "20261018T100020000001-ceo-0008",
+    "revises": null,
+    "service": null,
+    "feedback": null,
+    "wake": true,
+    "trace": "20261018T100000000003-root-0005",
+    "t": "2026-10-18T10:01:35.000001+00:00",
+    "boxes": [
+      [
+        "ceo",
+        "read"
+      ],
+      [
+        "ceo/eng",
+        "sent"
+      ]
+    ]
+  },
+  "20261018T100020000001-ceo-0008": {
+    "id": "20261018T100020000001-ceo-0008",
+    "sender": "ceo",
+    "to": "ceo/eng",
+    "type": "task",
+    "title": "Build",
+    "status": null,
+    "budget": 3,
+    "reply_to": null,
+    "revises": null,
+    "service": null,
+    "feedback": null,
+    "wake": true,
+    "trace": "20261018T100000000003-root-0005",
+    "t": "2026-10-18T10:00:20.000001+00:00",
+    "boxes": [
+      [
+        "ceo",
+        "sent"
+      ],
+      [
+        "ceo/eng",
+        "read"
+      ]
+    ]
+  }
+}

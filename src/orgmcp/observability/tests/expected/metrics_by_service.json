@@ -1,0 +1,170 @@
+{
+  "since": "2026-10-18T00:00:00+00:00",
+  "until": "2026-10-18T10:03:20+00:00",
+  "events": 29,
+  "agent": null,
+  "runs": {
+    "total": 5,
+    "ok": 5,
+    "failed": 0,
+    "timeout": 0,
+    "killed": 0,
+    "running": 0,
+    "unknown": 0,
+    "duration_ms": {
+      "n": 5,
+      "p50": 15000.0,
+      "p95": 42000.0,
+      "max": 42000.0
+    },
+    "queue_ms": {
+      "n": 5,
+      "p50": 20004.999,
+      "p95": 60005.0,
+      "max": 60005.0
+    }
+  },
+  "tool_calls": {
+    "total": 11,
+    "refused": 4,
+    "refusal_rate": 0.36363636363636365,
+    "by_tool": {
+      "delegate": {
+        "calls": 5,
+        "refused": 3,
+        "refusal_rate": 0.6,
+        "ms": {
+          "n": 5,
+          "p50": 4.0,
+          "p95": 5.0,
+          "max": 5.0
+        },
+        "exceptions": 0
+      },
+      "inbox": {
+        "calls": 1,
+        "refused": 0,
+        "refusal_rate": 0.0,
+        "ms": {
+          "n": 1,
+          "p50": 5.0,
+          "p95": 5.0,
+          "max": 5.0
+        },
+        "exceptions": 0
+      },
+      "report": {
+        "calls": 3,
+        "refused": 0,
+        "refusal_rate": 0.0,
+        "ms": {
+          "n": 3,
+          "p50": 5.0,
+          "p95": 5.0,
+          "max": 5.0
+        },
+        "exceptions": 0
+      },
+      "write": {
+        "calls": 2,
+        "refused": 1,
+        "refusal_rate": 0.5,
+        "ms": {
+          "n": 2,
+          "p50": 1.0,
+          "p95": 5.0,
+          "max": 5.0
+        },
+        "exceptions": 0
+      }
+    }
+  },
+  "top_refusals": [
+    {
+      "message": "not enough budget: you have N run(s) and must keep N in reserve",
+      "count": 3,
+      "example": "not enough budget: you have 5 run(s) and must keep 2 in reserve",
+      "tools": {
+        "delegate": 3
+      }
+    },
+    {
+      "message": "ceo/eng cannot write <path>",
+      "count": 1,
+      "example": "ceo/eng cannot write ceo/work/x.md",
+      "tools": {
+        "write": 1
+      }
+    }
+  ],
+  "messages": {
+    "result": 2,
+    "task": 4
+  },
+  "stalls": 1,
+  "pauses": {
+    "total": 1,
+    "by_reason": {
+      "failures": 1
+    }
+  },
+  "agent_failures": 1,
+  "orphans": 1,
+  "scheduler": {
+    "starts": 2,
+    "errors": {
+      "stall check": 1
+    },
+    "exits": {
+      "finished: no open tasks": 1
+    }
+  },
+  "budget_spent": 5,
+  "by": {
+    "dimension": "service",
+    "rows": [
+      {
+        "key": "-",
+        "runs": 5,
+        "ok": 5,
+        "failed": 0,
+        "run_ms": {
+          "n": 5,
+          "p50": 15000.0,
+          "p95": 42000.0,
+          "max": 42000.0
+        },
+        "calls": 9,
+        "refused": 2,
+        "refusal_rate": 0.2222222222222222,
+        "call_ms": {
+          "n": 9,
+          "p50": 5.0,
+          "p95": 5.0,
+          "max": 5.0
+        }
+      },
+      {
+        "key": "memo",
+        "runs": 0,
+        "ok": 0,
+        "failed": 0,
+        "run_ms": {
+          "n": 0,
+          "p50": null,
+          "p95": null,
+          "max": null
+        },
+        "calls": 2,
+        "refused": 2,
+        "refusal_rate": 1.0,
+        "call_ms": {
+          "n": 2,
+          "p50": 2.0,
+          "p95": 4.0,
+          "max": 4.0
+        }
+      }
+    ]
+  }
+}

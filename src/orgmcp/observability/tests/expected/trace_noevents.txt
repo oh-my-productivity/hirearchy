@@ -1,0 +1,10 @@
+trace 20261018T100000000003-root-0005 "Ship it" -> ceo: done  [partial]
+     +0s  root -> ceo task "Ship it" +6 run(s)
+     +2s    run 20261018T100003000001 ok, ran 42s
+    +19s    ceo -> ceo/eng task "Build" +3 run(s)
+  +1m09s      run 20261018T100110000001 ok, ran 30s
+  +1m34s      ceo/eng -> ceo result (done) "Build" +2 run(s)
+  +1m54s    run 20261018T100155000001 ok, ran 15s
+  +2m04s    ceo -> root result (done) "Ship it" +3 run(s)
+totals: wall 2m05s | runs 3 (budget given 6, returned 3) | run time 1m27s | queue 0s | waiting on you 0s | tool calls 0 (0 refused)
+note: partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs

@@ -1,0 +1,249 @@
+{
+  "events": [
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:00.000500+00:00",
+      "seq": 1,
+      "proc": "cli",
+      "pid": 5100,
+      "kind": "tool.call",
+      "actor": "root",
+      "run": null,
+      "trace": "20261018T100000000003-root-0005",
+      "tool": "delegate",
+      "ok": true,
+      "ms": 5,
+      "error": null,
+      "error_type": null,
+      "args": {
+        "to": "ceo",
+        "title": "Ship it",
+        "budget": 6
+      }
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:03.005000+00:00",
+      "seq": 2,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.start",
+      "actor": "runtime",
+      "run": "ceo@20261018T100003000001",
+      "trace": null,
+      "agent": "ceo",
+      "batch": [
+        "20261018T100000000003-root-0005"
+      ],
+      "traces": [
+        "20261018T100000000003-root-0005"
+      ],
+      "pgid": 1,
+      "model": null,
+      "budget_before": 3
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:10+00:00",
+      "seq": 2,
+      "proc": "mcp",
+      "pid": 4242,
+      "kind": "tool.call",
+      "actor": "ceo",
+      "run": "ceo@20261018T100003000001",
+      "trace": "20261018T100000000003-root-0005",
+      "tool": "delegate",
+      "ok": false,
+      "ms": 3,
+      "error": "not enough budget: you have 5 run(s) and must keep 2 in reserve",
+      "error_type": "OrgError",
+      "args": {
+        "to": "ceo/eng",
+        "budget": 9
+      }
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:20+00:00",
+      "seq": 3,
+      "proc": "mcp",
+      "pid": 4242,
+      "kind": "tool.call",
+      "actor": "ceo",
+      "run": "ceo@20261018T100003000001",
+      "trace": "20261018T100000000003-root-0005",
+      "tool": "delegate",
+      "ok": true,
+      "ms": 5,
+      "error": null,
+      "error_type": null,
+      "args": {
+        "to": "ceo/eng",
+        "title": "Build",
+        "budget": 3
+      }
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:00.005000+00:00",
+      "seq": 1,
+      "proc": "scheduler",
+      "pid": 1,
+      "kind": "run.start",
+      "actor": "runtime",
+      "run": "gone/agent@20261018T100100000000",
+      "trace": null,
+      "agent": "gone/agent",
+      "batch": [
+        "20261018T100000000000-root-ab12"
+      ],
+      "traces": [
+        "20261018T100000000003-root-0005"
+      ],
+      "pgid": 1,
+      "model": null,
+      "budget_before": 3
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:10.005000+00:00",
+      "seq": 4,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.start",
+      "actor": "runtime",
+      "run": "ceo/eng@20261018T100110000001",
+      "trace": null,
+      "agent": "ceo/eng",
+      "batch": [
+        "20261018T100020000001-ceo-0008"
+      ],
+      "traces": [
+        "20261018T100000000003-root-0005"
+      ],
+      "pgid": 1,
+      "model": null,
+      "budget_before": 3
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:30+00:00",
+      "seq": 4,
+      "proc": "mcp",
+      "pid": 4242,
+      "kind": "tool.call",
+      "actor": "ceo/eng",
+      "run": "ceo/eng@20261018T100110000001",
+      "trace": "20261018T100000000003-root-0005",
+      "tool": "write",
+      "ok": true,
+      "ms": 5,
+      "error": null,
+      "error_type": null,
+      "args": {
+        "path": "ceo/eng/work/out.md",
+        "content_chars": 5
+      }
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:35+00:00",
+      "seq": 5,
+      "proc": "mcp",
+      "pid": 4242,
+      "kind": "tool.call",
+      "actor": "ceo/eng",
+      "run": "ceo/eng@20261018T100110000001",
+      "trace": "20261018T100000000003-root-0005",
+      "tool": "report",
+      "ok": true,
+      "ms": 5,
+      "error": null,
+      "error_type": null,
+      "args": {
+        "task_id": "20261018T100020000001-ceo-0008",
+        "status": "done"
+      }
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:01:55.005000+00:00",
+      "seq": 6,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.start",
+      "actor": "runtime",
+      "run": "ceo@20261018T100155000001",
+      "trace": null,
+      "agent": "ceo",
+      "batch": [
+        "20261018T100135000001-ceo.eng-000c"
+      ],
+      "traces": [
+        "20261018T100000000003-root-0005"
+      ],
+      "pgid": 1,
+      "model": null,
+      "budget_before": 3
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:02:05+00:00",
+      "seq": 6,
+      "proc": "mcp",
+      "pid": 4242,
+      "kind": "tool.call",
+      "actor": "ceo",
+      "run": "ceo@20261018T100155000001",
+      "trace": "20261018T100000000003-root-0005",
+      "tool": "report",
+      "ok": true,
+      "ms": 5,
+      "error": null,
+      "error_type": null,
+      "args": {
+        "task_id": "20261018T100000000003-root-0005",
+        "status": "done"
+      }
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:02:22.005000+00:00",
+      "seq": 9,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "run.start",
+      "actor": "runtime",
+      "run": "ceo@20261018T100222000001",
+      "trace": null,
+      "agent": "ceo",
+      "batch": [
+        "20261018T100220000001-root-0013"
+      ],
+      "traces": [
+        "20261018T100220000001-root-0013",
+        "20261018T100000000003-root-0005"
+      ],
+      "pgid": 1,
+      "model": null,
+      "budget_before": 4
+    },
+    {
+      "v": 1,
+      "ts": "2026-10-18T10:00:30+00:00",
+      "seq": 11,
+      "proc": "scheduler",
+      "pid": 7000,
+      "kind": "agent.pause",
+      "actor": "runtime",
+      "run": null,
+      "trace": "20261018T100000000003-root-0005",
+      "agent": "ceo/eng",
+      "reason": "failures"
+    }
+  ],
+  "total": 12,
+  "shown": 12,
+  "since": "2026-10-18T00:00:00+00:00",
+  "until": null
+}
