@@ -11,4 +11,4 @@ class FsAgentSlots(AgentSlots):
         self._paths = paths
 
     def occupied(self, addr: str) -> bool:
-        raise NotImplementedError("B-hierarchy")
+        return self._paths.agent_dir(addr).exists()

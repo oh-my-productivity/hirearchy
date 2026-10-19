@@ -39,10 +39,7 @@ def in_memory(tmp_path: Path) -> Place:
     return Place(MemoryAgentSlots(files), files.put_dir, lambda path: files.put(path, "x"))
 
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-hierarchy")
-
-
-@pytest.fixture(params=[pytest.param(on_disk, marks=RED), in_memory], ids=lambda factory: factory.__name__)
+@pytest.fixture(params=[on_disk, in_memory], ids=lambda factory: factory.__name__)
 def place(request: pytest.FixtureRequest, tmp_path: Path) -> Place:
     made: Place = request.param(tmp_path)
     assert isinstance(made.slots, AgentSlots)
