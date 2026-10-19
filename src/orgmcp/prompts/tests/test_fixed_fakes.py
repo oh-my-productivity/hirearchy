@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from pathlib import Path
 
 from orgmcp.kernel import Message
@@ -19,12 +17,9 @@ from orgmcp.prompts.testing import (
     memory_world,
 )
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-prompts")
-
 NOTE = Message(sender="root", to="ceo", type="note", title="t", body="b", id="20260101T000000000001-root-aaaa")
 
 
-@RED
 def test_the_fixed_texts_are_what_they_were_given_and_remember_the_questions() -> None:
     summary, who, prompt = FixedStateSummary("S"), FixedWhoami("W"), FixedRunPrompt("P")
     assert isinstance(summary, StateSummarizer) and isinstance(who, Whoami) and isinstance(prompt, RunPromptBuilder)
@@ -34,7 +29,6 @@ def test_the_fixed_texts_are_what_they_were_given_and_remember_the_questions() -
     assert summary.asked == [("a", None), ("b", ["x"])] and who.asked == ["a"] and prompt.asked == [("a", [NOTE])]
 
 
-@RED
 def test_the_states_default_to_idle_and_are_by_normalized_address() -> None:
     states = FixedStates()
     assert states.state("ceo") == "idle"
@@ -42,7 +36,6 @@ def test_the_states_default_to_idle_and_are_by_normalized_address() -> None:
     assert states.state("ceo/eng/") == "running"
 
 
-@RED
 def test_the_services_are_the_ones_offered_and_the_questions_are_remembered() -> None:
     services = NamedServices()
     services.offered["ceo"] = ["a", "b"]
@@ -51,7 +44,6 @@ def test_the_services_are_the_ones_offered_and_the_questions_are_remembered() ->
     assert services.service_names("ceo") == ["a", "b"]  # a copy
 
 
-@RED
 def test_the_sections_are_the_text_put_in_and_the_batch_is_remembered() -> None:
     sections = FixedSections()
     sections.text["ceo"] = "T"
@@ -59,7 +51,6 @@ def test_the_sections_are_the_text_put_in_and_the_batch_is_remembered() -> None:
     assert sections.asked == [("ceo", [NOTE]), ("ops", [])]
 
 
-@RED
 def test_a_notice_is_told_once() -> None:
     strays = ToldOnce()
     strays.notices["ceo"] = "N"

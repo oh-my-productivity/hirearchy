@@ -50,7 +50,7 @@ class FixedStates(AgentStates):
         self.words: dict[str, str] = {}
 
     def state(self, addr: str) -> str:
-        raise NotImplementedError("red: C-prompts")
+        return self.words.get(norm(addr), "idle")
 
 
 class NamedServices(ServiceNames):
@@ -61,7 +61,8 @@ class NamedServices(ServiceNames):
         self.asked: list[str] = []
 
     def service_names(self, addr: str) -> list[str]:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append(addr)
+        return list(self.offered.get(norm(addr), []))
 
 
 class FixedSections(ServicePromptSections):
@@ -72,7 +73,8 @@ class FixedSections(ServicePromptSections):
         self.asked: list[tuple[str, Sequence[Message]]] = []
 
     def prompt_sections(self, addr: str, batch: Sequence[Message]) -> str:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append((addr, batch))
+        return self.text.get(addr, "")
 
 
 class ToldOnce(StrayRegistry):
@@ -83,10 +85,10 @@ class ToldOnce(StrayRegistry):
         self.recorded: list[tuple[str, tuple[str, ...]]] = []
 
     def record(self, addr: str, paths: Sequence[str]) -> None:
-        raise NotImplementedError("red: C-prompts")
+        self.recorded.append((addr, tuple(paths)))
 
     def take_notice(self, addr: str) -> str:
-        raise NotImplementedError("red: C-prompts")
+        return self.notices.pop(addr, "")
 
 
 class FixedStateSummary(StateSummarizer):
@@ -98,7 +100,10 @@ class FixedStateSummary(StateSummarizer):
         self.on_ask: Callable[[], None] | None = None  # called at every question (a test of the order of things)
 
     def state_summary(self, addr: str, shown: Collection[str] | None = None) -> str:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append((addr, shown))
+        if self.on_ask is not None:
+            self.on_ask()
+        return self.text
 
 
 class FixedWhoami(Whoami):
@@ -109,7 +114,8 @@ class FixedWhoami(Whoami):
         self.asked: list[str] = []
 
     def whoami(self, addr: str) -> str:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append(addr)
+        return self.text
 
 
 class FixedRunPrompt(RunPromptBuilder):
@@ -120,7 +126,8 @@ class FixedRunPrompt(RunPromptBuilder):
         self.asked: list[tuple[str, Sequence[Message]]] = []
 
     def run_prompt(self, addr: str, batch: Sequence[Message]) -> str:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append((addr, batch))
+        return self.text
 
 
 class FixedQuote(TaskQuoter):
@@ -130,7 +137,8 @@ class FixedQuote(TaskQuoter):
         self.asked: list[Message] = []
 
     def quote(self, m: Message) -> str:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append(m)
+        return "QUOTE"
 
 
 class FixedUpstream(UpstreamTasks):
@@ -141,7 +149,8 @@ class FixedUpstream(UpstreamTasks):
         self.asked: list[tuple[str, Message]] = []
 
     def upstream(self, addr: str, delegated: Message) -> tuple[Message, Message | None] | None:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append((addr, delegated))
+        return self.found
 
 
 class FixedFiles(FilesLines):
@@ -152,14 +161,15 @@ class FixedFiles(FilesLines):
         self.asked: list[tuple[str, Mapping[str, object]]] = []
 
     def lines(self, addr: str, meta: Mapping[str, object]) -> list[str]:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append((addr, meta))
+        return list(self.found)
 
 
 class FixedAgentLines(AgentLines):
     """The line of an agent is ``AGENT-LINE <addr>``."""
 
     def agent_line(self, addr: str) -> str:
-        raise NotImplementedError("red: C-prompts")
+        return f"AGENT-LINE {addr}"
 
 
 class FixedHeld(HeldTaskLines):
@@ -170,7 +180,8 @@ class FixedHeld(HeldTaskLines):
         self.asked: list[tuple[str, Collection[str]]] = []
 
     def lines(self, addr: str, shown: Collection[str]) -> list[str]:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append((addr, shown))
+        return list(self.found)
 
 
 class FixedDelegations(DelegationLines):
@@ -180,7 +191,7 @@ class FixedDelegations(DelegationLines):
         self.found = list(found)
 
     def lines(self, addr: str) -> list[str]:
-        raise NotImplementedError("red: C-prompts")
+        return list(self.found)
 
 
 class FixedMemory(MemoryText):
@@ -191,7 +202,8 @@ class FixedMemory(MemoryText):
         self.asked: list[str] = []
 
     def memory_text(self, addr: str) -> str:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append(addr)
+        return self.text
 
 
 class FixedBriefing(Briefing):
@@ -202,7 +214,8 @@ class FixedBriefing(Briefing):
         self.asked: list[str] = []
 
     def briefing(self, addr: str) -> str:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append(addr)
+        return self.text
 
 
 class FixedRenderer(ContextRenderer):
@@ -213,7 +226,10 @@ class FixedRenderer(ContextRenderer):
         self.on_ask: Callable[[], None] | None = None
 
     def render(self, addr: str, m: Message) -> str:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append((addr, m))
+        if self.on_ask is not None:
+            self.on_ask()
+        return f"RENDERED {m.id}"
 
 
 class FixedNotices(RunNotices):
@@ -225,7 +241,10 @@ class FixedNotices(RunNotices):
         self.on_ask: Callable[[], None] | None = None
 
     def notices(self, addr: str, batch: Sequence[Message]) -> str:
-        raise NotImplementedError("red: C-prompts")
+        self.asked.append((addr, batch))
+        if self.on_ask is not None:
+            self.on_ask()
+        return self.text
 
 
 @dataclass(frozen=True)
