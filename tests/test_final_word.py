@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from orgmcp import core, health as health_module
+from orgmcp import core
 from orgmcp.core import ROOT, OrgError, latest_results
 from orgmcp.health import agent_health
 from orgmcp.review import review
@@ -30,7 +30,6 @@ def clock(monkeypatch):
 
     c = Clock()
     monkeypatch.setattr(core, "utcnow", c)
-    monkeypatch.setattr(health_module, "utcnow", c)
     return c
 
 

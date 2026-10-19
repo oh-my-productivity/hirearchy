@@ -1,104 +1,29 @@
-"""Organization health, measured from the files alone.
+"""The old module-level names of ``orgmcp.health``, over the ``Org`` they are given.
 
-Everything here is read-only and derived from message files and run logs (nothing is persisted):
-
-* a run starts at the timestamp in its log file name and ends at the log's mtime;
-* an *empty* run is one during which the agent sent no message. Runs that failed (crash, timeout, kiro missing)
-  and runs woken only by runtime notes (stall reminders, reviews, refunds) are not the agent's doing and are left
-  out of the waste and cost statistics (``expensive``); ``runs_used`` itself still counts every run (it is the budget);
-* a task counts once, by its *latest* result: a ``blocked`` that was superseded by ``done`` is a ``done``;
-* *rework* is a received task that carries ``revises`` (a manager sent earlier work back). Rework that comes from
-  the client of a service case - a rework request after a delivery that was reported ``done``, and the re-checks
-  the owner sends its team while it handles such a request - is counted apart (``client_rework``) and is not held
-  against the agent: the client's rejection says nothing about the reviewer's or the writer's own quality.
-
-Thresholds come from ``HEALTH_DEFAULTS`` overridden by the ``health:`` mapping in ORG.md frontmatter.
+Exported by ``__init__`` until step E3 (``LEGACY_EXPORTS``). Step C-health starts here with the bodies of ``health.py`` as they were; they
+move into the analyzer, the renderer and the thresholds one at a time.
 """
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from collections.abc import Mapping
 from datetime import datetime, timezone
+from typing import Any
 
-from .core import ROOT, Message, Org, OrgError, latest_results, utcnow
-from .kernel import aware, fmt_duration, msg_time, parse_time, stamp_of
-from .settings import config_number  # noqa: F401 - re-export (legacy name health.config_number)
-from .settings import finite_number as _number
+from ..kernel import ROOT, Message, OrgError, aware, fmt_duration, latest_results, msg_time, parse_time, stamp_of
+from ..settings import config_number as config_number  # re-export (legacy name health.config_number)
+from ..settings import finite_number
+from .api import FLAGS, HEALTH_DEFAULTS, AgentHealth, BranchHealth, OrgHealth
 
-HEALTH_DEFAULTS: dict[str, float] = {
-    "stuck_after_seconds": 1800,  # open task older than this, with nothing in progress -> stuck
-    "max_runs_per_task": 5,  # runs used per result sent -> expensive
-    "max_runs_without_result": 6,  # runs since the last result while holding an open task -> expensive
-    "max_problem_ratio": 0.5,  # (failed + blocked + rework) / tasks received -> low_quality
-    "min_tasks_for_quality": 3,  # tasks received before low_quality can fire
-    "max_empty_run_ratio": 0.5,  # empty runs / runs used -> wasteful
-    "min_runs_for_waste": 4,  # runs used before wasteful can fire
-    "idle_after_seconds": 86400,  # no work and no activity for this long -> idle (candidate to retire)
-    "stranded_after_seconds": 1800,  # budget left, no work and no activity for this long -> stranded_budget
-}
+Org = Any  # the facade (a feature may not import it): the functions below take whatever has its methods
 
-FLAGS = ("stuck", "out_of_budget", "paused", "low_quality", "expensive", "wasteful", "stranded_budget", "idle")  # worst first
+__all__ = [
+    "FLAGS", "HEALTH_DEFAULTS", "AgentHealth", "BranchHealth", "OrgHealth", "agent_health", "config_number", "org_health", "render_text",
+    "thresholds",
+]
 
 
-@dataclass
-class AgentHealth:
-    addr: str
-    depth: int
-    state: str
-    budget_left: int | None
-    budget_received: int
-    runs_used: int
-    tasks_received: int
-    open_tasks: int
-    oldest_open_age: float | None  # seconds
-    done: int
-    failed: int
-    blocked: int
-    runs_per_task: float | None  # runs used / results sent; None without results
-    rework: int  # received tasks that revise an earlier one (client-driven ones excluded: see client_rework)
-    empty_runs: int  # runs that sent no message (failed runs and runs that only handled runtime notes excluded)
-    last_activity: datetime | None
-    since_activity: float | None  # seconds
-    flags: dict[str, str] = field(default_factory=dict)  # flag -> human reason
-    failed_runs: int = 0  # runs that crashed, failed to start, timed out or were interrupted (not the agent's fault)
-    runtime_runs: int = 0  # runs woken only by runtime notes (budget, stall, review): sending nothing is fine
-    client_rework: int = 0  # received reworks that stem from the client of a service case (not counted in ``rework``)
-
-    @property
-    def worst_flag(self) -> str | None:
-        return next((f for f in FLAGS if f in self.flags), None)
-
-
-@dataclass
-class BranchHealth:
-    addr: str  # the branch root ("root" = the whole organization)
-    agents: int
-    runs_used: int
-    open_tasks: int
-    done: int
-    failed: int
-    blocked: int
-    rework: int
-    worst_flag: str | None
-
-
-@dataclass
-class OrgHealth:
-    root: str
-    now: datetime
-    agents: list[AgentHealth]  # parents before children
-    branches: dict[str, BranchHealth]  # branch root address -> totals over it and its subtree
-
-    @property
-    def flagged(self) -> list[AgentHealth]:
-        return [a for a in self.agents if a.flags]
-
-    def to_dict(self) -> dict:
-        """Plain JSON-able structure (datetimes as ISO strings)."""
-        return _plain(asdict(self) | {"flagged": [a.addr for a in self.flagged]})
-
-
-def thresholds(org: Org) -> dict:
+def thresholds(org: Org) -> dict[str, float]:
     """HEALTH_DEFAULTS merged with the ``health:`` mapping of ORG.md.
 
     A value that is not a finite number falls back to its default (a typo in ORG.md must not break health).
@@ -106,7 +31,7 @@ def thresholds(org: Org) -> dict:
     custom = org.config.get("health")
     merged = {**HEALTH_DEFAULTS, **(custom if isinstance(custom, dict) else {})}
     for key, default in HEALTH_DEFAULTS.items():
-        number = _number(merged[key])
+        number = finite_number(merged[key])
         merged[key] = default if number is None else number
     return merged
 
@@ -146,12 +71,12 @@ def _holds_client_rework(org: Org, task: Message, depth: int) -> bool:
     )
 
 
-def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict | None = None) -> AgentHealth:
+def agent_health(org: Org, addr: str, now: datetime | None = None, limits: Mapping[str, float] | None = None) -> AgentHealth:
     """Metrics and flags for one agent. ``now`` defaults to the current time; ``limits`` to ``thresholds(org)``."""
     a = org.require(addr)
     if a == ROOT:
         raise OrgError("root is the human; only agents have health data")
-    now, cfg = _aware(now) or utcnow(), limits or thresholds(org)
+    now, cfg = _aware(now) or org.runtime.clock.now(), limits or thresholds(org)
 
     received, sent = org.received(a), org.sent(a)
     tasks = [m for m in received if m.type == "task"]
@@ -235,7 +160,7 @@ def agent_health(org: Org, addr: str, now: datetime | None = None, limits: dict 
 def org_health(org: Org, root: str = ROOT, now: datetime | None = None) -> OrgHealth:
     """Health of ``root`` and everything below it (``root`` = the whole organization, human excluded)."""
     top = org.require(root)
-    now, cfg = _aware(now) or utcnow(), thresholds(org)
+    now, cfg = _aware(now) or org.runtime.clock.now(), thresholds(org)
     addrs = org.agents() if top == ROOT else org.subtree(top)
     agents = [agent_health(org, a, now, cfg) for a in addrs]
     by_addr = {h.addr: h for h in agents}
@@ -288,6 +213,7 @@ def render_text(health: OrgHealth) -> str:
 
 
 # The time helpers live in the kernel; other modules still import these private names from here.
+_number = finite_number
 _aware = aware
 _parse_time = parse_time
 _stamp = stamp_of
@@ -303,11 +229,3 @@ def _since_hired(org: Org, addr: str, now: datetime) -> float:
 
 
 _duration = fmt_duration
-
-
-def _plain(value):
-    if isinstance(value, dict):
-        return {k: _plain(v) for k, v in value.items()}
-    if isinstance(value, list):
-        return [_plain(v) for v in value]
-    return value.isoformat() if isinstance(value, datetime) else value

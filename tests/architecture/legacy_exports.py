@@ -77,7 +77,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     },
     "health": _e3(
         "HEALTH_DEFAULTS FLAGS AgentHealth BranchHealth OrgHealth thresholds agent_health org_health "
-        "render_text"
+        "render_text config_number"
     ),
     "review": _e3(
         "LEDGER Note Review read_ledger total_runs review_if_due review"
