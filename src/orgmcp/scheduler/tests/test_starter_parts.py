@@ -14,9 +14,7 @@ from orgmcp.scheduler.testing import (
     RecordingRunFailures, RecordingStartFailures, ScriptedCommands, ScriptedPreparation, ScriptedSpawning, ScriptedStrayWatch, lifecycle_world,
 )
 
-from ._support import prepared, red
-
-pytestmark = red
+from ._support import prepared
 
 
 def preparer(w: LifecycleWorld) -> BatchPreparer:
@@ -81,14 +79,14 @@ def test_a_start_that_failed_is_logged_given_back_and_counted_as_a_failed_run() 
     run = preparer(w).prepare("ceo")
     events, failures = RecordingRunEvents(), RecordingRunFailures()
     StartFailureHandler(w.box, events, failures).handle(run, FileNotFoundError("kiro-cli"))
-    assert isinstance(run.sink, object) and w.box.messages("ceo", "inbox") != [] and w.box.messages("ceo", "inflight") == []
+    assert w.box.messages("ceo", "inbox") != [] and w.box.messages("ceo", "inflight") == []
     assert events.calls == [("not_started", "ceo", "kiro-cli")] and failures.failed_runs == [("ceo", run.log, run.traces)]
     assert w.runs_store.read_log(run.log) == b"\n# failed to start: kiro-cli\n"
 
 
 def test_the_announcement_emits_records_and_says_so_and_a_registry_that_fails_is_only_guarded() -> None:
     events, records, guard, console = RecordingRunEvents(), MemoryRunRecords(), CatchingGuard(), RecordingConsole()
-    table, clock = FakeProcessTable(), FakeClock()
+    table = FakeProcessTable()
     p = prepared("ceo")
     run = RunRecord("ceo", table.spawn(["x"], cwd=Path("/"), env={}, stdin=None, stdout=None), p.log, p.sink, 0.0, 1, run_id=p.run_id)
     announcing = StartAnnouncer(events, records, guard, console)
@@ -97,7 +95,6 @@ def test_the_announcement_emits_records_and_says_so_and_a_registry_that_fails_is
     records.fail = OSError("disk full")
     announcing.announce(run, p)
     assert guard.errors == [("run record", "OSError: disk full")] and console.lines[-1] == "ceo: started run (1 message(s))"
-    assert clock.time() > 0
 
 
 def test_a_started_run_joins_the_table_with_the_strays_before_it() -> None:

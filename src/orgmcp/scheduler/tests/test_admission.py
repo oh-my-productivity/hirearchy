@@ -2,13 +2,9 @@
 
 from __future__ import annotations
 
-from orgmcp.kernel.testing import ListEventSink
 from orgmcp.scheduler._admission import BudgetGate
 from orgmcp.scheduler.testing import LifecycleWorld, lifecycle_world
 
-from ._support import red
-
-pytestmark = red
 
 
 def gate(w: LifecycleWorld) -> BudgetGate:
@@ -72,4 +68,4 @@ def test_events_of_the_pause_are_the_pause_stores_not_the_gates() -> None:
     w.hire("ceo", budget=0)
     w.mail_to("ceo")
     gate(w).admit("ceo")
-    assert [e.kind for e in w.events.events] == ["agent.pause"] and isinstance(w.events, ListEventSink)
+    assert [e.kind for e in w.events.events] == ["agent.pause"]

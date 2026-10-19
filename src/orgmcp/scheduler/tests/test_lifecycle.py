@@ -7,9 +7,6 @@ import signal
 from orgmcp.scheduler._run import RunTable
 from orgmcp.scheduler.testing import LifecycleWorld, lifecycle_world
 
-from ._support import red
-
-pytestmark = red
 
 
 def world(config: str = "") -> LifecycleWorld:
@@ -54,7 +51,6 @@ def test_failed_runs_are_counted_and_the_agent_is_paused_at_the_limit() -> None:
         w.lifecycle.reaper.reap(runs)
         assert w.box.messages("ceo", "inbox") != [] and runs == {}
         assert w.console.lines[-1].startswith(f"ceo: run failed ({attempt} in a row)")
-        w.pauses.resume("ceo", "") if attempt == 1 else None
     assert w.pauses.paused("ceo") == "failures" and [m.to for m in w.delivery.messages] == ["root"]
     assert [e["count"] for e in w.events_of("agent.failure")] == [1, 2]
 

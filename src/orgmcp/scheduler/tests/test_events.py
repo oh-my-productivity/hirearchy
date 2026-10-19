@@ -9,9 +9,7 @@ from orgmcp.mail.testing import memory_mailbox
 from orgmcp.processes.testing import FakeProcessTable
 from orgmcp.scheduler._events import ERROR_MAX, LifecycleEvents, SchedulerEvents
 
-from ._support import ROOT_DIR, a_run, message, prepared, red
-
-pytestmark = red
+from ._support import ROOT_DIR, a_run, message, prepared
 
 
 def test_the_events_of_the_scheduler_say_who_emits() -> None:

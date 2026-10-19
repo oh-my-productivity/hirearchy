@@ -8,9 +8,7 @@ from orgmcp.processes.testing import FakeProcessTable
 from orgmcp.runs.testing import MemoryRuns
 from orgmcp.scheduler._tracker import RunTracker
 
-from ._support import ROOT_DIR, a_run, red
-
-pytestmark = red
+from ._support import ROOT_DIR, a_run
 
 
 def make() -> tuple[RunTracker, MemoryRuns, FakeProcessTable, FakeClock]:

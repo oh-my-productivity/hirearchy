@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import signal
-from pathlib import Path
 
 from orgmcp.kernel.testing import FakeClock
 from orgmcp.processes.testing import FakeProcessTable
@@ -15,9 +14,7 @@ from orgmcp.scheduler.testing import (
 )
 from orgmcp.access.testing import StaticAccess
 
-from ._support import ROOT_DIR, a_run, red
-
-pytestmark = red
+from ._support import ROOT_DIR, a_run
 
 
 def watcher(timeout: float = 100.0) -> tuple[ExitWatcher, FakeProcessTable, FakeClock, StaticAccess]:
@@ -166,4 +163,4 @@ def test_a_stray_check_or_registry_that_fails_never_stops_the_settling() -> None
 def test_terminate_all_is_the_terminators() -> None:
     terminating = RecordingTerminating()
     PollingRunReaper(ScriptedWatching(), MemoryRunRecords(), CatchingGuard(), ScriptedStrayWatch(), RecordingSettling(), FakeClock(), terminating).terminate_all({})
-    assert terminating.calls == 1 and Path("/") == Path("/")
+    assert terminating.calls == 1

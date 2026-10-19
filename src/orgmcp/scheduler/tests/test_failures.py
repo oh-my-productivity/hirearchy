@@ -11,9 +11,7 @@ from orgmcp.scheduler._failures import CountingFailures, PausingEscalation
 from orgmcp.scheduler.testing import RecordingConsole
 from orgmcp.templates.testing import RecordingNotices
 
-from ._support import ROOT_DIR, red
-
-pytestmark = red
+from ._support import ROOT_DIR
 
 LOG = ROOT_DIR / "ceo" / "eng" / "runs" / "20260101T000000000000.log"
 

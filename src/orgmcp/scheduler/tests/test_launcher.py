@@ -10,9 +10,6 @@ from orgmcp.scheduler._run import RunCount, RunRecord
 from orgmcp.scheduler._starter import AgentRunLauncher
 from orgmcp.scheduler.testing import RecordingInitiation, ScriptedAdmission
 
-from ._support import red
-
-pytestmark = red
 
 AGENTS = ["a", "b", "c", "d"]
 

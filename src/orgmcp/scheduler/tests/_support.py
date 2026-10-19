@@ -4,15 +4,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from orgmcp.kernel import Message
 from orgmcp.kernel.testing import FakeClock
 from orgmcp.processes.testing import FakeProcessTable
 from orgmcp.scheduler._run import PreparedRun, RunRecord
 from orgmcp.scheduler.testing import NullSink
 
-red = pytest.mark.xfail(strict=True, reason="red: D-sched-1")
 ROOT_DIR = Path("/memory/org")
 
 

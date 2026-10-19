@@ -10,9 +10,7 @@ from orgmcp.scheduler._strays import StrayCheck
 from orgmcp.scheduler.testing import NullSink, RecordingConsole
 from orgmcp.strays.testing import MemoryStrays
 
-from ._support import a_run, red
-
-pytestmark = red
+from ._support import a_run
 
 WORKSPACE = Path("/ws")
 
