@@ -1114,6 +1114,18 @@ class ExitPolicy(Protocol):
 class PhaseGuard(Protocol):
     def guard(self, phase: str, fn: Callable[[], None]) -> None: """Run a best-effort phase; log once per distinct error."""
 
+```
+**D-sched-1 (the run lifecycle) as built.** `_ports.py` holds `RunStarter` (`launch(runs, blocked, max_runs) -> int`, `start(runs, addr)`) and `RunReaper` (`reap(runs)`,
+`terminate_all(runs)`), and the roles they are made of, each a small Protocol: `RunAdmission` (`BudgetGate`), `RunPreparation` (`BatchPreparer`), `RunSpawning`
+(`CommandSpawner`), `StartFailures`, `StartAnnouncing`, `RunInitiation` (`SingleRunStarter`); `RunWatching` (`ExitWatcher`), `RunSettling` (`RunSettlement`),
+`RunTerminating` (`ShutdownTerminator`); `RunEvents` (`LifecycleEvents`), `RunRecords` (`RunTracker`), `RunFailures` + `FailureEscalation` (`CountingFailures`,
+`PausingEscalation`), `StrayWatch` (`StrayCheck`); `Console` and `PhaseGuard` are what the loop gives them (its output and its best-effort guard). The runs started are
+counted in a `RunCount` the loop and the preparation share (`max_runs` is compared with it), so `launch` needs no "remaining" argument and a failed start counts as
+before. `_assembly.assemble(LifecyclePorts, run_clock, console, guard, count) -> Lifecycle(starter, reaper)` is the one place that puts them together (wiring and
+`testing.lifecycle_world` call it); `app/wire_scheduler.lifecycle_of(runtime, ...)` makes it over a runtime. The boundary for D-sched-2: `HeartbeatLoop` takes a `Lifecycle`
+(or the two ports) and a `cadence_clock`; it owns `RunTable`, `RunCount` and `blocked`; `Scheduler._launch/_start/_reap/release` are delegators until it replaces them.
+
+```python
 # mcp_server/api.py
 class McpServerFactory(Protocol):
     def build(self, me: str) -> object: """The FastMCP server for `me` (root may start before an org exists)."""

@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Protocol
 
 from ..processes import ProcessHandle
-from ..runs import RunLogSink
 from ._run import Exit, PreparedRun, RunRecord, RunTable
 
 

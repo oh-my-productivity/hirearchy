@@ -2,6 +2,11 @@
 
 One agent runs at most once at a time; different agents run in parallel. A run is a separate
 process (kiro-cli by default) whose orgmcp MCP server is bound to the agent via ORG_AGENT.
+
+What is left here is the loop, for D-sched-2: acquire / release / serve / tick, the orphans of a dead scheduler (``_settle_orphans``), the upkeep (heartbeat,
+pruning), the exit policy (``finished``, ``_check_waiting``), the guard, the stall and review phases, and the legacy module functions. The run lifecycle -
+starting a run and reaping it - is done by the ``Lifecycle`` of ``_assembly`` (``_launch`` / ``_start`` / ``_reap`` / ``release`` only hand over to it); it is
+timed by the run clock (the system's), ``clock`` below is the cadence clock of the stalls, the review and the heartbeat.
 """
 
 from __future__ import annotations

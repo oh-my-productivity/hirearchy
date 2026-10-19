@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..access.testing import StaticAccess
-from ..agents.testing import MemoryAgents
 from ..budget.testing import FixedBudget
 from ..delivery.testing import RecordingDelivery
 from ..eligibility.testing import MemoryFailureCounter, MemoryPauseStore

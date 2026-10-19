@@ -9,7 +9,7 @@ from orgmcp.processes.testing import FakeProcessTable
 from orgmcp.scheduler._reaper import ExitWatcher, PollingRunReaper, RunSettlement, ShutdownTerminator
 from orgmcp.scheduler._run import Exit, RunRecord
 from orgmcp.scheduler.testing import (
-    CatchingGuard, LifecycleWorld, MemoryRunRecords, NullSink, RecordingConsole, RecordingRunEvents, RecordingRunFailures, RecordingSettling,
+    CatchingGuard, LifecycleWorld, MemoryRunRecords, NullSink, RecordingRunEvents, RecordingRunFailures, RecordingSettling,
     RecordingTerminating, ScriptedStrayWatch, ScriptedWatching, lifecycle_world,
 )
 from orgmcp.access.testing import StaticAccess
