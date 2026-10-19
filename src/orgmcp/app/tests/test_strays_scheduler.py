@@ -17,9 +17,6 @@ from orgmcp.app import Org
 from orgmcp.scheduler import Scheduler
 from orgmcp.strays import StrayProbe, StrayRegistry
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-strays")
-
-
 class ScriptedProbe(StrayProbe):
     """Probes ``{"/p": 1.0}`` before the run and ``{"/p": 2.0, ...}`` after it; finds what it is told."""
 
@@ -72,7 +69,6 @@ def run_once(org: Org, lines: list[str]) -> None:
     assert not sched.runs
 
 
-@RED
 def test_the_probe_is_the_one_of_the_runtime_and_runs_before_and_after_the_run(org: Org) -> None:
     probe = ScriptedProbe([])
     org.runtime = dataclasses.replace(org.runtime, stray_probe=probe, stray_registry=RecordingRegistry())
@@ -80,7 +76,6 @@ def test_the_probe_is_the_one_of_the_runtime_and_runs_before_and_after_the_run(o
     assert probe.probes == ["dev", "dev"] and probe.compared == [({"/p": 1.0}, {"/p": 2.0})]
 
 
-@RED
 def test_what_is_found_is_logged_echoed_and_recorded_in_the_registry_of_the_runtime(org: Org) -> None:
     found = [f"/ws/dev/{n}" for n in range(7)]
     registry = RecordingRegistry()

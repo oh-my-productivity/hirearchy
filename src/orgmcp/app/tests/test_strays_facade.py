@@ -12,9 +12,6 @@ import pytest
 from orgmcp.app import Org
 from orgmcp.strays import StrayRegistry
 
-RED = pytest.mark.xfail(strict=True, reason="red: B-strays")
-
-
 @pytest.fixture
 def org(tmp_path: Path) -> Org:
     made = Org.init(tmp_path / "org", "mission")
@@ -44,7 +41,7 @@ def test_an_agent_without_the_built_in_write_is_told_the_plain_tool_name(org: Or
     assert "`@orgmcp/write`" in org.stray_notice("plain")
 
 
-# -------------------------------------------------------------------------------------------- through the ports (red until wired)
+# -------------------------------------------------------------------------------------------- through the ports 
 
 
 class FixedRegistry(StrayRegistry):
@@ -59,7 +56,6 @@ class FixedRegistry(StrayRegistry):
         return f"NOTICE for {addr}"
 
 
-@RED
 def test_the_notice_comes_from_the_stray_registry_of_the_runtime(org: Org) -> None:
     fixed = FixedRegistry()
     org.runtime = dataclasses.replace(org.runtime, stray_registry=fixed)

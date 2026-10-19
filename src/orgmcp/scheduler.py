@@ -951,18 +951,14 @@ class Scheduler:
         Nothing is moved or deleted."""
         if run.strays is None:
             return
-        found = _strays_since(run.strays, _stray_probe(self.org, run.addr))
+        found = self.org.runtime.stray_probe.found_since(run.strays, _stray_probe(self.org, run.addr))
         if not found:
             return
         rel = ", ".join(found[:5])
         run.logf.write(log_note(f"warning: {run.addr} created org files in its workspace with the built-in `write` "
                                 f"(not in the org, so they are not its memory): {rel}"))
         self.echo(f"{run.addr}: warning: org files in its workspace (built-in write shadows orgmcp write?): {rel}")
-        ledger = self.org.ledger("strays")
-        entry = ledger.get(run.addr) if isinstance(ledger.get(run.addr), dict) else {}
-        if not entry.get("told"):  # told once per agent: later strays are only logged
-            ledger[run.addr] = {"paths": found[:10], "told": False}
-            self.org.save_ledger("strays", ledger)
+        self.org.runtime.stray_registry.record(run.addr, found)  # told once per agent: later strays are only logged
 
     def _failed(self, addr: str, log: Path, traces=()) -> None:
         n = self.org.record_failure(addr)
@@ -1075,30 +1071,10 @@ class Scheduler:
 
 
 def _stray_probe(org: Org, addr: str) -> dict:
-    """Where an agent's built-in ``write`` leaves org files in its workspace, and what is there now.
+    """Where an agent's built-in ``write`` leaves org files in its workspace, and what is there now (``strays.StrayProbe.probe``).
 
-    kiro's ``write`` starts in the workspace, so ``write("lead/analyst/MEMORY.md")`` lands in ``<workspace>/lead/analyst/``.
-    Probed: ``<workspace>/<address>`` (a directory) and ``<workspace>/<address>/MEMORY.md``, each with its mtime.
-    Empty for an agent without built-in ``write`` or without a workspace (then nothing can land there).
-    """
-    meta, _ = org.charter(addr)
-    ws = org.workspace_of(addr)
-    if "write" not in (meta.get("tools") or []) or ws is None:
-        return {}
-    tree = ws.joinpath(*addr.split("/"))
-    out = {}
-    for path in (tree, tree / "MEMORY.md"):
-        try:
-            out[str(path)] = path.stat().st_mtime
-        except OSError:
-            pass
-    return out
-
-
-def _strays_since(before: dict, after: dict) -> list[str]:
-    """Paths of ``after`` that did not exist before the run, and a MEMORY.md written during it."""
-    new = [p for p, mtime in after.items() if p not in before or (p.endswith("MEMORY.md") and mtime > before[p])]
-    return [p for p in new if not (p.endswith("/MEMORY.md") and p.rsplit("/", 1)[0] in new)]  # the tree says it all
+    Kept as the module's patch point for the tests until D-sched-1 moves the stray check out of the scheduler."""
+    return org.runtime.stray_probe.probe(addr)
 
 
 def nothing_to_do(org: Org) -> bool:
