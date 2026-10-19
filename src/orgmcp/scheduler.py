@@ -6,11 +6,7 @@ process (kiro-cli by default) whose orgmcp MCP server is bound to the agent via 
 
 from __future__ import annotations
 
-import hashlib
-import json
 import os
-import re
-import shutil
 import signal
 import subprocess
 import sys
@@ -22,7 +18,7 @@ from pathlib import Path
 from typing import Callable, NamedTuple
 
 from . import review, telemetry, templates
-from .app import wire_processes
+from .app import wire_kiro, wire_processes
 from .app.wiring import open_runtime
 from .core import ROOT, Org, OrgError, atomic_write
 from .health import config_number
@@ -45,138 +41,56 @@ from .runs import (
 # (org, agent address, prompt) -> (argv, cwd, env). The prompt is delivered on the process's stdin, not in argv.
 Runner = Callable[[Org, str, str], tuple[list[str], Path, dict]]
 
-PROJECT_DIR = Path(__file__).resolve().parents[2]
-KIRO_AGENTS_DIR = Path.home() / ".kiro" / "agents"
+PROJECT_DIR = wire_kiro.project_dir()  # two levels above the package, as `Path(__file__).resolve().parents[2]` was
+KIRO_AGENTS_DIR = Path.home() / ".kiro" / "agents"  # evaluated at import, as before; tests patch it (the wrappers read it at call time)
+
+
+# The kiro functions below are thin wrappers over `orgmcp.kiro` (B-kiro) until the scheduler is converted (D-sched-1): they stay module
+# attributes because tests replace them (`mcp_server_command`, `file_confinement`, `ensure_kiro_profile`) and the settings above
+# (`KIRO_AGENTS_DIR`), and each wrapper uses whatever is in force when it is called.
 
 
 def mcp_server_command() -> dict:
     """How kiro should start the orgmcp MCP server (prefer the venv's console script)."""
-    script = Path(sys.executable).with_name("orgmcp")
-    if script.exists():
-        return {"command": str(script), "args": ["mcp"]}
-    return {"command": shutil.which("uv") or "uv", "args": ["--directory", str(PROJECT_DIR), "run", "orgmcp", "mcp"]}
-
-
-def _slug(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    return wire_kiro.mcp_locator().command()
 
 
 def kiro_profile_name(org_root: str | Path, tools: list[str]) -> str:
-    """``orgmcp-<org-slug>-<6-char hash of the org root path>[-<tools>]``, lowercase ``[a-z0-9-]``.
-
-    The hash makes the name unique per organization (two ``.../org`` dirs never share a profile); the slug only
-    makes it recognizable. Profiles of different orgs therefore never overwrite each other.
-    """
-    root = Path(org_root).expanduser().resolve()
-    base = root.name
-    if base.lower() == "org" and root.parent.name:  # "org" alone says nothing: use "<parent>-org"
-        base = f"{root.parent.name}-org"
-    slug = _slug(base)[:24].strip("-") or "org"
-    digest = hashlib.sha1(str(root).encode("utf-8")).hexdigest()[:6]
-    return "-".join(["orgmcp", slug, digest, *(_slug(t) for t in sorted(set(tools)) if _slug(t))])
-
-
-FILE_TOOLS = ("read", "write")  # kiro built-ins whose reach can be limited by path (shell cannot)
+    """``orgmcp-<org-slug>-<6-char hash of the org root path>[-<tools>]``, lowercase ``[a-z0-9-]`` (see ``OrgProfileProvisioner``)."""
+    return wire_kiro.profile_name(Path(org_root), tools)
 
 
 def file_confinement(
     org_root: Path, tools: list[str], workspace: Path | None, inputs: list[Path]
 ) -> tuple[list[str], dict]:
-    """(allowedTools, toolsSettings) that confine kiro's built-in ``read``/``write`` by path.
-
-    Verified against kiro-cli 2.29.1 (see README, "Workspaces, inputs and confinement"):
-    * ``read``/``write`` must NOT be in ``allowedTools``: a tool there ignores ``allowedPaths``. Left out, a call inside
-      ``allowedPaths`` runs unprompted and any other path asks for an approval, which ``--no-interactive`` cannot
-      give, so it is refused.
-    * ``write``: only under the workspace (``[]`` without one: nowhere). ``read``: workspace + inputs + the organization
-      (read-only: orgmcp's own ``read`` may read anything in the org, and an agent that holds the built-in ``read``
-      sees only that one: it hides orgmcp's ``read``, same short name, see studies/F-read-experiment); a directory
-      needs both ``P`` and ``P/**`` to be listable.
-    * ``deniedPaths`` on the org directory is a hard deny even for kiro's own "current directory is readable" rule:
-      the org is never written with kiro's tools (orgmcp ``write`` does that), so ``write`` keeps the deny. ``read``
-      has none: a deny would beat the allow above. Skipped when the workspace is inside the org.
-    * ``shell`` stays in ``allowedTools`` and is NOT confined (kiro has no path rule for it).
-    """
-    org_root = Path(org_root).resolve()
-    deny = [] if workspace is not None and (workspace == org_root or org_root in workspace.parents) else [str(org_root), f"{org_root}/**"]
-    settings: dict = {}
-    if "write" in tools:
-        settings["write"] = {"allowedPaths": [f"{workspace}/**"] if workspace is not None else [], "deniedPaths": deny}
-    if "read" in tools:
-        bases = [p for p in (workspace, *inputs, org_root) if p is not None]
-        settings["read"] = {"allowedPaths": list(dict.fromkeys(x for p in bases for x in (str(p), f"{p}/**"))), "deniedPaths": []}
-    return [t for t in tools if t not in FILE_TOOLS], settings
+    """(allowedTools, toolsSettings) that confine kiro's built-in ``read``/``write`` by path (see ``KiroConfinementPolicy``)."""
+    return wire_kiro.confinement_policy().file_confinement(org_root, tools, workspace, inputs)
 
 
 def ensure_kiro_profile(
     tools: list[str], agents_dir: Path | None = None, *, org: Org,
     workspace: Path | None = None, inputs: list[Path] | None = None, confine: bool = False,
 ) -> str:
-    """Write the scheduler's profile for ``org`` into ``~/.kiro/agents``: only the orgmcp server plus the granted tools.
-
-    The profile is internal to this organization: its MCP server entry carries ``ORG_ROOT`` (this org) and
-    ``ORG_REQUIRE_AGENT=1``, so used outside the scheduler (no ``ORG_AGENT``) the server refuses to start instead of
-    acting as ``root``. ``ORG_AGENT`` itself is NOT baked in: it comes from the scheduler's process environment
-    (assumption: kiro starts MCP servers with its own environment plus the profile's ``env``; if it did not, the
-    server would fail closed and the run would fail visibly rather than act as root).
-
-    ``confine=False``: the shared profile of the org for this tool set; every granted tool runs unprompted.
-    ``confine=True``: the profile of an agent with built-in ``read``/``write``: they are limited to ``workspace`` (write)
-    and ``workspace`` + ``inputs`` + the org itself (read), see :func:`file_confinement`. Its name carries a hash of that access, so
-    agents with the same tools and access share a profile and different access never does.
+    """Write the scheduler's profile for ``org`` into ``~/.kiro/agents`` (see ``OrgProfileProvisioner.ensure_profile``).
 
     The directory is resolved when called (not when defined), so ``KIRO_AGENTS_DIR`` can be redirected.
     Profiles of other orgs, and the legacy global ``orgmcp[-tools].json`` files, are never touched.
     """
     agents_dir = Path(agents_dir) if agents_dir is not None else Path(KIRO_AGENTS_DIR)
-    tools = sorted(set(tools))
-    name = kiro_profile_name(org.root, tools)
-    allowed, settings = ["@orgmcp", *tools], {}
-    if confine:
-        allowed, settings = file_confinement(org.root, tools, workspace, list(inputs or []))
-        allowed = ["@orgmcp", *allowed]
-        name += "-x" + hashlib.sha1(json.dumps(settings, sort_keys=True).encode("utf-8")).hexdigest()[:8]
-    server = {**mcp_server_command(), "env": {"ORG_ROOT": str(org.root), "ORG_REQUIRE_AGENT": "1"}}
-    data = templates.kiro_profile(
-        name,
-        f"internal: used by the orgmcp scheduler for {org.root}; not a general-purpose agent"
-        + (f" (built-in tools: {', '.join(tools)})" if tools else ""),
-        ["@orgmcp", *tools],
-        server,
-        allowed_tools=allowed,
-        tools_settings=settings,
+    provisioner = wire_kiro.provisioner_at(
+        org.root, agents_dir, wire_kiro.FunctionMcpServerLocator(mcp_server_command),
+        wire_kiro.FunctionConfinementPolicy(file_confinement),
     )
-    path = agents_dir / f"{name}.json"
-    try:
-        current = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):  # missing or corrupt: rewrite it
-        current = None
-    if current != data:
-        atomic_write(path, json.dumps(data, indent=2) + "\n")  # temp file + rename: never a half-written profile
-    return name
+    return provisioner.ensure_profile(tools, workspace=workspace, inputs=inputs, confine=confine)
 
 
 def kiro_runner(kiro_bin: str = "kiro-cli") -> Runner:
     def build(org: Org, addr: str, prompt: str) -> tuple[list[str], Path, dict]:
-        meta, _ = org.charter(addr)
-        tools = list(meta.get("tools") or [])
-        # An agent with built-in read/write gets a profile that confines them by path. The one exception is a legacy
-        # charter (built-in `read` only, no workspace, no `inputs` key), which keeps the unconfined profile it always had.
-        legacy = "write" not in tools and org.unconfined_read(meta)
-        if set(tools) & set(FILE_TOOLS) and not legacy:
-            profile = ensure_kiro_profile(
-                tools, org=org, workspace=org.workspace_of(addr), inputs=org.inputs_of(addr), confine=True
-            )
-        else:
-            profile = ensure_kiro_profile(tools, org=org)
-        cmd = [kiro_bin, "chat", "--no-interactive", "--agent", profile]
-        cmd += ["--model", org.model_for(addr)]  # always explicit: charter model > org default_model > DEFAULT_MODEL
-        # The prompt is not an argument: it can be arbitrarily long (E2BIG) and visible in `ps`.
-        # `kiro-cli chat --no-interactive` without INPUT reads it from stdin; the scheduler feeds it there.
-        ws = meta.get("workspace")
-        cwd = Path(ws).expanduser() if ws else org.dir(addr)
-        env = {**os.environ, "ORG_ROOT": str(org.root), "ORG_AGENT": addr}
-        return cmd, cwd, env
+        provisioner = wire_kiro.FunctionProfileProvisioner(
+            lambda tools, **kw: ensure_kiro_profile(tools, org=org, **kw), lambda tools: kiro_profile_name(org.root, list(tools))
+        )
+        command = wire_kiro.run_command_builder(org.runtime, kiro_bin, provisioner).build(addr, prompt)
+        return list(command.argv), command.cwd, dict(command.env)
 
     return build
 
