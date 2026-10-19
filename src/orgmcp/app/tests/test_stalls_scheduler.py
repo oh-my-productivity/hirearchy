@@ -15,8 +15,6 @@ from orgmcp.scheduler import Scheduler, waiting_on_user
 from orgmcp.stalls import NudgeLedger
 from orgmcp.templates.testing import RecordingNotices
 
-RED = pytest.mark.xfail(strict=True, reason="red: C-stalls")
-
 
 class FixedNudges(NudgeLedger):
     """A ledger that has these entries and the chain it is told."""
@@ -40,7 +38,6 @@ def org(tmp_path: Path) -> Org:
     return made
 
 
-@RED
 def test_the_scheduler_climbs_the_ladder_of_the_runtime(org: Org) -> None:
     org.delegate("root", "ceo", "T", "g", "a", budget=3)
     org.begin_run("ceo")
@@ -59,7 +56,6 @@ def test_the_task_view_of_the_scheduler_is_remembered(org: Org) -> None:
     assert sched._task_view("ceo", "open_tasks") is sched._task_view("ceo", "open_tasks")  # remembered: the very same list
 
 
-@RED
 def test_waiting_on_user_reads_the_steps_taken_and_the_chain_from_the_nudge_ledger(org: Org) -> None:
     task = org.delegate("root", "ceo", "T", "g", "a", budget=3)
     org.begin_run("ceo")
@@ -71,7 +67,6 @@ def test_waiting_on_user_reads_the_steps_taken_and_the_chain_from_the_nudge_ledg
     assert org.runtime.nudge_ledger.asked == [("ceo", task.id)]  # type: ignore[attr-defined]
 
 
-@RED
 def test_the_helpers_of_the_ladder_are_gone_from_the_scheduler() -> None:
     assert not hasattr(sched_module, "_nudge_entries") and not hasattr(sched_module, "_chain")
     assert not any(hasattr(Scheduler, name) for name in ("_created", "_chain", "_task_memo"))
