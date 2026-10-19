@@ -14,14 +14,15 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp.app import Org
+from orgmcp.app import Org, fields_cli, wire_cli, wiring
+from orgmcp.app.wire_locator import os_locator
 from orgmcp.cli import CliApp
+from orgmcp.cli._session import AnnouncingOrgSession
 from orgmcp.cli.testing import MemoryOutput
 from orgmcp.hierarchy import Hiring
 from orgmcp.kernel import ROOT, OrgError
 from orgmcp.kernel.testing import FakeClock
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: D-cli")
 
 COMMANDS = [
     "init", "hire", "task", "services", "define-service", "request", "feedback", "retire-service", "plan", "apply", "send", "status", "health", "progress",
@@ -36,16 +37,10 @@ def team(tmp_path: Path) -> Org:
     return made
 
 
-def wire():  # type: ignore[no-untyped-def]
-    from orgmcp.app import wire_cli
-
-    return wire_cli
-
-
 def test_the_program_is_the_command_line_with_the_25_commands_in_order() -> None:
-    assert isinstance(wire().cli_app(), CliApp)
-    session = wire().AnnouncingOrgSession(wire().os_locator(), wire().RuntimeOrgOpener(), wire().StandardOutput())
-    commands = wire().commands_over(session, wire().StandardOutput(), wire().StandardTerminal(), FakeClock())
+    assert isinstance(wire_cli.cli_app(), CliApp)
+    session = AnnouncingOrgSession(os_locator(), wire_cli.RuntimeOrgOpener(), wire_cli.StandardOutput())
+    commands = wire_cli.commands_over(session, wire_cli.StandardOutput(), wire_cli.StandardTerminal(), FakeClock())
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="cmd")
     for command in commands:
@@ -54,22 +49,19 @@ def test_the_program_is_the_command_line_with_the_25_commands_in_order() -> None
 
 
 def test_the_wiring_has_no_port_of_its_own() -> None:
-    from orgmcp.app import fields_cli, wiring
-    from orgmcp.app.wire_cli import register
-
     assert fields_cli.STEP == "D-cli" and "CliApp" in fields_cli.NOT_A_FIELD
-    assert register in wiring.registrars()
+    assert wire_cli.register in wiring.registrars()
 
 
 def test_the_output_and_the_terminal_are_the_standard_ones_looked_up_at_each_call(capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch) -> None:
-    out = wire().StandardOutput()
+    out = wire_cli.StandardOutput()
     out.say("one")
     out.say()
     out.write("two")
     out.warn("three")
     captured = capsys.readouterr()
     assert captured.out == "one\n\ntwo" and captured.err == "three\n"
-    terminal = wire().StandardTerminal()
+    terminal = wire_cli.StandardTerminal()
 
     class Tty(io.StringIO):
         def isatty(self) -> bool:
@@ -83,12 +75,12 @@ def test_the_output_and_the_terminal_are_the_standard_ones_looked_up_at_each_cal
 
 
 def test_json_is_indented_and_made_of_text(tmp_path: Path) -> None:
-    dump = wire().PlainJson().dump({"at": datetime(2026, 1, 15, 9, 0, tzinfo=timezone.utc), "path": tmp_path, "tags": ("a", "b"), "set": {1}})
+    dump = wire_cli.PlainJson().dump({"at": datetime(2026, 1, 15, 9, 0, tzinfo=timezone.utc), "path": tmp_path, "tags": ("a", "b"), "set": {1}})
     assert dump == json.dumps({"at": "2026-01-15T09:00:00+00:00", "path": str(tmp_path), "tags": ["a", "b"], "set": [1]}, indent=2)
 
 
 def test_the_opener_opens_an_organization_and_refuses_a_directory_that_is_none(team: Org, tmp_path: Path) -> None:
-    opener = wire().RuntimeOrgOpener()
+    opener = wire_cli.RuntimeOrgOpener()
     ports = opener.open(team.root)
     assert ports.root == team.root and isinstance(ports.get(Hiring), Hiring)
     with pytest.raises(OrgError, match="not an organization"):
@@ -97,8 +89,8 @@ def test_the_opener_opens_an_organization_and_refuses_a_directory_that_is_none(t
 
 
 def test_a_provider_asks_the_organization_the_session_opened_last(team: Org) -> None:
-    session = wire().AnnouncingOrgSession(wire().os_locator(), wire().RuntimeOrgOpener(), MemoryOutput())
-    hiring = wire().of(session, Hiring)
+    session = AnnouncingOrgSession(os_locator(), wire_cli.RuntimeOrgOpener(), MemoryOutput())
+    hiring = wire_cli.of(session, Hiring)
     with pytest.raises(OrgError, match="no organization is open"):
         hiring()
     session.open(argparse.Namespace(root=str(team.root)))
@@ -106,8 +98,8 @@ def test_a_provider_asks_the_organization_the_session_opened_last(team: Org) -> 
 
 
 def test_the_tail_sees_the_events_written_after_it_started(team: Org) -> None:
-    ports = wire().RuntimeOrgOpener().open(team.root)
-    tails = wire().RuntimeEventTails(ports)
+    ports = wire_cli.RuntimeOrgOpener().open(team.root)
+    tails = wire_cli.RuntimeEventTails(ports)
     assert tails.any() is True  # (the hire above is an event)
     tail = tails.follow(None, "custom.kind", None, False)
     assert tail.poll() == []
@@ -120,12 +112,12 @@ def test_a_new_organization_has_no_event_files(tmp_path: Path) -> None:
     root = tmp_path / "bare"
     (root).mkdir()
     (root / "ORG.md").write_text("---\nmission: m\n---\n", encoding="utf-8")
-    assert wire().RuntimeEventTails(wire().RuntimeOrgOpener().open(root)).any() is False
+    assert wire_cli.RuntimeEventTails(wire_cli.RuntimeOrgOpener().open(root)).any() is False
 
 
 def test_the_scheduler_runner_runs_the_loop_until_there_is_nothing_to_do(team: Org) -> None:
     out = MemoryOutput()
-    runner = wire().LoopSchedulerRunner(out, FakeClock())
+    runner = wire_cli.LoopSchedulerRunner(out, FakeClock())
     runner.run(team.root, "kiro-cli", once=False, until_idle=False, until_done=True, max_runs=None)
     assert out.stdout == "scheduler exiting: finished: no open tasks\n"
     out.events.clear()
@@ -136,30 +128,30 @@ def test_the_scheduler_runner_runs_the_loop_until_there_is_nothing_to_do(team: O
 def test_the_launchers_of_the_other_entry_points_import_them_only_when_they_run(team: Org, monkeypatch: pytest.MonkeyPatch) -> None:
     started: list[object] = []
     monkeypatch.setattr("orgmcp.dashboard.run_dashboard", lambda root, interval=2.0: started.append((root, interval)))
-    wire().LazyDashboardRunner().run(team.root, 3.0)
+    wire_cli.LazyDashboardRunner().run(team.root, 3.0)
     assert started == [(team.root, 3.0)]
 
     class Server:
         def run(self) -> None:
             started.append("served")
 
-    monkeypatch.setattr(wire(), "mcp_server_runner", lambda: Server())
-    wire().LazyMcpRunner().run()
+    monkeypatch.setattr(wire_cli, "mcp_server_runner", lambda: Server())
+    wire_cli.LazyMcpRunner().run()
     assert started[-1] == "served"
 
 
 def test_the_plan_of_a_blueprint_is_checked_without_an_organization_against_the_defaults() -> None:
-    validator, renderer = wire().PlanTime().get()
+    validator, renderer = wire_cli.PlanTime().get()
     bp = {"mission": "m", "agents": [{"name": "lead", "template": "manager"}]}
     issues = validator.validate(bp, org_exists=False)
     assert [i.path for i in issues if i.level == "error"] and "Plan for approval" in renderer.render_plan(bp, issues)
-    assert wire().PlanTime().get() is not None
+    assert wire_cli.PlanTime().get() is not None
 
 
 def test_the_snapshot_of_dash_once_comes_from_the_runtime_of_the_dashboard(team: Org) -> None:
-    session = wire().AnnouncingOrgSession(wire().os_locator(), wire().RuntimeOrgOpener(), MemoryOutput())
+    session = AnnouncingOrgSession(os_locator(), wire_cli.RuntimeOrgOpener(), MemoryOutput())
     session.open(argparse.Namespace(root=str(team.root)))
-    assert "orgmcp dash" in wire().snapshot_renderer_of(session)().render_once()
+    assert "orgmcp dash" in wire_cli.snapshot_renderer_of(session)().render_once()
 
 
 def test_nothing_but_the_run_of_a_command_imports_the_framework_of_the_server_or_of_the_screen() -> None:
