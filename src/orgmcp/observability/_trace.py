@@ -8,16 +8,15 @@ from datetime import datetime, timedelta
 from typing import cast
 
 from ..agents import AgentDirectory
-from ..eventlog import ENVELOPE as _ENVELOPE
 from ..eventlog import EventReader
 from ..kernel import ROOT, Clock, JsonObject, OrgError, aware, clip_line, parse_time, stamp_of
 from ._messages import Msg
 from ._ports import MessageHistory, RunCollection, TraceDerivers
+from ._pure import ENVELOPE
 from ._runs import run_dict, run_events
 from ._util import iso, ms_between, plain
 from .api import TraceQueries
 
-ENVELOPE = set(_ENVELOPE)
 READ_ONLY_TOOLS = {"inbox", "read", "status", "health", "progress", "whoami", "services", "observe", "org_read"}
 _LIFECYCLE = ("agent.pause", "agent.resume", "agent.failure", "stall.nudge", "run.orphan")
 
