@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from ..kernel import Message
+from ..kernel import ROOT, Message, latest_results, stamp_of
 from ..mail import MailboxReader
 from ._ports import RootTasks
 
@@ -16,12 +16,15 @@ class MailRootTasks(RootTasks):
         self._mail = mail
 
     def tasks(self) -> list[Message]:
-        raise NotImplementedError("red: C-progress")
+        return [m for m in self._mail.sent(ROOT) if m.type == "task"]
 
     def latest_results(self) -> dict[str, Message]:
-        raise NotImplementedError("red: C-progress")
+        return latest_results(self._mail.received(ROOT))
 
 
 def listed(result: Message | None, now: datetime) -> bool:
     """Open and blocked tasks always; finished ones while they are recent."""
-    raise NotImplementedError("red: C-progress")
+    if result is None or result.status == "blocked":
+        return True
+    finished = stamp_of(result.id)
+    return finished is None or now - finished <= RECENT

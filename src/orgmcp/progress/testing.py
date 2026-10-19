@@ -39,7 +39,7 @@ from ._activity import FsTeamActivity
 from ._lines import CaseTaskLines
 from ._liveness import RunnableTeams
 from ._listing import MailRootTasks
-from ._ports import ProgressText, ProgressView, Snapshots, TeamActivity
+from ._ports import ProgressText, ProgressView, Snapshot, Snapshots, TeamActivity
 from ._render import RootTaskReport
 from ._reporter import DerivedProgressReporter
 from ._counts import LogRunCounts
@@ -78,15 +78,29 @@ class FixedProgressReporter(ProgressReporter):
 
 
 class SpyProgressView(ProgressView):
-    """The view answers ``text`` and keeps what it was asked in ``asked`` as ``(task_id, now, wait_seconds)``."""
+    """The view answers ``text``; it keeps what it was asked in ``asked`` as ``(task_id, now, wait_seconds)``, and the keyword arguments it was given in ``kwargs``."""
 
     def __init__(self, text: str = "lines") -> None:
         self.text = text
         self.asked: list[tuple[str | None, datetime | None, int]] = []
+        self.kwargs: dict[str, object] = {}
 
     def progress(self, task_id: str | None = None, now: datetime | None = None, *, wait_seconds: int = 0) -> str:
         self.asked.append((task_id, now, wait_seconds))
+        self.kwargs.update(wait_seconds=wait_seconds)
         return self.text
+
+
+class FixedSnapshots(Snapshots):
+    """Every look is ``found`` (by default nothing is listed), and each is kept in ``asked``."""
+
+    def __init__(self, found: Snapshot | None = None) -> None:
+        self.found = found or Snapshot({}, {}, frozenset())
+        self.asked: list[str | None] = []
+
+    def snapshot(self, task_id: str | None) -> Snapshot:
+        self.asked.append(task_id)
+        return self.found
 
 
 class FixedTeamActivity(TeamActivity):

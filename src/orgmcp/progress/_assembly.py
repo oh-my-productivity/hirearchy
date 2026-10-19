@@ -8,6 +8,8 @@ and the pause flags with tolerant, cached variants, and tests replace parts of `
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from datetime import datetime
 from typing import Any
 
 from ..kernel import Clock
@@ -23,6 +25,27 @@ from ._states import MailTaskStates
 from ._teams import AgentTaskTeams
 from ._wait import POLL, PollingProgress
 from .api import LegacyParts
+
+
+class WaitClock(Clock):
+    """The time of day of ``inner``, and the waits of a caller who gives them as functions (``progress(org, sleep=..., clock=...)``)."""
+
+    def __init__(self, inner: Clock, sleep: Callable[[float], None], monotonic: Callable[[], float]) -> None:
+        self._inner = inner
+        self._sleep = sleep
+        self._monotonic = monotonic
+
+    def now(self) -> datetime:
+        return self._inner.now()
+
+    def time(self) -> float:
+        return self._inner.time()
+
+    def monotonic(self) -> float:
+        return self._monotonic()
+
+    def sleep(self, seconds: float) -> None:
+        self._sleep(seconds)
 
 
 def reporter_of(org: Any, parts: LegacyParts, clock: Clock, poll: float = POLL) -> DerivedProgressReporter:

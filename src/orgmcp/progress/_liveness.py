@@ -15,7 +15,7 @@ class RunnableTeams(TeamLiveness):
         self._runnable = runnable
 
     def can_run(self, addr: str) -> bool:
-        raise NotImplementedError("red: C-progress")
+        return self._mail.has_inflight(addr) or self._runnable.startable(addr)
 
     def alive(self, team: Sequence[str]) -> bool:
-        raise NotImplementedError("red: C-progress")
+        return any(self.can_run(a) for a in team)

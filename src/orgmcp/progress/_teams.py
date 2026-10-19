@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ..agents import AgentDirectory
-from ..kernel import Message
+from ..kernel import ROOT, Message
 from ._ports import TaskTeams
 
 
@@ -12,4 +12,4 @@ class AgentTaskTeams(TaskTeams):
         self._agents = agents
 
     def team_of(self, task: Message) -> list[str]:
-        raise NotImplementedError("red: C-progress")
+        return [a for a in self._agents.subtree(task.to) if a != ROOT] if self._agents.exists(task.to) else []

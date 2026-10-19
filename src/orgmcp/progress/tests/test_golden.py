@@ -14,7 +14,6 @@ import pytest
 from orgmcp.progress import progress
 
 from . import _scenario
-from ._support import XFAIL
 
 EXPECTED = Path(__file__).with_name("expected")
 Ask = Callable[[Any, str | None, datetime], str]
@@ -32,7 +31,7 @@ def by_reporter(org: Any, task_id: str | None, now: datetime) -> str:
     return str(org.runtime.progress_reporter.progress(task_id, now))
 
 
-@pytest.fixture(params=[by_function, pytest.param(by_reporter, marks=XFAIL)], ids=["function", "reporter"])
+@pytest.fixture(params=[by_function, by_reporter], ids=["function", "reporter"])
 def ask(request: pytest.FixtureRequest) -> Ask:
     return request.param  # type: ignore[no-any-return]
 

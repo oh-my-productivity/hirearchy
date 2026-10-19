@@ -7,8 +7,6 @@ from orgmcp.progress._liveness import RunnableTeams
 from orgmcp.progress._ports import TeamLiveness
 from orgmcp.progress.testing import ProgressWorld
 
-from ._support import XFAIL
-
 
 def liveness(w: ProgressWorld) -> RunnableTeams:
     return RunnableTeams(w.mail, w.runnable)
@@ -18,25 +16,21 @@ def test_it_is_a_liveness(w: ProgressWorld) -> None:
     assert isinstance(liveness(w), TeamLiveness)
 
 
-@XFAIL
 def test_an_agent_with_unread_work_and_budget_can_run(w: ProgressWorld, task: Message) -> None:
     assert liveness(w).can_run("ceo") and not liveness(w).can_run("ceo/eng")
 
 
-@XFAIL
 def test_an_agent_that_is_running_can_run_whatever_the_rest_says(w: ProgressWorld, task: Message) -> None:
     w.begin_run("ceo")
     w.pause("ceo", "tired")
     assert liveness(w).can_run("ceo")
 
 
-@XFAIL
 def test_a_paused_agent_with_unread_work_cannot(w: ProgressWorld, task: Message) -> None:
     w.pause("ceo", "tired")
     assert not liveness(w).can_run("ceo")
 
 
-@XFAIL
 def test_a_team_is_alive_while_any_of_its_agents_can_run(w: ProgressWorld, task: Message) -> None:
     assert liveness(w).alive(["ceo/eng", "ceo"]) and not liveness(w).alive(["ceo/eng"]) and not liveness(w).alive([])
     assert ROOT not in {"ceo", "ceo/eng"}

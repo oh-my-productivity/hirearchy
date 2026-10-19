@@ -10,8 +10,6 @@ from orgmcp.kernel import OrgPaths
 from orgmcp.progress._activity import FsTeamActivity
 from orgmcp.progress._ports import TeamActivity
 
-from ._support import XFAIL
-
 
 T = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 
@@ -31,14 +29,12 @@ def test_it_is_a_team_activity(tmp_path: Path) -> None:
     assert isinstance(FsTeamActivity(OrgPaths(tmp_path)), TeamActivity)
 
 
-@XFAIL
 def test_a_team_that_did_nothing_has_no_activity(tmp_path: Path) -> None:
     (tmp_path / "ceo").mkdir()
     assert FsTeamActivity(OrgPaths(tmp_path)).newest(["ceo", "ceo/eng"]) is None
     assert FsTeamActivity(OrgPaths(tmp_path)).newest([]) is None
 
 
-@XFAIL
 def test_the_newest_name_of_the_four_mailboxes_of_any_agent_wins(tmp_path: Path) -> None:
     put(tmp_path, f"ceo/inbox/{stamp(10)}-root-aaaa.md")
     put(tmp_path, f"ceo/read/{stamp(30)}-root-bbbb.md")
@@ -49,7 +45,6 @@ def test_the_newest_name_of_the_four_mailboxes_of_any_agent_wins(tmp_path: Path)
     assert FsTeamActivity(OrgPaths(tmp_path)).newest(["ceo"]) == T + timedelta(seconds=30)
 
 
-@XFAIL
 def test_hidden_files_and_names_that_are_no_time_do_not_count(tmp_path: Path) -> None:
     put(tmp_path, f"ceo/inbox/.tmp-{stamp(50)}-x.md")
     put(tmp_path, "ceo/inbox/notes.md")
@@ -57,7 +52,6 @@ def test_hidden_files_and_names_that_are_no_time_do_not_count(tmp_path: Path) ->
     assert FsTeamActivity(OrgPaths(tmp_path)).newest(["ceo"]) == T + timedelta(seconds=5)
 
 
-@XFAIL
 def test_the_last_write_of_a_run_log_counts_as_activity(tmp_path: Path) -> None:
     log = put(tmp_path, f"ceo/runs/{stamp(100)}.log")
     os.utime(log, (T.timestamp() + 160, T.timestamp() + 160))

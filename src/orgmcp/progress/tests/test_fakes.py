@@ -8,7 +8,8 @@ from orgmcp.kernel import ROOT, Message
 from orgmcp.kernel.testing import FakeClock
 from orgmcp.progress import ProgressReporter
 from orgmcp.progress._ports import TeamActivity
-from orgmcp.progress.testing import FixedCaseTotals, FixedProgressReporter, FixedTeamActivity, ScriptedClock, SpyProgressView
+from orgmcp.progress._ports import Snapshot, Snapshots, TaskMark
+from orgmcp.progress.testing import FixedCaseTotals, FixedProgressReporter, FixedSnapshots, FixedTeamActivity, ScriptedClock, SpyProgressView
 from orgmcp.reflection import ServiceReports
 
 AT = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
@@ -28,7 +29,14 @@ def test_the_fixed_reporter_describes_with_its_text_when_not_told_otherwise() ->
 def test_the_spy_view_answers_and_keeps_what_it_was_asked() -> None:
     spy = SpyProgressView("x")
     assert spy.progress("t", AT, wait_seconds=5) == "x" and spy.progress() == "x"
-    assert spy.asked == [("t", AT, 5), (None, None, 0)]
+    assert spy.asked == [("t", AT, 5), (None, None, 0)] and spy.kwargs == {"wait_seconds": 0}
+
+
+def test_the_fixed_snapshots_are_what_they_are_told_and_keep_what_was_asked() -> None:
+    mark = Snapshot({"t": TaskMark("working", "T", "working")}, {}, frozenset())
+    fixed = FixedSnapshots(mark)
+    assert isinstance(fixed, Snapshots) and fixed.snapshot("t") is mark and fixed.snapshot(None) is mark and fixed.asked == ["t", None]
+    assert FixedSnapshots().snapshot(None) == Snapshot({}, {}, frozenset())
 
 
 def test_the_fixed_activity_is_the_newest_time_of_the_team() -> None:

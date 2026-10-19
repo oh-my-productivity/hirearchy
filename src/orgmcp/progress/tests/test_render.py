@@ -11,8 +11,6 @@ from orgmcp.progress._ports import ProgressText, RootTasks
 from orgmcp.progress._render import RootTaskReport
 from orgmcp.progress.testing import ProgressWorld
 
-from ._support import XFAIL
-
 
 AT = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 
@@ -29,7 +27,6 @@ def test_it_is_a_source_of_root_tasks(w: ProgressWorld) -> None:
     assert isinstance(MailRootTasks(w.mail), RootTasks)
 
 
-@XFAIL
 def test_root_tasks_are_the_tasks_root_sent_and_their_latest_results(w: ProgressWorld, task: Message) -> None:
     other = w.delegate(ROOT, "ceo/eng", "Other", 2)
     w.write(ROOT, "ceo", "A note", "not a task", 0)
@@ -40,12 +37,10 @@ def test_root_tasks_are_the_tasks_root_sent_and_their_latest_results(w: Progress
     assert {k: v.id for k, v in roots.latest_results().items()} == {task.id: final.id}
 
 
-@XFAIL
 def test_open_and_blocked_tasks_are_always_listed(w: ProgressWorld) -> None:
     assert listed(None, AT) and listed(result_at(AT - timedelta(days=30), "blocked"), AT)
 
 
-@XFAIL
 def test_a_finished_task_is_listed_for_a_day_after_it_finished() -> None:
     result = result_at(AT)
     assert listed(result, AT + RECENT) and not listed(result, AT + RECENT + timedelta(seconds=1))
@@ -67,7 +62,6 @@ def test_it_is_a_text(w: ProgressWorld) -> None:
     assert isinstance(report(w), ProgressText)
 
 
-@XFAIL
 def test_open_tasks_come_first_and_old_finished_ones_are_dropped(w: ProgressWorld, task: Message) -> None:
     old = w.delegate(ROOT, "ceo/eng", "Old", 2)
     w.answer(old, "done", "ok", 0)
@@ -78,7 +72,6 @@ def test_open_tasks_come_first_and_old_finished_ones_are_dropped(w: ProgressWorl
     assert titles == ['"Write the report"', '"Fresh"']
 
 
-@XFAIL
 def test_nothing_open_shows_the_last_finished_one(w: ProgressWorld, task: Message) -> None:
     w.answer(task, "done", "ok", 0)
     first = w.delegate(ROOT, "ceo/eng", "Second", 2)
@@ -88,7 +81,6 @@ def test_nothing_open_shows_the_last_finished_one(w: ProgressWorld, task: Messag
     assert out[0] == "No open tasks." and out[1].startswith('"Second": done.') and len(out) == 2
 
 
-@XFAIL
 def test_the_queue_follows_the_tasks(w: ProgressWorld, task: Message) -> None:
     w.queue.entries = [("m1", "Needs you: one (message m1)")]
     assert report(w).render(task.id, None).splitlines()[1:] == ["Needs you: one (message m1)"]
