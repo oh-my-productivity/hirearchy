@@ -395,7 +395,6 @@ def execute(label: str, base: Path, main: Callable[[list[str]], None]) -> str:
         with contextlib.ExitStack() as stack, pytest.MonkeyPatch.context() as mp:
             clock = install(mp, stack)
             mp.setenv("HOME", str(home))
-            mp.setattr("orgmcp.scheduler.KIRO_AGENTS_DIR", home / ".kiro" / "agents")
             world = World(tmp, WORLDS[scenario.world](tmp, clock), clock)
             world.fill(scenario.files)
             mp.chdir(tmp)

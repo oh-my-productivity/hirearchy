@@ -1,4 +1,4 @@
-"""The legacy functions of ``scheduler`` and ``progress`` that ask ``attention``: ``waiting_on_user``, ``nothing_to_do``, ``_human_items``
+"""The ports of ``attention`` the scheduler asks (``waiting_on_user``, ``open_work``), and the legacy ``progress`` functions that ask it: ``_human_items``
 and the check of whether an agent could run. The texts, the options and the decisions are pinned by ``tests/test_finish``, ``test_progress`` and
 ``test_progress_wait`` (unchanged); here are the seams."""
 
@@ -11,8 +11,7 @@ from pathlib import Path
 import pytest
 
 from orgmcp import progress as progress_module
-from orgmcp import scheduler as sched_module
-from orgmcp.app import Org
+from orgmcp.app import Org, wiring
 from orgmcp.attention import Waiting
 from orgmcp.eligibility import RunnableQuery
 from orgmcp.kernel import ROOT
@@ -38,33 +37,25 @@ def org(tmp_path: Path) -> Org:
     return made
 
 
-def test_the_scheduler_exports_the_waiting_of_the_package() -> None:
-    assert getattr(sched_module, "Waiting") is Waiting
-
-
 def test_waiting_on_user_is_a_waiting_of_the_package(org: Org) -> None:
     org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=1)
     org.start_run_log("ceo")
-    found = sched_module.waiting_on_user(org)
+    found = org.runtime.waiting_on_user.analyze()
     assert isinstance(found, Waiting) and found.text == 'waiting on you: "Ship it" needs budget (ceo out of runs)'
 
 
-def test_waiting_on_user_asks_the_runnable_query_of_the_runtime_in_force(org: Org) -> None:
+def test_waiting_on_user_asks_the_runnable_query_of_the_runtime(org: Org) -> None:
     org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=1)
     org.start_run_log("ceo")
-    assert sched_module.waiting_on_user(org) is not None
-    org.runtime = dataclasses.replace(org.runtime, runnable_query=Runnable("ceo"))
-    assert sched_module.waiting_on_user(org) is None
+    assert org.runtime.waiting_on_user.analyze() is not None
+    org.runtime = wiring.open_runtime(org.root, {RunnableQuery: Runnable("ceo")})
+    assert org.runtime.waiting_on_user.analyze() is None
 
 
-def test_nothing_to_do_asks_the_runnable_query_of_the_runtime_in_force(org: Org) -> None:
-    assert sched_module.nothing_to_do(org) is True
-    org.runtime = dataclasses.replace(org.runtime, runnable_query=Runnable("ceo"))
-    assert sched_module.nothing_to_do(org) is False
-
-
-def test_the_helpers_of_the_decision_are_gone_from_the_scheduler() -> None:
-    assert not hasattr(sched_module, "_startable") and not hasattr(sched_module, "_names")
+def test_nothing_to_do_asks_the_runnable_query_of_the_runtime(org: Org) -> None:
+    assert org.runtime.open_work.nothing_to_do() is True
+    org.runtime = wiring.open_runtime(org.root, {RunnableQuery: Runnable("ceo")})
+    assert org.runtime.open_work.nothing_to_do() is False
 
 
 def test_human_items_are_the_queue_of_the_package(org: Org) -> None:

@@ -1,4 +1,4 @@
-"""The wiring of ``processes``, and the module-level helpers of ``scheduler.py`` that now delegate to it (patch points stay valid).
+"""The wiring of ``processes``, and the system process table, judge and signaller it makes.
 
 Only processes this test starts are signalled.
 """
@@ -13,8 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp import scheduler as sched
-from orgmcp.app import wire_processes, wiring
+from orgmcp.app import wiring
 from orgmcp.processes import OrphanJudge, ProcessInspector, ProcessSignaller, ProcessSpawner
 from orgmcp.processes._inspect import PsProcessInspector
 from orgmcp.processes._judge import PsOrphanJudge
@@ -61,48 +60,37 @@ def test_two_runtimes_do_not_share_process_objects(tmp_path: Path) -> None:
     assert wiring.open_runtime(tmp_path).process_inspector is not wiring.open_runtime(tmp_path).process_inspector
 
 
-def test_adopt_wraps_a_popen_in_a_handle(child: subprocess.Popen[bytes]) -> None:
-    handle = wire_processes.adopt(child)  # type: ignore[arg-type]
-    assert isinstance(handle, PopenHandle) and handle.pid == child.pid and handle.poll() is None
+def test_the_inspector_gives_the_state_and_start_time_of_a_process(child: subprocess.Popen[bytes]) -> None:
+    inspector = wiring.open_runtime(Path.cwd()).process_inspector
+    info = inspector.info(child.pid)
+    assert info is not None and info.state and not info.state.startswith("Z") and info.started
+    assert inspector.start_time(child.pid) == info.started
 
 
-# ------------------------------------------------------------------------------------------------ scheduler.py still answers
-
-
-def test_ps_is_the_state_and_start_time_of_a_process(child: subprocess.Popen[bytes]) -> None:
-    state, started = sched._ps(child.pid) or ("", "")
-    assert state and not state.startswith("Z") and started
-    assert sched._start_time(child.pid) == started
-
-
-def test_ps_of_a_process_that_does_not_exist_is_none() -> None:
+def test_the_inspector_of_a_process_that_does_not_exist_answers_none() -> None:
     gone = subprocess.Popen(["true"])
     gone.wait()
-    assert sched._ps(gone.pid) is None and sched._start_time(gone.pid) is None and sched._command_line(gone.pid) is None
-
-
-def test_ps_that_cannot_run_raises_os_error_as_it_always_did(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("PATH", "/nonexistent-orgmcp-bin")
-    with pytest.raises(OSError):
-        sched._ps(os.getpid())
-    assert sched._start_time(os.getpid()) is None and sched._command_line(os.getpid()) is None
+    inspector = wiring.open_runtime(Path.cwd()).process_inspector
+    assert inspector.info(gone.pid) is None and inspector.start_time(gone.pid) is None and inspector.command_line(gone.pid) is None
 
 
 def test_the_command_line_names_the_program(child: subprocess.Popen[bytes]) -> None:
-    assert "sleep" in (sched._command_line(child.pid) or "")
+    assert "sleep" in (wiring.open_runtime(Path.cwd()).process_inspector.command_line(child.pid) or "")
 
 
-def test_judge_orphan_and_kill_group_work_on_a_real_run(child: subprocess.Popen[bytes]) -> None:
-    record = {"pgid": child.pid, "lstart": sched._start_time(child.pid)}
-    assert sched.judge_orphan(record) == "ours"
-    assert sched.kill_group(child.pid) is True
+def test_the_judge_and_the_signaller_work_on_a_real_run(child: subprocess.Popen[bytes]) -> None:
+    runtime = wiring.open_runtime(Path.cwd())
+    record = {"pgid": child.pid, "lstart": runtime.process_inspector.start_time(child.pid)}
+    assert runtime.orphan_judge.judge(record) == "ours"
+    assert runtime.process_signaller.kill_group(child.pid) is True
     assert child.wait(timeout=10) == -signal.SIGKILL
-    assert sched.judge_orphan(record) == "gone"
+    assert runtime.orphan_judge.judge(record) == "gone"
 
 
-def test_judge_orphan_never_calls_the_judging_process_ours() -> None:
-    assert sched.judge_orphan({"pgid": os.getpid(), "lstart": sched._start_time(os.getpid())}) == "foreign"
-    assert sched.judge_orphan({"pgid": os.getpgrp(), "lstart": "x"}) == "foreign"
+def test_the_judge_never_calls_the_judging_process_ours() -> None:
+    runtime = wiring.open_runtime(Path.cwd())
+    assert runtime.orphan_judge.judge({"pgid": os.getpid(), "lstart": runtime.process_inspector.start_time(os.getpid())}) == "foreign"
+    assert runtime.orphan_judge.judge({"pgid": os.getpgrp(), "lstart": "x"}) == "foreign"
 
 
 def test_signal_group_takes_a_popen_and_its_group(child: subprocess.Popen[bytes]) -> None:

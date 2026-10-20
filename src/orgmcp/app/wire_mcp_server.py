@@ -7,14 +7,10 @@ Process-scope objects (the sinks of the events, the trace scope, the process lab
 
 Heavy modules (the MCP framework, the tool groups) are imported when a server is made, not when the application package is loaded: every command of the
 command line opens a runtime, and none of them but ``orgmcp mcp`` needs a server.
-
-``LegacyOrgBinding``, ``legacy_build_server`` and ``legacy_resolve_binding`` serve the module ``orgmcp.server`` (a shim until E3): the constructor and the
-functions the tests and the old callers use, and the patch point ``orgmcp.server.start_scheduler``. They go with it.
 """
 
 from __future__ import annotations
 
-import sys
 from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING, TypeVar, cast
@@ -23,7 +19,7 @@ from ..daemon import SchedulerControl
 from ..kernel import Environment, OrgError, Provider
 from ..kernel._system import OsEnvironment
 from ..mcp_server import BindingResolver, McpServerFactory, McpServerRunner, OrgBindingPort
-from ..mcp_server._binding import OpenerBindings, OrgBinding
+from ..mcp_server._binding import OpenerBindings
 from ..mcp_server._instructions import DS_STORE, INSTRUCTIONS, ROOT_INSTRUCTIONS
 from ..mcp_server._ports import BindingFactory, OrgOpener, OrgPorts, ServerFactories
 from ._builder import Builder
@@ -32,16 +28,13 @@ from .wire_stalls import RuntimePorts
 from .wiring import open_runtime, process_resources, providers
 
 if TYPE_CHECKING:
-    from mcp.server.fastmcp import FastMCP
-
     from ..blueprint._assembly import PlanParts
-    from .facade import Org
 
 T = TypeVar("T")
 
 __all__ = [
-    "DS_STORE", "INSTRUCTIONS", "ROOT_INSTRUCTIONS", "LegacyOrgBinding", "RuntimeOrgOpener", "WiredServerFactories", "binding_resolver",
-    "legacy_build_server", "legacy_resolve_binding", "mcp_server_runner", "register", "serve", "server_factory",
+    "DS_STORE", "INSTRUCTIONS", "ROOT_INSTRUCTIONS", "RuntimeOrgOpener", "WiredServerFactories", "binding_resolver", "mcp_server_runner", "register",
+    "serve", "server_factory",
 ]
 
 
@@ -66,27 +59,6 @@ class RuntimeOrgOpener(OrgOpener):
 def provide(binding: OrgBindingPort, port: type[T]) -> Provider[T]:
     """The ``port`` of the organization the binding opens, asked for when the tool runs (an ``OrgError`` while there is none)."""
     return lambda: cast(OrgPorts, binding.get()).get(port)
-
-
-class PatchPointSchedulerControl(SchedulerControl):
-    """The control of the runtime, except that ``orgmcp.server.start_scheduler`` is looked up at the time of the call: the tests replace it (patch
-    point of the flat module). Only the servers made through ``orgmcp.server`` have it. Deleted with that module (E3)."""
-
-    def __init__(self, inner: SchedulerControl, root: Path) -> None:
-        self._inner = inner
-        self._root = root
-
-    def start(self, max_runs: int | None = None, until_done: bool = False) -> int:
-        shim, scheduler = sys.modules.get("orgmcp.server"), sys.modules.get("orgmcp.scheduler")
-        patched = getattr(shim, "start_scheduler", None)
-        if patched is None or scheduler is None or patched is getattr(scheduler, "start_scheduler", None):
-            return self._inner.start(max_runs, until_done)
-        from .facade import Org
-
-        return cast(int, patched(Org(self._root), max_runs, until_done))
-
-    def stop(self, wait: float = 15.0) -> str:
-        return self._inner.stop(wait)
 
 
 def plan_time_parts() -> PlanParts:
@@ -126,11 +98,9 @@ class CachedPlanTime:
         return self._parts
 
 
-def server_factory(
-    binding: OrgBindingPort, patch_points: bool = False, scheduler_control: Callable[[SchedulerControl], SchedulerControl] | None = None
-) -> McpServerFactory:
-    """The factory of the servers bound to ``binding``. ``patch_points``: the servers of ``orgmcp.server`` (see the module docstring).
-    ``scheduler_control``: wraps the control of the organization the ``start`` and ``stop`` tools use (the tests give a fake starter through it)."""
+def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[SchedulerControl], SchedulerControl] | None = None) -> McpServerFactory:
+    """The factory of the servers bound to ``binding``. ``scheduler_control``: wraps the control of the organization the ``start`` and ``stop`` tools use
+    (the tests give a fake starter through it)."""
     from ..access import ToolNaming
     from ..agents import AgentDirectory, CharterReader
     from ..attention import OpenWork, WaitingOnUser
@@ -188,10 +158,7 @@ def server_factory(
 
     def control() -> SchedulerControl:
         real = of(SchedulerControl)()
-        if scheduler_control is not None:
-            return scheduler_control(real)
-        located = binding.location()
-        return PatchPointSchedulerControl(real, located) if patch_points and located is not None else real
+        return scheduler_control(real) if scheduler_control is not None else real
 
     def renderer() -> PlanRenderer:
         return of(PlanRenderer)() if binding.peek() is not None else plan_time.get().renderer
@@ -228,11 +195,8 @@ def server_factory(
 
 
 class WiredServerFactories(ServerFactories):
-    def __init__(self, patch_points: bool = False) -> None:
-        self._patch_points = patch_points
-
     def factory_for(self, binding: OrgBindingPort) -> McpServerFactory:
-        return server_factory(binding, self._patch_points)
+        return server_factory(binding)
 
 
 def binding_resolver(bindings: BindingFactory | None = None, opener: OrgOpener | None = None) -> BindingResolver:
@@ -243,46 +207,12 @@ def binding_resolver(bindings: BindingFactory | None = None, opener: OrgOpener |
     return EnvBindingResolver(OsEnvironment(), os_locator(), opener, bindings or OpenerBindings(opener))
 
 
-def mcp_server_runner(patch_points: bool = False) -> McpServerRunner:
+def mcp_server_runner() -> McpServerRunner:
     """The process that serves the identity of the environment over stdio (what ``orgmcp mcp`` runs)."""
     from ..mcp_server._serve import StdioMcpRunner
 
-    return StdioMcpRunner(process_resources().process_label, binding_resolver(), WiredServerFactories(patch_points))
+    return StdioMcpRunner(process_resources().process_label, binding_resolver(), WiredServerFactories())
 
 
 def serve() -> None:
     mcp_server_runner().run()
-
-
-# ------------------------------------------------------------------------------------------------------ the module orgmcp.server (shim)
-
-
-class LegacyOrgBinding(OrgBinding):
-    """``OrgBinding(root, org=None, pinned=False)``: the constructor of the flat module, over an ``Org`` (or none) instead of an opener, and a
-    ``create`` that returns the ``Org`` it made. Deleted with ``orgmcp.server`` (E3)."""
-
-    def __init__(self, root: Path | None, org: Org | None = None, pinned: bool = False, *, ports: OrgPorts | None = None) -> None:
-        super().__init__(root, RuntimeOrgOpener(), RuntimePorts(org.runtime) if org is not None else ports, pinned)
-
-    def create(self, mission: str, default_model: str | None = None, path: str | None = None) -> Org:  # type: ignore[override]
-        super().create(mission, default_model, path)
-        from .facade import Org
-
-        return Org(cast(Path, self.root))
-
-
-class LegacyBindings(BindingFactory):
-    def bind(self, root: Path | None, ports: OrgPorts | None = None, pinned: bool = False) -> LegacyOrgBinding:
-        return LegacyOrgBinding(root, None, pinned, ports=ports)
-
-
-def legacy_build_server(org: Org | OrgBindingPort, me: str) -> FastMCP:
-    """``build_server(org, me)``: the MCP server for ``me``. ``org``: an ``Org``, or a binding (root only: it may not exist yet)."""
-    binding = org if isinstance(org, OrgBindingPort) else LegacyOrgBinding(org.root, org)
-    return cast("FastMCP", server_factory(binding, patch_points=True).build(me))
-
-
-def legacy_resolve_binding() -> tuple[LegacyOrgBinding, str]:
-    """``resolve_binding()``: the binding of the environment, and who it acts as."""
-    binding, me = binding_resolver(LegacyBindings()).resolve()
-    return cast(LegacyOrgBinding, binding), me

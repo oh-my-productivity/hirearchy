@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp.cli import main
+from testkit.cli_world import main
 from orgmcp.kernel import ROOT
 
 from ._events import read_events

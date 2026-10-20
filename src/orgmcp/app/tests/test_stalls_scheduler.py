@@ -8,13 +8,13 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp import scheduler as sched_module
-from orgmcp.app import Org
+from orgmcp.app import Org, wiring
 from orgmcp.kernel import Message
-from orgmcp.scheduler import Scheduler, waiting_on_user
 from orgmcp.stalls import NudgeLedger
 from orgmcp.stalls._views import FingerprintTaskViews
 from orgmcp.templates.testing import RecordingNotices
+from testkit.daemon_world import waiting_on_user
+from testkit.health_world import Scheduler
 
 
 class FixedNudges(NudgeLedger):
@@ -62,12 +62,7 @@ def test_waiting_on_user_reads_the_steps_taken_and_the_chain_from_the_nudge_ledg
     org.begin_run("ceo")
     org.end_run("ceo", ok=True)
     assert waiting_on_user(org).settled is False  # type: ignore[union-attr]  # nobody was reminded yet: the ladder may still wake the holder
-    org.runtime = dataclasses.replace(org.runtime, nudge_ledger=FixedNudges({task.id: {"step": 1, "at": 0}}, ["ceo", "root"]))
+    org.runtime = wiring.open_runtime(org.root, {NudgeLedger: FixedNudges({task.id: {"step": 1, "at": 0}}, ["ceo", "root"])})
     waiting = waiting_on_user(org)
     assert waiting is not None and waiting.settled is True  # root has been told: nothing further up
     assert org.runtime.nudge_ledger.asked == [("ceo", task.id)]  # type: ignore[attr-defined]
-
-
-def test_the_helpers_of_the_ladder_are_gone_from_the_scheduler() -> None:
-    assert not hasattr(sched_module, "_nudge_entries") and not hasattr(sched_module, "_chain")
-    assert not any(hasattr(Scheduler, name) for name in ("_created", "_chain", "_task_memo"))

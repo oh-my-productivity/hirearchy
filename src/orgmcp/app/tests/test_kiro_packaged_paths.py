@@ -31,7 +31,6 @@ def test_the_package_directory_is_the_one_of_the_orgmcp_module() -> None:
 
 def test_the_project_directory_of_the_checkout_is_the_value_of_main() -> None:
     assert wire_kiro.project_dir() == main_project_dir(wire_kiro.package_dir()) == REPO.resolve()
-    assert scheduler.PROJECT_DIR == wire_kiro.project_dir()
     assert (wire_kiro.project_dir() / "pyproject.toml").is_file()
 
 
@@ -45,13 +44,12 @@ def test_the_project_directory_of_any_layout_is_the_value_of_main(tmp_path: Path
 def test_the_uv_fallback_of_the_command_runs_in_the_value_of_main(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(sys, "executable", str(tmp_path / "bin" / "python"))  # no console script beside it
     monkeypatch.setattr(shutil, "which", lambda name: f"/opt/{name}")
-    assert scheduler.mcp_server_command() == {
+    assert wire_kiro.mcp_locator().command() == {
         "command": "/opt/uv", "args": ["--directory", str(main_project_dir(Path(orgmcp.__file__).resolve().parent)), "run", "orgmcp", "mcp"]}
-    assert wire_kiro.mcp_locator().command() == scheduler.mcp_server_command()
 
 
 def test_the_console_script_beside_the_interpreter_wins(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     (tmp_path / "bin").mkdir()
     (tmp_path / "bin" / "orgmcp").write_text("#!/bin/sh\n", encoding="utf-8")
     monkeypatch.setattr(sys, "executable", str(tmp_path / "bin" / "python"))
-    assert scheduler.mcp_server_command() == {"command": str(tmp_path / "bin" / "orgmcp"), "args": ["mcp"]}
+    assert wire_kiro.mcp_locator().command() == {"command": str(tmp_path / "bin" / "orgmcp"), "args": ["mcp"]}

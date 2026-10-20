@@ -52,7 +52,7 @@ def test_the_command_is_the_one_of_this_virtual_environment_for_the_organization
     program = [str(script)] if script.exists() else [sys.executable, "-m", "orgmcp"]
     runtime = wiring.open_runtime(tmp_path)
     assert runtime.scheduler_command.argv(3, True) == [*program, "--root", str(tmp_path), "run", "--max-runs", "3", "--until-done"]
-    assert wire_daemon.command_at(tmp_path).argv(None, False) == [*program, "--root", str(tmp_path), "run"]
+    assert wiring.open_runtime(tmp_path).scheduler_command.argv(None, False) == [*program, "--root", str(tmp_path), "run"]
 
 
 def test_the_schedulers_this_process_started_are_one_registry_for_every_runtime(tmp_path: Path) -> None:
@@ -122,13 +122,3 @@ def test_the_status_of_the_runtime_in_force_follows_a_part_the_runtime_replaced(
     stale = wire_daemon.status_of(busy)
     assert stale.exit_reason() == ""  # root waits for a result again: the reason of the exit is stale
     assert stale.describe().startswith('scheduler: stopped (waiting on you: "Ship it"')  # and attention, over the same tasks, says why
-
-
-def test_the_control_of_the_runtime_in_force_uses_the_replaced_command(tmp_path: Path) -> None:
-    org = tmp_path / "org"
-    org.mkdir()
-    table = FakeProcessTable(FakeClock())
-    runtime = wiring.open_runtime(org, {ProcessSpawner: ScriptedSchedulerSpawner(table, OrgPaths(org)), ProcessInspector: table, IgnoreList: MemoryIgnoreList()})
-    replaced = dataclasses.replace(runtime, scheduler_command=FakeSchedulerCommand(OrgPaths(org), ["/other/orgmcp"]))
-    wire_daemon.control_of(replaced).start()
-    assert table.spawned[0].argv[0] == "/other/orgmcp"

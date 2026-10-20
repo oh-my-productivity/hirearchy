@@ -1,7 +1,7 @@
 """Format golden: the logs the scheduler writes (with a stand-in agent) are exactly what the package reads.
 
 The scheduler and the readers of the logs were written apart and agree on a text format (header, closing lines). These tests run the
-real ``Scheduler`` with ``tests/testkit/fake_agent.py`` through every way a run can end, and pin both sides: the text of the log (written before
+real scheduler loop with ``tests/testkit/fake_agent.py`` through every way a run can end, and pin both sides: the text of the log (written before
 the scheduler used the package, and unchanged since) and what ``RunLogReader`` makes of it.
 """
 
@@ -18,6 +18,7 @@ from typing import Any
 
 import pytest
 import testkit
+from testkit.health_world import Scheduler
 
 from orgmcp.kernel import OrgPaths, stamp_of
 from orgmcp.runs import RunOutcomes
@@ -93,7 +94,6 @@ SCENARIOS = {
 
 def produce(name: str, tmp_path: Path) -> tuple[Any, Path]:
     """Run the scheduler through scenario ``name``; the org and the log of the run of ``ceo`` that the scenario is about."""
-    scheduler = legacy("scheduler")
     if name == "timeout":
         org = org_with_ceo(tmp_path, run_timeout=1)
     else:
@@ -101,7 +101,7 @@ def produce(name: str, tmp_path: Path) -> tuple[Any, Path]:
     task(org)
     runner = {"exit 1": fake_runner("crash"), "timeout": fake_runner("hang"), "interrupted": fake_runner("hang"),
               "failed to start": missing_runner}.get(name, fake_runner("idle"))
-    sched = scheduler.Scheduler(org, runner, echo=lambda _: None)
+    sched = Scheduler(org, runner, echo=lambda _: None)
     sched.acquire()
     try:
         logs = org.dir("ceo") / "runs"

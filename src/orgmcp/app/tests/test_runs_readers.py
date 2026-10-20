@@ -29,10 +29,10 @@ from orgmcp.runs.testing import MemoryRuns
 from orgmcp.runs.tests import _oracle
 from orgmcp.runs.tests._legacy import legacy
 from orgmcp.scheduler._orphans import LogRunNotes
+from testkit.health_world import Scheduler
 
-health, observe, sched_module = legacy("health"), legacy("observe"), legacy("scheduler")
+health, observe = legacy("health"), legacy("observe")
 
-SILENT = {"echo": lambda _: None}
 T1, T2, T3 = "20261018T100000000001", "20261018T110000000002", "20261018T120000000003"
 
 
@@ -107,7 +107,7 @@ def sleeper(seconds: str) -> Runner:
 def test_a_run_in_flight_is_recorded_and_forgotten_through_the_registry(org: Org, memory: MemoryRuns) -> None:
     a_task(org)
     use(org, run_registry=memory)
-    sched = sched_module.Scheduler(org, sleeper("0.4"), **SILENT)
+    sched = Scheduler(org, sleeper("0.4"), echo=lambda _: None)
     sched.acquire()
     try:
         sched.tick()
@@ -129,7 +129,7 @@ def test_orphans_of_a_dead_scheduler_are_settled_through_the_registry(org: Org, 
     memory.record("ceo", {"pgid": 4_000_000, "lstart": "x", "started": 0.0, "scheduler": 1, "log": ""})
     memory.record("gone/agent", {"pgid": 0})
     use(org, run_registry=memory)
-    sched = sched_module.Scheduler(org, sleeper("0"), **SILENT)
+    sched = Scheduler(org, sleeper("0"), echo=lambda _: None)
     sched.acquire()
     sched.release()
     assert memory.all() == {}
@@ -170,7 +170,7 @@ def test_the_scheduler_writes_its_logs_through_the_log_writer(org: Org) -> None:
     a_task(org)
     spy = SpyWriter(FsRunLogWriter(OrgPaths(org.root), org.runtime.clock))
     use(org, run_log_writer=spy)
-    sched = sched_module.Scheduler(org, sleeper("0"), **SILENT)
+    sched = Scheduler(org, sleeper("0"), echo=lambda _: None)
     sched.acquire()
     try:
         deadline = time.time() + 20

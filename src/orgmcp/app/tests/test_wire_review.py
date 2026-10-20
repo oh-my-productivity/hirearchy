@@ -11,9 +11,9 @@ from orgmcp.app import Org, wiring
 from orgmcp.review import HealthReviewer, Note, Review
 from orgmcp.review._reviewer import LedgerHealthReviewer
 from orgmcp.review.testing import ScriptedHealthReviewer
-from orgmcp.scheduler import Scheduler
 from orgmcp.templates import Notices
 from orgmcp.templates.testing import RecordingNotices
+from testkit.health_world import Scheduler
 
 AT = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 
@@ -44,12 +44,12 @@ def test_the_notes_are_worded_by_the_notices_of_the_runtime(tmp_path: Path) -> N
     assert any(name == "review_root" for name, _ in notices.calls)
 
 
-def test_the_scheduler_asks_the_reviewer_of_the_runtime_in_force(tmp_path: Path) -> None:
+def test_the_scheduler_asks_the_reviewer_of_the_runtime(tmp_path: Path) -> None:
     org = Org.init(tmp_path / "org", "m")
     done = Review(at=AT, runs=0, flagged=2, notes=[Note("ceo", "t", "b"), Note("root", "t", "b")])
     fake = ScriptedHealthReviewer(done, due=done)
     seen: list[str] = []
+    org.runtime = dataclasses.replace(org.runtime, health_reviewer=fake)
     sched = Scheduler(org, echo=seen.append, clock=lambda: AT.timestamp())
-    org.runtime = dataclasses.replace(org.runtime, health_reviewer=fake)  # tests replace the runtime under a running scheduler
     sched.tick()
     assert fake.calls == [("review_if_due", AT, False)] and seen == ["health review: 2 flagged, told ceo, root"]

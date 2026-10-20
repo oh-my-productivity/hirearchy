@@ -7,10 +7,11 @@ import subprocess
 import sys
 import textwrap
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
-from orgmcp.cli import main
+from testkit.cli_world import main
 from orgmcp.kernel import ROOT
 
 from ._org import Org, facade
@@ -46,6 +47,7 @@ def test_on_a_terminal_the_dashboard_runs_with_the_root_and_the_interval(org: Or
     import io
 
     calls: list[tuple[Path, float]] = []
+    launcher = SimpleNamespace(run_dashboard=lambda root, interval=2.0: calls.append((root, interval)))  # (the launcher of the composition root)
 
     class Tty(io.StringIO):
         def isatty(self) -> bool:
@@ -53,7 +55,7 @@ def test_on_a_terminal_the_dashboard_runs_with_the_root_and_the_interval(org: Or
 
     monkeypatch.setattr("sys.stdin", Tty())
     monkeypatch.setattr("sys.stdout", Tty())
-    monkeypatch.setattr("orgmcp.dashboard.run_dashboard", lambda root, interval=2.0: calls.append((root, interval)))
+    monkeypatch.setattr("orgmcp.app.wire_dashboard.dashboard_launcher", lambda screens=None: launcher)
     main(["--root", str(org.root), "dash", "--interval", "7"])
     assert calls == [(org.root, 7.0)]
 
@@ -61,10 +63,10 @@ def test_on_a_terminal_the_dashboard_runs_with_the_root_and_the_interval(org: Or
 def test_no_other_command_imports_textual_or_the_mcp_framework(org: Org) -> None:
     code = textwrap.dedent(f"""
         import sys
-        from orgmcp.cli import main
+        from orgmcp import main
         for argv in (["status"], ["dash", "--once"], ["obs", "now"], ["health"], ["check"], ["progress"], ["services"]):
             main(["--root", {str(org.root)!r}, *argv])
-        bad = [m for m in ("textual", "mcp.server.fastmcp", "orgmcp.dashboard", "orgmcp.server") if m in sys.modules]
+        bad = [m for m in ("textual", "mcp.server.fastmcp", "orgmcp.dashboard") if m in sys.modules]
         print("LOADED", bad)
     """)
     done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=120)

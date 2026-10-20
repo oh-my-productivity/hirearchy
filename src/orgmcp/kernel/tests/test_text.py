@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-
 import pytest
 
 from orgmcp.kernel import TITLE_MAX, clip, clip_line, single, word_count
@@ -72,16 +70,5 @@ def _clip_inputs() -> list[tuple[object, int]]:
 
 
 @pytest.mark.parametrize(("value", "limit"), _clip_inputs())
-def test_clip_equals_telemetry_clip(value: object, limit: int) -> None:
-    assert clip(value, limit) == legacy("telemetry").clip(value, limit)
-
-
-@pytest.mark.parametrize(("value", "limit"), _clip_inputs())
 def test_clip_line_equals_the_two_legacy_copies(value: object, limit: int) -> None:
     assert clip_line(value, limit) == legacy("observe")._clip(value, limit) == legacy("services")._clip(value, limit)
-
-
-@pytest.mark.parametrize("traces", [[], [None], ["a"], ["a", "a"], ["a", None], ["a", "b"], ["", "a"], [None, "b", "b"], ["a", "b", "a"]])
-def test_single_equals_telemetry_single(traces: Iterable[str | None]) -> None:
-    traces = list(traces)
-    assert single(traces) == legacy("telemetry").single(traces)

@@ -1,11 +1,10 @@
-"""The run lifecycle of the scheduler over the ports of a real runtime: ``wire_scheduler.lifecycle_of``, and the legacy ``Scheduler`` that holds it.
+"""The run lifecycle of the scheduler over the ports of a real runtime: ``wire_scheduler.lifecycle_of``, and the loop that holds it.
 
-The two clocks (ARCHITECTURE.md 1.3 decision 6, risk 11): the clock given to ``Scheduler(clock=...)`` is the cadence of the stall ladder, the review and
+The two clocks (ARCHITECTURE.md 1.3 decision 6, risk 11): the clock given to the loop (``Scheduler(clock=...)`` of the test world) is the cadence of the stall ladder, the review and
 the heartbeat; a run is timed by the run clock, which is the system's. Its output goes through the descriptor of the run log's sink (``fileno``)."""
 
 from __future__ import annotations
 
-import dataclasses
 import sys
 import time
 from pathlib import Path
@@ -15,10 +14,10 @@ import pytest
 from orgmcp.app import Org, wire_scheduler, wiring
 from orgmcp.processes import ProcessInspector, ProcessSpawner
 from orgmcp.processes.testing import FakeProcessTable
-from orgmcp.scheduler import Runner, Scheduler
 from orgmcp.scheduler._run import RunCount, RunTable
 from orgmcp.scheduler.testing import CapturingSpawner, CatchingGuard, RecordingConsole, ScriptedCommands
-from orgmcp.templates.testing import RecordingNotices
+from testkit.health_world import Scheduler
+from testkit.kiro_world import Runner
 
 
 @pytest.fixture
@@ -39,7 +38,7 @@ def script(code: str) -> Runner:
 def until_done(sched: Scheduler, limit: float = 20.0) -> None:
     deadline = time.time() + limit
     while sched.runs and time.time() < deadline:
-        sched._reap()
+        sched.reap()
         time.sleep(0.02)
     assert not sched.runs
 
@@ -83,7 +82,7 @@ def test_a_run_past_its_timeout_is_killed_whatever_the_cadence_clock_says(org: O
         sched.tick()
         run = sched.runs["ceo"]
         run.started -= 10  # it has been running for ten seconds by the run clock; the timeout is two
-        sched._reap()
+        sched.reap()
         assert sched.runs == {} and run.timed_out and run.killed
         assert "# killed after 2s timeout" in run.log.read_text(encoding="utf-8")
     finally:
@@ -102,18 +101,9 @@ def test_the_output_of_a_run_lands_in_its_log_through_the_descriptor_of_the_sink
 
 def test_the_total_of_runs_started_is_the_count_of_the_lifecycle(org: Org) -> None:
     sched = Scheduler(org, script("pass"), echo=lambda _: None)
-    assert sched.total_runs == 0
+    assert sched.state.count.total == 0
     sched.tick(max_runs=1)
-    assert sched.total_runs == 1 and sched._count.total == 1
+    assert sched.state.count.total == 1
     until_done(sched)
-    sched.total_runs = 5
-    assert sched._count.total == 5
-
-
-def test_a_replaced_runtime_is_the_one_the_next_run_uses(org: Org) -> None:
-    sched = Scheduler(org, script("import sys; sys.exit(1)"), echo=lambda _: None)
-    notices = RecordingNotices()
-    org.runtime = dataclasses.replace(org.runtime, notices=notices)  # the scheduler was made before: its failure notice comes from the new runtime
-    sched.tick()
-    until_done(sched)
-    assert [call[0] for call in notices.calls] == ["failures"] and org.paused("ceo") == "failures"
+    sched.state.count.total = 5
+    assert sched.state.count.total == 5

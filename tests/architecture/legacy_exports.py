@@ -30,18 +30,7 @@ PERMANENT_MODULES = {"core"}  # every name of these modules stays: the ledger ho
 
 LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "core": {"*": "permanent"},
-    "scheduler": _e3(
-        "Runner PROJECT_DIR KIRO_AGENTS_DIR mcp_server_command kiro_profile_name file_confinement "
-        "ensure_kiro_profile kiro_runner Run judge_orphan kill_group ignore_runtime_files "
-        "scheduler_command scheduler_state describe_scheduler waiting_on_user start_scheduler "
-        "stop_scheduler Scheduler nothing_to_do"
-    ),
-    "server": _e3(
-        "INSTRUCTIONS ROOT_INSTRUCTIONS DS_STORE OrgBinding build_server resolve_binding serve"
-    ),
-    "cli": _e3(
-        "main"
-    ),
+    "scheduler": _e3("file_confinement"),
     "services": _e3(
         "TITLE_MAX service_dir read_contract read_playbook owned_services requestable_services parse_input_spec define_service "
         "retire_service revise_playbook report_hint request rework_fields feedback_text feedback"
@@ -49,11 +38,6 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "reflection": _e3(
         "CLIP_LESSON CLIP_NOTE DIGEST_CASES DIGEST_CHARS MAX_VERDICTS cases case_of case_total playbook_timeline prompt_sections "
         "reflection_digest services_text"
-    ),
-    "telemetry": _e3(
-        "TITLE_MAX ERROR_MAX clip set_process "
-        "process dropped reset traces_seen note_trace single ensure_ignored emit summarize_args prune "
-        "SCHEMA_VERSION LINE_MAX EVENTS_REL DAY_RE ENVELOPE PROCS"
     ),
     "observe": _e3(
         "EVENTS_DIR ERROR_WINDOW COPY_GRACE INFLIGHT_GRACE RECV_BOXES ENVELOPE READ_ONLY_TOOLS VIEWS fmt_dur fmt_rel "
@@ -96,18 +80,6 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     ),
     "skill": _e3(
         "SKILL_NAME skill_source install_skill"
-    ),
-    "dashboard_events": _e3(
-        "WHO_WIDTH BATCH_SHOWN Lookup EventLine clock who describe humanize event_lines"
-    ),
-    "dashboard_data": _e3(
-        "ERROR_WINDOW ERROR_WINDOW_TEXT LOG_LINES LOG_BYTES FEED_KEEP FEED_BACKFILL TEXT_CAP CACHE_TRUST SERVICES_TTL "
-        "HEALTH_TTL REQUESTS_TTL STATE_KINDS GLYPHS clean_text AgentState pause_text classify Section "
-        "doc_text AgentRow SchedulerView Snapshot MsgRow RunLog AgentDetail RequestRow ServiceRow HealthView "
-        "EventFeed DashData render_once"
-    ),
-    "dashboard": _e3(
-        "TextPane NavTable TextScreen DashApp run_dashboard"
     ),
 }
 

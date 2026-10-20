@@ -95,7 +95,6 @@ def org(tmp_path: Path) -> Org:
 def test_the_legacy_objects_are_the_classes_of_the_package(org: Org) -> None:
     assert isinstance(wire_attention.waiting_on_user_of(org.runtime), RootTaskWaitingOnUser)
     assert isinstance(wire_attention.human_queue_of(org.runtime), InboxHumanQueue)
-    assert isinstance(wire_attention.open_work_of(org.runtime), RunnableOpenWork)
 
 
 def test_the_legacy_queue_reads_the_mailboxes_of_the_runtime_in_force(org: Org) -> None:

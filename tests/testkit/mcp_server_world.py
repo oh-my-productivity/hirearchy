@@ -1,6 +1,6 @@
-"""Servers of ``mcp_server`` for the tests that run the tools over a real organization: through the composition root, not the shim ``orgmcp.server``.
+"""Servers of ``mcp_server`` for the tests that run the tools over a real organization: through the composition root.
 
-``build_server(org, me)`` / ``resolve_binding()`` / ``OrgBinding(root)`` have the shapes the tests used when they imported them from ``orgmcp.server``;
+``build_server(org, me)`` / ``resolve_binding()`` / ``OrgBinding(root)`` have the shapes the tests used when they imported them from the old ``orgmcp.server``;
 they are made by ``orgmcp.app.wire_mcp_server`` (``server_factory``, ``binding_resolver``, ``RuntimeOrgOpener``). ``StartRecorder`` stands for the old
 patch point ``orgmcp.server.start_scheduler``: a fake starter that the server's ``start`` tool calls instead of the daemon's.
 
@@ -28,8 +28,11 @@ from orgmcp.blueprint._plan_texts import PLAN_DRAFT_HEADING, PLAN_END, PLAN_HEAD
 from orgmcp.blueprint._resolver import AgentResolver
 from orgmcp.core import Org
 from orgmcp.daemon import SchedulerControl
-from orgmcp.kernel._system import SystemClock
+from orgmcp.kernel import OrgPaths
+from orgmcp.kernel._system import FsAtomicWriter, SystemClock
 from orgmcp.kiro import RunCommand, RunCommandBuilder
+from orgmcp.kiro._profiles import FsProfileStore
+from orgmcp.kiro._provisioner import OrgProfileProvisioner
 from orgmcp.mcp_server import OrgBindingPort
 from orgmcp.mcp_server._binding import OrgBinding as _OrgBinding
 from orgmcp.mcp_server._ports import BindingFactory, OrgPorts
@@ -97,8 +100,8 @@ def resolve_binding() -> tuple[OrgBindingPort, str]:
 
 def ensure_kiro_profile(tools: list[str], agents_dir: Path, *, org: Any) -> str:
     """The profile of ``org`` written into ``agents_dir`` (what ``scheduler.ensure_kiro_profile`` did), over the provisioner of ``kiro``."""
-    provisioner = wire_kiro.provisioner_at(org.root, Path(agents_dir), wire_kiro.mcp_locator(), wire_kiro.confinement_policy())
-    return provisioner.ensure_profile(tools)
+    store = FsProfileStore(lambda: Path(agents_dir), FsAtomicWriter())
+    return OrgProfileProvisioner(OrgPaths(org.root), store, wire_kiro.confinement_policy(), wire_kiro.mcp_locator()).ensure_profile(tools)
 
 
 # ------------------------------------------------------------------------------ the status lines and a scheduler over a stand-in agent

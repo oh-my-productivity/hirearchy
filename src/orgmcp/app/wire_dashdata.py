@@ -60,7 +60,6 @@ from ..dashdata._render import TextSnapshotRenderer
 from ..dashdata._requests import CachedRequestQuery, MailRequestRows, ProgressRequestTexts
 from ..dashdata._rows import CharterProfile, LogRunElapsed, MailAgentWork, StateRows
 from ..dashdata._runlog import CachedRunLogViews
-from ..dashdata._runlog import read_tail as read_tail  # re-exported for dashboard_data.py
 from ..dashdata._scheduler import EventSchedulerViews, FsEventFileStamps
 from ..dashdata._services import CachedServiceQuery
 from ..dashdata._texts import FileAgentTexts
@@ -190,11 +189,6 @@ def health_query(b: PortResolver) -> HealthQuery:
 
 def snapshot_renderer(b: PortResolver) -> SnapshotRenderer:
     return TextSnapshotRenderer(b.get(SnapshotQuery), b.get(RequestQuery), b.get(ServiceQuery))
-
-
-def renderer_over(snapshots: SnapshotQuery, requests: RequestQuery, services: ServiceQuery) -> SnapshotRenderer:
-    """The text of ``dash --once`` over these queries (``dashboard_data.render_once(data)``, which is given one object that is all three)."""
-    return TextSnapshotRenderer(snapshots, requests, services)
 
 
 def register(b: Builder) -> None:
