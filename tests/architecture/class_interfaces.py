@@ -18,7 +18,7 @@ Exempt (data or framework, not behaviour):
 
 Limits: only classes reachable as module attributes (and their nested classes) are seen; a class defined inside a
 function is not. Modules named ``tests`` / ``*.tests.*`` (colocated tests), ``__main__``, the packages of
-``exempt_classes.EXEMPT_PACKAGES`` and ``_legacy`` modules are skipped.
+``exempt_classes.EXEMPT_PACKAGES`` are skipped (no ``_legacy`` module may exist: ``compat_surface.layout_problems``).
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ def source_modules(package: ModuleType) -> list[str]:
     names = []
     for info in pkgutil.walk_packages(package.__path__, package.__name__ + "."):
         parts = info.name.split(".")
-        if "tests" in parts or parts[-1] in ("__main__", exempt_classes.LEGACY_MODULE_NAME):
+        if "tests" in parts or parts[-1] == "__main__":
             continue
         if any(info.name == p or info.name.startswith(p + ".") for p in exempt_classes.EXEMPT_PACKAGES):
             continue

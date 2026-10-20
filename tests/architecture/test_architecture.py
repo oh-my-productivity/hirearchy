@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from . import checks, class_interfaces, contract_debt, gen_importlinter, graph, legacy_exports, lint
+from . import checks, class_interfaces, compat_surface, contract_debt, gen_importlinter, graph, lint
 from .paths import FIXTURES, REPO
 
 pytestmark = pytest.mark.architecture
@@ -52,7 +52,7 @@ def test_responsibilities_have_no_and(architecture_text):
 
 
 def test_init_reexports_exactly_api(real_tree):
-    assert not (found := checks.init_reexports(real_tree, legacy_exports.exported_names_by_package())), report(found)
+    assert not (found := checks.init_reexports(real_tree, compat_surface.PACKAGE_EXPORTS)), report(found)
 
 
 def test_package_contents(real_tree):

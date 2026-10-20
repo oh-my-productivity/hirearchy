@@ -54,9 +54,10 @@ markers = [
 [tool.mypy]
 # STRICT CHECKING, PACKAGE BY PACKAGE. scripts/static_checks.py checks with `strict = true` every package directory of src/orgmcp
 # (a directory with __init__.py: kernel, the features, the entry points, app) -- so a new package is strict from its first commit and
-# no step edits this file -- plus the modules listed in `packages` below (to make a flat legacy module strict early; empty today).
-# Everything else is only *followed* (its types are used, its errors are not reported), so today's untyped modules never fail the run.
-# Run it with `uv run python scripts/static_checks.py mypy` (nothing to check yet is a no-op that proves mypy runs).
+# no step edits this file -- plus the modules listed in `packages` below. Production code is strict; the test code (src/orgmcp/**/tests,
+# tests/) is not type-checked strictly: the tests moved by step E1 carry `# mypy: ignore-errors`. Everything outside the packages is only
+# *followed* (its types are used, its errors are not reported).
+# Run it with `uv run python scripts/static_checks.py mypy`.
 python_version = "3.11"
 mypy_path = "src:tests"  # tests/ too: a colocated test may `import testkit`
 namespace_packages = true
@@ -81,10 +82,6 @@ disallow_untyped_decorators = false
 module = ["orgmcp.app", "orgmcp.app.*"]
 disable_error_code = ["type-abstract"]
 
-# DEBT, only shrinks (ARCHITECTURE.md 8.1): the mixins of the Org facade are the former core.Org moved verbatim (step M2) and still carry its
-# untyped legacy bodies. The debt is the first line `# mypy: ignore-errors` of each `app/_facade_<pkg>.py` (not a table here: identical
-# neighbouring tables cannot be told apart by git, so two steps deleting neighbours conflicted); a feature step deletes that line of its own mixin
-# when it turns the bodies into typed calls to the interfaces of `self.runtime`; the last one goes with the facade slimming (E2).
 [[tool.mypy.overrides]]
 # `testkit.legacy.<module>` is an alias of <module> made at run time (tests/testkit/legacy): to mypy it is a missing module, i.e. Any.
 module = ["testkit.legacy", "testkit.legacy.*"]
@@ -97,9 +94,10 @@ module = ["yaml", "yaml.*"]
 ignore_missing_imports = true
 
 [tool.importlinter]
-# HAND-WRITTEN CONTRACTS for the flat legacy modules (they disappear with the modules). The contracts of the architecture
-# (docs/refactor-principles.md, "Enforcement": layers entry points -> features -> kernel; no import of another package's `_` modules;
-# no cycles between features; the kernel imports nothing; no feature imports the Org facade; frameworks at the edge) are GENERATED
+# HAND-WRITTEN CONTRACTS: what the generator does not derive from the package map (today: the permanent facade module `orgmcp.core` and
+# the library do not import the entry points). The contracts of the architecture (ARCHITECTURE.md 8.2: layers app/core -> entry points ->
+# features -> kernel; no import of another package's `_` modules; no cycles between features; the kernel imports nothing; no feature imports
+# the Org facade; frameworks at the edge) are GENERATED
 # from tests/architecture/graph.py and the packages that exist: `uv run python -m tests.architecture.lint` writes .importlinter
 # (git-ignored) and runs it together with this section. To add a hand-written contract append a `[[tool.importlinter.contracts]]` block
 # below: a `name`, a `type` (layers, forbidden, independence, acyclic_siblings ...) and its modules; it must pass before the commit.

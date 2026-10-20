@@ -68,7 +68,7 @@ class Tree:
         return [d.name for d in self.package_dirs()]
 
     def modules(self, *, tests: bool = False, packages_only: bool = True) -> Iterator[Module]:
-        """Modules of the packages (not of flat legacy modules directly under the root, unless ``packages_only=False``)."""
+        """Modules of the packages (not of the flat modules directly under the root: ``core``, ``__main__``; unless ``packages_only=False``)."""
         for path in sorted(self.directory.rglob("*.py")):
             relative = path.relative_to(self.directory)
             parts = relative.with_suffix("").parts
@@ -348,9 +348,10 @@ def package_contents(tree: Tree, known: Iterable[str] | None = None) -> list[Vio
     return found
 
 
-def init_reexports(tree: Tree, legacy: Mapping[str, Iterable[str]] | None = None) -> list[Violation]:
-    """R1: ``__init__.__all__ == api.__all__`` and nothing else public (apart from the legacy-export ledger). Imports the packages."""
-    legacy = legacy or {}
+def init_reexports(tree: Tree, compat: Mapping[str, Iterable[str]] | None = None) -> list[Violation]:
+    """R1: ``__init__.__all__ == api.__all__`` and nothing else public, apart from the names of the compatibility surface
+    (``compat`` = ``compat_surface.PACKAGE_EXPORTS``: package -> the extra names its ``__init__`` exports). Imports the packages."""
+    compat = compat or {}
     found = []
     base = tree.directory.parent
     added = str(base) not in sys.path
@@ -366,7 +367,7 @@ def init_reexports(tree: Tree, legacy: Mapping[str, Iterable[str]] | None = None
             if api_all is None:
                 found.append(Violation("R1", f"{directory.name}.api", "api.py defines no __all__"))
                 continue
-            extra = set(legacy.get(directory.name, ()))
+            extra = set(compat.get(directory.name, ()))
             declared = set(getattr(package, "__all__", ()))
             if declared != set(api_all) | extra:
                 found.append(Violation("R1", f"{directory.name}.__init__", f"__all__ differs from api.__all__: "
@@ -479,12 +480,12 @@ def imported_packages(module: Module, root: str) -> set[str]:
 
 def imports_against_graph(tree: Tree, packages: Mapping[str, graph.Package] = graph.PACKAGES) -> list[Violation]:
     """The imports that actually exist between packages are a subset of the edges of 2.2/4.3 (the layers contract proves the
-    level order; this proves the finer, per-package list). ``app`` may import everything; ``_legacy`` modules are skipped."""
+    level order; this proves the finer, per-package list). ``app`` may import everything."""
     found = []
     for module in tree.modules():
         package = module.package
-        if package not in packages or module.name.split(".")[-1] == "_legacy":
-            continue  # app, unknown packages (package_contents reports those), flat legacy modules
+        if package not in packages:
+            continue  # app, unknown packages (package_contents reports those)
         allowed = graph.allowed_imports(package) if packages is graph.PACKAGES else \
             frozenset(packages[package].deps) | {package, graph.KERNEL}
         for target in sorted(imported_packages(module, tree.name) - allowed):

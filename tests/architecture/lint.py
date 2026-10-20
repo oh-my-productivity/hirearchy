@@ -2,7 +2,7 @@
 
 1. generates ``.importlinter`` (git-ignored) from ``graph.py`` and the packages that exist (``gen_importlinter``) and runs
    ``lint-imports`` on it; when no package of the map exists yet there is nothing to generate and that step is skipped;
-2. runs ``lint-imports`` on the hand-written contracts of ``[tool.importlinter]`` in pyproject.toml (the flat legacy modules).
+2. runs ``lint-imports`` on the hand-written contracts of ``[tool.importlinter]`` in pyproject.toml (what the generator does not derive: ``orgmcp.core`` does not import the entry points).
 
 ``lint-imports`` is always given ``--config`` explicitly: a plain ``lint-imports`` would read the generated ``.importlinter`` only,
 and always ``--no-cache``: the cached import graph is keyed by file mtimes and can report "kept" for a tree that breaks a contract.

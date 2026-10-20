@@ -10,14 +10,15 @@ one ``private-modules-<pkg>`` contract per package that has ``_*`` modules. Noth
 
 Contracts (rule in parentheses):
 
-* ``layers`` (R4, R5): app/core/server -> entry points -> features by level (L11..L1) -> kernel. ``|`` = independent siblings.
+* ``layers`` (R4, R5): app/core -> entry points -> features by level (L11..L1) -> kernel. ``|`` = independent siblings.
 * ``private-modules-<pkg>`` (R2): only the package itself (its own tests included) and ``orgmcp.app`` import its ``_*`` modules.
 * ``kernel-independent`` (R3): the kernel imports no other module of the root package.
-* ``no-facade-import`` (R5): no package imports ``orgmcp.core``, ``orgmcp.app`` or ``orgmcp.server``.
+* ``no-facade-import`` (R5): no package imports ``orgmcp.core`` or ``orgmcp.app``.
 * ``no-testing-in-production``: ``<pkg>.testing`` is imported only by tests and by other ``testing`` modules.
 * ``textual-only-in-dashboard`` / ``mcp-only-in-mcp-server`` / ``yaml-only-where-needed``: frameworks stay at the edge.
 
-The older hand-written contracts for the flat legacy modules stay in ``[tool.importlinter]`` of pyproject.toml; ``lint`` runs both.
+The hand-written contracts (what the generator does not derive from the package map: ``orgmcp.core`` does not import the entry points)
+are in ``[tool.importlinter]`` of pyproject.toml; ``lint`` runs both.
 """
 
 from __future__ import annotations
@@ -30,7 +31,7 @@ from . import graph
 from .checks import Tree
 
 GRAPH: Mapping[str, graph.Package] = graph.PACKAGES
-SHIMS = ("app", "core", "server")  # the top layer: composition root and the shims over it (a flat module counts)
+SHIMS = ("app", "core")  # the top layer: the composition root and the permanent facade module over it (a flat module counts)
 FRAMEWORKS = (
     ("textual-only-in-dashboard", "Textual is used only by the dashboard entry point", ("dashboard",), ("textual",)),
     ("mcp-only-in-mcp-server", "The MCP SDK is used only by the MCP server entry point", ("mcp_server",), ("mcp", "anyio")),
@@ -76,7 +77,7 @@ def _imported_externals(tree: Tree, wanted: tuple[str, ...]) -> set[str]:
 
 
 def layer_lines(tree: Tree, packages: Mapping[str, graph.Package]) -> list[str]:
-    """Top to bottom, only what exists: ``root.app : root.core : root.server``, the entry points, one line per feature level, the kernel."""
+    """Top to bottom, only what exists: ``root.app : root.core``, the entry points, one line per feature level, the kernel."""
     root, existing, modules = tree.name, set(tree.package_names()), set(_top_level_modules(tree))
     lines = []
     shims = [f"{root}.{n}" for n in SHIMS if n in modules]

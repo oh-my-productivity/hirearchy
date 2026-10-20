@@ -1,7 +1,8 @@
 """Parsers of ARCHITECTURE.md: the tables that the machine-readable data (graph, ownership, mapping) must equal.
 
-Only what the architecture tests need: the package map (2.2), the levels (4.1), the ownership table (2.3), the edges (4.3) and the
-mapping tables (5.1-5.14). Each function takes the document text and returns plain data.
+Only what the architecture tests need: the package map (2.2), the levels (4.1), the ownership table (2.3) and the edges (4.3). Each
+function takes the document text and returns plain data. (The mapping tables of section 5 are the historical record of the migration;
+nothing parses them any more.)
 """
 
 from __future__ import annotations
@@ -19,13 +20,6 @@ class PackageRow:
     kind: str
     responsibility: str
     deps: tuple[str, ...]
-
-
-@dataclass(frozen=True)
-class MappingRow:
-    section: str  # "5.3"
-    symbol: str  # one legacy symbol (a row with several symbols gives several MappingRow)
-    target: str  # the raw target cell
 
 
 def section_lines(markdown: str, heading: str) -> list[str]:
@@ -121,42 +115,3 @@ def ledger_registry(markdown: str) -> dict[str, str]:
     text = " ".join(section_lines(markdown, "### 2.3"))
     paragraph = text[text.index("Ledger names"):] if "Ledger names" in text else ""
     return dict(re.findall(r"`(\w+)`\s*->\s*`(\w+)`", paragraph))
-
-
-# ------------------------------------------------------------------------------------------------------------------- 5.x
-
-
-def _symbols_of(cell_text: str) -> list[str]:
-    out = []
-    for segment in _tick(cell_text):
-        for token in re.split(r"[\s,]+", segment):
-            token = token.strip("()").removesuffix("()")
-            token = token.split("::")[-1] if "::" in token else token
-            token = token.rsplit(".", 1)[-1] if re.match(r"^\w+\.\w+$", token) else token
-            if _IDENTIFIER.match(token):
-                out.append(token)
-    return out
-
-
-def mapping_rows(markdown: str) -> list[MappingRow]:
-    """One MappingRow per legacy symbol of every table row in 5.1-5.14."""
-    rows = []
-    for number in range(1, 15):
-        for line in section_lines(markdown, f"### 5.{number} "):
-            if not line.startswith("|") or re.match(r"^\|\s*(Symbol|Method|-)", line):
-                continue
-            row = cells(line)
-            if len(row) < 2:
-                continue
-            whole_row = row[0].startswith(("`DashData`", "`LenientOrg`"))
-            symbols = _symbols_of(line if whole_row else row[0])
-            rows.extend(MappingRow(f"5.{number}", symbol, row[1]) for symbol in dict.fromkeys(symbols))
-    return rows
-
-
-def mapping_symbols(markdown: str) -> dict[str, set[str]]:
-    """{section number: every legacy symbol the section's table mentions}."""
-    out: dict[str, set[str]] = {}
-    for row in mapping_rows(markdown):
-        out.setdefault(row.section, set()).add(row.symbol)
-    return out

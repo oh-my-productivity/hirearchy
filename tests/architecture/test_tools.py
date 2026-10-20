@@ -1,40 +1,17 @@
-"""The generators and commands that later steps run: ``gen_importlinter``, ``lint``, ``mapping_status``."""
+"""The generators and commands that later steps run: ``gen_importlinter`` and ``lint``, and the mypy discovery."""
 
 from __future__ import annotations
 
 import importlib.util
-import os
-import subprocess
-import sys
 import tomllib
 from pathlib import Path
 
 import pytest
 
-from . import checks, gen_importlinter, graph, mapping_status
+from . import checks, gen_importlinter, graph
 from .paths import REPO
 
 pytestmark = pytest.mark.architecture
-
-MAPPING = """\
-### 5.1 `core.py` — module-level symbols
-
-| Symbol | Target |
-|---|---|
-| `OrgError` | `kernel.OrgError` |
-| `word_count`, `_FENCE_LINE` | `kernel/_text.py::word_count` |
-| `messages`, `received` | `mail.MailboxReader` |
-| `_wakes` | `mail/_mailbox.py::FsMailbox._wakes` (private helper) |
-| `_inside` | `kernel.inside` (**deleted: duplicate of** `blueprint._within`) |
-| `Retired` | `hierarchy.Retired` |
-| `ROOT RUNTIME BOXES` | `kernel` (public constants) |
-
-### 5.2 `core.Message` methods
-
-| Method | Target |
-|---|---|
-| `meta` | `kernel.Message` (unchanged, pure) |
-"""
 
 
 def package(root: Path, name: str, **files: str) -> None:
@@ -129,39 +106,6 @@ def test_every_package_of_the_map_is_known_to_the_generator():
 
 def test_lint_writes_the_config_to_a_git_ignored_file():
     assert ".importlinter" in (REPO / ".gitignore").read_text(encoding="utf-8").splitlines()
-
-
-# ------------------------------------------------------------------------------------------------------ mapping_status
-
-
-def test_mapping_status_lists_the_symbols_that_have_not_moved(tmp_path):
-    tree = synthetic_tree(tmp_path)  # mail/api.py defines MailboxReader; mail/_mailbox.py defines FsMailbox._wakes
-    result = mapping_status.status("mail", MAPPING, tree)
-    assert [r.symbol for r in result.moved] == ["messages", "received", "_wakes"]
-    assert result.unmoved == []
-    result = mapping_status.status("kernel", MAPPING, tree)
-    assert [r.symbol for r in result.moved] == ["word_count", "_FENCE_LINE"]
-    assert {r.symbol for r in result.unmoved} == {"OrgError", "_inside", "ROOT", "RUNTIME", "BOXES", "meta"}
-
-
-def test_mapping_status_attributes_a_row_to_its_first_target_and_skips_deleted_rows(tmp_path):
-    tree = synthetic_tree(tmp_path)
-    result = mapping_status.status("hierarchy", MAPPING, tree)
-    assert [r.symbol for r in result.unmoved] == ["Retired"] and result.moved == []
-    result = mapping_status.status("blueprint", MAPPING, tree)  # only mentioned in a "duplicate of" remark of the kernel row
-    assert result.unmoved == [] and result.moved == []
-    deleted = "| Symbol | Target |\n|---|---|\n| `Runner` (type alias) | deleted: replaced by `kiro.RunCommandBuilder` |\n"
-    assert mapping_status.status("kiro", "### 5.4 `scheduler.py`\n\n" + deleted, tree).unmoved == []
-
-
-def test_mapping_status_command_exits_1_while_symbols_are_unmoved_and_2_for_an_unknown_package():
-    def run(*args: str) -> subprocess.CompletedProcess[str]:
-        return subprocess.run([sys.executable, "-m", "tests.architecture.mapping_status", *args], capture_output=True, text=True,
-                              cwd=REPO, env={**os.environ, "PYTHONPATH": str(REPO)}, timeout=120)
-
-    result = run("cli")  # no package yet: every symbol of its rows is unmoved (was "blueprint" until C-blueprint-1 moved ``BlueprintError``)
-    assert result.returncode == 1 and "_announce" in result.stdout and "unmoved" in result.stdout
-    assert run("nonsense").returncode == 2
 
 
 # ------------------------------------------------------------------------------------------------------------ mypy strictness
