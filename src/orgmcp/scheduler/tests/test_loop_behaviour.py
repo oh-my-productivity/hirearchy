@@ -11,7 +11,7 @@ import pytest
 import testkit
 from testkit.legacy.orgmcp.core import ROOT, OrgError
 
-from orgmcp.scheduler import Scheduler
+from testkit.scheduler_loop import loop_over, runnable_of
 
 FAKE = str(testkit.FAKE_AGENT)
 
@@ -38,7 +38,7 @@ def run_until_idle(sched, max_ticks=500):
 
 def test_task_flows_down_and_result_flows_up(org):
     task = org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
-    sched = Scheduler(org, fake_runner("work"), echo=lambda _: None)
+    sched = loop_over(org, fake_runner("work"), echo=lambda _: None)
     run_until_idle(sched)
 
     results = [m for m in org.received(ROOT) if m.type == "result"]
@@ -54,7 +54,7 @@ def test_task_flows_down_and_result_flows_up(org):
 
 def test_crashing_agent_is_retried_then_paused(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
-    sched = Scheduler(org, fake_runner("crash"), echo=lambda _: None)
+    sched = loop_over(org, fake_runner("crash"), echo=lambda _: None)
     run_until_idle(sched)
     assert org.paused("ceo") == "failures"
     assert org.runs_used("ceo") == 3
@@ -66,11 +66,11 @@ def test_crashing_agent_is_retried_then_paused(org):
 def test_out_of_budget_pauses_and_notifies_parent(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=1)
     org.send(ROOT, "ceo", "also this")  # arrives later, but ceo will have no budget left
-    sched = Scheduler(org, fake_runner("idle"), echo=lambda _: None)
+    sched = loop_over(org, fake_runner("idle"), echo=lambda _: None)
     sched.acquire()
     sched.tick()  # ceo runs once with both messages
-    while sched.runs:
-        sched._reap()
+    while sched.state.runs:
+        sched.reap()
     org.send(ROOT, "ceo", "one more")
     sched.tick()
     sched.release()
@@ -78,7 +78,7 @@ def test_out_of_budget_pauses_and_notifies_parent(org):
     assert any("out of budget" in m.title for m in org.messages(ROOT, "inbox"))
     # a grant unpauses it
     org.send(ROOT, "ceo", "here are more runs", budget=2)
-    assert "ceo" in sched._runnable()
+    assert "ceo" in runnable_of(org, sched)
 
 
 class Clock:
@@ -96,7 +96,7 @@ class Clock:
 
 def stall_sched(org, runner=None):
     clock = Clock()
-    return Scheduler(org, runner or fake_runner("idle"), echo=lambda _: None, clock=clock), clock
+    return loop_over(org, runner or fake_runner("idle"), echo=lambda _: None, clock=clock), clock
 
 
 def after_stall(org, clock, sched):
@@ -190,13 +190,13 @@ def test_stall_is_detected_while_another_agent_is_running(org):
     try:
         for _ in range(200):
             sched.tick()
-            if "ceo/eng" not in sched.runs and org.runs_used("ceo/eng") == 1:
+            if "ceo/eng" not in sched.state.runs and org.runs_used("ceo/eng") == 1:
                 break
             time.sleep(0.02)
-        assert "ceo/ops" in sched.runs and titles(org, "ceo/eng") == []
+        assert "ceo/ops" in sched.state.runs and titles(org, "ceo/eng") == []
         clock.advance(float(org.config["stall_after"]) + 1)
         sched.tick()
-        assert "ceo/ops" in sched.runs  # still busy elsewhere, yet eng got its reminder
+        assert "ceo/ops" in sched.state.runs  # still busy elsewhere, yet eng got its reminder
         assert titles(org, "ceo/eng") == ["reminder: Build"]
     finally:
         sched.release()
@@ -219,33 +219,33 @@ def failures(org):
 
 def test_failure_count_survives_a_scheduler_restart(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
-    first = Scheduler(org, fake_runner("crash"), echo=lambda _: None)
+    first = loop_over(org, fake_runner("crash"), echo=lambda _: None)
     first.acquire()
     try:
         for _ in range(500):
             first.tick(max_runs=2)
-            if org.runs_used("ceo") == 2 and not first.runs:
+            if org.runs_used("ceo") == 2 and not first.state.runs:
                 break
             time.sleep(0.02)
     finally:
         first.release()
     assert failures(org) == {"ceo": 2} and org.paused("ceo") is None
 
-    run_until_idle(Scheduler(org, fake_runner("crash"), echo=lambda _: None))  # a fresh process: 3rd strike
+    run_until_idle(loop_over(org, fake_runner("crash"), echo=lambda _: None))  # a fresh process: 3rd strike
     assert org.paused("ceo") == "failures" and org.runs_used("ceo") == 3
 
 
 def test_failure_count_resets_on_success(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     org.save_ledger("failures", {"ceo": 2, "ceo/eng": 1})
-    run_until_idle(Scheduler(org, fake_runner("idle"), echo=lambda _: None))
+    run_until_idle(loop_over(org, fake_runner("idle"), echo=lambda _: None))
     assert failures(org) == {"ceo/eng": 1}
     assert org.paused("ceo") is None
 
 
 def test_single_scheduler_per_org(org):
-    a = Scheduler(org, fake_runner(), echo=lambda _: None)
+    a = loop_over(org, fake_runner(), echo=lambda _: None)
     a.acquire()
     with pytest.raises(OrgError, match="already running"):
-        Scheduler(org, fake_runner(), echo=lambda _: None).acquire()
+        loop_over(org, fake_runner(), echo=lambda _: None).acquire()
     a.release()

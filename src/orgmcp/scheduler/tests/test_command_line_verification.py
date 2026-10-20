@@ -4,8 +4,12 @@
 from pathlib import Path
 
 import pytest
+from testkit.legacy.orgmcp.app.wire_daemon import identity
 
-from orgmcp.scheduler import _looks_like_scheduler_of
+
+def _looks_like_scheduler_of(command, root):
+    """Does this command line plausibly start the scheduler of the organization at ``root``? (``SchedulerIdentity``)"""
+    return identity().recognises(command, root)
 
 
 @pytest.fixture(autouse=True)

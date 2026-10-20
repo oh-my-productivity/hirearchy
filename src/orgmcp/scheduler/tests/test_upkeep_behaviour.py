@@ -10,9 +10,8 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 import testkit
-
-from orgmcp import telemetry
-from orgmcp.scheduler import Scheduler
+from testkit.legacy.orgmcp.app import wiring
+from testkit.scheduler_loop import loop_over
 
 FAKE = str(testkit.FAKE_AGENT)
 SILENT = {"echo": lambda _: None}
@@ -23,7 +22,7 @@ SILENT = {"echo": lambda _: None}
 def org(org):
     """The shared org, with the events of its construction (hires) forgotten: tests see only their own."""
     shutil.rmtree(org.root / ".runtime" / "events", ignore_errors=True)
-    telemetry.reset()
+    wiring.process_resources().reset()  # forget the open event files and counters of the process
     return org
 
 
@@ -66,7 +65,7 @@ def test_the_scheduler_prunes_once_a_day_and_says_so(org):
     old.mkdir(parents=True)
     (old / "mcp-1-1.jsonl").write_text("{}\n")
     clock = Clock()
-    sched = Scheduler(org, fake_runner("idle"), clock=clock, **SILENT)
+    sched = loop_over(org, fake_runner("idle"), clock=clock, **SILENT)
     sched.tick()
     assert not old.exists()
     (prune,) = read_events(org, "prune")

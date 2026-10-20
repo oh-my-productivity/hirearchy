@@ -10,7 +10,7 @@ import time
 import pytest
 from testkit.legacy.orgmcp.core import ROOT
 
-from orgmcp.scheduler import Scheduler, _start_time, judge_orphan
+from testkit.scheduler_loop import loop_over, runnable_of
 
 SILENT = dict(echo=lambda _: None)
 
@@ -39,7 +39,7 @@ def crash_mid_run(org, addr="ceo"):
 
 
 def record(org, addr, proc, log=None, **override):
-    rec = {"pgid": proc.pid, "lstart": _start_time(proc.pid), "started": time.time(), "scheduler": 999999,
+    rec = {"pgid": proc.pid, "lstart": org.runtime.process_inspector.start_time(proc.pid), "started": time.time(), "scheduler": 999999,
            "log": str(log.relative_to(org.root)) if log else ""}
     org.save_ledger("running", {addr: {**rec, **override}})
 
@@ -69,7 +69,7 @@ def test_orphan_process_group_is_killed_on_start_and_the_batch_redelivered_once(
     record(org, "ceo", orphan, log)
     assert org.running("ceo") and org.unread("ceo") == 0
     runs = []
-    sched = Scheduler(org, counting_runner(runs), **SILENT)
+    sched = loop_over(org, counting_runner(runs), **SILENT)
     sched.acquire()
     try:
         assert orphan.wait(timeout=10) == -signal.SIGKILL  # dead before anything is redelivered
@@ -93,7 +93,7 @@ def test_the_whole_orphan_process_group_dies_with_its_leader(org):
         record(org, "ceo", leader, log)
         group = subprocess.run(["pgrep", "-g", str(leader.pid)], capture_output=True, text=True).stdout.split()
         assert len(group) >= 2
-        Scheduler(org, counting_runner([]), **SILENT).acquire()
+        loop_over(org, counting_runner([]), **SILENT).acquire()
         leader.wait(timeout=10)
         time.sleep(0.2)
         assert subprocess.run(["pgrep", "-g", str(leader.pid)], capture_output=True, text=True).stdout.split() == []
@@ -106,12 +106,12 @@ def test_a_recorded_pid_that_is_not_a_session_leader_is_not_killed(org, spawn):
     log = crash_mid_run(org)
     bystander = spawn(own_session=False)  # same process group as the test run itself
     record(org, "ceo", bystander, log)
-    assert judge_orphan(org.ledger("running")["ceo"]) == "foreign"
-    sched = Scheduler(org, counting_runner([]), **SILENT)
+    assert org.runtime.orphan_judge.judge(org.ledger("running")["ceo"]) == "foreign"
+    sched = loop_over(org, counting_runner([]), **SILENT)
     sched.acquire()
     try:
         assert alive(bystander)
-        assert org.ledger("running") == {} and "ceo" not in sched._blocked
+        assert org.ledger("running") == {} and "ceo" not in sched.state.blocked
         assert org.unread("ceo") == 1  # the batch is still redelivered: our run is gone
     finally:
         sched.release()
@@ -121,7 +121,7 @@ def test_a_recorded_pid_reused_by_another_process_is_not_killed(org, spawn):
     log = crash_mid_run(org)
     stranger = spawn()  # a session leader, but not started when the recorded run was
     record(org, "ceo", stranger, log, lstart="Mon Jan  1 00:00:00 2001")
-    sched = Scheduler(org, counting_runner([]), **SILENT)
+    sched = loop_over(org, counting_runner([]), **SILENT)
     sched.acquire()
     try:
         assert alive(stranger) and org.ledger("running") == {} and org.unread("ceo") == 1
@@ -133,7 +133,7 @@ def test_a_recorded_pid_reused_by_another_process_is_not_killed(org, spawn):
 def test_nonsense_records_never_kill_anything(org, pgid):
     crash_mid_run(org)
     org.save_ledger("running", {"ceo": {"pgid": pgid, "lstart": "x"}, "gone/agent": "junk"})
-    sched = Scheduler(org, counting_runner([]), **SILENT)
+    sched = loop_over(org, counting_runner([]), **SILENT)
     sched.acquire()
     sched.release()
     assert org.ledger("running") == {}
@@ -145,20 +145,20 @@ def test_an_unverifiable_live_orphan_blocks_its_agent_until_it_is_gone(org, spaw
     record(org, "ceo", orphan, log, lstart=None)  # cannot tell it is ours: in doubt
     runs = []
     messages = []
-    sched = Scheduler(org, counting_runner(runs), echo=messages.append)
+    sched = loop_over(org, counting_runner(runs), echo=messages.append)
     sched.acquire()
     try:
         for _ in range(5):
             sched.tick()
-        assert alive(orphan) and runs == [] and "ceo" in sched._blocked
-        assert org.unread("ceo") == 1 and "ceo" not in sched._runnable()
+        assert alive(orphan) and runs == [] and "ceo" in sched.state.blocked
+        assert org.unread("ceo") == 1 and "ceo" not in runnable_of(org, sched)
         assert any("no new run until it is gone" in m for m in messages)
         orphan.kill()
         orphan.wait()
         drain(sched)
     finally:
         sched.release()
-    assert runs == ["ceo"] and not sched._blocked and org.ledger("running") == {}
+    assert runs == ["ceo"] and not sched.state.blocked and org.ledger("running") == {}
 
 
 def test_a_scheduled_run_is_recorded_while_it_lives_and_cleaned_when_reaped(org):
@@ -168,14 +168,14 @@ def test_a_scheduled_run_is_recorded_while_it_lives_and_cleaned_when_reaped(org)
     def runner(o, a, p):
         return ["sleep", "0.4"], o.dir(a), dict(os.environ)
 
-    sched = Scheduler(org, runner, **SILENT)
+    sched = loop_over(org, runner, **SILENT)
     sched.acquire()
     try:
         sched.tick()
         rec = org.ledger("running")["ceo"]
-        run = sched.runs["ceo"]
+        run = sched.state.runs["ceo"]
         assert rec["pgid"] == run.proc.pid and rec["scheduler"] == os.getpid() and rec["lstart"]
-        assert judge_orphan(rec) == "ours"
+        assert org.runtime.orphan_judge.judge(rec) == "ours"
         seen.append(rec)
         drain(sched)
     finally:

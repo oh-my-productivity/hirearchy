@@ -7,10 +7,8 @@ import time
 
 import testkit
 import testkit.legacy.yaml as yaml
-from testkit.legacy.orgmcp import observe
 from testkit.legacy.orgmcp.core import DEFAULT_MODEL, ROOT, Org
-
-from orgmcp.scheduler import Scheduler
+from testkit.scheduler_loop import loop_over
 
 FAKE = str(testkit.FAKE_AGENT)
 CHARTER = "---\nrole: CEO\n{model}tools: [read]\n---\nLead.\n"
@@ -40,7 +38,7 @@ def fake_runner():
 
 def run_start_models(org: Org) -> dict[str, str]:
     org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
-    sched = Scheduler(org, fake_runner(), echo=lambda _: None)
+    sched = loop_over(org, fake_runner(), echo=lambda _: None)
     sched.acquire()
     try:
         for _ in range(500):
@@ -49,7 +47,7 @@ def run_start_models(org: Org) -> dict[str, str]:
             time.sleep(0.02)
     finally:
         sched.release()
-    return {e["agent"]: e["model"] for e in observe.events(org, kind="run.start", since="1h")}
+    return {e["agent"]: e["model"] for e in org.runtime.event_queries.events(kind="run.start", since="1h")}
 
 
 def test_the_run_start_event_reports_the_resolved_model(org):

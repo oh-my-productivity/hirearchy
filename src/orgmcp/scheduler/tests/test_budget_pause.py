@@ -6,7 +6,7 @@ import os
 from testkit.legacy.orgmcp import core
 from testkit.legacy.orgmcp.core import ROOT, Message
 
-from orgmcp.scheduler import Scheduler
+from testkit.scheduler_loop import loop_over, runnable_of
 
 SILENT = dict(echo=lambda _: None)
 
@@ -27,11 +27,11 @@ def test_refund_unpauses_an_agent_paused_for_budget_that_has_waking_mail(org):
     org.start_run_log("ceo")
     org.start_run_log("ceo")  # both runs spent
     org.send(ROOT, "ceo", "one more thing")  # waking mail, no budget to handle it
-    sched = Scheduler(org, true_runner, **SILENT)
+    sched = loop_over(org, true_runner, **SILENT)
     sched.tick()
     assert org.paused("ceo") == "budget" and org.runs_used("ceo") == 2
     refund_note(org, "ceo", 3)  # does not wake by itself, but the budget counts at once
-    assert org.budget("ceo") == 3 and "ceo" in sched._runnable()
+    assert org.budget("ceo") == 3 and "ceo" in runnable_of(org, sched)
     sched.acquire()
     try:
         for _ in range(100):
@@ -50,7 +50,7 @@ def test_a_refund_alone_lifts_a_budget_pause_without_a_run(org):
     org.end_run("ceo", ok=True)
     org.pause("ceo", "budget")
     refund_note(org, "ceo", 2)
-    sched = Scheduler(org, true_runner, **SILENT)
+    sched = loop_over(org, true_runner, **SILENT)
     assert sched.tick() is False
     assert org.paused("ceo") is None and org.runs_used("ceo") == 1  # state is honest; still no run
 
@@ -58,5 +58,5 @@ def test_a_refund_alone_lifts_a_budget_pause_without_a_run(org):
 def test_a_failure_pause_is_not_lifted_by_a_refund(org):
     org.pause("ceo", "failures")
     refund_note(org, "ceo", 2)
-    Scheduler(org, true_runner, **SILENT).tick()
+    loop_over(org, true_runner, **SILENT).tick()
     assert org.paused("ceo") == "failures"

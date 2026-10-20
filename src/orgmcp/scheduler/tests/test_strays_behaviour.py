@@ -8,7 +8,7 @@ import time
 
 from testkit.legacy.orgmcp.core import ROOT
 
-from orgmcp.scheduler import Scheduler
+from testkit.scheduler_loop import loop_over
 from orgmcp.strays import StrayProbe
 
 
@@ -31,10 +31,10 @@ def script_runner(code: str):
 def run_to_end(sched, addr):
     sched.tick()
     deadline = time.time() + 20
-    while sched.runs and time.time() < deadline:
-        sched._reap()
+    while sched.state.runs and time.time() < deadline:
+        sched.reap()
         time.sleep(0.02)
-    assert not sched.runs
+    assert not sched.state.runs
 
 
 STRAY = "import pathlib; p = pathlib.Path('dev/MEMORY.md'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text('my notes')"
@@ -44,7 +44,7 @@ def test_stray_memory_in_the_workspace_is_logged_and_noticed_once(org, tmp_path)
     ws = hire_writer(org, tmp_path, ["write"])
     org.send(ROOT, "dev", "go", budget=5)
     lines = []
-    sched = Scheduler(org, script_runner(STRAY), echo=lines.append)
+    sched = loop_over(org, script_runner(STRAY), echo=lines.append)
     run_to_end(sched, "dev")
     assert (ws / "dev" / "MEMORY.md").is_file() and org.memory("dev") == ""  # nothing was moved
     log = next((org.root / "dev" / "runs").glob("*.log")).read_text()
@@ -74,11 +74,11 @@ def test_stray_nested_address_tree_is_detected(org, tmp_path):
     org.send(ROOT, "lead", "budget for the team", budget=5)
     org.send("lead", "lead/an", "go", budget=2)
     code = "import pathlib; p = pathlib.Path('lead/an/work/x.md'); p.parent.mkdir(parents=True); p.write_text('x')"
-    sched = Scheduler(org, script_runner(code), echo=lambda _: None)
-    sched._start("lead/an")
+    sched = loop_over(org, script_runner(code), echo=lambda _: None)
+    sched.start("lead/an")
     deadline = time.time() + 20
-    while sched.runs and time.time() < deadline:
-        sched._reap()
+    while sched.state.runs and time.time() < deadline:
+        sched.reap()
         time.sleep(0.02)
     assert org.ledger("strays")["lead/an"]["paths"] == [str(ws / "lead" / "an")]
 
@@ -88,7 +88,7 @@ def test_no_warning_for_clean_runs_pre_existing_folders_or_agents_without_write(
     (ws / "dev").mkdir()  # already there before the run: not ours to flag
     org.send(ROOT, "dev", "go", budget=5)
     clean = "import pathlib; pathlib.Path('report.md').write_text('fine')"
-    sched = Scheduler(org, script_runner(clean), echo=lambda _: None)
+    sched = loop_over(org, script_runner(clean), echo=lambda _: None)
     run_to_end(sched, "dev")
     assert org.ledger("strays") == {}
     log = next((org.root / "dev" / "runs").glob("*.log")).read_text()
@@ -113,6 +113,6 @@ def test_a_failing_stray_probe_never_stops_a_run(org, tmp_path):
     org.send(ROOT, "dev", "go", budget=5)
     lines = []
     org.runtime = dataclasses.replace(org.runtime, stray_probe=BrokenProbe())
-    sched = Scheduler(org, script_runner("pass"), echo=lines.append)
+    sched = loop_over(org, script_runner("pass"), echo=lines.append)
     run_to_end(sched, "dev")
     assert any("stray check failed" in x for x in lines) and org.ledger("failures") == {}

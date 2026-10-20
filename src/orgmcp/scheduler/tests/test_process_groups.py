@@ -6,7 +6,7 @@ import time
 
 from testkit.legacy.orgmcp.core import ROOT
 
-from orgmcp.scheduler import Scheduler
+from testkit.scheduler_loop import loop_over
 
 
 def run_to_idle(sched, limit=5.0):
@@ -36,7 +36,7 @@ def wait_for_pid(pidfile, limit=5.0):
 def spawn_tree(org, tmp_path, marker):
     pidfile = tmp_path / f"{marker}.pid"
     cmd = ["sh", "-c", f"sleep {marker} & echo $! > {pidfile}; wait"]
-    sched = Scheduler(org, lambda o, a, p: (cmd, o.dir(a), dict(os.environ)), echo=lambda _: None)
+    sched = loop_over(org, lambda o, a, p: (cmd, o.dir(a), dict(os.environ)), echo=lambda _: None)
     sched.acquire()
     sched.tick()
     return sched, wait_for_pid(pidfile)
@@ -59,9 +59,9 @@ def test_retiring_an_agent_mid_run_kills_its_process_group(org, tmp_path):
     sched, child = spawn_tree(org, tmp_path, "45")
     try:
         org.retire(ROOT, "ceo", "gone")
-        sched._reap()
+        sched.reap()
         time.sleep(0.2)
-        assert sched.runs == {} and not alive(child) and not (org.root / "ceo").exists()
+        assert sched.state.runs == {} and not alive(child) and not (org.root / "ceo").exists()
     finally:
         sched.release()
         if alive(child):
@@ -72,7 +72,7 @@ def test_runs_are_started_in_their_own_session(org, tmp_path):
     out = tmp_path / "ids.txt"
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
     cmd = ["sh", "-c", f"ps -o pid=,pgid= -p $$ > {out}"]
-    sched = Scheduler(org, lambda o, a, p: (cmd, o.dir(a), dict(os.environ)), echo=lambda _: None)
+    sched = loop_over(org, lambda o, a, p: (cmd, o.dir(a), dict(os.environ)), echo=lambda _: None)
     sched.acquire()
     try:
         run_to_idle(sched)

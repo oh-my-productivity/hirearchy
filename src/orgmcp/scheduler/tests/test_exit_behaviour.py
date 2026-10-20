@@ -5,13 +5,9 @@ import time
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT
+from testkit.scheduler_loop import GraceWaiting, describe_scheduler, loop_over, waiting_on_user
 
-from orgmcp.scheduler import EXIT_FILE, Scheduler, describe_scheduler, waiting_on_user
-from orgmcp.scheduler._exit import GraceWait
-from orgmcp.scheduler._legacy import FunctionClock
-from orgmcp.scheduler._ports import Console
-from orgmcp.scheduler._run import GraceMemory, Standing
-from orgmcp.scheduler._work import QueriedWork
+from orgmcp.daemon import EXIT_FILE
 
 
 class Clock:
@@ -29,27 +25,6 @@ def never_runner(org, addr, prompt):
     raise AssertionError(f"{addr} must not be started")
 
 
-class Waiting:
-    """The grace period of an until-done scheduler (what ``Scheduler._check_waiting`` was): ``waiting()`` is the exit reason once nothing has progressed
-    without the user for ``until_done_grace_seconds``, else ''; ``waiting.since`` is when the count began. It looks at the scheduler's own runs, its blocked
-    agents and its clock, over the ports of the org's runtime."""
-
-    def __init__(self, sched):
-        rt = sched.org.runtime
-        self.sched, self.memory = sched, GraceMemory()
-        console = type("Console", (Console,), {"say": lambda _, line: sched.echo(line)})()
-        work = QueriedWork(rt.open_work, rt.runnable_query, rt.waiting_on_user)
-        self.grace = GraceWait(work, rt.settings, FunctionClock(lambda: sched.clock()), console, self.memory)
-
-    @property
-    def since(self):
-        return self.memory.since
-
-    def __call__(self, max_runs=None):
-        s = self.sched
-        return self.grace.check(Standing(s.runs, s._blocked, max_runs is None or s.total_runs < max_runs))
-
-
 # ------------------------------------------------------------------------------- until-done: waiting on the user
 @pytest.fixture
 def stalled_on_budget(org):
@@ -62,7 +37,7 @@ def stalled_on_budget(org):
 
 def test_serve_until_done_exits_when_budget_stalled_and_records_the_reason(org, stalled_on_budget):
     lines = []
-    Scheduler(org, never_runner, echo=lines.append, clock=Clock(step=40)).serve(until_done=True)
+    loop_over(org, never_runner, echo=lines.append, clock=Clock(step=40)).serve(until_done=True)
     reason = 'waiting on you: "Rework the report" needs budget (ceo out of runs)'
     assert f"scheduler exiting: {reason}" in lines
     assert (org.root / EXIT_FILE).read_text().strip() == reason
@@ -74,13 +49,14 @@ def test_serve_until_done_exits_when_a_worker_keeps_failing(org):
     org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=5)
     org.pause("ceo", "failures")
     lines = []
-    Scheduler(org, never_runner, echo=lines.append, clock=Clock(step=40)).serve(until_done=True)
+    loop_over(org, never_runner, echo=lines.append, clock=Clock(step=40)).serve(until_done=True)
     assert any(x.startswith("scheduler exiting: waiting on you:") and "resume ceo" in x for x in lines)
 
 
 def test_serve_without_until_done_keeps_going(org, stalled_on_budget):
-    sched = Scheduler(org, never_runner, echo=lambda _: None, clock=Clock(step=40))
-    waiting = Waiting(sched)
+    clock = Clock(step=40)
+    sched = loop_over(org, never_runner, echo=lambda _: None, clock=clock)
+    waiting = GraceWaiting(org, sched, lambda _: None, clock)
     sched.acquire()
     try:
         for _ in range(12):  # well past the grace period
@@ -97,7 +73,7 @@ def test_a_plain_stall_waits_for_the_stall_ladder_before_the_exit(org):
     org.begin_run("ceo")
     org.end_run("ceo", ok=True)  # read it, never reports
     clock = Clock()
-    waiting = Waiting(Scheduler(org, never_runner, echo=lambda _: None, clock=clock))
+    waiting = GraceWaiting(org, loop_over(org, never_runner, echo=lambda _: None, clock=clock), lambda _: None, clock)
     w = waiting_on_user(org)
     assert w.text == 'waiting on you: "Ship it" needs a decision (ceo holds it and nothing is running)' and not w.settled
     waiting()
