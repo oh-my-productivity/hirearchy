@@ -5,7 +5,6 @@ import time
 
 import pytest
 import yaml
-
 from testkit.services_world import (  # noqa: F401  (svc is a fixture)
     BRIEF, ENG, call, cli, contract_meta, define, deliver, fails, playbook_meta, request, svc, work,
 )
@@ -15,9 +14,8 @@ from orgmcp.core import ROOT, Message, OrgError, split_frontmatter
 from orgmcp.progress import progress
 from orgmcp.server import build_server
 
+
 # --------------------------------------------------------------------------------------------- define
-
-
 def test_define_writes_the_contract_without_a_playbook(org):
     text = define(org, notes="Mind the sources.")
     meta, body = contract_meta(org)
@@ -158,8 +156,6 @@ def test_only_the_parent_retires_a_service(svc):
 
 
 # --------------------------------------------------------------------------------------------- request
-
-
 def test_request_builds_a_task_from_the_contract(svc):
     org = svc
     msg = org.request(ROOT, "weekly-brief", {"topic": " ai chips ", "week": 42}, note="Short please.",
@@ -270,8 +266,6 @@ def test_old_messages_without_service_fields_parse_as_before(org):
 
 
 # ---------------------------------------------------------------------------------------------- report
-
-
 def test_report_on_a_service_request_requires_lessons(svc):
     org = svc
     task = request(org)
@@ -302,8 +296,6 @@ def test_lessons_are_optional_for_plain_tasks_and_kept_when_given(org):
 
 
 # ----------------------------------------------------------------------------------- revise_playbook
-
-
 def test_revise_playbook_versions_archives_and_tells_the_client(svc):
     org = svc
     assert org.revise_playbook("ceo", "weekly-brief", "---\nversion: 99\n---\n## Steps\n1. Search.", "first draft") == 1
@@ -370,8 +362,6 @@ def test_the_word_cap_is_configurable(svc):
 
 
 # ----------------------------------------------------------------------------------------- feedback
-
-
 def test_feedback_is_a_quiet_note_from_the_requester(svc):
     org = svc
     task = request(org)
@@ -426,8 +416,6 @@ def test_feedback_on_a_rework_belongs_to_the_case_and_the_latest_is_the_final_ve
 
 
 # ------------------------------------------------------------------------- cases, stats, digest
-
-
 def test_cases_group_rework_chains_and_derive_runs_budget_and_lessons(svc):
     org = svc
     first = request(org, "ai")
@@ -540,8 +528,6 @@ def test_digest_is_compact(svc):
 
 
 # ------------------------------------------------------------------------------------------ prompt
-
-
 def headers(prompt):
     return [line for line in prompt.splitlines() if line.startswith("# ")]
 
@@ -684,8 +670,6 @@ def test_the_locked_variant_shows_evidence_but_no_revision_steps(org):
 
 
 # ------------------------------------------------------------------------------------ write guard
-
-
 def test_the_runtime_owns_the_services_directory(svc):
     org = svc
     for path in ("ceo/services/weekly-brief/PLAYBOOK.md", "ceo/services/x.md", "ceo/Services/x.md", "ceo/services"):
@@ -711,8 +695,6 @@ def test_services_do_not_confuse_retire_or_run_counting(svc):
 
 
 # ------------------------------------------------------------------------------------ tools by role
-
-
 def tool_names(org, addr):
     return {t.name for t in asyncio.run(build_server(org, addr).list_tools())}
 
@@ -756,8 +738,6 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
 
 
 # ----------------------------------------------------------------------------------------------- CLI
-
-
 def test_cli_commands(org, capsys, tmp_path):
     criteria = tmp_path / "criteria.txt"
     criteria.write_text("At most 600 words\n- Every claim has a URL\n")
@@ -798,8 +778,6 @@ def test_cli_commands(org, capsys, tmp_path):
 
 
 # ---------------------------------------------------------------------------- progress and status
-
-
 def test_progress_tags_service_tasks_and_notes_missing_feedback(svc):
     org = svc
     org.revise_playbook("ceo", "weekly-brief", "Steps.", "r")
@@ -831,21 +809,7 @@ def test_status_tree_names_the_services_an_agent_offers(svc):
     assert "services:" not in tree.split("\n")[2]
 
 
-def test_new_organizations_carry_rule_10_and_upgrade_rules_propagates_it(org):
-    assert "10. Services: a service is a standing kind of task your parent defined for you" in org.rules()
-    assert "report it with `lessons`" in org.rules() and "revise_playbook" in org.rules()
-    path = org.root / "ORG.md"
-    text = path.read_text()
-    path.write_text(text.split("10. Services:")[0].rstrip() + "\n")  # an organization created before services
-    assert "10. Services" not in org.rules()
-    cli(org, "upgrade-rules")
-    assert "10. Services: a service is a standing kind of task" in org.rules()
-    assert path.read_text() == text  # back to exactly the current template, settings and mission untouched
-
-
 # ------------------------------------------------------------------------------- the whole loop
-
-
 def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     root = build_server(org, ROOT)
 

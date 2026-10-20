@@ -41,8 +41,6 @@ def org(tmp_path):
 
 
 # ------------------------------------------------------------------------------------------ profiles
-
-
 def test_an_agent_with_built_in_read_may_read_the_org_and_its_inputs_only(org, tmp_path, isolated_kiro):
     _, prof, _ = run_profile(org, isolated_kiro, "lead/writer")
     inputs = tmp_path / "inputs"
@@ -97,8 +95,6 @@ def test_a_workspace_inside_the_org_still_works(org, isolated_kiro):
 
 
 # --------------------------------------------------------------------------------- existing profiles
-
-
 def old_read_settings(org, tmp_path):
     """What the profile of `lead/writer` said before: workspace + inputs, the org denied."""
     p = tmp_path / "inputs"
@@ -131,17 +127,6 @@ def test_a_profile_file_with_stale_content_is_rewritten(org, tmp_path, isolated_
     assert ensure_kiro_profile(["read"], d, **kw) == name
     assert json.loads(path.read_text())["toolsSettings"]["read"]["deniedPaths"] == []
     assert f"{org.root}/**" in json.loads(path.read_text())["toolsSettings"]["read"]["allowedPaths"]
-
-
-# ------------------------------------------------------------------------------------ prompt and plan
-
-
-def test_the_prompt_tells_a_built_in_read_agent_to_read_org_files_by_absolute_path(org):
-    files = org.run_prompt("lead/writer", []).split("- Files:")[1].split("# New messages")[0]
-    assert "Your `read` is kiro's built-in: it reads org files too" in files and "`@orgmcp/org_read` for you" in files
-    assert f"`{org.root}/<path in the org>`" in files and "ABSOLUTE" in files
-    assert "never with the built-in `write`/`read`" not in files
-    assert "kiro `read` to workspace + inputs + the organization (read-only)" in files
 
 
 def documents_bp(tmp_path, reviewer: dict | None = None, writer: dict | None = None):

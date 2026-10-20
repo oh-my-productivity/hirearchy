@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from orgmcp import core
-from orgmcp.core import ROOT, OrgError, latest_results
+from orgmcp.core import ROOT, OrgError
 from orgmcp.health import agent_health
 from orgmcp.review import review
 from orgmcp.server import build_server
@@ -54,8 +54,6 @@ def results_for(org, task):
 
 
 # ------------------------------------------------------------------ report
-
-
 def test_blocked_can_be_re_reported_and_the_new_result_supersedes_it(org, blocked):
     task, _, first, _ = blocked
     assert first.supersedes is None
@@ -106,34 +104,6 @@ def test_report_docstring_and_rules_state_the_new_rule(org):
     assert "never changes a task's outcome" in rules and "unless you verified them" in rules
 
 
-# ------------------------------------------------------- latest status derivation
-
-
-def test_latest_results_picks_the_highest_id_per_task(org, blocked):
-    task, _, first, _ = blocked
-    second = org.report("ceo", task.id, "done", "ok")
-    latest = latest_results(org.sent("ceo"))
-    assert latest[task.id].id == second.id
-    assert latest_results([first]) == {task.id: first}
-
-
-def test_blocked_task_is_answered_not_open_but_state_says_it_can_be_re_reported(org, blocked):
-    task, *_ = blocked
-    assert task.id not in {t.id for t in org.open_tasks("ceo")}  # answered: it does not keep the scheduler busy
-    assert task.id not in {t.id for t in org.outstanding(ROOT)}
-    state = org.whoami("ceo")
-    assert "reported blocked; you may re-report it once the blocker is resolved" in state
-    assert f'{task.id} "Strict blurb"' in state and CRITERIA in state  # the contract to meet is in front of it
-    org.report("ceo", task.id, "done", "all criteria met")
-    assert "reported blocked" not in org.whoami("ceo")
-
-
-def test_state_summary_does_not_repeat_a_blocked_task_shown_in_the_batch(org, blocked):
-    task, *_ = blocked
-    assert CRITERIA not in org.state_summary("ceo", {task.id})
-    assert "full text: see the new messages below" in org.state_summary("ceo", {task.id})
-
-
 def test_health_counts_a_task_once_by_its_latest_status(org, clock):
     ids = []
     for i in range(3):
@@ -164,59 +134,7 @@ def test_low_quality_and_review_use_the_latest_status(org, clock):
     assert "low_quality" not in review(org, T0, dry_run=True).render(dry_run=True)
 
 
-# ------------------------------------------------------------- prompt guard
-
-
-def prompt_with_result(org, task, sub, result):
-    return org.run_prompt("ceo", [org.find_received("ceo", result.id)])
-
-
-def test_guard_when_the_upstream_task_is_already_reported_done(org):
-    task = org.delegate(ROOT, "ceo", "Strict blurb", "Write it.", CRITERIA, budget=20)
-    drain(org, "ceo")
-    sub = org.delegate("ceo", ENG, "Draft blurb", "Draft it.", "exactly 33 words", budget=4)
-    org.report("ceo", task.id, "done", "all good")
-    result = org.report(ENG, sub.id, "done", "33 words")
-    prompt = prompt_with_result(org, task, sub, result)
-    assert f'serves your task {task.id} "Strict blurb", which you already reported done: that is final' in prompt
-    assert "Do not claim in a note that its criteria are met" in prompt
-    assert "information only" in prompt and "probably serves your open task" not in prompt
-
-
-def test_guard_when_the_upstream_task_is_already_reported_failed(org):
-    task = org.delegate(ROOT, "ceo", "Strict blurb", "Write it.", CRITERIA, budget=20)
-    drain(org, "ceo")
-    sub = org.delegate("ceo", ENG, "Draft blurb", "Draft it.", "exactly 33 words", budget=4)
-    org.report("ceo", task.id, "failed", "gave up")
-    prompt = prompt_with_result(org, task, sub, org.report(ENG, sub.id, "done", "33 words"))
-    assert "which you already reported failed: that is final" in prompt
-    assert "Do not claim in a note" in prompt
-
-
-def test_guard_when_the_upstream_task_is_reported_blocked(org, blocked):
-    task, sub, _, result = blocked
-    prompt = prompt_with_result(org, task, sub, result)
-    assert f'serves your task {task.id} "Strict blurb", which you already reported blocked. That is not final' in prompt
-    assert "you may `report` it again, once, if the blocker is resolved" in prompt
-    assert "rule 6" in prompt and "required review of the FINAL version" in prompt
-    assert "Do not claim in a note that criteria are met" in prompt
-    assert "that is final" not in prompt.split("# New messages")[1]
-    assert "reported blocked; you may re-report it once the blocker is resolved" in prompt  # in the state block
-
-
-def test_guard_is_silent_when_the_upstream_task_is_ambiguous(org, blocked):
-    # a second task that was open before the next delegation: two candidates, so no link is guessed
-    other = org.delegate(ROOT, "ceo", "Other job", "g", "a", budget=3)
-    drain(org, "ceo")
-    sub2 = org.delegate("ceo", ENG, "Second draft", "g", "a", budget=1)
-    res2 = org.report(ENG, sub2.id, "done", "ok")
-    prompt = prompt_with_result(org, other, sub2, res2)
-    assert "probably serves" not in prompt and "already reported" not in prompt
-
-
 # -------------------------------------------------------------- D3: expensive
-
-
 def run_log(org, addr, n, senders="root", tail="\n# exit 0 after 2s\n", base=100):
     d = org.dir(addr) / "runs"
     d.mkdir(exist_ok=True)

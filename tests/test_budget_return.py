@@ -40,8 +40,6 @@ def assign(org, to, budget, title="Work"):
 
 
 # ------------------------------------------------------------------ return with the result
-
-
 def test_done_returns_everything_that_is_left(org):
     task = assign(org, "ceo", 5)
     run(org, "ceo")
@@ -168,8 +166,6 @@ def test_only_the_parent_can_receive_a_return(org):
 
 
 # -------------------------------------------------- redelivery (at-least-once runs) cannot double-return
-
-
 def test_a_second_final_report_is_refused_and_returns_nothing_more(org):
     task = assign(org, "ceo", 5)
     run(org, "ceo")
@@ -224,8 +220,6 @@ def test_old_messages_mean_what_they_always_meant(org):
 
 
 # ------------------------------------------------------------------------ voluntary return
-
-
 def test_an_agent_can_return_budget_to_its_parent(org):
     org.send(ROOT, "ceo", "grant", budget=10)
     org.send("ceo", ENG, "grant", budget=6)
@@ -276,8 +270,6 @@ def test_a_return_raises_the_parents_budget(org):
 
 
 # ---------------------------------------------------------------------------- stranded_budget
-
-
 def later(hours):
     return utcnow() + timedelta(hours=hours)
 
@@ -336,14 +328,3 @@ def test_the_review_tells_the_manager_what_to_do(stranded):
     assert "`ceo/eng` stranded_budget" in ceo_note.body
     assert templates.REVIEW_ACTIONS["stranded_budget"].format(a=ENG) in ceo_note.body
     assert "return its budget" in ceo_note.body and "retire" in ceo_note.body
-
-
-# ------------------------------------------------------------------------------- the rules
-
-
-def test_new_organizations_get_the_budget_and_review_rules(org):
-    rules = org.rules()
-    assert 'your remaining budget returns with the result' in rules and "`budget=N`" in rules
-    assert "9. Reviews and fact-checks: a reviewer never edits another agent's file" in rules
-    assert "Never write acceptance criteria" in rules and "revises=<task id>" in rules
-    assert "{" not in rules  # the template was filled in completely

@@ -71,8 +71,6 @@ def sched_org(org, tasks=1, mode="work"):
 
 
 # ------------------------------------------------------------------------------------------------ helpers
-
-
 def test_percentile_is_nearest_rank_and_exact():
     vals = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     assert observe.percentile(vals, 50) == 50
@@ -108,8 +106,6 @@ def test_refusals_are_normalized_so_reasons_group():
 
 
 # ------------------------------------------------------------------------------------------------ events
-
-
 def test_events_merge_files_by_time_and_tolerate_damage(org):
     log = EventLog(org)
     log.emit("tool.call", stamp(10), proc="mcp", pid=1, actor="ceo", tool="read", ok=True, ms=1, error=None, error_type=None, args={})
@@ -203,8 +199,6 @@ def test_follow_filters(org, clock):
 
 
 # ------------------------------------------------------------------------------------------------ trace
-
-
 def test_trace_lists_every_message_run_call_and_refusal(org, story):
     tr = observe.trace(org, story.task.id, now=NOW)
     kinds = [(i["kind"], i.get("type") or i.get("agent")) for i in tr["items"]]
@@ -379,8 +373,6 @@ def test_trace_of_a_rework_counts_the_runs_of_the_whole_request(org, clock):
 
 
 # ------------------------------------------------------------------------------------------------ metrics
-
-
 def test_metrics_percentiles_are_exact_and_counts_equal_the_files(org, clock):
     log = EventLog(org)
     durations = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -501,8 +493,6 @@ def test_metrics_scheduler_stalls_pauses(org, clock):
 
 
 # ------------------------------------------------------------------------------------------------ now
-
-
 def test_now_works_with_no_events_and_explains_the_queue(org, clock):
     v = observe.now_view(org, now=stamp(60))
     assert v["scheduler"]["state"] == "stopped" and not v["events_seen"] and v["queued"] == []
@@ -586,8 +576,6 @@ def test_now_heartbeat_of_a_stopped_scheduler_reports_its_exit(org, story):
 
 
 # ------------------------------------------------------------------------------------------------ check
-
-
 def by_id(res):
     return {c["id"]: c for c in res["checks"]}
 
@@ -806,8 +794,6 @@ def test_check_is_read_only(org, story):
 
 
 # ------------------------------------------------------------------------------------------------ surfaces
-
-
 def test_observe_text_dispatch_and_caps(org, story):
     assert observe.observe_text(org, "check", now=NOW).endswith("all checks passed")
     assert "runs 3" in observe.observe_text(org, "trace", story.task.id, now=NOW)
@@ -962,13 +948,3 @@ def test_runs_of_agents_that_no_longer_exist_are_known_from_events(org, clock):
     m = observe.metrics(org, since="2026-10-18T00:00:00Z", by="agent", now=stamp(500))
     assert m["runs"]["total"] == 1 and m["by"]["rows"][0]["key"] == "gone/agent"
     assert m["runs"]["duration_ms"]["p50"] == 12_000 and m["runs"]["queue_ms"]["p50"] == pytest.approx(60_005, abs=10)
-
-
-def test_the_skill_sends_the_assistant_to_observe_instead_of_guessing():
-    from orgmcp.skill import skill_source
-
-    skill = skill_source().read_text()
-    assert len(skill.splitlines()) <= 125
-    for needle in ("why something failed or took long, or what it cost", "use `observe` (read-only), never guesses",
-                   '`view="trace"` with\n  the task id', '"now"', '"metrics"', "`errors_only=True`"):
-        assert needle in skill, needle

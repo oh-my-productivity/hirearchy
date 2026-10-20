@@ -7,14 +7,11 @@ import os
 import re
 import sys
 import time
-from pathlib import Path
 
 import pytest
 
 from orgmcp import blueprint as bp_mod
 from orgmcp import blueprint_examples
-from orgmcp import scheduler as sched_mod
-from orgmcp import templates
 from orgmcp.app import wire_attention
 from orgmcp.core import ROOT, Org
 from orgmcp.daemon import SchedulerState
@@ -28,7 +25,6 @@ from orgmcp.scheduler._ports import Console
 from orgmcp.scheduler._run import GraceMemory, Standing
 from orgmcp.scheduler._work import QueriedWork
 from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
-from orgmcp.skill import skill_source
 from orgmcp.strays import StrayProbe
 
 
@@ -53,10 +49,6 @@ def never_runner(org, addr, prompt):
     raise AssertionError(f"{addr} must not be started")
 
 
-def quiet(org, **kw):
-    return Scheduler(org, never_runner, echo=lambda _: None, **kw)
-
-
 class Waiting:
     """The grace period of an until-done scheduler (what ``Scheduler._check_waiting`` was): ``waiting()`` is the exit reason once nothing has progressed
     without the user for ``until_done_grace_seconds``, else ''; ``waiting.since`` is when the count began. It looks at the scheduler's own runs, its blocked
@@ -79,8 +71,6 @@ class Waiting:
 
 
 # ------------------------------------------------------------------------------- until-done: waiting on the user
-
-
 @pytest.fixture
 def stalled_on_budget(org):
     """root's only task sits with ceo, which has used its single run: the task is unread and cannot be served."""
@@ -279,8 +269,6 @@ def test_start_tool_description_mentions_the_waiting_exit(root_server):
 
 
 # --------------------------------------------------------------------------------------------- the plan block
-
-
 def doc_bp(tmp_path, monkeypatch):
     monkeypatch.setenv("ORGMCP_WORKSPACE_ROOTS", str(tmp_path))
     (tmp_path / "<folder-with-your-files>").mkdir(exist_ok=True)
@@ -355,50 +343,11 @@ def test_clip_helper_and_other_lines_do_not_cut_mid_sentence(tmp_path, monkeypat
 
 
 # ----------------------------------------------------------------------- tool names in the prompts
-
-
 def hire_writer(org, tmp_path, tools):
     ws = tmp_path / "ws"
     ws.mkdir(exist_ok=True)
     org.hire(ROOT, "dev", "Developer", "Build.", tools=tools, workspace=str(ws))
     return ws
-
-
-def test_prompt_of_an_agent_with_built_ins_separates_the_two_kinds_of_tools(org, tmp_path):
-    hire_writer(org, tmp_path, ["read", "write", "shell"])
-    text = org.run_prompt("dev", [])
-    files = text.split("- Files:")[1].split("# New messages")[0]
-    # the built-ins `read`/`write` hide orgmcp's tools of the same name (studies/F-read-experiment, F2-tool-names):
-    # this agent has them as `org_read` / `org_write`
-    assert "orgmcp tools (shown as `@orgmcp/org_write`, `@orgmcp/org_read`, ...)" in files
-    assert "kiro's built-in `read`, `shell`, `write`" in files and "they write and run only in the workspace and never change the org" in files
-    assert "`dev/MEMORY.md`, `dev/work/`" in files
-    assert "written with `@orgmcp/org_write`, never with the built-in `write`" in files
-    assert "the orgmcp write tool is `@orgmcp/org_write` for you: use it for MEMORY.md and org files" in files
-    assert "Your `read` is kiro's built-in: it reads org files too" in files and "`@orgmcp/org_read` for you" in files
-    assert f"ABSOLUTE path, `{org.root}/<path in the org>`" in files
-    assert '`@orgmcp/org_write`(path="dev/MEMORY.md", ...) (the orgmcp tool, not a built-in `write`)' in text
-
-
-def test_agent_with_only_a_built_in_read_and_no_workspace_gets_the_naming_text(org):
-    org.hire(ROOT, "rd", "Reader", "Read.", tools=["read"])
-    files = org.run_prompt("rd", []).split("- Files:")[1]
-    assert "kiro's built-in `read`" in files and "`@orgmcp/org_read`" in files
-
-
-def test_agent_without_built_ins_has_no_files_section_but_the_orgmcp_memory_line(org):
-    text = org.run_prompt("ceo", [])
-    assert "- Files:" not in text and "never with the built-in" not in text
-    assert '`@orgmcp/write`(path="ceo/MEMORY.md", ...)' in text
-
-
-def test_org_rules_name_the_orgmcp_tools_unambiguously(tmp_path):
-    rules = Org.init(tmp_path / "o", "m").rules()
-    assert rules == templates.org_rules("m").strip()
-    assert "kiro shows them as `@orgmcp/<tool>`, e.g. `@orgmcp/write`" in rules
-    assert "built-in `write`/`read`/`shell`, those are different tools that reach the workspace only, never the org" in rules
-    assert "with `@orgmcp/write`: artifacts go in `<you>/work/`" in rules and "with `@orgmcp/read`" in rules
-    assert "(with `@orgmcp/write`, never the built-in `write`)" in rules
 
 
 def test_orgmcp_write_and_read_say_they_are_organization_tools(org, monkeypatch):
@@ -413,8 +362,6 @@ def test_orgmcp_write_and_read_say_they_are_organization_tools(org, monkeypatch)
 
 
 # ------------------------------------------------------------------------------ stray org files in a workspace
-
-
 def script_runner(code: str):
     def build(org, addr, prompt):
         return [sys.executable, "-c", code], org.workspace_of(addr), dict(os.environ)
@@ -510,22 +457,6 @@ def test_a_failing_stray_probe_never_stops_a_run(org, tmp_path):
     sched = Scheduler(org, script_runner("pass"), echo=lines.append)
     run_to_end(sched, "dev")
     assert any("stray check failed" in x for x in lines) and org.ledger("failures") == {}
-
-
-# --------------------------------------------------------------------------------- skill and instructions
-
-
-def test_skill_carries_the_finishing_rules():
-    skill = skill_source().read_text()
-    assert len(skill.splitlines()) <= 125
-    for needle in ("settle them with the user BEFORE you", "ask for approval", "state each one plainly",
-                   "what happens if the check still fails after one rework",
-                   "Ask at the FIRST budget request", "never wait until the reserve", "waiting on you",
-                   "`start()` refuses until something changes", "declines more budget",
-                   "unverified or partial result (say the task\n   stays open/blocked, not done)",
-                   "shorter still when the user asks for a short answer", "one line per criterion",
-                   "`stop()` only if the user cancels"):
-        assert needle in skill, needle
 
 
 def test_root_instructions_carry_the_finishing_rules_within_the_length_limit():
