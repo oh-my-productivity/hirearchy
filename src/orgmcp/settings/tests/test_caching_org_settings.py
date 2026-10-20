@@ -13,7 +13,7 @@ from orgmcp.settings import DEFAULT_CONFIG, OrgSettings
 from orgmcp.settings._caching import CachingOrgSettings
 from orgmcp.settings._fs import FsOrgSettings
 from orgmcp.settings._stamp import FsOrgDocumentStamp, OrgDocumentStamp
-from orgmcp.settings.tests._legacy import legacy
+from orgmcp.settings.tests._reach import reach
 from orgmcp.settings.tests._oracle import LenientConfig
 
 
@@ -149,7 +149,7 @@ def test_the_rules_are_not_cached_and_not_lenient() -> None:
 
 def test_it_does_what_the_lenient_org_of_the_dashboard_did(tmp_path: Path) -> None:
     """Characterization: the same document gives the same config and the same ``bad`` entry as ``LenientOrg.config`` (frozen in ``_oracle.LenientConfig``)."""
-    org = legacy("core").Org.init(tmp_path / "org", "mission", {"max_depth": 3})
+    org = reach("core").Org.init(tmp_path / "org", "mission", {"max_depth": 3})
     lenient = LenientConfig(org.root)
     paths = OrgPaths(org.root)
     problems: dict[str, str] = {}

@@ -10,7 +10,7 @@ from typing import Any
 import pytest
 
 import orgmcp.kernel as kernel
-from orgmcp.kernel.tests._legacy import legacy
+from orgmcp.kernel.tests._reach import reach
 
 MOVED_FROM_CORE = [
     "OrgError", "Message", "split_frontmatter", "join_frontmatter", "word_count", "latest_results",
@@ -20,21 +20,21 @@ MOVED_FROM_CORE = [
 
 @pytest.mark.parametrize("name", ["ROOT", "RUNTIME", "NAME_RE"])
 def test_core_constants_that_were_always_shared_stay_so(name: str) -> None:
-    assert getattr(legacy("core"), name) is getattr(kernel, name)  # interned string / cached pattern: true before and after the move
+    assert getattr(reach("core"), name) is getattr(kernel, name)  # interned string / cached pattern: true before and after the move
 
 
 @pytest.mark.parametrize("name", MOVED_FROM_CORE)
 def test_core_exposes_the_kernel_objects_themselves(name: str) -> None:
-    assert getattr(legacy("core"), name) is getattr(kernel, name)
+    assert getattr(reach("core"), name) is getattr(kernel, name)
 
 
 def test_core_private_helpers_are_the_kernel_functions() -> None:
-    core = legacy("core")
+    core = reach("core")
     assert core._inside is kernel.inside and core._visible is kernel.visible
 
 
 def test_utcnow_and_atomic_write_stay_in_core_as_plain_functions_and_the_kernel_message_loads_nothing() -> None:
-    core = legacy("core")
+    core = reach("core")
     assert core.utcnow.__module__ == "orgmcp.core" and core.atomic_write.__module__ == "orgmcp.core"
     assert "load" not in vars(kernel.Message)  # reading a message file is the mail package's parser (it was the classmethod ``Message.load``)
 
@@ -55,7 +55,7 @@ def test_loading_a_message_gives_a_kernel_message(org: Any) -> None:
 
 def test_a_message_file_is_parsed_once_however_often_it_is_read(org: Any) -> None:
     """The parse cache keeps its hit rate: N files read R times cost N parses, not N * R."""
-    core, mail = legacy("core"), legacy("mail")
+    core, mail = reach("core"), reach("mail")
     sent = [org.send("root", "ceo", f"note {i}") for i in range(40)]
     paths: list[Path] = [org.dir("ceo") / "inbox" / f"{m.id}.md" for m in sent]
     parses: list[int] = []
@@ -65,8 +65,8 @@ def test_a_message_file_is_parsed_once_however_often_it_is_read(org: Any) -> Non
         parses.append(1)
         return real(text)
 
-    parser = legacy("mail.testing").CountingMessageParser(split=counting)
-    org.runtime = legacy("app").open_runtime(org.root, {mail.MessageParser: parser})
+    parser = reach("mail.testing").CountingMessageParser(split=counting)
+    org.runtime = reach("app").open_runtime(org.root, {mail.MessageParser: parser})
     for _ in range(5):
         for p in paths:
             parser.parse(p)

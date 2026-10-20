@@ -24,7 +24,7 @@ from orgmcp.kernel import OrgPaths, stamp_of
 from orgmcp.runs import RunOutcomes
 from orgmcp.runs._reader import FsRunLogReader
 
-from ._legacy import legacy
+from ._reach import reach
 
 FAKE = str(testkit.FAKE_AGENT)
 MISSING = "/nonexistent/orgmcp-binary"
@@ -48,14 +48,14 @@ def missing_runner(org: Any, addr: str, prompt: str) -> tuple[list[str], Path, d
 
 
 def org_with_ceo(tmp_path: Path, **config: object) -> Any:
-    core = legacy("core")
+    core = reach("core")
     org = core.Org.init(tmp_path / "org", "mission", {"poll_seconds": 0.05, **config})
     org.hire(core.ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)
     return org
 
 
 def task(org: Any) -> None:
-    org.delegate(legacy("core").ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
+    org.delegate(reach("core").ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
 
 
 def until(sched: Any, condition: Callable[[], bool], limit: float = 30.0) -> None:

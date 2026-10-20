@@ -6,7 +6,7 @@ import pytest
 
 from orgmcp.kernel import TITLE_MAX, clip, clip_line, single, word_count
 from orgmcp.kernel.tests import _oracle
-from orgmcp.kernel.tests._legacy import legacy
+from orgmcp.kernel.tests._reach import reach
 
 
 def test_word_count_ignores_markdown_markers() -> None:  # moved from tests/test_core_safety.py (assertions unchanged)
@@ -34,7 +34,7 @@ WORDS = [
 
 @pytest.mark.parametrize("text", WORDS)
 def test_word_count_equals_the_legacy_count(text: str) -> None:
-    assert word_count(text) == legacy("core").word_count(text)
+    assert word_count(text) == reach("core").word_count(text)
 
 
 def test_clip_leaves_short_text_alone_and_marks_a_cut() -> None:

@@ -10,7 +10,7 @@ import pytest
 
 from orgmcp.settings import DEFAULT_CONFIG, DEFAULT_MODEL, OrgSettings
 from orgmcp.settings.testing import IMPLEMENTATIONS, SettingsHarness
-from orgmcp.settings.tests._legacy import yaml_error
+from orgmcp.settings.tests._reach import yaml_error
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[OrgSettings], ids=lambda factory: factory.__name__)

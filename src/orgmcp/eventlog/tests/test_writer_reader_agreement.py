@@ -10,11 +10,11 @@ from orgmcp.eventlog import DAY_RE, ENVELOPE, PROCS, SCHEMA_VERSION, event_file
 from orgmcp.eventlog._reader import FsEventReader
 from orgmcp.kernel import OrgPaths
 
-from ._legacy import legacy
+from ._reach import reach
 
 
 def test_what_the_writer_writes_the_reader_reads(tmp_path: Path) -> None:
-    core, wiring = legacy("core"), legacy("app.wiring")
+    core, wiring = reach("core"), reach("app.wiring")
     org = core.Org.init(tmp_path / "org", "Mission", {"events": True})
     try:
         wiring.open_runtime(org.root).events.emit("tool.call", actor="root", proc="mcp", tool="status", ok=True, ms=3)

@@ -15,7 +15,7 @@ from orgmcp.runs._caching import CachingRunLogReader, DirectoryStamps, FsDirecto
 from orgmcp.runs._reader import FsRunLogReader
 
 from . import _oracle
-from ._legacy import legacy
+from ._reach import reach
 
 NS = 1_000_000_000
 QUIET = 10 * NS  # a directory that was last modified this long before it was listed is trusted
@@ -148,7 +148,7 @@ def test_the_stamps_are_the_modification_times_of_the_directories_of_the_organiz
 
 def test_it_counts_as_the_dashboard_org_did_in_every_situation(tmp_path: Path) -> None:
     """Characterization of ``LenientOrg.runs_used`` (frozen in ``_oracle.LenientRuns``): same numbers, also while the cache is stale."""
-    root = legacy("core").Org.init(tmp_path / "org", "mission").root
+    root = reach("core").Org.init(tmp_path / "org", "mission").root
     (root / "ceo").mkdir()
     lenient = _oracle.LenientRuns(root)
     paths = OrgPaths(root)
