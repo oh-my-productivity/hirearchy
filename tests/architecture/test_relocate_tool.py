@@ -602,8 +602,9 @@ def test_applying_the_real_groups_in_two_orders_gives_the_same_tree(tool, tmp_pa
     run(tool, forward, manifest, "apply", "a", "b")
     run(tool, backward, manifest, "apply", "b", "a")
     assert tree(forward) == tree(backward)
-    run(tool, forward, manifest, "apply", "c", "d", "e")
-    run(tool, backward, manifest, "apply", "e", "d", "c")
+    rest = sorted(set(manifest.groups) - {"a", "b"})  # every other group of the manifest, in both orders
+    run(tool, forward, manifest, "apply", *rest)
+    run(tool, backward, manifest, "apply", *reversed(rest))
     assert tree(forward) == tree(backward)
     assert not list((forward / "tests").glob("test_*.py"))  # every source is empty and gone
     for path, text in tree(forward).items():
