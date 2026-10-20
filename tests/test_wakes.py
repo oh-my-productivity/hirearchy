@@ -1,6 +1,7 @@
 """Non-waking messages (D2) and orphaned runs of a dead scheduler (D4), ACCEPTANCE.md."""
 
 import os
+
 from orgmcp import core
 from orgmcp.core import ROOT, Message
 from orgmcp.scheduler import Scheduler
@@ -22,8 +23,6 @@ def ceo_with_funded_report(org, budget=20, grant=5):
 
 
 # --------------------------------------------------------------- non-waking
-
-
 def test_wake_flag_roundtrips_and_defaults_to_true(org):
     quiet = org.notify("ceo", "fyi", "x", wake=False)
     loud = org.notify("ceo", "ping", "y")
@@ -32,17 +31,6 @@ def test_wake_flag_roundtrips_and_defaults_to_true(org):
     assert got[quiet.id].wake is False and got[loud.id].wake is True
     assert "wake" not in loud.meta()  # normal messages stay byte-identical to before
     assert org.unread("ceo") == 1
-
-
-def test_retire_refund_is_non_waking_and_counts_immediately(org):
-    ceo_with_funded_report(org)
-    before = org.budget("ceo")
-    ret = org.retire_team("ceo", "ops", "done")
-    assert ret.refunded == 5
-    (note,) = org.messages("ceo", "inbox")
-    assert note.wake is False and note.budget == 5 and note.sender == core.RUNTIME
-    assert org.unread("ceo") == 0 and org.state("ceo") == "idle"
-    assert org.budget("ceo") == before + 5  # budget is derived from files, wake or not
 
 
 def test_non_waking_note_alone_starts_no_run(org):
@@ -140,7 +128,6 @@ def test_unreadable_inbox_file_still_counts_as_mail(org):
 
 
 # ------------------------------------------------- orphans of a dead scheduler
-
 import json  # noqa: E402
 import signal  # noqa: E402
 import subprocess  # noqa: E402

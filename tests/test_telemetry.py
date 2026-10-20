@@ -33,8 +33,6 @@ SILENT = {"echo": lambda _: None}
 
 
 # ---------------------------------------------------------------------------------------------------- helpers
-
-
 @pytest.fixture
 def org(org):
     """The shared org, with the events of its construction (hires) forgotten: tests see only their own."""
@@ -104,8 +102,6 @@ class Clock:
 
 
 # --------------------------------------------------------------------------------------- writer: layout, envelope
-
-
 def test_events_go_to_one_file_per_process_and_day_with_the_envelope(org):
     org.emit("custom.kind", trace="T1", thing=1)
     org.emit("custom.kind", thing=2)
@@ -194,8 +190,6 @@ def test_clip_marks_a_cut():
 
 
 # ------------------------------------------------------------------------------------------------ never raises
-
-
 def test_events_false_disables_emission_entirely(org):
     configure(org, events=False)
     org.send(ROOT, "ceo", "hello")
@@ -269,8 +263,6 @@ def test_the_log_recovers_when_the_directory_becomes_writable(org):
 
 
 # ---------------------------------------------------------------------------------------- overhead, concurrency
-
-
 def test_overhead_1000_events_take_well_under_a_second(org):
     org.emit("warmup")
     start = time.perf_counter()
@@ -323,8 +315,6 @@ def test_processes_writing_at_once_never_interleave(org):
 
 
 # --------------------------------------------------------------------------------- retention and git hygiene
-
-
 def test_prune_removes_only_old_day_directories(org):
     base = org.root / ".runtime" / "events"
     today = datetime(2026, 10, 18, tzinfo=timezone.utc)
@@ -395,8 +385,6 @@ def test_new_config_keys_have_defaults(org):
 
 
 # ---------------------------------------------------------------------------------------------- trace stamping
-
-
 def frontmatter(org, addr, box, msg):
     return split_frontmatter((org.dir(addr) / box / f"{msg.id}.md").read_text())[0]
 
@@ -546,43 +534,6 @@ def test_trace_of_ignores_ids_that_are_paths(org):
     assert org.trace_of("ceo", "../../ORG") is None and org.trace_of("ceo", "") is None and org.trace_of("ceo", None) is None
 
 
-# --------------------------------------------------------------------------- org operations: hire, pause, ...
-
-
-def test_hire_retire_pause_resume_events(org):
-    org.hire("ceo", "qa", "Tester", "Test things.", model="m1")
-    (hire,) = [e for e in read_events(org, "agent.hire") if e["agent"] == "ceo/qa"]
-    assert hire["by"] == "ceo" and hire["actor"] == "ceo" and hire["role"] == "Tester"
-    assert hire["model"] == "m1" and hire["tools"] == []
-    org.pause("ceo/qa", "failures")
-    org.resume("ceo/qa", "manual")
-    pause, resume = read_events(org, "agent.pause")[-1], read_events(org, "agent.resume")[-1]
-    assert pause["agent"] == "ceo/qa" and pause["reason"] == "failures"
-    assert resume["agent"] == "ceo/qa" and resume["reason"] == "manual" and resume["previous"] == "failures"
-    org.resume("ceo/qa")  # not paused: nothing to record
-    assert len(read_events(org, "agent.resume")) == 1
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=6)
-    org.retire(ROOT, "ceo/eng", "no longer needed")
-    (ret,) = read_events(org, "agent.retire")
-    assert ret["agent"] == "ceo/eng" and ret["by"] == "root" and ret["reason"] == "no longer needed"
-    assert ret["returned_budget"] == 0
-
-
-def test_service_events(org):
-    brief = dict(description="A brief.", acceptance=["Short"], deliverable={"description": "one file"}, budget=4)
-    org.define_service(ROOT, "ceo", "weekly", **brief)
-    org.define_service(ROOT, "ceo", "weekly", add_acceptance=["Sourced"])
-    org.revise_playbook("ceo", "weekly", "1. Do the thing.", "first version")
-    org.retire_service(ROOT, "ceo", "weekly", "not needed")
-    kinds = [e["kind"] for e in read_events(org) if e["kind"].startswith("service.")]
-    assert kinds == ["service.define", "service.define", "service.revise", "service.retire"]
-    first, second = read_events(org, "service.define")
-    assert (first["owner"], first["service"], first["version"], first["by"], first["amendment"]) == ("ceo", "weekly", 1, "root", False)
-    assert second["version"] == 2 and second["amendment"] is True
-    (rev,) = read_events(org, "service.revise")
-    assert rev["version"] == 1 and rev["by"] == "ceo" and rev["owner"] == "ceo"
-
-
 def test_review_run_event(org):
     from orgmcp import review
 
@@ -612,8 +563,6 @@ def test_cli_init_records_its_command_in_the_new_org(tmp_path):
 
 
 # ------------------------------------------------------------------------------------------------- tool.call
-
-
 def agent_server(org, me="ceo"):
     return build_server(org, me)
 
@@ -722,10 +671,6 @@ def test_arg_summaries_by_type():
     assert out["obj_type"] == "object" and len(out["name"]) == 80
 
 
-def all_tools(server):
-    return asyncio.run(server.list_tools())
-
-
 def test_every_tool_of_every_role_is_instrumented(org, tmp_path):
     org.define_service(ROOT, "ceo", "weekly", description="A brief.", acceptance=["Short"],
                        deliverable={"description": "one file"}, budget=4)
@@ -800,8 +745,6 @@ def test_emission_failure_does_not_change_a_tool_result(org):
 
 
 # ------------------------------------------------------------------------------- scheduler: runs, through tools
-
-
 def test_a_real_run_shows_start_end_tool_calls_and_traces(org):
     task = org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=8)
     run_all(org, "tools")

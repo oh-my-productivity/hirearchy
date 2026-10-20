@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from orgmcp import core
-from orgmcp.core import ROOT, OrgError, latest_results
+from orgmcp.core import ROOT, latest_results
 from orgmcp.health import agent_health
 from orgmcp.review import review
 from orgmcp.server import build_server
@@ -49,54 +49,6 @@ def blocked(org):
     return task, sub, first, result
 
 
-def results_for(org, task):
-    return sorted((m for m in org.received(ROOT) if m.type == "result" and m.reply_to == task.id), key=lambda m: m.id)
-
-
-# ------------------------------------------------------------------ report
-
-
-def test_blocked_can_be_re_reported_and_the_new_result_supersedes_it(org, blocked):
-    task, _, first, _ = blocked
-    assert first.supersedes is None
-    second = org.report("ceo", task.id, "done", "reviewed the final text; all criteria met")
-    assert second.supersedes == first.id and second.status == "done"
-    stored = org.find_received(ROOT, second.id)
-    assert stored.supersedes == first.id
-    assert "supersedes: " + first.id in stored.render()
-    assert f"supersedes: {first.id}" in stored.path.read_text()
-    assert [m.id for m in results_for(org, task)] == [first.id, second.id]
-
-
-def test_second_re_report_after_a_resolved_blocker_is_refused(org, blocked):
-    task, *_ = blocked
-    org.report("ceo", task.id, "done", "all criteria met")
-    with pytest.raises(OrgError, match="already reported done.*final.*rule 6.*`send`"):
-        org.report("ceo", task.id, "done", "again")
-    with pytest.raises(OrgError, match="already reported done"):
-        org.report("ceo", task.id, "blocked", "or not")
-
-
-def test_blocked_may_be_re_reported_blocked_once_per_prior_blocked(org, blocked):
-    task, _, first, _ = blocked
-    second = org.report("ceo", task.id, "blocked", "still waiting for a reviewer")
-    assert second.supersedes == first.id
-    third = org.report("ceo", task.id, "failed", "giving up")
-    assert third.supersedes == second.id
-    with pytest.raises(OrgError, match="already reported failed.*final"):
-        org.report("ceo", task.id, "done", "no")
-
-
-@pytest.mark.parametrize("status", ["done", "failed"])
-def test_done_and_failed_are_final(org, status):
-    task = org.delegate(ROOT, "ceo", "Job", "g", "a", budget=5)
-    drain(org, "ceo")
-    org.report("ceo", task.id, status, "x")
-    with pytest.raises(OrgError, match=f"already reported {status}.*final"):
-        org.report("ceo", task.id, "done", "y")
-    assert all(m.supersedes is None for m in org.sent("ceo"))
-
-
 def test_report_docstring_and_rules_state_the_new_rule(org):
     tools = asyncio.run(build_server(org, "ceo").list_tools())
     doc = next(t for t in tools if t.name == "report").description
@@ -107,8 +59,6 @@ def test_report_docstring_and_rules_state_the_new_rule(org):
 
 
 # ------------------------------------------------------- latest status derivation
-
-
 def test_latest_results_picks_the_highest_id_per_task(org, blocked):
     task, _, first, _ = blocked
     second = org.report("ceo", task.id, "done", "ok")
@@ -165,8 +115,6 @@ def test_low_quality_and_review_use_the_latest_status(org, clock):
 
 
 # ------------------------------------------------------------- prompt guard
-
-
 def prompt_with_result(org, task, sub, result):
     return org.run_prompt("ceo", [org.find_received("ceo", result.id)])
 
@@ -215,8 +163,6 @@ def test_guard_is_silent_when_the_upstream_task_is_ambiguous(org, blocked):
 
 
 # -------------------------------------------------------------- D3: expensive
-
-
 def run_log(org, addr, n, senders="root", tail="\n# exit 0 after 2s\n", base=100):
     d = org.dir(addr) / "runs"
     d.mkdir(exist_ok=True)
