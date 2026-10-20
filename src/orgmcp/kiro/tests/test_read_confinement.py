@@ -1,20 +1,13 @@
-"""Round F-read: an agent with kiro's built-in ``read`` can read the organization's files.
-
-The experiment (studies/F-read-experiment/NOTES.md, kiro-cli 2.29.1): an agent that holds the built-in ``read`` sees ONE
-tool named ``read`` (kiro's); orgmcp's ``read`` is hidden behind it. The profile used to deny the org directory to the
-built-in ``read``, so such an agent could not open a teammate's ``work/`` file at all (study E, F3: 85 failed calls and
-a playbook that pastes the memo inline). The profile now lets the built-in ``read`` open the org (read-only: what
-orgmcp ``read`` may open anyway); everything outside the org, the inputs and the workspace stays refused.
-"""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import hashlib
 import json
 from pathlib import Path
 
 import pytest
-
-from orgmcp.core import ROOT, Org
-from orgmcp.scheduler import ensure_kiro_profile, file_confinement, kiro_profile_name, kiro_runner
+from testkit.kiro_world import ensure_kiro_profile, file_confinement, kiro_profile_name, kiro_runner
+from testkit.legacy.orgmcp.core import ROOT, Org
 
 
 def profile_of(isolated_kiro, name):

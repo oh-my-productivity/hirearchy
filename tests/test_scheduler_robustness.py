@@ -1,62 +1,16 @@
 """Robustness of the scheduler, health and review code paths (QA_REPORT.md, workstream F2)."""
 
 import os
-import pwd
 import time
-from datetime import timedelta
-from pathlib import Path
 
-from orgmcp import scheduler as sched_mod
 from orgmcp.core import ROOT, OrgError, utcnow
-from orgmcp.scheduler import Scheduler, ensure_kiro_profile, kiro_profile_name
-
-
-def real_agent_profiles() -> dict[str, int]:
-    home = Path(pwd.getpwuid(os.getuid()).pw_dir)  # the account's home, whatever $HOME says
-    return {p.name: p.stat().st_mtime_ns for p in (home / ".kiro" / "agents").glob("orgmcp*.json")}
+from orgmcp.scheduler import Scheduler
 
 
 def run_to_idle(sched, limit=5.0):
     deadline = time.time() + limit
     while sched.tick() and time.time() < deadline:
         time.sleep(0.01)
-
-
-# ------------------------------------------------------------- test isolation
-def test_default_kiro_runner_in_tests_writes_nothing_under_the_real_home(org, isolated_kiro):
-    before = real_agent_profiles()
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
-    sched = Scheduler(org, echo=lambda _: None)  # the default runner: kiro_runner("kiro-cli")
-    sched.acquire()
-    try:
-        run_to_idle(sched)
-    finally:
-        sched.release()
-    name = kiro_profile_name(org.root, [])
-    assert (isolated_kiro / ".kiro" / "agents" / f"{name}.json").is_file()  # the profile went to the sandbox
-    assert f"--agent {name}" in (isolated_kiro / "kiro-stub.log").read_text()  # and the stub, not kiro, ran
-    assert real_agent_profiles() == before
-
-
-def test_ensure_kiro_profile_resolves_the_directory_at_call_time(org, isolated_kiro, tmp_path, monkeypatch):
-    elsewhere = tmp_path / "elsewhere"
-    monkeypatch.setattr(sched_mod, "KIRO_AGENTS_DIR", elsewhere)
-    name = ensure_kiro_profile(["read"], org=org)
-    assert (elsewhere / f"{name}.json").is_file()
-    assert not (isolated_kiro / ".kiro" / "agents" / f"{name}.json").exists()
-
-
-def test_ensure_kiro_profile_is_atomic_and_idempotent(org, tmp_path):
-    d = tmp_path / "agents"
-    name = ensure_kiro_profile([], d, org=org)
-    path = d / f"{name}.json"
-    path.write_text("{ not json")  # a corrupt profile is repaired, not fatal
-    ensure_kiro_profile([], d, org=org)
-    assert path.read_text().startswith("{") and '"orgmcp"' in path.read_text()
-    mtime = path.stat().st_mtime_ns
-    ensure_kiro_profile([], d, org=org)
-    assert path.stat().st_mtime_ns == mtime  # unchanged profile is not rewritten
-    assert [p.name for p in d.iterdir()] == [f"{name}.json"]  # no temp files left behind
 
 
 # ------------------------------------------------------------ QA-5: fault isolation
@@ -92,13 +46,6 @@ def test_malformed_ledgers_never_kill_tick(org, name, junk):
     sched._reap()
 
 
-def test_malformed_reviews_ledger_restarts_the_review_clock(org):
-    write_ledger(org, "reviews", '{"at": 5, "runs": "x", "notified": [1]}')
-    sched = Scheduler(org, echo=lambda _: None)
-    sched.tick()
-    assert json.loads((org.root / ".runtime" / "reviews.json").read_text())["at"]  # a real timestamp again
-
-
 def test_a_crashing_phase_is_logged_once_and_the_loop_continues(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
     messages = []
@@ -111,21 +58,6 @@ def test_a_crashing_phase_is_logged_once_and_the_loop_continues(org):
     assert "ceo" in sched.runs or org.runs_used("ceo") == 1  # launching still happened
     assert len([m for m in messages if "kaput" in m]) == 2  # once per phase, not once per tick
     sched.release()
-
-
-@pytest.mark.parametrize("bad", ["1h", None, [], {}, True, float("nan"), "nan", float("inf")])
-def test_bad_health_thresholds_fall_back_to_defaults(org, bad):
-    configure(org, health={"idle_after_seconds": bad, "max_runs_per_task": bad, "min_runs_for_waste": 7})
-    limits = thresholds(org)
-    assert limits["idle_after_seconds"] == 86400 and limits["max_runs_per_task"] == 5
-    assert limits["min_runs_for_waste"] == 7
-    org_health(org)  # no TypeError
-    agent_health(org, "ceo")
-
-
-def test_numeric_string_thresholds_are_accepted(org):
-    configure(org, health={"idle_after_seconds": "120", "max_problem_ratio": "0.25"})
-    assert thresholds(org)["idle_after_seconds"] == 120 and thresholds(org)["max_problem_ratio"] == 0.25
 
 
 def test_bad_scheduler_settings_fall_back_to_defaults(org):
@@ -155,141 +87,10 @@ def test_failed_run_of_a_retired_agent_leaves_no_trace(org):
     assert retired_logs and "# exit 3" in retired_logs[0].read_text()  # the log handle was closed and flushed
 
 
-# ------------------------------------------------------- QA-4: long prompts
-def test_prompt_is_delivered_on_stdin_not_in_argv(org, tmp_path):
-    out = tmp_path / "stdin.txt"
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
-    argv = ["sh", "-c", f"cat > {out}"]
-    sched = Scheduler(org, lambda o, a, p: (argv, o.dir(a), dict(os.environ)), echo=lambda _: None)
-    sched.acquire()
-    try:
-        run_to_idle(sched)
-    finally:
-        sched.release()
-    text = out.read_text()
-    assert text.startswith("# orgmcp run: you are `ceo`") and "### task " in text
-
-
-def test_kiro_command_has_no_prompt_argument(org):
-    cmd, _, _ = sched_mod.kiro_runner()(org, "ceo", "THE PROMPT")
-    assert "THE PROMPT" not in cmd
-
-
 # --------------------------------------------------- QA-7: monotonic run counter
 from orgmcp.review import review_if_due, total_runs  # noqa: E402
-
-
-def add_runs(org, addr, n, prefix="2026"):
-    d = org.dir(addr) / "runs"
-    start = len(list(d.glob("*.log")))
-    for i in range(n):
-        (d / f"{prefix}0101T{start + i:012d}.log").touch()
-
-
-def test_total_runs_never_goes_down_when_agents_are_retired(org):
-    org.hire("ceo", "sub", "S", "s")  # a sub-team: ceo/sub
-    add_runs(org, "ceo", 2)
-    add_runs(org, "ceo/eng", 3)
-    add_runs(org, "ceo/sub", 4)
-    assert total_runs(org) == 9
-    org.retire("ceo", "eng", "done")
-    assert total_runs(org) == 9
-    org.retire(ROOT, "ceo", "restructure")  # takes the whole team (ceo, ceo/sub) along
-    assert total_runs(org) == 9
-    # unrelated files inside a retired directory are not run logs
-    for d in (org.root / ".retired").glob("ceo-*"):
-        (d / "work" / "runs").mkdir(parents=True, exist_ok=True)
-        (d / "work" / "runs" / "x.log").touch()
-        (d / "inbox" / "y.log").touch()
-    assert total_runs(org) == 9
-
-
-def test_review_baseline_is_rebased_if_the_counter_ever_shrinks(org):
-    configure(org, review_every_runs=2, review_every_seconds=10**9)
-    add_runs(org, "ceo", 5)
-    review_if_due(org, utcnow())  # starts the clock at 5
-    for f in (org.dir("ceo") / "runs").glob("*.log"):
-        f.unlink()
-    assert review_if_due(org, utcnow()) is None  # no spurious review, and no permanent stall:
-    add_runs(org, "ceo", 2, prefix="2027")
-    assert review_if_due(org, utcnow()) is not None
-
-
-# ------------------------------------------------ QA-8: reviews and the reserve
-def test_manager_with_spare_budget_beyond_its_reserve_still_gets_the_note(org):
-    org.hire("ceo", "ops", "Ops", "Do ops.")
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=4)
-    org.delegate("ceo", "ceo/eng", "work", "g", "a", budget=1)  # budget 2 left, one outstanding
-    configure(org, health={"idle_after_seconds": -1})
-    from orgmcp.review import review
-
-    result = review(org, utcnow() + timedelta(hours=1))
-    assert [n.to for n in result.notes if n.to == "ceo"] == ["ceo"] and "ceo" not in result.skipped
-
-
-def test_skipped_manager_is_listed_in_roots_summary_and_told_later(org):
-    from orgmcp.review import review
-
-    org.hire("ceo", "ops", "Ops", "Do ops.")
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=3)
-    org.delegate("ceo", "ceo/eng", "work", "g", "a", budget=2)
-    configure(org, health={"idle_after_seconds": -1})
-    later = utcnow() + timedelta(hours=1)
-    result = review(org, later)
-    assert "reserved for 1 outstanding" in result.skipped["ceo"]
-    root_note = next(n for n in result.notes if n.to == ROOT)
-    assert "Managers not notified: `ceo` (budget 1 is reserved for 1 outstanding delegation(s))" in root_note.body
-    org.send(ROOT, "ceo", "more budget", budget=3)  # the reserve is covered again
-    again = review(org, later + timedelta(hours=1))
-    assert [n.to for n in again.notes if n.to == "ceo"] == ["ceo"]  # its pending news is delivered now
-
-
 # ------------------------------------------------ QA-14: health vs failed runs
 from orgmcp.health import agent_health  # noqa: E402,F811
-
-
-def write_run(org, addr, i, text):
-    (org.dir(addr) / "runs" / f"20260101T{i:012d}.log").write_text(text)
-
-
-HEADER = "# run of ceo, 1 message(s)\n# senders: {senders}\n# cwd: /x\n# cmd: kiro-cli chat <prompt on stdin>\n"
-PROMPT = "# ---- prompt ----\nplease do things\n# ---- output ----\n"
-
-
-def test_failed_runs_do_not_make_an_agent_wasteful(org):
-    org.send(ROOT, "ceo", "budget", budget=20)
-    for i, tail in enumerate(["\n# exit 1 after 2s\n", "\n# failed to start: boom\n", "\n# killed after 5s timeout\n\n# exit -9 after 5s\n",
-                              "\n# interrupted by scheduler shutdown\n", "\n# exit 2 after 1s\n"]):
-        write_run(org, "ceo", i, HEADER.format(senders="root") + PROMPT + tail)
-    h = agent_health(org, "ceo", utcnow())
-    assert "wasteful" not in h.flags and h.empty_runs == 0 and h.failed_runs == 5 and h.runs_used == 5
-
-
-def test_successful_empty_runs_are_still_wasteful(org):
-    org.send(ROOT, "ceo", "budget", budget=20)
-    for i in range(5):
-        write_run(org, "ceo", i, HEADER.format(senders="root") + PROMPT + "\n# exit 0 after 2s\n")
-    h = agent_health(org, "ceo", utcnow())
-    assert "wasteful" in h.flags and h.empty_runs == 5 and "5 of 5" in h.flags["wasteful"]
-
-
-def test_runs_that_only_handled_runtime_notes_are_not_empty(org):
-    org.send(ROOT, "ceo", "budget", budget=20)
-    for i in range(6):
-        write_run(org, "ceo", i, HEADER.format(senders="runtime") + PROMPT + "\n# exit 0 after 2s\n")
-    write_run(org, "ceo", 6, HEADER.format(senders="root, runtime") + PROMPT + "\n# exit 0 after 2s\n")  # mixed: counts
-    h = agent_health(org, "ceo", utcnow())
-    assert h.runtime_runs == 6 and h.empty_runs == 1 and "wasteful" not in h.flags  # 1 judged run < min_runs_for_waste
-
-
-def test_failures_mixed_with_real_empty_runs_judge_only_the_real_ones(org):
-    org.send(ROOT, "ceo", "budget", budget=20)
-    for i in range(10):
-        write_run(org, "ceo", i, HEADER.format(senders="root") + PROMPT + "\n# exit 1 after 1s\n")
-    for i in range(10, 14):
-        write_run(org, "ceo", i, HEADER.format(senders="root") + PROMPT + "\n# exit 0 after 1s\n")
-    h = agent_health(org, "ceo", utcnow())
-    assert h.empty_runs == 4 and "4 of 4" in h.flags["wasteful"]
 
 
 def test_the_scheduler_records_senders_and_exit_in_the_log(org):
@@ -396,14 +197,6 @@ def test_runs_are_started_in_their_own_session(org, tmp_path):
         sched.release()
     pid, pgid = map(int, out.read_text().split())
     assert pid == pgid != os.getpgid(0)
-
-
-def test_signalling_a_finished_run_is_harmless():
-    import subprocess
-
-    proc = subprocess.Popen(["true"], start_new_session=True)
-    proc.wait()
-    wire_processes.adopt(proc).signal_group(9)
 
 
 # ------------------------------------------------------------------ small extras

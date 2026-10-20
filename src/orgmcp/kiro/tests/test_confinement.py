@@ -1,17 +1,12 @@
-"""Workspace confinement and path semantics (workstream X1).
-
-What kiro enforces (profiles): built-in ``write`` only under the workspace, ``read`` under workspace + inputs, never the
-org directory; ``shell`` is not confinable. What orgmcp enforces itself: ``report``/``read`` path scope, authority
-narrowing for ``inputs``. What is only instructed: the prompt's Files section and shell rule.
-"""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import json
 import re
 
 import pytest
-
-from orgmcp.core import ROOT, Org
-from orgmcp.scheduler import ensure_kiro_profile, kiro_profile_name, kiro_runner
+from testkit.kiro_world import ensure_kiro_profile, kiro_profile_name, kiro_runner
+from testkit.legacy.orgmcp.core import ROOT, Org
 
 
 def profile_of(isolated_kiro, name):

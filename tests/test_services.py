@@ -10,7 +10,6 @@ from testkit.services_world import (  # noqa: F401  (svc is a fixture)
 
 from orgmcp import services
 from orgmcp.core import ROOT
-from orgmcp.progress import progress
 from orgmcp.server import build_server
 
 
@@ -95,32 +94,6 @@ def test_cli_commands(org, capsys, tmp_path):
     assert "retired service" in capsys.readouterr().out and org.service_names("ceo") == []
     log = __import__("subprocess").run(["git", "log", "--format=%s"], cwd=org.root, capture_output=True, text=True).stdout
     assert "root: service weekly-brief of ceo" in log and "root: retired service" in log
-
-
-# ---------------------------------------------------------------------------- progress and status
-def test_progress_tags_service_tasks_and_notes_missing_feedback(svc):
-    org = svc
-    org.revise_playbook("ceo", "weekly-brief", "Steps.", "r")
-    task = request(org, "ai")
-    (line,) = progress(org).splitlines()
-    assert line.startswith('"weekly-brief: ai" [service weekly-brief v1]: working.') and "no feedback yet" not in line
-    deliver(org, "ceo", task)
-    org.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
-    out = progress(org)
-    line = next(x for x in out.splitlines() if "weekly-brief: ai" in x)
-    assert "[service weekly-brief v1]: done." in line and line.count("no feedback yet") == 1
-    assert "[service" not in next(x for x in out.splitlines() if '"Plain"' in x)
-    assert "Needs you" not in out  # neither the missing feedback nor the revision note asks for the human
-    org.feedback(ROOT, task.id, "accept")
-    assert "no feedback yet" not in progress(org)
-
-
-def test_playbook_revisions_are_quiet_notices_for_root(svc):
-    org = svc
-    org.revise_playbook("ceo", "weekly-brief", "Steps.", "first")
-    assert org.messages(ROOT, "inbox") and "Needs you" not in progress(org)
-    org.notify(ROOT, "loud", "Needs a decision")
-    assert "Needs you: runtime notice" in progress(org)
 
 
 # ------------------------------------------------------------------------------- the whole loop

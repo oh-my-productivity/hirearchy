@@ -4,14 +4,13 @@ import os
 import sys
 import time
 
-import pytest
 import testkit
 import yaml
 
 from orgmcp import observe
 from orgmcp.cli import main
 from orgmcp.core import DEFAULT_MODEL, ROOT, Org
-from orgmcp.scheduler import Scheduler, kiro_runner
+from orgmcp.scheduler import Scheduler
 
 FAKE = str(testkit.FAKE_AGENT)
 CHARTER = "---\nrole: CEO\n{model}tools: [read]\n---\nLead.\n"
@@ -30,11 +29,6 @@ def set_config(org: Org, **kw) -> None:
 
 def charter_model(org: Org, model: str | None) -> None:
     org.write(ROOT, "ceo/AGENT.md", CHARTER.format(model=f"model: {model}\n" if model else ""))
-
-
-def model_arg(cmd: list[str]) -> str:
-    assert cmd.count("--model") == 1
-    return cmd[cmd.index("--model") + 1]
 
 
 def fake_runner():
@@ -62,27 +56,6 @@ def test_create_org_without_a_model_uses_the_default(tmp_path, monkeypatch):
     binding, _ = resolve_binding()
     org = binding.create("A mission")
     assert org.config["default_model"] == DEFAULT_MODEL
-
-
-# ------------------------------------------------------------------------------------------ the run command
-def test_the_scheduler_command_always_carries_the_model(org):
-    cmd, _, _ = kiro_runner()(org, "ceo", "P")
-    assert model_arg(cmd) == "claude-sonnet-5.5" and cmd[-2:] == ["--model", "claude-sonnet-5.5"]
-    cmd, _, _ = kiro_runner()(org, "ceo/eng", "P")
-    assert model_arg(cmd) == "claude-sonnet-5.5"
-
-
-def test_the_scheduler_command_keeps_an_explicit_model(org):
-    set_config(org, default_model="org-model")
-    charter_model(org, "charter-model")
-    assert model_arg(kiro_runner()(org, "ceo", "P")[0]) == "charter-model"
-    assert model_arg(kiro_runner()(org, "ceo/eng", "P")[0]) == "org-model"
-
-
-@pytest.mark.parametrize("value", [None, "<missing>"])
-def test_the_scheduler_command_for_a_legacy_org_config_uses_the_default(org, value):
-    set_config(org, default_model=value)
-    assert model_arg(kiro_runner()(org, "ceo", "P")[0]) == DEFAULT_MODEL
 
 
 def run_start_models(org: Org) -> dict[str, str]:

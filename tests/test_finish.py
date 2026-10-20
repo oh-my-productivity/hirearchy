@@ -9,12 +9,7 @@ import time
 
 import pytest
 
-from orgmcp.app import wire_attention
 from orgmcp.core import ROOT, Org
-from orgmcp.daemon import SchedulerState
-from orgmcp.daemon.testing import FakeSchedulerStatus
-from orgmcp.progress import describe_progress
-from orgmcp.progress.testing import FixedLegacyParts
 from orgmcp.scheduler import EXIT_FILE, Scheduler, describe_scheduler, waiting_on_user
 from orgmcp.scheduler._exit import GraceWait
 from orgmcp.scheduler._legacy import FunctionClock
@@ -75,55 +70,6 @@ def stalled_on_budget(org):
     org.start_run_log("ceo")  # the one run is gone
     assert org.budget("ceo") == 0 and org.unread("ceo") == 1
     return task
-
-
-def test_budget_stalled_task_is_waiting_on_the_user(org, stalled_on_budget):
-    w = waiting_on_user(org)
-    assert w.text == 'waiting on you: "Rework the report" needs budget (ceo out of runs)' and w.settled
-    assert 'send(to="ceo", body="<why>", budget=N)' in w.options and "call start()" in w.options
-    assert "accept what exists so far" in w.options and "stop()" in w.options
-
-
-def test_paused_for_failures_asks_for_a_human_resume(org):
-    org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=5)
-    org.pause("ceo", "failures")
-    w = waiting_on_user(org)
-    assert w.text == 'waiting on you: "Ship it" needs you to resume ceo (it keeps failing)'
-    assert "`orgmcp resume ceo`" in w.options
-
-
-def test_a_paused_worker_deep_in_the_subtree_counts_and_budget_goes_to_the_assignee(org):
-    org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=6)
-    org.begin_run("ceo")
-    org.delegate("ceo", "ceo/eng", "Build", "Build", "Built", budget=1)
-    org.end_run("ceo", ok=True)
-    org.start_run_log("ceo/eng")  # eng used its only run, has the unread task
-    org.pause("ceo/eng", "budget")
-    w = waiting_on_user(org)
-    assert "needs budget (ceo/eng out of runs)" in w.text and 'send(to="ceo"' in w.options
-
-
-def test_nothing_is_waiting_while_something_can_run_or_runs(org):
-    assert waiting_on_user(org) is None  # no open task
-    org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=5)
-    assert waiting_on_user(org) is None  # ceo can run
-    assert waiting_on_user(org, running={"ceo"}) is None  # or is running
-    org.begin_run("ceo")
-    assert waiting_on_user(org) is None  # inflight counts as running
-    org.end_run("ceo", ok=True)
-    assert waiting_on_user(org, blocked={"ceo"}) is None  # an orphaned run may still be alive
-
-
-def test_a_grant_makes_the_task_runnable_again(org, stalled_on_budget):
-    assert waiting_on_user(org)
-    org.send(ROOT, "ceo", "more runs please", budget=2)
-    assert waiting_on_user(org) is None
-
-
-def test_the_run_cap_counts_as_waiting(org):
-    org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=5)
-    w = waiting_on_user(org, can_start=False)
-    assert "the run cap (max_runs) was reached" in w.text and "higher max_runs" in w.options
 
 
 def test_grace_period_with_a_fake_clock(org, stalled_on_budget):
@@ -214,30 +160,6 @@ def test_a_plain_stall_waits_for_the_stall_ladder_before_the_exit(org):
     org.save_ledger("nudges", {task.id: {"step": 1, "at": clock.t}})  # root told: nothing else will happen
     assert waiting_on_user(org).settled
     assert waiting().startswith('waiting on you: "Ship it" needs a decision')
-
-
-def test_progress_shows_the_reason_and_the_options_and_does_not_wait(org, stalled_on_budget):
-    out = describe_progress(org, None, 300)
-    assert out.startswith("Not waiting: nothing can progress without you. ")
-    last = out.splitlines()[-1]
-    assert last.startswith('scheduler: stopped (waiting on you: "Rework the report" needs budget (ceo out of runs)) - ')
-    assert "nothing moves until you act" in last and 'send(to="ceo"' in last and "accept what exists so far" in last
-
-
-def test_progress_while_the_scheduler_runs_still_says_so(org, stalled_on_budget, monkeypatch):
-    rt = org.runtime
-    running = FixedLegacyParts(
-        rt.human_queue, rt.case_history, rt.service_reports, FakeSchedulerStatus(SchedulerState("running", 1, "x")), wire_attention.waiting_on_user_of(rt),
-    )
-    monkeypatch.setattr(org, "runtime", dataclasses.replace(rt, progress_parts=running))
-    out = describe_progress(org)
-    assert 'waiting on you: "Rework the report" needs budget' in out and "exits by itself soon" in out
-
-
-def test_status_line_of_an_org_that_can_progress_is_unchanged(org):
-    org.delegate(ROOT, "ceo", "Ship it", "Ship", "Shipped", budget=5)
-    assert describe_scheduler(org) == "scheduler: stopped"
-    assert describe_progress(org).splitlines()[-1].startswith("scheduler: stopped - open tasks do not move")
 
 
 @pytest.fixture

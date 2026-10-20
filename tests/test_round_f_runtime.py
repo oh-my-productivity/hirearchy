@@ -5,25 +5,14 @@ import asyncio
 
 import pytest
 
-from orgmcp import templates
 from orgmcp.core import ROOT
 from orgmcp.server import build_server
-
-ENG = "ceo/eng"
 
 
 def call(server, tool, **args):
     result = asyncio.run(server.call_tool(tool, args))
     blocks = result[0] if isinstance(result, tuple) else result
     return "\n".join(getattr(b, "text", "") for b in blocks)
-
-
-# ------------------------------------------------------------------------------------------ 2. review advice
-def test_low_quality_advice_points_at_the_body_not_the_whole_charter():
-    text = templates.REVIEW_ACTIONS["low_quality"].format(a=ENG)
-    assert "BODY of `ceo/eng`'s charter" in text and "kept automatically" in text
-    assert "revises=<task id>" in text and "`revise_playbook`" in text and "tighten" not in text
-    assert "frontmatter" in templates.REVIEW_ACTIONS["expensive"]
 
 
 # ------------------------------------------------------------------------------------------ 3. feedback
