@@ -7,7 +7,6 @@ from typing import cast
 
 import pytest
 
-from orgmcp.blueprint import load_text
 from orgmcp.blueprint._basis import ValidatedPlanBasis
 from orgmcp.blueprint._protocols import PlanBasis, PlanWords
 from orgmcp.blueprint._words import ServiceWords
@@ -16,7 +15,7 @@ from orgmcp.blueprint.testing import StaticOrgContext, plan_parts_over, role_lib
 from orgmcp.kernel.testing import DictEnvironment
 from orgmcp.services.testing import normalizer
 
-from ._plans import base_dir, template_at
+from ._plans import base_dir, load_text, template_at
 
 
 def basis_over(tmp: Path, org: StaticOrgContext) -> PlanBasis:

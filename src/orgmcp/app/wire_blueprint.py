@@ -1,23 +1,14 @@
-"""Providers of the ``blueprint`` ports (ARCHITECTURE.md 6.1), and the parts the legacy module-level functions of ``blueprint`` work with.
+"""Providers of the ``blueprint`` ports (ARCHITECTURE.md 6.1).
 
 The role templates stay in ``orgmcp/roles`` (package data, risk 8 of the architecture): the directory is found here, from the location of this
-module, and handed to ``PackagedRoleLibrary``; the classes of ``blueprint`` never look at their own file name.
-
-The legacy functions (``validate``, ``get_role``, ...) take an optional ``Org`` and read the process they run in; they cannot take their parts from
-a runtime, so ``legacy_parts`` makes them once and ``fields_blueprint`` installs them when the application package is loaded. They go away with
-the last legacy caller (E3)."""
+module, and handed to ``PackagedRoleLibrary``; the classes of ``blueprint`` never look at their own file name."""
 
 from __future__ import annotations
 
-import importlib
-import sys
 import tempfile
-from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
 
-from .. import blueprint_examples
 from ..agents import AgentDirectory
 from ..blueprint import (
     BlueprintApplier,
@@ -30,8 +21,7 @@ from ..blueprint import (
     WorkspaceProvisioner,
 )
 from ..blueprint._access import PolicyAccessReport
-from ..blueprint._assembly import LegacyParts, PlanParts, applier_over, plan_parts
-from ..blueprint._assembly import install_legacy_parts as install
+from ..blueprint._assembly import PlanParts, applier_over, plan_parts
 from ..blueprint._budgeting import BudgetPlanner
 from ..blueprint._examples import TemplateBlueprintExamples
 from ..blueprint._files import FsTextFiles
@@ -47,10 +37,8 @@ from ..blueprint._validator import RuleBlueprintValidator
 from ..dispatch import TaskAssigner
 from ..hierarchy import Hiring, Retirement
 from ..kernel import Environment, OrgLayout
-from ..kernel._system import OsEnvironment
 from ..kiro import ConfinementPolicy
 from ..services import ContractNormalizer, ServiceCatalog, ServiceCommands
-from ..services._normalizer import TextContractNormalizer
 from ..settings import OrgSettings
 from ..snapshots import OrgSnapshotter
 from ._builder import Builder
@@ -76,30 +64,6 @@ def roles_dir() -> Path:
 
 def temp_dir() -> Path:
     return Path(tempfile.gettempdir())
-
-
-class PatchPointConfinementPolicy(ConfinementPolicy):
-    """A policy that is a function: whatever ``scheduler.file_confinement`` is when the plan asks what the built-in ``read`` may open.
-
-    The flat module asked the scheduler's function at each call, and tests replace it; this keeps that patch point for the legacy functions."""
-
-    def file_confinement(
-        self, org_root: Path, tools: Sequence[str], workspace: Path | None, inputs: Sequence[Path]
-    ) -> tuple[list[str], dict[str, object]]:
-        scheduler = sys.modules.get("orgmcp.scheduler") or importlib.import_module("orgmcp.scheduler")  # it imports this package: looked up late
-        return cast("tuple[list[str], dict[str, object]]", scheduler.file_confinement(org_root, list(tools), workspace, list(inputs)))
-
-
-def legacy_parts() -> LegacyParts:
-    """The process the legacy functions of ``blueprint`` run in: the real environment, the scheduler's confinement policy, the roles directory."""
-    return LegacyParts(OsEnvironment(), PatchPointConfinementPolicy(), TextContractNormalizer(), roles_dir())
-
-
-def install_legacy_parts() -> None:
-    """Hand the legacy parts to ``blueprint`` (and the templates to the legacy ``blueprint_examples``); ``fields_blueprint`` calls this when the
-    application package is loaded."""
-    install(legacy_parts())
-    blueprint_examples._install(TemplateBlueprintExamples())
 
 
 def register(b: Builder) -> None:

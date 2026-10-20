@@ -9,11 +9,11 @@ from pathlib import Path
 import pytest
 import yaml
 
-from orgmcp.blueprint import PlanIdentity, load_text
+from orgmcp.blueprint import PlanIdentity
 from orgmcp.blueprint._identity import HashPlanIdentity
 
 from . import _corpus
-from ._plans import LABELS, fill, golden
+from ._plans import LABELS, fill, golden, load_text
 
 
 @pytest.fixture

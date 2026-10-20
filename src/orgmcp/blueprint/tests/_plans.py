@@ -13,6 +13,10 @@ import re
 from pathlib import Path
 from typing import Any
 
+from orgmcp.blueprint._files import FsTextFiles
+from orgmcp.blueprint._loader import YamlBlueprintLoader
+from orgmcp.kernel import JsonObject
+
 GOLDEN = Path(__file__).resolve().parent / "golden" / "second_half.json"
 FIXED_BASE = "/golden/base"
 LABELS = [f"{kind}{'-service' if service else ''}" for kind in ("research", "documents", "code", "analysis") for service in (False, True)]
@@ -23,6 +27,11 @@ PROPOSED = ["research/filled", "research-service/filled", "code/filled", "resear
 def golden() -> dict[str, Any]:
     result: dict[str, Any] = json.loads(GOLDEN.read_text(encoding="utf-8"))
     return result
+
+
+def load_text(text: str) -> JsonObject:
+    """A blueprint from YAML/JSON text: the loader of the package over the real files (the text is never taken for a file name)."""
+    return YamlBlueprintLoader(FsTextFiles()).load_text(text)
 
 
 def fill(text: str) -> str:

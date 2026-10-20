@@ -14,11 +14,10 @@ from pathlib import Path
 import pytest
 
 import orgmcp.blueprint as bpm
-from orgmcp.blueprint import _legacy, api
+from orgmcp.blueprint import api
 from orgmcp.blueprint._access import PolicyAccessReport
 from orgmcp.blueprint._budgeting import KINDS, REWORK_RUNS, SLACK, TIGHT, BudgetPlanner
 from orgmcp.blueprint._files import FsTextFiles
-from orgmcp.blueprint._host import HostOrgContext
 from orgmcp.blueprint._loader import PATH_NAME_MAX, YamlBlueprintLoader
 from orgmcp.blueprint._org import NoOrgContext, PresentOrAbsentOrg, RuntimeOrgContext
 from orgmcp.blueprint._pathcheck import RootedPathChecker
@@ -53,7 +52,7 @@ IMPLEMENTS: list[tuple[type, type]] = [
     (PackagedRoleLibrary, api.RoleLibrary), (MemoryRoleLibrary, api.RoleLibrary),
     (YamlBlueprintLoader, api.BlueprintLoader), (RuleBlueprintValidator, api.BlueprintValidator),
     (FsTextFiles, TextFiles), (MemoryTextFiles, TextFiles),
-    (NoOrgContext, OrgContext), (RuntimeOrgContext, OrgContext), (HostOrgContext, OrgContext), (StaticOrgContext, OrgContext),
+    (NoOrgContext, OrgContext), (RuntimeOrgContext, OrgContext), (StaticOrgContext, OrgContext),
     (PresentOrAbsentOrg, OrgContexts), (RootedPathChecker, PathChecking), (EnvironmentWorkspaceRoots, WorkspaceRoots),
     (AgentResolver, AgentResolution), (BudgetPlanner, BudgetPlanning), (PolicyAccessReport, AccessReport),
     (ServiceBlueprintRules, ServiceRules), (api.Issue, api.IssueText),
@@ -106,13 +105,4 @@ def test_the_removed_duplicate_of_inside_answered_the_same(tmp_path: Path) -> No
 
 def test_the_names_that_moved_to_the_api_are_the_api_objects() -> None:
     assert (bpm.Issue, bpm.Agent, bpm.Role, bpm.BlueprintError, bpm.errors) == (api.Issue, api.Agent, api.Role, api.BlueprintError, api.errors)
-    assert tuple(getattr(_legacy, name) for name in ("Issue", "Agent", "Role", "BlueprintError")) == (api.Issue, api.Agent, api.Role, api.BlueprintError)
 
-
-def test_the_legacy_function_access_is_not_shadowed_by_the_module_of_the_same_name() -> None:
-    """``blueprint._access`` is a function of the flat module and ``blueprint/_access.py`` a module of the package: the function wins,
-    whichever of them is imported first (importing a submodule binds its name in the package)."""
-    import importlib
-
-    importlib.import_module("orgmcp.blueprint._access")
-    assert callable(bpm._access) and not hasattr(bpm._access, "PolicyAccessReport")

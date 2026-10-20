@@ -67,17 +67,6 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "review": _e3(
         "LEDGER read_ledger total_runs review_if_due review"
     ),
-    "blueprint": _e3(
-        "ROLES_DIR WEB_TOOLS WRITE_TOOLS SLACK TIGHT REWORK_RUNS KINDS role_names "
-        "get_role load load_text NEEDS_KEYS AGENT_KEYS SERVICE_KEYS TASK_KEYS REQUEST_KEYS service_budget "
-        "declared_inputs review_roots estimate planned_total budget_split edits_others_files validate "
-        "default_playbook org_files_readable access_facts render_plan PLAN_HEADING PLAN_DRAFT_HEADING PLAN_END "
-        "PLAN_SHOW TOOL_WORDS SHOWN_CRITERIA SHOWN_WARNINGS HIDDEN_WARNINGS PLAN_ID_LENGTH SHOWN_SERVICE_CRITERIA "
-        "plan_id CLIP GOAL_CLIP plan_for_user propose_text propose apply"
-    ),
-    "blueprint_examples": _e3(
-        "KINDS example"
-    ),
     "dashboard_events": _e3(
         "WHO_WIDTH BATCH_SHOWN Lookup EventLine clock who describe humanize event_lines"
     ),
