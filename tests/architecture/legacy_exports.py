@@ -42,14 +42,6 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "cli": _e3(
         "main"
     ),
-    "services": _e3(
-        "TITLE_MAX service_dir read_contract read_playbook owned_services requestable_services parse_input_spec define_service "
-        "retire_service revise_playbook report_hint request rework_fields feedback_text feedback"
-    ),
-    "reflection": _e3(
-        "CLIP_LESSON CLIP_NOTE DIGEST_CASES DIGEST_CHARS MAX_VERDICTS cases case_of case_total playbook_timeline prompt_sections "
-        "reflection_digest services_text"
-    ),
     "telemetry": _e3(
         "TITLE_MAX ERROR_MAX clip set_process "
         "process dropped reset traces_seen note_trace single ensure_ignored emit summarize_args prune "

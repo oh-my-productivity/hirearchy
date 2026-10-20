@@ -4,13 +4,12 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
 from _pytest.mark import ParameterSet
 
-from orgmcp.kernel import Message, OrgPaths
+from orgmcp.kernel import Message
 from orgmcp.reflection.testing import ReflectionWorld
 
 SERVICE = "weekly-brief"
@@ -84,15 +83,3 @@ def read_inbox(w: ReflectionWorld, addr: str = "ceo") -> None:
     """The owner has seen everything in its inbox: the next batch holds only what arrives from now on."""
     w.s.d.begin_run(addr)
     w.s.d.end_run(addr)
-
-
-def org_of(w: ReflectionWorld, config: Any = None) -> Any:
-    """What the old module-level functions are given: an object with the ports in ``runtime`` (the facade is not importable here).
-
-    ``config`` is what its ``config`` property answers (the dashboard's lenient ``Org`` reads a damaged ORG.md as the defaults); the settings of the world by default."""
-    d = w.s.d
-    runtime = SimpleNamespace(
-        service_catalog=w.s.catalog, service_store=w.s.store, service_hints=w.s.hints, agents=d.agents, mailbox=d.mail, task_query=d.tasks,
-        run_log_reader=w.runs, paths=OrgPaths(d.root),
-    )
-    return SimpleNamespace(runtime=runtime, config=d.settings.config() if config is None else config)

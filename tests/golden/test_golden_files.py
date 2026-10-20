@@ -5,7 +5,7 @@ from pathlib import Path
 from golden_support import check
 from scenarios import BRIEF, PLAYBOOK, company, deliver_service, dirs, write_artifact
 
-from orgmcp import blueprint, templates
+from orgmcp.app import wiring
 from orgmcp.core import ROOT, Org
 
 PROJECT = Path(__file__).resolve().parents[2]
@@ -55,7 +55,7 @@ def test_message_files(tmp_path, clock, norm):
     clock.tick()
     check("messages/feedback_note.md", norm(text_of(org, "ceo", "inbox", fb)))
 
-    notice = org.notify("ceo", "Budget returned", templates.notice_budget_returned("ceo/eng", 3, "ceo", "done early"))
+    notice = org.notify("ceo", "Budget returned", org.runtime.notices.budget_returned("ceo/eng", 3, "ceo", "done early"))
     clock.tick()
     check("messages/runtime_notice.md", norm(text_of(org, "ceo", "inbox", notice)))
     quiet = org.notify("ceo", "FYI", "Nothing to do.", wake=False, trace=request.id)
@@ -67,18 +67,19 @@ def test_message_files(tmp_path, clock, norm):
 
 
 def test_runtime_notice_texts(tmp_path, clock, norm):
+    notices = wiring.open_runtime(tmp_path).notices
     parts = [
-        templates.notice_budget("ceo/eng", 3),
-        templates.notice_budget_returned("ceo/eng", 4, "ceo", "finished"),
-        templates.notice_failures("ceo/eng", 3, "ceo/eng/runs/20260115T090000000000.log"),
-        templates.notice_failures("ceo/eng", 3, "ceo/eng/runs/20260115T090000000000.log", to_human=False),
-        templates.notice_nudge("T-1", "Build the API"),
-        templates.notice_stalled("ceo", "T-1", "Build the API", ["ceo", "root"]),
-        templates.review_item("ceo/eng", "stuck", "no result for 2h"),
-        templates.review_item("ceo/eng", "low_quality", "2 of 3 reports rejected", act=False),
-        templates.review_item("ceo/eng", "expensive", "9 runs", branch="ceo"),
-        templates.notice_review_manager("ceo", [templates.review_item("ceo/eng", "idle", "nothing for 3 days")]),
-        templates.notice_review_root("1 agent flagged", ["- `ceo/eng` idle: nothing for 3 days"], {"ceo": "paused"}),
+        notices.budget("ceo/eng", 3),
+        notices.budget_returned("ceo/eng", 4, "ceo", "finished"),
+        notices.failures("ceo/eng", 3, "ceo/eng/runs/20260115T090000000000.log"),
+        notices.failures("ceo/eng", 3, "ceo/eng/runs/20260115T090000000000.log", to_human=False),
+        notices.nudge("T-1", "Build the API"),
+        notices.stalled("ceo", "T-1", "Build the API", ["ceo", "root"]),
+        notices.review_item("ceo/eng", "stuck", "no result for 2h"),
+        notices.review_item("ceo/eng", "low_quality", "2 of 3 reports rejected", act=False),
+        notices.review_item("ceo/eng", "expensive", "9 runs", branch="ceo"),
+        notices.review_manager("ceo", [notices.review_item("ceo/eng", "idle", "nothing for 3 days")]),
+        notices.review_root("1 agent flagged", ["- `ceo/eng` idle: nothing for 3 days"], {"ceo": "paused"}),
     ]
     check("messages/notice_templates.txt", "\n=====\n".join(parts) + "\n")
 
@@ -115,8 +116,8 @@ def apply_blueprint(tmp_path, clock, norm, text: str, label: str, roots=None) ->
     org = Org.init(tmp_path / "org", "Blueprint org", {"poll_seconds": 0.05})
     norm.add(org.root, "<ORG>")
     clock.tick()
-    bp = blueprint.load_text(text)
-    summary = blueprint.apply(org, bp, allowed_roots=roots)
+    bp = org.runtime.blueprint_loader.load_text(text)
+    summary = org.runtime.blueprint_applier.apply(bp, allowed_roots=roots)
     out = [f"##### summary\n{norm(summary.text())}\n"]
     for addr in org.agents():
         out.append(f"##### {addr}/AGENT.md\n" + norm((org.dir(addr) / "AGENT.md").read_text(encoding="utf-8")))
@@ -139,12 +140,10 @@ def test_blueprint_apply_service_example_writes_service_and_playbook(tmp_path, c
 
 
 def test_blueprint_apply_code_template_with_builtin_tools(tmp_path, clock, norm):
-    from orgmcp import blueprint_examples
-
     base = tmp_path / "base"
     base.mkdir()
     norm.add(base, "<BASE>")
-    text = fill(blueprint_examples.example("code", base), base)
+    text = fill(wiring.open_runtime(tmp_path).blueprint_examples.example("code", base), base)
     text = text.replace("<PLACEHOLDER>", "x")
     apply_blueprint(tmp_path, clock, norm, text, "code_template", roots=[tmp_path])
 
@@ -168,6 +167,4 @@ def test_service_and_playbook_files(tmp_path, clock, norm):
             p = org.dir("ceo") / "services" / name / f
             out.append(f"##### ceo/services/{name}/{f}\n" + (norm(p.read_text(encoding="utf-8")) if p.exists() else "(missing)\n"))
     check("services/service_and_playbook_files.md", "\n".join(out))
-    from orgmcp import services
-
-    check("services/services_text_root.txt", norm(services.services_text(org, ROOT)))
+    check("services/services_text_root.txt", norm(org.runtime.service_reports.services_text(ROOT)))

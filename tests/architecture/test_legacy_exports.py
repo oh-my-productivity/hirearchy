@@ -33,7 +33,7 @@ def test_the_permanent_entries_are_core_and_progress():
 
 
 def test_every_entry_names_the_step_that_removes_it():
-    assert len(legacy_exports.LEGACY_EXPORTS) >= 19  # core, scheduler, server, cli, ... (one table per legacy module)
+    assert len(legacy_exports.LEGACY_EXPORTS) >= 12  # core, scheduler, server, cli, ... (one table per legacy module that is left)
     for module, names in legacy_exports.LEGACY_EXPORTS.items():
         for name, step in names.items():
             assert step in STEPS, f"{module}.{name}: unknown removal step {step!r}"
