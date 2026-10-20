@@ -1,24 +1,23 @@
-"""Services in the assistant workflow: `blueprint_example(kind, service=True)`, the skill and README, the shipped example."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
 import re
 from pathlib import Path
 
 import pytest
-import yaml
+import testkit
+from testkit.blueprint_world import ex
+from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
+from testkit.blueprint_world import server_of_the_environment
 
-from orgmcp import blueprint as bpm
-from orgmcp import blueprint_examples as ex
-from orgmcp import services as services_mod
-from orgmcp.core import ROOT, Org, OrgError
-from orgmcp.server import build_server, resolve_binding
+from testkit.blueprint_world import bpm, services_mod
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = testkit.REPO
 
 
 def codes(found, level=None):
     return {i.code for i in found if level is None or i.level == level}
-
 
 
 def fill(text: str, base: Path, *, uncomment: bool = False) -> str:
@@ -114,10 +113,7 @@ def test_the_generated_playbook_fits_the_word_cap_for_every_team_shape(kind, tmp
     )
 
 
-
-
 # ------------------------------------------------------------------------------------------ the MCP tools
-
 def call(server, tool, **args):
     result = asyncio.run(server.call_tool(tool, args))
     blocks = result[0] if isinstance(result, tuple) else result
@@ -133,7 +129,7 @@ def root_server(tmp_path, monkeypatch):
     work = tmp_path / "cwd"
     work.mkdir()
     monkeypatch.chdir(work)
-    return build_server(*resolve_binding()), work
+    return server_of_the_environment(), work
 
 
 def test_blueprint_example_tool_has_a_service_flag(root_server):
@@ -183,10 +179,6 @@ def test_apply_with_a_first_request_says_to_start(root_server):
     assert "first request: service my-service, task " in reply and "Next step: call start()" in reply
 
 
-# ------------------------------------------------------------------------------ skill, README, example
-
-
-SKILL = ROOT_DIR / "skills" / "orgmcp" / "SKILL.md"
 README = ROOT_DIR / "README.md"
 EXAMPLE = ROOT_DIR / "examples" / "blueprint-service.yaml"
 

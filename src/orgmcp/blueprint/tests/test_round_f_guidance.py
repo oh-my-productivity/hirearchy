@@ -1,14 +1,14 @@
-"""Round F guidance (study E): verifiers enumerate independently, feedback never waives a criterion, the skill's new lines,
-and the README documents the behaviours."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import re
-from pathlib import Path
 
 import pytest
+import testkit
 
-from orgmcp import blueprint as bpm
+from testkit.blueprint_world import bpm
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = testkit.REPO
 SKILL = (ROOT_DIR / "skills" / "orgmcp" / "SKILL.md").read_text(encoding="utf-8")
 README = (ROOT_DIR / "README.md").read_text(encoding="utf-8")
 

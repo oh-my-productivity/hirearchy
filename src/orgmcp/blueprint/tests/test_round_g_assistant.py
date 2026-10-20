@@ -1,13 +1,12 @@
-"""Round G (study E2, assistant side): the skill's reading-of-criteria, relative-values and case-cost lines, the clean plan block
-(heading and markers), and the README."""
-
-from pathlib import Path
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
+import testkit
 
-from orgmcp import blueprint as bpm
+from testkit.blueprint_world import bpm
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = testkit.REPO
 SKILL = (ROOT_DIR / "skills" / "orgmcp" / "SKILL.md").read_text(encoding="utf-8")
 README = (ROOT_DIR / "README.md").read_text(encoding="utf-8")
 
