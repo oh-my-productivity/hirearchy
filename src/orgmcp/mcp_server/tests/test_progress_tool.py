@@ -2,17 +2,13 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
-import os
-import sys
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp.cli import main
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.scheduler import Scheduler, describe_scheduler
-from testkit.legacy.orgmcp.server import build_server, resolve_binding
+from testkit.mcp_server_world import build_server, describe_progress, describe_scheduler, resolve_binding, serve_until_done
 
-from orgmcp.progress import describe_progress
+from orgmcp.app.wire_cli import run_cli as main
 
 FAKE = str(testkit.FAKE_AGENT)
 
@@ -53,16 +49,9 @@ def test_progress_tool_and_cli_take_the_wait(org, task, capsys, tmp_path, monkey
 
 
 # ------------------------------------------------------------------------------------ until done
-def fake_runner(mode="work"):
-    def build(o, addr, prompt):
-        return [sys.executable, FAKE], o.dir(addr), {**os.environ, "ORG_ROOT": str(o.root), "ORG_AGENT": addr, "FAKE_MODE": mode}
-
-    return build
-
-
 def test_status_and_progress_show_the_finished_scheduler_until_new_work_arrives(org):
     org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
-    Scheduler(org, fake_runner("work"), echo=lambda _: None).serve(until_done=True)
+    serve_until_done(org, FAKE, "work")
     assert describe_progress(org).splitlines()[-1] == "scheduler: stopped (finished: no open tasks)"
     server = build_server(org, ROOT)
     assert "scheduler: stopped (finished: no open tasks)" in call(server, "status")

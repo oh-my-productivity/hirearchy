@@ -8,9 +8,10 @@ import pytest
 import testkit
 import testkit.legacy.yaml as yaml
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.legacy.orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
+from testkit.mcp_server_world import blueprint as blueprint_mod
+from testkit.mcp_server_world import build_server, resolve_binding
 
-from orgmcp import blueprint as blueprint_mod
+from orgmcp.mcp_server._instructions import ROOT_INSTRUCTIONS
 
 EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"
 

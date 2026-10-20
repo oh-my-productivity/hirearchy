@@ -4,7 +4,7 @@
 import asyncio
 
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.server import build_server
+from testkit.mcp_server_world import build_server
 
 
 def call(server, tool, **args):

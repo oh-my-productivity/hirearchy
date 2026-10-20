@@ -3,7 +3,7 @@
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.server import build_server
+from testkit.mcp_server_world import build_server
 from testkit.services_world import call, contract_meta, define, fails
 
 

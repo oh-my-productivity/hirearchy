@@ -9,8 +9,7 @@ import sys
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT, OrgError
-from testkit.legacy.orgmcp.scheduler import ensure_kiro_profile
-from testkit.legacy.orgmcp.server import OrgBinding, build_server, resolve_binding
+from testkit.mcp_server_world import OrgBinding, build_server, ensure_kiro_profile, resolve_binding
 
 ROOT_TOOLS = {
     "whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health",

@@ -6,9 +6,10 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from testkit.legacy.orgmcp import core
-from testkit.legacy.orgmcp.cli import main
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.server import build_server
+from testkit.mcp_server_world import build_server
+
+from orgmcp.app.wire_cli import run_cli as main
 
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 

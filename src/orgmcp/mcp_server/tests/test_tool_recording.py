@@ -10,9 +10,7 @@ import sys
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.legacy.orgmcp.server import build_server
-
-from orgmcp import telemetry
+from testkit.mcp_server_world import build_server, telemetry
 
 
 # ---------------------------------------------------------------------------------------------------- helpers
@@ -203,7 +201,7 @@ def test_the_async_progress_tool_is_recorded(org):
 
 def test_a_server_without_an_organization_still_works_and_writes_nothing(tmp_path):
     target = tmp_path / "later"
-    from testkit.legacy.orgmcp.server import OrgBinding
+    from testkit.mcp_server_world import OrgBinding
 
     server = build_server(OrgBinding(target), ROOT)
     assert "Setup" in str(call(server, "whoami"))

@@ -5,7 +5,7 @@ import asyncio
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.server import build_server, resolve_binding
+from testkit.mcp_server_world import StartRecorder, build_server, resolve_binding
 
 
 def call(server, tool, **args):
@@ -25,22 +25,28 @@ def stalled_on_budget(org):
 
 
 @pytest.fixture
-def root_server(org, monkeypatch):
+def starts():
+    """Stands for the patch point ``orgmcp.server.start_scheduler``: the starter the server's ``start`` tool calls."""
+    return StartRecorder()
+
+
+@pytest.fixture
+def root_server(org, monkeypatch, starts):
     monkeypatch.setenv("ORG_ROOT", str(org.root))
     for var in ("ORG_AGENT", "ORG_REQUIRE_AGENT"):
         monkeypatch.delenv(var, raising=False)
-    return build_server(*resolve_binding())
+    return build_server(*resolve_binding(), starts=starts)
 
 
-def test_start_refuses_when_nothing_can_progress(org, stalled_on_budget, root_server, monkeypatch):
-    monkeypatch.setattr("orgmcp.server.start_scheduler", lambda *a: pytest.fail("must not start"))
+def test_start_refuses_when_nothing_can_progress(org, stalled_on_budget, root_server, starts):
+    starts.use(lambda *a: pytest.fail("must not start"))
     for until_done in (True, False):
         out = call(root_server, "start", until_done=until_done)
         assert out.startswith("not started: nothing can progress without you")
         assert 'needs budget (ceo out of runs)' in out and 'send(to="ceo", body="<why>", budget=N)' in out
     org.send(ROOT, "ceo", "more", budget=2)
     seen = {}
-    monkeypatch.setattr("orgmcp.server.start_scheduler", lambda o, m, u: seen.update(u=u) or 77)
+    starts.use(lambda m, u: seen.update(u=u) or 77)
     assert "scheduler started (pid 77" in call(root_server, "start") and seen == {"u": True}
 
 

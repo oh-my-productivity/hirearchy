@@ -5,7 +5,7 @@ import asyncio
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.server import build_server
+from testkit.mcp_server_world import build_server
 
 ENG, QA = "ceo/eng", "ceo/qa"
 
@@ -52,8 +52,9 @@ def test_mcp_tool(team, org, monkeypatch):
 
 
 def test_skill_and_root_instructions_carry_the_reclaim_and_cheap_model_rules():
-    from testkit.legacy.orgmcp.server import ROOT_INSTRUCTIONS
-    from testkit.legacy.orgmcp.skill import skill_source
+    from testkit.mcp_server_world import skill_source
+
+    from orgmcp.mcp_server._instructions import ROOT_INSTRUCTIONS
 
     skill = skill_source().read_text()
     assert len(skill.splitlines()) <= 125 and len(ROOT_INSTRUCTIONS) < 2800

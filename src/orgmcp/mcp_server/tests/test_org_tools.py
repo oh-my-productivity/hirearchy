@@ -3,7 +3,7 @@
 
 import asyncio
 
-from testkit.legacy.orgmcp.server import build_server, resolve_binding
+from testkit.mcp_server_world import build_server, resolve_binding
 
 
 def call(server, tool, **args):

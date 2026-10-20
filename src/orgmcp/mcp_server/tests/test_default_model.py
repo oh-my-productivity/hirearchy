@@ -5,7 +5,7 @@ from testkit.legacy.orgmcp.core import DEFAULT_MODEL
 
 
 def test_create_org_without_a_model_uses_the_default(tmp_path, monkeypatch):
-    from testkit.legacy.orgmcp.server import resolve_binding
+    from testkit.mcp_server_world import resolve_binding
 
     monkeypatch.setenv("ORG_ROOT", str(tmp_path / "new"))
     binding, _ = resolve_binding()

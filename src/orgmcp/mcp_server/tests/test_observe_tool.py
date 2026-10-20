@@ -6,7 +6,7 @@ import dataclasses
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.legacy.orgmcp.server import build_server
+from testkit.mcp_server_world import build_server
 from testkit.obs_fixtures import Story, freeze, stamp
 
 from orgmcp.kernel.testing import FakeClock
@@ -58,7 +58,7 @@ def test_observe_tool_is_root_only_and_read_only(org, story):
 
 
 def test_observe_tool_docstring_is_short_and_says_read_only():
-    from testkit.legacy.orgmcp import observe as o
+    from orgmcp.mcp_server._tools_observe import ObservabilityTools
 
     class Fake:
         tools = {}
@@ -70,7 +70,7 @@ def test_observe_tool_docstring_is_short_and_says_read_only():
 
             return deco
 
-    o.register_observe_tool(Fake(), None)
+    ObservabilityTools(lambda: None).register(Fake(), ROOT)
     doc = Fake.tools["observe"].__doc__
     assert doc.startswith("Read-only") and len(doc) < 900
     for view in ("now", "trace", "metrics", "events", "check"):

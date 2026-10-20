@@ -5,16 +5,16 @@ import asyncio
 
 import testkit.legacy.yaml as yaml
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.server import build_server
+from testkit.mcp_server_world import build_server, services
 from testkit.services_world import BRIEF, ENG, call, define, deliver, fails, request, svc, work
 
-from orgmcp import services
+from orgmcp.services import ServiceCommands
 
 WEEKDAY = "weekly-brief"
 
 
 def test_the_feedback_tool_text_no_longer_says_a_later_one_replaces_the_earlier(svc):
-    doc = services.feedback.__doc__
+    doc = ServiceCommands.feedback.__doc__
     assert "replaces" not in doc and "stays in the case" in doc
     tools = {t.name: t for t in __import__("asyncio").run(build_server(svc, ROOT).list_tools())}
     assert "replaces this one" not in tools["feedback"].description

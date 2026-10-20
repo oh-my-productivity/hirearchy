@@ -1,7 +1,7 @@
 # mypy: ignore-errors
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
-from testkit.legacy.orgmcp.server import ROOT_INSTRUCTIONS
+from orgmcp.mcp_server._instructions import ROOT_INSTRUCTIONS
 
 
 def test_root_instructions_carry_the_finishing_rules_within_the_length_limit():

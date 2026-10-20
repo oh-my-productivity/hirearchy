@@ -7,12 +7,11 @@ from pathlib import Path
 
 import pytest
 import testkit.legacy.yaml as yaml
-from testkit.legacy.orgmcp import blueprint_examples
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.legacy.orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
-from testkit.legacy.orgmcp.skill import skill_source
+from testkit.mcp_server_world import build_server, resolve_binding, skill_source
+from testkit.mcp_server_world import blueprint as bp_mod
 
-from orgmcp import blueprint as bp_mod
+from orgmcp.mcp_server._instructions import ROOT_INSTRUCTIONS
 
 ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}  # shell-unconfined: the code example grants shell
 
@@ -166,7 +165,7 @@ def test_apply_org_with_the_plan_id_still_refuses_a_blueprint_with_errors(setup)
 
 
 # ----------------------------------------------------------------------------------- blueprint_example
-@pytest.mark.parametrize("kind", blueprint_examples.KINDS)
+@pytest.mark.parametrize("kind", bp_mod.KINDS)
 def test_every_example_validates_and_round_trips_through_propose_org(setup, kind):
     server, _ = setup
     text = example(server, kind)
@@ -197,7 +196,7 @@ def test_example_paths_start_in_the_users_current_directory(setup, env):
 def test_unknown_example_kind_lists_the_kinds(setup):
     server, _ = setup
     msg = fails(server, "blueprint_example", kind="poetry")
-    for k in blueprint_examples.KINDS:
+    for k in bp_mod.KINDS:
         assert k in msg
 
 

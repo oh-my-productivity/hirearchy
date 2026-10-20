@@ -7,7 +7,7 @@ import sys
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.legacy.orgmcp.server import build_server, resolve_binding
+from testkit.mcp_server_world import build_server, resolve_binding
 
 ROOT_TOOLS = {
     "whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health",

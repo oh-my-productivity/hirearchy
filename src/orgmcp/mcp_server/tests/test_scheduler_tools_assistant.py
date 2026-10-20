@@ -5,7 +5,7 @@ import asyncio
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.server import build_server, resolve_binding
+from testkit.mcp_server_world import StartRecorder, build_server, resolve_binding
 
 
 def call(server, tool, **args):
@@ -36,9 +36,10 @@ def test_start_tool_defaults_to_until_done(org, monkeypatch):
 def test_start_tool_passes_until_done_to_the_scheduler(org, monkeypatch):
     monkeypatch.setenv("ORG_ROOT", str(org.root))
     org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
-    server = build_server(*resolve_binding())
+    starts = StartRecorder()
+    server = build_server(*resolve_binding(), starts=starts)
     seen = {}
-    monkeypatch.setattr("orgmcp.server.start_scheduler", lambda o, m, u: seen.update(max=m, until_done=u) or 4242)
+    starts.use(lambda m, u: seen.update(max=m, until_done=u) or 4242)
     assert "exits by itself when the work is done" in call(server, "start", max_runs=2)
     assert seen == {"max": 2, "until_done": True}
     assert "runs until stop()" in call(server, "start", until_done=False)

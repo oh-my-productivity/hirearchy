@@ -9,7 +9,7 @@ ENG = "ceo/eng"
 def test_retire_tool_reports_the_refund(org):
     import asyncio
 
-    from testkit.legacy.orgmcp.server import build_server
+    from testkit.mcp_server_world import build_server
 
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     org.delegate("ceo", ENG, "t", "g", "a", budget=4)

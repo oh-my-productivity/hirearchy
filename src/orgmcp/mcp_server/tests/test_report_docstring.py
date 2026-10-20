@@ -5,7 +5,7 @@ import asyncio
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.server import build_server
+from testkit.mcp_server_world import build_server
 
 ENG = "ceo/eng"
 CRITERIA = "exactly 33 words; a non-author reviews the final text"
