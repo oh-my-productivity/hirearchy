@@ -7,7 +7,7 @@ import pytest
 from golden_support import check
 from scenarios import busy_org
 
-from orgmcp.cli import main
+from orgmcp import main
 
 
 @pytest.fixture

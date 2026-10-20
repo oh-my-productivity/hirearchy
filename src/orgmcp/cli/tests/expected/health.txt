@@ -1,0 +1,5 @@
+2 agents, 0 flagged
+ceo pending, budget 8/8, runs 0, open 1 (oldest 3m), done 0 failed 0 blocked 0 rework 0, runs/task -, empty 0, last activity 2m ago | branch: runs 0, open 1, done 0, failed 0, blocked 0, rework 0, worst none
+  eng idle, budget 0/0, runs 0, open 0, done 0 failed 0 blocked 0 rework 0, runs/task -, empty 0, last activity never
+
+[exit 0]

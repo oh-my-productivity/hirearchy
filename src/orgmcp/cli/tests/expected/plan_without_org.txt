@@ -1,0 +1,48 @@
+# Plan for approval
+
+Goal: Golden blueprint mission.
+
+Needs as understood:
+- Scope: a small written deliverable
+- Deliverable: A one page note [markdown, max 300 words]
+- Quality bar: The note is clear.
+- Sources / tools: (not specified)
+- Workspace: none (no agent writes files or runs commands)
+- Model policy: (not specified)
+- Review: (not specified)
+
+Organization (2 agents):
+- lead [manager] Manager: model=claude-sonnet-5.5, tools=none
+  - writer [writer] Writer: model=claude-sonnet-5.5, tools=none
+
+Budget: 10 runs planned (your cap: 12), estimate 8 for one pass + one review/rework cycle:
+  This is a ceiling: runs the team does not spend come back automatically, agent by agent, with their final reports, until what is left returns to you.
+  lead: starts with 10, hands down writer 3 (each includes its rework/re-check run), keeps 7 (own 5 + slack 2)
+  lead/writer: 3 runs (2 work + 1 rework)
+
+Review / verification:
+- no independent reviewer (!)
+- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done
+
+Deliverable:
+- A one page note (markdown, max 300 words)
+- Final location: inside the organization (no path given)
+
+First task: to lead: Write the note
+  1. The note has a title.
+  2. The note has a summary of two sentences.
+
+Checkpoints:
+- Approval: plan approval before anything is built or started (default)
+- Progress: one line on request (default)
+- Any spend beyond the budget needs your OK.
+
+Warnings (4):
+- task.acceptance: the 300-word limit is not in any criterion; add an exact criterion such as 'at most 300 words (as counted by read)'
+- needs.review: review not decided: set needs.review to true (independent check) or false; no independent verifier is planned
+- needs.approval: not elicited: when the user wants to approve (plan, before start, final)
+- needs.progress: not elicited: how the user wants progress updates
+
+Reply 'approve' or tell me what to change.
+
+[exit 0]

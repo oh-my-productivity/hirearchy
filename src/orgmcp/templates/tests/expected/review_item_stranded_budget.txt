@@ -1,0 +1,2 @@
+- `ceo/eng` stranded_budget: no result for 2h
+  -> ask `ceo/eng` to return its budget (it can `send` its parent a note with `budget=N`), or retire it

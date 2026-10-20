@@ -1,0 +1,42 @@
+ orgmcp dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |  running 2/2  queued 1  waiting on you 1  errors 15m 2
+▼ ★ root (you)  needs you: 1                                              │ Overview  Activity  Messages  Run log  Memory  Charter
+├─ ○ archivist  idle  0 left                                              │━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╸━━━━━━━╺━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+├─ ▼ ▶ ceo  running 1m12s  3 left                                         │ started 2026-10-18 10:02:20Z
+│  ├─ ◔ analyst  queued: all slots busy, 1 unread  4 left                 │ run of ops/deploy, 1 message(s)
+│  └─ ◆ writer  working on 1 task(s)  2 left                              │ senders: ops
+├─ ▼ ◇ ops  waiting on 1 report(s)  3 left                                │ exit 1 after 10s
+│  ├─ ‖ audit  paused by the user: audit window closed  0 left            │ ops/deploy/runs/20261018T100220000001.log  (245 bytes)  [last run]
+│  └─ ‖ deploy  paused: 2 consecutive failed runs, 1 unread  1 left       │
+└─ ▼ ▶ research  running 2m05s  4 left                                    │ # run of ops/deploy, 1 message(s)
+   └─ ! crawler  out of budget  0 left                                    │ # senders: ops
+                                                                          │ # cwd: /path/to/acme/ops/deploy
+                                                                          │ # cmd: kiro-cli chat --no-interactive <prompt on stdin>
+                                                                          │ # ---- prompt ----
+                                                                          │ (prompt)
+                                                                          │ # ---- output ----
+                                                                          │ error: deploy tool crashed
+                                                                          │ # exit 1 after 10s
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+ ←/h Fold  →/l Unfold/pane  ⏎ Open  12345 Screen  r Refresh  p Pause  ? Help  q Quit  [] Tab

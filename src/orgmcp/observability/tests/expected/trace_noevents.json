@@ -1,0 +1,184 @@
+{
+  "task": "20261018T100000000003-root-0005",
+  "title": "Ship it",
+  "assignee": "ceo",
+  "state": "done",
+  "partial": true,
+  "notes": [
+    "partial: no run events for this request (queue waits, tool calls and refusals unknown); runs and durations come from the run logs"
+  ],
+  "start": "2026-10-18T10:00:00.000003+00:00",
+  "end": "2026-10-18T10:02:05.000001+00:00",
+  "team": [
+    "ceo",
+    "ceo/eng"
+  ],
+  "window": {
+    "start": "20261018T100000000003",
+    "end": "20261018T100205000001"
+  },
+  "items": [
+    {
+      "t": "2026-10-18T10:00:00.000003+00:00",
+      "order": 1,
+      "kind": "message",
+      "agent": "root",
+      "id": "20261018T100000000003-root-0005",
+      "type": "task",
+      "from": "root",
+      "to": "ceo",
+      "title": "Ship it",
+      "status": null,
+      "budget": 6,
+      "trace_source": "recorded",
+      "rel_ms": 0.0
+    },
+    {
+      "t": "2026-10-18T10:00:03.000001+00:00",
+      "order": 2,
+      "kind": "run",
+      "agent": "ceo",
+      "run": "ceo@20261018T100003000001",
+      "start": "2026-10-18T10:00:03.000001+00:00",
+      "outcome": "ok",
+      "ok": true,
+      "end": null,
+      "duration_ms": 42000.0,
+      "exit_code": 0,
+      "error": null,
+      "batch": null,
+      "traces": null,
+      "queue_ms": null,
+      "source": "log",
+      "pid": null,
+      "tool_calls": {
+        "total": 0,
+        "by_tool": {},
+        "refused": []
+      },
+      "shared_with": [],
+      "rel_ms": 2999.998
+    },
+    {
+      "t": "2026-10-18T10:00:20.000001+00:00",
+      "order": 1,
+      "kind": "message",
+      "agent": "ceo",
+      "id": "20261018T100020000001-ceo-0008",
+      "type": "task",
+      "from": "ceo",
+      "to": "ceo/eng",
+      "title": "Build",
+      "status": null,
+      "budget": 3,
+      "trace_source": "recorded",
+      "rel_ms": 19999.998000000003
+    },
+    {
+      "t": "2026-10-18T10:01:10.000001+00:00",
+      "order": 2,
+      "kind": "run",
+      "agent": "ceo/eng",
+      "run": "ceo/eng@20261018T100110000001",
+      "start": "2026-10-18T10:01:10.000001+00:00",
+      "outcome": "ok",
+      "ok": true,
+      "end": null,
+      "duration_ms": 30000.0,
+      "exit_code": 0,
+      "error": null,
+      "batch": null,
+      "traces": null,
+      "queue_ms": null,
+      "source": "log",
+      "pid": null,
+      "tool_calls": {
+        "total": 0,
+        "by_tool": {},
+        "refused": []
+      },
+      "shared_with": [],
+      "rel_ms": 69999.998
+    },
+    {
+      "t": "2026-10-18T10:01:35.000001+00:00",
+      "order": 1,
+      "kind": "message",
+      "agent": "ceo/eng",
+      "id": "20261018T100135000001-ceo.eng-000c",
+      "type": "result",
+      "from": "ceo/eng",
+      "to": "ceo",
+      "title": "Build",
+      "status": "done",
+      "budget": 2,
+      "trace_source": "recorded",
+      "rel_ms": 94999.998
+    },
+    {
+      "t": "2026-10-18T10:01:55.000001+00:00",
+      "order": 2,
+      "kind": "run",
+      "agent": "ceo",
+      "run": "ceo@20261018T100155000001",
+      "start": "2026-10-18T10:01:55.000001+00:00",
+      "outcome": "ok",
+      "ok": true,
+      "end": null,
+      "duration_ms": 15000.0,
+      "exit_code": 0,
+      "error": null,
+      "batch": null,
+      "traces": null,
+      "queue_ms": null,
+      "source": "log",
+      "pid": null,
+      "tool_calls": {
+        "total": 0,
+        "by_tool": {},
+        "refused": []
+      },
+      "shared_with": [],
+      "rel_ms": 114999.998
+    },
+    {
+      "t": "2026-10-18T10:02:05.000001+00:00",
+      "order": 1,
+      "kind": "message",
+      "agent": "ceo",
+      "id": "20261018T100205000001-ceo-0010",
+      "type": "result",
+      "from": "ceo",
+      "to": "root",
+      "title": "Ship it",
+      "status": "done",
+      "budget": 3,
+      "trace_source": "recorded",
+      "rel_ms": 124999.998
+    }
+  ],
+  "totals": {
+    "wall_ms": 124999.998,
+    "runs": 3,
+    "run_ms": 87000.0,
+    "queue_ms": 0,
+    "user_wait_ms": 0.0,
+    "tool_calls": 0,
+    "refusals": 0,
+    "outcomes": {
+      "ok": 3
+    },
+    "budget_given": 6,
+    "budget_used": 3,
+    "budget_returned": 3,
+    "tasks": [
+      {
+        "task": "20261018T100000000003-root-0005",
+        "title": "Ship it",
+        "state": "done",
+        "runs": 3,
+        "budget": 6
+      }
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+
+# Your services
+The contract (SERVICE.md) is your parent's; the playbook (PLAYBOOK.md) is yours.
+- weekly-brief: contract v1, no playbook yet, 0 request(s) so far; contract: ceo/services/weekly-brief/SERVICE.md; playbook: ceo/services/weekly-brief/PLAYBOOK.md

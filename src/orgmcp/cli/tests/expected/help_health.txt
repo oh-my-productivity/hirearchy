@@ -1,0 +1,6 @@
+usage: orgmcp health [-h] [--agent ADDR] [--json]
+
+options:
+  -h, --help    show this help message and exit
+  --agent ADDR  only this agent and its subtree (default: whole organization)
+  --json        print the structured data

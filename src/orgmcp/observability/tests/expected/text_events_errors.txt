@@ -1,0 +1,4 @@
+3 of 9 matching event(s), oldest first - 6 earlier one(s) not shown: narrow with since/agent/kind/trace or raise the limit
+10:00:05 scheduler runtime scheduler.error phase=stall check error="boom"
+10:03:15 mcp ceo tool.call send REFUSED 5ms error="ceo cannot message nobody" error_type=OrgError run=ceo@20261018T100300000003
+09:26:40 mcp ceo tool.call send REFUSED 5ms error="an old refusal" error_type=OrgError

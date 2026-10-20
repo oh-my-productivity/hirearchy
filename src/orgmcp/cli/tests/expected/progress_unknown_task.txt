@@ -1,0 +1,5 @@
+
+[stderr]
+error: no task nope given by root. Tasks: 20260115T090200000000-root-0000
+
+[exit 1]

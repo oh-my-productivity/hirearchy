@@ -1,0 +1,14 @@
+metrics 2026-10-18T00:00:00Z .. 2026-10-18T10:03:20Z (29 event(s) in the window)
+runs 5: ok 5, failed 0, timeout 0, killed 0 | duration p50 15s p95 42s max 42s (n=5) | queue p50 20s p95 1m00s (n=5)
+budget spent 5 run(s)
+tool calls 11, refused 4 (36.4%)
+  delegate             5 calls   3 refused (60%) p50 4ms p95 5ms
+  report               3 calls   0 refused (0%) p50 5ms p95 5ms
+  write                2 calls   1 refused (50%) p50 1ms p95 5ms
+  inbox                1 calls   0 refused (0%) p50 5ms p95 5ms
+top refusals:
+  3x not enough budget: you have N run(s) and must keep N in reserve  (delegatex3)
+  1x ceo/eng cannot write <path>  (writex1)
+messages: result 2, task 4
+scheduler: 2 start(s); errors: stall check x1; exits: finished: no open tasks x1
+stalls 1, pauses 1 (failures x1), agent failures 1, orphaned runs 1

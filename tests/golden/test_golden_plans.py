@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 from golden_support import check
 
-from orgmcp import blueprint_examples
-from orgmcp.server import OrgBinding, build_server
+from orgmcp.blueprint import EXAMPLE_KINDS
+from testkit.mcp_server_world import OrgBinding, build_server
 
 PROJECT = Path(__file__).resolve().parents[2]
 PLAN_ID = re.compile(r"[0-9a-f]{12}")
@@ -66,7 +66,7 @@ def fill(text: str) -> str:
     return re.sub(r"<[A-Z][^<>\n]*>", "Sample text", text)
 
 
-CASES = [(kind, service) for kind in blueprint_examples.KINDS for service in (False, True)]
+CASES = [(kind, service) for kind in EXAMPLE_KINDS for service in (False, True)]
 
 
 @pytest.mark.parametrize("kind, service", CASES, ids=[f"{k}{'-service' if s else ''}" for k, s in CASES])

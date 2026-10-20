@@ -1,0 +1,30 @@
+ orgmcp dash empty  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler stopped  |  running 0/3  queued 0  waiting on you 0  errors 15m 0
+ service  owner  versions  requests  done/failed/open  reworked  feedback  avg runs  latest playbook
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                            ▋
+ ⏎ Open  12345 Screen  r Refresh  p Pause  ? Help  q Quit

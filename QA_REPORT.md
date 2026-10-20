@@ -1,14 +1,14 @@
 # orgmcp QA report
 
 Scope: `git diff 5207608..5a81dcb` plus the base modules it touches. Baseline: 89 tests pass.
-Reproductions are in `tests/test_qa_findings.py`: 20 tests, all `xfail(strict=True)`, one or two per finding.
+Reproductions were written as `tests/test_qa_findings.py`: 20 tests, all `xfail(strict=True)`, one or two per finding. Their fixes landed long ago and the tests now live next to the code they test, as plain passing tests in the `test_qa_findings.py` of `src/orgmcp/{budget,cli,dispatch,health,hierarchy,orgfiles,prompts,review,scheduler}/tests/`. The component column names the code as it was when this report was written (`core`, `scheduler`, ... were modules; they are packages now, see ARCHITECTURE.md section 5 for where each function went).
 Each asserts the *correct* behavior, so it flips to XPASS (a strict failure) once the bug is fixed.
 Each was also run with `--runxfail` to confirm it fails for the stated reason.
 No product code was changed.
 
 ## Findings
 
-Severity is by impact on a live org. The test column gives the test name in `tests/test_qa_findings.py`.
+Severity is by impact on a live org. The test column gives the test name in the `test_qa_findings.py` files listed above.
 
 | id | sev | component | description | repro / evidence | suggested fix |
 |---|---|---|---|---|---|

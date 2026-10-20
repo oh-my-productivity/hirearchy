@@ -1,0 +1,8 @@
+5 of 5 matching event(s), oldest first
+09:01:00 cli root agent.hire agent=ceo by=root role=Chief executive model=claude-sonnet-5.5
+09:01:00 cli ceo agent.hire agent=ceo/eng by=ceo role=Engineer model=claude-sonnet-5.5
+09:02:00 cli root msg.deliver id=20260115T090200000000-root-0000 type=task from=root to=ceo title=Ship it budget=8 wake=True hops=0 chars=62 trace_rule=new trace=20260115T090200000000-root-0000
+09:03:00 cli ceo msg.deliver id=20260115T090300000000-ceo-0001 type=note from=ceo to=root title=Greeting budget=0 wake=True hops=1 chars=19 trace_rule=open-task trace=20260115T090200000000-root-0000
+09:04:00 cli root service.define owner=ceo service=weekly version=1 by=root amendment=False
+
+[exit 0]

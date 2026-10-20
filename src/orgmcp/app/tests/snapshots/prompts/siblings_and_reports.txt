@@ -1,0 +1,37 @@
+- Address: `ceo`; parent: `root`; role: Chief executive
+- Budget: 6 run(s) left (this run already counted). Hiring: allowed (2/3 reports)
+- Tools beyond orgmcp: none
+- Direct reports:
+  - ceo/eng [Engineer] pending, budget 2, open tasks 1, delegated 0, unread 1
+  - ceo/qa [Quality assurance] idle, budget 0, open tasks 0, delegated 0, unread 0
+- Open tasks assigned to you:
+  - <ID1> "Plan" from root
+    > ## Goal
+    > Make a plan.
+    >
+    > ## Acceptance criteria
+    > plan.md exists
+- Work you delegated that is still outstanding:
+  - <ID2> "Build" -> ceo/eng (pending)
+=====
+- Address: `ceo/eng`; parent: `ceo`; role: Engineer
+- Budget: 2 run(s) left (this run already counted). Hiring: not allowed
+- Tools beyond orgmcp: none
+- Direct reports: none
+- Siblings: ceo/qa
+- Open tasks assigned to you:
+  - <ID2> "Build" from ceo
+    > ## Goal
+    > Build it.
+    >
+    > ## Acceptance criteria
+    > it builds
+- Work you delegated that is still outstanding: none
+=====
+- Address: `ceo/qa`; parent: `ceo`; role: Quality assurance
+- Budget: 0 run(s) left (this run already counted). Hiring: not allowed
+- Tools beyond orgmcp: none
+- Direct reports: none
+- Siblings: ceo/eng
+- Open tasks assigned to you: none
+- Work you delegated that is still outstanding: none

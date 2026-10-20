@@ -1,0 +1,5 @@
+
+[stderr]
+error: not an organization (no ORG.md): <TMP>/nowhere
+
+[exit 1]

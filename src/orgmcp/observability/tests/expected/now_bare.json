@@ -1,0 +1,26 @@
+{
+  "now": "2026-10-18T10:03:20+00:00",
+  "scheduler": {
+    "state": "stopped",
+    "pid": null,
+    "since": null,
+    "detail": "",
+    "mode": null,
+    "uptime_s": null,
+    "last_heartbeat_age_s": null,
+    "last_exit": null,
+    "heartbeats": false
+  },
+  "max_parallel": 3,
+  "runs_in_flight": [],
+  "queued": [],
+  "waiting_on_you": [],
+  "open_root_tasks": 0,
+  "paused": {},
+  "errors_15m": {
+    "count": 0,
+    "events": []
+  },
+  "last_event": null,
+  "events_seen": false
+}

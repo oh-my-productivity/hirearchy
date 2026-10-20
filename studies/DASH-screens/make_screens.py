@@ -3,13 +3,14 @@
     cd <repo> && uv run python studies/DASH-screens/make_screens.py
 
 Writes one SVG per screen into this directory (and a PNG next to it when ``rsvg-convert`` is on PATH), plus
-``once.txt`` (the output of ``orgmcp dash --once``). The demo org is built under ``$TMPDIR`` by ``tests/dash_fixtures.py``
+``once.txt`` (the output of ``orgmcp dash --once``). The demo org is built under ``$TMPDIR`` by ``tests/testkit/dash_fixtures.py``
 with a frozen clock, so the pictures are the same every time.
 """
 
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import shutil
 import subprocess
 import sys
@@ -19,12 +20,14 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[1] / "tests"))
 
-from dash_fixtures import DEMO_NOW, demo_org  # noqa: E402
+from testkit.dash_fixtures import DEMO_NOW, demo_org  # noqa: E402
+from testkit.dashboard_world import dash_app  # noqa: E402
+from testkit.dashdata_world import dd  # noqa: E402
+from testkit.scheduler import scheduler_is  # noqa: E402
 
-from orgmcp import dashboard_data as dd  # noqa: E402
-from orgmcp import observe  # noqa: E402
-from orgmcp.dashboard import DashApp  # noqa: E402
-from orgmcp.scheduler import SchedulerState  # noqa: E402
+from orgmcp.app import wiring  # noqa: E402
+from orgmcp.dashboard._app import DashApp  # noqa: E402
+from orgmcp.daemon import SchedulerState  # noqa: E402
 
 SIZE = (150, 42)
 
@@ -40,13 +43,16 @@ def save(app: DashApp, name: str) -> None:
 
 
 async def main() -> None:
-    up = lambda org: SchedulerState("running", 7000, "2026-10-18 10:00:00Z")  # noqa: E731 - the demo has no real scheduler
-    dd.scheduler_state = up
-    observe.scheduler_state = up
+    with contextlib.ExitStack() as stack:  # the process overrides stay in force while the screens are taken; the demo has no real scheduler
+        scheduler_is(lambda overrides: stack.enter_context(wiring.overriding(overrides)), SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))
+        await screens()
+
+
+async def screens() -> None:
     ns = demo_org(Path(tempfile.mkdtemp(prefix="dash-demo-")))
     once = dd.render_once(dd.DashData(ns.org.root, now=lambda: DEMO_NOW)).replace(str(ns.org.root), "/path/to/acme")
     (HERE / "once.txt").write_text(once + "\n", encoding="utf-8")
-    app = DashApp(ns.org.root, interval=3600, now=lambda: DEMO_NOW)
+    app = dash_app(ns.org.root, interval=3600, now=lambda: DEMO_NOW)
     async with app.run_test(size=SIZE) as pilot:
         async def step(*keys: str, name: str, wait: float = 0.0) -> None:
             await pilot.press(*keys)

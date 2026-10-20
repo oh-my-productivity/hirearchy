@@ -37,31 +37,56 @@ exclude = ["**/tests/**"]
 [tool.pytest.ini_options]
 # Tests live in tests/ (cross-feature, end-to-end, golden) and next to the code in src/orgmcp/**/tests/ (see README, "Test").
 # The shared fixtures and hooks are in the root conftest.py, so they reach both places; tests/ is on sys.path so tests can
-# import the helper modules that live there (fake_agent, kiro_sandbox, dash_fixtures, ...).
+# import the shared helpers (`import testkit`: fixtures, the stand-in agents fake_agent / fake_team_agent, kiro_sandbox, dash_fixtures, ...).
 testpaths = ["tests", "src/orgmcp"]
 pythonpath = ["tests"]
 markers = [
     "integration: uses the real kiro-cli / a real LLM; skipped unless --run-integration (or ORGMCP_RUN_INTEGRATION=1)",
+    "perf: timing guards; opt-in with ORGMCP_RUN_PERF=1 (the deterministic, count-based guards run by default)",
+    "architecture: structural checks of the refactor (tests/architecture); deselect with -m 'not architecture' for a quick loop",
 ]
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Static checks (dev tooling, pinned in [dependency-groups]). One command runs everything: scripts/check.sh
-# (pytest, which includes tests/test_static_checks.py, + mypy + lint-imports). README, "Test".
+# (pytest, which includes tests/architecture/test_static_checks.py, + mypy + lint-imports). README, "Test".
 # ---------------------------------------------------------------------------------------------------------------------
 
 [tool.mypy]
-# STRICT CHECKING, PACKAGE BY PACKAGE. `packages` is the list of refactored packages that must pass `strict = true`;
-# it is EMPTY until the first one exists. To put a package under strict checking add it here, e.g.
-#     packages = ["orgmcp.kernel", "orgmcp.messaging"]
-# Everything not listed is only *followed* (its types are used, its errors are not reported), so today's untyped
-# modules never fail the run. Run it with `uv run python scripts/static_checks.py mypy` (an empty list is a no-op).
+# STRICT CHECKING, PACKAGE BY PACKAGE. scripts/static_checks.py checks with `strict = true` every package directory of src/orgmcp
+# (a directory with __init__.py: kernel, the features, the entry points, app) -- so a new package is strict from its first commit and
+# no step edits this file -- plus the modules listed in `packages` below. Production code is strict; the test code (src/orgmcp/**/tests,
+# tests/) is not type-checked strictly: the tests moved by step E1 carry `# mypy: ignore-errors`. Everything outside the packages is only
+# *followed* (its types are used, its errors are not reported).
+# Run it with `uv run python scripts/static_checks.py mypy`.
 python_version = "3.11"
-mypy_path = "src"
+mypy_path = "src:tests"  # tests/ too: a colocated test may `import testkit`
 namespace_packages = true
 explicit_package_bases = true
 strict = true
 follow_imports = "silent"
-packages = []
+packages = ["orgmcp.kernel"]
+
+[[tool.mypy.overrides]]
+# R10: no explicit `Any` in the public surface (api.py) of a refactored package. `JsonObject = dict[str, object]` replaces dict[str, Any].
+module = ["orgmcp.*.api"]
+disallow_any_explicit = true
+
+[[tool.mypy.overrides]]
+# Colocated tests and the in-memory fakes use pytest fixtures/marks, which are untyped decorators.
+module = ["orgmcp.*.tests.*", "orgmcp.*.testing"]
+disallow_untyped_decorators = false
+
+[[tool.mypy.overrides]]
+# The builder is a registry keyed by Protocol classes (`b.get(Clock)`): mypy refuses a Protocol where `type[T]` is expected unless
+# this check is off (its documented remedy). Only the composition root has such a registry.
+module = ["orgmcp.app", "orgmcp.app.*"]
+disable_error_code = ["type-abstract"]
+
+[[tool.mypy.overrides]]
+# `testkit.reach.<module>` is an alias of <module> made at run time (tests/testkit/reach): to mypy it is a missing module, i.e. Any.
+# It lets a colocated test reach orgmcp.core, orgmcp.app.wiring and yaml, which the import contracts keep out of a package.
+module = ["testkit.reach", "testkit.reach.*"]
+ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 # PyYAML ships no type stubs and the stubs package is deliberately not a dev dependency (exact pins only):
@@ -70,15 +95,14 @@ module = ["yaml", "yaml.*"]
 ignore_missing_imports = true
 
 [tool.importlinter]
-# CONTRACTS over the import graph. `uv run lint-imports` (or scripts/static_checks.py imports) checks them all.
-# To add one, append a `[[tool.importlinter.contracts]]` block below: a `name`, a `type` (layers, forbidden, independence,
-# acyclic_siblings ...) and its modules; run lint-imports; it must pass before the commit. Docs: import-linter.readthedocs.io.
-# Planned for the refactor, to be added with the packages they talk about (refactor-principles.md, "Enforcement"):
-#   (a) layers: entry points (cli, mcp server, scheduler loop, dashboard) -> features -> orgmcp.kernel
-#   (b) forbidden: no package imports another package's `_*` modules (only orgmcp.app.wiring may)
-#   (c) independence/acyclic_siblings: no cycles between features
-#   (d) forbidden: orgmcp.kernel imports nothing else from orgmcp
-#   (e) forbidden: no feature imports the Org facade (orgmcp.core.Org)
+# HAND-WRITTEN CONTRACTS: what the generator does not derive from the package map (today: the permanent facade module `orgmcp.core` and
+# the library do not import the entry points). The contracts of the architecture (ARCHITECTURE.md 8.2: layers app/core -> entry points ->
+# features -> kernel; no import of another package's `_` modules; no cycles between features; the kernel imports nothing; no feature imports
+# the Org facade; frameworks at the edge) are GENERATED
+# from tests/architecture/graph.py and the packages that exist: `uv run python -m tests.architecture.lint` writes .importlinter
+# (git-ignored) and runs it together with this section. To add a hand-written contract append a `[[tool.importlinter.contracts]]` block
+# below: a `name`, a `type` (layers, forbidden, independence, acyclic_siblings ...) and its modules; it must pass before the commit.
+# Docs: import-linter.readthedocs.io. (A plain `lint-imports` reads .importlinter when it exists: use `lint` or static_checks.py.)
 root_package = "orgmcp"
 include_external_packages = false
 
@@ -86,19 +110,8 @@ include_external_packages = false
 name = "The library does not import the entry points (cli, mcp server, dashboard)"
 type = "forbidden"
 source_modules = [
-    "orgmcp.blueprint", "orgmcp.blueprint_examples", "orgmcp.core", "orgmcp.dashboard_data", "orgmcp.dashboard_events",
-    "orgmcp.health", "orgmcp.observe", "orgmcp.progress", "orgmcp.review", "orgmcp.scheduler", "orgmcp.services",
+    "orgmcp.blueprint", "orgmcp.core",
+    "orgmcp.health", "orgmcp.progress", "orgmcp.review", "orgmcp.scheduler", "orgmcp.services",
     "orgmcp.skill", "orgmcp.telemetry", "orgmcp.templates", "orgmcp.upgrade",
 ]
-forbidden_modules = ["orgmcp.cli", "orgmcp.cli_obs", "orgmcp.server", "orgmcp.dashboard"]
-
-[[tool.importlinter.contracts]]
-name = "orgmcp.templates is a leaf: it imports nothing else from orgmcp"
-type = "forbidden"
-source_modules = ["orgmcp.templates"]
-forbidden_modules = [
-    "orgmcp.blueprint", "orgmcp.blueprint_examples", "orgmcp.cli", "orgmcp.cli_obs", "orgmcp.core", "orgmcp.dashboard",
-    "orgmcp.dashboard_data", "orgmcp.dashboard_events", "orgmcp.health", "orgmcp.observe", "orgmcp.progress",
-    "orgmcp.review", "orgmcp.scheduler", "orgmcp.server", "orgmcp.services", "orgmcp.skill", "orgmcp.telemetry",
-    "orgmcp.upgrade",
-]
+forbidden_modules = ["orgmcp.cli", "orgmcp.dashboard"]

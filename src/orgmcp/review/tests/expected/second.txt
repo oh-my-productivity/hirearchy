@@ -1,0 +1,17 @@
+4 flagged agent(s); sent 2 note(s)
+
+-> ceo: health review: 1 new problem(s)
+   Health review: 1 new problem(s) among your direct reports.
+   - `ceo/cto` team: `ceo/cto/dev` is paused: paused: failures
+     -> ask `ceo/cto` to deal with it, or step in via its charter
+
+   Act within your charter and record your decisions in `ceo/MEMORY.md`. Problems that persist are not repeated in later reviews.
+
+-> root: health review: 4 of 7 agents flagged
+   Health review: 7 agents, 4 flagged.
+   - `ceo/cto/dev` paused: paused: failures
+   - `ceo/cto/dev` idle: no open tasks and no activity for 6h; candidate to retire
+   - `ceo/eng` idle: no open tasks and no activity for 6h; candidate to retire
+   - `ceo/qa` idle: no open tasks and no activity for 6h; candidate to retire
+   - `ops/dev` stuck: open task is 5h old and nothing is in progress
+   Managers not notified: `ops` (budget 1 is reserved for 1 outstanding delegation(s)).

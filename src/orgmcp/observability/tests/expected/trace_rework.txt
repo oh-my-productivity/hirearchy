@@ -1,0 +1,19 @@
+trace 20261018T100000000003-root-0005 "Ship it" -> ceo: open
+     +0s  root -> ceo task "Ship it" +6 run(s)
+     +0s  root delegate ok
+     +2s    run 20261018T100003000001 ok, ran 42s, queued 3.0s, 3 call(s) [delegate×2 inbox×1], 1 refused
+              ! delegate: not enough budget: you have 5 run(s) and must keep 2 in reserve
+    +19s    ceo -> ceo/eng task "Build" +3 run(s)
+    +29s      * agent.pause agent=ceo/eng reason=failures
+    +30s      * agent.failure agent=ceo/eng count=3
+    +59s    * stall.nudge task=20261018T100000000003-root-0005 to=ceo step=0
+  +1m09s      run 20261018T100110000001 ok, ran 30s, queued 50s, 2 call(s) [report×1 write×1]
+  +1m34s      ceo/eng -> ceo result (done) "Build" +2 run(s)
+  +1m39s      * run.orphan agent=ceo/eng action=killed detail=no process
+  +1m54s    run 20261018T100155000001 ok, ran 15s, queued 20s, 1 call(s) [report×1]
+  +2m04s    ceo -> root result (done) "Ship it" +3 run(s)
+  +2m19s  root -> ceo task "Ship it again" +3 run(s)
+  +2m21s    run 20261018T100222000001 ok, ran 13s, queued 2.0s, 0 call(s), shared with 1 other request(s)
+tasks: 20261018T100000000003-root-0005 "Ship it" done 3 run(s) | 20261018T100220000001-root-0013 "Ship it again" open 1 run(s)
+totals: wall 3m20s | runs 4 (budget given 9, returned 3) | run time 1m40s | queue 1m15s | waiting on you 0s | tool calls 7 (1 refused)
+note: 20261018T100220000001-root-0013 belongs to the request 20261018T100000000003-root-0005; showing that

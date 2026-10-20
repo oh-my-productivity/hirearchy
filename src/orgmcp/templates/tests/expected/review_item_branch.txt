@@ -1,0 +1,2 @@
+- `ceo` team: `ceo/eng/qa` is expensive: 9 runs
+  -> ask `ceo` to deal with it, or step in via its charter

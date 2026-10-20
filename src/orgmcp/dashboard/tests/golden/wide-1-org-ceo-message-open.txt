@@ -1,0 +1,42 @@
+ orgmcp dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |  running 2/2  queued 1  waiting on you 1  errors 15m 2
+▼ ★ root (you)  needs you: 1                                              │ Overview  Activity  Messages  Run log  Memory  Charter
+├─ ○ ar█▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█━━━━━━━━
+├─ ▼ ▶ █  note 20261018T100500000001-root-0041                                                                                               █ted
+│  ├─ ◔█  ### note 20261018T100500000001-root-0041                                                                                           █
+│  └─ ◆█  from: root | to: ceo | title: Scope change                                                                                         █
+├─ ▼ ◇ █                                                                                                                                     █rt  +3 r
+│  ├─ ‖█  Please also cover the Asian market.                                                                                                █itor dat
+│  └─ ‖█                                                                                                                                     █et repor
+└─ ▼ ▶ █                                                                                                                                     █
+   └─ !█                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █                                                                                                                                     █
+       █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
+                                                                          │
+                                                                          │
+                                                                          │                                                                ▊
+ ⏎ Open  p Pause  ? Help  q Quit

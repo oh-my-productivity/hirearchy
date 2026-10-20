@@ -13,8 +13,8 @@ Without the variable, a missing or different file fails the test and prints a un
 
 Normalisation happens here, in the tests, never in production code:
 
-* real clock -> ``FixedClock`` (``orgmcp.core`` / ``telemetry`` / ``scheduler`` ``datetime``); a test moves it with ``clock.tick()``;
-* ``secrets.token_hex`` in ``orgmcp.core`` -> a counter (one per byte length), so message ids are stable;
+* real clock -> ``FixedClock`` as the ``Clock`` of every runtime (``wiring.overriding``, see ``conftest.clock``); a test moves it with ``clock.tick()``;
+* the random part of message ids -> a counter (``CounterTokens(per_length=True)``: one per byte length), so message ids are stable;
 * the tmp paths, ``$HOME``, the venv ``bin`` dir and the project dir -> ``<ORG>``, ``<TMP>``, ``<HOME>``, ``<VENV_BIN>``, ``<PROJECT>``.
 """
 
@@ -73,30 +73,6 @@ class FixedClock:
         return self.now
 
 
-def fake_datetime(clock: FixedClock):
-    """A ``datetime`` subclass whose ``now()`` is the fixed clock (everything else is the real class)."""
-
-    class FakeDatetime(datetime):
-        @classmethod
-        def now(cls, tz=None):  # noqa: D401
-            t = clock.now
-            return t.astimezone(tz) if tz is not None else t.replace(tzinfo=None)
-
-    return FakeDatetime
-
-
-class CounterSecrets:
-    """Stand-in for the ``secrets`` module in ``orgmcp.core``: ``token_hex(n)`` counts 0, 1, 2 ... per byte length."""
-
-    def __init__(self) -> None:
-        self.counts: dict[int, int] = {}
-
-    def token_hex(self, nbytes: int = 32) -> str:
-        n = self.counts.get(nbytes, 0)
-        self.counts[nbytes] = n + 1
-        return f"{n:0{2 * nbytes}x}"
-
-
 class Normalizer:
     """Replace the machine-specific parts of a text with placeholders (longest first)."""
 
@@ -116,10 +92,10 @@ class Normalizer:
 
 
 def make_normalizer(tmp_path: Path, home: Path | None) -> Normalizer:
-    from orgmcp import scheduler
+    from orgmcp.app import wire_kiro
 
     n = Normalizer()
-    n.add(scheduler.PROJECT_DIR, "<PROJECT>")
+    n.add(wire_kiro.project_dir(), "<PROJECT>")
     n.add(Path(sys.executable).parent, "<VENV_BIN>")
     if home is not None:
         n.add(home, "<HOME>")

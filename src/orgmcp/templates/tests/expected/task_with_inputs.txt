@@ -1,0 +1,10 @@
+## Goal
+Write the API.
+
+## Acceptance criteria
+- 3 endpoints
+- under 200 words
+
+## Inputs
+- ceo/spec.md
+- ceo/notes.md

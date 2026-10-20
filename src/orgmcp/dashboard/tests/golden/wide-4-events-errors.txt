@@ -1,0 +1,42 @@
+ orgmcp dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |  running 2/2  queued 1  waiting on you 1  errors 15m 2
+ 2 of 11 event(s) in memory  ·  errors only  ·  no filter  ·  following  ·  readable      e errors · / filter · f follow · x raw
+ 10:02:30 ops/deploy     run ended FAILED after 10s: exit code 1
+ 10:05:40 ceo            delegate → ceo/analyst REFUSED: not enough budget: you have 5 run(s) and must keep 2 in reserve
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 12345 Screen  r Refresh  p Pause  ? Help  q Quit  e Errors only  / Filter  f Follow  x Raw events

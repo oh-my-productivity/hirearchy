@@ -1,0 +1,9 @@
+
+[stderr]
+org: <ORG>
+error: blueprint has errors, nothing was created:
+- needs: needs is missing: record the elicited requirements (scope, deliverable, budget, models, review, ...)
+- agents[lead]: unknown template 'no-such-template'; available: analyst, code-reviewer, data-checker, engineer, fact-checker, manager, researcher, reviewer, tester, writer
+- needs.deliverable: state the deliverable: description, format, length and where it should end up (needs.deliverable.description)
+
+[exit 1]

@@ -1,0 +1,6 @@
+hired ceo/dev
+
+[stderr]
+org: <ORG>
+
+[exit 0]

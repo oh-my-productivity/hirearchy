@@ -1,0 +1,9 @@
+scheduler: stopped
+runs in flight 0/3
+queued, not running (1):
+  ceo: 1 unread, oldest 3m00s - scheduler is not running
+waiting on you (1):
+  Needs you: note from ceo "Greeting": Hello from the ceo (message 20260115T090300000000-ceo-0001)
+errors in the last 15 min: 0
+
+[exit 0]

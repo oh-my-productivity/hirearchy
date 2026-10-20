@@ -1,0 +1,3 @@
+Health review: 1 agent flagged
+- `ceo/eng` idle: x
+Managers not notified: `ceo` (paused), `cto` (out of budget).

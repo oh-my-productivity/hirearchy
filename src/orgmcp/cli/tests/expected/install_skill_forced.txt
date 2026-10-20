@@ -1,0 +1,4 @@
+<TMP>/skills/orgmcp/SKILL.md
+installed the orgmcp skill
+
+[exit 0]

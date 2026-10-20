@@ -1,0 +1,74 @@
+{
+  "task": "20260115T090200000000-root-0000",
+  "title": "Ship it",
+  "assignee": "ceo",
+  "state": "open",
+  "partial": false,
+  "notes": [],
+  "start": "2026-01-15T09:02:00+00:00",
+  "end": null,
+  "team": [
+    "ceo",
+    "ceo/eng"
+  ],
+  "window": {
+    "start": "20260115T090200000000",
+    "end": null
+  },
+  "items": [
+    {
+      "t": "2026-01-15T09:02:00+00:00",
+      "order": 1,
+      "kind": "message",
+      "agent": "root",
+      "id": "20260115T090200000000-root-0000",
+      "type": "task",
+      "from": "root",
+      "to": "ceo",
+      "title": "Ship it",
+      "status": null,
+      "budget": 8,
+      "trace_source": "recorded",
+      "rel_ms": 0.0
+    },
+    {
+      "t": "2026-01-15T09:03:00+00:00",
+      "order": 1,
+      "kind": "message",
+      "agent": "ceo",
+      "id": "20260115T090300000000-ceo-0001",
+      "type": "note",
+      "from": "ceo",
+      "to": "root",
+      "title": "Greeting",
+      "status": null,
+      "budget": 0,
+      "trace_source": "recorded",
+      "rel_ms": 60000.0
+    }
+  ],
+  "totals": {
+    "wall_ms": 180000.0,
+    "runs": 0,
+    "run_ms": 0,
+    "queue_ms": 0,
+    "user_wait_ms": 120000.0,
+    "tool_calls": 0,
+    "refusals": 0,
+    "outcomes": {},
+    "budget_given": 8,
+    "budget_used": 0,
+    "budget_returned": 0,
+    "tasks": [
+      {
+        "task": "20260115T090200000000-root-0000",
+        "title": "Ship it",
+        "state": "open",
+        "runs": 0,
+        "budget": 8
+      }
+    ]
+  }
+}
+
+[exit 0]

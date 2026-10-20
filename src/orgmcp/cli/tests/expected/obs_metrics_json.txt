@@ -1,0 +1,53 @@
+{
+  "since": "2026-01-08T09:05:00+00:00",
+  "until": "2026-01-15T09:05:00+00:00",
+  "events": 5,
+  "agent": "ceo",
+  "runs": {
+    "total": 0,
+    "ok": 0,
+    "failed": 0,
+    "timeout": 0,
+    "killed": 0,
+    "running": 0,
+    "unknown": 0,
+    "duration_ms": {
+      "n": 0,
+      "p50": null,
+      "p95": null,
+      "max": null
+    },
+    "queue_ms": {
+      "n": 0,
+      "p50": null,
+      "p95": null,
+      "max": null
+    }
+  },
+  "tool_calls": {
+    "total": 0,
+    "refused": 0,
+    "refusal_rate": 0.0,
+    "by_tool": {}
+  },
+  "top_refusals": [],
+  "messages": {
+    "note": 1,
+    "task": 1
+  },
+  "stalls": 0,
+  "pauses": {
+    "total": 0,
+    "by_reason": {}
+  },
+  "agent_failures": 0,
+  "orphans": 0,
+  "scheduler": {
+    "starts": 0,
+    "errors": {},
+    "exits": {}
+  },
+  "budget_spent": 0
+}
+
+[exit 0]

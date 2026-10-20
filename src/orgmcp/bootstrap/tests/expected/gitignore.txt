@@ -1,0 +1,5 @@
+.tmp-*
+runs/
+.kiro/
+.runtime/scheduler.pid
+.runtime/events/

@@ -1,0 +1,12 @@
+11 of 11 matching event(s), oldest first
+10:00:03.005 scheduler runtime run.start agent=ceo batch=20261018T100000000003-root-0005 traces=20261018T100000000003-root-0005 pgid=1 budget_before=3 run=ceo@20261018T100003000001
+10:00:45 scheduler runtime run.end ok 42s agent=ceo exit_code=0 budget_after=2 run=ceo@20261018T100003000001
+10:01:00.005 scheduler runtime run.start agent=gone/agent batch=20261018T100000000000-root-ab12 traces=20261018T100000000003-root-0005 pgid=1 budget_before=3 run=gone/agent@20261018T100100000000
+10:01:10.005 scheduler runtime run.start agent=ceo/eng batch=20261018T100020000001-ceo-0008 traces=20261018T100000000003-root-0005 pgid=1 budget_before=3 run=ceo/eng@20261018T100110000001
+10:01:12 scheduler runtime run.end ok 12s agent=gone/agent exit_code=0 budget_after=2 run=gone/agent@20261018T100100000000
+10:01:40 scheduler runtime run.end ok 30s agent=ceo/eng exit_code=0 budget_after=2 run=ceo/eng@20261018T100110000001
+10:01:55.005 scheduler runtime run.start agent=ceo batch=20261018T100135000001-ceo.eng-000c traces=20261018T100000000003-root-0005 pgid=1 budget_before=3 run=ceo@20261018T100155000001
+10:02:10 scheduler runtime run.end ok 15s agent=ceo exit_code=0 budget_after=2 run=ceo@20261018T100155000001
+10:02:22.005 scheduler runtime run.start agent=ceo batch=20261018T100220000001-root-0013 traces=20261018T100220000001-root-0013,20261018T100000000003-root-0005 pgid=1 budget_before=4 run=ceo@20261018T100222000001
+10:02:35 scheduler runtime run.end ok 13s agent=ceo exit_code=0 budget_after=3 run=ceo@20261018T100222000001
+10:01:40 scheduler runtime run.orphan agent=ceo/eng action=killed detail=no process run=ceo/eng@20261018T100500000000

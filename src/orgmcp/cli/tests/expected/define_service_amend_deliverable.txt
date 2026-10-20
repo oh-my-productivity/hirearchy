@@ -1,0 +1,10 @@
+redefined service `weekly` of ceo: contract v1 -> v2 (ceo/services/weekly/SERVICE.md); the old one is kept at ceo/services/weekly/history/SERVICE.v1.md. ceo was told (without waking it).
+Changed:
+deliverable: "The note" (format: markdown) -> "The note" (format: text; max_words: 200)
+Acceptance criteria now (1):
+1. The note has a title.
+
+[stderr]
+org: <ORG>
+
+[exit 0]

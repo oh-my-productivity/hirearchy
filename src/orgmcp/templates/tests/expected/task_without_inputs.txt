@@ -1,0 +1,5 @@
+## Goal
+Write the API.
+
+## Acceptance criteria
+- 3 endpoints

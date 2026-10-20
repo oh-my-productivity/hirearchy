@@ -1,0 +1,37 @@
+{
+  "name": "orgmcp-ceo-eng",
+  "description": "agent ceo/eng",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "orgmcp": {
+      "command": "orgmcp",
+      "args": [
+        "mcp"
+      ]
+    }
+  },
+  "tools": [
+    "@orgmcp",
+    "read",
+    "write"
+  ],
+  "allowedTools": [
+    "@orgmcp"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false,
+  "toolsSettings": {
+    "write": {
+      "allowedPaths": [
+        "/ws"
+      ]
+    },
+    "read": {
+      "allowedPaths": [
+        "/ws",
+        "/org"
+      ]
+    }
+  }
+}

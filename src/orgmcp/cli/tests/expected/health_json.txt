@@ -1,0 +1,90 @@
+{
+  "root": "root",
+  "now": "2026-01-15T09:05:00+00:00",
+  "agents": [
+    {
+      "addr": "ceo",
+      "depth": 1,
+      "state": "pending",
+      "budget_left": 8,
+      "budget_received": 8,
+      "runs_used": 0,
+      "tasks_received": 1,
+      "open_tasks": 1,
+      "oldest_open_age": 180.0,
+      "done": 0,
+      "failed": 0,
+      "blocked": 0,
+      "runs_per_task": null,
+      "rework": 0,
+      "empty_runs": 0,
+      "last_activity": "2026-01-15T09:03:00+00:00",
+      "since_activity": 120.0,
+      "flags": {},
+      "failed_runs": 0,
+      "runtime_runs": 0,
+      "client_rework": 0
+    },
+    {
+      "addr": "ceo/eng",
+      "depth": 2,
+      "state": "idle",
+      "budget_left": 0,
+      "budget_received": 0,
+      "runs_used": 0,
+      "tasks_received": 0,
+      "open_tasks": 0,
+      "oldest_open_age": null,
+      "done": 0,
+      "failed": 0,
+      "blocked": 0,
+      "runs_per_task": null,
+      "rework": 0,
+      "empty_runs": 0,
+      "last_activity": null,
+      "since_activity": null,
+      "flags": {},
+      "failed_runs": 0,
+      "runtime_runs": 0,
+      "client_rework": 0
+    }
+  ],
+  "branches": {
+    "root": {
+      "addr": "root",
+      "agents": 2,
+      "runs_used": 0,
+      "open_tasks": 1,
+      "done": 0,
+      "failed": 0,
+      "blocked": 0,
+      "rework": 0,
+      "worst_flag": null
+    },
+    "ceo": {
+      "addr": "ceo",
+      "agents": 2,
+      "runs_used": 0,
+      "open_tasks": 1,
+      "done": 0,
+      "failed": 0,
+      "blocked": 0,
+      "rework": 0,
+      "worst_flag": null
+    },
+    "ceo/eng": {
+      "addr": "ceo/eng",
+      "agents": 1,
+      "runs_used": 0,
+      "open_tasks": 0,
+      "done": 0,
+      "failed": 0,
+      "blocked": 0,
+      "rework": 0,
+      "worst_flag": null
+    }
+  },
+  "flagged": []
+}
+
+[exit 0]

@@ -1,0 +1,7 @@
+
+# Your services
+The contract (SERVICE.md) is your parent's; the playbook (PLAYBOOK.md) is yours.
+- weekly-brief: contract v1, no playbook yet, 1 request(s) so far; contract: ceo/services/weekly-brief/SERVICE.md; playbook: ceo/services/weekly-brief/PLAYBOOK.md
+
+# Playbook: weekly-brief (v0, yours to improve)
+No playbook yet: plan as usual; when you report this request, write v1 with revise_playbook from how it went.

@@ -1,0 +1,6 @@
+
+[stderr]
+org: <ORG>
+error: no such agent: nobody. A service is offered by one of your direct reports (root: a top-level agent).
+
+[exit 1]

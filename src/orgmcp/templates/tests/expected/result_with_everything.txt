@@ -1,0 +1,9 @@
+## Summary
+Done.
+
+## Lessons
+Ask for the schema first.
+
+## Artifacts
+- ceo/eng/work/api.md
+- ceo/eng/work/tests.md

@@ -1,0 +1,6 @@
+
+[stderr]
+org: <ORG>
+error: --until-done and --once are different modes: use one of them
+
+[exit 1]

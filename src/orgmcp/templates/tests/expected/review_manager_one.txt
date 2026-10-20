@@ -1,0 +1,5 @@
+Health review: 1 new problem(s) among your direct reports.
+- `ceo/eng` idle: nothing for 3 days
+  -> retire `ceo/eng` if it is no longer needed
+
+Act within your charter and record your decisions in `ceo/MEMORY.md`. Problems that persist are not repeated in later reviews.
