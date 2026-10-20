@@ -5,11 +5,13 @@ import asyncio
 
 import pytest
 from testkit.dash_fixtures import DEMO_NOW, demo_org, set_scheduler, snapshot_files
+from testkit.dashboard_world import dash_app
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.legacy.orgmcp.scheduler import SchedulerState
 from testkit.obs_fixtures import EventLog, stamp
 
-from orgmcp.dashboard import DashApp, NavTable, TextPane, TextScreen
+from orgmcp.app.wire_cli import run_cli as main
+from orgmcp.dashboard._widgets import NavTable, TextPane, TextScreen
+from orgmcp.daemon import SchedulerState
 
 
 def run(coro):
@@ -23,7 +25,7 @@ def demo(tmp_path, monkeypatch):
 
 
 def make_app(ns, interval=60.0):
-    return DashApp(ns.org.root, interval=interval, now=lambda: DEMO_NOW)
+    return dash_app(ns.org.root, interval=interval, now=lambda: DEMO_NOW)
 
 
 def scenario(ns, fn, size=(110, 34), interval=60.0):
@@ -614,11 +616,10 @@ def test_refusals_and_failures_are_red_and_the_header_says_how_it_refreshes(demo
         await press(app, pilot, "p")
         assert "refresh paused" in header()
         await press(app, pilot, "p")
-        real = app.data.snapshot
-        app.data.snapshot = lambda: (_ for _ in ()).throw(RuntimeError("disk on fire"))
+        app.data.fail_snapshot(RuntimeError("disk on fire"))
         await press(app, pilot, "r")
         assert "refresh failed" in header() and "disk on fire" in str(app.query_one("#statusline").render())
-        app.data.snapshot = real
+        app.data.fail_snapshot(None)
         await press(app, pilot, "r")
         assert "refresh failed" not in header() and "refresh 60s" in header()
 
@@ -673,18 +674,13 @@ def test_an_exception_in_a_refresh_is_shown_and_the_app_keeps_running(demo):
     async def fn(app, pilot):
         status = app.query_one("#statusline")
         assert status.has_class("hidden")
-        real = app.data.snapshot
-
-        def boom():
-            raise RuntimeError("disk on fire")
-
-        app.data.snapshot = boom
+        app.data.fail_snapshot(RuntimeError("disk on fire"))
         await press(app, pilot, "r")
         assert not status.has_class("hidden") and "refresh failed: RuntimeError: disk on fire" in str(status.render())
         assert app.last_error and labels(app)["ceo"].startswith("▶ ceo")  # the last good picture stays
         await press(app, pilot, "2", "3", "4", "5", "1", "r")
         assert app.is_running
-        app.data.snapshot = real
+        app.data.fail_snapshot(None)
         await press(app, pilot, "r")
         assert status.has_class("hidden") and app.last_error is None
 
@@ -693,7 +689,7 @@ def test_an_exception_in_a_refresh_is_shown_and_the_app_keeps_running(demo):
 
 def test_a_display_failure_is_shown_too(demo):
     async def fn(app, pilot):
-        app._show_requests = lambda rows: (_ for _ in ()).throw(ValueError("bad row"))
+        app.data.break_requests(ValueError("bad row"))
         await press(app, pilot, "2")
         assert "display failed: ValueError: bad row" in str(app.query_one("#statusline").render())
         assert app.is_running
@@ -731,7 +727,7 @@ def test_an_empty_organization(tmp_path, monkeypatch):
         assert "this organization has no event files yet" in str(app.query_one("#events-bar").render()) or app.view == "org"
 
     async def go():
-        app = DashApp(org.root, interval=60)
+        app = dash_app(org.root, interval=60)
         async with app.run_test(size=(100, 30)) as pilot:
             await app.settle(pilot)
             await fn(app, pilot)
@@ -759,8 +755,6 @@ def test_the_app_writes_nothing(demo, capsys):
         assert app.last_error is None
 
     scenario(demo, fn, interval=0.2)
-    from testkit.legacy.orgmcp.cli import main
-
     main(["--root", str(demo.org.root), "dash", "--once"])
     capsys.readouterr()
     assert snapshot_files(demo.org.root) == before
@@ -774,7 +768,7 @@ def test_no_events_file_is_created_by_the_app_on_an_org_without_events(tmp_path,
     before = snapshot_files(org.root)
 
     async def go():
-        app = DashApp(org.root, interval=60)
+        app = dash_app(org.root, interval=60)
         async with app.run_test(size=(100, 30)) as pilot:
             await app.settle(pilot)
             for key in ("down", "]", "]", "]", "2", "enter", "escape", "3", "4", "5", "c", "1"):
