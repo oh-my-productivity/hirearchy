@@ -48,7 +48,7 @@ markers = [
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Static checks (dev tooling, pinned in [dependency-groups]). One command runs everything: scripts/check.sh
-# (pytest, which includes tests/test_static_checks.py, + mypy + lint-imports). README, "Test".
+# (pytest, which includes tests/architecture/test_static_checks.py, + mypy + lint-imports). README, "Test".
 # ---------------------------------------------------------------------------------------------------------------------
 
 [tool.mypy]

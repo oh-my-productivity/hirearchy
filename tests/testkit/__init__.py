@@ -2,7 +2,7 @@
 
 ``tests/`` is on ``sys.path`` (``pythonpath`` in pyproject.toml), so ``import testkit`` works in ``tests/`` and in the colocated
 ``src/orgmcp/**/tests/``. The constants below are absolute paths: a test that used to build them from its own ``__file__`` (which breaks
-the moment the test moves) uses these instead (``tools/relocate_tests.py`` rewrites ``Path(__file__)...`` expressions to them).
+the moment the test moves) uses these instead.
 """
 
 from pathlib import Path
