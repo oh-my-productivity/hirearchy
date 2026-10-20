@@ -20,11 +20,12 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[1] / "tests"))
 
 from testkit.dash_fixtures import DEMO_NOW, demo_org  # noqa: E402
+from testkit.dashboard_world import dash_app  # noqa: E402
+from testkit.dashdata_world import dd  # noqa: E402
 from testkit.scheduler import scheduler_is  # noqa: E402
 
-from orgmcp import dashboard_data as dd  # noqa: E402
-from orgmcp.dashboard import DashApp  # noqa: E402
-from orgmcp.scheduler import SchedulerState  # noqa: E402
+from orgmcp.dashboard._app import DashApp  # noqa: E402
+from orgmcp.daemon import SchedulerState  # noqa: E402
 
 SIZE = (150, 42)
 
@@ -49,7 +50,7 @@ async def main() -> None:
     ns = demo_org(Path(tempfile.mkdtemp(prefix="dash-demo-")))
     once = dd.render_once(dd.DashData(ns.org.root, now=lambda: DEMO_NOW)).replace(str(ns.org.root), "/path/to/acme")
     (HERE / "once.txt").write_text(once + "\n", encoding="utf-8")
-    app = DashApp(ns.org.root, interval=3600, now=lambda: DEMO_NOW)
+    app = dash_app(ns.org.root, interval=3600, now=lambda: DEMO_NOW)
     async with app.run_test(size=SIZE) as pilot:
         async def step(*keys: str, name: str, wait: float = 0.0) -> None:
             await pilot.press(*keys)
