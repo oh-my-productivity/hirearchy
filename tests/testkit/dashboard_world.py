@@ -12,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from orgmcp.app.wire_cli import run_cli as main  # noqa: F401 - the command line of the composition root (``orgmcp.cli.main``)
 from orgmcp.app.wire_dashboard import queries_of
 from orgmcp.dashboard._app import DashApp
 from orgmcp.dashboard._ports import DashboardQueries

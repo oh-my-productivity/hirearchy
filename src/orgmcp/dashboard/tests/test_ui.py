@@ -5,11 +5,10 @@ import asyncio
 
 import pytest
 from testkit.dash_fixtures import DEMO_NOW, demo_org, set_scheduler, snapshot_files
-from testkit.dashboard_world import dash_app
+from testkit.dashboard_world import dash_app, main
 from testkit.legacy.orgmcp.core import ROOT, Org
 from testkit.obs_fixtures import EventLog, stamp
 
-from orgmcp.app.wire_cli import run_cli as main
 from orgmcp.dashboard._widgets import NavTable, TextPane, TextScreen
 from orgmcp.daemon import SchedulerState
 

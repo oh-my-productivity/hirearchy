@@ -19,6 +19,7 @@ from typing import Any
 
 from orgmcp.app import wire_kiro, wire_scheduler, wire_skill, wiring
 from orgmcp.app import wire_mcp_server as wire
+from orgmcp.app.wire_cli import run_cli as main  # noqa: F401 - the command line of the composition root (``orgmcp.cli.main``)
 from orgmcp.app.wire_stalls import RuntimePorts
 from orgmcp.blueprint import EXAMPLE_KINDS, errors
 from orgmcp.blueprint._org import NoOrgContext, RuntimeOrgContext
