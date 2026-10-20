@@ -14,6 +14,7 @@ from orgmcp.runs import RunLogReader
 from orgmcp.runs._caching import CachingRunLogReader, DirectoryStamps, FsDirectoryStamps
 from orgmcp.runs._reader import FsRunLogReader
 
+from . import _oracle
 from ._legacy import legacy
 
 NS = 1_000_000_000
@@ -146,11 +147,10 @@ def test_the_stamps_are_the_modification_times_of_the_directories_of_the_organiz
 
 
 def test_it_counts_as_the_dashboard_org_did_in_every_situation(tmp_path: Path) -> None:
-    """Characterization of ``LenientOrg.runs_used`` (until the dashboard uses the decorator): same numbers, also while the cache is stale."""
-    core, dashboard = legacy("core"), legacy("app.tests._lenient_org")
-    root = core.Org.init(tmp_path / "org", "mission").root
+    """Characterization of ``LenientOrg.runs_used`` (frozen in ``_oracle.LenientRuns``): same numbers, also while the cache is stale."""
+    root = legacy("core").Org.init(tmp_path / "org", "mission").root
     (root / "ceo").mkdir()
-    lenient = dashboard.LenientOrg(root)
+    lenient = _oracle.LenientRuns(root)
     paths = OrgPaths(root)
     reader = CachingRunLogReader(FsRunLogReader(paths), FsDirectoryStamps(paths), system_clock(tmp_path))
     runs = root / "ceo" / "runs"

@@ -8,12 +8,14 @@ Delete this module together with the oracle tests when the last legacy reader is
 
 from __future__ import annotations
 
+import os
 import re
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from orgmcp.kernel import stamp_of, visible
+from orgmcp.kernel import ROOT, norm, stamp_of, visible
 
 from ._legacy import legacy
 
@@ -138,3 +140,47 @@ def read_tail(path: Path, rel: str, live: bool) -> Any:
     header.append(ends[-1] if ends else ("still running" if live else "no exit line (still running or interrupted)"))
     log.header = header
     return log
+
+
+class LenientRuns:
+    """``LenientOrg.runs_used`` of the dashboard, frozen verbatim from the class that was dissolved in C-dashdata: one ``stat`` per directory per ``tick``, and a
+    count that is reused while the ``runs`` directory has the modification time it had when it was counted, if it had been quiet for ``CACHE_TRUST`` seconds."""
+
+    CACHE_TRUST = 2.0  # a directory modified less than this many seconds before it was listed is listed again next time
+
+    def __init__(self, root: Path) -> None:
+        self._root_s = str(root)
+        self._runs_cache: dict[str, tuple[int, bool, int]] = {}
+        self._stat_memo: dict[tuple[str, str], int] = {}
+
+    def tick(self) -> None:
+        self._stat_memo.clear()
+
+    def mtime(self, addr: str, name: str) -> int:
+        a = norm(addr)
+        key = (a, name)
+        v = self._stat_memo.get(key)
+        if v is None:
+            path = self._root_s if a == ROOT else os.path.join(self._root_s, a)
+            try:
+                v = os.stat(os.path.join(path, name) if name else path).st_mtime_ns
+            except OSError:
+                v = -1
+            self._stat_memo[key] = v
+        return v
+
+    def _trusted(self, listed_at: int, mtime: int) -> bool:
+        return (listed_at - mtime) > self.CACHE_TRUST * 1e9
+
+    def runs_used(self, addr: str) -> int:
+        mtime = self.mtime(addr, "runs")
+        if mtime < 0:
+            return 0
+        key = norm(addr)
+        hit = self._runs_cache.get(key)
+        if hit is not None and hit[0] == mtime and hit[1]:
+            return hit[2]
+        listed_at = time.time_ns()
+        n = runs_used(Path(self._root_s) / key / "runs")
+        self._runs_cache[key] = (mtime, self._trusted(listed_at, mtime), n)
+        return n

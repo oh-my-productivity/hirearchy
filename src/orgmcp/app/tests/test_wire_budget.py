@@ -1,5 +1,5 @@
 """``wire_budget``: the runtime has the three budget ports, built from the mailboxes, task views, run logs, agents, settings and delivery of the
-runtime; and the dashboard's lenient variant reads the same ports through the decorated mailboxes and its own run count."""
+runtime."""
 
 from __future__ import annotations
 
@@ -8,12 +8,11 @@ from pathlib import Path
 import pytest
 
 from orgmcp.agents import AgentDirectory, CharterReader
-from orgmcp.app import Org, wire_budget, wiring
+from orgmcp.app import wiring
 from orgmcp.budget import AllocationPolicy, BudgetQuery, BudgetReclaimer
 from orgmcp.budget._policy import ReserveAllocationPolicy
 from orgmcp.budget._query import DerivedBudgetQuery
 from orgmcp.budget._reclaim import NoteBudgetReclaimer
-from ._lenient_org import LenientOrg
 from orgmcp.delivery import MessageDelivery
 from orgmcp.delivery.testing import RecordingDelivery
 from orgmcp.kernel import Message, OrgError
@@ -88,50 +87,3 @@ def test_an_override_replaces_a_port(tmp_path: Path) -> None:
 
 def test_every_runtime_has_its_own_ports(tmp_path: Path) -> None:
     assert wiring.open_runtime(tmp_path).budget_query is not wiring.open_runtime(tmp_path).budget_query
-
-
-# ------------------------------------------------------------------------------------------------------------------ lenient
-
-
-def test_the_lenient_runtime_counts_runs_with_the_function_it_is_given_and_reads_the_boxes_of_the_runtime(tmp_path: Path) -> None:
-    org = Org.init(tmp_path / "org", "mission")
-    org.hire("root", "ceo", "Boss", "text")
-    org.send("root", "ceo", "runs", budget=6)
-    asked: list[str] = []
-
-    def counted(addr: str) -> int:
-        asked.append(addr)
-        return 2
-
-    runtime = wire_budget.lenient(org.runtime, counted)
-    assert runtime.budget_query.budget("ceo") == 4 and asked == ["ceo"]
-    assert isinstance(runtime.allocation_policy, ReserveAllocationPolicy) and isinstance(runtime.budget_reclaimer, NoteBudgetReclaimer)
-    assert runtime.allocation_policy.default_budget("ceo") == 3  # 4 left - (0 outstanding + 1), under the default of 10
-
-
-def test_the_lenient_org_skips_a_message_it_cannot_read_when_it_adds_up_a_budget(tmp_path: Path) -> None:
-    org = Org.init(tmp_path / "org", "mission")
-    org.hire("root", "ceo", "Boss", "text")
-    org.send("root", "ceo", "runs", budget=6)
-    (org.root / "ceo" / "inbox" / "20260101T000000000000-root-bad0.md").write_text("---\nfrom: [oops\n---\nx\n", encoding="utf-8")
-    with pytest.raises(Exception):  # noqa: B017, PT011 - the plain Org raises on it (yaml error), as it always did
-        org.budget("ceo")
-    lenient = LenientOrg(org.root)
-    assert lenient.budget("ceo") == 6 and lenient.delegable("ceo") == (6, 0, 5)
-    assert "ceo/inbox/20260101T000000000000-root-bad0.md" in lenient.bad
-
-
-def test_the_lenient_org_uses_its_cached_run_count(tmp_path: Path) -> None:
-    org = Org.init(tmp_path / "org", "mission")
-    org.hire("root", "ceo", "Boss", "text")
-    org.send("root", "ceo", "runs", budget=6)
-    lenient = LenientOrg(org.root)
-    calls: list[str] = []
-    real = lenient.runs_used
-
-    def spy(addr: str) -> int:
-        calls.append(addr)
-        return real(addr)
-
-    lenient.runtime = wire_budget.lenient(lenient.runtime, spy)
-    assert lenient.budget("ceo") == 6 and calls == ["ceo"]
