@@ -1,23 +1,11 @@
-"""Providers of the ``observability`` ports (ARCHITECTURE.md 6.1), and the same objects over the runtime in force for the legacy functions.
+"""Providers of the ``observability`` ports (ARCHITECTURE.md 6.1).
 
 The seven ports of the package (the event, trace, metric and now queries, the integrity checks, the renderer and the text of the views) are fields of the
 runtime. The parts they are made of (the scheduler report, the batches in flight, the queue, the recent events, the desk of root, one class per
 invariant, the targeted events) are private to the package and made here, inside the provider of the port that uses them.
-
-``event_queries_of``, ``trace_queries_of``, ``metric_queries_of``, ``now_queries_of``, ``integrity_checks_of``, ``renderer_of``, ``observe_text_of``, ``event_queries_sleeping``,
-``system_renderer``, ``trace_derivers_of`` and ``run_collection_of`` serve the functions of ``observe.py`` that are still there (the legacy
-module, the dashboard): they are handed an ``Org`` whose ``runtime`` tests replace (the clock, the scheduler status, the processes) and the
-dashboard's lenient ``Org`` replaces the mailboxes of, so each call builds the objects over the ports the runtime has *now*, as the functions they
-replace read them through the ``Org``. They go when the legacy functions do.
-
-The legacy module also needs a few names of the package that are not public (``plain``, ``matcher``, ``Msg``, ``build_messages``, ``RunRec``, the thresholds
-...): it reaches them here, since only the composition root may import a private module.
 """
 
 from __future__ import annotations
-
-from collections.abc import Callable
-from datetime import datetime
 
 from ..agents import AgentDirectory, RetiredArchive
 from ..attention import HumanQueue
@@ -46,19 +34,12 @@ from ..observability._checks import (
     RunsAccounted,
     SeqGapless,
 )
-from ..observability._checks import COPY_GRACE as COPY_GRACE  # re-exported for observe.py
-from ..observability._checks import INFLIGHT_GRACE as INFLIGHT_GRACE  # re-exported for observe.py
-from ..observability._checks import RECV_BOXES as RECV_BOXES  # re-exported for observe.py
 from ..observability._derive import LogTraceDerivers
-from ..observability._dispatch import VIEWS as VIEWS  # re-exported for observe.py
 from ..observability._dispatch import AgentTargetedEvents, ViewDispatcher
 from ..observability._events import LogEventQueries
 from ..observability._files import FsMailboxFiles, FsSchedulerPidFile
 from ..observability._history import IndexedMessageHistory
-from ..observability._messages import Msg as Msg  # re-exported for observe.py
-from ..observability._messages import build_messages as build_messages  # re-exported for observe.py
 from ..observability._metrics import DerivedMetricQueries
-from ..observability._now import ERROR_WINDOW as ERROR_WINDOW  # re-exported for observe.py
 from ..observability._now import (
     BatchRunsInFlight,
     EventSchedulerReport,
@@ -71,20 +52,12 @@ from ..observability._now import (
 from ..observability._ports import IntegrityCheck, MessageHistory, RunCollection, TraceDerivers
 from ..observability._render import TextObservabilityRenderer
 from ..observability._runs import RunCollector
-from ..observability._runs import RunRec as RunRec  # re-exported for observe.py
-from ..observability._runs import run_events as run_events  # re-exported for observe.py
-from ..observability._trace import READ_ONLY_TOOLS as READ_ONLY_TOOLS  # re-exported for observe.py
 from ..observability._trace import DerivedTraceQueries
-from ..observability._trace import run_window as run_window  # re-exported for observe.py
-from ..observability._util import matcher as matcher  # re-exported for observe.py
-from ..observability._util import plain as plain  # re-exported for observe.py
 from ..processes import OrphanJudge
 from ..runs import RunLogReader, RunRegistry
 from ..settings import OrgSettings
 from ._builder import Builder
 from ._lazy import PortResolver
-from .runtime import OrgRuntime
-from .wire_stalls import RuntimePorts
 
 
 def event_queries(b: PortResolver) -> LogEventQueries:
@@ -166,82 +139,3 @@ def register(b: Builder) -> None:
     b.provide(IntegrityChecks, integrity_checks)
     b.provide(ObservabilityRenderer, renderer)
     b.provide(ObservabilityText, observe_text)
-
-
-# ------------------------------------------------------------------------------ the legacy functions' objects
-
-
-def event_queries_of(runtime: OrgRuntime) -> EventQueries:
-    """``EventQueries`` over the ports ``runtime`` has now."""
-    return event_queries(RuntimePorts(runtime))
-
-
-class SleepingClock(Clock):
-    """``clock`` that sleeps by the function it was given (``observe.follow_events`` has always taken one)."""
-
-    def __init__(self, clock: Clock, sleep: Callable[[float], None]) -> None:
-        self._clock, self._sleep = clock, sleep
-
-    def now(self) -> datetime:
-        return self._clock.now()
-
-    def time(self) -> float:
-        return self._clock.time()
-
-    def monotonic(self) -> float:
-        return self._clock.monotonic()
-
-    def sleep(self, seconds: float) -> None:
-        self._sleep(seconds)
-
-
-def event_queries_sleeping(runtime: OrgRuntime, sleep: Callable[[float], None]) -> EventQueries:
-    """``EventQueries`` over the ports ``runtime`` has now that waits between polls with ``sleep`` (``follow_events``)."""
-    return LogEventQueries(runtime.event_reader, runtime.event_followers, SleepingClock(runtime.clock, sleep))
-
-
-def trace_queries_of(runtime: OrgRuntime) -> TraceQueries:
-    """``TraceQueries`` over the ports ``runtime`` has now."""
-    return trace_queries(RuntimePorts(runtime))
-
-
-def metric_queries_of(runtime: OrgRuntime) -> MetricQueries:
-    """``MetricQueries`` over the ports ``runtime`` has now."""
-    return metric_queries(RuntimePorts(runtime))
-
-
-def trace_derivers_of(runtime: OrgRuntime) -> TraceDerivers:
-    """``TraceDerivers`` over the run logs ``runtime`` has now."""
-    return trace_derivers(RuntimePorts(runtime))
-
-
-def run_collection_of(runtime: OrgRuntime) -> RunCollection:
-    """``RunCollection`` over the ports ``runtime`` has now."""
-    return run_collection(RuntimePorts(runtime))
-
-
-def now_queries_of(runtime: OrgRuntime) -> NowQueries:
-    """``NowQueries`` over the ports ``runtime`` has now."""
-    return now_queries(RuntimePorts(runtime))
-
-
-def integrity_checks_of(runtime: OrgRuntime) -> IntegrityChecks:
-    """``IntegrityChecks`` over the ports ``runtime`` has now."""
-    return integrity_checks(RuntimePorts(runtime))
-
-
-def renderer_of(runtime: OrgRuntime) -> ObservabilityRenderer:
-    """``ObservabilityRenderer`` (the text of the views does not depend on the runtime)."""
-    return renderer(RuntimePorts(runtime))
-
-
-def system_renderer() -> ObservabilityRenderer:
-    """``ObservabilityRenderer`` for the legacy ``render_*`` functions, which are given a view and no organization."""
-    return TextObservabilityRenderer()
-
-
-def observe_text_of(runtime: OrgRuntime) -> ObservabilityText:
-    """``ObservabilityText`` over the queries, checks and renderer ``runtime`` has now."""
-    ports = RuntimePorts(runtime)
-    targeted = AgentTargetedEvents(event_queries(ports), ports.get(AgentDirectory), ports.get(EventReader))
-    return ViewDispatcher(targeted, trace_queries(ports), metric_queries(ports), now_queries(ports), integrity_checks(ports), renderer(ports))

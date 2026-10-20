@@ -55,13 +55,6 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "process dropped reset traces_seen note_trace single ensure_ignored emit summarize_args prune "
         "SCHEMA_VERSION LINE_MAX EVENTS_REL DAY_RE ENVELOPE PROCS"
     ),
-    "observe": _e3(
-        "EVENTS_DIR ERROR_WINDOW COPY_GRACE INFLIGHT_GRACE RECV_BOXES ENVELOPE READ_ONLY_TOOLS VIEWS fmt_dur fmt_rel "
-        "percentile parse_when event_files timed_events iter_events is_error events_view events Follower "
-        "follow_events format_event render_events FileRec scan_messages Msg build_messages Traces RunRec run_events "
-        "collect_runs run_window trace render_trace normalize_refusal metrics render_metrics now_view render_now "
-        "check render_check observe_text register_observe_tool"
-    ),
     "progress": {"progress": "permanent"},  # orgmcp.progress.progress(org, task_id=None) is documented in the README
     "blueprint": _e3(
         "ROLES_DIR WEB_TOOLS WRITE_TOOLS SLACK TIGHT REWORK_RUNS KINDS role_names "

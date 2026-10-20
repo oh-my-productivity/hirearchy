@@ -7,6 +7,7 @@ from collections.abc import Iterable
 import pytest
 
 from orgmcp.kernel import TITLE_MAX, clip, clip_line, single, word_count
+from orgmcp.kernel.tests import _oracle
 from orgmcp.kernel.tests._legacy import legacy
 
 
@@ -78,7 +79,7 @@ def test_clip_equals_telemetry_clip(value: object, limit: int) -> None:
 
 @pytest.mark.parametrize(("value", "limit"), _clip_inputs())
 def test_clip_line_equals_the_two_legacy_copies(value: object, limit: int) -> None:
-    assert clip_line(value, limit) == legacy("observe")._clip(value, limit) == legacy("services")._clip(value, limit)
+    assert clip_line(value, limit) == _oracle._clip(value, limit)
 
 
 @pytest.mark.parametrize("traces", [[], [None], ["a"], ["a", "a"], ["a", None], ["a", "b"], ["", "a"], [None, "b", "b"], ["a", "b", "a"]])

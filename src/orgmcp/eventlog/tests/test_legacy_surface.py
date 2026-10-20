@@ -20,11 +20,6 @@ def test_the_writer_takes_the_format_constants_from_the_package() -> None:
     assert telemetry.DAY_RE is DAY_RE and telemetry.ENVELOPE is ENVELOPE
 
 
-def test_the_query_module_keeps_its_old_names_for_the_constants() -> None:
-    observe = legacy("observe")
-    assert observe.EVENTS_DIR == EVENTS_REL and observe.ENVELOPE == set(ENVELOPE)
-
-
 def test_what_the_writer_writes_the_reader_reads(tmp_path: Path) -> None:
     core, telemetry = legacy("core"), legacy("telemetry")
     org = core.Org.init(tmp_path / "org", "Mission", {"events": True})

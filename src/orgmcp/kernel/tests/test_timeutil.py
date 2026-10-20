@@ -11,7 +11,6 @@ import pytest
 
 from orgmcp.kernel import Message, aware, fmt_dur, fmt_duration, msg_time, parse_time, stamp_of
 from orgmcp.kernel.tests import _oracle
-from orgmcp.kernel.tests._legacy import legacy
 
 UTC = timezone.utc
 
@@ -150,4 +149,4 @@ def test_fmt_dur_shapes() -> None:
 
 def test_fmt_dur_oracle() -> None:
     table = _millis()
-    same(fmt_dur, legacy("observe").fmt_dur, table)  # the legacy implementation is still there: compared live
+    same(fmt_dur, _oracle._fmt_dur, table)

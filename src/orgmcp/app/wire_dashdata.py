@@ -73,6 +73,7 @@ from ..kernel import Clock, JsonObject, Message, OrgLayout
 from ..mail import MailboxReader, MessageParser, TaskQuery
 from ..mail._caching import DirMtimeCachingMailbox
 from ..observability import EventQueries, IntegrityChecks, NowQueries, ObservabilityRenderer, TraceQueries
+from ..observability._util import matcher
 from ..progress import ProgressReporter
 from ..progress._activity import FsTeamActivity
 from ..progress._counts import LogRunCounts
@@ -91,7 +92,6 @@ from . import wiring
 from ._builder import Builder
 from ._lazy import PortResolver
 from .runtime import OrgRuntime
-from .wire_observability import matcher
 
 
 class ObservabilityEventFilters(EventFilters):
