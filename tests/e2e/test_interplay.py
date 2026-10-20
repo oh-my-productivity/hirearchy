@@ -2,11 +2,14 @@ import os
 import re
 
 import pytest
+from testkit.e2e_world import agent_health
+from testkit.legacy.orgmcp.app import wiring
+from testkit.scheduler_loop import loop_over, runnable_of
 
 from orgmcp import core
 from orgmcp.core import ROOT, word_count
-from orgmcp.health import agent_health
-from orgmcp.scheduler import Scheduler
+from orgmcp.kernel import AtomicWriter
+from orgmcp.kernel.testing import FailingAtomicWriter, fs_atomic_writer
 
 ENG = "ceo/eng"
 HEAD = "Exact criteria: 33 words, acrostic PLANT."
@@ -80,20 +83,20 @@ def test_refund_note_wakes_a_budget_paused_parent_but_not_a_failure_paused_one(o
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=20)
     org.hire("ceo", "ops", "Ops", "Do ops.")
     org.send("ceo", "ceo/ops", "grant", budget=5)
-    sched = Scheduler(org, echo=lambda _: None)
+    sched = loop_over(org, echo=lambda _: None)
     org.pause("ceo", "3 consecutive failed runs")
     org.retire_team("ceo", "ops", "done")
-    assert org.unread("ceo") >= 1 and "ceo" not in sched._runnable()  # a human-only pause stays paused
+    assert org.unread("ceo") >= 1 and "ceo" not in runnable_of(org, sched)  # a human-only pause stays paused
     org.resume("ceo")
     org.pause("ceo", "budget")
-    assert "ceo" in sched._runnable()  # budget came back with the note, so a budget pause is lifted
+    assert "ceo" in runnable_of(org, sched)  # budget came back with the note, so a budget pause is lifted
 
 
 def test_runtime_only_refund_run_is_not_counted_as_wasteful(org):
     _retire_with_refund(org)
     org.notify("ceo", "reminder: T", "still open")  # the refund note alone no longer wakes (tests/test_wakes.py)
     assert [m.sender for m in org.messages("ceo", "inbox")] == [core.RUNTIME] * 2
-    sched = Scheduler(org, runner=lambda o, a, p: (["true"], str(o.dir(a)), dict(os.environ)), echo=lambda _: None)
+    sched = loop_over(org, runner=lambda o, a, p: (["true"], str(o.dir(a)), dict(os.environ)), echo=lambda _: None)
     sched.serve(until_idle=True, max_runs=1)
     h = agent_health(org, "ceo")
     assert h.runs_used == 1 and h.runtime_runs == 1 and h.empty_runs == 0 and "wasteful" not in h.flags
@@ -114,19 +117,17 @@ def test_artifact_annotation_and_read_use_the_same_markdown_aware_count(org):
 
 
 # ------------------------------------------------- Message.load cache vs deliver
-def test_cache_stays_correct_across_redelivery_and_inflight_moves(org, monkeypatch):
-    real = core.atomic_write
+def test_cache_stays_correct_across_redelivery_and_inflight_moves(org):
+    armed = {"on": True}
 
-    def flaky(path, text):
-        if "/ceo/eng/inbox/" in str(path):
-            raise OSError("disk full")
-        return real(path, text)
+    def flaky(path):
+        return armed["on"] and "/ceo/eng/inbox/" in str(path)
 
-    monkeypatch.setattr(core, "atomic_write", flaky)
+    org.runtime = wiring.open_runtime(org.root, {AtomicWriter: FailingAtomicWriter(fs_atomic_writer(org.root).writer, fails=flaky, error=OSError("disk full"))})
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     with pytest.raises(OSError):
         org.send("ceo", ENG, "grant", budget=4)
-    monkeypatch.setattr(core, "atomic_write", real)
+    armed["on"] = False
     sent = [m for m in org.messages("ceo", "sent") if m.to == ENG]  # parses (and caches) the sender copy
     assert [m.budget for m in sent] == [4] and org.unread(ENG) == 0
     org.recover()

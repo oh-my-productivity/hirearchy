@@ -8,8 +8,7 @@ from pathlib import Path
 import pytest
 import testkit
 from testkit import kiro_sandbox
-
-from orgmcp import scheduler
+from testkit.e2e_world import kiro_agents_dir
 
 HERE = testkit.TESTS
 INNER = '''
@@ -72,7 +71,7 @@ def test_unmarked_tests_run_against_the_stub():
     assert stub and Path(stub).parent.parent.name.startswith("kiro-home")
     assert "kiro-stub" in Path(stub).read_text() or "KIRO_STUB_LOG" in Path(stub).read_text()
     assert str(Path.home()).find("kiro-home") != -1
-    assert str(scheduler.KIRO_AGENTS_DIR).startswith(str(Path.home()))
+    assert str(kiro_agents_dir()).startswith(str(Path.home()))
 
 
 def test_marked_tests_are_skipped_by_default(nested):

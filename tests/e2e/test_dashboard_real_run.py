@@ -5,11 +5,13 @@ import time
 
 import testkit
 from testkit.dash_fixtures import set_scheduler
+from testkit.e2e_world import DashApp, NavTable, TextPane
+from testkit.legacy.orgmcp.app import wiring
 from testkit.scheduler import scheduler_is
+from testkit.scheduler_loop import loop_over
 
 from orgmcp.core import ROOT, Org
-from orgmcp.dashboard import DashApp, NavTable, TextPane
-from orgmcp.scheduler import SchedulerState
+from orgmcp.daemon import SchedulerState
 
 
 def run(coro):
@@ -48,12 +50,10 @@ def _runner(mode):
 
 def test_a_real_run_with_fake_agents_shows_up(tmp_path, monkeypatch):
     """The real scheduler runs fake agents; the dashboard shows the finished request, the events, the trace and idle agents."""
-    from orgmcp.scheduler import Scheduler
-
     org = Org.init(tmp_path / "org", "Real run", {"poll_seconds": 0.05})
     org.hire(ROOT, "ceo", "Chief executive", "Run it.", can_hire=True, max_children=2)
     org.hire("ceo", "eng", "Engineer", "Build things.")
-    sched = Scheduler(org, _runner("tools"), echo=lambda *_: None)
+    sched = loop_over(org, _runner("tools"), echo=lambda *_: None)
     sched.acquire()
     try:
         task = org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
@@ -93,12 +93,10 @@ def test_a_real_run_with_fake_agents_shows_up(tmp_path, monkeypatch):
 
 
 def test_a_real_running_agent_is_shown_running_with_its_live_log(tmp_path, monkeypatch):
-    from orgmcp.scheduler import Scheduler
-
     org = Org.init(tmp_path / "org", "Hang", {"poll_seconds": 0.05})
     org.hire(ROOT, "ceo", "Chief executive", "Run it.", can_hire=True, max_children=2)
     org.hire(ROOT, "ops", "Ops", "Ops.")
-    sched = Scheduler(org, _runner("hang"), echo=lambda *_: None)
+    sched = loop_over(org, _runner("hang"), echo=lambda *_: None)
     sched.acquire()
     try:
         org.delegate(ROOT, "ceo", "Slow job", "g", "a", budget=3)
@@ -136,6 +134,4 @@ def test_a_real_running_agent_is_shown_running_with_its_live_log(tmp_path, monke
         run(go())
     finally:
         sched.release()
-        from orgmcp import telemetry
-
-        telemetry.reset()
+        wiring.process_resources().reset()  # forget the open event files and counters of the process

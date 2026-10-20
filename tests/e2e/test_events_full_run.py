@@ -7,10 +7,11 @@ import time
 
 import pytest
 import testkit
+from testkit.legacy.orgmcp.app import wiring
+from testkit.scheduler_loop import loop_over
 
-from orgmcp import telemetry
 from orgmcp.core import ROOT
-from orgmcp.scheduler import Scheduler
+from orgmcp.eventlog import LINE_MAX
 
 FAKE = str(testkit.FAKE_AGENT)
 SILENT = {"echo": lambda _: None}
@@ -21,7 +22,7 @@ SILENT = {"echo": lambda _: None}
 def org(org):
     """The shared org, with the events of its construction (hires) forgotten: tests see only their own."""
     shutil.rmtree(org.root / ".runtime" / "events", ignore_errors=True)
-    telemetry.reset()
+    wiring.process_resources().reset()  # forget the open event files and counters of the process
     return org
 
 
@@ -55,7 +56,7 @@ def drain(sched, limit=60.0):
 
 
 def run_all(org, mode="work", **kw):
-    sched = Scheduler(org, fake_runner(mode), **SILENT, **kw)
+    sched = loop_over(org, fake_runner(mode), **SILENT, **kw)
     sched.acquire()
     try:
         drain(sched)
@@ -123,4 +124,4 @@ def test_every_line_of_a_full_run_is_valid_and_gapless(org):
         assert {e["v"] for e in events} == {1}
         for e in events:
             assert {"ts", "proc", "pid", "kind", "actor", "run", "trace"} <= set(e)
-            assert len(json.dumps(e).encode()) <= telemetry.LINE_MAX
+            assert len(json.dumps(e).encode()) <= LINE_MAX

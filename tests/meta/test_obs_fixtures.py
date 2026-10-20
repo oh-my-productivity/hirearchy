@@ -1,8 +1,8 @@
 import pytest
+from testkit.e2e_world import load_message, observe
 from testkit.obs_fixtures import freeze, run_ids, stamp_trace
 
-from orgmcp import observe
-from orgmcp.core import ROOT, Message, Org
+from orgmcp.core import ROOT, Org
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def clock(monkeypatch):
 def test_stamp_trace_helper_roundtrips_through_the_loader(org, clock):
     task = org.delegate(ROOT, "ceo", "T", "g", "a", budget=2)
     stamp_trace(org, task.id, task.id)
-    loaded = Message.load(next((org.dir("ceo") / "inbox").glob("*.md")))
+    loaded = load_message(org, next((org.dir("ceo") / "inbox").glob("*.md")))
     assert loaded.id == task.id  # the core loader ignores the unknown key
     assert observe.build_messages(observe.scan_messages(org))[task.id].trace == task.id
 

@@ -10,14 +10,15 @@ from types import SimpleNamespace
 
 import pytest
 import testkit
+from testkit.cli_world import main
+from testkit.e2e_world import build_server, load_message, observe
+from testkit.legacy.orgmcp.app import wiring
 from testkit.scheduler import scheduler_is
+from testkit.scheduler_loop import loop_over
 
-from orgmcp import observe, telemetry
-from orgmcp.cli import main
-from orgmcp.core import ROOT, Message, Org
+from orgmcp.core import ROOT, Org
+from orgmcp.daemon import SchedulerState
 from orgmcp.progress import progress
-from orgmcp.scheduler import Scheduler, SchedulerState
-from orgmcp.server import build_server
 
 FAKE = str(testkit.FAKE_AGENT)
 REFUSAL = "status must be one of ('done', 'failed', 'blocked')"
@@ -91,11 +92,11 @@ def world(tmp_path_factory):
     mp = pytest.MonkeyPatch()
     base = tmp_path_factory.mktemp("obs-e2e")
     mp.setenv("HOME", str(base / "home"))  # nothing here may touch the real home
-    telemetry.reset()
+    wiring.process_resources().reset()  # forget the open event files and counters of the process
     org = new_org(base)
     root = build_server(org, ROOT)
     once = {"ceo/eng": "crash"}  # eng's first run crashes; the scheduler retries it
-    sched = Scheduler(org, runner_with(once), echo=lambda _: None)
+    sched = loop_over(org, runner_with(once), echo=lambda _: None)
     sched.acquire()
     try:
         call(root, "delegate", to="ceo", title="Ship it", goal="Ship the thing", acceptance="It is shipped", budget=8)
@@ -107,7 +108,7 @@ def world(tmp_path_factory):
         drain(sched)
     finally:
         sched.release()
-        telemetry.reset()
+        wiring.process_resources().reset()  # forget the open event files and counters of the process
     yield SimpleNamespace(org=org, first=first, second=second, base=base)
     mp.undo()
 
@@ -193,7 +194,7 @@ def test_trace_totals_equal_progress(world):
 
 def test_messages_carry_the_trace_stamped_by_the_runtime(world):
     org = world.org
-    msgs = [Message.load(p) for a in (ROOT, *org.agents()) for p in (org.dir(a) / "sent").glob("*.md")]
+    msgs = [load_message(org, p) for a in (ROOT, *org.agents()) for p in (org.dir(a) / "sent").glob("*.md")]
     assert msgs and {m.trace for m in msgs} == {world.first.id}  # the rework stays in the trace of the task it revises
     delivered = [e for e in raw_events(org) if e["kind"] == "msg.deliver"]
     assert {e["trace_rule"] for e in delivered} <= {"new", "link", "open-task", "batch", "given"} and {"new", "link"} <= {
@@ -207,7 +208,7 @@ def test_root_grants_and_notes_without_a_trace_still_belong_to_the_request(world
     base.mkdir()
     org = new_org(base)
     task = org.delegate(ROOT, "ceo", "Ship it", "g", "a", budget=3)
-    sched = Scheduler(org, runner_with({}), echo=lambda _: None)
+    sched = loop_over(org, runner_with({}), echo=lambda _: None)
     sched.acquire()
     try:
         drain(sched)
@@ -220,7 +221,7 @@ def test_root_grants_and_notes_without_a_trace_still_belong_to_the_request(world
     grants = [i for i in tr["items"] if i["kind"] == "message" and i["id"] == note.id]
     assert len(grants) == 1 and grants[0]["trace_source"] == "window"
     assert tr["totals"]["budget_given"] == 5
-    telemetry.reset()
+    wiring.process_resources().reset()  # forget the open event files and counters of the process
 
 
 # ------------------------------------------------------------------------------------------ Q5: events
@@ -269,7 +270,7 @@ def test_metrics_counts_equal_counts_derived_from_the_files(world, capsys):
     types = {}
     for p in (org.dir(a) / "sent" for a in (ROOT, *org.agents())):
         for f in p.glob("*.md"):
-            t = Message.load(f).type
+            t = load_message(org, f).type
             types[t] = types.get(t, 0) + 1
     assert m["messages"] == types
     assert m["agent_failures"] == 1 and m["budget_spent"] == 7
@@ -299,7 +300,7 @@ def failing(org, check_id, also=()):
 
 def test_check_names_a_lost_message_copy(copy_of_world, capsys):
     org = copy_of_world
-    victim = next(p for p in (org.dir("ceo") / "read").glob("*.md") if Message.load(p).type == "task")
+    victim = next(p for p in (org.dir("ceo") / "read").glob("*.md") if load_message(org, p).type == "task")
     mid = victim.stem
     victim.unlink()
     assert mid in failing(org, "a", also="b")  # the run budget that message carried is gone too
@@ -351,11 +352,11 @@ def test_check_names_a_stuck_inflight_batch(copy_of_world):
 
 # ------------------------------------------------------------------------------------------ Q1: now
 def test_now_reflects_a_running_and_a_queued_state(tmp_path, capsys):
-    telemetry.reset()
+    wiring.process_resources().reset()  # forget the open event files and counters of the process
     org = new_org(tmp_path)
     root = build_server(org, ROOT)
     once = {"ceo": "hang"}
-    sched = Scheduler(org, runner_with(once), echo=lambda _: None)
+    sched = loop_over(org, runner_with(once), echo=lambda _: None)
     sched.acquire()
     mp = pytest.MonkeyPatch()
     try:
@@ -386,7 +387,7 @@ def test_now_reflects_a_running_and_a_queued_state(tmp_path, capsys):
     finally:
         mp.undo()
         sched.release()  # kills the hung run: its cause is recorded
-        telemetry.reset()
+        wiring.process_resources().reset()  # forget the open event files and counters of the process
     ended = [e for e in raw_events(org) if e["kind"] == "run.end"]
     assert len(ended) == 1 and ended[0]["killed"] is True and "shutdown" in ended[0]["error"]
     after = observe.trace(org, hang.id)
@@ -411,4 +412,4 @@ def test_now_with_a_stale_running_record_and_no_scheduler(tmp_path):
     assert [r["agent"] for r in v["runs_in_flight"]] == ["ceo"]
     res = observe.check(org)
     assert not res["ok"] and any(c["id"] == "c" and not c["ok"] for c in res["checks"])
-    telemetry.reset()
+    wiring.process_resources().reset()  # forget the open event files and counters of the process
