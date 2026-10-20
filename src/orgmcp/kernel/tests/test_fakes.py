@@ -11,6 +11,7 @@ import pytest
 
 from orgmcp.kernel.testing import (
     T0,
+    CounterTokens,
     DictEnvironment,
     FailingAtomicWriter,
     FakeClock,
@@ -18,6 +19,7 @@ from orgmcp.kernel.testing import (
     MemoryAtomicWriter,
     MemoryLedgerStore,
     RecordedEvent,
+    RecordingAtomicWriter,
     RecordingTraceTap,
     SequenceIdGenerator,
 )
@@ -118,3 +120,26 @@ def test_dict_environment() -> None:
     assert (env.get("A"), env.get("B"), env.get("C")) == ("1", "2", None)
     assert dict(env.variables()) == {"A": "1", "B": "2"} and (env.cwd(), env.home()) == (Path("/w"), Path("/h"))
     assert DictEnvironment().variables() == {}
+
+
+def test_recording_atomic_writer_tells_what_it_was_asked_to_write_and_writes_nothing(tmp_path: Path) -> None:
+    seen: list[tuple[Path, str]] = []
+    writer = RecordingAtomicWriter(lambda path, text: seen.append((path, text)))
+    writer.write(tmp_path / "a.txt", "one")
+    writer.write(tmp_path / "b.txt", "two")
+    assert seen == [(tmp_path / "a.txt", "one"), (tmp_path / "b.txt", "two")] and list(tmp_path.iterdir()) == []
+
+
+def test_counter_tokens_share_one_counter_across_lengths_by_default() -> None:
+    tokens = CounterTokens()
+    assert [tokens.token_hex(2), tokens.token_hex(4), tokens.token_hex(2)] == ["0000", "00000001", "0002"]
+    assert tokens.counts == {2: 2, 4: 1}
+
+
+def test_counter_tokens_can_count_each_length_on_its_own() -> None:
+    tokens = CounterTokens(per_length=True)
+    assert [tokens.token_hex(2), tokens.token_hex(4), tokens.token_hex(2)] == ["0000", "00000000", "0001"]
+
+
+def test_counter_tokens_start_where_they_are_told_to() -> None:
+    assert [CounterTokens(start=1).token_hex(2), CounterTokens(per_length=True, start=0xFF).token_hex(1)] == ["0001", "ff"]

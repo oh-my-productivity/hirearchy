@@ -18,8 +18,8 @@ def run(coro):
 
 
 @pytest.fixture
-def demo(tmp_path, monkeypatch):
-    set_scheduler(monkeypatch, SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))
+def demo(tmp_path, process_overrides):
+    set_scheduler(process_overrides, SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))
     return demo_org(tmp_path)
 
 
@@ -711,8 +711,8 @@ def test_unreadable_files_are_reported_not_fatal(demo):
     scenario(demo, fn)
 
 
-def test_an_empty_organization(tmp_path, monkeypatch):
-    set_scheduler(monkeypatch, SchedulerState("stopped"))
+def test_an_empty_organization(tmp_path, process_overrides):
+    set_scheduler(process_overrides, SchedulerState("stopped"))
     org = Org.init(tmp_path / "empty", "m")
     ns = type("NS", (), {"org": org})()
 
@@ -759,8 +759,8 @@ def test_the_app_writes_nothing(demo, capsys):
     assert snapshot_files(demo.org.root) == before
 
 
-def test_no_events_file_is_created_by_the_app_on_an_org_without_events(tmp_path, monkeypatch):
-    set_scheduler(monkeypatch, SchedulerState("stopped"))
+def test_no_events_file_is_created_by_the_app_on_an_org_without_events(tmp_path, process_overrides):
+    set_scheduler(process_overrides, SchedulerState("stopped"))
     org = Org.init(tmp_path / "o", "m", {"events": False})  # the setup itself must not create an event log
     org.hire(ROOT, "a", "r", "c")
     org.delegate(ROOT, "a", "T", "g", "c", budget=2)

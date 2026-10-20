@@ -19,9 +19,9 @@ from orgmcp.progress import progress
 
 
 @pytest.fixture
-def sched_up(monkeypatch):
+def sched_up(process_overrides):
     up = lambda o: SchedulerState("running", 7000, "2026-10-18 10:00:00Z")  # noqa: E731
-    scheduler_is(monkeypatch, up(None))
+    scheduler_is(process_overrides, up(None))
 
 
 @pytest.fixture
@@ -73,7 +73,7 @@ def test_queued_matches_observe_now(demo):
     assert snap.agents["ceo"].elapsed_s == pytest.approx(ceo["elapsed_s"], abs=0.01)
 
 
-def test_queue_reasons_one_by_one(tmp_path, monkeypatch):
+def test_queue_reasons_one_by_one(tmp_path, process_overrides):
     org = Org.init(tmp_path / "o", "m", {"max_parallel": 1, "events": False})
     for n in ("a", "b", "c", "d", "e"):
         org.hire(ROOT, n, "r", "c")
@@ -91,14 +91,14 @@ def test_queue_reasons_one_by_one(tmp_path, monkeypatch):
     org.start_run_log("b")
     org.start_run_log("b")
     org.start_run_log("b")
-    set_scheduler(monkeypatch, SchedulerState("stopped"))
+    set_scheduler(process_overrides, SchedulerState("stopped"))
     data = dd.DashData(org.root)
     s = data.snapshot()
     assert (s.agents["a"].kind, s.agents["a"].main) == ("queued", "queued: scheduler is not running")
     assert (s.agents["b"].kind, s.agents["b"].main) == ("budget", "out of budget") and s.agents["b"].word.endswith(" unread")
     assert (s.agents["c"].kind, s.agents["c"].main) == ("paused", "paused: broken") and "queued" not in s.agents["c"].word
     assert s.agents["d"].word.startswith("running") and ", +1 unread" in s.agents["d"].word and "scheduler not running" in s.agents["d"].word
-    set_scheduler(monkeypatch, SchedulerState("running", 1, "x"), org)
+    set_scheduler(process_overrides, SchedulerState("running", 1, "x"), org)
     data = dd.DashData(org.root)
     s = data.snapshot()
     assert s.agents["a"].main == "queued: max_parallel (1) runs are busy"
@@ -111,14 +111,14 @@ def test_queue_reasons_one_by_one(tmp_path, monkeypatch):
         a: r.reason for a, r in s.agents.items() if r.unread and a != ROOT and r.kind != "budget"}
 
 
-def test_header_scheduler_text(demo, monkeypatch):
+def test_header_scheduler_text(demo, process_overrides):
     snap = demo.data.snapshot()
     assert snap.scheduler.state == "running" and snap.scheduler.pid == 7000
     assert snap.scheduler.mode == "until_done" and snap.scheduler.uptime_s == pytest.approx(400, abs=1)
     assert snap.scheduler.heartbeat_age_s == pytest.approx(3, abs=1)
     assert "scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)" == snap.scheduler.text
     assert snap.counts_text == "running 2/2 · queued 1 · waiting on you 1 · errors 15m 2"
-    set_scheduler(monkeypatch, SchedulerState("stopped"))
+    set_scheduler(process_overrides, SchedulerState("stopped"))
     d2 = dd.DashData(demo.org.root, now=lambda: DEMO_NOW)
     s2 = d2.snapshot()
     assert s2.scheduler.state == "stopped" and s2.scheduler.text == "scheduler stopped"
@@ -127,8 +127,8 @@ def test_header_scheduler_text(demo, monkeypatch):
     assert s3.scheduler.text == "scheduler stopped (finished: no open tasks)"
 
 
-def test_an_unverified_scheduler_is_not_trusted(demo, monkeypatch):
-    scheduler_is(monkeypatch, SchedulerState("unverified", 5, "x", "its command line is 'vim'"))
+def test_an_unverified_scheduler_is_not_trusted(demo, process_overrides):
+    scheduler_is(process_overrides, SchedulerState("unverified", 5, "x", "its command line is 'vim'"))
     s = dd.DashData(demo.org.root, now=lambda: DEMO_NOW).snapshot()
     assert s.scheduler.state == "unverified" and "unverified" in s.scheduler.text
     assert s.agents["ceo/analyst"].reason == "scheduler is not running"
@@ -296,8 +296,8 @@ def test_check_runs_on_demand_only(demo):
 
 
 # ------------------------------------------------------------------------------------------ robustness
-def test_an_org_with_no_agents_and_no_events(tmp_path, monkeypatch):
-    set_scheduler(monkeypatch, SchedulerState("stopped"))
+def test_an_org_with_no_agents_and_no_events(tmp_path, process_overrides):
+    set_scheduler(process_overrides, SchedulerState("stopped"))
     org = Org.init(tmp_path / "empty", "m")
     assert not (org.root / ".runtime" / "events").exists()
     data = dd.DashData(org.root)
@@ -337,8 +337,8 @@ def test_a_partially_written_event_line_and_garbage_are_ignored(demo):
     data.feed.poll(DEMO_NOW)  # must not raise
 
 
-def test_a_stale_running_record_without_a_scheduler(tmp_path, monkeypatch):
-    set_scheduler(monkeypatch, SchedulerState("stopped"))
+def test_a_stale_running_record_without_a_scheduler(tmp_path, process_overrides):
+    set_scheduler(process_overrides, SchedulerState("stopped"))
     org = Org.init(tmp_path / "o", "m", {"events": False})
     org.hire(ROOT, "a", "r", "c")
     org.delegate(ROOT, "a", "t", "g", "c", budget=3)
@@ -427,8 +427,8 @@ def test_once_output_sample(demo):
 
 # ------------------------------------------------------------------------------------------ performance
 @pytest.mark.skipif(os.environ.get("ORGMCP_SKIP_PERF"), reason="perf measurement skipped")
-def test_a_refresh_tick_of_50_agents_and_2000_messages(tmp_path, monkeypatch, capsys):
-    scheduler_is(monkeypatch, SchedulerState("running", 7000, "x"))
+def test_a_refresh_tick_of_50_agents_and_2000_messages(tmp_path, process_overrides, capsys):
+    scheduler_is(process_overrides, SchedulerState("running", 7000, "x"))
     org = big_org(tmp_path, agents=50, messages=2000)
     old = time.time() - 3600  # an organization that has existed for a while: its mailboxes are not being written now
     for dirpath, dirnames, _ in os.walk(org.root):

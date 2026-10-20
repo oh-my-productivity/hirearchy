@@ -34,8 +34,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "Runner PROJECT_DIR KIRO_AGENTS_DIR mcp_server_command kiro_profile_name file_confinement "
         "ensure_kiro_profile kiro_runner Run judge_orphan kill_group ignore_runtime_files "
         "scheduler_command scheduler_state describe_scheduler waiting_on_user start_scheduler "
-        "stop_scheduler Scheduler nothing_to_do "
-        "datetime"  # imported by the flat module, replaced by the golden fixtures (tests/golden/conftest.py): a public name of the package
+        "stop_scheduler Scheduler nothing_to_do"
     ),
     "server": _e3(
         "INSTRUCTIONS ROOT_INSTRUCTIONS DS_STORE OrgBinding build_server resolve_binding serve"
@@ -54,7 +53,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "telemetry": _e3(
         "TITLE_MAX ERROR_MAX clip set_process "
         "process dropped reset traces_seen note_trace single ensure_ignored emit summarize_args prune "
-        "SCHEMA_VERSION LINE_MAX EVENTS_REL DAY_RE ENVELOPE PROCS datetime"  # imported by the flat module, used by tests/golden: public names
+        "SCHEMA_VERSION LINE_MAX EVENTS_REL DAY_RE ENVELOPE PROCS"
     ),
     "observe": _e3(
         "EVENTS_DIR ERROR_WINDOW COPY_GRACE INFLIGHT_GRACE RECV_BOXES ENVELOPE READ_ONLY_TOOLS VIEWS fmt_dur fmt_rel "

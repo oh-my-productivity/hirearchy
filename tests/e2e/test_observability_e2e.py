@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import json
 import os
 import re
@@ -358,7 +359,7 @@ def test_now_reflects_a_running_and_a_queued_state(tmp_path, capsys):
     once = {"ceo": "hang"}
     sched = loop_over(org, runner_with(once), echo=lambda _: None)
     sched.acquire()
-    mp = pytest.MonkeyPatch()
+    stack = contextlib.ExitStack()  # the process overrides of this test: closed in the `finally`
     try:
         call(root, "delegate", to="ceo", title="Slow job", goal="g", acceptance="a", budget=3)
         hang = next(m for m in org.sent(ROOT) if m.type == "task")
@@ -370,7 +371,7 @@ def test_now_reflects_a_running_and_a_queued_state(tmp_path, capsys):
         call(root, "delegate", to="ceo", title="Second job", goal="g", acceptance="a", budget=2)  # waits behind the run
         sched.tick()
         # this pytest process stands in for the scheduler process: tell the view its pid file is verified
-        scheduler_is(mp, SchedulerState("running", os.getpid(), "now"), org)
+        scheduler_is(lambda overrides: stack.enter_context(wiring.overriding(overrides)), SchedulerState("running", os.getpid(), "now"), org)
         time.sleep(0.3)
         v = observe.now_view(org)
         assert v["scheduler"]["state"] == "running" and v["scheduler"]["mode"] == "daemon"
@@ -385,7 +386,7 @@ def test_now_reflects_a_running_and_a_queued_state(tmp_path, capsys):
         assert "runs in flight 1/3" in call(root, "observe", view="now")
         assert "ceo" in observe.trace(org, hang.id)["team"]
     finally:
-        mp.undo()
+        stack.close()
         sched.release()  # kills the hung run: its cause is recorded
         wiring.process_resources().reset()  # forget the open event files and counters of the process
     ended = [e for e in raw_events(org) if e["kind"] == "run.end"]

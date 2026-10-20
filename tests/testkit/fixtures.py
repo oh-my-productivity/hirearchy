@@ -4,6 +4,7 @@
 test starts with the process resources empty (no open event files, no drop counter, the default process name, no cached parse). ``org`` is a ready team; ``real_kiro`` is the sandbox of the (skipped by default) integration tests.
 """
 
+import contextlib
 import os
 import stat
 
@@ -11,8 +12,11 @@ import pytest
 
 from orgmcp.app import wiring
 from orgmcp.core import ROOT, Org
+from orgmcp.kernel import TokenSource
+from orgmcp.kernel.testing import CounterTokens
 
 from . import process_state
+from .clocks import clock_ports
 
 
 @pytest.fixture(autouse=True)
@@ -56,6 +60,42 @@ def isolated_kiro(request, tmp_path_factory, process_state_guard, monkeypatch):
     monkeypatch.setenv("PATH", f"{stub_dir}{os.pathsep}{os.environ.get('PATH', '')}")
     monkeypatch.setattr("orgmcp.scheduler.KIRO_AGENTS_DIR", base / ".kiro" / "agents")
     return base
+
+
+@pytest.fixture
+def process_overrides(request):
+    """``process_overrides({Port: fake, ...})``: every runtime opened from now until the end of the test (by the test or by the code under test:
+    ``Org(root)``, a CLI command, an MCP tool, the scheduler) starts from these ports; ``open_runtime(root, overrides)`` still wins. The one seam
+    that replaces patching module attributes (``wiring.overriding``). Request it BEFORE the fixtures that open an organization (``org``)."""
+    with contextlib.ExitStack() as stack:
+        yield lambda overrides: stack.enter_context(wiring.overriding(overrides))
+
+
+@pytest.fixture
+def frozen_clock(process_overrides):
+    """``frozen_clock(now, events=False)``: the ``Clock`` of every runtime reads ``now`` (a datetime, or a function returning one, called at each reading);
+    the time/monotonic/sleep of the clock stay the system's. The events are stamped with the system's time unless ``events`` (the clock of the events is
+    a port of its own). Returns ``now`` as a function (``clock()``, and the ``at``/``tick`` it may have)."""
+
+    def freeze(now, events=False):
+        reading = now if callable(now) else (lambda: now)
+        process_overrides(clock_ports(reading, events))
+        return now if callable(now) else reading
+
+    return freeze
+
+
+@pytest.fixture
+def counter_ids(process_overrides):
+    """``counter_ids(per_length=False, start=0)``: message ids (and the temp names of atomic writes) count 0000, 0001 ... instead of being random. One
+    counter for all lengths by default (the scenarios), one per byte length with ``per_length`` (the golden suite). Returns the ``CounterTokens``."""
+
+    def count(per_length=False, start=0):
+        tokens = CounterTokens(per_length, start)
+        process_overrides({TokenSource: tokens})
+        return tokens
+
+    return count
 
 
 @pytest.fixture

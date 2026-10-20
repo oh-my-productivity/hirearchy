@@ -1,7 +1,6 @@
 """The old module-level functions of ``orgmcp.telemetry``, as thin adapters over the process defaults (``_process``).
 
-Exported by ``__init__`` until step E3 (``LEGACY_EXPORTS``). ``datetime`` is imported here because the fixtures that fix the time of the
-events replace ``orgmcp.telemetry.datetime`` (the composition root's event clock reads it).
+Exported by ``__init__`` until step E3 (``LEGACY_EXPORTS``).
 """
 
 from __future__ import annotations
@@ -16,7 +15,7 @@ from ._process import count_dropped, defaults
 from ._summarize import JsonArgumentSummarizer
 
 __all__ = [
-    "DAY_RE", "ENVELOPE", "ERROR_MAX", "EVENTS_REL", "LINE_MAX", "PROCS", "SCHEMA_VERSION", "TITLE_MAX", "clip", "datetime", "dropped",
+    "DAY_RE", "ENVELOPE", "ERROR_MAX", "EVENTS_REL", "LINE_MAX", "PROCS", "SCHEMA_VERSION", "TITLE_MAX", "clip", "dropped",
     "emit", "ensure_ignored", "note_trace", "process", "prune", "reset", "set_process", "single", "summarize_args", "traces_seen",
 ]
 

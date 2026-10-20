@@ -9,9 +9,10 @@ from typing import Any
 
 import pytest
 
-import orgmcp.core as core
-from orgmcp.app import Org
+from orgmcp.app import Org, wiring
+from orgmcp.kernel import Clock
 from orgmcp.runs.testing import MemoryRuns
+from testkit.clocks import ClockReading
 
 
 def use(org: Org, **ports: Any) -> None:
@@ -50,9 +51,9 @@ def test_runs_used_of_an_address_that_is_spelled_differently(org: Org) -> None:
     assert org.runs_used(" /ceo/eng/ ") == 1
 
 
-def test_start_run_log_creates_the_empty_log_and_consumes_a_run(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_start_run_log_creates_the_empty_log_and_consumes_a_run(org: Org) -> None:
     org.delegate("root", "ceo", "T", "g", "a", budget=5)
-    monkeypatch.setattr(core, "utcnow", lambda: datetime(2031, 5, 6, 7, 8, 9, 123456, tzinfo=timezone.utc))
+    org.runtime = wiring.open_runtime(org.root, {Clock: ClockReading(lambda: datetime(2031, 5, 6, 7, 8, 9, 123456, tzinfo=timezone.utc))})
     before = org.budget("ceo")
     assert before is not None
     log = org.start_run_log("ceo")
@@ -73,8 +74,8 @@ def test_start_run_log_makes_only_the_runs_directory(org: Org) -> None:
     assert not (org.root / "ghost").exists()
 
 
-def test_two_logs_in_the_same_instant_are_one_run(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(core, "utcnow", lambda: datetime(2031, 5, 6, 7, 8, 9, 123456, tzinfo=timezone.utc))
+def test_two_logs_in_the_same_instant_are_one_run(org: Org) -> None:
+    org.runtime = wiring.open_runtime(org.root, {Clock: ClockReading(lambda: datetime(2031, 5, 6, 7, 8, 9, 123456, tzinfo=timezone.utc))})
     assert org.start_run_log("ceo") == org.start_run_log("ceo") and org.runs_used("ceo") == 1
 
 

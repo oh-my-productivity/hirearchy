@@ -8,7 +8,9 @@ from ..telemetry import ArgumentSummarizer, EventRetention, EventSinks, ProcessL
 
 STEP: str | None = "A-telemetry"  # the step that filled this part (see test_runtime_fields)
 # (the fields ``events: EventSink`` and ``trace_tap: TraceTap`` are the kernel's ports: they are in fields_kernel.py, built by wire_telemetry.py)
-NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
+NOT_A_FIELD: dict[str, str] = {
+    "EventClock": "private to telemetry (telemetry/_ports.py): the clock the sink and the retention are built with; a test overrides it, nothing reads it",
+}  # port -> why it is not a runtime field (a value, a factory, ...)
 
 
 @dataclass(frozen=True)

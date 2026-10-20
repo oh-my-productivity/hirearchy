@@ -14,6 +14,11 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+from testkit.clocks import clock_ports
+
+from orgmcp.kernel import TokenSource
+from orgmcp.kernel.testing import CounterTokens
+
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 ROOT = "root"
 
@@ -23,7 +28,7 @@ def at(seconds: float) -> datetime:
 
 
 class ScenarioClock:
-    """Replaces ``core.utcnow``: fixed until told to move, then 1 ms per call so that message ids stay ordered."""
+    """The clock of the runtimes (``Clock.now``): fixed until told to move, then 1 ms per call so that message ids stay ordered."""
 
     def __init__(self) -> None:
         self.t = T0
@@ -34,17 +39,6 @@ class ScenarioClock:
 
     def at(self, seconds: float) -> None:
         self.t = at(seconds)
-
-
-class CountingSecrets:
-    """``secrets.token_hex`` as a counter, so that the ids of the messages are the same in every run."""
-
-    def __init__(self) -> None:
-        self.n = 0
-
-    def token_hex(self, nbytes: int = 32) -> str:
-        self.n += 1
-        return f"{self.n:0{2 * nbytes}x}"
 
 
 def add_run(org: Any, addr: str, start: float, end: float, footer: str = "") -> None:
@@ -62,12 +56,11 @@ def drain(org: Any, addr: str) -> None:
     org.end_run(addr, ok=True)
 
 
-def install(monkeypatch: Any) -> ScenarioClock:
-    """Patch the patch points of ``core`` (the clock and the id randomness); the returned clock is the one in force."""
-    core: ModuleType = importlib.import_module("orgmcp.core")
+def install(process_overrides: Any) -> ScenarioClock:
+    """Give every runtime opened from now on (until the test ends) the clock of the scenario and ids that count (the ``process_overrides`` fixture);
+    the returned clock is the one in force."""
     clock = ScenarioClock()
-    monkeypatch.setattr(core, "utcnow", clock)
-    monkeypatch.setattr(core, "secrets", CountingSecrets())
+    process_overrides({**clock_ports(clock), TokenSource: CounterTokens(start=1)})
     return clock
 
 

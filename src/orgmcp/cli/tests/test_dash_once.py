@@ -12,9 +12,9 @@ from orgmcp.kernel.testing import FakeClock
 
 
 @pytest.fixture
-def sched_up(monkeypatch):
+def sched_up(process_overrides):
     up = lambda o: SchedulerState("running", 7000, "2026-10-18 10:00:00Z")  # noqa: E731
-    scheduler_is(monkeypatch, up(None))
+    scheduler_is(process_overrides, up(None))
 
 
 class DashData:
@@ -36,9 +36,9 @@ def render_once(data):
 
 
 @pytest.fixture
-def demo(tmp_path, sched_up, monkeypatch):
+def demo(tmp_path, sched_up, process_overrides):
     ns = demo_org(tmp_path)
-    clock_is(monkeypatch, FakeClock(DEMO_NOW))  # after the demo is built (under its own clock): every runtime opened from here on is at DEMO_NOW
+    clock_is(process_overrides, FakeClock(DEMO_NOW))  # after the demo is built (under its own clock): every runtime opened from here on is at DEMO_NOW
     ns.data = DashData(ns.org.root, now=lambda: DEMO_NOW)
     return ns
 

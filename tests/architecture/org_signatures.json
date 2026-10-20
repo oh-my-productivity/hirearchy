@@ -2238,22 +2238,6 @@
    ],
    "annotated": "(cls, meta: 'JsonObject', body: 'str', path: 'Path | None' = None) -> 'Self'"
   },
-  "load": {
-   "kind": "classmethod",
-   "params": [
-    {
-     "name": "cls",
-     "kind": "POSITIONAL_OR_KEYWORD",
-     "default": null
-    },
-    {
-     "name": "path",
-     "kind": "POSITIONAL_OR_KEYWORD",
-     "default": null
-    }
-   ],
-   "annotated": "(cls: 'type[Message]', path: 'Path') -> 'Message'"
-  },
   "meta": {
    "kind": "method",
    "params": [

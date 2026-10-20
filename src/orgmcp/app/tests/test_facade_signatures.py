@@ -18,7 +18,7 @@ ACTUAL = _signatures.collect()
 
 def test_the_recorded_surface_is_the_98_methods_of_org_and_the_members_of_message() -> None:
     assert len(EXPECTED["Org"]) == 98
-    assert set(EXPECTED["Message"]) == {"__init__", "cut_body", "from_parts", "load", "meta", "parse", "render", "to_text"}
+    assert set(EXPECTED["Message"]) == {"__init__", "cut_body", "from_parts", "meta", "parse", "render", "to_text"}  # (``load`` went with the legacy file reader: E2-compat)
 
 
 @pytest.mark.parametrize("cls", ["Org", "Message"])

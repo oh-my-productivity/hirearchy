@@ -68,19 +68,23 @@ class SequenceIdGenerator(IdGenerator):
 
 
 class CounterTokens(TokenSource):
-    """Tokens that count ``0``, ``1``, ``2`` ... instead of being random (so the ids of messages are the same in every run).
+    """Tokens that count ``start``, ``start + 1`` ... instead of being random (so the ids of messages are the same in every run).
 
     One counter for every length by default - the ids and the temp names of the atomic writes number off the same sequence, as the scenarios
     that patched ``core.secrets`` had it; ``per_length`` keeps a counter for each byte length (what the golden suite had), so that a write does not
     move the ids. ``counts`` is how many tokens were made, by byte length."""
 
-    def __init__(self, per_length: bool = False) -> None:
+    def __init__(self, per_length: bool = False, start: int = 0) -> None:
         self._per_length = per_length
+        self._start = start
         self.counts: dict[int, int] = {}
-        self._shared = 0
+        self._made = 0
 
     def token_hex(self, nbytes: int) -> str:
-        raise NotImplementedError
+        n = self._start + (self.counts.get(nbytes, 0) if self._per_length else self._made)
+        self._made += 1
+        self.counts[nbytes] = self.counts.get(nbytes, 0) + 1
+        return f"{n:0{2 * nbytes}x}"
 
 
 @dataclass
@@ -125,6 +129,16 @@ class MemoryAtomicWriter(AtomicWriter):
 
     def write(self, path: Path, text: str) -> None:
         self.files[path] = text
+
+
+class RecordingAtomicWriter(AtomicWriter):
+    """Writes nothing; tells ``on_write(path, text)`` what it was asked to write, in order (a test that only needs to see the writes)."""
+
+    def __init__(self, on_write: Callable[[Path, str], None]) -> None:
+        self._on_write = on_write
+
+    def write(self, path: Path, text: str) -> None:
+        self._on_write(path, text)
 
 
 class FailingAtomicWriter(AtomicWriter):

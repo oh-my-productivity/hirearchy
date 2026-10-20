@@ -10,7 +10,6 @@ import json
 from pathlib import Path
 
 from ..kernel import child_addr as _child_addr, depth as _depth, norm as _norm, OrgError, parent as _parent, ROOT
-from ._compat import atomic_write
 from .wiring import open_runtime
 
 
@@ -53,4 +52,4 @@ class CoreMixin:
             return {}
 
     def save_ledger(self, name: str, data: dict) -> None:
-        atomic_write(self.root / ".runtime" / f"{name}.json", json.dumps(data, indent=2) + "\n")
+        self.runtime.ledgers.write(name, data)

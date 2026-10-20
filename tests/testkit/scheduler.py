@@ -2,25 +2,23 @@
 
 ``SchedulerStatus`` is what ``observability`` (``now``, ``check``) asks; a test replaces it with ``FakeSchedulerStatus`` instead of patching a module
 function. The organizations a test already holds are given; every organization opened afterwards (by the command line, the dashboard, the MCP server)
-gets the fake from the table of providers of the composition root.
+gets the fake through the process overrides of the composition root (``wiring.overriding``, the ``process_overrides`` fixture).
 """
 
 from __future__ import annotations
 
 import dataclasses
+from collections.abc import Callable, Mapping
 from typing import Any
 
-import pytest
-
-from orgmcp.app import wiring
 from orgmcp.daemon import SchedulerState, SchedulerStatus
 from orgmcp.daemon.testing import FakeSchedulerStatus
 
 
-def scheduler_is(monkeypatch: pytest.MonkeyPatch, state: SchedulerState, *orgs: Any) -> FakeSchedulerStatus:
-    """The scheduler is in ``state`` for ``orgs`` and for every organization opened until the end of the test."""
+def scheduler_is(process_overrides: Callable[[Mapping[type, object]], object], state: SchedulerState, *orgs: Any) -> FakeSchedulerStatus:
+    """The scheduler is in ``state`` for ``orgs`` and for every organization opened until the end of the test (``process_overrides``: the fixture)."""
     status = FakeSchedulerStatus(state)
-    monkeypatch.setattr(wiring, "_providers", {**wiring.providers(), SchedulerStatus: lambda _: status})
+    process_overrides({SchedulerStatus: status})
     for org in orgs:
-        monkeypatch.setattr(org, "runtime", dataclasses.replace(org.runtime, scheduler_status=status))
+        org.runtime = dataclasses.replace(org.runtime, scheduler_status=status)
     return status

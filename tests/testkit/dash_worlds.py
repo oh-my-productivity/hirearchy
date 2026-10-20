@@ -9,12 +9,10 @@ from __future__ import annotations
 
 import shutil
 import tempfile
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator, Mapping
 from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
-
-import pytest
 
 from orgmcp.core import Org
 from orgmcp.daemon import SchedulerState
@@ -36,13 +34,13 @@ def scratch() -> Iterator[Path]:
         shutil.rmtree(base, ignore_errors=True)
 
 
-def demo(patch: pytest.MonkeyPatch, base: Path) -> SimpleNamespace:
-    """The organization ``acme`` of ``dash_fixtures`` at ``base``, with its scheduler running."""
-    scheduler_is(patch, SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))
+def demo(process_overrides: Callable[[Mapping[type, object]], object], base: Path) -> SimpleNamespace:
+    """The organization ``acme`` of ``dash_fixtures`` at ``base``, with its scheduler running (``process_overrides``: where the fake status is put)."""
+    scheduler_is(process_overrides, SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))
     return demo_org(base)
 
 
-def empty(patch: pytest.MonkeyPatch, base: Path) -> Org:
-    """An organization with only its root, with its scheduler stopped."""
-    scheduler_is(patch, SchedulerState("stopped"))
+def empty(process_overrides: Callable[[Mapping[type, object]], object], base: Path) -> Org:
+    """An organization with only its root, with its scheduler stopped (``process_overrides``: where the fake status is put)."""
+    scheduler_is(process_overrides, SchedulerState("stopped"))
     return Org.init(base / "empty", "m")

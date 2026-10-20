@@ -32,7 +32,7 @@ class SystemClock(Clock):
 
 class SecretsTokens(TokenSource):
     def token_hex(self, nbytes: int) -> str:
-        raise NotImplementedError
+        return secrets.token_hex(nbytes)
 
 
 class TimestampIdGenerator(IdGenerator):

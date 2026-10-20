@@ -13,11 +13,13 @@ from pathlib import Path
 
 from orgmcp.core import ROOT, Message, Org, join_frontmatter, split_frontmatter
 
+from .clocks import clock_ports
+
 T0 = datetime(2026, 10, 18, 10, 0, 0, tzinfo=timezone.utc)
 
 
 class Clock:
-    """A callable standing in for ``orgmcp.core.utcnow``: time only moves when the test says so (plus 1 microsecond per
+    """A callable serving ``Clock.now`` of the runtimes (``freeze``): time only moves when the test says so (plus 1 microsecond per
     call, so ids stay unique and ordered)."""
 
     def __init__(self, start: datetime = T0):
@@ -35,9 +37,10 @@ class Clock:
         return self.t
 
 
-def freeze(monkeypatch) -> Clock:
+def freeze(process_overrides) -> Clock:
+    """The controllable clock, as the ``Clock`` of every runtime opened from now on (``process_overrides``: the fixture of tests/testkit/fixtures.py)."""
     clock = Clock()
-    monkeypatch.setattr("orgmcp.core.utcnow", clock)
+    process_overrides(clock_ports(clock))
     return clock
 
 

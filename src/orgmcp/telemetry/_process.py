@@ -1,8 +1,7 @@
 """The process defaults that the legacy functions of ``orgmcp.telemetry`` delegate to, installed by the composition root.
 
 The legacy callers (the MCP server, the CLI, the scheduler, the facade) have no runtime at hand, and a feature package may not import
-the composition root: ``orgmcp.app`` installs the defaults of the process with ``install`` when it is loaded (as it installs
-``Message.load`` into the kernel). The only state here is that installed reference. Deleted with the legacy functions (E3).
+the composition root: ``orgmcp.app`` installs the defaults of the process with ``install`` when it is loaded. The only state here is that installed reference. Deleted with the legacy functions (E3).
 """
 
 from __future__ import annotations

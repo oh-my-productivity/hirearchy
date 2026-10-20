@@ -4,9 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
-import orgmcp.core as core
 from orgmcp.agents import AgentDirectory, AgentRegistry, CharterReader, RetiredArchive
 from orgmcp.agents._caching import CachingAgentDirectory, DirectoryProbe, LenientCharterReader
 from orgmcp.agents._charters import FsCharterReader
@@ -16,7 +13,8 @@ from orgmcp.agents._retired import FsRetiredArchive
 from orgmcp.agents.testing import MemoryAgents
 from orgmcp.app import Org, wire_agents, wiring
 from ._lenient_org import LenientOrg
-from orgmcp.kernel import OrgLayout, OrgPaths
+from orgmcp.kernel import AtomicWriter, OrgLayout, OrgPaths
+from orgmcp.kernel.testing import RecordingAtomicWriter
 
 
 class FixedProbe(DirectoryProbe):
@@ -48,14 +46,13 @@ def test_the_ports_look_at_the_runtime_root(tmp_path: Path) -> None:
     assert [t.name for t in runtime.retired_archive.trees()] == ["ceo-S"] and runtime.agents.agents() == []
 
 
-def test_the_charter_is_written_through_the_atomic_writer_of_the_runtime(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_the_charter_is_written_through_the_atomic_writer_of_the_runtime(tmp_path: Path) -> None:
     written: list[tuple[Path, str]] = []
 
     def record(path: Path, text: str) -> None:
         written.append((path, text))
 
-    monkeypatch.setattr(core, "atomic_write", record)
-    wiring.open_runtime(tmp_path).agent_registry.rewrite_charter("ceo", "text")
+    wiring.open_runtime(tmp_path, {AtomicWriter: RecordingAtomicWriter(record)}).agent_registry.rewrite_charter("ceo", "text")
     assert written == [(tmp_path / "ceo" / "AGENT.md", "text")]
 
 

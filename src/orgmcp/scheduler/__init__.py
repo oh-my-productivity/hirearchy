@@ -8,7 +8,6 @@ from it: they are answered by name (``__getattr__``) from the packages that own 
 """
 
 import importlib as _importlib
-from datetime import datetime  # the golden fixtures replace it (``orgmcp.scheduler.datetime``): kept in the ledger of the legacy names
 
 from . import api
 from .api import *  # noqa: F403
@@ -46,7 +45,6 @@ __all__ = [
     "Run",
     "Runner",
     "Scheduler",
-    "datetime",
     "describe_scheduler",
     "ensure_kiro_profile",
     "file_confinement",

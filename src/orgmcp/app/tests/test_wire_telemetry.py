@@ -15,8 +15,8 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp import core, telemetry
-from orgmcp.app import Org, _compat, wiring
+from orgmcp import telemetry
+from orgmcp.app import Org, wiring
 from orgmcp.app._resources import ProcessResources
 from orgmcp.eventlog import EVENTS_REL, PROCS
 from orgmcp.kernel import Clock, EventSink, TraceTap
@@ -25,6 +25,7 @@ from orgmcp.settings import EventSwitch
 from orgmcp.settings.testing import MemoryOrgSettings
 from orgmcp.snapshots import IgnoreList
 from orgmcp.snapshots.testing import MemoryIgnoreList
+from testkit.clocks import clock_ports
 from orgmcp.telemetry import ArgumentSummarizer, EventRetention, EventSinks, ProcessLabel, TraceScope
 from orgmcp.telemetry._label import MutableProcessLabel
 from orgmcp.telemetry._pool import EventWriterPool
@@ -102,34 +103,33 @@ def test_a_sink_override_replaces_the_port(tmp_path: Path) -> None:
     assert wiring.open_runtime(tmp_path, {EventSink: sink}).events is sink
 
 
-def test_the_event_clock_follows_the_patch_point_of_the_telemetry_module(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_the_events_are_stamped_by_the_event_clock_of_the_runtime(org: Org) -> None:
     fixed = datetime(2031, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
-
-    class FixedDatetime(datetime):
-        @classmethod
-        def now(cls, tz=None):  # type: ignore[no-untyped-def]
-            return fixed if tz is not None else fixed.replace(tzinfo=None)
-
-    monkeypatch.setattr(telemetry, "datetime", FixedDatetime)
+    org.runtime = wiring.open_runtime(org.root, clock_ports(lambda: fixed, events=True))
     org.emit("custom.kind")
     assert lines(org.root)[0]["ts"] == "2031-05-06T07:08:09.000000+00:00"
-    assert isinstance(org.runtime.clock, Clock)  # the clock of the runtime is another one: only the events follow the patch point
+    assert isinstance(org.runtime.clock, Clock)
 
 
-def test_the_event_clock_is_the_system_clock_once_the_patch_points_are_disabled(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(_compat, "ENABLED", False)
-    monkeypatch.setattr(telemetry, "datetime", type("Never", (), {"now": staticmethod(lambda tz=None: 1 / 0)}))
+def test_the_clock_of_the_runtime_does_not_stamp_the_events(org: Org) -> None:
+    """A clock that a reading moves (the scenarios') must not be moved by the events: the stamps of the events are the clock of their own."""
+    readings: list[int] = []
+
+    def moving() -> datetime:
+        readings.append(1)
+        return datetime(2031, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
+
+    org.runtime = wiring.open_runtime(org.root, clock_ports(moving))
+    org.emit("custom.kind")
+    assert readings == [] and str(lines(org.root)[0]["ts"]).startswith(str(datetime.now(timezone.utc).year))
+
+
+def test_the_event_clock_is_the_system_clock_of_a_plain_runtime(org: Org) -> None:
     runtime = wiring.open_runtime(org.root)
     before = datetime.now(timezone.utc)
     runtime.events.emit("custom.kind")
     ts = datetime.fromisoformat(str(lines(org.root)[0]["ts"]))
     assert before <= ts <= before + timedelta(seconds=5)
-
-
-def test_core_utcnow_does_not_move_the_events(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(core, "utcnow", lambda: datetime(2000, 1, 1, tzinfo=timezone.utc))  # as before: only telemetry.datetime did
-    org.emit("custom.kind")
-    assert str(lines(org.root)[0]["ts"]).startswith(str(datetime.now(timezone.utc).year))
 
 
 # ------------------------------------------------------------------------------------------------------------ the facade

@@ -4,12 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
-import orgmcp.core as core
 from orgmcp.app import wiring
 from orgmcp.kernel import AtomicWriter, Environment
-from orgmcp.kernel.testing import DictEnvironment
+from orgmcp.kernel.testing import DictEnvironment, RecordingAtomicWriter
 from orgmcp.locator import OrgLocator
 from orgmcp.settings import EventSwitch, OrgDocumentStore, OrgSettings
 from orgmcp.settings.testing import MemoryOrgSettings
@@ -31,10 +28,10 @@ def test_the_settings_are_the_files_of_the_runtime_root(tmp_path: Path) -> None:
     assert runtime.event_switch.enabled() is False
 
 
-def test_the_document_is_written_through_the_atomic_writer_of_the_runtime(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_the_document_is_written_through_the_atomic_writer_of_the_runtime(tmp_path: Path) -> None:
     written: list[tuple[Path, str]] = []
-    monkeypatch.setattr(core, "atomic_write", lambda path, text: written.append((path, text)))
-    wiring.open_runtime(tmp_path).documents.write_raw("text\n")
+    writer = RecordingAtomicWriter(lambda path, text: written.append((path, text)))
+    wiring.open_runtime(tmp_path, {AtomicWriter: writer}).documents.write_raw("text\n")
     assert written == [(tmp_path / "ORG.md", "text\n")]
 
 

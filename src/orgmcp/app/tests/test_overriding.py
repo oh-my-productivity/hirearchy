@@ -19,8 +19,7 @@ from orgmcp.eventlog import EVENTS_REL
 from orgmcp.kernel import AtomicWriter, Clock, IdGenerator, Message, TokenSource
 from orgmcp.kernel._system import FsAtomicWriter, SecretsTokens, SystemClock
 from orgmcp.kernel.testing import CounterTokens, FakeClock, MemoryAtomicWriter
-
-pytestmark = pytest.mark.xfail(strict=True, reason="red: E2-compat")
+from orgmcp.telemetry._ports import EventClock
 
 FIXED = datetime(2031, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
 
@@ -78,8 +77,8 @@ def test_the_atomic_writer_names_its_temp_files_with_the_token_source(tmp_path: 
     assert tokens.counts == {4: 1}  # one temp name of four bytes
 
 
-def test_the_events_are_stamped_by_the_clock_port(tmp_path: Path) -> None:
-    with wiring.overriding({Clock: Fixed()}):
+def test_the_events_are_stamped_by_the_event_clock_port(tmp_path: Path) -> None:
+    with wiring.overriding({EventClock: Fixed()}):
         org = Org.init(tmp_path / "org", "mission")
         org.emit("custom.kind")
     stamps = [json.loads(line)["ts"] for f in (org.root / EVENTS_REL).glob("*/*.jsonl") for line in f.read_text(encoding="utf-8").splitlines()]

@@ -30,8 +30,8 @@ BIG_NOW = T0 + timedelta(seconds=400)
 
 
 @pytest.fixture(autouse=True)
-def scheduler_up(monkeypatch: pytest.MonkeyPatch) -> None:
-    scheduler_is(monkeypatch, SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))
+def scheduler_up(process_overrides) -> None:
+    scheduler_is(process_overrides, SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))
 
 
 def golden(name: str, text: str, root: Path) -> None:

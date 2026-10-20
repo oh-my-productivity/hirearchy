@@ -6,7 +6,7 @@ from orgmcp.core import ROOT, Org
 
 
 @pytest.fixture
-def org(tmp_path):
+def org(tmp_path, clock):  # (the clock first: the runtimes of the organization are opened with it)
     """root -> ceo -> eng with emission OFF (``events: false``): the event files in these tests are written by hand
     (tests/testkit/obs_fixtures.py) so each test controls exactly which events exist. The real emitter is exercised against
     this query layer in tests/test_observability_e2e.py."""
@@ -17,8 +17,8 @@ def org(tmp_path):
 
 
 @pytest.fixture
-def clock(monkeypatch):
-    return freeze(monkeypatch)
+def clock(process_overrides):
+    return freeze(process_overrides)
 
 
 def test_stamp_trace_helper_roundtrips_through_the_loader(org, clock):

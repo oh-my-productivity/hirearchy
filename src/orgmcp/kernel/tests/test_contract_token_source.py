@@ -12,8 +12,6 @@ import pytest
 from orgmcp.kernel import TokenSource
 from orgmcp.kernel.testing import IMPLEMENTATIONS
 
-pytestmark = pytest.mark.xfail(strict=True, reason="red: E2-compat")
-
 HEX = re.compile(r"[0-9a-f]*")
 
 

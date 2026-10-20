@@ -9,7 +9,8 @@ and the way the package builds it, ``DashApp(queries, interval)`` over the queri
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+import contextlib
+from collections.abc import Iterator, Mapping
 from pathlib import Path
 
 import pytest
@@ -34,11 +35,15 @@ def given_queries(root: Path) -> App[None]:
 
 @pytest.fixture(scope="module", params=[given_a_root, given_queries], ids=lambda made: made.__name__)
 def screens(request: pytest.FixtureRequest) -> Iterator[dict[str, str]]:
-    with pytest.MonkeyPatch.context() as patch, _worlds.scratch() as base:
+    with contextlib.ExitStack() as stack, pytest.MonkeyPatch.context() as patch, _worlds.scratch() as base:
         patch.setenv("HOME", str(base))
-        demo = _worlds.demo(patch, base)
+
+        def process_overrides(overrides: Mapping[type, object]) -> object:
+            return stack.enter_context(_worlds.overriding(overrides))
+
+        demo = _worlds.demo(process_overrides, base)
         taken = _screens.demo_screens(request.param, demo.org.root)
-        empty = _worlds.empty(patch, base)
+        empty = _worlds.empty(process_overrides, base)
         taken.update(_screens.empty_screens(request.param, empty.root))
         yield taken
 

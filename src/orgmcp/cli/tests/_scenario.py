@@ -20,6 +20,12 @@ from pathlib import Path
 from typing import Callable
 
 import pytest
+from testkit.clocks import clock_ports
+
+from orgmcp.kernel import TokenSource
+from orgmcp.kernel.testing import CounterTokens
+
+from ._org import overriding
 
 START = datetime(2026, 1, 15, 9, 0, 0, tzinfo=timezone.utc)
 COLUMNS = "100"  # the width argparse wraps the help at
@@ -66,35 +72,11 @@ class FixedClock:
         return self.now
 
 
-class CounterSecrets:
-    """Stand-in for ``secrets`` in ``orgmcp.core``: ``token_hex(n)`` counts 0, 1, 2 ... per byte length."""
-
-    def __init__(self) -> None:
-        self.counts: dict[int, int] = {}
-
-    def token_hex(self, nbytes: int = 32) -> str:
-        n = self.counts.get(nbytes, 0)
-        self.counts[nbytes] = n + 1
-        return f"{n:0{2 * nbytes}x}"
-
-
-def fake_datetime(clock: FixedClock) -> type[datetime]:
-    class FakeDatetime(datetime):
-        @classmethod
-        def now(cls, tz=None):  # type: ignore[no-untyped-def]
-            t = clock.now
-            return t.astimezone(tz) if tz is not None else t.replace(tzinfo=None)
-
-    return FakeDatetime
-
-
-def install(mp: pytest.MonkeyPatch) -> FixedClock:
-    """Fix the clock and the ids of the message files, and the width of the help, for the length of the ``MonkeyPatch``."""
+def install(mp: pytest.MonkeyPatch, stack: contextlib.ExitStack) -> FixedClock:
+    """Fix the clock and the ids of the message files (the ports of every runtime opened until ``stack`` closes), and the width of the help, for the
+    length of the ``MonkeyPatch``."""
     clock = FixedClock()
-    fake = fake_datetime(clock)
-    for module in ("orgmcp.core", "orgmcp.telemetry", "orgmcp.scheduler"):
-        mp.setattr(f"{module}.datetime", fake)
-    mp.setattr("orgmcp.core.secrets", CounterSecrets())
+    stack.enter_context(overriding({**clock_ports(lambda: clock.now, events=True), TokenSource: CounterTokens(per_length=True)}))
     mp.setenv("COLUMNS", COLUMNS)
     for name in ("ORG_ROOT", "ORG_AGENT", "ORG_REQUIRE_AGENT", "ORG_RUN_ID"):
         mp.delenv(name, raising=False)
@@ -410,8 +392,8 @@ def execute(label: str, base: Path, main: Callable[[list[str]], None]) -> str:
     before = Path.cwd()
     process_resources().reset()
     try:
-        with pytest.MonkeyPatch.context() as mp:
-            clock = install(mp)
+        with contextlib.ExitStack() as stack, pytest.MonkeyPatch.context() as mp:
+            clock = install(mp, stack)
             mp.setenv("HOME", str(home))
             mp.setattr("orgmcp.scheduler.KIRO_AGENTS_DIR", home / ".kiro" / "agents")
             world = World(tmp, WORLDS[scenario.world](tmp, clock), clock)
