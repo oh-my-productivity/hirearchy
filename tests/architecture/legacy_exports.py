@@ -84,18 +84,6 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "skill": _e3(
         "SKILL_NAME skill_source install_skill"
     ),
-    "dashboard_events": _e3(
-        "WHO_WIDTH BATCH_SHOWN Lookup EventLine clock who describe humanize event_lines"
-    ),
-    "dashboard_data": _e3(
-        "ERROR_WINDOW ERROR_WINDOW_TEXT LOG_LINES LOG_BYTES FEED_KEEP FEED_BACKFILL TEXT_CAP CACHE_TRUST SERVICES_TTL "
-        "HEALTH_TTL REQUESTS_TTL STATE_KINDS GLYPHS clean_text AgentState pause_text classify Section "
-        "doc_text AgentRow SchedulerView Snapshot MsgRow RunLog AgentDetail RequestRow ServiceRow HealthView "
-        "EventFeed DashData render_once"
-    ),
-    "dashboard": _e3(
-        "TextPane NavTable TextScreen DashApp run_dashboard"
-    ),
 }
 
 

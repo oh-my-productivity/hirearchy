@@ -97,7 +97,7 @@ from ..services import ContractNormalizer, ServiceCatalog, ServiceCommands
 from ..skill import SkillInstaller
 from ..snapshots import OrgSnapshotter
 from ..upgrade import RulesUpgrader
-from . import wire_blueprint, wire_dashdata, wire_kiro
+from . import wire_blueprint, wire_dashboard, wire_dashdata, wire_kiro
 from ._builder import Builder
 from .runtime import OrgRuntime
 from .wire_locator import os_locator
@@ -240,12 +240,10 @@ class LazyMcpRunner(McpRunner):
 
 
 class LazyDashboardRunner(DashboardRunner):
-    """Starts the full-screen dashboard; Textual is imported only now."""
+    """Starts the full-screen dashboard; Textual is imported only now (``wire_dashboard.dashboard_launcher`` imports it when it makes the launcher)."""
 
     def run(self, root: Path, interval: float) -> None:
-        from ..dashboard import run_dashboard
-
-        run_dashboard(root, interval=interval)
+        wire_dashboard.dashboard_launcher().run_dashboard(Path(root), interval)
 
 
 # ------------------------------------------------------------------------------------------------------- the blueprints

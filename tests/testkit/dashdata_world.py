@@ -19,6 +19,7 @@ from typing import Any
 
 from orgmcp import dashdata as _api
 from orgmcp.app import wire_dashdata, wire_observability
+from orgmcp.dashdata._render import TextSnapshotRenderer
 from orgmcp.dashdata import (
     AgentDetail,
     AgentDetailQuery,
@@ -115,7 +116,7 @@ class DashData(SnapshotQuery, AgentDetailQuery, RequestQuery, ServiceQuery, Heal
 
 def render_once(data: DashData, width: int = 110) -> str:
     """The ``orgmcp dash --once`` output: header, the agent tree with states, requests, services."""
-    return wire_dashdata.renderer_over(data, data, data).render_once(width)
+    return TextSnapshotRenderer(data, data, data).render_once(width)
 
 
 class _Dd:

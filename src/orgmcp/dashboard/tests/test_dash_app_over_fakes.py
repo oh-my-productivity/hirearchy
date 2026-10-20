@@ -19,7 +19,7 @@ from textual.widgets import Static, TabbedContent
 from textual.widgets.tree import TreeNode
 
 from orgmcp.dashboard._app import DashApp
-from orgmcp.dashboard import NavTable, TextPane, TextScreen
+from orgmcp.dashboard._widgets import NavTable, TextPane, TextScreen
 from orgmcp.dashboard._ports import DashboardQueries
 from orgmcp.dashboard.testing import ORG_ROOT, detail, fixed_queries, request_row
 from orgmcp.dashdata import Section, ServiceRow

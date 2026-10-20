@@ -1,10 +1,8 @@
-"""``wire_dashboard``: the queries of one dashboard over a real organization, the launcher that shows them, and the two old ways in
-(``DashApp(root, interval, now)`` and ``orgmcp.dashboard.run_dashboard(root, interval)``), which are thin over them."""
+"""``wire_dashboard``: the queries of one dashboard over a real organization, and the launcher that shows them."""
 
 from __future__ import annotations
 
 import importlib
-import inspect
 import subprocess
 import sys
 from pathlib import Path
@@ -15,7 +13,7 @@ import pytest
 from orgmcp.app import Org
 from orgmcp.dashboard import DashboardLauncher
 from orgmcp.dashboard._ports import DashboardQueries
-from orgmcp.dashboard.testing import FakeDashboardLauncher, RecordingScreens
+from orgmcp.dashboard.testing import RecordingScreens
 from orgmcp.kernel import ROOT, OrgError
 
 
@@ -66,31 +64,6 @@ def test_the_launcher_refuses_a_directory_that_is_not_an_organization_before_the
     with pytest.raises(OrgError, match="not an organization"):
         wire().dashboard_launcher(screens).run_dashboard(tmp_path)
     assert screens.runs == []
-
-
-def test_run_dashboard_is_the_launcher_of_the_wiring(team: Org, monkeypatch: pytest.MonkeyPatch) -> None:
-    from orgmcp.dashboard import run_dashboard
-
-    fake = FakeDashboardLauncher({team.root})
-    monkeypatch.setattr(wire(), "dashboard_launcher", lambda screens=None: fake)
-    run_dashboard(str(team.root), 0.7)
-    run_dashboard(team.root)
-    assert fake.launched == [(team.root, 0.7), (team.root, 2.0)]
-
-
-def test_run_dashboard_keeps_the_signature_the_command_line_calls() -> None:
-    from orgmcp.dashboard import run_dashboard
-
-    parameters = inspect.signature(run_dashboard).parameters
-    assert list(parameters) == ["root", "interval"] and parameters["interval"].default == 2.0
-    assert inspect.signature(run_dashboard).return_annotation in (None, "None")
-
-
-def test_the_old_constructor_of_the_app_asks_the_wiring_for_its_queries(team: Org) -> None:
-    from orgmcp.dashboard import DashApp
-
-    app = DashApp(team.root, interval=60)
-    assert isinstance(app.data, DashboardQueries) and "ceo" in app.data.snapshot().agents and app.interval == 60.0
 
 
 def test_the_stylesheet_travels_with_the_package() -> None:

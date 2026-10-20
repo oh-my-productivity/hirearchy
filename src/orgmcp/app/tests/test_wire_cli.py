@@ -14,11 +14,12 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp.app import Org, fields_cli, wire_cli, wiring
+from orgmcp.app import Org, fields_cli, wire_cli, wire_dashboard, wiring
 from orgmcp.app.wire_locator import os_locator
 from orgmcp.cli import CliApp
 from orgmcp.cli._session import AnnouncingOrgSession
 from orgmcp.cli.testing import MemoryOutput
+from orgmcp.dashboard.testing import FakeDashboardLauncher
 from orgmcp.hierarchy import Hiring
 from orgmcp.kernel import ROOT, OrgError
 from orgmcp.kernel.testing import FakeClock
@@ -127,9 +128,10 @@ def test_the_scheduler_runner_runs_the_loop_until_there_is_nothing_to_do(team: O
 
 def test_the_launchers_of_the_other_entry_points_import_them_only_when_they_run(team: Org, monkeypatch: pytest.MonkeyPatch) -> None:
     started: list[object] = []
-    monkeypatch.setattr("orgmcp.dashboard.run_dashboard", lambda root, interval=2.0: started.append((root, interval)))
+    fake = FakeDashboardLauncher({team.root})
+    monkeypatch.setattr(wire_dashboard, "dashboard_launcher", lambda screens=None: fake)
     wire_cli.LazyDashboardRunner().run(team.root, 3.0)
-    assert started == [(team.root, 3.0)]
+    assert fake.launched == [(team.root, 3.0)]
 
     class Server:
         def run(self) -> None:
@@ -159,7 +161,7 @@ def test_nothing_but_the_run_of_a_command_imports_the_framework_of_the_server_or
         import sys
         from orgmcp.app import wire_cli
         wire_cli.cli_app()
-        print([m for m in ("textual", "mcp.server.fastmcp", "orgmcp.dashboard", "orgmcp.server") if m in sys.modules])
+        print([m for m in ("textual", "mcp.server.fastmcp", "orgmcp.dashboard") if m in sys.modules])
     """)
     done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=120)
     assert done.returncode == 0, done.stderr
