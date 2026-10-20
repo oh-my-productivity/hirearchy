@@ -1,17 +1,17 @@
-"""Lead quality (study A4): the manager sequences, routes rework to the author, follows the failure policy and keeps
-the authors' rework runs; the fact-checker prints one final coverage line from the fetched text; a cheap lead is warned."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import copy
-from pathlib import Path
 
 import pytest
+import testkit
 import yaml
+from testkit.legacy.orgmcp.blueprint_examples import example
+from testkit.legacy.orgmcp.core import split_frontmatter
 
 from orgmcp import blueprint as bpm
-from orgmcp.blueprint_examples import example
-from orgmcp.core import split_frontmatter
 
-EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "blueprint-research.yaml"
+EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"
 
 
 def body(name: str) -> str:
@@ -54,8 +54,6 @@ def codes(found, level=None):
 
 
 # ----------------------------------------------------------------------------------------- manager template
-
-
 def test_manager_delegates_a_step_only_when_its_inputs_exist():
     has("manager", "delegate a step only when its inputs exist", "research, then write, then check",
         "never pre-delegate a downstream step", "in one batch only the steps that need nothing from a teammate")
@@ -98,8 +96,6 @@ def test_manager_default_tier_is_strong_and_says_why():
 
 
 # ------------------------------------------------------------------------------------- fact-checker template
-
-
 def test_fact_checker_computes_totals_once_and_prints_one_final_coverage_line():
     has("fact-checker", "compute the totals once, from the finished ledger", "print one coverage line as the last line of your report",
         "never recount inside the deliverable, the author's file or another agent's files", "do not post a second, corrected line")
@@ -111,8 +107,6 @@ def test_fact_checker_quote_must_come_from_the_fetch_or_read_output():
 
 
 # ----------------------------------------------------------------------------------------- budget split
-
-
 def agents_of(bp, tmp_path):
     return bpm._resolve(bp, None, [tmp_path], [])
 
@@ -147,7 +141,7 @@ def test_split_at_the_estimate_leaves_exactly_the_managers_own_pass_and_rework(b
 
 
 def test_charter_and_plan_carry_the_new_numbers(base, tmp_path):
-    from orgmcp.core import Org
+    from testkit.legacy.orgmcp.core import Org
     org = Org.init(tmp_path / "org", "lead quality", {"poll_seconds": 0.05})
     plan = bpm.render_plan(base, allowed_roots=[tmp_path])
     assert ("lead: starts with 22, hands down researcher 4, writer 3, factcheck 3 (each includes its rework/re-check run), "
@@ -159,8 +153,6 @@ def test_charter_and_plan_carry_the_new_numbers(base, tmp_path):
 
 
 # ------------------------------------------------------------------------------- manager-cheap-model warning
-
-
 def test_cheap_manager_gets_a_warning_not_an_error(base, tmp_path):
     bp = mutate(tiered(base), lambda b: b["agents"][0].update(model="cheap"))
     found = issues(bp, tmp_path)
@@ -203,8 +195,6 @@ def test_one_model_for_all_is_not_flagged(base, tmp_path):
 
 
 # ------------------------------------------------------------------------------------------- research example
-
-
 def test_default_single_model_policy_never_warns_about_the_lead(base, tmp_path):
     for bp in (base, mutate(base, lambda b: b["agents"][0].update(model="cheap")),  # the cheap tier IS the strong model here
                mutate(base, lambda b: b["needs"].pop("models"))):

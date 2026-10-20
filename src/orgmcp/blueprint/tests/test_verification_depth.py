@@ -1,16 +1,17 @@
-"""Verification depth (Y1): the research criteria are winnable (facts vs judgement), the analysis example exists and
-proposes cleanly, and every verifier can read the work it reviews (read-only inputs), with a warning when it cannot."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 from pathlib import Path
 
 import pytest
+import testkit
 import yaml
+from testkit.legacy.orgmcp import blueprint_examples as ex
+from testkit.legacy.orgmcp.core import Org, OrgError
 
 from orgmcp import blueprint as bpm
-from orgmcp import blueprint_examples as ex
-from orgmcp.core import Org, OrgError
 
-EXAMPLE_YAML = Path(__file__).resolve().parent.parent / "examples" / "blueprint-research.yaml"
+EXAMPLE_YAML = testkit.REPO / "examples" / "blueprint-research.yaml"
 
 
 def filled(kind: str, base: Path) -> dict:
@@ -36,8 +37,6 @@ def codes(issues) -> set[str]:
 
 
 # ----------------------------------------------------------------------------------- research criteria
-
-
 @pytest.fixture(params=["example-tool", "example-yaml"])
 def research_criteria(request, cwd):
     if request.param == "example-tool":
@@ -82,8 +81,6 @@ def test_judgement_section_wording_is_consistent_across_writer_checker_and_manag
 
 
 # ------------------------------------------------------------------------------------ analysis example
-
-
 def test_analysis_example_is_a_known_kind_and_proposes_cleanly_once_filled(cwd):
     assert "analysis" in ex.KINDS
     bp = filled("analysis", cwd)
@@ -136,8 +133,6 @@ def test_analysis_example_applies_and_the_data_stays_read_only(cwd, tmp_path):
 
 
 # ------------------------------------------------------ verifiers read what they review (read-only inputs)
-
-
 def ws_bp(tmp_path, verifier: dict, authors=None):
     """A project with a workspace: an analyst writes there, one verifier checks it."""
     ws, data = tmp_path / "work", tmp_path / "data"

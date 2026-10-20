@@ -1,10 +1,10 @@
-"""The shipped role templates: they load, pass the blueprint checks, and carry the verification behaviours the
-validation studies (A2, B2, C) showed were missing."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
+from testkit.legacy.orgmcp.core import Org
 
 from orgmcp import blueprint as bpm
-from orgmcp.core import Org
 
 NAMES = bpm.role_names()
 SECTIONS = ("## Purpose", "## Responsibilities", "## Decision rights", "## Escalation", "## Quality bar", "## Budget")
@@ -55,8 +55,6 @@ def code_bp(tmp_path):
 
 
 # ------------------------------------------------------------------------------- every shipped template
-
-
 def test_all_expected_templates_ship():
     assert {"manager", "researcher", "writer", "reviewer", "fact-checker", "engineer", "tester", "code-reviewer",
             "analyst", "data-checker"} <= set(NAMES)
@@ -123,8 +121,6 @@ def _all(agents):
 
 
 # ------------------------------------------------------------------------------------------ fact-checker
-
-
 def test_fact_checker_builds_a_ledger_of_every_statement_split_into_fact_and_judgement():
     has("fact-checker", "work/ledger.md", "every sentence, table cell and list item", "`fact` or a `judgement`", "id", "type",
         "cited source", "verified", "wrong", "unsupported", "not-checkable", "evidence")
@@ -184,8 +180,6 @@ def test_fact_checker_works_with_web_tools_and_with_local_inputs():
 
 
 # ------------------------------------------------------------------------------------ reviewer and code-reviewer
-
-
 def test_reviewer_checks_every_criterion_one_by_one_with_evidence():
     has("reviewer", "one by one", "one line per criterion", "not met", "evidence", "criteria met: n of m",
         "counts come from `read`", "even if the author disclosed it")
@@ -216,8 +210,6 @@ def test_code_reviewer_with_shell_needs_a_workspace_like_the_engineer(tmp_path):
 
 
 # ------------------------------------------------------------------------------------------------ manager
-
-
 def test_manager_quotes_counts_and_facts_from_read_not_memory():
     has("manager", "from your own `read` output", "never from memory", "what a report says", "stale copy")
 
@@ -260,8 +252,6 @@ def test_manager_keeps_its_budget_reserve_and_does_not_skip_a_review():
 
 
 # --------------------------------------------------------------------------------- author roles and tester
-
-
 def test_writer_values_relevance_over_length_and_cites_precisely():
     has("writer", "relevance over length", "never pad", "too thin", "cite precisely", "count words with `read`")
 
@@ -304,8 +294,6 @@ def test_reviewer_opens_the_files_it_reviews_and_checks_figures_with_their_label
 
 
 # --------------------------------------------------------------------------- analysis roles
-
-
 def test_analyst_template_is_read_and_shell_only_in_a_workspace_and_never_touches_the_data():
     r = bpm.get_role("analyst")
     assert set(r.tools) == {"read", "shell"} and r.kind == "author"
