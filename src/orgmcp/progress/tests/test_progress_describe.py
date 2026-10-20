@@ -4,12 +4,11 @@
 import time
 
 import pytest
-from testkit.legacy.orgmcp.app import wire_attention
 from testkit.legacy.orgmcp.core import ROOT
+from testkit.progress_world import describe_progress
 
 from orgmcp.daemon import SchedulerState
 from orgmcp.daemon.testing import FakeSchedulerStatus
-from orgmcp.progress import describe_progress
 from orgmcp.progress._reporter import DerivedProgressReporter
 from orgmcp.progress.testing import FixedSnapshots, SpyProgressView
 
@@ -42,6 +41,6 @@ def test_describe_progress_adds_the_scheduler_line_and_does_not_wait_without_one
 def test_describe_progress_waits_when_a_scheduler_runs(org, task):
     scheduler = FakeSchedulerStatus(SchedulerState("running", 1, "x"))
     view = SpyProgressView("lines")
-    reporter = DerivedProgressReporter(view, FixedSnapshots(), scheduler, wire_attention.waiting_on_user_of(org.runtime), org.runtime.task_query)
+    reporter = DerivedProgressReporter(view, FixedSnapshots(), scheduler, org.runtime.waiting_on_user, org.runtime.task_query)
     assert reporter.describe_progress(None, 30) == "lines\nscheduler: running (pid 1, since x)"
     assert view.kwargs == {"wait_seconds": 30}

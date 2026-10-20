@@ -1,17 +1,14 @@
 # mypy: ignore-errors
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
-import dataclasses
-
 import pytest
-from testkit.legacy.orgmcp.app import wire_attention
+from testkit.daemon_world import describe_scheduler
+from testkit.health_world import with_ports
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.scheduler import describe_scheduler
+from testkit.progress_world import describe_progress
 
-from orgmcp.daemon import SchedulerState
+from orgmcp.daemon import SchedulerState, SchedulerStatus
 from orgmcp.daemon.testing import FakeSchedulerStatus
-from orgmcp.progress import describe_progress
-from orgmcp.progress.testing import FixedLegacyParts
 
 
 # ------------------------------------------------------------------------------- until-done: waiting on the user
@@ -33,11 +30,7 @@ def test_progress_shows_the_reason_and_the_options_and_does_not_wait(org, stalle
 
 
 def test_progress_while_the_scheduler_runs_still_says_so(org, stalled_on_budget, monkeypatch):
-    rt = org.runtime
-    running = FixedLegacyParts(
-        rt.human_queue, rt.case_history, rt.service_reports, FakeSchedulerStatus(SchedulerState("running", 1, "x")), wire_attention.waiting_on_user_of(rt),
-    )
-    monkeypatch.setattr(org, "runtime", dataclasses.replace(rt, progress_parts=running))
+    with_ports(org, {SchedulerStatus: FakeSchedulerStatus(SchedulerState("running", 1, "x"))})
     out = describe_progress(org)
     assert 'waiting on you: "Rework the report" needs budget' in out and "exits by itself soon" in out
 

@@ -2,12 +2,12 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
-from testkit.legacy.orgmcp.app import wire_attention
 from testkit.legacy.orgmcp.core import ROOT
+from testkit.progress_world import describe_progress, work_in_flight
 
 from orgmcp.daemon import SchedulerState
 from orgmcp.daemon.testing import FakeSchedulerStatus
-from orgmcp.progress import describe_progress, progress, work_in_flight
+from orgmcp.progress import progress
 from orgmcp.progress._reporter import DerivedProgressReporter
 from orgmcp.progress.testing import FixedSnapshots, SpyProgressView
 
@@ -172,7 +172,7 @@ def test_describe_progress_waits_for_a_running_scheduler_on_a_blocked_task(org, 
     grant(org)
     scheduler = FakeSchedulerStatus(SchedulerState("running", 1, "x"))
     view = SpyProgressView("lines")
-    reporter = DerivedProgressReporter(view, FixedSnapshots(), scheduler, wire_attention.waiting_on_user_of(org.runtime), org.runtime.task_query)
+    reporter = DerivedProgressReporter(view, FixedSnapshots(), scheduler, org.runtime.waiting_on_user, org.runtime.task_query)
     assert reporter.describe_progress(None, 30).endswith("scheduler: running (pid 1, since x)")
     assert view.kwargs == {"wait_seconds": 30}
 
