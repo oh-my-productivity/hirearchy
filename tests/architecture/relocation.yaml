@@ -16,7 +16,9 @@ groups:
   # E1-d
   d: [blueprint]
   # E1-e
-  e: [scheduler, mcp_server, cli, dashboard, dashdata, tests/e2e, tests/meta, tests/architecture]
+  e: [scheduler, cli, tests/e2e, tests/meta, tests/architecture]
+  # E1-f (split from E1-e by the manager to balance the parallel wave)
+  f: [mcp_server, dashboard, dashdata]
 
 destinations:
   # new file; 1 tests
@@ -1792,7 +1794,7 @@ destinations:
   # new file; 35 tests
   #   7.3: dashboard/tests/test_ui.py
   src/orgmcp/dashboard/tests/test_ui.py:
-    group: e
+    group: f
     sources:
       tests/test_dashboard_ui.py:
         - test_start_shows_the_header_and_the_whole_tree
@@ -1834,7 +1836,7 @@ destinations:
   # new file; 10 tests
   #   added after 7.3: characterization of the dashboard data layer (whole)
   src/orgmcp/dashdata/tests/test_characterization.py:
-    group: e
+    group: f
     sources:
       tests/test_dashboard_characterization.py:
         - test_once_of_the_demo_organization_is_what_it_always_was
@@ -1851,7 +1853,7 @@ destinations:
   # new file; 9 tests
   #   7.3: dashdata/tests/test_dashboard_events.py (whole)
   src/orgmcp/dashdata/tests/test_dashboard_events.py:
-    group: e
+    group: f
     sources:
       tests/test_dashboard_events.py:
         - test_the_lines_of_the_brief
@@ -1867,7 +1869,7 @@ destinations:
   # new file; 35 tests
   #   7.3: dashdata/tests/test_snapshot.py
   src/orgmcp/dashdata/tests/test_snapshot.py:
-    group: e
+    group: f
     sources:
       tests/test_dashboard_data.py:
         - test_every_state_word_of_the_demo_org
@@ -1909,7 +1911,7 @@ destinations:
   # new file; 10 tests
   #   7.3: how the MCP server binds to an organization
   src/orgmcp/mcp_server/tests/test_binding.py:
-    group: e
+    group: f
     sources:
       tests/test_bootstrap.py:
         - test_no_fallback_to_the_org_in_the_working_directory_when_org_root_is_set
@@ -1926,7 +1928,7 @@ destinations:
   # new file; 16 tests
   #   7.3: tests that call build_server / the blueprint tools (propose_org, apply_org, blueprint_example)
   src/orgmcp/mcp_server/tests/test_blueprint_tools.py:
-    group: e
+    group: f
     sources:
       tests/test_assistant_ux.py:
         - test_propose_org_returns_the_block_then_details_then_plan_id
@@ -1949,7 +1951,7 @@ destinations:
   # new file; 1 tests
   #   7.3: mcp_server
   src/orgmcp/mcp_server/tests/test_default_model.py:
-    group: e
+    group: f
     sources:
       tests/test_default_model.py:
         - test_create_org_without_a_model_uses_the_default
@@ -1957,7 +1959,7 @@ destinations:
   # new file; 1 tests
   #   7.3: root instructions are the MCP server
   src/orgmcp/mcp_server/tests/test_finish_rules.py:
-    group: e
+    group: f
     sources:
       tests/test_finish.py:
         - test_root_instructions_carry_the_finishing_rules_within_the_length_limit
@@ -1965,7 +1967,7 @@ destinations:
   # new file; 11 tests
   #   7.3: the goal tools of the MCP server
   src/orgmcp/mcp_server/tests/test_goal_tools.py:
-    group: e
+    group: f
     sources:
       tests/test_goal_workflow.py:
         - test_root_instructions_describe_the_workflow_and_keep_safety_lines
@@ -1983,7 +1985,7 @@ destinations:
   # new file; 2 tests
   #   7.3: tool-level tests (build_server)
   src/orgmcp/mcp_server/tests/test_grant_hint_tool.py:
-    group: e
+    group: f
     sources:
       tests/test_round_f_runtime.py:
         - test_the_send_reply_carries_the_grant_hint
@@ -1992,7 +1994,7 @@ destinations:
   # new file; 1 tests
   #   subject: who may call the MCP health tool (build_server)
   src/orgmcp/mcp_server/tests/test_health_tool.py:
-    group: e
+    group: f
     sources:
       tests/test_health.py:
         - test_mcp_health_permissions
@@ -2000,7 +2002,7 @@ destinations:
   # new file; 2 tests
   #   7.3: tool-level tests (build_server)
   src/orgmcp/mcp_server/tests/test_observe_tool.py:
-    group: e
+    group: f
     sources:
       tests/test_observe.py:
         - test_observe_tool_is_root_only_and_read_only
@@ -2009,7 +2011,7 @@ destinations:
   # new file; 1 tests
   #   7.3: tool descriptions are the MCP server
   src/orgmcp/mcp_server/tests/test_org_tools.py:
-    group: e
+    group: f
     sources:
       tests/test_finish.py:
         - test_orgmcp_write_and_read_say_they_are_organization_tools
@@ -2017,7 +2019,7 @@ destinations:
   # new file; 2 tests
   #   7.3: tool-level tests (build_server)
   src/orgmcp/mcp_server/tests/test_progress_tool.py:
-    group: e
+    group: f
     sources:
       tests/test_assistant_ux.py:
         - test_progress_tool_and_cli_take_the_wait
@@ -2026,7 +2028,7 @@ destinations:
   # new file; 2 tests
   #   7.3: tool-level tests (build_server); the last one compares the root instructions text of the server (and the skill)
   src/orgmcp/mcp_server/tests/test_reclaim_tool.py:
-    group: e
+    group: f
     sources:
       tests/test_reclaim.py:
         - test_mcp_tool
@@ -2036,7 +2038,7 @@ destinations:
   #   7.3: the docstring assertion is the MCP server
   #   7.3: mcp_server
   src/orgmcp/mcp_server/tests/test_report_docstring.py:
-    group: e
+    group: f
     sources:
       tests/test_final_word.py:
         - test_report_docstring_and_rules_state_the_new_rule
@@ -2046,7 +2048,7 @@ destinations:
   # new file; 1 tests
   #   subject: the text of the MCP `retire` tool (build_server); hierarchy may not import the server, 7.3's `retire_*` rule is for the rest
   src/orgmcp/mcp_server/tests/test_retire_tool.py:
-    group: e
+    group: f
     sources:
       tests/test_core_safety.py:
         - test_retire_tool_reports_the_refund
@@ -2054,7 +2056,7 @@ destinations:
   # new file; 1 tests
   #   subject: the `revises` argument of the MCP tool (and the CLI)
   src/orgmcp/mcp_server/tests/test_revises_tool.py:
-    group: e
+    group: f
     sources:
       tests/test_health.py:
         - test_revises_through_the_mcp_tool_and_cli
@@ -2062,7 +2064,7 @@ destinations:
   # new file; 2 tests
   #   7.3: scheduler control tools
   src/orgmcp/mcp_server/tests/test_scheduler_tools.py:
-    group: e
+    group: f
     sources:
       tests/test_finish.py:
         - test_start_refuses_when_nothing_can_progress
@@ -2071,7 +2073,7 @@ destinations:
   # new file; 2 tests
   #   7.3: scheduler control tools (build_server) [the source has an autouse fixture, which may not apply to other sources' tests: its tests get a destination of their own]
   src/orgmcp/mcp_server/tests/test_scheduler_tools_assistant.py:
-    group: e
+    group: f
     sources:
       tests/test_assistant_ux.py:
         - test_start_tool_defaults_to_until_done
@@ -2080,7 +2082,7 @@ destinations:
   # new file; 3 tests
   #   7.3: mcp_server/tests/test_server.py
   src/orgmcp/mcp_server/tests/test_server.py:
-    group: e
+    group: f
     sources:
       tests/test_server.py:
         - test_tools_are_bound_to_identity
@@ -2090,7 +2092,7 @@ destinations:
   # new file; 1 tests
   #   7.3: tool-level tests (build_server) [test_service_amend defines its own `svc` fixture; test_round_g_services uses the shared one]
   src/orgmcp/mcp_server/tests/test_service_amend_tool.py:
-    group: e
+    group: f
     sources:
       tests/test_service_amend.py:
         - test_the_mcp_tool_amends_with_optional_fields
@@ -2098,7 +2100,7 @@ destinations:
   # new file; 8 tests
   #   7.3: tool-level tests (build_server)
   src/orgmcp/mcp_server/tests/test_service_tools.py:
-    group: e
+    group: f
     sources:
       tests/test_round_g_services.py:
         - test_the_feedback_tool_text_no_longer_says_a_later_one_replaces_the_earlier
@@ -2114,7 +2116,7 @@ destinations:
   # new file; 15 tests
   #   7.3: setup mode of the MCP server
   src/orgmcp/mcp_server/tests/test_setup_mode.py:
-    group: e
+    group: f
     sources:
       tests/test_bootstrap.py:
         - test_setup_mode_exposes_all_tools_plus_create_org
@@ -2136,7 +2138,7 @@ destinations:
   # new file; 5 tests
   #   7.3: the names the MCP server registers (all other tests)
   src/orgmcp/mcp_server/tests/test_tool_names.py:
-    group: e
+    group: f
     sources:
       tests/test_tool_names.py:
         - test_tool_names_follow_the_charter_tools: 6
@@ -2148,7 +2150,7 @@ destinations:
   # new file; 14 tests
   #   7.3: tool-call recording is the MCP server
   src/orgmcp/mcp_server/tests/test_tool_recording.py:
-    group: e
+    group: f
     sources:
       tests/test_telemetry.py:
         - test_tool_calls_are_recorded_with_actor_run_and_summary
