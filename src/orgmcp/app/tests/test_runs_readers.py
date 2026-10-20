@@ -20,6 +20,7 @@ from typing import Any
 import pytest
 
 from orgmcp.app import Org, wire_dashdata
+from orgmcp.dashdata._runlog import read_tail
 from orgmcp.kernel import OrgPaths
 from orgmcp.runs import RunLogReader, RunLogSink, log_failed_start
 from orgmcp.runs._reader import FsRunLogReader
@@ -29,7 +30,7 @@ from orgmcp.runs.tests import _oracle
 from orgmcp.runs.tests._legacy import legacy
 from orgmcp.scheduler._orphans import LogRunNotes
 
-dashboard_data, health, observe, sched_module = legacy("dashboard_data"), legacy("health"), legacy("observe"), legacy("scheduler")
+health, observe, sched_module = legacy("health"), legacy("observe"), legacy("scheduler")
 
 SILENT = {"echo": lambda _: None}
 T1, T2, T3 = "20261018T100000000001", "20261018T110000000002", "20261018T120000000003"
@@ -221,20 +222,20 @@ def test_the_tail_of_a_log_is_what_the_dashboard_always_showed(tmp_path: Path, n
     path = tmp_path / f"{T1}.log"
     path.write_bytes(content)
     reader = FsRunLogReader(OrgPaths(tmp_path))
-    assert dashboard_data._read_tail(reader, path, f"x/{path.name}", live) == _oracle.read_tail(path, f"x/{path.name}", live)
+    assert read_tail(reader, path, f"x/{path.name}", live) == _oracle.read_tail(path, f"x/{path.name}", live)
 
 
 def test_the_tail_of_a_log_that_cannot_be_read_is_a_note(tmp_path: Path) -> None:
     path = tmp_path / f"{T1}.log"
     reader = FsRunLogReader(OrgPaths(tmp_path))
-    got = dashboard_data._read_tail(reader, path, "x/missing.log", False)
+    got = read_tail(reader, path, "x/missing.log", False)
     assert got == _oracle.read_tail(path, "x/missing.log", False) and got.note == "the run log could not be read"
 
 
 def test_the_tail_of_a_log_that_is_a_directory_is_a_note(tmp_path: Path) -> None:
     path = tmp_path / f"{T1}.log"
     path.mkdir()
-    got = dashboard_data._read_tail(FsRunLogReader(OrgPaths(tmp_path)), path, "x/dir.log", True)
+    got = read_tail(FsRunLogReader(OrgPaths(tmp_path)), path, "x/dir.log", True)
     assert got == _oracle.read_tail(path, "x/dir.log", True)
 
 

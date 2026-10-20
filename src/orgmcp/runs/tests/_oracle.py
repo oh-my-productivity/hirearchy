@@ -97,8 +97,8 @@ def last_run_end(d: Path) -> float:
 
 
 def read_tail(path: Path, rel: str, live: bool) -> Any:
-    """``dashboard_data._read_tail`` (the ``RunLog`` it returns and the constants and ``clean_text`` are the dashboard's)."""
-    dd = legacy("dashboard_data")
+    """``dashboard_data._read_tail`` as it was (the ``RunLog`` it returns and the constants and ``clean_text`` are those of ``dashdata``)."""
+    dd = legacy("dashdata")
     LOG_BYTES, LOG_LINES, clean_text, RunLog = dd.LOG_BYTES, dd.LOG_LINES, dd.clean_text, dd.RunLog
     log = RunLog(path=path, rel=rel, running=live)
     try:
