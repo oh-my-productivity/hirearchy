@@ -4,7 +4,10 @@
 from testkit.legacy.orgmcp.core import Org
 from testkit.services_world import cli
 
-from orgmcp import templates
+from orgmcp.templates._documents import ORG_RULES
+from orgmcp.templates.testing import static_document_templates
+
+document_templates = static_document_templates()
 
 
 # ------------------------------------------------------------------------------- the rules
@@ -29,13 +32,13 @@ def test_rules_carry_the_contract_protocol(org):
 def test_rules_numbering_is_contiguous():
     import re
 
-    numbers = [int(n) for n in re.findall(r"^(\d+)\. ", templates.ORG_RULES, re.M)]
+    numbers = [int(n) for n in re.findall(r"^(\d+)\. ", ORG_RULES, re.M)]
     assert numbers == list(range(1, len(numbers) + 1))
 
 
 def test_org_rules_name_the_orgmcp_tools_unambiguously(tmp_path):
     rules = Org.init(tmp_path / "o", "m").rules()
-    assert rules == templates.org_rules("m").strip()
+    assert rules == document_templates.org_rules("m").strip()
     assert "kiro shows them as `@orgmcp/<tool>`, e.g. `@orgmcp/write`" in rules
     assert "built-in `write`/`read`/`shell`, those are different tools that reach the workspace only, never the org" in rules
     assert "with `@orgmcp/write`: artifacts go in `<you>/work/`" in rules and "with `@orgmcp/read`" in rules
@@ -43,7 +46,7 @@ def test_org_rules_name_the_orgmcp_tools_unambiguously(tmp_path):
 
 
 def test_rule_10_says_feedback_never_waives_a_criterion():
-    rules = templates.org_rules("m")
+    rules = document_templates.org_rules("m")
     rule = rules[rules.index("10. Services"):]
     assert "client feedback never waives a criterion" in rule
     assert len(rule.splitlines()) <= 6

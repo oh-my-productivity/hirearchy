@@ -6,10 +6,16 @@ import subprocess
 import pytest
 from testkit.legacy.orgmcp.core import Org, OrgError
 
-from orgmcp import templates
-from orgmcp.upgrade import extract_mission, upgrade_rules
+from orgmcp.templates.testing import static_document_templates
+from orgmcp.upgrade._rules import extract_mission
+
+document_templates = static_document_templates()
 
 MISSION = "Study octopuses.\n\n## Findings so far\nThey have three hearts."
+
+
+def upgrade_rules(org, dry_run=False):
+    return org.runtime.rules_upgrader.upgrade_rules(dry_run)
 
 
 def old_org(tmp_path):
@@ -33,7 +39,7 @@ def test_fresh_org_is_up_to_date(tmp_path):
 
 
 def test_extract_mission_keeps_headings_inside_the_mission():
-    assert extract_mission(templates.org_rules(MISSION)) == MISSION
+    assert extract_mission(document_templates.org_rules(MISSION)) == MISSION
 
 
 def test_upgrade_rewrites_only_the_body(tmp_path):

@@ -8,7 +8,7 @@ import time
 
 import pytest
 
-from orgmcp.cli import main
+from orgmcp.app.wire_cli import run_cli as main
 from orgmcp.core import ROOT, split_frontmatter
 
 
