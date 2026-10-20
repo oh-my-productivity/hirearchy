@@ -8,7 +8,7 @@ import time
 import pytest
 import testkit
 from testkit import observability_world as observe
-from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
+from testkit.reach.orgmcp.core import ROOT, Org, OrgError
 from testkit.health_world import Scheduler
 from testkit.obs_fixtures import EventLog, Story, stamp
 from testkit.observability_world import freeze

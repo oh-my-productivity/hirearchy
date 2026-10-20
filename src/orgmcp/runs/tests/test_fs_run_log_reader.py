@@ -1,4 +1,4 @@
-"""``FsRunLogReader`` on real directories, compared with the legacy readers (frozen in ``_oracle``) on a corpus of logs."""
+"""``FsRunLogReader`` on real directories, compared with the readers of the first version (frozen in ``_oracle``) on a corpus of logs."""
 
 from __future__ import annotations
 
@@ -68,7 +68,7 @@ def test_the_reader_implements_the_port(org: Path) -> None:
 
 
 @pytest.mark.parametrize("seed", range(8))
-def test_it_answers_as_the_legacy_readers_did(org: Path, seed: int) -> None:
+def test_it_answers_as_the_frozen_readers_did(org: Path, seed: int) -> None:
     runs = fill(org, seed)
     reader = FsRunLogReader(OrgPaths(org))
     outcomes = reader.outcomes("ceo")
@@ -80,7 +80,7 @@ def test_it_answers_as_the_legacy_readers_did(org: Path, seed: int) -> None:
         assert reader.facts(log) == _oracle.log_facts(log)
 
 
-def test_it_answers_as_the_legacy_readers_did_for_an_agent_without_logs(org: Path) -> None:
+def test_it_answers_as_the_frozen_readers_did_for_an_agent_without_logs(org: Path) -> None:
     reader = FsRunLogReader(OrgPaths(org))
     runs = org / "ceo" / "runs"
     assert (reader.count("ceo"), reader.windows("ceo"), reader.last_end("ceo")) == (_oracle.runs_used(runs), _oracle.run_windows(runs), 0.0)

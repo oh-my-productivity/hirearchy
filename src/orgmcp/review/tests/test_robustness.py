@@ -5,7 +5,7 @@ import json
 from datetime import timedelta
 
 from testkit.health_world import Scheduler
-from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter, utcnow
+from testkit.reach.orgmcp.core import ROOT, join_frontmatter, split_frontmatter, utcnow
 from testkit.review_world import review_if_due, total_runs
 
 

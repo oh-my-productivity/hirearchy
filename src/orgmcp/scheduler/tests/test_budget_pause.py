@@ -3,8 +3,8 @@
 
 import os
 
-from testkit.legacy.orgmcp import core
-from testkit.legacy.orgmcp.core import ROOT, Message
+from testkit.reach.orgmcp import core
+from testkit.reach.orgmcp.core import ROOT, Message
 
 from testkit.scheduler_loop import loop_over, runnable_of
 

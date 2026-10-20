@@ -22,5 +22,5 @@ def make(request: pytest.FixtureRequest, tmp_path: Path, kind: type[T]) -> T:
 
 
 def golden(name: str) -> object:
-    """A characterization file captured from the legacy ``scheduler`` functions of ``main``."""
+    """A characterization file captured from the ``scheduler`` functions of ``main``."""
     return json.loads((GOLDEN / name).read_text(encoding="utf-8"))

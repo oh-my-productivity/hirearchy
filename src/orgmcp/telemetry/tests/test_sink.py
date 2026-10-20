@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 from testkit import telemetry_world as telemetry
-from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter
+from testkit.reach.orgmcp.core import ROOT, join_frontmatter, split_frontmatter
 
 from orgmcp.kernel.testing import FakeClock
 from orgmcp.telemetry._sink import FsEventSink

@@ -8,7 +8,7 @@ import pytest
 import testkit
 import yaml
 from testkit.blueprints import code_bp
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 
 from testkit.blueprint_world import bpm
 

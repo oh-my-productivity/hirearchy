@@ -1,6 +1,6 @@
 """The message as a value: ``meta to_text render cut_body parse from_parts`` and ``latest_results``.
 
-``parse`` must equal what the file reader of the mail package (``CachingMessageParser.parse``; the legacy ``Message.load``
+``parse`` must equal what the file reader of the mail package (``CachingMessageParser.parse``; the former ``Message.load``
 was its classmethod) builds from the same file, for every fixture."""
 
 from __future__ import annotations
@@ -62,7 +62,7 @@ def test_parse_round_trips_to_text(original: Message) -> None:
 
 
 @pytest.mark.parametrize("original", fixtures(), ids=lambda m: f"{m.type}-{m.title or m.body[:8]!s}")
-def test_parse_equals_the_legacy_loader_on_every_fixture(original: Message, tmp_path: Path) -> None:
+def test_parse_equals_the_file_reader_of_the_mail_package_on_every_fixture(original: Message, tmp_path: Path) -> None:
     path = tmp_path / f"{MID}.md"
     path.write_text(original.to_text(), encoding="utf-8")
     loaded = reach("mail._parser").CachingMessageParser().parse(path)

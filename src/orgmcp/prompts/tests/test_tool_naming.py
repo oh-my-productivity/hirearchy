@@ -4,7 +4,7 @@
 import hashlib
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 
 
 @pytest.fixture

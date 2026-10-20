@@ -9,7 +9,7 @@ import time
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp.core import ROOT, OrgError
+from testkit.reach.orgmcp.core import ROOT, OrgError
 
 from testkit.scheduler_loop import loop_over, runnable_of
 

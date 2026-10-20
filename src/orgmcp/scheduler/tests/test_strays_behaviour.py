@@ -6,7 +6,7 @@ import os
 import sys
 import time
 
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 
 from testkit.scheduler_loop import loop_over
 from orgmcp.strays import StrayProbe

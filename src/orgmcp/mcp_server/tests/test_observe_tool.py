@@ -5,7 +5,7 @@ import asyncio
 import dataclasses
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.mcp_server_world import build_server
 from testkit.obs_fixtures import Story, freeze, stamp
 

@@ -8,7 +8,7 @@ import subprocess
 import time
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 
 from testkit.scheduler_loop import loop_over, runnable_of
 

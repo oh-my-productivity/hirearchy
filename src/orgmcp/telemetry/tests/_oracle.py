@@ -1,8 +1,8 @@
-"""The legacy encoder and argument summary, frozen verbatim from commit ``8323897`` (``r1-integration``, ``orgmcp/telemetry.py``).
+"""The event encoder and argument summary of the first version, frozen verbatim from commit ``8323897`` (``r1-integration``, ``orgmcp/telemetry.py``).
 
-``_encode``, ``_shrink`` and ``summarize_args`` move into the package in step A-telemetry, so the live code can no longer serve as its own
+``_encode``, ``_shrink`` and ``summarize_args`` move into the package in step A-telemetry, so the live code cannot serve as its own
 oracle; these copies do (only the module constants come from ``orgmcp.eventlog`` and ``clip`` from the kernel, where the former module got
-them). Delete this module together with the oracle tests when the legacy surface goes (step E3).
+them). They are the reference of the byte-compatibility tests and stay as long as those tests do.
 """
 
 from __future__ import annotations

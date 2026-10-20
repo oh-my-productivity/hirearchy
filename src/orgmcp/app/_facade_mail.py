@@ -1,6 +1,6 @@
 """Mailboxes, task queries and the run lifecycle of the inbox (mail).
 
-The bodies call the ports of ``self.runtime`` (step A-mail; ARCHITECTURE.md 5.3 and 6.4); the legacy static ``_wakes`` has no runtime and calls the
+The bodies call the ports of ``self.runtime`` (step A-mail; ARCHITECTURE.md 5.3 and 6.4); the static ``_wakes`` has no runtime and calls the
 function of ``wire_mail`` that reads a file through the parser of the process."""
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ class MailMixin:
 
     @staticmethod
     def _wakes(path: Path) -> bool:
-        """Does this inbox file wake its agent? (The mailbox does this itself; the static spelling is the legacy one.)"""
+        """Does this inbox file wake its agent? (The mailbox does this itself; the static spelling is the old one.)"""
         return message_wakes(path)
 
     def find_received(self, addr: str, msg_id: str) -> Message | None:

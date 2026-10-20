@@ -1,7 +1,7 @@
 """The blueprint tests' view of the package: the old call shapes (``bpm.validate(bp, org=org)``, ``bpm.apply(org, bp)`` ...) over the new API.
 
-The tests of ``orgmcp.blueprint`` were written against the flat module's functions. Those functions are legacy adapters (deleted by step E3), so a
-moved test must not use them; it uses this world instead. Every method here is a thin call of a port of the runtime (``org.runtime.blueprint_validator``,
+The tests of ``orgmcp.blueprint`` were written against the flat module's functions. Those functions are gone, so a
+test uses this world instead. Every method here is a thin call of a port of the runtime (``org.runtime.blueprint_validator``,
 ``.plan_renderer``, ``.blueprint_applier`` ...) or of the private class that now owns the old function (``BudgetPlanner``, ``PolicyAccessReport``,
 ``AgentResolver`` ...: allowed here, ``testkit`` is not part of ``orgmcp``). The assertion text of the tests stays as it was; only their import changed::
 

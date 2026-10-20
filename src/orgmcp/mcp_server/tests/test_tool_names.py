@@ -5,7 +5,7 @@ import asyncio
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.mcp_server_world import build_server, resolve_binding
 
 README = (testkit.REPO / "README.md").read_text(encoding="utf-8")

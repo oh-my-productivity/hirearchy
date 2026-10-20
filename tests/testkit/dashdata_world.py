@@ -1,6 +1,6 @@
 """The data of the dashboard as the tests of ``dashdata`` ask for it: the old call shapes of ``orgmcp.dashboard_data`` and ``orgmcp.observe`` over the new API.
 
-Those two modules are legacy adapters (deleted by step E3), so a moved test does not import them; it imports this world and its lines stay as they were::
+Those two modules are gone, so a test imports this world, and its lines stay as they were::
 
     from testkit.dashdata_world import dd, observe       # was: from orgmcp import dashboard_data as dd, observe
 

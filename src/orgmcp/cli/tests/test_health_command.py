@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from testkit.cli_world import clock_is, main
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 
 from orgmcp.kernel.testing import FakeClock
 

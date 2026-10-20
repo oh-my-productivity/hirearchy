@@ -10,7 +10,7 @@ from datetime import timedelta
 import pytest
 from testkit.dash_fixtures import DEMO_NOW, big_org, demo_org, set_scheduler, write_running_json
 from testkit.dashdata_world import dd, observe
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.obs_fixtures import T0, EventLog, stamp
 from testkit.scheduler import scheduler_is
 

@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp.app import wiring
+from testkit.reach.orgmcp.app import wiring
 from testkit.scheduler_loop import loop_over
 
 FAKE = str(testkit.FAKE_AGENT)

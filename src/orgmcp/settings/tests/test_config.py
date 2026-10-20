@@ -1,4 +1,4 @@
-"""The pure rules for reading a value out of the settings mapping, pinned against the answers of the legacy functions."""
+"""The pure rules for reading a value out of the settings mapping, pinned against the answers of the functions it replaced."""
 
 from __future__ import annotations
 

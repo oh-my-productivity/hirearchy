@@ -1,6 +1,6 @@
 """Characterization of ``validate``: 160 mutated blueprints and what the validator of ``main`` answered for each (``golden/validate_corpus.json``).
 
-The golden file was captured from the legacy function before the validator moved; every issue is ``[level, path, message, code]`` with the
+The golden file was captured from the function of ``main`` before the validator moved; every issue is ``[level, path, message, code]`` with the
 temporary directory written ``<TMP>``. The validator must answer the same issues in the same order, whatever role library it reads."""
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ def shown(issues: list[Issue], tmp: Path, org_root: Path | None = None) -> list[
 
 
 @pytest.mark.parametrize("name", NAMES)
-def test_the_validator_answers_what_the_legacy_function_answered(h: ValidatorHarness, name: str) -> None:
+def test_the_validator_answers_what_the_function_of_main_answered(h: ValidatorHarness, name: str) -> None:
     if name in _corpus.ORG_SPECS:
         spec = _corpus.ORG_SPECS[name]
         root = h.tmp / "org"

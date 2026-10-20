@@ -13,7 +13,7 @@ import pytest
 import testkit
 from testkit.cli_world import main
 from testkit.e2e_world import build_server, load_message, observe
-from testkit.legacy.orgmcp.app import wiring
+from testkit.reach.orgmcp.app import wiring
 from testkit.scheduler import scheduler_is
 from testkit.scheduler_loop import loop_over
 

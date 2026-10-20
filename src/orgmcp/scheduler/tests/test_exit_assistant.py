@@ -7,7 +7,7 @@ import time
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.scheduler_loop import loop_over, nothing_left, scheduler_line
 
 from orgmcp.daemon import EXIT_FILE

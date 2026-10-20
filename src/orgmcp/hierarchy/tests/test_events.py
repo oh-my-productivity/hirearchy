@@ -5,7 +5,7 @@ import json
 import shutil
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 
 
 # ---------------------------------------------------------------------------------------------------- helpers

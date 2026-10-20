@@ -4,7 +4,7 @@
 from datetime import timedelta
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, utcnow
+from testkit.reach.orgmcp.core import ROOT, utcnow
 from testkit.review_world import REVIEW_ACTIONS, review
 
 ENG = "ceo/eng"

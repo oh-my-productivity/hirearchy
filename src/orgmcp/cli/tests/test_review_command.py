@@ -5,7 +5,7 @@ import time
 
 import pytest
 from testkit.cli_world import main
-from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter
+from testkit.reach.orgmcp.core import ROOT, join_frontmatter, split_frontmatter
 
 
 ENG = "ceo/eng"

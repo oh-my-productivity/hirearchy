@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 from testkit.daemon_world import describe_scheduler, env_server, scheduler_state, start_scheduler, stop_scheduler
 from testkit.health_world import with_ports
-from testkit.legacy.orgmcp.core import Org, OrgError
+from testkit.reach.orgmcp.core import Org, OrgError
 
 from orgmcp.daemon import SchedulerCommand
 from orgmcp.daemon.testing import FixedSchedulerCommand, RecordingSchedulerCommand

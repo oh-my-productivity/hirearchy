@@ -1,4 +1,4 @@
-"""One organization with a root task in every state, built on disk by the legacy ``Org`` with a clock that only moves when told.
+"""One organization with a root task in every state, built on disk by the ``Org`` facade with a clock that only moves when told.
 
 The golden files in ``expected/`` were captured from the module ``progress.py`` (the code before the package existed) on exactly this
 organization, so the tests that compare them prove the move changed no text and no number. ``orgmcp.core`` is reached by name: a feature's
@@ -187,7 +187,7 @@ def task_named(org: Any, title: str) -> Any:
 
 
 def wait_cases(org: Any, progress: Any) -> str:
-    """Six waits on the scenario, one after the other, as one text (``progress``: the function with the signature of the legacy one)."""
+    """Six waits on the scenario, one after the other, as one text (``progress``: the function with the signature it had before the package)."""
     out: list[str] = []
 
     def wait(label: str, task_id: str | None, seconds: int, poll: float, clock: WaitClock) -> None:

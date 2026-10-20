@@ -1,7 +1,7 @@
 """The dashboard app over the queries of a real organization, with failures injected through the queries (not by patching the app).
 
-``dash_app(root, interval, now)`` is ``DashApp(queries, interval)`` with the queries of ``orgmcp.app.wire_dashboard.queries_of`` (what the legacy
-``DashApp(root, interval, now)`` of ``dashboard/_legacy.py`` built for itself), wrapped in ``FailableQueries``: they answer exactly as the real ones do, until
+``dash_app(root, interval, now)`` is ``DashApp(queries, interval)`` with the queries of ``orgmcp.app.wire_dashboard.queries_of`` (what the former
+``DashApp(root, interval, now)`` built for itself), wrapped in ``FailableQueries``: they answer exactly as the real ones do, until
 a test says ``app.data.fail_snapshot(exc)`` (the refresh fails) or ``app.data.break_requests(exc)`` (the rows of the requests cannot be shown).
 """
 

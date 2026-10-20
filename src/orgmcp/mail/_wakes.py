@@ -1,4 +1,4 @@
-"""Whether the message in a file wakes its recipient (moved from ``FsMailbox._wakes``, which the legacy static ``Org._wakes`` also serves)."""
+"""Whether the message in a file wakes its recipient (moved from ``FsMailbox._wakes``, which the static ``Org._wakes`` of the facade also serves)."""
 
 from __future__ import annotations
 

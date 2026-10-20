@@ -3,7 +3,7 @@
 
 import time
 
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.services_world import define, deliver, request, svc, work
 
 from orgmcp.reflection import stats_by_version, summarize

@@ -5,7 +5,7 @@ from datetime import timedelta
 
 import pytest
 from testkit.health_world import agent_health
-from testkit.legacy.orgmcp.core import ROOT, utcnow
+from testkit.reach.orgmcp.core import ROOT, utcnow
 
 ENG = "ceo/eng"
 
@@ -39,7 +39,7 @@ def test_idle_budget_is_flagged_after_the_threshold(stranded):
 
 
 def test_stranded_budget_threshold_is_configurable(stranded):
-    from testkit.legacy.orgmcp.core import join_frontmatter, split_frontmatter
+    from testkit.reach.orgmcp.core import join_frontmatter, split_frontmatter
 
     path = stranded.root / "ORG.md"
     meta, body = split_frontmatter(path.read_text(encoding="utf-8"))

@@ -1,6 +1,6 @@
 """Organizations whose prompts the snapshots in ``snapshots/prompts/`` record (no test lives here).
 
-The snapshots were recorded from the legacy ``PromptsMixin`` before C-prompts moved it: they pin the pieces of the run prompt that the golden suite
+The snapshots were recorded from the ``PromptsMixin`` as it was before C-prompts moved it: they pin the pieces of the run prompt that the golden suite
 (``tests/golden``) does not reach - the root's whoami, the four ways a result links to the task it serves, a cut body, a redelivered batch, held
 non-waking mail, siblings, an empty first run. Ids, instants and the temporary directory are replaced by placeholders (``normalize``)."""
 

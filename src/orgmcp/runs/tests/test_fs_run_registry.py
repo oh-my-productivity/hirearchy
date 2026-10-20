@@ -52,7 +52,7 @@ def test_replacing_writes_the_records_as_they_are(tmp_path: Path) -> None:
     assert json.loads((OrgPaths(tmp_path).ledger_file("running")).read_text(encoding="utf-8")) == {"a": RECORD}
 
 
-def test_a_ledger_written_by_the_legacy_code_is_read(tmp_path: Path) -> None:
+def test_a_ledger_written_by_the_first_version_is_read(tmp_path: Path) -> None:
     (tmp_path / ".runtime").mkdir()
     (tmp_path / ".runtime" / "running.json").write_text(json.dumps({"ceo": RECORD, "x": "junk"}, indent=2) + "\n", encoding="utf-8")
     assert FsRunRegistry(fs_ledger_store(tmp_path).store).all() == {"ceo": RECORD}

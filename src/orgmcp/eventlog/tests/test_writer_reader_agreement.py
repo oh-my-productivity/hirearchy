@@ -1,4 +1,4 @@
-"""The legacy modules that still exist agree with the package: the lines the writer (``telemetry``) puts on the disk are what the package reads (the golden
+"""The writer and the reader agree: the lines the writer (``telemetry``) puts on the disk are what the package reads (the golden
 event shape: the file format does not change)."""
 
 from __future__ import annotations

@@ -3,7 +3,7 @@ and their public modules (ARCHITECTURE.md 2.2 and 4, allowed dependencies).
 
 import-linter checks the layers over the whole graph; this is the package's own guard. The fakes and the harness (``testing.py``) and the tests obey
 the same rule, through the ``testing`` modules of those packages (and the ones those harnesses are built on, ``dispatch``'s world through
-``services``'); the legacy modules and the facade are reached by name."""
+``services``'); the facade is reached by name."""
 
 from __future__ import annotations
 

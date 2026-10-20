@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from testkit.clocks import clock_ports
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.mcp_server_world import build_server
 
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)

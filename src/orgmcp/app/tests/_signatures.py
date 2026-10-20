@@ -1,4 +1,4 @@
-"""The public surface of the legacy facade, as data: every ``Org`` method and ``Message`` member, with kind and parameters.
+"""The public surface of the ``Org`` facade, as data: every ``Org`` method and ``Message`` member, with kind and parameters.
 
 ``tests/architecture/org_signatures.json`` was generated from the ``Org`` that existed before the pre-split (step M2) and guards
 every later step: the facade keeps the same names, kinds, parameter names, parameter kinds and defaults (annotations are recorded
@@ -76,7 +76,7 @@ def fields(cls: type) -> list[Entry]:
 
 
 def collect() -> dict[str, object]:
-    core = importlib.import_module("orgmcp.core")  # by name: the facade is reached through the legacy shim, not imported upward
+    core = importlib.import_module("orgmcp.core")  # by name: the facade is reached through the compatibility module, not imported upward
     Message, Org = core.Message, core.Org
     return {"Org": members(Org), "Message": members(Message), "MessageFields": fields(Message)}
 

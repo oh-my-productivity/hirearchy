@@ -2,7 +2,7 @@
 # A test moved from tests/ by refactor step E1: not type-checked strictly (production code is). Delete the first line when this file is typed.
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, latest_results
+from testkit.reach.orgmcp.core import ROOT, latest_results
 
 ENG = "ceo/eng"
 CRITERIA = "exactly 33 words; a non-author reviews the final text"

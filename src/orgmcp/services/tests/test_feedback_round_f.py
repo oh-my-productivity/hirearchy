@@ -4,7 +4,7 @@
 import time
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 
 # ------------------------------------------------------------------------------------------ 3. feedback
 SERVICE = dict(

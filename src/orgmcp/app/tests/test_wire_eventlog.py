@@ -23,7 +23,7 @@ def stamp(seconds: float) -> datetime:
 
 
 class EventLog:
-    """Writes event lines into the organization the way the runtime does (what ``tests/testkit/obs_fixtures.py`` does for the legacy tests)."""
+    """Writes event lines into the organization the way the runtime does (what ``tests/testkit/obs_fixtures.py`` does for the tests of the other packages)."""
 
     def __init__(self, org: Org) -> None:
         self.author: EventLogAuthor = StoreEventLogAuthor(DiskEventStore(org.root / EVENTS_REL), org.root / EVENTS_REL)

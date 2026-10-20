@@ -3,7 +3,7 @@ import re
 
 import pytest
 from testkit.e2e_world import agent_health
-from testkit.legacy.orgmcp.app import wiring
+from testkit.reach.orgmcp.app import wiring
 from testkit.scheduler_loop import loop_over, runnable_of
 
 from orgmcp import core

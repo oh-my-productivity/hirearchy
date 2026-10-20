@@ -937,13 +937,6 @@ class ProgressReporter(Protocol):
     def progress(self, task_id: str | None = None, now: datetime | None = None, *, wait_seconds: int = 0) -> str: ...
     def describe_progress(self, task_id: str | None = None, wait_seconds: int = 0) -> str: """progress + scheduler line."""
     def work_in_flight(self, task_id: str | None = None) -> bool: ...
-
-class LegacyParts(Protocol):  # the seam of the legacy functions; goes with them (E3)
-    def human_queue(self, runtime: object) -> HumanQueue: ...
-    def case_history(self, runtime: object) -> CaseHistory: ...
-    def service_reports(self, runtime: object) -> ServiceReports: ...
-    def scheduler_status(self, runtime: object) -> SchedulerStatus: ...
-    def waiting_on_user(self, runtime: object) -> WaitingOnUser: ...
 ```
 Constant `WAIT_MAX=900`. `DerivedProgressReporter(view, snapshots, scheduler: SchedulerStatus, waiting: WaitingOnUser, tasks: TaskQuery)` is made of small role classes
 (private interfaces in `_ports.py`, each with one implementation): `MailRootTasks(MailboxReader)` (the tasks root gave, their latest results, `listed`: open and blocked
@@ -955,11 +948,10 @@ the task's own plus the later grants), `FsTeamActivity(OrgLayout)` (names and mt
 blocked/stalled while an agent below can run) and `PollingProgress(text, snapshots, Clock, poll)` (the wait: `Clock.sleep/monotonic`, `changes`, the stall seen twice, stop after two
 idle looks, `WAIT_MAX`). The words of a message on a line are `attention`'s public helpers (`section`, `summary`, `short`, `SHORT`): `progress` keeps no copy.
 Fakes (`testing`): `ProgressWorld` over files and over memory (`fs_world`, `memory_world`), `FixedProgressReporter`, `SpyProgressView`, `FixedSnapshots`, `FixedTeamActivity`,
-`FixedCaseTotals`, `FixedLegacyParts`, `ScriptedClock`. `wire_progress` provides `ProgressReporter` and `LegacyParts` (`RuntimeParts`: the queue, the case history and the reports,
-the scheduler status and the decision of the user, built over the ports of the runtime in force). The legacy functions (`progress(org, task_id, now, *, wait_seconds, poll, sleep,
-clock)` - permanent -, `describe_progress`, `work_in_flight`, and the private `_human_items`, `_can_run`, `_state`, `_runs`, `_last_activity` that the dashboard, the scheduler and
-`observe` still import) build the reporter at each call over `org.runtime` (`_assembly.reporter_of`: the package takes what it can from the ports and asks `LegacyParts` for
-the rest, since it may not import the composition root), with the waits of their caller as the clock of the wait.
+`FixedCaseTotals`, `ScriptedClock`. `wire_progress` provides `ProgressReporter` (`DerivedProgressReporter` over the ports of the runtime). *As built (E3):* the function
+`progress(org, task_id=None, now=None, *, wait_seconds=0, poll, sleep, clock)` in `progress/_function.py` is the permanent Python entry point (README): it builds the reporter over
+`org.runtime` at each call, with the waits of its caller as the clock of the wait (`WaitClock`). The other module-level functions (`describe_progress`, `work_in_flight`, `_human_items`, ...)
+and the `LegacyParts` seam were deleted with the legacy layer.
 
 ### 3.31 `observability`
 
@@ -2251,7 +2243,7 @@ Behaviour that matters to the user is pinned **twice**: by the golden suite (byt
 > the collected tests in step. The support modules (`dash_fixtures`, `dash_worlds`, `obs_fixtures`, `kiro_sandbox`, `fake_agent`,
 > `fake_team_agent`, `expected_dash/`) moved into `tests/testkit/` in E0 (not in E1-e), with the stable paths `testkit.REPO`, `testkit.FAKE_AGENT`,
 > ... that replace `Path(__file__)` expressions; modules that a feature's tests may not import under the contracts of 8.2 are imported by moved
-> tests as `testkit.legacy.<module>` until the test is converted.
+> tests as `testkit.reach.<module>` until the test is converted.
 
 Rules for all moves: pure move + import adaptation (`from orgmcp.health import agent_health` becomes the new api; `Path(__file__).with_name("fake_agent.py")`
 becomes `testkit.FAKE_AGENT`); **no assertion changes**; a test that monkeypatches a module attribute is converted per 7.4 in the step that moves the code

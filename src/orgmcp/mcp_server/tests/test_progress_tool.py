@@ -5,7 +5,7 @@ import asyncio
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.mcp_server_world import build_server, describe_progress, describe_scheduler, main, resolve_binding, serve_until_done
 
 FAKE = str(testkit.FAKE_AGENT)

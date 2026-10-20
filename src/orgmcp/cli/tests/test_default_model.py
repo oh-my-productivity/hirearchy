@@ -2,7 +2,7 @@
 # A test moved from tests/ by refactor step E1: not type-checked strictly (production code is). Delete the first line when this file is typed.
 
 from testkit.cli_world import main
-from testkit.legacy.orgmcp.core import DEFAULT_MODEL, Org
+from testkit.reach.orgmcp.core import DEFAULT_MODEL, Org
 
 
 def test_the_cli_init_and_hire_without_model_use_the_default(tmp_path, capsys):

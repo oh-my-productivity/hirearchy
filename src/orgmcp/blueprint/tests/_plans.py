@@ -1,4 +1,4 @@
-"""The blueprints of the plan suites and what the legacy second half of ``main`` made of them (no test lives here).
+"""The blueprints of the plan suites and what the second half of ``blueprint.py`` of ``main`` made of them (no test lives here).
 
 ``golden/second_half.json`` was captured from the flat ``blueprint.py`` before it moved: for every kind of example blueprint, as a plain task and as
 a service (``<kind>[-service]``), as the template is (``raw``: its placeholders are still there, so it has errors) and as the assistant fills it

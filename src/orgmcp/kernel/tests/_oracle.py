@@ -1,7 +1,7 @@
-"""The legacy time helpers of ``orgmcp.health``, frozen verbatim from commit ``bdfb82a`` (``r1-integration``).
+"""The time helpers of the first version of ``orgmcp.health``, frozen verbatim from commit ``bdfb82a`` (``r1-integration``).
 
 ``health._aware _parse_time _stamp _msg_time _duration`` became aliases of the kernel's functions in step K1, and ``observe.fmt_dur`` and
-``observe._clip`` / ``services._clip`` followed; the live legacy names can no longer serve as the oracle for them (they are gone, or the same objects);
+``observe._clip`` / ``services._clip`` followed; the live names cannot serve as the oracle for them (they are gone, or the same objects);
 these copies do.
 """
 

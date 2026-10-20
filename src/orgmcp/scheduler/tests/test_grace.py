@@ -4,7 +4,7 @@
 import time
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.scheduler_loop import GraceWaiting, loop_over
 
 

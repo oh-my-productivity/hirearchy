@@ -7,7 +7,7 @@ ids that are the same every time (``tests/testkit/dash_fixtures.py``), and the o
 replaced by ``/path/to/acme``.
 
 ``capture`` takes a *function that makes the app*, so the same steps are taken over the app of the flat module (the goldens were taken before it
-became a package), over the app of the legacy constructor and over an app that was given its queries.
+became a package), over the app built from a root and over an app that was given its queries.
 """
 
 from __future__ import annotations

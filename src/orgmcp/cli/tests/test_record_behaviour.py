@@ -6,8 +6,8 @@ import shutil
 
 import pytest
 from testkit.cli_world import main
-from testkit.legacy.orgmcp.app import wiring
-from testkit.legacy.orgmcp.core import Org
+from testkit.reach.orgmcp.app import wiring
+from testkit.reach.orgmcp.core import Org
 
 
 # ---------------------------------------------------------------------------------------------------- helpers

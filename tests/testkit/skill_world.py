@@ -1,6 +1,6 @@
 """What the tests of the skill (and of the tools that name it) need from the application: the packaged SKILL.md, its installation, and an MCP server over an ``Org``.
 
-All of it is made by the composition root; none of it goes through the legacy module names (``orgmcp.skill.skill_source``, ``orgmcp.skill.install_skill``,
+All of it is made by the composition root; none of it goes through the former module names (``orgmcp.skill.skill_source``, ``orgmcp.skill.install_skill``,
 ``orgmcp.server.build_server``). The skill ports need no organization, so they are taken from the runtime of the working directory (nothing is read there).
 """
 

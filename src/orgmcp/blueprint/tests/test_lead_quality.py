@@ -7,7 +7,7 @@ import pytest
 import testkit
 import yaml
 from testkit.blueprint_world import ex
-from testkit.legacy.orgmcp.core import split_frontmatter
+from testkit.reach.orgmcp.core import split_frontmatter
 
 from testkit.blueprint_world import bpm
 
@@ -141,7 +141,7 @@ def test_split_at_the_estimate_leaves_exactly_the_managers_own_pass_and_rework(b
 
 
 def test_charter_and_plan_carry_the_new_numbers(base, tmp_path):
-    from testkit.legacy.orgmcp.core import Org
+    from testkit.reach.orgmcp.core import Org
     org = Org.init(tmp_path / "org", "lead quality", {"poll_seconds": 0.05})
     plan = bpm.render_plan(base, allowed_roots=[tmp_path])
     assert ("lead: starts with 22, hands down researcher 4, writer 3, factcheck 3 (each includes its rework/re-check run), "

@@ -1,4 +1,4 @@
-"""``JsonArgumentSummarizer`` against the frozen legacy ``summarize_args`` on a corpus of tool-call arguments."""
+"""``JsonArgumentSummarizer`` against the frozen ``summarize_args`` of the first version on a corpus of tool-call arguments."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ def test_a_read_only_mapping_is_enough() -> None:
 
 
 @pytest.mark.parametrize("seed", range(25))
-def test_it_summarizes_like_the_legacy_function(seed: int) -> None:
+def test_it_summarizes_like_the_frozen_function(seed: int) -> None:
     rng = random.Random(seed)
     words = ["", "ceo", "ceo/eng", "x" * 90, "y" * 250, "z" * 400, "é✓ text", "line\nbreak"]
 

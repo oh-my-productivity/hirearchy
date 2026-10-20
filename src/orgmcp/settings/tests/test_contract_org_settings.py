@@ -134,7 +134,7 @@ def test_a_numeric_setting_that_has_no_default_is_an_error_when_missing(h: Setti
         ("max_message_chars: abc\n", 20000),
         ("max_message_chars:\n", 20000),
         ("max_message_chars: [5]\n", 20000),
-        ("max_message_chars: true\n", 1),  # int(True) == 1: the legacy rule, kept as it is
+        ("max_message_chars: true\n", 1),  # int(True) == 1: the original rule, kept as it is
         ("", 20000),
     ],
 )

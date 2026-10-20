@@ -1,7 +1,7 @@
 """The texts an agent is shown: whoami, state summary, run prompt (prompts).
 
 ``state_summary``, ``whoami`` and ``run_prompt`` call the ports of ``self.runtime`` (step C-prompts; ARCHITECTURE.md 5.3 and 6.4). ``_agent_line``,
-``_indent``, ``_quote``, ``_files_lines``, ``_render_in_context`` and ``_upstream`` are the legacy spellings of the parts those texts are made of
+``_indent``, ``_quote``, ``_files_lines``, ``_render_in_context`` and ``_upstream`` are the old spellings of the parts those texts are made of
 (nothing calls them any more; the signature guard keeps them): the ports ``agent_lines``, ``task_quoter``, ``files_lines``, ``context_renderer`` and
 ``upstream_tasks`` of the runtime, and the function ``indent`` (static, as it always was)."""
 

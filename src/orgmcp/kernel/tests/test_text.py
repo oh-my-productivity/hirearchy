@@ -1,4 +1,4 @@
-"""Text helpers: ``word_count``, ``clip``, ``clip_line``, ``single``; oracle tests against the legacy copies."""
+"""Text helpers: ``word_count``, ``clip``, ``clip_line``, ``single``; oracle tests against the frozen copies (``_oracle``) and ``orgmcp.core``."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ WORDS = [
 
 
 @pytest.mark.parametrize("text", WORDS)
-def test_word_count_equals_the_legacy_count(text: str) -> None:
+def test_word_count_equals_the_core_count(text: str) -> None:
     assert word_count(text) == reach("core").word_count(text)
 
 
@@ -71,5 +71,5 @@ def _clip_inputs() -> list[tuple[object, int]]:
 
 
 @pytest.mark.parametrize(("value", "limit"), _clip_inputs())
-def test_clip_line_equals_the_two_legacy_copies(value: object, limit: int) -> None:
+def test_clip_line_equals_the_frozen_clip(value: object, limit: int) -> None:
     assert clip_line(value, limit) == _oracle._clip(value, limit)

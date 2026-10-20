@@ -4,7 +4,7 @@
 import asyncio
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.skill_world import build_server
 
 
@@ -17,7 +17,7 @@ def clean_env(monkeypatch, tmp_path):
 
 # ------------------------------------------------------------------------------------ install-skill
 def test_install_skill_to_a_temp_dest(tmp_path, capsys):
-    from testkit.legacy.orgmcp.app.wire_cli import run_cli as main
+    from testkit.reach.orgmcp.app.wire_cli import run_cli as main
     from testkit.skill_world import skill_source
 
     dest = tmp_path / "skills"
@@ -30,7 +30,7 @@ def test_install_skill_to_a_temp_dest(tmp_path, capsys):
 
 
 def test_install_skill_refuses_to_overwrite_a_different_file_without_force(tmp_path, capsys):
-    from testkit.legacy.orgmcp.app.wire_cli import run_cli as main
+    from testkit.reach.orgmcp.app.wire_cli import run_cli as main
 
     target = tmp_path / "skills" / "orgmcp" / "SKILL.md"
     target.parent.mkdir(parents=True)
@@ -43,7 +43,7 @@ def test_install_skill_refuses_to_overwrite_a_different_file_without_force(tmp_p
 
 
 def test_install_skill_defaults_to_home_kiro_skills(tmp_path, monkeypatch, capsys):
-    from testkit.legacy.orgmcp.app.wire_cli import run_cli as main
+    from testkit.reach.orgmcp.app.wire_cli import run_cli as main
 
     monkeypatch.setenv("HOME", str(tmp_path))
     main(["install-skill"])

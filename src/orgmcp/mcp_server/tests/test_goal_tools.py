@@ -6,8 +6,8 @@ import re
 
 import pytest
 import testkit
-import testkit.legacy.yaml as yaml
-from testkit.legacy.orgmcp.core import ROOT, Org
+import testkit.reach.yaml as yaml
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.mcp_server_world import blueprint as blueprint_mod
 from testkit.mcp_server_world import build_server, resolve_binding
 

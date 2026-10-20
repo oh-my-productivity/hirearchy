@@ -92,7 +92,7 @@ def test_the_last_resort_cuts_the_line_itself() -> None:
 
 
 @pytest.mark.parametrize("seed", range(12))
-def test_the_bytes_are_those_of_the_legacy_encoder(seed: int) -> None:
+def test_the_bytes_are_those_of_the_frozen_encoder(seed: int) -> None:
     rng = random.Random(seed)
     words = ["alpha", "βeta", "γ" * 80, "x" * 700, "é✓", "", "a b c"]
 

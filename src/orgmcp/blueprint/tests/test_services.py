@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 import testkit
 import yaml
-from testkit.legacy.orgmcp.app import wiring
-from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
+from testkit.reach.orgmcp.app import wiring
+from testkit.reach.orgmcp.core import ROOT, Org, OrgError
 
 from testkit.blueprint_world import bpm, services_mod
 from orgmcp.blueprint.testing import FlakyServiceCommands

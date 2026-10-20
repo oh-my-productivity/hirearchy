@@ -1,7 +1,7 @@
 """Characterization: what the views say about the scenario organizations, key for key and number for number.
 
 The expected files were captured from ``observe.py`` before the package existed (``_scenario``); the queries are built over the ports of the
-runtime of the same organizations. ``app/tests/test_observability_legacy.py`` runs the same comparison through the legacy functions."""
+runtime of the same organizations."""
 
 from __future__ import annotations
 

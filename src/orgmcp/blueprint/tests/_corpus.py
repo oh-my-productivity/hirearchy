@@ -1,7 +1,7 @@
 """A corpus of mutated blueprints, for the characterization of ``validate`` (no test lives here).
 
 ``cases(tmp)`` returns ``{name: blueprint}``: the shipped research example, a services-only variant, a code blueprint and a documents
-blueprint, each followed by the mutations that make one rule fire. ``golden/validate_corpus.json`` holds what the legacy ``validate`` of
+blueprint, each followed by the mutations that make one rule fire. ``golden/validate_corpus.json`` holds what the ``validate`` of
 ``main`` answered for every case (captured before the validator moved): every issue as ``[level, path, message, code]``, with the
 temporary directory written ``<TMP>``. The cases named ``org:...`` are validated against an organization (``ORG_CASES``)."""
 

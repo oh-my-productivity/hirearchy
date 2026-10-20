@@ -7,7 +7,7 @@ import pytest
 import testkit
 import yaml
 from testkit.blueprints import code_bp
-from testkit.legacy.orgmcp.core import DEFAULT_MODEL
+from testkit.reach.orgmcp.core import DEFAULT_MODEL
 
 from testkit.blueprint_world import bpm
 

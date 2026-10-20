@@ -9,7 +9,7 @@ import pytest
 import testkit
 from testkit import observability_world as observe
 from testkit.health_world import Scheduler, with_ports
-from testkit.legacy.orgmcp.core import ROOT, Message, Org
+from testkit.reach.orgmcp.core import ROOT, Message, Org
 from testkit.obs_fixtures import T0, EventLog, Story, stamp
 from testkit.observability_world import freeze
 
@@ -92,7 +92,7 @@ def test_check_a_missing_recipient_copy(org, story):
 
 def test_check_does_not_fail_on_a_message_that_is_being_delivered(org):
     msg = Message(sender=ROOT, to="ceo", type="task", title="T", body="b", budget=3, id="20261018T100000000000-root-ab12")
-    from testkit.legacy.orgmcp.core import atomic_write
+    from testkit.reach.orgmcp.core import atomic_write
 
     msg.created = "2026-10-18T10:00:00"
     atomic_write(org.dir(ROOT) / "sent" / f"{msg.id}.md", msg.to_text())  # the recipient copy is written a moment later
@@ -121,7 +121,7 @@ def test_check_a_missing_sender_copy_and_unparsable_and_duplicate_ids(org, story
 
 def test_check_budget_imbalance_names_the_difference(org, story):
     path = next((org.dir("ceo/eng") / "read").glob("*.md"))
-    from testkit.legacy.orgmcp.core import join_frontmatter, split_frontmatter
+    from testkit.reach.orgmcp.core import join_frontmatter, split_frontmatter
 
     meta, body = split_frontmatter(path.read_text())
     meta["budget"] = int(meta.get("budget", 0)) + 4

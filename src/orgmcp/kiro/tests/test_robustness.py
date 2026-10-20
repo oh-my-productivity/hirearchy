@@ -8,7 +8,7 @@ from pathlib import Path
 
 from testkit.health_world import Scheduler
 from testkit.kiro_world import ensure_kiro_profile, kiro_profile_name, kiro_runner
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 
 
 def real_agent_profiles() -> dict[str, int]:

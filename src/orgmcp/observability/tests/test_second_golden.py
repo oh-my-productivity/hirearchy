@@ -1,7 +1,7 @@
 """Characterization: what ``now`` and ``check`` say about the scenario organizations, key for key and character for character, and the text of every view.
 
 The expected files were captured from ``observe.py`` before the second half moved (``_scenario.SCENARIOS``, the scheduler and the judge as the scenario
-says). ``app/tests/test_observability_legacy.py`` runs the same comparison through the legacy functions."""
+says)."""
 
 from __future__ import annotations
 

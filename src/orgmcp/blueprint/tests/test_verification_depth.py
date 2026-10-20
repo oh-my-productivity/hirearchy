@@ -7,7 +7,7 @@ import pytest
 import testkit
 import yaml
 from testkit.blueprint_world import ex
-from testkit.legacy.orgmcp.core import Org, OrgError
+from testkit.reach.orgmcp.core import Org, OrgError
 
 from testkit.blueprint_world import bpm
 

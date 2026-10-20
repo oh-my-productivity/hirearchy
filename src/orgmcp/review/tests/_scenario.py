@@ -1,4 +1,4 @@
-"""One organization with managers, a team, a paused agent and a manager that cannot be written to, built on disk by the legacy ``Org`` with a clock that
+"""One organization with managers, a team, a paused agent and a manager that cannot be written to, built on disk by the ``Org`` facade with a clock that
 only moves when told.
 
 The files in ``expected/`` were captured from the module ``review.py`` (the code before the package existed) on exactly this organization, so the

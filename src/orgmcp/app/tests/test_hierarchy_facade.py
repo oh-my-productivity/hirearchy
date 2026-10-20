@@ -1,6 +1,6 @@
 """The hierarchy slice of the ``Org`` facade: ``hire``, ``retire`` and ``retire_team`` behave as they always did (green before and after), and now go
 through the ports of the runtime (``hiring`` and ``retirement``); the refund note and the charter body come from the notices and the document templates
-of the runtime, not from the legacy ``templates`` module."""
+of the runtime, not from a module-level function of ``templates``."""
 
 from __future__ import annotations
 

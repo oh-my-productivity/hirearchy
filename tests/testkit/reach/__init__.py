@@ -1,13 +1,14 @@
-"""Modules that the import contracts keep out of a feature's tests, reachable as ``testkit.legacy.<module>`` (the module itself, not a copy).
+"""Modules that the import contracts keep out of a package's tests, reachable as ``testkit.reach.<module>`` (the module itself, not a copy).
 
-A test moved from ``tests/`` into ``src/orgmcp/<package>/tests/`` (``tools/relocate_tests.py``) still builds its world with the facade
-(``orgmcp.core``), the MCP server (``orgmcp.server``), the scheduler and the like, which a package below them may not import
-(ARCHITECTURE.md 8.2). The tool writes ``from testkit.legacy.orgmcp.core import ROOT, Org`` instead of ``from orgmcp.core import ROOT, Org``;
-``testkit.legacy.<dotted name>`` is an alias of the module ``<dotted name>`` (``yaml``, ``orgmcp.server``, ``orgmcp.app.wiring`` ...): the very
-same module object, so ``isinstance`` and identity checks behave as before. The imports are invisible to import-linter
-(``testkit`` is not part of ``orgmcp``), and mypy treats them as ``Any`` (``ignore_missing_imports`` for ``testkit.legacy.*``).
+A test colocated in ``src/orgmcp/<package>/tests/`` still needs to build its world with the facade (``orgmcp.core``), the composition root
+(``orgmcp.app.wiring``) or PyYAML, which a package below them may not import (ARCHITECTURE.md 8.2). It writes
+``from testkit.reach.orgmcp.core import ROOT, Org`` instead of ``from orgmcp.core import ROOT, Org``; ``testkit.reach.<dotted name>`` is an
+alias of the module ``<dotted name>`` (``yaml``, ``orgmcp.core``, ``orgmcp.app.wiring`` ...): the very same module object, so ``isinstance``
+and identity checks behave as before. The imports are invisible to import-linter (``testkit`` is not part of ``orgmcp``), and mypy treats
+them as ``Any`` (``ignore_missing_imports`` for ``testkit.reach.*`` in pyproject.toml).
 
-A converted test imports the real API of the package it tests, and this alias goes away with the last test that needs it (step E3).
+Prefer the real API of the package under test; reach for this only where the test needs what its layer may not import. Seams of the
+runtime are replaced with ``orgmcp.app.wiring.overriding`` or the fixtures of ``testkit``, not by patching modules.
 """
 
 import importlib
@@ -20,7 +21,7 @@ PREFIX = __name__ + "."
 
 
 class _AliasFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
-    """Resolves ``testkit.legacy.<name>`` to the module ``<name>`` and keeps that module's own ``__spec__``."""
+    """Resolves ``testkit.reach.<name>`` to the module ``<name>`` and keeps that module's own ``__spec__``."""
 
     def __init__(self) -> None:
         self._specs: dict[str, importlib.machinery.ModuleSpec | None] = {}

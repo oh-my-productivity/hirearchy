@@ -7,7 +7,6 @@ from typing import cast
 
 import pytest
 
-from orgmcp.blueprint._basis import ValidatedPlanBasis
 from orgmcp.blueprint._protocols import PlanBasis, PlanWords
 from orgmcp.blueprint._words import ServiceWords
 from orgmcp.blueprint.api import Agent

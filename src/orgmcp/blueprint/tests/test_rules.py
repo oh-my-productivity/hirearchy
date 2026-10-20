@@ -1,5 +1,5 @@
 """The text heuristics and small predicates of the rules of ``validate``: each answers what the flat module's private function answered
-(the expected values were captured from ``blueprint._legacy`` before the rules moved)."""
+(the expected values were captured from the private functions of ``blueprint.py`` before the rules moved)."""
 
 from __future__ import annotations
 

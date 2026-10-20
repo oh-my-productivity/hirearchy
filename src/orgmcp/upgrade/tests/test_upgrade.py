@@ -4,7 +4,7 @@
 import subprocess
 
 import pytest
-from testkit.legacy.orgmcp.core import Org, OrgError
+from testkit.reach.orgmcp.core import Org, OrgError
 
 from orgmcp.templates.testing import static_document_templates
 from orgmcp.upgrade._rules import extract_mission

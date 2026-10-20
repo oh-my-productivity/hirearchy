@@ -6,8 +6,8 @@ import sys
 import time
 
 import testkit
-import testkit.legacy.yaml as yaml
-from testkit.legacy.orgmcp.core import DEFAULT_MODEL, ROOT, Org
+import testkit.reach.yaml as yaml
+from testkit.reach.orgmcp.core import DEFAULT_MODEL, ROOT, Org
 from testkit.scheduler_loop import loop_over
 
 FAKE = str(testkit.FAKE_AGENT)

@@ -4,7 +4,7 @@
 from pathlib import Path
 
 import pytest
-from testkit.legacy.orgmcp.app.wire_daemon import identity
+from testkit.reach.orgmcp.app.wire_daemon import identity
 
 
 def _looks_like_scheduler_of(command, root):

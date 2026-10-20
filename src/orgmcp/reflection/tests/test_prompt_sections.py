@@ -3,7 +3,7 @@
 
 import time
 
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.services_world import ENG, define, deliver, request, svc, work
 
 WEEKDAY = "weekly-brief"

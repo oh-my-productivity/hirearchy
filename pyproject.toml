@@ -83,8 +83,9 @@ module = ["orgmcp.app", "orgmcp.app.*"]
 disable_error_code = ["type-abstract"]
 
 [[tool.mypy.overrides]]
-# `testkit.legacy.<module>` is an alias of <module> made at run time (tests/testkit/legacy): to mypy it is a missing module, i.e. Any.
-module = ["testkit.legacy", "testkit.legacy.*"]
+# `testkit.reach.<module>` is an alias of <module> made at run time (tests/testkit/reach): to mypy it is a missing module, i.e. Any.
+# It lets a colocated test reach orgmcp.core, orgmcp.app.wiring and yaml, which the import contracts keep out of a package.
+module = ["testkit.reach", "testkit.reach.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

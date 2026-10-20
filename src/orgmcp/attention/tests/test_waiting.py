@@ -3,7 +3,7 @@
 
 import pytest
 from testkit.daemon_world import waiting_on_user
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 
 
 # ------------------------------------------------------------------------------- until-done: waiting on the user

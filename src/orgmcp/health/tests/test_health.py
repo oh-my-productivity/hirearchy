@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from testkit.health_world import StepClock, agent_health, org_health, render_text, team, thresholds
-from testkit.legacy.orgmcp.core import ROOT, OrgError, join_frontmatter, split_frontmatter
+from testkit.reach.orgmcp.core import ROOT, OrgError, join_frontmatter, split_frontmatter
 
 from orgmcp.health.api import FLAGS, HEALTH_DEFAULTS
 

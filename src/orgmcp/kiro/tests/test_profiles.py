@@ -4,7 +4,7 @@
 import json
 
 from testkit.kiro_world import kiro_profile_name, kiro_runner, profiles_in
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 
 
 def test_kiro_runner_builds_isolated_command(org, tmp_path, monkeypatch):

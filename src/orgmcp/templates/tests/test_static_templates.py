@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from orgmcp.templates import DocumentTemplates, Notices
 from orgmcp.templates._documents import DEFAULT_MISSION, StaticDocumentTemplates
 from orgmcp.templates._notices import REVIEW_ACTIONS, StaticNotices

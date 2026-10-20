@@ -7,7 +7,7 @@ import time
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp.app import wiring
+from testkit.reach.orgmcp.app import wiring
 from testkit.scheduler_loop import loop_over
 
 from orgmcp.core import ROOT

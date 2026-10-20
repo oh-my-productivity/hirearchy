@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from testkit.health_world import StepClock, agent_health, with_clock
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.review_world import review
 
 ENG = "ceo/eng"

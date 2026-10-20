@@ -6,8 +6,8 @@ import time
 
 import pytest
 from testkit.dispatch_loop import loop_over
-from testkit.legacy.orgmcp.app import wiring
-from testkit.legacy.orgmcp.core import ROOT, OrgError
+from testkit.reach.orgmcp.app import wiring
+from testkit.reach.orgmcp.core import ROOT, OrgError
 
 from orgmcp.kernel import AtomicWriter
 from orgmcp.kernel.testing import FailingAtomicWriter

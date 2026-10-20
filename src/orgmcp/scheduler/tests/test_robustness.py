@@ -5,8 +5,8 @@ import os
 import time
 
 import pytest
-from testkit.legacy.orgmcp.app import wiring
-from testkit.legacy.orgmcp.core import ROOT, OrgError, join_frontmatter, split_frontmatter, utcnow
+from testkit.reach.orgmcp.app import wiring
+from testkit.reach.orgmcp.core import ROOT, OrgError, join_frontmatter, split_frontmatter, utcnow
 from testkit.scheduler_loop import loop_over
 
 from orgmcp.processes import ProcessInspector

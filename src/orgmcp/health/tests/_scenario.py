@@ -1,4 +1,4 @@
-"""One organization with every health flag in it, built on disk by the legacy ``Org`` with a clock that only moves when told.
+"""One organization with every health flag in it, built on disk by the ``Org`` facade with a clock that only moves when told.
 
 The golden files in ``expected/`` were captured from the module ``health.py`` (the code before the package existed) on exactly this
 organization, so the tests that compare them prove the move changed no text and no number. ``orgmcp.core`` is reached by name: a feature's

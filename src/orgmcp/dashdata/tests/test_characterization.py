@@ -16,8 +16,8 @@ import pytest
 import testkit
 from testkit.dash_fixtures import DEMO_NOW, big_org, demo_org
 from testkit.dashdata_world import dd
-from testkit.legacy.orgmcp.app import wire_dashdata, wiring
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.app import wire_dashdata, wiring
+from testkit.reach.orgmcp.core import ROOT
 from testkit.obs_fixtures import T0
 from testkit.scheduler import scheduler_is
 

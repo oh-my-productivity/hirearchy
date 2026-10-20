@@ -37,7 +37,7 @@ class CachingMessageParser(MessageParser):
         return self.parse_as(Message, path)
 
     def parse_as(self, cls: type[M], path: Path) -> M:
-        """``parse`` into a subclass of ``Message`` (what the legacy classmethod ``Message.load`` needs)."""
+        """``parse`` into a subclass of ``Message`` (what the former classmethod ``Message.load`` needed)."""
         key = str(path)
         with open(path, "rb") as f:
             st = os.fstat(f.fileno())

@@ -3,8 +3,8 @@
 
 import asyncio
 
-import testkit.legacy.yaml as yaml
-from testkit.legacy.orgmcp.core import ROOT
+import testkit.reach.yaml as yaml
+from testkit.reach.orgmcp.core import ROOT
 from testkit.mcp_server_world import build_server, services
 from testkit.services_world import BRIEF, ENG, call, define, deliver, fails, request, svc, work
 

@@ -4,8 +4,8 @@
 import asyncio
 
 import pytest
-import testkit.legacy.yaml as yaml
-from testkit.legacy.orgmcp.core import ROOT, Org, OrgError, atomic_write
+import testkit.reach.yaml as yaml
+from testkit.reach.orgmcp.core import ROOT, Org, OrgError, atomic_write
 from testkit.orgfiles_server import build_server
 
 

@@ -2,9 +2,9 @@
 # A test moved from tests/ by refactor step E1: not type-checked strictly (production code is). Delete the first line when this file is typed.
 
 import pytest
-import testkit.legacy.yaml as yaml
+import testkit.reach.yaml as yaml
 from testkit.kiro_world import kiro_runner
-from testkit.legacy.orgmcp.core import DEFAULT_MODEL, ROOT, Org
+from testkit.reach.orgmcp.core import DEFAULT_MODEL, ROOT, Org
 
 CHARTER = "---\nrole: CEO\n{model}tools: [read]\n---\nLead.\n"
 

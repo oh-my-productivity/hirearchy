@@ -1,4 +1,4 @@
-"""The legacy names of the slice are the settings package's objects (``core``): one definition, many names."""
+"""The names ``orgmcp.core`` keeps for the slice are the settings package's objects: one definition, many names."""
 
 from __future__ import annotations
 

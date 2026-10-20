@@ -1,4 +1,4 @@
-"""``OrgProfileProvisioner``: names and bytes of the profiles are those ``main`` wrote (golden files captured from the legacy scheduler functions)."""
+"""``OrgProfileProvisioner``: names and bytes of the profiles are those ``main`` wrote (golden files captured from the scheduler functions of ``main``)."""
 
 from __future__ import annotations
 

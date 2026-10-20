@@ -5,8 +5,8 @@ import shutil
 import subprocess
 
 import pytest
-from testkit.legacy.orgmcp.app import wiring
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.app import wiring
+from testkit.reach.orgmcp.core import ROOT, Org
 
 
 # ---------------------------------------------------------------------------------------------------- helpers

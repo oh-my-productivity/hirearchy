@@ -6,8 +6,8 @@ import re
 from pathlib import Path
 
 import pytest
-import testkit.legacy.yaml as yaml
-from testkit.legacy.orgmcp.core import ROOT, Org
+import testkit.reach.yaml as yaml
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.mcp_server_world import build_server, resolve_binding, skill_source
 from testkit.mcp_server_world import blueprint as bp_mod
 

@@ -6,7 +6,7 @@ import time
 import testkit
 from testkit.dash_fixtures import set_scheduler
 from testkit.e2e_world import DashApp, NavTable, TextPane
-from testkit.legacy.orgmcp.app import wiring
+from testkit.reach.orgmcp.app import wiring
 from testkit.scheduler import scheduler_is
 from testkit.scheduler_loop import loop_over
 

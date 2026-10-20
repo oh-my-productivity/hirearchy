@@ -1,5 +1,5 @@
-"""Input tables with the answers the legacy code (``health._number``, ``health.config_number``, ``core.config_default_model``,
-``core._message_cap``) gives. They were produced by running the legacy functions; they pin the behaviour the move must keep."""
+"""Input tables with the answers of the functions the package replaced (``health._number``, ``health.config_number``, ``core.config_default_model``,
+``core._message_cap``) gives. They were produced by running those functions before the move; they pin the behaviour the move must keep."""
 
 from __future__ import annotations
 

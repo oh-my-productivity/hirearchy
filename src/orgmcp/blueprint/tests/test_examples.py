@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import testkit
 from testkit.blueprint_world import ex
-from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
+from testkit.reach.orgmcp.core import ROOT, Org, OrgError
 from testkit.blueprint_world import server_of_the_environment
 
 from testkit.blueprint_world import bpm, services_mod

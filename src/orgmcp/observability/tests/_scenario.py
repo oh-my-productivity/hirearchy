@@ -1,4 +1,4 @@
-"""Organizations with a request in them, built by the legacy ``Org`` with the story and the writers of ``tests/testkit/obs_fixtures.py``.
+"""Organizations with a request in them, built by the ``Org`` facade with the story and the writers of ``tests/testkit/obs_fixtures.py``.
 
 The expected files in ``expected/`` were captured from the module ``observe.py`` (the code before the package existed) on exactly these
 organizations, so the tests that compare them prove the move changed no key, no number and no character. ``orgmcp.core`` and ``obs_fixtures``
@@ -245,6 +245,6 @@ class VerdictJudge(OrphanJudge):
 
 
 def follow_ports(org: Any, state: tuple[str, int | None, str | None, str], verdict: str) -> Any:
-    """The runtime of ``org`` with the scheduler and the judge the scenario says (the legacy functions read the runtime of the ``Org``)."""
+    """The runtime of ``org`` with the scheduler and the judge the scenario says (the queries read the runtime of the ``Org``)."""
     org.runtime = dataclasses.replace(org.runtime, scheduler_status=FakeSchedulerStatus(SchedulerState(*state)), orphan_judge=VerdictJudge(verdict))
     return org.runtime

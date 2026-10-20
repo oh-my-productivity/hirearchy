@@ -3,7 +3,7 @@
 
 import pytest
 from testkit import observability_world as observe
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.obs_fixtures import EventLog, Story, stamp
 from testkit.observability_world import freeze
 

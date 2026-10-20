@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, OrgError
+from testkit.reach.orgmcp.core import ROOT, OrgError
 from testkit.mcp_server_world import OrgBinding, build_server, ensure_kiro_profile, resolve_binding
 
 ROOT_TOOLS = {

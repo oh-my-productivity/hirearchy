@@ -5,8 +5,8 @@ import shutil
 import time
 
 import pytest
-from testkit.legacy.orgmcp.app import wiring
-from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter
+from testkit.reach.orgmcp.app import wiring
+from testkit.reach.orgmcp.core import ROOT, join_frontmatter, split_frontmatter
 
 
 # ---------------------------------------------------------------------------------------------------- helpers

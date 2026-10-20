@@ -1,4 +1,4 @@
-"""Time vocabulary. Oracle tests: for tables of >= 200 inputs the kernel helpers give exactly what the legacy ones gave
+"""Time vocabulary. Oracle tests: for tables of >= 200 inputs the kernel helpers give exactly what the frozen originals (``_oracle``) gave
 (same value, or the same exception type)."""
 
 from __future__ import annotations
@@ -6,8 +6,6 @@ from __future__ import annotations
 import random
 from collections.abc import Callable
 from datetime import date, datetime, timedelta, timezone
-
-import pytest
 
 from orgmcp.kernel import Message, aware, fmt_dur, fmt_duration, msg_time, parse_time, stamp_of
 from orgmcp.kernel.tests import _oracle

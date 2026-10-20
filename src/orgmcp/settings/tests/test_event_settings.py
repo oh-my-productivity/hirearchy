@@ -4,7 +4,7 @@
 import shutil
 
 import pytest
-from testkit.legacy.orgmcp.app import wiring
+from testkit.reach.orgmcp.app import wiring
 
 
 # ---------------------------------------------------------------------------------------------------- helpers

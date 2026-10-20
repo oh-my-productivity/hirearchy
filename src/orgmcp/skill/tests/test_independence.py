@@ -1,6 +1,6 @@
 """``skill`` sits just above the kernel: its code imports nothing else of ``orgmcp`` (ARCHITECTURE.md 2.2, allowed dependencies).
 
-import-linter checks the layers over the whole graph; this is the package's own guard, ``_legacy.py`` included."""
+import-linter checks the layers over the whole graph; this is the package's own guard."""
 
 from __future__ import annotations
 

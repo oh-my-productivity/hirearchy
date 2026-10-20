@@ -3,7 +3,7 @@
 
 import pytest
 from testkit.cli_world import main
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 
 
 @pytest.fixture

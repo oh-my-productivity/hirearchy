@@ -4,7 +4,7 @@
 import pytest
 from testkit.daemon_world import describe_scheduler
 from testkit.health_world import with_ports
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.progress_world import describe_progress
 
 from orgmcp.daemon import SchedulerState, SchedulerStatus

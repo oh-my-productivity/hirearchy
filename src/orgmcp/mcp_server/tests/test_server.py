@@ -3,7 +3,7 @@
 
 import asyncio
 
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.mcp_server_world import build_server
 
 

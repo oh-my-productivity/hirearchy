@@ -4,8 +4,8 @@
 from datetime import datetime, timezone
 
 import pytest
-from testkit.legacy.orgmcp.app import wiring
-from testkit.legacy.orgmcp.core import ROOT, OrgError
+from testkit.reach.orgmcp.app import wiring
+from testkit.reach.orgmcp.core import ROOT, OrgError
 
 from orgmcp.kernel import Clock
 from orgmcp.kernel.testing import FakeClock

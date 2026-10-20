@@ -2,7 +2,7 @@
 
 The bodies call the ports of ``self.runtime`` (step B-dispatch; ARCHITECTURE.md 5.3 and 6.4). ``send``, ``delegate`` and ``report`` are the ports
 ``message_sender``, ``task_assigner`` and ``task_reporter``. ``can_message``, ``_next_hops``, ``_normalize_artifact`` and ``_check_lessons`` are the
-legacy spellings of the rules the commands are made of (nothing calls them any more; the signature guard keeps them): the ports ``route_policy``,
+old spellings of the rules the commands are made of (nothing calls them any more; the signature guard keeps them): the ports ``route_policy``,
 ``hop_counter`` and ``artifact_normalizer``, and the function ``check_lessons`` (static, as it always was). ``LESSONS_MAX_CHARS`` is re-exported under
 its old name for ``orgmcp.core``."""
 

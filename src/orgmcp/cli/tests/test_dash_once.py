@@ -4,7 +4,7 @@
 import pytest
 from testkit.cli_world import clock_is, main
 from testkit.dash_fixtures import DEMO_NOW, demo_org, snapshot_files
-from testkit.legacy.orgmcp.app.wire_dashdata import dashboard_runtime
+from testkit.reach.orgmcp.app.wire_dashdata import dashboard_runtime
 from testkit.scheduler import scheduler_is
 
 from orgmcp.daemon import SchedulerState

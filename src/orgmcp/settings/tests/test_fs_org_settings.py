@@ -76,7 +76,7 @@ def test_the_config_is_a_new_mapping_every_time(tmp_path: Path) -> None:
 
 
 def test_windows_line_ends_are_read_like_every_text_file_here(tmp_path: Path) -> None:
-    """The legacy readers open ORG.md in text mode (``read_text``): a CRLF file reads with LF, so its frontmatter is found."""
+    """The readers of ORG.md open it in text mode (``read_text``): a CRLF file reads with LF, so its frontmatter is found."""
     (tmp_path / "ORG.md").write_bytes(b"---\r\nmax_depth: 2\r\n---\r\nbody\r\n")
     fs = make(tmp_path)
     assert fs.read_raw() == "---\nmax_depth: 2\n---\nbody\n"

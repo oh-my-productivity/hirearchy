@@ -4,7 +4,7 @@
 import os
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
+from testkit.reach.orgmcp.core import ROOT, Org, OrgError
 
 
 @pytest.fixture

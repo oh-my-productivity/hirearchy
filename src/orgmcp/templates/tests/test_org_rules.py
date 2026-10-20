@@ -1,7 +1,7 @@
 # mypy: ignore-errors
 # A test moved from tests/ by refactor step E1: not type-checked strictly (production code is). Delete the first line when this file is typed.
 
-from testkit.legacy.orgmcp.core import Org
+from testkit.reach.orgmcp.core import Org
 from testkit.services_world import cli
 
 from orgmcp.templates._documents import ORG_RULES

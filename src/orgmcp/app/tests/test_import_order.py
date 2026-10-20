@@ -1,6 +1,6 @@
 """Import order during the strangler (ARCHITECTURE.md 10.1, risk 9): every module imports on its own, in a fresh interpreter.
 
-``core`` -> ``app.facade`` -> the mixins -> the legacy leaf modules must never close an import cycle. Two orders are tried for
+``core`` -> ``app.facade`` -> the mixins -> the leaf modules must never close an import cycle. Two orders are tried for
 every module of ``src/orgmcp`` (the tests and ``__main__`` excepted):
 
 * *package first*: ``python -c "import orgmcp.<module>"``, as in production (``orgmcp/__init__`` runs first and pulls in the CLI);

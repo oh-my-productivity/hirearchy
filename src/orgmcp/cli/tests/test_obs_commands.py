@@ -5,7 +5,7 @@ import json
 
 import pytest
 from testkit.cli_world import SleepingClock, cli_clocked, clock_is, main
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.obs_fixtures import EventLog, Story, stamp
 
 from orgmcp.kernel.testing import FakeClock

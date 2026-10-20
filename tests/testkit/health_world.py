@@ -6,7 +6,7 @@ again with those ports (``with_ports``, ``wiring.open_runtime(root, overrides)``
 well as the package under test, reads them.
 
 The functions at the end give the packages' interfaces the call shape the tests have always used (``agent_health(org, addr, now)`` ...): the
-assertions of a moved test stay as they were, only the import names this module instead of the legacy function.
+assertions of a moved test stay as they were, only the import names this module instead of the former function.
 """
 
 from __future__ import annotations

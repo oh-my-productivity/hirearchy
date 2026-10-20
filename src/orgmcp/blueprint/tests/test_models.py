@@ -8,7 +8,7 @@ import pytest
 import testkit
 import yaml
 from testkit.blueprint_world import ex
-from testkit.legacy.orgmcp.core import DEFAULT_MODEL, Org
+from testkit.reach.orgmcp.core import DEFAULT_MODEL, Org
 from testkit.blueprint_world import kiro_runner
 
 from testkit.blueprint_world import bpm

@@ -1,6 +1,6 @@
-"""What the legacy modules keep exposing now that the vocabulary lives in the kernel.
+"""What ``orgmcp.core`` keeps exposing now that the vocabulary lives in the kernel.
 
-``orgmcp.core`` is reached by name (``_legacy.legacy``): the kernel's tests do not import upward."""
+``orgmcp.core`` is reached by name (``_reach.reach``): the kernel's tests do not import upward."""
 
 from __future__ import annotations
 

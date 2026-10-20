@@ -4,7 +4,7 @@
 from datetime import timedelta
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, OrgError, utcnow
+from testkit.reach.orgmcp.core import ROOT, OrgError, utcnow
 
 from orgmcp.progress import progress
 

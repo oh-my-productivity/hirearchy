@@ -3,7 +3,7 @@
 
 import os
 
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.mail_world import scheduler_over
 
 

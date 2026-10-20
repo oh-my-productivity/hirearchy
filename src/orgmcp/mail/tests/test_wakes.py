@@ -1,4 +1,4 @@
-"""``wakes``: whether the message in a file wakes its recipient (the function behind ``FsMailbox.unread`` and the legacy static ``Org._wakes``)."""
+"""``wakes``: whether the message in a file wakes its recipient (the function behind ``FsMailbox.unread`` and the static ``Org._wakes`` of the facade)."""
 
 from __future__ import annotations
 

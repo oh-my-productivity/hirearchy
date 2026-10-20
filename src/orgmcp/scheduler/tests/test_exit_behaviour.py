@@ -4,7 +4,7 @@
 import time
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 from testkit.scheduler_loop import GraceWaiting, loop_over, scheduler_line, waiting_for_user
 
 from orgmcp.daemon import EXIT_FILE

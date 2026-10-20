@@ -6,7 +6,7 @@ import shutil
 
 import pytest
 from testkit import telemetry_world as telemetry
-from testkit.legacy.orgmcp.core import ROOT
+from testkit.reach.orgmcp.core import ROOT
 
 
 # ---------------------------------------------------------------------------------------------------- helpers

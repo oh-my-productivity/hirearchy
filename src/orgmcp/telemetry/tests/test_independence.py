@@ -1,7 +1,6 @@
 """``telemetry`` imports only the kernel, ``eventlog``, ``settings`` and ``snapshots`` (ARCHITECTURE.md 2.2), through their ``api``.
 
-import-linter checks the layers over the whole graph; this is the package's own guard. The legacy module ``_legacy`` is held to it too: it
-reaches the process defaults through a hook that ``orgmcp.app`` installs, never by importing the composition root."""
+import-linter checks the layers over the whole graph; this is the package's own guard."""
 
 from __future__ import annotations
 

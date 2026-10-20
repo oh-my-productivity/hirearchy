@@ -6,7 +6,7 @@ import re
 
 import pytest
 from testkit.kiro_world import ensure_kiro_profile, kiro_profile_name, kiro_runner
-from testkit.legacy.orgmcp import main
+from testkit.reach.orgmcp import main
 
 
 @pytest.fixture(autouse=True)

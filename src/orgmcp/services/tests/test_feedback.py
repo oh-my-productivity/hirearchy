@@ -4,7 +4,7 @@
 import time
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, OrgError
+from testkit.reach.orgmcp.core import ROOT, OrgError
 from testkit.reflection_world import summarize
 from testkit.services_world import ENG, define, deliver, request, svc
 

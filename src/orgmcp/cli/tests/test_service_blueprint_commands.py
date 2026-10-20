@@ -3,9 +3,9 @@
 
 import pytest
 import testkit
-import testkit.legacy.yaml as yaml
+import testkit.reach.yaml as yaml
 from testkit.cli_world import main
-from testkit.legacy.orgmcp.core import Org
+from testkit.reach.orgmcp.core import Org
 
 
 ROOT_DIR = testkit.REPO

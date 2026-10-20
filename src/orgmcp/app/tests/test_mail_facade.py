@@ -78,7 +78,7 @@ def test_redelivery_is_the_batch_stores(org: Org) -> None:
     assert [m.id for m in org.messages("ceo", "inbox")] == [task(1, "ceo", "cto").id]
 
 
-def test_the_legacy_static_wakes_reads_a_file_through_the_process_parser(org: Org, tmp_path: Path) -> None:
+def test_the_static_wakes_of_the_facade_reads_a_file_through_the_process_parser(org: Org, tmp_path: Path) -> None:
     held, waking, broken = tmp_path / "a.md", tmp_path / "b.md", tmp_path / "c.md"
     held.write_text("---\nfrom: root\nto: ceo\ntype: note\nwake: false\n---\nx\n", encoding="utf-8")
     waking.write_text("---\nfrom: root\nto: ceo\ntype: note\n---\nx\n", encoding="utf-8")

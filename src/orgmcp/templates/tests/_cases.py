@@ -1,7 +1,7 @@
 """The fixed inputs of the GOLDEN-text tests and the names of the files that hold their expected output.
 
 ``expected/<case>.txt`` was captured from the module ``orgmcp/templates.py`` as it was before it became a package (step
-A-templates), by calling the legacy function with these arguments, and is never regenerated: the
+A-templates), by calling the function with these arguments, and is never regenerated: the
 templates are the text the runtime writes into ORG.md, charters, messages and notices, so a changed byte is a changed behaviour.
 """
 

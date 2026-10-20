@@ -1,5 +1,5 @@
 """The prompts slice of the ``Org`` facade: ``whoami``, ``state_summary`` and ``run_prompt`` (and the private spellings the signature guard keeps) say
-what they always said, byte for byte. The snapshots were recorded from the legacy mixin before it moved (green before and after); the golden suite
+what they always said, byte for byte. The snapshots were recorded from the mixin as it was before it moved (green before and after); the golden suite
 (``tests/golden``) pins the rest."""
 
 from __future__ import annotations

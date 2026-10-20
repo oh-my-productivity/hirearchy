@@ -1,7 +1,7 @@
 """The scheduler's loop over a real ``Org`` for the tests that run agents as real (fake-agent) processes.
 
-``loop_over`` makes the ``HeartbeatLoop`` of ``org.runtime`` the way the composition root does (``app.wire_scheduler.loop_of``): the runner of a test is the
-legacy ``(org, addr, prompt) -> (argv, cwd, env)`` function, the output is a function of one line, and the cadence clock (stall detection, review, heartbeat, grace
+``loop_over`` makes the ``HeartbeatLoop`` of ``org.runtime`` the way the composition root does (``app.wire_scheduler.loop_of``): the runner of a test is a
+``(org, addr, prompt) -> (argv, cwd, env)`` function, the output is a function of one line, and the cadence clock (stall detection, review, heartbeat, grace
 period) is a function that returns seconds, so that a test can move time forward without sleeping. Runs are timed by the system's clock, as always.
 What a test asks of the loop it asks of the loop's own collaborators: ``loop.state`` (``runs``, ``blocked``, ``count``, ``mode``), ``loop.reap()``, ``loop.start(addr)``,
 ``org.runtime.runnable_query``, ``org.runtime.open_work``. ``GraceWaiting`` is the grace period of an until-done scheduler over the ports of a runtime and a loop.

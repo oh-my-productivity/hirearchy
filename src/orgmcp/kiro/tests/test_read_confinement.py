@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 from testkit.kiro_world import ensure_kiro_profile, file_confinement, kiro_profile_name, kiro_runner
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 
 
 def profile_of(isolated_kiro, name):

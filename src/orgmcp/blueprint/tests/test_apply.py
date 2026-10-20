@@ -7,8 +7,8 @@ import pytest
 import testkit
 import yaml
 from testkit.blueprints import code_bp
-from testkit.legacy.orgmcp.app import wiring
-from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
+from testkit.reach.orgmcp.app import wiring
+from testkit.reach.orgmcp.core import ROOT, Org, OrgError
 
 from testkit.blueprint_world import bpm
 from orgmcp.blueprint import BlueprintError

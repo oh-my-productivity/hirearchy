@@ -2,7 +2,7 @@
 # A test moved from tests/ by refactor step E1: not type-checked strictly (production code is). Delete the first line when this file is typed.
 
 from testkit.cli_world import main
-from testkit.legacy.orgmcp.core import Org
+from testkit.reach.orgmcp.core import Org
 
 
 MISSION = "Study octopuses.\n\n## Findings so far\nThey have three hearts."

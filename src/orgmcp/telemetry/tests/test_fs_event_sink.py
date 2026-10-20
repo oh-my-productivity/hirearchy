@@ -46,7 +46,7 @@ def test_the_timestamp_is_the_clock_in_utc_with_microseconds(tmp_path: Path) -> 
     assert kit.events()[0]["ts"] == "2026-10-18T10:00:00.000001+00:00" == (T0.replace(microsecond=1)).isoformat(timespec="microseconds")
 
 
-def test_the_line_is_byte_for_byte_what_the_legacy_writer_wrote(tmp_path: Path) -> None:
+def test_the_line_is_byte_for_byte_what_the_first_writer_wrote(tmp_path: Path) -> None:
     kit = sink_kit(tmp_path)
     kit.sink.emit("custom.kind", x=1, text="é✓")
     expected = ('{"v":1,"ts":"2026-10-18T10:00:00.000001+00:00","seq":1,"proc":"cli","pid":%d,"kind":"custom.kind","actor":"root",'
@@ -301,7 +301,7 @@ def test_an_ignore_list_that_fails_does_not_lose_the_event(tmp_path: Path) -> No
     assert [e["kind"] for e in kit.events()] == ["custom.kind"] and kit.pool.dropped() == 0
 
 
-def test_the_default_retry_window_of_the_sink_is_five_seconds() -> None:  # moved from test_legacy_surface.py (deleted with the legacy names)
+def test_the_default_retry_window_of_the_sink_is_five_seconds() -> None:  # moved from the former surface test of the package
     from orgmcp.telemetry._sink import RETRY_AFTER
 
     assert RETRY_AFTER == 5.0

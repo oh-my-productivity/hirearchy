@@ -1,4 +1,4 @@
-"""The words and limits of the plan (package-private; the legacy module still exports them under their old names)."""
+"""The words and limits of the plan (package-private)."""
 
 from __future__ import annotations
 

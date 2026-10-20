@@ -11,8 +11,8 @@ import time
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp.app import wiring
-from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter
+from testkit.reach.orgmcp.app import wiring
+from testkit.reach.orgmcp.core import ROOT, join_frontmatter, split_frontmatter
 from testkit.scheduler_loop import loop_over
 
 from orgmcp.eligibility import FailureCounter

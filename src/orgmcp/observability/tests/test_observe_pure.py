@@ -5,7 +5,7 @@ from datetime import timedelta
 
 import pytest
 from testkit import observability_world as observe
-from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
+from testkit.reach.orgmcp.core import ROOT, Org, OrgError
 from testkit.obs_fixtures import Story, stamp
 from testkit.observability_world import freeze
 

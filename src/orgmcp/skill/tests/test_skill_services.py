@@ -4,7 +4,7 @@
 import asyncio
 
 import testkit
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.skill_world import build_server
 
 ROOT_DIR = testkit.REPO

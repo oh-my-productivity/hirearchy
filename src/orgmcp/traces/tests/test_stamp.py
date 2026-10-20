@@ -5,8 +5,8 @@ import json
 import shutil
 
 import pytest
-from testkit.legacy.orgmcp.app import wiring
-from testkit.legacy.orgmcp.core import ROOT, split_frontmatter
+from testkit.reach.orgmcp.app import wiring
+from testkit.reach.orgmcp.core import ROOT, split_frontmatter
 
 
 # ---------------------------------------------------------------------------------------------------- helpers

@@ -1,7 +1,7 @@
 """What the end-to-end tests (``tests/e2e``, ``tests/meta``) take from the application, over the composition root and the packages' ports.
 
 The scenarios were written against the flat modules (``orgmcp.server.build_server``, ``orgmcp.observe.trace``, ``orgmcp.scheduler.Scheduler``,
-``orgmcp.blueprint`` ...); those names are legacy (deleted by step E3), so a scenario takes them from here, where each is a thin call of a port of the
+``orgmcp.blueprint`` ...); those names are gone, so a scenario takes them from here, where each is a thin call of a port of the
 runtime (``org.runtime.trace_queries``, ``.message_parser`` ...), of the composition root (``orgmcp.app.wire_*``) or of the private class that owns the old
 function (allowed here: ``testkit`` is not part of ``orgmcp``). The assertion text of the scenarios stays as it was; only their imports changed::
 

@@ -6,7 +6,7 @@ import os
 import sys
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.mcp_server_world import build_server, resolve_binding
 
 ROOT_TOOLS = {

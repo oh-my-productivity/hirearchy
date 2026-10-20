@@ -6,7 +6,7 @@ import asyncio
 import pytest
 from testkit.dash_fixtures import DEMO_NOW, demo_org, set_scheduler, snapshot_files
 from testkit.dashboard_world import dash_app, main
-from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.reach.orgmcp.core import ROOT, Org
 from testkit.obs_fixtures import EventLog, stamp
 
 from orgmcp.dashboard._widgets import NavTable, TextPane, TextScreen

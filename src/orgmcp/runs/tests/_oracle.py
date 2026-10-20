@@ -1,9 +1,9 @@
-"""The legacy readers of run logs, frozen verbatim from commit ``48fe55e`` (``r1-integration``).
+"""The readers of run logs of the first version, frozen verbatim from commit ``48fe55e`` (``r1-integration``).
 
 ``health._run_windows/_run_outcomes``, ``observe._log_facts`` and ``dashboard_data._read_tail`` become calls of ``RunLogReader`` in step
-A-runs, so the live legacy functions can no longer serve as the oracle for the package; these copies do (only the receiver changed: the
+A-runs, so the live functions cannot serve as the oracle for the package; these copies do (only the receiver changed: the
 directory of the agent's logs is a parameter instead of ``org.dir(addr) / "runs"``, the helpers ``_stamp`` etc. are the kernel's).
-Delete this module together with the oracle tests when the last legacy reader is gone (step E1).
+They are the reference of the comparison tests and stay as long as those tests do.
 """
 
 from __future__ import annotations

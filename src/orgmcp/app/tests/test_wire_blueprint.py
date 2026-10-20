@@ -28,7 +28,6 @@ from orgmcp.blueprint import (
 )
 from orgmcp.blueprint._applier import HiringBlueprintApplier
 from orgmcp.blueprint._examples import TemplateBlueprintExamples
-from orgmcp.blueprint._files import FsTextFiles
 from orgmcp.blueprint._identity import HashPlanIdentity
 from orgmcp.blueprint._loader import YamlBlueprintLoader
 from orgmcp.blueprint._provision import FsWorkspaceProvisioner
