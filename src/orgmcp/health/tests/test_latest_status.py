@@ -4,11 +4,9 @@
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from testkit.legacy.orgmcp import core
+from testkit.health_world import StepClock, agent_health, with_clock
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.review import review
-
-from orgmcp.health import agent_health
+from testkit.review_world import review
 
 ENG = "ceo/eng"
 CRITERIA = "exactly 33 words; a non-author reviews the final text"
@@ -16,18 +14,10 @@ T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 
 
 @pytest.fixture
-def clock(monkeypatch):
-    """Frozen time for health (`now`), advancing 1 ms per call so message ids stay ordered."""
-
-    class Clock:
-        t = T0
-
-        def __call__(self):
-            self.t += timedelta(milliseconds=1)
-            return self.t
-
-    c = Clock()
-    monkeypatch.setattr(core, "utcnow", c)
+def clock(org):
+    """Frozen time for health (`now`), advancing 1 ms per reading so message ids stay ordered."""
+    c = StepClock(T0, timedelta(milliseconds=1))
+    with_clock(org, c)
     return c
 
 

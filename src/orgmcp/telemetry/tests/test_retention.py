@@ -8,10 +8,9 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 import testkit
+from testkit import telemetry_world as telemetry
+from testkit.health_world import Scheduler
 from testkit.legacy.orgmcp.core import join_frontmatter, split_frontmatter
-from testkit.legacy.orgmcp.scheduler import Scheduler
-
-from orgmcp import telemetry
 
 FAKE = str(testkit.FAKE_AGENT)
 SILENT = {"echo": lambda _: None}

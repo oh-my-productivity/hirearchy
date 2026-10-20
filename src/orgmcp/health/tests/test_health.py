@@ -6,10 +6,10 @@ import os
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from testkit.legacy.orgmcp import core
+from testkit.health_world import StepClock, agent_health, org_health, render_text, team, thresholds
 from testkit.legacy.orgmcp.core import ROOT, OrgError, join_frontmatter, split_frontmatter
 
-from orgmcp.health import FLAGS, HEALTH_DEFAULTS, agent_health, org_health, render_text, thresholds
+from orgmcp.health import FLAGS, HEALTH_DEFAULTS
 
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 ENG = "ceo/eng"
@@ -19,24 +19,15 @@ def at(seconds: float) -> datetime:
     return T0 + timedelta(seconds=seconds)
 
 
-class Clock:
-    """Replaces core.utcnow so message ids, `created` stamps and hire times are deterministic."""
-
-    def __init__(self):
-        self.t = T0
-
-    def __call__(self):
-        return self.t
-
-    def at(self, seconds: float) -> None:
-        self.t = at(seconds)
-
-
 @pytest.fixture(autouse=True)
-def clock(monkeypatch):
-    c = Clock()
-    monkeypatch.setattr(core, "utcnow", c)
-    return c
+def clock():
+    """A clock of the test's, in the place of the system's: message ids, `created` stamps and hire times are deterministic."""
+    return StepClock(T0)
+
+
+@pytest.fixture
+def org(tmp_path, clock):
+    return team(tmp_path, clock)
 
 
 def add_run(org, addr, start, end):

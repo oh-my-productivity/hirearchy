@@ -4,10 +4,8 @@
 import os
 import shutil
 
+from testkit.health_world import Scheduler, agent_health, org_health
 from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter, utcnow
-from testkit.legacy.orgmcp.scheduler import Scheduler
-
-from orgmcp.health import agent_health, org_health
 
 TRUE = shutil.which("true") or "/usr/bin/true"
 

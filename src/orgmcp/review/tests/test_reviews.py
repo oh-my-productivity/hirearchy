@@ -7,12 +7,11 @@ import time
 from datetime import timedelta
 
 import pytest
+from testkit.health_world import Scheduler, agent_health
 from testkit.legacy.orgmcp.core import ROOT, Org, join_frontmatter, split_frontmatter, utcnow
-from testkit.legacy.orgmcp.scheduler import Scheduler
+from testkit.review_world import REVIEW_ACTIONS, review, review_if_due, total_runs
 
-from orgmcp import templates
-from orgmcp.health import FLAGS, agent_health
-from orgmcp.review import review, review_if_due, total_runs
+from orgmcp.health import FLAGS
 
 ENG = "ceo/eng"
 
@@ -78,16 +77,16 @@ def test_manager_gets_one_compact_note_with_reasons_and_actions(org):
     (note,) = runtime_notes(org, "ceo")
     assert note.title == "health review: 1 new problem(s)"
     assert "`ceo/eng` idle: no open tasks and no activity" in note.body
-    assert templates.REVIEW_ACTIONS["idle"].format(a=ENG) in note.body
+    assert REVIEW_ACTIONS["idle"].format(a=ENG) in note.body
     assert "ceo/MEMORY.md" in note.body
     assert runtime_notes(org, ENG) == []  # a worker with no team is nobody's manager
     assert result.notified["ceo"] == [f"{ENG}:idle"]
 
 
 def test_every_flag_has_an_action():
-    assert set(templates.REVIEW_ACTIONS) == set(FLAGS)
+    assert set(REVIEW_ACTIONS) == set(FLAGS)
     for flag in FLAGS:
-        assert ENG in templates.REVIEW_ACTIONS[flag].format(a=ENG)
+        assert ENG in REVIEW_ACTIONS[flag].format(a=ENG)
 
 
 def test_only_new_pairs_are_sent_and_persistent_ones_are_not_repeated(org):
@@ -148,8 +147,8 @@ def test_root_summary_lists_every_flagged_agent_every_review(org):
     assert first.title == "health review: 2 of 2 agents flagged" and first.body == second.body
     assert first.body.startswith("Health review: 2 agents, 2 flagged.")
     assert "- `ceo` idle:" in first.body and "- `ceo/eng` idle:" in first.body
-    assert templates.REVIEW_ACTIONS["idle"].format(a="ceo") in first.body  # root's direct report: suggested action
-    assert templates.REVIEW_ACTIONS["idle"].format(a=ENG) not in first.body  # not root's to act on
+    assert REVIEW_ACTIONS["idle"].format(a="ceo") in first.body  # root's direct report: suggested action
+    assert REVIEW_ACTIONS["idle"].format(a=ENG) not in first.body  # not root's to act on
     assert org.ledger("reviews")["notified"][ROOT] == ["ceo:idle", f"{ENG}:idle"]
 
 
@@ -260,7 +259,7 @@ def settled():
             if not sched.runs:
                 break
             time.sleep(0.02)
-            sched._reap()
+            sched.reap()
     SCHEDULERS.clear()
 
 

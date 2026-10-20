@@ -2,9 +2,8 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
+from testkit.health_world import agent_health, org_health, thresholds
 from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter, utcnow
-
-from orgmcp.health import agent_health, org_health, thresholds
 
 
 def configure(org, **changes):

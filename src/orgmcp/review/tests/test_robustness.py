@@ -4,10 +4,9 @@
 import json
 from datetime import timedelta
 
+from testkit.health_world import Scheduler
 from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter, utcnow
-from testkit.legacy.orgmcp.scheduler import Scheduler
-
-from orgmcp.review import review_if_due, total_runs
+from testkit.review_world import review_if_due, total_runs
 
 
 def configure(org, **changes):
@@ -70,14 +69,14 @@ def test_manager_with_spare_budget_beyond_its_reserve_still_gets_the_note(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=4)
     org.delegate("ceo", "ceo/eng", "work", "g", "a", budget=1)  # budget 2 left, one outstanding
     configure(org, health={"idle_after_seconds": -1})
-    from orgmcp.review import review
+    from testkit.review_world import review
 
     result = review(org, utcnow() + timedelta(hours=1))
     assert [n.to for n in result.notes if n.to == "ceo"] == ["ceo"] and "ceo" not in result.skipped
 
 
 def test_skipped_manager_is_listed_in_roots_summary_and_told_later(org):
-    from orgmcp.review import review
+    from testkit.review_world import review
 
     org.hire("ceo", "ops", "Ops", "Do ops.")
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=3)

@@ -1,10 +1,9 @@
 # mypy: ignore-errors
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
+from testkit.health_world import agent_health
 from testkit.legacy.orgmcp.core import ROOT
 from testkit.services_world import ENG, deliver, request, svc, work
-
-from orgmcp.health import agent_health
 
 WEEKDAY = "weekly-brief"
 

@@ -5,7 +5,7 @@ import json
 import shutil
 
 import pytest
-from testkit.legacy.orgmcp import telemetry
+from testkit import telemetry_world as telemetry
 from testkit.legacy.orgmcp.core import ROOT
 
 
@@ -33,7 +33,7 @@ def read_events(org, kind=None):
 
 
 def test_review_run_event(org):
-    from orgmcp import review
+    from testkit import review_world as review
 
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
     result = review.review(org)

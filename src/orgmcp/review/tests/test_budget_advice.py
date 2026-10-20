@@ -5,9 +5,7 @@ from datetime import timedelta
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT, utcnow
-
-from orgmcp import templates
-from orgmcp.review import review
+from testkit.review_world import REVIEW_ACTIONS, review
 
 ENG = "ceo/eng"
 
@@ -32,5 +30,5 @@ def test_the_review_tells_the_manager_what_to_do(stranded):
     result = review(stranded, now=later(1))
     ceo_note = next(n for n in result.notes if n.to == "ceo")
     assert "`ceo/eng` stranded_budget" in ceo_note.body
-    assert templates.REVIEW_ACTIONS["stranded_budget"].format(a=ENG) in ceo_note.body
+    assert REVIEW_ACTIONS["stranded_budget"].format(a=ENG) in ceo_note.body
     assert "return its budget" in ceo_note.body and "retire" in ceo_note.body

@@ -4,9 +4,8 @@
 from datetime import timedelta
 
 import pytest
+from testkit.health_world import agent_health
 from testkit.legacy.orgmcp.core import ROOT, utcnow
-
-from orgmcp.health import agent_health
 
 ENG = "ceo/eng"
 

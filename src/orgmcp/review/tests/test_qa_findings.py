@@ -3,9 +3,8 @@
 
 from datetime import timedelta
 
+from testkit import review_world as review
 from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter, utcnow
-
-from orgmcp import review
 
 ENG = "ceo/eng"
 

@@ -13,9 +13,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+from testkit import telemetry_world as telemetry
 from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter
 
-from orgmcp import telemetry
 from orgmcp.kernel.testing import FakeClock
 from orgmcp.telemetry._sink import FsEventSink
 
@@ -223,11 +223,13 @@ def test_overhead_1000_events_take_well_under_a_second(org):
 
 WRITER = """
 import sys
-from orgmcp import telemetry
+from pathlib import Path
+from orgmcp.app import wiring
 root, proc, n = sys.argv[1], sys.argv[2], int(sys.argv[3])
-telemetry.set_process(proc)
+wiring.process_resources().process_label.set(proc)
+events = wiring.open_runtime(Path(root)).events
 for i in range(n):
-    telemetry.emit(root, "tool.call", tool="t", i=i, pad="p" * 200)
+    events.emit("tool.call", tool="t", i=i, pad="p" * 200)
 """
 
 
