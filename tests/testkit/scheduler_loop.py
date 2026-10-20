@@ -103,16 +103,16 @@ class GraceWaiting:
         return self.grace.check(Standing(s.runs, s.blocked, max_runs is None or s.count.total < max_runs))
 
 
-def describe_scheduler(org: Any) -> str:
+def scheduler_line(org: Any) -> str:
     """The status line of the scheduler of ``org`` (``scheduler: stopped (...)``)."""
     return org.runtime.scheduler_status.describe()
 
 
-def waiting_on_user(org: Any) -> Any:
+def waiting_for_user(org: Any) -> Any:
     """Is every open root task unable to progress without the user, as a scheduler with no runs of its own sees it? (None if not)"""
     return org.runtime.waiting_on_user.analyze()
 
 
-def nothing_to_do(org: Any) -> bool:
+def nothing_left(org: Any) -> bool:
     """Would an until-done scheduler with no runs of its own exit at once?"""
     return org.runtime.open_work.nothing_to_do()

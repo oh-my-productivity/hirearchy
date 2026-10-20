@@ -5,8 +5,8 @@ import pytest
 from testkit.cli_world import main
 
 
-def describe_scheduler(org):
-    """What ``scheduler.describe_scheduler(org)`` said: the status line of the organization's scheduler."""
+def scheduler_line(org):
+    """The status line of the organization's scheduler."""
     return org.runtime.scheduler_status.describe()
 
 
@@ -25,6 +25,6 @@ def env(monkeypatch, tmp_path):
 def test_cli_run_until_done_exits_and_logs_the_reason(org, capsys):
     main(["--root", str(org.root), "run", "--until-done"])  # nothing to do: returns at once
     assert "scheduler exiting: finished: no open tasks" in capsys.readouterr().out
-    assert describe_scheduler(org) == "scheduler: stopped (finished: no open tasks)"
+    assert scheduler_line(org) == "scheduler: stopped (finished: no open tasks)"
     with pytest.raises(SystemExit):
         main(["--root", str(org.root), "run", "--until-done", "--once"])

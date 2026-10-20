@@ -5,7 +5,7 @@ import time
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.scheduler_loop import GraceWaiting, describe_scheduler, loop_over, waiting_on_user
+from testkit.scheduler_loop import GraceWaiting, loop_over, scheduler_line, waiting_for_user
 
 from orgmcp.daemon import EXIT_FILE
 
@@ -42,7 +42,7 @@ def test_serve_until_done_exits_when_budget_stalled_and_records_the_reason(org, 
     assert f"scheduler exiting: {reason}" in lines
     assert (org.root / EXIT_FILE).read_text().strip() == reason
     assert not (org.root / ".runtime" / "scheduler.pid").exists()
-    assert describe_scheduler(org) == f"scheduler: stopped ({reason})"
+    assert scheduler_line(org) == f"scheduler: stopped ({reason})"
 
 
 def test_serve_until_done_exits_when_a_worker_keeps_failing(org):
@@ -74,7 +74,7 @@ def test_a_plain_stall_waits_for_the_stall_ladder_before_the_exit(org):
     org.end_run("ceo", ok=True)  # read it, never reports
     clock = Clock()
     waiting = GraceWaiting(org, loop_over(org, never_runner, echo=lambda _: None, clock=clock), lambda _: None, clock)
-    w = waiting_on_user(org)
+    w = waiting_for_user(org)
     assert w.text == 'waiting on you: "Ship it" needs a decision (ceo holds it and nothing is running)' and not w.settled
     waiting()
     clock.t += 5000
@@ -82,5 +82,5 @@ def test_a_plain_stall_waits_for_the_stall_ladder_before_the_exit(org):
     org.save_ledger("nudges", {task.id: {"step": 0, "at": clock.t}})  # reminded
     assert waiting() == ""
     org.save_ledger("nudges", {task.id: {"step": 1, "at": clock.t}})  # root told: nothing else will happen
-    assert waiting_on_user(org).settled
+    assert waiting_for_user(org).settled
     assert waiting().startswith('waiting on you: "Ship it" needs a decision')

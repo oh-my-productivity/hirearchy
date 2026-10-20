@@ -8,7 +8,7 @@ import time
 import pytest
 import testkit
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.scheduler_loop import describe_scheduler, loop_over, nothing_to_do
+from testkit.scheduler_loop import loop_over, nothing_left, scheduler_line
 
 from orgmcp.daemon import EXIT_FILE
 
@@ -46,7 +46,7 @@ def test_until_done_exits_when_root_has_no_open_task(org):
     loop_over(org, fake_runner("work"), echo=lines.append).serve(until_done=True)
     assert "scheduler exiting: finished: no open tasks" in lines and not org.outstanding(ROOT)
     assert (org.root / EXIT_FILE).read_text().strip() == "finished: no open tasks"
-    assert describe_scheduler(org) == "scheduler: stopped (finished: no open tasks)"
+    assert scheduler_line(org) == "scheduler: stopped (finished: no open tasks)"
     assert not (org.root / ".runtime" / "scheduler.pid").exists()
 
 
@@ -78,14 +78,14 @@ def test_until_done_keeps_going_while_a_task_is_open_or_work_is_runnable(org):
     finally:
         sched.release()
     assert org.unread("ceo") == 0 and org.outstanding(ROOT)  # read it, never reported: still open
-    assert not sched.finished() and not nothing_to_do(org)
+    assert not sched.finished() and not nothing_left(org)
     org.report("ceo", task.id, "done", "ok")
-    assert sched.finished() and nothing_to_do(org)
+    assert sched.finished() and nothing_left(org)
 
 
 def test_work_still_runnable_keeps_an_until_done_scheduler_alive(org):
     org.send(ROOT, "ceo", "a note with no task", budget=2)
-    assert not org.outstanding(ROOT) and not nothing_to_do(org)  # nothing open for root, but ceo has mail
+    assert not org.outstanding(ROOT) and not nothing_left(org)  # nothing open for root, but ceo has mail
     assert not loop_over(org, echo=lambda _: None).finished()
     assert loop_over(org, echo=lambda _: None).finished(max_runs=0)  # ...unless the run cap forbids starting it
 
@@ -107,4 +107,4 @@ def test_a_real_until_done_scheduler_process_exits_by_itself(org, monkeypatch):
     assert org.runtime.scheduler_status.state().state == "stopped"
     log = (org.root / ".runtime" / "scheduler.log").read_text()
     assert "--until-done" in log and "scheduler exiting: finished: no open tasks" in log and pid > 0
-    assert describe_scheduler(org) == "scheduler: stopped (finished: no open tasks)"
+    assert scheduler_line(org) == "scheduler: stopped (finished: no open tasks)"
