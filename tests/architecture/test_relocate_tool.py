@@ -586,6 +586,8 @@ def real_copy(tool, tmp_path: Path) -> tuple[Path, Any]:  # type: ignore[no-unty
         if (REPO / destination).is_file():
             (repo / destination).parent.mkdir(parents=True, exist_ok=True)
             shutil.copy(REPO / destination, repo / destination)
+    if not list((repo / "tests").glob("test_*.py")):
+        pytest.skip("every tests/test_*.py has been moved already: nothing is left to move")
     return repo, manifest
 
 
