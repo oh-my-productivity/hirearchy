@@ -1,18 +1,14 @@
-"""Providers of the ``daemon`` ports (ARCHITECTURE.md 6.1), and the same objects over the runtime in force for the legacy functions.
+"""Providers of the ``daemon`` ports (ARCHITECTURE.md 6.1).
 
 The schedulers this process started are a process resource (``ProcessResources.children``, the former ``scheduler._children``): every status and every control
 of the process reaps and adopts through the same registry.
 
-``status_of``, ``control_of`` and ``command_at`` serve ``scheduler.scheduler_state`` / ``describe_scheduler`` / ``start_scheduler`` / ``stop_scheduler`` /
-``scheduler_command`` until those are converted (D-sched-1, and the consumers of the status: C-obs-2, C-progress, C-dashdata): they are handed an ``Org`` whose
-``runtime`` tests replace (the process table, the command, the tasks) and the dashboard's lenient ``Org`` replaces the mailboxes of, so each call builds the objects
-over the ports the runtime has *now*, as the functions they replace read them through the ``Org``. Both go when the legacy functions do.
-"""
+``status_of`` builds the status over the ports a runtime has *now*: the legacy ``progress`` functions (``wire_progress``, deleted by another step of E3) are
+handed an ``Org`` whose ``runtime`` tests replace. It goes with them (E3-close)."""
 
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 
 from ..attention import WaitingOnUser
 from ..daemon import ExitMarker, SchedulerCommand, SchedulerControl, SchedulerLock, SchedulerStatus
@@ -27,7 +23,7 @@ from ..daemon._site import RuntimeLaunchSite, ScrubbedLaunchEnvironment
 from ..daemon._status import PidFileSchedulerStatus
 from ..daemon._stop import SignalSchedulerStopper
 from ..daemon._watch import PidFileStartupWatch
-from ..kernel import AtomicWriter, Clock, Environment, OrgLayout, OrgPaths
+from ..kernel import AtomicWriter, Clock, Environment, OrgLayout
 from ..mail import TaskQuery
 from ..processes import ProcessInspector, ProcessSignaller, ProcessSpawner
 from ..snapshots import IgnoreList
@@ -86,19 +82,9 @@ def register(b: Builder) -> None:
     b.provide(SchedulerControl, lambda b: control(b, b.get(SchedulerStatus)))
 
 
-# ------------------------------------------------------------------------------ the legacy functions' objects
+# ------------------------------------------------------------------------------ for the legacy progress functions
 
 
 def status_of(runtime: OrgRuntime) -> SchedulerStatus:
     """``SchedulerStatus`` over the ports ``runtime`` has now (what stops a scheduler, if nothing else does, is what ``attention`` says over them)."""
     return status(RuntimePorts(runtime), waiting_on_user_of(runtime))
-
-
-def control_of(runtime: OrgRuntime) -> SchedulerControl:
-    """``SchedulerControl`` over the ports ``runtime`` has now."""
-    return control(RuntimePorts(runtime), status_of(runtime))
-
-
-def command_at(root: Path) -> SchedulerCommand:
-    """The command that starts the scheduler of the organization at ``root`` (no runtime is needed to know it)."""
-    return VenvSchedulerCommand(OrgPaths(root), sys.executable)

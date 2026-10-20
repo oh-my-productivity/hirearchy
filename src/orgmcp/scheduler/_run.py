@@ -121,7 +121,7 @@ class GuardMemory:
 @dataclass
 class LoopMemory:
     """What the collaborators of the loop remember from one tick to the next. It is data apart from them so that a loop rebuilt over another runtime
-    (the legacy ``Scheduler`` does, when ``org.runtime`` is replaced under it) goes on where the old one was."""
+    (a test does, when it replaces the runtime under a running scheduler) goes on where the old one was."""
 
     grace: GraceMemory = field(default_factory=GraceMemory)
     upkeep: UpkeepMemory = field(default_factory=UpkeepMemory)

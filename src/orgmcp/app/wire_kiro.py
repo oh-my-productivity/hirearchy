@@ -1,24 +1,15 @@
-"""Providers of the ``kiro`` ports (ARCHITECTURE.md 6.1), and the constructors the legacy ``scheduler`` functions still need.
-
-The module-level functions of ``scheduler.py`` (``kiro_profile_name``, ``ensure_kiro_profile``, ``file_confinement``, ``kiro_runner``,
-``mcp_server_command``) have no runtime to take the ports from, and tests replace them one by one (``scheduler.mcp_server_command``,
-``scheduler.ensure_kiro_profile``, ``scheduler.file_confinement``), so they ask this module for the real parts and hand it the functions
-that are in force at the time of the call. D-sched-1 kept them: the golden kiro tests (``tests/golden/test_golden_kiro.py``, which a refactor step may not
-edit) and ``tests/test_qa_findings`` / ``test_scheduler`` still replace ``scheduler.mcp_server_command`` / ``ensure_kiro_profile`` / ``file_confinement`` and read
-``scheduler.KIRO_AGENTS_DIR`` / ``PROJECT_DIR``, so the legacy ``kiro_runner`` still builds its command through them. They go with the legacy functions (E1/E3).
-"""
+"""Providers of the ``kiro`` ports (ARCHITECTURE.md 6.1), and the run command builder that ``orgmcp run --kiro BIN`` makes over a runtime."""
 
 from __future__ import annotations
 
 import shutil
 import sys
-from collections.abc import Callable, Sequence
 from pathlib import Path
 
 from ..access import AccessScopes, ModelResolver
 from ..agents import CharterReader
-from ..kernel import AtomicWriter, Environment, OrgLayout, OrgPaths, Provider
-from ..kernel._system import FsAtomicWriter, OsEnvironment
+from ..kernel import AtomicWriter, Environment, OrgLayout, Provider
+from ..kernel._system import OsEnvironment
 from ..kiro import ConfinementPolicy, McpServerLocator, ProfileProvisioner, ProfileStore, RunCommandBuilder
 from ..kiro._confinement import KiroConfinementPolicy
 from ..kiro._mcp_locator import VenvMcpServerLocator
@@ -28,14 +19,14 @@ from ..kiro._runner import KiroRunCommandBuilder
 from ._builder import Builder
 from .runtime import OrgRuntime
 
-KIRO_BIN = "kiro-cli"  # the binary of the runtime's run command builder (``orgmcp run --kiro`` builds its own, from the legacy runner)
+KIRO_BIN = "kiro-cli"  # the binary of the runtime's run command builder (``orgmcp run --kiro BIN`` builds its own, with ``run_command_builder``)
 
 
 def package_dir() -> Path:
     """The directory of the ``orgmcp`` package, from the location of this module (``orgmcp/app/wire_kiro.py``: two levels up).
 
     It is not read from the ``orgmcp`` package object (``import orgmcp`` runs the package ``__init__``, which imports the CLI and so
-    every entry point, and ``scheduler`` evaluates ``PROJECT_DIR`` at import time: the library would import the entry points). This module
+    every entry point). This module
     sits in a fixed place of the package in a checkout and in a wheel alike, and ``test_kiro_packaged_paths`` pins the result to
     ``Path(orgmcp.__file__).parent`` so that moving this file cannot go unnoticed."""
     return Path(__file__).resolve().parent.parent
@@ -82,63 +73,6 @@ def register(b: Builder) -> None:
             b.get(Environment),
         ),
     )
-
-
-# ------------------------------------------------------------------------------ for the legacy scheduler functions (no runtime at hand)
-
-
-class FunctionMcpServerLocator(McpServerLocator):
-    """A locator that is a function: whatever ``scheduler.mcp_server_command`` is when the profile is written."""
-
-    def __init__(self, command: Callable[[], dict[str, object]]) -> None:
-        self._command = command
-
-    def command(self) -> dict[str, object]:
-        return self._command()
-
-
-class FunctionConfinementPolicy(ConfinementPolicy):
-    """A policy that is a function: whatever ``scheduler.file_confinement`` is when the profile is written."""
-
-    def __init__(self, file_confinement: Callable[[Path, list[str], Path | None, list[Path]], tuple[list[str], dict[str, object]]]) -> None:
-        self._file_confinement = file_confinement
-
-    def file_confinement(
-        self, org_root: Path, tools: Sequence[str], workspace: Path | None, inputs: Sequence[Path]
-    ) -> tuple[list[str], dict[str, object]]:
-        return self._file_confinement(org_root, list(tools), workspace, list(inputs))
-
-
-class FunctionProfileProvisioner(ProfileProvisioner):
-    """A provisioner that is two functions: whatever ``scheduler.ensure_kiro_profile`` and ``kiro_profile_name`` are when a run starts.
-
-    A shared profile is asked for as ``ensure(tools)``, a confined one as ``ensure(tools, workspace=, inputs=, confine=True)``: the
-    two call shapes of the old ``kiro_runner``, which tests replace by stubs of that signature."""
-
-    def __init__(self, ensure: Callable[..., str], name: Callable[[Sequence[str]], str]) -> None:
-        self._ensure = ensure
-        self._name = name
-
-    def profile_name(self, tools: Sequence[str]) -> str:
-        return self._name(tools)
-
-    def ensure_profile(
-        self, tools: Sequence[str], *, workspace: Path | None = None, inputs: Sequence[Path] | None = None, confine: bool = False
-    ) -> str:
-        if confine:
-            return self._ensure(tools, workspace=workspace, inputs=inputs, confine=True)
-        return self._ensure(tools)
-
-
-def profile_name(org_root: Path, tools: Sequence[str]) -> str:
-    """The name of the profile of the organization at ``org_root`` for ``tools`` (nothing is read or written)."""
-    return provisioner_at(org_root, Path("."), mcp_locator(), confinement_policy()).profile_name(tools)
-
-
-def provisioner_at(root: Path, directory: Path, locator: McpServerLocator, confinement: ConfinementPolicy) -> ProfileProvisioner:
-    """The provisioner of the organization at ``root`` that writes into ``directory``, with the system's atomic writer."""
-    writer: AtomicWriter = FsAtomicWriter()
-    return OrgProfileProvisioner(OrgPaths(root), FsProfileStore(lambda: directory, writer), confinement, locator)
 
 
 def run_command_builder(runtime: OrgRuntime, kiro_bin: str, provisioner: ProfileProvisioner) -> RunCommandBuilder:

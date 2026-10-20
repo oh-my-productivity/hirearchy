@@ -30,12 +30,7 @@ PERMANENT_MODULES = {"core"}  # every name of these modules stays: the ledger ho
 
 LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "core": {"*": "permanent"},
-    "scheduler": _e3(
-        "Runner PROJECT_DIR KIRO_AGENTS_DIR mcp_server_command kiro_profile_name file_confinement "
-        "ensure_kiro_profile kiro_runner Run judge_orphan kill_group ignore_runtime_files "
-        "scheduler_command scheduler_state describe_scheduler waiting_on_user start_scheduler "
-        "stop_scheduler Scheduler nothing_to_do"
-    ),
+    "scheduler": _e3("file_confinement"),
     "cli": _e3(
         "main"
     ),

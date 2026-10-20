@@ -22,7 +22,6 @@ from orgmcp.mail._tasks import DerivedTaskQuery
 from orgmcp.mail.testing import CountingMessageParser, MemoryMailbox
 from orgmcp.runs import RunLogReader
 from orgmcp.runs.testing import MemoryRuns
-from orgmcp.scheduler._legacy import FunctionClock
 from orgmcp.scheduler._loop import HeartbeatLoop
 from orgmcp.scheduler._run import LoopMemory, LoopState
 from orgmcp.scheduler.testing import RecordingConsole, ScriptedCommands
@@ -33,6 +32,7 @@ from orgmcp.stalls._ladder import EscalationStallLadder
 from orgmcp.stalls._nudges import LedgerNudgeLedger
 from orgmcp.templates import Notices
 from orgmcp.templates.testing import RecordingNotices
+from testkit.health_world import SecondsClock
 
 
 def test_the_runtime_has_the_ladder_and_the_nudge_ledger(tmp_path: Path) -> None:
@@ -101,7 +101,7 @@ def test_the_nudge_ledger_is_the_one_the_ladder_writes(tmp_path: Path) -> None:
 
 def test_a_clock_made_of_a_function_follows_it() -> None:
     now = [1_800_000_000.0]
-    clock = FunctionClock(lambda: now[0])
+    clock = SecondsClock(lambda: now[0])
     assert isinstance(clock, Clock) and clock.time() == 1_800_000_000.0 and clock.now().timestamp() == 1_800_000_000.0
     now[0] += 5
     assert clock.time() == 1_800_000_005.0 and clock.now().timestamp() == 1_800_000_005.0
@@ -131,7 +131,7 @@ def test_the_scheduler_ladder_uses_the_clock_it_is_given(org: Org) -> None:
     org.begin_run("ceo")
     org.end_run("ceo", ok=True)
     now = [time.time()]
-    stalls = wire_stalls.ladder_on(wire_stalls.RuntimePorts(org.runtime), FunctionClock(lambda: now[0]))
+    stalls = wire_stalls.ladder_on(wire_stalls.RuntimePorts(org.runtime), SecondsClock(lambda: now[0]))
     assert stalls.check() == []
     now[0] += 601
     assert stalls.check() == [f"ceo: reminded about open task {task.id}"]
@@ -144,7 +144,7 @@ def test_the_scheduler_ladder_follows_the_runtime_and_keeps_its_memo(org: Org) -
     memory = LoopMemory()
 
     def make() -> HeartbeatLoop:
-        return wire_scheduler.loop_of(org.runtime, ScriptedCommands(), RecordingConsole(), FunctionClock(time.time), LoopState(), memory)
+        return wire_scheduler.loop_of(org.runtime, ScriptedCommands(), RecordingConsole(), SecondsClock(time.time), LoopState(), memory)
 
     make()
     views = memory.stall_views
@@ -167,5 +167,5 @@ def test_the_scheduler_ladder_asks_the_notices_of_the_runtime_in_force(org: Org)
     notices = RecordingNotices()
     org.runtime = dataclasses.replace(org.runtime, notices=notices)
     now = [time.time() + 601]
-    wire_stalls.ladder_on(wire_stalls.RuntimePorts(org.runtime), FunctionClock(lambda: now[0])).check()
+    wire_stalls.ladder_on(wire_stalls.RuntimePorts(org.runtime), SecondsClock(lambda: now[0])).check()
     assert [call[0] for call in notices.calls] == ["nudge"]

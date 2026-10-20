@@ -92,10 +92,10 @@ class Normalizer:
 
 
 def make_normalizer(tmp_path: Path, home: Path | None) -> Normalizer:
-    from orgmcp import scheduler
+    from orgmcp.app import wire_kiro
 
     n = Normalizer()
-    n.add(scheduler.PROJECT_DIR, "<PROJECT>")
+    n.add(wire_kiro.project_dir(), "<PROJECT>")
     n.add(Path(sys.executable).parent, "<VENV_BIN>")
     if home is not None:
         n.add(home, "<HOME>")

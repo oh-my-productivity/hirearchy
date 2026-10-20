@@ -13,8 +13,8 @@ from pathlib import Path
 import pytest
 
 from orgmcp.app import Org
-from orgmcp.scheduler import Scheduler
 from orgmcp.strays import StrayProbe, StrayRegistry
+from testkit.health_world import Scheduler
 
 class ScriptedProbe(StrayProbe):
     """Probes ``{"/p": 1.0}`` before the run and ``{"/p": 2.0, ...}`` after it; finds what it is told."""
@@ -63,7 +63,7 @@ def run_once(org: Org, lines: list[str]) -> None:
     sched.tick()
     deadline = time.time() + 20
     while sched.runs and time.time() < deadline:
-        sched._reap()
+        sched.reap()
         time.sleep(0.02)
     assert not sched.runs
 

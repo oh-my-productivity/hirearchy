@@ -16,11 +16,11 @@ from orgmcp.attention.testing import ListHumanQueue
 from orgmcp.processes import ProcessInspector, ProcessSpawner
 from orgmcp.processes.testing import FakeProcessTable
 from orgmcp.scheduler import SchedulerLoop
-from orgmcp.scheduler._legacy import FunctionClock
 from orgmcp.scheduler._loop import HeartbeatLoop
 from orgmcp.scheduler._phases import GuardedPhase
 from orgmcp.scheduler._run import LoopMemory, LoopState
 from orgmcp.scheduler.testing import CapturingSpawner, RecordingConsole, ScriptedCommands, ScriptedLadder
+from testkit.health_world import SecondsClock
 from orgmcp.stalls import StallLadder
 from orgmcp.templates.testing import RecordingNotices
 
@@ -36,7 +36,7 @@ def org(tmp_path: Path) -> Org:
 def make(org: Org, state: LoopState | None = None, memory: LoopMemory | None = None, overrides: dict[type, object] | None = None,
          console: RecordingConsole | None = None, cadence: float | None = None) -> HeartbeatLoop:
     commands = ScriptedCommands((sys.executable, "-c", "pass"), org.root, {"PATH": "/usr/bin:/bin"})
-    clock = FunctionClock(lambda: cadence if cadence is not None else time.time())
+    clock = SecondsClock(lambda: cadence if cadence is not None else time.time())
     return wire_scheduler.loop_of(org.runtime, commands, console or RecordingConsole(), clock, state or LoopState(), memory, overrides)
 
 

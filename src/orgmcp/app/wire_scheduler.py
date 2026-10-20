@@ -2,8 +2,8 @@
 
 The loop and its starter and reaper are not ports of the runtime (``NOT_A_FIELD`` of ``fields_scheduler``): they need what is the scheduler's own (its
 output, its command builder, the run clock and the cadence clock, the table of runs and the count of the runs it started), so they are made per
-scheduler. ``loop_of`` makes the loop over a runtime; the legacy ``Scheduler``, which is given an ``Org`` whose ``runtime`` tests replace, calls it again
-when that happens, handing the new loop the state and the memory of the old. ``lifecycle_of`` makes the lifecycle alone.
+scheduler. ``loop_of`` makes the loop over a runtime; a loop made again over another runtime (``state`` and ``memory`` passed on) goes on where the old one
+was. ``lifecycle_of`` makes the lifecycle alone.
 """
 
 from __future__ import annotations

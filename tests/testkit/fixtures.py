@@ -41,7 +41,7 @@ def fresh_process_resources():
 def isolated_kiro(request, tmp_path_factory, process_state_guard, monkeypatch):
     """No unmarked test may touch the real ~/.kiro or start the real kiro-cli.
 
-    * ``orgmcp.scheduler.KIRO_AGENTS_DIR`` and ``$HOME`` point into a throwaway directory;
+    * ``$HOME`` points into a throwaway directory (the profile store of every runtime follows it: ``~/.kiro/agents`` is below it);
     * a stub ``kiro-cli`` (exits 0 and appends its argv to ``$KIRO_STUB_LOG``) shadows the real binary on PATH.
 
     Tests marked ``integration`` get none of this (real kiro needs the user's auth): they must use the ``real_kiro``
@@ -58,7 +58,6 @@ def isolated_kiro(request, tmp_path_factory, process_state_guard, monkeypatch):
     monkeypatch.setenv("HOME", str(base))
     monkeypatch.setenv("KIRO_STUB_LOG", str(base / "kiro-stub.log"))
     monkeypatch.setenv("PATH", f"{stub_dir}{os.pathsep}{os.environ.get('PATH', '')}")
-    monkeypatch.setattr("orgmcp.scheduler.KIRO_AGENTS_DIR", base / ".kiro" / "agents")
     return base
 
 
@@ -120,9 +119,10 @@ def real_kiro(request, tmp_path):
     if not request.node.get_closest_marker("integration"):
         pytest.fail("real_kiro is only for tests marked @pytest.mark.integration (unmarked tests run against a stub kiro-cli)")
     kiro_sandbox.real_kiro_or_skip()
-    from orgmcp import scheduler
+    from orgmcp.app.wire_kiro import agents_dir
+    from orgmcp.kernel._system import OsEnvironment
 
-    assert scheduler.KIRO_AGENTS_DIR == kiro_sandbox.kiro_dirs()[0], "profile directory is not the real ~/.kiro/agents"
+    assert agents_dir(OsEnvironment())() == kiro_sandbox.kiro_dirs()[0], "profile directory is not the real ~/.kiro/agents"
     sandbox = kiro_sandbox.RealKiro(tmp_path)
     try:
         yield sandbox
