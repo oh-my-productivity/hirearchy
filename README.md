@@ -459,7 +459,7 @@ tool calls 3, refused 0 (0.0%)
 ...
 ```
 
-A refusal and a crashed run, from the test organization (`tests/test_observability_e2e.py`: a manager and a report, real scheduler, fake agent):
+A refusal and a crashed run, from the test organization (`tests/e2e/test_observability_e2e.py`: a manager and a report, real scheduler, fake agent):
 
 ```
 trace 20261018T091640455395-root-5160 "Ship it" -> ceo: done
@@ -713,48 +713,88 @@ without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first pri
   `read` to workspace, inputs and the organization (read-only) by its profile (see [Workspaces, inputs and confinement](#workspaces-inputs-and-confinement)); `shell` is not:
   an agent that holds it can touch anything its OS user can. Grant it only to agents that need it, with a `workspace`.
 
+## Architecture
+
+orgmcp is organized by feature: one package per responsibility under `src/orgmcp/`, each behind an interface, wired together in one place.
+
+```
+src/orgmcp/
+  kernel/          the shared vocabulary every package may use (Message, Address, Clock, IdGenerator, OrgError, ...); imports nothing else
+  <feature>/       36 feature packages (mail, budget, hierarchy, health, blueprint, ...); each has
+    api.py           the only public surface: its typing.Protocol interfaces, data types and exceptions (__init__.py re-exports exactly api)
+    _*.py            private implementations; every class with behaviour subclasses the Protocol it implements and gets its collaborators
+                     through its constructor, typed by Protocols
+    testing.py       in-memory fakes of its Protocols
+    tests/           its tests, next to the code; test_contract_<protocol>.py runs one contract suite against the real implementation AND the fake
+  scheduler/ mcp_server/ cli/ dashboard/    the entry points; they depend only on the api of features
+  app/             the composition root: the only package that imports `_` modules and constructs concrete classes
+                   (`wiring.open_runtime(root)` builds the `OrgRuntime` of ports; `wire_<pkg>.py` provides each package's ports)
+  core.py          the permanent compatibility facade: `orgmcp.core.Org` (+ `DEFAULT_MODEL`, `OrgError`, ...)
+```
+
+`orgmcp.core.Org` is a thin facade, built by `orgmcp.app`, that delegates every method to the feature services; no feature imports it. It, `orgmcp.progress.progress(org, task_id=None)`
+and the entry point `orgmcp.main` (the `orgmcp` script, `python -m orgmcp`) are the permanent Python surface; everything else is reached through the `api` of a feature.
+
+The rules, and what enforces them (all run by `scripts/check.sh`):
+
+* every class with behaviour implements a Protocol and no constructor names a concrete `orgmcp` class (`tests/architecture`: class-interface check, `test_constructors_depend_on_protocols`);
+* layers entry points -> features (by level) -> kernel, no cycles, the kernel imports nothing, only a package itself and `orgmcp.app` import its `_` modules, no feature imports `Org`,
+  Textual / the MCP SDK / PyYAML only at the edge (50 `import-linter` contracts, generated from the package map; `mypy --strict` on every package);
+* a Protocol has at most 8 methods, has a contract suite, and one writer owns each file and ledger (`tests/architecture`);
+* behaviour, text and formats are frozen by the golden suite (`tests/golden`).
+
+[ARCHITECTURE.md](ARCHITECTURE.md) has the package map, every interface, the dependency graph and, at the top, what was built and how it differs from the plan.
+
 ## Test
 
 ```sh
-scripts/check.sh                      # EVERYTHING: pytest (unit + golden + class-interface check) + mypy + lint-imports
-uv run pytest -q                      # unit tests: no LLM, no network, never touches your ~/.kiro (also runs mypy + lint-imports)
-uv run pytest -q tests/integration --run-integration    # + the real-kiro tests (or ORGMCP_RUN_INTEGRATION=1)
+scripts/check.sh                      # EVERYTHING, exit 0 = done: pytest (unit, contract, golden, architecture) + mypy --strict + import-linter
+uv run pytest -q                      # the tests alone: no LLM, no network, never touches your ~/.kiro (also runs mypy + lint-imports)
+uv run pytest -q src/orgmcp/mail      # the tests of one package (they live next to its code)
 uv run pytest -q tests/golden         # only the golden (characterization) snapshots, about 15 s
-ORGMCP_UPDATE_GOLDEN=1 uv run pytest -q tests/golden    # regenerate them, deliberately (review the git diff)
+uv run pytest -q tests/architecture   # the structural rules (or `-m "not architecture"` to leave them out)
+uv run pytest -q tests/integration --run-integration    # + the real-kiro tests (or ORGMCP_RUN_INTEGRATION=1)
+ORGMCP_UPDATE_GOLDEN=1 uv run pytest -q tests/golden    # regenerate the golden files, deliberately (review the git diff)
 uv run python scripts/static_checks.py mypy|imports     # one static check
 uv run python -m tests.architecture.lint                # import contracts only: generates .importlinter (git-ignored) and runs it + the pyproject ones
-uv run python -m tests.architecture.mapping_status mail # which symbols of ARCHITECTURE.md section 5 have not reached package `mail` (exit 1 if any; `all` = counts)
 uv run python -m tests.architecture.gen_importlinter    # print the generated contracts
-uv run pytest -q tests/architecture                     # the structural rules (or `-m "not architecture"` to leave them out)
+uv run python -m tests.architecture.collected_count --write   # record the test-count floor of each package (a floor only ever goes up)
 ```
 
-**Parallel steps.** A refactor step adds the fields of its package to its own `src/orgmcp/app/fields_<pkg>.py` (`OrgRuntime` is composed of those parts and
-`runtime.py` is never edited), marks itself done there with `STEP = "<step>"`, and keeps its tests' count in its own `tests/count.txt`
-(`uv run python -m tests.architecture.collected_count --write`; `tests/architecture/baseline_test_count.txt` is fixed). See ARCHITECTURE.md 9.2.
+**Where tests live.** A feature package keeps its tests next to its code, in `src/orgmcp/<feature>/tests/` (with an `__init__.py`, so two features may both have a
+`test_api.py`; `tests/architecture/test_layout.py` checks it): unit tests of each class, `test_contract_<protocol>.py` per Protocol (the same suite for the real
+implementation and the in-memory fake of `testing.py`), and behaviour tests. `tests/` holds what crosses features: `tests/architecture` (the structural rules),
+`tests/golden` (byte-for-byte snapshots), `tests/e2e` (scenarios through the facade, the CLI and the MCP server), `tests/meta` (tests of the test machinery) and
+`tests/integration` (the real `kiro-cli`, opt-in), and the shared helpers in `tests/testkit/` (`fake_agent.py`, `kiro_sandbox.py`, the worlds that build a team, ...;
+`tests/` is on `sys.path`, so `import testkit` works everywhere). `pytest` collects both trees (`testpaths`); the wheel contains no `tests/` directory. The collected count
+never drops: `tests/architecture/baseline_test_count.txt` and one `count.txt` per colocated `tests/` are floors (`test_collected_count`).
 
-**Where tests live.** `tests/` holds the cross-feature, end-to-end and golden tests and the shared helpers (`tests/testkit/`: `fake_agent.py`,
-`kiro_sandbox.py`, ...; `tests/` is on `sys.path`, so `import testkit` works everywhere). A feature package keeps its own tests next to its code, in
-`src/orgmcp/<feature>/tests/` (give that directory an `__init__.py`, so two features may both have a `test_api.py`;
-`tests/architecture/test_layout.py` checks it). `pytest` collects both (`testpaths`). The shared fixtures and hooks (`org`,
-`isolated_kiro`, the telemetry reset, `real_kiro`) are in `tests/testkit/fixtures.py`, registered by the root `conftest.py`
-(which also holds the integration marker), so colocated tests get them too. The wheel contains no `tests/` directory (`[tool.hatch.build.targets.wheel] exclude`).
+**Seams, not monkeypatching.** A test gives the code under test a fake by port, never by patching a module attribute: `open_runtime(root, {Port: fake})` for one runtime, and
+`orgmcp.app.wiring.overriding({Port: fake})` for code that opens its own (a CLI command, an MCP tool, the scheduler, `Org(root)`; the explicit overrides of `open_runtime` win).
+The fixtures in `tests/testkit/fixtures.py`, registered by the root `conftest.py` so colocated tests get them too, do it for the common cases: `org` (a small team),
+`frozen_clock(now)`, `counter_ids()` (predictable message ids), `process_overrides({...})`, and the autouse `isolated_kiro` (`$HOME` in a temp dir, a stub `kiro-cli` first on `PATH`),
+`fresh_process_resources` and `process_state_guard` (a test that leaves a process-global replaced is failed by name). A colocated test that needs what its layer may not import
+(`orgmcp.core`, `orgmcp.app.wiring`, `yaml`) takes it from `testkit.reach.<module>`, an alias of the very same module that import-linter does not see.
 
-**Golden tests (`tests/golden/`).** Byte-for-byte snapshots, in `tests/golden/expected/`, of everything the refactor must not
+**The `integration` marker.** Tests marked `@pytest.mark.integration` (and everything under `tests/integration/`, marked or not) call the real `kiro-cli` and a real LLM; a default run
+reports them as skipped, and `tests/meta/test_integration_marker.py` proves it. `--run-integration` (or `ORGMCP_RUN_INTEGRATION=1`) runs them.
+
+**Golden tests (`tests/golden/`).** Byte-for-byte snapshots, in `tests/golden/expected/`, of everything a refactor must not
 change: run prompts, `ORG.md`, message files, charters, `SERVICE.md`/`PLAYBOOK.md`, kiro profiles and command lines, the
 `propose_org` plans for every example and template, the MCP tool surface (names, parameters, defaults, docstrings, server
 instructions) for root, a manager, a worker, a service owner and agents with built-in tools, the output of the CLI
 (`status`, `progress`, `services`, `health`, `inbox`, `obs ...`, `check`, `dash --once`, every `--help`) and the shape of
 every event line. They use a fixed clock, counter-based ids and placeholders for tmp paths (`<ORG>`, `<TMP>`, `<HOME>`,
 `<VENV_BIN>`), all in the tests (`tests/golden/golden_support.py`), never in the production code. A failing golden test
-prints a unified diff. **A diff in `expected/` means observable behaviour changed**: a refactor step must leave the
+prints a unified diff. **A diff in `expected/` means observable behaviour changed**: a refactor must leave the
 directory untouched; a deliberate change regenerates the files with `ORGMCP_UPDATE_GOLDEN=1` and commits them with it.
 
 **Class-interface check (`tests/golden/test_class_interfaces.py`).** Every class with behaviour defined in `src/orgmcp`
-should subclass a `typing.Protocol` (data classes, exceptions, Protocols and Textual classes are exempt; the classifier is
-`tests/architecture/class_interfaces.py`, permanent exemptions `tests/architecture/exempt_classes.py`). The classes that
-do not yet are listed in `tests/golden/interface_allowlist.txt`; the check fails for a class that is not on the list, the
-list only shrinks, and its end state is empty (until then `test_every_class_has_an_interface` is reported as xfail,
-`ORGMCP_INTERFACE_REPORT=1 pytest -s` prints every offender).
+subclasses a `typing.Protocol` (data classes, exceptions, Protocols and Textual classes are exempt; the classifier is
+`tests/architecture/class_interfaces.py`, permanent exemptions `tests/architecture/exempt_classes.py`). The allow-list
+`tests/golden/interface_allowlist.txt` is empty and must stay so. Its second half, `tests/architecture/test_constructor_dependencies.py`, resolves the type hints of every such
+class's constructor (dataclass fields included) and fails when an annotation, however deeply nested in `Optional`, unions, generics or `Callable`, names a concrete
+`orgmcp` class instead of a Protocol (data classes, enums, exceptions and non-`orgmcp` types are fine; the fakes of the `testing` modules are not checked); a seeded package proves it can fail.
 
 **Static checks (pinned dev dependencies `mypy==2.4.0`, `import-linter==2.15`, config in `pyproject.toml`).**
 `uv run python scripts/static_checks.py` runs both; `scripts/check.sh` runs them after the tests, and
@@ -762,34 +802,30 @@ list only shrinks, and its end state is empty (until then `test_every_class_has_
 
 * *mypy, strict, package by package:* every package directory of `src/orgmcp/` (a directory with `__init__.py`: the kernel, a
   feature, an entry point, `app`) is checked with `strict = true` and, for its `api.py`, `disallow_any_explicit`; nothing has to be
-  registered, creating the package is enough. `[tool.mypy] packages` is for making a flat legacy module strict early (empty).
-  Everything else is only followed, never reported.
+  registered, creating the package is enough. Production code is strict; the tests that were moved into the packages carry `# mypy: ignore-errors`.
 * *import-linter contracts:* two sources. The contracts of the architecture (layers feature levels -> kernel, one
   `private-modules-<pkg>` per package with `_*` modules, kernel independence, no import of the `Org` facade, testing modules, Textual /
   MCP / PyYAML only at the edge) are **generated** by `tests/architecture/gen_importlinter.py` from `tests/architecture/graph.py` (the
-  42 packages and their allowed dependencies, equal to ARCHITECTURE.md 2.2/4.3) and the packages that exist, so a new package brings its
+  package map, equal to ARCHITECTURE.md 2.2/4.3) and the packages that exist, so a new package brings its
   contracts without editing a config; `python -m tests.architecture.lint` writes `.importlinter` (git-ignored) and runs it. The
-  hand-written `[[tool.importlinter.contracts]]` in `pyproject.toml` (today: the library does not import the entry points)
-  cover the flat legacy modules and disappear with them. A plain `lint-imports` would read only `.importlinter`; use
-  `lint` or `scripts/static_checks.py imports`, which run both.
+  hand-written `[[tool.importlinter.contracts]]` in `pyproject.toml` (the library and `orgmcp.core` do not import the entry points) are run with it.
+  A plain `lint-imports` would read only `.importlinter`; use `lint` or `scripts/static_checks.py imports`, which run both.
 * *Structural rules (`tests/architecture/`, marker `architecture`):* one test per rule of ARCHITECTURE.md 1.2 (R1 `api`/`__init__`,
-  R4 imports match the graph, R6 no module-level singletons, R7 Protocols have at most 8 methods, R8 contract suite per Protocol, R9
-  single writer per file and per ledger, R13 no "and" in a responsibility), run on the real tree (vacuous for packages that do not
-  exist yet) and on `tests/architecture/fixtures/bad_pkg`, which breaks each rule on purpose: a checker that cannot fail proves nothing.
-  `ownership.py` is the table 2.3, `legacy_exports.py` the ledger of legacy names (it only shrinks), `test_mapping_complete.py`
-  proves every legacy symbol appears in ARCHITECTURE.md section 5, and `test_collected_count.py` that no test is lost.
+  R4 imports match the graph, R6 no module-level singletons and constructors depend on Protocols, R7 Protocols have at most 8 methods, R8 contract suite per Protocol, R9
+  single writer per file and per ledger, R13 no "and" in a responsibility), run on the real tree and on `tests/architecture/fixtures/bad_pkg`
+  and other seeded violations, which break each rule on purpose: a checker that cannot fail proves nothing. `ownership.py` is the table 2.3 and
+  `compat_surface.py` states the permanent compatibility surface (`orgmcp.core`, `orgmcp.progress.progress`, `orgmcp.main`; no flat module besides `core.py`).
 
 **The `Org` facade (`src/orgmcp/app/`).** `orgmcp.core.Org` is assembled in `orgmcp.app` from 20 mixins (`_facade_<pkg>.py`, one per
-package it is being split into; the MRO is documented in `app/facade.py`) and `orgmcp.core` re-exports it, so every caller and every
-`monkeypatch.setattr(core, ...)` keeps working. `app/tests/test_facade_signatures.py` compares the facade with
+package it delegates to; the MRO is documented in `app/facade.py`) and `orgmcp.core` re-exports it. Every method is pure delegation to a port of the runtime;
+`tests/architecture/test_facade_contract.py` calls all 98 methods against a real runtime and a runtime of spy fakes and checks the delegation by AST.
+`app/tests/test_facade_signatures.py` compares the facade with
 `tests/architecture/org_signatures.json` (names, kinds, parameters and defaults of all 98 `Org` defs and of `Message`; regenerating it
 is a deliberate change of what callers can rely on: `uv run python -m orgmcp.app.tests._signatures --write`), and
 `app/tests/test_import_order.py` imports every module in a fresh interpreter in two orders.
 
-**Unit tests (default).** They use a deterministic fake agent (`tests/testkit/fake_agent.py`) in place of kiro. An autouse
-fixture (`tests/testkit/fixtures.py`) points `$HOME` and the profile directory at a temp dir and puts a stub `kiro-cli` first
-on `PATH`. A default run starts zero real-LLM runs: tests marked `@pytest.mark.integration` (and everything under
-`tests/integration/`, marked or not) are reported as skipped, and `tests/meta/test_integration_marker.py` proves it.
+**Unit tests (default).** They use a deterministic fake agent (`tests/testkit/fake_agent.py`) in place of kiro, and the autouse fixtures above keep them off your `$HOME`.
+A default run starts zero real-LLM runs.
 
 **Integration tests (opt-in).** `tests/integration/test_real_kiro.py` runs tiny orgs (3 tests, one agent run each,
 about 45 s and 3 LLM calls in total) against the real `kiro-cli` and your kiro login: that the agent and the scheduler's
