@@ -6,10 +6,10 @@ import os
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from testkit.legacy.orgmcp import core
+from testkit.cli_world import clock_is, main
 from testkit.legacy.orgmcp.core import ROOT
 
-from orgmcp.cli import main
+from orgmcp.kernel.testing import FakeClock
 
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 ENG = "ceo/eng"
@@ -19,13 +19,13 @@ def at(seconds: float) -> datetime:
     return T0 + timedelta(seconds=seconds)
 
 
-class Clock:
-    """Replaces core.utcnow so message ids, `created` stamps and hire times are deterministic."""
+class Clock(FakeClock):
+    """The clock of every runtime of the test, so message ids, `created` stamps and hire times are deterministic: it stands still."""
 
     def __init__(self):
-        self.t = T0
+        super().__init__(T0)
 
-    def __call__(self):
+    def now(self):
         return self.t
 
     def at(self, seconds: float) -> None:
@@ -35,7 +35,7 @@ class Clock:
 @pytest.fixture(autouse=True)
 def clock(monkeypatch):
     c = Clock()
-    monkeypatch.setattr(core, "utcnow", c)
+    clock_is(monkeypatch, c)
     return c
 
 

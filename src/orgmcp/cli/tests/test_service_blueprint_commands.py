@@ -4,9 +4,9 @@
 import pytest
 import testkit
 import testkit.legacy.yaml as yaml
+from testkit.cli_world import main
 from testkit.legacy.orgmcp.core import Org
 
-from orgmcp.cli import main
 
 ROOT_DIR = testkit.REPO
 RESEARCH = ROOT_DIR / "examples" / "blueprint-research.yaml"

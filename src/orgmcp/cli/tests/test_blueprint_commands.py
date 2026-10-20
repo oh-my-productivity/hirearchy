@@ -6,9 +6,9 @@ import copy
 import pytest
 import testkit
 import testkit.legacy.yaml as yaml
+from testkit.cli_world import main
 from testkit.legacy.orgmcp.core import Org
 
-from orgmcp.cli import main
 
 EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"
 

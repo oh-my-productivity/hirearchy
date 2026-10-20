@@ -5,10 +5,9 @@ import json
 import shutil
 
 import pytest
+from testkit.cli_world import main
+from testkit.legacy.orgmcp.app import wiring
 from testkit.legacy.orgmcp.core import Org
-
-from orgmcp import telemetry
-from orgmcp.cli import main
 
 
 # ---------------------------------------------------------------------------------------------------- helpers
@@ -16,7 +15,7 @@ from orgmcp.cli import main
 def org(org):
     """The shared org, with the events of its construction (hires) forgotten: tests see only their own."""
     shutil.rmtree(org.root / ".runtime" / "events", ignore_errors=True)
-    telemetry.reset()
+    wiring.process_resources().reset()  # forget the open event files and counters of the process
     return org
 
 

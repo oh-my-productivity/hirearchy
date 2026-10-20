@@ -352,15 +352,15 @@ def commands_over(session: OrgSession, out: Output, terminal: Terminal, clock: C
     ]
 
 
-def cli_app() -> CliApp:
-    """The command line of this process."""
-    out, clock = StandardOutput(), SystemClock()
+def cli_app(clock: Clock | None = None) -> CliApp:
+    """The command line of this process; ``clock`` is the one its commands wait and time by (default: the system's)."""
+    out, clock = StandardOutput(), clock or SystemClock()
     session = AnnouncingOrgSession(os_locator(), RuntimeOrgOpener(), out)
     resources = process_resources()
     recorder = EventCommandRecorder(resources.event_sinks, session, clock)
     return ArgparseCliApp(commands_over(session, out, StandardTerminal(), clock), recorder, resources.process_label, clock, out)
 
 
-def run_cli(argv: Sequence[str] | None = None) -> None:
-    """``orgmcp``: what the console script, ``python -m orgmcp`` and ``orgmcp.cli.main`` run."""
-    cli_app().main(argv)
+def run_cli(argv: Sequence[str] | None = None, clock: Clock | None = None) -> None:
+    """``orgmcp``: what the console script, ``python -m orgmcp`` and ``orgmcp.cli.main`` run (``clock``: see ``cli_app``)."""
+    cli_app(clock).main(argv)

@@ -2,9 +2,12 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
-from testkit.legacy.orgmcp.scheduler import describe_scheduler
+from testkit.cli_world import main
 
-from orgmcp.cli import main
+
+def describe_scheduler(org):
+    """What ``scheduler.describe_scheduler(org)`` said: the status line of the organization's scheduler."""
+    return org.runtime.scheduler_status.describe()
 
 
 @pytest.fixture(autouse=True)

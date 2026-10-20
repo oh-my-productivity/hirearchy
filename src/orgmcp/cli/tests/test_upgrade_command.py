@@ -1,9 +1,9 @@
 # mypy: ignore-errors
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
+from testkit.cli_world import main
 from testkit.legacy.orgmcp.core import Org
 
-from orgmcp.cli import main
 
 MISSION = "Study octopuses.\n\n## Findings so far\nThey have three hearts."
 

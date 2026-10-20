@@ -3,7 +3,7 @@
 
 import json
 
-from orgmcp.cli import main
+from testkit.cli_world import main
 
 
 def failures(org):

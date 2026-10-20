@@ -2,9 +2,8 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
+from testkit.cli_world import main
 from testkit.legacy.orgmcp.core import ROOT
-
-from orgmcp.cli import main
 
 
 @pytest.fixture

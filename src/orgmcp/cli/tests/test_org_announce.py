@@ -5,8 +5,7 @@ import subprocess
 import sys
 
 import pytest
-
-from orgmcp.cli import main
+from testkit.cli_world import main
 
 
 @pytest.fixture(autouse=True)

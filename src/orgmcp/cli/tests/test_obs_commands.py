@@ -4,19 +4,21 @@
 import json
 
 import pytest
+from testkit.cli_world import SleepingClock, cli_clocked, clock_is, main
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.obs_fixtures import EventLog, Story, freeze, stamp
+from testkit.obs_fixtures import EventLog, Story, stamp
 
-from orgmcp.cli import main
+from orgmcp.kernel.testing import FakeClock
 
 NOW = stamp(200)
 
 
 @pytest.fixture
-def org(tmp_path):
+def org(tmp_path, clock):
     """root -> ceo -> eng with emission OFF (``events: false``): the event files in these tests are written by hand
     (tests/testkit/obs_fixtures.py) so each test controls exactly which events exist. The real emitter is exercised against
-    this query layer in tests/test_observability_e2e.py."""
+    this query layer in tests/test_observability_e2e.py. Built under the frozen ``clock`` (the hand-written events are dated
+    from its origin), as is every organization the command line opens."""
     o = Org.init(tmp_path / "org", "Test mission", {"poll_seconds": 0.05, "events": False})
     o.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)
     o.hire("ceo", "eng", "Engineer", "Build things.")
@@ -25,7 +27,7 @@ def org(tmp_path):
 
 @pytest.fixture
 def clock(monkeypatch):
-    return freeze(monkeypatch)
+    return clock_is(monkeypatch, FakeClock())
 
 
 @pytest.fixture
@@ -35,7 +37,7 @@ def story(org, clock):
 
 def test_cli_views_and_json(org, story, capsys, monkeypatch):
     root = str(org.root)
-    monkeypatch.setattr("orgmcp.core.utcnow", lambda: NOW)  # the command line opens its own Org: the clock of its runtime is the patch point
+    clock_is(monkeypatch, FakeClock(NOW))  # the command line opens its own Org: its runtime gets the clock of the providers
     main(["--root", root, "obs", "trace", story.task.id])
     assert "totals: wall" in capsys.readouterr().out
     main(["--root", root, "obs", "trace", story.task.id, "--json"])
@@ -74,7 +76,7 @@ def test_cli_watch_and_follow_exit_cleanly_on_ctrl_c(org, story, capsys, monkeyp
     def interrupt(_):
         raise KeyboardInterrupt
 
-    monkeypatch.setattr("orgmcp.cli_obs.time.sleep", interrupt)
+    main = cli_clocked(SleepingClock(interrupt))
     main(["--root", str(org.root), "obs", "now", "--watch", "5"])
     assert "scheduler:" in capsys.readouterr().out
     main(["--root", str(org.root), "obs", "events", "--since", "2026-10-18T00:00:00Z", "--limit", "1", "--follow"])
@@ -93,7 +95,7 @@ def test_cli_follow_prints_new_events(org, clock, capsys, monkeypatch):
         else:
             raise KeyboardInterrupt
 
-    monkeypatch.setattr("orgmcp.cli_obs.time.sleep", sleeper)
+    main = cli_clocked(SleepingClock(sleeper))
     main(["--root", str(org.root), "obs", "events", "--since", "2026-10-01T00:00:00Z", "--follow"])
     out = capsys.readouterr().out
     assert "tool.call read" in out and "tool.call write" in out

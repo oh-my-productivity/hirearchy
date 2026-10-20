@@ -1,7 +1,7 @@
 # mypy: ignore-errors
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
-from orgmcp.cli import main
+from testkit.cli_world import main
 
 
 def test_qa10_resume_with_trailing_slash_clears_failures(org):

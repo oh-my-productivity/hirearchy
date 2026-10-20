@@ -2,12 +2,13 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
+from testkit.cli_world import clock_is, main
 from testkit.dash_fixtures import DEMO_NOW, demo_org, snapshot_files
-from testkit.legacy.orgmcp import dashboard_data as dd
-from testkit.legacy.orgmcp.scheduler import SchedulerState
+from testkit.legacy.orgmcp.app.wire_dashdata import dashboard_runtime
 from testkit.scheduler import scheduler_is
 
-from orgmcp.cli import main
+from orgmcp.daemon import SchedulerState
+from orgmcp.kernel.testing import FakeClock
 
 
 @pytest.fixture
@@ -16,17 +17,36 @@ def sched_up(monkeypatch):
     scheduler_is(monkeypatch, up(None))
 
 
+class DashData:
+    """What ``dashboard_data.DashData(root, now=...)`` answered, over the queries of the runtime of the dashboard."""
+
+    def __init__(self, root, now):
+        rt = dashboard_runtime(root, now=now)
+        self.snapshot = rt.snapshot_query.snapshot
+        self.agent_detail = rt.agent_detail_query.agent_detail
+        self.requests, self.trace_text, self.request_line = rt.request_query.requests, rt.request_query.trace_text, rt.request_query.request_line
+        self.services, self.service_detail = rt.service_query.services, rt.service_query.service_detail
+        self.health, self.run_check = rt.health_query.health, rt.health_query.run_check
+        self.render_once = rt.snapshot_renderer.render_once
+
+
+def render_once(data):
+    """``dashboard_data.render_once(data)``: the text of ``dash --once``."""
+    return data.render_once()
+
+
 @pytest.fixture
-def demo(tmp_path, sched_up):
+def demo(tmp_path, sched_up, monkeypatch):
     ns = demo_org(tmp_path)
-    ns.data = dd.DashData(ns.org.root, now=lambda: DEMO_NOW)
+    clock_is(monkeypatch, FakeClock(DEMO_NOW))  # after the demo is built (under its own clock): every runtime opened from here on is at DEMO_NOW
+    ns.data = DashData(ns.org.root, now=lambda: DEMO_NOW)
     return ns
 
 
 # ------------------------------------------------------------------------------------------ read-only
 def test_the_data_layer_and_once_write_nothing(demo, capsys):
     before = snapshot_files(demo.org.root)
-    data = dd.DashData(demo.org.root, now=lambda: DEMO_NOW)
+    data = DashData(demo.org.root, now=lambda: DEMO_NOW)
     snap = data.snapshot()
     for a in snap.order:
         data.agent_detail(a, snap)
@@ -37,7 +57,7 @@ def test_the_data_layer_and_once_write_nothing(demo, capsys):
     data.run_check()
     data.trace_text(demo.report_task.id)
     data.request_line(demo.report_task.id)
-    dd.render_once(data)
+    render_once(data)
     main(["--root", str(demo.org.root), "dash", "--once"])
     out = capsys.readouterr().out
     assert "AGENTS" in out and "ceo" in out
