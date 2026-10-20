@@ -2,30 +2,33 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
+from testkit.legacy.orgmcp.app import wiring
 from testkit.legacy.orgmcp.core import ROOT
+
+from orgmcp.kernel import AtomicWriter
+from orgmcp.kernel.testing import FailingAtomicWriter, fs_atomic_writer
 
 ENG = "ceo/eng"
 
 
 # ------------------------------------------------------------------- QA-12: delivery order and recovery
-def _fail_writes_into(monkeypatch, marker):
-    from testkit.legacy.orgmcp import core
-
-    real = core.atomic_write
-
-    def flaky(path, text):
-        if marker in str(path):
-            raise OSError("disk full")
-        return real(path, text)
-
-    monkeypatch.setattr(core, "atomic_write", flaky)
-    return lambda: monkeypatch.setattr(core, "atomic_write", real)
+def _writer_into(org, fails=lambda path: False):
+    """The organization goes on over a runtime whose atomic writer fails for the paths ``fails`` selects (and records every attempt)."""
+    writer = FailingAtomicWriter(fs_atomic_writer(org.root).writer, fails=fails, error=OSError("disk full"))
+    org.runtime = wiring.open_runtime(org.root, {AtomicWriter: writer})
+    return writer
 
 
-def test_recover_redelivers_to_root_too(org, monkeypatch):
+def _fail_writes_into(org, marker):
+    armed = {"on": True}
+    _writer_into(org, fails=lambda path: armed["on"] and marker in str(path))
+    return lambda: armed.update(on=False)
+
+
+def test_recover_redelivers_to_root_too(org):
     task = org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
     org.begin_run("ceo")
-    restore = _fail_writes_into(monkeypatch, str(org.root / "inbox"))
+    restore = _fail_writes_into(org, str(org.root / "inbox"))
     with pytest.raises(OSError):
         org.report("ceo", task.id, "done", "ok")
     restore()
