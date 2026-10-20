@@ -1,7 +1,7 @@
 """The fixed inputs of the GOLDEN-text tests and the names of the files that hold their expected output.
 
 ``expected/<case>.txt`` was captured from the module ``orgmcp/templates.py`` as it was before it became a package (step
-A-templates), by calling the legacy function listed in ``LEGACY_NAME`` with these arguments, and is never regenerated: the
+A-templates), by calling the legacy function with these arguments, and is never regenerated: the
 templates are the text the runtime writes into ORG.md, charters, messages and notices, so a changed byte is a changed behaviour.
 """
 
@@ -26,22 +26,6 @@ class Case:
     args: tuple[object, ...] = ()
     kwargs: dict[str, object] = field(default_factory=dict)
 
-
-# the legacy function of orgmcp.templates that each method of the Protocols replaces (ARCHITECTURE.md 5.13)
-LEGACY_NAME = {
-    "org_rules": "org_rules",
-    "charter_body": "charter_body",
-    "task_body": "task_body",
-    "result_body": "result_body",
-    "budget": "notice_budget",
-    "budget_returned": "notice_budget_returned",
-    "failures": "notice_failures",
-    "nudge": "notice_nudge",
-    "stalled": "notice_stalled",
-    "review_item": "review_item",
-    "review_manager": "notice_review_manager",
-    "review_root": "notice_review_root",
-}
 
 DOCUMENT_CASES = [
     Case("org_rules_mission", "documents", "org_rules", ("Build the best research desk.",)),

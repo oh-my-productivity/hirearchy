@@ -78,17 +78,6 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "blueprint_examples": _e3(
         "KINDS example"
     ),
-    "templates": _e3(
-        "ORG_RULES DEFAULT_MISSION org_rules charter_body task_body result_body notice_budget notice_budget_returned "
-        "notice_failures notice_nudge notice_stalled REVIEW_ACTIONS review_item notice_review_manager "
-        "notice_review_root"
-    ),
-    "upgrade": _e3(
-        "MISSION_HEADING RULES_HEADING extract_mission upgrade_rules"
-    ),
-    "skill": _e3(
-        "SKILL_NAME skill_source install_skill"
-    ),
     "dashboard_events": _e3(
         "WHO_WIDTH BATCH_SHOWN Lookup EventLine clock who describe humanize event_lines"
     ),
