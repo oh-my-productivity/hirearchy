@@ -36,9 +36,6 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "scheduler_command scheduler_state describe_scheduler waiting_on_user start_scheduler "
         "stop_scheduler Scheduler nothing_to_do"
     ),
-    "server": _e3(
-        "INSTRUCTIONS ROOT_INSTRUCTIONS DS_STORE OrgBinding build_server resolve_binding serve"
-    ),
     "cli": _e3(
         "main"
     ),

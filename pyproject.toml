@@ -115,4 +115,4 @@ source_modules = [
     "orgmcp.health", "orgmcp.observe", "orgmcp.progress", "orgmcp.review", "orgmcp.scheduler", "orgmcp.services",
     "orgmcp.skill", "orgmcp.telemetry", "orgmcp.templates", "orgmcp.upgrade",
 ]
-forbidden_modules = ["orgmcp.cli", "orgmcp.cli_obs", "orgmcp.server", "orgmcp.dashboard"]
+forbidden_modules = ["orgmcp.cli", "orgmcp.dashboard"]

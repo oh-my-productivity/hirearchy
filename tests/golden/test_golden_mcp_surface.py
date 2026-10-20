@@ -9,7 +9,7 @@ from golden_support import check
 from scenarios import BRIEF, company, dirs
 
 from orgmcp.core import ROOT
-from orgmcp.server import OrgBinding, build_server
+from testkit.mcp_server_world import OrgBinding, build_server
 
 
 def surface(server) -> str:

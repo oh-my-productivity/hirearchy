@@ -8,7 +8,7 @@ import pytest
 from golden_support import check
 
 from orgmcp import blueprint_examples
-from orgmcp.server import OrgBinding, build_server
+from testkit.mcp_server_world import OrgBinding, build_server
 
 PROJECT = Path(__file__).resolve().parents[2]
 PLAN_ID = re.compile(r"[0-9a-f]{12}")
