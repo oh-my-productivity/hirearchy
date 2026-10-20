@@ -7,7 +7,7 @@ import re
 
 import pytest
 
-from orgmcp.cli import main
+from testkit.cli_world import main
 
 from . import _scenario
 from ._golden import check

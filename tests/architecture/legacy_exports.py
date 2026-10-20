@@ -31,9 +31,6 @@ PERMANENT_MODULES = {"core"}  # every name of these modules stays: the ledger ho
 LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "core": {"*": "permanent"},
     "scheduler": _e3("file_confinement"),
-    "cli": _e3(
-        "main"
-    ),
     "services": _e3(
         "TITLE_MAX service_dir read_contract read_playbook owned_services requestable_services parse_input_spec define_service "
         "retire_service revise_playbook report_hint request rework_fields feedback_text feedback"
