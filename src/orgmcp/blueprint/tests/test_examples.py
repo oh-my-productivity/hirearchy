@@ -7,11 +7,11 @@ from pathlib import Path
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp import blueprint_examples as ex
+from testkit.blueprint_world import ex
 from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
-from testkit.legacy.orgmcp.server import build_server, resolve_binding
+from testkit.blueprint_world import server_of_the_environment
 
-from orgmcp import blueprint as bpm, services as services_mod
+from testkit.blueprint_world import bpm, services_mod
 
 ROOT_DIR = testkit.REPO
 
@@ -129,7 +129,7 @@ def root_server(tmp_path, monkeypatch):
     work = tmp_path / "cwd"
     work.mkdir()
     monkeypatch.chdir(work)
-    return build_server(*resolve_binding()), work
+    return server_of_the_environment(), work
 
 
 def test_blueprint_example_tool_has_a_service_flag(root_server):

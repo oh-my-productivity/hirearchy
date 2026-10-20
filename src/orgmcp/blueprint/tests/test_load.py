@@ -6,7 +6,7 @@ import json
 import pytest
 import testkit
 
-from orgmcp import blueprint as bpm
+from testkit.blueprint_world import bpm
 from orgmcp.blueprint import BlueprintError
 
 EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"

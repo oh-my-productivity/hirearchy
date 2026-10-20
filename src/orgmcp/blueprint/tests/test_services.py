@@ -11,7 +11,7 @@ import yaml
 from testkit.legacy.orgmcp.app import wiring
 from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
 
-from orgmcp import blueprint as bpm, services as services_mod
+from testkit.blueprint_world import bpm, services_mod
 from orgmcp.blueprint.testing import FlakyServiceCommands
 from orgmcp.services import ServiceCommands
 

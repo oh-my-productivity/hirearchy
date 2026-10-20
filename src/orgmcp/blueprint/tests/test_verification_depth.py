@@ -6,10 +6,10 @@ from pathlib import Path
 import pytest
 import testkit
 import yaml
-from testkit.legacy.orgmcp import blueprint_examples as ex
+from testkit.blueprint_world import ex
 from testkit.legacy.orgmcp.core import Org, OrgError
 
-from orgmcp import blueprint as bpm
+from testkit.blueprint_world import bpm
 
 EXAMPLE_YAML = testkit.REPO / "examples" / "blueprint-research.yaml"
 

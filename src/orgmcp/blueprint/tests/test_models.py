@@ -7,11 +7,11 @@ from pathlib import Path
 import pytest
 import testkit
 import yaml
-from testkit.legacy.orgmcp import blueprint_examples as ex
+from testkit.blueprint_world import ex
 from testkit.legacy.orgmcp.core import DEFAULT_MODEL, Org
-from testkit.legacy.orgmcp.scheduler import kiro_runner
+from testkit.blueprint_world import kiro_runner
 
-from orgmcp import blueprint as bpm
+from testkit.blueprint_world import bpm
 
 EXAMPLES = testkit.REPO / "examples"
 

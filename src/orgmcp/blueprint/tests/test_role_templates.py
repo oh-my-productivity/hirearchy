@@ -4,7 +4,7 @@
 import pytest
 from testkit.legacy.orgmcp.core import Org
 
-from orgmcp import blueprint as bpm
+from testkit.blueprint_world import bpm
 
 NAMES = bpm.role_names()
 SECTIONS = ("## Purpose", "## Responsibilities", "## Decision rights", "## Escalation", "## Quality bar", "## Budget")

@@ -6,10 +6,10 @@ import copy
 import pytest
 import testkit
 import yaml
-from testkit.legacy.orgmcp.blueprint_examples import example
+from testkit.blueprint_world import ex
 from testkit.legacy.orgmcp.core import split_frontmatter
 
-from orgmcp import blueprint as bpm
+from testkit.blueprint_world import bpm
 
 EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"
 
@@ -228,6 +228,6 @@ def test_research_example_proposes_cleanly_under_25(base, tmp_path):
 
 
 def test_research_blueprint_example_text_keeps_the_lead_strong(tmp_path):
-    bp = yaml.safe_load(example("research", tmp_path).replace("<", "").replace(">", ""))
+    bp = yaml.safe_load(ex.example("research", tmp_path).replace("<", "").replace(">", ""))
     lead = bp["agents"][0]
     assert lead["template"] == "manager" and lead["model"] == "strong"

@@ -3,9 +3,9 @@
 
 import re
 
-from testkit.legacy.orgmcp import blueprint_examples
+from testkit.blueprint_world import ex as blueprint_examples
 
-from orgmcp import blueprint as bp_mod
+from testkit.blueprint_world import bpm as bp_mod
 
 
 # --------------------------------------------------------------------------------------------- the plan block

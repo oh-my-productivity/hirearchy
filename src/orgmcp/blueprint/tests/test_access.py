@@ -8,7 +8,7 @@ import testkit
 import yaml
 from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
 
-from orgmcp import blueprint as bpm
+from testkit.blueprint_world import bpm
 
 EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"
 

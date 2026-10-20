@@ -2,9 +2,9 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
-from testkit.legacy.orgmcp import scheduler
+from testkit.blueprint_world import World, bpm
 
-from orgmcp import blueprint as bpm
+from orgmcp.kiro import ConfinementPolicy
 
 
 def documents_bp(tmp_path, reviewer: dict | None = None, writer: dict | None = None):
@@ -47,18 +47,19 @@ def test_org_files_are_readable_whatever_tools_a_verifier_holds(tools):
 
 def test_the_gap_cannot_come_back_the_validator_warns_when_the_profile_would_not_let_read_open_the_org(tmp_path, monkeypatch):
     bp = documents_bp(tmp_path)
-    real = scheduler.file_confinement
+    real = World().runtime().confinement_policy
 
-    def without_org(org_root, tools, workspace, inputs):  # the old profile: the org is denied to the built-in read
-        allowed, settings = real(org_root, tools, workspace, inputs)
-        if "read" in settings:
-            settings["read"] = {
-                "allowedPaths": [p for p in settings["read"]["allowedPaths"] if not p.startswith(str(org_root))],
-                "deniedPaths": [str(org_root), f"{org_root}/**"],
-            }
-        return allowed, settings
+    class WithoutOrgRead(ConfinementPolicy):  # the old profile: the org is denied to the built-in read
+        def file_confinement(self, org_root, tools, workspace, inputs):
+            allowed, settings = real.file_confinement(org_root, tools, workspace, inputs)
+            if "read" in settings:
+                settings["read"] = {
+                    "allowedPaths": [p for p in settings["read"]["allowedPaths"] if not p.startswith(str(org_root))],
+                    "deniedPaths": [str(org_root), f"{org_root}/**"],
+                }
+            return allowed, settings
 
-    monkeypatch.setattr(scheduler, "file_confinement", without_org)
+    bpm = World({ConfinementPolicy: WithoutOrgRead()})
     issues = bpm.validate(bp, allowed_roots=[tmp_path])
     warn = [i for i in issues if i.code == "verifier-cannot-read"]
     assert len(warn) == 1 and warn[0].level == "warning" and not bpm.errors(issues)

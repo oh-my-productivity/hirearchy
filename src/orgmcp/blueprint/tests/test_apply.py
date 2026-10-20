@@ -10,7 +10,7 @@ from testkit.blueprints import code_bp
 from testkit.legacy.orgmcp.app import wiring
 from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
 
-from orgmcp import blueprint as bpm
+from testkit.blueprint_world import bpm
 from orgmcp.blueprint import BlueprintError
 from orgmcp.blueprint.testing import FlakyHiring, FlakyTaskAssigner
 from orgmcp.dispatch import TaskAssigner

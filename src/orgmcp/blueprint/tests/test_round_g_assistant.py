@@ -4,7 +4,7 @@
 import pytest
 import testkit
 
-from orgmcp import blueprint as bpm
+from testkit.blueprint_world import bpm
 
 ROOT_DIR = testkit.REPO
 SKILL = (ROOT_DIR / "skills" / "orgmcp" / "SKILL.md").read_text(encoding="utf-8")
