@@ -118,10 +118,10 @@ def test_health_now_text_has_no_contradictions_and_readable_errors(demo_data):
 
 
 @pytest.fixture
-def demo_data(tmp_path, monkeypatch):
+def demo_data(tmp_path, process_overrides):
     from orgmcp.daemon import SchedulerState
 
     up = lambda org: SchedulerState("running", 7000, "2026-10-18 10:00:00Z")  # noqa: E731
-    scheduler_is(monkeypatch, up(None))
+    scheduler_is(process_overrides, up(None))
     ns = demo_org(tmp_path)
     return dd.DashData(ns.org.root, now=lambda: DEMO_NOW)

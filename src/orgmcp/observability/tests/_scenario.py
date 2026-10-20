@@ -18,6 +18,8 @@ from typing import Any
 
 from orgmcp.daemon import SchedulerState
 from orgmcp.daemon.testing import FakeSchedulerStatus
+from orgmcp.kernel import TokenSource
+from orgmcp.kernel.testing import CounterTokens
 from orgmcp.processes import OrphanJudge
 
 T0 = datetime(2026, 10, 18, 10, 0, 0, tzinfo=timezone.utc)
@@ -32,27 +34,16 @@ NOW = stamp(200)
 SINCE = "2026-10-18T00:00:00Z"
 
 
-class CountingSecrets:
-    """``secrets.token_hex`` as a counter, so that the ids of the messages are the same in every run."""
-
-    def __init__(self) -> None:
-        self.n = 0
-
-    def token_hex(self, nbytes: int = 32) -> str:
-        self.n += 1
-        return f"{self.n:0{2 * nbytes}x}"
-
-
 def fixtures() -> ModuleType:
     """``tests/testkit/obs_fixtures.py``: the clock, the event-file writer and the story."""
     return importlib.import_module("testkit.obs_fixtures")
 
 
-def install(monkeypatch: Any) -> Any:
-    """Patch the patch points of ``core`` (the clock and the id randomness); the returned clock is the one in force."""
-    core: ModuleType = importlib.import_module("orgmcp.core")
-    clock = fixtures().freeze(monkeypatch)
-    monkeypatch.setattr(core, "secrets", CountingSecrets())
+def install(process_overrides: Any) -> Any:
+    """Give every runtime opened from now on (until the test ends) the controllable clock and ids that count (the ``process_overrides`` fixture);
+    the returned clock is the one in force."""
+    clock = fixtures().freeze(process_overrides)
+    process_overrides({TokenSource: CounterTokens(start=1)})
     return clock
 
 

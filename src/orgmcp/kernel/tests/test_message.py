@@ -1,6 +1,7 @@
 """The message as a value: ``meta to_text render cut_body parse from_parts`` and ``latest_results``.
 
-``parse`` must equal what the legacy file reader (``Message.load``) builds from the same file, for every fixture."""
+``parse`` must equal what the file reader of the mail package (``CachingMessageParser.parse``; the legacy ``Message.load``
+was its classmethod) builds from the same file, for every fixture."""
 
 from __future__ import annotations
 
@@ -64,7 +65,7 @@ def test_parse_round_trips_to_text(original: Message) -> None:
 def test_parse_equals_the_legacy_loader_on_every_fixture(original: Message, tmp_path: Path) -> None:
     path = tmp_path / f"{MID}.md"
     path.write_text(original.to_text(), encoding="utf-8")
-    loaded = legacy("core").Message.load(path)
+    loaded = legacy("mail._parser").CachingMessageParser().parse(path)
     parsed = Message.parse(path.read_text(encoding="utf-8"), path)
     assert asdict(parsed) == asdict(loaded)
     assert parsed.path == path and parsed.render() == loaded.render() and parsed.to_text() == loaded.to_text()
@@ -76,7 +77,7 @@ def test_parse_normalises_newlines_like_the_file_reader(tmp_path: Path) -> None:
     path.write_bytes(raw)
     parsed = Message.parse(raw.decode("utf-8"), path)
     assert parsed.body == "line1\nline2" and parsed.sender == "root"
-    assert asdict(parsed) == asdict(legacy("core").Message.load(path))
+    assert asdict(parsed) == asdict(legacy("mail._parser").CachingMessageParser().parse(path))
     assert Message.parse("---\rfrom: root\r---\rbody\r").body == "body"
 
 

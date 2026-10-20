@@ -9,6 +9,14 @@ from ..kernel import Clock, JsonObject
 
 
 @runtime_checkable
+class EventClock(Clock, Protocol):
+    """The clock the events are stamped with, and the retention counts days with: the system's, unless a test fixes it (``wiring.overriding``).
+
+    It has the shape of ``Clock`` and a port of its own because the events are written by the process, beside the work of an organization: a test that
+    steps the clock of the runtime (a reading moves it) must not have it moved by every event that is emitted."""
+
+
+@runtime_checkable
 class LineWriter(Protocol):
     """The open file of one process for one organization."""
 

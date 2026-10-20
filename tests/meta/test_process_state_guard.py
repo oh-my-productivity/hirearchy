@@ -5,8 +5,7 @@ from testkit import process_state
 from testkit.process_state import ProcessState
 
 from orgmcp import core
-from orgmcp.app import _compat, wiring
-from orgmcp.kernel import Message
+from orgmcp.app import wiring
 
 
 def test_nothing_differs_from_itself() -> None:
@@ -23,28 +22,12 @@ def test_a_replaced_core_attribute_is_named_and_restored(name: str, monkeypatch:
     assert ProcessState.capture().leaks_since(before) == [] and getattr(core, name) is before.values[f"core.{name}"]
 
 
-def test_a_replaced_message_load_is_named_and_restored(monkeypatch: pytest.MonkeyPatch) -> None:
-    before = ProcessState.capture()
-    monkeypatch.setattr(Message, "load", classmethod(lambda cls, path: None), raising=False)
-    assert ProcessState.capture().leaks_since(before) == ["Message.load"]
-    process_state.restore(before)
-    assert vars(Message)["load"].__func__.__module__ == "orgmcp.app._compat"
-
-
 def test_replaced_process_resources_are_named_and_restored(monkeypatch: pytest.MonkeyPatch) -> None:
     before = ProcessState.capture()
     monkeypatch.setattr(wiring, "_process", wiring.new_process_resources())
     assert ProcessState.capture().leaks_since(before) == ["wiring._process", "resources.message_parser", "message_parser.cache"]
     process_state.restore(before)
     assert wiring.process_resources().message_parser.cache is core._PARSED
-
-
-def test_the_adapters_switch_is_named_and_restored(monkeypatch: pytest.MonkeyPatch) -> None:
-    before = ProcessState.capture()
-    monkeypatch.setattr(_compat, "ENABLED", False)
-    assert ProcessState.capture().leaks_since(before) == ["_compat.ENABLED"]
-    process_state.restore(before)
-    assert _compat.ENABLED is True
 
 
 def test_a_leaking_test_fails_by_itself_and_the_state_is_back() -> None:
@@ -58,3 +41,19 @@ def test_a_leaking_test_fails_by_itself_and_the_state_is_back() -> None:
     finally:
         core._PARSED = original
     process_state.verify(before, "clean")  # nothing left over: no failure
+
+
+def test_a_process_override_that_is_still_in_force_is_named_and_removed() -> None:
+    from orgmcp.kernel import Clock
+    from orgmcp.kernel._system import SystemClock
+
+    before = ProcessState.capture()
+    cm = wiring.overriding({Clock: SystemClock()})
+    cm.__enter__()  # not left again: a test that forgot to close its block
+    try:
+        assert ProcessState.capture().leaks_since(before) == ["wiring.overrides"]
+        with pytest.raises(pytest.fail.Exception, match=r"left process-global state replaced: wiring.overrides"):
+            process_state.verify(before, "some/test_x.py::test_leaks")
+        assert ProcessState.capture().leaks_since(before) == []  # put back: the next test is not affected
+    finally:
+        process_state.restore(before)

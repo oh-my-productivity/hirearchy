@@ -11,8 +11,8 @@ from . import _scenario
 
 
 @pytest.fixture
-def clock(monkeypatch: pytest.MonkeyPatch) -> Any:
-    return _scenario.install(monkeypatch)
+def clock(process_overrides: Any) -> Any:
+    return _scenario.install(process_overrides)
 
 
 @pytest.fixture

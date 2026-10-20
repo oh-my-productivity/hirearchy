@@ -14,10 +14,14 @@ from datetime import timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
+from .clocks import clock_ports
 from .obs_fixtures import T0, Clock, EventLog, stamp
 from .scheduler import scheduler_is
 
-from orgmcp.core import ROOT, Message, Org, atomic_write
+from orgmcp.app import wiring
+from orgmcp.core import ROOT, Message, Org
+from orgmcp.kernel import TokenSource
+from orgmcp.kernel.testing import CounterTokens
 
 DEMO_NOW = T0 + timedelta(seconds=400)
 
@@ -78,20 +82,11 @@ def demo_org(base: Path, clock: Clock | None = None) -> SimpleNamespace:
     ``research`` has two finished cases (one rejected then accepted) and one open.
     """
     clock = clock or Clock()
-    import orgmcp.core as core
-
-    counter = iter(range(1 << 30))
-
-    def token_hex(nbytes: int = 32) -> str:  # 0000, 0001, ...: never 1xxx, so no id contains e.g. 't-1' ('roo|t-1|657')
-        return f"{next(counter):0{2 * nbytes}x}"
-
-    real, real_secrets = core.utcnow, core.secrets
-    core.utcnow = clock
-    core.secrets = SimpleNamespace(token_hex=token_hex)  # message ids end in random hex; the demo must be the same every time
-    try:
-        return _build_demo(base, clock)
-    finally:
-        core.utcnow, core.secrets = real, real_secrets
+    # 0000, 0001, ...: never 1xxx, so no id contains e.g. 't-1' ('roo|t-1|657'); message ids end in random hex, the demo must be the same every time
+    with wiring.overriding({**clock_ports(clock), TokenSource: CounterTokens()}):
+        built = _build_demo(base, clock)
+    built.org.runtime = wiring.open_runtime(built.org.root)  # the clock and the ids were the demo's while it was built; afterwards the organization is a plain one
+    return built
 
 
 def _build_demo(base: Path, clock: Clock) -> SimpleNamespace:
@@ -283,7 +278,7 @@ def big_org(base: Path, agents: int = 50, messages: int = 2000) -> Org:
         for who, box in ((sender, "sent"), (to, box_in)):
             d = org.dir(who) / box
             d.mkdir(exist_ok=True)
-            atomic_write(d / f"{m.id}.md", text)
+            org.runtime.atomic_writer.write(d / f"{m.id}.md", text)
     for w in workers[: len(workers) // 2]:
         d = org.dir(w) / "runs"
         d.mkdir(exist_ok=True)
@@ -305,8 +300,8 @@ def write_running_json(org: Org, addr: str, seconds_ago: float = 72.0, import_ti
     return log
 
 
-def set_scheduler(monkeypatch, state, *orgs):
-    scheduler_is(monkeypatch, state, *orgs)
+def set_scheduler(process_overrides, state, *orgs):
+    scheduler_is(process_overrides, state, *orgs)
 
 
 def snapshot_files(root: Path) -> dict:

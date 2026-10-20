@@ -5,7 +5,7 @@ import asyncio
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from testkit.legacy.orgmcp import core
+from testkit.clocks import clock_ports
 from testkit.legacy.orgmcp.core import ROOT
 from testkit.mcp_server_world import build_server
 
@@ -18,7 +18,7 @@ def at(seconds: float) -> datetime:
 
 
 class Clock:
-    """Replaces core.utcnow so message ids, `created` stamps and hire times are deterministic."""
+    """The Clock of the runtimes, so message ids, `created` stamps and hire times are deterministic."""
 
     def __init__(self):
         self.t = T0
@@ -31,9 +31,9 @@ class Clock:
 
 
 @pytest.fixture(autouse=True)
-def clock(monkeypatch):
+def clock(process_overrides):
     c = Clock()
-    monkeypatch.setattr(core, "utcnow", c)
+    process_overrides(clock_ports(c))
     return c
 
 

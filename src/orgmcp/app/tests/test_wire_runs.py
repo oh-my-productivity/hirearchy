@@ -6,10 +6,10 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-import pytest
-
-import orgmcp.core as core
 from orgmcp.app import wiring
+from orgmcp.kernel import AtomicWriter, Clock
+from orgmcp.kernel.testing import RecordingAtomicWriter
+from testkit.clocks import ClockReading
 from orgmcp.runs import RunLogReader, RunLogWriter, RunRegistry
 from orgmcp.runs._reader import FsRunLogReader
 from orgmcp.runs._registry import FsRunRegistry
@@ -30,11 +30,11 @@ def test_building_the_run_ports_does_no_io(tmp_path: Path) -> None:
     assert list(tmp_path.iterdir()) == []
 
 
-def test_logs_are_stamped_by_the_clock_of_the_runtime(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """``core.utcnow`` is a patch point of the tests until they are converted: the clock of the runtime reads it at the time of the call."""
+def test_logs_are_stamped_by_the_clock_of_the_runtime(tmp_path: Path) -> None:
+    """The clock of the runtime is the ``Clock`` port: a test gives it another one through the overrides."""
     (tmp_path / "ceo").mkdir()
-    monkeypatch.setattr(core, "utcnow", lambda: datetime(2031, 5, 6, 7, 8, 9, 123456, tzinfo=timezone.utc))
-    assert wiring.open_runtime(tmp_path).run_log_writer.create("ceo") == tmp_path / "ceo" / "runs" / "20310506T070809123456.log"
+    clock = ClockReading(lambda: datetime(2031, 5, 6, 7, 8, 9, 123456, tzinfo=timezone.utc))
+    assert wiring.open_runtime(tmp_path, {Clock: clock}).run_log_writer.create("ceo") == tmp_path / "ceo" / "runs" / "20310506T070809123456.log"
 
 
 def test_the_registry_is_the_running_ledger_of_the_runtime(tmp_path: Path) -> None:
@@ -44,10 +44,10 @@ def test_the_registry_is_the_running_ledger_of_the_runtime(tmp_path: Path) -> No
     assert runtime.ledgers.read("running") == {"ceo": {"pgid": 7}}
 
 
-def test_the_registry_is_written_through_the_atomic_writer_of_the_runtime(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_the_registry_is_written_through_the_atomic_writer_of_the_runtime(tmp_path: Path) -> None:
     written: list[tuple[Path, str]] = []
-    monkeypatch.setattr(core, "atomic_write", lambda path, text: written.append((path, text)))
-    wiring.open_runtime(tmp_path).run_registry.record("ceo", {"pgid": 7})
+    writer = RecordingAtomicWriter(lambda path, text: written.append((path, text)))
+    wiring.open_runtime(tmp_path, {AtomicWriter: writer}).run_registry.record("ceo", {"pgid": 7})
     assert written == [(tmp_path / ".runtime" / "running.json", json.dumps({"ceo": {"pgid": 7}}, indent=2) + "\n")]
 
 

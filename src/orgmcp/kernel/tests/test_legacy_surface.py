@@ -40,10 +40,10 @@ def test_health_private_helpers_are_the_kernel_functions(old: str, new: str) -> 
     assert getattr(legacy("health"), old) is getattr(kernel, new)
 
 
-def test_the_patch_points_stay_in_core() -> None:
+def test_utcnow_and_atomic_write_stay_in_core_as_plain_functions_and_the_kernel_message_loads_nothing() -> None:
     core = legacy("core")
     assert core.utcnow.__module__ == "orgmcp.core" and core.atomic_write.__module__ == "orgmcp.core"
-    assert "load" in vars(kernel.Message) and kernel.Message.load.__func__.__module__ == "orgmcp.app._compat"  # type: ignore[attr-defined]
+    assert "load" not in vars(kernel.Message)  # reading a message file is the mail package's parser (it was the classmethod ``Message.load``)
 
 
 def test_org_address_helpers_agree_with_the_kernel(org: Any) -> None:
@@ -56,7 +56,7 @@ def test_org_address_helpers_agree_with_the_kernel(org: Any) -> None:
 
 def test_loading_a_message_gives_a_kernel_message(org: Any) -> None:
     msg = org.send("root", "ceo", "hello")
-    loaded = legacy("core").Message.load(org.dir("ceo") / "inbox" / f"{msg.id}.md")
+    loaded = org.runtime.message_parser.parse(org.dir("ceo") / "inbox" / f"{msg.id}.md")
     assert type(loaded) is kernel.Message and loaded == msg and loaded.path is not None
 
 

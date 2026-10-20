@@ -9,7 +9,7 @@ from orgmcp import eventlog, kernel
 from orgmcp.telemetry import _process, api
 
 LEGACY = {
-    "DAY_RE", "ENVELOPE", "ERROR_MAX", "EVENTS_REL", "LINE_MAX", "PROCS", "SCHEMA_VERSION", "TITLE_MAX", "clip", "datetime", "dropped", "emit",
+    "DAY_RE", "ENVELOPE", "ERROR_MAX", "EVENTS_REL", "LINE_MAX", "PROCS", "SCHEMA_VERSION", "TITLE_MAX", "clip", "dropped", "emit",
     "ensure_ignored", "note_trace", "process", "prune", "reset", "set_process", "single", "summarize_args", "traces_seen",
 }
 
@@ -41,10 +41,8 @@ def test_the_retry_window_is_not_a_legacy_name_any_more() -> None:
     assert not hasattr(telemetry, "RETRY_AFTER")
 
 
-def test_datetime_stays_for_the_fixtures_that_fix_the_clock() -> None:
-    import datetime as stdlib
-
-    assert telemetry.datetime is stdlib.datetime
+def test_datetime_is_not_a_legacy_name_any_more() -> None:
+    assert not hasattr(telemetry, "datetime")  # the time of the events is the Clock of the runtime (wiring.overriding), not a module attribute
 
 
 def test_the_legacy_names_that_need_the_process_say_so_when_nothing_is_installed(monkeypatch: pytest.MonkeyPatch) -> None:

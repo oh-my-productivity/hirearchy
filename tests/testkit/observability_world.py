@@ -39,7 +39,7 @@ def freeze(org: Any) -> FakeClock:
     return clock
 
 
-def scheduler_is(_monkeypatch: object, state: SchedulerState, *orgs: Any) -> FakeSchedulerStatus:
+def scheduler_is(_process_overrides: object, state: SchedulerState, *orgs: Any) -> FakeSchedulerStatus:
     """The scheduler is in ``state`` for ``orgs`` (their runtimes are opened again with a status that says so)."""
     status = FakeSchedulerStatus(state)
     for org in orgs:

@@ -33,9 +33,9 @@ class Clock(FakeClock):
 
 
 @pytest.fixture(autouse=True)
-def clock(monkeypatch):
+def clock(process_overrides):
     c = Clock()
-    clock_is(monkeypatch, c)
+    clock_is(process_overrides, c)
     return c
 
 

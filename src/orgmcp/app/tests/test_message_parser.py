@@ -1,7 +1,7 @@
-"""``CachingMessageParser`` (the parse cache that was ``core._PARSED``) and the legacy ``Message.load`` that is served by it.
+"""``CachingMessageParser`` (the parse cache that was ``core._PARSED``) and the process parser that serves it.
 
 The cache tests are the ones of ``test_scheduler_robustness`` (QA-13) restated against the class (A-mail converted those to inject a
-parser through ``open_runtime``; the legacy ``Message.load`` and ``core._PARSED`` stay, served by the process parser).
+parser through ``open_runtime``; ``core._PARSED`` stays, the cache of the process parser; the classmethod ``Message.load`` is gone: E2-compat).
 """
 
 from __future__ import annotations
@@ -111,7 +111,7 @@ def test_a_missing_file_raises_like_open(tmp_path: Path) -> None:
         CachingMessageParser().parse(tmp_path / "absent.md")
 
 
-# ---------------------------------------------------------------------------------------------- the legacy patch points
+# ---------------------------------------------------------------------------------------------- the process parser
 
 
 def test_the_process_parser_is_a_plain_caching_parser_with_the_limit_core_names(tmp_path: Path) -> None:
@@ -124,30 +124,29 @@ def test_core_parsed_is_the_cache_of_the_process_parser() -> None:
     assert core._PARSED is wiring.process_resources().message_parser.cache
 
 
-def test_message_load_is_served_by_the_process_parser(tmp_path: Path) -> None:
+def test_the_process_parser_serves_a_file_from_its_cache(tmp_path: Path) -> None:
     path = write(tmp_path)
     wiring.process_resources().reset()
-    first = Message.load(path)  # type: ignore[attr-defined]
+    first = wiring.process_resources().message_parser.parse(path)
     entry = wiring.process_resources().message_parser.cache[str(path)]
-    second = Message.load(path)  # type: ignore[attr-defined]
+    second = wiring.process_resources().message_parser.parse(path)
     assert wiring.process_resources().message_parser.cache[str(path)] is entry  # served from the cache: not parsed again
     assert first == second and first is not second and type(first) is Message
 
 
-def test_message_load_is_attached_by_the_composition_root_not_by_core() -> None:
-    load = vars(Message)["load"]
-    assert isinstance(load, classmethod) and load.__func__.__module__ == "orgmcp.app._compat"
-    assert not hasattr(core, "_load_message")
+def test_the_kernel_message_is_pure_data_and_core_has_no_loader() -> None:
+    assert not hasattr(Message, "load") and not hasattr(core, "_load_message")
 
 
-def test_a_fresh_interpreter_that_imports_only_the_kernel_message_can_load(tmp_path: Path) -> None:
+def test_a_fresh_interpreter_that_imports_only_the_kernel_message_has_no_loader_and_the_process_parser_loads(tmp_path: Path) -> None:
     path = write(tmp_path)
     code = (
         "import sys\n"
         "from orgmcp.kernel import Message\n"
-        f"m = Message.load(__import__('pathlib').Path({str(path)!r}))\n"
+        "from orgmcp.app import wiring\n"
+        f"m = wiring.process_resources().message_parser.parse(__import__('pathlib').Path({str(path)!r}))\n"
         "assert m.sender == 'root' and m.budget == 3\n"
-        "assert Message.load.__func__.__module__ == 'orgmcp.app._compat'\n"
+        "assert not hasattr(Message, 'load')\n"
         "assert 'orgmcp.app' in sys.modules\n"
     )
     done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=False, timeout=60)

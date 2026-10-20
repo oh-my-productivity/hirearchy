@@ -47,8 +47,8 @@ def test_now_works_with_no_events_and_explains_the_queue(org, clock):
     assert "ceo: 1 unread, oldest 50s - scheduler is not running" in observe.render_now(v)
 
 
-def test_now_queue_reasons(org, clock, monkeypatch):
-    scheduler_is(monkeypatch, SchedulerState("running", 4242, "2026-10-18 10:00:00Z"), org)
+def test_now_queue_reasons(org, clock, process_overrides):
+    scheduler_is(process_overrides, SchedulerState("running", 4242, "2026-10-18 10:00:00Z"), org)
     clock.at(0)
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=3)
     assert observe.now_view(org, now=stamp(5))["queued"][0]["reason"].startswith("ready")
@@ -71,10 +71,10 @@ def test_now_queue_reasons(org, clock, monkeypatch):
     assert {x["agent"]: x for x in observe.now_view(org, now=stamp(5))["queued"]}["poor"]["reason"] == "no budget"
 
 
-def test_now_shows_scheduler_runs_in_flight_and_errors(org, story, monkeypatch):
+def test_now_shows_scheduler_runs_in_flight_and_errors(org, story, process_overrides):
     log = story.log
     # a live scheduler with a heartbeat and a run in flight on eng
-    scheduler_is(monkeypatch, SchedulerState("running", 7000, "2026-10-18 10:00:00Z"), org)
+    scheduler_is(process_overrides, SchedulerState("running", 7000, "2026-10-18 10:00:00Z"), org)
     log.emit("scheduler.heartbeat", stamp(190), proc="scheduler", pid=7000, running=["ceo/eng"], runnable=0, waiting_on_you=0)
     story.clock.at(180)
     org.delegate(ROOT, "ceo", "Another", "g", "a", budget=2)

@@ -3,19 +3,19 @@
 from __future__ import annotations
 
 import pytest
-from golden_support import CounterSecrets, FixedClock, make_normalizer, fake_datetime
+from golden_support import FixedClock, make_normalizer
+from testkit.clocks import clock_ports
 
 from orgmcp.core import Org
+from orgmcp.kernel import TokenSource
+from orgmcp.kernel.testing import CounterTokens
 
 
 @pytest.fixture(autouse=True)
-def clock(monkeypatch):
-    """A fixed clock and counter-based message ids for every golden test."""
+def clock(process_overrides):
+    """A fixed clock and counter-based message ids for every runtime opened during a golden test (``wiring.overriding``)."""
     c = FixedClock()
-    fake = fake_datetime(c)
-    for module in ("orgmcp.core", "orgmcp.telemetry", "orgmcp.scheduler"):
-        monkeypatch.setattr(f"{module}.datetime", fake)
-    monkeypatch.setattr("orgmcp.core.secrets", CounterSecrets())
+    process_overrides({**clock_ports(lambda: c.now, events=True), TokenSource: CounterTokens(per_length=True)})
     return c
 
 

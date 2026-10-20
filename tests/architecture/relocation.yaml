@@ -2490,15 +2490,13 @@ destinations:
         - test_stamp_trace_helper_roundtrips_through_the_loader
         - test_run_ids_helper
 
-  # new file; 6 tests
-  #   added after 7.3: tests of the process-state guard fixture (test machinery)
+  # new file; 4 tests
+  #   added after 7.3: tests of the process-state guard fixture (test machinery); E2-compat: the tests of Message.load and of the adapters' switch went with them
   tests/meta/test_process_state_guard.py:
     group: e
     sources:
       tests/test_process_state_guard.py:
         - test_nothing_differs_from_itself
         - test_a_replaced_core_attribute_is_named_and_restored: 7
-        - test_a_replaced_message_load_is_named_and_restored
         - test_replaced_process_resources_are_named_and_restored
-        - test_the_adapters_switch_is_named_and_restored
         - test_a_leaking_test_fails_by_itself_and_the_state_is_back

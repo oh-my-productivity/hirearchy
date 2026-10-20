@@ -4,7 +4,7 @@ A test moved from ``tests/`` into ``src/orgmcp/<package>/tests/`` (``tools/reloc
 (``orgmcp.core``), the MCP server (``orgmcp.server``), the scheduler and the like, which a package below them may not import
 (ARCHITECTURE.md 8.2). The tool writes ``from testkit.legacy.orgmcp.core import ROOT, Org`` instead of ``from orgmcp.core import ROOT, Org``;
 ``testkit.legacy.<dotted name>`` is an alias of the module ``<dotted name>`` (``yaml``, ``orgmcp.server``, ``orgmcp.app.wiring`` ...): the very
-same module object, so ``monkeypatch.setattr(core, ...)`` and ``isinstance`` behave as before. The imports are invisible to import-linter
+same module object, so ``isinstance`` and identity checks behave as before. The imports are invisible to import-linter
 (``testkit`` is not part of ``orgmcp``), and mypy treats them as ``Any`` (``ignore_missing_imports`` for ``testkit.legacy.*``).
 
 A converted test imports the real API of the package it tests, and this alias goes away with the last test that needs it (step E3).

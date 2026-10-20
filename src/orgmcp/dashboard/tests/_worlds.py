@@ -7,7 +7,7 @@ back is typed here. Until the fixtures move into ``tests/testkit`` (E1-e) this i
 from __future__ import annotations
 
 import importlib
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from contextlib import AbstractContextManager
 from datetime import datetime
 from pathlib import Path
@@ -50,11 +50,16 @@ def queries_of(root: Path, now: Callable[[], datetime] | None = None) -> Dashboa
     return cast("DashboardQueries", getattr(wiring, "queries_of")(root, now))
 
 
-def demo(patch: pytest.MonkeyPatch, base: Path) -> DemoWorld:
-    """The demo organization ``acme`` at ``base``; its scheduler looks running."""
-    return cast("Callable[[pytest.MonkeyPatch, Path], DemoWorld]", getattr(_fixtures(), "demo"))(patch, base)
+def overriding(overrides: Mapping[type, object]) -> AbstractContextManager[None]:
+    """``orgmcp.app.wiring.overriding(overrides)``: the ports every runtime opened inside the block starts from (looked up by name: a package may not import it)."""
+    return cast("AbstractContextManager[None]", getattr(importlib.import_module("orgmcp.app.wiring"), "overriding")(overrides))
 
 
-def empty(patch: pytest.MonkeyPatch, base: Path) -> Organization:
-    """An organization that has only its root; its scheduler looks stopped."""
-    return cast("Callable[[pytest.MonkeyPatch, Path], Organization]", getattr(_fixtures(), "empty"))(patch, base)
+def demo(process_overrides: Callable[[Mapping[type, object]], object], base: Path) -> DemoWorld:
+    """The demo organization ``acme`` at ``base``; its scheduler looks running (the fake status is given to ``process_overrides``)."""
+    return cast("Callable[[Callable[[Mapping[type, object]], object], Path], DemoWorld]", getattr(_fixtures(), "demo"))(process_overrides, base)
+
+
+def empty(process_overrides: Callable[[Mapping[type, object]], object], base: Path) -> Organization:
+    """An organization that has only its root; its scheduler looks stopped (the fake status is given to ``process_overrides``)."""
+    return cast("Callable[[Callable[[Mapping[type, object]], object], Path], Organization]", getattr(_fixtures(), "empty"))(process_overrides, base)

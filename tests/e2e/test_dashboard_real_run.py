@@ -48,7 +48,7 @@ def _runner(mode):
     return build
 
 
-def test_a_real_run_with_fake_agents_shows_up(tmp_path, monkeypatch):
+def test_a_real_run_with_fake_agents_shows_up(tmp_path, process_overrides):
     """The real scheduler runs fake agents; the dashboard shows the finished request, the events, the trace and idle agents."""
     org = Org.init(tmp_path / "org", "Real run", {"poll_seconds": 0.05})
     org.hire(ROOT, "ceo", "Chief executive", "Run it.", can_hire=True, max_children=2)
@@ -62,7 +62,7 @@ def test_a_real_run_with_fake_agents_shows_up(tmp_path, monkeypatch):
             time.sleep(0.02)
     finally:
         sched.release()
-    set_scheduler(monkeypatch, SchedulerState("stopped"))
+    set_scheduler(process_overrides, SchedulerState("stopped"))
 
     async def fn(app, pilot):
         got = labels(app)
@@ -92,7 +92,7 @@ def test_a_real_run_with_fake_agents_shows_up(tmp_path, monkeypatch):
     run(go())
 
 
-def test_a_real_running_agent_is_shown_running_with_its_live_log(tmp_path, monkeypatch):
+def test_a_real_running_agent_is_shown_running_with_its_live_log(tmp_path, process_overrides):
     org = Org.init(tmp_path / "org", "Hang", {"poll_seconds": 0.05})
     org.hire(ROOT, "ceo", "Chief executive", "Run it.", can_hire=True, max_children=2)
     org.hire(ROOT, "ops", "Ops", "Ops.")
@@ -108,7 +108,7 @@ def test_a_real_running_agent_is_shown_running_with_its_live_log(tmp_path, monke
         org.send(ROOT, "ceo", "second", title="Second job")  # waits behind the run
         org.delegate(ROOT, "ops", "Ops job", "g", "a", budget=2)
         org.pause("ops", "manual pause")
-        scheduler_is(monkeypatch, SchedulerState("running", os.getpid(), "now"), org)
+        scheduler_is(process_overrides, SchedulerState("running", os.getpid(), "now"), org)
         time.sleep(0.3)
 
         async def fn(app, pilot):

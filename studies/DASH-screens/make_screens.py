@@ -10,6 +10,7 @@ with a frozen clock, so the pictures are the same every time.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import shutil
 import subprocess
 import sys
@@ -24,6 +25,7 @@ from testkit.dashboard_world import dash_app  # noqa: E402
 from testkit.dashdata_world import dd  # noqa: E402
 from testkit.scheduler import scheduler_is  # noqa: E402
 
+from orgmcp.app import wiring  # noqa: E402
 from orgmcp.dashboard._app import DashApp  # noqa: E402
 from orgmcp.daemon import SchedulerState  # noqa: E402
 
@@ -41,12 +43,12 @@ def save(app: DashApp, name: str) -> None:
 
 
 async def main() -> None:
-    class Patch:  # the one thing scheduler_is asks of a monkeypatch; the script ends with the process, nothing is undone
-        @staticmethod
-        def setattr(target: object, name: str, value: object) -> None:
-            setattr(target, name, value)
+    with contextlib.ExitStack() as stack:  # the process overrides stay in force while the screens are taken; the demo has no real scheduler
+        scheduler_is(lambda overrides: stack.enter_context(wiring.overriding(overrides)), SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))
+        await screens()
 
-    scheduler_is(Patch(), SchedulerState("running", 7000, "2026-10-18 10:00:00Z"))  # type: ignore[arg-type]  # the demo has no real scheduler
+
+async def screens() -> None:
     ns = demo_org(Path(tempfile.mkdtemp(prefix="dash-demo-")))
     once = dd.render_once(dd.DashData(ns.org.root, now=lambda: DEMO_NOW)).replace(str(ns.org.root), "/path/to/acme")
     (HERE / "once.txt").write_text(once + "\n", encoding="utf-8")

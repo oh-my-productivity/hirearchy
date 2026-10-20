@@ -1,7 +1,7 @@
 """The world of the command-line tests: the clock of every organization the command line opens, and the clock its commands wait by.
 
-The command line opens its own runtime for ``--root``, so a test cannot hand that runtime a clock; ``clock_is`` replaces the provider of ``Clock``
-in the table of the composition root (the way ``testkit.scheduler.scheduler_is`` does for the scheduler's status): every organization opened
+The command line opens its own runtime for ``--root``, so a test cannot hand that runtime a clock; ``clock_is`` gives the ``Clock`` to the process
+overrides of the composition root (the way ``testkit.scheduler.scheduler_is`` does for the scheduler's status): every organization opened
 afterwards - the one the test builds, the one the command line opens - reads that clock. ``cli_clocked`` is the command line whose commands
 sleep and time by a given clock (``obs now --watch``, ``obs events --follow``); ``SleepingClock`` is a ``FakeClock`` whose ``sleep`` is the test's.
 ``main`` is ``orgmcp.main``, the console entry (re-exported here: the package ``orgmcp`` loads the facade, which a test inside ``orgmcp.cli`` may not
@@ -10,13 +10,10 @@ import).
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime
 
-import pytest
-
 from orgmcp import main
-from orgmcp.app import wiring
 from orgmcp.app.wire_cli import run_cli
 from orgmcp.kernel import Clock
 from orgmcp.kernel.testing import T0, FakeClock
@@ -24,9 +21,9 @@ from orgmcp.kernel.testing import T0, FakeClock
 __all__ = ["SleepingClock", "cli_clocked", "clock_is", "main"]
 
 
-def clock_is(monkeypatch: pytest.MonkeyPatch, clock: Clock) -> Clock:
-    """Every organization opened until the end of the test (by the test, by the command line) reads ``clock``."""
-    monkeypatch.setattr(wiring, "_providers", {**wiring.providers(), Clock: lambda _: clock})
+def clock_is(process_overrides: Callable[[Mapping[type, object]], object], clock: Clock) -> Clock:
+    """Every organization opened until the end of the test (by the test, by the command line) reads ``clock`` (``process_overrides``: the fixture)."""
+    process_overrides({Clock: clock})
     return clock
 
 

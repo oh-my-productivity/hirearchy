@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from ._paths import OrgLayout
-from ._ports import AtomicWriter, Clock, Environment, IdGenerator, JsonObject, LedgerStore
+from ._ports import AtomicWriter, Clock, Environment, IdGenerator, JsonObject, LedgerStore, TokenSource
 from ._timeutil import STAMP_FORMAT
 
 
@@ -28,6 +28,11 @@ class SystemClock(Clock):
 
     def sleep(self, seconds: float) -> None:
         time.sleep(seconds)
+
+
+class SecretsTokens(TokenSource):
+    def token_hex(self, nbytes: int) -> str:
+        return secrets.token_hex(nbytes)
 
 
 class TimestampIdGenerator(IdGenerator):

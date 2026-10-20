@@ -10,7 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-# core attributes that tests patch (utcnow, atomic_write, secrets, split_frontmatter, _PARSED_MAX) or alias (_PARSED, Message)
+# core attributes that no test may leave replaced: the helpers that used to be patch points (utcnow, atomic_write, secrets: nothing reads them at call
+# time any more, a test gives a runtime its fakes through ``wiring.overriding``, captured below as ``wiring.overrides``) and the aliases of the parse cache
 CORE_NAMES = ("Message", "utcnow", "atomic_write", "secrets", "split_frontmatter", "_PARSED", "_PARSED_MAX")
 
 
@@ -23,18 +24,17 @@ class ProcessState:
     @staticmethod
     def capture() -> ProcessState:
         from orgmcp import core
-        from orgmcp.app import _compat, wiring
+        from orgmcp.app import wiring
         from orgmcp.kernel import Message
 
         resources = wiring.process_resources()
         values: dict[str, Any] = {f"core.{name}": getattr(core, name) for name in CORE_NAMES}
         values.update({
             "kernel.Message": Message,
-            "Message.load": vars(Message).get("load"),
             "wiring._process": wiring._process,
+            "wiring.overrides": wiring._overrides,
             "resources.message_parser": resources.message_parser,
             "message_parser.cache": resources.message_parser.cache,
-            "_compat.ENABLED": _compat.ENABLED,
         })
         return ProcessState(values)
 
@@ -50,15 +50,12 @@ def _same(a: Any, b: Any) -> bool:
 def restore(earlier: ProcessState) -> None:
     """Put back the patchable entries of ``earlier`` (the aliases that cannot be patched are only reported)."""
     from orgmcp import core
-    from orgmcp.app import _compat, wiring
-    from orgmcp.kernel import Message
+    from orgmcp.app import wiring
 
     for name in CORE_NAMES:
         setattr(core, name, earlier.values[f"core.{name}"])
     wiring._process = earlier.values["wiring._process"]
-    _compat.ENABLED = earlier.values["_compat.ENABLED"]
-    if earlier.values["Message.load"] is not None:
-        Message.load = earlier.values["Message.load"]  # type: ignore[attr-defined]
+    wiring._overrides = earlier.values["wiring.overrides"]
 
 
 def verify(before: ProcessState, nodeid: str) -> None:

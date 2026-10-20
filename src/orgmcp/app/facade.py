@@ -30,14 +30,11 @@ Method resolution order (the mixins define disjoint names, so the order only mat
      PromptsMixin       state_summary whoami run_prompt ...
      object
 
-Importing this module also attaches the legacy classmethod ``Message.load`` to the kernel's ``Message`` (served by the process
-parser, ``wiring.process_resources().message_parser``): the kernel's ``Message`` is pure data and the file reader belongs to the mail
-package (step A-mail). ``orgmcp.core`` re-exports ``Org`` and the module-level helpers listed below from here.
+``orgmcp.core`` re-exports ``Org`` and the module-level helpers listed below from here.
 """
 
 from __future__ import annotations
 
-from . import _compat
 from ._facade_access import AccessMixin
 from ._facade_agents import AgentsMixin
 from ._facade_bootstrap import BootstrapMixin
@@ -66,7 +63,6 @@ from ._facade_snapshots import SnapshotsMixin
 from ._facade_strays import StraysMixin
 from ._facade_telemetry import TelemetryMixin
 from ._facade_traces import TracesMixin
-from .wiring import process_resources
 
 __all__ = [
     "DEFAULT_CONFIG",
@@ -108,6 +104,3 @@ class Org(
     PromptsMixin,
 ):
     """The organization at ``root``: see the module docstring for the mixins and their order (the MRO)."""
-
-
-_compat.install_message_load(process_resources().message_parser)

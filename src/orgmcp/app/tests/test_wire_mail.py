@@ -4,13 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
-import orgmcp.core as core
 from orgmcp.agents import AgentDirectory
 from orgmcp.agents.testing import MemoryAgents
 from orgmcp.app import wire_mail, wiring
-from orgmcp.kernel import Message, OrgLayout, OrgPaths
+from orgmcp.kernel import AtomicWriter, Message, OrgLayout, OrgPaths
+from orgmcp.kernel.testing import RecordingAtomicWriter
 from orgmcp.mail import BatchStore, MailboxReader, MailboxWriter, MailFingerprint, MessageIndex, MessageParser, TaskQuery
 from orgmcp.mail._batch import FsBatchStore
 from orgmcp.mail._caching import DirectoryProbe, DirMtimeCachingMailbox
@@ -77,12 +75,11 @@ def test_the_ports_look_at_the_runtime_root(tmp_path: Path) -> None:
     assert [m.id for m in runtime.batches.begin("ceo")] == [msg.id] and runtime.mailbox.has_inflight("ceo")
 
 
-def test_the_messages_are_written_through_the_atomic_writer_of_the_runtime(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """``core.atomic_write`` is a patch point of the tests until they are converted: the writer of the runtime reads it at the time of the call."""
+def test_the_messages_are_written_through_the_atomic_writer_of_the_runtime(tmp_path: Path) -> None:
+    """The writer of the runtime is the ``AtomicWriter`` port: a test gives it another one through the overrides."""
     written: list[Path] = []
-    monkeypatch.setattr(core, "atomic_write", lambda path, text: written.append(path))
     msg = note(1)
-    wiring.open_runtime(tmp_path).mailbox_writer.store(msg)
+    wiring.open_runtime(tmp_path, {AtomicWriter: RecordingAtomicWriter(lambda path, text: written.append(path))}).mailbox_writer.store(msg)
     assert written == [tmp_path / "ceo" / "sent" / f"{msg.id}.md", tmp_path / "ceo" / "eng" / "inbox" / f"{msg.id}.md"]
 
 

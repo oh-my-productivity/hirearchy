@@ -17,7 +17,7 @@ from ._message import (
     latest_results,
 )
 from ._paths import OrgLayout, OrgPaths, inside, visible
-from ._ports import AtomicWriter, Clock, Environment, EventSink, IdGenerator, JsonObject, LedgerStore, Provider, TraceTap
+from ._ports import AtomicWriter, Clock, Environment, EventSink, IdGenerator, JsonObject, LedgerStore, Provider, TokenSource, TraceTap
 from ._text import TITLE_MAX, clip, clip_line, single, word_count
 from ._timeutil import STAMP_FORMAT, aware, fmt_dur, fmt_duration, msg_time, parse_time, stamp_of
 
@@ -46,6 +46,7 @@ __all__ = [
     "RUNTIME_NAMES",
     "STAMP_FORMAT",
     "TITLE_MAX",
+    "TokenSource",
     "TraceTap",
     "aware",
     "child_addr",

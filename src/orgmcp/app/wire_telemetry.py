@@ -1,45 +1,27 @@
-"""Providers of the ``telemetry`` ports (ARCHITECTURE.md 6.1), the event clock, and the process defaults of the legacy functions.
+"""Providers of the ``telemetry`` ports (ARCHITECTURE.md 6.1), and the process defaults of the legacy functions.
 
 The write side of the event log is shared by every runtime of the process (one file per process and day): the pool, the process name,
 the trace scope and the sinks of the roots are ``ProcessResources``; each runtime has its own sink over them, built from its own
-settings, ignore list, environment and clock.
+settings, ignore list, environment and event clock (the system's; a test fixes it with ``wiring.overriding``).
 """
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from pathlib import Path
 
-from .. import telemetry
-from ..kernel import Clock, Environment, EventSink, OrgLayout, TraceTap
+from ..kernel import Environment, EventSink, OrgLayout, TraceTap
 from ..kernel._system import SystemClock
 from ..settings import EventSwitch
 from ..snapshots import IgnoreList
 from ..telemetry import ArgumentSummarizer, EventRetention, EventSinks, ProcessLabel, TraceScope
-from ..telemetry._ports import DropLog
+from ..telemetry._ports import DropLog, EventClock
 from ..telemetry._process import ProcessDefaults, TraceChannel
 from ..telemetry._retention import FsEventRetention
 from ..telemetry._sink import FsEventSink
 from ..telemetry._summarize import JsonArgumentSummarizer
-from . import _compat
 from ._builder import Builder
 from ._resources import ProcessResources
 from .wiring import open_runtime, process_resources
-
-
-class PatchPointEventClock(SystemClock):
-    """The system clock whose ``now`` is whatever ``orgmcp.telemetry.datetime`` is at the time of the call.
-
-    The golden fixtures fix the time of the events by replacing that module attribute; the events of a test that replaces ``core.utcnow``
-    were never affected. Deleted with the legacy module (E3)."""
-
-    def now(self) -> datetime:
-        return telemetry.datetime.now(timezone.utc)
-
-
-def event_clock() -> Clock:
-    """The clock the events are stamped with (and the retention counts days with)."""
-    return PatchPointEventClock() if _compat.ENABLED else SystemClock()
 
 
 def register(b: Builder) -> None:
@@ -50,14 +32,15 @@ def register(b: Builder) -> None:
         EventSink,
         lambda b: FsEventSink(
             b.get(OrgLayout), resources(b).event_pool, resources(b).event_pool, b.get(EventSwitch), resources(b).process_label,
-            event_clock(), b.get(Environment), b.get(IgnoreList),
+            b.get(EventClock), b.get(Environment), b.get(IgnoreList),
         ),
     )
+    b.provide(EventClock, lambda b: SystemClock())
     b.provide(TraceTap, lambda b: resources(b).trace_scope)
     b.provide(TraceScope, lambda b: resources(b).trace_scope)
     b.provide(EventSinks, lambda b: resources(b).event_sinks)
     b.provide(ProcessLabel, lambda b: resources(b).process_label)
-    b.provide(EventRetention, lambda b: FsEventRetention(b.get(OrgLayout), event_clock(), resources(b).event_pool))
+    b.provide(EventRetention, lambda b: FsEventRetention(b.get(OrgLayout), b.get(EventClock), resources(b).event_pool))
     b.provide(ArgumentSummarizer, lambda b: JsonArgumentSummarizer())
 
 

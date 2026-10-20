@@ -26,8 +26,8 @@ def org(tmp_path, clock):
 
 
 @pytest.fixture
-def clock(monkeypatch):
-    return clock_is(monkeypatch, FakeClock())
+def clock(process_overrides):
+    return clock_is(process_overrides, FakeClock())
 
 
 @pytest.fixture
@@ -35,9 +35,9 @@ def story(org, clock):
     return Story(org, clock)
 
 
-def test_cli_views_and_json(org, story, capsys, monkeypatch):
+def test_cli_views_and_json(org, story, capsys, process_overrides):
     root = str(org.root)
-    clock_is(monkeypatch, FakeClock(NOW))  # the command line opens its own Org: its runtime gets the clock of the providers
+    clock_is(process_overrides, FakeClock(NOW))  # the command line opens its own Org: its runtime gets the clock of the providers
     main(["--root", root, "obs", "trace", story.task.id])
     assert "totals: wall" in capsys.readouterr().out
     main(["--root", root, "obs", "trace", story.task.id, "--json"])

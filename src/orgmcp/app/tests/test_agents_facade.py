@@ -9,9 +9,11 @@ from pathlib import Path
 
 import pytest
 
-import orgmcp.core as core
-from orgmcp.app import Org
-from orgmcp.kernel import OrgError
+from orgmcp.app import Org, wiring
+from orgmcp.kernel import AtomicWriter, Clock, OrgError
+from orgmcp.kernel._system import FsAtomicWriter
+from orgmcp.kernel.testing import FailingAtomicWriter
+from testkit.clocks import ClockReading
 
 SKELETON = ["AGENT.md", "MEMORY.md", "inbox", "inflight", "read", "runs", "sent", "work"]
 
@@ -51,18 +53,12 @@ def test_the_memory_is_read_as_the_agent_wrote_it(org: Org) -> None:
     assert org.memory("ceo") == "  # notes é\n\n"
 
 
-def test_the_charter_file_is_written_last(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
-    real = core.atomic_write
-
-    def flaky(path: Path, text: str) -> None:
-        if path.name == "AGENT.md":
-            raise OSError("disk full")
-        real(path, text)
-
-    monkeypatch.setattr(core, "atomic_write", flaky)
+def test_the_charter_file_is_written_last(org: Org) -> None:
+    flaky = FailingAtomicWriter(FsAtomicWriter(), lambda path: path.name == "AGENT.md", OSError("disk full"))
+    org.runtime = wiring.open_runtime(org.root, {AtomicWriter: flaky})
     with pytest.raises(OSError):
         org.hire("ceo", "new", "New", "Newer.")
-    monkeypatch.setattr(core, "atomic_write", real)
+    org.runtime = wiring.open_runtime(org.root)
     assert not org.exists("ceo/new") and "ceo/new" not in org.agents()
     assert sorted(p.name for p in org.dir("ceo/new").iterdir()) == [s for s in SKELETON if s != "AGENT.md"]
 
@@ -74,8 +70,8 @@ def test_hire_still_refuses_an_existing_agent_and_leaves_it_alone(org: Org) -> N
     assert (org.dir("ceo/ops") / "AGENT.md").read_bytes() == before
 
 
-def test_a_retired_team_moves_to_a_stamped_name_below_retired(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(core, "utcnow", lambda: datetime(2026, 10, 18, 10, 15, 0, tzinfo=timezone.utc))
+def test_a_retired_team_moves_to_a_stamped_name_below_retired(org: Org) -> None:
+    org.runtime = wiring.open_runtime(org.root, {Clock: ClockReading(lambda: datetime(2026, 10, 18, 10, 15, 0, tzinfo=timezone.utc))})
     assert org.retire("ceo", "eng", "done") == "ceo/eng"
     retired = org.root / ".retired" / "ceo.eng-20261018T101500"
     assert sorted(p.name for p in retired.iterdir()) == sorted([*SKELETON, "qa"])
@@ -91,15 +87,15 @@ def test_the_retired_archive_of_the_runtime_sees_what_retire_moved(org: Org) -> 
     assert [(t.name.split("-")[0], t.top_level) for t in trees] == [("ceo.eng", False), ("cto", True)]
 
 
-def test_a_charter_rewrite_goes_through_the_registry_and_the_atomic_write_patch_point(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_a_charter_rewrite_goes_through_the_registry_and_the_atomic_writer_of_the_runtime(org: Org) -> None:
     written: list[Path] = []
-    real = core.atomic_write
 
-    def spy(path: Path, text: str) -> None:
-        written.append(path)
-        real(path, text)
+    class Spy(FsAtomicWriter):
+        def write(self, path: Path, text: str) -> None:
+            written.append(path)
+            super().write(path, text)
 
-    monkeypatch.setattr(core, "atomic_write", spy)
+    org.runtime = wiring.open_runtime(org.root, {AtomicWriter: Spy()})
     org.write("ceo", "ceo/ops/AGENT.md", "---\nrole: Operator 2\n---\nNew words.\n")
     assert written == [org.dir("ceo/ops") / "AGENT.md"]
     meta, body = org.charter("ceo/ops")
