@@ -4,8 +4,8 @@
 that ARCHITECTURE.md 5.3 maps to its package (code moved verbatim from the former 98-def class in step M2), so that every feature
 step edits one small file of its own (``_facade_<pkg>.py``) and turns its bodies into calls to the interfaces of ``self.runtime``.
 
-Method resolution order (the mixins define disjoint names, so the order only matters for subclasses such as the dashboard's
-``LenientOrg``, which override methods of ``Org`` itself)::
+Method resolution order (the mixins define disjoint names and every method is a pure delegation, checked by
+``tests/architecture/test_facade_contract.py``; no subclass of ``Org`` overrides a method, so the order is documentation)::
 
     Org
      CoreMixin          __init__ norm parent depth child_addr dir new_id ledger save_ledger
