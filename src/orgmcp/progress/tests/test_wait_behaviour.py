@@ -1,9 +1,10 @@
-"""`progress`: waiting on blocked tasks whose team can still run, "Needs you", and run counts per root task."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
+from testkit.legacy.orgmcp.app import wire_attention
+from testkit.legacy.orgmcp.core import ROOT
 
-from orgmcp.app import wire_attention
-from orgmcp.core import ROOT
 from orgmcp.daemon import SchedulerState
 from orgmcp.daemon.testing import FakeSchedulerStatus
 from orgmcp.progress import describe_progress, progress, work_in_flight
@@ -64,8 +65,6 @@ def grant(org, n=3):
 
 
 # ------------------------------------------------------------------------------------------- waiting
-
-
 def test_a_blocked_task_whose_lead_has_a_grant_waiting_is_waited_for(org, blocked):
     grant(org)
     assert work_in_flight(org)
@@ -179,8 +178,6 @@ def test_describe_progress_waits_for_a_running_scheduler_on_a_blocked_task(org, 
 
 
 # ------------------------------------------------------------------------------------------ Needs you
-
-
 def test_every_unread_note_is_listed_with_its_id_including_the_first_budget_request(org, task):
     first = org.send("ceo", ROOT, "I need 2 more runs for the rework.\nDetails follow.", title="Budget request")
     second = org.send("ceo", ROOT, "BLOCKED: no budget left", title="BLOCKED: out of runs")
@@ -210,8 +207,6 @@ def test_a_note_that_starts_with_a_blank_line_gets_its_first_real_line(org):
 
 
 # ---------------------------------------------------------------------------------------- run counts
-
-
 def runs_line(org, task):
     return progress(org, task.id).splitlines()[0]
 

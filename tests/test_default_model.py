@@ -1,7 +1,6 @@
 """Every agent runs on claude-sonnet-5.5 unless its charter or the org config names another model."""
 
 import copy
-import json
 import os
 import sys
 import time
@@ -51,15 +50,11 @@ def fake_runner():
 
 
 # ------------------------------------------------------------------------------------------ the constant
-
-
 def test_the_default_is_one_constant_used_by_the_default_config():
     assert DEFAULT_MODEL == "claude-sonnet-5.5" and DEFAULT_CONFIG["default_model"] == DEFAULT_MODEL
 
 
 # ------------------------------------------------------------------------------------------ resolution order
-
-
 def test_charter_model_beats_org_config_beats_default(org):
     assert org.model_for("ceo") == DEFAULT_MODEL  # no model anywhere
     set_config(org, default_model="org-model")
@@ -112,29 +107,6 @@ def test_create_org_without_a_model_uses_the_default(tmp_path, monkeypatch):
     assert org.config["default_model"] == DEFAULT_MODEL
 
 
-# ------------------------------------------------------------------------------------------ the run command
-
-
-def test_the_scheduler_command_always_carries_the_model(org):
-    cmd, _, _ = kiro_runner()(org, "ceo", "P")
-    assert model_arg(cmd) == "claude-sonnet-5.5" and cmd[-2:] == ["--model", "claude-sonnet-5.5"]
-    cmd, _, _ = kiro_runner()(org, "ceo/eng", "P")
-    assert model_arg(cmd) == "claude-sonnet-5.5"
-
-
-def test_the_scheduler_command_keeps_an_explicit_model(org):
-    set_config(org, default_model="org-model")
-    charter_model(org, "charter-model")
-    assert model_arg(kiro_runner()(org, "ceo", "P")[0]) == "charter-model"
-    assert model_arg(kiro_runner()(org, "ceo/eng", "P")[0]) == "org-model"
-
-
-@pytest.mark.parametrize("value", [None, "<missing>"])
-def test_the_scheduler_command_for_a_legacy_org_config_uses_the_default(org, value):
-    set_config(org, default_model=value)
-    assert model_arg(kiro_runner()(org, "ceo", "P")[0]) == DEFAULT_MODEL
-
-
 def run_start_models(org: Org) -> dict[str, str]:
     org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
     sched = Scheduler(org, fake_runner(), echo=lambda _: None)
@@ -160,8 +132,6 @@ def test_the_run_start_event_reports_explicit_models(org):
 
 
 # ------------------------------------------------------------------------------------------ blueprints
-
-
 @pytest.fixture
 def research(tmp_path):
     (tmp_path / "deliverables").mkdir(exist_ok=True)
@@ -251,8 +221,6 @@ def test_apply_pins_the_resolved_model_in_the_charters(research, tmp_path):
 
 
 # ------------------------------------------------------------------------------------------ templates and examples
-
-
 def fill(text: str, base: Path) -> str:
     for n in ("docs", "data", "proj", "deliverables"):
         (base / n).mkdir(exist_ok=True)

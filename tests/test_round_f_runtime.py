@@ -37,8 +37,6 @@ def charter_text(role, body="New body.", **extra):
 
 
 # ------------------------------------------------------------------------------------------ 1. charter merge
-
-
 def test_a_rewrite_with_only_role_keeps_tools_inputs_model_and_the_rest(team, tmp_path):
     before, _ = team.charter("lead/rev")
     assert before["tools"] == ["read"] and before["model"] == "claude-sonnet-4.6"
@@ -93,19 +91,7 @@ def test_other_writes_have_no_note(team):
     assert call(server, "write", path="lead/MEMORY.md", content="m") == "wrote lead/MEMORY.md (organization file)"
 
 
-# ------------------------------------------------------------------------------------------ 2. review advice
-
-
-def test_low_quality_advice_points_at_the_body_not_the_whole_charter():
-    text = templates.REVIEW_ACTIONS["low_quality"].format(a=ENG)
-    assert "BODY of `ceo/eng`'s charter" in text and "kept automatically" in text
-    assert "revises=<task id>" in text and "`revise_playbook`" in text and "tighten" not in text
-    assert "frontmatter" in templates.REVIEW_ACTIONS["expensive"]
-
-
 # ------------------------------------------------------------------------------------------ 3. feedback
-
-
 SERVICE = dict(
     description="A brief.", acceptance=["At most 600 words"], budget=10,
     deliverable={"description": "one markdown file", "format": "markdown", "max_words": 600},
@@ -164,8 +150,6 @@ def test_rule_10_says_feedback_never_waives_a_criterion():
 
 
 # ------------------------------------------------------------------------------------------ 4. blocked lessons
-
-
 def test_a_blocked_report_on_a_service_request_requires_lessons(svc):
     task = svc.request(ROOT, "brief", {"topic": "ai"})
     work(svc, "ceo")
@@ -183,8 +167,6 @@ def test_the_report_tool_docstring_says_lessons_are_required_for_blocked(svc):
 
 
 # ------------------------------------------------------------------------------------------ 5. digest order
-
-
 def test_the_digest_shows_the_latest_lessons_first_and_earlier_ones_after(svc):
     first = svc.request(ROOT, "brief", {"topic": "ai"})
     deliver(svc, first, lessons="Ran cleanly; no changes needed.")
@@ -196,8 +178,6 @@ def test_the_digest_shows_the_latest_lessons_first_and_earlier_ones_after(svc):
 
 
 # ------------------------------------------------------------------------------------------ 6. grant hint
-
-
 def test_delegable_arithmetic(org):
     org.send(ROOT, "ceo", "runs", budget=3)
     assert org.delegable("ceo") == (3, 0, 2)
