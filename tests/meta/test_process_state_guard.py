@@ -58,3 +58,20 @@ def test_a_leaking_test_fails_by_itself_and_the_state_is_back() -> None:
     finally:
         core._PARSED = original
     process_state.verify(before, "clean")  # nothing left over: no failure
+
+
+@pytest.mark.xfail(strict=True, reason="red: E2-compat")
+def test_a_process_override_that_is_still_in_force_is_named_and_removed() -> None:
+    from orgmcp.kernel import Clock
+    from orgmcp.kernel._system import SystemClock
+
+    before = ProcessState.capture()
+    cm = wiring.overriding({Clock: SystemClock()})
+    cm.__enter__()  # not left again: a test that forgot to close its block
+    try:
+        assert ProcessState.capture().leaks_since(before) == ["wiring.overrides"]
+        with pytest.raises(pytest.fail.Exception, match=r"left process-global state replaced: wiring.overrides"):
+            process_state.verify(before, "some/test_x.py::test_leaks")
+        assert ProcessState.capture().leaks_since(before) == []  # put back: the next test is not affected
+    finally:
+        process_state.restore(before)

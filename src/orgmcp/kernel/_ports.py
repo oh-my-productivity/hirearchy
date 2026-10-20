@@ -40,6 +40,13 @@ class IdGenerator(Protocol):
 
 
 @runtime_checkable
+class TokenSource(Protocol):
+    def token_hex(self, nbytes: int) -> str:
+        """``2 * nbytes`` lowercase hex digits: the random part of a message id, the name of a temp file."""
+        ...
+
+
+@runtime_checkable
 class EventSink(Protocol):
     def emit(
         self,

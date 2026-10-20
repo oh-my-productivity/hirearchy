@@ -14,8 +14,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from ._paths import OrgPaths
-from ._ports import AtomicWriter, Clock, Environment, EventSink, IdGenerator, JsonObject, LedgerStore, TraceTap
-from ._system import FsAtomicWriter, FsLedgerStore, OsEnvironment, SystemClock, TimestampIdGenerator
+from ._ports import AtomicWriter, Clock, Environment, EventSink, IdGenerator, JsonObject, LedgerStore, TokenSource, TraceTap
+from ._system import FsAtomicWriter, FsLedgerStore, OsEnvironment, SecretsTokens, SystemClock, TimestampIdGenerator
 from ._timeutil import STAMP_FORMAT
 
 T0 = datetime(2026, 10, 18, 10, 0, 0, tzinfo=timezone.utc)
@@ -65,6 +65,22 @@ class SequenceIdGenerator(IdGenerator):
         n = self._count
         self._count = (n + 1) % 0x10000  # four hex digits, like the random part of a real id
         return f"{self._clock.now():{STAMP_FORMAT}}-{sender.replace('/', '.')}-{n:04x}"
+
+
+class CounterTokens(TokenSource):
+    """Tokens that count ``0``, ``1``, ``2`` ... instead of being random (so the ids of messages are the same in every run).
+
+    One counter for every length by default - the ids and the temp names of the atomic writes number off the same sequence, as the scenarios
+    that patched ``core.secrets`` had it; ``per_length`` keeps a counter for each byte length (what the golden suite had), so that a write does not
+    move the ids. ``counts`` is how many tokens were made, by byte length."""
+
+    def __init__(self, per_length: bool = False) -> None:
+        self._per_length = per_length
+        self.counts: dict[int, int] = {}
+        self._shared = 0
+
+    def token_hex(self, nbytes: int) -> str:
+        raise NotImplementedError
 
 
 @dataclass
@@ -216,6 +232,14 @@ def sequence_id_generator(tmp_path: Path) -> IdGenerator:
     return SequenceIdGenerator(FakeClock())
 
 
+def secrets_tokens(tmp_path: Path) -> TokenSource:
+    return SecretsTokens()
+
+
+def counter_tokens(tmp_path: Path) -> TokenSource:
+    return CounterTokens()
+
+
 def list_event_sink(tmp_path: Path) -> EventSink:
     return ListEventSink()
 
@@ -277,6 +301,7 @@ def dict_environment(tmp_path: Path) -> EnvHarness:
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     Clock: [system_clock, fake_clock],
     IdGenerator: [timestamp_id_generator, sequence_id_generator],
+    TokenSource: [secrets_tokens, counter_tokens],
     EventSink: [list_event_sink],
     TraceTap: [recording_trace_tap],
     AtomicWriter: [fs_atomic_writer, memory_atomic_writer],
