@@ -2,11 +2,12 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
-from testkit.legacy.orgmcp import observe
+from testkit import observability_world as observe
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.legacy.orgmcp.scheduler import SchedulerState
-from testkit.obs_fixtures import Story, freeze, stamp
-from testkit.scheduler import scheduler_is
+from testkit.obs_fixtures import Story, stamp
+from testkit.observability_world import freeze, scheduler_is
+
+from orgmcp.daemon import SchedulerState
 
 NOW = stamp(200)
 
@@ -23,8 +24,8 @@ def org(tmp_path):
 
 
 @pytest.fixture
-def clock(monkeypatch):
-    return freeze(monkeypatch)
+def clock(org):
+    return freeze(org)
 
 
 @pytest.fixture

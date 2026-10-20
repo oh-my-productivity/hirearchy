@@ -4,9 +4,10 @@
 from datetime import timedelta
 
 import pytest
-from testkit.legacy.orgmcp import observe
+from testkit import observability_world as observe
 from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
-from testkit.obs_fixtures import Story, freeze, stamp
+from testkit.obs_fixtures import Story, stamp
+from testkit.observability_world import freeze
 
 NOW = stamp(200)
 
@@ -23,8 +24,8 @@ def org(tmp_path):
 
 
 @pytest.fixture
-def clock(monkeypatch):
-    return freeze(monkeypatch)
+def clock(org):
+    return freeze(org)
 
 
 @pytest.fixture

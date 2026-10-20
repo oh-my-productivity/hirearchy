@@ -8,11 +8,12 @@ import time
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp import observe
+from testkit import observability_world as observe
 from testkit.legacy.orgmcp.core import ROOT, Org, OrgError
 from testkit.legacy.orgmcp.progress import progress
-from testkit.legacy.orgmcp.scheduler import Scheduler
-from testkit.obs_fixtures import EventLog, Story, freeze, stamp
+from testkit.health_world import Scheduler
+from testkit.obs_fixtures import EventLog, Story, stamp
+from testkit.observability_world import freeze
 
 FAKE = str(testkit.FAKE_AGENT)
 NOW = stamp(200)
@@ -30,8 +31,8 @@ def org(tmp_path):
 
 
 @pytest.fixture
-def clock(monkeypatch):
-    return freeze(monkeypatch)
+def clock(org):
+    return freeze(org)
 
 
 @pytest.fixture

@@ -1,18 +1,19 @@
 # mypy: ignore-errors
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
-import dataclasses
 import os
 import sys
 import time
 
 import pytest
 import testkit
-from testkit.legacy.orgmcp import observe
+from testkit import observability_world as observe
+from testkit.health_world import Scheduler, with_ports
 from testkit.legacy.orgmcp.core import ROOT, Message, Org
-from testkit.legacy.orgmcp.scheduler import Scheduler
-from testkit.obs_fixtures import T0, EventLog, Story, freeze, stamp
+from testkit.obs_fixtures import T0, EventLog, Story, stamp
+from testkit.observability_world import freeze
 
+from orgmcp.processes import OrphanJudge
 from orgmcp.processes.testing import fake_world
 
 FAKE = str(testkit.FAKE_AGENT)
@@ -31,8 +32,8 @@ def org(tmp_path):
 
 
 @pytest.fixture
-def clock(monkeypatch):
-    return freeze(monkeypatch)
+def clock(org):
+    return freeze(org)
 
 
 @pytest.fixture
@@ -187,7 +188,7 @@ def test_check_inflight_with_a_live_recorded_process_passes(org, clock, monkeypa
     world = fake_world(tmp_path)  # the process 99999 of the record is a session leader that started at "x": ours; then it is gone
     table = world.spawner
     table.add(99999, started="x")
-    monkeypatch.setattr(org, "runtime", dataclasses.replace(org.runtime, orphan_judge=world.judge))
+    with_ports(org, {OrphanJudge: world.judge})
     assert by_id(observe.check(org, now=stamp(10)))["c"]["ok"]
     table.exit(99999)
     assert not by_id(observe.check(org, now=stamp(10)))["c"]["ok"]
