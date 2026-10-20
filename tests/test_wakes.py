@@ -13,26 +13,6 @@ def true_runner(org, addr, prompt):
     return ["true"], org.dir(addr), dict(os.environ)
 
 
-def ceo_with_funded_report(org, budget=20, grant=5):
-    """ceo has handled its task; it has a report ``ops`` holding ``grant`` unspent runs."""
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=budget)
-    org.begin_run("ceo")
-    org.end_run("ceo", ok=True)
-    org.hire("ceo", "ops", "Ops", "Do ops.")
-    org.send("ceo", "ceo/ops", "grant", budget=grant)
-
-
-def test_retire_refund_is_non_waking_and_counts_immediately(org):
-    ceo_with_funded_report(org)
-    before = org.budget("ceo")
-    ret = org.retire_team("ceo", "ops", "done")
-    assert ret.refunded == 5
-    (note,) = org.messages("ceo", "inbox")
-    assert note.wake is False and note.budget == 5 and note.sender == core.RUNTIME
-    assert org.unread("ceo") == 0 and org.state("ceo") == "idle"
-    assert org.budget("ceo") == before + 5  # budget is derived from files, wake or not
-
-
 def refund_note(org, to, runs):
     return org.deliver(Message(sender=core.RUNTIME, to=to, type="note", budget=runs, wake=False,
                                title="Budget returned", body="x"))

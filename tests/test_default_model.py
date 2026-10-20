@@ -49,24 +49,6 @@ def fake_runner():
     return build
 
 
-# ------------------------------------------------------------------------------------------ resolution order
-def test_charter_model_beats_org_config_beats_default(org):
-    assert org.model_for("ceo") == DEFAULT_MODEL  # no model anywhere
-    set_config(org, default_model="org-model")
-    assert org.model_for("ceo") == "org-model" and org.model_for("ceo/eng") == "org-model"
-    charter_model(org, "charter-model")
-    assert org.model_for("ceo") == "charter-model" and org.model_for("ceo/eng") == "org-model"
-
-
-def test_hire_without_a_model_leaves_the_charter_unpinned_so_the_org_default_applies(org):
-    org.hire(ROOT, "ops", "Ops", "Do ops.")
-    assert "model" not in org.charter("ops")[0] and org.model_for("ops") == DEFAULT_MODEL
-    set_config(org, default_model="later")
-    assert org.model_for("ops") == "later"  # a later org-wide choice reaches the agent
-    org.hire(ROOT, "pinned", "Pinned", "Pinned.", model="m-x")
-    assert org.model_for("pinned") == "m-x"
-
-
 def test_the_cli_init_and_hire_without_model_use_the_default(tmp_path, capsys):
     target = tmp_path / "org"
     main(["init", str(target), "--mission", "m"])

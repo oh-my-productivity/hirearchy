@@ -1,6 +1,8 @@
-import pytest
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
-from orgmcp.core import OrgError
+import pytest
+from testkit.legacy.orgmcp.core import OrgError
 
 
 def words(n):

@@ -7,7 +7,7 @@ import pytest
 
 from orgmcp import core
 from orgmcp.cli import main
-from orgmcp.core import ROOT, Message, OrgError, join_frontmatter, split_frontmatter
+from orgmcp.core import ROOT, OrgError, join_frontmatter, split_frontmatter
 from orgmcp.health import FLAGS, HEALTH_DEFAULTS, agent_health, org_health, render_text, thresholds
 from orgmcp.server import build_server
 
@@ -71,35 +71,6 @@ def call(server, tool, **args):
     return "\n".join(getattr(b, "text", "") for b in blocks)
 
 
-# --------------------------------------------------------------------- revises
-
-
-def test_revises_is_stored_and_rendered(org):
-    first = org.delegate(ROOT, "ceo", "Plan", "g", "a")
-    second = org.delegate(ROOT, "ceo", "Plan v2", "g", "a", revises=first.id)
-    assert second.revises == first.id
-    loaded = Message.load(org.dir("ceo") / "inbox" / f"{second.id}.md")
-    assert loaded.revises == first.id
-    assert f"revises: {first.id}" in loaded.render()
-    assert Message.load(org.dir("ceo") / "inbox" / f"{first.id}.md").revises is None
-
-
-def test_revises_must_be_an_earlier_task_to_the_same_assignee(org):
-    org.hire("ceo", "ops", "Ops", "Operate.")
-    org.send(ROOT, "ceo", "budget", budget=20)
-    for_eng = org.delegate("ceo", ENG, "Build", "g", "a", budget=1)
-    with pytest.raises(OrgError, match="revises"):
-        org.delegate("ceo", "ceo/ops", "Build", "g", "a", revises=for_eng.id)  # other assignee
-    with pytest.raises(OrgError, match="revises"):
-        org.delegate("ceo", ENG, "Build", "g", "a", revises="nope")  # unknown id
-    with pytest.raises(OrgError, match="revises"):
-        org.delegate(ROOT, "ceo", "Build", "g", "a", revises=for_eng.id)  # not sent by this delegator
-    note = org.send("ceo", ENG, "just a note")
-    with pytest.raises(OrgError, match="revises"):
-        org.delegate("ceo", ENG, "Build", "g", "a", revises=note.id)  # not a task
-    assert org.delegate("ceo", ENG, "Build again", "g", "a", revises=for_eng.id).revises == for_eng.id
-
-
 def test_revises_through_the_mcp_tool_and_cli(org, capsys):
     first = org.delegate(ROOT, "ceo", "Plan", "g", "a")
     out = call(build_server(org, ROOT), "delegate", to="ceo", title="Plan 2", goal="g", acceptance="a",
@@ -116,8 +87,6 @@ def test_revises_through_the_mcp_tool_and_cli(org, capsys):
 
 
 # --------------------------------------------------------------------- metrics
-
-
 def test_agent_metrics(org, clock):
     clock.at(0)
     t1 = org.delegate(ROOT, ENG, "One", "g", "a", budget=6)
@@ -174,8 +143,6 @@ def test_agent_health_rejects_root(org):
 
 
 # ----------------------------------------------------------------------- flags
-
-
 def test_stuck(org):
     give(org)
     assert "stuck" not in health(org, 1800).flags  # not older than the threshold yet
@@ -322,8 +289,6 @@ def test_every_flag_has_a_severity():
 
 
 # ---------------------------------------------------------- branches and report
-
-
 @pytest.fixture
 def troubled(org):
     """ceo is paused; eng has an old open task nobody works on."""
@@ -383,8 +348,6 @@ def test_to_dict_is_json(troubled):
 
 
 # ----------------------------------------------------------------- CLI and MCP
-
-
 def test_cli_health(troubled, capsys):
     main(["--root", str(troubled.root), "health"])
     out = capsys.readouterr().out

@@ -1,8 +1,8 @@
-"""The task contract: visible in every run prompt (QA-17) and affordable to delegate (QA-18)."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
-
-from orgmcp.core import ROOT, OrgError
+from testkit.legacy.orgmcp.core import ROOT, OrgError
 
 ENG = "ceo/eng"
 

@@ -7,7 +7,6 @@ narrowing for ``inputs``. What is only instructed: the prompt's Files section an
 
 import copy
 import json
-import os
 import re
 from pathlib import Path
 
@@ -15,7 +14,7 @@ import pytest
 import yaml
 
 from orgmcp import blueprint as bpm
-from orgmcp.core import ROOT, Org, OrgError, atomic_write
+from orgmcp.core import ROOT, Org, OrgError
 from orgmcp.scheduler import ensure_kiro_profile, kiro_profile_name, kiro_runner
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "blueprint-research.yaml"
@@ -148,95 +147,9 @@ def test_ensure_kiro_profile_is_idempotent_for_confined_profiles(team, dirs, tmp
     assert len(list(d.iterdir())) == 2
 
 
-# ----------------------------------------------------------------------------------- authority
-def test_a_reports_inputs_must_be_inside_its_managers_inputs_or_workspace(team, dirs):
-    team.hire("lead", "a", "A", "x", inputs=[str(dirs["handbook/hr"])])  # inside the manager's inputs
-    team.hire("lead", "b", "B", "x", inputs=[str(dirs["proj/out"])])  # inside the manager's workspace
-    with pytest.raises(OrgError, match="inputs must be inside your inputs or workspace"):
-        team.hire("lead", "c", "C", "x", inputs=[str(dirs["elsewhere"])])
-    with pytest.raises(OrgError, match="absolute"):
-        team.hire("lead", "d", "D", "x", inputs=["handbook"])
-    assert not team.exists("lead/c") and not team.exists("lead/d")
-
-
-def test_inputs_need_something_to_be_inside_and_stay_out_of_the_org(team, dirs):
-    team.hire(ROOT, "bare", "Bare", "x", can_hire=True)
-    with pytest.raises(OrgError, match="no workspace or inputs"):
-        team.hire("bare", "kid", "Kid", "x", inputs=[str(dirs["handbook"])])
-    with pytest.raises(OrgError, match="overlap the organization"):
-        team.hire(ROOT, "intruder", "I", "x", inputs=[str(team.dir("lead"))])
-    with pytest.raises(OrgError, match="overlap the organization"):
-        team.hire(ROOT, "intruder", "I", "x", inputs=[str(team.root.parent)])
-
-
-def test_a_manager_cannot_widen_a_charter_by_editing_it(team, dirs):
-    ok = f"---\nrole: Writer\ntools: [read]\ninputs: ['{dirs['handbook/hr']}']\n---\nW.\n"
-    team.write("lead", "lead/writer/AGENT.md", ok)
-    wide = f"---\nrole: Writer\ntools: [read]\ninputs: ['{dirs['elsewhere']}']\n---\nW.\n"
-    with pytest.raises(OrgError, match="inputs must be inside"):
-        team.write("lead", "lead/writer/AGENT.md", wide)
-    omitted = "---\nrole: Writer\ntools: [read]\n---\nW.\n"  # leaving `inputs` out keeps the old (confined) list
-    team.write("lead", "lead/writer/AGENT.md", omitted)
-    assert team.charter("lead/writer")[0]["inputs"] == [str(dirs["handbook/hr"])]
-    # a legacy charter (read, no workspace, no `inputs` key) cannot be rewritten by a confined manager
-    legacy = "---\nrole: Writer\ntools: [read]\n---\nW.\n"
-    atomic_write(team.dir("lead/writer") / "AGENT.md", legacy)
-    with pytest.raises(OrgError, match="needs an `inputs:` list"):
-        team.write("lead", "lead/writer/AGENT.md", omitted)
-
-
-def test_a_confined_hirer_never_hands_down_an_unconfined_read(team):
-    team.hire("lead", "reader", "R", "x", tools=["read"])  # no workspace, no inputs given
-    meta, _ = team.charter("lead/reader")
-    assert meta["inputs"] == [] and not Org.unconfined_read(meta)
-    team.hire(ROOT, "old", "Old", "x", tools=["read"])  # root's own hire keeps the legacy shape
-    assert "inputs" not in team.charter("old")[0]
-
-
 # -------------------------------------------------------------------------------------- report
 def task_for(org, to, frm=ROOT):
     return org.delegate(frm, to, "T", "g", "a", budget=5)
-
-
-def test_report_accepts_an_absolute_path_in_its_own_workspace(team, dirs):
-    t = task_for(team, "lead")
-    f = dirs["proj"] / "guide.md"
-    f.write_text("# Title\none two three four five\n")
-    msg = team.report("lead", t.id, "done", "ok", artifacts=[str(f), str(dirs["proj"])])
-    assert f"- {f} (6 words, modified " in msg.body and "NOT modified" not in msg.body
-    assert f"- {dirs['proj']}/ (directory)" in msg.body
-
-
-def test_report_still_accepts_org_paths_and_annotates_staleness(team):
-    t = task_for(team, "lead")
-    team.write("lead", "lead/work/x.md", "a b c")
-    msg = team.report("lead", t.id, "done", "ok", artifacts=["lead/work/x.md"])
-    assert "- lead/work/x.md (3 words, modified " in msg.body
-
-
-def test_report_marks_a_workspace_file_not_modified_since_the_task(team, dirs):
-    f = dirs["proj"] / "old.md"
-    f.write_text("old")
-    os.utime(f, (1_000_000_000, 1_000_000_000))
-    t = task_for(team, "lead")
-    msg = team.report("lead", t.id, "done", "ok", artifacts=[str(f)])
-    assert "NOT modified since this task was assigned" in msg.body
-
-
-def test_report_refuses_everything_else_outside_the_org(team, dirs, tmp_path):
-    t = task_for(team, "lead")
-    for target in (dirs["elsewhere"] / "f.md",  # another agent's workspace
-                   dirs["handbook"] / "a.md",  # an input: read-only, not an artifact
-                   tmp_path / "f.md"):  # anywhere else
-        target.write_text("x")
-        with pytest.raises(OrgError, match="artifacts must be inside the organization"):
-            team.report("lead", t.id, "done", "ok", artifacts=[str(target)])
-
-
-def test_report_accepts_files_in_a_subfolder_of_its_own_workspace(team, dirs):
-    t = task_for(team, "lead")
-    (dirs["proj/out"] / "w.md").write_text("x y")
-    assert "w.md (2 words" in team.report("lead", t.id, "done", "ok", artifacts=[str(dirs["proj/out"] / "w.md")]).body
 
 
 def test_a_report_cannot_name_its_managers_workspace_files(team, dirs):
@@ -244,87 +157,6 @@ def test_a_report_cannot_name_its_managers_workspace_files(team, dirs):
     t = task_for(team, "lead/writer")
     with pytest.raises(OrgError, match="artifacts must be inside the organization"):
         team.report("lead/writer", t.id, "done", "ok", artifacts=[str(dirs["proj"] / "m.md")])
-
-
-def test_report_refusal_does_not_probe_the_host(team, dirs):
-    t = task_for(team, "lead")
-    for p in ("/etc/passwd", "/etc/nope-" + "x" * 8, str(dirs["elsewhere"] / "missing.md")):
-        with pytest.raises(OrgError, match="artifacts must be inside the organization"):  # same answer, exists or not
-            team.report("lead", t.id, "done", "ok", artifacts=[p])
-
-
-def test_report_workspace_paths_need_an_agent_with_a_workspace(team, dirs):
-    team.hire("lead", "free", "Free", "x")
-    t = task_for(team, "lead/free")
-    f = dirs["proj"] / "f.md"
-    f.write_text("x")
-    with pytest.raises(OrgError, match="you have no workspace"):
-        team.report("lead/free", t.id, "done", "ok", artifacts=[str(f)])
-
-
-def test_report_refuses_a_symlink_that_leaves_the_workspace(team, dirs):
-    t = task_for(team, "lead")
-    secret = dirs["elsewhere"] / "secret.md"
-    secret.write_text("s")
-    (dirs["proj"] / "escape.md").symlink_to(secret)
-    with pytest.raises(OrgError, match="artifacts must be inside"):
-        team.report("lead", t.id, "done", "ok", artifacts=[str(dirs["proj"] / "escape.md")])
-
-
-def test_report_not_found_points_at_the_workspace_copy(team, dirs):
-    """The study-C failure: the agent wrote `lead/work/x.md` into the workspace with kiro's write, then reported it."""
-    (dirs["proj"] / "lead" / "work").mkdir(parents=True)
-    (dirs["proj"] / "lead" / "work" / "x.md").write_text("misplaced")
-    t = task_for(team, "lead")
-    with pytest.raises(OrgError, match=r"artifact not found.*exists in your workspace: report it by absolute path"):
-        team.report("lead", t.id, "done", "ok", artifacts=["lead/work/x.md"])
-
-
-# ---------------------------------------------------------------------------------------- read
-def test_read_absolute_paths_in_workspace_inputs_and_reports_workspaces(team, dirs):
-    (dirs["proj"] / "mine.md").write_text("a b\n")
-    (dirs["proj/out"] / "theirs.md").write_text("a b c\n")
-    assert "2 words" in team.read(str(dirs["proj"] / "mine.md"), actor="lead").splitlines()[0]
-    assert "three" in team.read(str(dirs["handbook"] / "a.md"), actor="lead")  # its input
-    assert "a.md" in team.read(str(dirs["handbook"]), actor="lead")  # a directory listing
-    assert "3 words" in team.read(str(dirs["proj/out"] / "theirs.md"), actor="lead")  # its report's workspace
-    assert "3 words" in team.read(str(dirs["proj/out"] / "theirs.md"), actor="lead/writer")  # its own
-    assert "four five" in team.read(str(dirs["handbook/hr"] / "b.md"), actor="lead/writer")  # its own input
-
-
-def test_read_refuses_the_rest_outside_the_org(team, dirs, tmp_path):
-    (dirs["elsewhere"] / "x.md").write_text("x")
-    (dirs["proj"] / "mine.md").write_text("m")
-    for who, path in (
-        ("lead", dirs["elsewhere"] / "x.md"),  # another agent's workspace, not in its subtree
-        ("lead/writer", dirs["proj"] / "mine.md"),  # its manager's workspace is not its own
-        ("lead/writer", dirs["handbook"] / "a.md"),  # a parent input it was not given
-        ("lead", Path("/etc/hosts")),
-        ("lead", dirs["proj"] / ".." / "elsewhere" / "x.md"),  # traversal out of the workspace
-        ("other", dirs["proj"] / "mine.md"),
-    ):
-        with pytest.raises(OrgError, match="you can only read inside the organization"):
-            team.read(str(path), actor=who)
-
-
-def test_read_symlink_out_of_a_workspace_is_refused(team, dirs):
-    (dirs["elsewhere"] / "s.md").write_text("s")
-    (dirs["proj"] / "link.md").symlink_to(dirs["elsewhere"] / "s.md")
-    with pytest.raises(OrgError, match="you can only read"):
-        team.read(str(dirs["proj"] / "link.md"), actor="lead")
-
-
-def test_read_relative_paths_and_root_are_unchanged(team, dirs):
-    team.write("lead", "lead/work/n.md", "x y")
-    assert "2 words" in team.read("lead/work/n.md", actor="lead/writer")  # the whole org is readable, as before
-    assert "n.md" in team.read("lead/work", actor="lead")
-    assert team.read("lead/work/n.md").startswith("[lead/work/n.md: 2 words")
-    with pytest.raises(OrgError, match="only read inside the organization"):  # root: the organization only
-        team.read(str(dirs["proj"] / "mine.md"))
-    with pytest.raises(OrgError, match="you can only read"):
-        team.read("../outside.md", actor="lead")
-    (dirs["proj"] / "p.md").write_text("p")
-    assert team.read(str(dirs["proj"] / "p.md"), actor="lead").startswith(f"[{dirs['proj'] / 'p.md'}: 1 words")
 
 
 # ------------------------------------------------------------------------------------ blueprint

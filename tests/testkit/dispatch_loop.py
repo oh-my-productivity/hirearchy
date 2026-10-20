@@ -1,0 +1,23 @@
+"""The scheduler's loop over the runtime of an organization, for the dispatch tests that need a whole scheduler pass (qa4: an oversized message must not
+wedge the agent) with a stand-in binary instead of kiro-cli.
+
+The run command is the real one (``KiroRunCommandBuilder`` over the ports of the runtime, with ``kiro_bin`` as the binary); the profile it asks for is
+written to a ``MemoryProfileStore``, not to ``~/.kiro/agents`` (what the patch of ``scheduler.ensure_kiro_profile`` kept the test from doing).
+"""
+
+from __future__ import annotations
+
+from orgmcp.app import wire_kiro, wire_scheduler, wiring
+from orgmcp.kernel._system import SystemClock
+from orgmcp.kiro import McpServerLocator, ProfileStore
+from orgmcp.kiro.testing import MemoryProfileStore, StaticMcpServerLocator
+from orgmcp.scheduler._loop import HeartbeatLoop
+from orgmcp.scheduler._run import LoopState
+from orgmcp.scheduler.testing import RecordingConsole
+
+
+def loop_over(org, kiro_bin: str) -> HeartbeatLoop:
+    """The loop of ``org`` (whose runtime now writes its kiro profiles to memory) that runs ``kiro_bin`` for every agent."""
+    org.runtime = wiring.open_runtime(org.root, {ProfileStore: MemoryProfileStore(), McpServerLocator: StaticMcpServerLocator()})
+    commands = wire_kiro.run_command_builder(org.runtime, kiro_bin, org.runtime.profile_provisioner)
+    return wire_scheduler.loop_of(org.runtime, commands, RecordingConsole(), SystemClock(), LoopState())

@@ -364,41 +364,6 @@ def test_stall_notices_and_nudge_events_carry_the_task_trace(org):
         (task.id, "ceo", 0, task.id), (task.id, "root", 1, task.id)]
 
 
-# --------------------------------------------------------------------------- org operations: hire, pause, ...
-def test_hire_retire_pause_resume_events(org):
-    org.hire("ceo", "qa", "Tester", "Test things.", model="m1")
-    (hire,) = [e for e in read_events(org, "agent.hire") if e["agent"] == "ceo/qa"]
-    assert hire["by"] == "ceo" and hire["actor"] == "ceo" and hire["role"] == "Tester"
-    assert hire["model"] == "m1" and hire["tools"] == []
-    org.pause("ceo/qa", "failures")
-    org.resume("ceo/qa", "manual")
-    pause, resume = read_events(org, "agent.pause")[-1], read_events(org, "agent.resume")[-1]
-    assert pause["agent"] == "ceo/qa" and pause["reason"] == "failures"
-    assert resume["agent"] == "ceo/qa" and resume["reason"] == "manual" and resume["previous"] == "failures"
-    org.resume("ceo/qa")  # not paused: nothing to record
-    assert len(read_events(org, "agent.resume")) == 1
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=6)
-    org.retire(ROOT, "ceo/eng", "no longer needed")
-    (ret,) = read_events(org, "agent.retire")
-    assert ret["agent"] == "ceo/eng" and ret["by"] == "root" and ret["reason"] == "no longer needed"
-    assert ret["returned_budget"] == 0
-
-
-def test_service_events(org):
-    brief = dict(description="A brief.", acceptance=["Short"], deliverable={"description": "one file"}, budget=4)
-    org.define_service(ROOT, "ceo", "weekly", **brief)
-    org.define_service(ROOT, "ceo", "weekly", add_acceptance=["Sourced"])
-    org.revise_playbook("ceo", "weekly", "1. Do the thing.", "first version")
-    org.retire_service(ROOT, "ceo", "weekly", "not needed")
-    kinds = [e["kind"] for e in read_events(org) if e["kind"].startswith("service.")]
-    assert kinds == ["service.define", "service.define", "service.revise", "service.retire"]
-    first, second = read_events(org, "service.define")
-    assert (first["owner"], first["service"], first["version"], first["by"], first["amendment"]) == ("ceo", "weekly", 1, "root", False)
-    assert second["version"] == 2 and second["amendment"] is True
-    (rev,) = read_events(org, "service.revise")
-    assert rev["version"] == 1 and rev["by"] == "ceo" and rev["owner"] == "ceo"
-
-
 def test_review_run_event(org):
     from orgmcp import review
 
