@@ -15,12 +15,12 @@ from typing import Any
 import pytest
 import testkit
 from testkit.dash_fixtures import DEMO_NOW, big_org, demo_org
-from testkit.legacy.orgmcp import dashboard_data as dd
-from testkit.legacy.orgmcp.app import wire_dashdata, wiring
+from testkit.dashdata_world import dd
 from testkit.legacy.orgmcp.core import ROOT
 from testkit.obs_fixtures import T0
 from testkit.scheduler import scheduler_is
 
+from orgmcp.app import wire_dashdata, wiring
 from orgmcp.daemon import SchedulerState
 from orgmcp.kernel import BOXES, AtomicWriter, EventSink
 from orgmcp.mail import MessageParser

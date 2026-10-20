@@ -9,12 +9,12 @@ from datetime import timedelta
 
 import pytest
 from testkit.dash_fixtures import DEMO_NOW, big_org, demo_org, set_scheduler, write_running_json
-from testkit.legacy.orgmcp import dashboard_data as dd, observe
+from testkit.dashdata_world import dd, observe
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.legacy.orgmcp.scheduler import SchedulerState
 from testkit.obs_fixtures import T0, EventLog, stamp
 from testkit.scheduler import scheduler_is
 
+from orgmcp.daemon import SchedulerState
 from orgmcp.progress import progress
 
 
