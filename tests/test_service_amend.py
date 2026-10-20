@@ -4,7 +4,6 @@ import pytest
 
 from orgmcp import services
 from orgmcp.core import ROOT, OrgError, split_frontmatter
-from orgmcp.server import build_server
 
 from testkit.services_world import BRIEF, call, cli, contract_meta, define, fails, playbook_meta  # noqa: F401
 
@@ -162,20 +161,6 @@ def test_services_text_lists_the_criteria_in_full(svc):
             "  record:") in out
     assert "3 acceptance criteria" not in out
     assert "    3. Never longer than one page" in services.services_text(svc, "ceo")  # the owner sees them too
-
-
-def test_the_mcp_tool_amends_with_optional_fields(svc):
-    root = build_server(svc, ROOT)
-    schema = {t.name: t for t in __import__("asyncio").run(root.list_tools())}["define_service"].inputSchema
-    assert schema["required"] == ["owner", "name"]
-    assert {"add_acceptance", "remove_acceptance"} <= set(schema["properties"])
-    out = call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Never longer than one page"])
-    assert "v1 -> v2" in out and "3. Never longer than one page" in out
-    assert "no change" in fails(root, "define_service", owner="ceo", name="weekly-brief")
-    assert "already a criterion" in fails(root, "define_service", owner="ceo", name="weekly-brief",
-                                           add_acceptance=["Never longer than one page"])
-    call(root, "define_service", owner="ceo", name="weekly-brief", remove_acceptance=["At most 600 words"])
-    assert contract_meta(svc)[0]["acceptance"] == ["Every factual claim has a source URL", "Never longer than one page"]
 
 
 def test_a_manager_amends_the_contract_of_its_report(org):

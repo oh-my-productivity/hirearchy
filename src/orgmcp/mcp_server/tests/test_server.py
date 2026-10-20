@@ -1,7 +1,10 @@
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
+
 import asyncio
 
-from orgmcp.core import ROOT
-from orgmcp.server import build_server
+from testkit.legacy.orgmcp.core import ROOT
+from testkit.legacy.orgmcp.server import build_server
 
 
 def call(server, tool, **args):

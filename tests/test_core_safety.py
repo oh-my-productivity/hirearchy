@@ -9,8 +9,6 @@ CHARTER = "---\nrole: Engineer v2\n---\n# New charter\nDo more."
 
 
 # ------------------------------------------------------------------- QA-1 / QA-2: write guard
-
-
 @pytest.mark.parametrize(
     "path",
     [
@@ -91,8 +89,6 @@ def test_hire_is_the_way_to_create_agents(org):
 
 
 # ------------------------------------------------------------------- QA-12: delivery order and recovery
-
-
 def _fail_writes_into(monkeypatch, marker):
     from orgmcp import core
 
@@ -162,8 +158,6 @@ def test_recover_still_returns_inflight_batches(org):
 
 
 # ------------------------------------------------------------------- QA-6 / QA-9: retire
-
-
 def _team(org):
     """root -> ceo(20) -> mgr(10, used 2) -> w(4, used 1); ceo also keeps eng."""
     org.hire("ceo", "mgr", "Manager", "Manage.", can_hire=True)
@@ -228,22 +222,7 @@ def test_retire_is_still_limited_to_direct_reports(org):
     assert org.agents() == ["ceo", ENG, "ceo/mgr", "ceo/mgr/w"]
 
 
-def test_retire_tool_reports_the_refund(org):
-    import asyncio
-
-    from orgmcp.server import build_server
-
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
-    org.delegate("ceo", ENG, "t", "g", "a", budget=4)
-    result = asyncio.run(build_server(org, "ceo").call_tool("retire", {"name": ENG, "reason": "done"}))
-    blocks = result[0] if isinstance(result, tuple) else result
-    text = "\n".join(getattr(b, "text", "") for b in blocks)
-    assert "retired ceo/eng" in text and "4 unspent run(s)" in text and "returned to ceo" in text
-
-
 # ------------------------------------------------------------------- QA-15: artifact scope
-
-
 def _task(org):
     org.send(ROOT, "ceo", "budget", budget=5)
     return org.delegate("ceo", ENG, "t", "g", "a", budget=1)

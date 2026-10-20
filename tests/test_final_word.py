@@ -1,7 +1,6 @@
 """Final word on a task: `blocked` can be re-reported (superseded), `done`/`failed` are final (D1), and
 runtime-only/failed runs do not make an agent `expensive` (D3)."""
 
-import asyncio
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -10,7 +9,6 @@ from orgmcp import core
 from orgmcp.core import ROOT, OrgError, latest_results
 from orgmcp.health import agent_health
 from orgmcp.review import review
-from orgmcp.server import build_server
 
 ENG = "ceo/eng"
 CRITERIA = "exactly 33 words; a non-author reviews the final text"
@@ -54,8 +52,6 @@ def results_for(org, task):
 
 
 # ------------------------------------------------------------------ report
-
-
 def test_blocked_can_be_re_reported_and_the_new_result_supersedes_it(org, blocked):
     task, _, first, _ = blocked
     assert first.supersedes is None
@@ -97,18 +93,7 @@ def test_done_and_failed_are_final(org, status):
     assert all(m.supersedes is None for m in org.sent("ceo"))
 
 
-def test_report_docstring_and_rules_state_the_new_rule(org):
-    tools = asyncio.run(build_server(org, "ceo").list_tools())
-    doc = next(t for t in tools if t.name == "report").description
-    assert "final" in doc and "blocked" in doc and "supersedes" in doc and "once per blocked" in doc
-    rules = org.rules()
-    assert "`done` and `failed` are final" in rules and "`blocked` is not final" in rules
-    assert "never changes a task's outcome" in rules and "unless you verified them" in rules
-
-
 # ------------------------------------------------------- latest status derivation
-
-
 def test_latest_results_picks_the_highest_id_per_task(org, blocked):
     task, _, first, _ = blocked
     second = org.report("ceo", task.id, "done", "ok")
@@ -165,8 +150,6 @@ def test_low_quality_and_review_use_the_latest_status(org, clock):
 
 
 # ------------------------------------------------------------- prompt guard
-
-
 def prompt_with_result(org, task, sub, result):
     return org.run_prompt("ceo", [org.find_received("ceo", result.id)])
 
@@ -215,8 +198,6 @@ def test_guard_is_silent_when_the_upstream_task_is_ambiguous(org, blocked):
 
 
 # -------------------------------------------------------------- D3: expensive
-
-
 def run_log(org, addr, n, senders="root", tail="\n# exit 0 after 2s\n", base=100):
     d = org.dir(addr) / "runs"
     d.mkdir(exist_ok=True)

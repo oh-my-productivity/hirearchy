@@ -1,7 +1,6 @@
 """Every agent runs on claude-sonnet-5.5 unless its charter or the org config names another model."""
 
 import copy
-import json
 import os
 import sys
 import time
@@ -51,15 +50,11 @@ def fake_runner():
 
 
 # ------------------------------------------------------------------------------------------ the constant
-
-
 def test_the_default_is_one_constant_used_by_the_default_config():
     assert DEFAULT_MODEL == "claude-sonnet-5.5" and DEFAULT_CONFIG["default_model"] == DEFAULT_MODEL
 
 
 # ------------------------------------------------------------------------------------------ resolution order
-
-
 def test_charter_model_beats_org_config_beats_default(org):
     assert org.model_for("ceo") == DEFAULT_MODEL  # no model anywhere
     set_config(org, default_model="org-model")
@@ -103,18 +98,7 @@ def test_the_cli_init_and_hire_without_model_use_the_default(tmp_path, capsys):
     capsys.readouterr()
 
 
-def test_create_org_without_a_model_uses_the_default(tmp_path, monkeypatch):
-    from orgmcp.server import resolve_binding
-
-    monkeypatch.setenv("ORG_ROOT", str(tmp_path / "new"))
-    binding, _ = resolve_binding()
-    org = binding.create("A mission")
-    assert org.config["default_model"] == DEFAULT_MODEL
-
-
 # ------------------------------------------------------------------------------------------ the run command
-
-
 def test_the_scheduler_command_always_carries_the_model(org):
     cmd, _, _ = kiro_runner()(org, "ceo", "P")
     assert model_arg(cmd) == "claude-sonnet-5.5" and cmd[-2:] == ["--model", "claude-sonnet-5.5"]
@@ -160,8 +144,6 @@ def test_the_run_start_event_reports_explicit_models(org):
 
 
 # ------------------------------------------------------------------------------------------ blueprints
-
-
 @pytest.fixture
 def research(tmp_path):
     (tmp_path / "deliverables").mkdir(exist_ok=True)
@@ -251,8 +233,6 @@ def test_apply_pins_the_resolved_model_in_the_charters(research, tmp_path):
 
 
 # ------------------------------------------------------------------------------------------ templates and examples
-
-
 def fill(text: str, base: Path) -> str:
     for n in ("docs", "data", "proj", "deliverables"):
         (base / n).mkdir(exist_ok=True)

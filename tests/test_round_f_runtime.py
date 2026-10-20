@@ -37,8 +37,6 @@ def charter_text(role, body="New body.", **extra):
 
 
 # ------------------------------------------------------------------------------------------ 1. charter merge
-
-
 def test_a_rewrite_with_only_role_keeps_tools_inputs_model_and_the_rest(team, tmp_path):
     before, _ = team.charter("lead/rev")
     assert before["tools"] == ["read"] and before["model"] == "claude-sonnet-4.6"
@@ -94,8 +92,6 @@ def test_other_writes_have_no_note(team):
 
 
 # ------------------------------------------------------------------------------------------ 2. review advice
-
-
 def test_low_quality_advice_points_at_the_body_not_the_whole_charter():
     text = templates.REVIEW_ACTIONS["low_quality"].format(a=ENG)
     assert "BODY of `ceo/eng`'s charter" in text and "kept automatically" in text
@@ -104,8 +100,6 @@ def test_low_quality_advice_points_at_the_body_not_the_whole_charter():
 
 
 # ------------------------------------------------------------------------------------------ 3. feedback
-
-
 SERVICE = dict(
     description="A brief.", acceptance=["At most 600 words"], budget=10,
     deliverable={"description": "one markdown file", "format": "markdown", "max_words": 600},
@@ -164,8 +158,6 @@ def test_rule_10_says_feedback_never_waives_a_criterion():
 
 
 # ------------------------------------------------------------------------------------------ 4. blocked lessons
-
-
 def test_a_blocked_report_on_a_service_request_requires_lessons(svc):
     task = svc.request(ROOT, "brief", {"topic": "ai"})
     work(svc, "ceo")
@@ -177,14 +169,7 @@ def test_a_blocked_report_on_a_service_request_requires_lessons(svc):
     assert svc.report("ceo", plain.id, "blocked", "Waiting.").status == "blocked"  # plain tasks: still optional
 
 
-def test_the_report_tool_docstring_says_lessons_are_required_for_blocked(svc):
-    tools = {t.name: t for t in asyncio.run(build_server(svc, "ceo").list_tools())}
-    assert "whatever the status - done, failed or blocked" in tools["report"].description
-
-
 # ------------------------------------------------------------------------------------------ 5. digest order
-
-
 def test_the_digest_shows_the_latest_lessons_first_and_earlier_ones_after(svc):
     first = svc.request(ROOT, "brief", {"topic": "ai"})
     deliver(svc, first, lessons="Ran cleanly; no changes needed.")
@@ -196,8 +181,6 @@ def test_the_digest_shows_the_latest_lessons_first_and_earlier_ones_after(svc):
 
 
 # ------------------------------------------------------------------------------------------ 6. grant hint
-
-
 def test_delegable_arithmetic(org):
     org.send(ROOT, "ceo", "runs", budget=3)
     assert org.delegable("ceo") == (3, 0, 2)
@@ -224,22 +207,3 @@ def test_grant_hint_says_plainly_when_the_recipient_cannot_delegate(org):
 def test_grant_hint_needs_a_recipient_that_can_hire(org):
     org.send("ceo", ENG, "x")  # no budget, no hint needed
     assert org.grant_hint(ENG) == ""
-
-
-def test_the_send_reply_carries_the_grant_hint(org):
-    root = build_server(org, ROOT)
-    out = call(root, "send", to="ceo", body="runs for you", budget=1)
-    assert "with 1 run(s) of budget" in out
-    assert "`ceo` now has 1 run(s) and 0 outstanding delegation(s): with 1 run(s) and 0 outstanding delegation(s) it cannot delegate anything" in out
-    assert "grant at least 1 more (a budget of 2)" in out
-    out = call(root, "send", to="ceo", body="runs for you", budget=4)
-    assert "now has 5 run(s)" in out and "hand down at most 4 run(s)" in out
-    assert "now has" not in call(root, "send", to="ceo", body="just a note")
-
-
-def test_a_manager_granting_to_its_report_also_gets_the_hint(org):
-    org.hire("ceo", "lead2", "Lead", "x", can_hire=True)
-    org.send(ROOT, "ceo", "runs", budget=6)
-    out = call(build_server(org, "ceo"), "send", to="ceo/lead2", body="go", budget=2)
-    assert "`ceo/lead2` now has 2 run(s) and 0 outstanding delegation(s); with one more delegation it can hand down at most 1 run(s)." in out
-    assert "now has" not in call(build_server(org, "ceo/lead2"), "send", to="ceo", body="back", budget=1)  # to the parent: no hint

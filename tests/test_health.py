@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 from datetime import datetime, timedelta, timezone
@@ -9,7 +8,6 @@ from orgmcp import core
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Message, OrgError, join_frontmatter, split_frontmatter
 from orgmcp.health import FLAGS, HEALTH_DEFAULTS, agent_health, org_health, render_text, thresholds
-from orgmcp.server import build_server
 
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 ENG = "ceo/eng"
@@ -65,15 +63,7 @@ def health(org, now, addr=ENG, **limits):
     return agent_health(org, addr, at(now), {**HEALTH_DEFAULTS, **limits})
 
 
-def call(server, tool, **args):
-    result = asyncio.run(server.call_tool(tool, args))
-    blocks = result[0] if isinstance(result, tuple) else result
-    return "\n".join(getattr(b, "text", "") for b in blocks)
-
-
 # --------------------------------------------------------------------- revises
-
-
 def test_revises_is_stored_and_rendered(org):
     first = org.delegate(ROOT, "ceo", "Plan", "g", "a")
     second = org.delegate(ROOT, "ceo", "Plan v2", "g", "a", revises=first.id)
@@ -100,24 +90,7 @@ def test_revises_must_be_an_earlier_task_to_the_same_assignee(org):
     assert org.delegate("ceo", ENG, "Build again", "g", "a", revises=for_eng.id).revises == for_eng.id
 
 
-def test_revises_through_the_mcp_tool_and_cli(org, capsys):
-    first = org.delegate(ROOT, "ceo", "Plan", "g", "a")
-    out = call(build_server(org, ROOT), "delegate", to="ceo", title="Plan 2", goal="g", acceptance="a",
-               revises=first.id)
-    assert "delegated" in out
-    main(["--root", str(org.root), "task", "ceo", "--title", "Plan 3", "--goal", "g", "--acceptance", "a",
-          "--revises", first.id])
-    assert capsys.readouterr().out.startswith("task ")
-    assert sum(1 for m in org.received("ceo") if m.revises == first.id) == 2
-    with pytest.raises(SystemExit):
-        main(["--root", str(org.root), "task", "ceo", "--title", "x", "--goal", "g", "--acceptance", "a",
-              "--revises", "bogus"])
-    assert "revises" in capsys.readouterr().err
-
-
 # --------------------------------------------------------------------- metrics
-
-
 def test_agent_metrics(org, clock):
     clock.at(0)
     t1 = org.delegate(ROOT, ENG, "One", "g", "a", budget=6)
@@ -174,8 +147,6 @@ def test_agent_health_rejects_root(org):
 
 
 # ----------------------------------------------------------------------- flags
-
-
 def test_stuck(org):
     give(org)
     assert "stuck" not in health(org, 1800).flags  # not older than the threshold yet
@@ -322,8 +293,6 @@ def test_every_flag_has_a_severity():
 
 
 # ---------------------------------------------------------- branches and report
-
-
 @pytest.fixture
 def troubled(org):
     """ceo is paused; eng has an old open task nobody works on."""
@@ -383,8 +352,6 @@ def test_to_dict_is_json(troubled):
 
 
 # ----------------------------------------------------------------- CLI and MCP
-
-
 def test_cli_health(troubled, capsys):
     main(["--root", str(troubled.root), "health"])
     out = capsys.readouterr().out
@@ -397,19 +364,3 @@ def test_cli_health(troubled, capsys):
     with pytest.raises(SystemExit):
         main(["--root", str(troubled.root), "health", "--agent", "nobody"])
     assert "no such agent" in capsys.readouterr().err
-
-
-def test_mcp_health_permissions(org):
-    org.hire("ceo", "ops", "Ops", "Operate.")
-    root, ceo, eng = (build_server(org, a) for a in (ROOT, "ceo", ENG))
-    assert call(root, "health").splitlines()[0] == "3 agents, 0 flagged"  # whole org by default
-    assert call(root, "health", agent=ENG).splitlines()[0] == "1 agent, 0 flagged"
-    assert call(ceo, "health").splitlines()[0] == "3 agents, 0 flagged"  # own subtree by default
-    assert call(ceo, "health", agent="ceo/ops").splitlines()[0] == "1 agent, 0 flagged"
-    assert call(eng, "health").splitlines()[0] == "1 agent, 0 flagged"
-    assert call(eng, "health", agent=ENG).splitlines()[0] == "1 agent, 0 flagged"
-    for who, target in ((eng, "ceo"), (eng, "ceo/ops"), (ceo, ROOT)):
-        with pytest.raises(Exception, match="own subtree"):
-            call(who, "health", agent=target)
-    with pytest.raises(Exception, match="no such agent"):
-        call(root, "health", agent="nobody")

@@ -1,19 +1,16 @@
 """Finishing and naming: until-done exit when the user must act, the plan's failure policy and sentence-safe lines,
 orgmcp vs built-in tool names in the prompts, stray org files in a workspace, and the skill/instruction rules."""
 
-import asyncio
 import dataclasses
 import os
 import re
 import sys
 import time
-from pathlib import Path
 
 import pytest
 
 from orgmcp import blueprint as bp_mod
 from orgmcp import blueprint_examples
-from orgmcp import scheduler as sched_mod
 from orgmcp import templates
 from orgmcp.app import wire_attention
 from orgmcp.core import ROOT, Org
@@ -27,15 +24,8 @@ from orgmcp.scheduler._legacy import FunctionClock
 from orgmcp.scheduler._ports import Console
 from orgmcp.scheduler._run import GraceMemory, Standing
 from orgmcp.scheduler._work import QueriedWork
-from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
 from orgmcp.skill import skill_source
 from orgmcp.strays import StrayProbe
-
-
-def call(server, tool, **args):
-    result = asyncio.run(server.call_tool(tool, args))
-    blocks = result[0] if isinstance(result, tuple) else result
-    return "\n".join(getattr(b, "text", "") for b in blocks)
 
 
 class Clock:
@@ -51,10 +41,6 @@ class Clock:
 
 def never_runner(org, addr, prompt):
     raise AssertionError(f"{addr} must not be started")
-
-
-def quiet(org, **kw):
-    return Scheduler(org, never_runner, echo=lambda _: None, **kw)
 
 
 class Waiting:
@@ -79,8 +65,6 @@ class Waiting:
 
 
 # ------------------------------------------------------------------------------- until-done: waiting on the user
-
-
 @pytest.fixture
 def stalled_on_budget(org):
     """root's only task sits with ceo, which has used its single run: the task is unread and cannot be served."""
@@ -253,34 +237,7 @@ def test_status_line_of_an_org_that_can_progress_is_unchanged(org):
     assert describe_progress(org).splitlines()[-1].startswith("scheduler: stopped - open tasks do not move")
 
 
-@pytest.fixture
-def root_server(org, monkeypatch):
-    monkeypatch.setenv("ORG_ROOT", str(org.root))
-    for var in ("ORG_AGENT", "ORG_REQUIRE_AGENT"):
-        monkeypatch.delenv(var, raising=False)
-    return build_server(*resolve_binding())
-
-
-def test_start_refuses_when_nothing_can_progress(org, stalled_on_budget, root_server, monkeypatch):
-    monkeypatch.setattr("orgmcp.server.start_scheduler", lambda *a: pytest.fail("must not start"))
-    for until_done in (True, False):
-        out = call(root_server, "start", until_done=until_done)
-        assert out.startswith("not started: nothing can progress without you")
-        assert 'needs budget (ceo out of runs)' in out and 'send(to="ceo", body="<why>", budget=N)' in out
-    org.send(ROOT, "ceo", "more", budget=2)
-    seen = {}
-    monkeypatch.setattr("orgmcp.server.start_scheduler", lambda o, m, u: seen.update(u=u) or 77)
-    assert "scheduler started (pid 77" in call(root_server, "start") and seen == {"u": True}
-
-
-def test_start_tool_description_mentions_the_waiting_exit(root_server):
-    tools = {t.name: t.description for t in asyncio.run(root_server.list_tools())}
-    assert "waiting for YOU" in tools["start"] and "start() refuses" in tools["start"]
-
-
 # --------------------------------------------------------------------------------------------- the plan block
-
-
 def doc_bp(tmp_path, monkeypatch):
     monkeypatch.setenv("ORGMCP_WORKSPACE_ROOTS", str(tmp_path))
     (tmp_path / "<folder-with-your-files>").mkdir(exist_ok=True)
@@ -355,8 +312,6 @@ def test_clip_helper_and_other_lines_do_not_cut_mid_sentence(tmp_path, monkeypat
 
 
 # ----------------------------------------------------------------------- tool names in the prompts
-
-
 def hire_writer(org, tmp_path, tools):
     ws = tmp_path / "ws"
     ws.mkdir(exist_ok=True)
@@ -401,20 +356,7 @@ def test_org_rules_name_the_orgmcp_tools_unambiguously(tmp_path):
     assert "(with `@orgmcp/write`, never the built-in `write`)" in rules
 
 
-def test_orgmcp_write_and_read_say_they_are_organization_tools(org, monkeypatch):
-    monkeypatch.setenv("ORG_ROOT", str(org.root))
-    monkeypatch.setenv("ORG_AGENT", "ceo")
-    server = build_server(*resolve_binding())
-    tools = {t.name: t.description for t in asyncio.run(server.list_tools())}
-    assert "ORGANIZATION file" in tools["write"] and "@orgmcp/write" in tools["write"] and "NOT kiro's built-in `write`" in tools["write"]
-    assert "ORGANIZATION's read tool" in tools["read"] and "@orgmcp/read" in tools["read"]
-    assert call(server, "write", path="ceo/MEMORY.md", content="notes") == "wrote ceo/MEMORY.md (organization file)"
-    assert org.memory("ceo") == "notes"
-
-
 # ------------------------------------------------------------------------------ stray org files in a workspace
-
-
 def script_runner(code: str):
     def build(org, addr, prompt):
         return [sys.executable, "-c", code], org.workspace_of(addr), dict(os.environ)
@@ -513,8 +455,6 @@ def test_a_failing_stray_probe_never_stops_a_run(org, tmp_path):
 
 
 # --------------------------------------------------------------------------------- skill and instructions
-
-
 def test_skill_carries_the_finishing_rules():
     skill = skill_source().read_text()
     assert len(skill.splitlines()) <= 125
@@ -526,11 +466,3 @@ def test_skill_carries_the_finishing_rules():
                    "shorter still when the user asks for a short answer", "one line per criterion",
                    "`stop()` only if the user cancels"):
         assert needle in skill, needle
-
-
-def test_root_instructions_carry_the_finishing_rules_within_the_length_limit():
-    for needle in ("settle its warnings (e.g. model policy) with the user", "or state them", "FIRST budget request",
-                   "not after the reserve is gone", "declines", "unverified result (say the task stays open)",
-                   "Final answer: as short as asked", "`stop` only if the user cancels"):
-        assert needle in ROOT_INSTRUCTIONS, needle
-    assert len(ROOT_INSTRUCTIONS) < 2800

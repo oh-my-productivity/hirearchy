@@ -1,12 +1,5 @@
-"""The dashboard tick is cheap because of its caches, and the dashboard is read-only: both pinned by counts and by bytes, not by clocks.
-
-* ``render_once`` of the demo and of the big organization is byte-equal to what ``dashboard_data.py`` printed before it became ``dashdata``
-  (``tests/testkit/expected_dash/*.txt``, made from the legacy module on the same fixtures; the root path is replaced by ``<ROOT>``).
-* A second ``snapshot()`` reads no message file, and the directory of a mailbox is looked at (``stat``) at most once per tick.
-* Every query, run over a writer and an event sink that raise, writes nothing: not a byte, not a modification time, not a new file.
-* The data of a dashboard is not thread-safe and the app serialises its refreshes: that rule is written down, and a refresh from a worker thread
-  that is waited for before the next one gives the same answers.
-"""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 from __future__ import annotations
 
@@ -14,9 +7,7 @@ import os
 import stat
 import sys
 import threading
-import types
 from collections import Counter
-from collections.abc import Iterator
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -24,12 +15,12 @@ from typing import Any
 import pytest
 import testkit
 from testkit.dash_fixtures import DEMO_NOW, big_org, demo_org
+from testkit.legacy.orgmcp import dashboard_data as dd
+from testkit.legacy.orgmcp.app import wire_dashdata, wiring
+from testkit.legacy.orgmcp.core import ROOT
 from testkit.obs_fixtures import T0
 from testkit.scheduler import scheduler_is
 
-from orgmcp import dashboard_data as dd
-from orgmcp.app import wire_dashdata, wiring
-from orgmcp.core import ROOT
 from orgmcp.daemon import SchedulerState
 from orgmcp.kernel import BOXES, AtomicWriter, EventSink
 from orgmcp.mail import MessageParser
@@ -48,8 +39,6 @@ def golden(name: str, text: str, root: Path) -> None:
 
 
 # ------------------------------------------------------------------------------------------ the text of dash --once
-
-
 def test_once_of_the_demo_organization_is_what_it_always_was(tmp_path: Path) -> None:
     ns = demo_org(tmp_path)
     data = dd.DashData(ns.org.root, now=lambda: DEMO_NOW)
@@ -63,8 +52,6 @@ def test_once_of_the_big_organization_is_what_it_always_was(tmp_path: Path) -> N
 
 
 # ------------------------------------------------------------------------------------------ the caches, by counts
-
-
 class CountingParser(MessageParser):
     """The parser of the runtime, counting the files it is asked to read."""
 
@@ -159,8 +146,6 @@ def test_the_probe_answers_from_its_memo_until_the_next_tick(tmp_path: Path, mon
 
 
 # ------------------------------------------------------------------------------------------ read-only
-
-
 class Raising(AtomicWriter, EventSink):
     """A writer and an event sink that must never be asked for anything."""
 
@@ -225,8 +210,6 @@ def test_the_dashboard_runtime_of_a_big_organization_writes_nothing(tmp_path: Pa
 
 
 # ------------------------------------------------------------------------------------------ one thread at a time
-
-
 def test_the_data_of_a_dashboard_says_it_is_not_thread_safe() -> None:
     assert "not thread-safe" in (dd.DashData.__doc__ or "").lower()
     from orgmcp.dashdata._cache import DashCache

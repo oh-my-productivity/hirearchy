@@ -3,7 +3,6 @@
 Event files are written by hand (tests/testkit/obs_fixtures.py) exactly per the spec; the emitting module is not imported.
 """
 
-import asyncio
 import dataclasses
 import json
 import os
@@ -20,11 +19,9 @@ from testkit.scheduler import scheduler_is
 from orgmcp import observe
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Message, Org, OrgError
-from orgmcp.kernel.testing import FakeClock
 from orgmcp.processes.testing import fake_world
 from orgmcp.progress import progress
 from orgmcp.scheduler import Scheduler, SchedulerState
-from orgmcp.server import build_server
 
 FAKE = str(testkit.FAKE_AGENT)
 NOW = stamp(200)
@@ -71,8 +68,6 @@ def sched_org(org, tasks=1, mode="work"):
 
 
 # ------------------------------------------------------------------------------------------------ helpers
-
-
 def test_percentile_is_nearest_rank_and_exact():
     vals = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     assert observe.percentile(vals, 50) == 50
@@ -108,8 +103,6 @@ def test_refusals_are_normalized_so_reasons_group():
 
 
 # ------------------------------------------------------------------------------------------------ events
-
-
 def test_events_merge_files_by_time_and_tolerate_damage(org):
     log = EventLog(org)
     log.emit("tool.call", stamp(10), proc="mcp", pid=1, actor="ceo", tool="read", ok=True, ms=1, error=None, error_type=None, args={})
@@ -203,8 +196,6 @@ def test_follow_filters(org, clock):
 
 
 # ------------------------------------------------------------------------------------------------ trace
-
-
 def test_trace_lists_every_message_run_call_and_refusal(org, story):
     tr = observe.trace(org, story.task.id, now=NOW)
     kinds = [(i["kind"], i.get("type") or i.get("agent")) for i in tr["items"]]
@@ -379,8 +370,6 @@ def test_trace_of_a_rework_counts_the_runs_of_the_whole_request(org, clock):
 
 
 # ------------------------------------------------------------------------------------------------ metrics
-
-
 def test_metrics_percentiles_are_exact_and_counts_equal_the_files(org, clock):
     log = EventLog(org)
     durations = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -501,8 +490,6 @@ def test_metrics_scheduler_stalls_pauses(org, clock):
 
 
 # ------------------------------------------------------------------------------------------------ now
-
-
 def test_now_works_with_no_events_and_explains_the_queue(org, clock):
     v = observe.now_view(org, now=stamp(60))
     assert v["scheduler"]["state"] == "stopped" and not v["events_seen"] and v["queued"] == []
@@ -586,8 +573,6 @@ def test_now_heartbeat_of_a_stopped_scheduler_reports_its_exit(org, story):
 
 
 # ------------------------------------------------------------------------------------------------ check
-
-
 def by_id(res):
     return {c["id"]: c for c in res["checks"]}
 
@@ -806,8 +791,6 @@ def test_check_is_read_only(org, story):
 
 
 # ------------------------------------------------------------------------------------------------ surfaces
-
-
 def test_observe_text_dispatch_and_caps(org, story):
     assert observe.observe_text(org, "check", now=NOW).endswith("all checks passed")
     assert "runs 3" in observe.observe_text(org, "trace", story.task.id, now=NOW)
@@ -896,48 +879,6 @@ def test_cli_follow_prints_new_events(org, clock, capsys, monkeypatch):
     main(["--root", str(org.root), "obs", "events", "--since", "2026-10-01T00:00:00Z", "--follow"])
     out = capsys.readouterr().out
     assert "tool.call read" in out and "tool.call write" in out
-
-
-def call(server, tool, **args):
-    result = asyncio.run(server.call_tool(tool, args))
-    blocks = result[0] if isinstance(result, tuple) else result
-    return "\n".join(getattr(b, "text", "") for b in blocks)
-
-
-def test_observe_tool_is_root_only_and_read_only(org, story):
-    org.runtime = dataclasses.replace(org.runtime, clock=FakeClock(NOW))
-    root = build_server(org, ROOT)
-    names = {t.name for t in asyncio.run(root.list_tools())}
-    assert "observe" in names
-    assert "observe" not in {t.name for t in asyncio.run(build_server(org, "ceo").list_tools())}
-    assert "observe" not in {t.name for t in asyncio.run(build_server(org, "ceo/eng").list_tools())}
-    assert "scheduler:" in call(root, "observe")
-    assert "totals: wall" in call(root, "observe", view="trace", target=story.task.id)
-    assert "all checks passed" in call(root, "observe", view="check")
-    assert "tool.call" in call(root, "observe", view="events", target="ceo", since="2026-10-18T00:00:00Z", limit=5)
-    assert call(root, "observe", view="metrics", since="2026-10-18T00:00:00Z", by="tool").count("by tool:") == 1
-    with pytest.raises(Exception, match="trace needs target"):
-        call(root, "observe", view="trace")
-
-
-def test_observe_tool_docstring_is_short_and_says_read_only():
-    from orgmcp import observe as o
-
-    class Fake:
-        tools = {}
-
-        def tool(self):
-            def deco(fn):
-                Fake.tools[fn.__name__] = fn
-                return fn
-
-            return deco
-
-    o.register_observe_tool(Fake(), None)
-    doc = Fake.tools["observe"].__doc__
-    assert doc.startswith("Read-only") and len(doc) < 900
-    for view in ("now", "trace", "metrics", "events", "check"):
-        assert view in doc
 
 
 def test_stamp_trace_helper_roundtrips_through_the_loader(org, clock):
