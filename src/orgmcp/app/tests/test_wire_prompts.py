@@ -13,10 +13,15 @@ from orgmcp.app import wiring
 from orgmcp.budget import BudgetQuery
 from orgmcp.budget.testing import FixedBudget
 from orgmcp.eligibility import AgentStates
-from orgmcp.kernel import OrgLayout, OrgPaths
+from orgmcp.kernel import Message, OrgLayout, OrgPaths
 from orgmcp.mail import MailboxReader, TaskQuery
 from orgmcp.mail.testing import MemoryMailbox, memory_mailbox
-from orgmcp.prompts import RunPromptBuilder, StateSummarizer, Whoami
+from orgmcp.prompts import AgentLines, ContextRenderer, FilesLines, RunPromptBuilder, StateSummarizer, TaskQuoter, UpstreamTasks, Whoami
+from orgmcp.prompts._agent_line import StatusAgentLine
+from orgmcp.prompts._batch import BatchRenderer
+from orgmcp.prompts._files import FilesGuide
+from orgmcp.prompts._quote import LiteralQuoter
+from orgmcp.prompts._upstream import SoleUpstreamTask
 from orgmcp.prompts._run import TextRunPromptBuilder
 from orgmcp.prompts._state import TextStateSummarizer
 from orgmcp.prompts._whoami import TextWhoami
@@ -78,3 +83,30 @@ def test_every_collaborator_of_the_prompts_comes_from_the_runtime(tmp_path: Path
     assert "- Budget: 7 run(s) left" in runtime.state_summarizer.state_summary("ceo")
     assert "\n\n## Charter\n" in runtime.agent_whoami.whoami("ceo")
     assert list(tmp_path.iterdir()) == []
+
+
+def test_the_runtime_hands_out_the_parts_the_texts_are_made_of(tmp_path: Path) -> None:
+    runtime = wiring.open_runtime(tmp_path)
+    assert isinstance(runtime.agent_lines, StatusAgentLine) and isinstance(runtime.agent_lines, AgentLines)
+    assert isinstance(runtime.task_quoter, LiteralQuoter) and isinstance(runtime.task_quoter, TaskQuoter)
+    assert isinstance(runtime.files_lines, FilesGuide) and isinstance(runtime.files_lines, FilesLines)
+    assert isinstance(runtime.upstream_tasks, SoleUpstreamTask) and isinstance(runtime.upstream_tasks, UpstreamTasks)
+    assert isinstance(runtime.context_renderer, BatchRenderer) and isinstance(runtime.context_renderer, ContextRenderer)
+
+
+def test_the_context_renderer_is_made_of_the_quoter_and_the_upstream_of_the_runtime(tmp_path: Path) -> None:
+    class Quote(TaskQuoter):
+        def quote(self, m: Message) -> str:
+            return "QUOTED"
+
+    class Nothing(UpstreamTasks):
+        def upstream(self, addr: str, delegated: Message) -> None:
+            return None
+
+    box = MemoryMailbox()
+    task = Message(sender="ceo", to="ceo/eng", type="task", body="b", title="T", id="20260101T000000000001-ceo-aaaa")
+    result = Message(sender="ceo/eng", to="ceo", type="result", body="r", status="done", reply_to=task.id, id="20260101T000000000002-ceo.eng-bbbb")
+    box.store(task)
+    runtime = wiring.open_runtime(tmp_path, {TaskQuoter: Quote(), UpstreamTasks: Nothing(), MailboxReader: box})
+    shown = runtime.context_renderer.render("ceo", result)
+    assert "verbatim:]\nQUOTED\n" in shown and "probably serves" not in shown

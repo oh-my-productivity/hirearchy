@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import dataclasses
+from pathlib import Path
 
 from ..agents import AgentDirectory
 from ..kernel import AtomicWriter, OrgLayout
@@ -15,9 +16,11 @@ from ..mail._caching import DirectoryProbe, DirMtimeCachingMailbox
 from ..mail._index import FsMessageIndex
 from ..mail._mailbox import FsMailbox
 from ..mail._tasks import DerivedTaskQuery
+from ..mail._wakes import wakes
 from ._builder import Builder
 from ._resources import ProcessResources
 from .runtime import OrgRuntime
+from .wiring import process_resources
 
 
 def register(b: Builder) -> None:
@@ -40,3 +43,8 @@ def lenient(runtime: OrgRuntime, probe: DirectoryProbe) -> tuple[OrgRuntime, Dir
     mailbox = DirMtimeCachingMailbox(runtime.mailbox, runtime.paths, runtime.message_parser, probe, runtime.clock)
     index = FsMessageIndex(runtime.paths, runtime.agents, runtime.resources.meta_cache)
     return dataclasses.replace(runtime, mailbox=mailbox, task_query=DerivedTaskQuery(mailbox), message_index=index), mailbox
+
+
+def message_wakes(path: Path) -> bool:
+    """Does the inbox file at ``path`` wake its agent? Read through the parser of this process (``Org._wakes`` is static: it has no runtime)."""
+    return wakes(process_resources().message_parser, path)

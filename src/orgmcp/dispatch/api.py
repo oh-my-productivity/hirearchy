@@ -3,6 +3,10 @@
 ``MessageSender`` validates (size, type, body, route, budget, hops) and delivers, ``TaskAssigner`` is how a manager gives a task to a direct
 report, ``TaskReporter`` is how an agent answers a task it was given. ``ReworkContext`` is the port that ``services`` implements: the service
 fields a rework task inherits from the task it revises.
+
+The rules the three of them are made of are ports too, since the facade (``Org.can_message``, ``_next_hops``, ``_normalize_artifact``) and the
+runtime hand them out: ``RoutePolicy`` (who may message whom), ``HopCounter`` (the ``hops`` of the next message) and ``ArtifactNormalizer`` (an artifact
+of a report, checked and annotated). ``check_lessons`` is the lessons rule as a function (``Org._check_lessons`` is static).
 """
 
 from __future__ import annotations
@@ -11,14 +15,19 @@ from collections.abc import Mapping, Sequence
 from typing import Protocol, runtime_checkable
 
 from ..kernel import Message
-from ._lessons import LESSONS_MAX_CHARS
+from ._lessons import LESSONS_MAX_CHARS, check_lessons
+from ._protocols import ArtifactNormalizer, HopCounter, RoutePolicy
 
 __all__ = [
     "LESSONS_MAX_CHARS",
+    "ArtifactNormalizer",
+    "HopCounter",
     "MessageSender",
     "ReworkContext",
+    "RoutePolicy",
     "TaskAssigner",
     "TaskReporter",
+    "check_lessons",
 ]
 
 

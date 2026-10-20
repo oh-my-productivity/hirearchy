@@ -11,7 +11,7 @@ from ..budget import BudgetQuery
 from ..eligibility import AgentStates
 from ..kernel import OrgLayout
 from ..mail import MailboxReader, TaskQuery
-from ..prompts import RunPromptBuilder, StateSummarizer, Whoami
+from ..prompts import AgentLines, ContextRenderer, FilesLines, RunPromptBuilder, StateSummarizer, TaskQuoter, UpstreamTasks, Whoami
 from ..prompts import _assembly
 from ..reflection import ServicePromptSections
 from ..services import ServiceCatalog
@@ -21,6 +21,14 @@ from ._builder import Builder
 
 
 def register(b: Builder) -> None:
+    b.provide(TaskQuoter, lambda b: _assembly.task_quoter(b.get(OrgLayout)))
+    b.provide(
+        AgentLines,
+        lambda b: _assembly.agent_lines(b.get(CharterReader), b.get(AgentStates), b.get(BudgetQuery), b.get(TaskQuery), b.get(MailboxReader)),
+    )
+    b.provide(FilesLines, lambda b: _assembly.files_lines(b.get(AccessScopes), b.get(ToolNaming), b.get(OrgLayout)))
+    b.provide(UpstreamTasks, lambda b: _assembly.upstream_tasks(b.get(MailboxReader)))
+    b.provide(ContextRenderer, lambda b: _assembly.context_renderer(b.get(MailboxReader), b.get(TaskQuoter), b.get(UpstreamTasks)))
     b.provide(
         StateSummarizer,
         lambda b: _assembly.state_summarizer(

@@ -45,6 +45,15 @@ def test_an_explicit_start_is_used_instead_of_the_working_directory(h: LocatorHa
     assert h.locator.find_root() == h.cwd.parent
 
 
+def test_the_start_may_be_a_string_and_an_empty_one_means_the_working_directory(h: LocatorHarness) -> None:
+    elsewhere = h.cwd.parent.parent.parent / "elsewhere" / "deeper"
+    elsewhere.mkdir(parents=True)
+    h.make_org(h.cwd.parent)
+    h.make_org(elsewhere.parent)
+    assert h.locator.find_root(str(elsewhere)) == elsewhere.parent
+    assert h.locator.find_root("") == h.cwd.parent
+
+
 def test_ORG_ROOT_wins_and_need_not_be_an_organization(h: LocatorHarness) -> None:
     h.make_org(h.cwd)
     target = h.cwd.parent.parent / "named"

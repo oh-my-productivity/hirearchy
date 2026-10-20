@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import unicodedata
 from collections.abc import Iterable
 from pathlib import Path
@@ -35,6 +36,16 @@ def case_twin(names: Iterable[str], name: str) -> str | None:
         return None
     key = _fold(name)
     return next((n for n in listed if _fold(n) == key), None)
+
+
+def case_twin_in(parent: Path, name: str) -> str | None:
+    """The existing entry of the directory ``parent`` that equals ``name`` except for case, if there is one (``None`` when ``parent`` cannot be
+    listed). The old ``_case_twin`` of ``orgmcp.core``, which lists the directory itself."""
+    try:
+        names = os.listdir(parent)
+    except OSError:
+        return None
+    return case_twin(names, name)
 
 
 @runtime_checkable

@@ -14,7 +14,7 @@ class EnvOrgLocator(OrgLocator):
     def __init__(self, environment: Environment) -> None:
         self._environment = environment
 
-    def find_root(self, start: Path | None = None) -> Path:
+    def find_root(self, start: str | Path | None = None) -> Path:
         env = self._environment.get("ORG_ROOT")
         if env:
             return Path(env).expanduser().resolve()

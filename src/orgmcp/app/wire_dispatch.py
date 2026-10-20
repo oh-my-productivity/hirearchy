@@ -8,7 +8,7 @@ from ..access import AccessScopes
 from ..agents import AgentDirectory
 from ..budget import AllocationPolicy
 from ..delivery import MessageDelivery
-from ..dispatch import MessageSender, ReworkContext, TaskAssigner, TaskReporter
+from ..dispatch import ArtifactNormalizer, HopCounter, MessageSender, ReworkContext, RoutePolicy, TaskAssigner, TaskReporter
 from ..dispatch._artifacts import ArtifactAnnotator
 from ..dispatch._assigner import RuleTaskAssigner
 from ..dispatch._hops import InflightHopCounter
@@ -24,13 +24,15 @@ from ._builder import Builder
 
 
 def register(b: Builder) -> None:
-    """The collaborators among the rules of the package (route policy, hop counter, artifact annotator, lessons policy) are private to it: they
-    are made here, inside the providers of the ports that use them."""
+    """The rules the three commands are made of (route policy, hop counter, artifact annotator) are ports of the package: the commands take them
+    from the runtime, and so does the facade. The lessons policy is stateless and private to the reporter."""
+    b.provide(RoutePolicy, lambda b: ParentSiblingRoutePolicy(b.get(MailboxReader)))
+    b.provide(HopCounter, lambda b: InflightHopCounter(b.get(MailboxReader)))
+    b.provide(ArtifactNormalizer, lambda b: ArtifactAnnotator(b.get(OrgLayout), b.get(AccessScopes)))
     b.provide(
         MessageSender,
         lambda b: RuleMessageSender(
-            b.get(AgentDirectory), b.get(OrgSettings), ParentSiblingRoutePolicy(b.get(MailboxReader)), b.get(AllocationPolicy),
-            InflightHopCounter(b.get(MailboxReader)), b.get(MessageDelivery),
+            b.get(AgentDirectory), b.get(OrgSettings), b.get(RoutePolicy), b.get(AllocationPolicy), b.get(HopCounter), b.get(MessageDelivery),
         ),
     )
     b.provide(
@@ -43,6 +45,6 @@ def register(b: Builder) -> None:
         TaskReporter,
         lambda b: RuleTaskReporter(
             b.get(AgentDirectory), b.get(MailboxReader), b.get(TaskQuery), b.get(DocumentTemplates), b.get(AllocationPolicy), LessonsPolicy(),
-            ArtifactAnnotator(b.get(OrgLayout), b.get(AccessScopes)), b.get(MessageSender),
+            b.get(ArtifactNormalizer), b.get(MessageSender),
         ),
     )

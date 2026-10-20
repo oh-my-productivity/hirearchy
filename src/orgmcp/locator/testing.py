@@ -19,7 +19,7 @@ class MemoryOrgLocator(OrgLocator):
         self._environment = environment
         self.organizations = organizations if organizations is not None else set()
 
-    def find_root(self, start: Path | None = None) -> Path:
+    def find_root(self, start: str | Path | None = None) -> Path:
         env = self._environment.get("ORG_ROOT")
         if env:
             return Path(env).expanduser().resolve()
@@ -38,7 +38,7 @@ class FixedOrgLocator(OrgLocator):
     def __init__(self, root: Path) -> None:
         self._root = root
 
-    def find_root(self, start: Path | None = None) -> Path:
+    def find_root(self, start: str | Path | None = None) -> Path:
         return self._root
 
 

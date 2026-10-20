@@ -140,3 +140,20 @@ def test_org_init_refuses_an_organization_with_the_text_of_main(tmp_path: Path) 
     with pytest.raises(OrgError, match=f"^already an organization: {org.root}$"):
         Org.init(tmp_path / "org", "AGAIN-MISSION")
     assert "AGAIN-MISSION" not in (org.root / "ORG.md").read_text()
+
+
+def test_initialize_org_makes_the_organization_and_returns_its_resolved_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from orgmcp.app.wire_bootstrap import initialize_org
+
+    monkeypatch.chdir(tmp_path)
+    root = initialize_org("rel/../made", "a mission", {"max_hops": 5})
+    assert root == (tmp_path / "made").resolve() and (root / "ORG.md").is_file()
+    assert Org(root).config["max_hops"] == 5 and "a mission" in Org(root).rules()
+
+
+def test_initialize_org_refuses_an_organization_with_the_text_of_main(tmp_path: Path) -> None:
+    from orgmcp.app.wire_bootstrap import initialize_org
+
+    root = initialize_org(tmp_path / "org")
+    with pytest.raises(OrgError, match=f"^already an organization: {root}$"):
+        initialize_org(root, "AGAIN")

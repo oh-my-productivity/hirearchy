@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from orgmcp.dispatch import LESSONS_MAX_CHARS
+from orgmcp.dispatch import LESSONS_MAX_CHARS, check_lessons
 from orgmcp.dispatch._lessons import LessonsPolicy
 from orgmcp.kernel import Message, OrgError
 
@@ -50,3 +50,18 @@ def test_the_limit_is_inclusive() -> None:
 
 def test_the_length_is_that_of_the_stripped_text() -> None:
     assert LessonsPolicy().check(task(), "done", "  " + "x" * 800 + "  \n") == "x" * 800
+
+
+@pytest.mark.parametrize(
+    ("service", "status", "given"),
+    [(None, "done", None), (None, "done", "  worked \n"), ("weekly-brief", "done", "ok"), ("weekly-brief", "blocked", ""), ("weekly-brief", "failed", "x" * (LESSONS_MAX_CHARS + 1))],
+)
+def test_the_function_is_the_rule_of_the_policy(service: str | None, status: str, given: str | None) -> None:
+    """``check_lessons`` is what ``Org._check_lessons`` (static) calls; the policy and the function answer, or refuse, alike."""
+    outcomes = []
+    for check in (check_lessons, LessonsPolicy().check):
+        try:
+            outcomes.append(("returned", check(task(service), status, given)))
+        except OrgError as error:
+            outcomes.append(("refused", str(error)))
+    assert outcomes[0] == outcomes[1]
