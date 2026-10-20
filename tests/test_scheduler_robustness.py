@@ -23,8 +23,6 @@ def run_to_idle(sched, limit=5.0):
 
 
 # ------------------------------------------------------------- test isolation
-
-
 def test_default_kiro_runner_in_tests_writes_nothing_under_the_real_home(org, isolated_kiro):
     before = real_agent_profiles()
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
@@ -62,7 +60,6 @@ def test_ensure_kiro_profile_is_atomic_and_idempotent(org, tmp_path):
 
 
 # ------------------------------------------------------------ QA-5: fault isolation
-
 import json  # noqa: E402
 
 import pytest  # noqa: E402
@@ -139,16 +136,6 @@ def test_bad_scheduler_settings_fall_back_to_defaults(org):
     assert org.runs_used("ceo") == 1
 
 
-# ------------------------------------------------- QA-3: retire during a run
-
-
-def test_end_run_is_a_noop_for_a_vanished_agent(org):
-    org.retire(ROOT, "ceo", "gone")
-    org.end_run("ceo", ok=False)
-    org.end_run("ceo/eng", ok=True)
-    assert not (org.root / "ceo").exists()
-
-
 def test_failed_run_of_a_retired_agent_leaves_no_trace(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
     messages = []
@@ -169,8 +156,6 @@ def test_failed_run_of_a_retired_agent_leaves_no_trace(org):
 
 
 # ------------------------------------------------------- QA-4: long prompts
-
-
 def test_prompt_is_delivered_on_stdin_not_in_argv(org, tmp_path):
     out = tmp_path / "stdin.txt"
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
@@ -213,24 +198,7 @@ def test_the_cap_is_configurable_and_a_bad_value_means_the_default(org):
     org.send("ceo", "root", "x" * 5000)
 
 
-def test_a_huge_message_in_an_inbox_is_cut_in_the_prompt_with_the_path_to_read_it(org):
-    org.send(ROOT, "ceo", "BEGIN " + "x" * 3_000_000 + " END")  # root (the human) is not capped
-    batch = org.messages("ceo", "inbox")
-    prompt = org.run_prompt("ceo", batch)
-    assert len(prompt) < 40_000 and "BEGIN" in prompt and "END" not in prompt
-    assert f'read(path="ceo/inbox/{batch[0].id}.md")' in prompt
-    org.begin_run("ceo")  # the pointer stays right while the message is being handled
-    assert f"ceo/inflight/{batch[0].id}.md" in org.run_prompt("ceo", org.messages("ceo", "inflight"))
-    assert "cut" not in batch[0].render(limit=0) and batch[0].render(limit=0).endswith(" END\n")
-
-
-def test_short_messages_render_unchanged(org):
-    msg = org.send(ROOT, "ceo", "hello")
-    assert msg.render().endswith("\n\nhello\n") and "cut" not in msg.render()
-
-
 # --------------------------------------------------- QA-7: monotonic run counter
-
 from orgmcp.review import review_if_due, total_runs  # noqa: E402
 
 
@@ -271,8 +239,6 @@ def test_review_baseline_is_rebased_if_the_counter_ever_shrinks(org):
 
 
 # ------------------------------------------------ QA-8: reviews and the reserve
-
-
 def test_manager_with_spare_budget_beyond_its_reserve_still_gets_the_note(org):
     org.hire("ceo", "ops", "Ops", "Do ops.")
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=4)
@@ -302,7 +268,6 @@ def test_skipped_manager_is_listed_in_roots_summary_and_told_later(org):
 
 
 # ------------------------------------------------ QA-14: health vs failed runs
-
 from orgmcp.health import agent_health  # noqa: E402,F811
 
 
@@ -379,7 +344,6 @@ def test_runtime_only_batch_is_recorded_as_such(org):
 
 
 # --------------------------------------------------------- QA-13: parse caching
-
 from orgmcp import core  # noqa: E402
 from orgmcp.app import wire_processes, wiring  # noqa: E402
 from orgmcp.mail import MessageParser  # noqa: E402
@@ -390,69 +354,7 @@ from orgmcp.stalls import StallLadder  # noqa: E402
 from orgmcp.stalls._views import FingerprintTaskViews  # noqa: E402
 
 
-def test_message_load_is_cached_by_path_mtime_and_size(org):
-    msg = org.send(ROOT, "ceo", "hello")
-    path = org.dir("ceo") / "inbox" / f"{msg.id}.md"
-    parses = []
-    real = core.split_frontmatter
-    parser = CountingMessageParser(split=lambda t: (parses.append(1), real(t))[1])
-    first = parser.parse(path)
-    second = parser.parse(path)
-    assert len(parses) == 1 and first == second and first is not second and second.path == path
-    first.body = "mutated"  # the cache hands out fresh objects
-    assert parser.parse(path).body == "hello"
-    path.write_text(path.read_text().replace("hello", "HELLO!"))  # same path, new content: reparsed
-    assert parser.parse(path).body == "HELLO!" and len(parses) == 2
-
-
-def test_cached_load_equals_uncached_parse(org):
-    msg = org.delegate(ROOT, "ceo", "Title: with colon", "goal\nline2", "acc", budget=3)
-    path = org.dir("ceo") / "inbox" / f"{msg.id}.md"
-    parser = CountingMessageParser()
-    cold = parser.parse(path)
-    assert parser.parse(path) == cold and cold.title == "Title: with colon" and cold.budget == 3
-    meta, body = core.split_frontmatter(path.read_text(encoding="utf-8"))
-    assert cold.body == body.strip() and meta["id"] == cold.id
-
-
-def test_crlf_files_parse_like_read_text(tmp_path):
-    p = tmp_path / "20260101T000000000000-root-aaaa.md"
-    p.write_bytes(b"---\r\nfrom: root\r\nto: ceo\r\ntype: note\r\n---\r\nline1\r\nline2\r\n")
-    assert core.Message.load(p).body == "line1\nline2" and core.Message.load(p).sender == "root"
-
-
-def test_cache_is_bounded(org):
-    parser = CountingMessageParser(max_entries=5)
-    org.runtime = wiring.open_runtime(org.root, {MessageParser: parser})
-    for i in range(12):
-        org.send(ROOT, "ceo", f"n{i}")
-    org.messages("ceo", "inbox")
-    assert len(parser.cache) == 5
-
-
-def test_stall_view_reparses_only_when_the_mailbox_files_change(org):
-    org.send(ROOT, "ceo", "budget", budget=10)
-    task = org.delegate(ROOT, "ceo", "T", "g", "a", budget=2)
-    views = FingerprintTaskViews(org.runtime.task_query, org.runtime.mail_fingerprint)
-    assert [t.id for t in views.open_tasks("ceo")] == [task.id]
-    counting = CountingMessageParser()
-    org.runtime = wiring.open_runtime(org.root, {MessageParser: counting})
-    views = views.rebound(org.runtime.task_query, org.runtime.mail_fingerprint)  # the ladder of a scheduler goes on with its memo over the new runtime
-    loads = counting.loaded
-    for _ in range(3):
-        views.open_tasks("ceo")
-    assert loads == []  # unchanged mailbox: nothing is parsed
-    org.begin_run("ceo")  # inbox -> inflight is the same set of messages
-    loads.clear()  # (begin_run itself parses the batch)
-    assert [t.id for t in views.open_tasks("ceo")] == [task.id] and loads == []
-    org.end_run("ceo", ok=True)
-    org.report("ceo", task.id, "done", "ok")  # a new sent message: recomputed, and the task is closed
-    assert views.open_tasks("ceo") == [] and loads
-
-
 # ------------------------------------------------- QA-16: process groups
-
-
 def alive(pid):
     try:
         os.kill(pid, 0)
@@ -528,8 +430,6 @@ def test_signalling_a_finished_run_is_harmless():
 
 
 # ------------------------------------------------------------------ small extras
-
-
 def test_acquire_treats_a_pid_owned_by_someone_else_as_alive(org, monkeypatch):
     (org.root / ".runtime").mkdir(exist_ok=True)
     (org.root / ".runtime" / "scheduler.pid").write_text("1")

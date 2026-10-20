@@ -1,0 +1,21 @@
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
+
+import shutil
+
+import pytest
+from testkit.legacy.orgmcp import telemetry
+
+
+# ---------------------------------------------------------------------------------------------------- helpers
+@pytest.fixture
+def org(org):
+    """The shared org, with the events of its construction (hires) forgotten: tests see only their own."""
+    shutil.rmtree(org.root / ".runtime" / "events", ignore_errors=True)
+    telemetry.reset()
+    return org
+
+
+def test_new_config_keys_have_defaults(org):
+    cfg = org.config
+    assert cfg["events"] is True and cfg["events_keep_days"] == 30 and cfg["heartbeat_seconds"] == 60

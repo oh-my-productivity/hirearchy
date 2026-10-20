@@ -7,8 +7,6 @@ fixed now, so they run as plain regression tests.
 import os
 import shutil
 import signal
-import subprocess
-import sys
 import time
 from datetime import timedelta
 
@@ -17,7 +15,7 @@ import pytest
 from orgmcp import core, review
 from orgmcp.app import wiring
 from orgmcp.cli import main
-from orgmcp.core import ROOT, Org, OrgError, join_frontmatter, split_frontmatter, utcnow
+from orgmcp.core import ROOT, OrgError, join_frontmatter, split_frontmatter, utcnow
 from orgmcp.health import agent_health, org_health
 from orgmcp.mail import MessageParser
 from orgmcp.mail.testing import CountingMessageParser
@@ -52,8 +50,6 @@ def drain(org, addr, ok=True):
 
 
 # ------------------------------------------------------------------ write guard
-
-
 def test_qa1_case_variants_of_protected_names_are_refused(org):
     for path in ("ceo/agent.md", "ceo/Inbox/x.md", "ceo/READ/x.md", "ceo/Runs/x.log", "ceo/memory.md"):
         with pytest.raises(OrgError):
@@ -90,8 +86,6 @@ def test_qa2_write_cannot_create_agents_around_hire_rules(org):
 
 
 # ------------------------------------------------------------------- scheduler
-
-
 def test_qa3_retiring_a_running_agent_does_not_crash_the_scheduler(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
     sched = Scheduler(org, quiet_runner(), echo=lambda _: None)
@@ -184,8 +178,6 @@ def test_qa16_timeout_kills_the_whole_process_group(org, tmp_path):
 
 
 # ----------------------------------------------------------- budget and reviews
-
-
 def test_qa6_retire_returns_unspent_budget_to_the_parent(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     org.delegate("ceo", ENG, "t", "g", "a", budget=5)
@@ -227,8 +219,6 @@ def test_qa14_failed_runs_are_not_blamed_as_wasteful(org):
 
 
 # --------------------------------------------------------------------- core API
-
-
 def test_qa9_retire_accepts_the_full_address_of_a_direct_report(org):
     assert org.retire("ceo", ENG, "full address, as printed by status/health/review notes") == ENG
 
@@ -269,18 +259,6 @@ def test_qa15_report_refuses_artifacts_outside_the_org(org, tmp_path):
     task = org.delegate("ceo", ENG, "t", "g", "a", budget=1)
     with pytest.raises(OrgError):
         org.report(ENG, task.id, "done", "ok", [str(outside)])
-
-
-# ---------------------------------------------------------------------- prompts
-
-
-def test_qa17_prompt_shows_acceptance_criteria_of_open_tasks(org):
-    task = org.delegate(ROOT, "ceo", "Strict blurb", "the goal", "ACCEPT: exactly 33 words", budget=10)
-    drain(org, "ceo")  # the task was handled in an earlier run and now sits in read/
-    sub = org.delegate("ceo", ENG, "draft", "g", "a", budget=2)
-    result = org.report(ENG, sub.id, "done", "35 words")  # the next run is woken by this result only
-    prompt = org.run_prompt("ceo", [org.find_received("ceo", result.id)])
-    assert "exactly 33 words" in prompt, f"prompt for the run closing task {task.id} lacks its acceptance criteria"
 
 
 def test_qa18_delegate_without_budget_adapts_to_what_the_manager_can_afford(org):

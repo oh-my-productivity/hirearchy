@@ -1,12 +1,13 @@
-"""The assistant skill and the root instructions know the service workflow (and the skill ships in the wheel)."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
-from pathlib import Path
 
-from orgmcp.core import ROOT, Org
-from orgmcp.server import build_server
+import testkit
+from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.legacy.orgmcp.server import build_server
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = testkit.REPO
 SKILL = ROOT_DIR / "skills" / "orgmcp" / "SKILL.md"
 
 

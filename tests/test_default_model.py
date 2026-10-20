@@ -1,7 +1,6 @@
 """Every agent runs on claude-sonnet-5.5 unless its charter or the org config names another model."""
 
 import copy
-import json
 import os
 import sys
 import time
@@ -15,7 +14,7 @@ from orgmcp import blueprint as bpm
 from orgmcp import blueprint_examples as ex
 from orgmcp import observe
 from orgmcp.cli import main
-from orgmcp.core import DEFAULT_CONFIG, DEFAULT_MODEL, ROOT, Org
+from orgmcp.core import DEFAULT_MODEL, ROOT, Org
 from orgmcp.scheduler import Scheduler, kiro_runner
 
 FAKE = str(testkit.FAKE_AGENT)
@@ -50,37 +49,13 @@ def fake_runner():
     return build
 
 
-# ------------------------------------------------------------------------------------------ the constant
-
-
-def test_the_default_is_one_constant_used_by_the_default_config():
-    assert DEFAULT_MODEL == "claude-sonnet-5.5" and DEFAULT_CONFIG["default_model"] == DEFAULT_MODEL
-
-
 # ------------------------------------------------------------------------------------------ resolution order
-
-
 def test_charter_model_beats_org_config_beats_default(org):
     assert org.model_for("ceo") == DEFAULT_MODEL  # no model anywhere
     set_config(org, default_model="org-model")
     assert org.model_for("ceo") == "org-model" and org.model_for("ceo/eng") == "org-model"
     charter_model(org, "charter-model")
     assert org.model_for("ceo") == "charter-model" and org.model_for("ceo/eng") == "org-model"
-
-
-@pytest.mark.parametrize("value", [None, "", "<missing>"])
-def test_an_org_without_an_explicit_default_model_runs_on_the_default(org, value):
-    set_config(org, default_model=value)  # ORG.md says `default_model: null`, an empty value, or has no such key
-    assert org.default_model == DEFAULT_MODEL and org.model_for("ceo") == DEFAULT_MODEL
-    charter_model(org, "kept-explicit")
-    assert org.model_for("ceo") == "kept-explicit"
-
-
-def test_a_new_org_writes_the_default_and_an_explicit_one_is_kept(tmp_path):
-    fresh = Org.init(tmp_path / "a", "m")
-    assert fresh.config["default_model"] == DEFAULT_MODEL and "default_model: claude-sonnet-5.5" in (fresh.root / "ORG.md").read_text()
-    other = Org.init(tmp_path / "b", "m", {"default_model": "claude-haiku-4.5"})
-    assert other.default_model == "claude-haiku-4.5"
 
 
 def test_hire_without_a_model_leaves_the_charter_unpinned_so_the_org_default_applies(org):
@@ -113,8 +88,6 @@ def test_create_org_without_a_model_uses_the_default(tmp_path, monkeypatch):
 
 
 # ------------------------------------------------------------------------------------------ the run command
-
-
 def test_the_scheduler_command_always_carries_the_model(org):
     cmd, _, _ = kiro_runner()(org, "ceo", "P")
     assert model_arg(cmd) == "claude-sonnet-5.5" and cmd[-2:] == ["--model", "claude-sonnet-5.5"]
@@ -160,8 +133,6 @@ def test_the_run_start_event_reports_explicit_models(org):
 
 
 # ------------------------------------------------------------------------------------------ blueprints
-
-
 @pytest.fixture
 def research(tmp_path):
     (tmp_path / "deliverables").mkdir(exist_ok=True)
@@ -251,8 +222,6 @@ def test_apply_pins_the_resolved_model_in_the_charters(research, tmp_path):
 
 
 # ------------------------------------------------------------------------------------------ templates and examples
-
-
 def fill(text: str, base: Path) -> str:
     for n in ("docs", "data", "proj", "deliverables"):
         (base / n).mkdir(exist_ok=True)

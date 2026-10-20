@@ -27,8 +27,6 @@ def rejected_then_accepted(org, *, reject="Sam's 'before Friday' needs a date.",
 
 
 # ------------------------------------------------------------------------------- 1. every verdict stays
-
-
 def test_a_case_keeps_every_verdict_in_order_with_the_task_it_was_given_on(svc):
     first, rework = rejected_then_accepted(svc)
     (case,) = services.cases(svc, "ceo", WEEKDAY)
@@ -118,8 +116,6 @@ def test_the_feedback_tool_text_no_longer_says_a_later_one_replaces_the_earlier(
 
 
 # --------------------------------------------------------------------- 2/3. reflect at the moment of rejection
-
-
 def reflect_section(prompt):
     return prompt.split("# Reflect before you start: weekly-brief")[1].split("# New messages")[0]
 
@@ -206,8 +202,6 @@ def test_a_playbook_revised_after_the_rejection_leaves_no_reflect_section(svc):
 
 
 # ----------------------------------------------------------------------------------------- 4. case totals
-
-
 def test_the_rework_reply_states_the_case_total_and_warns_when_it_exceeds_the_contract(svc):
     server = build_server(svc, ROOT)
     first = request(svc, "ai")  # 10 runs handed down (the contract's)
@@ -250,8 +244,6 @@ def test_a_single_request_case_has_no_case_total_line(svc):
 
 
 # ------------------------------------------------------------------------------------------ 5. escaping
-
-
 def test_angle_brackets_and_ampersands_are_stored_exactly_as_given(svc):
     reason = 'Cases rejected for <weekday> & "dates"; keep &lt;literal&gt; -> done'
     content = "## Steps\n1. Resolve <weekday> and <date> & check \"quotes\" and &amp; entities.\n"
@@ -273,17 +265,7 @@ def test_angle_brackets_and_ampersands_are_stored_exactly_as_given(svc):
     assert "<weekday>" in (svc.dir("ceo") / "services" / WEEKDAY / "history" / "PLAYBOOK.v1.md").read_text()
 
 
-def test_messages_between_agents_keep_angle_brackets_too(svc):
-    svc.delegate(ROOT, "ceo", "Plan", "Plan", "a plan", budget=10)
-    msg = svc.delegate("ceo", ENG, "T", "Resolve 'before <weekday>' & \"for <date>\"", "c", budget=1)
-    assert "before <weekday>" in msg.body and "&lt;" not in msg.body
-    sent = svc.sent("ceo")[-1]
-    assert "before <weekday>" in sent.body and "&lt;" not in sent.body
-
-
 # ----------------------------------------------------------------------------------------- 6. health
-
-
 def first_pass_and_client_rework(org, rounds=3):
     """root requests a service from ceo; ceo has eng review it; root sends the delivery back; ceo has eng re-check."""
     first = org.request(ROOT, WEEKDAY, {"topic": "ai"}, budget=20)

@@ -53,8 +53,6 @@ def team(tmp_path, dirs):
 
 
 # ------------------------------------------------------------------------------------------ profiles
-
-
 def test_agent_with_file_tools_gets_a_confining_profile(team, dirs, isolated_kiro):
     prof, cmd, cwd, env = run_profile(team, isolated_kiro, "lead/writer")
     name = cmd[cmd.index("--agent") + 1]
@@ -151,8 +149,6 @@ def test_ensure_kiro_profile_is_idempotent_for_confined_profiles(team, dirs, tmp
 
 
 # ----------------------------------------------------------------------------------- authority
-
-
 def test_a_reports_inputs_must_be_inside_its_managers_inputs_or_workspace(team, dirs):
     team.hire("lead", "a", "A", "x", inputs=[str(dirs["handbook/hr"])])  # inside the manager's inputs
     team.hire("lead", "b", "B", "x", inputs=[str(dirs["proj/out"])])  # inside the manager's workspace
@@ -198,8 +194,6 @@ def test_a_confined_hirer_never_hands_down_an_unconfined_read(team):
 
 
 # -------------------------------------------------------------------------------------- report
-
-
 def task_for(org, to, frm=ROOT):
     return org.delegate(frm, to, "T", "g", "a", budget=5)
 
@@ -287,8 +281,6 @@ def test_report_not_found_points_at_the_workspace_copy(team, dirs):
 
 
 # ---------------------------------------------------------------------------------------- read
-
-
 def test_read_absolute_paths_in_workspace_inputs_and_reports_workspaces(team, dirs):
     (dirs["proj"] / "mine.md").write_text("a b\n")
     (dirs["proj/out"] / "theirs.md").write_text("a b c\n")
@@ -335,40 +327,7 @@ def test_read_relative_paths_and_root_are_unchanged(team, dirs):
     assert team.read(str(dirs["proj"] / "p.md"), actor="lead").startswith(f"[{dirs['proj'] / 'p.md'}: 1 words")
 
 
-# --------------------------------------------------------------------------------------- prompt
-
-
-def test_prompt_has_a_files_section_with_workspace_and_inputs(team, dirs):
-    text = team.run_prompt("lead/writer", [])
-    assert "- Files:" in text
-    assert f"Workspace (kiro read/write/shell, and the working directory of kiro tools): `{dirs['proj/out']}`" in text
-    assert f"Read-only inputs (kiro `read` or orgmcp `org_read` by absolute path): `{dirs['handbook/hr']}`" in text
-    assert "`lead/writer/MEMORY.md`" in text and "`lead/writer/work/` (orgmcp `org_write` only)" in text
-    assert "Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path." in text
-    assert "kiro `write` is limited to the workspace" in text and "cannot confine" not in text.split("# New messages")[0].split("- Files:")[1]
-
-
-def test_prompt_states_the_shell_rule_only_for_agents_with_shell(team, dirs):
-    team.hire("lead", "dev", "Dev", "x", tools=["read", "write", "shell"], workspace=str(dirs["proj/out"]))
-    assert "`shell`, which the runtime cannot confine" in team.run_prompt("lead/dev", [])
-    assert "cannot confine" not in team.run_prompt("lead/writer", [])
-
-
-def test_prompt_has_no_files_section_without_workspace_or_inputs(team):
-    team.hire("lead", "plain", "Plain", "x")
-    assert "- Files:" not in team.run_prompt("lead/plain", []) and "- Files:" not in team.whoami("lead/plain")
-    assert "- Files:" in team.whoami("lead")
-
-
-def test_inputs_only_agent_is_told_it_has_no_workspace(team, dirs):
-    team.hire("lead", "ro", "RO", "x", inputs=[str(dirs["handbook/hr"])])
-    text = team.state_summary("lead/ro")
-    assert "You have no workspace" in text and f"`{dirs['handbook/hr']}`" in text
-
-
 # ------------------------------------------------------------------------------------ blueprint
-
-
 @pytest.fixture
 def bp(tmp_path, dirs):
     (tmp_path / "deliverables").mkdir(exist_ok=True)
