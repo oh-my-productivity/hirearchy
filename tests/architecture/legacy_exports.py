@@ -30,7 +30,6 @@ PERMANENT_MODULES = {"core"}  # every name of these modules stays: the ledger ho
 
 LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "core": {"*": "permanent"},
-    "scheduler": _e3("file_confinement"),
     "progress": {"progress": "permanent"},  # orgmcp.progress.progress(org, task_id=None) is documented in the README
 }
 

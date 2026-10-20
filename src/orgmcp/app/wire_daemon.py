@@ -2,9 +2,7 @@
 
 The schedulers this process started are a process resource (``ProcessResources.children``, the former ``scheduler._children``): every status and every control
 of the process reaps and adopts through the same registry.
-
-``status_of`` builds the status over the ports a runtime has *now*: the legacy ``progress`` functions (``wire_progress``, deleted by another step of E3) are
-handed an ``Org`` whose ``runtime`` tests replace. It goes with them (E3-close)."""
+"""
 
 from __future__ import annotations
 
@@ -30,9 +28,6 @@ from ..snapshots import IgnoreList
 from ._builder import Builder
 from ._lazy import PortResolver
 from ._resources import ProcessResources
-from .runtime import OrgRuntime
-from .wire_attention import waiting_on_user_of
-from .wire_stalls import RuntimePorts
 
 
 def identity() -> SchedulerRecognizer:
@@ -80,11 +75,3 @@ def register(b: Builder) -> None:
     b.provide(SchedulerLock, lock)
     b.provide(SchedulerStatus, lambda b: status(b, b.get(WaitingOnUser)))
     b.provide(SchedulerControl, lambda b: control(b, b.get(SchedulerStatus)))
-
-
-# ------------------------------------------------------------------------------ for the legacy progress functions
-
-
-def status_of(runtime: OrgRuntime) -> SchedulerStatus:
-    """``SchedulerStatus`` over the ports ``runtime`` has now (what stops a scheduler, if nothing else does, is what ``attention`` says over them)."""
-    return status(RuntimePorts(runtime), waiting_on_user_of(runtime))

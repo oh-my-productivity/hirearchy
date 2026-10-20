@@ -1,15 +1,12 @@
-"""``wire_attention``: the runtime has the three ports of ``attention``, built from the ports of the runtime; and the object the scheduler status
-(``wire_daemon.status_of``) uses follows the runtime in force (one a test replaced a part of)."""
+"""``wire_attention``: the runtime has the three ports of ``attention``, built from the ports of the runtime."""
 
 from __future__ import annotations
 
 from collections.abc import Collection
 from pathlib import Path
 
-import pytest
-
 from orgmcp.agents import AgentDirectory
-from orgmcp.app import Org, wire_attention, wiring
+from orgmcp.app import wiring
 from orgmcp.attention import HumanQueue, OpenWork, Waiting, WaitingOnUser
 from orgmcp.attention._queue import InboxHumanQueue
 from orgmcp.attention._waiting import RootTaskWaitingOnUser
@@ -79,16 +76,3 @@ def test_every_collaborator_of_the_decision_comes_from_the_runtime(tmp_path: Pat
     assert [line for _, line in runtime.human_queue.items()] == ['Needs you: runtime notice "Q": really? (message 20261018T100000000002-runtime-aaaa)']
     assert list(tmp_path.iterdir()) == []
 
-
-# ------------------------------------------------------------------------------ the objects of the legacy functions
-
-
-@pytest.fixture
-def org(tmp_path: Path) -> Org:
-    made = Org.init(tmp_path / "org", "mission")
-    made.hire("root", "ceo", "Chief", "Run it.")
-    return made
-
-
-def test_the_legacy_objects_are_the_classes_of_the_package(org: Org) -> None:
-    assert isinstance(wire_attention.waiting_on_user_of(org.runtime), RootTaskWaitingOnUser)

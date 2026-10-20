@@ -35,7 +35,7 @@ def test_the_permanent_entries_are_core_and_progress():
 
 
 def test_every_entry_names_the_step_that_removes_it():
-    assert len(legacy_exports.LEGACY_EXPORTS) >= 2  # core and progress (permanent); the other tables go with their modules in E3
+    assert len(legacy_exports.LEGACY_EXPORTS) >= 2  # only the permanent tables remain: core and progress
     for module, names in legacy_exports.LEGACY_EXPORTS.items():
         for name, step in names.items():
             assert step in STEPS, f"{module}.{name}: unknown removal step {step!r}"

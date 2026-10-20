@@ -1,8 +1,4 @@
-"""Providers of the ``attention`` ports (ARCHITECTURE.md 6.1), and the same objects over the runtime in force for the legacy functions.
-
-``waiting_on_user_of`` serves ``daemon``'s ``status_of`` until that is deleted (E3-close): it is handed a runtime a test replaced a part of (a ledger of
-the stall ladder, the notices), so each call builds the object over the ports the runtime has *now*. It goes with ``status_of``.
-"""
+"""Providers of the ``attention`` ports (ARCHITECTURE.md 6.1)."""
 
 from __future__ import annotations
 
@@ -17,8 +13,6 @@ from ..mail import MailboxReader, TaskQuery
 from ..stalls import NudgeLedger
 from ._builder import Builder
 from ._lazy import PortResolver
-from .runtime import OrgRuntime
-from .wire_stalls import RuntimePorts
 
 
 def waiting_on_user(b: PortResolver) -> RootTaskWaitingOnUser:
@@ -43,10 +37,3 @@ def register(b: Builder) -> None:
     b.provide(HumanQueue, human_queue)
     b.provide(OpenWork, open_work)
 
-
-# ------------------------------------------------------------------------------ the legacy functions' objects
-
-
-def waiting_on_user_of(runtime: OrgRuntime) -> WaitingOnUser:
-    """``WaitingOnUser`` over the ports ``runtime`` has now."""
-    return waiting_on_user(RuntimePorts(runtime))

@@ -1,13 +1,12 @@
 """``wire_daemon``: the runtime has the five ports of ``daemon``, built from the ports of the runtime; the schedulers this process started are one registry
-for the whole process; and the objects the legacy functions use follow the runtime in force (one a test replaced a part of)."""
+for the whole process; and the status is built over the ports the runtime has."""
 
 from __future__ import annotations
 
-import dataclasses
 import sys
 from pathlib import Path
 
-from orgmcp.app import wire_daemon, wiring
+from orgmcp.app import wiring
 from orgmcp.attention import Waiting, WaitingOnUser
 from orgmcp.attention.testing import FixedWaiting
 from orgmcp.daemon import FINISHED, ExitMarker, SchedulerCommand, SchedulerControl, SchedulerLock, SchedulerState, SchedulerStatus
@@ -19,6 +18,7 @@ from orgmcp.daemon._status import PidFileSchedulerStatus
 from orgmcp.daemon.testing import FakeSchedulerCommand, FixedTasks, MemoryExitMarker, ScriptedSchedulerSpawner
 from orgmcp.kernel import OrgPaths
 from orgmcp.kernel.testing import FakeClock
+from orgmcp.mail import TaskQuery
 from orgmcp.processes import ProcessInspector, ProcessSignaller, ProcessSpawner
 from orgmcp.processes.testing import FakeProcessTable
 from orgmcp.snapshots import IgnoreList
@@ -109,16 +109,13 @@ def test_a_stopped_scheduler_is_explained_by_what_attention_says(tmp_path: Path)
     assert runtime.scheduler_status.describe() == "scheduler: stopped (waiting on you: x)"
 
 
-def test_the_status_of_the_runtime_in_force_follows_a_part_the_runtime_replaced(tmp_path: Path) -> None:
-    """``status_of`` builds over the ports the runtime has *now* (the legacy functions are handed an ``Org`` whose parts tests replace)."""
+def test_the_status_follows_the_parts_the_runtime_was_opened_with(tmp_path: Path) -> None:
+    """The status is built over the ports the runtime has (what stops a scheduler, if nothing else does, is what ``attention`` says over them)."""
     (tmp_path / ".runtime").mkdir()
-    runtime = wiring.open_runtime(tmp_path)
-    before = wire_daemon.status_of(runtime)
+    before = wiring.open_runtime(tmp_path).scheduler_status
     assert before.describe() == "scheduler: stopped"
-    replaced = dataclasses.replace(runtime, exit_marker=MemoryExitMarker(FINISHED + "\n"), task_query=FixedTasks())
-    after = wire_daemon.status_of(replaced)
+    after = wiring.open_runtime(tmp_path, {ExitMarker: MemoryExitMarker(FINISHED + "\n"), TaskQuery: FixedTasks()}).scheduler_status
     assert after.describe() == f"scheduler: stopped ({FINISHED})"
-    busy = dataclasses.replace(replaced, task_query=FixedTasks(root_waits=True))
-    stale = wire_daemon.status_of(busy)
+    stale = wiring.open_runtime(tmp_path, {ExitMarker: MemoryExitMarker(FINISHED + "\n"), TaskQuery: FixedTasks(root_waits=True)}).scheduler_status
     assert stale.exit_reason() == ""  # root waits for a result again: the reason of the exit is stale
     assert stale.describe().startswith('scheduler: stopped (waiting on you: "Ship it"')  # and attention, over the same tasks, says why
