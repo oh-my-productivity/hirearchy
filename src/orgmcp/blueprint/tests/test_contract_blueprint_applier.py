@@ -8,7 +8,7 @@ from typing import cast
 
 import pytest
 
-from orgmcp.blueprint import BlueprintApplier, BlueprintError, load_text
+from orgmcp.blueprint import BlueprintApplier, BlueprintError
 from orgmcp.blueprint.testing import (
     IMPLEMENTATIONS,
     ApplierHarness,
@@ -18,7 +18,7 @@ from orgmcp.blueprint.testing import (
 )
 from orgmcp.kernel import OrgError, child_addr
 
-from ._plans import base_dir, golden, scrub, template_at
+from ._plans import base_dir, golden, load_text, scrub, template_at
 from ._support import implementations, make
 
 ROLLED_BACK = "blueprint apply failed midway; rolled back"

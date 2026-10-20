@@ -13,7 +13,6 @@ import shutil
 import tomllib
 from pathlib import Path
 
-from orgmcp.skill import skill_source
 from orgmcp.skill._source import PackagedSkillSource
 
 REPO = Path(__file__).resolve().parents[4]
@@ -36,9 +35,10 @@ def force_include() -> dict[str, str]:
     return table
 
 
-def test_the_legacy_function_resolves_to_the_value_of_main() -> None:
-    assert skill_source() == PACKAGE.parent.parent / "skills" / "orgmcp" / "SKILL.md"  # main: here.parent.parent / "skills" / ...
-    assert skill_source() == SHIPPED.resolve()
+def test_the_source_of_the_package_resolves_to_the_value_of_main() -> None:
+    source = PackagedSkillSource(PACKAGE).path()
+    assert source == PACKAGE.parent.parent / "skills" / "orgmcp" / "SKILL.md"  # main: here.parent.parent / "skills" / ...
+    assert source == SHIPPED.resolve()
 
 
 def test_the_wheel_ships_the_skill_beside_the_package() -> None:

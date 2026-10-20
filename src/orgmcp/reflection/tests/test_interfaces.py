@@ -16,7 +16,6 @@ from orgmcp.reflection._cases import DerivedCaseHistory
 from orgmcp.reflection._digest import DigestBuilder
 from orgmcp.reflection._files import OrgServicePaths
 from orgmcp.reflection._ports import (
-    ConfigSource,
     PlaybookSection,
     PlaybookTimelines,
     RejectedServices,
@@ -29,7 +28,6 @@ from orgmcp.reflection._reports import TextServiceReports
 from orgmcp.reflection._runs import LogRunCounter
 from orgmcp.reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection
 from orgmcp.reflection._timeline import StorePlaybookTimelines
-from orgmcp.reflection._assembly import CallableConfig
 from orgmcp.reflection.testing import FixedCaseHistory
 
 
@@ -51,14 +49,11 @@ def test_each_role_inside_the_package_has_its_implementation() -> None:
     assert RejectedServices in MailRejectedServices.__mro__
     assert PlaybookSection in QuotedPlaybookSection.__mro__
     assert ReflectSection in EvidenceReflectSection.__mro__
-    assert ConfigSource in CallableConfig.__mro__
     assert ServicesListing in OwnedServicesListing.__mro__
 
 
-def test_the_package_exports_the_api_and_the_legacy_names_only() -> None:
-    legacy = {"CLIP_LESSON", "CLIP_NOTE", "DIGEST_CASES", "DIGEST_CHARS", "MAX_VERDICTS", "case_of", "case_total", "cases", "playbook_timeline",
-              "prompt_sections", "reflection_digest", "services_text"}
-    assert set(reflection.__all__) == set(api.__all__) | legacy and all(hasattr(reflection, n) for n in reflection.__all__)
+def test_the_package_exports_the_api_and_nothing_else() -> None:
+    assert set(reflection.__all__) == set(api.__all__) and all(hasattr(reflection, n) for n in reflection.__all__)
 
 
 def test_the_api_names_what_the_ports_return() -> None:

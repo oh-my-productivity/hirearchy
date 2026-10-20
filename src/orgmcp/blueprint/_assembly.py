@@ -1,37 +1,24 @@
-"""The validator and its parts as the legacy module-level functions need them (not a port of the package).
+"""The classes of the plan side and of the applier, put together from the ports they are made of: the one place that says how they are assembled.
 
-The legacy functions are handed an ``Org`` (duck-typed) or none, and read the process they run in: the environment, ``scheduler.file_confinement``
-(a patch point of the tests), the roles directory. They cannot take those from a runtime, so the composition root installs them once, when
-``orgmcp.app`` is loaded (``install_legacy_parts``): a feature may not import the application package, nor the private modules of ``kernel``, ``kiro``
-or ``services`` that make the real parts. Every legacy function and this module go away with the last caller (E3)."""
+``orgmcp.app`` (``wire_blueprint``, ``wire_cli``, ``wire_mcp_server``) and the fakes of the package (``testing``) build them through these two functions: a
+feature may not import the application package, nor the private modules of ``kernel``, ``kiro`` or ``services`` that make the real ports."""
 
 from __future__ import annotations
 
-import tempfile
 from dataclasses import dataclass
-from pathlib import Path
 
 from ..agents import AgentDirectory
 from ..dispatch import TaskAssigner
 from ..hierarchy import Hiring, Retirement
-from ..kernel import Environment
-from ..kiro import ConfinementPolicy
 from ..services import ContractNormalizer, ServiceCommands
 from ..snapshots import OrgSnapshotter
-from ._access import PolicyAccessReport
 from ._accesswords import PlainAccessWords
 from ._applier import HiringBlueprintApplier
 from ._basis import ValidatedPlanBasis
-from ._budgeting import BudgetPlanner
 from ._charters import CharterWriter
 from ._details import TextPlanDetails
-from ._files import FsTextFiles
 from ._firsttask import FirstTaskGiver
-from ._host import HostOrgContext, OrgFacts, OrgWithPorts
 from ._identity import HashPlanIdentity
-from ._loader import YamlBlueprintLoader
-from ._org import NoOrgContext, PresentOrAbsentOrg
-from ._pathcheck import RootedPathChecker
 from ._playbooks import StepsPlaybookWriter
 from ._protocols import (
     AccessReport,
@@ -45,45 +32,13 @@ from ._protocols import (
     PlanWords,
     WorkspaceRoots,
 )
-from ._provision import FsWorkspaceProvisioner
 from ._render import TextPlanRenderer
-from ._resolver import AgentResolver
-from ._roles import PackagedRoleLibrary
-from ._roots import EnvironmentWorkspaceRoots
 from ._servicedef import PlaybookServiceDefiner
-from ._service_rules import ServiceBlueprintRules
 from ._team import CharterTeamBuilder
 from ._undo import RetiringRollback
 from ._userplan import TextUserPlan
-from ._validator import RuleBlueprintValidator
 from ._words import ServiceWords
-from .api import BlueprintApplier, BlueprintLoader, BlueprintValidator, PlanIdentity, PlanRenderer, RoleLibrary, WorkspaceProvisioner
-
-
-@dataclass(frozen=True)
-class LegacyParts:
-    """What a legacy function works with, whether it is given an ``Org`` or none."""
-
-    environment: Environment
-    confinement_policy: ConfinementPolicy
-    contract_normalizer: ContractNormalizer
-    roles_dir: Path  # ``orgmcp/roles`` (package data): the wiring says where it is
-
-
-_installed: LegacyParts | None = None
-
-
-def install_legacy_parts(parts: LegacyParts) -> None:
-    """Called by ``orgmcp.app`` when it is loaded."""
-    global _installed
-    _installed = parts
-
-
-def legacy_parts() -> LegacyParts:
-    """The parts in force; ``RuntimeError`` when ``orgmcp.app`` has not been loaded."""
-    if _installed is None:
-        raise RuntimeError("orgmcp.app is not loaded: the parts of the legacy blueprint functions are not installed")
-    return _installed
+from .api import BlueprintApplier, BlueprintLoader, BlueprintValidator, PlanIdentity, PlanRenderer, WorkspaceProvisioner
 
 
 @dataclass(frozen=True)
@@ -121,44 +76,4 @@ def applier_over(
         plan.basis, budgets, CharterTeamBuilder(hiring, plan.charters, provisioner),
         PlaybookServiceDefiner(commands, normalizer, plan.playbooks, budgets), FirstTaskGiver(tasks, commands),
         RetiringRollback(agents, retirement, provisioner), snapshots,
-    )
-
-
-@dataclass(frozen=True)
-class Assembly:
-    """The classes of the package made over the legacy parts and over the ``Org`` a legacy function was given (or none)."""
-
-    roles: RoleLibrary
-    loader: BlueprintLoader
-    roots: WorkspaceRoots
-    resolver: AgentResolution
-    budgets: BudgetPlanning
-    access: AccessReport
-    org: OrgContext  # the organization given, or the defaults of plan time before there is one
-    validator: BlueprintValidator
-    plan: PlanParts
-
-
-def assembly_of(org: OrgFacts | None) -> Assembly:
-    parts = legacy_parts()
-    context: OrgContext = HostOrgContext(org) if org is not None else NoOrgContext()
-    roles = PackagedRoleLibrary(parts.roles_dir)
-    paths = RootedPathChecker(parts.environment)
-    roots = EnvironmentWorkspaceRoots(parts.environment, lambda: Path(tempfile.gettempdir()))
-    resolver = AgentResolver(roles, paths)
-    budgets = BudgetPlanner()
-    access = PolicyAccessReport(parts.confinement_policy)
-    services = ServiceBlueprintRules(parts.contract_normalizer, paths, budgets)
-    validator = RuleBlueprintValidator(resolver, paths, budgets, access, services, roots, PresentOrAbsentOrg(context, NoOrgContext()))
-    loader = YamlBlueprintLoader(FsTextFiles())
-    plan = plan_parts(loader, validator, resolver, roots, budgets, access, parts.contract_normalizer, context)
-    return Assembly(roles, loader, roots, resolver, budgets, access, context, validator, plan)
-
-
-def applier_of(org: OrgWithPorts) -> BlueprintApplier:
-    """The applier of a legacy ``apply``: the plan side over the ``Org`` given, and the ports that ``Org`` has *now* (``org.runtime``)."""
-    a, ports = assembly_of(org), org.runtime
-    return applier_over(
-        a.plan, a.budgets, legacy_parts().contract_normalizer, ports.hiring, ports.retirement, ports.agents, ports.service_commands,
-        ports.task_assigner, ports.snapshotter, FsWorkspaceProvisioner(),
     )

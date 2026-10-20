@@ -6,14 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp.blueprint import load_text
 from orgmcp.blueprint._charters import CharterWriter
 from orgmcp.blueprint._shapes import Split
 from orgmcp.blueprint.api import Agent, Role
 from orgmcp.blueprint.testing import plan_parts_over, role_library_of, StaticOrgContext
 from orgmcp.kernel.testing import DictEnvironment
 
-from ._plans import LABELS, base_dir, golden, scrub, template_at
+from ._plans import LABELS, base_dir, golden, load_text, scrub, template_at
 from ._support import role
 
 

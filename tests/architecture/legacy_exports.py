@@ -31,37 +31,7 @@ PERMANENT_MODULES = {"core"}  # every name of these modules stays: the ledger ho
 LEGACY_EXPORTS: dict[str, dict[str, str]] = {
     "core": {"*": "permanent"},
     "scheduler": _e3("file_confinement"),
-    "services": _e3(
-        "TITLE_MAX service_dir read_contract read_playbook owned_services requestable_services parse_input_spec define_service "
-        "retire_service revise_playbook report_hint request rework_fields feedback_text feedback"
-    ),
-    "reflection": _e3(
-        "CLIP_LESSON CLIP_NOTE DIGEST_CASES DIGEST_CHARS MAX_VERDICTS cases case_of case_total playbook_timeline prompt_sections "
-        "reflection_digest services_text"
-    ),
     "progress": {"progress": "permanent"},  # orgmcp.progress.progress(org, task_id=None) is documented in the README
-    "blueprint": _e3(
-        "ROLES_DIR WEB_TOOLS WRITE_TOOLS SLACK TIGHT REWORK_RUNS KINDS role_names "
-        "get_role load load_text NEEDS_KEYS AGENT_KEYS SERVICE_KEYS TASK_KEYS REQUEST_KEYS service_budget "
-        "declared_inputs review_roots estimate planned_total budget_split edits_others_files validate "
-        "default_playbook org_files_readable access_facts render_plan PLAN_HEADING PLAN_DRAFT_HEADING PLAN_END "
-        "PLAN_SHOW TOOL_WORDS SHOWN_CRITERIA SHOWN_WARNINGS HIDDEN_WARNINGS PLAN_ID_LENGTH SHOWN_SERVICE_CRITERIA "
-        "plan_id CLIP GOAL_CLIP plan_for_user propose_text propose apply"
-    ),
-    "blueprint_examples": _e3(
-        "KINDS example"
-    ),
-    "templates": _e3(
-        "ORG_RULES DEFAULT_MISSION org_rules charter_body task_body result_body notice_budget notice_budget_returned "
-        "notice_failures notice_nudge notice_stalled REVIEW_ACTIONS review_item notice_review_manager "
-        "notice_review_root"
-    ),
-    "upgrade": _e3(
-        "MISSION_HEADING RULES_HEADING extract_mission upgrade_rules"
-    ),
-    "skill": _e3(
-        "SKILL_NAME skill_source install_skill"
-    ),
 }
 
 

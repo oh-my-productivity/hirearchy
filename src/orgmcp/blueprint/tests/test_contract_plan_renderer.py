@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp.blueprint import Issue, PlanRenderer, load_text
+from orgmcp.blueprint import Issue, PlanRenderer
 from orgmcp.blueprint.testing import IMPLEMENTATIONS, RendererHarness, StaticOrgContext
 
-from ._plans import KEYS, PROPOSED, base_dir, golden, scrub, template_at
+from ._plans import KEYS, PROPOSED, base_dir, golden, load_text, scrub, template_at
 from ._support import implementations, make
 
 

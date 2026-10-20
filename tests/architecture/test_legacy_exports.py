@@ -18,7 +18,9 @@ def test_every_public_name_of_a_legacy_module_is_in_the_ledger():
     assert not problems, "\n".join(problems)
 
 
-def test_a_new_public_name_and_a_stale_entry_are_reported(tmp_path):
+def test_a_new_public_name_and_a_stale_entry_are_reported(tmp_path, monkeypatch):
+    # a table of its own, so that the test does not depend on which legacy modules the ledger still lists
+    monkeypatch.setitem(legacy_exports.LEGACY_EXPORTS, "upgrade", legacy_exports._e3("MISSION_HEADING RULES_HEADING extract_mission upgrade_rules"))
     (tmp_path / "upgrade.py").write_text("def upgrade_rules(): ...\ndef sneaked_in(): ...\nclass Upgrade: ...\n", encoding="utf-8")
     problems = legacy_exports.check(tmp_path)
     assert any("sneaked_in" in p and "upgrade" in p for p in problems)

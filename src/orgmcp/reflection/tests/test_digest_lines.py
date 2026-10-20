@@ -9,7 +9,7 @@ import pytest
 
 from orgmcp.kernel import Message
 from orgmcp.reflection import Case, Verdict
-from orgmcp.reflection._digest import CLIP_LESSON, CLIP_NOTE, MAX_VERDICTS, case_line, verdict_chain
+from orgmcp.reflection._digest import CLIP_LESSON, CLIP_NOTE, DIGEST_CASES, DIGEST_CHARS, MAX_VERDICTS, case_line, verdict_chain
 from orgmcp.reflection.testing import ReflectionWorld, fs_world, memory_world
 
 from ._support import SERVICE, ask, define, deliver, populated
@@ -32,6 +32,7 @@ def case(*, verdicts: list[Verdict] | None = None, lessons: list[str] | None = N
 
 def test_the_constants_of_the_digest() -> None:
     assert (CLIP_LESSON, CLIP_NOTE, MAX_VERDICTS) == (220, 160, 4)
+    assert (DIGEST_CASES, DIGEST_CHARS) == (6, 3000)
 
 
 # ------------------------------------------------------------------------------ verdict_chain

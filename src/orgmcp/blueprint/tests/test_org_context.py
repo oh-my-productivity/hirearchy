@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from orgmcp.agents import AgentDirectory
-from orgmcp.blueprint._host import HostOrgContext
 from orgmcp.blueprint._org import NoOrgContext, PresentOrAbsentOrg, RuntimeOrgContext
 from orgmcp.blueprint._protocols import OrgContext, OrgContexts
 from orgmcp.blueprint.testing import StaticOrgContext
@@ -99,37 +98,3 @@ def test_the_choice_between_the_organization_and_the_defaults() -> None:
     both = PresentOrAbsentOrg(present, absent)
     assert isinstance(both, OrgContexts) and both.context(True) is present and both.context(False) is absent
 
-
-class Facts:
-    """What an ``Org`` says about itself, as far as the legacy functions read it."""
-
-    def __init__(self, root: Path, config: dict[str, object], tree: dict[str, list[str]], services: dict[str, list[str]]) -> None:
-        self.root = root
-        self.config = config
-        self._tree = tree
-        self._services = services
-
-    def exists(self, addr: str) -> bool:
-        return addr in self._tree
-
-    def children(self, addr: str) -> list[str]:
-        return list(self._tree.get(addr, []))
-
-    def service_names(self, addr: str) -> list[str]:
-        return list(self._services.get(addr, []))
-
-
-def test_the_org_object_is_an_organization_as_it_says_it_is(tmp_path: Path) -> None:
-    facts = Facts(tmp_path, {"max_depth": 2}, {"ceo": [], "ops": [], "root": ["ceo", "ops"]}, {"ceo": ["brief"], "ops": ["digest", "brief"], "other": ["hidden"]})
-    org = HostOrgContext(facts)
-    assert isinstance(org, OrgContext)
-    assert org.config() == {"max_depth": 2} and org.root() == tmp_path and org.exists("ceo") and not org.exists("cto")
-    assert org.service_names() == {"brief", "digest"}  # the services of the direct reports of root
-
-
-def test_the_settings_of_the_org_object_are_read_each_time_and_given_as_a_copy(tmp_path: Path) -> None:
-    facts = Facts(tmp_path, {"max_depth": 2}, {"root": []}, {})
-    org = HostOrgContext(facts)
-    org.config()["max_depth"] = 99
-    facts.config = {"max_depth": 5}  # a lenient org re-reads ORG.md
-    assert org.config() == {"max_depth": 5}

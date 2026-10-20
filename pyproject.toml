@@ -111,7 +111,7 @@ include_external_packages = false
 name = "The library does not import the entry points (cli, mcp server, dashboard)"
 type = "forbidden"
 source_modules = [
-    "orgmcp.blueprint", "orgmcp.blueprint_examples", "orgmcp.core",
+    "orgmcp.blueprint", "orgmcp.core",
     "orgmcp.health", "orgmcp.progress", "orgmcp.review", "orgmcp.scheduler", "orgmcp.services",
     "orgmcp.skill", "orgmcp.telemetry", "orgmcp.templates", "orgmcp.upgrade",
 ]
