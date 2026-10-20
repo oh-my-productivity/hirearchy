@@ -1,14 +1,15 @@
-"""Cross-branch behavior after integrating confinement (X1), assistant UX (X2) and verifier templates (X3)."""
-
 import asyncio
-import json
+import re
 from pathlib import Path
 
 import pytest
+import testkit
+import yaml
 
-from orgmcp import blueprint as bpm
+from orgmcp import blueprint as bpm, blueprint_examples as ex
 from orgmcp.cli import main
 from orgmcp.core import ROOT, Org
+from orgmcp.scheduler import file_confinement
 from orgmcp.server import OrgBinding, build_server
 
 
@@ -40,8 +41,6 @@ def org(tmp_path, dirs):
 
 
 # ---------------------------------------------------------------------------------------- hire with inputs
-
-
 def test_root_hire_tool_takes_inputs(org, dirs):
     server = build_server(OrgBinding(org.root), ROOT)
     assert "hired reader" in call(server, "hire", name="reader", role="R", charter="Read.", tools=["read"], inputs=[str(dirs["docs"])])
@@ -67,14 +66,6 @@ def test_cli_hire_inputs_is_repeatable(org, dirs, capsys):
     main(["--root", str(org.root), "hire", "root", "plain", "--role", "P", "--charter", "x"])
     assert "inputs" not in org.charter("plain")[0]
 
-
-# ---------------------------------------------------------------- plan access text == what kiro enforces
-
-import re
-import yaml
-
-from orgmcp import blueprint_examples as ex
-from orgmcp.scheduler import file_confinement
 
 KNOWN_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}
 
@@ -157,8 +148,7 @@ def test_plan_words_for_each_access_shape():
 
 
 # ------------------------------------------------------------- blueprint_example kinds pass propose_org
-
-EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
+EXAMPLES_DIR = testkit.REPO / "examples"
 
 
 @pytest.fixture
@@ -208,8 +198,6 @@ def test_example_criteria_match_the_exhaustive_verifier_templates(root_server, c
 
 
 # ------------------------------------------------------------------------------ skill and instructions
-
-
 def test_skill_and_instructions_mention_read_only_inputs_within_the_limits(root_server):
     from orgmcp.server import ROOT_INSTRUCTIONS
     from orgmcp.skill import skill_source
@@ -223,7 +211,7 @@ def test_skill_and_instructions_mention_read_only_inputs_within_the_limits(root_
 
 
 def test_readme_documents_the_integrated_features():
-    readme = (Path(__file__).resolve().parent.parent / "README.md").read_text()
+    readme = (testkit.REPO / "README.md").read_text()
     for needle in ("hire ... --inputs PATH", "`inputs` parameter of the `hire` tool", "`plan_id`", "blueprint_example(kind)",
                    "progress(wait_seconds=N)", "--until-done", "n of m factual claims verified (n = m required); k wrong, u unsupported, p not-checkable; j judgement statements, each resting on verified facts: yes",
                    "`code-reviewer` now has `read` and `shell`", "`manager` verifies with its own `read` output",

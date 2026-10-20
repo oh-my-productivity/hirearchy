@@ -1,17 +1,12 @@
-"""mypy (strict, package by package) and import-linter run as part of the default test run.
-
-Both shell out to ``scripts/static_checks.py``; a test is skipped only when its tool is not installed.
-"""
-
 import importlib.util
 import subprocess
 import sys
 import tomllib
-from pathlib import Path
 
 import pytest
+import testkit
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = testkit.REPO
 SCRIPT = ROOT / "scripts" / "static_checks.py"
 
 

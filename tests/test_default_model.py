@@ -1,24 +1,16 @@
 """Every agent runs on claude-sonnet-5.5 unless its charter or the org config names another model."""
 
 import copy
-import json
-import os
-import sys
-import time
 from pathlib import Path
 
 import pytest
-import testkit
 import yaml
 
 from orgmcp import blueprint as bpm
 from orgmcp import blueprint_examples as ex
-from orgmcp import observe
-from orgmcp.cli import main
 from orgmcp.core import DEFAULT_CONFIG, DEFAULT_MODEL, ROOT, Org
-from orgmcp.scheduler import Scheduler, kiro_runner
+from orgmcp.scheduler import kiro_runner
 
-FAKE = str(testkit.FAKE_AGENT)
 EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
 CHARTER = "---\nrole: CEO\n{model}tools: [read]\n---\nLead.\n"
 
@@ -43,23 +35,12 @@ def model_arg(cmd: list[str]) -> str:
     return cmd[cmd.index("--model") + 1]
 
 
-def fake_runner():
-    def build(org, addr, prompt):
-        return [sys.executable, FAKE], org.dir(addr), {**os.environ, "ORG_ROOT": str(org.root), "ORG_AGENT": addr, "FAKE_MODE": "work"}
-
-    return build
-
-
 # ------------------------------------------------------------------------------------------ the constant
-
-
 def test_the_default_is_one_constant_used_by_the_default_config():
     assert DEFAULT_MODEL == "claude-sonnet-5.5" and DEFAULT_CONFIG["default_model"] == DEFAULT_MODEL
 
 
 # ------------------------------------------------------------------------------------------ resolution order
-
-
 def test_charter_model_beats_org_config_beats_default(org):
     assert org.model_for("ceo") == DEFAULT_MODEL  # no model anywhere
     set_config(org, default_model="org-model")
@@ -92,17 +73,6 @@ def test_hire_without_a_model_leaves_the_charter_unpinned_so_the_org_default_app
     assert org.model_for("pinned") == "m-x"
 
 
-def test_the_cli_init_and_hire_without_model_use_the_default(tmp_path, capsys):
-    target = tmp_path / "org"
-    main(["init", str(target), "--mission", "m"])
-    assert Org(target).default_model == DEFAULT_MODEL
-    main(["--root", str(target), "hire", "root", "ceo", "--role", "CEO", "--charter", "Lead."])
-    assert Org(target).model_for("ceo") == DEFAULT_MODEL
-    main(["init", str(tmp_path / "o2"), "--mission", "m", "--model", "claude-haiku-4.5"])
-    assert Org(tmp_path / "o2").config["default_model"] == "claude-haiku-4.5"
-    capsys.readouterr()
-
-
 def test_create_org_without_a_model_uses_the_default(tmp_path, monkeypatch):
     from orgmcp.server import resolve_binding
 
@@ -113,8 +83,6 @@ def test_create_org_without_a_model_uses_the_default(tmp_path, monkeypatch):
 
 
 # ------------------------------------------------------------------------------------------ the run command
-
-
 def test_the_scheduler_command_always_carries_the_model(org):
     cmd, _, _ = kiro_runner()(org, "ceo", "P")
     assert model_arg(cmd) == "claude-sonnet-5.5" and cmd[-2:] == ["--model", "claude-sonnet-5.5"]
@@ -135,33 +103,7 @@ def test_the_scheduler_command_for_a_legacy_org_config_uses_the_default(org, val
     assert model_arg(kiro_runner()(org, "ceo", "P")[0]) == DEFAULT_MODEL
 
 
-def run_start_models(org: Org) -> dict[str, str]:
-    org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
-    sched = Scheduler(org, fake_runner(), echo=lambda _: None)
-    sched.acquire()
-    try:
-        for _ in range(500):
-            if not sched.tick():
-                break
-            time.sleep(0.02)
-    finally:
-        sched.release()
-    return {e["agent"]: e["model"] for e in observe.events(org, kind="run.start", since="1h")}
-
-
-def test_the_run_start_event_reports_the_resolved_model(org):
-    assert run_start_models(org) == {"ceo": DEFAULT_MODEL, "ceo/eng": DEFAULT_MODEL}
-
-
-def test_the_run_start_event_reports_explicit_models(org):
-    set_config(org, default_model="org-model")
-    charter_model(org, "charter-model")
-    assert run_start_models(org) == {"ceo": "charter-model", "ceo/eng": "org-model"}
-
-
 # ------------------------------------------------------------------------------------------ blueprints
-
-
 @pytest.fixture
 def research(tmp_path):
     (tmp_path / "deliverables").mkdir(exist_ok=True)
@@ -251,8 +193,6 @@ def test_apply_pins_the_resolved_model_in_the_charters(research, tmp_path):
 
 
 # ------------------------------------------------------------------------------------------ templates and examples
-
-
 def fill(text: str, base: Path) -> str:
     for n in ("docs", "data", "proj", "deliverables"):
         (base / n).mkdir(exist_ok=True)

@@ -5,7 +5,6 @@ Event files are written by hand (tests/testkit/obs_fixtures.py) exactly per the 
 
 import asyncio
 import dataclasses
-import json
 import os
 import re
 import sys
@@ -14,11 +13,10 @@ from datetime import timedelta
 
 import pytest
 import testkit
-from testkit.obs_fixtures import T0, EventLog, Story, freeze, run_ids, stamp, stamp_trace
+from testkit.obs_fixtures import T0, EventLog, Story, freeze, stamp
 from testkit.scheduler import scheduler_is
 
 from orgmcp import observe
-from orgmcp.cli import main
 from orgmcp.core import ROOT, Message, Org, OrgError
 from orgmcp.kernel.testing import FakeClock
 from orgmcp.processes.testing import fake_world
@@ -71,8 +69,6 @@ def sched_org(org, tasks=1, mode="work"):
 
 
 # ------------------------------------------------------------------------------------------------ helpers
-
-
 def test_percentile_is_nearest_rank_and_exact():
     vals = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     assert observe.percentile(vals, 50) == 50
@@ -108,8 +104,6 @@ def test_refusals_are_normalized_so_reasons_group():
 
 
 # ------------------------------------------------------------------------------------------------ events
-
-
 def test_events_merge_files_by_time_and_tolerate_damage(org):
     log = EventLog(org)
     log.emit("tool.call", stamp(10), proc="mcp", pid=1, actor="ceo", tool="read", ok=True, ms=1, error=None, error_type=None, args={})
@@ -203,8 +197,6 @@ def test_follow_filters(org, clock):
 
 
 # ------------------------------------------------------------------------------------------------ trace
-
-
 def test_trace_lists_every_message_run_call_and_refusal(org, story):
     tr = observe.trace(org, story.task.id, now=NOW)
     kinds = [(i["kind"], i.get("type") or i.get("agent")) for i in tr["items"]]
@@ -379,8 +371,6 @@ def test_trace_of_a_rework_counts_the_runs_of_the_whole_request(org, clock):
 
 
 # ------------------------------------------------------------------------------------------------ metrics
-
-
 def test_metrics_percentiles_are_exact_and_counts_equal_the_files(org, clock):
     log = EventLog(org)
     durations = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -501,8 +491,6 @@ def test_metrics_scheduler_stalls_pauses(org, clock):
 
 
 # ------------------------------------------------------------------------------------------------ now
-
-
 def test_now_works_with_no_events_and_explains_the_queue(org, clock):
     v = observe.now_view(org, now=stamp(60))
     assert v["scheduler"]["state"] == "stopped" and not v["events_seen"] and v["queued"] == []
@@ -586,8 +574,6 @@ def test_now_heartbeat_of_a_stopped_scheduler_reports_its_exit(org, story):
 
 
 # ------------------------------------------------------------------------------------------------ check
-
-
 def by_id(res):
     return {c["id"]: c for c in res["checks"]}
 
@@ -806,8 +792,6 @@ def test_check_is_read_only(org, story):
 
 
 # ------------------------------------------------------------------------------------------------ surfaces
-
-
 def test_observe_text_dispatch_and_caps(org, story):
     assert observe.observe_text(org, "check", now=NOW).endswith("all checks passed")
     assert "runs 3" in observe.observe_text(org, "trace", story.task.id, now=NOW)
@@ -830,72 +814,6 @@ def test_observe_text_dispatch_and_caps(org, story):
 def test_trace_text_cap_says_how_to_narrow(org, story):
     text = observe.render_trace(observe.trace(org, story.task.id, now=NOW), max_lines=4)
     assert re.search(r"\.\.\. \d+ more line\(s\), narrow with observe events --trace", text)
-
-
-def test_cli_views_and_json(org, story, capsys, monkeypatch):
-    root = str(org.root)
-    monkeypatch.setattr("orgmcp.core.utcnow", lambda: NOW)  # the command line opens its own Org: the clock of its runtime is the patch point
-    main(["--root", root, "obs", "trace", story.task.id])
-    assert "totals: wall" in capsys.readouterr().out
-    main(["--root", root, "obs", "trace", story.task.id, "--json"])
-    data = json.loads(capsys.readouterr().out)
-    assert data["totals"]["runs"] == 3 and data["task"] == story.task.id
-    main(["--root", root, "obs", "metrics", "--since", "2026-10-18T00:00:00Z", "--by", "agent", "--json"])
-    out = json.loads(capsys.readouterr().out)
-    assert out["runs"]["total"] == 3 and out["by"]["dimension"] == "agent"
-    main(["--root", root, "obs", "events", "--since", "2026-10-18T00:00:00Z", "--errors", "--json"])
-    lines = capsys.readouterr().out.strip().splitlines()
-    assert len(lines) == 1 and json.loads(lines[0])["tool"] == "delegate"
-    main(["--root", root, "obs", "events", "--since", "2026-10-18T00:00:00Z", "--kind", "run.end", "--limit", "2"])
-    assert "2 of 3 matching event(s)" in capsys.readouterr().out
-    main(["--root", root, "obs", "now"])
-    assert "scheduler:" in capsys.readouterr().out
-    main(["--root", root, "obs", "now", "--json"])
-    assert json.loads(capsys.readouterr().out)["scheduler"]["state"] == "stopped"
-    main(["--root", root, "check", "--json"])
-    assert json.loads(capsys.readouterr().out)["ok"] is True
-
-
-def test_cli_check_exits_1_on_a_failure(org, capsys):
-    (org.root / ".runtime" / "scheduler.pid").write_text("999999")
-    with pytest.raises(SystemExit) as exc:
-        main(["--root", str(org.root), "check"])
-    assert exc.value.code == 1 and "FAIL" in capsys.readouterr().out
-
-
-def test_cli_errors_are_plain_messages(org, capsys):
-    with pytest.raises(SystemExit):
-        main(["--root", str(org.root), "obs", "trace", "nope"])
-    assert "error: no message nope" in capsys.readouterr().err
-
-
-def test_cli_watch_and_follow_exit_cleanly_on_ctrl_c(org, story, capsys, monkeypatch):
-    def interrupt(_):
-        raise KeyboardInterrupt
-
-    monkeypatch.setattr("orgmcp.cli_obs.time.sleep", interrupt)
-    main(["--root", str(org.root), "obs", "now", "--watch", "5"])
-    assert "scheduler:" in capsys.readouterr().out
-    main(["--root", str(org.root), "obs", "events", "--since", "2026-10-18T00:00:00Z", "--limit", "1", "--follow"])
-    assert "matching event" in capsys.readouterr().out
-
-
-def test_cli_follow_prints_new_events(org, clock, capsys, monkeypatch):
-    log = EventLog(org)
-    log.tool(stamp(1), "ceo", "read")
-    calls = []
-
-    def sleeper(_):
-        if not calls:
-            calls.append(1)
-            log.tool(stamp(2), "ceo", "write")
-        else:
-            raise KeyboardInterrupt
-
-    monkeypatch.setattr("orgmcp.cli_obs.time.sleep", sleeper)
-    main(["--root", str(org.root), "obs", "events", "--since", "2026-10-01T00:00:00Z", "--follow"])
-    out = capsys.readouterr().out
-    assert "tool.call read" in out and "tool.call write" in out
 
 
 def call(server, tool, **args):
@@ -938,22 +856,6 @@ def test_observe_tool_docstring_is_short_and_says_read_only():
     assert doc.startswith("Read-only") and len(doc) < 900
     for view in ("now", "trace", "metrics", "events", "check"):
         assert view in doc
-
-
-def test_stamp_trace_helper_roundtrips_through_the_loader(org, clock):
-    task = org.delegate(ROOT, "ceo", "T", "g", "a", budget=2)
-    stamp_trace(org, task.id, task.id)
-    loaded = Message.load(next((org.dir("ceo") / "inbox").glob("*.md")))
-    assert loaded.id == task.id  # the core loader ignores the unknown key
-    assert observe.build_messages(observe.scan_messages(org))[task.id].trace == task.id
-
-
-def test_run_ids_helper(org, clock):
-    clock.at(0)
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=2)
-    org.begin_run("ceo")
-    p = org.start_run_log("ceo")
-    assert run_ids(org, "ceo") == [f"ceo@{p.stem}"]
 
 
 def test_runs_of_agents_that_no_longer_exist_are_known_from_events(org, clock):

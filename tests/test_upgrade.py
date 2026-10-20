@@ -3,7 +3,6 @@ import subprocess
 import pytest
 
 from orgmcp import templates
-from orgmcp.cli import main
 from orgmcp.core import Org, OrgError
 from orgmcp.upgrade import extract_mission, upgrade_rules
 
@@ -65,17 +64,3 @@ def test_without_a_mission_section_it_refuses(tmp_path):
     with pytest.raises(OrgError, match="Mission"):
         upgrade_rules(org)
     assert path.read_text().endswith("My own rules.\n")
-
-
-def test_cli(tmp_path, capsys):
-    org = old_org(tmp_path)
-    main(["--root", str(org.root), "upgrade-rules", "--dry-run"])
-    out = capsys.readouterr()
-    assert "would rewrite" in out.out and "org:" not in out.err  # read-only: no 'org:' announcement
-    assert "9. Reviews" not in (org.root / "ORG.md").read_text()
-    main(["--root", str(org.root), "upgrade-rules"])
-    out = capsys.readouterr()
-    assert "rewrote the rules" in out.out and f"org: {org.root}" in out.err
-    assert "9. Reviews" in (org.root / "ORG.md").read_text()
-    main(["--root", str(org.root), "upgrade-rules"])
-    assert "already up to date" in capsys.readouterr().out

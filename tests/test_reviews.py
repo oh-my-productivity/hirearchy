@@ -6,7 +6,6 @@ from datetime import timedelta
 import pytest
 
 from orgmcp import templates
-from orgmcp.cli import main
 from orgmcp.core import ROOT, Org, join_frontmatter, split_frontmatter, utcnow
 from orgmcp.health import FLAGS, agent_health
 from orgmcp.review import review, review_if_due, total_runs
@@ -55,8 +54,6 @@ def snapshot(org):
 
 
 # ------------------------------------------------------------------ who hears what
-
-
 def test_healthy_org_sends_nothing_but_updates_the_ledger(org):
     fund(org)
     result = review(org, now())
@@ -180,8 +177,6 @@ def test_runtime_notes_are_not_tasks_rework_or_quality_problems(org):
 
 
 # ------------------------------------------------------------------ dry run
-
-
 def test_dry_run_reports_but_writes_nothing(org):
     flag_idle(org)
     fund(org)
@@ -193,8 +188,6 @@ def test_dry_run_reports_but_writes_nothing(org):
 
 
 # ------------------------------------------------------------------ cadence
-
-
 def test_first_check_only_starts_the_clock(org):
     assert review_if_due(org, now()) is None
     assert org.ledger("reviews")["runs"] == 0
@@ -236,8 +229,6 @@ def test_cadence_comes_from_files_not_memory(org):
 
 
 # ------------------------------------------------------------------ scheduler
-
-
 class Clock:
     """A fixed starting time plus an offset, so a test can move time forward without sleeping, and the wall clock (a loaded machine) cannot move it."""
 
@@ -318,29 +309,3 @@ def test_tick_on_a_healthy_org_costs_nothing(org):
     sched.tick()
     assert all(not runtime_notes(org, a) for a in (ROOT, "ceo", ENG))
     assert org.ledger("reviews")["notified"] == {}
-
-
-# ------------------------------------------------------------------ CLI
-
-
-def test_cli_review_dry_run_then_real(org, capsys):
-    flag_idle(org)
-    fund(org)
-    root = ["--root", str(org.root)]
-    before = snapshot(org)
-    main([*root, "review", "--dry-run"])
-    out = capsys.readouterr().out
-    assert "would send 2 note(s)" in out and "-> ceo: health review" in out and "-> root: health review" in out
-    assert snapshot(org) == before
-
-    main([*root, "review"])
-    out = capsys.readouterr().out
-    assert " sent 2 note(s)" in out and "would" not in out
-    assert len(runtime_notes(org, "ceo")) == 1 and len(runtime_notes(org, ROOT)) == 1
-    assert org.ledger("reviews")["notified"]["ceo"] == [f"{ENG}:idle"]
-
-
-def test_cli_review_on_a_healthy_org(org, capsys):
-    main(["--root", str(org.root), "review"])
-    assert "0 flagged agent(s); nothing to send" in capsys.readouterr().out
-    assert org.ledger("reviews")

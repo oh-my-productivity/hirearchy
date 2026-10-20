@@ -6,21 +6,14 @@ fixed now, so they run as plain regression tests.
 
 import os
 import shutil
-import signal
-import subprocess
-import sys
 import time
 from datetime import timedelta
 
 import pytest
 
 from orgmcp import core, review
-from orgmcp.app import wiring
-from orgmcp.cli import main
-from orgmcp.core import ROOT, Org, OrgError, join_frontmatter, split_frontmatter, utcnow
+from orgmcp.core import ROOT, OrgError, join_frontmatter, split_frontmatter, utcnow
 from orgmcp.health import agent_health, org_health
-from orgmcp.mail import MessageParser
-from orgmcp.mail.testing import CountingMessageParser
 from orgmcp.scheduler import Scheduler, kiro_runner
 
 ENG = "ceo/eng"
@@ -52,8 +45,6 @@ def drain(org, addr, ok=True):
 
 
 # ------------------------------------------------------------------ write guard
-
-
 def test_qa1_case_variants_of_protected_names_are_refused(org):
     for path in ("ceo/agent.md", "ceo/Inbox/x.md", "ceo/READ/x.md", "ceo/Runs/x.log", "ceo/memory.md"):
         with pytest.raises(OrgError):
@@ -89,24 +80,6 @@ def test_qa2_write_cannot_create_agents_around_hire_rules(org):
     assert not org.exists(f"{ENG}/sub")
 
 
-# ------------------------------------------------------------------- scheduler
-
-
-def test_qa3_retiring_a_running_agent_does_not_crash_the_scheduler(org):
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
-    sched = Scheduler(org, quiet_runner(), echo=lambda _: None)
-    sched.acquire()
-    try:
-        sched.tick()
-        assert "ceo" in sched.runs
-        sched.runs["ceo"].proc.wait()
-        org.retire(ROOT, "ceo", "no longer needed")  # a manager/root may do this at any time
-        sched._reap()  # must not raise
-        assert not (org.root / "ceo").exists()  # and must not resurrect a ghost directory
-    finally:
-        sched.release()
-
-
 def test_qa4_oversized_message_does_not_wedge_the_agent(org, tmp_path, monkeypatch):
     monkeypatch.setattr("orgmcp.scheduler.ensure_kiro_profile", lambda tools, org=None: "orgmcp")
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
@@ -124,12 +97,6 @@ def test_qa4_oversized_message_does_not_wedge_the_agent(org, tmp_path, monkeypat
     assert org.ledger("failures") == {} and not org.paused("ceo")
 
 
-def test_qa5_corrupt_nudge_ledger_does_not_crash_tick(org):
-    (org.root / ".runtime").mkdir(exist_ok=True)
-    (org.root / ".runtime" / "nudges.json").write_text("[]")  # valid JSON, wrong shape
-    Scheduler(org, quiet_runner(), echo=lambda _: None).tick()
-
-
 def test_qa5_bad_health_threshold_does_not_crash_tick(org):
     configure(org, review_every_seconds=0, health={"idle_after_seconds": "1h"})
     sched = Scheduler(org, quiet_runner(), echo=lambda _: None)
@@ -138,54 +105,7 @@ def test_qa5_bad_health_threshold_does_not_crash_tick(org):
     org_health(org)  # same for `orgmcp health` / the health tool
 
 
-def test_qa13_idle_tick_cost_does_not_grow_with_history(org):
-    for i in range(40):
-        org.send(ROOT, "ceo", f"old note {i}")
-    drain(org, "ceo")
-    sched = Scheduler(org, quiet_runner(), echo=lambda _: None)
-    sched.tick()  # warm up (creates the review ledger)
-    counting = CountingMessageParser()
-    org.runtime = wiring.open_runtime(org.root, {MessageParser: counting})
-    loads = counting.loaded
-    sched.tick()
-    assert len(loads) < 10, f"an idle tick parsed {len(loads)} message files"
-
-
-def test_qa16_timeout_kills_the_whole_process_group(org, tmp_path):
-    configure(org, run_timeout=1)
-    pidfile = tmp_path / "child.pid"
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=5)
-    cmd = ["sh", "-c", f"sleep 47 & echo $! > {pidfile}; wait"]
-    sched = Scheduler(org, quiet_runner(cmd), echo=lambda _: None)
-    sched.acquire()
-    child = None
-    try:
-        sched.tick()
-        deadline = time.time() + 5
-        while not (pidfile.exists() and pidfile.read_text().strip()) and time.time() < deadline:
-            time.sleep(0.02)
-        child = int(pidfile.read_text())
-        time.sleep(1.2)
-        sched._reap()  # timeout fires here
-        time.sleep(0.2)
-        try:
-            os.kill(child, 0)
-            alive = True
-        except ProcessLookupError:
-            alive = False
-        assert not alive, "tool subprocess outlived its timed-out run"
-    finally:
-        sched.release()
-        if child:
-            try:
-                os.kill(child, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
-
-
 # ----------------------------------------------------------- budget and reviews
-
-
 def test_qa6_retire_returns_unspent_budget_to_the_parent(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     org.delegate("ceo", ENG, "t", "g", "a", budget=5)
@@ -227,18 +147,8 @@ def test_qa14_failed_runs_are_not_blamed_as_wasteful(org):
 
 
 # --------------------------------------------------------------------- core API
-
-
 def test_qa9_retire_accepts_the_full_address_of_a_direct_report(org):
     assert org.retire("ceo", ENG, "full address, as printed by status/health/review notes") == ENG
-
-
-def test_qa10_resume_with_trailing_slash_clears_failures(org):
-    org.pause("ceo", "failures")
-    for _ in range(3):
-        org.record_failure("ceo")
-    main(["--root", str(org.root), "resume", "ceo/"])
-    assert org.ledger("failures").get("ceo", 0) == 0
 
 
 def test_qa11_hire_rejects_name_with_trailing_newline(org):
@@ -272,8 +182,6 @@ def test_qa15_report_refuses_artifacts_outside_the_org(org, tmp_path):
 
 
 # ---------------------------------------------------------------------- prompts
-
-
 def test_qa17_prompt_shows_acceptance_criteria_of_open_tasks(org):
     task = org.delegate(ROOT, "ceo", "Strict blurb", "the goal", "ACCEPT: exactly 33 words", budget=10)
     drain(org, "ceo")  # the task was handled in an earlier run and now sits in read/

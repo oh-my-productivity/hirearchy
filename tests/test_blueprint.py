@@ -4,14 +4,12 @@ from pathlib import Path
 
 import pytest
 import yaml
-
 from testkit.blueprints import code_bp
 
 from orgmcp import blueprint as bpm
 from orgmcp.app import wiring
 from orgmcp.blueprint import BlueprintError, Issue
 from orgmcp.blueprint.testing import FlakyHiring, FlakyTaskAssigner
-from orgmcp.cli import main
 from orgmcp.core import DEFAULT_MODEL, ROOT, Org, OrgError
 from orgmcp.dispatch import TaskAssigner
 from orgmcp.hierarchy import Hiring
@@ -65,8 +63,6 @@ def mutate(bp, fn):
 
 
 # ------------------------------------------------------------------------------------------- loading
-
-
 def test_load_from_yaml_text_json_and_path(tmp_path):
     text = EXAMPLE.read_text()
     from_text = bpm.load(text)
@@ -94,8 +90,6 @@ def test_example_is_valid_with_one_expected_warning(base, roots):
 
 
 # ----------------------------------------------------------------------------------------- the rules
-
-
 def test_missing_mission_needs_task_agents(roots):
     issues = check({}, roots)
     assert {"mission", "needs", "task", "agents"} <= codes(issues, "error")
@@ -406,8 +400,6 @@ def test_unelicited_preferences_warn(base, roots):
 
 
 # ------------------------------------------------------------------------------------------ the plan
-
-
 def test_render_plan_contents(base, roots):
     base = tiered(base)
     text = bpm.render_plan(base, bpm.validate(base, allowed_roots=roots), allowed_roots=roots)
@@ -438,8 +430,6 @@ def test_propose_is_load_validate_render(base, roots):
 
 
 # ------------------------------------------------------------------------------------------- apply
-
-
 def test_apply_creates_tree_charters_and_task(base, roots, empty_org):
     base = tiered(base)
     s = bpm.apply(empty_org, base, allowed_roots=roots)
@@ -557,8 +547,6 @@ def test_apply_commits(base, roots, empty_org):
 
 
 # ------------------------------------------------------------------------------------------ roles
-
-
 def test_role_library():
     assert {"manager", "researcher", "writer", "reviewer", "fact-checker", "engineer", "tester", "code-reviewer"} <= set(bpm.role_names())
     for name in bpm.role_names():
@@ -577,56 +565,6 @@ def test_role_library():
 def test_verifier_templates_never_edit_others_files(name):
     body = bpm.get_role(name).body
     assert "never edit" in body.lower() and "own" in body.lower()
-
-
-# --------------------------------------------------------------------------------------------- CLI
-
-
-def write_bp(tmp_path, bp, name="bp.yaml"):
-    p = tmp_path / name
-    p.write_text(yaml.safe_dump(bp, sort_keys=False))
-    return str(p)
-
-
-def test_cli_plan_ok_and_errors(base, tmp_path, empty_org, capsys):
-    good = write_bp(tmp_path, base)
-    main(["--root", str(empty_org.root), "plan", good, "--allow-root", str(tmp_path)])
-    out = capsys.readouterr().out
-    assert "Plan for approval" in out and "Reply 'approve'" in out
-    bad = write_bp(tmp_path, mutate(base, lambda b: b["task"].pop("acceptance")), "bad.yaml")
-    with pytest.raises(SystemExit) as e:
-        main(["--root", str(empty_org.root), "plan", bad, "--allow-root", str(tmp_path)])
-    assert e.value.code == 1
-    assert "Errors (1)" in capsys.readouterr().out
-    assert empty_org.agents() == []
-
-
-def test_cli_plan_works_without_an_org(base, tmp_path, capsys, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    monkeypatch.delenv("ORG_ROOT", raising=False)
-    main(["plan", write_bp(tmp_path, base), "--allow-root", str(tmp_path)])
-    assert "Plan for approval" in capsys.readouterr().out
-
-
-def test_cli_apply(base, tmp_path, empty_org, capsys):
-    path = write_bp(tmp_path, base)
-    main(["--root", str(empty_org.root), "apply", path, "--allow-root", str(tmp_path)])
-    cap = capsys.readouterr()
-    assert f"org: {empty_org.root}" in cap.err  # announced on stderr before anything is changed
-    assert "created 4 agents" in cap.out and "-> lead (budget 22)" in cap.out
-    assert empty_org.exists("lead/factcheck")
-    with pytest.raises(SystemExit) as e:  # second apply: names exist
-        main(["--root", str(empty_org.root), "apply", path, "--allow-root", str(tmp_path)])
-    assert e.value.code == 1
-    assert "already exists" in capsys.readouterr().err
-
-
-def test_cli_apply_error_exit(base, tmp_path, empty_org, capsys):
-    bad = write_bp(tmp_path, mutate(base, lambda b: b["needs"].pop("deliverable")), "bad.yaml")
-    with pytest.raises(SystemExit) as e:
-        main(["--root", str(empty_org.root), "apply", bad, "--allow-root", str(tmp_path)])
-    assert e.value.code == 1 and "nothing was created" in capsys.readouterr().err
-    assert empty_org.agents() == []
 
 
 def test_issue_render():

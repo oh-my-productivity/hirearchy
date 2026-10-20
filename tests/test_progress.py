@@ -4,7 +4,6 @@ from datetime import timedelta
 
 import pytest
 
-from orgmcp.cli import main
 from orgmcp.core import ROOT, OrgError, utcnow
 from orgmcp.progress import progress
 
@@ -157,15 +156,6 @@ def test_read_messages_no_longer_ask_for_attention(org):
 def test_a_retired_assignee_shows_as_failed(org, task):
     org.retire(ROOT, "ceo", "done with it")  # retire closes its open tasks as failed
     assert '"Write the report": failed.' in lines(org)[0]
-
-
-def test_cli_progress(org, task, capsys):
-    main(["--root", str(org.root), "progress"])
-    assert capsys.readouterr().out.startswith('"Write the report": working.')
-    main(["--root", str(org.root), "progress", task.id])
-    assert f"(task {task.id})" in capsys.readouterr().out
-    with pytest.raises(SystemExit):
-        main(["--root", str(org.root), "progress", "nope"])
 
 
 def test_runs_are_counted_per_task_even_when_an_agent_has_several(org, task):

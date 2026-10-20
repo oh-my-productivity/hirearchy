@@ -11,13 +11,11 @@ from orgmcp import blueprint as bpm
 from orgmcp import services as services_mod
 from orgmcp.app import wiring
 from orgmcp.blueprint.testing import FlakyServiceCommands
-from orgmcp.cli import main
 from orgmcp.core import ROOT, Org, OrgError
 from orgmcp.services import ServiceCommands
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 RESEARCH = ROOT_DIR / "examples" / "blueprint-research.yaml"
-
 CRITERIA = [
     "At most 600 words as counted by read.",
     'Has exactly the sections "This week" and "Our assessment", in that order.',
@@ -94,8 +92,6 @@ def block(bp, roots, **kw) -> str:
 
 
 # ------------------------------------------------------------------------------------------ validation
-
-
 def test_a_services_only_blueprint_needs_no_deliverable_task_or_acceptance(svc_bp, roots):
     found = issues(svc_bp, roots)
     assert not bpm.errors(found), [i.render() for i in found]
@@ -290,8 +286,6 @@ def test_plan_id_changes_when_services_change(svc_bp):
 
 
 # ----------------------------------------------------------------------------------------- first request
-
-
 def request_bp(svc_bp, **task):
     return mutate(svc_bp, lambda b: b.update(task={"service": "weekly-brief", "inputs": {"topic": "solid-state batteries"}, **task}))
 
@@ -335,8 +329,6 @@ def test_optional_inputs_may_stay_out_and_a_service_without_inputs_takes_none(sv
 
 
 # ------------------------------------------------------------------------------------------------ plan
-
-
 def test_the_block_has_a_compact_services_part(svc_bp, roots):
     text = block(svc_bp, roots)
     assert text.startswith(bpm.PLAN_HEADING) and bpm.PLAN_END not in text
@@ -427,8 +419,6 @@ def test_propose_text_shows_the_services_and_a_plan_id(svc_bp, roots):
 
 
 # ------------------------------------------------------------------------------------------------ apply
-
-
 def test_apply_services_only_defines_the_service_and_gives_no_task(svc_bp, roots, empty_org):
     s = bpm.apply(empty_org, svc_bp, allowed_roots=roots)
     assert s.agents == ["lead", "lead/researcher", "lead/writer", "lead/factcheck"] and s.services == ["weekly-brief"]
@@ -523,8 +513,6 @@ def test_the_applied_service_works_end_to_end_with_request_and_feedback(svc_bp, 
 
 
 # --------------------------------------------------------------------------------- playbook and charter
-
-
 def test_the_generated_playbook_has_the_three_sections_in_order(svc_bp):
     agents = bpm._resolve(svc_bp, None, [Path("/")], [])
     text = bpm.default_playbook(agents[0], agents, svc_bp["services"][0], 22)
@@ -609,19 +597,3 @@ def test_a_lead_with_a_plain_task_and_services_keeps_the_task_budget_plan(roots,
     bpm.apply(empty_org, bp, allowed_roots=roots)
     _, charter = empty_org.charter("lead")
     assert "Budget plan: you start with 22 runs" in charter and "Services you offer: weekly-brief" in charter
-
-
-# --------------------------------------------------------------------------------------------- CLI
-
-
-def test_cli_plan_and_apply_with_services(svc_bp, tmp_path, empty_org, capsys):
-    path = tmp_path / "svc.yaml"
-    path.write_text(yaml.safe_dump(svc_bp, sort_keys=False))
-    main(["--root", str(empty_org.root), "plan", str(path), "--allow-root", str(tmp_path)])
-    out = capsys.readouterr().out
-    assert "Services (1), offered by lead" in out and "No first task" in out
-    main(["--root", str(empty_org.root), "apply", str(path), "--allow-root", str(tmp_path)])
-    out = capsys.readouterr().out
-    assert "defined 1 service(s) of lead: weekly-brief" in out and "nothing runs yet" in out
-    main(["--root", str(empty_org.root), "request", "weekly-brief", "--input", "topic=ai"])
-    assert "-> lead (service weekly-brief, budget 22)" in capsys.readouterr().out

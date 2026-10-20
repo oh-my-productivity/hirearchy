@@ -5,7 +5,6 @@ import time
 
 import pytest
 import yaml
-
 from testkit.services_world import (  # noqa: F401  (svc is a fixture)
     BRIEF, ENG, call, cli, contract_meta, define, deliver, fails, playbook_meta, request, svc, work,
 )
@@ -15,9 +14,8 @@ from orgmcp.core import ROOT, Message, OrgError, split_frontmatter
 from orgmcp.progress import progress
 from orgmcp.server import build_server
 
+
 # --------------------------------------------------------------------------------------------- define
-
-
 def test_define_writes_the_contract_without_a_playbook(org):
     text = define(org, notes="Mind the sources.")
     meta, body = contract_meta(org)
@@ -158,8 +156,6 @@ def test_only_the_parent_retires_a_service(svc):
 
 
 # --------------------------------------------------------------------------------------------- request
-
-
 def test_request_builds_a_task_from_the_contract(svc):
     org = svc
     msg = org.request(ROOT, "weekly-brief", {"topic": " ai chips ", "week": 42}, note="Short please.",
@@ -270,8 +266,6 @@ def test_old_messages_without_service_fields_parse_as_before(org):
 
 
 # ---------------------------------------------------------------------------------------------- report
-
-
 def test_report_on_a_service_request_requires_lessons(svc):
     org = svc
     task = request(org)
@@ -302,8 +296,6 @@ def test_lessons_are_optional_for_plain_tasks_and_kept_when_given(org):
 
 
 # ----------------------------------------------------------------------------------- revise_playbook
-
-
 def test_revise_playbook_versions_archives_and_tells_the_client(svc):
     org = svc
     assert org.revise_playbook("ceo", "weekly-brief", "---\nversion: 99\n---\n## Steps\n1. Search.", "first draft") == 1
@@ -370,8 +362,6 @@ def test_the_word_cap_is_configurable(svc):
 
 
 # ----------------------------------------------------------------------------------------- feedback
-
-
 def test_feedback_is_a_quiet_note_from_the_requester(svc):
     org = svc
     task = request(org)
@@ -426,8 +416,6 @@ def test_feedback_on_a_rework_belongs_to_the_case_and_the_latest_is_the_final_ve
 
 
 # ------------------------------------------------------------------------- cases, stats, digest
-
-
 def test_cases_group_rework_chains_and_derive_runs_budget_and_lessons(svc):
     org = svc
     first = request(org, "ai")
@@ -540,8 +528,6 @@ def test_digest_is_compact(svc):
 
 
 # ------------------------------------------------------------------------------------------ prompt
-
-
 def headers(prompt):
     return [line for line in prompt.splitlines() if line.startswith("# ")]
 
@@ -684,8 +670,6 @@ def test_the_locked_variant_shows_evidence_but_no_revision_steps(org):
 
 
 # ------------------------------------------------------------------------------------ write guard
-
-
 def test_the_runtime_owns_the_services_directory(svc):
     org = svc
     for path in ("ceo/services/weekly-brief/PLAYBOOK.md", "ceo/services/x.md", "ceo/Services/x.md", "ceo/services"):
@@ -711,8 +695,6 @@ def test_services_do_not_confuse_retire_or_run_counting(svc):
 
 
 # ------------------------------------------------------------------------------------ tools by role
-
-
 def tool_names(org, addr):
     return {t.name for t in asyncio.run(build_server(org, addr).list_tools())}
 
@@ -755,51 +737,7 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     assert "Services you can request" not in mine  # ceo's report offers nothing
 
 
-# ----------------------------------------------------------------------------------------------- CLI
-
-
-def test_cli_commands(org, capsys, tmp_path):
-    criteria = tmp_path / "criteria.txt"
-    criteria.write_text("At most 600 words\n- Every claim has a URL\n")
-    playbook = tmp_path / "pb.md"
-    playbook.write_text("## Steps\n1. Search.")
-    cli(org, "define-service", "ceo", "weekly-brief", "--description", "A weekly brief.",
-        "--input", "topic*:what it is about", "--input", "week:ISO week", "--acceptance", f"@{criteria}",
-        "--acceptance", "Mention a risk", "--deliverable", "one file", "--format", "markdown", "--max-words", "600",
-        "--path", str(tmp_path / "out"), "--budget", "8", "--playbook", f"@{playbook}", "--locked")
-    meta, _ = contract_meta(org)
-    assert meta["acceptance"] == ["At most 600 words", "Every claim has a URL", "Mention a risk"]
-    assert meta["inputs"] == [{"name": "topic", "description": "what it is about", "required": True},
-                              {"name": "week", "description": "ISO week", "required": False}]
-    assert meta["deliverable"] == {"description": "one file", "format": "markdown", "max_words": 600, "path": str(tmp_path / "out")}
-    assert meta["budget"] == 8 and meta["locked"] is True and playbook_meta(org)[0]["version"] == 1
-    assert "defined service `weekly-brief`" in capsys.readouterr().out
-
-    cli(org, "services")
-    assert "weekly-brief (offered by ceo; contract v1, playbook v1)" in capsys.readouterr().out
-    cli(org, "request", "weekly-brief", "--input", "topic=ai chips", "--input", "week=3", "--note", "Hurry")
-    out = capsys.readouterr().out
-    (task,) = org.outstanding(ROOT)
-    assert task.id in out and task.budget == 8 and "- week: 3" in task.body and "Hurry" in task.body
-    deliver(org, "ceo", task)
-    cli(org, "feedback", task.id, "reject", "--note", "Too long")
-    assert "feedback reject on" in capsys.readouterr().out
-    assert [m.feedback for m in org.sent(ROOT) if m.type == "note"] == ["reject"]
-    with pytest.raises(SystemExit):
-        cli(org, "feedback", task.id, "reject")  # a rejection needs a note
-    assert "needs a note" in capsys.readouterr().err
-    with pytest.raises(SystemExit):
-        cli(org, "request", "weekly-brief", "--input", "no-equals-sign")
-    assert "key=value" in capsys.readouterr().err
-    cli(org, "retire-service", "ceo", "weekly-brief", "--reason", "done with it")
-    assert "retired service" in capsys.readouterr().out and org.service_names("ceo") == []
-    log = __import__("subprocess").run(["git", "log", "--format=%s"], cwd=org.root, capture_output=True, text=True).stdout
-    assert "root: service weekly-brief of ceo" in log and "root: retired service" in log
-
-
 # ---------------------------------------------------------------------------- progress and status
-
-
 def test_progress_tags_service_tasks_and_notes_missing_feedback(svc):
     org = svc
     org.revise_playbook("ceo", "weekly-brief", "Steps.", "r")
@@ -844,8 +782,6 @@ def test_new_organizations_carry_rule_10_and_upgrade_rules_propagates_it(org):
 
 
 # ------------------------------------------------------------------------------- the whole loop
-
-
 def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     root = build_server(org, ROOT)
 

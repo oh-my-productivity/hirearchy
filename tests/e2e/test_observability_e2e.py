@@ -1,12 +1,3 @@
-"""Acceptance of observability (spec section 1, "done means"), on the REAL emitter: no synthetic events.
-
-A real organization (root -> ceo -> eng) is run by the real scheduler with the fake agent in its ``tools`` mode (it calls
-the orgmcp MCP tools in-process, so the real server records ``tool.call``). The story has one refused tool call (eng's
-``report`` with a bad status, every time), one crashed run (eng's first run exits 1) and one rework (root revises its
-task). Every expectation is derived independently from the files (run logs, messages, raw event lines), then compared
-with what the views say.
-"""
-
 import asyncio
 import json
 import os
@@ -63,8 +54,6 @@ def new_org(base: Path) -> Org:
 
 
 # ------------------------------------------------------------------------------------------ independent readers
-
-
 def raw_events(org: Org) -> list[dict]:
     """Every event line, read straight from the files (never through the query layer)."""
     out = []
@@ -97,8 +86,6 @@ def cli_out(capsys, *argv) -> str:
 
 
 # ------------------------------------------------------------------------------------------ the world
-
-
 @pytest.fixture(scope="module")
 def world(tmp_path_factory):
     mp = pytest.MonkeyPatch()
@@ -150,8 +137,6 @@ def test_the_story_really_happened(world):
 
 
 # ------------------------------------------------------------------------------------------ Q2, Q3: trace
-
-
 def test_trace_lists_every_run_message_tool_call_and_refusal(world):
     org = world.org
     tr = observe.trace(org, world.first.id)
@@ -239,8 +224,6 @@ def test_root_grants_and_notes_without_a_trace_still_belong_to_the_request(world
 
 
 # ------------------------------------------------------------------------------------------ Q5: events
-
-
 def test_events_errors_has_every_refusal_and_the_crash(world, capsys):
     org = world.org
     out = cli_out(capsys, "--root", str(org.root), "obs", "events", "--errors", "--since", "1h", "--json")
@@ -265,8 +248,6 @@ def test_events_filters_by_trace_agent_and_kind(world):
 
 
 # ------------------------------------------------------------------------------------------ Q4: metrics
-
-
 def test_metrics_counts_equal_counts_derived_from_the_files(world, capsys):
     org = world.org
     m = json.loads(cli_out(capsys, "--root", str(org.root), "obs", "metrics", "--since", "1h", "--by", "agent", "--json"))
@@ -298,8 +279,6 @@ def test_metrics_counts_equal_counts_derived_from_the_files(world, capsys):
 
 
 # ------------------------------------------------------------------------------------------ Q6: check
-
-
 def test_check_passes_on_a_healthy_org(world, capsys):
     res = observe.check(world.org)
     assert res["ok"], observe.render_check(res)
@@ -371,8 +350,6 @@ def test_check_names_a_stuck_inflight_batch(copy_of_world):
 
 
 # ------------------------------------------------------------------------------------------ Q1: now
-
-
 def test_now_reflects_a_running_and_a_queued_state(tmp_path, capsys):
     telemetry.reset()
     org = new_org(tmp_path)

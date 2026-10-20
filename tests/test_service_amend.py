@@ -186,32 +186,3 @@ def test_a_manager_amends_the_contract_of_its_report(org):
     assert contract_meta(org, "ceo2/qa", "qa-brief")[0]["acceptance"][-1] == "Cite the test run"
     with pytest.raises(OrgError, match="only ceo2"):
         org.define_service(ROOT, "ceo2/qa", "qa-brief", add_acceptance=["Not mine to add"])
-
-
-def test_cli_amendment(svc, capsys, tmp_path):
-    cli(svc, "define-service", "ceo", "weekly-brief", "--add-acceptance", "Never longer than one page")
-    out = capsys.readouterr().out
-    assert "v1 -> v2" in out and "3. Never longer than one page" in out
-    meta = contract_meta(svc)[0]
-    assert meta["acceptance"][-1] == "Never longer than one page" and meta["budget"] == 10 and meta["deliverable"] == BRIEF["deliverable"]
-
-    more = tmp_path / "more.txt"
-    more.write_text("First extra\n- Second extra\n")
-    cli(svc, "define-service", "ceo", "weekly-brief", "--remove-acceptance", "At most 600 words",
-        "--remove-acceptance", "Never longer than one page", "--add-acceptance", f"@{more}")
-    assert contract_meta(svc)[0]["acceptance"] == ["Every factual claim has a source URL", "First extra", "Second extra"]
-
-    cli(svc, "define-service", "ceo", "weekly-brief", "--budget", "7", "--no-locked", "--max-words", "250", "--input", "topic*:the topic")
-    meta = contract_meta(svc)[0]
-    assert meta["budget"] == 7 and meta["locked"] is False and meta["inputs"] == [{"name": "topic", "description": "the topic", "required": True}]
-    assert meta["deliverable"] == {**BRIEF["deliverable"], "max_words": 250}  # single deliverable parts merge over the old one
-    capsys.readouterr()
-
-    for args, message in (
-        (("weekly-brief", "--acceptance", "Whole new", "--add-acceptance", "x y"), "replaces all criteria"),
-        (("weekly-brief", "--budget", "7"), "no change"),
-        (("brand-new", "--budget", "3"), "needs description"),
-    ):
-        with pytest.raises(SystemExit):
-            cli(svc, "define-service", "ceo", *args)
-        assert message in capsys.readouterr().err

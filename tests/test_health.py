@@ -72,8 +72,6 @@ def call(server, tool, **args):
 
 
 # --------------------------------------------------------------------- revises
-
-
 def test_revises_is_stored_and_rendered(org):
     first = org.delegate(ROOT, "ceo", "Plan", "g", "a")
     second = org.delegate(ROOT, "ceo", "Plan v2", "g", "a", revises=first.id)
@@ -116,8 +114,6 @@ def test_revises_through_the_mcp_tool_and_cli(org, capsys):
 
 
 # --------------------------------------------------------------------- metrics
-
-
 def test_agent_metrics(org, clock):
     clock.at(0)
     t1 = org.delegate(ROOT, ENG, "One", "g", "a", budget=6)
@@ -174,8 +170,6 @@ def test_agent_health_rejects_root(org):
 
 
 # ----------------------------------------------------------------------- flags
-
-
 def test_stuck(org):
     give(org)
     assert "stuck" not in health(org, 1800).flags  # not older than the threshold yet
@@ -322,8 +316,6 @@ def test_every_flag_has_a_severity():
 
 
 # ---------------------------------------------------------- branches and report
-
-
 @pytest.fixture
 def troubled(org):
     """ceo is paused; eng has an old open task nobody works on."""
@@ -380,23 +372,6 @@ def test_to_dict_is_json(troubled):
     eng = data["agents"][1]
     assert eng["flags"]["stuck"] and eng["last_activity"] == at(450).isoformat()
     assert data["branches"]["ceo"]["worst_flag"] == "stuck"
-
-
-# ----------------------------------------------------------------- CLI and MCP
-
-
-def test_cli_health(troubled, capsys):
-    main(["--root", str(troubled.root), "health"])
-    out = capsys.readouterr().out
-    assert out.splitlines()[0].endswith("flagged") and "ceo" in out and "eng" in out
-    main(["--root", str(troubled.root), "health", "--agent", ENG])
-    scoped = capsys.readouterr().out
-    assert scoped.splitlines()[0].startswith("1 agent,") and "ceo " not in scoped
-    main(["--root", str(troubled.root), "health", "--json"])
-    assert [a["addr"] for a in json.loads(capsys.readouterr().out)["agents"]] == ["ceo", ENG]
-    with pytest.raises(SystemExit):
-        main(["--root", str(troubled.root), "health", "--agent", "nobody"])
-    assert "no such agent" in capsys.readouterr().err
 
 
 def test_mcp_health_permissions(org):

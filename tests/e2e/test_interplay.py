@@ -1,6 +1,3 @@
-"""Interplay between the fix branches: prompt contract vs. render truncation, retire refunds vs. health/scheduler,
-word counts, and the Message.load cache vs. re-delivery."""
-
 import os
 import re
 
@@ -20,8 +17,6 @@ def long_acceptance(n: int = 15000) -> str:
 
 
 # ------------------------------------------------- long task bodies in prompts
-
-
 def test_long_open_task_is_cut_in_the_state_with_a_readable_pointer(org):
     big = org.delegate(ROOT, "ceo", "Huge", "goal", long_acceptance(), budget=20)
     org.begin_run("ceo")
@@ -61,8 +56,6 @@ def test_short_bodies_are_not_cut(org):
 
 
 # --------------------------------------------- retire refund vs health/scheduler
-
-
 def _retire_with_refund(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=20)
     org.begin_run("ceo")
@@ -107,8 +100,6 @@ def test_runtime_only_refund_run_is_not_counted_as_wasteful(org):
 
 
 # ------------------------------------------------------------------ word counts
-
-
 def test_artifact_annotation_and_read_use_the_same_markdown_aware_count(org):
     md = "# Title\n\n- one two\n- three\n\n---\n\n| a | b |\n|---|---|\n"
     path = org.dir("ceo") / "work"
@@ -123,8 +114,6 @@ def test_artifact_annotation_and_read_use_the_same_markdown_aware_count(org):
 
 
 # ------------------------------------------------- Message.load cache vs deliver
-
-
 def test_cache_stays_correct_across_redelivery_and_inflight_moves(org, monkeypatch):
     real = core.atomic_write
 
