@@ -4,7 +4,7 @@
 from testkit.legacy.orgmcp import core
 from testkit.legacy.orgmcp.app import wiring
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.stalls._views import FingerprintTaskViews
+from testkit.legacy.orgmcp.app.wire_stalls import FingerprintTaskViews  # the class the composition root makes the task views of the ladder with
 
 from orgmcp.mail import MessageParser
 from orgmcp.mail.testing import CountingMessageParser
@@ -38,7 +38,8 @@ def test_cached_load_equals_uncached_parse(org):
 def test_crlf_files_parse_like_read_text(tmp_path):
     p = tmp_path / "20260101T000000000000-root-aaaa.md"
     p.write_bytes(b"---\r\nfrom: root\r\nto: ceo\r\ntype: note\r\n---\r\nline1\r\nline2\r\n")
-    assert core.Message.load(p).body == "line1\nline2" and core.Message.load(p).sender == "root"
+    parser = CountingMessageParser()
+    assert parser.parse(p).body == "line1\nline2" and parser.parse(p).sender == "root"
 
 
 def test_cache_is_bounded(org):

@@ -5,7 +5,7 @@ import asyncio
 
 import testkit
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.legacy.orgmcp.server import build_server
+from testkit.skill_world import build_server
 
 ROOT_DIR = testkit.REPO
 SKILL = ROOT_DIR / "skills" / "orgmcp" / "SKILL.md"
@@ -43,7 +43,7 @@ def test_the_tools_the_skill_names_exist_for_root(tmp_path):
 
 
 def test_the_skill_ships_in_the_wheel_and_the_installed_copy_is_this_one(tmp_path):
-    from orgmcp.skill import install_skill, skill_source
+    from testkit.skill_world import install_skill, skill_source
     pyproject = (ROOT_DIR / "pyproject.toml").read_text()
     assert '"skills/orgmcp/SKILL.md" = "orgmcp/_skill/SKILL.md"' in pyproject  # the wheel copy is this very file
     assert skill_source().read_text() == SKILL.read_text()

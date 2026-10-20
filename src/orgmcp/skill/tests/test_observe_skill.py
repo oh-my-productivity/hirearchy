@@ -3,7 +3,7 @@
 
 
 def test_the_skill_sends_the_assistant_to_observe_instead_of_guessing():
-    from orgmcp.skill import skill_source
+    from testkit.skill_world import skill_source
 
     skill = skill_source().read_text()
     assert len(skill.splitlines()) <= 125

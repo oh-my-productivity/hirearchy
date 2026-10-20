@@ -5,8 +5,8 @@ import json
 import shutil
 
 import pytest
-from testkit.legacy.orgmcp import telemetry
-from testkit.legacy.orgmcp.core import ROOT, Message, split_frontmatter
+from testkit.legacy.orgmcp.app import wiring
+from testkit.legacy.orgmcp.core import ROOT, split_frontmatter
 
 
 # ---------------------------------------------------------------------------------------------------- helpers
@@ -14,7 +14,7 @@ from testkit.legacy.orgmcp.core import ROOT, Message, split_frontmatter
 def org(org):
     """The shared org, with the events of its construction (hires) forgotten: tests see only their own."""
     shutil.rmtree(org.root / ".runtime" / "events", ignore_errors=True)
-    telemetry.reset()
+    wiring.process_resources().reset()
     return org
 
 
@@ -141,7 +141,7 @@ def test_old_messages_without_a_trace_still_load_and_work(org):
     old = org.dir("ceo") / "inbox" / "20200101T000000000000-root-aaaa.md"
     old.write_text("---\nid: 20200101T000000000000-root-aaaa\nfrom: root\nto: ceo\ntype: task\ntitle: Old\n"
                    "created: '2020-01-01T00:00:00+00:00'\nhops: 0\nbudget: 4\n---\nbody\n")
-    m = Message.load(old)
+    m = org.runtime.message_parser.parse(old)
     assert m.trace is None and m.title == "Old"
     # an agent with only unstamped context sends without a trace and nothing breaks
     note = org.send("ceo", ROOT, "status?")

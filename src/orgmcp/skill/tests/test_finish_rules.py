@@ -1,7 +1,7 @@
 # mypy: ignore-errors
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
-from orgmcp.skill import skill_source
+from testkit.skill_world import skill_source
 
 
 # --------------------------------------------------------------------------------- skill and instructions

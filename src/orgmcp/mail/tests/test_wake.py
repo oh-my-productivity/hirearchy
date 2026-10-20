@@ -4,9 +4,7 @@
 import os
 
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.scheduler import Scheduler
-
-SILENT = dict(echo=lambda _: None)
+from testkit.mail_world import scheduler_over
 
 
 def true_runner(org, addr, prompt):
@@ -25,8 +23,8 @@ def ceo_with_funded_report(org, budget=20, grant=5):
 def test_non_waking_note_alone_starts_no_run(org):
     ceo_with_funded_report(org)
     org.retire_team("ceo", "ops", "done")
-    sched = Scheduler(org, true_runner, **SILENT)
-    assert sched._runnable() == []
+    sched = scheduler_over(org, true_runner)
+    assert org.runtime.runnable_query.runnable(exclude=set()) == []
     assert sched.tick() is False  # nothing to do, nothing started
     assert org.runs_used("ceo") == 0 and len(org.messages("ceo", "inbox")) == 1
 
@@ -52,7 +50,7 @@ def test_run_started_by_a_real_message_carries_the_held_note(org):
         prompts.append(p)
         return ["true"], o.dir(a), dict(os.environ)
 
-    sched = Scheduler(org, runner, **SILENT)
+    sched = scheduler_over(org, runner)
     sched.acquire()
     try:
         for _ in range(100):
