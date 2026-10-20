@@ -1,25 +1,18 @@
-"""Assistant UX: the plan the user sees + plan_id, blueprint_example, waiting progress, scheduler until-done, skill rules."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
-import os
 import re
-import sys
 from pathlib import Path
 
 import pytest
-import testkit
-import yaml
+import testkit.legacy.yaml as yaml
+from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.mcp_server_world import build_server, resolve_binding, skill_source
+from testkit.mcp_server_world import blueprint as bp_mod
 
-from orgmcp import blueprint as bp_mod
-from orgmcp import blueprint_examples
-from orgmcp.cli import main
-from orgmcp.core import ROOT, Org
-from orgmcp.progress import describe_progress
-from orgmcp.scheduler import Scheduler, describe_scheduler
-from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
-from orgmcp.skill import skill_source
+from orgmcp.mcp_server._instructions import ROOT_INSTRUCTIONS
 
-FAKE = str(testkit.FAKE_AGENT)
 ALLOWED_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}  # shell-unconfined: the code example grants shell
 
 
@@ -172,7 +165,7 @@ def test_apply_org_with_the_plan_id_still_refuses_a_blueprint_with_errors(setup)
 
 
 # ----------------------------------------------------------------------------------- blueprint_example
-@pytest.mark.parametrize("kind", blueprint_examples.KINDS)
+@pytest.mark.parametrize("kind", bp_mod.KINDS)
 def test_every_example_validates_and_round_trips_through_propose_org(setup, kind):
     server, _ = setup
     text = example(server, kind)
@@ -203,7 +196,7 @@ def test_example_paths_start_in_the_users_current_directory(setup, env):
 def test_unknown_example_kind_lists_the_kinds(setup):
     server, _ = setup
     msg = fails(server, "blueprint_example", kind="poetry")
-    for k in blueprint_examples.KINDS:
+    for k in bp_mod.KINDS:
         assert k in msg
 
 
@@ -244,53 +237,3 @@ def test_skill_and_instructions_carry_the_new_rules(setup):
 @pytest.fixture
 def task(org):
     return org.delegate(ROOT, "ceo", "Write the report", "goal", "criteria", budget=8)
-
-
-def test_progress_tool_and_cli_take_the_wait(org, task, capsys, tmp_path, monkeypatch):
-    monkeypatch.setenv("ORG_ROOT", str(org.root))
-    server = build_server(*resolve_binding())
-    tool = next(t for t in asyncio.run(server.list_tools()) if t.name == "progress")
-    assert set(tool.inputSchema["properties"]) == {"task_id", "wait_seconds"}
-    out = call(server, "progress", wait_seconds=300)  # stopped scheduler: answers at once
-    assert out.startswith("Not waiting") and f"(task {task.id})" in out
-    main(["--root", str(org.root), "progress", task.id, "--wait", "300"])
-    cli = capsys.readouterr().out
-    assert cli.startswith("Not waiting") and "scheduler: stopped" in cli
-
-
-# ------------------------------------------------------------------------------------ until done
-def fake_runner(mode="work"):
-    def build(o, addr, prompt):
-        return [sys.executable, FAKE], o.dir(addr), {**os.environ, "ORG_ROOT": str(o.root), "ORG_AGENT": addr, "FAKE_MODE": mode}
-
-    return build
-
-
-def test_status_and_progress_show_the_finished_scheduler_until_new_work_arrives(org):
-    org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
-    Scheduler(org, fake_runner("work"), echo=lambda _: None).serve(until_done=True)
-    assert describe_progress(org).splitlines()[-1] == "scheduler: stopped (finished: no open tasks)"
-    server = build_server(org, ROOT)
-    assert "scheduler: stopped (finished: no open tasks)" in call(server, "status")
-    org.delegate(ROOT, "ceo", "More", "g", "a", budget=3)  # new work: the old reason no longer holds
-    assert describe_scheduler(org) == "scheduler: stopped"
-    assert describe_progress(org).splitlines()[-1].startswith("scheduler: stopped - open tasks do not move")
-
-
-def test_start_tool_defaults_to_until_done(org, monkeypatch):
-    monkeypatch.setenv("ORG_ROOT", str(org.root))
-    server = build_server(*resolve_binding())
-    out = call(server, "start")  # empty org: nothing to run, so nothing is started
-    assert out.startswith("not started: there is nothing to run") and not (org.root / ".runtime" / "scheduler.pid").exists()
-
-
-def test_start_tool_passes_until_done_to_the_scheduler(org, monkeypatch):
-    monkeypatch.setenv("ORG_ROOT", str(org.root))
-    org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
-    server = build_server(*resolve_binding())
-    seen = {}
-    monkeypatch.setattr("orgmcp.server.start_scheduler", lambda o, m, u: seen.update(max=m, until_done=u) or 4242)
-    assert "exits by itself when the work is done" in call(server, "start", max_runs=2)
-    assert seen == {"max": 2, "until_done": True}
-    assert "runs until stop()" in call(server, "start", until_done=False)
-    assert seen["until_done"] is False

@@ -1,17 +1,15 @@
-"""The query half of observability: events, now, trace, metrics, check, the CLI and the MCP tool.
-
-Event files are written by hand (tests/testkit/obs_fixtures.py) exactly per the spec; the emitting module is not imported.
-"""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
 import dataclasses
 
 import pytest
+from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.mcp_server_world import build_server
 from testkit.obs_fixtures import Story, freeze, stamp
 
-from orgmcp.core import ROOT, Org
 from orgmcp.kernel.testing import FakeClock
-from orgmcp.server import build_server
 
 NOW = stamp(200)
 
@@ -60,7 +58,7 @@ def test_observe_tool_is_root_only_and_read_only(org, story):
 
 
 def test_observe_tool_docstring_is_short_and_says_read_only():
-    from orgmcp import observe as o
+    from orgmcp.mcp_server._tools_observe import ObservabilityTools
 
     class Fake:
         tools = {}
@@ -72,7 +70,7 @@ def test_observe_tool_docstring_is_short_and_says_read_only():
 
             return deco
 
-    o.register_observe_tool(Fake(), None)
+    ObservabilityTools(lambda: None).register(Fake(), ROOT)
     doc = Fake.tools["observe"].__doc__
     assert doc.startswith("Read-only") and len(doc) < 900
     for view in ("now", "trace", "metrics", "events", "check"):

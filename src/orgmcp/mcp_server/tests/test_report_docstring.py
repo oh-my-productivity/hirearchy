@@ -1,12 +1,11 @@
-"""Final word on a task: `blocked` can be re-reported (superseded), `done`/`failed` are final (D1), and
-runtime-only/failed runs do not make an agent `expensive` (D3)."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
 
 import pytest
-
-from orgmcp.core import ROOT
-from orgmcp.server import build_server
+from testkit.legacy.orgmcp.core import ROOT
+from testkit.mcp_server_world import build_server
 
 ENG = "ceo/eng"
 CRITERIA = "exactly 33 words; a non-author reviews the final text"
@@ -35,3 +34,22 @@ def test_report_docstring_and_rules_state_the_new_rule(org):
     rules = org.rules()
     assert "`done` and `failed` are final" in rules and "`blocked` is not final" in rules
     assert "never changes a task's outcome" in rules and "unless you verified them" in rules
+
+
+# ------------------------------------------------------------------------------------------ 3. feedback
+SERVICE = dict(
+    description="A brief.", acceptance=["At most 600 words"], budget=10,
+    deliverable={"description": "one markdown file", "format": "markdown", "max_words": 600},
+    inputs=[{"name": "topic", "description": "subject", "required": True}],
+)
+
+
+@pytest.fixture
+def svc(org):
+    org.define_service(ROOT, "ceo", "brief", **SERVICE)
+    return org
+
+
+def test_the_report_tool_docstring_says_lessons_are_required_for_blocked(svc):
+    tools = {t.name: t for t in asyncio.run(build_server(svc, "ceo").list_tools())}
+    assert "whatever the status - done, failed or blocked" in tools["report"].description

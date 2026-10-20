@@ -15,7 +15,7 @@ functions the tests and the old callers use, and the patch point ``orgmcp.server
 from __future__ import annotations
 
 import sys
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING, TypeVar, cast
 
@@ -126,8 +126,11 @@ class CachedPlanTime:
         return self._parts
 
 
-def server_factory(binding: OrgBindingPort, patch_points: bool = False) -> McpServerFactory:
-    """The factory of the servers bound to ``binding``. ``patch_points``: the servers of ``orgmcp.server`` (see the module docstring)."""
+def server_factory(
+    binding: OrgBindingPort, patch_points: bool = False, scheduler_control: Callable[[SchedulerControl], SchedulerControl] | None = None
+) -> McpServerFactory:
+    """The factory of the servers bound to ``binding``. ``patch_points``: the servers of ``orgmcp.server`` (see the module docstring).
+    ``scheduler_control``: wraps the control of the organization the ``start`` and ``stop`` tools use (the tests give a fake starter through it)."""
     from ..access import ToolNaming
     from ..agents import AgentDirectory, CharterReader
     from ..attention import OpenWork, WaitingOnUser
@@ -185,6 +188,8 @@ def server_factory(binding: OrgBindingPort, patch_points: bool = False) -> McpSe
 
     def control() -> SchedulerControl:
         real = of(SchedulerControl)()
+        if scheduler_control is not None:
+            return scheduler_control(real)
         located = binding.location()
         return PatchPointSchedulerControl(real, located) if patch_points and located is not None else real
 

@@ -1,4 +1,5 @@
-"""The data layer of ``orgmcp dash``: states, counts, requests, services, run log, robustness, caching, read-only."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import json
 import os
@@ -8,14 +9,13 @@ from datetime import timedelta
 
 import pytest
 from testkit.dash_fixtures import DEMO_NOW, big_org, demo_org, set_scheduler, write_running_json
+from testkit.dashdata_world import dd, observe
+from testkit.legacy.orgmcp.core import ROOT, Org
 from testkit.obs_fixtures import T0, EventLog, stamp
 from testkit.scheduler import scheduler_is
 
-from orgmcp import dashboard_data as dd
-from orgmcp import observe
-from orgmcp.core import ROOT, Org
+from orgmcp.daemon import SchedulerState
 from orgmcp.progress import progress
-from orgmcp.scheduler import SchedulerState
 
 
 @pytest.fixture

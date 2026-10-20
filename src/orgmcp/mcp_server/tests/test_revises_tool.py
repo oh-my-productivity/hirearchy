@@ -1,15 +1,15 @@
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
+
 import asyncio
 from datetime import datetime, timedelta, timezone
 
 import pytest
-
-from orgmcp import core
-from orgmcp.cli import main
-from orgmcp.core import ROOT
-from orgmcp.server import build_server
+from testkit.legacy.orgmcp import core
+from testkit.legacy.orgmcp.core import ROOT
+from testkit.mcp_server_world import build_server, main
 
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
-ENG = "ceo/eng"
 
 
 def at(seconds: float) -> datetime:
@@ -55,19 +55,3 @@ def test_revises_through_the_mcp_tool_and_cli(org, capsys):
         main(["--root", str(org.root), "task", "ceo", "--title", "x", "--goal", "g", "--acceptance", "a",
               "--revises", "bogus"])
     assert "revises" in capsys.readouterr().err
-
-
-def test_mcp_health_permissions(org):
-    org.hire("ceo", "ops", "Ops", "Operate.")
-    root, ceo, eng = (build_server(org, a) for a in (ROOT, "ceo", ENG))
-    assert call(root, "health").splitlines()[0] == "3 agents, 0 flagged"  # whole org by default
-    assert call(root, "health", agent=ENG).splitlines()[0] == "1 agent, 0 flagged"
-    assert call(ceo, "health").splitlines()[0] == "3 agents, 0 flagged"  # own subtree by default
-    assert call(ceo, "health", agent="ceo/ops").splitlines()[0] == "1 agent, 0 flagged"
-    assert call(eng, "health").splitlines()[0] == "1 agent, 0 flagged"
-    assert call(eng, "health", agent=ENG).splitlines()[0] == "1 agent, 0 flagged"
-    for who, target in ((eng, "ceo"), (eng, "ceo/ops"), (ceo, ROOT)):
-        with pytest.raises(Exception, match="own subtree"):
-            call(who, "health", agent=target)
-    with pytest.raises(Exception, match="no such agent"):
-        call(root, "health", agent="nobody")

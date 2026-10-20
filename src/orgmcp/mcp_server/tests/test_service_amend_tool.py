@@ -1,11 +1,10 @@
-"""define_service on an existing service is an amendment: omitted fields keep their value; add/remove criteria."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
-
-from orgmcp.core import ROOT
-from orgmcp.server import build_server
-
-from testkit.services_world import BRIEF, call, cli, contract_meta, define, fails, playbook_meta  # noqa: F401
+from testkit.legacy.orgmcp.core import ROOT
+from testkit.mcp_server_world import build_server
+from testkit.services_world import call, contract_meta, define, fails
 
 
 @pytest.fixture

@@ -1,13 +1,14 @@
-"""Events for a human (orgmcp.dashboard_events) and how the dashboard uses them."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 from __future__ import annotations
 
 import pytest
 from testkit.dash_fixtures import DEMO_NOW, demo_org
+from testkit.dashdata_world import dd
 from testkit.scheduler import scheduler_is
 
-from orgmcp import dashboard_data as dd
-from orgmcp.dashboard_events import describe, event_lines, humanize
+from orgmcp.dashdata import describe, event_lines, humanize
 
 TS = "2026-10-18T10:05:27.000000Z"
 
@@ -118,7 +119,7 @@ def test_health_now_text_has_no_contradictions_and_readable_errors(demo_data):
 
 @pytest.fixture
 def demo_data(tmp_path, monkeypatch):
-    from orgmcp.scheduler import SchedulerState
+    from orgmcp.daemon import SchedulerState
 
     up = lambda org: SchedulerState("running", 7000, "2026-10-18 10:00:00Z")  # noqa: E731
     scheduler_is(monkeypatch, up(None))

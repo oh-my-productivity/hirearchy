@@ -1,6 +1,7 @@
-"""Extra regression tests for the core safety/lifecycle fixes (see QA_REPORT.md and test_qa_findings.py)."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
-from orgmcp.core import ROOT
+from testkit.legacy.orgmcp.core import ROOT
 
 ENG = "ceo/eng"
 
@@ -8,7 +9,7 @@ ENG = "ceo/eng"
 def test_retire_tool_reports_the_refund(org):
     import asyncio
 
-    from orgmcp.server import build_server
+    from testkit.mcp_server_world import build_server
 
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     org.delegate("ceo", ENG, "t", "g", "a", budget=4)

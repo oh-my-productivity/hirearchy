@@ -1,17 +1,19 @@
-"""The "build me an org for <goal>" workflow through the root MCP tools, without kiro."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
 import re
-from pathlib import Path
 
 import pytest
-import yaml
+import testkit
+import testkit.legacy.yaml as yaml
+from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.mcp_server_world import blueprint as blueprint_mod
+from testkit.mcp_server_world import build_server, resolve_binding
 
-from orgmcp import blueprint as blueprint_mod
-from orgmcp.core import ROOT, Org
-from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
+from orgmcp.mcp_server._instructions import ROOT_INSTRUCTIONS
 
-EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "blueprint-research.yaml"
+EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"
 
 
 def call(server, tool, **args):

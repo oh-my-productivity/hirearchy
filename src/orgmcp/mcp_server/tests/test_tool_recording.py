@@ -1,4 +1,5 @@
-"""The event log (emission side): files, envelope, safety, retention, trace stamping and every emitted kind."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
 import dataclasses
@@ -8,10 +9,8 @@ import shutil
 import sys
 
 import pytest
-
-from orgmcp import telemetry
-from orgmcp.core import ROOT, Org
-from orgmcp.server import build_server
+from testkit.legacy.orgmcp.core import ROOT, Org
+from testkit.mcp_server_world import build_server, telemetry
 
 
 # ---------------------------------------------------------------------------------------------------- helpers
@@ -202,7 +201,7 @@ def test_the_async_progress_tool_is_recorded(org):
 
 def test_a_server_without_an_organization_still_works_and_writes_nothing(tmp_path):
     target = tmp_path / "later"
-    from orgmcp.server import OrgBinding
+    from testkit.mcp_server_world import OrgBinding
 
     server = build_server(OrgBinding(target), ROOT)
     assert "Setup" in str(call(server, "whoami"))

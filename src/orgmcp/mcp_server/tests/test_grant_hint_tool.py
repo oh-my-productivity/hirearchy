@@ -1,37 +1,16 @@
-"""Round F (runtime): charter rewrites keep the frontmatter, feedback is not a waiver, lessons on blocked reports,
-the digest shows the latest lessons first, and a budget grant says what the recipient can do with it."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
 
-import pytest
-
-from orgmcp.core import ROOT
-from orgmcp.server import build_server
+from testkit.legacy.orgmcp.core import ROOT
+from testkit.mcp_server_world import build_server
 
 
 def call(server, tool, **args):
     result = asyncio.run(server.call_tool(tool, args))
     blocks = result[0] if isinstance(result, tuple) else result
     return "\n".join(getattr(b, "text", "") for b in blocks)
-
-
-# ------------------------------------------------------------------------------------------ 3. feedback
-SERVICE = dict(
-    description="A brief.", acceptance=["At most 600 words"], budget=10,
-    deliverable={"description": "one markdown file", "format": "markdown", "max_words": 600},
-    inputs=[{"name": "topic", "description": "subject", "required": True}],
-)
-
-
-@pytest.fixture
-def svc(org):
-    org.define_service(ROOT, "ceo", "brief", **SERVICE)
-    return org
-
-
-def test_the_report_tool_docstring_says_lessons_are_required_for_blocked(svc):
-    tools = {t.name: t for t in asyncio.run(build_server(svc, "ceo").list_tools())}
-    assert "whatever the status - done, failed or blocked" in tools["report"].description
 
 
 def test_the_send_reply_carries_the_grant_hint(org):

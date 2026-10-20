@@ -1,10 +1,11 @@
-"""Every agent runs on claude-sonnet-5.5 unless its charter or the org config names another model."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
-from orgmcp.core import DEFAULT_MODEL
+from testkit.legacy.orgmcp.core import DEFAULT_MODEL
 
 
 def test_create_org_without_a_model_uses_the_default(tmp_path, monkeypatch):
-    from orgmcp.server import resolve_binding
+    from testkit.mcp_server_world import resolve_binding
 
     monkeypatch.setenv("ORG_ROOT", str(tmp_path / "new"))
     binding, _ = resolve_binding()

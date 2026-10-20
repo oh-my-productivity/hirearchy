@@ -1,15 +1,14 @@
-"""F2: kiro exposes MCP tools by plain name, so a built-in `read`/`write` shadows orgmcp's tool of the same name.
-An agent whose charter holds the built-in gets orgmcp's tool as `org_read` / `org_write`; everyone else is unchanged."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
-from pathlib import Path
 
 import pytest
+import testkit
+from testkit.legacy.orgmcp.core import ROOT
+from testkit.mcp_server_world import build_server, resolve_binding
 
-from orgmcp.core import ROOT
-from orgmcp.server import build_server, resolve_binding
-
-README = (Path(__file__).resolve().parent.parent / "README.md").read_text(encoding="utf-8")
+README = (testkit.REPO / "README.md").read_text(encoding="utf-8")
 
 
 def call(server, tool, **args):

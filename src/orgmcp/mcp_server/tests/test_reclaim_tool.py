@@ -1,11 +1,11 @@
-"""`reclaim`: a manager (or root) pulls unspent budget back from an idle direct report."""
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
 
 import pytest
-
-from orgmcp.core import ROOT
-from orgmcp.server import build_server
+from testkit.legacy.orgmcp.core import ROOT
+from testkit.mcp_server_world import build_server
 
 ENG, QA = "ceo/eng", "ceo/qa"
 
@@ -52,8 +52,9 @@ def test_mcp_tool(team, org, monkeypatch):
 
 
 def test_skill_and_root_instructions_carry_the_reclaim_and_cheap_model_rules():
-    from orgmcp.server import ROOT_INSTRUCTIONS
-    from orgmcp.skill import skill_source
+    from testkit.mcp_server_world import skill_source
+
+    from orgmcp.mcp_server._instructions import ROOT_INSTRUCTIONS
 
     skill = skill_source().read_text()
     assert len(skill.splitlines()) <= 125 and len(ROOT_INSTRUCTIONS) < 2800
