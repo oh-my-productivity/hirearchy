@@ -3,8 +3,8 @@
 
 import pytest
 import testkit.legacy.yaml as yaml
+from testkit.kiro_world import kiro_runner
 from testkit.legacy.orgmcp.core import DEFAULT_MODEL, ROOT, Org
-from testkit.legacy.orgmcp.scheduler import kiro_runner
 
 CHARTER = "---\nrole: CEO\n{model}tools: [read]\n---\nLead.\n"
 

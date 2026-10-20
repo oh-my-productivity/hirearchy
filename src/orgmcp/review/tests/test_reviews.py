@@ -11,7 +11,7 @@ from testkit.health_world import Scheduler, agent_health
 from testkit.legacy.orgmcp.core import ROOT, Org, join_frontmatter, split_frontmatter, utcnow
 from testkit.review_world import REVIEW_ACTIONS, review, review_if_due, total_runs
 
-from orgmcp.health import FLAGS
+from orgmcp.health.api import FLAGS
 
 ENG = "ceo/eng"
 

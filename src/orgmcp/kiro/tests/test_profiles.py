@@ -3,14 +3,12 @@
 
 import json
 
+from testkit.kiro_world import kiro_profile_name, kiro_runner, profiles_in
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.scheduler import ensure_kiro_profile, kiro_profile_name, kiro_runner
 
 
 def test_kiro_runner_builds_isolated_command(org, tmp_path, monkeypatch):
-    monkeypatch.setattr("orgmcp.scheduler.KIRO_AGENTS_DIR", tmp_path / "agents")
-    monkeypatch.setattr("orgmcp.scheduler.ensure_kiro_profile",
-                        lambda tools, org: ensure_kiro_profile(tools, tmp_path / "agents", org=org))
+    profiles_in(org, tmp_path / "agents")
     org.write(ROOT, "ceo/AGENT.md", "---\nrole: CEO\nmodel: claude-haiku-4.5\ntools: [read]\n---\nLead.\n")
     cmd, cwd, env = kiro_runner()(org, "ceo", "PROMPT")
     name = kiro_profile_name(org.root, ["read"])

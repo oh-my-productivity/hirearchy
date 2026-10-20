@@ -2,8 +2,8 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
+from testkit.daemon_world import waiting_on_user
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.scheduler import waiting_on_user
 
 
 # ------------------------------------------------------------------------------- until-done: waiting on the user

@@ -5,8 +5,8 @@ import json
 import re
 
 import pytest
-from testkit.legacy.orgmcp.cli import main
-from testkit.legacy.orgmcp.scheduler import ensure_kiro_profile, kiro_profile_name, kiro_runner
+from testkit.kiro_world import ensure_kiro_profile, kiro_profile_name, kiro_runner
+from testkit.legacy.orgmcp import main
 
 
 @pytest.fixture(autouse=True)

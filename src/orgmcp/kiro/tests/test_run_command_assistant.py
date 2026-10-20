@@ -2,7 +2,7 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
-from testkit.legacy.orgmcp import scheduler as sched_mod
+from testkit.daemon_world import scheduler_command
 
 
 @pytest.fixture(autouse=True)
@@ -18,5 +18,5 @@ def env(monkeypatch, tmp_path):
 
 
 def test_scheduler_command_adds_the_flag_only_when_asked(org):
-    assert "--until-done" not in sched_mod.scheduler_command(org.root, 3)
-    assert sched_mod.scheduler_command(org.root, 3, True)[-1] == "--until-done"
+    assert "--until-done" not in scheduler_command(org.root, 3)
+    assert scheduler_command(org.root, 3, True)[-1] == "--until-done"

@@ -9,7 +9,7 @@ import pytest
 from testkit.health_world import StepClock, agent_health, org_health, render_text, team, thresholds
 from testkit.legacy.orgmcp.core import ROOT, OrgError, join_frontmatter, split_frontmatter
 
-from orgmcp.health import FLAGS, HEALTH_DEFAULTS
+from orgmcp.health.api import FLAGS, HEALTH_DEFAULTS
 
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 ENG = "ceo/eng"

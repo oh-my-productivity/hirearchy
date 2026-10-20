@@ -2,7 +2,6 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import asyncio
-import dataclasses
 import os
 import re
 import signal
@@ -12,10 +11,11 @@ import time
 from pathlib import Path
 
 import pytest
+from testkit.daemon_world import describe_scheduler, env_server, scheduler_state, start_scheduler, stop_scheduler
+from testkit.health_world import with_ports
 from testkit.legacy.orgmcp.core import Org, OrgError
-from testkit.legacy.orgmcp.scheduler import describe_scheduler, scheduler_state, start_scheduler, stop_scheduler
-from testkit.legacy.orgmcp.server import build_server, resolve_binding
 
+from orgmcp.daemon import SchedulerCommand
 from orgmcp.daemon.testing import FixedSchedulerCommand, RecordingSchedulerCommand
 
 
@@ -53,7 +53,7 @@ def reap_schedulers():
 def test_start_and_stop_a_detached_scheduler(org, reap_schedulers, monkeypatch):
     reap_schedulers.append(org)
     monkeypatch.setenv("ORG_ROOT", str(org.root))
-    server = build_server(*resolve_binding())
+    server = env_server()
     assert "scheduler: stopped" in call(server, "status")
     out = call(server, "start", max_runs=0, until_done=False)  # the real scheduler command; at most 0 runs, so kiro is never started
     pid = int(re.search(r"pid (\d+)", out).group(1))
@@ -81,7 +81,7 @@ def test_start_passes_max_runs_and_logs_to_the_runtime_dir(org, reap_schedulers)
     reap_schedulers.append(org)
     seen = {}
     spy = RecordingSchedulerCommand(org.runtime.scheduler_command)
-    org.runtime = dataclasses.replace(org.runtime, scheduler_command=spy)
+    with_ports(org, {SchedulerCommand: spy})
     start_scheduler(org, max_runs=3)
     seen["cmd"] = spy.issued[0]
     assert seen["cmd"][-5:] == ["--root", str(org.root), "run", "--max-runs", "3"]
@@ -92,7 +92,7 @@ def test_start_passes_max_runs_and_logs_to_the_runtime_dir(org, reap_schedulers)
 
 def test_start_reports_a_scheduler_that_dies_at_once(org):
     dies = FixedSchedulerCommand([sys.executable, "-c", "import sys; print('boom'); sys.exit(3)"])
-    org.runtime = dataclasses.replace(org.runtime, scheduler_command=dies)
+    with_ports(org, {SchedulerCommand: dies})
     with pytest.raises(OrgError, match=r"exited at once \(exit 3\)[\s\S]*boom"):
         start_scheduler(org)
 

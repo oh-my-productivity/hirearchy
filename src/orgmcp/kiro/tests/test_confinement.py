@@ -5,8 +5,8 @@ import json
 import re
 
 import pytest
+from testkit.kiro_world import ensure_kiro_profile, kiro_profile_name, kiro_runner
 from testkit.legacy.orgmcp.core import ROOT, Org
-from testkit.legacy.orgmcp.scheduler import ensure_kiro_profile, kiro_profile_name, kiro_runner
 
 
 def profile_of(isolated_kiro, name):

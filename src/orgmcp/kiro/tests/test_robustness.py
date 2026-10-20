@@ -6,9 +6,9 @@ import pwd
 import time
 from pathlib import Path
 
-from testkit.legacy.orgmcp import scheduler as sched_mod
+from testkit.health_world import Scheduler
+from testkit.kiro_world import ensure_kiro_profile, kiro_profile_name, kiro_runner
 from testkit.legacy.orgmcp.core import ROOT
-from testkit.legacy.orgmcp.scheduler import Scheduler, ensure_kiro_profile, kiro_profile_name
 
 
 def real_agent_profiles() -> dict[str, int]:
@@ -39,8 +39,9 @@ def test_default_kiro_runner_in_tests_writes_nothing_under_the_real_home(org, is
 
 
 def test_ensure_kiro_profile_resolves_the_directory_at_call_time(org, isolated_kiro, tmp_path, monkeypatch):
-    elsewhere = tmp_path / "elsewhere"
-    monkeypatch.setattr(sched_mod, "KIRO_AGENTS_DIR", elsewhere)
+    home = tmp_path / "elsewhere-home"  # the profile directory is the one of the HOME in force when the profile is written
+    elsewhere = home / ".kiro" / "agents"
+    monkeypatch.setenv("HOME", str(home))
     name = ensure_kiro_profile(["read"], org=org)
     assert (elsewhere / f"{name}.json").is_file()
     assert not (isolated_kiro / ".kiro" / "agents" / f"{name}.json").exists()
@@ -75,5 +76,5 @@ def test_prompt_is_delivered_on_stdin_not_in_argv(org, tmp_path):
 
 
 def test_kiro_command_has_no_prompt_argument(org):
-    cmd, _, _ = sched_mod.kiro_runner()(org, "ceo", "THE PROMPT")
+    cmd, _, _ = kiro_runner()(org, "ceo", "THE PROMPT")
     assert "THE PROMPT" not in cmd
