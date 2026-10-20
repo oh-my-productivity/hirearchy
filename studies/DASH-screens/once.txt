@@ -14,7 +14,7 @@ AGENTS
     ! crawler [Web crawler]  out of budget  budget 0  claude-sonnet-5.5
 
 NEEDS YOU
-  Needs you: note from ops "Need approval for downtime": The key rotation needs a maintenance window. May I take the API down on Saturday 02:00? (message 20261018T100200000003-ops-007b)
+  Needs you: note from ops "Need approval for downtime": The key rotation needs a maintenance window. May I take the API down on Saturday 02:00? (message 20261018T100200000003-ops-0021)
 
 REQUESTS
   "Brief: heat pumps" -> research: working (running: research); runs 2 of 6, last activity 5.0s ago
