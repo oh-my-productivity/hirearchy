@@ -7,10 +7,10 @@ import time
 import pytest
 import testkit
 import yaml
+from testkit.e2e_world import build_server, resolve_binding
+from testkit.scheduler_loop import loop_over
 
 from orgmcp.core import ROOT, Org
-from orgmcp.scheduler import Scheduler
-from orgmcp.server import build_server, resolve_binding
 
 EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"
 TEAM = str(testkit.FAKE_TEAM_AGENT)
@@ -77,14 +77,15 @@ def code_text(tmp_path) -> str:
     }, sort_keys=False)
 
 
-def run_team(org, mode_runner=None, max_ticks=500):
+def run_team(org, mode_runner=None, limit=90.0):
     def runner(o, addr, prompt):
         return [sys.executable, TEAM], o.dir(addr), {**os.environ, "ORG_ROOT": str(o.root), "ORG_AGENT": addr}
 
-    sched = Scheduler(org, runner, echo=lambda _: None)
+    sched = loop_over(org, runner, echo=lambda _: None)
     sched.acquire()
     try:
-        for _ in range(max_ticks):
+        deadline = time.time() + limit
+        while time.time() < deadline:
             if not sched.tick():
                 return
             time.sleep(0.02)
