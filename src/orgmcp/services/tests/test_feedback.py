@@ -4,10 +4,11 @@
 import time
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, Message, OrgError
+from testkit.legacy.orgmcp.core import ROOT, OrgError
+from testkit.reflection_world import summarize
 from testkit.services_world import ENG, define, deliver, request, svc
 
-from orgmcp import services
+from orgmcp.services import FEEDBACK_HEADER
 
 
 # ----------------------------------------------------------------------------------------- feedback
@@ -27,10 +28,10 @@ def test_feedback_is_a_quiet_note_from_the_requester(svc):
     note = org.feedback(ROOT, task.id, "reject", "No week-over-week changes.")
     assert (note.type, note.to, note.reply_to, note.feedback, note.wake) == ("note", "ceo", task.id, "reject", False)
     assert note.title == f'feedback on "{task.title}": reject'
-    assert note.body == services.FEEDBACK_HEADER + "\n\nNo week-over-week changes."
+    assert note.body == FEEDBACK_HEADER + "\n\nNo week-over-week changes."
     assert org.unread("ceo") == ceo_unread and note.budget == 0
-    assert "feedback: reject" in Message.load(org.dir("ceo") / "inbox" / f"{note.id}.md").render()
-    assert org.feedback(ROOT, task.id, "accept").body == services.FEEDBACK_HEADER + "\n\naccepted"
+    assert "feedback: reject" in org.runtime.message_parser.parse(org.dir("ceo") / "inbox" / f"{note.id}.md").render()
+    assert org.feedback(ROOT, task.id, "accept").body == FEEDBACK_HEADER + "\n\naccepted"
 
 
 def test_only_the_requester_gives_feedback_on_a_service_request(org):
@@ -55,10 +56,10 @@ def test_feedback_on_a_rework_belongs_to_the_case_and_the_latest_is_the_final_ve
     org.feedback(ROOT, first.id, "reject", "Too long.")
     rework = org.delegate(ROOT, "ceo", "Shorten", "g", "c", budget=3, revises=first.id)
     deliver(org, "ceo", rework)
-    (case,) = services.cases(org, "ceo", "weekly-brief")
+    (case,) = org.runtime.case_history.cases("ceo", "weekly-brief")
     assert case.verdict == "reject"  # feedback on the first task counts for the case
     time.sleep(0.002)
     org.feedback(ROOT, rework.id, "accept")
-    (case,) = services.cases(org, "ceo", "weekly-brief")
+    (case,) = org.runtime.case_history.cases("ceo", "weekly-brief")
     assert case.verdict == "accept" and case.feedback.reply_to == rework.id
-    assert services.summarize([case]).accept == 1 and services.summarize([case]).reject == 0
+    assert summarize([case]).accept == 1 and summarize([case]).reject == 0

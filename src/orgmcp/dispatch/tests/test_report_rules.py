@@ -4,8 +4,8 @@
 import time
 
 import pytest
-from testkit.legacy.orgmcp import services
 from testkit.legacy.orgmcp.core import ROOT, OrgError
+from testkit.reflection_world import lessons_of
 
 ENG = "ceo/eng"
 CRITERIA = "exactly 33 words; a non-author reviews the final text"
@@ -102,6 +102,6 @@ def test_a_blocked_report_on_a_service_request_requires_lessons(svc):
     with pytest.raises(OrgError, match="pass `lessons`.*blocked"):
         svc.report("ceo", task.id, "blocked", "Cannot read the notes.")
     res = svc.report("ceo", task.id, "blocked", "Cannot read the notes.", lessons="Reviewer had no inputs.")
-    assert services.lessons_of(res) == "Reviewer had no inputs."
+    assert lessons_of(res) == "Reviewer had no inputs."
     plain = svc.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
     assert svc.report("ceo", plain.id, "blocked", "Waiting.").status == "blocked"  # plain tasks: still optional

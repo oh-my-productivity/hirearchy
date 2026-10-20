@@ -2,7 +2,7 @@
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
-from testkit.legacy.orgmcp.core import ROOT, Message, OrgError
+from testkit.legacy.orgmcp.core import ROOT, OrgError
 
 ENG, QA = "ceo/eng", "ceo/qa"
 
@@ -184,7 +184,7 @@ def test_redelivery_does_not_count_the_transfer_twice(team, org):
 
 def test_the_note_is_marked_and_read_back_from_the_file(team, org):
     msg = org.reclaim("ceo", "eng")
-    loaded = Message.load(org.dir("ceo") / "inbox" / f"{msg.id}.md")
+    loaded = org.runtime.message_parser.parse(org.dir("ceo") / "inbox" / f"{msg.id}.md")
     assert loaded.budget == 3 and loaded.wake is False and loaded.sender == ENG
     assert "budget reclaimed by ceo" in loaded.render() and "on ceo/eng's behalf" in loaded.body
 

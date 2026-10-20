@@ -5,7 +5,6 @@ import json
 import shutil
 
 import pytest
-from testkit.legacy.orgmcp import telemetry
 from testkit.legacy.orgmcp.core import ROOT
 
 
@@ -14,7 +13,7 @@ from testkit.legacy.orgmcp.core import ROOT
 def org(org):
     """The shared org, with the events of its construction (hires) forgotten: tests see only their own."""
     shutil.rmtree(org.root / ".runtime" / "events", ignore_errors=True)
-    telemetry.reset()
+    org.runtime.resources.reset()
     return org
 
 

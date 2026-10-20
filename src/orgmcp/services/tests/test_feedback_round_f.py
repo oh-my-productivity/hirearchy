@@ -6,8 +6,6 @@ import time
 import pytest
 from testkit.legacy.orgmcp.core import ROOT
 
-from orgmcp import services
-
 # ------------------------------------------------------------------------------------------ 3. feedback
 SERVICE = dict(
     description="A brief.", acceptance=["At most 600 words"], budget=10,
@@ -47,5 +45,5 @@ def test_feedback_note_starts_with_the_fixed_header_and_then_the_clients_words(s
         "report `done` only if every criterion is met."
     )
     assert rest == "deliver as is"
-    assert services.feedback_text(note) == "deliver as is"
-    assert services.feedback_text(svc.feedback(ROOT, task.id, "accept")) == ""
+    assert svc.runtime.service_hints.feedback_text(note) == "deliver as is"
+    assert svc.runtime.service_hints.feedback_text(svc.feedback(ROOT, task.id, "accept")) == ""

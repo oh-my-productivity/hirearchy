@@ -6,7 +6,7 @@ import asyncio
 import pytest
 import testkit.legacy.yaml as yaml
 from testkit.legacy.orgmcp.core import ROOT, Org, OrgError, atomic_write
-from testkit.legacy.orgmcp.server import build_server
+from testkit.orgfiles_server import build_server
 
 
 def call(server, tool, **args):

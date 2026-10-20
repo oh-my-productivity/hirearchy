@@ -5,8 +5,6 @@ import pytest
 from testkit.legacy.orgmcp.core import ROOT, OrgError, split_frontmatter
 from testkit.services_world import BRIEF, contract_meta, define, playbook_meta
 
-from orgmcp import services
-
 
 def amend(org, **kw):
     return org.define_service(ROOT, "ceo", "weekly-brief", **kw)
@@ -155,12 +153,12 @@ def test_a_requested_task_carries_the_amended_criteria(svc):
 
 def test_services_text_lists_the_criteria_in_full(svc):
     amend(svc, add_acceptance=["Never longer than one page"])
-    out = services.services_text(svc, ROOT)
+    out = svc.runtime.service_reports.services_text(ROOT)
     assert ("  each request: 10 runs; acceptance criteria (ceo/services/weekly-brief/SERVICE.md):\n"
             "    1. At most 600 words\n    2. Every factual claim has a source URL\n    3. Never longer than one page\n"
             "  record:") in out
     assert "3 acceptance criteria" not in out
-    assert "    3. Never longer than one page" in services.services_text(svc, "ceo")  # the owner sees them too
+    assert "    3. Never longer than one page" in svc.runtime.service_reports.services_text("ceo")  # the owner sees them too
 
 
 def test_a_manager_amends_the_contract_of_its_report(org):

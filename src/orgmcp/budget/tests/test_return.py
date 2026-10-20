@@ -210,7 +210,7 @@ def test_old_messages_mean_what_they_always_meant(org):
         id="20200101T000000000000-ceo-aaaa",
     )
     org.deliver(old)  # exactly what the previous `report` wrote
-    assert Message.load(org.dir("ceo") / "sent" / f"{old.id}.md").budget == 0
+    assert org.runtime.message_parser.parse(org.dir("ceo") / "sent" / f"{old.id}.md").budget == 0
     assert org.budget("ceo") == 4 and "returns" not in old.render()
 
 

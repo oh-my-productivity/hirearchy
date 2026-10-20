@@ -3,9 +3,8 @@
 
 import pytest
 from testkit.legacy.orgmcp.core import ROOT, Message, OrgError, split_frontmatter
+from testkit.reflection_world import lessons_of
 from testkit.services_world import ENG, define, deliver, request, svc, work
-
-from orgmcp import services
 
 
 # --------------------------------------------------------------------------------------------- request
@@ -23,7 +22,7 @@ def test_request_builds_a_task_from_the_contract(svc):
         "## Deliverable\none markdown file (format: markdown; at most 600 words)\n\n"
         "## Note from the requester\nShort please."
     )
-    stored = Message.load(org.dir("ceo") / "inbox" / f"{msg.id}.md")
+    stored = org.runtime.message_parser.parse(org.dir("ceo") / "inbox" / f"{msg.id}.md")
     assert (stored.service, stored.contract, stored.playbook) == ("weekly-brief", 1, 0)
     head = stored.render().splitlines()[1]
     assert "service: weekly-brief (contract v1, playbook v0)" in head
@@ -106,13 +105,13 @@ def test_delegate_revises_a_service_task_and_stays_in_the_case(org):
     assert plain.service is None and plain.contract is None and plain.playbook is None
     plain_rework = org.delegate(ROOT, "ceo", "Plain 2", "g", "c", budget=2, revises=plain.id)
     assert plain_rework.service is None
-    (case,) = services.cases(org, "ceo", "weekly-brief")
+    (case,) = org.runtime.case_history.cases("ceo", "weekly-brief")
     assert [t.id for t in case.tasks] == [first.id, rework.id] and case.reworks == 1
 
 
 def test_old_messages_without_service_fields_parse_as_before(org):
     msg = org.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
-    stored = Message.load(org.dir("ceo") / "inbox" / f"{msg.id}.md")
+    stored = org.runtime.message_parser.parse(org.dir("ceo") / "inbox" / f"{msg.id}.md")
     assert stored.service is stored.contract is stored.playbook is stored.feedback is None
     assert "service" not in stored.meta() and "feedback" not in stored.meta()
     assert "service:" not in stored.render()
@@ -131,12 +130,12 @@ def test_report_on_a_service_request_requires_lessons(svc):
     with pytest.raises(OrgError, match="limit is 800"):
         org.report("ceo", task.id, "done", "Delivered.", lessons="x" * 801)
     blocked = org.report("ceo", task.id, "blocked", "Waiting for sources.", lessons="Sources were not provided.")
-    assert services.lessons_of(blocked) == "Sources were not provided."  # required for blocked too
+    assert lessons_of(blocked) == "Sources were not provided."  # required for blocked too
     org.write("ceo", "ceo/work/brief.md", "# Brief")
     final = org.report("ceo", task.id, "done", "Delivered.", ["ceo/work/brief.md"], lessons="Search first.\nTwo runs.")
     assert final.body.index("## Summary") < final.body.index("## Lessons") < final.body.index("## Artifacts")
     assert "## Lessons\nSearch first.\nTwo runs." in final.body
-    assert services.lessons_of(final) == "Search first.\nTwo runs."
+    assert lessons_of(final) == "Search first.\nTwo runs."
 
 
 def test_lessons_are_optional_for_plain_tasks_and_kept_when_given(org):

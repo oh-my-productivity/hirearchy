@@ -1,8 +1,9 @@
 # mypy: ignore-errors
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
-from testkit.legacy.orgmcp import core
 from testkit.legacy.orgmcp.core import ROOT
+
+from orgmcp.kernel import RUNTIME
 
 
 def ceo_with_funded_report(org, budget=20, grant=5):
@@ -20,6 +21,6 @@ def test_retire_refund_is_non_waking_and_counts_immediately(org):
     ret = org.retire_team("ceo", "ops", "done")
     assert ret.refunded == 5
     (note,) = org.messages("ceo", "inbox")
-    assert note.wake is False and note.budget == 5 and note.sender == core.RUNTIME
+    assert note.wake is False and note.budget == 5 and note.sender == RUNTIME
     assert org.unread("ceo") == 0 and org.state("ceo") == "idle"
     assert org.budget("ceo") == before + 5  # budget is derived from files, wake or not

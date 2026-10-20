@@ -6,8 +6,6 @@ import time
 import pytest
 from testkit.legacy.orgmcp.core import ROOT
 
-from orgmcp import services
-
 # ------------------------------------------------------------------------------------------ 3. feedback
 SERVICE = dict(
     description="A brief.", acceptance=["At most 600 words"], budget=10,
@@ -41,7 +39,7 @@ def test_the_digest_quotes_the_clients_words_without_the_header(svc):
     task = svc.request(ROOT, "brief", {"topic": "ai"})
     deliver(svc, task)
     svc.feedback(ROOT, task.id, "reject", "Missed two items.")
-    digest = services.reflection_digest(svc, "ceo", "brief")
+    digest = svc.runtime.reflection_digest.reflection_digest("ceo", "brief")
     assert 'client feedback: reject "Missed two items."' in digest and "reflection only" not in digest
 
 
@@ -51,6 +49,6 @@ def test_the_digest_shows_the_latest_lessons_first_and_earlier_ones_after(svc):
     deliver(svc, first, lessons="Ran cleanly; no changes needed.")
     rework = svc.request(ROOT, "brief", {"topic": "ai"}, revises=first.id, budget=4)
     deliver(svc, rework, lessons="Two items were missed: add a pre-read step.")
-    digest = services.reflection_digest(svc, "ceo", "brief")
+    digest = svc.runtime.reflection_digest.reflection_digest("ceo", "brief")
     line = next(x for x in digest.splitlines() if x.startswith("- case "))
     assert line.index('lessons: "Two items were missed') < line.index('earlier: "Ran cleanly; no changes needed.')

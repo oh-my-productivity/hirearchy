@@ -5,8 +5,6 @@ import pytest
 from testkit.legacy.orgmcp.core import ROOT, OrgError, split_frontmatter
 from testkit.services_world import BRIEF, ENG, contract_meta, define, playbook_meta, request, svc, work
 
-from orgmcp import services
-
 
 # --------------------------------------------------------------------------------------------- define
 def test_define_writes_the_contract_without_a_playbook(org):
@@ -29,7 +27,7 @@ def test_define_with_a_playbook_writes_version_one(org):
     assert meta["version"] == 1 and meta["by"] == ROOT and meta["reason"] == "initial playbook"
     assert meta["service"] == "weekly-brief" and "ignored" not in meta
     assert body.strip().startswith("## Steps")
-    assert services.read_playbook(org, "ceo", "weekly-brief").version == 1
+    assert org.runtime.service_catalog.read_playbook("ceo", "weekly-brief").version == 1
 
 
 def test_only_the_parent_of_the_owner_defines_its_services(org):

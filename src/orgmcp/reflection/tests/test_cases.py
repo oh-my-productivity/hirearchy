@@ -6,7 +6,7 @@ import time
 from testkit.legacy.orgmcp.core import ROOT
 from testkit.services_world import define, deliver, request, svc, work
 
-from orgmcp import services
+from orgmcp.reflection import stats_by_version, summarize
 
 WEEKDAY = "weekly-brief"
 
@@ -27,7 +27,7 @@ def rejected_then_accepted(org, *, reject="Sam's 'before Friday' needs a date.",
 # ------------------------------------------------------------------------------- 1. every verdict stays
 def test_a_case_keeps_every_verdict_in_order_with_the_task_it_was_given_on(svc):
     first, rework = rejected_then_accepted(svc)
-    (case,) = services.cases(svc, "ceo", WEEKDAY)
+    (case,) = svc.runtime.case_history.cases("ceo", WEEKDAY)
     assert [(v.verdict, v.note, v.task_id, v.step) for v in case.verdicts] == [
         ("reject", "Sam's 'before Friday' needs a date.", first.id, 0),
         ("accept", "this version is right", rework.id, 1),
@@ -45,17 +45,17 @@ def test_stats_keep_the_final_counts_and_say_how_many_accepts_came_after_a_rejec
     bad = request(svc, "bio")
     deliver(svc, "ceo", bad)
     svc.feedback(ROOT, bad.id, "reject", "Too long.")
-    items = services.cases(svc, "ceo", WEEKDAY)
-    total = services.summarize(items)
+    items = svc.runtime.case_history.cases("ceo", WEEKDAY)
+    total = summarize(items)
     assert (total.accept, total.reject, total.accept_after_reject) == (2, 1, 1)
     assert total.line().endswith("feedback 2 accept (1 after a reject), 1 reject")
-    record = services.services_text(svc, ROOT)
+    record = svc.runtime.service_reports.services_text(ROOT)
     assert "feedback 2 accept (1 after a reject), 1 reject" in record
 
 
 def test_stats_per_playbook_version_carry_the_after_a_reject_count(svc):
     rejected_then_accepted(svc)
-    (v0,) = services.stats_by_version(services.cases(svc, "ceo", WEEKDAY)).values()
+    (v0,) = stats_by_version(svc.runtime.case_history.cases("ceo", WEEKDAY)).values()
     assert v0.line().endswith("feedback 1 accept (1 after a reject), 0 reject")
 
 
@@ -67,10 +67,10 @@ def test_a_case_rejected_twice_ends_as_a_reject_and_shows_both_verdicts(svc):
     rework = svc.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=first.id, budget=4)
     deliver(svc, "ceo", rework)
     svc.feedback(ROOT, rework.id, "reject", "Still no summary.")
-    (case,) = services.cases(svc, "ceo", WEEKDAY)
+    (case,) = svc.runtime.case_history.cases("ceo", WEEKDAY)
     assert case.verdict == "reject" and not case.accepted_after_reject
-    assert 'client feedback: reject "No summary." -> reject "Still no summary."' in services.reflection_digest(svc, "ceo", WEEKDAY)
-    assert services.summarize([case]).line().endswith("feedback 0 accept, 1 reject")
+    assert 'client feedback: reject "No summary." -> reject "Still no summary."' in svc.runtime.reflection_digest.reflection_digest("ceo", WEEKDAY)
+    assert summarize([case]).line().endswith("feedback 0 accept, 1 reject")
 
 
 def test_a_long_verdict_history_is_cut_to_the_latest_ones(svc):
@@ -82,7 +82,7 @@ def test_a_long_verdict_history_is_cut_to_the_latest_ones(svc):
         time.sleep(0.002)
         task = svc.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=task.id, budget=2)
         deliver(svc, "ceo", task)
-    line = services.reflection_digest(svc, "ceo", WEEKDAY)
+    line = svc.runtime.reflection_digest.reflection_digest("ceo", WEEKDAY)
     assert "client feedback: … -> reject" in line and "problem 4" in line and "problem 0" not in line
 
 
@@ -95,7 +95,7 @@ def test_cases_group_rework_chains_and_derive_runs_budget_and_lessons(svc):
     deliver(org, "ceo", rework, runs=1, lessons="Added sources.")
     second = request(org, "chips")
     work(org, "ceo", 1)
-    one, two = services.cases(org, "ceo", "weekly-brief")
+    one, two = org.runtime.case_history.cases("ceo", "weekly-brief")
     assert one.id == first.id and [t.id for t in one.tasks] == [first.id, rework.id]
     assert (one.state, one.reworks, one.playbook, one.budget, one.runs) == ("done", 1, 0, 14, 3)
     assert one.lessons == ["First pass was thin.", "Added sources."] and one.result.reply_to == rework.id
@@ -112,9 +112,9 @@ def test_a_blocked_case_is_not_finished_and_a_failed_one_counts_as_failed(svc):
     org.report("ceo", a.id, "blocked", "Need data.", lessons="Input was missing.")
     org.report("ceo", b.id, "failed", "Could not.", lessons="Source was down.")
     org.end_run("ceo", ok=True)
-    blocked, failed = services.cases(org, "ceo", "weekly-brief")
+    blocked, failed = org.runtime.case_history.cases("ceo", "weekly-brief")
     assert (blocked.state, blocked.finished) == ("blocked", None) and failed.state == "failed"
-    stats = services.summarize([blocked, failed])
+    stats = summarize([blocked, failed])
     assert (stats.requests, stats.done, stats.failed, stats.open) == (2, 0, 1, 1)
 
 
@@ -129,14 +129,14 @@ def test_stats_per_playbook_version_and_the_one_line_summary(svc):
     org.feedback(ROOT, b.id, "accept")
     c = request(org, "c")
     deliver(org, "ceo", c, status="failed", runs=3)
-    all_cases = services.cases(org, "ceo", "weekly-brief")
-    per = services.stats_by_version(all_cases)
+    all_cases = org.runtime.case_history.cases("ceo", "weekly-brief")
+    per = stats_by_version(all_cases)
     assert sorted(per) == [0, 1]
     v0, v1 = per[0], per[1]
     assert (v0.requests, v0.done, v0.reject, v0.avg_runs) == (1, 1, 1, 2.0)
     assert (v1.requests, v1.done, v1.failed, v1.accept, v1.avg_runs) == (2, 1, 1, 1, 2.0)
     assert v1.line() == "2 request(s): 1 done, 1 failed, 0 open; 0 reworked; avg 2 runs; feedback 1 accept, 0 reject"
-    total = services.summarize(all_cases)
+    total = summarize(all_cases)
     assert total.requests == 3 and total.reworked == 0
 
 
@@ -147,4 +147,4 @@ def test_requests_from_before_a_service_was_retired_are_not_cases_of_the_new_one
     org.retire_service(ROOT, "ceo", "weekly-brief", "redo")
     time.sleep(0.002)
     define(org)
-    assert services.cases(org, "ceo", "weekly-brief") == []
+    assert org.runtime.case_history.cases("ceo", "weekly-brief") == []
