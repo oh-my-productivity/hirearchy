@@ -1,9 +1,8 @@
 """Providers of the ``attention`` ports (ARCHITECTURE.md 6.1), and the same objects over the runtime in force for the legacy functions.
 
-``waiting_on_user_of``, ``human_queue_of`` and ``open_work_of`` serve ``scheduler.waiting_on_user`` / ``nothing_to_do`` and ``progress._human_items`` until
-those modules are converted (D-sched-1, C-progress): they are handed an ``Org`` whose ``runtime`` tests replace (a ledger of the stall ladder, the
-notices) and the dashboard's lenient ``Org`` replaces the mailboxes, the budgets and the pause flags of, so each call builds the objects over the
-ports the runtime has *now*, as the functions it replaces read them through the ``Org``. Both go when the legacy functions do.
+``waiting_on_user_of`` and ``open_work_of`` serve ``daemon`` (the scheduler status) and ``scheduler.waiting_on_user`` / ``nothing_to_do`` until those are
+converted: they are handed a runtime a test replaced a part of (a ledger of the stall ladder, the notices), so each call builds the objects over the
+ports the runtime has *now*. ``open_work_of`` goes when the legacy functions of ``scheduler`` do.
 """
 
 from __future__ import annotations
@@ -52,11 +51,6 @@ def register(b: Builder) -> None:
 def waiting_on_user_of(runtime: OrgRuntime) -> WaitingOnUser:
     """``WaitingOnUser`` over the ports ``runtime`` has now."""
     return waiting_on_user(RuntimePorts(runtime))
-
-
-def human_queue_of(runtime: OrgRuntime) -> HumanQueue:
-    """``HumanQueue`` over the mailboxes ``runtime`` has now."""
-    return human_queue(RuntimePorts(runtime))
 
 
 def open_work_of(runtime: OrgRuntime) -> OpenWork:

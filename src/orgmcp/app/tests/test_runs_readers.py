@@ -19,7 +19,7 @@ from typing import Any
 
 import pytest
 
-from orgmcp.app import Org, wire_dashdata
+from orgmcp.app import Org, wire_dashdata, wiring
 from orgmcp.dashdata._runlog import read_tail
 from orgmcp.kernel import OrgPaths
 from orgmcp.runs import RunLogReader, RunLogSink, log_failed_start
@@ -30,7 +30,7 @@ from orgmcp.runs.tests import _oracle
 from orgmcp.runs.tests._legacy import legacy
 from orgmcp.scheduler._orphans import LogRunNotes
 
-health, observe, sched_module = legacy("health"), legacy("observe"), legacy("scheduler")
+observe, sched_module = legacy("observe"), legacy("scheduler")
 
 SILENT = {"echo": lambda _: None}
 T1, T2, T3 = "20261018T100000000001", "20261018T110000000002", "20261018T120000000003"
@@ -61,8 +61,8 @@ def test_health_reads_the_windows_and_outcomes_from_the_log_reader(org: Org, mem
     memory.put_log("ceo", f"{T1}.log", "# run of ceo, 1 message(s)\n# senders: root\n# ---- prompt ----\nx\n# ---- output ----\n\n# exit 0 after 3s\n")
     memory.put_log("ceo", f"{T2}.log", "# run of ceo, 1 message(s)\n# senders: root\n# ---- prompt ----\nx\n# ---- output ----\n\n# exit 1 after 3s\n")
     memory.put_log("ceo", f"{T3}.log", "# run of ceo, 1 message(s)\n# senders: runtime\n# ---- prompt ----\nx\n# ---- output ----\n\n# exit 0 after 3s\n")
-    use(org, run_log_reader=memory)
-    report = health.agent_health(org, "ceo", datetime(2026, 10, 18, 13, 0, tzinfo=timezone.utc))
+    org.runtime = wiring.open_runtime(org.root, {RunLogReader: memory})
+    report = org.runtime.health_analyzer.agent_health("ceo", datetime(2026, 10, 18, 13, 0, tzinfo=timezone.utc))
     assert (report.runs_used, report.failed_runs, report.runtime_runs, report.empty_runs) == (3, 1, 1, 1)
     assert list((org.root / "ceo" / "runs").glob("*.log")) == []  # none on disk: the fake answered
 

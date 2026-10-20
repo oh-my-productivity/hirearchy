@@ -17,12 +17,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Protocol, runtime_checkable
 
-from ..attention import HumanQueue, WaitingOnUser
-from ..daemon import SchedulerStatus
-from ..reflection import CaseHistory, ServiceReports
-
 __all__ = [
-    "LegacyParts",
     "ProgressReporter",
     "WAIT_MAX",
 ]
@@ -54,33 +49,4 @@ class ProgressReporter(Protocol):
     def work_in_flight(self, task_id: str | None = None) -> bool:
         """Could anything move for the listed root tasks right now: a task that is working or waiting, or blocked or stalled while an agent
         below it is running or could run. Read-only."""
-        ...
-
-
-@runtime_checkable
-class LegacyParts(Protocol):
-    """The objects the legacy functions of this package (``progress(org, task_id)`` and the private names the dashboard, the scheduler and ``observe`` still
-    import) cannot build themselves, over the ports of the runtime they are handed. Not for new code; it goes with the legacy functions (step E3).
-
-    A runtime that a test or the dashboard's lenient ``Org`` replaced a part of keeps the objects that were built over the old ports, so each call asks
-    for them again over the runtime in force."""
-
-    def human_queue(self, runtime: object) -> HumanQueue:
-        """What waits for the user, read from the mailboxes ``runtime`` has now."""
-        ...
-
-    def case_history(self, runtime: object) -> CaseHistory:
-        """The cases of the service requests, over the ports ``runtime`` has now."""
-        ...
-
-    def service_reports(self, runtime: object) -> ServiceReports:
-        """The totals of a case, over the ports ``runtime`` has now."""
-        ...
-
-    def scheduler_status(self, runtime: object) -> SchedulerStatus:
-        """The scheduler of the organization, over the ports ``runtime`` has now."""
-        ...
-
-    def waiting_on_user(self, runtime: object) -> WaitingOnUser:
-        """The decision of whether everything waits for the user, over the ports ``runtime`` has now."""
         ...

@@ -49,7 +49,6 @@ def test_aware_oracle() -> None:
     zones = [None, UTC, timezone(timedelta(hours=5, minutes=30)), timezone(timedelta(hours=-8))]
     table: list[object] = [None] + [d.replace(tzinfo=z) for d in _datetimes() for z in zones]
     same(aware, _oracle._aware, table)
-    same(aware, legacy("health")._aware, table)
 
 
 def _parse_inputs() -> list[object]:
@@ -72,7 +71,6 @@ def test_parse_time_accepts_iso_strings_and_datetimes() -> None:
 def test_parse_time_oracle() -> None:
     table = _parse_inputs()
     same(parse_time, _oracle._parse_time, table)
-    same(parse_time, legacy("health")._parse_time, table)
 
 
 def _stamp_inputs() -> list[object]:
@@ -95,7 +93,6 @@ def test_stamp_of_reads_the_timestamp_prefix() -> None:
 def test_stamp_of_oracle() -> None:
     table = _stamp_inputs()
     same(stamp_of, _oracle._stamp, table)
-    same(stamp_of, legacy("health")._stamp, table)
 
 
 def _messages() -> list[object]:
@@ -120,7 +117,6 @@ def test_msg_time_prefers_the_id_over_created() -> None:
 def test_msg_time_oracle() -> None:
     table = _messages()
     same(msg_time, _oracle._msg_time, table)
-    same(msg_time, legacy("health")._msg_time, table)
 
 
 def _seconds() -> list[object]:
@@ -138,7 +134,6 @@ def test_fmt_duration_is_coarse() -> None:
 def test_fmt_duration_oracle() -> None:
     table = _seconds()
     same(fmt_duration, _oracle._duration, table)
-    same(fmt_duration, legacy("health")._duration, table)
 
 
 def _millis() -> list[object]:

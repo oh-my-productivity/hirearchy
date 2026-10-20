@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
 from typing import Protocol, runtime_checkable
 
@@ -52,23 +52,3 @@ class FsCharterStamp(CharterStamp):
 
     def modified(self, addr: str) -> datetime:
         return datetime.fromtimestamp(os.stat(self._paths.agent_dir(addr) / "AGENT.md").st_mtime, timezone.utc)
-
-
-class CallableConfig(ConfigSource):
-    """The settings as a function gives them (the dashboard's ``Org`` reads a damaged ORG.md as the defaults, and caches the parse)."""
-
-    def __init__(self, config: Callable[[], JsonObject]) -> None:
-        self._config = config
-
-    def config(self) -> JsonObject:
-        return self._config()
-
-
-class CallableRunCount(RunCount):
-    """The runs used as a function counts them (the dashboard's ``Org`` caches the count per change of the ``runs`` directory)."""
-
-    def __init__(self, count: Callable[[str], int]) -> None:
-        self._count = count
-
-    def count(self, addr: str) -> int:
-        return self._count(addr)

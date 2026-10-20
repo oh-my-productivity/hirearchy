@@ -62,19 +62,7 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "collect_runs run_window trace render_trace normalize_refusal metrics render_metrics now_view render_now "
         "check render_check observe_text register_observe_tool"
     ),
-    "progress": {
-        **_e3(
-        "RECENT SHORT POLL FINAL progress describe_progress work_in_flight"
-        ),
-        "progress": "permanent",  # orgmcp.progress.progress(org, task_id=None) is documented in the README
-    },
-    "health": _e3(
-        "HEALTH_DEFAULTS FLAGS AgentHealth BranchHealth OrgHealth thresholds agent_health org_health "
-        "render_text config_number"
-    ),
-    "review": _e3(
-        "LEDGER read_ledger total_runs review_if_due review"
-    ),
+    "progress": {"progress": "permanent"},  # orgmcp.progress.progress(org, task_id=None) is documented in the README
     "blueprint": _e3(
         "ROLES_DIR WEB_TOOLS WRITE_TOOLS SLACK TIGHT REWORK_RUNS KINDS role_names "
         "get_role load load_text NEEDS_KEYS AGENT_KEYS SERVICE_KEYS TASK_KEYS REQUEST_KEYS service_budget "

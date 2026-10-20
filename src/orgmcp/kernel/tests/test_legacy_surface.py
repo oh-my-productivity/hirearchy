@@ -1,6 +1,6 @@
 """What the legacy modules keep exposing now that the vocabulary lives in the kernel.
 
-``orgmcp.core`` and ``orgmcp.health`` are reached by name (``_legacy.legacy``): the kernel's tests do not import upward."""
+``orgmcp.core`` is reached by name (``_legacy.legacy``): the kernel's tests do not import upward."""
 
 from __future__ import annotations
 
@@ -31,13 +31,6 @@ def test_core_exposes_the_kernel_objects_themselves(name: str) -> None:
 def test_core_private_helpers_are_the_kernel_functions() -> None:
     core = legacy("core")
     assert core._inside is kernel.inside and core._visible is kernel.visible
-
-
-@pytest.mark.parametrize(("old", "new"), [
-    ("_aware", "aware"), ("_parse_time", "parse_time"), ("_stamp", "stamp_of"), ("_msg_time", "msg_time"), ("_duration", "fmt_duration"),
-])
-def test_health_private_helpers_are_the_kernel_functions(old: str, new: str) -> None:
-    assert getattr(legacy("health"), old) is getattr(kernel, new)
 
 
 def test_utcnow_and_atomic_write_stay_in_core_as_plain_functions_and_the_kernel_message_loads_nothing() -> None:
