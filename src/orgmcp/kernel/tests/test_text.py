@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from orgmcp.kernel import TITLE_MAX, clip, clip_line, single, word_count
+from orgmcp.kernel.tests import _oracle
 from orgmcp.kernel.tests._legacy import legacy
 
 
@@ -71,4 +72,4 @@ def _clip_inputs() -> list[tuple[object, int]]:
 
 @pytest.mark.parametrize(("value", "limit"), _clip_inputs())
 def test_clip_line_equals_the_two_legacy_copies(value: object, limit: int) -> None:
-    assert clip_line(value, limit) == legacy("observe")._clip(value, limit) == legacy("services")._clip(value, limit)
+    assert clip_line(value, limit) == _oracle._clip(value, limit)

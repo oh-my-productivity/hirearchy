@@ -10,7 +10,6 @@ import pytest
 
 from orgmcp import core
 from orgmcp.app import Org
-from ._lenient_org import LenientOrg
 from orgmcp.kernel import OrgError
 from orgmcp.orgfiles import OrgFileReader, OrgFileWriter
 
@@ -101,12 +100,6 @@ def test_a_charter_rewrite_keeps_the_frontmatter_and_says_so(org: Org) -> None:
     assert note.startswith("charter frontmatter of `ceo/eng`: kept from the old frontmatter (not in your text): ")
     assert "changed (old -> new): role: Engineer -> Sharper." in note
     assert org.write_noted("ceo", "ceo/work/n.md", "x")[1] == ""
-
-
-def test_the_dashboards_lenient_org_reads_and_writes_the_same_way(org: Org) -> None:
-    lenient = LenientOrg(org.root)
-    lenient.write("ceo", "ceo/work/n.md", "a b c")
-    assert lenient.read("ceo/work/n.md", "ceo").startswith("[ceo/work/n.md: 3 words")
 
 
 def test_the_old_module_level_helpers_are_still_importable_from_core(tmp_path: Path) -> None:

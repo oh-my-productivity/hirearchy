@@ -31,6 +31,8 @@ from orgmcp.dashboard._app import DashApp as _DashApp
 from orgmcp.dashboard._widgets import NavTable, TextPane
 from orgmcp.kernel._system import OsEnvironment
 from orgmcp.mcp_server._binding import OpenerBindings
+from orgmcp.observability._messages import build_messages
+from orgmcp.observability._render import TextObservabilityRenderer
 from orgmcp.skill._source import PackagedSkillSource
 
 __all__ = [
@@ -63,42 +65,46 @@ def resolve_binding() -> tuple[Any, str]:
 
 
 # ------------------------------------------------------------------------------------------------------------ observation
+RuntimePorts = wire_stalls.RuntimePorts
+_RENDERER = TextObservabilityRenderer()
+
+
 class Observe:
-    """The old module-level functions of ``orgmcp.observe`` over the queries the composition root makes over ``org.runtime`` as it is when they are called
-    (a test that replaces a port of the runtime - the scheduler's status - is seen)."""
+    """The module-level functions of the former ``orgmcp.observe`` over the queries the composition root makes over ``org.runtime`` as it is when they are called
+    (a test that replaces a port of the runtime - the scheduler's status - is seen); the text of a view is a pure function of the view."""
 
     @staticmethod
     def events(org: Any, since: Any = None, until: Any = None, agent: str | None = None, kind: str | None = None, trace: str | None = None,
                errors: bool = False, limit: int | None = None, now: datetime | None = None) -> Any:
-        return wire_observability.event_queries_of(org.runtime).events(since, until, agent, kind, trace, errors, limit, now)
+        return wire_observability.event_queries(RuntimePorts(org.runtime)).events(since, until, agent, kind, trace, errors, limit, now)
 
     @staticmethod
     def trace(org: Any, task_id: str, now: datetime | None = None) -> Any:
-        return wire_observability.trace_queries_of(org.runtime).trace(task_id, now)
+        return wire_observability.trace_queries(RuntimePorts(org.runtime)).trace(task_id, now)
 
     @staticmethod
     def metrics(org: Any, since: Any = "24h", by: str | None = None, now: datetime | None = None, agent: str | None = None) -> Any:
-        return wire_observability.metric_queries_of(org.runtime).metrics(since, by, now, agent)
+        return wire_observability.metric_queries(RuntimePorts(org.runtime)).metrics(since, by, now, agent)
 
     @staticmethod
     def now_view(org: Any, now: datetime | None = None) -> Any:
-        return wire_observability.now_queries_of(org.runtime).now_view(now)
+        return wire_observability.now_queries(RuntimePorts(org.runtime)).now_view(now)
 
     @staticmethod
     def check(org: Any, now: datetime | None = None) -> Any:
-        return wire_observability.integrity_checks_of(org.runtime).check(now)
+        return wire_observability.integrity_checks(RuntimePorts(org.runtime)).check(now)
 
     @staticmethod
     def render_trace(tr: Any, max_lines: int | None = None) -> str:
-        return wire_observability.system_renderer().render_trace(tr, max_lines)
+        return _RENDERER.render_trace(tr, max_lines)
 
     @staticmethod
     def render_metrics(m: Any, limit: int = 50) -> str:
-        return wire_observability.system_renderer().render_metrics(m, limit)
+        return _RENDERER.render_metrics(m, limit)
 
     @staticmethod
     def render_check(res: Any) -> str:
-        return wire_observability.system_renderer().render_check(res)
+        return _RENDERER.render_check(res)
 
     @staticmethod
     def scan_messages(org: Any) -> Any:
@@ -106,7 +112,7 @@ class Observe:
 
     @staticmethod
     def build_messages(files: Any) -> Any:
-        return wire_observability.build_messages(files)
+        return build_messages(files)
 
 
 observe = Observe()

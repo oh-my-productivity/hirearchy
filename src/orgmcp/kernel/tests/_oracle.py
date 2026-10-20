@@ -1,9 +1,8 @@
 """The legacy time helpers of ``orgmcp.health``, frozen verbatim from commit ``bdfb82a`` (``r1-integration``).
 
-``health._aware _parse_time _stamp _msg_time _duration`` become aliases of the kernel's functions in step K1, so the
-live legacy names can no longer serve as the oracle for them; these copies do. (``observe.fmt_dur`` is still a separate
-legacy implementation and is compared live.) Delete this module together with ``test_timeutil.py``'s oracle tests when the
-last legacy duplicate is gone (step E1).
+``health._aware _parse_time _stamp _msg_time _duration`` became aliases of the kernel's functions in step K1, and ``observe.fmt_dur`` and
+``observe._clip`` / ``services._clip`` followed; the live legacy names can no longer serve as the oracle for them (they are gone, or the same objects);
+these copies do.
 """
 
 from __future__ import annotations
@@ -47,3 +46,29 @@ def _duration(seconds: float | None) -> str:
         if s >= size:
             return f"{s // size}{unit}"
     return f"{s}s"
+
+
+def _fmt_dur(ms: float | None) -> str:
+    """A duration: ``850ms``, ``4.2s``, ``42s``, ``1m05s``, ``2h03m`` (``observe.fmt_dur``)."""
+    if ms is None:
+        return "?"
+    ms = max(0.0, float(ms))
+    if ms == 0:
+        return "0s"
+    if ms < 1000:
+        return f"{ms:.0f}ms"
+    s = ms / 1000
+    if s < 10:
+        return f"{s:.1f}s"
+    s = int(round(s))
+    if s < 60:
+        return f"{s}s"
+    if s < 3600:
+        return f"{s // 60}m{s % 60:02d}s"
+    return f"{s // 3600}h{(s % 3600) // 60:02d}m"
+
+
+def _clip(text: object, limit: int) -> str:
+    """``observe._clip`` and ``services._clip`` (two identical copies)."""
+    text = " ".join(str(text).split())
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"

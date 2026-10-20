@@ -112,7 +112,7 @@ name = "The library does not import the entry points (cli, mcp server, dashboard
 type = "forbidden"
 source_modules = [
     "orgmcp.blueprint", "orgmcp.blueprint_examples", "orgmcp.core",
-    "orgmcp.health", "orgmcp.observe", "orgmcp.progress", "orgmcp.review", "orgmcp.scheduler", "orgmcp.services",
+    "orgmcp.health", "orgmcp.progress", "orgmcp.review", "orgmcp.scheduler", "orgmcp.services",
     "orgmcp.skill", "orgmcp.telemetry", "orgmcp.templates", "orgmcp.upgrade",
 ]
 forbidden_modules = ["orgmcp.cli", "orgmcp.dashboard"]

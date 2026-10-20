@@ -18,12 +18,10 @@ from pathlib import Path
 
 from ..agents import AgentDirectory, AgentRegistry
 from ..agents.testing import fs_agents
-from ..attention import HumanQueue, WaitingOnUser
 from ..attention.testing import FixedWaiting, ListHumanQueue
 from ..budget.testing import BudgetWorld, FixedBudget
 from ..budget.testing import fixed_world as memory_budget_world
 from ..budget.testing import fs_world as fs_budget_world
-from ..daemon import SchedulerStatus
 from ..daemon.testing import FakeSchedulerStatus
 from ..eligibility import PauseStore, RunnableQuery
 from ..eligibility.testing import PauseHarness, fs_pauses, memory_pauses, runnable_over
@@ -31,7 +29,7 @@ from ..kernel import Clock, Message, OrgLayout, OrgPaths
 from ..kernel.testing import FakeClock
 from ..mail import MailboxReader, TaskQuery
 from ..mail.testing import MemoryMailbox
-from ..reflection import CaseHistory, ServiceReports
+from ..reflection import ServiceReports
 from ..reflection.testing import FixedCaseHistory
 from ..runs import RunLogReader
 from ..runs.testing import RunsHarness, fs_runs, memory_runs
@@ -47,7 +45,7 @@ from ._snapshot import TeamSnapshots
 from ._states import MailTaskStates
 from ._teams import AgentTaskTeams
 from ._wait import PollingProgress
-from .api import LegacyParts, ProgressReporter
+from .api import ProgressReporter
 
 STAMP = "%Y%m%dT%H%M%S%f"
 
@@ -124,36 +122,6 @@ class FixedCaseTotals(ServiceReports):
 
     def case_total(self, task: Message) -> str:
         return self.totals.get(task.id, "")
-
-
-class FixedLegacyParts(LegacyParts):
-    """The parts of the legacy functions are the objects it is given, whatever runtime it is asked for; ``asked`` keeps the names of what was asked."""
-
-    def __init__(
-        self, queue: HumanQueue, history: CaseHistory, reports: ServiceReports, scheduler: SchedulerStatus, waiting: WaitingOnUser,
-    ) -> None:
-        self._parts = (queue, history, reports, scheduler, waiting)
-        self.asked: list[str] = []
-
-    def human_queue(self, runtime: object) -> HumanQueue:
-        self.asked.append("human_queue")
-        return self._parts[0]
-
-    def case_history(self, runtime: object) -> CaseHistory:
-        self.asked.append("case_history")
-        return self._parts[1]
-
-    def service_reports(self, runtime: object) -> ServiceReports:
-        self.asked.append("service_reports")
-        return self._parts[2]
-
-    def scheduler_status(self, runtime: object) -> SchedulerStatus:
-        self.asked.append("scheduler_status")
-        return self._parts[3]
-
-    def waiting_on_user(self, runtime: object) -> WaitingOnUser:
-        self.asked.append("waiting_on_user")
-        return self._parts[4]
 
 
 class ScriptedClock(Clock):
@@ -288,8 +256,6 @@ def memory_world(tmp_path: Path) -> ProgressWorld:
     assert isinstance(box, MemoryMailbox)
     return _world(tmp_path, budgets, memory_runs(tmp_path), memory_pauses(tmp_path), box.agents, lambda layout: FixedTeamActivity(), ScriptedClock(budgets.clock))
 
-
-PURE = {"LegacyParts"}  # objects the composition root builds over a runtime: its one implementation is ``app.wire_progress.RuntimeParts`` (app/tests/test_wire_progress.py)
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     ProgressReporter: [fs_world, memory_world],

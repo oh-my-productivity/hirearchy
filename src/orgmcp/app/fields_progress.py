@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..progress import LegacyParts, ProgressReporter
+from ..progress import ProgressReporter
 
 STEP: str | None = "C-progress"  # the step that filled this part (see test_runtime_fields)
-NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
+NOT_A_FIELD: dict[str, str] = {
+    "LegacyParts": "deleted in E3 with the legacy functions of progress; its block in ARCHITECTURE.md 3.30 goes with this entry (E3-close)",
+}  # port -> why it is not a runtime field (a value, a factory, ...)
 
 
 @dataclass(frozen=True)
 class Fields:
     progress_reporter: ProgressReporter
-    progress_parts: LegacyParts  # the objects the legacy functions of ``progress`` build over the runtime in force (goes with them, E3)

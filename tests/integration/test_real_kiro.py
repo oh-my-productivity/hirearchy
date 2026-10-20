@@ -15,8 +15,8 @@ import secrets
 from pathlib import Path
 
 import pytest
+from testkit.e2e_world import observe
 
-from orgmcp import observe
 from orgmcp.core import ROOT
 from orgmcp.progress import progress
 

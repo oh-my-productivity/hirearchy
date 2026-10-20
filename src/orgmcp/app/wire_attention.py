@@ -1,9 +1,7 @@
 """Providers of the ``attention`` ports (ARCHITECTURE.md 6.1), and the same objects over the runtime in force for the legacy functions.
 
-``waiting_on_user_of`` and ``human_queue_of`` serve ``daemon``'s ``status_of`` and ``progress._human_items`` until
-those modules are converted (E3-close): they are handed an ``Org`` whose ``runtime`` tests replace (a ledger of the stall ladder, the
-notices) and the dashboard's lenient ``Org`` replaces the mailboxes, the budgets and the pause flags of, so each call builds the objects over the
-ports the runtime has *now*, as the functions it replaces read them through the ``Org``. They go when the legacy functions do.
+``waiting_on_user_of`` serves ``daemon``'s ``status_of`` until that is deleted (E3-close): it is handed a runtime a test replaced a part of (a ledger of
+the stall ladder, the notices), so each call builds the object over the ports the runtime has *now*. It goes with ``status_of``.
 """
 
 from __future__ import annotations
@@ -52,8 +50,3 @@ def register(b: Builder) -> None:
 def waiting_on_user_of(runtime: OrgRuntime) -> WaitingOnUser:
     """``WaitingOnUser`` over the ports ``runtime`` has now."""
     return waiting_on_user(RuntimePorts(runtime))
-
-
-def human_queue_of(runtime: OrgRuntime) -> HumanQueue:
-    """``HumanQueue`` over the mailboxes ``runtime`` has now."""
-    return human_queue(RuntimePorts(runtime))

@@ -1,8 +1,7 @@
 """``progress`` sits above the packages it consumes: its code imports nothing else of ``orgmcp``, and of those only what is public.
 
 import-linter checks the layers over the whole graph; this is the package's own guard (ARCHITECTURE.md 2.2 and 4, allowed dependencies).
-The in-memory fakes and the tests are not production code, but they obey the same rule (through the ``testing`` modules of the packages). The legacy
-module (``_legacy``) is the exception until E3: it still reaches the facade and the old modules."""
+The in-memory fakes and the tests are not production code, but they obey the same rule (through the ``testing`` modules of the packages)."""
 
 from __future__ import annotations
 
@@ -45,8 +44,6 @@ def scan() -> dict[Path, list[str]]:
     found: dict[Path, list[str]] = {}
     for path in sorted((ORGMCP / "progress").rglob("*.py")):
         relative = path.relative_to(ORGMCP / "progress")
-        if relative.name == "_legacy.py":
-            continue
         found[path] = imports_of(path.read_text(encoding="utf-8"), ["orgmcp", "progress", *relative.parts[:-1]])
     return found
 

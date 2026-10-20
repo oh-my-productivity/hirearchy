@@ -6,16 +6,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from orgmcp.eventlog import DAY_RE, ENVELOPE, EVENTS_REL, PROCS, SCHEMA_VERSION, event_file
+from orgmcp.eventlog import DAY_RE, ENVELOPE, PROCS, SCHEMA_VERSION, event_file
 from orgmcp.eventlog._reader import FsEventReader
 from orgmcp.kernel import OrgPaths
 
 from ._legacy import legacy
-
-
-def test_the_query_module_keeps_its_old_names_for_the_constants() -> None:
-    observe = legacy("observe")
-    assert observe.EVENTS_DIR == EVENTS_REL and observe.ENVELOPE == set(ENVELOPE)
 
 
 def test_what_the_writer_writes_the_reader_reads(tmp_path: Path) -> None:

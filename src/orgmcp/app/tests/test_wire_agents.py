@@ -1,30 +1,18 @@
-"""``wire_agents``: the runtime has the four ports of ``agents`` built from the kernel's ports, and the dashboard's lenient variant."""
+"""``wire_agents``: the runtime has the four ports of ``agents`` built from the kernel's ports."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
 from orgmcp.agents import AgentDirectory, AgentRegistry, CharterReader, RetiredArchive
-from orgmcp.agents._caching import CachingAgentDirectory, DirectoryProbe, LenientCharterReader
 from orgmcp.agents._charters import FsCharterReader
 from orgmcp.agents._directory import FsAgentDirectory
 from orgmcp.agents._registry import FsAgentRegistry
 from orgmcp.agents._retired import FsRetiredArchive
 from orgmcp.agents.testing import MemoryAgents
-from orgmcp.app import Org, wire_agents, wiring
-from ._lenient_org import LenientOrg
+from orgmcp.app import wiring
 from orgmcp.kernel import AtomicWriter, OrgLayout, OrgPaths
 from orgmcp.kernel.testing import RecordingAtomicWriter
-
-
-class FixedProbe(DirectoryProbe):
-    """Every directory was last modified at this time (-1: there is none)."""
-
-    def __init__(self, mtime: int) -> None:
-        self._mtime = mtime
-
-    def mtime(self, addr: str, name: str) -> int:
-        return self._mtime
 
 
 def test_the_runtime_has_the_real_agent_ports(tmp_path: Path) -> None:
@@ -87,52 +75,3 @@ def test_the_layout_the_ports_are_built_on_is_the_runtimes(tmp_path: Path) -> No
     (tmp_path / "elsewhere" / "cto").mkdir(parents=True)
     (tmp_path / "elsewhere" / "cto" / "AGENT.md").write_text("---\nrole: R\n---\n", encoding="utf-8")
     assert runtime.agents.agents() == ["cto"]
-
-
-# ------------------------------------------------------------------------------ the dashboard's variant
-
-
-def test_lenient_puts_the_decorators_on_the_read_ports_only(tmp_path: Path) -> None:
-    runtime = wiring.open_runtime(tmp_path)
-    problems: dict[str, str] = {}
-    lenient = wire_agents.lenient(runtime, FixedProbe(-1), problems)
-    assert isinstance(lenient.agents, CachingAgentDirectory) and isinstance(lenient.charters, LenientCharterReader)
-    assert lenient.agent_registry is runtime.agent_registry and lenient.retired_archive is runtime.retired_archive
-    assert lenient.root == runtime.root and lenient.clock is runtime.clock
-    assert lenient.agents.children("anyone") == []  # the probe says there is no such directory
-
-
-def test_the_lenient_org_is_built_on_the_decorators_and_reports_charters_it_cannot_read(tmp_path: Path) -> None:
-    org = Org.init(tmp_path / "org", "mission")
-    org.hire("root", "ceo", "Boss", "text")
-    lenient = LenientOrg(org.root)
-    assert isinstance(lenient.runtime.agents, CachingAgentDirectory) and isinstance(lenient.runtime.charters, LenientCharterReader)
-    assert lenient.charter("ceo")[0]["role"] == "Boss" and lenient.bad == {}
-    (org.root / "ceo" / "AGENT.md").write_text("---\nrole: [oops\n---\n", encoding="utf-8")
-    assert lenient.charter("ceo") == ({"role": "?"}, "") and lenient.bad == {"ceo/AGENT.md": "ParserError"}
-
-
-def test_the_lenient_org_lists_children_from_its_per_tick_directory_times(tmp_path: Path) -> None:
-    org = Org.init(tmp_path / "org", "mission")
-    org.hire("root", "ceo", "Boss", "text")
-    lenient = LenientOrg(org.root)
-    asked: list[tuple[str, str]] = []
-    real = lenient.mtime
-
-    def spy(addr: str, name: str) -> int:
-        asked.append((addr, name))
-        return real(addr, name)
-
-    lenient.mtime = spy  # type: ignore[method-assign]
-    assert lenient.children("root") == ["ceo"] and lenient.agents() == ["ceo"] and lenient.subtree("ceo") == ["ceo"]
-    assert ("root", "") in asked and ("ceo", "") in asked
-
-
-def test_what_the_probe_says_is_quiet_is_listed_once(tmp_path: Path) -> None:
-    (tmp_path / "ceo").mkdir()
-    (tmp_path / "ceo" / "AGENT.md").write_text("---\nrole: R\n---\n", encoding="utf-8")
-    lenient = wire_agents.lenient(wiring.open_runtime(tmp_path), FixedProbe(1), {})  # modified at the epoch: long quiet
-    assert lenient.agents.children("root") == ["ceo"]
-    (tmp_path / "cto").mkdir()
-    (tmp_path / "cto" / "AGENT.md").write_text("---\nrole: R\n---\n", encoding="utf-8")
-    assert lenient.agents.children("root") == ["ceo"]  # trusted: the probe still says nothing changed

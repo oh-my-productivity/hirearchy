@@ -1,32 +1,19 @@
-"""``wire_mail``: the runtime has the mail ports, built from the kernel's ports and the process resources, and the dashboard's lenient variant."""
+"""``wire_mail``: the runtime has the mail ports, built from the kernel's ports and the process resources."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from orgmcp.agents import AgentDirectory
-from orgmcp.agents.testing import MemoryAgents
-from orgmcp.app import wire_mail, wiring
+from orgmcp.app import wiring
 from orgmcp.kernel import AtomicWriter, Message, OrgLayout, OrgPaths
 from orgmcp.kernel.testing import RecordingAtomicWriter
 from orgmcp.mail import BatchStore, MailboxReader, MailboxWriter, MailFingerprint, MessageIndex, MessageParser, TaskQuery
 from orgmcp.mail._batch import FsBatchStore
-from orgmcp.mail._caching import DirectoryProbe, DirMtimeCachingMailbox
 from orgmcp.mail._index import FsMessageIndex
 from orgmcp.mail._mailbox import FsMailbox
 from orgmcp.mail._parser import CachingMessageParser
 from orgmcp.mail._tasks import DerivedTaskQuery
 from orgmcp.mail.testing import CountingMessageParser, MemoryMailbox
-
-
-class FixedProbe(DirectoryProbe):
-    """Every directory was last modified at this time (-1: there is none)."""
-
-    def __init__(self, mtime: int) -> None:
-        self._mtime = mtime
-
-    def mtime(self, addr: str, name: str) -> int:
-        return self._mtime
 
 
 def note(n: int, sender: str = "ceo", to: str = "ceo/eng") -> Message:
@@ -110,39 +97,3 @@ def test_the_layout_the_ports_are_built_on_is_the_runtimes(tmp_path: Path) -> No
     msg = note(1, sender="root", to="ceo")
     runtime.mailbox_writer.store(msg)
     assert (tmp_path / "elsewhere" / "ceo" / "inbox" / f"{msg.id}.md").is_file()
-
-
-# ------------------------------------------------------------------------------ the dashboard's variant
-
-
-def test_lenient_puts_the_decorator_on_the_reader_and_derives_the_task_views_from_it(tmp_path: Path) -> None:
-    runtime = wiring.open_runtime(tmp_path)
-    lenient, mailbox = wire_mail.lenient(runtime, FixedProbe(-1))
-    assert lenient.mailbox is mailbox and isinstance(mailbox, DirMtimeCachingMailbox)
-    assert isinstance(lenient.task_query, DerivedTaskQuery) and lenient.task_query is not runtime.task_query
-    assert lenient.mailbox_writer is runtime.mailbox_writer and lenient.batches is runtime.batches
-    assert lenient.message_parser is runtime.message_parser and isinstance(lenient.message_index, FsMessageIndex)
-    assert lenient.root == runtime.root and lenient.clock is runtime.clock
-    assert lenient.mailbox.messages("anyone", "inbox") == []  # the probe says there is no such directory
-
-
-def test_the_lenient_index_walks_the_agents_of_the_runtime_it_is_given(tmp_path: Path) -> None:
-    (tmp_path / "ceo" / "inbox").mkdir(parents=True)
-    (tmp_path / "ceo" / "AGENT.md").write_text("---\nrole: R\n---\nx\n", encoding="utf-8")
-    msg = note(1, sender="root", to="ceo")
-    (tmp_path / "ceo" / "inbox" / f"{msg.id}.md").write_text(msg.to_text(), encoding="utf-8")
-    runtime = wiring.open_runtime(tmp_path)
-    assert [f.id for f in runtime.message_index.scan()] == [msg.id]
-    quiet_agents = wiring.open_runtime(tmp_path, {AgentDirectory: MemoryAgents()})  # an agent directory that knows nobody
-    assert [f.id for f in wire_mail.lenient(quiet_agents, FixedProbe(-1))[0].message_index.scan()] == []
-
-
-def test_what_the_probe_says_is_quiet_is_read_once(tmp_path: Path) -> None:
-    (tmp_path / "ceo" / "inbox").mkdir(parents=True)
-    lenient, _ = wire_mail.lenient(wiring.open_runtime(tmp_path), FixedProbe(1))  # modified at the epoch: long quiet
-    one = note(1, sender="root", to="ceo")
-    (tmp_path / "ceo" / "inbox" / f"{one.id}.md").write_text(one.to_text(), encoding="utf-8")
-    assert [m.id for m in lenient.mailbox.messages("ceo", "inbox")] == [one.id]
-    two = note(2, sender="root", to="ceo")
-    (tmp_path / "ceo" / "inbox" / f"{two.id}.md").write_text(two.to_text(), encoding="utf-8")
-    assert [m.id for m in lenient.mailbox.messages("ceo", "inbox")] == [one.id]  # trusted: the probe still says nothing changed

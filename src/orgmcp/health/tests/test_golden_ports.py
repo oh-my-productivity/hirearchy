@@ -1,12 +1,10 @@
-"""The same comparison as ``test_golden_report.py``, through the ports of the runtime (``health_analyzer``, ``health_renderer``): the analyzer
-and the renderer of the package say what ``health.py`` said, text for text and number for number, on the organization with every flag in it."""
+"""What the analyzer and the renderer of the package (``health_analyzer``, ``health_renderer``, the ports of the runtime) say about the organization with
+every flag in it, text for text and number for number, as ``health.py`` said it before the move."""
 
 from __future__ import annotations
 
 import json
 from typing import Any
-
-from orgmcp.health import agent_health, org_health, render_text
 
 from . import _scenario
 from ._golden import expected
@@ -42,16 +40,6 @@ def test_the_json_three_days_later(scenario: Any) -> None:
 
 def test_one_agent_as_the_dataclass_prints_it(scenario: Any) -> None:
     assert repr(scenario.runtime.health_analyzer.agent_health("ceo/eng", NOW["4000"])) + "\n" == expected("eng_4000_repr.txt")
-
-
-def test_the_legacy_functions_and_the_ports_agree_on_everything(scenario: Any) -> None:
-    runtime = scenario.runtime
-    for now in NOW.values():
-        for top in ("root", "ceo", "ops", "ceo/eng"):
-            assert org_health(scenario, top, now) == runtime.health_analyzer.org_health(top, now)
-            assert render_text(org_health(scenario, top, now)) == runtime.health_renderer.render_text(runtime.health_analyzer.org_health(top, now))
-        for addr in scenario.agents():
-            assert agent_health(scenario, addr, now) == runtime.health_analyzer.agent_health(addr, now)
 
 
 def test_the_default_now_is_the_clock_of_the_runtime(scenario: Any) -> None:

@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from orgmcp import dashdata as _api
-from orgmcp.app import wire_dashdata, wire_observability
+from orgmcp.app import wire_dashdata, wire_observability, wire_stalls
 from orgmcp.dashdata._render import TextSnapshotRenderer
 from orgmcp.dashdata import (
     AgentDetail,
@@ -39,6 +39,7 @@ from orgmcp.dashdata import (
     SnapshotQuery,
 )
 from orgmcp.kernel import JsonObject, OrgError
+from orgmcp.observability._render import TextObservabilityRenderer
 
 
 class DashData(SnapshotQuery, AgentDetailQuery, RequestQuery, ServiceQuery, HealthQuery):
@@ -133,19 +134,19 @@ dd = _Dd()
 
 
 class _Observe:
-    """The reads of ``orgmcp.observe`` the dashboard tests compare with, from the ports of the runtime of ``org``."""
+    """The reads of the former ``orgmcp.observe`` the dashboard tests compare with, from the ports ``org.runtime`` has when they are called."""
 
     @staticmethod
     def now_view(org: Any, now: datetime | None = None) -> Any:
-        return wire_observability.now_queries_of(org.runtime).now_view(now)
+        return wire_observability.now_queries(wire_stalls.RuntimePorts(org.runtime)).now_view(now)
 
     @staticmethod
     def trace(org: Any, task_id: str, now: datetime | None = None) -> Any:
-        return wire_observability.trace_queries_of(org.runtime).trace(task_id, now)
+        return wire_observability.trace_queries(wire_stalls.RuntimePorts(org.runtime)).trace(task_id, now)
 
     @staticmethod
     def render_trace(tr: Any, max_lines: int | None = None) -> str:
-        return wire_observability.system_renderer().render_trace(tr, max_lines)
+        return TextObservabilityRenderer().render_trace(tr, max_lines)
 
 
 observe = _Observe()

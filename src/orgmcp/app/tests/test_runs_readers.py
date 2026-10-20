@@ -1,4 +1,4 @@
-"""The legacy readers of run logs (health, observe, the dashboard) and the scheduler's records go through the ports of the runtime.
+"""The readers of run logs (health, observability, the dashboard) and the scheduler's records go through the ports of the runtime.
 
 The behaviour they have is covered by their own tests (``test_health``, ``test_observe``, ``test_dashboard_data``, ``test_wakes``,
 ``test_scheduler``); here each one is shown to ask the ports (a fake that is not on disk answers) and, for the dashboard's tail, to
@@ -19,7 +19,7 @@ from typing import Any
 
 import pytest
 
-from orgmcp.app import Org, wire_dashdata
+from orgmcp.app import Org, wire_dashdata, wire_observability, wire_stalls, wiring
 from orgmcp.dashdata._runlog import read_tail
 from orgmcp.kernel import OrgPaths
 from orgmcp.runs import RunLogReader, RunLogSink, log_failed_start
@@ -27,11 +27,8 @@ from orgmcp.runs._reader import FsRunLogReader
 from orgmcp.runs._writer import FsRunLogWriter
 from orgmcp.runs.testing import MemoryRuns
 from orgmcp.runs.tests import _oracle
-from orgmcp.runs.tests._legacy import legacy
 from orgmcp.scheduler._orphans import LogRunNotes
 from testkit.health_world import Scheduler
-
-health, observe = legacy("health"), legacy("observe")
 
 T1, T2, T3 = "20261018T100000000001", "20261018T110000000002", "20261018T120000000003"
 
@@ -54,6 +51,11 @@ def use(org: Org, **ports: Any) -> None:
     org.runtime = dataclasses.replace(org.runtime, **ports)
 
 
+def collect_runs(org: Org, since: datetime | None, until: datetime | None, evs: dict[str, dict[str, dict[str, Any]]], agents: list[str]) -> Any:
+    """The runs the collection of ``observability`` makes over the ports ``org.runtime`` has now."""
+    return wire_observability.run_collection(wire_stalls.RuntimePorts(org.runtime)).collect(since, until, evs, agents)
+
+
 # ----------------------------------------------------------------------------------------------------------------- health
 
 
@@ -61,8 +63,8 @@ def test_health_reads_the_windows_and_outcomes_from_the_log_reader(org: Org, mem
     memory.put_log("ceo", f"{T1}.log", "# run of ceo, 1 message(s)\n# senders: root\n# ---- prompt ----\nx\n# ---- output ----\n\n# exit 0 after 3s\n")
     memory.put_log("ceo", f"{T2}.log", "# run of ceo, 1 message(s)\n# senders: root\n# ---- prompt ----\nx\n# ---- output ----\n\n# exit 1 after 3s\n")
     memory.put_log("ceo", f"{T3}.log", "# run of ceo, 1 message(s)\n# senders: runtime\n# ---- prompt ----\nx\n# ---- output ----\n\n# exit 0 after 3s\n")
-    use(org, run_log_reader=memory)
-    report = health.agent_health(org, "ceo", datetime(2026, 10, 18, 13, 0, tzinfo=timezone.utc))
+    org.runtime = wiring.open_runtime(org.root, {RunLogReader: memory})
+    report = org.runtime.health_analyzer.agent_health("ceo", datetime(2026, 10, 18, 13, 0, tzinfo=timezone.utc))
     assert (report.runs_used, report.failed_runs, report.runtime_runs, report.empty_runs) == (3, 1, 1, 1)
     assert list((org.root / "ceo" / "runs").glob("*.log")) == []  # none on disk: the fake answered
 
@@ -70,20 +72,20 @@ def test_health_reads_the_windows_and_outcomes_from_the_log_reader(org: Org, mem
 # ----------------------------------------------------------------------------------------------------------------- observe
 
 
-def test_observe_reads_the_registry_the_log_files_and_the_facts_from_the_ports(org: Org, memory: MemoryRuns) -> None:
+def test_the_collection_of_runs_reads_the_registry_the_log_files_and_the_facts_from_the_ports(org: Org, memory: MemoryRuns) -> None:
     path = memory.put_log("ceo", f"{T1}.log", "# run of ceo, 1 message(s)\n\n# exit 3 after 7s\n")
     memory.record("ceo", {"pgid": 5, "lstart": "x", "started": 1.0, "scheduler": 1, "log": f"ceo/runs/{T1}.log"})
     use(org, run_log_reader=memory, run_registry=memory)
-    assert observe._running_ledger(org) == {"ceo": {"pgid": 5, "lstart": "x", "started": 1.0, "scheduler": 1, "log": f"ceo/runs/{T1}.log"}}
-    assert observe._run_logs(org, "ceo") == [(T1, path)]
-    (run,) = observe.collect_runs(org, None, None, {}, ["ceo"])
+    assert org.runtime.run_registry.all() == {"ceo": {"pgid": 5, "lstart": "x", "started": 1.0, "scheduler": 1, "log": f"ceo/runs/{T1}.log"}}
+    assert [(f.stem, f.path) for f in org.runtime.run_log_reader.files("ceo")] == [(T1, path)]
+    (run,) = collect_runs(org, None, None, {}, ["ceo"])
     assert (run.run, run.outcome, run.exit_code, run.duration_ms) == (f"ceo@{T1}", "failed", 3, 7000.0)
 
 
-def test_observe_finds_a_start_that_failed_through_the_reader(org: Org, memory: MemoryRuns) -> None:
+def test_the_collection_of_runs_finds_a_start_that_failed_through_the_reader(org: Org, memory: MemoryRuns) -> None:
     path = memory.put_log("ceo", f"{T1}.log", "# run of ceo, 1 message(s)\n" + log_failed_start("no kiro"))
     use(org, run_log_reader=memory)
-    (run,) = observe.collect_runs(org, None, None, {}, ["ceo"])
+    (run,) = collect_runs(org, None, None, {}, ["ceo"])
     assert run.outcome == "failed" and run.log == path and run.exit_code is None
 
 
