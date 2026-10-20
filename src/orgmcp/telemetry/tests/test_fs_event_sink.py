@@ -299,3 +299,9 @@ def test_an_ignore_list_that_fails_does_not_lose_the_event(tmp_path: Path) -> No
     sink = build_sink(kit.root, kit.pool, kit.clock, kit.environment, kit.label, Failing(), kit.org_md.switch, 5.0)
     sink.emit("custom.kind")
     assert [e["kind"] for e in kit.events()] == ["custom.kind"] and kit.pool.dropped() == 0
+
+
+def test_the_default_retry_window_of_the_sink_is_five_seconds() -> None:  # moved from test_legacy_surface.py (deleted with the legacy names)
+    from orgmcp.telemetry._sink import RETRY_AFTER
+
+    assert RETRY_AFTER == 5.0

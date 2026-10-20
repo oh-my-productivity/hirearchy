@@ -1,5 +1,4 @@
-"""The telemetry ports in the runtime, the process resources behind them, and the legacy ``orgmcp.telemetry`` functions that now go through
-them. What the event files look like is what it was: ``tests/test_telemetry.py`` and the golden event shapes are the characterization."""
+"""The telemetry ports in the runtime, and the process resources behind them. What the event files look like is what it was: ``tests/test_telemetry.py`` and the golden event shapes are the characterization."""
 
 from __future__ import annotations
 
@@ -15,7 +14,6 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp import telemetry
 from orgmcp.app import Org, wiring
 from orgmcp.app._resources import ProcessResources
 from orgmcp.eventlog import EVENTS_REL, PROCS
@@ -156,11 +154,11 @@ def test_org_emit_never_raises(org: Org) -> None:
             raise RuntimeError("x")
 
     org.emit("custom.kind", boom=Boom())
-    assert telemetry.dropped() == 1
+    assert wiring.process_resources().event_pool.dropped() == 1
 
 
 def test_the_process_label_is_global_so_org_code_in_the_scheduler_says_scheduler(org: Org) -> None:
-    telemetry.set_process("scheduler")
+    wiring.process_resources().process_label.set("scheduler")
     org.emit("custom.kind")
     (event,) = lines(org.root)
     assert (event["proc"], event["actor"]) == ("scheduler", "runtime") and files(org.root)[0].name.startswith("scheduler-")
@@ -171,14 +169,14 @@ def test_one_file_per_process_and_day_across_several_runtimes_of_the_same_root(o
     org.emit("a")
     other.emit("b")
     wiring.open_runtime(org.root).events.emit("c")
-    telemetry.emit(org.root, "d")
+    wiring.open_runtime(org.root).events.emit("d")
     assert len(files(org.root)) == 1
     assert [(e["kind"], e["seq"]) for e in lines(org.root)] == [("a", 1), ("b", 2), ("c", 3), ("d", 4)]
 
 
 def test_a_second_process_writes_its_own_file(org: Org) -> None:
     org.emit("mine")
-    code = "from orgmcp import telemetry; import sys; telemetry.set_process('mcp'); telemetry.emit(sys.argv[1], 'theirs')"
+    code = "from pathlib import Path; import sys; from orgmcp.app import wiring; wiring.process_resources().process_label.set('mcp'); wiring.open_runtime(Path(sys.argv[1])).events.emit('theirs')"
     subprocess.run([sys.executable, "-c", code, str(org.root)], check=True, timeout=60)
     assert sorted(f.name.split("-")[0] for f in files(org.root)) == ["cli", "mcp"]
 
@@ -189,7 +187,7 @@ def test_a_second_process_writes_its_own_file(org: Org) -> None:
 def test_reset_closes_the_files_and_forgets_the_counters_the_label_and_the_sinks(org: Org) -> None:
     resources = wiring.process_resources()
     org.emit("custom.kind")
-    telemetry.set_process("mcp")
+    wiring.process_resources().process_label.set("mcp")
     resources.event_pool.drop("x")
     cached = resources.event_sinks.for_root(org.root)
     resources.reset()
@@ -221,49 +219,49 @@ def test_the_sinks_of_a_custom_set_of_resources_use_that_set(tmp_path: Path) -> 
     assert len(files(tmp_path)) == 1 and wiring.process_resources().event_pool is not resources.event_pool
 
 
-# ------------------------------------------------------------------------------------------- the legacy telemetry module
+# ------------------------------------------------------------------------------------------- the ports, called by root
 
 
 def test_emit_by_root_writes_the_event_with_the_old_arguments(org: Org) -> None:
-    telemetry.emit(org.root, "tool.call", proc="mcp", actor="ceo", trace="T", tool="status", ok=True)
+    wiring.open_runtime(org.root).events.emit("tool.call", proc="mcp", actor="ceo", trace="T", tool="status", ok=True)
     (event,) = lines(org.root)
     assert (event["proc"], event["actor"], event["trace"], event["tool"]) == ("mcp", "ceo", "T", "status")
 
 
 def test_emit_by_root_accepts_a_string_and_never_raises(org: Org, tmp_path: Path) -> None:
-    telemetry.emit(str(org.root), "custom.kind")
-    telemetry.emit(tmp_path / "nowhere", "custom.kind")
-    assert len(lines(org.root)) == 1 and not (tmp_path / "nowhere").exists() and telemetry.dropped() == 0
+    wiring.open_runtime(Path(str(org.root))).events.emit("custom.kind")
+    wiring.open_runtime(tmp_path / "nowhere").events.emit("custom.kind")
+    assert len(lines(org.root)) == 1 and not (tmp_path / "nowhere").exists() and wiring.process_resources().event_pool.dropped() == 0
 
 
 def test_the_process_name_functions(org: Org) -> None:
-    assert telemetry.process() == "cli"
-    telemetry.set_process("mcp")
-    assert telemetry.process() == "mcp" == wiring.process_resources().process_label.get()
-    telemetry.set_process("nonsense")
-    assert telemetry.process() == "cli"
+    assert wiring.process_resources().process_label.get() == "cli"
+    wiring.process_resources().process_label.set("mcp")
+    assert wiring.process_resources().process_label.get() == "mcp" == wiring.process_resources().process_label.get()
+    wiring.process_resources().process_label.set("nonsense")
+    assert wiring.process_resources().process_label.get() == "cli"
     assert set(PROCS) == {"scheduler", "mcp", "cli"}
 
 
 def test_reset_is_the_reset_of_the_resources(org: Org) -> None:
-    telemetry.set_process("mcp")
+    wiring.process_resources().process_label.set("mcp")
     org.emit("custom.kind")
-    telemetry.reset()
-    assert telemetry.process() == "cli" and telemetry.dropped() == 0
+    wiring.process_resources().reset()
+    assert wiring.process_resources().process_label.get() == "cli" and wiring.process_resources().event_pool.dropped() == 0
 
 
 def test_traces_seen_and_note_trace_are_the_scope_and_the_tap_of_the_runtime(org: Org) -> None:
-    with telemetry.traces_seen() as seen:
+    with wiring.process_resources().trace_scope.collect() as seen:
         org.runtime.trace_tap.note("a")
-        telemetry.note_trace("b")
+        wiring.process_resources().trace_scope.note("b")
         with org.runtime.trace_scope.collect() as inner:
-            telemetry.note_trace("c")
+            wiring.process_resources().trace_scope.note("c")
     assert seen == ["a", "b"] and inner == ["c"]
 
 
 def test_a_delivery_notes_its_trace_for_the_tool_call(org: Org) -> None:
     org.hire("root", "ceo", "Chief", "Run.", can_hire=True)
-    with telemetry.traces_seen() as seen:
+    with wiring.process_resources().trace_scope.collect() as seen:
         task = org.delegate("root", "ceo", "T", "g", "a", budget=3)
     assert seen == [task.id]
 
@@ -273,19 +271,19 @@ def test_prune_removes_through_the_retention_of_the_runtime(org: Org) -> None:
     old = base / (datetime.now(timezone.utc) - timedelta(days=45)).strftime("%Y-%m-%d")
     old.mkdir(parents=True)
     (old / "mcp-1-1.jsonl").write_text("{}\n")
-    assert telemetry.prune(org.root, 30) == [old.name] and not old.exists()
-    assert telemetry.prune(org.root / "missing", 30) == []
+    assert wiring.open_runtime(org.root).event_retention.prune(30) == [old.name] and not old.exists()
+    assert wiring.open_runtime(org.root / "missing").event_retention.prune(30) == []
 
 
 def test_summarize_args_is_the_summarizer(org: Org) -> None:
-    assert telemetry.summarize_args({"to": "ceo", "body": "abc", "x": None}) == {"to": "ceo", "body_chars": 3}
+    assert org.runtime.argument_summarizer.summarize({"to": "ceo", "body": "abc", "x": None}) == {"to": "ceo", "body_chars": 3}
 
 
 def test_ensure_ignored_writes_the_lines_through_the_ignore_list_and_never_raises(org: Org, tmp_path: Path) -> None:
     (org.root / ".gitignore").write_text(".tmp-*\n", encoding="utf-8")
-    telemetry.ensure_ignored(org.root)
+    wiring.open_runtime(org.root).ignore_list.ensure_runtime_files()
     assert ".runtime/events/" in (org.root / ".gitignore").read_text(encoding="utf-8").split()
-    telemetry.ensure_ignored(tmp_path / "nowhere")
+    wiring.open_runtime(tmp_path / "nowhere").ignore_list.ensure_runtime_files()
     assert not (tmp_path / "nowhere").exists()
 
 

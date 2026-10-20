@@ -34,11 +34,12 @@ kids = org.children(me)
 if mode == "tools":
     import asyncio
 
-    from orgmcp import telemetry
-    from orgmcp.server import build_server
+    from orgmcp.app import wire_mcp_server, wiring
+    from orgmcp.app.wire_stalls import RuntimePorts
+    from orgmcp.mcp_server._binding import OrgBinding
 
-    telemetry.set_process("mcp")
-    server = build_server(org, me)
+    wiring.process_resources().process_label.set("mcp")
+    server = wire_mcp_server.server_factory(OrgBinding(org.root, wire_mcp_server.RuntimeOrgOpener(), RuntimePorts(org.runtime), False)).build(me)
 
     def call(tool, **args):
         try:

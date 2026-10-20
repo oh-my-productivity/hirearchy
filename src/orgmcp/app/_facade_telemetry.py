@@ -1,18 +1,12 @@
 """Event emission (telemetry).
 
-``emit`` goes through the event sink of the runtime (ARCHITECTURE.md 5.3 and 6.4). Importing this module also hands the legacy functions
-of ``orgmcp.telemetry`` the defaults of the process (``wire_telemetry.ProcessTelemetry``): the callers that still import them have no
-runtime at hand, and a feature package may not import the composition root."""
+``emit`` goes through the event sink of the runtime (ARCHITECTURE.md 5.3 and 6.4)."""
 
 from __future__ import annotations
 
 from typing import Any
 
-from ..telemetry import _process
-from . import wire_telemetry
 from .runtime import OrgRuntime
-
-_process.install(wire_telemetry.ProcessTelemetry())
 
 
 class TelemetryMixin:

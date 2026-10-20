@@ -50,11 +50,6 @@ LEGACY_EXPORTS: dict[str, dict[str, str]] = {
         "CLIP_LESSON CLIP_NOTE DIGEST_CASES DIGEST_CHARS MAX_VERDICTS cases case_of case_total playbook_timeline prompt_sections "
         "reflection_digest services_text"
     ),
-    "telemetry": _e3(
-        "TITLE_MAX ERROR_MAX clip set_process "
-        "process dropped reset traces_seen note_trace single ensure_ignored emit summarize_args prune "
-        "SCHEMA_VERSION LINE_MAX EVENTS_REL DAY_RE ENVELOPE PROCS"
-    ),
     "observe": _e3(
         "EVENTS_DIR ERROR_WINDOW COPY_GRACE INFLIGHT_GRACE RECV_BOXES ENVELOPE READ_ONLY_TOOLS VIEWS fmt_dur fmt_rel "
         "percentile parse_when event_files timed_events iter_events is_error events_view events Follower "

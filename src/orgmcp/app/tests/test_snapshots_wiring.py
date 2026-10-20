@@ -1,5 +1,5 @@
-"""The snapshot ports in the runtime, and the legacy callers (``Org.commit``, ``Org.init``, ``ignore_runtime_files``,
-``ensure_ignored``) that now go through them. The observable behaviour is what it was before the step."""
+"""The snapshot ports in the runtime, and the callers (``Org.commit``, ``Org.init``, ``IgnoreList.ensure_runtime_files``)
+that go through them. The observable behaviour is what it was before the step."""
 
 from __future__ import annotations
 
@@ -8,7 +8,6 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp import scheduler, telemetry
 from orgmcp.app import Org, wiring
 from orgmcp.snapshots import GitClient, IgnoreList, OrgSnapshotter
 from orgmcp.snapshots._git import GitOrgSnapshotter, SubprocessGit
@@ -99,25 +98,25 @@ def test_org_init_keeps_a_repository_that_is_there(tmp_path: Path) -> None:
 
 def test_ignore_runtime_files_adds_the_four_lines_to_any_directory(tmp_path: Path) -> None:
     (tmp_path / ".gitignore").write_text(".tmp-*\n", encoding="utf-8")
-    scheduler.ignore_runtime_files(tmp_path)
-    scheduler.ignore_runtime_files(tmp_path)
+    wiring.open_runtime(tmp_path).ignore_list.ensure_runtime_files()
+    wiring.open_runtime(tmp_path).ignore_list.ensure_runtime_files()
     assert (tmp_path / ".gitignore").read_text(encoding="utf-8") == (
         ".tmp-*\n.runtime/running.json\n.runtime/scheduler.log\n.runtime/scheduler.exit\n.runtime/events/\n"
     )
 
 
 def test_ignore_runtime_files_does_nothing_for_a_directory_that_is_not_there(tmp_path: Path) -> None:
-    scheduler.ignore_runtime_files(tmp_path / "nowhere")
+    wiring.open_runtime(tmp_path / "nowhere").ignore_list.ensure_runtime_files()
     assert not (tmp_path / "nowhere").exists()
 
 
 def test_the_first_event_of_an_organization_ignores_the_event_log(tmp_path: Path) -> None:
     org = Org.init(tmp_path / "old", "m")
     (org.root / ".gitignore").write_text(".tmp-*\n", encoding="utf-8")
-    telemetry.emit(org.root, "custom.kind")
+    wiring.open_runtime(org.root).events.emit("custom.kind")
     assert ".runtime/events/" in (org.root / ".gitignore").read_text(encoding="utf-8").split()
 
 
 def test_ensure_ignored_never_raises_and_creates_nothing(tmp_path: Path) -> None:
-    telemetry.ensure_ignored(tmp_path / "nowhere")
+    wiring.open_runtime(tmp_path / "nowhere").ignore_list.ensure_runtime_files()
     assert not (tmp_path / "nowhere").exists()

@@ -14,11 +14,12 @@ from collections import defaultdict
 import pytest
 import testkit
 from golden_support import check
+from testkit.health_world import Scheduler
 
-from orgmcp import telemetry
-from orgmcp.cli import main
+from orgmcp import main
+from orgmcp.app import wiring
 from orgmcp.core import ROOT, Org
-from orgmcp.scheduler import Scheduler
+from orgmcp.eventlog import PROCS
 
 FAKE = str(testkit.FAKE_AGENT)
 
@@ -91,7 +92,7 @@ def test_event_line_shapes_from_a_fake_agent_scheduler_run(tmp_path, monkeypatch
         Scheduler(org, runner({"ceo/eng": "crash"}), echo=lambda _: None).serve(until_done=True)
     finally:
         signal.signal(signal.SIGTERM, previous)
-    telemetry.reset()
+    wiring.process_resources().reset()
 
     events = raw_events(org)
     kinds = {e["kind"] for e in events}
@@ -99,4 +100,4 @@ def test_event_line_shapes_from_a_fake_agent_scheduler_run(tmp_path, monkeypatch
             "agent.hire", "agent.retire", "agent.pause", "agent.resume", "service.define", "service.revise", "service.retire",
             "cli.command"} <= kinds
     check("events/line_shapes.txt", shapes(events))
-    assert all(e["v"] == 1 and e["proc"] in telemetry.PROCS for e in events)
+    assert all(e["v"] == 1 and e["proc"] in PROCS for e in events)
