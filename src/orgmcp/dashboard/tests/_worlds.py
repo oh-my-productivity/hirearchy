@@ -1,4 +1,4 @@
-"""The organizations the screens are taken of, from ``tests/dash_worlds.py`` (the demo organization of ``dash_fixtures`` and an empty one).
+"""The organizations the screens are taken of, from ``tests/testkit/dash_worlds.py`` (the demo organization of ``dash_fixtures`` and an empty one).
 
 The fixtures build them with the ``Org`` facade, which a package may not import (not even in its tests), so they are looked up by name; what comes
 back is typed here. Until the fixtures move into ``tests/testkit`` (E1-e) this is the one place that knows where they are.
@@ -31,7 +31,7 @@ class DemoWorld(Protocol):
 
 
 def _fixtures() -> object:
-    return importlib.import_module("dash_worlds")
+    return importlib.import_module("testkit.dash_worlds")
 
 
 def shown() -> datetime:

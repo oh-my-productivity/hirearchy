@@ -37,7 +37,7 @@ exclude = ["**/tests/**"]
 [tool.pytest.ini_options]
 # Tests live in tests/ (cross-feature, end-to-end, golden) and next to the code in src/orgmcp/**/tests/ (see README, "Test").
 # The shared fixtures and hooks are in the root conftest.py, so they reach both places; tests/ is on sys.path so tests can
-# import the helper modules that live there (fake_agent, kiro_sandbox, dash_fixtures, ...).
+# import the shared helpers (`import testkit`: fixtures, the stand-in agents fake_agent / fake_team_agent, kiro_sandbox, dash_fixtures, ...).
 testpaths = ["tests", "src/orgmcp"]
 pythonpath = ["tests"]
 markers = [
@@ -58,7 +58,7 @@ markers = [
 # Everything else is only *followed* (its types are used, its errors are not reported), so today's untyped modules never fail the run.
 # Run it with `uv run python scripts/static_checks.py mypy` (nothing to check yet is a no-op that proves mypy runs).
 python_version = "3.11"
-mypy_path = "src"
+mypy_path = "src:tests"  # tests/ too: a colocated test may `import testkit`
 namespace_packages = true
 explicit_package_bases = true
 strict = true
@@ -85,6 +85,11 @@ disable_error_code = ["type-abstract"]
 # untyped legacy bodies. The debt is the first line `# mypy: ignore-errors` of each `app/_facade_<pkg>.py` (not a table here: identical
 # neighbouring tables cannot be told apart by git, so two steps deleting neighbours conflicted); a feature step deletes that line of its own mixin
 # when it turns the bodies into typed calls to the interfaces of `self.runtime`; the last one goes with the facade slimming (E2).
+[[tool.mypy.overrides]]
+# `testkit.legacy.<module>` is an alias of <module> made at run time (tests/testkit/legacy): to mypy it is a missing module, i.e. Any.
+module = ["testkit.legacy", "testkit.legacy.*"]
+ignore_missing_imports = true
+
 [[tool.mypy.overrides]]
 # PyYAML ships no type stubs and the stubs package is deliberately not a dev dependency (exact pins only):
 # a strict package wraps yaml behind its own typed function instead of letting Any leak through its API.

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import pytest
-from dash_fixtures import DEMO_NOW, demo_org
+from testkit.dash_fixtures import DEMO_NOW, demo_org
 from testkit.scheduler import scheduler_is
 
 from orgmcp import dashboard_data as dd

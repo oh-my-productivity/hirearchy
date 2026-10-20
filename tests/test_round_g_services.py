@@ -1,13 +1,14 @@
 """Round G: the whole feedback history of a case, reflection at the moment of rejection, case totals, escaping, health."""
 
-from test_services import (  # noqa: F401  (svc is a fixture)
-    ENG, ROOT, build_server, call, define, deliver, request, services, svc, work,
-)
-
 import time
 
+from testkit.services_world import ENG, call, define, deliver, request, svc, work  # noqa: F401  (svc is a fixture)
+
+from orgmcp import services
+from orgmcp.core import ROOT
 from orgmcp.health import agent_health
 from orgmcp.progress import progress
+from orgmcp.server import build_server
 
 WEEKDAY = "weekly-brief"
 

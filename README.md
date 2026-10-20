@@ -732,8 +732,8 @@ uv run pytest -q tests/architecture                     # the structural rules (
 `runtime.py` is never edited), marks itself done there with `STEP = "<step>"`, and keeps its tests' count in its own `tests/count.txt`
 (`uv run python -m tests.architecture.collected_count --write`; `tests/architecture/baseline_test_count.txt` is fixed). See ARCHITECTURE.md 9.2.
 
-**Where tests live.** `tests/` holds the cross-feature, end-to-end and golden tests and the helper modules (`fake_agent.py`,
-`kiro_sandbox.py`, ...; `tests/` is on `sys.path`). A feature package keeps its own tests next to its code, in
+**Where tests live.** `tests/` holds the cross-feature, end-to-end and golden tests and the shared helpers (`tests/testkit/`: `fake_agent.py`,
+`kiro_sandbox.py`, ...; `tests/` is on `sys.path`, so `import testkit` works everywhere). A feature package keeps its own tests next to its code, in
 `src/orgmcp/<feature>/tests/` (give that directory an `__init__.py`, so two features may both have a `test_api.py`;
 `tests/test_static_checks.py` checks it). `pytest` collects both (`testpaths`). The shared fixtures and hooks (`org`,
 `isolated_kiro`, the telemetry reset, `real_kiro`) are in `tests/testkit/fixtures.py`, registered by the root `conftest.py`
@@ -786,7 +786,7 @@ package it is being split into; the MRO is documented in `app/facade.py`) and `o
 is a deliberate change of what callers can rely on: `uv run python -m orgmcp.app.tests._signatures --write`), and
 `app/tests/test_import_order.py` imports every module in a fresh interpreter in two orders.
 
-**Unit tests (default).** They use a deterministic fake agent (`tests/fake_agent.py`) in place of kiro. An autouse
+**Unit tests (default).** They use a deterministic fake agent (`tests/testkit/fake_agent.py`) in place of kiro. An autouse
 fixture (`tests/testkit/fixtures.py`) points `$HOME` and the profile directory at a temp dir and puts a stub `kiro-cli` first
 on `PATH`. A default run starts zero real-LLM runs: tests marked `@pytest.mark.integration` (and everything under
 `tests/integration/`, marked or not) are reported as skipped, and `tests/test_integration_marker.py` proves it.
@@ -799,7 +799,7 @@ that the built-in `write` and orgmcp's `org_write` work side by side. They asser
 * Cost: real model calls, billed to your kiro account like any other run. `ORGMCP_IT_MODEL=<model>` picks a cheaper one
   (default: the system default model, `claude-sonnet-5.5`).
 * Skipped (not failed) when `kiro-cli` is not on `PATH`. Each run is killed after 300 s, the scheduler after 480 s.
-* Safety (`tests/kiro_sandbox.py`): the org lives in the test's tmp dir. Before the test the md5 of every file in
+* Safety (`tests/testkit/kiro_sandbox.py`): the org lives in the test's tmp dir. Before the test the md5 of every file in
   `~/.kiro/agents/` and of `~/.kiro/settings/mcp.json` is taken (hashed only, never read out or printed). After it, pass or
   fail, only the per-org profiles whose `ORG_ROOT` is inside that tmp dir are deleted, every process whose command line
   mentions the tmp dir is killed, and the test fails if any of those md5s changed. No other organization is touched.

@@ -3,7 +3,7 @@
 A screen is read from the compositor of the app the way the terminal would draw it (one line per row, trailing blanks cut), after the keys of a step were
 pressed and the refresh they started has finished (``DashApp.settle``): nothing here waits for a time to pass, so the text does not depend on how
 fast the machine is. The app is shown a fixed time (``DEMO_NOW``) and has a fixed size, the demo organization is built under a frozen clock with
-ids that are the same every time (``tests/dash_fixtures.py``), and the only thing that varies - the directory the organization was made in - is
+ids that are the same every time (``tests/testkit/dash_fixtures.py``), and the only thing that varies - the directory the organization was made in - is
 replaced by ``/path/to/acme``.
 
 ``capture`` takes a *function that makes the app*, so the same steps are taken over the app of the flat module (the goldens were taken before it

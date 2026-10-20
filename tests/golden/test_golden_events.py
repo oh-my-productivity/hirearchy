@@ -10,9 +10,9 @@ import signal
 import sys
 import time
 from collections import defaultdict
-from pathlib import Path
 
 import pytest
+import testkit
 from golden_support import check
 
 from orgmcp import telemetry
@@ -20,7 +20,7 @@ from orgmcp.cli import main
 from orgmcp.core import ROOT, Org
 from orgmcp.scheduler import Scheduler
 
-FAKE = str(Path(__file__).resolve().parents[1] / "fake_agent.py")
+FAKE = str(testkit.FAKE_AGENT)
 
 
 @pytest.fixture(autouse=True)

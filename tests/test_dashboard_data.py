@@ -5,11 +5,10 @@ import os
 import statistics
 import time
 from datetime import timedelta
-from pathlib import Path
 
 import pytest
-from dash_fixtures import DEMO_NOW, big_org, demo_org, write_running_json
-from obs_fixtures import T0, EventLog, stamp
+from testkit.dash_fixtures import DEMO_NOW, big_org, demo_org, set_scheduler, snapshot_files, write_running_json
+from testkit.obs_fixtures import T0, EventLog, stamp
 from testkit.scheduler import scheduler_is
 
 from orgmcp import dashboard_data as dd
@@ -31,20 +30,6 @@ def demo(tmp_path, sched_up):
     ns = demo_org(tmp_path)
     ns.data = dd.DashData(ns.org.root, now=lambda: DEMO_NOW)
     return ns
-
-
-def set_scheduler(monkeypatch, state, *orgs):
-    scheduler_is(monkeypatch, state, *orgs)
-
-
-def snapshot_files(root: Path) -> dict:
-    out = {}
-    for dirpath, dirnames, filenames in os.walk(root):
-        for n in filenames + dirnames:
-            p = Path(dirpath) / n
-            st = p.lstat()
-            out[str(p)] = (st.st_mtime_ns, st.st_size)
-    return out
 
 
 # ------------------------------------------------------------------------------------------ states

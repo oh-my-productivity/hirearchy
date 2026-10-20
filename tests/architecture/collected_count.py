@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import functools
 import re
 import subprocess
 import sys
@@ -17,19 +18,31 @@ BASELINE = Path(__file__).with_name("baseline_test_count.txt")
 FLOOR = "count.txt"
 
 
-def collect() -> dict[str, int]:
-    """Test file (relative to the repository, posix) -> number of collected tests, from one ``pytest --collect-only``."""
+@functools.cache
+def collect_ids() -> dict[str, dict[str, int]]:
+    """Test file (relative to the repository, posix) -> {test id -> number of collected items}, from one ``pytest --collect-only``.
+
+    A test id is ``name`` or ``Class::name`` (a parametrized test has one item per parameter set, all counted under its id).
+    One collection per process: the result is cached, so every architecture test shares it.
+    """
     result = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider"], capture_output=True,
                             text=True, cwd=REPO, timeout=600)
-    counts: dict[str, int] = {}
+    found: dict[str, dict[str, int]] = {}
     for line in result.stdout.splitlines():
         if "::" in line and not line.startswith(" "):
-            path = line.split("::", 1)[0]
-            counts[path] = counts.get(path, 0) + 1
+            path, rest = line.split("::", 1)
+            test_id = rest.split("[", 1)[0]
+            tests = found.setdefault(path, {})
+            tests[test_id] = tests.get(test_id, 0) + 1
     summary = re.search(r"(\d+) tests? collected", result.stdout)
-    if not summary or int(summary.group(1)) != sum(counts.values()):
+    if not summary or int(summary.group(1)) != sum(sum(t.values()) for t in found.values()):
         raise AssertionError(f"could not read the collection: {result.stdout[-500:]}{result.stderr[-500:]}")
-    return counts
+    return found
+
+
+def collect() -> dict[str, int]:
+    """Test file (relative to the repository, posix) -> number of collected tests."""
+    return {path: sum(tests.values()) for path, tests in collect_ids().items()}
 
 
 def tests_directories() -> list[Path]:

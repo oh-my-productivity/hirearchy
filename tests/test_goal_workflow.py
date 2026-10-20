@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 
 import pytest
+import testkit
 import yaml
 
 from orgmcp import blueprint as blueprint_mod
@@ -17,7 +18,7 @@ from orgmcp.scheduler import Scheduler
 from orgmcp.server import ROOT_INSTRUCTIONS, build_server, resolve_binding
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "blueprint-research.yaml"
-TEAM = str(Path(__file__).with_name("fake_team_agent.py"))
+TEAM = str(testkit.FAKE_TEAM_AGENT)
 
 
 def call(server, tool, **args):

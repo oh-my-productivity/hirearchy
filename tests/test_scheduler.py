@@ -3,15 +3,15 @@ import os
 import subprocess
 import sys
 import time
-from pathlib import Path
 
 import pytest
+import testkit
 
 from orgmcp.cli import main
 from orgmcp.core import ROOT, OrgError
 from orgmcp.scheduler import Scheduler, ensure_kiro_profile, kiro_profile_name, kiro_runner
 
-FAKE = str(Path(__file__).with_name("fake_agent.py"))
+FAKE = str(testkit.FAKE_AGENT)
 
 
 def fake_runner(mode="work"):

@@ -56,7 +56,12 @@ def run_mypy() -> int:
               "(a src/orgmcp/<pkg>/ directory with __init__.py is checked automatically)", flush=True)
         return version.returncode
     print(f"mypy --strict on: {', '.join(packages)}", flush=True)
-    return subprocess.run([exe, *(arg for package in packages for arg in ("-p", package))], cwd=ROOT, check=False).returncode
+    code = subprocess.run([exe, *(arg for package in packages for arg in ("-p", package))], cwd=ROOT, check=False).returncode
+    tools = sorted(str(p.relative_to(ROOT)) for p in (ROOT / "tools").glob("*.py"))  # dev tooling (tools/relocate_tests.py): strict too
+    if tools:
+        print(f"mypy --strict on: {', '.join(tools)}", flush=True)
+        code = max(code, subprocess.run([exe, *tools], cwd=ROOT, check=False).returncode)
+    return code
 
 
 def run_imports() -> int:

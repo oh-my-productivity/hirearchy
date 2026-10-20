@@ -2241,6 +2241,18 @@ Behaviour that matters to the user is pinned **twice**: by the golden suite (byt
 
 ### 7.3 Relocation table: every current test file -> target
 
+> **Status (step E0).** The table below is the *plan* of 7.3 as it was written. `tests/architecture/relocation.yaml` is the source of truth now:
+> it assigns every test of every `tests/test_*.py` (the 51 files that exist, 1 166 test functions = 1 397 collected tests, including the files
+> this table does not list: `test_layout`, `test_static_checks`, `test_process_state_guard`, `test_dashboard_characterization`,
+> `test_integration_marker`) to exactly one destination file, with a comment on why, and every destination to one E1 group (`a`..`e`, by package,
+> `prompts` in `a`). Where this table is silent or says "by subject" the manifest decides by the subject of the test; where a destination of
+> this table exists already (typed, hand-written tests) the moved tests get a file of their own, `<name>_behaviour.py`. The mover is
+> `tools/relocate_tests.py` (`plan`, `apply --group X`, `prune --group X`); `tests/architecture/test_relocation_count.py` keeps the manifest and
+> the collected tests in step. The support modules (`dash_fixtures`, `dash_worlds`, `obs_fixtures`, `kiro_sandbox`, `fake_agent`,
+> `fake_team_agent`, `expected_dash/`) moved into `tests/testkit/` in E0 (not in E1-e), with the stable paths `testkit.REPO`, `testkit.FAKE_AGENT`,
+> ... that replace `Path(__file__)` expressions; modules that a feature's tests may not import under the contracts of 8.2 are imported by moved
+> tests as `testkit.legacy.<module>` until the test is converted.
+
 Rules for all moves: pure move + import adaptation (`from orgmcp.health import agent_health` becomes the new api; `Path(__file__).with_name("fake_agent.py")`
 becomes `testkit.FAKE_AGENT`); **no assertion changes**; a test that monkeypatches a module attribute is converted per 7.4 in the step that moves the code
 it pokes at. A split file is split by a manifest (`relocation.yaml`: test-function-name patterns -> destination) applied by `tools/relocate_tests.py`
@@ -2249,7 +2261,7 @@ it pokes at. A split file is split by a manifest (`relocation.yaml`: test-functi
 | Current file (tests) | Destination (split rule) |
 |---|---|
 | `conftest.py` | `/conftest.py` (options, hooks) + `tests/testkit/fixtures.py` (fixtures); `fresh_telemetry` -> `fresh_process_resources` (calls `ProcessResources.reset()`) |
-| `dash_fixtures.py`, `obs_fixtures.py`, `kiro_sandbox.py`, `fake_agent.py`, `fake_team_agent.py` | `tests/testkit/` unchanged (fake agents stay subprocess scripts using the facade `Org`) |
+| `dash_fixtures.py`, `dash_worlds.py`, `obs_fixtures.py`, `kiro_sandbox.py`, `fake_agent.py`, `fake_team_agent.py`, `expected_dash/` | `tests/testkit/` unchanged — **done in E0** (fake agents stay subprocess scripts using the facade `Org`) |
 | `test_core.py` (13) | `tests/e2e/test_core_scenarios.py` (whole): facade-level scenarios across mail, budget, hierarchy, prompts |
 | `test_core_safety.py` (24) | `protected_names* case_* memory_cap* legitimate_writes* writing_a_case_twin* agent_md_* hire_is_the_way* report_charter_authority*` -> `orgfiles/tests/test_guard.py`; `sender_copy_is_written_before* recipient_write_failure*` -> `delivery/tests/test_delivery_order.py` (+ `mail/tests/test_contract_mailbox_writer.py`); `recover_*` -> `mail/tests/test_recover.py`; `retire_*` -> `hierarchy/tests/test_retire.py`; `report_*artifact*`, `read_and_report_artifacts_share*` -> `dispatch/tests/test_artifacts.py`; `word_count_*` -> `kernel/tests/test_text.py` |
 | `test_contract.py` (19) | `prompt_* answered_task* open_task_in_the_batch* whoami_shows* result_is_followed* single_open_task* no_link* link_ignores* delegated_task_is_shown_once note_and_task*` -> `prompts/tests/test_contract.py`; `default_budget_* root_default_budget* explicit_budget*` -> `budget/tests/test_default_budget.py`; `rules_*` -> `templates/tests/test_org_rules.py` |

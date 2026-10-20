@@ -41,7 +41,7 @@ def isolated_kiro(request, tmp_path_factory, process_state_guard, monkeypatch):
     * a stub ``kiro-cli`` (exits 0 and appends its argv to ``$KIRO_STUB_LOG``) shadows the real binary on PATH.
 
     Tests marked ``integration`` get none of this (real kiro needs the user's auth): they must use the ``real_kiro``
-    fixture, which fences what they may touch in ``~/.kiro`` (see ``tests/kiro_sandbox.py``).
+    fixture, which fences what they may touch in ``~/.kiro`` (see ``tests/testkit/kiro_sandbox.py``).
     """
     if request.node.get_closest_marker("integration"):
         return None
@@ -75,7 +75,7 @@ def real_kiro(request, tmp_path):
     whose ``ORG_ROOT`` is inside the test's tmp dir, kills any process that mentions it, and fails the test if the md5
     of any file in ``~/.kiro/agents`` or of ``~/.kiro/settings/mcp.json`` changed.
     """
-    import kiro_sandbox
+    from . import kiro_sandbox
 
     if not request.node.get_closest_marker("integration"):
         pytest.fail("real_kiro is only for tests marked @pytest.mark.integration (unmarked tests run against a stub kiro-cli)")

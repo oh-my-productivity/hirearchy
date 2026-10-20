@@ -8,7 +8,7 @@ and remember what they were asked.
 decorators the dashboard puts in their place (the agent tree and the mailboxes listed per change of the directory, the run counts, the pause flags and
 ORG.md cached). Both must give the same answers (the contract suites run over both). The world is a bundle of the queries and of the means to put a story
 where they look: an agent, a message, a run log, an event, a service, a case, the health of an agent. Time is ``stamp(seconds)`` after the origin of
-the clock, the way ``tests/obs_fixtures.py`` has always written it; what the dashboard shows as "now" is ``world.shown``.
+the clock, the way ``tests/testkit/obs_fixtures.py`` has always written it; what the dashboard shows as "now" is ``world.shown``.
 
 ``disk_feed`` and ``memory_feed`` are the event feed over event files and over memory; ``cache_state`` and ``MemoryDashboardState`` are the state the
 queries share, real and fake.

@@ -7,7 +7,7 @@ They are the repeatable form of three ad-hoc checks (the studies' NOTES point he
 * ``studies/F-read-experiment``: a built-in ``read`` reads the org by absolute path and nothing outside it;
 * ``studies/F2-tool-names``: built-in ``write`` and orgmcp ``org_write`` work side by side.
 
-Model: ``$ORGMCP_IT_MODEL``, default ``orgmcp.core.DEFAULT_MODEL``. Safety (``~/.kiro`` fenced, leftovers killed): ``tests/kiro_sandbox.py``.
+Model: ``$ORGMCP_IT_MODEL``, default ``orgmcp.core.DEFAULT_MODEL``. Safety (``~/.kiro`` fenced, leftovers killed): ``tests/testkit/kiro_sandbox.py``.
 """
 
 import re

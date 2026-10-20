@@ -5,12 +5,11 @@ import asyncio
 import os
 import sys
 import time
-from pathlib import Path
 
 import pytest
-from dash_fixtures import DEMO_NOW, demo_org
-from obs_fixtures import EventLog, stamp
-from test_dashboard_data import set_scheduler, snapshot_files
+import testkit
+from testkit.dash_fixtures import DEMO_NOW, demo_org, set_scheduler, snapshot_files
+from testkit.obs_fixtures import EventLog, stamp
 from testkit.scheduler import scheduler_is
 
 from orgmcp import dashboard_data as dd
@@ -807,7 +806,7 @@ def test_no_events_file_is_created_by_the_app_on_an_org_without_events(tmp_path,
 
 # ------------------------------------------------------------------------------------------ against the real scheduler
 
-FAKE = str(Path(__file__).with_name("fake_agent.py"))
+FAKE = str(testkit.FAKE_AGENT)
 
 
 def _runner(mode):

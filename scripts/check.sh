@@ -5,9 +5,10 @@
 #   scripts/check.sh              # all of it
 #   scripts/check.sh tests/golden # pytest on a subset, then mypy and lint-imports
 #
-# tests/test_static_checks.py would run mypy and lint-imports again inside pytest, so it is deselected here.
+# tests/test_static_checks.py (tests/architecture/test_static_checks.py once it moved there, step E1-e) would run mypy and
+# lint-imports again inside pytest, so it is deselected here.
 set -eu
 cd "$(dirname "$0")/.."
 
-uv run pytest -q --deselect tests/test_static_checks.py "$@"
+uv run pytest -q --deselect tests/test_static_checks.py --deselect tests/architecture/test_static_checks.py "$@"
 uv run python scripts/static_checks.py all
