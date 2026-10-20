@@ -14,6 +14,7 @@ from orgmcp.access.testing import StaticAccess
 from orgmcp.app import Org
 from orgmcp.kernel import OrgError
 from orgmcp.settings import DEFAULT_MODEL
+from orgmcp.settings.testing import MemoryOrgSettings
 
 
 @pytest.fixture
@@ -86,11 +87,12 @@ def test_the_methods_come_from_the_ports_of_the_runtime(org: Org) -> None:
 
 
 def test_the_default_model_follows_the_config_of_the_org(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
-    """A subclass that overrides ``config`` (the dashboard's ``LenientOrg``) is read, as it was before the port existed."""
+    """The runtime's settings are read (the dashboard's lenient runtime puts its own ``OrgSettings`` there, where its ``LenientOrg`` used to
+    override ``config``)."""
 
     class Lenient(Org):
-        @property
-        def config(self) -> dict[str, object]:
-            return {"default_model": "m-lenient"}
+        def __init__(self, root: Path) -> None:
+            super().__init__(root)
+            self.runtime = dataclasses.replace(self.runtime, settings=MemoryOrgSettings("---\ndefault_model: m-lenient\n---\n"))
 
     assert Lenient(org.root).default_model == "m-lenient"

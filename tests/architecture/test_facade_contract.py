@@ -14,6 +14,7 @@ import dataclasses
 import importlib
 import json
 import shutil
+import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -26,29 +27,13 @@ from orgmcp.app.tests._mixins import MIXINS
 from orgmcp.app.wiring import open_runtime, runtime_ports
 
 from . import facade_cases, facade_rules
+from .paths import REPO
 from .facade_cases import CASES, Case, FunctionCase, Spy, Tape, World
 
 pytestmark = pytest.mark.architecture
 
 RECORDED = json.loads(_signatures.SIGNATURES.read_text(encoding="utf-8"))["Org"]
 PORTS = runtime_ports()  # field name -> the Protocol of its port
-RED: dict[str, set[str]] = {  # the methods that still hold logic (or a bare call) when the tests are written, per test
-    "fakes": {
-        "dir", "ledger", "save_ledger", "commit", "end_run", "emit", "default_model", "_check_authority", "_check_allocation", "pause", "resume",
-        "clear_failures", "can_message", "_next_hops", "_normalize_artifact", "_agent_line", "_quote", "_files_lines", "_render_in_context", "_upstream",
-    },
-    "real": {
-        "dir", "ledger", "save_ledger", "default_model", "can_message", "_next_hops", "_normalize_artifact", "_agent_line", "_quote", "_files_lines",
-        "_render_in_context", "_upstream",
-    },
-    "function": {"find_root", "init", "_wakes", "_check_lessons"},
-    "direct": {"find_root", "_wakes", "_check_lessons"},
-}
-
-
-def params(cases: list[Case | FunctionCase], test: str) -> list[Any]:
-    red = [pytest.mark.xfail(strict=True, reason="red: E2-facade")]
-    return [pytest.param(c, id=facade_cases.case_id(c), marks=red if c.name in RED[test] else []) for c in cases]
 
 
 @pytest.fixture(scope="module")
@@ -95,7 +80,7 @@ def fakes(world: World) -> tuple[Org, Tape]:
     return org, tape
 
 
-@pytest.mark.parametrize("case", params([c for c in CASES if isinstance(c, Case)], "fakes"))
+@pytest.mark.parametrize("case", [c for c in CASES if isinstance(c, Case)], ids=facade_cases.case_id)
 def test_on_a_runtime_of_fakes_a_method_makes_the_one_call_of_its_port(case: Case, world: World, fakes: tuple[Org, Tape]) -> None:
     org, tape = fakes
     call = case.args(world)
@@ -108,7 +93,7 @@ def test_on_a_runtime_of_fakes_a_method_makes_the_one_call_of_its_port(case: Cas
     assert result is made.result
 
 
-@pytest.mark.parametrize("case", params([c for c in CASES if isinstance(c, Case)], "real"))
+@pytest.mark.parametrize("case", [c for c in CASES if isinstance(c, Case)], ids=facade_cases.case_id)
 def test_on_the_real_runtime_a_method_returns_or_raises_what_its_port_did(case: Case, world: World, tmp_path: Path) -> None:
     shutil.copytree(world.root, tmp_path / "org")
     org = Org(tmp_path / "org")
@@ -133,7 +118,7 @@ def test_on_the_real_runtime_a_method_returns_or_raises_what_its_port_did(case: 
         assert raised is None and result is made.result
 
 
-@pytest.mark.parametrize("case", params([c for c in CASES if isinstance(c, FunctionCase)], "function"))
+@pytest.mark.parametrize("case", [c for c in CASES if isinstance(c, FunctionCase)], ids=facade_cases.case_id)
 def test_a_static_or_class_method_calls_the_function_of_its_feature(case: FunctionCase, world: World, monkeypatch: pytest.MonkeyPatch) -> None:
     module = importlib.import_module(case.module)
     calls: list[facade_cases.Call] = []
@@ -150,7 +135,7 @@ def test_a_static_or_class_method_calls_the_function_of_its_feature(case: Functi
     assert (isinstance(result, Org) and result.root == world.root) if case.wrap else result is answer
 
 
-@pytest.mark.parametrize("case", params([c for c in CASES if isinstance(c, FunctionCase) and not c.wrap], "direct"))
+@pytest.mark.parametrize("case", [c for c in CASES if isinstance(c, FunctionCase) and not c.wrap], ids=facade_cases.case_id)
 def test_a_static_or_class_method_returns_or_raises_what_its_function_does(case: FunctionCase, world: World) -> None:
     function = getattr(importlib.import_module(case.module), case.attribute)
     call = case.args(world)
@@ -172,7 +157,6 @@ def test_init_creates_the_organization_and_returns_the_facade_of_it(tmp_path: Pa
 # --------------------------------------------------------------------------------------------------------- 3. the facade is pure delegation
 
 
-@pytest.mark.xfail(strict=True, reason="red: E2-facade")
 def test_facade_is_pure_delegation() -> None:
     assert facade_rules.FACADE_MODULES, "no _facade_*.py found"
     violations = facade_rules.check()
@@ -183,8 +167,10 @@ def test_the_only_exemption_is_the_constructor_of_the_facade() -> None:
     assert set(facade_rules.EXEMPT) == {("CoreMixin", "__init__")}
 
 
-@pytest.mark.xfail(strict=True, reason="red: E2-facade")
 def test_no_facade_module_carries_mypy_debt() -> None:
+    """The last facade mixin left its debt in E2: no ``# mypy: ignore-errors`` first line, and no ``ignore_errors`` override in pyproject.toml."""
+    config = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))
+    assert [o for o in config["tool"]["mypy"]["overrides"] if o.get("ignore_errors")] == []
     debt = [p.name for p in facade_rules.FACADE_MODULES if p.read_text(encoding="utf-8").startswith("# mypy: ignore-errors")]
     assert not debt, f"strict-clean the facade modules: {debt}"
 

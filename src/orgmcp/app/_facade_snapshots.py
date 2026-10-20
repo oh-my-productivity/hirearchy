@@ -14,4 +14,4 @@ class SnapshotsMixin:
 
     def commit(self, message: str) -> None:
         """Snapshot the organization in git (if it is a repo). Called by the runtime after each run."""
-        self.runtime.snapshotter.commit(message)
+        return self.runtime.snapshotter.commit(message)

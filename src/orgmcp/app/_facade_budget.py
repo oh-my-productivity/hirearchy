@@ -30,7 +30,7 @@ class BudgetMixin:
         return self.runtime.budget_query.grant_hint(addr)
 
     def _check_allocation(self, actor: str, amount: int, new_delegation: bool) -> None:
-        self.runtime.allocation_policy.check_allocation(actor, amount, new_delegation)
+        return self.runtime.allocation_policy.check_allocation(actor, amount, new_delegation)
 
     def _default_budget(self, actor: str) -> int:
         """Runs a delegation gets when the caller names none: what the actor can afford, capped at default_budget.

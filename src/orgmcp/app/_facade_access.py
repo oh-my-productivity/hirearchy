@@ -1,24 +1,14 @@
 """What each agent was granted: model, workspace, inputs, tools (access).
 
-The bodies call the ports of ``self.runtime`` (step B-access; ARCHITECTURE.md 5.3 and 6.4). ``default_model`` is the one exception: it
-reads ``self.config`` so that the dashboard's ``LenientOrg``, which overrides ``config`` (a broken ORG.md means the defaults, and is
-reported), keeps its answer; it delegates to ``ModelResolver.default_model`` when C-dashdata gives the lenient runtime a lenient
-``OrgSettings``."""
+The bodies call the ports of ``self.runtime`` (step B-access; ARCHITECTURE.md 5.3 and 6.4); ``default_model`` is the settings'."""
 
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Protocol
 
 from ..access import unconfined_read as _unconfined_read
-from ..settings import config_default_model
 from .runtime import OrgRuntime
-
-
-class _Configured(Protocol):
-    @property
-    def config(self) -> dict[str, object]: ...
 
 
 class AccessMixin:
@@ -27,9 +17,9 @@ class AccessMixin:
     runtime: OrgRuntime
 
     @property
-    def default_model(self: _Configured) -> str:
+    def default_model(self) -> str:
         """The org-wide model: the config's ``default_model``, else DEFAULT_MODEL (also for ``null`` or a missing key)."""
-        return config_default_model(self.config)
+        return self.runtime.settings.default_model()
 
     def model_for(self, addr: str) -> str:
         """The model a run of ``addr`` uses: its charter's ``model``, else the org config's ``default_model``, else DEFAULT_MODEL."""
@@ -37,7 +27,7 @@ class AccessMixin:
 
     def _check_authority(self, actor: str, tools: Sequence[str], workspace: str | None, inputs: Sequence[str] | None = None) -> None:
         """Authority only narrows down the tree: a parent cannot grant what it does not have."""
-        self.runtime.authority_policy.check_authority(actor, tools, workspace, inputs)
+        return self.runtime.authority_policy.check_authority(actor, tools, workspace, inputs)
 
     def workspace_of(self, addr: str) -> Path | None:
         """The agent's workspace (read-write for its built-in tools) as a resolved path, if its charter has one."""

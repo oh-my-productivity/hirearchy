@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import ast
 import dataclasses
-import tomllib
 import typing
 
 import pytest
@@ -84,16 +83,6 @@ def test_a_part_imports_only_public_modules_of_packages() -> None:
             if isinstance(node, ast.ImportFrom) and node.level and pkg != "app":
                 private += [f"{pkg}: {node.module}" for part in (node.module or "").split(".") if part.startswith("_")]
     assert private == []
-
-
-def test_the_mypy_debt_of_the_facade_mixins_is_carried_by_the_files() -> None:
-    """One ``[[tool.mypy.overrides]]`` table per mixin was three identical lines, which git cannot tell apart when two steps delete
-    neighbouring ones; the debt is now the first line of the mixin file, which only its own step edits."""
-    config = tomllib.loads((APP_DIR.parents[2] / "pyproject.toml").read_text(encoding="utf-8"))
-    overrides = config["tool"]["mypy"]["overrides"]
-    assert [o for o in overrides if o.get("ignore_errors")] == []
-    debts = [p for p in sorted(APP_DIR.glob("_facade_*.py")) if p.read_text(encoding="utf-8").startswith("# mypy: ignore-errors")]
-    assert debts, "no mixin is left in debt: delete this test with the last one (E2)"
 
 
 @pytest.mark.parametrize("pkg", [p for p in _parts.part_names() if p not in NOT_FEATURES])

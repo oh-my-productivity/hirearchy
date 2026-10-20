@@ -1,6 +1,7 @@
 """Mailboxes, task queries and the run lifecycle of the inbox (mail).
 
-The bodies call the ports of ``self.runtime`` (step A-mail; ARCHITECTURE.md 5.3 and 6.4)."""
+The bodies call the ports of ``self.runtime`` (step A-mail; ARCHITECTURE.md 5.3 and 6.4); the legacy static ``_wakes`` has no runtime and calls the
+function of ``wire_mail`` that reads a file through the parser of the process."""
 
 from __future__ import annotations
 
@@ -8,7 +9,7 @@ from pathlib import Path
 
 from ..kernel import Message
 from .runtime import OrgRuntime
-from .wiring import process_resources
+from .wire_mail import message_wakes
 
 
 class MailMixin:
@@ -35,10 +36,7 @@ class MailMixin:
     @staticmethod
     def _wakes(path: Path) -> bool:
         """Does this inbox file wake its agent? (The mailbox does this itself; the static spelling is the legacy one.)"""
-        try:
-            return process_resources().message_parser.parse(path).wake
-        except Exception:  # noqa: BLE001 - an unreadable file still counts as mail: a run should look at it
-            return True
+        return message_wakes(path)
 
     def find_received(self, addr: str, msg_id: str) -> Message | None:
         return self.runtime.mailbox.find_received(addr, msg_id)
@@ -59,7 +57,7 @@ class MailMixin:
         A no-op for an agent that no longer exists (retired while its run was in flight): its directory is gone,
         and creating the mailbox again would leave a ghost directory behind.
         """
-        self.runtime.batches.end(addr, ok)
+        return self.runtime.batches.end(addr, ok)
 
     def recover(self) -> list[str]:
         """After a crash: return every inflight batch to its inbox, and finish interrupted deliveries.

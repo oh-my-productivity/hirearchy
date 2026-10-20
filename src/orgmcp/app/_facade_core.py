@@ -1,21 +1,27 @@
-# mypy: ignore-errors
 """Construction, addressing helpers, ids and the runtime ledgers.
 
-Moved verbatim from ``core.Org`` in step M2 (ARCHITECTURE.md 5.3 and 6.4); a later step replaces the bodies by calls
-to the interfaces of the package named above."""
+The bodies call the ports of ``self.runtime`` and the pure functions of the kernel (ARCHITECTURE.md 5.3 and 6.4): ``dir`` is the layout's, the ledgers are
+the ``LedgerStore``'s. ``__init__`` is the one method that is not a delegation: it opens the runtime."""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
+from typing import Any
 
-from ..kernel import child_addr as _child_addr, depth as _depth, norm as _norm, OrgError, parent as _parent, ROOT
+from ..kernel import OrgError
+from ..kernel import child_addr as _child_addr
+from ..kernel import depth as _depth
+from ..kernel import norm as _norm
+from ..kernel import parent as _parent
 from ._compat import atomic_write
+from .runtime import OrgRuntime
 from .wiring import open_runtime
 
 
 class CoreMixin:
     """Construction, addressing helpers, ids and the runtime ledgers."""
+
+    runtime: OrgRuntime
 
     def __init__(self, root: str | Path):
         self.root = Path(root).expanduser().resolve()
@@ -28,8 +34,7 @@ class CoreMixin:
         return _norm(addr)
 
     def dir(self, addr: str) -> Path:
-        a = self.norm(addr)
-        return self.root if a == ROOT else self.root / a
+        return self.runtime.paths.agent_dir(addr)
 
     @classmethod
     def parent(cls, addr: str) -> str | None:
@@ -45,12 +50,9 @@ class CoreMixin:
     def new_id(self, sender: str) -> str:
         return self.runtime.ids.message_id(sender)
 
-    def ledger(self, name: str) -> dict:
+    def ledger(self, name: str) -> dict[str, Any]:  # Any: callers index into the nested JSON of a ledger, as before
         """Runtime-private bookkeeping (``.runtime/<name>.json``): the only state not derived from messages."""
-        try:
-            return json.loads((self.root / ".runtime" / f"{name}.json").read_text(encoding="utf-8"))
-        except (FileNotFoundError, ValueError):
-            return {}
+        return self.runtime.ledgers.read(name)
 
-    def save_ledger(self, name: str, data: dict) -> None:
-        atomic_write(self.root / ".runtime" / f"{name}.json", json.dumps(data, indent=2) + "\n")
+    def save_ledger(self, name: str, data: dict[str, Any]) -> None:
+        return self.runtime.ledgers.write(name, data)
