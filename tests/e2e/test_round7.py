@@ -1,15 +1,14 @@
-"""Cross-branch behavior after integrating confinement (X1), assistant UX (X2) and verifier templates (X3)."""
-
 import asyncio
-import json
+import re
 from pathlib import Path
 
 import pytest
+import testkit
+import yaml
+from testkit.cli_world import main
+from testkit.e2e_world import ROOT_INSTRUCTIONS, binding_at, bpm, build_server, ex, file_confinement, resolve_binding, skill_source
 
-from orgmcp import blueprint as bpm
-from orgmcp.cli import main
 from orgmcp.core import ROOT, Org
-from orgmcp.server import OrgBinding, build_server
 
 
 def call(server, tool, **args):
@@ -40,10 +39,8 @@ def org(tmp_path, dirs):
 
 
 # ---------------------------------------------------------------------------------------- hire with inputs
-
-
 def test_root_hire_tool_takes_inputs(org, dirs):
-    server = build_server(OrgBinding(org.root), ROOT)
+    server = build_server(binding_at(org.root), ROOT)
     assert "hired reader" in call(server, "hire", name="reader", role="R", charter="Read.", tools=["read"], inputs=[str(dirs["docs"])])
     assert org.charter("reader")[0]["inputs"] == [str(dirs["docs"])] and org.inputs_of("reader") == [dirs["docs"]]
     call(server, "hire", name="plain", role="P", charter="Nothing.")  # old calls without inputs keep working
@@ -53,7 +50,7 @@ def test_root_hire_tool_takes_inputs(org, dirs):
 
 
 def test_manager_hire_tool_narrows_inputs(org, dirs):
-    server = build_server(OrgBinding(org.root), "lead")
+    server = build_server(binding_at(org.root), "lead")
     call(server, "hire", name="kid", role="K", charter="x", tools=["read"], inputs=[str(dirs["docs/hr"])])
     assert org.inputs_of("lead/kid") == [dirs["docs/hr"]]
     assert "inside your inputs or workspace" in fails(server, "hire", name="far", role="F", charter="x", inputs=[str(dirs["other"])])
@@ -67,14 +64,6 @@ def test_cli_hire_inputs_is_repeatable(org, dirs, capsys):
     main(["--root", str(org.root), "hire", "root", "plain", "--role", "P", "--charter", "x"])
     assert "inputs" not in org.charter("plain")[0]
 
-
-# ---------------------------------------------------------------- plan access text == what kiro enforces
-
-import re
-import yaml
-
-from orgmcp import blueprint_examples as ex
-from orgmcp.scheduler import file_confinement
 
 KNOWN_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconfined"}
 
@@ -157,13 +146,11 @@ def test_plan_words_for_each_access_shape():
 
 
 # ------------------------------------------------------------- blueprint_example kinds pass propose_org
-
-EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
+EXAMPLES_DIR = testkit.REPO / "examples"
 
 
 @pytest.fixture
 def root_server(tmp_path, cwd, monkeypatch):
-    from orgmcp.server import resolve_binding
     for var in ("ORG_AGENT", "ORG_REQUIRE_AGENT"):
         monkeypatch.delenv(var, raising=False)
     monkeypatch.setenv("ORG_ROOT", str(tmp_path / "org"))
@@ -208,11 +195,7 @@ def test_example_criteria_match_the_exhaustive_verifier_templates(root_server, c
 
 
 # ------------------------------------------------------------------------------ skill and instructions
-
-
 def test_skill_and_instructions_mention_read_only_inputs_within_the_limits(root_server):
-    from orgmcp.server import ROOT_INSTRUCTIONS
-    from orgmcp.skill import skill_source
     skill = skill_source().read_text()
     assert len(skill.splitlines()) <= 125 and len(ROOT_INSTRUCTIONS) < 2800
     for needle in ("`needs.inputs`", "can never change them", "never give an agent the built-in `write` tool",
@@ -223,7 +206,7 @@ def test_skill_and_instructions_mention_read_only_inputs_within_the_limits(root_
 
 
 def test_readme_documents_the_integrated_features():
-    readme = (Path(__file__).resolve().parent.parent / "README.md").read_text()
+    readme = (testkit.REPO / "README.md").read_text()
     for needle in ("hire ... --inputs PATH", "`inputs` parameter of the `hire` tool", "`plan_id`", "blueprint_example(kind)",
                    "progress(wait_seconds=N)", "--until-done", "n of m factual claims verified (n = m required); k wrong, u unsupported, p not-checkable; j judgement statements, each resting on verified facts: yes",
                    "`code-reviewer` now has `read` and `shell`", "`manager` verifies with its own `read` output",

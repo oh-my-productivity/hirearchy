@@ -2,7 +2,6 @@
 
 import asyncio
 
-import pytest
 import yaml
 from testkit.services_world import (  # noqa: F401  (svc is a fixture)
     BRIEF, ENG, call, cli, contract_meta, define, deliver, fails, playbook_meta, request, svc, work,
@@ -54,46 +53,6 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     mine = call(build_server(org, "ceo"), "services")
     assert "Services you offer:" in mine and "playbook file: ceo/services/weekly-brief/PLAYBOOK.md" in mine
     assert "Services you can request" not in mine  # ceo's report offers nothing
-
-
-# ----------------------------------------------------------------------------------------------- CLI
-def test_cli_commands(org, capsys, tmp_path):
-    criteria = tmp_path / "criteria.txt"
-    criteria.write_text("At most 600 words\n- Every claim has a URL\n")
-    playbook = tmp_path / "pb.md"
-    playbook.write_text("## Steps\n1. Search.")
-    cli(org, "define-service", "ceo", "weekly-brief", "--description", "A weekly brief.",
-        "--input", "topic*:what it is about", "--input", "week:ISO week", "--acceptance", f"@{criteria}",
-        "--acceptance", "Mention a risk", "--deliverable", "one file", "--format", "markdown", "--max-words", "600",
-        "--path", str(tmp_path / "out"), "--budget", "8", "--playbook", f"@{playbook}", "--locked")
-    meta, _ = contract_meta(org)
-    assert meta["acceptance"] == ["At most 600 words", "Every claim has a URL", "Mention a risk"]
-    assert meta["inputs"] == [{"name": "topic", "description": "what it is about", "required": True},
-                              {"name": "week", "description": "ISO week", "required": False}]
-    assert meta["deliverable"] == {"description": "one file", "format": "markdown", "max_words": 600, "path": str(tmp_path / "out")}
-    assert meta["budget"] == 8 and meta["locked"] is True and playbook_meta(org)[0]["version"] == 1
-    assert "defined service `weekly-brief`" in capsys.readouterr().out
-
-    cli(org, "services")
-    assert "weekly-brief (offered by ceo; contract v1, playbook v1)" in capsys.readouterr().out
-    cli(org, "request", "weekly-brief", "--input", "topic=ai chips", "--input", "week=3", "--note", "Hurry")
-    out = capsys.readouterr().out
-    (task,) = org.outstanding(ROOT)
-    assert task.id in out and task.budget == 8 and "- week: 3" in task.body and "Hurry" in task.body
-    deliver(org, "ceo", task)
-    cli(org, "feedback", task.id, "reject", "--note", "Too long")
-    assert "feedback reject on" in capsys.readouterr().out
-    assert [m.feedback for m in org.sent(ROOT) if m.type == "note"] == ["reject"]
-    with pytest.raises(SystemExit):
-        cli(org, "feedback", task.id, "reject")  # a rejection needs a note
-    assert "needs a note" in capsys.readouterr().err
-    with pytest.raises(SystemExit):
-        cli(org, "request", "weekly-brief", "--input", "no-equals-sign")
-    assert "key=value" in capsys.readouterr().err
-    cli(org, "retire-service", "ceo", "weekly-brief", "--reason", "done with it")
-    assert "retired service" in capsys.readouterr().out and org.service_names("ceo") == []
-    log = __import__("subprocess").run(["git", "log", "--format=%s"], cwd=org.root, capture_output=True, text=True).stdout
-    assert "root: service weekly-brief of ceo" in log and "root: retired service" in log
 
 
 # ------------------------------------------------------------------------------- the whole loop

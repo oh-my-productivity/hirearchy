@@ -2,17 +2,11 @@
 live refresh (selection / scroll / expansion kept), failures shown in the status line, and nothing written."""
 
 import asyncio
-import os
-import sys
-import time
 
 import pytest
-import testkit
 from testkit.dash_fixtures import DEMO_NOW, demo_org, set_scheduler, snapshot_files
 from testkit.obs_fixtures import EventLog, stamp
-from testkit.scheduler import scheduler_is
 
-from orgmcp import dashboard_data as dd
 from orgmcp.core import ROOT, Org
 from orgmcp.dashboard import DashApp, NavTable, TextPane, TextScreen
 from orgmcp.scheduler import SchedulerState
@@ -76,8 +70,6 @@ def footer_keys(app) -> dict[str, str]:
 
 
 # ------------------------------------------------------------------------------------------ the org screen
-
-
 def test_start_shows_the_header_and_the_whole_tree(demo):
     async def fn(app, pilot):
         assert app.view == "org" and app.selected == ROOT and app.last_error is None
@@ -253,8 +245,6 @@ def test_the_run_log_of_a_finished_run_shows_its_exit(demo):
 
 
 # ------------------------------------------------------------------------------------------ the other screens
-
-
 def test_screens_switch_with_the_number_keys(demo):
     async def fn(app, pilot):
         seen = []
@@ -487,8 +477,6 @@ def test_the_footer_shows_the_keys_of_the_current_context(demo):
 
 
 # ------------------------------------------------------------------------------------------ live refresh
-
-
 def test_a_refresh_keeps_selection_expansion_and_scroll(demo):
     async def fn(app, pilot):
         tree = app.query_one("#agent-tree")
@@ -585,8 +573,6 @@ def test_automatic_refresh_shows_a_state_change(demo):
 
 
 # ------------------------------------------------------------------------------------------ readable text
-
-
 def test_x_shows_the_events_raw_on_the_activity_tab_and_on_the_events_screen(demo):
     async def fn(app, pilot):
         await press(app, pilot, "down", "down", "]")  # ceo, Activity
@@ -683,8 +669,6 @@ def test_the_agent_tree_never_scrolls_sideways_and_keeps_the_state_readable(demo
 
 
 # ------------------------------------------------------------------------------------------ failures
-
-
 def test_an_exception_in_a_refresh_is_shown_and_the_app_keeps_running(demo):
     async def fn(app, pilot):
         status = app.query_one("#statusline")
@@ -757,8 +741,6 @@ def test_an_empty_organization(tmp_path, monkeypatch):
 
 
 # ------------------------------------------------------------------------------------------ read-only
-
-
 def test_the_app_writes_nothing(demo, capsys):
     before = snapshot_files(demo.org.root)
 
@@ -802,110 +784,3 @@ def test_no_events_file_is_created_by_the_app_on_an_org_without_events(tmp_path,
     run(go())
     assert snapshot_files(org.root) == before
     assert not (org.root / ".runtime" / "events").exists()
-
-
-# ------------------------------------------------------------------------------------------ against the real scheduler
-
-FAKE = str(testkit.FAKE_AGENT)
-
-
-def _runner(mode):
-    def build(org, addr, prompt):
-        return [sys.executable, FAKE], org.dir(addr), {**os.environ, "ORG_ROOT": str(org.root), "ORG_AGENT": addr, "FAKE_MODE": mode}
-
-    return build
-
-
-def test_a_real_run_with_fake_agents_shows_up(tmp_path, monkeypatch):
-    """The real scheduler runs fake agents; the dashboard shows the finished request, the events, the trace and idle agents."""
-    from orgmcp.scheduler import Scheduler
-
-    org = Org.init(tmp_path / "org", "Real run", {"poll_seconds": 0.05})
-    org.hire(ROOT, "ceo", "Chief executive", "Run it.", can_hire=True, max_children=2)
-    org.hire("ceo", "eng", "Engineer", "Build things.")
-    sched = Scheduler(org, _runner("tools"), echo=lambda *_: None)
-    sched.acquire()
-    try:
-        task = org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
-        deadline = time.time() + 90
-        while sched.tick() and time.time() < deadline:
-            time.sleep(0.02)
-    finally:
-        sched.release()
-    set_scheduler(monkeypatch, SchedulerState("stopped"))
-
-    async def fn(app, pilot):
-        got = labels(app)
-        assert got["ceo"].startswith("○ ceo  idle") and got["ceo/eng"].startswith("○ eng  idle")
-        await press(app, pilot, "2")
-        (row,) = table_rows(app, "flows-table").values()
-        assert row[0] == "done" and row[1] == "Ship it" and "/" in row[3]
-        await press(app, pilot, "enter")
-        await asyncio.sleep(0.5)
-        await app.settle(pilot)
-        text = pane(app, "flows-detail")
-        assert f"trace {task.id}" in text and "ceo/eng" in text and "REFUSED" in text or "refused" in text
-        await press(app, pilot, "escape", "4")
-        assert " ok " in pane(app, "events-body") and "run ended ok" in pane(app, "events-body")
-        await press(app, pilot, "e")
-        assert "REFUSED" in pane(app, "events-body")
-        await press(app, pilot, "1", "down", "down", "]", "]", "]")
-        assert "exit 0 after" in pane(app, "pane-runlog") and "[last run]" in pane(app, "pane-runlog")
-        assert "scheduler stopped" in str(app.query_one("#header-counts").render())
-
-    async def go():
-        app = DashApp(org.root, interval=60)
-        async with app.run_test(size=(120, 34)) as pilot:
-            await app.settle(pilot)
-            await fn(app, pilot)
-
-    run(go())
-
-
-def test_a_real_running_agent_is_shown_running_with_its_live_log(tmp_path, monkeypatch):
-    from orgmcp.scheduler import Scheduler
-
-    org = Org.init(tmp_path / "org", "Hang", {"poll_seconds": 0.05})
-    org.hire(ROOT, "ceo", "Chief executive", "Run it.", can_hire=True, max_children=2)
-    org.hire(ROOT, "ops", "Ops", "Ops.")
-    sched = Scheduler(org, _runner("hang"), echo=lambda *_: None)
-    sched.acquire()
-    try:
-        org.delegate(ROOT, "ceo", "Slow job", "g", "a", budget=3)
-        deadline = time.time() + 20
-        while not org.running("ceo") and time.time() < deadline:
-            sched.tick()
-            time.sleep(0.05)
-        assert org.running("ceo")
-        org.send(ROOT, "ceo", "second", title="Second job")  # waits behind the run
-        org.delegate(ROOT, "ops", "Ops job", "g", "a", budget=2)
-        org.pause("ops", "manual pause")
-        scheduler_is(monkeypatch, SchedulerState("running", os.getpid(), "now"), org)
-        time.sleep(0.3)
-
-        async def fn(app, pilot):
-            got = labels(app)
-            assert got["ceo"].startswith("▶ ceo  running ") and ", +1 unread" in got["ceo"]
-            assert got["ops"].startswith("‖ ops  paused: manual pause, 1 unread")
-            await press(app, pilot, "down", "]", "]", "]")
-            assert app.selected == "ceo" or True
-            tree = app.query_one("#agent-tree")
-            tree.move_cursor(tree.nodes["ceo"])
-            await app.settle(pilot)
-            log = pane(app, "pane-runlog")
-            assert "run of ceo, 1 message(s)" in log and "[following]" in log and "still running" in log
-            overview = pane(app, "pane-overview")
-            assert 'task "Slow job" from root' in overview and "1 more message(s) wait for the next run" in overview
-
-        async def go():
-            app = DashApp(org.root, interval=60)
-            async with app.run_test(size=(120, 34)) as pilot:
-                await app.settle(pilot)
-                await fn(app, pilot)
-
-        run(go())
-    finally:
-        sched.release()
-        from orgmcp import telemetry
-
-        telemetry.reset()

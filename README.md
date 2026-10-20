@@ -735,7 +735,7 @@ uv run pytest -q tests/architecture                     # the structural rules (
 **Where tests live.** `tests/` holds the cross-feature, end-to-end and golden tests and the shared helpers (`tests/testkit/`: `fake_agent.py`,
 `kiro_sandbox.py`, ...; `tests/` is on `sys.path`, so `import testkit` works everywhere). A feature package keeps its own tests next to its code, in
 `src/orgmcp/<feature>/tests/` (give that directory an `__init__.py`, so two features may both have a `test_api.py`;
-`tests/test_static_checks.py` checks it). `pytest` collects both (`testpaths`). The shared fixtures and hooks (`org`,
+`tests/architecture/test_layout.py` checks it). `pytest` collects both (`testpaths`). The shared fixtures and hooks (`org`,
 `isolated_kiro`, the telemetry reset, `real_kiro`) are in `tests/testkit/fixtures.py`, registered by the root `conftest.py`
 (which also holds the integration marker), so colocated tests get them too. The wheel contains no `tests/` directory (`[tool.hatch.build.targets.wheel] exclude`).
 
@@ -758,7 +758,7 @@ list only shrinks, and its end state is empty (until then `test_every_class_has_
 
 **Static checks (pinned dev dependencies `mypy==2.4.0`, `import-linter==2.15`, config in `pyproject.toml`).**
 `uv run python scripts/static_checks.py` runs both; `scripts/check.sh` runs them after the tests, and
-`tests/test_static_checks.py` runs them inside plain `pytest` (skipped only when a tool is not installed).
+`tests/architecture/test_static_checks.py` runs them inside plain `pytest` (skipped only when a tool is not installed).
 
 * *mypy, strict, package by package:* every package directory of `src/orgmcp/` (a directory with `__init__.py`: the kernel, a
   feature, an entry point, `app`) is checked with `strict = true` and, for its `api.py`, `disallow_any_explicit`; nothing has to be
@@ -789,7 +789,7 @@ is a deliberate change of what callers can rely on: `uv run python -m orgmcp.app
 **Unit tests (default).** They use a deterministic fake agent (`tests/testkit/fake_agent.py`) in place of kiro. An autouse
 fixture (`tests/testkit/fixtures.py`) points `$HOME` and the profile directory at a temp dir and puts a stub `kiro-cli` first
 on `PATH`. A default run starts zero real-LLM runs: tests marked `@pytest.mark.integration` (and everything under
-`tests/integration/`, marked or not) are reported as skipped, and `tests/test_integration_marker.py` proves it.
+`tests/integration/`, marked or not) are reported as skipped, and `tests/meta/test_integration_marker.py` proves it.
 
 **Integration tests (opt-in).** `tests/integration/test_real_kiro.py` runs tiny orgs (3 tests, one agent run each,
 about 45 s and 3 LLM calls in total) against the real `kiro-cli` and your kiro login: that the agent and the scheduler's

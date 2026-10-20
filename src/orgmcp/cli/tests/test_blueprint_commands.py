@@ -1,13 +1,16 @@
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
+
 import copy
-from pathlib import Path
 
 import pytest
-import yaml
+import testkit
+import testkit.legacy.yaml as yaml
+from testkit.cli_world import main
+from testkit.legacy.orgmcp.core import Org
 
-from orgmcp.cli import main
-from orgmcp.core import Org
 
-EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "blueprint-research.yaml"
+EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"
 
 
 @pytest.fixture

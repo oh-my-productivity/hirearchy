@@ -1,27 +1,16 @@
-"""The default test run never reaches a real LLM.
-
-* unmarked tests run against a stub ``kiro-cli`` and a fake ``$HOME`` (checked here, in-process);
-* tests marked ``integration`` (or living in ``tests/integration/``) are skipped unless asked for, and when asked for
-  they get the real ``$HOME`` / ``PATH`` (no stub). Checked in a nested pytest run on a throwaway project that reuses
-  the root ``conftest.py``, so nothing here can start a real kiro.
-* the safety harness (``tests/testkit/kiro_sandbox.py``) deletes only the sandbox's own profiles and detects ~/.kiro changes.
-"""
-
 import json
 import os
 import shutil
 import subprocess
 import sys
-import time
 from pathlib import Path
 
 import pytest
-
+import testkit
 from testkit import kiro_sandbox
-from orgmcp import scheduler
+from testkit.e2e_world import kiro_agents_dir
 
-HERE = Path(__file__).parent
-
+HERE = testkit.TESTS
 INNER = '''
 import os, shutil
 from pathlib import Path
@@ -82,7 +71,7 @@ def test_unmarked_tests_run_against_the_stub():
     assert stub and Path(stub).parent.parent.name.startswith("kiro-home")
     assert "kiro-stub" in Path(stub).read_text() or "KIRO_STUB_LOG" in Path(stub).read_text()
     assert str(Path.home()).find("kiro-home") != -1
-    assert str(scheduler.KIRO_AGENTS_DIR).startswith(str(Path.home()))
+    assert str(kiro_agents_dir()).startswith(str(Path.home()))
 
 
 def test_marked_tests_are_skipped_by_default(nested):
@@ -107,8 +96,6 @@ def test_real_kiro_fixture_refuses_unmarked_tests(real_kiro):
 
 
 # ----------------------------------------------------------------- safety harness (no kiro involved)
-
-
 def write_profile(agents: Path, name: str, org_root: Path) -> Path:
     p = agents / f"{name}.json"
     p.parent.mkdir(parents=True, exist_ok=True)

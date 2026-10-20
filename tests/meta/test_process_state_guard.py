@@ -1,6 +1,3 @@
-"""The guard that makes a test which leaks process-global state (``Message.load``, the parse cache, the patch points of ``orgmcp.core``,
-the process resources) fail by itself, and put the state back, instead of breaking a later test of ``orgmcp.app``."""
-
 from __future__ import annotations
 
 import pytest

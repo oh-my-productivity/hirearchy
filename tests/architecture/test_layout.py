@@ -1,9 +1,8 @@
-"""The test layout: tests live in ``tests/`` and next to the code in ``src/orgmcp/**/tests/``; the wheel ships none of them."""
-
 import tomllib
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+import testkit
+
+ROOT = testkit.REPO
 PYPROJECT = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
 
 

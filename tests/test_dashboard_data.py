@@ -7,13 +7,12 @@ import time
 from datetime import timedelta
 
 import pytest
-from testkit.dash_fixtures import DEMO_NOW, big_org, demo_org, set_scheduler, snapshot_files, write_running_json
+from testkit.dash_fixtures import DEMO_NOW, big_org, demo_org, set_scheduler, write_running_json
 from testkit.obs_fixtures import T0, EventLog, stamp
 from testkit.scheduler import scheduler_is
 
 from orgmcp import dashboard_data as dd
 from orgmcp import observe
-from orgmcp.cli import main
 from orgmcp.core import ROOT, Org
 from orgmcp.progress import progress
 from orgmcp.scheduler import SchedulerState
@@ -33,8 +32,6 @@ def demo(tmp_path, sched_up):
 
 
 # ------------------------------------------------------------------------------------------ states
-
-
 def test_every_state_word_of_the_demo_org(demo):
     snap = demo.data.snapshot()
     got = {a: (r.kind, r.word) for a, r in snap.agents.items() if a != ROOT}
@@ -138,8 +135,6 @@ def test_an_unverified_scheduler_is_not_trusted(demo, monkeypatch):
 
 
 # ------------------------------------------------------------------------------------------ detail
-
-
 def test_overview_of_a_running_agent(demo):
     text = dd.doc_text(demo.data.agent_detail("ceo").overview)
     assert "state    ▶ running 1m12s" in text
@@ -233,8 +228,6 @@ def test_a_log_with_control_characters_is_cleaned():
 
 
 # ------------------------------------------------------------------------------------------ requests / services
-
-
 def test_requests_agree_with_progress(demo):
     reqs = demo.data.requests()
     lines = progress(demo.org, None, DEMO_NOW).splitlines()
@@ -288,8 +281,6 @@ def test_services_rows_and_detail(demo):
 
 
 # ------------------------------------------------------------------------------------------ health and check
-
-
 def test_health_view(demo):
     h = demo.data.health()
     assert "scheduler: running pid 7000" in h.now_text and "runs in flight 2/2" in h.now_text
@@ -305,8 +296,6 @@ def test_check_runs_on_demand_only(demo):
 
 
 # ------------------------------------------------------------------------------------------ robustness
-
-
 def test_an_org_with_no_agents_and_no_events(tmp_path, monkeypatch):
     set_scheduler(monkeypatch, SchedulerState("stopped"))
     org = Org.init(tmp_path / "empty", "m")
@@ -373,8 +362,6 @@ def test_retired_agents_are_counted(demo):
 
 
 # ------------------------------------------------------------------------------------------ events feed
-
-
 def test_the_feed_picks_up_new_events_and_filters(demo):
     data = demo.data
     data.snapshot()
@@ -425,29 +412,6 @@ def test_new_mail_is_seen_at_once_despite_the_cache(demo):
     assert data.snapshot().agents["ceo/writer"].unread == 2
 
 
-# ------------------------------------------------------------------------------------------ read-only
-
-
-def test_the_data_layer_and_once_write_nothing(demo, capsys):
-    before = snapshot_files(demo.org.root)
-    data = dd.DashData(demo.org.root, now=lambda: DEMO_NOW)
-    snap = data.snapshot()
-    for a in snap.order:
-        data.agent_detail(a, snap)
-    data.requests(snap)
-    data.services(snap)
-    data.service_detail("research", "market-brief")
-    data.health(snap)
-    data.run_check()
-    data.trace_text(demo.report_task.id)
-    data.request_line(demo.report_task.id)
-    dd.render_once(data)
-    main(["--root", str(demo.org.root), "dash", "--once"])
-    out = capsys.readouterr().out
-    assert "AGENTS" in out and "ceo" in out
-    assert snapshot_files(demo.org.root) == before
-
-
 def test_once_output_sample(demo):
     text = dd.render_once(demo.data)
     lines = text.splitlines()
@@ -461,16 +425,7 @@ def test_once_output_sample(demo):
     assert "NEEDS YOU" in text and "SERVICES" in text and "research/market-brief" in text
 
 
-def test_dash_on_something_that_is_not_an_org(tmp_path, capsys):
-    with pytest.raises(SystemExit):
-        main(["--root", str(tmp_path), "dash", "--once"])
-    assert "not an organization" in capsys.readouterr().err
-    assert not (tmp_path / ".runtime").exists()
-
-
 # ------------------------------------------------------------------------------------------ performance
-
-
 @pytest.mark.skipif(os.environ.get("ORGMCP_SKIP_PERF"), reason="perf measurement skipped")
 def test_a_refresh_tick_of_50_agents_and_2000_messages(tmp_path, monkeypatch, capsys):
     scheduler_is(monkeypatch, SchedulerState("running", 7000, "x"))
@@ -514,8 +469,6 @@ def test_a_refresh_tick_of_50_agents_and_2000_messages(tmp_path, monkeypatch, ca
 
 
 # ------------------------------------------------------------------------------------------ one state per agent
-
-
 def test_an_agent_is_in_exactly_one_state_for_every_combination():
     """``classify`` over every combination of its inputs: one state; the words never contradict each other."""
     import itertools

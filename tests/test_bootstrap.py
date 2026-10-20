@@ -5,13 +5,11 @@ import json
 import os
 import subprocess
 import sys
-from pathlib import Path
 
 import pytest
 
-from orgmcp.cli import main
 from orgmcp.core import ROOT, Org, OrgError
-from orgmcp.scheduler import _looks_like_scheduler_of, ensure_kiro_profile
+from orgmcp.scheduler import ensure_kiro_profile
 from orgmcp.server import OrgBinding, build_server, resolve_binding
 
 ROOT_TOOLS = {
@@ -260,35 +258,6 @@ def test_mcp_process_starts_without_an_org_and_creates_one(tmp_path):
     assert not after.isError and "root (human)" in after.content[0].text
 
 
-def test_command_line_verification():
-    root = Path("/orgs/one")
-    ok = [
-        "/v/bin/python /v/bin/orgmcp --root /orgs/one run",
-        "/v/bin/orgmcp --root /orgs/one run --max-runs 3",
-        "/usr/bin/python3 -m orgmcp run --until-idle",  # started from inside the org (no --root)
-        "python3 /x/serve.py run /orgs/one",
-    ]
-    bad = [
-        "sleep 60", "vim /orgs/one/ORG.md", "/v/bin/orgmcp mcp", "/v/bin/orgmcp --root /orgs/two run",
-        "/v/bin/orgmcp --root org run", "python -m http.server run", "",
-    ]
-    assert all(_looks_like_scheduler_of(c, root) for c in ok)
-    assert not any(_looks_like_scheduler_of(c, root) for c in bad)
-
-
-def test_command_line_verification_follows_symlinks_and_rejects_other_dirs(tmp_path):
-    real = tmp_path / "real" / "org"
-    real.mkdir(parents=True)
-    link = tmp_path / "link"
-    link.symlink_to(tmp_path / "real")  # like /tmp -> /private/tmp: the command line has one spelling, the org another
-    other = tmp_path / "other"
-    other.mkdir()
-    assert _looks_like_scheduler_of(f"/v/bin/orgmcp --root {link}/org run --until-idle", real)
-    assert _looks_like_scheduler_of(f"/v/bin/orgmcp --root={link}/org run", real)
-    assert not _looks_like_scheduler_of(f"/v/bin/orgmcp --root {other} run", real)
-    assert not _looks_like_scheduler_of(f"/v/bin/orgmcp --root {link}/org mcp", real)
-
-
 # --------------------------------------------------------------- fail closed
 def run_mcp(env_extra: dict, drop=()) -> subprocess.CompletedProcess:
     env = {**os.environ, **env_extra}
@@ -338,48 +307,3 @@ def test_old_style_server_process_still_starts(org):
 def test_agent_process_without_org_fails_fast(tmp_path):
     done = run_mcp({"ORG_ROOT": str(tmp_path / "nope"), "ORG_AGENT": "ceo"})
     assert done.returncode == 1 and "not an organization" in done.stderr
-
-
-# ------------------------------------------------------------------ CLI
-def org_lines(capsys) -> list[str]:
-    return [line for line in capsys.readouterr().err.splitlines() if line.startswith("org: ")]
-
-
-def test_mutating_cli_commands_print_the_org_first(org, tmp_path, capsys):
-    root = str(org.root)
-    target = tmp_path / "newly"
-    main(["init", str(target), "--mission", "m"])
-    assert org_lines(capsys) == [f"org: {target.resolve()}"]
-
-    for argv in (
-        ["hire", "ceo", "dev", "--role", "Dev", "--charter", "Code."],
-        ["task", "ceo", "--title", "T", "--goal", "g", "--acceptance", "a"],
-        ["send", "ceo", "hello"],
-        ["resume", "ceo"],
-        ["review"],
-        ["run", "--once"],
-        ["inbox"],
-    ):
-        main(["--root", root, *argv])
-        assert org_lines(capsys) == [f"org: {org.root}"], argv
-
-
-def test_read_only_cli_commands_stay_quiet(org, capsys):
-    for argv in (["status"], ["health"], ["review", "--dry-run"], ["inbox", "--keep"]):
-        main(["--root", str(org.root), *argv])
-        assert org_lines(capsys) == [], argv
-
-
-def test_org_line_uses_the_discovered_org_and_comes_before_errors(org, monkeypatch, capsys, tmp_path):
-    monkeypatch.chdir(org.root)  # cwd discovery is unchanged
-    main(["send", "ceo", "hi"])
-    assert org_lines(capsys) == [f"org: {org.root}"]
-    with pytest.raises(SystemExit):
-        main(["--root", str(tmp_path / "nowhere"), "send", "ceo", "hi"])
-    err = capsys.readouterr().err
-    assert err.index("org: ") < err.index("error: ")
-
-
-def test_module_entry_point_matches_the_script():
-    done = subprocess.run([sys.executable, "-m", "orgmcp", "--help"], capture_output=True, text=True, timeout=60)
-    assert done.returncode == 0 and "usage: orgmcp" in done.stdout

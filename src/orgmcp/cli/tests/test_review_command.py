@@ -1,9 +1,12 @@
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
+
 import time
 
 import pytest
+from testkit.cli_world import main
+from testkit.legacy.orgmcp.core import ROOT, join_frontmatter, split_frontmatter
 
-from orgmcp.cli import main
-from orgmcp.core import ROOT, join_frontmatter, split_frontmatter
 
 ENG = "ceo/eng"
 
@@ -43,10 +46,10 @@ def settled():
     yield
     for sched in SCHEDULERS:
         for _ in range(500):
-            if not sched.runs:
+            if not sched.state.runs:
                 break
             time.sleep(0.02)
-            sched._reap()
+            sched.reap()
     SCHEDULERS.clear()
 
 

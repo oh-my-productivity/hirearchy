@@ -5,14 +5,11 @@ Event files are written by hand (tests/testkit/obs_fixtures.py) exactly per the 
 
 import asyncio
 import dataclasses
-import json
 
 import pytest
-from testkit.obs_fixtures import EventLog, Story, freeze, run_ids, stamp, stamp_trace
+from testkit.obs_fixtures import Story, freeze, stamp
 
-from orgmcp import observe
-from orgmcp.cli import main
-from orgmcp.core import ROOT, Message, Org
+from orgmcp.core import ROOT, Org
 from orgmcp.kernel.testing import FakeClock
 from orgmcp.server import build_server
 
@@ -38,72 +35,6 @@ def clock(monkeypatch):
 @pytest.fixture
 def story(org, clock):
     return Story(org, clock)
-
-
-def test_cli_views_and_json(org, story, capsys, monkeypatch):
-    root = str(org.root)
-    monkeypatch.setattr("orgmcp.core.utcnow", lambda: NOW)  # the command line opens its own Org: the clock of its runtime is the patch point
-    main(["--root", root, "obs", "trace", story.task.id])
-    assert "totals: wall" in capsys.readouterr().out
-    main(["--root", root, "obs", "trace", story.task.id, "--json"])
-    data = json.loads(capsys.readouterr().out)
-    assert data["totals"]["runs"] == 3 and data["task"] == story.task.id
-    main(["--root", root, "obs", "metrics", "--since", "2026-10-18T00:00:00Z", "--by", "agent", "--json"])
-    out = json.loads(capsys.readouterr().out)
-    assert out["runs"]["total"] == 3 and out["by"]["dimension"] == "agent"
-    main(["--root", root, "obs", "events", "--since", "2026-10-18T00:00:00Z", "--errors", "--json"])
-    lines = capsys.readouterr().out.strip().splitlines()
-    assert len(lines) == 1 and json.loads(lines[0])["tool"] == "delegate"
-    main(["--root", root, "obs", "events", "--since", "2026-10-18T00:00:00Z", "--kind", "run.end", "--limit", "2"])
-    assert "2 of 3 matching event(s)" in capsys.readouterr().out
-    main(["--root", root, "obs", "now"])
-    assert "scheduler:" in capsys.readouterr().out
-    main(["--root", root, "obs", "now", "--json"])
-    assert json.loads(capsys.readouterr().out)["scheduler"]["state"] == "stopped"
-    main(["--root", root, "check", "--json"])
-    assert json.loads(capsys.readouterr().out)["ok"] is True
-
-
-def test_cli_check_exits_1_on_a_failure(org, capsys):
-    (org.root / ".runtime" / "scheduler.pid").write_text("999999")
-    with pytest.raises(SystemExit) as exc:
-        main(["--root", str(org.root), "check"])
-    assert exc.value.code == 1 and "FAIL" in capsys.readouterr().out
-
-
-def test_cli_errors_are_plain_messages(org, capsys):
-    with pytest.raises(SystemExit):
-        main(["--root", str(org.root), "obs", "trace", "nope"])
-    assert "error: no message nope" in capsys.readouterr().err
-
-
-def test_cli_watch_and_follow_exit_cleanly_on_ctrl_c(org, story, capsys, monkeypatch):
-    def interrupt(_):
-        raise KeyboardInterrupt
-
-    monkeypatch.setattr("orgmcp.cli_obs.time.sleep", interrupt)
-    main(["--root", str(org.root), "obs", "now", "--watch", "5"])
-    assert "scheduler:" in capsys.readouterr().out
-    main(["--root", str(org.root), "obs", "events", "--since", "2026-10-18T00:00:00Z", "--limit", "1", "--follow"])
-    assert "matching event" in capsys.readouterr().out
-
-
-def test_cli_follow_prints_new_events(org, clock, capsys, monkeypatch):
-    log = EventLog(org)
-    log.tool(stamp(1), "ceo", "read")
-    calls = []
-
-    def sleeper(_):
-        if not calls:
-            calls.append(1)
-            log.tool(stamp(2), "ceo", "write")
-        else:
-            raise KeyboardInterrupt
-
-    monkeypatch.setattr("orgmcp.cli_obs.time.sleep", sleeper)
-    main(["--root", str(org.root), "obs", "events", "--since", "2026-10-01T00:00:00Z", "--follow"])
-    out = capsys.readouterr().out
-    assert "tool.call read" in out and "tool.call write" in out
 
 
 def call(server, tool, **args):
@@ -146,19 +77,3 @@ def test_observe_tool_docstring_is_short_and_says_read_only():
     assert doc.startswith("Read-only") and len(doc) < 900
     for view in ("now", "trace", "metrics", "events", "check"):
         assert view in doc
-
-
-def test_stamp_trace_helper_roundtrips_through_the_loader(org, clock):
-    task = org.delegate(ROOT, "ceo", "T", "g", "a", budget=2)
-    stamp_trace(org, task.id, task.id)
-    loaded = Message.load(next((org.dir("ceo") / "inbox").glob("*.md")))
-    assert loaded.id == task.id  # the core loader ignores the unknown key
-    assert observe.build_messages(observe.scan_messages(org))[task.id].trace == task.id
-
-
-def test_run_ids_helper(org, clock):
-    clock.at(0)
-    org.delegate(ROOT, "ceo", "T", "g", "a", budget=2)
-    org.begin_run("ceo")
-    p = org.start_run_log("ceo")
-    assert run_ids(org, "ceo") == [f"ceo@{p.stem}"]

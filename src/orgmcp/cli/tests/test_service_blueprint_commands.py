@@ -1,14 +1,14 @@
-"""Blueprint `services:`: validation, the plan the user sees, apply (contract + generated playbook + first request)."""
-
-from pathlib import Path
+# mypy: ignore-errors
+# A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
 import pytest
-import yaml
+import testkit
+import testkit.legacy.yaml as yaml
+from testkit.cli_world import main
+from testkit.legacy.orgmcp.core import Org
 
-from orgmcp.cli import main
-from orgmcp.core import Org
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = testkit.REPO
 RESEARCH = ROOT_DIR / "examples" / "blueprint-research.yaml"
 CRITERIA = [
     "At most 600 words as counted by read.",
