@@ -8,6 +8,7 @@ from pathlib import Path
 from ..kernel import BOXES, RUNTIME, AtomicWriter, Message, OrgLayout, visible
 from ._reads import DerivedMailboxReads
 from ._rules import RECEIVED_BOXES, is_message_name, is_plain_id
+from ._wakes import wakes
 from .api import MailboxWriter, MailFingerprint, MessageParser
 
 
@@ -50,10 +51,7 @@ class FsMailbox(DerivedMailboxReads, MailboxWriter, MailFingerprint):
         return sum(1 for p in visible(d.glob("*.md")) if self._wakes(p)) if d.is_dir() else 0
 
     def _wakes(self, path: Path) -> bool:
-        try:
-            return self._parser.parse(path).wake
-        except Exception:  # noqa: BLE001 - an unreadable file still counts as mail: a run should look at it
-            return True
+        return wakes(self._parser, path)
 
     def has_inflight(self, addr: str) -> bool:
         d = self._layout.box(addr, "inflight")

@@ -22,4 +22,4 @@ class TelemetryMixin:
 
     def emit(self, kind: str, **fields: Any) -> None:  # Any: the envelope fields (actor, run, trace, proc) and the free ones, as before
         """Append an event to the org's event log (see :mod:`orgmcp.telemetry`). Never raises."""
-        self.runtime.events.emit(kind, **fields)
+        return self.runtime.events.emit(kind, **fields)

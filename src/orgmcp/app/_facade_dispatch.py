@@ -2,17 +2,13 @@
 
 The bodies call the ports of ``self.runtime`` (step B-dispatch; ARCHITECTURE.md 5.3 and 6.4). ``send``, ``delegate`` and ``report`` are the ports
 ``message_sender``, ``task_assigner`` and ``task_reporter``. ``can_message``, ``_next_hops``, ``_normalize_artifact`` and ``_check_lessons`` are the
-legacy spellings of collaborators that are private to the package (nothing calls them any more; the signature guard keeps them): the facade, which
-belongs to the composition root, makes the stateless helper over the ports of the runtime when asked. ``LESSONS_MAX_CHARS`` is re-exported under its
-old name for ``orgmcp.core``."""
+legacy spellings of the rules the commands are made of (nothing calls them any more; the signature guard keeps them): the ports ``route_policy``,
+``hop_counter`` and ``artifact_normalizer``, and the function ``check_lessons`` (static, as it always was). ``LESSONS_MAX_CHARS`` is re-exported under
+its old name for ``orgmcp.core``."""
 
 from __future__ import annotations
 
-from ..dispatch import LESSONS_MAX_CHARS
-from ..dispatch._artifacts import ArtifactAnnotator
-from ..dispatch._hops import InflightHopCounter
-from ..dispatch._lessons import LessonsPolicy
-from ..dispatch._routes import ParentSiblingRoutePolicy
+from ..dispatch import LESSONS_MAX_CHARS, check_lessons
 from ..kernel import Message
 from .runtime import OrgRuntime
 
@@ -25,10 +21,10 @@ class DispatchMixin:
     runtime: OrgRuntime
 
     def can_message(self, sender: str, to: str, reply_to: str | None = None) -> bool:
-        return ParentSiblingRoutePolicy(self.runtime.mailbox).can_message(sender, to, reply_to)
+        return self.runtime.route_policy.can_message(sender, to, reply_to)
 
     def _next_hops(self, actor: str) -> int:
-        return InflightHopCounter(self.runtime.mailbox).next_hops(actor)
+        return self.runtime.hop_counter.next_hops(actor)
 
     def send(
         self,
@@ -75,7 +71,7 @@ class DispatchMixin:
         Inside the organization (paths relative to the org root, or absolute) or, as an absolute path, inside the
         reporter's own workspace. Anything else is refused before existence is checked: no probing of the host.
         """
-        return ArtifactAnnotator(self.runtime.paths, self.runtime.access_scopes).normalize(actor, path, since)
+        return self.runtime.artifact_normalizer.normalize(actor, path, since)
 
     def report(
         self,
@@ -92,5 +88,5 @@ class DispatchMixin:
     def _check_lessons(task: Message, status: str, lessons: str | None) -> str:
         """The lessons text for a report: required on a service request (done, failed or blocked), 1..800 characters.
 
-        Static, as it always was: the policy needs no collaborator, so the legacy spelling builds it."""
-        return LessonsPolicy().check(task, status, lessons)
+        Static, as it always was: the rule needs no collaborator."""
+        return check_lessons(task, status, lessons)

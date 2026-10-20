@@ -10,7 +10,7 @@ __all__ = ["OrgLocator"]
 
 @runtime_checkable
 class OrgLocator(Protocol):
-    def find_root(self, start: Path | None = None) -> Path:
-        """``$ORG_ROOT``, else the nearest directory with ORG.md at or above ``start`` (default: the working directory),
-        else ``start/org``; ``OrgError`` when there is none."""
+    def find_root(self, start: str | Path | None = None) -> Path:
+        """``$ORG_ROOT``, else the nearest directory with ORG.md at or above ``start`` (a path or a string; default, also for an empty
+        one: the working directory), else ``start/org``; ``OrgError`` when there is none."""
         ...

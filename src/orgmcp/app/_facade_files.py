@@ -2,27 +2,18 @@
 
 The bodies call the ports of ``self.runtime`` (step B-orgfiles; ARCHITECTURE.md 5.3 and 6.4). The helpers that ``core.Org`` used to
 define in this module (``_short``, ``charter_change_note``, ``_fold``, ``_case_twin``, ``_FOLDED_RUNTIME_NAMES``, ``_EXACT_FILES``) are the
-``orgfiles`` package's, re-exported under their old names for ``orgmcp.core``."""
+``orgfiles`` package's, re-exported under their old names for ``orgmcp.core`` (``_case_twin`` is ``case_twin_in``)."""
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 from ..orgfiles._charter_merge import _short, charter_change_note
-from ..orgfiles._guard import _EXACT_FILES, _FOLDED_RUNTIME_NAMES, _fold, case_twin
+from ..orgfiles._guard import _EXACT_FILES, _FOLDED_RUNTIME_NAMES, _fold
+from ..orgfiles._guard import case_twin_in as _case_twin
 from .runtime import OrgRuntime
 
 __all__ = ["FilesMixin", "_EXACT_FILES", "_FOLDED_RUNTIME_NAMES", "_case_twin", "_fold", "_short", "charter_change_note"]
-
-
-def _case_twin(parent: Path, name: str) -> str | None:
-    """The existing entry of ``parent`` that equals ``name`` except for case, if there is one (the old name of ``case_twin``)."""
-    try:
-        names = os.listdir(parent)
-    except OSError:
-        return None
-    return case_twin(names, name)
 
 
 class FilesMixin:

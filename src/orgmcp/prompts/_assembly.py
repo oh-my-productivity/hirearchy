@@ -20,7 +20,7 @@ from ._batch import BatchRenderer
 from ._briefing import CappedMemory, PromptBriefing
 from ._files import FilesGuide
 from ._notices import RuntimeNotices
-from ._ports import ServiceNames
+from ._ports import AgentLines, ContextRenderer, FilesLines, ServiceNames, TaskQuoter, UpstreamTasks
 from ._quote import LiteralQuoter
 from ._run import TextRunPromptBuilder
 from ._state import TextStateSummarizer
@@ -28,6 +28,26 @@ from ._tasks import HeldTasks, OutstandingDelegations
 from ._upstream import SoleUpstreamTask
 from ._whoami import TextWhoami
 from .api import RunPromptBuilder, StateSummarizer, Whoami
+
+
+def task_quoter(layout: OrgLayout) -> TaskQuoter:
+    return LiteralQuoter(layout)
+
+
+def agent_lines(charters: CharterReader, states: AgentStates, budgets: BudgetQuery, tasks: TaskQuery, mail: MailboxReader) -> AgentLines:
+    return StatusAgentLine(charters, states, budgets, tasks, mail)
+
+
+def files_lines(scopes: AccessScopes, naming: ToolNaming, layout: OrgLayout) -> FilesLines:
+    return FilesGuide(scopes, naming, layout)
+
+
+def upstream_tasks(mail: MailboxReader) -> UpstreamTasks:
+    return SoleUpstreamTask(mail)
+
+
+def context_renderer(mail: MailboxReader, quoter: TaskQuoter, upstream: UpstreamTasks) -> ContextRenderer:
+    return BatchRenderer(mail, quoter, upstream)
 
 
 def state_summarizer(

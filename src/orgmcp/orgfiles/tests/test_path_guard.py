@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from orgmcp.kernel import RUNTIME_NAMES
 from orgmcp.orgfiles import _guard
-from orgmcp.orgfiles._guard import case_twin
+from orgmcp.orgfiles._guard import case_twin, case_twin_in
 
 
 @pytest.mark.parametrize(
@@ -59,3 +61,14 @@ def test_names_that_fold_to_the_same_key_are_twins_whatever_the_difference() -> 
     assert case_twin(["ｉｎｂｏｘ"], "inbox") == "ｉｎｂｏｘ"
     assert case_twin(["a.md."], "A.MD") == "a.md."
 
+
+
+def test_the_case_twin_in_a_directory_is_found_by_listing_it(tmp_path: Path) -> None:
+    (tmp_path / "Plan.md").write_text("x", encoding="utf-8")
+    assert case_twin_in(tmp_path, "plan.md") == "Plan.md" and case_twin_in(tmp_path, "Plan.md") is None
+    assert case_twin_in(tmp_path, "other.md") is None
+
+
+def test_a_directory_that_cannot_be_listed_has_no_case_twin(tmp_path: Path) -> None:
+    (tmp_path / "file").write_text("x", encoding="utf-8")
+    assert case_twin_in(tmp_path / "missing", "x") is None and case_twin_in(tmp_path / "file", "x") is None

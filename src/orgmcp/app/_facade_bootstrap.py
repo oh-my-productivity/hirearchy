@@ -1,13 +1,14 @@
 """Creating a new organization (bootstrap).
 
-``init`` delegates to ``OrgInitializer`` (ARCHITECTURE.md 5.3 and 6.4)."""
+``init`` delegates to ``OrgInitializer``, through ``wire_bootstrap.initialize_org`` (the organization has no runtime before its ORG.md exists;
+ARCHITECTURE.md 5.3 and 6.4)."""
 
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Protocol, TypeVar
 
-from .wiring import open_runtime
+from .wire_bootstrap import initialize_org
 
 
 class _Organization(Protocol):
@@ -22,6 +23,4 @@ class BootstrapMixin:
 
     @classmethod
     def init(cls: type[Created], root: str | Path, mission: str | None = None, config: dict[str, object] | None = None) -> Created:
-        root = Path(root).expanduser().resolve()
-        open_runtime(root).org_initializer.init(root, mission, config)  # the ports of the new organization: the org is built once its ORG.md exists
-        return cls(root)
+        return cls(initialize_org(root, mission, config))

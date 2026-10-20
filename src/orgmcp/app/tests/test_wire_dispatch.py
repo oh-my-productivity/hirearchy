@@ -12,7 +12,10 @@ from orgmcp.app import Org, wiring
 from orgmcp.budget import AllocationPolicy
 from orgmcp.delivery import MessageDelivery
 from orgmcp.delivery.testing import RecordingDelivery
-from orgmcp.dispatch import MessageSender, ReworkContext, TaskAssigner, TaskReporter
+from orgmcp.dispatch import ArtifactNormalizer, HopCounter, MessageSender, ReworkContext, RoutePolicy, TaskAssigner, TaskReporter
+from orgmcp.dispatch._artifacts import ArtifactAnnotator
+from orgmcp.dispatch._hops import InflightHopCounter
+from orgmcp.dispatch._routes import ParentSiblingRoutePolicy
 from orgmcp.dispatch._assigner import RuleTaskAssigner
 from orgmcp.dispatch._reporter import RuleTaskReporter
 from orgmcp.dispatch._sender import RuleMessageSender
@@ -122,3 +125,35 @@ def test_over_a_real_organization_a_service_request_gives_its_service_fields(tmp
     context = wiring.open_runtime(org.root).rework_context
     assert dict(context.fields_for("root", request.id)) == {"service": "weekly-brief", "contract": 1, "playbook": 1}
     assert dict(context.fields_for("root", plain.id)) == {} and dict(context.fields_for("root", "nope")) == {}
+
+
+def test_the_runtime_hands_out_the_rules_the_commands_are_made_of(tmp_path: Path) -> None:
+    runtime = wiring.open_runtime(tmp_path)
+    assert isinstance(runtime.route_policy, ParentSiblingRoutePolicy) and isinstance(runtime.route_policy, RoutePolicy)
+    assert isinstance(runtime.hop_counter, InflightHopCounter) and isinstance(runtime.hop_counter, HopCounter)
+    assert isinstance(runtime.artifact_normalizer, ArtifactAnnotator) and isinstance(runtime.artifact_normalizer, ArtifactNormalizer)
+
+
+def test_the_sender_uses_the_route_policy_and_the_hop_counter_of_the_runtime(tmp_path: Path) -> None:
+    class Never(RoutePolicy):
+        def can_message(self, sender: str, to: str, reply_to: str | None = None) -> bool:
+            return False
+
+    class Hops(HopCounter):
+        def next_hops(self, actor: str) -> int:
+            return 99
+
+    box = MemoryMailbox()
+    box.agents.put("ceo/AGENT.md", CHARTER)
+    box.agents.put("ceo/eng/AGENT.md", "---\nrole: R\n---\nx\n")
+    clock = FakeClock()
+    common: dict[type, object] = {
+        MailboxReader: box, AgentDirectory: box.agents, OrgSettings: MemoryOrgSettings("---\nmax_hops: 5\n---\nrules\n"),
+        MessageDelivery: RecordingDelivery(clock, SequenceIdGenerator(clock)),
+    }
+    runtime = wiring.open_runtime(tmp_path, {**common, RoutePolicy: Never()})
+    with pytest.raises(OrgError, match="ceo cannot message ceo/eng"):
+        runtime.message_sender.send("ceo", "ceo/eng", "hello")
+    runtime = wiring.open_runtime(tmp_path, {**common, HopCounter: Hops()})
+    with pytest.raises(OrgError, match="hop"):
+        runtime.message_sender.send("ceo", "ceo/eng", "hello")

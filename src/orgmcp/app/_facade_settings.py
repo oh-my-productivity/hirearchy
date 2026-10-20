@@ -10,7 +10,7 @@ from pathlib import Path
 from ..settings import DEFAULT_CONFIG, DEFAULT_MODEL, config_default_model
 from ..settings import config_message_cap as _message_cap
 from .runtime import OrgRuntime
-from .wire_locator import os_locator
+from .wire_locator import find_org_root
 
 __all__ = ["DEFAULT_CONFIG", "DEFAULT_MODEL", "SettingsMixin", "_message_cap", "config_default_model"]
 
@@ -22,7 +22,7 @@ class SettingsMixin:
 
     @staticmethod
     def find_root(start: str | Path | None = None) -> Path:
-        return os_locator().find_root(Path(start) if start else None)
+        return find_org_root(start)
 
     @property
     def config(self) -> dict[str, object]:

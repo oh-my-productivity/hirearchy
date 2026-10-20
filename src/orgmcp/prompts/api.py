@@ -4,6 +4,9 @@ Everything here is DERIVED from the other features' ports at the moment of the c
 delegated, the budget and the state of the agent and of its reports, the tools and the paths it was granted, the messages of the run - and nothing
 is stored. The wording is part of the protocol the agents follow, so it does not change with the code that makes it: a prompt is byte for byte what
 it was.
+
+The parts the texts are made of that the facade hands out one by one (``Org._agent_line``, ``_quote``, ``_files_lines``, ``_render_in_context``,
+``_upstream``) are ports too: ``AgentLines``, ``TaskQuoter``, ``FilesLines``, ``ContextRenderer`` and ``UpstreamTasks``.
 """
 
 from __future__ import annotations
@@ -12,10 +15,16 @@ from collections.abc import Collection, Sequence
 from typing import Protocol, runtime_checkable
 
 from ..kernel import Message
+from ._ports import AgentLines, ContextRenderer, FilesLines, TaskQuoter, UpstreamTasks
 
 __all__ = [
+    "AgentLines",
+    "ContextRenderer",
+    "FilesLines",
     "RunPromptBuilder",
     "StateSummarizer",
+    "TaskQuoter",
+    "UpstreamTasks",
     "Whoami",
 ]
 

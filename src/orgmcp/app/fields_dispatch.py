@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..dispatch import MessageSender, ReworkContext, TaskAssigner, TaskReporter
+from ..dispatch import ArtifactNormalizer, HopCounter, MessageSender, ReworkContext, RoutePolicy, TaskAssigner, TaskReporter
 
 STEP: str | None = "B-dispatch"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
@@ -16,3 +16,6 @@ class Fields:
     task_assigner: TaskAssigner
     task_reporter: TaskReporter
     rework_context: ReworkContext
+    route_policy: RoutePolicy
+    hop_counter: HopCounter
+    artifact_normalizer: ArtifactNormalizer
