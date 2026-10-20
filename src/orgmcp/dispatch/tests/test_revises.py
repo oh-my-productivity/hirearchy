@@ -1,37 +1,24 @@
 # mypy: ignore-errors
 # A test moved from tests/ by tools/relocate_tests.py: untyped until it is converted. Delete the first line when this file is typed.
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import pytest
-from testkit.legacy.orgmcp import core
-from testkit.legacy.orgmcp.core import ROOT, Message, OrgError
+from testkit.legacy.orgmcp.app import wiring
+from testkit.legacy.orgmcp.core import ROOT, OrgError
+
+from orgmcp.kernel import Clock
+from orgmcp.kernel.testing import FakeClock
 
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 ENG = "ceo/eng"
 
 
-def at(seconds: float) -> datetime:
-    return T0 + timedelta(seconds=seconds)
-
-
-class Clock:
-    """Replaces core.utcnow so message ids, `created` stamps and hire times are deterministic."""
-
-    def __init__(self):
-        self.t = T0
-
-    def __call__(self):
-        return self.t
-
-    def at(self, seconds: float) -> None:
-        self.t = at(seconds)
-
-
 @pytest.fixture(autouse=True)
-def clock(monkeypatch):
-    c = Clock()
-    monkeypatch.setattr(core, "utcnow", c)
+def clock(org):
+    """The clock of the org: message ids, `created` stamps and hire times are deterministic."""
+    c = FakeClock(T0)
+    org.runtime = wiring.open_runtime(org.root, {Clock: c})
     return c
 
 
@@ -40,10 +27,10 @@ def test_revises_is_stored_and_rendered(org):
     first = org.delegate(ROOT, "ceo", "Plan", "g", "a")
     second = org.delegate(ROOT, "ceo", "Plan v2", "g", "a", revises=first.id)
     assert second.revises == first.id
-    loaded = Message.load(org.dir("ceo") / "inbox" / f"{second.id}.md")
+    loaded = org.runtime.message_parser.parse(org.dir("ceo") / "inbox" / f"{second.id}.md")
     assert loaded.revises == first.id
     assert f"revises: {first.id}" in loaded.render()
-    assert Message.load(org.dir("ceo") / "inbox" / f"{first.id}.md").revises is None
+    assert org.runtime.message_parser.parse(org.dir("ceo") / "inbox" / f"{first.id}.md").revises is None
 
 
 def test_revises_must_be_an_earlier_task_to_the_same_assignee(org):

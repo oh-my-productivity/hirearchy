@@ -5,44 +5,42 @@ import shutil
 import time
 
 import pytest
-from testkit.legacy.orgmcp import core
+from testkit.dispatch_loop import loop_over
+from testkit.legacy.orgmcp.app import wiring
 from testkit.legacy.orgmcp.core import ROOT, OrgError
-from testkit.legacy.orgmcp.scheduler import Scheduler, kiro_runner
+
+from orgmcp.kernel import AtomicWriter
+from orgmcp.kernel.testing import FailingAtomicWriter
 
 ENG = "ceo/eng"
 TRUE = shutil.which("true") or "/usr/bin/true"
 
 
-def test_qa4_oversized_message_does_not_wedge_the_agent(org, tmp_path, monkeypatch):
-    monkeypatch.setattr("orgmcp.scheduler.ensure_kiro_profile", lambda tools, org=None: "orgmcp")
+def test_qa4_oversized_message_does_not_wedge_the_agent(org, tmp_path):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     org.send(ROOT, "ceo", "x" * 3_000_000)  # a single long result/note is enough
-    sched = Scheduler(org, kiro_runner(TRUE), echo=lambda _: None)  # `true` stands in for kiro-cli
+    sched = loop_over(org, TRUE)  # `true` stands in for kiro-cli
     sched.acquire()
     try:
         for _ in range(4):
             sched.tick()
-            while sched.runs:
+            while sched.state.runs:
                 time.sleep(0.01)
-                sched._reap()
+                sched.reap()
     finally:
         sched.release()
     assert org.ledger("failures") == {} and not org.paused("ceo")
 
 
-def test_qa12_failed_send_does_not_mint_budget(org, monkeypatch):
+def test_qa12_failed_send_does_not_mint_budget(org):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
-    real = core.atomic_write
+    real = org.runtime
 
-    def flaky(path, text):
-        if "/sent/" in str(path):
-            raise OSError("disk full")
-        return real(path, text)
-
-    monkeypatch.setattr(core, "atomic_write", flaky)
+    flaky = FailingAtomicWriter(real.atomic_writer, lambda path: "/sent/" in str(path), OSError("disk full"))
+    org.runtime = wiring.open_runtime(org.root, {AtomicWriter: flaky})
     with pytest.raises(OSError):
         org.send("ceo", ENG, "grant", budget=4)
-    monkeypatch.setattr(core, "atomic_write", real)
+    org.runtime = real
     assert org.budget("ceo") + org.budget(ENG) <= 10
 
 
