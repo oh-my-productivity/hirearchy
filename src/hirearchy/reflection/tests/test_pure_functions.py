@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from hirearchy.kernel import Message
-from hirearchy.reflection import lessons_of, version_at
+from hirearchy.reflection import Case, case_spend, lessons_of, version_at
 
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
 TIMELINE = [(1, T), (2, T + timedelta(days=1)), (3, T + timedelta(days=2))]
@@ -65,3 +65,37 @@ def test_another_heading_is_not_the_section() -> None:
 
 def test_a_second_lessons_section_adds_to_the_first() -> None:
     assert lessons_of(result("## Lessons\na\n## Other\nb\n## Lessons\nc")) == "a\nc"
+
+
+# ------------------------------------------------------------------------------ case_spend
+
+
+def spent(state: str, runs: int, budget: int, returned: int) -> int:
+    """``case_spend`` of a case with these numbers (nothing else of a case matters to it)."""
+    task = Message(sender="root", to="ceo", type="task", body="b", title="t")
+    case = Case(
+        id="A", service="s", owner="ceo", tasks=[task], result=None, state=state, playbook=0, used=0, reworks=0, budget=budget, runs=runs,
+        lessons=[], verdicts=[], started=None, finished=None, returned=returned,
+    )
+    return case_spend(case)
+
+
+def test_case_spend_on_e3s_cases() -> None:
+    contract = 15  # the per-request budget of study E3
+    for runs, handed in ((12, 21), (15, 25), (14, 20)):
+        assert spent("done", runs, handed, 0) == runs and spent("done", runs, handed, 0) <= contract
+    assert spent("done", 16, 15, 0) == 16 > contract
+
+
+def test_case_spend_counts_runs_still_out_while_open() -> None:
+    assert spent("open", 7, 21, 8) == 13 and spent("blocked", 7, 21, 8) == 13
+    assert spent("done", 7, 21, 8) == 7 and spent("failed", 7, 21, 8) == 7
+
+
+def test_case_spend_never_counts_a_negative_rest() -> None:
+    assert spent("open", 9, 21, 15) == 9  # returned > budget - runs: nothing is still out
+    assert spent("open", 20, 15, 0) == 20  # more used than handed down
+
+
+def test_case_spend_of_a_case_with_nothing_handed_down_is_its_runs() -> None:
+    assert spent("open", 0, 0, 0) == 0 and spent("open", 2, 0, 0) == 2

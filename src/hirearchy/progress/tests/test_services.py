@@ -16,10 +16,10 @@ def test_progress_lines_of_a_rework_chain_show_the_case_total(svc):
     deliver(svc, "ceo", first, runs=3)
     svc.feedback(ROOT, first.id, "reject", "Too long.")
     time.sleep(0.002)
-    rework = svc.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=first.id, budget=6)
-    deliver(svc, "ceo", rework, runs=2)
+    rework = svc.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=first.id, budget=10)
+    deliver(svc, "ceo", rework, runs=8)  # 11 runs used in all: past the contract's 10
     text = progress(svc)
-    assert text.count("case total: 5 runs used of 16 handed down (contract: 10 per request)") == 2  # one per task line
+    assert text.count("case total: 11 runs used of 20 handed down (contract: 10 per request)") == 2  # one per task line
     assert "exceeds the per-request budget of 10: tell the user" in text
     assert ".." not in text.replace("...", "")  # the sentences join cleanly
     # the rework is delivered and not yet rated by the client; the first one has her verdict

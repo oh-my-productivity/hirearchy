@@ -295,6 +295,28 @@ def test_a_rework_without_a_source_is_not_counted_as_relayed(w: ReflectionWorld)
     assert (case.reworks, case.relayed_reworks) == (1, 0)
 
 
+# ------------------------------------------------------------------------------ the runs a case's results returned
+
+
+def test_a_case_counts_the_runs_its_results_returned(w: ReflectionWorld) -> None:
+    define(w)
+    first = ask(w, budget=5)
+    deliver(w, first, budget=3)
+    second = rework(w, first, budget=4)
+    deliver(w, second, budget=2)
+    rework(w, second, budget=4)  # a task without a result adds 0
+    (case,) = w.history.cases("ceo", SERVICE)
+    assert case.returned == 5 and case.budget == 13
+
+
+def test_a_case_clamps_each_results_returned_runs_to_its_tasks_budget(w: ReflectionWorld) -> None:
+    define(w)
+    task = ask(w, budget=4)
+    deliver(w, task, budget=9)
+    (case,) = w.history.cases("ceo", SERVICE)
+    assert case.returned == 4
+
+
 # ------------------------------------------------------------------------------ runs and the playbook
 
 

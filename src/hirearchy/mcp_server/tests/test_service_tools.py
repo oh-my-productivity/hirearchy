@@ -100,12 +100,12 @@ def test_root_request_rework_without_source_is_relayed(svc):
 # ----------------------------------------------------------------------------------------- 4. case totals
 def test_the_rework_reply_states_the_case_total_and_warns_when_it_exceeds_the_contract(svc):
     server = build_server(svc, ROOT)
-    first = request(svc, "ai")  # 10 runs handed down (the contract's)
+    first = request(svc, "ai")  # 10 runs handed down (the contract's); 4 used, 6 come back
     deliver(svc, "ceo", first, runs=4)
     plain = call(server, "request", service=WEEKDAY, inputs={"topic": "other"})
     assert "case total" not in plain  # not a rework: nothing to total
-    reply = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, budget=6)
-    assert "case total: 4 runs used of 16 handed down (contract: 10 per request)" in reply
+    reply = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, budget=8)  # 18 handed down, 6 came back: 12 can be spent
+    assert "case total: 4 runs used of 18 handed down (contract: 10 per request)" in reply
     assert "This case now exceeds the per-request budget of 10: tell the user." in reply
 
 

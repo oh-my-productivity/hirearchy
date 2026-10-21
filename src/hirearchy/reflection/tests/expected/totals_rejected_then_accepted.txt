@@ -1,2 +1,2 @@
-ask0: case total: 5 runs used of 16 handed down (contract: 10 per request). This case now exceeds the per-request budget of 10: tell the user.
-ask1: case total: 5 runs used of 16 handed down (contract: 10 per request). This case now exceeds the per-request budget of 10: tell the user.
+ask0: case total: 5 runs used of 16 handed down (contract: 10 per request)
+ask1: case total: 5 runs used of 16 handed down (contract: 10 per request)

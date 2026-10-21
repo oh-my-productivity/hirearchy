@@ -90,6 +90,7 @@ class DerivedCaseHistory(CaseHistory):
                 verdicts=verdicts, started=msg_time(tasks[0]),
                 finished=msg_time(res) if res is not None and final else None,
                 client_kind=kind, relayed_reworks=sum(t.source == "relayed" for t in tasks[1:]),
+                returned=sum(min(r.budget, t.budget) for t in tasks if (r := results.get(t.id)) is not None),
             ))
         return out
 

@@ -31,6 +31,7 @@ __all__ = [
     "Stats",
     "StatsReport",
     "Verdict",
+    "case_spend",
     "lessons_of",
     "regressions",
     "stats_by_version",
@@ -76,6 +77,7 @@ class Case:
     lesson_ids: list[str] = field(default_factory=list)  # id of the result each lesson came from (parallel to lessons)
     client_kind: str = "human"  # "human" when the owner's parent is root, else "agent"
     relayed_reworks: int = 0  # the tasks of the chain after the first that root stamped ``source: relayed``
+    returned: int = 0  # the runs the results of the chain carried back: each result counts at most its own task's budget
 
     @property
     def title(self) -> str:
@@ -116,6 +118,14 @@ class Assertion:
     verdict: Verdict
     about: tuple[str, ...]  # the criteria (C<k>) the client confirmed it is about, "the same as R<j>" resolved; an R<j> that is about nothing stays
     link: str  # "confirmed" (a human link naming ids) | "none" (a human link "none": no lasting rule) | "unconfirmed" (only a relayed link) | ""
+
+
+def case_spend(case: Case) -> int:
+    """The runs a case costs against its contract's per-request budget (pure): the runs its team used, plus, while it is not finished (open or
+    blocked), the runs handed down for it that were neither used nor returned (the team may still spend them). ``case_total`` warns on it;
+    Phase 0b's cost alarm reads the same number."""
+    still_out = 0 if case.state in ("done", "failed") else max(0, case.budget - case.runs - case.returned)
+    return case.runs + still_out
 
 
 def regressions(cases: Sequence[Case]) -> list[Assertion]:
@@ -279,8 +289,8 @@ class ServiceReports(Protocol):
     def case_total(self, task: Message) -> str:
         """The whole case in one sentence: runs used by the chain against the runs handed down, and the contract's budget.
 
-        ``case total: 19 runs used of 27 handed down (contract: 15 per request)``; when the chain was handed down more than the contract gives one
-        request, it adds that the case exceeds the budget and that the user must be told. Empty for a task that is not a service request."""
+        ``case total: 19 runs used of 27 handed down (contract: 15 per request)``; when the runs used, plus the runs still out on an open case
+        (``case_spend``), exceed the contract's budget, it adds that the case exceeds the budget and that the user must be told. Empty for a task that is not a service request."""
         ...
 
 

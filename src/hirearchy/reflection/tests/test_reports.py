@@ -76,3 +76,21 @@ def test_the_services_listing_marks_a_removed_criterion(svc):
     assert assertion_lines(svc.runtime.service_reports.services_text("root")) == [
         f'    R1 (case {first.id}, about C1, C2 (removed)): "Too long."'
     ]
+
+
+def test_case_total_warns_on_spend_not_on_runs_handed_down(svc):
+    from testkit.services_world import deliver, request
+
+    first = request(svc, "ai")  # the contract hands down 10
+    deliver(svc, "ceo", first, runs=3)
+    svc.feedback(ROOT_ADDR, first.id, "reject", "Too long.", source="human")
+    rework = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=first.id, budget=8)  # 18 handed down: more than the contract's 10
+    deliver(svc, "ceo", rework, runs=4)  # but 7 runs used
+    done = svc.runtime.service_reports.case_total(rework)
+    assert done == "case total: 7 runs used of 18 handed down (contract: 10 per request)"
+    over = request(svc, "other")
+    deliver(svc, "ceo", over, runs=11)  # more used than the contract allows
+    assert svc.runtime.service_reports.case_total(over) == (
+        "case total: 11 runs used of 10 handed down (contract: 10 per request). "
+        "This case now exceeds the per-request budget of 10: tell the user."
+    )

@@ -8,7 +8,7 @@ from ..agents import AgentDirectory
 from ..kernel import Message, clip_line
 from ..services import Contract, ServiceCatalog, criteria_of
 from ._ports import ServicePaths
-from .api import Assertion, CaseHistory, ServiceReports, regressions, summarize
+from .api import Assertion, CaseHistory, ServiceReports, case_spend, regressions, summarize
 
 CLIP_ASSERTION = 160  # characters of the client's words shown for an assertion in the listing
 
@@ -94,6 +94,6 @@ class TextServiceReports(ServiceReports):
         if c is None or contract is None:
             return ""
         text = f"case total: {c.runs} runs used of {c.budget} handed down (contract: {contract.budget} per request)"
-        if c.budget > contract.budget:
+        if case_spend(c) > contract.budget:
             text += f". This case now exceeds the per-request budget of {contract.budget}: tell the user."
         return text

@@ -55,12 +55,15 @@ def ask(w: ReflectionWorld, topic: str = "ai", **kw: Any) -> Message:
     return w.s.commands.request("root", SERVICE, {"topic": topic}, **kw)
 
 
-def deliver(w: ReflectionWorld, task: Message, status: str = "done", runs: int = 1, lessons: str = "") -> Message:
-    """The owner of ``task`` makes ``runs`` runs and answers it; ``lessons`` become the ``## Lessons`` section of the result."""
+def deliver(w: ReflectionWorld, task: Message, status: str = "done", runs: int = 1, lessons: str = "", budget: int = 0) -> Message:
+    """The owner of ``task`` makes ``runs`` runs and answers it; ``lessons`` become the ``## Lessons`` section of the result; ``budget`` is the
+    runs the result carries back to the client."""
     for _ in range(runs):
         w.use_run(task.to)
     body = "Delivered." + (f"\n\n## Lessons\n{lessons}" if lessons else "")
-    return w.s.d.post(Message(sender=task.to, to=task.sender, type="result", status=status, reply_to=task.id, body=body, title="Result"))
+    return w.s.d.post(Message(
+        sender=task.to, to=task.sender, type="result", status=status, reply_to=task.id, body=body, title="Result", budget=budget,
+    ))
 
 
 def rate(w: ReflectionWorld, task: Message, verdict: str, note: str = "", **kw: Any) -> Message:
