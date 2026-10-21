@@ -244,6 +244,7 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     added = "'before <weekday>' is that weekday's date"
     reply = call(w.root, "define_service", owner="lead", name=SERVICE, add_acceptance=[added])
     assert f"C7: {added}" in reply
+    assert "Not client-confirmed: C7" in reply and f'confirms="{n2}"' in reply  # the reply tells root which call records the user's yes
     note = next(m.body for m in w.org.received("lead") if "Acceptance criteria now:" in m.body)
     assert all(f"C{k}: " in note for k in range(1, 8))
     assert f"C7: {added} (not confirmed)" in note  # the lead sees that the client's yes to it is not recorded

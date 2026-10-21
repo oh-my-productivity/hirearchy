@@ -25,7 +25,7 @@ from ..kernel import ROOT, Message, OrgError, norm
 from ..kernel.testing import DictEnvironment
 from ..locator.testing import MemoryOrgLocator
 from ..orgfiles import OrgFileReader, OrgFileWriter
-from ..reflection import ServiceReports
+from ..reflection import ServiceReports, ServiceSteps
 from ..services import ServiceHints
 from ..mail.testing import memory_mailbox
 from ..telemetry import ProcessLabel
@@ -410,6 +410,28 @@ class ScriptedReports(ServiceReports):
 
     def case_total(self, task: Message) -> str:
         return self.totals.get(task.id, "")
+
+
+class ScriptedSteps(ServiceSteps):
+    """The next-step texts a test puts in; with ``raises`` set, both steps raise it (the reading of the cases or the mail failed)."""
+
+    def __init__(self, feedback: str = "", amendment: str = "", raises: BaseException | None = None) -> None:
+        self.feedback = feedback
+        self.amendment = amendment
+        self.raises = raises
+        self.asked: list[tuple[str, ...]] = []
+
+    def feedback_step(self, note: Message) -> str:
+        self.asked.append(("feedback", note.id))
+        if self.raises is not None:
+            raise self.raises
+        return self.feedback
+
+    def amendment_step(self, owner: str, service: str) -> str:
+        self.asked.append(("amendment", owner, service))
+        if self.raises is not None:
+            raise self.raises
+        return self.amendment
 
 
 class ScriptedHealth(HealthAnalyzer, HealthRenderer):

@@ -32,7 +32,8 @@ def test_root_feedback_docstring_names_the_users_own_words_verbatim(svc):
     assert "every verdict stays" in text
     assert 'source: "human" only when the verdict is the user\'s own judgement and note holds their words; "relayed" (the default)' in text
     assert 'criterion (reject only): what the rejection is about, as ids: "C<k>" (a contract criterion, see `services`)' in text
-    assert "confirms: when that yes comes after you recorded the rejection, call again with the same task_id, verdict \"reject\"" in text
+    assert 'confirms: the user\'s yes. After they answered yes to your one question naming the id, call again with the same task_id, verdict "reject"' in text
+    assert "on the rejection itself it is shown as not confirmed, whatever the source" in text and "only this link counts as the client's" in text
     assert "it records the link, not a new verdict" in text and "it never waives an acceptance criterion" in text
 
 
@@ -42,7 +43,11 @@ def test_root_feedback_reply_names_message_and_source(svc):
     deliver(svc, "ceo", first)
     reply = call(server, "feedback", task_id=first.id, verdict="reject", note="Too long.", source="human", criterion=["c1"])
     no = [m for m in svc.sent(ROOT) if m.feedback][-1]
-    assert reply == f"feedback reject recorded on {first.id} for ceo (message {no.id}, source human, about C1); it does not wake ceo"
+    assert reply.startswith(
+        f"feedback reject recorded on {first.id} for ceo (message {no.id}, source human, about C1 (not confirmed)); it does not wake ceo\n"
+        "The criterion on the rejection itself (C1) is recorded as not confirmed. This rejection is R1. Next, before define_service: "
+    )
+    assert f'task_id="{first.id}", verdict="reject", confirms="{no.id}"' in reply  # the step names the call that records the user's yes
     assert (no.source, no.criterion) == ("human", "C1")
     second = request(svc, "chips")
     deliver(svc, "ceo", second)

@@ -3,12 +3,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from ..agents import AgentDirectory, CharterReader
 from ..budget import BudgetQuery
-from ..kernel import ROOT, Message, Provider, parent
-from ..reflection import ServiceReports
+from ..kernel import ROOT, Message, OrgError, Provider, parent
+from ..reflection import ServiceReports, ServiceSteps
 from ..services import ServiceCatalog, ServiceCommands
 from ._ports import ServiceRoles, SetupMode, ToolGroup
 
@@ -38,14 +39,26 @@ class DirectoryServiceRoles(ServiceRoles):
         return not self._setup.active() and me != ROOT and bool(self._catalog().service_names(me))
 
 
+def _step(make: Callable[[], str]) -> str:
+    """The next step root is told after a write ("" when there is none). It is advice about something already recorded, so a record that cannot
+    be read (``OrgError``, ``OSError``) gives no step and never fails the call; any other error is a bug in the step and propagates."""
+    try:
+        text = make()
+    except (OrgError, OSError):
+        return ""
+    return f"\n{text}" if text else ""
+
+
 class ServiceTools(ToolGroup):
     def __init__(
         self, roles: ServiceRoles, reports: Provider[ServiceReports], commands: Provider[ServiceCommands], budgets: Provider[BudgetQuery],
+        steps: Provider[ServiceSteps],
     ) -> None:
         self._roles = roles
         self._reports = reports
         self._commands = commands
         self._budgets = budgets
+        self._steps = steps
 
     def register(self, mcp: FastMCP, me: str) -> None:
         manager, owner = self._roles.manager(me), self._roles.owner(me)
@@ -92,11 +105,14 @@ class ServiceTools(ToolGroup):
         all (not together with add/remove). The old contract is archived and the owner quietly told what changed; the
         reply lists the criteria now in force. An amendment that changes nothing is refused.
         """
-            return self._commands().define_service(
+            reply = self._commands().define_service(
                 me, owner, name, description=description, inputs=inputs, acceptance=acceptance,
                 deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,
                 add_acceptance=add_acceptance, remove_acceptance=remove_acceptance,
             )
+            if me == ROOT:  # only root answers to the user: what records their yes is for root alone
+                reply += _step(lambda: self._steps().amendment_step(owner, name))
+            return reply
 
         if me == ROOT:  # only root records where a rework comes from: the agents' tool has no `source`
             self._register_root_request(mcp, me)
@@ -128,19 +144,19 @@ class ServiceTools(ToolGroup):
         verdict is the user's own judgement and note holds their words; "relayed" (the default) for anything you concluded
         yourself: it is shown to the owner but weighs nothing when it revises its playbook. criterion (reject only): what
         the rejection is about, as ids: "C<k>" (a contract criterion, see `services`), "R<k>" (an earlier rejection it
-        repeats) or "none" (no lasting rule); with source "human" only when the user named it or said yes to your
-        question naming it. confirms: when that yes comes after you recorded the rejection, call again with the same
-        task_id, verdict "reject", confirms=<the rejection's message id>, criterion, and the user's answer verbatim as
-        note: it records the link, not a new verdict. Feedback is for reflection only: it never waives an acceptance
-        criterion or changes the outcome of the request.
+        repeats) or "none" (no lasting rule); on the rejection itself it is shown as not confirmed, whatever the source.
+        confirms: the user's yes. After they answered yes to your one question naming the id, call again with the same
+        task_id, verdict "reject", confirms=<the rejection's message id>, criterion, source "human" and their answer
+        verbatim as note: it records the link, not a new verdict, and only this link counts as the client's. Feedback is
+        for reflection only: it never waives an acceptance criterion or changes the outcome of the request.
         """
             msg = self._commands().feedback(me, task_id, verdict, note, source=source, criterion=criterion, confirms=confirms)
             if confirms is not None:
                 return (f"recorded: rejection {confirms} is about {msg.criterion} (source {msg.source}; message {msg.id}); "
                         f"it does not wake {msg.to}")
-            about = f", about {msg.criterion}" if msg.criterion else ""
+            about = f", about {msg.criterion} (not confirmed)" if msg.criterion else ""
             return (f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}, source {msg.source}{about}); "
-                    f"it does not wake {msg.to}")
+                    f"it does not wake {msg.to}" + _step(lambda: self._steps().feedback_step(msg)))
 
     def _register_agent_feedback(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()

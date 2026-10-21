@@ -1087,11 +1087,11 @@ Tell the owner of a service whether a delivered request was good: verdict "accep
         verdict is the user's own judgement and note holds their words; "relayed" (the default) for anything you concluded
         yourself: it is shown to the owner but weighs nothing when it revises its playbook. criterion (reject only): what
         the rejection is about, as ids: "C<k>" (a contract criterion, see `services`), "R<k>" (an earlier rejection it
-        repeats) or "none" (no lasting rule); with source "human" only when the user named it or said yes to your
-        question naming it. confirms: when that yes comes after you recorded the rejection, call again with the same
-        task_id, verdict "reject", confirms=<the rejection's message id>, criterion, and the user's answer verbatim as
-        note: it records the link, not a new verdict. Feedback is for reflection only: it never waives an acceptance
-        criterion or changes the outcome of the request.
+        repeats) or "none" (no lasting rule); on the rejection itself it is shown as not confirmed, whatever the source.
+        confirms: the user's yes. After they answered yes to your one question naming the id, call again with the same
+        task_id, verdict "reject", confirms=<the rejection's message id>, criterion, source "human" and their answer
+        verbatim as note: it records the link, not a new verdict, and only this link counts as the client's. Feedback is
+        for reflection only: it never waives an acceptance criterion or changes the outcome of the request.
         
 
 ### tool: observe

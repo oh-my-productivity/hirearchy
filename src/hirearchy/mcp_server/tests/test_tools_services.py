@@ -6,11 +6,13 @@ import asyncio
 from collections.abc import Sequence
 from pathlib import Path
 
+import pytest
+
 from hirearchy.agents.testing import MemoryAgents
 from hirearchy.kernel import ROOT, Message, OrgError
 from hirearchy.mcp_server._instructions import InstructionText
 from hirearchy.mcp_server._tools_services import DirectoryServiceRoles, ServiceTools
-from hirearchy.mcp_server.testing import HeldBudgets, MemoryBinding, ScriptedReports, agents_in
+from hirearchy.mcp_server.testing import HeldBudgets, MemoryBinding, ScriptedReports, ScriptedSteps, agents_in
 from hirearchy.services import Contract, Criterion, Playbook, ServiceCatalog, ServiceCommands
 
 from ._support import call, described, fails, names, serve
@@ -73,10 +75,13 @@ class Commands(ServiceCommands):
 
 
 def tools(agents: MemoryAgents | None = None, offered: dict[str, list[str]] | None = None, exists: bool = True,
-          reports: ScriptedReports | None = None) -> tuple[ServiceTools, Commands]:
+          reports: ScriptedReports | None = None, steps: ScriptedSteps | None = None) -> tuple[ServiceTools, Commands]:
     agents, commands = agents or agents_in("ceo", "ceo/eng", "ops"), Commands()
     roles = DirectoryServiceRoles(InstructionText(MemoryBinding(Path("/o"), exists=exists)), lambda: agents, lambda: agents, lambda: Catalog(offered or {}))
-    return ServiceTools(roles, lambda: reports or ScriptedReports("SERVICES", {"req-1": "case total: 3 of 9"}), lambda: commands, lambda: HeldBudgets({"ceo": 5})), commands
+    return ServiceTools(
+        roles, lambda: reports or ScriptedReports("SERVICES", {"req-1": "case total: 3 of 9"}), lambda: commands, lambda: HeldBudgets({"ceo": 5}),
+        lambda: steps or ScriptedSteps(),
+    ), commands
 
 
 CLIENT = ["services", "define_service", "request", "feedback"]
@@ -174,7 +179,7 @@ def test_a_missing_organization_is_the_refusal_of_a_client_tool() -> None:
         raise OrgError("no organization at /o yet: call create_org(mission=...) first")
 
     roles = DirectoryServiceRoles(InstructionText(MemoryBinding(Path("/o"))), gone, gone, gone)  # type: ignore[arg-type]
-    group = ServiceTools(roles, gone, gone, gone)  # type: ignore[arg-type]
+    group = ServiceTools(roles, gone, gone, gone, gone)  # type: ignore[arg-type]
     assert "call create_org" in fails(serve(group, ROOT), "services")
 
 
@@ -182,7 +187,7 @@ def test_root_feedback_passes_source_criterion_and_confirms_and_defaults_to_rela
     group, commands = tools()
     server = serve(group, ROOT)
     out = call(server, "feedback", task_id="t1", verdict="reject", note="No.", source="human", criterion=["C1", "R2"])
-    assert out == "feedback reject recorded on t1 for ceo (message fb-1, source human, about C1, R2); it does not wake ceo"
+    assert out == "feedback reject recorded on t1 for ceo (message fb-1, source human, about C1, R2 (not confirmed)); it does not wake ceo"
     assert commands.calls[-1] == ("feedback", ("root", "t1", "reject", "No."), {"source": "human", "criterion": ["C1", "R2"]})
     assert call(server, "feedback", task_id="t1", verdict="accept") == "feedback accept recorded on t1 for ceo (message fb-1, source relayed); it does not wake ceo"
     assert commands.calls[-1] == ("feedback", ("root", "t1", "accept", ""), {"source": "relayed"})
@@ -197,3 +202,64 @@ def test_the_agents_feedback_passes_nothing_but_the_verdict() -> None:
     call(server, "feedback", task_id="t1", verdict="reject", note="No.")
     assert commands.calls[-1] == ("feedback", ("ceo", "t1", "reject", "No."), {})
     assert params_of(server, "feedback") == {"task_id", "verdict", "note"}
+
+
+# ------------------------------------------------------------------------------ the next step, at the point of action (root only)
+
+FEEDBACK_STEP = "NEXT: ask the user one question naming R1."
+AMENDMENT_STEP = "Not client-confirmed: C3. NEXT: ask the user."
+
+
+def test_root_feedback_reply_marks_an_own_criterion_and_names_the_next_step() -> None:
+    steps = ScriptedSteps(feedback=FEEDBACK_STEP)
+    group, _ = tools(steps=steps)
+    out = call(serve(group, ROOT), "feedback", task_id="t1", verdict="reject", note="No.", source="human", criterion=["C1"])
+    assert out == f"feedback reject recorded on t1 for ceo (message fb-1, source human, about C1 (not confirmed)); it does not wake ceo\n{FEEDBACK_STEP}"
+    assert steps.asked == [("feedback", "fb-1")]
+
+
+def test_root_feedback_reply_without_a_step_or_a_criterion_is_the_bare_receipt() -> None:
+    group, _ = tools(steps=ScriptedSteps())
+    out = call(serve(group, ROOT), "feedback", task_id="t1", verdict="reject", note="No.", source="human")
+    assert out == "feedback reject recorded on t1 for ceo (message fb-1, source human); it does not wake ceo"
+
+
+def test_the_confirmation_receipt_carries_no_step() -> None:
+    steps = ScriptedSteps(feedback=FEEDBACK_STEP)
+    group, _ = tools(steps=steps)
+    out = call(serve(group, ROOT), "feedback", task_id="t1", verdict="reject", note="Yes.", source="human", criterion=["C1"], confirms="m-9")
+    assert out == "recorded: rejection m-9 is about C1 (source human; message fb-1); it does not wake ceo" and steps.asked == []
+
+
+def test_root_define_service_reply_carries_the_amendment_step() -> None:
+    steps = ScriptedSteps(amendment=AMENDMENT_STEP)
+    group, _ = tools(steps=steps)
+    out = call(serve(group, ROOT), "define_service", owner="ceo", name="brief", add_acceptance=["x"])
+    assert out == f"defined brief\n{AMENDMENT_STEP}" and steps.asked == [("amendment", "ceo", "brief")]
+    assert call(serve(tools(steps=ScriptedSteps())[0], ROOT), "define_service", owner="ceo", name="brief", add_acceptance=["x"]) == "defined brief"
+
+
+@pytest.mark.parametrize("error", [OrgError("the cases cannot be read"), OSError("disk")], ids=["OrgError", "OSError"])
+def test_a_failing_step_never_fails_the_call(error: BaseException) -> None:
+    group, commands = tools(steps=ScriptedSteps(feedback=FEEDBACK_STEP, amendment=AMENDMENT_STEP, raises=error))
+    server = serve(group, ROOT)
+    out = call(server, "feedback", task_id="t1", verdict="reject", note="No.", source="human", criterion=["C1"])
+    assert out == "feedback reject recorded on t1 for ceo (message fb-1, source human, about C1 (not confirmed)); it does not wake ceo"
+    assert call(server, "define_service", owner="ceo", name="brief", add_acceptance=["x"]) == "defined brief"
+    assert [c[0] for c in commands.calls] == ["feedback", "define_service"]  # both were recorded: the receipt is what happened
+
+
+def test_a_bug_in_a_step_is_not_hidden() -> None:
+    group, commands = tools(steps=ScriptedSteps(raises=ValueError("a bug in the step text")))
+    server = serve(group, ROOT)
+    assert "a bug in the step text" in fails(server, "feedback", task_id="t1", verdict="reject", note="No.", source="human", criterion=["C1"])
+    assert "a bug in the step text" in fails(server, "define_service", owner="ceo", name="brief", add_acceptance=["x"])
+
+
+def test_an_agent_clients_replies_carry_no_step() -> None:
+    steps = ScriptedSteps(feedback=FEEDBACK_STEP, amendment=AMENDMENT_STEP)
+    group, _ = tools(steps=steps)
+    server = serve(group, "ceo")
+    assert call(server, "feedback", task_id="t1", verdict="reject", note="No.") == "feedback reject recorded on t1 for ceo (message fb-1); it does not wake ceo"
+    assert call(server, "define_service", owner="ceo/eng", name="brief", add_acceptance=["x"]) == "defined brief"
+    assert steps.asked == []

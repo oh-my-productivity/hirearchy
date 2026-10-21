@@ -143,7 +143,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     from ..overview import OrgTree
     from ..progress import ProgressReporter
     from ..prompts import Whoami
-    from ..reflection import ServiceReports
+    from ..reflection import ServiceReports, ServiceSteps
     from ..services import ServiceCatalog, ServiceCommands, ServiceHints
     from ..telemetry._summarize import JsonArgumentSummarizer
     from ..traces import TraceLookup
@@ -174,7 +174,10 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         HiringTools(of(Hiring), of(Retirement)),
         FileTools(of(ToolNaming), of(OrgFileReader), of(OrgFileWriter), of(OrgLayout)),
         StatusTools(text, of(OrgTree), of(SchedulerStatus), directory, of(HealthAnalyzer), of(HealthRenderer)),
-        ServiceTools(DirectoryServiceRoles(text, directory, of(CharterReader), of(ServiceCatalog)), of(ServiceReports), of(ServiceCommands), of(BudgetQuery)),
+        ServiceTools(
+            DirectoryServiceRoles(text, directory, of(CharterReader), of(ServiceCatalog)), of(ServiceReports), of(ServiceCommands), of(BudgetQuery),
+            of(ServiceSteps),
+        ),
     ]
     root_only = [
         ObservabilityTools(of(ObservabilityText)),
