@@ -211,6 +211,13 @@ def judged(w: HealthWorld, kinds: list[str], *, source: str | None = "human") ->
         w.send("root", "ceo/eng", "note", 14 + 10 * i, reply_to=task, feedback=kind, source=source)
 
 
+def test_a_zero_minimum_does_not_divide_by_the_nothing_judged(w: HealthWorld) -> None:
+    w.configure(org_md(min_judged_for_quality=0, min_runs_for_waste=0))
+    h = w.analyzer.agent_health("ceo/eng", at(1000))  # no judged deliveries and no runs at all
+    assert (h.escapes, h.judged) == (0, 0) and "low_quality" not in h.flags and "wasteful" not in h.flags
+    assert [a.addr for a in w.analyzer.org_health("ceo", at(1000)).agents] == ["ceo", "ceo/eng"]
+
+
 def test_low_quality_needs_min_judged_for_quality(w: HealthWorld) -> None:
     judged(w, ["reject", "reject"])
     h = w.analyzer.agent_health("ceo/eng", at(1000))

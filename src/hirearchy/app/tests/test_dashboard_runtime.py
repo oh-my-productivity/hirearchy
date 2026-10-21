@@ -116,3 +116,9 @@ def test_the_health_of_the_agents_is_reported_without_the_message_it_cannot_read
     report = lenient(org).health_analyzer.org_health("root")
     assert [h.addr for h in report.agents] == ["ceo"] and report.agents[0].tasks_received >= 1
 
+
+
+def test_org_health_survives_a_zero_minimum_of_judged_deliveries(org: Org) -> None:
+    (org.root / "ORG.md").write_text("---\nmission: m\nhealth:\n  min_judged_for_quality: 0\n  min_runs_for_waste: 0\n---\nrules\n", encoding="utf-8")
+    report = org.runtime.health_analyzer.org_health("root")  # an agent with no judged delivery and no run
+    assert [h.addr for h in report.agents] == ["ceo"] and "low_quality" not in report.agents[0].flags

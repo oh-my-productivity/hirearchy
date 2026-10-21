@@ -87,7 +87,7 @@ class FileHealthAnalyzer(HealthAnalyzer):
             flags["out_of_budget"] = "no budget left but has unread mail or open tasks"
         if paused:
             flags["paused"] = f"paused: {paused}"
-        if escapes.judged >= cfg["min_judged_for_quality"] and escapes.escapes / escapes.judged > cfg["max_escape_ratio"]:
+        if escapes.judged and escapes.judged >= cfg["min_judged_for_quality"] and escapes.escapes / escapes.judged > cfg["max_escape_ratio"]:
             flags["low_quality"] = (
                 f"{escapes.escapes} of {escapes.judged} judged deliveries it signed off were rejected by the client after `done` (escapes); "
                 f"{escapes.rechecks} re-check(s) after a FAIL, costing {escapes.rework_runs} author rework run(s)"
