@@ -251,6 +251,33 @@ def test_manager_keeps_its_budget_reserve_and_does_not_skip_a_review():
         "not skipped")
 
 
+REGRESSION_BULLET = (
+    "- For a service request your prompt may show a `# Regression list` (the client's rejections, verbatim). Copy it verbatim into every review or "
+    "check task you delegate for that request: the verifier checks the deliverable against each line that is not marked \"no lasting rule\", as well "
+    "as against the criteria, and lists any line it cannot judge as `ambiguous`."
+)
+AMBIGUOUS_BULLET = (
+    "- Items a verifier lists as `ambiguous` (it cannot tell whether a criterion covers them) are the client's to decide, not yours: never settle one "
+    "by including or excluding it. Keep the deliverable as verified and put each item at the top of your report under `Questions for the client:` "
+    "(one line each: the item, the criterion id, the verifier's words), so they are asked before the delivery is accepted. Copy every `Questions for "
+    "the client:` item from your reports' results into your own report the same way; never answer one yourself."
+)
+
+
+def test_the_manager_copies_the_regression_list_into_review_tasks():
+    lines = bpm.get_role("manager").body.splitlines()
+    assert REGRESSION_BULLET in lines
+    coverage = next(i for i, line in enumerate(lines) if line.startswith("- Every `done` report pastes the verifier's final coverage line"))
+    assert lines[coverage + 1 : coverage + 3] == [REGRESSION_BULLET, AMBIGUOUS_BULLET]  # both bullets follow the coverage-line bullet
+
+
+def test_the_manager_puts_ambiguous_items_under_questions_for_the_client_and_forwards_reports_items():
+    assert AMBIGUOUS_BULLET in bpm.get_role("manager").body.splitlines()
+    has("manager", "under `Questions for the client:`", "never answer one yourself",
+        "copy every `questions for the client:` item from your reports' results into your own report the same way")
+    assert len(bpm.get_role("manager").body.splitlines()) <= 50
+
+
 # --------------------------------------------------------------------------------- author roles and tester
 def test_writer_values_relevance_over_length_and_cites_precisely():
     has("writer", "relevance over length", "never pad", "too thin", "cite precisely", "count words with `read`")
