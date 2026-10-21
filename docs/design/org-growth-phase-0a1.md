@@ -1,6 +1,7 @@
 # Org growth, Phase 0a.1: the fix batch before Phase 0b (technical design)
 
-Status: design, revision 2 (answers the design review of revision 1: section 20). Branch `feat/org-growth-phase-0a1` off `main` `d8e35f2`;
+Status: design, revision 2 (answers the design review of revision 1: section 20), amended after review pass 2 by the manager's binding decision
+(section 21, which wins over any earlier section it names). Branch `feat/org-growth-phase-0a1` off `main` `d8e35f2`;
 worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0a1`.
 Baseline (`.agents/tasks/baseline.md`): 13 749 passed, 4 skipped, 3 deselected, 1 xfailed; mypy strict clean; import-linter 49 + 1 contracts kept;
 `skills/hirearchy/SKILL.md` 125 lines.
@@ -966,3 +967,147 @@ models. In addition, specific to 0a.1:
 | DR-15 | LOW | Addressed: inline none words by first word, bullet-prefixed markers (5.1); both cases in `test_client_questions.py`. |
 | DR-16 | LOW | Addressed: "ten test files" (8.1); E4's skill wording (17); `test_11`'s docstring states why the 2 s gap is not replayed (3.6); `test_12`'s deliverables check is not counted as evidence (5.5). |
 | Unverified 7 | - | `cli/tests/_fakes.py:FakeReadings` is listed with the fakes (12, R8). |
+
+## 21. Amendments after review pass 2
+
+Sources: design review pass 2 (`.agents/tasks/design-review.md`, findings DR-17 to DR-27) and the manager's decision that closed the design
+loop (`.agents/tasks/manager-decision-design-loop.md`). Every finding is a mandatory amendment. Where a finding offered options, the
+manager's choice is given. An amendment replaces the text of the section it names. The commit ids (A1 ... F3) are those of the
+implementation plan (`.agents/tasks/plan.md`), which replaces the numbering of section 15 (its content per commit is kept; design commits 9
+and 13 are split, and C2 is new).
+
+### 21.1 DR-17 (MEDIUM): a relayed rework does not end the client-questions flag
+
+5.2's second condition becomes:
+
+```python
+# a rework the user asked for answers the questions; the assistant's own (relayed) rework does not
+not any(t.type == "task" and t.revises == task.id and t.source == "human" for t in mail.sent(ROOT))
+```
+
+The third condition (`not rated(case, task)`) is unchanged. 5.2's closing paragraph becomes: "A human rework of the task, or the client's
+verdict on the case, ends the flag; a relayed rework does not (its reply says so). A one-off keeps its flag until a human rework revises
+it, or while `progress` lists it."
+
+- Tests (commit E2, `progress/tests/test_lines.py`): `test_the_flag_ends_with_a_verdict_or_a_human_rework`,
+  `test_a_relayed_rework_keeps_the_flag`, `test_a_one_off_task_keeps_its_flag_until_a_human_rework_revises_it`.
+- `test_12` (commit E6): after `request(revises=A1)` without `source`, A1's line still has `1 question for the client: ask the user
+  before you copy or deliver`; after a second rework of A1 with `source="human"`, A1's line has no flag.
+- Section 17, clause 3, adds: count the flags that a relayed rework left standing, and whether they were asked before the copy.
+
+### 21.2 DR-18: sites outside the table, and the catch-all
+
+Rows added to the 3.6 table:
+
+| Site | Rule | Change | Commit |
+|---|---|---|---|
+| `SRC/reflection/tests/test_reports.py:13-20` | O | root's amended C3 reads `    C3: Never longer than one page (amendment, not confirmed)` | C1 |
+| `SRC/services/tests/test_contract_service_commands.py:229-241` (`test_the_owner_is_told_quietly_what_changed`) | O | C3's line under `Acceptance criteria now:` ends ` (not confirmed)` (the world's stub confirms nothing; the amendment is locked, so D2 adds no rule (c) line) | C4 |
+| `SRC/services/tests/test_amender.py:110`, `:118` and every direct `ContractAmender.diff(...)` call | signature | pass `confirmed` (`frozenset()` or the ids under test) | C4 |
+| `SRC/reflection/tests/test_prompt_sections.py:247-259` (step 3, exact) and `:460-464` (`HUMAN_LEAD`) | O | the step-3 clause and the preamble of 4.1 | D1 |
+
+The catch-all of 3.6 becomes: "the coder runs the suite after every commit and applies Rules H/O/C/F to anything else that fails; each
+such site is named in its commit message". It is applied before each commit, so every commit stays green: each commit that changes a
+derived tier, a gate or an agent-visible text of items 1 and 4 (C1, C3, C4, C6, C7, D1, D2, D3) runs the full pytest before it is made;
+every other commit runs its targeted set and a search of `src/` and `tests/` for each text fragment it changes; every work package ends
+with the full `scripts/check.sh` (plan, "Verification cadence").
+
+### 21.3 DR-19: `feedback_step` numbers the rejections service-wide
+
+3.4's placement adds: `found = regressions(self._history.cases(task.to, task.service))` (service-wide, as `services_text` numbers them);
+`{R}` is the assertion of `found` whose `verdict.message.id == note.id`; `{R ids}` are the ids of the others. `regressions([case])` is
+never used for the numbering. Test (commit C5): `test_feedback_step_names_the_ids_and_the_confirmation` records two earlier human
+rejections in other cases, so the new one is `R3` and the text names `R1, R2`.
+
+### 21.4 DR-20 (manager: record the deviation, no sleep)
+
+Section 16 gains item 17 (from the brief): "`test_11` does not wait 2 s between the rejection and the amendment. Ordering, not a
+wall-clock gap, drives the logic: the tier is derived from which note carries the link. The test orders the two calls explicitly. No
+`time.sleep` in tests." The `test_11` docstring says the same (commit C9).
+
+### 21.5 DR-21 (manager: clamp)
+
+6.1's `Case.returned` becomes: the sum, over the tasks of the chain that have a result, of `min(result.budget, task.budget)`. A result
+never counts as returning more than its own task was handed. `case_spend` is unchanged.
+
+- Tests (commit A1): `test_a_case_clamps_each_results_returned_runs_to_its_tasks_budget` (`test_contract_case_history.py`: a task handed
+  4 whose result returns 9 counts 4); `test_case_spend_never_counts_a_negative_rest` (`test_pure_functions.py`: returned > budget - runs
+  gives `still_out == 0`).
+- Section 19 adds: "While a case is open, a result that carried back runs from outside its task (grants, runs other tasks left, runs that
+  item 5 releases) can still lower `case_spend`, within its own task's budget. The clamp bounds the error; it does not remove it. The
+  done-state value is exact."
+
+### 21.6 DR-22 (manager: a new Protocol, `reflection.api.ServiceSteps`)
+
+`feedback_step`, `amendment_step` and `rework_step` are not `ServiceReports` methods. They are the three methods of a new Protocol,
+`reflection.api.ServiceSteps`. Their texts, inputs and placement are exactly those of 3.4, 5.3 and 21.3.
+
+- **Implementation.** A new `reflection/_steps.py:TextServiceSteps(agents: AgentDirectory, catalog: ServiceCatalog, history:
+  CaseHistory, mail: MailboxReader)`. `TextServiceReports` keeps its 4 collaborators, and `ServiceReports` keeps its 2 methods
+  (`services_text`, `case_total`). `case_spend` is a pure function of `reflection.api`, not a method.
+- **Consumers.** Only `mcp_server.ServiceTools`, through a 5th provider `steps: Provider[ServiceSteps]`. The CLI prints no step
+  (16, item 12).
+- **R8.** A contract suite `reflection/tests/test_contract_service_steps.py` over
+  `reflection.testing.IMPLEMENTATIONS[ServiceSteps] = [steps_fs, steps_memory]` (a new `ReflectionWorld.steps`). A fake
+  `mcp_server.testing.ScriptedSteps` returns scripted texts or raises a given exception. A runtime field `app/fields_reflection.py:service_steps`.
+- **Section 12, R7.** `ServiceSteps` has 3 methods; `ServiceReports` keeps 2. The fakes `FixedCaseTotals`, `ScriptedReports` and
+  `FakeReadings` are unchanged.
+- **Tests.** The unit tests of the step texts named in 3.6 and 5.5 live in `reflection/tests/test_steps.py`, not in
+  `test_reports.py`.
+- **Commits.** C5 adds `feedback_step` and `amendment_step`, C6 the MCP replies, and E3 `rework_step` with its MCP reply.
+
+### 21.7 DR-23: every construction site of a widened class
+
+- `CaseTaskLines`, 7th collaborator `mail: MailboxReader` (E2): `app/wire_progress.py:38`, `progress/_function.py:61` (production code;
+  it passes `rt.mailbox`), `progress/testing.py:205`, `progress/tests/test_lines.py:26`, `progress/tests/test_render.py:55`.
+- `EvidenceReflectSection`, 4th collaborator `history: CaseHistory` (D1): `app/wire_reflection.py:49`, `reflection/testing.py:81`.
+- `TextServiceSteps`, new (C5): `app/wire_reflection.py` (provider), `reflection/testing.py:_world`.
+- `RuleContractDefiner`, 13th collaborator `evidence: ServiceEvidence` (C4): `app/wire_services.py:54`, `services/testing.py:215`.
+- `ServiceTools`, 5th provider (C6): `app/wire_mcp_server.py:177`, `mcp_server/tests/test_tools_services.py:79` and `:177`.
+- `IdentityTools` and `StatusTools`, last parameter `skill: InstalledSkill` (F2): `app/wire_mcp_server.py:171` and `:176`,
+  `mcp_server/tests/test_tools_identity.py:27-28`, `mcp_server/tests/test_tools_status.py:20`.
+
+### 21.8 DR-24: the exact anchor in `second_half.json`
+
+The one-off script of 5.6 works on the string values of the loaded JSON.
+
+1. It replaces exactly `never exclude it silently. If you cannot open the source` with `never exclude it silently. An item that fits a
+   criterion's words but not its evident purpose (nothing for anyone to do, a restatement, a status) is `ambiguous`: list it, never decide
+   it. If you cannot open the source`, after asserting that the anchor occurs 2 times.
+2. It replaces the old manager bullet (line 27 of `roles/manager.md` at `d8e35f2`) with the bullet of 5.4, after asserting that it occurs 8
+   times.
+
+It writes `json.dumps(data, indent=1) + "\n"`. Commit E4.
+
+### 21.9 DR-25: `confirmed_amendment` honours `owner` and `name`
+
+The helper's first line is `task = org.request(ROOT, name, {"topic": topic})`. Commit C3.
+
+### 21.10 DR-26: E4's "kept by" rule
+
+Section 17's "No '0 returned (kept by ...)' on a case whose runs came back" becomes: "No `0 returned (kept by ...)` on a final result
+whose owner, at that time, had no open, outstanding, unread, or not-moved-past blocked work."
+
+### 21.11 DR-27 (adopted): user-initiated amendments, and what `confirms` may name
+
+- Section 19 adds: "A criterion the user adds outside any rejection stays `(not confirmed)` and is never (c)-eligible in 0a.1; `confirms`
+  must name the rejection the yes answered."
+- **What `confirms` may name.** `feedback(confirms=...)` refuses a `confirms` that is not a rejection root recorded on that same request:
+  - an accept (F8a);
+  - a link note, or any message that is no verdict (F7);
+  - a rejection of another request or of another service (F7: the rejection must reply to `task_id`, a request of this service).
+- **Existing behaviour.** These refusals exist since 0a (`services/_feedback.py:_check_confirmation`). 0a.1 adds no refusal: it pins the
+  link-note and other-service cases with a test (commit C2), and section 18's "refuses nothing new" stays true.
+- **The gate.** `test_a_user_initiated_amendment_is_never_rule_c_eligible` pins it (commit C3): an amendment made with no rejection is
+  marked "(not confirmed)", and a revision that cites it is refused.
+- **Section 17** adds two counts: the user-initiated amendments, and every `confirms` whose rejection is older than the question it
+  answers (the amendment's question).
+
+### 21.12 Consequences for earlier sections
+
+- 3.4 ("New `ServiceReports` methods", "`TextServiceReports` ... gets a 5th collaborator") and 5.3 ("New `ServiceReports` method") read
+  as `ServiceSteps` and `TextServiceSteps` (21.6).
+- Section 12, R1-R2, lists `reflection.ServiceSteps` in place of `ServiceReports.feedback_step / amendment_step / rework_step`. R6 adds
+  `TextServiceSteps`'s collaborators. R8 adds `test_contract_service_steps.py` and `ScriptedSteps`.
+- Section 14's total is unchanged: 17 golden files.
+- Section 13 is unchanged: no amendment adds a division. The clamp of 21.5 is a `min`.
