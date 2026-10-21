@@ -254,9 +254,68 @@ def test_step_3_for_a_human_client_names_evidence_and_the_refusal_question(svc):
         "playbook (at most 1000 words): concrete steps (who does what, in which order, which check), not slogans. Name the cases in the reason, "
         "and list in `evidence` what it rests on: regression assertions (R<k>), criteria (C<k>), verdict or case ids. It is admitted only when "
         "the same criterion or assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the "
-        "contract by an amendment; your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is refused, nothing is "
+        "contract by an amendment the client confirmed (none yet); your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is refused, nothing is "
         "written: send your parent the refusal's question once and go on with the playbook as it is. The new version applies to this request."
     )
+
+
+def step_3_after(org):
+    """The owner's step 3 for a new request, once the user has rejected a delivery (``org`` may already hold amendments)."""
+    first = request(org, "first")
+    deliver(org, "ceo", first, lessons="Thin on sources.")
+    org.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+    request(org, "next")
+    return step_3(reflect_section(org.run_prompt("ceo", org.begin_run("ceo"))))
+
+
+CLAUSE = "contract by an amendment the client confirmed ("
+
+
+def test_step_3_names_the_confirmed_amendments(svc):
+    org = svc
+    assert f"{CLAUSE}none yet);" in step_3_after(org)  # no amendment at all
+    assert "are not confirmed" not in step_3_after(org) and "is not confirmed" not in step_3_after(org)
+
+
+def test_step_3_names_one_confirmed_amendment(svc):
+    org = svc
+    c3 = confirmed_amendment(org, "Every claim names its source")
+    assert f"{CLAUSE}now {c3}: a revision citing it is admitted);" in step_3_after(org)
+
+
+def test_step_3_names_several_confirmed_amendments(svc):
+    org = svc
+    c3 = confirmed_amendment(org, "Every claim names its source", topic="one")
+    c4 = confirmed_amendment(org, "Every figure names its date", topic="two")
+    assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them is admitted);" in step_3_after(org)
+
+
+def test_step_3_says_which_amendments_are_not_confirmed_yet(svc):
+    org = svc
+    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])  # an amendment nobody confirmed: C3
+    assert f"{CLAUSE}none yet; C3 is not confirmed yet);" in step_3_after(org)
+    c4 = confirmed_amendment(org, "Every claim names its source")
+    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the date"])
+    assert f"{CLAUSE}now {c4}: a revision citing it is admitted; C3, C5 are not confirmed yet);" in step_3_after(org)
+
+
+def test_step_3_leaves_out_a_removed_amendment(svc):
+    org = svc
+    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])
+    org.define_service(ROOT, "ceo", "weekly-brief", remove_acceptance=["Quote the source"])
+    assert f"{CLAUSE}none yet);" in step_3_after(org)
+
+
+def test_the_reject_preamble_speaks_of_rules_without_client_evidence(svc):
+    org = svc
+    first = request(org, "ai")
+    deliver(org, "ceo", first, lessons="Thin on sources.")
+    org.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+    request(org, "chips")
+    section = reflect_section(org.run_prompt("ceo", org.begin_run("ceo")))
+    assert "A rule without the client's evidence (step 3) is a reason to look, not to change how the team works" in section
+    assert "Revise the playbook when step 3 admits it, then handle the request." in section
+    assert "One rejection is a reason to look" not in section and "Revise the playbook only as step 3 says" not in section
 
 
 def test_step_3_for_an_agent_client_says_nothing_can_admit(svc):
@@ -464,8 +523,9 @@ def test_the_regression_line_marks_a_removed_criterion(svc):
 # ------------------------------------------------------------------------------------------ the tier-aware Reflect texts
 HUMAN_LEAD = (
     "The client rejected a delivery: check the delivery against its words, the regression list and the contract before you plan the request. "
-    "One rejection is a reason to look, not to change how the team works: your parent asks the client whether it is a lasting requirement, "
-    "and the answer reaches you as a contract change or a criterion link. Revise the playbook only as step 3 says, then handle the request."
+    "A rule without the client's evidence (step 3) is a reason to look, not to change how the team works: your parent asks the client whether "
+    "it is a lasting requirement, and the answer reaches you as a contract change or a criterion link. Revise the playbook when step 3 admits "
+    "it, then handle the request."
 )
 RELAYED_LEAD = (
     "A relayed rejection arrived (the assistant's own reading, not the client's words): apply what it asks in this request where the contract "

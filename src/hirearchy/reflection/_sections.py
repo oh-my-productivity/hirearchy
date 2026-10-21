@@ -6,10 +6,10 @@ from collections.abc import Sequence
 
 from ..kernel import RENDER_BODY_CHARS, ROOT, Message, clip_line, parent, verdict_tier
 from ..mail import MailboxReader, TaskQuery
-from ..services import Contract, ServiceCatalog, playbook_word_cap
+from ..services import Contract, ServiceCatalog, confirmed_amendments, playbook_word_cap
 from ._ports import ConfigSource, PlaybookSection, RegressionSection, RejectedServices, ReflectSection, ServicePaths, ServicesListing
 from ._reports import marked
-from .api import Assertion, CaseHistory, ReflectionDigest, ServicePromptSections, regressions
+from .api import Assertion, CaseHistory, ReflectionDigest, ServicePromptSections, confirmed_criteria, regressions
 
 REGRESSION_LINES = 12  # the newest assertions shown in the owner's prompt
 CLIP_REGRESSION = 300  # characters of the client's words shown for one of them
@@ -116,10 +116,24 @@ class RegressionListSection(RegressionSection):
 class EvidenceReflectSection(ReflectSection):
     """The steps the owner takes before the work: read the evidence, revise the playbook if it would prevent the problem (unless it is locked)."""
 
-    def __init__(self, catalog: ServiceCatalog, config: ConfigSource, paths: ServicePaths) -> None:
+    def __init__(self, catalog: ServiceCatalog, config: ConfigSource, paths: ServicePaths, history: CaseHistory) -> None:
         self._catalog = catalog
         self._config = config
         self._paths = paths
+        self._history = history
+
+    def _eligible(self, addr: str, name: str) -> str:
+        """What rule (c) admits now, for step 3: the current amendments the client confirmed, and those it has not (``none yet`` when no one is)."""
+        current = [c for c in self._catalog.criteria(addr, name) if c.current]
+        confirmed = confirmed_criteria(self._history.cases(addr, name))
+        admitted = [c.id for c in confirmed_amendments(current, confirmed)]
+        waiting = [c.id for c in current if c.amended and c.id not in confirmed]
+        text = "none yet"
+        if admitted:
+            text = f"now {', '.join(admitted)}: a revision citing {'it' if len(admitted) == 1 else 'one of them'} is admitted"
+        if waiting:
+            text += f"; {', '.join(waiting)} {'is' if len(waiting) == 1 else 'are'} not confirmed yet"
+        return text
 
     def section(self, addr: str, contract: Contract, digest: str, *, rejected: str = "", new_request: bool = True) -> str:
         c = contract
@@ -170,8 +184,9 @@ class EvidenceReflectSection(ReflectSection):
                     "which order, which check), not slogans. Name the cases in the reason, and list in `evidence` what it rests on: "
                     "regression assertions (R<k>), criteria (C<k>), verdict or case ids. It is admitted only when the same criterion or "
                     "assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the "
-                    "contract by an amendment; your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is "
-                    "refused, nothing is written: send your parent the refusal's question once and go on with the playbook as it is. "
+                    f"contract by an amendment the client confirmed ({self._eligible(addr, c.name)}); your lessons and relayed verdicts (the "
+                    "assistant's own reading) are not evidence. If it is refused, nothing is written: send your parent the refusal's question "
+                    "once and go on with the playbook as it is. "
                     f"The new version applies to this {what}."
                 )
             else:
@@ -197,9 +212,9 @@ class EvidenceReflectSection(ReflectSection):
             if rejected == "human":
                 lead = (
                     f"{rejecter}: check the delivery against its words, the regression list and the contract before you plan the {what}. "
-                    "One rejection is a reason to look, not to change how the team works: your parent asks the client whether it is a lasting "
-                    "requirement, and the answer reaches you as a contract change or a criterion link. Revise the playbook only as step 3 "
-                    f"says, then handle the {what}."
+                    "A rule without the client's evidence (step 3) is a reason to look, not to change how the team works: your parent asks the "
+                    "client whether it is a lasting requirement, and the answer reaches you as a contract change or a criterion link. Revise "
+                    f"the playbook when step 3 admits it, then handle the {what}."
                 )
             elif rejected:
                 lead = (
