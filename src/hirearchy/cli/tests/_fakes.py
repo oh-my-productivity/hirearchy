@@ -99,6 +99,8 @@ class FakeServices(Recording, ServiceCommands, ServiceCatalog, ContractNormalize
     def __init__(self, contracts: Mapping[tuple[str, str], Contract] | None = None) -> None:
         super().__init__()
         self.contracts = dict(contracts or {})
+        self.refuse_confirmation: OrgError | None = None  # the refusal of a ``feedback`` that has ``confirms`` (the verdict itself goes through)
+        self._feedbacks = 0
 
     def define_service(self, actor: str, owner: str, name: str, **kwargs: object) -> str:
         self.note("define_service", actor, owner, name, **kwargs)
@@ -118,7 +120,12 @@ class FakeServices(Recording, ServiceCommands, ServiceCatalog, ContractNormalize
         confirms: str | None = None,
     ) -> Message:
         self.note("feedback", actor, task_id, verdict, note, source=source, criterion=None if criterion is None else list(criterion), confirms=confirms)
-        return Message(sender=actor, to="ceo", type="note", body="", id="f-1", source=source, criterion=", ".join(criterion) if criterion else None)
+        if confirms is not None and self.refuse_confirmation is not None:
+            raise self.refuse_confirmation
+        self._feedbacks += 1
+        return Message(
+            sender=actor, to="ceo", type="note", body="", id=f"f-{self._feedbacks}", source=source, criterion=", ".join(criterion) if criterion else None,
+        )
 
     def read_contract(self, owner: str, name: str) -> Contract | None:
         self.note("read_contract", owner, name)

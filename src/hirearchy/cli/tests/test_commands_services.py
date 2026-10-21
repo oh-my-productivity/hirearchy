@@ -135,13 +135,48 @@ def test_feedback_defaults_to_source_human(tmp_path: Path) -> None:
         parse(command, "feedback", "r-1", "accept", "--source", "assistant")
 
 
+def commits(office: FakeOffice) -> list[object]:
+    return [args[0] for name, args, _ in office.calls if name == "commit"]
+
+
 def test_feedback_reply_shows_the_message_id(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
     go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "No.",
-       "--criterion", "C1", "--criterion", "r2")
-    assert services.last("feedback") == (("root", "r-1", "reject", "No."), {"source": "human", "criterion": ["C1", "r2"], "confirms": None})
-    assert f.out.stdout == "feedback reject on r-1 -> ceo (message f-1, source human, about C1, r2)\n"
+       "--criterion", "C1", "--criterion", "r2", "--source", "relayed")  # someone else's reading: the criterion stays on the verdict
+    assert services.last("feedback") == (("root", "r-1", "reject", "No."), {"source": "relayed", "criterion": ["C1", "r2"], "confirms": None})
+    assert f.out.stdout == "feedback reject on r-1 -> ceo (message f-1, source relayed, about C1, r2)\n"
     assert office.last("commit") == (("root: feedback f-1 -> ceo",), {})
+
+
+def test_a_criterion_typed_with_a_rejection_is_recorded_as_the_users_link(tmp_path: Path) -> None:
+    """The terminal is the user's own seat: a criterion typed with a rejection is their yes, so it is recorded as a `confirms` link."""
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "No.",
+       "--criterion", "C1", "--criterion", "r2")
+    first, second = [c for c in services.calls if c[0] == "feedback"]
+    assert first == ("feedback", ("root", "r-1", "reject", "No."), {"source": "human", "criterion": ["C1", "r2"], "confirms": None})
+    assert second == ("feedback", ("root", "r-1", "reject", "No."), {"source": "human", "criterion": ["C1", "r2"], "confirms": "f-1"})
+    assert commits(office) == ["root: feedback f-1 -> ceo", "root: feedback f-2 -> ceo"]  # one snapshot per call
+    assert f.out.stdout == (
+        "feedback reject on r-1 -> ceo (message f-1, source human, about C1, r2)\n"
+        "link on f-1 -> ceo: C1, r2 (message f-2, source human)\n"
+    )
+
+
+def test_a_failing_confirmation_keeps_the_committed_verdict(tmp_path: Path) -> None:
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    services.refuse_confirmation = OrgError("the link cannot be written")
+    with pytest.raises(OrgError, match="the link cannot be written"):
+        go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "No.", "--criterion", "C1")
+    assert commits(office) == ["root: feedback f-1 -> ceo"]  # the verdict is written and committed; rerun with --confirms f-1 --criterion ...
+    assert f.out.stdout == "feedback reject on r-1 -> ceo (message f-1, source human, about C1)\n"
+
+
+def test_relayed_feedback_keeps_the_criterion_on_the_verdict(tmp_path: Path) -> None:
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "Maybe.",
+       "--criterion", "C1", "--source", "relayed")
+    assert [c[2]["confirms"] for c in services.calls if c[0] == "feedback"] == [None] and commits(office) == ["root: feedback f-1 -> ceo"]
 
 
 def test_feedback_confirms_reply_names_the_link(tmp_path: Path) -> None:

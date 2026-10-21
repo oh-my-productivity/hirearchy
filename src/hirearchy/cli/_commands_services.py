@@ -147,9 +147,17 @@ class FeedbackCommand(Command):
         self._snapshots().commit(f"root: feedback {msg.id} -> {msg.to}")
         if args.confirms:
             self._out.say(f"link on {args.confirms} -> {msg.to}: {msg.criterion} (message {msg.id}, source {msg.source})")
-        else:
-            about = f", about {msg.criterion}" if msg.criterion else ""
-            self._out.say(f"feedback {args.verdict} on {args.task_id} -> {msg.to} (message {msg.id}, source {msg.source}{about})")
+            return
+        about = f", about {msg.criterion}" if msg.criterion else ""
+        self._out.say(f"feedback {args.verdict} on {args.task_id} -> {msg.to} (message {msg.id}, source {msg.source}{about})")
+        if args.verdict == "reject" and args.criterion and args.source == "human":
+            # The terminal is the user's own seat, so the criterion they typed is their yes: it is recorded as a `confirms` link (a criterion on
+            # the verdict itself is the assistant's reading). The verdict is already written and committed; if this call fails, the error follows.
+            link = self._commands().feedback(
+                ROOT, args.task_id, "reject", args.note, source="human", criterion=args.criterion, confirms=msg.id,
+            )
+            self._snapshots().commit(f"root: feedback {link.id} -> {link.to}")
+            self._out.say(f"link on {msg.id} -> {link.to}: {link.criterion} (message {link.id}, source {link.source})")
 
 
 class RetireServiceCommand(Command):
