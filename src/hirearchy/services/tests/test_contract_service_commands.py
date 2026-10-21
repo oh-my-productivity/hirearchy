@@ -824,6 +824,22 @@ def test_f7_confirms_must_be_a_verdict_on_this_task(w: ServicesWorld) -> None:
     assert refused(w, first.id, "reject", "Yes.", criterion=["C1"], confirms=first.id) == message.format(task=first.id, confirms=first.id)
 
 
+def test_f7b_confirms_names_neither_a_link_note_nor_a_rejection_of_another_service(w: ServicesWorld) -> None:
+    """Pins existing behaviour (DR-27): ``confirms`` is a rejection recorded on this very request, so the client's yes cannot be put on a link
+    note or on a rejection of another request of another service."""
+    first = delivered(w)
+    no = w.commands.feedback("root", first.id, "reject", "No.", source="human")
+    link = w.commands.feedback("root", first.id, "reject", "Yes.", source="human", criterion=["C1"], confirms=no.id)
+    define(w, owner="ops", name="ops-brief")
+    elsewhere = w.commands.request("root", "ops-brief", {"topic": "ai"})
+    answer(w, elsewhere)
+    other_no = w.commands.feedback("root", elsewhere.id, "reject", "No.", source="human")
+    message = "confirms must be the id of a rejection you recorded on {task} (the message id `feedback` returned): {confirms}"
+    assert refused(w, first.id, "reject", "Yes.", criterion=["C2"], confirms=link.id) == message.format(task=first.id, confirms=link.id)
+    assert refused(w, first.id, "reject", "Yes.", criterion=["C2"], confirms=other_no.id) == message.format(task=first.id, confirms=other_no.id)
+    assert [m.criterion for m in w.d.inbox("ceo") if m.type == "note"] == [None, "C1"]  # nothing was recorded by the refused calls
+
+
 def test_f8a_confirms_an_accept_is_refused(w: ServicesWorld) -> None:
     task = delivered(w)
     yes = w.commands.feedback("root", task.id, "accept")
