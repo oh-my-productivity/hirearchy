@@ -1621,9 +1621,14 @@
      "name": "reason",
      "kind": "POSITIONAL_OR_KEYWORD",
      "default": null
+    },
+    {
+     "name": "evidence",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
     }
    ],
-   "annotated": "(self, actor: 'str', service: 'str', content: 'str', reason: 'str') -> 'int'"
+   "annotated": "(self, actor: 'str', service: 'str', content: 'str', reason: 'str', evidence: 'Sequence[str]') -> 'int'"
   },
   "rules": {
    "kind": "method",

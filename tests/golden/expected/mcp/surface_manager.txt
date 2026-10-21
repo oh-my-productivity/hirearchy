@@ -1015,12 +1015,20 @@ input: {
     "reason": {
       "title": "Reason",
       "type": "string"
+    },
+    "evidence": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence",
+      "type": "array"
     }
   },
   "required": [
     "service",
     "content",
-    "reason"
+    "reason",
+    "evidence"
   ],
   "title": "revise_playbookArguments",
   "type": "object"
@@ -1044,7 +1052,14 @@ Write the next version of the playbook of a service you offer: how your team del
 
         Only the owner can; refused when the contract is locked. content: the WHOLE new playbook in markdown (steps: who
         does what, in which order, which check; budget plan; pitfalls), at most playbook_max_words (default 1000) words,
-        and different from the current one. reason: 1-400 characters naming the cases it rests on. The old version is
-        archived; your parent is told quietly. The playbook may raise the bar, never lower it: the acceptance criteria
-        come from the contract. Returns the new version, which applies from now on.
+        and different from the current one. reason: 1-400 characters naming the cases it rests on. evidence (required):
+        the ids it rests on, from the regression list and the digest in your prompt: "R<k>" (a rejection by the client),
+        "C<k>" (a contract criterion), verdict ids, case ids. It is admitted only when the same criterion or regression
+        assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the
+        contract by an amendment; your lessons, relayed verdicts and an agent client's verdicts are not evidence. Pass
+        evidence=[] only for the first playbook (the steps your team followed, nothing more), or to restore unchanged a
+        version your parent wrote. A refusal writes nothing and gives you a question to send your parent once; do not
+        wait for the answer (it reaches you as a contract change or a criterion link). The old version is archived; your
+        parent is told quietly. The playbook may raise the bar, never lower it: the acceptance criteria come from the
+        contract. Returns the new version, which applies from now on.
         

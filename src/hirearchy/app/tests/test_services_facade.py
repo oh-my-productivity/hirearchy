@@ -4,7 +4,7 @@ behave as they always did (green before and after), and now go through the ports
 from __future__ import annotations
 
 import dataclasses
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -47,7 +47,7 @@ def test_a_service_is_defined_requested_answered_rated_revised_and_retired(org: 
     note = org.feedback("root", task.id, "reject", "Too long.", source="human")
     assert (note.type, note.wake, note.feedback, note.reply_to, note.source) == ("note", False, "reject", task.id, "human")
     assert org.feedback("root", task.id, "accept").source == "relayed"  # a root verdict is the user's own only when it says so
-    assert org.revise_playbook("ceo", "weekly-brief", "1. Search.\n2. Write.", "after the rejection") == 1
+    assert org.revise_playbook("ceo", "weekly-brief", "1. Search.\n2. Write.", "after the rejection", []) == 1
     assert org.retire_service("root", "ceo", "weekly-brief", "done with it").startswith("retired service `weekly-brief` of ceo; files kept at ")
     assert org.service_names("ceo") == []
 
@@ -58,7 +58,7 @@ def test_the_refusals_are_the_texts_agents_are_shown(org: Org) -> None:
     with pytest.raises(OrgError, match="no service `nope` among your direct reports"):
         org.request("root", "nope", {})
     with pytest.raises(OrgError, match="you do not own a service called `nope`"):
-        org.revise_playbook("ceo", "nope", "x", "y")
+        org.revise_playbook("ceo", "nope", "x", "y", [])
 
 
 def test_the_names_of_a_service_are_the_directories_with_a_contract(org: Org) -> None:
@@ -113,8 +113,8 @@ class Commands(ServiceCommands):
         self.calls.append(("request", (actor, service, inputs), kw))
         return Message(sender=actor, to="ceo", type="task", body="b", id="REQUESTED")
 
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
-        self.calls.append(("revise_playbook", (actor, service, content, reason), {}))
+    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
+        self.calls.append(("revise_playbook", (actor, service, content, reason, evidence), {}))
         return 7
 
     def feedback(self, actor: str, task_id: str, verdict: str, note: str = "", **kw: Any) -> Message:
@@ -149,15 +149,22 @@ def test_the_other_commands_come_from_the_commands_of_the_runtime(org: Org) -> N
     assert org.retire_service("root", "ceo", "x", "why") == "RETIRED"
     assert org.request("root", "x", {"topic": "ai"}, title="T", note="N", extra_acceptance=["e"], budget=3, revises="R", source="human").id == "REQUESTED"
     assert org.request("root", "x", None).id == "REQUESTED"
-    assert org.revise_playbook("ceo", "x", "content", "reason") == 7
+    assert org.revise_playbook("ceo", "x", "content", "reason", ["R1"]) == 7
     assert org.feedback("root", "T1", "reject", "words").id == "RATED" and org.feedback("root", "T1", "accept").id == "RATED"
     assert org.feedback("root", "T1", "reject", "yes", source="human", criterion=["C1"], confirms="M1").id == "RATED"
     assert fake.calls == [
         ("retire_service", ("root", "ceo", "x", "why"), {}),
         ("request", ("root", "x", {"topic": "ai"}), {"title": "T", "note": "N", "extra_acceptance": ["e"], "budget": 3, "revises": "R", "source": "human"}),
         ("request", ("root", "x", None), {"title": "", "note": "", "extra_acceptance": None, "budget": None, "revises": None, "source": None}),
-        ("revise_playbook", ("ceo", "x", "content", "reason"), {}),
+        ("revise_playbook", ("ceo", "x", "content", "reason", ["R1"]), {}),
         ("feedback", ("root", "T1", "reject", "words"), {"source": None, "criterion": None, "confirms": None}),
         ("feedback", ("root", "T1", "accept", ""), {"source": None, "criterion": None, "confirms": None}),
         ("feedback", ("root", "T1", "reject", "yes"), {"source": "human", "criterion": ["C1"], "confirms": "M1"}),
     ]
+
+
+def test_revise_playbook_without_evidence_is_a_type_error(org: Org) -> None:
+    org.define_service("root", "ceo", "weekly-brief", **BRIEF)
+    with pytest.raises(TypeError, match="evidence"):
+        org.revise_playbook("ceo", "weekly-brief", "1. Search.", "why")  # type: ignore[call-arg]
+    assert org.revise_playbook("ceo", "weekly-brief", "1. Search.", "why", evidence=[]) == 1  # the first version needs none: [] is the answer

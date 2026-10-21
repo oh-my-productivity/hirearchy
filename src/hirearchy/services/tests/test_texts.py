@@ -141,4 +141,14 @@ def test_a_revision_is_an_event_by_its_author() -> None:
     pb, _, events = writer(FakeClock())
     pb.write("ceo", "brief", 2, "Two.", "ceo", "r", None)
     (event,) = events.events
-    assert (event.kind, event.actor, event.fields) == ("service.revise", "ceo", {"owner": "ceo", "service": "brief", "version": 2, "by": "ceo"})
+    assert (event.kind, event.actor, event.fields) == ("service.revise", "ceo", {"owner": "ceo", "service": "brief", "version": 2, "by": "ceo", "admitted": "client"})
+
+
+def test_the_extra_frontmatter_goes_after_the_reason_and_its_admitted_is_the_events() -> None:
+    pb, store, events = writer(FakeClock())
+    pb.write("ceo", "brief", 1, "One.", "root", "r")
+    pb.write("ceo", "brief", 2, "Two.", "ceo", "why", 1, {"evidence": ["R1"], "admitted": "b", "restores": 1})
+    meta = (store.read_playbook("ceo", "brief") or ({}, ""))[0]
+    assert list(meta) == ["service", "version", "revised", "by", "reason", "evidence", "admitted", "restores"]
+    assert (meta["evidence"], meta["admitted"], meta["restores"]) == (["R1"], "b", 1)
+    assert [e.fields["admitted"] for e in events.events] == ["client", "b"]

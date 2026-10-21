@@ -90,7 +90,7 @@ def test_a_playbook_revised_after_the_rejection_leaves_no_reflect_section(svc):
     deliver(svc, "ceo", first)
     svc.feedback(ROOT, first.id, "reject", "Too long.")
     time.sleep(0.002)
-    svc.revise_playbook("ceo", WEEKDAY, "Steps.", "after the rejection")
+    svc.revise_playbook("ceo", WEEKDAY, "Steps.", "after the rejection", [])
     svc.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=first.id, budget=3)
     assert "# Reflect" not in svc.run_prompt("ceo", svc.begin_run("ceo"))
 
@@ -164,8 +164,11 @@ def test_v0_playbook_section_agrees_with_the_reflect_section(svc):
     prompt = org.run_prompt("ceo", org.begin_run("ceo"))
     playbook = prompt.split("# Playbook: weekly-brief")[1].split("\n# ")[0]
     assert "# Reflect before you start: weekly-brief" in prompt
-    assert "No playbook yet: write v1 now from the evidence below (Reflect before you start), then follow it." in playbook
-    assert "when you report this request" not in prompt  # the old text would contradict the reflect section
+    assert (
+        "No playbook yet: write v1 now from how the team works (Reflect before you start shows the evidence; rules from lessons or relayed "
+        "verdicts are not steps), then follow it (the first version needs no evidence: evidence=[])."
+    ) in playbook
+    assert "when you report this request" not in prompt  # the other text would contradict the reflect section
     assert prompt.index("# Playbook: weekly-brief") < prompt.index("# Reflect before you start")  # "below" is true
     org.end_run("ceo", ok=True)
 
@@ -187,7 +190,7 @@ def test_the_reflect_section_comes_before_a_new_request_when_there_is_evidence(s
     assert "# Reflect before you start: weekly-brief" in prompt
     section = prompt.split("# Reflect before you start: weekly-brief")[1].split("# New messages")[0]
     assert "Evidence so far (there is no playbook yet):" in section and "No week-over-week changes." in section
-    assert "revise_playbook(service, content, reason)" in section and "at most 1000 words" in section
+    assert "revise_playbook(service, content, reason, evidence)" in section and "at most 1000 words" in section
     assert "A rejection or a failure is enough on its own" in section and "never lower it" in section
     assert "restore" not in section  # nothing earlier to restore at v0
     assert section.rstrip().endswith("Then handle the request following the playbook.")
@@ -198,9 +201,9 @@ def test_the_reflect_section_comes_before_a_new_request_when_there_is_evidence(s
 
 def test_the_reflect_section_offers_restoring_an_older_version_from_v2_on(svc):
     org = svc
-    org.revise_playbook("ceo", "weekly-brief", "Steps one.", "first")
+    org.revise_playbook("ceo", "weekly-brief", "Steps one.", "first", [])
     org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Every claim names its source"])  # the user's amendment: C3, the evidence of v2
-    org.revise_playbook("ceo", "weekly-brief", "Steps two.", "second")
+    org.revise_playbook("ceo", "weekly-brief", "Steps two.", "second", ["C3"])
     time.sleep(0.002)
     first = request(org)
     deliver(org, "ceo", first)
@@ -219,7 +222,7 @@ def test_no_reflect_section_for_rework_old_evidence_or_a_locked_playbook_edit_st
     assert "# Reflect" not in prompt and "# Playbook: weekly-brief" in prompt
     org.end_run("ceo", ok=True)
     deliver(org, "ceo", rework)
-    org.revise_playbook("ceo", "weekly-brief", "Steps.", "after the rework")
+    org.revise_playbook("ceo", "weekly-brief", "Steps.", "after the rework", [])
     request(org)  # new request, but no evidence since v1
     assert "# Reflect" not in org.run_prompt("ceo", org.begin_run("ceo"))
 
@@ -236,3 +239,76 @@ def test_the_locked_variant_shows_evidence_but_no_revision_steps(org):
     assert "call `revise_playbook" not in section and "restore" not in section
     assert "(v0, locked by your parent)" in prompt and "No playbook yet, and the contract is locked" in prompt
     assert "(locked)" in prompt.split("# Your services")[1].split("# ")[0]
+
+
+# ------------------------------------------------------------------------------------------ the evidence gate in the texts
+def step_3(section):
+    return next(line for line in section.splitlines() if line.startswith("3. "))
+
+
+def test_step_3_for_a_human_client_names_evidence_and_the_refusal_question(svc):
+    org = svc
+    first = request(org, "ai")
+    deliver(org, "ceo", first, lessons="Thin on sources.")
+    request(org, "chips")
+    section = reflect_section(org.run_prompt("ceo", org.begin_run("ceo")))
+    assert step_3(section) == (
+        "3. If a change to how the team works would prevent it, call `revise_playbook(service, content, reason, evidence)` with the whole new "
+        "playbook (at most 1000 words): concrete steps (who does what, in which order, which check), not slogans. Name the cases in the reason, "
+        "and list in `evidence` what it rests on: regression assertions (R<k>), criteria (C<k>), verdict or case ids. It is admitted only when "
+        "the same criterion or assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the "
+        "contract by an amendment; your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is refused, nothing is "
+        "written: send your parent the refusal's question once and go on with the playbook as it is. The new version applies to this request."
+    )
+
+
+def test_step_3_for_an_agent_client_says_nothing_can_admit(svc):
+    org = svc
+    define(org, owner=ENG, actor="ceo", name="eng-brief")
+    org.send(ROOT, "ceo", "Runs to hand down.", budget=20)
+    first = org.request("ceo", "eng-brief", {"topic": "x"}, budget=3)
+    deliver(org, ENG, first, lessons="Thin on sources.")
+    org.request("ceo", "eng-brief", {"topic": "y"}, budget=3)
+    section = reflect_section_of(org.run_prompt(ENG, org.begin_run(ENG)), "eng-brief")
+    assert step_3(section) == (
+        "3. Your client is an agent, so nothing in this service's history can admit a playbook revision (only the first version, or restoring a "
+        "version your parent wrote): apply the evidence when you plan this request, and if you think the playbook must change, send your parent "
+        "(`send`) what you would change and why."
+    )
+    assert "evidence" not in step_3(section).replace("evidence when", "")
+
+
+def reflect_section_of(prompt, service):
+    return prompt.split(f"# Reflect before you start: {service}")[1].split("# New messages")[0]
+
+
+def test_the_restore_step_says_which_restore_needs_evidence(svc):
+    org = svc
+    org.revise_playbook("ceo", "weekly-brief", "Steps one.", "first", evidence=[])
+    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Every claim names its source"])
+    org.revise_playbook("ceo", "weekly-brief", "Steps two.", "second", evidence=["C3"])
+    time.sleep(0.002)
+    first = request(org)
+    deliver(org, "ceo", first)
+    request(org, "again")
+    section = reflect_section(org.run_prompt("ceo", org.begin_run("ceo")))
+    restore = next(line for line in section.splitlines() if "restore that one" in line)
+    assert restore == (
+        "5. If the current version did worse than an earlier one, restore that one (read ceo/services/weekly-brief/history/PLAYBOOK.v<k>.md): "
+        "revise_playbook with its text unchanged; a version your parent wrote needs evidence=[], any other needs evidence like a revision."
+    )
+
+
+def test_no_playbook_texts_ask_for_the_steps_followed_only(svc):
+    org = svc
+    request(org)
+    plain = org.run_prompt("ceo", org.begin_run("ceo"))
+    assert (
+        "No playbook yet: plan as usual; when you report this request, write v1 with revise_playbook: the steps your team followed, nothing more "
+        "(the first version needs no evidence: evidence=[])."
+    ) in plain
+    org.end_run("ceo", ok=True)
+    locked = "No playbook yet, and the contract is locked: plan as usual."
+    define(org, name="locked-brief", locked=True)
+    org.request(ROOT, "locked-brief", {"topic": "ai"})
+    assert locked in org.run_prompt("ceo", org.begin_run("ceo"))  # the locked text is unchanged

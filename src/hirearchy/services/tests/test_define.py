@@ -162,7 +162,7 @@ def test_the_runtime_owns_the_services_directory(svc):
 
 def test_services_do_not_confuse_retire_or_run_counting(svc):
     org = svc
-    org.revise_playbook("ceo", "weekly-brief", "Steps.", "r")
+    org.revise_playbook("ceo", "weekly-brief", "Steps.", "r", [])
     org.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
     work(org, "ceo")
     assert org.agents() == ["ceo", ENG] and org.runs_used("ceo") == 1

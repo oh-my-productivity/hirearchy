@@ -136,8 +136,8 @@ def test_criteria_of_a_service_carry_their_ids(w: ServicesWorld) -> None:
 def test_playbook_versions_are_oldest_first(w: ServicesWorld) -> None:
     define(w)
     assert w.catalog.playbook_versions("ceo", "weekly-brief") == []
-    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "first")
-    w.commands.revise_playbook("ceo", "weekly-brief", STEPS + "\n4. Publish.", "second")
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "first", [])
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS + "\n4. Publish.", "second", ["R1"])
     found = w.catalog.playbook_versions("ceo", "weekly-brief")
     assert [(p.version, p.reason) for p in found] == [(1, "first"), (2, "second")]
     assert found[0].body == STEPS and found[1].body.endswith("4. Publish.")

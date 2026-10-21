@@ -59,9 +59,13 @@ class PlaybookTexts(Protocol):
 
 @runtime_checkable
 class PlaybookWriter(Protocol):
-    def write(self, owner: str, name: str, version: int, body: str, by: str, reason: str, archive_version: int | None = None) -> str:
-        """Write the playbook ``version`` (keeping ``archive_version`` of the old one when given) and say so in the event log. Returns its path
-        relative to the organization."""
+    def write(
+        self, owner: str, name: str, version: int, body: str, by: str, reason: str, archive_version: int | None = None,
+        extra: Mapping[str, object] | None = None,
+    ) -> str:
+        """Write the playbook ``version`` (keeping ``archive_version`` of the old one when given) and say so in the event log. ``extra`` goes
+        into the frontmatter after ``reason`` (``evidence``, ``admitted``, ``restores``); its ``admitted`` is also the ``admitted`` of the event
+        (``"client"`` without it: a version the client wrote). Returns its path relative to the organization."""
         ...
 
 
@@ -114,7 +118,7 @@ class ServiceRetirement(Protocol):
 
 @runtime_checkable
 class PlaybookRevisions(Protocol):
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
+    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
         """Write the next version of a playbook (see ``ServiceCommands.revise_playbook``)."""
         ...
 

@@ -214,7 +214,7 @@ def _world(d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | 
     commands = RuleServiceCommands(
         RuleContractDefiner(d.agents, catalog, store, places, normalizer, ContractAmender(), texts, owners, playbooks, delivery, d.clock, events),
         RuleServiceRetirement(d.agents, catalog, store, owners, delivery, d.clock, events),
-        RulePlaybookReviser(d.agents, catalog, texts, playbooks, delivery),
+        RulePlaybookReviser(d.agents, catalog, texts, playbooks, delivery, gate),
         RuleServiceRequester(d.agents, catalog, d.mail, TextRequestBodies(), d.sender),
         RuleClientFeedback(d.agents, d.mail, d.sender, gate),
     )

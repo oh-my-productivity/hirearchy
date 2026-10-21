@@ -164,7 +164,7 @@ def test_service_and_playbook_files(tmp_path, clock, norm):
     deliver_service(org, "ceo", second, clock, lessons="Cite while drafting.")
     org.feedback(ROOT, second.id, "reject", "Still too long.", source="human", criterion=["C1"])
     clock.tick()
-    org.revise_playbook("ceo", "weekly-brief", PLAYBOOK + "4. Cut to 600 words before reporting.\n", "Client rejected: too long.")
+    org.revise_playbook("ceo", "weekly-brief", PLAYBOOK + "4. Cut to 600 words before reporting.\n", "Client rejected: too long.", ["C1"])
     clock.tick()
     out = []
     for name in ("weekly-brief", "plain-brief"):

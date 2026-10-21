@@ -195,6 +195,8 @@ class Playbook:
     reason: str = ""
     body: str = ""
     path: Path | None = None
+    evidence: list[str] = field(default_factory=list)  # the ids the owner cited for this version ([] for a legacy file or an exempt version)
+    admitted: str = ""  # which rule admitted it: b | c | first | restore ("" for a legacy file; a version the client wrote has none)
 
 
 @runtime_checkable
@@ -311,12 +313,17 @@ class ServiceCommands(Protocol):
         ``contract`` and ``playbook`` (versions at this moment) in its frontmatter."""
         ...
 
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
+    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
         """Write the next version of the playbook of a service ``actor`` owns; returns the new version.
 
         Refused when the contract is locked, when ``content`` is empty, over ``playbook_max_words`` or identical to the current playbook. A
         frontmatter in ``content`` is stripped (the runtime writes it). The old version is archived to ``history/PLAYBOOK.v<n>.md`` and the client
-        gets a quiet (non-waking) note with the reason."""
+        gets a quiet (non-waking) note with the reason, the evidence and the rule that admitted it.
+
+        ``evidence`` (required; a list of at most 20 ids): what the revision rests on, ``R<k>`` regression assertions, ``C<k>`` criteria, verdict
+        or case ids. The revision is admitted by ``ServiceEvidence``, by rule (b) the same criterion or assertion failed in 2 different cases
+        the human client rejected, or rule (c) it cites a criterion the client added by an amendment. Exempt, with ``[]``: the first
+        playbook, and restoring unchanged a version the client wrote. A refusal writes nothing."""
         ...
 
     def feedback(

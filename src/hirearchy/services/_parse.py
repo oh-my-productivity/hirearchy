@@ -65,5 +65,11 @@ def playbook_of(meta: JsonObject, body: str, path: Path | None) -> Playbook:
     """The playbook a ``PLAYBOOK.md`` describes."""
     return Playbook(
         version=as_int(meta.get("version")), revised=as_time(meta.get("revised")), by=str(meta.get("by") or ""),
-        reason=str(meta.get("reason") or ""), body=body.strip(), path=path,
+        reason=str(meta.get("reason") or ""), body=body.strip(), path=path, evidence=_ids(meta.get("evidence")),
+        admitted=str(meta.get("admitted") or ""),
     )
+
+
+def _ids(value: object) -> list[str]:
+    """The ids of an ``evidence`` list as text, without blanks; anything else (a damaged file) is no evidence."""
+    return [text for x in value if (text := str(x).strip())] if isinstance(value, list) else []

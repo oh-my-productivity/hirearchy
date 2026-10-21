@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from ..agents import AgentDirectory
 from ..kernel import ROOT, Clock, EventSink, OrgError, child_addr, norm, split_frontmatter
 from ..settings import OrgSettings
@@ -51,8 +53,14 @@ class EventedPlaybookWriter(PlaybookWriter):
         self._clock = clock
         self._events = events
 
-    def write(self, owner: str, name: str, version: int, body: str, by: str, reason: str, archive_version: int | None = None) -> str:
-        meta = {"service": name, "version": version, "revised": self._clock.now().isoformat(timespec="microseconds"), "by": by, "reason": reason}
+    def write(
+        self, owner: str, name: str, version: int, body: str, by: str, reason: str, archive_version: int | None = None,
+        extra: Mapping[str, object] | None = None,
+    ) -> str:
+        meta = {
+            "service": name, "version": version, "revised": self._clock.now().isoformat(timespec="microseconds"), "by": by, "reason": reason,
+            **(extra or {}),
+        }
         path = self._store.write_playbook(owner, name, version, meta, body, archive_version)
-        self._events.emit("service.revise", actor=by, owner=owner, service=name, version=version, by=by)
+        self._events.emit("service.revise", actor=by, owner=owner, service=name, version=version, by=by, admitted=str((extra or {}).get("admitted", "client")))
         return path

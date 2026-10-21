@@ -12,7 +12,7 @@ import pytest
 
 from hirearchy.kernel import Message, OrgError, split_frontmatter
 from hirearchy.services import FEEDBACK_HEADER, LINK_HEADER, ServiceCommands
-from hirearchy.services.testing import IMPLEMENTATIONS, ServicesWorld
+from hirearchy.services.testing import IMPLEMENTATIONS, RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
 
 from ._support import BRIEF, STEPS, amend, answer, define, grant, implementations, make, request
 
@@ -73,7 +73,7 @@ def test_the_definition_is_an_event(w: ServicesWorld) -> None:
     kinds = [(e.kind, e.actor, e.fields) for e in w.events.events]
     assert kinds == [
         ("service.define", "root", {"owner": "ceo", "service": "weekly-brief", "version": 1, "by": "root", "amendment": False}),
-        ("service.revise", "root", {"owner": "ceo", "service": "weekly-brief", "version": 1, "by": "root"}),
+        ("service.revise", "root", {"owner": "ceo", "service": "weekly-brief", "version": 1, "by": "root", "admitted": "client"}),
     ]
 
 
@@ -411,27 +411,30 @@ def test_a_retired_service_can_be_defined_again_as_a_new_one(w: ServicesWorld) -
 
 def test_the_owner_writes_the_first_playbook(w: ServicesWorld) -> None:
     define(w)
-    assert w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "  first draft  ") == 1
+    assert w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "  first draft  ", []) == 1
     meta, body = meta_of(w, PLAYBOOK)
     assert (meta["version"], meta["by"], meta["reason"], meta["service"]) == (1, "ceo", "first draft", "weekly-brief") and body.strip() == STEPS
     (note,) = w.d.inbox("root")
     assert (note.type, note.wake, note.title) == ("note", False, "playbook of weekly-brief revised to v1")
-    assert note.body == "ceo revised the playbook of service `weekly-brief` to v1.\nReason: first draft\nFile: ceo/services/weekly-brief/PLAYBOOK.md"
+    assert note.body == (
+        "ceo revised the playbook of service `weekly-brief` to v1.\nReason: first draft\nEvidence: none; the first playbook (no evidence needed)\n"
+        "File: ceo/services/weekly-brief/PLAYBOOK.md"
+    )
     assert w.events.events[-1].kind == "service.revise" and w.events.events[-1].fields["version"] == 1
 
 
 def test_each_revision_keeps_the_old_version(w: ServicesWorld) -> None:
     define(w)
-    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "one")
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "one", [])
     first = w.text(PLAYBOOK)
-    assert w.commands.revise_playbook("ceo", "weekly-brief", STEPS + "\n4. Publish.", "two") == 2
+    assert w.commands.revise_playbook("ceo", "weekly-brief", STEPS + "\n4. Publish.", "two", ["R1"]) == 2
     assert w.text("ceo/services/weekly-brief/history/PLAYBOOK.v1.md") == first
     assert meta_of(w, PLAYBOOK)[0]["version"] == 2
 
 
 def test_a_frontmatter_in_the_content_is_stripped(w: ServicesWorld) -> None:
     define(w)
-    w.commands.revise_playbook("ceo", "weekly-brief", f"---\nversion: 99\n---\n{STEPS}", "framed")
+    w.commands.revise_playbook("ceo", "weekly-brief", f"---\nversion: 99\n---\n{STEPS}", "framed", [])
     assert meta_of(w, PLAYBOOK)[0]["version"] == 1 and meta_of(w, PLAYBOOK)[1].strip() == STEPS
 
 
@@ -439,7 +442,7 @@ def test_only_the_owner_revises_its_playbook(w: ServicesWorld) -> None:
     define(w)
     for actor, name in (("root", "weekly-brief"), ("ops", "weekly-brief"), ("ceo", "nope"), ("ceo", "Bad Name")):
         with pytest.raises(OrgError) as e:
-            w.commands.revise_playbook(actor, name, STEPS, "why")
+            w.commands.revise_playbook(actor, name, STEPS, "why", [])
         mine = "weekly-brief" if actor == "ceo" else "none"
         assert str(e.value) == (
             f"you do not own a service called `{name}`. Services you own: {mine}. Only the owner revises a "
@@ -450,7 +453,7 @@ def test_only_the_owner_revises_its_playbook(w: ServicesWorld) -> None:
 def test_a_locked_contract_forbids_the_revision(w: ServicesWorld) -> None:
     define(w, locked=True)
     with pytest.raises(OrgError) as e:
-        w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "why")
+        w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "why", [])
     assert str(e.value) == (
         "the contract of `weekly-brief` is locked by root: you may not revise its playbook. Follow the current "
         "one, and if you think it must change, tell root (`send`)."
@@ -459,7 +462,7 @@ def test_a_locked_contract_forbids_the_revision(w: ServicesWorld) -> None:
 
 def test_a_manager_is_told_by_its_report_that_it_revised(w: ServicesWorld) -> None:
     define(w, owner="ceo/eng", actor="ceo", name="eng-brief")
-    w.commands.revise_playbook("ceo/eng", "eng-brief", STEPS, "why")
+    w.commands.revise_playbook("ceo/eng", "eng-brief", STEPS, "why", [])
     assert [m.title for m in w.d.inbox("ceo")] == ["playbook of eng-brief revised to v1"]
 
 
@@ -467,7 +470,7 @@ def test_a_manager_is_told_by_its_report_that_it_revised(w: ServicesWorld) -> No
 def test_a_revision_needs_a_reason_of_one_to_four_hundred_characters(w: ServicesWorld, reason: str) -> None:
     define(w)
     with pytest.raises(OrgError) as e:
-        w.commands.revise_playbook("ceo", "weekly-brief", STEPS, reason)
+        w.commands.revise_playbook("ceo", "weekly-brief", STEPS, reason, [])
     assert str(e.value) == (
         "reason is 1-400 characters: say what changed and which cases it rests on (case ids from the "
         "evidence), so the next revision can judge it"
@@ -477,10 +480,10 @@ def test_a_revision_needs_a_reason_of_one_to_four_hundred_characters(w: Services
 def test_a_revision_must_say_something_and_something_new(w: ServicesWorld) -> None:
     define(w)
     with pytest.raises(OrgError, match="the playbook is empty"):
-        w.commands.revise_playbook("ceo", "weekly-brief", " ", "why")
-    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "one")
+        w.commands.revise_playbook("ceo", "weekly-brief", " ", "why", [])
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "one", [])
     with pytest.raises(OrgError) as e:
-        w.commands.revise_playbook("ceo", "weekly-brief", f"\n{STEPS}\n", "again")
+        w.commands.revise_playbook("ceo", "weekly-brief", f"\n{STEPS}\n", "again", [])
     assert str(e.value) == (
         "no change: this is identical to playbook v1. Revise only when the evidence calls for a different way of working."
     )
@@ -490,7 +493,7 @@ def test_the_word_cap_comes_from_the_settings(w: ServicesWorld) -> None:
     define(w)
     w.d.configure("---\nmission: test\nplaybook_max_words: 3\n---\nrules\n")
     with pytest.raises(OrgError, match="the playbook is 4 words; the limit is 3 \\(playbook_max_words\\)"):
-        w.commands.revise_playbook("ceo", "weekly-brief", "a b c d", "why")
+        w.commands.revise_playbook("ceo", "weekly-brief", "a b c d", "why", [])
 
 
 @pytest.mark.parametrize("setting", ["abc", "0", "-4", "null"])
@@ -498,8 +501,8 @@ def test_a_malformed_cap_means_one_thousand_words(w: ServicesWorld, setting: str
     define(w)
     w.d.configure(f"---\nmission: test\nplaybook_max_words: {setting}\n---\nrules\n")
     with pytest.raises(OrgError, match="the playbook is 1001 words; the limit is 1000"):
-        w.commands.revise_playbook("ceo", "weekly-brief", " ".join(["w"] * 1001), "why")
-    w.commands.revise_playbook("ceo", "weekly-brief", " ".join(["w"] * 1000), "why")
+        w.commands.revise_playbook("ceo", "weekly-brief", " ".join(["w"] * 1001), "why", [])
+    w.commands.revise_playbook("ceo", "weekly-brief", " ".join(["w"] * 1000), "why", [])
 
 
 # ============================================================================================== request
@@ -883,3 +886,171 @@ def test_a_confirmation_records_no_second_verdict(w: ServicesWorld) -> None:
 def test_the_feedback_docstring_keeps_stays_in_the_case() -> None:
     doc = ServiceCommands.feedback.__doc__ or ""
     assert "stays in the case" in doc and "replaces" not in doc
+
+
+# ============================================================================================== revise the playbook: evidence and the gate
+
+P1 = (
+    "evidence is a list of at most 20 ids, each 1-80 characters without spaces: the regression assertions (R<k>), criteria (C<k>), verdict ids and "
+    "case ids this revision rests on (see the regression list and the digest in your prompt). Pass [] only for the first playbook, or to restore "
+    "unchanged a version your parent wrote."
+)
+OTHER = "## Steps\n1. Search.\n2. Cite while drafting."
+
+
+@pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
+def refusing(request: pytest.FixtureRequest, tmp_path: Path) -> ServicesWorld:
+    """A world whose gate refuses every revision that is not exempt."""
+    return make_with(request.param, tmp_path)
+
+
+def make_with(factory: Any, tmp_path: Path) -> ServicesWorld:
+    world: ServicesWorld = factory(tmp_path, RefusingServiceEvidence("refused: the client has not said so. Nothing was written."))
+    for addr in ("ceo", "ops"):
+        world.d.agent(addr, True)
+    for addr in ("ceo/eng", "ceo/qa"):
+        world.d.agent(addr, False)
+    return world
+
+
+def owner_wrote(w: ServicesWorld, version: int, body: str) -> None:
+    """The files hold a version the owner wrote (a revision admitted earlier), whatever the gate says now."""
+    meta = {"service": "weekly-brief", "version": version, "revised": "2026-01-01T00:00:00+00:00", "by": "ceo", "reason": "earlier"}
+    w.store.write_playbook("ceo", "weekly-brief", version, meta, body, version - 1 if version > 1 else None)
+
+
+@pytest.mark.parametrize(
+    "bad", ["R1", None, [1], ["R 1"], ["x" * 81], [f"R{i}" for i in range(21)], ["R1", None]],
+    ids=["a string", "none", "a number", "a spaced id", "a long id", "more than 20", "none in the list"],
+)
+def test_p1_evidence_must_be_a_list_of_short_ids(w: ServicesWorld, bad: Any) -> None:
+    define(w)
+    with pytest.raises(OrgError) as e:
+        w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "why", bad)
+    assert str(e.value) == P1 and w.text(PLAYBOOK) is None and w.d.inbox("root") == []
+
+
+def test_the_first_playbook_needs_no_evidence_and_records_admitted_first(w: ServicesWorld) -> None:
+    define(w)
+    assert w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "first draft", []) == 1
+    meta, _ = meta_of(w, PLAYBOOK)
+    assert list(meta) == ["service", "version", "revised", "by", "reason", "evidence", "admitted"]
+    assert (meta["evidence"], meta["admitted"]) == ([], "first")
+
+
+def test_the_first_playbook_may_still_cite_what_it_rests_on(w: ServicesWorld) -> None:
+    define(w)
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "first draft", [" c1 ", "C2", "c1"])
+    meta, _ = meta_of(w, PLAYBOOK)
+    assert (meta["evidence"], meta["admitted"]) == (["C1", "C2"], "first")
+
+
+def test_restoring_the_clients_version_needs_no_evidence_and_records_restores(w: ServicesWorld) -> None:
+    define(w, playbook=STEPS)  # v1 is the client's own
+    w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "why", ["R1"])
+    assert w.commands.revise_playbook("ceo", "weekly-brief", f"\n{STEPS}\n", "worse than before", []) == 3
+    meta, body = meta_of(w, PLAYBOOK)
+    assert (meta["evidence"], meta["admitted"], meta["restores"], body.strip()) == ([], "restore", 1, STEPS)
+    assert list(meta)[-3:] == ["evidence", "admitted", "restores"]
+
+
+def test_restoring_an_owner_version_goes_to_the_gate(refusing: ServicesWorld) -> None:
+    w = refusing
+    define(w, playbook=STEPS)  # v1: the client's
+    owner_wrote(w, 2, OTHER)
+    owner_wrote(w, 3, OTHER + "\n4. Publish.")
+    before = w.text(PLAYBOOK)
+    with pytest.raises(OrgError, match="^refused: the client has not said so"):
+        w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "back to v2", [])
+    assert w.text(PLAYBOOK) == before
+    assert w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "back to the client's", []) == 4  # the client's own version is exempt
+
+
+def test_a_restored_owner_version_that_the_gate_admits_records_restores_and_the_rule(w: ServicesWorld) -> None:
+    define(w, playbook=STEPS)
+    w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "two", ["R1"])
+    w.commands.revise_playbook("ceo", "weekly-brief", OTHER + "\n4. Publish.", "three", ["R1"])
+    assert w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "back to v2", ["R2"]) == 4
+    meta, _ = meta_of(w, PLAYBOOK)
+    assert (meta["evidence"], meta["admitted"], meta["restores"]) == (["R2"], "b", 2)
+
+
+def test_a_refusal_passes_through_unchanged_and_writes_nothing(refusing: ServicesWorld) -> None:
+    w = refusing
+    define(w, playbook=STEPS)
+    before, events = w.text(PLAYBOOK), len(w.events.events)
+    with pytest.raises(OrgError) as e:
+        w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "why", ["R1"])
+    assert str(e.value) == "refused: the client has not said so. Nothing was written."
+    assert w.text(PLAYBOOK) == before and w.text("ceo/services/weekly-brief/history/PLAYBOOK.v1.md") is None
+    assert len(w.events.events) == events and w.d.inbox("root") == []
+
+
+def test_an_admitted_revision_writes_evidence_admitted_after_reason(w: ServicesWorld) -> None:
+    define(w, playbook=STEPS)
+    assert w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "why", [" r1 ", "c2", "R1"]) == 2
+    meta, _ = meta_of(w, PLAYBOOK)
+    assert list(meta) == ["service", "version", "revised", "by", "reason", "evidence", "admitted"]
+    assert (meta["evidence"], meta["admitted"]) == (["R1", "C2"], "b")
+
+
+def test_the_client_note_names_reason_evidence_and_admission(w: ServicesWorld) -> None:
+    where = "File: ceo/services/weekly-brief/PLAYBOOK.md"
+    define(w)
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "first draft", [])
+    w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "two", ["R1", "C2"])
+    owner_wrote(w, 3, OTHER + "\n4. Publish.")
+    w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "back", ["R3"])
+    notes = [m.body for m in w.d.inbox("root")]
+    assert notes[0] == f"ceo revised the playbook of service `weekly-brief` to v1.\nReason: first draft\nEvidence: none; the first playbook (no evidence needed)\n{where}"
+    assert notes[1] == (
+        "ceo revised the playbook of service `weekly-brief` to v2.\nReason: two\nEvidence: R1, C2; admitted: admitted by the stand-in for the gate\n" + where
+    )
+    assert notes[2] == (
+        "ceo revised the playbook of service `weekly-brief` to v4.\nReason: back\nEvidence: R3; restores v2; admitted: admitted by the stand-in for the gate\n" + where
+    )
+
+
+def test_the_client_note_of_a_restored_client_version(w: ServicesWorld) -> None:
+    define(w, playbook=STEPS)
+    w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "two", ["R1"])
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "back", [])
+    assert [m.body for m in w.d.inbox("root")][-1] == (
+        "ceo revised the playbook of service `weekly-brief` to v3.\nReason: back\nEvidence: none; restores v1, which you wrote (no evidence needed)\n"
+        "File: ceo/services/weekly-brief/PLAYBOOK.md"
+    )
+
+
+def test_the_service_revise_event_carries_admitted(w: ServicesWorld) -> None:
+    define(w)
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "first draft", [])
+    w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "two", ["R1"])
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "back", [])
+    revised = [e for e in w.events.events if e.kind == "service.revise"]
+    assert [e.fields for e in revised] == [
+        {"owner": "ceo", "service": "weekly-brief", "version": 1, "by": "ceo", "admitted": "first"},
+        {"owner": "ceo", "service": "weekly-brief", "version": 2, "by": "ceo", "admitted": "b"},
+        {"owner": "ceo", "service": "weekly-brief", "version": 3, "by": "ceo", "admitted": "b"},  # v1 was written by the owner: it goes to the gate
+    ]
+
+
+def test_define_service_v1_has_no_new_keys_and_event_admitted_client(w: ServicesWorld) -> None:
+    define(w, playbook=STEPS)
+    meta, _ = meta_of(w, PLAYBOOK)
+    assert list(meta) == ["service", "version", "revised", "by", "reason"]
+    (revised,) = [e for e in w.events.events if e.kind == "service.revise"]
+    assert revised.fields == {"owner": "ceo", "service": "weekly-brief", "version": 1, "by": "root", "admitted": "client"}
+
+
+def test_the_checks_before_the_gate_come_first(refusing: ServicesWorld) -> None:
+    w = refusing
+    define(w, playbook=STEPS, locked=True)
+    with pytest.raises(OrgError, match="locked by root"):
+        w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "why", [])  # the lock is judged before the evidence
+    define(w, locked=False)
+    with pytest.raises(OrgError, match="^reason is 1-400"):
+        w.commands.revise_playbook("ceo", "weekly-brief", OTHER, " ", "not a list")
+    with pytest.raises(OrgError, match="^evidence is a list"):
+        w.commands.revise_playbook("ceo", "weekly-brief", OTHER, "why", "not a list")
+    with pytest.raises(OrgError, match="^no change: this is identical to playbook v1"):
+        w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "why", ["R1"])

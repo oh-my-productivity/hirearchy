@@ -42,16 +42,12 @@ def test_only_a_final_result_gets_a_hint(w: ServicesWorld, status: str) -> None:
 def test_an_owner_without_a_playbook_is_told_to_write_one(w: ServicesWorld) -> None:
     define(w)
     for status in ("done", "failed"):
-        assert w.hints.report_hint("ceo", request(w), status) == (
-            "This service has no playbook yet: write v1 now with revise_playbook - the steps your team followed and what you would change."
-        )
+        assert w.hints.report_hint("ceo", request(w), status).startswith("This service has no playbook yet: write v1 now with revise_playbook:")
 
 
 def test_an_owner_with_a_playbook_is_told_the_lessons_are_recorded(w: ServicesWorld) -> None:
     define(w, playbook=STEPS)
-    assert w.hints.report_hint("ceo", request(w), "done") == (
-        "Lessons recorded. If they call for a playbook change now, use revise_playbook; otherwise they are reviewed before the next request."
-    )
+    assert w.hints.report_hint("ceo", request(w), "done").startswith("Lessons recorded: they are your team's view")
 
 
 def test_a_locked_contract_gets_no_hint(w: ServicesWorld) -> None:
@@ -89,3 +85,21 @@ def test_a_body_without_the_header_is_the_words_as_they_are(hints: ServiceHints)
 
 def test_the_words_may_be_the_word_accepted_only_when_they_are_all_there_is(hints: ServiceHints) -> None:
     assert hints.feedback_text(note(FEEDBACK_HEADER + "\n\nnot accepted")) == "not accepted"
+
+
+def test_the_report_hint_says_a_revision_rests_on_the_clients_evidence(w: ServicesWorld) -> None:
+    define(w, playbook=STEPS)
+    assert w.hints.report_hint("ceo", request(w), "done") == (
+        "Lessons recorded: they are your team's view and are shown before the next request. A playbook revision rests on the client's evidence "
+        "(evidence: rejections R<k>, criteria C<k>), not on lessons."
+    )
+
+
+def test_the_no_playbook_hint_asks_for_the_steps_followed_only(w: ServicesWorld) -> None:
+    define(w)
+    for status in ("done", "failed"):
+        assert w.hints.report_hint("ceo", request(w), status) == (
+            "This service has no playbook yet: write v1 now with revise_playbook: the steps your team followed, nothing more (the first version "
+            "needs no evidence: evidence=[]). A rule drawn from your lessons or from a relayed rework is not a step: it needs the client's "
+            "evidence in a later revision."
+        )

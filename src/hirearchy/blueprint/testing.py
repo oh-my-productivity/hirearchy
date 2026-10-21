@@ -258,7 +258,7 @@ class RecordingServiceCommands(ServiceCommands):
         self._log.add("request", actor, service, inputs, title=title, note=note)
         return Message(actor, "lead", "task", "", title=title, budget=22, service=service, id=f"request-{len(self._log.of('request'))}")
 
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
+    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
         raise OrgError("an application does not revise playbooks")
 
     def feedback(
@@ -361,8 +361,8 @@ class FlakyServiceCommands(ServiceCommands):
             actor, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance, budget=budget, revises=revises, source=source,
         )
 
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
-        return self._inner.revise_playbook(actor, service, content, reason)
+    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
+        return self._inner.revise_playbook(actor, service, content, reason, evidence)
 
     def feedback(
         self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,

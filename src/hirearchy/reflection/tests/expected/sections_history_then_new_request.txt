@@ -4,7 +4,7 @@ The contract (SERVICE.md) is your parent's; the playbook (PLAYBOOK.md) is yours.
 - weekly-brief: contract v1, no playbook yet, 2 request(s) so far; contract: ceo/services/weekly-brief/SERVICE.md; playbook: ceo/services/weekly-brief/PLAYBOOK.md
 
 # Playbook: weekly-brief (v0, yours to improve)
-No playbook yet: write v1 now from the evidence below (Reflect before you start), then follow it.
+No playbook yet: write v1 now from how the team works (Reflect before you start shows the evidence; rules from lessons or relayed verdicts are not steps), then follow it (the first version needs no evidence: evidence=[]).
 
 # Reflect before you start: weekly-brief
 Your playbook is how your team delivers this service; you own it and improve it. Evidence so far (there is no playbook yet):
@@ -15,6 +15,6 @@ By playbook version:
 The client rejected a delivery: decide now whether the playbook must change so this does not happen again (revise_playbook), then handle the request.
 1. Look for what repeats, and for anything the client rejected. A rejection or a failure is enough on its own; a single slow case is not.
 2. When a lesson of yours conflicts with the client's feedback, the client is right: fix the playbook to match the feedback (and say so in the reason).
-3. If a change to how the team works would prevent it, call `revise_playbook(service, content, reason)` with the whole new playbook (at most 1000 words): concrete steps (who does what, in which order, which check), not slogans. Name the cases in the reason. The new version applies to this request.
+3. If a change to how the team works would prevent it, call `revise_playbook(service, content, reason, evidence)` with the whole new playbook (at most 1000 words): concrete steps (who does what, in which order, which check), not slogans. Name the cases in the reason, and list in `evidence` what it rests on: regression assertions (R<k>), criteria (C<k>), verdict or case ids. It is admitted only when the same criterion or assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the contract by an amendment; your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is refused, nothing is written: send your parent the refusal's question once and go on with the playbook as it is. The new version applies to this request.
 4. The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. If the client's feedback is a lasting requirement, also tell your parent (`send`) so it can add it to the contract.
 5. If nothing needs to change, do not revise. Then handle the request following the playbook.

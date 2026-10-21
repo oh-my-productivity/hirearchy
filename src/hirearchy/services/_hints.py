@@ -26,12 +26,13 @@ class ServiceReportHints(ServiceHints):
             return ""
         if self._catalog.read_playbook(actor, task.service).version == 0:
             return (
-                "This service has no playbook yet: write v1 now with revise_playbook - the steps your team followed and "
-                "what you would change."
+                "This service has no playbook yet: write v1 now with revise_playbook: the steps your team followed, nothing more (the first "
+                "version needs no evidence: evidence=[]). A rule drawn from your lessons or from a relayed rework is not a step: it needs the "
+                "client's evidence in a later revision."
             )
         return (
-            "Lessons recorded. If they call for a playbook change now, use revise_playbook; otherwise they are reviewed "
-            "before the next request."
+            "Lessons recorded: they are your team's view and are shown before the next request. A playbook revision rests on the client's "
+            "evidence (evidence: rejections R<k>, criteria C<k>), not on lessons."
         )
 
     def feedback_text(self, msg: Message) -> str:

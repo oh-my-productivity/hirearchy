@@ -65,6 +65,25 @@ def test_agent_feedback_surface_is_unchanged(svc):
     assert set(described(svc, ROOT)["feedback"].inputSchema["properties"]) == {"task_id", "verdict", "note", "source", "criterion", "confirms"}
 
 
+def test_revise_playbook_without_evidence_is_a_schema_error(svc):
+    ceo = build_server(svc, "ceo")
+    message = fails(ceo, "revise_playbook", service=WEEKDAY, content="## Steps\n1. Search.", reason="first draft")
+    assert "evidence" in message and "required" in message.lower()
+    assert services.read_playbook(svc, "ceo", WEEKDAY).version == 0
+    schema = {t.name: t for t in asyncio.run(ceo.list_tools())}["revise_playbook"].inputSchema
+    assert schema["required"] == ["service", "content", "reason", "evidence"]
+    assert schema["properties"]["evidence"] == {"items": {"type": "string"}, "title": "Evidence", "type": "array"}
+    assert "now v1" in call(ceo, "revise_playbook", service=WEEKDAY, content="## Steps\n1. Search.", reason="first draft", evidence=[])
+
+
+def test_the_revise_playbook_docstring_asks_for_the_clients_evidence(svc):
+    text = " ".join(described(svc, "ceo")["revise_playbook"].description.split())
+    assert "evidence (required): the ids it rests on, from the regression list and the digest in your prompt" in text
+    assert "It is admitted only when the same criterion or regression assertion failed in 2 different cases the client rejected" in text
+    assert "Pass evidence=[] only for the first playbook (the steps your team followed, nothing more), or to restore unchanged a version your parent wrote." in text
+    assert "A refusal writes nothing and gives you a question to send your parent once; do not wait for the answer" in text
+
+
 def test_root_request_rework_without_source_is_relayed(svc):
     server = build_server(svc, ROOT)
     first = request(svc, "ai")
@@ -103,7 +122,7 @@ def test_angle_brackets_and_ampersands_are_stored_exactly_as_given(svc):
     reason = 'Cases rejected for <weekday> & "dates"; keep &lt;literal&gt; -> done'
     content = "## Steps\n1. Resolve <weekday> and <date> & check \"quotes\" and &amp; entities.\n"
     server = build_server(svc, "ceo")
-    call(server, "revise_playbook", service=WEEKDAY, content=content, reason=reason)
+    call(server, "revise_playbook", service=WEEKDAY, content=content, reason=reason, evidence=[])
     pb = services.read_playbook(svc, "ceo", WEEKDAY)
     assert pb.reason == reason and pb.body == content.strip()
     raw = (svc.dir("ceo") / "services" / WEEKDAY / "PLAYBOOK.md").read_text()
@@ -116,7 +135,7 @@ def test_angle_brackets_and_ampersands_are_stored_exactly_as_given(svc):
 
     # the same through the Org API, and in the archived history
     svc.define_service(ROOT, "ceo", WEEKDAY, add_acceptance=["Names the week it covers"])  # the user's amendment: C3, the evidence of v2
-    svc.revise_playbook("ceo", WEEKDAY, "## Steps\n1. Other <b>.", "second <i> & more")
+    svc.revise_playbook("ceo", WEEKDAY, "## Steps\n1. Other <b>.", "second <i> & more", ["C3"])
     assert services.read_playbook(svc, "ceo", WEEKDAY).reason == "second <i> & more"
     assert "<weekday>" in (svc.dir("ceo") / "services" / WEEKDAY / "history" / "PLAYBOOK.v1.md").read_text()
 
@@ -152,7 +171,7 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     t2 = request(org, "chips")
     deliver(org, "ceo", t2, runs=2)
     org.feedback(ROOT, t2.id, "reject", "Still bad.", source="human", criterion=["C2"])  # C2 failed in two cases: the evidence of v2
-    org.revise_playbook("ceo", "weekly-brief", "Better steps.", "Case rejected for missing sources")
+    org.revise_playbook("ceo", "weekly-brief", "Better steps.", "Case rejected for missing sources", ["C2"])
     out = call(server, "services")
     assert out.splitlines()[0] == "Services you can request (from your direct reports):"
     assert "- weekly-brief (offered by ceo; contract v1, playbook v2): A one-page brief" in out
@@ -187,7 +206,7 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     assert "reported done" in out and "This service has no playbook yet: write v1 now with revise_playbook" in out
     org.end_run("ceo", ok=True)
     assert "now v1" in call(ceo, "revise_playbook", service="weekly-brief", content="## Steps\n1. Search.",
-                            reason="first draft")
+                            reason="first draft", evidence=[])
     assert services.read_playbook(org, "ceo", "weekly-brief").version == 1
 
     # the client rejects the delivery
@@ -203,10 +222,10 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     assert "Used 2 runs; no checks." in section
     call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Shows the changes since last week"])  # C3: the evidence of v2
     out = call(ceo, "revise_playbook", service="weekly-brief",
-               content="## Steps\n1. Search.\n2b. Compare with last week.", reason=f"case {task.id} rejected: no changes")
+               content="## Steps\n1. Search.\n2b. Compare with last week.", reason=f"case {task.id} rejected: no changes", evidence=["C3"])
     assert "playbook of `weekly-brief` is now v2" in out
     out = call(ceo, "report", task_id=second.id, status="done", summary="Delivered again.", lessons="Step 2b worked.")
-    assert "Lessons recorded. If they call for a playbook change now, use revise_playbook" in out
+    assert "Lessons recorded: they are your team's view and are shown before the next request. A playbook revision rests on the client's evidence" in out
     org.end_run("ceo", ok=True)
     call(root, "feedback", task_id=second.id, verdict="accept")
 
@@ -234,4 +253,4 @@ def test_a_locked_service_reports_without_the_revision_hint(org):
     work(org, "ceo")
     out = call(ceo, "report", task_id=task.id, status="done", summary="Delivered.", lessons="Fine.")
     assert out.startswith("reported done") and "revise_playbook" not in out
-    assert "locked by root" in fails(ceo, "revise_playbook", service="weekly-brief", content="x", reason="r")
+    assert "locked by root" in fails(ceo, "revise_playbook", service="weekly-brief", content="x", reason="r", evidence=[])

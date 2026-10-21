@@ -87,9 +87,10 @@ def nested(w: ReflectionWorld) -> Message:
 
 
 def revise(w: ReflectionWorld, content: str = STEPS, reason: str = "first", owner: str = "ceo") -> int:
-    """The owner writes the next version of the playbook; time moves a second first, so that it lies between the cases around it."""
+    """The owner writes the next version of the playbook (the world's gate admits it: ``evidence=("R1",)``); time moves a second first, so
+    that it lies between the cases around it."""
     w.s.d.clock.advance(1)
-    return w.s.commands.revise_playbook(owner, SERVICE, content, reason)
+    return w.s.commands.revise_playbook(owner, SERVICE, content, reason, evidence=("R1",))
 
 
 def rework(w: ReflectionWorld, task: Message, **kw: Any) -> Message:

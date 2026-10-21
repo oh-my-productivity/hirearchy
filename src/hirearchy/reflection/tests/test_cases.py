@@ -123,7 +123,7 @@ def test_stats_per_playbook_version_and_the_one_line_summary(svc):
     a = request(org, "a")
     deliver(org, "ceo", a, runs=2)
     org.feedback(ROOT, a.id, "reject", "Bad.")
-    org.revise_playbook("ceo", "weekly-brief", "Better steps.", "case a rejected")
+    org.revise_playbook("ceo", "weekly-brief", "Better steps.", "case a rejected", [])
     b = request(org, "b")
     deliver(org, "ceo", b, runs=1)
     org.feedback(ROOT, b.id, "accept")

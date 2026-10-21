@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from ..kernel import RENDER_BODY_CHARS, Message
+from ..kernel import RENDER_BODY_CHARS, ROOT, Message, parent
 from ..mail import MailboxReader, TaskQuery
 from ..services import Contract, ServiceCatalog, playbook_word_cap
 from ._ports import ConfigSource, PlaybookSection, RejectedServices, ReflectSection, ServicePaths, ServicesListing
@@ -52,12 +52,12 @@ class QuotedPlaybookSection(PlaybookSection):
                 return f"{head}\nNo playbook yet, and the contract is locked: plan as usual."
             if reflecting:
                 return (
-                    f"{head}\nNo playbook yet: write v1 now from the evidence below (Reflect before you start), then "
-                    "follow it."
+                    f"{head}\nNo playbook yet: write v1 now from how the team works (Reflect before you start shows the evidence; rules from "
+                    "lessons or relayed verdicts are not steps), then follow it (the first version needs no evidence: evidence=[])."
                 )
             return (
-                f"{head}\nNo playbook yet: plan as usual; when you report this request, write v1 with revise_playbook "
-                "from how it went."
+                f"{head}\nNo playbook yet: plan as usual; when you report this request, write v1 with revise_playbook: the steps your team "
+                "followed, nothing more (the first version needs no evidence: evidence=[])."
             )
         return f"{head}\n{_quoted(pb.body, self._paths.rel(pb.path))}"
 
@@ -107,18 +107,29 @@ class EvidenceReflectSection(ReflectSection):
             )
         else:
             intro = f"Your playbook is how your team delivers this service; you own it and improve it. {since}"
-            steps = [
-                first,
-                client_wins,
-                "If a change to how the team works would prevent it, call `revise_playbook(service, content, reason)` with "
-                f"the whole new playbook (at most {cap} words): concrete steps (who does what, in which order, which "
-                f"check), not slogans. Name the cases in the reason. The new version applies to this {what}.",
-                raise_bar,
-            ]
+            if parent(addr) == ROOT:
+                revise = (
+                    "If a change to how the team works would prevent it, call `revise_playbook(service, content, reason, evidence)` with "
+                    f"the whole new playbook (at most {cap} words): concrete steps (who does what, in which order, which "
+                    "check), not slogans. Name the cases in the reason, and list in `evidence` what it rests on: regression assertions "
+                    "(R<k>), criteria (C<k>), verdict or case ids. It is admitted only when the same criterion or assertion failed in 2 "
+                    "different cases the client rejected, or when it cites a criterion your parent added to the contract by an amendment; "
+                    "your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is refused, nothing is written: "
+                    "send your parent the refusal's question once and go on with the playbook as it is. "
+                    f"The new version applies to this {what}."
+                )
+            else:
+                revise = (
+                    "Your client is an agent, so nothing in this service's history can admit a playbook revision (only the first version, "
+                    f"or restoring a version your parent wrote): apply the evidence when you plan this {what}, and if you think the "
+                    "playbook must change, send your parent (`send`) what you would change and why."
+                )
+            steps = [first, client_wins, revise, raise_bar]
             if pb.version >= 2:
                 steps.append(
                     "If the current version did worse than an earlier one, restore that one "
-                    f"(read {self._paths.service_dir(addr, c.name)}/history/PLAYBOOK.v<k>.md)."
+                    f"(read {self._paths.service_dir(addr, c.name)}/history/PLAYBOOK.v<k>.md): revise_playbook with its text unchanged; "
+                    "a version your parent wrote needs evidence=[], any other needs evidence like a revision."
                 )
             steps.append(f"If nothing needs to change, do not revise. Then handle the {what} following the playbook.")
             lead = (

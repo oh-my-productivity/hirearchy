@@ -3,7 +3,7 @@
 09:02:00 cli ceo agent.hire agent=ceo/eng by=ceo role=Engineer model=claude-sonnet-5.5
 09:03:00 cli ceo agent.hire agent=ceo/qa by=ceo role=Quality assurance model=claude-sonnet-5.5
 09:04:00 cli root service.define owner=ceo service=weekly-brief version=1 by=root amendment=False
-09:04:00 cli root service.revise owner=ceo service=weekly-brief version=1 by=root
+09:04:00 cli root service.revise owner=ceo service=weekly-brief version=1 by=root admitted=client
 09:04:00 cli root agent.hire agent=ops by=root role=Operations model=claude-sonnet-5.5
 09:05:00 cli root msg.deliver id=20260115T090500000000-root-0000 type=task from=root to=ceo title=Plan the launch budget=8 wake=True hops=0 chars=84 trace_rule=new trace=20260115T090500000000-root-0000
 09:06:00 cli root msg.deliver id=20260115T090600000000-root-0001 type=task from=root to=ops title=Rotate the logs budget=2 wake=True hops=0 chars=61 trace_rule=new trace=20260115T090600000000-root-0001

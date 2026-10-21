@@ -59,8 +59,8 @@ class Commands(ServiceCommands):
         self.calls.append(("request", (actor, service, inputs), fields))
         return Message(actor, "ceo", "task", "", budget=9, contract=2, playbook=3, service=service, id="req-1")
 
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
-        self.calls.append(("revise_playbook", (actor, service, content, reason), {}))
+    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
+        self.calls.append(("revise_playbook", (actor, service, content, reason, evidence), {}))
         return 4
 
     def feedback(
@@ -163,8 +163,10 @@ def test_feedback_says_who_it_did_not_wake() -> None:
 
 
 def test_revise_playbook_says_the_version_and_that_the_client_was_told_quietly() -> None:
-    out = call(serve(tools(offered={"ceo/eng": ["brief"]})[0], "ceo/eng"), "revise_playbook", service="brief", content="c", reason="r")
+    group, commands = tools(offered={"ceo/eng": ["brief"]})
+    out = call(serve(group, "ceo/eng"), "revise_playbook", service="brief", content="c", reason="r", evidence=["R1", "C2"])
     assert out == "playbook of `brief` is now v4; ceo was told without being woken"
+    assert commands.calls[-1] == ("revise_playbook", ("ceo/eng", "brief", "c", "r", ["R1", "C2"]), {})
 
 
 def test_a_missing_organization_is_the_refusal_of_a_client_tool() -> None:

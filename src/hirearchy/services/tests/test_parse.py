@@ -89,3 +89,14 @@ def test_a_playbook_is_read_from_its_frontmatter(tmp_path: Path) -> None:
 def test_a_playbook_without_fields_is_version_zero() -> None:
     pb = playbook_of({}, "", None)
     assert (pb.version, pb.revised, pb.by, pb.reason, pb.body, pb.path) == (0, None, "", "", "", None)
+
+
+def test_a_legacy_playbook_reads_evidence_empty_and_admitted_blank() -> None:
+    legacy = playbook_of({"version": 2, "by": "ceo", "reason": "r"}, "Steps.", None)
+    assert (legacy.evidence, legacy.admitted) == ([], "")
+
+
+def test_the_evidence_and_the_rule_that_admitted_a_playbook_are_read() -> None:
+    pb = playbook_of({"version": 3, "evidence": ["R1", 2, " C3 ", ""], "admitted": "b", "restores": 1}, "Steps.", None)
+    assert (pb.evidence, pb.admitted) == (["R1", "2", "C3"], "b")
+    assert playbook_of({"evidence": "R1", "admitted": None}, "", None).evidence == []  # a damaged file reads as no evidence
