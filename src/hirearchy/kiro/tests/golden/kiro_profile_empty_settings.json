@@ -1,0 +1,17 @@
+{
+  "name": "hirearchy-ceo",
+  "description": "agent ceo",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "hirearchy"
+    }
+  },
+  "tools": [
+    "@hirearchy"
+  ],
+  "allowedTools": [],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false
+}

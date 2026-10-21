@@ -1,11 +1,11 @@
 """What the end-to-end tests (``tests/e2e``, ``tests/meta``) take from the application, over the composition root and the packages' ports.
 
-The scenarios were written against the flat modules (``orgmcp.server.build_server``, ``orgmcp.observe.trace``, ``orgmcp.scheduler.Scheduler``,
-``orgmcp.blueprint`` ...); those names are gone, so a scenario takes them from here, where each is a thin call of a port of the
-runtime (``org.runtime.trace_queries``, ``.message_parser`` ...), of the composition root (``orgmcp.app.wire_*``) or of the private class that owns the old
-function (allowed here: ``testkit`` is not part of ``orgmcp``). The assertion text of the scenarios stays as it was; only their imports changed::
+The scenarios were written against the flat modules (``hirearchy.server.build_server``, ``hirearchy.observe.trace``, ``hirearchy.scheduler.Scheduler``,
+``hirearchy.blueprint`` ...); those names are gone, so a scenario takes them from here, where each is a thin call of a port of the
+runtime (``org.runtime.trace_queries``, ``.message_parser`` ...), of the composition root (``hirearchy.app.wire_*``) or of the private class that owns the old
+function (allowed here: ``testkit`` is not part of ``hirearchy``). The assertion text of the scenarios stays as it was; only their imports changed::
 
-    from testkit.e2e_world import build_server, observe       # was: from orgmcp.server import build_server; from orgmcp import observe
+    from testkit.e2e_world import build_server, observe       # was: from hirearchy.server import build_server; from hirearchy import observe
 
 ``observe`` is a namespace with the old call shapes (``observe.trace(org, task_id)``); ``bpm`` and ``ex`` are the same for the few blueprint functions the
 scenarios use; ``DashApp`` is the app of the organization at a root path.
@@ -18,29 +18,29 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from orgmcp.app import wire_dashboard, wire_mcp_server, wire_observability, wire_skill, wire_stalls, wiring
-from orgmcp.app.wire_kiro import agents_dir
-from orgmcp.blueprint import EXAMPLE_KINDS, Agent
-from orgmcp.blueprint._access import PolicyAccessReport
-from orgmcp.blueprint._accesswords import PlainAccessWords
-from orgmcp.blueprint._org import NoOrgContext
-from orgmcp.blueprint._pathcheck import RootedPathChecker
-from orgmcp.blueprint._plan_texts import PLAN_DRAFT_HEADING, PLAN_HEADING
-from orgmcp.blueprint._resolver import AgentResolver
-from orgmcp.dashboard._app import DashApp as _DashApp
-from orgmcp.dashboard._widgets import NavTable, TextPane
-from orgmcp.kernel._system import OsEnvironment
-from orgmcp.mcp_server._binding import OpenerBindings
-from orgmcp.observability._messages import build_messages
-from orgmcp.observability._render import TextObservabilityRenderer
-from orgmcp.skill._source import PackagedSkillSource
+from hirearchy.app import wire_dashboard, wire_mcp_server, wire_observability, wire_skill, wire_stalls, wiring
+from hirearchy.app.wire_kiro import agents_dir
+from hirearchy.blueprint import EXAMPLE_KINDS, Agent
+from hirearchy.blueprint._access import PolicyAccessReport
+from hirearchy.blueprint._accesswords import PlainAccessWords
+from hirearchy.blueprint._org import NoOrgContext
+from hirearchy.blueprint._pathcheck import RootedPathChecker
+from hirearchy.blueprint._plan_texts import PLAN_DRAFT_HEADING, PLAN_HEADING
+from hirearchy.blueprint._resolver import AgentResolver
+from hirearchy.dashboard._app import DashApp as _DashApp
+from hirearchy.dashboard._widgets import NavTable, TextPane
+from hirearchy.kernel._system import OsEnvironment
+from hirearchy.mcp_server._binding import OpenerBindings
+from hirearchy.observability._messages import build_messages
+from hirearchy.observability._render import TextObservabilityRenderer
+from hirearchy.skill._source import PackagedSkillSource
 
 __all__ = [
     "ROOT_INSTRUCTIONS", "DashApp", "NavTable", "TextPane", "agent_health", "binding_at", "bpm", "build_server", "ex", "file_confinement", "kiro_agents_dir",
     "load_message", "observe", "resolve_binding", "skill_source",
 ]
 
-NO_ORG = Path("/nonexistent/orgmcp-no-org")  # a root nobody opens: the runtime of "no organization yet" (constructors do no I/O)
+NO_ORG = Path("/nonexistent/hirearchy-no-org")  # a root nobody opens: the runtime of "no organization yet" (constructors do no I/O)
 ROOT_INSTRUCTIONS = wire_mcp_server.ROOT_INSTRUCTIONS
 
 
@@ -51,7 +51,7 @@ def binding_at(root: Path) -> Any:
 
 
 def build_server(org: Any, me: str) -> Any:
-    """The MCP server for ``me``. ``org``: an ``Org`` (served over its runtime, as ``orgmcp mcp`` serves it once opened) or a binding (``binding_at``, ``resolve_binding``)."""
+    """The MCP server for ``me``. ``org``: an ``Org`` (served over its runtime, as ``hirearchy mcp`` serves it once opened) or a binding (``binding_at``, ``resolve_binding``)."""
     if hasattr(org, "runtime"):
         binding = OpenerBindings(wire_mcp_server.RuntimeOrgOpener()).bind(org.root, wire_stalls.RuntimePorts(org.runtime))
     else:
@@ -70,7 +70,7 @@ _RENDERER = TextObservabilityRenderer()
 
 
 class Observe:
-    """The module-level functions of the former ``orgmcp.observe`` over the queries the composition root makes over ``org.runtime`` as it is when they are called
+    """The module-level functions of the former ``hirearchy.observe`` over the queries the composition root makes over ``org.runtime`` as it is when they are called
     (a test that replaces a port of the runtime - the scheduler's status - is seen); the text of a view is a pure function of the view."""
 
     @staticmethod
@@ -164,7 +164,7 @@ class Examples:
 
 
 class Blueprint:
-    """The old functions of ``orgmcp.blueprint`` that the scenarios use, over the runtime ports and the private classes that own them."""
+    """The old functions of ``hirearchy.blueprint`` that the scenarios use, over the runtime ports and the private classes that own them."""
 
     Agent = Agent
     PLAN_HEADING = PLAN_HEADING

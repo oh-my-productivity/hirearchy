@@ -1,0 +1,5 @@
+usage: hirearchy inbox [-h] [--keep]
+
+options:
+  -h, --help  show this help message and exit
+  --keep      do not mark as read

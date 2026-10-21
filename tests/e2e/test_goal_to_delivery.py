@@ -10,7 +10,7 @@ import yaml
 from testkit.e2e_world import build_server, resolve_binding
 from testkit.scheduler_loop import loop_over
 
-from orgmcp.core import ROOT, Org
+from hirearchy.core import ROOT, Org
 
 EXAMPLE = testkit.REPO / "examples" / "blueprint-research.yaml"
 TEAM = str(testkit.FAKE_TEAM_AGENT)
@@ -37,7 +37,7 @@ def fails(server, tool, **args) -> str:
 def clean_env(monkeypatch, tmp_path):
     for var in ("ORG_ROOT", "ORG_AGENT", "ORG_REQUIRE_AGENT"):
         monkeypatch.delenv(var, raising=False)
-    monkeypatch.setenv("ORGMCP_WORKSPACE_ROOTS", str(tmp_path))
+    monkeypatch.setenv("HIREARCHY_WORKSPACE_ROOTS", str(tmp_path))
 
 
 @pytest.fixture

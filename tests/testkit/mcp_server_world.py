@@ -1,8 +1,8 @@
 """Servers of ``mcp_server`` for the tests that run the tools over a real organization: through the composition root.
 
-``build_server(org, me)`` / ``resolve_binding()`` / ``OrgBinding(root)`` have the shapes the tests used when they imported them from the old ``orgmcp.server``;
-they are made by ``orgmcp.app.wire_mcp_server`` (``server_factory``, ``binding_resolver``, ``RuntimeOrgOpener``). ``StartRecorder`` stands for the old
-patch point ``orgmcp.server.start_scheduler``: a fake starter that the server's ``start`` tool calls instead of the daemon's.
+``build_server(org, me)`` / ``resolve_binding()`` / ``OrgBinding(root)`` have the shapes the tests used when they imported them from the old ``hirearchy.server``;
+they are made by ``hirearchy.app.wire_mcp_server`` (``server_factory``, ``binding_resolver``, ``RuntimeOrgOpener``). ``StartRecorder`` stands for the old
+patch point ``hirearchy.server.start_scheduler``: a fake starter that the server's ``start`` tool calls instead of the daemon's.
 
 The rest are the old names that the tool tests read besides the server, kept so that the assertion lines of the tests stay as they were, over the new API:
 ``skill_source()``, ``telemetry.reset()`` / ``.summarize_args()``, ``services.read_playbook()`` / ``.cases()`` ..., ``blueprint.validate()`` / ``.plan_id()`` ...
@@ -17,32 +17,32 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from orgmcp.app import wire_kiro, wire_scheduler, wire_skill, wiring
-from orgmcp.app import wire_mcp_server as wire
-from orgmcp.app.wire_cli import run_cli as main  # noqa: F401 - the command line of the composition root (``orgmcp.cli.main``)
-from orgmcp.app.wire_stalls import RuntimePorts
-from orgmcp.blueprint import EXAMPLE_KINDS, errors
-from orgmcp.blueprint._org import NoOrgContext, RuntimeOrgContext
-from orgmcp.blueprint._pathcheck import RootedPathChecker
-from orgmcp.blueprint._plan_texts import PLAN_DRAFT_HEADING, PLAN_END, PLAN_HEADING
-from orgmcp.blueprint._resolver import AgentResolver
-from orgmcp.core import Org
-from orgmcp.daemon import SchedulerControl
-from orgmcp.kernel import OrgPaths
-from orgmcp.kernel._system import FsAtomicWriter, SystemClock
-from orgmcp.kiro import RunCommand, RunCommandBuilder
-from orgmcp.kiro._profiles import FsProfileStore
-from orgmcp.kiro._provisioner import OrgProfileProvisioner
-from orgmcp.mcp_server import OrgBindingPort
-from orgmcp.mcp_server._binding import OrgBinding as _OrgBinding
-from orgmcp.mcp_server._ports import BindingFactory, OrgPorts
-from orgmcp.reflection import stats_by_version
-from orgmcp.scheduler._ports import Console
-from orgmcp.scheduler._run import LoopState
-from orgmcp.skill._source import PackagedSkillSource
-from orgmcp.telemetry._summarize import JsonArgumentSummarizer
+from hirearchy.app import wire_kiro, wire_scheduler, wire_skill, wiring
+from hirearchy.app import wire_mcp_server as wire
+from hirearchy.app.wire_cli import run_cli as main  # noqa: F401 - the command line of the composition root (``hirearchy.cli.main``)
+from hirearchy.app.wire_stalls import RuntimePorts
+from hirearchy.blueprint import EXAMPLE_KINDS, errors
+from hirearchy.blueprint._org import NoOrgContext, RuntimeOrgContext
+from hirearchy.blueprint._pathcheck import RootedPathChecker
+from hirearchy.blueprint._plan_texts import PLAN_DRAFT_HEADING, PLAN_END, PLAN_HEADING
+from hirearchy.blueprint._resolver import AgentResolver
+from hirearchy.core import Org
+from hirearchy.daemon import SchedulerControl
+from hirearchy.kernel import OrgPaths
+from hirearchy.kernel._system import FsAtomicWriter, SystemClock
+from hirearchy.kiro import RunCommand, RunCommandBuilder
+from hirearchy.kiro._profiles import FsProfileStore
+from hirearchy.kiro._provisioner import OrgProfileProvisioner
+from hirearchy.mcp_server import OrgBindingPort
+from hirearchy.mcp_server._binding import OrgBinding as _OrgBinding
+from hirearchy.mcp_server._ports import BindingFactory, OrgPorts
+from hirearchy.reflection import stats_by_version
+from hirearchy.scheduler._ports import Console
+from hirearchy.scheduler._run import LoopState
+from hirearchy.skill._source import PackagedSkillSource
+from hirearchy.telemetry._summarize import JsonArgumentSummarizer
 
-NO_ORG = Path("/nonexistent/orgmcp-no-org")  # a root nobody opens: the runtime of "no organization yet"
+NO_ORG = Path("/nonexistent/hirearchy-no-org")  # a root nobody opens: the runtime of "no organization yet"
 Starter = Callable[[int | None, bool], int]
 
 
@@ -141,12 +141,12 @@ def serve_until_done(org: Any, script: str, mode: str = "work") -> None:
 
 
 def skill_source() -> Path:
-    """The SKILL.md that ships with this install (what ``orgmcp.skill.skill_source`` answered)."""
+    """The SKILL.md that ships with this install (what ``hirearchy.skill.skill_source`` answered)."""
     return PackagedSkillSource(wire_skill.package_dir()).path()
 
 
 class _Telemetry:
-    """``orgmcp.telemetry.reset`` / ``summarize_args``: the process resources of the composition root, and the summarizer of the arguments."""
+    """``hirearchy.telemetry.reset`` / ``summarize_args``: the process resources of the composition root, and the summarizer of the arguments."""
 
     @staticmethod
     def reset() -> None:
@@ -161,7 +161,7 @@ telemetry = _Telemetry()
 
 
 class _Services:
-    """``orgmcp.services`` / ``orgmcp.reflection`` reads of an organization: the ports of its runtime."""
+    """``hirearchy.services`` / ``hirearchy.reflection`` reads of an organization: the ports of its runtime."""
 
     stats_by_version = staticmethod(stats_by_version)
 
@@ -186,7 +186,7 @@ services = _Services()
 
 
 class _Blueprint:
-    """``orgmcp.blueprint`` as the tool tests called it (``validate``, ``load_text``, ``plan_id`` ...), over the ports of a runtime of no organization.
+    """``hirearchy.blueprint`` as the tool tests called it (``validate``, ``load_text``, ``plan_id`` ...), over the ports of a runtime of no organization.
 
     The blueprint tests have the fuller world (``testkit.blueprint_world``); these tests use five functions and the plan constants."""
 

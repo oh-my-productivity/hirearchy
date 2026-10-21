@@ -1,2 +1,0 @@
-- `ceo/eng` paused: no result for 2h
-  -> investigate why `ceo/eng` is paused; failed runs need a human (`orgmcp resume ceo/eng`), so escalate

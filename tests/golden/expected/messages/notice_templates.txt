@@ -4,7 +4,7 @@ To continue, grant runs: send(to="ceo/eng", body="<why>", budget=<runs>). Otherw
 `ceo/eng` and its team were retired by ceo (finished). Their unspent budget, 4 run(s), is returned to you with this note.
 =====
 `ceo/eng` failed 3 runs in a row and is paused. Last run log: ceo/eng/runs/20260115T090000000000.log
-A human must inspect it and run `orgmcp resume ceo/eng`.
+A human must inspect it and run `hirearchy resume ceo/eng`.
 =====
 `ceo/eng` failed 3 runs in a row and is paused. Last run log: ceo/eng/runs/20260115T090000000000.log
 Its unread messages and open tasks are stuck until then. A human will inspect the crash and resume it; you cannot. Meanwhile you can keep your own work moving:

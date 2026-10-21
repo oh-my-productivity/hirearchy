@@ -1,10 +1,10 @@
-"""The data of the dashboard as the tests of ``dashdata`` ask for it: the old call shapes of ``orgmcp.dashboard_data`` and ``orgmcp.observe`` over the new API.
+"""The data of the dashboard as the tests of ``dashdata`` ask for it: the old call shapes of ``hirearchy.dashboard_data`` and ``hirearchy.observe`` over the new API.
 
 Those two modules are gone, so a test imports this world, and its lines stay as they were::
 
-    from testkit.dashdata_world import dd, observe       # was: from orgmcp import dashboard_data as dd, observe
+    from testkit.dashdata_world import dd, observe       # was: from hirearchy import dashboard_data as dd, observe
 
-``dd`` is the api of ``orgmcp.dashdata`` (``dd.classify``, ``dd.doc_text``, ``dd.LOG_LINES`` ...) plus the two shapes the api does not have:
+``dd`` is the api of ``hirearchy.dashdata`` (``dd.classify``, ``dd.doc_text``, ``dd.LOG_LINES`` ...) plus the two shapes the api does not have:
 ``dd.DashData(root, now=None, scheduler_ttl=3.0)`` (the five queries of one dashboard in one object, over ``wire_dashdata.dashboard_runtime(root)``) and
 ``dd.render_once(data, width=110)``. ``observe`` answers the three reads the dashboard tests compare with (``now_view``, ``trace``, ``render_trace``) from the
 ports of the runtime of an ``Org``.
@@ -17,10 +17,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from orgmcp import dashdata as _api
-from orgmcp.app import wire_dashdata, wire_observability, wire_stalls
-from orgmcp.dashdata._render import TextSnapshotRenderer
-from orgmcp.dashdata import (
+from hirearchy import dashdata as _api
+from hirearchy.app import wire_dashdata, wire_observability, wire_stalls
+from hirearchy.dashdata._render import TextSnapshotRenderer
+from hirearchy.dashdata import (
     AgentDetail,
     AgentDetailQuery,
     DashboardState,
@@ -38,8 +38,8 @@ from orgmcp.dashdata import (
     Snapshot,
     SnapshotQuery,
 )
-from orgmcp.kernel import JsonObject, OrgError
-from orgmcp.observability._render import TextObservabilityRenderer
+from hirearchy.kernel import JsonObject, OrgError
+from hirearchy.observability._render import TextObservabilityRenderer
 
 
 class DashData(SnapshotQuery, AgentDetailQuery, RequestQuery, ServiceQuery, HealthQuery):
@@ -116,12 +116,12 @@ class DashData(SnapshotQuery, AgentDetailQuery, RequestQuery, ServiceQuery, Heal
 
 
 def render_once(data: DashData, width: int = 110) -> str:
-    """The ``orgmcp dash --once`` output: header, the agent tree with states, requests, services."""
+    """The ``hirearchy dash --once`` output: header, the agent tree with states, requests, services."""
     return TextSnapshotRenderer(data, data, data).render_once(width)
 
 
 class _Dd:
-    """``dd.<name>``: the api of ``orgmcp.dashdata``, and the two entry points above."""
+    """``dd.<name>``: the api of ``hirearchy.dashdata``, and the two entry points above."""
 
     DashData = DashData
     render_once = staticmethod(render_once)
@@ -134,7 +134,7 @@ dd = _Dd()
 
 
 class _Observe:
-    """The reads of the former ``orgmcp.observe`` the dashboard tests compare with, from the ports ``org.runtime`` has when they are called."""
+    """The reads of the former ``hirearchy.observe`` the dashboard tests compare with, from the ports ``org.runtime`` has when they are called."""
 
     @staticmethod
     def now_view(org: Any, now: datetime | None = None) -> Any:

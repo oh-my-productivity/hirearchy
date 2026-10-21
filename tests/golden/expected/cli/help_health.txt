@@ -1,4 +1,4 @@
-usage: orgmcp health [-h] [--agent ADDR] [--json]
+usage: hirearchy health [-h] [--agent ADDR] [--json]
 
 options:
   -h, --help    show this help message and exit

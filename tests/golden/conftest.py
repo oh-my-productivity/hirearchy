@@ -6,9 +6,9 @@ import pytest
 from golden_support import FixedClock, make_normalizer
 from testkit.clocks import clock_ports
 
-from orgmcp.core import Org
-from orgmcp.kernel import TokenSource
-from orgmcp.kernel.testing import CounterTokens
+from hirearchy.core import Org
+from hirearchy.kernel import TokenSource
+from hirearchy.kernel.testing import CounterTokens
 
 
 @pytest.fixture(autouse=True)

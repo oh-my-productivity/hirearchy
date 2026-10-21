@@ -1,4 +1,4 @@
-usage: orgmcp dash [-h] [--root ROOT] [--interval SECONDS] [--once]
+usage: hirearchy dash [-h] [--root ROOT] [--interval SECONDS] [--once]
 
 options:
   -h, --help          show this help message and exit

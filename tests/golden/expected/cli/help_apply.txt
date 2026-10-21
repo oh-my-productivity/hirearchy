@@ -1,4 +1,4 @@
-usage: orgmcp apply [-h] [--allow-root DIR] blueprint
+usage: hirearchy apply [-h] [--allow-root DIR] blueprint
 
 positional arguments:
   blueprint         blueprint YAML/JSON file

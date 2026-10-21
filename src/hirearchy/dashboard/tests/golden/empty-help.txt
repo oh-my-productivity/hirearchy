@@ -1,0 +1,30 @@
+ hirearchy  hirearchy dash - keys                                                        efresh
+ scheduler  GLOBAL
+ observe no   1 2 3 4 5     Org · Workflows · Services · Events · Health
+ scheduler:   Tab / Shift+Tab   cycle focus between the panes
+ runs in fl   ↑ ↓  j k      move            g / G   top / bottom
+ queued, no   ← →  h l      fold / unfold a node, or switch pane
+ waiting on   Enter         open (agent -> its details, request -> trace, service ->
+ errors in  cases, message -> text)
+              Esc / Backspace   back (close an overlay, leave a trace or a service,
+ Health fla return to the agent list)
+ no agent i   r             refresh now     p   pause / resume the automatic refresh
+              ?             this help       q   quit
+ Consistenc
+ not run ye 1 ORG  (agent tree on the left, details of the selected agent on the
+            right)
+              [ ]           previous / next tab: Overview · Activity · Messages · Run
+            log · Memory · Charter
+              Space         fold / unfold the selected node
+              root selected: what needs you and your requests; an agent: its run,
+            tasks, delegations, latest activity
+              Messages tab: Enter opens the message.   Run log tab: follows the log
+            while it grows (scroll up to stop).
+
+            2 WORKFLOWS   one line per request you gave; Enter opens its trace        ▂▂
+            (messages, runs, tool calls, timings)
+            3 SERVICES    one line per service; Enter opens its record, cases,
+            playbook and contract
+            4 EVENTS      the live merged event stream
+              e             errors only    /   filter (words: agent, kind, trace,
+ p Pause  ? tool)    f   follow on / off

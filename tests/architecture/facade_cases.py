@@ -14,8 +14,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from orgmcp.app import Org
-from orgmcp.kernel import Message
+from hirearchy.app import Org
+from hirearchy.kernel import Message
 
 
 @dataclass(frozen=True)
@@ -90,22 +90,22 @@ def _send_expected() -> Call:
 
 CASES: list[Case | FunctionCase] = [
     # core
-    FunctionCase("norm", "core", "orgmcp.app._facade_core", "_norm", args("/ceo/")),
+    FunctionCase("norm", "core", "hirearchy.app._facade_core", "_norm", args("/ceo/")),
     Case("dir", "core", "paths", "agent_dir", args("ceo")),
-    FunctionCase("parent", "core", "orgmcp.app._facade_core", "_parent", args("ceo/eng")),
-    FunctionCase("depth", "core", "orgmcp.app._facade_core", "_depth", args("ceo/eng")),
-    FunctionCase("child_addr", "core", "orgmcp.app._facade_core", "_child_addr", args("ceo", "eng")),
+    FunctionCase("parent", "core", "hirearchy.app._facade_core", "_parent", args("ceo/eng")),
+    FunctionCase("depth", "core", "hirearchy.app._facade_core", "_depth", args("ceo/eng")),
+    FunctionCase("child_addr", "core", "hirearchy.app._facade_core", "_child_addr", args("ceo", "eng")),
     Case("new_id", "core", "ids", "message_id", args("ceo")),
     Case("ledger", "core", "ledgers", "read", args("failures")),
     Case("save_ledger", "core", "ledgers", "write", args("failures", {"ceo": 1})),
     # settings
-    FunctionCase("find_root", "settings", "orgmcp.app._facade_settings", "find_org_root", args("somewhere")),
+    FunctionCase("find_root", "settings", "hirearchy.app._facade_settings", "find_org_root", args("somewhere")),
     Case("config", "settings", "settings", "config"),
     Case("rules", "settings", "settings", "rules"),
     # snapshots
     Case("commit", "snapshots", "snapshotter", "commit", args("snap")),
     # bootstrap
-    FunctionCase("init", "bootstrap", "orgmcp.app._facade_bootstrap", "initialize_org", args("new-org", "a mission", {"k": 1}), wrap=True),
+    FunctionCase("init", "bootstrap", "hirearchy.app._facade_bootstrap", "initialize_org", args("new-org", "a mission", {"k": 1}), wrap=True),
     # agents
     Case("exists", "agents", "agents", "exists", args("ceo")),
     Case("require", "agents", "agents", "require", args("ceo")),
@@ -122,7 +122,7 @@ CASES: list[Case | FunctionCase] = [
     Case("received", "mail", "mailbox", "received", args("ceo")),
     Case("sent", "mail", "mailbox", "sent", args("root")),
     Case("unread", "mail", "mailbox", "unread", args("ceo")),
-    FunctionCase("_wakes", "mail", "orgmcp.app._facade_mail", "message_wakes", args(Path("nowhere.md"))),
+    FunctionCase("_wakes", "mail", "hirearchy.app._facade_mail", "message_wakes", args(Path("nowhere.md"))),
     Case("find_received", "mail", "mailbox", "find_received", with_task(lambda t: (("ceo", t.id), {}))),
     Case("open_tasks", "mail", "task_query", "open_tasks", args("ceo")),
     Case("outstanding", "mail", "task_query", "outstanding", args("root")),
@@ -140,7 +140,7 @@ CASES: list[Case | FunctionCase] = [
     Case("_check_authority", "access", "authority_policy", "check_authority", args("ceo", ["read"], None, ["/data"])),
     Case("workspace_of", "access", "access_scopes", "workspace_of", args("ceo")),
     Case("inputs_of", "access", "access_scopes", "inputs_of", args("ceo")),
-    FunctionCase("unconfined_read", "access", "orgmcp.app._facade_access", "_unconfined_read", args({"workspace": "w"})),
+    FunctionCase("unconfined_read", "access", "hirearchy.app._facade_access", "_unconfined_read", args({"workspace": "w"})),
     Case("_check_inputs", "access", "authority_policy", "check_inputs", args(["/data"])),
     Case("readable_roots", "access", "access_scopes", "readable_roots", args("ceo")),
     Case("tool_names", "access", "tool_naming", "tool_names", args("ceo")),
@@ -187,7 +187,7 @@ CASES: list[Case | FunctionCase] = [
     Case("delegate", "dispatch", "task_assigner", "delegate", args("ceo", "ceo/eng", "T", "goal", "accept", ["/in"], 2, "r2")),
     Case("_normalize_artifact", "dispatch", "artifact_normalizer", "normalize", args("ceo", "ceo/AGENT.md", "2020-01-01T00:00:00")),
     Case("report", "dispatch", "task_reporter", "report", with_task(lambda t: (("ceo", t.id, "done", "summary", ["ceo/AGENT.md"], "lessons"), {}))),
-    FunctionCase("_check_lessons", "dispatch", "orgmcp.app._facade_dispatch", "check_lessons", with_task(lambda t: ((t, "done", "lessons"), {}))),
+    FunctionCase("_check_lessons", "dispatch", "hirearchy.app._facade_dispatch", "check_lessons", with_task(lambda t: ((t, "done", "lessons"), {}))),
     # services
     Case("service_names", "services", "service_catalog", "service_names", args("ceo")),
     Case("define_service", "services", "service_commands", "define_service", args(
@@ -202,7 +202,7 @@ CASES: list[Case | FunctionCase] = [
     Case("tree", "overview", "org_tree", "tree"),
     # prompts
     Case("_agent_line", "prompts", "agent_lines", "agent_line", args("ceo")),
-    FunctionCase("_indent", "prompts", "orgmcp.app._facade_prompts", "indent", args("a\nb", 4)),
+    FunctionCase("_indent", "prompts", "hirearchy.app._facade_prompts", "indent", args("a\nb", 4)),
     Case("_quote", "prompts", "task_quoter", "quote", with_task(lambda t: ((t,), {}))),
     Case("state_summary", "prompts", "state_summarizer", "state_summary", args("ceo", {"t1"})),
     Case("_files_lines", "prompts", "files_lines", "lines", args("ceo", {"workspace": "w"})),

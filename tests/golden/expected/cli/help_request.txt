@@ -1,6 +1,6 @@
-usage: orgmcp request [-h] [--input KEY=VALUE] [--title TITLE] [--note NOTE] [--budget BUDGET]
-                      [--revises TASK_ID]
-                      service
+usage: hirearchy request [-h] [--input KEY=VALUE] [--title TITLE] [--note NOTE] [--budget BUDGET]
+                         [--revises TASK_ID]
+                         service
 
 positional arguments:
   service

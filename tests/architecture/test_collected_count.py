@@ -4,7 +4,7 @@ Two floors, neither of which is a shared line that two parallel steps both edit 
 
 * ``baseline_test_count.txt`` is the count of the commit the scaffold was built on. It is fixed: no step edits it (tests only move
   and grow), so it needs no merge.
-* every colocated ``src/orgmcp/<pkg>/tests/`` directory records its own floor in ``count.txt`` beside its tests (the step that owns the package
+* every colocated ``src/hirearchy/<pkg>/tests/`` directory records its own floor in ``count.txt`` beside its tests (the step that owns the package
   creates it and raises it when it adds tests; ``uv run python -m tests.architecture.collected_count --write`` writes it). Lowering a floor
   is a review item, as lowering the baseline was.
 """

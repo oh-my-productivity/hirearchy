@@ -3,6 +3,6 @@
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-SRC = REPO / "src" / "orgmcp"
+SRC = REPO / "src" / "hirearchy"
 FIXTURES = Path(__file__).parent / "fixtures"
 DOCUMENT = REPO / "ARCHITECTURE.md"

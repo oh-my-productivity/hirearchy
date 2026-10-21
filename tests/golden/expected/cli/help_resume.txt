@@ -1,4 +1,4 @@
-usage: orgmcp resume [-h] agent
+usage: hirearchy resume [-h] agent
 
 positional arguments:
   agent

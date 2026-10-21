@@ -1,5 +1,0 @@
-usage: orgmcp kiro-profile [-h] [--tools TOOLS]
-
-options:
-  -h, --help     show this help message and exit
-  --tools TOOLS

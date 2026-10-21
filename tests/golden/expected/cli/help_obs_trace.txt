@@ -1,4 +1,4 @@
-usage: orgmcp obs trace [-h] [--json] task_id
+usage: hirearchy obs trace [-h] [--json] task_id
 
 positional arguments:
   task_id

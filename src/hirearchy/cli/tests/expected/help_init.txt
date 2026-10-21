@@ -1,0 +1,9 @@
+usage: hirearchy init [-h] [--mission MISSION] [--model MODEL] [path]
+
+positional arguments:
+  path
+
+options:
+  -h, --help         show this help message and exit
+  --mission MISSION  mission text or @file
+  --model MODEL      default kiro model for all agents (default: claude-sonnet-5.5)

@@ -1,4 +1,5 @@
-usage: orgmcp run [-h] [--once] [--until-idle] [--until-done] [--max-runs MAX_RUNS] [--kiro KIRO]
+usage: hirearchy run [-h] [--once] [--until-idle] [--until-done] [--max-runs MAX_RUNS]
+                     [--kiro KIRO]
 
 options:
   -h, --help           show this help message and exit

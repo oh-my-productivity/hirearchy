@@ -8,7 +8,7 @@ import pytest
 from golden_support import check
 from scenarios import BRIEF, company, dirs
 
-from orgmcp.core import ROOT
+from hirearchy.core import ROOT
 from testkit.mcp_server_world import OrgBinding, build_server
 
 

@@ -18,10 +18,10 @@ from .clocks import clock_ports
 from .obs_fixtures import T0, Clock, EventLog, stamp
 from .scheduler import scheduler_is
 
-from orgmcp.app import wiring
-from orgmcp.core import ROOT, Message, Org
-from orgmcp.kernel import TokenSource
-from orgmcp.kernel.testing import CounterTokens
+from hirearchy.app import wiring
+from hirearchy.core import ROOT, Message, Org
+from hirearchy.kernel import TokenSource
+from hirearchy.kernel.testing import CounterTokens
 
 DEMO_NOW = T0 + timedelta(seconds=400)
 

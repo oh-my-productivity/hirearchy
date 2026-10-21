@@ -1,4 +1,4 @@
-usage: orgmcp status [-h]
+usage: hirearchy status [-h]
 
 options:
   -h, --help  show this help message and exit

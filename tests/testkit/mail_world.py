@@ -11,12 +11,12 @@ from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from orgmcp.app import wire_scheduler
-from orgmcp.kernel._system import SystemClock
-from orgmcp.kiro import RunCommand, RunCommandBuilder
-from orgmcp.scheduler._loop import HeartbeatLoop
-from orgmcp.scheduler._run import LoopState
-from orgmcp.scheduler.testing import RecordingConsole
+from hirearchy.app import wire_scheduler
+from hirearchy.kernel._system import SystemClock
+from hirearchy.kiro import RunCommand, RunCommandBuilder
+from hirearchy.scheduler._loop import HeartbeatLoop
+from hirearchy.scheduler._run import LoopState
+from hirearchy.scheduler.testing import RecordingConsole
 
 Runner = Callable[[Any, str, str], tuple[Sequence[str], Path, Mapping[str, str]]]
 

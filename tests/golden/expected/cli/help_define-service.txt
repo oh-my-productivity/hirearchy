@@ -1,10 +1,10 @@
-usage: orgmcp define-service [-h] [--description DESCRIPTION] [--input 'name*:description']
-                             [--acceptance TEXT|@FILE] [--add-acceptance TEXT|@FILE]
-                             [--remove-acceptance TEXT|@FILE] [--deliverable DELIVERABLE]
-                             [--format FORMAT] [--max-words MAX_WORDS] [--path PATH]
-                             [--budget BUDGET] [--playbook @FILE] [--locked | --no-locked]
-                             [--notes NOTES]
-                             owner name
+usage: hirearchy define-service [-h] [--description DESCRIPTION] [--input 'name*:description']
+                                [--acceptance TEXT|@FILE] [--add-acceptance TEXT|@FILE]
+                                [--remove-acceptance TEXT|@FILE] [--deliverable DELIVERABLE]
+                                [--format FORMAT] [--max-words MAX_WORDS] [--path PATH]
+                                [--budget BUDGET] [--playbook @FILE] [--locked | --no-locked]
+                                [--notes NOTES]
+                                owner name
 
 positional arguments:
   owner                 the top-level agent that offers the service

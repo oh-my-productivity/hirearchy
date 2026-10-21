@@ -1,7 +1,0 @@
-usage: orgmcp resume [-h] agent
-
-positional arguments:
-  agent
-
-options:
-  -h, --help  show this help message and exit

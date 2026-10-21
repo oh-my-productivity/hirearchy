@@ -3,21 +3,21 @@
     uv run python -m tests.architecture.gen_importlinter        # prints the config
     uv run python -m tests.architecture.lint                    # writes .importlinter (git-ignored) and runs lint-imports
 
-Why generated: import-linter wildcards must replace a whole module name (``orgmcp.*._*`` is not valid), and a layer whose package does
+Why generated: import-linter wildcards must replace a whole module name (``hirearchy.*._*`` is not valid), and a layer whose package does
 not exist yet would fail the contract; so the file lists exactly the packages that exist (the others are simply left out) and
 one ``private-modules-<pkg>`` contract per package that has ``_*`` modules. Nothing here is edited by a feature step: creating
-``src/orgmcp/<pkg>/`` is enough for its contracts to appear.
+``src/hirearchy/<pkg>/`` is enough for its contracts to appear.
 
 Contracts (rule in parentheses):
 
 * ``layers`` (R4, R5): app/core -> entry points -> features by level (L11..L1) -> kernel. ``|`` = independent siblings.
-* ``private-modules-<pkg>`` (R2): only the package itself (its own tests included) and ``orgmcp.app`` import its ``_*`` modules.
+* ``private-modules-<pkg>`` (R2): only the package itself (its own tests included) and ``hirearchy.app`` import its ``_*`` modules.
 * ``kernel-independent`` (R3): the kernel imports no other module of the root package.
-* ``no-facade-import`` (R5): no package imports ``orgmcp.core`` or ``orgmcp.app``.
+* ``no-facade-import`` (R5): no package imports ``hirearchy.core`` or ``hirearchy.app``.
 * ``no-testing-in-production``: ``<pkg>.testing`` is imported only by tests and by other ``testing`` modules.
 * ``textual-only-in-dashboard`` / ``mcp-only-in-mcp-server`` / ``yaml-only-where-needed``: frameworks stay at the edge.
 
-The hand-written contracts (what the generator does not derive from the package map: ``orgmcp.core`` does not import the entry points)
+The hand-written contracts (what the generator does not derive from the package map: ``hirearchy.core`` does not import the entry points)
 are in ``[tool.importlinter]`` of pyproject.toml; ``lint`` runs both.
 """
 

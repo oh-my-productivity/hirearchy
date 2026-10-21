@@ -1,6 +1,6 @@
-usage: orgmcp obs events [-h] [--since SINCE] [--until UNTIL] [--agent ADDR] [--kind KIND]
-                         [--trace TASK_ID] [--errors] [--limit LIMIT] [--follow] [--poll POLL]
-                         [--json]
+usage: hirearchy obs events [-h] [--since SINCE] [--until UNTIL] [--agent ADDR] [--kind KIND]
+                            [--trace TASK_ID] [--errors] [--limit LIMIT] [--follow] [--poll POLL]
+                            [--json]
 
 options:
   -h, --help       show this help message and exit

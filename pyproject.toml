@@ -1,5 +1,5 @@
 [project]
-name = "orgmcp"
+name = "hirearchy"
 version = "0.1.0"
 description = "A file-based organization of agents, run over MCP"
 readme = "README.md"
@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-orgmcp = "orgmcp:main"
+hirearchy = "hirearchy:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -28,21 +28,21 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-# Colocated tests (src/orgmcp/**/tests/) are development files: never shipped.
+# Colocated tests (src/hirearchy/**/tests/) are development files: never shipped.
 exclude = ["**/tests/**"]
 
 [tool.hatch.build.targets.wheel.force-include]
-"skills/orgmcp/SKILL.md" = "orgmcp/_skill/SKILL.md"
+"skills/hirearchy/SKILL.md" = "hirearchy/_skill/SKILL.md"
 
 [tool.pytest.ini_options]
-# Tests live in tests/ (cross-feature, end-to-end, golden) and next to the code in src/orgmcp/**/tests/ (see README, "Test").
+# Tests live in tests/ (cross-feature, end-to-end, golden) and next to the code in src/hirearchy/**/tests/ (see README, "Test").
 # The shared fixtures and hooks are in the root conftest.py, so they reach both places; tests/ is on sys.path so tests can
 # import the shared helpers (`import testkit`: fixtures, the stand-in agents fake_agent / fake_team_agent, kiro_sandbox, dash_fixtures, ...).
-testpaths = ["tests", "src/orgmcp"]
+testpaths = ["tests", "src/hirearchy"]
 pythonpath = ["tests"]
 markers = [
-    "integration: uses the real kiro-cli / a real LLM; skipped unless --run-integration (or ORGMCP_RUN_INTEGRATION=1)",
-    "perf: timing guards; opt-in with ORGMCP_RUN_PERF=1 (the deterministic, count-based guards run by default)",
+    "integration: uses the real kiro-cli / a real LLM; skipped unless --run-integration (or HIREARCHY_RUN_INTEGRATION=1)",
+    "perf: timing guards; opt-in with HIREARCHY_RUN_PERF=1 (the deterministic, count-based guards run by default)",
     "architecture: structural checks of the refactor (tests/architecture); deselect with -m 'not architecture' for a quick loop",
 ]
 
@@ -52,9 +52,9 @@ markers = [
 # ---------------------------------------------------------------------------------------------------------------------
 
 [tool.mypy]
-# STRICT CHECKING, PACKAGE BY PACKAGE. scripts/static_checks.py checks with `strict = true` every package directory of src/orgmcp
+# STRICT CHECKING, PACKAGE BY PACKAGE. scripts/static_checks.py checks with `strict = true` every package directory of src/hirearchy
 # (a directory with __init__.py: kernel, the features, the entry points, app) -- so a new package is strict from its first commit and
-# no step edits this file -- plus the modules listed in `packages` below. Production code is strict; the test code (src/orgmcp/**/tests,
+# no step edits this file -- plus the modules listed in `packages` below. Production code is strict; the test code (src/hirearchy/**/tests,
 # tests/) is not type-checked strictly: the tests moved by step E1 carry `# mypy: ignore-errors`. Everything outside the packages is only
 # *followed* (its types are used, its errors are not reported).
 # Run it with `uv run python scripts/static_checks.py mypy`.
@@ -64,27 +64,27 @@ namespace_packages = true
 explicit_package_bases = true
 strict = true
 follow_imports = "silent"
-packages = ["orgmcp.kernel"]
+packages = ["hirearchy.kernel"]
 
 [[tool.mypy.overrides]]
 # R10: no explicit `Any` in the public surface (api.py) of a refactored package. `JsonObject = dict[str, object]` replaces dict[str, Any].
-module = ["orgmcp.*.api"]
+module = ["hirearchy.*.api"]
 disallow_any_explicit = true
 
 [[tool.mypy.overrides]]
 # Colocated tests and the in-memory fakes use pytest fixtures/marks, which are untyped decorators.
-module = ["orgmcp.*.tests.*", "orgmcp.*.testing"]
+module = ["hirearchy.*.tests.*", "hirearchy.*.testing"]
 disallow_untyped_decorators = false
 
 [[tool.mypy.overrides]]
 # The builder is a registry keyed by Protocol classes (`b.get(Clock)`): mypy refuses a Protocol where `type[T]` is expected unless
 # this check is off (its documented remedy). Only the composition root has such a registry.
-module = ["orgmcp.app", "orgmcp.app.*"]
+module = ["hirearchy.app", "hirearchy.app.*"]
 disable_error_code = ["type-abstract"]
 
 [[tool.mypy.overrides]]
 # `testkit.reach.<module>` is an alias of <module> made at run time (tests/testkit/reach): to mypy it is a missing module, i.e. Any.
-# It lets a colocated test reach orgmcp.core, orgmcp.app.wiring and yaml, which the import contracts keep out of a package.
+# It lets a colocated test reach hirearchy.core, hirearchy.app.wiring and yaml, which the import contracts keep out of a package.
 module = ["testkit.reach", "testkit.reach.*"]
 ignore_missing_imports = true
 
@@ -95,7 +95,7 @@ module = ["yaml", "yaml.*"]
 ignore_missing_imports = true
 
 [tool.importlinter]
-# HAND-WRITTEN CONTRACTS: what the generator does not derive from the package map (today: the permanent facade module `orgmcp.core` and
+# HAND-WRITTEN CONTRACTS: what the generator does not derive from the package map (today: the permanent facade module `hirearchy.core` and
 # the library do not import the entry points). The contracts of the architecture (ARCHITECTURE.md 8.2: layers app/core -> entry points ->
 # features -> kernel; no import of another package's `_` modules; no cycles between features; the kernel imports nothing; no feature imports
 # the Org facade; frameworks at the edge) are GENERATED
@@ -103,15 +103,15 @@ ignore_missing_imports = true
 # (git-ignored) and runs it together with this section. To add a hand-written contract append a `[[tool.importlinter.contracts]]` block
 # below: a `name`, a `type` (layers, forbidden, independence, acyclic_siblings ...) and its modules; it must pass before the commit.
 # Docs: import-linter.readthedocs.io. (A plain `lint-imports` reads .importlinter when it exists: use `lint` or static_checks.py.)
-root_package = "orgmcp"
+root_package = "hirearchy"
 include_external_packages = false
 
 [[tool.importlinter.contracts]]
 name = "The library does not import the entry points (cli, mcp server, dashboard)"
 type = "forbidden"
 source_modules = [
-    "orgmcp.blueprint", "orgmcp.core",
-    "orgmcp.health", "orgmcp.progress", "orgmcp.review", "orgmcp.scheduler", "orgmcp.services",
-    "orgmcp.skill", "orgmcp.telemetry", "orgmcp.templates", "orgmcp.upgrade",
+    "hirearchy.blueprint", "hirearchy.core",
+    "hirearchy.health", "hirearchy.progress", "hirearchy.review", "hirearchy.scheduler", "hirearchy.services",
+    "hirearchy.skill", "hirearchy.telemetry", "hirearchy.templates", "hirearchy.upgrade",
 ]
-forbidden_modules = ["orgmcp.cli", "orgmcp.dashboard"]
+forbidden_modules = ["hirearchy.cli", "hirearchy.dashboard"]

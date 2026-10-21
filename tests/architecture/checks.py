@@ -1,7 +1,7 @@
 """The structural checkers of the refactor (ARCHITECTURE.md 1.2 and 8.4), as plain functions over a source tree.
 
 Every checker takes a ``Tree`` (a directory holding a Python package) and returns a list of ``Violation``. They work on the AST, so
-they run on ``src/orgmcp`` AND on the seeded violations in ``fixtures/bad_pkg`` without importing either: ``test_architecture.py``
+they run on ``src/hirearchy`` AND on the seeded violations in ``fixtures/bad_pkg`` without importing either: ``test_architecture.py``
 proves that each checker is quiet on the real code and flags the seeded violation. A checker that finds nothing to look at (a package
 that does not exist yet) is quiet: the checks are vacuous for packages that are not there.
 
@@ -47,7 +47,7 @@ class Violation:
 
 @dataclass(frozen=True)
 class Module:
-    name: str  # dotted, e.g. orgmcp.mail._mailbox
+    name: str  # dotted, e.g. hirearchy.mail._mailbox
     package: str  # first component below the root ("mail"), "" for modules directly under the root
     path: Path
     ast: ast.Module
@@ -55,7 +55,7 @@ class Module:
 
 
 class Tree:
-    """A package directory on disk: ``Tree(Path("src/orgmcp"))`` or ``Tree(Path(".../fixtures/bad_pkg"))``."""
+    """A package directory on disk: ``Tree(Path("src/hirearchy"))`` or ``Tree(Path(".../fixtures/bad_pkg"))``."""
 
     def __init__(self, directory: Path, name: str | None = None) -> None:
         self.directory = directory
@@ -162,13 +162,13 @@ def module_singletons(tree: Tree, skip: Iterable[str] = ("app",)) -> list[Violat
                 called = func.id if isinstance(func, ast.Name) else func.attr if isinstance(func, ast.Attribute) else ""
                 if called in classes and not _data_class(classes[called]):
                     found.append(Violation("R6", _where(module, stmt), f"module-level instance {label} = {called}(...): only the "
-                                                                       "composition root (orgmcp.app) constructs objects"))
+                                                                       "composition root (hirearchy.app) constructs objects"))
                 elif called in MUTABLE_FACTORIES and not value.args and not value.keywords:
                     found.append(Violation("R6", _where(module, stmt), f"module-level mutable state {label} = {called}(): move it "
-                                                                       "to a process resource of orgmcp.app"))
+                                                                       "to a process resource of hirearchy.app"))
             elif (isinstance(value, ast.Dict) and not value.keys) or (isinstance(value, (ast.List, ast.Set)) and not value.elts):
                 found.append(Violation("R6", _where(module, stmt), f"module-level mutable state {label} = empty container: move it "
-                                                                   "to a process resource of orgmcp.app"))
+                                                                   "to a process resource of hirearchy.app"))
     return found
 
 
@@ -469,7 +469,7 @@ def imported_packages(module: Module, root: str) -> set[str]:
             else:
                 dotted = node.module or ""
             targets = [dotted]
-            if dotted == root:  # ``from orgmcp import mail``: the imported names are modules
+            if dotted == root:  # ``from hirearchy import mail``: the imported names are modules
                 targets = [f"{root}.{a.name}" for a in node.names]
         for target in targets:
             parts = target.split(".")

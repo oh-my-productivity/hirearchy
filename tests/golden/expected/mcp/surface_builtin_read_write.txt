@@ -526,7 +526,7 @@ output: {
 }
 other: {}
 description:
-The ORGANIZATION's read tool (kiro shows it as @orgmcp/org_read; not kiro's built-in `read`, which reads the
+The ORGANIZATION's read tool (kiro shows it as @hirearchy/org_read; not kiro's built-in `read`, which reads the
         workspace). kiro's built-in `read` has the name `read` (it reads the workspace, inputs and, by absolute path, the organization); this tool is the organization's relative-path reader, called `org_read` for you. Reads a file (with word count and modification time) or lists a directory in the organization. Paths
         are relative to the org root, e.g. "ceo/writer/work/brief.md". Outside the organization only ABSOLUTE paths work,
         and only inside your workspace, your read-only inputs, or the workspace of an agent in your team (to verify
@@ -571,8 +571,8 @@ output: {
 }
 other: {}
 description:
-Write an ORGANIZATION file (kiro shows this tool as @orgmcp/org_write; it is NOT kiro's built-in `write`, which
-        writes the workspace). kiro's built-in `write` has the name `write`; this orgmcp tool is called `org_write` for you. Use it for your memory, notes and artifacts inside your own org directory. Paths are
+Write an ORGANIZATION file (kiro shows this tool as @hirearchy/org_write; it is NOT kiro's built-in `write`, which
+        writes the workspace). kiro's built-in `write` has the name `write`; this hirearchy tool is called `org_write` for you. Use it for your memory, notes and artifacts inside your own org directory. Paths are
         relative to the org root, like every path here, so they start with your address: e.g. "<you>/MEMORY.md" or
         "<you>/work/plan.md".
 

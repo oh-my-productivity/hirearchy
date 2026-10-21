@@ -1,4 +1,4 @@
-"""The rule "the ``Org`` facade is pure delegation" (ARCHITECTURE.md 6.4), as an AST check over ``orgmcp/app/_facade_*.py``.
+"""The rule "the ``Org`` facade is pure delegation" (ARCHITECTURE.md 6.4), as an AST check over ``hirearchy/app/_facade_*.py``.
 
 A method of a facade mixin has, after an optional docstring, ONE statement:
 

@@ -15,12 +15,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from orgmcp.app import wiring
-from orgmcp.daemon import SchedulerState, SchedulerStatus
-from orgmcp.daemon.testing import FakeSchedulerStatus
-from orgmcp.kernel import Clock, fmt_dur
-from orgmcp.kernel.testing import FakeClock
-from orgmcp.observability import fmt_rel, format_event, is_error, normalize_refusal, parse_when, percentile
+from hirearchy.app import wiring
+from hirearchy.daemon import SchedulerState, SchedulerStatus
+from hirearchy.daemon.testing import FakeSchedulerStatus
+from hirearchy.kernel import Clock, fmt_dur
+from hirearchy.kernel.testing import FakeClock
+from hirearchy.observability import fmt_rel, format_event, is_error, normalize_refusal, parse_when, percentile
 
 from .health_world import _OVERRIDES, with_clock, with_ports
 from .obs_fixtures import T0

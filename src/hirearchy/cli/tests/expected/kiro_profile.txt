@@ -1,0 +1,6 @@
+wrote ~/.kiro/agents/hirearchy-t-org-<HASH>-read-write.json (mcp server: {"command": "<VENV_BIN>/hirearchy", "args": ["mcp"]})
+
+[stderr]
+org: <ORG>
+
+[exit 0]

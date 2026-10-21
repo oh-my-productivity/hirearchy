@@ -1,0 +1,4 @@
+<TMP>/skills/hirearchy/SKILL.md
+installed the hirearchy skill
+
+[exit 0]

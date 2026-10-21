@@ -1,14 +1,14 @@
 """Modules that the import contracts keep out of a package's tests, reachable as ``testkit.reach.<module>`` (the module itself, not a copy).
 
-A test colocated in ``src/orgmcp/<package>/tests/`` still needs to build its world with the facade (``orgmcp.core``), the composition root
-(``orgmcp.app.wiring``) or PyYAML, which a package below them may not import (ARCHITECTURE.md 8.2). It writes
-``from testkit.reach.orgmcp.core import ROOT, Org`` instead of ``from orgmcp.core import ROOT, Org``; ``testkit.reach.<dotted name>`` is an
-alias of the module ``<dotted name>`` (``yaml``, ``orgmcp.core``, ``orgmcp.app.wiring`` ...): the very same module object, so ``isinstance``
-and identity checks behave as before. The imports are invisible to import-linter (``testkit`` is not part of ``orgmcp``), and mypy treats
+A test colocated in ``src/hirearchy/<package>/tests/`` still needs to build its world with the facade (``hirearchy.core``), the composition root
+(``hirearchy.app.wiring``) or PyYAML, which a package below them may not import (ARCHITECTURE.md 8.2). It writes
+``from testkit.reach.hirearchy.core import ROOT, Org`` instead of ``from hirearchy.core import ROOT, Org``; ``testkit.reach.<dotted name>`` is an
+alias of the module ``<dotted name>`` (``yaml``, ``hirearchy.core``, ``hirearchy.app.wiring`` ...): the very same module object, so ``isinstance``
+and identity checks behave as before. The imports are invisible to import-linter (``testkit`` is not part of ``hirearchy``), and mypy treats
 them as ``Any`` (``ignore_missing_imports`` for ``testkit.reach.*`` in pyproject.toml).
 
 Prefer the real API of the package under test; reach for this only where the test needs what its layer may not import. Seams of the
-runtime are replaced with ``orgmcp.app.wiring.overriding`` or the fixtures of ``testkit``, not by patching modules.
+runtime are replaced with ``hirearchy.app.wiring.overriding`` or the fixtures of ``testkit``, not by patching modules.
 """
 
 import importlib

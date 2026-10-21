@@ -1,4 +1,4 @@
-usage: orgmcp review [-h] [--dry-run]
+usage: hirearchy review [-h] [--dry-run]
 
 options:
   -h, --help  show this help message and exit

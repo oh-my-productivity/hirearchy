@@ -1,0 +1,5 @@
+usage: hirearchy review [-h] [--dry-run]
+
+options:
+  -h, --help  show this help message and exit
+  --dry-run   print what would be sent; write nothing

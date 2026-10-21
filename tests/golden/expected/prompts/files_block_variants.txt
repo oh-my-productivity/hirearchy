@@ -1,12 +1,12 @@
 ### shell_only (shell-only)
 - Address: `shell-only`; parent: `root`; role: Worker
 - Budget: 0 run(s) left (this run already counted). Hiring: not allowed
-- Tools beyond orgmcp: shell; workspace: <WS>
+- Tools beyond hirearchy: shell; workspace: <WS>
 - Files:
-  - orgmcp tools (shown as `@orgmcp/write`, `@orgmcp/read`, ...): paths are relative to the org root; your notes and memory: `shell-only/MEMORY.md`, `shell-only/work/` (orgmcp `write` only).
-  - Do not mix up the two kinds of tools: kiro's built-in `shell` have the same short names as orgmcp's but are not the same tools: they work on the workspace only and never reach the org. Org files (`shell-only/MEMORY.md`, `shell-only/work/`, anything under `shell-only/`) are written with `@orgmcp/write` and read with `@orgmcp/read`, never with the built-in `write`/`read`.
+  - hirearchy tools (shown as `@hirearchy/write`, `@hirearchy/read`, ...): paths are relative to the org root; your notes and memory: `shell-only/MEMORY.md`, `shell-only/work/` (hirearchy `write` only).
+  - Do not mix up the two kinds of tools: kiro's built-in `shell` have the same short names as hirearchy's but are not the same tools: they work on the workspace only and never reach the org. Org files (`shell-only/MEMORY.md`, `shell-only/work/`, anything under `shell-only/`) are written with `@hirearchy/write` and read with `@hirearchy/read`, never with the built-in `write`/`read`.
   - Workspace (kiro read/write/shell, and the working directory of kiro tools): `<WS>`; relative paths in kiro tools resolve there.
-  - Read-only inputs (kiro `read` or orgmcp `read` by absolute path): `<INPUTS>`. Never modify them.
+  - Read-only inputs (kiro `read` or hirearchy `read` by absolute path): `<INPUTS>`. Never modify them.
   - Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path.
   - You have `shell`, which the runtime cannot confine: use it only inside your workspace; never write to inputs, to the org directory, or anywhere else.
 - Direct reports: none
@@ -17,12 +17,12 @@
 ### read_only (read-only)
 - Address: `read-only`; parent: `root`; role: Worker
 - Budget: 0 run(s) left (this run already counted). Hiring: not allowed
-- Tools beyond orgmcp: read; workspace: <WS>
+- Tools beyond hirearchy: read; workspace: <WS>
 - Files:
-  - orgmcp tools (shown as `@orgmcp/write`, `@orgmcp/org_read`, ...): paths are relative to the org root; your notes and memory: `read-only/MEMORY.md`, `read-only/work/` (orgmcp `write` only).
-  - Do not mix up the two kinds of tools: kiro's built-in `read` are not orgmcp's tools: they write and run only in the workspace and never change the org. Org files (`read-only/MEMORY.md`, `read-only/work/`, anything under `read-only/`) are written with `@orgmcp/write`, never with the built-in `write`. Your `read` is kiro's built-in: it reads org files too, but only by ABSOLUTE path, `<TMP>/org/<path in the org>` (a relative path starts in your working directory); the orgmcp read tool is `@orgmcp/org_read` for you (relative org paths; wherever ORG.md says `@orgmcp/read`, use that name).
+  - hirearchy tools (shown as `@hirearchy/write`, `@hirearchy/org_read`, ...): paths are relative to the org root; your notes and memory: `read-only/MEMORY.md`, `read-only/work/` (hirearchy `write` only).
+  - Do not mix up the two kinds of tools: kiro's built-in `read` are not hirearchy's tools: they write and run only in the workspace and never change the org. Org files (`read-only/MEMORY.md`, `read-only/work/`, anything under `read-only/`) are written with `@hirearchy/write`, never with the built-in `write`. Your `read` is kiro's built-in: it reads org files too, but only by ABSOLUTE path, `<TMP>/org/<path in the org>` (a relative path starts in your working directory); the hirearchy read tool is `@hirearchy/org_read` for you (relative org paths; wherever ORG.md says `@hirearchy/read`, use that name).
   - Workspace (kiro read/write/shell, and the working directory of kiro tools): `<WS>`; relative paths in kiro tools resolve there.
-  - Read-only inputs (kiro `read` or orgmcp `org_read` by absolute path): `<INPUTS>`. Never modify them.
+  - Read-only inputs (kiro `read` or hirearchy `org_read` by absolute path): `<INPUTS>`. Never modify them.
   - Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path.
   - kiro `write` is limited to the workspace and kiro `read` to workspace + inputs + the organization (read-only); other paths are refused.
 - Direct reports: none
@@ -33,12 +33,12 @@
 ### write_only (write-only)
 - Address: `write-only`; parent: `root`; role: Worker
 - Budget: 0 run(s) left (this run already counted). Hiring: not allowed
-- Tools beyond orgmcp: write; workspace: <WS>
+- Tools beyond hirearchy: write; workspace: <WS>
 - Files:
-  - orgmcp tools (shown as `@orgmcp/org_write`, `@orgmcp/read`, ...): paths are relative to the org root; your notes and memory: `write-only/MEMORY.md`, `write-only/work/` (orgmcp `org_write` only).
-  - Do not mix up the two kinds of tools: kiro's built-in `write` are not orgmcp's tools: they work on the workspace only and never reach the org. Org files (`write-only/MEMORY.md`, `write-only/work/`, anything under `write-only/`) are written with `@orgmcp/org_write`, never with the built-in `write`: kiro's built-in `write` has the name `write`; the orgmcp write tool is `@orgmcp/org_write` for you: use it for MEMORY.md and org files (wherever ORG.md says `@orgmcp/write`, use that name). Read org files with `@orgmcp/read`.
+  - hirearchy tools (shown as `@hirearchy/org_write`, `@hirearchy/read`, ...): paths are relative to the org root; your notes and memory: `write-only/MEMORY.md`, `write-only/work/` (hirearchy `org_write` only).
+  - Do not mix up the two kinds of tools: kiro's built-in `write` are not hirearchy's tools: they work on the workspace only and never reach the org. Org files (`write-only/MEMORY.md`, `write-only/work/`, anything under `write-only/`) are written with `@hirearchy/org_write`, never with the built-in `write`: kiro's built-in `write` has the name `write`; the hirearchy write tool is `@hirearchy/org_write` for you: use it for MEMORY.md and org files (wherever ORG.md says `@hirearchy/write`, use that name). Read org files with `@hirearchy/read`.
   - Workspace (kiro read/write/shell, and the working directory of kiro tools): `<WS>`; relative paths in kiro tools resolve there.
-  - Read-only inputs (kiro `read` or orgmcp `read` by absolute path): `<INPUTS>`. Never modify them.
+  - Read-only inputs (kiro `read` or hirearchy `read` by absolute path): `<INPUTS>`. Never modify them.
   - Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path.
   - kiro `write` is limited to the workspace and kiro `read` to workspace + inputs + the organization (read-only); other paths are refused.
 - Direct reports: none
@@ -49,12 +49,12 @@
 ### read_write (read-write)
 - Address: `read-write`; parent: `root`; role: Worker
 - Budget: 0 run(s) left (this run already counted). Hiring: not allowed
-- Tools beyond orgmcp: read, write; workspace: <WS>
+- Tools beyond hirearchy: read, write; workspace: <WS>
 - Files:
-  - orgmcp tools (shown as `@orgmcp/org_write`, `@orgmcp/org_read`, ...): paths are relative to the org root; your notes and memory: `read-write/MEMORY.md`, `read-write/work/` (orgmcp `org_write` only).
-  - Do not mix up the two kinds of tools: kiro's built-in `read`, `write` are not orgmcp's tools: they write and run only in the workspace and never change the org. Org files (`read-write/MEMORY.md`, `read-write/work/`, anything under `read-write/`) are written with `@orgmcp/org_write`, never with the built-in `write`: kiro's built-in `write` has the name `write`; the orgmcp write tool is `@orgmcp/org_write` for you: use it for MEMORY.md and org files (wherever ORG.md says `@orgmcp/write`, use that name). Your `read` is kiro's built-in: it reads org files too, but only by ABSOLUTE path, `<TMP>/org/<path in the org>` (a relative path starts in your working directory); the orgmcp read tool is `@orgmcp/org_read` for you (relative org paths; wherever ORG.md says `@orgmcp/read`, use that name).
+  - hirearchy tools (shown as `@hirearchy/org_write`, `@hirearchy/org_read`, ...): paths are relative to the org root; your notes and memory: `read-write/MEMORY.md`, `read-write/work/` (hirearchy `org_write` only).
+  - Do not mix up the two kinds of tools: kiro's built-in `read`, `write` are not hirearchy's tools: they write and run only in the workspace and never change the org. Org files (`read-write/MEMORY.md`, `read-write/work/`, anything under `read-write/`) are written with `@hirearchy/org_write`, never with the built-in `write`: kiro's built-in `write` has the name `write`; the hirearchy write tool is `@hirearchy/org_write` for you: use it for MEMORY.md and org files (wherever ORG.md says `@hirearchy/write`, use that name). Your `read` is kiro's built-in: it reads org files too, but only by ABSOLUTE path, `<TMP>/org/<path in the org>` (a relative path starts in your working directory); the hirearchy read tool is `@hirearchy/org_read` for you (relative org paths; wherever ORG.md says `@hirearchy/read`, use that name).
   - Workspace (kiro read/write/shell, and the working directory of kiro tools): `<WS>`; relative paths in kiro tools resolve there.
-  - Read-only inputs (kiro `read` or orgmcp `org_read` by absolute path): `<INPUTS>`. Never modify them.
+  - Read-only inputs (kiro `read` or hirearchy `org_read` by absolute path): `<INPUTS>`. Never modify them.
   - Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path.
   - kiro `write` is limited to the workspace and kiro `read` to workspace + inputs + the organization (read-only); other paths are refused.
 - Direct reports: none
@@ -65,11 +65,11 @@
 ### workspace_no_tools (workspace-no-tools)
 - Address: `workspace-no-tools`; parent: `root`; role: Worker
 - Budget: 0 run(s) left (this run already counted). Hiring: not allowed
-- Tools beyond orgmcp: none; workspace: <WS>
+- Tools beyond hirearchy: none; workspace: <WS>
 - Files:
-  - orgmcp tools (shown as `@orgmcp/write`, `@orgmcp/read`, ...): paths are relative to the org root; your notes and memory: `workspace-no-tools/MEMORY.md`, `workspace-no-tools/work/` (orgmcp `write` only).
+  - hirearchy tools (shown as `@hirearchy/write`, `@hirearchy/read`, ...): paths are relative to the org root; your notes and memory: `workspace-no-tools/MEMORY.md`, `workspace-no-tools/work/` (hirearchy `write` only).
   - Workspace (kiro read/write/shell, and the working directory of kiro tools): `<WS>`; relative paths in kiro tools resolve there.
-  - Read-only inputs (kiro `read` or orgmcp `read` by absolute path): `<INPUTS>`. Never modify them.
+  - Read-only inputs (kiro `read` or hirearchy `read` by absolute path): `<INPUTS>`. Never modify them.
   - Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path.
 - Direct reports: none
 - Siblings: ceo, read-only, read-write, shell-only, write-only
@@ -79,7 +79,7 @@
 ### bare
 - Address: `bare`; parent: `root`; role: Bare
 - Budget: 0 run(s) left (this run already counted). Hiring: not allowed
-- Tools beyond orgmcp: none
+- Tools beyond hirearchy: none
 - Direct reports: none
 - Siblings: ceo, read-only, read-write, shell-only, workspace-no-tools, write-only
 - Open tasks assigned to you: none

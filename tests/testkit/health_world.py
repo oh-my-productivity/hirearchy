@@ -17,15 +17,15 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-from orgmcp.app import wiring
-from orgmcp.app.wire_scheduler import loop_of
-from orgmcp.core import ROOT, Org
-from orgmcp.health import AgentHealth, OrgHealth
-from orgmcp.kernel import Clock
-from orgmcp.kernel.testing import FakeClock
-from orgmcp.kiro import RunCommand, RunCommandBuilder
-from orgmcp.scheduler._ports import Console
-from orgmcp.scheduler._run import LoopMemory, LoopState
+from hirearchy.app import wiring
+from hirearchy.app.wire_scheduler import loop_of
+from hirearchy.core import ROOT, Org
+from hirearchy.health import AgentHealth, OrgHealth
+from hirearchy.kernel import Clock
+from hirearchy.kernel.testing import FakeClock
+from hirearchy.kiro import RunCommand, RunCommandBuilder
+from hirearchy.scheduler._ports import Console
+from hirearchy.scheduler._run import LoopMemory, LoopState
 
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 _OVERRIDES = "_port_overrides"  # the overrides the organization was last opened with, kept on it so that a second ``with_ports`` adds to them

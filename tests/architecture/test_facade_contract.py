@@ -1,7 +1,7 @@
 """The ``Org`` facade is a contract with three parts (ARCHITECTURE.md 6.4, step E2-facade).
 
 1. It is the whole recorded surface: one case for each of the 98 methods of ``tests/architecture/org_signatures.json`` (their names, kinds and
-   parameters are guarded by ``orgmcp/app/tests/test_facade_signatures.py``), grouped by the mixin that holds them.
+   parameters are guarded by ``hirearchy/app/tests/test_facade_signatures.py``), grouped by the mixin that holds them.
 2. Every method does what its feature does: through a runtime of spy fakes (``open_runtime(root, overrides)``) it makes exactly one call of
    exactly one port, with the arguments it was given, and returns what the port returned; through the real runtime it returns, or raises, what the
    real port did.
@@ -20,11 +20,11 @@ from typing import Any
 
 import pytest
 
-from orgmcp.app import Org
-from orgmcp.app.runtime import OrgRuntime
-from orgmcp.app.tests import _signatures
-from orgmcp.app.tests._mixins import MIXINS
-from orgmcp.app.wiring import open_runtime, runtime_ports
+from hirearchy.app import Org
+from hirearchy.app.runtime import OrgRuntime
+from hirearchy.app.tests import _signatures
+from hirearchy.app.tests._mixins import MIXINS
+from hirearchy.app.wiring import open_runtime, runtime_ports
 
 from . import facade_cases, facade_rules
 from .paths import REPO

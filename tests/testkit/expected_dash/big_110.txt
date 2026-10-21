@@ -1,4 +1,4 @@
-orgmcp dash - big (<ROOT>)  2026-10-18 10:06:40Z
+hirearchy dash - big (<ROOT>)  2026-10-18 10:06:40Z
 scheduler running pid 7000 | running 2/4 · queued 43 · waiting on you 0 · errors 15m 0
 
 AGENTS

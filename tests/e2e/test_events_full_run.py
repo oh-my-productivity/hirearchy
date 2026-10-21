@@ -7,11 +7,11 @@ import time
 
 import pytest
 import testkit
-from testkit.reach.orgmcp.app import wiring
+from testkit.reach.hirearchy.app import wiring
 from testkit.scheduler_loop import loop_over
 
-from orgmcp.core import ROOT
-from orgmcp.eventlog import LINE_MAX
+from hirearchy.core import ROOT
+from hirearchy.eventlog import LINE_MAX
 
 FAKE = str(testkit.FAKE_AGENT)
 SILENT = {"echo": lambda _: None}

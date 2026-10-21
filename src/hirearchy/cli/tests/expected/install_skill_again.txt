@@ -1,0 +1,4 @@
+<TMP>/skills/hirearchy/SKILL.md
+already installed and up to date
+
+[exit 0]

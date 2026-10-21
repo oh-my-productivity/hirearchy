@@ -1,5 +1,5 @@
 {
-  "command": "<VENV_BIN>/orgmcp",
+  "command": "<VENV_BIN>/hirearchy",
   "args": [
     "mcp"
   ]

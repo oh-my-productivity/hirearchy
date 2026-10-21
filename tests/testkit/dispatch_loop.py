@@ -7,13 +7,13 @@ written to a ``MemoryProfileStore``, not to ``~/.kiro/agents`` (what the patch o
 
 from __future__ import annotations
 
-from orgmcp.app import wire_kiro, wire_scheduler, wiring
-from orgmcp.kernel._system import SystemClock
-from orgmcp.kiro import McpServerLocator, ProfileStore
-from orgmcp.kiro.testing import MemoryProfileStore, StaticMcpServerLocator
-from orgmcp.scheduler._loop import HeartbeatLoop
-from orgmcp.scheduler._run import LoopState
-from orgmcp.scheduler.testing import RecordingConsole
+from hirearchy.app import wire_kiro, wire_scheduler, wiring
+from hirearchy.kernel._system import SystemClock
+from hirearchy.kiro import McpServerLocator, ProfileStore
+from hirearchy.kiro.testing import MemoryProfileStore, StaticMcpServerLocator
+from hirearchy.scheduler._loop import HeartbeatLoop
+from hirearchy.scheduler._run import LoopState
+from hirearchy.scheduler.testing import RecordingConsole
 
 
 def loop_over(org, kiro_bin: str) -> HeartbeatLoop:

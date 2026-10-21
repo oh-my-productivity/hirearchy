@@ -1,6 +1,6 @@
 """``describe_progress(org, task_id, wait_seconds)`` and ``work_in_flight(org, task_id)`` as the tests call them: over the ``ProgressReporter`` of the runtime of the organization.
 
-(``progress(org, ...)`` is the permanent entry point of ``orgmcp.progress`` and is imported from there.)
+(``progress(org, ...)`` is the permanent entry point of ``hirearchy.progress`` and is imported from there.)
 """
 
 from __future__ import annotations

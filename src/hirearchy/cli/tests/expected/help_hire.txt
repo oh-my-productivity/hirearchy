@@ -1,0 +1,20 @@
+usage: hirearchy hire [-h] --role ROLE --charter CHARTER [--model MODEL] [--tools TOOLS]
+                      [--can-hire] [--max-children MAX_CHILDREN] [--workspace WORKSPACE]
+                      [--inputs PATH]
+                      parent name
+
+positional arguments:
+  parent                'root' or an agent address
+  name
+
+options:
+  -h, --help            show this help message and exit
+  --role ROLE
+  --charter CHARTER     charter text or @file
+  --model MODEL         kiro model for this agent (default: the org's default model, claude-
+                        sonnet-5.5)
+  --tools TOOLS         comma-separated kiro built-in tools, e.g. read,write,shell
+  --can-hire
+  --max-children MAX_CHILDREN
+  --workspace WORKSPACE
+  --inputs PATH         absolute folder the agent may only read, never change (repeatable)

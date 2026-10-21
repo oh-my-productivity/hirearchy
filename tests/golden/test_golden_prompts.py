@@ -3,7 +3,7 @@
 from golden_support import check
 from scenarios import BRIEF, PLAYBOOK, company, deliver_service, dirs, run, write_artifact
 
-from orgmcp.core import ROOT
+from hirearchy.core import ROOT
 
 
 def test_prompt_plain_worker(tmp_path, clock, norm):

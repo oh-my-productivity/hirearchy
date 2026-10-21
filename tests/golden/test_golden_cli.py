@@ -7,7 +7,7 @@ import pytest
 from golden_support import check
 from scenarios import busy_org
 
-from orgmcp import main
+from hirearchy import main
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def busy(tmp_path, clock, norm, monkeypatch):
 
 
 def cli(capsys, org, *argv, code: int | None = 0) -> str:
-    """Run ``orgmcp --root <org> <argv>``; stdout (and stderr, when there is any) as one text; checks the exit code."""
+    """Run ``hirearchy --root <org> <argv>``; stdout (and stderr, when there is any) as one text; checks the exit code."""
     try:
         main(["--root", str(org.root), *argv])
         status = 0
@@ -76,7 +76,7 @@ def test_cli_inbox_marks_mail_as_read(busy, capsys, norm):
 
 
 def test_cli_status_of_a_fresh_org(tmp_path, clock, norm, capsys, monkeypatch):
-    from orgmcp.core import Org
+    from hirearchy.core import Org
 
     monkeypatch.setenv("COLUMNS", "100")
     org = Org.init(tmp_path / "org", "Fresh")

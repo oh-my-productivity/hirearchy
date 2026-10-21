@@ -1,4 +1,4 @@
-# orgmcp
+# hirearchy
 
 A file-based organization of agents, run over MCP. Directories are agents, nesting is the hierarchy,
 immutable message files are the only channel, and a small scheduler wakes an agent (a fresh
@@ -25,28 +25,28 @@ org/                      # root = you, the human
 - The task contract travels with every run: the prompt carries the full text (goal, acceptance criteria, inputs) of each open task, and next to each `result` the task you delegated that it answers. Protocol: copy criteria verbatim when delegating, report `done` only if every criterion is met, otherwise `blocked`/`failed`.
 - Task state and budget are derived from the message files, never stored separately.
 - Budget is counted in runs and passes down the tree: a child gets only what its parent hands it, and each delegation keeps a reserve so the parent can process the result. It comes back up in two ways, both as one message that is charged to the sender and credited to the recipient (so nothing is minted or lost): with a final result, and by hand. When an agent reports `done` or `failed` and has no other open task, no task it reported `blocked` (that may be re-reported), no outstanding delegation and no mail waiting for a run, everything it has left travels up with the result to whoever assigned it (the result shows "returns N run(s)", and its own reports have already returned theirs, so it cascades up). `blocked` returns nothing. An agent can also give runs back early with `send(to=<parent>, body, budget=N)` (the reserve for its own delegations stays). A manager (or root) can also pull runs back with `reclaim(report, budget=None)`: from a DIRECT report that is idle (no open task, nothing delegated and outstanding, not running, no unread mail that would wake it), all of its unspent runs by default. It is one message too: a non-waking note titled "budget reclaimed by <actor>" from the report to the actor, written by the runtime on the report's behalf (in the report's `sent/`, so the arithmetic stays derived and the total conserved; the report is not woken). It is refused, with the reason, for a busy report, a report that is not a direct one (no cascade: a manager reclaims from its own team), nothing to reclaim or more than is available. Use it before asking for more budget when a team has stranded runs (`health` flags them as `stranded_budget`). Budget still goes nowhere else: down to direct reports, up to the parent. Results written before this existed carry no budget and mean what they always did. `delegate` without a `budget` hands down `min(default_budget, remaining - reserve)` (one run reserved per outstanding delegation plus one for the new one) and fails with the options if that is below 1.
-- Reviews follow the single-writer rule (rule 9 of the protocol in `ORG.md`): a reviewer or fact-checker never edits the author's file; it reports its findings and the changes it requires to whoever assigned the review, and the author applies them (`delegate(..., revises=<task id>)`). Acceptance criteria and charters must never require an agent to edit another agent's files. The protocol text is copied into `ORG.md` when an organization is created, so an existing organization keeps the text it was created with (the runtime rules above apply to it regardless). `orgmcp upgrade-rules [--dry-run]` rewrites the body of its `ORG.md` to the current text, keeping the frontmatter and the mission, and prints what changed (each agent sees the new rules from its next run).
+- Reviews follow the single-writer rule (rule 9 of the protocol in `ORG.md`): a reviewer or fact-checker never edits the author's file; it reports its findings and the changes it requires to whoever assigned the review, and the author applies them (`delegate(..., revises=<task id>)`). Acceptance criteria and charters must never require an agent to edit another agent's files. The protocol text is copied into `ORG.md` when an organization is created, so an existing organization keeps the text it was created with (the runtime rules above apply to it regardless). `hirearchy upgrade-rules [--dry-run]` rewrites the body of its `ORG.md` to the current text, keeping the frontmatter and the mission, and prints what changed (each agent sees the new rules from its next run).
 - Authority only narrows: a parent cannot grant tools, a workspace or inputs it doesn't have.
 - The write guard is the same on case-sensitive and case-insensitive filesystems (`agent.md`, `Memory.md` or a `RUNS` directory are refused, as are names that differ from an existing file only by case), and `AGENT.md` is created only by `hire`. `write` is confined to your own directory, `report` artifacts to the organization; `retire` takes a short name or full address and returns the team's unspent budget to the retired agent's parent as a runtime note (nothing when that parent is root). That note is non-waking (`wake: false`): it counts towards budget at once and lifts a budget pause, but does not start a run; it is held in the inbox, not counted as unread (scheduling, health), and delivered with the agent's next real batch.
 - Guards: hop limit (loops), max depth/children, out-of-budget pause with a parent notice, per-run timeout, one scheduler per org, and a git commit after every run. Also:
   - Stall ladder: checked every tick, per open task. If the assignee is idle (not running, no unread mail, not paused, not waiting on delegations) for `stall_after` seconds (default 600), it gets a reminder; each further `stall_after` the runtime tells the assigner, then each ancestor up to root, then stops. State is in `.runtime/nudges.json`.
-  - Consecutive failed runs pause the agent after `max_failures`. The count is kept in `.runtime/failures.json` (survives restarts) and cleared by a successful run or `orgmcp resume`.
+  - Consecutive failed runs pause the agent after `max_failures`. The count is kept in `.runtime/failures.json` (survives restarts) and cleared by a successful run or `hirearchy resume`.
   - Messages are capped at `max_message_chars` (default 20000): longer `send`/`delegate`/`report` bodies are refused (put detail in a file under `work/`). Whatever is shown to an agent (new messages, the contract of open tasks, the task a result answers, `inbox`) is cut at 8000 characters with the path to `read` the rest.
   - Word counts shown to agents (artifact notes on a `report`, `read`) ignore markdown markers (`#`, `-`, `1.`, `|`, fences); the `MEMORY.md` cap counts plain whitespace-separated words.
-  - A scheduler tick isolates faults per phase (a failing phase is logged and retried next tick), runs start in their own process group so a timeout kills the tools too, and prompts go to `kiro-cli` on stdin. Agent crashes notify the human (`orgmcp resume`); an LLM parent gets a notice with its options instead.
+  - A scheduler tick isolates faults per phase (a failing phase is logged and retried next tick), runs start in their own process group so a timeout kills the tools too, and prompts go to `kiro-cli` on stdin. Agent crashes notify the human (`hirearchy resume`); an LLM parent gets a notice with its options instead.
   - Orphaned runs: each run's process group is recorded in `.runtime/running.json` (pgid, start time) while it lives. A scheduler that starts finds the records of a dead one, kills a group only if its leader is still alive with the recorded start time and leads its own session (never anything else), then redelivers the batch; a live orphan that cannot be verified or killed keeps its agent from starting a second run until it is gone.
   - `MEMORY.md` is capped at `memory_max_words` (default 800): writes and appends beyond it are refused, and an oversized memory is flagged for condensing in the next run's prompt.
 
 ## Use
 
 ```sh
-uv run orgmcp init org --mission "..."           # every agent runs on claude-sonnet-5.5; --model X sets another org default
-uv run orgmcp hire root ceo --role "Chief of staff" --charter @examples/ceo.md \
+uv run hirearchy init org --mission "..."           # every agent runs on claude-sonnet-5.5; --model X sets another org default
+uv run hirearchy hire root ceo --role "Chief of staff" --charter @examples/ceo.md \
     --can-hire --max-children 3                  # no --model: the org default (add --model X to pin this agent)
-uv run orgmcp task ceo --title "..." --goal @goal.md --acceptance @acceptance.md --budget 14
-uv run orgmcp run --until-idle --max-runs 14     # or plain `run` as a daemon; `--until-done` exits when no task is open or all open ones wait on you
-uv run orgmcp status
-uv run orgmcp inbox
+uv run hirearchy task ceo --title "..." --goal @goal.md --acceptance @acceptance.md --budget 14
+uv run hirearchy run --until-idle --max-runs 14     # or plain `run` as a daemon; `--until-done` exits when no task is open or all open ones wait on you
+uv run hirearchy status
+uv run hirearchy inbox
 ```
 
 Other commands: `hire ... --inputs PATH` (repeatable: read-only folders for the agent), `progress [TASK_ID] [--wait SECONDS]`, `plan`/`apply` (blueprints, below), `services`, `define-service`, `request`, `feedback`, `retire-service` ([services](#services-and-reflection)), `send` (note or budget grant), `resume <agent>`, `review [--dry-run]`, `run --once`, `upgrade-rules [--dry-run]`, `install-skill [--dest DIR] [--force]`, `mcp`, `kiro-profile` (this org's internal profile), and the read-only views of [Observability](#observability): `obs now [--watch S]`, `obs trace TASK_ID`, `obs metrics [--since 24h] [--by agent|tool|service|trace]`, `obs events [--since] [--until] [--agent] [--kind] [--trace] [--errors] [--limit N] [--follow]` (each with `--json`) and `check [--json]`.
@@ -57,7 +57,7 @@ Every agent runs on **claude-sonnet-5.5** unless it is told otherwise. The sched
 
 1. the agent's charter (`model:` in its `AGENT.md`, set by `hire --model` or a blueprint),
 2. the organization's `default_model` in `ORG.md` (`init --model`, `create_org(default_model=...)`),
-3. `claude-sonnet-5.5` (`orgmcp.core.DEFAULT_MODEL`).
+3. `claude-sonnet-5.5` (`hirearchy.core.DEFAULT_MODEL`).
 
 `hire` without a model leaves the charter unpinned, so the agent follows the org default. **Existing organizations** whose `ORG.md` says `default_model: null` (or has no such key) used to run on kiro's own default; they now run on claude-sonnet-5.5. A model named explicitly in a charter or in `ORG.md` is kept, and to get another model org-wide, set `default_model` in `ORG.md`. The `run.start` event records the model each run used.
 
@@ -66,10 +66,10 @@ Blueprints follow the same rule: without `needs.models`, or for a tier it does n
 ### Progress
 
 ```sh
-uv run orgmcp progress [TASK_ID]
+uv run hirearchy progress [TASK_ID]
 ```
 
-What to read back to someone who asks "status?": one line per task you gave (open or blocked ones, and those that finished in the last day; with `TASK_ID`, just that task in any state): its state (`working`, `waiting on <agent>` with the reason if it is paused, `stalled`, `blocked: <reason>`, `done`, `failed`), who is running or has unread work in its team, runs used against the budget given for it (every run of any agent in the task's team from when it was given to its final `done`/`failed` result, or now, across scheduler restarts; the budget is the task's own plus every later grant), the time since the team's last activity, and for finished tasks the artifact paths and the runs returned. Then one `Needs you:` line, with the message id, for every unread item in your inbox that waits for a decision (blocked or failed results, notes such as budget requests and escalations, runtime notices); `done` results and quiet budget notices are not listed. With `wait_seconds`, a task counts as in progress while it is `working` or `waiting`, and also while it is `blocked` or `stalled` but an agent below it is running or can run (unread mail that wakes it and budget left), for example right after you granted the lead runs; the call returns at once only when nothing in the org can run, and ends early when the last thing that could run stops. It only reads; `orgmcp inbox` still shows the messages. The Python entry point is `orgmcp.progress.progress(org, task_id=None)`.
+What to read back to someone who asks "status?": one line per task you gave (open or blocked ones, and those that finished in the last day; with `TASK_ID`, just that task in any state): its state (`working`, `waiting on <agent>` with the reason if it is paused, `stalled`, `blocked: <reason>`, `done`, `failed`), who is running or has unread work in its team, runs used against the budget given for it (every run of any agent in the task's team from when it was given to its final `done`/`failed` result, or now, across scheduler restarts; the budget is the task's own plus every later grant), the time since the team's last activity, and for finished tasks the artifact paths and the runs returned. Then one `Needs you:` line, with the message id, for every unread item in your inbox that waits for a decision (blocked or failed results, notes such as budget requests and escalations, runtime notices); `done` results and quiet budget notices are not listed. With `wait_seconds`, a task counts as in progress while it is `working` or `waiting`, and also while it is `blocked` or `stalled` but an agent below it is running or can run (unread mail that wakes it and budget left), for example right after you granted the lead runs; the call returns at once only when nothing in the org can run, and ends early when the last thing that could run stops. It only reads; `hirearchy inbox` still shows the messages. The Python entry point is `hirearchy.progress.progress(org, task_id=None)`.
 
 ```
 "Competitor report": waiting on ceo/writer. runs 2 of 12. last activity 4m ago. (task 20261017T175121-root-8218)
@@ -80,8 +80,8 @@ Needs you: blocked result from ceo "Second": Need the 2025 sales figures from fi
 ## Create an org from a goal
 
 Building an org for a goal goes wrong when it is improvised: scope, deliverable, budget, models and the review step get
-assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#kiro-integration)) and its skill installed
-(`orgmcp install-skill`), this is the whole story:
+assumed. With hirearchy registered in your kiro assistant (see [Kiro integration](#kiro-integration)) and its skill installed
+(`hirearchy install-skill`), this is the whole story:
 
 1. **Ask.** "Build me an org that produces a competitor analysis of five note apps." The assistant replies with one message
    of the questions that matter, in plain words, with a proposed default only where a generic one exists: format, length,
@@ -109,7 +109,7 @@ assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#
 4. **It runs.** The scheduler wakes the agents. The budget in the plan is a ceiling, not a price: runs a team does not spend
    come back automatically with each agent's final report, up to you. Spending beyond the plan needs your OK. `start`
    launches it with `until_done`: it exits by itself when you have no open task and nothing is running or runnable
-   (`orgmcp run --until-done` on the command line; `--until-idle` is unchanged) and logs why in `.runtime/scheduler.log`;
+   (`hirearchy run --until-done` on the command line; `--until-idle` is unchanged) and logs why in `.runtime/scheduler.log`;
    `status` and `progress` then say `scheduler: stopped (finished: no open tasks)`. Give the org more work later and
    `start` again; `stop` is only for cancelling. It also exits by itself when every open task is **waiting on you**:
    nothing runs and nothing can start because the agents holding the work are out of budget or keep failing (or the task
@@ -121,7 +121,7 @@ assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#
 5. **Progress.** "Status?" is answered from `progress`: one line per task (working / waiting on an agent / stalled /
    blocked with the reason / done / failed), who is busy, runs used of the budget, time since the last activity, and what
    needs your decision. An assistant cannot message you between turns, so it never promises to. If you want to be told
-   when the work is done, it says it will wait and calls `progress(wait_seconds=N)` (up to 900; `orgmcp progress --wait N`
+   when the work is done, it says it will wait and calls `progress(wait_seconds=N)` (up to 900; `hirearchy progress --wait N`
    on the command line): the call returns as soon as a task is done, failed, blocked or stalled, or something new needs
    you, or when the time is up, with what changed; it only reads files (no locks, nothing written) and does not wait
    when no scheduler is running or nothing in the org can run. Say how long you are willing to wait and it repeats the call; otherwise ask "status?". If you ask for cheap models, the assistant keeps the lead (it decides how every other run is spent) and the final verifier on the strong model, and says so in one line; when a lead asks for more budget it first looks for stranded runs and `reclaim`s them before asking you.
@@ -129,8 +129,8 @@ assumed. With orgmcp registered in your kiro assistant (see [Kiro integration](#
    (sending it back for rework if one is unmet, never patching it itself), copies it to the path you chose, and tells you
    which criteria are met and how many runs it cost.
 
-The same flow works without an assistant: `orgmcp plan bp.yaml` (exit status 1 on errors), `orgmcp apply bp.yaml`,
-`orgmcp run`, `orgmcp progress`.
+The same flow works without an assistant: `hirearchy plan bp.yaml` (exit status 1 on errors), `hirearchy apply bp.yaml`,
+`hirearchy run`, `hirearchy progress`.
 
 The blueprint (YAML or JSON; `blueprint_example(kind)` returns a commented template, a longer one is in
 [`examples/blueprint-research.yaml`](examples/blueprint-research.yaml)):
@@ -153,7 +153,7 @@ task: {to: lead, title: ..., goal: ..., acceptance: [exact, checkable items], in
 
 Validation encodes the lessons of the usability studies: a deliverable and exact acceptance criteria; web tools when sources
 are needed; `write`/`shell` only with a workspace inside an allowed root (default: home, temp, cwd; `--allow-root DIR` or
-`$ORGMCP_WORKSPACE_ROOTS`; never the org itself or `~/.kiro`); code goals need an engineer with a workspace; a reviewer distinct
+`$HIREARCHY_WORKSPACE_ROOTS`; never the org itself or `~/.kiro`); code goals need an engineer with a workspace; a reviewer distinct
 from the author whose charter never has it edit others' files (rule 9 of the protocol); managers hold the tools and workspace
 they hand down; budget within the user's cap and above the estimate; different models for drafting and review when asked;
 depth and children within limits. Over MCP the blueprint is passed as YAML/JSON text and is never read from a file path.
@@ -163,11 +163,11 @@ depth and children within limits. Over MCP the blueprint is passed as YAML/JSON 
 pass costs 2 plus one per direct report; its rework costs 2. The planned budget is the estimate times 1.25 unless
 `task.budget` is set. Managers get a written budget plan: each report's grant is its whole subtree, pass and its one rework (author)
 or re-check (verifier) run, and the lead keeps the rest (its own runs plus a reserve). For `examples/blueprint-research.yaml`
-(`orgmcp plan` prints it): 22 runs, researcher 4, writer 3, fact-checker 3, lead keeps 12. Unspent runs return up the tree on each
+(`hirearchy plan` prints it): 22 runs, researcher 4, writer 3, fact-checker 3, lead keeps 12. Unspent runs return up the tree on each
 final report (see the budget rule above; a lead can pull them back from an idle report with `reclaim`), so the planned figure is
 what you authorize at most, and `progress` shows what was used and returned.
 
-**Role templates** live in `src/orgmcp/roles/*.md`: `manager`, `researcher`, `writer`, `reviewer`, `fact-checker`, `engineer`,
+**Role templates** live in `src/hirearchy/roles/*.md`: `manager`, `researcher`, `writer`, `reviewer`, `fact-checker`, `engineer`,
 `tester`, `code-reviewer`, `analyst`, `data-checker`. Each has purpose, responsibilities, decision rights, escalation, quality bar, budget discipline and a
 default tool set and model tier. Reviewers report findings and required changes to their manager and never edit another
 agent's file (the manager sends them back to the author with `revises`). `template:` plus a `charter:` adds your own text.
@@ -187,7 +187,7 @@ What the templates add for verification and delegation:
 
 So acceptance criteria should ask for the coverage report ("every factual claim verified, n = m"), not for "at least N" checks.
 
-**The assistant's playbook** is `skills/orgmcp/SKILL.md`: the precondition (use orgmcp or say it is unavailable), the one-message
+**The assistant's playbook** is `skills/hirearchy/SKILL.md`: the precondition (use hirearchy or say it is unavailable), the one-message
 checklist, plan and approval, build and run, monitoring, and verification before delivery. The server's own instructions carry
 a compact version of the same workflow, so an assistant without the skill still gets the order of steps. How to install the
 skill: see [Kiro integration](#kiro-integration).
@@ -221,7 +221,7 @@ and run logs like all state. `services` is a reserved name; plain `write` into i
 A request is a task built from the contract (inputs, its criteria plus any `extra_acceptance`, the deliverable, its budget), so every
 rule of tasks applies: direct reports only, budget moves down, `done`/`failed` are final, rework is `revises`.
 
-CLI (as root): `orgmcp services`; `define-service OWNER NAME --description T --input 'topic*:what it is about' --acceptance T|@file
+CLI (as root): `hirearchy services`; `define-service OWNER NAME --description T --input 'topic*:what it is about' --acceptance T|@file
 --deliverable T [--format F --max-words N --path DIR] --budget N [--playbook @file] [--locked]`; to amend, pass only what changes: `define-service OWNER NAME --add-acceptance T [--remove-acceptance EXACT_TEXT]` (also `--no-locked`; `--acceptance` replaces all and excludes add/remove); `request SERVICE --input key=value
 [--title --note --budget --revises]`; `feedback TASK_ID accept|reject [--note]`; `retire-service OWNER NAME --reason T` (the only way to
 retire one: there is no MCP tool for it).
@@ -287,7 +287,7 @@ Health is measured from the files alone (message files and `runs/*.log`); nothin
 the timestamp in its log file name and ends at the log's mtime; a run is *empty* if the agent sent no message during it.
 
 ```sh
-uv run orgmcp health [--agent ADDR] [--json]
+uv run hirearchy health [--agent ADDR] [--json]
 ```
 
 Prints a summary line (`3 agents, 1 flagged`), then one line per agent (indented by depth) with state, budget
@@ -299,7 +299,7 @@ The MCP tool `health(agent=None)` returns the same report. Root may ask about an
 about itself or an agent in its own subtree. By default it reports your own subtree (root: the whole organization).
 
 "Rework" counts tasks an agent received with `revises` set: a manager sends work back with
-`delegate(..., revises=<earlier task id>)` (CLI: `orgmcp task ... --revises TASK_ID`). The id must be a task the
+`delegate(..., revises=<earlier task id>)` (CLI: `hirearchy task ... --revises TASK_ID`). The id must be a task the
 delegator earlier sent to the same assignee.
 
 A task counts once, by its latest result: a `blocked` that was superseded by a later `done` is a `done` in the counts
@@ -330,7 +330,7 @@ health:
 
 Measuring is not managing. Periodically the runtime turns the flags above into a short note for the manager who
 can act on them, so problems get followed up, reworked, re-budgeted or retired instead of waiting for you to run
-`orgmcp health`.
+`hirearchy health`.
 
 - **Cadence.** The scheduler runs a review when `review_every_runs` runs have been used across the organization since
   the last review (counted from the run logs, so a restart does not reset it) or `review_every_seconds` have passed,
@@ -363,7 +363,7 @@ Runs that failed, and runs woken only by runtime notes (budget, stall, review, b
 `wasteful` statistics. The retired agents' runs still count towards `review_every_runs`.
 
 ```sh
-uv run orgmcp review [--dry-run]
+uv run hirearchy review [--dry-run]
 ```
 
 Runs a review immediately through the same code path and prints what was sent to whom. `--dry-run` prints what
@@ -401,12 +401,12 @@ Everything is derived from **one append-only event log** written by the runtime 
 | `agent.pause` / `agent.resume` / `agent.failure` | reason / failure count |
 | `stall.nudge` | each step of the stall ladder (`task`, `to`, `step`) |
 | `review.run`, `prune` | health review sent (`flagged`, `notes`); event-log days removed |
-| `tool.call` | every orgmcp tool, agents and root: `tool`, `ok`, `ms`, `error` (the refusal text), `error_type` (`OrgError` or the exception class), `args` (a summary, below) |
+| `tool.call` | every hirearchy tool, agents and root: `tool`, `ok`, `ms`, `error` (the refusal text), `error_type` (`OrgError` or the exception class), `args` (a summary, below) |
 | `cli.command` | `command`, `ok`, `ms`, `error` |
 | `msg.deliver` | every message: `id`, `type`, `from`, `to`, `title`, `status`, `budget`, `reply_to`, `revises`, `service`, `wake`, `hops`, `chars`, `trace_rule` (+ `trace_candidates` when ambiguous) |
 | `agent.hire` / `agent.retire`, `service.define` / `service.revise` / `service.retire` | who, what, returned budget |
 
-**Never recorded:** message bodies, file contents, environment values, secrets. `tool.call` `args` keeps ids, addresses, clipped titles (80 characters), status, budget, paths, service names, verdicts and numbers; long text fields only as their length (`"summary_chars": 1234`); unset arguments are omitted. Errors are clipped to 500 characters. **Out of scope:** the provider is a black box. We observe a run's boundaries (start, end, exit, duration, batch) and every orgmcp tool call it makes, never kiro's internals (tokens, built-in tool calls, model reasoning). There are no exporters, dashboards, sampling or alerting; the field names are OTel-friendly so a file exporter can be added later as a pure function over the events.
+**Never recorded:** message bodies, file contents, environment values, secrets. `tool.call` `args` keeps ids, addresses, clipped titles (80 characters), status, budget, paths, service names, verdicts and numbers; long text fields only as their length (`"summary_chars": 1234`); unset arguments are omitted. Errors are clipped to 500 characters. **Out of scope:** the provider is a black box. We observe a run's boundaries (start, end, exit, duration, batch) and every hirearchy tool call it makes, never kiro's internals (tokens, built-in tool calls, model reasoning). There are no exporters, dashboards, sampling or alerting; the field names are OTel-friendly so a file exporter can be added later as a pure function over the events.
 
 Config (`ORG.md`): `events` (default `true`; `false` disables emission entirely), `events_keep_days` (30; the scheduler prunes older day directories at most once a day), `heartbeat_seconds` (60).
 
@@ -425,24 +425,24 @@ Runtime notices carry the trace of the task they are about when known. Messages 
 ### Views
 
 ```sh
-uv run orgmcp obs now [--watch SECONDS]
-uv run orgmcp obs trace TASK_ID [--json]
-uv run orgmcp obs metrics [--since 24h] [--by agent|tool|service|trace] [--json]
-uv run orgmcp obs events [--since 24h] [--until T] [--agent ADDR] [--kind KIND] [--trace TASK_ID] [--errors] [--limit N] [--follow] [--json]
-uv run orgmcp check [--json]        # exit 1 when an invariant fails
+uv run hirearchy obs now [--watch SECONDS]
+uv run hirearchy obs trace TASK_ID [--json]
+uv run hirearchy obs metrics [--since 24h] [--by agent|tool|service|trace] [--json]
+uv run hirearchy obs events [--since 24h] [--until T] [--agent ADDR] [--kind KIND] [--trace TASK_ID] [--errors] [--limit N] [--follow] [--json]
+uv run hirearchy check [--json]        # exit 1 when an invariant fails
 ```
 
 Durations are `15m`, `24h`, `7d` or an ISO timestamp. The MCP tool `observe(view="now"|"trace"|"metrics"|"events"|"check", target=None, since="24h", by=None, errors_only=False, limit=50)` is offered to root only and returns the same text. Sample output from a real kiro run (`claude-haiku-4.5`, one agent that calls `whoami`, `write` and `report`; the full record is in `studies/O-observability-check/`):
 
 ```
-$ orgmcp obs trace 20261018T092904624658-root-a621
+$ hirearchy obs trace 20261018T092904624658-root-a621
 trace 20261018T092904624658-root-a621 "Tool check" -> worker: done
      +0s  root -> worker task "Tool check" +2 run(s)
      +8s    run 20261018T092912856677 ok, ran 14s, queued 8.2s, 3 call(s) [report×1 whoami×1 write×1]
     +20s    worker -> root result (done) "Tool check" +1 run(s)
 totals: wall 20s | runs 1 (budget given 2, returned 1) | run time 14s | queue 8.2s | waiting on you 0s | tool calls 3 (0 refused)
 
-$ orgmcp obs now                      # while the scheduler runs
+$ hirearchy obs now                      # while the scheduler runs
 scheduler: running pid 5585 (until_idle, up 9.0s, last heartbeat 9.0s ago)
 runs in flight 1/3:
   worker 9.0s Third check trace 20261018T093211981048-root-723b
@@ -450,7 +450,7 @@ queued, not running: none
 waiting on you: nothing
 errors in the last 15 min: 0
 
-$ orgmcp obs metrics --since 1h
+$ hirearchy obs metrics --since 1h
 metrics 2026-10-18T08:30:20Z .. 2026-10-18T09:30:20Z (18 event(s) in the window)
 runs 1: ok 1, failed 0, timeout 0, killed 0 | duration p50 14s p95 14s max 14s (n=1) | queue p50 8.2s p95 8.2s (n=1)
 budget spent 1 run(s)
@@ -478,11 +478,11 @@ Each is PASS or FAIL with details naming the defect: **(a)** every message file 
 
 ## Dashboard
 
-`orgmcp dash` is a read-only terminal dashboard for a running org: the agent hierarchy with what every agent is doing, its run log, messages and activity, your requests with their traces, services, the live event stream and health. It never writes inside the organization and emits no event; grants, start/stop and feedback stay with the assistant and the CLI.
+`hirearchy dash` is a read-only terminal dashboard for a running org: the agent hierarchy with what every agent is doing, its run log, messages and activity, your requests with their traces, services, the live event stream and health. It never writes inside the organization and emits no event; grants, start/stop and feedback stay with the assistant and the CLI.
 
 ```sh
-orgmcp --root ORG dash [--interval SECONDS]   # the interactive dashboard (default refresh: 2 s)
-orgmcp --root ORG dash --once                  # a plain-text snapshot, then exit (also used without a terminal)
+hirearchy --root ORG dash [--interval SECONDS]   # the interactive dashboard (default refresh: 2 s)
+hirearchy --root ORG dash --once                  # a plain-text snapshot, then exit (also used without a terminal)
 ```
 
 An agent is in exactly one state, with this precedence: `running 1m12s` (a run is in flight; mail that arrives meanwhile is `+N unread`); `paused: <reason>` (plus `, N unread`); `out of budget` (plus `, N unread`); `queued: <why>, N unread` - only when the agent would run and has not started yet: `scheduler is not running`, `max_parallel (N) runs are busy` or `starts on the next tick`; otherwise `waiting on N report(s)`, `working on N task(s)` or `idle`. The words are derived from the same files as `status`, `progress` and `obs now`. The header shows the org, the scheduler (running pid / uptime / last heartbeat, or stopped and why), the counts running, queued, waiting on you and errors in the last 15 minutes, and `refresh 2s` / `refresh paused` (and `refresh failed` when the last refresh did). Events are shown as one readable line each (`10:05:40 delegate → ceo/analyst REFUSED: not enough budget: ...`, `10:06:00 run ended ok after 33s`); `x` on the Activity tab and on the Events screen shows them raw, with ids, process groups, budgets and arguments. Screenshots of every screen of a demo org are in `studies/DASH-screens/` (`make_screens.py` regenerates them).
@@ -506,7 +506,7 @@ Refreshes keep the selection, the scroll position and the folded nodes; the Run 
 What `--once` prints (the demo org of `studies/DASH-screens`):
 
 ```text
-orgmcp dash - acme (/path/to/acme)  2026-10-18 10:06:40Z
+hirearchy dash - acme (/path/to/acme)  2026-10-18 10:06:40Z
 scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago) | running 2/2 · queued 1 · waiting on you 1 · errors 15m 2
 
 AGENTS
@@ -542,9 +542,9 @@ SERVICES
 organization to exist yet:
 
 ```json
-"orgmcp": {
+"hirearchy": {
   "command": "uv",
-  "args": ["--directory", "/path/to/orgmcp", "run", "orgmcp", "mcp"],
+  "args": ["--directory", "/path/to/hirearchy", "run", "hirearchy", "mcp"],
   "env": { "ORG_ROOT": "/path/to/your/org" }
 }
 ```
@@ -559,7 +559,7 @@ organization to exist yet:
   needs a `path` (absolute); with `ORG_ROOT` set a different `path` is refused.
 - Root-only tools: `create_org`, `start(max_runs=None)` (launch a detached scheduler for this org, output in
   `.runtime/scheduler.log`, returns its pid; refused if one runs), `stop()` (SIGTERM, only to a pid verified to be this
-  org's scheduler: alive, `run` in its command line, and this org's `--root` or an `orgmcp` program with no other
+  org's scheduler: alive, `run` in its command line, and this org's `--root` or a `hirearchy` program with no other
   `--root`). `status` and `whoami` end with a `scheduler: running (pid, since) / stopped` line.
 - Goal workflow tools (root only; see [Create an org from a goal](#create-an-org-from-a-goal)):
   - `blueprint_example(kind="research")`: a ready-to-edit YAML blueprint with a comment on every field and a schema
@@ -581,8 +581,8 @@ organization to exist yet:
   `progress` (or `progress(wait_seconds)`) → verify, copy) next to the safety
   rules: only the bound organization, no substituting other mechanisms, no claims without tool evidence.
 
-**The assistant skill.** `orgmcp install-skill [--dest DIR] [--force]` copies the skill to `~/.kiro/skills/orgmcp/SKILL.md`
-(`DIR` is the skills directory: the file goes to `DIR/orgmcp/SKILL.md`), prints the path, leaves an identical file alone and
+**The assistant skill.** `hirearchy install-skill [--dest DIR] [--force]` copies the skill to `~/.kiro/skills/hirearchy/SKILL.md`
+(`DIR` is the skills directory: the file goes to `DIR/hirearchy/SKILL.md`), prints the path, leaves an identical file alone and
 refuses to replace a different one without `--force`. Kiro loads skills through the `resources` of an agent profile as
 `skill://` entries (a path or a glob): the profiles in `~/.kiro/agents` use `"skill://.kiro/skills/*/SKILL.md"`. To use the skill from a project-local profile without installing it, give the
 absolute path of the checkout's file, for example in `<project>/.kiro/agents/org-assistant.json` (the file validates with
@@ -591,33 +591,33 @@ absolute path of the checkout's file, for example in `<project>/.kiro/agents/org
 ```json
 {
   "name": "org-assistant",
-  "description": "Builds and runs an orgmcp organization for a goal",
-  "prompt": "You manage one orgmcp organization for the user through the orgmcp tools. Follow the orgmcp skill.",
+  "description": "Builds and runs a hirearchy organization for a goal",
+  "prompt": "You manage one hirearchy organization for the user through the hirearchy tools. Follow the hirearchy skill.",
   "mcpServers": {
-    "orgmcp": {
+    "hirearchy": {
       "command": "uv",
-      "args": ["--directory", "/path/to/orgmcp", "run", "orgmcp", "mcp"],
+      "args": ["--directory", "/path/to/hirearchy", "run", "hirearchy", "mcp"],
       "env": { "ORG_ROOT": "/path/to/your/org" }
     }
   },
   "tools": ["*"],
-  "resources": ["skill:///path/to/orgmcp/skills/orgmcp/SKILL.md"],
+  "resources": ["skill:///path/to/hirearchy/skills/hirearchy/SKILL.md"],
   "includeMcpJson": false
 }
 ```
 
 Run it with `kiro-cli chat --agent org-assistant`. This profile binds the assistant to one organization (and keeps your other
 MCP servers out); `tools: ["*"]` lets it copy the finished deliverable with kiro's own file tools, so narrow it if you prefer
-to copy files yourself. Use a name other than `orgmcp-...`, which the scheduler's internal profiles use.
+to copy files yourself. Use a name other than `hirearchy-...`, which the scheduler's internal profiles use.
 
 **Agent runs (the scheduler).** Runs use `kiro-cli chat --no-interactive --agent <profile>`; the prompt is passed
 on stdin. The scheduler writes one *internal* profile per organization (and per set of granted built-in tools) to
 `~/.kiro/agents/`:
 
-- name `orgmcp-<org-slug>-<6-char hash of the org path>[-<tools>]` (lowercase `[a-z0-9-]`), description "internal:
-  used by the orgmcp scheduler for <org path>; not a general-purpose agent". Different orgs never share or overwrite a
+- name `hirearchy-<org-slug>-<6-char hash of the org path>[-<tools>]` (lowercase `[a-z0-9-]`), description "internal:
+  used by the hirearchy scheduler for <org path>; not a general-purpose agent". Different orgs never share or overwrite a
   profile.
-- It loads only the orgmcp server (`includeMcpJson: false`), so agents never see your other MCP servers. The server
+- It loads only the hirearchy server (`includeMcpJson: false`), so agents never see your other MCP servers. The server
   entry carries `ORG_ROOT=<this org>` and `ORG_REQUIRE_AGENT=1`.
 - Fail closed: with `ORG_REQUIRE_AGENT=1` the server refuses to start unless `ORG_AGENT` names an agent (`root` does not
   count). If something borrows a profile as a general subagent, it gets an error instead of acting as `root`.
@@ -625,51 +625,51 @@ on stdin. The scheduler writes one *internal* profile per organization (and per 
   This relies on kiro starting MCP servers with its own environment plus the profile's `env` (the same inheritance the
   scheduler always used for `ORG_AGENT`/`ORG_ROOT`). If a kiro version replaced the environment instead, runs would fail
   visibly with the message above rather than act as root.
-- Older global profiles (`~/.kiro/agents/orgmcp*.json`) are no longer written or used; they are never deleted or
+- Older global profiles (`~/.kiro/agents/hirearchy*.json`) are no longer written or used; they are never deleted or
   rewritten, so remove them yourself when no scheduler that uses them is running.
 
 ### Workspaces, inputs and confinement
 
-Two path worlds meet in a run: orgmcp tools (`read`, `write`, `report`, `delegate` inputs) use paths relative to the
+Two path worlds meet in a run: hirearchy tools (`read`, `write`, `report`, `delegate` inputs) use paths relative to the
 **org root**; kiro's own tools (`read`, `write`, `shell`) start in the agent's **workspace** (its charter `workspace`, else
 its org directory) and resolve relative paths there. An agent that writes `lead/writer/work/x.md` with kiro's `write`
 therefore creates that tree inside the user's folder, not in the org. The charter fields and the rules below keep the
 two apart.
 
 The two kinds of tools share short names, and kiro lists MCP tools by their plain names, so a built-in `read` or `write`
-**shadows** the orgmcp tool of the same name: an agent that holds it sees one `read` / one `write`, kiro's, and cannot call
-orgmcp's (verified in `studies/F-read-experiment` and `studies/F2-tool-names`). The server therefore registers the orgmcp
+**shadows** the hirearchy tool of the same name: an agent that holds it sees one `read` / one `write`, kiro's, and cannot call
+hirearchy's (verified in `studies/F-read-experiment` and `studies/F2-tool-names`). The server therefore registers the hirearchy
 tools by what the charter's `tools` hold:
 
-- charter `tools` holds `write`: the orgmcp write tool is **`org_write`** (else `write`);
-- charter `tools` holds `read`: the orgmcp read tool is **`org_read`** (else `read`).
+- charter `tools` holds `write`: the hirearchy write tool is **`org_write`** (else `write`);
+- charter `tools` holds `read`: the hirearchy read tool is **`org_read`** (else `read`).
 
 (`shell` alone changes nothing; root and agents without built-in `read`/`write` keep `read` / `write` exactly.) In kiro the
-orgmcp tools appear as `@orgmcp/org_write`, `@orgmcp/org_read`, `@orgmcp/report`, ... The agent's prompt (Files section,
-"update your memory" line, stray-file notice) names the tool *it* has: `@orgmcp/org_write` for `<addr>/MEMORY.md`,
-`<addr>/work/` and reports, and the built-in `write` for the workspace only. ORG.md's shared rules say `@orgmcp/write`
+hirearchy tools appear as `@hirearchy/org_write`, `@hirearchy/org_read`, `@hirearchy/report`, ... The agent's prompt (Files section,
+"update your memory" line, stray-file notice) names the tool *it* has: `@hirearchy/org_write` for `<addr>/MEMORY.md`,
+`<addr>/work/` and reports, and the built-in `write` for the workspace only. ORG.md's shared rules say `@hirearchy/write`
 generically; the per-agent line says to use the `org_` name wherever it appears. `org_read` takes **relative** org paths
 (and the absolute workspace/inputs paths below). The built-in `read` reaches the org too, but only by **absolute** path
 `<org root>/<path>`: a relative path starts in the agent's working directory (its workspace, else its org directory).
 **Stray org files:** after each run of an agent with built-in `write` and a workspace, the scheduler looks for
 `<workspace>/<address>/` (new during the run) and a written `<workspace>/<address>/MEMORY.md`. If found it logs a
 `# warning:` in the run log and the scheduler output and records it in `.runtime/strays.json`; the agent's next prompt says
-once to move that content into its org files with its orgmcp write tool. Nothing is moved or deleted.
+once to move that content into its org files with its hirearchy write tool. Nothing is moved or deleted.
 
 Charter fields: `workspace` (read-write, as before) and `inputs: [absolute paths]` (read-only; blueprint: `needs.inputs`
 for the whole project or `inputs` per agent). A report's inputs must be inside its manager's inputs or workspace (authority
 only narrows), inputs are absolute and never overlap the org directory. Charters without `inputs` keep working. Set them with
-`orgmcp hire ... --inputs PATH` (repeatable) or the `inputs` parameter of the `hire` tool (root, or a manager within its own
+`hirearchy hire ... --inputs PATH` (repeatable) or the `inputs` parameter of the `hire` tool (root, or a manager within its own
 inputs/workspace); `documents`-type goals put the user's folder in `needs.inputs` (it must exist).
 
 **Enforced by kiro** (per-agent profiles, checked against kiro-cli 2.29.1 in `--no-interactive` mode; the experiments are
 in `studies/X1-confinement/EXPERIMENTS.md`). An agent with built-in `read` or `write` gets a profile
-`orgmcp-<org>-<hash>-<tools>-x<access hash>` (same `ORG_ROOT`/`ORG_REQUIRE_AGENT=1`, same "internal" description; agents with
+`hirearchy-<org>-<hash>-<tools>-x<access hash>` (same `ORG_ROOT`/`ORG_REQUIRE_AGENT=1`, same "internal" description; agents with
 equal tools and access share it) whose `toolsSettings` say:
 
 ```json
-"tools": ["@orgmcp", "read", "write"],
-"allowedTools": ["@orgmcp"],
+"tools": ["@hirearchy", "read", "write"],
+"allowedTools": ["@hirearchy"],
 "toolsSettings": {
   "write": {"allowedPaths": ["/ws/**"], "deniedPaths": ["/org", "/org/**"]},
   "read":  {"allowedPaths": ["/ws", "/ws/**", "/inputs", "/inputs/**", "/org", "/org/**"], "deniedPaths": []}
@@ -681,7 +681,7 @@ equal tools and access share it) whose `toolsSettings` say:
   permission approval is not supported in non-interactive mode". `..` traversal is refused too.
 - `write` only under the workspace (nowhere without one), so inputs are read-only and nothing is created beside them. The
   org directory is a hard deny for it (also over kiro's "the working directory is readable" rule): org files are written
-  with the orgmcp tool (`org_write`) only.
+  with the hirearchy tool (`org_write`) only.
 - `read` under workspace + inputs + the organization (read-only), with **no** `deniedPaths` (a deny would beat the allow).
   Other paths, e.g. `/etc/hosts`, are refused. The built-in `read` is the only `read` such an agent sees, so this is how it
   reads a teammate's file by absolute path; `org_read` is the relative-path alternative. The deny is skipped for `write`
@@ -690,7 +690,7 @@ equal tools and access share it) whose `toolsSettings` say:
   no `inputs` key keeps today's unconfined read; give it `inputs: []` (or real inputs) to confine it. A confined parent never
   hands down an unconfined `read`.
 
-**Enforced by orgmcp:** `report(artifacts=...)` takes org paths (relative or absolute) and absolute paths inside the
+**Enforced by hirearchy:** `report(artifacts=...)` takes org paths (relative or absolute) and absolute paths inside the
 reporter's **own** workspace, annotated as before (words, modified, "NOT modified since..."); anything else outside the
 org is refused without probing. `read` takes relative org paths, and absolute paths inside the caller's workspace, its
 inputs, and the workspace of any agent in its subtree (a manager can verify what its team made); everything else outside
@@ -700,25 +700,25 @@ the org is refused. Root's `read` is unchanged (organization only).
 agent that holds it (engineer, tester, code-reviewer, and a manager that holds what its code team holds) is told the rule in its charter and prompt, and the plan says so (`shell-unconfined` warning, "shell NOT
 confined" in its `Access:` line). The prompt's Files section (workspace, inputs, "never create org files in the workspace",
 "report workspace artifacts by absolute path") is guidance on top of the enforcement above. Symlinks inside a workspace that
-point out were not tested against kiro's own matching; orgmcp's `read`/`report` resolve them and refuse targets outside.
+point out were not tested against kiro's own matching; hirearchy's `read`/`report` resolve them and refuse targets outside.
 
 Every command that changes an organization (`init`, `hire`, `task`, `apply`, `send`, `resume`, `run`, `review`, `inbox`
-without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first prints `org: <path>` to stderr. `python -m orgmcp` is the same as the `orgmcp` script.
+without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first prints `org: <path>` to stderr. `python -m hirearchy` is the same as the `hirearchy` script.
 
 ## Security notes
 
 - Everything is local stdio with no network listener. Identity is enforced by the process environment, not by
-  authentication: anything that can run `orgmcp mcp` with `ORG_AGENT` set can act as that agent.
-- The orgmcp write rules apply to the orgmcp tools. kiro's built-in `write` is confined to the agent's workspace and its
+  authentication: anything that can run `hirearchy mcp` with `ORG_AGENT` set can act as that agent.
+- The hirearchy write rules apply to the hirearchy tools. kiro's built-in `write` is confined to the agent's workspace and its
   `read` to workspace, inputs and the organization (read-only) by its profile (see [Workspaces, inputs and confinement](#workspaces-inputs-and-confinement)); `shell` is not:
   an agent that holds it can touch anything its OS user can. Grant it only to agents that need it, with a `workspace`.
 
 ## Architecture
 
-orgmcp is organized by feature: one package per responsibility under `src/orgmcp/`, each behind an interface, wired together in one place.
+hirearchy is organized by feature: one package per responsibility under `src/hirearchy/`, each behind an interface, wired together in one place.
 
 ```
-src/orgmcp/
+src/hirearchy/
   kernel/          the shared vocabulary every package may use (Message, Address, Clock, IdGenerator, OrgError, ...); imports nothing else
   <feature>/       36 feature packages (mail, budget, hierarchy, health, blueprint, ...); each has
     api.py           the only public surface: its typing.Protocol interfaces, data types and exceptions (__init__.py re-exports exactly api)
@@ -729,16 +729,16 @@ src/orgmcp/
   scheduler/ mcp_server/ cli/ dashboard/    the entry points; they depend only on the api of features
   app/             the composition root: the only package that imports `_` modules and constructs concrete classes
                    (`wiring.open_runtime(root)` builds the `OrgRuntime` of ports; `wire_<pkg>.py` provides each package's ports)
-  core.py          the permanent compatibility facade: `orgmcp.core.Org` (+ `DEFAULT_MODEL`, `OrgError`, ...)
+  core.py          the permanent compatibility facade: `hirearchy.core.Org` (+ `DEFAULT_MODEL`, `OrgError`, ...)
 ```
 
-`orgmcp.core.Org` is a thin facade, built by `orgmcp.app`, that delegates every method to the feature services; no feature imports it. It, `orgmcp.progress.progress(org, task_id=None)`
-and the entry point `orgmcp.main` (the `orgmcp` script, `python -m orgmcp`) are the permanent Python surface; everything else is reached through the `api` of a feature.
+`hirearchy.core.Org` is a thin facade, built by `hirearchy.app`, that delegates every method to the feature services; no feature imports it. It, `hirearchy.progress.progress(org, task_id=None)`
+and the entry point `hirearchy.main` (the `hirearchy` script, `python -m hirearchy`) are the permanent Python surface; everything else is reached through the `api` of a feature.
 
 The rules, and what enforces them (all run by `scripts/check.sh`):
 
-* every class with behaviour implements a Protocol and no constructor names a concrete `orgmcp` class (`tests/architecture`: class-interface check, `test_constructors_depend_on_protocols`);
-* layers entry points -> features (by level) -> kernel, no cycles, the kernel imports nothing, only a package itself and `orgmcp.app` import its `_` modules, no feature imports `Org`,
+* every class with behaviour implements a Protocol and no constructor names a concrete `hirearchy` class (`tests/architecture`: class-interface check, `test_constructors_depend_on_protocols`);
+* layers entry points -> features (by level) -> kernel, no cycles, the kernel imports nothing, only a package itself and `hirearchy.app` import its `_` modules, no feature imports `Org`,
   Textual / the MCP SDK / PyYAML only at the edge (50 `import-linter` contracts, generated from the package map; `mypy --strict` on every package);
 * a Protocol has at most 8 methods, has a contract suite, and one writer owns each file and ledger (`tests/architecture`);
 * behaviour, text and formats are frozen by the golden suite (`tests/golden`).
@@ -750,18 +750,18 @@ The rules, and what enforces them (all run by `scripts/check.sh`):
 ```sh
 scripts/check.sh                      # EVERYTHING, exit 0 = done: pytest (unit, contract, golden, architecture) + mypy --strict + import-linter
 uv run pytest -q                      # the tests alone: no LLM, no network, never touches your ~/.kiro (also runs mypy + lint-imports)
-uv run pytest -q src/orgmcp/mail      # the tests of one package (they live next to its code)
+uv run pytest -q src/hirearchy/mail      # the tests of one package (they live next to its code)
 uv run pytest -q tests/golden         # only the golden (characterization) snapshots, about 15 s
 uv run pytest -q tests/architecture   # the structural rules (or `-m "not architecture"` to leave them out)
-uv run pytest -q tests/integration --run-integration    # + the real-kiro tests (or ORGMCP_RUN_INTEGRATION=1)
-ORGMCP_UPDATE_GOLDEN=1 uv run pytest -q tests/golden    # regenerate the golden files, deliberately (review the git diff)
+uv run pytest -q tests/integration --run-integration    # + the real-kiro tests (or HIREARCHY_RUN_INTEGRATION=1)
+HIREARCHY_UPDATE_GOLDEN=1 uv run pytest -q tests/golden    # regenerate the golden files, deliberately (review the git diff)
 uv run python scripts/static_checks.py mypy|imports     # one static check
 uv run python -m tests.architecture.lint                # import contracts only: generates .importlinter (git-ignored) and runs it + the pyproject ones
 uv run python -m tests.architecture.gen_importlinter    # print the generated contracts
 uv run python -m tests.architecture.collected_count --write   # record the test-count floor of each package (a floor only ever goes up)
 ```
 
-**Where tests live.** A feature package keeps its tests next to its code, in `src/orgmcp/<feature>/tests/` (with an `__init__.py`, so two features may both have a
+**Where tests live.** A feature package keeps its tests next to its code, in `src/hirearchy/<feature>/tests/` (with an `__init__.py`, so two features may both have a
 `test_api.py`; `tests/architecture/test_layout.py` checks it): unit tests of each class, `test_contract_<protocol>.py` per Protocol (the same suite for the real
 implementation and the in-memory fake of `testing.py`), and behaviour tests. `tests/` holds what crosses features: `tests/architecture` (the structural rules),
 `tests/golden` (byte-for-byte snapshots), `tests/e2e` (scenarios through the facade, the CLI and the MCP server), `tests/meta` (tests of the test machinery) and
@@ -770,14 +770,14 @@ implementation and the in-memory fake of `testing.py`), and behaviour tests. `te
 never drops: `tests/architecture/baseline_test_count.txt` and one `count.txt` per colocated `tests/` are floors (`test_collected_count`).
 
 **Seams, not monkeypatching.** A test gives the code under test a fake by port, never by patching a module attribute: `open_runtime(root, {Port: fake})` for one runtime, and
-`orgmcp.app.wiring.overriding({Port: fake})` for code that opens its own (a CLI command, an MCP tool, the scheduler, `Org(root)`; the explicit overrides of `open_runtime` win).
+`hirearchy.app.wiring.overriding({Port: fake})` for code that opens its own (a CLI command, an MCP tool, the scheduler, `Org(root)`; the explicit overrides of `open_runtime` win).
 The fixtures in `tests/testkit/fixtures.py`, registered by the root `conftest.py` so colocated tests get them too, do it for the common cases: `org` (a small team),
 `frozen_clock(now)`, `counter_ids()` (predictable message ids), `process_overrides({...})`, and the autouse `isolated_kiro` (`$HOME` in a temp dir, a stub `kiro-cli` first on `PATH`),
 `fresh_process_resources` and `process_state_guard` (a test that leaves a process-global replaced is failed by name). A colocated test that needs what its layer may not import
-(`orgmcp.core`, `orgmcp.app.wiring`, `yaml`) takes it from `testkit.reach.<module>`, an alias of the very same module that import-linter does not see.
+(`hirearchy.core`, `hirearchy.app.wiring`, `yaml`) takes it from `testkit.reach.<module>`, an alias of the very same module that import-linter does not see.
 
 **The `integration` marker.** Tests marked `@pytest.mark.integration` (and everything under `tests/integration/`, marked or not) call the real `kiro-cli` and a real LLM; a default run
-reports them as skipped, and `tests/meta/test_integration_marker.py` proves it. `--run-integration` (or `ORGMCP_RUN_INTEGRATION=1`) runs them.
+reports them as skipped, and `tests/meta/test_integration_marker.py` proves it. `--run-integration` (or `HIREARCHY_RUN_INTEGRATION=1`) runs them.
 
 **Golden tests (`tests/golden/`).** Byte-for-byte snapshots, in `tests/golden/expected/`, of everything a refactor must not
 change: run prompts, `ORG.md`, message files, charters, `SERVICE.md`/`PLAYBOOK.md`, kiro profiles and command lines, the
@@ -787,20 +787,20 @@ instructions) for root, a manager, a worker, a service owner and agents with bui
 every event line. They use a fixed clock, counter-based ids and placeholders for tmp paths (`<ORG>`, `<TMP>`, `<HOME>`,
 `<VENV_BIN>`), all in the tests (`tests/golden/golden_support.py`), never in the production code. A failing golden test
 prints a unified diff. **A diff in `expected/` means observable behaviour changed**: a refactor must leave the
-directory untouched; a deliberate change regenerates the files with `ORGMCP_UPDATE_GOLDEN=1` and commits them with it.
+directory untouched; a deliberate change regenerates the files with `HIREARCHY_UPDATE_GOLDEN=1` and commits them with it.
 
-**Class-interface check (`tests/golden/test_class_interfaces.py`).** Every class with behaviour defined in `src/orgmcp`
+**Class-interface check (`tests/golden/test_class_interfaces.py`).** Every class with behaviour defined in `src/hirearchy`
 subclasses a `typing.Protocol` (data classes, exceptions, Protocols and Textual classes are exempt; the classifier is
 `tests/architecture/class_interfaces.py`, permanent exemptions `tests/architecture/exempt_classes.py`). The allow-list
 `tests/golden/interface_allowlist.txt` is empty and must stay so. Its second half, `tests/architecture/test_constructor_dependencies.py`, resolves the type hints of every such
 class's constructor (dataclass fields included) and fails when an annotation, however deeply nested in `Optional`, unions, generics or `Callable`, names a concrete
-`orgmcp` class instead of a Protocol (data classes, enums, exceptions and non-`orgmcp` types are fine; the fakes of the `testing` modules are not checked); a seeded package proves it can fail.
+`hirearchy` class instead of a Protocol (data classes, enums, exceptions and non-`hirearchy` types are fine; the fakes of the `testing` modules are not checked); a seeded package proves it can fail.
 
 **Static checks (pinned dev dependencies `mypy==2.4.0`, `import-linter==2.15`, config in `pyproject.toml`).**
 `uv run python scripts/static_checks.py` runs both; `scripts/check.sh` runs them after the tests, and
 `tests/architecture/test_static_checks.py` runs them inside plain `pytest` (skipped only when a tool is not installed).
 
-* *mypy, strict, package by package:* every package directory of `src/orgmcp/` (a directory with `__init__.py`: the kernel, a
+* *mypy, strict, package by package:* every package directory of `src/hirearchy/` (a directory with `__init__.py`: the kernel, a
   feature, an entry point, `app`) is checked with `strict = true` and, for its `api.py`, `disallow_any_explicit`; nothing has to be
   registered, creating the package is enough. Production code is strict; the tests that were moved into the packages carry `# mypy: ignore-errors`.
 * *import-linter contracts:* two sources. The contracts of the architecture (layers feature levels -> kernel, one
@@ -808,20 +808,20 @@ class's constructor (dataclass fields included) and fails when an annotation, ho
   MCP / PyYAML only at the edge) are **generated** by `tests/architecture/gen_importlinter.py` from `tests/architecture/graph.py` (the
   package map, equal to ARCHITECTURE.md 2.2/4.3) and the packages that exist, so a new package brings its
   contracts without editing a config; `python -m tests.architecture.lint` writes `.importlinter` (git-ignored) and runs it. The
-  hand-written `[[tool.importlinter.contracts]]` in `pyproject.toml` (the library and `orgmcp.core` do not import the entry points) are run with it.
+  hand-written `[[tool.importlinter.contracts]]` in `pyproject.toml` (the library and `hirearchy.core` do not import the entry points) are run with it.
   A plain `lint-imports` would read only `.importlinter`; use `lint` or `scripts/static_checks.py imports`, which run both.
 * *Structural rules (`tests/architecture/`, marker `architecture`):* one test per rule of ARCHITECTURE.md 1.2 (R1 `api`/`__init__`,
   R4 imports match the graph, R6 no module-level singletons and constructors depend on Protocols, R7 Protocols have at most 8 methods, R8 contract suite per Protocol, R9
   single writer per file and per ledger, R13 no "and" in a responsibility), run on the real tree and on `tests/architecture/fixtures/bad_pkg`
   and other seeded violations, which break each rule on purpose: a checker that cannot fail proves nothing. `ownership.py` is the table 2.3 and
-  `compat_surface.py` states the permanent compatibility surface (`orgmcp.core`, `orgmcp.progress.progress`, `orgmcp.main`; no flat module besides `core.py`).
+  `compat_surface.py` states the permanent compatibility surface (`hirearchy.core`, `hirearchy.progress.progress`, `hirearchy.main`; no flat module besides `core.py`).
 
-**The `Org` facade (`src/orgmcp/app/`).** `orgmcp.core.Org` is assembled in `orgmcp.app` from 20 mixins (`_facade_<pkg>.py`, one per
-package it delegates to; the MRO is documented in `app/facade.py`) and `orgmcp.core` re-exports it. Every method is pure delegation to a port of the runtime;
+**The `Org` facade (`src/hirearchy/app/`).** `hirearchy.core.Org` is assembled in `hirearchy.app` from 20 mixins (`_facade_<pkg>.py`, one per
+package it delegates to; the MRO is documented in `app/facade.py`) and `hirearchy.core` re-exports it. Every method is pure delegation to a port of the runtime;
 `tests/architecture/test_facade_contract.py` calls all 98 methods against a real runtime and a runtime of spy fakes and checks the delegation by AST.
 `app/tests/test_facade_signatures.py` compares the facade with
 `tests/architecture/org_signatures.json` (names, kinds, parameters and defaults of all 98 `Org` defs and of `Message`; regenerating it
-is a deliberate change of what callers can rely on: `uv run python -m orgmcp.app.tests._signatures --write`), and
+is a deliberate change of what callers can rely on: `uv run python -m hirearchy.app.tests._signatures --write`), and
 `app/tests/test_import_order.py` imports every module in a fresh interpreter in two orders.
 
 **Unit tests (default).** They use a deterministic fake agent (`tests/testkit/fake_agent.py`) in place of kiro, and the autouse fixtures above keep them off your `$HOME`.
@@ -830,9 +830,9 @@ A default run starts zero real-LLM runs.
 **Integration tests (opt-in).** `tests/integration/test_real_kiro.py` runs tiny orgs (3 tests, one agent run each,
 about 45 s and 3 LLM calls in total) against the real `kiro-cli` and your kiro login: that the agent and the scheduler's
 run id reach the MCP server's events (`ORG_RUN_ID`), that the built-in `read` reads the org but nothing outside it, and
-that the built-in `write` and orgmcp's `org_write` work side by side. They assert on files and events, not on wording.
+that the built-in `write` and hirearchy's `org_write` work side by side. They assert on files and events, not on wording.
 
-* Cost: real model calls, billed to your kiro account like any other run. `ORGMCP_IT_MODEL=<model>` picks a cheaper one
+* Cost: real model calls, billed to your kiro account like any other run. `HIREARCHY_IT_MODEL=<model>` picks a cheaper one
   (default: the system default model, `claude-sonnet-5.5`).
 * Skipped (not failed) when `kiro-cli` is not on `PATH`. Each run is killed after 300 s, the scheduler after 480 s.
 * Safety (`tests/testkit/kiro_sandbox.py`): the org lives in the test's tmp dir. Before the test the md5 of every file in

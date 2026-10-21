@@ -1,4 +1,4 @@
-usage: orgmcp check [-h] [--json]
+usage: hirearchy check [-h] [--json]
 
 options:
   -h, --help  show this help message and exit

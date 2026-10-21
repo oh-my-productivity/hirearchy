@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from orgmcp.app import Org, wiring
-from orgmcp.eventlog import EVENTS_REL
+from hirearchy.app import Org, wiring
+from hirearchy.eventlog import EVENTS_REL
 
 FIXED = datetime(2031, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
 

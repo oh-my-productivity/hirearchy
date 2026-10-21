@@ -1,0 +1,5 @@
+usage: hirearchy upgrade-rules [-h] [--dry-run]
+
+options:
+  -h, --help  show this help message and exit
+  --dry-run   print what would change; write nothing

@@ -6,12 +6,12 @@ import time
 import testkit
 from testkit.dash_fixtures import set_scheduler
 from testkit.e2e_world import DashApp, NavTable, TextPane
-from testkit.reach.orgmcp.app import wiring
+from testkit.reach.hirearchy.app import wiring
 from testkit.scheduler import scheduler_is
 from testkit.scheduler_loop import loop_over
 
-from orgmcp.core import ROOT, Org
-from orgmcp.daemon import SchedulerState
+from hirearchy.core import ROOT, Org
+from hirearchy.daemon import SchedulerState
 
 
 def run(coro):

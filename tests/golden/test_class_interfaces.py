@@ -1,4 +1,4 @@
-"""Class-interface check: every class with behaviour defined in ``src/orgmcp`` must subclass a ``typing.Protocol``.
+"""Class-interface check: every class with behaviour defined in ``src/hirearchy`` must subclass a ``typing.Protocol``.
 
 Principle (docs/refactor-principles.md, "D"): ``class FsMessageStore(MessageStore): ...``. Today almost no class does, so the
 classes that do not are listed in ``interface_allowlist.txt`` (one ``module.Qualname`` per line). Each refactor step
@@ -7,9 +7,9 @@ removes entries; the end state is an EMPTY list.
 * ``test_no_new_class_without_an_interface`` (active): fails only for a class that is NOT on the allow-list.
 * ``test_every_class_has_an_interface`` (report): xfails while the allow-list is not empty, and passes (as a hard
   assertion) once it is empty. ``pytest -rx tests/golden/test_class_interfaces.py`` shows the count; set
-  ``ORGMCP_INTERFACE_REPORT=1`` (with ``-s``) to print every offender and every stale allow-list entry.
+  ``HIREARCHY_INTERFACE_REPORT=1`` (with ``-s``) to print every offender and every stale allow-list entry.
 * Stale entries (on the list but gone, exempt or compliant now) are reported, not failed; prune them with
-  ``ORGMCP_INTERFACE_ALLOWLIST=rewrite uv run pytest tests/golden/test_class_interfaces.py`` (rewrites the list from
+  ``HIREARCHY_INTERFACE_ALLOWLIST=rewrite uv run pytest tests/golden/test_class_interfaces.py`` (rewrites the list from
   the current offenders: a diff that ADDS a line is a review failure; the list may only shrink).
 
 This is THE class-interface check (rule R6); the classifier it uses (the exemption rules: Protocols, exceptions, Textual
@@ -28,15 +28,15 @@ from pathlib import Path
 import pytest
 from architecture.class_interfaces import exemption, subclasses_a_protocol, survey as survey_package
 
-import orgmcp
+import hirearchy
 
 ALLOWLIST = Path(__file__).with_name("interface_allowlist.txt")
-REPORT = os.environ.get("ORGMCP_INTERFACE_REPORT", "").strip() not in ("", "0")
-REWRITE = os.environ.get("ORGMCP_INTERFACE_ALLOWLIST", "") == "rewrite"
+REPORT = os.environ.get("HIREARCHY_INTERFACE_REPORT", "").strip() not in ("", "0")
+REWRITE = os.environ.get("HIREARCHY_INTERFACE_ALLOWLIST", "") == "rewrite"
 
 
 def survey() -> tuple[dict[str, str], dict[str, int]]:
-    return survey_package(orgmcp)
+    return survey_package(hirearchy)
 
 
 def allowed() -> set[str]:
@@ -95,7 +95,7 @@ def test_every_class_has_an_interface(surveyed):
     offenders, counts = surveyed
     if offenders:
         pytest.xfail(f"{len(offenders)} class(es) with behaviour still lack a Protocol base "
-                     f"(allow-list: {len(allowed())}; exempt/compliant: {counts}); ORGMCP_INTERFACE_REPORT=1 lists them")
+                     f"(allow-list: {len(allowed())}; exempt/compliant: {counts}); HIREARCHY_INTERFACE_REPORT=1 lists them")
     assert not allowed(), "all classes have interfaces: empty interface_allowlist.txt"
 
 

@@ -1,0 +1,2 @@
+- `ceo/eng` paused: no result for 2h
+  -> investigate why `ceo/eng` is paused; failed runs need a human (`hirearchy resume ceo/eng`), so escalate

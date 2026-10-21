@@ -1,0 +1,42 @@
+ hirearchy dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |  running 2/2  queued 1  waiting on you 1  errors 15m 2
+▼ ★ root (you)  needs you: 1                                              │ Overview  Activity  Messages  Run log  Memory  Charter
+├─ ○ archivist  idle  0 left                                              │╸━━━━━━━━╺━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+├─ ▼ ▶ ceo  running 1m12s  3 left                                         │ ceo
+│  ├─ ◔ analyst  queued: all slots busy, 1 unread  4 left                 │ state    ▶ running 1m12s
+│  └─ ◆ writer  working on 1 task(s)  2 left                              │ parent   root
+├─ ▼ ◇ ops  waiting on 1 report(s)  3 left                                │ role     Chief executive
+│  ├─ ‖ audit  paused by the user: audit window closed  0 left            │ model    claude-sonnet-5.5
+│  └─ ‖ deploy  paused: 2 consecutive failed runs, 1 unread  1 left       │ budget   3 run(s) left; 2 run(s) used
+└─ ▼ ▶ research  running 2m05s  4 left                                    │ mailbox  0 unread, 1 open task(s), 2 delegated and outstanding
+   └─ ! crawler  out of budget  0 left                                    │
+                                                                          │ Current run
+                                                                          │ elapsed 1m12s
+                                                                          │ batch of 1 message(s):
+                                                                          │   note "Scope change" from root
+                                                                          │
+                                                                          │ Open tasks (1)
+                                                                          │ "Quarterly market report"  from root  budget 12
+                                                                          │     · Covers 5 competitors
+                                                                          │     · Every claim sourced
+                                                                          │
+                                                                          │ Delegated, outstanding (2)
+                                                                          │ "Collect competitor data" -> ceo/analyst  [queued: max_parallel (2)
+                                                                          │ runs are busy, 1 unread]  budget 4
+                                                                          │ "Draft the report" -> ceo/writer  [working on 1 task(s)]  budget 3
+                                                                          │
+                                                                          │ Latest activity
+                                                                          │ 10:05:27 run started (batch: note "Scope change" from root)
+                                                                          │ 10:05:30 inbox ok 5ms
+                                                                          │ 10:05:40 delegate → ceo/analyst REFUSED: not enough budget: you have 5
+                                                                          │ run(s) and must keep 2 in reserve
+                                                                          │ 10:05:50 read ceo/MEMORY.md ok 5ms
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+ ←/h Fold  →/l Unfold/pane  ⏎ Open  12345 Screen  r Refresh  p Pause  ? Help  q Quit  [] Tab
