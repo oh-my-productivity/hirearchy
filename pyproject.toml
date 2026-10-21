@@ -23,9 +23,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/achieveramin/hirearchy"
-Repository = "https://github.com/achieveramin/hirearchy"
-Issues = "https://github.com/achieveramin/hirearchy/issues"
+Homepage = "https://github.com/oh-my-productivity/hirearchy"
+Repository = "https://github.com/oh-my-productivity/hirearchy"
+Issues = "https://github.com/oh-my-productivity/hirearchy/issues"
 
 [project.scripts]
 hirearchy = "hirearchy:main"
