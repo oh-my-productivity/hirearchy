@@ -7,7 +7,7 @@ from collections.abc import Collection, Mapping, Sequence
 from ..kernel import JsonObject, OrgError
 from ._lines import criteria_lines
 from ._protocols import ContractAmendment
-from .api import Contract, Criterion
+from .api import Contract, Criterion, confirmed_amendments
 
 
 def _described(deliverable: JsonObject) -> str:
@@ -84,4 +84,12 @@ class ContractAmender(ContractAmendment):
         head = (f"{old.defined_by or 'your parent'} changed the contract of service `{old.name}` (v{old.version} -> v{new.version}). "
                 "Read it, and follow the new criteria from the next request on:")
         shown = (f"{c.id}: {c.text}" + (" (not confirmed)" if c.amended and c.id not in confirmed else "") for c in criteria)
-        return "\n".join([head, *changes, "Acceptance criteria now:", *shown, f"Contract: {where}"])
+        rule_c = []
+        if not new.locked and any(c.amended for c in criteria):  # on a locked contract revise_playbook refuses before the gate (DR-13)
+            ids = ", ".join(c.id for c in confirmed_amendments(criteria, confirmed)) or "none yet"
+            rule_c = [
+                "Rule (c): a playbook revision that cites a criterion added by an amendment the client confirmed is admitted; "
+                f"confirmed now: {ids}. A criterion marked (not confirmed) counts once the client's yes is recorded "
+                "(it reaches you as a criterion link)."
+            ]
+        return "\n".join([head, *changes, "Acceptance criteria now:", *shown, *rule_c, f"Contract: {where}"])

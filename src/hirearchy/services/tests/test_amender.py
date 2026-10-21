@@ -127,4 +127,29 @@ def test_the_note_marks_an_unconfirmed_amendment() -> None:
     assert "Acceptance criteria now:\nC1: one\nC2: two\nC3: three (not confirmed)\nC4: four (not confirmed)\nC5: five\n" in nothing  # v1 and non-root: no mark
     some = A.diff(contract(), new, [], "x", criteria, ["C3"])
     assert "C3: three\nC4: four (not confirmed)\nC5: five\n" in some
-    assert "(not confirmed)" not in A.diff(contract(), new, [], "x", criteria, {"C3", "C4"})
+    assert "(not confirmed)" not in A.diff(contract(), new, [], "x", criteria, {"C3", "C4"}).split("Rule (c)")[0]  # the rule (c) line only explains the mark
+
+
+RULE_C = (
+    "Rule (c): a playbook revision that cites a criterion added by an amendment the client confirmed is admitted; confirmed now: {ids}. "
+    "A criterion marked (not confirmed) counts once the client's yes is recorded (it reaches you as a criterion link)."
+)
+
+
+def amended_note(confirmed: object, *, locked: bool = False) -> str:
+    criteria = number_criteria([(1, "root", ["one", "two"]), (2, "root", ["one", "two", "three", "four"])])
+    return A.diff(contract(), contract(acceptance=["one", "two", "three", "four"], version=2, locked=locked), [], "ceo/services/brief/SERVICE.md", criteria, confirmed)  # type: ignore[arg-type]
+
+
+def test_the_note_names_rule_c_and_the_confirmed_amendments() -> None:
+    nothing = amended_note(frozenset()).splitlines()
+    assert nothing[-2:] == [RULE_C.format(ids="none yet"), "Contract: ceo/services/brief/SERVICE.md"]
+    assert amended_note({"C3"}).splitlines()[-2] == RULE_C.format(ids="C3")
+    assert amended_note({"C4", "C3", "C1"}).splitlines()[-2] == RULE_C.format(ids="C3, C4")  # in the order of the contract; only amendments count
+
+
+def test_no_rule_c_line_without_amendments_or_on_a_locked_contract() -> None:
+    assert "Rule (c)" not in amended_note({"C3", "C4"}, locked=True)  # the playbook cannot be revised: nothing would be admitted
+    plain = A.diff(contract(), contract(version=2), [], "x", ided("one", "two"), frozenset())
+    assert "Rule (c)" not in plain
+    assert "Rule (c)" not in A.diff(contract(), contract(version=2), [], "x", [], frozenset())

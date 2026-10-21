@@ -264,7 +264,8 @@ def test_the_amendment_note_reads_the_confirmations(factory: Any, tmp_path: Path
     define(w, acceptance=[f"Rule {k}" for k in range(1, 7)])
     amend(w, add_acceptance=["Cite at most five sources", "No opinions"])  # C7 and C8; the client confirmed C7 only
     (note,) = w.d.inbox("ceo")
-    assert "C6: Rule 6\nC7: Cite at most five sources\nC8: No opinions (not confirmed)\nContract:" in note.body
+    assert "C6: Rule 6\nC7: Cite at most five sources\nC8: No opinions (not confirmed)\nRule (c): " in note.body
+    assert "; confirmed now: C7. A criterion marked (not confirmed)" in note.body and "\nContract: ceo/services/weekly-brief/SERVICE.md" in note.body
 
 
 @pytest.mark.parametrize("error", [OrgError("the cases cannot be read"), OSError("disk")], ids=["OrgError", "OSError"])
