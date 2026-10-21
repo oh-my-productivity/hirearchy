@@ -30,6 +30,7 @@ from ..runs.testing import RunsHarness, fs_runs, memory_runs
 from ..settings.testing import SettingsHarness, fs_org_settings, memory_org_settings
 from ._analyzer import FileHealthAnalyzer
 from ._branches import branch_totals
+from ._escapes import MailEscapeCounter
 from ._hired import CharterHireDates
 from ._ports import CharterStamp, FsCharterStamp
 from ._rework import MailClientRework
@@ -118,7 +119,8 @@ class FixedHealthAnalyzer(HealthAnalyzer):
 class Send(Protocol):
     def __call__(
         self, sender: str, to: str, type: str, when: float, *, title: str = "t", status: str | None = None, reply_to: str | None = None,
-        budget: int = 0, revises: str | None = None, service: str | None = None, wake: bool = True,
+        budget: int = 0, revises: str | None = None, service: str | None = None, wake: bool = True, feedback: str | None = None,
+        source: str | None = None,
     ) -> Message: ...
 
 
@@ -174,7 +176,8 @@ def _world(
     budgets = FixedBudget(mail.tasks, agents, charters)
     analyzer = FileHealthAnalyzer(
         agents, mail.reader, runs.reader, runs.reader, budgets, pauses.store, StateWords(mail, pauses),
-        SettingsHealthThresholds(settings.settings), MailClientRework(agents, mail.reader), CharterHireDates(charters, stamps), runs.clock,
+        SettingsHealthThresholds(settings.settings), MailClientRework(agents, mail.reader),
+        MailEscapeCounter(agents, mail.reader, runs.reader, MailClientRework(agents, mail.reader)), CharterHireDates(charters, stamps), runs.clock,
     )
     numbers = itertools.count(1)
 
@@ -185,12 +188,13 @@ def _world(
 
     def send(
         sender: str, to: str, type: str, when: float, *, title: str = "t", status: str | None = None, reply_to: str | None = None,
-        budget: int = 0, revises: str | None = None, service: str | None = None, wake: bool = True,
+        budget: int = 0, revises: str | None = None, service: str | None = None, wake: bool = True, feedback: str | None = None,
+        source: str | None = None,
     ) -> Message:
         moment = at(when)
         msg = Message(
             sender=sender, to=to, type=type, title=title, body="b", status=status, reply_to=reply_to, budget=budget, revises=revises,
-            service=service, wake=wake, id=f"{moment:%Y%m%dT%H%M%S%f}-{sender.replace('/', '.')}-{next(numbers):04x}", created=moment.isoformat(),
+            service=service, wake=wake, feedback=feedback, source=source, id=f"{moment:%Y%m%dT%H%M%S%f}-{sender.replace('/', '.')}-{next(numbers):04x}", created=moment.isoformat(),
         )
         mail.writer.store(msg)
         return msg

@@ -12,14 +12,15 @@ from ..kernel import ROOT, Clock, OrgError, aware, depth, fmt_duration, latest_r
 from ..mail import MailboxReader
 from ..runs import RunLogReader
 from ._branches import branch_totals
-from ._ports import ClientRework, HireDates, RunCount
+from ._ports import ClientRework, EscapeCounter, HireDates, RunCount
 from .api import AgentHealth, HealthAnalyzer, HealthThresholds, OrgHealth
 
 
 class FileHealthAnalyzer(HealthAnalyzer):
     def __init__(
         self, agents: AgentDirectory, mail: MailboxReader, runs: RunLogReader, run_count: RunCount, budgets: BudgetQuery,
-        pauses: PauseStore, states: AgentStates, thresholds: HealthThresholds, rework: ClientRework, hired: HireDates, clock: Clock,
+        pauses: PauseStore, states: AgentStates, thresholds: HealthThresholds, rework: ClientRework, escapes: EscapeCounter, hired: HireDates,
+        clock: Clock,
     ) -> None:
         self._agents = agents
         self._mail = mail
@@ -30,6 +31,7 @@ class FileHealthAnalyzer(HealthAnalyzer):
         self._states = states
         self._thresholds = thresholds
         self._rework = rework
+        self._escapes = escapes
         self._hired = hired
         self._clock = clock
 
@@ -76,7 +78,7 @@ class FileHealthAnalyzer(HealthAnalyzer):
             1 for start, _ in windows if start not in excluded and (last_result is None or start > last_result)
         )
         runs_per_task = (runs_used - len(excluded)) / len(results) if results else None
-        problems = by_status["failed"] + by_status["blocked"] + rework
+        escapes = self._escapes.counts(a)
 
         flags: dict[str, str] = {}
         if oldest is not None and oldest > cfg["stuck_after_seconds"] and not (waiting or running or unread):
@@ -85,8 +87,11 @@ class FileHealthAnalyzer(HealthAnalyzer):
             flags["out_of_budget"] = "no budget left but has unread mail or open tasks"
         if paused:
             flags["paused"] = f"paused: {paused}"
-        if len(tasks) >= cfg["min_tasks_for_quality"] and problems / max(1, len(tasks)) > cfg["max_problem_ratio"]:
-            flags["low_quality"] = f"{problems} of {len(tasks)} tasks failed, blocked or were sent back"
+        if escapes.judged >= cfg["min_judged_for_quality"] and escapes.escapes / escapes.judged > cfg["max_escape_ratio"]:
+            flags["low_quality"] = (
+                f"{escapes.escapes} of {escapes.judged} judged deliveries it signed off were rejected by the client after `done` (escapes); "
+                f"{escapes.rechecks} re-check(s) after a FAIL, costing {escapes.rework_runs} author rework run(s)"
+            )
         reasons = []
         if runs_per_task is not None and runs_per_task > cfg["max_runs_per_task"]:
             reasons.append(f"{runs_per_task:.1f} runs per completed task (max {cfg['max_runs_per_task']})")
@@ -114,7 +119,8 @@ class FileHealthAnalyzer(HealthAnalyzer):
             open_tasks=len(open_tasks), oldest_open_age=oldest, rework=rework, client_rework=len(client_driven), empty_runs=empty,
             runs_per_task=runs_per_task, last_activity=last, since_activity=since, flags=flags,
             done=by_status["done"], failed=by_status["failed"], blocked=by_status["blocked"],
-            failed_runs=len(failed), runtime_runs=len(runtime_only - failed),
+            failed_runs=len(failed), runtime_runs=len(runtime_only - failed), escapes=escapes.escapes, judged=escapes.judged,
+            rechecks=escapes.rechecks, rework_runs=escapes.rework_runs,
         )
 
     def org_health(self, root: str = ROOT, now: datetime | None = None) -> OrgHealth:

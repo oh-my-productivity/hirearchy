@@ -23,7 +23,11 @@
       "flags": {},
       "failed_runs": 0,
       "runtime_runs": 0,
-      "client_rework": 1
+      "client_rework": 1,
+      "escapes": 0,
+      "judged": 0,
+      "rechecks": 0,
+      "rework_runs": 0
     },
     {
       "addr": "ceo/eng",
@@ -50,7 +54,11 @@
       },
       "failed_runs": 1,
       "runtime_runs": 0,
-      "client_rework": 0
+      "client_rework": 0,
+      "escapes": 0,
+      "judged": 0,
+      "rechecks": 0,
+      "rework_runs": 0
     },
     {
       "addr": "ceo/qa",
@@ -72,12 +80,15 @@
       "since_activity": 258860.0,
       "flags": {
         "stuck": "open task is 2d old and nothing is in progress",
-        "out_of_budget": "no budget left but has unread mail or open tasks",
-        "low_quality": "3 of 4 tasks failed, blocked or were sent back"
+        "out_of_budget": "no budget left but has unread mail or open tasks"
       },
       "failed_runs": 0,
       "runtime_runs": 0,
-      "client_rework": 0
+      "client_rework": 0,
+      "escapes": 0,
+      "judged": 0,
+      "rechecks": 0,
+      "rework_runs": 0
     },
     {
       "addr": "ceo/spare",
@@ -103,7 +114,11 @@
       },
       "failed_runs": 0,
       "runtime_runs": 1,
-      "client_rework": 0
+      "client_rework": 0,
+      "escapes": 0,
+      "judged": 0,
+      "rechecks": 0,
+      "rework_runs": 0
     },
     {
       "addr": "dormant",
@@ -128,7 +143,11 @@
       },
       "failed_runs": 0,
       "runtime_runs": 0,
-      "client_rework": 0
+      "client_rework": 0,
+      "escapes": 0,
+      "judged": 0,
+      "rechecks": 0,
+      "rework_runs": 0
     },
     {
       "addr": "ops",
@@ -153,7 +172,11 @@
       },
       "failed_runs": 0,
       "runtime_runs": 0,
-      "client_rework": 0
+      "client_rework": 0,
+      "escapes": 0,
+      "judged": 0,
+      "rechecks": 0,
+      "rework_runs": 0
     },
     {
       "addr": "ops/dev",
@@ -179,7 +202,11 @@
       },
       "failed_runs": 0,
       "runtime_runs": 0,
-      "client_rework": 0
+      "client_rework": 0,
+      "escapes": 0,
+      "judged": 0,
+      "rechecks": 0,
+      "rework_runs": 0
     }
   ],
   "branches": {

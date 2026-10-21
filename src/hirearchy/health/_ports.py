@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
-from typing import Protocol, runtime_checkable
+from typing import NamedTuple, Protocol, runtime_checkable
 
 from ..kernel import JsonObject, Message, OrgLayout
 
@@ -43,6 +43,21 @@ class ClientRework(Protocol):
     def driven(self, tasks: Sequence[Message], results: Mapping[str, Message]) -> set[str]:
         """Ids of the received reworks (tasks with ``revises``) among ``tasks`` that stem from the client of a service case, given the
         latest result of each task the agent has answered."""
+        ...
+
+
+class EscapeCounts(NamedTuple):
+    escapes: int  # judged deliveries the client rejected after ``done``
+    judged: int  # deliveries the human client gave a verdict on
+    rechecks: int  # re-checks the agent had to make after a FAIL
+    rework_runs: int  # runs of the authors that those FAILs cost
+
+
+@runtime_checkable
+class EscapeCounter(Protocol):
+    def counts(self, addr: str) -> EscapeCounts:
+        """The escapes of ``addr``: the human client's verdicts on the service deliveries it owned or signed off, and the re-checks and author
+        rework runs a FAIL of its own cost (all four numbers are 0 for an agent that took no part in a service delivery)."""
         ...
 
 

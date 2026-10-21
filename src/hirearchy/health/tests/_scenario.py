@@ -68,7 +68,7 @@ def build(tmp_path: Path, clock: ScenarioClock) -> Any:
     """The organization:
 
     * ``ceo/eng``: an open task for over an hour, seven runs and no result, most of them silent (stuck, expensive, wasteful);
-    * ``ceo/qa``: three tasks, two failed, one sent back by its manager (low_quality);
+    * ``ceo/qa``: three tasks, two failed, one sent back by its manager (no flag: failed, blocked and rework are not escapes);
     * ``ceo/spare``: reported its one task blocked long ago and still holds its budget (stranded_budget), one run of it woken by the runtime alone;
     * ``ceo``: a service request the client sent back once (``client_rework``), so no ``rework`` is held against it;
     * ``ops``: all its budget used and a new task waiting (out_of_budget); ``ops/dev``: paused;

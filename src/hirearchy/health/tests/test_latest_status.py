@@ -52,19 +52,19 @@ def test_health_counts_a_task_once_by_its_latest_status(org, clock):
     assert (h.done, h.blocked, h.failed, h.open_tasks) == (1, 1, 1, 0)
 
 
-def test_low_quality_and_review_use_the_latest_status(org, clock):
+def test_blocked_tasks_never_make_low_quality_and_the_latest_status_still_counts(org, clock):
     for i in range(3):
         t = org.delegate(ROOT, ENG, f"Job {i}", "g", "a", budget=3)
         org.begin_run(ENG)
         org.report(ENG, t.id, "blocked", "waiting")
-    assert "low_quality" in agent_health(org, ENG, T0).flags
-    assert "low_quality" in review(org, T0, dry_run=True).render(dry_run=True)
-    # every blocker is resolved by a later done: the agent is no longer low quality
+    h = agent_health(org, ENG, T0)
+    assert (h.done, h.blocked) == (0, 3) and "low_quality" not in h.flags  # an honest blocked is never penalized
+    assert "low_quality" not in review(org, T0, dry_run=True).render(dry_run=True)
+    # every blocker is resolved by a later done: the latest status counts
     for t in [m for m in org.received(ENG) if m.type == "task"]:
         org.report(ENG, t.id, "done", "resolved")
     h = agent_health(org, ENG, T0)
     assert (h.done, h.blocked) == (3, 0) and "low_quality" not in h.flags
-    assert "low_quality" not in review(org, T0, dry_run=True).render(dry_run=True)
 
 
 # -------------------------------------------------------------- D3: expensive

@@ -22,38 +22,51 @@ def flags(w: HealthWorld, now: float = 1000) -> dict[str, str]:
 # ------------------------------------------------------------------------------------------------------------------------ low_quality
 
 
-def test_low_quality_needs_more_than_half_of_at_least_three_tasks_to_go_wrong(w: HealthWorld) -> None:
-    for i, status in enumerate(("failed", "blocked", "done")):
-        answer(w, give(w, when=10 + i), status, 50 + i)
-    assert flags(w) == {"low_quality": "2 of 3 tasks failed, blocked or were sent back"}
+def judged(w: HealthWorld, kinds: tuple[str, ...]) -> None:
+    """``ceo/eng`` owns one service delivery per kind (it works alone: it signs them off itself); the user gave each its verdict."""
+    for i, kind in enumerate(kinds):
+        task = give(w, when=10 + 10 * i, service="weekly-brief")
+        answer(w, task, "done", 12 + 10 * i)
+        w.send("root", ENG, "note", 14 + 10 * i, reply_to=task, feedback=kind, source="human")
 
 
-def test_one_task_in_three_going_wrong_is_not_enough(w: HealthWorld) -> None:
-    for i, status in enumerate(("failed", "done", "done")):
-        answer(w, give(w, when=10 + i), status, 50 + i)
+def test_low_quality_needs_more_than_half_of_at_least_three_judged_deliveries_to_escape(w: HealthWorld) -> None:
+    judged(w, ("reject", "reject", "accept"))
+    assert flags(w) == {
+        "low_quality": "2 of 3 judged deliveries it signed off were rejected by the client after `done` (escapes); "
+        "0 re-check(s) after a FAIL, costing 0 author rework run(s)"
+    }
+
+
+def test_one_delivery_in_three_escaping_is_not_enough(w: HealthWorld) -> None:
+    judged(w, ("reject", "accept", "accept"))
     assert "low_quality" not in flags(w)
 
 
 def test_exactly_half_is_not_more_than_half(w: HealthWorld) -> None:
-    for i, status in enumerate(("failed", "failed", "done", "done")):
-        answer(w, give(w, when=10 + i), status, 50 + i)
+    judged(w, ("reject", "reject", "accept", "accept"))
     assert "low_quality" not in flags(w)
 
 
-def test_two_tasks_are_too_few_to_judge(w: HealthWorld) -> None:
-    for i in range(2):
-        answer(w, give(w, when=10 + i), "failed", 50 + i)
+def test_two_judged_deliveries_are_too_few_to_judge(w: HealthWorld) -> None:
+    judged(w, ("reject", "reject"))
     assert "low_quality" not in flags(w)
 
 
-def test_a_task_sent_back_by_its_manager_counts_as_a_problem(w: HealthWorld) -> None:
+def test_a_task_sent_back_by_its_manager_is_not_an_escape(w: HealthWorld) -> None:
     first = give(w, when=10)
     answer(w, first, "done", 20)
     give(w, when=30, revises=first)
     answer(w, give(w, when=40), "failed", 50)
     h = w.analyzer.agent_health(ENG, at(1000))
     assert h.rework == 1 and h.client_rework == 0
-    assert h.flags["low_quality"] == "2 of 3 tasks failed, blocked or were sent back"
+    assert "low_quality" not in h.flags
+
+
+def test_failed_and_blocked_results_are_never_penalized(w: HealthWorld) -> None:
+    for i, status in enumerate(("failed", "failed", "blocked", "blocked")):
+        answer(w, give(w, when=10 + i), status, 50 + i)
+    assert "low_quality" not in flags(w)
 
 
 def test_a_blocked_result_that_was_superseded_is_not_a_problem(w: HealthWorld) -> None:
@@ -65,11 +78,10 @@ def test_a_blocked_result_that_was_superseded_is_not_a_problem(w: HealthWorld) -
 
 
 def test_the_thresholds_of_org_md_move_the_boundary(w: HealthWorld) -> None:
-    for i, status in enumerate(("failed", "done", "done")):
-        answer(w, give(w, when=10 + i), status, 50 + i)
-    w.configure(org_md(max_problem_ratio=0.3))
+    judged(w, ("reject", "accept", "accept"))
+    w.configure(org_md(max_escape_ratio=0.3))
     assert "low_quality" in flags(w)
-    w.configure(org_md(min_tasks_for_quality=4, max_problem_ratio=0.3))
+    w.configure(org_md(min_judged_for_quality=4, max_escape_ratio=0.3))
     assert "low_quality" not in flags(w)
 
 

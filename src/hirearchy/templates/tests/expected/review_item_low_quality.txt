@@ -1,2 +1,2 @@
 - `ceo/eng` low_quality: no result for 2h
-  -> edit the BODY of `ceo/eng`'s charter (its frontmatter - tools, inputs, model - is kept automatically), sharpen the acceptance criteria in your next delegation, rework with delegate(..., revises=<task id>), or replace it; if you own a service, record the fix in its playbook with `revise_playbook`
+  -> compare `ceo/eng`'s last checks with the client's rejections it let through (escapes, and its re-checks after a FAIL): if you own a service, make sure its review tasks carry the regression list; edit the BODY of `ceo/eng`'s charter (its frontmatter - tools, inputs, model - is kept automatically) only if the same kind of item escaped more than once, or replace it

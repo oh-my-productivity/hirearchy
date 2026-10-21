@@ -94,3 +94,21 @@ def test_the_indent_is_relative_to_the_shallowest_agent_of_the_report(renderer: 
     agents = [agent("ceo/eng"), agent("ceo/eng/dev")]
     lines = renderer.render_text(report(agents, [branch("ceo/eng", 2), branch("ceo/eng/dev")])).splitlines()
     assert [len(line) - len(line.lstrip()) for line in lines[1:]] == [0, 2]
+
+
+def test_the_segment_shows_only_when_judged(renderer: HealthRenderer) -> None:
+    quiet = renderer.render_text(report([agent("ceo")], [branch("ceo")]))
+    assert "escapes" not in quiet and "re-checks" not in quiet
+    still = renderer.render_text(report([agent("ceo", rechecks=2, rework_runs=3)], [branch("ceo")]))
+    assert still == quiet  # nothing is judged: the segment stays out, whatever the other numbers say
+    judged = renderer.render_text(report([agent("ceo", escapes=1, judged=4, rechecks=2, rework_runs=3)], [branch("ceo")]))
+    assert judged == (
+        "1 agent, 0 flagged\n"
+        "ceo idle, budget 3/5, runs 2, open 0, done 1 failed 0 blocked 0 rework 0, escapes 1 of 4 judged, re-checks after a FAIL 2 "
+        "(author rework runs 3), runs/task 2.0, empty 0, last activity 1m ago"
+    )
+
+
+def test_the_segment_follows_the_rework_part_with_the_client_count(renderer: HealthRenderer) -> None:
+    text = renderer.render_text(report([agent("ceo", client_rework=2, escapes=0, judged=1)], [branch("ceo")]))
+    assert "rework 0 (+2 by the client), escapes 0 of 1 judged, re-checks after a FAIL 0 (author rework runs 0), runs/task" in text

@@ -45,7 +45,7 @@ def test_the_same_chain_without_a_service_still_counts_as_rework(svc):
     for i in range(3):
         prev = svc.delegate("ceo", ENG, f"Re-check {i}", "Review again", "a verdict", budget=1, revises=prev.id)
     eng = agent_health(svc, ENG)
-    assert (eng.rework, eng.client_rework) == (3, 0) and "low_quality" in eng.flags
+    assert (eng.rework, eng.client_rework) == (3, 0) and "low_quality" not in eng.flags  # rework alone no longer flags
 
 
 def test_a_rework_in_the_first_pass_of_a_service_request_still_counts(svc):

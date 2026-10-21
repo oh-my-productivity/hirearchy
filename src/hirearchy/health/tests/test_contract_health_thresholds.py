@@ -37,11 +37,11 @@ def test_the_answer_is_a_new_mapping_every_time(t: ThresholdsHarness) -> None:
 
 
 def test_the_values_of_the_block_override_the_defaults_one_by_one(t: ThresholdsHarness) -> None:
-    t.configure(health_block("idle_after_seconds: 60", "max_problem_ratio: 0.25"))
+    t.configure(health_block("idle_after_seconds: 60", "max_escape_ratio: 0.25"))
     got = t.thresholds.thresholds()
-    assert got["idle_after_seconds"] == 60 and got["max_problem_ratio"] == 0.25
-    assert {k: v for k, v in got.items() if k not in ("idle_after_seconds", "max_problem_ratio")} == {
-        k: v for k, v in HEALTH_DEFAULTS.items() if k not in ("idle_after_seconds", "max_problem_ratio")
+    assert got["idle_after_seconds"] == 60 and got["max_escape_ratio"] == 0.25
+    assert {k: v for k, v in got.items() if k not in ("idle_after_seconds", "max_escape_ratio")} == {
+        k: v for k, v in HEALTH_DEFAULTS.items() if k not in ("idle_after_seconds", "max_escape_ratio")
     }
 
 
@@ -77,3 +77,22 @@ def test_a_change_of_org_md_is_seen_at_the_next_call(t: ThresholdsHarness) -> No
     assert t.thresholds.thresholds()["idle_after_seconds"] == 120
     t.configure("---\nmission: test\n---\nrules\n")
     assert t.thresholds.thresholds() == HEALTH_DEFAULTS
+
+
+def test_the_new_keys_are_validated(t: ThresholdsHarness) -> None:
+    assert HEALTH_DEFAULTS["max_escape_ratio"] == 0.5 and HEALTH_DEFAULTS["min_judged_for_quality"] == 3
+    t.configure(health_block("max_escape_ratio: soon", "min_judged_for_quality: .nan"))
+    got = t.thresholds.thresholds()
+    assert (got["max_escape_ratio"], got["min_judged_for_quality"]) == (0.5, 3)
+    t.configure(health_block("max_escape_ratio: '0.75'", "min_judged_for_quality: 5"))
+    got = t.thresholds.thresholds()
+    assert (got["max_escape_ratio"], got["min_judged_for_quality"]) == (0.75, 5)
+
+
+def test_old_keys_are_carried_but_unread(t: ThresholdsHarness) -> None:
+    assert "max_problem_ratio" not in HEALTH_DEFAULTS and "min_tasks_for_quality" not in HEALTH_DEFAULTS
+    t.configure(health_block("max_problem_ratio: 0.1", "min_tasks_for_quality: soon"))
+    got = t.thresholds.thresholds()
+    carried = cast("dict[str, object]", got)
+    assert carried["max_problem_ratio"] == 0.1 and carried["min_tasks_for_quality"] == "soon"  # not validated: nothing reads them
+    assert got["max_escape_ratio"] == 0.5 and got["min_judged_for_quality"] == 3  # the old keys never move the new ones

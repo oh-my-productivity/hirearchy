@@ -23,7 +23,11 @@
       "flags": {},
       "failed_runs": 0,
       "runtime_runs": 0,
-      "client_rework": 0
+      "client_rework": 0,
+      "escapes": 0,
+      "judged": 0,
+      "rechecks": 0,
+      "rework_runs": 0
     },
     {
       "addr": "ceo/eng",
@@ -46,7 +50,11 @@
       "flags": {},
       "failed_runs": 0,
       "runtime_runs": 0,
-      "client_rework": 0
+      "client_rework": 0,
+      "escapes": 0,
+      "judged": 0,
+      "rechecks": 0,
+      "rework_runs": 0
     }
   ],
   "branches": {

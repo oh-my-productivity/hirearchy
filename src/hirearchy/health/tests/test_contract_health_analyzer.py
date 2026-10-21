@@ -198,3 +198,73 @@ def test_an_organization_without_agents_has_an_empty_report(bare: HealthWorld) -
     report = bare.analyzer.org_health("root", at(100))
     assert report.agents == [] and report.flagged == [] and list(report.branches) == ["root"]
     assert report.branches["root"].agents == 0 and report.branches["root"].worst_flag is None
+
+
+# --------------------------------------------------------------------------------------------------------------------------- low_quality: escapes
+
+
+def judged(w: HealthWorld, kinds: list[str], *, source: str | None = "human") -> None:
+    """``ceo/eng`` owns one delivery per kind: a service request, a ``done`` and the client's verdict (it works alone: it signs its own work off)."""
+    for i, kind in enumerate(kinds):
+        task = give(w, when=10 + 10 * i, service="weekly-brief")
+        answer(w, task, "done", 12 + 10 * i)
+        w.send("root", "ceo/eng", "note", 14 + 10 * i, reply_to=task, feedback=kind, source=source)
+
+
+def test_low_quality_needs_min_judged_for_quality(w: HealthWorld) -> None:
+    judged(w, ["reject", "reject"])
+    h = w.analyzer.agent_health("ceo/eng", at(1000))
+    assert (h.escapes, h.judged) == (2, 2) and "low_quality" not in h.flags  # 2 < min_judged_for_quality (3)
+    judged_more = give(w, when=100, service="weekly-brief")
+    answer(w, judged_more, "done", 102)
+    w.send("root", "ceo/eng", "note", 104, reply_to=judged_more, feedback="reject", source="human")
+    assert "low_quality" in w.analyzer.agent_health("ceo/eng", at(1000)).flags
+    w.configure(org_md(min_judged_for_quality=4))
+    assert "low_quality" not in w.analyzer.agent_health("ceo/eng", at(1000)).flags
+
+
+def test_low_quality_fires_above_the_escape_ratio_with_the_reason_text(w: HealthWorld) -> None:
+    judged(w, ["reject", "reject", "accept"])
+    h = w.analyzer.agent_health("ceo/eng", at(1000))
+    assert h.flags["low_quality"] == (
+        "2 of 3 judged deliveries it signed off were rejected by the client after `done` (escapes); "
+        "0 re-check(s) after a FAIL, costing 0 author rework run(s)"
+    )
+
+
+def test_exactly_the_escape_ratio_is_not_above_it(w: HealthWorld) -> None:
+    judged(w, ["reject", "reject", "accept", "accept"])  # 2 of 4 = 0.5
+    assert "low_quality" not in w.analyzer.agent_health("ceo/eng", at(1000)).flags
+    w.configure(org_md(max_escape_ratio=0.4))
+    assert "low_quality" in w.analyzer.agent_health("ceo/eng", at(1000)).flags
+
+
+def test_failed_blocked_and_rework_no_longer_flag(w: HealthWorld) -> None:
+    first = give(w, when=10)
+    answer(w, first, "done", 20)
+    give(w, when=30, revises=first)
+    give(w, when=31, revises=first)
+    for i, status in enumerate(("failed", "failed", "blocked", "failed")):
+        answer(w, give(w, when=40 + i), status, 50 + i)
+    h = w.analyzer.agent_health("ceo/eng", at(1000))
+    assert (h.failed, h.blocked, h.rework) == (3, 1, 2) and h.tasks_received == 7
+    assert "low_quality" not in h.flags
+
+
+def test_an_org_without_service_verdicts_never_flags_low_quality(w: HealthWorld) -> None:
+    for i in range(6):  # one-off tasks: nobody judges them yet
+        task = give(w, when=10 + 10 * i)
+        answer(w, task, "done", 12 + 10 * i)
+        w.send("root", "ceo/eng", "note", 14 + 10 * i, reply_to=task, feedback="reject", source="human")
+    h = w.analyzer.agent_health("ceo/eng", at(1000))
+    assert (h.escapes, h.judged) == (0, 0) and "low_quality" not in h.flags
+
+
+def test_to_dict_carries_the_four_numbers(w: HealthWorld) -> None:
+    judged(w, ["reject", "accept"])
+    data = w.analyzer.org_health("ceo", at(1000)).to_dict()
+    agents = cast(list[dict[str, object]], data["agents"])
+    eng = next(a for a in agents if a["addr"] == "ceo/eng")
+    assert (eng["escapes"], eng["judged"], eng["rechecks"], eng["rework_runs"]) == (1, 2, 0, 0)
+    ceo = next(a for a in agents if a["addr"] == "ceo")
+    assert (ceo["escapes"], ceo["judged"], ceo["rechecks"], ceo["rework_runs"]) == (0, 0, 0, 0)

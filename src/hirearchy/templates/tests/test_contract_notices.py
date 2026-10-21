@@ -59,3 +59,12 @@ def test_the_root_summary_names_the_managers_that_were_not_told_only_when_there_
 
 def test_a_manager_note_counts_its_items(notices: Notices) -> None:
     assert notices.review_manager("ceo", ["- a", "- b"]).startswith("Health review: 2 new problem(s) among your direct reports.\n- a\n- b\n\n")
+
+
+def test_the_low_quality_action_names_escapes_and_the_regression_list(notices: Notices) -> None:
+    text = notices.review_item("ceo/eng", "low_quality", "why").split("\n  -> ")[1]
+    assert text == (
+        "compare `ceo/eng`'s last checks with the client's rejections it let through (escapes, and its re-checks after a FAIL): if you own a "
+        "service, make sure its review tasks carry the regression list; edit the BODY of `ceo/eng`'s charter (its frontmatter - tools, "
+        "inputs, model - is kept automatically) only if the same kind of item escaped more than once, or replace it"
+    )

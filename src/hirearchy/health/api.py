@@ -12,6 +12,11 @@ Everything here is read-only and derived from message files and run logs (nothin
   handles such a request - is counted apart (``client_rework``) and is not held against the agent: the client's rejection says nothing
   about the reviewer's or the writer's own quality.
 
+* ``low_quality`` is judged on *escapes*, not on failed, blocked or reworked tasks: a delivery of a service that the human client rejected
+  after the team reported it ``done``, counted for the owner and for the verifier that signed it off (``escapes``, ``judged``). The
+  re-checks a FAIL caused and the author runs they cost (``rechecks``, ``rework_runs``) are shown next to it. Honest ``blocked`` and
+  ``failed`` are never penalized, and an organization without service verdicts never gets the flag.
+
 Thresholds come from ``HEALTH_DEFAULTS`` overridden by the ``health:`` mapping in ORG.md frontmatter. ``HealthAnalyzer`` measures,
 ``HealthRenderer`` writes the report as text (``OrgHealth.to_dict`` is the JSON form), ``HealthThresholds`` says where the flags start.
 """
@@ -42,8 +47,8 @@ HEALTH_DEFAULTS: dict[str, float] = {
     "stuck_after_seconds": 1800,  # open task older than this, with nothing in progress -> stuck
     "max_runs_per_task": 5,  # runs used per result sent -> expensive
     "max_runs_without_result": 6,  # runs since the last result while holding an open task -> expensive
-    "max_problem_ratio": 0.5,  # (failed + blocked + rework) / tasks received -> low_quality
-    "min_tasks_for_quality": 3,  # tasks received before low_quality can fire
+    "max_escape_ratio": 0.5,  # escapes / judged deliveries it signed off -> low_quality
+    "min_judged_for_quality": 3,  # judged deliveries before low_quality can fire
     "max_empty_run_ratio": 0.5,  # empty runs / runs used -> wasteful
     "min_runs_for_waste": 4,  # runs used before wasteful can fire
     "idle_after_seconds": 86400,  # no work and no activity for this long -> idle (candidate to retire)
@@ -76,6 +81,10 @@ class AgentHealth:
     failed_runs: int = 0  # runs that crashed, failed to start, timed out or were interrupted (not the agent's fault)
     runtime_runs: int = 0  # runs woken only by runtime notes (budget, stall, review): sending nothing is fine
     client_rework: int = 0  # received reworks that stem from the client of a service case (not counted in ``rework``)
+    escapes: int = 0  # judged service deliveries it signed off (or owned) that the human client rejected after ``done``
+    judged: int = 0  # service deliveries it signed off (or owned) that the human client gave a verdict on
+    rechecks: int = 0  # received reworks of a check it had reported done, after the owner sent the author a rework (a FAIL)
+    rework_runs: int = 0  # runs of the authors between each such FAIL and the re-check
 
     @property
     def worst_flag(self) -> str | None:

@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from testkit.health_world import StepClock, agent_health, org_health, render_text, team, thresholds
 from testkit.reach.hirearchy.core import ROOT, OrgError, join_frontmatter, split_frontmatter
+from testkit.services_world import define, deliver, request
 
 from hirearchy.health.api import FLAGS, HEALTH_DEFAULTS
 
@@ -182,16 +183,14 @@ def test_runs_without_result_count_only_runs_since_the_last_result(org, clock):
     assert "expensive" not in health(org, 2000, max_runs_per_task=100).flags
 
 
-def test_low_quality_counts_failed_blocked_and_rework(org, clock):
+def test_failed_blocked_and_rework_do_not_make_low_quality(org, clock):
     t1, t2, t3 = give(org), give(org), give(org)
     clock.at(5)
     org.report(ENG, t1.id, "failed", "x")
     org.report(ENG, t2.id, "done", "x")
-    assert "low_quality" not in health(org, 10).flags  # 1 of 3
     org.report(ENG, t3.id, "blocked", "x")
     h = health(org, 10)
-    assert h.flags["low_quality"] == "2 of 3 tasks failed, blocked or were sent back"
-    # rework counts too: two done tasks, two of the four tasks are sent-back revisions
+    assert (h.failed, h.blocked, h.done) == (1, 1, 1) and "low_quality" not in h.flags  # honest failed/blocked is never penalized
     other = "ceo/ops"
     org.hire("ceo", "ops", "Ops", "x")
     a = give(org, to=other)
@@ -200,16 +199,34 @@ def test_low_quality_counts_failed_blocked_and_rework(org, clock):
     give(org, to=other, revises=a.id)
     give(org, to=other, revises=a.id)
     assert agent_health(org, other, at(10)).rework == 2
-    assert "low_quality" in agent_health(org, other, at(10)).flags
+    assert "low_quality" not in agent_health(org, other, at(10)).flags  # nor is a rework
+
+
+def reject_deliveries(org, clock, n):
+    """ceo offers weekly-brief and delivers ``n`` requests (alone: it signs them off itself), which the user rejects."""
+    define(org)
+    for i in range(n):
+        clock.at(20 + i)
+        task = request(org, budget=5)
+        deliver(org, "ceo", task)
+        org.feedback(ROOT, task.id, "reject", "not what I asked", source="human")
 
 
 def test_low_quality_needs_a_minimum_sample(org, clock):
-    t1, t2 = give(org), give(org)
-    clock.at(5)
-    org.report(ENG, t1.id, "failed", "x")
-    org.report(ENG, t2.id, "failed", "x")
-    assert "low_quality" not in health(org, 10).flags
-    assert "low_quality" in health(org, 10, min_tasks_for_quality=2).flags
+    reject_deliveries(org, clock, 2)
+    h = health(org, 100, addr="ceo")
+    assert (h.escapes, h.judged) == (2, 2) and "low_quality" not in h.flags
+    assert "low_quality" in health(org, 100, addr="ceo", min_judged_for_quality=2).flags
+
+
+def test_low_quality_is_the_escapes_of_the_deliveries_it_signed_off(org, clock):
+    reject_deliveries(org, clock, 3)
+    h = health(org, 100, addr="ceo")
+    assert h.flags["low_quality"] == (
+        "3 of 3 judged deliveries it signed off were rejected by the client after `done` (escapes); "
+        "0 re-check(s) after a FAIL, costing 0 author rework run(s)"
+    )
+    assert render_text(org_health(org, ROOT, at(100))).count("escapes 3 of 3 judged, re-checks after a FAIL 0 (author rework runs 0)") == 1
 
 
 def test_wasteful(org, clock):

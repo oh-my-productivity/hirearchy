@@ -23,8 +23,8 @@ def test_bad_health_thresholds_fall_back_to_defaults(org, bad):
 
 
 def test_numeric_string_thresholds_are_accepted(org):
-    configure(org, health={"idle_after_seconds": "120", "max_problem_ratio": "0.25"})
-    assert thresholds(org)["idle_after_seconds"] == 120 and thresholds(org)["max_problem_ratio"] == 0.25
+    configure(org, health={"idle_after_seconds": "120", "max_escape_ratio": "0.25"})
+    assert thresholds(org)["idle_after_seconds"] == 120 and thresholds(org)["max_escape_ratio"] == 0.25
 
 
 def write_run(org, addr, i, text):

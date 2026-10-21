@@ -12,9 +12,9 @@ REVIEW_ACTIONS = {
     "out_of_budget": 'grant runs with send(to="{a}", body="<why>", budget=N), or report the task failed',
     "paused": "investigate why `{a}` is paused; failed runs need a human (`hirearchy resume {a}`), so escalate",
     "low_quality": (
-        "edit the BODY of `{a}`'s charter (its frontmatter - tools, inputs, model - is kept automatically), sharpen "
-        "the acceptance criteria in your next delegation, rework with delegate(..., revises=<task id>), or replace it; "
-        "if you own a service, record the fix in its playbook with `revise_playbook`"
+        "compare `{a}`'s last checks with the client's rejections it let through (escapes, and its re-checks after a FAIL): if you own a "
+        "service, make sure its review tasks carry the regression list; edit the BODY of `{a}`'s charter (its frontmatter - tools, "
+        "inputs, model - is kept automatically) only if the same kind of item escaped more than once, or replace it"
     ),
     "expensive": "narrow `{a}`'s tasks, or edit the body of its charter (its frontmatter is kept) or change its model",
     "wasteful": "fix `{a}`'s charter so every run ends with an action (report or send)",
