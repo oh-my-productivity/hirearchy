@@ -28,8 +28,9 @@ from ._ports import RejectedServices, ServicePaths
 from ._reports import TextServiceReports
 from ._runs import LogRunCounter
 from ._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection, RegressionListSection
+from ._steps import TextServiceSteps
 from ._timeline import StorePlaybookTimelines
-from .api import Case, CaseHistory, ReflectionDigest, ServicePromptSections, ServiceReports
+from .api import Case, CaseHistory, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
 
 # ------------------------------------------------------------------------------ the fake history
 
@@ -62,6 +63,7 @@ class ReflectionWorld:
     digest: ReflectionDigest
     reports: ServiceReports
     sections: ServicePromptSections
+    steps: ServiceSteps
     rejections: RejectedServices
     evidence: ServiceEvidence  # the gate over the cases of this world (the real one: ``CaseServiceEvidence``)
     paths: ServicePaths
@@ -88,7 +90,7 @@ def _world(s: ServicesWorld, runs: RunsHarness) -> ReflectionWorld:
 
     return ReflectionWorld(
         history=history, digest=digest, reports=TextServiceReports(d.agents, s.catalog, history, paths), sections=sections,
-        rejections=rejections, evidence=CaseServiceEvidence(history, s.catalog), paths=paths, s=s, runs=runs.reader, use_run=use_run,
+        steps=TextServiceSteps(d.agents, s.catalog, history, d.mail), rejections=rejections, evidence=CaseServiceEvidence(history, s.catalog), paths=paths, s=s, runs=runs.reader, use_run=use_run,
     )
 
 
@@ -132,6 +134,14 @@ def sections_memory(tmp_path: Path) -> ServicePromptSections:
     return memory_world(tmp_path).sections
 
 
+def steps_fs(tmp_path: Path) -> ServiceSteps:
+    return fs_world(tmp_path).steps
+
+
+def steps_memory(tmp_path: Path) -> ServiceSteps:
+    return memory_world(tmp_path).steps
+
+
 PURE = {"StatsReport"}  # data with derived views (counts that print themselves): one implementation, no fake
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
@@ -139,4 +149,5 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     ReflectionDigest: [digest_fs, digest_memory],
     ServiceReports: [reports_fs, reports_memory],
     ServicePromptSections: [sections_fs, sections_memory],
+    ServiceSteps: [steps_fs, steps_memory],
 }

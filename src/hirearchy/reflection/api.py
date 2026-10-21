@@ -28,6 +28,7 @@ __all__ = [
     "ReflectionDigest",
     "ServicePromptSections",
     "ServiceReports",
+    "ServiceSteps",
     "Stats",
     "StatsReport",
     "Verdict",
@@ -299,6 +300,23 @@ class ServiceReports(Protocol):
 
         ``case total: 19 runs used of 27 handed down (contract: 15 per request)``; when the runs used, plus the runs still out on an open case
         (``case_spend``), exceed the contract's budget, it adds that the case exceeds the budget and that the user must be told. Empty for a task that is not a service request."""
+        ...
+
+
+@runtime_checkable
+class ServiceSteps(Protocol):
+    """What root is told to do next after it records a rejection or amends a contract: advice that names the one question to ask the user and
+    the call that records their yes. Read-only: it never writes, and root is the only one who reads it (an agent never sees a step)."""
+
+    def feedback_step(self, note: Message) -> str:
+        """What root does next after recording ``note``, a verdict note: for a human-tier rejection of a service request, the one question naming
+        an id and the confirmation call; "" for an accept, a relayed or agent rejection, a link note or a note it cannot place."""
+        ...
+
+    def amendment_step(self, owner: str, service: str) -> str:
+        """After root amended the contract of ``owner``'s ``service``: when the latest version added amended criteria the client has not confirmed,
+        their ids and, while the latest human-tier rejection of the service has no answer, what records the user's yes; "" when every added
+        criterion is confirmed or the service has no human-tier rejection. ``OrgError`` for an unknown ``owner``."""
         ...
 
 

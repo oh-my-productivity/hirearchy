@@ -10,7 +10,7 @@ from __future__ import annotations
 from ..agents import AgentDirectory
 from ..kernel import OrgLayout
 from ..mail import MailboxReader, TaskQuery
-from ..reflection import CaseHistory, ReflectionDigest, ServicePromptSections, ServiceReports
+from ..reflection import CaseHistory, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
 from ..reflection._cases import DerivedCaseHistory
 from ..reflection._digest import DigestBuilder
 from ..reflection._evidence import CaseServiceEvidence
@@ -18,6 +18,7 @@ from ..reflection._files import OrgServicePaths
 from ..reflection._reports import TextServiceReports
 from ..reflection._runs import LogRunCounter
 from ..reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection, RegressionListSection
+from ..reflection._steps import TextServiceSteps
 from ..reflection._timeline import StorePlaybookTimelines
 from ..runs import RunLogReader
 from ..services import ServiceCatalog, ServiceEvidence, ServiceHints, ServiceStore
@@ -38,6 +39,10 @@ def register(b: Builder) -> None:
     b.provide(
         ServiceReports,
         lambda b: TextServiceReports(b.get(AgentDirectory), b.get(ServiceCatalog), b.get(CaseHistory), OrgServicePaths(b.get(OrgLayout))),
+    )
+    b.provide(
+        ServiceSteps,
+        lambda b: TextServiceSteps(b.get(AgentDirectory), b.get(ServiceCatalog), b.get(CaseHistory), b.get(MailboxReader)),
     )
     b.provide(ServicePromptSections, _sections)
 
