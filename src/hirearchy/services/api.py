@@ -20,7 +20,7 @@ Files::
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -51,6 +51,7 @@ __all__ = [
     "ServiceHints",
     "ServiceStore",
     "VERDICTS",
+    "confirmed_amendments",
     "criteria_of",
     "normalize_evidence",
     "normalize_links",
@@ -120,7 +121,8 @@ class Criterion:
 
     @property
     def amended(self) -> bool:
-        """Added by an amendment of the human client: first seen in v2 or later, defined by root, still current."""
+        """Added by an amendment of the human client: first seen in v2 or later, defined by root, still current. Rule (c) also needs the client's
+        recorded yes: :func:`confirmed_amendments`."""
         return self.since >= 2 and self.by == ROOT and self.current
 
 
@@ -136,6 +138,12 @@ def number_criteria(versions: Sequence[tuple[int, str, Sequence[str]]]) -> list[
             seen.setdefault(text, (version, defined_by))
     latest = set(versions[-1][2]) if versions else set()
     return [Criterion(f"C{k}", text, since, by, text in latest) for k, (text, (since, by)) in enumerate(seen.items(), start=1)]
+
+
+def confirmed_amendments(criteria: Sequence[Criterion], confirmed: Collection[str]) -> list[Criterion]:
+    """The criteria rule (c) admits, in the order given (pure): added by an amendment of the human client (``Criterion.amended``) and named by a
+    link the client confirmed (``confirmed``: ``ServiceEvidence.confirmed``). It is the single definition of that eligibility."""
+    return [c for c in criteria if c.amended and c.id in confirmed]
 
 
 def criteria_of(numbered: Sequence[Criterion], texts: Sequence[str]) -> list[Criterion]:
@@ -322,7 +330,7 @@ class ServiceCommands(Protocol):
 
         ``evidence`` (required; a list of at most 20 ids): what the revision rests on, ``R<k>`` regression assertions, ``C<k>`` criteria, verdict
         or case ids. The revision is admitted by ``ServiceEvidence``, by rule (b) the same criterion or assertion failed in 2 different cases
-        the human client rejected, or rule (c) it cites a criterion the client added by an amendment. Exempt, with ``[]``: the first
+        the human client rejected, or rule (c) it cites a criterion the client added by an amendment and confirmed. Exempt, with ``[]``: the first
         playbook, and restoring unchanged a version the client wrote. A refusal writes nothing."""
         ...
 
@@ -363,8 +371,13 @@ class ServiceEvidence(Protocol):
         ...
 
     def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None) -> Admission:
-        """Judge a revision of ``owner``'s playbook by rules (b) and (c) of the evidence gate; ``exempt`` ("first", "restore"): only resolve
-        the ids and return the exemption. ``OrgError`` with the client question when it is refused, or naming unknown ids."""
+        """Judge a revision of ``owner``'s playbook by rules (b) and (c) of the evidence gate (rule (c): it cites a criterion the client added by
+        an amendment and confirmed); ``exempt`` ("first", "restore"): only resolve the ids and return the exemption. ``OrgError`` with the client
+        question when it is refused, or naming unknown ids."""
+        ...
+
+    def confirmed(self, owner: str, service: str) -> frozenset[str]:
+        """The criterion ids of this service the human client confirmed with a link (``feedback(confirms=...)``); empty when there are none."""
         ...
 
 

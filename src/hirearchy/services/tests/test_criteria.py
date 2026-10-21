@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Collection
 from pathlib import Path
 
 import hirearchy.services as services
@@ -65,6 +66,20 @@ def test_amended_only_from_v2_defined_by_root_and_current() -> None:
 def test_a_version_defined_by_an_agent_is_not_amended() -> None:
     found = numbered((1, "root", ["A"]), (2, "ceo", ["A", "B"]), (3, "", ["A", "B", "C"]))
     assert {c.text: c.amended for c in found} == {"A": False, "B": False, "C": False}
+
+
+def test_confirmed_amendments_needs_both() -> None:
+    found = numbered((1, "root", ["A", "B"]), (2, "root", ["A", "B", "C", "D"]), (3, "root", ["A", "C", "D", "E"]))  # C1 A, C2 B, C3 C, C4 D, C5 E
+
+    def ids_of(confirmed: Collection[str]) -> list[str]:
+        return [c.id for c in services.confirmed_amendments(found, confirmed)]
+
+    assert ids_of({"C5", "C3", "C4"}) == ["C3", "C4", "C5"]  # amended and confirmed, in the order given
+    assert ids_of({"C4"}) == ["C4"]  # of three amendments, only the confirmed one
+    assert ids_of(set()) == [] and ids_of(()) == []  # amended only: out
+    assert ids_of({"C1"}) == []  # a confirmed v1 criterion is no amendment
+    assert ids_of({"C2"}) == []  # a removed criterion is out, confirmed or not
+    assert ids_of({"C9"}) == [] and services.confirmed_amendments([], {"C1"}) == []  # an id the contract never had; an empty contract
 
 
 def test_criteria_of_follows_the_order_of_texts_and_skips_unknown() -> None:

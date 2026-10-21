@@ -58,3 +58,8 @@ def test_links_returns_normalized_ids_or_raises(evidence: ServiceEvidence) -> No
 
 def test_links_accepts_none_alone(evidence: ServiceEvidence) -> None:
     assert evidence.links(OWNER, SERVICE, ["None"], verdict="20260101T000000000001-root-0001") == ("none",)
+
+
+def test_confirmed_is_a_frozenset_of_criterion_ids(evidence: ServiceEvidence) -> None:
+    got = evidence.confirmed(OWNER, SERVICE)
+    assert isinstance(got, frozenset) and all(isinstance(x, str) and x.startswith("C") for x in got)

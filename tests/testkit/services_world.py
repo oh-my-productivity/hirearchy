@@ -51,6 +51,18 @@ def request(org, topic="ai", **kw):
     return org.request(ROOT, "weekly-brief", {"topic": topic}, **kw)
 
 
+def confirmed_amendment(org, criterion, topic="confirm", owner="ceo", name="weekly-brief"):
+    """The user rejects a fresh delivery, the contract gains ``criterion`` and the user's yes to it is recorded (a ``confirms`` link naming its
+    new id): what admits a revision citing it by rule (c). Returns the new id."""
+    task = org.request(ROOT, name, {"topic": topic})
+    deliver(org, owner, task)
+    no = org.feedback(ROOT, task.id, "reject", f"Missing: {criterion}", source="human")
+    org.define_service(ROOT, owner, name, add_acceptance=[criterion])
+    new = next(c.id for c in reversed(org.runtime.service_catalog.criteria(owner, name)) if c.text == criterion and c.current)
+    org.feedback(ROOT, task.id, "reject", "Yes, add it.", source="human", criterion=[new], confirms=no.id)
+    return new
+
+
 def call(server, tool, **args):
     result = asyncio.run(server.call_tool(tool, args))
     blocks = result[0] if isinstance(result, tuple) else result

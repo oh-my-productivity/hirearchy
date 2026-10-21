@@ -3,7 +3,8 @@
 ``services`` cannot import ``reflection``, which derives the cases, so the gate behind ``revise_playbook`` lives here and ``app`` wires it into
 ``services`` (the pattern of ``dispatch.ReworkContext``, which ``services`` implements). A revision is admitted by rule (b), the same criterion or
 regression assertion failed in two different cases the human client rejected, or by rule (c), it cites a criterion the human client added to the
-contract by an amendment. Lessons, relayed verdicts and an agent client's verdicts weigh nothing.
+contract by an amendment and confirmed (a human ``confirms`` link names it: the user's recorded yes). Lessons, relayed verdicts and an agent
+client's verdicts weigh nothing.
 """
 
 from __future__ import annotations
@@ -11,8 +12,8 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 from ..kernel import ROOT, OrgError, clip_line, parent
-from ..services import Admission, Criterion, ServiceCatalog, ServiceEvidence, normalize_evidence, normalize_links
-from .api import Assertion, CaseHistory, Verdict, regressions
+from ..services import Admission, Criterion, ServiceCatalog, ServiceEvidence, confirmed_amendments, normalize_evidence, normalize_links
+from .api import Assertion, CaseHistory, Verdict, confirmed_criteria, regressions
 
 REASON_CLIP = 200  # characters of the reason in the question of a refusal
 WORDS_CLIP = 300  # characters of the client's words in the question of a refusal
@@ -42,11 +43,16 @@ class CaseServiceEvidence(ServiceEvidence):
             raise OrgError(f"{itself} is this rejection itself: name the criterion it is about, or the earlier rejection it repeats.")
         return wanted
 
+    def confirmed(self, owner: str, service: str) -> frozenset[str]:
+        return confirmed_criteria(self._history.cases(owner, service))
+
     def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None) -> Admission:
         ids = normalize_evidence(list(evidence))
         crit = {c.id: c for c in self._catalog.criteria(owner, service)}
         cases = self._history.cases(owner, service)
         found = regressions(cases)
+        confirmed = confirmed_criteria(cases)
+        eligible = confirmed_amendments(list(crit.values()), confirmed)
         client = parent(owner) or ROOT
         subjects: set[str] = set()  # what the revision rests on, once the human client's own evidence is picked out
         cited_cases: set[str] = set()  # the cases of the assertions it cites
@@ -73,6 +79,8 @@ class CaseServiceEvidence(ServiceEvidence):
                 subjects.add(x)
                 if not c.amended:
                     notes.append(f"{x} is in the contract since v{c.since}, not added by an amendment, and failed in no case the client rejected")
+                elif x not in confirmed:
+                    notes.append(f"{x} was added to the contract by an amendment (v{c.since}), but the client's yes to it is not recorded (not confirmed)")
             elif x in by_assertion:
                 count(by_assertion[x])
             elif x in by_verdict:
@@ -109,11 +117,10 @@ class CaseServiceEvidence(ServiceEvidence):
                 f"you think the playbook must change, send {client} (`send`) what you would change and why."
             )
 
-        amended = [c for c in crit.values() if c.amended]
-        added = [c for c in amended if c.id in subjects]
+        added = [c for c in eligible if c.id in subjects]
         if added:
             since = ", ".join(f"v{n}" for n in sorted({c.since for c in added}))
-            return Admission("c", ids, f"cites {', '.join(c.id for c in added)}, which {client} added to the contract ({since})")
+            return Admission("c", ids, f"cites {', '.join(c.id for c in added)}, which {client} added to the contract ({since}) and the client confirmed")
 
         order = {c.id: i for i, c in enumerate(cases)}
 
@@ -129,7 +136,7 @@ class CaseServiceEvidence(ServiceEvidence):
             a for a in found
             if a.case in cited_cases or any(x in subjects and len(cases_of(x)) == 1 for x in (a.id, *a.about))
         ]
-        where = ", ".join(c.id for c in amended) or "none yet"
+        where = ", ".join(c.id for c in eligible) or "none yet"
         if single:
             raise OrgError(_one_case(service, client, where, crit, max(single, key=lambda a: a.verdict.message.id)))
         raise OrgError(_no_client_evidence(service, client, where, notes, reason))
@@ -148,7 +155,7 @@ def _no_client_evidence(service: str, client: str, amended: str, notes: Sequence
     return (
         f"refused: none of this evidence is the client's own: {'; '.join(notes) or 'no evidence given'}. A revision is admitted only when (b) the "
         f"same criterion or regression assertion failed in 2 different cases the client rejected, or (c) it cites a criterion {client} added to "
-        f"the contract by an amendment ({amended}). Your team's lessons, relayed verdicts (the assistant's own reading) and an agent client's "
+        f"the contract by an amendment the client confirmed ({amended}). Your team's lessons, relayed verdicts (the assistant's own reading) and an agent client's "
         "verdicts weigh nothing. Nothing was written: follow the playbook and the contract.\n"
         f"If you think the client wants this from now on, send {client} (`send`) this question once, and do not wait for an answer (it reaches "
         f'you as a contract change or a criterion link): "We would change how we deliver {service}: {clip_line(reason, REASON_CLIP)}. Is that '
@@ -162,7 +169,7 @@ def _one_case(service: str, client: str, amended: str, crit: Mapping[str, Criter
     current = [x for x in g.about if x in crit and crit[x].current]
     return (
         f"refused: the client rejected this in one case only ({g.case}), and the evidence cites no criterion {client} added to the contract by an "
-        f"amendment ({amended}). One case is a reason to ask, not to change how the team works: a lasting requirement goes into the contract "
+        f"amendment the client confirmed ({amended}). One case is a reason to ask, not to change how the team works: a lasting requirement goes into the contract "
         "first. Nothing was written: apply the client's words to the work at hand without changing the playbook.\n"
         f"Send {client} (`send`) this question once, and do not wait for an answer (it reaches you as a contract change or a criterion link): "
         f'"In case {g.case} you said: "{clip_line(g.verdict.note, WORDS_CLIP)}". Is that a lasting requirement? If yes, which criterion should '

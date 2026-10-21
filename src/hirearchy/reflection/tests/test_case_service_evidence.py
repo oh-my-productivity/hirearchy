@@ -208,18 +208,56 @@ def test_an_unconfirmed_link_weighs_nothing(w: ReflectionWorld, evidence: Servic
 # ------------------------------------------------------------------------------ rule (c)
 
 
-def test_c_admits_a_cited_amended_criterion(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+def test_c_admits_a_cited_amended_criterion_the_client_confirmed(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     amend(w, add_acceptance=["Names the week it covers"])
-    assert evidence.admit("ceo", SERVICE, ["c3"], "why") == Admission("c", ("C3",), "cites C3, which root added to the contract (v2)")
+    rejected(w, "No week.", criterion="C3")  # the user's yes to the new criterion: a confirms link
+    assert evidence.admit("ceo", SERVICE, ["c3"], "why") == Admission(
+        "c", ("C3",), "cites C3, which root added to the contract (v2) and the client confirmed",
+    )
     amend(w, add_acceptance=["Ends with one open question"])
-    assert evidence.admit("ceo", SERVICE, ["C3", "C4"], "why").detail == "cites C3, C4, which root added to the contract (v2, v3)"
-    assert evidence.admit("ceo", SERVICE, ["C1", "C4"], "why").detail == "cites C4, which root added to the contract (v3)"
+    rejected(w, "No question.", topic="b", criterion="C4")
+    assert evidence.admit("ceo", SERVICE, ["C3", "C4"], "why").detail == (
+        "cites C3, C4, which root added to the contract (v2, v3) and the client confirmed"
+    )
+    assert evidence.admit("ceo", SERVICE, ["C1", "C4"], "why").detail == "cites C4, which root added to the contract (v3) and the client confirmed"
+
+
+def test_rule_c_admits_a_confirmed_amendment(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    amend(w, add_acceptance=["Names the week it covers", "Ends with one open question"])  # C3, C4
+    rejected(w, "No week.", criterion="C3")
+    assert evidence.admit("ceo", SERVICE, ["C3"], "why").detail == "cites C3, which root added to the contract (v2) and the client confirmed"
+    assert "C4 was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)." in refusal(
+        evidence, ["C4"],
+    )  # only C3 is confirmed: citing C4 alone gets no admission
+    assert evidence.admit("ceo", SERVICE, ["C3", "C4"], "why").detail == "cites C3, which root added to the contract (v2) and the client confirmed"
+
+
+def test_rule_c_refuses_an_amendment_without_a_confirmation(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    amend(w, add_acceptance=["Names the week it covers"])
+    task, no = rejected(w, "No week.")
+    note_on(w, task, reply_to=no.id, criterion="C3", source="relayed")  # the assistant's own reading is no confirmation
+    message = refusal(evidence, ["C3"])
+    assert message.startswith(
+        "refused: none of this evidence is the client's own: C3 was added to the contract by an amendment (v2), but the client's yes to it is not "
+        "recorded (not confirmed). "
+    )
+    assert "(c) it cites a criterion root added to the contract by an amendment the client confirmed (none yet)." in message
+
+
+def test_a_user_initiated_amendment_is_never_rule_c_eligible(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    """DR-27: root amends with no rejection at all, so no `confirms` link can name the new criterion."""
+    amend(w, add_acceptance=["Names the week it covers"])
+    message = refusal(evidence, ["C3"])
+    assert "C3 was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)." in message
+    assert "amendment the client confirmed (none yet)." in message
 
 
 def test_c_admits_an_amended_criterion_reached_through_an_assertion(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     amend(w, add_acceptance=["Names the week it covers"])
     rejected(w, "No week named.", criterion="C3")
-    assert evidence.admit("ceo", SERVICE, ["R1"], "why") == Admission("c", ("R1",), "cites C3, which root added to the contract (v2)")
+    assert evidence.admit("ceo", SERVICE, ["R1"], "why") == Admission(
+        "c", ("R1",), "cites C3, which root added to the contract (v2) and the client confirmed",
+    )
 
 
 def test_c_refuses_a_v1_criterion_with_its_note(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
@@ -228,7 +266,7 @@ def test_c_refuses_a_v1_criterion_with_its_note(w: ReflectionWorld, evidence: Se
     assert refusal(evidence, ["C1"], reason) == (
         "refused: none of this evidence is the client's own: C1 is in the contract since v1, not added by an amendment, and failed in no case the "
         "client rejected. A revision is admitted only when (b) the same criterion or regression assertion failed in 2 different cases the client "
-        "rejected, or (c) it cites a criterion root added to the contract by an amendment (C3). Your team's lessons, relayed verdicts (the "
+        "rejected, or (c) it cites a criterion root added to the contract by an amendment the client confirmed (none yet). Your team's lessons, relayed verdicts (the "
         "assistant's own reading) and an agent client's verdicts weigh nothing. Nothing was written: follow the playbook and the contract.\n"
         "If you think the client wants this from now on, send root (`send`) this question once, and do not wait for an answer (it reaches you as a "
         "contract change or a criterion link): \"We would change how we deliver weekly-brief: Always give the sources first. Is that what you want "
@@ -240,7 +278,7 @@ def test_no_evidence_at_all_is_a_g1_refusal_that_says_so(w: ReflectionWorld, evi
     assert refusal(evidence, []).startswith(
         "refused: none of this evidence is the client's own: no evidence given. A revision is admitted only when (b) "
     )
-    assert "(c) it cites a criterion root added to the contract by an amendment (none yet)." in refusal(evidence, [])
+    assert "(c) it cites a criterion root added to the contract by an amendment the client confirmed (none yet)." in refusal(evidence, [])
 
 
 # ------------------------------------------------------------------------------ criteria the client removed
@@ -251,7 +289,7 @@ def test_a_cited_removed_criterion_adds_no_subject_and_says_so(w: ReflectionWorl
     amend(w, remove_acceptance=["Names the week it covers"])
     message = refusal(evidence, ["C3"])
     assert "C3 is no longer in the contract: cite a current criterion (see `services`)." in message
-    assert "(c) it cites a criterion root added to the contract by an amendment (none yet)." in message
+    assert "(c) it cites a criterion root added to the contract by an amendment the client confirmed (none yet)." in message
 
 
 def test_two_rejections_linked_only_to_a_removed_criterion_do_not_admit(w: ReflectionWorld, evidence: ServiceEvidence) -> None:

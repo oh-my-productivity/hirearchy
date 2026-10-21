@@ -234,18 +234,26 @@ def test_6_a_second_independent_human_reject_admits_a_revision(tmp_path):
     assert any(f"admitted: C6 failed in 2 cases the client rejected: {ids['A1']}, {ids['B1']}" in m.body for m in w.org.received(ROOT))  # root's quiet note
 
 
-def test_7_a_criterion_added_by_amendment_admits_a_revision(tmp_path):
+def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_path):
     w = world(tmp_path)
-    chain(w, 6)
+    ids = chain(w, 4)
+    feedback(w, ids["A3"], "accept", "This version is right.", source="human")
+    ids["B1"] = request(w)
+    deliver(w, ids["B1"])
+    n2 = feedback(w, ids["B1"], "reject", LEE, source="human")  # the user's rejection; no criterion on it
     added = "'before <weekday>' is that weekday's date"
     reply = call(w.root, "define_service", owner="lead", name=SERVICE, add_acceptance=[added])
     assert f"C7: {added}" in reply
     note = next(m.body for m in w.org.received("lead") if "Acceptance criteria now:" in m.body)
     assert all(f"C{k}: " in note for k in range(1, 8))
-    v3 = PLAYBOOK_V1 + "3. A date is written only when the notes state it.\n4. 'before <weekday>' is that weekday's date.\n"
-    assert "now v3" in revise(w, v3, "C7 was added by the client", ["C7"])
+    v2 = PLAYBOOK_V1 + "3. 'before <weekday>' is that weekday's date.\n"
+    refused = fails(w.lead, "revise_playbook", service=SERVICE, content=v2, reason="C7 was added by the client", evidence=["C7"])
+    assert "C7 was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)" in refused
+    assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
+    feedback(w, ids["B1"], "reject", "Yes, add it.", source="human", criterion=["C7"], confirms=n2)  # the user's yes, recorded as a link
+    assert "now v2" in revise(w, v2, "C7 was added by the client", ["C7"])
     meta, _ = playbook_meta(w.org, "lead", SERVICE)
-    assert meta["version"] == 3 and meta["admitted"] == "c" and meta["evidence"] == ["C7"]
+    assert meta["version"] == 2 and meta["admitted"] == "c" and meta["evidence"] == ["C7"]
 
 
 def test_8_health_counts_the_escape_and_not_the_relayed_rework(tmp_path):

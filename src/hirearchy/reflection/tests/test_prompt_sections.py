@@ -4,7 +4,7 @@
 import time
 
 from testkit.reach.hirearchy.core import ROOT
-from testkit.services_world import ENG, define, deliver, request, svc, work
+from testkit.services_world import ENG, confirmed_amendment, define, deliver, request, svc, work
 
 WEEKDAY = "weekly-brief"
 
@@ -199,8 +199,8 @@ def test_the_reflect_section_comes_before_a_new_request_when_there_is_evidence(s
 def test_the_reflect_section_offers_restoring_an_older_version_from_v2_on(svc):
     org = svc
     org.revise_playbook("ceo", "weekly-brief", "Steps one.", "first", [])
-    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Every claim names its source"])  # the user's amendment: C3, the evidence of v2
-    org.revise_playbook("ceo", "weekly-brief", "Steps two.", "second", ["C3"])
+    c3 = confirmed_amendment(org, "Every claim names its source")  # the user's amendment and their yes: the evidence of v2
+    org.revise_playbook("ceo", "weekly-brief", "Steps two.", "second", [c3])
     time.sleep(0.002)
     first = request(org)
     deliver(org, "ceo", first)
@@ -282,8 +282,8 @@ def reflect_section_of(prompt, service):
 def test_the_restore_step_says_which_restore_needs_evidence(svc):
     org = svc
     org.revise_playbook("ceo", "weekly-brief", "Steps one.", "first", evidence=[])
-    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Every claim names its source"])
-    org.revise_playbook("ceo", "weekly-brief", "Steps two.", "second", evidence=["C3"])
+    c3 = confirmed_amendment(org, "Every claim names its source")
+    org.revise_playbook("ceo", "weekly-brief", "Steps two.", "second", evidence=[c3])
     time.sleep(0.002)
     first = request(org)
     deliver(org, "ceo", first)

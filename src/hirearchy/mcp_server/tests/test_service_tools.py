@@ -6,7 +6,7 @@ import asyncio
 import testkit.reach.yaml as yaml
 from testkit.reach.hirearchy.core import ROOT
 from testkit.mcp_server_world import build_server, services
-from testkit.services_world import BRIEF, ENG, call, define, deliver, fails, request, svc, work
+from testkit.services_world import BRIEF, ENG, call, confirmed_amendment, define, deliver, fails, request, svc, work
 
 from hirearchy.services import ServiceCommands
 
@@ -134,8 +134,9 @@ def test_angle_brackets_and_ampersands_are_stored_exactly_as_given(svc):
     assert "Resolve <weekday> and <date> & check" in svc.run_prompt("ceo", svc.begin_run("ceo"))
 
     # the same through the Org API, and in the archived history
-    svc.define_service(ROOT, "ceo", WEEKDAY, add_acceptance=["Names the week it covers"])  # the user's amendment: C3, the evidence of v2
-    svc.revise_playbook("ceo", WEEKDAY, "## Steps\n1. Other <b>.", "second <i> & more", ["C3"])
+    svc.end_run("ceo", ok=True)  # the run the prompt above opened
+    c3 = confirmed_amendment(svc, "Names the week it covers")  # the user's amendment and their yes: the evidence of v2
+    svc.revise_playbook("ceo", WEEKDAY, "## Steps\n1. Other <b>.", "second <i> & more", [c3])
     assert services.read_playbook(svc, "ceo", WEEKDAY).reason == "second <i> & more"
     assert "<weekday>" in (svc.dir("ceo") / "services" / WEEKDAY / "history" / "PLAYBOOK.v1.md").read_text()
 
@@ -223,6 +224,8 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     assert "Evidence since v1:" in section and "Missing week-over-week changes." in section
     assert "Used 2 runs; no checks." in section
     call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Shows the changes since last week"])  # C3: the evidence of v2
+    rejection = max(m.id for m in org.sent(ROOT) if m.feedback)
+    call(root, "feedback", task_id=task.id, verdict="reject", note="Yes, add it.", source="human", criterion=["C3"], confirms=rejection)
     out = call(ceo, "revise_playbook", service="weekly-brief",
                content="## Steps\n1. Search.\n2b. Compare with last week.", reason=f"case {task.id} rejected: no changes", evidence=["C3"])
     assert "playbook of `weekly-brief` is now v2" in out
