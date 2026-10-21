@@ -238,3 +238,12 @@ def test_root_has_no_bound_on_a_charter(h: OrgFilesHarness) -> None:
     h.writer.write("root", "ceo/AGENT.md", charter_of("CEO", can_hire=True, max_children=50))
     meta, _ = split_frontmatter(written(h, "ceo", "AGENT.md") or "")
     assert (meta["can_hire"], meta["max_children"]) == (True, 50)
+
+
+def test_lowering_a_legacy_max_children_that_stays_above_the_writers_is_allowed(h: OrgFilesHarness) -> None:
+    h.add_agent("ceo/legacy", {"role": "Legacy", "can_hire": True, "max_children": 5})  # the writer's own limit is 2
+    h.writer.write("ceo", "ceo/legacy/AGENT.md", charter_of("Legacy", max_children=3))
+    meta, _ = split_frontmatter(written(h, "ceo", "legacy", "AGENT.md") or "")
+    assert meta["max_children"] == 3
+    h.writer.write("ceo", "ceo/legacy/AGENT.md", charter_of("Legacy", max_children=3))  # unchanged
+    assert refusal(lambda: h.writer.write("ceo", "ceo/legacy/AGENT.md", charter_of("Legacy", max_children=4))) == a2(4, 2)  # raised above both

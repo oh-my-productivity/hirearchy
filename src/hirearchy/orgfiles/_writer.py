@@ -88,9 +88,11 @@ class GuardedOrgFileWriter(OrgFileWriter):
             new = old if append and old is not None else meta  # an append leaves the old frontmatter as it is
             grants_hire = bool(new.get("can_hire")) and not bool((old or {}).get("can_hire"))
             changed = "max_children" in new and (old is None or new["max_children"] != old.get("max_children"))
-            self._authority.check_grant(
-                actor, grants_hire=grants_hire, max_children=children_limit(new["max_children"]) if changed else None
-            )
+            wanted = children_limit(new["max_children"]) if changed else None
+            before = (old or {}).get("max_children")
+            if wanted is not None and isinstance(before, int) and not isinstance(before, bool) and wanted <= before:
+                wanted = None  # lowering a report's limit is always allowed: only a raise is bounded by the writer's own
+            self._authority.check_grant(actor, grants_hire=grants_hire, max_children=wanted)
         if append and self._store.kind(p) != "missing":
             content = self._store.read_text(p) + content
         if p == self._layout.agent_dir(actor) / "MEMORY.md":
