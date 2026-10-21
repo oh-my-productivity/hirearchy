@@ -16,11 +16,13 @@ from pathlib import Path
 from ..kernel import STAMP_FORMAT, Message, OrgPaths
 from ..runs import RunLogReader
 from ..runs.testing import RunsHarness, fs_runs, memory_runs
+from ..services import ServiceEvidence
 from ..services.testing import ServicesWorld
 from ..services.testing import fs_world as services_fs_world
 from ..services.testing import memory_world as services_memory_world
 from ._cases import DerivedCaseHistory
 from ._digest import DigestBuilder
+from ._evidence import CaseServiceEvidence
 from ._files import OrgServicePaths
 from ._ports import RejectedServices, ServicePaths
 from ._reports import TextServiceReports
@@ -61,6 +63,7 @@ class ReflectionWorld:
     reports: ServiceReports
     sections: ServicePromptSections
     rejections: RejectedServices
+    evidence: ServiceEvidence  # the gate over the cases of this world (the real one: ``CaseServiceEvidence``)
     paths: ServicePaths
     s: ServicesWorld  # the organization behind the ports: services, agents, mail, settings, the clock
     runs: RunLogReader  # the run logs the history counts
@@ -84,7 +87,7 @@ def _world(s: ServicesWorld, runs: RunsHarness) -> ReflectionWorld:
 
     return ReflectionWorld(
         history=history, digest=digest, reports=TextServiceReports(d.agents, s.catalog, history, paths), sections=sections,
-        rejections=rejections, paths=paths, s=s, runs=runs.reader, use_run=use_run,
+        rejections=rejections, evidence=CaseServiceEvidence(history, s.catalog), paths=paths, s=s, runs=runs.reader, use_run=use_run,
     )
 
 

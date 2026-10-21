@@ -1,0 +1,171 @@
+"""The evidence gate and the ids a verdict may name, judged from the cases of a service (``services``' ``ServiceEvidence`` port, implemented here).
+
+``services`` cannot import ``reflection``, which derives the cases, so the gate behind ``revise_playbook`` lives here and ``app`` wires it into
+``services`` (the pattern of ``dispatch.ReworkContext``, which ``services`` implements). A revision is admitted by rule (b), the same criterion or
+regression assertion failed in two different cases the human client rejected, or by rule (c), it cites a criterion the human client added to the
+contract by an amendment. Lessons, relayed verdicts and an agent client's verdicts weigh nothing.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping, Sequence
+
+from ..kernel import ROOT, OrgError, clip_line, parent
+from ..services import Admission, Criterion, ServiceCatalog, ServiceEvidence, normalize_evidence, normalize_links
+from .api import Assertion, CaseHistory, Verdict, regressions
+
+REASON_CLIP = 200  # characters of the reason in the question of a refusal
+WORDS_CLIP = 300  # characters of the client's words in the question of a refusal
+EXEMPTION = "no evidence needed"
+
+
+class CaseServiceEvidence(ServiceEvidence):
+    """Reads the cases of a service (``CaseHistory``) and its contract history (``ServiceCatalog``) to say what they prove."""
+
+    def __init__(self, history: CaseHistory, catalog: ServiceCatalog) -> None:
+        self._history = history
+        self._catalog = catalog
+
+    def links(self, owner: str, service: str, ids: Sequence[str], *, verdict: str | None = None) -> tuple[str, ...]:
+        wanted = normalize_links(list(ids))
+        criteria = [c.id for c in self._catalog.criteria(owner, service)]
+        found = regressions(self._history.cases(owner, service))
+        named = [a.id for a in found]
+        unknown = [x for x in wanted if x != "none" and x not in criteria and x not in named]
+        if unknown:
+            raise OrgError(
+                f"unknown criterion or assertion for `{service}`: {', '.join(unknown)}. Its criteria: {', '.join(criteria) or 'none'}; "
+                f"its regression assertions: {', '.join(named) or 'none yet'} (see `services`)."
+            )
+        itself = next((a.id for a in found if a.verdict.message.id == verdict), None) if verdict else None
+        if itself in wanted:
+            raise OrgError(f"{itself} is this rejection itself: name the criterion it is about, or the earlier rejection it repeats.")
+        return wanted
+
+    def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None) -> Admission:
+        ids = normalize_evidence(list(evidence))
+        crit = {c.id: c for c in self._catalog.criteria(owner, service)}
+        cases = self._history.cases(owner, service)
+        found = regressions(cases)
+        client = parent(owner) or ROOT
+        subjects: set[str] = set()  # what the revision rests on, once the human client's own evidence is picked out
+        cited_cases: set[str] = set()  # the cases of the assertions it cites
+        notes: list[str] = []  # why a cited id weighs nothing
+        unknown: list[str] = []
+
+        by_assertion = {a.id: a for a in found}
+        by_verdict = {v.message.id: (v, c) for c in cases for v in c.verdicts}
+        by_task = {t.id: c for c in cases for t in c.tasks}
+        by_result = {r: c for c in cases for r in [*c.lesson_ids, *([c.result.id] if c.result is not None else [])]}
+        assertion_of = {a.verdict.message.id: a for a in found}
+
+        def count(a: Assertion) -> None:
+            subjects.add(a.id)
+            subjects.update(x for x in a.about if x in crit and crit[x].current)
+            cited_cases.add(a.case)
+
+        for x in ids:
+            if x in crit:
+                c = crit[x]
+                if not c.current:
+                    notes.append(f"{x} is no longer in the contract: cite a current criterion (see `services`)")
+                    continue
+                subjects.add(x)
+                if not c.amended:
+                    notes.append(f"{x} is in the contract since v{c.since}, not added by an amendment, and failed in no case the client rejected")
+            elif x in by_assertion:
+                count(by_assertion[x])
+            elif x in by_verdict:
+                v, _ = by_verdict[x]
+                if x in assertion_of:
+                    count(assertion_of[x])
+                else:
+                    notes.append(_verdict_note(v))
+            elif x in by_task:
+                case = by_task[x]
+                mine = [a for a in found if a.case == case.id]
+                for a in mine:
+                    count(a)
+                if not mine:
+                    relayed = f"; {case.relayed_reworks} of its reworks were relayed (the assistant's own reading)" if case.relayed_reworks else ""
+                    notes.append(f"case {case.id} has no rejection by the client{relayed}")
+            elif x in by_result:
+                notes.append(f"{x} is a result: its lessons are your team's view")
+            else:
+                unknown.append(x)
+
+        if unknown:
+            raise OrgError(
+                f"unknown evidence for `{service}`: {', '.join(unknown)}. Evidence is a criterion ({', '.join(crit) or 'none'}), a regression "
+                f"assertion ({', '.join(by_assertion) or 'none yet'}), or the id of a verdict or a case of this service: see the regression list "
+                "and the digest in your prompt. Nothing was written."
+            )
+        if exempt:
+            return Admission(exempt, ids, EXEMPTION)
+        if client != ROOT:
+            raise OrgError(
+                f"refused: the client of `{service}` is {client}, an agent, so its verdicts are hypotheses and nothing in this service's history "
+                "can admit a revision (rules (b) and (c) need the human client). Nothing was written. Follow the playbook and the contract; if "
+                f"you think the playbook must change, send {client} (`send`) what you would change and why."
+            )
+
+        amended = [c for c in crit.values() if c.amended]
+        added = [c for c in amended if c.id in subjects]
+        if added:
+            since = ", ".join(f"v{n}" for n in sorted({c.since for c in added}))
+            return Admission("c", ids, f"cites {', '.join(c.id for c in added)}, which {client} added to the contract ({since})")
+
+        order = {c.id: i for i, c in enumerate(cases)}
+
+        def cases_of(x: str) -> list[str]:
+            return sorted({a.case for a in found if x == a.id or x in a.about}, key=order.__getitem__)
+
+        for x in sorted(subjects):
+            failed = cases_of(x)
+            if len(failed) >= 2:
+                return Admission("b", ids, f"{x} failed in {len(failed)} cases the client rejected: {', '.join(failed)}")
+
+        single = [
+            a for a in found
+            if a.case in cited_cases or any(x in subjects and len(cases_of(x)) == 1 for x in (a.id, *a.about))
+        ]
+        where = ", ".join(c.id for c in amended) or "none yet"
+        if single:
+            raise OrgError(_one_case(service, client, where, crit, max(single, key=lambda a: a.verdict.message.id)))
+        raise OrgError(_no_client_evidence(service, client, where, notes, reason))
+
+
+def _verdict_note(v: Verdict) -> str:
+    if v.tier == "relayed":
+        return f"verdict {v.message.id} is relayed (the assistant's own reading)"
+    if v.tier == "agent":
+        return f"verdict {v.message.id} is an agent client's (a hypothesis)"
+    return f"verdict {v.message.id} is an accept"
+
+
+def _no_client_evidence(service: str, client: str, amended: str, notes: Sequence[str], reason: str) -> str:
+    """G1: none of the evidence is the client's own."""
+    return (
+        f"refused: none of this evidence is the client's own: {'; '.join(notes) or 'no evidence given'}. A revision is admitted only when (b) the "
+        f"same criterion or regression assertion failed in 2 different cases the client rejected, or (c) it cites a criterion {client} added to "
+        f"the contract by an amendment ({amended}). Your team's lessons, relayed verdicts (the assistant's own reading) and an agent client's "
+        "verdicts weigh nothing. Nothing was written: follow the playbook and the contract.\n"
+        f"If you think the client wants this from now on, send {client} (`send`) this question once, and do not wait for an answer (it reaches "
+        f'you as a contract change or a criterion link): "We would change how we deliver {service}: {clip_line(reason, REASON_CLIP)}. Is that '
+        'what you want from now on? If yes, please add it to the contract as a criterion."'
+    )
+
+
+def _one_case(service: str, client: str, amended: str, crit: Mapping[str, Criterion], g: Assertion) -> str:
+    """G2: the client rejected this in one case only. The criteria offered for clarification are the assertion's current ones (a removed criterion
+    is never offered)."""
+    current = [x for x in g.about if x in crit and crit[x].current]
+    return (
+        f"refused: the client rejected this in one case only ({g.case}), and the evidence cites no criterion {client} added to the contract by an "
+        f"amendment ({amended}). One case is a reason to ask, not to change how the team works: a lasting requirement goes into the contract "
+        "first. Nothing was written: apply the client's words to the work at hand without changing the playbook.\n"
+        f"Send {client} (`send`) this question once, and do not wait for an answer (it reaches you as a contract change or a criterion link): "
+        f'"In case {g.case} you said: "{clip_line(g.verdict.note, WORDS_CLIP)}". Is that a lasting requirement? If yes, which criterion should '
+        f'say it: a new one, or a clarification of {" / ".join(current) or "an existing one"}?" Revise when the answer is in the contract (cite '
+        "its new criterion), or when a second case shows the same criterion failing."
+    )

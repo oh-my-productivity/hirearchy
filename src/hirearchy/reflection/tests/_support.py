@@ -68,6 +68,24 @@ def rate(w: ReflectionWorld, task: Message, verdict: str, note: str = "") -> Mes
     return w.s.commands.feedback("root", task.id, verdict, note)
 
 
+def note_on(w: ReflectionWorld, task: Message, *, verdict: str | None = None, reply_to: str | None = None, **kw: Any) -> Message:
+    """A note from root delivered straight, as the sender would stamp it: a verdict on ``task`` (``verdict``), or a link note replying to
+    ``reply_to`` (``criterion=...``). ``source``, ``criterion`` and ``body`` go in ``kw``."""
+    return w.s.d.post(Message(
+        sender="root", to=task.to, type="note", title="note", body=kw.pop("body", "the client's words"), feedback=verdict,
+        reply_to=reply_to or (task.id if verdict else None), **kw,
+    ))
+
+
+def nested(w: ReflectionWorld) -> Message:
+    """An agent is the client: ``ceo`` defines a service for its report ``ceo/eng`` and asks for it; the delivered request is returned."""
+    grant = Message(sender="root", to="ceo", type="note", body="runs for you", title="grant", budget=20)
+    w.s.d.post(grant)
+    define(w, "ceo/eng", "inner", actor="ceo")
+    task = w.s.commands.request("ceo", "inner", {"topic": "ai"})
+    return deliver(w, task)
+
+
 def revise(w: ReflectionWorld, content: str = STEPS, reason: str = "first", owner: str = "ceo") -> int:
     """The owner writes the next version of the playbook; time moves a second first, so that it lies between the cases around it."""
     w.s.d.clock.advance(1)

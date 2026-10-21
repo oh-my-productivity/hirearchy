@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -11,7 +10,7 @@ from hirearchy.kernel import Message
 from hirearchy.reflection import CaseHistory
 from hirearchy.reflection.testing import IMPLEMENTATIONS, ReflectionWorld, fs_world, memory_world
 
-from ._support import SERVICE, STEPS, ask, define, deliver, implementations, populated, rate, revise, rework
+from ._support import SERVICE, STEPS, ask, define, deliver, implementations, nested, note_on, populated, rate, revise, rework
 
 
 @pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
@@ -166,23 +165,6 @@ def test_a_case_nobody_rated_has_no_verdict(w: ReflectionWorld) -> None:
 
 
 # ------------------------------------------------------------------------------ tiers, links, client kind and relayed reworks
-
-
-def note_on(w: ReflectionWorld, task: Message, *, verdict: str | None = None, reply_to: str | None = None, **kw: Any) -> Message:
-    """A note from root delivered straight, as the sender would stamp it: a verdict on ``task``, or a link note replying to ``reply_to``."""
-    return w.s.d.post(Message(
-        sender="root", to=task.to, type="note", title="note", body=kw.pop("body", "the client's words"), feedback=verdict,
-        reply_to=reply_to or (task.id if verdict else None), **kw,
-    ))
-
-
-def nested(w: ReflectionWorld) -> Message:
-    """An agent is the client: ``ceo`` defines a service for its report ``ceo/eng`` and asks for it; the delivered request is returned."""
-    grant = Message(sender="root", to="ceo", type="note", body="runs for you", title="grant", budget=20)
-    w.s.d.post(grant)
-    define(w, "ceo/eng", "inner", actor="ceo")
-    task = w.s.commands.request("ceo", "inner", {"topic": "ai"})
-    return deliver(w, task)
 
 
 def test_verdicts_carry_their_tier(w: ReflectionWorld) -> None:
