@@ -167,10 +167,12 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     define(org, playbook="Steps.")
     t1 = request(org, "ai")
     deliver(org, "ceo", t1, runs=3)
-    org.feedback(ROOT, t1.id, "reject", "Bad.", source="human", criterion=["C2"])
+    no1 = org.feedback(ROOT, t1.id, "reject", "Bad.", source="human")
+    org.feedback(ROOT, t1.id, "reject", "Yes, it is about C2.", source="human", criterion=["C2"], confirms=no1.id)
     t2 = request(org, "chips")
     deliver(org, "ceo", t2, runs=2)
-    org.feedback(ROOT, t2.id, "reject", "Still bad.", source="human", criterion=["C2"])  # C2 failed in two cases: the evidence of v2
+    no2 = org.feedback(ROOT, t2.id, "reject", "Still bad.", source="human")
+    org.feedback(ROOT, t2.id, "reject", "Yes, it is about C2.", source="human", criterion=["C2"], confirms=no2.id)  # C2 failed in two cases: the evidence of v2
     org.revise_playbook("ceo", "weekly-brief", "Better steps.", "Case rejected for missing sources", ["C2"])
     out = call(server, "services")
     assert out.splitlines()[0] == "Services you can request (from your direct reports):"

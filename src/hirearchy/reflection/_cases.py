@@ -95,13 +95,20 @@ class DerivedCaseHistory(CaseHistory):
         return out
 
     def _verdict(self, note: Message, step: int, links: list[Message]) -> Verdict:
-        """The verdict a feedback note is. Its link is the latest human-tier candidate (the note's own criterion or a link note that replies
-        to it), else the latest candidate of any tier."""
+        """The verdict a feedback note is. Its link is the latest human-tier candidate, else the latest candidate of any tier. A candidate is the
+        note's own criterion, always of the relayed tier (the assistant wrote it, whatever the note's source), or a link note that replies to it,
+        which is human only when root sent it with ``source="human"`` after the user's yes. ``confirmed`` collects the criteria of every
+        human-tier link note."""
         candidates = sorted((m for m in (note, *links) if link_ids(m)), key=lambda m: m.id)
-        winning = [m for m in candidates if verdict_tier(m) == "human"] or candidates
+
+        def tier(m: Message) -> str:
+            return "relayed" if m is note else verdict_tier(m)
+
+        winning = [m for m in candidates if tier(m) == "human"] or candidates
+        confirmed = dict.fromkeys(x for m in candidates if m is not note and tier(m) == "human" for x in link_ids(m) if x.startswith("C"))
         return Verdict(
             note.feedback or "", self._words.feedback_text(note), msg_time(note), note.reply_to or "", step, note, tier=verdict_tier(note),
-            links=link_ids(winning[-1]) if winning else (), links_tier=verdict_tier(winning[-1]) if winning else "",
+            links=link_ids(winning[-1]) if winning else (), links_tier=tier(winning[-1]) if winning else "", confirmed=tuple(confirmed),
         )
 
     def case_of(self, task: Message) -> Case | None:

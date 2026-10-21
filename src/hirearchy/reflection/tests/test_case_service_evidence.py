@@ -47,10 +47,16 @@ def evidence(w: ReflectionWorld) -> ServiceEvidence:
 
 
 def rejected(w: ReflectionWorld, words: str = "Too long.", *, topic: str = "ai", source: str = "human", **kw: str) -> tuple[Message, Message]:
-    """A new case: the request, its delivery and the client's rejection (``criterion=...`` on the verdict itself); returns (request, verdict)."""
+    """A new case: the request, its delivery and the client's rejection; returns (request, verdict). A human ``criterion=...`` is the user's yes,
+    so it is recorded as a ``confirms`` link note after the verdict (the verdict's own criterion would be relayed tier); a relayed or agent one
+    stays on the verdict."""
     task = ask(w, topic)
     deliver(w, task)
-    return task, note_on(w, task, verdict="reject", source=source, body=words, **kw)
+    own = {} if source == "human" else kw
+    verdict = note_on(w, task, verdict="reject", source=source, body=words, **own)
+    if source == "human" and "criterion" in kw:
+        note_on(w, task, reply_to=verdict.id, source="human", criterion=kw["criterion"])
+    return task, verdict
 
 
 def amend(w: ReflectionWorld, **over: Any) -> None:
@@ -133,10 +139,24 @@ def test_two_rejections_in_one_case_are_one_case_g2(w: ReflectionWorld, evidence
     task, _ = rejected(w, "First words.", criterion="C2")
     again = rework(w, task)
     deliver(w, again)
-    note_on(w, again, verdict="reject", source="human", criterion="C2", body="Second words.")
+    second = note_on(w, again, verdict="reject", source="human", body="Second words.")
+    note_on(w, again, reply_to=second.id, source="human", criterion="C2")
     message = refusal(evidence, ["C2"])
     assert message.startswith(f"refused: the client rejected this in one case only ({task.id}), and the evidence cites no criterion root added")
     assert f'"In case {task.id} you said: "Second words.". Is that a lasting requirement?' in message
+
+
+def test_rule_b_ignores_criteria_given_on_the_verdicts(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    """A criterion on the rejection itself is relayed tier whatever its source: two such rejections in two cases are not the client's evidence."""
+    for topic in ("a", "b"):
+        task = ask(w, topic)
+        deliver(w, task)
+        note_on(w, task, verdict="reject", source="human", criterion="C2", body="No source.")
+    assert refusal(evidence, ["C2"]).startswith(
+        "refused: none of this evidence is the client's own: C2 is in the contract since v1, not added by an amendment, and failed in no case "
+        "the client rejected. "
+    )
+    assert refusal(evidence, ["R1", "R2"]).startswith("refused: the client rejected this in one case only (")  # both are assertions, about nothing
 
 
 # ------------------------------------------------------------------------------ what weighs nothing
@@ -292,7 +312,8 @@ def test_g2_quotes_the_words_clipped_to_300_and_picks_the_highest_note_id(w: Ref
     again = rework(w, task)
     deliver(w, again)
     long = "long words " * 50
-    note_on(w, again, verdict="reject", source="human", criterion="C2", body=long)
+    latest = note_on(w, again, verdict="reject", source="human", body=long)
+    note_on(w, again, reply_to=latest.id, source="human", criterion="C2")
     message = refusal(evidence, ["C2"])
     assert f'you said: "{clip_line(long, 300)}". Is that a lasting requirement?' in message and "The first words." not in message
 

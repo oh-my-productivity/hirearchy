@@ -141,7 +141,8 @@ def chain(w: World, through: int) -> dict[str, str]:
         feedback(w, ids["A3"], "accept", "This version is right.", source="human")
         ids["B1"] = request(w)
         deliver(w, ids["B1"])
-        feedback(w, ids["B1"], "reject", LEE, source="human", criterion=["C6"])
+        n = feedback(w, ids["B1"], "reject", LEE, source="human")
+        feedback(w, ids["B1"], "reject", "It is about C6 too.", source="human", criterion=["C6"], confirms=n)
         revise(w, PLAYBOOK_V1 + "3. A date is written only when the notes state it.\n", "C6 failed in A1 and B1", ["C6"])
     return ids
 
@@ -224,7 +225,8 @@ def test_6_a_second_independent_human_reject_admits_a_revision(tmp_path):
     feedback(w, ids["A3"], "accept", "This version is right.", source="human")
     ids["B1"] = request(w)
     deliver(w, ids["B1"])
-    feedback(w, ids["B1"], "reject", LEE, source="human", criterion=["C6"])
+    n = feedback(w, ids["B1"], "reject", LEE, source="human")
+    feedback(w, ids["B1"], "reject", "It is about C6 too.", source="human", criterion=["C6"], confirms=n)
     v2 = PLAYBOOK_V1 + "3. A date is written only when the notes state it.\n"
     assert "now v2" in revise(w, v2, "C6 failed in A1 and B1", ["C6"])
     meta, body = playbook_meta(w.org, "lead", SERVICE)

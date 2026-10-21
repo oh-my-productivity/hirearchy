@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from hirearchy.kernel import Message
-from hirearchy.reflection import Case, case_spend, lessons_of, version_at
+from hirearchy.reflection import Case, Verdict, case_spend, confirmed_criteria, lessons_of, version_at
 
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
 TIMELINE = [(1, T), (2, T + timedelta(days=1)), (3, T + timedelta(days=2))]
@@ -99,3 +99,31 @@ def test_case_spend_never_counts_a_negative_rest() -> None:
 
 def test_case_spend_of_a_case_with_nothing_handed_down_is_its_runs() -> None:
     assert spent("open", 0, 0, 0) == 0 and spent("open", 2, 0, 0) == 2
+
+
+# ------------------------------------------------------------------------------ confirmed_criteria
+
+
+def judged(*, links: tuple[str, ...] = (), links_tier: str = "", confirmed: tuple[str, ...] = (), n: int = 1) -> Verdict:
+    note = Message(id=f"2026010100000{n}000000-root-000{n}", sender="root", to="ceo", type="note", body="No.", feedback="reject")
+    return Verdict("reject", "No.", None, "T", 0, note, links=links, links_tier=links_tier, confirmed=confirmed)
+
+
+def with_verdicts(*verdicts: Verdict) -> Case:
+    task = Message(sender="root", to="ceo", type="task", body="b", title="t")
+    return Case(
+        id="A", service="s", owner="ceo", tasks=[task], result=None, state="done", playbook=0, used=0, reworks=0, budget=1, runs=1, lessons=[],
+        verdicts=list(verdicts), started=None, finished=None,
+    )
+
+
+def test_confirmed_criteria_reads_human_links_only() -> None:
+    relayed_link = judged(links=("C1",), links_tier="relayed")  # the assistant's own reading
+    own_criterion = judged(links=("C2",), links_tier="relayed", n=2)  # a criterion on the rejection itself
+    nothing = judged(links=("none",), links_tier="human", n=3)  # "none" and R<j> name no criterion
+    same_as = judged(links=("R1",), links_tier="human", n=4)
+    assert confirmed_criteria([with_verdicts(relayed_link, own_criterion, nothing, same_as)]) == frozenset()
+    yes = judged(links=("C3",), links_tier="human", confirmed=("C3",), n=5)
+    more = judged(links=("C4", "R1"), links_tier="human", confirmed=("C4",), n=6)
+    assert confirmed_criteria([with_verdicts(yes), with_verdicts(more, relayed_link)]) == frozenset({"C3", "C4"})  # united over cases
+    assert confirmed_criteria([]) == frozenset() and confirmed_criteria([with_verdicts()]) == frozenset()

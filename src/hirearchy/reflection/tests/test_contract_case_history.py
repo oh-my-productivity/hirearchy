@@ -250,8 +250,43 @@ def test_the_link_on_the_verdict_itself_is_a_candidate(w: ReflectionWorld) -> No
     other = note_on(w, second, verdict="reject", source="human", criterion="C1")
     note_on(w, second, reply_to=other.id, criterion="C2", source="human")  # a later link replaces the verdict's own
     one, two = w.history.cases("ceo", SERVICE)
-    assert (one.verdicts[0].message, one.verdicts[0].links, one.verdicts[0].links_tier) == (own, ("C1",), "human")
+    assert (one.verdicts[0].message, one.verdicts[0].links, one.verdicts[0].links_tier) == (own, ("C1",), "relayed")
     assert (two.verdicts[0].links, two.verdicts[0].links_tier) == (("C2",), "human")
+
+
+def test_a_criterion_on_the_rejection_itself_is_relayed_tier(w: ReflectionWorld) -> None:
+    define(w)
+    task = ask(w)
+    deliver(w, task)
+    note_on(w, task, verdict="reject", source="human", criterion="C1")
+    (case,) = w.history.cases("ceo", SERVICE)
+    (verdict,) = case.verdicts
+    assert verdict.tier == "human"  # the rejection is still the user's judgement: only what it is about needs the yes
+    assert (verdict.links, verdict.links_tier) == (("C1",), "relayed")
+
+
+def test_a_human_confirms_link_wins_over_the_verdicts_own_criterion(w: ReflectionWorld) -> None:
+    define(w)
+    task = ask(w)
+    deliver(w, task)
+    no = note_on(w, task, verdict="reject", source="human", criterion="C1")
+    note_on(w, task, reply_to=no.id, criterion="C2", source="human")
+    (case,) = w.history.cases("ceo", SERVICE)
+    assert (case.verdicts[0].links, case.verdicts[0].links_tier) == (("C2",), "human")
+
+
+def test_every_human_link_note_confirms_what_it_names(w: ReflectionWorld) -> None:
+    define(w)
+    task = ask(w)
+    deliver(w, task)
+    no = note_on(w, task, verdict="reject", source="human", criterion="C4")  # its own criterion is never a confirmation
+    note_on(w, task, reply_to=no.id, criterion="C1", source="human")
+    note_on(w, task, reply_to=no.id, criterion="C2, R1", source="human")
+    note_on(w, task, reply_to=no.id, criterion="C3", source="relayed")
+    (case,) = w.history.cases("ceo", SERVICE)
+    (verdict,) = case.verdicts
+    assert verdict.confirmed == ("C1", "C2")  # in note order, links only (an R<j> is not a criterion), the relayed C3 left out
+    assert (verdict.links, verdict.links_tier) == (("C2", "R1"), "human")  # the effective link keeps its winner rule
 
 
 def test_a_verdict_with_no_criterion_and_no_link_note_has_no_link(w: ReflectionWorld) -> None:

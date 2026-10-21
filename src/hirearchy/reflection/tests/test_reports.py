@@ -16,17 +16,22 @@ def test_the_services_listing_shows_criteria_by_id(svc):
     svc.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Never longer than one page"], remove_acceptance=["At most 600 words"])
     for who in (ROOT, "ceo"):
         out = svc.runtime.service_reports.services_text(who)
-        assert "    C2: Every factual claim has a source URL\n    C3: Never longer than one page\n  record:" in out
+        assert "    C2: Every factual claim has a source URL\n    C3: Never longer than one page (amendment, not confirmed)\n  record:" in out
         assert "C1" not in out and "1. " not in out.split("record:")[0]  # the removed C1 is not listed, and nothing is numbered by position
 
 
 def reject(svc, words, topic="ai", **kw):
-    """The user rejects a delivery (their own judgement); returns the request and the verdict note."""
+    """The user rejects a delivery (their own judgement); returns the request and the verdict note. A ``criterion`` is the user's yes: it is
+    recorded as a ``confirms`` link after the verdict."""
     from testkit.services_world import deliver, request
 
     task = request(svc, topic)
     deliver(svc, "ceo", task, lessons="L.")
-    return task, svc.feedback(ROOT_ADDR, task.id, "reject", words, source="human", **kw)
+    criterion = kw.pop("criterion", None)
+    note = svc.feedback(ROOT_ADDR, task.id, "reject", words, source="human", **kw)
+    if criterion:  # the user's yes to what it was about: a `confirms` link (a criterion on the rejection itself is not the client's)
+        svc.feedback(ROOT_ADDR, task.id, "reject", "Yes, it is about that.", source="human", criterion=criterion, confirms=note.id)
+    return task, note
 
 
 ROOT_ADDR = "root"
@@ -54,6 +59,8 @@ def test_the_services_listing_lists_every_assertion_clipped_to_160(svc):
 
 
 def test_the_services_listing_says_what_each_assertion_is_about(svc):
+    from testkit.services_world import deliver, request
+
     a, one = reject(svc, "One.", criterion=["C1", "C2"])
     b, two = reject(svc, "Two.", "b", criterion=["none"])
     c, three = reject(svc, "Three.", "c")
@@ -61,13 +68,28 @@ def test_the_services_listing_says_what_each_assertion_is_about(svc):
     svc.feedback("root", d.id, "reject", "Probably.", source="relayed", criterion=["C1"], confirms=four.id)
     e, five = reject(svc, "Five.", "e")
     svc.feedback("root", e.id, "reject", "Probably.", source="relayed", criterion=["none"], confirms=five.id)
+    f = request(svc, "f")
+    deliver(svc, "ceo", f, lessons="L.")
+    svc.feedback("root", f.id, "reject", "Six.", source="human", criterion=["C2"])  # a criterion on the rejection itself: not the client's yes
     assert assertion_lines(svc.runtime.service_reports.services_text("root")) == [
         f'    R1 (case {a.id}, about C1, C2): "One."',
         f'    R2 (case {b.id}, no lasting rule): "Two."',
         f'    R3 (case {c.id}): "Three."',
         f'    R4 (case {d.id}, about C1 (not confirmed)): "Four."',
         f'    R5 (case {e.id}, possibly a one-off (not confirmed)): "Five."',
+        f'    R6 (case {f.id}, about C2 (not confirmed)): "Six."',
     ]
+
+
+def test_an_unconfirmed_amendment_is_marked_in_the_listing(svc):
+    from testkit.reach.hirearchy.core import ROOT
+
+    svc.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["One page", "Names its week"])
+    _, no = reject(svc, "No week.")
+    svc.feedback(ROOT, no.reply_to, "reject", "Yes, add it.", source="human", criterion=["C4"], confirms=no.id)
+    out = svc.runtime.service_reports.services_text("root")
+    assert "    C3: One page (amendment, not confirmed)\n" in out and "    C4: Names its week\n" in out  # the client's yes unmarks C4
+    assert "    C1: At most 600 words\n" in out  # a v1 criterion was never an amendment
 
 
 def test_the_services_listing_marks_a_removed_criterion(svc):

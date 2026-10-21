@@ -156,8 +156,8 @@ def test_services_text_lists_the_criteria_in_full(svc):
     amend(svc, add_acceptance=["Never longer than one page"])
     out = svc.runtime.service_reports.services_text(ROOT)
     assert ("  each request: 10 runs; acceptance criteria (ceo/services/weekly-brief/SERVICE.md):\n"
-            "    C1: At most 600 words\n    C2: Every factual claim has a source URL\n    C3: Never longer than one page\n"
-            "  record:") in out
+            "    C1: At most 600 words\n    C2: Every factual claim has a source URL\n"
+            "    C3: Never longer than one page (amendment, not confirmed)\n  record:") in out
     assert "3 acceptance criteria" not in out
     assert "    C3: Never longer than one page" in svc.runtime.service_reports.services_text("ceo")  # the owner sees them too
 

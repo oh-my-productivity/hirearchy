@@ -157,12 +157,14 @@ def test_service_and_playbook_files(tmp_path, clock, norm):
     first = org.request(ROOT, "weekly-brief", {"topic": "ai"})
     clock.tick()
     deliver_service(org, "ceo", first, clock, lessons="Cite while drafting.")
-    org.feedback(ROOT, first.id, "reject", "Too long.", source="human", criterion=["C1"])
+    no1 = org.feedback(ROOT, first.id, "reject", "Too long.", source="human")
     clock.tick()
     second = org.request(ROOT, "weekly-brief", {"topic": "chips"})  # the same criterion fails in a second case: evidence of the revision
     clock.tick()
     deliver_service(org, "ceo", second, clock, lessons="Cite while drafting.")
-    org.feedback(ROOT, second.id, "reject", "Still too long.", source="human", criterion=["C1"])
+    no2 = org.feedback(ROOT, second.id, "reject", "Still too long.", source="human")
+    for task, no in ((first, no1), (second, no2)):  # the user's yes: a criterion on the rejection itself would be the assistant's reading
+        org.feedback(ROOT, task.id, "reject", "Yes, it is about C1.", source="human", criterion=["C1"], confirms=no.id)
     clock.tick()
     org.revise_playbook("ceo", "weekly-brief", PLAYBOOK + "4. Cut to 600 words before reporting.\n", "Client rejected: too long.", ["C1"])
     clock.tick()

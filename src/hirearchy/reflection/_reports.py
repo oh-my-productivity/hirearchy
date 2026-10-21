@@ -8,7 +8,7 @@ from ..agents import AgentDirectory
 from ..kernel import Message, clip_line
 from ..services import Contract, ServiceCatalog, criteria_of
 from ._ports import ServicePaths
-from .api import Assertion, CaseHistory, ServiceReports, case_spend, regressions, summarize
+from .api import Assertion, CaseHistory, ServiceReports, case_spend, confirmed_criteria, regressions, summarize
 
 CLIP_ASSERTION = 160  # characters of the client's words shown for an assertion in the listing
 
@@ -48,6 +48,7 @@ class TextServiceReports(ServiceReports):
         criteria = self._catalog.criteria(c.owner, c.name)
         current = {x.id for x in criteria if x.current}
         assertions = regressions(items)
+        confirmed = confirmed_criteria(items)
         inputs = ", ".join(f"{i['name']}{'*' if i['required'] else ''}" + (f" ({i['description']})" if i["description"] else "")
                            for i in c.inputs) or "none"
         head = f"- {c.name} (offered by {c.owner}; contract v{c.version}, playbook v{pb.version})" if not offered else \
@@ -56,7 +57,8 @@ class TextServiceReports(ServiceReports):
             f"{head}: {c.description}",
             f"  inputs: {inputs}   (* required)",
             f"  each request: {c.budget} runs; acceptance criteria ({self._paths.rel(c.path)}):" if c.path else "",
-            *(f"    {x.id}: {x.text}" for x in criteria_of(criteria, c.acceptance)),
+            *(f"    {x.id}: {x.text}{' (amendment, not confirmed)' if x.amended and x.id not in confirmed else ''}"
+              for x in criteria_of(criteria, c.acceptance)),
             f"  record: {summarize(items).line() if items else 'no requests yet'}",
             *(["  regression list (the client's rejections):"] if assertions else []),
             *(self._assertion_line(a, current) for a in assertions),

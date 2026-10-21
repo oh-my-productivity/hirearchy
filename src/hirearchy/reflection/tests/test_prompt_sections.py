@@ -317,10 +317,15 @@ OLDER = "- {n} older line(s) not shown: `services` lists them all."
 
 
 def reject(org, words, topic="ai", **kw):
-    """The user rejects a delivery with ``words`` (their own judgement: ``source="human"``); returns the request and the verdict note."""
+    """The user rejects a delivery with ``words`` (their own judgement: ``source="human"``); returns the request and the verdict note. A
+    ``criterion`` is the user's yes: it is recorded as a ``confirms`` link after the verdict (on the verdict itself it would be relayed tier)."""
     task = request(org, topic)
     deliver(org, "ceo", task, lessons="L.")
-    return task, org.feedback(ROOT, task.id, "reject", words, source="human", **kw)
+    criterion = kw.pop("criterion", None)
+    note = org.feedback(ROOT, task.id, "reject", words, source="human", **kw)
+    if criterion:
+        org.feedback(ROOT, task.id, "reject", "Yes, it is about that.", source="human", criterion=criterion, confirms=note.id)
+    return task, note
 
 
 def regression_list(prompt):

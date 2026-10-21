@@ -32,6 +32,7 @@ __all__ = [
     "StatsReport",
     "Verdict",
     "case_spend",
+    "confirmed_criteria",
     "lessons_of",
     "regressions",
     "stats_by_version",
@@ -53,6 +54,7 @@ class Verdict:
     tier: str = "human"  # its weight class: ``kernel.verdict_tier`` of the note (human | relayed | agent)
     links: tuple[str, ...] = ()  # what the client said it was about: the effective link (C<k>, R<k> or none), () when there is none
     links_tier: str = ""  # the tier of the note that carries the effective link ("" = no link)
+    confirmed: tuple[str, ...] = ()  # the C<k> ids named by every human-tier link note of this verdict (never by its own criterion), in note order
 
 
 @dataclass
@@ -126,6 +128,12 @@ def case_spend(case: Case) -> int:
     Phase 0b's cost alarm reads the same number."""
     still_out = 0 if case.state in ("done", "failed") else max(0, case.budget - case.runs - case.returned)
     return case.runs + still_out
+
+
+def confirmed_criteria(cases: Sequence[Case]) -> frozenset[str]:
+    """The C<k> ids the human client confirmed: every id in ``v.confirmed`` (named by a human-tier link note), over every verdict of ``cases``
+    (pure). A criterion on the rejection itself, a link "the same as R<j>" and "none" confirm no criterion."""
+    return frozenset(x for c in cases for v in c.verdicts for x in v.confirmed)
 
 
 def regressions(cases: Sequence[Case]) -> list[Assertion]:

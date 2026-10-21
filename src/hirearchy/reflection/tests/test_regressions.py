@@ -93,3 +93,10 @@ def test_link_is_confirmed_none_unconfirmed_or_empty() -> None:
     found = regressions(cases)
     assert [a.link for a in found] == ["confirmed", "none", "unconfirmed", "unconfirmed", ""]
     assert [a.about for a in found] == [("C1",), (), (), (), ()]
+
+
+def test_an_assertion_whose_only_link_is_on_the_verdict_is_unconfirmed() -> None:
+    """A human rejection that carries its own ``criterion`` has a relayed link (the derivation of ``_verdict``): the lists mark it."""
+    own = verdict(1, tier="human", links=("C1", "C2"), links_tier="relayed")
+    (found,) = regressions([case("A", own)])
+    assert (found.link, found.about, found.verdict.links) == ("unconfirmed", (), ("C1", "C2"))
