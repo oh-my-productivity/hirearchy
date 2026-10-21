@@ -17,18 +17,15 @@ def reflect_section(prompt):
 def test_a_rejection_with_its_rework_request_brings_the_reflect_section(svc):
     first = request(svc, "ai")
     deliver(svc, "ceo", first, lessons="Clean run.")
-    svc.feedback(ROOT, first.id, "reject", "Sam's date is wrong.")
+    svc.feedback(ROOT, first.id, "reject", "Sam's date is wrong.", source="human")
     svc.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=first.id, budget=5)  # a rework: not a NEW request
     prompt = svc.run_prompt("ceo", svc.begin_run("ceo"))
     section = reflect_section(prompt)
-    assert 'client feedback: reject "Sam\'s date is wrong."' in section
-    assert (
-        "The client rejected a delivery: decide now whether the playbook must change so this does not happen again "
-        "(revise_playbook), then handle the rework."
-    ) in section
+    assert 'client feedback: reject R1 "Sam\'s date is wrong."' in section
+    assert HUMAN_LEAD.replace("the request", "the rework").replace("plan the request", "plan the rework") in section.splitlines()
     assert "Before working on the new request" not in section
-    assert "When a lesson of yours conflicts with the client's feedback, the client is right: fix the playbook to match "\
-           "the feedback (and say so in the reason)." in section
+    assert "When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: apply the feedback "\
+           "in this rework, and change the playbook only as step 3 says (say so in the reason)." in section
     assert section.rstrip().endswith("Then handle the rework following the playbook.")
     assert prompt.count("# Reflect before you start") == 1
     assert prompt.index("# Reflect before") < prompt.index("# New messages")
@@ -58,10 +55,10 @@ def test_an_accept_or_a_rework_without_a_reject_brings_no_reflect_section(svc):
 def test_a_reject_with_a_new_request_keeps_the_new_request_wording(svc):
     first = request(svc, "ai")
     deliver(svc, "ceo", first)
-    svc.feedback(ROOT, first.id, "reject", "Too long.")
+    svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
     request(svc, "chips")
     section = reflect_section(svc.run_prompt("ceo", svc.begin_run("ceo")))
-    assert "The client rejected a delivery: decide now" in section and "then handle the request." in section
+    assert "The client rejected a delivery: check the delivery against its words" in section and "then handle the request." in section
     assert section.rstrip().endswith("Then handle the request following the playbook.")
 
 
@@ -70,7 +67,7 @@ def test_the_client_wins_step_is_in_every_reflect_section(svc):
     deliver(svc, "ceo", first)
     request(svc, "chips")
     section = reflect_section(svc.run_prompt("ceo", svc.begin_run("ceo")))
-    assert "the client is right: fix the playbook to match the feedback (and say so in the reason)" in section
+    assert "the client is right: apply the feedback in this request, and change the playbook only as step 3 says (say so in the reason)" in section
     assert [line[:2] for line in section.splitlines() if line[:1].isdigit()][:2] == ["1.", "2."]
 
 
@@ -78,7 +75,7 @@ def test_a_locked_service_reflects_on_a_rejection_without_revising(svc):
     define(svc, name="locked-brief", owner="ceo", locked=True, description="Locked brief.")
     first = svc.request(ROOT, "locked-brief", {"topic": "ai"})
     deliver(svc, "ceo", first)
-    svc.feedback(ROOT, first.id, "reject", "Too long.")
+    svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
     svc.request(ROOT, "locked-brief", {"topic": "ai"}, revises=first.id, budget=3)
     section = svc.run_prompt("ceo", svc.begin_run("ceo")).split("# Reflect before you start: locked-brief")[1].split("# New messages")[0]
     assert "The client rejected a delivery. The contract is locked, so you cannot revise the playbook" in section
@@ -184,14 +181,14 @@ def test_the_reflect_section_comes_before_a_new_request_when_there_is_evidence(s
     org = svc
     first = request(org, "ai")
     deliver(org, "ceo", first, runs=2, lessons="Thin on sources.")
-    org.feedback(ROOT, first.id, "reject", "No week-over-week changes.")
+    org.feedback(ROOT, first.id, "reject", "No week-over-week changes.", source="human")
     new = request(org, "chips")
     prompt = org.run_prompt("ceo", org.begin_run("ceo"))
     assert "# Reflect before you start: weekly-brief" in prompt
     section = prompt.split("# Reflect before you start: weekly-brief")[1].split("# New messages")[0]
     assert "Evidence so far (there is no playbook yet):" in section and "No week-over-week changes." in section
     assert "revise_playbook(service, content, reason, evidence)" in section and "at most 1000 words" in section
-    assert "A rejection or a failure is enough on its own" in section and "never lower it" in section
+    assert "A rejection or a failure is enough to look into on its own" in section and "never lower it" in section
     assert "restore" not in section  # nothing earlier to restore at v0
     assert section.rstrip().endswith("Then handle the request following the playbook.")
     assert [line[:2] for line in section.splitlines() if line[:1].isdigit()] == ["1.", "2.", "3.", "4.", "5."]
@@ -457,3 +454,125 @@ def test_the_regression_line_marks_a_removed_criterion(svc):
     (line,) = lines_of(org.run_prompt("ceo", org.begin_run("ceo")))
     assert line == f'- R1, case {first.id}, verdict {note.id}, about C1, C2 (removed): "Too long."'
     org.end_run("ceo", ok=True)
+
+
+# ------------------------------------------------------------------------------------------ the tier-aware Reflect texts
+HUMAN_LEAD = (
+    "The client rejected a delivery: check the delivery against its words, the regression list and the contract before you plan the request. "
+    "One rejection is a reason to look, not to change how the team works: your parent asks the client whether it is a lasting requirement, "
+    "and the answer reaches you as a contract change or a criterion link. Revise the playbook only as step 3 says, then handle the request."
+)
+RELAYED_LEAD = (
+    "A relayed rejection arrived (the assistant's own reading, not the client's words): apply what it asks in this request where the contract "
+    "allows it; it is not the client's evidence, so it cannot change the playbook (step 3). Then handle the request."
+)
+AGENT_LEAD = (
+    "Your client, an agent, rejected a delivery (its verdict is a hypothesis): apply what it asks in this request where the contract allows "
+    "it; it is not the client's evidence, so it cannot change the playbook (step 3). Then handle the request."
+)
+LOCKED_END = ". The contract is locked, so you cannot revise the playbook: apply what the feedback shows, then handle the request."
+UNLOCKED_RAISE_BAR = (
+    "The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent "
+    "asks the client whether a rejection is a lasting requirement: send nothing about it yourself beyond a refused revision's question (step 3)."
+)
+LOCKED_RAISE_BAR = (
+    "The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent "
+    "asks the client whether a rejection is a lasting requirement; do not send it yourself."
+)
+AGENT_RAISE_BAR = (
+    "The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. If the "
+    "client's feedback is a lasting requirement, also tell your parent (`send`) so it can add it to the contract."
+)
+
+
+def rejected_then_new(org, source="human", name="weekly-brief"):
+    """The client rejects a delivery (``source``) and asks again; returns the owner's Reflect section for the new request."""
+    first = request(org, "ai")
+    deliver(org, "ceo", first, lessons="Thin on sources.")
+    org.feedback(ROOT, first.id, "reject", "Too long.", source=source)
+    request(org, "chips")
+    return reflect_section_of(org.run_prompt("ceo", org.begin_run("ceo")), name)
+
+
+def numbered(section, n):
+    return next(line for line in section.splitlines() if line.startswith(f"{n}. "))
+
+
+def agent_client_section(org, locked=False):
+    define(org, owner=ENG, actor="ceo", name="eng-brief", locked=locked)
+    org.send(ROOT, "ceo", "Runs to hand down.", budget=20)
+    first = org.request("ceo", "eng-brief", {"topic": "x"}, budget=3)
+    deliver(org, ENG, first, lessons="Thin on sources.")
+    org.feedback("ceo", first.id, "reject", "Too long.")
+    org.request("ceo", "eng-brief", {"topic": "y"}, budget=3)
+    return reflect_section_of(org.run_prompt(ENG, org.begin_run(ENG)), "eng-brief")
+
+
+def test_the_human_lead_says_one_rejection_is_a_reason_to_look(svc):
+    section = rejected_then_new(svc)
+    assert HUMAN_LEAD in section.splitlines() and "decide now whether the playbook must change" not in section
+
+
+def test_the_relayed_lead_says_it_cannot_change_the_playbook(svc):
+    section = rejected_then_new(svc, source="relayed")
+    assert RELAYED_LEAD in section.splitlines() and "The client rejected a delivery" not in section
+
+
+def test_the_agent_lead_says_the_verdict_is_a_hypothesis(svc):
+    assert AGENT_LEAD in agent_client_section(svc).splitlines()
+
+
+def test_the_locked_lead_keeps_its_text_with_the_new_subject(svc):
+    define(svc, name="locked-brief", locked=True)
+    first = svc.request(ROOT, "locked-brief", {"topic": "ai"})
+    deliver(svc, "ceo", first)
+    svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+    svc.request(ROOT, "locked-brief", {"topic": "again"})
+    lines = reflect_section_of(svc.run_prompt("ceo", svc.begin_run("ceo")), "locked-brief").splitlines()
+    assert "The client rejected a delivery" + LOCKED_END in lines
+    svc.end_run("ceo", ok=True)
+    second = svc.request(ROOT, "locked-brief", {"topic": "more"})
+    deliver(svc, "ceo", second)
+    svc.feedback(ROOT, second.id, "reject", "Wrong.", source="relayed")
+    svc.request(ROOT, "locked-brief", {"topic": "last"})
+    section = reflect_section_of(svc.run_prompt("ceo", svc.begin_run("ceo")), "locked-brief")
+    assert "A relayed rejection arrived (the assistant's own reading, not the client's words)" + LOCKED_END in section.splitlines()
+
+
+def test_step_1_names_the_regression_list_except_for_an_agent_client(svc):
+    tail = ". A rejection or a failure is enough to look into on its own; a single slow case is not."
+    human = rejected_then_new(svc)
+    assert "1. Look for what repeats, and for anything the client rejected (the regression list)" + tail in human.splitlines()
+    assert "1. Look for what repeats, and for anything the client rejected" + tail in agent_client_section(svc).splitlines()
+
+
+def test_step_2_unlocked_and_locked_texts(svc):
+    unlocked = rejected_then_new(svc)
+    assert (
+        "2. When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: apply the feedback in "
+        "this request, and change the playbook only as step 3 says (say so in the reason)."
+    ) in unlocked.splitlines()
+    locked = agent_client_section(svc, locked=True)
+    assert (
+        "2. When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: follow the feedback."
+    ) in locked.splitlines()
+
+
+def test_raise_bar_for_a_human_client_unlocked_allows_only_the_refusal_question(svc):
+    section = rejected_then_new(svc)
+    assert UNLOCKED_RAISE_BAR in numbered(section, 4) and "do not send it yourself" not in section
+
+
+def test_raise_bar_for_a_human_client_locked_says_do_not_send_it_yourself(svc):
+    define(svc, name="locked-brief", locked=True)
+    first = svc.request(ROOT, "locked-brief", {"topic": "ai"})
+    deliver(svc, "ceo", first)
+    svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+    svc.request(ROOT, "locked-brief", {"topic": "again"})
+    section = reflect_section_of(svc.run_prompt("ceo", svc.begin_run("ceo")), "locked-brief")
+    assert LOCKED_RAISE_BAR in section and "send nothing about it yourself" not in section
+
+
+def test_raise_bar_for_an_agent_client_is_unchanged(svc):
+    section = agent_client_section(svc)
+    assert AGENT_RAISE_BAR in numbered(section, 4) and "do not send it yourself" not in section

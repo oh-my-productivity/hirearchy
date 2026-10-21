@@ -38,9 +38,9 @@ def deliver(org, task, status="done", lessons="ok"):
 def test_the_digest_quotes_the_clients_words_without_the_header(svc):
     task = svc.request(ROOT, "brief", {"topic": "ai"})
     deliver(svc, task)
-    svc.feedback(ROOT, task.id, "reject", "Missed two items.")
+    svc.feedback(ROOT, task.id, "reject", "Missed two items.", source="human")
     digest = svc.runtime.reflection_digest.reflection_digest("ceo", "brief")
-    assert 'client feedback: reject "Missed two items."' in digest and "reflection only" not in digest
+    assert 'client feedback: reject R1 "Missed two items."' in digest and "reflection only" not in digest
 
 
 # ------------------------------------------------------------------------------------------ 5. digest order

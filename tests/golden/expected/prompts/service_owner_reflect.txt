@@ -92,14 +92,14 @@ Each line is something the client rejected. Check every delivery of this service
 # Reflect before you start: weekly-brief
 Your playbook is how your team delivers this service; you own it and improve it. Evidence since v1:
 Cases with new evidence (most recent first):
-- case 20260115T090500000000-root-0000 "Brief on AI chips": open, playbook v1, 1 of 16 runs, 1 rework(s); client feedback: reject "Too long: cut to 600 words."; lessons: "The fact-check found two uncited claims; cite while drafting."
+- case 20260115T090500000000-root-0000 "Brief on AI chips": open, playbook v1, 1 of 16 runs, 1 rework(s); client feedback: reject R1 "Too long: cut to 600 words."; lessons: "The fact-check found two uncited claims; cite while drafting."
 By playbook version:
 - v1: 1 request(s): 0 done, 0 failed, 1 open; 1 reworked; feedback 0 accept, 1 reject
-The client rejected a delivery: decide now whether the playbook must change so this does not happen again (revise_playbook), then handle the rework.
-1. Look for what repeats, and for anything the client rejected. A rejection or a failure is enough on its own; a single slow case is not.
-2. When a lesson of yours conflicts with the client's feedback, the client is right: fix the playbook to match the feedback (and say so in the reason).
+The client rejected a delivery: check the delivery against its words, the regression list and the contract before you plan the rework. One rejection is a reason to look, not to change how the team works: your parent asks the client whether it is a lasting requirement, and the answer reaches you as a contract change or a criterion link. Revise the playbook only as step 3 says, then handle the rework.
+1. Look for what repeats, and for anything the client rejected (the regression list). A rejection or a failure is enough to look into on its own; a single slow case is not.
+2. When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: apply the feedback in this rework, and change the playbook only as step 3 says (say so in the reason).
 3. If a change to how the team works would prevent it, call `revise_playbook(service, content, reason, evidence)` with the whole new playbook (at most 1000 words): concrete steps (who does what, in which order, which check), not slogans. Name the cases in the reason, and list in `evidence` what it rests on: regression assertions (R<k>), criteria (C<k>), verdict or case ids. It is admitted only when the same criterion or assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the contract by an amendment; your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is refused, nothing is written: send your parent the refusal's question once and go on with the playbook as it is. The new version applies to this rework.
-4. The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. If the client's feedback is a lasting requirement, also tell your parent (`send`) so it can add it to the contract.
+4. The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent asks the client whether a rejection is a lasting requirement: send nothing about it yourself beyond a refused revision's question (step 3).
 5. If nothing needs to change, do not revise. Then handle the rework following the playbook.
 
 # New messages for this run (2)

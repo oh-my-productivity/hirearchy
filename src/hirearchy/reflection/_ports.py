@@ -76,8 +76,9 @@ class RunCounter(Protocol):
 
 @runtime_checkable
 class RejectedServices(Protocol):
-    def among(self, addr: str, batch: Sequence[Message]) -> set[str]:
-        """The services of ``addr`` for which the batch holds a ``feedback: reject`` note (the client rejected a delivery)."""
+    def among(self, addr: str, batch: Sequence[Message]) -> dict[str, str]:
+        """The services of ``addr`` for which the batch holds a ``feedback: reject`` note (the client rejected a delivery), each with the strongest
+        tier of its rejections: ``human``, else ``relayed``, else ``agent``."""
         ...
 
 
@@ -91,8 +92,9 @@ class PlaybookSection(Protocol):
 
 @runtime_checkable
 class ReflectSection(Protocol):
-    def section(self, addr: str, contract: Contract, digest: str, *, rejected: bool = False, new_request: bool = True) -> str:
-        """What to reflect on before the work starts, with the digest of the evidence."""
+    def section(self, addr: str, contract: Contract, digest: str, *, rejected: str = "", new_request: bool = True) -> str:
+        """What to reflect on before the work starts, with the digest of the evidence. ``rejected``: the tier of the rejection that brings the
+        section (``human``, ``relayed`` or ``agent``), ``""`` when there is none."""
         ...
 
 

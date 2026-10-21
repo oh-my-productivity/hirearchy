@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from ..kernel import RENDER_BODY_CHARS, ROOT, Message, clip_line, parent
+from ..kernel import RENDER_BODY_CHARS, ROOT, Message, clip_line, parent, verdict_tier
 from ..mail import MailboxReader, TaskQuery
 from ..services import Contract, ServiceCatalog, playbook_word_cap
 from ._ports import ConfigSource, PlaybookSection, RegressionSection, RejectedServices, ReflectSection, ServicePaths, ServicesListing
@@ -26,17 +26,24 @@ def _quoted(text: str, where: str) -> str:
 
 
 class MailRejectedServices(RejectedServices):
-    """A rejection is a ``feedback: reject`` note in the batch, a reply to a request the owner received."""
+    """A rejection is a ``feedback: reject`` note in the batch, a reply to a request the owner received; its tier is the note's (human > relayed > agent)."""
+
+    STRENGTH = ("human", "relayed", "agent")
 
     def __init__(self, mail: MailboxReader) -> None:
         self._mail = mail
 
-    def among(self, addr: str, batch: Sequence[Message]) -> set[str]:
+    def among(self, addr: str, batch: Sequence[Message]) -> dict[str, str]:
         notes = [m for m in batch if m.type == "note" and m.feedback == "reject" and m.to == addr and m.reply_to]
         if not notes:
-            return set()
+            return {}
         service_of = {m.id: m.service for m in self._mail.received(addr) if m.type == "task" and m.service}
-        return {svc for n in notes if (svc := service_of.get(n.reply_to or ""))}
+        tiers: dict[str, str] = {}
+        for n in notes:
+            svc, tier = service_of.get(n.reply_to or ""), verdict_tier(n)
+            if svc and (svc not in tiers or self.STRENGTH.index(tier) < self.STRENGTH.index(tiers[svc])):
+                tiers[svc] = tier
+        return tiers
 
 
 class QuotedPlaybookSection(PlaybookSection):
@@ -114,25 +121,31 @@ class EvidenceReflectSection(ReflectSection):
         self._config = config
         self._paths = paths
 
-    def section(self, addr: str, contract: Contract, digest: str, *, rejected: bool = False, new_request: bool = True) -> str:
+    def section(self, addr: str, contract: Contract, digest: str, *, rejected: str = "", new_request: bool = True) -> str:
         c = contract
         pb = self._catalog.read_playbook(addr, c.name)
-        cap = playbook_word_cap(self._config.config())
+        human_client = parent(addr) == ROOT
         since = f"Evidence since v{pb.version}:" if pb.version else "Evidence so far (there is no playbook yet):"
-        first = (
-            "Look for what repeats, and for anything the client rejected. A rejection or a failure is enough on its own; "
-            "a single slow case is not."
-        )
-        client_wins = (
-            "When a lesson of yours conflicts with the client's feedback, the client is right: fix the playbook to match "
-            "the feedback (and say so in the reason)."
-        )
-        raise_bar = (
-            "The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel "
-            "with every request. If the client's feedback is a lasting requirement, also tell your parent (`send`) so it "
-            "can add it to the contract."
-        )
         what = "rework" if rejected and not new_request else "request"
+        first = (
+            f"Look for what repeats, and for anything the client rejected{' (the regression list)' if human_client else ''}. "
+            "A rejection or a failure is enough to look into on its own; a single slow case is not."
+        )
+        bar = "The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. "
+        if not human_client:
+            raise_bar = bar + "If the client's feedback is a lasting requirement, also tell your parent (`send`) so it can add it to the contract."
+        elif c.locked:
+            raise_bar = bar + "Your parent asks the client whether a rejection is a lasting requirement; do not send it yourself."
+        else:
+            raise_bar = (
+                bar + "Your parent asks the client whether a rejection is a lasting requirement: send nothing about it yourself beyond a "
+                "refused revision's question (step 3)."
+            )
+        rejecter = {
+            "human": "The client rejected a delivery",
+            "relayed": "A relayed rejection arrived (the assistant's own reading, not the client's words)",
+            "agent": "Your client, an agent, rejected a delivery (its verdict is a hypothesis)",
+        }.get(rejected, "")
         if c.locked:
             intro = (
                 "Your playbook is how your team delivers this service. The contract is locked by your parent, so you may "
@@ -140,26 +153,25 @@ class EvidenceReflectSection(ReflectSection):
             )
             steps = [
                 first,
-                "When a lesson of yours conflicts with the client's feedback, the client is right: follow the feedback.",
+                "When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: follow the feedback.",
                 f"You cannot change the playbook, but apply what the evidence shows when you plan this {what}. " + raise_bar,
                 f"Then handle the {what} following the playbook.",
             ]
             lead = (
-                "The client rejected a delivery. The contract is locked, so you cannot revise the playbook: apply what the "
-                f"feedback shows, then handle the {what}."
+                f"{rejecter}. The contract is locked, so you cannot revise the playbook: apply what the feedback shows, then handle the {what}."
                 if rejected else "Before working on the new request:"
             )
         else:
             intro = f"Your playbook is how your team delivers this service; you own it and improve it. {since}"
-            if parent(addr) == ROOT:
+            if human_client:
                 revise = (
                     "If a change to how the team works would prevent it, call `revise_playbook(service, content, reason, evidence)` with "
-                    f"the whole new playbook (at most {cap} words): concrete steps (who does what, in which order, which "
-                    "check), not slogans. Name the cases in the reason, and list in `evidence` what it rests on: regression assertions "
-                    "(R<k>), criteria (C<k>), verdict or case ids. It is admitted only when the same criterion or assertion failed in 2 "
-                    "different cases the client rejected, or when it cites a criterion your parent added to the contract by an amendment; "
-                    "your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is refused, nothing is written: "
-                    "send your parent the refusal's question once and go on with the playbook as it is. "
+                    f"the whole new playbook (at most {playbook_word_cap(self._config.config())} words): concrete steps (who does what, in "
+                    "which order, which check), not slogans. Name the cases in the reason, and list in `evidence` what it rests on: "
+                    "regression assertions (R<k>), criteria (C<k>), verdict or case ids. It is admitted only when the same criterion or "
+                    "assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the "
+                    "contract by an amendment; your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is "
+                    "refused, nothing is written: send your parent the refusal's question once and go on with the playbook as it is. "
                     f"The new version applies to this {what}."
                 )
             else:
@@ -168,7 +180,13 @@ class EvidenceReflectSection(ReflectSection):
                     f"or restoring a version your parent wrote): apply the evidence when you plan this {what}, and if you think the "
                     "playbook must change, send your parent (`send`) what you would change and why."
                 )
-            steps = [first, client_wins, revise, raise_bar]
+            steps = [
+                first,
+                "When a lesson of yours conflicts with the client's own feedback (not a relayed verdict), the client is right: apply the "
+                f"feedback in this {what}, and change the playbook only as step 3 says (say so in the reason).",
+                revise,
+                raise_bar,
+            ]
             if pb.version >= 2:
                 steps.append(
                     "If the current version did worse than an earlier one, restore that one "
@@ -176,11 +194,20 @@ class EvidenceReflectSection(ReflectSection):
                     "a version your parent wrote needs evidence=[], any other needs evidence like a revision."
                 )
             steps.append(f"If nothing needs to change, do not revise. Then handle the {what} following the playbook.")
-            lead = (
-                "The client rejected a delivery: decide now whether the playbook must change so this does not happen "
-                f"again (revise_playbook), then handle the {what}."
-                if rejected else "Before working on the new request:"
-            )
+            if rejected == "human":
+                lead = (
+                    f"{rejecter}: check the delivery against its words, the regression list and the contract before you plan the {what}. "
+                    "One rejection is a reason to look, not to change how the team works: your parent asks the client whether it is a lasting "
+                    "requirement, and the answer reaches you as a contract change or a criterion link. Revise the playbook only as step 3 "
+                    f"says, then handle the {what}."
+                )
+            elif rejected:
+                lead = (
+                    f"{rejecter}: apply what it asks in this {what} where the contract allows it; it is not the client's evidence, so it "
+                    f"cannot change the playbook (step 3). Then handle the {what}."
+                )
+            else:
+                lead = "Before working on the new request:"
         numbered = "\n".join(f"{i}. {s}" for i, s in enumerate(steps, 1))
         return f"# Reflect before you start: {c.name}\n{intro}\n{digest}\n{lead}\n{numbered}"
 
@@ -230,7 +257,7 @@ class OwnerPromptSections(ServicePromptSections):
         new = {m.service for m in batch if m.type == "task" and m.service and not m.revises and m.to == addr}
         rejected = self._rejections.among(addr, batch)
         digests = {
-            c.name: d for c in owned if c.name in new | rejected and (d := self._digest.reflection_digest(addr, c.name)) is not None
+            c.name: d for c in owned if c.name in new | rejected.keys() and (d := self._digest.reflection_digest(addr, c.name)) is not None
         }
         for c in owned:
             if c.name in working:
@@ -240,6 +267,6 @@ class OwnerPromptSections(ServicePromptSections):
                 if c.name not in working:
                     sections.append(self._regressions.section(addr, c))
                 sections.append(self._reflections.section(
-                    addr, c, digests[c.name], rejected=c.name in rejected, new_request=c.name in new,
+                    addr, c, digests[c.name], rejected=rejected.get(c.name, ""), new_request=c.name in new,
                 ))
         return "".join(f"\n{s}\n" for s in sections if s)

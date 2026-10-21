@@ -17,16 +17,20 @@ from ._support import SERVICE, ask, define, deliver, populated
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 
-def verdict(kind: str, note: str = "", n: int = 0) -> Verdict:
+def verdict(kind: str, note: str = "", n: int = 0, tier: str = "human") -> Verdict:
     message = Message(id=f"20260101T0000{n:02d}000000-root-{n:04d}", sender="root", to="ceo", type="note", body=note, feedback=kind)
-    return Verdict(kind, note, T, "T", n, message)
+    return Verdict(kind, note, T, "T", n, message, tier=tier)
 
 
-def case(*, verdicts: list[Verdict] | None = None, lessons: list[str] | None = None, lesson_ids: list[str] | None = None, reworks: int = 0) -> Case:
+def case(
+    *, verdicts: list[Verdict] | None = None, lessons: list[str] | None = None, lesson_ids: list[str] | None = None, reworks: int = 0,
+    relayed: int = 0, client_kind: str = "human",
+) -> Case:
     task = Message(sender="root", to="ceo", type="task", body="b", title="A long title " * 6)
     return Case(
         id="C1", service="s", owner="ceo", tasks=[task], result=None, state="done", playbook=1, used=2, reworks=reworks, budget=9, runs=4,
-        lessons=lessons or [], verdicts=verdicts or [], started=T, finished=T, lesson_ids=lesson_ids or [],
+        lessons=lessons or [], verdicts=verdicts or [], started=T, finished=T, lesson_ids=lesson_ids or [], client_kind=client_kind,
+        relayed_reworks=relayed,
     )
 
 
@@ -69,6 +73,31 @@ def test_four_verdicts_are_shown_whole() -> None:
     assert not verdict_chain(case(verdicts=[verdict("reject", f"p{i}", i) for i in range(4)])).startswith("…")
 
 
+def test_verdict_chain_without_a_mapping_is_unchanged() -> None:
+    human = case(verdicts=[verdict("reject", "too long", 1), verdict("accept", "this one is right", 2)])
+    assert verdict_chain(human) == verdict_chain(human, None) == 'reject "too long" -> accept "this one is right"'
+    assert verdict_chain(human, {}) == verdict_chain(human)  # a verdict the mapping does not know keeps no id
+
+
+def test_the_digest_names_human_rejections_by_r_id() -> None:
+    c = case(verdicts=[verdict("reject", "too long", 1), verdict("reject", "wrong week", 2), verdict("accept", "ok", 3)])
+    ids = {c.verdicts[0].message.id: "R1", c.verdicts[1].message.id: "R4"}
+    assert verdict_chain(c, ids) == 'reject R1 "too long" -> reject R4 "wrong week" -> accept "ok"'
+
+
+def test_the_digest_labels_relayed_verdicts() -> None:
+    c = case(verdicts=[verdict("reject", "long?", 1, "relayed"), verdict("accept", "", 2, "relayed")])
+    assert verdict_chain(c) == 'reject (relayed) "long?" -> accept (relayed)'
+    ids = {c.verdicts[0].message.id: "R1"}  # a relayed verdict is no assertion: it never gets an id
+    assert verdict_chain(c, ids) == verdict_chain(c)
+
+
+def test_the_digest_labels_an_agent_clients_feedback() -> None:
+    c = case(verdicts=[verdict("reject", "thin", 1, "agent")], client_kind="agent")
+    assert case_line(c).endswith('; client feedback (an agent client: hypotheses): reject "thin"')
+    assert "; client feedback: " in case_line(case(verdicts=[verdict("reject", "thin", 1)]))
+
+
 # ------------------------------------------------------------------------------ case_line
 
 
@@ -78,6 +107,16 @@ def test_the_line_names_the_case_its_state_playbook_and_runs() -> None:
 
 def test_reworks_are_counted() -> None:
     assert case_line(case(reworks=2)).endswith(", 4 of 9 runs, 2 rework(s)")
+
+
+def test_the_case_line_counts_relayed_reworks() -> None:
+    assert case_line(case(reworks=3, relayed=2)).endswith(", 4 of 9 runs, 3 rework(s), 2 relayed")
+    assert case_line(case(reworks=2)).endswith(", 2 rework(s)")  # none relayed: the part is unchanged
+
+
+def test_the_case_line_names_the_assertions_it_is_given() -> None:
+    c = case(verdicts=[verdict("reject", "no", 1)])
+    assert case_line(c, {c.verdicts[0].message.id: "R2"}).endswith('; client feedback: reject R2 "no"')
 
 
 def test_the_verdicts_come_before_the_lessons() -> None:

@@ -18,6 +18,7 @@ from hirearchy.reflection._files import OrgServicePaths
 from hirearchy.reflection._ports import (
     PlaybookSection,
     PlaybookTimelines,
+    RegressionSection,
     RejectedServices,
     ReflectSection,
     RunCounter,
@@ -26,7 +27,7 @@ from hirearchy.reflection._ports import (
 )
 from hirearchy.reflection._reports import TextServiceReports
 from hirearchy.reflection._runs import LogRunCounter
-from hirearchy.reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection
+from hirearchy.reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection, RegressionListSection
 from hirearchy.reflection._timeline import StorePlaybookTimelines
 from hirearchy.reflection.testing import FixedCaseHistory
 
@@ -47,6 +48,7 @@ def test_each_role_inside_the_package_has_its_implementation() -> None:
     assert RunCounter in LogRunCounter.__mro__
     assert ServicePaths in OrgServicePaths.__mro__
     assert RejectedServices in MailRejectedServices.__mro__
+    assert RegressionSection in RegressionListSection.__mro__
     assert PlaybookSection in QuotedPlaybookSection.__mro__
     assert ReflectSection in EvidenceReflectSection.__mro__
     assert ServicesListing in OwnedServicesListing.__mro__

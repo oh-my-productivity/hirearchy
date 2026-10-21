@@ -62,14 +62,14 @@ def test_stats_per_playbook_version_carry_the_after_a_reject_count(svc):
 def test_a_case_rejected_twice_ends_as_a_reject_and_shows_both_verdicts(svc):
     first = request(svc, "ai")
     deliver(svc, "ceo", first)
-    svc.feedback(ROOT, first.id, "reject", "No summary.")
+    svc.feedback(ROOT, first.id, "reject", "No summary.", source="human")
     time.sleep(0.002)
     rework = svc.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=first.id, budget=4)
     deliver(svc, "ceo", rework)
-    svc.feedback(ROOT, rework.id, "reject", "Still no summary.")
+    svc.feedback(ROOT, rework.id, "reject", "Still no summary.", source="human")
     (case,) = svc.runtime.case_history.cases("ceo", WEEKDAY)
     assert case.verdict == "reject" and not case.accepted_after_reject
-    assert 'client feedback: reject "No summary." -> reject "Still no summary."' in svc.runtime.reflection_digest.reflection_digest("ceo", WEEKDAY)
+    assert 'client feedback: reject R1 "No summary." -> reject R2 "Still no summary."' in svc.runtime.reflection_digest.reflection_digest("ceo", WEEKDAY)
     assert summarize([case]).line().endswith("feedback 0 accept, 1 reject")
 
 

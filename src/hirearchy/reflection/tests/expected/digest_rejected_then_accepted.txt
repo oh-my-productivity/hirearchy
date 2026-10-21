@@ -1,4 +1,4 @@
 Cases with new evidence (most recent first):
-- case {ask0} "weekly-brief: ai": done, playbook v0, 5 of 16 runs, 1 rework(s); client feedback: reject "Sam's 'before Friday' needs a date." -> accept "this version is right"; lessons (written after the reject: check it against her words): "Applied the date rule."; earlier: "Clean run; no issues."
+- case {ask0} "weekly-brief: ai": done, playbook v0, 5 of 16 runs, 1 rework(s); client feedback: reject R1 "Sam's 'before Friday' needs a date." -> accept "this version is right"; lessons (written after the reject: check it against her words): "Applied the date rule."; earlier: "Clean run; no issues."
 By playbook version:
 - v0: 1 request(s): 1 done, 0 failed, 0 open; 1 reworked; avg 5 runs; feedback 1 accept (1 after a reject), 0 reject

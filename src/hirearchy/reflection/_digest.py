@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import datetime
 from typing import cast
 
 from ..kernel import clip_line
 from ..services import ServiceCatalog
-from .api import Case, CaseHistory, ReflectionDigest, stats_by_version
+from .api import Case, CaseHistory, ReflectionDigest, regressions, stats_by_version
 
 DIGEST_CASES = 6  # cases with new evidence shown in the digest
 DIGEST_CHARS = 3000  # soft limit of the whole digest
@@ -16,24 +17,34 @@ CLIP_NOTE = 160
 MAX_VERDICTS = 4  # verdicts of one case shown in a digest line
 
 
-def verdict_chain(c: Case) -> str:
-    """The client's verdicts in order, each with her words: ``reject "too long" -> accept "this one is right"``."""
+def verdict_chain(c: Case, assertions: Mapping[str, str] | None = None) -> str:
+    """The client's verdicts in order, each with her words: ``reject "too long" -> accept "this one is right"``.
+
+    ``assertions`` maps the id of a verdict note to its ``R<k>``: a rejection that has one reads ``reject R1 "too long"``. A relayed verdict reads
+    ``reject (relayed) "..."`` or ``accept (relayed)``."""
     shown = c.verdicts[-MAX_VERDICTS:]
     clip = CLIP_NOTE if len(shown) <= 2 else CLIP_NOTE // 2
-    parts = [f"{v.verdict}" + (f' "{clip_line(v.note, clip)}"' if v.note else "") for v in shown]
+    ids = assertions or {}
+    parts = [
+        v.verdict
+        + (" (relayed)" if v.tier == "relayed" else f" {ids[v.message.id]}" if v.message.id in ids else "")
+        + (f' "{clip_line(v.note, clip)}"' if v.note else "")
+        for v in shown
+    ]
     if len(c.verdicts) > len(shown):
         parts.insert(0, "…")
     return " -> ".join(parts)
 
 
-def case_line(c: Case) -> str:
+def case_line(c: Case, assertions: Mapping[str, str] | None = None) -> str:
     """One case in one line: state, playbook, runs, reworks, the client's verdicts, then the lessons (the latest first)."""
     bits = [f'case {c.id} "{clip_line(c.title, 40)}": {c.state}', f"playbook v{c.used}", f"{c.runs} of {c.budget} runs"]
     if c.reworks:
-        bits.append(f"{c.reworks} rework(s)")
+        bits.append(f"{c.reworks} rework(s)" + (f", {c.relayed_reworks} relayed" if c.relayed_reworks else ""))
     line = ", ".join(bits)
     if c.verdicts:  # the client's verdicts come before the lessons: her words outrank the owner's own conclusions
-        line += f"; client feedback: {verdict_chain(c)}"
+        who = "client feedback (an agent client: hypotheses)" if c.client_kind == "agent" else "client feedback"
+        line += f"; {who}: {verdict_chain(c, assertions)}"
     if c.lessons:
         # The latest result is the final word on the case; earlier lessons only where room remains.
         latest, earlier = c.lessons[-1], " / ".join(c.lessons[:-1])
@@ -63,9 +74,10 @@ class DigestBuilder(ReflectionDigest):
             return None
         fresh.sort(key=lambda c: cast(datetime, c.evidence_at))  # every case in ``fresh`` has evidence
         shown = fresh[-DIGEST_CASES:][::-1]
+        ids = {a.verdict.message.id: a.id for a in regressions(items)}
         per_version = [f"- v{v}: {s.line()}" for v, s in stats_by_version(items).items()]
         while True:
-            lines = [case_line(c) for c in shown]
+            lines = [case_line(c, ids) for c in shown]
             text = "Cases with new evidence (most recent first):\n" + "\n".join(lines) + "\nBy playbook version:\n" + "\n".join(per_version)
             if len(text) <= DIGEST_CHARS or len(shown) == 1:
                 return text if len(text) <= DIGEST_CHARS else text[: DIGEST_CHARS - 1].rstrip() + "…"

@@ -53,7 +53,7 @@ def test_feedback_alone_is_evidence(w: ReflectionWorld) -> None:
     assert w.digest.reflection_digest("ceo", SERVICE) is None
     rate(w, task, "reject", "No.")
     digest = w.digest.reflection_digest("ceo", SERVICE)
-    assert digest is not None and 'client feedback: reject "No."' in digest
+    assert digest is not None and 'client feedback: reject R1 "No."' in digest
 
 
 def test_a_playbook_newer_than_all_the_evidence_leaves_nothing_to_reflect_on(w: ReflectionWorld) -> None:
@@ -91,7 +91,7 @@ def test_the_digest_quotes_the_clients_words_without_the_header(w: ReflectionWor
     deliver(w, task)
     rate(w, task, "reject", "Missed two items.")
     digest = w.digest.reflection_digest("ceo", SERVICE)
-    assert digest is not None and 'client feedback: reject "Missed two items."' in digest and "reflection only" not in digest
+    assert digest is not None and 'client feedback: reject R1 "Missed two items."' in digest and "reflection only" not in digest
 
 
 def test_the_latest_lessons_come_first_and_the_earlier_ones_after(w: ReflectionWorld) -> None:
