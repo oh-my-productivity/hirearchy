@@ -2169,6 +2169,16 @@
      "default": "None"
     },
     {
+     "name": "source",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
+     "name": "criterion",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
+    },
+    {
      "name": "trace",
      "kind": "POSITIONAL_OR_KEYWORD",
      "default": "None"
@@ -2189,7 +2199,7 @@
      "default": "None"
     }
    ],
-   "annotated": "(self, sender: 'str', to: 'str', type: 'str', body: 'str', title: 'str' = '', reply_to: 'str | None' = None, status: 'str | None' = None, budget: 'int' = 0, hops: 'int' = 0, wake: 'bool' = True, revises: 'str | None' = None, supersedes: 'str | None' = None, service: 'str | None' = None, contract: 'int | None' = None, playbook: 'int | None' = None, feedback: 'str | None' = None, trace: 'str | None' = None, id: 'str' = '', created: 'str' = '', path: 'Path | None' = None) -> None"
+   "annotated": "(self, sender: 'str', to: 'str', type: 'str', body: 'str', title: 'str' = '', reply_to: 'str | None' = None, status: 'str | None' = None, budget: 'int' = 0, hops: 'int' = 0, wake: 'bool' = True, revises: 'str | None' = None, supersedes: 'str | None' = None, service: 'str | None' = None, contract: 'int | None' = None, playbook: 'int | None' = None, feedback: 'str | None' = None, source: 'str | None' = None, criterion: 'str | None' = None, trace: 'str | None' = None, id: 'str' = '', created: 'str' = '', path: 'Path | None' = None) -> None"
   },
   "cut_body": {
    "kind": "method",
@@ -2391,6 +2401,18 @@
   },
   {
    "name": "feedback",
+   "type": "str | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "source",
+   "type": "str | None",
+   "has_default": true,
+   "compare": true
+  },
+  {
+   "name": "criterion",
    "type": "str | None",
    "has_default": true,
    "compare": true

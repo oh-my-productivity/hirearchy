@@ -13,6 +13,7 @@ from ._ports import JsonObject
 
 MESSAGE_TYPES = ("task", "result", "note")
 RESULT_STATUSES = ("done", "failed", "blocked")
+SOURCES = ("human", "relayed")  # where a verdict, a link or a rework comes from: the user's own judgement, or the assistant's reading
 RENDER_BODY_CHARS = 8000  # longer bodies are cut when shown to an agent (prompt, inbox tool); the file has the rest
 
 
@@ -71,6 +72,8 @@ class Message(MessageView):
     contract: int | None = None  # version of the service contract the request was built from
     playbook: int | None = None  # version of the playbook current when the request was sent (0 = none)
     feedback: str | None = None  # "accept" | "reject" on the note that carries the client's verdict
+    source: str | None = None  # "human" | "relayed": set by root only, on a verdict, a link or a rework (see ``verdict_tier``)
+    criterion: str | None = None  # ids a rejection is about, joined by ", " ("C6", "C6, R2", "none"); root only, on a verdict or a link note
     trace: str | None = None  # id of the root task (request) this message belongs to; stamped by the runtime at send time
     id: str = ""
     created: str = ""
@@ -106,6 +109,10 @@ class Message(MessageView):
             meta["playbook"] = self.playbook
         if self.feedback:
             meta["feedback"] = self.feedback
+        if self.source:
+            meta["source"] = self.source
+        if self.criterion:
+            meta["criterion"] = self.criterion
         if self.trace:
             meta["trace"] = self.trace
         return meta
@@ -141,6 +148,8 @@ class Message(MessageView):
             contract=_opt_int(meta.get("contract")),
             playbook=_opt_int(meta.get("playbook")),
             feedback=_text(meta.get("feedback")),
+            source=_text(meta.get("source")),
+            criterion=_text(meta.get("criterion")),
             trace=_text(meta.get("trace")),
             id=str(meta.get("id") or (path.stem if path else "")),
             created=str(meta.get("created") or ""),
@@ -182,12 +191,32 @@ class Message(MessageView):
             head.append(f"service: {self.service}" + (f" ({', '.join(versions)})" if versions else ""))
         if self.feedback:
             head.append(f"feedback: {self.feedback}")
+        if self.source:
+            head.append(f"source: {self.source}")
+        if self.criterion:
+            head.append(f"criterion: {self.criterion}")
         if self.budget and self.type == "result":
             head.append(f"returns {self.budget} run(s)")
         elif self.budget:
             head.append(f"budget: {self.budget} runs")
         body = self.cut_body(limit)
         return f"### {self.type} {self.id}\n" + " | ".join(head) + f"\n\n{body}\n"
+
+
+def verdict_tier(note: Message) -> str:
+    """The weight class of a client's verdict or link note: "agent" when an agent sent it (its client is an LLM), else its
+    ``source``; a root note without one (written before sources existed) is "human", an unknown value "relayed".
+    Only "human" weighs anything in a gate."""
+    if note.sender != ROOT:
+        return "agent"
+    if note.source is None:
+        return "human"
+    return note.source if note.source in SOURCES else "relayed"
+
+
+def link_ids(note: Message) -> tuple[str, ...]:
+    """The ids in a note's ``criterion`` field, in order, without blanks ("C6, R2" -> ("C6", "R2"))."""
+    return tuple(part for part in (p.strip() for p in (note.criterion or "").split(",")) if part)
 
 
 def latest_results(results: Iterable[Message]) -> dict[str, Message]:
