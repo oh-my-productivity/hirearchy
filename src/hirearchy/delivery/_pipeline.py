@@ -39,7 +39,7 @@ class PipelineMessageDelivery(MessageDelivery):
             "msg.deliver", actor=msg.sender, trace=msg.trace, id=msg.id, type=msg.type, **{"from": msg.sender},
             to=msg.to, title=clip(msg.title), status=msg.status, budget=msg.budget, reply_to=msg.reply_to,
             revises=msg.revises, supersedes=msg.supersedes, service=msg.service, feedback=msg.feedback,
-            wake=msg.wake, hops=msg.hops, chars=len(msg.body), trace_rule=rule, **extra,
+            source=msg.source, criterion=msg.criterion, wake=msg.wake, hops=msg.hops, chars=len(msg.body), trace_rule=rule, **extra,
         )
         return msg
 

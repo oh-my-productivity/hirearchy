@@ -102,6 +102,8 @@ msg.deliver:
   supersedes: NoneType
   service: NoneType
   feedback: NoneType
+  source: NoneType
+  criterion: NoneType
   wake: bool
   hops: int
   chars: int

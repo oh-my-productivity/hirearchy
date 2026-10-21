@@ -17,8 +17,8 @@ from ._support import make, task
 
 # the keys of the event, in this order (the order of the JSON line in the event files)
 KEYS = [
-    "id", "type", "from", "to", "title", "status", "budget", "reply_to", "revises", "supersedes", "service", "feedback", "wake", "hops",
-    "chars", "trace_rule",
+    "id", "type", "from", "to", "title", "status", "budget", "reply_to", "revises", "supersedes", "service", "feedback", "source", "criterion", "wake",
+    "hops", "chars", "trace_rule",
 ]
 
 
@@ -48,9 +48,19 @@ def test_the_values_are_those_of_the_message() -> None:
     (event,) = deliver_with(LoggingStamper([], trace="T1", rule="open-task"), msg).events
     assert event.fields == {
         "id": "ID-ceo", "type": "task", "from": "ceo", "to": "ceo/eng", "title": "Draft the plan", "status": None, "budget": 3,
-        "reply_to": "R", "revises": "V", "supersedes": "S", "service": "svc", "feedback": "accept", "wake": False, "hops": 2, "chars": 61,
-        "trace_rule": "open-task",
+        "reply_to": "R", "revises": "V", "supersedes": "S", "service": "svc", "feedback": "accept", "source": None, "criterion": None, "wake": False, "hops": 2,
+        "chars": 61, "trace_rule": "open-task",
     }
+
+
+def test_msg_deliver_carries_source_and_criterion_after_feedback_and_before_wake() -> None:
+    note = task("root", "ceo", type="note", reply_to="V1", feedback="reject", source="human", criterion="C6, R2")
+    (event,) = deliver_with(LoggingStamper([], trace="T1"), note).events
+    keys = list(event.fields)
+    assert keys[keys.index("feedback") : keys.index("wake") + 1] == ["feedback", "source", "criterion", "wake"]
+    assert (event.fields["source"], event.fields["criterion"]) == ("human", "C6, R2")
+    (plain,) = deliver_with(LoggingStamper([], trace="T1"), task()).events
+    assert (plain.fields["source"], plain.fields["criterion"]) == (None, None)
 
 
 def test_the_title_is_clipped_to_eighty_characters_and_the_body_is_only_counted() -> None:
