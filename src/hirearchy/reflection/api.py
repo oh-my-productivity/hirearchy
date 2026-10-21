@@ -22,6 +22,7 @@ from typing import Protocol, runtime_checkable
 from ..kernel import Message, msg_time
 
 __all__ = [
+    "Assertion",
     "Case",
     "CaseHistory",
     "ReflectionDigest",
@@ -31,6 +32,7 @@ __all__ = [
     "StatsReport",
     "Verdict",
     "lessons_of",
+    "regressions",
     "stats_by_version",
     "summarize",
     "version_at",
@@ -47,6 +49,9 @@ class Verdict:
     task_id: str  # the task of the chain the feedback was given on
     step: int
     message: Message
+    tier: str = "human"  # its weight class: ``kernel.verdict_tier`` of the note (human | relayed | agent)
+    links: tuple[str, ...] = ()  # what the client said it was about: the effective link (C<k>, R<k> or none), () when there is none
+    links_tier: str = ""  # the tier of the note that carries the effective link ("" = no link)
 
 
 @dataclass
@@ -69,6 +74,8 @@ class Case:
     started: datetime | None
     finished: datetime | None  # when it ended done/failed
     lesson_ids: list[str] = field(default_factory=list)  # id of the result each lesson came from (parallel to lessons)
+    client_kind: str = "human"  # "human" when the owner's parent is root, else "agent"
+    relayed_reworks: int = 0  # the tasks of the chain after the first that root stamped ``source: relayed``
 
     @property
     def title(self) -> str:
@@ -98,6 +105,48 @@ class Case:
         """The latest moment this case produced evidence: its final result or its latest feedback."""
         times = [t for t in (self.finished, msg_time(self.feedback) if self.feedback else None) if t]
         return max(times) if times else None
+
+
+@dataclass(frozen=True)
+class Assertion:
+    """One regression assertion: a rejection by the human client, numbered ``R<k>`` in the order of the notes (derived by :func:`regressions`)."""
+
+    id: str  # "R<k>"
+    case: str  # the id of the case the rejection belongs to
+    verdict: Verdict
+    about: tuple[str, ...]  # the criteria (C<k>) the client confirmed it is about, "the same as R<j>" resolved; an R<j> that is about nothing stays
+    link: str  # "confirmed" (a human link naming ids) | "none" (a human link "none": no lasting rule) | "unconfirmed" (only a relayed link) | ""
+
+
+def regressions(cases: Sequence[Case]) -> list[Assertion]:
+    """The human-tier rejections of ``cases``, ordered by their note ids: ``R<k>`` is the k-th (pure).
+
+    Relayed and agent rejections are never assertions; a case rejected and then accepted keeps its assertions. What an assertion is about comes
+    only from human-tier links ("the same as R<j>" is resolved through the links of R<j>, a cycle ends where it started)."""
+    found = sorted(((v, c.id) for c in cases for v in c.verdicts if v.verdict == "reject" and v.tier == "human"), key=lambda item: item[0].message.id)
+    ids = [f"R{k}" for k in range(1, len(found) + 1)]
+
+    def human(v: Verdict) -> tuple[str, ...]:
+        return v.links if v.links_tier == "human" else ()
+
+    def about(k: int, seen: frozenset[str]) -> tuple[str, ...]:
+        out: list[str] = []
+        for x in human(found[k][0]):
+            if x == "none":
+                continue
+            if x.startswith("C"):
+                out.append(x)
+            elif x[1:].isdigit() and 1 <= int(x[1:]) <= len(found) and x != ids[k] and x not in seen:
+                inner = about(int(x[1:]) - 1, seen | {ids[k]})
+                out.extend(inner or (x,))
+        return tuple(dict.fromkeys(out))
+
+    def link(v: Verdict) -> str:
+        if human(v) == ("none",):
+            return "none"
+        return "confirmed" if human(v) else "unconfirmed" if v.links else ""
+
+    return [Assertion(ids[k], case, v, about(k, frozenset()), link(v)) for k, (v, case) in enumerate(found)]
 
 
 @runtime_checkable

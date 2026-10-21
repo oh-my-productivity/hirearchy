@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from ..agents import AgentDirectory
-from ..kernel import Message, latest_results, msg_time, parent
+from ..kernel import ROOT, Message, latest_results, link_ids, msg_time, parent, verdict_tier
 from ..mail import MailboxReader
 from ..services import ServiceCatalog
 from ._ports import FeedbackWords, PlaybookTimelines, RunCounter
@@ -56,6 +56,11 @@ class DerivedCaseHistory(CaseHistory):
             chains.setdefault(head(m), []).append(m)
         results = latest_results(self._mail.received(client))
         notes = sorted((m for m in sent if m.type == "note" and m.feedback and m.reply_to in by_id), key=lambda m: m.id)
+        by_note = {n.id: n for n in notes}
+        link_notes = sorted(
+            (m for m in sent if m.type == "note" and not m.feedback and link_ids(m) and m.reply_to in by_note), key=lambda m: m.id,
+        )
+        kind = "human" if client == ROOT else "agent"
         others = sorted(m.id for m in sent if m.type == "task" and m.to == owner)
         team = self._agents.subtree(owner)
         timeline = self.playbook_timeline(owner, service)
@@ -72,8 +77,7 @@ class DerivedCaseHistory(CaseHistory):
                 end = later[:21]
             step = {t.id: i for i, t in enumerate(tasks)}
             verdicts = [
-                Verdict(n.feedback or "", self._words.feedback_text(n), msg_time(n), n.reply_to or "", step[n.reply_to], n)
-                for n in notes if n.reply_to in ids
+                self._verdict(n, step[n.reply_to], [m for m in link_notes if m.reply_to == n.id]) for n in notes if n.reply_to in ids
             ]
             out.append(Case(
                 id=first, service=service, owner=owner, tasks=tasks, result=res, state=state,
@@ -85,8 +89,19 @@ class DerivedCaseHistory(CaseHistory):
                 lesson_ids=[r.id for t in tasks if (r := results.get(t.id)) is not None and lessons_of(r)],
                 verdicts=verdicts, started=msg_time(tasks[0]),
                 finished=msg_time(res) if res is not None and final else None,
+                client_kind=kind, relayed_reworks=sum(t.source == "relayed" for t in tasks[1:]),
             ))
         return out
+
+    def _verdict(self, note: Message, step: int, links: list[Message]) -> Verdict:
+        """The verdict a feedback note is. Its link is the latest human-tier candidate (the note's own criterion or a link note that replies
+        to it), else the latest candidate of any tier."""
+        candidates = sorted((m for m in (note, *links) if link_ids(m)), key=lambda m: m.id)
+        winning = [m for m in candidates if verdict_tier(m) == "human"] or candidates
+        return Verdict(
+            note.feedback or "", self._words.feedback_text(note), msg_time(note), note.reply_to or "", step, note, tier=verdict_tier(note),
+            links=link_ids(winning[-1]) if winning else (), links_tier=verdict_tier(winning[-1]) if winning else "",
+        )
 
     def case_of(self, task: Message) -> Case | None:
         if not task.service or not self._agents.exists(task.to):

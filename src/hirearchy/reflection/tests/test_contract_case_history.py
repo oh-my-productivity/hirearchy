@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -162,6 +163,154 @@ def test_a_case_nobody_rated_has_no_verdict(w: ReflectionWorld) -> None:
     deliver(w, ask(w))
     (case,) = w.history.cases("ceo", SERVICE)
     assert case.verdict is None and case.feedback is None and not case.rejected and case.evidence_at == case.finished
+
+
+# ------------------------------------------------------------------------------ tiers, links, client kind and relayed reworks
+
+
+def note_on(w: ReflectionWorld, task: Message, *, verdict: str | None = None, reply_to: str | None = None, **kw: Any) -> Message:
+    """A note from root delivered straight, as the sender would stamp it: a verdict on ``task``, or a link note replying to ``reply_to``."""
+    return w.s.d.post(Message(
+        sender="root", to=task.to, type="note", title="note", body=kw.pop("body", "the client's words"), feedback=verdict,
+        reply_to=reply_to or (task.id if verdict else None), **kw,
+    ))
+
+
+def nested(w: ReflectionWorld) -> Message:
+    """An agent is the client: ``ceo`` defines a service for its report ``ceo/eng`` and asks for it; the delivered request is returned."""
+    grant = Message(sender="root", to="ceo", type="note", body="runs for you", title="grant", budget=20)
+    w.s.d.post(grant)
+    define(w, "ceo/eng", "inner", actor="ceo")
+    task = w.s.commands.request("ceo", "inner", {"topic": "ai"})
+    return deliver(w, task)
+
+
+def test_verdicts_carry_their_tier(w: ReflectionWorld) -> None:
+    define(w)
+    first, second, third = ask(w, "a"), ask(w, "b"), ask(w, "c")
+    for task in (first, second, third):
+        deliver(w, task)
+    note_on(w, first, verdict="reject", source="human")
+    note_on(w, second, verdict="reject", source="relayed")
+    note_on(w, third, verdict="accept")  # written before sources existed
+    one, two, three = w.history.cases("ceo", SERVICE)
+    assert [c.verdicts[0].tier for c in (one, two, three)] == ["human", "relayed", "human"]
+
+
+def test_a_legacy_root_note_without_source_is_human(w: ReflectionWorld) -> None:
+    define(w)
+    task = ask(w)
+    deliver(w, task)
+    rate(w, task, "reject", "Too long.")
+    (case,) = w.history.cases("ceo", SERVICE)
+    (verdict,) = case.verdicts
+    assert verdict.message.source is None and verdict.tier == "human" and (verdict.links, verdict.links_tier) == ((), "")
+
+
+def test_an_agent_clients_verdict_is_of_the_agent_tier(w: ReflectionWorld) -> None:
+    answered = nested(w)
+    w.s.commands.feedback("ceo", answered.reply_to or "", "reject", "No.")
+    (case,) = w.history.cases("ceo/eng", "inner")
+    assert [v.tier for v in case.verdicts] == ["agent"]
+
+
+def test_a_link_note_is_not_a_verdict(w: ReflectionWorld) -> None:
+    define(w)
+    task = ask(w)
+    deliver(w, task)
+    no = note_on(w, task, verdict="reject", source="human")
+    link = note_on(w, task, reply_to=no.id, criterion="C2", source="human")
+    (case,) = w.history.cases("ceo", SERVICE)
+    assert [v.message for v in case.verdicts] == [no] and case.feedback == no and case.verdict == "reject"
+    assert (case.verdicts[0].links, case.verdicts[0].links_tier) == (("C2",), "human") and link.id > no.id
+
+
+def test_a_link_note_replying_to_nothing_of_the_case_is_ignored(w: ReflectionWorld) -> None:
+    define(w)
+    task = ask(w)
+    deliver(w, task)
+    no = note_on(w, task, verdict="reject", source="human")
+    note_on(w, task, reply_to="20260101T000000000000-root-0001", criterion="C1", source="human")
+    plain = note_on(w, task, reply_to=no.id, source="human")  # no criterion: an ordinary note
+    (case,) = w.history.cases("ceo", SERVICE)
+    assert [v.message for v in case.verdicts] == [no] and case.verdicts[0].links == () and plain.criterion is None
+
+
+def test_the_latest_human_link_wins_over_a_later_relayed_one(w: ReflectionWorld) -> None:
+    define(w)
+    task = ask(w)
+    deliver(w, task)
+    no = note_on(w, task, verdict="reject", source="human")
+    note_on(w, task, reply_to=no.id, criterion="C1", source="human")
+    note_on(w, task, reply_to=no.id, criterion="C2, R1", source="human")
+    note_on(w, task, reply_to=no.id, criterion="none", source="relayed")
+    (case,) = w.history.cases("ceo", SERVICE)
+    assert (case.verdicts[0].links, case.verdicts[0].links_tier) == (("C2", "R1"), "human")
+
+
+def test_without_a_human_link_the_latest_of_any_tier_wins(w: ReflectionWorld) -> None:
+    define(w)
+    task = ask(w)
+    deliver(w, task)
+    no = note_on(w, task, verdict="reject", source="relayed")
+    note_on(w, task, reply_to=no.id, criterion="C1", source="relayed")
+    note_on(w, task, reply_to=no.id, criterion="C2", source="relayed")
+    (case,) = w.history.cases("ceo", SERVICE)
+    assert (case.verdicts[0].links, case.verdicts[0].links_tier) == (("C2",), "relayed")
+
+
+def test_the_link_on_the_verdict_itself_is_a_candidate(w: ReflectionWorld) -> None:
+    define(w)
+    first, second = ask(w, "a"), ask(w, "b")
+    for task in (first, second):
+        deliver(w, task)
+    own = note_on(w, first, verdict="reject", source="human", criterion="C1")
+    other = note_on(w, second, verdict="reject", source="human", criterion="C1")
+    note_on(w, second, reply_to=other.id, criterion="C2", source="human")  # a later link replaces the verdict's own
+    one, two = w.history.cases("ceo", SERVICE)
+    assert (one.verdicts[0].message, one.verdicts[0].links, one.verdicts[0].links_tier) == (own, ("C1",), "human")
+    assert (two.verdicts[0].links, two.verdicts[0].links_tier) == (("C2",), "human")
+
+
+def test_a_verdict_with_no_criterion_and_no_link_note_has_no_link(w: ReflectionWorld) -> None:
+    define(w)
+    task = ask(w)
+    deliver(w, task)
+    rate(w, task, "reject", "Too long.")
+    (case,) = w.history.cases("ceo", SERVICE)
+    assert (case.verdicts[0].links, case.verdicts[0].links_tier) == ((), "")
+
+
+def test_client_kind_is_human_under_root_and_agent_otherwise(w: ReflectionWorld) -> None:
+    define(w)
+    ask(w)
+    nested(w)
+    (human,) = w.history.cases("ceo", SERVICE)
+    (agent,) = w.history.cases("ceo/eng", "inner")
+    assert (human.client_kind, agent.client_kind) == ("human", "agent")
+
+
+def test_relayed_reworks_count_the_chains_relayed_tasks_after_the_first(w: ReflectionWorld) -> None:
+    define(w)
+    first = ask(w)
+    deliver(w, first)
+    second = rework(w, first, source="relayed")
+    deliver(w, second)
+    third = rework(w, second, source="human")
+    deliver(w, third)
+    rework(w, third, source="relayed")
+    deliver(w, ask(w, "other"))
+    one, two = w.history.cases("ceo", SERVICE)
+    assert (one.reworks, one.relayed_reworks) == (3, 2) and (two.reworks, two.relayed_reworks) == (0, 0)
+
+
+def test_a_rework_without_a_source_is_not_counted_as_relayed(w: ReflectionWorld) -> None:
+    define(w)
+    first = ask(w)
+    deliver(w, first)
+    w.s.d.post(Message(sender="root", to="ceo", type="task", title="again", body="b", service=SERVICE, revises=first.id, budget=2))
+    (case,) = w.history.cases("ceo", SERVICE)
+    assert (case.reworks, case.relayed_reworks) == (1, 0)
 
 
 # ------------------------------------------------------------------------------ runs and the playbook

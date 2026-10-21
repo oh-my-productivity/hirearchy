@@ -45,9 +45,9 @@ def make(request: pytest.FixtureRequest, tmp_path: Path) -> ReflectionWorld:
     return populated(cast(Callable[[Path], ReflectionWorld], request.param)(tmp_path))
 
 
-def define(w: ReflectionWorld, owner: str = "ceo", name: str = SERVICE, **over: Any) -> str:
-    """The client defines the service ``name`` of ``owner`` (the brief of the tests unless ``over`` changes it)."""
-    return w.s.commands.define_service("root", owner, name, **{**BRIEF, **over})
+def define(w: ReflectionWorld, owner: str = "ceo", name: str = SERVICE, actor: str = "root", **over: Any) -> str:
+    """``actor``, the client, defines the service ``name`` of ``owner`` (the brief of the tests unless ``over`` changes it)."""
+    return w.s.commands.define_service(actor, owner, name, **{**BRIEF, **over})
 
 
 def ask(w: ReflectionWorld, topic: str = "ai", **kw: Any) -> Message:
