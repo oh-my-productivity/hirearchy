@@ -32,6 +32,20 @@ CRITERIA = [
 PLAYBOOK_V1 = "## Steps\n1. writer: read the notes and write the memo.\n2. reviewer: check every criterion and report PASS or FAIL.\n"
 FRIDAY = "Sam's 'before Friday' has a date: Oct 9."
 LEE = "Lee's 'next week' has a date too."
+# E3 turn 5 (studies/E3-org-growth-0a-live): Lena's first rejection, and the two criteria the assistant added 2 s later without asking her
+LENA_T5 = (
+    "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09. And Marta's room is for the training on the 14th, "
+    "so I want 2026-10-14 there. And always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+)
+SUMMARY_FIRST = (
+    "The memo starts with one line that begins with 'Summary:' and sums up the meeting in that single line, followed by exactly these sections, "
+    "in this order: Decisions, Action items, Next meeting."
+)
+DUE_RULE = (
+    "Every Due value is an ISO date (YYYY-MM-DD) or none. A deadline in the notes, including a relative one such as 'before Friday' (the date of "
+    "that Friday, resolved from the meeting date), is turned into its ISO date; a date the commitment is for, such as the date a room is booked "
+    "for, also counts as its Due. Due is none only when the notes give no such date or say there is no hard date."
+)
 A_MEMO = {"notes_file": "meeting-2024-10-02.txt"}
 
 
@@ -256,6 +270,32 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     assert "now v2" in revise(w, v2, "C7 was added by the client", ["C7"])
     meta, _ = playbook_meta(w.org, "lead", SERVICE)
     assert meta["version"] == 2 and meta["admitted"] == "c" and meta["evidence"] == ["C7"]
+
+
+def test_11_e3_turn_5_an_unasked_amendment_is_not_the_clients_yes(tmp_path):
+    """E3 turn 5: the assistant recorded Lena's rejection with a criterion she had not named, then amended the contract 2 s later without
+    asking her. Ordering, not a wall-clock gap, drives the logic: the tier is derived from which note carries the link. This test orders the two
+    calls explicitly. A real sleep would only slow the test, and the frozen clock is not used because the team runs in real scheduler subprocesses.
+    (E3's C9 and C10 are C7 and C8 here: the world has six v1 criteria.)"""
+    w = world(tmp_path)
+    a1 = request(w)
+    deliver(w, a1)
+    reply = call(w.root, "feedback", task_id=a1, verdict="reject", note=LENA_T5, source="human", criterion=["C6", "C3"])
+    n1 = last_verdict(w)
+    assert "about C6, C3 (not confirmed)" in reply and "This rejection is R1" in reply and f'confirms="{n1}"' in reply
+    reply = call(
+        w.root, "define_service", owner="lead", name=SERVICE, remove_acceptance=[CRITERIA[2], CRITERIA[5]], add_acceptance=[SUMMARY_FIRST, DUE_RULE],
+    )
+    assert "Not client-confirmed: C7, C8" in reply and f"Rejection R1 (message {n1}) has no recorded yes" in reply
+    rule = PLAYBOOK_V1 + "3. Start the memo with a one-line Summary.\n"
+    for new in ("C7", "C8"):
+        refused = fails(w.lead, "revise_playbook", service=SERVICE, content=rule, reason="Lena asked for it", evidence=[new])
+        assert f"{new} was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)" in refused
+        assert "amendment the client confirmed (none yet)" in refused
+    listing = call(w.root, "services")
+    assert f"R1 (case {a1}, about C6 (removed), C3 (removed) (not confirmed))" in listing
+    assert f"C7: {SUMMARY_FIRST} (amendment, not confirmed)" in listing
+    assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
 
 
 def test_8_health_counts_the_escape_and_not_the_relayed_rework(tmp_path):
