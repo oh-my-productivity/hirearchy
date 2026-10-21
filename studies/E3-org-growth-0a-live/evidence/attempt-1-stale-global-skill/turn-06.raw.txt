@@ -1,0 +1,13 @@
+Scheduler stopped on its own; restarting it.The reworked memo is done and I've checked it against the notes myself, but it hasn't had its independent re-check. That check needs 2 more runs, which would bring this memo to 18 runs against the 16 you've approved.
+
+- **What changed:** Sam's row now has Due 2026-10-09 and still says "before Friday". The memo opens with a `Summary:` line right after the title. Lee's `none` and Marta's `2026-10-14` are unchanged.
+- **My own check:** All of your checks are met, including the new Summary line. The memo is 204 words by `read`.
+- **What's missing:** The reviewer hasn't re-checked this version. The lead ran out of runs after the writer's rework, so no "7 of 7" line exists for it yet.
+- **Cost so far:** The first memo used 11 runs and the rework used 5, so this memo stands at 16 runs.
+- **Contract:** The Summary line is now a standing check for every future memo (contract v2).
+
+Options:
+1. **Grant 2 runs (my recommendation).** One goes to the reviewer for the re-check and one to the lead to report. You said you need it right, and the first pass also needed a rework.
+2. **Accept it on my own check.** That saves the 2 runs, but nobody other than me will have verified this version, and I'd tell you that when I hand it over.
+
+The copy in `deliverables/` is still the first version, with Sam's date at 2026-10-08 and no Summary line. I won't replace it until you choose.

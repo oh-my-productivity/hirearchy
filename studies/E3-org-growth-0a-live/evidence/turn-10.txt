@@ -1,0 +1,16 @@
+######## TURN 10  start 16:45:44  end 16:46:01  elapsed 17s  (local, 2026-10-21)
+######## LENA (prompt sent verbatim):
+Yes, add it. And this version is right now, thanks - keep it.
+######## ASSISTANT (stdout+stderr, ANSI stripped):
+Done. The rule is now part of the weekly contract (C11), so it applies to every memo from next week on. All three memos are saved and accepted in `/tmp/hirearchy-e3-1792595952/deliverables/`:
+
+- `memo-2026-10-05.md`
+- `memo-2026-10-12.md`
+- `memo-2026-10-19.md`
+
+The team is ready for next week. Ask me for a memo with the notes file name, for example `2026-10-26.md`, and nothing runs until you do. Each memo is budgeted at up to 15 runs. The contract now also covers:
+
+- the `Summary:` line first
+- "before Friday" meaning that Friday's date
+- the date a booking is for counting as the Due
+- "stays as it is" not counting as an action item

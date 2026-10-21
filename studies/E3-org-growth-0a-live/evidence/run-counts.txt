@@ -1,0 +1,19 @@
+lead: runs=24
+lead-writer: runs=9
+lead-reviewer: runs=8
+total runs (runs/*.log): 41
+
+runs started per user turn window (turn start -> next turn start, local time):
+  turn 1: 0 runs ()
+  turn 2: 0 runs ()
+  turn 3: 0 runs ()
+  turn 4: 7 runs (lead, lead/writer, lead, lead/writer, lead, lead/reviewer, lead)
+  turn 5: 5 runs (lead, lead/writer, lead, lead/reviewer, lead)
+  turn 6: 10 runs (lead, lead/writer, lead, lead/reviewer, lead, lead, lead/writer, lead, lead/reviewer, lead)
+  turn 7: 5 runs (lead, lead/writer, lead, lead/reviewer, lead)
+  turn 8: 9 runs (lead, lead/writer, lead, lead/reviewer, lead, lead/writer, lead, lead/reviewer, lead)
+  turn 9: 5 runs (lead, lead/writer, lead, lead/reviewer, lead)
+  turn 10: 0 runs ()
+
+per memo chain (from `progress` case totals): memo 2026-10-05: first pass 7 + rework 5 = 12 (handed down 15+6=21); memo 2026-10-12: first pass 5 + rework 5 (blocked) + rework 2 5 = 15 (handed down 25); memo 2026-10-19: first pass 9 + rework 5 = 14 (handed down 20). Total 41.
+E2 reference: 19 / 5 / 11 = 35.

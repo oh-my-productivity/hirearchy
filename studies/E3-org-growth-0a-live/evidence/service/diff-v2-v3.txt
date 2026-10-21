@@ -1,0 +1,24 @@
+--- SERVICE.v2.md	2026-10-21 16:47:10
++++ SERVICE.current.md	2026-10-21 16:47:10
+@@ -26,6 +26,9 @@
+   meeting date), is turned into its ISO date; a date the commitment is for, such as
+   the date a room is booked for, also counts as its Due. Due is none only when the
+   notes give no such date or say there is no hard date.
++- A statement that something stays as it is or is kept unchanged (for example 'Marta
++  keeps the agenda as sent') is not an action item and gets no row in the Action items
++  table.
+ deliverable:
+   description: One markdown memo per request, saved as memo-<meeting date>.md
+   format: markdown
+@@ -33,9 +36,9 @@
+   path: /tmp/hirearchy-e3-1792595952/deliverables
+ budget: 15
+ locked: false
+-version: 2
++version: 3
+ defined_by: root
+-defined: '2026-10-21T15:27:53.056427+00:00'
++defined: '2026-10-21T15:45:54.281239+00:00'
+ created: '2026-10-21T15:23:47.921302+00:00'
+ ---
+ Client feedback on the first memo (2026-10-05): 'before Friday' means the date of that Friday (Sam: 2026-10-09). The date a booking is for counts as the Due (Marta's room for the training: 2026-10-14). The memo starts with a one-line 'Summary:'. Playbook: tell the writer these rules.

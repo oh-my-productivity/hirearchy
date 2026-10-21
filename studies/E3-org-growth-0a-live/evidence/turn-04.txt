@@ -1,0 +1,20 @@
+######## TURN 4  start 16:23:34  end 16:26:24  elapsed 170s  (local, 2026-10-21)
+######## LENA (prompt sent verbatim):
+Great, approve. I'll wait.
+######## ASSISTANT (stdout+stderr, ANSI stripped):
+The team is built and running the memo for 2026-10-05. It's planned for up to 15 runs. I'll wait now.The first memo is done: `/tmp/hirearchy-e3-1792595952/deliverables/memo-2026-10-05.md`. I read it against your notes myself, and it matches.
+
+- Based only on the 2026-10-05 notes: met.
+- At most 400 words: met (167 by `wc`, which also counts the table markup; the lead's count was 136).
+- Sections Decisions, Action items, Next meeting, in that order: met.
+- Both decisions listed (gateway migration pushed to the week of 26 Oct, Renovate adopted): met.
+- Five table rows with Owner | Action | Due, including Sam and Lee, who only said they'd do it in prose: met.
+- Due values are ISO dates or `none`: met.
+- Next meeting is Monday 2026-10-12: met.
+- Reviewer's coverage report: met. It shows criteria met 7 of 7, and 26 of 26 factual claims verified against the notes.
+
+It used 7 of the 15 runs, and the rest came back unspent.
+
+I need one decision from you. Sam said he'd look into the flaky CI "before Friday". I set his due date to 2026-10-08, the day before Friday the 9th. The reviewer pointed out it could also mean 2026-10-09. Do you want 10-08 or 10-09? Marta (a room booked for Oct 14) and Lee ("this week", no hard date) have `none`, because the notes give no deadline for them.
+
+For next week, ask me for a memo with the notes file name, for example `2026-10-12.md`. Do you want to keep this one as is, or change something?

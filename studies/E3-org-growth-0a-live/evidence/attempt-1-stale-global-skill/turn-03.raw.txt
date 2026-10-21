@@ -1,0 +1,42 @@
+I've updated the plan: 15 runs per memo, and the writer now runs on a cheaper model, claude-haiku-4.5. The lead and the reviewer stay on claude-sonnet-5.5. The lead decides how every other run is spent, and the reviewer is the final check on accuracy. The writer is the only agent whose output gets checked line by line afterward, so that is where a cheaper model costs the least.
+
+PLAN FOR YOU
+Goal: After each weekly team meeting, turn the meeting's notes file into a short memo that states what was decided and who does what by when. The memo is for the meeting owner, who shares it with the team.
+What I understood you need:
+- Scope: For one meeting's notes file per request: the decisions the team made and the action items (everything someone said they would do, including informal commitments in prose). Nothing else from the meeting.
+- Your files (read-only): /tmp/hirearchy-e3-1792594182/notes
+- Quality bar: Every decision and action item comes from the notes file; nothing is invented. Vague deadlines are converted to ISO dates computed from the meeting date.
+- Sources: Only the files in the notes folder; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 for 2 agents, claude-haiku-4.5 for 1 agent (cheap model for the writer only; the lead (who decides how every other run is spent) and the reviewer (final verifier) stay on the strong model)
+Team (3 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-e3-1792594182/notes and the organization's own files; cannot change your files
+  - writer (Reads one meeting notes file and writes the memo, model claude-haiku-4.5): can read files only in /private/tmp/hirearchy-e3-1792594182/notes and the organization's own files; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-e3-1792594182/notes and the organization's own files; cannot change your files
+Budget: up to 15 runs per request (one run = one working session of one agent), your cap per request is 15; the minimum for one review and rework is 11. Unspent runs come back to you.
+  lead starts with 15, hands down writer 3, reviewer 2 and keeps 10 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One short memo (decisions and action items) from one meeting notes file
+  You provide: notes_file (required)
+  Each request: up to 15 runs
+  Checks:
+    1. Covers only the meeting in the given notes file.
+    2. At most 400 words as counted by read.
+    3. Has a title line and exactly two sections: Decisions and Action items.
+    4. The Decisions section lists every decision the team made in the notes and nothing that was only discussed.
+    5. The Action items section is a markdown table with the columns Owner | Action | Due, one row per commitment in the notes, including informal commitments stated in prose and not only lines labelled ACTION.
+    ... and 3 more (see the details)
+  Delivered to: /tmp/hirearchy-e3-1792594182/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+Nothing runs until you ask for a request: approving only creates the team and the services.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+
+The three checks hidden behind "and 3 more" are the same as before:
+- Every Due value is an ISO date or none, and vague deadlines are converted from the meeting date with the original wording kept in the Action text.
+- Every decision and action item can be traced to the notes file, and none is invented.
+- The reviewer's report shows every criterion met, and the writer applied every required change.
+
+Reply 'approve' to build it. Afterward, you can ask for a memo any time, for example for the 19 Oct notes as a first test.

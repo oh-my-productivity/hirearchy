@@ -1,0 +1,6 @@
+######## TURN 1  start 15:50:45  end 15:50:48  elapsed 3s  (local, 2026-10-21)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-e3-1792594182/notes (one file per meeting). Can you set up a team that does this for me every week?
+######## ASSISTANT (stdout+stderr, ANSI stripped):
+Dynamic registration failed: Registration failed: HTTP 404 Not Found: {"error":{"type":"not_found_error","code":"not_found","message":"No such endpoint.","param":null,"request_id":"req_01m5ff2zeref2br8j0daw29z3f","doc_url":"https://lessthan.ai/docs/errors#not_found"}}
+Error: failed to set agent 'hirearchy-study-e3-assistant': Internal error (code -32603): Mode 'hirearchy-study-e3-assistant' not found

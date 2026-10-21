@@ -1,0 +1,15 @@
+######## TURN 6  start 16:30:23  end 16:34:28  elapsed 245s  (local, 2026-10-21)
+######## LENA (prompt sent verbatim):
+Keep it as it is - this version is right now, thanks. Please do 2026-10-12.md. I'll wait.
+######## ASSISTANT (stdout+stderr, ANSI stripped):
+Memo request for `2026-10-12.md` started, with up to 15 runs. I'm waiting now.The 2026-10-12 memo is not delivered yet, because the review failed on one row and the team is out of runs.
+
+- **Fixed:** Priya's row now reads "Start implementing the rate limiter behind a feature flag", due 2026-10-20, as the notes say.
+- **Still wrong:** Sam's row says "Update test data for staging". The notes say the data is out of date and Sam "will probably sort it out himself", so "update" is the writer's own word. The reviewer marked it as not met (6 of 7 criteria), and I checked the notes and agree.
+- **Everything else is met:** the Summary line, the three decisions, the five-row table, the due dates (Sam's is 2026-10-21, the day before the Oct 22 freeze) and the next meeting date.
+
+Fixing it means one more writer pass and one more review, and the lead needs runs of its own to coordinate them. That is about 5 runs. So far this memo has used 10 of your 15, so it would end at exactly 15, with no slack. The system counts the runs handed to the lead at 25 against your 15, which is why I'm asking before spending more.
+
+My recommendation is to fund the 5 runs. The change is Sam's Action becoming "Sort out the out-of-date test data on staging", with Owner and Due unchanged. I'd leave out "probably". Or I can deliver the memo as it is, with the known wording difference on Sam's row.
+
+Which do you want? And should Sam's row mention "probably"?

@@ -1,0 +1,18 @@
+The memo for 5 October is at `/tmp/hirearchy-e3-1792594182/deliverables/memo-2026-10-05.md`. I read it against the notes myself, and the independent reviewer also passed it.
+
+- **Covers only that meeting:** met.
+- **At most 400 words:** met (180 by `wc -w`, which also counts the table's pipe characters; the reviewer's own count was 150).
+- **Title plus exactly two sections, Decisions and Action items:** met.
+- **Decisions:** met. It lists two: moving the gateway migration to the week of 26 October, and adopting Renovate. Topics that were only discussed are left out.
+- **Action table (Owner | Action | Due), one row per commitment, informal ones included:** met. It has 5 rows, including Sam's flaky-CI promise and Lee's vendor ping, which weren't labelled ACTION.
+- **ISO dates or none, with the original wording kept:** met, but two rows are judgment calls (below).
+- **Nothing invented, everything traceable to the notes:** met.
+- **Reviewer report shows 7 of 7 criteria met:** met.
+
+Runs used: 11 of the 15 approved, with 4 returned.
+
+Two Due values are judgment calls that you may read differently:
+- **Lee, SSO vendor ping:** The notes say "this week" but also "no hard date attached". The memo has Due `none` and keeps "this week" in the action text. If you want vague deadlines converted anyway, it would be 2026-10-09.
+- **Marta, room booking:** The notes only give the training date, Oct 14. The memo uses that as Due, but it's the date of the training, not a deadline for the booking.
+
+Keep it as is, or should one of those two rows change? Your answer also sets how the team handles this kind of case in future weeks.

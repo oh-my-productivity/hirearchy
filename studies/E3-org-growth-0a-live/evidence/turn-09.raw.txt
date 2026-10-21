@@ -1,0 +1,16 @@
+The corrected 2026-10-19 memo is saved at `/tmp/hirearchy-e3-1792595952/deliverables/memo-2026-10-19.md`. I read it against your notes.
+
+- Marta's "keep the agenda as sent" row is gone, so the table has 5 rows.
+- Lee's due date is still 2026-10-30, and Sam's is now `none`.
+- Based only on the notes: met.
+- At most 400 words: met (118 by the lead's count).
+- Summary line first, then Decisions, Action items, Next meeting: met.
+- All 3 decisions listed: met.
+- Table has Owner | Action | Due: met.
+- Due values are ISO dates or `none`: met.
+- Next meeting date: met (Monday 26 October 2026 at 14:00).
+- Reviewer's report: met, with criteria met 8 of 8.
+
+It used 14 of the 15 runs, counting the first pass and the rework.
+
+One yes/no question so this doesn't come back next week. Should I add this rule to the contract: "A statement that something stays as it is, like 'Marta keeps the agenda as sent', is not an action item"? The lead has noted that rule for itself, but only the contract makes it permanent.

@@ -1,0 +1,11 @@
+I read one of the notes so my questions fit them. This is recurring work, so I'd set it up as a standing service. You ask for it each week and it produces that week's memo. Before I draft the plan, I need a few answers. You can reply "defaults" to accept everything I've proposed.
+
+1. **Per-request input.** Each week you'd give the team the path to that meeting's note file, for example `notes/2026-10-26.md`. The rest stays fixed. Is that right?
+2. **What counts as an action item.** Your 19 Oct note has explicit `ACTION:` lines. It also has commitments in plain prose, such as Lee signing off on the renewal once legal replies, and Sam pairing with Jo on CI. My default is to include every commitment, including the informal ones, each with the person's name.
+3. **Vague deadlines.** For things like "end of next week" or "at the next meeting", should the memo turn them into a date (calculated from the meeting date), or leave the date blank? My default is to turn them into a date and show the original wording next to it.
+4. **Decisions.** My default is to list only what the team actually decided, such as going ahead with the demo, renewing the vendor, and moving the meeting time. Topics that were only discussed would be left out.
+5. **Format and place.** My default is a markdown memo of at most 400 words, with two sections ("Decisions" and "Who does what"). It would go in a new `deliverables/` folder here, as `deliverables/memo-<meeting date>.md`. Say so if you want a different format or place, or a header with date and attendees.
+6. **Sources.** Only your notes. The team would use no web access, and the notes folder stays read-only.
+7. **Review.** A separate reviewer who didn't write the memo checks every decision and action item against the note. My default is yes.
+8. **Budget and models.** The default is the estimate plus 25% runs per memo, with every agent on claude-sonnet-5.5.
+9. **Approval.** I'd show you the plan before anything is built. After that, each weekly memo runs when you ask, with no further approval unless it would go over budget.

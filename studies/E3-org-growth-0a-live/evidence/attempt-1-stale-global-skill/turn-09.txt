@@ -1,0 +1,24 @@
+######## TURN 9  start 16:12:11  end 16:14:15  elapsed 124s  (local, 2026-10-21)
+######## LENA (prompt sent verbatim):
+That one is right, all the items are there - keep it. Lee's none is fine. Now 2026-10-19.md please. I'll wait.
+######## ASSISTANT (stdout+stderr, ANSI stripped):
+The memo for `2026-10-19.md` is running with a budget of 15 runs. I'll wait for it.The memo for 19 October is at `/tmp/hirearchy-e3-1792594182/deliverables/memo-2026-10-19.md`. I checked it against the notes myself, and the independent reviewer passed it first time with no rework.
+
+- **Covers only that meeting:** met.
+- **At most 400 words:** met (174 by `wc -w`, which also counts the table's pipe characters; the lead's own count was 143).
+- **Title, one-line Summary, then exactly two sections:** met.
+- **Decisions:** met. It lists three: demo goes ahead without the rate limiter, SSO renewed with the current vendor for twelve months, and the weekly meeting moved to Monday 14:00 from 26 October. The vendor-alternatives debate is correctly left out.
+- **Action table with informal commitments:** met. It has 5 rows (Marta, Dev, Priya, Lee, Sam). Lee's sign-off and Sam's pairing with Jo were in prose.
+- **ISO dates or none:** met. Lee's "probably by end of next week" became 2026-10-30, with the original wording kept in the action text.
+- **Nothing invented in the table or Decisions:** met.
+- **Reviewer's report:** met, 8 of 8.
+
+Runs used: 5 of 15, with the rest returned.
+
+Four points are worth a look:
+- **Sam's row:** "During that first week" has Due `none`. Jo starts Monday 26 October, so that week ends 2026-10-30, the same date as Lee's. Your rule is to turn vague deadlines into dates, so this one could go either way.
+- **Dev's date:** The notes say Oct 24, which is a Saturday. I kept it as written.
+- **Marta's agenda:** The notes say Marta "will keep the agenda as sent". That's an intention, not a task, so it isn't in the table.
+- **Summary wording:** It says the team "welcomed" Jo. The notes don't say that; they only mention Sam offering to pair with Jo.
+
+Each fix would be a small rework, and I'd ask you before spending any runs on it. Keep the memo as is, or should I change something?

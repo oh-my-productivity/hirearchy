@@ -1,0 +1,24 @@
+### task 20261021T153316395971-lead-a9fd
+from: lead | to: lead/reviewer | title: Re-check memo 2026-10-12 after rework | revises: 20261021T153119296205-lead-5319 | budget: 1 runs
+
+## Goal
+Re-check lead/writer/work/memo-2026-10-12.md (the same file as before, reworked: Priya's row Action is now 'Start implementing the rate limiter behind a feature flag') independently against the notes /private/tmp/hirearchy-e3-1792595952/notes/2026-10-12.md (never modify). Re-check the WHOLE memo against all criteria. Also check that the verbs in every row keep the notes' wording. Save findings in lead/reviewer/work/ and report 'criteria met: n of m' plus REQUIRED CHANGES (or none). Never edit the writer's file.
+
+Regression list (verbatim):
+- R1, case 20261021T152347923195-root-dd87, verdict 20261021T152751342340-root-af5f, about C6 (removed), C3 (removed): "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09. And Marta's room is for the training on the 14th, so I want 2026-10-14 there. And always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+List any line you cannot judge as `ambiguous`.
+
+## Acceptance criteria
+- C1: The memo is based only on the requested notes file and contains nothing that is not in it.
+- C2: At most 400 words as counted by read.
+- C4: Decisions lists every decision recorded in the notes file.
+- C5: Action items is a markdown table with the columns Owner | Action | Due, and has one row for every commitment in the notes file, including informal ones stated only in prose (anyone who said they would do something).
+- C7: Next meeting gives the date of the next meeting as stated in the notes file.
+- C9: The memo starts with one line that begins with 'Summary:' and sums up the meeting in that single line, followed by exactly these sections, in this order: Decisions, Action items, Next meeting.
+- C10: Every Due value is an ISO date (YYYY-MM-DD) or none. A deadline in the notes, including a relative one such as 'before Friday' (the date of that Friday, resolved from the meeting date), is turned into its ISO date; a date the commitment is for, such as the date a room is booked for, also counts as its Due. Due is none only when the notes give no such date or say there is no hard date.
+- Priya's row Action reads 'Start implementing the rate limiter behind a feature flag' with Due 2026-10-20; all other correct content unchanged.
+- Report states 'criteria met: n of m' quoting word count from read.
+
+## Inputs
+- lead/writer/work/memo-2026-10-12.md
+- lead/reviewer/work/review-memo-2026-10-12.md

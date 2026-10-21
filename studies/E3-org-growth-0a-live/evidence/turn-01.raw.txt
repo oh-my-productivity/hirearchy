@@ -1,0 +1,15 @@
+Yes, I can set that up. Since you want it every week, I'd build it as a standing service. You'd ask for a memo whenever a meeting's notes are ready, and nothing runs until then. I read one of your notes files to see its shape. Some commitments are only in prose, like Sam on staging and Lee swapping pager shifts with Dev, so I have a few questions first.
+
+1. **Which notes:** Each request would name one notes file, for example `2026-10-19.md`, in `/tmp/hirearchy-e3-1792595952/notes`. The team can only read that folder and can't change it. Is that right?
+2. **Informal commitments:** Should the memo list every commitment, including ones in prose with no "ACTION:" label (Sam fixing the staging data, Lee swapping shifts)? I'd suggest yes.
+3. **Vague deadlines:** What should happen with "the day before the freeze starts" or "next week"? I'd suggest turning them into a date when the notes make it clear (Sam's would be Oct 21). If they don't, I'd write "no date given" instead of guessing. Do you agree?
+4. **Memo format:** I'd suggest markdown, at most 300 words, with these sections:
+   - Decisions
+   - Action items (owner, task, due date)
+   - Date of the next meeting
+5. **Where it goes:** I'd put each memo in a new `deliverables/` folder at `/tmp/hirearchy-e3-1792595952/deliverables/memo-<meeting date>.md`.
+6. **Review:** Should a second agent check the memo against your notes before it reaches you? I'd suggest yes, because an owner or date that's wrong in a memo causes real confusion. It checks every decision and action item. Nothing gets added that isn't in the notes.
+7. **Budget and models:** I'd suggest every agent on claude-sonnet-5.5. I'd set a budget per memo once I have the plan, which is probably around 8 to 10 runs, and I'll tell you the number. I'd ask you before spending more than that.
+8. **Approval:** You see and approve the plan before anything is built. After that, would you like me to run the first memo for 2026-10-19, so you can check the result?
+
+Reply "defaults" to accept everything I proposed, or tell me what to change.

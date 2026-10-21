@@ -1,0 +1,14 @@
+I've reworked the memo and saved it over the old one at `/tmp/hirearchy-e3-1792595952/deliverables/memo-2026-10-05.md`. I read it against your notes, and the changes you asked for are in:
+
+- **Summary line:** The memo now opens with a one-line `Summary:`, then Decisions, Action items, and Next meeting. I kept Next meeting because you didn't ask to drop it.
+- **Sam:** Due is 2026-10-09.
+- **Marta:** Due is 2026-10-14.
+- **Other dates:** Priya is 2026-10-09 and Dev is 2026-10-08, both from "ACTION:" lines in the notes. Lee is `none`, since the notes say "no hard date attached".
+- **Word count:** 157 by the lead's count, well under 400.
+- **Review:** The reviewer's report shows 8 of 8 criteria met, with no changes required.
+
+These rules are now part of the weekly contract, so next week's memos follow them from the start: "before Friday" means that Friday's date, the date a booking is for counts as the Due, and every memo opens with the Summary line.
+
+**Cost:** I spent 12 runs on this memo, which is under your 15. The lead was handed 15 runs for the first pass and 6 for the rework, 21 in total, and the system flagged that this is over the per-request amount. Actual spend stayed within your limit.
+
+One question about the Summary line. It ends with "several action items due this week to support rate limiting and CI stability". The last part is the writer's own wording, not something in your notes. The reviewer flagged it as optional and still passed it. Do you want me to send it back to trim the line to facts from the notes, or keep it as is?

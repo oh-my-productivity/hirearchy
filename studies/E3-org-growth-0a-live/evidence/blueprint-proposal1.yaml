@@ -1,0 +1,55 @@
+mission: >
+  Turn the notes of each weekly team meeting into a short memo that says what was decided and who does what.
+  The memo is written only from the user's own notes files.
+needs:
+  kind: writing
+  scope: "For one meeting's notes file: the decisions made and the action items (who does what, by when). Anything not in that file is out."
+  inputs:
+    - /tmp/hirearchy-e3-1792595952/notes
+  quality_bar: Every statement comes from the notes file of the requested meeting; nothing is added or guessed.
+  sources: Only the files in needs.inputs; no web.
+  budget_runs: 12
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {name: writer, template: writer, tools: [read]}
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]
+services:
+  - name: weekly-meeting-memo
+    owner: lead
+    description: One memo (decisions and action items) from the notes file of one weekly meeting
+    inputs:
+      - name: notes_file
+        description: File name of the meeting notes inside the notes folder, for example 2026-10-19.md
+        required: true
+    acceptance:
+      - The memo is based only on the requested notes file and contains nothing that is not in it.
+      - At most 400 words as counted by read.
+      - "The memo has exactly these sections, in this order: Decisions, Action items, Next meeting."
+      - "Decisions lists every decision recorded in the notes file."
+      - "Action items is a markdown table with the columns Owner | Action | Due, and has one row for every commitment in the notes file, including informal ones stated only in prose (anyone who said they would do something)."
+      - "Every Due value is an ISO date (YYYY-MM-DD); a relative or vague deadline is turned into a date only when the notes make the date clear, otherwise Due is none; a commitment with no deadline has Due none."
+      - "Next meeting gives the date of the next meeting as stated in the notes file."
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: One markdown memo per request, saved as memo-<meeting date>.md
+      format: markdown
+      max_words: 400
+      path: /tmp/hirearchy-e3-1792595952/deliverables
+    budget: 12
+    locked: false
+task:
+  service: weekly-meeting-memo
+  inputs:
+    notes_file: 2026-10-19.md
+  title: Memo for the meeting of 2026-10-19

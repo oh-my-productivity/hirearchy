@@ -1,0 +1,16 @@
+The 2026-10-12 memo is done: `/tmp/hirearchy-e3-1792595952/deliverables/memo-2026-10-12.md`. I read it against your notes and Sam's row now says "Sort out the out-of-date test data on staging", with no "probably".
+
+- Based only on the 2026-10-12 notes: met.
+- At most 400 words: met (132 by the lead's count).
+- Summary line first, then Decisions, Action items, Next meeting: met.
+- All 3 decisions listed: met.
+- Five-row table, including Sam and Lee, who only said it in prose: met.
+- Due dates: met. Dev is 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21 (the day before the Oct 22 freeze), and Lee is `none` because the notes only say "demo week".
+- Next meeting is Monday 19 October 2026: met.
+- Reviewer's report: met, with criteria met 7 of 7.
+
+It used 15 runs, exactly your limit. The system shows 25 runs handed out against your 15, but the unspent ones came back.
+
+The writer kept changing the notes' verbs, like "Implement" for "start implementing", and that cost two reworks. The lead's notes say it will have the writer and reviewer check each row's verb against your notes from the start next time. That should bring the cost down.
+
+Do you want to keep this memo, or change something?

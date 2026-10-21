@@ -1,0 +1,12 @@
+######## TURN 7  start 16:07:13  end 16:07:28  elapsed 15s  (local, 2026-10-21)
+######## LENA (prompt sent verbatim):
+No more spend, please - that was my one extra for this memo. Deliver it as is, I'll read it myself.
+######## ASSISTANT (stdout+stderr, ANSI stripped):
+The reworked memo is now at `/tmp/hirearchy-e3-1792594182/deliverables/memo-2026-10-05.md`. It replaces the first version, and I confirmed the file matches the source. No more runs will be spent.
+
+- **Not independently reviewed.** Only I checked this version, and I found every criterion met. That includes the Summary line after the title, and Sam's row with Due 2026-10-09 and "before Friday" kept in the action text. Lee's `none` and Marta's `2026-10-14` are unchanged. I didn't record the request as accepted, since you're still reading it.
+- **Still open.** The reviewer check ("7 of 7") never ran on this version, so the request stays open.
+- **Cost.** This memo used 16 runs, which is your 15 plus the one extra you granted. The scheduler is stopped.
+- **Future memos.** The Summary line is a standing check from now on. Just tell me which notes file you want next, for example `2026-10-12.md` or `2026-10-19.md`.
+
+The team's lessons from this round, which the lead will use to adjust its working steps (not the checks), are to treat "before X" as a date and to hold back runs for the reviewer re-check. Next time I'll also ask you about any budget overrun before starting a rework, not after.

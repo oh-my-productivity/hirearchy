@@ -1,0 +1,48 @@
+######## TURN 2  start 15:54:09  end 15:54:44  elapsed 35s  (local, 2026-10-21)
+######## LENA (prompt sent verbatim):
+Thanks! Yes, if someone said they'd do something, it counts. Yes, turn vague deadlines into a date. The file name each time is fine. Format: a markdown memo, at most 400 words, with the action items as a table with columns Owner | Action | Due (ISO dates, 'none' if there's no date). The rest of your defaults are fine, the deliverables folder too. Please keep it cheap, but I need it right - about 12 runs per memo.
+######## ASSISTANT (stdout+stderr, ANSI stripped):
+Here's the plan. Every agent runs on claude-sonnet-5.5, so the 12-run budget is what keeps the cost down. The warning at the bottom is real: 12 runs is only one above the 11-run minimum, so there's little room for rework. The first surprise could stall a request, and I'd come back to you before spending more.
+
+PLAN FOR YOU
+Goal: After each weekly team meeting, turn the meeting's notes file into a short memo that states what was decided and who does what by when. The memo is for the meeting owner, who shares it with the team.
+What I understood you need:
+- Scope: For one meeting's notes file per request: the decisions the team made and the action items (everything someone said they would do, including informal commitments in prose). Nothing else from the meeting.
+- Your files (read-only): /tmp/hirearchy-e3-1792594182/notes
+- Quality bar: Every decision and action item comes from the notes file; nothing is invented. Vague deadlines are converted to ISO dates computed from the meeting date.
+- Sources: Only the files in the notes folder; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 for every agent
+Team (3 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-e3-1792594182/notes and the organization's own files; cannot change your files
+  - writer (Reads one meeting notes file and writes the memo, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-e3-1792594182/notes and the organization's own files; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-e3-1792594182/notes and the organization's own files; cannot change your files
+Budget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 11. Unspent runs come back to you.
+  lead starts with 12, hands down writer 3, reviewer 2 and keeps 7 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One short memo (decisions and action items) from one meeting notes file
+  You provide: notes_file (required)
+  Each request: up to 12 runs
+  Checks:
+    1. Covers only the meeting in the given notes file.
+    2. At most 400 words as counted by read.
+    3. Has a title line and exactly two sections: Decisions and Action items.
+    4. The Decisions section lists every decision the team made in the notes and nothing that was only discussed.
+    5. The Action items section is a markdown table with the columns Owner | Action | Due, one row per commitment in the notes, including informal commitments stated in prose and not only lines labelled ACTION.
+    ... and 3 more (see the details)
+  Delivered to: /tmp/hirearchy-e3-1792594182/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+Nothing runs until you ask for a request: approving only creates the team and the services.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (1):
+- 12 runs per request leaves almost no slack over the estimate of 11; expect a stall on the first surprise
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+
+The three checks hidden behind "and 3 more" are:
+- Every Due value is an ISO date or none, and vague deadlines are converted from the meeting date with the original wording kept in the Action text.
+- Every decision and action item can be traced to the notes file, and none is invented.
+- The reviewer's report shows every criterion met, and the writer applied every required change.
+
+Reply 'approve' to build it. If you'd rather have more slack, I can raise the budget to about 15 runs per request.

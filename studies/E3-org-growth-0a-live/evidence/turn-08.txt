@@ -1,0 +1,23 @@
+######## TURN 8  start 16:37:58  end 16:41:43  elapsed 225s  (local, 2026-10-21)
+######## LENA (prompt sent verbatim):
+That one is right, all the items are there - keep it. Now 2026-10-19.md please. I'll wait.
+######## ASSISTANT (stdout+stderr, ANSI stripped):
+Memo for `2026-10-19.md` started, with up to 15 runs. I'm waiting now.The 2026-10-19 memo is done: `/tmp/hirearchy-e3-1792595952/deliverables/memo-2026-10-19.md`. I read it against your notes, and every contract criterion is met:
+
+- Based only on the notes: met.
+- At most 400 words: met (125 by the lead's count).
+- `Summary:` line first, then Decisions, Action items, Next meeting: met.
+- All 3 decisions listed (demo goes ahead without the rate limiter, SSO renewed for 12 months, meeting moved to Monday 14:00 from 26 Oct): met.
+- Six-row table with Owner | Action | Due, including the commitments that were only in prose (Lee's sign-off, Sam pairing with Jo, Marta keeping the agenda): met.
+- Due values are ISO dates or `none`: met.
+- Next meeting is Monday 26 October 2026 at 14:00: met.
+- Reviewer's report: met, with criteria met 8 of 8.
+
+It used 9 of the 15 runs, so 6 came back. The only rework was a wrong date for Lee's item, which the reviewer caught.
+
+I chose three due dates where the notes aren't exact, and I'd like you to check them:
+- **Lee's sign-off:** the notes say "probably by end of next week", and I set 2026-10-30, the Friday. Sunday 2026-11-01 is the other reading. Is the Friday right?
+- **Sam pairing with Jo:** the notes say "during that first week", and I set 2026-10-30, the Friday of Jo's first week. Or should this be `none`?
+- **Marta keeping the agenda as sent:** it has Due `none`, because the notes give no date.
+
+Tell me which to change, or keep the memo as it is.

@@ -1,0 +1,15 @@
+### task 20261021T153923637718-lead-0212
+from: lead | to: lead/reviewer | title: Review memo 2026-10-19 | budget: 2 runs
+
+## Goal
+Independently review lead/writer/work/memo-2026-10-19.md against the notes file /private/tmp/hirearchy-e3-1792595952/notes/2026-10-19.md (read-only) and every criterion below. Do not edit anything. Report findings and exact REQUIRED CHANGES in your report summary (detail in a file in lead/reviewer/work/). Quote the word count from `read`. List per-row verb/object mismatches vs the notes for every Action row on this first pass. Check each Due date against the calendar (2026-10-19 is a Monday) and check for hedges/glosses not in the notes (e.g. parentheticals). List as 'ambiguous' any item you cannot judge (e.g. vague Due periods: Lee's 'end of next week', Sam's 'first week'). End with the line 'criteria met: n of m' (m = criteria C1, C2, C4, C5, C7, C9, C10 plus regression line R1 = 8).
+
+Regression list (the client's rejections, verbatim; check the memo against each line):
+- R1, case 20261021T152347923195-root-dd87, verdict 20261021T152751342340-root-af5f, about C6 (removed), C3 (removed): "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09. And Marta's room is for the training on the 14th, so I want 2026-10-14 there. And always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+
+## Acceptance criteria
+C1: The memo is based only on the requested notes file and contains nothing that is not in it. C2: At most 400 words as counted by read. C4: Decisions lists every decision recorded in the notes file. C5: Action items is a markdown table with the columns Owner | Action | Due, and has one row for every commitment in the notes file, including informal ones stated only in prose (anyone who said they would do something). C7: Next meeting gives the date of the next meeting as stated in the notes file. C9: The memo starts with one line that begins with 'Summary:' and sums up the meeting in that single line, followed by exactly these sections, in this order: Decisions, Action items, Next meeting. C10: Every Due value is an ISO date (YYYY-MM-DD) or none. A deadline in the notes, including a relative one such as 'before Friday' (the date of that Friday, resolved from the meeting date), is turned into its ISO date; a date the commitment is for, such as the date a room is booked for, also counts as its Due. Due is none only when the notes give no such date or say there is no hard date.
+
+## Inputs
+- lead/writer/work/memo-2026-10-19.md
+- /private/tmp/hirearchy-e3-1792595952/notes/2026-10-19.md

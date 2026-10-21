@@ -1,0 +1,8 @@
+All three memos are done and in `/tmp/hirearchy-e3-1792594182/deliverables/`: `memo-2026-10-05.md`, `memo-2026-10-12.md` and `memo-2026-10-19.md`. You've accepted all three, and nothing is running.
+
+The weekly memo service is ready for next time. Tell me the notes file, for example `2026-10-26.md`, and I'll request it. Each memo has a budget of 15 runs and will have:
+- a one-line `Summary:` after the title;
+- a Decisions section;
+- an Action items table with Owner | Action | Due, with ISO dates or `none`.
+
+The 5 October memo needed a rework and took 16 runs. The 12 October memo took 7 and the 19 October memo took 5. One 5 October item is still open. The re-check for the reworked version never ran, because you chose not to spend more on it.

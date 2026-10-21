@@ -1,0 +1,38 @@
+{
+  "name": "hirearchy-hirearchy-e3-1792594182-50a5c8-read-x3d2d30d8",
+  "description": "internal: used by the hirearchy scheduler for /private/tmp/hirearchy-e3-1792594182/org; not a general-purpose agent (built-in tools: read)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "/Volumes/workspace/hirearchy/.venv/bin/hirearchy",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/private/tmp/hirearchy-e3-1792594182/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@hirearchy",
+    "read"
+  ],
+  "allowedTools": [
+    "@hirearchy"
+  ],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false,
+  "toolsSettings": {
+    "read": {
+      "allowedPaths": [
+        "/private/tmp/hirearchy-e3-1792594182/notes",
+        "/private/tmp/hirearchy-e3-1792594182/notes/**",
+        "/private/tmp/hirearchy-e3-1792594182/org",
+        "/private/tmp/hirearchy-e3-1792594182/org/**"
+      ],
+      "deniedPaths": []
+    }
+  }
+}

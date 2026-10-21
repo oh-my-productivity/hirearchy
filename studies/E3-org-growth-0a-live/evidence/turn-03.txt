@@ -1,0 +1,40 @@
+######## TURN 3  start 16:21:49  end 16:22:10  elapsed 21s  (local, 2026-10-21)
+######## LENA (prompt sent verbatim):
+OK, if it's needed to get it right, raise it to 15 for each memo. And please use cheaper models for the writing part, if you can. The first memo should be this week's: 2026-10-05.md, not the 19th.
+######## ASSISTANT (stdout+stderr, ANSI stripped):
+Updated plan below. It has three changes: 15 runs per memo, the writer on the cheaper claude-haiku-4.5, and 2026-10-05.md as the first memo. The lead and the reviewer stay on claude-sonnet-5.5. The lead decides how every other run is spent, and the reviewer is the final check on accuracy, so those two shouldn't be cheaper.
+
+PLAN FOR YOU
+Goal: Turn the notes of each weekly team meeting into a short memo that says what was decided and who does what. The memo is written only from the user's own notes files.
+What I understood you need:
+- Scope: For one meeting's notes file: the decisions made and the action items (who does what, by when). Anything not in that file is out.
+- Your files (read-only): /tmp/hirearchy-e3-1792595952/notes
+- Quality bar: Every statement comes from the notes file of the requested meeting; nothing is added or guessed.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 for 2 agents, claude-haiku-4.5 for 1 agent (cheap model for the writer only; the lead (decides how every other run is spent) and the reviewer (final check) stay on the strong model)
+Team (3 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-e3-1792595952/notes and the organization's own files; cannot change your files
+  - writer (Writer, model claude-haiku-4.5): can read files only in /private/tmp/hirearchy-e3-1792595952/notes and the organization's own files; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-e3-1792595952/notes and the organization's own files; cannot change your files
+Budget: up to 15 runs per request (one run = one working session of one agent), your cap per request is 15; the minimum for one review and rework is 11. Unspent runs come back to you.
+  lead starts with 15, hands down writer 3, reviewer 2 and keeps 10 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One memo (decisions and action items) from the notes file of one weekly meeting
+  You provide: notes_file (required)
+  Each request: up to 15 runs
+  Checks:
+    1. The memo is based only on the requested notes file and contains nothing that is not in it.
+    2. At most 400 words as counted by read.
+    3. The memo has exactly these sections, in this order: Decisions, Action items, Next meeting.
+    4. Decisions lists every decision recorded in the notes file.
+    5. Action items is a markdown table with the columns Owner | Action | Due, and has one row for every commitment in the notes file, including informal ones stated only in prose (anyone who said they would do something).
+    ... and 3 more (see the details)
+  Delivered to: /tmp/hirearchy-e3-1792595952/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+First request, started on approval: weekly-meeting-memo (notes_file: 2026-10-05.md).
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+
+Reply "approve" to build the team and start the memo for 2026-10-05. The agents can't write to `deliverables/`, so I'll copy each memo there myself after it passes the checks.
