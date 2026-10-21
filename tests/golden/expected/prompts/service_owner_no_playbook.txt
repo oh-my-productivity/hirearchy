@@ -92,8 +92,8 @@ Deliver the service `weekly-brief`: A one-page brief on the past week's news abo
 - topic: batteries
 
 ## Acceptance criteria
-- At most 600 words
-- Every factual claim has a source URL
+- C1: At most 600 words
+- C2: Every factual claim has a source URL
 
 ## Deliverable
 one markdown file (format: markdown; at most 600 words)

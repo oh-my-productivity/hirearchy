@@ -110,7 +110,7 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     assert "- weekly-brief (offered by ceo; contract v1, playbook v2): A one-page brief" in out
     assert "inputs: topic* (what the brief is about), week (ISO week; default the current one)   (* required)" in out
     assert ("each request: 10 runs; acceptance criteria (ceo/services/weekly-brief/SERVICE.md):\n"
-            "    1. At most 600 words\n    2. Every factual claim has a source URL\n  record:") in out
+            "    C1: At most 600 words\n    C2: Every factual claim has a source URL\n  record:") in out
     assert "record: 1 request(s): 1 done, 0 failed, 0 open; 0 reworked; avg 3 runs; feedback 0 accept, 1 reject" in out
     assert '  playbook v2 (' in out and '"Case rejected for missing sources"' in out
     assert "Services you offer" not in out

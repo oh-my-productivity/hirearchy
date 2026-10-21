@@ -445,8 +445,8 @@ def test_apply_with_a_first_request_creates_a_service_task(svc_bp, roots, empty_
     task = empty_org.find_received("lead", s.task_id)
     assert (task.service, task.contract, task.playbook, task.budget) == ("weekly-brief", 1, 1, 22)
     assert task.title == "Brief on batteries" and task.sender == ROOT
-    assert "- topic: solid-state batteries" in task.body and "## Acceptance criteria\n- At most 600 words" in task.body
-    assert "- Every sentence with a number" in task.body and "## Note from the requester\nKeep it short." in task.body
+    assert "- topic: solid-state batteries" in task.body and "## Acceptance criteria\n- C1: At most 600 words" in task.body
+    assert "- C3: Every sentence with a number" in task.body and "## Note from the requester\nKeep it short." in task.body
     assert empty_org.budget("lead") == 22
 
 

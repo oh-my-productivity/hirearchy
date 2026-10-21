@@ -10,13 +10,13 @@ from ..kernel import TITLE_MAX, Message, OrgError, clip_line
 from ..mail import MailboxReader
 from ._lines import criteria_lines
 from ._protocols import RequestBodies, ServiceRequests
-from .api import Contract, ServiceCatalog
+from .api import Contract, Criterion, ServiceCatalog, criteria_of
 
 
 class TextRequestBodies(RequestBodies):
     """The body of a request is its goal, the inputs, the acceptance criteria, the deliverable and the requester's note, as markdown."""
 
-    def body(self, contract: Contract, given: Mapping[str, str], extra: Sequence[str], note: str) -> str:
+    def body(self, contract: Contract, criteria: Sequence[Criterion], given: Mapping[str, str], extra: Sequence[str], note: str) -> str:
         d = contract.deliverable
         facts = [f"format: {d['format']}"] if d.get("format") else []
         facts += [f"at most {d['max_words']} words"] if d.get("max_words") else []
@@ -25,7 +25,7 @@ class TextRequestBodies(RequestBodies):
         parts = [
             f"## Goal\nDeliver the service `{contract.name}`: {contract.description}",
             "## Request\n" + ("\n".join(f"- {k}: {given[k]}".replace("\n", "\n  ") for k in names if k in given) or "(no inputs)"),
-            "## Acceptance criteria\n" + "\n".join(f"- {c}" for c in [*contract.acceptance, *extra]),
+            "## Acceptance criteria\n" + "\n".join([*(f"- {c.id}: {c.text}" for c in criteria), *(f"- this request only: {x}" for x in extra)]),
             "## Deliverable\n" + str(d.get("description", "")) + (f" ({'; '.join(facts)})" if facts else ""),
         ]
         if note.strip():
@@ -80,7 +80,8 @@ class RuleServiceRequester(ServiceRequests):
                 f"revises must be the id of an earlier request for `{service}` that you sent to {contract.owner}: {revises}"
             )
         extra = criteria_lines(extra_acceptance, "extra_acceptance", required=False)
-        body = self._bodies.body(contract, given, extra, note)
+        criteria = criteria_of(self._catalog.criteria(contract.owner, service), contract.acceptance)
+        body = self._bodies.body(contract, criteria, given, extra, note)
         if not title.strip():
             first = next((given[n] for n, i in known.items() if i["required"] and n in given), "")
             title = clip_line(f"{service}: {first}" if first else service, TITLE_MAX)

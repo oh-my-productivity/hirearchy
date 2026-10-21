@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..kernel import Message
-from .api import Contract
+from .api import Contract, Criterion
 
 
 @runtime_checkable
@@ -67,27 +67,30 @@ class PlaybookWriter(Protocol):
 
 @runtime_checkable
 class ContractAmendment(Protocol):
-    def numbered(self, items: Sequence[str], indent: str = "") -> str:
-        """The items, one per line, numbered from 1."""
+    def listed(self, criteria: Sequence[Criterion], indent: str = "") -> str:
+        """The criteria, one per line: ``{indent}{id}: {text}``."""
         ...
 
-    def amended_criteria(self, name: str, current: Sequence[str], add: object, remove: object) -> list[str]:
-        """``current`` without the ``remove`` criteria (exact text) and with the ``add`` ones appended; the errors say why not."""
+    def amended_criteria(self, name: str, current: Sequence[Criterion], add: object, remove: object) -> list[str]:
+        """The texts of ``current`` without the ``remove`` criteria (exact text) and with the ``add`` ones appended; the errors say why not
+        and list ``current`` with their ids."""
         ...
 
-    def changes(self, old: Contract, new: Contract) -> list[str]:
-        """What differs between the old contract and the new one, one line each (criteria verbatim, others old -> new)."""
+    def changes(self, old: Contract, new: Contract, ids: Mapping[str, str]) -> list[str]:
+        """What differs between the old contract and the new one, one line each (criteria as ``{id}: {text}``, others old -> new);
+        ``ids`` maps the text of every old and new criterion to its id."""
         ...
 
-    def diff(self, old: Contract, new: Contract, changes: Sequence[str], where: str) -> str:
-        """The note to the owner: who changed the contract, exactly what, and where to read it."""
+    def diff(self, old: Contract, new: Contract, changes: Sequence[str], where: str, criteria: Sequence[Criterion]) -> str:
+        """The note to the owner: who changed the contract, exactly what, every current criterion with its id, and where to read it."""
         ...
 
 
 @runtime_checkable
 class RequestBodies(Protocol):
-    def body(self, contract: Contract, given: Mapping[str, str], extra: Sequence[str], note: str) -> str:
-        """The body of a request: goal, the inputs given, the acceptance criteria (the contract's, then ``extra``), the deliverable, the note."""
+    def body(self, contract: Contract, criteria: Sequence[Criterion], given: Mapping[str, str], extra: Sequence[str], note: str) -> str:
+        """The body of a request: goal, the inputs given, the acceptance criteria (the contract's ``criteria`` with their ids, then ``extra``
+        without), the deliverable, the note."""
         ...
 
 

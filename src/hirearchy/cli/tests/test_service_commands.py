@@ -15,7 +15,7 @@ def svc(org):
 def test_cli_amendment(svc, capsys, tmp_path):
     cli(svc, "define-service", "ceo", "weekly-brief", "--add-acceptance", "Never longer than one page")
     out = capsys.readouterr().out
-    assert "v1 -> v2" in out and "3. Never longer than one page" in out
+    assert "v1 -> v2" in out and "C3: Never longer than one page" in out
     meta = contract_meta(svc)[0]
     assert meta["acceptance"][-1] == "Never longer than one page" and meta["budget"] == 10 and meta["deliverable"] == BRIEF["deliverable"]
 

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from ..kernel import JsonObject, OrgError
 from ._lines import criteria_lines
 from ._protocols import ContractAmendment
-from .api import Contract
+from .api import Contract, Criterion
 
 
 def _described(deliverable: JsonObject) -> str:
@@ -22,21 +22,22 @@ def _inputs_listing(items: Sequence[JsonObject]) -> list[str]:
 class ContractAmender(ContractAmendment):
     """Criteria are added and removed by their exact text; the owner is told line by line what changed."""
 
-    def numbered(self, items: Sequence[str], indent: str = "") -> str:
-        return "\n".join(f"{indent}{i}. {x}" for i, x in enumerate(items, 1))
+    def listed(self, criteria: Sequence[Criterion], indent: str = "") -> str:
+        return "\n".join(f"{indent}{c.id}: {c.text}" for c in criteria)
 
-    def amended_criteria(self, name: str, current: Sequence[str], add: object, remove: object) -> list[str]:
+    def amended_criteria(self, name: str, current: Sequence[Criterion], add: object, remove: object) -> list[str]:
+        texts = [c.text for c in current]
         if add is None and remove is None:
-            return list(current)
+            return texts
         add_n, remove_n = criteria_lines(add, "add_acceptance", required=False), criteria_lines(remove, "remove_acceptance", required=False)
-        listing = f"Current criteria of `{name}`:\n{self.numbered(current)}"
-        unknown = [x for x in remove_n if x not in current]
+        listing = f"Current criteria of `{name}`:\n{self.listed(current)}"
+        unknown = [x for x in remove_n if x not in texts]
         if unknown:
             raise OrgError(
                 "remove_acceptance must be the exact text of existing criteria; not found: "
                 + "; ".join(f'"{x}"' for x in unknown) + f".\n{listing}"
             )
-        dup = [x for x in add_n if x in current]
+        dup = [x for x in add_n if x in texts]
         if dup:
             raise OrgError(
                 "add_acceptance: already a criterion: " + "; ".join(f'"{x}"' for x in dup)
@@ -45,19 +46,22 @@ class ContractAmender(ContractAmendment):
         twice = sorted({x for x in add_n if add_n.count(x) > 1})
         if twice:
             raise OrgError("add_acceptance lists the same criterion twice: " + "; ".join(f'"{x}"' for x in twice))
-        result = [x for x in current if x not in remove_n] + add_n
+        result = [x for x in texts if x not in remove_n] + add_n
         if not result:
             raise OrgError(f"that would leave `{name}` without acceptance criteria: a service needs at least one.\n{listing}")
         return result
 
-    def changes(self, old: Contract, new: Contract) -> list[str]:
+    def changes(self, old: Contract, new: Contract, ids: Mapping[str, str]) -> list[str]:
         out: list[str] = []
 
-        def listing(label: str, before: list[str], after: list[str]) -> None:
-            out.extend(f"- {label} removed: {x}" for x in before if x not in after)
-            out.extend(f"+ {label} added: {x}" for x in after if x not in before)
+        def listing(label: str, before: list[str], after: list[str], tag: Mapping[str, str] | None = None) -> None:
+            def shown(x: str) -> str:
+                return f"{tag[x]}: {x}" if tag and x in tag else x
 
-        listing("acceptance", old.acceptance, new.acceptance)
+            out.extend(f"- {label} removed: {shown(x)}" for x in before if x not in after)
+            out.extend(f"+ {label} added: {shown(x)}" for x in after if x not in before)
+
+        listing("acceptance", old.acceptance, new.acceptance, ids)
         listing("input", _inputs_listing(old.inputs), _inputs_listing(new.inputs))
         if old.budget != new.budget:
             out.append(f"budget per request: {old.budget} -> {new.budget} runs")
@@ -74,7 +78,7 @@ class ContractAmender(ContractAmendment):
             out.append("acceptance: order changed")
         return out
 
-    def diff(self, old: Contract, new: Contract, changes: Sequence[str], where: str) -> str:
+    def diff(self, old: Contract, new: Contract, changes: Sequence[str], where: str, criteria: Sequence[Criterion]) -> str:
         head = (f"{old.defined_by or 'your parent'} changed the contract of service `{old.name}` (v{old.version} -> v{new.version}). "
                 "Read it, and follow the new criteria from the next request on:")
-        return "\n".join([head, *changes, f"Contract: {where}"])
+        return "\n".join([head, *changes, "Acceptance criteria now:", *(f"{c.id}: {c.text}" for c in criteria), f"Contract: {where}"])

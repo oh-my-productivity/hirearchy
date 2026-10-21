@@ -206,7 +206,7 @@ def test_an_amendment_changes_only_what_it_names(w: ServicesWorld) -> None:
         "redefined service `weekly-brief` of ceo: contract v1 -> v2 (ceo/services/weekly-brief/SERVICE.md); the old one "
         "is kept at ceo/services/weekly-brief/history/SERVICE.v1.md. ceo was told (without waking it).\n"
         "Changed:\nbudget per request: 10 -> 12 runs\n"
-        "Acceptance criteria now (2):\n1. At most 600 words\n2. Every factual claim has a source URL"
+        "Acceptance criteria now (2):\nC1: At most 600 words\nC2: Every factual claim has a source URL"
     )
 
 
@@ -234,9 +234,10 @@ def test_the_owner_is_told_quietly_what_changed(w: ServicesWorld) -> None:
     assert (note.sender, note.type, note.wake, note.title) == ("runtime", "note", False, "contract of service weekly-brief changed to v2")
     assert note.body == (
         "root changed the contract of service `weekly-brief` (v1 -> v2). Read it, and follow the new criteria from the next request on:\n"
-        "+ acceptance added: Cite at most five sources\n"
+        "+ acceptance added: C3: Cite at most five sources\n"
         "budget per request: 10 -> 12 runs\n"
         "locked: false -> true (you may no longer revise the playbook)\n"
+        "Acceptance criteria now:\nC1: At most 600 words\nC2: Every factual claim has a source URL\nC3: Cite at most five sources\n"
         "Contract: ceo/services/weekly-brief/SERVICE.md"
     )
 
@@ -251,7 +252,7 @@ def test_criteria_are_added_and_removed_by_their_exact_text(w: ServicesWorld) ->
     define(w)
     text = amend(w, add_acceptance="Cite five sources\nNo opinions", remove_acceptance=["At most 600 words"])
     assert meta_of(w, CONTRACT)[0]["acceptance"] == ["Every factual claim has a source URL", "Cite five sources", "No opinions"]
-    assert "- acceptance removed: At most 600 words\n+ acceptance added: Cite five sources\n+ acceptance added: No opinions" in text
+    assert "- acceptance removed: C1: At most 600 words\n+ acceptance added: C3: Cite five sources\n+ acceptance added: C4: No opinions" in text
 
 
 def test_acceptance_replaces_all_the_criteria(w: ServicesWorld) -> None:
@@ -277,7 +278,7 @@ def test_a_change_that_changes_nothing_is_refused_with_the_current_criteria(w: S
         amend(w, budget=10)
     assert str(e.value) == (
         "no change: the amendment leaves the contract of `weekly-brief` exactly as it is (v1). "
-        "Current criteria:\n1. At most 600 words\n2. Every factual claim has a source URL"
+        "Current criteria:\nC1: At most 600 words\nC2: Every factual claim has a source URL"
     )
     assert meta_of(w, CONTRACT)[0]["version"] == 1 and w.d.inbox("ceo") == []
 
@@ -306,7 +307,7 @@ def test_removing_a_criterion_that_is_not_there_lists_the_current_ones(w: Servic
         amend(w, remove_acceptance=["Never"])
     assert str(e.value) == (
         'remove_acceptance must be the exact text of existing criteria; not found: "Never".\n'
-        "Current criteria of `weekly-brief`:\n1. At most 600 words\n2. Every factual claim has a source URL"
+        "Current criteria of `weekly-brief`:\nC1: At most 600 words\nC2: Every factual claim has a source URL"
     )
 
 
@@ -512,7 +513,7 @@ def test_a_request_is_a_task_built_from_the_contract(w: ServicesWorld) -> None:
     assert task.body == (
         "## Goal\nDeliver the service `weekly-brief`: A one-page brief on the past week's news about a topic.\n\n"
         "## Request\n- topic: ai\n\n"
-        "## Acceptance criteria\n- At most 600 words\n- Every factual claim has a source URL\n\n"
+        "## Acceptance criteria\n- C1: At most 600 words\n- C2: Every factual claim has a source URL\n\n"
         "## Deliverable\none markdown file (format: markdown; at most 600 words)\n\n"
         "## Note from the requester\nBe quick."
     )
@@ -560,7 +561,7 @@ def test_a_request_needs_a_budget_of_at_least_one(w: ServicesWorld, budget: int)
 def test_extra_acceptance_criteria_come_after_the_contracts(w: ServicesWorld) -> None:
     define(w)
     task = request(w, extra_acceptance=["Use bullet points", "- Mention the date"])
-    assert "## Acceptance criteria\n- At most 600 words\n- Every factual claim has a source URL\n- Use bullet points\n- Mention the date\n\n" in task.body
+    assert "## Acceptance criteria\n- C1: At most 600 words\n- C2: Every factual claim has a source URL\n- this request only: Use bullet points\n- this request only: Mention the date\n\n" in task.body
 
 
 def test_a_title_the_caller_gives_is_kept(w: ServicesWorld) -> None:

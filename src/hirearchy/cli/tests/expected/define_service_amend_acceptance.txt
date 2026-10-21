@@ -1,10 +1,10 @@
 redefined service `weekly` of ceo: contract v1 -> v2 (ceo/services/weekly/SERVICE.md); the old one is kept at ceo/services/weekly/history/SERVICE.v1.md. ceo was told (without waking it).
 Changed:
-+ acceptance added: Has-a-summary.
++ acceptance added: C2: Has-a-summary.
 notes: "" -> "A note for the owner."
 Acceptance criteria now (2):
-1. The note has a title.
-2. Has-a-summary.
+C1: The note has a title.
+C2: Has-a-summary.
 
 [stderr]
 org: <ORG>

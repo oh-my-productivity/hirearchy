@@ -2,8 +2,8 @@ Services you offer:
 - weekly-brief (contract v1, playbook v2): A one-page brief on the past week's news about a topic.
   inputs: topic* (what the brief is about), week (ISO week; default the current one)   (* required)
   each request: 10 runs; acceptance criteria (ceo/services/weekly-brief/SERVICE.md):
-    1. At most 600 words
-    2. Every factual claim has a source URL
+    C1: At most 600 words
+    C2: Every factual claim has a source URL
   record: 4 request(s): 3 done, 0 failed, 1 open; 0 reworked; avg 1 runs; no feedback
   playbook v2 (2026-10-18): "playbook v2"
   playbook file: ceo/services/weekly-brief/PLAYBOOK.md

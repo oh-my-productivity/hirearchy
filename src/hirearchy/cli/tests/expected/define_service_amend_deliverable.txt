@@ -2,7 +2,7 @@ redefined service `weekly` of ceo: contract v1 -> v2 (ceo/services/weekly/SERVIC
 Changed:
 deliverable: "The note" (format: markdown) -> "The note" (format: text; max_words: 200)
 Acceptance criteria now (1):
-1. The note has a title.
+C1: The note has a title.
 
 [stderr]
 org: <ORG>

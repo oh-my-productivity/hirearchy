@@ -109,9 +109,10 @@ def test_redefinition_archives_bumps_the_version_and_tells_the_owner_quietly(svc
     (note,) = org.messages("ceo", "inbox")
     assert note.sender == "runtime" and note.wake is False and org.unread("ceo") == 0
     assert note.title == "contract of service weekly-brief changed to v2"
-    assert "- acceptance removed: At most 600 words" in note.body and "+ acceptance added: At most 500 words" in note.body
+    assert "- acceptance removed: C1: At most 600 words" in note.body and "+ acceptance added: C3: At most 500 words" in note.body
     assert "budget per request: 10 -> 12 runs" in note.body and "locked: false -> true" in note.body
-    assert "Every factual claim" not in note.body  # unchanged criteria are not repeated
+    assert "Every factual claim" not in note.body.split("Acceptance criteria now")[0]  # unchanged criteria are not diffed ...
+    assert "Acceptance criteria now:\nC3: At most 500 words\nC2: Every factual claim has a source URL\n" in note.body  # ... but listed with their ids
 
 
 def test_redefinition_refuses_a_playbook_and_keeps_the_existing_one(org):

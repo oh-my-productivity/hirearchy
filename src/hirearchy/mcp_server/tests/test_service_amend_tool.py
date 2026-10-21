@@ -19,7 +19,7 @@ def test_the_mcp_tool_amends_with_optional_fields(svc):
     assert schema["required"] == ["owner", "name"]
     assert {"add_acceptance", "remove_acceptance"} <= set(schema["properties"])
     out = call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Never longer than one page"])
-    assert "v1 -> v2" in out and "3. Never longer than one page" in out
+    assert "v1 -> v2" in out and "C3: Never longer than one page" in out
     assert "no change" in fails(root, "define_service", owner="ceo", name="weekly-brief")
     assert "already a criterion" in fails(root, "define_service", owner="ceo", name="weekly-brief",
                                            add_acceptance=["Never longer than one page"])

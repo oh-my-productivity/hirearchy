@@ -61,9 +61,9 @@ def test_acceptance_replaces_all_but_not_together_with_add_or_remove(svc):
 
 
 def test_duplicate_unknown_and_emptying_criteria_are_refused_with_the_current_list(svc):
-    with pytest.raises(OrgError, match=r'(?s)already a criterion: "At most 600 words".*1\. At most 600 words\n2\. Every factual'):
+    with pytest.raises(OrgError, match=r'(?s)already a criterion: "At most 600 words".*C1: At most 600 words\nC2: Every factual'):
         amend(svc, add_acceptance=["At most 600 words"])
-    with pytest.raises(OrgError, match=r'(?s)not found: "At most 700 words".*Current criteria.*1\. At most 600 words'):
+    with pytest.raises(OrgError, match=r'(?s)not found: "At most 700 words".*Current criteria.*C1: At most 600 words'):
         amend(svc, remove_acceptance=["At most 700 words"])
     with pytest.raises(OrgError, match="same criterion twice"):
         amend(svc, add_acceptance=["New one", "New one"])
@@ -93,7 +93,7 @@ def test_amendment_values_are_validated(svc, over, match):
 def test_an_amendment_that_changes_nothing_is_refused(svc):
     for same in ({}, {"budget": 10}, {"description": BRIEF["description"]}, {"acceptance": BRIEF["acceptance"]},
                  {"add_acceptance": []}, {"locked": True}, {"notes": "Mind the sources."}):
-        with pytest.raises(OrgError, match=r"(?s)no change.*1\. At most 600 words"):
+        with pytest.raises(OrgError, match=r"(?s)no change.*C1: At most 600 words"):
             amend(svc, **same)
     assert contract_meta(svc)[0]["version"] == 1
     assert not svc.messages("ceo", "inbox")
@@ -122,13 +122,14 @@ def test_the_note_and_the_reply_show_exactly_what_changed(svc):
     (note,) = svc.messages("ceo", "inbox")
     assert note.sender == "runtime" and note.wake is False and note.title == "contract of service weekly-brief changed to v2"
     for text in (note.body, reply):
-        assert "- acceptance removed: At most 600 words" in text and "+ acceptance added: Never longer than one page" in text
+        assert "- acceptance removed: C1: At most 600 words" in text and "+ acceptance added: C3: Never longer than one page" in text
         assert "budget per request: 10 -> 12 runs" in text and "locked: true -> false" in text
         assert f'description: "{BRIEF["description"]}" -> "A shorter brief."' in text
         assert ('deliverable: "one markdown file" (format: markdown; max_words: 600) -> '
                 '"one file" (format: markdown; max_words: 300)') in text
         assert "Every factual claim" not in text.split("Acceptance criteria now")[0]  # unchanged criteria are not diffed
-    assert reply.endswith("Acceptance criteria now (2):\n1. Every factual claim has a source URL\n2. Never longer than one page")
+    assert "- acceptance removed: C1: At most 600 words" in note.body and "+ acceptance added: C3: Never longer than one page" in note.body
+    assert reply.endswith("Acceptance criteria now (2):\nC2: Every factual claim has a source URL\nC3: Never longer than one page")
     assert "ceo/services/weekly-brief/SERVICE.md" in note.body
     amend(svc, notes="Fresh notes.")
     assert 'notes: "Mind the sources." -> "Fresh notes."' in svc.messages("ceo", "inbox")[-1].body
@@ -148,17 +149,17 @@ def test_an_amendment_bumps_the_version_and_archives_the_old_contract(svc):
 def test_a_requested_task_carries_the_amended_criteria(svc):
     amend(svc, add_acceptance=["Never longer than one page"])
     task = svc.request(ROOT, "weekly-brief", {"topic": "ai"})
-    assert "- Never longer than one page" in task.body
+    assert "- C3: Never longer than one page" in task.body and "- C1: At most 600 words" in task.body
 
 
 def test_services_text_lists_the_criteria_in_full(svc):
     amend(svc, add_acceptance=["Never longer than one page"])
     out = svc.runtime.service_reports.services_text(ROOT)
     assert ("  each request: 10 runs; acceptance criteria (ceo/services/weekly-brief/SERVICE.md):\n"
-            "    1. At most 600 words\n    2. Every factual claim has a source URL\n    3. Never longer than one page\n"
+            "    C1: At most 600 words\n    C2: Every factual claim has a source URL\n    C3: Never longer than one page\n"
             "  record:") in out
     assert "3 acceptance criteria" not in out
-    assert "    3. Never longer than one page" in svc.runtime.service_reports.services_text("ceo")  # the owner sees them too
+    assert "    C3: Never longer than one page" in svc.runtime.service_reports.services_text("ceo")  # the owner sees them too
 
 
 def test_a_manager_amends_the_contract_of_its_report(org):
@@ -169,3 +170,47 @@ def test_a_manager_amends_the_contract_of_its_report(org):
     assert contract_meta(org, "ceo2/qa", "qa-brief")[0]["acceptance"][-1] == "Cite the test run"
     with pytest.raises(OrgError, match="only ceo2"):
         org.define_service(ROOT, "ceo2/qa", "qa-brief", add_acceptance=["Not mine to add"])
+
+
+def test_the_amendment_reply_lists_the_new_versions_criteria_with_ids(svc):
+    reply = amend(svc, add_acceptance=["Dates are written in full"])
+    assert "Acceptance criteria now (3):\nC1: At most 600 words\nC2: Every factual claim has a source URL\nC3: Dates are written in full" in reply
+    assert "+ acceptance added: C3: Dates are written in full" in reply
+    reply = amend(svc, remove_acceptance=["At most 600 words"])
+    assert reply.endswith("Acceptance criteria now (2):\nC2: Every factual claim has a source URL\nC3: Dates are written in full")  # ids never move
+    assert "- acceptance removed: C1: At most 600 words" in reply
+
+
+def test_amendment_errors_list_current_criteria_with_ids(svc):
+    amend(svc, add_acceptance=["Dates are written in full"], remove_acceptance=["At most 600 words"])
+    with pytest.raises(OrgError) as e:
+        amend(svc, remove_acceptance=["At most 600 words"])  # gone: its id C1 is not offered any more
+    assert str(e.value).endswith("Current criteria of `weekly-brief`:\nC2: Every factual claim has a source URL\nC3: Dates are written in full")
+    with pytest.raises(OrgError) as e:
+        amend(svc, add_acceptance=["Dates are written in full"])
+    assert "C3: Dates are written in full" in str(e.value)
+    with pytest.raises(OrgError) as e:
+        amend(svc, budget=10)
+    assert str(e.value).endswith("Current criteria:\nC2: Every factual claim has a source URL\nC3: Dates are written in full")
+
+
+def test_the_owners_amendment_note_lists_every_current_criterion_with_its_id(svc):
+    amend(svc, add_acceptance=["Dates are written in full"])
+    amend(svc, add_acceptance=["Cite the test run"], remove_acceptance=["At most 600 words"])
+    first, second = svc.messages("ceo", "inbox")
+    assert second.body == (
+        "root changed the contract of service `weekly-brief` (v2 -> v3). Read it, and follow the new criteria from the next request on:\n"
+        "- acceptance removed: C1: At most 600 words\n+ acceptance added: C4: Cite the test run\n"
+        "Acceptance criteria now:\nC2: Every factual claim has a source URL\nC3: Dates are written in full\nC4: Cite the test run\n"
+        "Contract: ceo/services/weekly-brief/SERVICE.md"
+    )
+    assert "Acceptance criteria now:\nC1: At most 600 words\nC2: Every factual claim has a source URL\nC3: Dates are written in full\n" in first.body
+
+
+def test_a_text_added_removed_and_added_again_keeps_its_id_through_define_service(svc):
+    amend(svc, add_acceptance=["Dates are written in full"])  # C3
+    amend(svc, remove_acceptance=["Dates are written in full"])
+    reply = amend(svc, add_acceptance=["Dates are written in full", "Cite the test run"])
+    assert "+ acceptance added: C3: Dates are written in full" in reply and "+ acceptance added: C4: Cite the test run" in reply
+    assert reply.endswith("C3: Dates are written in full\nC4: Cite the test run")
+    assert [c.id for c in svc.runtime.service_catalog.criteria("ceo", "weekly-brief") if c.current] == ["C1", "C2", "C3", "C4"]

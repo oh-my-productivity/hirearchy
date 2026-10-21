@@ -27,6 +27,6 @@
 09:12:29 mcp ops tool.call report ok 8ms run=ops@20260115T091227000000 trace=20260115T090600000000-root-0001
 09:12:47 cli ops msg.deliver id=20260115T091247000000-ops-0005 type=result from=ops to=root title=Rotate the logs status=done budget=1 reply_to=20260115T090600000000-root-0001 wake=True hops=1 chars=24 trace_rule=link trace=20260115T090600000000-root-0001
 09:12:47 scheduler runtime run.end ok 20s agent=ops exit_code=0 budget_after=2 run=ops@20260115T091227000000
-09:13:47 cli root msg.deliver id=20260115T091347000000-root-0006 type=task from=root to=ceo title=Brief on AI chips budget=10 service=weekly-brief wake=True hops=0 chars=284 trace_rule=new trace=20260115T091347000000-root-0006
+09:13:47 cli root msg.deliver id=20260115T091347000000-root-0006 type=task from=root to=ceo title=Brief on AI chips budget=10 service=weekly-brief wake=True hops=0 chars=292 trace_rule=new trace=20260115T091347000000-root-0006
 
 [exit 0]

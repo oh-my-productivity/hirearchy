@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from ..agents import AgentDirectory
 from ..kernel import Message, clip_line
-from ..services import Contract, ServiceCatalog
+from ..services import Contract, ServiceCatalog, criteria_of
 from ._ports import ServicePaths
 from .api import CaseHistory, ServiceReports, summarize
 
@@ -29,7 +29,7 @@ class TextServiceReports(ServiceReports):
             f"{head}: {c.description}",
             f"  inputs: {inputs}   (* required)",
             f"  each request: {c.budget} runs; acceptance criteria ({self._paths.rel(c.path)}):" if c.path else "",
-            *(f"    {i}. {x}" for i, x in enumerate(c.acceptance, 1)),
+            *(f"    {x.id}: {x.text}" for x in criteria_of(self._catalog.criteria(c.owner, c.name), c.acceptance)),
             f"  record: {summarize(items).line() if items else 'no requests yet'}",
         ]
         if pb.version:

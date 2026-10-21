@@ -8,8 +8,9 @@ from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
 from ..kernel import NAME_RE, ROOT, Clock, EventSink, JsonObject, OrgError, parent
 from ._lines import criteria_lines
+from ._criteria import stored_versions
 from ._protocols import ContractAmendment, ContractDefinitions, OwnerAddresses, PlaybookTexts, PlaybookWriter, ServicePlaces
-from .api import DESCRIPTION_MAX, Contract, ContractNormalizer, ServiceCatalog, ServiceStore
+from .api import DESCRIPTION_MAX, Contract, ContractNormalizer, ServiceCatalog, ServiceStore, criteria_of, number_criteria
 
 
 class RuleContractDefiner(ContractDefinitions):
@@ -88,12 +89,14 @@ class RuleContractDefiner(ContractDefinitions):
             raise OrgError("locked must be true or false")
         inputs_n = self._normalizer.inputs(inputs) if inputs is not None or old is None else old.inputs
         deliverable_n = self._normalizer.deliverable(deliverable) if deliverable is not None else (old.deliverable if old else {})
+        stored = stored_versions(self._store, owner, name) if old is not None else []  # the ids of the versions on disk (3.3)
+        current = criteria_of(number_criteria(stored), old.acceptance) if old is not None else []  # the old contract's criteria, with ids
         if acceptance is not None:
             accept_n = criteria_lines(acceptance, "acceptance", required=True)
         elif old is None:
             accept_n = []
         else:
-            accept_n = self._amendment.amended_criteria(name, old.acceptance, add_acceptance, remove_acceptance)
+            accept_n = self._amendment.amended_criteria(name, current, add_acceptance, remove_acceptance)
         playbook_body = self._texts.body(playbook) if playbook is not None else None
 
         now = self._clock.now().isoformat(timespec="microseconds")
@@ -111,12 +114,13 @@ class RuleContractDefiner(ContractDefinitions):
             "defined": now, "created": now if old is None or old.created is None else old.created.isoformat(timespec="microseconds"),
         }
         changes: list[str] = []
+        after = number_criteria([*stored, (new.version, actor, accept_n)])  # the new version is numbered in memory, before it is written
         if old is not None:
-            changes = self._amendment.changes(old, new)
+            changes = self._amendment.changes(old, new, {c.text: c.id for c in after})
             if not changes:
                 raise OrgError(
                     f"no change: the amendment leaves the contract of `{name}` exactly as it is (v{old.version}). "
-                    f"Current criteria:\n{self._amendment.numbered(old.acceptance)}"
+                    f"Current criteria:\n{self._amendment.listed(current)}"
                 )
         where = self._store.write_contract(owner, name, meta, notes_n, old.version if old is not None else None)
         self._events.emit("service.define", actor=actor, owner=owner, service=name, version=new.version, by=actor, amendment=old is not None)
@@ -128,11 +132,13 @@ class RuleContractDefiner(ContractDefinitions):
                 text += f". It has no playbook yet: {owner} writes v1 with revise_playbook after its first request."
             return text
         self._delivery.notify(
-            owner, f"contract of service {name} changed to v{new.version}", self._amendment.diff(old, new, changes, where), wake=False,
+            owner, f"contract of service {name} changed to v{new.version}",
+            self._amendment.diff(old, new, changes, where, criteria_of(after, accept_n)), wake=False,
         )
         kept = self._places.rel(self._places.history_file(owner, name, "SERVICE", old.version))
         return (
             f"redefined service `{name}` of {owner}: contract v{old.version} -> v{new.version} ({where}); the old one "
             f"is kept at {kept}. {owner} was told (without waking it).\n"
-            "Changed:\n" + "\n".join(changes) + f"\nAcceptance criteria now ({len(accept_n)}):\n{self._amendment.numbered(accept_n)}"
+            "Changed:\n" + "\n".join(changes)
+            + f"\nAcceptance criteria now ({len(accept_n)}):\n{self._amendment.listed(criteria_of(after, accept_n))}"
         )

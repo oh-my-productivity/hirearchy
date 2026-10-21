@@ -18,7 +18,7 @@ def test_request_builds_a_task_from_the_contract(svc):
     assert msg.body == (
         "## Goal\nDeliver the service `weekly-brief`: A one-page brief on the past week's news about a topic.\n\n"
         "## Request\n- topic: ai chips\n- week: 42\n\n"
-        "## Acceptance criteria\n- At most 600 words\n- Every factual claim has a source URL\n- Mention one risk\n\n"
+        "## Acceptance criteria\n- C1: At most 600 words\n- C2: Every factual claim has a source URL\n- this request only: Mention one risk\n\n"
         "## Deliverable\none markdown file (format: markdown; at most 600 words)\n\n"
         "## Note from the requester\nShort please."
     )

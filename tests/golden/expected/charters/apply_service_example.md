@@ -239,11 +239,11 @@ Deliver the service `weekly-brief`: A one-page, sourced brief on the past week's
 - topic: solid-state batteries
 
 ## Acceptance criteria
-- At most 600 words as counted by read.
-- Has exactly the sections "This week", "Changes since last week" and "Our assessment", in that order.
-- Every sentence with a number, name, version, date, price or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
-- The "Our assessment" section is judgement, with no citations or new facts, and rests only on claims verified elsewhere in the brief.
-- The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim.
+- C1: At most 600 words as counted by read.
+- C2: Has exactly the sections "This week", "Changes since last week" and "Our assessment", in that order.
+- C3: Every sentence with a number, name, version, date, price or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+- C4: The "Our assessment" section is judgement, with no citations or new facts, and rests only on claims verified elsewhere in the brief.
+- C5: The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim.
 
 ## Deliverable
 One markdown file with the brief (format: markdown; at most 600 words; path: <HOME>/deliverables/weekly-briefs)
