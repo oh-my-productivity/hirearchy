@@ -78,6 +78,7 @@ def test_event_line_shapes_from_a_fake_agent_scheduler_run(tmp_path, monkeypatch
     org.define_service(ROOT, "ceo", "brief", description="A brief.", inputs=[{"name": "topic", "description": "t", "required": True}],
                        acceptance=["short"], deliverable={"description": "a file", "format": "markdown"}, budget=8,
                        playbook="# Playbook\n1. Do it.\n")
+    org.define_service(ROOT, "ceo", "brief", add_acceptance=["At most 300 words"])  # the user's amendment: C2, the evidence of the revision
     org.revise_playbook("ceo", "brief", "# Playbook\n1. Do it well.\n", "learned something")
     org.delegate(ROOT, "ceo", "Build it", "Build the thing.", "it exists", [], 8)
     org.pause("ceo/eng", "golden: paused once")

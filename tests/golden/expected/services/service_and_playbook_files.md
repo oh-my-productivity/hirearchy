@@ -29,7 +29,7 @@ Mind the sources.
 ---
 service: weekly-brief
 version: 2
-revised: '2026-01-15T09:10:00.000000+00:00'
+revised: '2026-01-15T09:14:00.000000+00:00'
 by: ceo
 reason: 'Client rejected: too long.'
 ---

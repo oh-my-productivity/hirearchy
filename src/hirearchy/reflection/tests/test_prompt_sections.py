@@ -199,6 +199,7 @@ def test_the_reflect_section_comes_before_a_new_request_when_there_is_evidence(s
 def test_the_reflect_section_offers_restoring_an_older_version_from_v2_on(svc):
     org = svc
     org.revise_playbook("ceo", "weekly-brief", "Steps one.", "first")
+    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Every claim names its source"])  # the user's amendment: C3, the evidence of v2
     org.revise_playbook("ceo", "weekly-brief", "Steps two.", "second")
     time.sleep(0.002)
     first = request(org)

@@ -11,5 +11,5 @@ Services you can request (from your direct reports):
   each request: 10 runs; acceptance criteria (ceo/services/weekly-brief/SERVICE.md):
     C1: At most 600 words
     C2: Every factual claim has a source URL
-  record: 1 request(s): 1 done, 0 failed, 0 open; 0 reworked; avg 1 runs; feedback 0 accept, 1 reject
+  record: 2 request(s): 2 done, 0 failed, 0 open; 0 reworked; avg 1 runs; feedback 0 accept, 2 reject
   playbook v2 (2026-01-15): "Client rejected: too long."

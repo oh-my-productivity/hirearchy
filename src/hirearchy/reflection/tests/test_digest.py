@@ -72,6 +72,7 @@ def test_a_revision_resets_the_evidence_and_later_feedback_counts_as_new(svc):
     org.feedback(ROOT, task.id, "reject", "Missing sources.")  # feedback after the revision: new evidence
     digest = org.runtime.reflection_digest.reflection_digest("ceo", "weekly-brief")
     assert digest is not None and "Missing sources." in digest and task.id in digest
+    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Every claim names its source"])  # the user's amendment: C3, the evidence of v2
     org.revise_playbook("ceo", "weekly-brief", "Steps v2.", "added sources")
     assert org.runtime.reflection_digest.reflection_digest("ceo", "weekly-brief") is None
     nxt = request(org)

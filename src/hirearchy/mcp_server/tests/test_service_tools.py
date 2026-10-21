@@ -115,6 +115,7 @@ def test_angle_brackets_and_ampersands_are_stored_exactly_as_given(svc):
     assert "Resolve <weekday> and <date> & check" in svc.run_prompt("ceo", svc.begin_run("ceo"))
 
     # the same through the Org API, and in the archived history
+    svc.define_service(ROOT, "ceo", WEEKDAY, add_acceptance=["Names the week it covers"])  # the user's amendment: C3, the evidence of v2
     svc.revise_playbook("ceo", WEEKDAY, "## Steps\n1. Other <b>.", "second <i> & more")
     assert services.read_playbook(svc, "ceo", WEEKDAY).reason == "second <i> & more"
     assert "<weekday>" in (svc.dir("ceo") / "services" / WEEKDAY / "history" / "PLAYBOOK.v1.md").read_text()
@@ -147,7 +148,10 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     define(org, playbook="Steps.")
     t1 = request(org, "ai")
     deliver(org, "ceo", t1, runs=3)
-    org.feedback(ROOT, t1.id, "reject", "Bad.", source="human")
+    org.feedback(ROOT, t1.id, "reject", "Bad.", source="human", criterion=["C2"])
+    t2 = request(org, "chips")
+    deliver(org, "ceo", t2, runs=2)
+    org.feedback(ROOT, t2.id, "reject", "Still bad.", source="human", criterion=["C2"])  # C2 failed in two cases: the evidence of v2
     org.revise_playbook("ceo", "weekly-brief", "Better steps.", "Case rejected for missing sources")
     out = call(server, "services")
     assert out.splitlines()[0] == "Services you can request (from your direct reports):"
@@ -155,7 +159,7 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     assert "inputs: topic* (what the brief is about), week (ISO week; default the current one)   (* required)" in out
     assert ("each request: 10 runs; acceptance criteria (ceo/services/weekly-brief/SERVICE.md):\n"
             "    C1: At most 600 words\n    C2: Every factual claim has a source URL\n  record:") in out
-    assert "record: 1 request(s): 1 done, 0 failed, 0 open; 0 reworked; avg 3 runs; feedback 0 accept, 1 reject" in out
+    assert f"record: 2 request(s): 2 done, 0 failed, 0 open; 0 reworked; avg {(3 + 2) / 2:g} runs; feedback 0 accept, 2 reject" in out
     assert '  playbook v2 (' in out and '"Case rejected for missing sources"' in out
     assert "Services you offer" not in out
     mine = call(build_server(org, "ceo"), "services")
@@ -197,6 +201,7 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     section = prompt.split("# Reflect before you start: weekly-brief")[1].split("# New messages")[0]
     assert "Evidence since v1:" in section and "Missing week-over-week changes." in section
     assert "Used 2 runs; no checks." in section
+    call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Shows the changes since last week"])  # C3: the evidence of v2
     out = call(ceo, "revise_playbook", service="weekly-brief",
                content="## Steps\n1. Search.\n2b. Compare with last week.", reason=f"case {task.id} rejected: no changes")
     assert "playbook of `weekly-brief` is now v2" in out
