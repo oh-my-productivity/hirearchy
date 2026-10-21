@@ -78,4 +78,4 @@ def test_prompts_of_agents_without_built_in_read_write_are_byte_identical_to_bef
     assert got == EXPECTED_HASHES
 
 
-EXPECTED_HASHES = {'plain': '08426ea1e9c99759', 'sh': '37495bda4e96be15', 'ro': 'b0f1762eb6c1ba44'}
+EXPECTED_HASHES = {'plain': '58f4804465924ace', 'sh': '6210caeb5e0c3520', 'ro': 'acbefd0c5267326e'}

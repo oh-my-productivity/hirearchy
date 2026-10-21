@@ -46,7 +46,7 @@ def test_a_current_org_md_is_left_alone(h: UpgradeHarness) -> None:
 
 def test_a_dry_run_reports_and_writes_nothing(old: UpgradeHarness) -> None:
     result = old.upgrader.upgrade_rules(dry_run=True)
-    assert (result.changed, result.written, result.added, result.removed) == (True, False, 35, 0)
+    assert (result.changed, result.written, result.added, result.removed) == (True, False, 36, 0)
     assert result.text() == expected("dry_run_text.txt")
     assert result.text(5) == expected("dry_run_text_5.txt")
     assert old.stored() == expected("old_org_md.md")
@@ -55,7 +55,7 @@ def test_a_dry_run_reports_and_writes_nothing(old: UpgradeHarness) -> None:
 
 def test_the_upgrade_rewrites_the_body_and_keeps_the_frontmatter_and_the_mission(old: UpgradeHarness) -> None:
     result = old.upgrader.upgrade_rules()
-    assert (result.changed, result.written, result.added, result.removed) == (True, True, 35, 0)
+    assert (result.changed, result.written, result.added, result.removed) == (True, True, 36, 0)
     assert result.text() == expected("written_text.txt")
     assert old.stored() == expected("new_org_md.md")
     assert frontmatter(old.stored()) == frontmatter(expected("old_org_md.md"))

@@ -1,5 +1,5 @@
-rewrote the rules in ORG.md: +35 -0 lines (frontmatter and mission unchanged)
-@@ -20 +20,36 @@
+rewrote the rules in ORG.md: +36 -0 lines (frontmatter and mission unchanged)
+@@ -20 +20,37 @@
    `delegate` without a `budget` hands over what you can afford, keeping one run per outstanding delegation to process its result.
 +  Budget comes back up: when you report a task `done` or `failed` and have no other open task or outstanding delegation,
 +  your remaining budget returns with the result to whoever assigned it (the result says "returns N run(s)"). To give runs
@@ -34,5 +34,6 @@ rewrote the rules in ORG.md: +35 -0 lines (frontmatter and mission unchanged)
 +10. Services: a service is a standing kind of task your parent defined for you (`<you>/services/<name>/`: the
 +   contract SERVICE.md is your parent's; the playbook PLAYBOOK.md is yours). Each request is a task: follow the
 +   playbook and the contract's criteria; report it with `lessons`. Improve the playbook with `revise_playbook` when the
-+   evidence shown before a new request calls for it; never lower the bar (client feedback never waives a criterion),
-+   and propose contract changes to your parent.
++   client's evidence calls for it, and cite it (`evidence`: the client's rejections R<k> and criteria C<k>; lessons and
++   `source: relayed` messages, the assistant's own reading, are not evidence); never lower the bar (client feedback
++   never waives a criterion), and propose contract changes to your parent.
