@@ -108,3 +108,14 @@ def test_a_delivery_is_rated_by_a_verdict_on_it_or_on_a_later_rework(step_of_ver
     assert rated(found, second) is (bool(step_of_verdicts) and max(step_of_verdicts) >= 1)
     assert rated(found, first) is expected
     assert rated(None, first) is False
+
+
+def test_a_line_says_who_kept_the_runs(w: ProgressWorld, task: Message) -> None:
+    w.write(ROOT, "ceo", "More", "7 more", 7)
+    for _ in range(9):
+        w.use_run("ceo")
+    done = w.answer(task, "done", "ok", 0)
+    assert ". runs 9 of 15. 0 returned (kept by ceo). " in lines(w).line(task, done, NOW)
+    returned = w.answer(task, "done", "ok", 6)
+    assert "kept by" not in lines(w).line(task, returned, NOW)
+    assert "kept by" not in lines(w).line(task, None, NOW)

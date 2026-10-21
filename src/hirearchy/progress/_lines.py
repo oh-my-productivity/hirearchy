@@ -42,6 +42,8 @@ class CaseTaskLines(TaskLines):
         if who:
             parts.append(who)
         parts.append(self._runs.runs_text(task, result, team))
+        if self._runs.kept(task, result, team):
+            parts.append(f"0 returned (kept by {task.to})")
         last = self._activity.newest(team)
         if last is not None:
             parts.append(f"last activity {fmt_duration(max(0.0, (now - last).total_seconds()))} ago")

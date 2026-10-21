@@ -20,7 +20,8 @@ class LogRunCounts(RunCounts):
         self._mail = mail
         self._logs = logs
 
-    def runs_text(self, task: Message, result: Message | None, team: Sequence[str]) -> str:
+    def _window(self, task: Message, result: Message | None, team: Sequence[str]) -> tuple[int, int]:
+        """``(used, given)``: the runs the team made in the window of the task, and everything root put into the team in it."""
         start = task.id[:21]
         end = result.id[:21] if result is not None and result.status in ("done", "failed") else None
         sent = self._mail.sent(ROOT)
@@ -34,7 +35,17 @@ class LogRunCounts(RunCounts):
         used = sum(1 for a in team for log in self._logs.files(a) if inside(f"{log.stem}.log"))
         members = set(team)
         given = task.budget + sum(m.budget for m in sent if m.type == "note" and m.to in members and inside(m.id))
+        return used, given
+
+    def runs_text(self, task: Message, result: Message | None, team: Sequence[str]) -> str:
+        used, given = self._window(task, result, team)
         text = f"runs {used} of {given}"
         if result is not None and result.budget:
             text += f" ({result.budget} returned)"
         return text
+
+    def kept(self, task: Message, result: Message | None, team: Sequence[str]) -> int:
+        if result is None or result.status not in ("done", "failed") or result.budget or not team:
+            return 0
+        used, given = self._window(task, result, team)
+        return given - used if used < given else 0

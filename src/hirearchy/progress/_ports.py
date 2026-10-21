@@ -58,6 +58,10 @@ class RunCounts(Protocol):
         """``runs 3 of 8`` or ``runs 3 of 8 (5 returned)``: the runs the team made for the task against everything root put into it."""
         ...
 
+    def kept(self, task: Message, result: Message | None, team: Sequence[str]) -> int:
+        """The runs left unused that a final result (``done``/``failed``) did not carry back, when the assignee still exists; else 0."""
+        ...
+
 
 @runtime_checkable
 class TeamActivity(Protocol):

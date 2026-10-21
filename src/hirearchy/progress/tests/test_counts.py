@@ -78,3 +78,36 @@ def test_a_task_to_another_assignee_does_not_cut_the_window(w: ProgressWorld, ta
     w.delegate(ROOT, "ceo/eng", "Elsewhere", 4)
     w.use_run("ceo")
     assert text(w, task) == "runs 2 of 8"
+
+
+# ------------------------------------------------------------------------------ kept
+
+
+def kept(w: ProgressWorld, task: Message, result: Message | None, team: list[str] | None = None) -> int:
+    return counts(w).kept(task, result, TEAM if team is None else team)
+
+
+def test_kept_counts_runs_a_final_result_did_not_return(w: ProgressWorld, task: Message) -> None:
+    w.use_run("ceo")
+    w.use_run("ceo/eng")
+    w.write(ROOT, "ceo", "More", "3 more", 3)
+    assert kept(w, task, w.answer(task, "done", "ok", 0)) == 9  # 11 handed down, 2 used
+    assert kept(w, task, w.answer(task, "failed", "no", 0)) == 9
+
+
+def test_kept_is_zero_when_runs_came_back_or_the_assignee_is_gone(w: ProgressWorld, task: Message) -> None:
+    w.use_run("ceo")
+    assert kept(w, task, w.answer(task, "done", "ok", 7)) == 0
+    assert kept(w, task, w.answer(task, "done", "ok", 0), []) == 0  # a retired assignee has no team
+
+
+def test_kept_is_zero_when_nothing_was_handed_down(w: ProgressWorld) -> None:
+    free = w.delegate(ROOT, "ceo", "Free", 0)
+    w.use_run("ceo")
+    assert text(w, free) == "runs 1 of 0"
+    assert kept(w, free, w.answer(free, "done", "ok", 0)) == 0  # given - used would be negative: nothing was kept
+
+
+def test_kept_is_zero_for_a_blocked_or_missing_result(w: ProgressWorld, task: Message) -> None:
+    assert kept(w, task, None) == 0
+    assert kept(w, task, w.answer(task, "blocked", "stuck", 0)) == 0
