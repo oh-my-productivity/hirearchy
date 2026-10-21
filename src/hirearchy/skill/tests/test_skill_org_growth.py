@@ -40,3 +40,12 @@ def test_the_example_item_is_one_yes_no_question():
 
 def test_the_trigger_words_are_gone():
     assert '("always", "never", "from now on")' not in flat()
+
+
+def test_always_is_not_the_users_yes():
+    """E3 turn 5: the assistant took "always" in the rejection for the yes and passed `criterion` on the rejection itself. Only the answer to
+    the one question is the yes, and it is recorded with `confirms`."""
+    assert len(SKILL.read_text().splitlines()) <= 125
+    text = flat()
+    for needle in ('"always ..." is not their yes: ask the item first', "never pass `criterion` on the rejection itself"):
+        assert needle in text, needle

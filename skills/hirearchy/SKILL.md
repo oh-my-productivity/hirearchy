@@ -63,8 +63,7 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
 Tell the user it is running and how many runs were planned (a ceiling: runs the team does not spend come back automatically).
 
 ## 4. Monitor
-- "status?": call `progress()` (or `progress(task_id=...)`) and answer in one or two lines (done / working / blocked, runs used of
-  planned, what needs the user). Do not answer from memory or guesses.
+- "status?": call `progress()` (or `progress(task_id=...)`) and answer in one or two lines (state, runs used of planned, what needs the user), never from memory.
 - You cannot notify the user later: a turn ends when you reply. Never say "I'll tell you when it's done". If they want to be told
   when it finishes, say you will wait now and call `progress(wait_seconds=240)`; repeat while they are willing to wait (it returns
   early on done/failed/blocked/stalled or when something needs them). Otherwise tell them to ask "status?".
@@ -102,7 +101,8 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
    criterion stays unmet: say so; feedback never waives it; reject needs the user's reason in their words. Your own reading is relayed
    (the default). With each human reject propose exactly ONE item they answer yes or no, naming what it is about by the ids `services()`
    shows, as one yes/no question ("About C6: add '...' as a criterion?" or "Same as R3: a one-off?"); if the new criterion would pull against
-   another, make the item the clarification that settles both. On yes: `define_service(owner, name, add_acceptance=[<the new criterion>])`
+   another, make the item the clarification that settles both. "Always ..." is not their yes: ask the item first, and never pass `criterion`
+   on the rejection itself. On yes: `define_service(owner, name, add_acceptance=[<the new criterion>])`
    (and `remove_acceptance` for a clarification), tell the user the resulting criteria, and record the answer as the link with
    `feedback(..., source="human", confirms=<the rejection's message id>)`: criterion = the id the reply gives (an existing one's if
    nothing changes; "none" for a one-off). An owner's note with a question for the client is no new question (only your one item per
