@@ -38,7 +38,7 @@ class StepsPlaybookWriter(PlaybookWriting):
         for i, k in enumerate(makers):
             what = f"`{k.name}` ({k.role})"
             if i == 0:
-                steps.append(f"Delegate to {what} with `budget={grant(k)}`: its part of the request, with the criteria it must meet. On this first run delegate only the steps that need nothing from a teammate.")
+                steps.append(f"Delegate to {what} with `budget={grant(k)}`: its part of the request, with the criteria it must meet.")
             else:
                 steps.append(f"When the previous result is in, read its artifact yourself, then delegate to {what} with `budget={grant(k)}`, naming the artifact it builds on. "
                              "Never delegate a step before its inputs exist, and send no status messages: results wake you.")

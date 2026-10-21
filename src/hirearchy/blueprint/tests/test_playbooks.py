@@ -41,3 +41,23 @@ def test_a_lead_without_a_team_does_the_work_itself(tmp_path: Path) -> None:
     lead = Agent(addr="lead", name="lead", parent=None, where="agents[lead]", role="Lead", kind="manager", model="m")
     text = StepsPlaybookWriter(BudgetPlanner()).default_playbook(lead, [lead], {"name": "s"}, 5)
     assert "Do the work yourself, following the request's deliverable and criteria exactly." in text and "Request budget: 5 runs" in text
+
+
+LEFTOVER = "On this first run delegate only the steps that need nothing from a teammate"
+
+
+@pytest.mark.parametrize("key", SERVICES)
+def test_the_default_playbook_has_no_first_run_leftover(key: str, tmp_path: Path) -> None:
+    label, _, name = key.partition("/")
+    bp, agents, _, _ = agents_of(label, tmp_path)
+    planner = BudgetPlanner()
+    service = next(sv for sv in cast(list[dict[str, object]], bp["services"]) if sv["name"] == name)
+    text = StepsPlaybookWriter(planner).default_playbook(agents[0], agents, service, planner.service_budgets(bp, agents)[name])
+    assert LEFTOVER not in text and LEFTOVER not in golden()["playbooks"][key]
+
+
+def test_the_first_maker_step_ends_with_the_criteria_it_must_meet(tmp_path: Path) -> None:
+    bp, agents, _, _ = agents_of("research-service", tmp_path)
+    text = StepsPlaybookWriter(BudgetPlanner()).default_playbook(agents[0], agents, bp["services"][0], 22)  # type: ignore[index]
+    first = next(line for line in text.splitlines() if line.startswith("2. Delegate to "))
+    assert first.endswith(" with `budget=4`: its part of the request, with the criteria it must meet.")

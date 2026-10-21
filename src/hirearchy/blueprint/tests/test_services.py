@@ -528,7 +528,7 @@ def test_the_generated_playbook_carries_the_teams_procedure(svc_bp):
     # who drafts, who verifies, in this order
     assert steps.index("`researcher`") < steps.index("`writer`") < steps.index("`factcheck`")
     assert "`budget=4`" in steps and "`budget=3`" in steps
-    assert "only the steps that need nothing from a teammate" in steps  # sequencing
+    assert "only the steps that need nothing from a teammate" not in steps  # no first-run leftover: the manager template says it, once per task
     assert "Never delegate a step before its inputs exist" in steps
     assert "AUTHOR of the failing file" in steps and "revises=<that author's task id>" in steps  # author-routed rework
     assert "revises=<the checker's task id>" in steps and "One rework and one re-check" in steps

@@ -94,7 +94,7 @@ Services (1), offered by lead and defined by root (the contract: only root can c
   playbook v1: generated from the team (steps, budget plan, pitfalls):
     ## Steps
     1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.
-    2. Delegate to `reader` (Reader of the user's files) with `budget=3`: its part of the request, with the criteria it must meet. On this first run delegate only the steps that need nothing from a teammate.
+    2. Delegate to `reader` (Reader of the user's files) with `budget=3`: its part of the request, with the criteria it must meet.
     3. When the previous result is in, read its artifact yourself, then delegate to `writer` (Writer) with `budget=3`, naming the artifact it builds on. Never delegate a step before its inputs exist, and send no status messages: results wake you.
     4. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.
     5. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.
