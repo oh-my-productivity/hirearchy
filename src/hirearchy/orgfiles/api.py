@@ -69,7 +69,9 @@ class OrgFileWriter(Protocol):
         ...
 
     def write(self, actor: str, path: str, content: str, append: bool = False) -> Path:
-        """Write (or append to) a file of the actor's directory; returns its path."""
+        """Write (or append to) a file of the actor's directory; returns its path. A non-root actor rewriting a report's charter (AGENT.md)
+        cannot make it ``can_hire: true`` if it was not, nor set a ``max_children`` above its own (``OrgError``): only changes are bounded,
+        so a body-only rewrite and an append never are."""
         ...
 
     def write_noted(self, actor: str, path: str, content: str, append: bool = False) -> tuple[Path, str]:

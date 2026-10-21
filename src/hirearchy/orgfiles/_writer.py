@@ -6,7 +6,7 @@ from collections.abc import Container, Iterable
 from pathlib import Path
 from typing import cast
 
-from ..access import AccessScopes, AuthorityPolicy
+from ..access import AccessScopes, AuthorityPolicy, children_limit
 from ..agents import AgentDirectory, AgentRegistry, CharterReader
 from ..kernel import ROOT, OrgError, OrgLayout, join_frontmatter, split_frontmatter
 from ..settings import OrgSettings
@@ -52,7 +52,9 @@ class GuardedOrgFileWriter(OrgFileWriter):
 
         A parent rewriting a report's charter does not strip its frontmatter: every key of the old frontmatter that
         the new text does not set is kept (a key the new text sets, even to an empty value, wins). The authority
-        checks run on the merged frontmatter.
+        checks run on the merged frontmatter. A parent that is not root cannot grant ``can_hire`` the report did not have, nor change the
+        report's ``max_children`` to a value above its own: only a change is bounded (a body-only edit keeps whatever the charter held),
+        and an append never changes the frontmatter.
         """
         actor = self._agents.require(actor)
         p = self.resolve_write(actor, path)
@@ -61,8 +63,10 @@ class GuardedOrgFileWriter(OrgFileWriter):
             meta, body = split_frontmatter(content)
             if not meta.get("role"):
                 raise OrgError("a charter needs YAML frontmatter with at least `role:`")
-            if not append and self._store.kind(p) == "file":
+            old: dict[str, object] | None = None  # the frontmatter the file has now, None when there is no file yet
+            if self._store.kind(p) == "file":
                 old, _ = split_frontmatter(self._store.read_text(p))
+            if not append and old is not None:
                 merged, note = self._merger.merge(p.parent.relative_to(self._layout.root).as_posix(), old, meta)
                 if len(merged) != len(meta):
                     content = join_frontmatter(merged, body)
@@ -80,6 +84,12 @@ class GuardedOrgFileWriter(OrgFileWriter):
             self._authority.check_authority(
                 actor, list(cast("Iterable[str]", meta.get("tools") or [])), cast("str | None", meta.get("workspace")),
                 self._authority.check_inputs(meta.get("inputs")),
+            )
+            new = old if append and old is not None else meta  # an append leaves the old frontmatter as it is
+            grants_hire = bool(new.get("can_hire")) and not bool((old or {}).get("can_hire"))
+            changed = "max_children" in new and (old is None or new["max_children"] != old.get("max_children"))
+            self._authority.check_grant(
+                actor, grants_hire=grants_hire, max_children=children_limit(new["max_children"]) if changed else None
             )
         if append and self._store.kind(p) != "missing":
             content = self._store.read_text(p) + content

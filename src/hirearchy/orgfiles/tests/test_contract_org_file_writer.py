@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from hirearchy.kernel import OrgError
+from hirearchy.kernel import OrgError, join_frontmatter, split_frontmatter
 from hirearchy.orgfiles import OrgFileWriter
 from hirearchy.orgfiles.testing import IMPLEMENTATIONS, OrgFilesHarness
 
@@ -157,3 +157,84 @@ def test_the_organization_files_a_refused_write_touches_stay_as_they_were(h: Org
         with pytest.raises(OrgError):
             h.writer.write("ceo", path, "overwritten")
     assert (written(h, "ceo", "AGENT.md"), written(h, "ORG.md"), written(h, "ceo", "MEMORY.md")) == before
+
+
+# ------------------------------------------------------------------------------ the authority bound on a charter rewrite (A1, A2, A3)
+
+A1 = (
+    "you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. "
+    "Hire it with can_hire false, or ask your parent (`send`) with the reason."
+)
+
+
+def a2(n: int, mine: int) -> str:
+    return (
+        f"you cannot give a report max_children {n}: your own limit is {mine}, and a report's may not be above yours. "
+        f"Use at most {mine}, or ask your parent (`send`)."
+    )
+
+
+def charter_of(role: str, body: str = "New body.", **extra: object) -> str:
+    return join_frontmatter({"role": role, **extra}, body)
+
+
+def test_a_rewrite_that_grants_can_hire_is_refused(h: OrgFilesHarness) -> None:
+    assert refusal(lambda: h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", can_hire=True))) == A1
+    assert refusal(lambda: h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", can_hire=True, max_children=1))) == A1
+
+
+def test_a_rewrite_that_raises_max_children_above_the_writers_is_refused(h: OrgFilesHarness) -> None:
+    assert refusal(lambda: h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", max_children=3))) == a2(3, 2)
+    assert refusal(lambda: h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", max_children=99))) == a2(99, 2)
+    h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", max_children=2))  # equal to its own is fine
+
+
+def test_an_odd_new_max_children_is_a3(h: OrgFilesHarness) -> None:
+    for value in ("3", -1, True, 2.5):
+        assert refusal(lambda: h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", max_children=value))) == (
+            "max_children must be a whole number >= 0"
+        )
+
+
+def test_a_body_only_rewrite_keeps_a_higher_legacy_limit(h: OrgFilesHarness) -> None:
+    h.add_agent("ceo/legacy", {"role": "Legacy", "can_hire": True, "max_children": 5})  # the writer's own limit is 2
+    h.writer.write("ceo", "ceo/legacy/AGENT.md", charter_of("Legacy", body="Sharper body."))
+    meta, body = split_frontmatter(written(h, "ceo", "legacy", "AGENT.md") or "")
+    assert (meta["can_hire"], meta["max_children"]) == (True, 5) and "Sharper body." in body
+    h.writer.write("ceo", "ceo/legacy/AGENT.md", charter_of("Legacy", body="Again.", max_children=5, can_hire=True))  # the same values, set explicitly
+
+
+def test_a_body_only_rewrite_keeps_an_odd_legacy_value(h: OrgFilesHarness) -> None:
+    h.add_agent("ceo/odd", {"role": "Odd", "max_children": "x"})
+    h.writer.write("ceo", "ceo/odd/AGENT.md", charter_of("Odd", body="Sharper body."))
+    meta, _ = split_frontmatter(written(h, "ceo", "odd", "AGENT.md") or "")
+    assert meta["max_children"] == "x"
+
+
+def test_an_append_to_agent_md_is_not_bounded(h: OrgFilesHarness) -> None:
+    h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", can_hire=True, max_children=99), append=True)
+    meta, _ = split_frontmatter(written(h, "ceo", "eng", "AGENT.md") or "")
+    assert "can_hire" not in meta and "max_children" not in meta  # the old frontmatter stays; the appended text is only text after it
+
+
+def test_lowering_max_children_is_allowed(h: OrgFilesHarness) -> None:
+    h.add_agent("ceo/legacy", {"role": "Legacy", "can_hire": True, "max_children": 5})
+    h.writer.write("ceo", "ceo/legacy/AGENT.md", charter_of("Legacy", max_children=1))
+    meta, _ = split_frontmatter(written(h, "ceo", "legacy", "AGENT.md") or "")
+    assert meta["max_children"] == 1
+    h.writer.write("ceo", "ceo/legacy/AGENT.md", charter_of("Legacy", can_hire=False))  # taking the right away is no grant
+    meta, _ = split_frontmatter(written(h, "ceo", "legacy", "AGENT.md") or "")
+    assert meta["can_hire"] is False
+
+
+def test_the_charter_is_unchanged_after_a_refusal(h: OrgFilesHarness) -> None:
+    before = written(h, "ceo", "eng", "AGENT.md")
+    refusal(lambda: h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", can_hire=True, max_children=9)))
+    refusal(lambda: h.writer.write("ceo", "ceo/eng/AGENT.md", charter_of("Engineer", max_children=3)))
+    assert written(h, "ceo", "eng", "AGENT.md") == before
+
+
+def test_root_has_no_bound_on_a_charter(h: OrgFilesHarness) -> None:
+    h.writer.write("root", "ceo/AGENT.md", charter_of("CEO", can_hire=True, max_children=50))
+    meta, _ = split_frontmatter(written(h, "ceo", "AGENT.md") or "")
+    assert (meta["can_hire"], meta["max_children"]) == (True, 50)
