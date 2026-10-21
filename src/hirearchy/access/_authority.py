@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import cast
+from typing import SupportsInt, cast
 
 from ..agents import CharterReader
-from ..kernel import OrgError, OrgLayout, inside
+from ..kernel import ROOT, OrgError, OrgLayout, inside
 from .api import AccessScopes, AuthorityPolicy
 
 
@@ -38,6 +38,24 @@ class CharterAuthorityPolicy(AuthorityPolicy):
                     raise OrgError(
                         f"a report's inputs must be inside your inputs or workspace ({', '.join(map(str, bases))}): {raw}"
                     )
+
+    def check_grant(self, actor: str, *, grants_hire: bool, max_children: int | None) -> None:
+        if actor == ROOT:
+            return
+        if grants_hire:
+            raise OrgError(
+                "you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. "
+                "Hire it with can_hire false, or ask your parent (`send`) with the reason."
+            )
+        if max_children is None:
+            return
+        meta, _ = self._charters.charter(actor)
+        mine = int(cast("SupportsInt | str", meta.get("max_children", 5)))
+        if max_children > mine:
+            raise OrgError(
+                f"you cannot give a report max_children {max_children}: your own limit is {mine}, and a report's may not be above "
+                f"yours. Use at most {mine}, or ask your parent (`send`)."
+            )
 
     def check_inputs(self, inputs: object) -> list[str]:
         items = [inputs] if isinstance(inputs, str) else list(cast("Iterable[object]", inputs or []))

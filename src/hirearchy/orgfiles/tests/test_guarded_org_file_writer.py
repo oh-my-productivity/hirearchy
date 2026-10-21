@@ -46,6 +46,7 @@ class RecordingAuthority(AuthorityPolicy):
     def __init__(self) -> None:
         self.checked: list[tuple[str, list[str], str | None, list[str] | None]] = []
         self.inputs_seen: list[object] = []
+        self.grants: list[tuple[str, bool, int | None]] = []
 
     def check_authority(self, actor: str, tools: Sequence[str], workspace: str | None, inputs: Sequence[str] | None = None) -> None:
         self.checked.append((actor, list(tools), workspace, None if inputs is None else list(inputs)))
@@ -53,6 +54,9 @@ class RecordingAuthority(AuthorityPolicy):
     def check_inputs(self, inputs: object) -> list[str]:
         self.inputs_seen.append(inputs)
         return ["normalized"]
+
+    def check_grant(self, actor: str, *, grants_hire: bool, max_children: int | None) -> None:
+        self.grants.append((actor, grants_hire, max_children))
 
 
 class AnswerScopes(AccessScopes):

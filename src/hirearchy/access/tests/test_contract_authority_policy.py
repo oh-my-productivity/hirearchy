@@ -202,3 +202,63 @@ def test_the_first_bad_input_decides(h: AccessHarness) -> None:
         h.authority.check_inputs([str(outside(h, "a")), "rel", str(h.root)])
     with pytest.raises(OrgError, match="overlap"):
         h.authority.check_inputs([str(outside(h, "a")), str(h.root), "rel"])
+
+
+# ------------------------------------------------------------------------------ check_grant (can_hire and max_children)
+
+A1 = (
+    "you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. "
+    "Hire it with can_hire false, or ask your parent (`send`) with the reason."
+)
+
+
+def a2(n: int, mine: int) -> str:
+    return (
+        f"you cannot give a report max_children {n}: your own limit is {mine}, and a report's may not be above yours. "
+        f"Use at most {mine}, or ask your parent (`send`)."
+    )
+
+
+def grant_refused(h: AccessHarness, actor: str, *, grants_hire: bool, max_children: int | None) -> str:
+    with pytest.raises(OrgError) as caught:
+        h.authority.check_grant(actor, grants_hire=grants_hire, max_children=max_children)
+    return str(caught.value)
+
+
+def test_a_non_root_grantor_cannot_grant_can_hire_a1(h: AccessHarness) -> None:
+    h.put_agent("ceo", {"role": "R", "can_hire": True, "max_children": 5})
+    assert grant_refused(h, "ceo", grants_hire=True, max_children=None) == A1
+    h.authority.check_grant("ceo", grants_hire=False, max_children=None)
+
+
+def test_a1_is_checked_before_a2(h: AccessHarness) -> None:
+    h.put_agent("ceo", {"role": "R", "can_hire": True, "max_children": 2})
+    assert grant_refused(h, "ceo", grants_hire=True, max_children=9) == A1
+
+
+def test_root_has_no_bound(h: AccessHarness) -> None:
+    h.authority.check_grant("root", grants_hire=True, max_children=99)  # root has no charter either
+
+
+def test_max_children_above_the_grantors_own_is_a2(h: AccessHarness) -> None:
+    h.put_agent("ceo", {"role": "R", "can_hire": True, "max_children": 2})
+    assert grant_refused(h, "ceo", grants_hire=False, max_children=3) == a2(3, 2)
+    h.put_agent("ceo", {"role": "R", "can_hire": True, "max_children": "3"})  # read as hire's capacity check reads it
+    assert grant_refused(h, "ceo", grants_hire=False, max_children=4) == a2(4, 3)
+
+
+def test_max_children_equal_to_its_own_is_allowed(h: AccessHarness) -> None:
+    h.put_agent("ceo", {"role": "R", "can_hire": True, "max_children": 2})
+    h.authority.check_grant("ceo", grants_hire=False, max_children=2)
+    h.authority.check_grant("ceo", grants_hire=False, max_children=0)
+
+
+def test_an_unchanged_limit_none_is_allowed(h: AccessHarness) -> None:
+    h.put_agent("ceo", {"role": "R", "can_hire": True, "max_children": 2})
+    h.authority.check_grant("ceo", grants_hire=False, max_children=None)
+
+
+def test_an_absent_own_limit_reads_5(h: AccessHarness) -> None:
+    h.put_agent("ceo", {"role": "R", "can_hire": True})
+    h.authority.check_grant("ceo", grants_hire=False, max_children=5)
+    assert grant_refused(h, "ceo", grants_hire=False, max_children=6) == a2(6, 5)

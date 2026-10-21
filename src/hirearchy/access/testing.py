@@ -64,6 +64,9 @@ class StaticAccess(AccessScopes, AuthorityPolicy, ToolNaming, ModelResolver):
     def check_inputs(self, inputs: object) -> list[str]:
         return self._authority.check_inputs(inputs)
 
+    def check_grant(self, actor: str, *, grants_hire: bool, max_children: int | None) -> None:
+        self._authority.check_grant(actor, grants_hire=grants_hire, max_children=max_children)
+
     def tool_names(self, addr: str) -> dict[str, str]:
         return self._naming.tool_names(addr)
 

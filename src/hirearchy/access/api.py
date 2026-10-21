@@ -1,8 +1,9 @@
 """The public surface of ``access``: what each agent was granted (workspace, inputs, tools, model).
 
 ``AccessScopes`` answers where an agent may read and write, ``AuthorityPolicy`` keeps a grant from reaching further than the grantor's
-own, ``ToolNaming`` says under which names an agent has the read and write tools of the organization, and ``ModelResolver`` which model
-a run uses. The pure function ``unconfined_read`` is the legacy-charter predicate for callers that hold only a charter's frontmatter.
+own (tools, workspace, inputs; the right to hire and a report's ``max_children``), ``ToolNaming`` says under which names an agent has the
+read and write tools of the organization, and ``ModelResolver`` which model a run uses. The pure function ``unconfined_read`` is the
+legacy-charter predicate for callers that hold only a charter's frontmatter, ``children_limit`` the one reading of a ``max_children``.
 """
 
 from __future__ import annotations
@@ -11,13 +12,15 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from ._rules import unconfined_read
+from ._rules import CHILDREN_LIMIT_ERROR, children_limit, unconfined_read
 
 __all__ = [
+    "CHILDREN_LIMIT_ERROR",
     "AccessScopes",
     "AuthorityPolicy",
     "ModelResolver",
     "ToolNaming",
+    "children_limit",
     "unconfined_read",
 ]
 
@@ -50,6 +53,12 @@ class AuthorityPolicy(Protocol):
 
     def check_inputs(self, inputs: object) -> list[str]:
         """Inputs are absolute paths outside the organization directory (kiro reads them; the org owns its own)."""
+        ...
+
+    def check_grant(self, actor: str, *, grants_hire: bool, max_children: int | None) -> None:
+        """A non-root grantor cannot give a report the right to hire (``grants_hire``: the report gets ``can_hire: true`` it did not have)
+        nor a ``max_children`` above its own (``max_children``: the value being set, ``None`` when it is not changed). Root has no bound.
+        ``OrgError`` otherwise."""
         ...
 
 

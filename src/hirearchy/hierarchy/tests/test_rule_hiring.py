@@ -54,6 +54,7 @@ class SpyAuthority(AuthorityPolicy):
     def __init__(self, calls: Calls) -> None:
         self.calls = calls
         self.checked: list[tuple[str, tuple[str, ...], str | None, list[str] | None]] = []
+        self.grants: list[tuple[str, bool, int | None]] = []
 
     def check_authority(self, actor: str, tools: Sequence[str], workspace: str | None, inputs: Sequence[str] | None = None) -> None:
         self.calls.log.append("authority")
@@ -62,6 +63,10 @@ class SpyAuthority(AuthorityPolicy):
     def check_inputs(self, inputs: object) -> list[str]:
         self.calls.log.append("inputs")
         return ["/checked"] if inputs else []
+
+    def check_grant(self, actor: str, *, grants_hire: bool, max_children: int | None) -> None:
+        self.calls.log.append("grant")
+        self.grants.append((actor, grants_hire, max_children))
 
 
 class FixedScopes(AccessScopes):
