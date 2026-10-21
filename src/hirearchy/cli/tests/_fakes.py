@@ -77,8 +77,8 @@ class FakeOffice(Recording, Hiring, TaskAssigner, MessageSender, OrgSnapshotter,
         return name if actor == "root" else f"{actor}/{name}"
 
     def delegate(self, actor: str, to: str, title: str, goal: str, acceptance: str, inputs: Sequence[str] | None = None, budget: int | None = None,
-                 revises: str | None = None) -> Message:
-        self.note("delegate", actor, to, title, goal, acceptance, inputs, budget, revises)
+                 revises: str | None = None, source: str | None = None) -> Message:
+        self.note("delegate", actor, to, title, goal, acceptance, inputs, budget, revises, source)
         return self._message(to, "task", budget or 0)
 
     def send(self, actor: str, to: str, body: str, **kwargs: object) -> Message:

@@ -50,6 +50,7 @@ class MessageSender(Protocol):
         contract: int | None = None,
         playbook: int | None = None,
         feedback: str | None = None,
+        source: str | None = None,
         wake: bool = True,
         skip_route_check: bool = False,
     ) -> Message:
@@ -58,7 +59,11 @@ class MessageSender(Protocol):
         message its parent, its direct reports, its siblings, and whoever sent the message it replies to; the human and the runtime may message
         anyone; ``skip_route_check`` skips it, for results), a negative budget, budget only to a direct report or back to the parent, the
         reserve every hand-down keeps, and the hop limit (``max_hops``; results always get through). Every refusal is an ``OrgError`` whose
-        text agents are shown. The body and the title are stripped; ``hops`` is one more than the longest chain the actor is working on."""
+        text agents are shown. The body and the title are stripped; ``hops`` is one more than the longest chain the actor is working on.
+
+        Provenance: only root records where a message comes from (``source``, ``"human"`` or ``"relayed"``): an agent that passes one, or
+        a value that is neither, is refused. A task from root that ``revises`` another (a rework) without a ``source`` is stamped
+        ``"relayed"`` (root's own reading); a fresh task, a note and every message of an agent stay unstamped unless root says."""
         ...
 
 
@@ -74,10 +79,12 @@ class TaskAssigner(Protocol):
         inputs: Sequence[str] | None = None,
         budget: int | None = None,
         revises: str | None = None,
+        source: str | None = None,
     ) -> Message:
         """Assign a task to a direct report (root: to anyone) and return the delivered task. A title, a goal and acceptance criteria are
         required; ``budget`` defaults to what ``actor`` can afford (at least 1 run); ``revises`` must be the id of an earlier task ``actor``
-        sent to ``to`` and sends it back for rework, and a rework of a service request keeps the service fields of the original."""
+        sent to ``to`` and sends it back for rework, and a rework of a service request keeps the service fields of the original. ``source`` (root only) says
+        whether the user asked for the rework (``"human"``) or it is root's own reading (``"relayed"``, the default for a rework)."""
         ...
 
 

@@ -21,6 +21,19 @@ def test_the_feedback_tool_text_no_longer_says_a_later_one_replaces_the_earlier(
     assert "every verdict stays" in tools["feedback"].description
 
 
+def test_root_request_rework_without_source_is_relayed(svc):
+    server = build_server(svc, ROOT)
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, runs=1)
+    call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, budget=3)
+    call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, budget=3, source="human")
+    plain = call(server, "request", service=WEEKDAY, inputs={"topic": "other"})
+    sent = svc.received("ceo")
+    assert [m.source for m in sent if m.revises == first.id] == ["relayed", "human"]
+    assert [m.source for m in sent if m.id in plain] == [None]  # a fresh request is the user's ask: not stamped
+    assert "source: relayed" in [m for m in sent if m.revises == first.id][0].to_text()
+
+
 # ----------------------------------------------------------------------------------------- 4. case totals
 def test_the_rework_reply_states_the_case_total_and_warns_when_it_exceeds_the_contract(svc):
     server = build_server(svc, ROOT)

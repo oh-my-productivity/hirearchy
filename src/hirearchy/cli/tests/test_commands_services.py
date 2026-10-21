@@ -86,9 +86,26 @@ def test_request_turns_the_inputs_into_a_mapping(tmp_path: Path) -> None:
     go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly", "--input", "topic=tests", "--input", " k = a=b",
        "--title", "Weekly", "--note", "Please.", "--budget", "3", "--revises", "r-0")
     assert f.session.calls == [("open", True)]
-    assert services.last("request") == (("root", "weekly", {"topic": "tests", "k": " a=b"}), {"title": "Weekly", "note": "Please.", "budget": 3, "revises": "r-0"})
+    assert services.last("request") == (("root", "weekly", {"topic": "tests", "k": " a=b"}),
+                                        {"title": "Weekly", "note": "Please.", "budget": 3, "revises": "r-0", "source": "human"})
     assert office.last("commit") == (("root: request r-1 -> ceo",), {})
     assert f.out.stdout == "request r-1 -> ceo (service weekly, budget 3)\n"
+
+
+def test_request_with_revises_is_stamped_human_by_default(tmp_path: Path) -> None:
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly", "--revises", "r-0")
+    assert services.last("request")[1]["source"] == "human"  # the human typed it: a rework they asked for
+    go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly")
+    assert services.last("request")[1]["source"] is None  # a fresh request is not stamped
+
+
+def test_request_source_relayed_is_passed(tmp_path: Path) -> None:
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly", "--revises", "r-0", "--source", "relayed")
+    assert services.last("request")[1]["source"] == "relayed"
+    with pytest.raises(SystemExit):
+        go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly", "--source", "assistant")
 
 
 def test_an_input_without_an_equals_sign_is_refused_before_anything_is_asked(tmp_path: Path) -> None:

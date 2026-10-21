@@ -229,9 +229,9 @@ class RecordingTaskAssigner(TaskAssigner):
 
     def delegate(
         self, actor: str, to: str, title: str, goal: str, acceptance: str, inputs: Sequence[str] | None = None, budget: int | None = None,
-        revises: str | None = None,
+        revises: str | None = None, source: str | None = None,
     ) -> Message:
-        self._log.add("delegate", actor, to, title, goal, acceptance, inputs, budget, revises)
+        self._log.add("delegate", actor, to, title, goal, acceptance, inputs, budget, revises, **({} if source is None else {"source": source}))
         return Message(actor, to, "task", goal, title=title, budget=budget or 0, id=f"task-{len(self._log.of('delegate'))}")
 
 
@@ -253,7 +253,7 @@ class RecordingServiceCommands(ServiceCommands):
 
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",
-        extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None,
+        extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None, source: str | None = None,
     ) -> Message:
         self._log.add("request", actor, service, inputs, title=title, note=note)
         return Message(actor, "lead", "task", "", title=title, budget=22, service=service, id=f"request-{len(self._log.of('request'))}")
@@ -321,10 +321,10 @@ class FlakyTaskAssigner(TaskAssigner):
 
     def delegate(
         self, actor: str, to: str, title: str, goal: str, acceptance: str, inputs: Sequence[str] | None = None, budget: int | None = None,
-        revises: str | None = None,
+        revises: str | None = None, source: str | None = None,
     ) -> Message:
         self._nth.check()
-        return self._inner.delegate(actor, to, title, goal, acceptance, inputs, budget, revises)
+        return self._inner.delegate(actor, to, title, goal, acceptance, inputs, budget, revises, source)
 
 
 class FlakyServiceCommands(ServiceCommands):
@@ -351,10 +351,12 @@ class FlakyServiceCommands(ServiceCommands):
 
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",
-        extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None,
+        extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None, source: str | None = None,
     ) -> Message:
         self._request.check()
-        return self._inner.request(actor, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance, budget=budget, revises=revises)
+        return self._inner.request(
+            actor, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance, budget=budget, revises=revises, source=source,
+        )
 
     def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
         return self._inner.revise_playbook(actor, service, content, reason)

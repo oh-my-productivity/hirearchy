@@ -47,7 +47,7 @@ class RuleServiceRequester(ServiceRequests):
 
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str, note: str,
-        extra_acceptance: Sequence[str] | None, budget: int | None, revises: str | None,
+        extra_acceptance: Sequence[str] | None, budget: int | None, revises: str | None, source: str | None,
     ) -> Message:
         actor = self._agents.require(actor)
         available = self._catalog.requestable_services(actor)
@@ -86,5 +86,5 @@ class RuleServiceRequester(ServiceRequests):
             title = clip_line(f"{service}: {first}" if first else service, TITLE_MAX)
         return self._sender.send(
             actor, contract.owner, body, type="task", title=title.strip(), budget=int(budget), revises=revises or None,
-            service=service, contract=contract.version, playbook=self._catalog.read_playbook(contract.owner, service).version,
+            source=source, service=service, contract=contract.version, playbook=self._catalog.read_playbook(contract.owner, service).version,
         )

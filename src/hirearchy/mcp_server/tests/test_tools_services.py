@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 
 from hirearchy.agents.testing import MemoryAgents
@@ -11,7 +12,7 @@ from hirearchy.mcp_server._tools_services import DirectoryServiceRoles, ServiceT
 from hirearchy.mcp_server.testing import HeldBudgets, MemoryBinding, ScriptedReports, agents_in
 from hirearchy.services import Contract, ServiceCatalog, ServiceCommands
 
-from ._support import call, fails, names, serve
+from ._support import call, described, fails, names, serve
 
 
 class Catalog(ServiceCatalog):
@@ -116,6 +117,28 @@ def test_request_says_the_task_the_versions_and_what_to_do_next() -> None:
     assert out == "requested service `brief` from ceo: task req-1, budget 9 (contract v2, playbook v3). Your budget is now 5."
     assert commands.calls[0][2] == {"title": "T", "note": "", "extra_acceptance": None, "budget": None, "revises": None}
     assert call(serve(group, ROOT), "request", service="brief").endswith("Call start() if the scheduler is not running.")
+
+
+def params_of(server: object, tool: str) -> set[str]:
+    return {t.name: set(t.inputSchema["properties"]) for t in asyncio.run(server.list_tools())}[tool]  # type: ignore[attr-defined]
+
+
+def test_root_request_says_a_rework_after_the_users_rejection_is_human() -> None:
+    text = " ".join(described(serve(tools()[0], ROOT))["request"].split())
+    assert "a rework after their own rejection, carrying their corrections, is one" in text and 'source (with revises): "human" when the user asked for this rework' in text
+    assert "source" in params_of(serve(tools()[0], ROOT), "request")
+
+
+def test_agents_request_has_no_source_parameter() -> None:
+    server = serve(tools()[0], "ceo")
+    assert "source" not in params_of(server, "request") and "source" not in described(server)["request"]
+
+
+def test_root_request_forwards_the_source_it_is_given() -> None:
+    group, commands = tools()
+    call(serve(group, ROOT), "request", service="brief", revises="old", source="human")
+    call(serve(group, ROOT), "request", service="brief", revises="old")
+    assert [c[2]["source"] for c in commands.calls] == ["human", None]  # no source: the sender stamps a root rework `relayed`
 
 
 def test_a_rework_also_states_the_case_total() -> None:

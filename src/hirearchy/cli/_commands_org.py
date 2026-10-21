@@ -92,7 +92,8 @@ class TaskCommand(Command):
     def run(self, args: Arguments) -> None:
         self._session.open(args, mutating=True)
         msg = self._tasks().delegate(
-            ROOT, args.to, args.title, self._text.read(args.goal), self._text.read(args.acceptance), args.input, args.budget, args.revises
+            ROOT, args.to, args.title, self._text.read(args.goal), self._text.read(args.acceptance), args.input, args.budget, args.revises,
+            "human" if args.revises else None,  # the human typed the rework
         )
         self._snapshots().commit(f"root: task {msg.id} -> {msg.to}")
         self._out.say(f"task {msg.id} -> {msg.to} (budget {msg.budget})")

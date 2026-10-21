@@ -64,7 +64,7 @@ def test_prompt_service_owner_with_playbook_and_reflect_section(tmp_path, clock,
     org.feedback(ROOT, first.id, "reject", "Too long: cut to 600 words.")
     clock.tick()
     org.request(ROOT, "weekly-brief", {"topic": "ai chips", "week": "2026-W03"}, title="Brief on AI chips", note="Shorter please.",
-                revises=first.id, budget=6)
+                revises=first.id, budget=6, source="human")
     clock.tick()
     batch = run(org, "ceo", clock)
     check("prompts/service_owner_reflect.txt", norm(org.run_prompt("ceo", batch)))

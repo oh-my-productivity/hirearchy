@@ -140,14 +140,14 @@ def test_the_other_commands_come_from_the_commands_of_the_runtime(org: Org) -> N
     fake = Commands()
     use(org, service_commands=fake)
     assert org.retire_service("root", "ceo", "x", "why") == "RETIRED"
-    assert org.request("root", "x", {"topic": "ai"}, title="T", note="N", extra_acceptance=["e"], budget=3, revises="R").id == "REQUESTED"
+    assert org.request("root", "x", {"topic": "ai"}, title="T", note="N", extra_acceptance=["e"], budget=3, revises="R", source="human").id == "REQUESTED"
     assert org.request("root", "x", None).id == "REQUESTED"
     assert org.revise_playbook("ceo", "x", "content", "reason") == 7
     assert org.feedback("root", "T1", "reject", "words").id == "RATED" and org.feedback("root", "T1", "accept").id == "RATED"
     assert fake.calls == [
         ("retire_service", ("root", "ceo", "x", "why"), {}),
-        ("request", ("root", "x", {"topic": "ai"}), {"title": "T", "note": "N", "extra_acceptance": ["e"], "budget": 3, "revises": "R"}),
-        ("request", ("root", "x", None), {"title": "", "note": "", "extra_acceptance": None, "budget": None, "revises": None}),
+        ("request", ("root", "x", {"topic": "ai"}), {"title": "T", "note": "N", "extra_acceptance": ["e"], "budget": 3, "revises": "R", "source": "human"}),
+        ("request", ("root", "x", None), {"title": "", "note": "", "extra_acceptance": None, "budget": None, "revises": None, "source": None}),
         ("revise_playbook", ("ceo", "x", "content", "reason"), {}),
         ("feedback", ("root", "T1", "reject", "words"), {}),
         ("feedback", ("root", "T1", "accept", ""), {}),

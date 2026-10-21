@@ -43,13 +43,14 @@ class DispatchMixin:
         contract: int | None = None,
         playbook: int | None = None,
         feedback: str | None = None,
+        source: str | None = None,
         wake: bool = True,
         _skip_route_check: bool = False,
     ) -> Message:
         return self.runtime.message_sender.send(
             actor, to, body, type=type, title=title, reply_to=reply_to, status=status, budget=budget, revises=revises,
-            supersedes=supersedes, service=service, contract=contract, playbook=playbook, feedback=feedback, wake=wake,
-            skip_route_check=_skip_route_check,
+            supersedes=supersedes, service=service, contract=contract, playbook=playbook, feedback=feedback, source=source,
+            wake=wake, skip_route_check=_skip_route_check,
         )
 
     def delegate(
@@ -62,8 +63,9 @@ class DispatchMixin:
         inputs: list[str] | None = None,
         budget: int | None = None,
         revises: str | None = None,
+        source: str | None = None,
     ) -> Message:
-        return self.runtime.task_assigner.delegate(actor, to, title, goal, acceptance, inputs, budget, revises)
+        return self.runtime.task_assigner.delegate(actor, to, title, goal, acceptance, inputs, budget, revises, source)
 
     def _normalize_artifact(self, actor: str, path: str, since: str = "") -> str:
         """Resolve an artifact path and annotate it with facts a manager can check claims against.

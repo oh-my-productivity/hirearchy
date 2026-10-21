@@ -101,15 +101,24 @@ def test_task_delegates_as_root_snapshots_and_says_the_budget(tmp_path: Path) ->
     go(TaskCommand(f.session, lambda: office, lambda: office, TEXT, f.out), "task", "ceo", "--title", "T", "--goal", "@goal.md", "--acceptance", "Done.",
        "--input", "/a", "--input", "/b", "--budget", "3", "--revises", "t-0")
     assert f.session.calls == [("open", True)]
-    assert office.last("delegate") == (("root", "ceo", "T", "The goal.\n", "Done.", ["/a", "/b"], 3, "t-0"), {})
+    assert office.last("delegate") == (("root", "ceo", "T", "The goal.\n", "Done.", ["/a", "/b"], 3, "t-0", "human"), {})
     assert office.last("commit") == (("root: task m-1 -> ceo",), {})
     assert f.out.stdout == "task m-1 -> ceo (budget 3)\n"
+
+
+def test_task_with_revises_is_stamped_human(tmp_path: Path) -> None:
+    f, office = Fixture(tmp_path), new_office()
+    go(TaskCommand(f.session, lambda: office, lambda: office, TEXT, f.out), "task", "ceo", "--title", "T", "--goal", "g", "--acceptance", "a",
+       "--revises", "t-0")
+    assert office.last("delegate")[0][7:] == ("t-0", "human")  # the human typed the rework
+    go(TaskCommand(f.session, lambda: office, lambda: office, TEXT, f.out), "task", "ceo", "--title", "T", "--goal", "g", "--acceptance", "a")
+    assert office.last("delegate")[0][7:] == (None, None)  # a fresh task is not stamped
 
 
 def test_task_without_inputs_or_budget(tmp_path: Path) -> None:
     f, office = Fixture(tmp_path), new_office()
     go(TaskCommand(f.session, lambda: office, lambda: office, TEXT, f.out), "task", "ceo", "--title", "T", "--goal", "g", "--acceptance", "a")
-    assert office.last("delegate")[0][5:] == ([], None, None)
+    assert office.last("delegate")[0][5:] == ([], None, None, None)
     assert f.out.stdout == "task m-1 -> ceo (budget 0)\n"
 
 

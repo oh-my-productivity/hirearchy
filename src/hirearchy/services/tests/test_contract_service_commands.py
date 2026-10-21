@@ -634,6 +634,15 @@ def test_a_request_can_be_sent_back_for_rework(w: ServicesWorld) -> None:
     assert again.revises == first.id and (again.service, again.contract) == ("weekly-brief", 1)
 
 
+def test_request_forwards_source_onto_the_rework(w: ServicesWorld) -> None:
+    define(w)
+    first = request(w)
+    assert first.source is None  # a fresh request is the user's ask: not stamped
+    assert request(w, revises=first.id).source == "relayed"  # root's own reading, unless it says the user asked
+    assert request(w, revises=first.id, source="human").source == "human"
+    assert request(w, revises=first.id, source="relayed").source == "relayed"
+
+
 @pytest.mark.parametrize("what", ["a task of another service", "nothing", "a note", "a request to someone else"])
 def test_only_an_earlier_request_for_the_same_service_to_the_same_owner_can_be_revised(w: ServicesWorld, what: str) -> None:
     define(w)

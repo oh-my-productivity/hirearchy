@@ -39,10 +39,11 @@ class ServicesMixin:
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",
         extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None,
+        source: str | None = None,
     ) -> Message:
         """Ask a direct report for one of its services. See :meth:`hirearchy.services.ServiceCommands.request`."""
         return self.runtime.service_commands.request(
-            actor, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance, budget=budget, revises=revises,
+            actor, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance, budget=budget, revises=revises, source=source,
         )
 
     def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:

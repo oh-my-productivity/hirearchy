@@ -265,9 +265,9 @@ class ScriptedTasks(TaskAssigner, TaskReporter):
 
     def delegate(
         self, actor: str, to: str, title: str, goal: str, acceptance: str, inputs: Sequence[str] | None = None, budget: int | None = None,
-        revises: str | None = None,
+        revises: str | None = None, source: str | None = None,
     ) -> Message:
-        self.log.add("delegate", actor, to, title, goal, acceptance, inputs, budget, revises)
+        self.log.add("delegate", actor, to, title, goal, acceptance, inputs, budget, revises, **({} if source is None else {"source": source}))
         if self.fails is not None:
             raise self.fails
         return Message(actor, to, "task", goal, title=title, budget=3 if budget is None else budget, id="task-1")
@@ -288,7 +288,8 @@ class ScriptedSender(MessageSender):
     def send(
         self, actor: str, to: str, body: str, *, type: str = "note", title: str = "", reply_to: str | None = None, status: str | None = None,
         budget: int = 0, revises: str | None = None, supersedes: str | None = None, service: str | None = None, contract: int | None = None,
-        playbook: int | None = None, feedback: str | None = None, wake: bool = True, skip_route_check: bool = False,
+        playbook: int | None = None, feedback: str | None = None, source: str | None = None, wake: bool = True,
+        skip_route_check: bool = False,
     ) -> Message:
         self.log.add("send", actor, to, body, type=type, title=title, reply_to=reply_to, status=status, budget=budget, wake=wake,
                      skip_route_check=skip_route_check)

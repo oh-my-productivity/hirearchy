@@ -167,7 +167,7 @@ def _build_demo(base: Path, clock: Clock) -> SimpleNamespace:
     clock.at(190)
     org.feedback(ROOT, c1.id, "reject", "Too long and no sources.")
     clock.at(195)
-    c1b = org.delegate(ROOT, "research", "Brief: EV chargers (shorter)", "Shorter please.", "Under 400 words", budget=4, revises=c1.id)
+    c1b = org.delegate(ROOT, "research", "Brief: EV chargers (shorter)", "Shorter please.", "Under 400 words", budget=4, revises=c1.id, source="human")
     clock.at(200)
     _, lg = start_run(org, "research", clock)
     clock.at(215)

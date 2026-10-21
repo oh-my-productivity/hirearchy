@@ -7,10 +7,27 @@ from typing import SupportsInt, cast
 from ..agents import AgentDirectory
 from ..budget import AllocationPolicy
 from ..delivery import MessageDelivery
-from ..kernel import MESSAGE_TYPES, ROOT, Message, OrgError, norm, parent
+from ..kernel import MESSAGE_TYPES, ROOT, SOURCES, Message, OrgError, norm, parent
 from ..settings import OrgSettings
 from ._protocols import HopCounter, RoutePolicy
 from .api import MessageSender
+
+
+def provenance_source(actor: str, type: str, revises: str | None, source: str | None) -> str | None:
+    """Where a message says it comes from (``source``), by the provenance rules every ``MessageSender`` applies (design 5.1):
+    only root records it (an agent that passes ``source`` is refused), it is ``human`` or ``relayed``, and a rework from root
+    (a task that ``revises`` another) without one is ``relayed``: root's own reading, unless the caller says the user asked for it.
+    A fresh task, a note or a message of an agent stays unstamped."""
+    if source is not None and actor != ROOT:
+        raise OrgError(
+            "only root (the human's seat) records where a verdict, a link or a rework comes from (`source`, `criterion`); "
+            "agents' messages carry neither"
+        )
+    if source is not None and source not in SOURCES:
+        raise OrgError('source must be "human" (the user\'s own judgement, in their own words) or "relayed" (anything you concluded yourself)')
+    if source is None and actor == ROOT and type == "task" and revises:
+        return "relayed"
+    return source
 
 
 class RuleMessageSender(MessageSender):
@@ -31,7 +48,7 @@ class RuleMessageSender(MessageSender):
         self, actor: str, to: str, body: str, *, type: str = "note", title: str = "", reply_to: str | None = None,
         status: str | None = None, budget: int = 0, revises: str | None = None, supersedes: str | None = None,
         service: str | None = None, contract: int | None = None, playbook: int | None = None, feedback: str | None = None,
-        wake: bool = True, skip_route_check: bool = False,
+        source: str | None = None, wake: bool = True, skip_route_check: bool = False,
     ) -> Message:
         cap = self._settings.message_cap()
         if len(body.strip()) > cap and norm(actor) != ROOT:  # the cap protects agents' runs; the human may paste
@@ -63,10 +80,11 @@ class RuleMessageSender(MessageSender):
                 f"message chain is {hops} hops long (limit {max_hops}); this looks like a loop. "
                 "Report blocked to whoever assigned your task instead."
             )
+        source = provenance_source(actor, type, revises, source)
         msg = Message(
             sender=actor, to=to, type=type, body=body.strip(), title=title.strip(),
             reply_to=reply_to, status=status, budget=budget, hops=hops, revises=revises,
             supersedes=supersedes, service=service, contract=contract, playbook=playbook, feedback=feedback,
-            wake=wake,
+            source=source, wake=wake,
         )
         return self._delivery.deliver(msg)

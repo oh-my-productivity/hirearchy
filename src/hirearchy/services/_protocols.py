@@ -120,7 +120,7 @@ class PlaybookRevisions(Protocol):
 class ServiceRequests(Protocol):
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str, note: str,
-        extra_acceptance: Sequence[str] | None, budget: int | None, revises: str | None,
+        extra_acceptance: Sequence[str] | None, budget: int | None, revises: str | None, source: str | None,
     ) -> Message:
         """Ask for a service (see ``ServiceCommands.request``)."""
         ...

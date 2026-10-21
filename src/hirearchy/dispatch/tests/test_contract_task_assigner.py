@@ -180,3 +180,21 @@ def test_the_rework_fields_are_asked_for_only_when_a_task_is_revised(w: Dispatch
 
     w.assigner_with(Spy({})).delegate("root", "ceo", "t", "g", "a", budget=1)
     assert asked == []
+
+
+# ------------------------------------------------------------------------------ provenance: where a rework comes from
+
+
+def test_a_root_delegate_with_revises_is_stamped_relayed_by_default(w: DispatchWorld) -> None:
+    first = w.assigner.delegate("root", "ceo", "Write it", "Write the blurb.", "33 words", budget=3)
+    assert first.source is None  # a fresh task is the user's ask: not stamped
+    again = w.assigner.delegate("root", "ceo", "Again", "Again.", "better", budget=3, revises=first.id)
+    assert again.source == "relayed"
+
+
+def test_a_root_delegate_with_revises_keeps_human(w: DispatchWorld) -> None:
+    first = w.assigner.delegate("root", "ceo", "Write it", "Write the blurb.", "33 words", budget=3)
+    again = w.assigner.delegate("root", "ceo", "Again", "Again.", "better", None, 3, first.id, "human")
+    assert again.source == "human"
+    third = w.assigner.delegate("root", "ceo", "Third", "Third.", "better", budget=3, revises=again.id, source="relayed")
+    assert third.source == "relayed"

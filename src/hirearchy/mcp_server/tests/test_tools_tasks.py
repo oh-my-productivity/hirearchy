@@ -9,7 +9,9 @@ from hirearchy.mail.testing import memory_mailbox
 from hirearchy.mcp_server._tools_tasks import TaskTools
 from hirearchy.mcp_server.testing import HeldBudgets, ScriptedHints, ScriptedTasks
 
-from ._support import call, fails, serve
+import asyncio
+
+from ._support import call, described, fails, serve
 
 
 def tools(tmp_path: Path, tasks: ScriptedTasks | None = None, hints: ScriptedHints | None = None) -> tuple[TaskTools, ScriptedTasks, ScriptedHints]:
@@ -29,6 +31,25 @@ def test_delegate_passes_inputs_and_the_task_it_revises(tmp_path: Path) -> None:
     group, tasks, _ = tools(tmp_path)
     call(serve(group, "ceo"), "delegate", to="ceo/eng", title="T", goal="G", acceptance="A", inputs=["/in"], revises="old")
     assert tasks.log.of("delegate")[0][0][6:] == (None, "old") and tasks.log.of("delegate")[0][0][5] == ["/in"]
+
+
+def test_root_delegate_says_a_rework_after_the_users_rejection_is_human(tmp_path: Path) -> None:
+    text = " ".join(described(serve(tools(tmp_path)[0], "root"))["delegate"].split())
+    assert "a rework after their own rejection, carrying their corrections, is one" in text and 'source (with revises): "human" when the user asked for this rework' in text
+
+
+def test_agents_delegate_has_no_source_parameter(tmp_path: Path) -> None:
+    server = serve(tools(tmp_path)[0], "ceo")
+    props = {t.name: set(t.inputSchema["properties"]) for t in asyncio.run(server.list_tools())}["delegate"]
+    assert "source" not in props and "source" not in described(server)["delegate"]
+    root_props = {t.name: set(t.inputSchema["properties"]) for t in asyncio.run(serve(tools(tmp_path)[0], "root").list_tools())}["delegate"]
+    assert "source" in root_props
+
+
+def test_root_delegate_passes_the_source_it_is_given(tmp_path: Path) -> None:
+    group, tasks, _ = tools(tmp_path)
+    call(serve(group, "root"), "delegate", to="ceo", title="T", goal="G", acceptance="A", revises="old", source="human")
+    assert tasks.log.of("delegate") == [(("root", "ceo", "T", "G", "A", [], None, "old"), {"source": "human"})]
 
 
 def test_a_refusal_of_the_port_is_the_refusal_of_the_tool(tmp_path: Path) -> None:

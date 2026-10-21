@@ -101,6 +101,7 @@ class RequestCommand(Command):
         s.add_argument("--note", default="", help="free text for the owner")
         s.add_argument("--budget", type=int, help="runs handed down (default: the contract's)")
         s.add_argument("--revises", metavar="TASK_ID", help="send back an earlier request of this service for rework")
+        s.add_argument("--source", choices=("human", "relayed"), help="who asked for a rework (--revises): human (you, the default) or relayed")
         s.set_defaults(fn=self.run)
 
     def run(self, args: Arguments) -> None:
@@ -111,7 +112,9 @@ class RequestCommand(Command):
             if not sep:
                 raise OrgError(f"--input must be key=value (got {item!r})")
             inputs[key.strip()] = value
-        msg = self._commands().request(ROOT, args.service, inputs, title=args.title, note=args.note, budget=args.budget, revises=args.revises)
+        source = args.source or ("human" if args.revises else None)  # the human typed it; a fresh request is not stamped
+        msg = self._commands().request(ROOT, args.service, inputs, title=args.title, note=args.note, budget=args.budget, revises=args.revises,
+                                       source=source)
         self._snapshots().commit(f"root: request {msg.id} -> {msg.to}")
         self._out.say(f"request {msg.id} -> {msg.to} (service {msg.service}, budget {msg.budget})")
 

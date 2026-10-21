@@ -2,8 +2,9 @@
 recording fake deliver alike.
 
 What the callers rely on: ``send`` returns the message it delivered, completed; the addresses are normalized, the body and the title are stripped; every
-field it is given is on the delivered message; the human's messages start a chain (0 hops); a message the route check is skipped for still arrives.
-(The refusals are the rules of the checking sender: ``test_rule_message_sender``.)"""
+field it is given is on the delivered message; the human's messages start a chain (0 hops); a message the route check is skipped for still arrives;
+only root records where a rework comes from (``source``), and a rework from root without one is stamped ``relayed``.
+(The other refusals are the rules of the checking sender: ``test_rule_message_sender``.)"""
 
 from __future__ import annotations
 
@@ -13,6 +14,7 @@ import pytest
 
 from hirearchy.dispatch import MessageSender
 from hirearchy.dispatch.testing import IMPLEMENTATIONS, DispatchWorld
+from hirearchy.kernel import OrgError
 
 from ._support import implementations, make
 
@@ -74,3 +76,49 @@ def test_a_message_of_the_human_starts_a_chain(w: DispatchWorld) -> None:
 def test_a_message_the_route_check_is_skipped_for_is_delivered(w: DispatchWorld) -> None:
     msg = w.sender.send("ceo/eng", "ceo/ops/dev", "not my cousin", type="result", skip_route_check=True)
     assert [m.id for m in w.inbox("ceo/ops/dev")] == [msg.id]
+
+
+# ------------------------------------------------------------------------------ provenance: where a rework comes from
+
+S1 = ("only root (the human's seat) records where a verdict, a link or a rework comes from (`source`, `criterion`); "
+      "agents' messages carry neither")
+S2 = 'source must be "human" (the user\'s own judgement, in their own words) or "relayed" (anything you concluded yourself)'
+EARLIER = "20260101T000000000002-root-bbbb"
+
+
+def test_an_agent_cannot_set_source(w: DispatchWorld) -> None:
+    for source in ("human", "relayed", "garbage"):
+        with pytest.raises(OrgError) as e:
+            w.sender.send("ceo", "root", "hello", source=source)
+        assert str(e.value) == S1
+
+
+def test_source_must_be_human_or_relayed(w: DispatchWorld) -> None:
+    for source in ("", "HUMAN", "assistant", "agent"):
+        with pytest.raises(OrgError) as e:
+            w.sender.send("root", "ceo", "hello", type="task", revises=EARLIER, source=source)
+        assert str(e.value) == S2
+    assert w.inbox("ceo") == []
+
+
+def test_a_root_rework_without_source_is_stamped_relayed(w: DispatchWorld) -> None:
+    msg = w.sender.send("root", "ceo", "again, please", type="task", revises=EARLIER)
+    assert msg.source == "relayed"
+    assert [m.source for m in w.inbox("ceo")] == ["relayed"]
+
+
+def test_a_root_rework_keeps_source_human(w: DispatchWorld) -> None:
+    msg = w.sender.send("root", "ceo", "again, please", type="task", revises=EARLIER, source="human")
+    assert msg.source == "human" and [m.source for m in w.inbox("ceo")] == ["human"]
+    assert w.sender.send("root", "ceo", "again", type="task", revises=EARLIER, source="relayed").source == "relayed"
+
+
+def test_a_fresh_root_task_is_not_stamped(w: DispatchWorld) -> None:
+    assert w.sender.send("root", "ceo", "new work", type="task").source is None
+    assert w.sender.send("root", "ceo", "just a note").source is None
+    assert w.sender.send("root", "ceo", "new work", type="task", source="human").source == "human"  # stamped only when the caller says
+
+
+def test_an_agent_rework_is_never_stamped(w: DispatchWorld) -> None:
+    msg = w.sender.send("ceo", "ceo/eng", "again, please", type="task", revises=EARLIER)
+    assert msg.source is None

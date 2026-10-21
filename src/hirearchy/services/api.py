@@ -180,13 +180,15 @@ class ServiceCommands(Protocol):
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",
         extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None,
+        source: str | None = None,
     ) -> Message:
         """Ask one of ``actor``'s direct reports for its service ``service``: a task built from the contract.
 
         The task goes through the message sender like a delegation (same route, hops and budget rules, the reserve included). ``budget`` defaults
         to the contract's. ``extra_acceptance`` adds criteria after the contract's, which always travel unchanged. ``revises``: the id of an
-        earlier request of this service to the same owner, to send it back. The task carries ``service``, ``contract`` and ``playbook``
-        (versions at this moment) in its frontmatter."""
+        earlier request of this service to the same owner, to send it back. ``source`` (root only, with ``revises``): ``"human"`` when the user
+        asked for the rework, ``"relayed"`` (the default of a root rework) when it is root's own reading. The task carries ``service``,
+        ``contract`` and ``playbook`` (versions at this moment) in its frontmatter."""
         ...
 
     def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:

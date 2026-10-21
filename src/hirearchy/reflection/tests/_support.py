@@ -75,8 +75,8 @@ def revise(w: ReflectionWorld, content: str = STEPS, reason: str = "first", owne
 
 
 def rework(w: ReflectionWorld, task: Message, **kw: Any) -> Message:
-    """The client sends ``task`` back."""
-    return w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=task.id, **kw)
+    """The client sends ``task`` back (the user asked for it: ``source="human"``, unless ``kw`` says otherwise)."""
+    return w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=task.id, **{"source": "human", **kw})
 
 
 def read_inbox(w: ReflectionWorld, addr: str = "ceo") -> None:

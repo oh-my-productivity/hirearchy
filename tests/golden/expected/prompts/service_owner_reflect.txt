@@ -107,7 +107,7 @@ Client feedback for reflection only: it does not change this task's acceptance c
 Too long: cut to 600 words.
 
 ### task 20260115T090900000000-root-0003
-from: root | to: ceo | title: Brief on AI chips | revises: 20260115T090500000000-root-0000 | service: weekly-brief (contract v1, playbook v1) | budget: 6 runs
+from: root | to: ceo | title: Brief on AI chips | revises: 20260115T090500000000-root-0000 | service: weekly-brief (contract v1, playbook v1) | source: human | budget: 6 runs
 
 ## Goal
 Deliver the service `weekly-brief`: A one-page brief on the past week's news about a topic.

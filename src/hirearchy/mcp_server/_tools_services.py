@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from ..agents import AgentDirectory, CharterReader
 from ..budget import BudgetQuery
-from ..kernel import ROOT, Provider, parent
+from ..kernel import ROOT, Message, Provider, parent
 from ..reflection import ServiceReports
 from ..services import ServiceCatalog, ServiceCommands
 from ._ports import ServiceRoles, SetupMode, ToolGroup
@@ -98,6 +98,60 @@ class ServiceTools(ToolGroup):
                 add_acceptance=add_acceptance, remove_acceptance=remove_acceptance,
             )
 
+        if me == ROOT:  # only root records where a rework comes from: the agents' tool has no `source`
+            self._register_root_request(mcp, me)
+        else:
+            self._register_agent_request(mcp, me)
+
+        @mcp.tool()
+        def feedback(task_id: str, verdict: str, note: str = "") -> str:
+            """Tell the owner of a service whether a delivered request was good: verdict "accept" or "reject".
+
+        task_id: a service request (or rework) you sent that has a result. note: required for reject (what was wrong),
+        optional for accept. It costs no run and does not wake the owner; it shows up in the evidence the owner reviews
+        before its next request (and the moment a rejection arrives). Give it on your own judgement of each delivery,
+        also on a rework: every verdict stays in the case's history, the latest one is the final verdict, and an
+        earlier reject is still shown to the owner with your words. Feedback is for reflection only: it never waives an
+        acceptance criterion or changes the outcome of the request.
+        """
+            msg = self._commands().feedback(me, task_id, verdict, note)
+            return f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}); it does not wake {msg.to}"
+
+    def _requested(self, me: str, msg: Message, service: str, revises: str | None) -> str:
+        tail = "Call start() if the scheduler is not running." if me == ROOT else f"Your budget is now {self._budgets().budget(me)}."
+        total = self._reports().case_total(msg) if revises else ""
+        return (f"requested service `{service}` from {msg.to}: task {msg.id}, budget {msg.budget} "
+                f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}" + (f"\n{total}" if total else ""))
+
+    def _register_root_request(self, mcp: FastMCP, me: str) -> None:
+        @mcp.tool()
+        def request(
+            service: str,
+            inputs: dict | None = None,  # type: ignore[type-arg]
+            title: str = "",
+            note: str = "",
+            extra_acceptance: list[str] | None = None,
+            budget: int | None = None,
+            revises: str | None = None,
+            source: str | None = None,
+        ) -> str:
+            """Ask a direct report for one of its services (see `services`): a task built from the contract.
+
+        inputs: {input name: value}; required ones must be present. note: free text for the owner. extra_acceptance:
+        criteria added after the contract's (the contract's always apply). budget: runs handed down (default: the
+        contract's; the usual reserve rule applies). revises: id of an earlier request of this service to send back for
+        rework; the reply then states the case total (runs used by the whole chain, runs handed down, the contract's
+        budget per request) and tells you to inform the user when the case exceeds that budget.
+        source (with revises): "human" when the user asked for this rework
+        (a rework after their own rejection, carrying their corrections, is one), "relayed" (the default) when it is your
+        own reading; the owner sees which.
+        Returns the task id; the result comes back like any result, then rate it with `feedback`.
+        """
+            msg = self._commands().request(me, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance,
+                                           budget=budget, revises=revises, source=source)
+            return self._requested(me, msg, service, revises)
+
+    def _register_agent_request(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
         def request(
             service: str,
@@ -119,24 +173,7 @@ class ServiceTools(ToolGroup):
         """
             msg = self._commands().request(me, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance,
                                            budget=budget, revises=revises)
-            tail = "Call start() if the scheduler is not running." if me == ROOT else f"Your budget is now {self._budgets().budget(me)}."
-            total = self._reports().case_total(msg) if revises else ""
-            return (f"requested service `{service}` from {msg.to}: task {msg.id}, budget {msg.budget} "
-                    f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}" + (f"\n{total}" if total else ""))
-
-        @mcp.tool()
-        def feedback(task_id: str, verdict: str, note: str = "") -> str:
-            """Tell the owner of a service whether a delivered request was good: verdict "accept" or "reject".
-
-        task_id: a service request (or rework) you sent that has a result. note: required for reject (what was wrong),
-        optional for accept. It costs no run and does not wake the owner; it shows up in the evidence the owner reviews
-        before its next request (and the moment a rejection arrives). Give it on your own judgement of each delivery,
-        also on a rework: every verdict stays in the case's history, the latest one is the final verdict, and an
-        earlier reject is still shown to the owner with your words. Feedback is for reflection only: it never waives an
-        acceptance criterion or changes the outcome of the request.
-        """
-            msg = self._commands().feedback(me, task_id, verdict, note)
-            return f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}); it does not wake {msg.to}"
+            return self._requested(me, msg, service, revises)
 
     def _register_owner_tools(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()

@@ -663,9 +663,14 @@
      "name": "revises",
      "kind": "POSITIONAL_OR_KEYWORD",
      "default": "None"
+    },
+    {
+     "name": "source",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": "None"
     }
    ],
-   "annotated": "(self, actor: 'str', to: 'str', title: 'str', goal: 'str', acceptance: 'str', inputs: 'list[str] | None' = None, budget: 'int | None' = None, revises: 'str | None' = None) -> 'Message'"
+   "annotated": "(self, actor: 'str', to: 'str', title: 'str', goal: 'str', acceptance: 'str', inputs: 'list[str] | None' = None, budget: 'int | None' = None, revises: 'str | None' = None, source: 'str | None' = None) -> 'Message'"
   },
   "deliver": {
    "kind": "method",
@@ -1398,9 +1403,14 @@
      "name": "revises",
      "kind": "KEYWORD_ONLY",
      "default": "None"
+    },
+    {
+     "name": "source",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
     }
    ],
-   "annotated": "(self, actor: 'str', service: 'str', inputs: 'dict | None', *, title: 'str' = '', note: 'str' = '', extra_acceptance: 'list[str] | None' = None, budget: 'int | None' = None, revises: 'str | None' = None) -> 'Message'"
+   "annotated": "(self, actor: 'str', service: 'str', inputs: 'Mapping[str, object] | None', *, title: 'str' = '', note: 'str' = '', extra_acceptance: 'Sequence[str] | None' = None, budget: 'int | None' = None, revises: 'str | None' = None, source: 'str | None' = None) -> 'Message'"
   },
   "require": {
    "kind": "method",
@@ -1764,6 +1774,11 @@
      "default": "None"
     },
     {
+     "name": "source",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
      "name": "wake",
      "kind": "KEYWORD_ONLY",
      "default": "True"
@@ -1774,7 +1789,7 @@
      "default": "False"
     }
    ],
-   "annotated": "(self, actor: 'str', to: 'str', body: 'str', *, type: 'str' = 'note', title: 'str' = '', reply_to: 'str | None' = None, status: 'str | None' = None, budget: 'int' = 0, revises: 'str | None' = None, supersedes: 'str | None' = None, service: 'str | None' = None, contract: 'int | None' = None, playbook: 'int | None' = None, feedback: 'str | None' = None, wake: 'bool' = True, _skip_route_check: 'bool' = False) -> 'Message'"
+   "annotated": "(self, actor: 'str', to: 'str', body: 'str', *, type: 'str' = 'note', title: 'str' = '', reply_to: 'str | None' = None, status: 'str | None' = None, budget: 'int' = 0, revises: 'str | None' = None, supersedes: 'str | None' = None, service: 'str | None' = None, contract: 'int | None' = None, playbook: 'int | None' = None, feedback: 'str | None' = None, source: 'str | None' = None, wake: 'bool' = True, _skip_route_check: 'bool' = False) -> 'Message'"
   },
   "sent": {
    "kind": "method",

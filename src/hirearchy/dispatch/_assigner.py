@@ -50,7 +50,7 @@ class RuleTaskAssigner(TaskAssigner):
 
     def delegate(
         self, actor: str, to: str, title: str, goal: str, acceptance: str, inputs: Sequence[str] | None = None,
-        budget: int | None = None, revises: str | None = None,
+        budget: int | None = None, revises: str | None = None, source: str | None = None,
     ) -> Message:
         actor, to = self._agents.require(actor), self._agents.require(to)
         if actor != ROOT and parent(to) != actor:
@@ -69,5 +69,5 @@ class RuleTaskAssigner(TaskAssigner):
         fields = self._rework.fields_for(actor, revises) if revises else {}  # rework of a service request is still part of its case
         return self._sender.send(
             actor, to, body, type="task", title=title, budget=budget, revises=revises or None,
-            **_service_fields(fields),
+            source=source, **_service_fields(fields),
         )
