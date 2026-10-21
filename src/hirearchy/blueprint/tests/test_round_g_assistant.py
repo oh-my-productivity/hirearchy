@@ -102,8 +102,21 @@ def test_readme_documents_the_round_g_behaviours():
                    "case total against the per-request budget", "client-driven reworks no longer count against an agent's `low_quality` health",
                    "asks the user", "relative or vague values", "bare `plan for you` line"):
         assert phrase in section, phrase
-    assert len(README.split("## Services and reflection")[1].split("\n## Health")[0].splitlines()) < 90
+    # phase 0a documents source, criterion ids, the regression list and the evidence gate (the cap was 90)
+    assert len(README.split("## Services and reflection")[1].split("\n## Health")[0].splitlines()) < 98
     assert "end-of-block marker sit outside it" in flat(README)
+
+
+def test_readme_health_row_says_escapes_and_old_keys_are_unread():
+    health = README.split("\n## Health")[1].split("\n## ")[0]
+    row = flat(next(line for line in health.splitlines() if line.startswith("| `low_quality` |")))
+    for phrase in ("escapes / judged deliveries above the ratio", "the human client gave a verdict after it",
+                   "an *escape* when that verdict was a reject", "(`source: relayed`) are not judged",
+                   "the agent's re-checks after a fail and the author rework runs they cost",
+                   "`max_escape_ratio` (0.5)", "`min_judged_for_quality` (3)"):
+        assert phrase in row, phrase
+    assert "max_problem_ratio" not in row and "min_tasks_for_quality" not in row
+    assert "no rule reads them" in flat(health) and "an `org.md` that still sets them is not an error" in flat(health)
 
 
 @pytest.mark.parametrize("old", ["(show this to the user exactly as written)", "END OF PLAN FOR YOU"])

@@ -189,7 +189,7 @@ def test_the_readme_documents_services_and_reflection():
     section = text.split("## Services and reflection")[1].split("\n## Health")[0]
     for needle in (
         "**service**", "**Reflection**", "`SERVICE.md`", "`PLAYBOOK.md`", "history/", "never stored", "`define_service`",
-        "`revise_playbook(service, content, reason)`", "`request(service, inputs, ...)`", "`feedback(task_id, accept", "`report(..., lessons)`",
+        "`revise_playbook(service, content, reason, evidence)`", "`request(service, inputs, ...)`", "`feedback(task_id, accept", "`report(..., lessons)`",
         "hirearchy services", "define-service OWNER NAME", "retire-service OWNER NAME", "no MCP tool for it",
         "# Your services", "# Playbook: <service>", "# Reflect before you start: <service>", "byte-identical",
         "can never mean \"lowering the bar\"", "`playbook_max_words`", "`locked: true`", "quiet", "`services:`",
@@ -198,7 +198,23 @@ def test_the_readme_documents_services_and_reflection():
     ):
         assert needle in section, needle
     assert "`services`, `define-service`, `request`, `feedback`, `retire-service`" in text.split("## Use")[1].split("### Progress")[0]
-    assert len(section.splitlines()) < 90
+    # phase 0a documents source, criterion ids, the regression list and the evidence gate (the cap was 90)
+    assert len(section.splitlines()) < 98
+
+
+def test_readme_lists_every_msg_deliver_key_in_pipeline_order():
+    shapes = (ROOT_DIR / "tests" / "golden" / "expected" / "events" / "line_shapes.txt").read_text().splitlines()
+    block = shapes[shapes.index("msg.deliver:") + 1:]
+    keys = []
+    for line in block:
+        if not line.startswith("  "):
+            break
+        keys.append(line.split(":")[0].strip())
+    pipeline = keys[keys.index("id"):keys.index("trace_rule") + 1]  # after the envelope (v ... trace), up to the last key
+    row = next(line for line in README.read_text().splitlines() if line.startswith("| `msg.deliver` |"))
+    listed = re.findall(r"`([a-z_]+)`", row.split("(+")[0])
+    assert listed == pipeline
+    assert "`trace_candidates`" in row.split("(+")[1]
 
 
 def test_the_shipped_service_example_validates_plans_and_applies(tmp_path):

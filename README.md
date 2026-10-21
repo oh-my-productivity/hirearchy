@@ -26,7 +26,7 @@ org/                      # root = you, the human
 - Task state and budget are derived from the message files, never stored separately.
 - Budget is counted in runs and passes down the tree: a child gets only what its parent hands it, and each delegation keeps a reserve so the parent can process the result. It comes back up in two ways, both as one message that is charged to the sender and credited to the recipient (so nothing is minted or lost): with a final result, and by hand. When an agent reports `done` or `failed` and has no other open task, no task it reported `blocked` (that may be re-reported), no outstanding delegation and no mail waiting for a run, everything it has left travels up with the result to whoever assigned it (the result shows "returns N run(s)", and its own reports have already returned theirs, so it cascades up). `blocked` returns nothing. An agent can also give runs back early with `send(to=<parent>, body, budget=N)` (the reserve for its own delegations stays). A manager (or root) can also pull runs back with `reclaim(report, budget=None)`: from a DIRECT report that is idle (no open task, nothing delegated and outstanding, not running, no unread mail that would wake it), all of its unspent runs by default. It is one message too: a non-waking note titled "budget reclaimed by <actor>" from the report to the actor, written by the runtime on the report's behalf (in the report's `sent/`, so the arithmetic stays derived and the total conserved; the report is not woken). It is refused, with the reason, for a busy report, a report that is not a direct one (no cascade: a manager reclaims from its own team), nothing to reclaim or more than is available. Use it before asking for more budget when a team has stranded runs (`health` flags them as `stranded_budget`). Budget still goes nowhere else: down to direct reports, up to the parent. Results written before this existed carry no budget and mean what they always did. `delegate` without a `budget` hands down `min(default_budget, remaining - reserve)` (one run reserved per outstanding delegation plus one for the new one) and fails with the options if that is below 1.
 - Reviews follow the single-writer rule (rule 9 of the protocol in `ORG.md`): a reviewer or fact-checker never edits the author's file; it reports its findings and the changes it requires to whoever assigned the review, and the author applies them (`delegate(..., revises=<task id>)`). Acceptance criteria and charters must never require an agent to edit another agent's files. The protocol text is copied into `ORG.md` when an organization is created, so an existing organization keeps the text it was created with (the runtime rules above apply to it regardless). `hirearchy upgrade-rules [--dry-run]` rewrites the body of its `ORG.md` to the current text, keeping the frontmatter and the mission, and prints what changed (each agent sees the new rules from its next run).
-- Authority only narrows: a parent cannot grant tools, a workspace or inputs it doesn't have.
+- Authority only narrows: a parent cannot grant tools, a workspace or inputs it doesn't have, cannot grant can_hire (only root or an approved plan does), and cannot give a report a max_children above its own, at hire or by rewriting the report's charter; a report hired without can_hire gets max_children 0. Existing charters are not rewritten.
 - The write guard is the same on case-sensitive and case-insensitive filesystems (`agent.md`, `Memory.md` or a `RUNS` directory are refused, as are names that differ from an existing file only by case), and `AGENT.md` is created only by `hire`. `write` is confined to your own directory, `report` artifacts to the organization; `retire` takes a short name or full address and returns the team's unspent budget to the retired agent's parent as a runtime note (nothing when that parent is root). That note is non-waking (`wake: false`): it counts towards budget at once and lifts a budget pause, but does not start a run; it is held in the inbox, not counted as unread (scheduling, health), and delivered with the agent's next real batch.
 - Guards: hop limit (loops), max depth/children, out-of-budget pause with a parent notice, per-run timeout, one scheduler per org, and a git commit after every run. Also:
   - Stall ladder: checked every tick, per open task. If the assignee is idle (not running, no unread mail, not paused, not waiting on delegations) for `stall_after` seconds (default 600), it gets a reminder; each further `stall_after` the runtime tells the assigner, then each ancestor up to root, then stops. State is in `.runtime/nudges.json`.
@@ -214,8 +214,8 @@ and run logs like all state. `services` is a reserved name; plain `write` into i
 
 | who | tools |
 |---|---|
-| root, and an agent with reports or `can_hire` | `services`, `define_service` (contract of a direct report's service; on an existing one it is an amendment: pass only what changes, e.g. `add_acceptance=[...]` / `remove_acceptance=[...]`; the old contract is archived and the owner quietly told exactly what changed), `request(service, inputs, ...)`, `feedback(task_id, accept\|reject, note)` |
-| an agent that owns a service | `services`, `revise_playbook(service, content, reason)` |
+| root, and an agent with reports or `can_hire` | `services`, `define_service` (contract of a direct report's service; on an existing one it is an amendment: pass only what changes, e.g. `add_acceptance=[...]` / `remove_acceptance=[...]`; the old contract is archived and the owner quietly told exactly what changed), `request(service, inputs, ...)`, `feedback(task_id, accept\|reject, note)` (root also: `source`, `criterion`, `confirms`) |
+| an agent that owns a service | `services`, `revise_playbook(service, content, reason, evidence)` |
 | every agent | `report(..., lessons)`: required for `done`, `failed` and `blocked` on a service request |
 
 A request is a task built from the contract (inputs, its criteria plus any `extra_acceptance`, the deliverable, its budget), so every
@@ -223,15 +223,15 @@ rule of tasks applies: direct reports only, budget moves down, `done`/`failed` a
 
 CLI (as root): `hirearchy services`; `define-service OWNER NAME --description T --input 'topic*:what it is about' --acceptance T|@file
 --deliverable T [--format F --max-words N --path DIR] --budget N [--playbook @file] [--locked]`; to amend, pass only what changes: `define-service OWNER NAME --add-acceptance T [--remove-acceptance EXACT_TEXT]` (also `--no-locked`; `--acceptance` replaces all and excludes add/remove); `request SERVICE --input key=value
-[--title --note --budget --revises]`; `feedback TASK_ID accept|reject [--note]`; `retire-service OWNER NAME --reason T` (the only way to
-retire one: there is no MCP tool for it).
+[--title --note --budget --revises --source human|relayed]`; `feedback TASK_ID accept|reject [--note --source human|relayed --criterion ID
+--confirms VERDICT_ID]`; `retire-service OWNER NAME --reason T` (the only way to retire one: there is no MCP tool for it).
 
 **What the owner sees.** Only an agent that owns a service gets more in its prompt (everyone else's is byte-identical): `# Your services`
 (versions, requests so far, file paths) every run; `# Playbook: <service> (v<n>)` while it holds an open request for it; and, when the
 batch holds a NEW request and there is evidence since the playbook's last revision, `# Reflect before you start: <service>`: the cases with
 new evidence (state, runs used of budget, rework, the client's verdict and note, its own lessons), statistics per playbook version, and
 the steps: revise if a change would prevent what repeats or was rejected, restore an older version if the current one did worse, else leave it
-alone (`report` reply and ORG.md rule 10 carry the rest).
+alone (`report` reply and ORG.md rule 10 carry the rest). With them comes `# Regression list: <service>` (phase 0a, below).
 
 **Guardrails.** The contract belongs to the client; the playbook may only raise the bar (a lasting requirement from feedback goes to the
 parent, who adds it to the contract with `define_service`). A playbook is capped at `playbook_max_words` (default 1000), must differ from the
@@ -253,6 +253,15 @@ playbook must change; the client's feedback outranks the owner's own lessons. A 
 `progress` show the case total against the per-request budget; client-driven reworks no longer count against an agent's `low_quality` health. The skill asks the user (not the team) when a reviewer evidenced a PASS and only the reading of a criterion is in doubt, asks about
 relative or vague values ("before Friday") up front, says so when it adds a criterion unasked, asks before a rework passes the budget and states the case total at delivery. The plan block starts at a bare `PLAN FOR YOU` line; the show-verbatim instruction and a marker
 line sit outside it.
+
+**What org growth phase 0a changed.** Root's verdicts and reworks carry `source`: `human` (the user's own judgement, in their words) or
+`relayed` (the assistant's own reading; the default; notes written before count as `human`). Contract criteria have stable ids
+`C1, C2, ...` (by first appearance across `history/`; removing one never renumbers the others; a deleted history file shifts them), and
+the human client's rejections are the regression list `R1, R2, ...`, shown only in the owner's prompt and in `services` (a one-off stays
+listed, unchecked). `feedback` can name what a rejection is about (`criterion`, or later `confirms`). `revise_playbook` needs `evidence`:
+a revision is admitted only when one criterion or assertion failed in two cases the human client rejected, or when it cites a criterion
+the user added by an amendment; otherwise it is refused with the question for the client. The first playbook and restoring the client's
+version need none; an agent client's service keeps its playbook. `Org.revise_playbook` needs `evidence` too.
 
 **In a blueprint.** `services:` next to `agents:` (any of the four kinds: `blueprint_example(kind, service=True)`; a filled research one is
 [`examples/blueprint-service.yaml`](https://github.com/oh-my-productivity/hirearchy/blob/main/examples/blueprint-service.yaml)):
@@ -311,11 +320,13 @@ agent scheduled, and `whoami` lists it as re-reportable.
 | `stuck` | open task older than the limit, and the agent is not running, has no unread mail, and is not waiting on a delegation | `stuck_after_seconds` (1800) |
 | `out_of_budget` | budget <= 0 while it has unread mail or open tasks | - |
 | `paused` | paused for any reason (shown in the reason) | - |
-| `low_quality` | (failed + blocked + rework) / tasks received above the ratio, once enough tasks were received | `max_problem_ratio` (0.5), `min_tasks_for_quality` (3) |
+| `low_quality` | escapes / judged deliveries above the ratio, once enough were judged. A delivery the agent signed off (as the owner that reported `done`, or as the report whose `done` came last before it) is *judged* when the human client gave a verdict after it, and an *escape* when that verdict was a reject. Reworks the assistant started on its own (`source: relayed`) are not judged. The reason always shows the agent's re-checks after a FAIL and the author rework runs they cost. `failed`, `blocked` and rework no longer count, so an org without services (no client verdicts yet) never gets this flag. | `max_escape_ratio` (0.5), `min_judged_for_quality` (3) |
 | `expensive` | runs per completed task above the limit (needs a result), or too many runs since its last result while holding an open task; runs that failed or were woken only by runtime notes (stall reminders, reviews, refunds) are not counted, but `runs` and the budget still include them | `max_runs_per_task` (5), `max_runs_without_result` (6) |
 | `wasteful` | empty runs / runs used above the ratio, once enough runs were used | `max_empty_run_ratio` (0.5), `min_runs_for_waste` (4) |
 | `stranded_budget` | budget left but no open tasks, no delegations, no unread mail and no activity for longer than the limit; the runs belong with the parent (not raised for root's direct reports: root has no limit). Suggested action: ask the agent to return its budget (a `send` to its parent with `budget=N`), or retire it | `stranded_after_seconds` (1800) |
 | `idle` | no open tasks, no delegations, no unread mail and no activity for longer than the limit (measured from hiring if it never ran): a candidate to retire | `idle_after_seconds` (86400) |
+
+The keys `max_problem_ratio` and `min_tasks_for_quality` are gone; an `ORG.md` that still sets them is not an error, and no rule reads them.
 
 Branch totals (the agent plus its subtree) sum runs, open tasks, results and rework, and show the worst flag, in the
 order above (`stuck` is worst, `idle` mildest; `stranded_budget` sits just above `idle`). Override any threshold in the `ORG.md` frontmatter:
@@ -403,8 +414,8 @@ Everything is derived from **one append-only event log** written by the runtime 
 | `review.run`, `prune` | health review sent (`flagged`, `notes`); event-log days removed |
 | `tool.call` | every hirearchy tool, agents and root: `tool`, `ok`, `ms`, `error` (the refusal text), `error_type` (`OrgError` or the exception class), `args` (a summary, below) |
 | `cli.command` | `command`, `ok`, `ms`, `error` |
-| `msg.deliver` | every message: `id`, `type`, `from`, `to`, `title`, `status`, `budget`, `reply_to`, `revises`, `service`, `wake`, `hops`, `chars`, `trace_rule` (+ `trace_candidates` when ambiguous) |
-| `agent.hire` / `agent.retire`, `service.define` / `service.revise` / `service.retire` | who, what, returned budget |
+| `msg.deliver` | every message: `id`, `type`, `from`, `to`, `title`, `status`, `budget`, `reply_to`, `revises`, `supersedes`, `service`, `feedback`, `source`, `criterion`, `wake`, `hops`, `chars`, `trace_rule` (+ `trace_candidates` when ambiguous) |
+| `agent.hire` / `agent.retire`, `service.define` / `service.revise` / `service.retire` | who, what, returned budget; `service.revise` also `admitted` |
 
 **Never recorded:** message bodies, file contents, environment values, secrets. `tool.call` `args` keeps ids, addresses, clipped titles (80 characters), status, budget, paths, service names, verdicts and numbers; long text fields only as their length (`"summary_chars": 1234`); unset arguments are omitted. Errors are clipped to 500 characters. **Out of scope:** the provider is a black box. We observe a run's boundaries (start, end, exit, duration, batch) and every hirearchy tool call it makes, never kiro's internals (tokens, built-in tool calls, model reasoning). There are no exporters, dashboards, sampling or alerting; the field names are OTel-friendly so a file exporter can be added later as a pure function over the events.
 
