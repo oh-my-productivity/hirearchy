@@ -1,0 +1,60 @@
+"""Contract of ``ServiceEvidence``: what the history of a service proves, for the ids a client's verdict may name and for a playbook revision.
+
+Every implementation is built over an organization where ``ceo`` offers ``weekly-brief`` with two criteria (``C1``, ``C2``) and no case yet. What the
+callers rely on: an exempt ``admit`` only resolves the ids and returns the exemption; any other ``admit`` returns rule ``b`` or ``c`` or raises an
+``OrgError`` (never anything else); the ids come back normalized."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from hirearchy.kernel import OrgError
+from hirearchy.services import Admission, ServiceEvidence
+from hirearchy.services.testing import IMPLEMENTATIONS
+
+from ._support import implementations
+
+OWNER, SERVICE = "ceo", "weekly-brief"
+
+
+@pytest.fixture(params=implementations(IMPLEMENTATIONS[ServiceEvidence]))
+def evidence(request: pytest.FixtureRequest, tmp_path: Path) -> ServiceEvidence:
+    made = request.param(tmp_path)
+    assert isinstance(made, ServiceEvidence)
+    return made
+
+
+@pytest.mark.parametrize("exempt", ["first", "restore"])
+def test_an_exempt_admit_returns_the_exemption_with_normalized_ids(evidence: ServiceEvidence, exempt: str) -> None:
+    got = evidence.admit(OWNER, SERVICE, [" c1 ", "C2", "c1"], "why", exempt=exempt)
+    assert isinstance(got, Admission) and (got.rule, got.evidence) == (exempt, ("C1", "C2"))
+
+
+@pytest.mark.parametrize("exempt", ["first", "restore"])
+def test_an_exempt_admit_with_no_evidence_returns_the_exemption(evidence: ServiceEvidence, exempt: str) -> None:
+    got = evidence.admit(OWNER, SERVICE, [], "why", exempt=exempt)
+    assert (got.rule, got.evidence) == (exempt, ())
+
+
+def test_admit_returns_rule_b_or_c_or_raises_an_org_error(evidence: ServiceEvidence) -> None:
+    try:
+        got = evidence.admit(OWNER, SERVICE, ["c1"], "why")
+    except OrgError as refusal:
+        assert str(refusal)
+    else:
+        assert isinstance(got, Admission) and got.rule in ("b", "c") and got.evidence == ("C1",) and got.detail
+
+
+def test_links_returns_normalized_ids_or_raises(evidence: ServiceEvidence) -> None:
+    try:
+        got = evidence.links(OWNER, SERVICE, ["c2", "C1", "c2"])
+    except OrgError as refusal:
+        assert str(refusal)
+    else:
+        assert got == ("C2", "C1")
+
+
+def test_links_accepts_none_alone(evidence: ServiceEvidence) -> None:
+    assert evidence.links(OWNER, SERVICE, ["None"], verdict="20260101T000000000001-root-0001") == ("none",)

@@ -26,26 +26,34 @@ from datetime import datetime
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from ..kernel import ROOT, JsonObject, Message
+from ..kernel import ROOT, JsonObject, Message, OrgError
 from ._cap import playbook_word_cap
 
 __all__ = [
+    "Admission",
     "Contract",
     "ContractNormalizer",
     "Criterion",
     "DELIVERABLE_KEYS",
     "DESCRIPTION_MAX",
+    "EVIDENCE_ID_MAX",
+    "EVIDENCE_MAX",
     "FEEDBACK_HEADER",
     "FEEDBACK_MAX",
     "INPUT_RE",
+    "LINKS_MAX",
+    "LINK_HEADER",
     "Playbook",
     "REASON_MAX",
     "ServiceCatalog",
     "ServiceCommands",
+    "ServiceEvidence",
     "ServiceHints",
     "ServiceStore",
     "VERDICTS",
     "criteria_of",
+    "normalize_evidence",
+    "normalize_links",
     "number_criteria",
     "playbook_word_cap",
 ]
@@ -60,6 +68,24 @@ FEEDBACK_HEADER = (
     "Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; "
     "report `done` only if every criterion is met."
 )
+LINK_HEADER = (
+    "The client says what their rejection {confirms} was about, for reflection only: it does not change any task's acceptance criteria or outcome."
+)
+EVIDENCE_MAX = 20  # ids a playbook revision may cite
+EVIDENCE_ID_MAX = 80  # characters of one cited id
+LINKS_MAX = 5  # ids one rejection may name as what it is about
+_REF_RE = re.compile(r"[cr]\d+\Z", re.IGNORECASE)  # C<k> and R<k>, in either case
+_LINK_RE = re.compile(r"[CR]\d+\Z")
+_EVIDENCE_ERROR = (
+    f"evidence is a list of at most {EVIDENCE_MAX} ids, each 1-{EVIDENCE_ID_MAX} characters without spaces: the regression assertions (R<k>), "
+    "criteria (C<k>), verdict ids and case ids this revision rests on (see the regression list and the digest in your prompt). Pass [] only for "
+    "the first playbook, or to restore unchanged a version your parent wrote."
+)
+_LINKS_ERROR = (
+    f"criterion is 1-{LINKS_MAX} ids: C<k> (a criterion of the contract, see `services`), R<k> (an earlier rejection this one repeats) or none "
+    '(the client said there is no lasting rule), e.g. ["C6"]. Not understood: {items}'
+)
+_NONE_ALONE = "none stands alone: it records that the client said this rejection is no lasting rule."
 
 
 @dataclass
@@ -116,6 +142,47 @@ def criteria_of(numbered: Sequence[Criterion], texts: Sequence[str]) -> list[Cri
     """The criteria with these texts, in the order of ``texts`` (a contract's acceptance list); a text ``numbered`` lacks is skipped."""
     by_text = {c.text: c for c in numbered}
     return [by_text[t] for t in texts if t in by_text]
+
+
+def normalize_evidence(ids: object) -> tuple[str, ...]:
+    """The ids a playbook revision cites, in their fixed form: each stripped, blanks and duplicates dropped, ``c<k>``/``r<k>`` upper-cased.
+
+    A list (or tuple) of at most ``EVIDENCE_MAX`` strings, each of at most ``EVIDENCE_ID_MAX`` characters without whitespace; anything else is
+    an ``OrgError`` (P1)."""
+    if not isinstance(ids, (list, tuple)) or len(ids) > EVIDENCE_MAX or not all(isinstance(x, str) for x in ids):
+        raise OrgError(_EVIDENCE_ERROR)
+    out: list[str] = []
+    for raw in ids:
+        x = raw.strip()
+        if len(x) > EVIDENCE_ID_MAX or any(c.isspace() for c in x):
+            raise OrgError(_EVIDENCE_ERROR)
+        if x:
+            x = x.upper() if _REF_RE.match(x) else x
+            if x not in out:
+                out.append(x)
+    return tuple(out)
+
+
+def normalize_links(ids: object) -> tuple[str, ...]:
+    """What a rejection says it is about, in its fixed form: each id stripped, ``c<k>``/``r<k>`` upper-cased, ``none`` lower-cased, blanks and
+    duplicates dropped; nothing (None, an empty list) gives ``()``. The shape checks only (whether the ids exist is ``ServiceEvidence.links``'):
+    more than ``LINKS_MAX`` ids, or one that is none of ``C<k>``, ``R<k>``, ``none`` is an ``OrgError`` (F3); ``none`` with another id (F4)."""
+    if ids is None:
+        return ()
+    if not isinstance(ids, (list, tuple)):
+        raise OrgError(_LINKS_ERROR.format(items=ids))
+    out: list[str] = []
+    for raw in ids:
+        x = str(raw).strip()
+        x = "none" if x.lower() == "none" else x.upper() if _REF_RE.match(x) else x
+        if x and x not in out:
+            out.append(x)
+    unknown = [x for x in out if x != "none" and not _LINK_RE.match(x)]
+    if unknown or len(out) > LINKS_MAX:
+        raise OrgError(_LINKS_ERROR.format(items=", ".join(unknown or out[LINKS_MAX:])))
+    if "none" in out and len(out) > 1:
+        raise OrgError(_NONE_ALONE)
+    return tuple(out)
 
 
 @dataclass
@@ -259,6 +326,30 @@ class ServiceCommands(Protocol):
         ``reject``; a rejection needs a ``note`` saying what was wrong. The owner sees it with its next batch and in the reflection digest. Every
         verdict stays in the case's history: the latest one is the final verdict of the statistics, and an earlier ``reject`` is still shown
         (and counted as "after a reject")."""
+        ...
+
+
+@dataclass(frozen=True)
+class Admission:
+    """Why a playbook revision may be written."""
+
+    rule: str  # "b" | "c" | "first" | "restore"
+    evidence: tuple[str, ...]  # the normalized ids cited
+    detail: str  # one line for the client's note, e.g. "C6 failed in 2 cases the client rejected: <id>, <id>"
+
+
+@runtime_checkable
+class ServiceEvidence(Protocol):
+    """What the history of a service proves: the ids a client's verdict may name, and whether a playbook revision is admitted."""
+
+    def links(self, owner: str, service: str, ids: Sequence[str], *, verdict: str | None = None) -> tuple[str, ...]:
+        """``ids`` (normalized: ``normalize_links``) if each is a criterion the contract has had (C<k>), an existing regression assertion (R<k>,
+        not the rejection ``verdict`` itself) or ``none``; ``OrgError`` naming the unknown ones and listing the valid ones otherwise."""
+        ...
+
+    def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None) -> Admission:
+        """Judge a revision of ``owner``'s playbook by rules (b) and (c) of the evidence gate; ``exempt`` ("first", "restore"): only resolve
+        the ids and return the exemption. ``OrgError`` with the client question when it is refused, or naming unknown ids."""
         ...
 
 

@@ -17,7 +17,7 @@ from ..dispatch import ReworkContext
 from ..dispatch.testing import MEMORY_ROOT, DispatchWorld, PostedDelivery
 from ..dispatch.testing import fs_world as dispatch_fs_world
 from ..dispatch.testing import memory_world as dispatch_memory_world
-from ..kernel import ROOT, JsonObject, OrgPaths, join_frontmatter, norm, split_frontmatter
+from ..kernel import ROOT, JsonObject, OrgError, OrgPaths, join_frontmatter, norm, split_frontmatter
 from ..kernel.testing import ListEventSink, fs_atomic_writer
 from ._amend import ContractAmender
 from ._catalog import ContractServiceCatalog
@@ -35,7 +35,17 @@ from ._retire import RuleServiceRetirement
 from ._rework import ServiceReworkContext
 from ._store import FsServiceStore
 from ._texts import CappedPlaybookTexts, DirectReportOwners, EventedPlaybookWriter
-from .api import ContractNormalizer, ServiceCatalog, ServiceCommands, ServiceHints, ServiceStore
+from .api import (
+    Admission,
+    ContractNormalizer,
+    ServiceCatalog,
+    ServiceCommands,
+    ServiceEvidence,
+    ServiceHints,
+    ServiceStore,
+    normalize_evidence,
+    normalize_links,
+)
 
 # ------------------------------------------------------------------------------ the fake store
 
@@ -102,6 +112,33 @@ class MemoryServiceStore(ServiceStore):
         return split_frontmatter(self.files[path]) if path in self.files else None
 
 
+# ------------------------------------------------------------------------------ the stand-ins for the evidence gate
+
+
+class AdmittingServiceEvidence(ServiceEvidence):
+    """The gate that lets everything through: admits every revision by rule ``b`` and accepts every link (the ids normalized). The default of the
+    worlds: the tests of the commands that call the gate do not need its judgement, ``reflection`` has the real one."""
+
+    def links(self, owner: str, service: str, ids: Sequence[str], *, verdict: str | None = None) -> tuple[str, ...]:
+        return normalize_links(list(ids))
+
+    def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None) -> Admission:
+        ids = normalize_evidence(list(evidence))
+        return Admission(exempt, ids, "no evidence needed") if exempt else Admission("b", ids, "admitted by the stand-in for the gate")
+
+
+class RefusingServiceEvidence(AdmittingServiceEvidence):
+    """The gate that refuses every revision that is not exempt, with the text it was given (the links as the admitting one)."""
+
+    def __init__(self, text: str = "refused by the stand-in for the gate") -> None:
+        self._text = text
+
+    def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None) -> Admission:
+        if exempt:
+            return super().admit(owner, service, evidence, reason, exempt=exempt)
+        raise OrgError(self._text)
+
+
 # ------------------------------------------------------------------------------ the worlds
 
 
@@ -123,6 +160,7 @@ class ServicesWorld:
     catalog: ServiceCatalog
     store: ServiceStore
     hints: ServiceHints
+    evidence: ServiceEvidence  # the gate the commands that need one are built with (the admitting stand-in unless the test chose another)
     normalizer: ContractNormalizer
     rework: ReworkContext
     places: ServicePlaces
@@ -165,7 +203,7 @@ def memory_store(tmp_path: Path) -> StoreHarness:
     return StoreHarness(store, places, text, rels)
 
 
-def _world(d: DispatchWorld, harness: StoreHarness) -> ServicesWorld:
+def _world(d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | None = None) -> ServicesWorld:
     places, store = harness.places, harness.store
     events, delivery = ListEventSink(), PostedDelivery(d.post)
     normalizer = TextContractNormalizer()
@@ -180,17 +218,18 @@ def _world(d: DispatchWorld, harness: StoreHarness) -> ServicesWorld:
         RuleClientFeedback(d.agents, d.mail, d.sender),
     )
     return ServicesWorld(
-        commands=commands, catalog=catalog, store=store, hints=ServiceReportHints(catalog), normalizer=normalizer,
+        commands=commands, catalog=catalog, store=store, hints=ServiceReportHints(catalog), evidence=evidence or AdmittingServiceEvidence(),
+        normalizer=normalizer,
         rework=ServiceReworkContext(d.mail, d.agents, catalog), places=places, d=d, events=events, text=harness.text, rels=harness.rels,
     )
 
 
-def fs_world(tmp_path: Path) -> ServicesWorld:
-    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path))
+def fs_world(tmp_path: Path, evidence: ServiceEvidence | None = None) -> ServicesWorld:
+    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path), evidence)
 
 
-def memory_world(tmp_path: Path) -> ServicesWorld:
-    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path))
+def memory_world(tmp_path: Path, evidence: ServiceEvidence | None = None) -> ServicesWorld:
+    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence)
 
 
 def fs_rework(tmp_path: Path) -> ReworkContext:
@@ -203,6 +242,14 @@ def memory_rework(tmp_path: Path) -> ReworkContext:
 
 def normalizer(tmp_path: Path) -> ContractNormalizer:
     return TextContractNormalizer()
+
+
+def admitting_evidence(tmp_path: Path) -> ServiceEvidence:
+    return AdmittingServiceEvidence()
+
+
+def refusing_evidence(tmp_path: Path) -> ServiceEvidence:
+    return RefusingServiceEvidence()
 
 
 def hints_fs(tmp_path: Path) -> ServiceHints:
@@ -222,4 +269,5 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     ServiceHints: [hints_fs, hints_memory],
     ContractNormalizer: [normalizer],
     ReworkContext: [fs_rework, memory_rework],
+    ServiceEvidence: [admitting_evidence, refusing_evidence],
 }
