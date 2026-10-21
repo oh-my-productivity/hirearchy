@@ -133,7 +133,7 @@ The same flow works without an assistant: `hirearchy plan bp.yaml` (exit status 
 `hirearchy run`, `hirearchy progress`.
 
 The blueprint (YAML or JSON; `blueprint_example(kind)` returns a commented template, a longer one is in
-[`examples/blueprint-research.yaml`](examples/blueprint-research.yaml)):
+[`examples/blueprint-research.yaml`](https://github.com/achieveramin/hirearchy/blob/main/examples/blueprint-research.yaml)):
 
 ```yaml
 mission: ...                          # what the organization is for
@@ -255,7 +255,7 @@ relative or vague values ("before Friday") up front, says so when it adds a crit
 line sit outside it.
 
 **In a blueprint.** `services:` next to `agents:` (any of the four kinds: `blueprint_example(kind, service=True)`; a filled research one is
-[`examples/blueprint-service.yaml`](examples/blueprint-service.yaml)):
+[`examples/blueprint-service.yaml`](https://github.com/achieveramin/hirearchy/blob/main/examples/blueprint-service.yaml)):
 
 ```yaml
 services:
@@ -743,7 +743,7 @@ The rules, and what enforces them (all run by `scripts/check.sh`):
 * a Protocol has at most 8 methods, has a contract suite, and one writer owns each file and ledger (`tests/architecture`);
 * behaviour, text and formats are frozen by the golden suite (`tests/golden`).
 
-[ARCHITECTURE.md](ARCHITECTURE.md) has the package map, every interface, the dependency graph and, at the top, what was built and how it differs from the plan.
+[ARCHITECTURE.md](https://github.com/achieveramin/hirearchy/blob/main/ARCHITECTURE.md) has the package map, every interface, the dependency graph and, at the top, what was built and how it differs from the plan.
 
 ## Test
 

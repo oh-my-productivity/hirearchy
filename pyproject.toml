@@ -7,11 +7,25 @@ authors = [
     { name = "Amin Alizadeh", email = "achieveramin@gmail.com" }
 ]
 requires-python = ">=3.11"
+keywords = ["agents", "mcp", "llm", "orchestration", "kiro"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development",
+]
 dependencies = [
     "mcp==1.30.0",
     "pyyaml==6.0.2",
     "textual==8.2.8",
 ]
+
+[project.urls]
+Homepage = "https://github.com/achieveramin/hirearchy"
+Repository = "https://github.com/achieveramin/hirearchy"
+Issues = "https://github.com/achieveramin/hirearchy/issues"
 
 [project.scripts]
 hirearchy = "hirearchy:main"
@@ -26,6 +40,12 @@ dev = [
     "mypy==2.4.0",
     "pytest==8.*",
 ]
+
+[tool.hatch.build.targets.sdist]
+# The source distribution carries what is needed to build and test the package; the recorded studies, the brand assets and the
+# research notes stay in the repository.
+include = ["/src", "/skills", "/tests", "/scripts", "/conftest.py", "/README.md", "/ARCHITECTURE.md", "/pyproject.toml"]
+exclude = ["**/__pycache__", "**/*.pyc"]
 
 [tool.hatch.build.targets.wheel]
 # Colocated tests (src/hirearchy/**/tests/) are development files: never shipped.
