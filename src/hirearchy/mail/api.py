@@ -8,6 +8,7 @@ a message file into a ``Message`` (and remembers the parse).
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol, runtime_checkable
@@ -24,6 +25,7 @@ __all__ = [
     "MetaRead",
     "MessageParser",
     "TaskQuery",
+    "moved_past",
 ]
 
 
@@ -41,6 +43,28 @@ class MessageFile:
     error: str | None  # why ``meta`` is unusable, None for a well-formed message
     id: str  # the ``id`` of the front matter, else the file name without ``.md``
     mtime: float  # modification time in epoch seconds (0.0 when the file could not be read)
+
+
+def moved_past(task: Message, blocked: Message, received: Sequence[Message]) -> bool:
+    """Has the assigner of ``task`` moved past it? ``blocked``: its latest result (``blocked``); ``received``: what its assignee received (pure).
+
+    Yes when a later task from the same sender revises ``task``, or revises what ``task`` revised (a second rework of the same delivery), or when
+    the sender gave a verdict (a note with ``feedback``) on any task of its chain after ``blocked``. The chain is the tasks received from the
+    sender that are connected to ``task`` through ``revises``, in both directions."""
+    mine = [t for t in received if t.type == "task" and t.sender == task.sender]
+    chain = {task.id}
+    grown = True
+    while grown:
+        more = {t.id for t in mine if t.revises in chain} | {t.revises for t in mine if t.id in chain and t.revises}
+        grown = not more <= chain
+        chain |= more
+    later = any(
+        t.id > task.id and (t.revises == task.id or (task.revises is not None and t.revises == task.revises)) for t in mine
+    )
+    verdict = any(
+        m.type == "note" and m.feedback and m.sender == task.sender and m.reply_to in chain and m.id > blocked.id for m in received
+    )
+    return later or verdict
 
 
 @runtime_checkable
