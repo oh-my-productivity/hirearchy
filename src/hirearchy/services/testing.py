@@ -205,6 +205,7 @@ def memory_store(tmp_path: Path) -> StoreHarness:
 
 def _world(d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | None = None) -> ServicesWorld:
     places, store = harness.places, harness.store
+    gate = evidence or AdmittingServiceEvidence()
     events, delivery = ListEventSink(), PostedDelivery(d.post)
     normalizer = TextContractNormalizer()
     catalog = ContractServiceCatalog(store, d.agents, places)
@@ -215,10 +216,10 @@ def _world(d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | 
         RuleServiceRetirement(d.agents, catalog, store, owners, delivery, d.clock, events),
         RulePlaybookReviser(d.agents, catalog, texts, playbooks, delivery),
         RuleServiceRequester(d.agents, catalog, d.mail, TextRequestBodies(), d.sender),
-        RuleClientFeedback(d.agents, d.mail, d.sender),
+        RuleClientFeedback(d.agents, d.mail, d.sender, gate),
     )
     return ServicesWorld(
-        commands=commands, catalog=catalog, store=store, hints=ServiceReportHints(catalog), evidence=evidence or AdmittingServiceEvidence(),
+        commands=commands, catalog=catalog, store=store, hints=ServiceReportHints(catalog), evidence=gate,
         normalizer=normalizer,
         rework=ServiceReworkContext(d.mail, d.agents, catalog), places=places, d=d, events=events, text=harness.text, rels=harness.rels,
     )

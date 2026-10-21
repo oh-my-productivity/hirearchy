@@ -103,6 +103,46 @@ class ServiceTools(ToolGroup):
         else:
             self._register_agent_request(mcp, me)
 
+        if me == ROOT:  # only root records where a verdict comes from and what it is about: the agents' tool has neither
+            self._register_root_feedback(mcp, me)
+        else:
+            self._register_agent_feedback(mcp, me)
+
+    def _register_root_feedback(self, mcp: FastMCP, me: str) -> None:
+        @mcp.tool()
+        def feedback(
+            task_id: str,
+            verdict: str,
+            note: str = "",
+            source: str = "relayed",
+            criterion: list[str] | None = None,
+            confirms: str | None = None,
+        ) -> str:
+            """Tell the owner of a service whether a delivered request was good: verdict "accept" or "reject".
+
+        task_id: a service request (or rework) you sent that has a result. note: required for reject (what was wrong),
+        optional for accept: the user's own words, verbatim. It costs no run and does not wake the owner; it shows up in
+        the evidence the owner reviews before its next request (and the moment a rejection arrives). Give it on the user's
+        own judgement of each delivery, also on a rework: every verdict stays in the case's history, the latest one is the
+        final verdict, and an earlier reject is still shown to the owner with your words. source: "human" only when the
+        verdict is the user's own judgement and note holds their words; "relayed" (the default) for anything you concluded
+        yourself: it is shown to the owner but weighs nothing when it revises its playbook. criterion (reject only): what
+        the rejection is about, as ids: "C<k>" (a contract criterion, see `services`), "R<k>" (an earlier rejection it
+        repeats) or "none" (no lasting rule); with source "human" only when the user named it or said yes to your
+        question naming it. confirms: when that yes comes after you recorded the rejection, call again with the same
+        task_id, verdict "reject", confirms=<the rejection's message id>, criterion, and the user's answer verbatim as
+        note: it records the link, not a new verdict. Feedback is for reflection only: it never waives an acceptance
+        criterion or changes the outcome of the request.
+        """
+            msg = self._commands().feedback(me, task_id, verdict, note, source=source, criterion=criterion, confirms=confirms)
+            if confirms is not None:
+                return (f"recorded: rejection {confirms} is about {msg.criterion} (source {msg.source}; message {msg.id}); "
+                        f"it does not wake {msg.to}")
+            about = f", about {msg.criterion}" if msg.criterion else ""
+            return (f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}, source {msg.source}{about}); "
+                    f"it does not wake {msg.to}")
+
+    def _register_agent_feedback(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
         def feedback(task_id: str, verdict: str, note: str = "") -> str:
             """Tell the owner of a service whether a delivered request was good: verdict "accept" or "reject".

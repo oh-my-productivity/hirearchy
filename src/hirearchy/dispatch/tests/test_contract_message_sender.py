@@ -3,12 +3,14 @@ recording fake deliver alike.
 
 What the callers rely on: ``send`` returns the message it delivered, completed; the addresses are normalized, the body and the title are stripped; every
 field it is given is on the delivered message; the human's messages start a chain (0 hops); a message the route check is skipped for still arrives;
-only root records where a rework comes from (``source``), and a rework from root without one is stamped ``relayed``.
+only root records where a rework, a verdict or a link comes from (``source``) and what a verdict is about (``criterion``, only on a verdict note or a
+link note); a rework, a verdict note and a link note from root without a ``source`` are stamped ``relayed``.
 (The other refusals are the rules of the checking sender: ``test_rule_message_sender``.)"""
 
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -122,3 +124,58 @@ def test_a_fresh_root_task_is_not_stamped(w: DispatchWorld) -> None:
 def test_an_agent_rework_is_never_stamped(w: DispatchWorld) -> None:
     msg = w.sender.send("ceo", "ceo/eng", "again, please", type="task", revises=EARLIER)
     assert msg.source is None
+
+
+# ------------------------------------------------------------------------------ provenance: what a verdict is about
+
+S3 = ("criterion goes only on a verdict (a note with `feedback`) or on a link note that replies to one: use `feedback(..., criterion=...)`.")
+
+
+def test_an_agent_cannot_set_criterion(w: DispatchWorld) -> None:
+    given: list[dict[str, Any]] = [
+        {"criterion": "C1"}, {"criterion": "C1", "feedback": "reject", "reply_to": EARLIER}, {"criterion": "none", "reply_to": EARLIER},
+    ]
+    for kw in given:
+        with pytest.raises(OrgError) as e:
+            w.sender.send("ceo", "root", "hello", **kw)
+        assert str(e.value) == S1
+    assert w.inbox("root") == []
+
+
+def test_criterion_on_a_task_or_a_plain_note_is_s3(w: DispatchWorld) -> None:
+    plain: list[dict[str, Any]] = [
+        {"type": "task"}, {"type": "task", "revises": EARLIER}, {"type": "note"}, {"type": "note", "reply_to": None},
+        {"type": "result", "reply_to": EARLIER}, {"type": "note", "status": "done"},
+    ]
+    for kw in plain:
+        with pytest.raises(OrgError) as e:
+            w.sender.send("root", "ceo", "hello", criterion="C1", skip_route_check=True, **kw)
+        assert str(e.value) == S3
+    assert w.inbox("ceo") == []
+
+
+def test_a_root_verdict_note_without_source_is_relayed(w: DispatchWorld) -> None:
+    reject = w.sender.send("root", "ceo", "too long", feedback="reject", reply_to=EARLIER)
+    accept = w.sender.send("root", "ceo", "fine", feedback="accept", reply_to=EARLIER)
+    assert (reject.source, accept.source) == ("relayed", "relayed")
+    assert [m.source for m in w.inbox("ceo")] == ["relayed", "relayed"]
+
+
+def test_a_root_link_note_without_source_is_relayed(w: DispatchWorld) -> None:
+    link = w.sender.send("root", "ceo", "yes, lasting", reply_to=EARLIER, criterion="C2")
+    assert (link.source, link.criterion, link.feedback) == ("relayed", "C2", None)
+    assert [(m.source, m.criterion) for m in w.inbox("ceo")] == [("relayed", "C2")]
+
+
+def test_an_explicit_human_verdict_is_kept(w: DispatchWorld) -> None:
+    verdict = w.sender.send("root", "ceo", "too long", feedback="reject", reply_to=EARLIER, source="human", criterion="C1, R2")
+    link = w.sender.send("root", "ceo", "yes", reply_to=EARLIER, source="human", criterion="none")
+    assert (verdict.source, verdict.criterion, link.source, link.criterion) == ("human", "C1, R2", "human", "none")
+    assert [(m.source, m.criterion) for m in w.inbox("ceo")] == [("human", "C1, R2"), ("human", "none")]
+
+
+def test_a_verdict_without_criterion_carries_none_and_a_plain_note_stays_unstamped(w: DispatchWorld) -> None:
+    verdict = w.sender.send("root", "ceo", "fine", feedback="accept", reply_to=EARLIER, source="relayed")
+    assert (verdict.source, verdict.criterion) == ("relayed", None)
+    note = w.sender.send("root", "ceo", "just a note", reply_to=EARLIER)  # no feedback, no criterion: not a link
+    assert (note.source, note.criterion) == (None, None)

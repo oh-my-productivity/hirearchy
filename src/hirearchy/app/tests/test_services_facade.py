@@ -44,8 +44,9 @@ def test_a_service_is_defined_requested_answered_rated_revised_and_retired(org: 
     org.begin_run("ceo")
     org.start_run_log("ceo")
     org.report("ceo", task.id, "done", "Delivered.", lessons="Worked.")
-    note = org.feedback("root", task.id, "reject", "Too long.")
-    assert (note.type, note.wake, note.feedback, note.reply_to) == ("note", False, "reject", task.id)
+    note = org.feedback("root", task.id, "reject", "Too long.", source="human")
+    assert (note.type, note.wake, note.feedback, note.reply_to, note.source) == ("note", False, "reject", task.id, "human")
+    assert org.feedback("root", task.id, "accept").source == "relayed"  # a root verdict is the user's own only when it says so
     assert org.revise_playbook("ceo", "weekly-brief", "1. Search.\n2. Write.", "after the rejection") == 1
     assert org.retire_service("root", "ceo", "weekly-brief", "done with it").startswith("retired service `weekly-brief` of ceo; files kept at ")
     assert org.service_names("ceo") == []
@@ -116,8 +117,8 @@ class Commands(ServiceCommands):
         self.calls.append(("revise_playbook", (actor, service, content, reason), {}))
         return 7
 
-    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
-        self.calls.append(("feedback", (actor, task_id, verdict, note), {}))
+    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "", **kw: Any) -> Message:
+        self.calls.append(("feedback", (actor, task_id, verdict, note), kw))
         return Message(sender=actor, to="ceo", type="note", body="b", id="RATED")
 
 
@@ -150,11 +151,13 @@ def test_the_other_commands_come_from_the_commands_of_the_runtime(org: Org) -> N
     assert org.request("root", "x", None).id == "REQUESTED"
     assert org.revise_playbook("ceo", "x", "content", "reason") == 7
     assert org.feedback("root", "T1", "reject", "words").id == "RATED" and org.feedback("root", "T1", "accept").id == "RATED"
+    assert org.feedback("root", "T1", "reject", "yes", source="human", criterion=["C1"], confirms="M1").id == "RATED"
     assert fake.calls == [
         ("retire_service", ("root", "ceo", "x", "why"), {}),
         ("request", ("root", "x", {"topic": "ai"}), {"title": "T", "note": "N", "extra_acceptance": ["e"], "budget": 3, "revises": "R", "source": "human"}),
         ("request", ("root", "x", None), {"title": "", "note": "", "extra_acceptance": None, "budget": None, "revises": None, "source": None}),
         ("revise_playbook", ("ceo", "x", "content", "reason"), {}),
-        ("feedback", ("root", "T1", "reject", "words"), {}),
-        ("feedback", ("root", "T1", "accept", ""), {}),
+        ("feedback", ("root", "T1", "reject", "words"), {"source": None, "criterion": None, "confirms": None}),
+        ("feedback", ("root", "T1", "accept", ""), {"source": None, "criterion": None, "confirms": None}),
+        ("feedback", ("root", "T1", "reject", "yes"), {"source": "human", "criterion": ["C1"], "confirms": "M1"}),
     ]

@@ -80,12 +80,12 @@ class Sender(MessageSender):
     def send(
         self, actor: str, to: str, body: str, *, type: str = "note", title: str = "", reply_to: str | None = None, status: str | None = None,
         budget: int = 0, revises: str | None = None, supersedes: str | None = None, service: str | None = None, contract: int | None = None,
-        playbook: int | None = None, feedback: str | None = None, source: str | None = None, wake: bool = True,
+        playbook: int | None = None, feedback: str | None = None, source: str | None = None, criterion: str | None = None, wake: bool = True,
         skip_route_check: bool = False,
     ) -> Message:
         self.calls.append((actor, to, body, {
             "type": type, "title": title, "reply_to": reply_to, "status": status, "budget": budget, "revises": revises, "supersedes": supersedes,
-            "service": service, "contract": contract, "playbook": playbook, "feedback": feedback, "source": source, "wake": wake,
+            "service": service, "contract": contract, "playbook": playbook, "feedback": feedback, "source": source, "criterion": criterion, "wake": wake,
             "skip_route_check": skip_route_check,
         }))
         return Message(sender=actor, to=to, type=type, body=body, id="FROM-THE-PORT")
@@ -95,13 +95,14 @@ def test_send_comes_from_the_sender_of_the_runtime_with_the_names_of_the_port(or
     fake = Sender()
     use(org, message_sender=fake)
     assert org.send("ceo", "root", "b", type="result", title="t", reply_to="r", status="done", budget=2, revises="v", supersedes="s", service="svc",
-                    contract=3, playbook=4, feedback="accept", source="human", wake=False, _skip_route_check=True).id == "FROM-THE-PORT"
+                    contract=3, playbook=4, feedback="accept", source="human", criterion="C1", wake=False, _skip_route_check=True).id == "FROM-THE-PORT"
     assert fake.calls == [("ceo", "root", "b", {
         "type": "result", "title": "t", "reply_to": "r", "status": "done", "budget": 2, "revises": "v", "supersedes": "s", "service": "svc",
-        "contract": 3, "playbook": 4, "feedback": "accept", "source": "human", "wake": False, "skip_route_check": True,
+        "contract": 3, "playbook": 4, "feedback": "accept", "source": "human", "criterion": "C1", "wake": False, "skip_route_check": True,
     })]
     org.send("ceo", "root", "plain")
     assert fake.calls[1][3]["skip_route_check"] is False and fake.calls[1][3]["type"] == "note" and fake.calls[1][3]["source"] is None
+    assert fake.calls[1][3]["criterion"] is None
 
 
 def test_delegate_comes_from_the_assigner_of_the_runtime(org: Org) -> None:

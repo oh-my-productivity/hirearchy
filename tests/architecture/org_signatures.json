@@ -805,9 +805,24 @@
      "name": "note",
      "kind": "POSITIONAL_OR_KEYWORD",
      "default": "''"
+    },
+    {
+     "name": "source",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "criterion",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "confirms",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
     }
    ],
-   "annotated": "(self, actor: 'str', task_id: 'str', verdict: 'str', note: 'str' = '') -> 'Message'"
+   "annotated": "(self, actor: 'str', task_id: 'str', verdict: 'str', note: 'str' = '', *, source: 'str | None' = None, criterion: 'Sequence[str] | None' = None, confirms: 'str | None' = None) -> 'Message'"
   },
   "find_received": {
    "kind": "method",
@@ -1779,6 +1794,11 @@
      "default": "None"
     },
     {
+     "name": "criterion",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
      "name": "wake",
      "kind": "KEYWORD_ONLY",
      "default": "True"
@@ -1789,7 +1809,7 @@
      "default": "False"
     }
    ],
-   "annotated": "(self, actor: 'str', to: 'str', body: 'str', *, type: 'str' = 'note', title: 'str' = '', reply_to: 'str | None' = None, status: 'str | None' = None, budget: 'int' = 0, revises: 'str | None' = None, supersedes: 'str | None' = None, service: 'str | None' = None, contract: 'int | None' = None, playbook: 'int | None' = None, feedback: 'str | None' = None, source: 'str | None' = None, wake: 'bool' = True, _skip_route_check: 'bool' = False) -> 'Message'"
+   "annotated": "(self, actor: 'str', to: 'str', body: 'str', *, type: 'str' = 'note', title: 'str' = '', reply_to: 'str | None' = None, status: 'str | None' = None, budget: 'int' = 0, revises: 'str | None' = None, supersedes: 'str | None' = None, service: 'str | None' = None, contract: 'int | None' = None, playbook: 'int | None' = None, feedback: 'str | None' = None, source: 'str | None' = None, criterion: 'str | None' = None, wake: 'bool' = True, _skip_route_check: 'bool' = False) -> 'Message'"
   },
   "sent": {
    "kind": "method",

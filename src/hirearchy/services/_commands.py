@@ -47,5 +47,8 @@ class RuleServiceCommands(ServiceCommands):
     def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
         return self._revisions.revise_playbook(actor, service, content, reason)
 
-    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
-        return self._ratings.feedback(actor, task_id, verdict, note)
+    def feedback(
+        self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
+        confirms: str | None = None,
+    ) -> Message:
+        return self._ratings.feedback(actor, task_id, verdict, note, source=source, criterion=criterion, confirms=confirms)

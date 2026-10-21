@@ -1,9 +1,19 @@
-usage: hirearchy feedback [-h] [--note NOTE] task_id {accept,reject}
+usage: hirearchy feedback [-h] [--note NOTE] [--source {human,relayed}] [--criterion ID]
+                          [--confirms VERDICT_ID]
+                          task_id {accept,reject}
 
 positional arguments:
   task_id
   {accept,reject}
 
 options:
-  -h, --help       show this help message and exit
-  --note NOTE      what was wrong (required for reject)
+  -h, --help            show this help message and exit
+  --note NOTE           what was wrong (required for reject)
+  --source {human,relayed}
+                        human (default): your own judgement; relayed: someone else's reading of
+                        the delivery
+  --criterion ID        what a rejection was about: C<k> (a contract criterion), R<k> (an earlier
+                        rejection it repeats) or none (no lasting rule)
+  --confirms VERDICT_ID
+                        record --criterion for an earlier rejection (its message id) instead of a
+                        new verdict; --note is your answer

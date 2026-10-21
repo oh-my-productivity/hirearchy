@@ -13,19 +13,25 @@ from ._protocols import HopCounter, RoutePolicy
 from .api import MessageSender
 
 
-def provenance_source(actor: str, type: str, revises: str | None, source: str | None) -> str | None:
+def provenance_source(
+    actor: str, type: str, revises: str | None, feedback: str | None, reply_to: str | None, source: str | None, criterion: str | None,
+) -> str | None:
     """Where a message says it comes from (``source``), by the provenance rules every ``MessageSender`` applies (design 5.1):
-    only root records it (an agent that passes ``source`` is refused), it is ``human`` or ``relayed``, and a rework from root
-    (a task that ``revises`` another) without one is ``relayed``: root's own reading, unless the caller says the user asked for it.
-    A fresh task, a note or a message of an agent stays unstamped."""
-    if source is not None and actor != ROOT:
+    only root records ``source`` and ``criterion`` (an agent that passes either is refused, S1), ``source`` is ``human`` or ``relayed`` (S2),
+    ``criterion`` goes only on a verdict note (a note with ``feedback``) or a link note (a note that replies to one, S3), and a rework from
+    root (a task that ``revises`` another), a verdict note or a link note without a ``source`` is ``relayed``: root's own reading, unless the
+    caller says the user asked for it. A fresh task, any other note and every message of an agent stay unstamped."""
+    if (source is not None or criterion is not None) and actor != ROOT:
         raise OrgError(
             "only root (the human's seat) records where a verdict, a link or a rework comes from (`source`, `criterion`); "
             "agents' messages carry neither"
         )
     if source is not None and source not in SOURCES:
         raise OrgError('source must be "human" (the user\'s own judgement, in their own words) or "relayed" (anything you concluded yourself)')
-    if source is None and actor == ROOT and type == "task" and revises:
+    verdict, link = type == "note" and bool(feedback), type == "note" and not feedback and bool(reply_to)
+    if criterion is not None and not (verdict or link):
+        raise OrgError("criterion goes only on a verdict (a note with `feedback`) or on a link note that replies to one: use `feedback(..., criterion=...)`.")
+    if source is None and actor == ROOT and ((type == "task" and revises) or (type == "note" and (feedback or criterion))):
         return "relayed"
     return source
 
@@ -48,7 +54,7 @@ class RuleMessageSender(MessageSender):
         self, actor: str, to: str, body: str, *, type: str = "note", title: str = "", reply_to: str | None = None,
         status: str | None = None, budget: int = 0, revises: str | None = None, supersedes: str | None = None,
         service: str | None = None, contract: int | None = None, playbook: int | None = None, feedback: str | None = None,
-        source: str | None = None, wake: bool = True, skip_route_check: bool = False,
+        source: str | None = None, criterion: str | None = None, wake: bool = True, skip_route_check: bool = False,
     ) -> Message:
         cap = self._settings.message_cap()
         if len(body.strip()) > cap and norm(actor) != ROOT:  # the cap protects agents' runs; the human may paste
@@ -80,11 +86,11 @@ class RuleMessageSender(MessageSender):
                 f"message chain is {hops} hops long (limit {max_hops}); this looks like a loop. "
                 "Report blocked to whoever assigned your task instead."
             )
-        source = provenance_source(actor, type, revises, source)
+        source = provenance_source(actor, type, revises, feedback, reply_to, source, criterion)
         msg = Message(
             sender=actor, to=to, type=type, body=body.strip(), title=title.strip(),
             reply_to=reply_to, status=status, budget=budget, hops=hops, revises=revises,
             supersedes=supersedes, service=service, contract=contract, playbook=playbook, feedback=feedback,
-            source=source, wake=wake,
+            source=source, criterion=criterion, wake=wake,
         )
         return self._delivery.deliver(msg)

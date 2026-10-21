@@ -61,7 +61,7 @@ def test_prompt_service_owner_with_playbook_and_reflect_section(tmp_path, clock,
     first = org.request(ROOT, "weekly-brief", {"topic": "ai chips"}, title="Brief on AI chips")
     clock.tick()
     deliver_service(org, "ceo", first, clock, lessons="The fact-check found two uncited claims; cite while drafting.")
-    org.feedback(ROOT, first.id, "reject", "Too long: cut to 600 words.")
+    org.feedback(ROOT, first.id, "reject", "Too long: cut to 600 words.", source="human")
     clock.tick()
     org.request(ROOT, "weekly-brief", {"topic": "ai chips", "week": "2026-W03"}, title="Brief on AI chips", note="Shorter please.",
                 revises=first.id, budget=6, source="human")

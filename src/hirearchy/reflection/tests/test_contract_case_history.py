@@ -183,7 +183,7 @@ def test_a_legacy_root_note_without_source_is_human(w: ReflectionWorld) -> None:
     define(w)
     task = ask(w)
     deliver(w, task)
-    rate(w, task, "reject", "Too long.")
+    note_on(w, task, verdict="reject", body="Too long.")  # as every note written before sources existed
     (case,) = w.history.cases("ceo", SERVICE)
     (verdict,) = case.verdicts
     assert verdict.message.source is None and verdict.tier == "human" and (verdict.links, verdict.links_tier) == ((), "")

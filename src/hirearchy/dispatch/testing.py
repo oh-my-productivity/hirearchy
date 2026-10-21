@@ -49,8 +49,8 @@ ORG_MD = "---\nmission: test\n---\nrules\n"  # the ORG.md every world starts wit
 
 class RecordingSender(MessageSender):
     """Keeps every message it is asked to send, in order, as the delivered message: the addresses normalized, the body and the title stripped,
-    ``hops`` 0. It checks nothing but provenance (S1/S2 and the ``relayed`` default for a root rework), which every ``MessageSender`` applies
-    (no cap, no route, no budget): a consumer's test sets up what it needs and looks at ``messages``.
+    ``hops`` 0. It checks nothing but provenance (S1-S3 and the ``relayed`` default for a root rework, verdict note or link note), which every
+    ``MessageSender`` applies (no cap, no route, no budget): a consumer's test sets up what it needs and looks at ``messages``.
     ``route_check_skipped`` holds the ids of the messages that were sent with ``skip_route_check``."""
 
     def __init__(self, delivery: MessageDelivery) -> None:
@@ -62,13 +62,13 @@ class RecordingSender(MessageSender):
         self, actor: str, to: str, body: str, *, type: str = "note", title: str = "", reply_to: str | None = None,
         status: str | None = None, budget: int = 0, revises: str | None = None, supersedes: str | None = None,
         service: str | None = None, contract: int | None = None, playbook: int | None = None, feedback: str | None = None,
-        source: str | None = None, wake: bool = True, skip_route_check: bool = False,
+        source: str | None = None, criterion: str | None = None, wake: bool = True, skip_route_check: bool = False,
     ) -> Message:
-        source = provenance_source(norm(actor), type, revises, source)
+        source = provenance_source(norm(actor), type, revises, feedback, reply_to, source, criterion)
         msg = Message(
             sender=norm(actor), to=norm(to), type=type, body=body.strip(), title=title.strip(), reply_to=reply_to, status=status,
             budget=int(budget or 0), revises=revises, supersedes=supersedes, service=service, contract=contract, playbook=playbook,
-            feedback=feedback, source=source, wake=wake,
+            feedback=feedback, source=source, criterion=criterion, wake=wake,
         )
         done = self._delivery.deliver(msg)
         self.messages.append(done)

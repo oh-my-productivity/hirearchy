@@ -261,7 +261,10 @@ class RecordingServiceCommands(ServiceCommands):
     def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
         raise OrgError("an application does not revise playbooks")
 
-    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
+    def feedback(
+        self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
+        confirms: str | None = None,
+    ) -> Message:
         raise OrgError("an application gives no feedback")
 
 
@@ -361,8 +364,11 @@ class FlakyServiceCommands(ServiceCommands):
     def revise_playbook(self, actor: str, service: str, content: str, reason: str) -> int:
         return self._inner.revise_playbook(actor, service, content, reason)
 
-    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
-        return self._inner.feedback(actor, task_id, verdict, note)
+    def feedback(
+        self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
+        confirms: str | None = None,
+    ) -> Message:
+        return self._inner.feedback(actor, task_id, verdict, note, source=source, criterion=criterion, confirms=confirms)
 
 
 # ------------------------------------------------------------------------------ the parts, made over fakes or over the real ports

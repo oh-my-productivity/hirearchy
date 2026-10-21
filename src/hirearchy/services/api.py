@@ -319,13 +319,21 @@ class ServiceCommands(Protocol):
         gets a quiet (non-waking) note with the reason."""
         ...
 
-    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
+    def feedback(
+        self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
+        confirms: str | None = None,
+    ) -> Message:
         """The client's verdict on a delivered service request: a quiet note to the owner (it costs no run).
 
         ``task_id``: any task of the case (the request or a rework) that ``actor`` sent and that has a result. ``verdict`` is ``accept`` or
         ``reject``; a rejection needs a ``note`` saying what was wrong. The owner sees it with its next batch and in the reflection digest. Every
         verdict stays in the case's history: the latest one is the final verdict of the statistics, and an earlier ``reject`` is still shown
-        (and counted as "after a reject")."""
+        (and counted as "after a reject").
+
+        Root only: ``source`` (``"human"``: the user's own judgement, in their words; ``"relayed"``, the default of a root verdict: anything root
+        concluded itself), ``criterion`` (a rejection only: what it is about, as ids ``C<k>`` of the contract, ``R<k>`` of an earlier rejection
+        it repeats, or ``none``: the client said it is no lasting rule) and ``confirms`` (the id of a rejection recorded on ``task_id``: ``criterion``
+        is then recorded for it in a link note, which is no new verdict)."""
         ...
 
 

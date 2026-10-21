@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Sequence
 from pathlib import Path
 
 from hirearchy.agents.testing import MemoryAgents
@@ -62,9 +63,13 @@ class Commands(ServiceCommands):
         self.calls.append(("revise_playbook", (actor, service, content, reason), {}))
         return 4
 
-    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
-        self.calls.append(("feedback", (actor, task_id, verdict, note), {}))
-        return Message(actor, "ceo", "note", "", id="fb-1")
+    def feedback(
+        self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
+        confirms: str | None = None,
+    ) -> Message:
+        given = {"source": source, "criterion": criterion, "confirms": confirms}
+        self.calls.append(("feedback", (actor, task_id, verdict, note), {k: v for k, v in given.items() if v is not None}))
+        return Message(actor, "ceo", "note", "", id="fb-1", source=source, criterion=", ".join(criterion) if criterion else None)
 
 
 def tools(agents: MemoryAgents | None = None, offered: dict[str, list[str]] | None = None, exists: bool = True,
@@ -169,3 +174,24 @@ def test_a_missing_organization_is_the_refusal_of_a_client_tool() -> None:
     roles = DirectoryServiceRoles(InstructionText(MemoryBinding(Path("/o"))), gone, gone, gone)  # type: ignore[arg-type]
     group = ServiceTools(roles, gone, gone, gone)  # type: ignore[arg-type]
     assert "call create_org" in fails(serve(group, ROOT), "services")
+
+
+def test_root_feedback_passes_source_criterion_and_confirms_and_defaults_to_relayed() -> None:
+    group, commands = tools()
+    server = serve(group, ROOT)
+    out = call(server, "feedback", task_id="t1", verdict="reject", note="No.", source="human", criterion=["C1", "R2"])
+    assert out == "feedback reject recorded on t1 for ceo (message fb-1, source human, about C1, R2); it does not wake ceo"
+    assert commands.calls[-1] == ("feedback", ("root", "t1", "reject", "No."), {"source": "human", "criterion": ["C1", "R2"]})
+    assert call(server, "feedback", task_id="t1", verdict="accept") == "feedback accept recorded on t1 for ceo (message fb-1, source relayed); it does not wake ceo"
+    assert commands.calls[-1] == ("feedback", ("root", "t1", "accept", ""), {"source": "relayed"})
+    out = call(server, "feedback", task_id="t1", verdict="reject", note="Yes.", source="human", criterion=["C1"], confirms="m-9")
+    assert out == "recorded: rejection m-9 is about C1 (source human; message fb-1); it does not wake ceo"
+    assert commands.calls[-1][2] == {"source": "human", "criterion": ["C1"], "confirms": "m-9"}
+
+
+def test_the_agents_feedback_passes_nothing_but_the_verdict() -> None:
+    group, commands = tools()
+    server = serve(group, "ceo")
+    call(server, "feedback", task_id="t1", verdict="reject", note="No.")
+    assert commands.calls[-1] == ("feedback", ("ceo", "t1", "reject", "No."), {})
+    assert params_of(server, "feedback") == {"task_id", "verdict", "note"}

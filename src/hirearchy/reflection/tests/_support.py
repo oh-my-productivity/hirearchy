@@ -63,9 +63,9 @@ def deliver(w: ReflectionWorld, task: Message, status: str = "done", runs: int =
     return w.s.d.post(Message(sender=task.to, to=task.sender, type="result", status=status, reply_to=task.id, body=body, title="Result"))
 
 
-def rate(w: ReflectionWorld, task: Message, verdict: str, note: str = "") -> Message:
-    """The client's verdict on a delivered request."""
-    return w.s.commands.feedback("root", task.id, verdict, note)
+def rate(w: ReflectionWorld, task: Message, verdict: str, note: str = "", **kw: Any) -> Message:
+    """The client's verdict on a delivered request (the user's own judgement: ``source="human"``, unless ``kw`` says otherwise)."""
+    return w.s.commands.feedback("root", task.id, verdict, note, **{"source": "human", **kw})
 
 
 def note_on(w: ReflectionWorld, task: Message, *, verdict: str | None = None, reply_to: str | None = None, **kw: Any) -> Message:

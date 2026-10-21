@@ -51,6 +51,7 @@ class MessageSender(Protocol):
         playbook: int | None = None,
         feedback: str | None = None,
         source: str | None = None,
+        criterion: str | None = None,
         wake: bool = True,
         skip_route_check: bool = False,
     ) -> Message:
@@ -61,9 +62,11 @@ class MessageSender(Protocol):
         reserve every hand-down keeps, and the hop limit (``max_hops``; results always get through). Every refusal is an ``OrgError`` whose
         text agents are shown. The body and the title are stripped; ``hops`` is one more than the longest chain the actor is working on.
 
-        Provenance: only root records where a message comes from (``source``, ``"human"`` or ``"relayed"``): an agent that passes one, or
-        a value that is neither, is refused. A task from root that ``revises`` another (a rework) without a ``source`` is stamped
-        ``"relayed"`` (root's own reading); a fresh task, a note and every message of an agent stay unstamped unless root says."""
+        Provenance: only root records where a message comes from (``source``, ``"human"`` or ``"relayed"``) and what a verdict is about
+        (``criterion``, ids joined by ``", "``): an agent that passes either, or a ``source`` that is neither value, is refused. ``criterion``
+        goes only on a verdict note (a note with ``feedback``) or on a link note (a note without ``feedback`` that replies to one). A task from
+        root that ``revises`` another (a rework), a verdict note and a link note without a ``source`` are stamped ``"relayed"`` (root's own
+        reading); a fresh task, any other note and every message of an agent stay unstamped unless root says."""
         ...
 
 

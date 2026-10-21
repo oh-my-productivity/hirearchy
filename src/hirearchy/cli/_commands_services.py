@@ -131,13 +131,25 @@ class FeedbackCommand(Command):
         s.add_argument("task_id")
         s.add_argument("verdict", choices=["accept", "reject"])
         s.add_argument("--note", default="", help="what was wrong (required for reject)")
+        s.add_argument("--source", choices=("human", "relayed"), default="human",
+                       help="human (default): your own judgement; relayed: someone else's reading of the delivery")
+        s.add_argument("--criterion", action="append", metavar="ID",
+                       help="what a rejection was about: C<k> (a contract criterion), R<k> (an earlier rejection it repeats) or none (no lasting rule)")
+        s.add_argument("--confirms", metavar="VERDICT_ID",
+                       help="record --criterion for an earlier rejection (its message id) instead of a new verdict; --note is your answer")
         s.set_defaults(fn=self.run)
 
     def run(self, args: Arguments) -> None:
         self._session.open(args, mutating=True)
-        msg = self._commands().feedback(ROOT, args.task_id, args.verdict, args.note)
+        msg = self._commands().feedback(
+            ROOT, args.task_id, args.verdict, args.note, source=args.source, criterion=args.criterion, confirms=args.confirms,
+        )
         self._snapshots().commit(f"root: feedback {msg.id} -> {msg.to}")
-        self._out.say(f"feedback {args.verdict} on {args.task_id} -> {msg.to}")
+        if args.confirms:
+            self._out.say(f"link on {args.confirms} -> {msg.to}: {msg.criterion} (message {msg.id}, source {msg.source})")
+        else:
+            about = f", about {msg.criterion}" if msg.criterion else ""
+            self._out.say(f"feedback {args.verdict} on {args.task_id} -> {msg.to} (message {msg.id}, source {msg.source}{about})")
 
 
 class RetireServiceCommand(Command):

@@ -9,6 +9,7 @@ hops: 0
 wake: false
 reply_to: 20260115T090700000000-root-0002
 feedback: reject
+source: human
 trace: 20260115T090700000000-root-0002
 ---
 Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.

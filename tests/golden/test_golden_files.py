@@ -51,7 +51,7 @@ def test_message_files(tmp_path, clock, norm):
     clock.tick()
     check("messages/result_with_artifacts_and_lessons.md", norm(text_of(org, ROOT, "inbox", result)))
 
-    fb = org.feedback(ROOT, request.id, "reject", "Too long: cut to 600 words.")
+    fb = org.feedback(ROOT, request.id, "reject", "Too long: cut to 600 words.", source="human")
     clock.tick()
     check("messages/feedback_note.md", norm(text_of(org, "ceo", "inbox", fb)))
 
@@ -157,7 +157,7 @@ def test_service_and_playbook_files(tmp_path, clock, norm):
     first = org.request(ROOT, "weekly-brief", {"topic": "ai"})
     clock.tick()
     deliver_service(org, "ceo", first, clock, lessons="Cite while drafting.")
-    org.feedback(ROOT, first.id, "reject", "Too long.")
+    org.feedback(ROOT, first.id, "reject", "Too long.", source="human")
     clock.tick()
     org.revise_playbook("ceo", "weekly-brief", PLAYBOOK + "4. Cut to 600 words before reporting.\n", "Client rejected: too long.")
     clock.tick()

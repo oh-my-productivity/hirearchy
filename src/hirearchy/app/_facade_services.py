@@ -50,6 +50,9 @@ class ServicesMixin:
         """Write the next version of the playbook of a service you own; returns the version."""
         return self.runtime.service_commands.revise_playbook(actor, service, content, reason)
 
-    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
-        """Tell the owner whether a delivered service request was accepted or rejected."""
-        return self.runtime.service_commands.feedback(actor, task_id, verdict, note)
+    def feedback(
+        self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
+        confirms: str | None = None,
+    ) -> Message:
+        """Tell the owner whether a delivered service request was accepted or rejected. See :meth:`hirearchy.services.ServiceCommands.feedback`."""
+        return self.runtime.service_commands.feedback(actor, task_id, verdict, note, source=source, criterion=criterion, confirms=confirms)

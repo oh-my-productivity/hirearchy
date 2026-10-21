@@ -131,6 +131,9 @@ class ServiceRequests(Protocol):
 
 @runtime_checkable
 class ClientFeedback(Protocol):
-    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
+    def feedback(
+        self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
+        confirms: str | None = None,
+    ) -> Message:
         """Give the verdict on a delivered request (see ``ServiceCommands.feedback``)."""
         ...

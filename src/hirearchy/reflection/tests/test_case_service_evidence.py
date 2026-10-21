@@ -10,8 +10,10 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import testkit.services_world as services_world
+from testkit.services_world import svc  # noqa: F401  (a fixture: the wired application with ceo offering weekly-brief)
 
-from hirearchy.kernel import Message, OrgError, clip_line
+from hirearchy.kernel import ROOT, Message, OrgError, clip_line
 from hirearchy.reflection import Case, CaseHistory, Verdict
 from hirearchy.reflection._evidence import CaseServiceEvidence
 from hirearchy.reflection.testing import FixedCaseHistory, ReflectionWorld, fs_world, memory_world
@@ -357,3 +359,25 @@ def test_a_service_nobody_defined_has_no_valid_ids(w: ReflectionWorld, evidence:
 
 def test_the_history_it_reads_is_the_one_of_the_world(w: ReflectionWorld) -> None:
     assert isinstance(w.history, CaseHistory)
+
+
+# ------------------------------------------------------------------------------ through the wired application
+
+
+def test_feedback_through_the_wired_application_raises_f5_and_f6(svc: Any) -> None:
+    wired: Any = services_world  # the helpers of the wired world are untyped
+    task = wired.request(svc, "ai")
+    wired.deliver(svc, "ceo", task)
+    with pytest.raises(OrgError) as e:
+        svc.feedback(ROOT, task.id, "reject", "Too long.", source="human", criterion=["C9"])
+    assert str(e.value) == (
+        "unknown criterion or assertion for `weekly-brief`: C9. Its criteria: C1, C2; its regression assertions: none yet (see `services`)."
+    )
+    no = svc.feedback(ROOT, task.id, "reject", "Too long.", source="human", criterion=["C1"])
+    with pytest.raises(OrgError) as e:
+        svc.feedback(ROOT, task.id, "reject", "Yes, always.", source="human", criterion=["R1"], confirms=no.id)
+    assert str(e.value) == "R1 is this rejection itself: name the criterion it is about, or the earlier rejection it repeats."
+    with pytest.raises(OrgError, match="^unknown criterion or assertion for `weekly-brief`: R2. Its criteria: C1, C2; its regression assertions: R1 "):
+        svc.feedback(ROOT, task.id, "reject", "Yes.", source="human", criterion=["R2"], confirms=no.id)
+    link = svc.feedback(ROOT, task.id, "reject", "Yes, always.", source="human", criterion=["c2"], confirms=no.id)
+    assert (link.criterion, link.reply_to, link.feedback) == ("C2", no.id, None)

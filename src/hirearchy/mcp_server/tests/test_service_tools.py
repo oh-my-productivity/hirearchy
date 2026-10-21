@@ -21,6 +21,50 @@ def test_the_feedback_tool_text_no_longer_says_a_later_one_replaces_the_earlier(
     assert "every verdict stays" in tools["feedback"].description
 
 
+def described(org, addr):
+    return {t.name: t for t in asyncio.run(build_server(org, addr).list_tools())}
+
+
+def test_root_feedback_docstring_names_the_users_own_words_verbatim(svc):
+    text = " ".join(described(svc, ROOT)["feedback"].description.split())
+    assert "optional for accept: the user's own words, verbatim" in text
+    assert "the user's own judgement" in text and "your own judgement" not in text
+    assert "every verdict stays" in text
+    assert 'source: "human" only when the verdict is the user\'s own judgement and note holds their words; "relayed" (the default)' in text
+    assert 'criterion (reject only): what the rejection is about, as ids: "C<k>" (a contract criterion, see `services`)' in text
+    assert "confirms: when that yes comes after you recorded the rejection, call again with the same task_id, verdict \"reject\"" in text
+    assert "it records the link, not a new verdict" in text and "it never waives an acceptance criterion" in text
+
+
+def test_root_feedback_reply_names_message_and_source(svc):
+    server = build_server(svc, ROOT)
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first)
+    reply = call(server, "feedback", task_id=first.id, verdict="reject", note="Too long.", source="human", criterion=["c1"])
+    no = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    assert reply == f"feedback reject recorded on {first.id} for ceo (message {no.id}, source human, about C1); it does not wake ceo"
+    assert (no.source, no.criterion) == ("human", "C1")
+    second = request(svc, "chips")
+    deliver(svc, "ceo", second)
+    reply = call(server, "feedback", task_id=second.id, verdict="accept")
+    yes = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    assert reply == f"feedback accept recorded on {second.id} for ceo (message {yes.id}, source relayed); it does not wake ceo"
+    assert yes.source == "relayed"
+    reply = call(server, "feedback", task_id=first.id, verdict="reject", note="Yes, always.", source="human", criterion=["C1"], confirms=no.id)
+    link = [m for m in svc.sent(ROOT) if m.criterion and not m.feedback][-1]
+    assert reply == f"recorded: rejection {no.id} is about C1 (source human; message {link.id}); it does not wake ceo"
+    assert (link.reply_to, link.source) == (no.id, "human")
+
+
+def test_agent_feedback_surface_is_unchanged(svc):
+    agent = described(svc, "ceo")["feedback"]
+    assert set(agent.inputSchema["properties"]) == {"task_id", "verdict", "note"}
+    text = " ".join(agent.description.split())
+    assert 'source: "human"' not in text and 'criterion (reject only)' not in text and "confirms:" not in text and "the user's own" not in text
+    assert "optional for accept. It costs no run" in text and "Give it on your own judgement of each delivery" in text
+    assert set(described(svc, ROOT)["feedback"].inputSchema["properties"]) == {"task_id", "verdict", "note", "source", "criterion", "confirms"}
+
+
 def test_root_request_rework_without_source_is_relayed(svc):
     server = build_server(svc, ROOT)
     first = request(svc, "ai")
@@ -103,7 +147,7 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     define(org, playbook="Steps.")
     t1 = request(org, "ai")
     deliver(org, "ceo", t1, runs=3)
-    org.feedback(ROOT, t1.id, "reject", "Bad.")
+    org.feedback(ROOT, t1.id, "reject", "Bad.", source="human")
     org.revise_playbook("ceo", "weekly-brief", "Better steps.", "Case rejected for missing sources")
     out = call(server, "services")
     assert out.splitlines()[0] == "Services you can request (from your direct reports):"

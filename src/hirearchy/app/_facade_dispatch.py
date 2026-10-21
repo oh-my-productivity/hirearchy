@@ -44,13 +44,14 @@ class DispatchMixin:
         playbook: int | None = None,
         feedback: str | None = None,
         source: str | None = None,
+        criterion: str | None = None,
         wake: bool = True,
         _skip_route_check: bool = False,
     ) -> Message:
         return self.runtime.message_sender.send(
             actor, to, body, type=type, title=title, reply_to=reply_to, status=status, budget=budget, revises=revises,
             supersedes=supersedes, service=service, contract=contract, playbook=playbook, feedback=feedback, source=source,
-            wake=wake, skip_route_check=_skip_route_check,
+            criterion=criterion, wake=wake, skip_route_check=_skip_route_check,
         )
 
     def delegate(

@@ -113,9 +113,12 @@ class FakeServices(Recording, ServiceCommands, ServiceCatalog, ContractNormalize
         budget = kwargs.get("budget")
         return Message(sender=actor, to="ceo", type="task", body="", budget=budget if isinstance(budget, int) else 4, service=service, id="r-1")
 
-    def feedback(self, actor: str, task_id: str, verdict: str, note: str = "") -> Message:
-        self.note("feedback", actor, task_id, verdict, note)
-        return Message(sender=actor, to="ceo", type="note", body="", id="f-1")
+    def feedback(
+        self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
+        confirms: str | None = None,
+    ) -> Message:
+        self.note("feedback", actor, task_id, verdict, note, source=source, criterion=None if criterion is None else list(criterion), confirms=confirms)
+        return Message(sender=actor, to="ceo", type="note", body="", id="f-1", source=source, criterion=", ".join(criterion) if criterion else None)
 
     def read_contract(self, owner: str, name: str) -> Contract | None:
         self.note("read_contract", owner, name)

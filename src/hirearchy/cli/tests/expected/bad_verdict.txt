@@ -1,6 +1,8 @@
 
 [stderr]
-usage: hirearchy feedback [-h] [--note NOTE] task_id {accept,reject}
+usage: hirearchy feedback [-h] [--note NOTE] [--source {human,relayed}] [--criterion ID]
+                          [--confirms VERDICT_ID]
+                          task_id {accept,reject}
 hirearchy feedback: error: argument verdict: invalid choice: 'maybe' (choose from 'accept', 'reject')
 
 [exit 2]

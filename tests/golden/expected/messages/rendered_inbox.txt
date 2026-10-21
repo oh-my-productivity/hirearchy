@@ -1,5 +1,5 @@
 ### note 20260115T090900000000-root-0004
-from: root | to: ceo | title: feedback on "Brief on AI chips": reject | reply_to: 20260115T090700000000-root-0002 | feedback: reject
+from: root | to: ceo | title: feedback on "Brief on AI chips": reject | reply_to: 20260115T090700000000-root-0002 | feedback: reject | source: human
 
 Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
 

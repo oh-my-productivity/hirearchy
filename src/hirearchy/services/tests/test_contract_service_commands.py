@@ -11,7 +11,7 @@ from typing import Any
 import pytest
 
 from hirearchy.kernel import Message, OrgError, split_frontmatter
-from hirearchy.services import FEEDBACK_HEADER, ServiceCommands
+from hirearchy.services import FEEDBACK_HEADER, LINK_HEADER, ServiceCommands
 from hirearchy.services.testing import IMPLEMENTATIONS, ServicesWorld
 
 from ._support import BRIEF, STEPS, amend, answer, define, grant, implementations, make, request
@@ -744,3 +744,142 @@ def test_feedback_is_for_requests_the_actor_sent(w: ServicesWorld) -> None:
     with pytest.raises(OrgError) as e:
         w.commands.feedback("ceo", task.id, "accept")
     assert str(e.value).endswith("Yours: none")
+
+
+# ============================================================================================== feedback: source, criterion and confirmations
+
+F1 = ("criterion and confirms are root's: they record what the human client said a rejection was about. An agent client's verdict is a "
+      "hypothesis and names no criterion.")
+F2 = "criterion says what a rejection was about; an accept has none: leave criterion out."
+F3 = ("criterion is 1-5 ids: C<k> (a criterion of the contract, see `services`), R<k> (an earlier rejection this one repeats) or none (the client "
+      'said there is no lasting rule), e.g. ["C6"]. Not understood: {items}')
+F4 = "none stands alone: it records that the client said this rejection is no lasting rule."
+F9 = "a confirmation records what the rejection was about: pass criterion (C<k>, R<k> or none)."
+
+
+def delivered_to_an_agent(w: ServicesWorld) -> Message:
+    """``ceo`` is the client of its report ``ceo/eng``: it asked for ``eng-brief`` and has the result."""
+    grant(w, "ceo", 20)
+    define(w, owner="ceo/eng", name="eng-brief", actor="ceo")
+    task = w.commands.request("ceo", "eng-brief", {"topic": "ai"})
+    answer(w, task)
+    return task
+
+
+def refused(w: ServicesWorld, task_id: str, verdict: str, note: str = "", actor: str = "root", **kw: Any) -> str:
+    with pytest.raises(OrgError) as e:
+        w.commands.feedback(actor, task_id, verdict, note, **kw)
+    return str(e.value)
+
+
+def test_f1_an_agent_client_cannot_pass_criterion_or_confirms(w: ServicesWorld) -> None:
+    task = delivered_to_an_agent(w)
+    assert refused(w, task.id, "reject", "No.", "ceo", criterion=["C1"]) == F1
+    assert refused(w, task.id, "reject", "No.", "ceo", confirms="x") == F1
+    assert refused(w, task.id, "reject", "No.", "ceo", criterion=["C1"], confirms="x") == F1
+    assert w.d.inbox("ceo/eng") == [m for m in w.d.inbox("ceo/eng") if m.type == "task"]  # nothing was sent
+    plain = w.commands.feedback("ceo", task.id, "reject", "No.")
+    assert (plain.feedback, plain.source, plain.criterion) == ("reject", None, None)  # an agent's verdict is never stamped
+
+
+def test_an_agent_cannot_pass_source_the_sender_refuses_it(w: ServicesWorld) -> None:
+    task = delivered_to_an_agent(w)
+    with pytest.raises(OrgError, match="^only root \\(the human's seat\\) records where a verdict, a link or a rework comes from"):
+        w.commands.feedback("ceo", task.id, "reject", "No.", source="human")
+
+
+def test_f2_an_accept_names_no_criterion(w: ServicesWorld) -> None:
+    task = delivered(w)
+    for criterion in (["C1"], ["none"], ["R1"]):
+        assert refused(w, task.id, "accept", criterion=criterion) == F2
+    assert [m for m in w.d.inbox("ceo") if m.type == "note"] == []
+
+
+def test_f3_more_than_five_or_an_unknown_shape(w: ServicesWorld) -> None:
+    task = delivered(w)
+    assert refused(w, task.id, "reject", "No.", criterion=["C1", "x"]) == F3.format(items="x")
+    assert refused(w, task.id, "reject", "No.", criterion=["C1", "C2", "C3", "C4", "C5", "C6"]) == F3.format(items="C6")
+    assert refused(w, task.id, "reject", "No.", criterion="C1") == F3.format(items="C1")  # a bare string is not a list of ids
+    assert refused(w, task.id, "accept", criterion=["x"]) == F3.format(items="x")  # the shape is judged before the verdict
+
+
+def test_f4_none_stands_alone(w: ServicesWorld) -> None:
+    task = delivered(w)
+    assert refused(w, task.id, "reject", "No.", criterion=["none", "C1"]) == F4
+    assert refused(w, task.id, "accept", criterion=["C1", "NONE"]) == F4
+    assert w.commands.feedback("root", task.id, "reject", "One-off.", criterion=["None", "none"]).criterion == "none"
+
+
+def test_f7_confirms_must_be_a_verdict_on_this_task(w: ServicesWorld) -> None:
+    first = delivered(w)
+    other = request(w, "other")
+    answer(w, other)
+    no = w.commands.feedback("root", first.id, "reject", "No.")
+    message = "confirms must be the id of a rejection you recorded on {task} (the message id `feedback` returned): {confirms}"
+    assert refused(w, first.id, "reject", "Yes.", criterion=["C1"], confirms="nope") == message.format(task=first.id, confirms="nope")
+    assert refused(w, other.id, "reject", "Yes.", criterion=["C1"], confirms=no.id) == message.format(task=other.id, confirms=no.id)
+    assert refused(w, first.id, "reject", "Yes.", criterion=["C1"], confirms=first.id) == message.format(task=first.id, confirms=first.id)
+
+
+def test_f8a_confirms_an_accept_is_refused(w: ServicesWorld) -> None:
+    task = delivered(w)
+    yes = w.commands.feedback("root", task.id, "accept")
+    assert refused(w, task.id, "reject", "Yes.", criterion=["C1"], confirms=yes.id) == (
+        f"{yes.id} is an accept: only a rejection is linked to a criterion."
+    )
+
+
+def test_f8b_a_confirmation_needs_verdict_reject(w: ServicesWorld) -> None:
+    task = delivered(w)
+    no = w.commands.feedback("root", task.id, "reject", "No.")
+    assert refused(w, task.id, "accept", confirms=no.id) == 'confirm a rejection with verdict "reject" (the verdict it repeats).'
+
+
+def test_f9_a_confirmation_needs_criterion(w: ServicesWorld) -> None:
+    task = delivered(w)
+    no = w.commands.feedback("root", task.id, "reject", "No.")
+    assert refused(w, task.id, "reject", "Yes.", confirms=no.id) == F9
+    assert refused(w, task.id, "reject", "Yes.", confirms=no.id, criterion=[]) == F9
+    assert refused(w, task.id, "reject", "", confirms=no.id, criterion=["C1"]) == (
+        "a rejection needs a note: say what was wrong, so the owner can change its playbook"
+    )
+
+
+def test_a_reject_with_criterion_is_stored_on_the_verdict(w: ServicesWorld) -> None:
+    task = delivered(w)
+    note = w.commands.feedback("root", task.id, "reject", "No source.", source="human", criterion=[" c2", "C1", "c2"])
+    assert (note.feedback, note.source, note.criterion, note.to, note.wake) == ("reject", "human", "C2, C1", "ceo", False)
+    (stored,) = [m for m in w.d.inbox("ceo") if m.feedback]
+    assert (stored.source, stored.criterion, stored.id) == ("human", "C2, C1", note.id)
+    assert stored.body == FEEDBACK_HEADER + "\n\nNo source."
+
+
+def test_a_root_verdict_without_a_source_is_stamped_relayed(w: ServicesWorld) -> None:
+    task = delivered(w)
+    assert w.commands.feedback("root", task.id, "reject", "Maybe too long.").source == "relayed"
+    assert w.commands.feedback("root", task.id, "accept", source="human").source == "human"
+    assert w.commands.feedback("root", task.id, "accept", source="relayed").source == "relayed"
+
+
+def test_a_link_note_goes_to_the_owner_with_its_header_and_the_users_answer(w: ServicesWorld) -> None:
+    task = delivered(w)
+    no = w.commands.feedback("root", task.id, "reject", "No source.", source="relayed")
+    link = w.commands.feedback("root", task.id, "reject", "  Yes, always cite.  ", source="human", criterion=["c2"], confirms=no.id)
+    assert (link.sender, link.to, link.type, link.wake, link.reply_to, link.feedback) == ("root", "ceo", "note", False, no.id, None)
+    assert (link.source, link.criterion) == ("human", "C2")
+    assert link.title == 'criterion link on "weekly-brief: ai": C2'
+    assert link.body == LINK_HEADER.format(confirms=no.id) + "\n\nYes, always cite."
+    assert [m.id for m in w.d.inbox("ceo") if m.type == "note"] == [no.id, link.id]
+
+
+def test_a_confirmation_records_no_second_verdict(w: ServicesWorld) -> None:
+    task = delivered(w)
+    no = w.commands.feedback("root", task.id, "reject", "No source.", source="human")
+    w.commands.feedback("root", task.id, "reject", "Yes.", source="human", criterion=["C1", "C2"], confirms=no.id)
+    notes = [m for m in w.d.inbox("ceo") if m.type == "note"]
+    assert [m.feedback for m in notes] == ["reject", None] and [m.criterion for m in notes] == [None, "C1, C2"]
+
+
+def test_the_feedback_docstring_keeps_stays_in_the_case() -> None:
+    doc = ServiceCommands.feedback.__doc__ or ""
+    assert "stays in the case" in doc and "replaces" not in doc

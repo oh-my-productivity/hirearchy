@@ -119,9 +119,39 @@ def test_feedback_tells_the_owner_and_says_who(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
     go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "Too long.")
     assert f.session.calls == [("open", True)]
-    assert services.last("feedback") == (("root", "r-1", "reject", "Too long."), {})
+    assert services.last("feedback") == (("root", "r-1", "reject", "Too long."), {"source": "human", "criterion": None, "confirms": None})
     assert office.last("commit") == (("root: feedback f-1 -> ceo",), {})
-    assert f.out.stdout == "feedback reject on r-1 -> ceo\n"
+    assert f.out.stdout == "feedback reject on r-1 -> ceo (message f-1, source human)\n"
+
+
+def test_feedback_defaults_to_source_human(tmp_path: Path) -> None:
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    command = FeedbackCommand(f.session, lambda: services, lambda: office, f.out)
+    go(command, "feedback", "r-1", "accept")
+    assert services.last("feedback")[1]["source"] == "human"  # the CLI is the human's own terminal
+    go(command, "feedback", "r-1", "accept", "--source", "relayed")
+    assert services.last("feedback")[1]["source"] == "relayed"
+    with pytest.raises(SystemExit):
+        parse(command, "feedback", "r-1", "accept", "--source", "assistant")
+
+
+def test_feedback_reply_shows_the_message_id(tmp_path: Path) -> None:
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "No.",
+       "--criterion", "C1", "--criterion", "r2")
+    assert services.last("feedback") == (("root", "r-1", "reject", "No."), {"source": "human", "criterion": ["C1", "r2"], "confirms": None})
+    assert f.out.stdout == "feedback reject on r-1 -> ceo (message f-1, source human, about C1, r2)\n"
+    assert office.last("commit") == (("root: feedback f-1 -> ceo",), {})
+
+
+def test_feedback_confirms_reply_names_the_link(tmp_path: Path) -> None:
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "Yes, always.",
+       "--criterion", "C1", "--confirms", "m-9", "--source", "human")
+    assert services.last("feedback") == (
+        ("root", "r-1", "reject", "Yes, always."), {"source": "human", "criterion": ["C1"], "confirms": "m-9"},
+    )
+    assert f.out.stdout == "link on m-9 -> ceo: C1 (message f-1, source human)\n"
 
 
 def test_feedback_accepts_only_a_verdict(tmp_path: Path) -> None:

@@ -100,7 +100,7 @@ The client rejected a delivery: decide now whether the playbook must change so t
 
 # New messages for this run (2)
 ### note 20260115T090800000000-root-0002
-from: root | to: ceo | title: feedback on "Brief on AI chips": reject | reply_to: 20260115T090500000000-root-0000 | feedback: reject
+from: root | to: ceo | title: feedback on "Brief on AI chips": reject | reply_to: 20260115T090500000000-root-0000 | feedback: reject | source: human
 
 Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
 
