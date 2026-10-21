@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import SupportsInt, cast
 
-from ..kernel import ROOT, Message, OrgError, parent
-from ..mail import MailboxReader, TaskQuery
+from ..kernel import ROOT, Message, OrgError, latest_results, parent
+from ..mail import MailboxReader, TaskQuery, moved_past
 from ..settings import OrgSettings
 from .api import AllocationPolicy, BudgetQuery
 
@@ -53,8 +53,17 @@ class ReserveAllocationPolicy(AllocationPolicy):
             return 0
         busy = (
             [t for t in self._tasks.open_tasks(actor) if t.id != task.id]
-            or [t for t in self._tasks.blocked_tasks(actor) if t.id != task.id]
+            or self._blocked_not_moved_past(actor, task)
             or self._tasks.outstanding(actor)
             or self._mail.unread(actor)
         )
         return 0 if busy else max(0, self._budget.budget(actor) or 0)
+
+    def _blocked_not_moved_past(self, actor: str, task: Message) -> list[Message]:
+        """The other tasks ``actor`` reported ``blocked`` that their assigner has not moved past (read only when this branch is reached)."""
+        blocked = [t for t in self._tasks.blocked_tasks(actor) if t.id != task.id]
+        if not blocked:
+            return []
+        latest = latest_results(self._mail.sent(actor))
+        received = self._mail.received(actor)
+        return [t for t in blocked if t.id not in latest or not moved_past(t, latest[t.id], received)]

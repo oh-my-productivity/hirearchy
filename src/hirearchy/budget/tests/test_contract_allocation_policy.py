@@ -14,7 +14,7 @@ from hirearchy.budget import AllocationPolicy
 from hirearchy.budget.testing import IMPLEMENTATIONS, BudgetWorld
 from hirearchy.kernel import Message, OrgError
 
-from ._support import assign, grant, make, report
+from ._support import assign, grant, make, report, verdict
 
 
 @pytest.fixture(params=IMPLEMENTATIONS[AllocationPolicy], ids=lambda factory: factory.__name__)
@@ -180,6 +180,29 @@ def test_a_blocked_task_that_is_reported_again_does_not_hold_itself_back(w: Budg
     task = one_run(w)
     report(w, task, "blocked")
     assert w.policy.budget_to_return("ceo", task, "done") == 4
+
+
+def test_a_blocked_task_superseded_by_a_rework_no_longer_keeps_the_runs(w: BudgetWorld) -> None:
+    first = one_run(w)
+    report(w, first, "blocked")
+    rework = assign(w, "root", "ceo", 4, revises=first.id)  # the assigner sent it back: it has moved past the block
+    w.begin_run("ceo")
+    assert w.policy.budget_to_return("ceo", rework, "done") == 8  # 5 + 4 - 1 run
+
+
+def test_a_blocked_task_the_client_gave_a_verdict_on_no_longer_keeps_the_runs(w: BudgetWorld) -> None:
+    first, second = one_run(w), assign(w, "root", "ceo", 4)
+    report(w, first, "blocked")
+    verdict(w, first)  # "delivered as is", after the block
+    w.begin_run("ceo")
+    assert w.policy.budget_to_return("ceo", second, "done") == 8
+
+
+def test_a_blocked_task_still_open_to_its_assigner_keeps_the_runs(w: BudgetWorld) -> None:
+    first, second = one_run(w), assign(w, "root", "ceo", 4)
+    report(w, first, "blocked")
+    w.begin_run("ceo")
+    assert w.policy.budget_to_return("ceo", second, "done") == 0
 
 
 def test_nothing_is_returned_while_a_delegation_is_outstanding(w: BudgetWorld) -> None:

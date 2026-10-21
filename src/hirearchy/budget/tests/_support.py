@@ -34,9 +34,14 @@ def grant(world: BudgetWorld, sender: str, to: str, runs: int) -> Message:
     return world.post(Message(sender=sender, to=to, type="note", body="runs for you", title="grant", budget=runs))
 
 
-def assign(world: BudgetWorld, sender: str, to: str, runs: int = 0) -> Message:
-    """A task that carries ``runs``."""
-    return world.post(Message(sender=sender, to=to, type="task", body="goal", title="Work", budget=runs))
+def assign(world: BudgetWorld, sender: str, to: str, runs: int = 0, revises: str | None = None) -> Message:
+    """A task that carries ``runs`` (``revises``: it sends the earlier task back for rework)."""
+    return world.post(Message(sender=sender, to=to, type="task", body="goal", title="Work", budget=runs, revises=revises))
+
+
+def verdict(world: BudgetWorld, task: Message, kind: str = "accept") -> Message:
+    """The assigner's quiet verdict note on the result of ``task``."""
+    return world.post(Message(sender=task.sender, to=task.to, type="note", body="as is", title="verdict", feedback=kind, reply_to=task.id))
 
 
 def report(world: BudgetWorld, task: Message, status: str = "done", runs: int = 0) -> Message:

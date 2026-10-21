@@ -53,7 +53,8 @@ class AllocationPolicy(Protocol):
     def budget_to_return(self, actor: str, task: Message, status: str) -> int:
         """Runs that travel up with the result ``actor`` reports for ``task``: everything it has left, or 0. Only a final result
         (``done``/``failed``) returns budget, only to the assigner when that is ``actor``'s parent, and only when nothing else needs ``actor``'s
-        runs after it: no other open task, no other task reported ``blocked``, no outstanding delegation and no mail waiting for a run."""
+        runs after it: no other open task, no other task reported ``blocked`` that its assigner has not moved past (a later rework or a verdict),
+        no outstanding delegation and no mail waiting for a run."""
         ...
 
 
