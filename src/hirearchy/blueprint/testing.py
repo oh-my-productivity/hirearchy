@@ -197,10 +197,11 @@ class RecordingHiring(Hiring):
     def hire(
         self, actor: str, name: str, role: str, charter: str, *, model: str | None = None, tools: Sequence[str] | None = None,
         can_hire: bool = False, max_children: int = 5, workspace: str | None = None, inputs: Sequence[str] | None = None,
+        approved: bool = False,
     ) -> str:
         addr = child_addr(actor, name)
         self._log.add("hire", actor, name, role, charter, model=model, tools=tools, can_hire=can_hire, max_children=max_children,
-                      workspace=workspace, inputs=inputs)
+                      workspace=workspace, inputs=inputs, approved=approved)
         if self._agents.exists(addr):
             raise OrgError(f"{addr} already exists")
         self._agents.create(addr, {"role": role}, charter)
@@ -309,10 +310,11 @@ class FlakyHiring(Hiring):
     def hire(
         self, actor: str, name: str, role: str, charter: str, *, model: str | None = None, tools: Sequence[str] | None = None,
         can_hire: bool = False, max_children: int = 5, workspace: str | None = None, inputs: Sequence[str] | None = None,
+        approved: bool = False,
     ) -> str:
         self._nth.check()
         return self._inner.hire(actor, name, role, charter, model=model, tools=tools, can_hire=can_hire, max_children=max_children,
-                                workspace=workspace, inputs=inputs)
+                                workspace=workspace, inputs=inputs, approved=approved)
 
 
 class FlakyTaskAssigner(TaskAssigner):

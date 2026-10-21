@@ -10,7 +10,7 @@ ENG = "ceo/eng"
 # ------------------------------------------------------------------- QA-6 / QA-9: retire
 def _team(org):
     """root -> ceo(20) -> mgr(10, used 2) -> w(4, used 1); ceo also keeps eng."""
-    org.hire("ceo", "mgr", "Manager", "Manage.", can_hire=True)
+    org.hire("ceo", "mgr", "Manager", "Manage.", can_hire=True, approved=True)
     org.hire("ceo/mgr", "w", "Worker", "Work.")
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=20)
     org.delegate("ceo", "ceo/mgr", "t", "g", "a", budget=10)
@@ -60,7 +60,7 @@ def test_retire_accepts_short_name_and_full_address(org):
 
 
 def test_retire_is_still_limited_to_direct_reports(org):
-    org.hire("ceo", "mgr", "Manager", "Manage.", can_hire=True)
+    org.hire("ceo", "mgr", "Manager", "Manage.", can_hire=True, approved=True)
     org.hire("ceo/mgr", "w", "Worker", "Work.")
     for actor, name in (("ceo", "ceo/mgr/w"), ("ceo", "mgr/w"), ("ceo/eng", "ceo"), ("ceo/mgr", "ceo/eng"), ("ceo", "ceo"), ("ceo", "root")):
         with pytest.raises(OrgError):

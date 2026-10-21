@@ -16,7 +16,7 @@ Run the company.
 role: Engineer
 tools: []
 can_hire: false
-max_children: 5
+max_children: 0
 hired_by: ceo
 created: '2026-01-15T09:02:00+00:00'
 ---
@@ -50,7 +50,7 @@ role: Analyst
 tools:
 - read
 can_hire: false
-max_children: 5
+max_children: 0
 inputs:
 - <INPUTS>
 hired_by: root

@@ -31,7 +31,7 @@ def org(tmp_path: Path) -> Org:
 def test_hire_writes_the_charter_and_returns_the_address(org: Org) -> None:
     assert org.hire("ceo", "ops", "Ops", "Do ops.", tools=[]) == "ceo/ops"
     meta, body = org.charter("ceo/ops")
-    assert (meta["role"], meta["hired_by"], meta["can_hire"], meta["max_children"]) == ("Ops", "ceo", False, 5)
+    assert (meta["role"], meta["hired_by"], meta["can_hire"], meta["max_children"]) == ("Ops", "ceo", False, 0)
     assert body == "# Role: Ops\n\nDo ops."
 
 
@@ -84,9 +84,10 @@ class Retirer(Retirement):
 def test_hire_comes_from_the_hiring_of_the_runtime_with_every_argument(org: Org) -> None:
     hirer = Hirer()
     org.runtime = dataclasses.replace(org.runtime, hiring=hirer)
-    assert org.hire("ceo", "ops", "Ops", "Do ops.", model="m", tools=["b"], can_hire=True, max_children=3, workspace="/w", inputs=["/i"]) == "from-the-port"
+    assert org.hire("ceo", "ops", "Ops", "Do ops.", model="m", tools=["b"], can_hire=True, max_children=3, workspace="/w", inputs=["/i"],
+                    approved=True) == "from-the-port"
     assert hirer.calls == [("ceo", "ops", "Ops", "Do ops.", {
-        "model": "m", "tools": ["b"], "can_hire": True, "max_children": 3, "workspace": "/w", "inputs": ["/i"],
+        "model": "m", "tools": ["b"], "can_hire": True, "max_children": 3, "workspace": "/w", "inputs": ["/i"], "approved": True,
     })]
 
 
@@ -96,6 +97,7 @@ def test_the_defaults_of_hire_are_the_ones_it_always_had(org: Org) -> None:
     org.hire("ceo", "ops", "Ops", "Do ops.")
     assert hirer.calls[0][4] == {
         "model": None, "tools": None, "can_hire": False, "max_children": 5, "workspace": None, "inputs": None,
+        "approved": False,
     }
 
 

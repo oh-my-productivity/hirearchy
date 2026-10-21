@@ -98,7 +98,7 @@ def test_refuses_a_busy_report_and_says_why(team, org):
 
 
 def test_refuses_a_report_with_outstanding_delegations(org):
-    org.hire("ceo", "lead", "Lead", "Lead.", can_hire=True)
+    org.hire("ceo", "lead", "Lead", "Lead.", can_hire=True, approved=True)
     org.hire("ceo/lead", "w", "Worker", "work")
     org.delegate(ROOT, "ceo", "P", "goal", "criteria", budget=10)
     run(org, "ceo")
@@ -127,7 +127,7 @@ def test_refuses_a_report_with_unread_waking_mail_but_not_with_quiet_mail(team, 
 
 
 def test_only_direct_reports_no_cascade(org):
-    org.hire("ceo", "lead", "Lead", "Lead.", can_hire=True)
+    org.hire("ceo", "lead", "Lead", "Lead.", can_hire=True, approved=True)
     org.hire("ceo/lead", "w", "Worker", "work")
     org.delegate(ROOT, "ceo", "P", "goal", "criteria", budget=10)
     org.send("ceo", "ceo/lead", "runs", budget=4)

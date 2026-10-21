@@ -65,6 +65,7 @@ class HireCommand(Command):
             args.parent, args.name, args.role, self._text.read(args.charter), model=args.model,
             tools=[t for t in (args.tools or "").split(",") if t], can_hire=args.can_hire,
             max_children=args.max_children, workspace=args.workspace, inputs=args.inputs or None,
+            approved=True,  # the user's own decision at the terminal: the authority bound does not apply
         )
         self._snapshots().commit(f"root: hired {addr}")
         self._out.say(f"hired {addr}")

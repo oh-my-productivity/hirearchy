@@ -86,15 +86,15 @@ def test_the_skeleton_of_an_agent_comes_with_it(w: HierarchyWorld) -> None:
     assert w.read("ops/MEMORY.md") == ""
 
 
-def test_bools_and_numbers_are_coerced(w: HierarchyWorld) -> None:
-    w.hiring.hire("root", "ops", "Ops", "Run things.", can_hire=1, max_children="3")  # type: ignore[arg-type]
-    assert (meta_of(w, "ops")["can_hire"], meta_of(w, "ops")["max_children"]) == (True, 3)
+def test_can_hire_is_coerced_to_a_bool_and_max_children_must_be_a_number(w: HierarchyWorld) -> None:
+    w.hiring.hire("root", "ops", "Ops", "Run things.", can_hire=1, max_children=3)  # type: ignore[arg-type]
+    assert (meta_of(w, "ops")["can_hire"], meta_of(w, "ops")["max_children"]) == (True, 3)  # "3" is refused now: see A3 below
 
 
 def test_the_defaults_are_a_report_that_cannot_hire(w: HierarchyWorld) -> None:
     w.hiring.hire("root", "ops", "Ops", "Run things.")
     meta = meta_of(w, "ops")
-    assert (meta["can_hire"], meta["max_children"], meta["tools"], meta["hired_by"]) == (False, 5, [], "root")
+    assert (meta["can_hire"], meta["max_children"], meta["tools"], meta["hired_by"]) == (False, 0, [], "root")  # no right, no limit
     assert not {"model", "workspace", "inputs"} & set(meta)
 
 
@@ -319,3 +319,63 @@ def test_a_refused_hire_leaves_no_event_and_no_trace(w: HierarchyWorld) -> None:
     refusal(w, "root", "Bad", "I", "c")
     refusal(w, "root", "ceo", "I", "c")
     assert w.events.events == [] and w.listing("") == before
+
+
+# ------------------------------------------------------------------------------ the authority bound (A1, A3) and max_children without can_hire
+
+A3 = "max_children must be a whole number >= 0"
+A1 = (
+    "you cannot grant `can_hire: true`: only the user (root) or an approved plan gives an agent the right to hire. "
+    "Hire it with can_hire false, or ask your parent (`send`) with the reason."
+)
+
+
+@pytest.mark.parametrize("hirer", ["root", "ceo"])
+@pytest.mark.parametrize("value", [True, -1, "3", 2.5, None])
+@pytest.mark.parametrize("can_hire", [False, True])
+def test_a3_for_every_hirer_root_included(w: HierarchyWorld, hirer: str, value: object, can_hire: bool) -> None:
+    assert refusal(w, hirer, "ops", "Ops", "c", can_hire=can_hire, max_children=value, approved=True) == A3
+    assert refusal(w, hirer, "ops", "Ops", "c", can_hire=can_hire, max_children=value) == A3
+    assert not w.agents.exists(f"{hirer}/ops" if hirer != "root" else "ops") and w.events.events == []
+
+
+def test_a3_is_checked_before_the_hirer_s_right_to_hire(w: HierarchyWorld) -> None:
+    assert refusal(w, "ceo/eng", "intern", "I", "c", max_children=-1) == A3  # ceo/eng cannot hire, but A3 comes first
+
+
+@pytest.mark.parametrize("hirer", ["root", "ceo"])
+@pytest.mark.parametrize("asked", [5, 3, 0])
+def test_a_report_without_can_hire_gets_max_children_0_root_and_non_root(w: HierarchyWorld, hirer: str, asked: int) -> None:
+    addr = w.hiring.hire(hirer, "a", "A", "c", can_hire=False, max_children=asked)
+    assert (meta_of(w, addr)["can_hire"], meta_of(w, addr)["max_children"]) == (False, 0)
+
+
+def test_the_default_max_children_of_a_report_that_cannot_hire_is_0(w: HierarchyWorld) -> None:
+    addr = w.hiring.hire("ceo", "a", "A", "c")  # the default max_children is 5
+    assert meta_of(w, addr)["max_children"] == 0
+
+
+def test_root_keeps_the_max_children_of_a_report_that_can_hire(w: HierarchyWorld) -> None:
+    w.hiring.hire("root", "lead", "Lead", "c", can_hire=True, max_children=3)
+    assert meta_of(w, "lead")["max_children"] == 3
+
+
+def test_a_non_root_hirer_granting_can_hire_is_a1(w: HierarchyWorld) -> None:
+    assert refusal(w, "ceo", "lead", "Lead", "c", can_hire=True) == A1
+    assert refusal(w, "ceo", "lead", "Lead", "c", can_hire=True, max_children=1) == A1
+    assert not w.agents.exists("ceo/lead") and w.events.events == []
+
+
+def test_approved_skips_only_the_grant_check(w: HierarchyWorld) -> None:
+    w.hiring.hire("ceo", "lead", "Lead", "c", can_hire=True, max_children=9, approved=True)  # ceo's own limit is 2
+    assert (meta_of(w, "ceo/lead")["can_hire"], meta_of(w, "ceo/lead")["max_children"]) == (True, 9)
+
+
+def test_capacity_and_authority_checks_still_run_when_approved(w: HierarchyWorld) -> None:
+    assert refusal(w, "ceo/eng", "intern", "I", "c", can_hire=True, approved=True) == "your charter does not allow hiring"
+    assert refusal(w, "ceo", "ops", "Ops", "c", tools=["shell"], can_hire=True, approved=True) == (
+        "you cannot grant tools you do not have yourself: shell"
+    )
+    w.hiring.hire("ceo", "ops", "Ops", "c", can_hire=True, approved=True)
+    assert refusal(w, "ceo", "qa", "QA", "c", can_hire=True, approved=True) == "you already have the maximum of 2 direct reports"
+    assert refusal(w, "ceo", "qa", "QA", "c", approved=True, max_children=-1) == A3

@@ -59,7 +59,7 @@ def test_no_flag_when_there_is_work_or_no_budget_or_the_parent_is_root(stranded)
 
 
 def test_no_flag_while_waiting_on_a_delegation(org):
-    org.hire("ceo", "ops", "Ops", "Run.", can_hire=True)
+    org.hire("ceo", "ops", "Ops", "Run.", can_hire=True, approved=True)
     org.hire("ceo/ops", "dev", "Dev", "Code.")
     org.send(ROOT, "ceo", "grant", budget=10)
     org.send("ceo", "ceo/ops", "grant", budget=6)

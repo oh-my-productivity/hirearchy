@@ -22,7 +22,7 @@ SKELETON = ["AGENT.md", "MEMORY.md", "inbox", "inflight", "read", "runs", "sent"
 def org(tmp_path: Path) -> Org:
     made = Org.init(tmp_path / "org", "mission")
     made.hire("root", "ceo", "Boss", "Runs it.", can_hire=True, max_children=3)
-    made.hire("ceo", "eng", "Engineer", "Builds.", can_hire=True)
+    made.hire("ceo", "eng", "Engineer", "Builds.", can_hire=True, approved=True)
     made.hire("ceo", "ops", "Operator", "Operates.")
     made.hire("ceo/eng", "qa", "Tester", "Tests.")
     made.hire("root", "cto", "Chief", "Advises.")

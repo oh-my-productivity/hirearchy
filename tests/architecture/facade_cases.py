@@ -177,7 +177,8 @@ CASES: list[Case | FunctionCase] = [
     Case("state", "eligibility", "agent_states", "state", args("ceo")),
     # hierarchy
     Case("hire", "hierarchy", "hiring", "hire", args(
-        "ceo", "dev", "Developer", "Code.", model="m1", tools=["read"], can_hire=True, max_children=2, workspace="/ws", inputs=["/data"])),
+        "ceo", "dev", "Developer", "Code.", model="m1", tools=["read"], can_hire=True, max_children=2, workspace="/ws", inputs=["/data"],
+        approved=True)),
     Case("retire", "hierarchy", "retirement", "retire", args("ceo", "qa", "gone")),
     Case("retire_team", "hierarchy", "retirement", "retire_team", args("ceo", "eng", "gone")),
     # dispatch

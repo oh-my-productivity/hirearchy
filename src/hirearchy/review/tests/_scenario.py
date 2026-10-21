@@ -64,7 +64,7 @@ def build(tmp_path: Path, clock: ScenarioClock) -> Any:
     org.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=4)
     org.hire("ceo", "eng", "Engineer", "Build things.")
     org.hire("ceo", "qa", "Tester", "Break things.")
-    org.hire("ceo", "cto", "CTO", "Lead tech.", can_hire=True, max_children=2)
+    org.hire("ceo", "cto", "CTO", "Lead tech.", can_hire=True, max_children=2, approved=True)
     org.hire("ceo/cto", "dev", "Developer", "Code.")
     org.hire(ROOT, "ops", "Operations", "Keep it running.", can_hire=True, max_children=2)
     org.hire("ops", "dev", "Developer", "Fix things.")

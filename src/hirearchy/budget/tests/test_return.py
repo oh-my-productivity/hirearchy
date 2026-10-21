@@ -229,7 +229,7 @@ def total_held(org):
 
 
 def test_a_manager_cannot_return_what_its_delegations_need(org):
-    org.hire("ceo", "ops", "Ops", "Run.", can_hire=True)
+    org.hire("ceo", "ops", "Ops", "Run.", can_hire=True, approved=True)
     org.hire("ceo/ops", "dev", "Dev", "Code.")
     org.send(ROOT, "ceo", "grant", budget=10)
     org.send("ceo", "ceo/ops", "grant", budget=5)

@@ -35,7 +35,8 @@ class HiringTools(ToolGroup):
         name: lowercase-dashed (becomes the address <you>/<name>). role: a short job title.
         charter: markdown with purpose, responsibilities, decision rights, what to escalate, quality bar.
         model: kiro model id (optional; unset = the organization's default model, claude-sonnet-5.5). tools: kiro built-in tools to grant, only ones you have yourself
-        (e.g. "read", "write", "shell"). can_hire: whether the report may build its own team.
+        (e.g. "read", "write", "shell"). can_hire: whether the report may build its own team; only root (the user) or an approved plan can grant it.
+        max_children: the most direct reports it may have (for an agent hiring: at most its own); a report without can_hire gets 0.
         workspace: directory the report works in (must be inside yours).
         inputs: absolute folders the report may only READ (never change); a manager can give only folders inside its
         own inputs or workspace. A report with `read` and no workspace/inputs reads nothing outside the org.

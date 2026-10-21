@@ -29,10 +29,11 @@ class HierarchyMixin:
         max_children: int = 5,
         workspace: str | None = None,
         inputs: list[str] | None = None,
+        approved: bool = False,
     ) -> str:
         return self.runtime.hiring.hire(
             actor, name, role, charter, model=model, tools=tools, can_hire=can_hire, max_children=max_children, workspace=workspace,
-            inputs=inputs,
+            inputs=inputs, approved=approved,
         )
 
     def retire(self, actor: str, name: str, reason: str) -> str:

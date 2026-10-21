@@ -60,7 +60,8 @@ def test_hire_opens_for_a_change_and_hires_then_snapshots_then_says(tmp_path: Pa
     assert f.session.calls == [("open", True)]
     assert office.last("hire") == (
         ("ceo", "dev", "Dev", "Check the work.\n"),
-        {"model": "m", "tools": ["read", "write"], "can_hire": True, "max_children": 3, "workspace": "/w", "inputs": ["/a", "/b"]},
+        {"model": "m", "tools": ["read", "write"], "can_hire": True, "max_children": 3, "workspace": "/w", "inputs": ["/a", "/b"],
+         "approved": True},
     )
     assert office.names() == ["hire", "commit"] and office.last("commit") == (("root: hired ceo/dev",), {})
     assert f.out.stdout == "hired ceo/dev\n"
@@ -69,7 +70,14 @@ def test_hire_opens_for_a_change_and_hires_then_snapshots_then_says(tmp_path: Pa
 def test_hire_defaults_are_no_model_no_tools_no_inputs(tmp_path: Path) -> None:
     f, office, command = hire_world(tmp_path)
     go(command, "hire", "root", "ceo", "--role", "CEO", "--charter", "Run it.")
-    assert office.last("hire")[1] == {"model": None, "tools": [], "can_hire": False, "max_children": 5, "workspace": None, "inputs": None}
+    assert office.last("hire")[1] == {"model": None, "tools": [], "can_hire": False, "max_children": 5, "workspace": None, "inputs": None,
+                                       "approved": True}
+
+
+def test_cli_hire_is_approved(tmp_path: Path) -> None:
+    f, office, command = hire_world(tmp_path)
+    go(command, "hire", "ceo", "lead", "--role", "Lead", "--charter", "x", "--can-hire")  # the human at the terminal decides, whoever the parent is
+    assert office.last("hire")[1]["approved"] is True
 
 
 def test_hire_announces_before_it_reads_the_charter_file(tmp_path: Path) -> None:

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import SupportsInt, cast
 
-from ..access import AccessScopes, AuthorityPolicy, ModelResolver
+from ..access import AccessScopes, AuthorityPolicy, ModelResolver, children_limit
 from ..agents import AgentDirectory, AgentRegistry, CharterReader
 from ..kernel import NAME_RE, RESERVED, ROOT, Clock, EventSink, OrgError, child_addr, clip, depth
 from ..settings import OrgSettings
@@ -56,10 +56,14 @@ class RuleHiring(Hiring):
         max_children: int = 5,
         workspace: str | None = None,
         inputs: Sequence[str] | None = None,
+        approved: bool = False,
     ) -> str:
         actor = self._agents.require(actor)
         if not NAME_RE.fullmatch(name) or name in RESERVED:
             raise OrgError("name must be lowercase letters, digits and dashes (max 32), and not a reserved word")
+        limit = children_limit(max_children)  # A3, for every hirer
+        if not can_hire:
+            limit = 0  # the limit means nothing without the right
         tools = sorted(set(tools or []))
         meta, _ = self._charters.charter(actor)
         if inputs is not None:
@@ -72,6 +76,8 @@ class RuleHiring(Hiring):
             if len(self._agents.children(actor)) >= int(cast("SupportsInt | str", meta.get("max_children", 5))):
                 raise OrgError(f"you already have the maximum of {meta.get('max_children', 5)} direct reports")
             self._authority.check_authority(actor, tools, workspace, inputs)
+            if not approved:
+                self._authority.check_grant(actor, grants_hire=bool(can_hire), max_children=limit)
         addr = child_addr(actor, name)
         max_depth = self._settings.config()["max_depth"]
         if depth(addr) > int(cast("SupportsInt | str", max_depth)):
@@ -83,7 +89,7 @@ class RuleHiring(Hiring):
             "model": model,
             "tools": tools,
             "can_hire": bool(can_hire),
-            "max_children": int(max_children),
+            "max_children": limit,
             "workspace": workspace,
             "inputs": inputs,
             "hired_by": actor,

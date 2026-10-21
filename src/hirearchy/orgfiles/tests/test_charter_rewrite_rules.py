@@ -75,7 +75,7 @@ def test_the_write_reply_lists_kept_and_changed_keys(team):
     assert "kept from the old frontmatter (not in your text):" in out
     for key in ("model", "inputs", "can_hire", "hired_by", "created"):
         assert key in out.split("kept from the old frontmatter")[1].split("changed")[0]
-    assert "role: Reviewer -> Sharper" in out and "max_children: 5 -> 2" in out
+    assert "role: Reviewer -> Sharper" in out and "max_children: 0 -> 2" in out
     assert "tools" not in out.split("kept from the old frontmatter")[1].split(".")[0]  # set explicitly, unchanged
     out = call(server, "write", path="lead/rev/AGENT.md", content=charter_text("Sharper", tools=[]))
     assert "tools: [read] -> []" in out

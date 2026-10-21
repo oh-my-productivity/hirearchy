@@ -79,6 +79,39 @@ def test_apply_creates_tree_charters_and_task(base, roots, empty_org):
     assert empty_org.budget("lead") == 22
 
 
+class SpyHiring(Hiring):
+    """Forwards to the real hiring and keeps the keywords of every hire."""
+
+    def __init__(self, inner):
+        self._inner = inner
+        self.seen = []
+
+    def hire(self, actor, name, role, charter, **kw):
+        self.seen.append((actor, name, kw))
+        return self._inner.hire(actor, name, role, charter, **kw)
+
+
+def test_apply_hires_with_approved_so_a_planned_sub_lead_gets_can_hire(base, roots, empty_org):
+    def nest(bp):
+        sub = {"name": "sub", "template": "manager", "role": "Research sub-lead",
+               "children": [{"name": "a", "template": "researcher"}, {"name": "b", "template": "researcher"},
+                            {"name": "c", "template": "researcher"}]}
+        bp["agents"][0]["children"].append(sub)
+        bp["needs"]["budget_runs"] = 80
+
+    bp = mutate(base, nest)
+    assert not bpm.errors(bpm.validate(bp, allowed_roots=roots)), bpm.validate(bp, allowed_roots=roots)
+    spy = SpyHiring(empty_org.runtime.hiring)
+    apply_through(empty_org, {Hiring: spy})
+    bpm.apply(empty_org, bp, allowed_roots=roots)
+    assert len(spy.seen) == 8 and all(kw.get("approved") is True for _, _, kw in spy.seen)  # every hire of an applied plan
+    lead, _ = empty_org.charter("lead")
+    sub, _ = empty_org.charter("lead/sub")
+    # the sub-lead was hired by the lead, who is not root: only the approved plan could give it the right to hire and more children than the lead has
+    assert lead["max_children"] == 4 and sub["can_hire"] is True and sub["max_children"] == 3
+    assert empty_org.charter("lead/sub/a")[0]["can_hire"] is False and empty_org.charter("lead/sub/a")[0]["max_children"] == 0
+
+
 def test_apply_budget_plan_is_executable_by_the_manager(base, roots, empty_org):
     s = bpm.apply(empty_org, base, allowed_roots=roots)
     for name, n in (("researcher", 3), ("writer", 2), ("factcheck", 2)):

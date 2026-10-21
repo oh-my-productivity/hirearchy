@@ -25,6 +25,6 @@ class CharterTeamBuilder(TeamBuilding):
             addr = self._hiring.hire(
                 a.parent or ROOT, a.name, a.role, self._charters.charter(a, agents, bp, split), model=a.model, tools=a.tools,
                 can_hire=a.can_hire, max_children=a.max_children, workspace=a.workspace,
-                inputs=a.inputs if (a.inputs or "read" in a.tools) else None,
+                inputs=a.inputs if (a.inputs or "read" in a.tools) else None, approved=True,  # the approved plan grants the positions in it
             )
             built.created.append(addr)

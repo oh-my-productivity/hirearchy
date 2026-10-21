@@ -157,10 +157,24 @@ def test_the_created_time_is_the_injected_clock_s() -> None:
     assert rig.registry.created[0][1]["created"] == "2030-05-07T07:08:09+00:00"
 
 
-def test_the_inputs_are_checked_first_then_the_rights_then_the_authority_then_the_agent_is_made_then_the_model_is_asked() -> None:
+def test_the_inputs_are_checked_first_then_the_rights_then_the_authority_then_the_grant_then_the_agent_is_made_then_the_model_is_asked() -> None:
     rig = Rig()
     rig.hiring.hire("ceo", "eng", "E", "c", inputs=["/in"])
-    assert rig.calls.log == ["inputs", "authority", "create", "model"]
+    assert rig.calls.log == ["inputs", "authority", "grant", "create", "model"]
+    assert rig.authority.grants == [("ceo", False, 0)]  # no can_hire, so max_children 0
+
+
+def test_an_approved_hire_skips_the_grant_check_and_nothing_else() -> None:
+    rig = Rig()
+    rig.hiring.hire("ceo", "eng", "E", "c", can_hire=True, max_children=4, inputs=["/in"], approved=True)
+    assert rig.calls.log == ["inputs", "authority", "create", "model"] and rig.authority.grants == []
+    assert rig.registry.created[0][1]["max_children"] == 4
+
+
+def test_the_grant_asks_whether_the_report_gets_the_right_and_which_limit() -> None:
+    rig = Rig()
+    rig.hiring.hire("ceo", "eng", "E", "c", can_hire=True, max_children=3)
+    assert rig.authority.grants == [("ceo", True, 3)]
 
 
 def test_the_authority_is_asked_what_the_hirer_would_hand_down() -> None:
@@ -195,12 +209,12 @@ def test_the_model_is_asked_after_the_agent_exists_and_its_answer_is_in_the_even
     assert event.fields["model"] == "model-of-ceo/eng"
 
 
-def test_the_depth_is_judged_after_the_authority_and_before_the_place_is_looked_at() -> None:
+def test_the_depth_is_judged_after_the_authority_and_the_grant_and_before_the_place_is_looked_at() -> None:
     rig = Rig(org_md="---\nmax_depth: 1\n---\nr\n")
     rig.files.put_dir("ceo/eng")  # the place is taken, too: the depth is what is said
     with pytest.raises(OrgError, match="limited to depth 1"):
         rig.hiring.hire("ceo", "eng", "E", "c")
-    assert rig.calls.log == ["authority"]
+    assert rig.calls.log == ["authority", "grant"]
 
 
 def test_nothing_is_made_nor_said_when_a_rule_refuses() -> None:

@@ -25,7 +25,7 @@ def test_the_send_reply_carries_the_grant_hint(org):
 
 
 def test_a_manager_granting_to_its_report_also_gets_the_hint(org):
-    org.hire("ceo", "lead2", "Lead", "x", can_hire=True)
+    org.hire("ceo", "lead2", "Lead", "x", can_hire=True, approved=True)
     org.send(ROOT, "ceo", "runs", budget=6)
     out = call(build_server(org, "ceo"), "send", to="ceo/lead2", body="go", budget=2)
     assert "`ceo/lead2` now has 2 run(s) and 0 outstanding delegation(s); with one more delegation it can hand down at most 1 run(s)." in out

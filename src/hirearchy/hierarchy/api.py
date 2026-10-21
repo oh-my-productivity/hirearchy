@@ -39,13 +39,17 @@ class Hiring(Protocol):
         max_children: int = 5,
         workspace: str | None = None,
         inputs: Sequence[str] | None = None,
+        approved: bool = False,
     ) -> str:
         """Create the direct report ``name`` of ``actor`` and return its address; emit ``agent.hire`` (with the model the new agent will run
         with). ``name`` is lowercase letters, digits and dashes (at most 32), not a reserved word, not already taken; ``tools`` are sorted and
         deduplicated; ``model=None`` leaves the charter unpinned, so the organization's default applies. A hirer other than root needs
         ``can_hire`` in its charter, fewer reports than its ``max_children``, and may grant no tool, workspace or input that it does not have
-        itself; an unconfined ``read`` is never handed down by a confined hirer (the report then gets ``inputs: []``). ``OrgError`` for every
-        refusal."""
+        itself; an unconfined ``read`` is never handed down by a confined hirer (the report then gets ``inputs: []``). ``max_children`` is a whole
+        number >= 0 for every hirer (root included), else ``OrgError``; a report without ``can_hire`` gets 0, whoever hires it. A hirer other than
+        root may not grant ``can_hire`` (and may not give a report a ``max_children`` above its own) unless ``approved``: the decision of a person,
+        passed only by the blueprint applier (an approved plan), the CLI and the ``Org`` facade, never by an MCP tool; ``approved`` skips that grant
+        check and no other. ``OrgError`` for every refusal."""
         ...
 
 
