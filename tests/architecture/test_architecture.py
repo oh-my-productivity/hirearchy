@@ -1,6 +1,6 @@
 """The structural rules R1, R4, R6-R9, R13 on the real source tree, and a seeded violation for each checker.
 
-On today's code the checks are vacuous for the packages that do not exist yet (a checker only looks at ``src/orgmcp/<pkg>/`` for
+On today's code the checks are vacuous for the packages that do not exist yet (a checker only looks at ``src/hirearchy/<pkg>/`` for
 packages that are there). The seeded tests prove each checker CAN fail: ``fixtures/bad_pkg`` breaks one rule per module.
 """
 

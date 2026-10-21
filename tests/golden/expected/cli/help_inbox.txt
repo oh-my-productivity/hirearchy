@@ -1,4 +1,4 @@
-usage: orgmcp inbox [-h] [--keep]
+usage: hirearchy inbox [-h] [--keep]
 
 options:
   -h, --help  show this help message and exit

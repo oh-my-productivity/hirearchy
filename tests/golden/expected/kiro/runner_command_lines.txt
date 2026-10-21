@@ -1,15 +1,15 @@
 ##### ceo
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "orgmcp-golden-team-org-<ROOT_HASH>", "--model", "claude-sonnet-5.5"]
+command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>", "--model", "claude-sonnet-5.5"]
 cwd: <TMP>/golden-team/org/ceo
 env: {"ORG_AGENT": "ceo", "ORG_ROOT": "<TMP>/golden-team/org"}
-profile file: orgmcp-golden-team-org-<ROOT_HASH>.json
+profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 {
-  "name": "orgmcp-golden-team-org-<ROOT_HASH>",
-  "description": "internal: used by the orgmcp scheduler for <TMP>/golden-team/org; not a general-purpose agent",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-team-org-<ROOT_HASH>",
+  "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<VENV_BIN>/orgmcp",
+    "hirearchy": {
+      "command": "<VENV_BIN>/hirearchy",
       "args": [
         "mcp"
       ],
@@ -20,10 +20,10 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>.json
     }
   },
   "tools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "allowedTools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "resources": [],
   "hooks": {},
@@ -31,17 +31,17 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>.json
 }
 
 ##### ceo/eng
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "orgmcp-golden-team-org-<ROOT_HASH>", "--model", "claude-sonnet-5.5"]
+command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>", "--model", "claude-sonnet-5.5"]
 cwd: <TMP>/golden-team/org/ceo/eng
 env: {"ORG_AGENT": "ceo/eng", "ORG_ROOT": "<TMP>/golden-team/org"}
-profile file: orgmcp-golden-team-org-<ROOT_HASH>.json
+profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 {
-  "name": "orgmcp-golden-team-org-<ROOT_HASH>",
-  "description": "internal: used by the orgmcp scheduler for <TMP>/golden-team/org; not a general-purpose agent",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-team-org-<ROOT_HASH>",
+  "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<VENV_BIN>/orgmcp",
+    "hirearchy": {
+      "command": "<VENV_BIN>/hirearchy",
       "args": [
         "mcp"
       ],
@@ -52,10 +52,10 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>.json
     }
   },
   "tools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "allowedTools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "resources": [],
   "hooks": {},
@@ -63,17 +63,17 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>.json
 }
 
 ##### sh
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "orgmcp-golden-team-org-<ROOT_HASH>-shell", "--model", "claude-sonnet-5.5"]
+command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-shell", "--model", "claude-sonnet-5.5"]
 cwd: <WS>
 env: {"ORG_AGENT": "sh", "ORG_ROOT": "<TMP>/golden-team/org"}
-profile file: orgmcp-golden-team-org-<ROOT_HASH>-shell.json
+profile file: hirearchy-golden-team-org-<ROOT_HASH>-shell.json
 {
-  "name": "orgmcp-golden-team-org-<ROOT_HASH>-shell",
-  "description": "internal: used by the orgmcp scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: shell)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-team-org-<ROOT_HASH>-shell",
+  "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: shell)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<VENV_BIN>/orgmcp",
+    "hirearchy": {
+      "command": "<VENV_BIN>/hirearchy",
       "args": [
         "mcp"
       ],
@@ -84,11 +84,11 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>-shell.json
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "shell"
   ],
   "allowedTools": [
-    "@orgmcp",
+    "@hirearchy",
     "shell"
   ],
   "resources": [],
@@ -97,17 +97,17 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>-shell.json
 }
 
 ##### dev
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "orgmcp-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5"]
+command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5"]
 cwd: <WS>
 env: {"ORG_AGENT": "dev", "ORG_ROOT": "<TMP>/golden-team/org"}
-profile file: orgmcp-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>.json
+profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>.json
 {
-  "name": "orgmcp-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>",
-  "description": "internal: used by the orgmcp scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: read, shell, write)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>",
+  "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: read, shell, write)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<VENV_BIN>/orgmcp",
+    "hirearchy": {
+      "command": "<VENV_BIN>/hirearchy",
       "args": [
         "mcp"
       ],
@@ -118,13 +118,13 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "read",
     "shell",
     "write"
   ],
   "allowedTools": [
-    "@orgmcp",
+    "@hirearchy",
     "shell"
   ],
   "resources": [],
@@ -155,17 +155,17 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>
 }
 
 ##### ro
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "orgmcp-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5"]
+command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5"]
 cwd: <TMP>/golden-team/org/ro
 env: {"ORG_AGENT": "ro", "ORG_ROOT": "<TMP>/golden-team/org"}
-profile file: orgmcp-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>.json
+profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>.json
 {
-  "name": "orgmcp-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>",
-  "description": "internal: used by the orgmcp scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: read)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>",
+  "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: read)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<VENV_BIN>/orgmcp",
+    "hirearchy": {
+      "command": "<VENV_BIN>/hirearchy",
       "args": [
         "mcp"
       ],
@@ -176,11 +176,11 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>.json
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "read"
   ],
   "allowedTools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "resources": [],
   "hooks": {},
@@ -199,17 +199,17 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>.json
 }
 
 ##### modeled
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "orgmcp-golden-team-org-<ROOT_HASH>", "--model", "claude-haiku-4.5"]
+command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>", "--model", "claude-haiku-4.5"]
 cwd: <TMP>/golden-team/org/modeled
 env: {"ORG_AGENT": "modeled", "ORG_ROOT": "<TMP>/golden-team/org"}
-profile file: orgmcp-golden-team-org-<ROOT_HASH>.json
+profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 {
-  "name": "orgmcp-golden-team-org-<ROOT_HASH>",
-  "description": "internal: used by the orgmcp scheduler for <TMP>/golden-team/org; not a general-purpose agent",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-team-org-<ROOT_HASH>",
+  "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<VENV_BIN>/orgmcp",
+    "hirearchy": {
+      "command": "<VENV_BIN>/hirearchy",
       "args": [
         "mcp"
       ],
@@ -220,10 +220,10 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>.json
     }
   },
   "tools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "allowedTools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "resources": [],
   "hooks": {},
@@ -231,17 +231,17 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>.json
 }
 
 ##### legacy
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "orgmcp-golden-team-org-<ROOT_HASH>-read", "--model", "claude-sonnet-5.5"]
+command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read", "--model", "claude-sonnet-5.5"]
 cwd: <TMP>/golden-team/org/legacy
 env: {"ORG_AGENT": "legacy", "ORG_ROOT": "<TMP>/golden-team/org"}
-profile file: orgmcp-golden-team-org-<ROOT_HASH>-read.json
+profile file: hirearchy-golden-team-org-<ROOT_HASH>-read.json
 {
-  "name": "orgmcp-golden-team-org-<ROOT_HASH>-read",
-  "description": "internal: used by the orgmcp scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: read)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-team-org-<ROOT_HASH>-read",
+  "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: read)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<VENV_BIN>/orgmcp",
+    "hirearchy": {
+      "command": "<VENV_BIN>/hirearchy",
       "args": [
         "mcp"
       ],
@@ -252,11 +252,11 @@ profile file: orgmcp-golden-team-org-<ROOT_HASH>-read.json
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "read"
   ],
   "allowedTools": [
-    "@orgmcp",
+    "@hirearchy",
     "read"
   ],
   "resources": [],

@@ -5,8 +5,8 @@ ids, tmp paths replaced by placeholders), renders some output and compares it wi
 
 Regenerate deliberately, review the diff in git, and commit it with the change that caused it::
 
-    ORGMCP_UPDATE_GOLDEN=1 uv run pytest tests/golden            # rewrite every expected file that differs
-    ORGMCP_UPDATE_GOLDEN=1 uv run pytest tests/golden -k prompts # only some
+    HIREARCHY_UPDATE_GOLDEN=1 uv run pytest tests/golden            # rewrite every expected file that differs
+    HIREARCHY_UPDATE_GOLDEN=1 uv run pytest tests/golden -k prompts # only some
 
 A refactor step must leave ``expected/`` untouched: a diff there means observable behaviour changed.
 Without the variable, a missing or different file fails the test and prints a unified diff.
@@ -30,7 +30,7 @@ from pathlib import Path
 import pytest
 
 EXPECTED = Path(__file__).resolve().parent / "expected"
-UPDATE = os.environ.get("ORGMCP_UPDATE_GOLDEN", "").strip().lower() not in ("", "0", "false", "no")
+UPDATE = os.environ.get("HIREARCHY_UPDATE_GOLDEN", "").strip().lower() not in ("", "0", "false", "no")
 START = datetime(2026, 1, 15, 9, 0, 0, tzinfo=timezone.utc)
 
 
@@ -38,7 +38,7 @@ START = datetime(2026, 1, 15, 9, 0, 0, tzinfo=timezone.utc)
 
 
 def check(name: str, actual: str) -> None:
-    """Compare ``actual`` with ``expected/<name>`` byte for byte (or rewrite it when ``ORGMCP_UPDATE_GOLDEN`` is set)."""
+    """Compare ``actual`` with ``expected/<name>`` byte for byte (or rewrite it when ``HIREARCHY_UPDATE_GOLDEN`` is set)."""
     path = EXPECTED / name
     data = actual.encode("utf-8")
     if UPDATE:
@@ -47,7 +47,7 @@ def check(name: str, actual: str) -> None:
             path.write_bytes(data)
         return
     if not path.is_file():
-        pytest.fail(f"no golden file {path.relative_to(EXPECTED.parent)}: create it with ORGMCP_UPDATE_GOLDEN=1 "
+        pytest.fail(f"no golden file {path.relative_to(EXPECTED.parent)}: create it with HIREARCHY_UPDATE_GOLDEN=1 "
                     f"uv run pytest tests/golden, then review it")
     expected = path.read_bytes()
     if expected != data:
@@ -56,7 +56,7 @@ def check(name: str, actual: str) -> None:
             actual.splitlines(keepends=True), "expected/" + name, "actual", n=2,
         ))
         pytest.fail(f"golden file {name} differs (behaviour changed? regenerate deliberately with "
-                    f"ORGMCP_UPDATE_GOLDEN=1):\n{diff[:6000]}")
+                    f"HIREARCHY_UPDATE_GOLDEN=1):\n{diff[:6000]}")
 
 
 # ------------------------------------------------------------------------------------------------ determinism
@@ -92,7 +92,7 @@ class Normalizer:
 
 
 def make_normalizer(tmp_path: Path, home: Path | None) -> Normalizer:
-    from orgmcp.app import wire_kiro
+    from hirearchy.app import wire_kiro
 
     n = Normalizer()
     n.add(wire_kiro.project_dir(), "<PROJECT>")

@@ -1,23 +1,23 @@
-# orgmcp refactor — binding principles (decided by the project manager with the user)
+# hirearchy refactor — binding principles (decided by the project manager with the user)
 
 User's goal (verbatim): "refactor the whole system respecting TDD and SOLID principles. All classes should implement
 and depend on interfaces." and "choose the one that fits extreme organization, well separated responsibilities and
 extremely high cohesion and extremely low coupling."
 
 ## Structure
-1. Package by feature (vertical slices) under `src/orgmcp/<feature>/`. Each feature package has:
+1. Package by feature (vertical slices) under `src/hirearchy/<feature>/`. Each feature package has:
    - `api.py`: the ONLY public surface — the `typing.Protocol` interfaces the feature provides, its data types
      (frozen dataclasses where possible) and its exceptions. `__init__.py` re-exports exactly `api`.
    - private implementation modules named `_*.py` (never imported from outside the package, except by the
      composition root).
    - `tests/`: the feature's tests, colocated (high cohesion). The global `tests/` dir shrinks to cross-feature
      end-to-end tests and shared fixtures, and is emptied as features move.
-2. `src/orgmcp/kernel/`: the smallest shared vocabulary every feature may use — primitive ports (`Clock`,
+2. `src/hirearchy/kernel/`: the smallest shared vocabulary every feature may use — primitive ports (`Clock`,
    `IdGenerator`, ...), core data types (e.g. `Address`, `Message`), the base error. The kernel imports nothing else
-   from orgmcp.
+   from hirearchy.
 3. Entry points (`cli`, `mcp` server, `scheduler` loop, `dashboard`) are packages too; they depend only on feature
    `api` modules.
-4. `src/orgmcp/app/wiring.py` (composition root) is the ONLY module that imports `_` implementation modules and
+4. `src/hirearchy/app/wiring.py` (composition root) is the ONLY module that imports `_` implementation modules and
    constructs concrete classes.
 5. `Org` (today's `core.Org`) survives only as a thin backward-compatible facade built by the composition root,
    delegating every method to the feature services. No feature may import it. It exists so the user's running
@@ -41,7 +41,7 @@ extremely high cohesion and extremely low coupling."
   package's `_` modules (only `app.wiring` may); (c) no cycles between features; (d) kernel independent; (e) no
   feature imports the `Org` facade.
 - `mypy==2.4.0`: strict on every refactored package (Protocol conformance, no `Any` leaks in APIs).
-- A test that walks every class in `src/orgmcp` and asserts each non-exempt class subclasses a Protocol.
+- A test that walks every class in `src/hirearchy` and asserts each non-exempt class subclasses a Protocol.
 - All three run in the default `pytest` run (or a single `uv run` command documented in the README) and must pass.
 
 ## TDD

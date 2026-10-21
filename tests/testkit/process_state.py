@@ -1,8 +1,8 @@
-"""The process-global state that ``orgmcp.core`` and ``orgmcp.app`` keep and that tests are allowed to patch for the length of one test.
+"""The process-global state that ``hirearchy.core`` and ``hirearchy.app`` keep and that tests are allowed to patch for the length of one test.
 
 ``ProcessState.capture()`` records it; ``leaks_since`` names what differs from an earlier capture; ``restore`` puts it back. The autouse fixture
 ``process_state_guard`` (tests/testkit/fixtures.py) uses all three after every test, so a test that leaves one of these replaced fails
-*itself*, by name, instead of making an unrelated test of ``orgmcp.app`` fail later (and only sometimes, depending on what ran before it).
+*itself*, by name, instead of making an unrelated test of ``hirearchy.app`` fail later (and only sometimes, depending on what ran before it).
 """
 
 from __future__ import annotations
@@ -23,9 +23,9 @@ class ProcessState:
 
     @staticmethod
     def capture() -> ProcessState:
-        from orgmcp import core
-        from orgmcp.app import wiring
-        from orgmcp.kernel import Message
+        from hirearchy import core
+        from hirearchy.app import wiring
+        from hirearchy.kernel import Message
 
         resources = wiring.process_resources()
         values: dict[str, Any] = {f"core.{name}": getattr(core, name) for name in CORE_NAMES}
@@ -49,8 +49,8 @@ def _same(a: Any, b: Any) -> bool:
 
 def restore(earlier: ProcessState) -> None:
     """Put back the patchable entries of ``earlier`` (the aliases that cannot be patched are only reported)."""
-    from orgmcp import core
-    from orgmcp.app import wiring
+    from hirearchy import core
+    from hirearchy.app import wiring
 
     for name in CORE_NAMES:
         setattr(core, name, earlier.values[f"core.{name}"])

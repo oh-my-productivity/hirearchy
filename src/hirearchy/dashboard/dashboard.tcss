@@ -1,0 +1,137 @@
+/* hirearchy dash: layout and colours. Behaviour lives in dashboard.py. */
+
+Screen {
+    layout: vertical;
+}
+
+#header {
+    dock: top;
+    height: 2;
+    background: $boost;
+    padding: 0 1;
+}
+
+#header-title, #header-counts {
+    height: 1;
+    width: 1fr;
+}
+
+#statusline {
+    dock: bottom;
+    height: auto;
+    max-height: 3;
+    background: $error 30%;
+    color: $text;
+    padding: 0 1;
+}
+
+#statusline.hidden {
+    display: none;
+}
+
+#screens {
+    height: 1fr;
+}
+
+/* ---- 1 Org */
+#org-view {
+    height: 1fr;
+}
+
+AgentTree {
+    overflow-x: hidden;
+    width: 50%;
+    min-width: 44;
+    max-width: 80;
+    border-right: solid $primary-darken-1;
+    padding: 0 1 0 0;
+}
+
+AgentTree:focus {
+    border-right: solid $accent;
+}
+
+#agent-tabs {
+    width: 1fr;
+}
+
+TabPane {
+    padding: 0;
+}
+
+TextPane {
+    height: 1fr;
+    padding: 0 1;
+    scrollbar-gutter: stable;
+}
+
+TextPane:focus {
+    background: $boost;
+}
+
+TextPane.nowrap > Static {
+    width: auto;
+    min-width: 100%;
+}
+
+NavTable {
+    height: 1fr;
+}
+
+#msg-hint {
+    height: 1;
+    color: $text-muted;
+    padding: 0 1;
+}
+
+/* ---- 2 / 3 lists with a detail */
+.list-detail {
+    height: 1fr;
+}
+
+.list-detail > .detail-title {
+    height: 1;
+    background: $primary-darken-2;
+    padding: 0 1;
+    text-style: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ---- 4 Events */
+#events-bar {
+    height: 1;
+    color: $text-muted;
+    padding: 0 1;
+}
+
+#events-filter {
+    height: 3;
+}
+
+/* ---- modals */
+ModalScreen {
+    align: center middle;
+}
+
+#modal-box {
+    width: 90%;
+    height: 85%;
+    background: $surface;
+    border: thick $primary;
+    padding: 0 1;
+}
+
+#modal-title {
+    height: 1;
+    text-style: bold;
+    background: $primary-darken-2;
+    padding: 0 1;
+}
+
+#help-box {
+    width: 78;
+    max-width: 96%;
+}

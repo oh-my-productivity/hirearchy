@@ -1,6 +1,7 @@
-usage: orgmcp hire [-h] --role ROLE --charter CHARTER [--model MODEL] [--tools TOOLS] [--can-hire]
-                   [--max-children MAX_CHILDREN] [--workspace WORKSPACE] [--inputs PATH]
-                   parent name
+usage: hirearchy hire [-h] --role ROLE --charter CHARTER [--model MODEL] [--tools TOOLS]
+                      [--can-hire] [--max-children MAX_CHILDREN] [--workspace WORKSPACE]
+                      [--inputs PATH]
+                      parent name
 
 positional arguments:
   parent                'root' or an agent address

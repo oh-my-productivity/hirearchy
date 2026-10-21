@@ -8,7 +8,7 @@ import yaml
 from testkit.cli_world import main
 from testkit.e2e_world import ROOT_INSTRUCTIONS, binding_at, bpm, build_server, ex, file_confinement, resolve_binding, skill_source
 
-from orgmcp.core import ROOT, Org
+from hirearchy.core import ROOT, Org
 
 
 def call(server, tool, **args):
@@ -71,7 +71,7 @@ KNOWN_WARNINGS = {"path-delivery", "path-parent", "workspace-new", "shell-unconf
 @pytest.fixture
 def cwd(tmp_path, monkeypatch):
     """The 'user's current directory' the examples build their absolute paths from."""
-    monkeypatch.setenv("ORGMCP_WORKSPACE_ROOTS", str(tmp_path))
+    monkeypatch.setenv("HIREARCHY_WORKSPACE_ROOTS", str(tmp_path))
     work = tmp_path / "cwd"
     work.mkdir()
     monkeypatch.chdir(work)
@@ -113,7 +113,7 @@ def test_plan_and_access_line_show_exactly_the_applied_confinement(kind, cwd, tm
         if "read" in tools:
             assert "organization" in plan and "organization" in technical, (addr, plan, technical)
         told = {str(o.workspace_of(addr))} if "shell" in tools and o.workspace_of(addr) else set()
-        if "read" not in tools:  # no built-in read: the inputs are opened with orgmcp `read` by absolute path
+        if "read" not in tools:  # no built-in read: the inputs are opened with hirearchy `read` by absolute path
             told |= set(map(str, o.inputs_of(addr)))
         for line in (plan, technical):
             assert paths_in(line) == enforced | told, (addr, line, enforced)

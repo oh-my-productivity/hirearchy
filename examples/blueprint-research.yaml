@@ -1,6 +1,6 @@
 # A research org, as the assistant would propose it after eliciting the needs.
-#   orgmcp plan examples/blueprint-research.yaml     # validate + print the plan
-#   orgmcp apply examples/blueprint-research.yaml    # create the agents and give the first task
+#   hirearchy plan examples/blueprint-research.yaml     # validate + print the plan
+#   hirearchy apply examples/blueprint-research.yaml    # create the agents and give the first task
 mission: >
   Produce a sourced competitor analysis of five self-hosted note-taking apps for a small team choosing one.
 needs:

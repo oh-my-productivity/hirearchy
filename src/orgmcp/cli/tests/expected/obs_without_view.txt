@@ -1,6 +1,0 @@
-
-[stderr]
-usage: orgmcp obs [-h] {now,trace,metrics,events} ...
-orgmcp obs: error: the following arguments are required: obs_cmd
-
-[exit 2]

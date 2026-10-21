@@ -5,7 +5,7 @@
     uv run python scripts/static_checks.py mypy       # only mypy
     uv run python scripts/static_checks.py imports    # only import-linter
 
-* mypy checks with ``strict = true`` (a) every package directory under ``src/orgmcp/`` (a directory with ``__init__.py``: kernel, the
+* mypy checks with ``strict = true`` (a) every package directory under ``src/hirearchy/`` (a directory with ``__init__.py``: kernel, the
   features, the entry points, app -- a package is a refactored package, ARCHITECTURE.md R10, so nobody has to remember to opt in) and
   (b) the packages listed in ``[tool.mypy] packages`` of pyproject.toml (for a flat legacy module that is made strict early). With
   neither there is nothing to check and the run only proves that mypy works.
@@ -34,14 +34,14 @@ def tool(name: str) -> str | None:
 
 
 def discover_packages(source: Path) -> list[str]:
-    """``orgmcp.<dir>`` for every package directory of ``source`` (a directory with an __init__.py)."""
+    """``hirearchy.<dir>`` for every package directory of ``source`` (a directory with an __init__.py)."""
     return sorted(f"{source.name}.{d.name}" for d in source.iterdir() if d.is_dir() and (d / "__init__.py").is_file())
 
 
 def strict_packages() -> list[str]:
     config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     configured = list(config.get("tool", {}).get("mypy", {}).get("packages", []))
-    return sorted(set(configured) | set(discover_packages(ROOT / "src" / "orgmcp")))
+    return sorted(set(configured) | set(discover_packages(ROOT / "src" / "hirearchy")))
 
 
 def run_mypy() -> int:
@@ -53,7 +53,7 @@ def run_mypy() -> int:
     if not packages:
         version = subprocess.run([exe, "--version"], capture_output=True, text=True, cwd=ROOT, check=False)
         print(f"mypy: {version.stdout.strip()}; no package is under strict checking yet "
-              "(a src/orgmcp/<pkg>/ directory with __init__.py is checked automatically)", flush=True)
+              "(a src/hirearchy/<pkg>/ directory with __init__.py is checked automatically)", flush=True)
         return version.returncode
     print(f"mypy --strict on: {', '.join(packages)}", flush=True)
     return subprocess.run([exe, *(arg for package in packages for arg in ("-p", package))], cwd=ROOT, check=False).returncode

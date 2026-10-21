@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from orgmcp.core import ROOT, Org, OrgError
+from hirearchy.core import ROOT, Org, OrgError
 
 
 def test_hierarchy_is_the_directory_tree(org):

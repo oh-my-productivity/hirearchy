@@ -10,10 +10,10 @@ import stat
 
 import pytest
 
-from orgmcp.app import wiring
-from orgmcp.core import ROOT, Org
-from orgmcp.kernel import TokenSource
-from orgmcp.kernel.testing import CounterTokens
+from hirearchy.app import wiring
+from hirearchy.core import ROOT, Org
+from hirearchy.kernel import TokenSource
+from hirearchy.kernel.testing import CounterTokens
 
 from . import process_state
 from .clocks import clock_ports
@@ -21,9 +21,9 @@ from .clocks import clock_ports
 
 @pytest.fixture(autouse=True)
 def process_state_guard(request):
-    """A test may patch the process-global state of orgmcp.core / orgmcp.app only through ``monkeypatch``. This fixture is set up before
+    """A test may patch the process-global state of hirearchy.core / hirearchy.app only through ``monkeypatch``. This fixture is set up before
     ``monkeypatch`` (``isolated_kiro`` lists it first), so it is torn down after it: whatever is still replaced then is put back and fails
-    the *leaking* test, by name; without it the damage shows up in whichever test of ``orgmcp.app`` happens to run next."""
+    the *leaking* test, by name; without it the damage shows up in whichever test of ``hirearchy.app`` happens to run next."""
     before = process_state.ProcessState.capture()
     yield
     process_state.verify(before, request.node.nodeid)
@@ -119,8 +119,8 @@ def real_kiro(request, tmp_path):
     if not request.node.get_closest_marker("integration"):
         pytest.fail("real_kiro is only for tests marked @pytest.mark.integration (unmarked tests run against a stub kiro-cli)")
     kiro_sandbox.real_kiro_or_skip()
-    from orgmcp.app.wire_kiro import agents_dir
-    from orgmcp.kernel._system import OsEnvironment
+    from hirearchy.app.wire_kiro import agents_dir
+    from hirearchy.kernel._system import OsEnvironment
 
     assert agents_dir(OsEnvironment())() == kiro_sandbox.kiro_dirs()[0], "profile directory is not the real ~/.kiro/agents"
     sandbox = kiro_sandbox.RealKiro(tmp_path)

@@ -1,0 +1,18 @@
+hirearchy dash - org (<ORG>)  2026-01-15 09:05:00Z
+scheduler stopped | running 0/3 · queued 1 · waiting on you 1 · errors 15m 0
+
+AGENTS
+★ root (you)  needs you: 1
+  ◔ ceo [Chief executive]  queued: scheduler is not running, 1 unread  budget 8  claude-sonnet-5.5
+    ○ eng [Engineer]  idle  budget 0  claude-sonnet-5.5
+
+NEEDS YOU
+  Needs you: note from ceo "Greeting": Hello from the ceo (message 20260115T090300000000-ceo-0001)
+
+REQUESTS
+  "Ship it" -> ceo: working (unread work: ceo); runs 0 of 8, last activity 2m00s ago
+
+SERVICES
+  ceo/weekly  contract v1 playbook v0  0 request(s): 0 done, 0 failed, 0 open; 0 reworked; no feedback
+
+[exit 0]

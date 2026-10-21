@@ -1,22 +1,22 @@
 
-# orgmcp live acceptance (main = 51128f0)
+# hirearchy live acceptance (main = 51128f0)
 
-Real `kiro-cli chat --no-interactive --agent orgmcp` runs, `claude-haiku-4.5` for every agent, throwaway root
-`/tmp/orgmcp-acc-1792252941` (deleted afterwards). Run from the main checkout's venv.
+Real `kiro-cli chat --no-interactive --agent hirearchy` runs, `claude-haiku-4.5` for every agent, throwaway root
+`/tmp/hirearchy-acc-1792252941` (deleted afterwards). Run from the main checkout's venv.
 
 | # | Scenario | Verdict |
 |---|----------|---------|
-| 1 | Smoke: stdin prompt + `--agent orgmcp` profile | PASS |
+| 1 | Smoke: stdin prompt + `--agent hirearchy` profile | PASS |
 | 2 | Strict contract, no false "done" | PASS (with one medium defect, D1) |
 | 3 | Lifecycle: review, retire refund, health | PASS (two low defects, D2/D3) |
 
-Runs used: 8 of 22 (ceo 6, ceo/writer 1, ceo/reviewer 1). Profile `~/.kiro/agents/orgmcp.json` `"command"` before and after:
-`/Volumes/workspace/orgmcp/.venv/bin/orgmcp`; md5 of all three `orgmcp*.json` profiles identical before/after. Main checkout untouched (`git status` clean).
+Runs used: 8 of 22 (ceo 6, ceo/writer 1, ceo/reviewer 1). Profile `~/.kiro/agents/hirearchy.json` `"command"` before and after:
+`/Volumes/workspace/hirearchy/.venv/bin/hirearchy`; md5 of all three `hirearchy*.json` profiles identical before/after. Main checkout untouched (`git status` clean).
 
 ## 1. Smoke: PASS
 
-First run's log header: `# cmd: kiro-cli chat --no-interactive --agent orgmcp --model claude-haiku-4.5 <prompt on stdin>`.
-The agent clearly saw the prompt (task text, org protocol, its charter) and used the orgmcp tools:
+First run's log header: `# cmd: kiro-cli chat --no-interactive --agent hirearchy --model claude-haiku-4.5 <prompt on stdin>`.
+The agent clearly saw the prompt (task text, org protocol, its charter) and used the hirearchy tools:
 `whoami`, `hire` x3 (writer, reviewer, one refused because the agent passed a `workspace`, which it fixed itself),
 `delegate`, `write` (MEMORY). Output: "I have 11 runs left and a budget of 12 runs for this task." (matches the state block).
 
@@ -71,7 +71,7 @@ The writer rewrote its file 8 times in one run (write/read loops, using the read
 | D2 | Low | Budget-refund runtime notes wake the manager for a content-free run (run 6: 52 s, 1 run of the refunded budget, the agent also misstated "4 + 5 = 9" runs in MEMORY). Repro: `retire` a report with unspent budget. | Deliver refund notes without waking (the next real message shows them), or wake only if the agent has open work and no budget. |
 | D3 | Low | `expensive` fires on housekeeping: ceo "6.0 runs per completed task (max 5)", 3 of 6 runs being redelivery/review/refund wakes (`runtime_runs: 2` is tracked but not subtracted); a review-then-retire cycle can flag the manager itself. README only excludes note runs for `wasteful`. | Exclude runtime-note-only runs from runs/task and runs-without-result. |
 | D4 | Low | Killing the scheduler (SIGKILL/timeout) leaves the kiro run orphaned (ppid 1, log has no `# exit` trailer) and its message in `inflight/`; the next start redelivers it, a duplicate run of an agent whose run already completed (and could overlap if the orphan is still running). | On startup, ack inflight messages whose latest run log is finished, or record the run pid and wait for/kill it; at least refuse to start a second run while the pid lives. |
-| D5 | Info | Every run log starts with `Dynamic registration failed ... HTTP 404` from a remote server in the user's global `~/.kiro/settings/mcp.json`, despite `includeMcpJson:false` in the profile. Harmless noise, not orgmcp code. | Document, or have the profile set an empty `mcpServers` override if kiro supports it. |
+| D5 | Info | Every run log starts with `Dynamic registration failed ... HTTP 404` from a remote server in the user's global `~/.kiro/settings/mcp.json`, despite `includeMcpJson:false` in the profile. Harmless noise, not hirearchy code. | Document, or have the profile set an empty `mcpServers` override if kiro supports it. |
 
 ## Recommendations
 

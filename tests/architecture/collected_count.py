@@ -46,7 +46,7 @@ def collect() -> dict[str, int]:
 
 
 def tests_directories() -> list[Path]:
-    """Every colocated ``src/orgmcp/**/tests`` package that holds tests."""
+    """Every colocated ``src/hirearchy/**/tests`` package that holds tests."""
     return sorted(d for d in SRC.rglob("tests") if d.is_dir() and (d / "__init__.py").is_file() and any(d.glob("test_*.py")))
 
 

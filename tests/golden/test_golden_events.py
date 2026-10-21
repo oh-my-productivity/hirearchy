@@ -16,10 +16,10 @@ import testkit
 from golden_support import check
 from testkit.health_world import Scheduler
 
-from orgmcp import main
-from orgmcp.app import wiring
-from orgmcp.core import ROOT, Org
-from orgmcp.eventlog import PROCS
+from hirearchy import main
+from hirearchy.app import wiring
+from hirearchy.core import ROOT, Org
+from hirearchy.eventlog import PROCS
 
 FAKE = str(testkit.FAKE_AGENT)
 
@@ -30,7 +30,7 @@ def clock():  # the real clock: overrides the golden suite's fixed one
 
 
 def runner(once: dict[str, str]):
-    """The fake agent in ``tools`` mode (it calls the orgmcp MCP tools in-process); ``once[agent]``: the mode of its next run only."""
+    """The fake agent in ``tools`` mode (it calls the hirearchy MCP tools in-process); ``once[agent]``: the mode of its next run only."""
 
     def build(org, addr, prompt):
         mode = once.pop(addr, "tools")
@@ -68,9 +68,9 @@ def shapes(events: list[dict]) -> str:
 def test_event_line_shapes_from_a_fake_agent_scheduler_run(tmp_path, monkeypatch):
     import datetime
 
-    import orgmcp.core
+    import hirearchy.core
 
-    assert orgmcp.core.datetime is datetime.datetime, "this test needs the real clock"
+    assert hirearchy.core.datetime is datetime.datetime, "this test needs the real clock"
     monkeypatch.delenv("ORG_ROOT", raising=False)
     org = Org.init(tmp_path / "org", "Shapes", {"poll_seconds": 0.05})
     org.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)

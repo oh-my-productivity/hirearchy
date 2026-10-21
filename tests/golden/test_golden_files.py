@@ -1,12 +1,12 @@
-"""Golden: the files orgmcp writes (ORG.md, messages, charters, SERVICE.md / PLAYBOOK.md) and the runtime's notice texts."""
+"""Golden: the files hirearchy writes (ORG.md, messages, charters, SERVICE.md / PLAYBOOK.md) and the runtime's notice texts."""
 
 from pathlib import Path
 
 from golden_support import check
 from scenarios import BRIEF, PLAYBOOK, company, deliver_service, dirs, write_artifact
 
-from orgmcp.app import wiring
-from orgmcp.core import ROOT, Org
+from hirearchy.app import wiring
+from hirearchy.core import ROOT, Org
 
 PROJECT = Path(__file__).resolve().parents[2]
 

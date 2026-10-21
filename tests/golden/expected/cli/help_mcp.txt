@@ -1,4 +1,4 @@
-usage: orgmcp mcp [-h]
+usage: hirearchy mcp [-h]
 
 options:
   -h, --help  show this help message and exit

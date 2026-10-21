@@ -7,7 +7,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from orgmcp.core import ROOT, Org
+from hirearchy.core import ROOT, Org
 
 BRIEF = dict(
     description="A one-page brief on the past week's news about a topic.",

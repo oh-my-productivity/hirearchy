@@ -1,4 +1,4 @@
-orgmcp dash - acme (<ROOT>)  2026-10-18 10:06:40Z
+hirearchy dash - acme (<ROOT>)  2026-10-18 10:06:40Z
 scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago) | running 2/2 · queued 1 · waiting on you 1 · errors 15m 2
 
 AGENTS

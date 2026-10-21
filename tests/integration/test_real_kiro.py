@@ -1,13 +1,13 @@
-"""Tests against the REAL kiro-cli and a real LLM. Skipped unless ``pytest --run-integration`` (or ORGMCP_RUN_INTEGRATION=1).
+"""Tests against the REAL kiro-cli and a real LLM. Skipped unless ``pytest --run-integration`` (or HIREARCHY_RUN_INTEGRATION=1).
 
 Each one is tiny (one agent run, a short task) and asserts on files and recorded events, never on the model's wording.
 They are the repeatable form of three ad-hoc checks (the studies' NOTES point here):
 
 * ``studies/O-observability-check``: ``ORG_RUN_ID`` / the agent reach the MCP server kiro spawns;
 * ``studies/F-read-experiment``: a built-in ``read`` reads the org by absolute path and nothing outside it;
-* ``studies/F2-tool-names``: built-in ``write`` and orgmcp ``org_write`` work side by side.
+* ``studies/F2-tool-names``: built-in ``write`` and hirearchy ``org_write`` work side by side.
 
-Model: ``$ORGMCP_IT_MODEL``, default ``orgmcp.core.DEFAULT_MODEL``. Safety (``~/.kiro`` fenced, leftovers killed): ``tests/testkit/kiro_sandbox.py``.
+Model: ``$HIREARCHY_IT_MODEL``, default ``hirearchy.core.DEFAULT_MODEL``. Safety (``~/.kiro`` fenced, leftovers killed): ``tests/testkit/kiro_sandbox.py``.
 """
 
 import re
@@ -17,8 +17,8 @@ from pathlib import Path
 import pytest
 from testkit.e2e_world import observe
 
-from orgmcp.core import ROOT
-from orgmcp.progress import progress
+from hirearchy.core import ROOT
+from hirearchy.progress import progress
 
 pytestmark = pytest.mark.integration
 
@@ -51,7 +51,7 @@ def describe(org, addr: str) -> str:
 def test_agent_and_run_id_reach_the_mcp_server(real_kiro):
     """A worker with no built-in tools calls whoami, writes MEMORY.md and reports; the events name the agent and the run."""
     org = real_kiro.new_org()
-    real_kiro.hire(org, "worker", "Worker", "You do small tasks exactly as asked, with orgmcp tools only.")
+    real_kiro.hire(org, "worker", "Worker", "You do small tasks exactly as asked, with hirearchy tools only.")
     note = token("MEM")
     task = real_kiro.task(
         org, "worker", "Tool check",
@@ -101,7 +101,7 @@ def test_builtin_read_reads_the_org_but_not_outside(real_kiro):
     task = real_kiro.task(
         org, "reader", "Read two files",
         f"Use kiro's BUILT-IN `read` tool (not org_read, not any shell) on these absolute paths. File A: {memo}. "
-        f"File B: {outside / 'secret.txt'}. Then, with the orgmcp write tool, save to reader/work/copy.md the "
+        f"File B: {outside / 'secret.txt'}. Then, with the hirearchy write tool, save to reader/work/copy.md the "
         "first line of file A, and the first line of file B if you could read it, else the single word DENIED. "
         "Then report the task done.",
         "reader/work/copy.md exists; the task is reported done.", budget=2)
@@ -114,13 +114,13 @@ def test_builtin_read_reads_the_org_but_not_outside(real_kiro):
     reader_files = [p for p in org.dir("reader").rglob("*") if p.is_file()]
     assert reader_files
     assert not [p for p in reader_files if outside_secret in p.read_text(errors="replace")], "the file outside the org was read"
-    # orgmcp's own read tool is hidden behind the built-in one (and renamed org_read): it was not what read file A
+    # hirearchy's own read tool is hidden behind the built-in one (and renamed org_read): it was not what read file A
     assert not [c for c in mcp_calls(real_kiro, org, "reader") if c.get("tool") in ("read", "org_read")]
     print(f"evidence: copy.md={copy.strip()!r}; reader mcp calls={[c['tool'] for c in mcp_calls(real_kiro, org, 'reader')]}")
 
 
 def test_builtin_write_and_org_write_side_by_side(real_kiro):
-    """read+write+shell agent with a workspace: built-in write in the workspace, orgmcp ``org_write`` for MEMORY.md and work/."""
+    """read+write+shell agent with a workspace: built-in write in the workspace, hirearchy ``org_write`` for MEMORY.md and work/."""
     org = real_kiro.new_org()
     ws = real_kiro.base / "ws"
     ws.mkdir()
@@ -130,7 +130,7 @@ def test_builtin_write_and_org_write_side_by_side(real_kiro):
     task = real_kiro.task(
         org, "dev", "Write three files",
         f"1) With kiro's built-in write tool create {ws / 'hello.txt'} containing exactly `{hello}`. "
-        f"2) With the orgmcp tool `org_write` write dev/work/note.md containing exactly `{note}`. "
+        f"2) With the hirearchy tool `org_write` write dev/work/note.md containing exactly `{note}`. "
         f"3) With `org_write` write dev/MEMORY.md containing exactly `{mem}`. 4) Report the task done.",
         "hello.txt in the workspace, dev/work/note.md and dev/MEMORY.md written as specified; reported done.", budget=2)
     real_kiro.run_scheduler(org, max_runs=2)

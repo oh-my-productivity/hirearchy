@@ -1,7 +1,7 @@
-# orgmcp QA report
+# hirearchy QA report
 
 Scope: `git diff 5207608..5a81dcb` plus the base modules it touches. Baseline: 89 tests pass.
-Reproductions were written as `tests/test_qa_findings.py`: 20 tests, all `xfail(strict=True)`, one or two per finding. Their fixes landed long ago and the tests now live next to the code they test, as plain passing tests in the `test_qa_findings.py` of `src/orgmcp/{budget,cli,dispatch,health,hierarchy,orgfiles,prompts,review,scheduler}/tests/`. The component column names the code as it was when this report was written (`core`, `scheduler`, ... were modules; they are packages now, see ARCHITECTURE.md section 5 for where each function went).
+Reproductions were written as `tests/test_qa_findings.py`: 20 tests, all `xfail(strict=True)`, one or two per finding. Their fixes landed long ago and the tests now live next to the code they test, as plain passing tests in the `test_qa_findings.py` of `src/hirearchy/{budget,cli,dispatch,health,hierarchy,orgfiles,prompts,review,scheduler}/tests/`. The component column names the code as it was when this report was written (`core`, `scheduler`, ... were modules; they are packages now, see ARCHITECTURE.md section 5 for where each function went).
 Each asserts the *correct* behavior, so it flips to XPASS (a strict failure) once the bug is fixed.
 Each was also run with `--runxfail` to confirm it fails for the stated reason.
 No product code was changed.
@@ -25,7 +25,7 @@ Severity is by impact on a live org. The test column gives the test name in the 
 | QA-14 | medium | health `wasteful` | An "empty" run is any run that sent no message. That counts crashed runs (kiro down, E2BIG, auth) and runs that merely handle a runtime note (review, reminder). **Live:** after the review note, the CEO acted correctly (two `retire` calls) and was booked `empty 1`. A broken kiro makes every agent `wasteful`, and the suggested action ("fix the charter") is wrong. | `test_qa14_failed_runs_are_not_blamed_as_wasteful` | Exclude runs whose log ends in a failure, and runs whose batch was runtime-only, from the empty ratio. |
 | QA-18 | medium | `delegate` UX | `budget` defaults to `default_budget` (10) and fails if the manager holds less. The docstring does not state the default. **Live (A1):** the CEO's reviewer delegation failed ("insufficient budget"), so it skipped the mandatory reviewer step and reported done anyway. The same happened in A3. | `test_qa18_delegate_without_budget_adapts_to_what_the_manager_can_afford` | Default to `min(default_budget, affordable)`. State the default in the tool docstring. Add to the protocol: "if you cannot satisfy an acceptance step, report blocked". |
 | QA-9 | low | core `retire` | `retire` takes a short name and rejects the full address (`ceo/eng` → "no such agent: ceo/ceo/eng"), but review notes and every other tool use full addresses. (In the live B run the CEO still got it right.) | `test_qa9_retire_accepts_the_full_address_of_a_direct_report` | Accept both forms. |
-| QA-10 | low | cli `resume` | `orgmcp resume ceo/` (tab completion) resumes the agent, but `clear_failures` uses the raw arg. The count stays at 3, so the next single failure re-pauses it. | `test_qa10_resume_with_trailing_slash_clears_failures` | Use `org.require()`'s normalized address. |
+| QA-10 | low | cli `resume` | `hirearchy resume ceo/` (tab completion) resumes the agent, but `clear_failures` uses the raw arg. The count stays at 3, so the next single failure re-pauses it. | `test_qa10_resume_with_trailing_slash_clears_failures` | Use `org.require()`'s normalized address. |
 | QA-11 | low | core `hire` | `NAME_RE` ends with `$`, which matches before a trailing newline. `hire(name="ops\n")` creates an unaddressable dir that `children()` lists. | `test_qa11_hire_rejects_name_with_trailing_newline` | Use `fullmatch`. |
 | QA-12 | low | core `deliver` | The recipient copy is written before the sender's `sent/` copy. A failure between them (disk full, crash) delivers a budget grant that the sender is never charged for, which mints budget. A redelivered `report` would also duplicate the result. | `test_qa12_failed_send_does_not_mint_budget` | Write `sent/` first, then the inbox, or make both idempotent by id. |
 | QA-15 | low | core `report` | Artifacts outside the org are accepted and annotated, e.g. `/etc/hosts` (word count and mtime). That is an info leak and a bogus "artifact". | `test_qa15_report_refuses_artifacts_outside_the_org` | Refuse paths that resolve outside the org root. Prefer the reporter's own directory. |
@@ -33,13 +33,13 @@ Severity is by impact on a live org. The test column gives the test name in the 
 
 Observations without a test (design or ambiguity, not defects):
 - `read` and `report` word counts include markdown markers (`#`, `-`). A 5-bullet blurb is "46 words" for 38 real words. Managers had to compensate for this.
-- `ensure_kiro_profile` rewrites the shared `~/.kiro/agents/orgmcp*.json` non-atomically, and it points at whichever checkout ran last. Before my live test, `orgmcp.json` pointed at the QA worktree venv (I did not determine which process wrote it). After it, the profile pointed at the main venv, as intended. Concurrent org runs from different checkouts will ping-pong it.
+- `ensure_kiro_profile` rewrites the shared `~/.kiro/agents/hirearchy*.json` non-atomically, and it points at whichever checkout ran last. Before my live test, `hirearchy.json` pointed at the QA worktree venv (I did not determine which process wrote it). After it, the profile pointed at the main venv, as intended. Concurrent org runs from different checkouts will ping-pong it.
 - The ledgers (`failures`, `reviews`, `nudges`) are read-modify-write with no lock, and the CLI (`resume`, `review`) can race the scheduler. A lost update re-sends a review item or restores a failure count.
 - `acquire()` trusts `kill(pid, 0)`: a recycled pid blocks startup forever, and `PermissionError` is not handled.
-- `notice_failures` text ("A human must inspect it and run `orgmcp resume`") is also sent to the LLM parent, who cannot act on it and wastes a run.
+- `notice_failures` text ("A human must inspect it and run `hirearchy resume`") is also sent to the LLM parent, who cannot act on it and wastes a run.
 - Security notes in the README hold. Symlink and `..` escapes in `write`/`read` and the `health` and `revises` permission checks held in my probes (`revises` must name an earlier task sent to the same report).
 
-## Live smoke test (claude-haiku-4.5, main checkout venv, throwaway `/tmp/orgmcp-qa-*`, since deleted)
+## Live smoke test (claude-haiku-4.5, main checkout venv, throwaway `/tmp/hirearchy-qa-*`, since deleted)
 
 Kiro runs used: **14 of 25** (A: 13, B: 1). No kiro-cli errors, auth issues or timeouts occurred. Every run exited 0. (Per-tool errors are not visible in the run logs, only "status: Completed".)
 
@@ -62,7 +62,7 @@ The same run's output:
 ```
 5. ✓ Word count: 35 words (≤40)      # root asked: exactly 33
 All criteria met. Now delegating to reviewer for final quality check.
-[tool] Running: @orgmcp/delegate
+[tool] Running: @hirearchy/delegate
 I'm out of budget to delegate further. I'll send the verified artifact directly to root ...
 ```
 

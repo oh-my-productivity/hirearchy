@@ -14,15 +14,15 @@ from collections.abc import Callable, Mapping
 from datetime import datetime, timezone
 from typing import Any
 
-from orgmcp.app import wire_kiro
-from orgmcp.app.wire_scheduler import loop_of
-from orgmcp.kernel import Clock
-from orgmcp.kiro import RunCommand, RunCommandBuilder
-from orgmcp.scheduler._exit import GraceWait
-from orgmcp.scheduler._loop import HeartbeatLoop
-from orgmcp.scheduler._ports import Console
-from orgmcp.scheduler._run import GraceMemory, LoopMemory, LoopState, Standing
-from orgmcp.scheduler._work import QueriedWork
+from hirearchy.app import wire_kiro
+from hirearchy.app.wire_scheduler import loop_of
+from hirearchy.kernel import Clock
+from hirearchy.kiro import RunCommand, RunCommandBuilder
+from hirearchy.scheduler._exit import GraceWait
+from hirearchy.scheduler._loop import HeartbeatLoop
+from hirearchy.scheduler._ports import Console
+from hirearchy.scheduler._run import GraceMemory, LoopMemory, LoopState, Standing
+from hirearchy.scheduler._work import QueriedWork
 
 Runner = Callable[[Any, str, str], tuple[list[str], Any, dict[str, str]]]
 

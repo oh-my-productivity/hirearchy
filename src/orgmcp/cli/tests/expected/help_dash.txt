@@ -1,7 +1,0 @@
-usage: orgmcp dash [-h] [--root ROOT] [--interval SECONDS] [--once]
-
-options:
-  -h, --help          show this help message and exit
-  --root ROOT         organization directory (same as the global --root)
-  --interval SECONDS  refresh every SECONDS (default 2)
-  --once              print a plain-text snapshot and exit (also used when there is no terminal)

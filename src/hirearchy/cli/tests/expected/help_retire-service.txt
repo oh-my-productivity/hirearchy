@@ -1,0 +1,9 @@
+usage: hirearchy retire-service [-h] --reason REASON owner name
+
+positional arguments:
+  owner
+  name
+
+options:
+  -h, --help       show this help message and exit
+  --reason REASON

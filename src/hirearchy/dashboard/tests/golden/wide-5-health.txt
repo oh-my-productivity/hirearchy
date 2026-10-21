@@ -1,0 +1,42 @@
+ hirearchy dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |  running 2/2  queued 1  waiting on you 1  errors 15m 2
+ observe now
+ scheduler: running pid 7000 (until_done, up 6m40s, last heartbeat 3.0s ago)
+ runs in flight 2/2:
+   ceo 1m12s Scope change
+   research 2m05s feedback on "Brief: EV chargers (shorter)": accept, Brief: heat pumps trace 20261018T100240000001-root-0026,
+ 20261018T100410000001-root-003a
+ queued, not running (1):
+   ceo/analyst: 1 unread, oldest 5m40s - max_parallel (2) runs are busy
+ not started, with unread mail (1):
+   ops/deploy: 1 unread, oldest 4m40s - paused: 2 consecutive failed runs
+ waiting on you (1):
+   Needs you: note from ops "Need approval for downtime": The key rotation needs a maintenance window. May I take the API down on Saturday 02:00?
+ (message 20261018T100200000003-ops-0021)
+ errors in the last 15 min: 2
+   10:02:30 ops/deploy     run ended FAILED after 10s: exit code 1
+   10:05:40 ceo            delegate → ceo/analyst REFUSED: not enough budget: you have 5 run(s) and must keep 2 in reserve
+ paused: ops/audit (paused by the user: audit window closed), ops/deploy (2 consecutive failed runs)
+
+ Health flags (9 agent(s), 3 flagged)
+ ops/audit
+    !paused: paused by the user: audit window closed
+ ops/deploy
+    !paused: 2 consecutive failed runs
+ research/crawler
+    !out_of_budget: no budget left but has unread mail or open tasks
+
+ Consistency check (c runs it)
+ not run yet - press c
+
+
+
+
+
+
+
+
+
+
+
+ 12345 Screen  r Refresh  p Pause  ? Help  q Quit  c Check

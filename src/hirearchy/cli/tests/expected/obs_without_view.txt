@@ -1,0 +1,6 @@
+
+[stderr]
+usage: hirearchy obs [-h] {now,trace,metrics,events} ...
+hirearchy obs: error: the following arguments are required: obs_cmd
+
+[exit 2]

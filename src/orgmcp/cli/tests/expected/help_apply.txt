@@ -1,8 +1,0 @@
-usage: orgmcp apply [-h] [--allow-root DIR] blueprint
-
-positional arguments:
-  blueprint         blueprint YAML/JSON file
-
-options:
-  -h, --help        show this help message and exit
-  --allow-root DIR  directory workspaces may be in (repeatable; default: home, temp, cwd)

@@ -1,5 +1,0 @@
-
-[stderr]
-error: <TMP>/skills/orgmcp/SKILL.md exists and differs from this version of the skill; nothing was changed. Use --force to replace it
-
-[exit 1]

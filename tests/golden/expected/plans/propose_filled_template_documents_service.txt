@@ -57,7 +57,7 @@ Organization (4 agents):
   - reader [custom] Reader of the user's files: model=claude-sonnet-5.5, tools=read
     Access: kiro read only in <CWD>/docs and in the organization's own files (read-only)
   - writer [writer] Writer: model=claude-sonnet-5.5, tools=none
-    Access: read-only inputs (orgmcp read): <CWD>/docs
+    Access: read-only inputs (hirearchy read): <CWD>/docs
   - reviewer [reviewer] Independent Reviewer: model=claude-sonnet-5.5, tools=read
     Access: kiro read only in <CWD>/docs and in the organization's own files (read-only)
 

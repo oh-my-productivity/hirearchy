@@ -1,11 +1,11 @@
-##### shared_no_tools: orgmcp-golden-org-26994b.json
+##### shared_no_tools: hirearchy-golden-org-26994b.json
 {
-  "name": "orgmcp-golden-org-26994b",
-  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-org-26994b",
+  "description": "internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<ORGMCP_BIN>",
+    "hirearchy": {
+      "command": "<HIREARCHY_BIN>",
       "args": [
         "mcp"
       ],
@@ -16,24 +16,24 @@
     }
   },
   "tools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "allowedTools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "resources": [],
   "hooks": {},
   "includeMcpJson": false
 }
 
-##### shared_shell: orgmcp-golden-org-26994b-shell.json
+##### shared_shell: hirearchy-golden-org-26994b-shell.json
 {
-  "name": "orgmcp-golden-org-26994b-shell",
-  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: shell)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-org-26994b-shell",
+  "description": "internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: shell)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<ORGMCP_BIN>",
+    "hirearchy": {
+      "command": "<HIREARCHY_BIN>",
       "args": [
         "mcp"
       ],
@@ -44,11 +44,11 @@
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "shell"
   ],
   "allowedTools": [
-    "@orgmcp",
+    "@hirearchy",
     "shell"
   ],
   "resources": [],
@@ -56,14 +56,14 @@
   "includeMcpJson": false
 }
 
-##### shared_read_unconfined: orgmcp-golden-org-26994b-read.json
+##### shared_read_unconfined: hirearchy-golden-org-26994b-read.json
 {
-  "name": "orgmcp-golden-org-26994b-read",
-  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: read)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-org-26994b-read",
+  "description": "internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<ORGMCP_BIN>",
+    "hirearchy": {
+      "command": "<HIREARCHY_BIN>",
       "args": [
         "mcp"
       ],
@@ -74,11 +74,11 @@
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "read"
   ],
   "allowedTools": [
-    "@orgmcp",
+    "@hirearchy",
     "read"
   ],
   "resources": [],
@@ -86,14 +86,14 @@
   "includeMcpJson": false
 }
 
-##### confined_read_write_shell: orgmcp-golden-org-26994b-read-shell-write-x6fbf3700.json
+##### confined_read_write_shell: hirearchy-golden-org-26994b-read-shell-write-x6fbf3700.json
 {
-  "name": "orgmcp-golden-org-26994b-read-shell-write-x6fbf3700",
-  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: read, shell, write)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-org-26994b-read-shell-write-x6fbf3700",
+  "description": "internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read, shell, write)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<ORGMCP_BIN>",
+    "hirearchy": {
+      "command": "<HIREARCHY_BIN>",
       "args": [
         "mcp"
       ],
@@ -104,13 +104,13 @@
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "read",
     "shell",
     "write"
   ],
   "allowedTools": [
-    "@orgmcp",
+    "@hirearchy",
     "shell"
   ],
   "resources": [],
@@ -142,14 +142,14 @@
   }
 }
 
-##### confined_write_only: orgmcp-golden-org-26994b-write-x841da205.json
+##### confined_write_only: hirearchy-golden-org-26994b-write-x841da205.json
 {
-  "name": "orgmcp-golden-org-26994b-write-x841da205",
-  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: write)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-org-26994b-write-x841da205",
+  "description": "internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: write)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<ORGMCP_BIN>",
+    "hirearchy": {
+      "command": "<HIREARCHY_BIN>",
       "args": [
         "mcp"
       ],
@@ -160,11 +160,11 @@
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "write"
   ],
   "allowedTools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "resources": [],
   "hooks": {},
@@ -182,14 +182,14 @@
   }
 }
 
-##### confined_write_without_workspace: orgmcp-golden-org-26994b-write-x05257e14.json
+##### confined_write_without_workspace: hirearchy-golden-org-26994b-write-x05257e14.json
 {
-  "name": "orgmcp-golden-org-26994b-write-x05257e14",
-  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: write)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-org-26994b-write-x05257e14",
+  "description": "internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: write)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<ORGMCP_BIN>",
+    "hirearchy": {
+      "command": "<HIREARCHY_BIN>",
       "args": [
         "mcp"
       ],
@@ -200,11 +200,11 @@
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "write"
   ],
   "allowedTools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "resources": [],
   "hooks": {},
@@ -220,14 +220,14 @@
   }
 }
 
-##### confined_read_inputs_only: orgmcp-golden-org-26994b-read-x8a3e7f11.json
+##### confined_read_inputs_only: hirearchy-golden-org-26994b-read-x8a3e7f11.json
 {
-  "name": "orgmcp-golden-org-26994b-read-x8a3e7f11",
-  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: read)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-org-26994b-read-x8a3e7f11",
+  "description": "internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<ORGMCP_BIN>",
+    "hirearchy": {
+      "command": "<HIREARCHY_BIN>",
       "args": [
         "mcp"
       ],
@@ -238,11 +238,11 @@
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "read"
   ],
   "allowedTools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "resources": [],
   "hooks": {},
@@ -260,14 +260,14 @@
   }
 }
 
-##### confined_read_workspace_inside_the_org: orgmcp-golden-org-26994b-read-write-xdcd24551.json
+##### confined_read_workspace_inside_the_org: hirearchy-golden-org-26994b-read-write-xdcd24551.json
 {
-  "name": "orgmcp-golden-org-26994b-read-write-xdcd24551",
-  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: read, write)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-org-26994b-read-write-xdcd24551",
+  "description": "internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read, write)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<ORGMCP_BIN>",
+    "hirearchy": {
+      "command": "<HIREARCHY_BIN>",
       "args": [
         "mcp"
       ],
@@ -278,12 +278,12 @@
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "read",
     "write"
   ],
   "allowedTools": [
-    "@orgmcp"
+    "@hirearchy"
   ],
   "resources": [],
   "hooks": {},
@@ -307,14 +307,14 @@
   }
 }
 
-##### confined_shell_only: orgmcp-golden-org-26994b-shell-xbf21a9e8.json
+##### confined_shell_only: hirearchy-golden-org-26994b-shell-xbf21a9e8.json
 {
-  "name": "orgmcp-golden-org-26994b-shell-xbf21a9e8",
-  "description": "internal: used by the orgmcp scheduler for /golden/org; not a general-purpose agent (built-in tools: shell)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the orgmcp tools, and stop when the messages are handled.",
+  "name": "hirearchy-golden-org-26994b-shell-xbf21a9e8",
+  "description": "internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: shell)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
   "mcpServers": {
-    "orgmcp": {
-      "command": "<ORGMCP_BIN>",
+    "hirearchy": {
+      "command": "<HIREARCHY_BIN>",
       "args": [
         "mcp"
       ],
@@ -325,11 +325,11 @@
     }
   },
   "tools": [
-    "@orgmcp",
+    "@hirearchy",
     "shell"
   ],
   "allowedTools": [
-    "@orgmcp",
+    "@hirearchy",
     "shell"
   ],
   "resources": [],

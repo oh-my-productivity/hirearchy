@@ -12,10 +12,10 @@ from scenarios import company, dirs
 from testkit.health_world import with_ports
 from testkit.kiro_world import ensure_kiro_profile, file_confinement, kiro_profile_name, kiro_runner
 
-from orgmcp.app import wire_kiro
-from orgmcp.core import ROOT
-from orgmcp.kiro import McpServerLocator
-from orgmcp.kiro.testing import StaticMcpServerLocator
+from hirearchy.app import wire_kiro
+from hirearchy.core import ROOT
+from hirearchy.kiro import McpServerLocator
+from hirearchy.kiro.testing import StaticMcpServerLocator
 
 STUB_ORG = SimpleNamespace(root=Path("/golden/org"))  # the profile only depends on ``org.root``: a fixed path, fixed hashes
 SHAPES = {
@@ -35,7 +35,7 @@ SHAPES = {
 
 @pytest.fixture
 def fixed_server():
-    locator = StaticMcpServerLocator({"command": "<ORGMCP_BIN>", "args": ["mcp"]})
+    locator = StaticMcpServerLocator({"command": "<HIREARCHY_BIN>", "args": ["mcp"]})
     with_ports(STUB_ORG, {McpServerLocator: locator})  # (an organization that is not there: nothing is read from it)
 
 

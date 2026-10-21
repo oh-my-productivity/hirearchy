@@ -1,7 +1,7 @@
 """The constructor-dependency check (rule R6, "depend on interfaces"): what a class may name in the signature of its ``__init__``.
 
-The ENGINE, like ``class_interfaces`` (whose population it shares): ``test_constructor_dependencies.py`` runs it on ``orgmcp`` and on a
-seeded package. The classes looked at are those the class-interface check calls compliant -- classes with behaviour, outside ``orgmcp.app``,
+The ENGINE, like ``class_interfaces`` (whose population it shares): ``test_constructor_dependencies.py`` runs it on ``hirearchy`` and on a
+seeded package. The classes looked at are those the class-interface check calls compliant -- classes with behaviour, outside ``hirearchy.app``,
 that subclass a Protocol; Protocols, exceptions, framework widgets (Textual) and pure data are exempt there and here. For each of them
 ``typing.get_type_hints(cls.__init__)`` is resolved (dataclass fields are the parameters of the generated ``__init__``), and every class
 that an annotation names -- inside ``Optional``/unions, generics, ``type[...]`` and the arguments and result of a ``Callable`` too -- must be:
@@ -11,7 +11,7 @@ that an annotation names -- inside ``Optional``/unions, generics, ``type[...]`` 
 * not a class of the package under check at all (builtins, ``pathlib.Path``, ``datetime``, ``collections.abc`` ...).
 
 Anything else is a concrete collaborator: the class constructs-by-type what it should receive through an interface, and only the
-composition root (``orgmcp.app``) knows which implementation to pass.
+composition root (``hirearchy.app``) knows which implementation to pass.
 
 Not looked at: the ``testing`` modules. They hold the in-memory fakes, test support that production never imports (the
 ``no-testing-in-production`` import contract), and a fake is scripted through the surface of its siblings (``FakeClock.advance``,

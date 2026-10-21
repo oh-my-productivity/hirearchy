@@ -1,8 +1,0 @@
-
-[stderr]
-usage: orgmcp [-h] [--root ROOT]
-              {init,hire,task,services,define-service,request,feedback,retire-service,plan,apply,send,status,health,progress,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
-              ...
-orgmcp: error: argument cmd: invalid choice: 'frobnicate' (choose from 'init', 'hire', 'task', 'services', 'define-service', 'request', 'feedback', 'retire-service', 'plan', 'apply', 'send', 'status', 'health', 'progress', 'upgrade-rules', 'install-skill', 'review', 'inbox', 'resume', 'run', 'mcp', 'dash', 'obs', 'check', 'kiro-profile')
-
-[exit 2]

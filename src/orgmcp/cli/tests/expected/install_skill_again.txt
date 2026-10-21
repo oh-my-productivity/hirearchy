@@ -1,4 +1,0 @@
-<TMP>/skills/orgmcp/SKILL.md
-already installed and up to date
-
-[exit 0]

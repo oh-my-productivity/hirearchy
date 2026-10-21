@@ -1,0 +1,5 @@
+"Ship it": working. unread work: ceo. runs 0 of 8. last activity 2m ago. (task 20260115T090200000000-root-0000)
+Needs you: note from ceo "Greeting": Hello from the ceo (message 20260115T090300000000-ceo-0001)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+
+[exit 0]

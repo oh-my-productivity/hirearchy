@@ -10,7 +10,7 @@ of an agent with mail waiting) and the next result would make the manager report
 
 import os
 
-from orgmcp.core import Org
+from hirearchy.core import Org
 
 org = Org(os.environ["ORG_ROOT"])
 me = os.environ["ORG_AGENT"]

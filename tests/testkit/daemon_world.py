@@ -7,9 +7,9 @@ from collections.abc import Collection
 from pathlib import Path
 from typing import Any
 
-from orgmcp.app import wiring
-from orgmcp.attention import Waiting
-from orgmcp.daemon import SchedulerState
+from hirearchy.app import wiring
+from hirearchy.attention import Waiting
+from hirearchy.daemon import SchedulerState
 
 
 def scheduler_state(org: Any) -> SchedulerState:
@@ -33,13 +33,13 @@ def waiting_on_user(org: Any, *, running: Collection[str] | None = None, blocked
 
 
 def scheduler_command(root: Path, max_runs: int | None = None, until_done: bool = False) -> list[str]:
-    """``<this venv's orgmcp> --root <org> run [--max-runs N] [--until-done]``."""
+    """``<this venv's hirearchy> --root <org> run [--max-runs N] [--until-done]``."""
     return wiring.open_runtime(Path(root)).scheduler_command.argv(max_runs, until_done)  # type: ignore[no-any-return]
 
 
 def env_server() -> Any:
-    """``orgmcp mcp``'s server for the identity of the environment (``ORG_ROOT``, ``ORG_AGENT`` ...): the binding resolved, the server of its tools built."""
-    from orgmcp.app import wire_mcp_server
+    """``hirearchy mcp``'s server for the identity of the environment (``ORG_ROOT``, ``ORG_AGENT`` ...): the binding resolved, the server of its tools built."""
+    from hirearchy.app import wire_mcp_server
 
     binding, me = wire_mcp_server.binding_resolver().resolve()
     return wire_mcp_server.server_factory(binding).build(me)

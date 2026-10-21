@@ -1,6 +1,6 @@
 """The dashboard app over the queries of a real organization, with failures injected through the queries (not by patching the app).
 
-``dash_app(root, interval, now)`` is ``DashApp(queries, interval)`` with the queries of ``orgmcp.app.wire_dashboard.queries_of`` (what the former
+``dash_app(root, interval, now)`` is ``DashApp(queries, interval)`` with the queries of ``hirearchy.app.wire_dashboard.queries_of`` (what the former
 ``DashApp(root, interval, now)`` built for itself), wrapped in ``FailableQueries``: they answer exactly as the real ones do, until
 a test says ``app.data.fail_snapshot(exc)`` (the refresh fails) or ``app.data.break_requests(exc)`` (the rows of the requests cannot be shown).
 """
@@ -12,12 +12,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from orgmcp.app.wire_cli import run_cli as main  # noqa: F401 - the command line of the composition root (``orgmcp.cli.main``)
-from orgmcp.app.wire_dashboard import queries_of
-from orgmcp.dashboard._app import DashApp
-from orgmcp.dashboard._ports import DashboardQueries
-from orgmcp.dashdata import AgentDetail, EventFeed, EventLine, HealthView, MsgRow, RequestRow, RunLog, Section, ServiceRow, Snapshot
-from orgmcp.kernel import JsonObject
+from hirearchy.app.wire_cli import run_cli as main  # noqa: F401 - the command line of the composition root (``hirearchy.cli.main``)
+from hirearchy.app.wire_dashboard import queries_of
+from hirearchy.dashboard._app import DashApp
+from hirearchy.dashboard._ports import DashboardQueries
+from hirearchy.dashdata import AgentDetail, EventFeed, EventLine, HealthView, MsgRow, RequestRow, RunLog, Section, ServiceRow, Snapshot
+from hirearchy.kernel import JsonObject
 
 
 class _BrokenRow:

@@ -1,0 +1,32 @@
+- Address: `ceo`; parent: `root`; role: Chief executive
+- Budget: 16 run(s) left (this run already counted). Hiring: allowed (2/3 reports)
+- Tools beyond hirearchy: none
+- Direct reports:
+  - ceo/eng [Engineer] pending, budget 4, open tasks 1, delegated 0, unread 1
+  - ceo/qa [Quality assurance] idle, budget 0, open tasks 0, delegated 0, unread 0
+- Open tasks assigned to you: none
+- Tasks you reported blocked (not final):
+  - <ID1> "Strict blurb" from root: reported blocked; you may re-report it once the blocker is resolved
+    > ## Goal
+    > Write a blurb about plants.
+    >
+    > ## Acceptance criteria
+    > exactly 33 words; acrostic P-L-A-N-T
+    >
+    > ## Inputs
+    > - ceo/work/brief.md
+- Work you delegated that is still outstanding:
+  - <ID2> "Draft blurb" -> ceo/eng (pending)
+=====
+- Address: `ceo`; parent: `root`; role: Chief executive
+- Budget: 16 run(s) left (this run already counted). Hiring: allowed (2/3 reports)
+- Tools beyond hirearchy: none
+- Direct reports:
+  - ceo/eng [Engineer] pending, budget 4, open tasks 1, delegated 0, unread 1
+  - ceo/qa [Quality assurance] idle, budget 0, open tasks 0, delegated 0, unread 0
+- Open tasks assigned to you: none
+- Tasks you reported blocked (not final):
+  - <ID1> "Strict blurb" from root: reported blocked; you may re-report it once the blocker is resolved
+    (full text: see the new messages below)
+- Work you delegated that is still outstanding:
+  - <ID2> "Draft blurb" -> ceo/eng (pending)

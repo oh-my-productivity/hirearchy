@@ -1,5 +1,5 @@
-orgmcp-golden-org-26994b
-orgmcp-golden-org-26994b-read-write
-orgmcp-some-team-org-e8fa7a-shell
-orgmcp-quarterly-review-2026-ex-559bdf-shell
-orgmcp-org-e019b5
+hirearchy-golden-org-26994b
+hirearchy-golden-org-26994b-read-write
+hirearchy-some-team-org-e8fa7a-shell
+hirearchy-quarterly-review-2026-ex-559bdf-shell
+hirearchy-org-e019b5

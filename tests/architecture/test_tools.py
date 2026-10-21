@@ -22,7 +22,7 @@ def package(root: Path, name: str, **files: str) -> None:
 
 
 def synthetic_tree(tmp_path: Path) -> checks.Tree:
-    root = tmp_path / "orgmcp"
+    root = tmp_path / "hirearchy"
     root.mkdir()
     (root / "__init__.py").write_text("", encoding="utf-8")
     (root / "core.py").write_text("", encoding="utf-8")
@@ -40,24 +40,24 @@ def synthetic_tree(tmp_path: Path) -> checks.Tree:
 def test_the_generated_config_describes_only_the_packages_that_exist(tmp_path):
     text = gen_importlinter.generate(synthetic_tree(tmp_path))
     assert text is not None
-    assert "root_package = orgmcp" in text and "include_external_packages = True" in text
+    assert "root_package = hirearchy" in text and "include_external_packages = True" in text
     layers = text.split("[importlinter:contract:layers]")[1].split("[importlinter:contract:")[0]
-    lines = [line.strip() for line in layers.splitlines() if line.strip().startswith("orgmcp.")]
-    assert lines == ["orgmcp.core", "orgmcp.mail", "orgmcp.agents | orgmcp.settings", "orgmcp.kernel"], lines
-    assert "orgmcp.telemetry" not in text and "orgmcp.dashboard" not in text  # not on disk
+    lines = [line.strip() for line in layers.splitlines() if line.strip().startswith("hirearchy.")]
+    assert lines == ["hirearchy.core", "hirearchy.mail", "hirearchy.agents | hirearchy.settings", "hirearchy.kernel"], lines
+    assert "hirearchy.telemetry" not in text and "hirearchy.dashboard" not in text  # not on disk
 
 
 def test_a_layer_order_follows_the_levels_of_the_graph(tmp_path):
     text = gen_importlinter.generate(synthetic_tree(tmp_path))
-    order = [line.strip() for line in text.split("[importlinter:contract:layers]")[1].splitlines() if line.strip().startswith("orgmcp.")]
-    assert order.index("orgmcp.mail") < order.index("orgmcp.agents | orgmcp.settings") < order.index("orgmcp.kernel")  # mail imports agents
+    order = [line.strip() for line in text.split("[importlinter:contract:layers]")[1].splitlines() if line.strip().startswith("hirearchy.")]
+    assert order.index("hirearchy.mail") < order.index("hirearchy.agents | hirearchy.settings") < order.index("hirearchy.kernel")  # mail imports agents
 
 
 def test_one_private_modules_contract_per_package_with_private_modules(tmp_path):
     text = gen_importlinter.generate(synthetic_tree(tmp_path))
     mail = text.split("[importlinter:contract:private-modules-mail]")[1].split("[importlinter:contract:")[0]
-    assert "type = protected" in mail and "orgmcp.mail._mailbox" in mail and "orgmcp.mail._parser" in mail
-    assert "allowed_importers" in mail and "orgmcp.mail\n" in mail
+    assert "type = protected" in mail and "hirearchy.mail._mailbox" in mail and "hirearchy.mail._parser" in mail
+    assert "allowed_importers" in mail and "hirearchy.mail\n" in mail
     assert "private-modules-agents" in text and "private-modules-settings" not in text  # settings has no _ module
     assert "private-modules-kernel" in text
 
@@ -65,15 +65,15 @@ def test_one_private_modules_contract_per_package_with_private_modules(tmp_path)
 def test_the_kernel_contract_forbids_every_other_module_of_the_root(tmp_path):
     text = gen_importlinter.generate(synthetic_tree(tmp_path))
     kernel = text.split("[importlinter:contract:kernel-independent]")[1].split("[importlinter:contract:")[0]
-    for module in ("orgmcp.core", "orgmcp.agents", "orgmcp.mail", "orgmcp.settings"):
+    for module in ("hirearchy.core", "hirearchy.agents", "hirearchy.mail", "hirearchy.settings"):
         assert module in kernel
-    assert "orgmcp.kernel\n" in kernel.split("forbidden_modules")[0]
+    assert "hirearchy.kernel\n" in kernel.split("forbidden_modules")[0]
 
 
 def test_testing_modules_are_protected_from_production_code(tmp_path):
     text = gen_importlinter.generate(synthetic_tree(tmp_path))
     section = text.split("[importlinter:contract:no-testing-in-production]")[1].split("[importlinter:contract:")[0]
-    assert "orgmcp.agents.testing" in section and "orgmcp.*.tests" in section and "orgmcp.*.testing" in section
+    assert "hirearchy.agents.testing" in section and "hirearchy.*.tests" in section and "hirearchy.*.testing" in section
 
 
 def test_framework_contracts_exist_for_the_frameworks_the_code_imports(tmp_path):
@@ -82,14 +82,14 @@ def test_framework_contracts_exist_for_the_frameworks_the_code_imports(tmp_path)
     (tree.directory / "mail" / "_parser.py").write_text("import textual\nimport mcp.server\nimport yaml\n", encoding="utf-8")
     text = gen_importlinter.generate(tree)
     textual = text.split("[importlinter:contract:textual-only-in-dashboard]")[1].split("[importlinter:contract:")[0]
-    assert "forbidden_modules =\n    textual\n" in textual and "orgmcp.mail" in textual and "orgmcp.dashboard" not in textual
+    assert "forbidden_modules =\n    textual\n" in textual and "hirearchy.mail" in textual and "hirearchy.dashboard" not in textual
     assert "[importlinter:contract:mcp-only-in-mcp-server]" in text
     yaml_section = text.split("[importlinter:contract:yaml-only-where-needed]")[1].split("[importlinter:contract:")[0]
-    assert "orgmcp.mail" in yaml_section and "orgmcp.kernel" not in yaml_section  # the kernel may use yaml
+    assert "hirearchy.mail" in yaml_section and "hirearchy.kernel" not in yaml_section  # the kernel may use yaml
 
 
 def test_nothing_is_generated_when_no_package_exists(tmp_path):
-    root = tmp_path / "orgmcp"
+    root = tmp_path / "hirearchy"
     root.mkdir()
     (root / "__init__.py").write_text("", encoding="utf-8")
     (root / "cli.py").write_text("", encoding="utf-8")
@@ -119,10 +119,10 @@ def test_every_package_directory_is_checked_with_mypy_strict(tmp_path):
     tree = synthetic_tree(tmp_path)
     (tree.directory / "roles").mkdir()  # packaged data, not a package
     (tree.directory / "roles" / "analyst.md").write_text("", encoding="utf-8")
-    assert static_checks.discover_packages(tree.directory) == ["orgmcp.agents", "orgmcp.kernel", "orgmcp.mail", "orgmcp.settings"]
+    assert static_checks.discover_packages(tree.directory) == ["hirearchy.agents", "hirearchy.kernel", "hirearchy.mail", "hirearchy.settings"]
 
 
 def test_the_public_surface_of_a_package_may_not_use_any():
     config = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))["tool"]["mypy"]
-    api = next(o for o in config["overrides"] if o["module"] == ["orgmcp.*.api"])
+    api = next(o for o in config["overrides"] if o["module"] == ["hirearchy.*.api"])
     assert api["disallow_any_explicit"] is True and config["strict"] is True

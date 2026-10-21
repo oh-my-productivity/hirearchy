@@ -1,6 +1,6 @@
 "Plan the launch": working. unread work: ceo, ceo/qa. runs 3 of 8. last activity 5m ago. (task 20260115T090500000000-root-0000)
 "Rotate the logs": done. runs 1 of 2 (1 returned). last activity 6m ago. no artifacts. (task 20260115T090600000000-root-0001)
 "Brief on AI chips" [service weekly-brief v1]: working. unread work: ceo, ceo/qa. runs 0 of 10. last activity 5m ago. (task 20260115T091347000000-root-0006)
-scheduler: stopped - open tasks do not move until it is started (start() or `orgmcp run`)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
 
 [exit 0]

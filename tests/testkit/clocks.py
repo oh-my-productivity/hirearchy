@@ -5,13 +5,13 @@ from __future__ import annotations
 from collections.abc import Callable
 from datetime import datetime
 
-from orgmcp.kernel import Clock
-from orgmcp.kernel._system import SystemClock
-from orgmcp.telemetry._ports import EventClock
+from hirearchy.kernel import Clock
+from hirearchy.kernel._system import SystemClock
+from hirearchy.telemetry._ports import EventClock
 
 
 class ClockReading(SystemClock):
-    """The system clock whose ``now()`` is ``reading()``: what a test that replaced ``orgmcp.core.utcnow`` had. ``time``, ``monotonic`` and ``sleep`` are the
+    """The system clock whose ``now()`` is ``reading()``: what a test that replaced ``hirearchy.core.utcnow`` had. ``time``, ``monotonic`` and ``sleep`` are the
     system's: they time waits and files, not the stamps of messages."""
 
     def __init__(self, reading: Callable[[], datetime]) -> None:

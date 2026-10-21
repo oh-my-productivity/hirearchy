@@ -1,11 +1,11 @@
 """The blueprint tests' view of the package: the old call shapes (``bpm.validate(bp, org=org)``, ``bpm.apply(org, bp)`` ...) over the new API.
 
-The tests of ``orgmcp.blueprint`` were written against the flat module's functions. Those functions are gone, so a
+The tests of ``hirearchy.blueprint`` were written against the flat module's functions. Those functions are gone, so a
 test uses this world instead. Every method here is a thin call of a port of the runtime (``org.runtime.blueprint_validator``,
 ``.plan_renderer``, ``.blueprint_applier`` ...) or of the private class that now owns the old function (``BudgetPlanner``, ``PolicyAccessReport``,
-``AgentResolver`` ...: allowed here, ``testkit`` is not part of ``orgmcp``). The assertion text of the tests stays as it was; only their import changed::
+``AgentResolver`` ...: allowed here, ``testkit`` is not part of ``hirearchy``). The assertion text of the tests stays as it was; only their import changed::
 
-    from testkit.blueprint_world import bpm          # was: from orgmcp import blueprint as bpm
+    from testkit.blueprint_world import bpm          # was: from hirearchy import blueprint as bpm
 
 ``World(overrides)`` is the same world over a runtime that has other ports (``ConfinementPolicy`` for a profile that does not let ``read`` open the
 org ...). Without an ``org`` a call runs over a runtime of an organization that does not exist (constructors do no I/O); with one, over ``org.runtime``,
@@ -17,28 +17,28 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
-from orgmcp.app import wire_blueprint, wire_mcp_server
-from orgmcp.app._builder import Builder
-from orgmcp.app.wiring import open_runtime, providers
-from orgmcp.blueprint import EXAMPLE_KINDS, Agent, BlueprintError, BlueprintLoader, BlueprintValidator, Issue, RoleLibrary, errors
-from orgmcp.blueprint._assembly import PlanParts, plan_parts
-from orgmcp.blueprint._access import PolicyAccessReport
-from orgmcp.blueprint._accesswords import PlainAccessWords
-from orgmcp.blueprint._budgeting import KINDS, REWORK_RUNS, BudgetPlanner
-from orgmcp.blueprint._org import NoOrgContext, RuntimeOrgContext
-from orgmcp.blueprint._pathcheck import RootedPathChecker
-from orgmcp.blueprint._plan_texts import PLAN_DRAFT_HEADING, PLAN_END, PLAN_HEADING, PLAN_ID_LENGTH, PLAN_SHOW
-from orgmcp.blueprint._playbooks import StepsPlaybookWriter
-from orgmcp.blueprint._resolver import AgentResolver
-from orgmcp.blueprint._rules import blob, edits_others_files, is_code
-from orgmcp.blueprint._roots import EnvironmentWorkspaceRoots
-from orgmcp.blueprint._text import clip
-from orgmcp.blueprint._view import WRITE_TOOLS, is_plain, is_request
-from orgmcp.kernel import Environment
-from orgmcp.kiro import ConfinementPolicy
-from orgmcp.services import ContractNormalizer
+from hirearchy.app import wire_blueprint, wire_mcp_server
+from hirearchy.app._builder import Builder
+from hirearchy.app.wiring import open_runtime, providers
+from hirearchy.blueprint import EXAMPLE_KINDS, Agent, BlueprintError, BlueprintLoader, BlueprintValidator, Issue, RoleLibrary, errors
+from hirearchy.blueprint._assembly import PlanParts, plan_parts
+from hirearchy.blueprint._access import PolicyAccessReport
+from hirearchy.blueprint._accesswords import PlainAccessWords
+from hirearchy.blueprint._budgeting import KINDS, REWORK_RUNS, BudgetPlanner
+from hirearchy.blueprint._org import NoOrgContext, RuntimeOrgContext
+from hirearchy.blueprint._pathcheck import RootedPathChecker
+from hirearchy.blueprint._plan_texts import PLAN_DRAFT_HEADING, PLAN_END, PLAN_HEADING, PLAN_ID_LENGTH, PLAN_SHOW
+from hirearchy.blueprint._playbooks import StepsPlaybookWriter
+from hirearchy.blueprint._resolver import AgentResolver
+from hirearchy.blueprint._rules import blob, edits_others_files, is_code
+from hirearchy.blueprint._roots import EnvironmentWorkspaceRoots
+from hirearchy.blueprint._text import clip
+from hirearchy.blueprint._view import WRITE_TOOLS, is_plain, is_request
+from hirearchy.kernel import Environment
+from hirearchy.kiro import ConfinementPolicy
+from hirearchy.services import ContractNormalizer
 
-NO_ORG = Path("/nonexistent/orgmcp-no-org")  # a root nobody opens: the runtime of "no organization yet"
+NO_ORG = Path("/nonexistent/hirearchy-no-org")  # a root nobody opens: the runtime of "no organization yet"
 Roots = Sequence[str | Path] | None
 
 
@@ -214,6 +214,6 @@ def kiro_runner():
 
 
 def server_of_the_environment():
-    """The MCP server of the identity the environment names (``ORG_ROOT``, ``ORG_AGENT`` ...): what ``orgmcp mcp`` serves."""
+    """The MCP server of the identity the environment names (``ORG_ROOT``, ``ORG_AGENT`` ...): what ``hirearchy mcp`` serves."""
     binding, me = wire_mcp_server.binding_resolver().resolve()
     return wire_mcp_server.server_factory(binding).build(me)

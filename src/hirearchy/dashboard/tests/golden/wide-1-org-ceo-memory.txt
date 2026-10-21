@@ -1,0 +1,42 @@
+ hirearchy dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5 Health   refresh 3600s
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |  running 2/2  queued 1  waiting on you 1  errors 15m 2
+▼ ★ root (you)  needs you: 1                                              │ Overview  Activity  Messages  Run log  Memory  Charter
+├─ ○ archivist  idle  0 left                                              │━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╸━━━━━━╺━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+├─ ▼ ▶ ceo  running 1m12s  3 left                                         │ (no memory yet)
+│  ├─ ◔ analyst  queued: all slots busy, 1 unread  4 left                 │
+│  └─ ◆ writer  working on 1 task(s)  2 left                              │
+├─ ▼ ◇ ops  waiting on 1 report(s)  3 left                                │
+│  ├─ ‖ audit  paused by the user: audit window closed  0 left            │
+│  └─ ‖ deploy  paused: 2 consecutive failed runs, 1 unread  1 left       │
+└─ ▼ ▶ research  running 2m05s  4 left                                    │
+   └─ ! crawler  out of budget  0 left                                    │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+                                                                          │
+ ←/h Fold  →/l Unfold/pane  ⏎ Open  12345 Screen  r Refresh  p Pause  ? Help  q Quit  [] Tab

@@ -1,4 +1,4 @@
-"""The compatibility surface (README: ``orgmcp.core``, ``orgmcp.progress.progress``, ``orgmcp.main``) and the shape of ``src/orgmcp``.
+"""The compatibility surface (README: ``hirearchy.core``, ``hirearchy.progress.progress``, ``hirearchy.main``) and the shape of ``src/hirearchy``.
 
 Everything else of the migration is gone; what stays is stated once, in ``compat_surface.py``, and these tests pin it: it neither
 shrinks nor grows by accident, and the seeded violations below prove that each check can fail.
@@ -18,7 +18,7 @@ pytestmark = pytest.mark.architecture
 
 
 def tree_of(tmp_path: Path, *modules: str) -> Path:
-    root = tmp_path / "orgmcp"
+    root = tmp_path / "hirearchy"
     root.mkdir()
     for module in modules:
         target = root / module
@@ -34,10 +34,10 @@ def test_the_source_tree_has_only_the_permitted_flat_modules_and_no_legacy_modul
     assert compat_surface.layout_problems(SRC) == []
 
 
-def test_orgmcp_core_exports_exactly_the_recorded_names():
-    import orgmcp.core
+def test_hirearchy_core_exports_exactly_the_recorded_names():
+    import hirearchy.core
 
-    assert compat_surface.core_problems(orgmcp.core) == []
+    assert compat_surface.core_problems(hirearchy.core) == []
 
 
 def test_the_entry_points_are_the_console_script_and_python_dash_m():
@@ -83,7 +83,7 @@ def test_a_missing_core_is_flagged(tmp_path):
 
 
 def test_a_core_that_gained_or_lost_a_name_is_flagged():
-    fake = types.ModuleType("orgmcp.core")
+    fake = types.ModuleType("hirearchy.core")
     for name in compat_surface.CORE_NAMES - {"Org"}:
         setattr(fake, name, object())
     fake.sneaked_in = object()  # type: ignore[attr-defined]
@@ -92,15 +92,15 @@ def test_a_core_that_gained_or_lost_a_name_is_flagged():
 
 
 def test_an_entry_point_that_moved_is_flagged(tmp_path):
-    (tmp_path / "pyproject.toml").write_text('[project.scripts]\norgmcp = "orgmcp.cli:main"\n', encoding="utf-8")
-    (tmp_path / "src" / "orgmcp").mkdir(parents=True)
-    (tmp_path / "src" / "orgmcp" / "__main__.py").write_text("print('hi')\n", encoding="utf-8")
+    (tmp_path / "pyproject.toml").write_text('[project.scripts]\nhirearchy = "hirearchy.cli:main"\n', encoding="utf-8")
+    (tmp_path / "src" / "hirearchy").mkdir(parents=True)
+    (tmp_path / "src" / "hirearchy" / "__main__.py").write_text("print('hi')\n", encoding="utf-8")
     problems = compat_surface.entry_point_problems(tmp_path)
-    assert any("orgmcp:main" in p for p in problems) and any("__main__" in p for p in problems), problems
+    assert any("hirearchy:main" in p for p in problems) and any("__main__" in p for p in problems), problems
 
 
 def test_a_readme_that_forgot_the_surface_is_flagged(tmp_path):
     readme = tmp_path / "README.md"
-    readme.write_text("# orgmcp\nnothing here\n", encoding="utf-8")
+    readme.write_text("# hirearchy\nnothing here\n", encoding="utf-8")
     problems = compat_surface.readme_problems(readme)
     assert len(problems) >= 3, problems

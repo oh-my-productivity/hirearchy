@@ -1,4 +1,4 @@
-usage: orgmcp init [-h] [--mission MISSION] [--model MODEL] [path]
+usage: hirearchy init [-h] [--mission MISSION] [--model MODEL] [path]
 
 positional arguments:
   path

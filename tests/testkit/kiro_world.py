@@ -12,10 +12,10 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
-from orgmcp.app import wiring
-from orgmcp.kernel._system import FsAtomicWriter
-from orgmcp.kiro import ProfileStore
-from orgmcp.kiro._profiles import FsProfileStore
+from hirearchy.app import wiring
+from hirearchy.kernel._system import FsAtomicWriter
+from hirearchy.kiro import ProfileStore
+from hirearchy.kiro._profiles import FsProfileStore
 
 from .health_world import _OVERRIDES, with_ports
 

@@ -1,0 +1,11 @@
+usage: hirearchy send [-h] [--title TITLE] [--reply-to REPLY_TO] [--budget BUDGET] to body
+
+positional arguments:
+  to
+  body                 text or @file
+
+options:
+  -h, --help           show this help message and exit
+  --title TITLE
+  --reply-to REPLY_TO
+  --budget BUDGET      grant extra runs

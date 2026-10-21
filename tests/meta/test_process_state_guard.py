@@ -4,8 +4,8 @@ import pytest
 from testkit import process_state
 from testkit.process_state import ProcessState
 
-from orgmcp import core
-from orgmcp.app import wiring
+from hirearchy import core
+from hirearchy.app import wiring
 
 
 def test_nothing_differs_from_itself() -> None:
@@ -44,8 +44,8 @@ def test_a_leaking_test_fails_by_itself_and_the_state_is_back() -> None:
 
 
 def test_a_process_override_that_is_still_in_force_is_named_and_removed() -> None:
-    from orgmcp.kernel import Clock
-    from orgmcp.kernel._system import SystemClock
+    from hirearchy.kernel import Clock
+    from hirearchy.kernel._system import SystemClock
 
     before = ProcessState.capture()
     cm = wiring.overriding({Clock: SystemClock()})

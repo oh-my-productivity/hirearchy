@@ -1,4 +1,4 @@
-usage: orgmcp feedback [-h] [--note NOTE] task_id {accept,reject}
+usage: hirearchy feedback [-h] [--note NOTE] task_id {accept,reject}
 
 positional arguments:
   task_id

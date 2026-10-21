@@ -8,8 +8,8 @@ import time
 
 import pytest
 
-from orgmcp.app.wire_cli import run_cli as main
-from orgmcp.core import ROOT, split_frontmatter
+from hirearchy.app.wire_cli import run_cli as main
+from hirearchy.core import ROOT, split_frontmatter
 
 
 ENG = "ceo/eng"

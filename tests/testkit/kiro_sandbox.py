@@ -21,9 +21,9 @@ import sys
 import time
 from pathlib import Path
 
-from orgmcp.core import DEFAULT_MODEL, ROOT, Org
+from hirearchy.core import DEFAULT_MODEL, ROOT, Org
 
-MODEL = os.environ.get("ORGMCP_IT_MODEL") or DEFAULT_MODEL
+MODEL = os.environ.get("HIREARCHY_IT_MODEL") or DEFAULT_MODEL
 RUN_TIMEOUT = 300  # seconds one agent run may take (the org's run_timeout: the scheduler kills it after that)
 SCHEDULER_TIMEOUT = 480  # seconds the whole scheduler process may take before the test kills it
 
@@ -155,9 +155,9 @@ class RealKiro:
     # ------------------------------------------------------------- running
 
     def run_scheduler(self, org: Org, max_runs: int, timeout: float = SCHEDULER_TIMEOUT) -> str:
-        """``orgmcp run --until-idle --max-runs N`` as a child process (own process group) with a hard timeout."""
-        script = Path(sys.executable).with_name("orgmcp")
-        cmd = [str(script)] if script.exists() else [sys.executable, "-m", "orgmcp"]
+        """``hirearchy run --until-idle --max-runs N`` as a child process (own process group) with a hard timeout."""
+        script = Path(sys.executable).with_name("hirearchy")
+        cmd = [str(script)] if script.exists() else [sys.executable, "-m", "hirearchy"]
         cmd += ["--root", str(org.root), "run", "--until-idle", "--max-runs", str(max_runs)]
         env = {k: v for k, v in os.environ.items() if k not in ("ORG_ROOT", "ORG_AGENT", "ORG_RUN_ID", "ORG_REQUIRE_AGENT")}
         proc = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, start_new_session=True)

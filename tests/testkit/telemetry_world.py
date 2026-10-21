@@ -10,9 +10,9 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-from orgmcp.app import wiring
-from orgmcp.eventlog import LINE_MAX as LINE_MAX
-from orgmcp.kernel import clip as clip
+from hirearchy.app import wiring
+from hirearchy.eventlog import LINE_MAX as LINE_MAX
+from hirearchy.kernel import clip as clip
 
 
 def reset() -> None:

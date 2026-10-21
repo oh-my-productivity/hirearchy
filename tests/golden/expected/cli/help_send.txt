@@ -1,4 +1,4 @@
-usage: orgmcp send [-h] [--title TITLE] [--reply-to REPLY_TO] [--budget BUDGET] to body
+usage: hirearchy send [-h] [--title TITLE] [--reply-to REPLY_TO] [--budget BUDGET] to body
 
 positional arguments:
   to

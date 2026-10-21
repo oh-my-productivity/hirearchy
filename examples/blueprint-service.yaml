@@ -1,7 +1,7 @@
 # A research org that offers its work as a standing SERVICE: asked for again and again, and improving each time.
-#   orgmcp plan examples/blueprint-service.yaml     # validate + print the plan
-#   orgmcp apply examples/blueprint-service.yaml    # create the agents, define the service, give the first request
-#   orgmcp request weekly-brief --input topic="solid-state batteries"   # ask for another one later (then `orgmcp run`)
+#   hirearchy plan examples/blueprint-service.yaml     # validate + print the plan
+#   hirearchy apply examples/blueprint-service.yaml    # create the agents, define the service, give the first request
+#   hirearchy request weekly-brief --input topic="solid-state batteries"   # ask for another one later (then `hirearchy run`)
 # `services:` is what changes with a plain blueprint (see blueprint-research.yaml): the service carries its own
 # acceptance criteria, deliverable and budget (per request); `task:` is optional and here is a first request.
 mission: >

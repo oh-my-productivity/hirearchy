@@ -1,4 +1,4 @@
-usage: orgmcp obs now [-h] [--watch SECONDS] [--json]
+usage: hirearchy obs now [-h] [--watch SECONDS] [--json]
 
 options:
   -h, --help       show this help message and exit

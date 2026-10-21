@@ -54,7 +54,7 @@ def nested(tmp_path):
     out.mkdir()
 
     def run(*args, env=None):
-        base_env = {k: v for k, v in os.environ.items() if k != "ORGMCP_RUN_INTEGRATION"}
+        base_env = {k: v for k, v in os.environ.items() if k != "HIREARCHY_RUN_INTEGRATION"}
         base_env["PATH"] = os.pathsep.join(d for d in base_env["PATH"].split(os.pathsep) if "kiro-home" not in d)  # the outer stub
         full = {**base_env, "REAL_HOME_FOR_TEST": str(tmp_path / "pretend-real-home"), "HOME": str(tmp_path / "pretend-real-home"),
                 "MARKER_OUT": str(out), **(env or {})}
@@ -84,7 +84,7 @@ def test_marked_tests_are_skipped_by_default(nested):
 @pytest.mark.parametrize("how", ["flag", "env"])
 def test_marked_tests_run_when_asked_and_get_no_stub(nested, how):
     p, ran = nested(*(["--run-integration"] if how == "flag" else []),
-                    env={"ORGMCP_RUN_INTEGRATION": "1"} if how == "env" else None)
+                    env={"HIREARCHY_RUN_INTEGRATION": "1"} if how == "env" else None)
     assert p.returncode == 0, p.stdout + p.stderr
     assert "4 passed" in p.stdout, p.stdout
     assert ran == ["class-ran", "dir-ran", "marked-ran"]
@@ -99,7 +99,7 @@ def test_real_kiro_fixture_refuses_unmarked_tests(real_kiro):
 def write_profile(agents: Path, name: str, org_root: Path) -> Path:
     p = agents / f"{name}.json"
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps({"name": name, "mcpServers": {"orgmcp": {"env": {"ORG_ROOT": str(org_root)}}}}))
+    p.write_text(json.dumps({"name": name, "mcpServers": {"hirearchy": {"env": {"ORG_ROOT": str(org_root)}}}}))
     return p
 
 

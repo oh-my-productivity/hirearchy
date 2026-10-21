@@ -1,6 +1,6 @@
-usage: orgmcp task [-h] --title TITLE --goal GOAL --acceptance ACCEPTANCE [--input INPUT]
-                   [--budget BUDGET] [--revises TASK_ID]
-                   to
+usage: hirearchy task [-h] --title TITLE --goal GOAL --acceptance ACCEPTANCE [--input INPUT]
+                      [--budget BUDGET] [--revises TASK_ID]
+                      to
 
 positional arguments:
   to

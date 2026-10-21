@@ -1,15 +1,15 @@
-"""The permanent compatibility surface of orgmcp, stated once (ARCHITECTURE.md 6.5), and the checks that keep it exactly that.
+"""The permanent compatibility surface of hirearchy, stated once (ARCHITECTURE.md 6.5), and the checks that keep it exactly that.
 
 Everything the migration needed is gone; what a user, a script or a kiro profile can still rely on is:
 
-* ``orgmcp.core`` -- the facade module (``Org``, ``DEFAULT_MODEL``, ``Message``, ``OrgError``, ...). Every public name is permanent and
+* ``hirearchy.core`` -- the facade module (``Org``, ``DEFAULT_MODEL``, ``Message``, ``OrgError``, ...). Every public name is permanent and
   documented in the README; ``CORE_NAMES`` records them, so a name can neither disappear nor be added without editing this file.
-* ``orgmcp.progress.progress(org, task_id=None)`` -- the Python entry point of the progress report (README). It is the one name that the
+* ``hirearchy.progress.progress(org, task_id=None)`` -- the Python entry point of the progress report (README). It is the one name that the
   ``__init__`` of a package exports besides its ``api`` (``PACKAGE_EXPORTS``: rule R1, ``checks.init_reexports``, takes its exceptions
   from here).
-* ``orgmcp.main`` -- the console script (``orgmcp = "orgmcp:main"``) and ``python -m orgmcp``.
+* ``hirearchy.main`` -- the console script (``hirearchy = "hirearchy:main"``) and ``python -m hirearchy``.
 
-And the shape of ``src/orgmcp``: the only flat modules are ``__init__``, ``__main__`` and ``core``, and no module named ``_legacy``
+And the shape of ``src/hirearchy``: the only flat modules are ``__init__``, ``__main__`` and ``core``, and no module named ``_legacy``
 exists anywhere (the strangler phase is over; a new flat module or a ``_legacy`` shim is a new, unreviewed public surface).
 """
 
@@ -38,7 +38,7 @@ CORE_NAMES = frozenset({
 PACKAGE_EXPORTS: Mapping[str, frozenset[str]] = {"progress": frozenset({"progress"})}
 
 # What the README must say about the surface (a fragment each).
-README_MENTIONS = ("orgmcp.core", "orgmcp.progress.progress", "orgmcp.core.Org")
+README_MENTIONS = ("hirearchy.core", "hirearchy.progress.progress", "hirearchy.core.Org")
 
 
 def layout_problems(src: Path = SRC) -> list[str]:
@@ -58,39 +58,39 @@ def layout_problems(src: Path = SRC) -> list[str]:
 
 
 def core_problems(core: ModuleType) -> list[str]:
-    """Public names of ``orgmcp.core`` that are missing from, or not recorded in, ``CORE_NAMES``."""
+    """Public names of ``hirearchy.core`` that are missing from, or not recorded in, ``CORE_NAMES``."""
     public = {name for name in vars(core) if not name.startswith("_")}
-    return [f"orgmcp.core.{name} is missing: the facade module keeps every name" for name in sorted(CORE_NAMES - public)] + \
-           [f"orgmcp.core.{name} is public but not recorded in compat_surface.CORE_NAMES" for name in sorted(public - CORE_NAMES)]
+    return [f"hirearchy.core.{name} is missing: the facade module keeps every name" for name in sorted(CORE_NAMES - public)] + \
+           [f"hirearchy.core.{name} is public but not recorded in compat_surface.CORE_NAMES" for name in sorted(public - CORE_NAMES)]
 
 
 def entry_point_problems(repo: Path) -> list[str]:
-    """The console script is ``orgmcp:main`` and ``python -m orgmcp`` runs it."""
+    """The console script is ``hirearchy:main`` and ``python -m hirearchy`` runs it."""
     problems = []
     scripts = tomllib.loads((repo / "pyproject.toml").read_text(encoding="utf-8")).get("project", {}).get("scripts", {})
-    if scripts.get("orgmcp") != "orgmcp:main":
-        problems.append(f"[project.scripts] orgmcp must be 'orgmcp:main', is {scripts.get('orgmcp')!r}")
-    main_module = repo / "src" / "orgmcp" / "__main__.py"
+    if scripts.get("hirearchy") != "hirearchy:main":
+        problems.append(f"[project.scripts] hirearchy must be 'hirearchy:main', is {scripts.get('hirearchy')!r}")
+    main_module = repo / "src" / "hirearchy" / "__main__.py"
     text = main_module.read_text(encoding="utf-8") if main_module.is_file() else ""
     if not (re.search(r"from \. import main\b", text) and re.search(r"^main\(\)", text, re.MULTILINE)):
-        problems.append("src/orgmcp/__main__.py must be 'from . import main' followed by 'main()'")
+        problems.append("src/hirearchy/__main__.py must be 'from . import main' followed by 'main()'")
     return problems
 
 
 def progress_problems() -> list[str]:
-    """``orgmcp.progress.progress(org, task_id=None)`` exists with the documented signature; ``orgmcp.main`` is callable."""
-    import orgmcp
-    import orgmcp.progress
+    """``hirearchy.progress.progress(org, task_id=None)`` exists with the documented signature; ``hirearchy.main`` is callable."""
+    import hirearchy
+    import hirearchy.progress
 
     problems = []
-    if not callable(orgmcp.main):
-        problems.append("orgmcp.main is not callable")
-    function = getattr(orgmcp.progress, "progress", None)
+    if not callable(hirearchy.main):
+        problems.append("hirearchy.main is not callable")
+    function = getattr(hirearchy.progress, "progress", None)
     if not callable(function):
-        return [*problems, "orgmcp.progress.progress is missing"]
+        return [*problems, "hirearchy.progress.progress is missing"]
     parameters = list(inspect.signature(function).parameters.values())
     if [p.name for p in parameters[:2]] != ["org", "task_id"] or parameters[1].default is not None:
-        problems.append("orgmcp.progress.progress must start with (org, task_id=None)")
+        problems.append("hirearchy.progress.progress must start with (org, task_id=None)")
     return problems
 
 

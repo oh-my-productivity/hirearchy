@@ -8,8 +8,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from orgmcp.review import Review
-from orgmcp.templates._notices import REVIEW_ACTIONS as REVIEW_ACTIONS  # what a review tells a manager to do about each flag: not in the api of templates
+from hirearchy.review import Review
+from hirearchy.templates._notices import REVIEW_ACTIONS as REVIEW_ACTIONS  # what a review tells a manager to do about each flag: not in the api of templates
 
 LEDGER = "reviews"  # .runtime/reviews.json
 

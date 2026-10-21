@@ -1,0 +1,24 @@
+ hirearchy dash acme  10:06:40Z   1 Org  2 Workflows  3 Services  4 Events  5
+ scheduler running pid 7000 (until_done, up 6m40s, heartbeat 3.0s ago)  |
+ state                               request
+ working                             Brief: heat pumps [market-brief]
+ done                                Brief: EV chargers (shorter) (rework) [mark
+ done                                Brief: EV chargers [market-brief]
+ waiting on ops/deploy (paused: 2 …  Rotate API keys
+ working                             Quarterly market report
+ done                                Archive old reports
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                ▏
+ ⏎ Open  12345 Screen  r Refresh  p Pause  ? Help  q Quit

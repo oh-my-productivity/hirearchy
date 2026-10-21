@@ -1,4 +1,4 @@
-usage: orgmcp upgrade-rules [-h] [--dry-run]
+usage: hirearchy upgrade-rules [-h] [--dry-run]
 
 options:
   -h, --help  show this help message and exit

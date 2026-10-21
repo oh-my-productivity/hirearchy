@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from golden_support import check
 
-from orgmcp.blueprint import EXAMPLE_KINDS
+from hirearchy.blueprint import EXAMPLE_KINDS
 from testkit.mcp_server_world import OrgBinding, build_server
 
 PROJECT = Path(__file__).resolve().parents[2]

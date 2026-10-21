@@ -1,4 +1,4 @@
-usage: orgmcp progress [-h] [--wait SECONDS] [task_id]
+usage: hirearchy progress [-h] [--wait SECONDS] [task_id]
 
 positional arguments:
   task_id         only this task (default: open tasks and those finished in the last day)

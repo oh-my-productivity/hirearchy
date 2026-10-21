@@ -65,7 +65,7 @@ Mission: <One paragraph: what software the organization builds and for whom.>
 Deliverable: <What is delivered, e.g. a Python package with a command-line tool> (python package)
 Quality bar: Tests pass from a clean checkout; no network use at runtime.
 Scope: <What the software does and what it deliberately does not do, in the user's words.>
-Workspace: <BASE>/proj. Everything you read, write or run outside orgmcp stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory. Relative paths in kiro tools resolve there; your org files (MEMORY.md, work/) are written with orgmcp `write`, never into the workspace.
+Workspace: <BASE>/proj. Everything you read, write or run outside hirearchy stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory. Relative paths in kiro tools resolve there; your org files (MEMORY.md, work/) are written with hirearchy `write`, never into the workspace.
 shell is not confined by the runtime: keep every command inside your workspace, and never write to the inputs, the organization directory or anywhere else.
 Reports to: root (the human)
 Your team (fixed by the plan; you cannot change it):
@@ -122,7 +122,7 @@ Mission: <One paragraph: what software the organization builds and for whom.>
 Deliverable: <What is delivered, e.g. a Python package with a command-line tool> (python package)
 Quality bar: Tests pass from a clean checkout; no network use at runtime.
 Scope: <What the software does and what it deliberately does not do, in the user's words.>
-Workspace: <BASE>/proj. Everything you read, write or run outside orgmcp stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory. Relative paths in kiro tools resolve there; your org files (MEMORY.md, work/) are written with orgmcp `write`, never into the workspace.
+Workspace: <BASE>/proj. Everything you read, write or run outside hirearchy stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory. Relative paths in kiro tools resolve there; your org files (MEMORY.md, work/) are written with hirearchy `write`, never into the workspace.
 shell is not confined by the runtime: keep every command inside your workspace, and never write to the inputs, the organization directory or anywhere else.
 Engineering rules: tests: pytest, at least one test per acceptance criterion; packaging: uv with a pyproject.toml; commits: local commits per feature; never push
 Reports to: lead
@@ -172,7 +172,7 @@ Mission: <One paragraph: what software the organization builds and for whom.>
 Deliverable: <What is delivered, e.g. a Python package with a command-line tool> (python package)
 Quality bar: Tests pass from a clean checkout; no network use at runtime.
 Scope: <What the software does and what it deliberately does not do, in the user's words.>
-Workspace: <BASE>/proj. Everything you read, write or run outside orgmcp stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory. Relative paths in kiro tools resolve there; your org files (MEMORY.md, work/) are written with orgmcp `write`, never into the workspace.
+Workspace: <BASE>/proj. Everything you read, write or run outside hirearchy stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory. Relative paths in kiro tools resolve there; your org files (MEMORY.md, work/) are written with hirearchy `write`, never into the workspace.
 shell is not confined by the runtime: keep every command inside your workspace, and never write to the inputs, the organization directory or anywhere else.
 Engineering rules: tests: pytest, at least one test per acceptance criterion; packaging: uv with a pyproject.toml; commits: local commits per feature; never push
 Reports to: lead
@@ -223,7 +223,7 @@ Mission: <One paragraph: what software the organization builds and for whom.>
 Deliverable: <What is delivered, e.g. a Python package with a command-line tool> (python package)
 Quality bar: Tests pass from a clean checkout; no network use at runtime.
 Scope: <What the software does and what it deliberately does not do, in the user's words.>
-Workspace: <BASE>/proj. Everything you read, write or run outside orgmcp stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory. Relative paths in kiro tools resolve there; your org files (MEMORY.md, work/) are written with orgmcp `write`, never into the workspace.
+Workspace: <BASE>/proj. Everything you read, write or run outside hirearchy stays inside it; nothing else on the machine, and nothing under ~/.kiro or the organization directory. Relative paths in kiro tools resolve there; your org files (MEMORY.md, work/) are written with hirearchy `write`, never into the workspace.
 shell is not confined by the runtime: keep every command inside your workspace, and never write to the inputs, the organization directory or anywhere else.
 Engineering rules: tests: pytest, at least one test per acceptance criterion; packaging: uv with a pyproject.toml; commits: local commits per feature; never push
 Reports to: lead

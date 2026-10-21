@@ -2,7 +2,7 @@ import pytest
 from testkit.e2e_world import load_message, observe
 from testkit.obs_fixtures import freeze, run_ids, stamp_trace
 
-from orgmcp.core import ROOT, Org
+from hirearchy.core import ROOT, Org
 
 
 @pytest.fixture

@@ -11,8 +11,8 @@ import dataclasses
 from collections.abc import Callable, Mapping
 from typing import Any
 
-from orgmcp.daemon import SchedulerState, SchedulerStatus
-from orgmcp.daemon.testing import FakeSchedulerStatus
+from hirearchy.daemon import SchedulerState, SchedulerStatus
+from hirearchy.daemon.testing import FakeSchedulerStatus
 
 
 def scheduler_is(process_overrides: Callable[[Mapping[type, object]], object], state: SchedulerState, *orgs: Any) -> FakeSchedulerStatus:

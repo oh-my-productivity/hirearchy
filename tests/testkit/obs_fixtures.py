@@ -11,7 +11,7 @@ import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from orgmcp.core import ROOT, Message, Org, join_frontmatter, split_frontmatter
+from hirearchy.core import ROOT, Message, Org, join_frontmatter, split_frontmatter
 
 from .clocks import clock_ports
 

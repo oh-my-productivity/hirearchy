@@ -13,13 +13,13 @@ import pytest
 import testkit
 from testkit.cli_world import main
 from testkit.e2e_world import build_server, load_message, observe
-from testkit.reach.orgmcp.app import wiring
+from testkit.reach.hirearchy.app import wiring
 from testkit.scheduler import scheduler_is
 from testkit.scheduler_loop import loop_over
 
-from orgmcp.core import ROOT, Org
-from orgmcp.daemon import SchedulerState
-from orgmcp.progress import progress
+from hirearchy.core import ROOT, Org
+from hirearchy.daemon import SchedulerState
+from hirearchy.progress import progress
 
 FAKE = str(testkit.FAKE_AGENT)
 REFUSAL = "status must be one of ('done', 'failed', 'blocked')"
@@ -159,7 +159,7 @@ def test_trace_lists_every_run_message_tool_call_and_refusal(world):
     # every message
     assert {i["id"] for i in tr["items"] if i["kind"] == "message"} == message_ids(org)
 
-    # every orgmcp tool call of those runs (ok or refused) and the refusal text
+    # every hirearchy tool call of those runs (ok or refused) and the refusal text
     calls = [e for e in ev if e["kind"] == "tool.call" and (e["run"] in {r["run"] for r in runs} or e["trace"] == world.first.id)]
     assert tr["totals"]["tool_calls"] == len(calls) and len(calls) >= 18
     per_run = {r["run"]: r["tool_calls"]["total"] for r in runs}

@@ -1,6 +1,6 @@
-usage: orgmcp [-h] [--root ROOT]
-              {init,hire,task,services,define-service,request,feedback,retire-service,plan,apply,send,status,health,progress,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
-              ...
+usage: hirearchy [-h] [--root ROOT]
+                 {init,hire,task,services,define-service,request,feedback,retire-service,plan,apply,send,status,health,progress,upgrade-rules,install-skill,review,inbox,resume,run,mcp,dash,obs,check,kiro-profile}
+                 ...
 
 A file-based organization of agents, run over MCP.
 
@@ -25,7 +25,7 @@ positional arguments:
                         needs you
     upgrade-rules       rewrite the rules in ORG.md to the current template (keeps settings and
                         mission)
-    install-skill       copy the orgmcp assistant skill into a kiro skills directory (default
+    install-skill       copy the hirearchy assistant skill into a kiro skills directory (default
                         ~/.kiro/skills)
     review              run a health review now: tell managers (and you) about flagged agents
     inbox               read your (root) messages

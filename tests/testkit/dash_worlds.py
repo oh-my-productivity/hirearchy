@@ -1,5 +1,5 @@
 """The organizations the screens of the dashboard are taken of: the demo organization of ``dash_fixtures`` (every state of an agent, requests, a service,
-events) and an empty one. Used by the colocated tests of ``orgmcp.dashboard`` through ``src/orgmcp/dashboard/tests/_worlds.py``, which may not import
+events) and an empty one. Used by the colocated tests of ``hirearchy.dashboard`` through ``src/hirearchy/dashboard/tests/_worlds.py``, which may not import
 the ``Org`` facade itself (the layers contract); this module may (E1-e moves it, with ``dash_fixtures``, into ``tests/testkit``).
 
 The scheduler is told to look running (pid 7000) or stopped through the ports of the composition root, so no process is looked for.
@@ -14,8 +14,8 @@ from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
 
-from orgmcp.core import Org
-from orgmcp.daemon import SchedulerState
+from hirearchy.core import Org
+from hirearchy.daemon import SchedulerState
 
 from .dash_fixtures import DEMO_NOW, demo_org
 from .scheduler import scheduler_is

@@ -3,13 +3,13 @@ import re
 
 import pytest
 from testkit.e2e_world import agent_health
-from testkit.reach.orgmcp.app import wiring
+from testkit.reach.hirearchy.app import wiring
 from testkit.scheduler_loop import loop_over, runnable_of
 
-from orgmcp import core
-from orgmcp.core import ROOT, word_count
-from orgmcp.kernel import AtomicWriter
-from orgmcp.kernel.testing import FailingAtomicWriter, fs_atomic_writer
+from hirearchy import core
+from hirearchy.core import ROOT, word_count
+from hirearchy.kernel import AtomicWriter
+from hirearchy.kernel.testing import FailingAtomicWriter, fs_atomic_writer
 
 ENG = "ceo/eng"
 HEAD = "Exact criteria: 33 words, acrostic PLANT."

@@ -5,6 +5,6 @@ Those packages may not import ``reflection`` (it sits above them: its cases are 
 (The cases themselves are read from the runtime: ``org.runtime.case_history.cases(owner, service)``.)
 """
 
-from orgmcp.reflection import lessons_of, summarize
+from hirearchy.reflection import lessons_of, summarize
 
 __all__ = ["lessons_of", "summarize"]

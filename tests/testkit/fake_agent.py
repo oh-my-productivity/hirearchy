@@ -5,7 +5,7 @@ Behaviour is chosen by FAKE_MODE:
           leaves write an artifact and report done.
   crash - exit 1 without doing anything.
   idle  - do nothing (simulates an agent that forgets to report).
-  tools - like work, but through the orgmcp MCP tools (in-process), so tool.call events are recorded; each leaf also
+  tools - like work, but through the hirearchy MCP tools (in-process), so tool.call events are recorded; each leaf also
           makes one refused call (a report with a bad status) before reporting.
   hang  - sleep for a long time (a run the scheduler has to kill on timeout).
 """
@@ -13,7 +13,7 @@ Behaviour is chosen by FAKE_MODE:
 import os
 import sys
 
-from orgmcp.core import Org
+from hirearchy.core import Org
 
 mode = os.environ.get("FAKE_MODE", "work")
 if mode == "crash":
@@ -34,9 +34,9 @@ kids = org.children(me)
 if mode == "tools":
     import asyncio
 
-    from orgmcp.app import wire_mcp_server, wiring
-    from orgmcp.app.wire_stalls import RuntimePorts
-    from orgmcp.mcp_server._binding import OrgBinding
+    from hirearchy.app import wire_mcp_server, wiring
+    from hirearchy.app.wire_stalls import RuntimePorts
+    from hirearchy.mcp_server._binding import OrgBinding
 
     wiring.process_resources().process_label.set("mcp")
     server = wire_mcp_server.server_factory(OrgBinding(org.root, wire_mcp_server.RuntimeOrgOpener(), RuntimePorts(org.runtime), False)).build(me)

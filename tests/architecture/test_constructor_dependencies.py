@@ -1,10 +1,10 @@
 """R6, the "depend on interfaces" half: a class receives its collaborators through its constructor, typed by a Protocol.
 
 ``test_constructors_depend_on_protocols`` walks the same classes as the class-interface check (``class_interfaces``: classes with
-behaviour outside ``orgmcp.app``, not Protocols, exceptions, framework widgets or pure data) and resolves the annotations of the
+behaviour outside ``hirearchy.app``, not Protocols, exceptions, framework widgets or pure data) and resolves the annotations of the
 constructor's parameters (dataclass fields included). An annotation -- inside ``Optional``/unions/generics/``Callable`` arguments too -- must not
-name a concrete ``orgmcp`` class: only Protocols, data (dataclass, ``NamedTuple``, enum, ``TypedDict``, exception) and types that are not
-``orgmcp`` classes (builtins, ``pathlib.Path``, ``datetime``, ...). The seeded tests build a package with one violation of each shape.
+name a concrete ``hirearchy`` class: only Protocols, data (dataclass, ``NamedTuple``, enum, ``TypedDict``, exception) and types that are not
+``hirearchy`` classes (builtins, ``pathlib.Path``, ``datetime``, ...). The seeded tests build a package with one violation of each shape.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from types import ModuleType
 
 import pytest
 
-import orgmcp
+import hirearchy
 from . import constructor_dependencies as deps
 
 pytestmark = pytest.mark.architecture
@@ -172,8 +172,8 @@ def bad_package(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
 
 
 def test_constructors_depend_on_protocols() -> None:
-    offences, counts = deps.survey(orgmcp)
-    assert not offences, "a constructor names a concrete class (take the Protocol, and let orgmcp.app pass the implementation):\n  " + \
+    offences, counts = deps.survey(hirearchy)
+    assert not offences, "a constructor names a concrete class (take the Protocol, and let hirearchy.app pass the implementation):\n  " + \
         "\n  ".join(str(o) for o in offences)
     assert counts.unresolved == [], f"annotations that could not be resolved: {counts.unresolved}"
     assert counts.classes > 300 and counts.parameters > 1000  # the check looks at the whole population, not at nothing
