@@ -12,9 +12,9 @@ import pytest
 
 from hirearchy.kernel import Message, OrgError, split_frontmatter
 from hirearchy.services import FEEDBACK_HEADER, LINK_HEADER, ServiceCommands
-from hirearchy.services.testing import IMPLEMENTATIONS, RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
+from hirearchy.services.testing import IMPLEMENTATIONS, AdmittingServiceEvidence, RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
 
-from ._support import BRIEF, STEPS, amend, answer, define, grant, implementations, make, request
+from ._support import BRIEF, STEPS, amend, answer, define, grant, implementations, make, populated, request
 
 CONTRACT = "ceo/services/weekly-brief/SERVICE.md"
 PLAYBOOK = "ceo/services/weekly-brief/PLAYBOOK.md"
@@ -237,9 +237,52 @@ def test_the_owner_is_told_quietly_what_changed(w: ServicesWorld) -> None:
         "+ acceptance added: C3: Cite at most five sources\n"
         "budget per request: 10 -> 12 runs\n"
         "locked: false -> true (you may no longer revise the playbook)\n"
-        "Acceptance criteria now:\nC1: At most 600 words\nC2: Every factual claim has a source URL\nC3: Cite at most five sources\n"
+        "Acceptance criteria now:\nC1: At most 600 words\nC2: Every factual claim has a source URL\nC3: Cite at most five sources (not confirmed)\n"
         "Contract: ceo/services/weekly-brief/SERVICE.md"
     )
+
+
+@pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
+def factory(request: pytest.FixtureRequest) -> Any:
+    """The constructor of one implementation of the world, which takes the evidence gate to build it over."""
+    return request.param
+
+
+class UnreadableConfirmations(AdmittingServiceEvidence):
+    """A gate whose record of what the client confirmed cannot be read."""
+
+    def __init__(self, error: Exception) -> None:
+        super().__init__()
+        self._error = error
+
+    def confirmed(self, owner: str, service: str) -> frozenset[str]:
+        raise self._error
+
+
+def test_the_amendment_note_reads_the_confirmations(factory: Any, tmp_path: Path) -> None:
+    w = populated(factory(tmp_path, AdmittingServiceEvidence(confirmed=["C7"])))
+    define(w, acceptance=[f"Rule {k}" for k in range(1, 7)])
+    amend(w, add_acceptance=["Cite at most five sources", "No opinions"])  # C7 and C8; the client confirmed C7 only
+    (note,) = w.d.inbox("ceo")
+    assert "C6: Rule 6\nC7: Cite at most five sources\nC8: No opinions (not confirmed)\nContract:" in note.body
+
+
+@pytest.mark.parametrize("error", [OrgError("the cases cannot be read"), OSError("disk")], ids=["OrgError", "OSError"])
+def test_an_unreadable_confirmation_marks_everything_and_still_amends(factory: Any, tmp_path: Path, error: Exception) -> None:
+    w = populated(factory(tmp_path, UnreadableConfirmations(error)))
+    define(w)
+    amend(w, add_acceptance=["Cite at most five sources", "No opinions"])
+    assert meta_of(w, CONTRACT)[0]["version"] == 2  # the mark is advisory: the amendment is written as usual
+    (note,) = w.d.inbox("ceo")
+    assert "C2: Every factual claim has a source URL\nC3: Cite at most five sources (not confirmed)\nC4: No opinions (not confirmed)\n" in note.body
+
+
+def test_a_bug_in_the_confirmation_read_is_not_hidden(factory: Any, tmp_path: Path) -> None:
+    w = populated(factory(tmp_path, UnreadableConfirmations(ValueError("a bug"))))
+    define(w)
+    with pytest.raises(ValueError, match="a bug"):
+        amend(w, add_acceptance=["Cite at most five sources"])
+    assert meta_of(w, CONTRACT)[0]["version"] == 1 and w.d.inbox("ceo") == []  # it propagates before anything is written
 
 
 def test_the_amendment_is_an_event(w: ServicesWorld) -> None:

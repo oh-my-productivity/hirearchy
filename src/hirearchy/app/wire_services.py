@@ -53,6 +53,7 @@ def _commands(b: Builder) -> ServiceCommands:
     return RuleServiceCommands(
         RuleContractDefiner(
             agents, catalog, store, places, b.get(ContractNormalizer), ContractAmender(), texts, owners, playbooks, delivery, clock, events,
+            b.get(ServiceEvidence),
         ),
         RuleServiceRetirement(agents, catalog, store, owners, delivery, clock, events),
         RulePlaybookReviser(agents, catalog, texts, playbooks, delivery, b.get(ServiceEvidence)),

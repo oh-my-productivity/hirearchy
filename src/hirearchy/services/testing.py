@@ -220,7 +220,9 @@ def _world(d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | 
     owners, texts = DirectReportOwners(d.agents), CappedPlaybookTexts(d.settings)
     playbooks = EventedPlaybookWriter(store, d.clock, events)
     commands = RuleServiceCommands(
-        RuleContractDefiner(d.agents, catalog, store, places, normalizer, ContractAmender(), texts, owners, playbooks, delivery, d.clock, events),
+        RuleContractDefiner(
+            d.agents, catalog, store, places, normalizer, ContractAmender(), texts, owners, playbooks, delivery, d.clock, events, gate,
+        ),
         RuleServiceRetirement(d.agents, catalog, store, owners, delivery, d.clock, events),
         RulePlaybookReviser(d.agents, catalog, texts, playbooks, delivery, gate),
         RuleServiceRequester(d.agents, catalog, d.mail, TextRequestBodies(), d.sender),

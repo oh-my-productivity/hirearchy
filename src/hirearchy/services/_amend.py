@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Collection, Mapping, Sequence
 
 from ..kernel import JsonObject, OrgError
 from ._lines import criteria_lines
@@ -78,7 +78,10 @@ class ContractAmender(ContractAmendment):
             out.append("acceptance: order changed")
         return out
 
-    def diff(self, old: Contract, new: Contract, changes: Sequence[str], where: str, criteria: Sequence[Criterion]) -> str:
+    def diff(
+        self, old: Contract, new: Contract, changes: Sequence[str], where: str, criteria: Sequence[Criterion], confirmed: Collection[str],
+    ) -> str:
         head = (f"{old.defined_by or 'your parent'} changed the contract of service `{old.name}` (v{old.version} -> v{new.version}). "
                 "Read it, and follow the new criteria from the next request on:")
-        return "\n".join([head, *changes, "Acceptance criteria now:", *(f"{c.id}: {c.text}" for c in criteria), f"Contract: {where}"])
+        shown = (f"{c.id}: {c.text}" + (" (not confirmed)" if c.amended and c.id not in confirmed else "") for c in criteria)
+        return "\n".join([head, *changes, "Acceptance criteria now:", *shown, f"Contract: {where}"])

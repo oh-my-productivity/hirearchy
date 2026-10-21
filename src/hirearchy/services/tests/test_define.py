@@ -112,7 +112,7 @@ def test_redefinition_archives_bumps_the_version_and_tells_the_owner_quietly(svc
     assert "- acceptance removed: C1: At most 600 words" in note.body and "+ acceptance added: C3: At most 500 words" in note.body
     assert "budget per request: 10 -> 12 runs" in note.body and "locked: false -> true" in note.body
     assert "Every factual claim" not in note.body.split("Acceptance criteria now")[0]  # unchanged criteria are not diffed ...
-    assert "Acceptance criteria now:\nC3: At most 500 words\nC2: Every factual claim has a source URL\n" in note.body  # ... but listed with their ids
+    assert "Acceptance criteria now:\nC3: At most 500 words (not confirmed)\nC2: Every factual claim has a source URL\n" in note.body  # ... but listed with their ids
 
 
 def test_redefinition_refuses_a_playbook_and_keeps_the_existing_one(org):

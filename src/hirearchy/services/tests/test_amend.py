@@ -201,10 +201,10 @@ def test_the_owners_amendment_note_lists_every_current_criterion_with_its_id(svc
     assert second.body == (
         "root changed the contract of service `weekly-brief` (v2 -> v3). Read it, and follow the new criteria from the next request on:\n"
         "- acceptance removed: C1: At most 600 words\n+ acceptance added: C4: Cite the test run\n"
-        "Acceptance criteria now:\nC2: Every factual claim has a source URL\nC3: Dates are written in full\nC4: Cite the test run\n"
-        "Contract: ceo/services/weekly-brief/SERVICE.md"
+        "Acceptance criteria now:\nC2: Every factual claim has a source URL\nC3: Dates are written in full (not confirmed)\n"
+        "C4: Cite the test run (not confirmed)\nContract: ceo/services/weekly-brief/SERVICE.md"
     )
-    assert "Acceptance criteria now:\nC1: At most 600 words\nC2: Every factual claim has a source URL\nC3: Dates are written in full\n" in first.body
+    assert "Acceptance criteria now:\nC1: At most 600 words\nC2: Every factual claim has a source URL\nC3: Dates are written in full (not confirmed)\n" in first.body
 
 
 def test_a_text_added_removed_and_added_again_keeps_its_id_through_define_service(svc):

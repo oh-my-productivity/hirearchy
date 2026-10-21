@@ -107,7 +107,9 @@ def test_only_a_new_order_is_a_change_of_its_own() -> None:
 
 
 def test_the_note_names_who_changed_what_and_where_to_read_it() -> None:
-    text = A.diff(contract(), contract(version=2), ["budget per request: 5 -> 6 runs"], "ceo/services/brief/SERVICE.md", ided("one", "two"))
+    text = A.diff(
+        contract(), contract(version=2), ["budget per request: 5 -> 6 runs"], "ceo/services/brief/SERVICE.md", ided("one", "two"), frozenset(),
+    )
     assert text == (
         "root changed the contract of service `brief` (v1 -> v2). Read it, and follow the new criteria from the next request on:\n"
         "budget per request: 5 -> 6 runs\nAcceptance criteria now:\nC1: one\nC2: two\nContract: ceo/services/brief/SERVICE.md"
@@ -115,4 +117,14 @@ def test_the_note_names_who_changed_what_and_where_to_read_it() -> None:
 
 
 def test_a_contract_defined_by_nobody_is_changed_by_the_parent() -> None:
-    assert A.diff(contract(defined_by=""), contract(version=2), [], "x", []).startswith("your parent changed the contract of service `brief`")
+    assert A.diff(contract(defined_by=""), contract(version=2), [], "x", [], frozenset()).startswith("your parent changed the contract of service `brief`")
+
+
+def test_the_note_marks_an_unconfirmed_amendment() -> None:
+    criteria = number_criteria([(1, "root", ["one", "two"]), (2, "root", ["one", "two", "three", "four"]), (3, "ceo", ["one", "two", "three", "four", "five"])])
+    new = contract(acceptance=["one", "two", "three", "four", "five"], version=3)
+    nothing = A.diff(contract(), new, [], "x", criteria, frozenset())
+    assert "Acceptance criteria now:\nC1: one\nC2: two\nC3: three (not confirmed)\nC4: four (not confirmed)\nC5: five\n" in nothing  # v1 and non-root: no mark
+    some = A.diff(contract(), new, [], "x", criteria, ["C3"])
+    assert "C3: three\nC4: four (not confirmed)\nC5: five\n" in some
+    assert "(not confirmed)" not in A.diff(contract(), new, [], "x", criteria, {"C3", "C4"})

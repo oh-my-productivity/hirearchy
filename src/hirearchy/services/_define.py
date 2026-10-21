@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping
 
 from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
@@ -10,7 +10,7 @@ from ..kernel import NAME_RE, ROOT, Clock, EventSink, JsonObject, OrgError, pare
 from ._lines import criteria_lines
 from ._criteria import stored_versions
 from ._protocols import ContractAmendment, ContractDefinitions, OwnerAddresses, PlaybookTexts, PlaybookWriter, ServicePlaces
-from .api import DESCRIPTION_MAX, Contract, ContractNormalizer, ServiceCatalog, ServiceStore, criteria_of, number_criteria
+from .api import DESCRIPTION_MAX, Contract, ContractNormalizer, ServiceCatalog, ServiceEvidence, ServiceStore, criteria_of, number_criteria
 
 
 class RuleContractDefiner(ContractDefinitions):
@@ -19,7 +19,7 @@ class RuleContractDefiner(ContractDefinitions):
     def __init__(
         self, agents: AgentDirectory, catalog: ServiceCatalog, store: ServiceStore, places: ServicePlaces, normalizer: ContractNormalizer,
         amendment: ContractAmendment, texts: PlaybookTexts, owners: OwnerAddresses, playbooks: PlaybookWriter, delivery: MessageDelivery,
-        clock: Clock, events: EventSink,
+        clock: Clock, events: EventSink, evidence: ServiceEvidence,
     ) -> None:
         self._agents = agents
         self._catalog = catalog
@@ -33,6 +33,15 @@ class RuleContractDefiner(ContractDefinitions):
         self._delivery = delivery
         self._clock = clock
         self._events = events
+        self._evidence = evidence
+
+    def _confirmed(self, owner: str, name: str) -> Collection[str]:
+        """The criteria the client confirmed, for the mark of the note. The mark is advisory, so a record that cannot be read marks every amended
+        criterion (``frozenset()``), which errs safe; any other error is a bug and propagates."""
+        try:
+            return self._evidence.confirmed(owner, name)
+        except (OrgError, OSError):
+            return frozenset()
 
     def define_service(
         self, actor: str, owner: str, name: str, *, description: str | None, inputs: object, acceptance: object,
@@ -114,6 +123,7 @@ class RuleContractDefiner(ContractDefinitions):
             "defined": now, "created": now if old is None or old.created is None else old.created.isoformat(timespec="microseconds"),
         }
         changes: list[str] = []
+        confirmed: Collection[str] = frozenset()
         after = number_criteria([*stored, (new.version, actor, accept_n)])  # the new version is numbered in memory, before it is written
         if old is not None:
             changes = self._amendment.changes(old, new, {c.text: c.id for c in after})
@@ -122,6 +132,7 @@ class RuleContractDefiner(ContractDefinitions):
                     f"no change: the amendment leaves the contract of `{name}` exactly as it is (v{old.version}). "
                     f"Current criteria:\n{self._amendment.listed(current)}"
                 )
+            confirmed = self._confirmed(owner, name)  # read before the write: the note marks what the client has not yet confirmed
         where = self._store.write_contract(owner, name, meta, notes_n, old.version if old is not None else None)
         self._events.emit("service.define", actor=actor, owner=owner, service=name, version=new.version, by=actor, amendment=old is not None)
         if old is None:
@@ -133,7 +144,7 @@ class RuleContractDefiner(ContractDefinitions):
             return text
         self._delivery.notify(
             owner, f"contract of service {name} changed to v{new.version}",
-            self._amendment.diff(old, new, changes, where, criteria_of(after, accept_n)), wake=False,
+            self._amendment.diff(old, new, changes, where, criteria_of(after, accept_n), confirmed), wake=False,
         )
         kept = self._places.rel(self._places.history_file(owner, name, "SERVICE", old.version))
         return (

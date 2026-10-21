@@ -246,6 +246,7 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     assert f"C7: {added}" in reply
     note = next(m.body for m in w.org.received("lead") if "Acceptance criteria now:" in m.body)
     assert all(f"C{k}: " in note for k in range(1, 8))
+    assert f"C7: {added} (not confirmed)" in note  # the lead sees that the client's yes to it is not recorded
     v2 = PLAYBOOK_V1 + "3. 'before <weekday>' is that weekday's date.\n"
     refused = fails(w.lead, "revise_playbook", service=SERVICE, content=v2, reason="C7 was added by the client", evidence=["C7"])
     assert "C7 was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)" in refused
