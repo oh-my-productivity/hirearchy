@@ -1,7 +1,7 @@
 """The ports ``reflection`` defines for what it consumes (consumer-owned, narrower than the providers') and the roles inside the package.
 
 The providers (``ServiceStore``, ``RunLogReader``, ``OrgSettings``, ``ServiceHints``, ``OrgLayout``) satisfy these structurally; the composition root
-passes them. The last three are the parts the sections of the run prompt are made of.
+passes them. The last four are the parts the sections of the run prompt are made of.
 """
 
 from __future__ import annotations
@@ -93,6 +93,13 @@ class PlaybookSection(Protocol):
 class ReflectSection(Protocol):
     def section(self, addr: str, contract: Contract, digest: str, *, rejected: bool = False, new_request: bool = True) -> str:
         """What to reflect on before the work starts, with the digest of the evidence."""
+        ...
+
+
+@runtime_checkable
+class RegressionSection(Protocol):
+    def section(self, addr: str, contract: Contract) -> str:
+        """The regression list of a service ``addr`` owns: the client's rejections, verbatim (the newest ones). ``""`` when it has none."""
         ...
 
 

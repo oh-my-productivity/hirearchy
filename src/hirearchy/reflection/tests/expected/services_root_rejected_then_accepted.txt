@@ -5,4 +5,6 @@ Services you can request (from your direct reports):
     C1: At most 600 words
     C2: Every factual claim has a source URL
   record: 1 request(s): 1 done, 0 failed, 0 open; 1 reworked; avg 5 runs; feedback 1 accept (1 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case {ask0}): "Sam's 'before Friday' needs a date."
   playbook: none yet

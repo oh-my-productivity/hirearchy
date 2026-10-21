@@ -6,6 +6,10 @@ The contract (SERVICE.md) is your parent's; the playbook (PLAYBOOK.md) is yours.
 # Playbook: weekly-brief (v0, yours to improve)
 No playbook yet: write v1 now from how the team works (Reflect before you start shows the evidence; rules from lessons or relayed verdicts are not steps), then follow it (the first version needs no evidence: evidence=[]).
 
+# Regression list: weekly-brief (the client's rejections, verbatim)
+Each line is something the client rejected. Check every delivery of this service against each line, except the lines marked "no lasting rule" (the client said it was a one-off: do not check them), and copy this list verbatim into every review or check task you delegate for it. A line is not a criterion: it becomes one when your parent adds it to the contract, or ends as "no lasting rule".
+- R1, case {ask0}, verdict {note0}: "Sam's 'before Friday' needs a date."
+
 # Reflect before you start: weekly-brief
 Your playbook is how your team delivers this service; you own it and improve it. Evidence so far (there is no playbook yet):
 Cases with new evidence (most recent first):

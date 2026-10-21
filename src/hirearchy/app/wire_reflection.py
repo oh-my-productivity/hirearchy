@@ -17,7 +17,7 @@ from ..reflection._evidence import CaseServiceEvidence
 from ..reflection._files import OrgServicePaths
 from ..reflection._reports import TextServiceReports
 from ..reflection._runs import LogRunCounter
-from ..reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection
+from ..reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection, RegressionListSection
 from ..reflection._timeline import StorePlaybookTimelines
 from ..runs import RunLogReader
 from ..services import ServiceCatalog, ServiceEvidence, ServiceHints, ServiceStore
@@ -43,8 +43,9 @@ def register(b: Builder) -> None:
 
 
 def _sections(b: Builder) -> ServicePromptSections:
-    catalog, paths = b.get(ServiceCatalog), OrgServicePaths(b.get(OrgLayout))
+    catalog, history, paths = b.get(ServiceCatalog), b.get(CaseHistory), OrgServicePaths(b.get(OrgLayout))
     return OwnerPromptSections(
-        catalog, OwnedServicesListing(catalog, b.get(CaseHistory), paths), b.get(ReflectionDigest), b.get(TaskQuery),
+        catalog, OwnedServicesListing(catalog, history, paths), b.get(ReflectionDigest), b.get(TaskQuery),
         MailRejectedServices(b.get(MailboxReader)), QuotedPlaybookSection(catalog, paths), EvidenceReflectSection(catalog, b.get(OrgSettings), paths),
+        RegressionListSection(catalog, history),
     )

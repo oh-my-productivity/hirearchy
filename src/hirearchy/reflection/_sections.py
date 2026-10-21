@@ -4,11 +4,15 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from ..kernel import RENDER_BODY_CHARS, ROOT, Message, parent
+from ..kernel import RENDER_BODY_CHARS, ROOT, Message, clip_line, parent
 from ..mail import MailboxReader, TaskQuery
 from ..services import Contract, ServiceCatalog, playbook_word_cap
-from ._ports import ConfigSource, PlaybookSection, RejectedServices, ReflectSection, ServicePaths, ServicesListing
-from .api import CaseHistory, ReflectionDigest, ServicePromptSections
+from ._ports import ConfigSource, PlaybookSection, RegressionSection, RejectedServices, ReflectSection, ServicePaths, ServicesListing
+from ._reports import marked
+from .api import Assertion, CaseHistory, ReflectionDigest, ServicePromptSections, regressions
+
+REGRESSION_LINES = 12  # the newest assertions shown in the owner's prompt
+CLIP_REGRESSION = 300  # characters of the client's words shown for one of them
 
 
 def _quoted(text: str, where: str) -> str:
@@ -60,6 +64,46 @@ class QuotedPlaybookSection(PlaybookSection):
                 "followed, nothing more (the first version needs no evidence: evidence=[])."
             )
         return f"{head}\n{_quoted(pb.body, self._paths.rel(pb.path))}"
+
+
+class RegressionListSection(RegressionSection):
+    """The client's rejections of a service, verbatim: the lines a delivery is checked against (the newest ones; ``services`` lists them all)."""
+
+    def __init__(self, catalog: ServiceCatalog, history: CaseHistory) -> None:
+        self._catalog = catalog
+        self._history = history
+
+    @staticmethod
+    def _line(a: Assertion, current: set[str]) -> str:
+        if a.link == "confirmed":
+            about = f", about {marked(a.about, current)}"
+        elif a.link == "none":
+            about = ", no lasting rule (the client said so): do not check it"
+        elif a.link == "unconfirmed":
+            about = (
+                ", possibly a one-off (not confirmed by the client)" if a.verdict.links == ("none",)
+                else f", about {marked(a.verdict.links, current)} (not confirmed by the client)"
+            )
+        else:
+            about = ""
+        return f'- {a.id}, case {a.case}, verdict {a.verdict.message.id}{about}: "{clip_line(a.verdict.note, CLIP_REGRESSION)}"'
+
+    def section(self, addr: str, contract: Contract) -> str:
+        found = regressions(self._history.cases(addr, contract.name))
+        if not found:
+            return ""
+        current = {x.id for x in self._catalog.criteria(addr, contract.name) if x.current}
+        shown = found[-REGRESSION_LINES:]
+        older = [f"- {len(found) - len(shown)} older line(s) not shown: `services` lists them all."] if len(found) > len(shown) else []
+        return "\n".join([
+            f"# Regression list: {contract.name} (the client's rejections, verbatim)",
+            "Each line is something the client rejected. Check every delivery of this service against each line, except the lines marked "
+            '"no lasting rule" (the client said it was a one-off: do not check them), and copy this list verbatim into every review or check '
+            "task you delegate for it. A line is not a criterion: it becomes one when your parent adds it to the contract, or ends as "
+            '"no lasting rule".',
+            *older,
+            *(self._line(a, current) for a in shown),
+        ])
 
 
 class EvidenceReflectSection(ReflectSection):
@@ -166,7 +210,7 @@ class OwnerPromptSections(ServicePromptSections):
 
     def __init__(
         self, catalog: ServiceCatalog, listing: ServicesListing, digest: ReflectionDigest, tasks: TaskQuery, rejections: RejectedServices,
-        playbooks: PlaybookSection, reflections: ReflectSection,
+        playbooks: PlaybookSection, reflections: ReflectSection, regressions: RegressionSection,
     ) -> None:
         self._catalog = catalog
         self._listing = listing
@@ -175,6 +219,7 @@ class OwnerPromptSections(ServicePromptSections):
         self._rejections = rejections
         self._playbooks = playbooks
         self._reflections = reflections
+        self._regressions = regressions
 
     def prompt_sections(self, addr: str, batch: Sequence[Message]) -> str:
         owned = self._catalog.owned_services(addr)
@@ -189,10 +234,12 @@ class OwnerPromptSections(ServicePromptSections):
         }
         for c in owned:
             if c.name in working:
-                sections.append(self._playbooks.section(addr, c, reflecting=c.name in digests))
+                sections += [self._playbooks.section(addr, c, reflecting=c.name in digests), self._regressions.section(addr, c)]
         for c in owned:
             if c.name in digests:
+                if c.name not in working:
+                    sections.append(self._regressions.section(addr, c))
                 sections.append(self._reflections.section(
                     addr, c, digests[c.name], rejected=c.name in rejected, new_request=c.name in new,
                 ))
-        return "".join(f"\n{s}\n" for s in sections)
+        return "".join(f"\n{s}\n" for s in sections if s)

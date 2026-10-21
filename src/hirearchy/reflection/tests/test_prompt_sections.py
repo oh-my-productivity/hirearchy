@@ -312,3 +312,148 @@ def test_no_playbook_texts_ask_for_the_steps_followed_only(svc):
     define(org, name="locked-brief", locked=True)
     org.request(ROOT, "locked-brief", {"topic": "ai"})
     assert locked in org.run_prompt("ceo", org.begin_run("ceo"))  # the locked text is unchanged
+
+
+# ------------------------------------------------------------------------------------------ the regression list
+LIST_HEADER = "# Regression list: weekly-brief (the client's rejections, verbatim)"
+OLDER = "- {n} older line(s) not shown: `services` lists them all."
+
+
+def reject(org, words, topic="ai", **kw):
+    """The user rejects a delivery with ``words`` (their own judgement: ``source="human"``); returns the request and the verdict note."""
+    task = request(org, topic)
+    deliver(org, "ceo", task, lessons="L.")
+    return task, org.feedback(ROOT, task.id, "reject", words, source="human", **kw)
+
+
+def regression_list(prompt):
+    return prompt.split(LIST_HEADER)[1].split("\n# ")[0]
+
+
+def lines_of(prompt):
+    return [line for line in regression_list(prompt).splitlines() if line.startswith("- ")]
+
+
+def test_the_regression_list_follows_the_playbook_section(svc):
+    org = svc
+    first, note = reject(org, "Too long.")
+    request(org, "chips")  # a new request: the playbook section, then the list, then the reflection
+    prompt = org.run_prompt("ceo", org.begin_run("ceo"))
+    assert prompt.index("# Playbook: weekly-brief") < prompt.index(LIST_HEADER) < prompt.index("# Reflect before you start")
+    assert f"\n{LIST_HEADER}\n" in prompt
+    section = LIST_HEADER + regression_list(prompt)
+    assert section.splitlines()[1] == (
+        'Each line is something the client rejected. Check every delivery of this service against each line, except the lines marked "no '
+        'lasting rule" (the client said it was a one-off: do not check them), and copy this list verbatim into every review or check task you '
+        'delegate for it. A line is not a criterion: it becomes one when your parent adds it to the contract, or ends as "no lasting rule".'
+    )
+    assert section.splitlines()[2] == f'- R1, case {first.id}, verdict {note.id}: "Too long."'
+    org.end_run("ceo", ok=True)
+
+
+def test_the_regression_list_comes_before_reflect_when_only_reflect_is_shown(svc):
+    org = svc
+    first, note = reject(org, "Too long.")  # delivered: no open request, so no playbook section; the rejection alone brings the reflection
+    prompt = org.run_prompt("ceo", org.begin_run("ceo"))
+    assert "# Playbook: weekly-brief" not in prompt and "# Reflect before you start: weekly-brief" in prompt
+    assert prompt.index(LIST_HEADER) < prompt.index("# Reflect before you start: weekly-brief")
+    assert f'\n{LIST_HEADER}\n' in prompt and prompt.split("# Reflect before you start")[0].rstrip().endswith('"Too long."')
+    org.end_run("ceo", ok=True)
+
+
+def test_no_regression_list_for_a_non_owner_or_an_empty_list(svc):
+    org = svc
+    first = request(org, "ai")
+    deliver(org, "ceo", first, lessons="L.")
+    org.feedback(ROOT, first.id, "accept", "good", source="human")  # an accept is no assertion
+    request(org, "chips")
+    assert "# Regression list" not in org.run_prompt("ceo", org.begin_run("ceo"))
+    org.end_run("ceo", ok=True)
+    task = request(org, "relayed")
+    deliver(org, "ceo", task, lessons="L.")
+    org.feedback(ROOT, task.id, "reject", "The assistant finds it long.", source="relayed")  # nor is the assistant's own reading
+    assert "# Regression list" not in org.run_prompt("ceo", org.begin_run("ceo"))
+    org.end_run("ceo", ok=True)
+    reject(org, "Too long.", "again")  # now there is an assertion, but only the owner is shown it
+    assert org.runtime.service_prompt_sections.prompt_sections(ENG, []) == ""
+    assert LIST_HEADER in org.runtime.service_prompt_sections.prompt_sections("ceo", org.begin_run("ceo"))
+    org.end_run("ceo", ok=True)
+
+
+def test_the_list_is_cut_to_the_newest_12_with_the_older_line_first(svc):
+    org = svc
+    for k in range(13):
+        reject(org, f"Problem {k + 1}.", f"t{k}")
+    request(org, "next")
+    lines = lines_of(org.run_prompt("ceo", org.begin_run("ceo")))
+    assert len(lines) == 13 and lines[0] == OLDER.format(n=1)
+    assert [line.split(",")[0] for line in lines[1:]] == [f"- R{k}" for k in range(2, 14)]  # newest last, ids ascend
+    assert lines[-1].endswith('"Problem 13."')
+    org.end_run("ceo", ok=True)
+
+
+def test_regression_lines_carry_their_own_assertion_ids(svc):
+    org = svc
+    (t1, n1), (t2, n2) = reject(org, "Too long.", "a"), reject(org, "Wrong week.", "b")
+    request(org, "next")
+    lines = lines_of(org.run_prompt("ceo", org.begin_run("ceo")))
+    assert lines == [f'- R1, case {t1.id}, verdict {n1.id}: "Too long."', f'- R2, case {t2.id}, verdict {n2.id}: "Wrong week."']
+    assert all(line.startswith(f"- R{k}, case ") for k, line in enumerate(lines, 1))
+    org.end_run("ceo", ok=True)
+    for k in range(11):  # 13 assertions: the older line first, then R2..R13
+        reject(org, f"More {k}.", f"m{k}")
+    request(org, "again")
+    lines = lines_of(org.run_prompt("ceo", org.begin_run("ceo")))
+    assert lines[0] == OLDER.format(n=1) and lines[1].startswith("- R2, case ") and lines[-1].startswith("- R13, case ")
+
+
+def test_the_words_of_a_line_are_cut_to_300_characters(svc):
+    org = svc
+    reject(org, "w" * 400)
+    request(org, "next")
+    (line,) = lines_of(org.run_prompt("ceo", org.begin_run("ceo")))
+    assert line.endswith(': "' + "w" * 299 + '…"')
+    org.end_run("ceo", ok=True)
+
+
+def test_a_no_lasting_rule_line_says_do_not_check_it(svc):
+    org = svc
+    first, note = reject(org, "Only this once.", criterion=["none"])
+    request(org, "next")
+    (line,) = lines_of(org.run_prompt("ceo", org.begin_run("ceo")))
+    assert line == f'- R1, case {first.id}, verdict {note.id}, no lasting rule (the client said so): do not check it: "Only this once."'
+    org.end_run("ceo", ok=True)
+
+
+def test_unconfirmed_links_say_not_confirmed_by_the_client(svc):
+    org = svc
+    first, note = reject(org, "Too long.")
+    second, other = reject(org, "Rambling.", "b")
+    third, last = reject(org, "Three.", "c")
+    org.feedback(ROOT, first.id, "reject", "Probably.", source="relayed", criterion=["C1"], confirms=note.id)  # the assistant's reading of R1
+    org.feedback(ROOT, second.id, "reject", "Probably.", source="relayed", criterion=["none"], confirms=other.id)  # "a one-off", said by the assistant
+    request(org, "next")
+    lines = lines_of(org.run_prompt("ceo", org.begin_run("ceo")))
+    assert lines[0] == f'- R1, case {first.id}, verdict {note.id}, about C1 (not confirmed by the client): "Too long."'
+    assert lines[1] == f'- R2, case {second.id}, verdict {other.id}, possibly a one-off (not confirmed by the client): "Rambling."'
+    assert lines[2] == f'- R3, case {third.id}, verdict {last.id}: "Three."'
+    org.end_run("ceo", ok=True)
+
+
+def test_a_confirmed_link_names_its_criteria(svc):
+    org = svc
+    first, note = reject(org, "Too long.", criterion=["C1", "C2"])
+    request(org, "next")
+    (line,) = lines_of(org.run_prompt("ceo", org.begin_run("ceo")))
+    assert line == f'- R1, case {first.id}, verdict {note.id}, about C1, C2: "Too long."'
+    org.end_run("ceo", ok=True)
+
+
+def test_the_regression_line_marks_a_removed_criterion(svc):
+    org = svc
+    first, note = reject(org, "Too long.", criterion=["C1", "C2"])
+    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["One page"], remove_acceptance=["Every factual claim has a source URL"])
+    request(org, "next")
+    (line,) = lines_of(org.run_prompt("ceo", org.begin_run("ceo")))
+    assert line == f'- R1, case {first.id}, verdict {note.id}, about C1, C2 (removed): "Too long."'
+    org.end_run("ceo", ok=True)
