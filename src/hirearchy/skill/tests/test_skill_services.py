@@ -3,12 +3,28 @@
 
 import asyncio
 
+import pytest
 import testkit
 from testkit.reach.hirearchy.core import ROOT, Org
 from testkit.skill_world import build_server
 
 ROOT_DIR = testkit.REPO
 SKILL = ROOT_DIR / "skills" / "hirearchy" / "SKILL.md"
+
+
+REFERENCE_ORG_PATH = "/" + "r" * 59  # 60 characters: the length the instructions budget is defined against
+
+
+def root_instructions(org_path):
+    """The root instructions of a server over a new organization at ``org_path``, and their length as if it were at ``REFERENCE_ORG_PATH``.
+
+    The instructions embed the path, so the raw length follows pytest's temp path (the ``pytest-<N>`` counter, the test name, the user): a budget on it
+    is flaky. The reference length is the length of the text without the path plus the length of the reference path, whatever the real path is.
+    """
+    org = Org.init(org_path, "m")
+    instructions = build_server(org, ROOT).instructions
+    assert str(org.root) in instructions  # else the replacement below would measure nothing
+    return instructions, len(instructions.replace(str(org.root), REFERENCE_ORG_PATH))
 
 
 def test_the_skill_teaches_the_service_workflow_within_its_line_limit():
@@ -37,9 +53,16 @@ def test_the_tools_the_skill_names_exist_for_root(tmp_path):
     for name in ("services", "request", "feedback", "define_service", "blueprint_example"):
         assert name in tools and f"`{name}" in SKILL.read_text(), name
     assert "service" in tools["blueprint_example"].inputSchema["properties"]
-    instructions = build_server(Org.init(tmp_path / "o2", "m"), ROOT).instructions
+    instructions, length_at_reference_path = root_instructions(tmp_path / "o2")
     assert "`service=True` for recurring work" in instructions and "check it before building a new org" in instructions
-    assert len(instructions) < 2700  # sent on every connection; the limit is 2800: keep 100 characters of headroom for a long path
+    # sent on every connection; the limit is 2800: keep 100 characters of headroom for a long path. Measured with an organization path of
+    # len(REFERENCE_ORG_PATH) = 60 characters, so that it does not depend on the temp path of this run (pytest-<N> with three digits, a longer test name).
+    assert length_at_reference_path < 2700
+
+
+@pytest.mark.parametrize("extra", [1, 2, 3, 100])
+def test_the_length_of_the_root_instructions_does_not_depend_on_the_path_of_the_organization(tmp_path, extra):
+    assert root_instructions(tmp_path / ("o2" + "x" * extra))[1] == root_instructions(tmp_path / "o2")[1]
 
 
 def test_the_skill_ships_in_the_wheel_and_the_installed_copy_is_this_one(tmp_path):
