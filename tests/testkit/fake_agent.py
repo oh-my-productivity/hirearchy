@@ -8,6 +8,8 @@ Behaviour is chosen by FAKE_MODE:
   tools - like work, but through the hirearchy MCP tools (in-process), so tool.call events are recorded; each leaf also
           makes one refused call (a report with a bad status) before reporting.
   hang  - sleep for a long time (a run the scheduler has to kill on timeout).
+  service - delivers a service request through a review step: a manager sends each task to the reports of FAKE_REPORTS in order (author, then checker), reports
+          the task done with lessons when the last one answers; leaves write an artifact and report done (with lessons when the task is a service request).
 """
 
 import os
@@ -61,6 +63,27 @@ if mode == "tools":
         elif msg.type == "result":
             mapping = dict(line.split("=") for line in org.memory(me).split())
             call("report", task_id=mapping[msg.reply_to], status=msg.status, summary=f"Team result: {msg.status}")
+    sys.exit(0)
+
+if mode == "service":
+    order = [a for a in os.environ.get("FAKE_REPORTS", "").split(",") if a] or kids
+    for msg in org.messages(me, "inflight"):
+        if msg.type == "task":
+            if kids:
+                sub = org.delegate(me, order[0], msg.title, msg.body, "same as parent", budget=2)
+                org.write(me, f"{me}/MEMORY.md", f"{sub.id}={msg.id}\n", append=True)
+            else:
+                org.write(me, f"{me}/work/out.md", f"done: {msg.title}")
+                org.report(me, msg.id, "done", "Did it.", [f"{me}/work/out.md"], lessons="Followed the playbook." if msg.service else None)
+        elif msg.type == "result":
+            parent_id = dict(line.split("=") for line in org.memory(me).split())[msg.reply_to]
+            at = order.index(msg.sender)
+            if msg.status == "done" and at + 1 < len(order):  # the author is done: the next report checks the same task
+                parent = org.find_received(me, parent_id)
+                sub = org.delegate(me, order[at + 1], f"check: {parent.title}", parent.body, "same as parent", budget=2)
+                org.write(me, f"{me}/MEMORY.md", f"{sub.id}={parent_id}\n", append=True)
+            else:
+                org.report(me, parent_id, msg.status, f"Team result: {msg.status}", [f"{order[0]}/work/out.md"], lessons="Delivered by the team; nothing to change.")
     sys.exit(0)
 
 for msg in org.messages(me, "inflight"):
