@@ -62,7 +62,7 @@ class CharterWriter(Charters):
                 f"Services you offer: {', '.join(offers)} (the runtime shows them, with their contract, in your prompt). A task with a `service:` "
                 "header is a request for one: for it the playbook shown in your prompt is the procedure (steps, who does what, budget plan), "
                 "and wherever this charter's general procedure differs, the playbook wins. You own the playbook and improve it with `revise_playbook` "
-                "from the evidence shown before a new request. The acceptance criteria come from the request and the contract; improving the playbook "
+                "when the client's evidence calls for it (ORG.md rule 10). The acceptance criteria come from the request and the contract; improving the playbook "
                 "may raise the bar, never lower it.")
         parts.append("\n".join(asg))
         if a.extra:

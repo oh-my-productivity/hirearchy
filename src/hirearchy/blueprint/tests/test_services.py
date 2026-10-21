@@ -585,6 +585,8 @@ def test_the_leads_charter_says_the_playbook_is_the_procedure(svc_bp, roots, emp
     assert "Services you offer: weekly-brief" in charter
     assert "the playbook shown in your prompt is the procedure" in charter and "the playbook wins" in charter
     assert "You own the playbook and improve it with `revise_playbook`" in charter and "never lower it" in charter
+    assert "improve it with `revise_playbook` when the client's evidence calls for it (ORG.md rule 10)" in charter
+    assert "from the evidence shown before a new request" not in charter
     # a services-only lead is not given numbers that could contradict the playbook's budget plan
     assert "you start with" not in charter and "the budget of its service" in charter and "`## Budget plan`" in charter
     assert "Review loop:" in charter and "Your team (fixed by the plan" in charter
