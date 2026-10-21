@@ -6,7 +6,7 @@ import shutil
 from pathlib import Path
 
 from ..kernel import ROOT, AtomicWriter, JsonObject, join_frontmatter, norm, split_frontmatter, visible
-from ._parse import as_int
+from ._parse import as_int, merged_versions
 from ._protocols import ServicePlaces
 from .api import ServiceStore
 
@@ -63,6 +63,12 @@ class FsServiceStore(ServiceStore):
                 meta = split_frontmatter(path.read_text(encoding="utf-8"))[0]
                 found.append((as_int(meta.get("version")), meta))
         return found
+
+    def versions(self, owner: str, name: str, kind: str) -> list[tuple[int, JsonObject, str]]:
+        merged_versions(kind, [])  # the kind is checked before any file is read
+        directory = self._places.service_dir(owner, name)
+        paths = [*sorted((directory / "history").glob(f"{kind}.v*.md")), directory / f"{kind}.md"]
+        return merged_versions(kind, [split_frontmatter(p.read_text(encoding="utf-8")) for p in paths if p.is_file()])
 
     @staticmethod
     def _read(path: Path) -> tuple[JsonObject, str] | None:

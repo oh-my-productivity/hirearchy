@@ -26,7 +26,7 @@ from ._define import RuleContractDefiner
 from ._feedback import RuleClientFeedback
 from ._hints import ServiceReportHints
 from ._normalizer import TextContractNormalizer
-from ._parse import as_int
+from ._parse import as_int, merged_versions
 from ._places import OrgServicePlaces
 from ._playbook import RulePlaybookReviser
 from ._protocols import ServicePlaces
@@ -91,6 +91,12 @@ class MemoryServiceStore(ServiceStore):
                 meta = split_frontmatter(self.files[path])[0]
                 found.append((as_int(meta.get("version")), meta))
         return found
+
+    def versions(self, owner: str, name: str, kind: str) -> list[tuple[int, JsonObject, str]]:
+        merged_versions(kind, [])  # the kind is checked before any file is read
+        directory = self._places.service_dir(owner, name) / "history"
+        paths = [*sorted(p for p in self.files if p.parent == directory and fnmatch(p.name, f"{kind}.v*.md")), self._places.service_dir(owner, name) / f"{kind}.md"]
+        return merged_versions(kind, [split_frontmatter(self.files[p]) for p in paths if p in self.files])
 
     def _read(self, path: Path) -> tuple[JsonObject, str] | None:
         return split_frontmatter(self.files[path]) if path in self.files else None

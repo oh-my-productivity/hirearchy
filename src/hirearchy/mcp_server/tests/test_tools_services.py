@@ -10,7 +10,7 @@ from hirearchy.kernel import ROOT, Message, OrgError
 from hirearchy.mcp_server._instructions import InstructionText
 from hirearchy.mcp_server._tools_services import DirectoryServiceRoles, ServiceTools
 from hirearchy.mcp_server.testing import HeldBudgets, MemoryBinding, ScriptedReports, agents_in
-from hirearchy.services import Contract, ServiceCatalog, ServiceCommands
+from hirearchy.services import Contract, Criterion, Playbook, ServiceCatalog, ServiceCommands
 
 from ._support import call, described, fails, names, serve
 
@@ -34,6 +34,12 @@ class Catalog(ServiceCatalog):
         return []
 
     def requestable_services(self, actor: str) -> list[Contract]:
+        return []
+
+    def criteria(self, owner: str, name: str) -> list[Criterion]:
+        return []
+
+    def playbook_versions(self, owner: str, name: str) -> list[Playbook]:
         return []
 
 

@@ -9,7 +9,7 @@ from hirearchy.blueprint._org import NoOrgContext, PresentOrAbsentOrg, RuntimeOr
 from hirearchy.blueprint._protocols import OrgContext, OrgContexts
 from hirearchy.blueprint.testing import StaticOrgContext
 from hirearchy.kernel import OrgPaths
-from hirearchy.services import ServiceCatalog
+from hirearchy.services import Criterion, Playbook, ServiceCatalog
 from hirearchy.settings import DEFAULT_CONFIG, OrgSettings
 
 
@@ -72,6 +72,12 @@ class Catalog(ServiceCatalog):
         return []
 
     def requestable_services(self, actor: str) -> list[object]:  # type: ignore[override]
+        return []
+
+    def criteria(self, owner: str, name: str) -> list[Criterion]:
+        return []
+
+    def playbook_versions(self, owner: str, name: str) -> list[Playbook]:
         return []
 
 

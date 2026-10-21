@@ -33,7 +33,7 @@ from hirearchy.overview import OrgTree
 from hirearchy.progress import ProgressReporter
 from hirearchy.reflection import ServiceReports
 from hirearchy.review import HealthReviewer, Note, Review
-from hirearchy.services import Contract, ContractNormalizer, ServiceCatalog, ServiceCommands
+from hirearchy.services import Contract, ContractNormalizer, Criterion, Playbook, ServiceCatalog, ServiceCommands, number_criteria
 from hirearchy.skill import SkillInstaller
 from hirearchy.snapshots import OrgSnapshotter
 from hirearchy.upgrade import RulesUpgrader, Upgrade
@@ -120,6 +120,13 @@ class FakeServices(Recording, ServiceCommands, ServiceCatalog, ContractNormalize
     def read_contract(self, owner: str, name: str) -> Contract | None:
         self.note("read_contract", owner, name)
         return self.contracts.get((owner, name))
+
+    def criteria(self, owner: str, name: str) -> list[Criterion]:
+        contract = self.contracts.get((owner, name))
+        return number_criteria([(contract.version, contract.defined_by, contract.acceptance)]) if contract else []
+
+    def playbook_versions(self, owner: str, name: str) -> list[Playbook]:
+        return []
 
     def parse_input_spec(self, spec: str) -> JsonObject:
         self.note("parse_input_spec", spec)

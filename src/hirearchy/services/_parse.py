@@ -11,6 +11,9 @@ from ..kernel import JsonObject, parse_time
 from .api import Contract, Playbook
 
 
+VERSIONED_KINDS = ("SERVICE", "PLAYBOOK")  # the files that keep a history
+
+
 def as_int(value: object, default: int = 0) -> int:
     """``value`` as a whole number; ``default`` for what is none (absent, a bool, text that is no number)."""
     if value is None or isinstance(value, bool):
@@ -47,6 +50,15 @@ def contract_of(owner: str, name: str, meta: JsonObject, body: str, path: Path |
         defined=as_time(meta.get("defined")), created=as_time(meta.get("created") or meta.get("defined")),
         notes=body.strip(), path=path,
     )
+
+
+def merged_versions(kind: str, files: Iterable[tuple[JsonObject, str]]) -> list[tuple[int, JsonObject, str]]:
+    """The ``(version, frontmatter, body)`` of the files of one kind, given kept ones first and the current one last, sorted by the version
+    they state (0 when none); of two files that state one version, the later (the current one) wins."""
+    if kind not in VERSIONED_KINDS:
+        raise ValueError(f"kind must be one of {VERSIONED_KINDS}: {kind!r}")
+    by_version = {as_int(meta.get("version")): (meta, body) for meta, body in files}
+    return [(version, *by_version[version]) for version in sorted(by_version)]
 
 
 def playbook_of(meta: JsonObject, body: str, path: Path | None) -> Playbook:

@@ -26,12 +26,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from ..kernel import JsonObject, Message
+from ..kernel import ROOT, JsonObject, Message
 from ._cap import playbook_word_cap
 
 __all__ = [
     "Contract",
     "ContractNormalizer",
+    "Criterion",
     "DELIVERABLE_KEYS",
     "DESCRIPTION_MAX",
     "FEEDBACK_HEADER",
@@ -44,6 +45,8 @@ __all__ = [
     "ServiceHints",
     "ServiceStore",
     "VERDICTS",
+    "criteria_of",
+    "number_criteria",
     "playbook_word_cap",
 ]
 
@@ -77,6 +80,42 @@ class Contract:
     created: datetime | None = None  # when the service was first defined (requests before it belong to an older service)
     notes: str = ""  # free text body: notes from the client
     path: Path | None = None
+
+
+@dataclass(frozen=True)
+class Criterion:
+    """One acceptance criterion of a contract, with its stable id ``C<k>`` (see :func:`number_criteria`)."""
+
+    id: str  # "C<k>"
+    text: str  # the criterion, verbatim
+    since: int  # the contract version that first had it
+    by: str  # who defined that version (its ``defined_by``): "root" for the user's seat
+    current: bool  # it is in the latest version given to ``number_criteria``
+
+    @property
+    def amended(self) -> bool:
+        """Added by an amendment of the human client: first seen in v2 or later, defined by root, still current."""
+        return self.since >= 2 and self.by == ROOT and self.current
+
+
+def number_criteria(versions: Sequence[tuple[int, str, Sequence[str]]]) -> list[Criterion]:
+    """``(version, defined_by, acceptance)`` of every contract version, oldest first -> every criterion it ever had, by id (pure).
+
+    The id of a criterion is fixed by the order in which its exact text first appeared: versions in the order given, each version's
+    ``acceptance`` in list order, the first sight of a text takes ``C<k>``, ``k`` = 1 + the distinct texts seen before. Removing a criterion
+    never renumbers the others, a reworded text is a new criterion, and a text that comes back keeps its first id."""
+    seen: dict[str, tuple[int, str]] = {}  # text -> (the version that first had it, who defined that version)
+    for version, defined_by, acceptance in versions:
+        for text in acceptance:
+            seen.setdefault(text, (version, defined_by))
+    latest = set(versions[-1][2]) if versions else set()
+    return [Criterion(f"C{k}", text, since, by, text in latest) for k, (text, (since, by)) in enumerate(seen.items(), start=1)]
+
+
+def criteria_of(numbered: Sequence[Criterion], texts: Sequence[str]) -> list[Criterion]:
+    """The criteria with these texts, in the order of ``texts`` (a contract's acceptance list); a text ``numbered`` lacks is skipped."""
+    by_text = {c.text: c for c in numbered}
+    return [by_text[t] for t in texts if t in by_text]
 
 
 @dataclass
@@ -128,6 +167,12 @@ class ServiceStore(Protocol):
         The version is the one the frontmatter says (0 when it says none)."""
         ...
 
+    def versions(self, owner: str, name: str, kind: str) -> list[tuple[int, JsonObject, str]]:
+        """``(version, frontmatter, body)`` of every file of ``kind`` (``"SERVICE"`` or ``"PLAYBOOK"``, otherwise ``ValueError``): the kept ones
+        in ``history/``, then the current one, sorted by the version the frontmatter states (0 when it states none). When two files state one
+        version, the current file wins. Files that are missing are skipped."""
+        ...
+
 
 @runtime_checkable
 class ServiceCatalog(Protocol):
@@ -149,6 +194,14 @@ class ServiceCatalog(Protocol):
 
     def requestable_services(self, actor: str) -> list[Contract]:
         """The services ``actor`` can request: those of its direct reports (root: of its top-level agents)."""
+        ...
+
+    def criteria(self, owner: str, name: str) -> list[Criterion]:
+        """Every criterion the contract of this service ever had, by id, from the versions that are kept (empty when there is no such service)."""
+        ...
+
+    def playbook_versions(self, owner: str, name: str) -> list[Playbook]:
+        """Every playbook version that is kept, oldest first, the current one last (empty when there is none)."""
         ...
 
 

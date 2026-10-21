@@ -12,7 +12,7 @@ import pytest
 
 from hirearchy.app import Org
 from hirearchy.kernel import Message, OrgError
-from hirearchy.services import ServiceCatalog, ServiceCommands
+from hirearchy.services import Criterion, Playbook, ServiceCatalog, ServiceCommands
 
 BRIEF: dict[str, Any] = dict(
     description="A brief.", inputs=[{"name": "topic", "description": "what", "required": True}], acceptance=["Short"],
@@ -85,6 +85,12 @@ class Catalog(ServiceCatalog):
         raise NotImplementedError
 
     def requestable_services(self, actor: str) -> list[Any]:
+        raise NotImplementedError
+
+    def criteria(self, owner: str, name: str) -> list[Criterion]:
+        raise NotImplementedError
+
+    def playbook_versions(self, owner: str, name: str) -> list[Playbook]:
         raise NotImplementedError
 
 

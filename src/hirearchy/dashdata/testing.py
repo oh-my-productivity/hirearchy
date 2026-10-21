@@ -37,7 +37,7 @@ from ..observability.testing import ObservabilityWorld, disk_world, stamp
 from ..progress.testing import FixedProgressReporter
 from ..reflection import Case, CaseHistory
 from ..runs.testing import RunsHarness, caching_fs_runs, fs_runs
-from ..services import Contract, Playbook, ServiceCatalog
+from ..services import Contract, Criterion, Playbook, ServiceCatalog, number_criteria
 from ..settings.testing import SettingsHarness, caching_org_settings, fs_org_settings
 from ._cache import DashCache
 from ._clock import GivenDashTime
@@ -398,6 +398,14 @@ class ListServiceCatalog(ServiceCatalog):
 
     def requestable_services(self, actor: str) -> list[Contract]:
         return [c for (o, _), c in sorted(self.contracts.items()) if o.rpartition("/")[0] == ("" if actor == ROOT else actor)]
+
+    def criteria(self, owner: str, name: str) -> list[Criterion]:
+        contract = self.contracts.get((owner, name))
+        return number_criteria([(contract.version, contract.defined_by, contract.acceptance)]) if contract else []
+
+    def playbook_versions(self, owner: str, name: str) -> list[Playbook]:
+        playbook = self.playbooks.get((owner, name))
+        return [playbook] if playbook is not None and playbook.version else []
 
 
 # ------------------------------------------------------------------------------ the worlds

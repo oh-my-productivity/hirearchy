@@ -116,3 +116,28 @@ def test_a_manager_can_request_only_the_services_of_its_direct_reports(w: Servic
     define(w, owner="ceo/eng", name="eng-brief", actor="ceo")
     assert [(c.owner, c.name) for c in w.catalog.requestable_services("ceo")] == [("ceo/eng", "eng-brief")]
     assert w.catalog.requestable_services("ceo/eng") == []
+
+
+# ------------------------------------------------------------------------------ criteria and playbook versions
+
+
+def test_criteria_of_a_service_carry_their_ids(w: ServicesWorld) -> None:
+    define(w)
+    w.commands.define_service("root", "ceo", "weekly-brief", add_acceptance=["Dates are written in full"], remove_acceptance=["At most 600 words"])
+    found = w.catalog.criteria("ceo", "weekly-brief")
+    assert [(c.id, c.text, c.since, c.current, c.amended) for c in found] == [
+        ("C1", "At most 600 words", 1, False, False),
+        ("C2", "Every factual claim has a source URL", 1, True, False),
+        ("C3", "Dates are written in full", 2, True, True),
+    ]
+    assert w.catalog.criteria("ceo", "no-such-service") == []
+
+
+def test_playbook_versions_are_oldest_first(w: ServicesWorld) -> None:
+    define(w)
+    assert w.catalog.playbook_versions("ceo", "weekly-brief") == []
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "first")
+    w.commands.revise_playbook("ceo", "weekly-brief", STEPS + "\n4. Publish.", "second")
+    found = w.catalog.playbook_versions("ceo", "weekly-brief")
+    assert [(p.version, p.reason) for p in found] == [(1, "first"), (2, "second")]
+    assert found[0].body == STEPS and found[1].body.endswith("4. Publish.")

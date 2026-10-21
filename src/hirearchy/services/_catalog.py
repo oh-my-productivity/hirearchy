@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from ..agents import AgentDirectory
 from ..kernel import ROOT, norm
+from ._criteria import stored_versions
 from ._parse import contract_of, playbook_of
 from ._protocols import ServicePlaces
-from .api import Contract, Playbook, ServiceCatalog, ServiceStore
+from .api import Contract, Criterion, Playbook, ServiceCatalog, ServiceStore, number_criteria
 
 
 class ContractServiceCatalog(ServiceCatalog):
@@ -40,3 +41,9 @@ class ContractServiceCatalog(ServiceCatalog):
 
     def requestable_services(self, actor: str) -> list[Contract]:
         return [c for kid in self._agents.children(actor) for c in self.owned_services(kid)]
+
+    def criteria(self, owner: str, name: str) -> list[Criterion]:
+        return number_criteria(stored_versions(self._store, owner, name))
+
+    def playbook_versions(self, owner: str, name: str) -> list[Playbook]:
+        return [playbook_of(meta, body, None) for _, meta, body in self._store.versions(owner, name, "PLAYBOOK")]

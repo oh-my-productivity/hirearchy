@@ -28,6 +28,10 @@ def contract(version: int = 1) -> dict[str, object]:
     return {"name": "brief", "description": "A brief.", "acceptance": ["Short"], "version": version, "budget": 3, "locked": False}
 
 
+def with_body(version: int, text: str) -> dict[str, object]:
+    return {**contract(version), "description": text}
+
+
 # ------------------------------------------------------------------------------ the names
 
 
@@ -156,3 +160,38 @@ def test_a_service_of_the_same_name_can_be_defined_after_it_was_retired(h: Store
     h.store.retire("ceo", "brief", "20260101T000000000001")
     h.store.write_contract("ceo", "brief", contract(1), "", None)
     assert h.store.names("ceo") == ["brief"] and len(h.rels()) == 2
+
+
+# ------------------------------------------------------------------------------ the versions
+
+
+def test_versions_lists_history_then_current_sorted_by_version(h: StoreHarness) -> None:
+    h.store.write_contract("ceo", "brief", with_body(1, "one"), "b1", None)
+    for v in range(2, 13):  # past v9 and v10: the order is the version's, not the file names'
+        h.store.write_contract("ceo", "brief", with_body(v, f"v{v}"), f"b{v}", v - 1)
+    found = h.store.versions("ceo", "brief", "SERVICE")
+    assert [v for v, _, _ in found] == list(range(1, 13))
+    assert found[0][1]["description"] == "one" and found[0][2].strip() == "b1"
+    assert found[-1][1]["description"] == "v12" and found[-1][2].strip() == "b12"
+
+
+def test_versions_skips_missing_files(h: StoreHarness) -> None:
+    assert h.store.versions("ceo", "brief", "SERVICE") == [] and h.store.versions("ceo", "brief", "PLAYBOOK") == []
+    h.store.write_contract("ceo", "brief", contract(1), "", None)
+    h.store.write_playbook("ceo", "brief", 1, {"version": 1}, "Steps.")
+    assert [v for v, _, _ in h.store.versions("ceo", "brief", "SERVICE")] == [1]  # no history yet
+    (_, meta, body), = h.store.versions("ceo", "brief", "PLAYBOOK")
+    assert meta["version"] == 1 and body.strip() == "Steps."
+
+
+def test_the_current_file_wins_a_tie(h: StoreHarness) -> None:
+    h.store.write_contract("ceo", "brief", with_body(1, "old"), "old body", None)
+    h.store.write_contract("ceo", "brief", with_body(1, "new"), "new body", 1)  # the archive and the current file both say v1
+    found = h.store.versions("ceo", "brief", "SERVICE")
+    assert len(found) == 1 and found[0][1]["description"] == "new" and found[0][2].strip() == "new body"
+
+
+def test_versions_of_another_kind_is_a_value_error(h: StoreHarness) -> None:
+    h.store.write_contract("ceo", "brief", contract(1), "", None)
+    with pytest.raises(ValueError):
+        h.store.versions("ceo", "brief", "README")
