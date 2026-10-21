@@ -1,6 +1,6 @@
 # Org growth, Phase 0a: known-cause fixes (technical design)
 
-Status: design, revision 3. Revision 2 resolved the first design review (1 HIGH, 7 MEDIUM, 14 LOW); revision 3 resolves the second (`/Volumes/workspace/hirearchy/.worktrees/org-growth-0a/.agents/tasks/design-review.md`, verdict CHANGES_REQUESTED: 0 HIGH, 2 MEDIUM, 7 LOW findings, LOW 9 with four parts) and applies the manager's decisions on it (size caps kept by condensing; the reviewer's D3 rule; no change to 08's behaviour). Section 18 maps every finding of both reviews to its change.
+Status: design, revision 3 + review pass 3 amendments (18.4). Revision 2 resolved the first design review (1 HIGH, 7 MEDIUM, 14 LOW); revision 3 resolves the second (`/Volumes/workspace/hirearchy/.worktrees/org-growth-0a/.agents/tasks/design-review.md`, verdict CHANGES_REQUESTED: 0 HIGH, 2 MEDIUM, 7 LOW findings, LOW 9 with four parts) and applies the manager's decisions on it (size caps kept by condensing; the reviewer's D3 rule; no change to 08's behaviour). Section 18 maps every finding of both reviews to its change.
 Branch `feat/org-growth-phase-0a` off `main` `bf4a285`; worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0a`. Baseline: 13 149 passed, mypy strict clean, 49+1 import contracts kept.
 
 Source of truth: `/Volumes/workspace/hirearchy/docs/research/org-growth/08-synthesis.md` (v2.1):
@@ -677,7 +677,7 @@ The notes are exactly:
 - `{C} is in the contract since v{since}, not added by an amendment, and failed in no case the client rejected` (a current criterion that is not (c)-eligible);
 - ``{C} is no longer in the contract: cite a current criterion (see `services`)`` (a cited criterion with `current == False`; `links` and G0 accept every id the contract ever had, so the gate must say why such a citation weighs nothing).
 
-**G2** (one case). `g` is the assertion chosen in 5.3. `{case}` is its case, `{words}` its words clipped to 300 characters, and `{criteria}` its `about` C ids joined with ` / `, or `an existing one`.
+**G2** (one case). `g` is the assertion chosen in 5.3. `{case}` is its case, `{words}` its words clipped to 300 characters, and `{criteria}` the C ids of its `about` that are current (`Criterion.current`), joined with ` / `, or `an existing one` when there are none (a criterion the client removed is never offered for clarification).
 
 ```
 refused: the client rejected this in one case only ({case}), and the evidence cites no criterion {client} added to the contract by an amendment ({amended C ids or "none yet"}). One case is a reason to ask, not to change how the team works: a lasting requirement goes into the contract first. Nothing was written: apply the client's words to the work at hand without changing the playbook.
@@ -709,14 +709,16 @@ File: {path}
 - `unconfirmed` otherwise: `, about {link ids joined ", "} (not confirmed by the client)`;
 - `""`: nothing.
 
+In every `{about}`, a C id that is no longer in the contract (`Criterion.current` is false) is rendered `C<k> (removed)`, for example `, about C6 (removed), C7`. This applies to confirmed and unconfirmed links alike, so a list never presents a removed criterion as current.
+
 ```
 # Regression list: {service} (the client's rejections, verbatim)
 Each line is something the client rejected. Check every delivery of this service against each line, except the lines marked "no lasting rule" (the client said it was a one-off: do not check them), and copy this list verbatim into every review or check task you delegate for it. A line is not a criterion: it becomes one when your parent adds it to the contract, or ends as "no lasting rule".
 - {n} older line(s) not shown: `services` lists them all.
-- R1, case {case id}, verdict {note id}{about}: "{words}"
+- R{k}, case {case id}, verdict {note id}{about}: "{words}"
 ```
 
-The "older line(s)" line appears only when more than 12 assertions exist (the newest 12 are shown, newest last).
+The "older line(s)" line appears only when more than 12 assertions exist (the newest 12 are shown, newest last). `{k}` is the assertion's own number (R1, R2, ...), never a literal `R1`.
 
 **Playbook section, no playbook yet** (`QuotedPlaybookSection`; the locked text is unchanged):
 - not reflecting: `No playbook yet: plan as usual; when you report this request, write v1 with revise_playbook: the steps your team followed, nothing more (the first version needs no evidence: evidence=[]).`
@@ -742,9 +744,11 @@ The "older line(s)" line appears only when more than 12 assertions exist (the ne
   - agent client: ``Your client is an agent, so nothing in this service's history can admit a playbook revision (only the first version, or restoring a version your parent wrote): apply the evidence when you plan this {what}, and if you think the playbook must change, send your parent (`send`) what you would change and why.``
 - **Restore step** (unlocked, `pb.version >= 2`): ``If the current version did worse than an earlier one, restore that one (read {dir}/history/PLAYBOOK.v<k>.md): revise_playbook with its text unchanged; a version your parent wrote needs evidence=[], any other needs evidence like a revision.``
 - **`raise_bar` step** (used by the unlocked steps and by the locked step 3):
-  - human client (`parent(addr) == ROOT`), locked or not: ``The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent asks the client whether a rejection is a lasting requirement; do not send it yourself.``
+  - human client (`parent(addr) == ROOT`), unlocked: ``The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent asks the client whether a rejection is a lasting requirement: send nothing about it yourself beyond a refused revision's question (step 3).``
+  - human client, locked: ``The playbook may raise the bar, never lower it: the acceptance criteria come from the contract and travel with every request. Your parent asks the client whether a rejection is a lasting requirement; do not send it yourself.``
   - agent client: unchanged (``... If the client's feedback is a lasting requirement, also tell your parent (`send`) so it can add it to the contract.``). An agent client reads its owner's notes in its own run and has no skill that asks for it.
-  - Why the locked case too: the skill's one yes/no item asks the human client in both cases (a locked contract can still be amended by the client), so a note from the owner is a redundant "Needs you" item either way. The locked sections change in the same commit anyway (lead and step 2 texts).
+  - Why the unlocked text differs: step 3 and G1/G2 tell the owner to send a refused revision's question once, so a flat "do not send it yourself" in the same numbered list would contradict them (review 3 MEDIUM 2). A locked contract has no revision, so no refusal question, and keeps the flat text.
+  - Why the locked case says it at all: the skill's one yes/no item asks the human client in both cases (a locked contract can still be amended by the client), so a note from the owner is a redundant "Needs you" item either way. The locked sections change in the same commit anyway (lead and step 2 texts).
 - The locked step 3 (apart from its `raise_bar` part) and the last step are unchanged.
 
 **Digest** (`SRC/reflection/_digest.py`). `verdict_chain(c, assertions: Mapping[str, str] | None = None)` and `case_line(c, assertions: Mapping[str, str] | None = None)` take the mapping from verdict note id to `R<k>`. `DigestBuilder` builds it from `regressions(items)`; the dashboard (`SRC/app/wire_dashdata.py`) keeps calling `verdict_chain` without it.
@@ -763,7 +767,7 @@ The "older line(s)" line appears only when more than 12 assertions exist (the ne
 - **Request body** (`TextRequestBodies.body`, which receives the criteria): `## Acceptance criteria` lists `- {C id}: {text}` for the contract's current criteria, then `- this request only: {text}` for each `extra_acceptance` line.
 - **`services` listing** (`TextServiceReports._block`):
   - the criteria lines become `    {C id}: {text}` (they were `    {i}. {text}`);
-  - after the `record:` line, when the service has assertions: `  regression list (the client's rejections):`, then one line per assertion: `    R{k} (case {id}{, about ids | , about ids (not confirmed) | , no lasting rule | , possibly a one-off (not confirmed)}): "{words clipped 160}"`.
+  - after the `record:` line, when the service has assertions: `  regression list (the client's rejections):`, then one line per assertion: `    R{k} (case {id}{, about ids | , about ids (not confirmed) | , no lasting rule | , possibly a one-off (not confirmed)}): "{words clipped 160}"`; a C id that is no longer current reads `C<k> (removed)` here too (6.2).
 - **`define_service` amendment reply:** `Acceptance criteria now ({n}):` followed by `{C id}: {text}` lines (they were `{i}. {text}`). The amendment errors and the "no change" error list the current criteria the same way (`listed`, 5.8).
 - **Amendment note to the owner** (`ContractAmender.diff`, 08 §4.1.3 "the owner is shown the full contract on every amendment"):
 
@@ -802,13 +806,13 @@ note: it records the link, not a new verdict. Feedback is for reflection only: i
 criterion or changes the outcome of the request.
 ```
 
-It keeps today's sentences, so the phrase `"every verdict stays"` that `SRC/mcp_server/tests/test_service_tools.py:21` pins on root's surface stays, lower-case as today. The only change to them is "your own judgement" becoming "the user's own judgement", to match the skill (6.8).
+It keeps today's sentences, so the phrase `"every verdict stays"` that `SRC/mcp_server/tests/test_service_tools.py:21` pins on root's surface stays, lower-case as today. It makes two changes to them, to match the skill (6.8): "your own judgement" becomes "the user's own judgement", and "optional for accept" becomes "optional for accept: the user's own words, verbatim".
 
 The agents' `feedback` docstring is unchanged.
 
-`request` (root): the existing docstring, plus before `Returns`: `source (with revises): "human" when the user asked for this rework, "relayed" (the default) when it is your own reading; the owner sees which.`
+`request` (root): the existing docstring, plus before `Returns`: `source (with revises): "human" when the user asked for this rework (a rework after their own rejection, carrying their corrections, is one), "relayed" (the default) when it is your own reading; the owner sees which.`
 
-`delegate` (root): the existing docstring, plus after the `revises` sentence: `source (with revises): "human" when the user asked for this rework, "relayed" (the default) when it is your own reading.`
+`delegate` (root): the existing docstring, plus after the `revises` sentence: `source (with revises): "human" when the user asked for this rework (a rework after their own rejection, carrying their corrections, is one), "relayed" (the default) when it is your own reading; the owner sees which.` The agents' `request` and `delegate` have no `source` parameter.
 
 `revise_playbook`:
 
@@ -875,6 +879,8 @@ New (no braces, so `.format` is unaffected):
 ```
 
 Existing orgs get it with `hirearchy upgrade-rules` (README says so). Rules 1-9 are unchanged.
+
+**The service lead's charter sentence follows the rule (review 3 LOW 4).** In `SRC/blueprint/_charters.py` (lines 64-65), ``You own the playbook and improve it with `revise_playbook` from the evidence shown before a new request.`` becomes ``You own the playbook and improve it with `revise_playbook` when the client's evidence calls for it (ORG.md rule 10).`` The pinned prefix of `SRC/blueprint/tests/test_services.py::test_the_leads_charter_says_the_playbook_is_the_procedure` stays; the test gains an assertion for the new sentence and one that the old half is gone. It is its own commit, right after rule 10 (plan 13.2).
 
 ### 6.8 SKILL.md (`/Volumes/workspace/hirearchy/.worktrees/org-growth-0a/skills/hirearchy/SKILL.md`)
 
@@ -943,6 +949,8 @@ Block F (line 93). One rule for every rework root sends: `request(..., revises=.
   ("finished") and you sent more work, call `start()` again. Pass source="human" only on a rework the user asked for (the default is relayed).
 ```
 
+What counts as "a rework the user asked for" (review 3 LOW 6): a rework after the user's own rejection, carrying their corrections, is one. It costs no SKILL.md line: the root `request` and `delegate` docstrings say it (6.4), and the SKILL.md line stays as above.
+
 Block G (new step 5 item 3, inserted before today's line 100). It folds item 2's reading question and the verifier's `ambiguous` items into one message (D3: one question before delivery):
 
 ```
@@ -958,17 +966,18 @@ Block H (new step 5 item 6, replacing today's lines 103-109):
    ("keep it" / "what's wrong"); "deliver as is" or "I'll read it myself" is not an accept: ask, or record nothing yet. A known unmet
    criterion stays unmet: say so; feedback never waives it; reject needs the user's reason in their words. Your own reading is relayed
    (the default). With each human reject propose exactly ONE item they answer yes or no, naming what it is about by the ids `services()`
-   shows ("About C6 / the same as R3: a new criterion, C6 clarified as '...', or a one-off?"); if the new criterion would pull against
+   shows, as one yes/no question ("About C6: add '...' as a criterion?" or "Same as R3: a one-off?"); if the new criterion would pull against
    another, make the item the clarification that settles both. On yes: `define_service(owner, name, add_acceptance=[<the new criterion>])`
    (and `remove_acceptance` for a clarification), tell the user the resulting criteria, and record the answer as the link with
    `feedback(..., source="human", confirms=<the rejection's message id>)`: criterion = the id the reply gives (an existing one's if
-   nothing changes; "none" for a one-off). An owner's note asking if a rejection is lasting is no new question (only your one item per
-   reject asks it): read it with `inbox`, go on, and never reply to it or mention it. Never edit SERVICE.md or PLAYBOOK.md yourself.
+   nothing changes; "none" for a one-off). An owner's note with a question for the client is no new question (only your one item per
+   reject asks one): read it with `inbox`, go on, and never reply to it or mention it. Never edit SERVICE.md or PLAYBOOK.md yourself.
 ```
 
 What block H settles:
 - **One question per reject (D3, review 2 MEDIUM 2).** The conflict check runs *before* the item is proposed. A proposed criterion that would pull against an existing one (E2: the new "'before Friday' is that Friday" against C6 "a date is never invented") becomes the clarification of that criterion, so the user still answers one yes or no. No consistency question follows a reject-driven amendment. The separate consistency question (block D) is only for definitions and amendments outside a rejection, and it is asked before the `define_service` call rather than after its reply, so no amendment needs undoing.
-- **Owner notes (review 2 LOW 5).** `inbox` lists the unread messages for root and marks them read (`SRC/mcp_server/_tools_identity.py:inbox`), so the note leaves "Needs you" and `progress(wait_seconds=N)` stops returning early on it. Never replying saves the owner a run.
+- **One yes/no question (review 3 MEDIUM 3).** The assistant picks ONE of the three kinds (a new criterion, a clarification of `C<k>`, no lasting rule) and puts it as one yes/no question: "About C6: add '...' as a criterion?" or "Same as R3: a one-off?". It never offers the three kinds as a choice.
+- **Owner notes (review 2 LOW 5, review 3 MEDIUM 1).** This covers every owner note with a question for the client: G2's "Is that a lasting requirement?" and G1's "Is that what you want from now on?" (a team proposal resting on no rejection of the user's), so the assistant never relays either as a second question. `inbox` lists the unread messages for root and marks them read (`SRC/mcp_server/_tools_identity.py:inbox`), so the note leaves "Needs you" and `progress(wait_seconds=N)` stops returning early on it. Never replying saves the owner a run.
 - **The link id.** It is the id the `define_service` reply gives the new or clarified criterion (e.g. `C7`). It is the existing criterion's id when the user says the rejection is about it and wants no change, and `none` for a one-off. The call shape (same `task_id`, verdict `reject`, the answer as `note`) is in the root `feedback` docstring.
 
 What was condensed, with the meaning kept:
@@ -998,9 +1007,13 @@ The new test `SRC/skill/tests/test_skill_org_growth.py` (raising `SRC/skill/test
 - `'"questions for the client:"'`;
 - `"with any question from item 2, in one message before you deliver"`;
 - `"confirms=<the rejection's message id>"`;
-- `"only your one item per reject asks it"`;
+- `"only your one item per reject asks one"`;
+- `"an owner's note with a question for the client is no new question"`;
+- `"as one yes/no question"`;
 - `"read it with `inbox`, go on, and never reply to it or mention it"`;
 - `"make the item the clarification that settles both"`.
+
+The same test asserts that `"an owner's note asking if a rejection is lasting"` and `"a new criterion, C6 clarified as"` are absent.
 
 After 0a, SKILL.md has no line of headroom (risk in 17).
 
@@ -1188,8 +1201,8 @@ Tests that assert the old behaviour on purpose are rewritten to the new behaviou
 - Every app-level test that revises a playbook past v1 makes the revision admissible, in commit 9: two human-tier rejections in two cases linked to one criterion, or a root amendment cited in `evidence`. The known ones:
   - `TESTS/golden/test_golden_events.py:81` uses the amendment: `org.define_service(ROOT, "ceo", "brief", add_acceptance=["At most 300 words"])` before it, then `evidence=["C2"]`. That gives `service.revise.admitted == "c"` in `events/line_shapes.txt`.
   - `TESTS/golden/test_golden_files.py:162` gets a second case with a human reject linked to `C1`.
-  - `SRC/mcp_server/tests/test_service_tools.py:94` does the same, so its `contract v1, playbook v2` assertion holds.
-  - `SRC/mcp_server/tests/test_service_tools.py:61` and `:143` (v2 through the owner's MCP server) each cite a root amendment made just before them. `:147` asserts the new `report` hint of 6.2 instead of "Lessons recorded. If they call for a playbook change now, use revise_playbook".
+  - `SRC/mcp_server/tests/test_service_tools.py:94` does the same, so its `contract v1, playbook v2` assertion holds. Its record assertion at `:100` changes on purpose (D1): `2 request(s): 2 done, 0 failed, 0 open; 0 reworked; avg {n} runs; feedback 0 accept, 2 reject`, with `{n}` computed from the two deliveries.
+  - `SRC/mcp_server/tests/test_service_tools.py:61` is the revision through the `Org` API (`svc.revise_playbook(...)`, not MCP), preceded by a root amendment `svc.define_service(ROOT, "ceo", WEEKDAY, add_acceptance=[...])`, and cites that new `C<k>`. `:143` is the only MCP revision (v2 through the owner's MCP server); it cites a root `define_service` amendment made through root's server just before it. `:147` asserts the new `report` hint of 6.2 instead of "Lessons recorded. If they call for a playbook change now, use revise_playbook".
   - `SRC/mcp_server/tests/test_service_tools.py:175` passes `evidence=[]`, so the MCP schema accepts the call and the lock refusal, which is checked before the evidence (5.3, step 2), is still what the test sees.
 - A first version passes `evidence=[]`, for example `SRC/app/tests/test_services_facade.py:49` (returns 1) and the MCP calls of `test_service_tools.py:49,128`.
 - The unit and contract tests of `services` keep the stub. `services.testing` worlds (and `ReflectionWorld`, which is built on them) default to `AdmittingServiceEvidence`, so `reflection/tests/_support.py:revise` passes `evidence=("R1",)` and keeps working. The real gate is exercised by `SRC/reflection/tests/test_case_service_evidence.py`, which calls `CaseServiceEvidence.links/admit` directly over a `ReflectionWorld`'s history and catalog, and through the wired application by the app tests above, the goldens and the e2e test (12.2).
@@ -1228,7 +1241,8 @@ Tests that assert the old behaviour on purpose are rewritten to the new behaviou
     - "no lasting rule" lines carry "do not check it";
     - the lead texts per tier (human, relayed, agent; locked and unlocked);
     - step 1 without "(the regression list)" for an agent client; steps 2 and 3 for human and agent clients; the restore step; the no-playbook texts;
-    - the `raise_bar` step: "do not send it yourself" for a human client (locked and unlocked), today's text for an agent client;
+    - the `raise_bar` step: for a human client, unlocked, the text that allows only a refused revision's question (no "do not send it yourself"); locked, "do not send it yourself"; today's text for an agent client;
+    - G2 asks about the current criteria of the assertion only (`a clarification of C2?` when C6 was removed), and `an existing one` when every linked criterion was removed; the regression line and the `services` listing mark a removed criterion `(removed)`; the regression lines carry their own `R{k}`;
     - `MailRejectedServices` tier precedence.
   - Digest labels and R ids; `services_text` ids and assertions.
 - **health** (`MailEscapeCounter` and the analyzer over the memory and fs worlds):
@@ -1318,7 +1332,7 @@ Goldens are regenerated with `HIREARCHY_UPDATE_GOLDEN=1 uv run pytest tests/gold
 | `prompts/*.txt` | 7 / 8 | ORG.md rule 10 (11). `service_owner_reflect.txt` also gets the ids (5), the rendered `source` of the rework (3) and of the verdict (8), the Reflect step 3 (9), the regression list, R ids and lead/step texts (10). `service_owner_no_playbook.txt` also gets the ids (5) and the no-playbook texts (9). |
 | `files/org_md_*.md` | 2 / 3 | rule 10 (11) |
 | `messages/feedback_note.md`, `rendered_inbox.txt`, `service_request_task.md`, `notice_templates.txt` | 4 / 9 | `source` on the verdict (8); criterion ids (5); the `low_quality` action (17) |
-| `charters/hire.md`, `apply_service_example.md`, `apply_research_example.md`, `apply_code_template.md` | 4 / 5 | `ceo/eng` `max_children: 5` -> 0 (15); the manager template (12); the playbook leftover and the request ids in `apply_service_example.md` (13, 5) |
+| `charters/hire.md`, `apply_service_example.md`, `apply_research_example.md`, `apply_code_template.md` | 4 / 5 | `ceo/eng` `max_children: 5` -> 0 (15); the manager template (12); the playbook leftover and the request ids in `apply_service_example.md` (13, 5); the service lead's charter sentence in `apply_service_example.md` (11, A4) |
 | `plans/*` (the 8 `propose_*_service.txt` and `example_blueprint-service.txt`) | 9 / 27 | the playbook leftover (13) |
 | `services/service_and_playbook_files.md`, `services_text_root.txt` | 2 / 2 | the scenario's revision cites evidence: a second case with a human reject on C1 and the frontmatter of 3.5 (9); ids and the regression list (5, 10) |
 | `cli/help_feedback.txt`, `help_request.txt`, `services.txt`, `obs_events_json.txt`, `health_json.txt` | 5 / 64 | flags (8, 3); ids (5); null `source`/`criterion` keys in `msg.deliver` (2); the four health numbers (17) |
@@ -1343,7 +1357,7 @@ To verify (expected unchanged): `cli/dash_once.txt` and `cli/health.txt`. Their 
 | `bootstrap` | 3 / 5 | `org_md_*` (rule 10) |
 | `upgrade` | 3 / 6 | `new_org_md.md`, `dry_run_text.txt`, `written_text.txt` (rule 10) |
 | `cli` | 11 / 116 | `help_feedback.txt`, `help_request.txt`, `bad_verdict.txt` (its `usage: hirearchy feedback` line gains the new flags, 8), `services.txt`, `feedback.txt` (reply with the message id), `define_service_amend_acceptance.txt`, `define_service_amend_deliverable.txt` (ids), `obs_events_json.txt`, `health_json.txt`, `upgrade_rules_old.txt`, `upgrade_rules_old_dry_run.txt`; to verify: `define_service_error.txt`, `define_service.txt`, `health.txt`, `health_agent.txt` |
-| `blueprint` (`golden/second_half.json`, one file) | 1 / 2 | 22 of its strings: the 8 `charters/*/lead` entries get the manager bullets (12); the 10 `plans/*-service/*/details\|propose` entries and the 4 `playbooks/*` entries lose the leftover sentence (13). Its `plan_ids` hash the blueprint only (`_identity.py`) and stay; `validate_corpus.json` stays. |
+| `blueprint` (`golden/second_half.json`, one file) | 1 / 2 | 22 of its strings: the 8 `charters/*/lead` entries get the manager bullets (12); the 10 `plans/*-service/*/details\|propose` entries and the 4 `playbooks/*` entries lose the leftover sentence (13). Its `plan_ids` hash the blueprint only (`_identity.py`) and stay; `validate_corpus.json` stays. The service lead's charter sentence (A4, right after commit 11) changes 4 more strings of it, by the same one-off script (asserting 4). |
 | `dashboard` (`golden/*.txt`) | 0 / 34 | stays byte-identical, because `TESTS/testkit/dash_fixtures.py` passes `source="human"` (rule in 12): `verdict_chain` without the R mapping renders human verdicts as today, and the contract view lists criteria in its own format. To verify: `wide-3-services-detail.txt`. |
 | `observability`, `progress`, `review` | 0 / 98, 0 / 12, 0 / 6 | `messages_*.json` lists its own message fields, and `source`/`criterion` are not added to it in 0a |
 
@@ -1368,9 +1382,9 @@ Each commit regenerates exactly the goldens and the signature record (4.4) its c
 6. `feat(reflection): verdict tiers, client kind, links and the regression assertions`. Derived only; no output change.
 7. `feat(reflection): the evidence gate behind services' ServiceEvidence port`. Port, stubs, contract suite, `CaseServiceEvidence`, wiring; not used yet.
 8. `feat(services): feedback records source, criterion and confirmations`. Sender: `criterion`, S3, the relayed default for verdict and link notes. `feedback`; root MCP (parameters and docstring; the server instructions are unchanged, 6.4) and CLI (flags; replies with the message id); facade `send(+criterion)`, `feedback(...)`. Record: `Org.send`, `Org.feedback`. Goldens: `mcp/surface_root*.txt` (3), `cli/help_feedback.txt` (both), cli `feedback.txt` and `bad_verdict.txt`, `messages/feedback_note.md`, `rendered_inbox.txt`, `prompts/service_owner_reflect.txt` (its scenario's verdict passes `source="human"`). Scenario helpers (rule in 12) pass `source="human"`: `SRC/reflection/tests/_support.py:rate`, `TESTS/golden/test_golden_files.py:54,160`, `TESTS/golden/test_golden_prompts.py:64`, `TESTS/testkit/dash_fixtures.py:168,180`, `SRC/mcp_server/tests/test_service_tools.py:93`, `SRC/app/tests/test_services_facade.py:47`. The dashboard goldens stay byte-identical.
-9. `feat(services)!: revise_playbook requires evidence and is gated`. All call sites; Reflect step 3 and the restore step; the no-playbook texts and hints; the client's note; frontmatter; event; facade. Record: `Org.revise_playbook`. Goldens: `mcp/surface_manager.txt`, `prompts/service_owner_*.txt`, `services/service_and_playbook_files.md`, `events/line_shapes.txt`, reflection `sections_*`. Revisions past v1 are made admissible (rule in 12): `TESTS/golden/test_golden_events.py:81` (amendment, `evidence=["C2"]`), `TESTS/golden/test_golden_files.py:162` (a second case), `SRC/mcp_server/tests/test_service_tools.py:61,94,143` (and `:147`'s hint, `:175`'s `evidence=[]`); first versions pass `evidence=[]` (`SRC/app/tests/test_services_facade.py:49`, `test_service_tools.py:49,128`).
+9. `feat(services)!: revise_playbook requires evidence and is gated`. All call sites; Reflect step 3 and the restore step; the no-playbook texts and hints; the client's note; frontmatter; event; facade. Record: `Org.revise_playbook`. Goldens: `mcp/surface_manager.txt`, `prompts/service_owner_*.txt`, `services/service_and_playbook_files.md`, `events/line_shapes.txt`, reflection `sections_*`. Revisions past v1 are made admissible (rule in 12): `TESTS/golden/test_golden_events.py:81` (amendment, `evidence=["C2"]`), `TESTS/golden/test_golden_files.py:162` (a second case), `SRC/mcp_server/tests/test_service_tools.py:61,94,143` (`:61` through the `Org` API, `:143` the only MCP revision; `:94`'s record assertion rewritten; and `:147`'s hint, `:175`'s `evidence=[]`); first versions pass `evidence=[]` (`SRC/app/tests/test_services_facade.py:49`, `test_service_tools.py:49,128`).
 10. `feat(reflection): the regression list, tier-aware Reflect texts and labelled verdicts`. `RegressionListSection`, the lead texts and steps 1-2, the `raise_bar` step for human clients, `MailRejectedServices` tiers, digest labels and R ids, the regression list in `services`. Goldens: `prompts/service_owner_reflect.txt`, `services/services_text_root.txt`, reflection `digest_*`, `sections_*`, `services_*`.
-11. `feat(templates): ORG.md rule 10 asks for the client's evidence`. Goldens: 7 prompts, 2 ORG.md, bootstrap 3, upgrade 3, templates `org_rules_*` 5, cli `upgrade_rules_old*` 2.
+11. `feat(templates): ORG.md rule 10 asks for the client's evidence`. Goldens: 7 prompts, 2 ORG.md, bootstrap 3, upgrade 3, templates `org_rules_*` 5, cli `upgrade_rules_old*` 2. It is followed by its own commit for the service lead's charter sentence (6.7, A4): `charters/apply_service_example.md` and 4 strings of `second_half.json`.
 12. `feat(roles): the manager copies the regression list and forwards ambiguous items`. 3 charter goldens; the 8 `charters` strings of `SRC/blueprint/tests/golden/second_half.json` (one-off script, 13).
 13. `fix(blueprint): drop the default playbook's first-run leftover`. 9 plans, 1 charter; the 14 `plans`/`playbooks` strings of `SRC/blueprint/tests/golden/second_half.json` (one-off script, 13).
 14. `feat(access): grants of can_hire and max_children are bounded by the grantor's`. `children_limit`, `check_grant`; policy only.
@@ -1401,7 +1415,7 @@ Each commit regenerates exactly the goldens and the signature record (4.4) its c
     - The item for the rejection already answers a G2 question. A proposal resting on no rejection of the user's is not asked.
     - A conflict between the criterion the item would add and an existing one is folded into that same item, as the clarification that settles both (6.8 block H). So 08 §4.1.3's consistency check costs no second question after a reject-driven amendment.
     - The separate consistency question (08 §4.1.3, "at `define_service`") is asked only before a definition or an amendment made outside a rejection (6.8 block D).
-    - For a human client, the owner's `raise_bar` step no longer asks it to send lasting requirements to root (6.2), and the skill reads any such note with `inbox` without replying.
+    - For a human client, the owner's `raise_bar` step no longer asks it to send lasting requirements to root (6.2): unlocked, it allows only a refused revision's question (step 3); locked, it says not to send it. The skill reads any owner note with a question for the client with `inbox`, without replying.
 16. **"No lasting rule" assertions stay in the regression list**, marked "do not check it". 08 §4.1.2's explicit "no" closes them, and keeping the lines keeps the R ids stable and the history visible.
 
 ## 16. Decisions taken (all open choices resolved)
@@ -1439,7 +1453,7 @@ Each commit regenerates exactly the goldens and the signature record (4.4) its c
 | 29 | `revise_playbook` CLI | none | 4.2 |
 | 30 | Consistency question | conflicts of a reject-driven criterion are folded into the reject's one item; a separate question is asked only before a definition or an amendment outside a rejection, before the `define_service` call | 6.8 (blocks D, H), 15.15 |
 | 31 | Size budgets | SKILL.md stays at 125 lines by condensing (no cap changes); the root instructions are unchanged (< 2700); the README Services-section cap goes from < 90 to the measured minimum < 98 | 6.4, 6.8, 6.10 |
-| 32 | `raise_bar` for a human client | "Your parent asks the client ...; do not send it yourself", locked or not; unchanged for agent clients | 6.2 |
+| 32 | `raise_bar` for a human client | unlocked: "Your parent asks the client ...: send nothing about it yourself beyond a refused revision's question (step 3)"; locked: "...; do not send it yourself"; unchanged for agent clients | 6.2 |
 | 33 | CLI feedback replies | both show `(message {id}, source {source})`, so `--confirms` can be used from the terminal | 4.2 |
 | 34 | Nested `Questions for the client:` | every manager copies its reports' items into its own report | 6.6 |
 | 35 | Cited removed criterion | weighs nothing (no subject, a note saying so); `links` still accepts it | 5.3, 6.1 |
@@ -1525,3 +1539,16 @@ Each of these follows from the same budgets and assertions, so it is fixed here 
 
 None of these resolutions changes the approved product behaviour of 08 beyond what Phase 0a specifies. The interpretations 08 leaves open are recorded as deviations 15.12-15.16 and decisions 30-36.
 
+### 18.4 Third review (amendments A1-A7, binding on revision 3)
+
+Review: `/Volumes/workspace/hirearchy/.worktrees/org-growth-0a/.agents/tasks/design-review.md` (0 HIGH, 3 MEDIUM, 4 LOW), closed by the manager decision `/Volumes/workspace/hirearchy/.worktrees/org-growth-0a/.agents/tasks/manager-decision-design-loop.md` after three passes. None of the seven changes approved behaviour; each fixes an exact text, and the final texts are in the sections named below. Where an amendment differs from an earlier text, the amendment wins.
+
+| Amendment | Severity | Finding (short) | Resolution (final text) |
+|---|---|---|---|
+| A1 | MEDIUM 1 | Block H covers only "is a rejection lasting" notes, not the owner's refusal question for a team proposal (G1) | **Addressed.** The last two lines of block H read: `nothing changes; "none" for a one-off). An owner's note with a question for the client is no new question (only your one item per` / `reject asks one): read it with `inbox`, go on, and never reply to it or mention it. Never edit SERVICE.md or PLAYBOOK.md yourself.` The needle `"only your one item per reject asks one"` replaces `"...asks it"`, and `"an owner's note with a question for the client is no new question"` is added; the "Owner notes" bullet names G1 and G2 (6.8). |
+| A2 | MEDIUM 2 | The human-client `raise_bar` step says "do not send it yourself" while step 3, G2 and the docstring say to send the question once | **Addressed.** Unlocked: ``... Your parent asks the client whether a rejection is a lasting requirement: send nothing about it yourself beyond a refused revision's question (step 3).`` Locked: as before (``...; do not send it yourself.``). Agent client: unchanged (6.2, 12.1, 15.15, 16 #32). |
+| A3 | MEDIUM 3 | The block H example is a three-way question | **Addressed.** Line 6 of block H reads: `shows, as one yes/no question ("About C6: add '...' as a criterion?" or "Same as R3: a one-off?"); if the new criterion would pull against`. The needle `"as one yes/no question"` is added, and `"a new criterion, C6 clarified as"` must be absent (6.8). |
+| A4 | LOW 4 | The service lead's charter keeps the pre-0a sentence that rule 10 was changed for | **Addressed.** ``You own the playbook and improve it with `revise_playbook` when the client's evidence calls for it (ORG.md rule 10).`` replaces ``... from the evidence shown before a new request.`` in `SRC/blueprint/_charters.py`; goldens: `charters/apply_service_example.md` and 4 strings of `second_half.json` (6.7, 13, 14). |
+| A5 | LOW 5 | G2's `{criteria}` and the regression list can name a criterion the client removed | **Addressed.** G2's `{criteria}` is the current C ids of the assertion's `about`, else `an existing one` (6.1). In the regression list and in the `services` listing a no-longer-current C id reads `C<k> (removed)`, for confirmed and unconfirmed links alike (6.2, 6.3). Unit tests in 12.1. |
+| A6 | LOW 6 | "A rework the user asked for" is undefined for a rework after the user's own rejection | **Addressed.** The root `request` and `delegate` docstrings say: `source (with revises): "human" when the user asked for this rework (a rework after their own rejection, carrying their corrections, is one), "relayed" (the default) when it is your own reading; the owner sees which.` The agents' surfaces have no `source` parameter (6.4, 6.8 block F). |
+| A7 | LOW 7 | Small inaccuracies | **Addressed.** (a) The regression line template is `- R{k}, case {case id}, verdict {note id}{about}: "{words}"` (6.2). (b) `test_service_tools.py:61` is a revision through the `Org` API after a root amendment, `:143` the only MCP revision, and `:94`'s record assertion at `:100` changes on purpose, logged under D1 (12). (c) The root `feedback` docstring makes two changes: "the user's own judgement" and "optional for accept: the user's own words, verbatim" (6.4). |
