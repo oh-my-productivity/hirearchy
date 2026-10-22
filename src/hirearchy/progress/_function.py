@@ -60,6 +60,7 @@ def progress(org: Org, task_id: str | None = None, now: datetime | None = None, 
     roots, teams, states = MailRootTasks(rt.mailbox), AgentTaskTeams(rt.agents), MailTaskStates(rt.mailbox, rt.pause_store, rt.task_query)
     lines = CaseTaskLines(
         teams, states, LogRunCounts(rt.mailbox, rt.run_log_reader), FsTeamActivity(rt.paths), rt.case_history, rt.service_reports,
+        rt.mailbox,
     )
     snapshots = TeamSnapshots(roots, teams, states, RunnableTeams(rt.mailbox, rt.runnable_query), rt.human_queue, time_of)
     view = PollingProgress(RootTaskReport(roots, lines, rt.human_queue, time_of), snapshots, time_of, poll)

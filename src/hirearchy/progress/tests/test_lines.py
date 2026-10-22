@@ -25,7 +25,7 @@ def lines(
 ) -> CaseTaskLines:
     return CaseTaskLines(
         AgentTaskTeams(w.agents), MailTaskStates(w.mail, w.pauses, w.tasks), LogRunCounts(w.mail, w.runs), activity or FixedTeamActivity(),
-        history or w.history, totals or w.totals,
+        history or w.history, totals or w.totals, w.mail,
     )
 
 
@@ -119,3 +119,67 @@ def test_a_line_says_who_kept_the_runs(w: ProgressWorld, task: Message) -> None:
     returned = w.answer(task, "done", "ok", 6)
     assert "kept by" not in lines(w).line(task, returned, NOW)
     assert "kept by" not in lines(w).line(task, None, NOW)
+
+
+QUESTIONS = "## Summary\nok\n\nQuestions for the client:\n- Keep Marta's row?\n- Which Friday?\n\n## Artifacts\n- a/b.md (3 words)"
+FLAG = "for the client: ask the user before you copy or deliver"
+
+
+def rework(w: ProgressWorld, first: Message, source: str | None) -> Message:
+    """Root sends a rework of ``first``; ``source`` says whether the user asked for it (``human``) or the assistant did (``relayed``)."""
+    return w.post(Message(sender=ROOT, to="ceo", type="task", title="again", body="goal", budget=3, revises=first.id, source=source))
+
+
+def test_a_done_result_with_client_questions_is_flagged(w: ProgressWorld, task: Message) -> None:
+    done = w.answer(task, "done", QUESTIONS, 0)
+    assert f". artifacts: a/b.md. 2 questions for the client: ask the user before you copy or deliver. (task {task.id})" in lines(w).line(task, done, NOW)
+
+
+def test_one_question_is_singular(w: ProgressWorld, task: Message) -> None:
+    done = w.answer(task, "done", "Questions for the client: Keep Marta's row?\n\n## Artifacts\n- a.md", 0)
+    out = lines(w).line(task, done, NOW)
+    assert f". 1 question {FLAG}. " in out and "1 questions" not in out
+
+
+def test_a_service_request_is_flagged_before_the_no_feedback_part(w: ProgressWorld) -> None:
+    first = request(w)
+    done = w.answer(first, "done", QUESTIONS, 0)
+    assert f". artifacts: a/b.md. 2 questions for the client: ask the user before you copy or deliver. no feedback yet. " in lines(w).line(first, done, NOW)
+
+
+def test_the_flag_ends_with_a_verdict_or_a_human_rework(w: ProgressWorld) -> None:
+    first = request(w)
+    done = w.answer(first, "done", QUESTIONS, 0)
+    assert FLAG in lines(w).line(first, done, NOW)
+    rated_case = FixedCaseHistory([case([first], [verdict(0, first)])])
+    assert FLAG not in lines(w, history=rated_case).line(first, done, NOW)  # the client's verdict on the case
+    rework(w, first, "human")
+    assert FLAG not in lines(w).line(first, done, NOW)  # the user asked for the rework: it answers the questions
+
+
+def test_a_relayed_rework_keeps_the_flag(w: ProgressWorld) -> None:  # DR-17
+    first = request(w)
+    done = w.answer(first, "done", QUESTIONS, 0)
+    rework(w, first, "relayed")
+    assert "2 questions for the client: ask the user before you copy or deliver" in lines(w).line(first, done, NOW)
+
+
+def test_a_one_off_task_keeps_its_flag_until_a_human_rework_revises_it(w: ProgressWorld, task: Message) -> None:
+    done = w.answer(task, "done", QUESTIONS, 0)
+    assert "2 questions for the client" in lines(w).line(task, done, NOW)  # nothing else records that the questions were asked
+    rework(w, task, "relayed")
+    assert "2 questions for the client" in lines(w).line(task, done, NOW)
+    rework(w, task, "human")
+    assert "questions for the client" not in lines(w).line(task, done, NOW)
+
+
+def test_a_blocked_result_is_not_flagged(w: ProgressWorld, task: Message) -> None:
+    for status in ("blocked", "failed"):
+        result = w.answer(task, status, QUESTIONS, 0)
+        assert "for the client" not in lines(w).line(task, result, NOW)
+    assert "for the client" not in lines(w).line(task, None, NOW)
+
+
+def test_a_result_whose_questions_are_none_is_not_flagged(w: ProgressWorld, task: Message) -> None:  # zero pin: no items, no flag
+    for body in ("Questions for the client: none.\n\n## Artifacts\n- a.md", "ok, nothing asked", "Questions for the client:\n\n## Lessons\n- x"):
+        assert "for the client" not in lines(w).line(task, w.answer(task, "done", body, 0), NOW)

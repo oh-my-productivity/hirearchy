@@ -184,6 +184,7 @@ class ProgressWorld:
     delegate: Callable[[str, str, str, int], Message]  # (sender, to, title, runs): a task, delivered with the runs it carries
     answer: Callable[[Message, str, str, int], Message]  # (task, status, body, runs returned): the assignee reports; the result, delivered
     write: Callable[[str, str, str, str, int], Message]  # (sender, to, title, body, runs): a note that wakes, delivered
+    post: Callable[[Message], Message]  # a message as it is (a rework with ``revises`` and ``source``), delivered
     use_run: Callable[[str], None]  # the agent makes one run: a log stamped now, and one run of its budget
     begin_run: Callable[[str], None]  # its inbox becomes the batch of a run in flight
     end_run: Callable[[str], None]  # the run ends well: the batch is read
@@ -202,7 +203,9 @@ def _world(
     history, totals, queue, scheduler = FixedCaseHistory(), FixedCaseTotals(), ListHumanQueue(), FakeSchedulerStatus(waiting=waiting)
     team_activity = activity(layout)
     roots, teams, states = MailRootTasks(budgets.mail), AgentTaskTeams(budgets.agents), MailTaskStates(budgets.mail, pauses.store, budgets.tasks)
-    lines = CaseTaskLines(teams, states, LogRunCounts(budgets.mail, runs.reader), team_activity, history, totals)
+    lines = CaseTaskLines(
+        teams, states, LogRunCounts(budgets.mail, runs.reader), team_activity, history, totals, budgets.mail,
+    )
     snapshots = TeamSnapshots(roots, teams, states, RunnableTeams(budgets.mail, runnable), queue, wait_clock)
     text = RootTaskReport(roots, lines, queue, wait_clock)
     reporter = DerivedProgressReporter(PollingProgress(text, snapshots, wait_clock), snapshots, scheduler, waiting, budgets.tasks)
@@ -236,7 +239,7 @@ def _world(
         reporter=reporter, text=text, snapshots=snapshots, mail=budgets.mail, tasks=budgets.tasks, agents=budgets.agents, pauses=pauses.store,
         runnable=runnable, runs=runs.reader, layout=layout, clock=wait_clock, history=history, totals=totals, queue=queue, scheduler=scheduler,
         waiting=waiting, activity=team_activity, hire=hire, retire=retire, delegate=delegate,
-        answer=answer, write=write, use_run=use_run, begin_run=budgets.begin_run, end_run=budgets.end_run, pause=pauses.store.pause,
+        answer=answer, write=write, post=budgets.post, use_run=use_run, begin_run=budgets.begin_run, end_run=budgets.end_run, pause=pauses.store.pause,
         advance=budgets.clock.advance,
     )
 

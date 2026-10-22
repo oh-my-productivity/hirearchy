@@ -53,7 +53,7 @@ def report(w: ProgressWorld) -> RootTaskReport:
     from hirearchy.progress._teams import AgentTaskTeams
 
     lines = CaseTaskLines(
-        AgentTaskTeams(w.agents), MailTaskStates(w.mail, w.pauses, w.tasks), LogRunCounts(w.mail, w.runs), w.activity, w.history, w.totals,
+        AgentTaskTeams(w.agents), MailTaskStates(w.mail, w.pauses, w.tasks), LogRunCounts(w.mail, w.runs), w.activity, w.history, w.totals, w.mail,
     )
     return RootTaskReport(MailRootTasks(w.mail), lines, w.queue, w.clock)
 

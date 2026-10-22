@@ -36,7 +36,7 @@ def reporter(b: PortResolver) -> DerivedProgressReporter:
     mail, clock, queue = b.get(MailboxReader), b.get(Clock), b.get(HumanQueue)
     roots, teams, states = MailRootTasks(mail), AgentTaskTeams(b.get(AgentDirectory)), MailTaskStates(mail, b.get(PauseStore), b.get(TaskQuery))
     lines = CaseTaskLines(
-        teams, states, LogRunCounts(mail, b.get(RunLogReader)), FsTeamActivity(b.get(OrgLayout)), b.get(CaseHistory), b.get(ServiceReports),
+        teams, states, LogRunCounts(mail, b.get(RunLogReader)), FsTeamActivity(b.get(OrgLayout)), b.get(CaseHistory), b.get(ServiceReports), mail,
     )
     snapshots = TeamSnapshots(roots, teams, states, RunnableTeams(mail, b.get(RunnableQuery)), queue, clock)
     return DerivedProgressReporter(
