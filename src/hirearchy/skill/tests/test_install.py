@@ -61,3 +61,23 @@ def test_skill_names_the_final_tools_and_signatures(tmp_path):
         assert name in tools and f"`{name}" in text, name
     assert "apply_org(blueprint=<the approved YAML, unchanged>, approved=True, plan_id=<from propose_org>)" in text
     assert "create_org(mission=" in text and "propose_org(blueprint=" in text
+
+
+def flat(text):
+    return " ".join(text.split())
+
+
+def test_readme_says_a_global_skill_shadows_a_profiles_resource():
+    import testkit
+
+    readme = flat((testkit.REPO / "README.md").read_text(encoding="utf-8"))
+    assert "A global skill with the same name (`~/.kiro/skills/hirearchy/SKILL.md`, what `install-skill` writes) shadows a profile's `skill://` resource" in readme
+    assert "After upgrading hirearchy run `hirearchy install-skill --force`" in readme
+    assert "root's `whoami` and `status` say when the installed copy differs from this version" in readme
+
+
+def test_readme_says_rule_c_needs_an_amendment_the_client_confirmed():
+    import testkit
+
+    readme = flat((testkit.REPO / "README.md").read_text(encoding="utf-8"))
+    assert "an amendment the client confirmed" in readme and "(not confirmed)" in readme

@@ -258,10 +258,10 @@ line sit outside it.
 `relayed` (the assistant's own reading; the default; notes written before count as `human`). Contract criteria have stable ids
 `C1, C2, ...` (by first appearance across `history/`; removing one never renumbers the others; a deleted history file shifts them), and
 the human client's rejections are the regression list `R1, R2, ...`, shown only in the owner's prompt and in `services` (a one-off stays
-listed, unchecked). `feedback` can name what a rejection is about (`criterion`, or later `confirms`). `revise_playbook` needs `evidence`:
-a revision is admitted only when one criterion or assertion failed in two cases the human client rejected, or when it cites a criterion
-the user added by an amendment; otherwise it is refused with the question for the client. The first playbook and restoring the client's
-version need none; an agent client's service keeps its playbook. `Org.revise_playbook` needs `evidence` too.
+listed, unchecked). `feedback` can name what a rejection is about: `confirms` records the client's yes (a link note, the only thing the gate trusts);
+a `criterion` on the rejection itself is relayed and shows `(not confirmed)`. `revise_playbook` needs `evidence`: a revision is admitted only when one
+criterion or assertion failed in two cases the human client rejected, or when it cites an amendment the client confirmed; otherwise it is refused with
+the question for the client. The first playbook and restoring the client's version need none; an agent client's service keeps its playbook. `Org.revise_playbook` needs `evidence` too.
 
 **In a blueprint.** `services:` next to `agents:` (any of the four kinds: `blueprint_example(kind, service=True)`; a filled research one is
 [`examples/blueprint-service.yaml`](https://github.com/oh-my-productivity/hirearchy/blob/main/examples/blueprint-service.yaml)):
@@ -620,6 +620,8 @@ absolute path of the checkout's file, for example in `<project>/.kiro/agents/org
 Run it with `kiro-cli chat --agent org-assistant`. This profile binds the assistant to one organization (and keeps your other
 MCP servers out); `tools: ["*"]` lets it copy the finished deliverable with kiro's own file tools, so narrow it if you prefer
 to copy files yourself. Use a name other than `hirearchy-...`, which the scheduler's internal profiles use.
+
+A global skill with the same name (`~/.kiro/skills/hirearchy/SKILL.md`, what `install-skill` writes) shadows a profile's `skill://` resource: kiro loads the global one. After upgrading hirearchy run `hirearchy install-skill --force` (root's `whoami` and `status` say when the installed copy differs from this version), or remove the global copy when a profile should use another one.
 
 **Agent runs (the scheduler).** Runs use `kiro-cli chat --no-interactive --agent <profile>`; the prompt is passed
 on stdin. The scheduler writes one *internal* profile per organization (and per set of granted built-in tools) to
