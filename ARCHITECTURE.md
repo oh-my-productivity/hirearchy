@@ -147,7 +147,7 @@ level in the dependency DAG (4.1).
 | 13 | `mail` (L2) | feature | Persists messages in per-agent mailboxes (inbox, inflight, read, sent). | `<addr>/{inbox,inflight,read,sent}/*.md` (root: `<root>/{inbox,...}`) | - | kernel, agents |
 | 14 | `telemetry` (L2) | feature | Appends what the runtime does to the event log as structured events. | `.runtime/events/<day>/<proc>-<pid>-<ms>.jsonl` (one writer per file: the emitting process); deletes expired day directories | `ORG.md` (the `events` switch, through `settings`) | kernel, eventlog, settings, snapshots |
 | 15 | `upgrade` (L2) | feature | Brings an organization's ORG.md rules up to the current template. | - (rewrites `ORG.md` through `settings`) | - | kernel, settings, snapshots, templates |
-| 16 | `kiro` (L3) | feature | Adapts the organization to the kiro-cli agent runtime (profiles, path confinement, run command). | `~/.kiro/agents/hirearchy-<slug>-<hash>[-tools][-x<hash>].json` | - | kernel, agents, settings, access |
+| 16 | `kiro` (L3) | feature | Adapts the organization to the kiro-cli agent runtime (profiles, path confinement, kiro state, run command, readiness). | `<state>/kiro-home/<org-id>/agents/hirearchy-<slug>-<hash>[-tools][-x<hash>].json`, `<state>/kiro-cwd/<org-id>/**` | - | kernel, agents, settings, access |
 | 17 | `orgfiles` (L3) | feature | Guards every file an agent reads or writes inside the organization. | agent-authored files: `<addr>/MEMORY.md` (after creation), `<addr>/work/**`, any other path the guard allows an agent; routes charter rewrites to `agents` | any file inside the org root | kernel, agents, settings, access |
 | 18 | `strays` (L3) | feature | Tracks org files that an agent's built-in write left in its workspace until the agent has been told. | `.runtime/strays.json` | agent workspaces (stat only) | kernel, agents, access |
 | 19 | `traces` (L3) | feature | Decides which request trace a message belongs to. | - | mailboxes (through `mail`) | kernel, mail |
@@ -235,7 +235,7 @@ module globals do now.
 Conventions: every block is the future `<pkg>/api.py` (imports abbreviated). `Protocol` = interface; **ISP split**: read/query and
 mutating roles are separate Protocols. "Impl" lists the implementations that will exist: **real** (filesystem/OS), **fake**
 (in-memory, in `<pkg>/testing.py`, passes the same contract suite), or decorators. Signatures keep today's parameter names and
-defaults so the facade delegates one-to-one. All Protocols are `@runtime_checkable`. **Fake policy.** I/O Protocols (the 42 listed in 4.5) have a real implementation and an in-memory fake in `testing.py` that pass one contract suite.
+defaults so the facade delegates one-to-one. All Protocols are `@runtime_checkable`. **Fake policy.** I/O Protocols (the 45 listed in 4.5) have a real implementation and an in-memory fake in `testing.py` that pass one contract suite.
 Role interfaces over derived logic (policies, queries, renderers) have one real implementation; their unit tests run it against fakes of the I/O Protocols it
 depends on, and `testing.py` adds a trivial stub (`RecordingDelivery`, `FixedBudget`, `FakeSchedulerStatus`, ...) where a consumer's test wants to dictate the answer.
 Common imports for all blocks:
@@ -963,7 +963,7 @@ lenient `Org` replace parts of `org.runtime`.
 
 ### 3.29 `daemon`
 
-Data: `SchedulerState(state, pid, since, detail)` NamedTuple; constants `EXIT_FILE`, `FINISHED`.
+Data: `SchedulerState(state, pid, since, detail)` NamedTuple; constants `EXIT_FILE`, `FINISHED`, `REFUSED_START` (`"refused to start: "`: the start of the exit marker of a scheduler that refused to start because kiro-cli is not ready; `SchedulerStatus.exit_reason` returns it until a scheduler starts, so `status` and `progress` show it while root has open tasks).
 
 ```python
 class SchedulerStatus(Protocol):
@@ -1147,25 +1147,47 @@ Runtime field `skill_check`. `mcp_server` may not import `skill`: root's `whoami
 
 ### 3.34 `kiro`
 
-Data: `RunCommand(argv, cwd, env)` (frozen), `FILE_TOOLS`, `KIRO_AGENTS_DIR` default (resolved at call time, as today).
+Data: `RunCommand(argv, cwd, env)` (frozen), `Confinement(tools, rules, read, write, problem)` (frozen: the V3 `tools` selector, the profile's `permissions.rules`, where kiro's read tools may read, the one directory its write tools may change, and why the grant cannot be enforced),
+`CliResult(code, output)` (frozen), `KiroRunRefused(OrgError)`; constants `CHARTER_TOOLS` (`read write shell web_search web_fetch`), `FILE_TOOLS`, `START_DEADLINE=60.0`, `READINESS_TIMEOUT=2.5`.
 
 ```python
 class ConfinementPolicy(Protocol):
-    def file_confinement(self, org_root: Path, tools: Sequence[str], workspace: Path | None, inputs: Sequence[Path]) -> tuple[list[str], dict[str, object]]:
-        """(allowedTools, toolsSettings) confining kiro's built-in read/write by path (pure; verified against kiro-cli 2.29.1)."""
-class ProfileStore(Protocol):   # port: ~/.kiro/agents
+    def file_confinement(self, org_root: Path, tools: Sequence[str], workspace: Path | None, inputs: Sequence[Path]) -> Confinement:
+        """The V3 tools selector and permission rules of this grant, and what they let kiro read and write (pure; verified against kiro-cli 2.33.0 / KAS 0.66.48)."""
+class ProfileStore(Protocol):   # port: <state>/kiro-home/<org-id>/agents
     def read(self, name: str) -> dict[str, object] | None: ...
     def write(self, name: str, data: Mapping[str, object]) -> None: """Atomic."""
 class ProfileProvisioner(Protocol):
     def profile_name(self, tools: Sequence[str]) -> str: """hirearchy-<slug>-<6 hex>[-<tools>]."""
-    def ensure_profile(self, tools: Sequence[str], *, workspace: Path | None = None, inputs: Sequence[Path] | None = None, confine: bool = False) -> str:
-        """Write the org's profile if missing or different; returns its name."""
+    def ensure_profile(self, tools: Sequence[str], *, workspace: Path | None = None, inputs: Sequence[Path] | None = None) -> str:
+        """Write the org's V3 profile if missing or different; returns its name (-x<8 hex> when built-in read/write is granted); KiroRunRefused when the grant cannot be confined."""
 class McpServerLocator(Protocol):
     def command(self) -> dict[str, object]: """{'command','args'} to start `hirearchy mcp`."""
 class RunCommandBuilder(Protocol):
-    def build(self, addr: str, prompt: str) -> RunCommand: """kiro-cli chat --no-interactive --agent <profile> --model <m>; prompt goes on stdin."""
+    def build(self, addr: str, prompt: str) -> RunCommand: """<launcher> -- kiro-cli chat --no-interactive --agent <profile> --model <m> --v3 --require-mcp-startup --output-format stream-json; prompt goes on stdin."""
+class KiroPlaces(Protocol):
+    def home(self) -> Path: """KIRO_HOME of this organization: <state>/kiro-home/<org-id>."""
+    def scratch(self, addr: str) -> Path: """Working directory of addr's runs: <state>/kiro-cwd/<org-id>/<agent-key>."""
+    def roots(self) -> tuple[Path, Path]: """(<state>/kiro-home, <state>/kiro-cwd), shared by every organization of the user."""
+    def problem(self) -> str | None: """Why these places cannot be used, else None."""
+class KiroStateDirs(Protocol):   # I/O
+    def private_dir(self, path: Path) -> None: """Create with mode 0700; OSError when a symlink."""
+    def fresh(self, path: Path) -> None: """Make an empty 0700 directory; OSError when that cannot be done safely."""
+class KiroHomeAudit(Protocol):   # I/O
+    def planted(self, home: Path) -> list[str]: """What the kiro home holds that kiro-cli would load into every agent and hirearchy did not put there."""
+class KiroCli(Protocol):   # I/O
+    def run(self, argv: Sequence[str], env: Mapping[str, str], timeout: float) -> CliResult | None: """A short kiro-cli command; None when it cannot start or overruns."""
+class RuntimeReadiness(Protocol):
+    def state_problem(self) -> str | None: """Why the kiro state cannot be used (no kiro-cli call), else None."""
+    def check(self, kiro_bin: str) -> str | None: """state_problem, then whether kiro_bin is usable, offers the V3 engine and has credentials, else None."""
 ```
-Impl: `KiroConfinementPolicy`, `FsProfileStore`, `OrgProfileProvisioner`, `VenvMcpServerLocator`, `KiroRunCommandBuilder`; fakes `MemoryProfileStore`.
+Impl: `KiroConfinementPolicy`, `FsProfileStore`, `OrgProfileProvisioner`, `VenvMcpServerLocator`, `KiroRunCommandBuilder(... KiroPlaces, KiroStateDirs, KiroHomeAudit ...)`,
+`StateDirPlaces(OrgLayout, Environment, platform)` (the state directory is `HIREARCHY_STATE_DIR`, else `~/Library/Application Support/hirearchy` on macOS or `$XDG_STATE_HOME/hirearchy` / `~/.local/state/hirearchy`),
+`FsKiroState(Clock)` (`KiroStateDirs` and `KiroHomeAudit`), `SubprocessKiroCli`, `KiroReadiness(OrgLayout, AgentRegistry, AccessScopes, KiroPlaces, KiroStateDirs, KiroHomeAudit, KiroCli, Environment)`;
+fakes `MemoryProfileStore`, `FixedKiroPlaces`, `MemoryKiroState`, `ScriptedKiroCli`, `FixedReadiness`.
+The launcher `kiro/_launch.py` is a script, not a module of the package graph: the run command starts it as `<python> -I -S _launch.py --start-deadline 60 -- <kiro-cli> chat ...`; it imports only the standard library,
+refuses a run whose engine is not V3 or that does not start within the deadline, and writes a transcript (without tool results or output) to stdout. `_env.run_environment` builds the run environment
+(the host's `KIRO_*` variables pass; `KIRO_HOME` is the org's kiro home). The launcher argv and the platform come from `app`; no `kiro/_*.py` reads `os.environ`, `sys.executable` or the user's home.
 `blueprint.org_files_readable/access_facts` call `ConfinementPolicy` with a stand-in org dir (as today).
 
 ### 3.35 `dashdata`
@@ -1725,12 +1747,12 @@ where it should be: `agents` (24), `settings` (21), `mail` (21), `budget` (13), 
 
 ### 4.5 Interface inventory
 
-**152 Protocols**: 7 in `kernel`, 125 in the 36 features, 20 in the entry points (5 public + 15 private). Of the 152, 42 are
+**157 Protocols**: 7 in `kernel`, 130 in the 36 features, 20 in the entry points (5 public + 15 private). Of the 157, 45 are
 *I/O Protocols* (they touch the filesystem, the OS, git or time) with real and in-memory implementations: `Clock IdGenerator EventSink TraceTap AtomicWriter LedgerStore Environment`
 (kernel), `OrgDocumentStore GitClient EventReader EventFollowers ProcessSpawner ProcessHandle ProcessInspector ProcessSignaller
 OrphanJudge AgentRegistry RetiredArchive MessageParser MailboxWriter BatchStore MessageIndex RunLogWriter RunLogReader RunRegistry
-PauseStore OrgFileStore ServiceStore ProfileStore SkillSource SkillStore WorkspaceProvisioner OrgLocator OrgSnapshotter IgnoreList
-SchedulerLock ExitMarker SchedulerControl` plus the consumer-owned `SchedulerRunner McpRunner DashboardRunner Terminal`. The remaining 110 are
+PauseStore OrgFileStore ServiceStore ProfileStore KiroStateDirs KiroHomeAudit KiroCli SkillSource SkillStore WorkspaceProvisioner OrgLocator OrgSnapshotter IgnoreList
+SchedulerLock ExitMarker SchedulerControl` plus the consumer-owned `SchedulerRunner McpRunner DashboardRunner Terminal`. The remaining 112 are
 role interfaces over derived logic (policies, queries, renderers) whose "fake" is the real class run against fakes of the ports.
 
 ---
