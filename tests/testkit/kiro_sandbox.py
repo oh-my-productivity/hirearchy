@@ -7,6 +7,10 @@ steps aside for them). What they may touch in ``~/.kiro`` is therefore fenced in
   into a variable that is printed, never shown);
 * after the test (pass or fail): delete ONLY the per-org profiles whose JSON ``ORG_ROOT`` is inside the test's tmp dir,
   kill every process whose command line mentions the tmp dir, then assert that the md5s are what they were.
+
+hirearchy keeps kiro's state (the kiro home with the profiles, kiro's logs and sessions, the scratch working directories) in
+``HIREARCHY_STATE_DIR``: the sandbox points it at ``<tmp>/kiro-state``, so a correct hirearchy writes nothing to ``~/.kiro/agents``
+and any profile ``cleanup`` still has to delete there is reported as a problem.
 """
 
 from __future__ import annotations
@@ -138,6 +142,8 @@ class RealKiro:
     def __init__(self, base: Path, model: str = MODEL):
         self.base = base.resolve()
         self.model = model
+        self.state = self.base / "kiro-state"  # HIREARCHY_STATE_DIR of the sandbox: kiro homes and scratch directories live below it
+        self.state.mkdir(exist_ok=True)
         self.before = snapshot()
 
     # ------------------------------------------------------------- building
@@ -160,6 +166,8 @@ class RealKiro:
         cmd = [str(script)] if script.exists() else [sys.executable, "-m", "hirearchy"]
         cmd += ["--root", str(org.root), "run", "--until-idle", "--max-runs", str(max_runs)]
         env = {k: v for k, v in os.environ.items() if k not in ("ORG_ROOT", "ORG_AGENT", "ORG_RUN_ID", "ORG_REQUIRE_AGENT")}
+        env["HIREARCHY_STATE_DIR"] = str(self.state)
+        env["KIRO_LOG_LEVEL"] = "debug"  # kiro.log then records the tool surface and every permission decision
         proc = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, start_new_session=True)
         try:
             out, _ = proc.communicate(timeout=timeout)
@@ -184,13 +192,33 @@ class RealKiro:
                     pass
         return found
 
+    def kiro_home(self, org: Org) -> Path:
+        """The kiro home (``KIRO_HOME``) of the sandbox's organization: the one directory under ``<tmp>/kiro-state/kiro-home/``."""
+        homes = [p for p in (self.state / "kiro-home").glob("*") if p.is_dir()] if (self.state / "kiro-home").is_dir() else []
+        assert len(homes) == 1, f"expected one kiro home below {self.state}, found {homes}"
+        return homes[0]
+
+    def kiro_logs(self, org: Org) -> str:
+        """The text of every ``kiro.log`` and ``mcp.log`` kiro wrote in the organization's kiro home (debug level)."""
+        logs = self.kiro_home(org) / "logs"
+        files = sorted([*logs.glob("*/kiro.log"), *logs.glob("*/mcp.log")]) if logs.is_dir() else []
+        return "\n".join(f.read_text(encoding="utf-8", errors="replace") for f in files)
+
+    @staticmethod
+    def transcript(org: Org, addr: str) -> str:
+        """The text of every run log of ``addr`` (what the launcher wrote: assistant text, tool lines, denials, never tool output)."""
+        runs = sorted((org.dir(addr) / "runs").glob("*.log"))
+        return "\n".join(p.read_text(encoding="utf-8", errors="replace") for p in runs)
+
     # ------------------------------------------------------------- cleanup
 
     def cleanup(self) -> list[str]:
         """Kill leftovers, delete this sandbox's profiles, and return the list of safety violations (empty = clean)."""
         problems: list[str] = []
         kill_processes_mentioning(self.base)
-        delete_sandbox_profiles(self.base)
+        written = delete_sandbox_profiles(self.base)
+        if written:
+            problems.append(f"hirearchy wrote ~/.kiro/agents: {[p.name for p in written]}")
         left = processes_mentioning(self.base)
         if left:
             problems.append(f"processes still mention the sandbox: {[p for p, _ in left]}")
