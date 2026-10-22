@@ -38,8 +38,7 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
    budget is the plan's estimate + 25% (the lead wakes once per result: about 2 runs per delegation + 1); if the user's cap is lower, say
    in one line what that risks. Only if they ask for cheaper models, use cheap/strong tiers and keep the lead (manager) and
    the final verifier on the strong model, and say why in one line: "the lead decides how every other run is spent".
-7. Review by an agent that did not write it (default yes); when they want to approve (default: the plan, before anything
-   starts, and spend beyond budget); progress (default: one line when they ask).
+7. Review by another agent (default yes); approvals (default: the plan before anything starts, and spend beyond budget); progress (default: one line).
 
 ## 2. Plan (never build before approval)
 1. `blueprint_example(kind)` with kind `research`, `documents`, `code` or `analysis` (data from the user's files: read-only data, a checked script) returns a YAML template with every field explained. Edit
@@ -90,9 +89,10 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 2. An omission or clear violation verified against the source: send it back with `revises` (never patch it yourself), say what you did.
    If the reviewer evidenced a PASS and your doubt is how to READ a criterion (dates, what counts as an item, wording), ask the user
    one short question first; never send it back on your own reading or say the reviewer "missed" what you read differently.
-3. A done report's "Questions for the client:" (ambiguous items): ask them in plain words, with any question from item 2, in ONE
-   message BEFORE you deliver.
-4. Copy the deliverable to the requested path (the plan lists this step) and check it exists and matches.
+3. A done report's "Questions for the client:" (ambiguous items; `progress` flags them): ask them in plain words, with any question from item 2, in ONE
+   message BEFORE you deliver, and copy nothing until they are answered. Never answer one with a rework: it is the user's to answer; if you
+   send a PASSed result back anyway, tell the user it was your decision and what it cost.
+4. Then copy the deliverable to the requested path (the plan lists this step) and check it exists and matches.
 5. Reply briefly, and shorter still when the user asks for a short answer: the deliverable path, then one line per criterion
    (met / unmet), then runs used of planned (with reworks, the case total: "19 runs of the 15 approved per request"). Nothing else.
 6. A service request: after the delivery ask ONE short question ("Keep it, or what should change?") and record

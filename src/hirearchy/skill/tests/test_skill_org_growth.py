@@ -49,3 +49,18 @@ def test_always_is_not_the_users_yes():
     text = flat()
     for needle in ('"always ..." is not their yes: ask the item first', "never pass `criterion` on the rejection itself"):
         assert needle in text, needle
+
+
+def test_the_skill_asks_before_the_copy_and_never_answers_a_question_with_a_rework():
+    """E3: root copied a deliverable whose questions for the client were still open, and once answered one with a rework. Item 3 asks first,
+    `progress` flags the questions, and nothing is copied until they are answered."""
+    assert len(SKILL.read_text().splitlines()) <= 125
+    text = flat()
+    for needle in (
+        "`progress` flags them",
+        "copy nothing until they are answered",
+        "never answer one with a rework",
+        "tell the user it was your decision and what it cost",
+        "4. then copy the deliverable",
+    ):
+        assert needle in text, needle
