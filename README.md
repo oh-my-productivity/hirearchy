@@ -623,47 +623,58 @@ to copy files yourself. Use a name other than `hirearchy-...`, which the schedul
 
 A global skill with the same name (`~/.kiro/skills/hirearchy/SKILL.md`, what `install-skill` writes) shadows a profile's `skill://` resource: kiro loads the global one. After upgrading hirearchy run `hirearchy install-skill --force` (root's `whoami` and `status` say when the installed copy differs from this version), or remove the global copy when a profile should use another one.
 
-**Agent runs (the scheduler).** Runs use `kiro-cli chat --no-interactive --agent <profile>`; the prompt is passed
-on stdin. The scheduler writes one *internal* profile per organization (and per set of granted built-in tools) to
-`~/.kiro/agents/`:
+**Agent runs (the scheduler).** A run is `kiro-cli chat --no-interactive --agent <profile> --model <model> --v3 --require-mcp-startup --output-format stream-json`
+(kiro-cli's V3 / KAS agent engine; the prompt is passed on stdin), started through a small launcher of hirearchy's. The launcher refuses a run that is not on
+the V3 engine, stops one that has not started after 60 s, and writes a readable transcript to the run log: the assistant's text, one line per tool call, and kiro's own
+denial text for a refused call, never tool results or tool output.
 
-- name `hirearchy-<org-slug>-<6-char hash of the org path>[-<tools>]` (lowercase `[a-z0-9-]`), description "internal:
-  used by the hirearchy scheduler for <org path>; not a general-purpose agent". Different orgs never share or overwrite a
-  profile.
-- It loads only the hirearchy server (`includeMcpJson: false`), so agents never see your other MCP servers. The server
-  entry carries `ORG_ROOT=<this org>` and `ORG_REQUIRE_AGENT=1`.
-- Fail closed: with `ORG_REQUIRE_AGENT=1` the server refuses to start unless `ORG_AGENT` names an agent (`root` does not
-  count). If something borrows a profile as a general subagent, it gets an error instead of acting as `root`.
-- `ORG_AGENT` is not baked into the profile: the scheduler sets it per run in the process environment of `kiro-cli`.
-  This relies on kiro starting MCP servers with its own environment plus the profile's `env` (the same inheritance the
-  scheduler always used for `ORG_AGENT`/`ORG_ROOT`). If a kiro version replaced the environment instead, runs would fail
-  visibly with the message above rather than act as root.
-- Older global profiles (`~/.kiro/agents/hirearchy*.json`) are no longer written or used; they are never deleted or
-  rewritten, so remove them yourself when no scheduler that uses them is running.
+- **Requirements.** kiro-cli with the V3 engine (verified with 2.33.0) and a credential: `KIRO_API_KEY` (verified) or a sign-in that
+  `KIRO_HOME=<home> kiro-cli whoami` accepts (not verified). `hirearchy run` and `start` check this first and refuse with the reason, which `status` and
+  `progress` keep showing (`scheduler: stopped (refused to start: ...)`) until a scheduler starts. hirearchy never falls back to your `~/.kiro`.
+  Accounts whose kiro sign-in carries enterprise cloud configuration cannot run hirearchy agents confined: kiro-cli syncs that configuration (hooks, steering, powers) into the kiro home (`cloud-cache/`), and hirearchy then refuses every run.
+- **The `start` tool's environment.** A scheduler started by root's `start` tool inherits the environment of root's hirearchy MCP server, not your shell's.
+  Put `KIRO_API_KEY` (and `HIREARCHY_STATE_DIR`, if you use it) in the `env` of the hirearchy entry of your client's MCP configuration; otherwise `start`
+  refuses (no credential) or uses another kiro home than `hirearchy run` does in a shell.
+- **Where kiro's state lives.** One kiro home per organization, `0700`: `~/Library/Application Support/hirearchy/kiro-home/<org-id>/` on macOS,
+  `$XDG_STATE_HOME/hirearchy/kiro-home/<org-id>/` or `~/.local/state/hirearchy/kiro-home/<org-id>/` elsewhere; `HIREARCHY_STATE_DIR` moves it. It holds the
+  profiles and kiro's own sessions, logs and snapshots of the files agents wrote (about 80 KB per run, not pruned). Every run starts in an emptied scratch
+  directory under `.../kiro-cwd/<org-id>/`. No organization, workspace or input may be inside `kiro-home/` or `kiro-cwd/`, and neither may be inside an organization, a
+  workspace or an input (checked; a run is refused otherwise). Do not add configuration to a kiro home (hooks, steering, settings, MCP servers): the check refuses a run when it finds some.
+- **Profiles.** The scheduler writes one *internal* profile per organization and set of granted tools into the org's kiro home (`<kiro home>/agents/`), in kiro's V3 format
+  (`tools` and `permissions.rules`, `hooks: []`, `includeMcpJson` and `includePowers` false):
+  - name `hirearchy-<org-slug>-<6-char hash of the org path>[-<tools>][-x<access hash>]` (lowercase `[a-z0-9-]`), description "internal: used by the
+    hirearchy scheduler for <org path>; not a general-purpose agent". Different orgs never share or overwrite a profile.
+  - It loads only the hirearchy server, so agents never see your other MCP servers. The server entry carries `ORG_ROOT=<this org>` and `ORG_REQUIRE_AGENT=1`.
+  - Fail closed: with `ORG_REQUIRE_AGENT=1` the server refuses to start unless `ORG_AGENT` names an agent (`root` does not count). If something borrows a profile as a
+    general subagent, it gets an error instead of acting as `root`.
+  - `ORG_AGENT` is not baked into the profile: the scheduler sets it per run in the process environment of `kiro-cli`. This relies on kiro starting MCP servers with its
+    own environment plus the profile's `env`. If a kiro version replaced the environment instead, runs would fail visibly with the message above rather than act as root.
+  - `hirearchy kiro-profile` writes the profile into the org's kiro home too, and prints that path.
+- **Profiles from older versions.** `~/.kiro/agents/hirearchy-*.json` files (all older formats) are inert under V3: kiro-cli ignores them for these runs, and hirearchy neither
+  reads, rewrites nor deletes them. You may remove them yourself when no scheduler of an older version is still running; one that is keeps its old behaviour until you `stop` and `start` it.
+- **An observation.** Every run, also with the isolated kiro home, logs `acp.content_collection.resolved {"enabled":true}` and `acp.remote_sessions.enabled {"endpoint":"https://app.kiro.dev"}`;
+  no profile field changes that. It is kiro's and your account setting, not hirearchy's.
 
 ### Workspaces, inputs and confinement
 
 Two path worlds meet in a run: hirearchy tools (`read`, `write`, `report`, `delegate` inputs) use paths relative to the
-**org root**; kiro's own tools (`read`, `write`, `shell`) start in the agent's **workspace** (its charter `workspace`, else
-its org directory) and resolve relative paths there. An agent that writes `lead/writer/work/x.md` with kiro's `write`
-therefore creates that tree inside the user's folder, not in the org. The charter fields and the rules below keep the
-two apart.
+**org root**; kiro's own tools (`read`, `write`, `shell`) use absolute paths. Every kiro run starts in an empty **scratch directory** of hirearchy's, not in the
+agent's workspace, so agents are told to use absolute paths for kiro's tools; a relative kiro write lands in the scratch directory and is refused (it is outside the workspace)
+instead of creating files in your folder. The charter fields and the rules below keep the two worlds apart.
 
-The two kinds of tools share short names, and kiro lists MCP tools by their plain names, so a built-in `read` or `write`
-**shadows** the hirearchy tool of the same name: an agent that holds it sees one `read` / one `write`, kiro's, and cannot call
-hirearchy's (verified in `studies/F-read-experiment` and `studies/F2-tool-names`). The server therefore registers the hirearchy
-tools by what the charter's `tools` hold:
+Under kiro's V3 engine the built-in tools have their own ids (`read_file`, `fs_write`, `execute_bash`, ...) and hirearchy's tools are deferred tools the agent loads
+with `tool_load` (`hirearchy::<name>`), so a built-in tool is not expected to shadow a hirearchy tool of the same name (not separately verified). The names are kept anyway so charters, prompts and the MCP
+surface stay as they are, and the server registers the hirearchy tools by what the charter's `tools` hold:
 
 - charter `tools` holds `write`: the hirearchy write tool is **`org_write`** (else `write`);
 - charter `tools` holds `read`: the hirearchy read tool is **`org_read`** (else `read`).
 
-(`shell` alone changes nothing; root and agents without built-in `read`/`write` keep `read` / `write` exactly.) In kiro the
-hirearchy tools appear as `@hirearchy/org_write`, `@hirearchy/org_read`, `@hirearchy/report`, ... The agent's prompt (Files section,
-"update your memory" line, stray-file notice) names the tool *it* has: `@hirearchy/org_write` for `<addr>/MEMORY.md`,
-`<addr>/work/` and reports, and the built-in `write` for the workspace only. ORG.md's shared rules say `@hirearchy/write`
+(`shell` alone changes nothing; root and agents without built-in `read`/`write` keep `read` / `write` exactly.) The agent's prompt (Files section,
+"update your memory" line, stray-file notice) names the tool *it* has: `hirearchy::org_write` for `<addr>/MEMORY.md`,
+`<addr>/work/` and reports, and kiro's built-in write tools for the workspace only. ORG.md's shared rules say `@hirearchy/write`
 generically; the per-agent line says to use the `org_` name wherever it appears. `org_read` takes **relative** org paths
-(and the absolute workspace/inputs paths below). The built-in `read` reaches the org too, but only by **absolute** path
-`<org root>/<path>`: a relative path starts in the agent's working directory (its workspace, else its org directory).
+(and the absolute workspace/inputs paths below). The built-in read tools reach the org too, but only by **absolute** path
+`<org root>/<path>`: a relative path starts in the scratch directory.
 **Stray org files:** after each run of an agent with built-in `write` and a workspace, the scheduler looks for
 `<workspace>/<address>/` (new during the run) and a written `<workspace>/<address>/MEMORY.md`. If found it logs a
 `# warning:` in the run log and the scheduler output and records it in `.runtime/strays.json`; the agent's next prompt says
@@ -675,33 +686,46 @@ only narrows), inputs are absolute and never overlap the org directory. Charters
 `hirearchy hire ... --inputs PATH` (repeatable) or the `inputs` parameter of the `hire` tool (root, or a manager within its own
 inputs/workspace); `documents`-type goals put the user's folder in `needs.inputs` (it must exist).
 
-**Enforced by kiro** (per-agent profiles, checked against kiro-cli 2.29.1 in `--no-interactive` mode; the experiments are
-in `studies/X1-confinement/EXPERIMENTS.md`). An agent with built-in `read` or `write` gets a profile
-`hirearchy-<org>-<hash>-<tools>-x<access hash>` (same `ORG_ROOT`/`ORG_REQUIRE_AGENT=1`, same "internal" description; agents with
-equal tools and access share it) whose `toolsSettings` say:
+**Enforced by kiro** (per-agent profiles, verified against kiro-cli 2.33.0 on the V3 engine; the evidence is in `docs/design/kiro-runtime-v3.md`). The profile's `tools` list
+is the whole tool surface of the agent, and its `permissions.rules` are the only permissions: nothing is left to approve, and a call no rule allows is refused
+("approval is not supported in non-interactive mode"). What a charter's `tools` grant becomes:
+
+| charter `tools` | profile `tools` (always starts with `@hirearchy`) | kiro tools |
+|---|---|---|
+| `read` | `read` | `read_file`, `list_directory`, `file_search`, `grep_search`, `code` |
+| `write` | `write` | `fs_write`, `fs_append`, `str_replace`, `delete_file`, `code` |
+| `shell` | `shell` | `execute_bash` |
+| `web_search` and `web_fetch` | `web` | `remote_web_search`, `web_fetch` |
+| `web_fetch` or `web_search` alone | `web_fetch` or `remote_web_search` | that one tool |
+
+Any other name in `tools` (or a path kiro's patterns cannot match literally, see below) makes the run fail closed with the reason, instead of running with less or more access than the charter says.
+An agent with built-in `read` or `write` gets a profile `hirearchy-<org>-<hash>-<tools>-x<access hash>` (agents with equal tools and access share it). For
+`tools: [read, write]`, workspace `/ws`, inputs `/inputs` and org `/org` its rules are (abridged; the `skill` and `context` denies close the list):
 
 ```json
 "tools": ["@hirearchy", "read", "write"],
-"allowedTools": ["@hirearchy"],
-"toolsSettings": {
-  "write": {"allowedPaths": ["/ws/**"], "deniedPaths": ["/org", "/org/**"]},
-  "read":  {"allowedPaths": ["/ws", "/ws/**", "/inputs", "/inputs/**", "/org", "/org/**"], "deniedPaths": []}
-}
+"permissions": {"rules": [
+  {"capability": "mcp", "match": ["hirearchy/*"], "effect": "allow"},
+  {"capability": "fs_read", "effect": "allow", "match": ["/ws", "/ws/**", "/inputs", "/inputs/**", "/org", "/org/**"]},
+  {"capability": "fs_write", "effect": "allow", "match": ["/ws/**"]},
+  {"capability": "fs_write", "effect": "deny", "match": ["/org", "/org/**"]},
+  {"capability": "fs_read", "effect": "deny", "match": ["/**"], "exclude": ["/ws", "/ws/**", "/inputs", "/inputs/**", "/org", "/org/**"]},
+  {"capability": "fs_write", "effect": "deny", "match": ["/**"], "exclude": ["/ws/**"]},
+  {"capability": "fs_write", "effect": "deny", "match": ["/ws/.kiro", "/ws/.kiro/**", "/ws/**/.kiro", "/ws/**/.kiro/**", "/ws/AGENTS.md", ...]}]}
 ```
 
-- `read`/`write` are deliberately **not** in `allowedTools`: a trusted tool ignores `allowedPaths`. Left out, a call on an
-  allowed path runs, and any other path needs an approval, which a headless run cannot give: it is refused with "tool
-  permission approval is not supported in non-interactive mode". `..` traversal is refused too.
-- `write` only under the workspace (nowhere without one), so inputs are read-only and nothing is created beside them. The
-  org directory is a hard deny for it (also over kiro's "the working directory is readable" rule): org files are written
-  with the hirearchy tool (`org_write`) only.
-- `read` under workspace + inputs + the organization (read-only), with **no** `deniedPaths` (a deny would beat the allow).
-  Other paths, e.g. `/etc/hosts`, are refused. The built-in `read` is the only `read` such an agent sees, so this is how it
-  reads a teammate's file by absolute path; `org_read` is the relative-path alternative. The deny is skipped for `write`
-  too when the workspace is inside the org.
-- Agents without built-in `read`/`write` keep the shared per-org profile. A legacy charter with only `read`, no workspace and
-  no `inputs` key keeps today's unconfined read; give it `inputs: []` (or real inputs) to confine it. A confined parent never
-  hands down an unconfined `read`.
+- Read only under workspace + inputs + the organization, for every kiro tool that reads (the `code` tool included): the explicit deny over `/**` refuses everything else, e.g. `/etc/hosts`.
+  The built-in read tools are how such an agent reads a teammate's file by absolute path; `org_read` is the relative-path alternative.
+- Write only under the workspace (nowhere without one), so inputs are read-only and nothing is created beside them. The org directory is denied for kiro's write tools
+  (unless the workspace is inside it): org files are written with the hirearchy tool (`org_write`) only.
+- Never `.kiro/`, `.git/`, `.vscode/` or `AGENTS.md`, anywhere in the workspace: explicit profile denies refuse them. (Whether kiro's own protection of these folders also
+  applies outside its root was not probed; the denies make the refusal explicit either way.) A granted `shell` running `git` is not affected.
+- The search tools (`grep_search`, `file_search`) cannot search the workspace under this confinement; use `list_directory` and `read_file`, or `grep -r` with `shell`.
+- The workspace's `.kiro/` folder, `AGENTS.md`, hooks and `mcp.json` are never loaded. The agent has no user memory, skills, MCP servers other than hirearchy's, sub-agents, workflows, powers
+  or knowledge.
+- Paths that contain `{`, `}`, a backslash, a control character or `+(`, `@(`, `!(` are refused (kiro's patterns cannot match them literally, so the access could not be confined): rename the folder.
+  `[ ] * ?` are escaped. More than 29 inputs are refused too (kiro compiles at most 63 path exclusions into one rule): give the agent a common parent folder.
+- A charter without `inputs` reads only the organization. A confined parent never hands down a wider `read`.
 
 **Enforced by hirearchy:** `report(artifacts=...)` takes org paths (relative or absolute) and absolute paths inside the
 reporter's **own** workspace, annotated as before (words, modified, "NOT modified since..."); anything else outside the
@@ -709,7 +733,7 @@ org is refused without probing. `read` takes relative org paths, and absolute pa
 inputs, and the workspace of any agent in its subtree (a manager can verify what its team made); everything else outside
 the org is refused. Root's `read` is unchanged (organization only).
 
-**Only instructed:** `shell` cannot be confined (kiro has no path rule for it; it can write anywhere its OS user can), so an
+**Only instructed:** a `web_fetch` grant reaches the internet and the machine's local network, loopback and the link-local metadata address included; grant it sparingly on cloud hosts (a network sandbox would be the real fix). `shell` cannot be confined (kiro has no path rule for it; it can write anywhere its OS user can), so an
 agent that holds it (engineer, tester, code-reviewer, and a manager that holds what its code team holds) is told the rule in its charter and prompt, and the plan says so (`shell-unconfined` warning, "shell NOT
 confined" in its `Access:` line). The prompt's Files section (workspace, inputs, "never create org files in the workspace",
 "report workspace artifacts by absolute path") is guidance on top of the enforcement above. Symlinks inside a workspace that
@@ -722,9 +746,12 @@ without `--keep`, `upgrade-rules` without `--dry-run`, `kiro-profile`) first pri
 
 - Everything is local stdio with no network listener. Identity is enforced by the process environment, not by
   authentication: anything that can run `hirearchy mcp` with `ORG_AGENT` set can act as that agent.
-- The hirearchy write rules apply to the hirearchy tools. kiro's built-in `write` is confined to the agent's workspace and its
-  `read` to workspace, inputs and the organization (read-only) by its profile (see [Workspaces, inputs and confinement](#workspaces-inputs-and-confinement)); `shell` is not:
-  an agent that holds it can touch anything its OS user can. Grant it only to agents that need it, with a `workspace`.
+- The hirearchy write rules apply to the hirearchy tools. kiro's built-in write tools are confined to the agent's workspace and its
+  read tools to workspace, inputs and the organization (read-only) by its profile (see [Workspaces, inputs and confinement](#workspaces-inputs-and-confinement)); `shell` is not:
+  an agent that holds it can touch anything its OS user can, and sees the scheduler's environment, `KIRO_API_KEY` included. Grant it only to agents that need it, with a `workspace`.
+- A `web_fetch` grant reaches the local network too (loopback and the metadata address included).
+- The run environment drops `ASBX_KIRO_MANDATORY_MCPS`, `KIRO_DUMP_*`, `KIRO_CHAT_LOG_FILE` and `KIRO_FEATURE_*` (they would add MCP servers to every agent or write transcripts elsewhere);
+  every other variable of the scheduler's environment reaches kiro-cli.
 
 ## Architecture
 
@@ -767,6 +794,8 @@ uv run pytest -q src/hirearchy/mail      # the tests of one package (they live n
 uv run pytest -q tests/golden         # only the golden (characterization) snapshots, about 15 s
 uv run pytest -q tests/architecture   # the structural rules (or `-m "not architecture"` to leave them out)
 uv run pytest -q tests/integration --run-integration    # + the real-kiro tests (or HIREARCHY_RUN_INTEGRATION=1)
+#   the real-kiro tests keep kiro's state in HIREARCHY_STATE_DIR inside their tmp dir and never write ~/.kiro; they use the default model
+#   unless HIREARCHY_IT_MODEL is set (claude-haiku-4.5 for a cheap run)
 HIREARCHY_UPDATE_GOLDEN=1 uv run pytest -q tests/golden    # regenerate the golden files, deliberately (review the git diff)
 uv run python scripts/static_checks.py mypy|imports     # one static check
 uv run python -m tests.architecture.lint                # import contracts only: generates .importlinter (git-ignored) and runs it + the pyproject ones
@@ -840,17 +869,17 @@ is a deliberate change of what callers can rely on: `uv run python -m hirearchy.
 **Unit tests (default).** They use a deterministic fake agent (`tests/testkit/fake_agent.py`) in place of kiro, and the autouse fixtures above keep them off your `$HOME`.
 A default run starts zero real-LLM runs.
 
-**Integration tests (opt-in).** `tests/integration/test_real_kiro.py` runs tiny orgs (3 tests, one agent run each,
-about 45 s and 3 LLM calls in total) against the real `kiro-cli` and your kiro login: that the agent and the scheduler's
+**Integration tests (opt-in).** `tests/integration/test_real_kiro.py` runs tiny orgs (4 tests, one agent run each,
+about a minute and 4 LLM calls in total) against the real `kiro-cli` and your kiro login: that the agent and the scheduler's
 run id reach the MCP server's events (`ORG_RUN_ID`), that the built-in `read` reads the org but nothing outside it, and
-that the built-in `write` and hirearchy's `org_write` work side by side. They assert on files and events, not on wording.
+that the built-in `write` and hirearchy's `org_write` work side by side, and (V3) that an agent reaches the hirearchy tools while a file outside its folders and a shell it was not granted are refused. They assert on files and events, not on wording.
 
 * Cost: real model calls, billed to your kiro account like any other run. `HIREARCHY_IT_MODEL=<model>` picks a cheaper one
   (default: the system default model, `claude-sonnet-5.5`).
 * Skipped (not failed) when `kiro-cli` is not on `PATH`. Each run is killed after 300 s, the scheduler after 480 s.
-* Safety (`tests/testkit/kiro_sandbox.py`): the org lives in the test's tmp dir. Before the test the md5 of every file in
+* Safety (`tests/testkit/kiro_sandbox.py`): the org lives in the test's tmp dir and kiro's state (`HIREARCHY_STATE_DIR`) below it. Before the test the md5 of every file in
   `~/.kiro/agents/` and of `~/.kiro/settings/mcp.json` is taken (hashed only, never read out or printed). After it, pass or
   fail, only the per-org profiles whose `ORG_ROOT` is inside that tmp dir are deleted, every process whose command line
-  mentions the tmp dir is killed, and the test fails if any of those md5s changed. No other organization is touched.
+  mentions the tmp dir is killed, and the test fails if any of those md5s changed or if a profile of the sandbox had to be deleted from `~/.kiro/agents` (hirearchy must not write there). No other organization is touched.
 * Possible flakiness: model behaviour (a run that does not follow the task fails the test, the run log tail is in the
   assertion message), kiro or network outages, a machine so loaded that a run exceeds its timeout.

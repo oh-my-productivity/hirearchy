@@ -105,6 +105,8 @@ def test_readme_states_the_names_and_the_confinement_after_round_f():
     section = README.split("### Workspaces, inputs and confinement")[1].split("## Security notes")[0]
     assert "`org_write`" in section and "`org_read`" in section and "shadow" in section
     assert "workspace + inputs + the organization" in section
-    assert '"write": {"allowedPaths": ["/ws/**"], "deniedPaths": ["/org", "/org/**"]}' in section  # write: org denied
-    assert 'read":  {"allowedPaths": ["/ws", "/ws/**", "/inputs", "/inputs/**", "/org", "/org/**"], "deniedPaths": []}' in section
+    assert '"tools": ["@hirearchy", "read", "write"' in section  # the V3 selector
+    assert '"capability": "fs_write", "effect": "deny"' in section and ".kiro" in section  # write: org and protected folders denied
+    assert '"capability": "fs_read", "effect": "allow", "match": ["/ws", "/ws/**", "/inputs", "/inputs/**", "/org", "/org/**"]' in section
+    assert "allowedTools" not in section and "toolsSettings" not in section and "allowedPaths" not in section  # no legacy recipe
     assert "**absolute** path" in section and "Neither reaches the org directory" not in section
