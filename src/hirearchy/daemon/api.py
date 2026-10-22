@@ -14,6 +14,7 @@ __all__ = [
     "EXIT_FILE",
     "ExitMarker",
     "FINISHED",
+    "REFUSED_START",
     "SchedulerCommand",
     "SchedulerControl",
     "SchedulerLock",
@@ -23,6 +24,7 @@ __all__ = [
 
 EXIT_FILE = ".runtime/scheduler.exit"  # why the last scheduler exited by itself (until-done); removed when one starts
 FINISHED = "finished: no open tasks"
+REFUSED_START = "refused to start: "  # begins the exit marker of a scheduler that refused to start; shown while root has open tasks
 
 
 class SchedulerState(NamedTuple):
@@ -50,7 +52,8 @@ class SchedulerStatus(Protocol):
         ...
 
     def exit_reason(self) -> str:
-        """Why the last scheduler exited by itself, while that is still true (root has no outstanding task); else ``""``."""
+        """Why the last scheduler exited by itself, while that is still true (root has no outstanding task), or a reason that starts with
+        ``REFUSED_START`` (true until a scheduler starts, so it is shown while root has open tasks too); else ``""``."""
         ...
 
 

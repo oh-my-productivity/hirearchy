@@ -40,7 +40,7 @@ from ._site import RuntimeLaunchSite, ScrubbedLaunchEnvironment
 from ._status import PidFileSchedulerStatus
 from ._stop import SignalSchedulerStopper
 from ._watch import PidFileStartupWatch
-from .api import ExitMarker, SchedulerCommand, SchedulerControl, SchedulerLock, SchedulerState, SchedulerStatus
+from .api import REFUSED_START, ExitMarker, SchedulerCommand, SchedulerControl, SchedulerLock, SchedulerState, SchedulerStatus
 
 LIVE = ("sh", "-c", "sleep 60; :")  # a process that lives until it is signalled; the semicolon keeps the shell from replacing itself with ``sleep``
 LIVE_TEXT = " ".join(LIVE)  # how the process table shows it, before the words that follow
@@ -71,7 +71,7 @@ class FakeSchedulerStatus(SchedulerStatus):
         return describe_state(self.current, self.exit_reason, self.waiting)
 
     def exit_reason(self) -> str:
-        return self.reason if self.reason and not self.open_tasks else ""
+        return self.reason if self.reason and (self.reason.startswith(REFUSED_START) or not self.open_tasks) else ""
 
 
 class FakeSchedulerControl(SchedulerControl):

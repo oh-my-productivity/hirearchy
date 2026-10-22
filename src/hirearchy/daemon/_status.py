@@ -12,7 +12,7 @@ from ._describe import describe_state
 from ._files import pidfile_of
 from ._ports import Children, SchedulerRecognizer
 from ._refusals import SINCE_FORMAT
-from .api import ExitMarker, SchedulerState, SchedulerStatus
+from .api import REFUSED_START, ExitMarker, SchedulerState, SchedulerStatus
 
 
 class PidFileSchedulerStatus(SchedulerStatus):
@@ -59,6 +59,6 @@ class PidFileSchedulerStatus(SchedulerStatus):
         return describe_state(self.state(), self.exit_reason, self._waiting)
 
     def exit_reason(self) -> str:
-        """Why the scheduler last exited by itself, while that is still true (root has no open task); else ''."""
+        """Why the scheduler last exited by itself, while that is still true (root has no open task), or a refused start (always); else ''."""
         reason = self._marker.read()
-        return reason if reason and not self._tasks.outstanding(ROOT) else ""
+        return reason if reason and (reason.startswith(REFUSED_START) or not self._tasks.outstanding(ROOT)) else ""

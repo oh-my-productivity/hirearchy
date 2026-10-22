@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from hirearchy.attention import Waiting
-from hirearchy.daemon import FINISHED, SchedulerState, SchedulerStatus
+from hirearchy.daemon import FINISHED, REFUSED_START, SchedulerState, SchedulerStatus
 from hirearchy.daemon.testing import IMPLEMENTATIONS, LIVE_TEXT, SINCE, StatusWorld
 
 from ._support import build, worlds
@@ -118,6 +118,21 @@ def test_the_reason_is_only_true_while_root_has_no_task_that_was_not_answered(w:
     assert w.status.describe() == "scheduler: stopped"
     w.open_task(False)
     assert w.status.exit_reason() == FINISHED
+
+
+REFUSAL = f"{REFUSED_START}kiro-cli is not ready: no key"
+
+
+def test_a_refused_start_is_the_stopped_reason_even_while_root_has_an_open_task(w: StatusWorld) -> None:
+    w.mark_exit(REFUSAL + "\n")
+    w.open_task(True)
+    assert w.status.exit_reason() == REFUSAL
+
+
+def test_a_refused_start_is_described_while_root_has_an_open_task(w: StatusWorld) -> None:
+    w.mark_exit(REFUSAL + "\n")
+    w.open_task(True)
+    assert w.status.describe() == f"scheduler: stopped ({REFUSAL})"
 
 
 def test_the_reason_is_stripped(w: StatusWorld) -> None:

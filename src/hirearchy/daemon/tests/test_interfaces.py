@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import inspect
 
-from hirearchy.daemon import EXIT_FILE, FINISHED, ExitMarker, SchedulerCommand, SchedulerControl, SchedulerLock, SchedulerState, SchedulerStatus
+from hirearchy.daemon import EXIT_FILE, FINISHED, REFUSED_START, ExitMarker, SchedulerCommand, SchedulerControl, SchedulerLock, SchedulerState, SchedulerStatus
 from hirearchy.daemon import api
 from hirearchy.daemon._children import ChildRegistry
 from hirearchy.daemon._command import VenvSchedulerCommand
@@ -41,11 +41,12 @@ def test_the_scheduler_state_is_a_plain_value_with_defaults() -> None:
 
 def test_the_constants_are_what_the_files_and_the_messages_say() -> None:
     assert EXIT_FILE == ".runtime/scheduler.exit" and FINISHED == "finished: no open tasks"
+    assert REFUSED_START == "refused to start: "
 
 
 def test_the_public_surface_is_exactly_the_api() -> None:
     assert sorted(api.__all__) == sorted(
-        ["EXIT_FILE", "ExitMarker", "FINISHED", "SchedulerCommand", "SchedulerControl", "SchedulerLock", "SchedulerState", "SchedulerStatus"]
+        ["EXIT_FILE", "ExitMarker", "FINISHED", "REFUSED_START", "SchedulerCommand", "SchedulerControl", "SchedulerLock", "SchedulerState", "SchedulerStatus"]
     )
 
 
