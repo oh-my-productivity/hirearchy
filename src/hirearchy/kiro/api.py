@@ -17,8 +17,12 @@ from ..kernel import JsonObject, OrgError
 __all__ = [
     "CHARTER_TOOLS",
     "FILE_TOOLS",
+    "READINESS_TIMEOUT",
+    "START_DEADLINE",
+    "CliResult",
     "Confinement",
     "ConfinementPolicy",
+    "KiroCli",
     "KiroHomeAudit",
     "KiroPlaces",
     "KiroRunRefused",
@@ -28,10 +32,15 @@ __all__ = [
     "ProfileStore",
     "RunCommand",
     "RunCommandBuilder",
+    "RuntimeReadiness",
 ]
 
 CHARTER_TOOLS = ("read", "write", "shell", "web_search", "web_fetch")  # the charter names kiro maps (design 4.2)
 FILE_TOOLS = ("read", "write")  # kiro built-ins whose reach can be limited by path (shell cannot)
+START_DEADLINE = 60.0  # seconds a run has to emit ``runStarted`` before the launcher gives up (design 5.1)
+# Seconds one kiro-cli call of the readiness check may take (design 9). Three calls plus 2.5 s must fit in the daemon's startup window:
+# pinned by app/tests/test_wire_kiro.py::test_readiness_fits_in_the_start_window (3 * READINESS_TIMEOUT + 2.5 <= STARTUP_SECONDS).
+READINESS_TIMEOUT = 2.5
 
 
 @dataclass(frozen=True)
@@ -156,4 +165,34 @@ class KiroStateDirs(Protocol):
 class KiroHomeAudit(Protocol):
     def planted(self, home: Path) -> list[str]:
         """What ``home`` holds that kiro-cli would load into every agent and hirearchy did not put there, relative to ``home`` and sorted."""
+        ...
+
+
+@dataclass(frozen=True)
+class CliResult:
+    """What a short kiro-cli command answered: its exit code and its output (both streams, decoded with replacement, at most 64 KB)."""
+
+    code: int
+    output: str
+
+
+@runtime_checkable
+class KiroCli(Protocol):
+    def run(self, argv: Sequence[str], env: Mapping[str, str], timeout: float) -> CliResult | None:
+        """Run a short kiro-cli command with stdin closed and ``env`` as its whole environment, in its own session.
+
+        ``None`` when it cannot start or does not finish within ``timeout`` seconds (its whole process group is killed then)."""
+        ...
+
+
+@runtime_checkable
+class RuntimeReadiness(Protocol):
+    def state_problem(self) -> str | None:
+        """Why the kiro state cannot be used (places, placement, the kiro home and its audit; design 9 steps 1-3) as one line, else ``None``.
+        Makes no kiro-cli call and never raises."""
+        ...
+
+    def check(self, kiro_bin: str) -> str | None:
+        """``state_problem``, then whether ``kiro_bin`` is usable, offers the V3 engine and has credentials (design 9 steps 1-6) as one
+        line, else ``None``. Never raises."""
         ...

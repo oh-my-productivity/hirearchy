@@ -18,15 +18,20 @@ from ..access.testing import charters_on_disk
 from ..agents.testing import fs_agents
 from ..kernel import JsonObject, OrgPaths
 from ..kernel.testing import DictEnvironment, fs_atomic_writer, system_clock
+from ._cli import SubprocessKiroCli
 from ._confinement import KiroConfinementPolicy
 from ._mcp_locator import VenvMcpServerLocator
 from ._profile_document import parse_profile, render_profile
 from ._places import StateDirPlaces
 from ._profiles import FsProfileStore
 from ._provisioner import OrgProfileProvisioner
+from ._readiness import KiroReadiness
 from ._runner import KiroRunCommandBuilder
 from ._state import FsKiroState
-from .api import ConfinementPolicy, KiroHomeAudit, KiroPlaces, KiroStateDirs, McpServerLocator, ProfileProvisioner, ProfileStore, RunCommandBuilder
+from .api import (
+    CliResult, ConfinementPolicy, KiroCli, KiroHomeAudit, KiroPlaces, KiroStateDirs, McpServerLocator, ProfileProvisioner, ProfileStore,
+    RunCommandBuilder, RuntimeReadiness,
+)
 
 PURE = {"ConfinementPolicy"}  # a pure function of its arguments: one implementation, no fake
 
@@ -118,6 +123,32 @@ class MemoryKiroState(KiroStateDirs, KiroHomeAudit):
         return sorted(self.planted_files.get(home, ()))
 
 
+class ScriptedKiroCli(KiroCli):
+    """Answers by argv from a table (``None``, i.e. "cannot start or overran", for an argv not in it); records every call."""
+
+    def __init__(self, answers: Mapping[tuple[str, ...], CliResult | None]) -> None:
+        self._answers = dict(answers)
+        self.calls: list[tuple[tuple[str, ...], dict[str, str], float]] = []  # (argv, env, timeout)
+
+    def run(self, argv: Sequence[str], env: Mapping[str, str], timeout: float) -> CliResult | None:
+        self.calls.append((tuple(argv), dict(env), timeout))
+        return self._answers.get(tuple(argv))
+
+
+class FixedReadiness(RuntimeReadiness):
+    """``check`` answers ``problem`` and ``state_problem`` answers ``state``, whatever the world."""
+
+    def __init__(self, problem: str | None, state: str | None = None) -> None:
+        self._problem = problem
+        self._state = state
+
+    def state_problem(self) -> str | None:
+        return self._state
+
+    def check(self, kiro_bin: str) -> str | None:
+        return self._problem
+
+
 # ------------------------------------------------------------------------------ harnesses and the registry
 
 
@@ -126,6 +157,22 @@ class PlacesHarness:
     places: KiroPlaces  # a valid world
     broken: KiroPlaces  # the same kind of places in a world with a problem
     base: Path  # a directory below which nothing may be created by computing places
+
+
+@dataclass(frozen=True)
+class CliHarness:
+    cli: KiroCli
+    succeeds: list[str]  # an argv that exits 0 and prints "hello"
+    fails: list[str]  # exits 3 and prints "bad"
+    missing: list[str]  # cannot start
+    hangs: list[str]  # does not finish
+
+
+@dataclass(frozen=True)
+class ReadinessHarness:
+    ready: RuntimeReadiness  # a world in which kiro-cli is ready
+    broken: RuntimeReadiness  # a world with a problem (``state_problem`` and ``check`` both answer it)
+    kiro_bin: str  # what to pass to ``check``
 
 
 @dataclass(frozen=True)
@@ -211,6 +258,75 @@ def memory_state(tmp_path: Path) -> StateHarness:
         lambda p: p in fake.private,
         fake.plant,
     )
+
+
+def _script(path: Path, body: str) -> list[str]:
+    path.write_text("#!/bin/sh\n" + body, encoding="utf-8")
+    path.chmod(path.stat().st_mode | stat.S_IXUSR)
+    return [str(path)]
+
+
+def subprocess_cli(tmp_path: Path) -> CliHarness:
+    return CliHarness(
+        SubprocessKiroCli(),
+        _script(tmp_path / "succeeds", "echo hello\n"),
+        _script(tmp_path / "fails", "echo bad >&2\nexit 3\n"),
+        [str(tmp_path / "missing")],
+        _script(tmp_path / "hangs", "exec sleep 30\n"),
+    )
+
+
+def scripted_cli(tmp_path: Path) -> CliHarness:
+    succeeds, fails, missing, hangs = ["succeeds"], ["fails"], ["missing"], ["hangs"]
+    answers: dict[tuple[str, ...], CliResult | None] = {("succeeds",): CliResult(0, "hello\n"), ("fails",): CliResult(3, "bad\n"), ("missing",): None, ("hangs",): None}
+    return CliHarness(ScriptedKiroCli(answers), succeeds, fails, missing, hangs)
+
+
+_FLAGS = "Usage: kiro-cli chat [OPTIONS]\n  --v3  --require-mcp-startup\n  --output-format <FORMAT>\n"
+_READY = {
+    ("kiro-cli", "--version"): CliResult(0, "kiro-cli 2.33.0\n"),
+    ("kiro-cli", "chat", "--help"): CliResult(0, _FLAGS),
+    ("kiro-cli", "whoami"): CliResult(0, "Logged in\n"),
+}
+
+
+def readiness_scripted(tmp_path: Path) -> ReadinessHarness:
+    from ..access.testing import StaticAccess
+
+    access = StaticAccess(tmp_path / "org")
+    environment = DictEnvironment({"PATH": "/usr/bin"}, home=tmp_path / "user")
+
+    def readiness(problem: str | None) -> RuntimeReadiness:
+        state = MemoryKiroState()
+        return KiroReadiness(
+            OrgPaths(access.root), access.agents, access, FixedKiroPlaces(tmp_path / "state", problem), state, state,
+            ScriptedKiroCli(_READY), environment,
+        )
+
+    return ReadinessHarness(readiness(None), readiness("the places are bad"), "kiro-cli")
+
+
+def readiness_on_disk(tmp_path: Path) -> ReadinessHarness:
+    """The real class over the files of an organization directory and shell scripts as kiro-cli."""
+    access, files = charters_on_disk(tmp_path), fs_agents(tmp_path)
+    kiro = _script(
+        tmp_path.parent / f"{tmp_path.name}-kiro-cli",
+        'case "$1" in\n  --version) echo "kiro-cli 2.33.0";;\n  chat) echo "--v3 --require-mcp-startup --output-format";;\n  whoami) echo ok;;\n  *) exit 9;;\nesac\n',
+    )[0]
+    home = tmp_path.parent / f"{tmp_path.name}-home"  # outside the organization, like the other harnesses
+
+    def readiness(state_dir: str) -> RuntimeReadiness:
+        environment = DictEnvironment({"PATH": "/usr/bin:/bin", "HIREARCHY_STATE_DIR": state_dir}, home=home)
+        state = FsKiroState(system_clock(tmp_path))
+        places = StateDirPlaces(OrgPaths(tmp_path), environment, "linux")
+        return KiroReadiness(OrgPaths(tmp_path), files.directory, access.scopes, places, state, state, SubprocessKiroCli(), environment)
+
+    good = str(tmp_path.parent / f"{tmp_path.name}-state")
+    return ReadinessHarness(readiness(good), readiness("relative/state"), kiro)
+
+
+def fixed_readiness(tmp_path: Path) -> ReadinessHarness:
+    return ReadinessHarness(FixedReadiness(None), FixedReadiness("kiro-cli is not ready", "the kiro state is bad"), "kiro-cli")
 
 
 def kiro_confinement(tmp_path: Path) -> ConfinementPolicy:
@@ -325,6 +441,8 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     KiroPlaces: [state_dir_places, fixed_places],
     KiroStateDirs: [fs_state, memory_state],
     KiroHomeAudit: [fs_state, memory_state],
+    KiroCli: [subprocess_cli, scripted_cli],
+    RuntimeReadiness: [readiness_scripted, readiness_on_disk, fixed_readiness],
     ProfileStore: [fs_profile_store, memory_profile_store],
     McpServerLocator: [venv_locator, static_locator],
     ProfileProvisioner: [provisioner_on_disk, provisioner_in_memory],

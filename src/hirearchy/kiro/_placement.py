@@ -6,6 +6,8 @@ import os
 from collections.abc import Sequence
 from pathlib import Path
 
+from ..access import AccessScopes
+
 
 def _real(path: Path) -> Path:
     return Path(os.path.realpath(path))  # follows links (reads them, writes nothing): the comparison is between real locations
@@ -31,3 +33,17 @@ def placement_problem(roots: Sequence[Path], readable: Sequence[tuple[Path, str]
                     "kiro keeps there; set HIREARCHY_STATE_DIR to a folder outside every workspace, input and the organization"
                 )
     return None
+
+
+def readable_places(org_root: Path, scopes: AccessScopes, addr: str) -> list[tuple[Path, str]]:
+    """Every place ``addr``'s kiro run can read, each with what it is (for the messages): the organization, the agent's workspace and
+    inputs, and the other folders hirearchy's own ``read`` shows it (the workspaces of its subtree)."""
+    found: dict[Path, str] = {org_root: "organization"}
+    workspace = scopes.workspace_of(addr)
+    if workspace is not None:
+        found.setdefault(workspace, f"workspace of {addr}")
+    for path in scopes.inputs_of(addr):
+        found.setdefault(path, f"input of {addr}")
+    for path in scopes.readable_roots(addr):
+        found.setdefault(path, f"readable folder of {addr}")
+    return list(found.items())
