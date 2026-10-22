@@ -16,7 +16,7 @@ from ._fs import NOT_A_FILE, FsSkillStore
 from ._install import CopySkillInstaller
 from ._source import NOT_FOUND, PackagedSkillSource
 from ._target import SKILL_FILE, SKILL_NAME, default_base, target_in
-from .api import SkillInstaller, SkillSource, SkillStore
+from .api import SkillCheck, SkillInstaller, SkillSource, SkillStore
 
 PACKAGED_TEXT = "---\nname: hirearchy\n---\n# the packaged skill\n\nnaïve ✓\n"  # not ASCII on purpose: the file is UTF-8
 
@@ -191,4 +191,5 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     SkillSource: [wheel_source, checkout_source, memory_source],
     SkillStore: [fs_store, memory_store],
     SkillInstaller: [fs_installer, memory_installer],
+    SkillCheck: [fs_installer, memory_installer],
 }

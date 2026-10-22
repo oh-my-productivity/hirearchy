@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..skill import SkillInstaller, SkillSource, SkillStore
+from ..skill import SkillCheck, SkillInstaller, SkillSource, SkillStore
 
 STEP: str | None = "A-skill"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
@@ -15,3 +15,4 @@ class Fields:
     skill_source: SkillSource
     skill_store: SkillStore
     skill_installer: SkillInstaller
+    skill_check: SkillCheck

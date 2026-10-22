@@ -5,11 +5,13 @@ from __future__ import annotations
 from pathlib import Path
 
 from ..kernel import OrgError
-from .api import SkillInstaller, SkillSource, SkillStore
+from .api import SkillCheck, SkillInstaller, SkillSource, SkillStore
 
 
-class CopySkillInstaller(SkillInstaller):
-    """Copy the skill of a ``SkillSource`` into a ``SkillStore``: identical is left alone, different needs ``force``."""
+class CopySkillInstaller(SkillInstaller, SkillCheck):
+    """Copy the skill of a ``SkillSource`` into a ``SkillStore``: identical is left alone, different needs ``force``.
+
+    It also says when the installed copy is out of date (``stale``), reading both and writing nothing."""
 
     def __init__(self, source: SkillSource, store: SkillStore) -> None:
         self._source = source
@@ -28,3 +30,12 @@ class CopySkillInstaller(SkillInstaller):
                                "Use --force to replace it")
         self._store.write(base, text)
         return f"{target}\ninstalled the hirearchy skill"
+
+    def stale(self, dest: Path | None = None) -> Path | None:
+        try:
+            existing = self._store.read_existing(dest)
+            if existing is None or existing == self._source.read():
+                return None
+            return self._store.target(dest)
+        except (OrgError, OSError, UnicodeDecodeError):
+            return None

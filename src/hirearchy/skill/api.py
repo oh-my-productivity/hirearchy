@@ -2,6 +2,7 @@
 
 Three roles, one small interface each: where the packaged text comes from (``SkillSource``), where a skills directory keeps its
 copy (``SkillStore``), and the decision between them (``SkillInstaller``: install, leave alone, or refuse to overwrite).
+``SkillCheck`` is the read-only side of the same decision: is the installed copy out of date?
 """
 
 from __future__ import annotations
@@ -9,7 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-__all__ = ["SkillInstaller", "SkillSource", "SkillStore"]
+__all__ = ["SkillCheck", "SkillInstaller", "SkillSource", "SkillStore"]
 
 
 @runtime_checkable
@@ -40,4 +41,12 @@ class SkillInstaller(Protocol):
         """Copy the skill to ``<dest>/hirearchy/SKILL.md`` (default dest: ``~/.kiro/skills``). Returns what to print.
 
         An identical file is left alone; a different existing file is only replaced with ``force`` (``OrgError`` otherwise)."""
+        ...
+
+
+@runtime_checkable
+class SkillCheck(Protocol):
+    def stale(self, dest: Path | None = None) -> Path | None:
+        """The installed copy (``<dest>/hirearchy/SKILL.md``; default dest ``~/.kiro/skills``) when it exists and differs from the packaged
+        skill; None when nothing is installed, when it is identical, or when either cannot be read (the check never raises)."""
         ...
