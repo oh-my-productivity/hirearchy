@@ -1,6 +1,6 @@
-"""Contract of ``ServiceSteps``: what root is told to do next after a rejection or an amendment is advice, never an error for a case it cannot place.
+"""Contract of ``ServiceSteps``: what root is told to do next after a rejection, an amendment or a rework is advice, never an error for a case it cannot place.
 
-Every implementation is built over an organization with no service at all: both methods answer ``""`` for what they cannot place. The texts of
+Every implementation is built over an organization with no service at all: each method answers ``""`` for what they cannot place. The texts of
 a populated world are ``test_steps.py``'s."""
 
 from __future__ import annotations
@@ -30,3 +30,9 @@ def test_a_note_it_cannot_place_has_no_feedback_step(steps: ServiceSteps) -> Non
 
 def test_a_service_without_a_contract_has_no_amendment_step(steps: ServiceSteps) -> None:
     assert steps.amendment_step("root", SERVICE) == ""
+
+
+def test_a_rework_it_cannot_place_has_no_rework_step(steps: ServiceSteps) -> None:
+    lost = Message(sender="root", to="ceo", type="task", body="x", service=SERVICE, revises="20260101T000000000000-root-0001", source="relayed")
+    assert steps.rework_step(lost) == ""
+    assert steps.rework_step(Message(sender="root", to="ceo", type="task", body="x", service=SERVICE, source="relayed")) == ""

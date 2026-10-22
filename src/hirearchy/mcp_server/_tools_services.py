@@ -176,8 +176,9 @@ class ServiceTools(ToolGroup):
     def _requested(self, me: str, msg: Message, service: str, revises: str | None) -> str:
         tail = "Call start() if the scheduler is not running." if me == ROOT else f"Your budget is now {self._budgets().budget(me)}."
         total = self._reports().case_total(msg) if revises else ""
+        asked = _step(lambda: self._steps().rework_step(msg)) if revises and me == ROOT else ""  # a relayed rework repeats the client questions
         return (f"requested service `{service}` from {msg.to}: task {msg.id}, budget {msg.budget} "
-                f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}" + (f"\n{total}" if total else ""))
+                f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}" + (f"\n{total}" if total else "") + asked)
 
     def _register_root_request(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()

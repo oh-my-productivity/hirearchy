@@ -305,8 +305,9 @@ class ServiceReports(Protocol):
 
 @runtime_checkable
 class ServiceSteps(Protocol):
-    """What root is told to do next after it records a rejection or amends a contract: advice that names the one question to ask the user and
-    the call that records their yes. Read-only: it never writes, and root is the only one who reads it (an agent never sees a step)."""
+    """What root is told to do next after it records a rejection, amends a contract or sends a rework: advice that names the one question to
+    ask the user and the call that records their yes, or the questions the client was already asked. Read-only: it never writes, and root is the
+    only one who reads it (an agent never sees a step)."""
 
     def feedback_step(self, note: Message) -> str:
         """What root does next after recording ``note``, a verdict note: for a human-tier rejection of a service request, the one question naming
@@ -317,6 +318,12 @@ class ServiceSteps(Protocol):
         """After root amended the contract of ``owner``'s ``service``: when the latest version added amended criteria the client has not confirmed,
         their ids and, while the latest human-tier rejection of the service has no answer, what records the user's yes; "" when every added
         criterion is confirmed or the service has no human-tier rejection. ``OrgError`` for an unknown ``owner``."""
+        ...
+
+    def rework_step(self, task: Message) -> str:
+        """For a rework root just sent with ``source: relayed`` (``task``, a request that ``revises`` another), the client questions of the latest
+        result of the request it revises, in one sentence that tells root to ask the user (a rework does not answer them); "" for a rework the
+        user asked for, a result without a ``Questions for the client:`` block, or a request it cannot place. A nudge: nothing is refused."""
         ...
 
 

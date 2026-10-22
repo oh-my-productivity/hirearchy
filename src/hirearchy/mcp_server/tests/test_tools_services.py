@@ -216,6 +216,7 @@ def test_the_agents_feedback_passes_nothing_but_the_verdict() -> None:
 
 FEEDBACK_STEP = "NEXT: ask the user one question naming R1."
 AMENDMENT_STEP = "Not client-confirmed: C3. NEXT: ask the user."
+REWORK_STEP = "old's result asked the client: Keep Marta's row?. Ask the user these questions, unless the user asked for this change: a rework does not answer them."
 
 
 def test_root_feedback_reply_marks_an_own_criterion_and_names_the_next_step() -> None:
@@ -271,3 +272,29 @@ def test_an_agent_clients_replies_carry_no_step() -> None:
     assert call(server, "feedback", task_id="t1", verdict="reject", note="No.") == "feedback reject recorded on t1 for ceo (message fb-1); it does not wake ceo"
     assert call(server, "define_service", owner="ceo/eng", name="brief", add_acceptance=["x"]) == "defined brief"
     assert steps.asked == []
+
+
+def test_a_relayed_rework_reply_repeats_the_client_questions() -> None:
+    steps = ScriptedSteps(rework=REWORK_STEP)
+    group, _ = tools(steps=steps)
+    out = call(serve(group, ROOT), "request", service="brief", revises="old")
+    assert out.endswith(f"Call start() if the scheduler is not running.\ncase total: 3 of 9\n{REWORK_STEP}")  # after the case total
+    assert steps.asked == [("rework", "req-1")]
+    plain = call(serve(group, ROOT), "request", service="brief")
+    assert "asked the client" not in plain and steps.asked == [("rework", "req-1")]  # not a rework: no step is asked
+    bare = call(serve(tools(steps=ScriptedSteps())[0], ROOT), "request", service="brief", revises="old")
+    assert bare.endswith("Call start() if the scheduler is not running.\ncase total: 3 of 9")  # nothing to repeat: the reply is as before
+
+
+def test_an_agents_rework_reply_carries_no_client_questions() -> None:
+    steps = ScriptedSteps(rework=REWORK_STEP)
+    out = call(serve(tools(steps=steps)[0], "ceo"), "request", service="brief", revises="old")
+    assert out.endswith("Your budget is now 5.\ncase total: 3 of 9") and steps.asked == []
+
+
+@pytest.mark.parametrize("error", [OrgError("the result cannot be read"), OSError("disk")], ids=["OrgError", "OSError"])
+def test_a_failing_rework_step_never_fails_the_request(error: BaseException) -> None:
+    group, commands = tools(steps=ScriptedSteps(rework=REWORK_STEP, raises=error))
+    out = call(serve(group, ROOT), "request", service="brief", revises="old")
+    assert out.endswith("Call start() if the scheduler is not running.\ncase total: 3 of 9")
+    assert [c[0] for c in commands.calls] == ["request"]  # the rework was sent: the reply is what happened

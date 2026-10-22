@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ..agents import AgentDirectory
-from ..kernel import Message, verdict_tier
+from ..kernel import Message, client_questions, clip_line, latest_results, verdict_tier
 from ..mail import MailboxReader
 from ..services import ServiceCatalog
 from .api import CaseHistory, ServiceSteps, confirmed_criteria, regressions
@@ -19,6 +19,12 @@ NO_YES_YET = (
     '"Always ..." in the rejection is not it. If you have not asked that question, ask it now and record nothing. Only after they answer yes: '
     'feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=[{quoted}], source="human", note="<their answer, verbatim>").'
 )
+REWORK = (
+    "{revised}'s result asked the client: {questions}. Ask the user these questions, unless the user asked for this change: "
+    "a rework does not answer them."
+)
+QUESTION_CHARS = 160  # each repeated question is cut to this many characters
+QUESTIONS_SHOWN = 5  # at most this many are repeated; the rest are counted
 
 
 class TextServiceSteps(ServiceSteps):
@@ -65,3 +71,16 @@ class TextServiceSteps(ServiceSteps):
             rejection=latest.id, note=latest.verdict.message.id, names=", ".join(added), task=latest.verdict.task_id,
             quoted=", ".join(f'"{x}"' for x in added),
         )
+
+    def rework_step(self, task: Message) -> str:
+        if task.type != "task" or task.source != "relayed" or not task.revises:
+            return ""
+        results = latest_results(m for m in self._mail.received(task.sender) if m.reply_to == task.revises)
+        revised = results.get(task.revises)
+        questions = client_questions(revised.body) if revised is not None else []
+        if not questions:
+            return ""
+        shown = [clip_line(q, QUESTION_CHARS) for q in questions[:QUESTIONS_SHOWN]]
+        more = len(questions) - len(shown)
+        listing = "; ".join(shown) + (f"; and {more} more" if more > 0 else "")
+        return REWORK.format(revised=task.revises, questions=listing)

@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from hirearchy.kernel import Message, OrgError
+from hirearchy.kernel import Message, OrgError, clip_line
 from hirearchy.reflection.testing import ReflectionWorld, fs_world, memory_world
 
 from ._support import SERVICE, ask, define, deliver, nested, note_on, populated, rate
@@ -148,3 +148,67 @@ def test_amendment_step_is_empty_outside_a_rejection_or_when_everything_is_confi
 def test_amendment_step_refuses_an_unknown_owner(w: ReflectionWorld) -> None:
     with pytest.raises(OrgError, match="no such agent: ghost"):
         w.steps.amendment_step("ghost", SERVICE)
+
+
+# ------------------------------------------------------------------------------ rework_step
+
+REWORK = (
+    "{revised}'s result asked the client: {questions}. Ask the user these questions, unless the user asked for this change: "
+    "a rework does not answer them."
+)
+
+
+def deliver_asking(w: ReflectionWorld, task: Message, *questions: str, block: str | None = None) -> Message:
+    """The owner answers ``task`` with a done result whose summary ends in a ``Questions for the client:`` block (``block`` replaces it)."""
+    w.use_run(task.to)
+    listing = block if block is not None else "Questions for the client:\n" + "\n".join(f"- {q}" for q in questions)
+    return w.s.d.post(Message(
+        sender=task.to, to=task.sender, type="result", status="done", reply_to=task.id, body=f"## Summary\nDelivered.\n\n{listing}\n", title="Result",
+    ))
+
+
+def test_rework_step_repeats_the_revised_results_questions(w: ReflectionWorld) -> None:
+    first = ask(w)
+    deliver_asking(w, first, "Keep Marta's row?", "Which Friday?")
+    rework = ask(w, "ai", revises=first.id)  # root's own reading: relayed
+    assert rework.source == "relayed"
+    assert w.steps.rework_step(rework) == REWORK.format(revised=first.id, questions="Keep Marta's row?; Which Friday?")
+
+
+def test_rework_step_is_empty_for_a_human_rework_or_a_result_without_questions(w: ReflectionWorld) -> None:
+    first = ask(w)
+    deliver_asking(w, first, "Keep Marta's row?")
+    assert w.steps.rework_step(ask(w, "ai", revises=first.id, source="human")) == ""  # the user asked for it: it answers them
+    quiet = ask(w, "b")
+    deliver_asking(w, quiet, block="Questions for the client: none.")
+    assert w.steps.rework_step(ask(w, "b", revises=quiet.id)) == ""  # zero questions
+    plain = ask(w, "c")
+    deliver(w, plain)
+    assert w.steps.rework_step(ask(w, "c", revises=plain.id)) == ""  # no block at all
+    undelivered = ask(w, "d")
+    assert w.steps.rework_step(ask(w, "d", revises=undelivered.id)) == ""  # no result yet
+    assert w.steps.rework_step(ask(w, "e")) == ""  # not a rework
+
+
+def test_rework_step_reads_the_latest_result_of_the_revised_task(w: ReflectionWorld) -> None:
+    first = ask(w)
+    deliver_asking(w, first, "Old question?")
+    w.s.d.post(Message(sender="ceo", to="root", type="result", status="done", reply_to=first.id, body="Questions for the client: none.", title="Again"))
+    assert w.steps.rework_step(ask(w, "ai", revises=first.id)) == ""
+
+
+def test_rework_step_clips_and_counts(w: ReflectionWorld) -> None:
+    long = "Is this the long question? " * 12
+    first = ask(w, "a")
+    deliver_asking(w, first, long, "second?")
+    text = w.steps.rework_step(ask(w, "a", revises=first.id))
+    assert clip_line(long, 160) in text and len(clip_line(long, 160)) == 160 and long.strip() not in text
+    five = ask(w, "b")
+    deliver_asking(w, five, *[f"q{i}?" for i in range(1, 6)])
+    assert w.steps.rework_step(ask(w, "b", revises=five.id)) == REWORK.format(revised=five.id, questions="q1?; q2?; q3?; q4?; q5?")  # no suffix
+    six = ask(w, "c")
+    deliver_asking(w, six, *[f"q{i}?" for i in range(1, 7)])
+    assert w.steps.rework_step(ask(w, "c", revises=six.id)) == REWORK.format(revised=six.id, questions="q1?; q2?; q3?; q4?; q5?; and 1 more")
+    seven = ask(w, "d")
+    deliver_asking(w, seven, *[f"q{i}?" for i in range(1, 8)])
+    assert "q5?; and 2 more. Ask the user" in w.steps.rework_step(ask(w, "d", revises=seven.id))
