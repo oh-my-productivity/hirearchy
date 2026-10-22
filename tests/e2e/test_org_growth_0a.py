@@ -194,6 +194,7 @@ def test_3_the_e2_rule_is_refused_at_zero_run_cost(tmp_path):
     refused = fails(w.lead, "revise_playbook", service=SERVICE, content=rule, reason=reason, evidence=[ids["A1"]])
     assert "refused: none of this evidence is the client's own" in refused
     assert f"case {ids['A1']} has no rejection by the client; 1 of its reworks were relayed (the assistant's own reading)" in refused
+    assert "by an amendment the client confirmed (none yet)" in refused  # a relayed rework is not the client's evidence, and rule (c) admits nothing yet
     assert f'"We would change how we deliver {SERVICE}: {reason}. Is that what you want from now on?' in refused
     assert "C6 is in the contract since v1, not added by an amendment" in fails(w.lead, "revise_playbook", service=SERVICE, content=rule, reason=reason, evidence=["C6"])
     assert "no evidence given" in fails(w.lead, "revise_playbook", service=SERVICE, content=rule, reason=reason, evidence=[])
@@ -267,7 +268,13 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     assert "C7 was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)" in refused
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
     feedback(w, ids["B1"], "reject", "Yes, add it.", source="human", criterion=["C7"], confirms=n2)  # the user's yes, recorded as a link
-    assert "now v2" in revise(w, v2, "C7 was added by the client", ["C7"])
+    ids["B2"] = request(w)  # the owner's next prompt names what rule (c) admits now
+    deliver(w, ids["B2"])
+    b2_prompt = next(p for addr, p in w.prompts if addr == "lead" and ids["B2"] in p)
+    assert "amendment the client confirmed (now C7: a revision citing it is admitted)" in b2_prompt
+    assert "not confirmed yet" not in b2_prompt.split("# Reflect before you start")[1].split("# New messages")[0]
+    assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1  # nothing was revised yet
+    assert "now v2" in revise(w, v2, "C7 was added by the client", ["C7"])  # admitted after B2's delivery
     meta, _ = playbook_meta(w.org, "lead", SERVICE)
     assert meta["version"] == 2 and meta["admitted"] == "c" and meta["evidence"] == ["C7"]
 
@@ -295,6 +302,15 @@ def test_11_e3_turn_5_an_unasked_amendment_is_not_the_clients_yes(tmp_path):
     listing = call(w.root, "services")
     assert f"R1 (case {a1}, about C6 (removed), C3 (removed) (not confirmed))" in listing
     assert f"C7: {SUMMARY_FIRST} (amendment, not confirmed)" in listing
+    assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
+    note = next(m.body for m in w.org.received("lead") if "Acceptance criteria now:" in m.body)
+    assert "Rule (c): " in note and "confirmed now: none yet." in note  # the owner is told what rule (c) admits, quietly
+    rework = request(w, revises=a1, note="Start with the Summary line.", source="human")  # the user asks for the rework themselves
+    deliver(w, rework)
+    prompt = next(p for addr, p in w.prompts if addr == "lead" and rework in p)
+    assert "about C6 (removed), C3 (removed) (not confirmed by the client)" in prompt  # the regression list says the link is not the client's yet
+    assert "amendment the client confirmed (none yet; C7, C8 are not confirmed yet)" in prompt
+    assert "A rule without the client's evidence (step 3) is a reason to look" in prompt
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
 
 
