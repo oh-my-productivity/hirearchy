@@ -31,8 +31,8 @@ def team(tmp_path, dirs):
 def test_prompt_has_a_files_section_with_workspace_and_inputs(team, dirs):
     text = team.run_prompt("lead/writer", [])
     assert "- Files:" in text
-    assert f"Workspace (kiro read/write/shell, and the working directory of kiro tools): `{dirs['proj/out']}`" in text
-    assert f"Read-only inputs (kiro `read` or hirearchy `org_read` by absolute path): `{dirs['handbook/hr']}`" in text
+    assert f"Workspace (kiro read/write/shell): `{dirs['proj/out']}`. kiro tools start in an empty scratch directory" in text
+    assert f"Read-only inputs (kiro's `read_file` or `hirearchy::org_read`, by absolute path): `{dirs['handbook/hr']}`" in text
     assert "`lead/writer/MEMORY.md`" in text and "`lead/writer/work/` (hirearchy `org_write` only)" in text
     assert "Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path." in text
     assert "kiro `write` is limited to the workspace" in text and "cannot confine" not in text.split("# New messages")[0].split("- Files:")[1]
@@ -70,12 +70,12 @@ def test_prompt_of_an_agent_with_built_ins_separates_the_two_kinds_of_tools(org,
     files = text.split("- Files:")[1].split("# New messages")[0]
     # the built-ins `read`/`write` hide hirearchy's tools of the same name (studies/F-read-experiment, F2-tool-names):
     # this agent has them as `org_read` / `org_write`
-    assert "hirearchy tools (shown as `@hirearchy/org_write`, `@hirearchy/org_read`, ...)" in files
+    assert "hirearchy tools (load them with `tool_load`, then call them with `tool_call` and tool_id `hirearchy::<name>`, e.g. `hirearchy::org_write`, `hirearchy::org_read`)" in files
     assert "kiro's built-in `read`, `shell`, `write`" in files and "they write and run only in the workspace and never change the org" in files
     assert "`dev/MEMORY.md`, `dev/work/`" in files
-    assert "written with `@hirearchy/org_write`, never with the built-in `write`" in files
-    assert "the hirearchy write tool is `@hirearchy/org_write` for you: use it for MEMORY.md and org files" in files
-    assert "Your `read` is kiro's built-in: it reads org files too" in files and "`@hirearchy/org_read` for you" in files
+    assert "written with `hirearchy::org_write`, never with kiro's file tools" in files
+    assert "the hirearchy write tool is `hirearchy::org_write` for you: use it for MEMORY.md and org files" in files
+    assert "Your `read` is kiro's built-in (`read_file`, `list_directory`): it reads org files too" in files and "`hirearchy::org_read` for you" in files
     assert f"ABSOLUTE path, `{org.root}/<path in the org>`" in files
     assert '`@hirearchy/org_write`(path="dev/MEMORY.md", ...) (the hirearchy tool, not a built-in `write`)' in text
 
@@ -83,7 +83,7 @@ def test_prompt_of_an_agent_with_built_ins_separates_the_two_kinds_of_tools(org,
 def test_agent_with_only_a_built_in_read_and_no_workspace_gets_the_naming_text(org):
     org.hire(ROOT, "rd", "Reader", "Read.", tools=["read"])
     files = org.run_prompt("rd", []).split("- Files:")[1]
-    assert "kiro's built-in `read`" in files and "`@hirearchy/org_read`" in files
+    assert "kiro's built-in `read`" in files and "`hirearchy::org_read`" in files
 
 
 def test_agent_without_built_ins_has_no_files_section_but_the_hirearchy_memory_line(org):

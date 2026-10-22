@@ -82,6 +82,18 @@ def test_org_write_and_org_read_work_and_describe_themselves(team, monkeypatch):
     assert "work/" in call(server, "org_read", path="dev")  # relative org path
 
 
+def test_the_descriptions_name_kiros_v3_built_in_ids(team, monkeypatch):
+    tools = tool_map(server_for(team, "dev", monkeypatch))
+    assert (
+        "kiro's built-in file tools (`read_file`, `list_directory`) read the workspace, inputs and, by absolute path, the organization; "
+        "this tool is the organization's relative-path reader, called `org_read` for you."
+    ) in " ".join(tools["org_read"].split())
+    assert (
+        "kiro's built-in file tools are `fs_write`, `str_replace`, `fs_append` and `delete_file`; this hirearchy tool is called "
+        "`org_write` for you."
+    ) in " ".join(tools["org_write"].split())
+
+
 def test_plain_tools_keep_their_descriptions(team, monkeypatch):
     tools = tool_map(server_for(team, "plain", monkeypatch))
     assert "shows this tool as @hirearchy/write" in tools["write"] and "called" not in tools["write"]

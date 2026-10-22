@@ -30,9 +30,9 @@ def files_of(org, who):
 def test_write_only_agent_is_told_org_write_and_plain_read(team):
     text = team.run_prompt("wr", [])
     files = files_of(team, "wr")
-    assert "hirearchy tools (shown as `@hirearchy/org_write`, `@hirearchy/read`, ...)" in files
-    assert "the hirearchy write tool is `@hirearchy/org_write` for you: use it for MEMORY.md and org files" in files
-    assert "Read org files with `@hirearchy/read`." in files and "org_read" not in files
+    assert "e.g. `hirearchy::org_write`, `hirearchy::read`)" in files
+    assert "the hirearchy write tool is `hirearchy::org_write` for you: use it for MEMORY.md and org files" in files
+    assert "Read org files with `hirearchy::read`." in files and "org_read" not in files
     assert '`@hirearchy/org_write`(path="wr/MEMORY.md", ...) (the hirearchy tool, not a built-in `write`)' in text
     assert '`@hirearchy/write`(' not in text
 
@@ -40,9 +40,9 @@ def test_write_only_agent_is_told_org_write_and_plain_read(team):
 def test_read_only_agent_is_told_org_read_and_plain_write(team):
     text = team.run_prompt("rd", [])
     files = files_of(team, "rd")
-    assert "hirearchy tools (shown as `@hirearchy/write`, `@hirearchy/org_read`, ...)" in files and "(hirearchy `write` only)" in files
-    assert "written with `@hirearchy/write`, never with the built-in `write`." in files
-    assert "ABSOLUTE path" in files and "`@hirearchy/org_read` for you" in files and "org_write" not in files
+    assert "e.g. `hirearchy::write`, `hirearchy::org_read`)" in files and "(hirearchy `write` only)" in files
+    assert "written with `hirearchy::write`, never with kiro's tools." in files
+    assert "ABSOLUTE path" in files and "`hirearchy::org_read` for you" in files and "org_write" not in files
     assert '`@hirearchy/write`(path="rd/MEMORY.md", ...)' in text
 
 
@@ -63,7 +63,8 @@ def test_stray_notice_uses_the_name_the_agent_has(team):
 
 # Prompts of agents WITHOUT built-in read/write as produced by main before this change (sha256[:16] of the prompt with
 # the sandbox path replaced by T): the new text must be byte-identical. (The hashes were re-pinned when the project was renamed to hirearchy:
-# the prompts from before the rename, with the old name replaced, hash to these values.)
+# the prompts from before the rename, with the old name replaced, hash to these values. 'sh' and 'ro' were re-pinned for the V3 Files lines,
+# docs/design/kiro-runtime-v3.md 13.4.)
 def test_prompts_of_agents_without_built_in_read_write_are_byte_identical_to_before(tmp_path):
     tmp_path = tmp_path.resolve()
     ws = tmp_path / "ws"
@@ -78,4 +79,4 @@ def test_prompts_of_agents_without_built_in_read_write_are_byte_identical_to_bef
     assert got == EXPECTED_HASHES
 
 
-EXPECTED_HASHES = {'plain': '58f4804465924ace', 'sh': '6210caeb5e0c3520', 'ro': 'acbefd0c5267326e'}
+EXPECTED_HASHES = {'plain': '58f4804465924ace', 'sh': '38fb2f37cab47f68', 'ro': 'dec15e7d7ae319cc'}

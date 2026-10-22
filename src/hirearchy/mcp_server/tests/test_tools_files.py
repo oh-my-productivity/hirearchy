@@ -28,8 +28,8 @@ def test_an_agent_that_holds_a_built_in_gets_the_org_names_and_the_description_s
     server = serve(group, "rw")
     assert names(server) == ["org_read", "org_write"]
     out = described(server)
-    assert "kiro's built-in `read` has the name `read`" in out["org_read"] and "called `org_read` for you" in out["org_read"]
-    assert "this hirearchy tool is called `org_write` for you" in out["org_write"]
+    assert "kiro's built-in file tools (`read_file`, `list_directory`) read the workspace" in out["org_read"] and "called `org_read` for you" in out["org_read"]
+    assert "`delete_file`; this hirearchy tool is called `org_write` for you" in out["org_write"]
     only_read = described(serve(group, "rd"))
     assert "called `org_read` for you" in only_read["org_read"] and "called" not in only_read["write"].split("workspace).")[1][:60]
 

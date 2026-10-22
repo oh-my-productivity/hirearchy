@@ -36,11 +36,12 @@ class FileTools(ToolGroup):
 
         rn, wn = names["read"], names["write"]
         hide_read = (
-            " kiro's built-in `read` has the name `read` (it reads the workspace, inputs and, by absolute path, the "
-            f"organization); this tool is the organization's relative-path reader, called `{rn}` for you." if rn != "read" else ""
+            " kiro's built-in file tools (`read_file`, `list_directory`) read the workspace, inputs and, by absolute path, the "
+            f"organization; this tool is the organization's relative-path reader, called `{rn}` for you." if rn != "read" else ""
         )
         hide_write = (
-            f" kiro's built-in `write` has the name `write`; this hirearchy tool is called `{wn}` for you." if wn != "write" else ""
+            " kiro's built-in file tools are `fs_write`, `str_replace`, `fs_append` and `delete_file`; this hirearchy tool is "
+            f"called `{wn}` for you." if wn != "write" else ""
         )
         mcp.tool(name=rn, description=f"""The ORGANIZATION's read tool (kiro shows it as @hirearchy/{rn}; not kiro's built-in `read`, which reads the
         workspace).{hide_read} Reads a file (with word count and modification time) or lists a directory in the organization. Paths

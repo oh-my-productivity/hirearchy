@@ -573,7 +573,7 @@ output: {
 other: {}
 description:
 Write an ORGANIZATION file (kiro shows this tool as @hirearchy/org_write; it is NOT kiro's built-in `write`, which
-        writes the workspace). kiro's built-in `write` has the name `write`; this hirearchy tool is called `org_write` for you. Use it for your memory, notes and artifacts inside your own org directory. Paths are
+        writes the workspace). kiro's built-in file tools are `fs_write`, `str_replace`, `fs_append` and `delete_file`; this hirearchy tool is called `org_write` for you. Use it for your memory, notes and artifacts inside your own org directory. Paths are
         relative to the org root, like every path here, so they start with your address: e.g. "<you>/MEMORY.md" or
         "<you>/work/plan.md".
 

@@ -19,7 +19,7 @@ def org(tmp_path):
 # ------------------------------------------------------------------------------------ prompt and plan
 def test_the_prompt_tells_a_built_in_read_agent_to_read_org_files_by_absolute_path(org):
     files = org.run_prompt("lead/writer", []).split("- Files:")[1].split("# New messages")[0]
-    assert "Your `read` is kiro's built-in: it reads org files too" in files and "`@hirearchy/org_read` for you" in files
+    assert "Your `read` is kiro's built-in (`read_file`, `list_directory`): it reads org files too" in files and "`hirearchy::org_read` for you" in files
     assert f"`{org.root}/<path in the org>`" in files and "ABSOLUTE" in files
-    assert "never with the built-in `write`/`read`" not in files
+    assert "never with the built-in `write`/`read`" not in files and "a relative path starts in an empty scratch directory" in files
     assert "kiro `read` to workspace + inputs + the organization (read-only)" in files
