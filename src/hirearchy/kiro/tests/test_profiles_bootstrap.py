@@ -36,7 +36,7 @@ def test_profile_is_internal_and_bound_to_its_org(org, tmp_path):
     legacy = agents / "hirearchy.json"
     legacy.write_text('{"name": "hirearchy", "legacy": true}')
     name = ensure_kiro_profile(["read", "shell"], agents, org=org)
-    assert name == kiro_profile_name(org.root, ["read", "shell"])
+    assert re.fullmatch(rf"{re.escape(kiro_profile_name(org.root, ['read', 'shell']))}-x[0-9a-f]{{8}}", name)  # built-in read: confined, V3
     profile = json.loads((agents / f"{name}.json").read_text())
     assert profile["name"] == name
     assert profile["description"].startswith(f"internal: used by the hirearchy scheduler for {org.root}; not a general-purpose agent")
@@ -45,6 +45,7 @@ def test_profile_is_internal_and_bound_to_its_org(org, tmp_path):
     assert "ORG_AGENT" not in server["env"]  # identity comes from the scheduler's process environment
     assert server["args"][-1] == "mcp"
     assert profile["tools"] == ["@hirearchy", "read", "shell"] and profile["includeMcpJson"] is False
+    assert profile["permissions"]["rules"][0]["capability"] == "mcp"
     assert legacy.read_text() == '{"name": "hirearchy", "legacy": true}'  # the global profile is never touched
     assert sorted(p.name for p in agents.iterdir()) == sorted(["hirearchy.json", f"{name}.json"])
 
@@ -60,6 +61,8 @@ def test_kiro_runner_uses_the_per_org_profile_and_keeps_the_scheduler_env(org, i
 
 def test_cli_kiro_profile_writes_the_org_profile(org, isolated_kiro, capsys):
     main(["--root", str(org.root), "kiro-profile", "--tools", "read"])
-    name = kiro_profile_name(org.root, ["read"])
+    written = re.search(r"wrote ~/\.kiro/agents/(\S+)\.json", capsys.readouterr().out)
+    assert written is not None
+    name = written.group(1)
+    assert re.fullmatch(rf"{re.escape(kiro_profile_name(org.root, ['read']))}-x[0-9a-f]{{8}}", name)  # the grant is confined to the organization
     assert (isolated_kiro / ".kiro" / "agents" / f"{name}.json").is_file()
-    assert f"wrote ~/.kiro/agents/{name}.json" in capsys.readouterr().out

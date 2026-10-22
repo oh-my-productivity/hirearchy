@@ -1,6 +1,6 @@
 """The public surface of ``kiro``: how the organization is adapted to the kiro-cli agent runtime.
 
-Five roles, one small interface each: which built-in tools kiro may use on which paths (``ConfinementPolicy``), where the profiles
+Five roles, one small interface each: which tools kiro may use on which paths (``ConfinementPolicy``), where the profiles
 live (``ProfileStore``), which profile an organization's agents run with (``ProfileProvisioner``), how kiro starts the hirearchy server
 (``McpServerLocator``), and the command that runs one agent (``RunCommandBuilder``).
 """
@@ -12,9 +12,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
+from ..kernel import JsonObject, OrgError
+
 __all__ = [
+    "CHARTER_TOOLS",
     "FILE_TOOLS",
+    "Confinement",
     "ConfinementPolicy",
+    "KiroRunRefused",
     "McpServerLocator",
     "ProfileProvisioner",
     "ProfileStore",
@@ -22,6 +27,7 @@ __all__ = [
     "RunCommandBuilder",
 ]
 
+CHARTER_TOOLS = ("read", "write", "shell", "web_search", "web_fetch")  # the charter names kiro maps (design 4.2)
 FILE_TOOLS = ("read", "write")  # kiro built-ins whose reach can be limited by path (shell cannot)
 
 
@@ -34,18 +40,40 @@ class RunCommand:
     env: Mapping[str, str]
 
 
+@dataclass(frozen=True)
+class Confinement:
+    """What one agent's kiro run may reach, as kiro-cli V3 enforces it (verified against kiro-cli 2.33.0 / KAS 0.66.48).
+
+    With ``problem`` set, the other fields are computed from the valid part of the grant as if the invalid part were absent (unknown
+    tool names dropped; a workspace or input with a refused character dropped; the org root kept, so ``read`` still names it); the
+    run command builder never uses them (it refuses the run), only the blueprint's access report reads ``read``. ``tools`` always
+    starts with ``"@hirearchy"``.
+    """
+
+    tools: tuple[str, ...]  # the profile's "tools" selector
+    rules: tuple[JsonObject, ...]  # the profile's "permissions.rules", in order
+    read: tuple[Path, ...]  # where kiro's read tools may read (resolved; empty: nowhere)
+    write: Path | None  # the one directory kiro's write tools may change (None: nowhere)
+    problem: str | None = None  # why this access cannot be enforced (unknown tool, path kiro cannot match); then refuse
+
+
+class KiroRunRefused(OrgError):
+    """A run that kiro-cli could not run confined, or that kiro's state forbids; the message says why."""
+
+
 @runtime_checkable
 class ConfinementPolicy(Protocol):
     def file_confinement(
         self, org_root: Path, tools: Sequence[str], workspace: Path | None, inputs: Sequence[Path]
-    ) -> tuple[list[str], dict[str, object]]:
-        """``(allowedTools, toolsSettings)`` confining kiro's built-in ``read``/``write`` by path (pure; verified against kiro-cli 2.29.1)."""
+    ) -> Confinement:
+        """The V3 ``tools`` selector and permission rules of this grant, and what they let kiro read and write (pure; verified against
+        kiro-cli 2.33.0 / KAS 0.66.48)."""
         ...
 
 
 @runtime_checkable
 class ProfileStore(Protocol):
-    """The directory of kiro agent profiles (``~/.kiro/agents``), resolved when it is used, not when the store is made."""
+    """The directory of kiro agent profiles, resolved when it is used, not when the store is made."""
 
     def read(self, name: str) -> dict[str, object] | None:
         """The profile ``name``; ``None`` when it is missing, unreadable or not a JSON object."""
@@ -62,11 +90,11 @@ class ProfileProvisioner(Protocol):
         """``hirearchy-<org slug>-<6 hex of the org root path>[-<tools>]``, lowercase ``[a-z0-9-]``: one name per organization and tool set."""
         ...
 
-    def ensure_profile(
-        self, tools: Sequence[str], *, workspace: Path | None = None, inputs: Sequence[Path] | None = None, confine: bool = False
-    ) -> str:
-        """Write the organization's profile when it is missing or different; returns its name. ``confine``: built-in ``read``/``write``
-        limited by path, and ``-x<8 hex>`` (a hash of that access) appended to the name."""
+    def ensure_profile(self, tools: Sequence[str], *, workspace: Path | None = None, inputs: Sequence[Path] | None = None) -> str:
+        """Write the organization's V3 profile for this grant and access when it is missing or different; returns its name.
+
+        Every profile is V3 and confined by its grant (``ConfinementPolicy``); one with built-in ``read``/``write`` has ``-x<8 hex>``
+        (a hash of its rules) appended to the name. ``KiroRunRefused`` when the grant cannot be confined; nothing is written then."""
         ...
 
 

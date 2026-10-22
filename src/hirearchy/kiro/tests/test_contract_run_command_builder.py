@@ -7,7 +7,7 @@ from typing import cast
 
 import pytest
 
-from hirearchy.kiro import RunCommand, RunCommandBuilder
+from hirearchy.kiro import KiroRunRefused, RunCommand, RunCommandBuilder
 from hirearchy.kiro.testing import IMPLEMENTATIONS, BuilderHarness
 from hirearchy.settings import DEFAULT_MODEL
 
@@ -112,34 +112,51 @@ def test_an_agent_without_tools_runs_with_the_shared_profile_of_the_organization
 # ------------------------------------------------------------------------------------------------------------- confinement
 
 
+def rules_of(data: dict[str, object] | None) -> list[dict[str, object]]:
+    assert data is not None
+    return cast("list[dict[str, object]]", cast("dict[str, object]", data["permissions"])["rules"])
+
+
+def rule(rules: list[dict[str, object]], capability: str, effect: str) -> dict[str, object]:
+    (found,) = [r for r in rules if r["capability"] == capability and r["effect"] == effect]
+    return found
+
+
 def test_built_in_write_gets_a_profile_confined_to_the_workspace(h: BuilderHarness) -> None:
     workspace = outside(h, "ws")
     h.put_agent("dev", {"role": "R", "tools": ["write"], "workspace": str(workspace), "inputs": []})
     profile = profile_of(h.builder.build("dev", "P"))
     data = h.profile(profile)
     assert data is not None and profile.startswith(h.provisioner.profile_name(["write"]) + "-x")
-    assert cast(dict[str, dict[str, list[str]]], data["toolsSettings"])["write"]["allowedPaths"] == [f"{workspace.resolve()}/**"]
+    assert data["tools"] == ["@hirearchy", "write"] and "permissions" in data
+    rules = rules_of(data)
+    assert rule(rules, "fs_write", "allow")["match"] == [f"{workspace.resolve()}/**"]
+    org_deny = {"capability": "fs_write", "effect": "deny", "match": [str(h.root.resolve()), f"{h.root.resolve()}/**"]}
+    assert org_deny in rules  # the organization is never written with kiro's tools
+    assert not [r for r in rules if r["capability"] == "fs_read" and r["effect"] == "allow"]  # a write-only agent reads nothing
 
 
 def test_built_in_read_gets_the_workspace_the_inputs_and_the_organization(h: BuilderHarness) -> None:
     workspace, inputs = outside(h, "ws"), outside(h, "in")
     h.put_agent("dev", {"role": "R", "tools": ["read"], "workspace": str(workspace), "inputs": [str(inputs)]})
-    data = h.profile(profile_of(h.builder.build("dev", "P")))
-    assert data is not None
-    paths = cast(dict[str, dict[str, list[str]]], data["toolsSettings"])["read"]["allowedPaths"]
-    assert paths == [p for base in (workspace.resolve(), inputs.resolve(), h.root.resolve()) for p in (str(base), f"{base}/**")]
+    rules = rules_of(h.profile(profile_of(h.builder.build("dev", "P"))))
+    expected = [p for base in (workspace.resolve(), inputs.resolve(), h.root.resolve()) for p in (str(base), f"{base}/**")]
+    assert rule(rules, "fs_read", "allow")["match"] == expected
+    assert rule(rules, "fs_read", "deny")["exclude"] == expected and rule(rules, "fs_read", "deny")["match"] == ["/**"]
 
 
-def test_a_legacy_charter_keeps_the_unconfined_profile_it_always_had(h: BuilderHarness) -> None:
+def test_a_former_legacy_charter_is_confined_to_the_org(h: BuilderHarness) -> None:
     h.put_agent("old", {"role": "R", "tools": ["read"]})  # built-in read only, no workspace, no ``inputs`` key
     profile = profile_of(h.builder.build("old", "P"))
-    assert profile == h.provisioner.profile_name(["read"])
-    data = h.profile(profile)
-    assert data is not None and "toolsSettings" not in data and data["allowedTools"] == ["@hirearchy", "read"]
+    assert profile.startswith(h.provisioner.profile_name(["read"]) + "-x")
+    rules = rules_of(h.profile(profile))
+    org = [str(h.root.resolve()), f"{h.root.resolve()}/**"]
+    assert rule(rules, "fs_read", "allow")["match"] == org and rule(rules, "fs_read", "deny")["exclude"] == org
+    assert rule(rules, "fs_write", "deny") == {"capability": "fs_write", "effect": "deny", "match": ["/**"]}  # writes nowhere
 
 
-def test_a_charter_with_write_is_never_legacy(h: BuilderHarness) -> None:
-    h.put_agent("dev", {"role": "R", "tools": ["read", "write"]})  # no workspace and no inputs key, but write
+def test_a_charter_with_write_is_confined(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R", "tools": ["read", "write"]})  # no workspace and no inputs key
     assert "-x" in profile_of(h.builder.build("dev", "P"))
 
 
@@ -148,9 +165,33 @@ def test_a_charter_with_an_empty_inputs_list_is_confined(h: BuilderHarness) -> N
     assert "-x" in profile_of(h.builder.build("dev", "P"))
 
 
-def test_shell_alone_is_not_confined(h: BuilderHarness) -> None:
+def test_shell_alone_has_no_fs_rules(h: BuilderHarness) -> None:
     h.put_agent("dev", {"role": "R", "tools": ["shell"], "workspace": str(outside(h, "ws")), "inputs": []})
-    assert profile_of(h.builder.build("dev", "P")) == h.provisioner.profile_name(["shell"])
+    profile = profile_of(h.builder.build("dev", "P"))
+    assert profile == h.provisioner.profile_name(["shell"])
+    assert not [r for r in rules_of(h.profile(profile)) if str(r["capability"]).startswith("fs_")]
+
+
+def test_an_unknown_tool_refuses_the_run(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R", "tools": ["read", "Shell"]})
+    with pytest.raises(KiroRunRefused, match="^kiro: the charter's tools name 'Shell', which is not one of read, write, shell, web_search, web_fetch"):
+        h.builder.build("dev", "P")
+    assert h.names() == []
+
+
+@pytest.mark.parametrize("tools", ["read", {"read": True}, [1], ["read", None], [["read"]]])
+def test_tools_that_are_not_a_list_refuse_the_run(h: BuilderHarness, tools: object) -> None:
+    h.put_agent("dev", {"role": "R", "tools": tools})
+    with pytest.raises(KiroRunRefused, match=r"^kiro: the charter's tools must be a list of names \(read, write, shell, web_search, web_fetch\)$"):
+        h.builder.build("dev", "P")
+    assert h.names() == []
+
+
+def test_a_workspace_kiro_cannot_match_refuses_the_run(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R", "tools": ["write"], "workspace": str(outside(h, "w{s"))})
+    with pytest.raises(KiroRunRefused, match=r'contains "\{"'):
+        h.builder.build("dev", "P")
+    assert h.names() == []
 
 
 def test_an_agent_that_does_not_exist_is_the_error_of_the_charter_reader(h: BuilderHarness) -> None:

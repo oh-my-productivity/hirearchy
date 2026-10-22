@@ -13,6 +13,17 @@ def profile_of(isolated_kiro, name):
     return json.loads((isolated_kiro / ".kiro" / "agents" / f"{name}.json").read_text())
 
 
+def rules(prof):
+    return prof["permissions"]["rules"]
+
+
+def rule(prof, capability, effect, *, exclude=None):
+    """The one rule of ``capability``/``effect``; ``exclude=True``/``False`` picks the one with/without an ``exclude`` key."""
+    found = [r for r in rules(prof) if r["capability"] == capability and r["effect"] == effect and (exclude is None or ("exclude" in r) == exclude)]
+    assert len(found) == 1, (capability, effect, found)
+    return found[0]
+
+
 def run_profile(org, isolated_kiro, addr):
     cmd, cwd, env = kiro_runner()(org, addr, "P")
     return profile_of(isolated_kiro, cmd[cmd.index("--agent") + 1]), cmd, cwd, env
@@ -46,15 +57,15 @@ def test_agent_with_file_tools_gets_a_confining_profile(team, dirs, isolated_kir
     name = cmd[cmd.index("--agent") + 1]
     assert re.fullmatch(rf"{re.escape(kiro_profile_name(team.root, ['read', 'write']))}-x[0-9a-f]{{8}}", name)
     assert prof["name"] == name and prof["description"].startswith(f"internal: used by the hirearchy scheduler for {team.root}")
-    # read/write are NOT in allowedTools (kiro ignores allowedPaths for a trusted tool); hirearchy is
-    assert prof["tools"] == ["@hirearchy", "read", "write"] and prof["allowedTools"] == ["@hirearchy"]
-    out, hb = dirs["proj/out"], dirs["handbook/hr"]
-    deny = [str(team.root), f"{team.root}/**"]
-    assert prof["toolsSettings"]["write"] == {"allowedPaths": [f"{out}/**"], "deniedPaths": deny}
-    # read also reaches the organization itself (read-only), exactly what hirearchy `read` may open: no deny to beat the allow
-    org = team.root
-    assert prof["toolsSettings"]["read"] == {
-        "allowedPaths": [str(out), f"{out}/**", str(hb), f"{hb}/**", str(org), f"{org}/**"], "deniedPaths": []}
+    assert prof["tools"] == ["@hirearchy", "read", "write"] and "permissions" in prof
+    out, hb, org = dirs["proj/out"], dirs["handbook/hr"], team.root
+    assert rule(prof, "fs_write", "allow")["match"] == [f"{out}/**"]
+    assert {"capability": "fs_write", "effect": "deny", "match": [str(org), f"{org}/**"]} in rules(prof)
+    # read also reaches the organization itself (read-only), exactly what hirearchy `read` may open
+    reach = [str(out), f"{out}/**", str(hb), f"{hb}/**", str(org), f"{org}/**"]
+    assert rule(prof, "fs_read", "allow")["match"] == reach
+    assert rule(prof, "fs_read", "deny")["match"] == ["/**"] and rule(prof, "fs_read", "deny")["exclude"] == reach
+    assert rule(prof, "fs_write", "deny", exclude=True) == {"capability": "fs_write", "effect": "deny", "match": ["/**"], "exclude": [f"{out}/**"]}
     # the env contract is unchanged
     assert prof["mcpServers"]["hirearchy"]["env"] == {"ORG_ROOT": str(team.root), "ORG_REQUIRE_AGENT": "1"}
     assert prof["includeMcpJson"] is False and cwd == out
@@ -64,9 +75,9 @@ def test_agent_with_file_tools_gets_a_confining_profile(team, dirs, isolated_kir
 def test_inputs_are_readable_but_never_writable(team, dirs, isolated_kiro):
     prof, *_ = run_profile(team, isolated_kiro, "lead")
     hb = dirs["handbook"]
-    assert str(hb) in prof["toolsSettings"]["read"]["allowedPaths"] and f"{hb}/**" in prof["toolsSettings"]["read"]["allowedPaths"]
-    assert not any(str(hb) in p for p in prof["toolsSettings"]["write"]["allowedPaths"])
-    assert prof["toolsSettings"]["write"]["allowedPaths"] == [f"{dirs['proj']}/**"]
+    assert str(hb) in rule(prof, "fs_read", "allow")["match"] and f"{hb}/**" in rule(prof, "fs_read", "allow")["match"]
+    assert not any(str(hb) in p for p in rule(prof, "fs_write", "allow")["match"])
+    assert rule(prof, "fs_write", "allow")["match"] == [f"{dirs['proj']}/**"]
 
 
 def test_profiles_are_per_access_not_per_tool_set(team, dirs, isolated_kiro):
@@ -78,43 +89,46 @@ def test_profiles_are_per_access_not_per_tool_set(team, dirs, isolated_kiro):
     assert t[t.index("--agent") + 1] == b[b.index("--agent") + 1]  # same tools and access: shared profile
 
 
-def test_shell_stays_trusted_and_is_not_confined(team, dirs, isolated_kiro):
+def test_shell_is_allowed_by_one_rule_and_is_not_confined(team, dirs, isolated_kiro):
     team.hire("lead", "dev", "Dev", "x", tools=["read", "write", "shell"], workspace=str(dirs["proj/out"]))
     prof, *_ = run_profile(team, isolated_kiro, "lead/dev")
-    assert prof["allowedTools"] == ["@hirearchy"] + ["shell"] and "shell" in prof["tools"]
-    assert "shell" not in prof["toolsSettings"]  # kiro has no path rule for it
+    assert prof["tools"] == ["@hirearchy", "read", "write", "shell"]
+    assert rule(prof, "shell", "allow") == {"capability": "shell", "match": ["*"], "effect": "allow"}  # kiro has no path rule for it
 
 
 def test_write_without_workspace_is_allowed_nowhere(team, isolated_kiro):
     team.hire("lead", "scribe", "Scribe", "x", tools=["write"])
     prof, _, cwd, _ = run_profile(team, isolated_kiro, "lead/scribe")
-    assert prof["toolsSettings"]["write"]["allowedPaths"] == [] and cwd == team.dir("lead/scribe")
+    assert not [r for r in rules(prof) if r["capability"] == "fs_write" and r["effect"] == "allow"]
+    assert {"capability": "fs_write", "effect": "deny", "match": ["/**"]} in rules(prof) and cwd == team.dir("lead/scribe")
 
 
-def test_read_with_empty_inputs_reads_nothing(team, isolated_kiro):
+def test_read_with_empty_inputs_reads_only_the_organization(team, isolated_kiro):
     team.hire("lead", "peek", "Peek", "x", tools=["read"], inputs=[])
     prof, *_ = run_profile(team, isolated_kiro, "lead/peek")
     # nothing outside the organization; the organization itself is readable (it is what hirearchy `read` serves)
-    assert prof["toolsSettings"]["read"]["allowedPaths"] == [str(team.root), f"{team.root}/**"]
-    assert prof["allowedTools"] == ["@hirearchy"]
+    assert rule(prof, "fs_read", "allow")["match"] == [str(team.root), f"{team.root}/**"]
+    assert prof["tools"] == ["@hirearchy", "read"]
 
 
 def test_agents_without_built_in_file_tools_keep_the_shared_profile(team, isolated_kiro):
     team.hire(ROOT, "web", "Web", "x", tools=["web_fetch", "web_search"])
     prof, cmd, *_ = run_profile(team, isolated_kiro, "web")
     assert cmd[cmd.index("--agent") + 1] == kiro_profile_name(team.root, ["web_fetch", "web_search"])
-    assert prof["allowedTools"] == prof["tools"] == ["@hirearchy", "web_fetch", "web_search"] and "toolsSettings" not in prof
+    assert prof["tools"] == ["@hirearchy", "web"] and not any(r["capability"].startswith("fs_") for r in rules(prof))
+    assert rule(prof, "web_fetch", "allow")["match"] == ["*"] and rule(prof, "web_search", "allow")["match"] == ["*"]
     team.hire("lead", "plain", "Plain", "x")
     assert run_profile(team, isolated_kiro, "lead/plain")[1][4] == kiro_profile_name(team.root, [])  # shared with web-less agents
 
 
-def test_legacy_read_only_charter_keeps_todays_profile(team, isolated_kiro):
-    """No workspace and no `inputs` key: nothing new in the charter, nothing new in the profile."""
+def test_legacy_read_only_charter_is_confined_to_the_org(team, isolated_kiro):
+    """No workspace and no `inputs` key: it used to get the unconfined profile; under V3 it reads the organization only."""
     (team.dir("lead") / "legacy").mkdir()
     (team.dir("lead") / "legacy" / "AGENT.md").write_text("---\nrole: Old\ntools: [read]\n---\nOld.\n")
     prof, cmd, *_ = run_profile(team, isolated_kiro, "lead/legacy")
-    assert cmd[cmd.index("--agent") + 1] == kiro_profile_name(team.root, ["read"])
-    assert prof["allowedTools"] == ["@hirearchy", "read"] and "toolsSettings" not in prof
+    assert re.fullmatch(rf"{re.escape(kiro_profile_name(team.root, ['read']))}-x[0-9a-f]{{8}}", cmd[cmd.index("--agent") + 1])
+    assert rule(prof, "fs_read", "allow")["match"] == [str(team.root), f"{team.root}/**"]
+    assert "permissions" in prof
 
 
 def test_workspace_inside_the_org_is_not_denied(team, isolated_kiro):
@@ -122,12 +136,13 @@ def test_workspace_inside_the_org_is_not_denied(team, isolated_kiro):
     ws.mkdir(parents=True)
     team.hire(ROOT, "inorg", "In", "x", tools=["write"], workspace=str(ws))
     prof, *_ = run_profile(team, isolated_kiro, "inorg")
-    assert prof["toolsSettings"]["write"]["deniedPaths"] == []
+    assert {"capability": "fs_write", "effect": "deny", "match": [str(team.root), f"{team.root}/**"]} not in rules(prof)
+    assert rule(prof, "fs_write", "allow")["match"] == [f"{ws.resolve()}/**"]
 
 
 def test_ensure_kiro_profile_is_idempotent_for_confined_profiles(team, dirs, tmp_path):
     d = tmp_path / "agents"
-    kw = dict(org=team, workspace=dirs["proj"], inputs=[dirs["handbook"]], confine=True)
+    kw = dict(org=team, workspace=dirs["proj"], inputs=[dirs["handbook"]])
     name = ensure_kiro_profile(["read", "write"], d, **kw)
     path = d / f"{name}.json"
     mtime = path.stat().st_mtime_ns

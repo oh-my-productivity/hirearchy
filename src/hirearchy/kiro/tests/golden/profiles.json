@@ -1,10 +1,94 @@
 {
+ "confined_nothing": {
+  "args": {
+   "tools": []
+  },
+  "name": "hirearchy-golden-org-26994b",
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
+ },
+ "confined_read_inputs_only": {
+  "args": {
+   "inputs": [
+    "/golden/in-a"
+   ],
+   "tools": [
+    "read"
+   ]
+  },
+  "name": "hirearchy-golden-org-26994b-read-x8b0c3d33",
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-read-x8b0c3d33\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"read\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"fs_read\",\n        \"effect\": \"allow\",\n        \"match\": [\n          \"/golden/in-a\",\n          \"/golden/in-a/**\",\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_read\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ],\n        \"exclude\": [\n          \"/golden/in-a\",\n          \"/golden/in-a/**\",\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ]\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
+ },
+ "confined_read_workspace_inside_the_org": {
+  "args": {
+   "tools": [
+    "read",
+    "write"
+   ],
+   "workspace": "/golden/org/ws"
+  },
+  "name": "hirearchy-golden-org-26994b-read-write-x1d43a7dd",
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-read-write-x1d43a7dd\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read, write)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"read\",\n    \"write\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"fs_read\",\n        \"effect\": \"allow\",\n        \"match\": [\n          \"/golden/org/ws\",\n          \"/golden/org/ws/**\",\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"allow\",\n        \"match\": [\n          \"/golden/org/ws/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_read\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ],\n        \"exclude\": [\n          \"/golden/org/ws\",\n          \"/golden/org/ws/**\",\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ],\n        \"exclude\": [\n          \"/golden/org/ws/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/golden/org/ws/.kiro\",\n          \"/golden/org/ws/.kiro/**\",\n          \"/golden/org/ws/**/.kiro\",\n          \"/golden/org/ws/**/.kiro/**\",\n          \"/golden/org/ws/AGENTS.md\",\n          \"/golden/org/ws/**/AGENTS.md\",\n          \"/golden/org/ws/.git\",\n          \"/golden/org/ws/.git/**\",\n          \"/golden/org/ws/**/.git\",\n          \"/golden/org/ws/**/.git/**\",\n          \"/golden/org/ws/.vscode\",\n          \"/golden/org/ws/.vscode/**\",\n          \"/golden/org/ws/**/.vscode\",\n          \"/golden/org/ws/**/.vscode/**\"\n        ]\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
+ },
+ "confined_read_write_shell": {
+  "args": {
+   "inputs": [
+    "/golden/in-a",
+    "/golden/in-b"
+   ],
+   "tools": [
+    "read",
+    "write",
+    "shell"
+   ],
+   "workspace": "/golden/ws"
+  },
+  "name": "hirearchy-golden-org-26994b-read-shell-write-x532a82f5",
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-read-shell-write-x532a82f5\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read, shell, write)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"read\",\n    \"write\",\n    \"shell\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"fs_read\",\n        \"effect\": \"allow\",\n        \"match\": [\n          \"/golden/ws\",\n          \"/golden/ws/**\",\n          \"/golden/in-a\",\n          \"/golden/in-a/**\",\n          \"/golden/in-b\",\n          \"/golden/in-b/**\",\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"allow\",\n        \"match\": [\n          \"/golden/ws/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_read\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ],\n        \"exclude\": [\n          \"/golden/ws\",\n          \"/golden/ws/**\",\n          \"/golden/in-a\",\n          \"/golden/in-a/**\",\n          \"/golden/in-b\",\n          \"/golden/in-b/**\",\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ],\n        \"exclude\": [\n          \"/golden/ws/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/golden/ws/.kiro\",\n          \"/golden/ws/.kiro/**\",\n          \"/golden/ws/**/.kiro\",\n          \"/golden/ws/**/.kiro/**\",\n          \"/golden/ws/AGENTS.md\",\n          \"/golden/ws/**/AGENTS.md\",\n          \"/golden/ws/.git\",\n          \"/golden/ws/.git/**\",\n          \"/golden/ws/**/.git\",\n          \"/golden/ws/**/.git/**\",\n          \"/golden/ws/.vscode\",\n          \"/golden/ws/.vscode/**\",\n          \"/golden/ws/**/.vscode\",\n          \"/golden/ws/**/.vscode/**\"\n        ]\n      },\n      {\n        \"capability\": \"shell\",\n        \"match\": [\n          \"*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
+ },
+ "confined_shell_only": {
+  "args": {
+   "tools": [
+    "shell"
+   ],
+   "workspace": "/golden/ws"
+  },
+  "name": "hirearchy-golden-org-26994b-shell",
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-shell\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: shell)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"shell\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"shell\",\n        \"match\": [\n          \"*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
+ },
+ "confined_write_only": {
+  "args": {
+   "tools": [
+    "write"
+   ],
+   "workspace": "/golden/ws"
+  },
+  "name": "hirearchy-golden-org-26994b-write-x064511f4",
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-write-x064511f4\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: write)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"write\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"allow\",\n        \"match\": [\n          \"/golden/ws/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_read\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ],\n        \"exclude\": [\n          \"/golden/ws/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/golden/ws/.kiro\",\n          \"/golden/ws/.kiro/**\",\n          \"/golden/ws/**/.kiro\",\n          \"/golden/ws/**/.kiro/**\",\n          \"/golden/ws/AGENTS.md\",\n          \"/golden/ws/**/AGENTS.md\",\n          \"/golden/ws/.git\",\n          \"/golden/ws/.git/**\",\n          \"/golden/ws/**/.git\",\n          \"/golden/ws/**/.git/**\",\n          \"/golden/ws/.vscode\",\n          \"/golden/ws/.vscode/**\",\n          \"/golden/ws/**/.vscode\",\n          \"/golden/ws/**/.vscode/**\"\n        ]\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
+ },
+ "confined_write_without_workspace": {
+  "args": {
+   "tools": [
+    "write"
+   ]
+  },
+  "name": "hirearchy-golden-org-26994b-write-x2fddd637",
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-write-x2fddd637\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: write)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"write\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_read\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ]\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
+ },
  "shared_no_tools": {
   "args": {
    "tools": []
   },
   "name": "hirearchy-golden-org-26994b",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false\n}\n"
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
+ },
+ "shared_read_unconfined": {
+  "args": {
+   "tools": [
+    "read"
+   ]
+  },
+  "name": "hirearchy-golden-org-26994b-read-x206ad3ea",
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-read-x206ad3ea\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"read\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"fs_read\",\n        \"effect\": \"allow\",\n        \"match\": [\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_read\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ],\n        \"exclude\": [\n          \"/golden/org\",\n          \"/golden/org/**\"\n        ]\n      },\n      {\n        \"capability\": \"fs_write\",\n        \"effect\": \"deny\",\n        \"match\": [\n          \"/**\"\n        ]\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
  },
  "shared_shell": {
   "args": {
@@ -13,16 +97,7 @@
    ]
   },
   "name": "hirearchy-golden-org-26994b-shell",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-shell\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: shell)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"shell\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\",\n    \"shell\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false\n}\n"
- },
- "shared_read_unconfined": {
-  "args": {
-   "tools": [
-    "read"
-   ]
-  },
-  "name": "hirearchy-golden-org-26994b-read",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-read\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"read\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\",\n    \"read\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false\n}\n"
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-shell\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: shell)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"shell\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"shell\",\n        \"match\": [\n          \"*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
  },
  "shared_unsorted_duplicates": {
   "args": {
@@ -33,88 +108,6 @@
    ]
   },
   "name": "hirearchy-golden-org-26994b-shell-web-search",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-shell-web-search\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: shell, web_search)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"shell\",\n    \"web_search\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\",\n    \"shell\",\n    \"web_search\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false\n}\n"
- },
- "confined_read_write_shell": {
-  "args": {
-   "tools": [
-    "read",
-    "write",
-    "shell"
-   ],
-   "confine": true,
-   "workspace": "/golden/ws",
-   "inputs": [
-    "/golden/in-a",
-    "/golden/in-b"
-   ]
-  },
-  "name": "hirearchy-golden-org-26994b-read-shell-write-x6fbf3700",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-read-shell-write-x6fbf3700\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read, shell, write)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"read\",\n    \"shell\",\n    \"write\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\",\n    \"shell\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false,\n  \"toolsSettings\": {\n    \"write\": {\n      \"allowedPaths\": [\n        \"/golden/ws/**\"\n      ],\n      \"deniedPaths\": [\n        \"/golden/org\",\n        \"/golden/org/**\"\n      ]\n    },\n    \"read\": {\n      \"allowedPaths\": [\n        \"/golden/ws\",\n        \"/golden/ws/**\",\n        \"/golden/in-a\",\n        \"/golden/in-a/**\",\n        \"/golden/in-b\",\n        \"/golden/in-b/**\",\n        \"/golden/org\",\n        \"/golden/org/**\"\n      ],\n      \"deniedPaths\": []\n    }\n  }\n}\n"
- },
- "confined_write_only": {
-  "args": {
-   "tools": [
-    "write"
-   ],
-   "confine": true,
-   "workspace": "/golden/ws"
-  },
-  "name": "hirearchy-golden-org-26994b-write-x841da205",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-write-x841da205\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: write)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"write\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false,\n  \"toolsSettings\": {\n    \"write\": {\n      \"allowedPaths\": [\n        \"/golden/ws/**\"\n      ],\n      \"deniedPaths\": [\n        \"/golden/org\",\n        \"/golden/org/**\"\n      ]\n    }\n  }\n}\n"
- },
- "confined_write_without_workspace": {
-  "args": {
-   "tools": [
-    "write"
-   ],
-   "confine": true
-  },
-  "name": "hirearchy-golden-org-26994b-write-x05257e14",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-write-x05257e14\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: write)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"write\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false,\n  \"toolsSettings\": {\n    \"write\": {\n      \"allowedPaths\": [],\n      \"deniedPaths\": [\n        \"/golden/org\",\n        \"/golden/org/**\"\n      ]\n    }\n  }\n}\n"
- },
- "confined_read_inputs_only": {
-  "args": {
-   "tools": [
-    "read"
-   ],
-   "confine": true,
-   "inputs": [
-    "/golden/in-a"
-   ]
-  },
-  "name": "hirearchy-golden-org-26994b-read-x8a3e7f11",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-read-x8a3e7f11\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"read\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false,\n  \"toolsSettings\": {\n    \"read\": {\n      \"allowedPaths\": [\n        \"/golden/in-a\",\n        \"/golden/in-a/**\",\n        \"/golden/org\",\n        \"/golden/org/**\"\n      ],\n      \"deniedPaths\": []\n    }\n  }\n}\n"
- },
- "confined_read_workspace_inside_the_org": {
-  "args": {
-   "tools": [
-    "read",
-    "write"
-   ],
-   "confine": true,
-   "workspace": "/golden/org/ws"
-  },
-  "name": "hirearchy-golden-org-26994b-read-write-xdcd24551",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-read-write-xdcd24551\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: read, write)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"read\",\n    \"write\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false,\n  \"toolsSettings\": {\n    \"write\": {\n      \"allowedPaths\": [\n        \"/golden/org/ws/**\"\n      ],\n      \"deniedPaths\": []\n    },\n    \"read\": {\n      \"allowedPaths\": [\n        \"/golden/org/ws\",\n        \"/golden/org/ws/**\",\n        \"/golden/org\",\n        \"/golden/org/**\"\n      ],\n      \"deniedPaths\": []\n    }\n  }\n}\n"
- },
- "confined_shell_only": {
-  "args": {
-   "tools": [
-    "shell"
-   ],
-   "confine": true,
-   "workspace": "/golden/ws"
-  },
-  "name": "hirearchy-golden-org-26994b-shell-xbf21a9e8",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-shell-xbf21a9e8\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: shell)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"shell\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\",\n    \"shell\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false\n}\n"
- },
- "confined_nothing": {
-  "args": {
-   "tools": [],
-   "confine": true
-  },
-  "name": "hirearchy-golden-org-26994b-xbf21a9e8",
-  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-xbf21a9e8\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\"\n  ],\n  \"allowedTools\": [\n    \"@hirearchy\"\n  ],\n  \"resources\": [],\n  \"hooks\": {},\n  \"includeMcpJson\": false\n}\n"
+  "text": "{\n  \"name\": \"hirearchy-golden-org-26994b-shell-web-search\",\n  \"description\": \"internal: used by the hirearchy scheduler for /golden/org; not a general-purpose agent (built-in tools: shell, web_search)\",\n  \"prompt\": \"You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\\\"hirearchy::*\\\"] loads all of them), then call each with tool_call and tool_id \\\"hirearchy::<name>\\\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.\",\n  \"mcpServers\": {\n    \"hirearchy\": {\n      \"command\": \"<BIN>\",\n      \"args\": [\n        \"mcp\"\n      ],\n      \"env\": {\n        \"ORG_ROOT\": \"/golden/org\",\n        \"ORG_REQUIRE_AGENT\": \"1\"\n      }\n    }\n  },\n  \"tools\": [\n    \"@hirearchy\",\n    \"shell\",\n    \"remote_web_search\"\n  ],\n  \"resources\": [],\n  \"hooks\": [],\n  \"includeMcpJson\": false,\n  \"includePowers\": false,\n  \"permissions\": {\n    \"rules\": [\n      {\n        \"capability\": \"mcp\",\n        \"match\": [\n          \"hirearchy/*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"shell\",\n        \"match\": [\n          \"*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"web_search\",\n        \"match\": [\n          \"*\"\n        ],\n        \"effect\": \"allow\"\n      },\n      {\n        \"capability\": \"skill\",\n        \"effect\": \"deny\"\n      },\n      {\n        \"capability\": \"context\",\n        \"effect\": \"deny\"\n      }\n    ]\n  }\n}\n"
  }
 }

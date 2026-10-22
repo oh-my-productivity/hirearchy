@@ -13,8 +13,7 @@ from hirearchy.blueprint.testing import ScriptedConfinementPolicy, access_over
 
 
 
-ROOT_DIR = str(ORG_PLACEHOLDER)
-OPEN = {"read": {"allowedPaths": [ROOT_DIR, f"{ROOT_DIR}/**"], "deniedPaths": []}}
+OPEN = (ORG_PLACEHOLDER,)
 
 
 def agent(**kw: object) -> Agent:
@@ -31,37 +30,32 @@ def test_without_the_built_in_read_the_organization_is_read_with_hirearchy_read_
 
 
 def test_with_the_built_in_read_the_policy_is_asked_about_a_stand_in_organization_directory() -> None:
-    policy = ScriptedConfinementPolicy(OPEN)
+    policy = ScriptedConfinementPolicy(read=OPEN)
     assert PolicyAccessReport(policy).org_files_readable(agent(tools=["read", "shell"], workspace="/ws", inputs=["/in1", "/in2"]))
     assert policy.calls == [(Path("/hirearchy-org-root"), ["read", "shell"], Path("/ws"), [Path("/in1"), Path("/in2")])]
 
 
 def test_without_a_workspace_the_policy_is_asked_with_none() -> None:
-    policy = ScriptedConfinementPolicy(OPEN)
+    policy = ScriptedConfinementPolicy(read=OPEN)
     PolicyAccessReport(policy).org_files_readable(agent(tools=["read"]))
     assert policy.calls[0][2] is None
 
 
 def test_the_organization_is_readable_when_the_policy_allows_it_and_does_not_deny_it() -> None:
-    assert PolicyAccessReport(ScriptedConfinementPolicy(OPEN)).org_files_readable(agent(tools=["read"]))
+    assert PolicyAccessReport(ScriptedConfinementPolicy(read=OPEN)).org_files_readable(agent(tools=["read"]))
 
 
-@pytest.mark.parametrize("settings", [
-    {},  # nothing allowed
-    {"read": {"allowedPaths": [], "deniedPaths": []}},
-    {"read": {"allowedPaths": [ROOT_DIR], "deniedPaths": []}},  # the directory but not what is in it
-    {"read": {"allowedPaths": [f"{ROOT_DIR}/**"], "deniedPaths": [ROOT_DIR]}},
-    {"read": {"allowedPaths": [f"{ROOT_DIR}/**"], "deniedPaths": ["/"]}},  # a denied parent
-])
-def test_the_organization_is_not_readable_when_the_policy_does_not_allow_it_or_denies_it(settings: dict[str, object]) -> None:
-    assert not PolicyAccessReport(ScriptedConfinementPolicy(settings)).org_files_readable(agent(tools=["read"]))
+@pytest.mark.parametrize(
+    "read",
+    [(), (Path("/other"),), (Path("/ws"), Path("/in")), (Path("/hirearchy-org-root/work"),), (Path("/"),)],  # (a folder in the org or a parent is not the org)
+)
+def test_the_organization_is_not_readable_when_the_policy_does_not_name_it(read: tuple[Path, ...]) -> None:
+    assert not PolicyAccessReport(ScriptedConfinementPolicy(read=read)).org_files_readable(agent(tools=["read"]))
 
 
-def test_a_denial_of_the_glob_alone_does_not_hide_the_directory_itself() -> None:
-    """What the flat function answered: a denied path hides the directory when it IS the directory or a parent of it (``root.startswith(parent + "/")``);
-    the glob ``<root>/**`` is neither."""
-    settings = {"read": {"allowedPaths": [f"{ROOT_DIR}/**"], "deniedPaths": [f"{ROOT_DIR}/**"]}}
-    assert PolicyAccessReport(ScriptedConfinementPolicy(settings)).org_files_readable(agent(tools=["read"]))
+def test_a_problem_does_not_hide_the_organization_the_policy_names() -> None:
+    """``Confinement.read`` keeps the org when ``problem`` is set (the run is refused later, with its reason); the plan stays readable."""
+    assert PolicyAccessReport(ScriptedConfinementPolicy(read=OPEN, problem="why")).org_files_readable(agent(tools=["read"]))
 
 
 def test_the_real_policy_lets_the_built_in_read_open_the_organization() -> None:
@@ -94,6 +88,6 @@ def test_the_technical_line() -> None:
 
 
 def test_a_policy_that_hides_the_organization_changes_the_line() -> None:
-    hidden = PolicyAccessReport(ScriptedConfinementPolicy({"read": {"allowedPaths": ["/ws"], "deniedPaths": []}}))
+    hidden = PolicyAccessReport(ScriptedConfinementPolicy(read=[Path("/ws")]))
     assert hidden.line(agent(tools=["read"], workspace="/ws")) == "kiro read only in /ws"
     assert hidden.line(agent(tools=["read"])) == "kiro read nowhere"

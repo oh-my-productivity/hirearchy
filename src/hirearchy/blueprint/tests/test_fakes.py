@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from hirearchy.blueprint._protocols import OrgContext
+from hirearchy.kiro import Confinement
 from hirearchy.blueprint.testing import MemoryRoleLibrary, MemoryTextFiles, ScriptedConfinementPolicy, StaticOrgContext
 from hirearchy.settings import DEFAULT_CONFIG
 
@@ -49,17 +50,17 @@ def test_a_static_organization_gives_its_settings_and_names_as_copies() -> None:
     assert org.config()["max_depth"] == DEFAULT_CONFIG["max_depth"] and org.service_names() == {"brief"}
 
 
-def test_the_scripted_policy_answers_its_settings_whatever_it_is_asked_and_records_the_questions() -> None:
-    policy = ScriptedConfinementPolicy({"read": {"allowedPaths": ["/x"]}})
+def test_the_scripted_policy_answers_its_read_whatever_it_is_asked_and_records_the_questions() -> None:
+    policy = ScriptedConfinementPolicy(read=[Path("/x")])
     answer = policy.file_confinement(Path("/o"), ("read", "shell"), Path("/w"), (Path("/i"),))
-    assert answer == (["read", "shell"], {"read": {"allowedPaths": ["/x"]}})
-    answer[1]["read"] = None  # the answer is a copy
-    assert policy.file_confinement(Path("/o2"), ["web_fetch"], None, [])[1] == {"read": {"allowedPaths": ["/x"]}}
+    assert answer == Confinement(("@hirearchy", "read", "shell"), (), (Path("/x"),), None, None)
+    assert policy.file_confinement(Path("/o2"), ["web_fetch"], None, []).read == (Path("/x"),)
     assert policy.calls == [(Path("/o"), ["read", "shell"], Path("/w"), [Path("/i")]), (Path("/o2"), ["web_fetch"], None, [])]
 
 
-def test_the_scripted_policy_without_settings_answers_none() -> None:
-    assert ScriptedConfinementPolicy().file_confinement(Path("/o"), [], None, []) == ([], {})
+def test_the_scripted_policy_without_read_answers_nowhere_and_may_carry_a_problem() -> None:
+    assert ScriptedConfinementPolicy().file_confinement(Path("/o"), [], None, []) == Confinement(("@hirearchy",), (), (), None, None)
+    assert ScriptedConfinementPolicy(problem="why").file_confinement(Path("/o"), [], None, []).problem == "why"
 
 
 def test_the_memory_role_library_is_given_its_roles_at_once_or_one_by_one() -> None:

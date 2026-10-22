@@ -10,7 +10,7 @@ from typing import cast
 
 import pytest
 
-from hirearchy.kiro import ProfileProvisioner
+from hirearchy.kiro import KiroRunRefused, ProfileProvisioner
 from hirearchy.kiro.testing import IMPLEMENTATIONS, ProvisionerHarness
 
 from ._support import make
@@ -83,14 +83,14 @@ def test_naming_writes_nothing(h: ProvisionerHarness) -> None:
 # ----------------------------------------------------------------------------------------------------------- the profile
 
 
-def test_the_shared_profile_has_the_name_of_the_tools_and_the_server_of_the_organization(h: ProvisionerHarness) -> None:
+def test_the_profile_has_the_name_of_the_tools_and_the_server_of_the_organization(h: ProvisionerHarness) -> None:
     name = h.provisioner.ensure_profile(["shell", "read"])
-    assert name == h.provisioner.profile_name(["read", "shell"])
+    assert name.startswith(h.provisioner.profile_name(["read", "shell"]))
     data = profile(h, name)
-    assert data["name"] == name and data["tools"] == ["@hirearchy", "read", "shell"] and data["allowedTools"] == ["@hirearchy", "read", "shell"]
+    assert data["name"] == name and data["tools"] == ["@hirearchy", "read", "shell"]
     assert data["description"] == f"internal: used by the hirearchy scheduler for {h.root}; not a general-purpose agent (built-in tools: read, shell)"
     assert data["mcpServers"] == {"hirearchy": {**h.server, "env": {"ORG_ROOT": str(h.root), "ORG_REQUIRE_AGENT": "1"}}}
-    assert "toolsSettings" not in data and data["includeMcpJson"] is False
+    assert "permissions" in data and data["includeMcpJson"] is False
 
 
 def test_a_profile_without_tools_has_no_tool_list_in_its_description(h: ProvisionerHarness) -> None:
@@ -134,31 +134,52 @@ def test_two_organizations_never_share_a_profile(h: ProvisionerHarness) -> None:
 # ------------------------------------------------------------------------------------------------------------ confinement
 
 
-def test_a_confined_profile_has_a_hash_of_its_access_in_its_name(h: ProvisionerHarness) -> None:
-    name = h.provisioner.ensure_profile(["read", "write"], workspace=Path("/golden/ws"), inputs=[Path("/golden/in-a")], confine=True)
+def rules_of(data: dict[str, object]) -> list[dict[str, object]]:
+    return cast("list[dict[str, object]]", cast("dict[str, object]", data["permissions"])["rules"])
+
+
+def test_a_profile_with_file_tools_has_a_hash_of_its_access_in_its_name(h: ProvisionerHarness) -> None:
+    name = h.provisioner.ensure_profile(["read", "write"], workspace=Path("/golden/ws"), inputs=[Path("/golden/in-a")])
     data = profile(h, name)
-    settings = cast(dict[str, object], data["toolsSettings"])
-    assert name == h.provisioner.profile_name(["read", "write"]) + "-x" + hashlib.sha1(json.dumps(settings, sort_keys=True).encode()).hexdigest()[:8]
+    digest8 = hashlib.sha1(json.dumps(rules_of(data), sort_keys=True).encode()).hexdigest()[:8]
+    assert name == h.provisioner.profile_name(["read", "write"]) + "-x" + digest8
     assert re.fullmatch(r".*-x[0-9a-f]{8}", name)
-    assert data["tools"] == ["@hirearchy", "read", "write"] and data["allowedTools"] == ["@hirearchy"]
+    assert data["tools"] == ["@hirearchy", "read", "write"]
 
 
 def test_the_same_access_shares_a_profile_and_different_access_never_does(h: ProvisionerHarness) -> None:
-    kw = {"workspace": Path("/golden/ws"), "inputs": [Path("/golden/in-a")], "confine": True}
+    kw = {"workspace": Path("/golden/ws"), "inputs": [Path("/golden/in-a")]}
     name = h.provisioner.ensure_profile(["read", "write"], **kw)  # type: ignore[arg-type]
     assert h.provisioner.ensure_profile(["write", "read"], **kw) == name  # type: ignore[arg-type]
-    assert h.provisioner.ensure_profile(["read", "write"], workspace=Path("/golden/ws"), inputs=[], confine=True) != name
-    assert h.provisioner.ensure_profile(["read", "write"], workspace=Path("/golden/other"), inputs=[Path("/golden/in-a")], confine=True) != name
+    assert h.provisioner.ensure_profile(["read", "write"], workspace=Path("/golden/ws"), inputs=[]) != name
+    assert h.provisioner.ensure_profile(["read", "write"], workspace=Path("/golden/other"), inputs=[Path("/golden/in-a")]) != name
     assert h.writes().count(name) == 1
 
 
-def test_confinement_is_only_applied_when_asked_for(h: ProvisionerHarness) -> None:
-    unconfined = h.provisioner.ensure_profile(["read", "write"], workspace=Path("/golden/ws"))
-    assert unconfined == h.provisioner.profile_name(["read", "write"]) and "toolsSettings" not in profile(h, unconfined)
-    assert profile(h, unconfined)["allowedTools"] == ["@hirearchy", "read", "write"]
-
-
-def test_a_confined_profile_without_file_tools_has_no_settings(h: ProvisionerHarness) -> None:
-    name = h.provisioner.ensure_profile(["shell"], workspace=Path("/golden/ws"), confine=True)
+def test_the_profile_is_v3(h: ProvisionerHarness) -> None:
+    name = h.provisioner.ensure_profile(["read", "shell"], workspace=Path("/golden/ws"))
     data = profile(h, name)
-    assert "toolsSettings" not in data and data["allowedTools"] == ["@hirearchy", "shell"]
+    assert data["tools"] == ["@hirearchy", "read", "shell"]
+    assert not {"allowedTools", "toolsSettings", "model"} & set(data) and data["hooks"] == [] and data["includePowers"] is False
+    assert rules_of(data)[0] == {"capability": "mcp", "match": ["hirearchy/*"], "effect": "allow"}
+    assert rules_of(data)[-2:] == [{"capability": "skill", "effect": "deny"}, {"capability": "context", "effect": "deny"}]
+    assert {"capability": "shell", "match": ["*"], "effect": "allow"} in rules_of(data)
+
+
+def test_every_profile_is_v3_and_confined_by_its_grant(h: ProvisionerHarness) -> None:
+    shell = h.provisioner.ensure_profile(["shell"], workspace=Path("/golden/ws"))
+    assert shell == h.provisioner.profile_name(["shell"]) and not any(str(r["capability"]).startswith("fs_") for r in rules_of(profile(h, shell)))
+    legacy = h.provisioner.ensure_profile(["read"])  # the former unconfined charter: confined to the organization
+    fs = [r for r in rules_of(profile(h, legacy)) if str(r["capability"]).startswith("fs_")]
+    assert legacy.startswith(h.provisioner.profile_name(["read"]) + "-x") and fs
+    root = h.root.resolve()
+    assert fs[0]["match"] == [str(root), f"{root}/**"]
+
+
+def test_a_refused_grant_writes_nothing(h: ProvisionerHarness) -> None:
+    for kw in ({"workspace": Path("/golden/w{s")}, {"inputs": [Path("/golden/i\\n")]}):
+        with pytest.raises(KiroRunRefused, match=r"^kiro: the path .* contains"):
+            h.provisioner.ensure_profile(["read", "write"], **kw)
+    with pytest.raises(KiroRunRefused, match="not one of read, write, shell, web_search, web_fetch"):
+        h.provisioner.ensure_profile(["read", "Shell"])
+    assert h.names() == [] and h.writes() == []

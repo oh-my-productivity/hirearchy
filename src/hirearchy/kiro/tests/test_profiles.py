@@ -2,6 +2,7 @@
 # A test moved from tests/ by refactor step E1: not type-checked strictly (production code is). Delete the first line when this file is typed.
 
 import json
+import re
 
 from testkit.kiro_world import kiro_profile_name, kiro_runner, profiles_in
 from testkit.reach.hirearchy.core import ROOT
@@ -11,8 +12,9 @@ def test_kiro_runner_builds_isolated_command(org, tmp_path, monkeypatch):
     profiles_in(org, tmp_path / "agents")
     org.write(ROOT, "ceo/AGENT.md", "---\nrole: CEO\nmodel: claude-haiku-4.5\ntools: [read]\n---\nLead.\n")
     cmd, cwd, env = kiro_runner()(org, "ceo", "PROMPT")
-    name = kiro_profile_name(org.root, ["read"])
-    assert cmd[:5] == ["kiro-cli", "chat", "--no-interactive", "--agent", name]
+    name = cmd[4]
+    assert re.fullmatch(rf"{re.escape(kiro_profile_name(org.root, ['read']))}-x[0-9a-f]{{8}}", name)  # built-in read: confined to the org
+    assert cmd[:4] == ["kiro-cli", "chat", "--no-interactive", "--agent"]
     assert cmd[-2:] == ["--model", "claude-haiku-4.5"] and "PROMPT" not in cmd  # the prompt goes via stdin
     assert cwd == org.dir("ceo") and env["ORG_AGENT"] == "ceo" and env["ORG_ROOT"] == str(org.root)
     profile = json.loads((tmp_path / "agents" / f"{name}.json").read_text())

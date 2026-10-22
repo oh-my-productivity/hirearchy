@@ -140,7 +140,7 @@ def kiro_agents_dir() -> Path:
 
 
 def file_confinement(org_root: Path, tools: list[str], workspace: Path | None, inputs: list[Path]) -> Any:
-    """(allowedTools, toolsSettings) that confine kiro's built-in ``read``/``write`` by path (``KiroConfinementPolicy``)."""
+    """The ``Confinement`` (V3 selector, rules, read and write reach) of kiro's tools for this grant (``KiroConfinementPolicy``)."""
     return wiring.open_runtime(NO_ORG).confinement_policy.file_confinement(org_root, tools, workspace, inputs)
 
 

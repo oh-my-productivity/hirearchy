@@ -1,45 +1,202 @@
 {
   "confined_read_inputs_only": {
-    "allowedTools": [],
-    "toolsSettings": {
-      "read": {
-        "allowedPaths": [
+    "problem": null,
+    "read": [
+      "/golden/in-a",
+      "/golden/org"
+    ],
+    "rules": [
+      {
+        "capability": "mcp",
+        "effect": "allow",
+        "match": [
+          "hirearchy/*"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "allow",
+        "match": [
+          "/golden/in-a",
+          "/golden/in-a/**",
+          "/golden/org",
+          "/golden/org/**"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "deny",
+        "exclude": [
           "/golden/in-a",
           "/golden/in-a/**",
           "/golden/org",
           "/golden/org/**"
         ],
-        "deniedPaths": []
+        "match": [
+          "/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ]
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
       }
-    }
+    ],
+    "tools": [
+      "@hirearchy",
+      "read"
+    ],
+    "write": null
   },
   "confined_read_workspace_inside_the_org": {
-    "allowedTools": [],
-    "toolsSettings": {
-      "read": {
-        "allowedPaths": [
+    "problem": null,
+    "read": [
+      "/golden/org/ws",
+      "/golden/org"
+    ],
+    "rules": [
+      {
+        "capability": "mcp",
+        "effect": "allow",
+        "match": [
+          "hirearchy/*"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "allow",
+        "match": [
+          "/golden/org/ws",
+          "/golden/org/ws/**",
+          "/golden/org",
+          "/golden/org/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "allow",
+        "match": [
+          "/golden/org/ws/**"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "deny",
+        "exclude": [
           "/golden/org/ws",
           "/golden/org/ws/**",
           "/golden/org",
           "/golden/org/**"
         ],
-        "deniedPaths": []
+        "match": [
+          "/**"
+        ]
       },
-      "write": {
-        "allowedPaths": [
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "exclude": [
           "/golden/org/ws/**"
         ],
-        "deniedPaths": []
+        "match": [
+          "/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/golden/org/ws/.kiro",
+          "/golden/org/ws/.kiro/**",
+          "/golden/org/ws/**/.kiro",
+          "/golden/org/ws/**/.kiro/**",
+          "/golden/org/ws/AGENTS.md",
+          "/golden/org/ws/**/AGENTS.md",
+          "/golden/org/ws/.git",
+          "/golden/org/ws/.git/**",
+          "/golden/org/ws/**/.git",
+          "/golden/org/ws/**/.git/**",
+          "/golden/org/ws/.vscode",
+          "/golden/org/ws/.vscode/**",
+          "/golden/org/ws/**/.vscode",
+          "/golden/org/ws/**/.vscode/**"
+        ]
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
       }
-    }
+    ],
+    "tools": [
+      "@hirearchy",
+      "read",
+      "write"
+    ],
+    "write": "/golden/org/ws"
   },
   "confined_read_write_shell": {
-    "allowedTools": [
-      "shell"
+    "problem": null,
+    "read": [
+      "/golden/ws",
+      "/golden/in-a",
+      "/golden/in-b",
+      "/golden/org"
     ],
-    "toolsSettings": {
-      "read": {
-        "allowedPaths": [
+    "rules": [
+      {
+        "capability": "mcp",
+        "effect": "allow",
+        "match": [
+          "hirearchy/*"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "allow",
+        "match": [
+          "/golden/ws",
+          "/golden/ws/**",
+          "/golden/in-a",
+          "/golden/in-a/**",
+          "/golden/in-b",
+          "/golden/in-b/**",
+          "/golden/org",
+          "/golden/org/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "allow",
+        "match": [
+          "/golden/ws/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/golden/org",
+          "/golden/org/**"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "deny",
+        "exclude": [
           "/golden/ws",
           "/golden/ws/**",
           "/golden/in-a",
@@ -49,49 +206,221 @@
           "/golden/org",
           "/golden/org/**"
         ],
-        "deniedPaths": []
+        "match": [
+          "/**"
+        ]
       },
-      "write": {
-        "allowedPaths": [
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "exclude": [
           "/golden/ws/**"
         ],
-        "deniedPaths": [
-          "/golden/org",
-          "/golden/org/**"
+        "match": [
+          "/**"
         ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/golden/ws/.kiro",
+          "/golden/ws/.kiro/**",
+          "/golden/ws/**/.kiro",
+          "/golden/ws/**/.kiro/**",
+          "/golden/ws/AGENTS.md",
+          "/golden/ws/**/AGENTS.md",
+          "/golden/ws/.git",
+          "/golden/ws/.git/**",
+          "/golden/ws/**/.git",
+          "/golden/ws/**/.git/**",
+          "/golden/ws/.vscode",
+          "/golden/ws/.vscode/**",
+          "/golden/ws/**/.vscode",
+          "/golden/ws/**/.vscode/**"
+        ]
+      },
+      {
+        "capability": "shell",
+        "effect": "allow",
+        "match": [
+          "*"
+        ]
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
       }
-    }
-  },
-  "confined_shell_only": {
-    "allowedTools": [
+    ],
+    "tools": [
+      "@hirearchy",
+      "read",
+      "write",
       "shell"
     ],
-    "toolsSettings": {}
+    "write": "/golden/ws"
+  },
+  "confined_shell_only": {
+    "problem": null,
+    "read": [],
+    "rules": [
+      {
+        "capability": "mcp",
+        "effect": "allow",
+        "match": [
+          "hirearchy/*"
+        ]
+      },
+      {
+        "capability": "shell",
+        "effect": "allow",
+        "match": [
+          "*"
+        ]
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
+      }
+    ],
+    "tools": [
+      "@hirearchy",
+      "shell"
+    ],
+    "write": null
   },
   "confined_write_only": {
-    "allowedTools": [],
-    "toolsSettings": {
-      "write": {
-        "allowedPaths": [
+    "problem": null,
+    "read": [],
+    "rules": [
+      {
+        "capability": "mcp",
+        "effect": "allow",
+        "match": [
+          "hirearchy/*"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "allow",
+        "match": [
+          "/golden/ws/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/golden/org",
+          "/golden/org/**"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "exclude": [
           "/golden/ws/**"
         ],
-        "deniedPaths": [
-          "/golden/org",
-          "/golden/org/**"
+        "match": [
+          "/**"
         ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/golden/ws/.kiro",
+          "/golden/ws/.kiro/**",
+          "/golden/ws/**/.kiro",
+          "/golden/ws/**/.kiro/**",
+          "/golden/ws/AGENTS.md",
+          "/golden/ws/**/AGENTS.md",
+          "/golden/ws/.git",
+          "/golden/ws/.git/**",
+          "/golden/ws/**/.git",
+          "/golden/ws/**/.git/**",
+          "/golden/ws/.vscode",
+          "/golden/ws/.vscode/**",
+          "/golden/ws/**/.vscode",
+          "/golden/ws/**/.vscode/**"
+        ]
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
       }
-    }
+    ],
+    "tools": [
+      "@hirearchy",
+      "write"
+    ],
+    "write": "/golden/ws"
   },
   "confined_write_without_workspace": {
-    "allowedTools": [],
-    "toolsSettings": {
-      "write": {
-        "allowedPaths": [],
-        "deniedPaths": [
+    "problem": null,
+    "read": [],
+    "rules": [
+      {
+        "capability": "mcp",
+        "effect": "allow",
+        "match": [
+          "hirearchy/*"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
           "/golden/org",
           "/golden/org/**"
         ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ]
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
       }
-    }
+    ],
+    "tools": [
+      "@hirearchy",
+      "write"
+    ],
+    "write": null
   }
 }

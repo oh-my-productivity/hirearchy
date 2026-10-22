@@ -26,3 +26,12 @@ def test_every_expected_text_has_a_scenario_and_every_scenario_a_text() -> None:
 def test_the_scenarios_cover_every_command() -> None:
     used = {scenario.argv[2] if scenario.argv[:1] == ("--root",) else scenario.argv[0] for scenario in _scenario.SCENARIOS.values() if scenario.argv}
     assert set(_scenario.SUBCOMMANDS) - {"mcp"} <= used  # (mcp serves over stdio: test_mcp_command starts it in a process)
+
+
+def test_the_normalizer_hides_the_access_hash_of_a_profile_name(tmp_path: Path) -> None:
+    """A confined profile's name ends in ``-x`` and a hash of its rules, which hold the (temporary) path of the organization."""
+    normalize = _scenario.normalizer(tmp_path, None)
+    one = normalize("wrote ~/.kiro/agents/hirearchy-t-org-1a2b3c-read-write-x0badf00d.json (mcp server: {})")
+    two = normalize("wrote ~/.kiro/agents/hirearchy-t-org-4d5e6f-read-write-x9c8b7a65.json (mcp server: {})")
+    assert one == two == "wrote ~/.kiro/agents/hirearchy-t-org-<HASH>-read-write-x<ACCESS_HASH>.json (mcp server: {})"
+    assert normalize("x0badf00dxx -xyz") == "x0badf00dxx -xyz"  # only a name suffix: -x and exactly 8 hex digits at a word end

@@ -14,7 +14,7 @@ from typing import Any
 
 from hirearchy.app import wiring
 from hirearchy.kernel._system import FsAtomicWriter
-from hirearchy.kiro import ProfileStore
+from hirearchy.kiro import Confinement, ProfileStore
 from hirearchy.kiro._profiles import FsProfileStore
 
 from .health_world import _OVERRIDES, with_ports
@@ -45,18 +45,18 @@ def profiles_in(org: Any, directory: Path) -> Any:
 
 
 def ensure_kiro_profile(
-    tools: Sequence[str], agents_dir: Path | None = None, *, org: Any, workspace: Path | None = None, inputs: Sequence[Path] | None = None, confine: bool = False,
+    tools: Sequence[str], agents_dir: Path | None = None, *, org: Any, workspace: Path | None = None, inputs: Sequence[Path] | None = None,
 ) -> str:
     """Write the profile of ``org`` into ``agents_dir`` (default: ``~/.kiro/agents`` of the ``HOME`` in force); returns its name."""
     runtime = org.runtime
     if agents_dir is not None:
         store: ProfileStore = FsProfileStore(lambda: Path(agents_dir), FsAtomicWriter())
         runtime = wiring.open_runtime(org.root, {**getattr(org, _OVERRIDES, {}), ProfileStore: store})
-    return runtime.profile_provisioner.ensure_profile(tools, workspace=workspace, inputs=inputs, confine=confine)  # type: ignore[no-any-return]
+    return runtime.profile_provisioner.ensure_profile(tools, workspace=workspace, inputs=inputs)  # type: ignore[no-any-return]
 
 
 def file_confinement(
     org_root: str | Path, tools: Sequence[str], workspace: Path | None, inputs: Sequence[Path]
-) -> tuple[list[str], dict[str, object]]:
-    """(allowedTools, toolsSettings) that confine kiro's built-in ``read``/``write`` by path."""
+) -> Confinement:
+    """The V3 ``tools`` selector, permission rules and reach that confine kiro's tools by path."""
     return wiring.open_runtime(Path(org_root)).confinement_policy.file_confinement(Path(org_root), tools, workspace, inputs)  # type: ignore[no-any-return]

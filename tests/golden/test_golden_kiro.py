@@ -23,13 +23,13 @@ SHAPES = {
     "shared_shell": dict(tools=["shell"]),
     "shared_read_unconfined": dict(tools=["read"]),
     "confined_read_write_shell": dict(
-        tools=["read", "write", "shell"], confine=True, workspace=Path("/golden/ws"),
+        tools=["read", "write", "shell"], workspace=Path("/golden/ws"),
         inputs=[Path("/golden/in-a"), Path("/golden/in-b")]),
-    "confined_write_only": dict(tools=["write"], confine=True, workspace=Path("/golden/ws")),
-    "confined_write_without_workspace": dict(tools=["write"], confine=True),
-    "confined_read_inputs_only": dict(tools=["read"], confine=True, inputs=[Path("/golden/in-a")]),
-    "confined_read_workspace_inside_the_org": dict(tools=["read", "write"], confine=True, workspace=Path("/golden/org/ws")),
-    "confined_shell_only": dict(tools=["shell"], confine=True, workspace=Path("/golden/ws")),
+    "confined_write_only": dict(tools=["write"], workspace=Path("/golden/ws")),
+    "confined_write_without_workspace": dict(tools=["write"]),
+    "confined_read_inputs_only": dict(tools=["read"], inputs=[Path("/golden/in-a")]),
+    "confined_read_workspace_inside_the_org": dict(tools=["read", "write"], workspace=Path("/golden/org/ws")),
+    "confined_shell_only": dict(tools=["shell"], workspace=Path("/golden/ws")),
 }
 
 
@@ -64,10 +64,12 @@ def test_kiro_profile_names(tmp_path):
 def test_file_confinement_settings():
     out = {}
     for label, kw in SHAPES.items():
-        if kw.get("confine"):
-            allowed, settings = file_confinement(
-                Path("/golden/org"), sorted(kw["tools"]), kw.get("workspace"), list(kw.get("inputs", [])))
-            out[label] = {"allowedTools": allowed, "toolsSettings": settings}
+        if label.startswith("confined_"):
+            c = file_confinement(Path("/golden/org"), sorted(kw["tools"]), kw.get("workspace"), list(kw.get("inputs", [])))
+            out[label] = {
+                "tools": list(c.tools), "rules": list(c.rules), "read": [str(p) for p in c.read],
+                "write": None if c.write is None else str(c.write), "problem": c.problem,
+            }
     check("kiro/file_confinement.json", json.dumps(out, indent=2, sort_keys=True) + "\n")
 
 
@@ -94,7 +96,7 @@ def test_scheduler_kiro_command_line(tmp_path, clock, norm):
     org.hire(ROOT, "ro", "Reader", "x", tools=["read"], inputs=[str(inputs)])
     org.hire(ROOT, "modeled", "Modeled", "x", model="claude-haiku-4.5")
     org.hire(ROOT, "legacy", "Legacy", "x", tools=["read"])
-    legacy_meta = org.dir("legacy") / "AGENT.md"  # a charter written before `inputs` existed: no key, unconfined `read`
+    legacy_meta = org.dir("legacy") / "AGENT.md"  # a charter written before `inputs` existed: no key, `read` of the organization only
     legacy_meta.write_text(re.sub(r"^inputs:.*\n", "", legacy_meta.read_text(encoding="utf-8"), flags=re.M), encoding="utf-8")
     build = kiro_runner()
     agents_dir = Path.home() / ".kiro" / "agents"  # (``$HOME`` is the sandbox's: the ``isolated_kiro`` fixture)

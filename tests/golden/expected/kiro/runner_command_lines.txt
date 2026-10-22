@@ -6,7 +6,7 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>",
   "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\"hirearchy::*\"] loads all of them), then call each with tool_call and tool_id \"hirearchy::<name>\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.",
   "mcpServers": {
     "hirearchy": {
       "command": "<VENV_BIN>/hirearchy",
@@ -22,12 +22,29 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
   "tools": [
     "@hirearchy"
   ],
-  "allowedTools": [
-    "@hirearchy"
-  ],
   "resources": [],
-  "hooks": {},
-  "includeMcpJson": false
+  "hooks": [],
+  "includeMcpJson": false,
+  "includePowers": false,
+  "permissions": {
+    "rules": [
+      {
+        "capability": "mcp",
+        "match": [
+          "hirearchy/*"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
+      }
+    ]
+  }
 }
 
 ##### ceo/eng
@@ -38,7 +55,7 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>",
   "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\"hirearchy::*\"] loads all of them), then call each with tool_call and tool_id \"hirearchy::<name>\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.",
   "mcpServers": {
     "hirearchy": {
       "command": "<VENV_BIN>/hirearchy",
@@ -54,12 +71,29 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
   "tools": [
     "@hirearchy"
   ],
-  "allowedTools": [
-    "@hirearchy"
-  ],
   "resources": [],
-  "hooks": {},
-  "includeMcpJson": false
+  "hooks": [],
+  "includeMcpJson": false,
+  "includePowers": false,
+  "permissions": {
+    "rules": [
+      {
+        "capability": "mcp",
+        "match": [
+          "hirearchy/*"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
+      }
+    ]
+  }
 }
 
 ##### sh
@@ -70,7 +104,7 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>-shell.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>-shell",
   "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: shell)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\"hirearchy::*\"] loads all of them), then call each with tool_call and tool_id \"hirearchy::<name>\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.",
   "mcpServers": {
     "hirearchy": {
       "command": "<VENV_BIN>/hirearchy",
@@ -87,13 +121,36 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>-shell.json
     "@hirearchy",
     "shell"
   ],
-  "allowedTools": [
-    "@hirearchy",
-    "shell"
-  ],
   "resources": [],
-  "hooks": {},
-  "includeMcpJson": false
+  "hooks": [],
+  "includeMcpJson": false,
+  "includePowers": false,
+  "permissions": {
+    "rules": [
+      {
+        "capability": "mcp",
+        "match": [
+          "hirearchy/*"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "shell",
+        "match": [
+          "*"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
+      }
+    ]
+  }
 }
 
 ##### dev
@@ -104,7 +161,7 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HA
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>",
   "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: read, shell, write)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\"hirearchy::*\"] loads all of them), then call each with tool_call and tool_id \"hirearchy::<name>\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.",
   "mcpServers": {
     "hirearchy": {
       "command": "<VENV_BIN>/hirearchy",
@@ -120,37 +177,110 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HA
   "tools": [
     "@hirearchy",
     "read",
-    "shell",
-    "write"
-  ],
-  "allowedTools": [
-    "@hirearchy",
+    "write",
     "shell"
   ],
   "resources": [],
-  "hooks": {},
+  "hooks": [],
   "includeMcpJson": false,
-  "toolsSettings": {
-    "write": {
-      "allowedPaths": [
-        "<WS>/**"
-      ],
-      "deniedPaths": [
-        "<TMP>/golden-team/org",
-        "<TMP>/golden-team/org/**"
-      ]
-    },
-    "read": {
-      "allowedPaths": [
-        "<WS>",
-        "<WS>/**",
-        "<INPUTS>",
-        "<INPUTS>/**",
-        "<TMP>/golden-team/org",
-        "<TMP>/golden-team/org/**"
-      ],
-      "deniedPaths": []
-    }
+  "includePowers": false,
+  "permissions": {
+    "rules": [
+      {
+        "capability": "mcp",
+        "match": [
+          "hirearchy/*"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "fs_read",
+        "effect": "allow",
+        "match": [
+          "<WS>",
+          "<WS>/**",
+          "<INPUTS>",
+          "<INPUTS>/**",
+          "<TMP>/golden-team/org",
+          "<TMP>/golden-team/org/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "allow",
+        "match": [
+          "<WS>/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "<TMP>/golden-team/org",
+          "<TMP>/golden-team/org/**"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ],
+        "exclude": [
+          "<WS>",
+          "<WS>/**",
+          "<INPUTS>",
+          "<INPUTS>/**",
+          "<TMP>/golden-team/org",
+          "<TMP>/golden-team/org/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ],
+        "exclude": [
+          "<WS>/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "<WS>/.kiro",
+          "<WS>/.kiro/**",
+          "<WS>/**/.kiro",
+          "<WS>/**/.kiro/**",
+          "<WS>/AGENTS.md",
+          "<WS>/**/AGENTS.md",
+          "<WS>/.git",
+          "<WS>/.git/**",
+          "<WS>/**/.git",
+          "<WS>/**/.git/**",
+          "<WS>/.vscode",
+          "<WS>/.vscode/**",
+          "<WS>/**/.vscode",
+          "<WS>/**/.vscode/**"
+        ]
+      },
+      {
+        "capability": "shell",
+        "match": [
+          "*"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
+      }
+    ]
   }
 }
 
@@ -162,7 +292,7 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>",
   "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: read)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\"hirearchy::*\"] loads all of them), then call each with tool_call and tool_id \"hirearchy::<name>\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.",
   "mcpServers": {
     "hirearchy": {
       "command": "<VENV_BIN>/hirearchy",
@@ -179,22 +309,58 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>.json
     "@hirearchy",
     "read"
   ],
-  "allowedTools": [
-    "@hirearchy"
-  ],
   "resources": [],
-  "hooks": {},
+  "hooks": [],
   "includeMcpJson": false,
-  "toolsSettings": {
-    "read": {
-      "allowedPaths": [
-        "<INPUTS>",
-        "<INPUTS>/**",
-        "<TMP>/golden-team/org",
-        "<TMP>/golden-team/org/**"
-      ],
-      "deniedPaths": []
-    }
+  "includePowers": false,
+  "permissions": {
+    "rules": [
+      {
+        "capability": "mcp",
+        "match": [
+          "hirearchy/*"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "fs_read",
+        "effect": "allow",
+        "match": [
+          "<INPUTS>",
+          "<INPUTS>/**",
+          "<TMP>/golden-team/org",
+          "<TMP>/golden-team/org/**"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ],
+        "exclude": [
+          "<INPUTS>",
+          "<INPUTS>/**",
+          "<TMP>/golden-team/org",
+          "<TMP>/golden-team/org/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ]
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
+      }
+    ]
   }
 }
 
@@ -206,7 +372,7 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>",
   "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\"hirearchy::*\"] loads all of them), then call each with tool_call and tool_id \"hirearchy::<name>\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.",
   "mcpServers": {
     "hirearchy": {
       "command": "<VENV_BIN>/hirearchy",
@@ -222,23 +388,40 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
   "tools": [
     "@hirearchy"
   ],
-  "allowedTools": [
-    "@hirearchy"
-  ],
   "resources": [],
-  "hooks": {},
-  "includeMcpJson": false
+  "hooks": [],
+  "includeMcpJson": false,
+  "includePowers": false,
+  "permissions": {
+    "rules": [
+      {
+        "capability": "mcp",
+        "match": [
+          "hirearchy/*"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
+      }
+    ]
+  }
 }
 
 ##### legacy
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read", "--model", "claude-sonnet-5.5"]
+command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5"]
 cwd: <TMP>/golden-team/org/legacy
 env: {"ORG_AGENT": "legacy", "ORG_ROOT": "<TMP>/golden-team/org"}
-profile file: hirearchy-golden-team-org-<ROOT_HASH>-read.json
+profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>.json
 {
-  "name": "hirearchy-golden-team-org-<ROOT_HASH>-read",
+  "name": "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>",
   "description": "internal: used by the hirearchy scheduler for <TMP>/golden-team/org; not a general-purpose agent (built-in tools: read)",
-  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled.",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\"hirearchy::*\"] loads all of them), then call each with tool_call and tool_id \"hirearchy::<name>\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.",
   "mcpServers": {
     "hirearchy": {
       "command": "<VENV_BIN>/hirearchy",
@@ -255,11 +438,53 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>-read.json
     "@hirearchy",
     "read"
   ],
-  "allowedTools": [
-    "@hirearchy",
-    "read"
-  ],
   "resources": [],
-  "hooks": {},
-  "includeMcpJson": false
+  "hooks": [],
+  "includeMcpJson": false,
+  "includePowers": false,
+  "permissions": {
+    "rules": [
+      {
+        "capability": "mcp",
+        "match": [
+          "hirearchy/*"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "fs_read",
+        "effect": "allow",
+        "match": [
+          "<TMP>/golden-team/org",
+          "<TMP>/golden-team/org/**"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ],
+        "exclude": [
+          "<TMP>/golden-team/org",
+          "<TMP>/golden-team/org/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ]
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
+      }
+    ]
+  }
 }

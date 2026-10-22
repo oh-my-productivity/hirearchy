@@ -10,7 +10,7 @@ from pathlib import Path
 
 from ..kernel import OrgLayout
 from ._profile_document import kiro_profile
-from .api import ConfinementPolicy, McpServerLocator, ProfileProvisioner, ProfileStore
+from .api import FILE_TOOLS, ConfinementPolicy, KiroRunRefused, McpServerLocator, ProfileProvisioner, ProfileStore
 
 
 def _slug(text: str) -> str:
@@ -38,10 +38,8 @@ class OrgProfileProvisioner(ProfileProvisioner):
         digest = hashlib.sha1(str(root).encode("utf-8")).hexdigest()[:6]
         return "-".join(["hirearchy", slug, digest, *(_slug(t) for t in sorted(set(tools)) if _slug(t))])
 
-    def ensure_profile(
-        self, tools: Sequence[str], *, workspace: Path | None = None, inputs: Sequence[Path] | None = None, confine: bool = False
-    ) -> str:
-        """Write the scheduler's profile for the organization into ``~/.kiro/agents``: only the hirearchy server plus the granted tools.
+    def ensure_profile(self, tools: Sequence[str], *, workspace: Path | None = None, inputs: Sequence[Path] | None = None) -> str:
+        """Write the scheduler's V3 profile for the organization: only the hirearchy server plus the granted tools, confined by the grant.
 
         The profile is internal to this organization: its MCP server entry carries ``ORG_ROOT`` (this org) and
         ``ORG_REQUIRE_AGENT=1``, so used outside the scheduler (no ``ORG_AGENT``) the server refuses to start instead of
@@ -49,31 +47,28 @@ class OrgProfileProvisioner(ProfileProvisioner):
         (assumption: kiro starts MCP servers with its own environment plus the profile's ``env``; if it did not, the
         server would fail closed and the run would fail visibly rather than act as root).
 
-        ``confine=False``: the shared profile of the org for this tool set; every granted tool runs unprompted.
-        ``confine=True``: the profile of an agent with built-in ``read``/``write``: they are limited to ``workspace`` (write)
-        and ``workspace`` + ``inputs`` + the org itself (read), see ``ConfinementPolicy.file_confinement``. Its name carries a
-        hash of that access, so agents with the same tools and access share a profile and different access never does.
+        The policy is asked for every profile (``ConfinementPolicy.file_confinement``): a grant it cannot confine is a
+        ``KiroRunRefused`` and nothing is written. A profile with built-in ``read``/``write`` is limited to ``workspace`` (write) and
+        ``workspace`` + ``inputs`` + the org itself (read); its name carries a hash of its rules, so agents with the same tools and
+        access share a profile and different access never does. Profiles without file tools are shared per organization and tool set.
 
-        Profiles of other orgs, and the legacy global ``hirearchy[-tools].json`` files, are never touched.
+        Profiles of other orgs are never touched.
         """
         root = self._layout.root
         tools = sorted(set(tools))
+        confinement = self._confinement.file_confinement(root, tools, workspace, list(inputs or []))
+        if confinement.problem is not None:
+            raise KiroRunRefused(f"kiro: {confinement.problem}")
         name = self.profile_name(tools)
-        settings: dict[str, object]
-        allowed, settings = ["@hirearchy", *tools], {}
-        if confine:
-            allowed, settings = self._confinement.file_confinement(root, tools, workspace, list(inputs or []))
-            allowed = ["@hirearchy", *allowed]
-            name += "-x" + hashlib.sha1(json.dumps(settings, sort_keys=True).encode("utf-8")).hexdigest()[:8]
+        if set(tools) & set(FILE_TOOLS):
+            name += "-x" + hashlib.sha1(json.dumps(list(confinement.rules), sort_keys=True).encode("utf-8")).hexdigest()[:8]
         server = {**self._locator.command(), "env": {"ORG_ROOT": str(root), "ORG_REQUIRE_AGENT": "1"}}
         data = kiro_profile(
             name,
             f"internal: used by the hirearchy scheduler for {root}; not a general-purpose agent"
             + (f" (built-in tools: {', '.join(tools)})" if tools else ""),
-            ["@hirearchy", *tools],
             server,
-            allowed_tools=allowed,
-            tools_settings=settings,
+            confinement,
         )
         if self._store.read(name) != data:  # missing or corrupt: rewrite it
             self._store.write(name, data)

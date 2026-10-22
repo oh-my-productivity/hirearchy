@@ -331,6 +331,7 @@ class Normalizer:
     def __call__(self, text: str) -> str:
         for real, placeholder in sorted(self.pairs, key=lambda p: -len(p[0])):
             text = text.replace(real, placeholder)
+        text = re.sub(r"-x[0-9a-f]{8}\b", "-x<ACCESS_HASH>", text)  # a confined profile's name ends in a hash of its rules (they hold the org's path)
         text = re.sub(r"(hirearchy-[a-z0-9-]*?)-[0-9a-f]{6}\b", r"\1-<HASH>", text)  # the profile name carries a hash of the path of the organization
         text = re.sub(r'("pid": )\d+', r'\1"<PID>"', text)
         return re.sub(r"\bpid \d+", "pid <PID>", text)

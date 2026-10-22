@@ -88,17 +88,17 @@ def test_the_validator_of_the_runtime_knows_the_organization_it_is_built_for(tmp
     assert "exists" not in {i.code for i in validator.validate(bp, allowed_roots=[tmp_path])}
 
 
-OPEN = {"read": {"allowedPaths": ["/hirearchy-org-root", "/hirearchy-org-root/**"], "deniedPaths": []}}
+OPEN = (Path("/hirearchy-org-root"),)
 
 
 def test_the_validator_of_the_runtime_asks_the_confinement_policy_of_the_runtime(tmp_path: Path) -> None:
-    policy = ScriptedConfinementPolicy(OPEN)
+    policy = ScriptedConfinementPolicy(read=OPEN)
     runtime = wiring.open_runtime(tmp_path, {ConfinementPolicy: policy})
     bp = _corpus.documents(tmp_path)  # the writer leaves its work in the org; the reviewer holds the built-in read
     issues = runtime.blueprint_validator.validate(bp, allowed_roots=[tmp_path])
     assert policy.calls and policy.calls[0][1] == ["read"]
     assert "verifier-cannot-read" not in {i.code for i in issues}
-    policy.settings = {}  # the policy now hides the organization from the built-in read
+    policy.read = ()  # the policy now hides the organization from the built-in read
     assert "verifier-cannot-read" in {i.code for i in runtime.blueprint_validator.validate(bp, allowed_roots=[tmp_path])}
 
 

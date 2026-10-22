@@ -1,6 +1,9 @@
 # mypy: ignore-errors
 # A test moved from tests/ by refactor step E1: not type-checked strictly (production code is). Delete the first line when this file is typed.
 
+import dataclasses
+from pathlib import Path
+
 import pytest
 from testkit.blueprint_world import World, bpm
 
@@ -51,13 +54,8 @@ def test_the_gap_cannot_come_back_the_validator_warns_when_the_profile_would_not
 
     class WithoutOrgRead(ConfinementPolicy):  # the old profile: the org is denied to the built-in read
         def file_confinement(self, org_root, tools, workspace, inputs):
-            allowed, settings = real.file_confinement(org_root, tools, workspace, inputs)
-            if "read" in settings:
-                settings["read"] = {
-                    "allowedPaths": [p for p in settings["read"]["allowedPaths"] if not p.startswith(str(org_root))],
-                    "deniedPaths": [str(org_root), f"{org_root}/**"],
-                }
-            return allowed, settings
+            c = real.file_confinement(org_root, tools, workspace, inputs)
+            return dataclasses.replace(c, read=tuple(p for p in c.read if p != Path(org_root).resolve()))
 
     bpm = World({ConfinementPolicy: WithoutOrgRead()})
     issues = bpm.validate(bp, allowed_roots=[tmp_path])

@@ -264,7 +264,7 @@ class FakeUpkeep(Recording, RulesUpgrader, SkillInstaller, HealthReviewer, Profi
     def profile_name(self, tools: Sequence[str]) -> str:
         return "-".join(["hirearchy", *tools])
 
-    def ensure_profile(self, tools: Sequence[str], *, workspace: Path | None = None, inputs: Sequence[Path] | None = None, confine: bool = False) -> str:
+    def ensure_profile(self, tools: Sequence[str], *, workspace: Path | None = None, inputs: Sequence[Path] | None = None) -> str:
         self.note("ensure_profile", list(tools))
         return self.profile_name(tools)
 

@@ -102,10 +102,8 @@ def test_plan_and_access_line_show_exactly_the_applied_confinement(kind, cwd, tm
     shells = 0
     for addr, agent in agents.items():
         tools = o.charter(addr)[0].get("tools") or []
-        _, settings = file_confinement(o.root, tools, o.workspace_of(addr), o.inputs_of(addr))
-        enforced = set()
-        for rule in settings.values():
-            enforced |= {p[:-3] if p.endswith("/**") else p for p in rule["allowedPaths"]}
+        confinement = file_confinement(o.root, tools, o.workspace_of(addr), o.inputs_of(addr))
+        enforced = {str(p) for p in confinement.read} | ({str(confinement.write)} if confinement.write else set())
         # built-in read also reaches the organization's own files; the plan says so in words (no path: it does not exist yet)
         assert ("read" in tools) == (str(o.root) in enforced), addr
         enforced.discard(str(o.root))

@@ -3,41 +3,40 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
+from copy import deepcopy
 from typing import cast
 
 from ..kernel import JsonObject
+from .api import Confinement
 
 
-def kiro_profile(
-    name: str, description: str, tools: Sequence[str], mcp_server: JsonObject, *,
-    allowed_tools: Sequence[str] | None = None, tools_settings: JsonObject | None = None,
-) -> JsonObject:
-    """A kiro-cli agent profile that loads only the hirearchy server (not the user's global mcp.json).
+PROFILE_PROMPT = (
+    "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages "
+    "for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are "
+    'deferred: load them with tool_load (tool_ids ["hirearchy::*"] loads all of them), then call each with tool_call and tool_id '
+    '"hirearchy::<name>", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.'
+)
 
-    ``allowed_tools`` = the tools kiro runs without asking (default: all of ``tools``). A tool that is NOT in it and has
-    ``tools_settings`` with ``allowedPaths`` runs unprompted only on those paths; anything else needs an approval,
-    which a ``--no-interactive`` run cannot give, so it is refused. A tool in ``allowed_tools`` ignores its
-    ``allowedPaths`` entirely (only ``deniedPaths`` still apply), so confined tools must be left out of it.
+
+def kiro_profile(name: str, description: str, server: JsonObject, confinement: Confinement) -> JsonObject:
+    """A kiro-cli V3 agent profile that loads only the hirearchy server and whatever ``confinement`` selects and allows.
+
+    No pre-V3 tool-permission keys (V3 rejects them) and no ``model`` (``--model`` is always passed); nothing from the user's
+    global configuration is included (``includeMcpJson`` and ``includePowers`` are false, no resources, no hooks).
     """
-    data = {
+    return {
         "name": name,
         "description": description,
-        "prompt": (
-            "You are a member of a file-based agent organization. The user message contains your "
-            "rules, charter, memory, state and new messages for this run. Follow it exactly, act "
-            "through the hirearchy tools, and stop when the messages are handled."
-        ),
-        "mcpServers": {"hirearchy": mcp_server},
-        "tools": tools,
-        "allowedTools": tools if allowed_tools is None else allowed_tools,
+        "prompt": PROFILE_PROMPT,
+        "mcpServers": {"hirearchy": deepcopy(server)},
+        "tools": list(confinement.tools),
         "resources": [],
-        "hooks": {},
+        "hooks": [],
         "includeMcpJson": False,
+        "includePowers": False,
+        "permissions": {"rules": deepcopy(list(confinement.rules))},
     }
-    if tools_settings:
-        data["toolsSettings"] = tools_settings
-    return data
 
 
 def render_profile(data: Mapping[str, object]) -> str:

@@ -100,8 +100,7 @@ def test_what_an_agent_may_touch_in_plain_words(tmp_path: Path) -> None:
     from hirearchy.blueprint._protocols import AccessWording
     from hirearchy.blueprint.testing import ScriptedConfinementPolicy, access_over
 
-    open_org = {"read": {"allowedPaths": ["/hirearchy-org-root", "/hirearchy-org-root/**"], "deniedPaths": []}}
-    words = PlainAccessWords(access_over(ScriptedConfinementPolicy(open_org)))
+    words = PlainAccessWords(access_over(ScriptedConfinementPolicy(read=[Path("/hirearchy-org-root")])))
     assert isinstance(words, AccessWording)
     assert words.describe(agent("w", ["write"], "/ws")) == "changes files only in /ws"
     assert words.describe(agent("w", ["web_search", "web_fetch"], None)) == "can search the web and read web pages; cannot change your files"

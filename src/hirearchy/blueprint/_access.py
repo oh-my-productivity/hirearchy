@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Collection, Iterable
 from pathlib import Path
-from typing import cast
 
 from ..kiro import ConfinementPolicy
 from ._protocols import AccessReport
 from ._shapes import AccessFacts
-from ._view import mapping_or_empty
 from .api import Agent
 
 ORG_PLACEHOLDER = Path("/hirearchy-org-root")  # stands for the org directory, which does not exist at plan time
@@ -24,16 +21,13 @@ class PolicyAccessReport(AccessReport):
 
         Without built-in ``read`` it uses hirearchy's ``read``. With it, the built-in ``read`` is the only ``read`` the model
         sees (it hides hirearchy's, same short name), so the answer comes from what the runtime really allows it: the same
-        confinement policy that writes the profile, asked about a stand-in org directory.
+        confinement policy that writes the profile, asked about a stand-in org directory, names the org among the folders
+        kiro's read tools may read (``Confinement.read``).
         """
         if "read" not in a.tools:
             return True
         ws = Path(a.workspace) if a.workspace else None
-        _, settings = self._policy.file_confinement(ORG_PLACEHOLDER, list(a.tools), ws, [Path(p) for p in a.inputs])
-        rule = mapping_or_empty(settings.get("read"))
-        root = str(ORG_PLACEHOLDER)
-        denied = any(root == d or root.startswith(d.removesuffix("/**").rstrip("/") + "/") for d in cast("Iterable[str]", rule.get("deniedPaths", [])))
-        return f"{root}/**" in cast("Collection[str]", rule.get("allowedPaths", [])) and not denied
+        return ORG_PLACEHOLDER in self._policy.file_confinement(ORG_PLACEHOLDER, list(a.tools), ws, [Path(p) for p in a.inputs]).read
 
     def facts(self, a: Agent) -> AccessFacts:
         """What the runtime lets this agent reach with kiro's file tools: the ONE computation behind both the technical

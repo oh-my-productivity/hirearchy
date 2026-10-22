@@ -18,7 +18,7 @@ from ..dispatch import TaskAssigner
 from ..hierarchy import Hiring, Retired, Retirement
 from ..kernel import NAME_RE, JsonObject, Message, OrgError, child_addr
 from ..kernel.testing import DictEnvironment
-from ..kiro import ConfinementPolicy
+from ..kiro import Confinement, ConfinementPolicy
 from ..kiro.testing import kiro_confinement
 from ..services import ContractNormalizer, ServiceCommands
 from ..services.testing import normalizer as contract_normalizer
@@ -113,17 +113,18 @@ class StaticOrgContext(OrgContext):
 
 
 class ScriptedConfinementPolicy(ConfinementPolicy):
-    """A confinement policy that answers the same ``toolsSettings`` whatever it is asked, and records what it was asked."""
+    """A confinement policy that lets kiro's read tools read the same folders (``read``) whatever it is asked, and records what it was asked."""
 
-    def __init__(self, settings: Mapping[str, object] | None = None) -> None:
-        self.settings: dict[str, object] = dict(settings or {})
+    def __init__(self, read: Sequence[Path] = (), *, problem: str | None = None) -> None:
+        self.read: tuple[Path, ...] = tuple(read)
+        self.problem = problem
         self.calls: list[tuple[Path, list[str], Path | None, list[Path]]] = []
 
     def file_confinement(
         self, org_root: Path, tools: Sequence[str], workspace: Path | None, inputs: Sequence[Path]
-    ) -> tuple[list[str], dict[str, object]]:
+    ) -> Confinement:
         self.calls.append((org_root, list(tools), workspace, list(inputs)))
-        return list(tools), dict(self.settings)
+        return Confinement(("@hirearchy", *tools), (), self.read, None, self.problem)
 
 
 class MemoryWorkspaceProvisioner(WorkspaceProvisioner):
