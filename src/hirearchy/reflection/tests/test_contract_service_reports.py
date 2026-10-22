@@ -118,3 +118,20 @@ def test_a_request_of_a_retired_service_has_no_total(w: ReflectionWorld) -> None
 
 def test_the_implementations_agree_on_an_empty_organization(reports: ServiceReports) -> None:
     assert reports.services_text("root") == NO_SERVICES
+
+
+def test_case_total_warns_only_when_more_runs_were_used_than_the_contract_gives(w: ReflectionWorld) -> None:
+    """Study E3's numbers, memo by memo, with its 15-run contract: runs handed down above 15 are no overspend (F-E3-7), runs used above 15 are."""
+    define(w, budget=15)
+    for used, handed in ((12, 21), (15, 25), (14, 20)):
+        task = ask(w, f"t{used}", budget=handed)
+        deliver(w, task, runs=used)
+        total = w.reports.case_total(task)
+        assert total == f"case total: {used} runs used of {handed} handed down (contract: 15 per request)"
+        assert "exceeds" not in total
+    over = ask(w, "over", budget=15)
+    deliver(w, over, runs=16)
+    assert w.reports.case_total(over) == (
+        "case total: 16 runs used of 15 handed down (contract: 15 per request). "
+        "This case now exceeds the per-request budget of 15: tell the user."
+    )
