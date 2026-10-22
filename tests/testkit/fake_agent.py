@@ -10,6 +10,8 @@ Behaviour is chosen by FAKE_MODE:
   hang  - sleep for a long time (a run the scheduler has to kill on timeout).
   service - delivers a service request through a review step: a manager sends each task to the reports of FAKE_REPORTS in order (author, then checker), reports
           the task done with lessons when the last one answers; leaves write an artifact and report done (with lessons when the task is a service request).
+          FAKE_AMBIGUOUS (items separated by "|"; unset: nothing changes): the checker (the last of FAKE_REPORTS) adds one line "Ambiguous: <item>" per item to
+          its summary, and the manager copies each of them into its own report under "Questions for the client:" (what roles/manager.md asks).
 """
 
 import os
@@ -67,6 +69,7 @@ if mode == "tools":
 
 if mode == "service":
     order = [a for a in os.environ.get("FAKE_REPORTS", "").split(",") if a] or kids
+    ambiguous = [item.strip() for item in os.environ.get("FAKE_AMBIGUOUS", "").split("|") if item.strip()]
     for msg in org.messages(me, "inflight"):
         if msg.type == "task":
             if kids:
@@ -74,7 +77,8 @@ if mode == "service":
                 org.write(me, f"{me}/MEMORY.md", f"{sub.id}={msg.id}\n", append=True)
             else:
                 org.write(me, f"{me}/work/out.md", f"done: {msg.title}")
-                org.report(me, msg.id, "done", "Did it.", [f"{me}/work/out.md"], lessons="Followed the playbook." if msg.service else None)
+                said = "Did it." + "".join(f"\nAmbiguous: {item}" for item in ambiguous if order and me == order[-1])  # the checker lists what it cannot judge
+                org.report(me, msg.id, "done", said, [f"{me}/work/out.md"], lessons="Followed the playbook." if msg.service else None)
         elif msg.type == "result":
             parent_id = dict(line.split("=") for line in org.memory(me).split())[msg.reply_to]
             at = order.index(msg.sender)
@@ -83,7 +87,9 @@ if mode == "service":
                 sub = org.delegate(me, order[at + 1], f"check: {parent.title}", parent.body, "same as parent", budget=2)
                 org.write(me, f"{me}/MEMORY.md", f"{sub.id}={parent_id}\n", append=True)
             else:
-                org.report(me, parent_id, msg.status, f"Team result: {msg.status}", [f"{order[0]}/work/out.md"], lessons="Delivered by the team; nothing to change.")
+                asked = [line[len("Ambiguous: "):] for line in msg.body.splitlines() if line.startswith("Ambiguous: ")]
+                team = f"Team result: {msg.status}" + ("\n\nQuestions for the client:\n" + "\n".join(f"- {item}" for item in asked) if asked else "")
+                org.report(me, parent_id, msg.status, team, [f"{order[0]}/work/out.md"], lessons="Delivered by the team; nothing to change.")
     sys.exit(0)
 
 for msg in org.messages(me, "inflight"):

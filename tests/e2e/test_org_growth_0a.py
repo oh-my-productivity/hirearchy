@@ -92,11 +92,11 @@ def world(tmp_path) -> World:
     return w
 
 
-def run_team(w: World, limit: float = 90.0) -> None:
+def run_team(w: World, limit: float = 90.0, env: dict[str, str] | None = None) -> None:
     def runner(org, addr, prompt):
         w.prompts.append((addr, prompt))
-        env = {**os.environ, "ORG_ROOT": str(org.root), "ORG_AGENT": addr, "FAKE_MODE": "service", "FAKE_REPORTS": "lead/writer,lead/reviewer"}
-        return [sys.executable, str(testkit.FAKE_AGENT)], org.dir(addr), env
+        env_of = {**os.environ, "ORG_ROOT": str(org.root), "ORG_AGENT": addr, "FAKE_MODE": "service", "FAKE_REPORTS": "lead/writer,lead/reviewer", **(env or {})}
+        return [sys.executable, str(testkit.FAKE_AGENT)], org.dir(addr), env_of
 
     loop = loop_over(w.org, runner, echo=lambda _: None)
     loop.acquire()
@@ -111,8 +111,8 @@ def run_team(w: World, limit: float = 90.0) -> None:
         loop.release()
 
 
-def deliver(w: World, task_id: str) -> None:
-    run_team(w)
+def deliver(w: World, task_id: str, env: dict[str, str] | None = None) -> None:
+    run_team(w, env=env)
     assert any(m.type == "result" and m.status == "done" and m.reply_to == task_id for m in w.org.received(ROOT)), task_id
 
 
@@ -312,6 +312,29 @@ def test_11_e3_turn_5_an_unasked_amendment_is_not_the_clients_yes(tmp_path):
     assert "amendment the client confirmed (none yet; C7, C8 are not confirmed yet)" in prompt
     assert "A rule without the client's evidence (step 3) is a reason to look" in prompt
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
+
+
+AMBIGUOUS_MARTA = "Marta keeps the agenda as sent (C5): fits the words, not the purpose"
+
+
+def test_12_a_reviewers_ambiguous_item_reaches_roots_progress_before_delivery(tmp_path):
+    """E3 turn 3: the reviewer listed an item as ambiguous, the lead asked the client in its report, and root went on to copy and to rework.
+    The fake reviewer lists the item (``FAKE_AMBIGUOUS``) and the fake lead copies it under ``Questions for the client:``, as roles/manager.md asks.
+    Root's ``progress`` flags the result before the copy, a rework root relays does not answer it, a rework the user asked for does (DR-17)."""
+    w = world(tmp_path)
+    a1 = request(w)
+    deliver(w, a1, env={"FAKE_AMBIGUOUS": AMBIGUOUS_MARTA})
+    result = next(m for m in w.org.received(ROOT) if m.type == "result" and m.reply_to == a1)
+    assert f"Questions for the client:\n- {AMBIGUOUS_MARTA}" in result.body  # the reviewer's item, forwarded by the lead
+    flag = "1 question for the client: ask the user before you copy or deliver"
+    assert flag in call(w.root, "progress", task_id=a1)  # before anyone copies anything
+    assert not (tmp_path / "deliverables").exists()  # as the go/no-go words it; nothing in this test copies, so this is not evidence (DR-16)
+    relayed = call(w.root, "request", service=SERVICE, inputs=A_MEMO, revises=a1)  # no source: the assistant's own reading
+    assert f"{a1}'s result asked the client: Marta keeps the agenda as sent" in relayed and "a rework does not answer them" in relayed
+    assert flag in call(w.root, "progress", task_id=a1)  # a relayed rework did not ask anyone (DR-17)
+    human = call(w.root, "request", service=SERVICE, inputs=A_MEMO, revises=a1, source="human")
+    assert "asked the client" not in human and "a rework does not answer them" not in human  # the user asked for this change: nothing to repeat
+    assert flag not in call(w.root, "progress", task_id=a1)
 
 
 def test_8_health_counts_the_escape_and_not_the_relayed_rework(tmp_path):
