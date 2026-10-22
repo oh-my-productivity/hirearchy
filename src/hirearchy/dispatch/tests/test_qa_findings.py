@@ -1,7 +1,6 @@
 # mypy: ignore-errors
 # A test moved from tests/ by refactor step E1: not type-checked strictly (production code is). Delete the first line when this file is typed.
 
-import shutil
 import time
 
 import pytest
@@ -13,13 +12,11 @@ from hirearchy.kernel import AtomicWriter
 from hirearchy.kernel.testing import FailingAtomicWriter
 
 ENG = "ceo/eng"
-TRUE = shutil.which("true") or "/usr/bin/true"
-
 
 def test_qa4_oversized_message_does_not_wedge_the_agent(org, tmp_path):
     org.delegate(ROOT, "ceo", "T", "g", "a", budget=10)
     org.send(ROOT, "ceo", "x" * 3_000_000)  # a single long result/note is enough
-    sched = loop_over(org, TRUE)  # `true` stands in for kiro-cli
+    sched = loop_over(org, "kiro-cli")  # the stub kiro-cli of the fixture: under the launcher `true` would exit before any runStarted and count as a failure
     sched.acquire()
     try:
         for _ in range(4):

@@ -3,7 +3,7 @@
 
 import pytest
 import testkit.reach.yaml as yaml
-from testkit.kiro_world import kiro_runner
+from testkit.kiro_world import kiro_part, kiro_runner
 from testkit.reach.hirearchy.core import DEFAULT_MODEL, ROOT, Org
 
 CHARTER = "---\nrole: CEO\n{model}tools: [read]\n---\nLead.\n"
@@ -32,7 +32,7 @@ def model_arg(cmd: list[str]) -> str:
 # ------------------------------------------------------------------------------------------ the run command
 def test_the_scheduler_command_always_carries_the_model(org):
     cmd, _, _ = kiro_runner()(org, "ceo", "P")
-    assert model_arg(cmd) == "claude-sonnet-5.5" and cmd[-2:] == ["--model", "claude-sonnet-5.5"]
+    assert model_arg(cmd) == "claude-sonnet-5.5" and kiro_part(cmd)[5:7] == ["--model", "claude-sonnet-5.5"]  # (the launcher's arguments come first)
     cmd, _, _ = kiro_runner()(org, "ceo/eng", "P")
     assert model_arg(cmd) == "claude-sonnet-5.5"
 

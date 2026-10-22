@@ -6,7 +6,7 @@ import argparse
 import json
 
 from ..kernel import OrgError, Provider
-from ..kiro import McpServerLocator, ProfileProvisioner
+from ..kiro import KiroPlaces, McpServerLocator, ProfileProvisioner, RuntimeReadiness
 from ..review import HealthReviewer
 from ..skill import SkillInstaller
 from ..snapshots import OrgSnapshotter
@@ -102,9 +102,14 @@ class McpCommand(Command):
 
 
 class KiroProfileCommand(Command):
-    def __init__(self, session: OrgSession, profiles: Provider[ProfileProvisioner], locator: Provider[McpServerLocator], out: Output) -> None:
+    def __init__(
+        self, session: OrgSession, profiles: Provider[ProfileProvisioner], readiness: Provider[RuntimeReadiness], places: Provider[KiroPlaces],
+        locator: Provider[McpServerLocator], out: Output,
+    ) -> None:
         self._session = session
         self._profiles = profiles
+        self._readiness = readiness
+        self._places = places
         self._locator = locator
         self._out = out
 
@@ -115,5 +120,8 @@ class KiroProfileCommand(Command):
 
     def run(self, args: Arguments) -> None:
         self._session.open(args, mutating=True)  # the profile belongs to this organization
+        problem = self._readiness().state_problem()  # where the profile goes (the kiro home) must be a place hirearchy can use: nothing is written otherwise
+        if problem is not None:
+            raise OrgError(problem)
         name = self._profiles().ensure_profile([t for t in (args.tools or "").split(",") if t])
-        self._out.say(f"wrote ~/.kiro/agents/{name}.json (mcp server: {json.dumps(self._locator().command())})")
+        self._out.say(f"wrote {self._places().home() / 'agents' / name}.json (mcp server: {json.dumps(self._locator().command())})")

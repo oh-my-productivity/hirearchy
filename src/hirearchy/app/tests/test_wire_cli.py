@@ -19,10 +19,15 @@ from hirearchy.app.wire_locator import os_locator
 from hirearchy.cli import CliApp
 from hirearchy.cli._session import AnnouncingOrgSession
 from hirearchy.cli.testing import MemoryOutput
+from hirearchy.daemon import REFUSED_START, SchedulerState, SchedulerStatus
+from hirearchy.daemon.testing import FakeSchedulerStatus
 from hirearchy.dashboard.testing import FakeDashboardLauncher
 from hirearchy.hierarchy import Hiring
 from hirearchy.kernel import ROOT, OrgError
 from hirearchy.kernel.testing import FakeClock
+from hirearchy.kiro import RuntimeReadiness
+from hirearchy.kiro.testing import FixedReadiness
+from hirearchy.snapshots import RUNTIME_IGNORE_LINES
 
 
 COMMANDS = [
@@ -124,6 +129,82 @@ def test_the_scheduler_runner_runs_the_loop_until_there_is_nothing_to_do(team: O
     out.events.clear()
     runner.run(team.root, "kiro-cli", once=True, until_idle=False, until_done=False, max_runs=None)
     assert out.stdout == ""  # (one pass, nothing to run)
+
+
+def tree_of(root: Path) -> dict[str, bytes]:
+    """Every file of the organization (not the git objects), by relative path."""
+    return {str(p.relative_to(root)): p.read_bytes() for p in sorted(root.rglob("*")) if p.is_file() and ".git" not in p.relative_to(root).parts}
+
+
+def refuse(team: Org, problem: str = "no key", *, once: bool = False, max_runs: int | None = None, status: SchedulerStatus | None = None) -> None:
+    """Start the scheduler of ``team`` in a world where kiro-cli is not ready (``problem``) and let the refusal propagate."""
+    overrides: dict[type, object] = {RuntimeReadiness: FixedReadiness(problem)}
+    if status is not None:
+        overrides[SchedulerStatus] = status
+    with wiring.overriding(overrides):
+        wire_cli.LoopSchedulerRunner(MemoryOutput(), FakeClock()).run(team.root, "kiro-cli", once=once, until_idle=False, until_done=True, max_runs=max_runs)
+
+
+def test_a_refused_start_raises_and_writes_only_the_marker(team: Org) -> None:
+    (team.root / ".gitignore").write_text("runs/\n", encoding="utf-8")  # (a repository that does not know the runtime files yet)
+    before = tree_of(team.root)
+    with pytest.raises(OrgError, match="^kiro-cli is not ready, no run was started: no key$"):
+        refuse(team)
+    after = tree_of(team.root)
+    assert (team.root / ".runtime" / "scheduler.exit").read_text(encoding="utf-8") == f"{REFUSED_START}kiro-cli is not ready: no key\n"
+    assert set(after) - set(before) == {".runtime/scheduler.exit"} and set(before) <= set(after)
+    assert sorted(k for k in before if after[k] != before[k]) == [".gitignore"]  # the runtime files are ignored by the snapshots, as a claim would do
+    assert set(RUNTIME_IGNORE_LINES) <= set((team.root / ".gitignore").read_text(encoding="utf-8").splitlines())
+
+
+def test_a_refused_start_emits_no_event_and_starts_no_run(team: Org) -> None:
+    events = wiring.open_runtime(team.root).event_reader.files()
+    with pytest.raises(OrgError):
+        refuse(team)
+    assert wiring.open_runtime(team.root).event_reader.files() == events
+    assert not (team.root / ".runtime" / "scheduler.pid").exists() and not (team.root / ".runtime" / "running.json").exists()
+
+
+def test_with_a_live_scheduler_no_marker_is_written(team: Org) -> None:
+    status = FakeSchedulerStatus(SchedulerState("running", 4242, "2026-10-18 10:00:00Z"))
+    with pytest.raises(OrgError, match="no run was started: no key"):
+        refuse(team, status=status)
+    assert not (team.root / ".runtime" / "scheduler.exit").exists()  # the status of the scheduler that is alive must win
+
+
+def test_status_names_the_refusal_while_root_has_an_open_task(team: Org, capsys: pytest.CaptureFixture[str]) -> None:
+    team.delegate(ROOT, "ceo", "Ship it", "goal", "accept", budget=5)
+    with pytest.raises(OrgError):
+        refuse(team)
+    wire_cli.run_cli(["--root", str(team.root), "status"])
+    assert capsys.readouterr().out.rstrip().endswith("scheduler: stopped (refused to start: kiro-cli is not ready: no key)")
+
+
+@pytest.mark.parametrize("once", [False, True])
+def test_readiness_is_checked_first_also_with_max_runs_0(team: Org, once: bool) -> None:
+    with pytest.raises(OrgError, match="no run was started: kiro-cli cannot run"):
+        refuse(team, "kiro-cli cannot run", once=once, max_runs=0)
+    assert (team.root / ".runtime" / "scheduler.exit").read_text(encoding="utf-8").startswith(REFUSED_START)
+
+
+def test_a_ready_kiro_cli_starts_the_loop_and_leaves_no_marker(team: Org) -> None:
+    with wiring.overriding({RuntimeReadiness: FixedReadiness(None)}):
+        out = MemoryOutput()
+        wire_cli.LoopSchedulerRunner(out, FakeClock()).run(team.root, "kiro-cli", once=False, until_idle=False, until_done=True, max_runs=None)
+    assert out.stdout == "scheduler exiting: finished: no open tasks\n"
+
+
+def test_the_readiness_is_asked_for_the_binary_of_the_command(team: Org) -> None:
+    asked: list[str] = []
+
+    class Spy(FixedReadiness):
+        def check(self, kiro_bin: str) -> str | None:
+            asked.append(kiro_bin)
+            return super().check(kiro_bin)
+
+    with wiring.overriding({RuntimeReadiness: Spy(None)}):
+        wire_cli.LoopSchedulerRunner(MemoryOutput(), FakeClock()).run(team.root, "my-kiro", once=True, until_idle=False, until_done=False, max_runs=0)
+    assert asked == ["my-kiro"]
 
 
 def test_the_launchers_of_the_other_entry_points_import_them_only_when_they_run(team: Org, monkeypatch: pytest.MonkeyPatch) -> None:

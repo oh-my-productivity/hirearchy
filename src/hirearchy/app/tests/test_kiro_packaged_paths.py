@@ -14,6 +14,7 @@ from pathlib import Path
 import pytest
 
 import hirearchy
+import hirearchy.kiro
 import hirearchy.scheduler as scheduler
 from hirearchy.app import wire_kiro
 
@@ -53,3 +54,11 @@ def test_the_console_script_beside_the_interpreter_wins(tmp_path: Path, monkeypa
     (tmp_path / "bin" / "hirearchy").write_text("#!/bin/sh\n", encoding="utf-8")
     monkeypatch.setattr(sys, "executable", str(tmp_path / "bin" / "python"))
     assert wire_kiro.mcp_locator().command() == {"command": str(tmp_path / "bin" / "hirearchy"), "args": ["mcp"]}
+
+
+def test_the_launcher_ships_inside_the_kiro_package() -> None:
+    """The launcher is a script of the ``kiro`` package (not of ``tests/``), so a wheel carries it and ``python -I -S`` can run it."""
+    launcher = wire_kiro.launcher()
+    script = Path(launcher[3])
+    assert launcher == (sys.executable, "-I", "-S", str((Path(hirearchy.kiro.__file__).parent / "_launch.py").resolve()))
+    assert script.is_file() and script.parent == wire_kiro.package_dir() / "kiro" and "tests" not in script.parts[len(wire_kiro.package_dir().parts):]

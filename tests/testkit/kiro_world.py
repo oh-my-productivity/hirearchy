@@ -2,8 +2,10 @@
 ``kiro_profile_name(org_root, tools)``, ``file_confinement(...)``, over the ports of the runtime (``run_command_builder``, ``profile_provisioner``,
 ``confinement_policy``).
 
-The profile store resolves ``$HOME`` when it is used (``Environment.home()``), so the ``isolated_kiro`` fixture, which sets ``HOME``, is enough to keep a test out of the
-real ``~/.kiro``; a profile directory of the test's own is the ``ProfileStore`` it puts into the runtime.
+The profile store is ``agents/`` of the kiro home of the organization (``kiro_home_agents_dir``), which the places resolve below ``$HOME`` when they are used
+(``Environment.home()``), so the ``isolated_kiro`` fixture, which sets ``HOME``, is enough to keep a test out of the real ``~/.kiro``; a profile directory of
+the test's own is the ``ProfileStore`` it puts into the runtime. The command a run is started with is the launcher, then ``--``, then the kiro command
+(``kiro_part``).
 """
 
 from __future__ import annotations
@@ -33,6 +35,16 @@ def kiro_runner(kiro_bin: str = "kiro-cli") -> Runner:
     return build
 
 
+def kiro_part(argv: Sequence[str]) -> list[str]:
+    """The kiro command of a run command: what follows the ``--`` that ends the arguments of the launcher (``kiro-cli chat --no-interactive ...``)."""
+    return list(argv[list(argv).index("--") + 1 :])
+
+
+def kiro_home_agents_dir(org_root: str | Path) -> Path:
+    """``agents/`` of the kiro home of the organization at ``org_root``, below the ``HOME`` in force: where its profiles are."""
+    return wiring.open_runtime(Path(org_root)).kiro_places.home() / "agents"
+
+
 def kiro_profile_name(org_root: str | Path, tools: Sequence[str]) -> str:
     """The name of the profile of the organization at ``org_root`` for ``tools`` (nothing is read or written)."""
     return wiring.open_runtime(Path(org_root)).profile_provisioner.profile_name(tools)  # type: ignore[no-any-return]
@@ -47,7 +59,7 @@ def profiles_in(org: Any, directory: Path) -> Any:
 def ensure_kiro_profile(
     tools: Sequence[str], agents_dir: Path | None = None, *, org: Any, workspace: Path | None = None, inputs: Sequence[Path] | None = None,
 ) -> str:
-    """Write the profile of ``org`` into ``agents_dir`` (default: ``~/.kiro/agents`` of the ``HOME`` in force); returns its name."""
+    """Write the profile of ``org`` into ``agents_dir`` (default: ``agents/`` of its kiro home, below the ``HOME`` in force); returns its name."""
     runtime = org.runtime
     if agents_dir is not None:
         store: ProfileStore = FsProfileStore(lambda: Path(agents_dir), FsAtomicWriter())

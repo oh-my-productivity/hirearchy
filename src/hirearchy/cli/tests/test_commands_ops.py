@@ -17,6 +17,7 @@ from hirearchy.cli._commands_ops import (
 )
 from hirearchy.cli.testing import RecordingMcpRunner, RecordingSchedulerRunner
 from hirearchy.kernel import OrgError
+from hirearchy.kiro.testing import FixedKiroPlaces, FixedReadiness
 from hirearchy.review import Note
 
 from ._fakes import FakeOffice, FakeUpkeep, new_office, new_upkeep
@@ -98,10 +99,42 @@ def test_mcp_serves_without_opening_an_organization(tmp_path: Path) -> None:
     assert server.runs == 1
 
 
+def kiro_profile(f: Fixture, upkeep: FakeUpkeep, tmp_path: Path, state: str | None = None) -> tuple[KiroProfileCommand, FixedKiroPlaces]:
+    """The command over a readiness that has ``state`` as its problem and places below ``tmp_path``."""
+    places = FixedKiroPlaces(tmp_path / "state")
+    return KiroProfileCommand(f.session, lambda: upkeep, lambda: FixedReadiness(None, state), lambda: places, lambda: upkeep, f.out), places
+
+
 def test_kiro_profile_writes_the_profile_of_this_organization(tmp_path: Path) -> None:
     f, upkeep = Fixture(tmp_path), new_upkeep()
-    go(KiroProfileCommand(f.session, lambda: upkeep, lambda: upkeep, f.out), "kiro-profile", "--tools", "read,,write")
+    command, places = kiro_profile(f, upkeep, tmp_path)
+    go(command, "kiro-profile", "--tools", "read,,write")
     assert f.session.calls == [("open", True)] and upkeep.last("ensure_profile") == ((["read", "write"],), {})
-    assert f.out.stdout == f"wrote ~/.kiro/agents/hirearchy-read-write.json (mcp server: {json.dumps({'command': 'hirearchy', 'args': ['mcp']})})\n"
-    go(KiroProfileCommand(f.session, lambda: upkeep, lambda: upkeep, f.out), "kiro-profile")
+    server = json.dumps({"command": "hirearchy", "args": ["mcp"]})
+    assert f.out.stdout == f"wrote {places.home()}/agents/hirearchy-read-write.json (mcp server: {server})\n"  # the kiro home of the organization
+    go(command, "kiro-profile")
     assert upkeep.last("ensure_profile") == (([],), {})
+
+
+def test_kiro_profile_names_the_organizations_home_and_not_the_users(tmp_path: Path) -> None:
+    f, upkeep = Fixture(tmp_path), new_upkeep()
+    command, places = kiro_profile(f, upkeep, tmp_path)
+    go(command, "kiro-profile")
+    assert "~/.kiro" not in f.out.stdout and f.out.stdout.startswith(f"wrote {places.home()}/agents/")
+
+
+def test_kiro_profile_refuses_on_a_state_problem_and_writes_nothing(tmp_path: Path) -> None:
+    f, upkeep = Fixture(tmp_path), new_upkeep()
+    command, _ = kiro_profile(f, upkeep, tmp_path, "the kiro state is bad")
+    with pytest.raises(OrgError, match="^the kiro state is bad$"):
+        go(command, "kiro-profile", "--tools", "read")
+    assert f.session.calls == [("open", True)]  # the organization is opened first, then the state is checked
+    assert upkeep.names() == [] and f.out.stdout == ""  # no profile was asked for, none was written, nothing was said
+
+
+def test_kiro_profile_does_not_check_the_state_of_an_organization_that_does_not_open(tmp_path: Path) -> None:
+    f, upkeep = Fixture(tmp_path, exists=False), new_upkeep()
+    command, _ = kiro_profile(f, upkeep, tmp_path, "the kiro state is bad")
+    with pytest.raises(OrgError, match="not an organization"):
+        go(command, "kiro-profile")
+    assert upkeep.names() == []

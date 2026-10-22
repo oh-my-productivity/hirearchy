@@ -1,7 +1,7 @@
 ##### ceo
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>", "--model", "claude-sonnet-5.5"]
-cwd: <TMP>/golden-team/org/ceo
-env: {"ORG_AGENT": "ceo", "ORG_ROOT": "<TMP>/golden-team/org"}
+command: ["<PYTHON>", "-I", "-S", "<LAUNCH>", "--start-deadline", "60", "--", "kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>", "--model", "claude-sonnet-5.5", "--v3", "--require-mcp-startup", "--output-format", "stream-json"]
+cwd: <SCRATCH>/ceo-9d382342
+env: {"KIRO_HOME": "<KIRO_HOME>", "ORG_AGENT": "ceo", "ORG_ROOT": "<TMP>/golden-team/org"}
 profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>",
@@ -48,9 +48,9 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 }
 
 ##### ceo/eng
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>", "--model", "claude-sonnet-5.5"]
-cwd: <TMP>/golden-team/org/ceo/eng
-env: {"ORG_AGENT": "ceo/eng", "ORG_ROOT": "<TMP>/golden-team/org"}
+command: ["<PYTHON>", "-I", "-S", "<LAUNCH>", "--start-deadline", "60", "--", "kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>", "--model", "claude-sonnet-5.5", "--v3", "--require-mcp-startup", "--output-format", "stream-json"]
+cwd: <SCRATCH>/ceo-eng-2053a97e
+env: {"KIRO_HOME": "<KIRO_HOME>", "ORG_AGENT": "ceo/eng", "ORG_ROOT": "<TMP>/golden-team/org"}
 profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>",
@@ -97,9 +97,9 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 }
 
 ##### sh
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-shell", "--model", "claude-sonnet-5.5"]
-cwd: <WS>
-env: {"ORG_AGENT": "sh", "ORG_ROOT": "<TMP>/golden-team/org"}
+command: ["<PYTHON>", "-I", "-S", "<LAUNCH>", "--start-deadline", "60", "--", "kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-shell", "--model", "claude-sonnet-5.5", "--v3", "--require-mcp-startup", "--output-format", "stream-json"]
+cwd: <SCRATCH>/sh-16795633
+env: {"KIRO_HOME": "<KIRO_HOME>", "ORG_AGENT": "sh", "ORG_ROOT": "<TMP>/golden-team/org"}
 profile file: hirearchy-golden-team-org-<ROOT_HASH>-shell.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>-shell",
@@ -154,9 +154,9 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>-shell.json
 }
 
 ##### dev
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5"]
-cwd: <WS>
-env: {"ORG_AGENT": "dev", "ORG_ROOT": "<TMP>/golden-team/org"}
+command: ["<PYTHON>", "-I", "-S", "<LAUNCH>", "--start-deadline", "60", "--", "kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5", "--v3", "--require-mcp-startup", "--output-format", "stream-json"]
+cwd: <SCRATCH>/dev-34c6fcec
+env: {"KIRO_HOME": "<KIRO_HOME>", "ORG_AGENT": "dev", "ORG_ROOT": "<TMP>/golden-team/org"}
 profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HASH>",
@@ -285,9 +285,9 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-shell-write-x<ACCESS_HA
 }
 
 ##### ro
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5"]
-cwd: <TMP>/golden-team/org/ro
-env: {"ORG_AGENT": "ro", "ORG_ROOT": "<TMP>/golden-team/org"}
+command: ["<PYTHON>", "-I", "-S", "<LAUNCH>", "--start-deadline", "60", "--", "kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5", "--v3", "--require-mcp-startup", "--output-format", "stream-json"]
+cwd: <SCRATCH>/ro-eed1903a
+env: {"KIRO_HOME": "<KIRO_HOME>", "ORG_AGENT": "ro", "ORG_ROOT": "<TMP>/golden-team/org"}
 profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>",
@@ -365,9 +365,9 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>.json
 }
 
 ##### modeled
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>", "--model", "claude-haiku-4.5"]
-cwd: <TMP>/golden-team/org/modeled
-env: {"ORG_AGENT": "modeled", "ORG_ROOT": "<TMP>/golden-team/org"}
+command: ["<PYTHON>", "-I", "-S", "<LAUNCH>", "--start-deadline", "60", "--", "kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>", "--model", "claude-haiku-4.5", "--v3", "--require-mcp-startup", "--output-format", "stream-json"]
+cwd: <SCRATCH>/modeled-6d063753
+env: {"KIRO_HOME": "<KIRO_HOME>", "ORG_AGENT": "modeled", "ORG_ROOT": "<TMP>/golden-team/org"}
 profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>",
@@ -414,9 +414,9 @@ profile file: hirearchy-golden-team-org-<ROOT_HASH>.json
 }
 
 ##### legacy
-command: ["kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5"]
-cwd: <TMP>/golden-team/org/legacy
-env: {"ORG_AGENT": "legacy", "ORG_ROOT": "<TMP>/golden-team/org"}
+command: ["<PYTHON>", "-I", "-S", "<LAUNCH>", "--start-deadline", "60", "--", "kiro-cli", "chat", "--no-interactive", "--agent", "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>", "--model", "claude-sonnet-5.5", "--v3", "--require-mcp-startup", "--output-format", "stream-json"]
+cwd: <SCRATCH>/legacy-9b33046e
+env: {"KIRO_HOME": "<KIRO_HOME>", "ORG_AGENT": "legacy", "ORG_ROOT": "<TMP>/golden-team/org"}
 profile file: hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>.json
 {
   "name": "hirearchy-golden-team-org-<ROOT_HASH>-read-x<ACCESS_HASH>",

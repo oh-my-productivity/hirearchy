@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..kiro import ConfinementPolicy, McpServerLocator, ProfileProvisioner, ProfileStore, RunCommandBuilder
+from ..kiro import (
+    ConfinementPolicy, KiroCli, KiroHomeAudit, KiroPlaces, KiroStateDirs, McpServerLocator, ProfileProvisioner, ProfileStore, RunCommandBuilder,
+    RuntimeReadiness,
+)
 
 STEP: str | None = "B-kiro"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
@@ -17,3 +20,8 @@ class Fields:
     profile_provisioner: ProfileProvisioner
     mcp_locator: McpServerLocator
     run_command_builder: RunCommandBuilder
+    kiro_places: KiroPlaces
+    kiro_state_dirs: KiroStateDirs
+    kiro_home_audit: KiroHomeAudit
+    kiro_cli: KiroCli
+    runtime_readiness: RuntimeReadiness

@@ -35,3 +35,12 @@ def test_the_normalizer_hides_the_access_hash_of_a_profile_name(tmp_path: Path) 
     two = normalize("wrote ~/.kiro/agents/hirearchy-t-org-4d5e6f-read-write-x9c8b7a65.json (mcp server: {})")
     assert one == two == "wrote ~/.kiro/agents/hirearchy-t-org-<HASH>-read-write-x<ACCESS_HASH>.json (mcp server: {})"
     assert normalize("x0badf00dxx -xyz") == "x0badf00dxx -xyz"  # only a name suffix: -x and exactly 8 hex digits at a word end
+
+
+def test_the_normalizer_hides_the_kiro_home_of_the_organization(tmp_path: Path) -> None:
+    """The kiro home differs by platform (Library/Application Support or .local/state) and by organization (a hash of its path): one placeholder."""
+    from testkit.reach.hirearchy.app import wiring
+
+    home = wiring.open_runtime(tmp_path / "org").kiro_places.home()
+    normalize = _scenario.normalizer(tmp_path, None)
+    assert normalize(f"wrote {home}/agents/hirearchy-t-org-1a2b3c.json") == "wrote <KIRO_HOME>/agents/hirearchy-t-org-<HASH>.json"

@@ -1,9 +1,8 @@
-"""``run`` over a real organization and a binary that stands in for kiro-cli (``true``): one pass starts the run of the agent that has mail, waits for it and
-ends; the run leaves its log and its events; ``--until-done`` ends by itself when there is nothing to do; the two modes cannot be mixed."""
+"""``run`` over a real organization and the stub kiro-cli of the test fixture (it answers the readiness check and runs a V3 chat that starts and
+finishes): one pass starts the run of the agent that has mail, waits for it and ends; the run leaves its log and its events; ``--until-done`` ends by itself when there is nothing to do; the two modes cannot be mixed."""
 
 from __future__ import annotations
 
-import shutil
 from pathlib import Path
 
 import pytest
@@ -13,8 +12,6 @@ from hirearchy.kernel import ROOT
 
 from ._events import read_events
 from ._org import Org, facade
-
-TRUE = shutil.which("true") or "/usr/bin/true"
 
 
 @pytest.fixture
@@ -26,7 +23,7 @@ def org(tmp_path: Path) -> Org:
 
 
 def test_one_pass_starts_the_run_waits_for_it_and_ends(org: Org, capsys: pytest.CaptureFixture[str]) -> None:
-    main(["--root", str(org.root), "run", "--once", "--kiro", TRUE])
+    main(["--root", str(org.root), "run", "--once"])
     assert capsys.readouterr().err == f"org: {org.root}\n"
     kinds = [e["kind"] for e in read_events(org.root) if str(e["kind"]).startswith(("scheduler.", "run."))]
     assert kinds[0] == "scheduler.start" and "run.start" in kinds and "run.end" in kinds and kinds[-1] == "scheduler.exit"
@@ -36,7 +33,7 @@ def test_one_pass_starts_the_run_waits_for_it_and_ends(org: Org, capsys: pytest.
 
 
 def test_the_cap_on_runs_is_the_one_given(org: Org) -> None:
-    main(["--root", str(org.root), "run", "--once", "--max-runs", "0", "--kiro", TRUE])
+    main(["--root", str(org.root), "run", "--once", "--max-runs", "0"])
     assert read_events(org.root, "run.start") == []
 
 

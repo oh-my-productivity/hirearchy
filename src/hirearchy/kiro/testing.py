@@ -36,6 +36,7 @@ from .api import (
 PURE = {"ConfinementPolicy"}  # a pure function of its arguments: one implementation, no fake
 
 SERVER: dict[str, object] = {"command": "/venv/bin/hirearchy", "args": ["mcp"]}  # what the fake locator answers
+LAUNCHER = ("/venv/bin/python", "-I", "-S", "/package/kiro/_launch.py")  # what the composition root hands the builder: interpreter, its flags, the script
 
 
 class MemoryProfileStore(ProfileStore):
@@ -220,6 +221,9 @@ class BuilderHarness:
     provisioner: ProfileProvisioner  # the one the builder asks (to compare names)
     names: Callable[[], list[str]]  # the profiles that exist, sorted
     profile: Callable[[str], JsonObject | None]  # a profile, parsed
+    places: KiroPlaces  # where the builder keeps the home and the scratch directories of this organization
+    state: StateHarness  # the directories and the audit it asks (``plant`` puts a file into the home)
+    launcher: tuple[str, ...]  # what the builder was given to put before the kiro command
 
 
 def state_dir_places(tmp_path: Path) -> PlacesHarness:
@@ -402,20 +406,27 @@ def provisioner_in_memory(tmp_path: Path) -> ProvisionerHarness:
 
 
 def builder_on_disk(tmp_path: Path) -> BuilderHarness:
-    """The real access classes and the real profile store over the files of an organization directory."""
+    """The real access classes, places, directories and profile store over the files of an organization directory."""
     access, files = charters_on_disk(tmp_path), fs_agents(tmp_path)
-    directory = tmp_path.parent / f"{tmp_path.name}-kiro-agents"
+    paths = OrgPaths(tmp_path)
+    home = tmp_path.parent / f"{tmp_path.name}-home"  # outside the organization: the kiro state lies below it, and placement refuses one inside
+    environment = DictEnvironment({"PATH": "/usr/bin", "KEEP": "me"}, home=home)
+    places, state = StateDirPlaces(paths, environment, "linux"), fs_state(tmp_path)
+    directory = places.home() / "agents"
     store = FsProfileStore(lambda: directory, fs_atomic_writer(tmp_path).writer)
-    paths, environment = OrgPaths(tmp_path), DictEnvironment({"PATH": "/usr/bin", "KEEP": "me"})
     provisioner = OrgProfileProvisioner(paths, store, KiroConfinementPolicy(), StaticMcpServerLocator())
-    builder = KiroRunCommandBuilder("kiro-cli", paths, files.charters, access.scopes, access.models, provisioner, environment)
+    builder = KiroRunCommandBuilder(
+        "kiro-cli", LAUNCHER, paths, files.charters, access.scopes, access.models, provisioner, environment, places, state.dirs, state.audit
+    )
     text = _disk_text(directory)
 
     def profile(name: str) -> JsonObject | None:
         raw = text(name)
         return None if raw is None else dict(json.loads(raw))
 
-    return BuilderHarness(builder, tmp_path, environment, access.put_agent, access.put_config, provisioner, _disk_names(directory), profile)
+    return BuilderHarness(
+        builder, tmp_path, environment, access.put_agent, access.put_config, provisioner, _disk_names(directory), profile, places, state, LAUNCHER
+    )
 
 
 def builder_in_memory(tmp_path: Path) -> BuilderHarness:
@@ -423,8 +434,11 @@ def builder_in_memory(tmp_path: Path) -> BuilderHarness:
 
     access, store = StaticAccess(), MemoryProfileStore()
     paths, environment = OrgPaths(access.root), DictEnvironment({"PATH": "/usr/bin", "KEEP": "me"})
+    places, state = FixedKiroPlaces(tmp_path / "state"), memory_state(tmp_path)
     provisioner = OrgProfileProvisioner(paths, store, KiroConfinementPolicy(), StaticMcpServerLocator())
-    builder = KiroRunCommandBuilder("kiro-cli", paths, access.agents, access, access, provisioner, environment)
+    builder = KiroRunCommandBuilder(
+        "kiro-cli", LAUNCHER, paths, access.agents, access, access, provisioner, environment, places, state.dirs, state.audit
+    )
 
     def profile(name: str) -> JsonObject | None:
         raw = store.files.get(name)
@@ -432,7 +446,7 @@ def builder_in_memory(tmp_path: Path) -> BuilderHarness:
 
     return BuilderHarness(
         builder, access.root, environment, access.put_agent, access.put_config, provisioner,
-        lambda: sorted(f"{name}.json" for name in store.files), profile,
+        lambda: sorted(f"{name}.json" for name in store.files), profile, places, state, LAUNCHER,
     )
 
 

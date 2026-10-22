@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import testkit
 from testkit import kiro_sandbox
-from testkit.e2e_world import kiro_agents_dir
+from testkit.kiro_world import kiro_home_agents_dir
 
 HERE = testkit.TESTS
 INNER = '''
@@ -53,7 +53,9 @@ def nested(tmp_path):
     out = tmp_path / "out"
     out.mkdir()
 
-    def run(*args, env=None):
+    def run(*args, env=None, extra=None):
+        for name, text in (extra or {}).items():
+            (proj / name).write_text(text)
         base_env = {k: v for k, v in os.environ.items() if k != "HIREARCHY_RUN_INTEGRATION"}
         base_env["PATH"] = os.pathsep.join(d for d in base_env["PATH"].split(os.pathsep) if "kiro-home" not in d)  # the outer stub
         full = {**base_env, "REAL_HOME_FOR_TEST": str(tmp_path / "pretend-real-home"), "HOME": str(tmp_path / "pretend-real-home"),
@@ -66,12 +68,64 @@ def nested(tmp_path):
     return run
 
 
-def test_unmarked_tests_run_against_the_stub():
-    stub = shutil.which("kiro-cli")
-    assert stub and Path(stub).parent.parent.name.startswith("kiro-home")
-    assert "kiro-stub" in Path(stub).read_text() or "KIRO_STUB_LOG" in Path(stub).read_text()
+def stub(*argv, stdin=""):
+    """The stub ``kiro-cli`` of the fixture, run the way the readiness check and the launcher run kiro."""
+    return subprocess.run(["kiro-cli", *argv], input=stdin, capture_output=True, text=True, timeout=30)
+
+
+def test_unmarked_tests_run_against_the_stub(tmp_path):
+    path = shutil.which("kiro-cli")
+    assert path and Path(path).parent.parent.name.startswith("kiro-home")
+    assert "KIRO_STUB_LOG" in Path(path).read_text()
     assert str(Path.home()).find("kiro-home") != -1
-    assert str(kiro_agents_dir()).startswith(str(Path.home()))
+    agents = kiro_home_agents_dir(tmp_path / "org")  # the profiles of an organization live in its own kiro home, below the throwaway HOME
+    assert agents.name == "agents" and agents.parent.parent.name == "kiro-home" and str(agents).startswith(str(Path.home()))
+
+
+def test_the_stub_speaks_the_readiness_commands_of_kiro_cli_2_33():
+    version = stub("--version")
+    assert (version.returncode, version.stdout.strip()) == (0, "kiro-cli 2.33.0")
+    chat_help = stub("chat", "--help")
+    assert chat_help.returncode == 0 and all(flag in chat_help.stdout for flag in ("--v3", "--require-mcp-startup", "--output-format"))
+    assert stub("whoami").returncode == 0
+
+
+def test_the_stub_runs_a_v3_chat_that_starts_and_finishes():
+    run = stub("chat", "--no-interactive", "--agent", "p", "--model", "m", "--v3", "--require-mcp-startup", "--output-format", "stream-json",
+               stdin="the prompt\n")
+    events = [json.loads(line) for line in run.stdout.splitlines()]
+    assert run.returncode == 0
+    assert events[0] == {"type": "runStarted", "data": {"engine": "v3"}}
+    assert events[-1]["type"] == "runFinished" and events[-1]["data"]["status"] == "success"
+
+
+def test_the_stub_writes_what_it_was_asked_to_the_log(isolated_kiro):
+    stub("--version")
+    stub("chat", "--agent", "p", stdin="x")
+    assert (isolated_kiro / "kiro-stub.log").read_text().splitlines() == ["--version", "chat --agent p"]
+
+
+STATE_VARIABLES = ("HIREARCHY_STATE_DIR", "XDG_STATE_HOME", "KIRO_API_KEY")
+
+
+def test_the_fixture_clears_the_state_and_key_variables():
+    """Readiness takes the ``whoami`` path and the kiro state is below the throwaway HOME, whatever the machine running the tests has set."""
+    assert [name for name in STATE_VARIABLES if name in os.environ] == []
+
+
+INNER_VARIABLES = '''
+import os
+
+def test_unmarked_sees_none_of_them():
+    assert [name for name in ("HIREARCHY_STATE_DIR", "XDG_STATE_HOME", "KIRO_API_KEY") if name in os.environ] == []
+'''
+
+
+def test_the_fixture_clears_them_even_when_the_process_sets_them(nested):
+    p, _ = nested(env={"HIREARCHY_STATE_DIR": "/somewhere/state", "XDG_STATE_HOME": "/somewhere/xdg", "KIRO_API_KEY": "not-a-real-key"},
+                  extra={"test_variables.py": INNER_VARIABLES})
+    assert p.returncode == 0, p.stdout + p.stderr
+    assert "2 passed" in p.stdout and "failed" not in p.stdout, p.stdout
 
 
 def test_marked_tests_are_skipped_by_default(nested):

@@ -5,12 +5,13 @@ import json
 import re
 
 import pytest
-from testkit.kiro_world import ensure_kiro_profile, kiro_profile_name, kiro_runner
+from testkit.kiro_world import ensure_kiro_profile, kiro_home_agents_dir, kiro_part, kiro_profile_name, kiro_runner
 from testkit.reach.hirearchy.core import ROOT, Org
 
 
-def profile_of(isolated_kiro, name):
-    return json.loads((isolated_kiro / ".kiro" / "agents" / f"{name}.json").read_text())
+def profile_of(org, name):
+    """A profile of the organization: they are in its kiro home, not in ``~/.kiro/agents``."""
+    return json.loads((kiro_home_agents_dir(org.root) / f"{name}.json").read_text())
 
 
 def rules(prof):
@@ -25,8 +26,9 @@ def rule(prof, capability, effect, *, exclude=None):
 
 
 def run_profile(org, isolated_kiro, addr):
-    cmd, cwd, env = kiro_runner()(org, addr, "P")
-    return profile_of(isolated_kiro, cmd[cmd.index("--agent") + 1]), cmd, cwd, env
+    argv, cwd, env = kiro_runner()(org, addr, "P")
+    cmd = kiro_part(argv)
+    return profile_of(org, cmd[cmd.index("--agent") + 1]), cmd, cwd, env
 
 
 @pytest.fixture
@@ -68,7 +70,7 @@ def test_agent_with_file_tools_gets_a_confining_profile(team, dirs, isolated_kir
     assert rule(prof, "fs_write", "deny", exclude=True) == {"capability": "fs_write", "effect": "deny", "match": ["/**"], "exclude": [f"{out}/**"]}
     # the env contract is unchanged
     assert prof["mcpServers"]["hirearchy"]["env"] == {"ORG_ROOT": str(team.root), "ORG_REQUIRE_AGENT": "1"}
-    assert prof["includeMcpJson"] is False and cwd == out
+    assert prof["includeMcpJson"] is False and cwd == team.runtime.kiro_places.scratch("lead/writer") != out  # kiro starts in an empty scratch directory
     assert env["ORG_AGENT"] == "lead/writer" and env["ORG_ROOT"] == str(team.root)
 
 
@@ -100,7 +102,7 @@ def test_write_without_workspace_is_allowed_nowhere(team, isolated_kiro):
     team.hire("lead", "scribe", "Scribe", "x", tools=["write"])
     prof, _, cwd, _ = run_profile(team, isolated_kiro, "lead/scribe")
     assert not [r for r in rules(prof) if r["capability"] == "fs_write" and r["effect"] == "allow"]
-    assert {"capability": "fs_write", "effect": "deny", "match": ["/**"]} in rules(prof) and cwd == team.dir("lead/scribe")
+    assert {"capability": "fs_write", "effect": "deny", "match": ["/**"]} in rules(prof) and cwd == team.runtime.kiro_places.scratch("lead/scribe")
 
 
 def test_read_with_empty_inputs_reads_only_the_organization(team, isolated_kiro):
@@ -118,7 +120,8 @@ def test_agents_without_built_in_file_tools_keep_the_shared_profile(team, isolat
     assert prof["tools"] == ["@hirearchy", "web"] and not any(r["capability"].startswith("fs_") for r in rules(prof))
     assert rule(prof, "web_fetch", "allow")["match"] == ["*"] and rule(prof, "web_search", "allow")["match"] == ["*"]
     team.hire("lead", "plain", "Plain", "x")
-    assert run_profile(team, isolated_kiro, "lead/plain")[1][4] == kiro_profile_name(team.root, [])  # shared with web-less agents
+    plain = run_profile(team, isolated_kiro, "lead/plain")[1]
+    assert plain[plain.index("--agent") + 1] == kiro_profile_name(team.root, [])  # shared with web-less agents
 
 
 def test_legacy_read_only_charter_is_confined_to_the_org(team, isolated_kiro):

@@ -21,6 +21,7 @@ from typing import Callable
 
 import pytest
 from testkit.clocks import clock_ports
+from testkit.reach.hirearchy.app import wiring
 
 from hirearchy.kernel import TokenSource
 from hirearchy.kernel.testing import CounterTokens
@@ -344,6 +345,8 @@ def normalizer(tmp: Path, home: Path | None) -> Normalizer:
     n = Normalizer()
     n.add(Path(spec.origin).resolve().parents[2], "<PROJECT>")
     n.add(Path(sys.executable).parent, "<VENV_BIN>")
+    # the kiro home of the organization, from the same places the command line uses (below the HOME in force: a path that differs by platform and by organization)
+    n.add(wiring.open_runtime(tmp / "org").kiro_places.home(), "<KIRO_HOME>")
     if home is not None:
         n.add(home, "<HOME>")
     n.add(tmp / "org", "<ORG>")

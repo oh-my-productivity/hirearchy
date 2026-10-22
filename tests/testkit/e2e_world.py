@@ -19,7 +19,6 @@ from pathlib import Path
 from typing import Any
 
 from hirearchy.app import wire_dashboard, wire_mcp_server, wire_observability, wire_skill, wire_stalls, wiring
-from hirearchy.app.wire_kiro import agents_dir
 from hirearchy.blueprint import EXAMPLE_KINDS, Agent
 from hirearchy.blueprint._access import PolicyAccessReport
 from hirearchy.blueprint._accesswords import PlainAccessWords
@@ -29,14 +28,15 @@ from hirearchy.blueprint._plan_texts import PLAN_DRAFT_HEADING, PLAN_HEADING
 from hirearchy.blueprint._resolver import AgentResolver
 from hirearchy.dashboard._app import DashApp as _DashApp
 from hirearchy.dashboard._widgets import NavTable, TextPane
-from hirearchy.kernel._system import OsEnvironment
 from hirearchy.mcp_server._binding import OpenerBindings
 from hirearchy.observability._messages import build_messages
 from hirearchy.observability._render import TextObservabilityRenderer
 from hirearchy.skill._source import PackagedSkillSource
 
+from .kiro_world import kiro_home_agents_dir
+
 __all__ = [
-    "ROOT_INSTRUCTIONS", "DashApp", "NavTable", "TextPane", "agent_health", "binding_at", "bpm", "build_server", "ex", "file_confinement", "kiro_agents_dir",
+    "ROOT_INSTRUCTIONS", "DashApp", "NavTable", "TextPane", "agent_health", "binding_at", "bpm", "build_server", "ex", "file_confinement", "kiro_home_agents_dir",
     "load_message", "observe", "resolve_binding", "skill_source",
 ]
 
@@ -132,11 +132,6 @@ def load_message(org: Any, path: Path) -> Any:
 def skill_source() -> Path:
     """The SKILL.md that ships with this install: inside the package (wheel) or in the source checkout."""
     return PackagedSkillSource(wire_skill.package_dir()).path()
-
-
-def kiro_agents_dir() -> Path:
-    """``~/.kiro/agents`` as the home of this process says it now."""
-    return agents_dir(OsEnvironment())()
 
 
 def file_confinement(org_root: Path, tools: list[str], workspace: Path | None, inputs: list[Path]) -> Any:

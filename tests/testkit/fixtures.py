@@ -19,6 +19,25 @@ from . import process_state
 from .clocks import clock_ports
 
 
+STUB = r"""#!/bin/sh
+printf "%s\n" "$*" >> "${KIRO_STUB_LOG:-/dev/null}"
+case "$1" in
+  --version) echo "kiro-cli 2.33.0" ;;
+  whoami) echo "stub user" ;;
+  chat)
+    if [ "$2" = "--help" ]; then
+      printf '%s\n' "Usage: kiro-cli chat [OPTIONS] [INPUT]" "      --v3" "      --require-mcp-startup" "      --output-format <FORMAT>"
+    else
+      cat > /dev/null
+      printf '%s\n' '{"type":"runStarted","data":{"engine":"v3"}}'
+      printf '%s\n' '{"type":"runFinished","data":{"status":"success","stopReason":"end_turn"}}'
+    fi
+    ;;
+esac
+exit 0
+"""  # (the stub kiro-cli of ``isolated_kiro``)
+
+
 @pytest.fixture(autouse=True)
 def process_state_guard(request):
     """A test may patch the process-global state of hirearchy.core / hirearchy.app only through ``monkeypatch``. This fixture is set up before
@@ -41,8 +60,12 @@ def fresh_process_resources():
 def isolated_kiro(request, tmp_path_factory, process_state_guard, monkeypatch):
     """No unmarked test may touch the real ~/.kiro or start the real kiro-cli.
 
-    * ``$HOME`` points into a throwaway directory (the profile store of every runtime follows it: ``~/.kiro/agents`` is below it);
-    * a stub ``kiro-cli`` (exits 0 and appends its argv to ``$KIRO_STUB_LOG``) shadows the real binary on PATH.
+    * ``$HOME`` points into a throwaway directory (the kiro home of every organization, with the profiles of its runtime, lies below it, and the runtime
+      follows ``$HOME`` on every use); ``HIREARCHY_STATE_DIR``, ``XDG_STATE_HOME`` and ``KIRO_API_KEY`` are unset, so the kiro state is always below that
+      directory and the readiness check always takes the ``whoami`` path;
+    * a stub ``kiro-cli`` shadows the real binary on PATH. It appends its argv to ``$KIRO_STUB_LOG`` and speaks kiro-cli 2.33.0 as far as hirearchy asks:
+      ``--version``, ``chat --help`` (the three flags of the V3 engine), ``whoami`` (signed in) and ``chat`` (after draining stdin it starts a run on the V3
+      engine, ``runStarted``, and finishes it, ``runFinished``). Tests that count the lines of the log account for the readiness calls.
 
     Tests marked ``integration`` get none of this (real kiro needs the user's auth): they must use the ``real_kiro``
     fixture, which fences what they may touch in ``~/.kiro`` (see ``tests/testkit/kiro_sandbox.py``).
@@ -53,11 +76,13 @@ def isolated_kiro(request, tmp_path_factory, process_state_guard, monkeypatch):
     stub_dir = base / "bin"
     stub_dir.mkdir()
     stub = stub_dir / "kiro-cli"
-    stub.write_text('#!/bin/sh\nprintf "%s\\n" "$*" >> "${KIRO_STUB_LOG:-/dev/null}"\ncat > /dev/null\nexit 0\n')
+    stub.write_text(STUB)
     stub.chmod(stub.stat().st_mode | stat.S_IEXEC)
     monkeypatch.setenv("HOME", str(base))
     monkeypatch.setenv("KIRO_STUB_LOG", str(base / "kiro-stub.log"))
     monkeypatch.setenv("PATH", f"{stub_dir}{os.pathsep}{os.environ.get('PATH', '')}")
+    for name in ("HIREARCHY_STATE_DIR", "XDG_STATE_HOME", "KIRO_API_KEY"):
+        monkeypatch.delenv(name, raising=False)
     return base
 
 
@@ -107,7 +132,7 @@ def org(tmp_path):
 
 
 @pytest.fixture
-def real_kiro(request, tmp_path):
+def real_kiro(request, tmp_path, monkeypatch):
     """Sandbox for a test that uses the REAL kiro-cli (and so a real LLM); only for tests marked ``integration``.
 
     Skips (does not fail) when ``kiro-cli`` is not on PATH. Afterwards, pass or fail: deletes only the per-org profiles
@@ -119,10 +144,12 @@ def real_kiro(request, tmp_path):
     if not request.node.get_closest_marker("integration"):
         pytest.fail("real_kiro is only for tests marked @pytest.mark.integration (unmarked tests run against a stub kiro-cli)")
     kiro_sandbox.real_kiro_or_skip()
-    from hirearchy.app.wire_kiro import agents_dir
-    from hirearchy.kernel._system import OsEnvironment
+    from hirearchy.app import wire_kiro
 
-    assert agents_dir(OsEnvironment())() == kiro_sandbox.kiro_dirs()[0], "profile directory is not the real ~/.kiro/agents"
+    state = tmp_path / "kiro-state"  # the kiro homes of the sandbox's organizations are made below it, never in the user's ~/.kiro
+    monkeypatch.setenv("HIREARCHY_STATE_DIR", str(state))
+    store = wire_kiro.kiro_agents_dir(wiring.open_runtime(tmp_path / "org").kiro_places)()
+    assert state.resolve() in store.parents, "the profile directory is not below the state directory of the sandbox"
     sandbox = kiro_sandbox.RealKiro(tmp_path)
     try:
         yield sandbox

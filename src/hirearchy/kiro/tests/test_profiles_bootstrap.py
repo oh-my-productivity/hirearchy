@@ -3,9 +3,10 @@
 
 import json
 import re
+from pathlib import Path
 
 import pytest
-from testkit.kiro_world import ensure_kiro_profile, kiro_profile_name, kiro_runner
+from testkit.kiro_world import ensure_kiro_profile, kiro_home_agents_dir, kiro_part, kiro_profile_name, kiro_runner
 from testkit.reach.hirearchy import main
 
 
@@ -51,18 +52,21 @@ def test_profile_is_internal_and_bound_to_its_org(org, tmp_path):
 
 
 def test_kiro_runner_uses_the_per_org_profile_and_keeps_the_scheduler_env(org, isolated_kiro):
-    cmd, _, env = kiro_runner()(org, "ceo", "P")
+    argv, _, env = kiro_runner()(org, "ceo", "P")
     name = kiro_profile_name(org.root, [])
-    assert cmd[:5] == ["kiro-cli", "chat", "--no-interactive", "--agent", name]
+    assert kiro_part(argv)[:5] == ["kiro-cli", "chat", "--no-interactive", "--agent", name]
     assert env["ORG_AGENT"] == "ceo" and env["ORG_ROOT"] == str(org.root)
-    assert (isolated_kiro / ".kiro" / "agents" / f"{name}.json").is_file()
-    assert not (isolated_kiro / ".kiro" / "agents" / "hirearchy.json").exists()
+    assert (kiro_home_agents_dir(org.root) / f"{name}.json").is_file()  # the profile is in the kiro home of the organization
+    assert not (kiro_home_agents_dir(org.root) / "hirearchy.json").exists()
+    assert not (isolated_kiro / ".kiro").exists()  # and nothing is written to the user's own
 
 
 def test_cli_kiro_profile_writes_the_org_profile(org, isolated_kiro, capsys):
     main(["--root", str(org.root), "kiro-profile", "--tools", "read"])
-    written = re.search(r"wrote ~/\.kiro/agents/(\S+)\.json", capsys.readouterr().out)
+    written = re.search(r"wrote (.+)/([^/\s]+)\.json \(mcp server", capsys.readouterr().out)  # (the home may hold a space: "Application Support")
     assert written is not None
-    name = written.group(1)
+    directory, name = Path(written.group(1)), written.group(2)
+    assert directory == kiro_home_agents_dir(org.root) and "kiro-home" in directory.parts  # the profile is in the kiro home of the organization
     assert re.fullmatch(rf"{re.escape(kiro_profile_name(org.root, ['read']))}-x[0-9a-f]{{8}}", name)  # the grant is confined to the organization
-    assert (isolated_kiro / ".kiro" / "agents" / f"{name}.json").is_file()
+    assert (directory / f"{name}.json").is_file()
+    assert not (isolated_kiro / ".kiro").exists()  # and nothing is written to the user's own

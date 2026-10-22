@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 from testkit.health_world import Scheduler
-from testkit.kiro_world import ensure_kiro_profile, kiro_profile_name, kiro_runner
+from testkit.kiro_world import ensure_kiro_profile, kiro_home_agents_dir, kiro_profile_name, kiro_runner
 from testkit.reach.hirearchy.core import ROOT
 
 
@@ -33,18 +33,21 @@ def test_default_kiro_runner_in_tests_writes_nothing_under_the_real_home(org, is
     finally:
         sched.release()
     name = kiro_profile_name(org.root, [])
-    assert (isolated_kiro / ".kiro" / "agents" / f"{name}.json").is_file()  # the profile went to the sandbox
+    assert (kiro_home_agents_dir(org.root) / f"{name}.json").is_file()  # the profile went to the kiro home of the organization, below the sandbox HOME
+    assert not (isolated_kiro / ".kiro").exists()
     assert f"--agent {name}" in (isolated_kiro / "kiro-stub.log").read_text()  # and the stub, not kiro, ran
     assert real_agent_profiles() == before
 
 
 def test_ensure_kiro_profile_resolves_the_directory_at_call_time(org, isolated_kiro, tmp_path, monkeypatch):
+    here = kiro_home_agents_dir(org.root)
     home = tmp_path / "elsewhere-home"  # the profile directory is the one of the HOME in force when the profile is written
-    elsewhere = home / ".kiro" / "agents"
     monkeypatch.setenv("HOME", str(home))
+    elsewhere = kiro_home_agents_dir(org.root)
     name = ensure_kiro_profile(["read"], org=org)
+    assert elsewhere != here and home in elsewhere.parents
     assert (elsewhere / f"{name}.json").is_file()
-    assert not (isolated_kiro / ".kiro" / "agents" / f"{name}.json").exists()
+    assert not (here / f"{name}.json").exists()
 
 
 def test_ensure_kiro_profile_is_atomic_and_idempotent(org, tmp_path):

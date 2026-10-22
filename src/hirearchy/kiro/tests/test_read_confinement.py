@@ -5,12 +5,13 @@ import json
 from pathlib import Path
 
 import pytest
-from testkit.kiro_world import ensure_kiro_profile, file_confinement, kiro_profile_name, kiro_runner
+from testkit.kiro_world import ensure_kiro_profile, file_confinement, kiro_home_agents_dir, kiro_part, kiro_profile_name, kiro_runner
 from testkit.reach.hirearchy.core import ROOT, Org
 
 
-def profile_of(isolated_kiro, name):
-    return json.loads((isolated_kiro / ".kiro" / "agents" / f"{name}.json").read_text())
+def profile_of(org, name):
+    """A profile of the organization: they are in its kiro home, not in ``~/.kiro/agents``."""
+    return json.loads((kiro_home_agents_dir(org.root) / f"{name}.json").read_text())
 
 
 def rules(prof):
@@ -28,9 +29,10 @@ def catch_all(prof, capability):
 
 
 def run_profile(org, isolated_kiro, addr):
-    cmd, cwd, env = kiro_runner()(org, addr, "P")
+    argv, cwd, env = kiro_runner()(org, addr, "P")
+    cmd = kiro_part(argv)
     name = cmd[cmd.index("--agent") + 1]
-    return name, profile_of(isolated_kiro, name), cwd
+    return name, profile_of(org, name), cwd
 
 
 @pytest.fixture
@@ -102,7 +104,7 @@ def test_a_workspace_inside_the_org_still_works(org, isolated_kiro):
 
 # --------------------------------------------------------------------------------- existing profiles
 def test_an_existing_profile_of_another_name_is_left_alone_and_a_v3_one_is_written(org, tmp_path, isolated_kiro):
-    agents = isolated_kiro / ".kiro" / "agents"
+    agents = kiro_home_agents_dir(org.root)
     agents.mkdir(parents=True, exist_ok=True)
     old_name = kiro_profile_name(org.root, ["read"]) + "-x0ld0ld0"
     old_text = json.dumps({"name": old_name, "tools": ["@hirearchy", "read"], "hooks": {}}) + "\n"

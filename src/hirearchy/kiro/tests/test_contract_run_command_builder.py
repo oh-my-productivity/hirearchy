@@ -1,4 +1,4 @@
-"""Contract of ``RunCommandBuilder``: ``kiro-cli chat --no-interactive --agent <profile> --model <model>``, where the agent works, and its environment."""
+"""Contract of ``RunCommandBuilder``: the V3 command (the launcher, then ``kiro-cli chat ... --v3 ...``), the empty directory the agent works in, and its environment."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ from typing import cast
 import pytest
 
 from hirearchy.kiro import KiroRunRefused, RunCommand, RunCommandBuilder
+from hirearchy.kiro._env import run_environment
 from hirearchy.kiro.testing import IMPLEMENTATIONS, BuilderHarness
 from hirearchy.settings import DEFAULT_MODEL
 
@@ -30,11 +31,21 @@ def profile_of(command: RunCommand) -> str:
     return command.argv[command.argv.index("--agent") + 1]
 
 
-def test_the_command_line_is_kiro_chat_without_interaction_for_the_profile_and_the_model(h: BuilderHarness) -> None:
+def test_the_command_line_is_the_launcher_then_kiro_chat_on_the_v3_engine_for_the_profile_and_the_model(h: BuilderHarness) -> None:
     h.put_agent("dev", {"role": "R", "tools": []})
     command = h.builder.build("dev", "THE PROMPT")
     assert isinstance(command, RunCommand)
-    assert command.argv == ("kiro-cli", "chat", "--no-interactive", "--agent", h.provisioner.profile_name([]), "--model", DEFAULT_MODEL)
+    assert command.argv == (
+        *h.launcher, "--start-deadline", "60", "--",
+        "kiro-cli", "chat", "--no-interactive", "--agent", h.provisioner.profile_name([]), "--model", DEFAULT_MODEL,
+        "--v3", "--require-mcp-startup", "--output-format", "stream-json",
+    )
+
+
+def test_no_trust_flag_is_ever_passed(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R", "tools": ["read", "write", "shell", "web_search", "web_fetch"]})
+    argv = h.builder.build("dev", "P").argv
+    assert not [a for a in argv if a.startswith("--trust")]  # neither --trust-all-tools nor --trust-tools
 
 
 def test_the_prompt_is_not_in_the_command_line(h: BuilderHarness) -> None:
@@ -42,38 +53,66 @@ def test_the_prompt_is_not_in_the_command_line(h: BuilderHarness) -> None:
     assert "THE PROMPT" not in " ".join(h.builder.build("dev", "THE PROMPT").argv)
 
 
+def model_of(command: RunCommand) -> str:
+    return command.argv[command.argv.index("--model") + 1]
+
+
 def test_the_model_is_the_charters_then_the_organizations_then_the_built_in_one(h: BuilderHarness) -> None:
     h.put_agent("plain", {"role": "R"})
-    assert h.builder.build("plain", "P").argv[-1] == DEFAULT_MODEL
+    assert model_of(h.builder.build("plain", "P")) == DEFAULT_MODEL
     h.put_config("---\ndefault_model: m-org\n---\n# Organization\n")
-    assert h.builder.build("plain", "P").argv[-2:] == ("--model", "m-org")
+    assert model_of(h.builder.build("plain", "P")) == "m-org"
     h.put_agent("own", {"role": "R", "model": "m-charter"})
-    assert h.builder.build("own", "P").argv[-2:] == ("--model", "m-charter")
+    assert model_of(h.builder.build("own", "P")) == "m-charter"
 
 
-def test_the_agent_works_in_its_own_directory(h: BuilderHarness) -> None:
+def test_the_agent_works_in_its_own_empty_scratch_directory(h: BuilderHarness) -> None:
     h.put_agent("ceo", {"role": "R"})
     h.put_agent("ceo/eng", {"role": "R"})
-    assert h.builder.build("ceo", "P").cwd == h.root / "ceo"
-    assert h.builder.build("ceo/eng", "P").cwd == h.root / "ceo" / "eng"
-    assert h.builder.build("root", "P").cwd == h.root
+    for addr in ("ceo", "ceo/eng", "root"):
+        cwd = h.builder.build(addr, "P").cwd
+        assert cwd == h.places.scratch(addr) and h.state.is_empty_dir(cwd)
+    assert len({h.places.scratch(a) for a in ("ceo", "ceo/eng", "root")}) == 3
 
 
-def test_the_agent_works_in_its_workspace_when_it_has_one(h: BuilderHarness) -> None:
+def test_the_scratch_directory_is_neither_the_agents_directory_nor_inside_the_organization(h: BuilderHarness) -> None:
+    h.put_agent("ceo", {"role": "R"})
+    cwd = h.builder.build("ceo", "P").cwd
+    assert cwd != h.root / "ceo" and h.root not in cwd.parents and cwd.parent != h.root
+
+
+def test_a_workspace_is_not_the_working_directory(h: BuilderHarness) -> None:
     workspace = outside(h, "ws")
     h.put_agent("dev", {"role": "R", "tools": ["shell"], "workspace": str(workspace)})
-    assert h.builder.build("dev", "P").cwd == workspace
+    assert h.builder.build("dev", "P").cwd == h.places.scratch("dev") != workspace
 
 
-def test_the_workspace_of_the_charter_is_used_as_written_with_only_the_home_expanded(h: BuilderHarness) -> None:
-    h.put_agent("dev", {"role": "R", "tools": [], "workspace": "~/ws"})
-    assert h.builder.build("dev", "P").cwd == Path("~/ws").expanduser()
+def test_the_scratch_directory_is_made_fresh_on_every_run(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R"})
+    scratch = h.builder.build("dev", "P").cwd
+    h.state.plant(scratch, "left-over.txt")
+    assert h.builder.build("dev", "P").cwd == scratch and h.state.is_empty_dir(scratch)
 
 
-def test_the_environment_is_the_one_of_the_process_plus_the_organization_and_the_agent(h: BuilderHarness) -> None:
+def test_the_environment_is_run_environment_of_the_process_plus_the_organization_and_the_agent(h: BuilderHarness) -> None:
     h.put_agent("ceo/eng", {"role": "R"})
     command = h.builder.build("ceo/eng", "P")
-    assert dict(command.env) == {**h.environment.variables(), "ORG_ROOT": str(h.root), "ORG_AGENT": "ceo/eng"}
+    expected = {**run_environment(h.environment.variables(), h.places.home()), "ORG_ROOT": str(h.root), "ORG_AGENT": "ceo/eng"}
+    assert dict(command.env) == expected and command.env["KEEP"] == "me"
+
+
+def test_kiro_home_is_the_one_of_the_organization_whatever_the_process_says(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R"})
+    h.environment.set("KIRO_HOME", "/somewhere/else")
+    assert h.builder.build("dev", "P").env["KIRO_HOME"] == str(h.places.home())
+
+
+def test_variables_that_would_change_what_kiro_loads_or_writes_are_not_passed(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R"})
+    for name in ("KIRO_DUMP_REQUESTS", "ASBX_KIRO_MANDATORY_MCPS", "KIRO_FEATURE_X"):
+        h.environment.set(name, "1")
+    env = h.builder.build("dev", "P").env
+    assert not [name for name in env if name in ("KIRO_DUMP_REQUESTS", "ASBX_KIRO_MANDATORY_MCPS") or name.startswith("KIRO_FEATURE_")]
 
 
 def test_the_environment_of_the_process_is_read_on_every_run(h: BuilderHarness) -> None:
@@ -95,6 +134,12 @@ def test_the_profile_is_written_and_named_on_the_command_line(h: BuilderHarness)
     profile = profile_of(h.builder.build("dev", "P"))
     assert profile == h.provisioner.profile_name(["shell", "web_search"])
     assert h.names() == [f"{profile}.json"] and h.profile(profile) is not None
+
+
+def test_the_profile_is_in_the_kiro_home_of_the_organization(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R", "tools": ["shell"]})
+    h.builder.build("dev", "P")
+    assert h.state.is_private_dir(h.places.home())
 
 
 def test_agents_with_the_same_tools_share_a_profile(h: BuilderHarness) -> None:
@@ -190,6 +235,46 @@ def test_tools_that_are_not_a_list_refuse_the_run(h: BuilderHarness, tools: obje
 def test_a_workspace_kiro_cannot_match_refuses_the_run(h: BuilderHarness) -> None:
     h.put_agent("dev", {"role": "R", "tools": ["write"], "workspace": str(outside(h, "w{s"))})
     with pytest.raises(KiroRunRefused, match=r'contains "\{"'):
+        h.builder.build("dev", "P")
+    assert h.names() == []
+
+
+def test_a_workspace_that_holds_the_kiro_state_refuses_the_run(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R", "tools": ["shell"], "workspace": str(h.places.roots()[0].parent)})
+    with pytest.raises(KiroRunRefused, match=r"^kiro: hirearchy's kiro state .* is inside the workspace of dev "):
+        h.builder.build("dev", "P")
+    assert h.names() == []
+
+
+def test_a_workspace_inside_the_kiro_state_refuses_the_run(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R", "tools": ["shell"], "workspace": str(h.places.home() / "ws")})
+    with pytest.raises(KiroRunRefused, match=r"^kiro: the workspace of dev .* is inside hirearchy's kiro state "):
+        h.builder.build("dev", "P")
+    assert h.names() == []
+
+
+def test_an_input_that_holds_the_kiro_state_refuses_the_run_of_that_agent_only(h: BuilderHarness) -> None:
+    h.put_agent("dev", {"role": "R", "tools": ["read"], "inputs": [str(h.places.roots()[1].parent)]})
+    h.put_agent("ops", {"role": "R", "tools": ["read"]})
+    with pytest.raises(KiroRunRefused, match="is inside the input of dev "):
+        h.builder.build("dev", "P")
+    assert h.builder.build("ops", "P").cwd == h.places.scratch("ops")
+
+
+@pytest.mark.parametrize("planted", ["settings/mcp.json", "skills", "steering", "hooks", "settings/permissions.yaml", "workspace-roots", "AGENTS.md"])
+def test_configuration_planted_in_the_kiro_home_refuses_the_run(h: BuilderHarness, planted: str) -> None:
+    h.put_agent("dev", {"role": "R", "tools": ["shell"]})
+    h.state.plant(h.places.home(), planted)
+    with pytest.raises(KiroRunRefused, match=rf"^kiro: the kiro home .* holds configuration kiro-cli would load into every agent: {planted}; remove it"):
+        h.builder.build("dev", "P")
+    assert h.names() == []
+
+
+def test_a_synced_cloud_cache_refuses_the_run(h: BuilderHarness) -> None:
+    """A1: configuration kiro-cli synced for the account (admin hooks, steering, powers) cannot be confined: the message says so."""
+    h.put_agent("dev", {"role": "R", "tools": ["shell"]})
+    h.state.plant(h.places.home(), "cloud-cache")
+    with pytest.raises(KiroRunRefused, match=r"^kiro: the kiro home .* holds cloud-cache/, configuration kiro-cli synced for this account .*cannot run hirearchy agents confined$"):
         h.builder.build("dev", "P")
     assert h.names() == []
 

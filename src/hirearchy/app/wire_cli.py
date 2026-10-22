@@ -15,7 +15,7 @@ import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
-from typing import TypeVar
+from typing import NoReturn, TypeVar
 
 from ..agents import AgentDirectory
 from ..blueprint import BlueprintApplier, BlueprintLoader, BlueprintValidator, PlanRenderer, RoleLibrary
@@ -67,7 +67,7 @@ from ..cli._ports import (
 )
 from ..cli._record import EventCommandRecorder
 from ..cli._session import AnnouncingOrgSession
-from ..daemon import SchedulerStatus
+from ..daemon import REFUSED_START, SchedulerStatus
 from ..dashdata import SnapshotRenderer
 from ..dispatch import MessageSender, TaskAssigner
 from ..eligibility import FailureCounter, PauseStore
@@ -76,7 +76,7 @@ from ..health import HealthAnalyzer, HealthRenderer
 from ..hierarchy import Hiring
 from ..kernel import Clock, Environment, JsonObject, OrgError, Provider
 from ..kernel._system import SystemClock
-from ..kiro import ConfinementPolicy, McpServerLocator, ProfileProvisioner
+from ..kiro import ConfinementPolicy, KiroPlaces, McpServerLocator, ProfileProvisioner, RuntimeReadiness
 from ..mail import BatchStore, MailboxReader, TaskQuery
 from ..observability import (
     EventQueries,
@@ -224,12 +224,23 @@ class LoopSchedulerRunner(SchedulerRunner):
 
     def run(self, root: Path, kiro_bin: str, once: bool, until_idle: bool, until_done: bool, max_runs: int | None) -> None:
         runtime = open_runtime(root)
+        problem = runtime.runtime_readiness.check(kiro_bin)  # before anything else, also for ``--max-runs 0`` and ``--once``: no run is made unready
+        if problem is not None:
+            self._refuse(runtime, problem)
         commands = wire_kiro.run_command_builder(runtime, kiro_bin, runtime.profile_provisioner)
         loop = loop_of(runtime, commands, OutputConsole(self._out), self._cadence, LoopState())
         if once:
             loop.run_once(max_runs)
         else:
             loop.serve(until_idle=until_idle, max_runs=max_runs, until_done=until_done)
+
+    @staticmethod
+    def _refuse(runtime: OrgRuntime, problem: str) -> NoReturn:
+        """Leave the refusal where ``status`` and ``progress`` read it (unless a scheduler is alive: its own status wins), then fail the start."""
+        if runtime.scheduler_status.state().state == "stopped":
+            runtime.ignore_list.ensure_runtime_files()  # as a claim does: the marker stays out of the snapshots of the organization
+            runtime.exit_marker.write(f"{REFUSED_START}kiro-cli is not ready: {problem}")
+        raise OrgError(f"kiro-cli is not ready, no run was started: {problem}")
 
 
 class LazyMcpRunner(McpRunner):
@@ -346,7 +357,7 @@ def commands_over(session: OrgSession, out: Output, terminal: Terminal, clock: C
         DashCommand(session, snapshot_renderer_of(session), LazyDashboardRunner(), terminal, out),
         ObsCommand(views),
         CheckCommand(session, get(IntegrityChecks), renderer, dump, out),
-        KiroProfileCommand(session, get(ProfileProvisioner), get(McpServerLocator), out),
+        KiroProfileCommand(session, get(ProfileProvisioner), get(RuntimeReadiness), get(KiroPlaces), get(McpServerLocator), out),
     ]
 
 

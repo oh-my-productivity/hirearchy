@@ -2,6 +2,7 @@
 
 import json
 import re
+import sys
 from hashlib import sha1
 from pathlib import Path
 from types import SimpleNamespace
@@ -99,15 +100,21 @@ def test_scheduler_kiro_command_line(tmp_path, clock, norm):
     legacy_meta = org.dir("legacy") / "AGENT.md"  # a charter written before `inputs` existed: no key, `read` of the organization only
     legacy_meta.write_text(re.sub(r"^inputs:.*\n", "", legacy_meta.read_text(encoding="utf-8"), flags=re.M), encoding="utf-8")
     build = kiro_runner()
-    agents_dir = Path.home() / ".kiro" / "agents"  # (``$HOME`` is the sandbox's: the ``isolated_kiro`` fixture)
+    places = org.runtime.kiro_places  # the same places the command line and the scheduler use, under the sandbox's ``$HOME`` (the ``isolated_kiro`` fixture)
+    kiro_agents = places.home() / "agents"
+    norm.add(places.home(), "<KIRO_HOME>")  # a path that differs by platform (Library/Application Support or .local/state) and by organization
+    norm.add(places.scratch("ceo").parent, "<SCRATCH>")
+    norm.add(sys.executable, "<PYTHON>")
+    norm.add(wire_kiro.launcher()[3], "<LAUNCH>")
     out = []
     for addr in ("ceo", "ceo/eng", "sh", "dev", "ro", "modeled", "legacy"):
         cmd, cwd, env = build(org, addr, "PROMPT")
         profile = next(a for i, a in enumerate(cmd) if cmd[i - 1] == "--agent")
-        content = (agents_dir / f"{profile}.json").read_text(encoding="utf-8")
-        added = {k: v for k, v in env.items() if k in ("ORG_ROOT", "ORG_AGENT")}
+        content = (kiro_agents / f"{profile}.json").read_text(encoding="utf-8")
+        added = {k: v for k, v in env.items() if k in ("ORG_ROOT", "ORG_AGENT", "KIRO_HOME")}
         out.append(f"##### {addr}\ncommand: {scrub(json.dumps(cmd), org.root, norm)}\ncwd: {norm(str(cwd))}\n"
                    f"env: {scrub(json.dumps(added, sort_keys=True), org.root, norm)}\n"
                    f"profile file: {scrub(profile, org.root, norm)}.json\n{scrub(content, org.root, norm)}")
     check("kiro/runner_command_lines.txt", "\n".join(out))
-    assert sorted(p.name for p in agents_dir.iterdir()), "profiles were written into the sandbox, not ~/.kiro"
+    assert sorted(p.name for p in kiro_agents.iterdir()), "profiles were written into the kiro home of the organization"
+    assert not list((Path.home() / ".kiro" / "agents").glob("hirearchy-*")), "and none into ~/.kiro"
