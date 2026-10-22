@@ -49,6 +49,24 @@ def test_manager_says_feedback_never_waives_a_criterion_and_the_lead_does_not_re
     assert len(bpm.get_role("manager").body.splitlines()) <= 50
 
 
+def test_manager_asks_before_delivery_and_forwards_two_readings():
+    body = bpm.get_role("manager").body
+    text = role("manager")
+    assert "so they are asked before delivery" in text
+    assert "any note of a verifier that a criterion can be read two ways (even one it calls non-blocking)" in text
+    assert "before the delivery is accepted" not in text
+    assert len(body.splitlines()) <= 50
+
+
+def test_reviewer_marks_items_that_miss_a_criterions_purpose_ambiguous():
+    text = role("reviewer")
+    assert "fits a criterion's words but not its evident purpose" in text
+    assert "list it, never decide it" in text
+    assert "(nothing for anyone to do, a restatement, a status)" in text
+    assert text.index("never exclude it silently") < text.index("fits a criterion's words") < text.index("if you cannot open the source")
+    assert bpm.edits_others_files(bpm.get_role("reviewer").body) is None
+
+
 def test_skill_asks_whether_informal_items_count_and_writes_it_into_the_first_criteria():
     text = flat(SKILL)
     for phrase in ('"what was decided, who does what", "list the risks"', "ask whether informal or unlabelled items count",

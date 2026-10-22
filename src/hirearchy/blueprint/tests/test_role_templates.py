@@ -257,10 +257,11 @@ REGRESSION_BULLET = (
     "as against the criteria, and lists any line it cannot judge as `ambiguous`."
 )
 AMBIGUOUS_BULLET = (
-    "- Items a verifier lists as `ambiguous` (it cannot tell whether a criterion covers them) are the client's to decide, not yours: never settle one "
-    "by including or excluding it. Keep the deliverable as verified and put each item at the top of your report under `Questions for the client:` "
-    "(one line each: the item, the criterion id, the verifier's words), so they are asked before the delivery is accepted. Copy every `Questions for "
-    "the client:` item from your reports' results into your own report the same way; never answer one yourself."
+    "- Items a verifier lists as `ambiguous` (it cannot tell whether a criterion covers them), and any note of a verifier that a criterion can be "
+    "read two ways (even one it calls non-blocking), are the client's to decide, not yours: never settle one by including or excluding it. Keep the "
+    "deliverable as verified and put each item at the top of your report under `Questions for the client:` (one line each: the item, the criterion "
+    "id, the verifier's words), so they are asked before delivery. Copy every `Questions for the client:` item from your reports' results into your "
+    "own report the same way; never answer one yourself."
 )
 
 
