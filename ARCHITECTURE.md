@@ -201,6 +201,8 @@ other than the owner contains the path literal in a write call (`write_text`, `a
 | `.runtime/events/<day>/*.jsonl` | `telemetry` (`FsEventSink` of the emitting process; `FsEventRetention` deletes expired days) | read through `EventReader` |
 | workspace directories created for a plan | `blueprint` (`FsWorkspaceProvisioner`) | - |
 | `~/.kiro/agents/hirearchy-*.json` | `kiro` (`FsProfileStore`) | - |
+| `<state>/kiro-home/<org-id>/agents/hirearchy-*.json` | `kiro` (`FsProfileStore`; `FsKiroState` makes the home) | - |
+| `<state>/kiro-cwd/<org-id>/**` | `kiro` (`FsKiroState`: the empty working directory of each run) | - |
 | `~/.kiro/skills/hirearchy/SKILL.md` | `skill` (`FsSkillStore`) | - |
 
 **Creator exceptions** (directories and empty files, never content), listed in `ownership.py` so the test knows them: `agents` creates the agent

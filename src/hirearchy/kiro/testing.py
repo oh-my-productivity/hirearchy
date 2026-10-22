@@ -8,6 +8,7 @@ The confinement policy is a pure function of its arguments: it has one implement
 from __future__ import annotations
 
 import json
+import stat
 from collections.abc import Callable, Mapping, Sequence
 from copy import deepcopy
 from dataclasses import dataclass
@@ -16,14 +17,16 @@ from pathlib import Path
 from ..access.testing import charters_on_disk
 from ..agents.testing import fs_agents
 from ..kernel import JsonObject, OrgPaths
-from ..kernel.testing import DictEnvironment, fs_atomic_writer
+from ..kernel.testing import DictEnvironment, fs_atomic_writer, system_clock
 from ._confinement import KiroConfinementPolicy
 from ._mcp_locator import VenvMcpServerLocator
 from ._profile_document import parse_profile, render_profile
+from ._places import StateDirPlaces
 from ._profiles import FsProfileStore
 from ._provisioner import OrgProfileProvisioner
 from ._runner import KiroRunCommandBuilder
-from .api import ConfinementPolicy, McpServerLocator, ProfileProvisioner, ProfileStore, RunCommandBuilder
+from ._state import FsKiroState
+from .api import ConfinementPolicy, KiroHomeAudit, KiroPlaces, KiroStateDirs, McpServerLocator, ProfileProvisioner, ProfileStore, RunCommandBuilder
 
 PURE = {"ConfinementPolicy"}  # a pure function of its arguments: one implementation, no fake
 
@@ -73,7 +76,66 @@ class CountingProfileStore(ProfileStore):
         self._inner.write(name, data)
 
 
+class FixedKiroPlaces(KiroPlaces):
+    """Homes, scratch directories and roots below ``base`` (one organization); ``problem`` is what ``problem()`` answers."""
+
+    def __init__(self, base: Path, problem: str | None = None) -> None:
+        self._base = base
+        self._problem = problem
+
+    def home(self) -> Path:
+        return self._base / "kiro-home" / "org"
+
+    def scratch(self, addr: str) -> Path:
+        return self._base / "kiro-cwd" / "org" / addr.replace("/", "-")
+
+    def roots(self) -> tuple[Path, Path]:
+        return self._base / "kiro-home", self._base / "kiro-cwd"
+
+    def problem(self) -> str | None:
+        return self._problem
+
+
+class MemoryKiroState(KiroStateDirs, KiroHomeAudit):
+    """Records ``private_dir`` and ``fresh`` calls; ``plant`` simulates a file a user or an agent left in a home."""
+
+    def __init__(self) -> None:
+        self.private: list[Path] = []
+        self.fresh_calls: list[Path] = []
+        self.planted_files: dict[Path, set[str]] = {}
+
+    def plant(self, home: Path, rel: str) -> None:
+        """``rel`` (relative to ``home``) now exists there."""
+        self.planted_files.setdefault(home, set()).add(rel)
+
+    def private_dir(self, path: Path) -> None:
+        self.private.append(path)
+
+    def fresh(self, path: Path) -> None:
+        self.fresh_calls.append(path)
+
+    def planted(self, home: Path) -> list[str]:
+        return sorted(self.planted_files.get(home, ()))
+
+
 # ------------------------------------------------------------------------------ harnesses and the registry
+
+
+@dataclass(frozen=True)
+class PlacesHarness:
+    places: KiroPlaces  # a valid world
+    broken: KiroPlaces  # the same kind of places in a world with a problem
+    base: Path  # a directory below which nothing may be created by computing places
+
+
+@dataclass(frozen=True)
+class StateHarness:
+    dirs: KiroStateDirs
+    audit: KiroHomeAudit
+    base: Path  # a directory the world may use
+    is_empty_dir: Callable[[Path], bool]  # ``fresh`` was the last thing done to it and it is an empty directory
+    is_private_dir: Callable[[Path], bool]  # ``private_dir`` made it a directory only its owner can use
+    plant: Callable[[Path, str], None]  # ``rel`` now exists below the home
 
 
 @dataclass(frozen=True)
@@ -111,6 +173,44 @@ class BuilderHarness:
     provisioner: ProfileProvisioner  # the one the builder asks (to compare names)
     names: Callable[[], list[str]]  # the profiles that exist, sorted
     profile: Callable[[str], JsonObject | None]  # a profile, parsed
+
+
+def state_dir_places(tmp_path: Path) -> PlacesHarness:
+    root = tmp_path / "org"
+    home = tmp_path.parent / f"{tmp_path.name}-home"  # outside the org, like the other harnesses
+    valid = DictEnvironment({"HIREARCHY_STATE_DIR": str(tmp_path / "state")}, home=home)
+    bad = DictEnvironment({"HIREARCHY_STATE_DIR": "relative/state"}, home=home)
+    return PlacesHarness(StateDirPlaces(OrgPaths(root), valid, "linux"), StateDirPlaces(OrgPaths(root), bad, "linux"), tmp_path)
+
+
+def fixed_places(tmp_path: Path) -> PlacesHarness:
+    return PlacesHarness(FixedKiroPlaces(tmp_path / "state"), FixedKiroPlaces(tmp_path / "state", "the places are bad"), tmp_path)
+
+
+def fs_state(tmp_path: Path) -> StateHarness:
+    state = FsKiroState(system_clock(tmp_path))
+
+    def plant(home: Path, rel: str) -> None:
+        path = home / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("x", encoding="utf-8")
+
+    return StateHarness(
+        state, state, tmp_path,
+        lambda p: p.is_dir() and not p.is_symlink() and not any(p.iterdir()),
+        lambda p: p.is_dir() and stat.S_IMODE(p.stat().st_mode) == 0o700,
+        plant,
+    )
+
+
+def memory_state(tmp_path: Path) -> StateHarness:
+    fake = MemoryKiroState()
+    return StateHarness(
+        fake, fake, tmp_path,
+        lambda p: bool(fake.fresh_calls) and fake.fresh_calls[-1] == p,
+        lambda p: p in fake.private,
+        fake.plant,
+    )
 
 
 def kiro_confinement(tmp_path: Path) -> ConfinementPolicy:
@@ -222,6 +322,9 @@ def builder_in_memory(tmp_path: Path) -> BuilderHarness:
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     ConfinementPolicy: [kiro_confinement],
+    KiroPlaces: [state_dir_places, fixed_places],
+    KiroStateDirs: [fs_state, memory_state],
+    KiroHomeAudit: [fs_state, memory_state],
     ProfileStore: [fs_profile_store, memory_profile_store],
     McpServerLocator: [venv_locator, static_locator],
     ProfileProvisioner: [provisioner_on_disk, provisioner_in_memory],

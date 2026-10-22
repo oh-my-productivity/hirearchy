@@ -43,6 +43,8 @@ OWNERS: tuple[Owned, ...] = (
     Owned(".runtime/scheduler.exit, .runtime/scheduler.log", "daemon", ("scheduler.exit", "scheduler.log")),
     Owned(".runtime/events/<day>/*.jsonl", "telemetry", ("events",)),
     Owned("~/.kiro/agents/hirearchy-*.json", "kiro", (".kiro/agents", "hirearchy-")),
+    Owned("<state>/kiro-home/<org-id>/agents/hirearchy-*.json", "kiro", ("kiro-home",)),
+    Owned("<state>/kiro-cwd/<org-id>/**", "kiro", ("kiro-cwd",)),
     Owned("~/.kiro/skills/hirearchy/SKILL.md", "skill", (".kiro/skills",)),
 )
 # "workspace directories created for a plan" (blueprint) has no literal fragment: the paths come from the blueprint.

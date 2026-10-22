@@ -19,7 +19,10 @@ __all__ = [
     "FILE_TOOLS",
     "Confinement",
     "ConfinementPolicy",
+    "KiroHomeAudit",
+    "KiroPlaces",
     "KiroRunRefused",
+    "KiroStateDirs",
     "McpServerLocator",
     "ProfileProvisioner",
     "ProfileStore",
@@ -109,4 +112,48 @@ class McpServerLocator(Protocol):
 class RunCommandBuilder(Protocol):
     def build(self, addr: str, prompt: str) -> RunCommand:
         """``kiro-cli chat --no-interactive --agent <profile> --model <model>`` for ``addr``; the prompt goes on stdin, not in the command."""
+        ...
+
+
+@runtime_checkable
+class KiroPlaces(Protocol):
+    """Where hirearchy keeps the kiro home and the working directories of one organization (computing them touches no file).
+
+    ``<state>/kiro-home/<org-id>`` is ``KIRO_HOME``; ``<state>/kiro-cwd/<org-id>/<agent-key>`` is a run's working directory. Every
+    path is absolute and ``realpath``ed; the environment and the home directory are asked on every call."""
+
+    def home(self) -> Path:
+        """``KIRO_HOME`` of this organization."""
+        ...
+
+    def scratch(self, addr: str) -> Path:
+        """The working directory of ``addr``'s runs (emptied before every run)."""
+        ...
+
+    def roots(self) -> tuple[Path, Path]:
+        """``(<state>/kiro-home, <state>/kiro-cwd)``: shared by every organization of this user (the placement check, design 8.3)."""
+        ...
+
+    def problem(self) -> str | None:
+        """Why these places cannot be used (a relative ``HIREARCHY_STATE_DIR``, a home that is the user's home or above it, a path kiro
+        cannot match literally) as one line, else ``None``."""
+        ...
+
+
+@runtime_checkable
+class KiroStateDirs(Protocol):
+    def private_dir(self, path: Path) -> None:
+        """Create ``path`` (and its parents) with mode ``0700``; ``OSError`` when it is a symlink."""
+        ...
+
+    def fresh(self, path: Path) -> None:
+        """Make ``path`` an empty directory (``0700``), removing whatever was there; ``OSError`` when that cannot be done safely
+        (a symlinked component, a platform whose ``rmtree`` follows symlinks)."""
+        ...
+
+
+@runtime_checkable
+class KiroHomeAudit(Protocol):
+    def planted(self, home: Path) -> list[str]:
+        """What ``home`` holds that kiro-cli would load into every agent and hirearchy did not put there, relative to ``home`` and sorted."""
         ...
