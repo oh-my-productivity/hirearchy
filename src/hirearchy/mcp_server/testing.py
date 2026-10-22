@@ -34,7 +34,7 @@ from ..traces import TraceLookup
 from ._binding import OpenerBindings, OrgBinding
 from ._factory import GroupedServerFactory
 from ._instructions import InstructionText
-from ._ports import OrgOpener, OrgPorts, ServerFactories, ToolGroup
+from ._ports import InstalledSkill, OrgOpener, OrgPorts, ServerFactories, ToolGroup
 from ._recorder import BatchCallTrace, ToolCallRecorder
 from ._resolver import EnvBindingResolver
 from ._serve import StdioMcpRunner
@@ -439,6 +439,16 @@ class ScriptedSteps(ServiceSteps):
         if self.raises is not None:
             raise self.raises
         return self.rework
+
+
+class FixedInstalledSkill(InstalledSkill):
+    """The installed skill is out of date at ``path``, or is not (``None``)."""
+
+    def __init__(self, path: Path | None = None) -> None:
+        self.path = path
+
+    def stale(self) -> Path | None:
+        return self.path
 
 
 class ScriptedHealth(HealthAnalyzer, HealthRenderer):

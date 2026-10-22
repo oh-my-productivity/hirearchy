@@ -9,7 +9,8 @@ from ..daemon import SchedulerStatus
 from ..health import HealthAnalyzer, HealthRenderer
 from ..kernel import ROOT, OrgError, Provider
 from ..overview import OrgTree
-from ._ports import SetupMode, ToolGroup
+from ._ports import InstalledSkill, SetupMode, ToolGroup
+from ._tools_identity import with_stale_skill_note
 
 if TYPE_CHECKING:
     from mcp.server.fastmcp import FastMCP
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 class StatusTools(ToolGroup):
     def __init__(
         self, setup: SetupMode, tree: Provider[OrgTree], scheduler: Provider[SchedulerStatus], directory: Provider[AgentDirectory],
-        analyzer: Provider[HealthAnalyzer], renderer: Provider[HealthRenderer],
+        analyzer: Provider[HealthAnalyzer], renderer: Provider[HealthRenderer], skill: InstalledSkill,
     ) -> None:
         self._setup = setup
         self._tree = tree
@@ -26,15 +27,18 @@ class StatusTools(ToolGroup):
         self._directory = directory
         self._analyzer = analyzer
         self._renderer = renderer
+        self._skill = skill
 
     def register(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
         def status() -> str:
             """The whole organization as a tree: each agent's role, state, budget and workload."""
             if me == ROOT and self._setup.active():
-                return self._setup.state()
+                return with_stale_skill_note(self._setup.state(), self._skill)
             tree = self._tree().tree()
-            return f"{tree}\n\n{self._scheduler().describe()}" if me == ROOT else tree
+            if me != ROOT:
+                return tree
+            return with_stale_skill_note(f"{tree}\n\n{self._scheduler().describe()}", self._skill)
 
         @mcp.tool()
         def health(agent: str | None = None) -> str:

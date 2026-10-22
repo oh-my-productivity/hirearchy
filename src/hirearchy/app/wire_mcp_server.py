@@ -21,7 +21,8 @@ from ..kernel._system import OsEnvironment
 from ..mcp_server import BindingResolver, McpServerFactory, McpServerRunner, OrgBindingPort
 from ..mcp_server._binding import OpenerBindings
 from ..mcp_server._instructions import DS_STORE, INSTRUCTIONS, ROOT_INSTRUCTIONS
-from ..mcp_server._ports import BindingFactory, OrgOpener, OrgPorts, ServerFactories
+from ..mcp_server._ports import BindingFactory, InstalledSkill, OrgOpener, OrgPorts, ServerFactories
+from . import wire_skill
 from ._builder import Builder
 from .wire_locator import os_locator
 from .wire_stalls import RuntimePorts
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 __all__ = [
-    "DS_STORE", "INSTRUCTIONS", "ROOT_INSTRUCTIONS", "RuntimeOrgOpener", "WiredServerFactories", "binding_resolver", "mcp_server_runner", "register",
+    "DS_STORE", "INSTRUCTIONS", "ROOT_INSTRUCTIONS", "PackagedInstalledSkill", "RuntimeOrgOpener", "WiredServerFactories", "binding_resolver", "mcp_server_runner", "register",
     "serve", "server_factory",
 ]
 
@@ -98,6 +99,17 @@ class CachedPlanTime:
         return self._parts
 
 
+class PackagedInstalledSkill(InstalledSkill):
+    """The skill installed under the home of ``environment`` against the one this install ships (``SkillCheck``). It needs no organization, because in
+    setup mode none is bound and the first ``whoami`` of root is already there."""
+
+    def __init__(self, environment: Environment) -> None:
+        self._environment = environment
+
+    def stale(self) -> Path | None:
+        return wire_skill.skill_check(self._environment).stale()
+
+
 def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[SchedulerControl], SchedulerControl] | None = None) -> McpServerFactory:
     """The factory of the servers bound to ``binding``. ``scheduler_control``: wraps the control of the organization the ``start`` and ``stop`` tools use
     (the tests give a fake starter through it)."""
@@ -155,6 +167,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     plan_time = CachedPlanTime()
     text = InstructionText(binding)  # the instructions, and the setup state
     directory = of(AgentDirectory)
+    installed_skill = PackagedInstalledSkill(environment)
 
     def control() -> SchedulerControl:
         real = of(SchedulerControl)()
@@ -168,12 +181,12 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     examples: Provider[BlueprintExamples] = lambda: TemplateBlueprintExamples()
 
     common = [
-        IdentityTools(text, of(Whoami), of(SchedulerStatus), of(BatchStore), of(MailboxReader)),
+        IdentityTools(text, of(Whoami), of(SchedulerStatus), of(BatchStore), of(MailboxReader), installed_skill),
         TaskTools(of(TaskAssigner), of(TaskReporter), of(BudgetQuery), of(MailboxReader), of(ServiceHints)),
         NoteTools(of(MessageSender), of(BudgetQuery), of(BudgetReclaimer)),
         HiringTools(of(Hiring), of(Retirement)),
         FileTools(of(ToolNaming), of(OrgFileReader), of(OrgFileWriter), of(OrgLayout)),
-        StatusTools(text, of(OrgTree), of(SchedulerStatus), directory, of(HealthAnalyzer), of(HealthRenderer)),
+        StatusTools(text, of(OrgTree), of(SchedulerStatus), directory, of(HealthAnalyzer), of(HealthRenderer), installed_skill),
         ServiceTools(
             DirectoryServiceRoles(text, directory, of(CharterReader), of(ServiceCatalog)), of(ServiceReports), of(ServiceCommands), of(BudgetQuery),
             of(ServiceSteps),

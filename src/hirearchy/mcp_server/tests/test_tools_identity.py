@@ -10,23 +10,28 @@ from hirearchy.daemon.testing import FakeSchedulerStatus
 from hirearchy.kernel import ROOT, OrgError
 from hirearchy.mail.testing import MailHarness, memory_mailbox
 from hirearchy.mcp_server._instructions import InstructionText
-from hirearchy.mcp_server._tools_identity import IdentityTools
-from hirearchy.mcp_server.testing import MemoryBinding
+from hirearchy.mcp_server._tools_identity import STALE_SKILL, IdentityTools
+from hirearchy.mcp_server.testing import FixedInstalledSkill, MemoryBinding
 from hirearchy.prompts.testing import FixedWhoami
 
 from ._support import call, fails, names, serve
 
 
-def tools(tmp_path: Path, exists: bool = True, state: SchedulerState = SchedulerState("stopped")) -> tuple[IdentityTools, FixedWhoami, MailHarness]:
+STALE = Path("/h/.kiro/skills/hirearchy/SKILL.md")
+
+
+def tools(
+    tmp_path: Path, exists: bool = True, state: SchedulerState = SchedulerState("stopped"), stale: Path | None = None,
+) -> tuple[IdentityTools, FixedWhoami, MailHarness]:
     who, box = FixedWhoami("WHO"), memory_mailbox(tmp_path)
 
     def gone() -> NoReturn:
         raise OrgError("no organization at /o yet: call create_org(mission=...) first")
 
     if not exists:
-        return IdentityTools(InstructionText(MemoryBinding(Path("/o"))), gone, gone, gone, gone), who, box
+        return IdentityTools(InstructionText(MemoryBinding(Path("/o"))), gone, gone, gone, gone, FixedInstalledSkill(stale)), who, box
     return IdentityTools(InstructionText(MemoryBinding(Path("/o"), exists=True)), lambda: who, lambda: FakeSchedulerStatus(state),
-                         lambda: box.batches, lambda: box.reader), who, box
+                         lambda: box.batches, lambda: box.reader, FixedInstalledSkill(stale)), who, box
 
 
 def message(n: int, to: str, sender: str = "root", folder: str = "inbox") -> tuple[str, str]:
@@ -46,6 +51,31 @@ def test_an_agent_is_told_who_it_is_without_the_scheduler(tmp_path: Path) -> Non
 def test_root_is_also_told_whether_the_scheduler_runs(tmp_path: Path) -> None:
     group, _, _ = tools(tmp_path, state=SchedulerState("running", 77, "2026-01-01 00:00:00Z"))
     assert call(serve(group, ROOT), "whoami") == "WHO\n\nscheduler: running (pid 77, since 2026-01-01 00:00:00Z)"
+
+
+def test_root_is_told_when_the_installed_skill_is_out_of_date(tmp_path: Path) -> None:
+    group, _, _ = tools(tmp_path, state=SchedulerState("running", 77, "2026-01-01 00:00:00Z"), stale=STALE)
+    out = call(serve(group, ROOT), "whoami")
+    assert out == "WHO\n\nscheduler: running (pid 77, since 2026-01-01 00:00:00Z)\n\n" + STALE_SKILL.format(path=STALE)
+    assert out.endswith(f"Note: the installed skill at {STALE} is out of date: run `hirearchy install-skill --force` "
+                        "(tell the user; this session may follow the old text until it is restarted).")
+
+
+def test_root_is_told_nothing_when_no_skill_is_out_of_date(tmp_path: Path) -> None:
+    group, _, _ = tools(tmp_path)
+    assert "installed skill" not in call(serve(group, ROOT), "whoami")
+
+
+def test_an_agent_never_sees_the_stale_skill_note(tmp_path: Path) -> None:
+    group, _, _ = tools(tmp_path, stale=STALE)
+    assert call(serve(group, "ceo"), "whoami") == "WHO"
+
+
+def test_the_setup_state_also_carries_the_stale_skill_note(tmp_path: Path) -> None:
+    group, _, _ = tools(tmp_path, exists=False, stale=STALE)
+    out = call(serve(group, ROOT), "whoami")
+    assert out.startswith("Setup: no organization exists at /o yet.") and out.endswith("\n\n" + STALE_SKILL.format(path=STALE))
+    assert "installed skill" not in call(serve(tools(tmp_path, exists=False)[0], ROOT), "whoami")
 
 
 def test_before_the_organization_exists_root_gets_the_setup_state_and_an_agent_the_refusal(tmp_path: Path) -> None:

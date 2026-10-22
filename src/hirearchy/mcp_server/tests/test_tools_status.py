@@ -9,23 +9,43 @@ from hirearchy.daemon.testing import FakeSchedulerStatus
 from hirearchy.kernel import ROOT
 from hirearchy.mcp_server._instructions import InstructionText
 from hirearchy.mcp_server._tools_status import StatusTools
-from hirearchy.mcp_server.testing import MemoryBinding, ScriptedHealth, agents_in
+from hirearchy.mcp_server._tools_identity import STALE_SKILL
+from hirearchy.mcp_server.testing import FixedInstalledSkill, MemoryBinding, ScriptedHealth, agents_in
 from hirearchy.overview.testing import FixedOrgTree
 
 from ._support import call, fails, serve
 
 
-def tools(exists: bool = True) -> tuple[StatusTools, ScriptedHealth]:
+STALE = Path("/h/.kiro/skills/hirearchy/SKILL.md")
+
+
+def tools(exists: bool = True, stale: Path | None = None) -> tuple[StatusTools, ScriptedHealth]:
     agents, health = agents_in("ceo", "ceo/eng", "ops"), ScriptedHealth()
     return StatusTools(
         InstructionText(MemoryBinding(Path("/o"), exists=exists)), lambda: FixedOrgTree("THE TREE"),
         lambda: FakeSchedulerStatus(SchedulerState("running", 5, "then")), lambda: agents, lambda: health, lambda: health,
+        FixedInstalledSkill(stale),
     ), health
 
 
 def test_an_agent_sees_the_tree_and_root_also_the_scheduler() -> None:
     assert call(serve(tools()[0], "ceo"), "status") == "THE TREE"
     assert call(serve(tools()[0], ROOT), "status") == "THE TREE\n\nscheduler: running (pid 5, since then)"
+
+
+def test_root_is_told_when_the_installed_skill_is_out_of_date() -> None:
+    out = call(serve(tools(stale=STALE)[0], ROOT), "status")
+    assert out == "THE TREE\n\nscheduler: running (pid 5, since then)\n\n" + STALE_SKILL.format(path=STALE)
+    assert "installed skill" not in call(serve(tools()[0], ROOT), "status")
+
+
+def test_an_agent_never_sees_the_stale_skill_note_in_the_tree() -> None:
+    assert call(serve(tools(stale=STALE)[0], "ceo"), "status") == "THE TREE"
+
+
+def test_the_setup_state_also_carries_the_stale_skill_note() -> None:
+    out = call(serve(tools(exists=False, stale=STALE)[0], ROOT), "status")
+    assert out.startswith("Setup: no organization exists at /o yet.") and out.endswith("\n\n" + STALE_SKILL.format(path=STALE))
 
 
 def test_before_the_organization_exists_root_gets_the_setup_state() -> None:

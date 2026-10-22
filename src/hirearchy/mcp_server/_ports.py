@@ -144,3 +144,10 @@ class PlanTarget(Protocol):
     def line(self) -> str:
         """The ``Target organization:`` line of a proposal: where it will be applied, and whether that exists."""
         ...
+
+
+@runtime_checkable
+class InstalledSkill(Protocol):
+    def stale(self) -> Path | None:
+        """The installed assistant skill when it differs from the one this server ships; None otherwise."""
+        ...

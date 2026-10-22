@@ -8,31 +8,44 @@ from ..daemon import SchedulerStatus
 from ..kernel import ROOT, Provider
 from ..mail import BatchStore, MailboxReader
 from ..prompts import Whoami
-from ._ports import SetupMode, ToolGroup
+from ._ports import InstalledSkill, SetupMode, ToolGroup
 
 if TYPE_CHECKING:
     from mcp.server.fastmcp import FastMCP
 
 
+STALE_SKILL = ("Note: the installed skill at {path} is out of date: run `hirearchy install-skill --force` "
+               "(tell the user; this session may follow the old text until it is restarted).")
+
+
+def with_stale_skill_note(text: str, skill: InstalledSkill) -> str:
+    """``text``, and when the installed assistant skill is out of date a closing note naming it (only root is shown this)."""
+    path = skill.stale()
+    return text if path is None else f"{text}\n\n{STALE_SKILL.format(path=path)}"
+
+
 class IdentityTools(ToolGroup):
     def __init__(
         self, setup: SetupMode, whoami: Provider[Whoami], scheduler: Provider[SchedulerStatus], batches: Provider[BatchStore],
-        mail: Provider[MailboxReader],
+        mail: Provider[MailboxReader], skill: InstalledSkill,
     ) -> None:
         self._setup = setup
         self._whoami = whoami
         self._scheduler = scheduler
         self._batches = batches
         self._mail = mail
+        self._skill = skill
 
     def register(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
         def whoami() -> str:
             """Your address, role, budget, direct reports, open tasks, outstanding delegations and charter."""
             if me == ROOT and self._setup.active():
-                return self._setup.state()
+                return with_stale_skill_note(self._setup.state(), self._skill)
             text = self._whoami().whoami(me)
-            return f"{text}\n\n{self._scheduler().describe()}" if me == ROOT else text
+            if me != ROOT:
+                return text
+            return with_stale_skill_note(f"{text}\n\n{self._scheduler().describe()}", self._skill)
 
         @mcp.tool()
         def inbox() -> str:
