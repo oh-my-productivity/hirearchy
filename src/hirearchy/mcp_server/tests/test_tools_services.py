@@ -167,6 +167,14 @@ def test_feedback_says_who_it_did_not_wake() -> None:
         "feedback accept recorded on t1 for ceo (message fb-1); it does not wake ceo")
 
 
+def test_revise_playbook_docstring_names_confirmed_amendments() -> None:
+    text = " ".join(described(serve(tools(offered={"ceo/eng": ["brief"]})[0], "ceo/eng"))["revise_playbook"].split())
+    assert (
+        "or when it cites a criterion your parent added to the contract by an amendment the client confirmed (your Reflect section and the "
+        "amendment note name them); your lessons, relayed verdicts and an agent client's verdicts are not evidence." in text
+    )
+
+
 def test_revise_playbook_says_the_version_and_that_the_client_was_told_quietly() -> None:
     group, commands = tools(offered={"ceo/eng": ["brief"]})
     out = call(serve(group, "ceo/eng"), "revise_playbook", service="brief", content="c", reason="r", evidence=["R1", "C2"])

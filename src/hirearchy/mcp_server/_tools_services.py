@@ -242,12 +242,13 @@ class ServiceTools(ToolGroup):
         the ids it rests on, from the regression list and the digest in your prompt: "R<k>" (a rejection by the client),
         "C<k>" (a contract criterion), verdict ids, case ids. It is admitted only when the same criterion or regression
         assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the
-        contract by an amendment; your lessons, relayed verdicts and an agent client's verdicts are not evidence. Pass
-        evidence=[] only for the first playbook (the steps your team followed, nothing more), or to restore unchanged a
-        version your parent wrote. A refusal writes nothing and gives you a question to send your parent once; do not
-        wait for the answer (it reaches you as a contract change or a criterion link). The old version is archived; your
-        parent is told quietly. The playbook may raise the bar, never lower it: the acceptance criteria come from the
-        contract. Returns the new version, which applies from now on.
+        contract by an amendment the client confirmed (your Reflect section and the amendment note name them); your
+        lessons, relayed verdicts and an agent client's verdicts are not evidence. Pass evidence=[] only for the first
+        playbook (the steps your team followed, nothing more), or to restore unchanged a version your parent wrote. A
+        refusal writes nothing and gives you a question to send your parent once; do not wait for the answer (it reaches
+        you as a contract change or a criterion link). The old version is archived; your parent is told quietly. The
+        playbook may raise the bar, never lower it: the acceptance criteria come from the contract. Returns the new
+        version, which applies from now on.
         """
             version = self._commands().revise_playbook(me, service, content, reason, evidence)
             client = parent(me)
