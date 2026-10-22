@@ -1,0 +1,39 @@
+Raising the budget changed the plan, so here is the updated version. The slack warning is gone. The one remaining warning is routine. The agents can't write into your `deliverables` folder, so I copy each checked memo there myself and confirm it's there.
+
+PLAN FOR YOU
+Goal: Every week, after the team meeting, write a short memo for the user from that meeting's notes file: what the team decided and who does what.
+What I understood you need:
+- Scope: One memo per request, covering only the meeting in the notes file named in the request: the decisions made and the action items (who does what, by when). Decisions and commitments count whether labelled (for example 'ACTION:') or only stated in prose, including 'X offered to / said they would ...'. Nothing from other meetings.
+- Your files (read-only): /tmp/hirearchy-e4-s1-1792640562/notes
+- Quality bar: Every statement comes from the named notes file; nothing is invented; where the notes are silent about an owner or date, the memo says so.
+- Sources: Only the files in the notes folder; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-4.6 for 2 agents, claude-haiku-4.5 for 1 agent (Per the user: the lead and the reviewer (who checks the memo) on claude-sonnet-4.6; every other agent on claude-haiku-4.5)
+Team (3 agents):
+- lead (Manager, model claude-sonnet-4.6): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-e4-s1-1792640562/notes and the organization's own files; cannot change your files
+  - writer (Writer, model claude-haiku-4.5): can read /private/tmp/hirearchy-e4-s1-1792640562/notes through the organization's read tool; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-4.6): can read files only in /private/tmp/hirearchy-e4-s1-1792640562/notes and the organization's own files; cannot change your files
+Budget: up to 15 runs per request (one run = one working session of one agent), your cap per request is 15; the minimum for one review and rework is 11. Unspent runs come back to you.
+  lead starts with 15, hands down writer 3, reviewer 2 and keeps 10 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One short markdown memo (decisions, and who does what) from one meeting's notes file.
+  You provide: notes_file (required)
+  Each request: up to 15 runs
+  Checks:
+    1. Covers only the meeting in the named notes file.
+    2. At most 400 words as counted by read.
+    3. A markdown memo with a section titled 'Decisions' that lists every decision in the notes, including decisions stated only in prose.
+    4. A section titled 'Action items' that is a markdown table with exactly the columns Owner | Action | Due.
+    5. The table has one row for every commitment in the notes, including informal ones stated in prose (for example someone offering or saying they would do something), and none that are not in the notes.
+    ... and 4 more (see the details)
+  Delivered to: /tmp/hirearchy-e4-s1-1792640562/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+Nothing runs until you ask for a request: approving only creates the team and the services.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+
+The four checks under "... and 4 more" are the same ones I listed before.
+
+Reply "approve" and I'll create the team. After that, ask me for a memo whenever you like.

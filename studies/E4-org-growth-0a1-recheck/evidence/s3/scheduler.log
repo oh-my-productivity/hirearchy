@@ -1,0 +1,130 @@
+
+# --- scheduler started 2026-10-22 21:41:00Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s3-1792705005/org run --until-done
+org: /private/tmp/hirearchy-e4-s3-1792705005/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 54s
+lead: started run (1 message(s))
+lead/writer: run finished in 44s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 61s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 91s
+lead: run finished in 44s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 21:46:12Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s3-1792705005/org run --until-done
+org: /private/tmp/hirearchy-e4-s3-1792705005/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 71s
+lead: started run (1 message(s))
+lead/writer: run finished in 36s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 65s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 57s
+lead: run finished in 38s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 21:51:28Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s3-1792705005/org run --until-done
+org: /private/tmp/hirearchy-e4-s3-1792705005/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 111s
+lead: started run (1 message(s))
+lead/writer: run finished in 44s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 65s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 75s
+lead: run finished in 44s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 21:57:30Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s3-1792705005/org run --until-done
+org: /private/tmp/hirearchy-e4-s3-1792705005/org
+lead: started run (2 message(s))
+
+# --- scheduler started 2026-10-22 21:59:12Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s3-1792705005/org run --max-runs 8 --until-done
+org: /private/tmp/hirearchy-e4-s3-1792705005/org
+lead: started run (5 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 121s
+lead: started run (1 message(s))
+lead/writer: run finished in 38s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 52s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 79s
+lead: run finished in 44s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 22:04:49Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s3-1792705005/org run --max-runs 15 --until-done
+org: /private/tmp/hirearchy-e4-s3-1792705005/org
+lead: started run (2 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 56s
+lead: started run (1 message(s))
+lead/writer: run finished in 50s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 65s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 113s
+lead: run finished in 73s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 22:10:58Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s3-1792705005/org run --max-runs 8 --until-done
+org: /private/tmp/hirearchy-e4-s3-1792705005/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 87s
+lead: started run (1 message(s))
+lead/writer: run finished in 32s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 48s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 81s
+lead: run finished in 48s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 22:16:04Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s3-1792705005/org run --max-runs 15 --until-done
+org: /private/tmp/hirearchy-e4-s3-1792705005/org
+lead: started run (2 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 54s
+lead: started run (1 message(s))
+lead/writer: run finished in 38s
+lead/writer: started run (1 message(s))
+lead: run finished in 71s
+lead: started run (1 message(s))
+lead/writer: run finished in 44s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 61s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 83s
+lead: run finished in 51s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 22:22:38Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s3-1792705005/org run --max-runs 8 --until-done
+org: /private/tmp/hirearchy-e4-s3-1792705005/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 73s
+lead: started run (1 message(s))
+lead/writer: run finished in 45s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 55s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 212s
+lead: run finished in 64s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 22:29:38Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s3-1792705005/org run --max-runs 4 --until-done
+org: /private/tmp/hirearchy-e4-s3-1792705005/org
+lead: started run (1 message(s))
+lead/reviewer: started run (1 message(s))
+lead: run finished in 97s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 71s
+lead: run finished in 57s
+scheduler exiting: finished: no open tasks

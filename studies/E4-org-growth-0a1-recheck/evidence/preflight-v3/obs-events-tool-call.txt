@@ -1,0 +1,5 @@
+4 of 4 matching event(s), oldest first
+18:19:26.737 mcp lead tool.call org_write REFUSED 1ms error="you may only write inside your own directory. Paths are relative to the org root, so yours start with `lead/`: e.g. `lead/MEMORY.md` or `lead/work/notes.md` (got `notes/preflight.txt`)" error_type=OrgError args=path=notes/preflight.txt,co…
+18:19:41.331 mcp lead tool.call org_read ok 1ms args=path=. run=lead@20261022T181852089488 trace=20261022T181846737551-root-80a1
+18:20:00.678 mcp lead tool.call org_write ok 2ms args=path=lead/MEMORY.md,content_chars=158,append=False run=lead@20261022T181852089488 trace=20261022T181846737551-root-80a1
+18:20:06.179 mcp lead tool.call report ok 4ms args=task_id=20261022T181846737551-root-80a1,status=failed,summary_chars=340 run=lead@20261022T181852089488 trace=20261022T181846737551-root-80a1

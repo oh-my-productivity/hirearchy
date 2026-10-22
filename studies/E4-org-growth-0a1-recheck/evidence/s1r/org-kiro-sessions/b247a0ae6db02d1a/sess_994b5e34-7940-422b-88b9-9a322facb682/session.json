@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_994b5e34-7940-422b-88b9-9a322facb682",
+  "title": "Hirearchy run: you are `lead`",
+  "agentMode": "hirearchy-hirearchy-e4-s1r-1792693-bfcddd-read-x31175034",
+  "workspacePaths": [
+    "/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e4-s1r-1792693-bfcddd47e6ecb16c/lead-8cb33b27"
+  ],
+  "rootPaths": [
+    "/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e4-s1r-1792693-bfcddd47e6ecb16c/lead-8cb33b27"
+  ],
+  "createdAt": "2026-10-22T18:42:00.751Z",
+  "lastModifiedAt": "2026-10-22T18:43:18.763Z",
+  "modelId": "claude-sonnet-4.6",
+  "autopilot": true,
+  "effortLevel": "high",
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-sonnet-4.6",
+    "display": "Claude Sonnet 4.6"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "disabled",
+    "reflection": false
+  },
+  "memoryConfigSource": "explicit",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "disabled",
+          "reflection": false
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+# client questions (protocol 7.2); facts only
+
+Result messages root received (lead -> root), with the product parser's items (hirearchy.kernel._text.client_questions):
+- id 20261022T223256660054-lead-f190 folder=inbox created=2026-10-22T22:32:56+00:00 answers(reply_to)=20261022T222238418574-root-3286 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T214508787095-lead-de22 folder=read created=2026-10-22T21:45:08+00:00 answers(reply_to)=20261022T214057425390-root-88b2 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T214955106608-lead-ffba folder=read created=2026-10-22T21:49:55+00:00 answers(reply_to)=20261022T214612649634-root-4510 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T215618947365-lead-40d8 folder=read created=2026-10-22T21:56:18+00:00 answers(reply_to)=20261022T215128895860-root-fe20 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T220345128394-lead-4e06 folder=read created=2026-10-22T22:03:45+00:00 answers(reply_to)=20261022T215730424416-root-ff36 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T221002308873-lead-350c folder=read created=2026-10-22T22:10:02+00:00 answers(reply_to)=20261022T220445258658-root-cdef status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- A1: "Next meeting: Monday 19 October" footer appears after the Action Items table. Criterion: none of C1–C8 explicitly prohibits it (reviewer: "not a criterion violation but may be outside scope per charter"). The charter assignment says 'Nothing else' beyond decisions and action items; the playbook allows a 'Next meeting' footer if stated in the notes. Client's call on whether to keep or remove it.
+
+Memo delivered: lead/writer/work/memo-2026-10-12.md
+
+Verification (from my own read, 167 words, modified 22:05:58 UTC):
+- C1: 167 words, markdown. MET.
+- C2: All content from Oct 12 notes. MET.
+- C3: 4 decisions (rate limiter RFC/token bucket, behind feature flag, blameless postmortem, deploy freeze Oct 22–23). MET.
+- C4: 5 rows (Dev, Marta, Priya, Sam, Lee), columns Owner | Action | Due. MET.
+- C5: All ISO dates or none; Sam=2026-10-21 derived from freeze Oct 22 (calculable). MET.
+- C6: All owner names match notes. MET.
+- C7: Reviewer coverage line: criteria met: 7 of 7 — PASS. MET.
+- C8: Starts with 'Summary:', then Decisions, then Action Items table. MET.
+- R1: Order confirmed. MET.
+
+Reviewer: criteria met: 7 of 7 — PASS (lead/reviewer/work/review-memo-2026-10-12-task8edb.md)
+  parsed items (1): ['A1: "Next meeting: Monday 19 October" footer appears after the Action Items table. Criterion: none of C1–C8 explicitly prohibits it (reviewer: "not a criterion violation but may be outside scope per charter"). The charter assignment says \'Nothing else\' beyond decisions and action items; the playbook allows a \'Next meeting\' footer if stated in the notes. Client\'s call on whether to keep or remove it.']
+- id 20261022T221507718221-lead-9154 folder=read created=2026-10-22T22:15:07+00:00 answers(reply_to)=20261022T221058950422-root-116b status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T222147531458-lead-0532 folder=read created=2026-10-22T22:21:47+00:00 answers(reply_to)=20261022T221604637344-root-6947 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T222916707473-lead-96e9 folder=read created=2026-10-22T22:29:16+00:00 answers(reply_to)=20261022T222238418574-root-3286 status=blocked from=lead
+  raw 'Questions for the client' text: **Questions for the client:**
+- Item: "Marta will keep the agenda as sent" (notes, prose statement). Criterion: C4. Verifier's words: "This phrase fits C4's words (a person said in prose they would do something) but may fit the charter's exception ('nothing for anyone to do' — passive maintenance of the status quo). The task's required-change check demands the row be absent; C4 may demand it be present. These two requirements contradict each other if the item counts as a commitment."
+  → Please decide: is this (a) a commitment requiring a table row under C4, or (b) a non-action / decision consequence not requiring one?
+
+The memo currently has the row absent (as the required change specified). Once you confirm, I will either keep the memo as-is (option b, and C4/C7 will pass on re-check) or send it back to the writer to add the row (option a).
+
+Deliverable (current): lead/writer/work/memo-2026-10-19.md (149 words)
+  parsed items (1): ['Item: "Marta will keep the agenda as sent" (notes, prose statement). Criterion: C4. Verifier\'s words: "This phrase fits C4\'s words (a person said in prose they would do something) but may fit the charter\'s exception (\'nothing for anyone to do\' — passive maintenance of the status quo). The task\'s required-change check demands the row be absent; C4 may demand it be present. These two requirements contradict each other if the item counts as a commitment."']
+
+progress replies the assistant received that contain 'for the client: ask the user before you copy or deliver':
+- call #60 2026-10-22T22:10:02.595Z turn 8 hirearchy::progress: ['"Memo for 2026-10-12 meeting" [service weekly-memo v2]: done. runs 5 of 15 (10 returned). last activity 0s ago. artifacts: lead/writer/work/memo-2026-10-12.md. 1 question for the client: ask the user before you copy or deliver. no feedback yet. (task 20261022T220445258658-root-cdef)']
+count: 1

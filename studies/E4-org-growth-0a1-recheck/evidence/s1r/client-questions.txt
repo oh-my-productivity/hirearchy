@@ -1,0 +1,44 @@
+# client questions (protocol 7.2); facts only
+
+Result messages root received (lead -> root), with the product parser's items (hirearchy.kernel._text.client_questions):
+- id 20261022T184536871337-lead-4f4d folder=read created=2026-10-22T18:45:36+00:00 answers(reply_to)=20261022T182945409755-root-ed94 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T185542011090-lead-34c6 folder=read created=2026-10-22T18:55:42+00:00 answers(reply_to)=20261022T184712524029-root-9ce9 status=blocked from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T190330437021-lead-f61d folder=read created=2026-10-22T19:03:30+00:00 answers(reply_to)=20261022T184712524029-root-9ce9 status=failed from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T191112496455-lead-f84e folder=read created=2026-10-22T19:11:12+00:00 answers(reply_to)=20261022T190015448581-root-3559 status=blocked from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T192346320735-lead-fa63 folder=read created=2026-10-22T19:23:46+00:00 answers(reply_to)=20261022T191407596413-root-114d status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Sam's CI cache fix note: notes say 'the fix touches the runner image, so it needs more than a quick patch' — status update or implicit commitment? (C4; checker's words: 'No "will" or "I'll" language. Reads as a status report rather than a commitment. If it is treated as an informal commitment, C4 would have a missing row.')
+
+---
+
+Memo for the 2026-10-12 Platform weekly delivered.
+
+My own read of lead/writer/work/memo-2026-10-12.md (124 words, 16 lines, modified 19:18:24 UTC):
+- C1: content traces entirely to 2026-10-12 notes. Met.
+- C2: 124 words (limit 400). Met.
+- C3: 3 decisions, each on one line, matching notes. Met.
+- C4: 5 rows (Dev, Marta, Priya, Sam, Lee), columns Owner|Action|Due, all explicit ACTIONs and informal commitments covered, no spurious rows. Met.
+- C6: all statements traceable; dates derived, not invented. Met.
+- C7: checker's report: criteria met: 7 of 7. Verdict: PASS. No required changes. Met.
+- C8: first line is 'Summary: ...' (one sentence), then ## Decisions, then ## Actions; no heading before Summary. Met.
+- C9: all 5 Due values are ISO dates; relative deadlines converted correctly (Sam: 'day before freeze' = 2026-10-21; Lee: 'demo week' = 2026-10-19). Met.
+
+Checker's final coverage line (lead/checker/work/review-memo-2026-10-12.md): criteria met: 7 of 7. Verdict: PASS.
+
+Deliverable: lead/writer/work/memo-2026-10-12.md
+  parsed items (1): ['Sam\'s CI cache fix note: notes say \'the fix touches the runner image, so it needs more than a quick patch\' — status update or implicit commitment? (C4; checker\'s words: \'No "will" or "I\'ll" language. Reads as a status report rather than a commitment. If it is treated as an informal commitment, C4 would have a missing row.\')']
+- id 20261022T193926321265-lead-56fc folder=read created=2026-10-22T19:39:26+00:00 answers(reply_to)=20261022T192724706946-root-2efa status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+
+progress replies the assistant received that contain 'for the client: ask the user before you copy or deliver':
+- call #36 2026-10-22T19:23:47.977Z turn 8 hirearchy::progress: ['"Memo for the 2026-10-12 platform weekly" [service weekly-memo v2]: done. runs 7 of 15. 0 returned (kept by lead). last activity 1s ago. artifacts: lead/writer/work/memo-2026-10-12.md, lead/checker/work/review-memo-2026-10-12.md. 1 question for the client: ask the user before you copy or deliver. no feedback yet. (task 20261022T191407596413-root-114d)']
+count: 1

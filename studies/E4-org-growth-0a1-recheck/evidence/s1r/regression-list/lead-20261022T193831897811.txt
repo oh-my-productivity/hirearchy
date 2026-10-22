@@ -1,0 +1,4 @@
+# Regression list: weekly-memo (the client's rejections, verbatim)
+Each line is something the client rejected. Check every delivery of this service against each line, except the lines marked "no lasting rule" (the client said it was a one-off: do not check them), and copy this list verbatim into every review or check task you delegate for it. A line is not a criterion: it becomes one when your parent adds it to the contract, or ends as "no lasting rule".
+- R1, case 20261022T182945409755-root-ed94, verdict 20261022T185900393028-root-cdb5, about C9 (removed): "Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+

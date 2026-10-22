@@ -1,0 +1,40 @@
+######## hirearchy --root /tmp/hirearchy-e4-s2-1792698851/org services
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v1, playbook v1): One short memo (decisions and action items) from one weekly meeting-notes file
+  inputs: notes_file* (File name of the meeting notes inside the notes folder, e.g. 2026-10-19.md)   (* required)
+  each request: 15 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Uses only the notes file named in the request.
+    C2: At most 400 words as counted by read.
+    C3: A markdown memo with a section titled Decisions (a list) and a section titled Action items (a table).
+    C4: Decisions lists every decision recorded in the notes, including small ones such as meeting logistics.
+    C5: The Action items table has exactly the columns Owner | Action | Due, with one row for every commitment in the notes, including informal ones written in prose and not labelled ACTION (anyone who said they would do something).
+    C6: Due is an ISO date (YYYY-MM-DD). A vague or relative deadline (for example 'next week', 'by Friday') is turned into a date computed from the meeting date only when it identifies one exact calendar day; otherwise Due is 'none'. A commitment with no deadline has Due 'none'.
+    C7: Every decision, owner, action and date is traceable to the notes file; nothing is invented.
+    C8: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+  record: 1 request(s): 0 done, 0 failed, 1 open; 1 reworked; no feedback
+  playbook v1 (2026-10-22): "initial playbook"
+
+######## hirearchy --root /tmp/hirearchy-e4-s2-1792698851/org progress
+"Memo for meeting 2026-10-05" [service weekly-meeting-memo v1]: done. runs 9 of 15 (6 returned). last activity 13m ago. artifacts: lead/writer/work/memo-2026-10-05.md. no feedback yet. case total: 19 runs used of 36 handed down (contract: 15 per request). This case now exceeds the per-request budget of 15: tell the user. (task 20261022T195928156602-root-2ab8)
+"Rework memo 2026-10-05: Sam's due date" [service weekly-meeting-memo v1]: done. runs 5 of 15 (10 returned). last activity 13m ago. artifacts: lead/writer/work/memo-2026-10-05.md. no feedback yet. case total: 19 runs used of 36 handed down (contract: 15 per request). This case now exceeds the per-request budget of 15: tell the user. (task 20261022T201253989822-root-2139)
+"Rework memo 2026-10-05: unclear due dates" [service weekly-meeting-memo v1]: waiting on lead/reviewer (paused: budget). runs 5 of 6. last activity 13m ago. case total: 19 runs used of 36 handed down (contract: 15 per request). This case now exceeds the per-request budget of 15: tell the user. (task 20261022T202052658793-root-7da0)
+Needs you: note from lead "Budget needed: 1 run to process reviewer result": I have 1 run left (this one). I am granting lead/reviewer budget=1 now so they can finish re-checking memo-20… (message 20261022T202827043470-lead-d0c7)
+scheduler: stopped (waiting on you: "Rework memo 2026-10-05: unclear due dates" needs budget (lead/reviewer out of runs)) - nothing moves until you act. Your options: grant runs with send(to="lead", body="<why>", budget=N), then call start(); or accept what exists so far (the task stays open: tell the user, and stop() the scheduler).
+
+######## hirearchy --root /tmp/hirearchy-e4-s2-1792698851/org status
+root (human): unread 1, delegated 1
+  lead [Manager] idle  budget=1 open=1 delegated=1 unread=0 services: weekly-meeting-memo
+    reviewer [Independent Reviewer] paused(budget)  budget=0 open=1 delegated=0 unread=1
+    writer [Writer] idle  budget=0 open=0 delegated=0 unread=0
+
+your outstanding tasks:
+  20261022T202052658793-root-7da0 "Rework memo 2026-10-05: unclear due dates" -> lead
+
+scheduler: stopped (waiting on you: "Rework memo 2026-10-05: unclear due dates" needs budget (lead/reviewer out of runs))
+
+######## hirearchy --root /tmp/hirearchy-e4-s2-1792698851/org health
+3 agents, 1 flagged
+lead idle, budget 1/40, runs 11, open 1 (oldest 21m), done 2 failed 0 blocked 0 rework 0 (+2 by the client), runs/task 5.0, empty 0, last activity 13m ago | branch: runs 19, open 2, done 9, failed 0, blocked 0, rework 2, worst out_of_budget
+  reviewer paused(budget), budget 0/6, runs 4, open 1 (oldest 17m), done 3 failed 0 blocked 0 rework 1 (+2 by the client), runs/task 1.0, empty 0 (+1 failed), last activity 15m ago | !out_of_budget: no budget left but has unread mail or open tasks; !paused: paused: budget
+  writer idle, budget 0/6, runs 4, open 0, done 4 failed 0 blocked 0 rework 1 (+2 by the client), runs/task 1.0, empty 0, last activity 18m ago
+

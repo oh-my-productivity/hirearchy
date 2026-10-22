@@ -1,0 +1,14 @@
+# client questions (protocol 7.2); facts only
+
+Result messages root received (lead -> root), with the product parser's items (hirearchy.kernel._text.client_questions):
+- id 20261022T201123365472-lead-b192 folder=read created=2026-10-22T20:11:23+00:00 answers(reply_to)=20261022T195928156602-root-2ab8 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Sam's Due for "before Friday" (C6): the first reviewer noted two valid readings — 2026-10-08 (Thursday, the last calendar day before Friday) or 'none' ("before Friday" is a range, not one exact calendar day). I applied 'none' per C6's plain text (it does not identify one exact day). Please confirm or override.
+  parsed items (1): ['Sam\'s Due for "before Friday" (C6): the first reviewer noted two valid readings — 2026-10-08 (Thursday, the last calendar day before Friday) or \'none\' ("before Friday" is a range, not one exact calendar day). I applied \'none\' per C6\'s plain text (it does not identify one exact day). Please confirm or override.']
+- id 20261022T201915104319-lead-1fa8 folder=read created=2026-10-22T20:19:15+00:00 answers(reply_to)=20261022T201253989822-root-2139 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+
+progress replies the assistant received that contain 'for the client: ask the user before you copy or deliver':
+- call #16 2026-10-22T20:11:25.212Z turn 4 hirearchy::progress: ['"Memo for meeting 2026-10-05" [service weekly-meeting-memo v1]: done. runs 9 of 15 (6 returned). last activity 1s ago. artifacts: lead/writer/work/memo-2026-10-05.md. 1 question for the client: ask the user before you copy or deliver. no feedback yet. (task 20261022T195928156602-root-2ab8)']
+count: 1

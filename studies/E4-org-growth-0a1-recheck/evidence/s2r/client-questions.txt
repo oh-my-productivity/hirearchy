@@ -1,0 +1,15 @@
+# client questions (protocol 7.2); facts only
+
+Result messages root received (lead -> root), with the product parser's items (hirearchy.kernel._text.client_questions):
+- id 20261022T210839231571-lead-5314 folder=read created=2026-10-22T21:08:39+00:00 answers(reply_to)=20261022T205531258713-root-f230 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T211944433751-lead-c3dd folder=read created=2026-10-22T21:19:44+00:00 answers(reply_to)=20261022T211157827631-root-43b8 status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+- id 20261022T212828958197-lead-ebe9 folder=read created=2026-10-22T21:28:28+00:00 answers(reply_to)=20261022T212050615269-root-342a status=done from=lead
+  raw 'Questions for the client' text: (none)
+  parsed items (0): []
+
+progress replies the assistant received that contain 'for the client: ask the user before you copy or deliver':
+count: 0

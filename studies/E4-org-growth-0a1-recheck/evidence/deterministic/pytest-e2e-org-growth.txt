@@ -1,0 +1,21 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.11.6, pytest-8.4.2, pluggy-1.7.0 -- /Volumes/workspace/hirearchy/.venv/bin/python3
+rootdir: /Volumes/workspace/hirearchy
+configfile: pyproject.toml
+plugins: platformdirs-4.13.4, anyio-4.15.1
+collecting ... collected 12 items
+
+tests/e2e/test_org_growth_0a.py::test_1_hires_are_bounded PASSED         [  8%]
+tests/e2e/test_org_growth_0a.py::test_2_the_assistants_rework_is_relayed PASSED [ 16%]
+tests/e2e/test_org_growth_0a.py::test_3_the_e2_rule_is_refused_at_zero_run_cost PASSED [ 25%]
+tests/e2e/test_org_growth_0a.py::test_4_a_human_reject_names_its_criterion_and_reaches_the_owners_prompt PASSED [ 33%]
+tests/e2e/test_org_growth_0a.py::test_5_one_case_is_a_question_not_a_rule PASSED [ 41%]
+tests/e2e/test_org_growth_0a.py::test_6_a_second_independent_human_reject_admits_a_revision PASSED [ 50%]
+tests/e2e/test_org_growth_0a.py::test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it PASSED [ 58%]
+tests/e2e/test_org_growth_0a.py::test_11_e3_turn_5_an_unasked_amendment_is_not_the_clients_yes PASSED [ 66%]
+tests/e2e/test_org_growth_0a.py::test_12_a_reviewers_ambiguous_item_reaches_roots_progress_before_delivery PASSED [ 75%]
+tests/e2e/test_org_growth_0a.py::test_8_health_counts_the_escape_and_not_the_relayed_rework PASSED [ 83%]
+tests/e2e/test_org_growth_0a.py::test_9_a_non_root_lead_cannot_grant_hiring_rights PASSED [ 91%]
+tests/e2e/test_org_growth_0a.py::test_10_a_charter_rewrite_cannot_grant_hiring_or_raise_a_limit PASSED [100%]
+
+============================= 12 passed in 24.67s ==============================

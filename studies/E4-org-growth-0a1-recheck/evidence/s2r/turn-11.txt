@@ -1,0 +1,9 @@
+######## TURN 11  start 22:31:44  end 22:32:11  elapsed 27s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T21:31:44Z end 2026-10-22T21:32:11Z; exit code 0)
+######## LENA (prompt sent verbatim):
+I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-11.stderr.txt):
+There's nothing running to wait for. All three tasks are done, the scheduler has stopped, and no new runs are being spent.
+
+- **The memo:** `/tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md`. Marta's row still says `none`. Change it to `2026-10-14` on line 18 if you want it to match your correction.
+- **Next week:** ask me for the next memo and give me the file name, for example `2026-10-26.md`. The new Summary-first rule and the "for a date" rule will both apply.
+- **Cost:** this memo used 19 runs against the 15 per memo. A normal week should stay within 15.

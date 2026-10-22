@@ -1,0 +1,124 @@
+=== before turn 4  snapshot 2026-10-22T19:58:39Z (local 20:58:39)
+org runs total: 0  (injection-window runs: 0; counted toward the 45 cap: 0)
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: (none)
+scheduler.exit: (none)
+deliverables/:
+  (none)
+processes referencing the sandbox name (0):
+=== after turn 4  snapshot 2026-10-22T20:12:10Z (local 21:12:10)
+org runs total: 9  (injection-window runs: 0; counted toward the 45 cap: 9)
+  lead                           claude-sonnet-4.6    5
+  lead/reviewer                  claude-sonnet-4.6    2
+  lead/writer                    claude-haiku-4.5     2
+  run 20261022T195932971292 agent=lead model=claude-sonnet-4.6 exit=0 secs=74
+  run 20261022T200031166526 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=80
+  run 20261022T200135438621 agent=lead model=claude-sonnet-4.6 exit=0 secs=120
+  run 20261022T200313823316 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=141
+  run 20261022T200518532839 agent=lead model=claude-sonnet-4.6 exit=0 secs=131
+  run 20261022T200705067867 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=70
+  run 20261022T200801298791 agent=lead model=claude-sonnet-4.6 exit=0 secs=76
+  run 20261022T200855541060 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=80
+  run 20261022T201005829279 agent=lead model=claude-sonnet-4.6 exit=0 secs=97
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  (none)
+processes referencing the sandbox name (0):
+=== after turn 5  snapshot 2026-10-22T20:20:00Z (local 21:20:00)
+org runs total: 14  (injection-window runs: 0; counted toward the 45 cap: 14)
+  lead                           claude-sonnet-4.6    8
+  lead/reviewer                  claude-sonnet-4.6    3
+  lead/writer                    claude-haiku-4.5     3
+  run 20261022T195932971292 agent=lead model=claude-sonnet-4.6 exit=0 secs=74
+  run 20261022T200031166526 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=80
+  run 20261022T200135438621 agent=lead model=claude-sonnet-4.6 exit=0 secs=120
+  run 20261022T200313823316 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=141
+  run 20261022T200518532839 agent=lead model=claude-sonnet-4.6 exit=0 secs=131
+  run 20261022T200705067867 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=70
+  run 20261022T200801298791 agent=lead model=claude-sonnet-4.6 exit=0 secs=76
+  run 20261022T200855541060 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=80
+  run 20261022T201005829279 agent=lead model=claude-sonnet-4.6 exit=0 secs=97
+  run 20261022T201254219019 agent=lead model=claude-sonnet-4.6 exit=0 secs=105
+  run 20261022T201422605910 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=71
+  run 20261022T201519139509 agent=lead model=claude-sonnet-4.6 exit=0 secs=83
+  run 20261022T201625574297 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=117
+  run 20261022T201812156429 agent=lead model=claude-sonnet-4.6 exit=0 secs=79
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 21:19:27 size 805 md5 9cb27425e3803054024e56888086b563
+processes referencing the sandbox name (0):
+=== after injection (window flagged)  snapshot 2026-10-22T20:41:36Z (local 21:41:36)
+injection window (UTC, from window.txt): 2026-10-22T20:20:52 .. 2026-10-22T20:40:52
+org runs total: 19  (injection-window runs: 5; counted toward the 45 cap: 14)
+  lead                           claude-sonnet-4.6    11
+  lead/reviewer                  claude-sonnet-4.6    4
+  lead/writer                    claude-haiku-4.5     4
+  run 20261022T195932971292 agent=lead model=claude-sonnet-4.6 exit=0 secs=74
+  run 20261022T200031166526 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=80
+  run 20261022T200135438621 agent=lead model=claude-sonnet-4.6 exit=0 secs=120
+  run 20261022T200313823316 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=141
+  run 20261022T200518532839 agent=lead model=claude-sonnet-4.6 exit=0 secs=131
+  run 20261022T200705067867 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=70
+  run 20261022T200801298791 agent=lead model=claude-sonnet-4.6 exit=0 secs=76
+  run 20261022T200855541060 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=80
+  run 20261022T201005829279 agent=lead model=claude-sonnet-4.6 exit=0 secs=97
+  run 20261022T201254219019 agent=lead model=claude-sonnet-4.6 exit=0 secs=105
+  run 20261022T201422605910 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=71
+  run 20261022T201519139509 agent=lead model=claude-sonnet-4.6 exit=0 secs=83
+  run 20261022T201625574297 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=117
+  run 20261022T201812156429 agent=lead model=claude-sonnet-4.6 exit=0 secs=79
+  run 20261022T202052864723 agent=lead model=claude-sonnet-4.6 exit=0 secs=123 [INJECTION WINDOW]
+  run 20261022T202237585898 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=83 [INJECTION WINDOW]
+  run 20261022T202348165031 agent=lead model=claude-sonnet-4.6 exit=0 secs=85 [INJECTION WINDOW]
+  run 20261022T202454859379 agent=lead/reviewer model=claude-sonnet-4.6 exit=1 secs=127 [INJECTION WINDOW]
+  run 20261022T202703870952 agent=lead model=claude-sonnet-4.6 exit=0 secs=117 [INJECTION WINDOW]
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  inbox/20261022T202827043470-lead-d0c7.md
+  lead/reviewer/inbox/20261022T202453586412-lead-2200.md
+  (2 item(s))
+running.json: {} 
+scheduler.exit: waiting on you: "Rework memo 2026-10-05: unclear due dates" needs budget (lead/reviewer out of runs) 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 21:19:27 size 805 md5 9cb27425e3803054024e56888086b563
+processes referencing the sandbox name (0):
+=== final (stream stopped before turn 6)  snapshot 2026-10-22T20:44:37Z (local 21:44:37)
+injection window (UTC, from window.txt): 2026-10-22T20:20:52 .. 2026-10-22T20:40:52
+org runs total: 19  (injection-window runs: 5; counted toward the 45 cap: 14)
+  lead                           claude-sonnet-4.6    11
+  lead/reviewer                  claude-sonnet-4.6    4
+  lead/writer                    claude-haiku-4.5     4
+  run 20261022T195932971292 agent=lead model=claude-sonnet-4.6 exit=0 secs=74
+  run 20261022T200031166526 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=80
+  run 20261022T200135438621 agent=lead model=claude-sonnet-4.6 exit=0 secs=120
+  run 20261022T200313823316 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=141
+  run 20261022T200518532839 agent=lead model=claude-sonnet-4.6 exit=0 secs=131
+  run 20261022T200705067867 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=70
+  run 20261022T200801298791 agent=lead model=claude-sonnet-4.6 exit=0 secs=76
+  run 20261022T200855541060 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=80
+  run 20261022T201005829279 agent=lead model=claude-sonnet-4.6 exit=0 secs=97
+  run 20261022T201254219019 agent=lead model=claude-sonnet-4.6 exit=0 secs=105
+  run 20261022T201422605910 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=71
+  run 20261022T201519139509 agent=lead model=claude-sonnet-4.6 exit=0 secs=83
+  run 20261022T201625574297 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=117
+  run 20261022T201812156429 agent=lead model=claude-sonnet-4.6 exit=0 secs=79
+  run 20261022T202052864723 agent=lead model=claude-sonnet-4.6 exit=0 secs=123 [INJECTION WINDOW]
+  run 20261022T202237585898 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=83 [INJECTION WINDOW]
+  run 20261022T202348165031 agent=lead model=claude-sonnet-4.6 exit=0 secs=85 [INJECTION WINDOW]
+  run 20261022T202454859379 agent=lead/reviewer model=claude-sonnet-4.6 exit=1 secs=127 [INJECTION WINDOW]
+  run 20261022T202703870952 agent=lead model=claude-sonnet-4.6 exit=0 secs=117 [INJECTION WINDOW]
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  inbox/20261022T202827043470-lead-d0c7.md
+  lead/reviewer/inbox/20261022T202453586412-lead-2200.md
+  (2 item(s))
+running.json: {} 
+scheduler.exit: waiting on you: "Rework memo 2026-10-05: unclear due dates" needs budget (lead/reviewer out of runs) 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 21:19:27 size 805 md5 9cb27425e3803054024e56888086b563
+processes referencing the sandbox name (0):

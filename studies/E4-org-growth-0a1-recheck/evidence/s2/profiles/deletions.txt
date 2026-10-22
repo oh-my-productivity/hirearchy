@@ -1,0 +1,1 @@
+deleted ~/.kiro/agents/hirearchy-study-e4-s2-assistant.json md5 c31c3292e1dc33c9db0d8f40610b3234 at 2026-10-22T20:44:25Z (copy: profiles/hirearchy-study-e4-s2-assistant.json; ORG_ROOT inside the s2 sandbox)

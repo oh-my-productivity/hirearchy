@@ -1,0 +1,19 @@
+######## TURN 6  start 19:59:44  end 20:11:38  elapsed 714s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T18:59:44Z end 2026-10-22T19:11:38Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it. Yes, fund it - but please keep an eye on the cost.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-06.stderr.txt):
+Blocked. I'll read the details and the current memo before deciding anything.The rework is blocked, and I've stopped there because the next step costs more. The memo in your deliverables folder is still the first version with the old date and no Summary line.
+
+**Where it stands:**
+- **Fixed:** Sam's item is now 2026-10-09, and the memo starts with the Summary line followed by the Decisions section and the action table. It is 216 words.
+- **Still failing:** The checker passes 6 of 8 criteria. The one real defect is Marta's row, which now says "none" instead of 2026-10-14. The writer got that right in the first version and lost it in the rework. The checker wants the date restored and the now-pointless "Open questions" note removed. That is a one-line fix.
+- **Judgement call:** The notes say "book the on-call training room for Oct 14", so 14 October is the training date, not a booking deadline. Under your rule that "none" is only for no date wording at all, the checker's reading holds. If you'd rather "none" there, I can tell the team to treat event dates as not deadlines.
+
+**Cost:**
+- **Over the cap:** This memo has used 23 runs against the 15 you set. Your approved extra was about 6 on top of the first memo's 13, so it's roughly 4 over the 19 you approved.
+- **Unrequested rework:** About 5 of those runs went to a second rework task, "unclear due dates", that I didn't request. It started before your feedback, and I can't tell from the status output who started it. I can dig into that if you want.
+- **What's left:** The current task has 1 run left.
+
+**Proposal:** I'd give the team 3 more runs (one for the writer, one for the checker's re-check and one for the lead). That would bring this memo to about 26 runs. Say "go" and I'll grant them. Or tell me to stop, and I'll leave the memo as is.
+
+If you approve, I'd also ask the team to restore the date and change nothing else, and to stop after one re-check.

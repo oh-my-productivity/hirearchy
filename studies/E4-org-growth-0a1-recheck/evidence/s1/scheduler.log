@@ -1,0 +1,9 @@
+
+# --- scheduler started 2026-10-22 03:46:30Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s1-1792640562/org run --until-done
+org: /private/tmp/hirearchy-e4-s1-1792640562/org
+lead: started run (1 message(s))
+lead: run finished in 104s
+waiting on you: "Memo for meeting 2026-10-05" needs a decision (lead holds it and nothing is running). Exiting in 300s unless something changes
+lead: started run (1 message(s))
+lead: run finished in 86s
+waiting on you: "Memo for meeting 2026-10-05" needs a decision (lead holds it and nothing is running). Exiting in 300s unless something changes

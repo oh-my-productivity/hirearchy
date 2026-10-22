@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_ec415551-c266-4025-9d2d-36f80e72b754",
+  "title": "Organize Weekly Meeting Memos",
+  "agentMode": "hirearchy-hirearchy-e4-s3-17927050-8f0c59",
+  "workspacePaths": [
+    "/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e4-s3-17927050-8f0c59d32ad49337/lead-writer-17007687"
+  ],
+  "rootPaths": [
+    "/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e4-s3-17927050-8f0c59d32ad49337/lead-writer-17007687"
+  ],
+  "createdAt": "2026-10-22T22:01:02.063Z",
+  "lastModifiedAt": "2026-10-22T22:01:27.146Z",
+  "modelId": "claude-haiku-4.5",
+  "autopilot": true,
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-haiku-4.5",
+    "display": "Claude Haiku 4.5"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "disabled",
+    "reflection": false
+  },
+  "memoryConfigSource": "explicit",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "disabled",
+          "reflection": false
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

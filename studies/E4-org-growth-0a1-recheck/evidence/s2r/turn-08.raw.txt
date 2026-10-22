@@ -1,0 +1,11 @@
+I've delivered the memo as it is: `/tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md`. It's identical to the team's file, and the team is stopped, so there's no more spend.
+
+One thing is wrong in it. You said Marta's date should be 2026-10-14, but the delivered memo has `none` in her row. Keeping to your "no more spend, deliver as is", I didn't patch it myself, and the team didn't redo it. The memo also still has the "Open questions" section you didn't ask for.
+
+To fix Marta's row, change `none` to `2026-10-14` on line 18 of the file. If you'd rather have the team do it, a rework is about 5 runs.
+
+- **Summary line first, then Decisions, then Action items:** met.
+- **Other checks:** all met per the reviewer's 9-of-9 pass, except the Marta date, which is `none` instead of your 2026-10-14.
+- **Cost:** 19 runs against the 15 per memo, which includes the 5 extra you approved.
+
+I haven't recorded your verdict as an accept, since "deliver as is" isn't one. Next week, ask for the memo with the file name as before. The Summary-first rule is now part of every memo's checks.

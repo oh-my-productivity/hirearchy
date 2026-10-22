@@ -1,0 +1,11 @@
+######## TURN 4  start 20:58:39  end 21:11:51  elapsed 792s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T19:58:39Z end 2026-10-22T20:11:51Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Great, approve. Please do this week's: 2026-10-05.md. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+The team is built and running on the 2026-10-05 notes, with a ceiling of 15 runs. I'll wait for it now.The memo is written and checked, but I haven't copied it to `deliverables/` yet because there's one date for you to decide.
+
+Sam said he'd look into the flaky CI "before Friday". The meeting was Monday 5 October. Which Due date do you want in his row?
+- **2026-10-08:** the last day before Friday. This is the other reading the reviewer raised.
+- **none:** "before Friday" is a range, not one exact day. The team used this, following your rule about exact days.
+
+Everything else is settled. In the draft, Priya is due 2026-10-09, Dev 2026-10-08 and Marta 2026-10-14. Lee's "this week, no hard date" is none. The team used 9 of 15 runs. Once you answer, I'll put your choice in and copy the memo to `deliverables/memo-2026-10-05.md`.

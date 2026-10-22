@@ -1,0 +1,11 @@
+The team is built and running on 2026-10-05.md. It has up to 15 runs for this memo. I'll wait for it now.I haven't delivered the memo yet. It passed the reviewer's 7-of-7 check and I checked it against your notes myself. There's one date I'd like you to decide first.
+
+Sam said he'd look into the flaky CI "before Friday". The memo has Due = 2026-10-09, which is that Friday. Read strictly, "before Friday" is Thursday 2026-10-08. Which do you want?
+
+- 2026-10-09 (the Friday, as it is now)
+- 2026-10-08 (the day before)
+- none (leave it undated)
+
+I left Lee's SSO vendor ping as `none`. The notes say "this week, no hard date attached", so I didn't guess a date. Tell me if you want 2026-10-09 there too.
+
+Once you answer, I'll fix the date if needed and copy the memo to `/tmp/hirearchy-e4-s2r-1792702135/deliverables`. So far it has used 9 of the 15 runs. If you change a date, I'll send the memo back to the writer for a fix, which costs a few runs and stays within the 15.

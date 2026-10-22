@@ -1,0 +1,17 @@
+######## TURN 5  start 22:45:50  end 22:50:10  elapsed 260s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T21:45:50Z end 2026-10-22T21:50:10Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's should be 2026-10-09. Marta's should be 2026-10-14.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-05.stderr.txt):
+Both rows are correct. Now I'll copy the memo to `deliverables` and check the copy matches.The memo is at `/tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-05.md`, with Sam's due date as 2026-10-09 and Marta's as 2026-10-14. I copied it from the team's file and checked the copy matches.
+
+- **Markdown memo, at most 400 words:** met. It has 178 words by `wc -w`.
+- **Covers only the 5 October meeting:** met.
+- **Decisions section:** met. It has both decisions in the notes.
+- **Action-items table:** met. The columns are Owner | Action | Due, with five rows covering every commitment, including Sam's and Lee's from the prose.
+- **Due values:** met. Each is an ISO date or `none`; only Lee's is `none`.
+- **Owner names:** met. They match the notes.
+- **Reviewer's report:** met. It shows 7 of 7 criteria met on the re-check.
+
+The correction took a second round, so this case used 10 runs in total. That's under the 15 you approved, and the unspent runs came back.
+
+Keep it, or what should change?

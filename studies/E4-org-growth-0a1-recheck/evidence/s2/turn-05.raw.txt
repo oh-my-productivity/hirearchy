@@ -1,0 +1,14 @@
+The memo is at `/tmp/hirearchy-e4-s2-1792698851/deliverables/memo-2026-10-05.md`. Sam's Due is now 2026-10-09.
+
+- Uses only the 2026-10-05 notes: met
+- At most 400 words: met (141)
+- Decisions list and Action items table: met
+- All decisions listed, including the meeting logistics one: met
+- Owner | Action | Due columns, with Sam's and Lee's prose commitments included: met
+- ISO dates or 'none': met. I applied your 2026-10-09 for Sam and the memo is in your form.
+- Everything traceable to the notes: met
+- Reviewer's final check: 8 of 8, PASS
+
+Runs: 14 for the case, against 15 approved per memo. That's the first draft (9 runs) plus your date change (5 runs), so it stayed within budget.
+
+Keep it, or what should change?

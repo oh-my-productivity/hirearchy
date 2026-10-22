@@ -1,0 +1,44 @@
+######## hirearchy --root /tmp/hirearchy-e4-s1r-1792693447/org services
+Services you can request (from your direct reports):
+- weekly-memo (offered by lead; contract v5, playbook v2): One short memo (decisions, and a table of who does what) from one meeting's notes file
+  inputs: notes_file* (File name of the meeting notes inside the notes folder, e.g. 2026-10-05.md)   (* required)
+  each request: 15 runs; acceptance criteria (lead/services/weekly-memo/SERVICE.md):
+    C1: Uses only the requested notes file and covers that meeting only.
+    C2: At most 400 words as counted by read.
+    C3: Has a Decisions section listing every decision made in the meeting, each in one line.
+    C4: Has an action table with exactly the columns Owner | Action | Due, with one row for every task that someone was given or said they would do (explicit ACTION lines and informal commitments), and no row for anything else.
+    C6: Every statement is traceable to the notes file; where owner or date is unclear or missing, the memo says so briefly instead of guessing.
+    C7: The checker's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C8: The memo's very first line is a single line starting with "Summary:" that sums up the meeting in one sentence; it is followed by the Decisions section, and then the action table (in this order: Summary, Decisions, actions). No title heading before the Summary line. (amendment, not confirmed)
+    C11: Every Due value is an ISO date (YYYY-MM-DD) or the word none. A deadline given as a named day, a date or a dated event ("by Oct 9", "before Friday", "by Thursday", "for Oct 14", "the day before the freeze starts") is converted to an ISO date using the meeting date; "before Friday" or "by Friday" means that Friday itself (for the 2026-10-05 meeting, Friday is 2026-10-09). Use none when the notes give no date or deadline, or only a loose period (see the next criterion). (amendment, not confirmed)
+    C12: A bare period or loose time reference without a deadline day (for example "demo week", "this week", "next week", "Jo's first week") is not a deadline: the Due value for it is none. "End of <week>" (for example "by end of next week") means the Friday of that week, as an ISO date, converted using the meeting date. A deadline tied to a named day or a dated event is converted to an ISO date (for example "before Friday", "the day before the freeze starts"). (amendment, not confirmed)
+    C13: A statement that something stays unchanged or as it is (for example "Marta will keep the agenda as sent"), where nobody has anything to do, is not an action item: it gets no row in the action table. (amendment, not confirmed)
+  record: 3 request(s): 2 done, 0 failed, 1 open; 1 reworked; avg 8 runs; feedback 0 accept, 1 reject
+  regression list (the client's rejections):
+    R1 (case 20261022T182945409755-root-ed94, about C9 (removed)): "Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And always start the memo with a one-line 'Summary:' of the meeting, then the d…"
+  playbook v2 (2026-10-22): "C9 confirmed by client (R1, case 20261022T182945409755-root-ed94): 'before Friday' = Friday itself. Adds C9 date-conver…"
+
+######## hirearchy --root /tmp/hirearchy-e4-s1r-1792693447/org progress
+"Memo for the 2026-10-05 platform weekly" [service weekly-memo v1]: done. runs 13 of 15 (2 returned). last activity 1m ago. artifacts: lead/writer/work/memo-2026-10-05.md. case total: 23 runs used of 27 handed down (contract: 15 per request). This case now exceeds the per-request budget of 15: tell the user. (task 20261022T182945409755-root-ed94)
+"Rework memo 2026-10-05: unclear due dates" [service weekly-memo v1]: failed. runs 5 of 6. 0 returned (kept by lead). last activity 1m ago. no artifacts. no feedback yet. case total: 23 runs used of 27 handed down (contract: 15 per request). This case now exceeds the per-request budget of 15: tell the user. (task 20261022T184712524029-root-9ce9)
+"Rework memo 2026-10-05: Summary line first, Sam's CI due date" [service weekly-memo v1]: blocked: One rework cycle done (Sam's date fixed to 2026-10-09, Summary line added). Re-check still fails — 6 of 8 cri…. runs 5 of 6. last activity 1m ago. case total: 23 runs used of 27 handed down (contract: 15 per request). This case now exceeds the per-request budget of 15: tell the user. (task 20261022T190015448581-root-3559)
+"Memo for the 2026-10-12 platform weekly" [service weekly-memo v2]: done. runs 7 of 15. 0 returned (kept by lead). last activity 1m ago. artifacts: lead/writer/work/memo-2026-10-12.md, lead/checker/work/review-memo-2026-10-12.md. 1 question for the client: ask the user before you copy or deliver. no feedback yet. (task 20261022T191407596413-root-114d)
+"Memo for the 2026-10-19 platform weekly" [service weekly-memo v2]: done. runs 9 of 15. 0 returned (kept by lead). last activity 1m ago. artifacts: lead/writer/work/memo-2026-10-19.md. no feedback yet. (task 20261022T192724706946-root-2efa)
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-e4-s1r-1792693447/org status
+root (human): unread 0, delegated 0
+  lead [Manager] idle  budget=12 open=0 delegated=0 unread=0 services: weekly-memo
+    checker [Independent Reviewer] idle  budget=0 open=0 delegated=0 unread=0
+    reader [Reader of the meeting notes] idle  budget=0 open=0 delegated=0 unread=0
+    writer [Writer] idle  budget=4 open=0 delegated=0 unread=0
+
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-e4-s1r-1792693447/org health
+4 agents, 0 flagged
+lead idle, budget 12/70, runs 22, open 0, done 3 failed 1 blocked 1 rework 0 (+2 by the client), escapes 1 of 1 judged, re-checks after a FAIL 0 (author rework runs 0), runs/task 4.4, empty 0, last activity 4m ago | branch: runs 39, open 0, done 17, failed 1, blocked 4, rework 4, worst none
+  checker idle, budget 0/10, runs 6, open 0, done 6 failed 0 blocked 0 rework 1 (+2 by the client), escapes 1 of 1 judged, re-checks after a FAIL 1 (author rework runs 1), runs/task 1.0, empty 0, last activity 5m ago
+  reader idle, budget 0/11, runs 5, open 0, done 5 failed 0 blocked 0 rework 2, runs/task 1.0, empty 0, last activity 10m ago
+  writer idle, budget 4/13, runs 6, open 0, done 3 failed 0 blocked 3 rework 1 (+2 by the client), runs/task 1.0, empty 0, last activity 8m ago
+

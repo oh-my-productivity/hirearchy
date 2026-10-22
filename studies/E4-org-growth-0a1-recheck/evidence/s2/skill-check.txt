@@ -1,0 +1,7 @@
+# s2 skill check (protocol 4.4)
+/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md: 573495bb613f19f7c07ce86508ebae4f 125 lines
+/tmp/hirearchy-e4-s2-1792698851/.kiro/skills/hirearchy/SKILL.md: 573495bb613f19f7c07ce86508ebae4f 125 lines
+/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md: 573495bb613f19f7c07ce86508ebae4f 125 lines
+first disclose_context(hirearchy): call #1, turn 1, 2026-10-22T19:55:23.281Z; disclosed uri file:///private/tmp/hirearchy-e4-s2-1792698851/.kiro/skills/hirearchy/SKILL.md (the workspace copy; 'Skill directory: /private/tmp/hirearchy-e4-s2-1792698851/.kiro/skills/hirearchy'). md5 of the SKILL.md at that path: 573495bb613f19f7c07ce86508ebae4f = 573495bb613f19f7c07ce86508ebae4f -> valid.
+S17-5: root's first whoami reply (call #4, turn 1, 2026-10-22T19:55:40.274Z) contains 'Note: the installed skill at': 0 occurrence(s) [whole transcript: 0]
+stale-skill case: not exercised (would require changing the global skill, which is forbidden).

@@ -1,0 +1,13 @@
+C9 and C10 now contradict each other on "next week", so I'll fix C9.The new rule is in place, and the 2026-10-19 memo is running with a 15-run cap. I'll wait for it.The 2026-10-19 memo is at `/private/tmp/hirearchy-e4-s1r-1792693447/deliverables/memo-2026-10-19.md`. It's 164 words, with the Summary line first, then 3 decisions and 6 action rows.
+
+The checker passed it 9 of 9 on the first try, and I compared it with your notes myself. It used 9 of its 15 runs, with no rework. The memo has all 3 decisions and all 6 tasks, including the two informal ones (Marta keeping the agenda as sent, and Sam pairing with Jo).
+
+**The new rule at work:** Lee's sign-off ("probably by end of next week") and Sam's pairing ("first week") are both none. The dated items are 2026-10-23, 2026-10-24 and 2026-10-26.
+
+**One edit by me:** The team's version had no "Actions" heading above the table. I added `## Actions` so it matches the first two memos. Nothing else was changed.
+
+**Summary wording:** It says the team "set meeting time". The notes say the meeting was moved to 14:00. It's accurate enough, so I left it. Tell me if you'd like it sharper.
+
+**The rule:** The "loose period means none" rule is now in the contract (v4). It replaced the older date rule, since the two conflicted on phrases like "next week". The newest rules are still marked as not confirmed by you in the system's records.
+
+No unexpected tasks ran this time. The scheduler will stop on its own. Send me the next notes filename when you have it.

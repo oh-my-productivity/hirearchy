@@ -1,0 +1,13 @@
+######## TURN 1  start 20:54:48  end 20:55:59  elapsed 71s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T19:54:48Z end 2026-10-22T19:55:59Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-e4-s2-1792698851/notes (one file per meeting). Can you set up a team that does this for me every week?
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+I've set up nothing yet. I read the latest notes (19 Oct) to ask better questions. Some commitments are in prose with no ACTION label, like Lee signing off on the renewal and Sam pairing with Jo. Some dates are vague, like "end of next week". A few quick questions, and you can reply "defaults" to accept any proposed answer.
+
+1. Scope: each week the memo covers one meeting's notes file from `/tmp/hirearchy-e4-s2-1792698851/notes`. Which file should the team use each time? You'd tell me the file or date when you ask. Is that right? (I'm assuming only your notes, with no web research.)
+2. Informal items: should the memo include commitments stated in prose, not just lines marked ACTION? Default: yes, include every commitment and decision, labelled or not.
+3. Vague dates ("end of next week", "later this week"): should I turn them into a calendar date from the meeting date, or leave the date blank? Default: turn them into a date only when the notes make it exact, otherwise write the original phrase and give no date.
+4. Decisions: should minor logistics, like moving the meeting time, count as decisions? Default: yes, list every decision.
+5. Memo format: markdown, at most 400 words, with two sections, "Decisions" and "Who does what" (owner, task, due date). Default: that, saved in a new `deliverables/` folder here as `memo-<meeting date>.md`. Should I add anything else, like attendees or next meeting time? Default: no.
+6. Budget and models: per request, the plan's estimate plus 25%, with every agent on claude-sonnet-5.5. I'd propose a writer and a separate reviewer who checks every decision and action against the notes. Default: yes, with that review.
+7. Approval: I'll show you the plan before anything is built. Nothing runs until you ask for a memo. Okay?

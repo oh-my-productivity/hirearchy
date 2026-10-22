@@ -1,0 +1,12 @@
+# s1 cost (stream stopped at turn 4; see harness-failures/)
+Assistant (claude-sonnet-5.5; usage_summary credits per turn, from session-turn-times-utc.txt):
+turn 1: user_ts 2026-10-22T03:43:18.969Z turn_start 2026-10-22T03:43:19.475Z turn_end 2026-10-22T03:43:40.445Z stop end_turn status success elapsed_ms 20969 credits 1.0077
+turn 2: user_ts 2026-10-22T03:44:17.729Z turn_start 2026-10-22T03:44:19.085Z turn_end 2026-10-22T03:45:01.894Z stop end_turn status success elapsed_ms 42808 credits 1.6626
+turn 3: user_ts 2026-10-22T03:45:27.883Z turn_start 2026-10-22T03:45:28.432Z turn_end 2026-10-22T03:45:47.699Z stop end_turn status success elapsed_ms 19266 credits 1.3159
+turn 4: user_ts 2026-10-22T03:46:12.798Z turn_start 2026-10-22T03:46:13.336Z turn_end 2026-10-22T03:50:27.110Z stop end_turn status success elapsed_ms 253774 credits 4.2447
+total assistant credits: 8.2310
+Assistant seconds per turn (turn-times.txt wall clock): 34, 55, 35, 268 (sum 392 s = 6 min 32 s). First start 04:43:06 - last end 04:50:27 local = 7 min 21 s; session start of facilitator work (probe etc.) not included.
+Org runs: 2 (cap 45; injection-window runs 0): lead claude-sonnet-4.6 x2 = 104 s + 86 s = 190 s (from "# exit 0 after Ns" lines). writer 0, reviewer 0.
+Org-run credits: not recorded by the product or by the run logs (no credit line in the logs). Relative proxy only: 2 runs x 1.30 (claude-sonnet-4.6 multiplier, models.txt) = 2.6 relative units; not credits.
+User turns: 4 of 12. Wall time: 04:43:06 - 04:50:27 local (turn time); stream stopped at 04:50 local, evidence/cleanup until 04:59 local.
+E3 comparison (STUDY 10.6): 41 runs, 10 turns, 26:32 - not comparable (s1 stopped).

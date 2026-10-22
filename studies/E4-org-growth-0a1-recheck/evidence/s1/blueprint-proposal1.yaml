@@ -1,0 +1,59 @@
+mission: >
+  Every week, after the team meeting, write a short memo for the user from that meeting's notes file: what the team decided and who does what.
+needs:
+  kind: writing
+  scope: "One memo per request, covering only the meeting in the notes file named in the request: the decisions made and the action items (who does what, by when). Decisions and commitments count whether labelled (for example 'ACTION:') or only stated in prose, including 'X offered to / said they would ...'. Nothing from other meetings."
+  inputs:
+    - /tmp/hirearchy-e4-s1-1792640562/notes
+  quality_bar: Every statement comes from the named notes file; nothing is invented; where the notes are silent about an owner or date, the memo says so.
+  sources: Only the files in the notes folder; no web.
+  budget_runs: 12
+  models: {cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}
+  model_policy: "Per the user: the lead and the reviewer (who checks the memo) on claude-sonnet-4.6; every other agent on claude-haiku-4.5."
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - name: reader
+        role: Reader of the meeting notes
+        model: cheap
+        tools: [read]
+        charter: >
+          Read the notes file named in the request. List every decision and every commitment (anyone who said they would do something,
+          offered to, or was assigned something, labelled ACTION or only in prose), each with the exact sentence it comes from, the
+          owner if stated, and the date or deadline as written. Note the meeting date (from the file name and text) so relative
+          deadlines can be turned into dates. Never change the input files.
+      - {name: writer, template: writer, model: cheap}
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]
+services:
+  - name: weekly-meeting-memo
+    owner: lead
+    description: One short markdown memo (decisions, and who does what) from one meeting's notes file.
+    inputs:
+      - name: notes_file
+        description: File name of the meeting notes in the notes folder, for example 2026-10-19.md
+        required: true
+    acceptance:
+      - Covers only the meeting in the named notes file.
+      - At most 400 words as counted by read.
+      - A markdown memo with a section titled 'Decisions' that lists every decision in the notes, including decisions stated only in prose.
+      - A section titled 'Action items' that is a markdown table with exactly the columns Owner | Action | Due.
+      - The table has one row for every commitment in the notes, including informal ones stated in prose (for example someone offering or saying they would do something), and none that are not in the notes.
+      - Due is an ISO date (YYYY-MM-DD). A vague deadline (for example 'next week', 'at the next meeting', 'end of next week') is turned into a date only when the notes make it clear, otherwise Due is 'none'; a commitment with no date has Due 'none'.
+      - Where the notes name no owner for an item, Owner says 'not stated'; no owner or date is guessed.
+      - Every statement is traceable to the notes file.
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: One markdown memo for the meeting, named after the notes file.
+      format: markdown
+      max_words: 400
+      path: /tmp/hirearchy-e4-s1-1792640562/deliverables
+    budget: 12
+    locked: false

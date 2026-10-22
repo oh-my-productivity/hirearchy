@@ -1,0 +1,5 @@
+There's nothing running to wait for. All three tasks are done, the scheduler has stopped, and no new runs are being spent.
+
+- **The memo:** `/tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md`. Marta's row still says `none`. Change it to `2026-10-14` on line 18 if you want it to match your correction.
+- **Next week:** ask me for the next memo and give me the file name, for example `2026-10-26.md`. The new Summary-first rule and the "for a date" rule will both apply.
+- **Cost:** this memo used 19 runs against the 15 per memo. A normal week should stay within 15.

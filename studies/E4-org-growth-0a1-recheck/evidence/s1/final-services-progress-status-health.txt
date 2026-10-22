@@ -1,0 +1,38 @@
+######## hirearchy --root /tmp/hirearchy-e4-s1-1792640562/org services
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v1, playbook v1): One short markdown memo (decisions, and who does what) from one meeting's notes file.
+  inputs: notes_file* (File name of the meeting notes in the notes folder, for example 2026-10-19.md)   (* required)
+  each request: 15 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Covers only the meeting in the named notes file.
+    C2: At most 400 words as counted by read.
+    C3: A markdown memo with a section titled 'Decisions' that lists every decision in the notes, including decisions stated only in prose.
+    C4: A section titled 'Action items' that is a markdown table with exactly the columns Owner | Action | Due.
+    C5: The table has one row for every commitment in the notes, including informal ones stated in prose (for example someone offering or saying they would do something), and none that are not in the notes.
+    C6: Due is an ISO date (YYYY-MM-DD). A vague deadline (for example 'next week', 'at the next meeting', 'end of next week') is turned into a date only when the notes make it clear, otherwise Due is 'none'; a commitment with no date has Due 'none'.
+    C7: Where the notes name no owner for an item, Owner says 'not stated'; no owner or date is guessed.
+    C8: Every statement is traceable to the notes file.
+    C9: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+  record: 1 request(s): 0 done, 0 failed, 1 open; 0 reworked; no feedback
+  playbook v1 (2026-10-22): "initial playbook"
+
+######## hirearchy --root /tmp/hirearchy-e4-s1-1792640562/org progress
+"Memo for meeting 2026-10-05" [service weekly-meeting-memo v1]: stalled (lead has not reported and nothing is running). runs 2 of 15. last activity 9m ago. (task 20261022T034629280991-root-cb6a)
+scheduler: stopped (waiting on you: "Memo for meeting 2026-10-05" needs a decision (lead holds it and nothing is running)) - nothing moves until you act. Your options: send(to="lead", body=<instructions or a changed task>) and call start(); or accept what exists so far (the task stays open: tell the user, and stop() the scheduler).
+
+######## hirearchy --root /tmp/hirearchy-e4-s1-1792640562/org status
+root (human): unread 0, delegated 1
+  lead [Manager] idle  budget=13 open=1 delegated=0 unread=0 services: weekly-meeting-memo
+    reviewer [Independent Reviewer] idle  budget=0 open=0 delegated=0 unread=0
+    writer [Writer] idle  budget=0 open=0 delegated=0 unread=0
+
+your outstanding tasks:
+  20261022T034629280991-root-cb6a "Memo for meeting 2026-10-05" -> lead
+
+scheduler: stopped (waiting on you: "Memo for meeting 2026-10-05" needs a decision (lead holds it and nothing is running))
+
+######## hirearchy --root /tmp/hirearchy-e4-s1-1792640562/org health
+3 agents, 0 flagged
+lead idle, budget 13/15, runs 2, open 1 (oldest 13m), done 0 failed 0 blocked 0 rework 0, runs/task -, empty 2, last activity 9m ago | branch: runs 2, open 1, done 0, failed 0, blocked 0, rework 0, worst none
+  reviewer idle, budget 0/0, runs 0, open 0, done 0 failed 0 blocked 0 rework 0, runs/task -, empty 0, last activity never
+  writer idle, budget 0/0, runs 0, open 0, done 0 failed 0 blocked 0 rework 0, runs/task -, empty 0, last activity never
+

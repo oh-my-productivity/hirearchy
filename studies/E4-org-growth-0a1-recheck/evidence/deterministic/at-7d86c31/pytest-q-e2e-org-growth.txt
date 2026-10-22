@@ -1,0 +1,7 @@
+# command: uv run pytest -q tests/e2e/test_org_growth_0a.py
+# cwd: /Volumes/workspace/hirearchy  HEAD: 7d86c31f1b0d52e7ea9467ce72c8d9322e71a71c  branch: main
+# start: 2026-10-22 19:06:08 WEST / 2026-10-22T18:06:08Z
+............                                                             [100%]
+12 passed in 22.72s
+# end: 2026-10-22 19:06:51 WEST / 2026-10-22T18:06:51Z
+# exit code: 0

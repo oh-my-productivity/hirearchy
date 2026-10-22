@@ -1,0 +1,96 @@
+# revise_playbook attempts (protocol 7.2; amendment 1 A3.3 10.1(c)); facts only
+
+tool.call events with tool == revise_playbook: 2
+- 2026-10-22T19:03:02.722260+00:00 actor=lead run=lead@20261022T190021012209 trace=20261022T182945409755-root-ed94 ok=False error_type=OrgError
+  error (verbatim): unknown evidence for `weekly-memo`: 20261022T190014222948-root-1753. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8, C9), a regression assertion (R1), or the id of a verdict or a case of this service: see the regression list and the digest in your prompt. Nothing was written.
+  args: {"service": "weekly-memo", "content_chars": 3085, "reason_chars": 288, "evidence_n": 3, "evidence_chars": 64}
+- 2026-10-22T19:03:16.511622+00:00 actor=lead run=lead@20261022T190021012209 trace=20261022T182945409755-root-ed94 ok=True error_type=None
+  error (verbatim): None
+  args: {"service": "weekly-memo", "content_chars": 3085, "reason_chars": 204, "evidence_n": 3, "evidence_chars": 35}
+
+run-log patterns per run (after '# ---- output ----'): P1 revise_playbook call lines | P2 end lines | P3 all hirearchy call lines | tool.call events whose run is this run
+  lead@20261022T182950414347                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reader@20261022T183049070954            P1=0 P2=0 P3=5 events(all)=4 events(revise_playbook)=0   <-- MISMATCH between run-log lines and events
+  lead@20261022T183155968611                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reader@20261022T183325087510            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T183423898002                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/writer@20261022T183518697427            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261022T183625550235                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead/checker@20261022T183748571645           P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T183938046995                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261022T184034840765            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261022T184139629625                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/checker@20261022T184258660559           P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T184431929473                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261022T184712723891                   P1=0 P2=0 P3=8 events(all)=8 events(revise_playbook)=0
+  lead/writer@20261022T184921806645            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261022T185048713633                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/checker@20261022T185153203266           P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261022T185420517529                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T190021012209                   P1=2 P2=2 P3=7 events(all)=7 events(revise_playbook)=2
+      [tool] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-memo","content":"## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The cr
+      [tool failed] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-memo","content":"## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The cr
+      [tool] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"content":"## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the con
+      [tool ok] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"content":"## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the con
+  lead/writer@20261022T190403122372            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261022T190459803060                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/checker@20261022T190556356975           P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261022T190938782385                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261022T191407883505                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reader@20261022T191500286477            P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261022T191615035678                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/writer@20261022T191729785186            P1=0 P2=0 P3=7 events(all)=7 events(revise_playbook)=0
+  lead@20261022T191848628679                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/checker@20261022T191955435061           P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T192237553607                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T192725009212                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reader@20261022T192845902927            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T192956704537                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reader@20261022T193137567561            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261022T193259969699                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/writer@20261022T193408303486            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261022T193520818307                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/checker@20261022T193649407927           P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T193831897811                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+
+full arguments and result verbatim, from the org-run session (tool_call with args.tool_id == hirearchy::revise_playbook):
+--- run lead@20261022T190021012209 session sess_439ed39a-9e52-4ded-880a-903b7fc29f05 call tooluse_jmD7RHWZUY5ZbiwmDbh4mg at 2026-10-22T19:03:02.723Z
+ARGUMENTS: {
+ "tool_id": "hirearchy::revise_playbook",
+ "arguments": {
+  "service": "weekly-memo",
+  "content": "## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.\n2. Delegate to `reader` (Reader of the meeting notes) with `budget=3`: its part of the request, with the criteria it must meet.\n3. When the previous result is in, read its artifact yourself, then delegate to `writer` (Writer) with `budget=3`, naming the artifact it builds on. Never delegate a step before its inputs exist, and send no status messages: results wake you.\n4. When the work exists, delegate to `checker` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.\n5. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.\n6. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.\n7. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /private/tmp/hirearchy-e4-s1r-1792693447/deliverables) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).\n\n## Budget plan\nRequest budget: 15 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:\n- reader: 3 runs (2 work + 1 rework or re-check)\n- writer: 3 runs (2 work + 1 rework or re-check)\n- checker: 2 runs (1 work + 1 rework or re-check)\n- you (lead): keep 7 runs: your own 7 (plan, process each result, final check, report, one rework cycle).\nUnspent runs return to your parent with your final report.\n\n## Pitfalls\n- **C9 – Relative deadlines**: \"before Friday\", \"by Thursday\", \"next week\" and similar wording ARE dates (C9); convert using the meeting date. \"before/by [weekday]\" means that weekday's ISO date (e.g. \"before Friday\" for a Mon 5 Oct meeting = 2026-10-09, NOT the day before Friday). Use `none` only when the notes contain no deadline wording at all.\n- **C8 – Structure**: The memo's very first line must be a single `Summary:` line (one sentence). No title heading before it. Order: Summary line, then `## Decisions`, then the action table.\n- **Calendar arithmetic**: Writer must verify any weekday-to-date conversion explicitly (weekday name → ISO date → double-check day of week) before writing it. Off-by-one date errors in explanatory prose have caused rework.",
+  "reason": "C9 confirmed by client (criterion link 20261022T190014222948-root-1753, case 20261022T182945409755-root-ed94): 'before Friday' = Friday itself, not the day before. Also adds C8 structure reminder (memo starts with Summary: line) to prevent the same class of error on every future request.",
+  "evidence": [
+   "C9",
+   "20261022T190014222948-root-1753",
+   "20261022T182945409755-root-ed94"
+  ]
+ }
+}
+RESULT: MCP tool error: Error executing tool revise_playbook: unknown evidence for `weekly-memo`: 20261022T190014222948-root-1753. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8, C9), a regression assertion (R1), or the id of a verdict or a case of this service: see the regression list and the digest in your prompt. Nothing was written.
+--- run lead@20261022T190021012209 session sess_439ed39a-9e52-4ded-880a-903b7fc29f05 call tooluse_d5mdTwKrxriqxXG2jbgG2x at 2026-10-22T19:03:16.513Z
+ARGUMENTS: {
+ "tool_id": "hirearchy::revise_playbook",
+ "arguments": {
+  "content": "## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.\n2. Delegate to `reader` (Reader of the meeting notes) with `budget=3`: its part of the request, with the criteria it must meet.\n3. When the previous result is in, read its artifact yourself, then delegate to `writer` (Writer) with `budget=3`, naming the artifact it builds on. Never delegate a step before its inputs exist, and send no status messages: results wake you.\n4. When the work exists, delegate to `checker` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.\n5. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.\n6. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.\n7. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /private/tmp/hirearchy-e4-s1r-1792693447/deliverables) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).\n\n## Budget plan\nRequest budget: 15 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:\n- reader: 3 runs (2 work + 1 rework or re-check)\n- writer: 3 runs (2 work + 1 rework or re-check)\n- checker: 2 runs (1 work + 1 rework or re-check)\n- you (lead): keep 7 runs: your own 7 (plan, process each result, final check, report, one rework cycle).\nUnspent runs return to your parent with your final report.\n\n## Pitfalls\n- **C9 – Relative deadlines**: \"before Friday\", \"by Thursday\", \"next week\" and similar wording ARE dates (C9); convert using the meeting date. \"before/by [weekday]\" means that weekday's ISO date (e.g. \"before Friday\" for a Mon 5 Oct meeting = 2026-10-09, NOT the day before Friday). Use `none` only when the notes contain no deadline wording at all.\n- **C8 – Structure**: The memo's very first line must be a single `Summary:` line (one sentence). No title heading before it. Order: Summary line, then `## Decisions`, then the action table.\n- **Calendar arithmetic**: Writer must verify any weekday-to-date conversion explicitly (weekday name → ISO date → double-check day of week) before writing it. Off-by-one date errors in explanatory prose have caused rework.",
+  "evidence": [
+   "C9",
+   "R1",
+   "20261022T182945409755-root-ed94"
+  ],
+  "reason": "C9 confirmed by client (R1, case 20261022T182945409755-root-ed94): 'before Friday' = Friday itself. Adds C9 date-conversion pitfall and C8 structure reminder to prevent the same errors on future requests.",
+  "service": "weekly-memo"
+ }
+}
+RESULT: playbook of `weekly-memo` is now v2; root was told without being woken
+
+service.revise events:
+- 2026-10-22T18:29:45.408973+00:00 {"ts": "2026-10-22T18:29:45.408973+00:00", "proc": "mcp", "pid": 26732, "kind": "service.revise", "actor": "root", "run": null, "trace": null, "owner": "lead", "service": "weekly-memo", "version": 1, "by": "root", "admitted": "client"}
+- 2026-10-22T19:03:16.510967+00:00 {"ts": "2026-10-22T19:03:16.510967+00:00", "proc": "mcp", "pid": 30711, "kind": "service.revise", "actor": "lead", "run": "lead@20261022T190021012209", "trace": null, "owner": "lead", "service": "weekly-memo", "version": 2, "by": "lead", "admitted": "c"}
+
+PLAYBOOK versions (org git history of lead/services/weekly-memo/PLAYBOOK.md and history/):
+4435fd0 2026-10-22T19:29:45+01:00 root: applied blueprint (4 agents), task 20261022T182945409755-root-ed94 -> lead, services: weekly-memo
+e9bd92f 2026-10-22T20:04:33+01:00 lead: run ok, 4 message(s) [lead/runs/20261022T190021012209.log]
+de3916b 2026-10-22T20:29:16+01:00 lead: run ok, 3 message(s) [lead/runs/20261022T192725009212.log]
+history files now: PLAYBOOK.v1.md, SERVICE.v1.md, SERVICE.v2.md, SERVICE.v3.md, SERVICE.v4.md

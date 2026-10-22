@@ -1,0 +1,14 @@
+I've made both changes in the delivered memo at `/private/tmp/hirearchy-e4-s1r-1792693447/deliverables/memo-2026-10-19.md`. It's now 150 words with 5 action rows, and no runs were spent.
+
+- **Marta's row:** I removed it.
+- **Lee's due:** It's now 2026-10-30. I read "end of next week" from a Monday 19 October meeting as Friday 30 October.
+
+Both changes conflict with the contract the team works under, so the next memo would repeat the old behaviour:
+1. The contract has no rule excluding "nobody has to do anything" items, and the team counted Marta's "will keep the agenda as sent" as an informal commitment.
+2. The "loose period means none" rule (C10) lists "next week" as none. Your date for Lee treats "end of next week" as Friday of that week, unlike "demo week" and "first week", which stay none.
+
+Should I add these to the contract? Both would be free.
+- **Not an action:** A statement that something stays unchanged, with nothing for anyone to do, doesn't get a row.
+- **"End of <week>":** It means that week's Friday as an ISO date. A bare "this week", "next week" or "<name> week" stays none.
+
+Reply yes or no, or reword either rule. A yes also means the next memo should come out the way you want it.

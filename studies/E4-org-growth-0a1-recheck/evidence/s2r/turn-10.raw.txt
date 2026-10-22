@@ -1,0 +1,5 @@
+I added the new rule as check C10: when the notes say a task is "for" a date, that date is its Due. It applies to every memo from next week. Nothing ran and nothing more was spent.
+
+The delivered memo (`/tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md`) is unchanged. Marta's row still says `none` instead of 2026-10-14, so that one point is still unmet in this memo. It's a one-cell edit on line 18 if you want to fix it by hand. The memo also still has the "Open questions" section.
+
+This memo used 19 runs against the 15 per memo.

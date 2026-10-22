@@ -1,0 +1,102 @@
+# revise_playbook attempts (protocol 7.2; amendment 1 A3.3 10.1(c)); facts only
+
+tool.call events with tool == revise_playbook: 2
+- 2026-10-22T22:00:42.420430+00:00 actor=lead run=lead@20261022T215913204760 trace=20261022T214057425390-root-88b2 ok=False error_type=OrgError
+  error (verbatim): unknown evidence for `weekly-memo`: 20261022T215837117856-root-1fb7. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8), a regression assertion (R1), or the id of a verdict or a case of this service: see the regression list and the digest in your prompt. Nothing was written.
+  args: {"service": "weekly-memo", "content_chars": 3128, "reason_chars": 177, "evidence_n": 3, "evidence_chars": 35}
+- 2026-10-22T22:01:00.632296+00:00 actor=lead run=lead@20261022T215913204760 trace=20261022T214057425390-root-88b2 ok=True error_type=None
+  error (verbatim): None
+  args: {"service": "weekly-memo", "content_chars": 3128, "reason_chars": 187, "evidence_n": 3, "evidence_chars": 35}
+
+run-log patterns per run (after '# ---- output ----'): P1 revise_playbook call lines | P2 end lines | P3 all hirearchy call lines | tool.call events whose run is this run
+  lead@20261022T214100476954                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261022T214140761737            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261022T214219140105                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261022T214309663549          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T214434352232                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T214612887434                   P1=0 P2=0 P3=9 events(all)=9 events(revise_playbook)=0
+  lead/writer@20261022T214715450348            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261022T214743753465                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261022T214838219224          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T214926680791                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T215129101372                   P1=0 P2=0 P3=8 events(all)=8 events(revise_playbook)=0
+  lead/writer@20261022T215309961059            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261022T215346314449                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261022T215434728330          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T215543270429                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261022T215730665781                   P1=0 P2=0 P3=0 events(all)=0 events(revise_playbook)=0
+  lead@20261022T215913204760                   P1=2 P2=2 P3=5 events(all)=5 events(revise_playbook)=2
+      [tool] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-memo","content":"## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The cr
+      [tool failed] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-memo","content":"## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The cr
+      [tool] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"content":"## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the con
+      [tool ok] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"content":"## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the con
+  lead/writer@20261022T220050148834            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261022T220122452335                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261022T220158822062          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T220309387879                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261022T220449446122                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261022T220533760135            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261022T220620192001                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261022T220712756658          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T220859737072                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261022T221059196612                   P1=0 P2=0 P3=11 events(all)=11 events(revise_playbook)=0
+  lead/writer@20261022T221209892439            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261022T221238192747                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261022T221316587386          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T221429357542                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261022T221604879734                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261022T221649245423            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261022T221721591399                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/writer@20261022T221820273013            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261022T221858697814                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261022T221947175637          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T222103982980                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261022T222238670453                   P1=0 P2=0 P3=7 events(all)=7 events(revise_playbook)=0
+  lead/writer@20261022T222341210592            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261022T222421722229                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261022T222504163070          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T222825986058                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T222938655161                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261022T223103321849          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261022T223208095829                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+
+full arguments and result verbatim, from the org-run session (tool_call with args.tool_id == hirearchy::revise_playbook):
+--- run lead@20261022T215913204760 session sess_f4f9774f-dba7-4710-afec-ff5fea1430a3 call tooluse_bWatxJJDtZ7KGEfk0ACGit at 2026-10-22T22:00:42.422Z
+ARGUMENTS: {
+ "tool_id": "hirearchy::revise_playbook",
+ "arguments": {
+  "service": "weekly-memo",
+  "content": "## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.\n2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet. Explicitly instruct the writer to structure the memo in this exact order: (a) one line starting with 'Summary:' that summarises the meeting in a single line, using only information from the notes file; (b) the Decisions section; (c) the action-items table with columns Owner | Action | Due; (d) a 'Next meeting' footer if stated in the notes. No other sections (e.g. no Open questions section unless a criterion requires it).\n3. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion (C1–C8) and the regression list verbatim. It reports findings and required changes to you and never edits the author's file.\n4. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.\n5. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.\n6. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /tmp/hirearchy-e4-s3-1792705005/deliverables) and pass `lessons`: 1-3 lines for the next request — what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).\n\n## Budget plan\nRequest budget: 15 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:\n- writer: 3 runs (2 work + 1 rework or re-check)\n- reviewer: 2 runs (1 work + 1 rework or re-check)\n- you (lead): keep 10 runs: your own 6 (plan, process each result, final check, report, one rework cycle) and 4 of slack.\nUnspent runs return to your parent with your final report.\n\n## Pitfalls\n- C8 (Summary line first): The memo MUST start with a single line beginning with 'Summary:' before any other section, followed immediately by Decisions, then the action-items table. Omitting it or placing it elsewhere fails C8. Instruct the writer explicitly in every delegation.\n- Date resolution (C5): A relative deadline becomes an ISO date only when the notes make the reference date calculable (e.g. 'before Friday' in a meeting explicitly dated Monday Oct 5 resolves to Oct 9 of that week). Do not default all relative dates to 'none'; resolve them when the notes supply the anchor. Do not invent a date that is not calculable from the notes.",
+  "reason": "Add C8 (Summary line) to writer instructions and pitfalls; clarify C5 date resolution. Client confirmed C8 via criterion link 20261022T215837117856-root-1fb7 after rejection R1.",
+  "evidence": [
+   "C8",
+   "R1",
+   "20261022T215837117856-root-1fb7"
+  ]
+ }
+}
+RESULT: MCP tool error: Error executing tool revise_playbook: unknown evidence for `weekly-memo`: 20261022T215837117856-root-1fb7. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8), a regression assertion (R1), or the id of a verdict or a case of this service: see the regression list and the digest in your prompt. Nothing was written.
+--- run lead@20261022T215913204760 session sess_f4f9774f-dba7-4710-afec-ff5fea1430a3 call tooluse_456HO9a6v3Rs8NqQJFXcct at 2026-10-22T22:01:00.634Z
+ARGUMENTS: {
+ "tool_id": "hirearchy::revise_playbook",
+ "arguments": {
+  "content": "## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.\n2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet. Explicitly instruct the writer to structure the memo in this exact order: (a) one line starting with 'Summary:' that summarises the meeting in a single line, using only information from the notes file; (b) the Decisions section; (c) the action-items table with columns Owner | Action | Due; (d) a 'Next meeting' footer if stated in the notes. No other sections (e.g. no Open questions section unless a criterion requires it).\n3. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion (C1–C8) and the regression list verbatim. It reports findings and required changes to you and never edits the author's file.\n4. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.\n5. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.\n6. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /tmp/hirearchy-e4-s3-1792705005/deliverables) and pass `lessons`: 1-3 lines for the next request — what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).\n\n## Budget plan\nRequest budget: 15 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:\n- writer: 3 runs (2 work + 1 rework or re-check)\n- reviewer: 2 runs (1 work + 1 rework or re-check)\n- you (lead): keep 10 runs: your own 6 (plan, process each result, final check, report, one rework cycle) and 4 of slack.\nUnspent runs return to your parent with your final report.\n\n## Pitfalls\n- C8 (Summary line first): The memo MUST start with a single line beginning with 'Summary:' before any other section, followed immediately by Decisions, then the action-items table. Omitting it or placing it elsewhere fails C8. Instruct the writer explicitly in every delegation.\n- Date resolution (C5): A relative deadline becomes an ISO date only when the notes make the reference date calculable (e.g. 'before Friday' in a meeting explicitly dated Monday Oct 5 resolves to Oct 9 of that week). Do not default all relative dates to 'none'; resolve them when the notes supply the anchor. Do not invent a date that is not calculable from the notes.",
+  "evidence": [
+   "C8",
+   "R1",
+   "20261022T214057425390-root-88b2"
+  ],
+  "reason": "Add C8 (Summary line) to writer instructions and pitfalls after client rejection R1 and contract amendment confirming C8; clarify C5 date resolution. Case 20261022T214057425390-root-88b2.",
+  "service": "weekly-memo"
+ }
+}
+RESULT: playbook of `weekly-memo` is now v2; root was told without being woken
+
+service.revise events:
+- 2026-10-22T21:40:54.844023+00:00 {"ts": "2026-10-22T21:40:54.844023+00:00", "proc": "mcp", "pid": 57887, "kind": "service.revise", "actor": "root", "run": null, "trace": null, "owner": "lead", "service": "weekly-memo", "version": 1, "by": "root", "admitted": "client"}
+- 2026-10-22T22:01:00.631656+00:00 {"ts": "2026-10-22T22:01:00.631656+00:00", "proc": "mcp", "pid": 62597, "kind": "service.revise", "actor": "lead", "run": "lead@20261022T215913204760", "trace": null, "owner": "lead", "service": "weekly-memo", "version": 2, "by": "lead", "admitted": "c"}
+
+PLAYBOOK versions (org git history of lead/services/weekly-memo/PLAYBOOK.md and history/):
+f6d34a7 2026-10-22T22:40:54+01:00 root: applied blueprint (3 agents), no task, services: weekly-memo
+dd2d1da 2026-10-22T23:01:14+01:00 lead: run ok, 5 message(s) [lead/runs/20261022T215913204760.log]
+history files now: PLAYBOOK.v1.md, SERVICE.v1.md

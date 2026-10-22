@@ -1,0 +1,10 @@
+# shell writes (protocol 7.2): every execute_bash call of the assistant; facts only
+
+[2026-10-22T20:19:27.574Z] call #27 turn 5 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: mkdir -p /tmp/hirearchy-e4-s2-1792698851/deliverables && cp /tmp/hirearchy-e4-s2-1792698851/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e4-s2-1792698851/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-e4-s2-1792698851/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e4-s2-1792698851/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e4-s2-1792698851/deliverables/memo-2026-10-05.md
+RESULT: Output:
+     141 /tmp/hirearchy-e4-s2-1792698851/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+

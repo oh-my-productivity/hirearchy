@@ -1,0 +1,15 @@
+######## TURN 4  start 19:28:53  end 19:46:22  elapsed 1049s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T18:28:53Z end 2026-10-22T18:46:22Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Great, approve. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+The team is created and running on the 2026-10-05 memo. I'll wait for it to finish.The memo for the 2026-10-05 meeting is done. It's at `/private/tmp/hirearchy-e4-s1r-1792693447/deliverables/memo-2026-10-05.md`.
+
+It is 177 words, with a Decisions section and an Owner | Action | Due table. I compared it with your notes myself. It has 2 decisions and 5 action rows. All owners and dates match the notes, and it uses ISO dates and "none" where there's no date.
+
+The team used 13 of its 15 runs, so 2 came back unspent.
+
+- **Sam's date:** Your notes say he'd look into the CI "before Friday". The memo shows 2026-10-08, the Thursday before Friday 10-09. That is a reasonable reading, but it is the team's interpretation, so change it if you meant something else.
+- **Lee's row:** It has no date because the notes give none. It is included because he said he'd ping the vendor.
+- **Feedback:** I haven't given the team feedback on this first memo. I can record some if you want to tune the next one.
+
+For the next meeting, tell me the notes filename, for example `2026-10-26.md`. I'll request the memo from the same team, and it will be saved to the same folder. The team doesn't watch the notes folder or run on a schedule by itself.

@@ -1,0 +1,3 @@
+Your feedback is recorded. All three memos (5, 12 and 19 October) are now in `/tmp/hirearchy-e4-s3-1792705005/deliverables/`.
+
+For next week, say "memo for <date>" with the notes file name and I'll run it. The service now has the Summary rule built in, so you won't need to repeat it. Budget is 15 runs per memo. A clean first pass has taken about 5 to 7 runs. Corrections add to that.

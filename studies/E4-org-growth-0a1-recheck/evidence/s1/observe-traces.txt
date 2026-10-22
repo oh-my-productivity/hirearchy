@@ -1,0 +1,21 @@
+######## hirearchy --root /tmp/hirearchy-e4-s1-1792640562/org obs trace 20261022T034629280991-root-cb6a
+trace 20261022T034629280991-root-cb6a "Memo for meeting 2026-10-05" -> lead: open
+     +0s  root -> lead task "Memo for meeting 2026-10-05" +15 run(s)
+     +0s  root request ok
+     +1s    run 20261022T034631122838 ok, ran 1m44s, queued 1.9s, 0 call(s)
+  +2m04s  root -> lead note "Task 20261022T034629280991-root-cb6a: nothing delegated yet"
+  +2m04s  root send ok
+  +2m04s    run 20261022T034833740575 ok, ran 1m26s, queued 139ms, 0 call(s)
+totals: wall 13m01s | runs 2 (budget given 15, returned 0) | run time 3m11s | queue 2.0s | waiting on you 0s | tool calls 2 (0 refused)
+
+######## hirearchy --root /tmp/hirearchy-e4-s1-1792640562/org obs trace 20261022T034833609815-root-c6e4
+trace 20261022T034629280991-root-cb6a "Memo for meeting 2026-10-05" -> lead: open
+     +0s  root -> lead task "Memo for meeting 2026-10-05" +15 run(s)
+     +0s  root request ok
+     +1s    run 20261022T034631122838 ok, ran 1m44s, queued 1.9s, 0 call(s)
+  +2m04s  root -> lead note "Task 20261022T034629280991-root-cb6a: nothing delegated yet"
+  +2m04s  root send ok
+  +2m04s    run 20261022T034833740575 ok, ran 1m26s, queued 139ms, 0 call(s)
+totals: wall 13m01s | runs 2 (budget given 15, returned 0) | run time 3m11s | queue 2.0s | waiting on you 0s | tool calls 2 (0 refused)
+note: 20261022T034833609815-root-c6e4 belongs to the request 20261022T034629280991-root-cb6a; showing that
+

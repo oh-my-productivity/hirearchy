@@ -1,0 +1,86 @@
+# E4 s3 setup (recorded before turn 1)
+date: Thu Oct 22 22:37:57 WEST 2026; utc: 2026-10-22T21:37:57Z
+S: /tmp/hirearchy-e4-s3-1792705005  epoch: 1792705005
+== repo checks (4.1, amendment A1: product 7d86c31)
+git rev-parse HEAD: 7d86c31f1b0d52e7ea9467ce72c8d9322e71a71c
+git status --porcelain:
+?? docs/research/
+?? studies/E4-org-growth-0a1-recheck/
+git diff --stat 7d86c31 HEAD -- src skills pyproject.toml uv.lock: []
+== kiro-cli --version: kiro-cli 2.33.0
+== model list (evidence/s3/models-list.txt); fixed set M present -> no substitution
+  claude-sonnet-5.5    1.30x credits      Claude Sonnet 5.5 model with 1M context window
+  claude-sonnet-4.6    1.30x credits      Claude Sonnet 4.6 model with 1M context window
+  claude-haiku-4.5     0.40x credits      The latest Claude Haiku model
+== model checks before turn 1: see model-checks.txt
+RESULT: before turn 1 both models OK (2026-10-22T21:37:46Z)
+== assistant profile
+MD5 (/Users/aminalizadeh/.kiro/agents/hirearchy-study-e4-s3-assistant.json) = 0f4cc202be29cc791d50e8bd8d872c6c
+(diff against s1r's profile, the reference)
+2,3c2,3
+<   "name": "hirearchy-study-e4-s1r-assistant",
+<   "description": "internal: hirearchy usability study E4 stream s1r assistant; deleted after the stream",
+---
+>   "name": "hirearchy-study-e4-s3-assistant",
+>   "description": "internal: hirearchy usability study E4 stream s3 assistant; deleted after the stream",
+15c15
+<         "ORG_ROOT": "/tmp/hirearchy-e4-s1r-1792693447/org"
+---
+>         "ORG_ROOT": "/tmp/hirearchy-e4-s3-1792705005/org"
+== workspace settings
+MD5 (/tmp/hirearchy-e4-s3-1792705005/.kiro/settings/cli.json) = 05d30ccbfd35530747c8a542eb67985c
+{"chat.disableInheritingDefaultResources": true, "chat.enableWorkflows": false}
+MD5 (/Volumes/workspace/hirearchy/studies/E4-org-growth-0a1-recheck/evidence/harness/workspace-cli.json) = 05d30ccbfd35530747c8a542eb67985c
+== skill copies
+MD5 (/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md) = 573495bb613f19f7c07ce86508ebae4f
+MD5 (/tmp/hirearchy-e4-s3-1792705005/.kiro/skills/hirearchy/SKILL.md) = 573495bb613f19f7c07ce86508ebae4f
+MD5 (/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md) = 573495bb613f19f7c07ce86508ebae4f
+     125 /Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md
+     125 /tmp/hirearchy-e4-s3-1792705005/.kiro/skills/hirearchy/SKILL.md
+     125 /Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md
+     375 total
+== notes
+MD5 (/tmp/hirearchy-e4-s3-1792705005/notes/2026-10-05.md) = 903e3bbf5f35df2c17444f3313c12395
+MD5 (/tmp/hirearchy-e4-s3-1792705005/notes/2026-10-12.md) = 3893bd637c87760b43be4894b47fdb53
+MD5 (/tmp/hirearchy-e4-s3-1792705005/notes/2026-10-19.md) = 9976a7653a6346b0976c3c38b1c697dd
+== protocol.md vs protocol.md5
+MD5 (/Volumes/workspace/hirearchy/studies/E4-org-growth-0a1-recheck/evidence/protocol.md) = 584b6cc71e3d073d10d45c1c2e64325e
+584b6cc71e3d073d10d45c1c2e64325e
+== amendment vs .md5
+MD5 (/Volumes/workspace/hirearchy/studies/E4-org-growth-0a1-recheck/evidence/protocol-amendment-1.md) = 1ec9e658e3bd59ab9d9f785986a26c19
+1ec9e658e3bd59ab9d9f785986a26c19
+== manager-decision-s2-and-h3.md present: /Volumes/workspace/hirearchy/studies/E4-org-growth-0a1-recheck/evidence/manager-decision-s2-and-h3.md
+== injection script md5 (must equal c80e25d65fe58cdb97d7faa758d59484)
+MD5 (/Volumes/workspace/hirearchy/studies/E4-org-growth-0a1-recheck/evidence/harness/inject_root_rework.py) = c80e25d65fe58cdb97d7faa758d59484
+== extract script md5
+MD5 (/Volumes/workspace/hirearchy/studies/E4-org-growth-0a1-recheck/evidence/harness/extract_mechanical.py) = ec2d7db51fd06233f182c0153ecd6957
+== HIREARCHY_STATE_DIR set? no
+== org dir exists before turn 1? no
+== ps: processes referencing the sandbox
+(none)
+== other e4 streams running? (s1r/s2/s2r/s3)
+(none)
+== schedulers: 
+4207 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+4831 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+8830 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+21747 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+32552 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+64818 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+75823 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+
+== AFTER the last turn (4.1 / A1)
+date: Thu Oct 22 23:34:25 WEST 2026; utc: 2026-10-22T22:34:25Z
+git rev-parse HEAD: 7d86c31f1b0d52e7ea9467ce72c8d9322e71a71c
+git status --porcelain:
+?? docs/research/
+?? studies/E4-org-growth-0a1-recheck/
+git diff --stat 7d86c31 HEAD -- src skills pyproject.toml uv.lock: []
+kiro-cli --version: kiro-cli 2.33.0
+protocol.md md5: 584b6cc71e3d073d10d45c1c2e64325e  (protocol.md5: 584b6cc71e3d073d10d45c1c2e64325e)
+protocol-amendment-1.md md5: 1ec9e658e3bd59ab9d9f785986a26c19  (.md5: 1ec9e658e3bd59ab9d9f785986a26c19)
+injection script md5: c80e25d65fe58cdb97d7faa758d59484
+workspace settings md5: 05d30ccbfd35530747c8a542eb67985c; skill copy md5: 573495bb613f19f7c07ce86508ebae4f; notes: 903e3bbf5f35df2c17444f3313c12395
+3893bd637c87760b43be4894b47fdb53
+9976a7653a6346b0976c3c38b1c697dd
+ps (sandbox):        0 process(es)

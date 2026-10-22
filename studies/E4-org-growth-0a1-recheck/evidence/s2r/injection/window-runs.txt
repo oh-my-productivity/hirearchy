@@ -1,0 +1,176 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-22T21:11:57Z .. 2026-10-22T21:19:53Z; injected task 20261022T211157827631-root-43b8; revised (memo 1) task 20261022T205531258713-root-f230
+
+## run lead@20261022T211158029103 agent=lead model=claude-sonnet-4.6 start=2026-10-22T21:11:58.040575+00:00 end=2026-10-22T21:14:14.959704+00:00 exit=0 secs=137 session=sess_79675309-bb12-4656-833c-40c90fc0161b
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 11
+  lead message 20261022T211355821063-lead-608b to=lead/writer type=task status=None created=2026-10-22T21:13:55+00:00
+  ## Lessons: (none)
+  org-git commit 05366b2 MEMORY.md diff:
+    commit 05366b2a8a16ccc0875746d507ad065aad7d8d83
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 22 22:14:15 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261022T211158029103.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 312d31e..9c69691 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,10 +1,25 @@
+     # Memory
+     
+    +## Current task
+    +- Task 20261022T211157827631-root-43b8 "Rework memo 2026-10-05: unclear due dates" from root
+    +- service: weekly-meeting-memo, revises 20261022T205531258713-root-f230
+    +
+     ## State
+    -No open tasks. No outstanding delegations.
+    +- Delegated rework to writer: task 20261022T211355821063-lead-608b (budget=1, revises=20261022T210338775220-lead-7124)
+    +- Waiting for writer result.
+    +
+    +## Required changes (delegated to writer)
+    +1. Sam Due: none (was 2026-10-09); add Open questions item: notes say "before Friday", no explicit date
+    +2. Marta Due: none (was 2026-10-14); add Open questions item: Oct 14 is training date, not booking deadline
+    +
+    +## Next steps when writer reports
+    +1. Read lead/writer/work/2026-10-05-memo.md and verify Sam Due=none, Marta Due=none, Open questions section present with both items
+    +2. Delegate re-check to reviewer with revises=20261022T210600941668-lead-677e (budget=2)
+    +   - Tell reviewer to re-check every Due value against notes text, not only changed rows
+    +   - Acceptance criteria C1-C8 apply; also check Open questions section
+    +3. When reviewer reports, read artifact, verify criteria met n of n, report done to root
+     
+    -## Last completed
+    -- Task 20261022T205531258713-root-f230 "Memo for 2026-10-05 meeting" — reported done.
+    -- Deliverable: lead/writer/work/2026-10-05-memo.md (148 words)
+    -- Final reviewer coverage: criteria met: 7 of 7 — PASS
+    -- One rework cycle was needed (RC1: Lee/SSO Decisions bullet; RC2: Sam Due = 2026-10-09). Both resolved on first rework.
+    +## Key IDs
+    +- Writer last task (to revise): 20261022T210338775220-lead-7124
+    +- Reviewer last task (to revise): 20261022T210600941668-lead-677e
+    +- Memo path: lead/writer/work/2026-10-05-memo.md
+
+## run lead/writer@20261022T211356819599 agent=lead-writer model=claude-haiku-4.5 start=2026-10-22T21:13:56.829325+00:00 end=2026-10-22T21:15:35.670758+00:00 exit=0 secs=99 session=sess_2c3b874f-a254-4032-81cc-6551a64144f0
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 5
+
+## run lead@20261022T211525542150 agent=lead model=claude-sonnet-4.6 start=2026-10-22T21:15:25.556977+00:00 end=2026-10-22T21:17:08.437425+00:00 exit=0 secs=103 session=sess_10195bd1-ed59-4bb8-be8e-780bfc400886
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+  lead message 20261022T211647953674-lead-023c to=lead/reviewer type=task status=None created=2026-10-22T21:16:47+00:00
+  ## Lessons: (none)
+  org-git commit 38cf50c MEMORY.md diff:
+    commit 38cf50c4128998c5e2bfd17c7461238303ca1b2c
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 22 22:17:08 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261022T211525542150.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 9c69691..04272ba 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -5,21 +5,28 @@
+     - service: weekly-meeting-memo, revises 20261022T205531258713-root-f230
+     
+     ## State
+    -- Delegated rework to writer: task 20261022T211355821063-lead-608b (budget=1, revises=20261022T210338775220-lead-7124)
+    -- Waiting for writer result.
+    +- Delegated re-check to reviewer: task 20261022T211647953674-lead-023c (budget=2, revises 20261022T210600941668-lead-677e)
+    +- Waiting for reviewer result.
+     
+    -## Required changes (delegated to writer)
+    -1. Sam Due: none (was 2026-10-09); add Open questions item: notes say "before Friday", no explicit date
+    -2. Marta Due: none (was 2026-10-14); add Open questions item: Oct 14 is training date, not booking deadline
+    +## Verification done (pre-delegation, from my own read)
+    +- Sam Due = none ✓
+    +- Marta Due = none ✓
+    +- Open questions section present with both required items ✓
+    +- Word count: 193 (under 400) ✓
+    +- Priya Due = 2026-10-09 ✓ (notes: "by Oct 9")
+    +- Dev Due = 2026-10-08 ✓ (notes: "by Oct 8")
+    +- Lee Due = none ✓ (notes: "no hard date")
+     
+    -## Next steps when writer reports
+    -1. Read lead/writer/work/2026-10-05-memo.md and verify Sam Due=none, Marta Due=none, Open questions section present with both items
+    -2. Delegate re-check to reviewer with revises=20261022T210600941668-lead-677e (budget=2)
+    -   - Tell reviewer to re-check every Due value against notes text, not only changed rows
+    -   - Acceptance criteria C1-C8 apply; also check Open questions section
+    -3. When reviewer reports, read artifact, verify criteria met n of n, report done to root
+    +## Next steps when reviewer reports
+    +1. Read lead/writer/work/2026-10-05-memo.md (verify word count, dates, Open questions)
+    +2. Check reviewer's coverage line: must be "criteria met: N of M" with N=M
+    +3. If all met: report done to root with artifact lead/writer/work/2026-10-05-memo.md and lessons
+    +4. If any fail: I have only 1 run left — report blocked to root with deviation and options
+    +
+    +## Budget warning
+    +- Budget is now 1 run. If reviewer requires rework, I cannot afford another cycle. Must report blocked.
+     
+     ## Key IDs
+    -- Writer last task (to revise): 20261022T210338775220-lead-7124
+    -- Reviewer last task (to revise): 20261022T210600941668-lead-677e
+    +- Writer rework task: 20261022T211355821063-lead-608b
+    +- Reviewer re-check task: 20261022T211647953674-lead-023c
+     - Memo path: lead/writer/work/2026-10-05-memo.md
+
+## run lead/reviewer@20261022T211648280490 agent=lead-reviewer model=claude-sonnet-4.6 start=2026-10-22T21:16:48.291235+00:00 end=2026-10-22T21:19:19.409219+00:00 exit=0 secs=151 session=sess_37d3d466-13c7-4326-9282-922a7dfe88d6
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261022T211853214312 agent=lead model=claude-sonnet-4.6 start=2026-10-22T21:18:53.230689+00:00 end=2026-10-22T21:19:53.817614+00:00 exit=0 secs=61 session=sess_4d87a4ef-c40f-4af7-a049-a6815a1541a4
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261022T211944433751-lead-c3dd to=root type=result status=done created=2026-10-22T21:19:44+00:00
+  ## Lessons: Rework needed: two Due values (Sam 'before Friday', Marta 'book for Oct 14') were silently resolved to ISO dates on first pass without documentation. Fix: in the writer task, explicitly require that any Due converted from a vague deadline must be flagged in Open questions; add to playbook pitfalls. One rework + one re-check resolved it cleanly; budget held.
+  org-git commit 32d6224 MEMORY.md diff:
+    commit 32d6224ddfcf564871d4805f36a2608864becc5c
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 22 22:19:53 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261022T211853214312.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 04272ba..eaf582b 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,32 +1,13 @@
+     # Memory
+     
+    -## Current task
+    -- Task 20261022T211157827631-root-43b8 "Rework memo 2026-10-05: unclear due dates" from root
+    -- service: weekly-meeting-memo, revises 20261022T205531258713-root-f230
+    -
+     ## State
+    -- Delegated re-check to reviewer: task 20261022T211647953674-lead-023c (budget=2, revises 20261022T210600941668-lead-677e)
+    -- Waiting for reviewer result.
+    -
+    -## Verification done (pre-delegation, from my own read)
+    -- Sam Due = none ✓
+    -- Marta Due = none ✓
+    -- Open questions section present with both required items ✓
+    -- Word count: 193 (under 400) ✓
+    -- Priya Due = 2026-10-09 ✓ (notes: "by Oct 9")
+    -- Dev Due = 2026-10-08 ✓ (notes: "by Oct 8")
+    -- Lee Due = none ✓ (notes: "no hard date")
+    -
+    -## Next steps when reviewer reports
+    -1. Read lead/writer/work/2026-10-05-memo.md (verify word count, dates, Open questions)
+    -2. Check reviewer's coverage line: must be "criteria met: N of M" with N=M
+    -3. If all met: report done to root with artifact lead/writer/work/2026-10-05-memo.md and lessons
+    -4. If any fail: I have only 1 run left — report blocked to root with deviation and options
+    +No open tasks. Last task 20261022T211157827631-root-43b8 reported done.
+     
+    -## Budget warning
+    -- Budget is now 1 run. If reviewer requires rework, I cannot afford another cycle. Must report blocked.
+    +## Last delivery
+    +- Memo: lead/writer/work/2026-10-05-memo.md (193 words)
+    +- Reviewer: criteria met 8 of 8
+    +- One rework cycle: two Due values (Sam, Marta) corrected to none with Open questions.
+     
+    -## Key IDs
+    -- Writer rework task: 20261022T211355821063-lead-608b
+    -- Reviewer re-check task: 20261022T211647953674-lead-023c
+    -- Memo path: lead/writer/work/2026-10-05-memo.md
+    +## Lessons (for next request)
+    +- Writer must flag any vague deadline → Open questions on first pass; avoids rework.
+    +- Add to playbook pitfalls when client evidence supports it.
+

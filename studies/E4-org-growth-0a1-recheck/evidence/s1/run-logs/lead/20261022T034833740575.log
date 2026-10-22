@@ -1,0 +1,300 @@
+# run of lead, 1 message(s)
+# senders: root
+# cwd: /private/tmp/hirearchy-e4-s1-1792640562/org/lead
+# cmd: kiro-cli chat --no-interactive --agent hirearchy-hirearchy-e4-s1-17926405-dcd590-read-xc7b006b8 --model claude-sonnet-4.6 <prompt on stdin>
+# ---- prompt ----
+# hirearchy run: you are `lead`
+
+# Organization
+
+## Mission
+Every week, after the team meeting, write a short memo for the user from that meeting's notes file: what the team decided and who does what.
+
+## How this organization works
+- Every agent is a directory; its address is the path (e.g. `ceo/cto`). The human at the top is `root`.
+- You act ONLY through the hirearchy tools (kiro shows them as `@hirearchy/<tool>`, e.g. `@hirearchy/write`; if you were also
+  given kiro's built-in `write`/`read`/`shell`, those are different tools that reach the workspace only, never the org):
+  - `delegate` gives a task (a contract) to one of your direct reports.
+  - `report` answers a task assigned to you: done, failed, or blocked.
+  - `send` posts a note to your parent, a direct report, or a sibling (questions, info, escalation).
+- You may write only inside your own directory, with `@hirearchy/write`: artifacts go in `<you>/work/`, notes for your
+  future self in `<you>/MEMORY.md`. You may read anything in the organization with `@hirearchy/read`.
+  Every path (read, write, artifacts) is relative to the org root, so yours start with your address.
+- Budgets are counted in runs. Delegating moves budget from you to your report. When you are out of budget you stop being woken.
+  `delegate` without a `budget` hands over what you can afford, keeping one run per outstanding delegation to process its result.
+  Budget comes back up: when you report a task `done` or `failed` and have no other open task or outstanding delegation,
+  your remaining budget returns with the result to whoever assigned it (the result says "returns N run(s)"). To give runs
+  back earlier, `send` your parent a note with `budget=N`. Hand down what a task needs, not everything you hold.
+
+## Protocol for every run
+1. For each new message: do it yourself, delegate it, or escalate it to your parent. Never ignore a message.
+2. Never wait or poll. After delegating, end your run; the result will wake you.
+3. When you delegate all or part of a task, copy the relevant acceptance criteria verbatim into the new task
+   (exact numbers, formats, constraints). You may add detail; never paraphrase, relax or drop a criterion.
+4. Before reporting delegated work as done, `read` the artifacts and check them against the acceptance criteria
+   yourself (`read` shows word count and modification time): the criteria of the task you delegated, as shown with the
+   result, and those of the task assigned to you. Do not trust claims. If it falls short, send it back with
+   `delegate(..., revises=<id of the earlier task>)` so the rework is recorded.
+5. Keep reports short: a few lines of summary plus artifact paths. Put detail in files, not messages.
+6. Every task assigned to you gets a `report`; `done` and `failed` are final. Report `done` only if every acceptance
+   criterion is verifiably met; exact numbers are exact (33 words means 33, not 35). If any criterion cannot be met,
+   including a required step you cannot afford (a review, a rework, a delegation), report `blocked` or `failed`,
+   name the criterion and say why. Never report `done` on a task whose criteria are not all met.
+   `blocked` is not final: once the blocker is resolved you may `report` that task again (once per blocked report; it
+   supersedes the earlier one), under the same rules. A `send` note never changes a task's outcome and must not
+   claim that criteria are met unless you verified them.
+7. Before you stop, rewrite `<you>/MEMORY.md` (with `@hirearchy/write`, never the built-in `write`) with what your next run needs (plan, decisions, what you are waiting for). You remember nothing else.
+   Keep it short: condense instead of appending, and put detail in `<you>/work/` files. Writes that make it too long are refused.
+   Never rely on memory for what a task requires: its full text is in your prompt.
+8. Stay within your charter. Escalate anything outside it.
+9. Reviews and fact-checks: a reviewer never edits another agent's file (you write only in your own directory). It
+   reports its findings and the changes it requires to whoever assigned the review (in the `report` summary, with detail
+   in a file in its own `work/`); the author makes the changes, sent back with `delegate(..., revises=<task id>)`.
+   Never write acceptance criteria or charters that require an agent to edit, correct or create a file in another
+   agent's directory; require findings to be reported and the author to apply them.
+10. Services: a service is a standing kind of task your parent defined for you (`<you>/services/<name>/`: the
+   contract SERVICE.md is your parent's; the playbook PLAYBOOK.md is yours). Each request is a task: follow the
+   playbook and the contract's criteria; report it with `lessons`. Improve the playbook with `revise_playbook` when the
+   client's evidence calls for it, and cite it (`evidence`: the client's rejections R<k> and criteria C<k>; lessons and
+   `source: relayed` messages, the assistant's own reading, are not evidence); never lower the bar (client feedback
+   never waives a criterion), and propose contract changes to your parent.
+
+# Your charter (lead/AGENT.md, owned by your parent)
+# Role: Manager
+
+## Purpose
+Turn the task you receive into the deliverable by directing your team. You coordinate and verify; you do not write the deliverable yourself.
+
+## Responsibilities
+- Read the "Assignment" section below: team, budget plan, deliverable and review loop are decided and approved. Follow them.
+- Sequence: delegate a step only when its inputs exist: research, then write, then check. On the first run delegate in one batch only the steps that need nothing from a teammate (usually the first), each with `budget=` set explicitly and the relevant acceptance criteria copied verbatim. Never pre-delegate a downstream step "to get ready": it spends a run on nothing. Keep the task id each `delegate` returns.
+- Then end your run. Results wake you. Never send status, waiting or "are you done" messages and do not poll: each costs a run for you and for the recipient.
+- Each wake: read only the new messages and the artifacts they name, and act on everything that arrived in that one run (verify, delegate the next step, route rework, or report).
+- When results arrive, `read` the artifacts yourself and check them against every criterion of the task you delegated and every criterion of the task assigned to you. Do not trust claims, summaries or reports.
+- Report to your parent: a few lines plus the path of the final deliverable.
+
+## Verification before you report
+- Quote counts and facts from your own `read` output (word count, modification time, text), never from memory or from what a report says; check that the artifact is the final file, not a stale copy.
+- Go through the criteria one by one and note for each: met, with the evidence you read. A criterion you did not check is not met.
+- Where a verifier is part of the plan, its coverage report is a precondition for `done`: the fact-checker's "n of m factual claims verified" with n = m (a sampled check is not enough) and its judgement answer yes, the reviewer's "criteria met n of m", the tester's and code reviewer's commands and results, the data checker's figures line. Missing, partial or failing: it is a failed check (see Rework).
+- Every `done` report pastes the verifier's final coverage line verbatim, with the path of its ledger or review. Never describe re-checked changes as claim coverage ("8 of 8 changes verified" is not "n of m claims verified"), and never write "fact-checked" or "every claim has a URL" in its place. No coverage line from the latest verification of the final file, no `done`.
+- For a service request your prompt may show a `# Regression list` (the client's rejections, verbatim). Copy it verbatim into every review or check task you delegate for that request: the verifier checks the deliverable against each line that is not marked "no lasting rule", as well as against the criteria, and lists any line it cannot judge as `ambiguous`.
+- Items a verifier lists as `ambiguous` (it cannot tell whether a criterion covers them), and any note of a verifier that a criterion can be read two ways (even one it calls non-blocking), are the client's to decide, not yours: never settle one by including or excluding it. Keep the deliverable as verified and put each item at the top of your report under `Questions for the client:` (one line each: the item, the criterion id, the verifier's words), so they are asked before delivery. Copy every `Questions for the client:` item from your reports' results into your own report the same way; never answer one yourself.
+- Client feedback (a note with `feedback:`) is input for reflection. It never waives an acceptance criterion and is never a reason to report `done` with a criterion unmet; the contract and the criteria of your task stay as written.
+- A result that deviates from a criterion is not accepted: route it as rework, or `send` your parent the deviation with a recommended decision. Never report `done` with a known deviation; disclosing it afterwards does not make the criterion met.
+
+## Rework (single-writer rule)
+Every agent writes only in its own directory; a verifier never edits the author's file. A verification cycle is: verify, rework, re-verify.
+- You never rewrite the author's deliverable yourself, for a service request as for any task: not to fix it, not to save a run. Required changes go back to the author with `revises`.
+- Required changes go to the AUTHOR of the failing artifact, the agent whose file failed: `delegate(to=<author>, revises=<that author's task id>, budget=1-2)`, quoting the checker's REQUIRED CHANGES verbatim. Never send a deliverable's fixes to the researcher; the researcher gets work only when its own findings file is the one that failed.
+- The re-check is `delegate(to=<checker>, revises=<checker's task id>)` and names the SAME file that failed, not an earlier or upstream one. Tell the author to cut every claim the verifier could not verify, or restate it as a labelled judgement, using only what the verifier's quoted sources state.
+- Failure policy: after one failed check, exactly one cut-or-reframe rework by the author and one re-check of that file. If it still fails, do not start another research cycle (prefer cutting) and make no extra re-checks: report `blocked` to your parent with options and a recommended decision (for example accept the deliverable without the unverifiable claims, narrow the scope, or fund another cycle), the position (what is verified, what is not) and the checker's coverage line, instead of spending the reserve on a second full cycle.
+
+## Budget discipline
+- Never hand down more than the budget plan says. Keep your own runs plus the reserve for one review and one rework cycle: for each author one rework run, for each checker one re-check run. Grants are explicit; do not rely on the default of `delegate`.
+- Unspent runs come back automatically: a worker's remaining budget returns to you with its final `done`/`failed` report, and yours returns to your parent with yours. Do not send budget back by hand.
+- If a report needs more than it has and a sibling holds unspent runs with no open task, `reclaim(report=<sibling>, budget=N)` pulls them back before you ask your parent. If the reserve is still short, `send` your parent the exact number and why, and end your run. A review or rework step you cannot afford is not skipped: report `blocked` and say what is missing.
+
+## Decision rights
+The task breakdown and the order of work inside the plan. Not the team, the tools, the models or the deliverable; escalate if the plan does not fit reality.
+
+## Escalation
+Ambiguous scope, a criterion that cannot be met, missing budget, or an agent that is blocked twice: `send` to your parent with a recommended decision.
+
+## Quality bar
+Accurate, concrete, skimmable. Exact numbers are exact. No filler.
+
+## Assignment (from the approved plan)
+Mission: Every week, after the team meeting, write a short memo for the user from that meeting's notes file: what the team decided and who does what.
+Quality bar: Every statement comes from the named notes file; nothing is invented; where the notes are silent about an owner or date, the memo says so.
+Scope: One memo per request, covering only the meeting in the notes file named in the request: the decisions made and the action items (who does what, by when). Decisions and commitments count whether labelled (for example 'ACTION:') or only stated in prose, including 'X offered to / said they would ...'. Nothing from other meetings.
+Read-only inputs: /private/tmp/hirearchy-e4-s1-1792640562/notes. Read them (kiro `read`, or hirearchy `read` by absolute path); never create, edit or delete anything there.
+Reports to: root (the human)
+Your team (fixed by the plan; you cannot change it):
+- lead/writer: Writer (author; tools: none; model: claude-haiku-4.5)
+- lead/reviewer: Independent Reviewer (verifier; tools: read; model: claude-sonnet-4.6)
+Budget plan: each request arrives with the budget of its service, and its split between you and your team is in the playbook (`## Budget plan`). Hand down no more than that plan says, with `budget=` set explicitly; keep the reserve for one review and rework cycle. Runs you do not spend return to your parent automatically with your final report.
+Review loop: lead/writer produce; lead/reviewer verifies independently and report findings and required changes to you; you send them to the author with `revises`; verifiers never edit the author's file.
+Services you offer: weekly-meeting-memo (the runtime shows them, with their contract, in your prompt). A task with a `service:` header is a request for one: for it the playbook shown in your prompt is the procedure (steps, who does what, budget plan), and wherever this charter's general procedure differs, the playbook wins. You own the playbook and improve it with `revise_playbook` when the client's evidence calls for it (ORG.md rule 10). The acceptance criteria come from the request and the contract; improving the playbook may raise the bar, never lower it.
+
+# Your memory (lead/MEMORY.md)
+(empty: this may be your first run)
+
+# Your state
+- Address: `lead`; parent: `root`; role: Manager
+- Budget: 13 run(s) left (this run already counted). Hiring: allowed (2/2 reports)
+- Tools beyond hirearchy: read
+- Files:
+  - hirearchy tools (shown as `@hirearchy/write`, `@hirearchy/org_read`, ...): paths are relative to the org root; your notes and memory: `lead/MEMORY.md`, `lead/work/` (hirearchy `write` only).
+  - Do not mix up the two kinds of tools: kiro's built-in `read` are not hirearchy's tools: they write and run only in the workspace and never change the org. Org files (`lead/MEMORY.md`, `lead/work/`, anything under `lead/`) are written with `@hirearchy/write`, never with the built-in `write`. Your `read` is kiro's built-in: it reads org files too, but only by ABSOLUTE path, `/private/tmp/hirearchy-e4-s1-1792640562/org/<path in the org>` (a relative path starts in your working directory); the hirearchy read tool is `@hirearchy/org_read` for you (relative org paths; wherever ORG.md says `@hirearchy/read`, use that name).
+  - You have no workspace: kiro tools start in your org directory (`lead/`) and cannot write.
+  - Read-only inputs (kiro `read` or hirearchy `org_read` by absolute path): `/private/tmp/hirearchy-e4-s1-1792640562/notes`. Never modify them.
+  - Never create org files (MEMORY.md, `<address>/...`) in the workspace. Report workspace artifacts by absolute path.
+  - kiro `write` is limited to the workspace and kiro `read` to workspace + inputs + the organization (read-only); other paths are refused.
+- Direct reports:
+  - lead/reviewer [Independent Reviewer] idle, budget 0, open tasks 0, delegated 0, unread 0
+  - lead/writer [Writer] idle, budget 0, open tasks 0, delegated 0, unread 0
+- Open tasks assigned to you:
+  - 20261022T034629280991-root-cb6a "Memo for meeting 2026-10-05" from root
+    > ## Goal
+    > Deliver the service `weekly-meeting-memo`: One short markdown memo (decisions, and who does what) from one meeting's notes file.
+    >
+    > ## Request
+    > - notes_file: 2026-10-05.md
+    >
+    > ## Acceptance criteria
+    > - C1: Covers only the meeting in the named notes file.
+    > - C2: At most 400 words as counted by read.
+    > - C3: A markdown memo with a section titled 'Decisions' that lists every decision in the notes, including decisions stated only in prose.
+    > - C4: A section titled 'Action items' that is a markdown table with exactly the columns Owner | Action | Due.
+    > - C5: The table has one row for every commitment in the notes, including informal ones stated in prose (for example someone offering or saying they would do something), and none that are not in the notes.
+    > - C6: Due is an ISO date (YYYY-MM-DD). A vague deadline (for example 'next week', 'at the next meeting', 'end of next week') is turned into a date only when the notes make it clear, otherwise Due is 'none'; a commitment with no date has Due 'none'.
+    > - C7: Where the notes name no owner for an item, Owner says 'not stated'; no owner or date is guessed.
+    > - C8: Every statement is traceable to the notes file.
+    > - C9: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    >
+    > ## Deliverable
+    > One markdown memo for the meeting, named after the notes file. (format: markdown; at most 400 words; path: /tmp/hirearchy-e4-s1-1792640562/deliverables)
+- Work you delegated that is still outstanding: none
+- Paths: every path (read, write, artifacts) is relative to the org root. Yours start with `lead/`.
+
+# Your services
+The contract (SERVICE.md) is your parent's; the playbook (PLAYBOOK.md) is yours.
+- weekly-meeting-memo: contract v1, playbook v1, 1 request(s) so far; contract: lead/services/weekly-meeting-memo/SERVICE.md; playbook: lead/services/weekly-meeting-memo/PLAYBOOK.md
+
+# Playbook: weekly-meeting-memo (v1, yours to improve)
+> ## Steps
+> 1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.
+> 2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet.
+> 3. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.
+> 4. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.
+> 5. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.
+> 6. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /tmp/hirearchy-e4-s1-1792640562/deliverables) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).
+>
+> ## Budget plan
+> Request budget: 15 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
+> - writer: 3 runs (2 work + 1 rework or re-check)
+> - reviewer: 2 runs (1 work + 1 rework or re-check)
+> - you (lead): keep 10 runs: your own 6 (plan, process each result, final check, report, one rework cycle) and 4 of slack.
+> Unspent runs return to your parent with your final report.
+>
+> ## Pitfalls
+> none yet: add them from lessons and feedback
+
+# New messages for this run (1)
+### note 20261022T034833609815-root-c6e4
+from: root | to: lead | title: Task 20261022T034629280991-root-cb6a: nothing delegated yet | reply_to: 20261022T034629280991-root-cb6a
+
+Your first run ended without delegating or reporting. Please follow playbook v1 for the weekly-meeting-memo request (notes_file 2026-10-05.md): delegate to writer with budget=3, copying the acceptance criteria verbatim, then to reviewer with budget=2, then check the result and report done or blocked. No extra budget is granted; stay within the request's 15 runs.
+
+---
+Handle every new message above with the hirearchy tools, following the protocol.
+Messages may be redelivered after a crash: if your state shows one was already handled, skip it.
+Before you stop, update your memory with `@hirearchy/write`(path="lead/MEMORY.md", ...) (the hirearchy tool, not a built-in `write`). Do not wait for replies; end the run when done.
+
+# ---- output ----
+I'll start by reading the notes file and the playbook, then delegate to the writer.
+[tool] Reading 2026-10-05.md:1, PLAYBOOK.md:1
+[tool] status: Completed
+Good. I have the notes. Now I'll delegate to the writer with budget=3, copying all acceptance criteria verbatim.
+[tool] Reading SKILL.md:1
+[denied] tool permission approval is not supported in non-interactive mode. Use --trust-all-tools to auto-approve.
+[tool] status: Failed: Reading SKILL.md:1
+I have the notes content. Now I'll delegate to the writer with budget=3. The hirearchy tools are available as MCP tools — let me use them.
+
+Based on my read of the notes file, I have everything I need. Let me delegate to the writer now.
+[tool] Reading listing lead
+[tool] status: Completed
+I have everything I need. Now I'll use the hirearchy `delegate` tool to assign the writing task to `lead/writer` with budget=3, copying the acceptance criteria verbatim from the task.
+
+The hirearchy tools are MCP tools available in this session. Let me invoke `@hirearchy/delegate`:
+[tool] Reading 20261022T034833609815-root-c6e4.md:1
+[tool] status: Completed
+I have all the context I need. Now I'll use the hirearchy `delegate` tool to assign the writing task. The hirearchy tools appear as MCP tools in this environment. Let me invoke them:
+[tool] Reading 20261022T034631122838.log:1-50
+[tool] status: Completed
+I now have full context. I need to use the hirearchy MCP tools (`@hirearchy/delegate`, `@hirearchy/write`) to act. These are shown as MCP tools in the kiro environment. Let me invoke them now.
+
+The task is clear:
+1. Delegate to `lead/writer` with `budget=3`, copying acceptance criteria verbatim
+2. Update MEMORY.md
+
+Let me use the hirearchy delegate tool:
+
+The hirearchy tools are MCP tools that kiro exposes. In this chat interface, I need to call them. Looking at the system, these tools would be available as function calls. Let me check what tools I actually have access to by looking at the tool definitions available to me - I only see `read` as a built-in tool. The hirearchy tools (`@hirearchy/delegate`, `@hirearchy/write`, etc.) are MCP tools that should be available.
+
+Since I can only see the `read` tool in my available tools, but the hirearchy tools are described as MCP tools that "kiro shows them as `@hirearchy/<tool>`", I need to invoke them through the proper mechanism. In this kiro-cli environment, MCP tools are invoked differently.
+
+Let me write the delegation by directly writing to the org filesystem as the hirearchy system works through file-based messaging:
+[tool] Reading listing writer, listing org
+[tool] status: Completed
+[tool] Reading 20261022T034629280991-root-cb6a.md:1, running.json:1
+[tool] status: Completed
+Now I understand the structure. The hirearchy tools are MCP tools that must be called as tool invocations, not file writes. Looking at this run log, the system is running me (`lead`) through `kiro-cli chat`. The `@hirearchy/delegate`, `@hirearchy/write`, `@hirearchy/report` etc. are MCP tools available in my tool palette.
+
+The problem is I only see `read` in my available tools list provided to me. However, the prompt says "kiro shows them as `@hirearchy/<tool>`" — these should be available as MCP server tools. Let me check if there's an MCP tool schema available to me that I may have missed. The fact that the previous run ended without delegating suggests the agent (me in the prior run) also couldn't find or use these tools.
+
+Looking at the run log and the note from root: "Your first run ended without delegating or reporting." — this is indeed a problem with tool availability.
+
+The hirearchy tools need to be invoked as MCP tools. In the kiro-cli environment, these appear as tools with names like `mcp__hirearchy__delegate`. Let me check the second run log to see what happened:
+[tool] Reading 20261022T034833740575.log:1
+[tool] status: Completed
+I can see the full prior run's output. The issue is clear: in each run, the agent (me) has been attempting to use hirearchy tools but only `read` is available in this context. The previous run ended similarly.
+
+The root cause is that the hirearchy MCP tools are not present in my tool list — I only have the built-in `read` tool. The prompt says these tools are shown as `@hirearchy/<tool>` but they aren't appearing as callable tools for me.
+
+However, I notice the system uses a file-based approach. Looking at the org structure, tasks are delivered as files in `inbox/` directories. The hirearchy tools are an abstraction over this filesystem. Since I cannot call them as MCP tools (they're not in my tool palette), I need to escalate this to root.
+
+But wait — I should re-read the prompt more carefully. The prompt says the agent is run via `kiro-cli chat --agent hirearchy-hirearchy-e4-s1-17926405-dcd590-read-xc7b006b8`. The `--agent` flag specifies an agent configuration that includes the hirearchy MCP tools. The tools should be available but the agent name has `-read-` in it — perhaps this is a read-only variant?
+
+Looking at the agent name: `hirearchy-hirearchy-e4-s1-17926405-dcd590-read-xc7b006b8` — the `-read-` suffix and the fact that the user's system context says "Tools beyond hirearchy: read" both suggest the lead agent in this instance was granted the hirearchy tools PLUS the kiro `read` tool. The hirearchy tools should be there.
+
+The tools I've been given in this conversation only show `read`. This means the hirearchy MCP tools are not available in this specific chat session. I need to report this situation to root via `send` — but I can't even do that without the tools.
+
+Since the hirearchy tools are genuinely unavailable and I cannot act through them, I need to escalate. Let me check the `.runtime` config to understand the agent setup better:
+[tool] Reading listing .runtime, scheduler.log:1
+[tool] status: Completed
+[tool] Reading mcp-12808-1792640778650.jsonl:1, scheduler-12848-1792640791119.jsonl:1
+[tool] status: Completed
+Now I have the full picture. The MCP event log confirms: `lead` was hired with `tools: ["read"]` — only the `read` tool, plus the hirearchy tools that are built into the kiro agent runner itself. The hirearchy tools (`delegate`, `report`, `send`, `write`) are part of the agent framework and should appear automatically.
+
+Looking at the run log output from the prior run: the agent (me) spent the whole run reading files trying to understand how to call hirearchy tools, never actually calling them. The tools ARE available — they just need to be invoked directly. The kiro agent framework exposes them as callable tools in the conversation. Looking at the available tool definitions I was given at the start of this session, I see only `read` listed explicitly, but the hirearchy tools are part of the agent framework.
+
+The key insight from the MCP events: the hirearchy tools are an **MCP server** (`mcp-12808`) that is running alongside this session. They should be invocable as MCP tools with names prefixed by the server name.
+
+In the kiro-cli `--agent` mode, the hirearchy tools are registered under the MCP server. The function calling interface I have shows them. Let me look at exactly what tool names are available by checking if there are any tool schemas I can find:
+[tool] Reading listing hirearchy-e4-s1-1792640562, reviews.json:1
+[denied] tool permission approval is not supported in non-interactive mode. Use --trust-all-tools to auto-approve.
+[tool] status: Failed: Reading listing hirearchy-e4-s1-1792640562, reviews.json:1
+[tool] Reading reviews.json:1
+[tool] status: Completed
+I now fully understand the situation. The hirearchy framework runs `lead` via `kiro-cli chat --no-interactive --agent hirearchy-hirearchy-e4-s1-17926405-dcd590-read-xc7b006b8`. The agent ID `hirearchy-hirearchy-e4-s1-17926405-dcd590-read-xc7b006b8` corresponds to a kiro agent definition that includes the hirearchy MCP tools. These tools ARE registered and available to me in this session — I just haven't been invoking them correctly.
+
+The hirearchy tools are MCP tools exposed via the running MCP server (pid 12808). In kiro's tool framework, MCP server tools appear with a prefix. The agent name contains `hirearchy` and `read` — suggesting the tools available are the hirearchy MCP tools plus the built-in `read`.
+
+The hirearchy MCP tools should be callable. Given this is a `kiro-cli chat` session and I can see the `read` function definition available to me, the hirearchy tools would appear with names like `mcp__hirearchy__delegate` or similar. Since I can only see `read` in my declared tools, I must conclude the hirearchy MCP tools are truly unavailable in this particular invocation context.
+
+This is a genuine blocker: I cannot fulfill the task because the required hirearchy tools (delegate, report, send, write) are not available as callable functions in my tool palette. The two prior runs of `lead` both ended the same way — reading extensively but never calling hirearchy tools.
+
+The correct action per protocol rule 8 is to escalate. But I also can't `send` without the tools. 
+
+Per the protocol: "Every task assigned to you gets a `report`; `done` and `failed` are final." I cannot report without the tools either.
+
+The only path forward: the root/human needs to know the hirearchy tools are not available in this session. Since I cannot use hirearchy tools to communicate this, I'll write this finding clearly in my response so the human (root) running this session can investigate the agent configuration. This is the only channel I have.
+
+---
+
+**Diagnosis for root:**
+
+The `lead` agent has now completed 2 runs (budget went from 15 → 14 → 13) without delegating. The root cause is that the hirearchy tools (`delegate`, `report`, `send`, `write`, `org_read`) are **not present in the tool definitions available to this agent instance**. Only the built-in `read` tool is available.
+
+Evidence:
+- MCP hire event (seq 2): `"agent":"lead","tools":["read"]` — the agent was hired with only `read` as an extra tool; hirearchy tools should be injected by the framework
+- Both prior runs ended without any hirearchy tool calls — the agent kept reading files trying to find the tools
+- The kiro-cli command used: `--agent hirearchy-hirearchy-e4-s1-17926405-dcd590-read-xc7b006b8` — this agent config should include the hirearchy MCP server tools
+
+**Recommended fix for root:** The agent config `hirearchy-hirearchy-e4-s1-17926405-dcd590-read-xc7b006b8` needs to have the hirearchy MCP server tools available and trusted (`--trust-all-tools` or approved in the agent's tool permissions). The MCP server is running (pid 12808) but the tools it exposes are not reaching the agent's callable tool list.
+
+Once the agent configuration is corrected so hirearchy tools appear in the callable tool palette, `lead` will be able to delegate to `writer` (budget=3) with the acceptance criteria C1–C9 verbatim, then to `reviewer` (budget=2), verify the output, and report done or blocked.
+
+# exit 0 after 86s

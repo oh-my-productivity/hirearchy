@@ -1,0 +1,20 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-22T20:19:27.574Z] call #27 turn 5 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-e4-s2-1792698851/deliverables && cp /tmp/hirearchy-e4-s2-1792698851/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e4-s2-1792698851/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-e4-s2-1792698851/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e4-s2-1792698851/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e4-s2-1792698851/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 87093b1 2026-10-22T21:15:33+01:00', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 87093b1 2026-10-22T21:15:33+01:00']
+result: Output:
+     141 /tmp/hirearchy-e4-s2-1792698851/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 805 mtime 21:19:27 local md5 9cb27425e3803054024e56888086b563
+
+final ls -la:
+total 8
+drwxr-xr-x@ 3 aminalizadeh  wheel   96 Oct 22 21:19 .
+drwxr-xr-x@ 7 aminalizadeh  wheel  224 Oct 22 21:19 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  805 Oct 22 21:19 memo-2026-10-05.md
+

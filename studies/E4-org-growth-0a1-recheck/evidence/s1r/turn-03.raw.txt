@@ -1,0 +1,44 @@
+I've updated the plan to 15 runs per memo and put the reader back. Here is the plan:
+
+PLAN FOR YOU
+Goal: Each week, after the Platform team weekly meeting, turn the meeting notes (one file per meeting) into a short memo for the team lead: what was decided and who does what. Nothing is added that is not in the notes.
+What I understood you need:
+- Scope: For one meeting's notes file: the decisions made, and every task someone was given or said they would do (explicit ACTION lines and informal commitments alike), with owner and due date. Nothing from other meetings and nothing outside the notes.
+- Your files (read-only): /tmp/hirearchy-e4-s1r-1792693447/notes
+- Quality bar: Every decision and every action is traceable to the notes file of that meeting; nothing is invented; where the notes are silent or unclear (owner, date), the memo says so.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-4.6 for 2 agents, claude-haiku-4.5 for 2 agents (lead and checker on claude-sonnet-4.6, all other agents on claude-haiku-4.5)
+Team (4 agents):
+- lead (Manager, model claude-sonnet-4.6): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-e4-s1r-1792693447/notes and the organization's own files; cannot change your files
+  - reader (Reader of the meeting notes, model claude-haiku-4.5): can read files only in /private/tmp/hirearchy-e4-s1r-1792693447/notes and the organization's own files; cannot change your files
+  - writer (Writer, model claude-haiku-4.5): can read /private/tmp/hirearchy-e4-s1r-1792693447/notes through the organization's read tool; cannot change your files
+  - checker (Independent Reviewer, model claude-sonnet-4.6): can read files only in /private/tmp/hirearchy-e4-s1r-1792693447/notes and the organization's own files; cannot change your files
+Budget: up to 15 runs per request (one run = one working session of one agent), your cap per request is 15; the minimum for one review and rework is 15. Unspent runs come back to you.
+  lead starts with 15, hands down reader 3, writer 3, checker 2 and keeps 7 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: checker reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-memo: One short memo (decisions, and a table of who does what) from one meeting's notes file
+  You provide: notes_file (required)
+  Each request: up to 15 runs
+  Checks:
+    1. Uses only the requested notes file and covers that meeting only.
+    2. At most 400 words as counted by read.
+    3. Has a Decisions section listing every decision made in the meeting, each in one line.
+    4. Has an action table with exactly the columns Owner | Action | Due, with one row for every task that someone was given or said they would do (explicit ACTION lines and informal commitments), and no row for anything else.
+    5. Every Due value is an ISO date (YYYY-MM-DD) or the word none when the notes give no date; a date stated only relatively (for example a weekday) is converted using the meeting date, and if it cannot be determined the value is none.
+    ... and 2 more (see the details)
+  Delivered to: /private/tmp/hirearchy-e4-s1r-1792693447/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+First request, started on approval: weekly-memo (notes_file: 2026-10-05.md).
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (1):
+- 15 runs per request leaves almost no slack over the estimate of 15; expect a stall on the first surprise
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+
+The two checks hidden under "... and 2 more" are:
+- Every statement is traceable to the notes file. Where an owner or date is unclear or missing, the memo says so briefly instead of guessing.
+- The checker's report shows every criterion met, and the writer applied every required change.
+
+15 runs is exactly the minimum for one pass plus one rework, so there's no slack. If something goes wrong, I'll ask you before spending more. Reply "approve" and I'll create the team and start the 2026-10-05 memo.

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_ef009da4-724c-40a7-bbbe-0d3a665b9aba",
+  "title": "Build Meeting Memo System With Hierarchy",
+  "agentMode": "hirearchy-hirearchy-e4-s3-17927050-8f0c59-read-x3d664e6e",
+  "workspacePaths": [
+    "/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e4-s3-17927050-8f0c59d32ad49337/lead-8cb33b27"
+  ],
+  "rootPaths": [
+    "/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e4-s3-17927050-8f0c59d32ad49337/lead-8cb33b27"
+  ],
+  "createdAt": "2026-10-22T22:09:10.673Z",
+  "lastModifiedAt": "2026-10-22T22:10:10.547Z",
+  "modelId": "claude-sonnet-4.6",
+  "autopilot": true,
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-sonnet-4.6",
+    "display": "Claude Sonnet 4.6"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "disabled",
+    "reflection": false
+  },
+  "memoryConfigSource": "explicit",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "disabled",
+          "reflection": false
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

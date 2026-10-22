@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_4dda2d94-c265-4104-a528-92b13e69c9e1",
+  "title": "Hirearchy run: you are `lead/writer`",
+  "agentMode": "hirearchy-hirearchy-e4-s2r-1792702-b0c5db-read-xb2bd0081",
+  "workspacePaths": [
+    "/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e4-s2r-1792702-b0c5db682e7e6ab7/lead-writer-17007687"
+  ],
+  "rootPaths": [
+    "/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e4-s2r-1792702-b0c5db682e7e6ab7/lead-writer-17007687"
+  ],
+  "createdAt": "2026-10-22T20:56:54.477Z",
+  "lastModifiedAt": "2026-10-22T20:57:52.041Z",
+  "modelId": "claude-haiku-4.5",
+  "autopilot": true,
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-haiku-4.5",
+    "display": "Claude Haiku 4.5"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "disabled",
+    "reflection": false
+  },
+  "memoryConfigSource": "explicit",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "disabled",
+          "reflection": false
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

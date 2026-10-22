@@ -1,0 +1,12 @@
+## model check: before turn 1 (started 2026-10-22T21:37:12Z)
+[2026-10-22T21:37:12Z] before turn 1 model=claude-sonnet-4.6 attempt=1 exit=0 reply=<<OK >> stderr=<<[INFO] kas.server.starting {"product":"KAS (Kiro Agent Server)","version":"0.66.48"} [INFO] Auth: KIRO_API_KEY env var (api_key) {"regionDiscovery":true} [INFO] acp.content_collection.resolved {"enabled":false} [INFO] acp.remote_sessions.enabled {"endpoint":"https://app.kiro.dev"} [INFO] [KiroAgent]>>
+  -> success
+[2026-10-22T21:37:30Z] before turn 1 model=claude-haiku-4.5 attempt=1 exit=0 reply=<<OK. >> stderr=<<[INFO] kas.server.starting {"product":"KAS (Kiro Agent Server)","version":"0.66.48"} [INFO] Auth: KIRO_API_KEY env var (api_key) {"regionDiscovery":true} [INFO] acp.content_collection.resolved {"enabled":false} [INFO] acp.remote_sessions.enabled {"endpoint":"https://app.kiro.dev"} [INFO] [KiroAgent]>>
+  -> success
+RESULT: before turn 1 both models OK (2026-10-22T21:37:46Z)
+## model check: before the injection (started 2026-10-22T21:50:48Z)
+[2026-10-22T21:50:48Z] before the injection model=claude-sonnet-4.6 attempt=1 exit=0 reply=<<OK. >> stderr=<<[INFO] kas.server.starting {"product":"KAS (Kiro Agent Server)","version":"0.66.48"} [INFO] Auth: KIRO_API_KEY env var (api_key) {"regionDiscovery":true} [INFO] acp.content_collection.resolved {"enabled":false} [INFO] acp.remote_sessions.enabled {"endpoint":"https://app.kiro.dev"} [INFO] [KiroAgent]>>
+  -> success
+[2026-10-22T21:51:05Z] before the injection model=claude-haiku-4.5 attempt=1 exit=0 reply=<<OK. >> stderr=<<[INFO] kas.server.starting {"product":"KAS (Kiro Agent Server)","version":"0.66.48"} [INFO] Auth: KIRO_API_KEY env var (api_key) {"regionDiscovery":true} [INFO] acp.content_collection.resolved {"enabled":false} [INFO] acp.remote_sessions.enabled {"endpoint":"https://app.kiro.dev"} [INFO] [KiroAgent]>>
+  -> success
+RESULT: before the injection both models OK (2026-10-22T21:51:22Z)

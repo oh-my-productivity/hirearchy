@@ -1,0 +1,19 @@
+######## TURN 1  start 04:43:06  end 04:43:40  elapsed 34s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T03:43:06Z end 2026-10-22T03:43:40Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-e4-s1-1792640562/notes (one file per meeting). Can you set up a team that does this for me every week?
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+Precondition: check hirearchy state, then services.Hirearchy is available and no team exists yet, so I'll set this up as a standing weekly service. I read your latest notes (19 Oct) to ask the right questions. Before I draft a plan, please answer these. You can reply "defaults" to accept everything I propose.
+
+1. **What changes each week:** the notes file for that meeting. Each week you'd tell me which file (e.g. `2026-10-26.md`). Everything else stays fixed. Is that right?
+2. **Sources:** only your notes in `/tmp/hirearchy-e4-s1-1792640562/notes`. No web. Default: yes.
+3. **Memo format and place:** markdown, at most 400 words, with two sections ("Decisions" and "Who does what"). I'd put each memo in a new `deliverables/` folder in `/tmp/hirearchy-e4-s1-1792640562`, named after the meeting date. Default: yes.
+4. **What counts as an item.** Your notes mix labelled and unlabelled items:
+   - Labelled "ACTION:" lines (e.g. "Marta to collect demo feedback by Oct 23").
+   - Commitments in plain prose (e.g. "Sam offered to pair with Jo on CI", "Lee will sign off the renewal once legal replies").
+   - Decisions in prose (demo goes ahead without the rate limiter, SSO renewal, meeting moves to 14:00).
+
+   Should the memo include informal prose items as well as the labelled ones? My default is yes, every decision and every commitment, labelled or not.
+5. **Vague dates** ("end of next week", "at the next meeting"). Should I turn them into a calendar date from the meeting date, or keep your wording and add no date? My default is to convert them to a date when the notes make it clear, and to leave the date blank (marked "no date given") when they don't.
+6. **Owners:** if someone's name isn't attached to a task, should the memo say "owner not stated" rather than guess? Default: yes.
+7. **Review, budget, models:** a second agent checks the memo against the notes (default: yes). All agents on claude-sonnet-5.5. Budget per memo is the plan's estimate plus 25%, which I'll show in the plan. Default: ok?
+8. **Approval:** I show you the plan first and build nothing until you approve. After that, you ask for a memo each week and I run it. I can't start it on a schedule by myself, so you'd need to ask me each week.

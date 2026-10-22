@@ -1,0 +1,20 @@
+{
+  "name": "hirearchy-study-e4-prep-1792693245",
+  "description": "internal: hirearchy usability study E4 harness-preparation profile (preflight-v3 load check only, no org); deleted at the end of the study",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "uv",
+      "args": ["--directory", "/Volumes/workspace/hirearchy", "run", "hirearchy", "mcp"],
+      "env": { "ORG_ROOT": "/tmp/hirearchy-e4-prep-1792693245/org" }
+    }
+  },
+  "tools": ["*"],
+  "permissions": { "rules": [ { "capability": "all", "effect": "allow" } ] },
+  "resources": [
+    "skill:///Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md",
+    "skill://.kiro/skills/*/SKILL.md"
+  ],
+  "hooks": [],
+  "includeMcpJson": false,
+  "model": "claude-sonnet-5.5"
+}

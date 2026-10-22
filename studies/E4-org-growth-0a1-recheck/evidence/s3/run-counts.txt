@@ -1,0 +1,74 @@
+=== final  snapshot 2026-10-22T22:34:46Z (local 23:34:46)
+injection window (UTC, from window.txt): 2026-10-22T21:51:28 .. 2026-10-22T21:56:27
+org runs total: 46  (injection-window runs: 5; counted toward the 45 cap: 41)
+  lead                           claude-sonnet-4.6    28
+  lead/reviewer                  claude-sonnet-4.6    9
+  lead/writer                    claude-haiku-4.5     9
+  run 20261022T214100476954 agent=lead model=claude-sonnet-4.6 exit=0 secs=54
+  run 20261022T214140761737 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=44
+  run 20261022T214219140105 agent=lead model=claude-sonnet-4.6 exit=0 secs=61
+  run 20261022T214309663549 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=91
+  run 20261022T214434352232 agent=lead model=claude-sonnet-4.6 exit=0 secs=44
+  run 20261022T214612887434 agent=lead model=claude-sonnet-4.6 exit=0 secs=71
+  run 20261022T214715450348 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=36
+  run 20261022T214743753465 agent=lead model=claude-sonnet-4.6 exit=0 secs=65
+  run 20261022T214838219224 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=57
+  run 20261022T214926680791 agent=lead model=claude-sonnet-4.6 exit=0 secs=38
+  run 20261022T215129101372 agent=lead model=claude-sonnet-4.6 exit=0 secs=111 [INJECTION WINDOW]
+  run 20261022T215309961059 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=44 [INJECTION WINDOW]
+  run 20261022T215346314449 agent=lead model=claude-sonnet-4.6 exit=0 secs=65 [INJECTION WINDOW]
+  run 20261022T215434728330 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=75 [INJECTION WINDOW]
+  run 20261022T215543270429 agent=lead model=claude-sonnet-4.6 exit=0 secs=44 [INJECTION WINDOW]
+  run 20261022T215730665781 agent=lead model=claude-sonnet-4.6 exit=running/none secs=None
+  run 20261022T215913204760 agent=lead model=claude-sonnet-4.6 exit=0 secs=121
+  run 20261022T220050148834 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=38
+  run 20261022T220122452335 agent=lead model=claude-sonnet-4.6 exit=0 secs=52
+  run 20261022T220158822062 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=79
+  run 20261022T220309387879 agent=lead model=claude-sonnet-4.6 exit=0 secs=44
+  run 20261022T220449446122 agent=lead model=claude-sonnet-4.6 exit=0 secs=56
+  run 20261022T220533760135 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=50
+  run 20261022T220620192001 agent=lead model=claude-sonnet-4.6 exit=0 secs=65
+  run 20261022T220712756658 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=113
+  run 20261022T220859737072 agent=lead model=claude-sonnet-4.6 exit=0 secs=73
+  run 20261022T221059196612 agent=lead model=claude-sonnet-4.6 exit=0 secs=87
+  run 20261022T221209892439 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=32
+  run 20261022T221238192747 agent=lead model=claude-sonnet-4.6 exit=0 secs=48
+  run 20261022T221316587386 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=81
+  run 20261022T221429357542 agent=lead model=claude-sonnet-4.6 exit=0 secs=48
+  run 20261022T221604879734 agent=lead model=claude-sonnet-4.6 exit=0 secs=54
+  run 20261022T221649245423 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=38
+  run 20261022T221721591399 agent=lead model=claude-sonnet-4.6 exit=0 secs=71
+  run 20261022T221820273013 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=44
+  run 20261022T221858697814 agent=lead model=claude-sonnet-4.6 exit=0 secs=61
+  run 20261022T221947175637 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=83
+  run 20261022T222103982980 agent=lead model=claude-sonnet-4.6 exit=0 secs=51
+  run 20261022T222238670453 agent=lead model=claude-sonnet-4.6 exit=0 secs=73
+  run 20261022T222341210592 agent=lead/writer model=claude-haiku-4.5 exit=0 secs=45
+  run 20261022T222421722229 agent=lead model=claude-sonnet-4.6 exit=0 secs=55
+  run 20261022T222504163070 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=212
+  run 20261022T222825986058 agent=lead model=claude-sonnet-4.6 exit=0 secs=64
+  run 20261022T222938655161 agent=lead model=claude-sonnet-4.6 exit=0 secs=97
+  run 20261022T223103321849 agent=lead/reviewer model=claude-sonnet-4.6 exit=0 secs=71
+  run 20261022T223208095829 agent=lead model=claude-sonnet-4.6 exit=0 secs=57
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  inbox/20261022T223256660054-lead-f190.md
+  lead/inbox/20261022T223346261203-root-f5e0.md
+  (2 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 23:03:58 size 1094 md5 4d0c561def5dad308ec7568bba3bf023
+  deliverables/memo-2026-10-12.md mtime 23:15:20 size 1103 md5 492f5f05fa8bfbf785e15ee30cc6a2c8
+  deliverables/memo-2026-10-19.md mtime 23:33:02 size 1025 md5 42d25e22e5ccdddefd36a68c753f73fe
+processes referencing the sandbox name (0):
+
+
+runs per user-turn window (UTC turn_start .. next turn_start / end):
+  during/after turn 4 start: 5 runs, lead-reviewer=claude-sonnet-4.6, lead-writer=claude-haiku-4.5, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6
+  during/after turn 5 start: 10 runs, lead-reviewer=claude-sonnet-4.6, lead-reviewer=claude-sonnet-4.6, lead-writer=claude-haiku-4.5, lead-writer=claude-haiku-4.5, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6
+  during/after turn 6 start: 1 runs, lead=claude-sonnet-4.6
+  during/after turn 7 start: 5 runs, lead-reviewer=claude-sonnet-4.6, lead-writer=claude-haiku-4.5, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6
+  during/after turn 8 start: 5 runs, lead-reviewer=claude-sonnet-4.6, lead-writer=claude-haiku-4.5, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6
+  during/after turn 9 start: 5 runs, lead-reviewer=claude-sonnet-4.6, lead-writer=claude-haiku-4.5, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6
+  during/after turn 10 start: 7 runs, lead-reviewer=claude-sonnet-4.6, lead-writer=claude-haiku-4.5, lead-writer=claude-haiku-4.5, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6
+  during/after turn 11 start: 8 runs, lead-reviewer=claude-sonnet-4.6, lead-reviewer=claude-sonnet-4.6, lead-writer=claude-haiku-4.5, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6, lead=claude-sonnet-4.6

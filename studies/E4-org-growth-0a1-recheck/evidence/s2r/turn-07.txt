@@ -1,0 +1,20 @@
+######## TURN 7  start 22:21:10  end 22:28:52  elapsed 462s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T21:21:10Z end 2026-10-22T21:28:52Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, fund it - but please keep an eye on the cost. Yes, add it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-07.stderr.txt):
+The rework is done and the reviewer passed it 9 of 9, but I haven't copied it to deliverables yet. The memo now starts with the Summary line, then Decisions, then the Action items. The team changed two other things you didn't ask for, and I'd like your call on them.
+
+- **Marta's due date:** it changed from 2026-10-14 to `none`. The notes say "book the on-call training room for Oct 14". The team read that as the training date rather than a booking deadline, which is defensible, but you only confirmed Sam's and Lee's dates.
+- **Extra section:** an "Open questions" section was added at the end, asking when Marta should book the room. You didn't request it.
+
+The Summary line also says flaky CI was identified as a "priority", which is a little stronger than the notes. Sam just said he'd look into it before Friday.
+
+The old version, without the Summary line, is still in `/tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md`. I'll replace it once you decide.
+
+Cost: this memo is at 19 runs against the 15 per memo, which is about 5 over what you approved. The team is stopped, so nothing more is spending.
+
+Options:
+1. **Accept as is.** It costs nothing more. The memo keeps Marta at `none` and the Open questions section.
+2. **Rework.** Marta goes back to 2026-10-14, the Open questions section goes, and the Summary wording is tightened. That's about 5 more runs, so roughly 24 of 15.
+
+I'd pick option 1 if you're happy with `none` for Marta. If you want 2026-10-14 back, say so and I'll start the rework.

@@ -1,0 +1,13 @@
+# lead prompt sizes (protocol 7.2): bytes between '# ---- prompt ----' and '# ---- output ----'
+
+lead@20261022T205535964994     bytes=20353 reflect_section=no reflect_words=0 regression_list=no
+lead@20261022T205738874755     bytes=23029 reflect_section=no reflect_words=0 regression_list=no
+lead@20261022T210243436527     bytes=25022 reflect_section=no reflect_words=0 regression_list=no
+lead@20261022T210454479230     bytes=23825 reflect_section=no reflect_words=0 regression_list=no
+lead@20261022T210737963878     bytes=24518 reflect_section=no reflect_words=0 regression_list=no
+lead@20261022T211158029103     bytes=21709 reflect_section=no reflect_words=0 regression_list=no
+lead@20261022T211525542150     bytes=25600 reflect_section=no reflect_words=0 regression_list=no
+lead@20261022T211853214312     bytes=26254 reflect_section=no reflect_words=0 regression_list=no
+lead@20261022T212137122059     bytes=27556 reflect_section=yes reflect_words=492 regression_list=yes
+lead@20261022T212446530767     bytes=26541 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261022T212730037912     bytes=27310 reflect_section=no reflect_words=0 regression_list=yes

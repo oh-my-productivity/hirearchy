@@ -1,0 +1,7 @@
+# s3 skill check (protocol 4.4)
+/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md: 573495bb613f19f7c07ce86508ebae4f 125 lines
+/tmp/hirearchy-e4-s3-1792705005/.kiro/skills/hirearchy/SKILL.md: 573495bb613f19f7c07ce86508ebae4f 125 lines
+/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md: 573495bb613f19f7c07ce86508ebae4f 125 lines
+first disclose_context(hirearchy): call #2, turn 1, 2026-10-22T21:38:24.313Z; disclosed uri file:///private/tmp/hirearchy-e4-s3-1792705005/.kiro/skills/hirearchy/SKILL.md (the workspace copy); md5 of the SKILL.md at that path: 573495bb613f19f7c07ce86508ebae4f = 573495bb613f19f7c07ce86508ebae4f -> valid.
+S17-5: 'Note: the installed skill at' occurrences in the whole transcript: 0
+stale-skill case: not exercised (would require changing the global skill, which is forbidden).

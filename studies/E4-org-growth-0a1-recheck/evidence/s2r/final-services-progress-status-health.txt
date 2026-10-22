@@ -1,0 +1,41 @@
+######## hirearchy --root /tmp/hirearchy-e4-s2r-1792702135/org services
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v3, playbook v2): One short memo (decisions and who does what) from one weekly meeting notes file
+  inputs: notes_file* (File name of the meeting notes in the notes folder, for example 2026-10-26.md)   (* required)
+  each request: 15 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Covers only the meeting in the named notes file and nothing else.
+    C2: At most 400 words as counted by read.
+    C3: The memo has a Decisions section and an Action items table with exactly the columns Owner | Action | Due.
+    C4: Every decision stated in the notes appears in the Decisions section.
+    C5: Every commitment in the notes, including informal ones in prose and ones without an ACTION label, is a row in the table with its owner.
+    C6: Every Due value is an ISO date (YYYY-MM-DD), converted from a vague deadline only when the notes make the date clear, otherwise none.
+    C7: Nothing in the memo is missing from or contradicts the notes.
+    C8: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C9: The memo starts with a one-line summary of the meeting that begins with 'Summary:' (after the title), then the Decisions section, then the Action items table, in that order.
+    C10: When the notes say a task is for a date (for example 'book the room for Oct 14'), that date is the task's Due.
+  record: 1 request(s): 1 done, 0 failed, 0 open; 1 reworked; avg 19 runs; feedback 0 accept, 1 reject
+  regression list (the client's rejections):
+    R1 (case 20261022T205531258713-root-f230, about C9): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+    R2 (case 20261022T205531258713-root-f230, about C10): "Not right yet: Marta's due should be 2026-10-14."
+  playbook v2 (2026-10-22): "R1 was about C9 (client rejected missing Summary line; criterion link 20261022T212136687899-root-b255 confirmed it). Ad…"
+
+######## hirearchy --root /tmp/hirearchy-e4-s2r-1792702135/org progress
+"Memo for 2026-10-05 meeting" [service weekly-meeting-memo v1]: done. runs 9 of 15 (6 returned). last activity 1m ago. artifacts: lead/writer/work/2026-10-05-memo.md. case total: 19 runs used of 36 handed down (contract: 15 per request). This case now exceeds the per-request budget of 15: tell the user. (task 20261022T205531258713-root-f230)
+"Rework memo 2026-10-05: unclear due dates" [service weekly-meeting-memo v1]: done. runs 5 of 6 (1 returned). last activity 1m ago. artifacts: lead/writer/work/2026-10-05-memo.md. case total: 19 runs used of 36 handed down (contract: 15 per request). This case now exceeds the per-request budget of 15: tell the user. (task 20261022T211157827631-root-43b8)
+"Memo for 2026-10-05 meeting (rework: add Summary line)" [service weekly-meeting-memo v1]: done. runs 5 of 15 (10 returned). last activity 1m ago. artifacts: lead/writer/work/2026-10-05-memo.md. case total: 19 runs used of 36 handed down (contract: 15 per request). This case now exceeds the per-request budget of 15: tell the user. (task 20261022T212050615269-root-342a)
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-e4-s2r-1792702135/org status
+root (human): unread 0, delegated 0
+  lead [Manager] idle  budget=0 open=0 delegated=0 unread=0 services: weekly-meeting-memo
+    reviewer [Independent Reviewer] idle  budget=0 open=0 delegated=0 unread=0
+    writer [Writer] idle  budget=0 open=0 delegated=0 unread=0
+
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-e4-s2r-1792702135/org health
+3 agents, 0 flagged
+lead idle, budget 0/42, runs 11, open 0, done 3 failed 0 blocked 0 rework 0 (+2 by the client), escapes 2 of 2 judged, re-checks after a FAIL 0 (author rework runs 0), runs/task 3.7, empty 0, last activity 4m ago | branch: runs 19, open 0, done 11, failed 0, blocked 0, rework 2, worst none
+  reviewer idle, budget 0/7, runs 4, open 0, done 4 failed 0 blocked 0 rework 1 (+2 by the client), escapes 2 of 2 judged, re-checks after a FAIL 1 (author rework runs 1), runs/task 1.0, empty 0, last activity 5m ago
+  writer idle, budget 0/7, runs 4, open 0, done 4 failed 0 blocked 0 rework 1 (+2 by the client), runs/task 1.0, empty 0, last activity 7m ago
+

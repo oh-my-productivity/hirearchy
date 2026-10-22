@@ -1,0 +1,12 @@
+The 12 October memo is written, and I haven't copied it to `deliverables` yet. I have one question and one error to fix.
+
+Question for you: the memo ends with a "Next meeting: Monday 19 October" line, which comes from the notes. Your approved 5 October memo had the same line, so I'd keep it. Keep it, or remove it?
+
+The error: the Summary line says "four action items", but the table has five rows (Dev, Marta, Priya, Sam, Lee). I'll send it back to the team to fix the count, and I won't edit it myself. I'll do that in one rework together with your answer on the footer, which should cost about 5 runs. This request has used 5 of its 15.
+
+The rest of the memo checks out against the notes:
+- **Decisions:** it lists all four: the RFC approved with the per-key token bucket, shipping behind a feature flag, a blameless company-wide postmortem, and the deploy freeze on 22 and 23 October.
+- **Table:** it has five rows, in the Owner | Action | Due columns.
+- **Due dates:** Dev is 2026-10-14, Marta 2026-10-16, Priya 2026-10-20 and Lee `none`.
+- **Sam's date:** it's 2026-10-21. He said the test data would be ready the day before the freeze starts, and the freeze starts 22 October.
+- **Length:** 196 words by `wc -w`.

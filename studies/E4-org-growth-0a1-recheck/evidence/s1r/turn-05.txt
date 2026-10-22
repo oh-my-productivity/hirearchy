@@ -1,0 +1,16 @@
+######## TURN 5  start 19:58:10  end 19:59:11  elapsed 61s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T18:58:10Z end 2026-10-22T18:59:11Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09, not 'none'. And always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-05.stderr.txt):
+I've changed the standing rules, but I haven't spent any runs on a redo yet. I need two answers from you.
+
+One correction on Sam's row: the memo had 2026-10-08 for his item, not "none". You're right that the date should be 2026-10-09, because "before Friday" means that Friday.
+
+I've updated the weekly-memo contract (now v2) so it applies to every future memo:
+- **C8:** The memo's first line is a one-line "Summary:" of the meeting. The Decisions section comes next, then the action table. There is no title heading.
+- **C9:** "none" is allowed only when the notes give no deadline wording at all. A deadline like "before Friday" is converted to that day's ISO date, so Sam's row would be 2026-10-09.
+
+The memo is also logged as rejected, with your words and a note pointing at the date rule.
+
+1. Should C8 and C9 be lasting rules for all future memos? Yes or no? I applied them because you said "always", but the system wants your explicit yes before I treat them as permanent.
+2. Do you want the redo of the 2026-10-05 memo now? The first memo used 13 of your 15 runs. A rework (writer, checker and lead) would take roughly 5 to 6 more, so this memo would total about 18 to 19, above your cap of 15. Do you approve that extra spend, up to 6 runs? If you'd rather not, I can leave the memo as is. Future memos will follow the new rules at 15 runs each.

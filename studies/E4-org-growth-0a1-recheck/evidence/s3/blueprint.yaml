@@ -1,0 +1,48 @@
+mission: >
+  Write a short memo after each weekly team meeting from the user's meeting notes: what was decided and who does what.
+needs:
+  kind: writing
+  scope: "One memo per meeting, from that meeting's notes file only. Contents: the decisions made, and the action items (everyone who said they would do something, including informal commitments in prose). Nothing else."
+  inputs:
+    - /tmp/hirearchy-e4-s3-1792705005/notes
+  quality_bar: Every decision and action item comes from the notes file; nothing is invented.
+  sources: Only the files in the notes folder; no web.
+  budget_runs: 15
+  models: {cheap: claude-haiku-4.5, strong: claude-sonnet-4.6}
+  model_policy: "Lead and reviewer on claude-sonnet-4.6; everyone else on claude-haiku-4.5 (cheaper models, as the user asked)."
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {name: writer, template: writer, model: cheap}
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]
+services:
+  - name: weekly-memo
+    owner: lead
+    description: One short memo (decisions and action items) from one meeting's notes file
+    inputs:
+      - name: notes_file
+        description: File name of the meeting notes in the notes folder, for example 2026-10-19.md
+        required: true
+    acceptance:
+      - The memo is markdown and has at most 400 words as counted by read.
+      - It covers only the meeting in the given notes file.
+      - It has a Decisions section that lists every decision recorded in the notes file and no decision that is not in the notes.
+      - It has an action-items table with exactly the columns Owner | Action | Due, with one row for every commitment in the notes, including informal ones where a person said in prose that they would do something, and no row that is not in the notes.
+      - Every Due value is an ISO date (YYYY-MM-DD) or none. A relative deadline (for example next week, next meeting) becomes a date only when the notes make the date clear; otherwise Due is none. No date is guessed.
+      - Every owner name matches the person named in the notes.
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: One markdown memo named memo-<meeting date>.md
+      format: markdown
+      max_words: 400
+      path: /tmp/hirearchy-e4-s3-1792705005/deliverables
+    budget: 15
+    locked: false

@@ -1,0 +1,11 @@
+{
+  "name": "hirearchy-study-e4-diag",
+  "description": "internal: hirearchy usability study E4 diagnostic profile (env pass-through check); deleted right after",
+  "prompt": "Answer briefly.",
+  "mcpServers": { "hirearchy": { "command": "/bin/sh", "args": ["-c", "env | grep -E '^(ORG_|KIRO|HOME=)' | sed 's/KIRO_API_KEY=.*/KIRO_API_KEY=<redacted>/' > /tmp/hirearchy-e4-diag/mcp-env.txt; date -u >> /tmp/hirearchy-e4-diag/mcp-env.txt; exec /Volumes/workspace/hirearchy/.venv/bin/hirearchy mcp"], "env": { "ORG_ROOT": "/tmp/hirearchy-e4-diag/org", "ORG_REQUIRE_AGENT": "1" } } },
+  "tools": ["@hirearchy", "read"],
+  "allowedTools": ["@hirearchy"],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false
+}

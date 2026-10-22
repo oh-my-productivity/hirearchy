@@ -1,0 +1,66 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-22T21:50:04.184Z] call #29 turn 5 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-e4-s3-1792705005/deliverables && cp /tmp/hirearchy-e4-s3-1792705005/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-e4-s3-1792705005/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-05.md && ls -la /tmp/hirearchy-e4-s3-1792705005/deliverables && grep -E 'Sam|Marta' /tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: a526bb3 2026-10-22T22:47:51+01:00', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: a526bb3 2026-10-22T22:47:51+01:00']
+result: Output:
+total 8
+drwxr-xr-x@ 3 aminalizadeh  wheel    96 Oct 22 22:50 .
+drwxr-xr-x@ 6 aminalizadeh  wheel   192 Oct 22 22:50 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  1030 Oct 22 22:50 memo-2026-10-05.md
+| Sam | Investigate flaky CI (suspected shared build cache) | 2026-10-09 |
+| Marta | Book on-call training room for Oct 14 (capacity: 8 people with screen) | 2026-10-14 |
+
+
+Exit Code: 0
+
+[2026-10-22T22:03:58.863Z] call #54 turn 7 execute_bash
+COMMAND: cp /tmp/hirearchy-e4-s3-1792705005/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-e4-s3-1792705005/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-05.md && echo same && head -1 /tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-05.md && ls /tmp/hirearchy-e4-s3-1792705005/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: b7f937f 2026-10-22T23:01:28+01:00', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: b7f937f 2026-10-22T23:01:28+01:00']
+result: Output:
+same
+Summary: Platform team decided to delay the API gateway migration to late October and adopt Renovate for dependency management.
+memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-22T22:15:20.879Z] call #72 turn 9 execute_bash
+COMMAND: cp /tmp/hirearchy-e4-s3-1792705005/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-12.md && cmp /tmp/hirearchy-e4-s3-1792705005/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-12.md && echo same && ls /tmp/hirearchy-e4-s3-1792705005/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 6b9d503 2026-10-22T23:12:42+01:00', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 6b9d503 2026-10-22T23:12:42+01:00']
+result: Output:
+same
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-22T22:33:02.155Z] call #87 turn 11 execute_bash
+COMMAND: cd /tmp/hirearchy-e4-s3-1792705005/org && grep -h "criteria met" lead/reviewer/work/review-memo-2026-10-19-task00e8.md | tail -3; cp lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-19.md && cmp lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-19.md && echo same && ls /tmp/hirearchy-e4-s3-1792705005/deliverables
+source file(s): not found in the command
+result: Output:
+- This report shows criteria met: 8 of 8 (all met). ✓
+| C7 | Reviewer report shows all criteria met | MET |
+**criteria met: 8 of 8**
+same
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 1094 mtime 23:03:58 local md5 4d0c561def5dad308ec7568bba3bf023
+  memo-2026-10-12.md size 1103 mtime 23:15:20 local md5 492f5f05fa8bfbf785e15ee30cc6a2c8
+  memo-2026-10-19.md size 1025 mtime 23:33:02 local md5 42d25e22e5ccdddefd36a68c753f73fe
+
+final ls -la:
+total 24
+drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 22 23:33 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 22 22:51 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  1094 Oct 22 23:03 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1103 Oct 22 23:15 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1025 Oct 22 23:33 memo-2026-10-19.md
+

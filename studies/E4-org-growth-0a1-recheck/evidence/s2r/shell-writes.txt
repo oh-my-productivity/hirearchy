@@ -1,0 +1,30 @@
+# shell writes (protocol 7.2): every execute_bash call of the assistant; facts only
+
+[2026-10-22T21:08:49.720Z] call #19 turn 4 status=completed flags=['touches S/org']
+COMMAND: find /tmp/hirearchy-e4-s2r-1792702135/org -name "2026-10-05-memo.md" -path "*writer*" | head; 
+RESULT: Output:
+/tmp/hirearchy-e4-s2r-1792702135/org/lead/writer/work/2026-10-05-memo.md
+
+
+Exit Code: 0
+
+[2026-10-22T21:10:11.388Z] call #24 turn 5 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: mkdir -p /tmp/hirearchy-e4-s2r-1792702135/deliverables && cp /tmp/hirearchy-e4-s2r-1792702135/org/lead/writer/work/2026-10-05-memo.md /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md && diff /tmp/hirearchy-e4-s2r-1792702135/org/lead/writer/work/2026-10-05-memo.md /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md && echo identical && wc -w /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md
+RESULT: Output:
+identical
+     180 /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md
+
+
+Exit Code: 0
+
+[2026-10-22T21:29:46.486Z] call #38 turn 8 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /tmp/hirearchy-e4-s2r-1792702135/org/lead/writer/work/2026-10-05-memo.md /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md && diff /tmp/hirearchy-e4-s2r-1792702135/org/lead/writer/work/2026-10-05-memo.md /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md && echo identical && grep -n "Summary:\|Marta" /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md
+RESULT: Output:
+identical
+3:Summary: Deferred API gateway migration to the week of 26 October, adopted Renovate for weekly dependency updates, and identified flaky CI investigation as a priority before Friday.
+18:| Marta | Book on-call training room for eight people with screen | none |
+24:- Marta / training room booking: Oct 14 is the training date; no booking deadline stated — when should the room be booked by?
+
+
+Exit Code: 0
+

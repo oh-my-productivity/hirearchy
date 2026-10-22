@@ -1,0 +1,14 @@
+Both match the memo as it stands, so there's nothing to rework. I'll copy it to the deliverables folder and check the copy.The memo is at `/tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md`. The copy is identical to the team's file.
+
+- Covers only the 5 October meeting: met
+- At most 400 words: met (148 by the lead's count, 180 by a raw `wc`)
+- Decisions section plus an Action items table with columns Owner | Action | Due: met
+- Every decision in the notes is listed (4 of 4): met
+- Every commitment is a table row with its owner (5 of 5, including Sam's and Lee's informal ones): met
+- Due values are ISO dates or none: met, with Sam at 2026-10-09 and Lee at none, as you confirmed
+- Nothing missing from or contradicting the notes: met
+- Reviewer's final report shows all criteria met (7 of 7): met
+
+The team used 9 of the 15 approved runs, which includes one rework. The reviewer's first pass found a missing SSO decision and an unconverted "before Friday" date, and both were fixed.
+
+Keep it, or should anything change?

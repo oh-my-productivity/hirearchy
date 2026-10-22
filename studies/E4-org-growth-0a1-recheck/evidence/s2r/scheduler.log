@@ -1,0 +1,50 @@
+
+# --- scheduler started 2026-10-22 20:55:35Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s2r-1792702135/org run --until-done
+org: /private/tmp/hirearchy-e4-s2r-1792702135/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 70s
+lead: started run (1 message(s))
+lead/writer: run finished in 87s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 111s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 230s
+lead/writer: started run (1 message(s))
+lead: run finished in 77s
+lead: started run (1 message(s))
+lead/writer: run finished in 91s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 87s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 109s
+lead: run finished in 81s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 21:11:57Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s2r-1792702135/org run --until-done
+org: /private/tmp/hirearchy-e4-s2r-1792702135/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 137s
+lead: started run (1 message(s))
+lead/writer: run finished in 99s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 103s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 151s
+lead: run finished in 61s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 21:21:36Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s2r-1792702135/org run --max-runs 7 --until-done
+org: /private/tmp/hirearchy-e4-s2r-1792702135/org
+lead: started run (4 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 171s
+lead: started run (1 message(s))
+lead/writer: run finished in 38s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 57s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 125s
+lead: run finished in 68s
+scheduler exiting: finished: no open tasks

@@ -1,0 +1,4182 @@
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T214057425390-root-88b2
+trace 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" -> lead: done  [partial]
+     +0s  root -> lead task "Memo for 2026-10-05 meeting" +15 run(s)
+     +0s  root request ok
+     +3s    run 20261022T214100476954 ok, ran 54s, queued 3.1s, 2 call(s) [delegate×1 write×1]
+    +42s    lead -> lead/writer task "Write memo for 2026-10-05 meeting" +3 run(s)
+    +43s      run 20261022T214140761737 ok, ran 44s, queued 1.3s, 5 call(s) [read×2 write×2 report×1]
+  +1m20s      lead/writer -> lead result (done) "Write memo for 2026-10-05 meeting" +2 run(s)
+  +1m21s    run 20261022T214219140105 ok, ran 1m01s, queued 848ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m10s    lead -> lead/reviewer task "Review memo-2026-10-05.md against all criteria" +2 run(s)
+  +2m12s      run 20261022T214309663549 ok, ran 1m31s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m34s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against all criteria" +1 run(s)
+  +3m36s    run 20261022T214434352232 ok, ran 44s, queued 2.0s, 4 call(s) [org_read×2 report×1 write×1]
+  +4m11s    lead -> root result (done) "Memo for 2026-10-05 meeting" +10 run(s)
+  +5m15s  root -> lead task "Memo for 2026-10-05: fix two Due dates" +15 run(s)
+  +5m15s  root request ok
+  +5m15s    run 20261022T214612887434 ok, ran 1m11s, queued 248ms, 9 call(s) [org_read×7 delegate×1 write×1]
+  +6m17s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md" +2 run(s)
+  +6m18s      run 20261022T214715450348 ok, ran 36s, queued 536ms, 5 call(s) [read×2 write×2 report×1]
+  +6m46s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md" +1 run(s)
+  +6m46s    run 20261022T214743753465 ok, ran 1m05s, queued 90ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +7m39s    lead -> lead/reviewer task "Review memo-2026-10-05.md (rework: two Due-date fixes)" +2 run(s)
+  +7m40s      run 20261022T214838219224 ok, ran 57s, queued 1.7s, 4 call(s) [write×2 org_read×1 report×1]
+  +8m28s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md (rework: two Due-date fixes)" +1 run(s)
+  +8m29s    run 20261022T214926680791 ok, ran 38s, queued 908ms, 4 call(s) [org_read×2 report×1 write×1]
+  +8m57s    lead -> root result (done) "Memo for 2026-10-05: fix two Due dates" +10 run(s)
+ +10m31s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+ +10m31s  root request ok
+ +10m31s    run 20261022T215129101372 ok, ran 1m51s, queued 218ms, 8 call(s) [org_read×6 delegate×1 write×1]
+ +12m11s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md (second rework)" +1 run(s)
+ +12m12s      run 20261022T215309961059 ok, ran 44s, queued 857ms, 6 call(s) [read×3 write×2 report×1]
+ +12m48s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md (second rework)"
+ +12m48s    run 20261022T215346314449 ok, ran 1m05s, queued 128ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +13m36s    lead -> lead/reviewer task "Re-check memo-2026-10-05.md after second rework" +1 run(s)
+ +13m37s      run 20261022T215434728330 ok, ran 1m15s, queued 576ms, 4 call(s) [write×2 org_read×1 report×1]
+ +14m45s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-05.md after second rework"
+ +14m45s    run 20261022T215543270429 ok, ran 44s, queued 607ms, 3 call(s) [org_read×1 report×1 write×1]
+ +15m21s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +16m32s  root -> lead note "feedback on "Memo for 2026-10-05: fix two Due dates": reject"
+ +16m32s  root feedback ok
+ +16m32s  root -> lead task "Memo for 2026-10-05: add Summary line" +15 run(s)
+ +16m33s  root request ok
+ +16m33s    run 20261022T215730665781 killed, ran 10s, queued 301ms, 0 call(s), error: interrupted by scheduler shutdown
+ +17m39s  root -> lead note "criterion link on "Memo for 2026-10-05: fix two Due dates":…"
+ +17m39s  root feedback ok
+ +18m15s  ~root -> lead note "Correction for the Summary rework (task ...ff36): user's fi…"
+ +18m15s    run 20261022T215913204760 ok, ran 2m01s, queued 1m43s, 5 call(s) [revise_playbook×2 delegate×1 org_read×1 write×1], 1 refused
+              ! revise_playbook: unknown evidence for `weekly-memo`: 20261022T215837117856-root-1fb7. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8), a regression assertion (R1), or the id of a verdict or a case of this se…
+ +19m51s    lead -> lead/writer task "Write memo-2026-10-05.md with Summary line, corrected Due d…" +3 run(s)
+ +19m52s      run 20261022T220050148834 ok, ran 38s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+ +20m24s      lead/writer -> lead result (done) "Write memo-2026-10-05.md with Summary line, corrected Due d…" +2 run(s)
+ +20m25s    run 20261022T220122452335 ok, ran 52s, queued 723ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +21m00s    lead -> lead/reviewer task "Review memo-2026-10-05.md against C1–C8 and regression list" +2 run(s)
+ +21m01s      run 20261022T220158822062 ok, ran 1m19s, queued 880ms, 4 call(s) [write×2 org_read×1 report×1]
+ +22m10s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against C1–C8 and regression list" +1 run(s)
+ +22m11s    run 20261022T220309387879 ok, ran 44s, queued 1.2s, 3 call(s) [org_read×1 report×1 write×1]
+ +22m47s    lead -> root result (done) "Memo for 2026-10-05: add Summary line" +9 run(s)
+ +23m47s  root -> lead note "feedback on "Memo for 2026-10-05: add Summary line": accept"
+ +23m47s  root feedback ok
+tasks: 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" done 5 run(s) | 20261022T214612649634-root-4510 "Memo for 2026-10-05: fix two…" done 5 run(s) | 20261022T215128895860-root-fe20 "Rework memo 2026-10-05: uncle…" done 5 run(s) | 20261022T215730424416-root-ff36 "Memo for 2026-10-05: add Summ…" done 6 run(s)
+totals: wall 22m48s | runs 21 (budget given 51, returned 30) | run time 20m45s | queue 2m02s | waiting on you 0s | tool calls 587 (1 refused)
+note: 1 message(s) have no recorded trace: their request was derived from reply_to/revises/open tasks (marked ~)
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T214612649634-root-4510
+trace 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" -> lead: done  [partial]
+     +0s  root -> lead task "Memo for 2026-10-05 meeting" +15 run(s)
+     +0s  root request ok
+     +3s    run 20261022T214100476954 ok, ran 54s, queued 3.1s, 2 call(s) [delegate×1 write×1]
+    +42s    lead -> lead/writer task "Write memo for 2026-10-05 meeting" +3 run(s)
+    +43s      run 20261022T214140761737 ok, ran 44s, queued 1.3s, 5 call(s) [read×2 write×2 report×1]
+  +1m20s      lead/writer -> lead result (done) "Write memo for 2026-10-05 meeting" +2 run(s)
+  +1m21s    run 20261022T214219140105 ok, ran 1m01s, queued 848ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m10s    lead -> lead/reviewer task "Review memo-2026-10-05.md against all criteria" +2 run(s)
+  +2m12s      run 20261022T214309663549 ok, ran 1m31s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m34s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against all criteria" +1 run(s)
+  +3m36s    run 20261022T214434352232 ok, ran 44s, queued 2.0s, 4 call(s) [org_read×2 report×1 write×1]
+  +4m11s    lead -> root result (done) "Memo for 2026-10-05 meeting" +10 run(s)
+  +5m15s  root -> lead task "Memo for 2026-10-05: fix two Due dates" +15 run(s)
+  +5m15s  root request ok
+  +5m15s    run 20261022T214612887434 ok, ran 1m11s, queued 248ms, 9 call(s) [org_read×7 delegate×1 write×1]
+  +6m17s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md" +2 run(s)
+  +6m18s      run 20261022T214715450348 ok, ran 36s, queued 536ms, 5 call(s) [read×2 write×2 report×1]
+  +6m46s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md" +1 run(s)
+  +6m46s    run 20261022T214743753465 ok, ran 1m05s, queued 90ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +7m39s    lead -> lead/reviewer task "Review memo-2026-10-05.md (rework: two Due-date fixes)" +2 run(s)
+  +7m40s      run 20261022T214838219224 ok, ran 57s, queued 1.7s, 4 call(s) [write×2 org_read×1 report×1]
+  +8m28s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md (rework: two Due-date fixes)" +1 run(s)
+  +8m29s    run 20261022T214926680791 ok, ran 38s, queued 908ms, 4 call(s) [org_read×2 report×1 write×1]
+  +8m57s    lead -> root result (done) "Memo for 2026-10-05: fix two Due dates" +10 run(s)
+ +10m31s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+ +10m31s  root request ok
+ +10m31s    run 20261022T215129101372 ok, ran 1m51s, queued 218ms, 8 call(s) [org_read×6 delegate×1 write×1]
+ +12m11s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md (second rework)" +1 run(s)
+ +12m12s      run 20261022T215309961059 ok, ran 44s, queued 857ms, 6 call(s) [read×3 write×2 report×1]
+ +12m48s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md (second rework)"
+ +12m48s    run 20261022T215346314449 ok, ran 1m05s, queued 128ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +13m36s    lead -> lead/reviewer task "Re-check memo-2026-10-05.md after second rework" +1 run(s)
+ +13m37s      run 20261022T215434728330 ok, ran 1m15s, queued 576ms, 4 call(s) [write×2 org_read×1 report×1]
+ +14m45s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-05.md after second rework"
+ +14m45s    run 20261022T215543270429 ok, ran 44s, queued 607ms, 3 call(s) [org_read×1 report×1 write×1]
+ +15m21s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +16m32s  root -> lead note "feedback on "Memo for 2026-10-05: fix two Due dates": reject"
+ +16m32s  root feedback ok
+ +16m32s  root -> lead task "Memo for 2026-10-05: add Summary line" +15 run(s)
+ +16m33s  root request ok
+ +16m33s    run 20261022T215730665781 killed, ran 10s, queued 301ms, 0 call(s), error: interrupted by scheduler shutdown
+ +17m39s  root -> lead note "criterion link on "Memo for 2026-10-05: fix two Due dates":…"
+ +17m39s  root feedback ok
+ +18m15s  ~root -> lead note "Correction for the Summary rework (task ...ff36): user's fi…"
+ +18m15s    run 20261022T215913204760 ok, ran 2m01s, queued 1m43s, 5 call(s) [revise_playbook×2 delegate×1 org_read×1 write×1], 1 refused
+              ! revise_playbook: unknown evidence for `weekly-memo`: 20261022T215837117856-root-1fb7. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8), a regression assertion (R1), or the id of a verdict or a case of this se…
+ +19m51s    lead -> lead/writer task "Write memo-2026-10-05.md with Summary line, corrected Due d…" +3 run(s)
+ +19m52s      run 20261022T220050148834 ok, ran 38s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+ +20m24s      lead/writer -> lead result (done) "Write memo-2026-10-05.md with Summary line, corrected Due d…" +2 run(s)
+ +20m25s    run 20261022T220122452335 ok, ran 52s, queued 723ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +21m00s    lead -> lead/reviewer task "Review memo-2026-10-05.md against C1–C8 and regression list" +2 run(s)
+ +21m01s      run 20261022T220158822062 ok, ran 1m19s, queued 880ms, 4 call(s) [write×2 org_read×1 report×1]
+ +22m10s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against C1–C8 and regression list" +1 run(s)
+ +22m11s    run 20261022T220309387879 ok, ran 44s, queued 1.2s, 3 call(s) [org_read×1 report×1 write×1]
+ +22m47s    lead -> root result (done) "Memo for 2026-10-05: add Summary line" +9 run(s)
+ +23m47s  root -> lead note "feedback on "Memo for 2026-10-05: add Summary line": accept"
+ +23m47s  root feedback ok
+tasks: 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" done 5 run(s) | 20261022T214612649634-root-4510 "Memo for 2026-10-05: fix two…" done 5 run(s) | 20261022T215128895860-root-fe20 "Rework memo 2026-10-05: uncle…" done 5 run(s) | 20261022T215730424416-root-ff36 "Memo for 2026-10-05: add Summ…" done 6 run(s)
+totals: wall 22m48s | runs 21 (budget given 51, returned 30) | run time 20m45s | queue 2m02s | waiting on you 0s | tool calls 587 (1 refused)
+note: 20261022T214612649634-root-4510 belongs to the request 20261022T214057425390-root-88b2; showing that
+note: 1 message(s) have no recorded trace: their request was derived from reply_to/revises/open tasks (marked ~)
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T215128895860-root-fe20
+trace 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" -> lead: done  [partial]
+     +0s  root -> lead task "Memo for 2026-10-05 meeting" +15 run(s)
+     +0s  root request ok
+     +3s    run 20261022T214100476954 ok, ran 54s, queued 3.1s, 2 call(s) [delegate×1 write×1]
+    +42s    lead -> lead/writer task "Write memo for 2026-10-05 meeting" +3 run(s)
+    +43s      run 20261022T214140761737 ok, ran 44s, queued 1.3s, 5 call(s) [read×2 write×2 report×1]
+  +1m20s      lead/writer -> lead result (done) "Write memo for 2026-10-05 meeting" +2 run(s)
+  +1m21s    run 20261022T214219140105 ok, ran 1m01s, queued 848ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m10s    lead -> lead/reviewer task "Review memo-2026-10-05.md against all criteria" +2 run(s)
+  +2m12s      run 20261022T214309663549 ok, ran 1m31s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m34s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against all criteria" +1 run(s)
+  +3m36s    run 20261022T214434352232 ok, ran 44s, queued 2.0s, 4 call(s) [org_read×2 report×1 write×1]
+  +4m11s    lead -> root result (done) "Memo for 2026-10-05 meeting" +10 run(s)
+  +5m15s  root -> lead task "Memo for 2026-10-05: fix two Due dates" +15 run(s)
+  +5m15s  root request ok
+  +5m15s    run 20261022T214612887434 ok, ran 1m11s, queued 248ms, 9 call(s) [org_read×7 delegate×1 write×1]
+  +6m17s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md" +2 run(s)
+  +6m18s      run 20261022T214715450348 ok, ran 36s, queued 536ms, 5 call(s) [read×2 write×2 report×1]
+  +6m46s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md" +1 run(s)
+  +6m46s    run 20261022T214743753465 ok, ran 1m05s, queued 90ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +7m39s    lead -> lead/reviewer task "Review memo-2026-10-05.md (rework: two Due-date fixes)" +2 run(s)
+  +7m40s      run 20261022T214838219224 ok, ran 57s, queued 1.7s, 4 call(s) [write×2 org_read×1 report×1]
+  +8m28s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md (rework: two Due-date fixes)" +1 run(s)
+  +8m29s    run 20261022T214926680791 ok, ran 38s, queued 908ms, 4 call(s) [org_read×2 report×1 write×1]
+  +8m57s    lead -> root result (done) "Memo for 2026-10-05: fix two Due dates" +10 run(s)
+ +10m31s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+ +10m31s  root request ok
+ +10m31s    run 20261022T215129101372 ok, ran 1m51s, queued 218ms, 8 call(s) [org_read×6 delegate×1 write×1]
+ +12m11s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md (second rework)" +1 run(s)
+ +12m12s      run 20261022T215309961059 ok, ran 44s, queued 857ms, 6 call(s) [read×3 write×2 report×1]
+ +12m48s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md (second rework)"
+ +12m48s    run 20261022T215346314449 ok, ran 1m05s, queued 128ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +13m36s    lead -> lead/reviewer task "Re-check memo-2026-10-05.md after second rework" +1 run(s)
+ +13m37s      run 20261022T215434728330 ok, ran 1m15s, queued 576ms, 4 call(s) [write×2 org_read×1 report×1]
+ +14m45s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-05.md after second rework"
+ +14m45s    run 20261022T215543270429 ok, ran 44s, queued 607ms, 3 call(s) [org_read×1 report×1 write×1]
+ +15m21s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +16m32s  root -> lead note "feedback on "Memo for 2026-10-05: fix two Due dates": reject"
+ +16m32s  root feedback ok
+ +16m32s  root -> lead task "Memo for 2026-10-05: add Summary line" +15 run(s)
+ +16m33s  root request ok
+ +16m33s    run 20261022T215730665781 killed, ran 10s, queued 301ms, 0 call(s), error: interrupted by scheduler shutdown
+ +17m39s  root -> lead note "criterion link on "Memo for 2026-10-05: fix two Due dates":…"
+ +17m39s  root feedback ok
+ +18m15s  ~root -> lead note "Correction for the Summary rework (task ...ff36): user's fi…"
+ +18m15s    run 20261022T215913204760 ok, ran 2m01s, queued 1m43s, 5 call(s) [revise_playbook×2 delegate×1 org_read×1 write×1], 1 refused
+              ! revise_playbook: unknown evidence for `weekly-memo`: 20261022T215837117856-root-1fb7. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8), a regression assertion (R1), or the id of a verdict or a case of this se…
+ +19m51s    lead -> lead/writer task "Write memo-2026-10-05.md with Summary line, corrected Due d…" +3 run(s)
+ +19m52s      run 20261022T220050148834 ok, ran 38s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+ +20m24s      lead/writer -> lead result (done) "Write memo-2026-10-05.md with Summary line, corrected Due d…" +2 run(s)
+ +20m25s    run 20261022T220122452335 ok, ran 52s, queued 723ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +21m00s    lead -> lead/reviewer task "Review memo-2026-10-05.md against C1–C8 and regression list" +2 run(s)
+ +21m01s      run 20261022T220158822062 ok, ran 1m19s, queued 880ms, 4 call(s) [write×2 org_read×1 report×1]
+ +22m10s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against C1–C8 and regression list" +1 run(s)
+ +22m11s    run 20261022T220309387879 ok, ran 44s, queued 1.2s, 3 call(s) [org_read×1 report×1 write×1]
+ +22m47s    lead -> root result (done) "Memo for 2026-10-05: add Summary line" +9 run(s)
+ +23m47s  root -> lead note "feedback on "Memo for 2026-10-05: add Summary line": accept"
+ +23m47s  root feedback ok
+tasks: 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" done 5 run(s) | 20261022T214612649634-root-4510 "Memo for 2026-10-05: fix two…" done 5 run(s) | 20261022T215128895860-root-fe20 "Rework memo 2026-10-05: uncle…" done 5 run(s) | 20261022T215730424416-root-ff36 "Memo for 2026-10-05: add Summ…" done 6 run(s)
+totals: wall 22m48s | runs 21 (budget given 51, returned 30) | run time 20m45s | queue 2m02s | waiting on you 0s | tool calls 587 (1 refused)
+note: 20261022T215128895860-root-fe20 belongs to the request 20261022T214057425390-root-88b2; showing that
+note: 1 message(s) have no recorded trace: their request was derived from reply_to/revises/open tasks (marked ~)
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T215730383010-root-ac19
+trace 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" -> lead: done  [partial]
+     +0s  root -> lead task "Memo for 2026-10-05 meeting" +15 run(s)
+     +0s  root request ok
+     +3s    run 20261022T214100476954 ok, ran 54s, queued 3.1s, 2 call(s) [delegate×1 write×1]
+    +42s    lead -> lead/writer task "Write memo for 2026-10-05 meeting" +3 run(s)
+    +43s      run 20261022T214140761737 ok, ran 44s, queued 1.3s, 5 call(s) [read×2 write×2 report×1]
+  +1m20s      lead/writer -> lead result (done) "Write memo for 2026-10-05 meeting" +2 run(s)
+  +1m21s    run 20261022T214219140105 ok, ran 1m01s, queued 848ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m10s    lead -> lead/reviewer task "Review memo-2026-10-05.md against all criteria" +2 run(s)
+  +2m12s      run 20261022T214309663549 ok, ran 1m31s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m34s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against all criteria" +1 run(s)
+  +3m36s    run 20261022T214434352232 ok, ran 44s, queued 2.0s, 4 call(s) [org_read×2 report×1 write×1]
+  +4m11s    lead -> root result (done) "Memo for 2026-10-05 meeting" +10 run(s)
+  +5m15s  root -> lead task "Memo for 2026-10-05: fix two Due dates" +15 run(s)
+  +5m15s  root request ok
+  +5m15s    run 20261022T214612887434 ok, ran 1m11s, queued 248ms, 9 call(s) [org_read×7 delegate×1 write×1]
+  +6m17s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md" +2 run(s)
+  +6m18s      run 20261022T214715450348 ok, ran 36s, queued 536ms, 5 call(s) [read×2 write×2 report×1]
+  +6m46s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md" +1 run(s)
+  +6m46s    run 20261022T214743753465 ok, ran 1m05s, queued 90ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +7m39s    lead -> lead/reviewer task "Review memo-2026-10-05.md (rework: two Due-date fixes)" +2 run(s)
+  +7m40s      run 20261022T214838219224 ok, ran 57s, queued 1.7s, 4 call(s) [write×2 org_read×1 report×1]
+  +8m28s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md (rework: two Due-date fixes)" +1 run(s)
+  +8m29s    run 20261022T214926680791 ok, ran 38s, queued 908ms, 4 call(s) [org_read×2 report×1 write×1]
+  +8m57s    lead -> root result (done) "Memo for 2026-10-05: fix two Due dates" +10 run(s)
+ +10m31s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+ +10m31s  root request ok
+ +10m31s    run 20261022T215129101372 ok, ran 1m51s, queued 218ms, 8 call(s) [org_read×6 delegate×1 write×1]
+ +12m11s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md (second rework)" +1 run(s)
+ +12m12s      run 20261022T215309961059 ok, ran 44s, queued 857ms, 6 call(s) [read×3 write×2 report×1]
+ +12m48s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md (second rework)"
+ +12m48s    run 20261022T215346314449 ok, ran 1m05s, queued 128ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +13m36s    lead -> lead/reviewer task "Re-check memo-2026-10-05.md after second rework" +1 run(s)
+ +13m37s      run 20261022T215434728330 ok, ran 1m15s, queued 576ms, 4 call(s) [write×2 org_read×1 report×1]
+ +14m45s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-05.md after second rework"
+ +14m45s    run 20261022T215543270429 ok, ran 44s, queued 607ms, 3 call(s) [org_read×1 report×1 write×1]
+ +15m21s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +16m32s  root -> lead note "feedback on "Memo for 2026-10-05: fix two Due dates": reject"
+ +16m32s  root feedback ok
+ +16m32s  root -> lead task "Memo for 2026-10-05: add Summary line" +15 run(s)
+ +16m33s  root request ok
+ +16m33s    run 20261022T215730665781 killed, ran 10s, queued 301ms, 0 call(s), error: interrupted by scheduler shutdown
+ +17m39s  root -> lead note "criterion link on "Memo for 2026-10-05: fix two Due dates":…"
+ +17m39s  root feedback ok
+ +18m15s  ~root -> lead note "Correction for the Summary rework (task ...ff36): user's fi…"
+ +18m15s    run 20261022T215913204760 ok, ran 2m01s, queued 1m43s, 5 call(s) [revise_playbook×2 delegate×1 org_read×1 write×1], 1 refused
+              ! revise_playbook: unknown evidence for `weekly-memo`: 20261022T215837117856-root-1fb7. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8), a regression assertion (R1), or the id of a verdict or a case of this se…
+ +19m51s    lead -> lead/writer task "Write memo-2026-10-05.md with Summary line, corrected Due d…" +3 run(s)
+ +19m52s      run 20261022T220050148834 ok, ran 38s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+ +20m24s      lead/writer -> lead result (done) "Write memo-2026-10-05.md with Summary line, corrected Due d…" +2 run(s)
+ +20m25s    run 20261022T220122452335 ok, ran 52s, queued 723ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +21m00s    lead -> lead/reviewer task "Review memo-2026-10-05.md against C1–C8 and regression list" +2 run(s)
+ +21m01s      run 20261022T220158822062 ok, ran 1m19s, queued 880ms, 4 call(s) [write×2 org_read×1 report×1]
+ +22m10s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against C1–C8 and regression list" +1 run(s)
+ +22m11s    run 20261022T220309387879 ok, ran 44s, queued 1.2s, 3 call(s) [org_read×1 report×1 write×1]
+ +22m47s    lead -> root result (done) "Memo for 2026-10-05: add Summary line" +9 run(s)
+ +23m47s  root -> lead note "feedback on "Memo for 2026-10-05: add Summary line": accept"
+ +23m47s  root feedback ok
+tasks: 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" done 5 run(s) | 20261022T214612649634-root-4510 "Memo for 2026-10-05: fix two…" done 5 run(s) | 20261022T215128895860-root-fe20 "Rework memo 2026-10-05: uncle…" done 5 run(s) | 20261022T215730424416-root-ff36 "Memo for 2026-10-05: add Summ…" done 6 run(s)
+totals: wall 22m48s | runs 21 (budget given 51, returned 30) | run time 20m45s | queue 2m02s | waiting on you 0s | tool calls 587 (1 refused)
+note: 20261022T215730383010-root-ac19 belongs to the request 20261022T214057425390-root-88b2; showing that
+note: 1 message(s) have no recorded trace: their request was derived from reply_to/revises/open tasks (marked ~)
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T215730424416-root-ff36
+trace 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" -> lead: done  [partial]
+     +0s  root -> lead task "Memo for 2026-10-05 meeting" +15 run(s)
+     +0s  root request ok
+     +3s    run 20261022T214100476954 ok, ran 54s, queued 3.1s, 2 call(s) [delegate×1 write×1]
+    +42s    lead -> lead/writer task "Write memo for 2026-10-05 meeting" +3 run(s)
+    +43s      run 20261022T214140761737 ok, ran 44s, queued 1.3s, 5 call(s) [read×2 write×2 report×1]
+  +1m20s      lead/writer -> lead result (done) "Write memo for 2026-10-05 meeting" +2 run(s)
+  +1m21s    run 20261022T214219140105 ok, ran 1m01s, queued 848ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m10s    lead -> lead/reviewer task "Review memo-2026-10-05.md against all criteria" +2 run(s)
+  +2m12s      run 20261022T214309663549 ok, ran 1m31s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m34s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against all criteria" +1 run(s)
+  +3m36s    run 20261022T214434352232 ok, ran 44s, queued 2.0s, 4 call(s) [org_read×2 report×1 write×1]
+  +4m11s    lead -> root result (done) "Memo for 2026-10-05 meeting" +10 run(s)
+  +5m15s  root -> lead task "Memo for 2026-10-05: fix two Due dates" +15 run(s)
+  +5m15s  root request ok
+  +5m15s    run 20261022T214612887434 ok, ran 1m11s, queued 248ms, 9 call(s) [org_read×7 delegate×1 write×1]
+  +6m17s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md" +2 run(s)
+  +6m18s      run 20261022T214715450348 ok, ran 36s, queued 536ms, 5 call(s) [read×2 write×2 report×1]
+  +6m46s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md" +1 run(s)
+  +6m46s    run 20261022T214743753465 ok, ran 1m05s, queued 90ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +7m39s    lead -> lead/reviewer task "Review memo-2026-10-05.md (rework: two Due-date fixes)" +2 run(s)
+  +7m40s      run 20261022T214838219224 ok, ran 57s, queued 1.7s, 4 call(s) [write×2 org_read×1 report×1]
+  +8m28s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md (rework: two Due-date fixes)" +1 run(s)
+  +8m29s    run 20261022T214926680791 ok, ran 38s, queued 908ms, 4 call(s) [org_read×2 report×1 write×1]
+  +8m57s    lead -> root result (done) "Memo for 2026-10-05: fix two Due dates" +10 run(s)
+ +10m31s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+ +10m31s  root request ok
+ +10m31s    run 20261022T215129101372 ok, ran 1m51s, queued 218ms, 8 call(s) [org_read×6 delegate×1 write×1]
+ +12m11s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md (second rework)" +1 run(s)
+ +12m12s      run 20261022T215309961059 ok, ran 44s, queued 857ms, 6 call(s) [read×3 write×2 report×1]
+ +12m48s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md (second rework)"
+ +12m48s    run 20261022T215346314449 ok, ran 1m05s, queued 128ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +13m36s    lead -> lead/reviewer task "Re-check memo-2026-10-05.md after second rework" +1 run(s)
+ +13m37s      run 20261022T215434728330 ok, ran 1m15s, queued 576ms, 4 call(s) [write×2 org_read×1 report×1]
+ +14m45s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-05.md after second rework"
+ +14m45s    run 20261022T215543270429 ok, ran 44s, queued 607ms, 3 call(s) [org_read×1 report×1 write×1]
+ +15m21s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +16m32s  root -> lead note "feedback on "Memo for 2026-10-05: fix two Due dates": reject"
+ +16m32s  root feedback ok
+ +16m32s  root -> lead task "Memo for 2026-10-05: add Summary line" +15 run(s)
+ +16m33s  root request ok
+ +16m33s    run 20261022T215730665781 killed, ran 10s, queued 301ms, 0 call(s), error: interrupted by scheduler shutdown
+ +17m39s  root -> lead note "criterion link on "Memo for 2026-10-05: fix two Due dates":…"
+ +17m39s  root feedback ok
+ +18m15s  ~root -> lead note "Correction for the Summary rework (task ...ff36): user's fi…"
+ +18m15s    run 20261022T215913204760 ok, ran 2m01s, queued 1m43s, 5 call(s) [revise_playbook×2 delegate×1 org_read×1 write×1], 1 refused
+              ! revise_playbook: unknown evidence for `weekly-memo`: 20261022T215837117856-root-1fb7. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8), a regression assertion (R1), or the id of a verdict or a case of this se…
+ +19m51s    lead -> lead/writer task "Write memo-2026-10-05.md with Summary line, corrected Due d…" +3 run(s)
+ +19m52s      run 20261022T220050148834 ok, ran 38s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+ +20m24s      lead/writer -> lead result (done) "Write memo-2026-10-05.md with Summary line, corrected Due d…" +2 run(s)
+ +20m25s    run 20261022T220122452335 ok, ran 52s, queued 723ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +21m00s    lead -> lead/reviewer task "Review memo-2026-10-05.md against C1–C8 and regression list" +2 run(s)
+ +21m01s      run 20261022T220158822062 ok, ran 1m19s, queued 880ms, 4 call(s) [write×2 org_read×1 report×1]
+ +22m10s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against C1–C8 and regression list" +1 run(s)
+ +22m11s    run 20261022T220309387879 ok, ran 44s, queued 1.2s, 3 call(s) [org_read×1 report×1 write×1]
+ +22m47s    lead -> root result (done) "Memo for 2026-10-05: add Summary line" +9 run(s)
+ +23m47s  root -> lead note "feedback on "Memo for 2026-10-05: add Summary line": accept"
+ +23m47s  root feedback ok
+tasks: 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" done 5 run(s) | 20261022T214612649634-root-4510 "Memo for 2026-10-05: fix two…" done 5 run(s) | 20261022T215128895860-root-fe20 "Rework memo 2026-10-05: uncle…" done 5 run(s) | 20261022T215730424416-root-ff36 "Memo for 2026-10-05: add Summ…" done 6 run(s)
+totals: wall 22m48s | runs 21 (budget given 51, returned 30) | run time 20m45s | queue 2m02s | waiting on you 0s | tool calls 587 (1 refused)
+note: 20261022T215730424416-root-ff36 belongs to the request 20261022T214057425390-root-88b2; showing that
+note: 1 message(s) have no recorded trace: their request was derived from reply_to/revises/open tasks (marked ~)
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T215837117856-root-1fb7
+trace 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" -> lead: done  [partial]
+     +0s  root -> lead task "Memo for 2026-10-05 meeting" +15 run(s)
+     +0s  root request ok
+     +3s    run 20261022T214100476954 ok, ran 54s, queued 3.1s, 2 call(s) [delegate×1 write×1]
+    +42s    lead -> lead/writer task "Write memo for 2026-10-05 meeting" +3 run(s)
+    +43s      run 20261022T214140761737 ok, ran 44s, queued 1.3s, 5 call(s) [read×2 write×2 report×1]
+  +1m20s      lead/writer -> lead result (done) "Write memo for 2026-10-05 meeting" +2 run(s)
+  +1m21s    run 20261022T214219140105 ok, ran 1m01s, queued 848ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m10s    lead -> lead/reviewer task "Review memo-2026-10-05.md against all criteria" +2 run(s)
+  +2m12s      run 20261022T214309663549 ok, ran 1m31s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m34s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against all criteria" +1 run(s)
+  +3m36s    run 20261022T214434352232 ok, ran 44s, queued 2.0s, 4 call(s) [org_read×2 report×1 write×1]
+  +4m11s    lead -> root result (done) "Memo for 2026-10-05 meeting" +10 run(s)
+  +5m15s  root -> lead task "Memo for 2026-10-05: fix two Due dates" +15 run(s)
+  +5m15s  root request ok
+  +5m15s    run 20261022T214612887434 ok, ran 1m11s, queued 248ms, 9 call(s) [org_read×7 delegate×1 write×1]
+  +6m17s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md" +2 run(s)
+  +6m18s      run 20261022T214715450348 ok, ran 36s, queued 536ms, 5 call(s) [read×2 write×2 report×1]
+  +6m46s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md" +1 run(s)
+  +6m46s    run 20261022T214743753465 ok, ran 1m05s, queued 90ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +7m39s    lead -> lead/reviewer task "Review memo-2026-10-05.md (rework: two Due-date fixes)" +2 run(s)
+  +7m40s      run 20261022T214838219224 ok, ran 57s, queued 1.7s, 4 call(s) [write×2 org_read×1 report×1]
+  +8m28s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md (rework: two Due-date fixes)" +1 run(s)
+  +8m29s    run 20261022T214926680791 ok, ran 38s, queued 908ms, 4 call(s) [org_read×2 report×1 write×1]
+  +8m57s    lead -> root result (done) "Memo for 2026-10-05: fix two Due dates" +10 run(s)
+ +10m31s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+ +10m31s  root request ok
+ +10m31s    run 20261022T215129101372 ok, ran 1m51s, queued 218ms, 8 call(s) [org_read×6 delegate×1 write×1]
+ +12m11s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md (second rework)" +1 run(s)
+ +12m12s      run 20261022T215309961059 ok, ran 44s, queued 857ms, 6 call(s) [read×3 write×2 report×1]
+ +12m48s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md (second rework)"
+ +12m48s    run 20261022T215346314449 ok, ran 1m05s, queued 128ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +13m36s    lead -> lead/reviewer task "Re-check memo-2026-10-05.md after second rework" +1 run(s)
+ +13m37s      run 20261022T215434728330 ok, ran 1m15s, queued 576ms, 4 call(s) [write×2 org_read×1 report×1]
+ +14m45s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-05.md after second rework"
+ +14m45s    run 20261022T215543270429 ok, ran 44s, queued 607ms, 3 call(s) [org_read×1 report×1 write×1]
+ +15m21s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +16m32s  root -> lead note "feedback on "Memo for 2026-10-05: fix two Due dates": reject"
+ +16m32s  root feedback ok
+ +16m32s  root -> lead task "Memo for 2026-10-05: add Summary line" +15 run(s)
+ +16m33s  root request ok
+ +16m33s    run 20261022T215730665781 killed, ran 10s, queued 301ms, 0 call(s), error: interrupted by scheduler shutdown
+ +17m39s  root -> lead note "criterion link on "Memo for 2026-10-05: fix two Due dates":…"
+ +17m39s  root feedback ok
+ +18m15s  ~root -> lead note "Correction for the Summary rework (task ...ff36): user's fi…"
+ +18m15s    run 20261022T215913204760 ok, ran 2m01s, queued 1m43s, 5 call(s) [revise_playbook×2 delegate×1 org_read×1 write×1], 1 refused
+              ! revise_playbook: unknown evidence for `weekly-memo`: 20261022T215837117856-root-1fb7. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8), a regression assertion (R1), or the id of a verdict or a case of this se…
+ +19m51s    lead -> lead/writer task "Write memo-2026-10-05.md with Summary line, corrected Due d…" +3 run(s)
+ +19m52s      run 20261022T220050148834 ok, ran 38s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+ +20m24s      lead/writer -> lead result (done) "Write memo-2026-10-05.md with Summary line, corrected Due d…" +2 run(s)
+ +20m25s    run 20261022T220122452335 ok, ran 52s, queued 723ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +21m00s    lead -> lead/reviewer task "Review memo-2026-10-05.md against C1–C8 and regression list" +2 run(s)
+ +21m01s      run 20261022T220158822062 ok, ran 1m19s, queued 880ms, 4 call(s) [write×2 org_read×1 report×1]
+ +22m10s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against C1–C8 and regression list" +1 run(s)
+ +22m11s    run 20261022T220309387879 ok, ran 44s, queued 1.2s, 3 call(s) [org_read×1 report×1 write×1]
+ +22m47s    lead -> root result (done) "Memo for 2026-10-05: add Summary line" +9 run(s)
+ +23m47s  root -> lead note "feedback on "Memo for 2026-10-05: add Summary line": accept"
+ +23m47s  root feedback ok
+tasks: 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" done 5 run(s) | 20261022T214612649634-root-4510 "Memo for 2026-10-05: fix two…" done 5 run(s) | 20261022T215128895860-root-fe20 "Rework memo 2026-10-05: uncle…" done 5 run(s) | 20261022T215730424416-root-ff36 "Memo for 2026-10-05: add Summ…" done 6 run(s)
+totals: wall 22m48s | runs 21 (budget given 51, returned 30) | run time 20m45s | queue 2m02s | waiting on you 0s | tool calls 587 (1 refused)
+note: 20261022T215837117856-root-1fb7 belongs to the request 20261022T214057425390-root-88b2; showing that
+note: 1 message(s) have no recorded trace: their request was derived from reply_to/revises/open tasks (marked ~)
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T215912903944-root-f2a1
+error: 20261022T215912903944-root-f2a1 is not a root task and its request cannot be determined. Root's tasks (latest): 20261022T215730424416-root-ff36, 20261022T220445258658-root-cdef, 20261022T221058950422-root-116b, 20261022T221604637344-root-6947, 20261022T222238418574-root-3286
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T220445083316-root-ccd9
+trace 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" -> lead: done  [partial]
+     +0s  root -> lead task "Memo for 2026-10-05 meeting" +15 run(s)
+     +0s  root request ok
+     +3s    run 20261022T214100476954 ok, ran 54s, queued 3.1s, 2 call(s) [delegate×1 write×1]
+    +42s    lead -> lead/writer task "Write memo for 2026-10-05 meeting" +3 run(s)
+    +43s      run 20261022T214140761737 ok, ran 44s, queued 1.3s, 5 call(s) [read×2 write×2 report×1]
+  +1m20s      lead/writer -> lead result (done) "Write memo for 2026-10-05 meeting" +2 run(s)
+  +1m21s    run 20261022T214219140105 ok, ran 1m01s, queued 848ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m10s    lead -> lead/reviewer task "Review memo-2026-10-05.md against all criteria" +2 run(s)
+  +2m12s      run 20261022T214309663549 ok, ran 1m31s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m34s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against all criteria" +1 run(s)
+  +3m36s    run 20261022T214434352232 ok, ran 44s, queued 2.0s, 4 call(s) [org_read×2 report×1 write×1]
+  +4m11s    lead -> root result (done) "Memo for 2026-10-05 meeting" +10 run(s)
+  +5m15s  root -> lead task "Memo for 2026-10-05: fix two Due dates" +15 run(s)
+  +5m15s  root request ok
+  +5m15s    run 20261022T214612887434 ok, ran 1m11s, queued 248ms, 9 call(s) [org_read×7 delegate×1 write×1]
+  +6m17s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md" +2 run(s)
+  +6m18s      run 20261022T214715450348 ok, ran 36s, queued 536ms, 5 call(s) [read×2 write×2 report×1]
+  +6m46s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md" +1 run(s)
+  +6m46s    run 20261022T214743753465 ok, ran 1m05s, queued 90ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +7m39s    lead -> lead/reviewer task "Review memo-2026-10-05.md (rework: two Due-date fixes)" +2 run(s)
+  +7m40s      run 20261022T214838219224 ok, ran 57s, queued 1.7s, 4 call(s) [write×2 org_read×1 report×1]
+  +8m28s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md (rework: two Due-date fixes)" +1 run(s)
+  +8m29s    run 20261022T214926680791 ok, ran 38s, queued 908ms, 4 call(s) [org_read×2 report×1 write×1]
+  +8m57s    lead -> root result (done) "Memo for 2026-10-05: fix two Due dates" +10 run(s)
+ +10m31s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+ +10m31s  root request ok
+ +10m31s    run 20261022T215129101372 ok, ran 1m51s, queued 218ms, 8 call(s) [org_read×6 delegate×1 write×1]
+ +12m11s    lead -> lead/writer task "Fix two Due dates in memo-2026-10-05.md (second rework)" +1 run(s)
+ +12m12s      run 20261022T215309961059 ok, ran 44s, queued 857ms, 6 call(s) [read×3 write×2 report×1]
+ +12m48s      lead/writer -> lead result (done) "Fix two Due dates in memo-2026-10-05.md (second rework)"
+ +12m48s    run 20261022T215346314449 ok, ran 1m05s, queued 128ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +13m36s    lead -> lead/reviewer task "Re-check memo-2026-10-05.md after second rework" +1 run(s)
+ +13m37s      run 20261022T215434728330 ok, ran 1m15s, queued 576ms, 4 call(s) [write×2 org_read×1 report×1]
+ +14m45s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-05.md after second rework"
+ +14m45s    run 20261022T215543270429 ok, ran 44s, queued 607ms, 3 call(s) [org_read×1 report×1 write×1]
+ +15m21s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m23s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m24s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m25s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m26s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m27s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m28s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m29s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +15m30s  root progress ok
+ +16m32s  root -> lead note "feedback on "Memo for 2026-10-05: fix two Due dates": reject"
+ +16m32s  root feedback ok
+ +16m32s  root -> lead task "Memo for 2026-10-05: add Summary line" +15 run(s)
+ +16m33s  root request ok
+ +16m33s    run 20261022T215730665781 killed, ran 10s, queued 301ms, 0 call(s), error: interrupted by scheduler shutdown
+ +17m39s  root -> lead note "criterion link on "Memo for 2026-10-05: fix two Due dates":…"
+ +17m39s  root feedback ok
+ +18m15s  ~root -> lead note "Correction for the Summary rework (task ...ff36): user's fi…"
+ +18m15s    run 20261022T215913204760 ok, ran 2m01s, queued 1m43s, 5 call(s) [revise_playbook×2 delegate×1 org_read×1 write×1], 1 refused
+              ! revise_playbook: unknown evidence for `weekly-memo`: 20261022T215837117856-root-1fb7. Evidence is a criterion (C1, C2, C3, C4, C5, C6, C7, C8), a regression assertion (R1), or the id of a verdict or a case of this se…
+ +19m51s    lead -> lead/writer task "Write memo-2026-10-05.md with Summary line, corrected Due d…" +3 run(s)
+ +19m52s      run 20261022T220050148834 ok, ran 38s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+ +20m24s      lead/writer -> lead result (done) "Write memo-2026-10-05.md with Summary line, corrected Due d…" +2 run(s)
+ +20m25s    run 20261022T220122452335 ok, ran 52s, queued 723ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +21m00s    lead -> lead/reviewer task "Review memo-2026-10-05.md against C1–C8 and regression list" +2 run(s)
+ +21m01s      run 20261022T220158822062 ok, ran 1m19s, queued 880ms, 4 call(s) [write×2 org_read×1 report×1]
+ +22m10s      lead/reviewer -> lead result (done) "Review memo-2026-10-05.md against C1–C8 and regression list" +1 run(s)
+ +22m11s    run 20261022T220309387879 ok, ran 44s, queued 1.2s, 3 call(s) [org_read×1 report×1 write×1]
+ +22m47s    lead -> root result (done) "Memo for 2026-10-05: add Summary line" +9 run(s)
+ +23m47s  root -> lead note "feedback on "Memo for 2026-10-05: add Summary line": accept"
+ +23m47s  root feedback ok
+tasks: 20261022T214057425390-root-88b2 "Memo for 2026-10-05 meeting" done 5 run(s) | 20261022T214612649634-root-4510 "Memo for 2026-10-05: fix two…" done 5 run(s) | 20261022T215128895860-root-fe20 "Rework memo 2026-10-05: uncle…" done 5 run(s) | 20261022T215730424416-root-ff36 "Memo for 2026-10-05: add Summ…" done 6 run(s)
+totals: wall 22m48s | runs 21 (budget given 51, returned 30) | run time 20m45s | queue 2m02s | waiting on you 0s | tool calls 587 (1 refused)
+note: 20261022T220445083316-root-ccd9 belongs to the request 20261022T214057425390-root-88b2; showing that
+note: 1 message(s) have no recorded trace: their request was derived from reply_to/revises/open tasks (marked ~)
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T220445258658-root-cdef
+trace 20261022T220445258658-root-cdef "Memo for 2026-10-12 meeting" -> lead: done
+     +0s  root -> lead task "Memo for 2026-10-12 meeting" +15 run(s)
+     +0s  root request ok
+     +4s    run 20261022T220449446122 ok, ran 56s, queued 4.4s, 2 call(s) [delegate×1 write×1], shared with 1 other request(s)
+    +47s    lead -> lead/writer task "Write memo for 2026-10-12 meeting" +3 run(s)
+    +48s      run 20261022T220533760135 ok, ran 50s, queued 1.3s, 5 call(s) [read×2 write×2 report×1]
+  +1m33s      lead/writer -> lead result (done) "Write memo for 2026-10-12 meeting" +2 run(s)
+  +1m34s    run 20261022T220620192001 ok, ran 1m05s, queued 1.6s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m25s    lead -> lead/reviewer task "Review memo-2026-10-12.md" +2 run(s)
+  +2m27s      run 20261022T220712756658 ok, ran 1m53s, queued 1.9s, 4 call(s) [write×2 org_read×1 report×1]
+  +4m13s      lead/reviewer -> lead result (done) "Review memo-2026-10-12.md" +1 run(s)
+  +4m14s    run 20261022T220859737072 ok, ran 1m13s, queued 934ms, 3 call(s) [org_read×1 report×1 write×1]
+  +5m17s    lead -> root result (done) "Memo for 2026-10-12 meeting" +10 run(s)
+  +5m17s  root progress ok
+  +6m13s  root -> lead task "Memo for 2026-10-12: fix action-item count in Summary" +8 run(s)
+  +6m13s  root request ok
+  +6m13s    run 20261022T221059196612 ok, ran 1m27s, queued 268ms, 11 call(s) [org_read×8 delegate×1 status×1 write×1]
+  +7m23s    lead -> lead/writer task "Fix Summary line count in memo-2026-10-12.md" +1 run(s)
+  +7m24s      run 20261022T221209892439 ok, ran 32s, queued 958ms, 5 call(s) [read×2 write×2 report×1]
+  +7m51s      lead/writer -> lead result (done) "Fix Summary line count in memo-2026-10-12.md"
+  +7m52s    run 20261022T221238192747 ok, ran 48s, queued 1.4s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +8m29s    lead -> lead/reviewer task "Re-check memo-2026-10-12.md after Summary line fix" +1 run(s)
+  +8m31s      run 20261022T221316587386 ok, ran 1m21s, queued 1.4s, 4 call(s) [write×2 org_read×1 report×1]
+  +9m43s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-12.md after Summary line fix"
+  +9m44s    run 20261022T221429357542 ok, ran 48s, queued 798ms, 3 call(s) [org_read×1 report×1 write×1]
+ +10m22s    lead -> root result (done) "Memo for 2026-10-12: fix action-item count in Summary" +3 run(s)
+ +10m24s  root progress ok
+ +11m19s  root -> lead note "feedback on "Memo for 2026-10-12: fix action-item count in…"
+ +11m19s  root feedback ok
+tasks: 20261022T220445258658-root-cdef "Memo for 2026-10-12 meeting" done 5 run(s) | 20261022T221058950422-root-116b "Memo for 2026-10-12: fix acti…" done 5 run(s)
+totals: wall 10m22s | runs 10 (budget given 23, returned 13) | run time 10m54s | queue 15s | waiting on you 0s | tool calls 48 (0 refused)
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T221058950422-root-116b
+trace 20261022T220445258658-root-cdef "Memo for 2026-10-12 meeting" -> lead: done
+     +0s  root -> lead task "Memo for 2026-10-12 meeting" +15 run(s)
+     +0s  root request ok
+     +4s    run 20261022T220449446122 ok, ran 56s, queued 4.4s, 2 call(s) [delegate×1 write×1], shared with 1 other request(s)
+    +47s    lead -> lead/writer task "Write memo for 2026-10-12 meeting" +3 run(s)
+    +48s      run 20261022T220533760135 ok, ran 50s, queued 1.3s, 5 call(s) [read×2 write×2 report×1]
+  +1m33s      lead/writer -> lead result (done) "Write memo for 2026-10-12 meeting" +2 run(s)
+  +1m34s    run 20261022T220620192001 ok, ran 1m05s, queued 1.6s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m25s    lead -> lead/reviewer task "Review memo-2026-10-12.md" +2 run(s)
+  +2m27s      run 20261022T220712756658 ok, ran 1m53s, queued 1.9s, 4 call(s) [write×2 org_read×1 report×1]
+  +4m13s      lead/reviewer -> lead result (done) "Review memo-2026-10-12.md" +1 run(s)
+  +4m14s    run 20261022T220859737072 ok, ran 1m13s, queued 934ms, 3 call(s) [org_read×1 report×1 write×1]
+  +5m17s    lead -> root result (done) "Memo for 2026-10-12 meeting" +10 run(s)
+  +5m17s  root progress ok
+  +6m13s  root -> lead task "Memo for 2026-10-12: fix action-item count in Summary" +8 run(s)
+  +6m13s  root request ok
+  +6m13s    run 20261022T221059196612 ok, ran 1m27s, queued 268ms, 11 call(s) [org_read×8 delegate×1 status×1 write×1]
+  +7m23s    lead -> lead/writer task "Fix Summary line count in memo-2026-10-12.md" +1 run(s)
+  +7m24s      run 20261022T221209892439 ok, ran 32s, queued 958ms, 5 call(s) [read×2 write×2 report×1]
+  +7m51s      lead/writer -> lead result (done) "Fix Summary line count in memo-2026-10-12.md"
+  +7m52s    run 20261022T221238192747 ok, ran 48s, queued 1.4s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +8m29s    lead -> lead/reviewer task "Re-check memo-2026-10-12.md after Summary line fix" +1 run(s)
+  +8m31s      run 20261022T221316587386 ok, ran 1m21s, queued 1.4s, 4 call(s) [write×2 org_read×1 report×1]
+  +9m43s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-12.md after Summary line fix"
+  +9m44s    run 20261022T221429357542 ok, ran 48s, queued 798ms, 3 call(s) [org_read×1 report×1 write×1]
+ +10m22s    lead -> root result (done) "Memo for 2026-10-12: fix action-item count in Summary" +3 run(s)
+ +10m24s  root progress ok
+ +11m19s  root -> lead note "feedback on "Memo for 2026-10-12: fix action-item count in…"
+ +11m19s  root feedback ok
+tasks: 20261022T220445258658-root-cdef "Memo for 2026-10-12 meeting" done 5 run(s) | 20261022T221058950422-root-116b "Memo for 2026-10-12: fix acti…" done 5 run(s)
+totals: wall 10m22s | runs 10 (budget given 23, returned 13) | run time 10m54s | queue 15s | waiting on you 0s | tool calls 48 (0 refused)
+note: 20261022T221058950422-root-116b belongs to the request 20261022T220445258658-root-cdef; showing that
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T221604611563-root-3c6f
+trace 20261022T220445258658-root-cdef "Memo for 2026-10-12 meeting" -> lead: done
+     +0s  root -> lead task "Memo for 2026-10-12 meeting" +15 run(s)
+     +0s  root request ok
+     +4s    run 20261022T220449446122 ok, ran 56s, queued 4.4s, 2 call(s) [delegate×1 write×1], shared with 1 other request(s)
+    +47s    lead -> lead/writer task "Write memo for 2026-10-12 meeting" +3 run(s)
+    +48s      run 20261022T220533760135 ok, ran 50s, queued 1.3s, 5 call(s) [read×2 write×2 report×1]
+  +1m33s      lead/writer -> lead result (done) "Write memo for 2026-10-12 meeting" +2 run(s)
+  +1m34s    run 20261022T220620192001 ok, ran 1m05s, queued 1.6s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m25s    lead -> lead/reviewer task "Review memo-2026-10-12.md" +2 run(s)
+  +2m27s      run 20261022T220712756658 ok, ran 1m53s, queued 1.9s, 4 call(s) [write×2 org_read×1 report×1]
+  +4m13s      lead/reviewer -> lead result (done) "Review memo-2026-10-12.md" +1 run(s)
+  +4m14s    run 20261022T220859737072 ok, ran 1m13s, queued 934ms, 3 call(s) [org_read×1 report×1 write×1]
+  +5m17s    lead -> root result (done) "Memo for 2026-10-12 meeting" +10 run(s)
+  +5m17s  root progress ok
+  +6m13s  root -> lead task "Memo for 2026-10-12: fix action-item count in Summary" +8 run(s)
+  +6m13s  root request ok
+  +6m13s    run 20261022T221059196612 ok, ran 1m27s, queued 268ms, 11 call(s) [org_read×8 delegate×1 status×1 write×1]
+  +7m23s    lead -> lead/writer task "Fix Summary line count in memo-2026-10-12.md" +1 run(s)
+  +7m24s      run 20261022T221209892439 ok, ran 32s, queued 958ms, 5 call(s) [read×2 write×2 report×1]
+  +7m51s      lead/writer -> lead result (done) "Fix Summary line count in memo-2026-10-12.md"
+  +7m52s    run 20261022T221238192747 ok, ran 48s, queued 1.4s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +8m29s    lead -> lead/reviewer task "Re-check memo-2026-10-12.md after Summary line fix" +1 run(s)
+  +8m31s      run 20261022T221316587386 ok, ran 1m21s, queued 1.4s, 4 call(s) [write×2 org_read×1 report×1]
+  +9m43s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-12.md after Summary line fix"
+  +9m44s    run 20261022T221429357542 ok, ran 48s, queued 798ms, 3 call(s) [org_read×1 report×1 write×1]
+ +10m22s    lead -> root result (done) "Memo for 2026-10-12: fix action-item count in Summary" +3 run(s)
+ +10m24s  root progress ok
+ +11m19s  root -> lead note "feedback on "Memo for 2026-10-12: fix action-item count in…"
+ +11m19s  root feedback ok
+tasks: 20261022T220445258658-root-cdef "Memo for 2026-10-12 meeting" done 5 run(s) | 20261022T221058950422-root-116b "Memo for 2026-10-12: fix acti…" done 5 run(s)
+totals: wall 10m22s | runs 10 (budget given 23, returned 13) | run time 10m54s | queue 15s | waiting on you 0s | tool calls 48 (0 refused)
+note: 20261022T221604611563-root-3c6f belongs to the request 20261022T220445258658-root-cdef; showing that
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T221604637344-root-6947
+trace 20261022T221604637344-root-6947 "Memo for 2026-10-19 meeting" -> lead: done
+     +0s  root -> lead task "Memo for 2026-10-19 meeting" +15 run(s)
+     +0s  root request ok
+     +0s    run 20261022T221604879734 ok, ran 54s, queued 294ms, 2 call(s) [delegate×1 write×1], shared with 1 other request(s)
+    +43s    lead -> lead/writer task "Write memo-2026-10-19.md" +3 run(s)
+    +44s      run 20261022T221649245423 ok, ran 38s, queued 1.1s, 5 call(s) [read×2 write×2 report×1]
+  +1m16s      lead/writer -> lead result (done) "Write memo-2026-10-19.md" +2 run(s)
+  +1m16s    run 20261022T221721591399 ok, ran 1m11s, queued 629ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m14s    lead -> lead/writer task "Rework memo-2026-10-19.md — add two missing action items" +1 run(s)
+  +2m15s      run 20261022T221820273013 ok, ran 44s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+  +2m53s      lead/writer -> lead result (done) "Rework memo-2026-10-19.md — add two missing action items"
+  +2m54s    run 20261022T221858697814 ok, ran 1m01s, queued 1.0s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +3m41s    lead -> lead/reviewer task "Review memo-2026-10-19.md against C1–C8 and R1" +2 run(s)
+  +3m42s      run 20261022T221947175637 ok, ran 1m23s, queued 692ms, 4 call(s) [write×2 org_read×1 report×1]
+  +4m59s      lead/reviewer -> lead result (done) "Review memo-2026-10-19.md against C1–C8 and R1" +1 run(s)
+  +4m59s    run 20261022T222103982980 ok, ran 51s, queued 63ms, 3 call(s) [org_read×1 report×1 write×1]
+  +5m42s    lead -> root result (done) "Memo for 2026-10-19 meeting" +8 run(s)
+  +5m44s  root progress ok
+  +6m33s  root -> lead task "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording" +8 run(s)
+  +6m33s  root request ok
+  +6m34s    run 20261022T222238670453 ok, ran 1m13s, queued 276ms, 7 call(s) [org_read×5 delegate×1 write×1]
+  +7m35s    lead -> lead/writer task "Rework memo-2026-10-19.md: remove Marta agenda row, fix SSO…" +2 run(s)
+  +7m36s      run 20261022T222341210592 ok, ran 45s, queued 597ms, 6 call(s) [read×3 write×2 report×1]
+  +8m15s      lead/writer -> lead result (done) "Rework memo-2026-10-19.md: remove Marta agenda row, fix SSO…" +1 run(s)
+  +8m17s    run 20261022T222421722229 ok, ran 55s, queued 2.0s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +8m59s    lead -> lead/reviewer task "Re-check memo-2026-10-19.md after rework (criteria C1-C8 +…" +2 run(s)
+  +8m59s      run 20261022T222504163070 ok, ran 3m32s, queued 167ms, 4 call(s) [write×2 org_read×1 report×1]
+ +12m20s      lead/reviewer -> lead result (blocked) "Re-check memo-2026-10-19.md after rework (criteria C1-C8 +…"
+ +12m21s    run 20261022T222825986058 ok, ran 1m04s, queued 1.1s, 4 call(s) [org_read×2 report×1 write×1]
+ +13m12s    lead -> root result (blocked) "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording"
+ +13m13s  root progress ok
+ +13m33s  root -> lead note "Client decision: Marta agenda item is option (b)" +3 run(s)
+ +13m33s  root send ok
+ +13m34s    run 20261022T222938655161 ok, ran 1m37s, queued 236ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +14m57s    lead -> lead/reviewer task "Re-check memo-2026-10-19.md (final, with client decision on…" +1 run(s)
+ +14m58s      run 20261022T223103321849 ok, ran 1m11s, queued 1.6s, 4 call(s) [write×2 org_read×1 report×1]
+ +16m01s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-19.md (final, with client decision on…" +1 run(s)
+ +16m03s    run 20261022T223208095829 ok, ran 57s, queued 1.5s, 4 call(s) [org_read×2 report×1 write×1]
+ +16m52s    lead -> root result (done) "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording" +3 run(s)
+ +16m53s  root progress ok
+ +17m41s  root -> lead note "feedback on "Memo for 2026-10-19: drop Marta agenda row, fi…"
+ +17m41s  root feedback ok
+tasks: 20261022T221604637344-root-6947 "Memo for 2026-10-19 meeting" done 7 run(s) | 20261022T222238418574-root-3286 "Memo for 2026-10-19: drop Mar…" done 8 run(s)
+totals: wall 16m52s | runs 15 (budget given 26, returned 11) | run time 17m54s | queue 13s | waiting on you 22s | tool calls 68 (0 refused)
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T222238418574-root-3286
+trace 20261022T221604637344-root-6947 "Memo for 2026-10-19 meeting" -> lead: done
+     +0s  root -> lead task "Memo for 2026-10-19 meeting" +15 run(s)
+     +0s  root request ok
+     +0s    run 20261022T221604879734 ok, ran 54s, queued 294ms, 2 call(s) [delegate×1 write×1], shared with 1 other request(s)
+    +43s    lead -> lead/writer task "Write memo-2026-10-19.md" +3 run(s)
+    +44s      run 20261022T221649245423 ok, ran 38s, queued 1.1s, 5 call(s) [read×2 write×2 report×1]
+  +1m16s      lead/writer -> lead result (done) "Write memo-2026-10-19.md" +2 run(s)
+  +1m16s    run 20261022T221721591399 ok, ran 1m11s, queued 629ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m14s    lead -> lead/writer task "Rework memo-2026-10-19.md — add two missing action items" +1 run(s)
+  +2m15s      run 20261022T221820273013 ok, ran 44s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+  +2m53s      lead/writer -> lead result (done) "Rework memo-2026-10-19.md — add two missing action items"
+  +2m54s    run 20261022T221858697814 ok, ran 1m01s, queued 1.0s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +3m41s    lead -> lead/reviewer task "Review memo-2026-10-19.md against C1–C8 and R1" +2 run(s)
+  +3m42s      run 20261022T221947175637 ok, ran 1m23s, queued 692ms, 4 call(s) [write×2 org_read×1 report×1]
+  +4m59s      lead/reviewer -> lead result (done) "Review memo-2026-10-19.md against C1–C8 and R1" +1 run(s)
+  +4m59s    run 20261022T222103982980 ok, ran 51s, queued 63ms, 3 call(s) [org_read×1 report×1 write×1]
+  +5m42s    lead -> root result (done) "Memo for 2026-10-19 meeting" +8 run(s)
+  +5m44s  root progress ok
+  +6m33s  root -> lead task "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording" +8 run(s)
+  +6m33s  root request ok
+  +6m34s    run 20261022T222238670453 ok, ran 1m13s, queued 276ms, 7 call(s) [org_read×5 delegate×1 write×1]
+  +7m35s    lead -> lead/writer task "Rework memo-2026-10-19.md: remove Marta agenda row, fix SSO…" +2 run(s)
+  +7m36s      run 20261022T222341210592 ok, ran 45s, queued 597ms, 6 call(s) [read×3 write×2 report×1]
+  +8m15s      lead/writer -> lead result (done) "Rework memo-2026-10-19.md: remove Marta agenda row, fix SSO…" +1 run(s)
+  +8m17s    run 20261022T222421722229 ok, ran 55s, queued 2.0s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +8m59s    lead -> lead/reviewer task "Re-check memo-2026-10-19.md after rework (criteria C1-C8 +…" +2 run(s)
+  +8m59s      run 20261022T222504163070 ok, ran 3m32s, queued 167ms, 4 call(s) [write×2 org_read×1 report×1]
+ +12m20s      lead/reviewer -> lead result (blocked) "Re-check memo-2026-10-19.md after rework (criteria C1-C8 +…"
+ +12m21s    run 20261022T222825986058 ok, ran 1m04s, queued 1.1s, 4 call(s) [org_read×2 report×1 write×1]
+ +13m12s    lead -> root result (blocked) "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording"
+ +13m13s  root progress ok
+ +13m33s  root -> lead note "Client decision: Marta agenda item is option (b)" +3 run(s)
+ +13m33s  root send ok
+ +13m34s    run 20261022T222938655161 ok, ran 1m37s, queued 236ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +14m57s    lead -> lead/reviewer task "Re-check memo-2026-10-19.md (final, with client decision on…" +1 run(s)
+ +14m58s      run 20261022T223103321849 ok, ran 1m11s, queued 1.6s, 4 call(s) [write×2 org_read×1 report×1]
+ +16m01s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-19.md (final, with client decision on…" +1 run(s)
+ +16m03s    run 20261022T223208095829 ok, ran 57s, queued 1.5s, 4 call(s) [org_read×2 report×1 write×1]
+ +16m52s    lead -> root result (done) "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording" +3 run(s)
+ +16m53s  root progress ok
+ +17m41s  root -> lead note "feedback on "Memo for 2026-10-19: drop Marta agenda row, fi…"
+ +17m41s  root feedback ok
+tasks: 20261022T221604637344-root-6947 "Memo for 2026-10-19 meeting" done 7 run(s) | 20261022T222238418574-root-3286 "Memo for 2026-10-19: drop Mar…" done 8 run(s)
+totals: wall 16m52s | runs 15 (budget given 26, returned 11) | run time 17m54s | queue 13s | waiting on you 22s | tool calls 68 (0 refused)
+note: 20261022T222238418574-root-3286 belongs to the request 20261022T221604637344-root-6947; showing that
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T222938438003-root-3ee5
+trace 20261022T221604637344-root-6947 "Memo for 2026-10-19 meeting" -> lead: done
+     +0s  root -> lead task "Memo for 2026-10-19 meeting" +15 run(s)
+     +0s  root request ok
+     +0s    run 20261022T221604879734 ok, ran 54s, queued 294ms, 2 call(s) [delegate×1 write×1], shared with 1 other request(s)
+    +43s    lead -> lead/writer task "Write memo-2026-10-19.md" +3 run(s)
+    +44s      run 20261022T221649245423 ok, ran 38s, queued 1.1s, 5 call(s) [read×2 write×2 report×1]
+  +1m16s      lead/writer -> lead result (done) "Write memo-2026-10-19.md" +2 run(s)
+  +1m16s    run 20261022T221721591399 ok, ran 1m11s, queued 629ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m14s    lead -> lead/writer task "Rework memo-2026-10-19.md — add two missing action items" +1 run(s)
+  +2m15s      run 20261022T221820273013 ok, ran 44s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+  +2m53s      lead/writer -> lead result (done) "Rework memo-2026-10-19.md — add two missing action items"
+  +2m54s    run 20261022T221858697814 ok, ran 1m01s, queued 1.0s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +3m41s    lead -> lead/reviewer task "Review memo-2026-10-19.md against C1–C8 and R1" +2 run(s)
+  +3m42s      run 20261022T221947175637 ok, ran 1m23s, queued 692ms, 4 call(s) [write×2 org_read×1 report×1]
+  +4m59s      lead/reviewer -> lead result (done) "Review memo-2026-10-19.md against C1–C8 and R1" +1 run(s)
+  +4m59s    run 20261022T222103982980 ok, ran 51s, queued 63ms, 3 call(s) [org_read×1 report×1 write×1]
+  +5m42s    lead -> root result (done) "Memo for 2026-10-19 meeting" +8 run(s)
+  +5m44s  root progress ok
+  +6m33s  root -> lead task "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording" +8 run(s)
+  +6m33s  root request ok
+  +6m34s    run 20261022T222238670453 ok, ran 1m13s, queued 276ms, 7 call(s) [org_read×5 delegate×1 write×1]
+  +7m35s    lead -> lead/writer task "Rework memo-2026-10-19.md: remove Marta agenda row, fix SSO…" +2 run(s)
+  +7m36s      run 20261022T222341210592 ok, ran 45s, queued 597ms, 6 call(s) [read×3 write×2 report×1]
+  +8m15s      lead/writer -> lead result (done) "Rework memo-2026-10-19.md: remove Marta agenda row, fix SSO…" +1 run(s)
+  +8m17s    run 20261022T222421722229 ok, ran 55s, queued 2.0s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +8m59s    lead -> lead/reviewer task "Re-check memo-2026-10-19.md after rework (criteria C1-C8 +…" +2 run(s)
+  +8m59s      run 20261022T222504163070 ok, ran 3m32s, queued 167ms, 4 call(s) [write×2 org_read×1 report×1]
+ +12m20s      lead/reviewer -> lead result (blocked) "Re-check memo-2026-10-19.md after rework (criteria C1-C8 +…"
+ +12m21s    run 20261022T222825986058 ok, ran 1m04s, queued 1.1s, 4 call(s) [org_read×2 report×1 write×1]
+ +13m12s    lead -> root result (blocked) "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording"
+ +13m13s  root progress ok
+ +13m33s  root -> lead note "Client decision: Marta agenda item is option (b)" +3 run(s)
+ +13m33s  root send ok
+ +13m34s    run 20261022T222938655161 ok, ran 1m37s, queued 236ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +14m57s    lead -> lead/reviewer task "Re-check memo-2026-10-19.md (final, with client decision on…" +1 run(s)
+ +14m58s      run 20261022T223103321849 ok, ran 1m11s, queued 1.6s, 4 call(s) [write×2 org_read×1 report×1]
+ +16m01s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-19.md (final, with client decision on…" +1 run(s)
+ +16m03s    run 20261022T223208095829 ok, ran 57s, queued 1.5s, 4 call(s) [org_read×2 report×1 write×1]
+ +16m52s    lead -> root result (done) "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording" +3 run(s)
+ +16m53s  root progress ok
+ +17m41s  root -> lead note "feedback on "Memo for 2026-10-19: drop Marta agenda row, fi…"
+ +17m41s  root feedback ok
+tasks: 20261022T221604637344-root-6947 "Memo for 2026-10-19 meeting" done 7 run(s) | 20261022T222238418574-root-3286 "Memo for 2026-10-19: drop Mar…" done 8 run(s)
+totals: wall 16m52s | runs 15 (budget given 26, returned 11) | run time 17m54s | queue 13s | waiting on you 22s | tool calls 68 (0 refused)
+note: 20261022T222938438003-root-3ee5 belongs to the request 20261022T221604637344-root-6947; showing that
+
+######## hirearchy --root /tmp/hirearchy-e4-s3-1792705005/org obs trace 20261022T223346261203-root-f5e0
+trace 20261022T221604637344-root-6947 "Memo for 2026-10-19 meeting" -> lead: done
+     +0s  root -> lead task "Memo for 2026-10-19 meeting" +15 run(s)
+     +0s  root request ok
+     +0s    run 20261022T221604879734 ok, ran 54s, queued 294ms, 2 call(s) [delegate×1 write×1], shared with 1 other request(s)
+    +43s    lead -> lead/writer task "Write memo-2026-10-19.md" +3 run(s)
+    +44s      run 20261022T221649245423 ok, ran 38s, queued 1.1s, 5 call(s) [read×2 write×2 report×1]
+  +1m16s      lead/writer -> lead result (done) "Write memo-2026-10-19.md" +2 run(s)
+  +1m16s    run 20261022T221721591399 ok, ran 1m11s, queued 629ms, 3 call(s) [delegate×1 org_read×1 write×1]
+  +2m14s    lead -> lead/writer task "Rework memo-2026-10-19.md — add two missing action items" +1 run(s)
+  +2m15s      run 20261022T221820273013 ok, ran 44s, queued 1.3s, 6 call(s) [read×3 write×2 report×1]
+  +2m53s      lead/writer -> lead result (done) "Rework memo-2026-10-19.md — add two missing action items"
+  +2m54s    run 20261022T221858697814 ok, ran 1m01s, queued 1.0s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +3m41s    lead -> lead/reviewer task "Review memo-2026-10-19.md against C1–C8 and R1" +2 run(s)
+  +3m42s      run 20261022T221947175637 ok, ran 1m23s, queued 692ms, 4 call(s) [write×2 org_read×1 report×1]
+  +4m59s      lead/reviewer -> lead result (done) "Review memo-2026-10-19.md against C1–C8 and R1" +1 run(s)
+  +4m59s    run 20261022T222103982980 ok, ran 51s, queued 63ms, 3 call(s) [org_read×1 report×1 write×1]
+  +5m42s    lead -> root result (done) "Memo for 2026-10-19 meeting" +8 run(s)
+  +5m44s  root progress ok
+  +6m33s  root -> lead task "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording" +8 run(s)
+  +6m33s  root request ok
+  +6m34s    run 20261022T222238670453 ok, ran 1m13s, queued 276ms, 7 call(s) [org_read×5 delegate×1 write×1]
+  +7m35s    lead -> lead/writer task "Rework memo-2026-10-19.md: remove Marta agenda row, fix SSO…" +2 run(s)
+  +7m36s      run 20261022T222341210592 ok, ran 45s, queued 597ms, 6 call(s) [read×3 write×2 report×1]
+  +8m15s      lead/writer -> lead result (done) "Rework memo-2026-10-19.md: remove Marta agenda row, fix SSO…" +1 run(s)
+  +8m17s    run 20261022T222421722229 ok, ran 55s, queued 2.0s, 3 call(s) [delegate×1 org_read×1 write×1]
+  +8m59s    lead -> lead/reviewer task "Re-check memo-2026-10-19.md after rework (criteria C1-C8 +…" +2 run(s)
+  +8m59s      run 20261022T222504163070 ok, ran 3m32s, queued 167ms, 4 call(s) [write×2 org_read×1 report×1]
+ +12m20s      lead/reviewer -> lead result (blocked) "Re-check memo-2026-10-19.md after rework (criteria C1-C8 +…"
+ +12m21s    run 20261022T222825986058 ok, ran 1m04s, queued 1.1s, 4 call(s) [org_read×2 report×1 write×1]
+ +13m12s    lead -> root result (blocked) "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording"
+ +13m13s  root progress ok
+ +13m33s  root -> lead note "Client decision: Marta agenda item is option (b)" +3 run(s)
+ +13m33s  root send ok
+ +13m34s    run 20261022T222938655161 ok, ran 1m37s, queued 236ms, 3 call(s) [delegate×1 org_read×1 write×1]
+ +14m57s    lead -> lead/reviewer task "Re-check memo-2026-10-19.md (final, with client decision on…" +1 run(s)
+ +14m58s      run 20261022T223103321849 ok, ran 1m11s, queued 1.6s, 4 call(s) [write×2 org_read×1 report×1]
+ +16m01s      lead/reviewer -> lead result (done) "Re-check memo-2026-10-19.md (final, with client decision on…" +1 run(s)
+ +16m03s    run 20261022T223208095829 ok, ran 57s, queued 1.5s, 4 call(s) [org_read×2 report×1 write×1]
+ +16m52s    lead -> root result (done) "Memo for 2026-10-19: drop Marta agenda row, fix SSO wording" +3 run(s)
+ +16m53s  root progress ok
+ +17m41s  root -> lead note "feedback on "Memo for 2026-10-19: drop Marta agenda row, fi…"
+ +17m41s  root feedback ok
+tasks: 20261022T221604637344-root-6947 "Memo for 2026-10-19 meeting" done 7 run(s) | 20261022T222238418574-root-3286 "Memo for 2026-10-19: drop Mar…" done 8 run(s)
+totals: wall 16m52s | runs 15 (budget given 26, returned 11) | run time 17m54s | queue 13s | waiting on you 22s | tool calls 68 (0 refused)
+note: 20261022T223346261203-root-f5e0 belongs to the request 20261022T221604637344-root-6947; showing that
+

@@ -1,0 +1,153 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-22T21:51:28Z .. 2026-10-22T21:56:27Z; injected task 20261022T215128895860-root-fe20; revised (memo 1) task 20261022T214612649634-root-4510
+
+## run lead@20261022T215129101372 agent=lead model=claude-sonnet-4.6 start=2026-10-22T21:51:29.114237+00:00 end=2026-10-22T21:53:20.081134+00:00 exit=0 secs=111 session=sess_cdea88a4-7d2b-4e99-962b-47dce1d20286
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 8
+  lead message 20261022T215309118322-lead-5559 to=lead/writer type=task status=None created=2026-10-22T21:53:09+00:00
+  ## Lessons: (none)
+  org-git commit fe51cf7 MEMORY.md diff:
+    commit fe51cf77560191c68d6f3c217d7f4100e4423c46
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 22 22:53:20 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261022T215129101372.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 796ee75..32a8aea 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,11 +1,18 @@
+     # State
+    -No open tasks. Last task 20261022T214612649634-root-4510 reported done.
+    +Open task: 20261022T215128895860-root-fe20 "Rework memo 2026-10-05: unclear due dates" from root.
+     
+    -## Last delivery
+    -- Memo: lead/writer/work/memo-2026-10-05.md (146 words)
+    -- All 7 criteria met; reviewer: criteria met 7 of 7 — PASS
+    -- Both Due fixes applied: Sam=2026-10-09, Marta=2026-10-14
+    +## What happened
+    +- Previous delivery had wrong Due values: Sam=2026-10-09 (Friday itself, not 'before Friday') and Marta=2026-10-14 (training date, not booking deadline). Root rejected.
+    +- Delegated second rework to writer: task 20261022T215309118322-lead-5559 (revises 20261022T214714927747-lead-0ebf, budget=1).
+    +- Required changes: Sam Due→none, Marta Due→none, add Open questions section with both items.
+     
+    -## Notes for next request
+    -- Relative-date anchoring (e.g. "before Friday" from a Monday meeting) needs explicit attention at write time to avoid first-pass errors.
+    -- Playbook revision requires client evidence (R<k>/C<k>); lessons alone are not enough.
+    +## Next run (when writer result arrives)
+    +- Read lead/writer/work/memo-2026-10-05.md, verify both Due values are none and Open questions section is present with the two bullets.
+    +- Delegate to reviewer with revises=20261022T214836526691-lead-735b, budget=1.
+    +- Reviewer criteria C7 must reflect new required values (Sam=none, Marta=none) and instruct reviewer to check ALL Due values against notes text, not only changed rows.
+    +
+    +## Key IDs
+    +- Root task: 20261022T215128895860-root-fe20
+    +- Writer prev task: 20261022T214714927747-lead-0ebf
+    +- Reviewer prev task: 20261022T214836526691-lead-735b
+    +- Writer rework task: 20261022T215309118322-lead-5559
+
+## run lead/writer@20261022T215309961059 agent=lead-writer model=claude-haiku-4.5 start=2026-10-22T21:53:09.975567+00:00 end=2026-10-22T21:53:54.387726+00:00 exit=0 secs=44 session=sess_e33723f0-2010-453b-8080-5734f6166d49
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261022T215346314449 agent=lead model=claude-sonnet-4.6 start=2026-10-22T21:53:46.328078+00:00 end=2026-10-22T21:54:50.871109+00:00 exit=0 secs=65 session=sess_8fa2b5bf-0cbf-4e77-85cb-836c439f78b4
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261022T215434165800-lead-f428 to=lead/reviewer type=task status=None created=2026-10-22T21:54:34+00:00
+  ## Lessons: (none)
+  org-git commit a042fc2 MEMORY.md diff:
+    commit a042fc2f1690411c0ebdd48d8e87f4b5c61824ae
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 22 22:54:50 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261022T215346314449.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 32a8aea..97394c3 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -2,17 +2,23 @@
+     Open task: 20261022T215128895860-root-fe20 "Rework memo 2026-10-05: unclear due dates" from root.
+     
+     ## What happened
+    -- Previous delivery had wrong Due values: Sam=2026-10-09 (Friday itself, not 'before Friday') and Marta=2026-10-14 (training date, not booking deadline). Root rejected.
+    -- Delegated second rework to writer: task 20261022T215309118322-lead-5559 (revises 20261022T214714927747-lead-0ebf, budget=1).
+    -- Required changes: Sam Due→none, Marta Due→none, add Open questions section with both items.
+    +- Writer completed second rework (task 20261022T215309118322-lead-5559): Sam Due→none, Marta Due→none, Open questions section added. 193 words. Read and verified.
+    +- Delegated re-check to reviewer: task 20261022T215434165800-lead-f428 (revises 20261022T214836526691-lead-735b, budget=1).
+     
+    -## Next run (when writer result arrives)
+    -- Read lead/writer/work/memo-2026-10-05.md, verify both Due values are none and Open questions section is present with the two bullets.
+    -- Delegate to reviewer with revises=20261022T214836526691-lead-735b, budget=1.
+    -- Reviewer criteria C7 must reflect new required values (Sam=none, Marta=none) and instruct reviewer to check ALL Due values against notes text, not only changed rows.
+    +## Next run (when reviewer result arrives)
+    +- Read reviewer's findings file.
+    +- Check coverage line: must be "criteria met: N of M" with N=M (all 6 criteria).
+    +- If all met: report root task done with artifact lead/writer/work/memo-2026-10-05.md.
+    +- If not met: one more rework+re-check cycle (budget may be tight: 2 runs remain).
+    +
+    +## Verified facts from my own read
+    +- 193 words (C1 ✓)
+    +- Decisions: API gateway pushed to Oct 26, Renovate adopted (C3 ✓)
+    +- 5 action items: Priya 2026-10-09, Dev 2026-10-08, Sam none, Marta none, Lee none (C4/C5 ✓)
+    +- Owner names match notes (C6 ✓)
+    +- Open questions section present with 2 bullets (required changes ✓)
+     
+     ## Key IDs
+     - Root task: 20261022T215128895860-root-fe20
+    -- Writer prev task: 20261022T214714927747-lead-0ebf
+    -- Reviewer prev task: 20261022T214836526691-lead-735b
+    -- Writer rework task: 20261022T215309118322-lead-5559
+    +- Reviewer re-check task: 20261022T215434165800-lead-f428
+    +- Writer final artifact: lead/writer/work/memo-2026-10-05.md
+
+## run lead/reviewer@20261022T215434728330 agent=lead-reviewer model=claude-sonnet-4.6 start=2026-10-22T21:54:34.741407+00:00 end=2026-10-22T21:55:49.342363+00:00 exit=0 secs=75 session=sess_52144439-433f-4495-83ba-45b65823e9a7
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261022T215543270429 agent=lead model=claude-sonnet-4.6 start=2026-10-22T21:55:43.285754+00:00 end=2026-10-22T21:56:27.669151+00:00 exit=0 secs=44 session=sess_37bb3e67-136c-44b7-bcb3-30bf3941b7cb
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261022T215618947365-lead-40d8 to=root type=result status=done created=2026-10-22T21:56:18+00:00
+  ## Lessons: Two rework cycles were needed: first to add an Open questions section (not required by criteria but flagged by reviewer), then to correct two Due values (Sam's 'before Friday' and Marta's training date were incorrectly resolved to dates). Pitfall to add: relative or contextual dates (e.g. 'before Friday', 'date of the event') must always become none unless the ISO calendar date is explicitly stated in the notes. Writer should default to none and flag ambiguous dates in Open questions rather than resolving them.
+  org-git commit 49396ec MEMORY.md diff:
+    commit 49396ec8258a3e6fe8a09dd881a26675cc56c86a
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 22 22:56:27 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261022T215543270429.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 97394c3..23e8925 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,24 +1,11 @@
+     # State
+    -Open task: 20261022T215128895860-root-fe20 "Rework memo 2026-10-05: unclear due dates" from root.
+    +No open tasks. Ready for next request.
+     
+    -## What happened
+    -- Writer completed second rework (task 20261022T215309118322-lead-5559): Sam Due→none, Marta Due→none, Open questions section added. 193 words. Read and verified.
+    -- Delegated re-check to reviewer: task 20261022T215434165800-lead-f428 (revises 20261022T214836526691-lead-735b, budget=1).
+    -
+    -## Next run (when reviewer result arrives)
+    -- Read reviewer's findings file.
+    -- Check coverage line: must be "criteria met: N of M" with N=M (all 6 criteria).
+    -- If all met: report root task done with artifact lead/writer/work/memo-2026-10-05.md.
+    -- If not met: one more rework+re-check cycle (budget may be tight: 2 runs remain).
+    -
+    -## Verified facts from my own read
+    -- 193 words (C1 ✓)
+    -- Decisions: API gateway pushed to Oct 26, Renovate adopted (C3 ✓)
+    -- 5 action items: Priya 2026-10-09, Dev 2026-10-08, Sam none, Marta none, Lee none (C4/C5 ✓)
+    -- Owner names match notes (C6 ✓)
+    -- Open questions section present with 2 bullets (required changes ✓)
+    +## Last completed
+    +Task 20261022T215128895860-root-fe20: memo-2026-10-05.md delivered done.
+    +- 2 rework cycles needed
+    +- Pitfall identified: relative/contextual dates must default to none unless ISO date is explicit in notes
+     
+     ## Key IDs
+    -- Root task: 20261022T215128895860-root-fe20
+    -- Reviewer re-check task: 20261022T215434165800-lead-f428
+     - Writer final artifact: lead/writer/work/memo-2026-10-05.md
+    +- Reviewer final report: lead/reviewer/work/review-memo-2026-10-05-rework2.md
+

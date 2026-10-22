@@ -1,0 +1,33 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-22T21:10:11.388Z] call #24 turn 5 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-e4-s2r-1792702135/deliverables && cp /tmp/hirearchy-e4-s2r-1792702135/org/lead/writer/work/2026-10-05-memo.md /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md && diff /tmp/hirearchy-e4-s2r-1792702135/org/lead/writer/work/2026-10-05-memo.md /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md && echo identical && wc -w /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md
+source file(s): ['lead/writer/work/2026-10-05-memo.md -> org-git commit at that time: 0aa3d3b 2026-10-22T22:05:10+01:00', 'lead/writer/work/2026-10-05-memo.md -> org-git commit at that time: 0aa3d3b 2026-10-22T22:05:10+01:00']
+result: Output:
+identical
+     180 /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md
+
+
+Exit Code: 0
+
+[2026-10-22T21:29:46.486Z] call #38 turn 8 execute_bash
+COMMAND: cp /tmp/hirearchy-e4-s2r-1792702135/org/lead/writer/work/2026-10-05-memo.md /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md && diff /tmp/hirearchy-e4-s2r-1792702135/org/lead/writer/work/2026-10-05-memo.md /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md && echo identical && grep -n "Summary:\|Marta" /tmp/hirearchy-e4-s2r-1792702135/deliverables/2026-10-05-memo.md
+source file(s): ['lead/writer/work/2026-10-05-memo.md -> org-git commit at that time: 814f709 2026-10-22T22:24:54+01:00', 'lead/writer/work/2026-10-05-memo.md -> org-git commit at that time: 814f709 2026-10-22T22:24:54+01:00']
+result: Output:
+identical
+3:Summary: Deferred API gateway migration to the week of 26 October, adopted Renovate for weekly dependency updates, and identified flaky CI investigation as a priority before Friday.
+18:| Marta | Book on-call training room for eight people with screen | none |
+24:- Marta / training room booking: Oct 14 is the training date; no booking deadline stated — when should the room be booked by?
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  2026-10-05-memo.md size 1356 mtime 22:29:46 local md5 7a2956053e16a21999c2b3ccd638b179
+
+final ls -la:
+total 8
+drwxr-xr-x@ 3 aminalizadeh  wheel    96 Oct 22 22:10 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 22 22:10 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  1356 Oct 22 22:29 2026-10-05-memo.md
+

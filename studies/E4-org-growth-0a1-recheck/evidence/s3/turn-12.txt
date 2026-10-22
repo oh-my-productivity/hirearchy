@@ -1,0 +1,7 @@
+######## TURN 12  start 23:33:29  end 23:33:51  elapsed 22s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T22:33:29Z end 2026-10-22T22:33:51Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks - keep it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+Your feedback is recorded. All three memos (5, 12 and 19 October) are now in `/tmp/hirearchy-e4-s3-1792705005/deliverables/`.
+
+For next week, say "memo for <date>" with the notes file name and I'll run it. The service now has the Summary rule built in, so you won't need to repeat it. Budget is 15 runs per memo. A clean first pass has taken about 5 to 7 runs. Corrections add to that.

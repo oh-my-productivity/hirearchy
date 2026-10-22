@@ -1,0 +1,2 @@
+script md5 at s2r's request (frozen at s1r's first successful request; s2r must use the same md5): c80e25d65fe58cdb97d7faa758d59484
+md5 checked before the run (setup.txt) and at the launch: c80e25d65fe58cdb97d7faa758d59484

@@ -1,0 +1,4 @@
+deleted hirearchy-study-e4-s1-assistant.json md5 41cfe53fa8549d2f8cebfb94631b8e25 at 2026-10-22T03:59:44Z
+deleted hirearchy-hirearchy-e4-s1-17926405-dcd590-read-xc7b006b8.json md5 7bf763832fc93442634a6e49cff6abde at 2026-10-22T03:59:44Z
+deleted hirearchy-study-e4-diag.json md5 5702d008e19dccf798d720d4cb28fc8c at 2026-10-22T03:59:44Z
+2026-10-22T04:08:26Z manager moved hirearchy-study-e4-prep-1792639838.json out of ~/.kiro/agents (E4 workflow failed at s1; the restart creates a fresh prep profile)

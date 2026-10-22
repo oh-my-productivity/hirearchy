@@ -1,0 +1,15 @@
+# contract loop (protocol 7.2); facts only, time order
+
+Lena reject turns (D1 candidates: turns whose line starts with 'No, not right yet' / 'Not right yet' / 'Almost'):
+
+assistant calls to feedback, define_service, request, services (full arguments and replies):
+[2026-10-22T19:59:28.159Z] call #12 turn 4 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"service": "weekly-meeting-memo", "inputs": {"notes_file": "2026-10-05.md"}, "title": "Memo for meeting 2026-10-05"}}
+REPLY (2026-10-22T19:59:28.159Z): requested service `weekly-meeting-memo` from lead: task 20261022T195928156602-root-2ab8, budget 15 (contract v1, playbook v1). Call start() if the scheduler is not running.
+
+[2026-10-22T20:12:54.218Z] call #21 turn 5 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"service": "weekly-meeting-memo", "inputs": {"notes_file": "2026-10-05.md"}, "title": "Rework memo 2026-10-05: Sam's due date", "revises": "20261022T195928156602-root-2ab8", "source": "human", "note": "The user answered your question for the client: Sam's Due (\"before Friday\") must be 2026-10-09. Change only that cell; keep everything else as is. Have the reviewer re-check the whole memo against every criterion, treating the user's answer as authoritative for this one cell."}}
+REPLY (2026-10-22T20:12:54.218Z): requested service `weekly-meeting-memo` from lead: task 20261022T201253989822-root-2139, budget 15 (contract v1, playbook v1). Call start() if the scheduler is not running.
+case total: 9 runs used of 30 handed down (contract: 15 per request). This case now exceeds the per-request budget of 15: tell the user.
+
+root notes in S/org/sent with a feedback: or criterion: header:

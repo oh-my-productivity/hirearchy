@@ -1,0 +1,52 @@
+
+# --- scheduler started 2026-10-22 19:59:32Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s2-1792698851/org run --until-done
+org: /private/tmp/hirearchy-e4-s2-1792698851/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 74s
+lead: started run (1 message(s))
+lead/writer: run finished in 80s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 120s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 141s
+lead/writer: started run (1 message(s))
+lead: run finished in 131s
+lead: started run (1 message(s))
+lead/writer: run finished in 70s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 76s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 80s
+lead: run finished in 97s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 20:12:53Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s2-1792698851/org run --until-done
+org: /private/tmp/hirearchy-e4-s2-1792698851/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 105s
+lead: started run (1 message(s))
+lead/writer: run finished in 71s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 83s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 117s
+lead: run finished in 79s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-22 20:20:52Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e4-s2-1792698851/org run --until-done
+org: /private/tmp/hirearchy-e4-s2-1792698851/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 123s
+lead: started run (1 message(s))
+lead/writer: run finished in 83s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 85s
+lead/reviewer: run failed (1 in a row), log: /private/tmp/hirearchy-e4-s2-1792698851/org/lead/reviewer/runs/20261022T202454859379.log
+lead/reviewer: out of budget, paused, parent notified
+lead: started run (1 message(s))
+lead: run finished in 117s
+waiting on you: "Rework memo 2026-10-05: unclear due dates" needs budget (lead/reviewer out of runs). Exiting in 300s unless something changes
+scheduler exiting: waiting on you: "Rework memo 2026-10-05: unclear due dates" needs budget (lead/reviewer out of runs)

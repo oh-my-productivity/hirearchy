@@ -1,0 +1,7 @@
+# s1r skill check (protocol 4.4)
+repo skills/hirearchy/SKILL.md: 573495bb613f19f7c07ce86508ebae4f      125 lines
+workspace copy /tmp/hirearchy-e4-s1r-1792693447/.kiro/skills/hirearchy/SKILL.md: 573495bb613f19f7c07ce86508ebae4f      125 lines
+global ~/.kiro/skills/hirearchy/SKILL.md (read-only): 573495bb613f19f7c07ce86508ebae4f      125 lines
+first disclose_context(hirearchy): NONE. The assistant session holds 54 tool calls: tool_call 32 (all hirearchy::*), tool_load 6, read_file 7, execute_bash 8, list_directory 1; no disclose_context call, so no skill directory was disclosed and no skill md5 was read from a loaded path. Recorded as assistant behaviour (protocol 4.4: the stream stays valid).
+S17-5: root's first status reply (call #33, turn 8; the assistant made no whoami call) contains 'Note: the installed skill at': 0 occurrence(s) [whole transcript: 0]
+stale-skill case: not exercised (would require changing the global skill, which is forbidden).

@@ -1,0 +1,18 @@
+######## TURN 11  start 23:22:19  end 23:33:10  elapsed 651s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T22:22:19Z end 2026-10-22T22:33:10Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Lee's 2026-10-30 is right. Sam's should be none. No, nothing for Marta to do there, leave it out.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-11.stderr.txt):
+The 19 October memo is at `/tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-19.md`, and the copy matches the team's file. It's the version with your three answers applied. I also fixed the SSO wording to "at roughly the same price" to match the notes.
+
+- **Markdown, at most 400 words:** met. It has 179 words by `wc -w`.
+- **Covers only the 19 October meeting:** met.
+- **Decisions:** met. All three are there: the demo goes ahead without the rate limiter, the SSO renewal for twelve months, and the meeting moving to Monday 14:00 from 26 October.
+- **Action-items table:** met. It has five rows (Marta, Dev, Priya, Sam, Lee), and Marta's "keep the agenda as sent" row is left out.
+- **Due dates:** met. Marta is 2026-10-23, Dev 2026-10-24, Priya 2026-10-26 and Lee 2026-10-30. Sam's is `none`.
+- **Owner names:** met.
+- **Summary first, then decisions, then actions (C8):** met.
+- **Reviewer's report:** met. The final re-check shows 8 of 8 criteria met.
+
+Runs: this memo used 15 of the 15 approved. The first pass took 7 and your corrections took 8, including a re-check after the reviewer got stuck on Marta's row. That row was a gap in the reviewer's instructions, which your answer settled.
+
+Keep it, or what should change?

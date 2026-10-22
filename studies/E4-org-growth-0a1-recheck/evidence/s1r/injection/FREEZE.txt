@@ -1,0 +1,3 @@
+script md5 at the first successful request (frozen from here, protocol 5.3 / amendment A2; s2 and s3 must use it): c80e25d65fe58cdb97d7faa758d59484
+first successful request: 2026-10-22T18:47:12Z (task 20261022T184712524029-root-9ce9)
+request-args.json (note abbreviated): {"service": "weekly-memo", "inputs": {"notes_file": "2026-10-05.md"}, "title": "Rework memo 2026-10-05: unclear due dates", "note": "<866 chars>", "budget": 6, "revises": "20261022T182945409755-root-ed94", "source": "relayed"}

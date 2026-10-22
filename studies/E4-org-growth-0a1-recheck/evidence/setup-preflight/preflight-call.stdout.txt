@@ -1,0 +1,17 @@
+autonomous research
+commit-work
+hirearchy
+reverse-engineer-anything
+skill-generation
+test-driven-development
+workflow-suggest
+
+Correction: the first name should be "autoresearch", not "autonomous research".
+
+autoresearch
+commit-work
+hirearchy
+reverse-engineer-anything
+skill-generation
+test-driven-development
+workflow-suggest

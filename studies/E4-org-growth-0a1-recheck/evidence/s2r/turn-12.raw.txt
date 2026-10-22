@@ -1,0 +1,3 @@
+Nothing is running, so there's nothing to wait for. I can't message you later either, because I only respond when you write to me.
+
+When you're ready for the next memo, send me the notes file name, for example `2026-10-26.md`. I'll start the team and wait for it with you.

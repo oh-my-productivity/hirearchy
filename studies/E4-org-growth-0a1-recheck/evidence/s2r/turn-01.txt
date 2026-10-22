@@ -1,0 +1,26 @@
+######## TURN 1  start 21:50:45  end 21:51:53  elapsed 68s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T20:50:45Z end 2026-10-22T20:51:53Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-e4-s2r-1792702135/notes (one file per meeting). Can you set up a team that does this for me every week?
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+I read the latest notes (19 October), so I can ask about the real cases in them. Since this repeats every week, I'll set it up as a standing service: you ask once per meeting, and the team writes the memo. I need a few answers before I draft the plan. Reply "defaults" to accept the proposed ones.
+
+1. **Which notes each time?** The input that changes is the meeting file, for example `2026-10-26.md`. Everything else stays fixed. Default: you tell me the file name each week. Is that OK?
+
+2. **What counts as a decision or an action?** Your 19 October notes mix labelled and unlabelled items:
+   - Labelled "ACTION:" lines, such as Marta collecting demo feedback.
+   - Informal commitments in prose, such as Lee signing off the SSO renewal "once legal replies" and Sam pairing with Jo on the CI pipeline.
+   - Decisions with no owner, such as renewing the SSO vendor or moving the meeting to 14:00.
+
+   Default: include every decision and every commitment, labelled or not, each with its owner. A decision without an owner is listed as "no owner named".
+
+3. **Vague dates.** Examples are "by end of next week" and "the next meeting". Default: turn them into a calendar date from the meeting date when that's clear (next meeting becomes 26 Oct). Otherwise keep the original wording and leave the date blank. I won't guess dates. Which do you prefer?
+
+4. **Format and place.** Default: a markdown memo of at most 400 words, in two sections ("Decisions" and "Who does what", as a table with owner, task and due date). It goes in a new `deliverables/` folder here, named after the meeting date. Should I keep that length and layout?
+
+5. **Sources.** Only your own notes folder, `/tmp/hirearchy-e4-s2r-1792702135/notes`, read-only. No web. OK?
+
+6. **Checks.** Default: a second agent checks the memo against the notes. Every decision and commitment in the notes must be in the memo, and nothing may appear in the memo that isn't in the notes.
+
+7. **Budget and models.** Default: the plan's estimate plus 25% per memo, with all agents on claude-sonnet-5.5. I'll show you the exact number in the plan.
+
+8. **Approval.** Default: you approve the plan before anything is built. Nothing runs until you ask for a memo.

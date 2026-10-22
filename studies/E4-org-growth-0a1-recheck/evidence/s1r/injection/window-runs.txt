@@ -1,0 +1,205 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-22T18:47:12Z .. 2026-10-22T18:56:03Z; injected task 20261022T184712524029-root-9ce9; revised (memo 1) task 20261022T182945409755-root-ed94
+
+## run lead@20261022T184712723891 agent=lead model=claude-sonnet-4.6 start=2026-10-22T18:47:12.736766+00:00 end=2026-10-22T18:49:46.041588+00:00 exit=0 secs=153 session=sess_10a1a1c1-d7a7-4ada-8be9-66c3d1bd7207
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 8
+  lead message 20261022T184921776465-lead-cc98 to=lead/writer type=task status=None created=2026-10-22T18:49:21+00:00
+  ## Lessons: (none)
+  org-git commit 7507cf7 MEMORY.md diff:
+    commit 7507cf73ccc7d53589d0247ba638f492c4446ee4
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 22 19:49:46 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261022T184712723891.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 489b732..1e486fe 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,14 +1,29 @@
+     # State
+     
+    -## Last completed task
+    -- 20261022T182945409755-root-ed94: Memo for 2026-10-05 platform weekly — reported done.
+    -- Deliverable: lead/writer/work/memo-2026-10-05.md (147 words)
+    -- Checker ledger: lead/checker/work/review-memo-2026-10-05-v2.md
+    -- criteria met: 6 of 6 — PASS
+    -
+    -## No open tasks or outstanding delegations.
+    -
+    -## Lessons (for next request)
+    -- One rework was needed: Sam's due date required ISO conversion from relative weekday ("before Friday" from Mon = Thu 2026-10-08). Writer initially used 2026-10-09.
+    -- Pitfall to add to playbook (needs client rejection evidence R<k> to qualify): relative weekday dates must be converted using the meeting date as day 0.
+    -- Budget: ~12 of 15 runs used; reserve adequate.
+    +## Open task
+    +- 20261022T184712524029-root-9ce9: Rework memo 2026-10-05 (revises 20261022T182945409755-root-ed94) from root
+    +  - Service: weekly-memo
+    +  - Notes file: 2026-10-05.md
+    +  - Required changes:
+    +    1. Sam Due: bare 2026-10-08 not acceptable; must be 2026-10-08 WITH Open questions derivation note, or none with "before Friday" in Open questions.
+    +    2. Marta Due: must be none; Oct 14 is training date not booking deadline; Open questions entry required.
+    +  - C7 (checker coverage line) must be in final report.
+    +
+    +## Outstanding delegation
+    +- 20261022T184921776465-lead-cc98 → lead/writer: rework memo fix Sam+Marta Due, add Open questions (budget=1)
+    +  - revises: 20261022T184033947675-lead-0d54
+    +
+    +## Next steps (when writer reports)
+    +1. Read lead/writer/work/memo-2026-10-05.md and verify all changes applied.
+    +2. Delegate checker re-check (revises=20261022T184257558777-lead-3fb1, budget=1).
+    +   - Instruct checker to re-check EVERY Due value against notes text, not only changed rows.
+    +3. When checker reports: read artifact + checker ledger, verify all 6 criteria + checker coverage line, report done/blocked.
+    +
+    +## Budget
+    +- 4 runs left (after this run and writer delegation).
+    +- Reserve: writer done (1) → checker (1) → checker done (1) → report (1) = 4. OK.
+    +
+    +## Key task IDs
+    +- Writer's rework task (previous): 20261022T184033947675-lead-0d54
+    +- Checker's re-check task (previous): 20261022T184257558777-lead-3fb1
+    +- Deliverable path: lead/writer/work/memo-2026-10-05.md
+
+## run lead/writer@20261022T184921806645 agent=lead-writer model=claude-haiku-4.5 start=2026-10-22T18:49:21.812064+00:00 end=2026-10-22T18:50:58.808661+00:00 exit=0 secs=97 session=sess_e89d67ea-28a7-4982-9216-dd0019699070
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261022T185048713633 agent=lead model=claude-sonnet-4.6 start=2026-10-22T18:50:48.736650+00:00 end=2026-10-22T18:52:13.348418+00:00 exit=0 secs=85 session=sess_964f65fe-2a03-4d49-8f73-04a006ce5e0d
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261022T185152705117-lead-2ae7 to=lead/checker type=task status=None created=2026-10-22T18:51:52+00:00
+  ## Lessons: (none)
+  org-git commit 6fd3f46 MEMORY.md diff:
+    commit 6fd3f46c5449378cf7f28cbd2d43bdc4a2b7dd0b
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 22 19:52:13 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261022T185048713633.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 1e486fe..a9f46e6 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,29 +1,31 @@
+     # State
+     
+     ## Open task
+    -- 20261022T184712524029-root-9ce9: Rework memo 2026-10-05 (revises 20261022T182945409755-root-ed94) from root
+    -  - Service: weekly-memo
+    -  - Notes file: 2026-10-05.md
+    -  - Required changes:
+    -    1. Sam Due: bare 2026-10-08 not acceptable; must be 2026-10-08 WITH Open questions derivation note, or none with "before Friday" in Open questions.
+    -    2. Marta Due: must be none; Oct 14 is training date not booking deadline; Open questions entry required.
+    -  - C7 (checker coverage line) must be in final report.
+    +- 20261022T184712524029-root-9ce9: Rework memo 2026-10-05 (service: weekly-memo) from root
+     
+     ## Outstanding delegation
+    -- 20261022T184921776465-lead-cc98 → lead/writer: rework memo fix Sam+Marta Due, add Open questions (budget=1)
+    -  - revises: 20261022T184033947675-lead-0d54
+    +- 20261022T185152705117-lead-2ae7 → lead/checker: Re-check memo after rework (budget=1)
+    +  - revises: 20261022T184257558777-lead-3fb1
+     
+    -## Next steps (when writer reports)
+    -1. Read lead/writer/work/memo-2026-10-05.md and verify all changes applied.
+    -2. Delegate checker re-check (revises=20261022T184257558777-lead-3fb1, budget=1).
+    -   - Instruct checker to re-check EVERY Due value against notes text, not only changed rows.
+    -3. When checker reports: read artifact + checker ledger, verify all 6 criteria + checker coverage line, report done/blocked.
+    +## Memo already verified by me (lead)
+    +- Sam row: Due=2026-10-08, Open questions has derivation: meeting Mon 5 Oct → Friday 10 Oct → before Friday = Thu 8 Oct. ✅
+    +- Marta row: Due=none, Open questions states 14 Oct is training date, no booking deadline. ✅
+    +- Decisions: 2 items, one line each. ✅
+    +- Action table: Owner|Action|Due, 5 rows (Priya, Dev, Sam, Marta, Lee). ✅
+    +- Other Due values: Priya=2026-10-09, Dev=2026-10-08, Lee=none. Need checker to confirm against notes.
+    +- Word count: 209 (well under 400). ✅
+    +
+    +## Next steps (when checker reports)
+    +1. Read lead/writer/work/memo-2026-10-05.md (verify unchanged) and checker's ledger file.
+    +2. Confirm checker coverage line: "criteria met: N of M" with N=M.
+    +3. Go through C1-C6 one by one with own read evidence.
+    +4. If all met: report done (task 20261022T184712524029-root-9ce9), artifact=lead/writer/work/memo-2026-10-05.md, paste checker coverage line verbatim.
+    +5. If not: rework or blocked per policy (but this is the final rework; no second cycle).
+     
+     ## Budget
+    -- 4 runs left (after this run and writer delegation).
+    -- Reserve: writer done (1) → checker (1) → checker done (1) → report (1) = 4. OK.
+    +- 2 runs left: 1 to process checker result + 1 to report.
+     
+     ## Key task IDs
+    -- Writer's rework task (previous): 20261022T184033947675-lead-0d54
+    -- Checker's re-check task (previous): 20261022T184257558777-lead-3fb1
+    -- Deliverable path: lead/writer/work/memo-2026-10-05.md
+    +- Checker re-check: 20261022T185152705117-lead-2ae7
+    +- Writer's rework: 20261022T184921776465-lead-cc98
+    +- Deliverable: lead/writer/work/memo-2026-10-05.md
+
+## run lead/checker@20261022T185153203266 agent=lead-checker model=claude-sonnet-4.6 start=2026-10-22T18:51:53.212863+00:00 end=2026-10-22T18:54:50.799940+00:00 exit=0 secs=178 session=sess_2df3660b-0975-4eac-9bee-c8dd238b839f
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 5
+
+## run lead@20261022T185420517529 agent=lead model=claude-sonnet-4.6 start=2026-10-22T18:54:20.544043+00:00 end=2026-10-22T18:56:01.356739+00:00 exit=0 secs=101 session=sess_ed63644e-fc8d-4ec5-a31c-342d2018ed8f
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+  lead message 20261022T185542011090-lead-34c6 to=root type=result status=blocked created=2026-10-22T18:55:42+00:00
+  ## Lessons: Second rework cycle triggered by a single incorrect calendar date ('Friday 10 Oct' instead of 'Friday 9 Oct') introduced in explanatory prose. Pitfall to add to playbook: writer should verify any calendar arithmetic in Open questions text (day-of-week cross-check: meeting Mon 5 Oct, next Fri = Oct 9, not Oct 10). Budget plan held; one full cycle plus one rework+recheck fits in 15 runs.
+  org-git commit 0e2f7ad MEMORY.md diff:
+    commit 0e2f7ad9d240d9816f5c2c03d97e85b45b92ebb1
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Thu Oct 22 19:56:01 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261022T185420517529.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index a9f46e6..2a8057d 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,31 +1,27 @@
+     # State
+     
+     ## Open task
+    -- 20261022T184712524029-root-9ce9: Rework memo 2026-10-05 (service: weekly-memo) from root
+    +- 20261022T184712524029-root-9ce9: Rework memo 2026-10-05 (service: weekly-memo) from root — **BLOCKED** (reported)
+     
+    -## Outstanding delegation
+    -- 20261022T185152705117-lead-2ae7 → lead/checker: Re-check memo after rework (budget=1)
+    -  - revises: 20261022T184257558777-lead-3fb1
+    +## Blocker
+    +C6 NOT MET: Open questions, Sam's entry says "Friday 10 Oct" but Oct 10 is a Saturday. Correct is "Friday 9 Oct".
+    +Due value 2026-10-08 in the table is correct. Single-word fix needed.
+     
+    -## Memo already verified by me (lead)
+    -- Sam row: Due=2026-10-08, Open questions has derivation: meeting Mon 5 Oct → Friday 10 Oct → before Friday = Thu 8 Oct. ✅
+    -- Marta row: Due=none, Open questions states 14 Oct is training date, no booking deadline. ✅
+    -- Decisions: 2 items, one line each. ✅
+    -- Action table: Owner|Action|Due, 5 rows (Priya, Dev, Sam, Marta, Lee). ✅
+    -- Other Due values: Priya=2026-10-09, Dev=2026-10-08, Lee=none. Need checker to confirm against notes.
+    -- Word count: 209 (well under 400). ✅
+    +One rework + one re-check already spent. Budget exhausted (0 runs left after this write).
+     
+    -## Next steps (when checker reports)
+    -1. Read lead/writer/work/memo-2026-10-05.md (verify unchanged) and checker's ledger file.
+    -2. Confirm checker coverage line: "criteria met: N of M" with N=M.
+    -3. Go through C1-C6 one by one with own read evidence.
+    -4. If all met: report done (task 20261022T184712524029-root-9ce9), artifact=lead/writer/work/memo-2026-10-05.md, paste checker coverage line verbatim.
+    -5. If not: rework or blocked per policy (but this is the final rework; no second cycle).
+    +## If root sends budget (to unblock)
+    +1. Delegate writer to fix "Friday 10 Oct" → "Friday 9 Oct" in lead/writer/work/memo-2026-10-05.md, Open questions Sam entry:
+    +   - Corrected text: "Notes say 'before Friday' (meeting Mon 5 Oct → Friday 9 Oct → before Friday = Thu 8 Oct = 2026-10-08)"
+    +   - budget=1, revises=20261022T184921776465-lead-cc98
+    +2. When writer done: delegate checker to re-check same file (budget=1, revises=20261022T185152705117-lead-2ae7)
+    +3. When checker done: read artifact, verify C6, confirm coverage line = "criteria met: 9 of 9", report done.
+     
+    -## Budget
+    -- 2 runs left: 1 to process checker result + 1 to report.
+    +## Key task / file IDs
+    +- Root task: 20261022T184712524029-root-9ce9
+    +- Writer's last task: 20261022T184921776465-lead-cc98
+    +- Checker's last task (re-check): 20261022T185152705117-lead-2ae7
+    +- Checker review file: lead/checker/work/review-memo-2026-10-05-v3.md
+    +- Deliverable: lead/writer/work/memo-2026-10-05.md (209 words, 8 of 9 criteria met)
+     
+    -## Key task IDs
+    -- Checker re-check: 20261022T185152705117-lead-2ae7
+    -- Writer's rework: 20261022T184921776465-lead-cc98
+    -- Deliverable: lead/writer/work/memo-2026-10-05.md
+    +## Budget
+    +0 runs left. Need 3 from root to complete: 1 writer + 1 checker + 1 for me.
+

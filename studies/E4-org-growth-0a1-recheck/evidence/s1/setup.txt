@@ -1,0 +1,42 @@
+# E4 s1 setup (recorded before turn 1)
+date: Thu Oct 22 04:43:00 WEST 2026; utc: 2026-10-22T03:43:00Z
+S: /tmp/hirearchy-e4-s1-1792640562  epoch: 1792640562
+== repo checks (4.1)
+git rev-parse HEAD: d85cc1311a8eb2788e22411fd3d257b60675e443
+git status --porcelain:
+?? docs/research/
+?? studies/E4-org-growth-0a1-recheck/
+git diff --stat d85cc13 HEAD -- src skills pyproject.toml uv.lock: []
+== kiro-cli --version: kiro-cli 2.33.0
+== model list (evidence/models.txt); fixed set M present -> no substitution
+  claude-sonnet-5.5    1.30x credits      Claude Sonnet 5.5 model with 1M context window
+  claude-sonnet-4.6    1.30x credits      Claude Sonnet 4.6 model with 1M context window
+  claude-haiku-4.5     0.40x credits      The latest Claude Haiku model
+== assistant profile ~/.kiro/agents/hirearchy-study-e4-s1-assistant.json
+MD5 (/Users/aminalizadeh/.kiro/agents/hirearchy-study-e4-s1-assistant.json) = 41cfe53fa8549d2f8cebfb94631b8e25
+(s1 is the reference profile; diff against s1's: n/a)
+== workspace settings file
+MD5 (/tmp/hirearchy-e4-s1-1792640562/.kiro/settings/cli.json) = 05d30ccbfd35530747c8a542eb67985c
+{"chat.disableInheritingDefaultResources": true, "chat.enableWorkflows": false}
+harness/workspace-cli.json md5:
+MD5 (/Volumes/workspace/hirearchy/studies/E4-org-growth-0a1-recheck/evidence/harness/workspace-cli.json) = 05d30ccbfd35530747c8a542eb67985c
+== skill copies
+MD5 (/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md) = 573495bb613f19f7c07ce86508ebae4f
+MD5 (/tmp/hirearchy-e4-s1-1792640562/.kiro/skills/hirearchy/SKILL.md) = 573495bb613f19f7c07ce86508ebae4f
+MD5 (/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md) = 573495bb613f19f7c07ce86508ebae4f
+     125 /Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md
+     125 /tmp/hirearchy-e4-s1-1792640562/.kiro/skills/hirearchy/SKILL.md
+     125 /Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md
+     375 total
+== notes
+MD5 (/tmp/hirearchy-e4-s1-1792640562/notes/2026-10-05.md) = 903e3bbf5f35df2c17444f3313c12395
+MD5 (/tmp/hirearchy-e4-s1-1792640562/notes/2026-10-12.md) = 3893bd637c87760b43be4894b47fdb53
+MD5 (/tmp/hirearchy-e4-s1-1792640562/notes/2026-10-19.md) = 9976a7653a6346b0976c3c38b1c697dd
+== protocol.md vs evidence/protocol.md5
+MD5 (/Volumes/workspace/hirearchy/studies/E4-org-growth-0a1-recheck/evidence/protocol.md) = 584b6cc71e3d073d10d45c1c2e64325e
+584b6cc71e3d073d10d45c1c2e64325e
+== injection script md5 (not yet frozen)
+MD5 (/Volumes/workspace/hirearchy/studies/E4-org-growth-0a1-recheck/evidence/harness/inject_root_rework.py) = c80e25d65fe58cdb97d7faa758d59484
+== org dir exists before turn 1? no
+== ps: processes referencing the sandbox
+(none)

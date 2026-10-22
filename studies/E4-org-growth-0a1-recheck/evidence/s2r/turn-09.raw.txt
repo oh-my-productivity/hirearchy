@@ -1,0 +1,7 @@
+I've recorded that as a rejection. I haven't started any work, because it needs your OK on budget and I have one question.
+
+Budget: fixing Marta's row means a writer fix and a reviewer re-check, about 5 more runs. That takes this memo to roughly 24 of the 15 per memo, which is about 9 over the limit. You said earlier "no more spend", so I'm checking before I spend anything. Should I go ahead with about 5 runs? If not, you can change `none` to `2026-10-14` on line 18 of the delivered file yourself.
+
+Rule: about C6 (the due-date check), should I add this as a permanent criterion: "When the notes say a task is for a date ('book the room for Oct 14'), that date is the task's Due"? Yes, or no, meaning it's a one-off for this memo?
+
+While I'm at it, I could also have the rework drop the "Open questions" section you didn't ask for. Tell me if you want that too.

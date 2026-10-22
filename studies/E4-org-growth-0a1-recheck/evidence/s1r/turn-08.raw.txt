@@ -1,0 +1,15 @@
+The 2026-10-12 memo is running, capped at 15 runs. I'll wait for it.There's a question for you from the lead before delivery. I'll read the memo, the review and the question.The 2026-10-12 memo is at `/private/tmp/hirearchy-e4-s1r-1792693447/deliverables/memo-2026-10-12.md`. It's 155 words, with the Summary line first, then 3 decisions and 5 action rows.
+
+It passed the checker's review on the first try (7 of 7), and I compared it with your notes myself. It used 7 of its 15 runs, so there was no rework this time.
+
+**One edit by me:** The team's Summary said the team "implemented a deploy freeze". Your notes say the team decided on one, so I changed the wording to "decided on". Nothing else was touched.
+
+**Open question:** The lead asked whether Sam's CI update counts as a commitment. The notes only say the fix "needs more than a quick patch", with no promise from Sam, so the team left it out. Do you want a row for it? If so, I can add it by hand at no run cost, or you can leave it out.
+
+**Dates worth a glance:** Two Due values are inferred, not stated in the notes.
+- Sam's staging test data is 2026-10-21, from "the day before the freeze starts".
+- Lee's pager swap is 2026-10-19, the Monday of demo week.
+
+**The unrequested rework:** The status log lists the "unclear due dates" rework as a request from root, meaning your seat. I didn't issue it in this conversation and you didn't either, so I can't explain it yet. This memo's lead followed the 15-run cap, and the lead's notes show nothing unusual.
+
+For the next meeting, give me the notes filename and I'll run it the same way.

@@ -1,0 +1,43 @@
+Here's the plan with your models and the 12-run budget. One warning is worth reading: 12 runs leaves almost no slack over the 11 the plan estimates. If the first memo needs more than one rework, I'll come back to you before spending more.
+
+PLAN FOR YOU
+Goal: Turn the notes of one weekly team meeting into a short memo that says what was decided and who does what, so the team lead can send it out after each meeting.
+What I understood you need:
+- Scope: For the one meeting named in the request: every decision made and every commitment (anything someone said they would do, labelled or informal). Nothing from other meetings, no summary of the discussion.
+- Your files (read-only): /tmp/hirearchy-e4-s2r-1792702135/notes
+- Quality bar: Every statement comes from the notes file named in the request; nothing is added or invented.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-4.6 for 2 agents, claude-haiku-4.5 for 1 agent (tiered - lead and reviewer on claude-sonnet-4.6 (the lead decides how every other run is spent), writer on claude-haiku-4.5)
+Team (3 agents):
+- lead (Manager, model claude-sonnet-4.6): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-e4-s2r-1792702135/notes and the organization's own files; cannot change your files
+  - writer (Writer, model claude-haiku-4.5): can read files only in /private/tmp/hirearchy-e4-s2r-1792702135/notes and the organization's own files; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-4.6): can read files only in /private/tmp/hirearchy-e4-s2r-1792702135/notes and the organization's own files; cannot change your files
+Budget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 11. Unspent runs come back to you.
+  lead starts with 12, hands down writer 3, reviewer 2 and keeps 7 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One short memo (decisions and who does what) from one weekly meeting notes file
+  You provide: notes_file (required)
+  Each request: up to 12 runs
+  Checks:
+    1. Covers only the meeting in the named notes file and nothing else.
+    2. At most 400 words as counted by read.
+    3. The memo has a Decisions section and an Action items table with exactly the columns Owner | Action | Due.
+    4. Every decision stated in the notes appears in the Decisions section.
+    5. Every commitment in the notes, including informal ones in prose and ones without an ACTION label, is a row in the table with its owner.
+    ... and 3 more (see the details)
+  Delivered to: /tmp/hirearchy-e4-s2r-1792702135/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+Nothing runs until you ask for a request: approving only creates the team and the services.
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (1):
+- 12 runs per request leaves almost no slack over the estimate of 11; expect a stall on the first surprise
+
+The three checks cut from the block are:
+- Check 6: every Due value is an ISO date, converted from a vague deadline only when the notes make the date clear, otherwise none.
+- Check 7: nothing in the memo is missing from or contradicts the notes.
+- Check 8: the reviewer's report shows every criterion met, and the writer applied every required change.
+
+Reply "approve" to create the team, or tell me what to change. For example, I can raise the budget to about 15 runs to leave real slack.

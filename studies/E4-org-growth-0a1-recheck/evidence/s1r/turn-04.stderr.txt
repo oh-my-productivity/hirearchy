@@ -1,0 +1,48 @@
+[INFO] kas.server.starting {"product":"KAS (Kiro Agent Server)","version":"0.66.48"}
+[INFO] Auth: KIRO_API_KEY env var (api_key) {"regionDiscovery":true}
+[INFO] acp.content_collection.resolved {"enabled":false}
+[INFO] acp.remote_sessions.enabled {"endpoint":"https://app.kiro.dev"}
+[INFO] [KiroAgent] MCP subsystem initialized
+[ERROR] (node:26635) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[INFO] fs.workflow.recipes.readDir.ok {"system":"fs","tier":"user","durationMs":1}
+[INFO] fs.workflow.recipes.readDir.ok {"system":"fs","tier":"cloud","durationMs":4}
+[INFO] fs.workflow.recipeCatalog.refreshShared.ok {"system":"fs","trigger":"startup","durationMs":6}
+[tool] @hirearchy/create_org
+[tool] status: InProgress
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=44
+[tool] status: Completed
+[tool] status: Completed
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=24
+[tool] @hirearchy/apply_org
+[tool] status: InProgress
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=536
+[tool] status: Completed
+[tool] @hirearchy/start
+[tool] status: InProgress
+[tool] status: Completed
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=14
+
+[tool] @hirearchy/progress
+[tool] status: InProgress
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=27
+[tool] status: Completed
+[tool] @hirearchy/progress
+[tool] status: InProgress
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=21
+[tool] status: Completed
+[tool] Run Command
+[tool] status: InProgress
+[tool] status: InProgress
+[tool] status: Failed: Run Command
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=40
+[tool] Read File
+[tool] status: InProgress
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=21
+[tool] status: Completed
+[tool] Run Command
+[tool] status: InProgress
+[tool] status: InProgress
+[tool] status: Completed
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=83
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=96

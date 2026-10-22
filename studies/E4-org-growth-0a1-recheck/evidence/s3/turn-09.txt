@@ -1,0 +1,20 @@
+######## TURN 9  start 23:10:34  end 23:15:26  elapsed 292s  (local, 2026-10-22; UTC wall-clock start 2026-10-22T22:10:34Z end 2026-10-22T22:15:26Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Keep it as it is.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-09.stderr.txt):
+The 12 October memo is at `/tmp/hirearchy-e4-s3-1792705005/deliverables/memo-2026-10-12.md`, and the copy matches the team's file.
+
+I kept the "Next meeting" line, as you said. The only change was the Summary line, which said "four action items" and now says "five", matching the table.
+
+- **Markdown, at most 400 words:** met. It has 196 words by `wc -w`; the team counted 167.
+- **Covers only the 12 October meeting:** met.
+- **Decisions:** met. All four from the notes are there.
+- **Action-items table:** met. It has five rows, in the Owner | Action | Due columns.
+- **Due dates:** met. Dev is 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21 and Lee `none`.
+- **Owner names:** met.
+- **Summary first, then decisions, then actions (C8):** met.
+- **Reviewer's report:** met. It shows 8 of 8 criteria met.
+
+Runs: this request took 10 of the 15 approved. That was 5 for the first pass and 5 for the count fix.
+
+Keep it, or what should change?

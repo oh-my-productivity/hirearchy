@@ -1,0 +1,10 @@
+I stopped the rework after its first run, because this case is already over budget. I started it before checking the case total, which I should have done first.
+
+The case is at 16 runs against the 15 you approved. An extra round of the lead's own, "Rework memo: unclear due dates", added runs on top of your date correction. Adding the Summary line would take about 5 or 6 more runs, so roughly 22 in total. The rework is paused with 1 run used.
+
+I need two answers from you:
+
+1. Can I spend up to 6 more runs on this memo to add the Summary line? That's my recommendation, since nothing else is wrong with it.
+2. Should I make the Summary line a lasting rule for every memo, not just this one? That would add a check to the service contract: "Starts with a one-line 'Summary:', then Decisions, then the action-items table." Reply yes or no. If you say no, it applies to this memo only.
+
+The file in `deliverables/` is still the previous version, without a Summary line. I'll replace it once the reworked memo passes my check.

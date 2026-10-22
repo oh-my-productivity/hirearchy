@@ -1,0 +1,12 @@
+=== final  snapshot 2026-10-22T03:59:51Z (local 04:59:51)
+org runs total: 2  (injection-window runs: 0; counted toward the 45 cap: 2)
+  lead                           claude-sonnet-4.6    2
+  run 20261022T034631122838 agent=lead model=claude-sonnet-4.6 exit=0 secs=104
+  run 20261022T034833740575 agent=lead model=claude-sonnet-4.6 exit=0 secs=86
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: (none)
+deliverables/:
+  (none)
+processes referencing the sandbox name (0):

@@ -1,0 +1,11 @@
+Yes, I can set that up as a recurring service: you ask for a memo after each meeting and it reads that week's notes. I read your latest notes to see the style. Some commitments are written as "ACTION:" lines. Others are in prose, like Lee signing off the renewal and Sam pairing with Jo. So I have a few questions before I draft a plan. Reply "defaults" to accept the proposed answers.
+
+1. **Input per week:** you tell me which notes file to use (for example `2026-10-26.md`). Everything else stays fixed. The team only reads the notes in `/tmp/hirearchy-e4-s3-1792705005/notes`, with no web access. Is that right?
+2. **Scope of the memo:** two sections, "Decisions" and "Who does what". Default: no summary of the discussion. Do you want anything else in it, such as attendees or next meeting date?
+3. **Informal items:** should commitments in prose count as action items? Default: yes. That would include Lee's sign-off and Sam pairing with Jo, not just the "ACTION:" lines.
+4. **Vague dates:** how should "by end of next week" or "next meeting" be handled? Default: give the exact date when the notes allow it, such as "next meeting" becoming 26 Oct. Otherwise keep the notes' wording and add no invented date.
+5. **Format and place:** markdown, at most 300 words ("short"), saved as `memo-<meeting date>.md` in a new `deliverables/` folder here (`/tmp/hirearchy-e4-s3-1792705005/deliverables`).
+6. **Checks:** every decision and every owner/task in the notes appears in the memo, with the correct owner and no invented items. Each item has an owner, and a date only where the notes give one.
+7. **Review:** a second agent checks the memo against the notes before delivery. Default: yes.
+8. **Budget and models:** all agents on claude-sonnet-5.5. I'll set the per-memo budget in runs from the plan estimate plus 25%, and show it in the plan. I'll ask you before anything goes over budget.
+9. **Approval:** you approve the plan once. After that, each week you say "memo for <date>" and I run it.
