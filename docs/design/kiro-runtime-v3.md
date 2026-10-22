@@ -1251,3 +1251,142 @@ Design review, iteration 1 (`.agents/tasks/design-review.md`). Every finding is 
 One correction found while revising, not raised by the review: the iteration-1 live plan hired `worker` (read, write, workspace,
 inputs) under a `lead` that held none of them, which `Hiring` refuses (a hirer other than root grants only what it has, even with the
 CLI's `approved`); the lead now holds the same grant (17 step 1), and the extra live workers are hired under root.
+
+## Amendments after design review pass 2
+
+Design review pass 2 (`.agents/tasks/design-review.md`, findings 1-11; 0 HIGH, 3 MEDIUM, 8 NIT) found no over-grant and no reliance on
+`--trust-all-tools`. The manager closed the design loop after this pass and adopted every finding, with the choices below. This
+section is binding where it differs from the sections above; the sections above are not rewritten, so that the review trail stays
+readable. A1-A11 are the review findings 1-11 in order. A missing amendment is a blocking finding for the build.
+
+### A1 (finding 1, MEDIUM): enterprise cloud configuration is synced into the isolated home
+
+The bundle syncs the account's cloud configuration into `<KIRO_HOME>/cloud-cache/<scope>/config/<layer>/` and uses the layers as
+global bases for hooks, steering, powers and workflow recipes. An isolated `KIRO_HOME` therefore does not keep them out. This machine's
+key has no cloud-config endpoint, so the spike could not observe it. Manager's choices:
+
+* `cloud-cache` is a **planted** entry of the 8.4 home audit, with its own fail-closed message M7 (below), which takes precedence over
+  the generic message M6 when `cloud-cache` is planted. The builder checks it per run and readiness at start, so every run after the
+  first sync is refused.
+* Section 20 gains a row: "accounts with enterprise cloud config: the first run's sync is exposed (admin hooks, steering and powers
+  load before the audit can see them); later runs are refused; not probed (no such account here). Residual risk: the synced layers are
+  the account administrator's own configuration, not agent-controlled, so the exposure is to admin hooks, not to an agent's
+  escalation."
+* Section 2, row "an isolated `KIRO_HOME` removes ...", is qualified: "removes the user's memory index, skills, MCP servers, agents and
+  permission scopes **that live in `~/.kiro`**; cloud-config layers are synced into the home itself (see 8.4)".
+* README requirement sentence (section 18, "Requirements"): an account with synced cloud configuration cannot run hirearchy agents
+  confined; hirearchy refuses its runs with that reason.
+* Live steps 3 and 3b gain the pass criterion "no `cloud-cache/` in the org home".
+* `test_fs_kiro_state.py::test_cloud_cache_is_planted`; `test_readiness.py::test_a_synced_cloud_cache_refuses_with_its_own_message`;
+  `test_contract_run_command_builder.py::test_a_synced_cloud_cache_refuses_the_run`.
+
+### A2 (finding 2, MEDIUM): runs without a parent kiro session
+
+* Section 2, "Working directory of the probes" becomes "... **and environment**": the spike ran inside a parent kiro session whose
+  environment held about 29 `KIRO_*` variables (`KIRO_ENABLED_FEATURES`, `KIRO_ROLLOUT_FEATURES`, `KIRO_KAS_SERVER_PATH`,
+  `KIRO_KAS_NODE_PATH`, `KIRO_CHAT_CLI_BIN`, `KIRO_VERSION_OVERRIDE`, `KIRO_AGENT_ENGINE`, `KIRO_REMOTE_SESSIONS_ENDPOINT`,
+  `KIRO_SESSION_ID`, `KIRO_TURN_MARKER_DIR`, `KIRO_TUI_READY_FILE`, `KIRO_FEED_FILE`, ...; names only). Every result of sections 2, 6
+  and 17 was observed with them.
+* Section 5 gains the sentence: the host's `KIRO_*` variables keep passing through unless live step 3c shows a difference; a
+  difference is a failure of the change and is fixed in code (for example by extending `SCRUBBED_VARIABLES`), then steps 3, 3b and 3c are
+  repeated.
+* Live step **3c** is added to section 17, exactly as the review gives it: rerun step 3b's ping task through a minimal environment,
+  `env -i HOME="$HOME" PATH="$PATH" KIRO_API_KEY="$KIRO_API_KEY" HIREARCHY_STATE_DIR=/tmp/kirov3-live/state KIRO_LOG_LEVEL=debug perl -e 'alarm shift; exec @ARGV' 600 hirearchy --root /tmp/kirov3-live/org run --until-done --max-runs 2`.
+  Pass criteria: those of step 3b, plus `custom_agent.tool_selection.tools` identical to the lead's surface in step 3, plus
+  `mcp.listTools.ok` for `hirearchy` only. A failure of 3c is a failure of the change: fix it, never waive it.
+
+### A3 (finding 3, MEDIUM): golden and test impact
+
+* **(a)** Section 16 gains the row `src/hirearchy/app/tests/snapshots/prompts/a_workspace_and_inputs.txt | regenerated | 7 | the Files
+  lines of 13.4`. The final cumulative check of sections 16 and 19 covers `*/golden/*`, `*/expected/*` **and `*/snapshots/*`**.
+* **(b)** `cli/tests/_scenario.Normalizer` also replaces `-x[0-9a-f]{8}\b` with `-x<ACCESS_HASH>` (before the 6-hex org rule), in
+  commit 1. Test: `cli/tests/test_golden_commands.py::test_the_normalizer_hides_the_access_hash_of_a_profile_name`.
+* **(c)** In commit 6, `kiro_profile.txt` and `runner_command_lines.txt` use the placeholders `<KIRO_HOME>` and `<SCRATCH>`, computed
+  in the test from the same `StateDirPlaces` the CLI uses (no `Library/Application Support` or `.local/state` in a golden), so the
+  goldens are identical on macOS and Linux.
+* **(d)** `dispatch/tests/test_qa_findings.py::test_qa4_oversized_message_does_not_wedge_the_agent` and every other kiro run made with
+  `true` through `KiroRunCommandBuilder` move to the testkit stub `kiro-cli` (which prints `runStarted`/`runFinished`): under the
+  launcher `true` exits 0 before any `runStarted` and counts as a failure. The complete list (commit 6, plan step 18) is:
+  `dispatch/tests/test_qa_findings.py::test_qa4_oversized_message_does_not_wedge_the_agent` and the two tests of
+  `cli/tests/test_run_command.py`. `health/tests/test_qa_findings.py` has its own runner and is not affected.
+
+### A4 (finding 4, NIT): kiro's own `.git`/`.vscode` protection
+
+Wherever sections 1 (behaviour change 2), 2, 3.3 and 6 say that kiro's root-relative `.git`/`.vscode` protection is skipped for a
+workspace outside kiro's root: read it as "whether kiro's own root-relative `.git`/`.vscode` protection still applies to a workspace
+outside its root was not probed (the bundle suggests it may); rule 7 makes the refusal explicit either way". `zCo` is not evidence
+for the claim. The README never claims that kiro's own protection is gone.
+
+### A5 (finding 5, NIT): extglob openers
+
+The refusal of `+(`, `@(` and `!(` in 4.4 stays. Its sentence reads: "kiro's matcher runs with `noext: true` [bundle:
+`matchExpandedPattern`], so extglob openers are literal; they are still refused because no probe ran them." Test:
+`test_confinement_v3.py::test_extglob_openers_are_refused`.
+
+### A6 (finding 6, NIT): case-insensitivity is per path
+
+Added to 4.3 (rule 7) and section 20 #7: kiro matches case-insensitively exactly where the file system is case-insensitive (`Db`, per
+path) [bundle], and its loaders use the exact names `.kiro` and `AGENTS.md`, so on a case-sensitive volume `.KIRO` is neither denied
+nor loaded (no bypass). Live step 4 runs under `/tmp` (case-insensitive APFS); on a case-sensitive volume an allowed `.KIRO` is
+expected and does not trigger the 4.3 fallback.
+
+### A7 (finding 7, NIT): at most 29 inputs
+
+Kiro's Cedar compiler turns each `exclude` entry of rule 5 into one condition; a policy with 64 or more conditions needs a separate
+validation that may fail (deny-all). Rule 5 has `1 + len(READ)` conditions and `len(READ) = 2 x (workspace + inputs + org)`. So
+`Confinement.problem` is set (M4) when `read` is granted and the agent has more than 29 inputs. **Scope:** the limit applies only
+when `read` is granted. Without `read`, `READ` is empty, no kiro rule lists the inputs and nothing is compiled, so a write-only or
+shell-only agent may have any number of inputs. Tests: `test_more_than_29_inputs_is_a_problem_that_suggests_a_common_parent`,
+`test_29_inputs_are_accepted`, `test_30_inputs_without_read_are_accepted`.
+
+### A8 (finding 8, NIT): `.tmp-*` in `agents/`
+
+In the 8.4 audit an `agents/.tmp-*` entry is **planted** unless it is a regular file whose mtime is less than 60 s old
+(`FsAtomicWriter` renames within milliseconds). Tests: `test_an_old_tmp_file_in_agents_is_planted`,
+`test_a_fresh_tmp_file_is_ignored`, `test_a_tmp_directory_is_planted`.
+
+### A9 (finding 9, NIT): the frozen MCP tool descriptions
+
+Option (a) is adopted, in commit 7. `hide_read` becomes "kiro's built-in file tools (`read_file`, `list_directory`) read the
+workspace, inputs and, by absolute path, the organization; this tool is the organization's relative-path reader, called `{rn}` for
+you." and `hide_write` becomes "kiro's built-in file tools are `fs_write`, `str_replace`, `fs_append` and `delete_file`; this
+hirearchy tool is called `{wn}` for you." Section 16 gains the three goldens `tests/golden/expected/mcp/surface_builtin_read.txt`,
+`surface_builtin_write.txt`, `surface_builtin_read_write.txt` (commit 7). Test:
+`mcp_server/tests/test_tool_names.py::test_the_descriptions_name_kiros_v3_built_in_ids`.
+
+### A10 (finding 10, NIT): the launcher waits for kiro's exit
+
+5.1 step 3 reads: loop on `select` with a 1 s timeout and check `proc.poll()` on each turn; once kiro has exited, read what is
+readable for at most 2 s more, then stop reading and return kiro's exit code. Test:
+`test_launch.py::test_a_background_child_holding_stdout_does_not_hold_the_run` (a fake kiro starts `sleep 30 &` with inherited stdout
+and exits 0; the launcher returns 0 within 5 s).
+
+### A11 (finding 11, NIT): the integration test's model
+
+The new integration test hires with `real_kiro.hire(org, "probe", ...)`, so that `HIREARCHY_IT_MODEL` applies.
+
+### Manager's rule: live steps 3, 3b, 3c and 4 are fail-closed
+
+Live steps 3, 3b, 3c and 4 are part of the build loop's live-verify step. A FAIL in any of them sends the loop back to code; it is
+never reported as a pass and never waived.
+
+### Correction: the daemon fake
+
+The in-memory implementation of the daemon's `SchedulerStatus` is `FakeSchedulerStatus` (`daemon/testing.py`). Sections 9 and 13.4
+say `MemorySchedulerStatus`; read `FakeSchedulerStatus`.
+
+### Message table M1-M11
+
+| id | where | text |
+|---|---|---|
+| M1 | `Confinement.problem`, unknown or non-string tool | `the charter's tools name <repr(item)>, which is not one of read, write, shell, web_search, web_fetch (exact, lowercase)` |
+| M2 | builder, charter `tools` not a list of strings | `the charter's tools must be a list of names (read, write, shell, web_search, web_fetch)` |
+| M3 | `Confinement.problem` / `KiroPlaces.problem`, refused path character (4.4) | `the path <p> contains "<c>", which kiro-cli's permission patterns cannot match literally, so this agent's access cannot be confined; rename it`; `<c>` is the character, or `\xNN` for a control character; `<p>` has control characters written as `\xNN` (a message is one line) |
+| M4 | `Confinement.problem`, A7 | `this agent has <n> inputs: kiro-cli compiles at most 63 path exclusions into one rule without a separate validation step; give this agent at most 29 inputs (a common parent folder counts as one)` |
+| M5 | placement (8.3) | the two messages of 8.3, verbatim |
+| M6 | home audit, generic (8.4) | `the kiro home <home> holds configuration kiro-cli would load into every agent: <comma-separated sorted list>; remove it (this home belongs to hirearchy)` |
+| M7 | home audit, A1 (takes precedence over M6 when `cloud-cache` is planted) | `the kiro home <home> holds cloud-cache/, configuration kiro-cli synced for this account whose hooks, steering and powers would run in every agent: synced cloud configuration cannot be confined; this account cannot run hirearchy agents confined` |
+| M8 | readiness, steps 4-6 | the texts of 9 steps 4-6, verbatim |
+| M9 | readiness, `OSError` | `cannot prepare the kiro home <home>: <error>` |
+| M10 | builder refusal | `KiroRunRefused(f"kiro: {problem}")` |
+| M11 | `LoopSchedulerRunner` | marker: `refused to start: kiro-cli is not ready: <problem>`; raised: `OrgError("kiro-cli is not ready, no run was started: <problem>")` |
