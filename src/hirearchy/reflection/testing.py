@@ -187,7 +187,7 @@ class ReflectionWorld:
 def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder) -> ReflectionWorld:
     d = s.d
     paths = OrgServicePaths(OrgPaths(d.root))
-    history = DerivedCaseHistory(s.catalog, d.agents, d.mail, s.hints, StorePlaybookTimelines(s.store), LogRunCounter(runs.reader))
+    history = DerivedCaseHistory(s.catalog, d.agents, d.mail, s.hints, StorePlaybookTimelines(s.store), LogRunCounter(runs.reader, d.mail))
     digest = DigestBuilder(s.catalog, history)
     rejections = MailRejectedServices(d.mail)
     sections = OwnerPromptSections(

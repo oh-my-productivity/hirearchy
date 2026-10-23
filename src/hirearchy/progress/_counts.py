@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from ..kernel import ROOT, Message
+from ..kernel import ROOT, Message, credited_stems
 from ..mail import MailboxReader
-from ..runs import RunLogReader
+from ..runs import RunLogFile, RunLogReader
 from ._ports import RunCounts
 
 
@@ -20,6 +20,12 @@ class LogRunCounts(RunCounts):
         self._mail = mail
         self._logs = logs
 
+    def _charged(self, addr: str) -> list[RunLogFile]:
+        """The logs of ``addr`` that were charged: a run the runtime gave back with a run credit is neither used nor kept."""
+        logs = self._logs.files(addr)
+        credited = credited_stems(self._mail.received(addr)) if logs else set()
+        return [log for log in logs if log.stem not in credited]
+
     def _window(self, task: Message, result: Message | None, team: Sequence[str]) -> tuple[int, int]:
         """``(used, given)``: the runs the team made in the window of the task, and everything root put into the team in it."""
         start = task.id[:21]
@@ -32,7 +38,7 @@ class LogRunCounts(RunCounts):
         def inside(name: str) -> bool:
             return name[:21] >= start and (end is None or name[:21] <= end)
 
-        used = sum(1 for a in team for log in self._logs.files(a) if inside(f"{log.stem}.log"))
+        used = sum(1 for a in team for log in self._charged(a) if inside(f"{log.stem}.log"))
         members = set(team)
         given = task.budget + sum(m.budget for m in sent if m.type == "note" and m.to in members and inside(m.id))
         return used, given

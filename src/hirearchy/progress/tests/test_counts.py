@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from hirearchy.budget import run_credit
 from hirearchy.kernel import ROOT, Message
 from hirearchy.progress._ports import RunCounts
 from hirearchy.progress._counts import LogRunCounts
@@ -111,3 +112,14 @@ def test_kept_is_zero_when_nothing_was_handed_down(w: ProgressWorld) -> None:
 def test_kept_is_zero_for_a_blocked_or_missing_result(w: ProgressWorld, task: Message) -> None:
     assert kept(w, task, None) == 0
     assert kept(w, task, w.answer(task, "blocked", "stuck", 0)) == 0
+
+
+def test_a_credited_run_is_neither_used_nor_kept(w: ProgressWorld, task: Message) -> None:
+    w.use_run("ceo")
+    w.use_run("ceo")
+    w.post(run_credit("ceo", w.runs.files("ceo")[-1].stem))  # the second run ended on a model-service throttle: the runtime returned it
+    assert text(w, task) == "runs 1 of 8"
+    done = w.answer(task, "done", "ok", 0)
+    assert text(w, task, done) == "runs 1 of 8" and kept(w, task, done) == 7  # 8 handed down, 1 charged
+    w.post(run_credit("ceo/eng", "20260101T000000000000"))  # a credit for a stem that is no log of the team changes nothing
+    assert text(w, task, done) == "runs 1 of 8"

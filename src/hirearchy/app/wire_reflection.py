@@ -40,7 +40,7 @@ def register(b: Builder) -> None:
         CaseHistory,
         lambda b: DerivedCaseHistory(
             b.get(ServiceCatalog), b.get(AgentDirectory), b.get(MailboxReader), b.get(ServiceHints),
-            StorePlaybookTimelines(b.get(ServiceStore)), LogRunCounter(b.get(RunLogReader)),
+            StorePlaybookTimelines(b.get(ServiceStore)), LogRunCounter(b.get(RunLogReader), b.get(MailboxReader)),
         ),
     )
     b.provide(ReflectionDigest, lambda b: DigestBuilder(b.get(ServiceCatalog), b.get(CaseHistory)))

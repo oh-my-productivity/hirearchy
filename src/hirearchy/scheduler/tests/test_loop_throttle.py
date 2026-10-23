@@ -82,6 +82,20 @@ def test_one_throttle_is_credited_retried_and_not_a_failure(org: Org) -> None:
     assert any(line == "ceo: run throttled by the model service before any tool effect: not charged, retried" for line in said)
 
 
+def test_progress_says_runs_1_after_a_credited_throttle(org: Org) -> None:
+    """The credited run is a log, but root's progress counts the runs that were charged (design 9.2, correction P5)."""
+    org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
+    runner = throttling(1)
+
+    def idle_after_the_throttle(org: Any, addr: str, prompt: str) -> tuple[list[str], Any, dict[str, str]]:
+        argv, cwd, env = runner(org, addr, prompt)
+        return argv, cwd, {**env, "FAKE_MODE": "idle"}  # the retry does nothing: the task stays open
+
+    run_until_idle(org, idle_after_the_throttle)
+    assert org.runs_used("ceo") == 2 and len(credits(org)) == 1  # two logs, one of them credited
+    assert "runs 1 of 6" in org.runtime.progress_reporter.progress()
+
+
 def test_two_throttles_are_credited_and_one_failure_is_counted(org: Org) -> None:
     task = org.delegate(ROOT, "ceo", "Ship it", "Ship the thing", "It is shipped", budget=6)
     said = run_until_idle(org, throttling(2))

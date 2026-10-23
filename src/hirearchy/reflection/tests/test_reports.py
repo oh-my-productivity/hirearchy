@@ -130,3 +130,16 @@ def test_case_total_warns_on_spend_not_on_runs_handed_down(svc):
         "case total: 11 runs used of 10 handed down (contract: 10 per request). "
         "This case now exceeds the per-request budget of 10: tell the user."
     )
+
+
+def test_case_total_with_one_credited_run_does_not_say_exceeds(svc):
+    from testkit.services_world import deliver, request
+
+    from hirearchy.kernel import RUNTIME, Message, run_credit_title
+
+    over = request(svc, "other")
+    deliver(svc, "ceo", over, runs=11)  # 11 run logs: more than the 10 the contract allows
+    assert "exceeds" in svc.runtime.service_reports.case_total(over)
+    throttled = svc.runtime.run_log_reader.files("ceo")[-1].stem  # one of them ended on a model-service throttle and was not charged
+    svc.runtime.delivery.deliver(Message(sender=RUNTIME, to="ceo", type="note", budget=1, wake=False, title=run_credit_title("ceo", throttled), body="returned"))
+    assert svc.runtime.service_reports.case_total(over) == "case total: 10 runs used of 10 handed down (contract: 10 per request)"
