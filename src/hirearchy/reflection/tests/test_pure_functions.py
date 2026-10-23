@@ -1,4 +1,4 @@
-"""``version_at`` and ``lessons_of``: pure functions."""
+"""``version_at``, ``lessons_of``, ``rated``, ``delivered_unrated`` and ``questions_open``: pure functions."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from hirearchy.kernel import Message
-from hirearchy.reflection import Case, Verdict, case_spend, confirmed_criteria, delivered_unrated, lessons_of, rated, version_at
+from hirearchy.reflection import Case, Verdict, case_spend, confirmed_criteria, delivered_unrated, lessons_of, questions_open, rated, version_at
 from hirearchy.services import Criterion
 
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -216,3 +216,53 @@ def test_a_later_rework_carries_the_rating() -> None:
 
 def test_no_cases_gives_no_unrated() -> None:
     assert delivered_unrated([]) == ()
+
+
+# ------------------------------------------------------------------------------ questions_open
+
+ASKED = "## Summary\nok\n\nQuestions for the client:\n- Keep Marta's row?\n- Which Friday?\n\n## Artifacts\n- a/b.md"
+
+
+def answered(task: Message, status: str, body: str) -> Message:
+    return Message(sender="ceo", to="root", type="result", reply_to=task.id, status=status, body=body)
+
+
+def root_rework(task: Message, source: str | None) -> Message:
+    return Message(sender="root", to="ceo", type="task", title="again", body="goal", revises=task.id, source=source)
+
+
+def test_questions_open_counts_done_and_blocked_results() -> None:
+    (task,) = chain("1")
+    found = case_with([task])
+    assert questions_open(task, answered(task, "done", ASKED), found, []) == 2
+    assert questions_open(task, answered(task, "blocked", ASKED), found, []) == 2  # a blocked result asks too (6.1)
+    assert questions_open(task, answered(task, "failed", ASKED), found, []) == 0  # a failed one has nothing to copy or deliver
+    one = answered(task, "done", "Questions for the client: Which Friday?\n\n## Artifacts\n- a.md")
+    assert questions_open(task, one, found, []) == 1
+
+
+def test_questions_open_is_0_once_rated_or_reworked_by_a_human() -> None:
+    first, second = chain("1", "2")
+    result = answered(first, "done", ASKED)
+    assert questions_open(first, result, case_with([first, second], verdict_at(0, [first, second], kind="accept")), []) == 0  # the client's verdict
+    assert questions_open(first, result, case_with([first, second]), [root_rework(first, "human")]) == 0  # the user asked for the rework
+    assert questions_open(first, result, case_with([first, second]), [root_rework(second, "human")]) == 2  # a rework of another task settles nothing
+    assert questions_open(first, result, case_with([first, second], verdict_at(1, [first, second], kind="accept")), []) == 0  # a later rework's verdict
+
+
+def test_a_relayed_rework_does_not_settle_questions() -> None:
+    (task,) = chain("1")
+    result = answered(task, "blocked", ASKED)
+    for source in (None, "relayed"):
+        assert questions_open(task, result, case_with([task]), [root_rework(task, source)]) == 2  # 0a.1 DR-17
+    not_a_rework = Message(sender="root", to="ceo", type="note", body="b", revises=task.id, source="human")
+    assert questions_open(task, result, case_with([task]), [not_a_rework]) == 2
+
+
+def test_no_questions_gives_0() -> None:
+    (task,) = chain("1")
+    for body in ("ok, nothing asked", "Questions for the client: none.\n\n## Artifacts\n- a.md", "Questions for the client:\n\n## Lessons\n- x", ""):
+        assert questions_open(task, answered(task, "done", body), case_with([task]), []) == 0
+    assert questions_open(task, answered(task, "done", ASKED), None, []) == 2  # a one-off task has no case: only a human rework settles it
+    one_off = Message(id="9", sender="root", to="ceo", type="task", body="b", title="one off")  # no service: a verdict cannot settle it
+    assert questions_open(one_off, answered(one_off, "done", ASKED), case_with(chain("9"), verdict_at(0, chain("9"), kind="accept")), []) == 2

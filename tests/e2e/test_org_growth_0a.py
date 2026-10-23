@@ -283,6 +283,7 @@ def test_12_a_reviewers_ambiguous_item_reaches_roots_progress_before_delivery(tm
     assert f"Questions for the client:\n- {AMBIGUOUS_MARTA}" in result.body  # the reviewer's item, forwarded by the lead
     flag = "1 question for the client: ask the user before you copy or deliver"
     assert flag in call(w.root, "progress", task_id=a1)  # before anyone copies anything
+    assert "artifacts withheld (ask first)" in call(w.root, "progress", task_id=a1)  # 0a.2 (P3): the path waits for the answer (Rule F)
     assert not (tmp_path / "deliverables").exists()  # as the go/no-go words it; nothing in this test copies, so this is not evidence (DR-16)
     relayed = call(w.root, "request", service=SERVICE, inputs=A_MEMO, revises=a1)  # no source: the assistant's own reading
     assert f"{a1}'s result asked the client: Marta keeps the agenda as sent" in relayed and "a rework does not answer them" in relayed
@@ -290,6 +291,7 @@ def test_12_a_reviewers_ambiguous_item_reaches_roots_progress_before_delivery(tm
     human = call(w.root, "request", service=SERVICE, inputs=A_MEMO, revises=a1, source="human")
     assert "asked the client" not in human and "a rework does not answer them" not in human  # the user asked for this change: nothing to repeat
     assert flag not in call(w.root, "progress", task_id=a1)
+    assert "artifacts withheld (ask first)" not in call(w.root, "progress", task_id=a1)  # the user's rework answered them: the path is back
 
 
 def test_8_health_counts_the_escape_and_not_the_relayed_rework(tmp_path):

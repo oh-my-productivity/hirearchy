@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Protocol, runtime_checkable
 
-from ..kernel import Message, msg_time
+from ..kernel import Message, client_questions, msg_time
 from ..services import Criterion
 
 __all__ = [
@@ -37,6 +37,7 @@ __all__ = [
     "confirmed_criteria",
     "delivered_unrated",
     "lessons_of",
+    "questions_open",
     "rated",
     "regressions",
     "stats_by_version",
@@ -158,6 +159,20 @@ def rated(case: Case | None, task: Message) -> bool:
         return False
     step = next((i for i, t in enumerate(case.tasks) if t.id == task.id), 0)
     return any(v.step >= step for v in case.verdicts)
+
+
+def questions_open(task: Message, result: Message, case: Case | None, root_sent: Sequence[Message]) -> int:
+    """The client questions (``kernel.client_questions``) of a ``done`` or ``blocked`` result that nothing has settled (pure): 0 when there are none,
+    when ``task`` is a service request and ``rated(case, task)``, or when ``root_sent`` holds a task with ``revises == task.id`` and ``source ==
+    "human"``; else their number. The user's own rework of the task or the client's verdict on the delivery settles them; the assistant's own
+    (relayed) rework does not (0a.1 DR-17). ``progress`` withholds the artifact path while this is above 0 and the deliverable checks do the same."""
+    if result.status not in ("done", "blocked"):
+        return 0
+    asked = len(client_questions(result.body))
+    if asked == 0 or (task.service and rated(case, task)):
+        return 0
+    reworked = any(t.type == "task" and t.revises == task.id and t.source == "human" for t in root_sent)
+    return 0 if reworked else asked
 
 
 def delivered_unrated(cases: Sequence[Case]) -> tuple[str, ...]:

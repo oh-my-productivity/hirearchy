@@ -6,7 +6,7 @@ from datetime import datetime
 
 from ..kernel import ROOT, Message, artifact_paths, client_questions, fmt_duration
 from ..mail import MailboxReader
-from ..reflection import Case, CaseHistory, ServiceReports, rated
+from ..reflection import Case, CaseHistory, ServiceReports, questions_open, rated
 from ._ports import RunCounts, TaskLines, TaskStates, TaskTeams, TeamActivity
 
 
@@ -42,12 +42,15 @@ class CaseTaskLines(TaskLines):
         if last is not None:
             parts.append(f"last activity {fmt_duration(max(0.0, (now - last).total_seconds()))} ago")
         case = self._history.case_of(task) if task.service else None
+        asked = self._questions_open(task, result, case)
         if result is not None and result.status in ("done", "failed"):
             arts = artifacts_of(result)
-            parts.append("artifacts: " + ", ".join(arts) if arts else "no artifacts")
-            asked = self._questions_to_ask(task, result, case)
             if asked:
-                parts.append(f"{asked} question{'' if asked == 1 else 's'} for the client: ask the user before you copy or deliver")
+                parts.append("artifacts withheld (ask first)")  # the path waits for the answers; it is still in the result body (inbox)
+            else:
+                parts.append("artifacts: " + ", ".join(arts) if arts else "no artifacts")
+        if asked:
+            parts.append(f"{asked} question{'' if asked == 1 else 's'} for the client: ask the user before you copy or deliver")
         if task.service:
             if result is not None and result.status in ("done", "failed") and not rated(case, task):
                 parts.append("no feedback yet")
@@ -55,14 +58,8 @@ class CaseTaskLines(TaskLines):
                 parts.append(self._reports.case_total(task).rstrip("."))
         return ". ".join(parts) + f". (task {task.id})"
 
-    def _questions_to_ask(self, task: Message, result: Message, case: Case | None) -> int:
-        """The client questions of a done result that nobody has answered yet; 0 when there are none or they are settled.
-
-        The user's own rework of the task answers them, so does the client's verdict on the delivery. The assistant's own (relayed) rework does not."""
-        if result.status != "done":
+    def _questions_open(self, task: Message, result: Message | None, case: Case | None) -> int:
+        """``reflection.questions_open`` of a result that asked something; the sent box is read only then."""
+        if result is None or not client_questions(result.body):
             return 0
-        asked = len(client_questions(result.body))
-        if asked == 0 or (task.service and rated(case, task)):
-            return 0
-        reworked = any(t.type == "task" and t.revises == task.id and t.source == "human" for t in self._mail.sent(ROOT))
-        return 0 if reworked else asked
+        return questions_open(task, result, case, self._mail.sent(ROOT))

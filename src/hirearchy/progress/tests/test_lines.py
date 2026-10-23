@@ -139,7 +139,7 @@ def rework(w: ProgressWorld, first: Message, source: str | None) -> Message:
 
 def test_a_done_result_with_client_questions_is_flagged(w: ProgressWorld, task: Message) -> None:
     done = w.answer(task, "done", QUESTIONS, 0)
-    assert f". artifacts: a/b.md. 2 questions for the client: ask the user before you copy or deliver. (task {task.id})" in lines(w).line(task, done, NOW)
+    assert f". artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver. (task {task.id})" in lines(w).line(task, done, NOW)
 
 
 def test_one_question_is_singular(w: ProgressWorld, task: Message) -> None:
@@ -151,7 +151,7 @@ def test_one_question_is_singular(w: ProgressWorld, task: Message) -> None:
 def test_a_service_request_is_flagged_before_the_no_feedback_part(w: ProgressWorld) -> None:
     first = request(w)
     done = w.answer(first, "done", QUESTIONS, 0)
-    assert f". artifacts: a/b.md. 2 questions for the client: ask the user before you copy or deliver. no feedback yet. " in lines(w).line(first, done, NOW)
+    assert f". artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver. no feedback yet. " in lines(w).line(first, done, NOW)
 
 
 def test_the_flag_ends_with_a_verdict_or_a_human_rework(w: ProgressWorld) -> None:
@@ -180,11 +180,42 @@ def test_a_one_off_task_keeps_its_flag_until_a_human_rework_revises_it(w: Progre
     assert "questions for the client" not in lines(w).line(task, done, NOW)
 
 
-def test_a_blocked_result_is_not_flagged(w: ProgressWorld, task: Message) -> None:
-    for status in ("blocked", "failed"):
-        result = w.answer(task, status, QUESTIONS, 0)
-        assert "for the client" not in lines(w).line(task, result, NOW)
+def test_a_blocked_result_with_questions_is_flagged(w: ProgressWorld, task: Message) -> None:  # inverts 0a.1's test_a_blocked_result_is_not_flagged
+    blocked = w.answer(task, "blocked", QUESTIONS, 0)
+    assert ": blocked" in lines(w).line(task, blocked, NOW)
+    assert f". 2 questions {FLAG}. (task {task.id})" in lines(w).line(task, blocked, NOW)
+    failed = w.answer(task, "failed", QUESTIONS, 0)
+    assert "for the client" not in lines(w).line(task, failed, NOW)  # a failed result has nothing to copy or deliver
     assert "for the client" not in lines(w).line(task, None, NOW)
+
+
+def test_a_blocked_result_has_no_artifact_part(w: ProgressWorld, task: Message) -> None:
+    blocked = w.answer(task, "blocked", QUESTIONS, 0)
+    assert "artifacts" not in lines(w).line(task, blocked, NOW)  # neither "artifacts: ..." nor "no artifacts" nor the withheld part
+
+
+def test_the_artifact_path_is_withheld_while_questions_are_open(w: ProgressWorld, task: Message) -> None:
+    done = w.answer(task, "done", QUESTIONS, 0)
+    out = lines(w).line(task, done, NOW)
+    assert f". artifacts withheld (ask first). 2 questions {FLAG}. (task {task.id})" in out
+    assert "a/b.md" not in out and "artifacts:" not in out
+    failed = w.answer(task, "failed", QUESTIONS, 0)
+    assert ". artifacts: a/b.md. " in lines(w).line(task, failed, NOW)  # a failed result asks nothing: today's text, the path included
+
+
+def test_the_path_returns_once_the_questions_are_settled(w: ProgressWorld) -> None:
+    first = request(w)
+    done = w.answer(first, "done", QUESTIONS, 0)
+    assert "artifacts withheld (ask first)" in lines(w).line(first, done, NOW) and "a/b.md" not in lines(w).line(first, done, NOW)
+    rework(w, first, "relayed")
+    assert "artifacts withheld (ask first)" in lines(w).line(first, done, NOW)  # the assistant's own rework settles nothing
+    rated_case = FixedCaseHistory([case([first], [verdict(0, first)])])
+    settled = lines(w, history=rated_case).line(first, done, NOW)
+    assert ". artifacts: a/b.md. " in settled and "withheld" not in settled  # the client's verdict
+    rework(w, first, "human")
+    assert ". artifacts: a/b.md. " in lines(w).line(first, done, NOW)  # the user asked for the rework: it answers the questions
+    plain = w.answer(first, "done", "## Summary\nok\n\n## Artifacts\n- a/b.md", 0)
+    assert ". artifacts: a/b.md. " in lines(w).line(first, plain, NOW)  # no questions, no withholding
 
 
 def test_a_result_whose_questions_are_none_is_not_flagged(w: ProgressWorld, task: Message) -> None:  # zero pin: no items, no flag

@@ -89,7 +89,7 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 2. An omission or clear violation verified against the source: send it back with `revises` (never patch it yourself), say what you did.
    If the reviewer evidenced a PASS and your doubt is how to READ a criterion (dates, what counts as an item, wording), ask the user
    one short question first; never send it back on your own reading or say the reviewer "missed" what you read differently.
-3. A done report's "Questions for the client:" (ambiguous items; `progress` flags them): ask them in plain words, with any question from item 2, in ONE
+3. A done or blocked report's "Questions for the client:" (ambiguous items; `progress` flags them and withholds the path): ask them in plain words, with any question from item 2, in ONE
    message BEFORE you deliver, and copy nothing until they are answered. Never answer one with a rework: it is the user's to answer; if you
    send a PASSed result back anyway, tell the user it was your decision and what it cost.
 4. Then copy the deliverable to the requested path (the plan lists this step) and check it exists and matches.

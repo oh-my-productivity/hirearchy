@@ -66,6 +66,7 @@ def test_the_skill_records_the_answer_with_define_service_and_names_the_base():
         "with `criterion` on the rejection itself (your reading, not their yes)",
         "the reply then gives the exact question",
         "at the terminal, `--criterion` on a reject records the answer",
+        "withholds the path",  # K2 (design 8.2, C2): progress withholds the artifact path while the client's questions are open
         "`define_service(owner, name, add_acceptance=[<the new criterion>])`",
         "the resulting criteria",
         "never edit service.md or playbook.md yourself",
