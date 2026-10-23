@@ -46,11 +46,16 @@ def case_line(c: Case, assertions: Mapping[str, str] | None = None) -> str:
         who = "client feedback (an agent client: hypotheses)" if c.client_kind == "agent" else "client feedback"
         line += f"; {who}: {verdict_chain(c, assertions)}"
     if c.lessons:
-        # The latest result is the final word on the case; earlier lessons only where room remains.
-        latest, earlier = c.lessons[-1], " / ".join(c.lessons[:-1])
+        # The latest result is the team's final word on the case, earlier lessons only where room remains; a relayed rework's lessons are
+        # marked: they are not the client's.
+        sources = [*c.lesson_sources, *[""] * (len(c.lessons) - len(c.lesson_sources))]
+        latest = c.lessons[-1]
+        earlier = " / ".join(("(relayed) " if s == "relayed" else "") + x for x, s in zip(c.lessons[:-1], sources))
         first_reject = next((v.message.id for v in c.verdicts if v.verdict == "reject"), None)
         after = first_reject is not None and bool(c.lesson_ids) and c.lesson_ids[-1] > first_reject
-        mark = " (written after the reject: check it against her words)" if after else ""
+        marks = [*(["from a relayed rework, not the client's"] if sources[-1] == "relayed" else []),
+                 *(["written after the reject: check it against her words"] if after else [])]
+        mark = f" ({'; '.join(marks)})" if marks else ""
         line += f'; lessons{mark}: "{clip_line(latest, CLIP_LESSON)}"'
         room = CLIP_LESSON - len(latest)
         if earlier and room > 40:

@@ -87,6 +87,7 @@ class DerivedCaseHistory(CaseHistory):
                 runs=self._counter.runs_between(team, tasks[0].id[:21], end),
                 lessons=[x for t in tasks if (r := results.get(t.id)) is not None and (x := lessons_of(r))],
                 lesson_ids=[r.id for t in tasks if (r := results.get(t.id)) is not None and lessons_of(r)],
+                lesson_sources=[t.source or "" for t in tasks if (r := results.get(t.id)) is not None and lessons_of(r)],
                 verdicts=verdicts, started=msg_time(tasks[0]),
                 finished=msg_time(res) if res is not None and final else None,
                 client_kind=kind, relayed_reworks=sum(t.source == "relayed" for t in tasks[1:]),

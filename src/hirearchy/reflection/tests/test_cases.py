@@ -56,6 +56,21 @@ def test_a_verdict_lists_its_link_notes_in_id_order(svc):
     assert other.link_notes == ()
 
 
+def test_lesson_sources_parallel_lessons(svc):
+    """Each lesson carries the ``source`` of the task its result answers, so the digest can mark the ones a relayed rework wrote (4.4)."""
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, lessons="One.")
+    svc.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+    human = svc.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=first.id, source="human")
+    deliver(svc, "ceo", human, lessons="Two.")
+    relayed = svc.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=human.id)  # no source: the assistant's own rework is relayed
+    deliver(svc, "ceo", relayed, lessons="Three.")
+    (case,) = svc.runtime.case_history.cases("ceo", WEEKDAY)
+    assert case.lessons == ["One.", "Two.", "Three."]
+    assert case.lesson_sources == ["", "human", "relayed"]
+    assert len(case.lesson_sources) == len(case.lesson_ids) == len(case.lessons)
+
+
 def test_stats_keep_the_final_counts_and_say_how_many_accepts_came_after_a_reject(svc):
     rejected_then_accepted(svc)
     plain = request(svc, "chips")

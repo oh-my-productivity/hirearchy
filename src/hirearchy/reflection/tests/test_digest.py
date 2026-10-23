@@ -15,7 +15,7 @@ def rejected_then_accepted(org, *, reject="Sam's 'before Friday' needs a date.",
     deliver(org, "ceo", first, runs=runs[0], lessons="Clean run; no issues.")
     org.feedback(ROOT, first.id, "reject", reject, source="human")
     time.sleep(0.002)
-    rework = org.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=first.id, budget=6)
+    rework = org.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=first.id, budget=6, source="human")
     deliver(org, "ceo", rework, runs=runs[1], lessons="Applied the date rule.")
     time.sleep(0.002)
     org.feedback(ROOT, rework.id, "accept", accept, source="human")

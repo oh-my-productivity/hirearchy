@@ -24,13 +24,13 @@ def verdict(kind: str, note: str = "", n: int = 0, tier: str = "human") -> Verdi
 
 def case(
     *, verdicts: list[Verdict] | None = None, lessons: list[str] | None = None, lesson_ids: list[str] | None = None, reworks: int = 0,
-    relayed: int = 0, client_kind: str = "human",
+    relayed: int = 0, client_kind: str = "human", lesson_sources: list[str] | None = None,
 ) -> Case:
     task = Message(sender="root", to="ceo", type="task", body="b", title="A long title " * 6)
     return Case(
         id="C1", service="s", owner="ceo", tasks=[task], result=None, state="done", playbook=1, used=2, reworks=reworks, budget=9, runs=4,
         lessons=lessons or [], verdicts=verdicts or [], started=T, finished=T, lesson_ids=lesson_ids or [], client_kind=client_kind,
-        relayed_reworks=relayed,
+        relayed_reworks=relayed, lesson_sources=lesson_sources or [],
     )
 
 
@@ -173,3 +173,30 @@ def test_case_line_drops_earlier_lessons_when_there_is_no_room_and_never_clips_t
     case.lessons = ["old lesson", "x" * 400]
     line = case_line(case)
     assert "earlier:" not in line and "old lesson" not in line and "x" * 100 in line
+
+
+# ------------------------------------------------------------------------------ lessons of relayed reworks (4.4)
+
+RELAYED = "from a relayed rework, not the client's"
+
+
+def test_the_latest_lesson_of_a_relayed_rework_is_marked() -> None:
+    line = case_line(case(lessons=["first", "second"], lesson_ids=["r1", "r2"], lesson_sources=["", "relayed"]))
+    assert f'; lessons ({RELAYED}): "second"' in line
+
+
+def test_both_marks_are_joined_when_written_after_the_reject() -> None:
+    reject = verdict("reject", "too long", 1)
+    line = case_line(case(verdicts=[reject], lessons=["x"], lesson_ids=["20260101T000009000000-ceo-0001"], lesson_sources=["relayed"]))
+    assert f'; lessons ({RELAYED}; written after the reject: check it against her words): "x"' in line
+
+
+def test_earlier_relayed_lessons_are_prefixed() -> None:
+    line = case_line(case(lessons=["a", "b", "c"], lesson_ids=["r1", "r2", "r3"], lesson_sources=["relayed", "human", "relayed"]))
+    assert '; earlier: "(relayed) a / b"' in line and f'lessons ({RELAYED}): "c"' in line
+
+
+def test_human_and_unsourced_lessons_are_unmarked() -> None:
+    for sources in (["", "human"], ["human", "human"], []):
+        line = case_line(case(lessons=["a", "b"], lesson_ids=["r1", "r2"], lesson_sources=sources))
+        assert "relayed" not in line and '; lessons: "b"; earlier: "a"' in line

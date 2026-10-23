@@ -47,7 +47,7 @@ def test_the_digest_quotes_the_clients_words_without_the_header(svc):
 def test_the_digest_shows_the_latest_lessons_first_and_earlier_ones_after(svc):
     first = svc.request(ROOT, "brief", {"topic": "ai"})
     deliver(svc, first, lessons="Ran cleanly; no changes needed.")
-    rework = svc.request(ROOT, "brief", {"topic": "ai"}, revises=first.id, budget=4)
+    rework = svc.request(ROOT, "brief", {"topic": "ai"}, revises=first.id, budget=4, source="human")
     deliver(svc, rework, lessons="Two items were missed: add a pre-read step.")
     digest = svc.runtime.reflection_digest.reflection_digest("ceo", "brief")
     line = next(x for x in digest.splitlines() if x.startswith("- case "))

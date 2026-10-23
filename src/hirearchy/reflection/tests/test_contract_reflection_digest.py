@@ -98,7 +98,7 @@ def test_the_latest_lessons_come_first_and_the_earlier_ones_after(w: ReflectionW
     define(w)
     first = ask(w)
     deliver(w, first, lessons="Ran cleanly; no changes needed.")
-    again = w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=first.id, budget=4)
+    again = w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=first.id, budget=4, source="human")
     deliver(w, again, lessons="Two items were missed: add a pre-read step.")
     digest = w.digest.reflection_digest("ceo", SERVICE)
     assert digest is not None

@@ -79,6 +79,7 @@ class Case:
     started: datetime | None
     finished: datetime | None  # when it ended done/failed
     lesson_ids: list[str] = field(default_factory=list)  # id of the result each lesson came from (parallel to lessons)
+    lesson_sources: list[str] = field(default_factory=list)  # the ``source`` of the task each lesson's result answers: relayed | human | "" (parallel)
     client_kind: str = "human"  # "human" when the owner's parent is root, else "agent"
     relayed_reworks: int = 0  # the tasks of the chain after the first that root stamped ``source: relayed``
     returned: int = 0  # the runs the results of the chain carried back: each result counts at most its own task's budget
