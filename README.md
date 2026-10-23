@@ -871,12 +871,12 @@ is a deliberate change of what callers can rely on: `uv run python -m hirearchy.
 **Unit tests (default).** They use a deterministic fake agent (`tests/testkit/fake_agent.py`) in place of kiro, and the autouse fixtures above keep them off your `$HOME`.
 A default run starts zero real-LLM runs.
 
-**Integration tests (opt-in).** `tests/integration/test_real_kiro.py` runs tiny orgs (4 tests, one agent run each,
-about a minute and 4 LLM calls in total) against the real `kiro-cli` and your kiro login: that the agent and the scheduler's
+**Integration tests (opt-in).** `tests/integration/test_real_kiro.py` runs tiny orgs (5 tests, one agent run each,
+about a minute and 5 LLM calls in total) against the real `kiro-cli` and your kiro login: that the agent and the scheduler's
 run id reach the MCP server's events (`ORG_RUN_ID`), that the built-in `read` reads the org but nothing outside it, and
-that the built-in `write` and hirearchy's `org_write` work side by side, and (V3) that an agent reaches the hirearchy tools while a file outside its folders and a shell it was not granted are refused. They assert on files and events, not on wording.
+that the built-in `write` and hirearchy's `org_write` work side by side, and (V3) that an agent reaches the hirearchy tools while a file outside its folders and a shell it was not granted are refused, and that a run on claude-sonnet-5.5 passes `--effort high` (its run log's `# cmd:` line). They assert on files and events, not on wording.
 
-* Cost: real model calls, billed to your kiro account like any other run. `HIREARCHY_IT_MODEL=<model>` picks a cheaper one
+* Cost: real model calls, billed to your kiro account like any other run. `HIREARCHY_IT_MODEL=<model>` picks another allowed model
   (default: the system default model, `claude-sonnet-5.5`).
 * Skipped (not failed) when `kiro-cli` is not on `PATH`. Each run is killed after 300 s, the scheduler after 480 s.
 * Safety (`tests/testkit/kiro_sandbox.py`): the org lives in the test's tmp dir and kiro's state (`HIREARCHY_STATE_DIR`) below it. Before the test the md5 of every file in

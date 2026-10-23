@@ -7,7 +7,9 @@ They are the repeatable form of three ad-hoc checks (the studies' NOTES point he
 * ``studies/F-read-experiment``: a built-in ``read`` reads the org by absolute path and nothing outside it;
 * ``studies/F2-tool-names``: built-in ``write`` and hirearchy ``org_write`` work side by side;
 * ``test_v3_agent_uses_hirearchy_tools_and_is_confined``: on kiro-cli's V3 engine an agent reaches the hirearchy tools, reads only what it
-  may, cannot run a shell it was not granted, and leaves ``~/.kiro/agents`` alone.
+  may, cannot run a shell it was not granted, and leaves ``~/.kiro/agents`` alone;
+* ``test_an_org_agent_runs_claude_sonnet_5_5_at_high_effort``: the model floor and the effort (docs/design/org-agent-model-floor.md): an org agent
+  hired on claude-sonnet-5.5 runs to the end, and its run log's ``# cmd:`` line carries ``--model claude-sonnet-5.5 --effort high --v3``.
 
 kiro's state (homes, logs, scratch directories) is kept in ``HIREARCHY_STATE_DIR`` inside the test's tmp dir.
 
@@ -218,3 +220,27 @@ def test_v3_agent_uses_hirearchy_tools_and_is_confined(real_kiro):
     assert logs and all("# kiro: run started (engine v3)" in text for text in logs), logs
     print(f"evidence: model={real_kiro.model} runs={runs} tool.call(actor=probe)={sorted(map(str, tools))} "
           f"denied(transcript={denied_in_transcript}, kiro.log={denied_in_log}) tool surfaces={len(surfaces)} canary={canary.exists()}")
+
+
+def test_an_org_agent_runs_claude_sonnet_5_5_at_high_effort(real_kiro):
+    """The floor of the org agents (D-E4-9): a run on claude-sonnet-5.5 passes ``--effort high`` to the real kiro-cli, succeeds, and says so in its run log."""
+    org = real_kiro.new_org()
+    org.hire(ROOT, "worker", "Worker", "You do small tasks exactly as asked, with hirearchy tools only.", model="claude-sonnet-5.5")
+    task = real_kiro.task(
+        org, "worker", "Effort check",
+        "The hirearchy tools are loaded with tool_load (tool_ids [\"hirearchy::*\"]) and called with tool_call. "
+        "1) Call the whoami tool. 2) Report the task done with the report tool.",
+        "whoami called; task reported done.", budget=2)
+    real_kiro.run_scheduler(org, max_runs=2)
+
+    result = final_result(org, task)
+    assert result is not None and result.status == "done", describe(org, "worker")
+    runs = scheduler_runs(real_kiro, org, "worker")
+    logs = run_logs(org, "worker")
+    assert runs and logs, describe(org, "worker")
+    first = logs[0].read_text(encoding="utf-8", errors="replace")
+    cmd = next(line for line in first.splitlines() if line.startswith("# cmd:"))
+    assert "--model claude-sonnet-5.5 --effort high --v3" in cmd, cmd
+    assert "# kiro: run started (engine v3)" in first, first[-1500:]
+    print(f"evidence: model=claude-sonnet-5.5 effort=high runs={runs} result={result.status}")
+    print(f"evidence: {cmd}")
