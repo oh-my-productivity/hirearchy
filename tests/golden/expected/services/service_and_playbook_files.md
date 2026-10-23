@@ -41,7 +41,7 @@ admitted: b
 1. Ask the researcher for sources on the topic.
 2. Have the writer draft at most 600 words.
 3. Have the fact-checker verify every claim before you report.
-4. Cut to 600 words before reporting.
+4. Cut to 600 words before reporting [C1].
 
 ##### ceo/services/plain-brief/SERVICE.md
 ---

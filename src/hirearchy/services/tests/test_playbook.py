@@ -5,6 +5,11 @@ import pytest
 from testkit.reach.hirearchy.core import ROOT, OrgError
 from testkit.services_world import ENG, confirmed_amendment, define, playbook_meta, svc
 
+from hirearchy.services.testing import AdmittingServiceEvidence, RefusingServiceEvidence, fs_world
+
+from ._support import define as define_in
+from ._support import populated
+
 
 # ----------------------------------------------------------------------------------- revise_playbook
 def test_revise_playbook_versions_archives_and_tells_the_client(svc):
@@ -14,9 +19,9 @@ def test_revise_playbook_versions_archives_and_tells_the_client(svc):
     assert meta["version"] == 1 and meta["by"] == "ceo" and meta["reason"] == "first draft" and meta["service"] == "weekly-brief"
     assert body.strip() == "## Steps\n1. Search."  # the caller's frontmatter was stripped, the runtime's is used
     c3 = confirmed_amendment(org, "Every claim names its source")  # the user's amendment and their yes: the evidence of v2
-    assert org.revise_playbook("ceo", "weekly-brief", "## Steps\n1. Search.\n2. Cite.", "Cases A and B lacked sources", [c3]) == 2
+    assert org.revise_playbook("ceo", "weekly-brief", "## Steps\n1. Search.\n- C3: Every claim names its source", "Cases A and B lacked sources", [c3]) == 2
     hist = org.dir("ceo") / "services" / "weekly-brief" / "history" / "PLAYBOOK.v1.md"
-    assert "1. Search." in hist.read_text() and "2. Cite." not in hist.read_text()
+    assert "1. Search." in hist.read_text() and "C3: Every claim" not in hist.read_text()
     assert playbook_meta(org)[0]["version"] == 2
     notes = [n for n in org.messages(ROOT, "inbox") if n.sender == "runtime"]  # the helper's delivery put its result in the inbox too
     assert [n.title for n in notes] == [
@@ -71,3 +76,52 @@ def test_the_word_cap_is_configurable(svc):
     (org.root / "ORG.md").write_text(text)
     with pytest.raises(OrgError, match="the limit is 5"):
         org.revise_playbook("ceo", "weekly-brief", "one two three four five six", "r", [])
+
+
+# ----------------------------------------------------------------------------------- the lines of a revision (P1)
+class RecordingEvidence(AdmittingServiceEvidence):
+    """The stand-in gate that remembers what it was asked."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.asked: list[tuple[str | None, tuple[str, ...]]] = []
+
+    def admit(self, owner, service, evidence, reason, *, exempt=None, lines=()):
+        self.asked.append((exempt, tuple(lines)))
+        return super().admit(owner, service, evidence, reason, exempt=exempt, lines=lines)
+
+
+def test_revise_playbook_passes_the_changed_lines_to_the_gate(tmp_path):
+    gate = RecordingEvidence()
+    w = populated(fs_world(tmp_path, gate))
+    define_in(w)
+    w.commands.revise_playbook("ceo", "weekly-brief", "A one\nB two\nC three", "first", [])
+    w.commands.revise_playbook("ceo", "weekly-brief", "A one\nB changed\nC three\nD four", "second", ["R1"])
+    w.commands.revise_playbook("ceo", "weekly-brief", "A one\nC three", "third", ["R1"])  # a removal only
+    assert gate.asked == [("first", ()), (None, ("B changed", "D four")), (None, ())]
+
+
+def test_a_refused_revision_writes_nothing(tmp_path):
+    w = populated(fs_world(tmp_path, RefusingServiceEvidence("refused by the stand-in for the gate")))
+    define_in(w, playbook="A one\nB two")
+    before = w.text("ceo/services/weekly-brief/PLAYBOOK.md")
+    with pytest.raises(OrgError, match="^refused by the stand-in"):
+        w.commands.revise_playbook("ceo", "weekly-brief", "A one\nB three", "why", ["R1"])
+    assert w.text("ceo/services/weekly-brief/PLAYBOOK.md") == before and w.d.inbox("root") == []
+
+
+def test_roots_note_lists_the_admitted_lines_and_the_removed_count(tmp_path):
+    w = populated(fs_world(tmp_path, AdmittingServiceEvidence()))
+    define_in(w)
+    w.commands.revise_playbook("ceo", "weekly-brief", "A one\nB two\nC three", "first", [])
+    w.commands.revise_playbook("ceo", "weekly-brief", "A one\nB changed\nC three", "second", ["R1"])  # one line changed, one removed
+    w.commands.revise_playbook("ceo", "weekly-brief", "A one\nB changed\nC three\nD four", "third", ["R2"])  # added only
+    w.commands.revise_playbook("ceo", "weekly-brief", "A one\nD four", "fourth", ["R3"])  # removed only (and reordered)
+    first, second, third, fourth = (m.body for m in w.d.inbox("root"))
+    where = "File: ceo/services/weekly-brief/PLAYBOOK.md"
+    stand_in = "admitted: admitted by the stand-in for the gate"
+    head = "Lines added or changed (each with the id that admits it):"
+    assert first == f"ceo revised the playbook of service `weekly-brief` to v1.\nReason: first\nEvidence: none; the first playbook (no evidence needed)\n{where}"
+    assert second == f"ceo revised the playbook of service `weekly-brief` to v2.\nReason: second\nEvidence: R1; {stand_in}\n{head}\n- [R1] B changed\n1 line(s) removed.\n{where}"
+    assert third == f"ceo revised the playbook of service `weekly-brief` to v3.\nReason: third\nEvidence: R2; {stand_in}\n{head}\n- [R2] D four\n{where}"
+    assert fourth == f"ceo revised the playbook of service `weekly-brief` to v4.\nReason: fourth\nEvidence: R3; {stand_in}\n2 line(s) removed.\n{where}"

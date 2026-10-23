@@ -6,9 +6,11 @@ from collections.abc import Sequence
 
 from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
-from ..kernel import NAME_RE, ROOT, OrgError, parent
+from ..kernel import NAME_RE, ROOT, OrgError, clip_line, parent
 from ._protocols import PlaybookRevisions, PlaybookTexts, PlaybookWriter
-from .api import REASON_MAX, Admission, Contract, ServiceCatalog, ServiceEvidence, normalize_evidence
+from .api import REASON_MAX, Admission, Contract, ServiceCatalog, ServiceEvidence, changed_lines, normalize_evidence
+
+LINE_CLIP = 200  # characters of one admitted line in the client's note
 
 
 class RulePlaybookReviser(PlaybookRevisions):
@@ -59,7 +61,9 @@ class RulePlaybookReviser(PlaybookRevisions):
                 restored = max(same, key=lambda p: p.version)
                 restores = restored.version
                 exempt = "restore" if restored.by == client else None
-        admission = self._evidence.admit(actor, service, ids, reason, exempt=exempt)
+        lines = changed_lines(current.body, body) if current.version else []  # the lines this revision adds or changes
+        removed = changed_lines(body, current.body) if current.version else []
+        admission = self._evidence.admit(actor, service, ids, reason, exempt=exempt, lines=lines)
         version = current.version + 1
         extra: dict[str, object] = {"evidence": list(admission.evidence), "admitted": admission.rule}
         if restores:
@@ -68,7 +72,8 @@ class RulePlaybookReviser(PlaybookRevisions):
         self._delivery.notify(
             client, f"playbook of {service} revised to v{version}",
             f"{actor} revised the playbook of service `{service}` to v{version}.\nReason: {reason}\n"
-            f"Evidence: {', '.join(admission.evidence) or 'none'}; {self._admission(admission, restores)}\nFile: {path}",
+            f"Evidence: {', '.join(admission.evidence) or 'none'}; {self._admission(admission, restores)}\n"
+            f"{self._line_notes(admission, removed)}File: {path}",
             wake=False,
         )
         return version
@@ -81,6 +86,17 @@ class RulePlaybookReviser(PlaybookRevisions):
         if admission.rule == "restore":
             return f"restores v{restores}, which you wrote (no evidence needed)"
         return f"restores v{restores}; admitted: {admission.detail}" if restores else f"admitted: {admission.detail}"
+
+    @staticmethod
+    def _line_notes(admission: Admission, removed: Sequence[str]) -> str:
+        """The lines of the client's note about what changed: each admitted line with the id that admits it, and how many lines went."""
+        out = ""
+        if admission.lines:
+            out += "Lines added or changed (each with the id that admits it):\n"
+            out += "".join(f"- [{admits}] {clip_line(line, LINE_CLIP)}\n" for admits, line in admission.lines)
+        if removed:
+            out += f"{len(removed)} line(s) removed.\n"
+        return out
 
     def _owned(self, actor: str, name: str) -> Contract:
         """The contract of ``name`` among the services ``actor`` owns, or an error listing the ones it owns."""

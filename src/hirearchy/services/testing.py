@@ -129,9 +129,14 @@ class AdmittingServiceEvidence(ServiceEvidence):
     def links(self, owner: str, service: str, ids: Sequence[str], *, verdict: str | None = None) -> tuple[str, ...]:
         return normalize_links(list(ids))
 
-    def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None) -> Admission:
+    def admit(
+        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),
+    ) -> Admission:
         ids = normalize_evidence(list(evidence))
-        return Admission(exempt, ids, "no evidence needed") if exempt else Admission("b", ids, "admitted by the stand-in for the gate")
+        if exempt:
+            return Admission(exempt, ids, "no evidence needed")
+        admitting = ids[0] if ids else "b"  # every line rests on the first id it cites
+        return Admission("b", ids, "admitted by the stand-in for the gate", lines=tuple((admitting, line) for line in lines))
 
 
 class RefusingServiceEvidence(AdmittingServiceEvidence):
@@ -141,9 +146,11 @@ class RefusingServiceEvidence(AdmittingServiceEvidence):
         super().__init__(())
         self._text = text
 
-    def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None) -> Admission:
+    def admit(
+        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),
+    ) -> Admission:
         if exempt:
-            return super().admit(owner, service, evidence, reason, exempt=exempt)
+            return super().admit(owner, service, evidence, reason, exempt=exempt, lines=lines)
         raise OrgError(self._text)
 
 

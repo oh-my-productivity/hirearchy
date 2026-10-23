@@ -141,7 +141,7 @@ def test_angle_brackets_and_ampersands_are_stored_exactly_as_given(svc):
     # the same through the Org API, and in the archived history
     svc.end_run("ceo", ok=True)  # the run the prompt above opened
     c3 = confirmed_amendment(svc, "Names the week it covers")  # the user's amendment and their yes: the evidence of v2
-    svc.revise_playbook("ceo", WEEKDAY, "## Steps\n1. Other <b>.", "second <i> & more", [c3])
+    svc.revise_playbook("ceo", WEEKDAY, content.rstrip() + "\n- C3: Names the week it covers", "second <i> & more", [c3])
     assert services.read_playbook(svc, "ceo", WEEKDAY).reason == "second <i> & more"
     assert "<weekday>" in (svc.dir("ceo") / "services" / WEEKDAY / "history" / "PLAYBOOK.v1.md").read_text()
 
@@ -179,7 +179,7 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     deliver(org, "ceo", t2, runs=2)
     no2 = org.feedback(ROOT, t2.id, "reject", "Still bad.", source="human")
     org.feedback(ROOT, t2.id, "reject", "Yes, it is about C2.", source="human", criterion=["C2"], confirms=no2.id)  # C2 failed in two cases: the evidence of v2
-    org.revise_playbook("ceo", "weekly-brief", "Better steps.", "Case rejected for missing sources", ["C2"])
+    org.revise_playbook("ceo", "weekly-brief", "Better steps. [C2]", "Case rejected for missing sources", ["C2"])
     out = call(server, "services")
     assert out.splitlines()[0] == "Services you can request (from your direct reports):"
     assert "- weekly-brief (offered by ceo; contract v1, playbook v2): A one-page brief" in out
@@ -232,7 +232,7 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     rejection = max(m.id for m in org.sent(ROOT) if m.feedback)
     call(root, "feedback", task_id=task.id, verdict="reject", note="Yes, add it.", source="human", criterion=["C3"], confirms=rejection)
     out = call(ceo, "revise_playbook", service="weekly-brief",
-               content="## Steps\n1. Search.\n2b. Compare with last week.", reason=f"case {task.id} rejected: no changes", evidence=["C3"])
+               content="## Steps\n1. Search.\n- C3: Shows the changes since last week", reason=f"case {task.id} rejected: no changes", evidence=["C3"])
     assert "playbook of `weekly-brief` is now v2" in out
     out = call(ceo, "report", task_id=second.id, status="done", summary="Delivered again.", lessons="Step 2b worked.")
     assert "Lessons recorded: they are your team's view and are shown before the next request. A playbook revision rests on the client's evidence" in out

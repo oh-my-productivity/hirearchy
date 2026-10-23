@@ -47,6 +47,18 @@ def test_admit_returns_rule_b_or_c_or_raises_an_org_error(evidence: ServiceEvide
         assert isinstance(got, Admission) and got.rule in ("b", "c") and got.evidence == ("C1",) and got.detail
 
 
+def test_admit_accepts_lines(evidence: ServiceEvidence) -> None:
+    """The changed lines of a revision (P1): a gate that admits returns, with each line, the id that admits it; an exempt one ignores them."""
+    lines = ["A new line", "Another one"]
+    try:
+        got = evidence.admit(OWNER, SERVICE, ["c1"], "why", lines=lines)
+    except OrgError as refusal:
+        assert str(refusal)
+    else:
+        assert got.rule in ("b", "c") and all(isinstance(i, str) and line in lines for i, line in got.lines)
+    assert evidence.admit(OWNER, SERVICE, [], "why", exempt="first", lines=lines).lines == ()
+
+
 def test_links_returns_normalized_ids_or_raises(evidence: ServiceEvidence) -> None:
     try:
         got = evidence.links(OWNER, SERVICE, ["c2", "C1", "c2"])

@@ -73,7 +73,7 @@ def test_a_revision_resets_the_evidence_and_later_feedback_counts_as_new(svc):
     digest = org.runtime.reflection_digest.reflection_digest("ceo", "weekly-brief")
     assert digest is not None and "Missing sources." in digest and task.id in digest
     c3 = confirmed_amendment(org, "Every claim names its source")  # the user's amendment and their yes: the evidence of v2
-    org.revise_playbook("ceo", "weekly-brief", "Steps v2.", "added sources", [c3])
+    org.revise_playbook("ceo", "weekly-brief", "Steps v1.\n- C3: Every claim names its source", "added sources", [c3])
     assert org.runtime.reflection_digest.reflection_digest("ceo", "weekly-brief") is None
     nxt = request(org)
     deliver(org, "ceo", nxt, runs=1)

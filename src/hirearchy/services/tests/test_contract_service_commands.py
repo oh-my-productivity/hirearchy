@@ -1064,10 +1064,12 @@ def test_the_client_note_names_reason_evidence_and_admission(w: ServicesWorld) -
     notes = [m.body for m in w.d.inbox("root")]
     assert notes[0] == f"ceo revised the playbook of service `weekly-brief` to v1.\nReason: first draft\nEvidence: none; the first playbook (no evidence needed)\n{where}"
     assert notes[1] == (
-        "ceo revised the playbook of service `weekly-brief` to v2.\nReason: two\nEvidence: R1, C2; admitted: admitted by the stand-in for the gate\n" + where
+        "ceo revised the playbook of service `weekly-brief` to v2.\nReason: two\nEvidence: R1, C2; admitted: admitted by the stand-in for the gate\n"
+        "Lines added or changed (each with the id that admits it):\n- [R1] 2. Cite while drafting.\n2 line(s) removed.\n" + where
     )
     assert notes[2] == (
-        "ceo revised the playbook of service `weekly-brief` to v4.\nReason: back\nEvidence: R3; restores v2; admitted: admitted by the stand-in for the gate\n" + where
+        "ceo revised the playbook of service `weekly-brief` to v4.\nReason: back\nEvidence: R3; restores v2; admitted: admitted by the stand-in for the gate\n"
+        "1 line(s) removed.\n" + where
     )
 
 
@@ -1077,7 +1079,7 @@ def test_the_client_note_of_a_restored_client_version(w: ServicesWorld) -> None:
     w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "back", [])
     assert [m.body for m in w.d.inbox("root")][-1] == (
         "ceo revised the playbook of service `weekly-brief` to v3.\nReason: back\nEvidence: none; restores v1, which you wrote (no evidence needed)\n"
-        "File: ceo/services/weekly-brief/PLAYBOOK.md"
+        "1 line(s) removed.\nFile: ceo/services/weekly-brief/PLAYBOOK.md"
     )
 
 

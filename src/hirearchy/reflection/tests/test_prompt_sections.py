@@ -200,7 +200,7 @@ def test_the_reflect_section_offers_restoring_an_older_version_from_v2_on(svc):
     org = svc
     org.revise_playbook("ceo", "weekly-brief", "Steps one.", "first", [])
     c3 = confirmed_amendment(org, "Every claim names its source")  # the user's amendment and their yes: the evidence of v2
-    org.revise_playbook("ceo", "weekly-brief", "Steps two.", "second", [c3])
+    org.revise_playbook("ceo", "weekly-brief", "Steps one.\n- C3: Every claim names its source", "second", [c3])
     time.sleep(0.002)
     first = request(org)
     deliver(org, "ceo", first)
@@ -342,7 +342,7 @@ def test_the_restore_step_says_which_restore_needs_evidence(svc):
     org = svc
     org.revise_playbook("ceo", "weekly-brief", "Steps one.", "first", evidence=[])
     c3 = confirmed_amendment(org, "Every claim names its source")
-    org.revise_playbook("ceo", "weekly-brief", "Steps two.", "second", evidence=[c3])
+    org.revise_playbook("ceo", "weekly-brief", "Steps one.\n- C3: Every claim names its source", "second", evidence=[c3])
     time.sleep(0.002)
     first = request(org)
     deliver(org, "ceo", first)

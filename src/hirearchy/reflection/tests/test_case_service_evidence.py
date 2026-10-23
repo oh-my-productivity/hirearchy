@@ -5,6 +5,7 @@ where ``ceo`` offers ``weekly-brief`` (``C1``, ``C2``, no case yet); the behavio
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -21,6 +22,7 @@ from hirearchy.services import Admission, ServiceEvidence
 
 # The suite that every ``ServiceEvidence`` passes: the same functions, run against this package's implementation.
 from hirearchy.services.tests.test_contract_service_evidence import (  # noqa: F401  (imported to be collected here)
+    test_admit_accepts_lines,
     test_admit_returns_rule_b_or_c_or_raises_an_org_error,
     test_an_exempt_admit_returns_the_exemption_with_normalized_ids,
     test_an_exempt_admit_with_no_evidence_returns_the_exemption,
@@ -63,9 +65,11 @@ def amend(w: ReflectionWorld, **over: Any) -> None:
     w.s.commands.define_service("root", "ceo", SERVICE, **over)
 
 
-def refusal(evidence: ServiceEvidence, ids: list[str], reason: str = "why", owner: str = "ceo", service: str = SERVICE) -> str:
+def refusal(
+    evidence: ServiceEvidence, ids: list[str], reason: str = "why", owner: str = "ceo", service: str = SERVICE, lines: Sequence[str] = (),
+) -> str:
     with pytest.raises(OrgError) as e:
-        evidence.admit(owner, service, ids, reason)
+        evidence.admit(owner, service, ids, reason, lines=lines)
     return str(e.value)
 
 
@@ -312,6 +316,131 @@ def test_an_unknown_id_is_still_unknown_evidence(w: ReflectionWorld, evidence: S
     link_note(w, "human")
     other = "20990101T000000000000-root-0000"
     assert refusal(evidence, [other]).startswith(f"unknown evidence for `weekly-brief`: {other}. Evidence is a criterion (")
+
+
+# ------------------------------------------------------------------------------ line by line (P1, 4.1)
+
+WEEK = "Names the week it covers"
+REFUSED_HEAD = "refused: every line a revision adds or changes must rest on the evidence it cites, and {n} line(s) do not:\n"
+
+
+def confirmed_c3(w: ReflectionWorld) -> None:
+    """C3 (``WEEK``) is added by an amendment and the user's yes to it is recorded."""
+    amend(w, add_acceptance=[WEEK])
+    rejected(w, "No week.", criterion="C3")
+
+
+def failed_twice(w: ReflectionWorld, criterion: str = "C2") -> tuple[Message, Message]:
+    """``criterion`` failed in two cases the client rejected (rule (b)); returns the two requests."""
+    first, _ = rejected(w, "No source.", criterion=criterion)
+    second, _ = rejected(w, "Still none.", topic="b", criterion=criterion)
+    return first, second
+
+
+def test_rule_c_admits_only_the_cited_criterions_words_one_line_each(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    confirmed_c3(w)
+    lines = [f"- C3: {WEEK}", f"2. C3: {WEEK}", f"{WEEK} (C3)"]
+    detail = "cites C3, which root added to the contract (v2) and the client confirmed"
+    got = evidence.admit("ceo", SERVICE, ["C3"], "why", lines=lines)
+    assert got == Admission("c", ("C3",), detail, lines=tuple(("C3", line) for line in lines))
+
+
+def test_rule_c_refuses_an_elaboration_of_the_cited_criterion(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    confirmed_c3(w)
+    elaborated = f"- C3: {WEEK} and the year it falls in"
+    message = refusal(evidence, ["C3"], lines=[f"- C3: {WEEK}", elaborated])
+    assert message.startswith(REFUSED_HEAD.format(n=1) + f'- "{elaborated}"\n')
+    assert f"these lines are not C3's words. Write it as \"- C3: {WEEK}\". " in message
+    assert "Rule (b)" not in message  # nothing is tagged-eligible: no (b) evidence
+
+
+def test_a_criterion_with_an_empty_key_admits_no_c_line(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    amend(w, add_acceptance=["???"])  # C3: no letter or digit, so a bare "C3" would be its "words"
+    rejected(w, "No marks.", criterion="C3")
+    message = refusal(evidence, ["C3"], lines=["C3", "- C3: ???", "???"])
+    assert message.startswith(REFUSED_HEAD.format(n=3) + '- "C3"\n- "- C3: ???"\n- "???"\n')
+
+
+def test_rule_b_admits_a_line_tagged_with_a_qualifying_id_and_refuses_an_untagged_one(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    first, second = failed_twice(w)
+    tagged = "Cite a URL for every claim [C2]"
+    detail = f"C2 failed in 2 {CASES}: {first.id}, {second.id}"
+    assert evidence.admit("ceo", SERVICE, ["C2"], "why", lines=[tagged]) == Admission("b", ("C2",), detail, lines=(("C2", tagged),))
+    message = refusal(evidence, ["C2"], lines=[tagged, "Cite a URL for every claim", "Cite a URL [C20]"])
+    assert message.startswith(REFUSED_HEAD.format(n=2) + '- "Cite a URL for every claim"\n- "Cite a URL [C20]"\n')
+    assert 'Rule (b) admits a line that carries the id it rests on ("[C2]"): these lines carry none. ' in message
+    assert "Rule (c)" not in message
+
+
+def test_a_cited_assertion_tags_through_its_about(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    failed_twice(w)  # R1 and R2 are both about C2
+    by_assertion = "Cite a source [R2]"
+    by_criterion = "Cite a source [C2]"
+    got = evidence.admit("ceo", SERVICE, ["R2"], "why", lines=[by_assertion, by_criterion])
+    assert (got.rule, got.lines) == ("b", (("R2", by_assertion), ("C2", by_criterion)))
+
+
+def test_a_revision_that_only_removes_or_reorders_lines_is_admitted_as_today(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    failed_twice(w)
+    today = evidence.admit("ceo", SERVICE, ["C2"], "why")
+    assert today.rule == "b" and today.lines == ()
+    assert evidence.admit("ceo", SERVICE, ["C2"], "why", lines=[]) == today
+
+
+def test_exempt_revisions_ignore_lines(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    for exempt in ("first", "restore"):
+        assert evidence.admit("ceo", SERVICE, [], "why", exempt=exempt, lines=["anything at all"]) == Admission(exempt, (), "no evidence needed")
+
+
+def test_g1_and_g2_are_unchanged_when_nothing_admits(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    assert refusal(evidence, ["C1"], lines=["a line"]) == refusal(evidence, ["C1"])  # G1: no client evidence
+    task, _ = rejected(w, "Too long.", criterion="C2")
+    one_case = refusal(evidence, ["R1"])
+    assert one_case.startswith("refused: the client rejected this in one case only (") and refusal(evidence, ["R1"], lines=["a line"]) == one_case
+
+
+def test_the_refusal_lists_at_most_ten_lines_then_and_k_more(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    confirmed_c3(w)
+    for n in (1, 10, 11):
+        lines = [f"Offending line number {i}" for i in range(n)]
+        message = refusal(evidence, ["C3"], lines=lines)
+        assert message.startswith(REFUSED_HEAD.format(n=n))
+        listed = [x for x in message.splitlines() if x.startswith('- "Offending line number')]
+        assert listed == [f'- "Offending line number {i}"' for i in range(min(n, 10))]
+        assert ("- and 1 more" in message) == (n == 11) and "- and 0 more" not in message and "- and 10 more" not in message
+
+
+def test_each_listed_line_is_clipped_to_600_characters(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    confirmed_c3(w)
+    long = " ".join(["word"] * 200)  # 799 characters
+    message = refusal(evidence, ["C3"], lines=[long])
+    assert f'- "{clip_line(long, 600)}"\n' in message and long not in message and len(clip_line(long, 600)) == 600
+
+
+def test_the_question_quotes_the_first_offending_line_clipped_to_160(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    confirmed_c3(w)
+    first = " ".join(["first"] * 80)
+    message = refusal(evidence, ["C3"], lines=[first, "Second offending line"])
+    assert f'"We would add to how we deliver weekly-brief: {clip_line(first, 160)}. Is that what you want from now on? ' in message
+    assert "Second offending line. Is that" not in message
+
+
+def test_the_refusal_text_is_lines_refused(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    confirmed_c3(w)
+    failed_twice(w)
+    message = refusal(evidence, ["C3", "C2"], lines=["Add a footer", "Cut the intro"])
+    assert message == (
+        "refused: every line a revision adds or changes must rest on the evidence it cites, and 2 line(s) do not:\n"
+        '- "Add a footer"\n'
+        '- "Cut the intro"\n'
+        "Rule (c) admits only the cited confirmed criterion's own words, one line each with its id: these lines are not C3's words. "
+        f'Write it as "- C3: {WEEK}". '
+        'Rule (b) admits a line that carries the id it rests on ("[C2]"): these lines carry none. '
+        "A change of punctuation, spacing, list numbering or markdown alone needs nothing. Nothing was written: revise again without these "
+        "lines, or send root (`send`) this question once: "
+        '"We would add to how we deliver weekly-brief: Add a footer. Is that what you want from now on? '
+        'If yes, please add it to the contract as a criterion."'
+    )
 
 
 # ------------------------------------------------------------------------------ criteria the client removed

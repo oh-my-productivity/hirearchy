@@ -387,6 +387,7 @@ class Admission:
     rule: str  # "b" | "c" | "first" | "restore"
     evidence: tuple[str, ...]  # the normalized ids cited
     detail: str  # one line for the client's note, e.g. "C6 failed in 2 cases the client rejected: <id>, <id>"
+    lines: tuple[tuple[str, str], ...] = ()  # (the id that admits it, the line) of every line the revision added or changed; () when none/exempt
 
 
 @runtime_checkable
@@ -398,10 +399,14 @@ class ServiceEvidence(Protocol):
         not the rejection ``verdict`` itself) or ``none``; ``OrgError`` naming the unknown ones and listing the valid ones otherwise."""
         ...
 
-    def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None) -> Admission:
+    def admit(
+        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),
+    ) -> Admission:
         """Judge a revision of ``owner``'s playbook by rules (b) and (c) of the evidence gate (rule (c): it cites a criterion the client added by
-        an amendment and confirmed); ``exempt`` ("first", "restore"): only resolve the ids and return the exemption. ``OrgError`` with the client
-        question when it is refused, or naming unknown ids."""
+        an amendment and confirmed); ``exempt`` ("first", "restore"): only resolve the ids and return the exemption. ``lines`` are the lines the
+        revision adds or changes (``changed_lines``): under rule (c) each must be the cited criterion's own words with its id, under rule (b) each
+        must carry the id it rests on; the admission lists them with the id that admits each. ``OrgError`` with the client question when it is
+        refused (an offending line included), or naming unknown ids."""
         ...
 
     def confirmed(self, owner: str, service: str) -> frozenset[str]:

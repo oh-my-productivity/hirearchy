@@ -157,7 +157,7 @@ def chain(w: World, through: int) -> dict[str, str]:
         deliver(w, ids["B1"])
         n = feedback(w, ids["B1"], "reject", LEE, source="human")
         feedback(w, ids["B1"], "reject", "It is about C6 too.", source="human", criterion=["C6"], confirms=n)
-        revise(w, PLAYBOOK_V1 + "3. A date is written only when the notes state it.\n", "C6 failed in A1 and B1", ["C6"])
+        revise(w, PLAYBOOK_V1 + "3. A date is written only when the notes state it [C6].\n", "C6 failed in A1 and B1", ["C6"])
     return ids
 
 
@@ -242,7 +242,7 @@ def test_6_a_second_independent_human_reject_admits_a_revision(tmp_path):
     deliver(w, ids["B1"])
     n = feedback(w, ids["B1"], "reject", LEE, source="human")
     feedback(w, ids["B1"], "reject", "It is about C6 too.", source="human", criterion=["C6"], confirms=n)
-    v2 = PLAYBOOK_V1 + "3. A date is written only when the notes state it.\n"
+    v2 = PLAYBOOK_V1 + "3. A date is written only when the notes state it [C6].\n"
     assert "now v2" in revise(w, v2, "C6 failed in A1 and B1", ["C6"])
     meta, body = playbook_meta(w.org, "lead", SERVICE)
     assert meta["version"] == 2 and meta["admitted"] == "b" and meta["evidence"] == ["C6"] and body.strip() == v2.strip()
@@ -263,7 +263,7 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     note = next(m.body for m in w.org.received("lead") if "Acceptance criteria now:" in m.body)
     assert all(f"C{k}: " in note for k in range(1, 8))
     assert f"C7: {added} (not confirmed)" in note  # the lead sees that the client's yes to it is not recorded
-    v2 = PLAYBOOK_V1 + "3. 'before <weekday>' is that weekday's date.\n"
+    v2 = PLAYBOOK_V1 + "- C7: " + added + "\n"  # rule (c): only the criterion's own words, one line, with its id
     refused = fails(w.lead, "revise_playbook", service=SERVICE, content=v2, reason="C7 was added by the client", evidence=["C7"])
     assert "C7 was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)" in refused
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
