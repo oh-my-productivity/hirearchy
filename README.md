@@ -224,8 +224,8 @@ A request is a task built from the contract (inputs, its criteria plus any `extr
 rule of tasks applies: direct reports only, budget moves down, `done`/`failed` are final, rework is `revises`.
 
 CLI (as root): `hirearchy services`; `define-service OWNER NAME --description T --input 'topic*:what it is about' --acceptance T|@file
---deliverable T [--format F --max-words N --path DIR] --budget N [--playbook @file] [--locked]`; to amend, pass only what changes: `define-service OWNER NAME --add-acceptance T [--remove-acceptance EXACT_TEXT]` (also `--no-locked`; `--acceptance` replaces all and excludes add/remove); `request SERVICE --input key=value
-[--title --note --budget --revises --source human|relayed]`; `feedback TASK_ID accept|reject [--note --source human|relayed --criterion ID
+--deliverable T [--format F --max-words N --path DIR] --budget N [--playbook @file] [--locked]`; to amend, pass only what changes: `define-service OWNER NAME --add-acceptance T [--remove-acceptance EXACT_TEXT] [--answers VERDICT_ID --about ID --words TEXT|@FILE]` (also `--no-locked`; `--acceptance` replaces all and excludes add/remove; the criteria change only as the user's recorded answer, see phase 0a.2 below); `request SERVICE --input key=value
+[--title --note --budget --revises --source human|relayed --base delivered|latest]`; `feedback TASK_ID accept|reject [--note --source human|relayed --criterion ID
 --confirms VERDICT_ID]`; `retire-service OWNER NAME --reason T` (the only way to retire one: there is no MCP tool for it).
 
 **What the owner sees.** Only an agent that owns a service gets more in its prompt (everyone else's is byte-identical): `# Your services`
@@ -264,6 +264,25 @@ listed, unchecked). `feedback` can name what a rejection is about: `confirms` re
 a `criterion` on the rejection itself is relayed and shows `(not confirmed)`. `revise_playbook` needs `evidence`: a revision is admitted only when one
 criterion or assertion failed in two cases the human client rejected, or when it cites an amendment the client confirmed; otherwise it is refused with
 the question for the client. The first playbook and restoring the client's version need none; an agent client's service keeps its playbook. `Org.revise_playbook` needs `evidence` too.
+
+**What org growth phase 0a.2 changed** (the enforcement batch after study E4; the design is `docs/design/org-growth-phase-0a2.md`).
+- *Playbook lines are admitted one by one.* Rule (c) admits only the cited confirmed criterion's own words, written `- C8: <the criterion>`; rule (b) only lines tagged with the
+  id that qualifies them (`- C1: ...`). A refusal lists the offending lines and root's note lists the admitted ones. The digest marks the lessons that come from relayed reworks. The id of a
+  `confirms` link note counts as evidence for its criterion. An amendment that removes a criterion names the playbook lines that quote it.
+- *The contract changes only as the user's recorded answer.* On an existing service root's `define_service` changes the acceptance criteria only with `answers=<the rejection's
+  message id>`, `about=<the C or R id the question named>` and `words=<their answer, verbatim>`, after every delivery has its verdict (one rejection, one answer); or with `words=` alone
+  for a change the user asks for on their own, outside a rejection, which travels with every request and is never rule-(c) eligible. The product writes the `confirms` link itself. The reply of
+  `feedback(reject)` gives the exact question with the id. Retiring a service needs every delivery rated and every rejection answered; a service defined again after its owner was retired
+  continues the retired record.
+- *`progress`* flags a `blocked` result with questions for the client and withholds its artifact path ("ask first") while they are open. `progress`, `status` and `whoami` name the files
+  in a contract's deliverable folder that differ from the team's last checked artifact or that the team never wrote, and tell root to tell the user. Nothing outside the folder is read.
+- *A rework the user asks for* (`request(revises=X, source="human")`) after a relayed rework changed the artifact needs `base="delivered"` (the version the user judged, named by its
+  org-git commit) or `base="latest"`. A service request is sent back with `request`, not `delegate`. The tier (`human` or `relayed`) travels into the rework delegations of the team.
+- *Root's instructions* tell root to activate the hirearchy skill before it builds an org or rates a delivery, and give the order for a reject: `feedback` first, then one yes/no question
+  naming an id, then the change.
+- *A throttled run is not charged.* A run that ends on a model-service throttle (kiro's `retryErrorType: THROTTLING`) before any tool call that changes something is given back
+  by a run credit (a quiet note of the runtime that carries the run) and retried once without counting as a failure; a second throttle in a row is credited but counted. Case totals,
+  the overspend warning and `runs n of m` leave credited runs out, and `check` counts credits in the budget equation.
 
 **In a blueprint.** `services:` next to `agents:` (any of the four kinds: `blueprint_example(kind, service=True)`; a filled research one is
 [`examples/blueprint-service.yaml`](https://github.com/oh-my-productivity/hirearchy/blob/main/examples/blueprint-service.yaml)):
@@ -592,7 +611,8 @@ organization to exist yet:
 - The server's instructions for root contain the workflow in five lines (ask once → `blueprint_example` + `propose_org` →
   show the PLAN FOR YOU block, wait for explicit approval → `create_org`/`apply_org(approved=True, plan_id)`/`start` →
   `progress` (or `progress(wait_seconds)`) → verify, copy) next to the safety
-  rules: only the bound organization, no substituting other mechanisms, no claims without tool evidence.
+  rules: only the bound organization, no substituting other mechanisms, no claims without tool evidence; and two lines for the assistant: activate the hirearchy skill before building
+  or rating, and on a reject `feedback` first, then one yes/no question, then the change.
 
 **The assistant skill.** `hirearchy install-skill [--dest DIR] [--force]` copies the skill to `~/.kiro/skills/hirearchy/SKILL.md`
 (`DIR` is the skills directory: the file goes to `DIR/hirearchy/SKILL.md`), prints the path, leaves an identical file alone and
@@ -628,7 +648,8 @@ A global skill with the same name (`~/.kiro/skills/hirearchy/SKILL.md`, what `in
 **Agent runs (the scheduler).** A run is `kiro-cli chat --no-interactive --agent <profile> --model <model> --v3 --require-mcp-startup --output-format stream-json`
 (kiro-cli's V3 / KAS agent engine; the prompt is passed on stdin), started through a small launcher of hirearchy's. The launcher refuses a run that is not on
 the V3 engine, stops one that has not started after 60 s, and writes a readable transcript to the run log: the assistant's text, one line per tool call, and kiro's own
-denial text for a refused call, never tool results or tool output.
+denial text for a refused call, never tool results or tool output. When the run ends on a model-service throttle the launcher counts the tool calls that completed and are not
+read-only; with none it writes a `# kiro: throttled by the model service ...; tool effects: none` line and exits with 75 (kiro's own 75 becomes 1), which makes the scheduler credit the run (see "Services and reflection").
 
 - **Requirements.** kiro-cli with the V3 engine (verified with 2.33.0) and a credential: `KIRO_API_KEY` (verified) or a sign-in that
   `KIRO_HOME=<home> kiro-cli whoami` accepts (not verified). `hirearchy run` and `start` check this first and refuse with the reason, which `status` and

@@ -157,12 +157,12 @@ level in the dependency DAG (4.1).
 | 23 | `eligibility` (L6) | feature | Tracks whether an agent may run (paused, failing, pending, idle). | `<addr>/.paused`, `.runtime/failures.json` | mailboxes (through `mail`) | kernel, agents, mail, budget |
 | 24 | `hierarchy` (L6) | feature | Applies the rules that change the agent tree's membership. | - (acts through `agents`, `delivery`) | - | kernel, agents, settings, templates, access, mail, delivery, budget |
 | 25 | `health` (L7) | feature | Measures the health of agents, branches, from the files. | - | - | kernel, agents, runs, settings, mail, budget, eligibility |
-| 26 | `services` (L7) | feature | Manages standing services: contract, playbook, request, feedback. | `<owner>/services/<name>/{SERVICE.md,PLAYBOOK.md,history/*}`, `<owner>/services/.retired/**` | - | kernel, agents, settings, mail, delivery, dispatch |
+| 26 | `services` (L7) | feature | Manages standing services: contract, playbook, request, feedback. | `<owner>/services/<name>/{SERVICE.md,PLAYBOOK.md,history/*}`, `<owner>/services/.retired/**` | the retired copies of its services (`.retired/<addr>-<stamp>/**`, read-only through `RetiredArchive` and `ServiceFiles`, to continue a record when the owner is defined again) | kernel, agents, settings, mail, delivery, dispatch |
 | 27 | `stalls` (L7) | feature | Climbs the escalation ladder for tasks whose assignee has gone quiet. | `.runtime/nudges.json` | - | kernel, agents, runs, settings, templates, mail, delivery, eligibility |
 | 28 | `attention` (L8) | feature | Determines what remains to be done, by whom. | - | - | kernel, agents, mail, budget, eligibility, stalls |
 | 29 | `blueprint` (L8) | feature | Turns a blueprint into an organization via a validated plan. | workspace directories it creates for a plan (`WorkspaceProvisioner`) | `roles/*.md` (packaged), user blueprint files | kernel, agents, settings, snapshots, kiro, dispatch, hierarchy, services |
 | 30 | `overview` (L8) | feature | Renders the organization tree with one state line per agent. | - | - | kernel, agents, mail, budget, eligibility, services |
-| 31 | `reflection` (L8) | feature | Derives the history of service requests, with statistics, from the files. | - | - | kernel, agents, runs, settings, mail, services |
+| 31 | `reflection` (L8) | feature | Derives the history of service requests, with statistics, from the files. | - | the contracts' deliverable folders (names and hashes of the direct files, read-only, never outside the folder, through its private `DeliverableFolder`); the organization's git history (through `CheckedVersions`, implemented in `app` over `snapshots.OrgHistory`) | kernel, agents, runs, settings, mail, services |
 | 32 | `review` (L8) | feature | Turns flagged health into notes for the responsible managers on a schedule. | `.runtime/reviews.json` | - | kernel, agents, runs, settings, templates, mail, delivery, budget, eligibility, health |
 | 33 | `daemon` (L9) | feature | Manages the organization's scheduler process (start, stop, status). | `.runtime/scheduler.pid`, `.runtime/scheduler.exit`, `.runtime/scheduler.log` | process table (through `processes`) | kernel, processes, snapshots, mail, attention |
 | 34 | `prompts` (L9) | feature | Builds the texts an agent is shown (whoami, state summary, run prompt). | - (consumes the one-time stray notice through `strays`) | - | kernel, agents, settings, access, mail, strays, budget, eligibility, services, reflection |
@@ -257,7 +257,9 @@ Data and pure vocabulary (not Protocols): `ROOT="root"`, `RUNTIME="runtime"`, `B
 `word_count clip clip_line single`; time helpers `aware parse_time stamp_of msg_time fmt_duration fmt_dur`; `inside visible`;
 `latest_results`; `verdict_tier(note)` (`human` | `relayed` | `agent`) and `link_ids(note)` (pure; org growth phase 0a);
 `client_questions(body) -> list[str]` (phase 0a.1, pure: the items of the first `Questions for the client:` block of a message body, `[]` when there is none or it says none;
-`progress` and `reflection` read a result's questions through it, nobody else parses the block);
+`progress` and `reflection` read a result's questions through it, nobody else parses the block); phase 0a.2 adds the pure `strip_markers(line)` (a playbook line without its leading markdown markers: lines are compared on their words),
+`artifact_paths(body)` (the paths of a result's `## Artifacts` section) and the run-credit vocabulary `RUN_CREDIT_TITLE`, `run_credit_title(addr, stem)`, `is_run_credit(note)` and
+`credited_stems(received) -> set[str]` (a run credit is a note of the runtime that carries runs and whose title `run credit <addr>@<run-log stem>` names its own recipient; budget stays derived, so the note is the credit);
 `@dataclass class Message` (fields as today, plus `source` and `criterion` after `feedback` and before `trace`: provenance of a root verdict, link or rework, and
 what a rejection is about; `meta() to_text() render(limit) cut_body(limit, where)` and the
 new pure `Message.parse(text, path=None)`; **no file I/O**); `@dataclass(frozen=True) class OrgPaths(root)` with pure path
@@ -373,8 +375,18 @@ class GitClient(Protocol):   # port to the outside world
     def has_repository(self, root: Path) -> bool: """root/.git exists."""
     def init(self, root: Path) -> None: """git init -q."""
     def commit_all(self, root: Path, message: str) -> None: """add -A, commit -q as hirearchy <hirearchy@localhost>."""
+    def added_by(self, root: Path, path: str) -> str | None: """The oldest commit that added path (read literally); None when there is none; never raises."""
+    def object_id(self, root: Path, spec: str) -> str | None: """The object id HEAD or <commit>:<path> names, verified to exist; None otherwise; never raises."""
+    def cat(self, root: Path, obj: str, limit: int) -> bytes | None: """The blob obj when its size is at most limit bytes; None otherwise; never raises."""
+
+class OrgHistory(Protocol):   # phase 0a.2: read-only questions to the commits already made; None when there is no repository, no git or no answer; never raises, never writes
+    def first_commit_with(self, path: str) -> str | None: """The oldest commit that added path (relative to the org, no '..' or '.' segment)."""
+    def blob(self, commit: str, path: str) -> str | None: """The object id of path at commit (a directory answers its tree id, which equals no blob id)."""
+    def text(self, commit: str, path: str, limit: int) -> bytes | None: """The bytes of the file at commit; None when absent, not a file or larger than limit."""
+    def head(self) -> str | None: """The commit HEAD names now."""
 ```
-Impl: `GitOrgSnapshotter(GitClient)`, `FsIgnoreList(OrgPaths, AtomicWriter)`, `SubprocessGit(GitClient)`; fakes `RecordingGit`, `MemoryIgnoreList`.
+Impl: `GitOrgSnapshotter(GitClient)`, `FsIgnoreList(OrgPaths, AtomicWriter)`, `SubprocessGit(GitClient)` (every git call has a 2 s timeout and reads paths literally), `GitOrgHistory(GitClient, OrgLayout)`; fakes `RecordingGit`, `MemoryIgnoreList`, `MemoryOrgHistory`.
+The pure `blob_id(data, hexlen=40)` is the object id `git hash-object` gives (sha1 for 40, sha256 for 64). `OrgHistory` is the runtime field `org_history`; `reflection` reaches it only through `app`'s `GitCheckedVersions` (3.22).
 
 ### 3.6 `eventlog`
 
@@ -483,12 +495,13 @@ class AgentRegistry(Protocol):
     def archive(self, addr: str, stamp: str) -> str: """Move to .retired/<addr with . for />-<stamp>; returns that name."""
 
 @dataclass(frozen=True)
-class RetiredTree: name: str; top_level: bool; path: Path
+class RetiredTree: name: str; top_level: bool; path: Path   # + the property addr: the retired agent's address read from the name (the one rule that names a tree)
 
 class RetiredArchive(Protocol):
     def trees(self) -> list[RetiredTree]: """Every retired tree; top_level = it was a direct report of root."""
     def run_count(self) -> int: """Run logs inside retired trees (today's review.retired_runs)."""
     def unspent_budget(self, tree: RetiredTree) -> int: """received - sent - runs of every agent dir inside the tree."""
+    def credited(self) -> int: """Runs the runtime gave back with run credits (3.1) in the received boxes of every agent dir of every retired tree (phase 0a.2)."""
 ```
 Impl: `FsAgentDirectory`, `FsCharterReader`, `FsAgentRegistry(AtomicWriter)`, `FsRetiredArchive`; fake `MemoryAgents`
 (implements all four). `dashdata`'s wiring adds the decorators `CachingAgentDirectory` and `LenientCharterReader` (replace `LenientOrg.children/charter`).
@@ -719,6 +732,8 @@ MailboxReader, OrgSettings)`, `NoteBudgetReclaimer(MessageDelivery, BudgetQuery,
 `RunCounter` (`count(addr) -> int`) is budget's own, narrower port for the one thing it needs of `RunLogReader` (any `RunLogReader` is one); the
 dashboard's `LenientOrg` hands its per-refresh cache of the run count through it (`wire_budget.lenient`). The arithmetic and the words of
 `delegable` / `grant_hint` are the pure functions of `budget/_hint.py`, shared by `DerivedBudgetQuery` and `FixedBudget`.
+Phase 0a.2 adds the pure `run_credit(addr, stem) -> Message` (`budget/_credit.py`): the note from the runtime that returns the run whose log is `<stem>.log` (budget 1, no wake). Nothing is stored: a run credit is
+received budget, so `DerivedBudgetQuery` needs no change and the run log still exists.
 
 ### 3.19 `hierarchy`
 
@@ -752,23 +767,28 @@ class MessageSender(Protocol):
              status: str | None = None, budget: int = 0, revises: str | None = None, supersedes: str | None = None,
              service: str | None = None, contract: int | None = None, playbook: int | None = None,
              feedback: str | None = None, source: str | None = None, criterion: str | None = None, wake: bool = True,
-             skip_route_check: bool = False) -> Message:
+             skip_route_check: bool = False, inherited: str | None = None) -> Message:
         """Validate (cap, route, budget, hops) then deliver. The facade maps skip_route_check to today's _skip_route_check. `source` and `criterion` are root's
-        only (an agent that passes either is refused); a root rework, verdict or link without a `source` is stamped `relayed`."""
+        only (an agent that passes either is refused); a root rework, verdict or link without a `source` is stamped `relayed`. `inherited` (from `ReworkContext`) is the tier an agent's rework carries."""
 
 class TaskAssigner(Protocol):
     def delegate(self, actor: str, to: str, title: str, goal: str, acceptance: str, inputs: Sequence[str] | None = None,
                  budget: int | None = None, revises: str | None = None, source: str | None = None) -> Message:
-        """Assign a task to a direct report. `source` (root only, with `revises`): `human` when the user asked for the rework, else `relayed`."""
+        """Assign a task to a direct report. `source` (root only, with `revises`): `human` when the user asked for the rework, else `relayed`. Root's rework of a service request is refused (use `request(..., revises=...)`)."""
 
 class TaskReporter(Protocol):
     def report(self, actor: str, task_id: str, status: str, summary: str, artifacts: Sequence[str] | None = None,
                lessons: str | None = None) -> Message: """Answer a task; returns the result message (budget travels with a final result)."""
 
 class ReworkContext(Protocol):   # port, implemented by `services`
-    def fields_for(self, actor: str, revises: str) -> Mapping[str, object]: """service/contract/playbook a rework inherits ({} for an ordinary task)."""
+    def fields_for(self, actor: str, revises: str) -> Mapping[str, object]: """service/contract/playbook a rework inherits ({} for an ordinary task) and, for an agent, the `source` tier of the open task it received in the same trace."""
+
+class GuardedSender(MessageSender, Protocol):   # phase 0a.2: the sender behind `Org.send`; no method of its own
+    """Refuses what only the rules of a case may send for root (`check_root_send`: a task that names a service or revises another, a note that carries a verdict or a link); every other message passes unchanged."""
 ```
 Impl: `RuleMessageSender`, `RuleTaskAssigner` (consumes a `MessageSender` and a `ReworkContext`), `RuleTaskReporter` (consumes a `MessageSender`); private collaborators (in `_protocols.py`, made by `wire_dispatch`, not runtime fields): `RoutePolicy` -> `ParentSiblingRoutePolicy`, `HopCounter` -> `InflightHopCounter`, `ArtifactNormalizer` -> `ArtifactAnnotator`, `LessonsCheck` -> `LessonsPolicy`.
+Phase 0a.2: the pure `check_root_send(actor, type, service, revises, feedback, criterion)` (in `dispatch/_root_send.py`, exported by `api`) holds the refusal texts; `GuardedRootSender(MessageSender)` (`dispatch/_guarded.py`) applies it and then calls the sender it guards; `wire_dispatch` provides it as the runtime field `facade_sender: GuardedSender`
+and `Org.send` delegates to that field (the facade stays one delegation statement per method), while the rule classes keep `message_sender`. `RuleTaskAssigner` refuses root's `delegate(revises=<service request>)` (`USE_REQUEST`).
 Fakes: `RecordingSender`, `NoReworkContext`, `FixedReworkContext`. `ReworkContext` is provided by `wire_services` (`ServiceReworkContext`, step C-services); `wire_dispatch` has no provider of it (two providers of one port are refused), but its `RuleTaskAssigner` takes it from the runtime.
 
 ### 3.21 `services`
@@ -803,10 +823,14 @@ class ServiceCommands(Protocol):
     def define_service(self, actor: str, owner: str, name: str, *, description: str | None = None, inputs: object = None,
                        acceptance: object = None, deliverable: Mapping[str, object] | None = None, budget: int | None = None,
                        playbook: str | None = None, locked: bool | None = None, notes: str | None = None,
-                       add_acceptance: object = None, remove_acceptance: object = None) -> str: """Define or amend."""
+                       add_acceptance: object = None, remove_acceptance: object = None, answers: str | None = None, about: str | None = None,
+                       words: str | None = None) -> str:
+        """Define or amend. Root changes the acceptance criteria of an existing service only with `answers`+`about`+`words` (the user's recorded answer to a rejection)
+        or `words` alone (a change they ask for on their own, never rule-(c) eligible), once every delivery has its verdict (phase 0a.2)."""
     def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str: ...
     def request(self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",
-                extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None, source: str | None = None) -> Message: ...
+                extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None, source: str | None = None,
+                base: str | None = None) -> Message: """`base` (`delivered` | `latest`): which version a rework the user asked for starts from when relayed reworks changed the artifact after the judged delivery."""
     def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int: """New version; `evidence` is required and judged by `ServiceEvidence`."""
     def feedback(self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
                  confirms: str | None = None) -> Message: ...
@@ -822,12 +846,26 @@ class ContractNormalizer(Protocol):
 
 class ServiceEvidence(Protocol):   # port, implemented by `reflection` (like `ReworkContext`, which `services` implements for `dispatch`)
     def links(self, owner: str, service: str, ids: Sequence[str], *, verdict: str | None = None) -> tuple[str, ...]: """The ids a verdict may name, or OrgError listing the valid ones."""
-    def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None) -> Admission: """Judge a revision by rules (b) and (c); OrgError with the client's question when refused."""
+    def admit(self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = ()) -> Admission:
+        """Judge a revision by rules (b) and (c), line by line (`lines`: the lines it adds or changes; the `Admission` carries the admitted ones); OrgError with the client's question and the offending lines when refused."""
     def confirmed(self, owner: str, service: str) -> frozenset[str]: """The criterion ids the human client confirmed with a link (`feedback(confirms=...)`); empty when none."""
+    def amendment_basis(self, owner: str, service: str) -> AmendmentBasis: """Every human rejection with whether its answer is recorded, and the deliveries without a verdict (what a root amendment may answer)."""
+
+@dataclass(frozen=True)
+class JudgedBase: task: str; result: str; commit: str; relayed: tuple[str, ...]; changed: tuple[str, ...]; texts: tuple[tuple[str, str], ...]   # at most JUDGED_BYTES=6000 bytes of text
+
+class JudgedVersions(Protocol):   # port, implemented by `reflection` (phase 0a.2)
+    def base(self, owner: str, service: str, revises: str) -> JudgedBase | None:
+        """For a rework of `revises`: the delivery the client judged (its org-git commit) and what relayed reworks sent after it changed in its artifacts; None when no base needs to be named."""
 ```
 Impl: `FsServiceStore`, `ContractServiceCatalog`, `RuleServiceCommands`, `ServiceReportHints`, `TextContractNormalizer`, `ServiceReworkContext(ReworkContext)`; fake `MemoryServiceStore`.
 `ServiceEvidence` is implemented by `reflection._evidence.CaseServiceEvidence` (it needs the cases, which `services` cannot read), provided by `wire_reflection` and held in the runtime field
 `service_evidence` (`fields_services`); fakes `AdmittingServiceEvidence` and `RefusingServiceEvidence` (`services/testing.py`) and the contract suite `test_contract_service_evidence.py`.
+Phase 0a.2 (the enforcement batch after study E4, `docs/design/org-growth-phase-0a2.md`): the playbook gate judges lines (the pure `line_key`, `changed_lines` and `quoting_lines`; `Admission.lines` is `(admitting id, line)`),
+`RuleContractDefiner` refuses a root change of the acceptance criteria that is not the user's recorded answer and writes the `confirms` link itself (`LinkNotes`, private), `RuleServiceRetirement` refuses to retire a service with unrated deliveries or unanswered rejections,
+and a service defined again after its owner was retired continues the retired record (`RecordedContinuations`, `ContinuedServices`, `ServiceRestorer` and `ServiceFiles`, private ports; `FsServiceStore.restore` writes `SERVICE.md` last). `RuleServiceRequester` takes
+`JudgedVersions` (a sixth collaborator) and refuses a human rework that needs a base (`BASES`, `NEEDS_BASE`); `JudgedVersions` is the runtime field `judged_versions`, implemented by `reflection._judged.CaseJudgedVersions`. `ServiceReworkContext.fields_for` also returns the tier a rework
+delegation inherits, `source`, taken from the newest open task its sender received in the same trace, never for root. Every refusal text names the CLI form of the argument it mentions.
 `RuleServiceCommands` only offers the five commands together; each rule is a part with its own private Protocol (in `_protocols.py`, made by `wire_services`, not runtime fields): `ContractDefinitions` -> `RuleContractDefiner`, `ServiceRetirement` -> `RuleServiceRetirement`, `PlaybookRevisions` -> `RulePlaybookReviser`, `ServiceRequests` -> `RuleServiceRequester`, `ClientFeedback` -> `RuleClientFeedback`. Their collaborators, also private: `ServicePlaces` -> `OrgServicePlaces` (where the files are; `Contract.path` and the relative paths in the texts come from it), `OwnerAddresses` -> `DirectReportOwners`, `PlaybookTexts` -> `CappedPlaybookTexts` (the cap is read from `OrgSettings.config()["playbook_max_words"]` exactly as the old `_word_cap` did: `OrgSettings.number` would read a bool as the default and an infinity as a crash), `PlaybookWriter` -> `EventedPlaybookWriter` (writes through the store and emits `service.revise`), `ContractAmendment` -> `ContractAmender`, `RequestBodies` -> `TextRequestBodies`. `ServiceStore.write_contract` / `write_playbook` write the file, `archive_version` names the old version to keep; the events (`service.define`, `service.revise`, `service.retire`) and the quiet notes (`MessageDelivery.notify(..., wake=False)`) are the commands'. Requests and feedback go through the runtime's `MessageSender`.
 The part of the old `services.py` that is derived from the message files (cases, statistics, digest, `services_text`, `case_total`, the prompt sections) was the seam in `services/_legacy.py` until C-reflection; it is `reflection` now (3.22). `services._clip` is left as an alias of `kernel.clip_line` for `kernel/tests/test_text.py`, which compares the three copies; it goes with that test in E3. `services.api` also exports the pure `playbook_word_cap(config)` (C-reflection), so that the sections of the run prompt read the setting exactly as the commands do.
 
@@ -853,14 +891,20 @@ class ServicePromptSections(Protocol):
     def prompt_sections(self, addr: str, batch: Sequence[Message]) -> str: """Playbook + reflect sections of an owner's run prompt ('' if it owns no service)."""
 
 class ServiceSteps(Protocol):   # phase 0a.1: what root is told to do next; read-only, root only (an agent never sees a step)
-    def feedback_step(self, note: Message) -> str: """After a human-tier rejection of a service request: the one yes/no question naming the id, and the confirming call; '' otherwise."""
-    def amendment_step(self, owner: str, service: str) -> str: """After an amendment: the added criteria the client has not confirmed and, while the latest rejection has no answer, what records the yes; '' otherwise."""
+    def feedback_step(self, note: Message) -> str: """After a human-tier rejection of a service request: the one yes/no question naming the id, and the confirming call (`define_service(answers=...)`, phase 0a.2); '' otherwise."""
     def rework_step(self, task: Message) -> str: """For a relayed rework: the client questions of the result it revises, to be asked before the user's answer is assumed; '' otherwise (a nudge, never a refusal)."""
+
+class DeliverableChecks(Protocol):   # phase 0a.2: read-only; never reads outside a contract's deliverable folder
+    def findings(self, actor: str, service: str | None = None) -> list[DeliverableFinding]:
+        """The files in the deliverable folders of the services `actor` requests that differ from the team's last checked version, that the team never wrote, or that could not be read."""
 ```
 Impl: `DerivedCaseHistory`, `DigestBuilder`, `TextServiceReports`, `OwnerPromptSections`, `TextServiceSteps(AgentDirectory, ServiceCatalog, CaseHistory, MailboxReader)`; runtime fields `case_history`, `reflection_digest`, `service_reports`, `service_prompt_sections`, `service_steps`. `StatsReport` is `testing.PURE` and `NOT_A_FIELD`.
+Phase 0a.2 adds `DeliverableChecks` (runtime field `deliverable_checks`; `FolderDeliverableChecks` over the private ports `DeliverableFolder` (a contract's folder walked from a descriptor, no link followed, only the names and hashes of the direct files, at most 200 entries and 32 MiB), `CheckedVersions` (what the team last checked, implemented in `app` by `GitCheckedVersions` over `snapshots.OrgHistory`)
+and `BlobIds`), the pure `deliverables_note(findings)` that `progress`, `status` and `whoami` show to root, `questions_open(task, result, case, root_sent)` (the client questions a `done` or `blocked` result still has open), `Case.lesson_sources` (the digest marks lessons from relayed reworks),
+`Verdict.link_notes`, `amendment_basis` and `CaseJudgedVersions(history, mail, versions)` (`services.JudgedVersions`, runtime field `judged_versions`). `CaseServiceEvidence` admits playbook lines one by one.
 Reflection also implements `services.ServiceEvidence` (3.21): `CaseServiceEvidence(ServiceEvidence)` in `reflection/_evidence.py`, built by `wire_reflection` from `CaseHistory` and `ServiceCatalog` (no new Protocol in `reflection`, no new edge). `OwnerPromptSections` adds the owner-only `# Regression list: <service>` (derived with `regressions`, never stored).
 
-The collaborators among the rules are private ports of the package (`_ports.py`, consumer-owned and narrower than the providers': `ServiceStore` is read only through `PlaybookHistory`, `RunLogReader` only through `RunLogNames`, `OrgSettings` only through `ConfigSource`, `ServiceHints` only through `FeedbackWords`, `OrgLayout` through `ServicePaths`), made by `wire_reflection` and not runtime fields: `PlaybookTimelines` -> `StorePlaybookTimelines` (when each version was written), `RunCounter` -> `LogRunCounter` (the old `_count_runs`: the logs of a team whose name, cut at 21 characters, lies in a window; it reads `RunLogReader.files`, not `windows`, because the old rule compares names, also for logs whose name is no timestamp), `ServicePaths` -> `OrgServicePaths` (relative paths in the texts), `ServicesListing` -> `OwnedServicesListing` (the opening paragraph), `RejectedServices` -> `MailRejectedServices`, `PlaybookSection` -> `QuotedPlaybookSection`, `ReflectSection` -> `EvidenceReflectSection`. `DerivedCaseHistory` takes six collaborators and `OwnerPromptSections` seven (the catalog, the digest, the task query and the four parts it composes); no class of the package takes more.
+The collaborators among the rules are private ports of the package (`_ports.py`, consumer-owned and narrower than the providers': `ServiceStore` is read only through `PlaybookHistory`, `RunLogReader` only through `RunLogNames`, `OrgSettings` only through `ConfigSource`, `ServiceHints` only through `FeedbackWords`, `OrgLayout` through `ServicePaths`), made by `wire_reflection` and not runtime fields: `PlaybookTimelines` -> `StorePlaybookTimelines` (when each version was written), `RunCounter` -> `LogRunCounter(logs, mail)` (the old `_count_runs`: the logs of a team whose name, cut at 21 characters, lies in a window, except the runs a run credit gave back (3.1); it reads `RunLogReader.files`, not `windows`, because the old rule compares names, also for logs whose name is no timestamp), `ServicePaths` -> `OrgServicePaths` (relative paths in the texts), `ServicesListing` -> `OwnedServicesListing` (the opening paragraph), `RejectedServices` -> `MailRejectedServices`, `PlaybookSection` -> `QuotedPlaybookSection`, `ReflectSection` -> `EvidenceReflectSection`. `DerivedCaseHistory` takes six collaborators and `OwnerPromptSections` seven (the catalog, the digest, the task query and the four parts it composes); no class of the package takes more.
 
 The legacy functions (`reflection/_legacy.py`: `cases(org, owner, service)`, `reflection_digest`, `case_of`, `case_total`, `services_text`, `prompt_sections`, `playbook_timeline`, and the private `_case_line`, `_verdict_chain`) build the classes over the ports of the `Org` they are given *at the call* (`_assembly`), so that the dashboard's lenient `Org` keeps its cached, tolerant mailboxes, agents and config. The callers (`progress`, `dashboard_data`, `server`, `cli`, the run prompt of the prompts mixin) call them, or the runtime ports, directly. `services` answers to the old names (`services.cases`, ...) through a module `__getattr__` that looks them up in `reflection` at the first use (the tests, among them the golden suite, still say them; `services` sits below `reflection` and may not import it): it goes with the legacy names in E3.
 
@@ -1022,10 +1066,10 @@ class ProgressReporter(Protocol):
 Constant `WAIT_MAX=900`. `DerivedProgressReporter(view, snapshots, scheduler: SchedulerStatus, waiting: WaitingOnUser, tasks: TaskQuery)` is made of small role classes
 (private interfaces in `_ports.py`, each with one implementation): `MailRootTasks(MailboxReader)` (the tasks root gave, their latest results, `listed`: open and blocked
 always, finished ones for `RECENT` = 24 h), `AgentTaskTeams(AgentDirectory)`, `MailTaskStates(MailboxReader, PauseStore, TaskQuery)` (the state words and who is busy),
-`LogRunCounts(MailboxReader, RunLogReader)` (the run-window rule: logs from the task's creation to its final result or the next task to the same assignee; budget =
+`LogRunCounts(MailboxReader, RunLogReader)` (the run-window rule: logs from the task's creation to its final result or the next task to the same assignee, without the runs a run credit gave back; budget =
 the task's own plus the later grants), `FsTeamActivity(OrgLayout)` (names and mtimes, no parsing), `RunnableTeams(MailboxReader, RunnableQuery)`,
 `CaseTaskLines(teams, states, runs, activity, CaseHistory, ServiceReports)` (the line: `[service <name> v<n>]`, artifacts, "no feedback yet", the case total of a rework chain),
-`RootTaskReport(roots, lines, HumanQueue, Clock)`, `TeamSnapshots(roots, teams, states, liveness, HumanQueue, Clock)` + `moving(snapshot)` (does anything move: working/waiting, or
+`RootTaskReport(roots, lines, HumanQueue, Clock, DeliverableChecks)` (phase 0a.2: it flags a `blocked` result that has client questions, prints `artifacts withheld (ask first)` while any question is open, and ends with the deliverables note), `TeamSnapshots(roots, teams, states, liveness, HumanQueue, Clock)` + `moving(snapshot)` (does anything move: working/waiting, or
 blocked/stalled while an agent below can run) and `PollingProgress(text, snapshots, Clock, poll)` (the wait: `Clock.sleep/monotonic`, `changes`, the stall seen twice, stop after two
 idle looks, `WAIT_MAX`). The words of a message on a line are `attention`'s public helpers (`section`, `summary`, `short`, `SHORT`): `progress` keeps no copy.
 Fakes (`testing`): `ProgressWorld` over files and over memory (`fs_world`, `memory_world`), `FixedProgressReporter`, `SpyProgressView`, `FixedSnapshots`, `FixedTeamActivity`,
@@ -1193,8 +1237,9 @@ Impl: `KiroConfinementPolicy`, `FsProfileStore`, `OrgProfileProvisioner`, `VenvM
 `StateDirPlaces(OrgLayout, Environment, platform)` (the state directory is `HIREARCHY_STATE_DIR`, else `~/Library/Application Support/hirearchy` on macOS or `$XDG_STATE_HOME/hirearchy` / `~/.local/state/hirearchy`),
 `FsKiroState(Clock)` (`KiroStateDirs` and `KiroHomeAudit`), `SubprocessKiroCli`, `KiroReadiness(OrgLayout, AgentRegistry, AccessScopes, KiroPlaces, KiroStateDirs, KiroHomeAudit, KiroCli, Environment)`;
 fakes `MemoryProfileStore`, `FixedKiroPlaces`, `MemoryKiroState`, `ScriptedKiroCli`, `FixedReadiness`.
+Phase 0a.2: `api` also exports `THROTTLE_EXIT = 75`, `READ_ONLY_TOOL_IDS` (the tools of hirearchy that change nothing, sorted; `tests/architecture/test_read_only_tool_ids.py` pins it equal to observability's `READ_ONLY_TOOLS`) and the pure `throttled_without_effect(tail) -> bool` (the launcher's mark is the last `# kiro:` line before the closing `# exit` line, with a THROTTLING `[run error]` line before it).
 The launcher `kiro/_launch.py` is a script, not a module of the package graph: the run command starts it as `<python> -I -S _launch.py --start-deadline 60 -- <kiro-cli> chat ...`; it imports only the standard library,
-refuses a run whose engine is not V3 or that does not start within the deadline, and writes a transcript (without tool results or output) to stdout. `_env.run_environment` builds the run environment
+refuses a run whose engine is not V3 or that does not start within the deadline, and writes a transcript (without tool results or output) to stdout. It also counts the completed tool calls that are not read-only; a run that ends on a model-service throttle (`retryErrorType: THROTTLING`) with none gets the mark `# kiro: throttled by the model service ...; tool effects: none` and the exit code 75, and kiro's own 75 is returned as 1 on every path, so 75 is the launcher's verdict alone. `_env.run_environment` builds the run environment
 (the host's `KIRO_*` variables pass; `KIRO_HOME` is the org's kiro home). The launcher argv and the platform come from `app`; no `kiro/_*.py` reads `os.environ`, `sys.executable` or the user's home.
 `blueprint.org_files_readable/access_facts` call `ConfinementPolicy` with a stand-in org dir (as today).
 
@@ -1261,7 +1306,7 @@ class PhaseGuard(Protocol):
 **D-sched-1 (the run lifecycle) as built.** `_ports.py` holds `RunStarter` (`launch(runs, blocked, max_runs) -> int`, `start(runs, addr)`) and `RunReaper` (`reap(runs)`,
 `terminate_all(runs)`), and the roles they are made of, each a small Protocol: `RunAdmission` (`BudgetGate`), `RunPreparation` (`BatchPreparer`), `RunSpawning`
 (`CommandSpawner`), `StartFailures`, `StartAnnouncing`, `RunInitiation` (`SingleRunStarter`); `RunWatching` (`ExitWatcher`), `RunSettling` (`RunSettlement`),
-`RunTerminating` (`ShutdownTerminator`); `RunEvents` (`LifecycleEvents`), `RunRecords` (`RunTracker`), `RunFailures` + `FailureEscalation` (`CountingFailures`,
+`RunTerminating` (`ShutdownTerminator`); `ThrottleCredits` (`CreditingThrottles(logs, mail, delivery, console)`, phase 0a.2: `RunSettlement` asks it for a credit only on exit code 75 (`kiro.THROTTLE_EXIT`) of a run that was not killed; it reads the end of the log, finds no message sent since the run began, and delivers `budget.run_credit` last, so a free credit is not a failure and a second one in a row is credited but counted); `RunEvents` (`LifecycleEvents`), `RunRecords` (`RunTracker`), `RunFailures` + `FailureEscalation` (`CountingFailures`,
 `PausingEscalation`), `StrayWatch` (`StrayCheck`); `Console` and `PhaseGuard` are what the loop gives them (its output and its best-effort guard). The runs started are
 counted in a `RunCount` the loop and the preparation share (`max_runs` is compared with it), so `launch` needs no "remaining" argument and a failed start counts as
 before. `_assembly.assemble(LifecyclePorts, run_clock, console, guard, count) -> Lifecycle(starter, reaper)` is the one place that puts them together (wiring and
@@ -1371,6 +1416,7 @@ Screen goldens (`dashboard/tests/golden`, 34 plain-text screens) were taken from
 ### 3.37 Interface count and widths
 
 Totals and the split into I/O Protocols and role interfaces are in 4.5 (counted by a script over the code blocks of this section). The widest Protocol has 8 methods (`Notices`); `MailboxReader`, `RunLogReader`, `ServiceStore` have 7; kernel ports have at most 4. Package-private Protocols (collaborators inside one package, e.g. `IntegrityCheck`, `RoutePolicy`, `ArtifactNormalizer`, `LineWriter`) live in `_protocols.py`, follow the same rules (R6, R7) and are not counted.
+Phase 0a.2 adds the public Protocols `OrgHistory` (3.5), `JudgedVersions` (3.21), `DeliverableChecks` (3.22) and `GuardedSender` (3.20), and grows `GitClient` to 7 methods, `ServiceEvidence` to 4 and `RetiredArchive` to 4; `ServiceSteps` has 2. No Protocol has more than 8 methods.
 
 ---
 
