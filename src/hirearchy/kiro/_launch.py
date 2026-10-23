@@ -20,6 +20,23 @@ DRAIN_SECONDS = 2.0  # how long output is read after kiro has exited (a backgrou
 SLICE_SECONDS = 1.0  # one select() turn
 CUT_INPUT, CUT_DENIAL, CUT_ERROR, CUT_PLAIN = 200, 300, 500, 2000  # longest piece of a tool input / denial / error / plain line
 USAGE = "usage: _launch.py --start-deadline SECONDS -- KIRO_ARGV..."
+THROTTLE_EXIT = 75  # EX_TEMPFAIL of sysexits.h: the launcher's verdict "throttled by the model service before any tool effect" (kiro's own 75 becomes 1)
+THROTTLE_MARK = "# kiro: throttled by the model service (retryErrorType THROTTLING); tool effects: "  # followed by "none" or the number of effects
+THROTTLING = '"retryErrorType":"THROTTLING"'  # as it reads in a run error with its spaces removed
+READ_KINDS = ("read", "search", "think", "fetch")  # kinds of tool call that change nothing
+# The tools of hirearchy that change nothing, as kiro names them (sorted). Pinned equal to observability's READ_ONLY_TOOLS by
+# tests/architecture/test_read_only_tool_ids.py: the launcher is standard library only and cannot import it.
+READ_ONLY_TOOL_IDS = (
+    "hirearchy::health",
+    "hirearchy::inbox",
+    "hirearchy::observe",
+    "hirearchy::org_read",
+    "hirearchy::progress",
+    "hirearchy::read",
+    "hirearchy::services",
+    "hirearchy::status",
+    "hirearchy::whoami",
+)
 
 
 # ------------------------------------------------------------------------------------------------------------ the renderer
@@ -30,6 +47,9 @@ class RenderState:
     partial: str = ""  # an agent line that is not finished yet
     titles: dict[str, str] = field(default_factory=dict)  # toolCallId -> title
     targets: dict[str, str] = field(default_factory=dict)  # toolCallId -> path or input
+    calls: dict[str, tuple[str, str, bool]] = field(default_factory=dict)  # toolCallId -> (kind, tool id, is a tool load) of its tool_call
+    effects: int = 0  # completed tool calls that may have changed something
+    throttled: bool = False  # the run ended on a model-service throttle (a runError with retryErrorType THROTTLING)
 
 
 def _obj(value: object) -> dict[str, object]:
@@ -80,12 +100,35 @@ def _mark(*parts: str) -> str:
     return " ".join(part for part in parts if part)
 
 
+def _facts(update: dict[str, object]) -> tuple[str, str, bool | None]:
+    """What a tool call or update says of itself: its kind, its tool id, and whether it is a tool load (None: its input does not say)."""
+    raw = _obj(update.get("rawInput"))
+    tool_id = _text(raw.get("tool_id"))
+    is_load = (isinstance(raw.get("tool_ids"), list) and not tool_id) if ("tool_id" in raw or "tool_ids" in raw) else None
+    return _text(update.get("kind")), tool_id, is_load
+
+
+def _completed(state: RenderState, identifier: str, update: dict[str, object]) -> None:
+    """Count a completed tool call as an effect unless it is read-only; a fact the update lacks comes from its call, else it is unknown."""
+    kind, tool_id, is_load = _facts(update)
+    known = state.calls.get(identifier, ("", "", False))
+    kind, tool_id = kind or known[0], tool_id or known[1]
+    if is_load is None:
+        is_load = known[2]
+    if not (kind in READ_KINDS or is_load or tool_id in READ_ONLY_TOOL_IDS):
+        state.effects += 1
+
+
 def _session_update(state: RenderState, update: dict[str, object]) -> list[str]:
     kind = _text(update.get("sessionUpdate"))
     identifier = _text(update.get("toolCallId"))
     if kind == "tool_call":
         title, target = _text(update.get("title")), _target(update)
         state.titles[identifier], state.targets[identifier] = title, target
+        kind_of, tool_id, is_load = _facts(update)
+        state.calls[identifier] = (kind_of, tool_id, bool(is_load))
+        if update.get("status") == "completed":
+            _completed(state, identifier, update)
         return [_mark("[tool]", title, target)]
     if kind == "tool_call_update":
         status = update.get("status")
@@ -94,6 +137,7 @@ def _session_update(state: RenderState, update: dict[str, object]) -> list[str]:
         title = _text(update.get("title")) or state.titles.get(identifier, "")
         target = _target(update) or state.targets.get(identifier, "")
         if status == "completed":
+            _completed(state, identifier, update)
             return [_mark("[tool ok]", title, target)]
         line = _mark("[tool failed]", title, target)
         denial = _denial(update)
@@ -125,7 +169,10 @@ def render_line(state: RenderState, line: str) -> list[str]:
         stop = _text(body.get("stopReason"))
         lines = [_mark("[run finished]", _text(body.get("status")), f"({stop})" if stop else "")]
     elif kind == "runError":
-        message = _text(body.get("message")).replace("\r", "").replace("\n", " ")[:CUT_ERROR]
+        whole = _text(body.get("message")).replace("\r", "").replace("\n", " ")
+        message = whole[:CUT_ERROR]
+        if "THROTTLING" in (body.get("retryErrorType"), _obj(body.get("data")).get("retryErrorType")) or THROTTLING in whole.replace(" ", ""):
+            state.throttled = True
         lines = ["[run error] " + ": ".join(part for part in (_text(body.get("stage")), message) if part)]
     else:
         lines = []
@@ -133,8 +180,26 @@ def render_line(state: RenderState, line: str) -> list[str]:
 
 
 def finish(state: RenderState) -> list[str]:
-    """What is still waiting at the end of the output."""
-    return _flush(state)
+    """What is still waiting at the end of the output, then the mark of a throttled run (its tool effects: ``none`` or a number)."""
+    lines = _flush(state)
+    if state.throttled:
+        lines.append(THROTTLE_MARK + (str(state.effects) if state.effects else "none"))
+    return lines
+
+
+def throttled_without_effect(tail: str) -> bool:
+    """The transcript of a run says it ended on a throttle before any tool effect (design 9.1, DR-44): the mark ``...; tool effects: none``
+    is the last ``# kiro:`` line before the runtime's closing ``# exit`` line, and a ``[run error]`` line carrying the throttle stands before it.
+
+    Kiro's own stderr lines may sit between them or after the mark; a later ``# kiro:`` line, no throttling run error, or an effect makes it
+    false. An agent's text can forge both lines, so the exit code ``THROTTLE_EXIT`` of the launcher is the verdict and this is its second check."""
+    lines = tail.splitlines()
+    closing = [i for i, line in enumerate(lines) if line.startswith("# exit ")]
+    before = lines[: closing[-1]] if closing else lines
+    marks = [i for i, line in enumerate(before) if line.startswith("# kiro:")]
+    if not marks or before[marks[-1]] != THROTTLE_MARK + "none":
+        return False
+    return any(line.startswith("[run error] ") and THROTTLING in line.replace(" ", "") for line in before[: marks[-1]])
 
 
 # ----------------------------------------------------------------------------------------------------------- the launcher
@@ -210,8 +275,8 @@ def _wait_for_start(fd: int, limit: float) -> Start:
             buffer = b""
 
 
-def _stream(proc: subprocess.Popen[bytes], fd: int, rest: bytes) -> None:
-    """Render kiro's output until its end, or until 2 s after kiro exited (a background child may hold the pipe open)."""
+def _stream(proc: subprocess.Popen[bytes], fd: int, rest: bytes) -> RenderState:
+    """Render kiro's output until its end, or until 2 s after kiro exited (a background child may hold the pipe open); what it learned."""
     state, buffer, exited_at = RenderState(), rest, None
     while True:
         while b"\n" in buffer:
@@ -232,6 +297,7 @@ def _stream(proc: subprocess.Popen[bytes], fd: int, rest: bytes) -> None:
             emit(text)
     for text in finish(state):
         emit(text)
+    return state
 
 
 def _exit_code(proc: subprocess.Popen[bytes]) -> int:
@@ -267,11 +333,14 @@ def _supervise(proc: subprocess.Popen[bytes], limit: float) -> int:
     if start.outcome == "ended":
         code = _exit_code(proc)
         emit(f"# kiro: kiro-cli exited with code {code} before the run started")
-        return code or 1
+        return 1 if code in (0, THROTTLE_EXIT) else code  # 75 is the launcher's verdict alone
     emit("# kiro: run started (engine v3)")
-    _stream(proc, fd, start.rest)
+    state = _stream(proc, fd, start.rest)
     proc.stdout.close()
-    return _exit_code(proc)
+    code = _exit_code(proc)
+    if code != 0 and state.throttled and state.effects == 0:
+        return THROTTLE_EXIT
+    return 1 if code == THROTTLE_EXIT else code
 
 
 def _parse(argv: list[str]) -> tuple[float, list[str]] | None:

@@ -420,3 +420,173 @@ def test_a_background_child_holding_stdout_does_not_hold_the_run(tmp_path: Path)
                 os.kill(int((tmp_path / "pid").read_text(encoding="utf-8")), signal.SIGKILL)
             except ProcessLookupError:
                 pass
+
+
+# ------------------------------------------------------------------------- a throttled run (design 9.1, DR-44)
+
+THROTTLE_STREAM = "f-e4-8-throttle"
+NO_EFFECT_MARK = "# kiro: throttled by the model service (retryErrorType THROTTLING); tool effects: none"
+THROTTLING_ERROR = json.dumps({"type": "runError", "data": {"stage": "prompt", "message": 'high traffic (code -32000): {"errorType":"ModelThrottleError","retryErrorType":"THROTTLING"}'}})
+START_EVENT = json.dumps({"type": "runStarted", "data": {"engine": "v3"}})
+
+
+def rendered(lines: list[str]) -> tuple[list[str], RenderState]:
+    state, out = RenderState(), []
+    for line in lines:
+        out += render_line(state, line)
+    return out + finish(state), state
+
+
+def call_of_kind(identifier: str, title: str, tool_kind: str) -> str:
+    return json.dumps({"type": "sessionUpdate", "data": {"update": {"sessionUpdate": "tool_call", "toolCallId": identifier, "title": title, "kind": tool_kind}}})
+
+
+def throttle_stream(write: str = "failed") -> list[str]:
+    """The fixture with its ``hirearchy::write`` update given another status."""
+    lines = []
+    for line in stream(THROTTLE_STREAM):
+        data = json.loads(line)
+        update = data.get("data", {}).get("update", {})
+        if update.get("toolCallId") == "tooluse_write":
+            update["status"] = write
+        lines.append(json.dumps(data))
+    return lines
+
+
+def run_stream(tmp_path: Path, lines: list[str], code: int, session: bool = True) -> tuple[int, list[str]]:
+    """The launcher over a fake kiro that prints ``lines`` and exits with ``code``."""
+    (tmp_path / "events.jsonl").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    done, out, _ = launch(tmp_path, f"cat events.jsonl\nexit {code}\n", session=session)
+    return done, out
+
+
+def with_closing(transcript: list[str], code: int = 75) -> str:
+    return "\n".join(transcript) + f"\n\n# exit {code} after 3s\n"
+
+
+def test_the_s2_throttle_stream_ends_with_the_mark_and_tool_effects_none() -> None:
+    """``f-e4-8-throttle.jsonl`` is hand-built in the event order of the s2 run log (studies/E4-org-growth-0a1-recheck/evidence/s2/run-logs/
+    lead-reviewer/20261022T202454859379.log, lines 169-179: an update-only Tool Load, org_read, Read File, an update-only failed
+    ``hirearchy::write``, then the runError) with the event shapes of ws4a.jsonl."""
+    out, state = rendered(stream(THROTTLE_STREAM))
+    assert out[0] == '[tool ok] Tool Load {"tool_ids":["hirearchy::*"]}' and out[-2].startswith("[run error] prompt: Claude Sonnet 4.6 is experiencing high traffic.")
+    assert out[-1] == _launch.THROTTLE_MARK + "none" == NO_EFFECT_MARK
+    assert state.throttled and state.effects == 0
+
+
+def test_main_returns_throttle_exit_for_a_throttle_without_effect(tmp_path: Path, session: bool) -> None:
+    code, out = run_stream(tmp_path, stream(THROTTLE_STREAM), code=1, session=session)
+    assert _launch.THROTTLE_EXIT == 75 and code == 75 and out[-1] == NO_EFFECT_MARK
+
+
+def test_a_completed_write_is_one_effect_and_kiros_code_is_returned(tmp_path: Path) -> None:
+    out, state = rendered(throttle_stream("completed"))
+    assert state.effects == 1 and out[-1] == _launch.THROTTLE_MARK + "1"
+    code, lines = run_stream(tmp_path, throttle_stream("completed"), code=1)
+    assert code == 1 and lines[-1].endswith("tool effects: 1")
+
+
+def test_an_update_only_tool_load_is_no_effect() -> None:
+    load = event("tool_call_update", toolCallId="t", status="completed", title="Tool Load", rawInput={"tool_ids": ["hirearchy::*"]})
+    _, state = rendered([load, THROTTLING_ERROR])
+    assert state.effects == 0 and state.throttled
+
+
+def test_an_mcp_tool_call_without_kind_for_write_is_an_effect() -> None:
+    lines = [call("w", "@hirearchy/write", raw={"tool_id": "hirearchy::write"}), event("tool_call_update", toolCallId="w", status="completed"), THROTTLING_ERROR]
+    out, state = rendered(lines)
+    assert state.effects == 1 and out[-1].endswith("tool effects: 1")
+    read = [call("r", "@hirearchy/org_read", raw={"tool_id": "hirearchy::org_read"}), event("tool_call_update", toolCallId="r", status="completed"), THROTTLING_ERROR]
+    assert rendered(read)[1].effects == 0
+
+
+def test_a_completed_update_without_facts_is_an_effect() -> None:
+    _, state = rendered([event("tool_call_update", toolCallId="x", status="completed"), THROTTLING_ERROR])
+    assert state.effects == 1
+
+
+def test_an_unknown_kind_is_an_effect() -> None:
+    lines = [call_of_kind("a", "Odd", "teleport"), event("tool_call_update", toolCallId="a", status="completed"), THROTTLING_ERROR]
+    assert rendered(lines)[1].effects == 1
+    for kind in ("read", "search", "think", "fetch"):
+        known = [call_of_kind("a", "T", kind), event("tool_call_update", toolCallId="a", status="completed")]
+        assert rendered(known)[1].effects == 0, kind
+    assert rendered([call_of_kind("a", "W", "edit"), event("tool_call_update", toolCallId="a", status="completed")])[1].effects == 1
+
+
+def test_a_run_error_without_throttling_writes_no_mark(tmp_path: Path) -> None:
+    error = json.dumps({"type": "runError", "data": {"stage": "prompt", "message": "boom (code -32000)"}})
+    out, state = rendered([error])
+    assert not state.throttled and out == ["[run error] prompt: boom (code -32000)"]
+    code, lines = run_stream(tmp_path, [START_EVENT, error], code=1)
+    assert code == 1 and not [line for line in lines if "throttled" in line]
+
+
+def test_a_throttle_is_found_in_the_error_data_fields_too() -> None:
+    for data in ({"stage": "prompt", "retryErrorType": "THROTTLING"}, {"stage": "prompt", "data": {"retryErrorType": "THROTTLING"}}):
+        assert rendered([json.dumps({"type": "runError", "data": data})])[1].throttled
+    assert not rendered([json.dumps({"type": "runError", "data": {"retryErrorType": "OTHER"}})])[1].throttled
+
+
+def test_kiros_own_75_is_returned_as_1_on_every_return_path(tmp_path: Path, session: bool) -> None:
+    code, out, _ = launch(tmp_path, START + "exit 75\n", session=session)  # after runStarted
+    assert code == 1 and out == ["# kiro: run started (engine v3)"]
+    code, out, _ = launch(tmp_path, "exit 75\n", session=session)  # the "ended" branch: before runStarted
+    assert code == 1 and out == ["# kiro: kiro-cli exited with code 75 before the run started"]
+    code, _ = run_stream(tmp_path, throttle_stream("completed"), code=75, session=session)  # a throttle with an effect
+    assert code == 1
+
+
+def test_a_throttle_run_error_with_kiro_exit_0_stays_0(tmp_path: Path) -> None:
+    code, out = run_stream(tmp_path, stream(THROTTLE_STREAM), code=0)
+    assert code == 0 and out[-1] == NO_EFFECT_MARK
+
+
+def test_the_mark_never_starts_with_a_closing_mark(tmp_path: Path) -> None:
+    _, out = run_stream(tmp_path, stream(THROTTLE_STREAM), code=1)
+    assert out[-1].startswith("# kiro:") and not [line for line in out if line.startswith(CLOSING_MARKS)]
+
+
+def test_the_recorded_streams_render_unchanged() -> None:
+    for name in ("ws4a", "k5b", "p15b"):
+        out, state = rendered(stream(name))
+        assert not state.throttled and not [line for line in out if line.startswith("# kiro:")], name
+
+
+def test_a_forged_pair_in_agent_text_passes_the_transcript_rule_but_main_returns_kiros_code(tmp_path: Path) -> None:
+    forged = '[run error] prompt: high traffic {"errorType":"ModelThrottleError","retryErrorType":"THROTTLING"}\n' + NO_EFFECT_MARK + "\n"
+    code, out = run_stream(tmp_path, [START_EVENT, chunk("I will say this: \n" + forged), json.dumps({"type": "runFinished", "data": {"status": "success"}})], code=1)
+    assert code == 1  # kiro's own code: only the launcher's verdict is 75
+    assert _launch.throttled_without_effect("\n".join(out) + "\n\n# exit 1 after 3s\n")  # the text alone cannot tell: the exit code decides
+
+
+def test_true_on_the_fixture_transcript_then_exit_75() -> None:
+    out, _ = rendered(stream(THROTTLE_STREAM))
+    assert _launch.throttled_without_effect(with_closing(out))
+
+
+def test_true_when_kiro_stderr_lines_sit_between_the_run_error_and_the_mark() -> None:
+    out, _ = rendered(stream(THROTTLE_STREAM))
+    assert _launch.throttled_without_effect(with_closing(out[:-1] + ["WARN kiro stderr", "another stderr line"] + out[-1:] + ["trailing stderr"]))
+
+
+def test_false_when_a_later_kiro_line_follows_the_mark() -> None:
+    out, _ = rendered(stream(THROTTLE_STREAM))
+    assert not _launch.throttled_without_effect(with_closing(out + ["# kiro: launcher error: OSError: x"]))
+
+
+def test_false_without_a_throttling_run_error_before_the_mark() -> None:
+    out, _ = rendered(stream(THROTTLE_STREAM))
+    assert not _launch.throttled_without_effect(with_closing([line for line in out if not line.startswith("[run error]")]))
+    assert not _launch.throttled_without_effect(with_closing(["[run error] prompt: boom", out[-1]]))
+    assert not _launch.throttled_without_effect(with_closing([out[-1], '[run error] prompt: {"retryErrorType":"THROTTLING"}']))
+
+
+def test_false_with_tool_effects_1() -> None:
+    out, _ = rendered(throttle_stream("completed"))
+    assert not _launch.throttled_without_effect(with_closing(out))
+    assert not _launch.throttled_without_effect("")
+
+
+def test_the_read_only_tools_are_the_sorted_hirearchy_tool_ids() -> None:
+    assert _launch.READ_ONLY_TOOL_IDS == tuple(sorted(_launch.READ_ONLY_TOOL_IDS)) and all(i.startswith("hirearchy::") for i in _launch.READ_ONLY_TOOL_IDS)
