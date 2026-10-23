@@ -30,7 +30,7 @@ from ..kernel.testing import FakeClock
 from ..mail import MailboxReader, TaskQuery
 from ..mail.testing import MemoryMailbox
 from ..reflection import ServiceReports
-from ..reflection.testing import FixedCaseHistory
+from ..reflection.testing import FixedCaseHistory, FixedDeliverableChecks
 from ..runs import RunLogReader
 from ..runs.testing import RunsHarness, fs_runs, memory_runs
 from ._activity import FsTeamActivity
@@ -175,6 +175,7 @@ class ProgressWorld:
     clock: ScriptedClock
     history: FixedCaseHistory
     totals: FixedCaseTotals
+    deliverables: FixedDeliverableChecks  # the findings of the deliverable folders root is shown (none unless a test puts some in)
     queue: ListHumanQueue
     scheduler: FakeSchedulerStatus
     waiting: FixedWaiting
@@ -201,13 +202,14 @@ def _world(
     runnable = runnable_over(budgets.agents, budgets.mail, pauses.store, budgets.query)
     waiting = FixedWaiting()
     history, totals, queue, scheduler = FixedCaseHistory(), FixedCaseTotals(), ListHumanQueue(), FakeSchedulerStatus(waiting=waiting)
+    deliverables = FixedDeliverableChecks()
     team_activity = activity(layout)
     roots, teams, states = MailRootTasks(budgets.mail), AgentTaskTeams(budgets.agents), MailTaskStates(budgets.mail, pauses.store, budgets.tasks)
     lines = CaseTaskLines(
         teams, states, LogRunCounts(budgets.mail, runs.reader), team_activity, history, totals, budgets.mail,
     )
     snapshots = TeamSnapshots(roots, teams, states, RunnableTeams(budgets.mail, runnable), queue, wait_clock)
-    text = RootTaskReport(roots, lines, queue, wait_clock)
+    text = RootTaskReport(roots, lines, queue, wait_clock, deliverables)
     reporter = DerivedProgressReporter(PollingProgress(text, snapshots, wait_clock), snapshots, scheduler, waiting, budgets.tasks)
 
     def hire(addr: str) -> None:
@@ -237,7 +239,7 @@ def _world(
 
     return ProgressWorld(
         reporter=reporter, text=text, snapshots=snapshots, mail=budgets.mail, tasks=budgets.tasks, agents=budgets.agents, pauses=pauses.store,
-        runnable=runnable, runs=runs.reader, layout=layout, clock=wait_clock, history=history, totals=totals, queue=queue, scheduler=scheduler,
+        runnable=runnable, runs=runs.reader, layout=layout, clock=wait_clock, history=history, totals=totals, deliverables=deliverables, queue=queue, scheduler=scheduler,
         waiting=waiting, activity=team_activity, hire=hire, retire=retire, delegate=delegate,
         answer=answer, write=write, post=budgets.post, use_run=use_run, begin_run=budgets.begin_run, end_run=budgets.end_run, pause=pauses.store.pause,
         advance=budgets.clock.advance,

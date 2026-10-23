@@ -6,7 +6,8 @@ deliverable path points into ``tmp_path``), then makes the calls the recorded as
 the lead's in-process MCP servers (``testkit.e4_replay`` reads the evidence; the lead's reports are the recorded results, played by ``scripted_report``).
 A missing evidence file, an absent call number or an unbound id FAILS the test (design 10, DR-42).
 
-This module holds the replays of the answer path and the gate (plan commit 14): s1r T5, s1r v3/v4, s1r's playbook v2 and E3 T5.
+This module holds the replays of the answer path and the gate (plan commit 14): s1r T5, s1r v3/v4, s1r's playbook v2 and E3 T5; and, from plan commit 24,
+s1r T8: the artifact path is withheld while the client's question is open, and the file the assistant edited is named (P3, partial).
 """
 
 from dataclasses import dataclass, field
@@ -215,3 +216,70 @@ def test_e3_turn_5_an_amendment_in_the_reject_turn_is_refused(tmp_path):
     assert f"refused: rejection R1 (message {n24}) on task {first} has no answer yet" in fails(w.root, "define_service", **c25, words=t5)
     assert "words (CLI: --words) repeats rejection R1's own note" in fails(w.root, "define_service", **c25, answers=n24, about="C6", words=t5)
     assert state(w) == before and contract_meta(w.org, "lead", "weekly-meeting-memo")[0]["version"] == 1
+
+
+# ------------------------------------------------------------------------------------------------------------------------ s1r T8
+
+
+MEMO_2_V1 = "s1r/memos/versions/memo-2026-10-12.v1.dfce3a4.md"
+FLAG = "1 question for the client: ask the user before you copy or deliver"
+E3_3286 = "20261022T222238418574-root-3286"  # s3: the rework that came back blocked, with a question (result 96e9)
+
+
+def memo_2_delivered(tmp_path):
+    """s1r: memo 2 (``114d``) is requested and delivered as E4's result ``fa63``: done, with a question for the client; the user has not answered."""
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    w = s1r_world(tmp_path)
+    task = w.request(E_114D, inputs={"notes_file": "2026-10-12.md"}, title=evidence("s1r/msgs/sent/" + E_114D + ".md")[0]["title"])
+    scripted_report(w.org, task, RESULT_FA63, {MEMO_2: raw(MEMO_2_V1), REVIEW_2: raw("s1r/org-files/lead-checker-work-review-memo-2026-10-12.md")})
+    return w, task
+
+
+def assistant_edits_the_copy(tmp_path):
+    """E4's call #40 (``deliverables-log.txt``): ``sed`` copies the memo to the deliverable folder with one word changed, the question still open."""
+    text = raw(MEMO_2_V1)
+    old, new = "and implemented a deploy freeze", "and decided on a deploy freeze"
+    assert old in text
+    (tmp_path / "deliverables").mkdir(exist_ok=True)
+    (tmp_path / "deliverables" / "memo-2026-10-12.md").write_text(text.replace(old, new), encoding="utf-8")
+
+
+def test_s1r_t8_the_artifact_path_is_withheld_while_the_question_is_open(tmp_path):
+    w, task = memo_2_delivered(tmp_path)
+    shown = call(w.root, "progress", task_id=task)  # E4's call #36: it flagged the question and still gave the path
+    assert "artifacts withheld (ask first)" in shown and FLAG in shown and MEMO_2 not in shown
+    assert MEMO_2 in call(w.root, "inbox")  # the path stays in the result body: the partial form adds no deliver tool
+    assistant_edits_the_copy(tmp_path)  # call #40, with the question still open
+    withheld = f'"memo-2026-10-12.md": differs from the team\'s checked version (task {task}; path withheld: ask first)'
+    for tool, args in (("progress", {"task_id": task}), ("status", {}), ("whoami", {})):
+        out = call(w.root, tool, **args)
+        assert withheld in out and MEMO_2 not in out, tool  # root is told, in all three, and the path is in none of them
+    listed = call(w.root, "progress", task_id=task)
+    assert listed.index("Deliverable folder") > listed.index(f"(task {task})")  # the note follows the task line
+    call(w.root, "feedback", task_id=task, verdict="accept")  # the assistant's own accept after its own edit (relayed): it rates the case ...
+    shown = call(w.root, "progress", task_id=task)
+    assert "withheld" not in shown and f"artifacts: {MEMO_2}," in shown  # ... so the flag ends,
+    assert f'"memo-2026-10-12.md": differs from {MEMO_2} as the team checked it (task {task})' in shown  # ... but the finding stays
+    call(w.root, "feedback", task_id=task, verdict="accept", source="human")  # the user's own verdict after the edit settles it
+    for tool, args in (("progress", {"task_id": task}), ("status", {}), ("whoami", {})):
+        assert "Deliverable" not in call(w.root, tool, **args), tool
+
+
+def test_s1r_t8_a_human_rework_answers_the_question_and_the_path_returns(tmp_path):
+    w, task = memo_2_delivered(tmp_path / "second")
+    assistant_edits_the_copy(tmp_path / "second")
+    assert "artifacts withheld (ask first)" in call(w.root, "progress", task_id=task)
+    call(w.root, "request", service=SERVICE, inputs={"notes_file": "2026-10-12.md"}, revises=task, source="human")  # instead of a verdict
+    shown = call(w.root, "progress", task_id=task)
+    assert f"artifacts: {MEMO_2}," in shown and "withheld" not in shown and FLAG not in shown
+
+
+def test_s3_a_blocked_result_with_a_question_is_flagged(tmp_path):
+    (tmp_path / "three").mkdir()
+    w = build(tmp_path / "three", "s3/service/history--SERVICE.v1.md", "s3/playbook/PLAYBOOK.f6d34a7.md", ("reviewer", "writer"))
+    title = evidence("s3/msgs/sent/" + E3_3286 + ".md")[0]["title"]
+    task = w.request(E3_3286, inputs={"notes_file": "2026-10-19.md"}, title=title)
+    scripted_report(w.org, task, "s3/msgs/read/20261022T222916707473-lead-96e9.md", {"lead/writer/work/memo-2026-10-19.md": raw("s3/memos/versions/memo-2026-10-19.v2.5e4a099.md")})
+    shown = call(w.root, "progress", task_id=task)
+    assert ": blocked" in shown and FLAG in shown  # E4's s3 result 96e9: blocked on one ambiguous item, and progress used to say nothing of it
+    assert "artifacts" not in shown

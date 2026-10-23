@@ -25,7 +25,7 @@ from ..progress._snapshot import TeamSnapshots
 from ..progress._states import MailTaskStates
 from ..progress._teams import AgentTaskTeams
 from ..progress._wait import PollingProgress
-from ..reflection import CaseHistory, ServiceReports
+from ..reflection import CaseHistory, DeliverableChecks, ServiceReports
 from ..runs import RunLogReader
 from ._builder import Builder
 from ._lazy import PortResolver
@@ -40,7 +40,7 @@ def reporter(b: PortResolver) -> DerivedProgressReporter:
     )
     snapshots = TeamSnapshots(roots, teams, states, RunnableTeams(mail, b.get(RunnableQuery)), queue, clock)
     return DerivedProgressReporter(
-        PollingProgress(RootTaskReport(roots, lines, queue, clock), snapshots, clock), snapshots, b.get(SchedulerStatus), b.get(WaitingOnUser),
+        PollingProgress(RootTaskReport(roots, lines, queue, clock, b.get(DeliverableChecks)), snapshots, clock), snapshots, b.get(SchedulerStatus), b.get(WaitingOnUser),
         b.get(TaskQuery),
     )
 

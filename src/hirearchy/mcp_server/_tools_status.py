@@ -10,8 +10,9 @@ from ..daemon import SchedulerStatus
 from ..health import HealthAnalyzer, HealthRenderer
 from ..kernel import ROOT, OrgError, Provider
 from ..overview import OrgTree
+from ..reflection import DeliverableChecks
 from ._ports import InstalledSkill, SetupMode, ToolGroup
-from ._tools_identity import with_floor_note, with_stale_skill_note
+from ._tools_identity import with_deliverables_note, with_floor_note, with_stale_skill_note
 
 if TYPE_CHECKING:
     from mcp.server.fastmcp import FastMCP
@@ -20,7 +21,8 @@ if TYPE_CHECKING:
 class StatusTools(ToolGroup):
     def __init__(
         self, setup: SetupMode, tree: Provider[OrgTree], scheduler: Provider[SchedulerStatus], directory: Provider[AgentDirectory],
-        analyzer: Provider[HealthAnalyzer], renderer: Provider[HealthRenderer], skill: InstalledSkill, floor: Provider[ModelFloorAudit],
+        analyzer: Provider[HealthAnalyzer], renderer: Provider[HealthRenderer], skill: InstalledSkill, deliverables: Provider[DeliverableChecks],
+        floor: Provider[ModelFloorAudit],
     ) -> None:
         self._setup = setup
         self._tree = tree
@@ -29,6 +31,7 @@ class StatusTools(ToolGroup):
         self._analyzer = analyzer
         self._renderer = renderer
         self._skill = skill
+        self._deliverables = deliverables
         self._floor = floor
 
     def register(self, mcp: FastMCP, me: str) -> None:
@@ -40,7 +43,8 @@ class StatusTools(ToolGroup):
             tree = self._tree().tree()
             if me != ROOT:
                 return tree
-            return with_stale_skill_note(with_floor_note(f"{tree}\n\n{self._scheduler().describe()}", self._floor()), self._skill)
+            shown = with_deliverables_note(f"{tree}\n\n{self._scheduler().describe()}", self._deliverables())
+            return with_stale_skill_note(with_floor_note(shown, self._floor()), self._skill)
 
         @mcp.tool()
         def health(agent: str | None = None) -> str:

@@ -33,6 +33,13 @@ def test_status_without_tasks_leaves_out_their_heading(tmp_path: Path) -> None:
     assert f.out.stdout == "root (human): unread 0, delegated 0\n\nscheduler: stopped\n"
 
 
+def test_cli_status_does_not_show_it(tmp_path: Path) -> None:
+    """The terminal is the user's own seat: `status` never asks the progress text (where the deliverable note lives)."""
+    f, readings = Fixture(tmp_path), new_readings()
+    go(StatusCommand(f.session, lambda: readings, lambda: readings, lambda: readings, f.out), "status")
+    assert "describe_progress" not in readings.names() and "Deliverable" not in f.out.stdout
+
+
 def test_health_renders_the_report_of_the_whole_organization(tmp_path: Path) -> None:
     f, readings = Fixture(tmp_path), new_readings()
     go(HealthCommand(f.session, lambda: readings, lambda: readings, f.out), "health")

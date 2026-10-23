@@ -155,7 +155,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     from ..overview import OrgTree
     from ..progress import ProgressReporter
     from ..prompts import Whoami
-    from ..reflection import ServiceReports, ServiceSteps
+    from ..reflection import DeliverableChecks, ServiceReports, ServiceSteps
     from ..services import ServiceCatalog, ServiceCommands, ServiceEvidence, ServiceHints
     from ..telemetry._summarize import JsonArgumentSummarizer
     from ..traces import TraceLookup
@@ -181,13 +181,16 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     examples: Provider[BlueprintExamples] = lambda: TemplateBlueprintExamples()
 
     common = [
-        IdentityTools(text, of(Whoami), of(SchedulerStatus), of(BatchStore), of(MailboxReader), installed_skill, of(ModelFloorAudit)),
+        IdentityTools(
+            text, of(Whoami), of(SchedulerStatus), of(BatchStore), of(MailboxReader), installed_skill, of(DeliverableChecks), of(ModelFloorAudit),
+        ),
         TaskTools(of(TaskAssigner), of(TaskReporter), of(BudgetQuery), of(MailboxReader), of(ServiceHints)),
         NoteTools(of(MessageSender), of(BudgetQuery), of(BudgetReclaimer)),
         HiringTools(of(Hiring), of(Retirement), of(ServiceCatalog), of(ServiceEvidence)),
         FileTools(of(ToolNaming), of(OrgFileReader), of(OrgFileWriter), of(OrgLayout)),
         StatusTools(
-            text, of(OrgTree), of(SchedulerStatus), directory, of(HealthAnalyzer), of(HealthRenderer), installed_skill, of(ModelFloorAudit),
+            text, of(OrgTree), of(SchedulerStatus), directory, of(HealthAnalyzer), of(HealthRenderer), installed_skill, of(DeliverableChecks),
+            of(ModelFloorAudit),
         ),
         ServiceTools(
             DirectoryServiceRoles(text, directory, of(CharterReader), of(ServiceCatalog)), of(ServiceReports), of(ServiceCommands), of(BudgetQuery),

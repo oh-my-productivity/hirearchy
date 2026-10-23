@@ -4,12 +4,15 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
-from hirearchy.kernel import ROOT, Message
+import pytest
+
+from hirearchy.kernel import ROOT, Message, OrgError
 from hirearchy.progress._lines import CaseTaskLines
 from hirearchy.progress._listing import RECENT, MailRootTasks, listed
 from hirearchy.progress._ports import ProgressText, RootTasks
 from hirearchy.progress._render import RootTaskReport
 from hirearchy.progress.testing import ProgressWorld
+from hirearchy.reflection import DeliverableChecks, DeliverableFinding, deliverables_note
 
 
 AT = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
@@ -47,7 +50,7 @@ def test_a_finished_task_is_listed_for_a_day_after_it_finished() -> None:
     assert listed(Message(sender="ceo", to=ROOT, type="result", body="", status="done", id="not-a-time"), AT)  # no time in the id: nothing to age
 
 
-def report(w: ProgressWorld) -> RootTaskReport:
+def report(w: ProgressWorld, checks: DeliverableChecks | None = None) -> RootTaskReport:
     from hirearchy.progress._counts import LogRunCounts
     from hirearchy.progress._states import MailTaskStates
     from hirearchy.progress._teams import AgentTaskTeams
@@ -55,7 +58,7 @@ def report(w: ProgressWorld) -> RootTaskReport:
     lines = CaseTaskLines(
         AgentTaskTeams(w.agents), MailTaskStates(w.mail, w.pauses, w.tasks), LogRunCounts(w.mail, w.runs), w.activity, w.history, w.totals, w.mail,
     )
-    return RootTaskReport(MailRootTasks(w.mail), lines, w.queue, w.clock)
+    return RootTaskReport(MailRootTasks(w.mail), lines, w.queue, w.clock, checks or w.deliverables)
 
 
 def test_it_is_a_text(w: ProgressWorld) -> None:
@@ -84,3 +87,64 @@ def test_nothing_open_shows_the_last_finished_one(w: ProgressWorld, task: Messag
 def test_the_queue_follows_the_tasks(w: ProgressWorld, task: Message) -> None:
     w.queue.entries = [("m1", "Needs you: one (message m1)")]
     assert report(w).render(task.id, None).splitlines()[1:] == ["Needs you: one (message m1)"]
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the deliverable note (P3, design 6.5)
+
+
+def found(name: str = "memo.md", kind: str = "unknown", service: str = "brief", folder: str = "/tmp/deliverables") -> DeliverableFinding:
+    return DeliverableFinding(folder=folder, services=(service,), name=name, kind=kind)
+
+
+def service_task(w: ProgressWorld, service: str = "brief") -> Message:
+    return w.post(Message(sender=ROOT, to="ceo", type="task", title=f"{service}: ai", body="goal", budget=5, service=service, playbook=1))
+
+
+def test_root_progress_appends_the_deliverable_note_before_the_human_queue(w: ProgressWorld, task: Message) -> None:
+    w.deliverables.put(ROOT, found())
+    w.queue.entries = [("m1", "Needs you: one (message m1)")]
+    lines = report(w).render(None, w.clock.now()).splitlines()
+    assert lines[0].startswith('"Write the report"')
+    assert lines[1:-1] == deliverables_note([found()]).splitlines() and lines[1].startswith('Deliverable folder "/tmp/deliverables" (service `brief`)')
+    assert lines[-1] == "Needs you: one (message m1)"
+    nothing = report(w, type(w.deliverables)()).render(None, w.clock.now())
+    assert "Deliverable" not in nothing  # no findings, no note
+
+
+def test_the_note_follows_a_report_with_no_open_task(w: ProgressWorld) -> None:
+    w.deliverables.put(ROOT, found())
+    assert report(w).render(None, w.clock.now()).splitlines()[0] == "No open tasks."
+    assert "never written by the team" in report(w).render(None, w.clock.now())
+
+
+def test_progress_of_a_service_task_shows_only_its_group(w: ProgressWorld) -> None:
+    w.deliverables.put(ROOT, found("a.md", service="brief"), found("b.md", service="other", folder="/tmp/other"))
+    brief, other = service_task(w, "brief"), service_task(w, "other")
+    for task, shown, hidden in ((brief, "a.md", "b.md"), (other, "b.md", "a.md")):
+        out = report(w).render(task.id, None)
+        assert f'"{shown}"' in out and f'"{hidden}"' not in out
+    both = report(w).render(None, w.clock.now())
+    assert '"a.md"' in both and '"b.md"' in both  # the list shows every service root requests
+
+
+def test_a_one_off_task_shows_no_block(w: ProgressWorld, task: Message) -> None:
+    w.deliverables.put(ROOT, found())
+    assert "Deliverable" not in report(w).render(task.id, None)  # a goal given with `delegate` has no service: no folder to speak of
+    assert "Deliverable" in report(w).render(None, w.clock.now())
+
+
+class RaisingChecks(DeliverableChecks):
+    def __init__(self, error: Exception) -> None:
+        self._error = error
+
+    def findings(self, actor: str, service: str | None = None) -> list[DeliverableFinding]:
+        raise self._error
+
+
+def test_a_findings_error_drops_the_note(w: ProgressWorld, task: Message) -> None:
+    w.queue.entries = [("m1", "Needs you: one (message m1)")]
+    for error in (OrgError("a contract cannot be read"), OSError(5, "I/O error")):
+        out = report(w, RaisingChecks(error)).render(None, w.clock.now()).splitlines()
+        assert out[0].startswith('"Write the report"') and out[-1] == "Needs you: one (message m1)" and len(out) == 2  # the rest of the report is whole
+    with pytest.raises(ValueError):  # anything else is a bug: not hidden
+        report(w, RaisingChecks(ValueError("a bug"))).render(None, w.clock.now())

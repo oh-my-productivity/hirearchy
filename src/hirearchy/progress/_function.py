@@ -63,5 +63,5 @@ def progress(org: Org, task_id: str | None = None, now: datetime | None = None, 
         rt.mailbox,
     )
     snapshots = TeamSnapshots(roots, teams, states, RunnableTeams(rt.mailbox, rt.runnable_query), rt.human_queue, time_of)
-    view = PollingProgress(RootTaskReport(roots, lines, rt.human_queue, time_of), snapshots, time_of, poll)
+    view = PollingProgress(RootTaskReport(roots, lines, rt.human_queue, time_of, rt.deliverable_checks), snapshots, time_of, poll)
     return view.progress(task_id, now, wait_seconds=wait_seconds)
