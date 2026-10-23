@@ -131,8 +131,10 @@ def test_the_note_marks_an_unconfirmed_amendment() -> None:
 
 
 RULE_C = (
-    "Rule (c): a playbook revision that cites a criterion added by an amendment the client confirmed is admitted; confirmed now: {ids}. "
-    "A criterion marked (not confirmed) counts once the client's yes is recorded (it reaches you as a criterion link)."
+    "Rule (c): a playbook revision that cites a criterion added by an amendment the client confirmed may add that criterion's own words, "
+    'one line each ("- C<k>: <its text>"); confirmed now: {ids}. '
+    "A criterion marked (not confirmed) counts once the client's yes is recorded (it reaches you as a criterion link); one marked "
+    "(user-initiated) never does."
 )
 
 
@@ -146,6 +148,16 @@ def test_the_note_names_rule_c_and_the_confirmed_amendments() -> None:
     assert nothing[-2:] == [RULE_C.format(ids="none yet"), "Contract: ceo/services/brief/SERVICE.md"]
     assert amended_note({"C3"}).splitlines()[-2] == RULE_C.format(ids="C3")
     assert amended_note({"C4", "C3", "C1"}).splitlines()[-2] == RULE_C.format(ids="C3, C4")  # in the order of the contract; only amendments count
+
+
+def test_the_rule_c_line_says_may_add_that_criterions_own_words() -> None:
+    line = amended_note({"C3"}).splitlines()[-2]
+    assert "is admitted" not in line
+    assert line == (
+        "Rule (c): a playbook revision that cites a criterion added by an amendment the client confirmed may add that criterion's own words, "
+        'one line each ("- C<k>: <its text>"); confirmed now: C3. A criterion marked (not confirmed) counts once the client\'s yes is recorded '
+        "(it reaches you as a criterion link); one marked (user-initiated) never does."
+    )
 
 
 def test_no_rule_c_line_without_amendments_or_on_a_locked_contract() -> None:

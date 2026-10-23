@@ -271,7 +271,7 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     ids["B2"] = request(w)  # the owner's next prompt names what rule (c) admits now
     deliver(w, ids["B2"])
     b2_prompt = next(p for addr, p in w.prompts if addr == "lead" and ids["B2"] in p)
-    assert "amendment the client confirmed (now C7: a revision citing it is admitted)" in b2_prompt
+    assert "amendment the client confirmed (now C7: a revision citing it may add its words)" in b2_prompt
     assert "not confirmed yet" not in b2_prompt.split("# Reflect before you start")[1].split("# New messages")[0]
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1  # nothing was revised yet
     assert "now v2" in revise(w, v2, "C7 was added by the client", ["C7"])  # admitted after B2's delivery

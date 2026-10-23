@@ -89,6 +89,15 @@ def test_the_revise_playbook_docstring_asks_for_the_clients_evidence(svc):
     assert "A refusal writes nothing and gives you a question to send your parent once; do not wait for the answer" in text
 
 
+def test_revise_playbook_docstring_says_line_by_line(svc):
+    text = " ".join(described(svc, "ceo")["revise_playbook"].description.split())
+    assert (
+        "contract by an amendment the client confirmed (your Reflect section and the amendment note name them); line by line: under the first "
+        'rule every line you add or change carries the id it rests on ("[C6]"), under the second it is only that criterion\'s words '
+        '("- C<k>: <its text>"); a link note id counts as its criterion; your lessons, relayed verdicts and an agent client\'s verdicts are not evidence.'
+    ) in text
+
+
 def test_root_request_rework_without_source_is_relayed(svc):
     server = build_server(svc, ROOT)
     first = request(svc, "ai")

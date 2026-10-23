@@ -253,10 +253,22 @@ def test_step_3_for_a_human_client_names_evidence_and_the_refusal_question(svc):
         "3. If a change to how the team works would prevent it, call `revise_playbook(service, content, reason, evidence)` with the whole new "
         "playbook (at most 1000 words): concrete steps (who does what, in which order, which check), not slogans. Name the cases in the reason, "
         "and list in `evidence` what it rests on: regression assertions (R<k>), criteria (C<k>), verdict or case ids. It is admitted only when "
-        "the same criterion or assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the "
-        "contract by an amendment the client confirmed (none yet); your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is refused, nothing is "
+        "the same criterion or assertion failed in 2 different cases the client rejected (then every line it adds or changes carries that id, "
+        'e.g. "[C6]"), or when it cites a criterion your parent added to the contract by an amendment the client confirmed (none yet): then it '
+        'may add only that criterion\'s own words, one line each, "- C<k>: <its text>". A link note id counts as its criterion. Your lessons and '
+        "relayed verdicts (the assistant's own reading) are not evidence. If it is refused, nothing is "
         "written: send your parent the refusal's question once and go on with the playbook as it is. The new version applies to this request."
     )
+
+
+def test_step_3_says_lines_carry_their_id_or_are_the_criterions_words(svc):
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, lessons="Thin on sources.")
+    request(svc, "chips")
+    step = step_3(reflect_section(svc.run_prompt("ceo", svc.begin_run("ceo"))))
+    assert 'failed in 2 different cases the client rejected (then every line it adds or changes carries that id, e.g. "[C6]"), or when' in step
+    assert 'then it may add only that criterion\'s own words, one line each, "- C<k>: <its text>". A link note id counts as its criterion. ' in step
+    assert "Your lessons and relayed verdicts (the assistant's own reading) are not evidence. If it is refused" in step
 
 
 def step_3_after(org):
@@ -273,37 +285,50 @@ CLAUSE = "contract by an amendment the client confirmed ("
 
 def test_step_3_names_the_confirmed_amendments(svc):
     org = svc
-    assert f"{CLAUSE}none yet);" in step_3_after(org)  # no amendment at all
+    assert f"{CLAUSE}none yet):" in step_3_after(org)  # no amendment at all
     assert "are not confirmed" not in step_3_after(org) and "is not confirmed" not in step_3_after(org)
 
 
 def test_step_3_names_one_confirmed_amendment(svc):
     org = svc
     c3 = confirmed_amendment(org, "Every claim names its source")
-    assert f"{CLAUSE}now {c3}: a revision citing it is admitted);" in step_3_after(org)
+    assert f"{CLAUSE}now {c3}: a revision citing it may add its words):" in step_3_after(org)
 
 
 def test_step_3_names_several_confirmed_amendments(svc):
     org = svc
     c3 = confirmed_amendment(org, "Every claim names its source", topic="one")
     c4 = confirmed_amendment(org, "Every figure names its date", topic="two")
-    assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them is admitted);" in step_3_after(org)
+    assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them may add its words):" in step_3_after(org)
 
 
 def test_step_3_says_which_amendments_are_not_confirmed_yet(svc):
     org = svc
     org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])  # an amendment nobody confirmed: C3
-    assert f"{CLAUSE}none yet; C3 is not confirmed yet);" in step_3_after(org)
+    assert f"{CLAUSE}none yet; C3 is not confirmed yet):" in step_3_after(org)
     c4 = confirmed_amendment(org, "Every claim names its source")
     org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the date"])
-    assert f"{CLAUSE}now {c4}: a revision citing it is admitted; C3, C5 are not confirmed yet);" in step_3_after(org)
+    assert f"{CLAUSE}now {c4}: a revision citing it may add its words; C3, C5 are not confirmed yet):" in step_3_after(org)
+
+
+def test_eligible_ids_say_may_add_its_words(svc):
+    """One id, several, none yet, and the unconfirmed ones appended (``_eligible``)."""
+    org = svc
+    assert f"{CLAUSE}none yet):" in step_3_after(org)
+    c3 = confirmed_amendment(org, "Every claim names its source", topic="one")
+    assert f"{CLAUSE}now {c3}: a revision citing it may add its words):" in step_3_after(org)
+    c4 = confirmed_amendment(org, "Every figure names its date", topic="two")
+    assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them may add its words):" in step_3_after(org)
+    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])  # C5: nobody confirmed it
+    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the date"])  # C6
+    assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them may add its words; C5, C6 are not confirmed yet):" in step_3_after(org)
 
 
 def test_step_3_leaves_out_a_removed_amendment(svc):
     org = svc
     org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])
     org.define_service(ROOT, "ceo", "weekly-brief", remove_acceptance=["Quote the source"])
-    assert f"{CLAUSE}none yet);" in step_3_after(org)
+    assert f"{CLAUSE}none yet):" in step_3_after(org)
 
 
 def test_the_reject_preamble_speaks_of_rules_without_client_evidence(svc):

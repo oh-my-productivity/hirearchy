@@ -130,7 +130,7 @@ class EvidenceReflectSection(ReflectSection):
         waiting = [c.id for c in current if c.amended and c.id not in confirmed]
         text = "none yet"
         if admitted:
-            text = f"now {', '.join(admitted)}: a revision citing {'it' if len(admitted) == 1 else 'one of them'} is admitted"
+            text = f"now {', '.join(admitted)}: a revision citing {'it' if len(admitted) == 1 else 'one of them'} may add its words"
         if waiting:
             text += f"; {', '.join(waiting)} {'is' if len(waiting) == 1 else 'are'} not confirmed yet"
         return text
@@ -183,8 +183,10 @@ class EvidenceReflectSection(ReflectSection):
                     f"the whole new playbook (at most {playbook_word_cap(self._config.config())} words): concrete steps (who does what, in "
                     "which order, which check), not slogans. Name the cases in the reason, and list in `evidence` what it rests on: "
                     "regression assertions (R<k>), criteria (C<k>), verdict or case ids. It is admitted only when the same criterion or "
-                    "assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the "
-                    f"contract by an amendment the client confirmed ({self._eligible(addr, c.name)}); your lessons and relayed verdicts (the "
+                    "assertion failed in 2 different cases the client rejected (then every line it adds or changes carries that id, "
+                    'e.g. "[C6]"), or when it cites a criterion your parent added to the contract by an amendment the client confirmed '
+                    f"({self._eligible(addr, c.name)}): then it may add only that criterion's own words, one line each, "
+                    '"- C<k>: <its text>". A link note id counts as its criterion. Your lessons and relayed verdicts (the '
                     "assistant's own reading) are not evidence. If it is refused, nothing is written: send your parent the refusal's question "
                     "once and go on with the playbook as it is. "
                     f"The new version applies to this {what}."

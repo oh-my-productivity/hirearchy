@@ -88,8 +88,8 @@ class ContractAmender(ContractAmendment):
         if not new.locked and any(c.amended for c in criteria):  # on a locked contract revise_playbook refuses before the gate (DR-13)
             ids = ", ".join(c.id for c in confirmed_amendments(criteria, confirmed)) or "none yet"
             rule_c = [
-                "Rule (c): a playbook revision that cites a criterion added by an amendment the client confirmed is admitted; "
-                f"confirmed now: {ids}. A criterion marked (not confirmed) counts once the client's yes is recorded "
-                "(it reaches you as a criterion link)."
+                "Rule (c): a playbook revision that cites a criterion added by an amendment the client confirmed may add that criterion's "
+                f'own words, one line each ("- C<k>: <its text>"); confirmed now: {ids}. A criterion marked (not confirmed) counts once the '
+                "client's yes is recorded (it reaches you as a criterion link); one marked (user-initiated) never does."
             ]
         return "\n".join([head, *changes, "Acceptance criteria now:", *shown, *rule_c, f"Contract: {where}"])

@@ -171,7 +171,9 @@ def test_revise_playbook_docstring_names_confirmed_amendments() -> None:
     text = " ".join(described(serve(tools(offered={"ceo/eng": ["brief"]})[0], "ceo/eng"))["revise_playbook"].split())
     assert (
         "or when it cites a criterion your parent added to the contract by an amendment the client confirmed (your Reflect section and the "
-        "amendment note name them); your lessons, relayed verdicts and an agent client's verdicts are not evidence." in text
+        "amendment note name them); line by line: under the first rule every line you add or change carries the id it rests on (\"[C6]\"), "
+        "under the second it is only that criterion's words (\"- C<k>: <its text>\"); a link note id counts as its criterion; "
+        "your lessons, relayed verdicts and an agent client's verdicts are not evidence." in text
     )
 
 
