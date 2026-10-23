@@ -31,7 +31,7 @@ def research(tmp_path):
 
 
 def tiered(bp):
-    bp["needs"]["models"] = {"cheap": "claude-haiku-4.5", "strong": "claude-sonnet-4.6"}
+    bp["needs"]["models"] = {"cheap": "claude-sonnet-5.5", "strong": "claude-opus-5.5"}
     bp["needs"]["model_policy"] = "cheap drafting, strong review"
     return bp
 
@@ -81,10 +81,10 @@ def test_the_plan_says_plainly_that_every_agent_runs_on_the_default(research, tm
 
 def test_tiering_on_request_resolves_each_tier_and_the_plan_names_them(research, tmp_path):
     bp = tiered(research)
-    assert models_of(bp, tmp_path) == {"lead": "claude-sonnet-4.6", "lead/researcher": "claude-haiku-4.5",
-                                       "lead/writer": "claude-haiku-4.5", "lead/factcheck": "claude-sonnet-4.6"}
+    assert models_of(bp, tmp_path) == {"lead": "claude-opus-5.5", "lead/researcher": "claude-sonnet-5.5",
+                                       "lead/writer": "claude-sonnet-5.5", "lead/factcheck": "claude-opus-5.5"}
     plan = bpm.plan_for_user(bp, allowed_roots=[tmp_path])
-    assert "- Models: claude-sonnet-4.6 for 2 agents, claude-haiku-4.5 for 2 agents (cheap drafting, strong review)" in plan.splitlines()
+    assert "- Models: claude-opus-5.5 for 2 agents, claude-sonnet-5.5 for 2 agents (cheap drafting, strong review)" in plan.splitlines()
     assert "for every agent" not in plan
 
 

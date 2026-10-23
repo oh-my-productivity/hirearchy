@@ -26,7 +26,7 @@ def base(tmp_path):
 
 def tiered(bp):
     """The example blueprint with the cheap-drafting / strong-review tiers the user asked for."""
-    bp["needs"]["models"] = {"cheap": "claude-haiku-4.5", "strong": "claude-sonnet-4.6"}
+    bp["needs"]["models"] = {"cheap": "claude-sonnet-5.5", "strong": "claude-opus-5.5"}
     bp["needs"]["model_policy"] = "cheap drafting, strong review"
     return bp
 
@@ -57,8 +57,8 @@ def test_planned_budget_has_slack_and_respects_cap(base, roots):
 def test_render_plan_contents(base, roots):
     base = tiered(base)
     text = bpm.render_plan(base, bpm.validate(base, allowed_roots=roots), allowed_roots=roots)
-    for expected in ("Goal:", "Obsidian, Logseq, Joplin", "max 1500 words", "lead/researcher", "model=claude-haiku-4.5",
-                     "model=claude-sonnet-4.6", "tools=web_fetch,web_search", "Budget: 22 runs planned (your cap: 25), estimate 17",
+    for expected in ("Goal:", "Obsidian, Logseq, Joplin", "max 1500 words", "lead/researcher", "model=claude-sonnet-5.5",
+                     "model=claude-opus-5.5", "tools=web_fetch,web_search", "Budget: 22 runs planned (your cap: 25), estimate 17",
                      "factcheck", "nobody edits another agent's file", "competitors.md", "copied there by the assistant",
                      "1. Covers exactly", "Checkpoints:", "Warnings (1):", "Reply 'approve' or tell me what to change."):
         assert expected in text, expected

@@ -26,7 +26,7 @@ def base(tmp_path):
 
 def tiered(bp):
     """The example blueprint with the cheap-drafting / strong-review tiers the user asked for."""
-    bp["needs"]["models"] = {"cheap": "claude-haiku-4.5", "strong": "claude-sonnet-4.6"}
+    bp["needs"]["models"] = {"cheap": "claude-sonnet-5.5", "strong": "claude-opus-5.5"}
     bp["needs"]["model_policy"] = "cheap drafting, strong review"
     return bp
 
@@ -253,11 +253,11 @@ def test_single_model_with_tiered_policy_is_error(base, roots):
         tiered(b)
         b["needs"].pop("models")
         for a in (b["agents"][0], *b["agents"][0]["children"]):
-            a["model"] = "claude-sonnet-4.6"
+            a["model"] = "claude-opus-5.5"
 
     assert "model-single" in codes(check(mutate(base, one_model), roots), "error")
     assert "model-single" not in codes(check(tiered(copy.deepcopy(base)), roots))
-    same_review = mutate(tiered(copy.deepcopy(base)), lambda b: b["agents"][0]["children"][2].update(model="claude-haiku-4.5"))
+    same_review = mutate(tiered(copy.deepcopy(base)), lambda b: b["agents"][0]["children"][2].update(model="claude-sonnet-5.5"))
     assert "model-review" in codes(check(same_review, roots), "warning")
 
 

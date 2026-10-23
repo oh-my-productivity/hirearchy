@@ -153,6 +153,13 @@ def test_apply_refuses_errors_and_creates_nothing(base, roots, empty_org):
     assert empty_org.agents() == [] and not (empty_org.root / "lead").exists() and not (empty_org.root / ".retired").exists()
 
 
+def test_apply_refuses_a_plan_below_the_model_floor_and_creates_nobody(base, roots, empty_org):
+    base["needs"]["models"] = {"cheap": "claude-haiku-4.5", "strong": "claude-sonnet-4.6"}
+    with pytest.raises(BlueprintError, match=r'needs.models.cheap: model "claude-haiku-4.5" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5'):
+        bpm.apply(empty_org, base, allowed_roots=roots)
+    assert empty_org.agents() == [] and not (empty_org.root / "lead").exists()
+
+
 def test_apply_refuses_existing_names(base, roots, empty_org):
     empty_org.hire(ROOT, "lead", "someone", "x")
     before = sorted(p.name for p in empty_org.root.iterdir())

@@ -1,4 +1,4 @@
-"""Characterization of ``validate``: 160 mutated blueprints and what the validator of ``main`` answered for each (``golden/validate_corpus.json``).
+"""Characterization of ``validate``: 166 mutated blueprints and what the validator of ``main`` answered for each (``golden/validate_corpus.json``).
 
 The golden file was captured from the function of ``main`` before the validator moved; every issue is ``[level, path, message, code]`` with the
 temporary directory written ``<TMP>``. The validator must answer the same issues in the same order, whatever role library it reads."""
@@ -23,8 +23,8 @@ NAMES = [name for name, _, _ in _corpus.MUTATIONS] + list(_corpus.ORG_SPECS)
 # Every code of an Issue that ``validate`` can emit (``schema``: a blueprint that is not a mapping, in the contract suite).
 ALL_CODES = {
     "agents", "authority", "budget", "budget-cap", "budget-low", "budget-tight", "children", "code-criteria", "code-needs", "code-tools",
-    "criteria", "deliverable", "deliverable-format", "depth", "edits-others", "exists", "inputs", "inputs-overlap", "kind", "limit-criterion",
-    "manager-cheap-model", "mission", "model-policy", "model-review", "model-single", "name", "needs", "needs-approval", "needs-progress",
+    "criteria", "deliverable", "deliverable-format", "depth", "edits-others", "effort-floor", "exists", "inputs", "inputs-overlap", "kind", "limit-criterion",
+    "manager-cheap-model", "mission", "model-floor", "model-policy", "model-review", "model-single", "name", "needs", "needs-approval", "needs-progress",
     "needs-scope", "path", "path-delivery", "path-parent", "path-root", "playbook", "read-nothing", "review", "scale", "service",
     "service-inputs", "service-name", "service-owner", "service-request", "shell-unconfined", "task", "template", "unknown-key",
     "vague-criterion", "verifier-cannot-read", "verifier-web", "web-current", "web-tools", "web-tools-partial", "workspace",

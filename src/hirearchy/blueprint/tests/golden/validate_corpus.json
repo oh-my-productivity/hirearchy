@@ -292,6 +292,34 @@
    "write-noncode"
   ]
  ],
+ "org:default-model-below-floor": [
+  [
+   "warning",
+   "needs.deliverable.path",
+   "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
+   "path-delivery"
+  ],
+  [
+   "error",
+   "ORG.md default_model",
+   "model \"claude-haiku-4.5\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
+  ]
+ ],
+ "org:effort-below-floor": [
+  [
+   "warning",
+   "needs.deliverable.path",
+   "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
+   "path-delivery"
+  ],
+  [
+   "error",
+   "ORG.md effort",
+   "effort \"medium\" is not allowed for org agents; allowed: high, xhigh, max",
+   "effort-floor"
+  ]
+ ],
  "org:max-depth-one": [
   [
    "error",
@@ -353,6 +381,14 @@
    "lead already exists in this organization; pick another name or retire it first",
    "exists"
   ],
+  [
+   "warning",
+   "needs.deliverable.path",
+   "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
+   "path-delivery"
+  ]
+ ],
+ "org:widened-model-set": [
   [
    "warning",
    "needs.deliverable.path",
@@ -602,6 +638,18 @@
    "agents[lead]",
    "lead directs the team but runs on the cheap model; the lead decides how every other run is spent; cheap leads misroute rework and waste runs (studies A3/A4). Give it model: strong",
    "manager-cheap-model"
+  ],
+  [
+   "error",
+   "needs.models.cheap",
+   "model \"claude-haiku-4.5\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
+  ],
+  [
+   "error",
+   "needs.models.strong",
+   "model \"claude-sonnet-4.6\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
   ]
  ],
  "research:criteria-as-text": [
@@ -936,6 +984,30 @@
    "agents[lead]",
    "lead directs the team but runs on the cheap model; the lead decides how every other run is spent; cheap leads misroute rework and waste runs (studies A3/A4). Give it model: strong",
    "manager-cheap-model"
+  ],
+  [
+   "error",
+   "needs.models.cheap",
+   "model \"claude-haiku-4.5\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
+  ],
+  [
+   "error",
+   "needs.models.strong",
+   "model \"claude-sonnet-4.6\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
+  ],
+  [
+   "error",
+   "agents[lead]",
+   "model \"claude-haiku-4.5\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
+  ],
+  [
+   "error",
+   "agents[lead/researcher]",
+   "model \"claude-haiku-4.5\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
   ]
  ],
  "research:limit-not-in-criteria": [
@@ -1006,6 +1078,12 @@
    "needs.model_policy",
    "the agents run on different models but no model policy says why: state it (for example cheap drafting + strong review)",
    "model-policy"
+  ],
+  [
+   "error",
+   "agents[lead/researcher]",
+   "model \"claude-haiku-4.5\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
   ]
  ],
  "research:no-agents": [
@@ -1566,6 +1644,18 @@
    "needs.deliverable.path",
    "no agent can write to <TMP>/deliverables/competitors.md (agents write only inside their own directory or workspace); the assistant must copy the final artifact there and verify it on completion (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "error",
+   "needs.models.cheap",
+   "model \"claude-haiku-4.5\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
+  ],
+  [
+   "error",
+   "needs.models.strong",
+   "model \"claude-sonnet-4.6\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
   ]
  ],
  "research:tiered-single-model": [
@@ -1594,6 +1684,18 @@
    "agents[lead/factcheck]",
    "the reviewer uses the same model as the author it checks; the policy asks for a stronger reviewer (model: strong)",
    "model-review"
+  ],
+  [
+   "error",
+   "needs.models.cheap",
+   "model \"claude-haiku-4.5\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
+  ],
+  [
+   "error",
+   "needs.models.strong",
+   "model \"claude-sonnet-4.6\" is not allowed for org agents; allowed: claude-sonnet-5.5, claude-opus-5.5 (only the user can widen this set)",
+   "model-floor"
   ]
  ],
  "research:tools-beyond-manager": [

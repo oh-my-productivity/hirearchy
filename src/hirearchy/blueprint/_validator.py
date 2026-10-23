@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import cast
 
 from ..kernel import JsonObject, inside
-from ..settings import config_default_model
+from ..settings import config_default_model, config_effort, effort_floor_problem, model_floor_problem
 from ._budgeting import TIGHT
 from ._protocols import AccessReport, AgentResolution, BudgetPlanning, OrgContexts, PathChecking, ServiceRules, WorkspaceRoots
 from ._resolver import declared_inputs, review_roots
@@ -324,6 +324,28 @@ class RuleBlueprintValidator(BlueprintValidator):
             if on_cheap or shared:
                 why = "the cheap model" if on_cheap else f"{a.model}, the same model as the drafters, while a strong model ({strong_id}) is available"
                 issues.append(Issue("warning", a.where, f"{a.addr} directs the team but runs on {why}; the lead decides how every other run is spent; cheap leads misroute rework and waste runs (studies A3/A4). Give it model: strong", "manager-cheap-model"))
+
+        # --- the org-agent floor (docs/design/org-agent-model-floor.md 3): every model the plan runs on is allowed, and so is the org's effort
+        refused: set[str] = set()  # the ids reported so far, each at the source that names it
+
+        def floor(model: str, where: str) -> None:
+            problem = model_floor_problem(cfg, model)
+            if problem is not None:
+                refused.add(model)
+                issues.append(Issue("error", where, problem, "model-floor"))
+
+        for tier in ("cheap", "strong"):
+            if s(mdl.get(tier)):
+                floor(s(mdl.get(tier)), f"needs.models.{tier}")
+        for a in agents:
+            named = s(a.raw.get("model"))
+            if named and named not in ("cheap", "strong"):
+                floor(named, a.where)
+        if dflt not in refused and any(a.model == dflt for a in agents):
+            floor(dflt, "ORG.md default_model")  # some agent resolves to the org's default
+        problem = effort_floor_problem(config_effort(cfg))
+        if problem is not None:
+            issues.append(Issue("error", "ORG.md effort", problem, "effort-floor"))
 
         # --- elicited preferences the org itself does not use but the assistant must honor
         for key, hint in (("scope", "what is in and out of scope"), ("approval", "when the user wants to approve (plan, before start, final)"),

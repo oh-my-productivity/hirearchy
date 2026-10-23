@@ -9,6 +9,8 @@ import re
 import time
 
 import pytest
+import testkit
+import yaml
 from testkit.e2e_world import build_server
 from testkit.health_world import Scheduler
 from testkit.kiro_world import kiro_runner
@@ -137,8 +139,30 @@ def point_org_md_default_model(org, model: str) -> str | None:
     return None
 
 
+def point_blueprint(mutate):
+    """The shipped research blueprint with ``model`` put in by ``mutate``, proposed by root: the DRAFT text with its errors, or None when it is ready."""
+
+    def point(org, model: str) -> str | None:
+        bp = yaml.safe_load((testkit.REPO / "examples" / "blueprint-research.yaml").read_text(encoding="utf-8"))
+        mutate(bp, model)
+        out = call(build_server(org, ROOT), "propose_org", blueprint=yaml.safe_dump(bp, sort_keys=False))
+        return out if "DRAFT - NOT READY" in out else None
+
+    return point
+
+
+def set_tiers(bp, model: str) -> None:
+    bp["needs"]["models"] = {"cheap": model, "strong": model}
+
+
+def set_lead_model(bp, model: str) -> None:
+    bp["agents"][0]["model"] = model
+
+
 POINTS = {
     "hire": point_hire,
+    "blueprint tier": point_blueprint(set_tiers),
+    "blueprint agent model": point_blueprint(set_lead_model),
     "create_org default_model": point_create_org,
     "charter rewrite": point_charter_rewrite,
     "ORG.md default_model": point_org_md_default_model,
@@ -168,6 +192,7 @@ def test_a_widened_set_admits_another_model(org):
     assert point_hire(org, "claude-sonnet-4.6") is None
     assert point_charter_rewrite(org, "claude-sonnet-4.6") is None  # a root rewrite admits it after the hand edit
     assert point_org_md_default_model(org, "claude-sonnet-4.6") is None
+    assert point_blueprint(set_tiers)(org, "claude-sonnet-4.6") is None  # and a plan with that tier is ready
     assert point_hire(org, "claude-haiku-4.5") is not None  # still outside the widened set
 
 
@@ -186,3 +211,15 @@ def test_root_cannot_lower_the_effort_through_write(org):
     message = fails(build_server(org, ROOT), "write", path="ORG.md", content=join_frontmatter({**meta, "effort": "medium"}, body))
     assert 'effort "medium" is not allowed for org agents; allowed: high, xhigh, max' in message
     assert split_frontmatter((org.root / "ORG.md").read_text(encoding="utf-8"))[0]["effort"] == "high"
+
+
+def test_a_blueprint_tier_outside_the_set_is_an_error_line_of_the_draft(org):
+    out = point_blueprint(set_tiers)(org, "claude-haiku-4.5")
+    assert out is not None and 'needs.models.cheap: model "claude-haiku-4.5" is not allowed' in out and "needs.models.strong:" in out
+    assert "PLAN FOR YOU" not in out.split("DRAFT - NOT READY")[0]  # nothing to show the user yet
+
+
+def test_a_blueprint_with_the_widened_set_is_ready(org):
+    assert point_blueprint(set_tiers)(org, "claude-sonnet-4.6") is not None
+    widen(org, "claude-sonnet-4.6")
+    assert point_blueprint(set_tiers)(org, "claude-sonnet-4.6") is None

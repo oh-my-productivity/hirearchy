@@ -34,7 +34,7 @@ def base(tmp_path):
 
 def tiered(bp):
     """The tiering a user gets only by asking for cheaper drafting models."""
-    bp["needs"]["models"] = {"cheap": "claude-haiku-4.5", "strong": "claude-sonnet-4.6"}
+    bp["needs"]["models"] = {"cheap": "claude-sonnet-5.5", "strong": "claude-opus-5.5"}
     bp["needs"]["model_policy"] = "cheap drafting, strong review"
     return bp
 
@@ -163,7 +163,7 @@ def test_cheap_manager_gets_a_warning_not_an_error(base, tmp_path):
 
 
 def test_manager_on_the_cheap_model_id_is_flagged(base, tmp_path):
-    bp = mutate(tiered(base), lambda b: b["agents"][0].update(model="claude-haiku-4.5"))
+    bp = mutate(tiered(base), lambda b: b["agents"][0].update(model="claude-sonnet-5.5"))
     assert "manager-cheap-model" in codes(issues(bp, tmp_path), "warning")
 
 
@@ -180,7 +180,7 @@ def test_manager_sharing_the_drafters_model_while_strong_is_available_is_flagged
 def test_strong_manager_is_not_flagged(base, tmp_path):
     base = tiered(base)
     assert "manager-cheap-model" not in codes(issues(base, tmp_path))
-    by_id = mutate(base, lambda b: b["agents"][0].update(model="claude-sonnet-4.6"))
+    by_id = mutate(base, lambda b: b["agents"][0].update(model="claude-opus-5.5"))
     assert "manager-cheap-model" not in codes(issues(by_id, tmp_path))
     default = mutate(base, lambda b: b["agents"][0].pop("model"))  # the template's default tier is strong
     assert "manager-cheap-model" not in codes(issues(default, tmp_path))
@@ -221,8 +221,8 @@ def test_research_example_proposes_cleanly_under_25(base, tmp_path):
     total = bpm.planned_total(base, est)
     assert est == 17 and total == 22 <= base["needs"]["budget_runs"] == 25
     models = {a.addr: a.model for a in agents}
-    assert models == {"lead": "claude-sonnet-4.6", "lead/researcher": "claude-haiku-4.5", "lead/writer": "claude-haiku-4.5",
-                      "lead/factcheck": "claude-sonnet-4.6"}
+    assert models == {"lead": "claude-opus-5.5", "lead/researcher": "claude-sonnet-5.5", "lead/writer": "claude-sonnet-5.5",
+                      "lead/factcheck": "claude-opus-5.5"}
     plan = bpm.propose(yaml.safe_dump(base), allowed_roots=[tmp_path])
     assert "Reply 'approve'" in plan and "Errors" not in plan
 

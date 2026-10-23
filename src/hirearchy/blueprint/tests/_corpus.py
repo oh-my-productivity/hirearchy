@@ -296,6 +296,9 @@ ORG_SPECS: dict[str, dict[str, object]] = {
     "org:workspace-overlaps-org": {},
     "org:max-depth-one": {"config": {"max_depth": 1}},
     "org:small-playbook-cap": {"config": {"playbook_max_words": 5}},
+    "org:effort-below-floor": {"config": {"effort": "medium"}},
+    "org:default-model-below-floor": {"config": {"default_model": "claude-haiku-4.5"}},
+    "org:widened-model-set": {"config": {"extra_allowed_models": ["claude-haiku-4.5", "claude-sonnet-4.6"]}},
 }
 ORG_CASES: dict[str, tuple[str, Mutation]] = {
     "org:top-agent-exists": ("research", lambda b: None),
@@ -303,6 +306,9 @@ ORG_CASES: dict[str, tuple[str, Mutation]] = {
     "org:workspace-overlaps-org": ("code", lambda b: _d(b, "needs").update(workspace="<ORG>/inside")),
     "org:max-depth-one": ("code", lambda b: None),
     "org:small-playbook-cap": ("services", _service_update(playbook="one two three four five six")),
+    "org:effort-below-floor": ("research", lambda b: None),
+    "org:default-model-below-floor": ("research", lambda b: _d(b, "needs").pop("models")),
+    "org:widened-model-set": ("research", _tier_mix),
 }
 
 
