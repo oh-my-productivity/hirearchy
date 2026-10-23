@@ -13,7 +13,7 @@ from hirearchy.kernel import ROOT, Message, OrgError
 from hirearchy.mcp_server._instructions import InstructionText
 from hirearchy.mcp_server._tools_services import DirectoryServiceRoles, ServiceTools
 from hirearchy.mcp_server.testing import HeldBudgets, MemoryBinding, ScriptedReports, ScriptedSteps, agents_in
-from hirearchy.services import Contract, Criterion, Playbook, ServiceCatalog, ServiceCommands
+from hirearchy.services import BASE_HEADING, Contract, Criterion, Playbook, ServiceCatalog, ServiceCommands
 
 from ._support import call, described, fails, names, serve
 
@@ -47,7 +47,8 @@ class Catalog(ServiceCatalog):
 
 
 class Commands(ServiceCommands):
-    def __init__(self) -> None:
+    def __init__(self, needs_base: bool = False) -> None:
+        self.needs_base = needs_base  # a request that is given a ``base`` is answered with a task body that has the base section
         self.calls: list[tuple[str, tuple[object, ...], dict[str, object]]] = []
 
     def define_service(self, actor: str, owner: str, name: str, **fields: object) -> str:
@@ -59,7 +60,8 @@ class Commands(ServiceCommands):
 
     def request(self, actor: str, service: str, inputs: object, **fields: object) -> Message:
         self.calls.append(("request", (actor, service, inputs), fields))
-        return Message(actor, "ceo", "task", "", budget=9, contract=2, playbook=3, service=service, id="req-1")
+        based = f"{BASE_HEADING}the version the client judged\n..." if self.needs_base and fields.get("base") else ""
+        return Message(actor, "ceo", "task", based, budget=9, contract=2, playbook=3, service=service, id="req-1")
 
     def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
         self.calls.append(("revise_playbook", (actor, service, content, reason, evidence), {}))
@@ -75,8 +77,8 @@ class Commands(ServiceCommands):
 
 
 def tools(agents: MemoryAgents | None = None, offered: dict[str, list[str]] | None = None, exists: bool = True,
-          reports: ScriptedReports | None = None, steps: ScriptedSteps | None = None) -> tuple[ServiceTools, Commands]:
-    agents, commands = agents or agents_in("ceo", "ceo/eng", "ops"), Commands()
+          reports: ScriptedReports | None = None, steps: ScriptedSteps | None = None, needs_base: bool = False) -> tuple[ServiceTools, Commands]:
+    agents, commands = agents or agents_in("ceo", "ceo/eng", "ops"), Commands(needs_base)
     roles = DirectoryServiceRoles(InstructionText(MemoryBinding(Path("/o"), exists=exists)), lambda: agents, lambda: agents, lambda: Catalog(offered or {}))
     return ServiceTools(
         roles, lambda: reports or ScriptedReports("SERVICES", {"req-1": "case total: 3 of 9"}), lambda: commands, lambda: HeldBudgets({"ceo": 5}),
@@ -155,6 +157,23 @@ def test_root_request_forwards_the_source_it_is_given() -> None:
     call(serve(group, ROOT), "request", service="brief", revises="old", source="human")
     call(serve(group, ROOT), "request", service="brief", revises="old")
     assert [c[2]["source"] for c in commands.calls] == ["human", None]  # no source: the sender stamps a root rework `relayed`
+
+
+def test_root_request_has_base_and_the_reply_says_what_it_did() -> None:
+    assert "base" in params_of(serve(tools()[0], ROOT), "request") and "base" not in params_of(serve(tools()[0], "ceo"), "request")
+    text = " ".join(described(serve(tools()[0], ROOT))["request"].split())
+    assert 'base (with revises and source="human"): "delivered" or "latest"' in text and "which version the user's corrections apply to" in text
+    assert "base" not in described(serve(tools()[0], "ceo"))["request"]
+    group, commands = tools(needs_base=True)
+    delivered = call(serve(group, ROOT), "request", service="brief", revises="old", source="human", base="delivered")
+    latest = call(serve(group, ROOT), "request", service="brief", revises="old", source="human", base="latest")
+    assert [c[2]["base"] for c in commands.calls] == ["delivered", "latest"]
+    assert delivered.endswith("\nbase delivered: the lead starts from the version the user judged.")
+    assert latest.endswith("\nbase latest: the changes of your own relayed rework stay in it: tell the user so.")
+    plain = call(serve(tools()[0], ROOT), "request", service="brief", revises="old", source="human", base="latest")
+    assert plain.endswith("\nbase: not needed (no relayed rework changed the delivery the user judged).")
+    unasked = call(serve(tools()[0], ROOT), "request", service="brief", revises="old", source="human")
+    assert "base" not in unasked
 
 
 def test_a_rework_also_states_the_case_total() -> None:

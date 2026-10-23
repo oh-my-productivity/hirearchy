@@ -33,6 +33,7 @@ from ._cap import playbook_word_cap
 __all__ = [
     "Admission",
     "AmendmentBasis",
+    "BASE_HEADING",
     "Contract",
     "ContractNormalizer",
     "Criterion",
@@ -82,6 +83,7 @@ FEEDBACK_HEADER = (
 LINK_HEADER = (
     "The client says what their rejection {confirms} was about, for reflection only: it does not change any task's acceptance criteria or outcome."
 )
+BASE_HEADING = "## Base: "  # the heading of the base section of a rework's task body (P4)
 JUDGED_BYTES = 6000  # bytes of the judged versions a rework's task body carries, in all (P4)
 EVIDENCE_MAX = 20  # ids a playbook revision may cite
 EVIDENCE_ID_MAX = 80  # characters of one cited id
@@ -404,14 +406,17 @@ class ServiceCommands(Protocol):
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",
         extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None,
-        source: str | None = None,
+        source: str | None = None, base: str | None = None,
     ) -> Message:
         """Ask one of ``actor``'s direct reports for its service ``service``: a task built from the contract.
 
         The task goes through the message sender like a delegation (same route, hops and budget rules, the reserve included). ``budget`` defaults
         to the contract's. ``extra_acceptance`` adds criteria after the contract's, which always travel unchanged. ``revises``: the id of an
         earlier request of this service to the same owner, to send it back. ``source`` (root only, with ``revises``): ``"human"`` when the user
-        asked for the rework, ``"relayed"`` (the default of a root rework) when it is root's own reading. The task carries ``service``,
+        asked for the rework, ``"relayed"`` (the default of a root rework) when it is root's own reading. ``base`` (root only, with ``revises``
+        and ``source="human"``): when a relayed rework changed an artifact after the delivery the client judged, the request is refused until it
+        says which version the user's corrections apply to, ``"delivered"`` (the task then carries the judged text and the lead starts from it) or
+        ``"latest"`` (the relayed changes stay); when none did, ``base`` is accepted and changes nothing. The task carries ``service``,
         ``contract`` and ``playbook`` (versions at this moment) in its frontmatter."""
         ...
 

@@ -257,6 +257,7 @@ class RecordingServiceCommands(ServiceCommands):
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",
         extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None, source: str | None = None,
+        base: str | None = None,
     ) -> Message:
         self._log.add("request", actor, service, inputs, title=title, note=note)
         return Message(actor, "lead", "task", "", title=title, budget=22, service=service, id=f"request-{len(self._log.of('request'))}")
@@ -361,10 +362,12 @@ class FlakyServiceCommands(ServiceCommands):
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str = "", note: str = "",
         extra_acceptance: Sequence[str] | None = None, budget: int | None = None, revises: str | None = None, source: str | None = None,
+        base: str | None = None,
     ) -> Message:
         self._request.check()
         return self._inner.request(
             actor, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance, budget=budget, revises=revises, source=source,
+            base=base,
         )
 
     def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:

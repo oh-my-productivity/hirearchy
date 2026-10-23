@@ -145,3 +145,86 @@ def test_lessons_are_optional_for_plain_tasks_and_kept_when_given(org):
     assert "## Lessons\nAnyway." in res.body
     other = org.delegate(ROOT, "ceo", "Plain 2", "g", "c", budget=2)
     assert "## Lessons" not in org.report("ceo", other.id, "done", "Done.").body
+
+
+# ---------------------------------------------------------------------------------------------- the base of a human rework (P4)
+MEMO = "ceo/work/memo.md"
+V1, V2 = "| Marta | 2026-10-14 |\n", "| Marta | none |\n"
+
+
+def deliver_memo(org, task, text, lessons="Worked."):
+    """The lead writes the memo and reports it as the artifact of ``task``."""
+    path = org.dir("ceo") / "work" / "memo.md"
+    path.parent.mkdir(exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    work(org, "ceo")
+    msg = org.report("ceo", task.id, "done", "Delivered.", artifacts=[str(path)], lessons=lessons)
+    org.end_run("ceo", ok=True)
+    return msg
+
+
+def relayed_change(org):
+    """The memo is delivered and rejected by the user; root's own rework (relayed) changes it. Returns (the first request, the relayed rework)."""
+    first = request(org)
+    deliver_memo(org, first, V1)
+    org.feedback(ROOT, first.id, "reject", "Marta's date is wrong.", source="human")
+    again = request(org, revises=first.id)  # no source: root's own reading
+    deliver_memo(org, again, V2)
+    return first, again
+
+
+def needs_base(first, again):
+    return (
+        f"refused: since the delivery the client judged (task {first.id}, result {{result}}), relayed rework {again.id} (your own reading, not the "
+        f"client's) changed {MEMO}. Say which version the user's corrections apply to: base=\"delivered\" (the lead restores the version they "
+        "judged, then applies their corrections) or base=\"latest\" (the relayed changes stay; tell the user) (CLI: --base delivered or --base latest). "
+        "Nothing was sent."
+    )
+
+
+def test_base_must_be_delivered_or_latest(svc):
+    first, again = relayed_change(svc)
+    sent = len(svc.sent(ROOT))
+    for bad in ("both", "", "Delivered"):
+        with pytest.raises(OrgError) as e:
+            request(svc, revises=first.id, source="human", base=bad)
+        assert str(e.value) == f'refused: base must be "delivered" or "latest": {bad}. Nothing was sent.'
+    assert len(svc.sent(ROOT)) == sent
+
+
+def test_base_goes_only_with_a_human_rework_by_root(svc):
+    where = (
+        'refused: base goes only with a rework the user asked for: revises=<an earlier request of this service>, source="human" '
+        "(CLI: --revises <task id> --source human). Nothing was sent."
+    )
+    first, again = relayed_change(svc)
+    sent = len(svc.sent(ROOT))
+    for kw in ({}, {"revises": first.id}, {"revises": first.id, "source": "relayed"}):
+        with pytest.raises(OrgError) as e:
+            request(svc, base="delivered", **kw)
+        assert str(e.value) == where
+    assert len(svc.sent(ROOT)) == sent
+
+
+def test_a_human_rework_after_relayed_changes_needs_a_base(svc):
+    first, again = relayed_change(svc)
+    sent = len(svc.sent(ROOT))
+    result = max(r.id for r in svc.messages(ROOT, "read", "inbox") if r.type == "result" and r.reply_to == first.id)
+    with pytest.raises(OrgError) as e:
+        request(svc, revises=first.id, source="human")
+    assert str(e.value) == needs_base(first, again).format(result=result)
+    assert len(svc.sent(ROOT)) == sent  # nothing was sent
+    kept = request(svc, revises=first.id, source="human", base="latest")
+    assert kept.source == "human" and kept.body.endswith("Keep those changes unless this request says otherwise.")
+    judged = request(svc, revises=first.id, source="human", base="delivered")
+    assert judged.source == "human" and "## Base: the version the client judged" in judged.body
+
+
+def test_a_base_when_none_is_needed_changes_nothing(svc):
+    first = request(svc)
+    deliver_memo(svc, first, V1)
+    svc.feedback(ROOT, first.id, "reject", "No.", source="human")
+    plain = request(svc, revises=first.id, source="human")  # no relayed rework: no base needed
+    assert "## Base: " not in plain.body
+    plain_with_base = request(svc, revises=first.id, source="human", base="delivered")
+    assert plain_with_base.body == plain.body and plain_with_base.source == "human"

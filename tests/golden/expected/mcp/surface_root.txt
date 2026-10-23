@@ -1011,6 +1011,18 @@ input: {
       ],
       "default": null,
       "title": "Source"
+    },
+    "base": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Base"
     }
   },
   "required": [
@@ -1044,6 +1056,10 @@ Ask a direct report for one of its services (see `services`): a task built from 
         source (with revises): "human" when the user asked for this rework
         (a rework after their own rejection, carrying their corrections, is one), "relayed" (the default) when it is your
         own reading; the owner sees which.
+        base (with revises and source="human"): "delivered" or "latest". When your own relayed rework changed a file after the
+        delivery the user judged, this is refused until you say which version the user's corrections apply to:
+        "delivered" (the lead restores the version they judged, then applies their corrections) or "latest" (your
+        relayed changes stay; tell the user).
         Returns the task id; the result comes back like any result, then rate it with `feedback`.
         
 

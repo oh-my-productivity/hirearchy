@@ -424,3 +424,81 @@ def test_apply_of_a_continued_name_is_refused(svc, capsys, surface, tmp_path):
     assert "refused: `weekly-brief` of ceo continues the retired service kept at .retired/ceo-" in got, got
     assert "Leave out playbook (CLI: --playbook) and the change of the criteria: give no acceptance" in got  # (the blueprint's criteria are not v1's either)
     assert svc.agents() == [] and svc.service_names("ceo") == []  # what the apply hired was retired again
+
+
+# ------------------------------------------------------------------------------------------------------------ P4: a human rework names its base (plan 7.3, commit 27)
+MEMO = "ceo/work/memo.md"
+
+
+def memo(org, task, text: str):
+    """The lead writes the memo and reports it as the artifact of ``task``."""
+    path = org.dir("ceo") / "work" / "memo.md"
+    path.parent.mkdir(exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    org.begin_run("ceo")
+    msg = org.report("ceo", task.id, "done", "Delivered.", artifacts=[str(path)], lessons="Worked.")
+    org.end_run("ceo", ok=True)
+    return msg
+
+
+def after_relayed_change(org):
+    """The user rejects the first delivery; root's own (relayed) rework changes the memo. Returns (the request, its judged result, the relayed rework)."""
+    first = request(org)
+    result = memo(org, first, "| Marta | 2026-10-14 |\n")
+    org.feedback(ROOT, first.id, "reject", "Marta's date is wrong.", source="human")
+    again = request(org, revises=first.id)
+    memo(org, again, "| Marta | none |\n")
+    return first, result, again
+
+
+def ask_on(org, surface: str, capsys, *, revises=None, source=None, base=None) -> tuple[bool, str]:
+    """root's ``request`` of ``weekly-brief`` on ``surface``: (refused, the reply or the refusal text)."""
+    fields = {k: v for k, v in dict(revises=revises, source=source, base=base).items() if v is not None}
+    try:
+        if surface == "mcp":
+            return False, call(build_server(org, ROOT), "request", service=SERVICE, inputs={"topic": "ai"}, **fields)
+        if surface == "cli":
+            args = ["request", SERVICE, "--input", "topic=ai"]
+            for key, value in fields.items():
+                args += [f"--{key}", value]
+            capsys.readouterr()
+            try:
+                cli(org, *args)
+            except SystemExit as stop:
+                return True, capsys.readouterr().err + ("" if stop.code in (None, 0, 1) else f"(exit {stop.code})")
+            return False, capsys.readouterr().out
+        return False, org.request(ROOT, SERVICE, {"topic": "ai"}, **fields).id
+    except Exception as error:  # noqa: BLE001  (an MCP tool error and an OrgError are both a refusal)
+        return True, str(error)
+
+
+@pytest.mark.parametrize("surface", SURFACES)
+def test_p4_refusals_on_every_surface(svc, capsys, surface):
+    """P4-NEEDS-BASE and P4-BASE-WHERE are refused with the same text on the MCP tool, the CLI and the facade; P4-BASE-VALUE on the MCP tool and the
+    facade (the CLI's choices refuse a bad value first, exit 2). Nothing is sent by any of them; a named base is admitted."""
+    first, result, again = after_relayed_change(svc)
+    sent, inbox = len(svc.sent(ROOT)), len(svc.messages("ceo", "inbox"))
+    needs = (
+        f"refused: since the delivery the client judged (task {first.id}, result {result.id}), relayed rework {again.id} (your own reading, not the "
+        f"client's) changed {MEMO}. Say which version the user's corrections apply to: base=\"delivered\" (the lead restores the version they "
+        "judged, then applies their corrections) or base=\"latest\" (the relayed changes stay; tell the user) (CLI: --base delivered or --base latest). "
+        "Nothing was sent."
+    )
+    where = (
+        'refused: base goes only with a rework the user asked for: revises=<an earlier request of this service>, source="human" '
+        "(CLI: --revises <task id> --source human). Nothing was sent."
+    )
+    refused_, text = ask_on(svc, surface, capsys, revises=first.id, source="human")
+    assert refused_ and needs in text
+    refused_, text = ask_on(svc, surface, capsys, revises=first.id, source="relayed", base="delivered")
+    assert refused_ and where in text
+    refused_, text = ask_on(svc, surface, capsys, base="latest")
+    assert refused_ and where in text
+    refused_, text = ask_on(svc, surface, capsys, revises=first.id, source="human", base="both")
+    if surface == "cli":
+        assert refused_ and "invalid choice: 'both'" in text and "(exit 2)" in text
+    else:
+        assert refused_ and 'refused: base must be "delivered" or "latest": both. Nothing was sent.' in text
+    assert (len(svc.sent(ROOT)), len(svc.messages("ceo", "inbox"))) == (sent, inbox)
+    refused_, text = ask_on(svc, surface, capsys, revises=first.id, source="human", base="delivered")
+    assert not refused_ and len(svc.sent(ROOT)) == sent + 1

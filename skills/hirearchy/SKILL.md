@@ -81,8 +81,8 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 - What happened, why something failed or took long, or what it cost: use `observe` (read-only), never guesses: `view="trace"` with
   the task id (every message, run, tool call, refusal; queue/run/wait times), `"now"`, `"metrics"`, `"events"` + `errors_only=True`.
 - Never edit the org's artifacts to "fix" them: send the work back with `delegate(to=<top agent>, title=..., goal=<required changes>,
-  acceptance=<the criteria, verbatim>, revises=<task id>)`, or ask the user. If `progress` says the scheduler is stopped
-  ("finished") and you sent more work, call `start()` again. Pass source="human" only on a rework the user asked for (the default is relayed).
+  acceptance=<the criteria, verbatim>, revises=<task id>)` (a service request: `request(service, inputs, revises=<task id>)`), or ask the user. If `progress` says the scheduler is stopped
+  ("finished") and you sent more work, call `start()` again. Pass source="human" only on a rework the user asked for (the default is relayed); if a relayed rework changed the file after their verdict, also base="delivered" (what they judged) or base="latest" (say so).
 
 ## 5. Finish
 1. Read the final deliverable and check it yourself against EVERY acceptance criterion (counts, sections, URLs, tests run).

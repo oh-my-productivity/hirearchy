@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..kernel import Message
-from .api import Contract, Criterion
+from .api import Contract, Criterion, JudgedBase
 
 
 @runtime_checkable
@@ -98,9 +98,13 @@ class ContractAmendment(Protocol):
 
 @runtime_checkable
 class RequestBodies(Protocol):
-    def body(self, contract: Contract, criteria: Sequence[Criterion], given: Mapping[str, str], extra: Sequence[str], note: str) -> str:
+    def body(
+        self, contract: Contract, criteria: Sequence[Criterion], given: Mapping[str, str], extra: Sequence[str], note: str,
+        base: tuple[str, JudgedBase | None] | None = None,
+    ) -> str:
         """The body of a request: goal, the inputs given, the acceptance criteria (the contract's ``criteria`` with their ids, then ``extra``
-        without), the deliverable, the note."""
+        without), the deliverable, the note and, last, the base of a human rework (``base``: ``"delivered"`` or ``"latest"`` with what was found;
+        no section when nothing was found)."""
         ...
 
 
@@ -142,7 +146,7 @@ class PlaybookRevisions(Protocol):
 class ServiceRequests(Protocol):
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str, note: str,
-        extra_acceptance: Sequence[str] | None, budget: int | None, revises: str | None, source: str | None,
+        extra_acceptance: Sequence[str] | None, budget: int | None, revises: str | None, source: str | None, base: str | None,
     ) -> Message:
         """Ask for a service (see ``ServiceCommands.request``)."""
         ...

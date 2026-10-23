@@ -1443,9 +1443,14 @@
      "name": "source",
      "kind": "KEYWORD_ONLY",
      "default": "None"
+    },
+    {
+     "name": "base",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
     }
    ],
-   "annotated": "(self, actor: 'str', service: 'str', inputs: 'Mapping[str, object] | None', *, title: 'str' = '', note: 'str' = '', extra_acceptance: 'Sequence[str] | None' = None, budget: 'int | None' = None, revises: 'str | None' = None, source: 'str | None' = None) -> 'Message'"
+   "annotated": "(self, actor: 'str', service: 'str', inputs: 'Mapping[str, object] | None', *, title: 'str' = '', note: 'str' = '', extra_acceptance: 'Sequence[str] | None' = None, budget: 'int | None' = None, revises: 'str | None' = None, source: 'str | None' = None, base: 'str | None' = None) -> 'Message'"
   },
   "require": {
    "kind": "method",

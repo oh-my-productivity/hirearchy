@@ -11,7 +11,7 @@ from ..delivery import MessageDelivery
 from ..dispatch import MessageSender, ReworkContext
 from ..kernel import AtomicWriter, Clock, EventSink, OrgLayout
 from ..mail import MailboxReader
-from ..services import ContractNormalizer, ServiceCatalog, ServiceCommands, ServiceEvidence, ServiceHints, ServiceStore
+from ..services import ContractNormalizer, JudgedVersions, ServiceCatalog, ServiceCommands, ServiceEvidence, ServiceHints, ServiceStore
 from ..services._amend import ContractAmender
 from ..services._catalog import ContractServiceCatalog
 from ..services._commands import RuleServiceCommands
@@ -59,6 +59,6 @@ def _commands(b: Builder) -> ServiceCommands:
         ),
         RuleServiceRetirement(agents, catalog, store, owners, delivery, clock, events, b.get(ServiceEvidence)),
         RulePlaybookReviser(agents, catalog, texts, playbooks, delivery, b.get(ServiceEvidence)),
-        RuleServiceRequester(agents, catalog, mail, TextRequestBodies(), sender),
+        RuleServiceRequester(agents, catalog, mail, TextRequestBodies(), sender, b.get(JudgedVersions)),
         RuleClientFeedback(agents, mail, sender, b.get(ServiceEvidence), store),
     )

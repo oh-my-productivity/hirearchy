@@ -68,6 +68,9 @@ def test_the_skill_records_the_answer_with_define_service_and_names_the_base():
         "at the terminal, `--criterion` on a reject records the answer",
         "withholds the path",  # K2 (design 8.2, C2): progress withholds the artifact path while the client's questions are open
         "did not deliver as checked",  # K3 (design 8.2, C5): progress, status and whoami name the files there the team did not deliver as checked
+        'base="delivered"',  # K1 (design 8.2, D3): a human rework after a relayed one names the version the user judged
+        'base="latest"',
+        "request(service, inputs, revises=<task id>)",
         "`define_service(owner, name, add_acceptance=[<the new criterion>])`",
         "the resulting criteria",
         "never edit service.md or playbook.md yourself",

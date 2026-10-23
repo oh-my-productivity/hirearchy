@@ -10,7 +10,7 @@ from ..agents import AgentDirectory, CharterReader
 from ..budget import BudgetQuery
 from ..kernel import ROOT, Message, OrgError, Provider, parent
 from ..reflection import ServiceReports, ServiceSteps
-from ..services import ServiceCatalog, ServiceCommands
+from ..services import BASE_HEADING, ServiceCatalog, ServiceCommands
 from ._ports import ServiceRoles, SetupMode, ToolGroup
 
 if TYPE_CHECKING:
@@ -222,12 +222,23 @@ class ServiceTools(ToolGroup):
             msg = self._commands().feedback(me, task_id, verdict, note)
             return f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}); it does not wake {msg.to}"
 
-    def _requested(self, me: str, msg: Message, service: str, revises: str | None) -> str:
+    def _requested(self, me: str, msg: Message, service: str, revises: str | None, base: str | None = None) -> str:
         tail = "Call start() if the scheduler is not running." if me == ROOT else f"Your budget is now {self._budgets().budget(me)}."
         total = self._reports().case_total(msg) if revises else ""
         asked = _step(lambda: self._steps().rework_step(msg)) if revises and me == ROOT else ""  # a relayed rework repeats the client questions
         return (f"requested service `{service}` from {msg.to}: task {msg.id}, budget {msg.budget} "
-                f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}" + (f"\n{total}" if total else "") + asked)
+                f"(contract v{msg.contract}, playbook v{msg.playbook}). {tail}" + (f"\n{total}" if total else "") + asked + self._based(msg, base))
+
+    @staticmethod
+    def _based(msg: Message, base: str | None) -> str:
+        """What the base the caller named did (the task body has the base section only when a relayed rework changed what the user judged)."""
+        if base is None:
+            return ""
+        if BASE_HEADING not in msg.body:
+            return "\nbase: not needed (no relayed rework changed the delivery the user judged)."
+        if base == "delivered":
+            return "\nbase delivered: the lead starts from the version the user judged."
+        return "\nbase latest: the changes of your own relayed rework stay in it: tell the user so."
 
     def _register_root_request(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
@@ -240,6 +251,7 @@ class ServiceTools(ToolGroup):
             budget: int | None = None,
             revises: str | None = None,
             source: str | None = None,
+            base: str | None = None,
         ) -> str:
             """Ask a direct report for one of its services (see `services`): a task built from the contract.
 
@@ -251,11 +263,15 @@ class ServiceTools(ToolGroup):
         source (with revises): "human" when the user asked for this rework
         (a rework after their own rejection, carrying their corrections, is one), "relayed" (the default) when it is your
         own reading; the owner sees which.
+        base (with revises and source="human"): "delivered" or "latest". When your own relayed rework changed a file after the
+        delivery the user judged, this is refused until you say which version the user's corrections apply to:
+        "delivered" (the lead restores the version they judged, then applies their corrections) or "latest" (your
+        relayed changes stay; tell the user).
         Returns the task id; the result comes back like any result, then rate it with `feedback`.
         """
             msg = self._commands().request(me, service, inputs, title=title, note=note, extra_acceptance=extra_acceptance,
-                                           budget=budget, revises=revises, source=source)
-            return self._requested(me, msg, service, revises)
+                                           budget=budget, revises=revises, source=source, base=base)
+            return self._requested(me, msg, service, revises, base)
 
     def _register_agent_request(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()

@@ -152,6 +152,13 @@ def test_org_define_service_passes_answers_about_and_words(org: Org) -> None:
     assert [(c[2]["answers"], c[2]["about"], c[2]["words"]) for c in fake.calls] == [("M1", "C2", "Yes, add it."), (None, None, "Add it, please.")]
 
 
+def test_org_request_passes_base(org: Org) -> None:
+    fake = Commands()
+    use(org, service_commands=fake)
+    assert org.request("root", "x", {"topic": "ai"}, revises="R", source="human", base="delivered").id == "REQUESTED"
+    assert fake.calls[0][2]["base"] == "delivered"
+
+
 def test_the_other_commands_come_from_the_commands_of_the_runtime(org: Org) -> None:
     fake = Commands()
     use(org, service_commands=fake)
@@ -163,8 +170,8 @@ def test_the_other_commands_come_from_the_commands_of_the_runtime(org: Org) -> N
     assert org.feedback("root", "T1", "reject", "yes", source="human", criterion=["C1"], confirms="M1").id == "RATED"
     assert fake.calls == [
         ("retire_service", ("root", "ceo", "x", "why"), {}),
-        ("request", ("root", "x", {"topic": "ai"}), {"title": "T", "note": "N", "extra_acceptance": ["e"], "budget": 3, "revises": "R", "source": "human"}),
-        ("request", ("root", "x", None), {"title": "", "note": "", "extra_acceptance": None, "budget": None, "revises": None, "source": None}),
+        ("request", ("root", "x", {"topic": "ai"}), {"title": "T", "note": "N", "extra_acceptance": ["e"], "budget": 3, "revises": "R", "source": "human", "base": None}),
+        ("request", ("root", "x", None), {"title": "", "note": "", "extra_acceptance": None, "budget": None, "revises": None, "source": None, "base": None}),
         ("revise_playbook", ("ceo", "x", "content", "reason", ["R1"]), {}),
         ("feedback", ("root", "T1", "reject", "words"), {"source": None, "criterion": None, "confirms": None}),
         ("feedback", ("root", "T1", "accept", ""), {"source": None, "criterion": None, "confirms": None}),

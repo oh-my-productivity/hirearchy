@@ -339,9 +339,10 @@ def memory_store(tmp_path: Path) -> StoreHarness:
 
 def _world(
     d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
-    delivery: Callable[[MessageDelivery], MessageDelivery] | None = None,
+    delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, judged: JudgedVersions | None = None,
 ) -> ServicesWorld:
-    """``links`` and ``delivery`` wrap the link writer and the delivery of the runtime's notes (a write that fails, a call that is watched)."""
+    """``links`` and ``delivery`` wrap the link writer and the delivery of the runtime's notes (a write that fails, a call that is watched);
+    ``judged`` is the base a human rework is checked against (``NoJudgedVersions``: none needs one)."""
     places, store = harness.places, harness.store
     gate = evidence or AdmittingServiceEvidence()
     link_notes: LinkNotes = SenderLinkNotes(d.sender)
@@ -360,7 +361,7 @@ def _world(
         ),
         RuleServiceRetirement(d.agents, catalog, store, owners, notes, d.clock, events, gate),
         RulePlaybookReviser(d.agents, catalog, texts, playbooks, notes, gate),
-        RuleServiceRequester(d.agents, catalog, d.mail, TextRequestBodies(), d.sender),
+        RuleServiceRequester(d.agents, catalog, d.mail, TextRequestBodies(), d.sender, judged or NoJudgedVersions()),
         RuleClientFeedback(d.agents, d.mail, d.sender, gate, store),
     )
     return ServicesWorld(
@@ -374,16 +375,17 @@ def _world(
 def fs_world(
     tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
     delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, writer: Callable[[AtomicWriter], AtomicWriter] | None = None,
+    judged: JudgedVersions | None = None,
 ) -> ServicesWorld:
     """``writer`` wraps the atomic writer of the store (a write that fails)."""
-    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path, writer), evidence, links, delivery)
+    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path, writer), evidence, links, delivery, judged)
 
 
 def memory_world(
     tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
-    delivery: Callable[[MessageDelivery], MessageDelivery] | None = None,
+    delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, judged: JudgedVersions | None = None,
 ) -> ServicesWorld:
-    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence, links, delivery)
+    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence, links, delivery, judged)
 
 
 def fs_rework(tmp_path: Path) -> ReworkContext:

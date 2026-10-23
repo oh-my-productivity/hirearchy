@@ -102,7 +102,7 @@ def test_request_turns_the_inputs_into_a_mapping(tmp_path: Path) -> None:
        "--title", "Weekly", "--note", "Please.", "--budget", "3", "--revises", "r-0")
     assert f.session.calls == [("open", True)]
     assert services.last("request") == (("root", "weekly", {"topic": "tests", "k": " a=b"}),
-                                        {"title": "Weekly", "note": "Please.", "budget": 3, "revises": "r-0", "source": "human"})
+                                        {"title": "Weekly", "note": "Please.", "budget": 3, "revises": "r-0", "source": "human", "base": None})
     assert office.last("commit") == (("root: request r-1 -> ceo",), {})
     assert f.out.stdout == "request r-1 -> ceo (service weekly, budget 3)\n"
 
@@ -121,6 +121,20 @@ def test_request_source_relayed_is_passed(tmp_path: Path) -> None:
     assert services.last("request")[1]["source"] == "relayed"
     with pytest.raises(SystemExit):
         go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly", "--source", "assistant")
+
+
+def test_request_passes_base(tmp_path: Path) -> None:
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    command = RequestCommand(f.session, lambda: services, lambda: office, f.out)
+    go(command, "request", "weekly", "--revises", "r-0", "--base", "delivered")
+    assert services.last("request")[1]["base"] == "delivered" and services.last("request")[1]["source"] == "human"
+    assert f.out.stdout == "request r-1 -> ceo (service weekly, budget 4, base delivered)\n"
+    go(command, "request", "weekly", "--revises", "r-0", "--base", "latest")
+    assert services.last("request")[1]["base"] == "latest"
+    go(command, "request", "weekly", "--revises", "r-0")
+    assert services.last("request")[1]["base"] is None and f.out.stdout.endswith("request r-1 -> ceo (service weekly, budget 4)\n")
+    with pytest.raises(SystemExit):
+        go(command, "request", "weekly", "--revises", "r-0", "--base", "both")  # the parser refuses a value that is neither
 
 
 def test_an_input_without_an_equals_sign_is_refused_before_anything_is_asked(tmp_path: Path) -> None:

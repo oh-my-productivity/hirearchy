@@ -108,6 +108,8 @@ class RequestCommand(Command):
         s.add_argument("--budget", type=int, help="runs handed down (default: the contract's)")
         s.add_argument("--revises", metavar="TASK_ID", help="send back an earlier request of this service for rework")
         s.add_argument("--source", choices=("human", "relayed"), help="who asked for a rework (--revises): human (you, the default) or relayed")
+        s.add_argument("--base", choices=("delivered", "latest"), help="which version a rework you asked for starts from, when the team's own rework changed the "
+                                                                        "delivery you judged: delivered (what you judged) or latest")
         s.set_defaults(fn=self.run)
 
     def run(self, args: Arguments) -> None:
@@ -120,9 +122,10 @@ class RequestCommand(Command):
             inputs[key.strip()] = value
         source = args.source or ("human" if args.revises else None)  # the human typed it; a fresh request is not stamped
         msg = self._commands().request(ROOT, args.service, inputs, title=args.title, note=args.note, budget=args.budget, revises=args.revises,
-                                       source=source)
+                                       source=source, base=args.base)
         self._snapshots().commit(f"root: request {msg.id} -> {msg.to}")
-        self._out.say(f"request {msg.id} -> {msg.to} (service {msg.service}, budget {msg.budget})")
+        based = f", base {args.base}" if args.base else ""
+        self._out.say(f"request {msg.id} -> {msg.to} (service {msg.service}, budget {msg.budget}{based})")
 
 
 class FeedbackCommand(Command):
