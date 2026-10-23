@@ -41,6 +41,15 @@ def test_root_instructions_carry_the_workflow_and_the_safety_lines() -> None:
         assert needle in ROOT_INSTRUCTIONS, needle
 
 
+def test_root_instructions_name_the_skill_and_the_reject_order() -> None:
+    """E4's s1r root never loaded the skill and amended before the reject was rated: the instructions say both, in one line each."""
+    for needle in ("activate the hirearchy skill",
+                   "On a reject: `feedback` first, then ONE yes/no question naming an id, then the change",
+                   "send it back with\n   `request`/`delegate(..., revises=...)`",
+                   "(no other paths or ORG_ROOT)"):
+        assert needle in ROOT_INSTRUCTIONS, needle
+
+
 def test_the_setup_state_is_what_whoami_and_status_say_before_an_organization_exists() -> None:
     bound = InstructionText(MemoryBinding(Path("/o")))
     assert bound.active() and bound.state() == (
