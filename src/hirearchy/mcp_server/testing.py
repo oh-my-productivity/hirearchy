@@ -415,9 +415,8 @@ class ScriptedReports(ServiceReports):
 class ScriptedSteps(ServiceSteps):
     """The next-step texts a test puts in; with ``raises`` set, every step raises it (the reading of the cases or the mail failed)."""
 
-    def __init__(self, feedback: str = "", amendment: str = "", rework: str = "", raises: BaseException | None = None) -> None:
+    def __init__(self, feedback: str = "", rework: str = "", raises: BaseException | None = None) -> None:
         self.feedback = feedback
-        self.amendment = amendment
         self.rework = rework
         self.raises = raises
         self.asked: list[tuple[str, ...]] = []
@@ -427,12 +426,6 @@ class ScriptedSteps(ServiceSteps):
         if self.raises is not None:
             raise self.raises
         return self.feedback
-
-    def amendment_step(self, owner: str, service: str) -> str:
-        self.asked.append(("amendment", owner, service))
-        if self.raises is not None:
-            raise self.raises
-        return self.amendment
 
     def rework_step(self, task: Message) -> str:
         self.asked.append(("rework", task.id))

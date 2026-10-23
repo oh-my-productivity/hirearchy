@@ -1,7 +1,7 @@
-"""``TextServiceSteps``: what root is told to do next after it recorded a rejection, and after it amended a contract (design 3.4, DR-19, DR-27).
+"""``TextServiceSteps``: what root is told to do next after it recorded a rejection, and after it sent a rework (design 3.4, 5.6, DR-19).
 
-The user's yes is what makes a link the client's, so both texts name the one question to ask and the one call that records the answer; they are
-advice and never write anything."""
+The user's yes is what makes a link the client's, so the rejection's text names the one question to ask and the calls that record the answer; they
+are advice and never write anything. No step follows an amendment: the gate refuses one that does not carry the user's words."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from hirearchy.kernel import Message, OrgError, clip_line
+from hirearchy.kernel import Message, clip_line
 from hirearchy.reflection.testing import ReflectionWorld, fs_world, memory_world
 
 from ._support import SERVICE, amend_legacy, ask, define, deliver, nested, note_on, populated, rate
@@ -39,11 +39,6 @@ FORM_NONE = (
     'criterion=["none"], ["R<j>"] or ["C<k>"], source="human", note="<their answer, verbatim>").'
 )
 REPEAT = '; for a repeat: "Same as R<j>: a one-off? Yes or no.", with R<j> one of {rejections}'
-NOT_YET = (
-    'Rejection {rejection} (message {note}) has no recorded yes. The yes is the user\'s answer to your ONE yes/no question naming {names}; an "Always ..." '
-    'in the rejection is not it. If you have not asked that question, ask it now and record nothing. Only after they answer yes: '
-    'feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=[{quoted}], source="human", note="<their answer, verbatim>").'
-)
 
 
 @pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
@@ -169,62 +164,31 @@ def test_feedback_step_is_empty_for_a_note_it_cannot_place(w: ReflectionWorld) -
     assert w.steps.feedback_step(Message(sender="root", to="ceo", type="note", body="x", feedback="reject", source="human", reply_to=plain.id)) == ""
 
 
-# ------------------------------------------------------------------------------ amendment_step
+# ------------------------------------------------------------------------------ no step before the yes
 
 
-def test_amendment_step_after_an_unconfirmed_reject(w: ReflectionWorld) -> None:
-    task, note = rejected(w, "Needs a week.")
-    amend(w, add_acceptance=["Names the week it covers", "Ends with one open question"])  # C3 and C4
-    assert w.steps.amendment_step("ceo", SERVICE) == "Not client-confirmed: C3, C4. " + NOT_YET.format(
-        rejection="R1", note=note.id, task=task.id, names="C3, C4", quoted='"C3", "C4"',
-    )
-
-
-def test_amendment_step_after_a_confirmed_reject_says_only_not_confirmed(w: ReflectionWorld) -> None:
-    task, note = rejected(w, "Needs a source.")
-    note_on(w, task, reply_to=note.id, criterion="C1", source="human")  # the latest rejection already has the user's answer
-    amend(w, add_acceptance=["Ends with one open question"])
-    assert w.steps.amendment_step("ceo", SERVICE) == "Not client-confirmed: C3."
-
-
-def test_amendment_step_after_a_none_answer_says_only_not_confirmed(w: ReflectionWorld) -> None:
-    task, note = rejected(w, "Only this once.")
-    note_on(w, task, reply_to=note.id, criterion="none", source="human")
-    amend(w, add_acceptance=["Ends with one open question"])
-    assert w.steps.amendment_step("ceo", SERVICE) == "Not client-confirmed: C3."
-
-
-def test_amendment_step_names_the_latest_rejection(w: ReflectionWorld) -> None:
+@pytest.mark.parametrize(
+    "criterion", [None, ["none"], ["C9"], ["C1"], ["R1"], ["C2", "R1"]],
+    ids=["no-reading", "none", "an-id-the-service-lacks", "ck", "rj", "the-first-valid-one"],
+)
+def test_no_text_names_a_yes_before_the_answer(w: ReflectionWorld, criterion: list[str] | None) -> None:
+    """Whatever root's reading, the step asks the question first and says the contract changes only with the answer (``answers=<this rejection>``);
+    nothing names a "yes" that is not recorded, and the old texts are gone."""
     rejected(w, "First.", topic="a")
-    task, latest = rejected(w, "Second.", topic="b")
-    amend(w, add_acceptance=["Names the week it covers"])
-    text = w.steps.amendment_step("ceo", SERVICE)
-    assert f"Rejection R2 (message {latest.id}) has no recorded yes." in text and f'task_id="{task.id}"' in text
+    task, note = rejected(w, "Second.", topic="b", **({"criterion": criterion} if criterion else {}))
+    text = w.steps.feedback_step(note)
+    assert 'Change nothing in this turn: an "always ..." in the rejection is not their yes.' in text
+    assert f'confirms="{note.id}"' in text and f'task_id="{task.id}"' in text
+    for gone in ("Not client-confirmed", "has no recorded yes", "Only after their yes", "Next, before define_service"):
+        assert gone not in text
+    assert "answers=" in text  # every form can end in define_service(answers=...)
 
 
-def test_amendment_step_names_only_what_the_latest_version_added(w: ReflectionWorld) -> None:
-    rejected(w)
-    amend(w, add_acceptance=["Names the week it covers"])  # v2: C3
-    amend(w, add_acceptance=["Ends with one open question"])  # v3: C4
-    assert w.steps.amendment_step("ceo", SERVICE).startswith("Not client-confirmed: C4. Rejection R1 ")
-
-
-def test_amendment_step_is_empty_outside_a_rejection_or_when_everything_is_confirmed(w: ReflectionWorld) -> None:
-    amend(w, add_acceptance=["Names the week it covers"])  # no rejection at all: DR-27, the user's own amendment gets no step
-    assert w.steps.amendment_step("ceo", SERVICE) == ""
-    task, note = rejected(w, "No question.")
-    amend(w, add_acceptance=["Ends with one open question"])  # C4, after a rejection
-    assert w.steps.amendment_step("ceo", SERVICE) != ""
-    note_on(w, task, reply_to=note.id, criterion="C4", source="human")  # the user said yes to it
-    assert w.steps.amendment_step("ceo", SERVICE) == ""
-    amend(w, budget=12)  # nothing added
-    assert w.steps.amendment_step("ceo", SERVICE) == ""
-    assert w.steps.amendment_step("ceo", "no-such-service") == ""  # a service without a contract
-
-
-def test_amendment_step_refuses_an_unknown_owner(w: ReflectionWorld) -> None:
-    with pytest.raises(OrgError, match="no such agent: ghost"):
-        w.steps.amendment_step("ghost", SERVICE)
+def test_an_answered_amendment_needs_no_further_step(w: ReflectionWorld) -> None:
+    """After define_service(answers=...) the product's link is a note, not a verdict: it gets no step, and there is no amendment step to ask."""
+    task, note = rejected(w)
+    link = note_on(w, task, reply_to=note.id, source="human", criterion="C1")
+    assert w.steps.feedback_step(link) == "" and not hasattr(w.steps, "amendment_step")
 
 
 # ------------------------------------------------------------------------------ rework_step

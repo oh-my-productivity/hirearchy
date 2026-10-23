@@ -1,4 +1,4 @@
-"""What root does next after a rejection or an amendment: the one question to ask the user, and the call that records their yes."""
+"""What root does next after a rejection or a rework: the one question to ask the user, and the calls that record their answer."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from collections.abc import Sequence
 from ..kernel import Message, client_questions, clip_line, latest_results, link_ids, verdict_tier
 from ..mail import MailboxReader
 from ..services import ServiceCatalog
-from .api import CaseHistory, ServiceSteps, confirmed_criteria, regressions
+from .api import CaseHistory, ServiceSteps, regressions
 
 ASK_C = 'About {id}: add "<the rule, in their words>" as a lasting rule? Yes or no.'
 ASK_R = "Same as {id}: a one-off? Yes or no."
@@ -35,11 +35,6 @@ STEP_NONE = (  # no reading: the question names the id root chooses now
     'criterion=["none"], ["R<j>"] or ["C<k>"], source="human", note="<their answer, verbatim>").'
 )
 REPEAT = '; for a repeat: "Same as R<j>: a one-off? Yes or no.", with R<j> one of {rejections}'
-NO_YES_YET = (
-    'Rejection {rejection} (message {note}) has no recorded yes. The yes is the user\'s answer to your ONE yes/no question naming {names}; an '
-    '"Always ..." in the rejection is not it. If you have not asked that question, ask it now and record nothing. Only after they answer yes: '
-    'feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=[{quoted}], source="human", note="<their answer, verbatim>").'
-)
 REWORK = (
     "{revised}'s result asked the client: {questions}. Ask the user these questions, unless the user asked for this change: "
     "a rework does not answer them."
@@ -65,7 +60,7 @@ def question_for(note: Message, criteria: Sequence[str], earlier: Sequence[str])
 
 
 class TextServiceSteps(ServiceSteps):
-    """Reads the rejection (or the contract) and the cases of its service; the rejections are numbered service-wide, as ``services`` numbers them."""
+    """Reads the rejection and the cases of its service; the rejections are numbered service-wide, as ``services`` numbers them."""
 
     def __init__(self, agents: AgentDirectory, catalog: ServiceCatalog, history: CaseHistory, mail: MailboxReader) -> None:
         self._agents = agents
@@ -94,28 +89,6 @@ class TextServiceSteps(ServiceSteps):
             repeat = REPEAT.format(rejections=", ".join(earlier)) if earlier else ""
             step = STEP_NONE.format(criteria=", ".join(criteria) or "none", repeat=repeat, **ids)
         return f"{own}This rejection is {mine.id}. " + step
-
-    def amendment_step(self, owner: str, service: str) -> str:
-        owner = self._agents.require(owner)
-        contract = self._catalog.read_contract(owner, service)
-        if contract is None:
-            return ""
-        cases = self._history.cases(owner, service)
-        criteria = self._catalog.criteria(owner, service)
-        confirmed = confirmed_criteria(cases, criteria)
-        added = [c.id for c in criteria if c.current and c.amended and c.since == contract.version and c.id not in confirmed]
-        if not added:
-            return ""
-        latest = max(regressions(cases), key=lambda a: a.verdict.message.id, default=None)
-        if latest is None:
-            return ""  # an amendment outside any rejection gets no step: nothing records the user's yes to it
-        head = f"Not client-confirmed: {', '.join(added)}."
-        if latest.link in ("confirmed", "none"):
-            return head  # the latest rejection already has the user's answer
-        return f"{head} " + NO_YES_YET.format(
-            rejection=latest.id, note=latest.verdict.message.id, names=", ".join(added), task=latest.verdict.task_id,
-            quoted=", ".join(f'"{x}"' for x in added),
-        )
 
     def rework_step(self, task: Message) -> str:
         if task.type != "task" or task.source != "relayed" or not task.revises:

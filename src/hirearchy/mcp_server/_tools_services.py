@@ -129,12 +129,11 @@ class ServiceTools(ToolGroup):
         request, verbatim> alone (never admits a playbook revision). Every delivered request of the service needs its
         verdict first.
         """
-            reply = self._commands().define_service(
+            return self._commands().define_service(
                 me, owner, name, description=description, inputs=inputs, acceptance=acceptance,
                 deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,
                 add_acceptance=add_acceptance, remove_acceptance=remove_acceptance, answers=answers, about=about, words=words,
             )
-            return reply + _step(lambda: self._steps().amendment_step(owner, name))  # what records the user's yes is for root alone
 
     def _register_agent_define(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()

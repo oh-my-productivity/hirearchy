@@ -217,7 +217,6 @@ def test_the_agents_feedback_passes_nothing_but_the_verdict() -> None:
 # ------------------------------------------------------------------------------ the next step, at the point of action (root only)
 
 FEEDBACK_STEP = "NEXT: ask the user one question naming R1."
-AMENDMENT_STEP = "Not client-confirmed: C3. NEXT: ask the user."
 REWORK_STEP = "old's result asked the client: Keep Marta's row?. Ask the user these questions, unless the user asked for this change: a rework does not answer them."
 
 
@@ -242,17 +241,17 @@ def test_the_confirmation_receipt_carries_no_step() -> None:
     assert out == "recorded: rejection m-9 is about C1 (source human; message fb-1); it does not wake ceo" and steps.asked == []
 
 
-def test_root_define_service_reply_carries_the_amendment_step() -> None:
-    steps = ScriptedSteps(amendment=AMENDMENT_STEP)
+def test_root_define_service_reply_has_no_step() -> None:
+    """An amendment can no longer precede the user's yes (the gate refuses it), so root is told nothing to do next: the reply is the service's own."""
+    steps = ScriptedSteps(feedback=FEEDBACK_STEP, rework=REWORK_STEP)
     group, _ = tools(steps=steps)
     out = call(serve(group, ROOT), "define_service", owner="ceo", name="brief", add_acceptance=["x"])
-    assert out == f"defined brief\n{AMENDMENT_STEP}" and steps.asked == [("amendment", "ceo", "brief")]
-    assert call(serve(tools(steps=ScriptedSteps())[0], ROOT), "define_service", owner="ceo", name="brief", add_acceptance=["x"]) == "defined brief"
+    assert out == "defined brief" and steps.asked == []
 
 
 @pytest.mark.parametrize("error", [OrgError("the cases cannot be read"), OSError("disk")], ids=["OrgError", "OSError"])
 def test_a_failing_step_never_fails_the_call(error: BaseException) -> None:
-    group, commands = tools(steps=ScriptedSteps(feedback=FEEDBACK_STEP, amendment=AMENDMENT_STEP, raises=error))
+    group, commands = tools(steps=ScriptedSteps(feedback=FEEDBACK_STEP, raises=error))
     server = serve(group, ROOT)
     out = call(server, "feedback", task_id="t1", verdict="reject", note="No.", source="human", criterion=["C1"])
     assert out == "feedback reject recorded on t1 for ceo (message fb-1, source human, about C1 (not confirmed)); it does not wake ceo"
@@ -264,11 +263,11 @@ def test_a_bug_in_a_step_is_not_hidden() -> None:
     group, commands = tools(steps=ScriptedSteps(raises=ValueError("a bug in the step text")))
     server = serve(group, ROOT)
     assert "a bug in the step text" in fails(server, "feedback", task_id="t1", verdict="reject", note="No.", source="human", criterion=["C1"])
-    assert "a bug in the step text" in fails(server, "define_service", owner="ceo", name="brief", add_acceptance=["x"])
+    assert call(server, "define_service", owner="ceo", name="brief", add_acceptance=["x"]) == "defined brief"  # no step is asked after an amendment
 
 
 def test_an_agent_clients_replies_carry_no_step() -> None:
-    steps = ScriptedSteps(feedback=FEEDBACK_STEP, amendment=AMENDMENT_STEP)
+    steps = ScriptedSteps(feedback=FEEDBACK_STEP, rework=REWORK_STEP)
     group, _ = tools(steps=steps)
     server = serve(group, "ceo")
     assert call(server, "feedback", task_id="t1", verdict="reject", note="No.") == "feedback reject recorded on t1 for ceo (message fb-1); it does not wake ceo"

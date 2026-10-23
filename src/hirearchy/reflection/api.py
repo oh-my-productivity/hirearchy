@@ -334,19 +334,13 @@ class ServiceReports(Protocol):
 
 @runtime_checkable
 class ServiceSteps(Protocol):
-    """What root is told to do next after it records a rejection, amends a contract or sends a rework: advice that names the one question to
-    ask the user and the call that records their yes, or the questions the client was already asked. Read-only: it never writes, and root is the
-    only one who reads it (an agent never sees a step)."""
+    """What root is told to do next after it records a rejection or sends a rework: advice that names the one question to ask the user and the
+    calls that record their answer, or the questions the client was already asked. No step follows an amendment: the gate refuses one that does
+    not carry the user's words. Read-only: it never writes, and root is the only one who reads it (an agent never sees a step)."""
 
     def feedback_step(self, note: Message) -> str:
         """What root does next after recording ``note``, a verdict note: for a human-tier rejection of a service request, the one question naming
         an id and the confirmation call; "" for an accept, a relayed or agent rejection, a link note or a note it cannot place."""
-        ...
-
-    def amendment_step(self, owner: str, service: str) -> str:
-        """After root amended the contract of ``owner``'s ``service``: when the latest version added amended criteria the client has not confirmed,
-        their ids and, while the latest human-tier rejection of the service has no answer, what records the user's yes; "" when every added
-        criterion is confirmed or the service has no human-tier rejection. ``OrgError`` for an unknown ``owner``."""
         ...
 
     def rework_step(self, task: Message) -> str:
