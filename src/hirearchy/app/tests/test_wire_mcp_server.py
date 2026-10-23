@@ -147,8 +147,8 @@ def test_a_binding_over_an_org_or_over_a_root_that_may_not_exist_creates_it(tmp_
     unbound = OrgBinding(None, None)
     assert unbound.root is None and not unbound.pinned and unbound.peek() is None
     binding = OrgBinding(tmp_path / "org", pinned=True)
-    created = binding.create("A mission", "a-model")
-    assert isinstance(created, Org) and created.config["default_model"] == "a-model"
+    created = binding.create("A mission", "claude-opus-5.5")
+    assert isinstance(created, Org) and created.config["default_model"] == "claude-opus-5.5"
     assert binding.get().root == created.root and binding.pinned
     org = Org(created.root)
     assert OrgBinding(org.root, org).get().root == org.root
