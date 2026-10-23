@@ -7,6 +7,7 @@ import subprocess
 
 from ..agents import AgentDirectory
 from ..kernel import Clock, OrgLayout
+from ..kiro import THROTTLE_EXIT
 from ..mail import BatchStore
 from ..runs import log_exit, log_interrupted, log_retired, log_timeout
 from ..settings import OrgSettings
@@ -22,6 +23,7 @@ from ._ports import (
     RunTerminating,
     RunWatching,
     StrayWatch,
+    ThrottleCredits,
 )
 from ._run import Exit, RunRecord, RunTable
 
@@ -54,10 +56,10 @@ class ExitWatcher(RunWatching):
 class RunSettlement(RunSettling):
     def __init__(
         self, agents: AgentDirectory, batches: BatchStore, failures: RunFailures, snapshots: OrgSnapshotter, events: RunEvents, console: Console,
-        layout: OrgLayout,
+        layout: OrgLayout, throttles: ThrottleCredits,
     ) -> None:
         self._agents, self._batches, self._failures, self._snapshots = agents, batches, failures, snapshots
-        self._events, self._console, self._layout = events, console, layout
+        self._events, self._console, self._layout, self._throttles = events, console, layout, throttles
 
     def settle(self, run: RunRecord, exit: Exit, elapsed: float) -> None:
         addr, code, ok = run.addr, exit.code, exit.code == 0
@@ -72,9 +74,19 @@ class RunSettlement(RunSettling):
             self._failures.cleared(addr)
             self._console.say(f"{addr}: run finished in {elapsed:.0f}s")
         else:
-            self._failures.failed(addr, run.log, run.traces)
+            self._failed(run, exit)
         rel = run.log.relative_to(self._layout.root)
         self._snapshots.commit(f"{addr}: run {'ok' if ok else f'failed ({code})'}, {run.batch} message(s) [{rel}]")
+
+
+    def _failed(self, run: RunRecord, exit: Exit) -> None:
+        """A failed run: charged and counted, unless the launcher said it was throttled before any tool effect (exit 75 of a run that was not killed)
+        and the runtime credited it; a free credit is no failure (the batch is back in the inbox and the run is retried)."""
+        kind = self._throttles.credit(run) if exit.code == THROTTLE_EXIT and not run.killed else ""
+        if kind:
+            self._console.say(f"{run.addr}: run throttled by the model service before any tool effect: not charged" + (", retried" if kind == "free" else ""))
+        if kind != "free":
+            self._failures.failed(run.addr, run.log, run.traces)
 
 
 class ShutdownTerminator(RunTerminating):

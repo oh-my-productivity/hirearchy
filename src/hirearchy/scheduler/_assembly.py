@@ -17,7 +17,7 @@ from ..mail import BatchStore, MailboxReader
 from ..processes import OrphanJudge, ProcessInspector, ProcessSignaller, ProcessSpawner
 from ..prompts import RunPromptBuilder
 from ..review import HealthReviewer
-from ..runs import RunLogWriter, RunRegistry
+from ..runs import RunLogReader, RunLogWriter, RunRegistry
 from ..settings import OrgSettings
 from ..snapshots import IgnoreList, OrgSnapshotter
 from ..stalls import StallLadder
@@ -38,6 +38,7 @@ from ._run import LoopMemory, LoopState, RunCount
 from ._session import BatchRecovery, ClaimedSession, ProcessClaim
 from ._starter import AgentRunLauncher, BatchPreparer, CommandSpawner, SingleRunStarter, StartAnnouncer, StartFailureHandler
 from ._strays import StrayCheck
+from ._throttle import CreditingThrottles
 from ._tracker import RunTracker
 from ._upkeep import HeartbeatUpkeep
 from ._work import QueriedWork
@@ -68,6 +69,7 @@ class LifecyclePorts:
     inspector: ProcessInspector
     layout: OrgLayout
     commands: RunCommandBuilder
+    log_reader: RunLogReader
 
 
 def assemble(ports: LifecyclePorts, run_clock: Clock, console: Console, guard: PhaseGuard, count: RunCount) -> Lifecycle:
@@ -85,7 +87,8 @@ def assemble(ports: LifecyclePorts, run_clock: Clock, console: Console, guard: P
     starter = AgentRunLauncher(p.agents, p.settings, BudgetGate(p.mail, p.pauses, p.budgets, p.delivery, p.notices, console), single, count)
     reaper = PollingRunReaper(
         ExitWatcher(p.agents, p.settings, run_clock), tracker, guard, strays,
-        RunSettlement(p.agents, p.batches, failures, p.snapshots, run_events, console, p.layout), run_clock,
+        RunSettlement(p.agents, p.batches, failures, p.snapshots, run_events, console, p.layout, CreditingThrottles(p.log_reader, p.mail, p.delivery, console)),
+        run_clock,
         ShutdownTerminator(p.batches, run_events, tracker),
     )
     return Lifecycle(starter, reaper)

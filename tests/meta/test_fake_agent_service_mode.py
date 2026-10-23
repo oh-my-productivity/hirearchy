@@ -1,6 +1,7 @@
 """``FAKE_MODE=service`` of the testkit fake agent: a service request delivered through an author and then a checker, under the real scheduler loop."""
 
 import os
+import subprocess
 import sys
 import time
 
@@ -50,3 +51,18 @@ def test_the_service_mode_delivers_through_author_then_checker(tmp_path):
     assert "lead/author/work/out.md" in final.body  # the author's artifact travels with the lead's result
     # a leaf reports with lessons when its task carries a service, and without when it does not
     assert lessons_of(results[0]) == "" and lessons_of(results[1]) == ""
+
+
+def test_fake_throttle_runs_prints_the_lines_and_exits_75(tmp_path):
+    runs = tmp_path / "ceo" / "runs"
+    runs.mkdir(parents=True)
+    env = {**os.environ, "ORG_ROOT": str(tmp_path), "ORG_AGENT": "ceo", "FAKE_MODE": "idle", "FAKE_THROTTLE_RUNS": "1"}
+    (runs / "20260101T000000000001.log").write_text("")
+    first = subprocess.run([sys.executable, str(FAKE_AGENT)], env=env, capture_output=True, text=True, timeout=60)
+    assert first.returncode == 75
+    lines = first.stdout.splitlines()
+    assert lines[0].startswith("[run error] prompt: ") and '"retryErrorType":"THROTTLING"' in lines[0]
+    assert lines[1] == "# kiro: throttled by the model service (retryErrorType THROTTLING); tool effects: none" and len(lines) == 2
+    (runs / "20260101T000000000002.log").write_text("")  # the second log: the count passes N, the agent works as FAKE_MODE says (idle: nothing)
+    second = subprocess.run([sys.executable, str(FAKE_AGENT)], env=env, capture_output=True, text=True, timeout=60)
+    assert second.returncode == 0 and second.stdout == ""

@@ -4,17 +4,21 @@ from __future__ import annotations
 
 import signal
 
+from hirearchy.kernel import is_run_credit
 from hirearchy.kernel.testing import FakeClock
 from hirearchy.processes.testing import FakeProcessTable
+from hirearchy.scheduler._ports import ThrottleCredits
 from hirearchy.scheduler._reaper import ExitWatcher, PollingRunReaper, RunSettlement, ShutdownTerminator
 from hirearchy.scheduler._run import Exit, RunRecord
+from hirearchy.scheduler._throttle import CreditingThrottles
 from hirearchy.scheduler.testing import (
     CatchingGuard, LifecycleWorld, MemoryRunRecords, NullSink, RecordingRunEvents, RecordingRunFailures, RecordingSettling,
-    RecordingTerminating, ScriptedStrayWatch, ScriptedWatching, lifecycle_world,
+    RecordingTerminating, ScriptedStrayWatch, ScriptedThrottles, ScriptedWatching, lifecycle_world,
 )
 from hirearchy.access.testing import StaticAccess
 
 from ._support import ROOT_DIR, a_run
+from .test_throttle import MARK, THROTTLE_ERROR
 
 
 def watcher(timeout: float = 100.0) -> tuple[ExitWatcher, FakeProcessTable, FakeClock, StaticAccess]:
@@ -69,9 +73,9 @@ def test_a_run_of_a_retired_agent_is_killed_and_says_so() -> None:
     assert sink.text == "\n# killed: the agent was retired during its run\n" and access.agents.exists("ceo")
 
 
-def settlement(w: LifecycleWorld) -> tuple[RunSettlement, RecordingRunFailures, RecordingRunEvents]:
+def settlement(w: LifecycleWorld, throttles: ThrottleCredits | None = None) -> tuple[RunSettlement, RecordingRunFailures, RecordingRunEvents]:
     failures, events = RecordingRunFailures(), RecordingRunEvents()
-    return RunSettlement(w.access.agents, w.box, failures, w.snapshots, events, w.console, w.ports.layout), failures, events
+    return RunSettlement(w.access.agents, w.box, failures, w.snapshots, events, w.console, w.ports.layout, throttles or ScriptedThrottles()), failures, events
 
 
 def an_ended_run(w: LifecycleWorld) -> RunRecord:
@@ -118,6 +122,61 @@ def test_a_run_that_ended_after_its_agent_was_retired_has_nothing_to_settle() ->
     assert w.snapshots.commits == ["gone: run ended after retirement (exit 1)"]
     settling.settle(run, Exit(0), 2.0)
     assert events.calls[-1] == ("ended", "gone", 0)
+
+
+THROTTLE_LINE = "ceo: run throttled by the model service before any tool effect: not charged"
+
+
+def test_settle_asks_for_a_credit_only_on_throttle_exit_of_a_run_not_killed() -> None:
+    for exit, killed in ((Exit(75), False), (Exit(1), False), (Exit(0), False), (Exit(-9, "timed out: killed after 5s"), True), (Exit(75), True)):
+        w = lifecycle_world()
+        throttles = ScriptedThrottles("free")
+        settling, _, _ = settlement(w, throttles)
+        run = an_ended_run(w)
+        run.killed = killed
+        settling.settle(run, exit, 1.0)
+        assert [r.addr for r in throttles.asked] == (["ceo"] if (exit.code, killed) == (75, False) else []), (exit, killed)
+
+
+def test_a_free_credit_is_not_a_failure_and_says_retried() -> None:
+    w = lifecycle_world()
+    settling, failures, events = settlement(w, ScriptedThrottles("free"))
+    run = an_ended_run(w)
+    settling.settle(run, Exit(75), 1.0)
+    assert failures.failed_runs == [] and failures.cleared_agents == [] and w.console.lines == [THROTTLE_LINE + ", retried"]
+    assert w.box.messages("ceo", "inbox") != [] and events.calls == [("ended", "ceo", 75)]  # the batch is back: the run is started again
+    assert w.snapshots.commits == ["ceo: run failed (75), 1 message(s) [ceo/runs/20260101T000000000000.log]"]
+
+
+def test_a_counted_credit_is_a_failure() -> None:
+    w = lifecycle_world()
+    settling, failures, _ = settlement(w, ScriptedThrottles("counted"))
+    run = an_ended_run(w)
+    settling.settle(run, Exit(75), 1.0)
+    assert failures.failed_runs == [("ceo", run.log, ())] and w.console.lines == [THROTTLE_LINE]
+
+
+def test_no_credit_is_the_failure_of_today() -> None:
+    w = lifecycle_world()
+    settling, failures, _ = settlement(w, ScriptedThrottles(""))
+    run = an_ended_run(w)
+    settling.settle(run, Exit(75), 1.0)
+    assert failures.failed_runs == [("ceo", run.log, ())] and w.console.lines == []
+
+
+def test_a_forged_mark_with_exit_1_or_a_kill_is_charged_and_counted() -> None:
+    """The agent's text can hold the throttle line and the mark (the transcript rule cannot tell), but only the launcher's exit code 75 asks for a credit."""
+    forged = f"{THROTTLE_ERROR}\n{MARK}\n"
+    for exit, killed in ((Exit(1), False), (Exit(-9, "timed out: killed after 5s"), True)):
+        w = lifecycle_world()
+        w.hire("ceo")
+        w.runs_store.put_log("ceo", "20260101T000000000000.log", forged + f"\n# exit {exit.code} after 3s\n")
+        throttles = CreditingThrottles(w.runs_store, w.box, w.delivery, w.console)
+        settling, failures, _ = settlement(w, throttles)
+        run = an_ended_run(w)
+        run.killed = killed
+        settling.settle(run, exit, 3.0)
+        assert failures.failed_runs == [("ceo", run.log, ())] and not [m for m in w.delivery.messages if is_run_credit(m)], (exit, killed)
 
 
 def test_shutdown_interrupts_every_run_gives_the_batches_back_and_empties_the_table() -> None:

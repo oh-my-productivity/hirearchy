@@ -41,7 +41,7 @@ from ._loop import HeartbeatLoop
 from ._ports import (
     Claim, Console, ExitPolicy, InterruptedRuns, Lifecycle, OrphanSettler, Pacing, PhaseGuard, RunAdmission, RunEvents, RunFailures, RunInitiation,
     RunNotes, RunPreparation, RunReaper, RunRecords, RunSettling, RunSpawning, RunStarter, RunTerminating, RunWatching, SchedulerSession,
-    SessionEvents, StartAnnouncing, StartFailures, StrayWatch, TickPhase, WaitGrace, WorkLeft,
+    SessionEvents, StartAnnouncing, StartFailures, StrayWatch, ThrottleCredits, TickPhase, WaitGrace, WorkLeft,
 )
 from ._run import Exit, LoopMemory, LoopState, PreparedRun, RunCount, RunRecord, RunTable, Standing, StopWhen
 from .api import SchedulerLoop
@@ -314,6 +314,18 @@ class RecordingSettling(RunSettling):
         self.settled.append((run.addr, exit, elapsed))
 
 
+class ScriptedThrottles(ThrottleCredits):
+    """Answers every credit the same way (``""``, ``"free"`` or ``"counted"``) and keeps the runs it was asked about."""
+
+    def __init__(self, answer: str = "") -> None:
+        self.answer = answer
+        self.asked: list[RunRecord] = []
+
+    def credit(self, run: RunRecord) -> str:
+        self.asked.append(run)
+        return self.answer
+
+
 class RecordingTerminating(RunTerminating):
     def __init__(self) -> None:
         self.calls = 0
@@ -381,7 +393,7 @@ def lifecycle_world(tmp: Path = Path("/memory")) -> LifecycleWorld:
     strays = MemoryStrays()
     ports = LifecyclePorts(
         access.agents, access.settings, box, box, pauses, counter, budgets, delivery, notices, access, runs_store, runs_store, prompts, strays, strays,
-        snapshots, events, spawner, table, OrgPaths(access.agents.root), commands,
+        snapshots, events, spawner, table, OrgPaths(access.agents.root), commands, runs_store,
     )
     def hire(addr: str, budget: int = 3) -> None:
         box.agents.put(f"{addr}/AGENT.md", "---\nrole: Worker\n---\n# Role: Worker\n\nDo the work.\n")

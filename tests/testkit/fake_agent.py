@@ -12,6 +12,10 @@ Behaviour is chosen by FAKE_MODE:
           the task done with lessons when the last one answers; leaves write an artifact and report done (with lessons when the task is a service request).
           FAKE_AMBIGUOUS (items separated by "|"; unset: nothing changes): the checker (the last of FAKE_REPORTS) adds one line "Ambiguous: <item>" per item to
           its summary, and the manager copies each of them into its own report under "Questions for the client:" (what roles/manager.md asks).
+
+FAKE_THROTTLE_RUNS=N (unset or 0: nothing changes; any FAKE_MODE): while the number of the agent's run logs (the log of the current run included) is at most N,
+the run prints a ``[run error]`` line carrying ``"retryErrorType":"THROTTLING"`` and then the throttle mark of the kiro launcher, and exits 75 (THROTTLE_EXIT)
+without doing anything; later runs work as FAKE_MODE says.
 """
 
 import os
@@ -20,6 +24,15 @@ import sys
 from hirearchy.core import Org
 
 mode = os.environ.get("FAKE_MODE", "work")
+throttled_runs = int(os.environ.get("FAKE_THROTTLE_RUNS") or 0)
+if throttled_runs:
+    from pathlib import Path
+
+    logs = [p for p in (Path(os.environ["ORG_ROOT"]) / os.environ["ORG_AGENT"] / "runs").glob("*.log") if not p.name.startswith(".")]
+    if len(logs) <= throttled_runs:
+        print('[run error] prompt: high traffic (code -32000): {"errorType":"ModelThrottleError","retryErrorType":"THROTTLING"}', flush=True)
+        print("# kiro: throttled by the model service (retryErrorType THROTTLING); tool effects: none", flush=True)
+        sys.exit(75)
 if mode == "crash":
     sys.exit(1)
 if mode == "idle":

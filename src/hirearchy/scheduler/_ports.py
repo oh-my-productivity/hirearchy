@@ -135,6 +135,13 @@ class RunSettling(Protocol):
         ...
 
 
+class ThrottleCredits(Protocol):
+    def credit(self, run: RunRecord) -> str:
+        """Give back the run that ended on a model-service throttle before any tool effect: ``"free"`` (the retry is no failure), ``"counted"``
+        (the run before it was credited too: not charged, but a failure) or ``""`` (no credit exists: charged as today; never raises)."""
+        ...
+
+
 class RunTerminating(Protocol):
     def terminate_all(self, runs: RunTable) -> None:
         """Interrupt every run in flight (SIGTERM, then SIGKILL of the group), give their batches back and empty the table."""
@@ -251,6 +258,6 @@ class SchedulerSession(Protocol):
 __all__ = [
     "Claim", "Console", "ExitPolicy", "FailureEscalation", "InterruptedRuns", "Lifecycle", "OrphanSettler", "Pacing", "PhaseGuard", "RunAdmission", "RunEvents",
     "RunFailures", "RunInitiation", "RunNotes", "RunPreparation", "RunReaper", "RunRecords", "RunSettling", "RunSpawning", "RunStarter",
-    "RunTerminating", "RunWatching", "SchedulerSession", "SessionEvents", "StartAnnouncing", "StartFailures", "StrayWatch", "TickPhase", "WaitGrace",
-    "WorkLeft",
+    "RunTerminating", "RunWatching", "SchedulerSession", "SessionEvents", "StartAnnouncing", "StartFailures", "StrayWatch", "ThrottleCredits", "TickPhase",
+    "WaitGrace", "WorkLeft",
 ]

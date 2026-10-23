@@ -26,7 +26,7 @@ from ..mail import BatchStore, MailboxReader, MailFingerprint, TaskQuery
 from ..processes import OrphanJudge, ProcessInspector, ProcessSignaller, ProcessSpawner
 from ..prompts import RunPromptBuilder
 from ..review import HealthReviewer
-from ..runs import RunLogWriter, RunRegistry
+from ..runs import RunLogReader, RunLogWriter, RunRegistry
 from ..scheduler._assembly import LifecyclePorts, LoopPorts, assemble, assemble_loop
 from ..scheduler._loop import HeartbeatLoop
 from ..scheduler._ports import Console, Lifecycle, PhaseGuard
@@ -53,7 +53,7 @@ def lifecycle_ports(b: PortResolver, commands: RunCommandBuilder) -> LifecyclePo
         b.get(AgentDirectory), b.get(OrgSettings), b.get(MailboxReader), b.get(BatchStore), b.get(PauseStore), b.get(FailureCounter),
         b.get(BudgetQuery), b.get(MessageDelivery), b.get(Notices), b.get(ModelResolver), b.get(RunLogWriter), b.get(RunRegistry),
         b.get(RunPromptBuilder), b.get(StrayProbe), b.get(StrayRegistry), b.get(OrgSnapshotter), b.get(EventSink), b.get(ProcessSpawner),
-        b.get(ProcessInspector), b.get(OrgLayout), commands,
+        b.get(ProcessInspector), b.get(OrgLayout), commands, b.get(RunLogReader),
     )
 
 
