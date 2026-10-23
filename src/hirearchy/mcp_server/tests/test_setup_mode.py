@@ -85,6 +85,14 @@ def test_create_org_then_every_tool_works_in_the_same_server(setup_server):
     assert "(no new messages)" in call(server, "inbox")
 
 
+def test_create_org_refuses_a_default_model_below_the_floor(setup_server):
+    server, target = setup_server
+    message = fails(server, "create_org", mission="Study octopuses", default_model="claude-haiku-4.5")
+    assert "cannot create the organization: default_model: " in message and "allowed: claude-sonnet-5.5, claude-opus-5.5" in message
+    assert not (target / "ORG.md").exists()
+    assert str(target) in call(server, "create_org", mission="Study octopuses", default_model="claude-opus-5.5")  # the second try works
+
+
 def test_create_org_works_in_an_existing_empty_directory(tmp_path, monkeypatch):
     target = tmp_path / "empty"
     target.mkdir()

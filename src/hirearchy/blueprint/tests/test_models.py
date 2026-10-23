@@ -53,12 +53,12 @@ def test_without_needs_models_every_tier_is_the_default(research, tmp_path):
 
 
 def test_a_tier_missing_from_needs_models_uses_the_orgs_default_model(research, tmp_path):
-    org = Org.init(tmp_path / "org", "m", {"default_model": "org-model"})
+    org = Org.init(tmp_path / "org", "m", {"default_model": "claude-opus-5.5"})
     research["needs"].pop("models")
-    assert set(models_of(research, tmp_path, org).values()) == {"org-model"}
-    research["needs"]["models"] = {"cheap": "claude-haiku-4.5"}  # strong is not mapped: the org default
+    assert set(models_of(research, tmp_path, org).values()) == {"claude-opus-5.5"}
+    research["needs"]["models"] = {"cheap": "claude-sonnet-5.5"}  # strong is not mapped: the org default
     got = models_of(research, tmp_path, org)
-    assert got["lead"] == "org-model" and got["lead/writer"] == "claude-haiku-4.5"
+    assert got["lead"] == "claude-opus-5.5" and got["lead/writer"] == "claude-sonnet-5.5"
 
 
 def test_the_default_policy_is_single_model_and_raises_no_warning(research, tmp_path):

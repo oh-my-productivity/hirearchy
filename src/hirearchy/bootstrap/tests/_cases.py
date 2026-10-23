@@ -9,7 +9,7 @@ EXPECTED = Path(__file__).resolve().parent / "expected"
 
 DIRECTORIES = [".runtime/", "inbox/", "inflight/", "read/", "sent/"]
 MISSION = "Study octopuses.\n\n## Findings so far\nThey have three hearts."
-CONFIG = {"poll_seconds": 0.05, "default_model": "m1", "events": False, "max_depth": 2}
+CONFIG = {"poll_seconds": 0.05, "default_model": "claude-opus-5.5", "events": False, "max_depth": 2}
 
 
 @dataclass(frozen=True)

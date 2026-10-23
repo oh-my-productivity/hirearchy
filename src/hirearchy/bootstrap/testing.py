@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..kernel import BOXES, OrgError, join_frontmatter
-from ..settings import DEFAULT_CONFIG
+from ..settings import DEFAULT_CONFIG, config_floor_problem
 from ..settings.testing import MemoryOrgSettings
 from ..snapshots import OrgSnapshotter
 from ..snapshots.testing import MemoryIgnoreList
@@ -45,7 +45,11 @@ class MemoryOrgInitializer(OrgInitializer):
     def init(self, root: Path, mission: str | None = None, config: Mapping[str, object] | None = None) -> None:
         if root in self.organizations:
             raise OrgError(f"already an organization: {root}")
-        text = join_frontmatter({**DEFAULT_CONFIG, **(config or {})}, self._templates.org_rules(mission))
+        cfg = {**DEFAULT_CONFIG, **(config or {})}
+        problem = config_floor_problem(cfg)
+        if problem is not None:
+            raise OrgError(f"cannot create the organization: {problem}")
+        text = join_frontmatter(cfg, self._templates.org_rules(mission))
         made = MemoryOrganization(
             text, frozenset({*(f"{box}/" for box in BOXES), ".runtime/"}), "".join(f"{line}\n" for line in INITIAL_IGNORE_LINES),
             repository=self._git_available,

@@ -20,7 +20,7 @@ def upgrade_rules(org, dry_run=False):
 
 def old_org(tmp_path):
     """An organization whose ORG.md has the rules of an earlier version (no budget return, no rule 9) and a commented frontmatter."""
-    org = Org.init(tmp_path / "org", MISSION, {"poll_seconds": 0.05, "default_model": "m1"})
+    org = Org.init(tmp_path / "org", MISSION, {"poll_seconds": 0.05, "default_model": "claude-opus-5.5"})
     path = org.root / "ORG.md"
     text = path.read_text()
     front, body = text.split("\n---\n", 1)
@@ -51,7 +51,7 @@ def test_upgrade_rewrites_only_the_body(tmp_path):
     assert text.split("\n---\n", 1)[0] == front_before and "# my comment" in text  # frontmatter byte for byte
     assert "9. Reviews and fact-checks" in text and "Budget comes back up" in text
     assert extract_mission(org.rules()) == MISSION
-    assert org.config["default_model"] == "m1" and org.config["poll_seconds"] == 0.05
+    assert org.config["default_model"] == "claude-opus-5.5" and org.config["poll_seconds"] == 0.05
     assert upgrade_rules(org).changed is False  # idempotent
     log = subprocess.run(["git", "log", "--oneline"], cwd=org.root, capture_output=True, text=True).stdout
     assert "upgrade ORG.md rules" in log

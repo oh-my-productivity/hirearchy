@@ -5,6 +5,8 @@ import pytest
 import testkit.reach.yaml as yaml
 from testkit.reach.hirearchy.core import DEFAULT_CONFIG, DEFAULT_MODEL, ROOT, Org
 
+from hirearchy.kernel import OrgError
+
 CHARTER = "---\nrole: CEO\n{model}tools: [read]\n---\nLead.\n"
 
 
@@ -39,5 +41,8 @@ def test_an_org_without_an_explicit_default_model_runs_on_the_default(org, value
 def test_a_new_org_writes_the_default_and_an_explicit_one_is_kept(tmp_path):
     fresh = Org.init(tmp_path / "a", "m")
     assert fresh.config["default_model"] == DEFAULT_MODEL and "default_model: claude-sonnet-5.5" in (fresh.root / "ORG.md").read_text()
-    other = Org.init(tmp_path / "b", "m", {"default_model": "claude-haiku-4.5"})
-    assert other.default_model == "claude-haiku-4.5"
+    other = Org.init(tmp_path / "b", "m", {"default_model": "claude-opus-5.5"})
+    assert other.default_model == "claude-opus-5.5"
+    with pytest.raises(OrgError, match="default_model: model .claude-haiku-4.5. is not allowed"):
+        Org.init(tmp_path / "c", "m", {"default_model": "claude-haiku-4.5"})
+    assert not (tmp_path / "c" / "ORG.md").exists()

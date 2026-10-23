@@ -10,7 +10,7 @@ MISSION = "Study octopuses.\n\n## Findings so far\nThey have three hearts."
 
 def old_org(tmp_path):
     """An organization whose ORG.md has the rules of an earlier version (no budget return, no rule 9) and a commented frontmatter."""
-    org = Org.init(tmp_path / "org", MISSION, {"poll_seconds": 0.05, "default_model": "m1"})
+    org = Org.init(tmp_path / "org", MISSION, {"poll_seconds": 0.05, "default_model": "claude-opus-5.5"})
     path = org.root / "ORG.md"
     text = path.read_text()
     front, body = text.split("\n---\n", 1)

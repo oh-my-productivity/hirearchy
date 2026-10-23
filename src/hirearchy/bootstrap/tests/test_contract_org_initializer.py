@@ -79,3 +79,41 @@ def test_without_git_everything_but_the_repository_is_made(no_git: InitHarness) 
     assert no_git.directories() == DIRECTORIES
     assert no_git.gitignore() == expected("gitignore.txt")
     assert (no_git.has_repository(), no_git.commits()) == (False, [])
+
+
+PAIR = "claude-sonnet-5.5, claude-opus-5.5"
+
+
+@pytest.mark.parametrize(
+    "config, message",
+    [
+        ({"effort": "low"}, 'effort "low" is not allowed for org agents; allowed: high, xhigh, max'),
+        ({"effort": "medium"}, 'effort "medium" is not allowed for org agents; allowed: high, xhigh, max'),
+        (
+            {"default_model": "claude-haiku-4.5"},
+            f'default_model: model "claude-haiku-4.5" is not allowed for org agents; allowed: {PAIR} (only the user can widen this set)',
+        ),
+        (
+            {"default_model": "claude-sonnet-4.6"},
+            f'default_model: model "claude-sonnet-4.6" is not allowed for org agents; allowed: {PAIR} (only the user can widen this set)',
+        ),
+    ],
+    ids=lambda v: repr(v)[:30],
+)
+def test_a_settings_block_below_the_floor_is_refused_and_nothing_is_made(h: InitHarness, config: dict[str, object], message: str) -> None:
+    with pytest.raises(OrgError) as refused:
+        h.initializer.init(h.root, "m", config)
+    assert str(refused.value) == f"cannot create the organization: {message}"
+    assert h.org_md() is None and h.directories() == [] and h.commits() == [] and h.gitignore() is None and h.has_repository() is False
+
+
+@pytest.mark.parametrize("config", [{"effort": "xhigh"}, {"effort": "max"}, {"default_model": "claude-opus-5.5"}], ids=lambda v: repr(v)[:30])
+def test_a_settings_block_inside_the_floor_is_written(h: InitHarness, config: dict[str, object]) -> None:
+    h.initializer.init(h.root, "m", config)
+    assert h.org_md() is not None and h.directories() == DIRECTORIES
+
+
+def test_a_settings_block_that_widens_the_set_may_default_to_its_extra_model(h: InitHarness) -> None:
+    h.initializer.init(h.root, "m", {"extra_allowed_models": ["claude-sonnet-4.6"], "default_model": "claude-sonnet-4.6"})
+    org_md = h.org_md()
+    assert org_md is not None and "default_model: claude-sonnet-4.6" in org_md and "extra_allowed_models:" in org_md

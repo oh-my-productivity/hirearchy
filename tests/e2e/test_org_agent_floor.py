@@ -12,6 +12,8 @@ import pytest
 from testkit.e2e_world import build_server
 from testkit.health_world import Scheduler
 from testkit.kiro_world import kiro_runner
+from testkit.mcp_server_world import OrgBinding
+from testkit.mcp_server_world import build_server as build_setup_server
 
 from hirearchy.core import ROOT
 from hirearchy.kernel import join_frontmatter, split_frontmatter
@@ -85,7 +87,7 @@ def test_an_agent_that_existed_below_the_floor_keeps_its_model(org, isolated_kir
 
 def point_hire(org, model: str) -> str | None:
     """Root hires an agent on ``model`` through its MCP server: the refusal, or None when the agent exists with that model."""
-    name = "x-" + re.sub(r"[^a-z0-9]+", "-", model)  # one agent per model, so a test may hire on several
+    name = f"x-{slug(model)}"  # one agent per model, so a test may hire on several
     try:
         call(build_server(org, ROOT), "hire", name=name, role="X", charter="x", model=model)
     except Exception as error:
@@ -95,7 +97,25 @@ def point_hire(org, model: str) -> str | None:
     return None
 
 
-POINTS = {"hire": point_hire}
+def slug(model: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", model)
+
+
+def point_create_org(org, model: str) -> str | None:
+    """A setup-mode root creates an organization with ``default_model=model``: the refusal, or None when ORG.md says so."""
+    target = org.root.parent / f"created-{slug(model)}"
+    server = build_setup_server(OrgBinding(target, None, pinned=True), ROOT)
+    try:
+        call(server, "create_org", mission="m", default_model=model)
+    except Exception as error:
+        assert not (target / "ORG.md").exists()
+        return str(error)
+    meta, _ = split_frontmatter((target / "ORG.md").read_text(encoding="utf-8"))
+    assert meta["default_model"] == model
+    return None
+
+
+POINTS = {"hire": point_hire, "create_org default_model": point_create_org}
 
 
 @pytest.mark.parametrize("point", POINTS)
