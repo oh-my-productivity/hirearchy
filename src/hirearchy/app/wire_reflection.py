@@ -1,4 +1,5 @@
-"""Providers of the ``reflection`` ports (ARCHITECTURE.md 6.1), and of ``ServiceEvidence``, the port of ``services`` that ``reflection`` implements.
+"""Providers of the ``reflection`` ports (ARCHITECTURE.md 6.1), and of ``ServiceEvidence`` and ``JudgedVersions``, the ports of ``services`` that ``reflection``
+implements.
 
 ``DeliverableChecks`` is joined here: ``reflection`` reads the deliverable folders itself, and the team's checked versions come from the organization's
 git history (``snapshots``), which only the composition root may put beside it.
@@ -20,13 +21,14 @@ from ..reflection._deliverables import FsDeliverableFolder
 from ..reflection._digest import DigestBuilder
 from ..reflection._evidence import CaseServiceEvidence
 from ..reflection._files import OrgServicePaths
+from ..reflection._judged import CaseJudgedVersions
 from ..reflection._reports import TextServiceReports
 from ..reflection._runs import LogRunCounter
 from ..reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection, RegressionListSection
 from ..reflection._steps import TextServiceSteps
 from ..reflection._timeline import StorePlaybookTimelines
 from ..runs import RunLogReader
-from ..services import ServiceCatalog, ServiceEvidence, ServiceHints, ServiceStore
+from ..services import JudgedVersions, ServiceCatalog, ServiceEvidence, ServiceHints, ServiceStore
 from ..settings import OrgSettings
 from ..snapshots import OrgHistory
 from ._builder import Builder
@@ -43,6 +45,10 @@ def register(b: Builder) -> None:
     )
     b.provide(ReflectionDigest, lambda b: DigestBuilder(b.get(ServiceCatalog), b.get(CaseHistory)))
     b.provide(ServiceEvidence, lambda b: CaseServiceEvidence(b.get(CaseHistory), b.get(ServiceCatalog)))
+    b.provide(
+        JudgedVersions,
+        lambda b: CaseJudgedVersions(b.get(CaseHistory), b.get(MailboxReader), GitCheckedVersions(b.get(OrgHistory), b.get(OrgLayout))),
+    )
     b.provide(
         ServiceReports,
         lambda b: TextServiceReports(b.get(AgentDirectory), b.get(ServiceCatalog), b.get(CaseHistory), OrgServicePaths(b.get(OrgLayout))),

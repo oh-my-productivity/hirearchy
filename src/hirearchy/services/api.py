@@ -43,6 +43,9 @@ __all__ = [
     "FEEDBACK_HEADER",
     "FEEDBACK_MAX",
     "INPUT_RE",
+    "JUDGED_BYTES",
+    "JudgedBase",
+    "JudgedVersions",
     "LINKS_MAX",
     "LINK_HEADER",
     "Playbook",
@@ -79,6 +82,7 @@ FEEDBACK_HEADER = (
 LINK_HEADER = (
     "The client says what their rejection {confirms} was about, for reflection only: it does not change any task's acceptance criteria or outcome."
 )
+JUDGED_BYTES = 6000  # bytes of the judged versions a rework's task body carries, in all (P4)
 EVIDENCE_MAX = 20  # ids a playbook revision may cite
 EVIDENCE_ID_MAX = 80  # characters of one cited id
 LINKS_MAX = 5  # ids one rejection may name as what it is about
@@ -527,4 +531,26 @@ class ContractNormalizer(Protocol):
 
     def deliverable(self, value: object) -> JsonObject:
         """The deliverable of a contract in its fixed form (``description``, and ``format``, ``max_words``, ``path`` when given)."""
+        ...
+
+
+@dataclass(frozen=True)
+class JudgedBase:
+    """The delivery the client judged, and what relayed reworks changed after it (``JudgedVersions.base``)."""
+
+    task: str  # the task whose delivery the client judged
+    result: str  # that delivery (a result id)
+    commit: str  # the org-git commit that holds it; "" without history
+    relayed: tuple[str, ...]  # the relayed reworks of the case sent after it
+    changed: tuple[str, ...]  # its artifacts (org paths) that differ now
+    texts: tuple[tuple[str, str], ...]  # (path, judged text) of the changed artifacts included: at most ``JUDGED_BYTES`` bytes of UTF-8 in all
+
+
+@runtime_checkable
+class JudgedVersions(Protocol):
+    def base(self, owner: str, service: str, revises: str) -> JudgedBase | None:
+        """For a rework of ``revises``, a task of a case of ``owner``'s ``service``: the delivery the client judged (the latest human verdict's task and
+        its result, else the latest ``done`` result of a task that was not relayed) and what relayed reworks sent after it changed in its artifacts.
+        None when the task is in no case, nothing was judged or delivered, no relayed rework came after it, or none of its artifacts differs now: no
+        base needs to be named."""
         ...

@@ -43,6 +43,8 @@ from .api import (
     Admission,
     AmendmentBasis,
     ContractNormalizer,
+    JudgedBase,
+    JudgedVersions,
     ServiceCatalog,
     ServiceCommands,
     ServiceEvidence,
@@ -404,6 +406,39 @@ def refusing_evidence(tmp_path: Path) -> ServiceEvidence:
     return RefusingServiceEvidence()
 
 
+class NoJudgedVersions(JudgedVersions):
+    """No delivery was judged and no relayed rework changed one: no rework needs a base (the default of the worlds)."""
+
+    def base(self, owner: str, service: str, revises: str) -> JudgedBase | None:
+        return None
+
+
+class FixedJudgedVersions(JudgedVersions):
+    """The bases a test puts in, by the task a rework revises; ``asked`` records every question as ``(owner, service, revises)``."""
+
+    def __init__(self, bases: Mapping[str, JudgedBase] | None = None) -> None:
+        self.bases = dict(bases or {})
+        self.asked: list[tuple[str, str, str]] = []
+
+    def base(self, owner: str, service: str, revises: str) -> JudgedBase | None:
+        self.asked.append((owner, service, revises))
+        return self.bases.get(revises)
+
+
+JUDGED_TASK = "20260101T000000000001-root-aaaa"  # the task ``fixed_judged_versions`` has a base for
+
+
+def no_judged_versions(tmp_path: Path) -> JudgedVersions:
+    return NoJudgedVersions()
+
+
+def fixed_judged_versions(tmp_path: Path) -> JudgedVersions:
+    return FixedJudgedVersions({JUDGED_TASK: JudgedBase(
+        task=JUDGED_TASK, result="20260101T000000000002-ceo-bbbb", commit="a" * 40, relayed=("20260101T000000000003-root-cccc",),
+        changed=("ceo/memo.md", "ceo/other.md"), texts=(("ceo/memo.md", "the judged text"),),
+    )})
+
+
 def hints_fs(tmp_path: Path) -> ServiceHints:
     return fs_world(tmp_path).hints
 
@@ -422,4 +457,5 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     ContractNormalizer: [normalizer],
     ReworkContext: [fs_rework, memory_rework],
     ServiceEvidence: [admitting_evidence, refusing_evidence],
+    JudgedVersions: [no_judged_versions, fixed_judged_versions],
 }
