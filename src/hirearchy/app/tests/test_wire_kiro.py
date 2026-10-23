@@ -121,7 +121,8 @@ def test_the_run_command_builder_reads_the_charters_the_access_ports_and_the_env
     profile = runtime.profile_provisioner.profile_name(["shell"])
     assert dev.argv == (
         sys.executable, "-I", "-S", LAUNCH, "--start-deadline", "60", "--",
-        "kiro-cli", "chat", "--no-interactive", "--agent", profile, "--model", "m-dev", "--v3", "--require-mcp-startup", "--output-format", "stream-json",
+        "kiro-cli", "chat", "--no-interactive", "--agent", profile, "--model", "m-dev", "--effort", "high", "--v3", "--require-mcp-startup",
+        "--output-format", "stream-json",
     )
     assert ops.argv[ops.argv.index("--model") + 1] == "m-org"
     places = runtime.kiro_places

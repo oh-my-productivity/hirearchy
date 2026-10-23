@@ -95,7 +95,7 @@ def test_scheduler_kiro_command_line(tmp_path, clock, norm):
     org.hire(ROOT, "sh", "Shell", "x", tools=["shell"], workspace=str(ws))
     org.hire(ROOT, "dev", "Dev", "x", tools=["read", "write", "shell"], workspace=str(ws), inputs=[str(inputs)])
     org.hire(ROOT, "ro", "Reader", "x", tools=["read"], inputs=[str(inputs)])
-    org.hire(ROOT, "modeled", "Modeled", "x", model="claude-haiku-4.5")
+    org.hire(ROOT, "modeled", "Modeled", "x", model="claude-opus-5.5")
     org.hire(ROOT, "legacy", "Legacy", "x", tools=["read"])
     legacy_meta = org.dir("legacy") / "AGENT.md"  # a charter written before `inputs` existed: no key, `read` of the organization only
     legacy_meta.write_text(re.sub(r"^inputs:.*\n", "", legacy_meta.read_text(encoding="utf-8"), flags=re.M), encoding="utf-8")

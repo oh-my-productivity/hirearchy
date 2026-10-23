@@ -38,7 +38,7 @@ def test_the_command_line_is_the_launcher_then_kiro_chat_on_the_v3_engine_for_th
     assert command.argv == (
         *h.launcher, "--start-deadline", "60", "--",
         "kiro-cli", "chat", "--no-interactive", "--agent", h.provisioner.profile_name([]), "--model", DEFAULT_MODEL,
-        "--v3", "--require-mcp-startup", "--output-format", "stream-json",
+        "--effort", "high", "--v3", "--require-mcp-startup", "--output-format", "stream-json",
     )
 
 
@@ -64,6 +64,36 @@ def test_the_model_is_the_charters_then_the_organizations_then_the_built_in_one(
     assert model_of(h.builder.build("plain", "P")) == "m-org"
     h.put_agent("own", {"role": "R", "model": "m-charter"})
     assert model_of(h.builder.build("own", "P")) == "m-charter"
+
+
+def effort_of(command: RunCommand) -> str:
+    return command.argv[command.argv.index("--effort") + 1]
+
+
+@pytest.mark.parametrize("effort", ["high", "xhigh", "max"])
+def test_the_effort_of_ORG_md_follows_the_model(h: BuilderHarness, effort: str) -> None:
+    h.put_agent("dev", {"role": "R"})
+    h.put_config(f"---\neffort: {effort}\n---\n# Organization\n")
+    argv = h.builder.build("dev", "P").argv
+    assert argv[argv.index("--model") + 2 :][:2] == ("--effort", effort)  # right after the model, once
+    assert argv.count("--effort") == 1
+
+
+@pytest.mark.parametrize("effort", ["low", "medium"])
+def test_an_effort_below_high_refuses_the_run_before_anything_is_written(h: BuilderHarness, effort: str) -> None:
+    h.put_agent("dev", {"role": "R", "tools": ["shell"]})
+    h.put_config(f"---\neffort: {effort}\n---\n# Organization\n")
+    with pytest.raises(KiroRunRefused) as refused:
+        h.builder.build("dev", "P")
+    assert str(refused.value) == f'kiro: effort "{effort}" is not allowed for org agents; allowed: high, xhigh, max'
+    assert h.names() == [] and not h.state.is_empty_dir(h.places.scratch("dev"))
+
+
+def test_a_model_below_the_floor_is_passed_as_it_is(h: BuilderHarness) -> None:
+    """An agent that existed before the floor keeps running on its model: nothing is substituted (docs/design/org-agent-model-floor.md 5)."""
+    h.put_agent("old", {"role": "R", "model": "claude-haiku-4.5"})
+    argv = h.builder.build("old", "P").argv
+    assert argv[argv.index("--model") :][:4] == ("--model", "claude-haiku-4.5", "--effort", "high")
 
 
 def test_the_agent_works_in_its_own_empty_scratch_directory(h: BuilderHarness) -> None:

@@ -8,6 +8,7 @@ from pathlib import Path
 from ..access import AccessScopes, ModelResolver
 from ..agents import CharterReader
 from ..kernel import Environment, OrgLayout
+from ..settings import effort_floor_problem
 from ._env import run_environment
 from ._placement import placement_problem, readable_places
 from ._state import planted_problem
@@ -48,13 +49,18 @@ class KiroRunCommandBuilder(RunCommandBuilder):
     def build(self, addr: str, prompt: str) -> RunCommand:
         meta, _ = self._charters.charter(addr)
         tools = _tools_of(meta)
+        effort = self._models.effort()
+        problem = effort_floor_problem(effort)  # the floor (docs/design/org-agent-model-floor.md 3): refused before a profile or a scratch directory is made
+        if problem is not None:
+            raise KiroRunRefused(f"kiro: {problem}")
         home = self._checked_home(addr)
         profile = self._provisioner.ensure_profile(tools, workspace=self._scopes.workspace_of(addr), inputs=self._scopes.inputs_of(addr))
         scratch = self._places.scratch(addr)
         self._dirs.fresh(scratch)  # kiro loads configuration from its working directory: an empty one holds none
         cmd = [*self._launcher, "--start-deadline", f"{START_DEADLINE:g}", "--"]
         cmd += [self._kiro_bin, "chat", "--no-interactive", "--agent", profile]
-        cmd += ["--model", self._models.model_for(addr)]  # always explicit: charter model > org default_model > DEFAULT_MODEL
+        # always explicit: charter model > org default_model > DEFAULT_MODEL (never substituted, even below the floor), and the org's effort
+        cmd += ["--model", self._models.model_for(addr), "--effort", effort]
         cmd += KIRO_FLAGS
         # The prompt is not an argument: it can be arbitrarily long (E2BIG) and visible in `ps`.
         # `kiro-cli chat --no-interactive` without INPUT reads it from stdin; the scheduler feeds it there.

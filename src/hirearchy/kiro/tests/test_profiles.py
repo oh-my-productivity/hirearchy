@@ -10,13 +10,14 @@ from testkit.reach.hirearchy.core import ROOT
 
 def test_kiro_runner_builds_isolated_command(org, tmp_path, monkeypatch):
     profiles_in(org, tmp_path / "agents")
-    org.write(ROOT, "ceo/AGENT.md", "---\nrole: CEO\nmodel: claude-haiku-4.5\ntools: [read]\n---\nLead.\n")
+    org.write(ROOT, "ceo/AGENT.md", "---\nrole: CEO\nmodel: claude-opus-5.5\ntools: [read]\n---\nLead.\n")
     argv, cwd, env = kiro_runner()(org, "ceo", "PROMPT")
     cmd = kiro_part(argv)
     name = cmd[4]
     assert re.fullmatch(rf"{re.escape(kiro_profile_name(org.root, ['read']))}-x[0-9a-f]{{8}}", name)  # built-in read: confined to the org
     assert cmd[:4] == ["kiro-cli", "chat", "--no-interactive", "--agent"]
-    assert cmd[5:7] == ["--model", "claude-haiku-4.5"] and cmd[7:] == ["--v3", "--require-mcp-startup", "--output-format", "stream-json"]
+    assert cmd[5:9] == ["--model", "claude-opus-5.5", "--effort", "high"]
+    assert cmd[9:] == ["--v3", "--require-mcp-startup", "--output-format", "stream-json"]
     assert "PROMPT" not in argv  # the prompt goes via stdin
     assert cwd == org.runtime.kiro_places.scratch("ceo") and env["ORG_AGENT"] == "ceo" and env["ORG_ROOT"] == str(org.root)  # kiro starts in an empty scratch directory
     profile = json.loads((tmp_path / "agents" / f"{name}.json").read_text())

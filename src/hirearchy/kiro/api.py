@@ -120,7 +120,8 @@ class McpServerLocator(Protocol):
 @runtime_checkable
 class RunCommandBuilder(Protocol):
     def build(self, addr: str, prompt: str) -> RunCommand:
-        """``kiro-cli chat --no-interactive --agent <profile> --model <model>`` for ``addr``; the prompt goes on stdin, not in the command."""
+        """``kiro-cli chat --no-interactive --agent <profile> --model <model> --effort <effort>`` for ``addr``; the prompt goes on stdin, not in the
+        command. An ORG.md effort outside high, xhigh and max refuses the run (``KiroRunRefused``)."""
         ...
 
 
