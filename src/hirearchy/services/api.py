@@ -60,6 +60,7 @@ __all__ = [
     "normalize_links",
     "number_criteria",
     "playbook_word_cap",
+    "quoting_lines",
 ]
 
 INPUT_RE = re.compile(r"[a-z][a-z0-9_]{0,31}\Z")
@@ -178,6 +179,18 @@ def changed_lines(current: str, new: str) -> list[str]:
         else:
             out.append(line.strip())
     return out
+
+
+def quoting_lines(body: str, criterion: Criterion) -> list[str]:
+    """The lines of ``body`` (stripped, with a non-empty :func:`line_key`) that quote ``criterion`` (pure): they contain its id as a standalone
+    token (``C9``, not ``C90`` or ``xC9``), or their key contains the key of its text, so the text quoted verbatim, modulo punctuation. A
+    criterion whose text has no letter or digit has an empty key, which every line would "contain": it is matched by its id alone."""
+    token = re.compile(rf"(?<![A-Za-z0-9]){re.escape(criterion.id)}(?![0-9])", re.IGNORECASE)
+    text = line_key(criterion.text)
+    return [
+        stripped for line in body.splitlines()
+        if (key := line_key(line)) and (stripped := line.strip()) and (token.search(line) or (text and text in key))
+    ]
 
 
 def normalize_evidence(ids: object) -> tuple[str, ...]:

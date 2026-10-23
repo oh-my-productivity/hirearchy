@@ -214,3 +214,17 @@ def test_a_text_added_removed_and_added_again_keeps_its_id_through_define_servic
     assert "+ acceptance added: C3: Dates are written in full" in reply and "+ acceptance added: C4: Cite the test run" in reply
     assert reply.endswith("C3: Dates are written in full\nC4: Cite the test run")
     assert [c.id for c in svc.runtime.service_catalog.criteria("ceo", "weekly-brief") if c.current] == ["C1", "C2", "C3", "C4"]
+
+
+def test_removing_a_quoted_criterion_tells_the_owner(svc):
+    define(svc, playbook="Steps: search, write.\n- C1: At most 600 words\n- Keep every claim sourced, at most 600 words.", name="quoted")
+    svc.define_service(ROOT, "ceo", "quoted", remove_acceptance=["At most 600 words"], add_acceptance=["At most 400 words"])
+    note = svc.messages("ceo", "inbox")[-1].body
+    assert (
+        'Removed: C1. Playbook v1 still quotes it in 2 line(s): "- C1: At most 600 words", "- Keep every claim sourced, at most 600 words.". '
+        "Where it differs from the contract, follow the contract; the playbook changes only by a revision the evidence admits (step 3)."
+    ) in note
+    assert note.index("Acceptance criteria now:") < note.index("Removed: C1.")
+    svc.define_service(ROOT, "ceo", "quoted", remove_acceptance=["Every factual claim has a source URL"])  # quoted by nothing
+    assert "Removed:" not in svc.messages("ceo", "inbox")[-1].body
+

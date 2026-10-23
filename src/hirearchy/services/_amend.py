@@ -4,10 +4,14 @@ from __future__ import annotations
 
 from collections.abc import Collection, Mapping, Sequence
 
-from ..kernel import JsonObject, OrgError
+from ..kernel import JsonObject, OrgError, clip_line
 from ._lines import criteria_lines
 from ._protocols import ContractAmendment
 from .api import Contract, Criterion, confirmed_amendments
+
+
+QUOTED_LINES = 3  # playbook lines quoted in the note about a removed criterion
+QUOTED_CLIP = 160  # characters of one quoted line
 
 
 def _described(deliverable: JsonObject) -> str:
@@ -80,10 +84,12 @@ class ContractAmender(ContractAmendment):
 
     def diff(
         self, old: Contract, new: Contract, changes: Sequence[str], where: str, criteria: Sequence[Criterion], confirmed: Collection[str],
+        quoting: Mapping[str, Sequence[str]] | None = None, playbook_version: int = 0,
     ) -> str:
         head = (f"{old.defined_by or 'your parent'} changed the contract of service `{old.name}` (v{old.version} -> v{new.version}). "
                 "Read it, and follow the new criteria from the next request on:")
         shown = (f"{c.id}: {c.text}" + (" (not confirmed)" if c.amended and c.id not in confirmed else "") for c in criteria)
+        removed = [self._removed(x, lines, playbook_version) for x, lines in (quoting or {}).items() if lines]
         rule_c = []
         if not new.locked and any(c.amended for c in criteria):  # on a locked contract revise_playbook refuses before the gate (DR-13)
             ids = ", ".join(c.id for c in confirmed_amendments(criteria, confirmed)) or "none yet"
@@ -92,4 +98,14 @@ class ContractAmender(ContractAmendment):
                 f'own words, one line each ("- C<k>: <its text>"); confirmed now: {ids}. A criterion marked (not confirmed) counts once the '
                 "client's yes is recorded (it reaches you as a criterion link); one marked (user-initiated) never does."
             ]
-        return "\n".join([head, *changes, "Acceptance criteria now:", *shown, *rule_c, f"Contract: {where}"])
+        return "\n".join([head, *changes, "Acceptance criteria now:", *shown, *removed, *rule_c, f"Contract: {where}"])
+
+    @staticmethod
+    def _removed(criterion: str, lines: Sequence[str], version: int) -> str:
+        """Advisory: the playbook still quotes a criterion the amendment removed (at most ``QUOTED_LINES`` of its lines are shown)."""
+        shown = ", ".join(f'"{clip_line(x, QUOTED_CLIP)}"' for x in lines[:QUOTED_LINES])
+        more = f" and {len(lines) - QUOTED_LINES} more" if len(lines) > QUOTED_LINES else ""
+        return (
+            f"Removed: {criterion}. Playbook v{version} still quotes it in {len(lines)} line(s): {shown}{more}. Where it differs from the "
+            "contract, follow the contract; the playbook changes only by a revision the evidence admits (step 3)."
+        )

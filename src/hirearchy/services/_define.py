@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Collection, Mapping
+from collections.abc import Collection, Mapping, Sequence
 
 from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
@@ -10,7 +10,9 @@ from ..kernel import NAME_RE, ROOT, Clock, EventSink, JsonObject, OrgError, pare
 from ._lines import criteria_lines
 from ._criteria import stored_versions
 from ._protocols import ContractAmendment, ContractDefinitions, OwnerAddresses, PlaybookTexts, PlaybookWriter, ServicePlaces
-from .api import DESCRIPTION_MAX, Contract, ContractNormalizer, ServiceCatalog, ServiceEvidence, ServiceStore, criteria_of, number_criteria
+from .api import (
+    DESCRIPTION_MAX, Contract, ContractNormalizer, Criterion, ServiceCatalog, ServiceEvidence, ServiceStore, criteria_of, number_criteria, quoting_lines,
+)
 
 
 class RuleContractDefiner(ContractDefinitions):
@@ -42,6 +44,17 @@ class RuleContractDefiner(ContractDefinitions):
             return self._evidence.confirmed(owner, name)
         except (OrgError, OSError):
             return frozenset()
+
+    def _quoting(self, owner: str, name: str, removed: Sequence[Criterion]) -> tuple[dict[str, list[str]], int]:
+        """The lines of the current playbook that quote each removed criterion, and its version, for the owner's note. The note is advisory, so a
+        playbook that cannot be read says nothing; any other error is a bug and propagates."""
+        if not removed:
+            return {}, 0
+        try:
+            playbook = self._catalog.read_playbook(owner, name)
+        except (OrgError, OSError):
+            return {}, 0
+        return {c.id: quoting_lines(playbook.body, c) for c in removed}, playbook.version
 
     def define_service(
         self, actor: str, owner: str, name: str, *, description: str | None, inputs: object, acceptance: object,
@@ -142,9 +155,10 @@ class RuleContractDefiner(ContractDefinitions):
             else:
                 text += f". It has no playbook yet: {owner} writes v1 with revise_playbook after its first request."
             return text
+        quoting, version = self._quoting(owner, name, [c for c in current if c.text not in accept_n])
         self._delivery.notify(
             owner, f"contract of service {name} changed to v{new.version}",
-            self._amendment.diff(old, new, changes, where, criteria_of(after, accept_n), confirmed), wake=False,
+            self._amendment.diff(old, new, changes, where, criteria_of(after, accept_n), confirmed, quoting, version), wake=False,
         )
         kept = self._places.rel(self._places.history_file(owner, name, "SERVICE", old.version))
         return (

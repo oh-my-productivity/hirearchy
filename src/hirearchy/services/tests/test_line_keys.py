@@ -3,7 +3,7 @@ bullets and checkboxes never make two lines differ; a changed word or number doe
 
 from __future__ import annotations
 
-from hirearchy.services import changed_lines, line_key
+from hirearchy.services import Criterion, changed_lines, line_key, quoting_lines
 
 
 def test_line_key_ignores_punctuation_spacing_case_and_markers() -> None:
@@ -51,3 +51,28 @@ def test_changed_lines_reversed_gives_the_removed_lines() -> None:
     new = "Keep one.\nKeep three.\nKeep four."
     assert changed_lines(old, new) == ["Keep four."]
     assert changed_lines(new, old) == ["Keep two."]
+
+
+# ------------------------------------------------------------------------------ quoting_lines (4.5)
+
+
+def criterion(text: str, id: str = "C9") -> Criterion:
+    return Criterion(id, text, 2, "root", False)
+
+
+def test_quoting_lines_by_id_or_by_verbatim_text() -> None:
+    body = "\n".join([
+        "## Steps", "- **C9 – Relative deadlines**: resolve them", "Every Due value is an ISO date, always.", "  - every due VALUE is an iso date  ",
+        "Mention C90 in passing", "xC9 is not an id", "A different rule", "", "---",
+    ])
+    assert quoting_lines(body, criterion("Every Due value is an ISO date")) == [
+        "- **C9 – Relative deadlines**: resolve them", "Every Due value is an ISO date, always.", "- every due VALUE is an iso date",
+    ]
+    assert quoting_lines("Cites c9 lower-case", criterion("Another rule")) == ["Cites c9 lower-case"]
+    assert quoting_lines("", criterion("x")) == [] and quoting_lines("nothing here", criterion("Another rule")) == []
+
+
+def test_an_empty_key_criterion_is_quoted_by_id_only() -> None:
+    """A criterion with no letter or digit has an empty key, which every line would "contain": it is matched by its id alone."""
+    assert quoting_lines("- ???\n- C9: the rule\nplain", criterion("???")) == ["- C9: the rule"]
+

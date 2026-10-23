@@ -165,3 +165,34 @@ def test_no_rule_c_line_without_amendments_or_on_a_locked_contract() -> None:
     plain = A.diff(contract(), contract(version=2), [], "x", ided("one", "two"), frozenset())
     assert "Rule (c)" not in plain
     assert "Rule (c)" not in A.diff(contract(), contract(version=2), [], "x", [], frozenset())
+
+
+# ------------------------------------------------------------------------------ the playbook lines that quote a removed criterion (4.5)
+
+TAIL = "Where it differs from the contract, follow the contract; the playbook changes only by a revision the evidence admits (step 3)."
+
+
+def removal_note(quoting: dict[str, list[str]], *, locked: bool = False) -> str:
+    criteria = number_criteria([(1, "root", ["one", "two"]), (2, "root", ["one", "two", "three", "four"])])
+    new = contract(acceptance=["one", "two", "three", "four"], version=2, locked=locked)
+    return A.diff(contract(), new, [], "ceo/services/brief/SERVICE.md", criteria, frozenset({"C3"}), quoting=quoting, playbook_version=2)
+
+
+def test_a_removed_criterion_names_its_quoting_lines_at_most_three_then_and_k_more() -> None:
+    line = "- **C2 – Sources**: every claim has a source URL"
+    one = removal_note({"C2": [line]}).splitlines()
+    assert f'Removed: C2. Playbook v2 still quotes it in 1 line(s): "{line}". {TAIL}' in one
+    four = removal_note({"C2": ["a", "b", "c", "d"], "C1": ["x" * 200]}).splitlines()
+    assert f'Removed: C2. Playbook v2 still quotes it in 4 line(s): "a", "b", "c" and 1 more. {TAIL}' in four
+    assert f'Removed: C1. Playbook v2 still quotes it in 1 line(s): "{"x" * 159}…". {TAIL}' in four  # each line clipped to 160
+    assert four.index("C4: four (not confirmed)") < four.index(next(x for x in four if x.startswith("Removed: C2"))) < four.index(
+        next(x for x in four if x.startswith("Rule (c):"))
+    )  # after the criteria list, before the rule (c) line
+
+
+def test_no_quoting_line_adds_nothing() -> None:
+    plain = A.diff(contract(), contract(version=2), [], "x", ided("one", "two"), frozenset())
+    assert A.diff(contract(), contract(version=2), [], "x", ided("one", "two"), frozenset(), quoting={}, playbook_version=2) == plain
+    assert A.diff(contract(), contract(version=2), [], "x", ided("one", "two"), frozenset(), quoting={"C1": []}, playbook_version=2) == plain
+    assert "Removed:" not in removal_note({})
+
