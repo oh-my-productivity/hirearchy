@@ -1,10 +1,10 @@
-"""Text helpers: ``word_count``, ``clip``, ``clip_line``, ``single``; oracle tests against the frozen copies (``_oracle``) and ``hirearchy.core``."""
+"""Text helpers: ``word_count``, ``strip_markers``, ``clip``, ``clip_line``, ``single``; oracle tests against the frozen copies (``_oracle``) and ``hirearchy.core``."""
 
 from __future__ import annotations
 
 import pytest
 
-from hirearchy.kernel import TITLE_MAX, clip, clip_line, single, word_count
+from hirearchy.kernel import TITLE_MAX, clip, clip_line, single, strip_markers, word_count
 from hirearchy.kernel.tests import _oracle
 from hirearchy.kernel.tests._reach import reach
 
@@ -35,6 +35,31 @@ WORDS = [
 @pytest.mark.parametrize("text", WORDS)
 def test_word_count_equals_the_core_count(text: str) -> None:
     assert word_count(text) == reach("core").word_count(text)
+
+
+def test_strip_markers_removes_leading_markdown_markers() -> None:
+    assert strip_markers("- [ ] x") == "x"
+    assert strip_markers("> # 1. x") == "x"
+    assert strip_markers("\u2022 x") == "x"
+    assert strip_markers("12) x") == "x"
+    assert strip_markers("  * - [x] nested x") == "nested x"
+
+
+def test_strip_markers_keeps_what_is_not_a_marker() -> None:
+    assert strip_markers("plain words") == "plain words"
+    assert strip_markers("1234) not a marker") == "1234) not a marker"
+    assert strip_markers("-5 degrees") == "-5 degrees"
+    assert strip_markers("") == "" and strip_markers("- ") == ""
+
+
+NESTED = ["> - [x] done nine", "  * 1. nested", "# - [ ] todo", "> > quote", "- 12) twelve\n- [ ] a\n> # b"]
+
+
+@pytest.mark.parametrize("text", [*NESTED, *WORDS])
+def test_word_count_is_unchanged_by_the_extraction(text: str) -> None:
+    assert word_count(text) == reach("core").word_count(text)
+    flat = [strip_markers(ln.replace("|", " ") if ln.lstrip().startswith("|") else ln) for ln in text.splitlines()]
+    assert all(not ln.lstrip().startswith(("> ", "- ", "# ")) for ln in flat)
 
 
 def test_clip_leaves_short_text_alone_and_marks_a_cut() -> None:

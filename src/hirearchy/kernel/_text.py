@@ -50,6 +50,14 @@ def client_questions(body: str) -> list[str]:
     return []
 
 
+def strip_markers(line: str) -> str:
+    """``line`` without its leading markdown markers (``>``, ``#``..``######``, ``-``, ``*``, ``+``, ``\u2022``, ``1.``/``1)`` up to 3 digits,
+    ``[ ]``/``[x]``), removed repeatedly from the start, and the blanks that follow them; the words after are untouched (pure)."""
+    while (m := _LINE_MARKER.match(line)) and m.end() > 0:
+        line = line[m.end():]
+    return line.lstrip()
+
+
 def word_count(text: str) -> int:
     """Words of ``text`` for word limits: markdown markers (``#``, ``-``, ``*``, ``1.``, ``|``, ``---``, fence lines,
     ``>``, checkboxes) are not words; the words next to them are."""
@@ -59,9 +67,7 @@ def word_count(text: str) -> int:
             continue
         if line.lstrip().startswith("|"):  # table row: the pipes are delimiters
             line = line.replace("|", " ")
-        while (m := _LINE_MARKER.match(line)) and m.end() > 0:
-            line = line[m.end():]
-        total += sum(1 for tok in line.split() if not _MARKUP_ONLY.fullmatch(tok))
+        total += sum(1 for tok in strip_markers(line).split() if not _MARKUP_ONLY.fullmatch(tok))
     return total
 
 

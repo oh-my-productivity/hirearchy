@@ -1,0 +1,53 @@
+"""``line_key`` and ``changed_lines``: playbook lines compared on their words (P1, 4.1): punctuation, spacing, case, list numbering,
+bullets and checkboxes never make two lines differ; a changed word or number does."""
+
+from __future__ import annotations
+
+from hirearchy.services import changed_lines, line_key
+
+
+def test_line_key_ignores_punctuation_spacing_case_and_markers() -> None:
+    assert line_key("- Cut to 600 words, before reporting!") == line_key("  * cut  to 600 WORDS before reporting")
+    assert line_key("> ## Cut to 600 words") == "cutto600words"
+    assert line_key("Hello, wörld") == "hellowörld"
+    assert line_key("---") == "" and line_key("```") == "" and line_key("-") == "" and line_key("#") == "" and line_key("   ") == ""
+
+
+def test_renumbered_steps_are_no_change() -> None:
+    current = "1. Search.\n2. Write.\n3. Check every claim."
+    new = "1. Search.\n2. Write.\n3. Add a summary.\n4. Check every claim."
+    assert changed_lines(current, new) == ["3. Add a summary."]
+    assert changed_lines(current, "2) Search.\n3) Write.\n4) Check every claim.") == []
+
+
+def test_a_checkbox_toggle_is_no_change() -> None:
+    assert changed_lines("- [ ] Check the dates", "- [x] Check the dates") == []
+    assert line_key("- [ ] x") == line_key("- [x] x") == "x"
+
+
+def test_a_changed_word_or_number_is_a_change() -> None:
+    assert changed_lines("Cut to 600 words.", "Cut to 500 words.") == ["Cut to 500 words."]
+    assert changed_lines("Use the table.", "Use the tables.") == ["Use the tables."]
+    assert changed_lines("Use the table.", "Never use the table.") == ["Never use the table."]
+
+
+def test_a_repeated_line_counts_once_more() -> None:
+    assert changed_lines("Keep it short.", "Keep it short.\nKeep it short.") == ["Keep it short."]
+    assert changed_lines("Keep it short.\nKeep it short.", "Keep it short.\nKeep it short.") == []
+    assert changed_lines("Keep it short.\nKeep it short.", "Keep it short.") == []
+
+
+def test_lines_with_an_empty_key_are_never_changes() -> None:
+    assert changed_lines("a", "a\n\n---\n```\n-\n#\n   ") == []
+    assert changed_lines("", "") == [] and changed_lines("", "\n\n") == []
+
+
+def test_changed_lines_are_stripped_in_order_and_everything_is_new_without_a_current() -> None:
+    assert changed_lines("", "  first line  \n\n- second line\n") == ["first line", "- second line"]
+
+
+def test_changed_lines_reversed_gives_the_removed_lines() -> None:
+    old = "Keep one.\nKeep two.\nKeep three."
+    new = "Keep one.\nKeep three.\nKeep four."
+    assert changed_lines(old, new) == ["Keep four."]
+    assert changed_lines(new, old) == ["Keep two."]

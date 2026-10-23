@@ -20,13 +20,14 @@ Files::
 from __future__ import annotations
 
 import re
+from collections import Counter
 from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from ..kernel import ROOT, JsonObject, Message, OrgError
+from ..kernel import ROOT, JsonObject, Message, OrgError, strip_markers
 from ._cap import playbook_word_cap
 
 __all__ = [
@@ -51,8 +52,10 @@ __all__ = [
     "ServiceHints",
     "ServiceStore",
     "VERDICTS",
+    "changed_lines",
     "confirmed_amendments",
     "criteria_of",
+    "line_key",
     "normalize_evidence",
     "normalize_links",
     "number_criteria",
@@ -150,6 +153,31 @@ def criteria_of(numbered: Sequence[Criterion], texts: Sequence[str]) -> list[Cri
     """The criteria with these texts, in the order of ``texts`` (a contract's acceptance list); a text ``numbered`` lacks is skipped."""
     by_text = {c.text: c for c in numbered}
     return [by_text[t] for t in texts if t in by_text]
+
+
+def line_key(line: str) -> str:
+    """The words of a playbook line, for comparing lines (pure): its letters and digits after its leading markdown markers, case-folded.
+
+    Punctuation, spacing, list numbering (``3.`` -> ``4.`` when a step is inserted), bullets, checkboxes (``- [ ] x`` and ``- [x] x`` are the
+    same line) and other markdown never make two lines differ; a change of any word, or of a number inside the text, does."""
+    return "".join(ch for ch in strip_markers(line).casefold() if ch.isalnum())
+
+
+def changed_lines(current: str, new: str) -> list[str]:
+    """The lines of ``new`` (stripped, in order) whose :func:`line_key` is not among the keys of ``current``'s lines, counted as a multiset (a
+    line repeated in ``new`` more often than in ``current`` counts once more); lines with an empty key (blank, ``---``, a fence, a lone ``-`` or
+    ``#``) are never changes (pure). ``changed_lines(new, current)`` gives the removed lines."""
+    have = Counter(key for line in current.splitlines() if (key := line_key(line)))
+    out: list[str] = []
+    for line in new.splitlines():
+        key = line_key(line)
+        if not key:
+            continue
+        if have[key] > 0:
+            have[key] -= 1
+        else:
+            out.append(line.strip())
+    return out
 
 
 def normalize_evidence(ids: object) -> tuple[str, ...]:
