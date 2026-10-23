@@ -63,6 +63,17 @@ def confirmed_amendment(org, criterion, topic="confirm", owner="ceo", name="week
     return new
 
 
+def write_version(org, version, acceptance, owner="ceo", name="weekly-brief", **basis):
+    """Write contract version ``version`` of the service straight into the store (the current one is archived) with ``basis`` keys in its
+    frontmatter (``answers``, ``about``, ``words``, ``initiated``), as a version of 0a.2 carries them. A version's basis is its own: the keys of
+    the version before are not copied."""
+    meta, body = org.runtime.service_store.read_contract(owner, name)
+    meta = {k: v for k, v in meta.items() if k not in ("answers", "about", "words", "initiated")}
+    org.runtime.service_store.write_contract(
+        owner, name, {**meta, "version": version, "acceptance": list(acceptance), "defined_by": ROOT, **basis}, body, version - 1,
+    )
+
+
 def call(server, tool, **args):
     result = asyncio.run(server.call_tool(tool, args))
     blocks = result[0] if isinstance(result, tuple) else result

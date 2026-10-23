@@ -4,7 +4,7 @@
 import time
 
 from testkit.reach.hirearchy.core import ROOT
-from testkit.services_world import ENG, confirmed_amendment, define, deliver, request, svc, work
+from testkit.services_world import ENG, confirmed_amendment, define, deliver, request, svc, work, write_version
 
 WEEKDAY = "weekly-brief"
 
@@ -322,6 +322,20 @@ def test_eligible_ids_say_may_add_its_words(svc):
     org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])  # C5: nobody confirmed it
     org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the date"])  # C6
     assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them may add its words; C5, C6 are not confirmed yet):" in step_3_after(org)
+
+
+def test_eligible_names_user_initiated_ids_as_never_admitted(svc):
+    """A change the user asked for on their own is named apart from the unconfirmed ones: it never counts (``_eligible``)."""
+    org = svc
+    v1 = ["At most 600 words", "Every factual claim has a source URL"]
+    write_version(org, 2, [*v1, "One page"], initiated="user", words="Keep it to one page.")  # C3
+    assert f"{CLAUSE}none yet; C3 is user-initiated (rule (c) never admits it)):" in step_3_after(org)
+    write_version(org, 3, [*v1, "One page", "Names its week"], initiated="user", words="Name the week.")  # C4
+    assert f"{CLAUSE}none yet; C3, C4 are user-initiated (rule (c) never admits them)):" in step_3_after(org)
+    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])  # C5: an amendment nobody confirmed
+    assert f"{CLAUSE}none yet; C5 is not confirmed yet; C3, C4 are user-initiated (rule (c) never admits them)):" in step_3_after(org)
+    c6 = confirmed_amendment(org, "Every figure names its date")
+    assert f"{CLAUSE}now {c6}: a revision citing it may add its words; C5 is not confirmed yet; C3, C4 are user-initiated (rule (c) never admits them)):" in step_3_after(org)
 
 
 def test_step_3_leaves_out_a_removed_amendment(svc):

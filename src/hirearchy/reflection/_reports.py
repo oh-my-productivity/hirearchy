@@ -6,7 +6,7 @@ from collections.abc import Collection, Sequence
 
 from ..agents import AgentDirectory
 from ..kernel import Message, clip_line
-from ..services import Contract, ServiceCatalog, confirmed_amendments, criteria_of
+from ..services import Contract, Criterion, ServiceCatalog, confirmed_amendments, criteria_of
 from ._ports import ServicePaths
 from .api import Assertion, CaseHistory, ServiceReports, case_spend, confirmed_criteria, regressions, summarize
 
@@ -42,13 +42,22 @@ class TextServiceReports(ServiceReports):
             about = ""
         return f'    {a.id} (case {a.case}{about}): "{clip_line(a.verdict.note, CLIP_ASSERTION)}"'
 
+    @staticmethod
+    def _mark(x: Criterion, eligible: Collection[str]) -> str:
+        """What the listing says of a criterion that is an amendment: the user's own request never admits a revision; the others wait for the yes."""
+        if not x.amended:
+            return ""
+        if x.user:
+            return " (amendment, user-initiated: never admits a playbook revision)"
+        return "" if x.id in eligible else " (amendment, not confirmed)"
+
     def _block(self, c: Contract, *, offered: bool) -> list[str]:
         pb = self._catalog.read_playbook(c.owner, c.name)
         items = self._history.cases(c.owner, c.name)
         criteria = self._catalog.criteria(c.owner, c.name)
         current = {x.id for x in criteria if x.current}
         assertions = regressions(items)
-        eligible = {x.id for x in confirmed_amendments(criteria, confirmed_criteria(items))}  # the amendments rule (c) admits
+        eligible = {x.id for x in confirmed_amendments(criteria, confirmed_criteria(items, criteria))}  # the amendments rule (c) admits
         inputs = ", ".join(f"{i['name']}{'*' if i['required'] else ''}" + (f" ({i['description']})" if i["description"] else "")
                            for i in c.inputs) or "none"
         head = f"- {c.name} (offered by {c.owner}; contract v{c.version}, playbook v{pb.version})" if not offered else \
@@ -57,7 +66,7 @@ class TextServiceReports(ServiceReports):
             f"{head}: {c.description}",
             f"  inputs: {inputs}   (* required)",
             f"  each request: {c.budget} runs; acceptance criteria ({self._paths.rel(c.path)}):" if c.path else "",
-            *(f"    {x.id}: {x.text}{' (amendment, not confirmed)' if x.amended and x.id not in eligible else ''}" for x in criteria_of(criteria, c.acceptance)),
+            *(f"    {x.id}: {x.text}{self._mark(x, eligible)}" for x in criteria_of(criteria, c.acceptance)),
             f"  record: {summarize(items).line() if items else 'no requests yet'}",
             *(["  regression list (the client's rejections):"] if assertions else []),
             *(self._assertion_line(a, current) for a in assertions),

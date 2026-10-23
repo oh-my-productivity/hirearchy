@@ -130,6 +130,19 @@ def test_the_note_marks_an_unconfirmed_amendment() -> None:
     assert "(not confirmed)" not in A.diff(contract(), new, [], "x", criteria, {"C3", "C4"}).split("Rule (c)")[0]  # the rule (c) line only explains the mark
 
 
+def test_a_user_initiated_criterion_is_marked_in_the_amendment_note() -> None:
+    criteria = number_criteria(
+        [(1, "root", ["one", "two"]), (2, "root", ["one", "two", "three"]), (3, "root", ["one", "two", "three", "four", "five"])],
+        {2: ("", True), 3: ("20261018T100000000012-root-0004", False)},
+    )
+    new = contract(acceptance=["one", "two", "three", "four", "five"], version=3)
+    note = A.diff(contract(), new, [], "x", criteria, frozenset({"C3"}))  # even a confirmed id: the user's own request never counts
+    assert "Acceptance criteria now:\nC1: one\nC2: two\nC3: three (user-initiated)\nC4: four (not confirmed)\nC5: five (not confirmed)\n" in note
+    answered = A.diff(contract(), new, [], "x", criteria, frozenset({"C4", "C5"}))
+    assert "C3: three (user-initiated)\nC4: four\nC5: five\n" in answered
+    assert "confirmed now: C4, C5." in answered  # a user-initiated criterion is not among those rule (c) admits
+
+
 RULE_C = (
     "Rule (c): a playbook revision that cites a criterion added by an amendment the client confirmed may add that criterion's own words, "
     'one line each ("- C<k>: <its text>"); confirmed now: {ids}. '

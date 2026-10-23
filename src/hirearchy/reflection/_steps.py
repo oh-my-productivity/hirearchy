@@ -57,8 +57,9 @@ class TextServiceSteps(ServiceSteps):
         if contract is None:
             return ""
         cases = self._history.cases(owner, service)
-        confirmed = confirmed_criteria(cases)
-        added = [c.id for c in self._catalog.criteria(owner, service) if c.current and c.amended and c.since == contract.version and c.id not in confirmed]
+        criteria = self._catalog.criteria(owner, service)
+        confirmed = confirmed_criteria(cases, criteria)
+        added = [c.id for c in criteria if c.current and c.amended and c.since == contract.version and c.id not in confirmed]
         if not added:
             return ""
         latest = max(regressions(cases), key=lambda a: a.verdict.message.id, default=None)

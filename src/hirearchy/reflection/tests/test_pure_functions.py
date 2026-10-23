@@ -8,6 +8,7 @@ import pytest
 
 from hirearchy.kernel import Message
 from hirearchy.reflection import Case, Verdict, case_spend, confirmed_criteria, lessons_of, version_at
+from hirearchy.services import Criterion
 
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
 TIMELINE = [(1, T), (2, T + timedelta(days=1)), (3, T + timedelta(days=2))]
@@ -122,8 +123,36 @@ def test_confirmed_criteria_reads_human_links_only() -> None:
     own_criterion = judged(links=("C2",), links_tier="relayed", n=2)  # a criterion on the rejection itself
     nothing = judged(links=("none",), links_tier="human", n=3)  # "none" and R<j> name no criterion
     same_as = judged(links=("R1",), links_tier="human", n=4)
-    assert confirmed_criteria([with_verdicts(relayed_link, own_criterion, nothing, same_as)]) == frozenset()
+    assert confirmed_criteria([with_verdicts(relayed_link, own_criterion, nothing, same_as)], []) == frozenset()
     yes = judged(links=("C3",), links_tier="human", confirmed=("C3",), n=5)
     more = judged(links=("C4", "R1"), links_tier="human", confirmed=("C4",), n=6)
-    assert confirmed_criteria([with_verdicts(yes), with_verdicts(more, relayed_link)]) == frozenset({"C3", "C4"})  # united over cases
-    assert confirmed_criteria([]) == frozenset() and confirmed_criteria([with_verdicts()]) == frozenset()
+    assert confirmed_criteria([with_verdicts(yes), with_verdicts(more, relayed_link)], []) == frozenset({"C3", "C4"})  # united over cases
+    assert confirmed_criteria([], []) == frozenset() and confirmed_criteria([with_verdicts()], []) == frozenset()
+
+
+def criterion(id: str, *, since: int = 2, by: str = "root", answers: str = "", user: bool = False) -> Criterion:
+    return Criterion(id, f"text of {id}", since, by, True, answers, user)
+
+
+def test_an_answered_criterion_is_confirmed_only_by_a_human_link_on_its_rejection() -> None:
+    mine = judged(links=("C3",), links_tier="human", confirmed=("C3",), n=5)  # the rejection the amendment answers
+    other = judged(links=("C3",), links_tier="human", confirmed=("C3",), n=6)  # a later, unrelated link that names C3
+    answered = criterion("C3", answers=mine.message.id)
+    assert confirmed_criteria([with_verdicts(other)], [answered]) == frozenset()  # a link on another rejection confirms nothing
+    assert confirmed_criteria([with_verdicts(mine)], [answered]) == frozenset({"C3"})  # the product's own link, on that rejection
+    assert confirmed_criteria([with_verdicts(other), with_verdicts(mine)], [answered]) == frozenset({"C3"})
+    unlinked = judged(n=7)  # the rejection is there, its link is not (the write failed): nothing is confirmed
+    assert confirmed_criteria([with_verdicts(unlinked)], [criterion("C3", answers=unlinked.message.id)]) == frozenset()
+
+
+def test_a_user_initiated_criterion_is_never_confirmed() -> None:
+    yes = judged(links=("C3", "C4"), links_tier="human", confirmed=("C3", "C4"))
+    assert confirmed_criteria([with_verdicts(yes)], [criterion("C3", user=True), criterion("C4")]) == frozenset({"C4"})
+    assert confirmed_criteria([with_verdicts(yes)], [criterion("C3", user=True), criterion("C4", user=True)]) == frozenset()
+
+
+def test_a_legacy_or_v1_criterion_is_confirmed_as_in_0a1() -> None:
+    yes = judged(links=("C1", "C3", "C5"), links_tier="human", confirmed=("C1", "C3", "C5"))
+    both = [criterion("C1", since=1), criterion("C3")]  # a v1 criterion; an amendment written before 0a.2 (no basis)
+    assert confirmed_criteria([with_verdicts(yes)], both) == frozenset({"C1", "C3", "C5"})  # C5: an id the criteria do not list
+    assert confirmed_criteria([with_verdicts(yes)], []) == frozenset({"C1", "C3", "C5"})

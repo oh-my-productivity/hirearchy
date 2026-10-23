@@ -88,7 +88,7 @@ class ContractAmender(ContractAmendment):
     ) -> str:
         head = (f"{old.defined_by or 'your parent'} changed the contract of service `{old.name}` (v{old.version} -> v{new.version}). "
                 "Read it, and follow the new criteria from the next request on:")
-        shown = (f"{c.id}: {c.text}" + (" (not confirmed)" if c.amended and c.id not in confirmed else "") for c in criteria)
+        shown = (f"{c.id}: {c.text}" + self._mark(c, confirmed) for c in criteria)
         removed = [self._removed(x, lines, playbook_version) for x, lines in (quoting or {}).items() if lines]
         rule_c = []
         if not new.locked and any(c.amended for c in criteria):  # on a locked contract revise_playbook refuses before the gate (DR-13)
@@ -99,6 +99,15 @@ class ContractAmender(ContractAmendment):
                 "client's yes is recorded (it reaches you as a criterion link); one marked (user-initiated) never does."
             ]
         return "\n".join([head, *changes, "Acceptance criteria now:", *shown, *removed, *rule_c, f"Contract: {where}"])
+
+    @staticmethod
+    def _mark(criterion: Criterion, confirmed: Collection[str]) -> str:
+        """An amendment the client has not confirmed is marked; one the user asked for on their own never counts."""
+        if not criterion.amended:
+            return ""
+        if criterion.user:
+            return " (user-initiated)"
+        return "" if criterion.id in confirmed else " (not confirmed)"
 
     @staticmethod
     def _removed(criterion: str, lines: Sequence[str], version: int) -> str:

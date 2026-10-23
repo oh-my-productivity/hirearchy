@@ -58,7 +58,7 @@ class CaseServiceEvidence(ServiceEvidence):
         return wanted
 
     def confirmed(self, owner: str, service: str) -> frozenset[str]:
-        return confirmed_criteria(self._history.cases(owner, service))
+        return confirmed_criteria(self._history.cases(owner, service), self._catalog.criteria(owner, service))
 
     def admit(
         self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),
@@ -67,7 +67,7 @@ class CaseServiceEvidence(ServiceEvidence):
         crit = {c.id: c for c in self._catalog.criteria(owner, service)}
         cases = self._history.cases(owner, service)
         found = regressions(cases)
-        confirmed = confirmed_criteria(cases)
+        confirmed = confirmed_criteria(cases, list(crit.values()))
         eligible = confirmed_amendments(list(crit.values()), confirmed)
         client = parent(owner) or ROOT
         subjects: set[str] = set()  # what the revision rests on, once the human client's own evidence is picked out

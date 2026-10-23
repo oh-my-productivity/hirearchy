@@ -124,15 +124,19 @@ class EvidenceReflectSection(ReflectSection):
 
     def _eligible(self, addr: str, name: str) -> str:
         """What rule (c) admits now, for step 3: the current amendments the client confirmed, and those it has not (``none yet`` when no one is)."""
-        current = [c for c in self._catalog.criteria(addr, name) if c.current]
-        confirmed = confirmed_criteria(self._history.cases(addr, name))
+        criteria = self._catalog.criteria(addr, name)
+        current = [c for c in criteria if c.current]
+        confirmed = confirmed_criteria(self._history.cases(addr, name), criteria)
         admitted = [c.id for c in confirmed_amendments(current, confirmed)]
-        waiting = [c.id for c in current if c.amended and c.id not in confirmed]
+        waiting = [c.id for c in current if c.amended and not c.user and c.id not in confirmed]
+        own = [c.id for c in current if c.amended and c.user]
         text = "none yet"
         if admitted:
             text = f"now {', '.join(admitted)}: a revision citing {'it' if len(admitted) == 1 else 'one of them'} may add its words"
         if waiting:
             text += f"; {', '.join(waiting)} {'is' if len(waiting) == 1 else 'are'} not confirmed yet"
+        if own:
+            text += f"; {', '.join(own)} {'is' if len(own) == 1 else 'are'} user-initiated (rule (c) never admits {'it' if len(own) == 1 else 'them'})"
         return text
 
     def section(self, addr: str, contract: Contract, digest: str, *, rejected: str = "", new_request: bool = True) -> str:

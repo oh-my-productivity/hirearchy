@@ -20,6 +20,7 @@ from datetime import datetime
 from typing import Protocol, runtime_checkable
 
 from ..kernel import Message, msg_time
+from ..services import Criterion
 
 __all__ = [
     "Assertion",
@@ -133,10 +134,20 @@ def case_spend(case: Case) -> int:
     return case.runs + still_out
 
 
-def confirmed_criteria(cases: Sequence[Case]) -> frozenset[str]:
-    """The C<k> ids the human client confirmed: every id in ``v.confirmed`` (named by a human-tier link note), over every verdict of ``cases``
-    (pure). A criterion on the rejection itself, a link "the same as R<j>" and "none" confirm no criterion."""
-    return frozenset(x for c in cases for v in c.verdicts for x in v.confirmed)
+def confirmed_criteria(cases: Sequence[Case], criteria: Sequence[Criterion]) -> frozenset[str]:
+    """The C<k> ids the human client confirmed: the ids in ``v.confirmed`` (named by a human-tier link note), over every verdict of ``cases``
+    (pure). A criterion on the rejection itself, a link "the same as R<j>" and "none" confirm no criterion.
+
+    ``criteria`` (the service's, with their basis) decide which link counts for which criterion: one added by an answered amendment
+    (``Criterion.answers``) is confirmed only by a human link on that rejection (the product's own link), one the user asked for on their own
+    (``Criterion.user``) never; any other (v1, an agent's version, a version written before 0a.2) as in 0a.1, by any human link."""
+    basis = {c.id: c for c in criteria}
+
+    def counts(v: Verdict, x: str) -> bool:
+        c = basis.get(x)
+        return c is None or not (c.user or (c.answers and c.answers != v.message.id))
+
+    return frozenset(x for c in cases for v in c.verdicts for x in v.confirmed if counts(v, x))
 
 
 def regressions(cases: Sequence[Case]) -> list[Assertion]:

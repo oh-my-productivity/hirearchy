@@ -92,6 +92,20 @@ def test_an_unconfirmed_amendment_is_marked_in_the_listing(svc):
     assert "    C1: At most 600 words\n" in out  # a v1 criterion was never an amendment
 
 
+def test_a_user_initiated_amendment_is_marked_never_admits_a_playbook_revision(svc):
+    from testkit.reach.hirearchy.core import ROOT
+    from testkit.services_world import write_version
+
+    write_version(svc, 2, ["At most 600 words", "Every factual claim has a source URL", "One page"], initiated="user", words="Keep it to one page.")
+    out = svc.runtime.service_reports.services_text("root")
+    assert "    C3: One page (amendment, user-initiated: never admits a playbook revision)\n" in out
+    _, no = reject(svc, "Too long.")
+    svc.feedback(ROOT, no.reply_to, "reject", "Yes.", source="human", criterion=["C3"], confirms=no.id)  # a human link names it: still never admitted
+    out = svc.runtime.service_reports.services_text("ceo")
+    assert "    C3: One page (amendment, user-initiated: never admits a playbook revision)\n" in out
+    assert "not confirmed)\n    C" not in out and "C3: One page (amendment, not confirmed)" not in out
+
+
 def test_the_services_listing_marks_a_removed_criterion(svc):
     first, note = reject(svc, "Too long.", criterion=["C1", "C2"])
     svc.define_service("root", "ceo", "weekly-brief", add_acceptance=["One page"], remove_acceptance=["Every factual claim has a source URL"])
