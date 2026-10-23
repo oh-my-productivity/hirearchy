@@ -1,10 +1,10 @@
-"""Text helpers: ``word_count``, ``strip_markers``, ``clip``, ``clip_line``, ``single``; oracle tests against the frozen copies (``_oracle``) and ``hirearchy.core``."""
+"""Text helpers: ``word_count``, ``strip_markers``, ``artifact_paths``, ``clip``, ``clip_line``, ``single``; oracle tests against the frozen copies (``_oracle``) and ``hirearchy.core``."""
 
 from __future__ import annotations
 
 import pytest
 
-from hirearchy.kernel import TITLE_MAX, clip, clip_line, single, strip_markers, word_count
+from hirearchy.kernel import TITLE_MAX, artifact_paths, clip, clip_line, single, strip_markers, word_count
 from hirearchy.kernel.tests import _oracle
 from hirearchy.kernel.tests._reach import reach
 
@@ -98,3 +98,17 @@ def _clip_inputs() -> list[tuple[object, int]]:
 @pytest.mark.parametrize(("value", "limit"), _clip_inputs())
 def test_clip_line_equals_the_frozen_clip(value: object, limit: int) -> None:
     assert clip_line(value, limit) == _oracle._clip(value, limit)
+
+
+def test_artifact_paths_reads_the_artifacts_section() -> None:
+    body = "## Summary\nx\n## ARTIFACTS\n- ceo/a.md (12 words)\n\n* ceo/b.md\n  ceo/c.md  \n## Lessons\n- not me"
+    assert artifact_paths(body) == ["ceo/a.md", "ceo/b.md", "ceo/c.md"]
+    assert artifact_paths("## artifacts\n-   ceo/dir with space/d.md (1 words) (2)") == ["ceo/dir with space/d.md"]
+    assert artifact_paths("## Artifacts\n- a.md\n## Artifacts\n- b.md") == ["a.md", "b.md"]  # one section, however often it is headed
+
+
+def test_no_artifacts_section_gives_no_paths() -> None:
+    assert artifact_paths("") == []
+    assert artifact_paths("no sections") == []
+    assert artifact_paths("## Summary\n- ceo/a.md\n### Artifacts\n- ceo/b.md") == []  # a deeper heading is not the section
+    assert artifact_paths("## Artifacts\n\n   \n## Lessons\n- x") == []

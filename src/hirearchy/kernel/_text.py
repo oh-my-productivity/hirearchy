@@ -50,6 +50,19 @@ def client_questions(body: str) -> list[str]:
     return []
 
 
+def artifact_paths(body: str) -> list[str]:
+    """The paths of the ``## Artifacts`` section of a result body (pure): its non-blank lines (the heading is read in any case; any other ``## ``
+    heading ends the section), each stripped, without its ``-``/``*`` bullet, and cut at the first `` (`` (the runtime's word-count note)."""
+    paths: list[str] = []
+    inside = False
+    for line in body.splitlines():
+        if line.startswith("## "):
+            inside = line[3:].strip().lower() == "artifacts"
+        elif inside and line.strip():
+            paths.append(line.strip().lstrip("-* ").split(" (", 1)[0])
+    return paths
+
+
 def strip_markers(line: str) -> str:
     """``line`` without its leading markdown markers (``>``, ``#``..``######``, ``-``, ``*``, ``+``, ``\u2022``, ``1.``/``1)`` up to 3 digits,
     ``[ ]``/``[x]``), removed repeatedly from the start, and the blanks that follow them; the words after are untouched (pure)."""

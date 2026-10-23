@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from hirearchy.kernel import ROOT, Message
+from hirearchy.kernel import ROOT, Message, artifact_paths
 from hirearchy.progress._lines import CaseTaskLines, artifacts_of
 from hirearchy.progress._ports import TaskLines
 from hirearchy.progress._counts import LogRunCounts
@@ -99,6 +99,13 @@ def test_artifacts_of_drops_the_word_counts_and_the_bullets() -> None:
     result = Message(sender="ceo", to=ROOT, type="result", body="## Summary\nx\n## Artifacts\n- ceo/a.md (12 words)\n\n* ceo/b.md\n## Lessons\n- not me")
     assert artifacts_of(result) == ["ceo/a.md", "ceo/b.md"]
     assert artifacts_of(Message(sender="ceo", to=ROOT, type="result", body="no sections")) == []
+
+
+def test_artifacts_of_is_artifact_paths_of_the_body() -> None:
+    """``progress`` and ``reflection`` parse a result's artifacts one way: ``kernel.artifact_paths``."""
+    bodies = ["## Summary\nx\n## Artifacts\n- ceo/a.md (12 words)\n\n* ceo/b.md\n## Lessons\n- not me", "no sections", "", "## ARTIFACTS\n-   c.md (1 words)"]
+    for body in bodies:
+        assert artifacts_of(Message(sender="ceo", to=ROOT, type="result", body=body)) == artifact_paths(body)
 
 
 @pytest.mark.parametrize(("step_of_verdicts", "expected"), [([], False), ([0], True), ([1], True), ([2], True)])

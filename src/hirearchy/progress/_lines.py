@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from ..attention import section
-from ..kernel import ROOT, Message, client_questions, fmt_duration
+from ..kernel import ROOT, Message, artifact_paths, client_questions, fmt_duration
 from ..mail import MailboxReader
 from ..reflection import Case, CaseHistory, ServiceReports, rated
 from ._ports import RunCounts, TaskLines, TaskStates, TaskTeams, TeamActivity
@@ -13,7 +12,7 @@ from ._ports import RunCounts, TaskLines, TaskStates, TaskTeams, TeamActivity
 
 def artifacts_of(result: Message) -> list[str]:
     """Paths listed under ``## Artifacts`` (the runtime's word-count notes after the path are dropped)."""
-    return [line.lstrip("-* ").split(" (", 1)[0] for line in section(result.body, "artifacts")]
+    return artifact_paths(result.body)
 
 
 class CaseTaskLines(TaskLines):
