@@ -113,7 +113,7 @@ class PackagedInstalledSkill(InstalledSkill):
 def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[SchedulerControl], SchedulerControl] | None = None) -> McpServerFactory:
     """The factory of the servers bound to ``binding``. ``scheduler_control``: wraps the control of the organization the ``start`` and ``stop`` tools use
     (the tests give a fake starter through it)."""
-    from ..access import ToolNaming
+    from ..access import ModelFloorAudit, ToolNaming
     from ..agents import AgentDirectory, CharterReader
     from ..attention import OpenWork, WaitingOnUser
     from ..blueprint import BlueprintApplier, BlueprintExamples, BlueprintLoader, PlanIdentity, PlanRenderer
@@ -181,12 +181,14 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     examples: Provider[BlueprintExamples] = lambda: TemplateBlueprintExamples()
 
     common = [
-        IdentityTools(text, of(Whoami), of(SchedulerStatus), of(BatchStore), of(MailboxReader), installed_skill),
+        IdentityTools(text, of(Whoami), of(SchedulerStatus), of(BatchStore), of(MailboxReader), installed_skill, of(ModelFloorAudit)),
         TaskTools(of(TaskAssigner), of(TaskReporter), of(BudgetQuery), of(MailboxReader), of(ServiceHints)),
         NoteTools(of(MessageSender), of(BudgetQuery), of(BudgetReclaimer)),
         HiringTools(of(Hiring), of(Retirement)),
         FileTools(of(ToolNaming), of(OrgFileReader), of(OrgFileWriter), of(OrgLayout)),
-        StatusTools(text, of(OrgTree), of(SchedulerStatus), directory, of(HealthAnalyzer), of(HealthRenderer), installed_skill),
+        StatusTools(
+            text, of(OrgTree), of(SchedulerStatus), directory, of(HealthAnalyzer), of(HealthRenderer), installed_skill, of(ModelFloorAudit),
+        ),
         ServiceTools(
             DirectoryServiceRoles(text, directory, of(CharterReader), of(ServiceCatalog)), of(ServiceReports), of(ServiceCommands), of(BudgetQuery),
             of(ServiceSteps),

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from hirearchy.access.testing import FixedModelFloorAudit
 from hirearchy.daemon import SchedulerState
 from hirearchy.daemon.testing import FakeSchedulerStatus
 from hirearchy.kernel import ROOT
@@ -19,12 +20,15 @@ from ._support import call, fails, serve
 STALE = Path("/h/.kiro/skills/hirearchy/SKILL.md")
 
 
-def tools(exists: bool = True, stale: Path | None = None) -> tuple[StatusTools, ScriptedHealth]:
+NOTE = "Model floor: below the allowed models (claude-sonnet-5.5, claude-opus-5.5): ceo/eng on claude-haiku-4.5. Fix: set model: claude-sonnet-5.5 in each one's AGENT.md."
+
+
+def tools(exists: bool = True, stale: Path | None = None, floor: str = "") -> tuple[StatusTools, ScriptedHealth]:
     agents, health = agents_in("ceo", "ceo/eng", "ops"), ScriptedHealth()
     return StatusTools(
         InstructionText(MemoryBinding(Path("/o"), exists=exists)), lambda: FixedOrgTree("THE TREE"),
         lambda: FakeSchedulerStatus(SchedulerState("running", 5, "then")), lambda: agents, lambda: health, lambda: health,
-        FixedInstalledSkill(stale),
+        FixedInstalledSkill(stale), lambda: FixedModelFloorAudit(note=floor),
     ), health
 
 
@@ -37,6 +41,21 @@ def test_root_is_told_when_the_installed_skill_is_out_of_date() -> None:
     out = call(serve(tools(stale=STALE)[0], ROOT), "status")
     assert out == "THE TREE\n\nscheduler: running (pid 5, since then)\n\n" + STALE_SKILL.format(path=STALE)
     assert "installed skill" not in call(serve(tools()[0], ROOT), "status")
+
+
+def test_root_is_told_which_agents_run_below_the_model_floor() -> None:
+    assert call(serve(tools(floor=NOTE)[0], ROOT), "status") == "THE TREE\n\nscheduler: running (pid 5, since then)\n\n" + NOTE
+    out = call(serve(tools(stale=STALE, floor=NOTE)[0], ROOT), "status")
+    assert out == "THE TREE\n\nscheduler: running (pid 5, since then)\n\n" + NOTE + "\n\n" + STALE_SKILL.format(path=STALE)  # the floor before the skill
+    assert "Model floor" not in call(serve(tools()[0], ROOT), "status")
+
+
+def test_an_agent_is_never_shown_the_floor_note() -> None:
+    assert call(serve(tools(floor=NOTE)[0], "ceo"), "status") == "THE TREE"
+
+
+def test_setup_mode_shows_no_floor_note() -> None:
+    assert "Model floor" not in call(serve(tools(exists=False, floor=NOTE)[0], ROOT), "status")
 
 
 def test_an_agent_never_sees_the_stale_skill_note_in_the_tree() -> None:

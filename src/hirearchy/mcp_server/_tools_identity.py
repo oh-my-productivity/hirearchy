@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ..access import ModelFloorAudit
 from ..daemon import SchedulerStatus
 from ..kernel import ROOT, Provider
 from ..mail import BatchStore, MailboxReader
@@ -24,10 +25,16 @@ def with_stale_skill_note(text: str, skill: InstalledSkill) -> str:
     return text if path is None else f"{text}\n\n{STALE_SKILL.format(path=path)}"
 
 
+def with_floor_note(text: str, floor: ModelFloorAudit) -> str:
+    """``text``, and when some agent runs on a model outside the allowed set a closing line naming each one and the fix (only root is shown this)."""
+    note = floor.note()
+    return f"{text}\n\n{note}" if note else text
+
+
 class IdentityTools(ToolGroup):
     def __init__(
         self, setup: SetupMode, whoami: Provider[Whoami], scheduler: Provider[SchedulerStatus], batches: Provider[BatchStore],
-        mail: Provider[MailboxReader], skill: InstalledSkill,
+        mail: Provider[MailboxReader], skill: InstalledSkill, floor: Provider[ModelFloorAudit],
     ) -> None:
         self._setup = setup
         self._whoami = whoami
@@ -35,6 +42,7 @@ class IdentityTools(ToolGroup):
         self._batches = batches
         self._mail = mail
         self._skill = skill
+        self._floor = floor
 
     def register(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
@@ -45,7 +53,7 @@ class IdentityTools(ToolGroup):
             text = self._whoami().whoami(me)
             if me != ROOT:
                 return text
-            return with_stale_skill_note(f"{text}\n\n{self._scheduler().describe()}", self._skill)
+            return with_stale_skill_note(with_floor_note(f"{text}\n\n{self._scheduler().describe()}", self._floor()), self._skill)
 
         @mcp.tool()
         def inbox() -> str:

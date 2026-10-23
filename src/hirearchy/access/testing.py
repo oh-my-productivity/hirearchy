@@ -91,6 +91,20 @@ class StaticAccess(AccessScopes, AuthorityPolicy, ToolNaming, ModelResolver, Mod
 # ------------------------------------------------------------------------------ harnesses and the registry
 
 
+class FixedModelFloorAudit(ModelFloorAudit):
+    """A floor audit for a consumer's test: it answers the ``note`` and the ``below`` agents it was given, whatever the organization is."""
+
+    def __init__(self, note: str = "", below: Sequence[tuple[str, str]] = ()) -> None:
+        self._note = note
+        self._below = list(below)
+
+    def below_floor(self) -> list[tuple[str, str]]:
+        return list(self._below)
+
+    def note(self) -> str:
+        return self._note
+
+
 @dataclass(frozen=True)
 class AccessHarness:
     """The four ports over one organization, and the means to prepare its files behind their back."""

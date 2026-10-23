@@ -223,3 +223,23 @@ def test_a_blueprint_with_the_widened_set_is_ready(org):
     assert point_blueprint(set_tiers)(org, "claude-sonnet-4.6") is not None
     widen(org, "claude-sonnet-4.6")
     assert point_blueprint(set_tiers)(org, "claude-sonnet-4.6") is None
+
+
+FLOOR_NOTE = (
+    "Model floor: below the allowed models (claude-sonnet-5.5, claude-opus-5.5): ceo/eng on claude-haiku-4.5. Fix: set model: claude-sonnet-5.5 in "
+    "each one's AGENT.md (you for your direct reports, the manager for the others); they keep running as they are until then."
+)
+
+
+def test_root_status_and_whoami_name_an_existing_agent_below_the_floor(org):
+    pin_model(org, "ceo/eng", "claude-haiku-4.5")  # an agent made before the floor
+    root, ceo = build_server(org, ROOT), build_server(org, "ceo")
+    for tool in ("status", "whoami"):
+        text = call(root, tool)
+        assert FLOOR_NOTE in text and len([line for line in text.splitlines() if line.startswith("Model floor")]) == 1
+        assert "Model floor" not in call(ceo, tool)  # the agents are not told
+    # the agent keeps its model (nothing is substituted), and the line is gone once its model is allowed
+    assert "--model claude-haiku-4.5" in " ".join(kiro_runner()(org, "ceo/eng", "P")[0])
+    call(ceo, "write", path="ceo/eng/AGENT.md", content="---\nrole: Engineer\nmodel: claude-sonnet-5.5\n---\nBuild things.\n")  # the manager's fix
+    for tool in ("status", "whoami"):
+        assert "Model floor" not in call(root, tool)
