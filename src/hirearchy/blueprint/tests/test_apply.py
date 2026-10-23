@@ -30,7 +30,7 @@ def base(tmp_path):
 
 def tiered(bp):
     """The example blueprint with the cheap-drafting / strong-review tiers the user asked for."""
-    bp["needs"]["models"] = {"cheap": "claude-haiku-4.5", "strong": "claude-sonnet-4.6"}
+    bp["needs"]["models"] = {"cheap": "claude-sonnet-5.5", "strong": "claude-opus-5.5"}
     bp["needs"]["model_policy"] = "cheap drafting, strong review"
     return bp
 
@@ -63,15 +63,15 @@ def test_apply_creates_tree_charters_and_task(base, roots, empty_org):
     assert s.agents == ["lead", "lead/researcher", "lead/writer", "lead/factcheck"] and s.to == "lead" and s.budget == 22
     assert empty_org.agents() == ["lead", "lead/factcheck", "lead/researcher", "lead/writer"]
     meta, body = empty_org.charter("lead")
-    assert meta["model"] == "claude-sonnet-4.6" and meta["can_hire"] and meta["max_children"] == 3
+    assert meta["model"] == "claude-opus-5.5" and meta["can_hire"] and meta["max_children"] == 3
     assert meta["tools"] == ["web_fetch", "web_search"] and meta["role"] == "Research lead"
     assert "Budget plan: you start with 22 runs" in body and "lead/researcher 4, lead/writer 3, lead/factcheck 3" in body and "You keep 12 runs" in body
     assert "Review loop:" in body and "Never hand down more than the budget plan says" in body
     rmeta, rbody = empty_org.charter("lead/researcher")
-    assert rmeta["model"] == "claude-haiku-4.5" and "Cite" not in rbody and "primary-source URL" in rbody
+    assert rmeta["model"] == "claude-sonnet-5.5" and "Cite" not in rbody and "primary-source URL" in rbody
     assert "Reports to: lead" in rbody
     _, fbody = empty_org.charter("lead/factcheck")
-    assert "You never edit the deliverable" in fbody and empty_org.charter("lead/factcheck")[0]["model"] == "claude-sonnet-4.6"
+    assert "You never edit the deliverable" in fbody and empty_org.charter("lead/factcheck")[0]["model"] == "claude-opus-5.5"
     task = empty_org.find_received("lead", s.task_id)
     assert task.budget == 22 and task.sender == ROOT and task.title.startswith("Competitor analysis")
     assert "1. Covers exactly Obsidian" in task.body and "7. The final report names the path" in task.body

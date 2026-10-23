@@ -8,7 +8,7 @@ from typing import SupportsInt, cast
 from ..access import AccessScopes, AuthorityPolicy, ModelResolver, children_limit
 from ..agents import AgentDirectory, AgentRegistry, CharterReader
 from ..kernel import NAME_RE, RESERVED, ROOT, Clock, EventSink, OrgError, child_addr, clip, depth
-from ..settings import OrgSettings
+from ..settings import OrgSettings, config_default_model, model_floor_problem
 from ..templates import DocumentTemplates
 from ._ports import AgentSlots
 from .api import Hiring
@@ -61,6 +61,11 @@ class RuleHiring(Hiring):
         actor = self._agents.require(actor)
         if not NAME_RE.fullmatch(name) or name in RESERVED:
             raise OrgError("name must be lowercase letters, digits and dashes (max 32), and not a reserved word")
+        cfg = self._settings.config()
+        given = (model or "").strip()
+        problem = model_floor_problem(cfg, given or config_default_model(cfg))  # the effective model: docs/design/org-agent-model-floor.md 3
+        if problem is not None:
+            raise OrgError(problem if given else f"default_model: {problem}")
         limit = children_limit(max_children)  # A3, for every hirer
         if not can_hire:
             limit = 0  # the limit means nothing without the right

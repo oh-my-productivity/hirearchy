@@ -22,7 +22,7 @@ def team(tmp_path):
         (tmp_path / d).mkdir()
     o = Org.init(tmp_path / "org", "Test mission", {"poll_seconds": 0.05})
     o.hire(ROOT, "lead", "Lead", "Lead.", can_hire=True, tools=["read", "shell"], inputs=[str(tmp_path / "notes")])
-    o.hire("lead", "rev", "Reviewer", "Review.", model="claude-sonnet-4.6", tools=["read"], inputs=[str(tmp_path / "notes")])
+    o.hire("lead", "rev", "Reviewer", "Review.", model="claude-opus-5.5", tools=["read"], inputs=[str(tmp_path / "notes")])
     return o
 
 
@@ -34,7 +34,7 @@ def charter_text(role, body="New body.", **extra):
 # ------------------------------------------------------------------------------------------ 1. charter merge
 def test_a_rewrite_with_only_role_keeps_tools_inputs_model_and_the_rest(team, tmp_path):
     before, _ = team.charter("lead/rev")
-    assert before["tools"] == ["read"] and before["model"] == "claude-sonnet-4.6"
+    assert before["tools"] == ["read"] and before["model"] == "claude-opus-5.5"
     team.write("lead", "lead/rev/AGENT.md", "---\nrole: Sharper reviewer\n---\n# Role\nNew body.\n")
     after, body = team.charter("lead/rev")
     assert after["role"] == "Sharper reviewer" and "New body." in body
@@ -44,9 +44,9 @@ def test_a_rewrite_with_only_role_keeps_tools_inputs_model_and_the_rest(team, tm
 
 
 def test_a_key_set_explicitly_wins_even_when_empty(team):
-    team.write("lead", "lead/rev/AGENT.md", charter_text("Reviewer", tools=[], model="claude-haiku-4.5"))
+    team.write("lead", "lead/rev/AGENT.md", charter_text("Reviewer", tools=[], model="claude-sonnet-5.5"))
     after, _ = team.charter("lead/rev")
-    assert after["tools"] == [] and after["model"] == "claude-haiku-4.5"
+    assert after["tools"] == [] and after["model"] == "claude-sonnet-5.5"
     assert after["inputs"]  # not set in the new text: kept
 
 

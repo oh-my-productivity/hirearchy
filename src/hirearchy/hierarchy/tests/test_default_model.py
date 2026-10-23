@@ -21,5 +21,5 @@ def test_hire_without_a_model_leaves_the_charter_unpinned_so_the_org_default_app
     assert "model" not in org.charter("ops")[0] and org.model_for("ops") == DEFAULT_MODEL
     set_config(org, default_model="later")
     assert org.model_for("ops") == "later"  # a later org-wide choice reaches the agent
-    org.hire(ROOT, "pinned", "Pinned", "Pinned.", model="m-x")
-    assert org.model_for("pinned") == "m-x"
+    org.hire(ROOT, "pinned", "Pinned", "Pinned.", model="claude-opus-5.5")
+    assert org.model_for("pinned") == "claude-opus-5.5"

@@ -61,10 +61,10 @@ def test_the_charter_is_written_byte_for_byte(w: HierarchyWorld) -> None:
 
 def test_every_key_is_written_in_its_order_when_everything_is_given(w: HierarchyWorld) -> None:
     ws, data = outside(w, "ws"), outside(w, "data")
-    w.hiring.hire("root", "dev", " Developer ", "Write code.", model="m-x", tools=["shell", "read"], can_hire=True, max_children=3,
+    w.hiring.hire("root", "dev", " Developer ", "Write code.", model="claude-opus-5.5", tools=["shell", "read"], can_hire=True, max_children=3,
                   workspace=ws, inputs=[data])
     assert w.read("dev/AGENT.md") == (
-        f"---\nrole: Developer\nmodel: m-x\ntools:\n- read\n- shell\ncan_hire: true\nmax_children: 3\nworkspace: {ws}\ninputs:\n- {data}\n"
+        f"---\nrole: Developer\nmodel: claude-opus-5.5\ntools:\n- read\n- shell\ncan_hire: true\nmax_children: 3\nworkspace: {ws}\ninputs:\n- {data}\n"
         "hired_by: root\ncreated: '2026-10-18T10:00:00+00:00'\n---\n# Role:  Developer \n\nWrite code.\n"  # the heading has the role as given
     )
 
@@ -112,13 +112,59 @@ def test_tools_are_sorted_and_deduplicated(w: HierarchyWorld) -> None:
 
 
 def test_a_model_that_is_given_is_pinned(w: HierarchyWorld) -> None:
-    w.hiring.hire("root", "ops", "Ops", "Run things.", model="m-x")
-    assert meta_of(w, "ops")["model"] == "m-x"
+    w.hiring.hire("root", "ops", "Ops", "Run things.", model="claude-opus-5.5")
+    assert meta_of(w, "ops")["model"] == "claude-opus-5.5"
 
 
 def test_without_a_model_the_charter_is_unpinned_so_the_default_of_the_org_applies(w: HierarchyWorld) -> None:
     w.hiring.hire("root", "ops", "Ops", "Run things.")
     assert "model" not in meta_of(w, "ops")
+
+
+# ------------------------------------------------------------------------------ the model floor (docs/design/org-agent-model-floor.md)
+
+PAIR = "claude-sonnet-5.5, claude-opus-5.5"
+
+
+def m1(model: str, allowed: str = PAIR) -> str:
+    return f'model "{model}" is not allowed for org agents; allowed: {allowed} (only the user can widen this set)'
+
+
+@pytest.mark.parametrize("model", ["claude-haiku-4.5", "claude-sonnet-4.6"])
+def test_a_model_outside_the_allowed_set_is_refused(w: HierarchyWorld, model: str) -> None:
+    before = w.listing("")
+    assert refusal(w, "root", "ops", "Ops", "c", model=model) == m1(model)
+    assert not w.agents.exists("ops") and w.listing("") == before and w.events.events == []
+
+
+@pytest.mark.parametrize("model", ["claude-sonnet-5.5", "claude-opus-5.5"])
+def test_the_floor_models_are_admitted_and_pinned(w: HierarchyWorld, model: str) -> None:
+    w.hiring.hire("root", "ops", "Ops", "Run things.", model=model)
+    assert meta_of(w, "ops")["model"] == model
+
+
+def test_without_a_model_a_default_model_outside_the_set_is_refused(w: HierarchyWorld) -> None:
+    w.configure("---\nmission: m\ndefault_model: claude-haiku-4.5\n---\nrules\n")
+    assert refusal(w, "root", "ops", "Ops", "c") == "default_model: " + m1("claude-haiku-4.5")
+    assert not w.agents.exists("ops") and w.events.events == []
+
+
+def test_a_model_inside_the_set_is_admitted_whatever_the_default_is(w: HierarchyWorld) -> None:
+    w.configure("---\nmission: m\ndefault_model: claude-haiku-4.5\n---\nrules\n")
+    w.hiring.hire("root", "ops", "Ops", "Run things.", model="claude-opus-5.5")
+    assert meta_of(w, "ops")["model"] == "claude-opus-5.5"
+
+
+def test_a_widened_set_admits_its_extra_model(w: HierarchyWorld) -> None:
+    w.configure("---\nmission: m\nextra_allowed_models: [claude-sonnet-4.6]\n---\nrules\n")
+    w.hiring.hire("root", "ops", "Ops", "Run things.", model="claude-sonnet-4.6")
+    assert meta_of(w, "ops")["model"] == "claude-sonnet-4.6"
+    assert refusal(w, "root", "pm", "PM", "c", model="claude-haiku-4.5") == m1("claude-haiku-4.5", PAIR + ", claude-sonnet-4.6")
+
+
+def test_an_approved_hire_below_the_floor_is_refused_too(w: HierarchyWorld) -> None:
+    assert refusal(w, "ceo", "ops", "Ops", "c", model="claude-haiku-4.5", approved=True) == m1("claude-haiku-4.5")
+    assert not w.agents.exists("ceo/ops")
 
 
 # ------------------------------------------------------------------------------ names
@@ -285,19 +331,19 @@ def test_the_default_depth_allows_four_levels(w: HierarchyWorld) -> None:
 
 
 def test_one_event_says_who_hired_whom(w: HierarchyWorld) -> None:
-    w.hiring.hire("ceo", "qa", "  Tester ", "Test things.", model="m1")
+    w.hiring.hire("ceo", "qa", "  Tester ", "Test things.", model="claude-opus-5.5")
     (event,) = w.events.events
     assert event.kind == "agent.hire" and event.actor == "ceo"
-    assert event.fields == {"agent": "ceo/qa", "by": "ceo", "role": "Tester", "model": "m1", "tools": []}
+    assert event.fields == {"agent": "ceo/qa", "by": "ceo", "role": "Tester", "model": "claude-opus-5.5", "tools": []}
 
 
 def test_the_event_carries_the_model_the_agent_will_run_with(w: HierarchyWorld) -> None:
     w.hiring.hire("root", "ops", "Ops", "Run things.")
     (event,) = w.events.events
     assert event.fields["model"] == "claude-sonnet-5.5"  # the default of the organization
-    w.configure("---\nmission: m\ndefault_model: later\n---\nrules\n")
+    w.configure("---\nmission: m\ndefault_model: claude-opus-5.5\n---\nrules\n")
     w.hiring.hire("root", "pm", "PM", "Plan.")
-    assert w.events.events[-1].fields["model"] == "later"
+    assert w.events.events[-1].fields["model"] == "claude-opus-5.5"
 
 
 def test_the_event_lists_the_tools_sorted(w: HierarchyWorld) -> None:

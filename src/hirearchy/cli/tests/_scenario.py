@@ -192,11 +192,11 @@ SCENARIOS: dict[str, Scenario] = {
     "obs_without_view": sc(f"{R} obs"),
     # --- init
     "init": sc("init {tmp}/new --mission Ship-the-thing.", "none"),
-    "init_from_file": sc("init {tmp}/new --mission @{tmp}/mission.md --model claude-test", "none", {"mission.md": "A mission from a file.\n"}),
+    "init_from_file": sc("init {tmp}/new --mission @{tmp}/mission.md --model claude-opus-5.5", "none", {"mission.md": "A mission from a file.\n"}),
     "init_default_path": sc("init", "none", cwd="work"),
     "init_again": sc("init {org}"),
     # --- people and mail
-    "hire": sc(f"{R} hire ceo dev --role Dev --charter Write-code. --model claude-test --can-hire --max-children 3"),
+    "hire": sc(f"{R} hire ceo dev --role Dev --charter Write-code. --model claude-opus-5.5 --can-hire --max-children 3"),
     "hire_with_tools_it_does_not_have": sc(f"{R} hire ceo dev --role Dev --charter Write-code. --tools read,write --inputs {{tmp}}/in"),
     "hire_charter_from_file": sc(f"{R} hire ceo qa --role QA --charter @{{tmp}}/charter.md", files={"charter.md": "Check the work.\n"}),
     "hire_unknown_parent": sc(f"{R} hire nobody dev --role Dev --charter Code."),

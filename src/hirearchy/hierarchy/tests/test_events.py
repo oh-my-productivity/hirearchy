@@ -33,10 +33,10 @@ def read_events(org, kind=None):
 
 # --------------------------------------------------------------------------- org operations: hire, pause, ...
 def test_hire_retire_pause_resume_events(org):
-    org.hire("ceo", "qa", "Tester", "Test things.", model="m1")
+    org.hire("ceo", "qa", "Tester", "Test things.", model="claude-opus-5.5")
     (hire,) = [e for e in read_events(org, "agent.hire") if e["agent"] == "ceo/qa"]
     assert hire["by"] == "ceo" and hire["actor"] == "ceo" and hire["role"] == "Tester"
-    assert hire["model"] == "m1" and hire["tools"] == []
+    assert hire["model"] == "claude-opus-5.5" and hire["tools"] == []
     org.pause("ceo/qa", "failures")
     org.resume("ceo/qa", "manual")
     pause, resume = read_events(org, "agent.pause")[-1], read_events(org, "agent.resume")[-1]

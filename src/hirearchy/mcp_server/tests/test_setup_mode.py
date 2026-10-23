@@ -75,9 +75,9 @@ def test_setup_mode_whoami_and_status_describe_the_setup(setup_server):
 
 def test_create_org_then_every_tool_works_in_the_same_server(setup_server):
     server, target = setup_server
-    out = call(server, "create_org", mission="Study octopuses", default_model="claude-haiku-4.5")
+    out = call(server, "create_org", mission="Study octopuses", default_model="claude-opus-5.5")
     assert str(target) in out and (target / "ORG.md").is_file()
-    assert Org(target).config["default_model"] == "claude-haiku-4.5" and "Study octopuses" in Org(target).rules()
+    assert Org(target).config["default_model"] == "claude-opus-5.5" and "Study octopuses" in Org(target).rules()
     assert "root (human)" in call(server, "status")
     assert "hired ceo" in call(server, "hire", name="ceo", role="Chief", charter="Lead.", can_hire=True)
     assert "delegated" in call(server, "delegate", to="ceo", title="T", goal="g", acceptance="a", budget=3)

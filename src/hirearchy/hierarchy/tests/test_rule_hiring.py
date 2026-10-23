@@ -136,12 +136,12 @@ class Rig:
 
 def test_the_registry_is_given_the_address_the_meta_in_its_order_and_the_body_of_the_templates() -> None:
     rig = Rig()
-    rig.hiring.hire("ceo", "eng", " Engineer ", "Build.", model="m", tools=["b", "a", "b"], can_hire=True, max_children=3, workspace="/ws", inputs=["/in"])
+    rig.hiring.hire("ceo", "eng", " Engineer ", "Build.", model="claude-opus-5.5", tools=["b", "a", "b"], can_hire=True, max_children=3, workspace="/ws", inputs=["/in"])
     ((addr, meta, text),) = rig.registry.created
     assert addr == "ceo/eng" and text == "BODY[ Engineer |Build.]"
     assert list(meta) == ["role", "model", "tools", "can_hire", "max_children", "workspace", "inputs", "hired_by", "created"]
     assert meta == {
-        "role": "Engineer", "model": "m", "tools": ["a", "b"], "can_hire": True, "max_children": 3, "workspace": "/ws",
+        "role": "Engineer", "model": "claude-opus-5.5", "tools": ["a", "b"], "can_hire": True, "max_children": 3, "workspace": "/ws",
         "inputs": ["/checked"], "hired_by": "ceo", "created": "2030-05-06T07:08:09+00:00",
     }
 

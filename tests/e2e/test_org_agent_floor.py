@@ -4,13 +4,32 @@ that already runs below the floor keeps running and is named to root. The schedu
 the calls under test go through the in-process MCP servers. Every test builds its own organization in its own ``tmp_path``.
 """
 
+import asyncio
+import re
 import time
 
+import pytest
+from testkit.e2e_world import build_server
 from testkit.health_world import Scheduler
 from testkit.kiro_world import kiro_runner
 
 from hirearchy.core import ROOT
 from hirearchy.kernel import join_frontmatter, split_frontmatter
+
+ALLOWED = "allowed: claude-sonnet-5.5, claude-opus-5.5"
+MODELS = [("claude-haiku-4.5", False), ("claude-sonnet-4.6", False), ("claude-sonnet-5.5", True), ("claude-opus-5.5", True)]
+
+
+def call(server, tool, **args):
+    result = asyncio.run(server.call_tool(tool, args))
+    blocks = result[0] if isinstance(result, tuple) else result
+    return "\n".join(getattr(b, "text", "") for b in blocks)
+
+
+def fails(server, tool, **args) -> str:
+    with pytest.raises(Exception) as info:
+        call(server, tool, **args)
+    return str(info.value)
 
 
 def run_to_idle(sched, limit=5.0):
@@ -59,3 +78,44 @@ def test_an_agent_that_existed_below_the_floor_keeps_its_model(org, isolated_kir
     pin_model(org, "ceo/eng", "claude-haiku-4.5")
     argv, _, _ = kiro_runner()(org, "ceo/eng", "P")  # no refusal and no substitution
     assert "--model claude-haiku-4.5 --effort high" in " ".join(argv)
+
+
+# ------------------------------------------------------------------------------------------------ the refusal points
+
+
+def point_hire(org, model: str) -> str | None:
+    """Root hires an agent on ``model`` through its MCP server: the refusal, or None when the agent exists with that model."""
+    name = "x-" + re.sub(r"[^a-z0-9]+", "-", model)  # one agent per model, so a test may hire on several
+    try:
+        call(build_server(org, ROOT), "hire", name=name, role="X", charter="x", model=model)
+    except Exception as error:
+        return str(error)
+    meta, _ = split_frontmatter((org.dir(name) / "AGENT.md").read_text(encoding="utf-8"))
+    assert meta["model"] == model
+    return None
+
+
+POINTS = {"hire": point_hire}
+
+
+@pytest.mark.parametrize("point", POINTS)
+@pytest.mark.parametrize("model, admitted", MODELS)
+def test_each_refusal_point_refuses_or_admits(org, point, model, admitted):
+    refusal = POINTS[point](org, model)
+    if admitted:
+        assert refusal is None
+    else:
+        assert refusal is not None and f'model "{model}" is not allowed' in refusal and ALLOWED in refusal
+
+
+def widen(org, *ids: str) -> None:
+    """The user widens the set by editing ORG.md by hand."""
+    path = org.root / "ORG.md"
+    path.write_text(path.read_text(encoding="utf-8").replace("effort: high", f"effort: high\nextra_allowed_models: [{', '.join(ids)}]"), encoding="utf-8")
+
+
+def test_a_widened_set_admits_another_model(org):
+    assert point_hire(org, "claude-sonnet-4.6") is not None
+    widen(org, "claude-sonnet-4.6")
+    assert point_hire(org, "claude-sonnet-4.6") is None
+    assert point_hire(org, "claude-haiku-4.5") is not None  # still outside the widened set
