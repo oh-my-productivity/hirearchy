@@ -13,6 +13,7 @@ default_budget: 7
 memory_max_words: 800
 playbook_max_words: 1000
 default_model: claude-sonnet-5.5
+effort: high
 max_message_chars: 20000
 events: true
 events_keep_days: 30

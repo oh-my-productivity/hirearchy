@@ -1,7 +1,8 @@
 """The public surface of ``settings``: ORG.md, its settings block and its rules text.
 
 ``OrgSettings`` reads the settings and the rules, ``OrgDocumentStore`` is the raw file (the only way to write it), and
-``EventSwitch`` answers whether the event log is on. The pure functions read one value out of a settings mapping.
+``EventSwitch`` answers whether the event log is on. The pure functions read one value out of a settings mapping; the ``*_floor_problem``
+ones are the org-agent floor (the allowed models and the effort levels, docs/design/org-agent-model-floor.md).
 """
 
 from __future__ import annotations
@@ -11,23 +12,41 @@ from typing import Protocol, runtime_checkable
 from ..kernel import JsonObject
 from ._config import (
     DEFAULT_CONFIG,
+    DEFAULT_EFFORT,
     DEFAULT_MODEL,
     config_default_model,
     config_message_cap,
     config_number,
     finite_number,
 )
+from ._floor import (
+    DEFAULT_ALLOWED_MODELS,
+    EFFORT_LEVELS,
+    config_allowed_models,
+    config_effort,
+    config_floor_problem,
+    effort_floor_problem,
+    model_floor_problem,
+)
 
 __all__ = [
+    "DEFAULT_ALLOWED_MODELS",
     "DEFAULT_CONFIG",
+    "DEFAULT_EFFORT",
     "DEFAULT_MODEL",
+    "EFFORT_LEVELS",
     "EventSwitch",
     "OrgDocumentStore",
     "OrgSettings",
+    "config_allowed_models",
     "config_default_model",
+    "config_effort",
+    "config_floor_problem",
     "config_message_cap",
     "config_number",
+    "effort_floor_problem",
     "finite_number",
+    "model_floor_problem",
 ]
 
 

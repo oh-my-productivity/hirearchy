@@ -9,6 +9,7 @@ from typing import cast
 from ..kernel import JsonObject, split_frontmatter
 
 DEFAULT_MODEL = "claude-sonnet-5.5"  # the model every agent runs on unless its charter or the org config names another
+DEFAULT_EFFORT = "high"  # the kiro effort of every org-agent run unless the org config names a higher one
 
 
 DEFAULT_CONFIG: JsonObject = {
@@ -26,6 +27,7 @@ DEFAULT_CONFIG: JsonObject = {
     "memory_max_words": 800,  # cap on an agent's MEMORY.md; writes that exceed it are refused
     "playbook_max_words": 1000,  # cap on a service playbook (revise_playbook refuses longer ones)
     "default_model": DEFAULT_MODEL,  # kiro model for agents whose charter names none; null/missing = DEFAULT_MODEL
+    "effort": DEFAULT_EFFORT,  # kiro effort of every org-agent run: high, xhigh or max; null/missing = high
     "max_message_chars": 20000,  # longest message body send/delegate/report accept; detail goes in a file
     "events": True,  # write the structured event log (.runtime/events/); false = no emission at all
     "events_keep_days": 30,  # the scheduler deletes event-log days older than this (at most once a day)

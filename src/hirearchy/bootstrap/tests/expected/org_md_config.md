@@ -13,6 +13,7 @@ default_budget: 10
 memory_max_words: 800
 playbook_max_words: 1000
 default_model: m1
+effort: high
 max_message_chars: 20000
 events: false
 events_keep_days: 30
