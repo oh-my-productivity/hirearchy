@@ -63,7 +63,7 @@ def test_every_collaborator_comes_from_the_runtime(tmp_path: Path) -> None:
     inner = RecordingDelivery(clock, SequenceIdGenerator(clock))
     budget = FixedBudget(tasks, files, files)
     delivery = MovingDelivery(inner, budget)
-    access = StaticAccess(agents=files, org_md="---\ndefault_model: from-the-fake\n---\nrules\n")
+    access = StaticAccess(agents=files, org_md="---\ndefault_model: claude-opus-5.5\n---\nrules\n")
     notices = RecordingNotices()
     overrides: dict[type, object] = {
         AgentDirectory: files, CharterReader: files, AgentRegistry: files, OrgSettings: access.settings, AccessScopes: access,
@@ -76,7 +76,7 @@ def test_every_collaborator_comes_from_the_runtime(tmp_path: Path) -> None:
     assert files.exists("ceo/eng") and files.read("ceo/eng/AGENT.md") is not None
     assert "created: '2026-10-18T10:00:00+00:00'" in (files.read("ceo/eng/AGENT.md") or "")  # the clock of the runtime
     (hired,) = events.events
-    assert hired.kind == "agent.hire" and hired.fields["model"] == "from-the-fake"  # the model resolver and the sink of the runtime
+    assert hired.kind == "agent.hire" and hired.fields["model"] == "claude-opus-5.5"  # the model resolver and the sink of the runtime
 
     budget.held["ceo/eng"] = 5
     assert runtime.retirement.retire_team("ceo", "eng", "done") == Retired("ceo/eng", 5, "ceo")
