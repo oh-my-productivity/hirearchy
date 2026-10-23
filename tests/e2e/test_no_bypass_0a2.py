@@ -333,19 +333,20 @@ def test_no_mcp_tool_retires_a_service(svc):
 
 
 # ------------------------------------------------------------------------------------------------------------ P2: the continuation (plan 7.3, commit 18)
-def restructure_on(org, surface: str) -> None:
-    """root retires ceo's team and hires ceo again on ``surface``. No terminal command retires a team, so the CLI leg retires through the facade
-    and hires at the terminal."""
+def restructure_on(org, surface: str) -> str:
+    """root retires ceo's team and hires ceo again on ``surface``; returns the reply of the retirement. No terminal command retires a team, so the
+    CLI leg retires through the facade and hires at the terminal."""
     if surface == "mcp":
         server = build_server(org, ROOT)
-        call(server, "retire", name="ceo", reason="restructure")
+        said = call(server, "retire", name="ceo", reason="restructure")
         call(server, "hire", name="ceo", role="Chief executive", charter="Run the company.", can_hire=True, max_children=2)
-        return
+        return said
     org.retire_team(ROOT, "ceo", "restructure")
     if surface == "cli":
         cli(org, "hire", "root", "ceo", "--role", "Chief executive", "--charter", "Run the company.", "--can-hire", "--max-children", "2")
     else:
         org.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)
+    return ""
 
 
 def service_files(org) -> dict:
@@ -373,7 +374,10 @@ def test_retire_team_hire_and_define_continues_on_every_surface(svc, capsys, sur
     import re
 
     task, no = rejection(svc)
-    restructure_on(svc, surface)
+    said = restructure_on(svc, surface)
+    if surface == "mcp":  # root's retire names what the service keeps and what is open in it (design 5.10)
+        assert said.startswith("retired ceo\nKept with ceo: weekly-brief. Defining one of them again for ceo continues its contract, playbook and cases")
+        assert f"Still open in `weekly-brief`: rejection R1 (message {no.id}) has no answer. Tell the user." in said, said
     before = service_files(svc)
     refused_it, got = amend_on(svc, surface, capsys, acceptance=["A different criterion"])
     path = re.search(r"kept at (\S+) \(", got).group(1)

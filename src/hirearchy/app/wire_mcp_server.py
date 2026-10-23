@@ -156,7 +156,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
     from ..progress import ProgressReporter
     from ..prompts import Whoami
     from ..reflection import ServiceReports, ServiceSteps
-    from ..services import ServiceCatalog, ServiceCommands, ServiceHints
+    from ..services import ServiceCatalog, ServiceCommands, ServiceEvidence, ServiceHints
     from ..telemetry._summarize import JsonArgumentSummarizer
     from ..traces import TraceLookup
 
@@ -184,7 +184,7 @@ def server_factory(binding: OrgBindingPort, scheduler_control: Callable[[Schedul
         IdentityTools(text, of(Whoami), of(SchedulerStatus), of(BatchStore), of(MailboxReader), installed_skill, of(ModelFloorAudit)),
         TaskTools(of(TaskAssigner), of(TaskReporter), of(BudgetQuery), of(MailboxReader), of(ServiceHints)),
         NoteTools(of(MessageSender), of(BudgetQuery), of(BudgetReclaimer)),
-        HiringTools(of(Hiring), of(Retirement)),
+        HiringTools(of(Hiring), of(Retirement), of(ServiceCatalog), of(ServiceEvidence)),
         FileTools(of(ToolNaming), of(OrgFileReader), of(OrgFileWriter), of(OrgLayout)),
         StatusTools(
             text, of(OrgTree), of(SchedulerStatus), directory, of(HealthAnalyzer), of(HealthRenderer), installed_skill, of(ModelFloorAudit),

@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ..hierarchy import Hiring, Retirement
-from ..kernel import Provider
+from ..kernel import ROOT, OrgError, Provider, norm
+from ..services import AmendmentBasis, ServiceCatalog, ServiceEvidence
 from ._ports import ToolGroup
 
 if TYPE_CHECKING:
@@ -13,9 +14,40 @@ if TYPE_CHECKING:
 
 
 class HiringTools(ToolGroup):
-    def __init__(self, hiring: Provider[Hiring], retirement: Provider[Retirement]) -> None:
+    def __init__(
+        self, hiring: Provider[Hiring], retirement: Provider[Retirement], catalog: Provider[ServiceCatalog], evidence: Provider[ServiceEvidence],
+    ) -> None:
         self._hiring = hiring
         self._retirement = retirement
+        self._catalog = catalog
+        self._evidence = evidence
+
+    def _kept(self, me: str, name: str) -> str:
+        """Root retiring a top-level agent: what its services keep, and what is still open in them (design 5.10). Read before the retirement moves
+        the services; advisory, so a record that cannot be read says nothing."""
+        addr = norm(name)
+        if me != ROOT or addr == ROOT or "/" in addr:
+            return ""
+        try:
+            services = self._catalog().service_names(addr)
+            open_ = [(service, self._open(self._evidence().amendment_basis(addr, service))) for service in services]
+        except (OrgError, OSError):
+            return ""
+        if not services:
+            return ""
+        still = "".join(f" Still open in `{service}`: {parts}." for service, parts in open_ if parts)
+        return (
+            f"\nKept with {addr}: {', '.join(services)}. Defining one of them again for {addr} continues its contract, playbook and cases "
+            f"(when a request of it has a result).{still} Tell the user."
+        )
+
+    @staticmethod
+    def _open(basis: AmendmentBasis) -> str:
+        """The rejections without an answer and the deliveries without a verdict, as one list (``""`` when none)."""
+        parts = [f"rejection {r.assertion} (message {r.note}) has no answer" for r in basis.rejections if not r.answered]
+        if basis.unrated:
+            parts.append(f"{len(basis.unrated)} delivered request(s) without a verdict: {', '.join(basis.unrated)}")
+        return "; ".join(parts)
 
     def register(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
@@ -52,6 +84,7 @@ class HiringTools(ToolGroup):
 
         Their open tasks are reported to you as failed, and the team's unspent budget is returned to you.
         """
+            kept = self._kept(me, name)  # before the retirement: it moves the services away
             r = self._retirement().retire_team(me, name, reason)
             refund = f"; {r.refunded} unspent run(s) of budget returned to {r.refunded_to}" if r.refunded else ""
-            return f"retired {r.addr}{refund}"
+            return f"retired {r.addr}{refund}{kept}"
