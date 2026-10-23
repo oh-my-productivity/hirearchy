@@ -67,9 +67,9 @@ def test_the_merged_charter_is_the_new_keys_first_then_the_kept_ones_and_the_new
 
 
 def test_a_key_set_explicitly_wins_even_when_empty(h: OrgFilesHarness) -> None:
-    h.writer.write("lead", f"{REPORT}/AGENT.md", text("Reviewer", tools=[], model="m-2"))
+    h.writer.write("lead", f"{REPORT}/AGENT.md", text("Reviewer", tools=[], model="claude-opus-5.5"))
     after = charter(h)
-    assert after["tools"] == [] and after["model"] == "m-2"
+    assert after["tools"] == [] and after["model"] == "claude-opus-5.5"
     assert after["inputs"] == [str(h.outside / "notes")]  # not in the new text: kept
 
 
@@ -124,6 +124,7 @@ def test_the_note_when_nothing_is_kept_and_nothing_changes(h: OrgFilesHarness) -
 
 
 def test_the_note_shows_an_emptied_key_and_clips_long_values(h: OrgFilesHarness) -> None:
+    h.put_org_md(join_frontmatter({"max_depth": 4, "extra_allowed_models": ["m" * 200]}, "# Organization"))  # the user allowed this odd id
     _, note = h.writer.write_noted("lead", f"{REPORT}/AGENT.md", text("Reviewer", tools=[], model="m" * 200))
     assert "tools: [read] -> []" in note
     assert f"model: m-1 -> {'m' * 79}…" in note

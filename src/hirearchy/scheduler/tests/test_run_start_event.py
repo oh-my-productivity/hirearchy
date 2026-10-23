@@ -26,7 +26,8 @@ def set_config(org: Org, **kw) -> None:
 
 
 def charter_model(org: Org, model: str | None) -> None:
-    org.write(ROOT, "ceo/AGENT.md", CHARTER.format(model=f"model: {model}\n" if model else ""))
+    """A charter written before the model floor (docs/design/org-agent-model-floor.md): on disk, behind ``write``, which would refuse the id."""
+    (org.dir("ceo") / "AGENT.md").write_text(CHARTER.format(model=f"model: {model}\n" if model else ""), encoding="utf-8")
 
 
 def fake_runner():

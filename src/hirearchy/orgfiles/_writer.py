@@ -8,11 +8,19 @@ from typing import cast
 
 from ..access import AccessScopes, AuthorityPolicy, children_limit
 from ..agents import AgentDirectory, AgentRegistry, CharterReader
-from ..kernel import ROOT, OrgError, OrgLayout, join_frontmatter, split_frontmatter
-from ..settings import OrgSettings
+from ..kernel import ROOT, JsonObject, OrgError, OrgLayout, join_frontmatter, split_frontmatter
+from ..settings import OrgSettings, config_default_model, config_floor_problem, model_floor_problem
 from ._charter_merge import CharterMerge
 from ._guard import WriteGuard
 from .api import OrgFileStore, OrgFileWriter
+
+
+def _frontmatter_of(text: str) -> JsonObject:
+    """The frontmatter of a text; ``{}`` when YAML cannot read it (nothing reads such a file as a charter or a settings block either)."""
+    try:
+        return split_frontmatter(text)[0]
+    except Exception:  # noqa: BLE001 - YAML that does not parse: the file is no charter and no settings block, so there is nothing to check
+        return {}
 
 
 class GuardedOrgFileWriter(OrgFileWriter):
@@ -55,6 +63,10 @@ class GuardedOrgFileWriter(OrgFileWriter):
         checks run on the merged frontmatter. A parent that is not root cannot grant ``can_hire`` the report did not have, nor change the
         report's ``max_children`` to a value above its own: only a change is bounded (a body-only edit keeps whatever the charter held),
         and an append never changes the frontmatter.
+
+        The org-agent floor (docs/design/org-agent-model-floor.md 3): a charter rewrite that changes the model the agent runs on to one outside the
+        allowed models is refused (a rewrite that leaves it as it was is not, even below the floor), and so is a write of the top-level ORG.md
+        that widens the allowed models or sets an effort or a default model outside the floor.
         """
         actor = self._agents.require(actor)
         p = self.resolve_write(actor, path)
@@ -104,7 +116,29 @@ class GuardedOrgFileWriter(OrgFileWriter):
                     "and move detail into files under your work/ directory."
                 )
         if p.name == "AGENT.md":  # a report's charter: the registry of the agents writes it
-            self._registry.rewrite_charter(p.parent.relative_to(self._layout.root).as_posix(), content)
+            addr = p.parent.relative_to(self._layout.root).as_posix()
+            self._check_charter_model(addr, p, content)
+            self._registry.rewrite_charter(addr, content)
         else:
+            self._check_org_md(p, content)
             self._store.write_text(p, content)
         return p, note
+
+    def _check_charter_model(self, addr: str, path: Path, content: str) -> None:
+        """Refuse a charter text that changes the model the agent runs on (its ``model``, else the org's default) to one outside the allowed set."""
+        cfg = self._settings.config()
+        fallback = config_default_model(cfg)
+        new = str(_frontmatter_of(content).get("model") or "").strip() or fallback
+        if self._store.kind(path) == "file" and new == (str(_frontmatter_of(self._store.read_text(path)).get("model") or "").strip() or fallback):
+            return  # the model is as it was: an agent from before the floor can still get a new body
+        problem = model_floor_problem(cfg, new)
+        if problem is not None:
+            raise OrgError(f"charter of {addr}: {problem}")
+
+    def _check_org_md(self, path: Path, content: str) -> None:
+        """Refuse a write of the top-level ORG.md that widens the allowed models or sets an effort or a default model outside the floor."""
+        if path != self._store.resolve(self._layout.root) / "ORG.md":
+            return
+        problem = config_floor_problem(_frontmatter_of(content), before=self._settings.config())
+        if problem is not None:
+            raise OrgError(f"ORG.md: {problem}")

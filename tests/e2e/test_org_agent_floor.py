@@ -115,7 +115,34 @@ def point_create_org(org, model: str) -> str | None:
     return None
 
 
-POINTS = {"hire": point_hire, "create_org default_model": point_create_org}
+def point_charter_rewrite(org, model: str) -> str | None:
+    """Root rewrites the charter of ``ceo`` through its MCP ``write``, setting ``model``: the refusal, or None when the charter says so."""
+    meta, body = split_frontmatter((org.dir("ceo") / "AGENT.md").read_text(encoding="utf-8"))
+    try:
+        call(build_server(org, ROOT), "write", path="ceo/AGENT.md", content=join_frontmatter({**meta, "model": model}, body))
+    except Exception as error:
+        return str(error)
+    assert split_frontmatter((org.dir("ceo") / "AGENT.md").read_text(encoding="utf-8"))[0]["model"] == model
+    return None
+
+
+def point_org_md_default_model(org, model: str) -> str | None:
+    """Root rewrites ORG.md through its MCP ``write`` with ``default_model: model``: the refusal, or None when ORG.md says so."""
+    meta, body = split_frontmatter((org.root / "ORG.md").read_text(encoding="utf-8"))
+    try:
+        call(build_server(org, ROOT), "write", path="ORG.md", content=join_frontmatter({**meta, "default_model": model}, body))
+    except Exception as error:
+        return str(error)
+    assert split_frontmatter((org.root / "ORG.md").read_text(encoding="utf-8"))[0]["default_model"] == model
+    return None
+
+
+POINTS = {
+    "hire": point_hire,
+    "create_org default_model": point_create_org,
+    "charter rewrite": point_charter_rewrite,
+    "ORG.md default_model": point_org_md_default_model,
+}
 
 
 @pytest.mark.parametrize("point", POINTS)
@@ -136,6 +163,26 @@ def widen(org, *ids: str) -> None:
 
 def test_a_widened_set_admits_another_model(org):
     assert point_hire(org, "claude-sonnet-4.6") is not None
+    assert point_charter_rewrite(org, "claude-sonnet-4.6") is not None
     widen(org, "claude-sonnet-4.6")
     assert point_hire(org, "claude-sonnet-4.6") is None
+    assert point_charter_rewrite(org, "claude-sonnet-4.6") is None  # a root rewrite admits it after the hand edit
+    assert point_org_md_default_model(org, "claude-sonnet-4.6") is None
     assert point_hire(org, "claude-haiku-4.5") is not None  # still outside the widened set
+
+
+def test_root_cannot_widen_the_set_through_write(org):
+    server = build_server(org, ROOT)
+    meta, body = split_frontmatter((org.root / "ORG.md").read_text(encoding="utf-8"))
+    before = (org.root / "ORG.md").read_text(encoding="utf-8")
+    message = fails(server, "write", path="ORG.md", content=join_frontmatter({**meta, "extra_allowed_models": ["claude-haiku-4.5"]}, body))
+    assert "only the user can widen the allowed models, by editing ORG.md themselves" in message and "claude-haiku-4.5" in message
+    assert (org.root / "ORG.md").read_text(encoding="utf-8") == before
+    assert point_hire(org, "claude-haiku-4.5") is not None  # and the set is the same as before
+
+
+def test_root_cannot_lower_the_effort_through_write(org):
+    meta, body = split_frontmatter((org.root / "ORG.md").read_text(encoding="utf-8"))
+    message = fails(build_server(org, ROOT), "write", path="ORG.md", content=join_frontmatter({**meta, "effort": "medium"}, body))
+    assert 'effort "medium" is not allowed for org agents; allowed: high, xhigh, max' in message
+    assert split_frontmatter((org.root / "ORG.md").read_text(encoding="utf-8"))[0]["effort"] == "high"
