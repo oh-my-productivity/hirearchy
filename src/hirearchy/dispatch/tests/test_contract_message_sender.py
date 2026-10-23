@@ -126,6 +126,11 @@ def test_an_agent_rework_is_never_stamped(w: DispatchWorld) -> None:
     assert msg.source is None
 
 
+def test_send_accepts_inherited(w: DispatchWorld) -> None:
+    msg = w.sender.send("ceo", "ceo/eng", "again, please", type="task", revises=EARLIER, inherited="relayed")
+    assert msg.source == "relayed"
+
+
 # ------------------------------------------------------------------------------ provenance: what a verdict is about
 
 S3 = ("criterion goes only on a verdict (a note with `feedback`) or on a link note that replies to one: use `feedback(..., criterion=...)`.")

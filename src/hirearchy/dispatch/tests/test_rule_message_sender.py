@@ -264,3 +264,37 @@ def test_the_delivered_message_is_the_one_that_is_returned(w: DispatchWorld) -> 
     sender, delivery = over(w, Routes(True))
     msg = sender.send("ceo", "ceo/eng", "hi", wake=False)
     assert delivery.messages == [msg] and msg.wake is False and msg.hops == 1
+
+
+# ------------------------------------------------------------------------------ provenance: the tier an agent's rework inherits (P4, design 7.6)
+
+S1 = ("only root (the human's seat) records where a verdict, a link or a rework comes from (`source`, `criterion`); "
+      "agents' messages carry neither")
+EARLIER = "20260101T000000000002-ceo-bbbb"
+
+
+def test_an_agents_rework_task_carries_the_inherited_tier(w: DispatchWorld) -> None:
+    msg = w.sender.send("ceo", "ceo/eng", "again, please", type="task", revises=EARLIER, inherited="human")
+    assert msg.source == "human" and [m.source for m in w.inbox("ceo/eng")] == ["human"]
+    assert w.sender.send("ceo", "ceo/eng", "again", type="task", revises=EARLIER, inherited="relayed").source == "relayed"
+
+
+def test_an_agents_own_source_is_still_refused(w: DispatchWorld) -> None:
+    assert refused(w, "ceo", "ceo/eng", "again", type="task", revises=EARLIER, source="human", inherited="human") == S1
+    assert w.inbox("ceo/eng") == []
+
+
+@pytest.mark.parametrize("fields", [
+    {"type": "task"},  # a fresh task is no rework
+    {"type": "note", "revises": EARLIER},
+    {"type": "result", "revises": EARLIER},
+    {"type": "task", "revises": EARLIER, "inherited": "garbage"},
+    {"type": "task", "revises": EARLIER, "inherited": None},
+])
+def test_inherited_outside_a_rework_task_is_ignored(w: DispatchWorld, fields: dict[str, str | None]) -> None:
+    msg = w.sender.send("ceo", "ceo/eng", "x", **{"inherited": "human", **fields})  # type: ignore[arg-type]
+    assert msg.source is None
+
+
+def test_root_ignores_inherited(w: DispatchWorld) -> None:
+    assert w.sender.send("root", "ceo", "again", type="task", revises=EARLIER, inherited="human").source == "relayed"

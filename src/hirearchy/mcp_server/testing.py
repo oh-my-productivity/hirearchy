@@ -289,7 +289,7 @@ class ScriptedSender(MessageSender):
         self, actor: str, to: str, body: str, *, type: str = "note", title: str = "", reply_to: str | None = None, status: str | None = None,
         budget: int = 0, revises: str | None = None, supersedes: str | None = None, service: str | None = None, contract: int | None = None,
         playbook: int | None = None, feedback: str | None = None, source: str | None = None, criterion: str | None = None, wake: bool = True,
-        skip_route_check: bool = False,
+        skip_route_check: bool = False, inherited: str | None = None,
     ) -> Message:
         self.log.add("send", actor, to, body, type=type, title=title, reply_to=reply_to, status=status, budget=budget, wake=wake,
                      skip_route_check=skip_route_check)

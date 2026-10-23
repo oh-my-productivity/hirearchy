@@ -63,8 +63,9 @@ class RecordingSender(MessageSender):
         status: str | None = None, budget: int = 0, revises: str | None = None, supersedes: str | None = None,
         service: str | None = None, contract: int | None = None, playbook: int | None = None, feedback: str | None = None,
         source: str | None = None, criterion: str | None = None, wake: bool = True, skip_route_check: bool = False,
+        inherited: str | None = None,
     ) -> Message:
-        source = provenance_source(norm(actor), type, revises, feedback, reply_to, source, criterion)
+        source = provenance_source(norm(actor), type, revises, feedback, reply_to, source, criterion, inherited)
         msg = Message(
             sender=norm(actor), to=norm(to), type=type, body=body.strip(), title=title.strip(), reply_to=reply_to, status=status,
             budget=int(budget or 0), revises=revises, supersedes=supersedes, service=service, contract=contract, playbook=playbook,

@@ -70,7 +70,7 @@ def over(w: DispatchWorld, sender: Sender, policy: Policy | None = None, rework:
 def test_the_task_is_sent_through_the_sender_with_the_body_of_the_templates(w: DispatchWorld) -> None:
     sender = Sender()
     over(w, sender).delegate("root", " ceo ", "Title", "Goal", "Criteria", ["/in/a", "/in/b"], 4)
-    assert sender.calls == [(("root", "ceo", "BODY[Goal|Criteria|/in/a,/in/b]"), {"type": "task", "title": "Title", "budget": 4, "revises": None, "source": None})]
+    assert sender.calls == [(("root", "ceo", "BODY[Goal|Criteria|/in/a,/in/b]"), {"type": "task", "title": "Title", "budget": 4, "revises": None, "source": None, "inherited": None})]
 
 
 def test_no_inputs_are_an_empty_list_for_the_templates(w: DispatchWorld) -> None:
@@ -105,9 +105,18 @@ def test_the_rework_fields_are_passed_on_when_a_task_is_revised(w: DispatchWorld
     rework = FixedReworkContext({first.id: {"service": "weekly-brief", "contract": 3, "playbook": 2}})
     over(w, sender, rework=rework).delegate("ceo", "ceo/eng", "Again", "Again.", "better", budget=2, revises=first.id)
     assert sender.calls[0][1] == {
-        "type": "task", "title": "Again", "budget": 2, "revises": first.id, "source": None, "service": "weekly-brief", "contract": 3,
+        "type": "task", "title": "Again", "budget": 2, "revises": first.id, "source": None, "inherited": None, "service": "weekly-brief", "contract": 3,
         "playbook": 2,
     }
+
+
+def test_delegate_passes_the_inherited_tier(w: DispatchWorld) -> None:
+    grant(w, "root", "ceo", 20)
+    first = w.assigner.delegate("ceo", "ceo/eng", "Draft", "Draft it.", "one page", budget=3)
+    sender = Sender()
+    rework = FixedReworkContext({first.id: {"source": "human"}})
+    over(w, sender, rework=rework).delegate("ceo", "ceo/eng", "Again", "Again.", "better", budget=2, revises=first.id)
+    assert sender.calls[0][1] == {"type": "task", "title": "Again", "budget": 2, "revises": first.id, "source": None, "inherited": "human"}
 
 
 def test_the_order_of_the_refusals(w: DispatchWorld) -> None:

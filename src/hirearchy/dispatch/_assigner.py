@@ -34,6 +34,12 @@ def _service_fields(fields: Mapping[str, object]) -> _ServiceFields:
     return found
 
 
+def _tier_of(fields: Mapping[str, object]) -> str | None:
+    """The tier (``source``) a ``ReworkContext`` answered, when it is a string."""
+    tier = fields.get("source")
+    return tier if isinstance(tier, str) else None
+
+
 class RuleTaskAssigner(TaskAssigner):
     """Direct reports only; a title, a goal and acceptance criteria; a budget of at least one run."""
 
@@ -69,5 +75,5 @@ class RuleTaskAssigner(TaskAssigner):
         fields = self._rework.fields_for(actor, revises) if revises else {}  # rework of a service request is still part of its case
         return self._sender.send(
             actor, to, body, type="task", title=title, budget=budget, revises=revises or None,
-            source=source, **_service_fields(fields),
+            source=source, inherited=_tier_of(fields), **_service_fields(fields),
         )

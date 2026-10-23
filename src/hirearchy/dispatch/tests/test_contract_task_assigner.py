@@ -170,6 +170,15 @@ def test_a_rework_of_a_service_request_keeps_its_service_fields(w: DispatchWorld
     assert (again.service, again.contract, again.playbook, again.revises) == ("weekly-brief", 3, 2, first.id)
 
 
+def test_an_agents_rework_carries_the_tier_its_context_gives(w: DispatchWorld) -> None:
+    grant(w, "root", "ceo", 20)
+    first = w.assigner.delegate("ceo", "ceo/eng", "Draft", "Draft it.", "one page", budget=3)
+    rework = FixedReworkContext({first.id: {"source": "human"}})
+    again = w.assigner_with(rework).delegate("ceo", "ceo/eng", "Again", "Again.", "better", budget=2, revises=first.id)
+    assert (again.source, again.service) == ("human", None)
+    assert [m.source for m in w.inbox("ceo/eng")] == [None, "human"]
+
+
 def test_the_rework_fields_are_asked_for_only_when_a_task_is_revised(w: DispatchWorld) -> None:
     asked: list[str] = []
 

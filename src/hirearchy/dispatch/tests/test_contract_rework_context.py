@@ -1,7 +1,8 @@
 """Contract of ``ReworkContext``: every source of the service fields of a rework answers alike.
 
-What the callers rely on: the answer is a mapping that holds at most ``service``, ``contract`` and ``playbook``, and it is empty for a task that is not
-a request for a service (or not known)."""
+What the callers rely on: the answer is a mapping that holds at most ``service``, ``contract`` and ``playbook`` (a rework of a service request keeps its
+case) and, for an agent, ``source`` (the tier of the work it does in that case: ``human`` or ``relayed``, never for root); it is empty for a task that is
+not one of the actor's. (What the tier is made of: ``services/tests/test_service_rework_context``.)"""
 
 from __future__ import annotations
 
@@ -27,8 +28,17 @@ def test_an_ordinary_task_inherits_nothing(context: ReworkContext) -> None:
     assert dict(context.fields_for("ceo", "20260101T000000000009-ceo-zzzz")) == {}
 
 
-def test_the_answer_holds_only_the_service_fields(context: ReworkContext) -> None:
-    assert set(context.fields_for("ceo", KNOWN)) <= {"service", "contract", "playbook"}
+def test_the_answer_holds_only_the_service_fields_and_the_tier(context: ReworkContext) -> None:
+    assert set(context.fields_for("ceo", KNOWN)) <= {"service", "contract", "playbook", "source"}
+
+
+def test_root_never_gets_a_tier(context: ReworkContext) -> None:
+    assert "source" not in context.fields_for("root", KNOWN)
+    assert "source" not in context.fields_for("root", "20260101T000000000009-root-zzzz")
+
+
+def test_a_tier_is_human_or_relayed(context: ReworkContext) -> None:
+    assert context.fields_for("ceo", KNOWN).get("source") in (None, "human", "relayed")
 
 
 def test_the_answer_for_a_task_is_the_same_every_time(context: ReworkContext) -> None:

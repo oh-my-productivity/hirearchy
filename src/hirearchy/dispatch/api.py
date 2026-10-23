@@ -54,6 +54,7 @@ class MessageSender(Protocol):
         criterion: str | None = None,
         wake: bool = True,
         skip_route_check: bool = False,
+        inherited: str | None = None,
     ) -> Message:
         """Check the message against the protocol, deliver it and return the delivered message. The checks, in this order: the size of the body
         (``max_message_chars``, not for root: the human may paste), both addresses exist, the type, an empty body, the route (``actor`` may
@@ -66,7 +67,9 @@ class MessageSender(Protocol):
         (``criterion``, ids joined by ``", "``): an agent that passes either, or a ``source`` that is neither value, is refused. ``criterion``
         goes only on a verdict note (a note with ``feedback``) or on a link note (a note without ``feedback`` that replies to one). A task from
         root that ``revises`` another (a rework), a verdict note and a link note without a ``source`` are stamped ``"relayed"`` (root's own
-        reading); a fresh task, any other note and every message of an agent stay unstamped unless root says."""
+        reading); a fresh task, any other note and every message of an agent stay unstamped unless root says. A task of an
+        agent that revises another carries the tier its sender works under (``inherited``, from ``ReworkContext``): the runtime's copy, never the
+        agent's declaration."""
         ...
 
 
@@ -113,6 +116,7 @@ class TaskReporter(Protocol):
 @runtime_checkable
 class ReworkContext(Protocol):
     def fields_for(self, actor: str, revises: str) -> Mapping[str, object]:
-        """The service fields a rework task inherits from the task ``actor`` sent with id ``revises``: ``service`` and ``contract`` of that
-        task and the ``playbook`` version current now. Empty for an ordinary task (or one that is not found)."""
+        """The fields a rework task inherits from the task ``actor`` sent with id ``revises``: ``service`` and ``contract`` of that task and the
+        ``playbook`` version current now when it is a service request, and, for an agent, the ``source`` of the open task it received in the
+        same trace. Empty when the task is not one of ``actor``'s."""
         ...
