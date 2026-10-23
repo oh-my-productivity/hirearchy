@@ -51,15 +51,18 @@ def test_mcp_tool(team, org, monkeypatch):
     assert "reclaim" in {t.name for t in asyncio.run(root.list_tools())}
 
 
-def test_skill_and_root_instructions_carry_the_reclaim_and_cheap_model_rules():
+def test_skill_and_root_instructions_carry_the_reclaim_and_model_floor_rules():
     from testkit.mcp_server_world import skill_source
 
     from hirearchy.mcp_server._instructions import ROOT_INSTRUCTIONS
 
     skill = skill_source().read_text()
     assert len(skill.splitlines()) <= 125 and len(ROOT_INSTRUCTIONS) < 2800
-    for needle in ("keep the lead (manager) and\n   the final verifier on the strong model", "the lead decides how every other run is spent",
+    for needle in ("every agent runs claude-sonnet-5.5 at high effort", "Nothing below claude-sonnet-5.5 at high effort is available",
                    "`reclaim(report=<agent>)`", "stranded runs", "never poll\n  with `sleep`"):
         assert needle in skill, needle
-    for needle in ("keep the lead and final verifier", "the lead decides how every other run is spent", "`reclaim`", "stranded runs"):
+    for needle in ("models (all claude-sonnet-5.5 at high effort; nothing below is available)", "`reclaim`", "stranded runs"):
         assert needle in ROOT_INSTRUCTIONS, needle
+    # the cheaper-models option is gone (D-E4-9): nothing offers tiers, a cheaper model or a lower effort
+    assert "cheaper" not in ROOT_INSTRUCTIONS and "if cheaper" not in ROOT_INSTRUCTIONS
+    assert "cheap/strong tiers" not in skill and "tiered\nmodels when asked" not in skill and "no tiers" not in skill

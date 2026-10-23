@@ -34,10 +34,10 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
 4. Sources: web with a URL per claim (`research`), or only the user's own files (`documents`: ask which folder; it goes into
    `needs.inputs` as an absolute path of a folder that exists). Default: web for factual work.
 5. Code only: workspace (one new project directory), tests, packaging, commits. Default: tests per criterion, uv/pytest for Python, local commits, never push.
-6. Budget in runs (each agent wake-up is one run) and models. Default: the estimate + 25%; every agent on claude-sonnet-5.5, no tiers. A service's per-request
+6. Budget in runs (each agent wake-up is one run). Default: the estimate + 25%; every agent runs claude-sonnet-5.5 at high effort. A service's per-request
    budget is the plan's estimate + 25% (the lead wakes once per result: about 2 runs per delegation + 1); if the user's cap is lower, say
-   in one line what that risks. Only if they ask for cheaper models, use cheap/strong tiers and keep the lead (manager) and
-   the final verifier on the strong model, and say why in one line: "the lead decides how every other run is spent".
+   in one line what that risks. Nothing below claude-sonnet-5.5 at high effort is available: never offer a cheaper model, tiers to
+   save runs or a lower effort; if the user asks for one, say so in one line.
 7. Review by another agent (default yes); approvals (default: the plan before anything starts, and spend beyond budget); progress (default: one line).
 
 ## 2. Plan (never build before approval)
@@ -114,8 +114,8 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 ## Blueprint rules
 Templates: manager, researcher, writer, reviewer, fact-checker, engineer, tester, code-reviewer, analyst, data-checker (or give `charter:` text).
 The validator enforces: exact acceptance criteria and a deliverable; web tools for web needs; write+shell only with a workspace;
-a reviewer separate from the author who never edits others' files; budget within the user's cap and above the estimate; tiered
-models when asked. Criteria must be checkable ("at most 1500 words"), never "good quality". Example criteria: "Covers exactly the
+a reviewer separate from the author who never edits others' files; budget within the user's cap and above the estimate; the
+model floor (nothing below claude-sonnet-5.5). Criteria must be checkable ("at most 1500 words"), never "good quality". Example criteria: "Covers exactly the
 items the user listed", "The fact-checker's coverage report shows every factual claim verified (n of m, n = m)". The fact-checker and reviewer check everything, not a sample, so never ask for "at least N" checks.
 
 ## Files and access

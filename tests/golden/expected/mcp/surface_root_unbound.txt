@@ -9,8 +9,8 @@ When the user asks for an org, team or agents for a goal:
 1. Ask what you need in ONE message. Propose defaults only where a generic one exists; ASK for any list not
    given (scope items, source files), never invent. Default deliverable place: a new
    `deliverables/` folder in the current directory (say so). Also ask: format, length, exact checkable criteria,
-   sources/web, workspace and tests (code), budget in runs, models (all claude-sonnet-5.5; if cheaper: keep the lead and final verifier strong;
-   the lead decides how every other run is spent), review, approval.
+   sources/web, workspace and tests (code), budget in runs, models (all claude-sonnet-5.5 at high effort; nothing below is available),
+   review, approval.
 2. Start the blueprint from `blueprint_example(kind)` (`service=True` for recurring work), then `propose_org`. Show the
    "PLAN FOR YOU" block exactly as returned. Fix errors; settle its warnings (e.g. model policy) with the user
    or state them; wait for approval. The user's own files go in `needs.inputs` (read-only);
