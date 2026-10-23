@@ -70,6 +70,22 @@ Each point calls `settings`. The wrapper text is in brackets.
    as `{}`, so the built-in set, effort and default model apply. Root can then still repair ORG.md and rewrite charters, as before the floor, and
    the repair is held to the built-in floor (it cannot widen the set or lower the effort or the default model).
 
+### 3.1 When ORG.md cannot be parsed
+
+The set is widened by a hand edit of YAML, so a slip is likely, and the skill's first step (`whoami`, `status`) must not stop at it. Every read of the
+settings that the floor added or changed has one rule; nothing shows the parser's own text.
+
+| Read | Used by | ORG.md cannot be parsed |
+|---|---|---|
+| `CharterModelFloorAudit` (`below_floor`, `note`) | root's `status`, `whoami` | `[]` and `""`: they answer as before the floor, and name nobody (the set is unknown) |
+| `CharterModelResolver.effort()` | `KiroRunCommandBuilder.build` | `DEFAULT_EFFORT` (`high`, never below the floor): the command is built, and `# cmd:` shows it |
+| `_config_or_empty()` of the file writer | root's `write` of ORG.md and of charters | `{}`: the repair is held to the built-in floor (above) |
+| `readable_config(settings)` | `RuleHiring.hire` (the floor and `max_depth`, one read), `RuntimeOrgContext.config()` (the validator, the Models line, the resolver) | `OrgError("ORG.md cannot be read: ... repair it first")`: `hire`, `propose_org` and `apply_org` were refused on `main` too, with the parser's text; now with words that name ORG.md |
+| `FsOrgInitializer.init` | `create_org`, `init` | no read of an existing ORG.md; an existing one is "already an organization" |
+
+Not changed: the scheduler's own reads (the session's `open`, the tick's `max_parallel`, the briefing's `memory_max_words`) raise on `main` too, so no
+run starts until ORG.md parses again; the floor adds none.
+
 ## 4. Effort on the command line
 
 The builder reads `ModelResolver.effort()`, a new third method of `access.ModelResolver` that returns `config_effort` of the settings. The builder

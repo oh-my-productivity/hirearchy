@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from hirearchy.agents import AgentDirectory
 from hirearchy.blueprint._org import NoOrgContext, PresentOrAbsentOrg, RuntimeOrgContext
 from hirearchy.blueprint._protocols import OrgContext, OrgContexts
 from hirearchy.blueprint.testing import StaticOrgContext
-from hirearchy.kernel import OrgPaths
+from hirearchy.kernel import OrgError, OrgPaths
 from hirearchy.services import Criterion, Playbook, ServiceCatalog
 from hirearchy.settings import DEFAULT_CONFIG, OrgSettings
 
@@ -104,3 +106,16 @@ def test_the_choice_between_the_organization_and_the_defaults() -> None:
     both = PresentOrAbsentOrg(present, absent)
     assert isinstance(both, OrgContexts) and both.context(True) is present and both.context(False) is absent
 
+
+
+def test_settings_that_cannot_be_read_are_an_error_that_names_ORG_md_not_the_parsers_text(tmp_path: Path) -> None:
+    """Every reader of the organization's settings during planning (the validator, the Models line, the resolver) gets this one error."""
+
+    class Unreadable(Settings):
+        def config(self) -> dict[str, object]:
+            raise ValueError("while parsing a flow sequence")  # what YAML says about a hand edit that slipped
+
+    org = RuntimeOrgContext(Unreadable({}), Agents({}), Catalog({}), OrgPaths(tmp_path))
+    with pytest.raises(OrgError) as refused:
+        org.config()
+    assert str(refused.value).startswith("ORG.md cannot be read") and "while parsing" not in str(refused.value)

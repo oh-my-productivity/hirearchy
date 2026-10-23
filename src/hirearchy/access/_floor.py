@@ -13,18 +13,27 @@ class CharterModelFloorAudit(ModelFloorAudit):
         self._models = models
         self._settings = settings
 
-    def below_floor(self) -> list[tuple[str, str]]:
+    def _audit(self) -> tuple[tuple[str, ...], list[tuple[str, str]]]:
+        """The allowed models and ``(addr, model)`` of the agents outside them; raises when ORG.md or a charter cannot be read."""
         allowed = config_allowed_models(self._settings.config())
         pairs = ((addr, self._models.model_for(addr)) for addr in self._agents.agents())
-        return [(addr, model) for addr, model in pairs if model not in allowed]
+        return allowed, [(addr, model) for addr, model in pairs if model not in allowed]
+
+    def below_floor(self) -> list[tuple[str, str]]:
+        try:
+            return self._audit()[1]
+        except Exception:  # noqa: BLE001 - ORG.md that does not parse: the allowed set is unknown, so nobody is claimed to be outside it (as before the floor)
+            return []
 
     def note(self) -> str:
-        below = self.below_floor()
+        try:
+            allowed, below = self._audit()
+        except Exception:  # noqa: BLE001 - the same: root's status and whoami answer as they did before the floor, whatever ORG.md says
+            return ""
         if not below:
             return ""
-        allowed = ", ".join(config_allowed_models(self._settings.config()))
         named = ", ".join(f"{addr} on {model}" for addr, model in below)
         return (
-            f"Model floor: below the allowed models ({allowed}): {named}. Fix: set model: {DEFAULT_MODEL} in each one's AGENT.md "
+            f"Model floor: below the allowed models ({', '.join(allowed)}): {named}. Fix: set model: {DEFAULT_MODEL} in each one's AGENT.md "
             "(you for your direct reports, the manager for the others); they keep running as they are until then."
         )

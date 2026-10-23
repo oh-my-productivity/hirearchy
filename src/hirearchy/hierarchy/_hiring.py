@@ -8,7 +8,7 @@ from typing import SupportsInt, cast
 from ..access import AccessScopes, AuthorityPolicy, ModelResolver, children_limit
 from ..agents import AgentDirectory, AgentRegistry, CharterReader
 from ..kernel import NAME_RE, RESERVED, ROOT, Clock, EventSink, OrgError, child_addr, clip, depth
-from ..settings import OrgSettings, config_default_model, model_floor_problem
+from ..settings import OrgSettings, config_default_model, model_floor_problem, readable_config
 from ..templates import DocumentTemplates
 from ._ports import AgentSlots
 from .api import Hiring
@@ -61,7 +61,7 @@ class RuleHiring(Hiring):
         actor = self._agents.require(actor)
         if not NAME_RE.fullmatch(name) or name in RESERVED:
             raise OrgError("name must be lowercase letters, digits and dashes (max 32), and not a reserved word")
-        cfg = self._settings.config()
+        cfg = readable_config(self._settings)  # one read for the floor and the depth; ORG.md that does not parse is refused in plain words
         given = (model or "").strip()
         problem = model_floor_problem(cfg, given or config_default_model(cfg))  # the effective model: docs/design/org-agent-model-floor.md 3
         if problem is not None:
@@ -84,7 +84,7 @@ class RuleHiring(Hiring):
             if not approved:
                 self._authority.check_grant(actor, grants_hire=bool(can_hire), max_children=limit)
         addr = child_addr(actor, name)
-        max_depth = self._settings.config()["max_depth"]
+        max_depth = cfg["max_depth"]
         if depth(addr) > int(cast("SupportsInt | str", max_depth)):
             raise OrgError(f"the organization is limited to depth {max_depth}")
         if self._slots.occupied(addr):

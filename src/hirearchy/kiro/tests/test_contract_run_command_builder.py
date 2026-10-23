@@ -89,6 +89,14 @@ def test_an_effort_below_high_refuses_the_run_before_anything_is_written(h: Buil
     assert h.names() == [] and not h.state.is_empty_dir(h.places.scratch("dev"))
 
 
+def test_an_ORG_md_that_cannot_be_parsed_still_builds_the_command_with_the_built_in_effort(h: BuilderHarness) -> None:
+    """A charter that names its model needs nothing else of ORG.md: the run is built with ``--effort high``, as before the floor it was built at all."""
+    h.put_agent("dev", {"role": "R", "model": "claude-opus-5.5"})
+    h.put_config("---\neffort: max\nextra_allowed_models: [claude-sonnet-4.6\n---\n# Organization\n")
+    argv = h.builder.build("dev", "P").argv
+    assert argv[argv.index("--model") :][:4] == ("--model", "claude-opus-5.5", "--effort", "high")
+
+
 def test_a_model_below_the_floor_is_passed_as_it_is(h: BuilderHarness) -> None:
     """An agent that existed before the floor keeps running on its model: nothing is substituted (docs/design/org-agent-model-floor.md 5)."""
     h.put_agent("old", {"role": "R", "model": "claude-haiku-4.5"})

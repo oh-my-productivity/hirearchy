@@ -122,3 +122,11 @@ def test_a_change_of_ORG_md_effort_is_seen_by_the_next_call(h: AccessHarness) ->
     assert h.models.effort() == "max"
     h.put_config(org_md("effort: xhigh\n"))
     assert h.models.effort() == "xhigh"
+
+
+def test_the_effort_is_high_when_ORG_md_cannot_be_parsed(h: AccessHarness) -> None:
+    """The built-in effort: a run is never refused or skipped because of a slipped hand edit (the floor is never below ``high``)."""
+    h.put_config("---\neffort: max\nextra_allowed_models: [claude-sonnet-4.6\n---\n# Organization\n")
+    assert h.models.effort() == "high"
+    h.put_config(org_md("effort: max\n"))
+    assert h.models.effort() == "max"

@@ -226,6 +226,93 @@ def test_root_repairs_an_ORG_md_with_broken_yaml_and_still_rewrites_charters(org
     assert (org.root / "ORG.md").read_text(encoding="utf-8") == fixed
 
 
+# ------------------------------------------------------------------------------------ ORG.md whose settings block cannot be parsed
+
+BROKEN_ORG_MD = "---\nmax_depth: 4\nextra_allowed_models: [claude-sonnet-4.6\n---\n# Organization\n"  # the hand edit of the widening channel slipped
+PARSER_TEXT = re.compile(r"while (parsing|scanning)|ParserError|ScannerError|did not find expected|<unicode string>")  # what YAML says, never the user's to read
+
+
+def break_org_md(org) -> None:
+    (org.root / "ORG.md").write_text(BROKEN_ORG_MD, encoding="utf-8")
+
+
+def test_root_status_and_whoami_answer_while_ORG_md_cannot_be_parsed(org):
+    """As before the floor: the skill's first step (whoami / status) must not stop at a parser error; no agent is claimed to be below an unknown set."""
+    pin_model(org, "ceo/eng", "claude-haiku-4.5")
+    break_org_md(org)
+    root = build_server(org, ROOT)
+    assert "root (human)" in call(root, "status") and "eng [Engineer]" in call(root, "status")
+    assert "Address: `root`" in call(root, "whoami")
+    for tool in ("status", "whoami"):
+        assert "Model floor" not in call(root, tool)
+    (org.root / "ORG.md").write_text("---\nmax_depth: 4\n---\n# Organization\n", encoding="utf-8")  # repaired: the agent is named again
+    assert FLOOR_NOTE in call(root, "status")
+
+
+def test_a_run_is_built_with_effort_high_while_ORG_md_cannot_be_parsed(org, isolated_kiro):
+    """The run command of an agent whose charter names its model needs nothing else of ORG.md: it is neither refused nor skipped."""
+    pin_model(org, "ceo/eng", "claude-opus-5.5")
+    break_org_md(org)
+    argv, _, _ = kiro_runner()(org, "ceo/eng", "P")
+    assert "--model claude-opus-5.5 --effort high --v3" in " ".join(argv)
+
+
+def research_blueprint() -> str:
+    return (testkit.REPO / "examples" / "blueprint-research.yaml").read_text(encoding="utf-8")
+
+
+def plan_id_of(server, text: str) -> str:
+    return re.search(r"^plan_id: (\w+)$", call(server, "propose_org", blueprint=text), re.M).group(1)
+
+
+BROKEN_CALLS = {  # label: (tool, arguments of the call given the plan_id of the research blueprint, what its refusal says; None = the call answers)
+    "status": ("status", lambda pid: {}, None),
+    "whoami": ("whoami", lambda pid: {}, None),
+    "hire with a model": ("hire", lambda pid: dict(name="ops", role="Ops", charter="c", model="claude-opus-5.5"), "ORG.md cannot be read"),
+    "hire without a model": ("hire", lambda pid: dict(name="ops", role="Ops", charter="c"), "ORG.md cannot be read"),
+    "charter rewrite to a floor model": (
+        "write", lambda pid: dict(path="ceo/AGENT.md", content="---\nrole: CEO\nmodel: claude-opus-5.5\n---\nNew body.\n"), None),
+    "charter rewrite below the floor": (
+        "write", lambda pid: dict(path="ceo/AGENT.md", content="---\nrole: CEO\nmodel: claude-haiku-4.5\n---\nNew body.\n"),
+        'model "claude-haiku-4.5" is not allowed'),
+    "ORG.md repair": ("write", lambda pid: dict(path="ORG.md", content="---\nmax_depth: 4\n---\n# Organization\n"), None),
+    "ORG.md repair that widens the set": (
+        "write", lambda pid: dict(path="ORG.md", content="---\nmax_depth: 4\nextra_allowed_models: [claude-haiku-4.5]\n---\nx\n"),
+        "only the user can widen the allowed models"),
+    "ORG.md repair below the floor": (
+        "write", lambda pid: dict(path="ORG.md", content="---\nmax_depth: 4\neffort: medium\n---\nx\n"), 'effort "medium" is not allowed'),
+    "propose_org": ("propose_org", lambda pid: dict(blueprint=research_blueprint()), "ORG.md cannot be read"),
+    "apply_org": (
+        "apply_org", lambda pid: dict(blueprint=research_blueprint(), approved=True, plan_id=pid), "ORG.md cannot be read"),
+    "blueprint_example": ("blueprint_example", lambda pid: dict(kind="research"), None),
+}
+
+
+@pytest.mark.parametrize("label", BROKEN_CALLS)
+def test_no_root_tool_of_the_floor_shows_a_yaml_error_while_ORG_md_cannot_be_parsed(org, label):
+    """Every root call the floor touches (status, whoami, hire, write, propose_org, apply_org ...): it answers, or refuses in words that do not
+    quote the parser; one that needs ORG.md says so by name, and the floor still holds."""
+    tool, make_args, refusal = BROKEN_CALLS[label]
+    root = build_server(org, ROOT)
+    pid = plan_id_of(root, research_blueprint())  # the plan the user approved, before the slip
+    break_org_md(org)
+    args = make_args(pid)
+    if refusal is None:
+        text = call(root, tool, **args)
+    else:
+        text = fails(root, tool, **args)
+        assert refusal in text
+    assert not PARSER_TEXT.search(text), text
+    assert not (org.dir("ops") / "AGENT.md").exists()  # nothing was hired
+
+
+def test_create_org_on_a_root_with_an_ORG_md_that_cannot_be_parsed_says_it_is_one(org):
+    break_org_md(org)
+    server = build_setup_server(OrgBinding(org.root, None, pinned=True), ROOT)
+    text = fails(server, "create_org", mission="m")
+    assert not PARSER_TEXT.search(text), text
+
+
 def test_a_blueprint_tier_outside_the_set_is_an_error_line_of_the_draft(org):
     out = point_blueprint(set_tiers)(org, "claude-haiku-4.5")
     assert out is not None and 'needs.models.cheap: model "claude-haiku-4.5" is not allowed' in out and "needs.models.strong:" in out

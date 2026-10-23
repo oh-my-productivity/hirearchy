@@ -167,6 +167,15 @@ def test_an_approved_hire_below_the_floor_is_refused_too(w: HierarchyWorld) -> N
     assert not w.agents.exists("ceo/ops")
 
 
+def test_an_ORG_md_that_cannot_be_parsed_refuses_the_hire_in_words_that_name_it(w: HierarchyWorld) -> None:
+    """The refusal is not the parser's own text, whether a model is given or not; nothing is created."""
+    w.configure("---\nmax_depth: 4\nextra_allowed_models: [claude-sonnet-4.6\n---\nrules\n")
+    for model in ("claude-opus-5.5", None):
+        message = refusal(w, "root", "ops", "Ops", "c", model=model)
+        assert message.startswith("ORG.md cannot be read") and "while parsing" not in message
+    assert not w.agents.exists("ops") and w.events.events == []
+
+
 # ------------------------------------------------------------------------------ names
 
 

@@ -83,17 +83,18 @@ class ModelResolver(Protocol):
         ...
 
     def effort(self) -> str:
-        """The effort of every run: the settings' ``effort``, else ``DEFAULT_EFFORT``, read as written (a level below the floor is
-        returned as it is; the run command refuses it)."""
+        """The effort of every run: the settings' ``effort``, else ``DEFAULT_EFFORT`` (also when ORG.md cannot be parsed), read as written (a
+        level below the floor is returned as it is; the run command refuses it)."""
         ...
 
 
 @runtime_checkable
 class ModelFloorAudit(Protocol):
     def below_floor(self) -> list[tuple[str, str]]:
-        """``(addr, model)`` of every agent whose model is outside the allowed models, in directory order (root is never listed)."""
+        """``(addr, model)`` of every agent whose model is outside the allowed models, in directory order (root is never listed); ``[]`` when
+        ORG.md cannot be parsed, so the allowed models are unknown."""
         ...
 
     def note(self) -> str:
-        """One line naming each such agent and the fix; ``""`` when none is below the floor."""
+        """One line naming each such agent and the fix; ``""`` when none is below the floor (or ORG.md cannot be parsed)."""
         ...

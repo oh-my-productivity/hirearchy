@@ -7,7 +7,7 @@ from pathlib import Path
 from ..agents import AgentDirectory
 from ..kernel import ROOT, JsonObject, OrgLayout
 from ..services import ServiceCatalog
-from ..settings import DEFAULT_CONFIG, OrgSettings
+from ..settings import DEFAULT_CONFIG, OrgSettings, readable_config
 from ._protocols import OrgContext, OrgContexts
 
 
@@ -35,7 +35,7 @@ class RuntimeOrgContext(OrgContext):
         self._layout = layout
 
     def config(self) -> JsonObject:
-        return self._settings.config()
+        return readable_config(self._settings)  # a plan is refused in plain words when ORG.md does not parse
 
     def root(self) -> Path | None:
         return self._layout.root

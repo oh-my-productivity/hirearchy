@@ -2,7 +2,8 @@
 
 ``OrgSettings`` reads the settings and the rules, ``OrgDocumentStore`` is the raw file (the only way to write it), and
 ``EventSwitch`` answers whether the event log is on. The pure functions read one value out of a settings mapping; the ``*_floor_problem``
-ones are the org-agent floor (the allowed models and the effort levels, docs/design/org-agent-model-floor.md).
+ones are the org-agent floor (the allowed models and the effort levels, docs/design/org-agent-model-floor.md); ``readable_config`` reads the
+settings of a caller that must refuse in plain words when ORG.md cannot be parsed.
 """
 
 from __future__ import annotations
@@ -28,6 +29,7 @@ from ._floor import (
     effort_floor_problem,
     model_floor_problem,
 )
+from ._readable import readable_config
 
 __all__ = [
     "DEFAULT_ALLOWED_MODELS",
@@ -47,6 +49,7 @@ __all__ = [
     "effort_floor_problem",
     "finite_number",
     "model_floor_problem",
+    "readable_config",
 ]
 
 
