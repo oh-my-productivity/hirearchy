@@ -7,21 +7,13 @@ from datetime import datetime
 from ..attention import section
 from ..kernel import ROOT, Message, client_questions, fmt_duration
 from ..mail import MailboxReader
-from ..reflection import Case, CaseHistory, ServiceReports
+from ..reflection import Case, CaseHistory, ServiceReports, rated
 from ._ports import RunCounts, TaskLines, TaskStates, TaskTeams, TeamActivity
 
 
 def artifacts_of(result: Message) -> list[str]:
     """Paths listed under ``## Artifacts`` (the runtime's word-count notes after the path are dropped)."""
     return [line.lstrip("-* ").split(" (", 1)[0] for line in section(result.body, "artifacts")]
-
-
-def rated(case: Case | None, task: Message) -> bool:
-    """Has the client given feedback on this delivery (or on a later rework of it)? An earlier verdict does not count."""
-    if case is None:
-        return False
-    step = next((i for i, t in enumerate(case.tasks) if t.id == task.id), 0)
-    return any(v.step >= step for v in case.verdicts)
 
 
 class CaseTaskLines(TaskLines):

@@ -25,12 +25,13 @@ from hirearchy.services.tests.test_contract_service_evidence import (  # noqa: F
     test_admit_accepts_lines,
     test_admit_returns_rule_b_or_c_or_raises_an_org_error,
     test_an_exempt_admit_returns_the_exemption_with_normalized_ids,
+    test_amendment_basis_of_a_service_without_cases_is_empty,
     test_an_exempt_admit_with_no_evidence_returns_the_exemption,
     test_links_accepts_none_alone,
     test_links_returns_normalized_ids_or_raises,
 )
 
-from ._support import SERVICE, ask, define, deliver, nested, note_on, populated, rework
+from ._support import SERVICE, ask, define, deliver, nested, note_on, populated, rate, rework
 
 CASES = "cases the client rejected"
 
@@ -602,3 +603,57 @@ def test_feedback_through_the_wired_application_raises_f5_and_f6(svc: Any) -> No
         svc.feedback(ROOT, task.id, "reject", "Yes.", source="human", criterion=["R2"], confirms=no.id)
     link = svc.feedback(ROOT, task.id, "reject", "Yes, always.", source="human", criterion=["c2"], confirms=no.id)
     assert (link.criterion, link.reply_to, link.feedback) == ("C2", no.id, None)
+
+
+# ------------------------------------------------------------------------------ amendment_basis (P2: what an amendment may answer)
+
+
+def test_amendment_basis_lists_human_rejections_oldest_first_with_their_answers(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    first, one = rejected(w, "Too long.", criterion="C1")  # answered by the user's link
+    second, two = rejected(w, "No dates.", topic="b")  # waiting for its answer
+    third, three = rejected(w, "Wrong tone.", topic="c")
+    w.s.d.clock.advance(1)
+    basis = evidence.amendment_basis("ceo", SERVICE)
+    assert [(r.note, r.assertion, r.task, r.title, r.earlier, r.words) for r in basis.rejections] == [
+        (one.id, "R1", first.id, first.title, (), "Too long."),
+        (two.id, "R2", second.id, second.title, ("R1",), "No dates."),
+        (three.id, "R3", third.id, third.title, ("R1", "R2"), "Wrong tone."),
+    ]
+    link = next(m for m in w.s.d.mail.sent("root") if m.reply_to == one.id and m.criterion)
+    assert [r.answered for r in basis.rejections] == [link.id, "", ""]
+    assert basis.unrated == ()  # every delivery has its verdict
+
+
+def test_a_relayed_rejection_is_not_in_the_basis(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    rejected(w, "The assistant's reading.", source="relayed")
+    _, human = rejected(w, "The user's.", topic="b")
+    basis = evidence.amendment_basis("ceo", SERVICE)
+    assert [(r.note, r.assertion) for r in basis.rejections] == [(human.id, "R1")]  # R<k> counts human rejections only, as `services` shows
+
+
+def test_a_human_reject_of_a_blocked_result_is_in_the_basis(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    """The shape of DR-41: a rejection of a result that is not ``done`` is a rejection to answer; a blocked case is not a delivery to rate."""
+    task = ask(w, "ai")
+    deliver(w, task, status="blocked")
+    verdict = rate(w, task, "reject", "Not what I asked.")
+    basis = evidence.amendment_basis("ceo", SERVICE)
+    assert [(r.note, r.task, r.answered) for r in basis.rejections] == [(verdict.id, task.id, "")]
+    assert basis.unrated == ()
+
+
+def test_the_basis_names_the_deliveries_without_a_verdict(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    rated_task, unrated_task, open_task = ask(w, "a"), ask(w, "b"), ask(w, "c")
+    deliver(w, rated_task)
+    deliver(w, unrated_task)
+    rate(w, rated_task, "accept")
+    assert open_task.id and evidence.amendment_basis("ceo", SERVICE).unrated == (unrated_task.id,)  # the open request has no delivery yet
+
+
+def test_answered_is_the_first_human_link_note_on_it(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    task, verdict = rejected(w, "Too long.")
+    relayed = note_on(w, task, reply_to=verdict.id, source="relayed", criterion="C1")
+    assert evidence.amendment_basis("ceo", SERVICE).rejections[0].answered == ""  # a relayed link answers nothing
+    first = note_on(w, task, reply_to=verdict.id, source="human", criterion="C2")
+    note_on(w, task, reply_to=verdict.id, source="human", criterion="none")  # a correction: the first human link stays the answer
+    assert relayed.id < first.id
+    assert evidence.amendment_basis("ceo", SERVICE).rejections[0].answered == first.id

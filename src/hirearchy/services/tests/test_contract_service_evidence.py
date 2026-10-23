@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from hirearchy.kernel import OrgError
-from hirearchy.services import Admission, ServiceEvidence
+from hirearchy.services import Admission, AmendmentBasis, ServiceEvidence
 from hirearchy.services.testing import IMPLEMENTATIONS
 
 from ._support import implementations
@@ -75,3 +75,9 @@ def test_links_accepts_none_alone(evidence: ServiceEvidence) -> None:
 def test_confirmed_is_a_frozenset_of_criterion_ids(evidence: ServiceEvidence) -> None:
     got = evidence.confirmed(OWNER, SERVICE)
     assert isinstance(got, frozenset) and all(isinstance(x, str) and x.startswith("C") for x in got)
+
+
+def test_amendment_basis_of_a_service_without_cases_is_empty(evidence: ServiceEvidence) -> None:
+    """No request yet: no rejection to answer and no delivery without a verdict (0a.2 adds no division: the empty case is the zero case)."""
+    got = evidence.amendment_basis(OWNER, SERVICE)
+    assert isinstance(got, AmendmentBasis) and got.rejections == () and got.unrated == ()

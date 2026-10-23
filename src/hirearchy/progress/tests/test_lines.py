@@ -7,13 +7,13 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from hirearchy.kernel import ROOT, Message
-from hirearchy.progress._lines import CaseTaskLines, artifacts_of, rated
+from hirearchy.progress._lines import CaseTaskLines, artifacts_of
 from hirearchy.progress._ports import TaskLines
 from hirearchy.progress._counts import LogRunCounts
 from hirearchy.progress._states import MailTaskStates
 from hirearchy.progress._teams import AgentTaskTeams
 from hirearchy.progress.testing import FixedCaseTotals, FixedTeamActivity, ProgressWorld
-from hirearchy.reflection import Case, Verdict
+from hirearchy.reflection import Case, Verdict, rated
 from hirearchy.reflection.testing import FixedCaseHistory
 
 

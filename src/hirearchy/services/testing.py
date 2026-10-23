@@ -37,6 +37,7 @@ from ._store import FsServiceStore
 from ._texts import CappedPlaybookTexts, DirectReportOwners, EventedPlaybookWriter
 from .api import (
     Admission,
+    AmendmentBasis,
     ContractNormalizer,
     ServiceCatalog,
     ServiceCommands,
@@ -118,13 +119,18 @@ class MemoryServiceStore(ServiceStore):
 class AdmittingServiceEvidence(ServiceEvidence):
     """The gate that lets everything through: admits every revision by rule ``b`` and accepts every link (the ids normalized). The default of the
     worlds: the tests of the commands that call the gate do not need its judgement, ``reflection`` has the real one. ``confirmed`` are the criterion
-    ids it says the client confirmed (none by default)."""
+    ids it says the client confirmed (none by default); ``basis`` is the record it says the service has (no rejection, no delivery without a
+    verdict, by default)."""
 
-    def __init__(self, confirmed: Iterable[str] = ()) -> None:
+    def __init__(self, confirmed: Iterable[str] = (), basis: AmendmentBasis | None = None) -> None:
         self._confirmed = frozenset(confirmed)
+        self._basis = basis or AmendmentBasis((), ())
 
     def confirmed(self, owner: str, service: str) -> frozenset[str]:
         return self._confirmed
+
+    def amendment_basis(self, owner: str, service: str) -> AmendmentBasis:
+        return self._basis
 
     def links(self, owner: str, service: str, ids: Sequence[str], *, verdict: str | None = None) -> tuple[str, ...]:
         return normalize_links(list(ids))
@@ -142,8 +148,8 @@ class AdmittingServiceEvidence(ServiceEvidence):
 class RefusingServiceEvidence(AdmittingServiceEvidence):
     """The gate that refuses every revision that is not exempt, with the text it was given (the links as the admitting one)."""
 
-    def __init__(self, text: str = "refused by the stand-in for the gate") -> None:
-        super().__init__(())
+    def __init__(self, text: str = "refused by the stand-in for the gate", basis: AmendmentBasis | None = None) -> None:
+        super().__init__((), basis)
         self._text = text
 
     def admit(

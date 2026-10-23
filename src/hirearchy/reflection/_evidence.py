@@ -14,9 +14,10 @@ from collections.abc import Callable, Mapping, Sequence
 
 from ..kernel import ROOT, OrgError, clip_line, link_ids, parent, verdict_tier
 from ..services import (
-    Admission, Criterion, ServiceCatalog, ServiceEvidence, confirmed_amendments, line_key, normalize_evidence, normalize_links,
+    Admission, AmendmentBasis, Criterion, Rejection, ServiceCatalog, ServiceEvidence, confirmed_amendments, line_key, normalize_evidence,
+    normalize_links,
 )
-from .api import Assertion, CaseHistory, Verdict, confirmed_criteria, regressions
+from .api import Assertion, CaseHistory, Verdict, confirmed_criteria, delivered_unrated, regressions
 
 REASON_CLIP = 200  # characters of the reason in the question of a refusal
 WORDS_CLIP = 300  # characters of the client's words in the question of a refusal
@@ -59,6 +60,20 @@ class CaseServiceEvidence(ServiceEvidence):
 
     def confirmed(self, owner: str, service: str) -> frozenset[str]:
         return confirmed_criteria(self._history.cases(owner, service), self._catalog.criteria(owner, service))
+
+    def amendment_basis(self, owner: str, service: str) -> AmendmentBasis:
+        cases = self._history.cases(owner, service)
+        found = regressions(cases)
+        titles = {t.id: t.title for c in cases for t in c.tasks}
+        rejections = tuple(
+            Rejection(
+                note=a.verdict.message.id, assertion=a.id, task=a.verdict.task_id, title=titles.get(a.verdict.task_id, ""),
+                earlier=tuple(x.id for x in found[:k]), words=a.verdict.note,
+                answered=next((m.id for m in a.verdict.link_notes if verdict_tier(m) == "human"), ""),
+            )
+            for k, a in enumerate(found)
+        )
+        return AmendmentBasis(rejections, delivered_unrated(cases))
 
     def admit(
         self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),

@@ -35,7 +35,9 @@ __all__ = [
     "Verdict",
     "case_spend",
     "confirmed_criteria",
+    "delivered_unrated",
     "lessons_of",
+    "rated",
     "regressions",
     "stats_by_version",
     "summarize",
@@ -148,6 +150,20 @@ def confirmed_criteria(cases: Sequence[Case], criteria: Sequence[Criterion]) -> 
         return c is None or not (c.user or (c.answers and c.answers != v.message.id))
 
     return frozenset(x for c in cases for v in c.verdicts for x in v.confirmed if counts(v, x))
+
+
+def rated(case: Case | None, task: Message) -> bool:
+    """Has the client given a verdict (any tier) on this delivery or on a later rework of it? An earlier verdict does not count (pure)."""
+    if case is None:
+        return False
+    step = next((i for i, t in enumerate(case.tasks) if t.id == task.id), 0)
+    return any(v.step >= step for v in case.verdicts)
+
+
+def delivered_unrated(cases: Sequence[Case]) -> tuple[str, ...]:
+    """The latest task id of every case that is delivered (``state == "done"``) and whose latest task has no verdict (pure). A case that is blocked,
+    failed or still open has no delivery to rate."""
+    return tuple(c.tasks[-1].id for c in cases if c.state == "done" and not rated(c, c.tasks[-1]))
 
 
 def regressions(cases: Sequence[Case]) -> list[Assertion]:

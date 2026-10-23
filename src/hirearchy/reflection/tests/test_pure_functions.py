@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from hirearchy.kernel import Message
-from hirearchy.reflection import Case, Verdict, case_spend, confirmed_criteria, lessons_of, version_at
+from hirearchy.reflection import Case, Verdict, case_spend, confirmed_criteria, delivered_unrated, lessons_of, rated, version_at
 from hirearchy.services import Criterion
 
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -156,3 +156,63 @@ def test_a_legacy_or_v1_criterion_is_confirmed_as_in_0a1() -> None:
     both = [criterion("C1", since=1), criterion("C3")]  # a v1 criterion; an amendment written before 0a.2 (no basis)
     assert confirmed_criteria([with_verdicts(yes)], both) == frozenset({"C1", "C3", "C5"})  # C5: an id the criteria do not list
     assert confirmed_criteria([with_verdicts(yes)], []) == frozenset({"C1", "C3", "C5"})
+
+
+# ------------------------------------------------------------------------------ rated and delivered_unrated
+
+
+def chain(*ids: str) -> list[Message]:
+    return [Message(id=i, sender="root", to="ceo", type="task", body="b", title=f"task {i}", service="s") for i in ids]
+
+
+def verdict_at(step: int, tasks: list[Message], *, tier: str = "human", kind: str = "reject", n: int = 1) -> Verdict:
+    note = Message(id=f"2026010100000{n}000000-root-000{n}", sender="root", to="ceo", type="note", body="b", feedback=kind)
+    return Verdict(kind, "b", None, tasks[step].id, step, note, tier=tier)
+
+
+def case_with(tasks: list[Message], *verdicts: Verdict, state: str = "done", id: str | None = None) -> Case:
+    return Case(
+        id=id or tasks[0].id, service="s", owner="ceo", tasks=tasks, result=None, state=state, playbook=0, used=0, reworks=len(tasks) - 1, budget=1,
+        runs=1, lessons=[], verdicts=list(verdicts), started=None, finished=None,
+    )
+
+
+def test_rated_is_unchanged_after_the_move() -> None:
+    """The rule ``progress`` had (a verdict on a delivery or on a later rework of it), now in ``reflection``."""
+    first, second = chain("1", "2")
+    found = case_with([first, second], verdict_at(0, [first, second]))
+    assert rated(found, first) is True and rated(found, second) is False  # a verdict on the first delivery does not rate its rework
+    later = case_with([first, second], verdict_at(1, [first, second]))
+    assert rated(later, first) is True and rated(later, second) is True  # a verdict on the rework rates the delivery it replaced
+    assert rated(case_with([first, second]), first) is False and rated(None, first) is False
+
+
+def test_delivered_unrated_names_the_latest_task_of_each_done_unrated_case() -> None:
+    a, b, c = chain("a1", "a2"), chain("b1"), chain("c1")
+    cases = [
+        case_with(a, verdict_at(0, a, n=1)),  # reworked after its verdict: the rework a2 is delivered and unrated
+        case_with(b, id="b1"),  # delivered, no verdict
+        case_with(c, verdict_at(0, c, kind="accept", n=2)),  # rated
+    ]
+    assert delivered_unrated(cases) == ("a2", "b1")
+
+
+def test_a_blocked_or_failed_case_is_not_unrated() -> None:
+    one, two, three = chain("o1"), chain("t1"), chain("h1")
+    assert delivered_unrated([case_with(one, state="blocked"), case_with(two, state="failed"), case_with(three, state="open")]) == ()
+
+
+def test_a_relayed_verdict_counts_as_rated() -> None:
+    one, two = chain("r1"), chain("a1")
+    cases = [case_with(one, verdict_at(0, one, tier="relayed", kind="accept")), case_with(two, verdict_at(0, two, tier="agent", n=2))]
+    assert delivered_unrated(cases) == ()  # any tier is a verdict: root can always meet the condition (a relayed accept)
+
+
+def test_a_later_rework_carries_the_rating() -> None:
+    tasks = chain("1", "2", "3")
+    assert delivered_unrated([case_with(tasks, verdict_at(2, tasks))]) == ()  # the verdict on the last rework rates the whole chain
+    assert delivered_unrated([case_with(tasks, verdict_at(1, tasks))]) == ("3",)  # a verdict on the second does not rate the third
+
+
+def test_no_cases_gives_no_unrated() -> None:
+    assert delivered_unrated([]) == ()

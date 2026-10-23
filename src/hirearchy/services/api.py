@@ -32,6 +32,7 @@ from ._cap import playbook_word_cap
 
 __all__ = [
     "Admission",
+    "AmendmentBasis",
     "Contract",
     "ContractNormalizer",
     "Criterion",
@@ -46,6 +47,7 @@ __all__ = [
     "LINK_HEADER",
     "Playbook",
     "REASON_MAX",
+    "Rejection",
     "ServiceCatalog",
     "ServiceCommands",
     "ServiceEvidence",
@@ -422,6 +424,28 @@ class Admission:
     lines: tuple[tuple[str, str], ...] = ()  # (the id that admits it, the line) of every line the revision added or changed; () when none/exempt
 
 
+@dataclass(frozen=True)
+class Rejection:
+    """A rejection of a service request by the human client, with whether the user's answer to it is recorded (``ServiceEvidence.amendment_basis``)."""
+
+    note: str  # the rejection's message id (its first 21 characters are when it was recorded)
+    assertion: str  # its R<k> (service-wide numbering, as `services` shows it)
+    task: str  # the request (or rework) it judged
+    title: str  # that task's title (the link note's title names it)
+    earlier: tuple[str, ...]  # the R ids recorded before it
+    words: str  # the client's words in the rejection
+    answered: str  # the id of the first human-tier link note that replies to it; "" while it has none
+    question: str = ""  # the exact question to ask the user about it, with its ids filled in ("" until reflection words it)
+
+
+@dataclass(frozen=True)
+class AmendmentBasis:
+    """What a root amendment of the acceptance criteria may answer."""
+
+    rejections: tuple[Rejection, ...]  # every human-tier rejection of the service, oldest first
+    unrated: tuple[str, ...]  # the latest task of every case whose delivery has no verdict yet
+
+
 @runtime_checkable
 class ServiceEvidence(Protocol):
     """What the history of a service proves: the ids a client's verdict may name, and whether a playbook revision is admitted."""
@@ -443,6 +467,11 @@ class ServiceEvidence(Protocol):
 
     def confirmed(self, owner: str, service: str) -> frozenset[str]:
         """The criterion ids of this service the human client confirmed with a link (``feedback(confirms=...)``); empty when there are none."""
+        ...
+
+    def amendment_basis(self, owner: str, service: str) -> AmendmentBasis:
+        """What a root amendment of the acceptance criteria may answer: every human-tier rejection of the service (oldest first) with whether it has
+        its answer, and the latest task of every case whose done delivery has no verdict yet. Empty for a service without cases."""
         ...
 
 
