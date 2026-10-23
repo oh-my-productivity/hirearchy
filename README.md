@@ -53,15 +53,17 @@ Other commands: `hire ... --inputs PATH` (repeatable: read-only folders for the 
 
 ### Models
 
-Every agent runs on **claude-sonnet-5.5** unless it is told otherwise. The scheduler always passes `--model` to `kiro-cli`, chosen in this order:
+Every org agent runs on **claude-sonnet-5.5** at **high** effort, and nothing below that is available ([docs/design/org-agent-model-floor.md](docs/design/org-agent-model-floor.md)). The scheduler always passes `--model` and `--effort` to `kiro-cli` (the run log's `# cmd:` line shows both); the model is chosen in this order:
 
 1. the agent's charter (`model:` in its `AGENT.md`, set by `hire --model` or a blueprint),
 2. the organization's `default_model` in `ORG.md` (`init --model`, `create_org(default_model=...)`),
 3. `claude-sonnet-5.5` (`hirearchy.core.DEFAULT_MODEL`).
 
-`hire` without a model leaves the charter unpinned, so the agent follows the org default. **Existing organizations** whose `ORG.md` says `default_model: null` (or has no such key) used to run on kiro's own default; they now run on claude-sonnet-5.5. A model named explicitly in a charter or in `ORG.md` is kept, and to get another model org-wide, set `default_model` in `ORG.md`. The `run.start` event records the model each run used.
+Only `claude-sonnet-5.5` and `claude-opus-5.5` are allowed: `hire`, a blueprint (`propose_org`/`apply_org`, `plan`/`apply`), a charter rewrite that changes the model, and `init`/`create_org` refuse any other id with a message that names the allowed set. Only you can widen it: list more ids under `extra_allowed_models:` in `ORG.md` yourself (root's `write` tool cannot). The effort is `effort:` in `ORG.md`: `high` (the default), `xhigh` or `max`; `low` and `medium` are refused, and runs are refused while `ORG.md` says one of them.
 
-Blueprints follow the same rule: without `needs.models`, or for a tier it does not map, `cheap` and `strong` both resolve to the org's default model, and the plan says `Models: claude-sonnet-5.5 for every agent`. Cheaper drafting is only used when you ask for it (`needs.models: {cheap: <id>, strong: <id>}`); then the lead and the final verifier stay on `strong`, and the plan lists which model each group of agents runs on.
+`hire` without a model leaves the charter unpinned, so the agent follows the org default. **Existing agents** whose model is outside the allowed set keep running on it (nothing is substituted); root's `status` and `whoami` name each one with the fix (`model: claude-sonnet-5.5` in its `AGENT.md`). The `run.start` event records the model each run used.
+
+Blueprints follow the same rule: without `needs.models`, or for a tier it does not map, `cheap` and `strong` both resolve to the org's default model, and the plan says `Models: claude-sonnet-5.5 (high effort) for every agent`.
 
 ### Progress
 
@@ -179,7 +181,7 @@ What the templates add for verification and delegation:
 - Verifiers get the project and the authors' workspaces read-only as `inputs` unless they can already write there; explicit `inputs` that hide the reviewed work raise the warning `verifier-cannot-read`.
 - `blueprint_example("analysis")`: data analysis with read-only data, a scratch workspace, an `analyst` and an independent `data-checker`. The data-checker recomputes the key figures with its own script and checks figures with their label: (label, number) pairs, not numbers alone.
 - `code-reviewer` now has `read` and `shell`: it runs the test suite and the commands named in the criteria and reports each command and result; it still never edits files (charter-enforced, since shell can't be confined). It needs a workspace, like the engineer.
-- The lead (`manager`) runs on the strong model, even when the drafters are cheap, because it decides how every other run is spent; the plan warns `manager-cheap-model` if it is put on a cheap one. By default there is no cheap model (see Models): every tier is claude-sonnet-5.5 and the warning cannot fire.
+- The lead (`manager`) runs on the strong model, even when the drafters are cheap, because it decides how every other run is spent; the plan warns `manager-cheap-model` if it is put on a cheap one. There is no model below the floor (see Models): with the default tiers the warning cannot fire.
 - The lead delegates a step only when its inputs exist (research, then write, then check) and never sends status messages; results wake it.
 - A failed check goes back to the author of the failing file (`delegate(revises=...)`, required changes quoted verbatim), with one cut-or-reframe rework and one re-check of that same file. If it still fails, the lead reports `blocked` with options and the coverage line.
 - `manager` verifies with its own `read` output (never memory or a report's claim), treats the verifier's coverage report as a precondition for `done`, and sends deviations back with `revises` or escalates instead of reporting `done`.
@@ -795,7 +797,7 @@ uv run pytest -q tests/golden         # only the golden (characterization) snaps
 uv run pytest -q tests/architecture   # the structural rules (or `-m "not architecture"` to leave them out)
 uv run pytest -q tests/integration --run-integration    # + the real-kiro tests (or HIREARCHY_RUN_INTEGRATION=1)
 #   the real-kiro tests keep kiro's state in HIREARCHY_STATE_DIR inside their tmp dir and never write ~/.kiro; they use the default model
-#   unless HIREARCHY_IT_MODEL is set (claude-haiku-4.5 for a cheap run)
+#   unless HIREARCHY_IT_MODEL is set (an allowed model: claude-sonnet-5.5 or claude-opus-5.5)
 HIREARCHY_UPDATE_GOLDEN=1 uv run pytest -q tests/golden    # regenerate the golden files, deliberately (review the git diff)
 uv run python scripts/static_checks.py mypy|imports     # one static check
 uv run python -m tests.architecture.lint                # import contracts only: generates .importlinter (git-ignored) and runs it + the pyproject ones
