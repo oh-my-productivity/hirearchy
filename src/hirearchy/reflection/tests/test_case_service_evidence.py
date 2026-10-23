@@ -281,6 +281,39 @@ def test_no_evidence_at_all_is_a_g1_refusal_that_says_so(w: ReflectionWorld, evi
     assert "(c) it cites a criterion root added to the contract by an amendment the client confirmed (none yet)." in refusal(evidence, [])
 
 
+# ------------------------------------------------------------------------------ a link-note id is evidence (F-E4-7)
+
+
+def link_note(w: ReflectionWorld, source: str, criterion: str = "C3") -> tuple[Message, Message]:
+    """A new case rejected by the client, then a link note of the given ``source`` naming ``criterion``; returns (verdict, link note)."""
+    task = ask(w)
+    deliver(w, task)
+    no = note_on(w, task, verdict="reject", source="human", body="No week.")
+    return no, note_on(w, task, reply_to=no.id, source=source, criterion=criterion)
+
+
+def test_a_human_link_note_id_is_evidence_for_the_criteria_it_names(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    amend(w, add_acceptance=["Names the week it covers"])  # C3
+    no, link = link_note(w, "human")
+    admitted = evidence.admit("ceo", SERVICE, [link.id], "why")
+    assert admitted == Admission("c", (link.id,), "cites C3, which root added to the contract (v2) and the client confirmed")
+    assert evidence.admit("ceo", SERVICE, [no.id], "why").rule == "c"  # the rejection itself resolves through its human link as before
+
+
+def test_a_relayed_link_note_id_weighs_nothing_and_is_noted(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    amend(w, add_acceptance=["Names the week it covers"])
+    _, link = link_note(w, "relayed")
+    message = refusal(evidence, [link.id])
+    assert message.startswith(f"refused: none of this evidence is the client's own: link {link.id} is relayed (the assistant's own reading). ")
+
+
+def test_an_unknown_id_is_still_unknown_evidence(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    amend(w, add_acceptance=["Names the week it covers"])
+    link_note(w, "human")
+    other = "20990101T000000000000-root-0000"
+    assert refusal(evidence, [other]).startswith(f"unknown evidence for `weekly-brief`: {other}. Evidence is a criterion (")
+
+
 # ------------------------------------------------------------------------------ criteria the client removed
 
 

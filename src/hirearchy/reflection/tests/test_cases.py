@@ -37,6 +37,25 @@ def test_a_case_keeps_every_verdict_in_order_with_the_task_it_was_given_on(svc):
     assert case.feedback.reply_to == rework.id  # the final verdict is the latest note
 
 
+def test_a_verdict_lists_its_link_notes_in_id_order(svc):
+    """F-E4-7: the link notes that reply to a verdict (every tier) travel with it, so a cited link-note id can be resolved."""
+    task = request(svc, "ai")
+    deliver(svc, "ceo", task)
+    no = svc.feedback(ROOT, task.id, "reject", "Too long.", source="human")
+    plain = request(svc, "chips")
+    deliver(svc, "ceo", plain)
+    svc.feedback(ROOT, plain.id, "reject", "Too short.", source="human")
+    time.sleep(0.002)
+    first = svc.feedback(ROOT, task.id, "reject", "I read it as C1.", source="relayed", criterion=["C1"], confirms=no.id)
+    time.sleep(0.002)
+    second = svc.feedback(ROOT, task.id, "reject", "No: C2.", source="human", criterion=["C2"], confirms=no.id)
+    cases = {c.id: c for c in svc.runtime.case_history.cases("ceo", WEEKDAY)}
+    (verdict,) = cases[task.id].verdicts
+    assert [m.id for m in verdict.link_notes] == [first.id, second.id]
+    (other,) = cases[plain.id].verdicts
+    assert other.link_notes == ()
+
+
 def test_stats_keep_the_final_counts_and_say_how_many_accepts_came_after_a_reject(svc):
     rejected_then_accepted(svc)
     plain = request(svc, "chips")

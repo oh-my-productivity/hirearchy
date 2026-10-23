@@ -56,6 +56,7 @@ class Verdict:
     links: tuple[str, ...] = ()  # what the client said it was about: the effective link (C<k>, R<k> or none), () when there is none
     links_tier: str = ""  # the tier of the note that carries the effective link ("" = no link)
     confirmed: tuple[str, ...] = ()  # the C<k> ids named by every human-tier link note of this verdict (never by its own criterion), in note order
+    link_notes: tuple[Message, ...] = ()  # the link notes that reply to this verdict, of every tier, in id order (a cited note id is evidence, 4.3)
 
 
 @dataclass

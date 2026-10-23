@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
-from ..kernel import ROOT, OrgError, clip_line, parent
+from ..kernel import ROOT, OrgError, clip_line, link_ids, parent, verdict_tier
 from ..services import Admission, Criterion, ServiceCatalog, ServiceEvidence, confirmed_amendments, normalize_evidence, normalize_links
 from .api import Assertion, CaseHistory, Verdict, confirmed_criteria, regressions
 
@@ -63,6 +63,7 @@ class CaseServiceEvidence(ServiceEvidence):
         by_verdict = {v.message.id: (v, c) for c in cases for v in c.verdicts}
         by_task = {t.id: c for c in cases for t in c.tasks}
         by_result = {r: c for c in cases for r in [*c.lesson_ids, *([c.result.id] if c.result is not None else [])]}
+        by_link = {m.id: (m, v) for c in cases for v in c.verdicts for m in v.link_notes}
         assertion_of = {a.verdict.message.id: a for a in found}
 
         def count(a: Assertion) -> None:
@@ -99,6 +100,16 @@ class CaseServiceEvidence(ServiceEvidence):
                     notes.append(f"case {case.id} has no rejection by the client{relayed}")
             elif x in by_result:
                 notes.append(f"{x} is a result: its lessons are your team's view")
+            elif x in by_link:
+                link, v = by_link[x]
+                if verdict_tier(link) == "human":  # the user's recorded yes: it stands for the rejection and the criteria it names
+                    if v.message.id in assertion_of:
+                        count(assertion_of[v.message.id])
+                    subjects.update(k for k in link_ids(link) if k in crit and crit[k].current)
+                elif verdict_tier(link) == "agent":
+                    notes.append(f"link {x} is an agent client's (a hypothesis)")
+                else:
+                    notes.append(f"link {x} is relayed (the assistant's own reading)")
             else:
                 unknown.append(x)
 

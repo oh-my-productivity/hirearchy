@@ -109,6 +109,7 @@ class DerivedCaseHistory(CaseHistory):
         return Verdict(
             note.feedback or "", self._words.feedback_text(note), msg_time(note), note.reply_to or "", step, note, tier=verdict_tier(note),
             links=link_ids(winning[-1]) if winning else (), links_tier=tier(winning[-1]) if winning else "", confirmed=tuple(confirmed),
+            link_notes=tuple(sorted(links, key=lambda m: m.id)),
         )
 
     def case_of(self, task: Message) -> Case | None:
