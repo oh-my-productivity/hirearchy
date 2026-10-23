@@ -13,23 +13,24 @@ from dataclasses import dataclass
 from fnmatch import fnmatch
 from pathlib import Path
 
+from ..delivery import MessageDelivery
 from ..dispatch import ReworkContext
 from ..dispatch.testing import MEMORY_ROOT, DispatchWorld, PostedDelivery
 from ..dispatch.testing import fs_world as dispatch_fs_world
 from ..dispatch.testing import memory_world as dispatch_memory_world
-from ..kernel import ROOT, JsonObject, OrgError, OrgPaths, join_frontmatter, norm, split_frontmatter
+from ..kernel import ROOT, JsonObject, Message, OrgError, OrgPaths, join_frontmatter, norm, split_frontmatter
 from ..kernel.testing import ListEventSink, fs_atomic_writer
 from ._amend import ContractAmender
 from ._catalog import ContractServiceCatalog
 from ._commands import RuleServiceCommands
 from ._define import RuleContractDefiner
-from ._feedback import RuleClientFeedback
+from ._feedback import RuleClientFeedback, SenderLinkNotes
 from ._hints import ServiceReportHints
 from ._normalizer import TextContractNormalizer
 from ._parse import as_int, merged_versions
 from ._places import OrgServicePlaces
 from ._playbook import RulePlaybookReviser
-from ._protocols import ServicePlaces
+from ._protocols import LinkNotes, ServicePlaces
 from ._request import RuleServiceRequester, TextRequestBodies
 from ._retire import RuleServiceRetirement
 from ._rework import ServiceReworkContext
@@ -160,6 +161,42 @@ class RefusingServiceEvidence(AdmittingServiceEvidence):
         raise OrgError(self._text)
 
 
+# ------------------------------------------------------------------------------ the stand-ins for a write that fails
+
+
+class FlakyLinkNotes(LinkNotes):
+    """The link writer that fails its first ``failures`` calls with ``error`` and writes through ``inner`` afterwards (a link that cannot be written)."""
+
+    def __init__(self, inner: LinkNotes, failures: int = 1, error: Exception | None = None) -> None:
+        self._inner = inner
+        self._failures = failures
+        self._error = error or OSError("disk full")
+
+    def write(self, actor: str, owner: str, title: str, rejection: str, ids: Sequence[str], words: str, source: str | None = "human") -> Message:
+        if self._failures > 0:
+            self._failures -= 1
+            raise self._error
+        return self._inner.write(actor, owner, title, rejection, ids, words, source)
+
+
+class FlakyDelivery(MessageDelivery):
+    """The delivery whose notes of the runtime fail the first ``failures`` times with ``error`` (messages themselves go through ``inner``)."""
+
+    def __init__(self, inner: MessageDelivery, failures: int = 1, error: Exception | None = None) -> None:
+        self._inner = inner
+        self._failures = failures
+        self._error = error or OSError("disk full")
+
+    def deliver(self, msg: Message) -> Message:
+        return self._inner.deliver(msg)
+
+    def notify(self, to: str, title: str, body: str, wake: bool = True, trace: str | None = None) -> Message:
+        if self._failures > 0:
+            self._failures -= 1
+            raise self._error
+        return self._inner.notify(to, title, body, wake, trace)
+
+
 # ------------------------------------------------------------------------------ the worlds
 
 
@@ -224,22 +261,29 @@ def memory_store(tmp_path: Path) -> StoreHarness:
     return StoreHarness(store, places, text, rels)
 
 
-def _world(d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | None = None) -> ServicesWorld:
+def _world(
+    d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
+    delivery: Callable[[MessageDelivery], MessageDelivery] | None = None,
+) -> ServicesWorld:
+    """``links`` and ``delivery`` wrap the link writer and the delivery of the runtime's notes (a write that fails, a call that is watched)."""
     places, store = harness.places, harness.store
     gate = evidence or AdmittingServiceEvidence()
-    events, delivery = ListEventSink(), PostedDelivery(d.post)
+    link_notes: LinkNotes = SenderLinkNotes(d.sender)
+    link_notes = links(link_notes) if links else link_notes
+    events, posted = ListEventSink(), PostedDelivery(d.post)
+    notes: MessageDelivery = delivery(posted) if delivery else posted
     normalizer = TextContractNormalizer()
     catalog = ContractServiceCatalog(store, d.agents, places)
     owners, texts = DirectReportOwners(d.agents), CappedPlaybookTexts(d.settings)
     playbooks = EventedPlaybookWriter(store, d.clock, events)
     commands = RuleServiceCommands(
         RuleContractDefiner(
-            d.agents, catalog, store, places, normalizer, ContractAmender(), texts, owners, playbooks, delivery, d.clock, events, gate,
+            d.agents, catalog, store, places, normalizer, ContractAmender(), texts, owners, playbooks, notes, d.clock, events, gate, link_notes,
         ),
-        RuleServiceRetirement(d.agents, catalog, store, owners, delivery, d.clock, events),
-        RulePlaybookReviser(d.agents, catalog, texts, playbooks, delivery, gate),
+        RuleServiceRetirement(d.agents, catalog, store, owners, notes, d.clock, events),
+        RulePlaybookReviser(d.agents, catalog, texts, playbooks, notes, gate),
         RuleServiceRequester(d.agents, catalog, d.mail, TextRequestBodies(), d.sender),
-        RuleClientFeedback(d.agents, d.mail, d.sender, gate),
+        RuleClientFeedback(d.agents, d.mail, d.sender, gate, store),
     )
     return ServicesWorld(
         commands=commands, catalog=catalog, store=store, hints=ServiceReportHints(catalog), evidence=gate,
@@ -248,12 +292,18 @@ def _world(d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | 
     )
 
 
-def fs_world(tmp_path: Path, evidence: ServiceEvidence | None = None) -> ServicesWorld:
-    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path), evidence)
+def fs_world(
+    tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
+    delivery: Callable[[MessageDelivery], MessageDelivery] | None = None,
+) -> ServicesWorld:
+    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path), evidence, links, delivery)
 
 
-def memory_world(tmp_path: Path, evidence: ServiceEvidence | None = None) -> ServicesWorld:
-    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence)
+def memory_world(
+    tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
+    delivery: Callable[[MessageDelivery], MessageDelivery] | None = None,
+) -> ServicesWorld:
+    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence, links, delivery)
 
 
 def fs_rework(tmp_path: Path) -> ReworkContext:

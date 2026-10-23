@@ -134,13 +134,21 @@ def test_define_service_comes_from_the_commands_of_the_runtime_with_the_names_of
                               playbook="p", locked=True, notes="n", add_acceptance=["+"], remove_acceptance=["-"]) == "DEFINED"
     assert fake.calls == [("define_service", ("root", "ceo", "x"), {
         "description": "d", "inputs": ["a"], "acceptance": ["c"], "deliverable": {"description": "f"}, "budget": 2, "playbook": "p", "locked": True,
-        "notes": "n", "add_acceptance": ["+"], "remove_acceptance": ["-"],
+        "notes": "n", "add_acceptance": ["+"], "remove_acceptance": ["-"], "answers": None, "about": None, "words": None,
     })]
     org.define_service("root", "ceo", "y")
     assert fake.calls[1][2] == {
         "description": None, "inputs": None, "acceptance": None, "deliverable": None, "budget": None, "playbook": None, "locked": None, "notes": None,
-        "add_acceptance": None, "remove_acceptance": None,
+        "add_acceptance": None, "remove_acceptance": None, "answers": None, "about": None, "words": None,
     }
+
+
+def test_org_define_service_passes_answers_about_and_words(org: Org) -> None:
+    fake = Commands()
+    use(org, service_commands=fake)
+    assert org.define_service("root", "ceo", "x", add_acceptance=["+"], answers="M1", about="C2", words="Yes, add it.") == "DEFINED"
+    assert org.define_service("root", "ceo", "x", add_acceptance=["+"], words="Add it, please.") == "DEFINED"
+    assert [(c[2]["answers"], c[2]["about"], c[2]["words"]) for c in fake.calls] == [("M1", "C2", "Yes, add it."), (None, None, "Add it, please.")]
 
 
 def test_the_other_commands_come_from_the_commands_of_the_runtime(org: Org) -> None:

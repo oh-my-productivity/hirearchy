@@ -193,7 +193,7 @@ CASES: list[Case | FunctionCase] = [
     Case("service_names", "services", "service_catalog", "service_names", args("ceo")),
     Case("define_service", "services", "service_commands", "define_service", args(
         "root", "ceo", "svc", description="d", inputs=[{"name": "x"}], acceptance=["a"], deliverable={"format": "md"}, budget=3, playbook="p",
-        locked=True, notes="n", add_acceptance=["b"], remove_acceptance=["c"])),
+        locked=True, notes="n", add_acceptance=["b"], remove_acceptance=["c"], answers="a1", about="C1", words="w")),
     Case("retire_service", "services", "service_commands", "retire_service", args("root", "ceo", "svc", "gone")),
     Case("request", "services", "service_commands", "request", args(
         "root", "svc", {"x": "1"}, title="T", note="n", extra_acceptance=["e"], budget=2, revises="r1")),

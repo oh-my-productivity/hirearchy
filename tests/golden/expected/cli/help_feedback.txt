@@ -13,7 +13,8 @@ options:
                         human (default): your own judgement; relayed: someone else's reading of
                         the delivery
   --criterion ID        what a rejection was about: C<k> (a contract criterion), R<k> (an earlier
-                        rejection it repeats) or none (no lasting rule)
+                        rejection it repeats) or none (no lasting rule) (an answer that changes no
+                        criterion)
   --confirms VERDICT_ID
                         record --criterion for an earlier rejection (its message id) instead of a
                         new verdict; --note is your answer

@@ -16,7 +16,7 @@ from ..services._amend import ContractAmender
 from ..services._catalog import ContractServiceCatalog
 from ..services._commands import RuleServiceCommands
 from ..services._define import RuleContractDefiner
-from ..services._feedback import RuleClientFeedback
+from ..services._feedback import RuleClientFeedback, SenderLinkNotes
 from ..services._hints import ServiceReportHints
 from ..services._normalizer import TextContractNormalizer
 from ..services._places import OrgServicePlaces
@@ -53,10 +53,10 @@ def _commands(b: Builder) -> ServiceCommands:
     return RuleServiceCommands(
         RuleContractDefiner(
             agents, catalog, store, places, b.get(ContractNormalizer), ContractAmender(), texts, owners, playbooks, delivery, clock, events,
-            b.get(ServiceEvidence),
+            b.get(ServiceEvidence), SenderLinkNotes(sender),
         ),
         RuleServiceRetirement(agents, catalog, store, owners, delivery, clock, events),
         RulePlaybookReviser(agents, catalog, texts, playbooks, delivery, b.get(ServiceEvidence)),
         RuleServiceRequester(agents, catalog, mail, TextRequestBodies(), sender),
-        RuleClientFeedback(agents, mail, sender, b.get(ServiceEvidence)),
+        RuleClientFeedback(agents, mail, sender, b.get(ServiceEvidence), store),
     )

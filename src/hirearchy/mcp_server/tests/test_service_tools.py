@@ -32,9 +32,40 @@ def test_root_feedback_docstring_names_the_users_own_words_verbatim(svc):
     assert "every verdict stays" in text
     assert 'source: "human" only when the verdict is the user\'s own judgement and note holds their words; "relayed" (the default)' in text
     assert 'criterion (reject only): what the rejection is about, as ids: "C<k>" (a contract criterion, see `services`)' in text
-    assert 'confirms: the user\'s yes. After they answered yes to your one question naming the id, call again with the same task_id, verdict "reject"' in text
-    assert "on the rejection itself it is shown as not confirmed, whatever the source" in text and "only this link counts as the client's" in text
+    # DR-46, replaced on purpose: `confirms` is now the answer that changes no criterion; a yes that changes the contract is define_service(answers=...)
+    assert 'confirms: the user\'s answer that changes no criterion ("no", "a one-off", "about C<k> as it is"): call again with the same task_id, verdict "reject"' in text
+    assert "after it, that rejection takes no confirms" in text
+    assert "on the rejection itself it is shown as not confirmed, whatever the source" in text
+    assert "only this link counts as the client's" not in text and "confirms: the user's yes." not in text
     assert "it records the link, not a new verdict" in text and "it never waives an acceptance criterion" in text
+
+
+def test_root_define_service_has_answers_about_words_and_agents_do_not(svc):
+    root, agent = described(svc, ROOT)["define_service"], described(svc, "ceo")["define_service"]
+    props = root.inputSchema["properties"]
+    assert set(props) - set(agent.inputSchema["properties"]) == {"answers", "about", "words"}
+    for name in ("answers", "about", "words"):
+        assert props[name]["anyOf"] == [{"type": "string"}, {"type": "null"}] and props[name]["default"] is None
+    assert root.inputSchema["required"] == ["owner", "name"] == agent.inputSchema["required"]
+    assert set(agent.inputSchema["properties"]) == {
+        "owner", "name", "description", "acceptance", "deliverable", "budget", "inputs", "playbook", "locked", "notes", "add_acceptance", "remove_acceptance",
+    }
+    text = " ".join(agent.description.split())
+    assert "answers" not in text and "CHANGING THE CRITERIA" not in text  # the agents' tool and docstring are what they were
+
+
+def test_root_define_service_docstring_names_changing_the_criteria(svc):
+    text = " ".join(described(svc, ROOT)["define_service"].description.split())
+    assert "An amendment that changes nothing is refused. CHANGING THE CRITERIA (you, root): only as the user's answer after a rejection: " in text
+    assert "answers=<the rejection's message id>, about=<the C or R id your one question named>, words=<their answer, verbatim> (it records their yes as the link itself); " in text
+    assert "or, for a change the user asks for on their own outside any rejection, words=<their request, verbatim> alone (never admits a playbook revision). " in text
+    assert text.endswith("Every delivered request of the service needs its verdict first.")
+
+
+def test_root_feedback_docstring_asks_for_the_reading(svc):
+    text = " ".join(described(svc, ROOT)["feedback"].description.split())
+    assert "on the rejection itself it is shown as not confirmed, whatever the source. Pass your reading there (one id: what you read the rejection as), and the reply gives the exact question naming it. " in text
+    assert 'A yes that changes the contract is define_service(..., answers=<the rejection\'s message id>, about=<the id>, words=<their answer>), which records the link itself; after it, that rejection takes no confirms.' in text
 
 
 def test_root_feedback_reply_names_message_and_source(svc):

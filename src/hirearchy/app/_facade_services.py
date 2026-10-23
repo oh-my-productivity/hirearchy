@@ -24,12 +24,14 @@ class ServicesMixin:
         self, actor: str, owner: str, name: str, *, description: str | None = None, inputs: object = None, acceptance: object = None,
         deliverable: Mapping[str, object] | None = None, budget: int | None = None, playbook: str | None = None,
         locked: bool | None = None, notes: str | None = None, add_acceptance: object = None, remove_acceptance: object = None,
+        answers: str | None = None, about: str | None = None, words: str | None = None,
     ) -> str:
         """Define a service of a direct report, or amend it (omitted fields keep their value). See
         :meth:`hirearchy.services.ServiceCommands.define_service`."""
         return self.runtime.service_commands.define_service(
             actor, owner, name, description=description, inputs=inputs, acceptance=acceptance, deliverable=deliverable, budget=budget,
             playbook=playbook, locked=locked, notes=notes, add_acceptance=add_acceptance, remove_acceptance=remove_acceptance,
+            answers=answers, about=about, words=words,
         )
 
     def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:

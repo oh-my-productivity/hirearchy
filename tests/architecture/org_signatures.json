@@ -596,9 +596,24 @@
      "name": "remove_acceptance",
      "kind": "KEYWORD_ONLY",
      "default": "None"
+    },
+    {
+     "name": "answers",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "about",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "words",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
     }
    ],
-   "annotated": "(self, actor: 'str', owner: 'str', name: 'str', *, description: 'str | None' = None, inputs=None, acceptance=None, deliverable: 'dict | None' = None, budget: 'int | None' = None, playbook: 'str | None' = None, locked: 'bool | None' = None, notes: 'str | None' = None, add_acceptance=None, remove_acceptance=None) -> 'str'"
+   "annotated": "(self, actor: 'str', owner: 'str', name: 'str', *, description: 'str | None' = None, inputs=None, acceptance=None, deliverable: 'dict | None' = None, budget: 'int | None' = None, playbook: 'str | None' = None, locked: 'bool | None' = None, notes: 'str | None' = None, add_acceptance=None, remove_acceptance=None, answers: 'str | None' = None, about: 'str | None' = None, words: 'str | None' = None) -> 'str'"
   },
   "delegable": {
    "kind": "method",

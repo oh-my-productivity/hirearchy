@@ -53,6 +53,11 @@ class DefineServiceCommand(Command):
                        help="amendment: add a criterion (repeatable); not with --acceptance")
         s.add_argument("--remove-acceptance", action="append", metavar="TEXT|@FILE",
                        help="amendment: drop a criterion, by its exact text (repeatable); not with --acceptance")
+        s.add_argument("--answers", metavar="VERDICT_ID",
+                       help="amendment of the criteria: the rejection the user's answer is about (its message id)")
+        s.add_argument("--about", metavar="ID", help="the C or R id your question named")
+        s.add_argument("--words", metavar="TEXT|@FILE",
+                       help="the user's words, verbatim (their answer; alone: a change they asked for on their own)")
         s.add_argument("--deliverable", help="what is handed back (a first definition needs it)")
         s.add_argument("--format")
         s.add_argument("--max-words", type=int)
@@ -81,6 +86,7 @@ class DefineServiceCommand(Command):
             locked=args.locked, notes=read(args.notes) if args.notes else None,
             add_acceptance=[read(a) for a in args.add_acceptance] if args.add_acceptance is not None else None,
             remove_acceptance=[read(a) for a in args.remove_acceptance] if args.remove_acceptance is not None else None,
+            answers=args.answers, about=args.about, words=read(args.words) if args.words is not None else None,
         )
         self._snapshots().commit(f"root: service {args.name} of {args.owner}")
         self._out.say(text)
@@ -134,7 +140,8 @@ class FeedbackCommand(Command):
         s.add_argument("--source", choices=("human", "relayed"), default="human",
                        help="human (default): your own judgement; relayed: someone else's reading of the delivery")
         s.add_argument("--criterion", action="append", metavar="ID",
-                       help="what a rejection was about: C<k> (a contract criterion), R<k> (an earlier rejection it repeats) or none (no lasting rule)")
+                       help="what a rejection was about: C<k> (a contract criterion), R<k> (an earlier rejection it repeats) or none (no lasting rule) "
+                       "(an answer that changes no criterion)")
         s.add_argument("--confirms", metavar="VERDICT_ID",
                        help="record --criterion for an earlier rejection (its message id) instead of a new verdict; --note is your answer")
         s.set_defaults(fn=self.run)

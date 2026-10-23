@@ -1,6 +1,7 @@
 usage: hirearchy define-service [-h] [--description DESCRIPTION] [--input 'name*:description']
                                 [--acceptance TEXT|@FILE] [--add-acceptance TEXT|@FILE]
-                                [--remove-acceptance TEXT|@FILE] [--deliverable DELIVERABLE]
+                                [--remove-acceptance TEXT|@FILE] [--answers VERDICT_ID]
+                                [--about ID] [--words TEXT|@FILE] [--deliverable DELIVERABLE]
                                 [--format FORMAT] [--max-words MAX_WORDS] [--path PATH]
                                 [--budget BUDGET] [--playbook @FILE] [--locked | --no-locked]
                                 [--notes NOTES]
@@ -24,6 +25,11 @@ options:
   --remove-acceptance TEXT|@FILE
                         amendment: drop a criterion, by its exact text (repeatable); not with
                         --acceptance
+  --answers VERDICT_ID  amendment of the criteria: the rejection the user's answer is about (its
+                        message id)
+  --about ID            the C or R id your question named
+  --words TEXT|@FILE    the user's words, verbatim (their answer; alone: a change they asked for
+                        on their own)
   --deliverable DELIVERABLE
                         what is handed back (a first definition needs it)
   --format FORMAT

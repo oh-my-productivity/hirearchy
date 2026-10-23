@@ -44,6 +44,7 @@ def test_a_first_definition_passes_every_part_and_commits(tmp_path: Path) -> Non
         "inputs": [{"name": "topic", "description": "what", "required": True}, {"name": "tone", "description": "how", "required": False}],
         "acceptance": ["Has a title.\n", "Short."], "deliverable": {"description": "The note", "format": "markdown", "max_words": 300, "path": "/out"},
         "budget": 4, "playbook": "Step one.\n", "locked": True, "notes": "For the owner.\n", "add_acceptance": None, "remove_acceptance": None,
+        "answers": None, "about": None, "words": None,
     }
     assert office.last("commit") == (("root: service weekly of ceo",), {})
     assert f.out.stdout == "defined service `weekly` for ceo\n"
@@ -71,6 +72,20 @@ def test_no_deliverable_part_means_no_deliverable(tmp_path: Path) -> None:
     assert kwargs["deliverable"] is None and kwargs["locked"] is False and kwargs["inputs"] is None and kwargs["acceptance"] is None
     assert kwargs["add_acceptance"] == ["Has a summary."] and kwargs["remove_acceptance"] == ["Has a title.\n"]
     assert "read_contract" not in services.names()
+
+
+def test_define_service_passes_answers_about_and_words(tmp_path: Path) -> None:
+    f, services, office, command = define_world(tmp_path)
+    go(command, "define-service", "ceo", "weekly", "--add-acceptance", "Has a summary.", "--answers", "20261018T100000000012-root-0004",
+       "--about", "C2", "--words", "@notes.md")
+    _, kwargs = services.last("define_service")
+    assert (kwargs["answers"], kwargs["about"], kwargs["words"]) == ("20261018T100000000012-root-0004", "C2", "For the owner.\n")  # --words reads @FILE
+    go(command, "define-service", "ceo", "weekly", "--add-acceptance", "Has a summary.", "--words", "Yes, add it.")
+    _, kwargs = services.last("define_service")
+    assert (kwargs["answers"], kwargs["about"], kwargs["words"]) == (None, None, "Yes, add it.")  # a change the user asked for on their own
+    go(command, "define-service", "ceo", "weekly", "--budget", "3")
+    _, kwargs = services.last("define_service")
+    assert (kwargs["answers"], kwargs["about"], kwargs["words"]) == (None, None, None)
 
 
 def test_a_refused_definition_is_not_committed(tmp_path: Path) -> None:

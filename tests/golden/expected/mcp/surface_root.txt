@@ -852,6 +852,42 @@ input: {
       ],
       "default": null,
       "title": "Remove Acceptance"
+    },
+    "answers": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Answers"
+    },
+    "about": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "About"
+    },
+    "words": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Words"
     }
   },
   "required": [
@@ -888,6 +924,11 @@ Define a standing service of one of your direct reports (root: a top-level agent
         `add_acceptance=[<criterion>]`; to drop one: `remove_acceptance=[<its exact text>]`; `acceptance` replaces
         all (not together with add/remove). The old contract is archived and the owner quietly told what changed; the
         reply lists the criteria now in force. An amendment that changes nothing is refused.
+        CHANGING THE CRITERIA (you, root): only as the user's answer after a rejection: answers=<the rejection's
+        message id>, about=<the C or R id your one question named>, words=<their answer, verbatim> (it records their yes
+        as the link itself); or, for a change the user asks for on their own outside any rejection, words=<their
+        request, verbatim> alone (never admits a playbook revision). Every delivered request of the service needs its
+        verdict first.
         
 
 ### tool: request
@@ -1088,10 +1129,13 @@ Tell the owner of a service whether a delivered request was good: verdict "accep
         yourself: it is shown to the owner but weighs nothing when it revises its playbook. criterion (reject only): what
         the rejection is about, as ids: "C<k>" (a contract criterion, see `services`), "R<k>" (an earlier rejection it
         repeats) or "none" (no lasting rule); on the rejection itself it is shown as not confirmed, whatever the source.
-        confirms: the user's yes. After they answered yes to your one question naming the id, call again with the same
-        task_id, verdict "reject", confirms=<the rejection's message id>, criterion, source "human" and their answer
-        verbatim as note: it records the link, not a new verdict, and only this link counts as the client's. Feedback is
-        for reflection only: it never waives an acceptance criterion or changes the outcome of the request.
+        Pass your reading there (one id: what you read the rejection as), and the reply gives the exact question naming it.
+        confirms: the user's answer that changes no criterion ("no", "a one-off", "about C<k> as it is"): call again with
+        the same task_id, verdict "reject", confirms=<the rejection's message id>, criterion ("none", "R<j>" or "C<k>"),
+        source "human" and their answer verbatim as note; it records the link, not a new verdict. A yes that changes the
+        contract is define_service(..., answers=<the rejection's message id>, about=<the id>, words=<their answer>), which
+        records the link itself; after it, that rejection takes no confirms. Feedback is for reflection only: it never
+        waives an acceptance criterion or changes the outcome of the request.
         
 
 ### tool: observe

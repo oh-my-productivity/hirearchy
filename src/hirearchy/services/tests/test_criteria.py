@@ -122,6 +122,55 @@ def test_stored_basis_reads_the_map_from_stored_versions(tmp_path: Path) -> None
     assert stored_basis(w.store, "ceo", "no-such-service") == {}
 
 
+def test_answering_version_is_the_first_version_whose_answers_is_the_note(tmp_path: Path) -> None:
+    from hirearchy.services._criteria import answering_version
+
+    w = populated(fs_world(tmp_path))
+    define(w, acceptance=["A", "B"])
+    write_version(w, 2, ["A", "B", "C"], answers="N1", about="C1", words="Yes.")
+    write_version(w, 3, ["A", "B", "C", "D"], answers="N2", about="C2", words="Yes.")
+    write_version(w, 4, ["A", "B", "C", "D", "E"], answers="N1", about="C1", words="Again.")  # a later version naming N1 again: the first counts
+    write_version(w, 5, ["A", "B", "C", "D", "E", "F"], initiated="user", words="Add F.")
+    assert answering_version(w.store, "ceo", "weekly-brief", "N1") == 2
+    assert answering_version(w.store, "ceo", "weekly-brief", "N2") == 3
+
+
+def test_answering_version_is_0_when_none(tmp_path: Path) -> None:
+    from hirearchy.services._criteria import answering_version
+
+    w = populated(fs_world(tmp_path))
+    define(w, acceptance=["A", "B"])
+    write_version(w, 2, ["A", "B", "C"], initiated="user", words="Add C.")
+    assert answering_version(w.store, "ceo", "weekly-brief", "N1") == 0 and answering_version(w.store, "ceo", "weekly-brief", "") == 0
+    assert answering_version(w.store, "ceo", "no-such-service", "N1") == 0
+
+
+def test_answer_ids_are_the_added_criteria_in_order(tmp_path: Path) -> None:
+    from hirearchy.services._criteria import amendment_ids, answer_ids
+
+    w = populated(fs_world(tmp_path))
+    define(w, acceptance=["A", "B"])
+    write_version(w, 2, ["A", "B", "C", "D"], answers="N1", about="C1", words="Yes.")  # C3, C4
+    write_version(w, 3, ["B", "C", "D", "E"], answers="N2", about="C2", words="Yes.")  # removes A, adds E (C5)
+    assert answer_ids(w.store, "ceo", "weekly-brief", 2) == ("C3", "C4")
+    assert answer_ids(w.store, "ceo", "weekly-brief", 3) == ("C5",)  # the removed one is named only when nothing was added
+    assert amendment_ids([(1, "root", ["A", "B"]), (2, "root", ["A", "B", "C", "D"])], 2) == (("C3", "C4"), ())  # the same rule over versions in memory
+    assert amendment_ids([(1, "root", ["A", "B"]), (2, "root", ["B", "C"])], 2) == (("C3",), ("C1",))  # (added, removed)
+    assert amendment_ids([(1, "root", ["A"])], 1) == ((), ()) and amendment_ids([(1, "root", ["A"])], 5) == ((), ())
+
+
+def test_answer_ids_are_the_removed_ones_when_none_was_added(tmp_path: Path) -> None:
+    from hirearchy.services._criteria import answer_ids
+
+    w = populated(fs_world(tmp_path))
+    define(w, acceptance=["A", "B", "C"])
+    write_version(w, 2, ["B"], answers="N1", about="C1", words="Drop it.")  # removes A and C, adds nothing
+    assert answer_ids(w.store, "ceo", "weekly-brief", 2) == ("C1", "C3")
+    assert answer_ids(w.store, "ceo", "weekly-brief", 1) == () and answer_ids(w.store, "ceo", "weekly-brief", 9) == ()  # v1 and a version it lacks
+    write_version(w, 3, ["B"], initiated="user", words="Nothing changes.")  # a version that adds and removes nothing
+    assert answer_ids(w.store, "ceo", "weekly-brief", 3) == ()
+
+
 def test_criteria_of_follows_the_order_of_texts_and_skips_unknown() -> None:
     found = numbered((1, "root", ["A", "B", "C"]), (2, "root", ["A", "C", "D"]))
     assert [c.id for c in services.criteria_of(found, ["D", "nothing like it", "A"])] == ["C4", "C1"]

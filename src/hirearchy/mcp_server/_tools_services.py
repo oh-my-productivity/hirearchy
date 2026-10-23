@@ -77,6 +77,66 @@ class ServiceTools(ToolGroup):
             self._register_owner_tools(mcp, me)
 
     def _register_client_tools(self, mcp: FastMCP, me: str) -> None:
+        if me == ROOT:  # only root records the user's answer: the agents' tool has no `answers`, `about` or `words`
+            self._register_root_define(mcp, me)
+        else:
+            self._register_agent_define(mcp, me)
+
+        if me == ROOT:  # only root records where a rework comes from: the agents' tool has no `source`
+            self._register_root_request(mcp, me)
+        else:
+            self._register_agent_request(mcp, me)
+
+        if me == ROOT:  # only root records where a verdict comes from and what it is about: the agents' tool has neither
+            self._register_root_feedback(mcp, me)
+        else:
+            self._register_agent_feedback(mcp, me)
+
+    def _register_root_define(self, mcp: FastMCP, me: str) -> None:
+        @mcp.tool()
+        def define_service(
+            owner: str,
+            name: str,
+            description: str | None = None,
+            acceptance: list[str] | None = None,
+            deliverable: dict | None = None,  # type: ignore[type-arg]
+            budget: int | None = None,
+            inputs: list[dict] | None = None,  # type: ignore[type-arg]
+            playbook: str | None = None,
+            locked: bool | None = None,
+            notes: str | None = None,
+            add_acceptance: list[str] | None = None,
+            remove_acceptance: list[str] | None = None,
+            answers: str | None = None,
+            about: str | None = None,
+            words: str | None = None,
+        ) -> str:
+            """Define a standing service of one of your direct reports (root: a top-level agent), or amend its contract.
+
+        You are the client: the contract is yours; the owner cannot change it. owner: the report. name: lowercase-dashed,
+        unique among your reports' services. FIRST definition needs description (one line), acceptance (concrete,
+        checkable criteria that travel with every request), deliverable ({description, format?, max_words?, path?
+        (absolute)}) and budget (runs handed down with each request); optional: inputs ([{name, description, required
+        (default true)}] the requester fills in), playbook (markdown workflow, first definition only), locked (true = the
+        owner may not revise the playbook), notes (free text for the owner).
+        AMENDMENT (the service exists): pass only what changes, the rest stays. To add a lasting requirement:
+        `add_acceptance=[<criterion>]`; to drop one: `remove_acceptance=[<its exact text>]`; `acceptance` replaces
+        all (not together with add/remove). The old contract is archived and the owner quietly told what changed; the
+        reply lists the criteria now in force. An amendment that changes nothing is refused.
+        CHANGING THE CRITERIA (you, root): only as the user's answer after a rejection: answers=<the rejection's
+        message id>, about=<the C or R id your one question named>, words=<their answer, verbatim> (it records their yes
+        as the link itself); or, for a change the user asks for on their own outside any rejection, words=<their
+        request, verbatim> alone (never admits a playbook revision). Every delivered request of the service needs its
+        verdict first.
+        """
+            reply = self._commands().define_service(
+                me, owner, name, description=description, inputs=inputs, acceptance=acceptance,
+                deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,
+                add_acceptance=add_acceptance, remove_acceptance=remove_acceptance, answers=answers, about=about, words=words,
+            )
+            return reply + _step(lambda: self._steps().amendment_step(owner, name))  # what records the user's yes is for root alone
+
+    def _register_agent_define(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
         def define_service(
             owner: str,
@@ -105,24 +165,11 @@ class ServiceTools(ToolGroup):
         all (not together with add/remove). The old contract is archived and the owner quietly told what changed; the
         reply lists the criteria now in force. An amendment that changes nothing is refused.
         """
-            reply = self._commands().define_service(
+            return self._commands().define_service(
                 me, owner, name, description=description, inputs=inputs, acceptance=acceptance,
                 deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,
                 add_acceptance=add_acceptance, remove_acceptance=remove_acceptance,
             )
-            if me == ROOT:  # only root answers to the user: what records their yes is for root alone
-                reply += _step(lambda: self._steps().amendment_step(owner, name))
-            return reply
-
-        if me == ROOT:  # only root records where a rework comes from: the agents' tool has no `source`
-            self._register_root_request(mcp, me)
-        else:
-            self._register_agent_request(mcp, me)
-
-        if me == ROOT:  # only root records where a verdict comes from and what it is about: the agents' tool has neither
-            self._register_root_feedback(mcp, me)
-        else:
-            self._register_agent_feedback(mcp, me)
 
     def _register_root_feedback(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
@@ -145,10 +192,13 @@ class ServiceTools(ToolGroup):
         yourself: it is shown to the owner but weighs nothing when it revises its playbook. criterion (reject only): what
         the rejection is about, as ids: "C<k>" (a contract criterion, see `services`), "R<k>" (an earlier rejection it
         repeats) or "none" (no lasting rule); on the rejection itself it is shown as not confirmed, whatever the source.
-        confirms: the user's yes. After they answered yes to your one question naming the id, call again with the same
-        task_id, verdict "reject", confirms=<the rejection's message id>, criterion, source "human" and their answer
-        verbatim as note: it records the link, not a new verdict, and only this link counts as the client's. Feedback is
-        for reflection only: it never waives an acceptance criterion or changes the outcome of the request.
+        Pass your reading there (one id: what you read the rejection as), and the reply gives the exact question naming it.
+        confirms: the user's answer that changes no criterion ("no", "a one-off", "about C<k> as it is"): call again with
+        the same task_id, verdict "reject", confirms=<the rejection's message id>, criterion ("none", "R<j>" or "C<k>"),
+        source "human" and their answer verbatim as note; it records the link, not a new verdict. A yes that changes the
+        contract is define_service(..., answers=<the rejection's message id>, about=<the id>, words=<their answer>), which
+        records the link itself; after it, that rejection takes no confirms. Feedback is for reflection only: it never
+        waives an acceptance criterion or changes the outcome of the request.
         """
             msg = self._commands().feedback(me, task_id, verdict, note, source=source, criterion=criterion, confirms=confirms)
             if confirms is not None:

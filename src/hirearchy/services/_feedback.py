@@ -6,15 +6,40 @@ from collections.abc import Sequence
 
 from ..agents import AgentDirectory
 from ..dispatch import MessageSender
-from ..kernel import ROOT, Message, OrgError, latest_results
+from ..kernel import ROOT, Message, OrgError, latest_results, link_ids, verdict_tier
 from ..mail import MailboxReader
-from ._protocols import ClientFeedback
-from .api import FEEDBACK_HEADER, FEEDBACK_MAX, LINK_HEADER, VERDICTS, ServiceEvidence, normalize_links
+from ._criteria import answer_ids, answering_version
+from ._protocols import ClientFeedback, LinkNotes
+from .api import FEEDBACK_HEADER, FEEDBACK_MAX, LINK_HEADER, VERDICTS, ServiceEvidence, ServiceStore, normalize_links
 
 CLIENT_ONLY = (
     "criterion and confirms are root's: they record what the human client said a rejection was about. An agent client's verdict is a "
     "hypothesis and names no criterion."
 )
+CONFIRMS_ANSWERED = (
+    "refused: rejection {confirms} was answered by contract v{n} of `{service}` (define_service(..., answers=\"{confirms}\"); CLI: define-service "
+    "--answers) and its link {link} records the user's yes: one rejection gets one answer. A different answer needs a new rejection and its "
+    "question. Nothing was recorded."
+)
+CONFIRMS_RECOVERY = (
+    "refused: rejection {confirms} was answered by contract v{n} of `{service}`, and its link is missing (its write failed). The only link it "
+    'still takes is that one: feedback(task_id="{task}", verdict="reject", confirms="{confirms}", criterion=[{ids}], source="human", '
+    "note=<the user's answer, verbatim>) (CLI: --confirms, --criterion, --source human, --note). Nothing was recorded."
+)
+
+
+class SenderLinkNotes(LinkNotes):
+    """The link note that says what a rejection was about, written through the message sender: one shape for ``feedback(confirms=...)`` and for
+    ``define_service(answers=...)``."""
+
+    def __init__(self, sender: MessageSender) -> None:
+        self._sender = sender
+
+    def write(self, actor: str, owner: str, title: str, rejection: str, ids: Sequence[str], words: str, source: str | None = "human") -> Message:
+        return self._sender.send(
+            actor, owner, LINK_HEADER.format(confirms=rejection) + "\n\n" + words, type="note",
+            title=f'criterion link on "{title}": {", ".join(ids)}', reply_to=rejection, criterion=", ".join(ids), source=source, wake=False,
+        )
 
 
 class RuleClientFeedback(ClientFeedback):
@@ -24,11 +49,15 @@ class RuleClientFeedback(ClientFeedback):
     the verdict comes from (``source``). When the user answers only after the rejection was recorded, ``confirms`` names it and a link note
     carries the ids: a note that refers to the rejection and is no verdict."""
 
-    def __init__(self, agents: AgentDirectory, mail: MailboxReader, sender: MessageSender, evidence: ServiceEvidence) -> None:
+    def __init__(
+        self, agents: AgentDirectory, mail: MailboxReader, sender: MessageSender, evidence: ServiceEvidence, store: ServiceStore,
+    ) -> None:
         self._agents = agents
         self._mail = mail
         self._sender = sender
         self._evidence = evidence
+        self._store = store
+        self._links: LinkNotes = SenderLinkNotes(sender)
 
     def feedback(
         self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
@@ -56,28 +85,43 @@ class RuleClientFeedback(ClientFeedback):
         if ids and verdict == "accept":
             raise OrgError("criterion says what a rejection was about; an accept has none: leave criterion out.")
         if confirms is not None:
-            self._check_confirmation(actor, task.id, verdict, ids, confirms)
+            self._check_confirmation(actor, task, verdict, ids, confirms, source)
         if ids:
             ids = self._evidence.links(task.to, task.service, ids, verdict=confirms)
         if confirms is not None:
-            return self._sender.send(
-                actor, task.to, LINK_HEADER.format(confirms=confirms) + "\n\n" + note, type="note",
-                title=f'criterion link on "{task.title}": {", ".join(ids)}', reply_to=confirms, criterion=", ".join(ids), source=source, wake=False,
-            )
+            return self._links.write(actor, task.to, task.title, confirms, ids, note, source=source)
         body = FEEDBACK_HEADER + "\n\n" + (note or "accepted")
         return self._sender.send(
             actor, task.to, body, type="note", title=f'feedback on "{task.title}": {verdict}',
             reply_to=task.id, feedback=verdict, criterion=", ".join(ids) or None, source=source, wake=False,
         )
 
-    def _check_confirmation(self, actor: str, task_id: str, verdict: str, ids: Sequence[str], confirms: str) -> None:
-        """F7-F9: ``confirms`` is a rejection ``actor`` recorded on this task, and the answer to it is a rejection that names what it was about."""
-        prior = next((m for m in self._mail.sent(actor) if m.id == confirms and m.feedback and m.reply_to == task_id), None)
+    def _check_confirmation(
+        self, actor: str, task: Message, verdict: str, ids: Sequence[str], confirms: str, source: str | None,
+    ) -> None:
+        """F7-F9: ``confirms`` is a rejection ``actor`` recorded on this task, and the answer to it is a rejection that names what it was about.
+        Then one rejection has one answer (P2): when a contract version answers it (``define_service(answers=...)``), the link the product wrote
+        is that answer, and nothing else is recorded on it, except the same link when its write failed."""
+        prior = next((m for m in self._mail.sent(actor) if m.id == confirms and m.feedback and m.reply_to == task.id), None)
         if prior is None:
-            raise OrgError(f"confirms must be the id of a rejection you recorded on {task_id} (the message id `feedback` returned): {confirms}")
+            raise OrgError(f"confirms must be the id of a rejection you recorded on {task.id} (the message id `feedback` returned): {confirms}")
         if prior.feedback != "reject":
             raise OrgError(f"{confirms} is an accept: only a rejection is linked to a criterion.")
         if verdict != "reject":
             raise OrgError('confirm a rejection with verdict "reject" (the verdict it repeats).')
         if not ids:
             raise OrgError("a confirmation records what the rejection was about: pass criterion (C<k>, R<k> or none).")
+        n = answering_version(self._store, task.to, task.service or "", confirms)
+        if n == 0:
+            return
+        link = next(
+            (m for m in self._mail.sent(actor) if m.reply_to == confirms and m.type == "note" and not m.feedback and link_ids(m) and verdict_tier(m) == "human"),
+            None,
+        )
+        if link is not None:
+            raise OrgError(CONFIRMS_ANSWERED.format(confirms=confirms, n=n, service=task.service, link=link.id))
+        expected = answer_ids(self._store, task.to, task.service or "", n)
+        if source != "human" or set(ids) != set(expected):
+            raise OrgError(CONFIRMS_RECOVERY.format(
+                confirms=confirms, n=n, service=task.service, task=task.id, ids=", ".join(f'"{x}"' for x in expected),
+            ))

@@ -3,7 +3,7 @@
 
 import pytest
 from testkit.reach.hirearchy.core import ROOT
-from testkit.services_world import BRIEF, cli, contract_meta, define, deliver, playbook_meta
+from testkit.services_world import BRIEF, cli, contract_meta, define, deliver, playbook_meta, request
 
 
 @pytest.fixture
@@ -79,3 +79,38 @@ def test_cli_commands(org, capsys, tmp_path):
     assert "retired service" in capsys.readouterr().out and org.service_names("ceo") == []
     log = __import__("subprocess").run(["git", "log", "--format=%s"], cwd=org.root, capture_output=True, text=True).stdout
     assert "root: service weekly-brief of ceo" in log and "root: retired service" in log
+
+
+# ----------------------------------------------------------------------------------------------- the user's answer at the terminal (D16, DR-46)
+def test_a_terminal_reject_with_criterion_records_the_answer_so_define_service_answers_is_answered(svc, capsys):
+    task = request(svc)
+    deliver(svc, "ceo", task)
+    cli(svc, "feedback", task.id, "reject", "--note", "Always add a summary.", "--criterion", "C1")
+    out = capsys.readouterr().out
+    verdict = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    (link,) = [m for m in svc.sent(ROOT) if m.reply_to == verdict.id and m.criterion]
+    assert f"feedback reject on {task.id} -> ceo (message {verdict.id}, source human, about C1)" in out
+    assert f"link on {verdict.id} -> ceo: C1 (message {link.id}, source human)" in out  # the terminal is the user's seat: --criterion is their answer
+    with pytest.raises(SystemExit):
+        cli(svc, "define-service", "ceo", "weekly-brief", "--add-acceptance", "Starts with a summary.", "--answers", verdict.id, "--about", "C1",
+            "--words", "Yes, add it.")
+    err = capsys.readouterr().err
+    assert f"rejection R1 (message {verdict.id}) already has its answer (link note {link.id}): one rejection gets one answer." in err
+    assert contract_meta(svc)[0]["version"] == 1
+
+
+def test_a_terminal_reject_without_criterion_then_define_service_answers_records_the_answer(svc, capsys):
+    task = request(svc)
+    deliver(svc, "ceo", task)
+    cli(svc, "feedback", task.id, "reject", "--note", "Always add a summary.")
+    capsys.readouterr()
+    verdict = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    assert not [m for m in svc.sent(ROOT) if m.reply_to == verdict.id and m.criterion]  # no link yet: the rejection waits for its answer
+    cli(svc, "define-service", "ceo", "weekly-brief", "--add-acceptance", "Starts with a summary.", "--answers", verdict.id, "--about", "C1",
+        "--words", "Yes, add it.")
+    out = capsys.readouterr().out
+    assert f"Recorded as the user's answer to R1 (rejection {verdict.id}; your question named C1): link " in out and "names C3." in out
+    meta = contract_meta(svc)[0]
+    assert (meta["version"], meta["answers"], meta["about"], meta["words"]) == (2, verdict.id, "C1", "Yes, add it.")
+    (link,) = [m for m in svc.sent(ROOT) if m.reply_to == verdict.id and m.criterion]
+    assert (link.criterion, link.source) == ("C3", "human")

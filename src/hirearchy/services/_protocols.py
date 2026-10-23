@@ -108,9 +108,18 @@ class ContractDefinitions(Protocol):
     def define_service(
         self, actor: str, owner: str, name: str, *, description: str | None, inputs: object, acceptance: object,
         deliverable: Mapping[str, object] | None, budget: int | None, playbook: str | None, locked: bool | None, notes: str | None,
-        add_acceptance: object, remove_acceptance: object,
+        add_acceptance: object, remove_acceptance: object, answers: str | None, about: str | None, words: str | None,
     ) -> str:
         """Define or amend (see ``ServiceCommands.define_service``)."""
+        ...
+
+
+@runtime_checkable
+class LinkNotes(Protocol):
+    def write(self, actor: str, owner: str, title: str, rejection: str, ids: Sequence[str], words: str, source: str | None = "human") -> Message:
+        """The link note on ``rejection`` (a message id): from ``actor`` (root) to ``owner``, ``LINK_HEADER`` and the user's ``words``, its
+        ``criterion`` the ``ids``, title ``criterion link on "<title>": <ids>``, quiet (it wakes nobody). ``source`` is ``human``, the product's
+        own link; ``feedback(confirms=...)`` passes the one its caller gave."""
         ...
 
 

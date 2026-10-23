@@ -63,6 +63,7 @@ __all__ = [
     "number_criteria",
     "playbook_word_cap",
     "quoting_lines",
+    "repeats_rejection",
 ]
 
 INPUT_RE = re.compile(r"[a-z][a-z0-9_]{0,31}\Z")
@@ -200,6 +201,21 @@ def changed_lines(current: str, new: str) -> list[str]:
         else:
             out.append(line.strip())
     return out
+
+
+def _words(text: str) -> list[str]:
+    return [word for word in re.split(r"[^0-9a-z]+", text.casefold()) if word]
+
+
+def repeats_rejection(words: str, note: str) -> bool:
+    """Do ``words`` (offered as the user's answer) repeat the rejection ``note`` they answer (pure)? True when their words are the same, or when
+    the shorter of the two has at least 4 words and occurs as a contiguous run in the longer: symmetric, so a paste of the user's whole reject
+    turn that contains the recorded note is caught as well as a part of the note. Fewer than 4 words: only equality counts (``"Yes, add it."``)."""
+    a, b = _words(words), _words(note)
+    if a == b:
+        return True
+    short, long = (a, b) if len(a) <= len(b) else (b, a)
+    return len(short) >= 4 and any(long[i : i + len(short)] == short for i in range(len(long) - len(short) + 1))
 
 
 def quoting_lines(body: str, criterion: Criterion) -> list[str]:
@@ -349,7 +365,8 @@ class ServiceCommands(Protocol):
     def define_service(
         self, actor: str, owner: str, name: str, *, description: str | None = None, inputs: object = None, acceptance: object = None,
         deliverable: Mapping[str, object] | None = None, budget: int | None = None, playbook: str | None = None, locked: bool | None = None,
-        notes: str | None = None, add_acceptance: object = None, remove_acceptance: object = None,
+        notes: str | None = None, add_acceptance: object = None, remove_acceptance: object = None, answers: str | None = None,
+        about: str | None = None, words: str | None = None,
     ) -> str:
         """Define a service for ``owner`` (first definition), or amend its contract (the service exists). Returns a confirmation.
 
@@ -359,7 +376,12 @@ class ServiceCommands(Protocol):
         but ``owner`` and ``name`` is optional and an omitted (None) one keeps its value: ``add_acceptance`` appends criteria,
         ``remove_acceptance`` drops criteria (exact text), ``acceptance`` replaces them all (not with add/remove). The old contract is archived
         to ``history/SERVICE.v<n>.md``, ``n+1`` written, and the owner gets a non-waking note saying exactly what changed. A change that changes
-        nothing is refused; ``playbook`` is refused (the owner's)."""
+        nothing is refused; ``playbook`` is refused (the owner's).
+
+        Root's ``answers``, ``about`` and ``words`` record where an amendment of the acceptance criteria comes from (agents may not pass them): the
+        user's answer to a rejection (``answers``: the rejection's message id; ``about``: the C or R id the question named; ``words``: their answer,
+        verbatim), which also writes the ``confirms`` link, or, with ``words`` alone, a change they asked for on their own (user-initiated: it
+        never admits a playbook revision). A rejection gets one answer."""
         ...
 
     def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
