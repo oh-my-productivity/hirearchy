@@ -4,7 +4,7 @@
 import time
 
 from testkit.reach.hirearchy.core import ROOT
-from testkit.services_world import define, deliver, request, svc, work
+from testkit.services_world import contract_meta, define, deliver, request, svc, work
 
 from hirearchy.reflection import stats_by_version, summarize
 
@@ -174,12 +174,17 @@ def test_stats_per_playbook_version_and_the_one_line_summary(svc):
     assert total.requests == 3 and total.reworked == 0
 
 
-def test_requests_from_before_a_service_was_retired_are_not_cases_of_the_new_one(svc):
+def test_a_service_defined_again_after_a_delivery_continues_its_cases(svc):
+    """Design 5.10 (Rule C): a service retired after a request that has a result and defined again is the same service, so its earlier request is
+    a case of it again; the contract is v2 with the old ``created`` (a copy none of whose requests has a result starts fresh: test_contract_case_history)."""
     org = svc
     old = request(org)
     deliver(org, "ceo", old)
     org.feedback(ROOT, old.id, "accept", "dropped", source="relayed")  # a service is retired only after the verdict on its delivery (design 5.2a)
+    created = contract_meta(org)[0]["created"]
     org.retire_service(ROOT, "ceo", "weekly-brief", "redo")
     time.sleep(0.002)
     define(org)
-    assert org.runtime.case_history.cases("ceo", "weekly-brief") == []
+    assert [c.id for c in org.runtime.case_history.cases("ceo", "weekly-brief")] == [old.id]
+    meta = contract_meta(org)[0]
+    assert meta["version"] == 2 and meta["created"] == created

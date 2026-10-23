@@ -9,32 +9,35 @@ the files.
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from fnmatch import fnmatch
 from pathlib import Path
 
+from ..agents import RetiredArchive, RetiredTree
+from ..agents.testing import fs_agents
 from ..delivery import MessageDelivery
 from ..dispatch import ReworkContext
 from ..dispatch.testing import MEMORY_ROOT, DispatchWorld, PostedDelivery
 from ..dispatch.testing import fs_world as dispatch_fs_world
 from ..dispatch.testing import memory_world as dispatch_memory_world
-from ..kernel import ROOT, JsonObject, Message, OrgError, OrgPaths, join_frontmatter, norm, split_frontmatter
+from ..kernel import ROOT, AtomicWriter, JsonObject, Message, OrgError, OrgPaths, join_frontmatter, norm, split_frontmatter
 from ..kernel.testing import ListEventSink, fs_atomic_writer
 from ._amend import ContractAmender
 from ._catalog import ContractServiceCatalog
 from ._commands import RuleServiceCommands
+from ._continue import RecordedContinuations
 from ._define import RuleContractDefiner
 from ._feedback import RuleClientFeedback, SenderLinkNotes
 from ._hints import ServiceReportHints
 from ._normalizer import TextContractNormalizer
-from ._parse import as_int, merged_versions
+from ._parse import FILE_SHAPE, as_int, merged_versions
 from ._places import OrgServicePlaces
 from ._playbook import RulePlaybookReviser
-from ._protocols import LinkNotes, ServicePlaces
+from ._protocols import ContinuedServices, LinkNotes, RetiredService, ServiceFiles, ServicePlaces, ServiceRestorer
 from ._request import RuleServiceRequester, TextRequestBodies
 from ._retire import RuleServiceRetirement
 from ._rework import ServiceReworkContext
-from ._store import FsServiceStore
+from ._store import FsServiceStore, OsServiceFiles
 from ._texts import CappedPlaybookTexts, DirectReportOwners, EventedPlaybookWriter
 from .api import (
     Admission,
@@ -52,7 +55,7 @@ from .api import (
 # ------------------------------------------------------------------------------ the fake store
 
 
-class MemoryServiceStore(ServiceStore):
+class MemoryServiceStore(ServiceStore, ServiceRestorer):
     """The files of the services in a dictionary (``files``: path -> text), laid out like the real store lays them out."""
 
     def __init__(self, places: ServicePlaces) -> None:
@@ -88,6 +91,12 @@ class MemoryServiceStore(ServiceStore):
         self.files[path] = join_frontmatter(meta, body)
         return self._places.rel(path)
 
+    def restore(self, owner: str, name: str, retired: RetiredService) -> None:
+        directory = self._places.service_dir(owner, name)
+        shapes = [(rel, text) for rel, text in retired.files if FILE_SHAPE.fullmatch(rel)]
+        for rel, text in sorted(shapes, key=lambda file: file[0] == "SERVICE.md"):  # SERVICE.md last
+            self.files[directory / rel] = text
+
     def retire(self, owner: str, name: str, stamp: str) -> str:
         source, dest = self._places.service_dir(owner, name), self._places.retired_dir(owner, name, stamp)
         for path in [p for p in self.files if source in p.parents]:
@@ -112,6 +121,43 @@ class MemoryServiceStore(ServiceStore):
 
     def _read(self, path: Path) -> tuple[JsonObject, str] | None:
         return split_frontmatter(self.files[path]) if path in self.files else None
+
+
+class MemoryServiceFiles(ServiceFiles):
+    """The files of the copies the continuation reads, kept in the dictionary of a ``MemoryServiceStore`` (``mark_unreadable`` makes one fail)."""
+
+    def __init__(self, files: Mapping[Path, str]) -> None:
+        self._files = files
+        self._unreadable: set[Path] = set()
+
+    def mark_unreadable(self, path: Path) -> None:
+        self._unreadable.add(path)
+
+    def listdir(self, path: Path) -> list[str]:
+        return sorted({p.relative_to(path).parts[0] for p in self._files if path in p.parents})
+
+    def read_text(self, path: Path) -> str | None:
+        if path in self._unreadable:
+            raise OSError(f"{path} cannot be read")
+        return self._files.get(path)
+
+
+class MemoryRetiredTrees(RetiredArchive):
+    """The retired trees of an organization whose files are the dictionary of a ``MemoryServiceStore``: the directories below ``.retired``."""
+
+    def __init__(self, root: Path, files: Mapping[Path, str]) -> None:
+        self._base = root / ".retired"
+        self._files = files
+
+    def trees(self) -> list[RetiredTree]:
+        named = [RetiredTree(n, False, self._base / n) for n in sorted({p.relative_to(self._base).parts[0] for p in self._files if self._base in p.parents})]
+        return [replace(t, top_level="/" not in t.addr) for t in named]
+
+    def run_count(self) -> int:
+        return 0
+
+    def unspent_budget(self, tree: RetiredTree) -> int:
+        return 0
 
 
 # ------------------------------------------------------------------------------ the stand-ins for the evidence gate
@@ -208,6 +254,11 @@ class StoreHarness:
     places: ServicePlaces
     text: Callable[[str], str | None]  # the text of a file (path relative to the organization), None when there is none
     rels: Callable[[], list[str]]  # every file of the services, relative to the organization, sorted
+    restorer: ServiceRestorer  # the store, as the port that puts a retired copy back
+    files: ServiceFiles  # the files of the retired copies, as the continuation reads them
+    archive: RetiredArchive  # the retired trees of the organization
+    put: Callable[[str, str], None]  # a file with this text at this path (relative to the organization); the directories above it are made
+    unreadable: Callable[[str], None]  # the file at this path (relative to the organization) cannot be read any more
 
 
 @dataclass(frozen=True)
@@ -226,6 +277,9 @@ class ServicesWorld:
     events: ListEventSink  # what the commands emitted
     text: Callable[[str], str | None]  # the text of a file (path relative to the organization), None when there is none
     rels: Callable[[], list[str]]  # every file of the services, relative to the organization, sorted
+    continued: ContinuedServices  # the retired copies the definer continues (the world's, built over its files, archive and mailboxes)
+    put: Callable[[str, str], None]  # a file with this text at this path (relative to the organization); the directories above it are made
+    unreadable: Callable[[str], None]  # the file at this path (relative to the organization) cannot be read any more
 
 
 def _text_on_disk(root: Path) -> Callable[[str], str | None]:
@@ -243,14 +297,29 @@ def _rels_on_disk(root: Path) -> Callable[[], list[str]]:
     return rels
 
 
-def fs_store(tmp_path: Path) -> StoreHarness:
+def fs_store(tmp_path: Path, writer: Callable[[AtomicWriter], AtomicWriter] | None = None) -> StoreHarness:
+    """The store on disk; ``writer`` wraps the atomic writer it writes through (a write that fails, a write that is watched)."""
     places = OrgServicePlaces(OrgPaths(tmp_path))
-    return StoreHarness(FsServiceStore(places, fs_atomic_writer(tmp_path).writer), places, _text_on_disk(tmp_path), _rels_on_disk(tmp_path))
+    atomic = fs_atomic_writer(tmp_path).writer
+    store = FsServiceStore(places, writer(atomic) if writer else atomic)
+
+    def put(rel: str, text: str) -> None:
+        target = tmp_path / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(text, encoding="utf-8")
+
+    def unreadable(rel: str) -> None:
+        (tmp_path / rel).write_bytes(b"\xff\xfe not text")  # not UTF-8
+
+    return StoreHarness(
+        store, places, _text_on_disk(tmp_path), _rels_on_disk(tmp_path), store, OsServiceFiles(), fs_agents(tmp_path).archive, put, unreadable,
+    )
 
 
 def memory_store(tmp_path: Path) -> StoreHarness:
     places = OrgServicePlaces(OrgPaths(MEMORY_ROOT))
     store = MemoryServiceStore(places)
+    files = MemoryServiceFiles(store.files)
 
     def text(rel: str) -> str | None:
         return store.files.get(MEMORY_ROOT / rel)
@@ -258,7 +327,12 @@ def memory_store(tmp_path: Path) -> StoreHarness:
     def rels() -> list[str]:
         return sorted(str(p.relative_to(MEMORY_ROOT)) for p in store.files)
 
-    return StoreHarness(store, places, text, rels)
+    def put(rel: str, content: str) -> None:
+        store.files[MEMORY_ROOT / rel] = content
+
+    return StoreHarness(
+        store, places, text, rels, store, files, MemoryRetiredTrees(MEMORY_ROOT, store.files), put, lambda rel: files.mark_unreadable(MEMORY_ROOT / rel),
+    )
 
 
 def _world(
@@ -276,9 +350,11 @@ def _world(
     catalog = ContractServiceCatalog(store, d.agents, places)
     owners, texts = DirectReportOwners(d.agents), CappedPlaybookTexts(d.settings)
     playbooks = EventedPlaybookWriter(store, d.clock, events)
+    continued = RecordedContinuations(places, harness.archive, d.mail, harness.files)
     commands = RuleServiceCommands(
         RuleContractDefiner(
             d.agents, catalog, store, places, normalizer, ContractAmender(), texts, owners, playbooks, notes, d.clock, events, gate, link_notes,
+            continued, harness.restorer,
         ),
         RuleServiceRetirement(d.agents, catalog, store, owners, notes, d.clock, events, gate),
         RulePlaybookReviser(d.agents, catalog, texts, playbooks, notes, gate),
@@ -289,14 +365,16 @@ def _world(
         commands=commands, catalog=catalog, store=store, hints=ServiceReportHints(catalog), evidence=gate,
         normalizer=normalizer,
         rework=ServiceReworkContext(d.mail, d.agents, catalog), places=places, d=d, events=events, text=harness.text, rels=harness.rels,
+        continued=continued, put=harness.put, unreadable=harness.unreadable,
     )
 
 
 def fs_world(
     tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
-    delivery: Callable[[MessageDelivery], MessageDelivery] | None = None,
+    delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, writer: Callable[[AtomicWriter], AtomicWriter] | None = None,
 ) -> ServicesWorld:
-    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path), evidence, links, delivery)
+    """``writer`` wraps the atomic writer of the store (a write that fails)."""
+    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path, writer), evidence, links, delivery)
 
 
 def memory_world(

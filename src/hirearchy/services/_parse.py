@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable
 from datetime import datetime
 from pathlib import Path
@@ -12,6 +13,7 @@ from .api import Contract, Playbook
 
 
 VERSIONED_KINDS = ("SERVICE", "PLAYBOOK")  # the files that keep a history
+FILE_SHAPE = re.compile(r"(SERVICE|PLAYBOOK)\.md|history/(SERVICE|PLAYBOOK)\.v\d+\.md")  # the files of a service directory, as named inside it
 
 
 def as_int(value: object, default: int = 0) -> int:

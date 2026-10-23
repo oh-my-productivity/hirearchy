@@ -5,6 +5,7 @@ Each test is parametrized over the surfaces that reach the rule (the MCP tool of
 refusal's whole text and that the files did not change. The file grows commit by commit, one test per refusal family."""
 
 import pytest
+import testkit
 from testkit.mcp_server_world import build_server
 from testkit.services_world import (  # noqa: F401  (svc is a fixture)
     call, cli, confirmed_amendment, contract_meta, deliver, fails, playbook_meta, request, svc, write_version,
@@ -329,3 +330,93 @@ def test_no_mcp_tool_retires_a_service(svc):
 
     names = {t.name for t in asyncio.run(build_server(svc, ROOT).list_tools())}
     assert "retire_service" not in names and "retire" in names
+
+
+# ------------------------------------------------------------------------------------------------------------ P2: the continuation (plan 7.3, commit 18)
+def restructure_on(org, surface: str) -> None:
+    """root retires ceo's team and hires ceo again on ``surface``. No terminal command retires a team, so the CLI leg retires through the facade
+    and hires at the terminal."""
+    if surface == "mcp":
+        server = build_server(org, ROOT)
+        call(server, "retire", name="ceo", reason="restructure")
+        call(server, "hire", name="ceo", role="Chief executive", charter="Run the company.", can_hire=True, max_children=2)
+        return
+    org.retire_team(ROOT, "ceo", "restructure")
+    if surface == "cli":
+        cli(org, "hire", "root", "ceo", "--role", "Chief executive", "--charter", "Run the company.", "--can-hire", "--max-children", "2")
+    else:
+        org.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)
+
+
+def service_files(org) -> dict:
+    """The files of the services below the organization, with their bytes (what a refusal must leave as it was)."""
+    return {str(p.relative_to(org.root)): p.read_bytes() for p in org.root.glob("**/services/**/*.md")}
+
+
+CONTINUES_TEXT = (
+    "refused: `weekly-brief` of ceo continues the retired service kept at {path} (1 request(s) with a result), so defining it again keeps its "
+    "contract v1, its playbook (none yet) and its record. Leave out {what} and define it again; then change the criteria as an amendment, the "
+    "user's answer to a rejection (answers=, about=, words=) or a change they asked for on their own (words= alone) (CLI: --answers, --about, "
+    "--words). Nothing was written."
+)
+CRITERIA = (
+    "the change of the criteria: give no acceptance, add_acceptance or remove_acceptance, or acceptance exactly as in v1 "
+    "(CLI: --acceptance, --add-acceptance, --remove-acceptance)"
+)
+
+
+@pytest.mark.parametrize("surface", SURFACES)
+def test_retire_team_hire_and_define_continues_on_every_surface(svc, capsys, surface):
+    """P2-CONTINUES: after the owner and its team were retired and hired again, defining the service with other criteria is refused with the same
+    text on MCP root, the CLI and the Org facade, and nothing is written; with its criteria the definition continues the record, and the amendment
+    that follows meets the gate with the whole rejection."""
+    import re
+
+    task, no = rejection(svc)
+    restructure_on(svc, surface)
+    before = service_files(svc)
+    refused_it, got = amend_on(svc, surface, capsys, acceptance=["A different criterion"])
+    path = re.search(r"kept at (\S+) \(", got).group(1)
+    assert re.fullmatch(r"\.retired/ceo-\d{8}T\d{6}/services/weekly-brief", path)
+    assert refused_it and CONTINUES_TEXT.format(path=path, what=CRITERIA) in got, got
+    assert service_files(svc) == before and svc.service_names("ceo") == []
+    refused_it, got = amend_on(svc, surface, capsys, budget=10)  # (the CLI cannot say "no field": the budget it already has)
+    assert not refused_it and f"it continues the retired one kept at {path} (contract v1 -> v2, no playbook yet, 1 request(s) with a result" in got, got
+    assert f"Still open: rejection R1 (message {no.id}) has no answer." in got and contract_meta(svc)[0]["version"] == 2
+    refused_it, got = amend_on(svc, surface, capsys, add_acceptance=[RULE], words=YES)
+    assert refused_it and f"rejection R1 (message {no.id}) on task {task.id} has no answer yet" in got, got
+
+
+@pytest.mark.parametrize("surface", ["mcp", "cli"])
+def test_apply_of_a_continued_name_is_refused(svc, capsys, surface, tmp_path):
+    """A blueprint always carries a playbook for its services, so applying one that defines the name of a retired service with a record is refused
+    with P2-CONTINUES (the playbook) through MCP ``apply_org`` and the CLI ``apply``; the agents it hired are retired again."""
+    import re
+    import time
+
+    import yaml
+
+    rejection(svc)
+    svc.retire_team(ROOT, "ceo", "restructure")
+    time.sleep(1.1)  # a retired tree is named after the second it was retired in
+    plan = yaml.safe_load((testkit.REPO / "examples" / "blueprint-service.yaml").read_text())
+    plan["agents"][0]["name"] = "ceo"
+    service = plan["services"][0]
+    service["owner"] = "ceo"
+    service["deliverable"]["path"] = str(tmp_path / "briefs")
+    del plan["task"]
+    text = yaml.safe_dump(plan, sort_keys=False)
+    server = build_server(svc, ROOT)
+    if surface == "mcp":
+        pid = re.search(r"^plan_id: (\w+)$", call(server, "propose_org", blueprint=text), re.M).group(1)
+        got = fails(server, "apply_org", blueprint=text, approved=True, plan_id=pid)
+    else:
+        file = tmp_path / "blueprint.yaml"
+        file.write_text(text)
+        capsys.readouterr()
+        with pytest.raises(SystemExit):
+            cli(svc, "apply", str(file))
+        got = capsys.readouterr().err
+    assert "refused: `weekly-brief` of ceo continues the retired service kept at .retired/ceo-" in got, got
+    assert "Leave out playbook (CLI: --playbook) and the change of the criteria: give no acceptance" in got  # (the blueprint's criteria are not v1's either)
+    assert svc.agents() == [] and svc.service_names("ceo") == []  # what the apply hired was retired again

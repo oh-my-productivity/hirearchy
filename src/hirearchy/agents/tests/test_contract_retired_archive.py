@@ -78,6 +78,26 @@ def test_top_level_is_read_from_the_name(h: AgentsHarness, name: str, top_level:
     assert tree(h, name).top_level is top_level
 
 
+@pytest.mark.parametrize(
+    ("name", "addr"),
+    [
+        ("ceo-20261023T101010", "ceo"),
+        ("ceo.eng-20261023T101010", "ceo/eng"),
+        ("ceo.eng.qa-20261023T101010", "ceo/eng/qa"),
+        ("my-team-20261023T101010", "my-team"),
+        ("my-team.sub-20261023T101010", "my-team/sub"),
+        ("ceo-S", "ceo-S"),  # no stamp, nothing to cut off
+        ("ceo-20261023T1010", "ceo-20261023T1010"),
+        ("ceo-20261023T101010123", "ceo-20261023T101010123"),
+    ],
+)
+def test_a_retired_tree_names_its_address(h: AgentsHarness, name: str, addr: str) -> None:
+    """The address of the retired agent is the directory name without its ``-<stamp>`` suffix, ``.`` read as ``/`` (design 5.10): the one rule that
+    names and reads a tree, so the service continuation finds the trees of one owner."""
+    h.put_dir(f".retired/{name}")
+    assert tree(h, name).addr == addr
+
+
 def test_a_tree_knows_its_directory(h: AgentsHarness) -> None:
     h.put_dir(".retired/ceo-S")
     found = tree(h, "ceo-S")

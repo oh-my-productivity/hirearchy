@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -73,11 +74,19 @@ class AgentRegistry(Protocol):
         ...
 
 
+_STAMP_SUFFIX = re.compile(r"-\d{8}T\d{6}$")  # the ``%Y%m%dT%H%M%S`` stamp ``AgentRegistry.archive`` appends to the name of a retired tree
+
+
 @dataclass(frozen=True)
 class RetiredTree:
     name: str  # the directory name in ``.retired``: ``<address with . for />-<stamp>``
     top_level: bool  # the retired agent was a direct report of root
     path: Path  # the directory
+
+    @property
+    def addr(self) -> str:
+        """The address of the retired agent: ``name`` without its ``-<stamp>`` suffix, ``.`` read as ``/`` (a name without a stamp is its own address)."""
+        return _STAMP_SUFFIX.sub("", self.name).replace(".", "/")
 
 
 @runtime_checkable

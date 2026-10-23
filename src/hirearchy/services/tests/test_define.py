@@ -3,7 +3,7 @@
 
 import pytest
 from testkit.reach.hirearchy.core import ROOT, OrgError, split_frontmatter
-from testkit.services_world import BRIEF, ENG, contract_meta, define, playbook_meta, request, svc, work
+from testkit.services_world import BRIEF, ENG, contract_meta, define, deliver, playbook_meta, request, svc, work
 
 
 # --------------------------------------------------------------------------------------------- define
@@ -170,3 +170,18 @@ def test_services_do_not_confuse_retire_or_run_counting(svc):
     assert r.addr == "ceo"
     retired = list((org.root / ".retired").glob("ceo-*"))
     assert (retired[0] / "services" / "weekly-brief" / "SERVICE.md").is_file()  # the service moved with its owner
+
+
+def test_a_service_retired_with_its_owner_continues_when_defined_again(svc):
+    """The sibling of the one above for a service with a request that has a result: the owner is hired again and the definition continues the service
+    it left in the retired tree (design 5.10), contract and playbook included."""
+    org = svc
+    org.revise_playbook("ceo", "weekly-brief", "Steps.", "r", [])
+    task = request(org)
+    deliver(org, "ceo", task)
+    org.feedback(ROOT, task.id, "accept", "fine", source="human")
+    org.retire_team(ROOT, "ceo", "done")
+    org.hire(ROOT, "ceo", "Chief executive", "Run the company.", can_hire=True, max_children=2)
+    assert "it continues the retired one kept at .retired/ceo-" in define(org)
+    assert contract_meta(org)[0]["version"] == 2 and playbook_meta(org)[0]["version"] == 1
+    assert [c.id for c in org.runtime.case_history.cases("ceo", "weekly-brief")] == [task.id]

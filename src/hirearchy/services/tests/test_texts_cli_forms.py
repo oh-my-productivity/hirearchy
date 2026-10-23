@@ -23,6 +23,7 @@ P2_TEXTS = [
     (_feedback, "CONFIRMS_RECOVERY"),
     (_retire, "RETIRE_UNRATED"),
     (_retire, "RETIRE_OPEN"),
+    (_define, "CONTINUES"),
 ]
 
 

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import os
-import re
 from collections.abc import Iterator
+from dataclasses import replace
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
@@ -13,7 +13,6 @@ from ._budget import message_budget
 from .api import RetiredArchive, RetiredTree
 
 RECV_BOXES = ("inbox", "inflight", "read")
-_STAMP_SUFFIX = re.compile(r"-\d{8}T\d{6}$")
 
 
 @runtime_checkable
@@ -62,7 +61,8 @@ class FsRetiredArchive(RetiredArchive):
             names = sorted(self._files.listdir(base))
         except OSError:
             return []
-        return [RetiredTree(n, "." not in _STAMP_SUFFIX.sub("", n), base / n) for n in names if self._files.is_dir(base / n)]
+        named = [RetiredTree(n, False, base / n) for n in names if self._files.is_dir(base / n)]
+        return [replace(t, top_level="/" not in t.addr) for t in named]  # the one rule that names a tree says whether it is a direct report of root
 
     def run_count(self) -> int:
         base = self._paths.retired_dir()

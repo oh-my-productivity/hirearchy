@@ -7,9 +7,13 @@ from collections.abc import Collection, Mapping, Sequence
 from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
 from ..kernel import NAME_RE, ROOT, Clock, EventSink, JsonObject, Message, OrgError, clip_line, parent, stamp_of
+from ._continue import copy_contracts, copy_playbook_version
 from ._criteria import amendment_ids, answering_version, in_force, stored_basis, stored_versions
 from ._lines import criteria_lines
-from ._protocols import ContractAmendment, ContractDefinitions, LinkNotes, OwnerAddresses, PlaybookTexts, PlaybookWriter, ServicePlaces
+from ._protocols import (
+    ContinuedServices, ContractAmendment, ContractDefinitions, LinkNotes, OwnerAddresses, PlaybookTexts, PlaybookWriter, RetiredService,
+    ServicePlaces, ServiceRestorer,
+)
 from .api import (
     DESCRIPTION_MAX, FEEDBACK_MAX, Contract, ContractNormalizer, Criterion, Rejection, ServiceCatalog, ServiceEvidence, ServiceStore, criteria_of,
     number_criteria, quoting_lines, repeats_rejection,
@@ -69,6 +73,27 @@ WORDS_ARE_THE_REJECTION = (
     "refused: words (CLI: --words) repeats rejection {assertion}'s own note (or the note is part of it). The answer is what the user said to your "
     'one question after the rejection (e.g. "Yes, add it."); an "always ..." inside the rejection is not it. Nothing was written.'
 )
+CONTINUES = (
+    "refused: `{name}` of {owner} continues the retired service kept at {path} ({k} request(s) with a result), so defining it again keeps its "
+    "contract v{version}, its playbook {playbook} and its record. Leave out {what} and define it again; then change the criteria as an "
+    "amendment, the user's answer to a rejection (answers=, about=, words=) or a change they asked for on their own (words= alone) "
+    "(CLI: --answers, --about, --words). Nothing was written."
+)
+CONTINUES_PLAYBOOK = "playbook (CLI: --playbook)"
+CONTINUES_CRITERIA = (
+    "the change of the criteria: give no acceptance, add_acceptance or remove_acceptance, or acceptance exactly as in v{version} "
+    "(CLI: --acceptance, --add-acceptance, --remove-acceptance)"
+)
+CONTINUED_REPLY = (
+    "defined service `{name}` for {owner} again: it continues the retired one kept at {path} (contract v{old} -> v{new}, {playbook}, "
+    "{k} request(s) with a result and their record)."
+)
+CONTINUED_NOTE = (
+    "{actor} defined the service `{name}` again: it continues the retired one kept at {path}. Contract v{new} has the criteria of v{old}; "
+    "playbook {playbook}; every earlier request is a case of it again."
+)
+STILL_OPEN = "Still open: {parts}. Record them before the criteria change (feedback first)."
+ALL_RECORDED = "Every delivery has its verdict and every rejection its answer."
 LINK_FAILED = (
     "the contract of `{name}` is now v{version} (it answers rejection {note}), but the link that records the user's yes could not be written "
     '({error}). Record it with feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=[{ids}], source="human", '
@@ -93,7 +118,7 @@ class RuleContractDefiner(ContractDefinitions):
     def __init__(
         self, agents: AgentDirectory, catalog: ServiceCatalog, store: ServiceStore, places: ServicePlaces, normalizer: ContractNormalizer,
         amendment: ContractAmendment, texts: PlaybookTexts, owners: OwnerAddresses, playbooks: PlaybookWriter, delivery: MessageDelivery,
-        clock: Clock, events: EventSink, evidence: ServiceEvidence, links: LinkNotes,
+        clock: Clock, events: EventSink, evidence: ServiceEvidence, links: LinkNotes, continued: ContinuedServices, restorer: ServiceRestorer,
     ) -> None:
         self._agents = agents
         self._catalog = catalog
@@ -109,6 +134,8 @@ class RuleContractDefiner(ContractDefinitions):
         self._events = events
         self._evidence = evidence
         self._links = links
+        self._continued = continued
+        self._restorer = restorer
 
     def _confirmed(self, owner: str, name: str) -> Collection[str]:
         """The criteria the client confirmed, for the mark of the note. The mark is advisory, so a record that cannot be read marks every amended
@@ -157,9 +184,13 @@ class RuleContractDefiner(ContractDefinitions):
                     f"must be unique among the agents that report to {client}: pick another name."
                 )
         old = self._catalog.read_contract(owner, name)
+        prior = self._prior(owner, name) if old is None and actor == ROOT else None  # step 0: a retired service with a record to keep
+        copied = copy_contracts(owner, name, prior) if prior is not None else []
+        if copied:
+            old = copied[-1]  # the contract of the retired copy stands for the existing one in every rule below
         if old is None and given:
             raise OrgError(NOT_AN_AMENDMENT)
-        if old is not None and playbook is not None:
+        if old is not None and playbook is not None and prior is None:
             raise OrgError(
                 f"the playbook belongs to {owner}, which revises it with revise_playbook: do not pass `playbook` when "
                 "you redefine the contract. Leave it out; the existing playbook stays."
@@ -190,8 +221,12 @@ class RuleContractDefiner(ContractDefinitions):
             raise OrgError("locked must be true or false")
         inputs_n = self._normalizer.inputs(inputs) if inputs is not None or old is None else old.inputs
         deliverable_n = self._normalizer.deliverable(deliverable) if deliverable is not None else (old.deliverable if old else {})
-        stored = stored_versions(self._store, owner, name) if old is not None else []  # the ids of the versions on disk (3.3)
-        basis = stored_basis(self._store, owner, name) if old is not None else {}  # what each of them records
+        if prior is not None:  # the versions of the copy, as the live store will read them once the copy is restored
+            stored = [(c.version, c.defined_by or "", c.acceptance) for c in copied]
+            basis = {c.version: (c.answers, c.initiated == "user") for c in copied}
+        else:
+            stored = stored_versions(self._store, owner, name) if old is not None else []  # the ids of the versions on disk (3.3)
+            basis = stored_basis(self._store, owner, name) if old is not None else {}  # what each of them records
         current = criteria_of(number_criteria(stored, basis), old.acceptance) if old is not None else []  # the old contract's criteria, with ids
         if acceptance is not None:
             accept_n = criteria_lines(acceptance, "acceptance", required=True)
@@ -199,6 +234,8 @@ class RuleContractDefiner(ContractDefinitions):
             accept_n = []
         else:
             accept_n = self._amendment.amended_criteria(name, current, add_acceptance, remove_acceptance)
+        if prior is not None and old is not None:
+            self._check_continuation(owner, name, prior, old, playbook, accept_n, given)
         playbook_body = self._texts.body(playbook) if playbook is not None else None
 
         now = self._clock.now().isoformat(timespec="microseconds")
@@ -222,7 +259,7 @@ class RuleContractDefiner(ContractDefinitions):
         answered: Rejection | None = None
         if old is not None:
             changes = self._amendment.changes(old, new, {c.text: c.id for c in after})
-            if not changes:
+            if not changes and prior is None:  # a continuation always writes the next version: it records who defined the service again, and when
                 raise OrgError(
                     f"no change: the amendment leaves the contract of `{name}` exactly as it is (v{old.version}). "
                     f"Current criteria:\n{self._amendment.listed(current)}"
@@ -233,9 +270,11 @@ class RuleContractDefiner(ContractDefinitions):
             if actor == ROOT and of_criteria:  # the user's answer, or their own request: no other change of the criteria by root
                 answered = self._check_answer(owner, name, answers_n, about_n, words_n)
                 meta.update({"answers": answered.note, "about": about_n, "words": words_n} if answered else {"initiated": "user", "words": words_n})
-            confirmed = self._confirmed(owner, name)  # read before the write: the note marks what the client has not yet confirmed
+            confirmed = self._confirmed(owner, name) if prior is None else frozenset()  # read before the write: the note marks what is not yet confirmed
         recorded = old is not None and actor == ROOT and set(accept_n) != set(old.acceptance)  # the amendment carries the user's words
         added, removed = amendment_ids(numbered, new.version) if recorded else ((), ())
+        if prior is not None:  # the copy first, byte for byte, SERVICE.md last: then the next version is an ordinary amendment of it
+            self._restorer.restore(owner, name, prior)
         where = self._store.write_contract(owner, name, meta, notes_n, old.version if old is not None else None)
         self._events.emit("service.define", actor=actor, owner=owner, service=name, version=new.version, by=actor, amendment=old is not None)
         if old is None:
@@ -245,6 +284,8 @@ class RuleContractDefiner(ContractDefinitions):
             else:
                 text += f". It has no playbook yet: {owner} writes v1 with revise_playbook after its first request."
             return text
+        if prior is not None:
+            return self._continuation_told(actor, owner, name, prior, old, new, changes)
         link: Message | None = None
         link_error: Exception | None = None
         if answered is not None:  # the user's yes is recorded by the product itself, after the contract it is about and before the owner is told
@@ -281,6 +322,59 @@ class RuleContractDefiner(ContractDefinitions):
             + f"\nAcceptance criteria now ({len(accept_n)}):\n{self._amendment.listed(shown)}"
             + self._recorded(answered, link, about_n, words_n, added, removed)
         )
+
+    def _prior(self, owner: str, name: str) -> RetiredService | None:
+        """Step 0: the retired copy this definition continues, when a request of it has a result. A copy that cannot be read refuses the definition
+        (fail closed): a skipped copy would reset the record."""
+        try:
+            return self._continued.continued(owner, name)
+        except (OrgError, OSError) as error:
+            raise OrgError(UNREADABLE.format(name=name, error=error)) from error
+
+    @staticmethod
+    def _check_continuation(
+        owner: str, name: str, prior: RetiredService, old: Contract, playbook: str | None, accept_n: Sequence[str], given: bool,
+    ) -> None:
+        """A continuation keeps the copy's playbook and criteria: it cannot pass a playbook or change the set of criteria, and it is no answer."""
+        what = [
+            *([CONTINUES_PLAYBOOK] if playbook is not None else []),
+            *([CONTINUES_CRITERIA.format(version=old.version)] if set(accept_n) != set(old.acceptance) else []),
+        ]
+        if what:
+            version = copy_playbook_version(prior)
+            raise OrgError(CONTINUES.format(
+                name=name, owner=owner, path=prior.path, k=prior.recorded, version=old.version,
+                playbook=f"v{version}" if version else "(none yet)", what=" and ".join(what),
+            ))
+        if given:
+            raise OrgError(NOT_AN_AMENDMENT)
+
+    def _continuation_told(
+        self, actor: str, owner: str, name: str, prior: RetiredService, old: Contract, new: Contract, changes: Sequence[str],
+    ) -> str:
+        """The owner's note and the reply of a continuation (design 5.10); the changes of other fields follow in both."""
+        version = copy_playbook_version(prior)
+        said = {"name": name, "owner": owner, "actor": actor, "path": prior.path, "old": old.version, "new": new.version, "k": prior.recorded}
+        lines = "\n".join(changes)
+        listed = f"\nChanged:\n{lines}" if changes else ""
+        self._delivery.notify(
+            owner, f"service {name} continued as contract v{new.version}",
+            CONTINUED_NOTE.format(**said, playbook=f"v{version}" if version else "none yet") + listed, wake=False,
+        )
+        record = self._record(owner, name)
+        return CONTINUED_REPLY.format(**said, playbook=f"playbook v{version}" if version else "no playbook yet") + (f" {record}" if record else "") + listed
+
+    def _record(self, owner: str, name: str) -> str:
+        """What is still open in the record of the continued service, or that nothing is. Advisory: a record that cannot be read says nothing."""
+        try:
+            basis = self._evidence.amendment_basis(owner, name)
+            waiting = [r for r in basis.rejections if not r.answered and answering_version(self._store, owner, name, r.note) == 0]
+        except (OrgError, OSError):
+            return ""
+        parts = [f"rejection {r.assertion} (message {r.note}) has no answer" for r in waiting]
+        if basis.unrated:
+            parts.append(f"{len(basis.unrated)} delivered request(s) have no verdict: {', '.join(basis.unrated)}")
+        return STILL_OPEN.format(parts="; ".join(parts)) if parts else ALL_RECORDED
 
     def _check_answer(self, owner: str, name: str, answers: str, about: str, words: str) -> Rejection | None:
         """Root's acceptance amendment (steps 3.1-3.6): every delivery has its verdict first, then the user's words come with it: the rejection it

@@ -6,7 +6,7 @@ providers of the ports that use them."""
 
 from __future__ import annotations
 
-from ..agents import AgentDirectory
+from ..agents import AgentDirectory, RetiredArchive
 from ..delivery import MessageDelivery
 from ..dispatch import MessageSender, ReworkContext
 from ..kernel import AtomicWriter, Clock, EventSink, OrgLayout
@@ -15,6 +15,7 @@ from ..services import ContractNormalizer, ServiceCatalog, ServiceCommands, Serv
 from ..services._amend import ContractAmender
 from ..services._catalog import ContractServiceCatalog
 from ..services._commands import RuleServiceCommands
+from ..services._continue import RecordedContinuations
 from ..services._define import RuleContractDefiner
 from ..services._feedback import RuleClientFeedback, SenderLinkNotes
 from ..services._hints import ServiceReportHints
@@ -24,7 +25,7 @@ from ..services._playbook import RulePlaybookReviser
 from ..services._request import RuleServiceRequester, TextRequestBodies
 from ..services._retire import RuleServiceRetirement
 from ..services._rework import ServiceReworkContext
-from ..services._store import FsServiceStore
+from ..services._store import FsServiceStore, OsServiceFiles
 from ..services._texts import CappedPlaybookTexts, DirectReportOwners, EventedPlaybookWriter
 from ..settings import OrgSettings
 from ._builder import Builder
@@ -50,10 +51,11 @@ def _commands(b: Builder) -> ServiceCommands:
     places, owners = OrgServicePlaces(b.get(OrgLayout)), DirectReportOwners(agents)
     texts, playbooks = CappedPlaybookTexts(b.get(OrgSettings)), EventedPlaybookWriter(store, clock, events)
     sender, mail = b.get(MessageSender), b.get(MailboxReader)
+    restorer = FsServiceStore(places, b.get(AtomicWriter))  # the same single writer of <owner>/services/**, as the port that puts a retired copy back
     return RuleServiceCommands(
         RuleContractDefiner(
             agents, catalog, store, places, b.get(ContractNormalizer), ContractAmender(), texts, owners, playbooks, delivery, clock, events,
-            b.get(ServiceEvidence), SenderLinkNotes(sender),
+            b.get(ServiceEvidence), SenderLinkNotes(sender), RecordedContinuations(places, b.get(RetiredArchive), mail, OsServiceFiles()), restorer,
         ),
         RuleServiceRetirement(agents, catalog, store, owners, delivery, clock, events, b.get(ServiceEvidence)),
         RulePlaybookReviser(agents, catalog, texts, playbooks, delivery, b.get(ServiceEvidence)),

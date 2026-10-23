@@ -381,14 +381,20 @@ class ServiceCommands(Protocol):
         Root's ``answers``, ``about`` and ``words`` record where an amendment of the acceptance criteria comes from (agents may not pass them): the
         user's answer to a rejection (``answers``: the rejection's message id; ``about``: the C or R id the question named; ``words``: their answer,
         verbatim), which also writes the ``confirms`` link, or, with ``words`` alone, a change they asked for on their own (user-initiated: it
-        never admits a playbook revision). A rejection gets one answer."""
+        never admits a playbook revision). A rejection gets one answer.
+
+        Root's definition of a name that has no live contract but a retired copy of the same owner with a recorded request (a request of it with a
+        result of any status) continues that copy: it is restored, and the next contract version is written with the old ``created``, so the
+        cases, the playbook and the criteria ids continue. Such a call cannot pass ``playbook`` or change the set of criteria."""
         ...
 
     def retire_service(self, actor: str, owner: str, name: str, reason: str) -> str:
         """Take a service out of use: it moves to ``<owner>/services/.retired/<name>-<timestamp>/``. Returns a confirmation.
 
-        Same authority as ``define_service`` (the owner's parent). Afterwards the service is not listed and cannot be requested; its past cases no
-        longer count for a service of the same name defined later. The owner is told in a non-waking note."""
+        Same authority as ``define_service`` (the owner's parent). Afterwards the service is not listed and cannot be requested. Root retires a
+        service only after every delivered request has a verdict and every rejection its answer (a refusal moves nothing). A service of the same
+        name defined later for the same owner continues it (its contract, playbook and cases) when a request of it has a result of any status,
+        and starts fresh otherwise. The owner is told in a non-waking note."""
         ...
 
     def request(

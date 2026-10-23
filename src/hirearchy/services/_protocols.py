@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Collection, Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
@@ -154,4 +155,43 @@ class ClientFeedback(Protocol):
         confirms: str | None = None,
     ) -> Message:
         """Give the verdict on a delivered request (see ``ServiceCommands.feedback``)."""
+        ...
+
+
+@dataclass(frozen=True)
+class RetiredService:
+    """A retired copy of a service that a root definition continues (design 5.10)."""
+
+    path: str  # the copy, relative to the organization
+    files: tuple[tuple[str, str], ...]  # (name inside the service directory, text): SERVICE.md, PLAYBOOK.md, history/SERVICE.v<k>.md, history/PLAYBOOK.v<k>.md
+    recorded: int  # the requests of the service with a result of any status (done, blocked or failed)
+
+
+@runtime_checkable
+class ServiceFiles(Protocol):
+    """The files of the copies the continuation reads (read only; nothing is written through it)."""
+
+    def listdir(self, path: Path) -> list[str]:
+        """The names in the directory ``path``; ``[]`` when there is no such directory (or it is a link); ``OSError`` when it cannot be listed."""
+        ...
+
+    def read_text(self, path: Path) -> str | None:
+        """The text of the regular file ``path`` exactly as written (no newline translation); ``None`` when it is no regular file (nothing, a
+        directory, a link); ``OSError`` when it cannot be read or decoded."""
+        ...
+
+
+@runtime_checkable
+class ContinuedServices(Protocol):
+    def continued(self, owner: str, name: str) -> RetiredService | None:
+        """The retired copy a root definition of ``owner``'s ``name`` continues: the newest one, when a request of it has a result of any status
+        (a recorded request); ``None`` otherwise. ``OSError``/``OrgError`` when a copy or a mailbox cannot be read."""
+        ...
+
+
+@runtime_checkable
+class ServiceRestorer(Protocol):
+    def restore(self, owner: str, name: str, retired: RetiredService) -> None:
+        """Write the files of the copy byte for byte into the live service directory, ``SERVICE.md`` last. Only the four file shapes of a service
+        are written; any other name is ignored."""
         ...
