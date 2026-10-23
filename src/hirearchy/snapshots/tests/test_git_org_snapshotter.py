@@ -71,6 +71,15 @@ class RefusingGit(GitClient):
     def commit_all(self, root: Path, message: str) -> None:
         raise PermissionError(13, "denied")
 
+    def added_by(self, root: Path, path: str) -> str | None:
+        return None  # the read questions never raise: they answer None
+
+    def object_id(self, root: Path, spec: str) -> str | None:
+        return None
+
+    def cat(self, root: Path, obj: str, limit: int) -> bytes | None:
+        return None
+
 
 def test_commit_swallows_an_operating_system_error() -> None:
     make(RefusingGit()).commit("x")

@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import os
+import stat
 import subprocess
+import time
 from pathlib import Path
 
 import pytest
@@ -67,3 +70,65 @@ def test_a_missing_program_raises_an_os_error(root: Path) -> None:
         git.init(root)
     with pytest.raises(OSError):
         git.commit_all(root, "m")
+
+
+# ------------------------------------------------------------------------------ the read methods: how git is asked
+
+
+def wrapper(tmp_path: Path, body: str) -> str:
+    """An executable stand-in for git (a shell script), to see how ``SubprocessGit`` asks and what it does when git is slow."""
+    script = tmp_path / "git-stand-in"
+    script.write_text("#!/bin/sh\n" + body, encoding="utf-8")
+    script.chmod(script.stat().st_mode | stat.S_IXUSR)
+    return str(script)
+
+
+def logging_git(tmp_path: Path) -> tuple[SubprocessGit, Path]:
+    log = tmp_path / "git-calls.log"
+    return SubprocessGit(wrapper(tmp_path, f'echo "$@" >> "{log}"\nexec git "$@"\n')), log
+
+
+def test_the_read_methods_run_git_with_literal_pathspecs_in_the_repository(tmp_path: Path, root: Path) -> None:
+    git, log = logging_git(tmp_path)
+    git.init(root)
+    (root / "a*.md").write_text("a\n", encoding="utf-8")
+    git.commit_all(root, "m")
+    log.unlink(missing_ok=True)
+    assert git.added_by(root, "a*.md") is not None
+    head = git.object_id(root, "HEAD")
+    assert head is not None and git.cat(root, git.object_id(root, f"{head}:a*.md") or "", 100) == b"a\n"
+    calls = log.read_text(encoding="utf-8").splitlines()
+    assert calls[0] == "--literal-pathspecs log --format=%H --diff-filter=A -- a*.md"
+    assert all(call.startswith("--literal-pathspecs ") for call in calls)
+
+
+def test_cat_asks_for_the_size_and_reads_the_blob_only_when_it_fits(tmp_path: Path, root: Path) -> None:
+    git, log = logging_git(tmp_path)
+    git.init(root)
+    (root / "big.bin").write_bytes(b"x" * 5000)
+    git.commit_all(root, "m")
+    blob = git.object_id(root, "HEAD:big.bin")
+    assert blob is not None
+    log.unlink(missing_ok=True)
+    assert git.cat(root, blob, 4999) is None
+    assert [c.split()[1:] for c in log.read_text(encoding="utf-8").splitlines()] == [["cat-file", "-s", blob]]  # the blob itself was not asked for
+    log.unlink()
+    assert git.cat(root, blob, 5000) == b"x" * 5000
+    assert [c.split()[1:] for c in log.read_text(encoding="utf-8").splitlines()] == [["cat-file", "-s", blob], ["cat-file", "blob", blob]]
+
+
+def test_a_read_that_takes_longer_than_the_timeout_answers_none_in_time(tmp_path: Path, root: Path) -> None:
+    git = SubprocessGit(wrapper(tmp_path, "exec sleep 5\n"), timeout=0.3)
+    started = time.monotonic()
+    assert (git.added_by(root, "a.md"), git.object_id(root, "HEAD"), git.cat(root, "0" * 40, 10)) == (None, None, None)
+    assert time.monotonic() - started < 3.0  # three timeouts of 0.3 s, not three sleeps of 5 s
+
+
+def test_the_timeout_is_2_seconds_by_default() -> None:
+    assert SubprocessGit().timeout == 2.0
+
+
+def test_the_read_methods_answer_none_when_the_program_is_missing(root: Path) -> None:
+    git = SubprocessGit(NO_GIT)
+    assert (git.added_by(root, "a.md"), git.object_id(root, "HEAD"), git.cat(root, "0" * 40, 10)) == (None, None, None)
+    assert os.path.isdir(root)

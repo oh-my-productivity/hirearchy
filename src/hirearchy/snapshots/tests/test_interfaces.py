@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from hirearchy.snapshots import GitClient, IgnoreList, OrgSnapshotter
-from hirearchy.snapshots._git import GitOrgSnapshotter, SubprocessGit
+from hirearchy.snapshots import GitClient, IgnoreList, OrgHistory, OrgSnapshotter
+from hirearchy.snapshots._git import GitOrgHistory, GitOrgSnapshotter, SubprocessGit
 from hirearchy.snapshots._ignore import FsIgnoreList
-from hirearchy.snapshots.testing import MemoryIgnoreList, RecordingGit
+from hirearchy.snapshots.testing import MemoryIgnoreList, MemoryOrgHistory, RecordingGit
 
 
 @pytest.mark.parametrize(
@@ -16,6 +16,8 @@ from hirearchy.snapshots.testing import MemoryIgnoreList, RecordingGit
         (SubprocessGit, GitClient),
         (RecordingGit, GitClient),
         (GitOrgSnapshotter, OrgSnapshotter),
+        (GitOrgHistory, OrgHistory),
+        (MemoryOrgHistory, OrgHistory),
         (FsIgnoreList, IgnoreList),
         (MemoryIgnoreList, IgnoreList),
     ],
