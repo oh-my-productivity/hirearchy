@@ -144,6 +144,9 @@ class MemoryAgents(TreeDirectory, CharterReader, AgentRegistry, RetiredArchive):
     def unspent_budget(self, tree: RetiredTree) -> int:
         return self._retired.unspent_budget(tree)
 
+    def credited(self) -> int:
+        return self._retired.credited()
+
 
 class MemoryArchiveFiles(ArchiveFiles):
     """The file tree of a ``MemoryAgents`` as the retired archive reads it (absolute paths below its ``root``)."""

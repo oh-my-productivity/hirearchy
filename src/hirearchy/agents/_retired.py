@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import os
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import replace
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..kernel import BOXES, OrgLayout
-from ._budget import message_budget
+from ._budget import credit_budget, message_budget
 from .api import RetiredArchive, RetiredTree
 
 RECV_BOXES = ("inbox", "inflight", "read")
@@ -93,8 +93,24 @@ class FsRetiredArchive(RetiredArchive):
                 total -= sum(1 for n in logs if n.endswith(".log") and not n.startswith("."))
         return total
 
-    def _box_budget(self, box: Path) -> int:
-        """The budget of the messages in one mailbox directory (0 for a directory that cannot be listed)."""
+    def credited(self) -> int:
+        total = 0
+        base = self._paths.retired_dir()
+        try:
+            names = sorted(self._files.listdir(base))
+        except OSError:
+            return 0
+        for name in names:
+            for here, dirs, files in self._files.walk(base / name):
+                if here.name in (*BOXES, "runs", "work", "services") or here.name.startswith("."):
+                    dirs.clear()
+                    continue
+                if "AGENT.md" in files:
+                    total += sum(self._box_budget(here / b, credit_budget) for b in RECV_BOXES)
+        return total
+
+    def _box_budget(self, box: Path, budget: Callable[[str], int] = message_budget) -> int:
+        """The budget of the messages in one mailbox directory (0 for a directory that cannot be listed); ``budget`` reads one file's text."""
         try:
             names = self._files.listdir(box)
         except OSError:
@@ -106,5 +122,5 @@ class FsRetiredArchive(RetiredArchive):
                     text = self._files.read_text(box / n)
                 except (OSError, UnicodeDecodeError):
                     continue
-                total += message_budget(text)
+                total += budget(text)
         return total

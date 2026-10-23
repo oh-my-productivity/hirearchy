@@ -103,3 +103,8 @@ class RetiredArchive(Protocol):
         """What the tree still held when it was retired: for every agent directory in it, received (inbox, inflight, read)
         minus sent minus run logs, in runs of budget."""
         ...
+
+    def credited(self) -> int:
+        """The runs the runtime gave back with run credits (``kernel.is_run_credit``) that sit in the received boxes (inbox, inflight, read)
+        of every agent directory of all retired trees: budget the retired agents received, besides what root and their parents handed down."""
+        ...

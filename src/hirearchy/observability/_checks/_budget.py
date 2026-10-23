@@ -6,7 +6,7 @@ from collections.abc import Sequence
 
 from ...agents import AgentDirectory, RetiredArchive
 from ...budget import BudgetQuery
-from ...kernel import ROOT, JsonObject, norm
+from ...kernel import ROOT, JsonObject, Message, is_run_credit, norm
 from ...mail import MessageFile
 from ...runs import RunLogReader
 from .._ports import IntegrityCheck
@@ -26,6 +26,10 @@ class BudgetConserved(IntegrityCheck):
 
     A message being delivered right now (sender copy written, recipient copy not yet, younger than ``COPY_GRACE``) is charged but not yet credited; it is
     counted as "in delivery" so a live check does not fail on it.
+
+    A run credit (the runtime's note that returns a run it did not charge: ``kernel.is_run_credit``) is budget that enters from the runtime, not from root:
+    ``handed down + credited`` is what the right side holds, with the credits of live agents counted from their received boxes and the credits of
+    retired agents from ``RetiredArchive.credited``. The equation text names the credits only when there are some.
     """
 
     def __init__(self, agents: AgentDirectory, budgets: BudgetQuery, run_logs: RunLogReader, archive: RetiredArchive) -> None:
@@ -41,6 +45,7 @@ class BudgetConserved(IntegrityCheck):
         used_live = sum(self._run_logs.count(a) for a in self._agents.agents())
         used_retired = self._archive.run_count()
         dropped = sum(self._archive.unspent_budget(tree) for tree in self._archive.trees() if tree.top_level)
+        credited = sum(runs_of(f) for f in files if not f.error and f.box in RECV_BOXES and self._credit(f)) + self._archive.credited()
         delivered = {f.id for f in files if not f.error and f.box in RECV_BOXES}
         pending = sum(
             runs_of(f)
@@ -49,10 +54,19 @@ class BudgetConserved(IntegrityCheck):
             and self._agents.exists(norm(str((f.meta or {}).get("to"))))
         )
         rhs = held + used_live + used_retired + returned + dropped + pending
-        eq = (f"handed down {handed} = held {held} + used {used_live} live + {used_retired} retired "
+        eq = (f"handed down {handed}" + (f" + {credited} credited" if credited else "") + f" = held {held} + used {used_live} live + {used_retired} retired "
               f"+ returned {returned} + dropped {dropped}" + (f" + {pending} in delivery" if pending else ""))
+        handed += credited
         if handed == rhs:
             return verdict("b", "budget conserved: handed down = held + used + returned (+ dropped at retirement)", [], eq)
         diff = handed - rhs
         return verdict("b", "budget conserved: handed down = held + used + returned (+ dropped at retirement)",
                        [f"{eq}: {abs(diff)} run(s) {'vanished' if diff > 0 else 'appeared from nowhere'} (difference {diff:+d})"])
+
+    @staticmethod
+    def _credit(f: MessageFile) -> bool:
+        """The message file is a run credit (its front matter says so)."""
+        try:
+            return is_run_credit(Message.from_parts(f.meta or {}, ""))
+        except Exception:  # noqa: BLE001 - a front matter that is not a message (a budget that is no number): not a credit
+            return False

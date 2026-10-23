@@ -161,6 +161,9 @@ class MemoryRetiredTrees(RetiredArchive):
     def unspent_budget(self, tree: RetiredTree) -> int:
         return 0
 
+    def credited(self) -> int:
+        return 0
+
 
 # ------------------------------------------------------------------------------ the stand-ins for the evidence gate
 

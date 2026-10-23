@@ -139,6 +139,36 @@ def test_a_budget_that_cannot_be_computed_says_so(built: Any) -> None:
     assert result["ok"] is False and result["details"][0].startswith("cannot compute the agents' budgets: ")
 
 
+def credit_meta(to: str, name: str) -> dict[str, Any]:
+    """A run credit: the runtime's note that returns one run of ``to`` (kernel.run_credit_title)."""
+    return {"id": name, "from": "runtime", "to": to, "type": "note", "budget": 1, "wake": False, "title": f"run credit {to}@20261018T100100000000"}
+
+
+def test_conservation_holds_with_a_live_credit(built: Any) -> None:
+    s = second(built, "story")
+    assert run(s.budget, s)["details"] == ["handed down 11 = held 4 + used 4 live + 0 retired + returned 3 + dropped 0"]
+    name = "20261018T100700000000-runtime-hhhh"
+    _scenario.write(built.org, f"ceo/inbox/{name}.md", credit_meta("ceo", name))  # a run was credited: ceo holds one more, the log stays
+    result = run(s.budget, s)
+    assert result["ok"] is True and result["details"] == ["handed down 11 + 1 credited = held 5 + used 4 live + 0 retired + returned 3 + dropped 0"]
+
+
+def test_conservation_holds_with_a_retired_agents_credit(built: Any) -> None:
+    s = second(built, "retired")
+    tree = next((built.org.root / ".retired").glob("ops-*")).name
+    name = "20261018T100700000000-runtime-iiii"
+    _scenario.write(built.org, f".retired/{tree}/inbox/{name}.md", credit_meta("ops", name))
+    result = run(s.budget, s)
+    assert result["ok"] is True and result["details"] == ["handed down 19 + 1 credited = held 7 + used 4 live + 1 retired + returned 3 + dropped 5"]
+
+
+def test_the_equation_text_is_unchanged_without_credits(built: Any) -> None:
+    for name, text in (("story", "handed down 11 = held 4 + used 4 live + 0 retired + returned 3 + dropped 0"),
+                       ("retired", "handed down 19 = held 7 + used 4 live + 1 retired + returned 3 + dropped 4")):
+        s = second(built, name)
+        assert run(s.budget, s)["details"] == [text] and "credited" not in text
+
+
 # ------------------------------------------------------------------------------ (c) inflight accounted
 
 

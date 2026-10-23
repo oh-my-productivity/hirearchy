@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..kernel import split_frontmatter
+from ..kernel import Message, is_run_credit, split_frontmatter
 
 
 def message_budget(text: str) -> int:
@@ -22,3 +22,14 @@ def message_budget(text: str) -> int:
         return budget
     except (TypeError, ValueError):
         return 0
+
+
+def credit_budget(text: str) -> int:
+    """The runs of budget in the text of a message file when it is a run credit (the runtime's note that returns a run), else 0."""
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    try:
+        meta, body = split_frontmatter(text)
+        note = Message.from_parts(meta, body)
+    except Exception:  # noqa: BLE001 - yaml errors of any kind, a budget that is no number
+        return 0
+    return note.budget if is_run_credit(note) else 0

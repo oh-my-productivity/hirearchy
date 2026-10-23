@@ -307,3 +307,30 @@ def test_an_archived_agent_holds_what_it_held(h: AgentsHarness) -> None:
     h.put("ceo/runs/20260101T000000000001.log", "x")
     h.registry.archive("ceo", STAMP)
     assert unspent(h, f"ceo-{STAMP}") == 8 - 3 - 1
+
+
+# ------------------------------------------------------------------------------ credited
+
+
+def credit(budget: int = 1, to: str = "ceo", stem: str = "20260101T000000000001", sender: str = "runtime") -> str:
+    """The text of a run credit (the runtime's note that returns a run, kernel.run_credit_title)."""
+    return message(budget, sender=sender, to=to, kind="note", extra=f"\ntitle: run credit {to}@{stem}")
+
+
+def test_no_retired_tree_credits_0(h: AgentsHarness) -> None:
+    assert h.archive.credited() == 0
+    given(h, {"AGENT.md": "x", "inbox/a.md": message(10), "sent/d.md": credit(), "runs/1.log": "x"})  # a tree whose boxes hold no credit received
+    assert h.archive.credited() == 0
+
+
+def test_credited_sums_the_run_credits_of_retired_received_boxes(h: AgentsHarness) -> None:
+    given(h, {
+        "AGENT.md": "x", "inbox/a.md": credit(1, stem="20260101T000000000001"), "read/b.md": credit(2, stem="20260101T000000000002"),
+        "inbox/c.md": message(7), "sent/d.md": credit(5),  # a task is no credit, and a credit in sent/ was not received
+        "inbox/e.md": credit(4, sender="ceo"), "inbox/f.md": message(4, sender="runtime", to="ceo", kind="note", extra="\ntitle: run credit ops@20260101T000000000009"),
+        # ... neither a note of another sender nor one whose title names another agent
+        "eng/AGENT.md": "x", "eng/inflight/a.md": credit(1, to="ceo/eng", stem="20260101T000000000003"),
+    })
+    h.put(".retired/cto-S/AGENT.md", "x")
+    h.put(".retired/cto-S/inbox/a.md", credit(1, to="cto"))
+    assert h.archive.credited() == 1 + 2 + 1 + 1
