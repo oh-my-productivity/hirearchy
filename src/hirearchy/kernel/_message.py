@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol, Self, SupportsInt, cast, runtime_checkable
 
-from ._address import ROOT
+from ._address import ROOT, RUNTIME
 from ._frontmatter import join_frontmatter, split_frontmatter
 from ._ports import JsonObject
 
@@ -217,6 +217,31 @@ def verdict_tier(note: Message) -> str:
 def link_ids(note: Message) -> tuple[str, ...]:
     """The ids in a note's ``criterion`` field, in order, without blanks ("C6, R2" -> ("C6", "R2"))."""
     return tuple(part for part in (p.strip() for p in (note.criterion or "").split(",")) if part)
+
+
+RUN_CREDIT_TITLE = "run credit"  # the title of the note with which the runtime returns a run it does not charge: "run credit <addr>@<run-log stem>"
+
+
+def run_credit_title(addr: str, stem: str) -> str:
+    """The title of the credit for ``addr``'s run whose log is ``<stem>.log``."""
+    return f"{RUN_CREDIT_TITLE} {addr}@{stem}"
+
+
+def _credited_stem(note: Message) -> str:
+    """The run-log stem a run credit returns, else ``""``: a note of the runtime that carries runs and whose title names its own recipient."""
+    prefix = f"{RUN_CREDIT_TITLE} {note.to}@"
+    credited = note.sender == RUNTIME and note.type == "note" and note.budget > 0 and note.title.startswith(prefix)
+    return note.title[len(prefix):] if credited else ""
+
+
+def is_run_credit(note: Message) -> bool:
+    """The note is a run credit: it returns one run to the agent it was sent to (budget is derived, so the note is the credit)."""
+    return bool(_credited_stem(note))
+
+
+def credited_stems(received: Iterable[Message]) -> set[str]:
+    """The stems of the run logs that a received box credits: those runs are not charged."""
+    return {stem for stem in map(_credited_stem, received) if stem}
 
 
 def latest_results(results: Iterable[Message]) -> dict[str, Message]:

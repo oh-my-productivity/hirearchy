@@ -12,8 +12,13 @@ import pytest
 
 from hirearchy.kernel import (
     RENDER_BODY_CHARS,
+    RUN_CREDIT_TITLE,
+    RUNTIME,
     Message,
+    credited_stems,
+    is_run_credit,
     latest_results,
+    run_credit_title,
 )
 from hirearchy.kernel.tests._reach import reach
 
@@ -161,3 +166,28 @@ def test_latest_results_picks_the_highest_id_per_task() -> None:
     assert latest_results([done, blocked, other, note, orphan]) == {"t1": done, "t2": other}
     assert latest_results([blocked, done]) == {"t1": done}
     assert latest_results([]) == {}
+
+
+def credit(to: str = "ceo", stem: str = "20261022T202454859379", **fields: object) -> Message:
+    base: dict[str, object] = {"sender": RUNTIME, "to": to, "type": "note", "budget": 1, "wake": False, "title": run_credit_title(to, stem), "body": "returns a run"}
+    return Message(**{**base, **fields})  # type: ignore[arg-type]
+
+
+def test_run_credit_title_and_is_run_credit() -> None:
+    assert run_credit_title("ceo/eng", "20261022T202454859379") == f"{RUN_CREDIT_TITLE} ceo/eng@20261022T202454859379"
+    assert is_run_credit(credit())
+    assert not is_run_credit(credit(sender="ceo"))  # only the runtime credits a run
+    assert not is_run_credit(credit(budget=0))  # a credit returns a run
+    assert not is_run_credit(credit(type="task"))
+    assert not is_run_credit(credit(title="budget reclaimed by ceo"))
+    assert not is_run_credit(credit(title=run_credit_title("ceo/eng", "20261022T202454859379")))  # names another agent than the one it was sent to
+
+
+def test_credited_stems_of_a_received_box() -> None:
+    box = [credit(stem="20261022T200000000001"), Message("root", "ceo", "note", "hi", id="n1"), credit(stem="20261022T200000000002"), credit(sender="ceo", stem="20261022T200000000003")]
+    assert credited_stems(box) == {"20261022T200000000001", "20261022T200000000002"}
+
+
+def test_no_credit_gives_an_empty_set() -> None:
+    assert credited_stems([]) == set()
+    assert credited_stems([Message("root", "ceo", "note", "hi", id="n1")]) == set()
