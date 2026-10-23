@@ -213,6 +213,19 @@ def test_root_cannot_lower_the_effort_through_write(org):
     assert split_frontmatter((org.root / "ORG.md").read_text(encoding="utf-8"))[0]["effort"] == "high"
 
 
+def test_root_repairs_an_ORG_md_with_broken_yaml_and_still_rewrites_charters(org):
+    (org.root / "ORG.md").write_text("---\nmax_depth: 4\nextra_allowed_models: [claude-sonnet-4.6\n---\n# Organization\n", encoding="utf-8")
+    server = build_server(org, ROOT)
+    charter = join_frontmatter({"role": "CEO", "model": "claude-opus-5.5"}, "# Role\n\nNew body.")
+    call(server, "write", path="ceo/AGENT.md", content=charter)  # a charter rewrite does not need ORG.md to parse
+    assert "model: claude-opus-5.5" in (org.dir("ceo") / "AGENT.md").read_text(encoding="utf-8")
+    message = fails(server, "write", path="ORG.md", content=join_frontmatter({"max_depth": 4, "effort": "medium"}, "# Organization\n"))
+    assert 'effort "medium" is not allowed for org agents' in message  # the repair is checked against the built-in floor
+    fixed = join_frontmatter({"max_depth": 4}, "# Organization\n")
+    call(server, "write", path="ORG.md", content=fixed)
+    assert (org.root / "ORG.md").read_text(encoding="utf-8") == fixed
+
+
 def test_a_blueprint_tier_outside_the_set_is_an_error_line_of_the_draft(org):
     out = point_blueprint(set_tiers)(org, "claude-haiku-4.5")
     assert out is not None and 'needs.models.cheap: model "claude-haiku-4.5" is not allowed' in out and "needs.models.strong:" in out

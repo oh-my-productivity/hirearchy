@@ -165,6 +165,73 @@ def test_an_ORG_md_whose_frontmatter_cannot_be_read_is_written_as_before(h: OrgF
     assert written(h, "ORG.md") == broken
 
 
+# ------------------------------------------------------------------------------ an ORG.md that cannot be parsed (a hand edit slipped)
+
+BROKEN = "---\nmax_depth: 4\nextra_allowed_models: [claude-sonnet-4.6\n---\n# Organization\n"  # an unclosed list: YAML cannot read it
+
+
+def test_root_repairs_an_ORG_md_whose_current_frontmatter_cannot_be_parsed(h: OrgFilesHarness) -> None:
+    h.put_org_md(BROKEN)
+    repaired = org_md({"max_depth": 4, "extra_allowed_models": ["claude-sonnet-4.6"]})
+    assert refusal(lambda: h.writer.write("root", "ORG.md", repaired)) == (  # the repair is checked against the default set: root cannot widen it
+        "ORG.md: only the user can widen the allowed models, by editing ORG.md themselves (not allowed now: claude-sonnet-4.6)"
+    )
+    fixed = org_md({"max_depth": 4})
+    h.writer.write("root", "ORG.md", fixed)
+    assert written(h, "ORG.md") == fixed
+
+
+@pytest.mark.parametrize(
+    "meta, message",
+    [
+        ({"effort": "medium"}, 'effort "medium" is not allowed for org agents; allowed: high, xhigh, max'),
+        ({"default_model": "claude-haiku-4.5"}, "default_model: " + m1("claude-haiku-4.5")),
+    ],
+    ids=lambda v: repr(v)[:30],
+)
+def test_the_repair_of_an_unreadable_ORG_md_still_refuses_an_effort_or_a_default_model_below_the_floor(
+    h: OrgFilesHarness, meta: JsonObject, message: str
+) -> None:
+    h.put_org_md(BROKEN)
+    assert refusal(lambda: h.writer.write("root", "ORG.md", org_md({"max_depth": 4, **meta}))) == f"ORG.md: {message}"
+    assert written(h, "ORG.md") == BROKEN
+
+
+def test_the_repair_of_an_unreadable_ORG_md_may_raise_the_effort_and_choose_a_floor_model(h: OrgFilesHarness) -> None:
+    fixed = org_md({"max_depth": 4, "effort": "max", "default_model": "claude-opus-5.5"})
+    h.put_org_md(BROKEN)
+    h.writer.write("root", "ORG.md", fixed)
+    assert written(h, "ORG.md") == fixed
+
+
+@pytest.mark.parametrize("who, addr", WRITERS)
+@pytest.mark.parametrize("model", MODELS_IN)
+def test_a_charter_rewrite_works_while_ORG_md_cannot_be_parsed(h: OrgFilesHarness, who: str, addr: str, model: str) -> None:
+    h.put_org_md(BROKEN)
+    h.writer.write(who, f"{addr}/AGENT.md", charter(model))
+    text = written(h, addr, "AGENT.md")
+    assert text is not None and f"model: {model}" in text
+
+
+@pytest.mark.parametrize("who, addr", WRITERS)
+@pytest.mark.parametrize("model", MODELS_OUT)
+def test_a_charter_rewrite_below_the_floor_is_still_refused_while_ORG_md_cannot_be_parsed(
+    h: OrgFilesHarness, who: str, addr: str, model: str
+) -> None:
+    h.put_org_md(BROKEN)
+    before = written(h, addr, "AGENT.md")
+    assert refusal(lambda: h.writer.write(who, f"{addr}/AGENT.md", charter(model))) == f"charter of {addr}: {m1(model)}"
+    assert written(h, addr, "AGENT.md") == before
+
+
+@pytest.mark.parametrize("who, addr", WRITERS)
+def test_a_charter_rewrite_without_a_model_works_while_ORG_md_cannot_be_parsed(h: OrgFilesHarness, who: str, addr: str) -> None:
+    h.put_org_md(BROKEN)  # the effective default is the built-in one, which is in the set
+    h.writer.write(who, f"{addr}/AGENT.md", charter(None, role="Sharper"))
+    text = written(h, addr, "AGENT.md")
+    assert text is not None and "Sharper" in text
+
+
 def test_other_files_are_not_looked_at(h: OrgFilesHarness) -> None:
     h.writer.write("root", "MEMORY.md", "---\neffort: low\nmodel: claude-haiku-4.5\n---\nnotes\n")
     h.writer.write("ceo", "ceo/notes.md", "---\nextra_allowed_models: [x]\n---\nnotes\n")

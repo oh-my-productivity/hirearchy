@@ -124,9 +124,16 @@ class GuardedOrgFileWriter(OrgFileWriter):
             self._store.write_text(p, content)
         return p, note
 
+    def _config_or_empty(self) -> JsonObject:
+        """The org's settings, ``{}`` when ORG.md cannot be parsed: the floor is then checked against the built-in set, effort and model, so root can still repair ORG.md and rewrite charters."""
+        try:
+            return self._settings.config()
+        except Exception:  # noqa: BLE001 - YAML that does not parse (a hand edit slipped): the writes that would repair it must not fail on it
+            return {}
+
     def _check_charter_model(self, addr: str, path: Path, content: str) -> None:
         """Refuse a charter text that changes the model the agent runs on (its ``model``, else the org's default) to one outside the allowed set."""
-        cfg = self._settings.config()
+        cfg = self._config_or_empty()
         fallback = config_default_model(cfg)
         new = str(_frontmatter_of(content).get("model") or "").strip() or fallback
         if self._store.kind(path) == "file" and new == (str(_frontmatter_of(self._store.read_text(path)).get("model") or "").strip() or fallback):
@@ -139,6 +146,6 @@ class GuardedOrgFileWriter(OrgFileWriter):
         """Refuse a write of the top-level ORG.md that widens the allowed models or sets an effort or a default model outside the floor."""
         if path != self._store.resolve(self._layout.root) / "ORG.md":
             return
-        problem = config_floor_problem(_frontmatter_of(content), before=self._settings.config())
+        problem = config_floor_problem(_frontmatter_of(content), before=self._config_or_empty())
         if problem is not None:
             raise OrgError(f"ORG.md: {problem}")

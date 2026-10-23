@@ -66,6 +66,10 @@ Each point calls `settings`. The wrapper text is in brackets.
 
    Values the file already had are tolerated, so root can still edit the rules of an organization made before the floor.
 
+   Items 3 and 6 read the current settings tolerantly: when the current ORG.md has YAML that does not parse (a hand edit slipped), the settings read
+   as `{}`, so the built-in set, effort and default model apply. Root can then still repair ORG.md and rewrite charters, as before the floor, and
+   the repair is held to the built-in floor (it cannot widen the set or lower the effort or the default model).
+
 ## 4. Effort on the command line
 
 The builder reads `ModelResolver.effort()`, a new third method of `access.ModelResolver` that returns `config_effort` of the settings. The builder
