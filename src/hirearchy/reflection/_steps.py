@@ -3,17 +3,38 @@
 from __future__ import annotations
 
 from ..agents import AgentDirectory
-from ..kernel import Message, client_questions, clip_line, latest_results, verdict_tier
+from collections.abc import Sequence
+
+from ..kernel import Message, client_questions, clip_line, latest_results, link_ids, verdict_tier
 from ..mail import MailboxReader
 from ..services import ServiceCatalog
 from .api import CaseHistory, ServiceSteps, confirmed_criteria, regressions
 
-QUESTION = (
-    'Next, before define_service: ask the user ONE yes/no question that names what it is about by an id, a criterion ({criteria}) or an earlier '
-    'rejection ({rejections}), e.g. "About C<k>: add \'<the rule in their words>\' as a criterion?" or "Same as R<j>: a one-off?". "Always ..." is '
-    "not their yes: ask anyway. Only after their yes call define_service (when the answer changes the contract), then record the answer: "
-    'feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=["<the id>"], source="human", note="<their answer, verbatim>").'
+ASK_C = 'About {id}: add "<the rule, in their words>" as a lasting rule? Yes or no.'
+ASK_R = "Same as {id}: a one-off? Yes or no."
+ASK_NONE = 'About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.'
+NOT_THEIR_YES = 'Change nothing in this turn: an "always ..." in the rejection is not their yes. '
+STEP_C = (  # root read the rejection as a criterion in force
+    'Next: ask the user exactly ONE yes/no question, in these words: "{question}" ' + NOT_THEIR_YES
+    + 'On yes: define_service(owner="{owner}", name="{service}", add_acceptance=["<the rule>"], answers="{note}", about="{id}", '
+    'words="<their answer, verbatim>"). On no, a one-off or "as it is": feedback(task_id="{task}", verdict="reject", confirms="{note}", '
+    'criterion=["none"] or ["{id}"], source="human", note="<their answer, verbatim>").'
 )
+STEP_R = (  # root read the rejection as a repeat of an earlier one
+    'Next: ask the user exactly ONE yes/no question, in these words: "{question}" ' + NOT_THEIR_YES
+    + 'On yes: feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=["{id}"], source="human", note="<their answer, verbatim>"). '
+    'On no, when their answer asks for a lasting rule: define_service(owner="{owner}", name="{service}", add_acceptance=["<the rule>"], '
+    'answers="{note}", about="{id}", words="<their answer, verbatim>"); otherwise feedback(task_id="{task}", verdict="reject", confirms="{note}", '
+    'criterion=["none"], source="human", note="<their answer, verbatim>").'
+)
+STEP_NONE = (  # no reading: the question names the id root chooses now
+    'Next: ask the user exactly ONE yes/no question that names the criterion you read the rejection as: "{question}", with <its id> one of '
+    '{criteria}{repeat}. Next time, pass your reading as criterion on the rejection and this reply gives the question with its id. ' + NOT_THEIR_YES
+    + 'On yes: define_service(owner="{owner}", name="{service}", add_acceptance=["<the rule>"], answers="{note}", about="<the id you asked about>", '
+    'words="<their answer, verbatim>"). On no, a one-off or "as it is": feedback(task_id="{task}", verdict="reject", confirms="{note}", '
+    'criterion=["none"], ["R<j>"] or ["C<k>"], source="human", note="<their answer, verbatim>").'
+)
+REPEAT = '; for a repeat: "Same as R<j>: a one-off? Yes or no.", with R<j> one of {rejections}'
 NO_YES_YET = (
     'Rejection {rejection} (message {note}) has no recorded yes. The yes is the user\'s answer to your ONE yes/no question naming {names}; an '
     '"Always ..." in the rejection is not it. If you have not asked that question, ask it now and record nothing. Only after they answer yes: '
@@ -25,6 +46,22 @@ REWORK = (
 )
 QUESTION_CHARS = 160  # each repeated question is cut to this many characters
 QUESTIONS_SHOWN = 5  # at most this many are repeated; the rest are counted
+
+
+def reading_of(note: Message, criteria: Sequence[str], earlier: Sequence[str]) -> str:
+    """What root read the rejection ``note`` as: the first id of its own ``criterion`` that is a criterion in force (``criteria``) or an earlier
+    rejection (``earlier``); ``""`` for none, for no ``criterion`` and for ids the service lacks. It is a reading, not the user's yes."""
+    return next((x for x in link_ids(note) if x in criteria or x in earlier), "")
+
+
+def question_for(note: Message, criteria: Sequence[str], earlier: Sequence[str]) -> str:
+    """The one yes/no question to ask the user about the rejection ``note``, with root's reading filled in (``About C3: add "..."``, ``Same as R1:
+    a one-off?``); without a reading, the question root completes with the id it chooses. The reply to the rejection quotes this text, and so
+    does every refusal that waits for the answer: one function words it."""
+    reading = reading_of(note, criteria, earlier)
+    if not reading:
+        return ASK_NONE
+    return (ASK_C if reading.startswith("C") else ASK_R).format(id=reading)
 
 
 class TextServiceSteps(ServiceSteps):
@@ -46,10 +83,17 @@ class TextServiceSteps(ServiceSteps):
         mine = next((a for a in found if a.verdict.message.id == note.id), None)
         if mine is None:
             return ""
-        criteria = ", ".join(c.id for c in self._catalog.criteria(task.to, task.service) if c.current) or "none"
-        earlier = ", ".join(a.id for a in found if a.id != mine.id) or "none"
+        criteria = [c.id for c in self._catalog.criteria(task.to, task.service) if c.current]
+        earlier = [a.id for a in found[: found.index(mine)]]
         own = f"The criterion on the rejection itself ({note.criterion}) is recorded as not confirmed. " if note.criterion else ""
-        return f"{own}This rejection is {mine.id}. " + QUESTION.format(criteria=criteria, rejections=earlier, task=note.reply_to, note=note.id)
+        reading = reading_of(note, criteria, earlier)
+        ids = {"owner": task.to, "service": task.service, "task": note.reply_to, "note": note.id, "question": question_for(note, criteria, earlier)}
+        if reading:
+            step = (STEP_C if reading.startswith("C") else STEP_R).format(id=reading, **ids)
+        else:
+            repeat = REPEAT.format(rejections=", ".join(earlier)) if earlier else ""
+            step = STEP_NONE.format(criteria=", ".join(criteria) or "none", repeat=repeat, **ids)
+        return f"{own}This rejection is {mine.id}. " + step
 
     def amendment_step(self, owner: str, service: str) -> str:
         owner = self._agents.require(owner)

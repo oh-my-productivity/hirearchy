@@ -76,9 +76,11 @@ def test_root_feedback_reply_names_message_and_source(svc):
     no = [m for m in svc.sent(ROOT) if m.feedback][-1]
     assert reply.startswith(
         f"feedback reject recorded on {first.id} for ceo (message {no.id}, source human, about C1 (not confirmed)); it does not wake ceo\n"
-        "The criterion on the rejection itself (C1) is recorded as not confirmed. This rejection is R1. Next, before define_service: "
+        "The criterion on the rejection itself (C1) is recorded as not confirmed. This rejection is R1. Next: ask the user exactly ONE yes/no "
+        'question, in these words: "About C1: add "<the rule, in their words>" as a lasting rule? Yes or no." '
     )
-    assert f'task_id="{first.id}", verdict="reject", confirms="{no.id}"' in reply  # the step names the call that records the user's yes
+    assert "Next, before define_service: " not in reply and "Only after their yes call define_service" not in reply
+    assert f'task_id="{first.id}", verdict="reject", confirms="{no.id}"' in reply  # the step names the call that records the user's no
     assert (no.source, no.criterion) == ("human", "C1")
     second = request(svc, "chips")
     deliver(svc, "ceo", second)
@@ -90,6 +92,24 @@ def test_root_feedback_reply_names_message_and_source(svc):
     link = [m for m in svc.sent(ROOT) if m.criterion and not m.feedback][-1]
     assert reply == f"recorded: rejection {no.id} is about C1 (source human; message {link.id}); it does not wake ceo"
     assert (link.reply_to, link.source) == (no.id, "human")
+
+
+def test_mcp_reject_with_a_reading_then_define_service_answers_is_admitted(svc):
+    """DR-46: root passes its reading as `criterion` on the rejection; the reply gives the exact question with that id, and the user's yes is
+    recorded by define_service(answers=..., about=<that id>, words=...), which writes the link itself."""
+    server = build_server(svc, ROOT)
+    task = request(svc, "ai")
+    deliver(svc, "ceo", task)
+    reply = call(server, "feedback", task_id=task.id, verdict="reject", note="Always start with a Summary line.", source="human", criterion=["C1"])
+    no = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    assert 'in these words: "About C1: add "<the rule, in their words>" as a lasting rule? Yes or no."' in reply
+    assert f'answers="{no.id}", about="C1", words="<their answer, verbatim>"' in reply
+    answer = call(server, "define_service", owner="ceo", name=WEEKDAY, add_acceptance=["Starts with a Summary line"], answers=no.id, about="C1",
+                  words="Yes, add it.")
+    (link,) = [m for m in svc.sent(ROOT) if m.reply_to == no.id and m.criterion]
+    assert f"Recorded as the user's answer to R1 (rejection {no.id}; your question named C1): link {link.id} names C3." in answer
+    assert (link.criterion, link.source) == ("C3", "human")
+    assert "C3: Starts with a Summary line" in answer and "(not confirmed)" not in answer.split("Recorded as")[0].split("Acceptance criteria now")[1]
 
 
 def test_agent_feedback_surface_is_unchanged(svc):

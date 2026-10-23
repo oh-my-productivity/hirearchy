@@ -17,6 +17,7 @@ from ..services import (
     Admission, AmendmentBasis, Criterion, Rejection, ServiceCatalog, ServiceEvidence, confirmed_amendments, line_key, normalize_evidence,
     normalize_links,
 )
+from ._steps import question_for
 from .api import Assertion, CaseHistory, Verdict, confirmed_criteria, delivered_unrated, regressions
 
 REASON_CLIP = 200  # characters of the reason in the question of a refusal
@@ -65,11 +66,13 @@ class CaseServiceEvidence(ServiceEvidence):
         cases = self._history.cases(owner, service)
         found = regressions(cases)
         titles = {t.id: t.title for c in cases for t in c.tasks}
+        criteria = [c.id for c in self._catalog.criteria(owner, service) if c.current]
         rejections = tuple(
             Rejection(
                 note=a.verdict.message.id, assertion=a.id, task=a.verdict.task_id, title=titles.get(a.verdict.task_id, ""),
                 earlier=tuple(x.id for x in found[:k]), words=a.verdict.note,
                 answered=next((m.id for m in a.verdict.link_notes if verdict_tier(m) == "human"), ""),
+                question=question_for(a.verdict.message, criteria, [x.id for x in found[:k]]),
             )
             for k, a in enumerate(found)
         )

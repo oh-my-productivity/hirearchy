@@ -14,12 +14,30 @@ from hirearchy.reflection.testing import ReflectionWorld, fs_world, memory_world
 
 from ._support import SERVICE, ask, define, deliver, nested, note_on, populated, rate
 
-QUESTION = (
-    'ask the user ONE yes/no question that names what it is about by an id, a criterion ({criteria}) or an earlier rejection ({rejections}), e.g. '
-    '"About C<k>: add \'<the rule in their words>\' as a criterion?" or "Same as R<j>: a one-off?". "Always ..." is not their yes: ask anyway. '
-    "Only after their yes call define_service (when the answer changes the contract), then record the answer: "
-    'feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=["<the id>"], source="human", note="<their answer, verbatim>").'
+FORM_C = (
+    'Next: ask the user exactly ONE yes/no question, in these words: "About {id}: add "<the rule, in their words>" as a lasting rule? Yes or no." '
+    'Change nothing in this turn: an "always ..." in the rejection is not their yes. '
+    'On yes: define_service(owner="ceo", name="weekly-brief", add_acceptance=["<the rule>"], answers="{note}", about="{id}", '
+    'words="<their answer, verbatim>"). On no, a one-off or "as it is": feedback(task_id="{task}", verdict="reject", confirms="{note}", '
+    'criterion=["none"] or ["{id}"], source="human", note="<their answer, verbatim>").'
 )
+FORM_R = (
+    'Next: ask the user exactly ONE yes/no question, in these words: "Same as {id}: a one-off? Yes or no." '
+    'Change nothing in this turn: an "always ..." in the rejection is not their yes. '
+    'On yes: feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=["{id}"], source="human", note="<their answer, verbatim>"). '
+    'On no, when their answer asks for a lasting rule: define_service(owner="ceo", name="weekly-brief", add_acceptance=["<the rule>"], '
+    'answers="{note}", about="{id}", words="<their answer, verbatim>"); otherwise feedback(task_id="{task}", verdict="reject", confirms="{note}", '
+    'criterion=["none"], source="human", note="<their answer, verbatim>").'
+)
+FORM_NONE = (
+    'Next: ask the user exactly ONE yes/no question that names the criterion you read the rejection as: "About <its id>: add "<the rule, in their '
+    'words>" as a lasting rule? Yes or no.", with <its id> one of {criteria}{repeat}. Next time, pass your reading as criterion on the rejection and '
+    'this reply gives the question with its id. Change nothing in this turn: an "always ..." in the rejection is not their yes. '
+    'On yes: define_service(owner="ceo", name="weekly-brief", add_acceptance=["<the rule>"], answers="{note}", about="<the id you asked about>", '
+    'words="<their answer, verbatim>"). On no, a one-off or "as it is": feedback(task_id="{task}", verdict="reject", confirms="{note}", '
+    'criterion=["none"], ["R<j>"] or ["C<k>"], source="human", note="<their answer, verbatim>").'
+)
+REPEAT = '; for a repeat: "Same as R<j>: a one-off? Yes or no.", with R<j> one of {rejections}'
 NOT_YET = (
     'Rejection {rejection} (message {note}) has no recorded yes. The yes is the user\'s answer to your ONE yes/no question naming {names}; an "Always ..." '
     'in the rejection is not it. If you have not asked that question, ask it now and record nothing. Only after they answer yes: '
@@ -51,22 +69,76 @@ def rejected(w: ReflectionWorld, words: str = "Too long.", *, topic: str = "ai",
 def test_feedback_step_names_the_ids_and_the_confirmation(w: ReflectionWorld) -> None:
     rejected(w, "First.", topic="a")  # two earlier human rejections, in other cases: the new one is the third of the service (DR-19)
     rejected(w, "Second.", topic="b")
-    task, note = rejected(w, "Third.", topic="c")
-    assert w.steps.feedback_step(note) == "This rejection is R3. Next, before define_service: " + QUESTION.format(
-        criteria="C1, C2", rejections="R1, R2", task=task.id, note=note.id,
+    task, note = rejected(w, "Third.", topic="c")  # no reading: the third form lists the ids
+    assert w.steps.feedback_step(note) == "This rejection is R3. " + FORM_NONE.format(
+        criteria="C1, C2", repeat=REPEAT.format(rejections="R1, R2"), task=task.id, note=note.id,
     )
 
 
-def test_feedback_step_with_no_other_rejection_says_none(w: ReflectionWorld) -> None:
-    _, note = rejected(w)
+def test_a_reading_ck_gives_about_ck_add_and_about_ck(w: ReflectionWorld) -> None:
+    task, note = rejected(w, criterion=["C2", "C1"])  # root's reading: the first id that is a current criterion
+    assert w.steps.feedback_step(note) == (
+        "The criterion on the rejection itself (C2, C1) is recorded as not confirmed. This rejection is R1. "
+        + FORM_C.format(id="C2", task=task.id, note=note.id)
+    )
+    amend(w, add_acceptance=["Names the week it covers"], remove_acceptance=["At most 600 words"])  # C1 is no longer current: the next reading skips it
+    task, second = rejected(w, "Again.", topic="b", criterion=["C1", "C3"])
+    assert w.steps.feedback_step(second).endswith(FORM_C.format(id="C3", task=task.id, note=second.id))
+
+
+def test_a_reading_rj_gives_same_as_rj_a_one_off(w: ReflectionWorld) -> None:
+    rejected(w, "First.", topic="a")
+    task, second = rejected(w, "Second.", topic="b", criterion=["R1"])
+    assert w.steps.feedback_step(second) == (
+        "The criterion on the rejection itself (R1) is recorded as not confirmed. This rejection is R2. "
+        + FORM_R.format(id="R1", task=task.id, note=second.id)
+    )
+
+
+def test_no_reading_or_none_gives_the_third_form_listing_the_ids_and_no_ck_is_one_of(w: ReflectionWorld) -> None:
+    rejected(w, "First.", topic="a")
+    task, plain = rejected(w, "Second.", topic="b")
+    expected = FORM_NONE.format(criteria="C1, C2", repeat=REPEAT.format(rejections="R1"), task=task.id, note=plain.id)
+    assert w.steps.feedback_step(plain) == "This rejection is R2. " + expected
+    assert "C<k> is one of" not in expected and "with <its id> one of C1, C2" in expected
+
+
+@pytest.mark.parametrize("ids", [["none"], ["C9"], ["R1"]], ids=["none", "an-id-the-service-lacks", "the-rejection-itself"])
+def test_an_id_that_is_no_reading_gives_the_third_form(w: ReflectionWorld, ids: list[str]) -> None:
+    task, note = rejected(w, criterion=ids)  # the first rejection: no earlier R<j>, and none, C9 and R1 (itself) name no criterion in force
     text = w.steps.feedback_step(note)
-    assert text.startswith("This rejection is R1. Next, before define_service: ") and "or an earlier rejection (none), e.g." in text
+    assert text.endswith(FORM_NONE.format(criteria="C1, C2", repeat="", task=task.id, note=note.id))
+    assert f"The criterion on the rejection itself ({ids[0]}) is recorded as not confirmed. " in text and "C<k> is one of" not in text
+
+
+def test_no_earlier_rejection_leaves_out_the_repeat_sentence(w: ReflectionWorld) -> None:
+    task, note = rejected(w)
+    text = w.steps.feedback_step(note)
+    assert text == "This rejection is R1. " + FORM_NONE.format(criteria="C1, C2", repeat="", task=task.id, note=note.id)
+    assert "for a repeat" not in text and "R<j> one of" not in text
+
+
+def test_question_for_is_the_quoted_question_of_the_reply(w: ReflectionWorld) -> None:
+    from hirearchy.reflection._steps import question_for
+
+    _, first = rejected(w, "First.", topic="a")
+    _, with_c = rejected(w, "Second.", topic="b", criterion=["C2"])
+    _, with_r = rejected(w, "Third.", topic="c", criterion=["R1"])
+    criteria, earlier = ["C1", "C2"], ["R1", "R2"]
+    ask_c = 'About C2: add "<the rule, in their words>" as a lasting rule? Yes or no.'
+    ask_r = "Same as R1: a one-off? Yes or no."
+    ask_none = 'About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.'
+    assert question_for(with_c, criteria, earlier) == ask_c and question_for(with_r, criteria, earlier) == ask_r
+    assert question_for(first, criteria, earlier) == ask_none
+    assert f'in these words: "{ask_c}"' in w.steps.feedback_step(with_c) and f'in these words: "{ask_r}"' in w.steps.feedback_step(with_r)
+    assert f'names the criterion you read the rejection as: "{ask_none}"' in w.steps.feedback_step(first)  # the third form quotes it the same way
+    assert question_for(with_c, ["C1"], earlier) == ask_none  # C2 is not a criterion in force: no reading
 
 
 def test_feedback_step_says_an_own_criterion_is_not_confirmed(w: ReflectionWorld) -> None:
     task, note = rejected(w, criterion=["C2"])
     text = w.steps.feedback_step(note)
-    assert text.startswith("The criterion on the rejection itself (C2) is recorded as not confirmed. This rejection is R1. Next, ")
+    assert text.startswith("The criterion on the rejection itself (C2) is recorded as not confirmed. This rejection is R1. Next: ")
     assert f'confirms="{note.id}"' in text
 
 

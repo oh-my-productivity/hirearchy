@@ -657,3 +657,19 @@ def test_answered_is_the_first_human_link_note_on_it(w: ReflectionWorld, evidenc
     note_on(w, task, reply_to=verdict.id, source="human", criterion="none")  # a correction: the first human link stays the answer
     assert relayed.id < first.id
     assert evidence.amendment_basis("ceo", SERVICE).rejections[0].answered == first.id
+
+
+def test_the_basis_question_is_the_replys_question(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    """``Rejection.question`` is the question of the reply that followed the rejection, byte for byte, with its ids filled in."""
+    _, plain = rejected(w, "First.", source="human")
+    _, with_c = rejected(w, "Second.", topic="b", source="human")
+    task = ask(w, "c")
+    deliver(w, task)
+    by_c = rate(w, task, "reject", "Third.", criterion=["C2"])
+    rejections = evidence.amendment_basis("ceo", SERVICE).rejections
+    assert [r.note for r in rejections] == [plain.id, with_c.id, by_c.id]
+    third = rejections[2]
+    assert third.question == 'About C2: add "<the rule, in their words>" as a lasting rule? Yes or no.'
+    assert f'in these words: "{third.question}"' in w.steps.feedback_step(by_c)
+    assert rejections[0].question == 'About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.'
+    assert f'names the criterion you read the rejection as: "{rejections[0].question}"' in w.steps.feedback_step(plain)
