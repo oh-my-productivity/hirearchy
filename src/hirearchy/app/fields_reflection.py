@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..reflection import CaseHistory, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
+from ..reflection import CaseHistory, DeliverableChecks, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
 
 STEP: str | None = "C-reflection"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {
@@ -19,3 +19,4 @@ class Fields:
     service_reports: ServiceReports
     service_prompt_sections: ServicePromptSections
     service_steps: ServiceSteps
+    deliverable_checks: DeliverableChecks

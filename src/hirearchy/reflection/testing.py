@@ -3,17 +3,21 @@
 ``ReflectionWorld`` is what a test gets: the ports of the package built over one organization (the agents, mailboxes, services, settings and clock of
 ``services``' world, and the run logs of ``runs``' harness), and the means to prepare it. The run logs are stamped by the clock of the messages, so
 that a window of a case contains exactly the runs a test made in it. ``FixedCaseHistory`` is the history a test puts in, for the consumers of
-``CaseHistory`` (``progress``, ``dashdata``, ``prompts``).
+``CaseHistory`` (``progress``, ``dashdata``, ``prompts``); ``FixedDeliverableChecks`` the findings of a deliverable folder, for the consumers of
+``DeliverableChecks`` (``progress``, ``mcp_server``). ``MemoryDeliverableFolder``, ``FixedCheckedVersions`` and ``HashBlobIds`` are the three ports
+``FolderDeliverableChecks`` is built from, in memory.
 """
 
 from __future__ import annotations
 
+import hashlib
+import os
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
-from ..kernel import STAMP_FORMAT, Message, OrgPaths
+from ..kernel import ROOT, STAMP_FORMAT, Message, OrgPaths
 from ..runs import RunLogReader
 from ..runs.testing import RunsHarness, fs_runs, memory_runs
 from ..services import ServiceEvidence
@@ -21,16 +25,18 @@ from ..services.testing import ServicesWorld
 from ..services.testing import fs_world as services_fs_world
 from ..services.testing import memory_world as services_memory_world
 from ._cases import DerivedCaseHistory
+from ._deliverable_checks import FolderDeliverableChecks
+from ._deliverables import FsDeliverableFolder
 from ._digest import DigestBuilder
 from ._evidence import CaseServiceEvidence
 from ._files import OrgServicePaths
-from ._ports import RejectedServices, ServicePaths
+from ._ports import BlobIds, CheckedVersions, DeliverableFolder, FolderFile, FolderRead, Located, RejectedServices, ServicePaths
 from ._reports import TextServiceReports
 from ._runs import LogRunCounter
 from ._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection, RegressionListSection
 from ._steps import TextServiceSteps
 from ._timeline import StorePlaybookTimelines
-from .api import Case, CaseHistory, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
+from .api import Case, CaseHistory, DeliverableChecks, DeliverableFinding, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
 
 # ------------------------------------------------------------------------------ the fake history
 
@@ -52,6 +58,111 @@ class FixedCaseHistory(CaseHistory):
         return list(self._timelines.get((owner, service), []))
 
 
+class FixedDeliverableChecks(DeliverableChecks):
+    """The findings a test puts in, by actor; ``findings`` answers them (only those of ``service`` when it is given)."""
+
+    def __init__(self, findings: Mapping[str, Sequence[DeliverableFinding]] | None = None) -> None:
+        self._by_actor = {actor: list(found) for actor, found in (findings or {}).items()}
+
+    def put(self, actor: str, *found: DeliverableFinding) -> None:
+        self._by_actor.setdefault(actor, []).extend(found)
+
+    def findings(self, actor: str, service: str | None = None) -> list[DeliverableFinding]:
+        return [f for f in self._by_actor.get(actor, []) if service is None or service in f.services]
+
+
+class HashBlobIds(BlobIds):
+    """Git's blob ids, computed here (a copy of ``snapshots.blob_id``, which ``reflection`` may not import; the test of ``app``'s ``GitBlobIds``
+    compares the real one with ``git hash-object``)."""
+
+    def of(self, data: bytes, hexlen: int) -> str:
+        digest = hashlib.sha1 if hexlen == 40 else hashlib.sha256
+        return digest(b"blob %d\0" % len(data) + data, usedforsecurity=False).hexdigest()
+
+
+def blob(data: bytes, hexlen: int = 40) -> str:
+    """The blob id of ``data``, as the fakes of this module compute it."""
+    return HashBlobIds().of(data, hexlen)
+
+
+class MemoryDeliverableFolder(DeliverableFolder):
+    """Deliverable places in memory, by absolute path: ``folder`` and ``file`` put what a read answers, ``states`` overrides what is there (``link``,
+    ``unreadable``). ``reads`` and ``budgets`` record every read. A file named inside a folder that is put is a ``file`` place too."""
+
+    def __init__(self) -> None:
+        self.places: dict[str, FolderRead] = {}
+        self.states: dict[str, str] = {}
+        self.reads: list[str] = []
+        self.budgets: list[int] = []
+
+    def folder(self, path: str, files: Mapping[str, tuple[bytes, int]], *, used: int = 0) -> None:
+        """``path`` is a folder holding ``files`` (name -> (content, last write in microseconds))."""
+        listed = tuple(FolderFile(name, "file", data, stamp) for name, (data, stamp) in sorted(files.items()))
+        self.places[path] = FolderRead("folder", path, listed, used=used)
+
+    def file(self, path: str, data: bytes, mtime_us: int) -> None:
+        """``path`` is a file with this content."""
+        folder, _, name = path.rpartition("/")
+        self.places[path] = FolderRead("file", folder, (FolderFile(name, "file", data, mtime_us),), used=len(data))
+
+    def put(self, path: str, read: FolderRead) -> None:
+        self.places[path] = read
+
+    def locate(self, raw: object) -> Located | None:
+        if not isinstance(raw, str) or not raw.startswith("/"):
+            return None
+        return Located(Path(raw), Path(raw))
+
+    def kind(self, place: Located) -> str:
+        return self._answer(str(place.target)).state
+
+    def read(self, place: Located, budget: int) -> FolderRead:
+        self.reads.append(str(place.target))
+        self.budgets.append(budget)
+        return self._answer(str(place.target))
+
+    def _answer(self, path: str) -> FolderRead:
+        if path in self.states:
+            state = self.states[path]
+            return FolderRead(state, path, error="Permission denied" if state == "unreadable" else "")
+        if path in self.places:
+            return self.places[path]
+        folder, _, name = path.rpartition("/")
+        found = self.places.get(folder)
+        if found is not None and found.state == "folder":
+            listed = next((f for f in found.files if f.name == name and f.kind == "file"), None)
+            if listed is not None:  # a file named inside a folder that is there
+                return FolderRead("file", folder, (listed,), used=len(listed.data))
+        return FolderRead("missing", path)
+
+
+class FixedCheckedVersions(CheckedVersions):
+    """The team's checked versions a test puts in: ``at`` by (result id, path) -> (commit, blob id), ``now`` by path -> blob id. ``asked`` and
+    ``currents`` record the questions, in order."""
+
+    def __init__(
+        self, at: Mapping[tuple[str, str], tuple[str, str]] | None = None, now: Mapping[str, str] | None = None,
+        texts: Mapping[tuple[str, str], bytes] | None = None,
+    ) -> None:
+        self.at = dict(at or {})
+        self.now = dict(now or {})
+        self.texts = dict(texts or {})
+        self.asked: list[tuple[str, str]] = []
+        self.currents: list[tuple[str, int]] = []
+
+    def at_result(self, result: Message, path: str) -> tuple[str, str] | None:
+        self.asked.append((result.id, path))
+        return self.at.get((result.id, path))
+
+    def current(self, path: str, hexlen: int) -> str | None:
+        self.currents.append((path, hexlen))
+        return self.now.get(path)
+
+    def text(self, commit: str, path: str, limit: int) -> bytes | None:
+        data = self.texts.get((commit, path))
+        return data if data is not None and len(data) <= limit else None
+
+
 # ------------------------------------------------------------------------------ the worlds
 
 
@@ -70,9 +181,10 @@ class ReflectionWorld:
     s: ServicesWorld  # the organization behind the ports: services, agents, mail, settings, the clock
     runs: RunLogReader  # the run logs the history counts
     use_run: Callable[[str], None]  # the agent makes one run: a log stamped now, by the clock of the messages
+    deliverables: DeliverableChecks  # the checks of the deliverable folders over this world's cases (no checked versions: git knows nothing here)
 
 
-def _world(s: ServicesWorld, runs: RunsHarness) -> ReflectionWorld:
+def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder) -> ReflectionWorld:
     d = s.d
     paths = OrgServicePaths(OrgPaths(d.root))
     history = DerivedCaseHistory(s.catalog, d.agents, d.mail, s.hints, StorePlaybookTimelines(s.store), LogRunCounter(runs.reader))
@@ -91,15 +203,16 @@ def _world(s: ServicesWorld, runs: RunsHarness) -> ReflectionWorld:
     return ReflectionWorld(
         history=history, digest=digest, reports=TextServiceReports(d.agents, s.catalog, history, paths), sections=sections,
         steps=TextServiceSteps(d.agents, s.catalog, history, d.mail), rejections=rejections, evidence=CaseServiceEvidence(history, s.catalog), paths=paths, s=s, runs=runs.reader, use_run=use_run,
+        deliverables=FolderDeliverableChecks(s.catalog, history, d.mail, folders, FixedCheckedVersions(), HashBlobIds(), d.clock),
     )
 
 
 def fs_world(tmp_path: Path) -> ReflectionWorld:
-    return _world(services_fs_world(tmp_path), fs_runs(tmp_path))
+    return _world(services_fs_world(tmp_path), fs_runs(tmp_path), FsDeliverableFolder())
 
 
 def memory_world(tmp_path: Path) -> ReflectionWorld:
-    return _world(services_memory_world(tmp_path), memory_runs(tmp_path))
+    return _world(services_memory_world(tmp_path), memory_runs(tmp_path), MemoryDeliverableFolder())
 
 
 def history_fs(tmp_path: Path) -> CaseHistory:
@@ -142,6 +255,46 @@ def steps_memory(tmp_path: Path) -> ServiceSteps:
     return memory_world(tmp_path).steps
 
 
+@dataclass(frozen=True)
+class DeliverableHarness:
+    """A ``DeliverableChecks`` and the means to give it one finding: after ``populate``, root's ``weekly-brief`` has exactly one: ``x.md``, a file the
+    team never wrote (``unknown``)."""
+
+    checks: DeliverableChecks
+    populate: Callable[[], None]
+    service: str
+
+
+SERVICE = "weekly-brief"
+
+
+def deliverable_checks_fs(tmp_path: Path) -> DeliverableHarness:
+    """The real checks over the fs world, with a real deliverable folder."""
+    w = fs_world(tmp_path)
+    folder = tmp_path / "deliverables"
+
+    def populate() -> None:
+        w.s.d.agent("ceo", True)
+        w.s.d.agent("ceo/eng", False)
+        w.s.commands.define_service(
+            ROOT, "ceo", SERVICE, description="A brief.", inputs=[], acceptance=["At most 600 words"],
+            deliverable={"description": "one markdown file", "path": str(folder)}, budget=10,
+        )
+        folder.mkdir()
+        written = folder / "x.md"
+        written.write_text("somebody's file\n", encoding="utf-8")
+        later = w.s.d.clock.now() + timedelta(days=1)  # the clock of the messages is a fake: a file written "now" must be after the contract
+        os.utime(written, ns=(int(later.timestamp() * 1e9),) * 2)
+
+    return DeliverableHarness(w.deliverables, populate, SERVICE)
+
+
+def deliverable_checks_fixed(tmp_path: Path) -> DeliverableHarness:
+    fixed = FixedDeliverableChecks()
+    finding = DeliverableFinding(folder=str(tmp_path / "deliverables"), services=(SERVICE,), name="x.md", kind="unknown")
+    return DeliverableHarness(fixed, lambda: fixed.put(ROOT, finding), SERVICE)
+
+
 PURE = {"StatsReport"}  # data with derived views (counts that print themselves): one implementation, no fake
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
@@ -150,4 +303,5 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     ServiceReports: [reports_fs, reports_memory],
     ServicePromptSections: [sections_fs, sections_memory],
     ServiceSteps: [steps_fs, steps_memory],
+    DeliverableChecks: [deliverable_checks_fs, deliverable_checks_fixed],
 }

@@ -7,6 +7,7 @@ passes them. The last four are the parts the sections of the run prompt are made
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Protocol, runtime_checkable
@@ -109,4 +110,82 @@ class RegressionSection(Protocol):
 class ServicesListing(Protocol):
     def listing(self, addr: str, owned: Sequence[Contract]) -> str:
         """The opening of the prompt's services: who writes what, then one line per service ``addr`` owns (contract, playbook, requests so far, files)."""
+        ...
+
+
+# ------------------------------------------------------------------------------------------------------------------------ deliverable folders
+
+
+@dataclass(frozen=True)
+class Located:
+    """The place a contract's ``deliverable.path`` names, before anything of it is opened."""
+
+    target: Path  # absolute, normalized and resolved as it was when this was made
+    named: Path  # absolute and normalized lexically: what the contract says
+    link: bool = False  # the named path is itself a symbolic link
+
+
+@dataclass(frozen=True)
+class FolderFile:
+    """One file of a deliverable folder, as read (the bytes never leave the process: the caller keeps their blob id)."""
+
+    name: str
+    kind: str  # "file" | "link" | "large" | "limit" | "unreadable"
+    data: bytes = b""  # "file": the content (at most 4 MiB)
+    mtime_us: int = 0  # the file's last write, in microseconds since the epoch
+    error: str = ""  # "unreadable": the operating system's words for it (never the file's name)
+
+
+@dataclass(frozen=True)
+class FolderRead:
+    """What reading a place gave: a folder (its direct files, sorted by name), one file, or why nothing was read."""
+
+    state: str  # "folder" | "file" | "link" | "unreadable" | "missing"
+    folder: str  # the folder read (a file: the folder it is in; a link: the place the contract names)
+    files: tuple[FolderFile, ...] = ()
+    error: str = ""  # "unreadable": the operating system's words for it
+    used: int = 0  # bytes of content read, against the budget of one call
+
+
+@runtime_checkable
+class DeliverableFolder(Protocol):
+    """The only way into a contract's deliverable folder (or file): nothing outside the place it names is opened."""
+
+    def locate(self, raw: object) -> Located | None:
+        """The place ``raw`` (a contract's ``deliverable.path``) names; None when it is not an absolute path."""
+        ...
+
+    def kind(self, place: Located) -> str:
+        """What is there now: ``folder``, ``file``, ``link`` (the place, or a part of the way to it, is a link), ``unreadable`` (the folder cannot be
+        opened) or ``missing``. Nothing is read."""
+        ...
+
+    def read(self, place: Located, budget: int) -> FolderRead:
+        """The place, read: the direct files of a folder (at most 200, hidden ones left out) or the one file, at most 4 MiB each and ``budget``
+        bytes in all. Never raises."""
+        ...
+
+
+@runtime_checkable
+class CheckedVersions(Protocol):
+    """What the team delivered, as git and the organization's files know it."""
+
+    def at_result(self, result: Message, path: str) -> tuple[str, str] | None:
+        """``(commit, blob id)`` of ``path`` (relative to the organization) at the first commit that holds ``result``'s sent copy; None when unknown."""
+        ...
+
+    def current(self, path: str, hexlen: int) -> str | None:
+        """The blob id (``hexlen`` 40 or 64: the object format of the ids it is compared with) of the organization's file now; None when it is
+        missing, not a regular file, larger than 4 MiB, or reached through a link or outside the organization."""
+        ...
+
+    def text(self, commit: str, path: str, limit: int) -> bytes | None:
+        """The bytes of ``path`` at ``commit``; None when absent or larger than ``limit`` bytes."""
+        ...
+
+
+@runtime_checkable
+class BlobIds(Protocol):
+    def of(self, data: bytes, hexlen: int) -> str:
+        """The git blob id of ``data`` in an object format of ``hexlen`` hex digits (40 or 64)."""
         ...

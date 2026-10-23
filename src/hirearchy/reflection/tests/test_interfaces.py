@@ -5,6 +5,7 @@ from __future__ import annotations
 import hirearchy.reflection as reflection
 from hirearchy.reflection import (
     CaseHistory,
+    DeliverableChecks,
     ReflectionDigest,
     ServicePromptSections,
     ServiceReports,
@@ -13,9 +14,14 @@ from hirearchy.reflection import (
     api,
 )
 from hirearchy.reflection._cases import DerivedCaseHistory
+from hirearchy.reflection._deliverable_checks import FolderDeliverableChecks
+from hirearchy.reflection._deliverables import FsDeliverableFolder
 from hirearchy.reflection._digest import DigestBuilder
 from hirearchy.reflection._files import OrgServicePaths
 from hirearchy.reflection._ports import (
+    BlobIds,
+    CheckedVersions,
+    DeliverableFolder,
     PlaybookSection,
     PlaybookTimelines,
     RegressionSection,
@@ -29,7 +35,7 @@ from hirearchy.reflection._reports import TextServiceReports
 from hirearchy.reflection._runs import LogRunCounter
 from hirearchy.reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection, RegressionListSection
 from hirearchy.reflection._timeline import StorePlaybookTimelines
-from hirearchy.reflection.testing import FixedCaseHistory
+from hirearchy.reflection.testing import FixedCaseHistory, FixedCheckedVersions, FixedDeliverableChecks, HashBlobIds, MemoryDeliverableFolder
 
 
 def test_the_counts_subclass_their_port() -> None:
@@ -41,6 +47,7 @@ def test_each_port_has_its_implementation() -> None:
     assert ReflectionDigest in DigestBuilder.__mro__
     assert ServiceReports in TextServiceReports.__mro__
     assert ServicePromptSections in OwnerPromptSections.__mro__
+    assert DeliverableChecks in FolderDeliverableChecks.__mro__ and DeliverableChecks in FixedDeliverableChecks.__mro__
 
 
 def test_each_role_inside_the_package_has_its_implementation() -> None:
@@ -52,6 +59,9 @@ def test_each_role_inside_the_package_has_its_implementation() -> None:
     assert PlaybookSection in QuotedPlaybookSection.__mro__
     assert ReflectSection in EvidenceReflectSection.__mro__
     assert ServicesListing in OwnedServicesListing.__mro__
+    assert DeliverableFolder in FsDeliverableFolder.__mro__ and DeliverableFolder in MemoryDeliverableFolder.__mro__
+    assert CheckedVersions in FixedCheckedVersions.__mro__
+    assert BlobIds in HashBlobIds.__mro__
 
 
 def test_the_package_exports_the_api_and_nothing_else() -> None:

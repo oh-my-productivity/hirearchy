@@ -19,13 +19,16 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Protocol, runtime_checkable
 
-from ..kernel import Message, client_questions, msg_time
+from ..kernel import Message, clip_line, client_questions, msg_time
 from ..services import Criterion
+from ._deliverables import FOLDER_SHOWN, NAME_SHOWN, shown_name
 
 __all__ = [
     "Assertion",
     "Case",
     "CaseHistory",
+    "DeliverableChecks",
+    "DeliverableFinding",
     "ReflectionDigest",
     "ServicePromptSections",
     "ServiceReports",
@@ -36,6 +39,7 @@ __all__ = [
     "case_spend",
     "confirmed_criteria",
     "delivered_unrated",
+    "deliverables_note",
     "lessons_of",
     "questions_open",
     "rated",
@@ -373,3 +377,87 @@ class ServicePromptSections(Protocol):
 
         Each section starts and ends with a newline, to be appended after the notice and before "# New messages"."""
         ...
+
+
+@dataclass(frozen=True)
+class DeliverableFinding:
+    """One thing the check found in a contract's deliverable folder (or at its file): a file the team did not deliver as checked, or a place it could
+    not read."""
+
+    folder: str  # the folder as resolved (for a contract that names a file: that file's folder)
+    services: tuple[str, ...]  # every service whose contract names this folder (or this file), sorted
+    name: str  # the file name inside it ("" for the folder itself)
+    kind: str  # "differs" | "unknown" | "link" | "large" | "limit" | "unreadable"
+    artifact: str = ""  # the team's artifact it was compared with ("" unless "differs")
+    task: str = ""  # the task whose done result last listed that artifact ("" unless "differs")
+    withheld: bool = False  # that result still has open client questions (``questions_open`` > 0): its artifact path is not shown
+    error: str = ""  # for "unreadable": the operating system's words for it
+    file: bool = False  # the contract names this file itself, not a folder
+
+
+@runtime_checkable
+class DeliverableChecks(Protocol):
+    def findings(self, actor: str, service: str | None = None) -> list[DeliverableFinding]:
+        """The files in the deliverable folders (``deliverable.path`` of the contracts) of the services ``actor`` requests (or only the folder of
+        ``service``) that differ from the team's last checked version, that the team never wrote, or that could not be read; the ones the user's own
+        verdict settled are left out. Never reads outside a folder; never raises for an unreadable folder, file or history (a catalog or a mailbox
+        that cannot be read does raise ``OrgError`` or ``OSError``)."""
+        ...
+
+
+_NOTE_HEAD = "Tell the user what changed and why; never patch a deliverable yourself (send it back with revises):"
+_NOTE_LINES = 10  # file lines of one block that are shown; the rest is counted
+
+
+def _what(f: DeliverableFinding) -> str:
+    """What is wrong with the file, in words (the part of a line after the name)."""
+    if f.kind == "differs":
+        if f.withheld:
+            return f"differs from the team's checked version (task {f.task}; path withheld: ask first)"
+        return f"differs from {clip_line(f.artifact, FOLDER_SHOWN)} as the team checked it (task {f.task})"
+    if f.kind == "unknown":
+        return "never written by the team"
+    if f.kind == "link":
+        return "a link, not read (hirearchy reads only files inside the folder)"
+    if f.kind == "large":
+        return "not read (larger than 4 MiB)"
+    if f.kind == "limit":
+        return "not read (this check reads at most 32 MiB in all)"
+    return f"cannot be read ({clip_line(f.error, NAME_SHOWN)})" if f.kind == "unreadable" else f.kind
+
+
+def _services(f: DeliverableFinding) -> str:
+    return ("service " if len(f.services) == 1 else "services ") + ", ".join(f"`{name}`" for name in f.services)
+
+
+def _block(key: tuple[str, tuple[str, ...]], found: Sequence[DeliverableFinding]) -> list[str]:
+    """The block of a folder: its heading, at most 10 file lines, and the count of the rest."""
+    folder, _ = key
+    lines = [f"Deliverable folder {shown_name(folder, FOLDER_SHOWN)} ({_services(found[0])}): {len(found)} file(s) the team did not deliver as checked. {_NOTE_HEAD}"]
+    lines += [f"- {shown_name(f.name, NAME_SHOWN)}: {_what(f)}" for f in found[:_NOTE_LINES]]
+    if len(found) > _NOTE_LINES:
+        lines.append(f"- and {len(found) - _NOTE_LINES} more")
+    return lines
+
+
+def deliverables_note(findings: Sequence[DeliverableFinding]) -> str:
+    """The note root reads when files of a deliverable folder are not what the team delivered as checked (pure): one block per folder, at most 10 file
+    lines each; a contract that names a file has a heading of its own, and a folder that cannot be read, or is a link, is one line. ``""`` for none.
+    File names and folders are rendered by :func:`shown_name`: a name is a prompt-injection channel, so it is never shown raw."""
+    entries: list[list[str] | tuple[str, tuple[str, ...]]] = []  # in the order of the findings: lines already made, or the key of a block
+    blocks: dict[tuple[str, tuple[str, ...]], list[DeliverableFinding]] = {}
+    for f in findings:
+        place = shown_name(f.folder, FOLDER_SHOWN)
+        if f.file:
+            heading = f"Deliverable file {shown_name(f'{f.folder}/{f.name}', FOLDER_SHOWN)} ({_services(f)}): it is not what the team delivered as checked. {_NOTE_HEAD}"
+            entries.append([heading, f"- {_what(f)}"])
+        elif not f.name and f.kind == "unreadable":
+            entries.append([f"Deliverable folder {place} ({_services(f)}) cannot be read ({clip_line(f.error, NAME_SHOWN)})."])
+        elif not f.name and f.kind == "link":
+            entries.append([f"Deliverable folder {place} ({_services(f)}) is a link: not read (hirearchy reads only the folder the contract names)."])
+        else:
+            key = (f.folder, f.services)
+            if key not in blocks:
+                entries.append(key)
+            blocks.setdefault(key, []).append(f)
+    return "\n".join(line for entry in entries for line in (_block(entry, blocks[entry]) if isinstance(entry, tuple) else entry))
