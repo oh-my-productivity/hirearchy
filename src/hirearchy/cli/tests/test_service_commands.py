@@ -75,6 +75,9 @@ def test_cli_commands(org, capsys, tmp_path):
     with pytest.raises(SystemExit):
         cli(org, "request", "weekly-brief", "--input", "no-equals-sign")
     assert "key=value" in capsys.readouterr().err
+    rejected = [m for m in org.sent(ROOT) if m.feedback][-1]
+    cli(org, "feedback", task.id, "reject", "--note", "A one-off.", "--source", "human", "--confirms", rejected.id, "--criterion", "none")  # its answer
+    capsys.readouterr()
     cli(org, "retire-service", "ceo", "weekly-brief", "--reason", "done with it")
     assert "retired service" in capsys.readouterr().out and org.service_names("ceo") == []
     log = __import__("subprocess").run(["git", "log", "--format=%s"], cwd=org.root, capture_output=True, text=True).stdout

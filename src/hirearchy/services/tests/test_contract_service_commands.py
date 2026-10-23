@@ -11,7 +11,7 @@ from typing import Any
 import pytest
 
 from hirearchy.kernel import Message, OrgError, split_frontmatter
-from hirearchy.services import FEEDBACK_HEADER, LINK_HEADER, ServiceCommands
+from hirearchy.services import FEEDBACK_HEADER, LINK_HEADER, AmendmentBasis, Rejection, ServiceCommands
 from hirearchy.services.testing import IMPLEMENTATIONS, AdmittingServiceEvidence, RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
 
 from ._support import BRIEF, STEPS, amend, answer, define, grant, implementations, make, populated, request, write_version
@@ -451,6 +451,28 @@ def test_a_retired_service_can_be_defined_again_as_a_new_one(w: ServicesWorld) -
     define(w)
     w.commands.retire_service("root", "ceo", "weekly-brief", "redo")
     assert define(w).startswith("defined service `weekly-brief` (contract v1)")
+
+
+def test_retire_service_refuses_while_the_record_is_incomplete(factory: Any, tmp_path: Path) -> None:
+    """Root retires a service only after its verdicts and answers (design 5.2a): the gate reads the record of the world's evidence, a delivery
+    without a verdict first, then a rejection without an answer, and an agent client retiring its report's service is not asked."""
+    rejection = Rejection("20261018T100000000001-ceo-0001", "R1", "20261018T090000000001-root-0001", "Brief: ai", (), "Too long.", "")
+    unrated = AdmittingServiceEvidence(basis=AmendmentBasis((rejection,), ("20261018T090000000002-root-0002",)))
+    w = populated(factory(tmp_path, unrated))
+    define(w)
+    with pytest.raises(OrgError, match=r"refused: 1 delivered request\(s\) of `weekly-brief` have no verdict yet: 20261018T090000000002-root-0002\. .*Nothing was retired\.$"):
+        w.commands.retire_service("root", "ceo", "weekly-brief", "redo")
+    (tmp_path / "open").mkdir()
+    open_ = populated(factory(tmp_path / "open", AdmittingServiceEvidence(basis=AmendmentBasis((rejection,), ()))))
+    define(open_)
+    with pytest.raises(OrgError, match=r"refused: rejection R1 \(message 20261018T100000000001-ceo-0001\) on task .* of `weekly-brief` has no answer yet\..*Nothing was retired\.$"):
+        open_.commands.retire_service("root", "ceo", "weekly-brief", "redo")
+    for refused in (w, open_):
+        assert refused.catalog.service_names("ceo") == ["weekly-brief"] and refused.d.inbox("ceo") == []
+        assert not [e for e in refused.events.events if e.kind == "service.retire"]
+    define(w, owner="ceo/eng", name="inner", actor="ceo")
+    text = w.commands.retire_service("ceo", "ceo/eng", "inner", "done")
+    assert text.startswith("retired service `inner` of ceo/eng; files kept at ceo/eng/services/.retired/inner-")
 
 
 # ============================================================================================== revise the playbook

@@ -47,6 +47,7 @@ def test_a_service_is_defined_requested_answered_rated_revised_and_retired(org: 
     note = org.feedback("root", task.id, "reject", "Too long.", source="human")
     assert (note.type, note.wake, note.feedback, note.reply_to, note.source) == ("note", False, "reject", task.id, "human")
     assert org.feedback("root", task.id, "accept").source == "relayed"  # a root verdict is the user's own only when it says so
+    org.feedback("root", task.id, "reject", "A one-off.", source="human", criterion=["none"], confirms=note.id)  # the rejection has its answer: only then is it retired
     assert org.revise_playbook("ceo", "weekly-brief", "1. Search.\n2. Write.", "after the rejection", []) == 1
     assert org.retire_service("root", "ceo", "weekly-brief", "done with it").startswith("retired service `weekly-brief` of ceo; files kept at ")
     assert org.service_names("ceo") == []

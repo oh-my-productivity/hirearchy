@@ -178,6 +178,7 @@ def test_requests_from_before_a_service_was_retired_are_not_cases_of_the_new_one
     org = svc
     old = request(org)
     deliver(org, "ceo", old)
+    org.feedback(ROOT, old.id, "accept", "dropped", source="relayed")  # a service is retired only after the verdict on its delivery (design 5.2a)
     org.retire_service(ROOT, "ceo", "weekly-brief", "redo")
     time.sleep(0.002)
     define(org)

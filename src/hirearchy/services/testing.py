@@ -280,7 +280,7 @@ def _world(
         RuleContractDefiner(
             d.agents, catalog, store, places, normalizer, ContractAmender(), texts, owners, playbooks, notes, d.clock, events, gate, link_notes,
         ),
-        RuleServiceRetirement(d.agents, catalog, store, owners, notes, d.clock, events),
+        RuleServiceRetirement(d.agents, catalog, store, owners, notes, d.clock, events, gate),
         RulePlaybookReviser(d.agents, catalog, texts, playbooks, notes, gate),
         RuleServiceRequester(d.agents, catalog, d.mail, TextRequestBodies(), d.sender),
         RuleClientFeedback(d.agents, d.mail, d.sender, gate, store),

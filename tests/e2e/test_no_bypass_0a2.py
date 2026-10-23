@@ -267,3 +267,65 @@ def test_p2_gate_refusals_on_every_surface(svc, capsys, surface, case):
     refused_it, got = amend_on(svc, surface, capsys, **kw)
     assert refused_it and text in got, got
     assert state(svc) == before
+
+
+# ------------------------------------------------------------------------------------------------------------ P2: retire_service (plan 7.3, commit 17)
+def retire_on(org, surface: str, capsys) -> tuple[bool, str]:
+    """root's ``retire_service`` of ``weekly-brief`` on ``surface`` (the CLI or the Org facade): (refused, the reply or the refusal text)."""
+    try:
+        if surface == "cli":
+            capsys.readouterr()
+            try:
+                cli(org, "retire-service", "ceo", SERVICE, "--reason", "not needed")
+            except SystemExit:
+                return True, capsys.readouterr().err
+            return False, capsys.readouterr().out
+        return False, org.retire_service(ROOT, "ceo", SERVICE, "not needed")
+    except Exception as error:  # noqa: BLE001  (a refusal)
+        return True, str(error)
+
+
+@pytest.mark.parametrize("surface", ["cli", "org"])
+@pytest.mark.parametrize("case", ["unrated", "open"])
+def test_retire_service_gate_on_every_surface(svc, capsys, surface, case):
+    """P2-RETIRE-UNRATED and P2-RETIRE-OPEN: the same text from the CLI ``retire-service`` and the Org facade, and the service stays where it is,
+    with nobody told. The two doors are all there are: root's MCP surface has no tool that retires a service (pinned below)."""
+    if case == "unrated":
+        task = request(svc)
+        deliver(svc, "ceo", task)
+        text = (
+            f"refused: 1 delivered request(s) of `weekly-brief` have no verdict yet: {task.id}. Record the user's verdict on each with feedback "
+            "first (CLI: hirearchy feedback <task id> accept|reject --note ...); a service is retired only after its verdicts, so that its record "
+            "stays complete. Nothing was retired."
+        )
+    else:
+        task, no = rejection(svc)
+        text = (
+            f"refused: rejection R1 (message {no.id}) on task {task.id} of `weekly-brief` has no answer yet. Ask the user the one question first "
+            '(About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.) and record the answer: '
+            f'define_service(..., answers="{no.id}", about=<the id you asked about>, words=<their answer, verbatim>) on yes '
+            "(CLI: --answers, --about, --words), "
+            f'feedback(task_id="{task.id}", verdict="reject", confirms="{no.id}", criterion=["none"], ["R<j>"] or ["C<k>"], source="human", '
+            "note=<their answer, verbatim>) otherwise (CLI: --confirms, --criterion, --source human, --note). A service is retired only after its "
+            "rejections are answered. Nothing was retired."
+        )
+    before = state(svc)
+    refused_it, got = retire_on(svc, surface, capsys)
+    assert refused_it and text in got, got
+    assert state(svc) == before and svc.service_names("ceo") == [SERVICE]
+    if case == "unrated":
+        svc.feedback(ROOT, task.id, "accept", "fine", source="human")
+    else:
+        svc.feedback(ROOT, task.id, "reject", "A one-off.", source="human", criterion=["none"], confirms=no.id)
+    refused_it, got = retire_on(svc, surface, capsys)
+    assert not refused_it and "retired service `weekly-brief` of ceo" in got, got
+    assert svc.service_names("ceo") == []
+
+
+def test_no_mcp_tool_retires_a_service(svc):
+    """The retirement of a service has two doors, the CLI and the Org facade (above). If an MCP tool ever offers it, it reaches the same rule class
+    and this test must grow that surface."""
+    import asyncio
+
+    names = {t.name for t in asyncio.run(build_server(svc, ROOT).list_tools())}
+    assert "retire_service" not in names and "retire" in names
