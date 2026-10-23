@@ -1967,3 +1967,24 @@ below, which override the sections they name where they conflict. Each is an exp
   34), not in E4.
 - **P6.** B9 before B8; B6k split out of B6 (the replay kit `TESTS/testkit/e4_replay.py` with its own tests); Z0 is new (this amendment). The plan
   numbers section 18's items in 36 commits (18, above).
+
+### A.5 What the implementation of P4 (plan commits 25-29) changed in the text above
+
+No behaviour of 7.1 to 7.7 changed. Five points of how it is built differ from the words of 7.2, 7.5, 7.6 and A.4 P1:
+
+- **The facade sender is a port of its own.** A runtime field is typed by a port, and the runtime builds each port once by its type, so `facade_sender: MessageSender`
+  (A.4 P1) would have been the unguarded `message_sender` again. `dispatch/api.py` has a new Protocol `GuardedSender(MessageSender)` with no method of its own (the
+  sender behind `Org.send`); `GuardedRootSender` implements it, `wire_dispatch` provides it over `MessageSender`, and the field is `facade_sender: GuardedSender`.
+  `GuardedSender` is `PURE` in `dispatch/testing.py` (one implementation, over any sender); `dispatch/tests/test_contract_guarded_sender.py` runs it over the
+  recording fake and the checking sender of two worlds.
+- **`_guarded.py`.** `GuardedRootSender` is in `dispatch/_guarded.py`, not `_root_send.py`: `dispatch/api.py` exports `check_root_send` from `_root_send.py`, and
+  the class needs `api.MessageSender`, so one module for both would import `api` from `api`.
+- **The tier tests that need mail** (7.6: a non-service revised task with a trace, none without a trace, a received task with a final result skipped) are in
+  `services/tests/test_service_rework_context.py`, over the real `ServiceReworkContext`; `dispatch/tests/test_contract_rework_context.py` has the part every
+  implementation, the fakes included, can honour (the fields it may hold, `source` is `human` or `relayed`, never for root).
+- **7.3, a path without text over no history.** With no org-git commit (`commit == ""`) the line reads `### {path}: not included (no org history).` and does not
+  say the path "is in the organization's git history": there is none to point at.
+- **`CaseJudgedVersions` uses `CaseHistory.cases(owner, service)`** to find the case that holds `revises` (the rule class knows the owner and the service, and
+  `case_of` needs the task message); `CheckedVersions` gives `(commit, blob)` as a tuple, so "checked.blob" of 7.2 step 4 is its second item.
+
+The plan's `GuardedRootSender`-in-`_root_send.py` and `facade_sender: MessageSender` wording (plan 3.2 P1, commit 28) is superseded by this section.
