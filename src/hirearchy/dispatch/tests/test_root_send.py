@@ -10,7 +10,7 @@ import pytest
 from hirearchy.delivery.testing import RecordingDelivery
 from hirearchy.dispatch import GuardedSender, MessageSender, check_root_send
 from hirearchy.dispatch._guarded import GuardedRootSender
-from hirearchy.dispatch._root_send import FACADE_ROOT_TASK
+from hirearchy.dispatch._root_send import FACADE_ROOT_TASK, FACADE_ROOT_VERDICT
 from hirearchy.dispatch.testing import RecordingSender
 from hirearchy.kernel import Message, OrgError
 from hirearchy.kernel.testing import FakeClock, SequenceIdGenerator
@@ -21,8 +21,14 @@ TEXT = (
 )
 
 
+VERDICT = (
+    "refused: a verdict or a link from root goes through feedback(...), which applies the rules of a case (a delivered request, one answer per "
+    "rejection). Nothing was sent."
+)
+
+
 def test_the_text_of_the_refusal() -> None:
-    assert FACADE_ROOT_TASK == TEXT
+    assert FACADE_ROOT_TASK == TEXT and FACADE_ROOT_VERDICT == VERDICT
 
 
 @pytest.mark.parametrize("actor", ["root", " /root/ "])
@@ -30,6 +36,20 @@ def test_the_text_of_the_refusal() -> None:
 def test_check_root_send_refuses_a_root_task_with_service_or_revises(actor: str, fields: dict[str, str]) -> None:
     with pytest.raises(OrgError) as refusal:
         check_root_send(actor, "task", fields.get("service"), fields.get("revises"), None, None)
+    assert str(refusal.value) == TEXT
+
+
+@pytest.mark.parametrize("actor", ["root", " /root/ "])
+@pytest.mark.parametrize("fields", [{"feedback": "reject"}, {"feedback": "accept"}, {"criterion": "C1"}, {"feedback": "reject", "criterion": "C1, R2"}])
+def test_check_root_send_refuses_a_root_note_with_feedback_or_criterion(actor: str, fields: dict[str, str]) -> None:
+    with pytest.raises(OrgError) as refusal:
+        check_root_send(actor, "note", None, None, fields.get("feedback"), fields.get("criterion"))
+    assert str(refusal.value) == VERDICT
+
+
+def test_the_task_rule_comes_first_and_a_task_with_a_verdict_field_is_refused_as_a_task() -> None:
+    with pytest.raises(OrgError) as refusal:
+        check_root_send("root", "task", "weekly-brief", None, "reject", "C1")
     assert str(refusal.value) == TEXT
 
 
@@ -45,6 +65,11 @@ def test_check_root_send_refuses_a_root_task_with_service_or_revises(actor: str,
 ])
 def test_other_messages_pass(actor: str, type: str, service: str | None, revises: str | None) -> None:
     check_root_send(actor, type, service, revises, None, None)
+
+
+@pytest.mark.parametrize(("actor", "type"), [("ceo", "note"), ("ceo/eng", "note"), ("root", "task"), ("root", "result"), ("ceo", "task")])
+def test_a_verdict_or_link_field_is_refused_for_root_notes_only(actor: str, type: str) -> None:
+    check_root_send(actor, type, None, None, "reject", "C1")  # an agent's note is refused later, by provenance (S1); a task or result is no verdict
 
 
 class Spy(MessageSender):

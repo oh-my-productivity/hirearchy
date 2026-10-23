@@ -157,3 +157,22 @@ def test_the_facade_sender_of_the_runtime_guards_the_message_sender(org: Org) ->
 
     assert isinstance(org.runtime.facade_sender, GuardedRootSender) and isinstance(org.runtime.facade_sender, GuardedSender)
     assert org.runtime.facade_sender is org.runtime.facade_sender and org.runtime.facade_sender is not org.runtime.message_sender
+
+
+VERDICT_OR_LINK = (
+    "refused: a verdict or a link from root goes through feedback(...), which applies the rules of a case (a delivered request, one answer per "
+    "rejection). Nothing was sent."
+)
+
+
+def test_org_send_refuses_a_root_verdict_or_link(org: Org) -> None:
+    task = org.delegate("root", "ceo", "Work", "Do it.", "Done when it is.", budget=3)
+    sent = len(org.sent("root"))
+    for fields in ({"feedback": "reject"}, {"feedback": "accept", "source": "human"}, {"criterion": "C1", "reply_to": task.id}, {"feedback": "reject", "criterion": "C1", "reply_to": task.id}):
+        with pytest.raises(OrgError) as refusal:
+            org.send("root", "ceo", "words", **fields)  # type: ignore[arg-type]
+        assert str(refusal.value) == VERDICT_OR_LINK
+    assert len(org.sent("root")) == sent
+    assert org.send("root", "ceo", "a plain note", title="fyi").feedback is None  # every other root note still goes
+    with pytest.raises(OrgError, match="only root"):  # an agent's verdict is refused by provenance, as before
+        org.send("ceo", "root", "words", feedback="reject", criterion="C1", reply_to=task.id)

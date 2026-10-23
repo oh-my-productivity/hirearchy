@@ -563,3 +563,25 @@ def test_org_send_refuses_a_root_service_task_or_rework(svc):
         assert str(refusal.value) == SERVICE_OR_REWORK
     assert len(svc.sent(ROOT)) == sent
     assert svc.send(ROOT, "ceo", "one-off work", type="task", budget=1).type == "task" and svc.send(ROOT, "ceo", "a note").type == "note"
+
+
+VERDICT_OR_LINK = (
+    "refused: a verdict or a link from root goes through feedback(...), which applies the rules of a case (a delivered request, one answer per "
+    "rejection). Nothing was sent."
+)
+
+
+def test_org_send_refuses_a_root_verdict_or_link(svc):
+    """FACADE-ROOT-VERDICT: the facade's free-form ``send`` cannot write a verdict note or a link note for root (``feedback`` can: it applies the rules of a
+    case). A refusal sends nothing; root's other notes, and the verdict ``feedback`` writes, are unchanged."""
+    first = request(svc)
+    deliver(svc, "ceo", first)
+    sent = len(svc.sent(ROOT))
+    for fields in ({"feedback": "reject"}, {"feedback": "accept", "source": "human"}, {"criterion": "C1"}, {"feedback": "reject", "criterion": "C1"}):
+        with pytest.raises(OrgError) as refusal:
+            svc.send(ROOT, "ceo", "words", reply_to=first.id, **fields)
+        assert str(refusal.value) == VERDICT_OR_LINK
+    assert len(svc.sent(ROOT)) == sent
+    verdict = svc.feedback(ROOT, first.id, "reject", "No.", source="human")  # the rules of a case write the same note
+    assert verdict.feedback == "reject" and len(svc.sent(ROOT)) == sent + 1
+    assert svc.send(ROOT, "ceo", "a note").type == "note"
