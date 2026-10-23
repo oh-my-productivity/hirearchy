@@ -324,7 +324,9 @@ real implementations are pure); `testing.py` offers `RecordingNotices` for consu
 
 ### 3.3 `settings`
 
-Data/pure: `DEFAULT_MODEL`, `DEFAULT_CONFIG`, `config_default_model(config) -> str`, `config_number(config, key, kind=float)`.
+Data/pure: `DEFAULT_MODEL`, `DEFAULT_CONFIG`, `config_default_model(config) -> str`, `config_number(config, key, kind=float)`; the org-agent floor (docs/design/org-agent-model-floor.md):
+`DEFAULT_EFFORT`, `DEFAULT_ALLOWED_MODELS`, `EFFORT_LEVELS`, `config_effort(config) -> str`, `config_allowed_models(config) -> tuple[str, ...]`, and the refusals `model_floor_problem(config, model)`,
+`effort_floor_problem(effort)`, `config_floor_problem(config, before=None)` (each `str | None`; the one wording of every refusal).
 
 ```python
 class OrgSettings(Protocol):
@@ -660,8 +662,14 @@ class ToolNaming(Protocol):
 class ModelResolver(Protocol):
     def default_model(self) -> str: """Org default model."""
     def model_for(self, addr: str) -> str: """charter model > org default_model > DEFAULT_MODEL."""
+    def effort(self) -> str: """ORG.md `effort`, else DEFAULT_EFFORT, as written (the run command refuses a level below high)."""
+
+class ModelFloorAudit(Protocol):
+    def below_floor(self) -> list[tuple[str, str]]: """(addr, model) of every agent whose model is outside the allowed models, in directory order."""
+    def note(self) -> str: """One line naming each such agent and the fix; "" when none."""
 ```
-Impl: `CharterAccessScopes`, `CharterAuthorityPolicy`, `CharterToolNaming`, `CharterModelResolver`; fake `StaticAccess`. Pure in `api.py` next to `unconfined_read`:
+Impl: `CharterAccessScopes`, `CharterAuthorityPolicy`, `CharterToolNaming`, `CharterModelResolver`, `CharterModelFloorAudit`; fakes `StaticAccess` (also a `ModelFloorAudit`) and `FixedModelFloorAudit`. The floor
+(the allowed models and the efforts of `settings`) is checked by `hierarchy.RuleHiring`, `orgfiles.GuardedOrgFileWriter`, `bootstrap`, `blueprint` and the kiro run command builder; root's `status` and `whoami` show `ModelFloorAudit.note()`. Pure in `api.py` next to `unconfined_read`:
 `children_limit(value)` (the one reading of a `max_children`) and `CHILDREN_LIMIT_ERROR`. `check_grant` is called by `hierarchy.RuleHiring` (A1 and A2, unless the hire is `approved`)
 and by `orgfiles.GuardedOrgFileWriter` (a charter rewrite that grants hiring or raises a limit).
 
@@ -1164,7 +1172,7 @@ class ProfileProvisioner(Protocol):
 class McpServerLocator(Protocol):
     def command(self) -> dict[str, object]: """{'command','args'} to start `hirearchy mcp`."""
 class RunCommandBuilder(Protocol):
-    def build(self, addr: str, prompt: str) -> RunCommand: """<launcher> -- kiro-cli chat --no-interactive --agent <profile> --model <m> --v3 --require-mcp-startup --output-format stream-json; prompt goes on stdin."""
+    def build(self, addr: str, prompt: str) -> RunCommand: """<launcher> -- kiro-cli chat --no-interactive --agent <profile> --model <m> --effort <effort> --v3 --require-mcp-startup --output-format stream-json; prompt goes on stdin."""
 class KiroPlaces(Protocol):
     def home(self) -> Path: """KIRO_HOME of this organization: <state>/kiro-home/<org-id>."""
     def scratch(self, addr: str) -> Path: """Working directory of addr's runs: <state>/kiro-cwd/<org-id>/<agent-key>."""
@@ -1747,7 +1755,7 @@ where it should be: `agents` (24), `settings` (21), `mail` (21), `budget` (13), 
 
 ### 4.5 Interface inventory
 
-**157 Protocols**: 7 in `kernel`, 130 in the 36 features, 20 in the entry points (5 public + 15 private). Of the 157, 45 are
+**158 Protocols**: 7 in `kernel`, 131 in the 36 features, 20 in the entry points (5 public + 15 private). Of the 158, 45 are
 *I/O Protocols* (they touch the filesystem, the OS, git or time) with real and in-memory implementations: `Clock IdGenerator EventSink TraceTap AtomicWriter LedgerStore Environment`
 (kernel), `OrgDocumentStore GitClient EventReader EventFollowers ProcessSpawner ProcessHandle ProcessInspector ProcessSignaller
 OrphanJudge AgentRegistry RetiredArchive MessageParser MailboxWriter BatchStore MessageIndex RunLogWriter RunLogReader RunRegistry
