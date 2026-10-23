@@ -63,7 +63,7 @@ def plan_parts(
     words, playbooks, identity = ServiceWords(normalizer), StepsPlaybookWriter(budgets), HashPlanIdentity()
     access_words = PlainAccessWords(access)
     details = TextPlanDetails(basis, budgets, access, playbooks, words)
-    renderer = TextPlanRenderer(loader, basis, details, TextUserPlan(basis, budgets, access_words, words), identity)
+    renderer = TextPlanRenderer(loader, basis, details, TextUserPlan(basis, budgets, access_words, words, org), identity)
     return PlanParts(basis, words, playbooks, CharterWriter(), access_words, identity, renderer)
 
 

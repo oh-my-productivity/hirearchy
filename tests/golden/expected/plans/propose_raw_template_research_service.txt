@@ -7,7 +7,7 @@ What I understood you need:
 - Quality bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts come from the live source.
 - Sources: Web access to official sites and documentation; a source URL per claim.
 - Workspace: none (nothing writes files or runs commands)
-- Models: claude-sonnet-5.5 for every agent
+- Models: claude-sonnet-5.5 (high effort) for every agent
 Team (4 agents):
 - lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read web pages and search the web; cannot change your files
   - researcher (Researcher, model claude-sonnet-5.5): can read web pages and search the web; cannot change your files

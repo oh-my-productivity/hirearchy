@@ -7,7 +7,7 @@ What I understood you need:
 - Quality bar: Tests pass from a clean checkout; no network use at runtime.
 - Workspace: <CWD>/<project-folder>
 - Tests / packaging / commits: tests: pytest, at least one test per acceptance criterion; packaging: uv with a pyproject.toml; commits: local commits per feature; never push
-- Models: claude-sonnet-5.5 for every agent
+- Models: claude-sonnet-5.5 (high effort) for every agent
 Team (4 agents):
 - lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files in <CWD>/<project-folder> and the organization's own files; changes files only in <CWD>/<project-folder>; can run commands, which are NOT confined: it is told to stay in <CWD>/<project-folder>, but nothing enforces that
   - dev (Engineer, model claude-sonnet-5.5): can read files in <CWD>/<project-folder> and the organization's own files; changes files only in <CWD>/<project-folder>; can run commands, which are NOT confined: it is told to stay in <CWD>/<project-folder>, but nothing enforces that

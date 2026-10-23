@@ -9,7 +9,7 @@ What I understood you need:
 - Quality bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts (versions, licenses) come from the live source.
 - Sources: Web access to official sites, repositories and docs; a source URL per claim.
 - Workspace: none (nothing writes files or runs commands)
-- Models: claude-sonnet-5.5 for every agent
+- Models: claude-sonnet-5.5 (high effort) for every agent
 Team (4 agents):
 - lead (Research lead, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read web pages and search the web; cannot change your files
   - researcher (Researcher, model claude-sonnet-5.5): can read web pages and search the web; cannot change your files
@@ -45,7 +45,7 @@ Needs as understood:
 - Quality bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations; current facts (versions, licenses) come from the live source.
 - Sources / tools: Web access to official sites, repositories and docs; a source URL per claim.
 - Workspace: none (no agent writes files or runs commands)
-- Model policy: one model for all (claude-sonnet-5.5 for every agent; a cheaper drafting model only if the user asks, with the lead and the fact-check staying strong)
+- Model policy: one model for all (claude-sonnet-5.5 at high effort for every agent; nothing below it is available)
 - Review: required
 
 Organization (4 agents):
@@ -89,5 +89,5 @@ Warnings (2):
 
 Reply 'approve' or tell me what to change.
 
-plan_id: 79ee3ad33ef8
-Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="79ee3ad33ef8"). If you change the blueprint, call propose_org again: the plan_id changes.
+plan_id: 3f9a09d31a1b
+Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="3f9a09d31a1b"). If you change the blueprint, call propose_org again: the plan_id changes.

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
-from ..settings import DEFAULT_MODEL
+from ..settings import DEFAULT_MODEL, config_effort
 from ._plan_texts import (
     HIDDEN_WARNINGS,
     PLAN_DRAFT_HEADING,
@@ -14,7 +14,7 @@ from ._plan_texts import (
     SHOWN_SERVICE_CRITERIA,
     SHOWN_WARNINGS,
 )
-from ._protocols import AccessWording, BudgetPlanning, PlanBasis, PlanWords, UserPlanning
+from ._protocols import AccessWording, BudgetPlanning, OrgContext, PlanBasis, PlanWords, UserPlanning
 from ._rules import is_code, review_required
 from ._text import GOAL_CLIP, clip
 from ._view import (
@@ -35,11 +35,12 @@ from .api import Agent, Issue
 
 
 class TextUserPlan(UserPlanning):
-    def __init__(self, basis: PlanBasis, budgets: BudgetPlanning, access: AccessWording, words: PlanWords) -> None:
+    def __init__(self, basis: PlanBasis, budgets: BudgetPlanning, access: AccessWording, words: PlanWords, org: OrgContext) -> None:
         self._basis = basis
         self._budgets = budgets
         self._access = access
         self._words = words
+        self._org = org
 
     def render(self, bp: Mapping[str, object], issues: Sequence[Issue] | None, allowed_roots: Sequence[str | Path] | None) -> str:
         """The compact, plain-language plan the assistant shows to the user verbatim (about 40 lines at most).
@@ -208,14 +209,16 @@ class TextUserPlan(UserPlanning):
         return out
 
     def _models_line(self, agents: Sequence[Agent], needs: Mapping[str, object]) -> str:
-        """The plan's Models line: what the agents will really run on (the resolved ids), plus the stated policy if they differ."""
+        """The plan's Models line: what the agents will really run on (the resolved ids) and at which effort (ORG.md's), plus the stated policy
+        if the models differ."""
+        effort = config_effort(self._org.config())
         used: dict[str, int] = {}
         for a in agents:
             used[a.model] = used.get(a.model, 0) + 1
         if not used:
-            return f"{DEFAULT_MODEL} (no agents yet)"
+            return f"{DEFAULT_MODEL} ({effort} effort, no agents yet)"
         if len(used) == 1:
-            return f"{next(iter(used))} for every agent"
+            return f"{next(iter(used))} ({effort} effort) for every agent"
         parts = ", ".join(f"{m} for {n} agent{'s' if n != 1 else ''}" for m, n in used.items())
         pol = clip(needs.get("model_policy")).rstrip(".")
-        return f"{parts}" + (f" ({pol})" if pol else "")
+        return f"{parts}, all at {effort} effort" + (f" ({pol})" if pol else "")

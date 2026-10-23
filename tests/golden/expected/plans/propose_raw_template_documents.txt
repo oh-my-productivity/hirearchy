@@ -8,7 +8,7 @@ What I understood you need:
 - Quality bar: Every statement comes from the input files; where the files disagree or are silent, the document says so.
 - Sources: Only the files in needs.inputs; no web.
 - Workspace: none (nothing writes files or runs commands)
-- Models: claude-sonnet-5.5 for every agent
+- Models: claude-sonnet-5.5 (high effort) for every agent
 Team (4 agents):
 - lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read no files outside the organization; cannot change your files
   - reader (Reader of the user's files, model claude-sonnet-5.5): can read no files outside the organization; cannot change your files

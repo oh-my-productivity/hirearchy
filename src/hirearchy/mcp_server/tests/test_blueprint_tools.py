@@ -75,7 +75,7 @@ def test_the_plan_block_is_compact_and_has_everything_the_user_approves(setup, e
     b = block(call(server, "propose_org", blueprint=example(server, "documents")))
     assert len(b.splitlines()) <= 42
     for needle in ("Goal:", "What I understood you need", "Team (4 agents)", "lead (Manager, model claude-sonnet-5.5)",
-                   "Models: claude-sonnet-5.5 for every agent", "reader", "can read files", "cannot change your files", "Budget: 19 runs planned",
+                   "Models: claude-sonnet-5.5 (high effort) for every agent", "reader", "can read files", "cannot change your files", "Budget: 19 runs planned",
                    "your cap is 25", "lead starts with 19", "Checking: reviewer", "Deliverable:", "Delivered to:",
                    str(env / "deliverables"), "(I copy it there after checking it)", "Done when ALL of these hold",
                    "1. Covers", "Checkpoints:", "Your files (read-only)", "approve"):

@@ -28,7 +28,7 @@ needs:
   sources: Only the files in needs.inputs; no web.
   budget_runs: 25
   models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
-  model_policy: one model for all   # claude-sonnet-5.5 for every agent; tiers (cheap drafting, strong review) only if the user asks
+  model_policy: one model for all   # claude-sonnet-5.5 at high effort for every agent; nothing below it is available
   review: true                     # a checker who did not do the analysis recomputes the figures with its own script
   approval: Plan first; ask before any spend beyond the budget.
   progress: One line when I ask.

@@ -11,8 +11,8 @@ needs:
   quality_bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations.
   sources: Web access to news sites, official sites and documentation; a source URL per claim.
   budget_runs: 25   # the user's cap for ONE request; the service below asks for 22
-  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}   # same model for both tiers; set a cheaper cheap id only if the user asks for one
-  model_policy: one model for all (claude-sonnet-5.5 for every agent; a cheaper drafting model only if the user asks, with the lead and the fact-check staying strong)
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}   # same model for both tiers: the floor is claude-sonnet-5.5, nothing below it is available
+  model_policy: one model for all (claude-sonnet-5.5 at high effort for every agent; nothing below it is available)
   review: true   # independent fact-check by someone who did not write the brief
   approval: Approve this plan before anything is created or started; ask before spending beyond a request's budget.
   progress: One line when I ask.
@@ -20,7 +20,7 @@ agents:
   - name: lead
     template: manager
     role: Research lead
-    model: strong   # if a cheaper drafting model is ever set, the lead stays strong: a cheap lead misroutes rework and wastes runs
+    model: strong   # the lead stays strong: a cheap lead misroutes rework and wastes runs
     children:
       - {name: researcher, template: researcher}
       - {name: writer, template: writer}

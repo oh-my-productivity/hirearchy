@@ -10,7 +10,7 @@ What I understood you need:
 - Quality bar: Every number is reproducible from one script and appears with its label in the script's output; no conclusion from a slice under 30 rows.
 - Sources: Only the files in needs.inputs; no web.
 - Workspace: <CWD>/analysis-work
-- Models: claude-sonnet-5.5 for every agent
+- Models: claude-sonnet-5.5 (high effort) for every agent
 Team (4 agents):
 - lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in <CWD>/analysis-work, <CWD>/data and the organization's own files; can run commands, which are NOT confined: it is told to stay in <CWD>/analysis-work, but nothing enforces that
   - analyst (Data Analyst, model claude-sonnet-5.5): can read files only in <CWD>/analysis-work, <CWD>/data and the organization's own files; can run commands, which are NOT confined: it is told to stay in <CWD>/analysis-work, but nothing enforces that

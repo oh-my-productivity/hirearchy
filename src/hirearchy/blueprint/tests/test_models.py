@@ -74,7 +74,7 @@ def test_the_default_policy_is_single_model_and_raises_no_warning(research, tmp_
 
 def test_the_plan_says_plainly_that_every_agent_runs_on_the_default(research, tmp_path):
     plan = bpm.plan_for_user(research, allowed_roots=[tmp_path])
-    assert "- Models: claude-sonnet-5.5 for every agent" in plan.splitlines()
+    assert "- Models: claude-sonnet-5.5 (high effort) for every agent" in plan.splitlines()
     assert "lead (Research lead, model claude-sonnet-5.5)" in plan and "haiku" not in plan and "sonnet-4" not in plan
     assert "model=claude-sonnet-5.5" in bpm.render_plan(research, allowed_roots=[tmp_path])
 
@@ -84,8 +84,20 @@ def test_tiering_on_request_resolves_each_tier_and_the_plan_names_them(research,
     assert models_of(bp, tmp_path) == {"lead": "claude-opus-5.5", "lead/researcher": "claude-sonnet-5.5",
                                        "lead/writer": "claude-sonnet-5.5", "lead/factcheck": "claude-opus-5.5"}
     plan = bpm.plan_for_user(bp, allowed_roots=[tmp_path])
-    assert "- Models: claude-opus-5.5 for 2 agents, claude-sonnet-5.5 for 2 agents (cheap drafting, strong review)" in plan.splitlines()
+    assert "- Models: claude-opus-5.5 for 2 agents, claude-sonnet-5.5 for 2 agents, all at high effort (cheap drafting, strong review)" in plan.splitlines()
     assert "for every agent" not in plan
+
+
+def test_the_plan_shows_the_effort_of_ORG_md(research, tmp_path):
+    org = Org.init(tmp_path / "org", "m", {"effort": "xhigh"})
+    assert "- Models: claude-sonnet-5.5 (xhigh effort) for every agent" in bpm.plan_for_user(research, org=org, allowed_roots=[tmp_path]).splitlines()
+    mixed = bpm.plan_for_user(tiered(research), org=org, allowed_roots=[tmp_path]).splitlines()
+    assert "- Models: claude-opus-5.5 for 2 agents, claude-sonnet-5.5 for 2 agents, all at xhigh effort (cheap drafting, strong review)" in mixed
+
+
+def test_the_plan_of_no_agents_shows_the_default_and_the_effort(tmp_path):
+    plan = bpm.plan_for_user({"mission": "m", "needs": {}, "agents": []}, allowed_roots=[tmp_path])
+    assert "- Models: claude-sonnet-5.5 (high effort, no agents yet)" in plan.splitlines()
 
 
 def test_tiering_still_warns_when_the_lead_is_cheap_and_never_when_the_tiers_are_equal(research, tmp_path):
@@ -128,7 +140,7 @@ def test_every_template_defaults_to_the_default_model_and_validates(kind, servic
     assert bp["needs"]["models"] == {"cheap": DEFAULT_MODEL, "strong": DEFAULT_MODEL}
     assert not bpm.errors(bpm.validate(bp, allowed_roots=[tmp_path]))
     assert set(models_of(bp, tmp_path).values()) == {DEFAULT_MODEL}
-    assert "claude-sonnet-5.5 for every agent" in bpm.plan_for_user(bp, allowed_roots=[tmp_path])
+    assert "claude-sonnet-5.5 (high effort) for every agent" in bpm.plan_for_user(bp, allowed_roots=[tmp_path])
     assert not codes(bpm.validate(bp, allowed_roots=[tmp_path])) & {"model-policy", "model-single", "manager-cheap-model", "model-review"}
 
 
@@ -139,3 +151,11 @@ def test_shipped_example_blueprints_default_to_the_default_model(name, tmp_path)
     bp = yaml.safe_load(raw)
     if "models" in bp.get("needs", {}):
         assert bp["needs"]["models"] == {"cheap": DEFAULT_MODEL, "strong": DEFAULT_MODEL}
+
+
+def test_templates_and_shipped_examples_never_offer_a_cheaper_model(tmp_path):
+    """The floor is claude-sonnet-5.5 (docs/design/org-agent-model-floor.md): no text tells the assistant a cheaper model may be set."""
+    texts = [ex.example(kind, tmp_path, service=service) for kind in ex.KINDS for service in (False, True)]
+    texts += [p.read_text() for p in sorted(EXAMPLES.glob("*.yaml"))]
+    for text in texts:
+        assert "cheaper" not in text and "only if the user asks" not in text and "if the user asks for" not in text
