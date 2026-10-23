@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from functools import cached_property
 from pathlib import PurePosixPath
 
 from ..kernel import Clock, Message, artifact_paths, latest_results, msg_time
@@ -71,27 +70,20 @@ class _Basis:
     floor: int | None  # microseconds: files last written before the earliest contract of the group are the user's own older files
 
 
+@dataclass
 class _Call:
-    """What one ``findings`` call keeps: the actor's mail (read when a comparison needs it), what is left to read and to ask git, and the checked
-    versions it already knows."""
+    """What one ``findings`` call keeps: the actor, what is left to read and to ask git, and the checked versions it already knows. The actor's mail is
+    read when a comparison first needs it (``sent``, ``latest``)."""
 
-    def __init__(self, mail: MailboxReader, actor: str, started: float) -> None:
-        self._mail = mail
-        self._actor = actor
-        self.started = started
-        self.left = READ_TOTAL
-        self.hexlen = 40  # the length of the ids of the repository's object format, once git has answered one
-        self.asked: set[tuple[str, str]] = set()
-        self.known: dict[tuple[str, str], str | None] = {}
-        self.current: dict[tuple[str, int], str | None] = {}
-
-    @cached_property
-    def sent(self) -> list[Message]:
-        return list(self._mail.sent(self._actor))
-
-    @cached_property
-    def latest(self) -> dict[str, Message]:
-        return latest_results(self._mail.received(self._actor))
+    actor: str
+    started: float
+    left: int = READ_TOTAL
+    hexlen: int = 40  # the length of the ids of the repository's object format, once git has answered one
+    asked: set[tuple[str, str]] = field(default_factory=set)
+    known: dict[tuple[str, str], str | None] = field(default_factory=dict)
+    current: dict[tuple[str, int], str | None] = field(default_factory=dict)
+    sent: list[Message] | None = None
+    latest: dict[str, Message] | None = None
 
 
 class FolderDeliverableChecks(DeliverableChecks):
@@ -111,7 +103,7 @@ class FolderDeliverableChecks(DeliverableChecks):
         chosen = [g for g in self._groups(actor) if service is None or any(c.name == service for c in g.members)]
         if not chosen:
             return []
-        call = _Call(self._mail, actor, self._clock.monotonic())
+        call = _Call(actor, self._clock.monotonic())
         return [found for group in chosen for found in self._group(call, group)]
 
     # ---------------------------------------------------------------------------------------------------- groups
@@ -182,7 +174,7 @@ class FolderDeliverableChecks(DeliverableChecks):
             return [DeliverableFinding(folder, group.services, entry.name, "unknown", file=single)]
         if self._settled(entry.mtime_us, [pair.case] if pair.case is not None else []):
             return []
-        withheld = questions_open(pair.task, pair.result, pair.case, call.sent) > 0
+        withheld = questions_open(pair.task, pair.result, pair.case, call.sent or []) > 0
         return [DeliverableFinding(folder, group.services, entry.name, "differs", pair.path, pair.task.id, withheld, file=single)]
 
     def _folder_rule(self, call: _Call, basis: _Basis, entry: FolderFile) -> tuple[str, _Pair | None]:
@@ -226,19 +218,22 @@ class FolderDeliverableChecks(DeliverableChecks):
     # ---------------------------------------------------------------------------------------------------- the basis
 
     def _basis(self, call: _Call, group: _Group) -> _Basis:
+        if call.latest is None or call.sent is None:  # the actor's mail, read once per call
+            call.sent, call.latest = list(self._mail.sent(call.actor)), latest_results(self._mail.received(call.actor))
+        latest, sent = call.latest, call.sent
         cases: list[Case] = []
         done: dict[str, tuple[Message, Message, Case | None]] = {}  # result id -> (result, its task, the task's case)
         for contract in group.members:
             mine = self._history.cases(contract.owner, contract.name)
             cases += mine
             candidates = [
-                (r, task, case) for case in mine for task in case.tasks if (r := call.latest.get(task.id)) is not None and r.status == "done"
+                (r, task, case) for case in mine for task in case.tasks if (r := latest.get(task.id)) is not None and r.status == "done"
             ]
             for r, task, case in sorted(candidates, key=lambda item: item[0].id, reverse=True)[:RESULTS_PER_SOURCE]:
                 done[r.id] = (r, task, case)
         one_off = [
-            (r, task, None) for task in call.sent
-            if task.type == "task" and not task.service and (r := call.latest.get(task.id)) is not None and r.status == "done"
+            (r, task, None) for task in sent
+            if task.type == "task" and not task.service and (r := latest.get(task.id)) is not None and r.status == "done"
         ]
         for r, task, _ in sorted(one_off, key=lambda item: item[0].id, reverse=True)[:RESULTS_PER_SOURCE]:
             done[r.id] = (r, task, None)
