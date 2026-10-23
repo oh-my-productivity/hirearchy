@@ -1,7 +1,6 @@
 # Org growth, Phase 0a.2: the enforcement batch after E4 (technical design)
 
-Status: design, revision 3 (revision 1 was `31bf5ab`, revision 2 `1b385a2`; the 27 findings of review pass 1 and the 13 of pass 2, DR-28 to
-DR-40, are resolved in Appendix A, under the manager's binding directives of 2026-10-23 for this revision). Branch
+Status: design, revision 3, amended by the manager's decision of 2026-10-23 (DR-41 to DR-46, Appendix A.3) and the planner's corrections (A.4) (revision 1 was `31bf5ab`, revision 2 `1b385a2`; the 27 findings of review pass 1 and the 13 of pass 2, DR-28 to DR-40, are resolved in Appendix A, under the manager's binding directives of 2026-10-23 for this revision). Where Appendix A.3 or A.4 conflicts with a section above, the appendix wins. Branch
 `feat/org-growth-phase-0a2` off `main` `3815813`; worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0a2`.
 Baseline (`.agents/tasks/baseline.md`): 14 415 passed, 5 skipped, 3 deselected, 1 xfailed; import-linter contracts kept; `scripts/check.sh` exit 0
 (734 s). `skills/hirearchy/SKILL.md`: 125 lines. Root instructions: 2 635 characters at the reference path (`/` + 59 `r`), 2 558 raw.
@@ -218,7 +217,7 @@ through `ServiceCommands.define_service` -> `RuleServiceCommands` -> `RuleContra
 closed. Retiring the service (`FsServiceStore.retire` moves it under `.retired/`) is gated by the same basis (5.2a). Retiring the owning
 agent with its team (`hierarchy.RuleRetirement.retire_team`: MCP root `retire`, CLI `retire`, `Org.retire`, `Org.retire_team`), hiring it
 again and defining the service is not refused (the user keeps authority over the structure); instead the definition continues the retired
-service's contract, playbook and cases whenever that service had a delivered request (5.10), so its record is neither erased nor reset.
+service's contract, playbook and cases whenever a request of that service has a result of any status (a recorded request, 5.10, DR-41), so its record is neither erased nor reset.
 Every path, and the declared ways around that remain visible (another owner, another name), is listed in 5.8.
 
 ### 5.2 The gate (in `RuleContractDefiner.define_service`)
@@ -263,7 +262,7 @@ Order of checks, each refusal writes nothing:
    - a `playbook`, or a resulting acceptance list whose set differs from `old`'s: P2-CONTINUES;
    - today's "no change" refusal does not apply (a continuation always writes the next version, which records who defined the service again
      and when).
-   Without a `prior` (none, or none with a delivered request), the call is today's first definition.
+   Without a `prior` (none, or none with a recorded request, DR-41), the call is today's first definition.
 1. `actor != ROOT` and any of `answers`, `about`, `words` given: P2-ROOT-ONLY.
 2. Any of them given on a first definition, or on a call that is not an acceptance amendment (a continuation never is one): P2-NOT-AN-AMENDMENT
    (after today's "no change" refusal, so an amendment that changes nothing keeps today's text).
@@ -302,8 +301,7 @@ Order of checks, each refusal writes nothing:
 3. any `r` with `not r.answered` and `answering_version(store, owner, name, r.note) == 0`: P2-RETIRE-OPEN (the oldest is named).
 Agents retiring their reports' services are not gated (as agents' amendments are not, 5.8). Root can always meet the condition: any verdict
 counts as rated (a relayed `accept` when the user drops the delivery), and a rejection is answered by `feedback(confirms=...)` with "none".
-After every verdict and answer the retirement is allowed; defining the service again afterwards continues it when it had a delivered request
-(5.10), so the record survives this path too. The gate is kept beside the continuation: it costs no structure (the agent and its team stay),
+After every verdict and answer the retirement is allowed; defining the service again afterwards continues it when it had a recorded request (5.10), so the record survives this path too. The gate is kept beside the continuation: it costs no structure (the agent and its team stay),
 and it keeps the retired copy's record complete at the moment it is retired (section 20, D20).
 
 ### 5.3 Refusal texts (new; constants in `SRC/services/_define.py`)
@@ -321,14 +319,14 @@ one layer MCP and the CLI share, so a text that names arguments gives both forms
   refused: a change of the acceptance criteria of `{name}` records the user's words. If it answers a rejection, pass answers=<the rejection's message id>, about=<the C or R id your one question named> and words=<the user's answer, verbatim> (CLI: --answers, --about, --words), after they answered yes to that question{open}. If the user asked for this change on their own, outside any rejection, pass words=<their request, verbatim> alone (CLI: --words): it is recorded as user-initiated and never admits a playbook revision. Nothing was written.
   ```
   `{open}` = ` (waiting for an answer: R1, message <id>)` listing every unanswered rejection, or `""`.
-- **P2-WORDS-LONG**: `refused: words is {n} characters; the limit is 1000: the user's answer, verbatim, not a summary. Nothing was written.`
+- **P2-WORDS-LONG** (DR-46): `refused: words (CLI: --words) is {n} characters; the limit is 1000: the user's answer, verbatim, not a summary. Nothing was written.`
 - **P2-PAIR**: `refused: answers and about go together: answers=<the rejection's message id>, about=<the C or R id your question named> (CLI: --answers, --about). Nothing was written.`
 - **P2-UNREADABLE**: `refused: the record of `{name}` cannot be read ({error}), so the contract was not changed. Try again; if it persists, tell the user.`
-- **P2-UNRATED**: `refused: {n} delivered request(s) of `{name}` have no verdict yet: {task ids}. Record the user's verdict on each with feedback first (a rejection, then its one question); the contract changes only after the verdicts. Nothing was written.`
-- **P2-NOT-A-REJECTION**: `refused: answers must be the message id of a rejection you recorded with feedback(..., source="human") on a request of `{name}`: {answers}. Its rejections: {"R1 (message <id>)", ... or "none yet"}. Nothing was written.`
+- **P2-UNRATED** (DR-46): ``refused: {n} delivered request(s) of `{name}` have no verdict yet: {task ids}. Record the user's verdict on each with feedback first, a rejection then its one question (CLI: hirearchy feedback <task id> accept|reject --note ...); the contract changes only after the verdicts. Nothing was written.``
+- **P2-NOT-A-REJECTION** (DR-46): ``refused: answers (CLI: --answers) must be the message id of a rejection you recorded with feedback(..., source="human") (CLI: hirearchy feedback <task id> reject --note ...) on a request of `{name}`: {answers}. Its rejections: {"R1 (message <id>)", ... or "none yet"}. Nothing was written.``
 - **P2-ANSWERED**: `refused: rejection {R} (message {id}) already has its answer ({link note <id> | contract v<n>}): one rejection gets one answer. A new lasting rule needs a new rejection and its question, or words alone (CLI: --words) when the user asks for it on their own. Nothing was written.`
-- **P2-ABOUT**: `refused: about must be the id your one question named: a criterion of contract v{v}, in force when {R} was recorded ({C ids}), or an earlier rejection ({R ids or "none"}): {about}. A criterion this change creates cannot be what the question was about. Nothing was written.`
-- **P2-WORDS-ARE-THE-REJECTION**: `refused: words repeats rejection {R}'s own note (or the note is part of it). The answer is what the user said to your one question after the rejection (e.g. "Yes, add it."); an "always ..." inside the rejection is not it. Nothing was written.`
+- **P2-ABOUT** (DR-46): `refused: about (CLI: --about) must be the id your one question named: a criterion of contract v{v}, in force when {R} was recorded ({C ids}), or an earlier rejection ({R ids or "none"}): {about}. A criterion this change creates cannot be what the question was about. Nothing was written.`
+- **P2-WORDS-ARE-THE-REJECTION** (DR-46): `refused: words (CLI: --words) repeats rejection {R}'s own note (or the note is part of it). The answer is what the user said to your one question after the rejection (e.g. "Yes, add it."); an "always ..." inside the rejection is not it. Nothing was written.`
 - **P2-OPEN-REJECTION**:
   ```
   refused: rejection {R} (message {id}) on task {task} has no answer yet, so this change is not one the user asked for on their own. Ask the user the one question first ({question}). On yes: define_service(owner="{owner}", name="{name}", ..., answers="{id}", about=<the id you asked about>, words=<their answer, verbatim>) (CLI: --answers, --about, --words). On no, a one-off or "as it is": feedback(task_id="{task}", verdict="reject", confirms="{id}", criterion=["none"], ["R<j>"] or ["C<k>"], source="human", note=<their answer, verbatim>) (CLI: --confirms, --criterion, --source human, --note). Nothing was written.
@@ -336,12 +334,12 @@ one layer MCP and the CLI share, so a text that names arguments gives both forms
   `{question}` is `Rejection.question` (5.2, 5.6). With several unanswered rejections, the oldest is named.
 - **P2-CONTINUES** (5.10):
   ```
-  refused: `{name}` of {owner} continues the retired service kept at {path} ({k} delivered request(s)), so defining it again keeps its contract v{n}, its playbook {v<p> | (none yet)} and its record. Leave out {what} and define it again; then change the criteria as an amendment, the user's answer to a rejection (answers=, about=, words=) or a change they asked for on their own (words= alone) (CLI: --answers, --about, --words). Nothing was written.
+  refused: `{name}` of {owner} continues the retired service kept at {path} ({k} request(s) with a result), so defining it again keeps its contract v{n}, its playbook {v<p> | (none yet)} and its record. Leave out {what} and define it again; then change the criteria as an amendment, the user's answer to a rejection (answers=, about=, words=) or a change they asked for on their own (words= alone) (CLI: --answers, --about, --words). Nothing was written.
   ```
   `{what}`: `playbook (CLI: --playbook)` when one was given; `the change of the criteria: give no acceptance, add_acceptance or remove_acceptance, or acceptance exactly as in v{n} (CLI: --acceptance, --add-acceptance, --remove-acceptance)` when the set differs; both joined by ` and ` when both apply.
 
 New refusals of `retire_service` (5.2a; constants in `SRC/services/_retire.py`):
-- **P2-RETIRE-UNRATED**: `refused: {n} delivered request(s) of `{name}` have no verdict yet: {task ids}. Record the user's verdict on each with feedback first; a service is retired only after its verdicts, so that its record stays complete. Nothing was retired.`
+- **P2-RETIRE-UNRATED** (DR-46): ``refused: {n} delivered request(s) of `{name}` have no verdict yet: {task ids}. Record the user's verdict on each with feedback first (CLI: hirearchy feedback <task id> accept|reject --note ...); a service is retired only after its verdicts, so that its record stays complete. Nothing was retired.``
 - **P2-RETIRE-OPEN**:
   ```
   refused: rejection {R} (message {id}) on task {task} of `{name}` has no answer yet. Ask the user the one question first ({question}) and record the answer: define_service(..., answers="{id}", about=<the id you asked about>, words=<their answer, verbatim>) on yes (CLI: --answers, --about, --words), feedback(task_id="{task}", verdict="reject", confirms="{id}", criterion=["none"], ["R<j>"] or ["C<k>"], source="human", note=<their answer, verbatim>) otherwise (CLI: --confirms, --criterion, --source human, --note). A service is retired only after its rejections are answered. Nothing was retired.
@@ -355,7 +353,7 @@ when `n = answering_version(store, task.to, task.service, confirms) > 0` (a cont
 is still accepted, the product's own link when its write failed (section 12): `criterion` equal as a set to `answer_ids(store, task.to,
 task.service, n)` (after `normalize_links`), `source == "human"`, and no human-tier link note on `confirms` in root's sent box yet. That link
 confirms the criteria (5.5: a human-tier link on the answered rejection). Every other `confirms` on that rejection is refused:
-- **P2-CONFIRMS-ANSWERED** (a human-tier link on `confirms` exists): `refused: rejection {confirms} was answered by contract v{n} of `{service}` (define_service(..., answers="{confirms}")) and its link {link id} records the user's yes: one rejection gets one answer. A different answer needs a new rejection and its question. Nothing was recorded.`
+- **P2-CONFIRMS-ANSWERED** (a human-tier link on `confirms` exists; DR-46): ``refused: rejection {confirms} was answered by contract v{n} of `{service}` (define_service(..., answers="{confirms}"); CLI: define-service --answers) and its link {link id} records the user's yes: one rejection gets one answer. A different answer needs a new rejection and its question. Nothing was recorded.``
 - **P2-CONFIRMS-RECOVERY** (no such link yet, but other ids or another source): `refused: rejection {confirms} was answered by contract v{n} of `{service}`, and its link is missing (its write failed). The only link it still takes is that one: feedback(task_id="{task}", verdict="reject", confirms="{confirms}", criterion=[{ids}], source="human", note=<the user's answer, verbatim>) (CLI: --confirms, --criterion, --source human, --note). Nothing was recorded.`
 
 ### 5.4 What is recorded (immutable versions and notes, nothing derived is stored)
@@ -444,7 +442,7 @@ Next: ask the user exactly ONE yes/no question that names the criterion you read
 - **Owner's amendment note**: one line after the changes: `The client's yes to {R} (about {about}) is recorded: {ids} {is|are} client-confirmed.` or `The client asked for this change on their own ("{words, 160}"): {ids} {is|are} user-initiated.`; the marks use `confirmed` read after the link write (`confirmed | set(ids)` on the answer path).
 - **Root `define_service` docstring** = today's plus, after `An amendment that changes nothing is refused.`:
   `CHANGING THE CRITERIA (you, root): only as the user's answer after a rejection: answers=<the rejection's message id>, about=<the C or R id your one question named>, words=<their answer, verbatim> (it records their yes as the link itself); or, for a change the user asks for on their own outside any rejection, words=<their request, verbatim> alone (never admits a playbook revision). Every delivered request of the service needs its verdict first.` (wrapped at today's column).
-- **Root `feedback` docstring**: the sentence from `confirms: the user's yes.` to `only this link counts as the client's.` becomes
+- **Root `feedback` docstring** (two phrases pinned by `SRC/mcp_server/tests/test_service_tools.py:35-36` go on purpose, DR-46: line 35's `confirms: the user's yes. After they answered yes to your one question naming the id, call again with the same task_id, verdict "reject"` and line 36's `only this link counts as the client's`; commit B4 replaces them in that test with the new sentence's phrases, in the same commit; the rest of those assertions stays): the sentence from `confirms: the user's yes.` to `only this link counts as the client's.` becomes
   `confirms: the user's answer that changes no criterion ("no", "a one-off", "about C<k> as it is"): call again with the same task_id, verdict "reject", confirms=<the rejection's message id>, criterion ("none", "R<j>" or "C<k>"), source "human" and their answer verbatim as note; it records the link, not a new verdict. A yes that changes the contract is define_service(..., answers=<the rejection's message id>, about=<the id>, words=<their answer>), which records the link itself; after it, that rejection takes no confirms.`
   and, after `on the rejection itself it is shown as not confirmed, whatever the source.` (kept: `test_service_tools.py:36` pins it), the
   sentence `Pass your reading there (one id: what you read the rejection as), and the reply gives the exact question naming it.` is inserted
@@ -458,15 +456,15 @@ Next: ask the user exactly ONE yes/no question that names the criterion you read
 | MCP agent `define_service` (no new arguments) | same; `actor != ROOT`, not root's amendment | not gated (agent clients' amendments are never `amended`, hence never (c)-eligible) |
 | CLI `define-service` | same | yes: the human at the terminal passes `--words` (or `--answers/--about/--words`) like anyone |
 | `Org.define_service` | same | yes |
-| `apply_org` / `hirearchy apply` | `ServiceCommands.define_service` with `playbook=` | first definitions only (an existing service with `playbook` is refused today; a name that continues a retired service with a delivered request is refused with P2-CONTINUES, 5.10) |
+| `apply_org` / `hirearchy apply` | `ServiceCommands.define_service` with `playbook=` | first definitions only (an existing service with `playbook` is refused today; a name that continues a retired service with a recorded request is refused with P2-CONTINUES, 5.10) |
 | root `retire_service` (MCP, CLI `retire-service`, `Org.retire_service`), all through `ServiceCommands.retire_service` -> `RuleServiceRetirement` | the basis of 5.2a | yes: P2-RETIRE-UNRATED, P2-RETIRE-OPEN, P2-RETIRE-UNREADABLE |
-| retire the service, then define it again for the same owner, after every verdict and answer | a continuation when it had a delivered request (5.10); else a first definition | the continuation keeps contract, playbook and record; its defining call cannot change the criteria (P2-CONTINUES); later changes go through the gate with the whole record. A retired service that never delivered anything has no record to keep: its re-definition is a new service, as in 0a.1. |
-| root retires the owning agent with its team (MCP root `retire`, CLI `retire`, `Org.retire`, `Org.retire_team`, all through `hierarchy.RuleRetirement.retire_team`), hires the same name again (MCP/CLI `hire`, `Org.hire`) and defines the service | `ServiceCommands.define_service` -> `RuleContractDefiner`, step 0 of 5.2 | the retirement is **not refused** (the user's authority over the structure); the definition continues the service whenever it had a delivered request (5.10): the same contract (next version, same `created`), playbook and cases, and P2-CONTINUES for a criteria change in that call. MCP root's `retire` reply says so and names what is still open (5.10). E5 counts retire/hire/define triples (section 21). |
+| retire the service, then define it again for the same owner, after every verdict and answer | a continuation when it had a recorded request (5.10); else a first definition | the continuation keeps contract, playbook and record; its defining call cannot change the criteria (P2-CONTINUES); later changes go through the gate with the whole record. A retired service none of whose requests ever got a result has no record to keep: its re-definition is a new service, as in 0a.1. |
+| root retires the owning agent with its team (MCP root `retire`, CLI `retire`, `Org.retire`, `Org.retire_team`, all through `hierarchy.RuleRetirement.retire_team`), hires the same name again (MCP/CLI `hire`, `Org.hire`) and defines the service | `ServiceCommands.define_service` -> `RuleContractDefiner`, step 0 of 5.2 | the retirement is **not refused** (the user's authority over the structure); the definition continues the service whenever a request of it has a result of any status (5.10, DR-41): the same contract (next version, same `created`), playbook and cases, and P2-CONTINUES for a criteria change in that call. `retire_team` closes the team's open requests as `failed` (`hierarchy/_retirement.py:64`), so after a team retirement every request of the service is recorded; a human rejection of a `blocked` or `failed` result keeps its record across retire, hire and define, and the later amendment is refused P2-OPEN-REJECTION exactly as for a `done` result. MCP root's `retire` reply says so and names what is still open (5.10). E5 counts retire/hire/define triples (section 21). |
 | after that retirement, the same service name defined for **another** top-level agent, or the criteria under **another name** (also while a rejection of the old service is unanswered or a delivery unrated) | a first definition of a new service (another owner or name) | **declared way around, visible**: `services` lists a new service (its owner or name differs, its record starts empty, its v1 criteria are never (c)-eligible); the old record stays in root's mailbox and in the retired copy. E5 counts new services defined by root while another service, live or retired, has an unanswered rejection or an unrated delivery (section 21; D22). |
 | root's `delegate` without `revises` to a service's owner (a one-off task, "redo the memo") | `RuleTaskAssigner.delegate`; no case, no contract, no base | **declared way around, visible**: a one-off task in `progress`, outside every case (no P4 base, no verdict needed). E5 counts one-off root tasks to an owner while one of its cases is open or has an unrated delivery (section 21). |
 | `feedback(confirms=...)` naming a `C<k>` | a link note | cannot make an amendment eligible (5.5); after `define_service(answers=X)`, `confirms=X` is refused (P2-CONFIRMS-ANSWERED), except the one recovery link when the product's link write failed (P2-CONFIRMS-RECOVERY refuses every other) |
 | `send` / `write` (MCP, CLI) | notes without `feedback`, `criterion`, `service` or `revises` (neither surface has these arguments) / files outside `services/` | `criterion` is refused on a plain note by `provenance_source` (S3); `orgfiles` does not own `services/**` |
-| `Org.send(ROOT, ..., type="note", feedback=... or criterion=...)` (the facade, which forwards every field) | would write a verdict or link note without `RuleClientFeedback` | refused in `SRC/app/_facade_dispatch.py:DispatchMixin.send` by `dispatch.check_root_send` (7.5): FACADE-ROOT-VERDICT |
+| `Org.send(ROOT, ..., type="note", feedback=... or criterion=...)` (the facade, which forwards every field) | would write a verdict or link note without `RuleClientFeedback` | refused by `dispatch.GuardedRootSender` (`check_root_send`, 7.5), which the `Org` facade's `send` delegates to (A.4 P1): FACADE-ROOT-VERDICT |
 | `Org.deliver(msg)` and `Org.runtime.<port>` | the delivery pipeline and the composition root's ports, below every policy | **out of the guarantee, declared**: `Org.deliver`'s docstring already says "Low level ... Policy is checked by the callers"; both are the primitives every rule is built on (ARCHITECTURE 2.3) and no surface exposes them. Pinned by `TESTS/architecture/test_policy_free_primitives.py`: (1) no module of `SRC/mcp_server` or `SRC/cli` outside `tests/` calls `.deliver(` (a source scan, as the existing architecture checks do); (2) the MCP `send` tool (every identity) and the CLI `send` parser have none of the parameters `type`, `feedback`, `criterion`, `service`, `revises`, `source` (checked on the registered tool's input schema and the argparse actions); (3) `Org.deliver.__doc__` starts with `Low level`; (4) the guarded `Org.send` refuses the four shapes of 7.5. A new surface that calls the primitive or widens `send` fails (section 20, D19). |
 | the assistant's shell writing `SERVICE.md` | outside the product | not preventable by the product (the user's machine); a hand-written version is read like any other, and a forged `answers` key with a `feedback(confirms=...)` link could make a criterion eligible. No product path writes a root acceptance amendment without a basis, so a legacy-shaped root version after 0a.2 can only come from such a write. E4 counted 0 shell writes under `services/` (STUDY "Clause 1 (b)"); E5 counts them (section 21). |
 
@@ -484,7 +482,7 @@ refused: the product cannot tell a new service the user wants from an escape.
 ### 5.10 Retiring the owner keeps the record: a definition continues the retired service
 
 **The rule.** When root defines service `name` of a top-level agent `owner` and no live contract exists, the definition **continues** the
-newest retired copy of that service when that copy has a delivered request; otherwise it is a first definition, as today. Agent clients'
+newest retired copy of that service when that copy has a recorded request (a request of it with a result of any status, DR-41); otherwise it is a first definition, as today. Agent clients'
 definitions never continue (P2 binds root's amendments only). The retirement itself is never refused for this: retiring an agent with its
 team is the user's structural decision, and the record survives it.
 
@@ -499,22 +497,28 @@ team is the user's structural decision, and the record survives it.
   read in a file; all of them are inside the organization.
 - The **newest** copy is the one with the greatest `defined` in its `SERVICE.md` (`contract_of(...).defined`; `None` sorts first); ties go to
   the greater path. A continued service carries its whole lineage (its copied history), so the newest copy is enough.
-- The copy **has a delivered request** when root's sent box holds a task with `to == owner`, `service == name` and `msg_time(m) >= created`
-  (the copy's `Contract.created`; `None`: no floor) whose latest result in root's received box (`kernel.latest_results`) has
-  `status == "done"`. Verdicts, rejections, answers and judged deliveries all start with a delivery, so a copy without one has no record to
-  keep. A rolled-back blueprint (`blueprint/_undo.py:RetiringRollback`, which retires what a failed `apply_org` built) and a service retired
-  before its first delivery therefore start fresh.
+- The copy **has a recorded request** (DR-41) when root's sent box holds a task with `to == owner`, `service == name` and `msg_time(m) >= created`
+  (the copy's `Contract.created`; `None`: no floor) whose latest result in root's received box (`kernel.latest_results`) has **any** status:
+  `done`, `blocked` or `failed`. A verdict, a rejection, an answer and a judged delivery all rest on a result (`RuleClientFeedback` refuses a
+  task that has none: "has no result yet"), so a request with a result of any status is exactly what can leave a record to keep, and a
+  human rejection of a `blocked` or `failed` result keeps its record across retire, hire and define like one of a `done` result.
+  `retire_team` closes the team's open requests as `failed` results (`hierarchy/_retirement.py:64`), so after a team retirement every request
+  of the service is recorded. A rolled-back blueprint (`blueprint/_undo.py:RetiringRollback`, which retires what a failed `apply_org` built)
+  and a service none of whose requests got a result before it was retired therefore start fresh.
+  **Declared facet** (DR-41): a request still open at `retire_service`, whose result arrives only after a fresh re-definition (the copy had no
+  recorded request then, so the definition was a first one with a new `created`), falls outside every case of the new service; E5 counts the
+  results recorded after a fresh re-definition of a retired service (section 21).
 
 ```python
 @dataclass(frozen=True)
 class RetiredService:  # SRC/services/_protocols.py (package-private)
     path: str                            # the copy, org-relative
     files: tuple[tuple[str, str], ...]   # (name inside the service directory, text): SERVICE.md, PLAYBOOK.md, history/SERVICE.v<k>.md, history/PLAYBOOK.v<k>.md
-    delivered: int                       # the requests of it with a done result
+    recorded: int                        # the requests of it with a result of any status (done, blocked, failed)
 
 class ContinuedServices(Protocol):
     def continued(self, owner: str, name: str) -> RetiredService | None:
-        """The retired copy a root definition of ``owner``'s ``name`` continues: the newest one, when it has a delivered request; None
+        """The retired copy a root definition of ``owner``'s ``name`` continues: the newest one, when it has a recorded request; None
         otherwise. ``OSError``/``OrgError`` when a copy cannot be read."""
 
 class ServiceRestorer(Protocol):
@@ -545,7 +549,7 @@ only (the current file of a moved path is `None`: 6.3 skips the pair, 7.2 counts
 
 **Texts.**
 - Reply (services, so MCP and the CLI show it): `defined service `{name}` for {owner} again: it continues the retired one kept at {path}
-  (contract v{n} -> v{n+1}, {playbook v{p} | no playbook yet}, {k} delivered request(s) and their record). {record}`, then today's
+  (contract v{n} -> v{n+1}, {playbook v{p} | no playbook yet}, {k} request(s) with a result and their record). {record}`, then today's
   `Changed:` lines when other fields changed. `{record}` is read after the write from `ServiceEvidence.amendment_basis(owner, name)`:
   `Still open: rejection R1 (message <id>) has no answer; {n} delivered request(s) have no verdict: <ids>. Record them before the criteria
   change (feedback first).` (only the parts that apply), or `Every delivery has its verdict and every rejection its answer.`; `""` on
@@ -555,8 +559,7 @@ only (the current file of a moved path is `None`: 6.3 skips the pair, 7.2 counts
   case of it again.`, then the changes.
 - MCP root `retire` (`SRC/mcp_server/_tools_hiring.py:HiringTools`, root only, advisory). Before the retirement, when `addr` is top-level,
   the tool reads `catalog.service_names(addr)` and `evidence.amendment_basis(addr, name)` of each; after a successful retirement it appends
-  `\nKept with {addr}: {services}. Defining one of them again for {addr} continues its contract, playbook and cases (when it had a
-  delivery).{ Still open in `{name}`: rejection R1 (message <id>) has no answer; {n} delivered request(s) without a verdict: <ids>.} Tell the
+  `\nKept with {addr}: {services}. Defining one of them again for {addr} continues its contract, playbook and cases (when a request of it has a result).{ Still open in `{name}`: rejection R1 (message <id>) has no answer; {n} delivered request(s) without a verdict: <ids>.} Tell the
   user.` (nothing when the agent offers no service; nothing on a read error). `HiringTools` gets `catalog: Provider[ServiceCatalog]` and
   `evidence: Provider[ServiceEvidence]` (`wire_mcp_server.py`); the `retire` docstring and every surface golden stay unchanged. Agents'
   `retire` and the CLI `retire` print today's text (the terminal is the user's own seat, D15).
@@ -633,10 +636,7 @@ line without the `{name}: ` prefix (for example `- differs from lead/writer/work
 
 **Folders.** The services are `catalog.requestable_services(actor)` (for root: the top-level agents' services), or only `service`. Each
 service's path is resolved (containment steps 1-2 below). Services whose folders resolve to the same path form one **group**, shown as one
-block that names them all. A contract whose path names a file (an existing regular file, or a missing name in an existing folder: the
-blueprint's own examples use `deliverables/<name>.md`, `blueprint/_example_texts.py:34, 81, 179`) forms a **single-file group** keyed by the
-file's resolved path; when that file's folder is also a folder group, the file is checked once, as an entry of the folder group, whose block
-then names the file's services too. With `service` given (`progress(task_id)` of a service request), the group of its path is checked (all
+block that names them all. Whether a contract names a folder or a file is decided per contract by the walk (containment, step 3 below) **before** groups are formed (DR-45). A contract whose path names a file (an existing regular file; a name not there yet gives no findings) forms a **single-file group** keyed by the file's resolved path; when that file's folder is also a folder group, the file is checked once, as an entry of that folder group, by the **file rule** below (`differs` or no finding, never `unknown`), its services join that group's comparison basis, and the group's block names them too. The blueprint examples at `blueprint/_example_texts.py:34, 81, 179` are one-off `needs.deliverable` paths; the service examples at `:267, 279, 303` name a FOLDER. With `service` given (`progress(task_id)` of a service request), the group of its path is checked (all
 its members still form the comparison basis) and only that block is shown; a one-off task gives no block.
 
 **Comparison basis** (per group; the default `deliverables/` folder is shared by every service and every one-off goal, SKILL 1.2 and
@@ -660,12 +660,11 @@ ROOT_INSTRUCTIONS step 1, so the basis is the union):
      allows (newest first): no finding; else `unknown` ("never written by the team").
 - *A single-file group* (`file`; its one file `F` is opened as in step 5 below, through its folder's descriptor): the basename pairs of step 1
   when there are any, else every pair of the **newest** candidate result (a contract that names `memo.md` while the team writes
-  `2026-10-05-memo.md`). Equal to the checked version of any of them: no finding; else `differs` from the first of them (the basename match,
+  `2026-10-05-memo.md`). The same rule checks a file contract that is an entry of a folder group (DR-45). Equal to the checked version of any of them: no finding; else `differs` from the first of them (the basename match,
   or that result's first artifact), with its task and `withheld`; with no candidate result at all: `unknown`. A missing file gives no
   finding (nothing was copied yet).
 - *Git bound*: one `findings` call asks `at_result` for at most 40 distinct pairs and spends at most 5 s of git time (measured with
-  `kernel.Clock.monotonic`, read before each pair; `FolderDeliverableChecks` gets the clock). Each git subprocess has a 2 s timeout, so a call
-  spends at most about 9 s on git (5 s plus the last pair's two subprocesses, plus the one `head` lookup below). Basename matches are asked
+  `kernel.Clock.monotonic`, read before each pair; `FolderDeliverableChecks` gets the clock). Each git subprocess has a 2 s timeout, so a call spends at most about 11 s on git (5 s, plus the last pair's two subprocesses of 2 s each, plus 2 s for the one `head` lookup below). Basename matches are asked
   first, newest first; past either bound, the remaining pairs use `current`. `GitCheckedVersions` memoizes answers per (result id, path) for
   the life of the runtime: non-`None` answers for good (commits are immutable), `None` answers under the `HEAD` they were asked at
   (`OrgHistory.head()`, read once per `findings` call), so a pair not committed yet is asked again only after the next commit. The CLI, a fresh
@@ -690,15 +689,12 @@ ROOT_INSTRUCTIONS step 1, so the basis is the union):
    as it is now, such as macOS `/tmp` -> `/private/tmp`: the user chose that place). **A link as the last component**: `os.lstat(named)` is a
    symbolic link (`deliverables -> ~/.ssh`, which an agent with shell and an overlapping workspace could make): the folder-level `link`
    finding, nothing read. `FileNotFoundError` on `lstat`: go on with `target` (the walk below decides).
-3. **The walk** (a component that becomes a link after the resolve is never followed): `fd = os.open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC)`, then for
-   each component of `target.parts[1:]` in turn `fd = os.open(part, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC, dir_fd=fd)` (each
-   previous descriptor closed in a `finally`). `target` had no link when it was resolved, so a component that became a link afterwards is
-   refused by `O_NOFOLLOW` (`ELOOP`) instead of followed: the folder-level `link` finding, nothing read. `ENOENT` on any component: skipped,
-   no findings (nothing there yet: no folder, or a file not copied yet). `ENOTDIR` on the **last** component, which then names a file: the
-   contract is a single-file group, and step 5 runs on that name with the parent's descriptor (so a link swapped in for it is still refused
-   there, `ELOOP`). `ENOTDIR` on an earlier component: skipped (a system that reports a link opened with `O_DIRECTORY | O_NOFOLLOW` as
-   `ENOTDIR` ends here too: nothing is read through it). Other `OSError`: the folder-level `unreadable` finding. The descriptor of the last
-   component, `dfd`, is the folder; it is closed in a `finally`.
+3. **The walk** (a component that becomes a link after the resolve is never followed; DR-43): `fd = os.open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC)` and `pending = ""` (the traverse-only components carried so far, each followed by `/`); then, for each component `part` of `target.parts[1:]` in turn (descriptors closed in a `finally`):
+   - `os.open(pending + part, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC, dir_fd=fd)`. On success it is the new `fd` (the previous one is closed) and `pending` is reset; before the walk goes on, every carried component is `os.stat`ed again (`follow_symlinks=False`): one that is no longer the same directory (`(st_dev, st_ino)` changed, or now a link) gives the folder-level `link` finding, nothing read. `O_NOFOLLOW` guards the component just opened.
+   - `ENOTDIR` or `ELOOP` (the open refused a link or a non-directory; which of the two a system reports for a link opened with `O_DIRECTORY | O_NOFOLLOW` differs): `st = os.stat(pending + part, dir_fd=fd, follow_symlinks=False)`; `S_ISLNK`: the folder-level `link` finding, nothing read; `S_ISREG` and `part` is the last component: the contract is a **single-file group**, and step 5 runs on `pending + part` with `dfd = fd`; anything else: skipped.
+   - `EACCES` on a component that is **not** the last (a traverse-only parent, mode `--x`: it can be passed through but not opened for listing; measured on macOS: `os.open` of a 0o311 directory gives `EACCES`, while `os.open("p/f", ..., dir_fd=gp)` succeeds): `st = os.stat(pending + part, dir_fd=fd, follow_symlinks=False)`; `S_ISLNK`: `link`; not `S_ISDIR`: skipped; else its `(st_dev, st_ino)` is remembered, `part + "/"` is appended to `pending` and the walk goes on with the next component (`fd` unchanged). It is **not** reported as `unreadable`.
+   - `EACCES` on the last component (the folder itself): the folder-level `unreadable` finding. `ENOENT` on any component: skipped, no findings (nothing there yet: no folder, or a file not copied yet). Other `OSError`: `unreadable`.
+   The descriptor of the last component, `dfd`, is the folder; it is closed in a `finally`.
 4. `os.scandir(dfd)` (file descriptors are supported on macOS and Linux: `os.scandir in os.supports_fd` and `os.open in os.supports_dir_fd`
    are true on the project's Python 3.11), entries sorted by name, names starting with `.` skipped (`.DS_Store`), at most 200 entries; never
    recursive.
@@ -717,7 +713,7 @@ Nothing outside the named place is opened: the objects opened are the components
 appeared after the resolve), the folder itself and its direct entries, by name relative to the folder's descriptor. What remains: a link in
 an earlier component that existed **before** the resolve is followed (the user's own layout, such as `/tmp`); an agent that can replace a
 parent of the user's folder by a link before `progress` runs can point the check at another folder, and then only the names and hashes of
-its direct files are used, never their contents (section 22).
+its direct files are used, never their contents (section 22). Declared residual (DR-43): a traverse-only parent swapped for a link and swapped back between its two `stat`s is not detected; the same bound holds for it.
 
 **Names.** File names reach root's tool output, and an org agent with a workspace can create a file whose name carries newlines or
 instructions, so names are a prompt-injection channel. `shown_name(text, limit)` (`SRC/reflection/_deliverables.py`) renders every name and
@@ -794,7 +790,7 @@ The assistant can still copy before asking (the path is in the result body) and 
 refusal. A file beyond the git bound (40 pairs, 5 s) is compared with the current org file only, and a renamed copy of an old checked
 version can be reported as `unknown` (a false "never written"; E5 counts the notes and checks each against the deliverables log). Files
 beyond 32 MiB in one call are listed as not read (`limit`), not compared. A link in a parent of the deliverable folder that is there
-before the check runs is followed (6.3, step 3). A contract that names a file is checked as that one file; one whose path is missing is
+before the check runs is followed (6.3, step 3); a traverse-only parent (mode `--x`) is walked through, not reported, and one swapped for a link and swapped back between its two `stat`s is not detected (DR-43). A contract that names a file is checked as that one file; one whose path is missing is
 checked once something is there (E5 counts file-path contracts and their notes, section 21).
 
 ## 7. P4: a human rework starts from the version the client judged (D-E4-4; gate 3 P4)
@@ -1041,10 +1037,10 @@ rework, the id of the earlier task you sent to the same report.` insert `A servi
 | K3 | 95 (step 5 item 4) | `4. Then copy the deliverable to the requested path (the plan lists this step) and check it exists and matches. If `progress`, `status` or `whoami` name a file there the team did not deliver as checked, tell the user what changed and why.` | 1 -> 1 |
 | K4 | 104-109 (step 5 item 6, from `another, make the item`) | block below | 6 -> 6 |
 
-K4 (the reading on the rejection, 5.6 and D23, replaces 0a.1's "never pass `criterion` on the rejection itself"):
+K4 (the reading on the rejection, 5.6 and D23, replaces 0a.1's "never pass `criterion` on the rejection itself"; as amended by DR-46, which names the terminal path too):
 ```
    another, make the item the clarification that settles both. "Always ..." is not their yes: ask the item first. Name the id you
-   read the reject as, with `criterion` on the rejection itself (your reading, not their yes): the reply then gives the exact question.
+   read the reject as, with `criterion` on the rejection itself (your reading, not their yes) in MCP `feedback` (at the terminal, `--criterion` on a reject records the answer): the reply then gives the exact question.
    On yes: `define_service(owner, name, add_acceptance=[<the new criterion>])` with `answers=<the rejection's message id>`, `about=<the id
    you asked about>` and `words=<their answer, verbatim>` (and `remove_acceptance` for a clarification): it records their yes; tell the user the resulting criteria. On no, a one-off or "as it is":
    `feedback(..., source="human", confirms=<the rejection's message id>)` with criterion "none", the R id or the existing C id. A change they ask for on their own, outside a rejection: `words=` alone. An owner's note
@@ -1064,7 +1060,7 @@ in the reject turn is refused, so naming the reading only gives the reply its id
 lines, and the ten tests that assert `<= 125` lines stay green (0a.1 8.1 lists them). New needle test
 `test_the_skill_records_the_answer_with_define_service_and_names_the_base` (`SRC/skill/tests/test_skill_org_growth.py`) asserts `<= 125`
 lines plus the needles of the replacements that exist at each commit, each K commit adding its own (section 18): B9 creates it with K4's
-`answers=<the rejection's message id>`, `words=<their answer, verbatim>`, `` `words=` alone `` and the reading needle; C2 adds K2's
+`answers=<the rejection's message id>`, `words=<their answer, verbatim>`, `` `words=` alone ``, the reading needle and, from DR-46, ``at the terminal, `--criterion` on a reject records the answer``; C2 adds K2's
 `withholds the path`; C5 adds K3's `did not deliver as checked`; D3 adds K1's `base="delivered"`.
 
 ### 8.3 Merge order with the floor batch (D-E4-9)
@@ -1129,18 +1125,14 @@ of the stream and no fixture is built from it.
   run-log closing mark. Rendered transcript lines are unchanged (V3 design 5.2 table).
 - **The launcher's verdict is its exit code** (the agent cannot write it). `_stream` returns its `RenderState`; `_supervise` then returns
   `THROTTLE_EXIT = 75` (`EX_TEMPFAIL` of `sysexits.h`, "temporary failure, retry") when `state.throttled and state.effects == 0`, else
-  kiro's exit code as today, except that kiro's own 75 is returned as 1, so 75 always means the launcher's verdict (V3 design 5.1 step 4
+  kiro's exit code as today, except that kiro's own 75 is returned as 1 on EVERY return path of `main` and `_supervise`, the "ended" branch included (`code or 1`), so 75 always means the launcher's verdict (DR-44) (V3 design 5.1 step 4
   gains this one exception; no code of `scheduler`, `runs`, `health` or `stalls` gives 75 a meaning today: searched). The mark stays in the
   transcript for the reader and for E5.
 - Why both: agent message chunks are written to the transcript line by line, verbatim (`render_line`, `state.partial.split("\n")`), so an
   agent's text can contain a line equal to the mark, and even a forged `[run error] ...THROTTLING...` line before it. The exit code is the
   launcher's alone; the transcript rule below is a second check, never the only one.
 - `SRC/kiro/api.py` exports `THROTTLE_EXIT`, `READ_ONLY_TOOL_IDS` and the pure parser `throttled_without_effect(tail: str) -> bool`: true
-  only when the mark `...; tool effects: none` is the **last launcher line** of the tail (the last non-empty line before the runtime's
-  closing line `# exit <code> after <n>s`, `runs/_format.py`) **and** the line right before it is a `[run error] ` line whose compact text
-  (spaces removed) carries `"retryErrorType":"THROTTLING"`. A genuine run gives exactly that order: `render_line` flushes any partial agent
-  line before it writes the `[run error]` line, and `finish` writes the mark next. Anything after the run error (an agent chunk that comes
-  later, a kiro stderr line) makes it false: charged as today (fail safe). The launcher cannot import `observability` (standard library
+  only when the mark `...; tool effects: none` is the **last `# kiro:` line** of the tail (the last line starting with `# kiro:` before the runtime's closing line `# exit <code> after <n>s`, `runs/_format.py`) **and** a `[run error] ` line whose compact text (spaces removed) carries `"retryErrorType":"THROTTLING"` stands somewhere before it in the tail (DR-44). Other lines (kiro's stderr, which the supervisor interleaves) may sit between the run error and the mark, or after the mark up to the closing line. A genuine run gives the run error and then the mark (`render_line` flushes any partial agent line before it writes the `[run error]` line, and `finish` writes the mark next). A later `# kiro:` line after the mark, or no THROTTLING run error before it, makes it false: charged as today (fail safe). The launcher cannot import `observability` (standard library
   only), so the equality
   `READ_ONLY_TOOL_IDS == tuple(sorted("hirearchy::" + t for t in observability READ_ONLY_TOOLS))` is pinned by
   `TESTS/architecture/test_read_only_tool_ids.py`, which may import `hirearchy.observability._trace` (the top-level `tests/architecture`
@@ -1210,22 +1202,20 @@ is received budget. No file kind is added, and the credit is an immutable note.
   (`tool effects: 1`, kiro's code returned); an update-only tool load alone (none); an MCP `tool_call` without `kind` for `hirearchy::write`,
   completed (1); a completed update with no recorded call and no `rawInput` (1); an unknown kind (1); a `runError` without THROTTLING (no
   mark, kiro's code); a kiro that exits 75 without a throttle (the launcher returns 1); the mark never starts with a closing mark.
-  `throttled_without_effect`: true on the fixture's transcript followed by `\n# exit 75 after 3s\n`; false when an agent line follows the
-  mark; false when the line before the mark is no `[run error]` with THROTTLING; false on a **forged** pair, the mark and a
-  `[run error] ...THROTTLING...` line written by the agent's text, when the launcher's own last line follows them.
+  `throttled_without_effect`: true on the fixture's transcript followed by `\n# exit 75 after 3s\n` (`test_true_when_kiro_stderr_lines_sit_between_the_run_error_and_the_mark` adds kiro stderr lines between the run error and the mark); false when a later `# kiro:` line follows the mark (`test_false_when_a_later_kiro_line_follows_the_mark`); false when no THROTTLING `[run error]` line precedes the mark; `test_kiros_own_75_is_returned_as_1_on_every_return_path` (`main` and `_supervise`, the "ended" branch included); and `test_a_forged_pair_in_agent_text_passes_the_transcript_rule_but_main_returns_kiros_code`: a **forged** pair, the mark and a `[run error] ...THROTTLING...` line written by the agent's text, can satisfy the transcript rule, but the launcher's exit code is kiro's own, never 75.
 - `TESTS/architecture/test_read_only_tool_ids.py`: the equality of 9.1.
 - `SRC/scheduler/tests/test_throttle.py` (unit, fakes): free credit; counted credit after a credited previous run; a message sent during the
   run (no credit); no mark (no credit); an unreadable log (no credit, console line); a delivery that raises (`""`, console line, and no note
   in the agent's received boxes); a run log missing from `logs.files(addr)` (`"free"`).
-- `SRC/scheduler/tests/test_reaper.py`: `settle` asks `ThrottleCredits` only for `exit.code == THROTTLE_EXIT` and a run that was not
-  killed. **Forged mark**: a run whose transcript ends with the agent's forged `[run error] ...THROTTLING...` line and the mark, and that
+- `SRC/scheduler/tests/test_reaper_parts.py` (the existing file; A.4 P3): `settle` asks `ThrottleCredits` only for `exit.code == THROTTLE_EXIT` and a run that was not
+  killed. **Forged mark** (`test_a_forged_mark_with_exit_1_or_a_kill_is_charged_and_counted`): a run whose transcript ends with the agent's forged `[run error] ...THROTTLING...` line and the mark, and that
   then fails another way (exit 1, or killed after the timeout), is charged and counted as a failure, and no credit note exists.
 - `SRC/scheduler/tests/test_loop_throttle.py` (integration, `testkit.scheduler_loop` with the fake agent): a new switch of
   `TESTS/testkit/fake_agent.py`, `FAKE_THROTTLE_RUNS=N` (documented in its docstring), makes a run print a `[run error] ...` line carrying
   `"retryErrorType":"THROTTLING"` and then the mark, and exit `THROTTLE_EXIT`, while the agent's run-log count (its current run's log
   included) is at most `N`, then work as `FAKE_MODE` says. `N=1`: the agent's budget after the run equals the budget before it; one credit
   note; the retry ran and finished; `.runtime/failures.json` has no failure for it; root's `progress` says `runs 1 of ...` (the credited run
-  left out). `N=2`: two credits, one failure counted. A run that `send`s before the throttle: charged, failure counted. A run that prints the
+  left out: this assertion needs the counters of E5 and is added in the E5 commit, A.4 P5). `N=2`: two credits, one failure counted. A run that `send`s before the throttle: charged, failure counted. A run that prints the
   two lines but exits 1: charged, failure counted.
 - `SRC/reflection/tests/test_run_counter.py` and `SRC/progress/tests/test_counts.py`: a credited log is not counted; a credit note for another
   agent's stem changes nothing; `case_total` of a case with one credited run does not say "exceeds".
@@ -1241,6 +1231,8 @@ New file `TESTS/e2e/test_org_growth_0a2.py` with a small kit `TESTS/testkit/e4_r
   `[<time>] CALL #<n> <tool> status=... success=... args={...}` (the JSON is everything after `args=`). A call number that is absent, or
   present twice, fails the test. `lena_line(stream_dir, turn) -> str`: `turn-<NN>.prompt.txt` when it exists (E4), else the line after
   `######## LENA (prompt sent verbatim):` in `turn-<NN>.txt` (E3).
+- `ReplayIds` (DR-42): maps the literal case ids of E4's evidence (a message id such as `20261022T182945409755-root-ed94`) to the ids of the
+  replay's own organization, which differ; `C<k>` and `R<k>` pass through; an E4 id that is not bound fails the test (never a skip).
 - `scripted_report(w, task_id, result_file, artifact_texts)`: writes each artifact (org path -> text, from `EV/<stream>/memos/versions/...`) in
   the org, reports the task through the lead's MCP `report` tool with the summary, artifacts and lessons parsed from the evidence result's
   `## ` sections, then commits through `org.runtime.snapshotter` (the `OrgSnapshotter` field) as `RunSettlement.settle` does after a run (real
@@ -1253,7 +1245,7 @@ New file `TESTS/e2e/test_org_growth_0a2.py` with a small kit `TESTS/testkit/e4_r
 |---|---|---|
 | `test_s1r_t5_an_amendment_before_the_verdict_is_refused` | `s1r/service/history--SERVICE.v1.md`; `s1r/playbook/PLAYBOOK.4435fd0.md`; `s1r/msgs/sent/20261022T182945409755-root-ed94.md`; `s1r/msgs/read/20261022T184536871337-lead-4f4d.md`; `s1r/memos/versions/memo-2026-10-05.v2.a358b76.md`; `s1r/contract-loop.txt` calls #21, #22, #23; `s1r/turn-05.prompt.txt` (Lena's T5, verbatim) | #21's arguments as made, before #22: **P2-UNRATED** naming `...-ed94`; with `words=<Lena's T5>` added: P2-UNRATED again. After #22 (`criterion=["C5"]`): the reply has `About C5: add` and `answers="{#22's id}"`; #21 + `words=<T5>`: **P2-OPEN-REJECTION**; + `answers, about="C5", words=<T5>`: **P2-WORDS-ARE-THE-REJECTION** (T5 is the #22 note with "No, not right yet." before it: the symmetric rule of section 3 catches it); `SERVICE.md` still v1 after each. The compliant path (#21 + `answers`, `about="C5"`, `words=<#23's note>`) is admitted: v2, a link from root naming `C8, C9`, `services` shows neither as "(not confirmed)". |
 | `test_s1r_v3_and_v4_without_a_verdict_are_refused` | as above, plus `s1r/msgs/sent/20261022T190015448581-root-3559.md` (#24, memo 1's human rework) and its result `s1r/msgs/read/20261022T191112496455-lead-f84e.md`, `s1r/msgs/sent/20261022T191407596413-root-114d.md`, `s1r/msgs/read/20261022T192346320735-lead-fa63.md`, `s1r/memos/versions/memo-2026-10-12.v1.dfce3a4.md`, `s1r/service/history--SERVICE.v2.md` and `v3.md`, `s1r/contract-loop.txt` #24, #44, #45; `s1r/turn-09.prompt.txt` (Lena's reject of memo 2) | Setup: from v2 (the compliant T5/T6 of the first row), #24 is sent and reported with its evidence result `...-lead-f84e`, which is `status: blocked` as in E4, and **no verdict is recorded on it** (E4 recorded none): a blocked case has no delivery to rate, so it is not in `delivered_unrated`. Memo 2 (`...-114d`) is delivered (`...-lead-fa63`) and unrated. #44 (+ `words`) and #45 (+ `answers=<T5 rejection>`, `about="C9"`, `words`) are both **P2-UNRATED** naming `...-114d` only (`1 delivered request(s)`). After Lena's T9 reject of memo 2 is recorded (`source="human"`), #45 with the T5 rejection is **P2-ANSWERED** (`contract v2`), and #44 + `words` is **P2-OPEN-REJECTION** naming the T9 rejection; `SERVICE.md` stays v2 and `C9` current. |
-| `test_s1r_playbook_v2_of_e4_is_refused_line_by_line` (the gate's P1 replay "of s1r") | `s1r/playbook/PLAYBOOK.4435fd0.md` (v1), `s1r/playbook/PLAYBOOK.e9bd92f.md` (E4's v2: its body verbatim as the content, its frontmatter `evidence` `[C9, R1, 20261022T182945409755-root-ed94]` as the evidence); `s1r/revise-playbook-attempts.txt` (the admitted attempt, `ok=True`); setup as the first row's compliant end state | E4's v2 replaced the line `none yet: add them from lessons and feedback` with three lines: `**C9 – Relative deadlines**: ...`, `**C8 – Structure**: ...` and `**Calendar arithmetic**: ...`. Under P1: **P1-REFUSED** listing all three (no `- and ... more` line), with `are not C9's words` and `Write it as "- C9: Every Due value is an ISO date`; the playbook stays v1. In the replay both C8 and C9 are confirmed (the product's link names every added criterion, D8, where E4's link named only C9), so the C8 line is refused for not being cited, not for being unconfirmed; the Calendar line rests on nothing cited; the C9 line is an elaboration, not C9's words. Then v1 with that line replaced by `- C9: <C9's text>` and evidence `["C9"]`: admitted `c`, root's note lists `[C9] - C9: ...`. |
+| `test_s1r_playbook_v2_of_e4_is_refused_line_by_line` (the gate's P1 replay "of s1r") | `s1r/playbook/PLAYBOOK.4435fd0.md` (v1), `s1r/playbook/PLAYBOOK.e9bd92f.md` (E4's v2: its body verbatim as the content, its frontmatter `evidence` `[C9, R1, 20261022T182945409755-root-ed94]` as the evidence); `s1r/revise-playbook-attempts.txt` (the admitted attempt, `ok=True`); setup as the first row's compliant end state | E4's v2 replaced the line `none yet: add them from lessons and feedback` with three lines: `**C9 – Relative deadlines**: ...`, `**C8 – Structure**: ...` and `**Calendar arithmetic**: ...`. Under P1: **P1-REFUSED** listing all three (no `- and ... more` line), with `are not C8's or C9's words`, `Write it as "- C8: The memo's very first line` and `Write it as "- C9: Every Due value is an ISO date`; the playbook stays v1. C8 and C9 are both in `added` (C9 cited, C8 through R1's link: R1.about == (C8, C9), so citing R1 brings C8 into `added`, 4.1; in the replay the product's link names every added criterion, D8, where E4's link named only C9), and none of the three lines is either criterion's own words. (DR-42) Then v1 with that line replaced by `- C9: <C9's text>` and evidence `["C9"]`: admitted `c`, root's note lists `[C9] - C9: ...`. |
 | `test_s1r_t8_the_artifact_path_is_withheld_while_the_question_is_open` | `s1r/msgs/sent/...-root-114d.md`; `s1r/msgs/read/...-lead-fa63.md` (its `Questions for the client:` block); `s1r/memos/versions/memo-2026-10-12.v1.dfce3a4.md`; `s1r/client-questions.txt` (progress #36); `s1r/deliverables-log.txt` (#40's `sed`) | `progress(task_id=114d)` has `artifacts withheld (ask first)` and `1 question for the client: ask the user before you copy or deliver`, and not `lead/writer/work/memo-2026-10-12.md`. After #40's edit is applied to a copy in the deliverable folder (`implemented a deploy freeze` -> `decided on a deploy freeze`), with the question still open: `progress`, `status` and `whoami` name `"memo-2026-10-12.md": differs from the team's checked version (task ...114d; path withheld: ask first)` and none of them shows `lead/writer/work/memo-2026-10-12.md`. A relayed `feedback(114d, "accept")` after the edit: the finding stays and the flag ends, so the line becomes `"memo-2026-10-12.md": differs from lead/writer/work/memo-2026-10-12.md as the team checked it (task ...114d)`. A human-tier verdict recorded after the edit: the finding is settled (no note). Separately, a human rework of 114d (instead of a verdict): `progress` shows the path again. Also `s3/msgs/read/20261022T222916707473-lead-96e9.md` (blocked, with a question): flagged. |
 | `test_s2r_the_wrong_rule_is_refused_and_the_human_rework_needs_a_base` | `s2r/service/history--SERVICE.v1.md`, `history--SERVICE.v2.md`; `s2r/playbook/PLAYBOOK.2b6438a.md` (v1), `PLAYBOOK.6b06123.md` (v2); `s2r/revise-playbook-attempts.txt` (v2 arguments verbatim); `s2r/msgs/sent/` `...-root-f230`, `...-root-43b8` (and `s2r/injection/request-args.json`), `...-root-a9fd`, `...-root-342a`; `s2r/msgs/read/` `...-lead-5314`, `...-lead-c3dd`; `s2r/msgs/lead-sent/` `...-lead-608b`, `...-lead-0e90`; `s2r/memos/versions/2026-10-05-memo.v2.0aa3d3b.md` (judged, Marta 2026-10-14) and `v3.d8fd320.md` (injected, Marta none); `s2r/contract-loop.txt` (#31) | (1) the injected rework's writer delegation (a rework of the writer's task, sent while the lead works the relayed `43b8`) carries `source: relayed`; (2) the lead's service sections for the batch `[a9fd, 342a]` (`org.runtime.service_prompt_sections.prompt_sections("lead", batch)`, what the
 scheduler puts in the lead's prompt) show `lessons (from a relayed rework, not the client's): "Rework needed`; (2a) `a9fd` is recorded with its note verbatim and root's reading `criterion=["C3"]` added (E4's assistant passed none; the reading is what the compliant 0a.2 flow passes, 5.6): its reply has `"About C3: add "<the rule, in their words>" as a lasting rule? Yes or no."` and `answers="<a9fd's id>", about="C3"`; recorded without the reading, the reply has `"About <its id>: add`, lists the current C ids, says `Next time, pass your reading as criterion on the rejection`, and contains no `C<k> is one of`; (3) after `a9fd`, `request(revises=f230, source="human")` without base: **P4-NEEDS-BASE** naming `...-43b8` and `lead/writer/work/2026-10-05-memo.md`; (4) with `base="delivered"`: the task body has `## Base: the version the client judged`, the commit that first holds `lead/sent/<5314>.md`, and the judged text with `| Marta |` ... `| 2026-10-14 |` and no `Open questions`: Marta's date survives; the writer delegation for it carries `source: human`; (5) #31 with `answers=a9fd`, `about="C3"`, `words="Yes, add it."`: admitted, link names `C9`; (6) the lead's `revise_playbook` with v2's exact content and `["R1", "C9"]`: **P1-REFUSED**, containing `are not C9's words` and both vague-deadline lines (`Flag any vague deadline as `none``, `Vague deadlines:`); playbook stays v1; (7) v1 with its `none yet: ...` line replaced by `- C9: <C9's text>`, evidence `["C9"]`: v2 `admitted: c`, root's note lists `[C9] - C9: ...`. |
@@ -1317,6 +1309,8 @@ no ledger, no `.runtime/*.json`, no file kind, no `Message` field, no event fiel
 | `Org.send` (root) | FACADE-ROOT-TASK, FACADE-ROOT-VERDICT | recoverable (a programming error of the caller) | `OrgError`; nothing sent | no (the facade has no event of its own; the caller is in-process code) |
 | `progress`, `status`, `whoami` | the deliverable folder or one file unreadable | recoverable | a finding of kind `unreadable` in the note | no |
 | `progress`, `status`, `whoami` | the folder (or one of its components after the resolve) is a link | recoverable | the folder-level `link` line; nothing in it is read | no |
+| `progress`, `status`, `whoami` | a parent component of the folder is traverse-only (mode `--x`) | recoverable | walked through; no finding (never `unreadable`, DR-43) | no |
+| `progress`, `status`, `whoami` | the folder itself cannot be opened or listed | recoverable | the folder-level `unreadable` finding | no |
 | `progress`, `status`, `whoami` | more than 32 MiB of deliverable files in one call | recoverable | `limit` lines for the files not read | no |
 | `progress`, `status`, `whoami` | git slow or failing for the checked versions | recoverable | at most 40 pairs and 5 s of git time per call, each git call at most 2 s; a `None` answer falls back to the current org file | no |
 | `progress`, `status`, `whoami` | `DeliverableChecks.findings` raises `OrgError`/`OSError` (catalog or mail) | recoverable | the text without the note (the `_step` rule of 0a.1: any other exception is a bug and propagates) | no |
@@ -1345,12 +1339,12 @@ no ledger, no `.runtime/*.json`, no file kind, no `Message` field, no event fiel
 | git inputs (`OrgHistory`) | - | relative path without `..` or empty segment or leading `-`, without `:`, `^`, `~`, `@{` or `\`, always after `--` and under `--literal-pathspecs`; commit `[0-9a-f]{40}` or `{64}` | `None`, git not run |
 | `Org.send` from root | - | `type == "task"` without `service` and `revises`; `type == "note"` without `feedback` and `criterion` | FACADE-ROOT-TASK, FACADE-ROOT-VERDICT |
 | `retire_service` (root) | - | no new argument; the service's record must be complete (5.2a) | P2-RETIRE-UNRATED, P2-RETIRE-OPEN, P2-RETIRE-UNREADABLE |
-| `define_service` (root) of a name with a retired copy that has a delivered request | - | no `playbook`; the acceptance set unchanged; no `answers`/`about`/`words` (5.10) | P2-CONTINUES, P2-NOT-AN-AMENDMENT |
+| `define_service` (root) of a name with a retired copy that has a recorded request (a request with a result of any status) | - | no `playbook`; the acceptance set unchanged; no `answers`/`about`/`words` (5.10) | P2-CONTINUES, P2-NOT-AN-AMENDMENT |
 | `feedback(reject, criterion=...)` on the rejection itself (root's reading) | no | the existing `criterion` rules (`normalize_links`, `ServiceEvidence.links`); the first current `C<k>` or earlier `R<j>` is the reading | as today; no reading: the reply's third form (5.6) |
 | a retired copy's files (continuation) | - | only `SERVICE.md`, `PLAYBOOK.md`, `history/SERVICE.v\d+.md`, `history/PLAYBOOK.v\d+.md`, inside the organization; paths built from the layout and the archive, never from file contents | other files ignored; unreadable: P2-UNREADABLE |
 | a `runError` event (launcher) | - | any JSON; THROTTLING detected in three places (9.1) | no mark |
 | the launcher's exit code (scheduler) | - | `THROTTLE_EXIT` (75) only from the launcher's own verdict; kiro's own 75 becomes 1 | anything else: no credit |
-| a run log tail (scheduler) | - | the last 4 096 bytes; the mark must be the last launcher line, right after a THROTTLING `[run error]` line | no credit |
+| a run log tail (scheduler) | - | the last 4 096 bytes; the mark must be the last `# kiro:` line, with a THROTTLING `[run error]` line before it (DR-44) | no credit |
 
 ## 14. Invariants and their owners
 
@@ -1360,9 +1354,9 @@ no ledger, no `.runtime/*.json`, no file kind, no `Message` field, no event fiel
 | Lines are compared one way | `services.line_key` | the reviser, the gate and `quoting_lines` share it |
 | Root changes the criteria only with a basis; one answer per rejection; verdicts before amendments | `services.RuleContractDefiner` | the only writer of `SERVICE.md`; every surface reaches it (5.8) |
 | Root cannot reset a service's record by retiring the service while a verdict or an answer is missing | `services.RuleServiceRetirement` | the only path that moves a service under `.retired/`; every surface reaches it |
-| Retiring the owner (or the service) never resets the record of the same owner and name: a root definition after it continues the retired copy that has a delivered request, and that call cannot change the criteria | `services.RuleContractDefiner` over `services.ContinuedServices` (which copy) and `ServiceRestorer` (the copy) | the definer is the only writer of `SERVICE.md` versions and every surface reaches it (5.8); the retirement itself stays the user's structural decision, unrefused |
+| Retiring the owner (or the service) never resets the record of the same owner and name: a root definition after it continues the retired copy that has a recorded request (a result of any status), and that call cannot change the criteria | `services.RuleContractDefiner` over `services.ContinuedServices` (which copy) and `ServiceRestorer` (the copy) | the definer is the only writer of `SERVICE.md` versions and every surface reaches it (5.8); the retirement itself stays the user's structural decision, unrefused |
 | One rejection, one answer, in both directions (amendment after a link, link after an amendment, except the one recovery link of an answer whose link write failed) | `services._criteria.answering_version` and `answer_ids`, read by the definer and by `RuleClientFeedback` | both writers of an answer are in `services`; one reader of "a version answers it" and of "the ids its link names" |
-| Root's verdicts, links and service reworks go through their rule classes | `dispatch.check_root_send`, called by the `Org` facade's `send` (the only surface that can pass those fields) | MCP and CLI `send` cannot pass the fields (pinned); `RuleMessageSender` must keep accepting them from the rule classes |
+| Root's verdicts, links and service reworks go through their rule classes | `dispatch.check_root_send`, applied by `dispatch.GuardedRootSender`, which the `Org` facade's `send` delegates to (A.4 P1; the only surface that can pass those fields) | MCP and CLI `send` cannot pass the fields (pinned); `RuleMessageSender` must keep accepting them from the rule classes |
 | A user-initiated criterion is never (c)-eligible; only the product's link confirms an answered one | `reflection.confirmed_criteria` (basis join), read by the gate, step 3, the amendment note and `services` | one rule for every reader, as 0a.1's `confirmed_amendments` |
 | The link that records an answer has one shape | `services.LinkNotes` | `feedback(confirms=)` and `define_service(answers=)` write it the same way |
 | A human rework after relayed changes names its base | `services.RuleServiceRequester`; `dispatch.RuleTaskAssigner` refuses root's `delegate` of a service request | the requester builds every service rework; the assigner is the only other way root reworks |
@@ -1398,7 +1392,7 @@ rejections, the deliverable note is `""` with no findings, ` + {c} credited` onl
 - **No reading on a rejection**: the reply's third form (5.6), which names no id and lists the candidates; **no current criterion** (`{C ids}`
   empty, a contract with no criteria cannot exist: `criteria_lines(..., required=True)`) and **no earlier rejection** (`{R ids}` = `none`:
   the repeat sentence is left out).
-- **No retired copy** (continuation): a first definition, as today. **A copy with no delivered request**: a first definition. **A copy
+- **No retired copy** (continuation): a first definition, as today. **A copy with no recorded request** (no request of it has a result): a first definition. **A copy
   without `created`**: every request of the owner and name counts (no floor). **A copy without a playbook**: the continued service has none
   (`no playbook yet`), and the owner's first revision is exempt as it would have been.
 - **No previous run** (first run of an agent), or a run log that `logs.files(addr)` does not list: the throttle credit is `"free"`.
@@ -1463,7 +1457,7 @@ request; the CLI scenario's `retire_service` is not followed by a definition; `p
   (it delivers, then retires). The other retiring tests retire with open requests only (no `done` result), which the gate does not count:
   `test_contract_case_history.py` (lines 421, 453), `test_contract_service_reports.py:115`, `services/tests/test_contract_service_hints.py:62`,
   `services/tests/test_events.py:39`, `TESTS/golden/test_golden_events.py:87`, the CLI scenario `retire_service`.
-- **Rule C** (continuation, 5.10): a test that retires a root service (or its owner) after a delivered request and defines it again expects
+- **Rule C** (continuation, 5.10): a test that retires a root service (or its owner) after a request that has a result and defines it again expects
   the continuation. Known site: `SRC/reflection/tests/test_cases.py:test_requests_from_before_a_service_was_retired_are_not_cases_of_the_new_one`
   becomes `test_a_service_defined_again_after_a_delivery_continues_its_cases` (deliver, rate (Rule R), retire, define again: the old case is
   a case of the defined service, and its contract is v2 with the old `created`). The 0a.1 meaning stays pinned where it still holds:
@@ -1546,10 +1540,13 @@ commit is RED (its tests first, failing for the stated reason) -> GREEN -> REFAC
     owner with `retire_team`, hire it again, define the service with other criteria: P2-CONTINUES, nothing written; (b) define it with its
     criteria: v<n+1> with the old `created`, the old case is a case again, the reply names the open rejection; (c) then
     `define_service(..., add_acceptance=..., words=...)`: P2-OPEN-REJECTION, and with the answer: admitted with the whole record; (d) the
-    same after `retire_service` (with its verdicts); (e) a retired copy with no delivered request (a rolled-back blueprint): a first
+    same after `retire_service` (with its verdicts); (e) a retired copy with no recorded request (a rolled-back blueprint): a first
     definition, as today; (f) `weekly` is not continued from `weekly-memo-<stamp>`; (g) the same name for another top-level agent: a new
     service; (h) an unreadable copy: P2-UNREADABLE; (i) a continuation retired and continued again keeps the whole lineage; (j) `apply_org`
-    of a blueprint that defines a continued name: P2-CONTINUES (the playbook)).
+    of a blueprint that defines a continued name: P2-CONTINUES (the playbook); (k) DR-41: a **blocked** result rejected by the human, then
+    `retire_team`, `hire` and `define_service` with new criteria: the service continues (the open rejection keeps its record) and the
+    amendment is refused P2-OPEN-REJECTION as for a done result; with the open request closed by `retire_team` as `failed`, the same;
+    a request without a result at `retire_service` is not recorded (the declared late-result facet)).
 17. (B8b) `feat(mcp_server): root's retire reply names the records its services keep` (5.10 texts; `HiringTools` gets the catalog and the
     evidence; tests: a top-level agent with an open rejection and an unrated delivery; one without services (no note); a read error (no
     note); an agent's `retire` (today's text)).
@@ -1568,8 +1565,10 @@ commit is RED (its tests first, failing for the stated reason) -> GREEN -> REFAC
     line); single-file contracts (a contract path that names a file: an edited copy gives `differs`, an equal one none, a missing one none;
     a file contract inside a folder group is checked once); containment tests: a symlink entry, a `..` in the contract path, the folder
     itself a symlink (`deliverables -> <another folder>`: the folder-level `link` line and none of that folder's names), a parent component
-    swapped for a symlink **between** `resolve` and the walk (`Path.resolve` monkeypatched to swap after resolving: `ELOOP`, the `link` line,
-    nothing of the other folder read), a FIFO (skipped, and a FIFO swapped in for a regular entry does not block: `O_NONBLOCK`), a 4 MiB + 1
+    swapped for a symlink **between** `resolve` and the walk (the walk called with a stale target through the `locate`/`walk` seam of A.4 P4 (no `Path.resolve` patch): the `link` line,
+    nothing of the other folder read; DR-43: `ENOTDIR`/`ELOOP` classified by `os.stat(..., follow_symlinks=False)`, a last component swapped for a link,
+    a traverse-only parent gives no `unreadable` and one swapped for a link gives `link`, a folder that cannot be listed is `unreadable`; DR-45: the kind is decided before
+    grouping, a file contract inside a folder group uses the file rule and joins the basis, a single-file group outside any folder group), a FIFO (skipped, and a FIFO swapped in for a regular entry does not block: `O_NONBLOCK`), a 4 MiB + 1
     byte file (`large`), nine 4 MiB files (eight read, the ninth `limit`), a hard link (read), a subfolder (skipped), 201 entries (200 read)).
 23. (C5) `feat(progress,mcp_server): progress, status and whoami show the deliverable note` (K3 and its needle `did not deliver as checked`;
     the withheld-path line; replay `test_s1r_t8_...`).
@@ -1587,7 +1586,7 @@ commit is RED (its tests first, failing for the stated reason) -> GREEN -> REFAC
     `TESTS/architecture/test_policy_free_primitives.py`).
 29. (E1) `docs(instructions): activate the skill before building or rating; the reject order in one line` (8.1; 3 goldens; needle test).
 30. (E2) `feat(kiro): the launcher marks a throttled run, counts its tool effects and says so in its exit code` (the update-first facts of
-    9.1; `THROTTLE_EXIT` and kiro's own 75 returned as 1; the new fixture stream; `throttled_without_effect` with the position rule and the
+    9.1; `THROTTLE_EXIT` and kiro's own 75 returned as 1 on every return path (DR-44); the new fixture stream; `throttled_without_effect` with the last-`# kiro:`-line rule and the
     forged-pair test; `READ_ONLY_TOOL_IDS` and `TESTS/architecture/test_read_only_tool_ids.py`).
 31. (E3) `feat(kernel,budget): run credit vocabulary` (`RUN_CREDIT_TITLE`, `run_credit_title`, `is_run_credit`, `credited_stems`,
     `run_credit`).
@@ -1600,9 +1599,11 @@ commit is RED (its tests first, failing for the stated reason) -> GREEN -> REFAC
     organization's git history (through a port implemented in `app`), and the `services` row: the retired copies of its services; section 3
     interface blocks of `kernel`, `snapshots`, `agents`, `dispatch`, `services`, `reflection`, `kiro`, `budget`, and 3.37).
 
+Numbering (A.4 P6): the plan numbers these items in 36 commits: 1 Z0 (this amendment of the design), 2-7 A1-A6, 8-12 B1-B5, 13 B6k (the replay kit, split out of B6), 14 B6, 15 B7, 16 B9 (before B8), 17 B8, 18 B8a, 19 B8b, 20-24 C1-C5, 25-29 D1-D5, 30-35 E1-E6, 36 docs. The paragraph below uses revision 3's numbers; read A, B, C, D, E labels.
+
 Order: A (2-7) and C (19-23) are independent of each other; B (8-18) needs A; D (24-28) needs A and B; E (29-34) is independent, except that
 29 comes after 11, 26 and 27 (the same three goldens are regenerated in each, and each commit lists its own diff) and its step 5 names the
-`request` rework that 27 enforces. Commits 4, 9, 13, 15, 16, 20, 23, 26, 27, 30 and 32 run the full pytest before they are made; every
+`request` rework that 27 enforces. The full pytest runs before the plan's commits 4, 9, 14, 17, 18, 21, 27, 28, 31 and 33 (design A3, B2, B6, B8, B8a, C2, D3, D4, E2, E4); every
 other commit its targeted set plus a search of `src/` and `tests/` for each text it changes; each package ends with the full
 `scripts/check.sh`.
 
@@ -1618,7 +1619,7 @@ a service request (the P4 invariant), D5 closes the facade's way to write a verd
 | P1 companions (A2, A5, A6) | link-note id resolution (human, relayed); `case_line` marks; `quoting_lines` | the amendment note names the quoting lines; the digest in the owner's prompt sections | s2r (2); s3 (link id as evidence) |
 | P2 answer path (B1-B5) | `repeats_rejection` (the four evidence cases); `answering_version`; `answer_ids`; `confirmed_criteria` basis join; `question_for` (the three forms: reading `C<k>`, reading `R<j>`, no reading) | every refusal of 5.3 through MCP root, CLI `define-service` and `Org.define_service` (one parametrized test per refusal and surface: no bypass); the product's link shape equals `feedback(confirms=)`'s; P2-CONFIRMS-ANSWERED and P2-CONFIRMS-RECOVERY through MCP, CLI `feedback` and `Org.feedback`; the link-failure recovery (B4) | s1r T5 (compliant path), s2r (2a), (5), s3 #30, #37 |
 | P2 gate (B6, B8) | `delivered_unrated` (done, rated by any tier, a later rework; a blocked case is not unrated) | P2-UNRATED, P2-NEEDS-WORDS, P2-OPEN-REJECTION and P2-RETIRE-* on the three surfaces | s1r T5, s1r v3/v4, s1r playbook v2, E3 T5 |
-| P2 continuation (B8a, B8b) | the copy selection (newest by `defined`, `fullmatch` of the name, `RetiredTree.addr`, a delivered request since `created`) over a memory fake; `restore` byte for byte, `SERVICE.md` last | the ten cases (a)-(j) of B8a through MCP, CLI and `Org` (`retire_team` + `hire` + `define_service`, and `retire_service` + `define_service`); root's `retire` note (B8b) | - (E4 has no retirement; E5 counts them, section 21) |
+| P2 continuation (B8a, B8b) | the copy selection (newest by `defined`, `fullmatch` of the name, `RetiredTree.addr`, a request with a result of any status since `created`) over a memory fake; `restore` byte for byte, `SERVICE.md` last | the eleven cases (a)-(k) of B8a through MCP, CLI and `Org` (`retire_team` + `hire` + `define_service`, and `retire_service` + `define_service`); root's `retire` note (B8b) | - (E4 has no retirement; E5 counts them, section 21) |
 | P3 flag and path (C2) | `questions_open` (done, blocked, settled by a verdict or a human rework, not by a relayed one) | `progress` lines | s1r T8 (first half); s3 `...-lead-96e9` |
 | P3 folder check (C3-C5) | `blob_id` against `git hash-object` (sha1; sha256 in a `--object-format=sha256` repository); `shown_name`; grouping (file contracts included); settling; the git bounds (40 pairs, 5 s by a fake clock, the `None` memo under `HEAD`); the 32 MiB total | `FsDeliverableFolder` containment cases (C4: the component walk, a final link, a swap between resolve and walk, single-file contracts); `GitOrgHistory` over real git; note in `progress`, `status`, `whoami` (root only; agents never) | s1r T8 (second half) |
 | P4 tier (D1) | `provenance_source(inherited=)` | `fields_for` contract cases; a lead's writer delegation during a relayed and a human rework | s2r (1), (4) |
@@ -1641,12 +1642,12 @@ a service request (the P4 invariant), D5 closes the facade's way to write a verd
 | 0a.1 4.1, step 3 and the rule (c) note line | "a revision citing it is admitted" | "may add its words", one line each (4.6) |
 | 0a.1 5.2, the progress flag | `done` results only | `done` and `blocked`; the path is withheld while open (6.1, 6.2) |
 | 0a.1 18, "`define_service`, `request`, `feedback` and delivery refuse nothing new" | no new refusal | the refusals of 4.2, 5.3, 7.4 (D-E4-1, -2, -4); `feedback` refuses one new case, `confirms` on a rejection a contract version answered (P2-CONFIRMS-ANSWERED, D18); delivery still refuses nothing new |
-| 0a 4.1 / services `retire_service` ("same authority as a definition") | root may retire any top-level service at any time | root's retirement needs the service's record complete: every delivery rated, every human rejection answered (5.2a); defining it again afterwards continues it when it had a delivery (5.10) |
+| 0a 4.1 / services `retire_service` ("same authority as a definition") | root may retire any top-level service at any time | root's retirement needs the service's record complete: every delivery rated, every human rejection answered (5.2a); defining it again afterwards continues it when it had a recorded request (5.10) |
 | `app/_facade_dispatch.py:DispatchMixin.send` | forwards every field to the message sender | refuses root's service tasks, reworks, verdicts and links (7.5, D19); `Org.deliver` stays the declared policy-free primitive |
 | `services/_rework.py:ServiceReworkContext.fields_for` ("Empty for an ordinary task") | service fields only, `{}` for a non-service task | the restructured method of 7.6: service fields when the revised task is a service request, `source` for an agent in a traced case |
 | 0a.1 21.11 (DR-27), what `confirms` may name | unchanged | unchanged |
 | V3 design 5.1/5.2 | the launcher's lines; 5.1 step 4 "Return kiro's exit code" | one more `# kiro:` line (9.1); the rendered lines are unchanged; the launcher returns `THROTTLE_EXIT` (75) for a throttled run without a tool effect, and kiro's own 75 as 1 (9.1) |
-| 0a.1 (and 0a) "a service defined again after its retirement is a new service" (`reflection/tests/test_cases.py:143`; the `created` filter of `DerivedCaseHistory.cases`) | requests from before a retirement are never cases of the new definition | still true for agent clients and for a retired copy that never delivered; a root definition of the same owner and name whose retired copy has a delivered request continues it (5.10): same `created`, the old cases are its cases |
+| 0a.1 (and 0a) "a service defined again after its retirement is a new service" (`reflection/tests/test_cases.py:143`; the `created` filter of `DerivedCaseHistory.cases`) | requests from before a retirement are never cases of the new definition | still true for agent clients and for a retired copy none of whose requests got a result; a root definition of the same owner and name whose retired copy has a recorded request (a result of any status) continues it (5.10): same `created`, the old cases are its cases |
 | `hierarchy` team retirement (`RuleRetirement.retire_team`) | retires the team; its services leave with it | unchanged and never refused; MCP root's `retire` reply names the records the services keep (5.10) |
 | SKILL.md step 5 item 6 (0a.1 8.1, S-lines) | "never pass `criterion` on the rejection itself" | "Name the id you read the reject as, with `criterion` on the rejection itself (your reading, not their yes)" (8.2 K4, D23) |
 | 0a.1 3.4 `QUESTION` `{own}` and the reading | the rejection's own `criterion` is shown as not confirmed | unchanged, and it is now also root's reading, which fills the question's id (5.6) |
@@ -1712,7 +1713,7 @@ a service request (the P4 invariant), D5 closes the facade's way to write a verd
 - **D16 (P2 and 0a.1's CLI composition).** `hirearchy feedback <task> reject --criterion C<k>` (source human) still records the verdict and a
   link in one command (0a.1 3.4). That link is the rejection's answer ("about C<k>"), so a later `define-service --answers <that verdict>` is
   P2-ANSWERED. A terminal user who wants a lasting rule rejects without `--criterion` and then runs `define-service ... --answers <id> --about
-  C<k> --words "..."`; the `--criterion` help gains `(an answer that changes no criterion)` (golden `help_feedback.txt`, both copies, B4).
+  C<k> --words "..."`; the `--criterion` help gains `(an answer that changes no criterion)` (golden `help_feedback.txt`, both copies, B4). DR-46: K4 says so (`at the terminal, `--criterion` on a reject records the answer`), and the tests `test_a_terminal_reject_with_criterion_records_the_answer_so_define_service_answers_is_answered` and `test_a_terminal_reject_without_criterion_then_define_service_answers_records_the_answer` keep both paths consistent.
 - **D17 (D-E4-6 throttle, what "not charged" covers).** Not charged = the agent's budget gets the run back (credit note) and the case and task
   run counts (`case_total`, the overspend warning, `progress`'s `runs n of m` and `kept`) leave the run out. The per-agent run counts of the
   dashboard, `Org.runs_used` and `observability` keep it: they report what ran, and the conservation check adds the credits.
@@ -1737,8 +1738,8 @@ a service request (the P4 invariant), D5 closes the facade's way to write a verd
   effects here are the merge order (8.3) and E5's effort check (section 21).
 - **D22 (P2, closure of retire-the-owner-and-redefine, DR-28; behaviour the decision does not name).** Root can retire the owning agent with
   its team, hire the same name again and define the service. 0a.2 does not refuse the retirement (the manager's directive: the user keeps
-  authority over the structure); a root definition of the same owner and name then **continues** the retired copy that has a delivered
-  request (5.10): the same `created`, the contract's next version, the playbook, every case. The defining call cannot change the criteria
+  authority over the structure); a root definition of the same owner and name then **continues** the retired copy that has a recorded
+  request (a result of any status, DR-41; 5.10): the same `created`, the contract's next version, the playbook, every case. The defining call cannot change the criteria
   (P2-CONTINUES), so every change meets the gate with the whole record. This changes 0a.1's "a re-defined service is a new service" for
   root's services with a delivery (section 19). Declared, visible and counted, not refused: the same name defined for another top-level
   agent, or the criteria put under another name (5.8; section 21), because the product cannot tell a new service the user wants from an
@@ -1748,13 +1749,12 @@ a service request (the P4 invariant), D5 closes the facade's way to write a verd
   it the reply gives the exact wording and the candidate ids, and tells root to pass its reading next time. The reading never confirms
   anything (5.5) and is shown as "not confirmed" (0a.1), so allowing it reverses the skill's 0a.1 line "never pass `criterion` on the
   rejection itself" (8.2 K4, Rule K) without weakening P2: since 0a.2 an amendment in the reject turn is refused. The reading is not
-  required (no new refusal in `feedback`); E5 counts the rejections recorded without one and the `about` values that differ from it.
+  required (no new refusal in `feedback`); E5 counts the rejections recorded without one and the `about` values that differ from it. DR-46: the reading applies to MCP `feedback`; the CLI's `reject --criterion` records the answer (D16); both paths are tested.
 - **D24 (D-E4-6 throttle, the verdict's channel, DR-34).** The gate and the decision describe detection from `retryErrorType: THROTTLING` and
   "no tool effect". 0a.2 carries the launcher's verdict in its exit code (`THROTTLE_EXIT` = 75, `EX_TEMPFAIL`) besides the transcript mark,
   because an agent's text is rendered into the transcript verbatim and could forge the mark and a run-error line; the exit code is the
   launcher's alone. V3 design 5.1 step 4 ("return kiro's exit code") gains this one exception, and kiro's own 75 is returned as 1.
-- **D25 (P3, scope of the folder check, DR-32 and DR-33).** "The contract's deliverable folder" is read as the place `deliverable.path`
-  names: a folder, or a single file (the blueprint's examples name files). The check stays inside it: the path's components are walked
+- **D25 (P3, scope of the folder check, DR-32 and DR-33).** "The contract's deliverable folder" is read as the place `deliverable.path` names: a folder, or a single file (the one-off `needs.deliverable` examples of the blueprint name files, `_example_texts.py:34, 81, 179`; the service examples name a folder: DR-45). The check stays inside it: the path's components are walked
   with `O_NOFOLLOW`, a link as the last component is reported and not read, and a call reads at most 32 MiB and spends at most 5 s on git.
   A link in an earlier component that exists before the check runs is followed (the user's layout, such as `/tmp`), and is a declared limit
   (6.6).
@@ -1807,6 +1807,8 @@ Specific to 0a.2:
   whether the definition continued (the reply's `continues the retired one`) and every P2-CONTINUES refusal; the declared ways around: new
   services defined by root, for another owner or under another name, while another service (live or retired) has an unanswered human
   rejection or an unrated delivery; each is reported, not excused.
+- **Late results (DR-41):** the results recorded after a fresh re-definition of a retired service whose request was still open when it was
+  retired (the declared facet of 5.10): each is reported with its request, the retirement and the re-definition, not excused.
 - **No regression and P4:** count human reworks that needed a base, which base was chosen, what the user was told for `latest`, and whether the
   lead's writer restored the judged version (memo versions); s2r's Marta date in particular. Check that every lead writer task made during a
   relayed rework carries `source: relayed`. Count the ways around the base (7.7): reworks sent with `source="relayed"` whose turn shows a user
@@ -1851,7 +1853,10 @@ Specific to 0a.2:
     stay in the retired tree), and their old artifacts are compared with the org history only. The continuation's copies duplicate
     immutable versions (the retired copy stays the archive).
   - The deliverable check follows a link in a parent of the folder that exists before it runs (the user's layout); an agent that can
-    replace such a parent can point it at another folder, of which only direct file names and hashes are used, never contents (6.3).
+    replace such a parent can point it at another folder, of which only direct file names and hashes are used, never contents (6.3). A traverse-only
+    parent swapped for a link and swapped back between its two `stat`s is not detected (DR-43).
+  - A request still open when its service is retired, whose result arrives after a fresh re-definition, falls outside every case of the new
+    service (DR-41, 5.10); E5 counts it.
   - The throttle detector depends on kiro's event shapes (`kind` on built-in `tool_call`s, `rawInput.tool_id`/`tool_ids` on calls and
     updates, update-only events, `runError`); a change in them degrades to "charged as today", never to a wrong credit (a completed call with
     unknown facts counts as an effect). The `kind` values of built-ins other than `read`, `search`, `edit` and `delete` (`think`, `fetch`)
@@ -1896,7 +1901,7 @@ Every finding is **addressed**; none is backlogged or declined. Where the review
 | DR-26 | LOW | Commit 21 is split into D2 (the `JudgedVersions` port, implementation and contract suite) and D3 (`base` and its refusals); the facade closure is also split (D4, D5). | 18 |
 | DR-27 | LOW | "(no other paths or ORG_ROOT)" is restored now, without waiting for the floor batch: "organization" became "org" in the claim line and "and check" became ", check" in step 5. Measured: 2 616 raw, 2 693 at the reference path (< 2 700), 2 833 with a 200-character path; needle test added. | 8.1, 20 D12 |
 
-The commit numbers in A.1 are revision 2's; revision 3 inserts B8a and B8b, so section 18 now numbers 35 commits (the docs commit is 35).
+The commit numbers in A.1 are revision 2's; revision 3 inserts B8a and B8b, and the plan numbers section 18's items in 36 commits (Z0 and B6k are new; the docs commit is 36).
 DR-22's placement of the base section is superseded by DR-35's, DR-24's git bound by DR-33's, and DR-27's measurement by DR-29's.
 
 ### A.2 Review pass 2 (revision 2, 13 findings, DR-28 to DR-40), under the manager's directives for revision 3
@@ -1918,4 +1923,47 @@ follows the directive, and the reason is given.
 | DR-37 | LOW | (a) New replay `test_s1r_playbook_v2_of_e4_is_refused_line_by_line` from `PLAYBOOK.4435fd0.md` -> `PLAYBOOK.e9bd92f.md` (evidence C9, R1 and the case id): P1-REFUSED lists all three changed lines (the C9 elaboration, the C8 line, Calendar arithmetic); in the replay C8 is confirmed too (D8), so it is refused as not cited. (b) The v3/v4 setup reports #24 (`...-root-3559`) with its evidence result `...-lead-f84e`, which is `blocked`, and records no verdict on it, as E4 did: a blocked case is not unrated, so P2-UNRATED names only `...-114d`. (c) Each K commit adds its own needles to the new skill test (B9: K4; C2: K2; C5: K3; D3: K1). | 8.2, 10, 18 (B6, B9, C2, C5, D3) |
 | DR-38 | LOW | A basename pair unknown on both sides is dropped (the file goes to step 2 when none is left); a criterion with an empty `line_key` admits no (c) line and is quoted by its id only; a run log missing from `logs.files(addr)` gives `"free"`. | 4.1, 4.5, 6.3, 9.2, 15, 18 (E4) |
 | DR-39 | LOW | 8.3 points to the floor batch's design section 7 and adopts it: its resolved step-1 text (measured: 2 642 at the reference path), the root-note order (tree or summary, scheduler line, deliverables note, floor note, stale-skill note), the constructor merge (both parameters, `deliverables` first), the regeneration of `surface_root*`, and both `kiro/api.py` export sets. Whichever batch merges second rebases onto the other. | 6.5, 8.3 |
-| DR-40 | LOW | `_check_confirmation`'s four checks are named and the new refusals follow them; the ws4a tool load is line 174; P2-ROOT-ONLY, P2-NOT-AN-AMENDMENT, P2-WORDS-LONG, P2-PAIR, P4-BASE-VALUE and P4-BASE-WHERE get the `refused: ... Nothing was ...` frame; every P2 and P4 text that names arguments gives the CLI flags in a `(CLI: ...)` parenthesis (the texts are raised in `services`, the one layer both surfaces share, so one text serves both). | 5.3, 7.4, 9.1, 12 |
+| DR-40 | LOW | `_check_confirmation`'s four checks are named and the new refusals follow them; the ws4a tool load is line 174; P2-ROOT-ONLY, P2-NOT-AN-AMENDMENT, P2-WORDS-LONG, P2-PAIR, P4-BASE-VALUE and P4-BASE-WHERE get the `refused: ... Nothing was ...` frame; every P2 and P4 text that names arguments gives the CLI flags in a `(CLI: ...)` parenthesis (the texts are raised in `services`, the one layer both surfaces share, so one text serves both); DR-46 completes this for the texts it missed (A.3). | 5.3, 7.4, 9.1, 12 |
+
+### A.3 The manager's closing decision (DR-41 to DR-46; binding; 2026-10-23)
+
+Review pass 3 had 0 HIGH, 2 MEDIUM and 4 LOW findings. The design loop is closed: this design (`c0f72d1`) is approved as amended by the six items
+below, which override the sections they name where they conflict. Each is an explicit TDD item of the plan and is checked by its DR id in the final validation.
+
+| Id | Sev. | Resolution | Where | Plan commit, named tests |
+|---|---|---|---|---|
+| DR-41 | MEDIUM | The continuation is keyed on "a request of this service (root's sent task, `to == owner`, `service == name`, `msg_time >= created`, or no floor without `created`) with a result of ANY status (`done`, `blocked`, `failed`) in root's received box (`kernel.latest_results`)". `RetiredService.delivered` is renamed `recorded`; texts say `{k} request(s) with a result`. A human rejection of a blocked or failed result keeps the record across `retire_team` + `hire` + `define_service`, and the later amendment is refused P2-OPEN-REJECTION exactly as for a done result. Declared facet: a request still open at `retire_service`, whose result arrives after a fresh re-definition, falls outside every case (5.10, 22; E5 counts it). Consequence: `retire_team` closes the team's open requests as `failed` (`hierarchy/_retirement.py:64`), so after a team retirement every request of the service is recorded. | 5.1, 5.2 (step 0), 5.2a, 5.3, 5.8, 5.10, 13, 14, 15, 17, 18 (B8a case (k)), 20 D22, 21, 22 | 1 (design text), 18 (B8a): `test_contract_continued_services.py::test_a_copy_without_a_recorded_request_continues_nothing`, `::test_a_request_with_a_blocked_or_failed_result_is_recorded`; `test_continue.py::test_a_rejected_blocked_result_keeps_the_record_across_retire_team_hire_and_define`, `::test_retire_team_closes_open_requests_as_failed_so_they_are_recorded`, `::test_a_request_without_a_result_at_retire_service_is_not_recorded` |
+| DR-42 | MEDIUM | The s1r playbook replay expects `are not C8's or C9's words`, `Write it as "- C8: The memo's very first line` and `Write it as "- C9: Every Due value is an ISO date` (R1.about == (C8, C9), so citing R1 brings C8 into `added`, 4.1). The row's explanation: C8 and C9 are both in `added` (C9 cited, C8 through R1's link), and none of the three lines is either criterion's own words. E4's literal case id maps to the replay's id through `e4_replay.ReplayIds`. | 10 (the s1r playbook row and the kit list) | 1, 13 (B6k), 14 (B6): `tests/meta/test_e4_replay_kit.py::test_replay_ids_map_e4_ids_and_pass_c_and_r_ids_through`, `::test_an_unbound_e4_id_fails`; `tests/e2e/test_org_growth_0a2.py::test_s1r_playbook_v2_of_e4_is_refused_line_by_line` |
+| DR-43 | LOW | The walk classifies `ENOTDIR`/`ELOOP` from `O_DIRECTORY` + `O_NOFOLLOW` with `os.stat(part, dir_fd=fd, follow_symlinks=False)`: `S_ISLNK` -> the folder-level `link` finding (nothing read); `S_ISREG` on the last component -> the single-file group; otherwise skipped. A traverse-only parent (`EACCES` on the `O_RDONLY` open; measured on macOS: `os.open` of a 0o311 directory gives `EACCES`, `os.open("p/f", ..., dir_fd=gp)` succeeds) is walked through, never reported; only the folder itself (or the single file) that cannot be opened is `unreadable`. The git worst case is about 11 s (5 s + 2 x 2 s + 2 s for `head`). Declared residual: a traverse-only parent swapped for a link and swapped back between its two `stat`s is not detected. | 6.3 (step 3, "Git bound"), 6.6, 12, 18 (C4), 22 | 1, 23 (C4): `test_deliverable_folder.py::test_a_component_swapped_for_a_link_after_the_resolve_reports_link`, `::test_a_last_component_swapped_for_a_link_reports_link`, `::test_a_traverse_only_parent_gives_no_unreadable`, `::test_a_traverse_only_parent_swapped_for_a_link_reports_link`, `::test_a_folder_that_cannot_be_listed_is_unreadable` |
+| DR-44 | LOW | The transcript mark is accepted only as the LAST `# kiro:` line before the closing `# exit <code> after <n>s` line, with a `[run error] ` line carrying `"retryErrorType":"THROTTLING"` (compact text) somewhere before it in the tail; other lines (kiro's stderr) may sit between or after. kiro's own 75 is returned as 1 on EVERY return path of `main` and `_supervise`, including the "ended" branch (`code or 1`). The credit rests on the launcher's exit code 75 of a run that was not killed. A forged mark in agent text is tested. | 9.1, 9.3, 13, 18 (E2, E4) | 1, 31 (E2), 33 (E4): `test_launch.py::test_true_when_kiro_stderr_lines_sit_between_the_run_error_and_the_mark`, `::test_false_when_a_later_kiro_line_follows_the_mark`, `::test_kiros_own_75_is_returned_as_1_on_every_return_path`, `::test_a_forged_pair_in_agent_text_passes_the_transcript_rule_but_main_returns_kiros_code`; `test_reaper_parts.py::test_a_forged_mark_with_exit_1_or_a_kill_is_charged_and_counted` |
+| DR-45 | LOW | The blueprint lines `_example_texts.py:34, 81, 179` are one-off `needs.deliverable` paths (the service examples at `:267, 279, 303` name a FOLDER). The kind (folder or file) is decided per contract by the walk BEFORE groups are formed. A file contract whose folder is a folder group is checked once, as an entry of that group, by the file rule (`differs`, never `unknown`), and its services join that group's comparison basis and its block's services. | 6.3 ("Folders"), 6.6, 18 (C4), 20 D25 | 1, 23 (C4): `test_deliverable_checks.py::test_the_kind_is_decided_before_grouping`, `::test_a_file_contract_inside_a_folder_group_uses_the_file_rule_and_joins_the_basis`, `::test_a_single_file_group_outside_any_folder_group` |
+| DR-46 | LOW | Every P2 refusal text that names an argument gives its CLI form: P2-NOT-A-REJECTION, P2-ABOUT, P2-WORDS-LONG, P2-WORDS-ARE-THE-REJECTION, P2-UNRATED (binding) and, for "every", P2-RETIRE-UNRATED and P2-CONFIRMS-ANSWERED (planner; texts in 5.3). The two phrases pinned by `SRC/mcp_server/tests/test_service_tools.py:35-36` that 5.7 removes are replaced on purpose in B4, in the same commit. K4 reads "in MCP `feedback` (at the terminal, `--criterion` on a reject records the answer)"; both paths are tested. | 5.3, 5.7, 8.2 (K4), 20 D16, D23, A.2 DR-40 | 1, 11 (B4), 12 (B5), 14 (B6), 16 (B9), 17 (B8), 18 (B8a): `SRC/services/tests/test_texts_cli_forms.py::test_every_p2_text_that_names_an_argument_gives_its_cli_form` (grown per commit); `SRC/cli/tests/test_service_commands.py::test_a_terminal_reject_with_criterion_records_the_answer_so_define_service_answers_is_answered`, `::test_a_terminal_reject_without_criterion_then_define_service_answers_records_the_answer`; `SRC/mcp_server/tests/test_service_tools.py::test_mcp_reject_with_a_reading_then_define_service_answers_is_admitted`; `SRC/skill/tests/test_skill_org_growth.py::test_the_skill_records_the_answer_with_define_service_and_names_the_base` |
+
+**Also binding.** D-E4-9: every seat runs claude-sonnet-5.5 at `--effort high` (21). The floor batch (`feat/org-agent-model-floor-effort`; its design is
+`docs/design/org-agent-model-floor.md` in `.worktrees/org-agent-floor`) is expected to merge to `main` before 0a.2; 0a.2's merge step rebases onto
+`main` and resolves conflicts keeping both changes, the 125-line SKILL.md cap and the ROOT_INSTRUCTIONS character cap (8.3).
+
+### A.4 The planner's corrections (no behaviour change)
+
+- **P1. The facade guard is a port, not a statement in the facade.** `tests/architecture/facade_rules.py` requires every `_facade_*.py` method to
+  be ONE `return self.runtime.<field>.<method>(<params>)` statement (no other call, no branch). A `dispatch.check_root_send(...)` call inside
+  `DispatchMixin.send` (7.5) would break that rule. So D4 adds `dispatch._root_send.GuardedRootSender(MessageSender)` (constructor `inner:
+  MessageSender`; `send` calls `check_root_send(actor, type, service, revises, feedback, criterion)` and then `inner.send(...)` with every
+  argument unchanged), a runtime field `facade_sender: MessageSender` (`SRC/app/fields_dispatch.py`, wired in `SRC/app/wire_dispatch.py` as
+  `GuardedRootSender(<the message_sender>)`), and `DispatchMixin.send` delegates to `self.runtime.facade_sender.send(...)`.
+  `TESTS/architecture/facade_cases.py`'s `send` case names `facade_sender`. The rule classes keep `message_sender`. `check_root_send` stays the
+  pure function in `dispatch.api` with the texts in `dispatch/_root_send.py` (the design's intent: the rule lives in dispatch).
+  `GuardedRootSender` is not added to `dispatch.testing.IMPLEMENTATIONS[MessageSender]` (it is a guard over any sender; its own tests are
+  `SRC/dispatch/tests/test_root_send.py`, including "every other message reaches the inner sender unchanged" with `RecordingSender`).
+- **P2. `JudgedVersions` contract suite.** `services/tests` cannot import `reflection` (layers). Follow the `ServiceEvidence` pattern
+  (`SRC/reflection/tests/test_case_service_evidence.py` header): `SRC/services/tests/test_contract_judged_versions.py` iterates
+  `services.testing.IMPLEMENTATIONS[JudgedVersions] = [no_judged_versions, fixed_judged_versions]`, and
+  `SRC/reflection/tests/test_case_judged_versions.py` runs the same suite functions against `CaseJudgedVersions` over the fs world.
+- **P3. Reaper tests** go to the existing `SRC/scheduler/tests/test_reaper_parts.py` (the design's `test_reaper.py` does not exist).
+- **P4. The C4 swap test uses a seam.** `SRC/reflection/_deliverables.py` splits the containment into `locate(raw: str) -> Located | None`
+  (steps 1-2: type and absolute checks, `normpath`, the last-component `lstat`, `resolve`) and the module function `walk(target: Path) ->
+  Opened` (step 3). The test resolves, swaps a component for a link, then calls `walk` with the stale target: no `Path.resolve` patch.
+- **P5. The loop test's `runs 1 of ...` assertion** (9.3, `test_loop_throttle.py`, N=1) needs E5's counters, so it is added in E5 (plan commit
+  34), not in E4.
+- **P6.** B9 before B8; B6k split out of B6 (the replay kit `TESTS/testkit/e4_replay.py` with its own tests); Z0 is new (this amendment). The plan
+  numbers section 18's items in 36 commits (18, above).
