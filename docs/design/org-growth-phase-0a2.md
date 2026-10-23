@@ -1988,3 +1988,21 @@ No behaviour of 7.1 to 7.7 changed. Five points of how it is built differ from t
   `case_of` needs the task message); `CheckedVersions` gives `(commit, blob)` as a tuple, so "checked.blob" of 7.2 step 4 is its second item.
 
 The plan's `GuardedRootSender`-in-`_root_send.py` and `facade_sender: MessageSender` wording (plan 3.2 P1, commit 28) is superseded by this section.
+
+### A.6 What the implementation of D-E4-6 (plan commits 30-35) changed in the text above
+
+No behaviour of 8.1 or 9 changed. Six points of how it is built differ from the words of 8.1, 8.3, 9.1, 9.2 and A.4:
+
+- **`ROOT_INSTRUCTIONS` was built on top of the floor batch** (the branch was rebased onto `main` `9f0777c` before FEAT-004). The text is 8.1's diff with 8.3's step 1; measured with the command of the plan:
+  raw **2 565**, **2 642** at the reference path, 2 782 with a 200-character path, 26 lines, longest line 120 (8.1's 2 622 / 2 699 / 2 839 are the numbers without the floor batch; 8.3's 2 565 / 2 642 / 2 782 are
+  the ones after it). Step 1 keeps `models (all claude-sonnet-5.5 at high effort; nothing below is available), review, approval.` on one line, because `mcp_server/tests/test_reclaim_tool.py` pins that sentence flat; the line
+  break of 8.3's block moved to before `models` (same number of characters).
+- **`CreditingThrottles` has four collaborators**, `(logs, mail, delivery, console)`: the console line `{addr}: throttle credit not given: {error}` of 9.2 needs the console. The delivery is still the last fallible step.
+  `LifecyclePorts` gains `log_reader` (a `RunLogReader`) for it.
+- **A run credit names its recipient.** `kernel.is_run_credit(note)` is true for a note of the runtime that carries runs and whose title is `run credit <note.to>@<stem>`; a credit whose title names another agent is no credit.
+  `RetiredArchive.credited()` reads the credits of the received boxes of retired trees with the same rule (`services.testing.MemoryRetiredTrees` answers 0).
+- **The launcher returns 75 only for a non-zero kiro exit.** A throttle run error with kiro's exit code 0 stays 0 (a run kiro reports as successful is not failed); `READ_ONLY_TOOL_IDS` is sorted, so that the equality with
+  `sorted("hirearchy::" + t for t in READ_ONLY_TOOLS)` holds.
+- **`runs_between` and `LogRunCounts` read the credits of each agent once** (`credited_stems(mail.received(addr))` per agent of the team), not once per log.
+- **Test-first order.** The `FAKE_THROTTLE_RUNS` switch of the fake agent and the five loop tests were written together with their production code (the loop tests ran red against the old code afterwards; the meta test
+  ran red against the old fake agent).
