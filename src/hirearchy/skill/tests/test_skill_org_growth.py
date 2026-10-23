@@ -44,10 +44,32 @@ def test_the_trigger_words_are_gone():
 
 def test_always_is_not_the_users_yes():
     """E3 turn 5: the assistant took "always" in the rejection for the yes and passed `criterion` on the rejection itself. Only the answer to
-    the one question is the yes, and it is recorded with `confirms`."""
+    the one question is the yes, and it is recorded with `confirms` or `answers`. The 0a.1 needle "never pass `criterion` on the rejection
+    itself" is replaced on purpose (design 8.2, B9): since 0a.1 a criterion on the rejection is relayed, and since 0a.2 an amendment in the
+    reject turn is refused, so naming the reading on the rejection only gives the reply its id (your reading, not their yes)."""
     assert len(SKILL.read_text().splitlines()) <= 125
     text = flat()
-    for needle in ('"always ..." is not their yes: ask the item first', "never pass `criterion` on the rejection itself"):
+    for needle in ('"always ..." is not their yes: ask the item first', "with `criterion` on the rejection itself (your reading, not their yes)"):
+        assert needle in text, needle
+    assert "never pass `criterion` on the rejection itself" not in text
+
+
+def test_the_skill_records_the_answer_with_define_service_and_names_the_base():
+    """K4 (design 8.2, DR-46): the yes is recorded with define_service(answers=, about=, words=), a change the user asks for on their own with
+    words= alone, and the reading goes on the rejection in MCP feedback (at the terminal --criterion on a reject records the answer)."""
+    assert len(SKILL.read_text().splitlines()) <= 125
+    text = flat()
+    for needle in (
+        "`answers=<the rejection's message id>`",
+        "`words=<their answer, verbatim>`",
+        "`words=` alone",
+        "with `criterion` on the rejection itself (your reading, not their yes)",
+        "the reply then gives the exact question",
+        "at the terminal, `--criterion` on a reject records the answer",
+        "`define_service(owner, name, add_acceptance=[<the new criterion>])`",
+        "the resulting criteria",
+        "never edit service.md or playbook.md yourself",
+    ):
         assert needle in text, needle
 
 

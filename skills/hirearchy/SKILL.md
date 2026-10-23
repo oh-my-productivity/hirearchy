@@ -101,12 +101,12 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
    criterion stays unmet: say so; feedback never waives it; reject needs the user's reason in their words. Your own reading is relayed
    (the default). With each human reject propose exactly ONE item they answer yes or no, naming what it is about by the ids `services()`
    shows, as one yes/no question ("About C6: add '...' as a criterion?" or "Same as R3: a one-off?"); if the new criterion would pull against
-   another, make the item the clarification that settles both. "Always ..." is not their yes: ask the item first, and never pass `criterion`
-   on the rejection itself. On yes: `define_service(owner, name, add_acceptance=[<the new criterion>])`
-   (and `remove_acceptance` for a clarification), tell the user the resulting criteria, and record the answer as the link with
-   `feedback(..., source="human", confirms=<the rejection's message id>)`: criterion = the id the reply gives (an existing one's if
-   nothing changes; "none" for a one-off). An owner's note with a question for the client is no new question (only your one item per
-   reject asks one): read it with `inbox`, go on, and never reply to it or mention it. Never edit SERVICE.md or PLAYBOOK.md yourself.
+   another, make the item the clarification that settles both. "Always ..." is not their yes: ask the item first. Name the id you
+   read the reject as, with `criterion` on the rejection itself (your reading, not their yes) in MCP `feedback` (at the terminal, `--criterion` on a reject records the answer): the reply then gives the exact question.
+   On yes: `define_service(owner, name, add_acceptance=[<the new criterion>])` with `answers=<the rejection's message id>`, `about=<the id
+   you asked about>` and `words=<their answer, verbatim>` (and `remove_acceptance` for a clarification): it records their yes; tell the user the resulting criteria. On no, a one-off or "as it is":
+   `feedback(..., source="human", confirms=<the rejection's message id>)` with criterion "none", the R id or the existing C id. A change they ask for on their own, outside a rejection: `words=` alone. An owner's note
+   with a question for the client is no new question (only your one item per reject asks one): read it with `inbox`, go on, and never reply to it or mention it. Never edit SERVICE.md or PLAYBOOK.md yourself.
 7. The scheduler exits on its own when nothing is left (`progress` shows "scheduler: stopped (finished: no open tasks)").
    Call `stop()` only if the user cancels, declines more budget, you hand over an unverified or partial result (say the task
    stays open/blocked, not done), or you started it with `until_done=False`.
