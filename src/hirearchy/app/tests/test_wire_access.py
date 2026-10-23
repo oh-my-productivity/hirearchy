@@ -6,7 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from hirearchy.access import AccessScopes, AuthorityPolicy, ModelResolver, ToolNaming
+from hirearchy.access import AccessScopes, AuthorityPolicy, ModelFloorAudit, ModelResolver, ToolNaming
+from hirearchy.access._floor import CharterModelFloorAudit
 from hirearchy.access.testing import StaticAccess
 from hirearchy.agents import CharterReader
 from hirearchy.agents.testing import MemoryAgents
@@ -30,6 +31,12 @@ def test_the_runtime_has_the_access_ports(tmp_path: Path) -> None:
     runtime = wiring.open_runtime(tmp_path)
     assert isinstance(runtime.access_scopes, AccessScopes) and isinstance(runtime.authority_policy, AuthorityPolicy)
     assert isinstance(runtime.tool_naming, ToolNaming) and isinstance(runtime.model_resolver, ModelResolver)
+
+
+def test_the_runtime_has_a_model_floor_audit(root: Path) -> None:
+    runtime = wiring.open_runtime(root)
+    assert isinstance(runtime.model_floor_audit, ModelFloorAudit) and isinstance(runtime.model_floor_audit, CharterModelFloorAudit)
+    assert runtime.model_floor_audit.below_floor() == [("ceo", "m-org")]  # ORG.md says default_model: m-org, and ceo names no model
 
 
 def test_building_the_ports_touches_nothing(tmp_path: Path) -> None:

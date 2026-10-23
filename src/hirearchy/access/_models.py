@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ..agents import CharterReader
-from ..settings import OrgSettings
+from ..settings import OrgSettings, config_effort
 from .api import ModelResolver
 
 
@@ -18,3 +18,6 @@ class CharterModelResolver(ModelResolver):
     def model_for(self, addr: str) -> str:
         meta, _ = self._charters.charter(addr)
         return str(meta.get("model") or "").strip() or self.default_model()
+
+    def effort(self) -> str:
+        return config_effort(self._settings.config())

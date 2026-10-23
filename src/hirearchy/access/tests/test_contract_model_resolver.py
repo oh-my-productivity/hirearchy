@@ -91,3 +91,34 @@ def test_root_runs_on_the_default(h: AccessHarness) -> None:
 def test_an_agent_that_does_not_exist_is_the_error_of_the_charter_reader(h: AccessHarness) -> None:
     with pytest.raises(FileNotFoundError):
         h.models.model_for("nobody")
+
+
+# ------------------------------------------------------------------------------------------ the effort of a run
+
+
+def test_the_effort_is_high_when_ORG_md_names_none(h: AccessHarness) -> None:
+    assert h.models.effort() == "high"
+
+
+def test_the_effort_is_the_one_of_ORG_md(h: AccessHarness) -> None:
+    h.put_config(org_md("effort: xhigh\n"))
+    assert h.models.effort() == "xhigh"
+
+
+@pytest.mark.parametrize("line", ["effort:\n", "effort: null\n", "effort: ''\n", "effort: '   '\n", "other: 1\n"])
+def test_a_null_blank_or_missing_effort_is_high(h: AccessHarness, line: str) -> None:
+    h.put_config(org_md(line))
+    assert h.models.effort() == "high"
+
+
+def test_the_effort_is_read_as_written(h: AccessHarness) -> None:
+    """A level below the floor is returned as it is: the run command refuses it, not the resolver."""
+    h.put_config(org_md("effort: low\n"))
+    assert h.models.effort() == "low"
+
+
+def test_a_change_of_ORG_md_effort_is_seen_by_the_next_call(h: AccessHarness) -> None:
+    h.put_config(org_md("effort: max\n"))
+    assert h.models.effort() == "max"
+    h.put_config(org_md("effort: xhigh\n"))
+    assert h.models.effort() == "xhigh"

@@ -2,8 +2,9 @@
 
 ``AccessScopes`` answers where an agent may read and write, ``AuthorityPolicy`` keeps a grant from reaching further than the grantor's
 own (tools, workspace, inputs; the right to hire and a report's ``max_children``), ``ToolNaming`` says under which names an agent has the
-read and write tools of the organization, and ``ModelResolver`` which model a run uses. The pure function ``unconfined_read`` is the
-legacy-charter predicate for callers that hold only a charter's frontmatter, ``children_limit`` the one reading of a ``max_children``.
+read and write tools of the organization, and ``ModelResolver`` which model and effort a run uses. ``ModelFloorAudit`` names the agents
+that run below the model floor (docs/design/org-agent-model-floor.md). The pure function ``unconfined_read`` is the legacy-charter
+predicate for callers that hold only a charter's frontmatter, ``children_limit`` the one reading of a ``max_children``.
 """
 
 from __future__ import annotations
@@ -18,6 +19,7 @@ __all__ = [
     "CHILDREN_LIMIT_ERROR",
     "AccessScopes",
     "AuthorityPolicy",
+    "ModelFloorAudit",
     "ModelResolver",
     "ToolNaming",
     "children_limit",
@@ -78,4 +80,20 @@ class ModelResolver(Protocol):
 
     def model_for(self, addr: str) -> str:
         """The model a run of ``addr`` uses: its charter's ``model``, else the org's ``default_model``, else ``DEFAULT_MODEL``."""
+        ...
+
+    def effort(self) -> str:
+        """The effort of every run: the settings' ``effort``, else ``DEFAULT_EFFORT``, read as written (a level below the floor is
+        returned as it is; the run command refuses it)."""
+        ...
+
+
+@runtime_checkable
+class ModelFloorAudit(Protocol):
+    def below_floor(self) -> list[tuple[str, str]]:
+        """``(addr, model)`` of every agent whose model is outside the allowed models, in directory order (root is never listed)."""
+        ...
+
+    def note(self) -> str:
+        """One line naming each such agent and the fix; ``""`` when none is below the floor."""
         ...

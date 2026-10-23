@@ -100,6 +100,9 @@ class FixedModel(ModelResolver):
         self.seen_agent_exists.append(self.files.exists(addr))
         return f"model-of-{addr}"
 
+    def effort(self) -> str:
+        raise AssertionError("not asked")
+
 
 class ShoutingTemplates(DocumentTemplates):
     def org_rules(self, mission: str | None) -> str:

@@ -1,6 +1,6 @@
 """An in-memory ``access`` and the registry the contract suites iterate over.
 
-``StaticAccess`` answers all four ports for charters kept in memory. It passes the same contract suites as the real classes over the
+``StaticAccess`` answers all four ports (and the model floor audit) for charters kept in memory. It passes the same contract suites as the real classes over the
 files of an organization (``tests/test_contract_*.py``), so a consumer's unit test may use it instead of directories on disk.
 """
 
@@ -14,16 +14,17 @@ from ..agents.testing import MemoryAgents, fs_agents
 from ..kernel import JsonObject, OrgPaths, join_frontmatter
 from ..settings.testing import MemoryOrgSettings, fs_org_settings
 from ._authority import CharterAuthorityPolicy
+from ._floor import CharterModelFloorAudit
 from ._models import CharterModelResolver
 from ._naming import CharterToolNaming
 from ._scopes import CharterAccessScopes
-from .api import AccessScopes, AuthorityPolicy, ModelResolver, ToolNaming
+from .api import AccessScopes, AuthorityPolicy, ModelFloorAudit, ModelResolver, ToolNaming
 
 DEFAULT_ORG_MD = "---\nmax_depth: 4\n---\n# Organization\n"
 CHARTER_BODY = "# Role\n\nDo the work."
 
 
-class StaticAccess(AccessScopes, AuthorityPolicy, ToolNaming, ModelResolver):
+class StaticAccess(AccessScopes, AuthorityPolicy, ToolNaming, ModelResolver, ModelFloorAudit):
     """The four ports over agents and an ORG.md kept in memory: ``put_agent`` makes an agent, ``put_config`` replaces ORG.md."""
 
     def __init__(self, root: Path | None = None, org_md: str = DEFAULT_ORG_MD, agents: MemoryAgents | None = None) -> None:
@@ -37,6 +38,7 @@ class StaticAccess(AccessScopes, AuthorityPolicy, ToolNaming, ModelResolver):
         self._authority = CharterAuthorityPolicy(OrgPaths(self.root), self.agents, self._scopes)
         self._naming = CharterToolNaming(self.agents)
         self._models = CharterModelResolver(self.agents, self.settings)
+        self._floor = CharterModelFloorAudit(self.agents, self._models, self.settings)
 
     def put_agent(self, addr: str, meta: Mapping[str, object]) -> None:
         """``addr`` becomes an agent whose charter has this frontmatter."""
@@ -76,6 +78,15 @@ class StaticAccess(AccessScopes, AuthorityPolicy, ToolNaming, ModelResolver):
     def model_for(self, addr: str) -> str:
         return self._models.model_for(addr)
 
+    def effort(self) -> str:
+        return self._models.effort()
+
+    def below_floor(self) -> list[tuple[str, str]]:
+        return self._floor.below_floor()
+
+    def note(self) -> str:
+        return self._floor.note()
+
 
 # ------------------------------------------------------------------------------ harnesses and the registry
 
@@ -88,6 +99,7 @@ class AccessHarness:
     authority: AuthorityPolicy
     naming: ToolNaming
     models: ModelResolver
+    floor: ModelFloorAudit
     root: Path  # the organization directory as the ports see it
     put_agent: Callable[[str, JsonObject], None]  # ``addr`` becomes an agent whose charter has this frontmatter
     put_config: Callable[[str], None]  # ORG.md becomes this text
@@ -102,11 +114,13 @@ def charters_on_disk(tmp_path: Path) -> AccessHarness:
         files.put(f"{addr}/AGENT.md", join_frontmatter(meta, CHARTER_BODY))
 
     document.put(DEFAULT_ORG_MD)
+    models = CharterModelResolver(files.charters, document.settings)
     return AccessHarness(
         scopes,
         CharterAuthorityPolicy(paths, files.charters, scopes),
         CharterToolNaming(files.charters),
-        CharterModelResolver(files.charters, document.settings),
+        models,
+        CharterModelFloorAudit(files.directory, models, document.settings),
         tmp_path,
         put_agent,
         document.put,
@@ -116,7 +130,7 @@ def charters_on_disk(tmp_path: Path) -> AccessHarness:
 def static_access(tmp_path: Path) -> AccessHarness:
     """The in-memory fake."""
     fake = StaticAccess()
-    return AccessHarness(fake, fake, fake, fake, fake.root, fake.put_agent, fake.put_config)
+    return AccessHarness(fake, fake, fake, fake, fake, fake.root, fake.put_agent, fake.put_config)
 
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
@@ -124,4 +138,5 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     AuthorityPolicy: [charters_on_disk, static_access],
     ToolNaming: [charters_on_disk, static_access],
     ModelResolver: [charters_on_disk, static_access],
+    ModelFloorAudit: [charters_on_disk, static_access],
 }

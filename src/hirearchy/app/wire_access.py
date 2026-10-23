@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from ..access import AccessScopes, AuthorityPolicy, ModelResolver, ToolNaming
+from ..access import AccessScopes, AuthorityPolicy, ModelFloorAudit, ModelResolver, ToolNaming
 from ..access._authority import CharterAuthorityPolicy
+from ..access._floor import CharterModelFloorAudit
 from ..access._models import CharterModelResolver
 from ..access._naming import CharterToolNaming
 from ..access._scopes import CharterAccessScopes
@@ -18,3 +19,4 @@ def register(b: Builder) -> None:
     b.provide(AuthorityPolicy, lambda b: CharterAuthorityPolicy(b.get(OrgLayout), b.get(CharterReader), b.get(AccessScopes)))
     b.provide(ToolNaming, lambda b: CharterToolNaming(b.get(CharterReader)))
     b.provide(ModelResolver, lambda b: CharterModelResolver(b.get(CharterReader), b.get(OrgSettings)))
+    b.provide(ModelFloorAudit, lambda b: CharterModelFloorAudit(b.get(AgentDirectory), b.get(ModelResolver), b.get(OrgSettings)))

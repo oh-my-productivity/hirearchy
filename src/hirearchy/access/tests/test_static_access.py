@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from hirearchy.access import AccessScopes, AuthorityPolicy, ModelResolver, ToolNaming
+from hirearchy.access import AccessScopes, AuthorityPolicy, ModelFloorAudit, ModelResolver, ToolNaming
 from hirearchy.access.testing import StaticAccess
 
 
@@ -12,6 +12,13 @@ def test_it_is_all_four_ports() -> None:
     fake = StaticAccess()
     assert isinstance(fake, AccessScopes) and isinstance(fake, AuthorityPolicy)
     assert isinstance(fake, ToolNaming) and isinstance(fake, ModelResolver)
+
+
+def test_it_is_also_the_model_floor_audit() -> None:
+    fake = StaticAccess()
+    assert isinstance(fake, ModelFloorAudit)
+    fake.put_agent("ceo", {"role": "R", "model": "claude-haiku-4.5"})
+    assert fake.below_floor() == [("ceo", "claude-haiku-4.5")] and fake.effort() == "high"
 
 
 def test_agents_and_the_configuration_are_prepared_in_memory() -> None:
