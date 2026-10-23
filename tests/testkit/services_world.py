@@ -52,15 +52,15 @@ def request(org, topic="ai", **kw):
 
 
 def confirmed_amendment(org, criterion, topic="confirm", owner="ceo", name="weekly-brief"):
-    """The user rejects a fresh delivery, the contract gains ``criterion`` and the user's yes to it is recorded (a ``confirms`` link naming its
-    new id): what admits a revision citing it by rule (c). Returns the new id."""
+    """The user rejects a fresh delivery and answers yes to the question about ``criterion``: ``define_service(..., answers=<the rejection>,
+    about=<a current id>, words="Yes, add it.")`` adds it and the product writes the link that confirms it (Rule A); what admits a revision citing
+    it by rule (c). Returns the new id."""
     task = org.request(ROOT, name, {"topic": topic})
     deliver(org, owner, task)
     no = org.feedback(ROOT, task.id, "reject", f"Missing: {criterion}", source="human")
-    org.define_service(ROOT, owner, name, add_acceptance=[criterion])
-    new = next(c.id for c in reversed(org.runtime.service_catalog.criteria(owner, name)) if c.text == criterion and c.current)
-    org.feedback(ROOT, task.id, "reject", "Yes, add it.", source="human", criterion=[new], confirms=no.id)
-    return new
+    about = next(c.id for c in org.runtime.service_catalog.criteria(owner, name) if c.current)
+    org.define_service(ROOT, owner, name, add_acceptance=[criterion], answers=no.id, about=about, words="Yes, add it.")
+    return next(c.id for c in reversed(org.runtime.service_catalog.criteria(owner, name)) if c.text == criterion and c.current)
 
 
 def write_version(org, version, acceptance, owner="ceo", name="weekly-brief", **basis):
@@ -69,9 +69,19 @@ def write_version(org, version, acceptance, owner="ceo", name="weekly-brief", **
     the version before are not copied."""
     meta, body = org.runtime.service_store.read_contract(owner, name)
     meta = {k: v for k, v in meta.items() if k not in ("answers", "about", "words", "initiated")}
+    defined = org.runtime.clock.now().isoformat(timespec="microseconds")
     org.runtime.service_store.write_contract(
-        owner, name, {**meta, "version": version, "acceptance": list(acceptance), "defined_by": ROOT, **basis}, body, version - 1,
+        owner, name, {**meta, "version": version, "acceptance": list(acceptance), "defined_by": ROOT, "defined": defined, **basis}, body, version - 1,
     )
+
+
+def amend_legacy(org, add_acceptance=(), remove_acceptance=(), owner="ceo", name="weekly-brief"):
+    """Root's amendment written the way a version of the contract was before 0a.2: criteria added or removed, no answer and no words in the
+    frontmatter (a legacy version: the 0a.1 rule applies to its criteria, so a human `confirms` link makes an added one eligible). Today's
+    `define_service` records the user's words, so a test of the legacy rule writes the version itself."""
+    current = org.runtime.service_store.read_contract(owner, name)[0]
+    acceptance = [t for t in current["acceptance"] if t not in remove_acceptance] + list(add_acceptance)
+    write_version(org, current["version"] + 1, acceptance, owner=owner, name=name)
 
 
 def call(server, tool, **args):

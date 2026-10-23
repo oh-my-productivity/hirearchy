@@ -18,10 +18,10 @@ def test_the_mcp_tool_amends_with_optional_fields(svc):
     schema = {t.name: t for t in __import__("asyncio").run(root.list_tools())}["define_service"].inputSchema
     assert schema["required"] == ["owner", "name"]
     assert {"add_acceptance", "remove_acceptance"} <= set(schema["properties"])
-    out = call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Never longer than one page"])
+    out = call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Never longer than one page"], words="One page at most.")
     assert "v1 -> v2" in out and "C3: Never longer than one page" in out
     assert "no change" in fails(root, "define_service", owner="ceo", name="weekly-brief")
     assert "already a criterion" in fails(root, "define_service", owner="ceo", name="weekly-brief",
                                            add_acceptance=["Never longer than one page"])
-    call(root, "define_service", owner="ceo", name="weekly-brief", remove_acceptance=["At most 600 words"])
+    call(root, "define_service", owner="ceo", name="weekly-brief", remove_acceptance=["At most 600 words"], words="Drop the word limit.")
     assert contract_meta(svc)[0]["acceptance"] == ["Every factual claim has a source URL", "Never longer than one page"]

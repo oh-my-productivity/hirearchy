@@ -162,7 +162,7 @@ def test_p2_answered_on_every_surface(svc, capsys, surface):
     before = state(svc)
     refused_it, got = amend_on(svc, surface, capsys, add_acceptance=["Names its week"], answers=no.id, about="C1", words="Yes, that too.")
     assert refused_it and (
-        f"refused: rejection R1 (message {no.id}) already has its answer (link note {link.id}): one rejection gets one answer. A new lasting rule "
+        f"refused: rejection R1 (message {no.id}) already has its answer (contract v2): one rejection gets one answer. A new lasting rule "
         "needs a new rejection and its question, or words alone (CLI: --words) when the user asks for it on their own. Nothing was written."
     ) in got, got
     assert state(svc) == before
@@ -225,4 +225,45 @@ def test_confirms_after_an_answer_on_every_surface(svc, capsys, surface, kind):
             svc.feedback(ROOT, task.id, "reject", "Also.", source="human", criterion=ids, confirms=no.id)
         got = str(info.value)
     assert text in got, got
+    assert state(svc) == before
+
+
+# ------------------------------------------------------------------------------------------------------------ P2: the gate (plan 7.3, commit 14)
+@pytest.mark.parametrize("surface", SURFACES)
+@pytest.mark.parametrize("case", ["unrated", "needs-words", "open-rejection"])
+def test_p2_gate_refusals_on_every_surface(svc, capsys, surface, case):
+    """P2-UNRATED, P2-NEEDS-WORDS and P2-OPEN-REJECTION: a change of the criteria by root is refused with the same text on MCP root, the CLI and
+    the Org facade, and nothing is written."""
+    if case == "unrated":
+        task = request(svc)
+        deliver(svc, "ceo", task)
+        kw = {"add_acceptance": [RULE], "words": YES}
+        text = (
+            f"refused: 1 delivered request(s) of `weekly-brief` have no verdict yet: {task.id}. Record the user's verdict on each with feedback first, "
+            "a rejection then its one question (CLI: hirearchy feedback <task id> accept|reject --note ...); the contract changes only after the "
+            "verdicts. Nothing was written."
+        )
+    elif case == "needs-words":
+        kw = {"add_acceptance": [RULE]}
+        text = (
+            "refused: a change of the acceptance criteria of `weekly-brief` records the user's words. If it answers a rejection, pass "
+            "answers=<the rejection's message id>, about=<the C or R id your one question named> and words=<the user's answer, verbatim> "
+            "(CLI: --answers, --about, --words), after they answered yes to that question. If the user asked for this change on their own, outside "
+            "any rejection, pass words=<their request, verbatim> alone (CLI: --words): it is recorded as user-initiated and never admits a playbook "
+            "revision. Nothing was written."
+        )
+    else:
+        task, no = rejection(svc)
+        kw = {"add_acceptance": [RULE], "words": YES}
+        text = (
+            f"refused: rejection R1 (message {no.id}) on task {task.id} has no answer yet, so this change is not one the user asked for on their own. "
+            'Ask the user the one question first (About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.). '
+            f'On yes: define_service(owner="ceo", name="weekly-brief", ..., answers="{no.id}", about=<the id you asked about>, words=<their answer, '
+            'verbatim>) (CLI: --answers, --about, --words). On no, a one-off or "as it is": '
+            f'feedback(task_id="{task.id}", verdict="reject", confirms="{no.id}", criterion=["none"], ["R<j>"] or ["C<k>"], source="human", '
+            "note=<their answer, verbatim>) (CLI: --confirms, --criterion, --source human, --note). Nothing was written."
+        )
+    before = state(svc)
+    refused_it, got = amend_on(svc, surface, capsys, **kw)
+    assert refused_it and text in got, got
     assert state(svc) == before

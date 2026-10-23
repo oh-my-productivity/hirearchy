@@ -32,20 +32,6 @@ CRITERIA = [
 PLAYBOOK_V1 = "## Steps\n1. writer: read the notes and write the memo.\n2. reviewer: check every criterion and report PASS or FAIL.\n"
 FRIDAY = "Sam's 'before Friday' has a date: Oct 9."
 LEE = "Lee's 'next week' has a date too."
-# E3 turn 5 (studies/E3-org-growth-0a-live): Lena's first rejection, and the two criteria the assistant added 2 s later without asking her
-LENA_T5 = (
-    "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09. And Marta's room is for the training on the 14th, "
-    "so I want 2026-10-14 there. And always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
-)
-SUMMARY_FIRST = (
-    "The memo starts with one line that begins with 'Summary:' and sums up the meeting in that single line, followed by exactly these sections, "
-    "in this order: Decisions, Action items, Next meeting."
-)
-DUE_RULE = (
-    "Every Due value is an ISO date (YYYY-MM-DD) or none. A deadline in the notes, including a relative one such as 'before Friday' (the date of "
-    "that Friday, resolved from the meeting date), is turned into its ISO date; a date the commitment is for, such as the date a room is booked "
-    "for, also counts as its Due. Due is none only when the notes give no such date or say there is no hard date."
-)
 A_MEMO = {"notes_file": "meeting-2024-10-02.txt"}
 
 
@@ -257,17 +243,18 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     deliver(w, ids["B1"])
     n2 = feedback(w, ids["B1"], "reject", LEE, source="human")  # the user's rejection; no criterion on it
     added = "'before <weekday>' is that weekday's date"
-    reply = call(w.root, "define_service", owner="lead", name=SERVICE, add_acceptance=[added])
-    assert f"C7: {added}" in reply
-    assert "Not client-confirmed: C7" in reply and f'confirms="{n2}"' in reply  # the reply tells root which call records the user's yes
+    # Rule A (0a.2): the user's yes to the one question is what changes the contract; the product writes the link that confirms the new criterion
+    reply = call(w.root, "define_service", owner="lead", name=SERVICE, add_acceptance=[added], answers=n2, about="C6", words="Yes, add it.")
+    assert f"C7: {added}" in reply and "Recorded as the user's answer to R2" in reply and "C7 is client-confirmed" in reply
+    assert "Not client-confirmed" not in reply  # the yes is recorded: root is told nothing further to do
     note = next(m.body for m in w.org.received("lead") if "Acceptance criteria now:" in m.body)
     assert all(f"C{k}: " in note for k in range(1, 8))
-    assert f"C7: {added} (not confirmed)" in note  # the lead sees that the client's yes to it is not recorded
+    assert f"C7: {added}\n" in note and "(not confirmed)" not in note.split("Rule (c)")[0]  # the lead sees that the client's yes to it is recorded
+    assert "The client's yes to R2 (about C6) is recorded: C7 is client-confirmed." in note
     v2 = PLAYBOOK_V1 + "- C7: " + added + "\n"  # rule (c): only the criterion's own words, one line, with its id
-    refused = fails(w.lead, "revise_playbook", service=SERVICE, content=v2, reason="C7 was added by the client", evidence=["C7"])
-    assert "C7 was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)" in refused
+    refused = fails(w.lead, "revise_playbook", service=SERVICE, content=v2 + "3. Check every date twice.\n", reason="C7 was added by the client", evidence=["C7"])
+    assert "refused: every line a revision adds or changes must rest on the evidence it cites, and 1 line(s) do not" in refused  # the other line is refused
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
-    feedback(w, ids["B1"], "reject", "Yes, add it.", source="human", criterion=["C7"], confirms=n2)  # the user's yes, recorded as a link
     ids["B2"] = request(w)  # the owner's next prompt names what rule (c) admits now
     deliver(w, ids["B2"])
     b2_prompt = next(p for addr, p in w.prompts if addr == "lead" and ids["B2"] in p)
@@ -279,39 +266,7 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     assert meta["version"] == 2 and meta["admitted"] == "c" and meta["evidence"] == ["C7"]
 
 
-def test_11_e3_turn_5_an_unasked_amendment_is_not_the_clients_yes(tmp_path):
-    """E3 turn 5: the assistant recorded Lena's rejection with a criterion she had not named, then amended the contract 2 s later without
-    asking her. Ordering, not a wall-clock gap, drives the logic: the tier is derived from which note carries the link. This test orders the two
-    calls explicitly. A real sleep would only slow the test, and the frozen clock is not used because the team runs in real scheduler subprocesses.
-    (E3's C9 and C10 are C7 and C8 here: the world has six v1 criteria.)"""
-    w = world(tmp_path)
-    a1 = request(w)
-    deliver(w, a1)
-    reply = call(w.root, "feedback", task_id=a1, verdict="reject", note=LENA_T5, source="human", criterion=["C6", "C3"])
-    n1 = last_verdict(w)
-    assert "about C6, C3 (not confirmed)" in reply and "This rejection is R1" in reply and f'confirms="{n1}"' in reply
-    reply = call(
-        w.root, "define_service", owner="lead", name=SERVICE, remove_acceptance=[CRITERIA[2], CRITERIA[5]], add_acceptance=[SUMMARY_FIRST, DUE_RULE],
-    )
-    assert "Not client-confirmed: C7, C8" in reply and f"Rejection R1 (message {n1}) has no recorded yes" in reply
-    rule = PLAYBOOK_V1 + "3. Start the memo with a one-line Summary.\n"
-    for new in ("C7", "C8"):
-        refused = fails(w.lead, "revise_playbook", service=SERVICE, content=rule, reason="Lena asked for it", evidence=[new])
-        assert f"{new} was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)" in refused
-        assert "amendment the client confirmed (none yet)" in refused
-    listing = call(w.root, "services")
-    assert f"R1 (case {a1}, about C6 (removed), C3 (removed) (not confirmed))" in listing
-    assert f"C7: {SUMMARY_FIRST} (amendment, not confirmed)" in listing
-    assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
-    note = next(m.body for m in w.org.received("lead") if "Acceptance criteria now:" in m.body)
-    assert "Rule (c): " in note and "confirmed now: none yet." in note  # the owner is told what rule (c) admits, quietly
-    rework = request(w, revises=a1, note="Start with the Summary line.", source="human")  # the user asks for the rework themselves
-    deliver(w, rework)
-    prompt = next(p for addr, p in w.prompts if addr == "lead" and rework in p)
-    assert "about C6 (removed), C3 (removed) (not confirmed by the client)" in prompt  # the regression list says the link is not the client's yet
-    assert "amendment the client confirmed (none yet; C7, C8 are not confirmed yet)" in prompt
-    assert "A rule without the client's evidence (step 3) is a reason to look" in prompt
-    assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
+# test_11 (E3 turn 5: an amendment in the reject turn is not the user's yes) is replayed from E3's own evidence in test_org_growth_0a2.py
 
 
 AMBIGUOUS_MARTA = "Marta keeps the agenda as sent (C5): fits the words, not the purpose"

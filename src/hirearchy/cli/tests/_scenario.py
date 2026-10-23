@@ -219,7 +219,7 @@ SCENARIOS: dict[str, Scenario] = {
     "define_service": sc(f"{R} define-service ceo monthly --description A-monthly-note --input topic*:what --acceptance Has-a-title. "
                          "--deliverable The-note --format markdown --max-words 400 --budget 5 --locked"),
     "define_service_amend_deliverable": sc(f"{R} define-service ceo weekly --format text --max-words 200"),
-    "define_service_amend_acceptance": sc(f"{R} define-service ceo weekly --add-acceptance Has-a-summary. --no-locked --notes @{{tmp}}/notes.md",
+    "define_service_amend_acceptance": sc(f"{R} define-service ceo weekly --add-acceptance Has-a-summary. --words Add-a-summary. --no-locked --notes @{{tmp}}/notes.md",
                                           files={"notes.md": "A note for the owner.\n"}),
     "define_service_error": sc(f"{R} define-service nobody weekly --description x"),
     "request": sc(f"{R} request weekly --input topic=tests --title Weekly --note Please. --budget 3"),

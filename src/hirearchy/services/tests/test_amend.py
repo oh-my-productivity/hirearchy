@@ -7,7 +7,14 @@ from testkit.services_world import BRIEF, contract_meta, define, playbook_meta
 
 
 def amend(org, **kw):
+    """Root amends the contract. A change of the criteria carries the user's words (Rule W: ``words`` alone is a change the user asked for)."""
+    if {"acceptance", "add_acceptance", "remove_acceptance"} & set(kw) and "words" not in kw and "answers" not in kw:
+        kw = {**kw, "words": "Change them, please."}
     return org.define_service(ROOT, "ceo", "weekly-brief", **kw)
+
+
+def amend_named(org, name, **kw):
+    return org.define_service(ROOT, "ceo", name, **{"words": "Change them, please.", **kw})
 
 
 @pytest.fixture
@@ -129,7 +136,7 @@ def test_the_note_and_the_reply_show_exactly_what_changed(svc):
                 '"one file" (format: markdown; max_words: 300)') in text
         assert "Every factual claim" not in text.split("Acceptance criteria now")[0]  # unchanged criteria are not diffed
     assert "- acceptance removed: C1: At most 600 words" in note.body and "+ acceptance added: C3: Never longer than one page" in note.body
-    assert reply.endswith("Acceptance criteria now (2):\nC2: Every factual claim has a source URL\nC3: Never longer than one page")
+    assert reply.split("\nRecorded as")[0].endswith("Acceptance criteria now (2):\nC2: Every factual claim has a source URL\nC3: Never longer than one page")
     assert "ceo/services/weekly-brief/SERVICE.md" in note.body
     amend(svc, notes="Fresh notes.")
     assert 'notes: "Mind the sources." -> "Fresh notes."' in svc.messages("ceo", "inbox")[-1].body
@@ -157,7 +164,7 @@ def test_services_text_lists_the_criteria_in_full(svc):
     out = svc.runtime.service_reports.services_text(ROOT)
     assert ("  each request: 10 runs; acceptance criteria (ceo/services/weekly-brief/SERVICE.md):\n"
             "    C1: At most 600 words\n    C2: Every factual claim has a source URL\n"
-            "    C3: Never longer than one page (amendment, not confirmed)\n  record:") in out
+            "    C3: Never longer than one page (amendment, user-initiated: never admits a playbook revision)\n  record:") in out
     assert "3 acceptance criteria" not in out
     assert "    C3: Never longer than one page" in svc.runtime.service_reports.services_text("ceo")  # the owner sees them too
 
@@ -177,7 +184,7 @@ def test_the_amendment_reply_lists_the_new_versions_criteria_with_ids(svc):
     assert "Acceptance criteria now (3):\nC1: At most 600 words\nC2: Every factual claim has a source URL\nC3: Dates are written in full" in reply
     assert "+ acceptance added: C3: Dates are written in full" in reply
     reply = amend(svc, remove_acceptance=["At most 600 words"])
-    assert reply.endswith("Acceptance criteria now (2):\nC2: Every factual claim has a source URL\nC3: Dates are written in full")  # ids never move
+    assert reply.split("\nRecorded as")[0].endswith("Acceptance criteria now (2):\nC2: Every factual claim has a source URL\nC3: Dates are written in full")  # ids never move
     assert "- acceptance removed: C1: At most 600 words" in reply
 
 
@@ -201,10 +208,11 @@ def test_the_owners_amendment_note_lists_every_current_criterion_with_its_id(svc
     assert second.body == (
         "root changed the contract of service `weekly-brief` (v2 -> v3). Read it, and follow the new criteria from the next request on:\n"
         "- acceptance removed: C1: At most 600 words\n+ acceptance added: C4: Cite the test run\n"
-        "Acceptance criteria now:\nC2: Every factual claim has a source URL\nC3: Dates are written in full (not confirmed)\n"
-        "C4: Cite the test run (not confirmed)\nContract: ceo/services/weekly-brief/SERVICE.md"
-    )
-    assert "Acceptance criteria now:\nC1: At most 600 words\nC2: Every factual claim has a source URL\nC3: Dates are written in full (not confirmed)\n" in first.body
+        'The client asked for this change on their own ("Change them, please."): C4 is user-initiated.\n'
+        "Acceptance criteria now:\nC2: Every factual claim has a source URL\nC3: Dates are written in full (user-initiated)\n"
+        "C4: Cite the test run (user-initiated)\nContract: ceo/services/weekly-brief/SERVICE.md"
+    )  # locked in the fixture: no rule (c) line
+    assert "Acceptance criteria now:\nC1: At most 600 words\nC2: Every factual claim has a source URL\nC3: Dates are written in full (user-initiated)\n" in first.body
 
 
 def test_a_text_added_removed_and_added_again_keeps_its_id_through_define_service(svc):
@@ -212,19 +220,19 @@ def test_a_text_added_removed_and_added_again_keeps_its_id_through_define_servic
     amend(svc, remove_acceptance=["Dates are written in full"])
     reply = amend(svc, add_acceptance=["Dates are written in full", "Cite the test run"])
     assert "+ acceptance added: C3: Dates are written in full" in reply and "+ acceptance added: C4: Cite the test run" in reply
-    assert reply.endswith("C3: Dates are written in full\nC4: Cite the test run")
+    assert reply.split("\nRecorded as")[0].endswith("C3: Dates are written in full\nC4: Cite the test run")
     assert [c.id for c in svc.runtime.service_catalog.criteria("ceo", "weekly-brief") if c.current] == ["C1", "C2", "C3", "C4"]
 
 
 def test_removing_a_quoted_criterion_tells_the_owner(svc):
     define(svc, playbook="Steps: search, write.\n- C1: At most 600 words\n- Keep every claim sourced, at most 600 words.", name="quoted")
-    svc.define_service(ROOT, "ceo", "quoted", remove_acceptance=["At most 600 words"], add_acceptance=["At most 400 words"])
+    amend_named(svc, "quoted", remove_acceptance=["At most 600 words"], add_acceptance=["At most 400 words"])
     note = svc.messages("ceo", "inbox")[-1].body
     assert (
         'Removed: C1. Playbook v1 still quotes it in 2 line(s): "- C1: At most 600 words", "- Keep every claim sourced, at most 600 words.". '
         "Where it differs from the contract, follow the contract; the playbook changes only by a revision the evidence admits (step 3)."
     ) in note
     assert note.index("Acceptance criteria now:") < note.index("Removed: C1.")
-    svc.define_service(ROOT, "ceo", "quoted", remove_acceptance=["Every factual claim has a source URL"])  # quoted by nothing
+    amend_named(svc, "quoted", remove_acceptance=["Every factual claim has a source URL"])  # quoted by nothing
     assert "Removed:" not in svc.messages("ceo", "inbox")[-1].body
 

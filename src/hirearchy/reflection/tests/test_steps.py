@@ -6,13 +6,14 @@ advice and never write anything."""
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from hirearchy.kernel import Message, OrgError, clip_line
 from hirearchy.reflection.testing import ReflectionWorld, fs_world, memory_world
 
-from ._support import SERVICE, ask, define, deliver, nested, note_on, populated, rate
+from ._support import SERVICE, amend_legacy, ask, define, deliver, nested, note_on, populated, rate
 
 FORM_C = (
     'Next: ask the user exactly ONE yes/no question, in these words: "About {id}: add "<the rule, in their words>" as a lasting rule? Yes or no." '
@@ -52,8 +53,12 @@ def w(request: pytest.FixtureRequest, tmp_path: Path) -> ReflectionWorld:
     return made
 
 
-def amend(w: ReflectionWorld, **over: object) -> None:
-    w.s.commands.define_service("root", "ceo", SERVICE, **over)  # type: ignore[arg-type]
+def amend(w: ReflectionWorld, **over: Any) -> None:
+    """Root's amendment as a contract version was written before 0a.2 (no basis in its frontmatter): the step texts are about the legacy rule."""
+    if "add_acceptance" in over or "remove_acceptance" in over:
+        amend_legacy(w, **over)
+    else:
+        w.s.commands.define_service("root", "ceo", SERVICE, **over)
 
 
 def rejected(w: ReflectionWorld, words: str = "Too long.", *, topic: str = "ai", **kw: object) -> tuple[Message, Message]:

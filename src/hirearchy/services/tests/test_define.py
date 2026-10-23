@@ -99,7 +99,7 @@ def test_service_names_are_unique_among_the_owners_siblings(org):
 def test_redefinition_archives_bumps_the_version_and_tells_the_owner_quietly(svc):
     org = svc
     first, _ = contract_meta(org)
-    text = define(org, acceptance=["At most 500 words", "Every factual claim has a source URL"], budget=12, locked=True)
+    text = define(org, acceptance=["At most 500 words", "Every factual claim has a source URL"], budget=12, locked=True, words="Cut it to 500 words.")
     meta, _ = contract_meta(org)
     assert meta["version"] == 2 and meta["budget"] == 12 and meta["locked"] is True
     assert meta["created"] == first["created"]  # the service is the same one
@@ -112,7 +112,7 @@ def test_redefinition_archives_bumps_the_version_and_tells_the_owner_quietly(svc
     assert "- acceptance removed: C1: At most 600 words" in note.body and "+ acceptance added: C3: At most 500 words" in note.body
     assert "budget per request: 10 -> 12 runs" in note.body and "locked: false -> true" in note.body
     assert "Every factual claim" not in note.body.split("Acceptance criteria now")[0]  # unchanged criteria are not diffed ...
-    assert "Acceptance criteria now:\nC3: At most 500 words (not confirmed)\nC2: Every factual claim has a source URL\n" in note.body  # ... but listed with their ids
+    assert "Acceptance criteria now:\nC3: At most 500 words (user-initiated)\nC2: Every factual claim has a source URL\n" in note.body  # ... but listed with their ids
 
 
 def test_redefinition_refuses_a_playbook_and_keeps_the_existing_one(org):

@@ -278,7 +278,7 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     assert services.read_playbook(org, "ceo", "weekly-brief").version == 1
 
     # the client rejects the delivery
-    out = call(root, "feedback", task_id=task.id, verdict="reject", note="Missing week-over-week changes.")
+    out = call(root, "feedback", task_id=task.id, verdict="reject", note="Missing week-over-week changes.", source="human")
     assert "feedback reject recorded" in out
     assert "needs a note" in fails(root, "feedback", task_id=task.id, verdict="reject")
 
@@ -288,9 +288,9 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     section = prompt.split("# Reflect before you start: weekly-brief")[1].split("# New messages")[0]
     assert "Evidence since v1:" in section and "Missing week-over-week changes." in section
     assert "Used 2 runs; no checks." in section
-    call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Shows the changes since last week"])  # C3: the evidence of v2
     rejection = max(m.id for m in org.sent(ROOT) if m.feedback)
-    call(root, "feedback", task_id=task.id, verdict="reject", note="Yes, add it.", source="human", criterion=["C3"], confirms=rejection)
+    call(root, "define_service", owner="ceo", name="weekly-brief", add_acceptance=["Shows the changes since last week"],  # C3: the evidence of v2
+         answers=rejection, about="C1", words="Yes, add it.")  # Rule A: the user's yes, and the product writes the link
     out = call(ceo, "revise_playbook", service="weekly-brief",
                content="## Steps\n1. Search.\n- C3: Shows the changes since last week", reason=f"case {task.id} rejected: no changes", evidence=["C3"])
     assert "playbook of `weekly-brief` is now v2" in out

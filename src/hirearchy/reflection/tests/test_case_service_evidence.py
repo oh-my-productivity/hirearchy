@@ -31,7 +31,7 @@ from hirearchy.services.tests.test_contract_service_evidence import (  # noqa: F
     test_links_returns_normalized_ids_or_raises,
 )
 
-from ._support import SERVICE, ask, define, deliver, nested, note_on, populated, rate, rework
+from ._support import SERVICE, amend_legacy, ask, define, deliver, nested, note_on, populated, rate, rework
 
 CASES = "cases the client rejected"
 
@@ -63,7 +63,9 @@ def rejected(w: ReflectionWorld, words: str = "Too long.", *, topic: str = "ai",
 
 
 def amend(w: ReflectionWorld, **over: Any) -> None:
-    w.s.commands.define_service("root", "ceo", SERVICE, **over)
+    """Root's amendment as a contract version was written before 0a.2 (no basis): the legacy rule is what these tests are about. The amendments
+    of today carry the user's words: ``test_a_user_initiated_amendment_is_never_rule_c_eligible`` and the answered ones are tested apart."""
+    amend_legacy(w, **over)
 
 
 def refusal(
@@ -250,8 +252,9 @@ def test_rule_c_refuses_an_amendment_without_a_confirmation(w: ReflectionWorld, 
 
 
 def test_a_user_initiated_amendment_is_never_rule_c_eligible(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    """DR-27: root amends with no rejection at all, so no `confirms` link can name the new criterion."""
-    amend(w, add_acceptance=["Names the week it covers"])
+    """DR-27: root amends with no rejection at all, so no `confirms` link can name the new criterion; since 0a.2 the amendment is recorded as the
+    user's own request (``words`` alone), which no link confirms (``test_pure_functions`` tests a link that names it)."""
+    w.s.commands.define_service("root", "ceo", SERVICE, add_acceptance=["Names the week it covers"], words="Name the week, please.")
     message = refusal(evidence, ["C3"])
     assert "C3 was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)." in message
     assert "amendment the client confirmed (none yet)." in message

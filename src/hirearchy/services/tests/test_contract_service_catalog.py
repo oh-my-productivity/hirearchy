@@ -123,7 +123,9 @@ def test_a_manager_can_request_only_the_services_of_its_direct_reports(w: Servic
 
 def test_criteria_of_a_service_carry_their_ids(w: ServicesWorld) -> None:
     define(w)
-    w.commands.define_service("root", "ceo", "weekly-brief", add_acceptance=["Dates are written in full"], remove_acceptance=["At most 600 words"])
+    w.commands.define_service(
+        "root", "ceo", "weekly-brief", add_acceptance=["Dates are written in full"], remove_acceptance=["At most 600 words"], words="Dates in full, please.",
+    )
     found = w.catalog.criteria("ceo", "weekly-brief")
     assert [(c.id, c.text, c.since, c.current, c.amended) for c in found] == [
         ("C1", "At most 600 words", 1, False, False),

@@ -13,7 +13,7 @@ def svc(org):
 
 
 def test_cli_amendment(svc, capsys, tmp_path):
-    cli(svc, "define-service", "ceo", "weekly-brief", "--add-acceptance", "Never longer than one page")
+    cli(svc, "define-service", "ceo", "weekly-brief", "--add-acceptance", "Never longer than one page", "--words", "One page at most.")
     out = capsys.readouterr().out
     assert "v1 -> v2" in out and "C3: Never longer than one page" in out
     meta = contract_meta(svc)[0]
@@ -22,7 +22,7 @@ def test_cli_amendment(svc, capsys, tmp_path):
     more = tmp_path / "more.txt"
     more.write_text("First extra\n- Second extra\n")
     cli(svc, "define-service", "ceo", "weekly-brief", "--remove-acceptance", "At most 600 words",
-        "--remove-acceptance", "Never longer than one page", "--add-acceptance", f"@{more}")
+        "--remove-acceptance", "Never longer than one page", "--add-acceptance", f"@{more}", "--words", "Change them, please.")
     assert contract_meta(svc)[0]["acceptance"] == ["Every factual claim has a source URL", "First extra", "Second extra"]
 
     cli(svc, "define-service", "ceo", "weekly-brief", "--budget", "7", "--no-locked", "--max-words", "250", "--input", "topic*:the topic")

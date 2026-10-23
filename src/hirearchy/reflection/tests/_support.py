@@ -105,3 +105,20 @@ def read_inbox(w: ReflectionWorld, addr: str = "ceo") -> None:
     """The owner has seen everything in its inbox: the next batch holds only what arrives from now on."""
     w.s.d.begin_run(addr)
     w.s.d.end_run(addr)
+
+
+def amend_legacy(w: ReflectionWorld, add_acceptance: Sequence[str] = (), remove_acceptance: Sequence[str] = (), owner: str = "ceo") -> None:
+    """Root's amendment written the way a contract version was before 0a.2: criteria added or removed, no answer and no words in the frontmatter (a
+    legacy version: the 0a.1 rule applies to its criteria, so a human ``confirms`` link makes an added one eligible). Today's ``define_service``
+    records the user's words, so a test of the legacy rule writes the version itself."""
+    found = w.s.store.read_contract(owner, SERVICE)
+    assert found is not None
+    meta, body = found
+    version = int(str(meta["version"])) + 1
+    kept = [t for t in meta["acceptance"] if t not in remove_acceptance]  # type: ignore[attr-defined]
+    for key in ("answers", "about", "words", "initiated"):
+        meta.pop(key, None)
+    w.s.store.write_contract(
+        owner, SERVICE, {**meta, "version": version, "acceptance": [*kept, *add_acceptance], "defined_by": "root",
+                         "defined": w.s.d.clock.now().isoformat(timespec="microseconds")}, body, version - 1,
+    )

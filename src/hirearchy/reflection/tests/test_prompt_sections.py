@@ -4,7 +4,7 @@
 import time
 
 from testkit.reach.hirearchy.core import ROOT
-from testkit.services_world import ENG, confirmed_amendment, define, deliver, request, svc, work, write_version
+from testkit.services_world import ENG, amend_legacy, confirmed_amendment, define, deliver, request, svc, work, write_version
 
 WEEKDAY = "weekly-brief"
 
@@ -304,10 +304,10 @@ def test_step_3_names_several_confirmed_amendments(svc):
 
 def test_step_3_says_which_amendments_are_not_confirmed_yet(svc):
     org = svc
-    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])  # an amendment nobody confirmed: C3
+    amend_legacy(org, add_acceptance=["Quote the source"])  # an amendment nobody confirmed: C3
     assert f"{CLAUSE}none yet; C3 is not confirmed yet):" in step_3_after(org)
     c4 = confirmed_amendment(org, "Every claim names its source")
-    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the date"])
+    amend_legacy(org, add_acceptance=["Quote the date"])
     assert f"{CLAUSE}now {c4}: a revision citing it may add its words; C3, C5 are not confirmed yet):" in step_3_after(org)
 
 
@@ -319,8 +319,8 @@ def test_eligible_ids_say_may_add_its_words(svc):
     assert f"{CLAUSE}now {c3}: a revision citing it may add its words):" in step_3_after(org)
     c4 = confirmed_amendment(org, "Every figure names its date", topic="two")
     assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them may add its words):" in step_3_after(org)
-    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])  # C5: nobody confirmed it
-    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the date"])  # C6
+    amend_legacy(org, add_acceptance=["Quote the source"])  # C5: nobody confirmed it
+    amend_legacy(org, add_acceptance=["Quote the date"])  # C6
     assert f"{CLAUSE}now {c3}, {c4}: a revision citing one of them may add its words; C5, C6 are not confirmed yet):" in step_3_after(org)
 
 
@@ -332,7 +332,7 @@ def test_eligible_names_user_initiated_ids_as_never_admitted(svc):
     assert f"{CLAUSE}none yet; C3 is user-initiated (rule (c) never admits it)):" in step_3_after(org)
     write_version(org, 3, [*v1, "One page", "Names its week"], initiated="user", words="Name the week.")  # C4
     assert f"{CLAUSE}none yet; C3, C4 are user-initiated (rule (c) never admits them)):" in step_3_after(org)
-    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])  # C5: an amendment nobody confirmed
+    amend_legacy(org, add_acceptance=["Quote the source"])  # C5: an amendment nobody confirmed
     assert f"{CLAUSE}none yet; C5 is not confirmed yet; C3, C4 are user-initiated (rule (c) never admits them)):" in step_3_after(org)
     c6 = confirmed_amendment(org, "Every figure names its date")
     assert f"{CLAUSE}now {c6}: a revision citing it may add its words; C5 is not confirmed yet; C3, C4 are user-initiated (rule (c) never admits them)):" in step_3_after(org)
@@ -340,8 +340,8 @@ def test_eligible_names_user_initiated_ids_as_never_admitted(svc):
 
 def test_step_3_leaves_out_a_removed_amendment(svc):
     org = svc
-    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Quote the source"])
-    org.define_service(ROOT, "ceo", "weekly-brief", remove_acceptance=["Quote the source"])
+    amend_legacy(org, add_acceptance=["Quote the source"])
+    amend_legacy(org, remove_acceptance=["Quote the source"])
     assert f"{CLAUSE}none yet):" in step_3_after(org)
 
 
@@ -552,7 +552,7 @@ def test_a_confirmed_link_names_its_criteria(svc):
 def test_the_regression_line_marks_a_removed_criterion(svc):
     org = svc
     first, note = reject(org, "Too long.", criterion=["C1", "C2"])
-    org.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["One page"], remove_acceptance=["Every factual claim has a source URL"])
+    amend_legacy(org, add_acceptance=["One page"], remove_acceptance=["Every factual claim has a source URL"])
     request(org, "next")
     (line,) = lines_of(org.run_prompt("ceo", org.begin_run("ceo")))
     assert line == f'- R1, case {first.id}, verdict {note.id}, about C1, C2 (removed): "Too long."'

@@ -66,7 +66,10 @@ def write_version(w: ServicesWorld, version: int, acceptance: Sequence[str], own
     meta, body = found
     for key in ("answers", "about", "words", "initiated"):
         meta.pop(key, None)  # a version's basis is its own: the next version never copies it
-    w.store.write_contract(owner, name, {**meta, "version": version, "acceptance": list(acceptance), "defined_by": "root", **basis}, body, version - 1)
+    defined = w.d.clock.now().isoformat(timespec="microseconds")
+    w.store.write_contract(
+        owner, name, {**meta, "version": version, "acceptance": list(acceptance), "defined_by": "root", "defined": defined, **basis}, body, version - 1,
+    )
 
 
 def grant(w: ServicesWorld, to: str, runs: int) -> Message:

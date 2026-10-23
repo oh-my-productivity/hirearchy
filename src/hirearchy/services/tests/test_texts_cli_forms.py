@@ -16,6 +16,9 @@ P2_TEXTS = [
     (_define, "ABOUT"),
     (_define, "WORDS_ARE_THE_REJECTION"),
     (_define, "LINK_FAILED"),
+    (_define, "UNRATED"),
+    (_define, "NEEDS_WORDS"),
+    (_define, "OPEN_REJECTION"),
     (_feedback, "CONFIRMS_ANSWERED"),
     (_feedback, "CONFIRMS_RECOVERY"),
 ]

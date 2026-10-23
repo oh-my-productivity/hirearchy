@@ -162,7 +162,7 @@ def test_words_over_1000_characters_is_refused(factory: Any, tmp_path: Path) -> 
     text = "refused: words (CLI: --words) is 1001 characters; the limit is 1000: the user's answer, verbatim, not a summary. Nothing was written."
     assert refusal(w, add_acceptance=[RULE], words=long) == text
     assert refusal(w, add_acceptance=[RULE], answers=found.note, about="C1", words=long) == text
-    amend(w, add_acceptance=[RULE], words=" " + "x" * 1000 + " ")  # the limit is on the stripped words: the limit itself is fine
+    amend(w, add_acceptance=[RULE], answers=found.note, about="C1", words=" " + "x" * 1000 + " ")  # the limit is on the stripped words: 1000 is fine
     assert version(w) == 2
 
 
@@ -222,7 +222,7 @@ def test_about_must_name_a_criterion_in_force_or_an_earlier_rejection(factory: A
     first = reject(w, basis, "Too long.")
     second = reject(w, basis, NOTE, "b")
     w.d.clock.advance(1)
-    amend(w, add_acceptance=["Cite at most five sources"], words="Keep the sources few.")  # v2 adds C3, after both rejections
+    write_version(w, 2, ["At most 600 words", "Every factual claim has a source URL", "Cite at most five sources"], initiated="user", words="Few sources.")  # C3, after both
     refused_about = (
         "refused: about (CLI: --about) must be the id your one question named: a criterion of contract v1, in force when R2 was recorded (C1, C2), "
         "or an earlier rejection (R1): {about}. A criterion this change creates cannot be what the question was about. Nothing was written."
@@ -246,7 +246,7 @@ def test_about_falls_back_to_the_oldest_stored_version(factory: Any, tmp_path: P
     old = Rejection("20000101T000000000000-root-0001", "R1", "t", "title", (), NOTE, "")  # recorded before any stored version was defined
     basis.rejections.append(old)
     w.d.clock.advance(1)
-    amend(w, add_acceptance=["Cite at most five sources"], words="Keep the sources few.")  # v2 adds C3
+    write_version(w, 2, ["At most 600 words", "Every factual claim has a source URL", "Cite at most five sources"], initiated="user", words="Few sources.")  # C3
     text = refusal(w, add_acceptance=[RULE], answers=old.note, about="C3", words=YES)
     assert text.startswith("refused: about (CLI: --about) must be the id your one question named: a criterion of contract v1, in force when R1 was recorded (C1, C2)")
     amend(w, add_acceptance=[RULE], answers=old.note, about="C2", words=YES)
@@ -363,12 +363,17 @@ def test_the_owners_note_says_the_users_own_request_is_user_initiated(factory: A
 
 
 def test_a_call_without_the_new_arguments_is_unchanged(factory: Any, tmp_path: Path) -> None:
+    """What does not change the acceptance criteria needs none of them (the criteria need words: the gate's tests); an agent client amends as ever."""
     w, _ = build(factory, tmp_path)
-    text = amend(w, add_acceptance=["Names its week"])
+    text = amend(w, budget=12)
     assert version(w) == 2 and "Recorded as" not in text
     assert not {"answers", "about", "words", "initiated"} & set(meta(w))
     (note,) = notes_of_the_runtime(w)
-    assert "C3: Names its week (not confirmed)\n" in note.body and "The client" not in note.body
+    assert "budget per request: 10 -> 12 runs" in note.body and "The client" not in note.body
+    define(w, owner="ceo/eng", name="inner", actor="ceo")
+    amend(w, owner="ceo/eng", name="inner", actor="ceo", add_acceptance=["Brief"])
+    found = w.store.read_contract("ceo/eng", "inner")
+    assert found is not None and found[0]["version"] == 2 and not {"answers", "about", "words", "initiated"} & set(found[0])
 
 
 # ------------------------------------------------------------------------------ section 12: the link that cannot be written

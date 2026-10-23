@@ -33,6 +33,24 @@ WORDS_LONG = (
     "refused: words (CLI: --words) is {n} characters; the limit is " + str(FEEDBACK_MAX) + ": the user's answer, verbatim, not a summary. "
     "Nothing was written."
 )
+UNRATED = (
+    "refused: {n} delivered request(s) of `{name}` have no verdict yet: {tasks}. Record the user's verdict on each with feedback first, a rejection "
+    "then its one question (CLI: hirearchy feedback <task id> accept|reject --note ...); the contract changes only after the verdicts. "
+    "Nothing was written."
+)
+NEEDS_WORDS = (
+    "refused: a change of the acceptance criteria of `{name}` records the user's words. If it answers a rejection, pass answers=<the rejection's "
+    "message id>, about=<the C or R id your one question named> and words=<the user's answer, verbatim> (CLI: --answers, --about, --words), after "
+    "they answered yes to that question{open}. If the user asked for this change on their own, outside any rejection, pass words=<their request, "
+    "verbatim> alone (CLI: --words): it is recorded as user-initiated and never admits a playbook revision. Nothing was written."
+)
+OPEN_REJECTION = (
+    "refused: rejection {assertion} (message {note}) on task {task} has no answer yet, so this change is not one the user asked for on their own. "
+    "Ask the user the one question first ({question}). On yes: define_service(owner=\"{owner}\", name=\"{name}\", ..., answers=\"{note}\", "
+    "about=<the id you asked about>, words=<their answer, verbatim>) (CLI: --answers, --about, --words). On no, a one-off or \"as it is\": "
+    'feedback(task_id="{task}", verdict="reject", confirms="{note}", criterion=["none"], ["R<j>"] or ["C<k>"], source="human", '
+    "note=<their answer, verbatim>) (CLI: --confirms, --criterion, --source human, --note). Nothing was written."
+)
 UNREADABLE = "refused: the record of `{name}` cannot be read ({error}), so the contract was not changed. Try again; if it persists, tell the user."
 NOT_A_REJECTION = (
     'refused: answers (CLI: --answers) must be the message id of a rejection you recorded with feedback(..., source="human") '
@@ -209,13 +227,15 @@ class RuleContractDefiner(ContractDefinitions):
                     f"no change: the amendment leaves the contract of `{name}` exactly as it is (v{old.version}). "
                     f"Current criteria:\n{self._amendment.listed(current)}"
                 )
-            if given and set(accept_n) == set(old.acceptance):
+            of_criteria = set(accept_n) != set(old.acceptance)  # an acceptance amendment: a pure reordering is not one
+            if given and not of_criteria:
                 raise OrgError(NOT_AN_AMENDMENT)
-            if given:
+            if actor == ROOT and of_criteria:  # the user's answer, or their own request: no other change of the criteria by root
                 answered = self._check_answer(owner, name, answers_n, about_n, words_n)
                 meta.update({"answers": answered.note, "about": about_n, "words": words_n} if answered else {"initiated": "user", "words": words_n})
             confirmed = self._confirmed(owner, name)  # read before the write: the note marks what the client has not yet confirmed
-        added, removed = amendment_ids(numbered, new.version) if given else ((), ())
+        recorded = old is not None and actor == ROOT and set(accept_n) != set(old.acceptance)  # the amendment carries the user's words
+        added, removed = amendment_ids(numbered, new.version) if recorded else ((), ())
         where = self._store.write_contract(owner, name, meta, notes_n, old.version if old is not None else None)
         self._events.emit("service.define", actor=actor, owner=owner, service=name, version=new.version, by=actor, amendment=old is not None)
         if old is None:
@@ -232,7 +252,7 @@ class RuleContractDefiner(ContractDefinitions):
                 link = self._links.write(actor, owner, answered.title, answered.note, added or removed, words_n)
             except (OrgError, OSError) as error:
                 link_error = error
-        marked = after if not given else number_criteria(numbered, {**basis, new.version: (answered.note if answered else "", answered is None)})
+        marked = number_criteria(numbered, {**basis, new.version: (answered.note if answered else "", answered is None)}) if recorded else after
         shown = criteria_of(marked, accept_n)
         quoting, version = self._quoting(owner, name, [c for c in current if c.text not in accept_n])
         told: OrgError | OSError | None = None
@@ -263,17 +283,29 @@ class RuleContractDefiner(ContractDefinitions):
         )
 
     def _check_answer(self, owner: str, name: str, answers: str, about: str, words: str) -> Rejection | None:
-        """Root's acceptance amendment with the user's words (steps 3.1, 3.3-3.5): the rejection it answers, or None for a change the user asked
-        for on their own (``words`` alone). A refusal writes nothing."""
+        """Root's acceptance amendment (steps 3.1-3.6): every delivery has its verdict first, then the user's words come with it: the rejection it
+        answers, or None for a change the user asked for on their own (``words`` alone, with no rejection waiting for its answer). A refusal
+        writes nothing."""
         try:
             basis = self._evidence.amendment_basis(owner, name)
         except (OrgError, OSError) as error:
             raise OrgError(UNREADABLE.format(name=name, error=error)) from error
+        if basis.unrated:  # the verdicts come first, whatever else was passed
+            raise OrgError(UNRATED.format(n=len(basis.unrated), name=name, tasks=", ".join(basis.unrated)))
+        waiting = [r for r in basis.rejections if not r.answered and answering_version(self._store, owner, name, r.note) == 0]
+        if not words:
+            open_ = f" (waiting for an answer: {'; '.join(f'{r.assertion}, message {r.note}' for r in waiting)})" if waiting else ""
+            raise OrgError(NEEDS_WORDS.format(name=name, open=open_))
         if len(words) > FEEDBACK_MAX:
             raise OrgError(WORDS_LONG.format(n=len(words)))
         if bool(answers) != bool(about):
             raise OrgError(PAIR)
         if not answers:
+            if waiting:  # the change is inside a rejection: it carries the user's answer to it
+                oldest = waiting[0]
+                raise OrgError(OPEN_REJECTION.format(
+                    assertion=oldest.assertion, note=oldest.note, task=oldest.task, question=oldest.question, owner=owner, name=name,
+                ))
             return None
         found = next((r for r in basis.rejections if r.note == answers), None)
         if found is None:
@@ -281,7 +313,7 @@ class RuleContractDefiner(ContractDefinitions):
             raise OrgError(NOT_A_REJECTION.format(name=name, answers=answers, listed=listed))
         answering = answering_version(self._store, owner, name, found.note)
         if found.answered or answering:
-            how = f"link note {found.answered}" if found.answered else f"contract v{answering}"
+            how = f"contract v{answering}" if answering else f"link note {found.answered}"
             raise OrgError(ANSWERED.format(assertion=found.assertion, note=found.note, how=how))
         version, criteria = in_force(self._store, owner, name, stamp_of(found.note))
         ids = [c.id for c in criteria]

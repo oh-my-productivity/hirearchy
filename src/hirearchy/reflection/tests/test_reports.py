@@ -1,7 +1,7 @@
 # mypy: ignore-errors
 # A test moved from tests/ by refactor step E1: not type-checked strictly (production code is). Delete the first line when this file is typed.
 
-from testkit.services_world import svc
+from testkit.services_world import amend_legacy, svc
 
 
 def test_status_tree_names_the_services_an_agent_offers(svc):
@@ -13,7 +13,7 @@ def test_status_tree_names_the_services_an_agent_offers(svc):
 def test_the_services_listing_shows_criteria_by_id(svc):
     from testkit.reach.hirearchy.core import ROOT
 
-    svc.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["Never longer than one page"], remove_acceptance=["At most 600 words"])
+    amend_legacy(svc, add_acceptance=["Never longer than one page"], remove_acceptance=["At most 600 words"])
     for who in (ROOT, "ceo"):
         out = svc.runtime.service_reports.services_text(who)
         assert "    C2: Every factual claim has a source URL\n    C3: Never longer than one page (amendment, not confirmed)\n  record:" in out
@@ -84,7 +84,7 @@ def test_the_services_listing_says_what_each_assertion_is_about(svc):
 def test_an_unconfirmed_amendment_is_marked_in_the_listing(svc):
     from testkit.reach.hirearchy.core import ROOT
 
-    svc.define_service(ROOT, "ceo", "weekly-brief", add_acceptance=["One page", "Names its week"])
+    amend_legacy(svc, add_acceptance=["One page", "Names its week"])
     _, no = reject(svc, "No week.")
     svc.feedback(ROOT, no.reply_to, "reject", "Yes, add it.", source="human", criterion=["C4"], confirms=no.id)
     out = svc.runtime.service_reports.services_text("root")
@@ -108,7 +108,7 @@ def test_a_user_initiated_amendment_is_marked_never_admits_a_playbook_revision(s
 
 def test_the_services_listing_marks_a_removed_criterion(svc):
     first, note = reject(svc, "Too long.", criterion=["C1", "C2"])
-    svc.define_service("root", "ceo", "weekly-brief", add_acceptance=["One page"], remove_acceptance=["Every factual claim has a source URL"])
+    amend_legacy(svc, add_acceptance=["One page"], remove_acceptance=["Every factual claim has a source URL"])
     assert assertion_lines(svc.runtime.service_reports.services_text("root")) == [
         f'    R1 (case {first.id}, about C1, C2 (removed)): "Too long."'
     ]

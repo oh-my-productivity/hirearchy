@@ -182,8 +182,8 @@ def test_missing_history_files_are_skipped(tmp_path: Path) -> None:
 
     w = populated(fs_world(tmp_path))
     define(w, acceptance=["A", "B"])
-    amend(w, add_acceptance=["C"])
-    amend(w, add_acceptance=["D"], remove_acceptance=["B"])
+    amend(w, add_acceptance=["C"], words="Add C.")
+    amend(w, add_acceptance=["D"], remove_acceptance=["B"], words="Add D, drop B.")
     assert stored_versions(w.store, "ceo", "weekly-brief") == [(1, "root", ["A", "B"]), (2, "root", ["A", "B", "C"]), (3, "root", ["A", "C", "D"])]
     (tmp_path / "ceo/services/weekly-brief/history/SERVICE.v2.md").unlink()
     versions = stored_versions(w.store, "ceo", "weekly-brief")
