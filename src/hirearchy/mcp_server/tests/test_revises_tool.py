@@ -55,3 +55,11 @@ def test_revises_through_the_mcp_tool_and_cli(org, capsys):
         main(["--root", str(org.root), "task", "ceo", "--title", "x", "--goal", "g", "--acceptance", "a",
               "--revises", "bogus"])
     assert "revises" in capsys.readouterr().err
+
+
+def test_root_delegate_docstring_names_request_for_a_service_request(org):
+    def described(addr):
+        return {t.name: " ".join(t.description.split()) for t in asyncio.run(build_server(org, addr).list_tools())}["delegate"]
+
+    assert "A service request is sent back with request(..., revises=...)." in described(ROOT)
+    assert "A service request is sent back" not in described("ceo")

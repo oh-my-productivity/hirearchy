@@ -6,6 +6,7 @@ organization (real git, no scheduler, no LLM, no network) with the calls the rec
   ``assistant-tool-calls.txt``);
 * ``lena_line(stream_dir, turn)`` is what the user said in that turn;
 * ``ReplayIds`` maps the literal message ids of the evidence to the ids of the replay's own organization, which differ (DR-42);
+* ``delegation(task_file)`` is the ``delegate`` call the recorded lead made, read from the task it sent (title, goal, acceptance, budget, revises);
 * ``scripted_report(w, task_id, result_file, artifact_texts)`` makes the owner of a task report it the way the recorded result did.
 
 Every lookup that finds nothing, or finds it twice, FAILS the test that asked (``pytest.fail``), never skips it: a replay that quietly did not run
@@ -114,6 +115,22 @@ def _sections(body: str) -> dict[str, str]:
         elif current is not None:
             current.append(line)
     return {name: "\n".join(lines).strip() for name, lines in found.items()}
+
+
+def delegation(task_file: str | Path) -> dict[str, object]:
+    """The arguments of the ``delegate`` call that sent the task in ``task_file`` (a file of ``msgs/lead-sent``): its title, the ``## Goal`` and
+    ``## Acceptance criteria`` sections, and its ``budget`` and ``revises`` when it had them (``revises`` is the recorded id: map it with
+    ``ReplayIds``). A file without a goal or acceptance criteria fails the test."""
+    meta, body = evidence(task_file)
+    sections = _sections(body)
+    missing = [name for name in ("goal", "acceptance criteria") if not sections.get(name)]
+    if missing:
+        pytest.fail(f"{task_file} has no {' and no '.join(missing)} section: it is not a task the lead delegated")
+    args: dict[str, object] = {"title": str(meta["title"]), "goal": sections["goal"], "acceptance": sections["acceptance criteria"]}
+    for key in ("budget", "revises"):
+        if meta.get(key) is not None:
+            args[key] = meta[key]
+    return args
 
 
 def scripted_report(w: object, task_id: str, result_file: str | Path, artifact_texts: Mapping[str, str]) -> Message:

@@ -214,7 +214,7 @@ def test_no_reflect_section_for_rework_old_evidence_or_a_locked_playbook_edit_st
     org = svc
     first = request(org)
     deliver(org, "ceo", first)
-    rework = org.delegate(ROOT, "ceo", "Fix", "g", "c", budget=3, revises=first.id)  # not a NEW request
+    rework = request(org, revises=first.id, budget=3)  # not a NEW request
     prompt = org.run_prompt("ceo", org.begin_run("ceo"))
     assert "# Reflect" not in prompt and "# Playbook: weekly-brief" in prompt
     org.end_run("ceo", ok=True)

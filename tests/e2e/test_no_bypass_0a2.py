@@ -502,3 +502,64 @@ def test_p4_refusals_on_every_surface(svc, capsys, surface):
     assert (len(svc.sent(ROOT)), len(svc.messages("ceo", "inbox"))) == (sent, inbox)
     refused_, text = ask_on(svc, surface, capsys, revises=first.id, source="human", base="delivered")
     assert not refused_ and len(svc.sent(ROOT)) == sent + 1
+
+
+# ------------------------------------------------------------------------------------------------------------ P4: root reworks a service request with request only (plan 7.3, commit 28)
+def use_request(first_id: str) -> str:
+    return (
+        f"refused: {first_id} is a request for the service `{SERVICE}`: send it back with request(service=\"{SERVICE}\", inputs=..., "
+        f"revises=\"{first_id}\", source=...) (CLI: hirearchy request {SERVICE} --revises {first_id}) so the rework stays in its case under the contract "
+        "(and names its base when a relayed rework changed the delivery). Nothing was sent."
+    )
+
+
+def delegate_on(org, surface: str, capsys, first_id: str) -> tuple[bool, str]:
+    """root's ``delegate`` (the CLI's ``task``) sending ``first_id`` back to ``ceo``: (refused, the reply or the refusal text)."""
+    fields = dict(title="Again", goal="Fix the date.", acceptance="the date is right")
+    try:
+        if surface == "mcp":
+            return False, call(build_server(org, ROOT), "delegate", to="ceo", revises=first_id, source="human", **fields)
+        if surface == "cli":
+            capsys.readouterr()
+            try:
+                cli(org, "task", "ceo", "--title", fields["title"], "--goal", fields["goal"], "--acceptance", fields["acceptance"], "--revises", first_id)
+            except SystemExit:
+                return True, capsys.readouterr().err
+            return False, capsys.readouterr().out
+        return False, org.delegate(ROOT, "ceo", fields["title"], fields["goal"], fields["acceptance"], revises=first_id, source="human").id
+    except Exception as error:  # noqa: BLE001
+        return True, str(error)
+
+
+@pytest.mark.parametrize("surface", SURFACES)
+def test_p4_use_request_on_every_surface(svc, capsys, surface):
+    """P4-USE-REQUEST: root sends a service request back with ``request``; ``delegate`` (the CLI's ``task``) with ``revises`` on one is refused with the
+    same text on the MCP tool, the CLI and the facade, and nothing is sent. A rework of a task that is not a request still goes."""
+    first = request(svc)
+    deliver(svc, "ceo", first)
+    plain = svc.delegate(ROOT, "ceo", "Other", "g", "c", budget=2)
+    sent = len(svc.sent(ROOT))
+    refused_, text = delegate_on(svc, surface, capsys, first.id)
+    assert refused_ and use_request(first.id) in text and len(svc.sent(ROOT)) == sent
+    refused_, text = delegate_on(svc, surface, capsys, plain.id)
+    assert not refused_ and len(svc.sent(ROOT)) == sent + 1
+
+
+SERVICE_OR_REWORK = (
+    "refused: a root task for a service, or a rework, goes through request(...) or delegate(...), which apply the case rules (the contract, the "
+    "base, the verdicts). Nothing was sent."
+)
+
+
+def test_org_send_refuses_a_root_service_task_or_rework(svc):
+    """FACADE-ROOT-TASK: the facade's free-form ``send`` cannot send root's service task or rework (MCP and the CLI have no such argument: pinned in
+    ``tests/architecture/test_policy_free_primitives.py``). Root's other messages, and an agent's, go as before."""
+    first = request(svc)
+    deliver(svc, "ceo", first)
+    sent = len(svc.sent(ROOT))
+    for fields in ({"service": SERVICE}, {"revises": first.id}, {"revises": first.id, "source": "human", "service": SERVICE}):
+        with pytest.raises(OrgError) as refusal:
+            svc.send(ROOT, "ceo", "again", type="task", **fields)
+        assert str(refusal.value) == SERVICE_OR_REWORK
+    assert len(svc.sent(ROOT)) == sent
+    assert svc.send(ROOT, "ceo", "one-off work", type="task", budget=1).type == "task" and svc.send(ROOT, "ceo", "a note").type == "note"

@@ -79,6 +79,7 @@ class TaskTools(ToolGroup):
         An explicit budget must leave that same reserve.
         Copy the relevant acceptance criteria verbatim from the task you are working on; never paraphrase or relax them.
         revises: when sending work back for rework, the id of the earlier task you sent to the same report.
+        A service request is sent back with request(..., revises=...).
         source (with revises): "human" when the user asked for this rework
         (a rework after their own rejection, carrying their corrections, is one), "relayed" (the default) when it is your
         own reading; the owner sees which.

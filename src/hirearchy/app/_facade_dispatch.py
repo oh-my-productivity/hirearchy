@@ -48,7 +48,7 @@ class DispatchMixin:
         wake: bool = True,
         _skip_route_check: bool = False,
     ) -> Message:
-        return self.runtime.message_sender.send(
+        return self.runtime.facade_sender.send(
             actor, to, body, type=type, title=title, reply_to=reply_to, status=status, budget=budget, revises=revises,
             supersedes=supersedes, service=service, contract=contract, playbook=playbook, feedback=feedback, source=source,
             criterion=criterion, wake=wake, skip_route_check=_skip_route_check,

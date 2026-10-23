@@ -8,9 +8,10 @@ from ..access import AccessScopes
 from ..agents import AgentDirectory
 from ..budget import AllocationPolicy
 from ..delivery import MessageDelivery
-from ..dispatch import ArtifactNormalizer, HopCounter, MessageSender, ReworkContext, RoutePolicy, TaskAssigner, TaskReporter
+from ..dispatch import ArtifactNormalizer, GuardedSender, HopCounter, MessageSender, ReworkContext, RoutePolicy, TaskAssigner, TaskReporter
 from ..dispatch._artifacts import ArtifactAnnotator
 from ..dispatch._assigner import RuleTaskAssigner
+from ..dispatch._guarded import GuardedRootSender
 from ..dispatch._hops import InflightHopCounter
 from ..dispatch._lessons import LessonsPolicy
 from ..dispatch._reporter import RuleTaskReporter
@@ -35,6 +36,7 @@ def register(b: Builder) -> None:
             b.get(AgentDirectory), b.get(OrgSettings), b.get(RoutePolicy), b.get(AllocationPolicy), b.get(HopCounter), b.get(MessageDelivery),
         ),
     )
+    b.provide(GuardedSender, lambda b: GuardedRootSender(b.get(MessageSender)))
     b.provide(
         TaskAssigner,
         lambda b: RuleTaskAssigner(

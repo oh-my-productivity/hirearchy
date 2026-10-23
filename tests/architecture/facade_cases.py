@@ -184,7 +184,7 @@ CASES: list[Case | FunctionCase] = [
     # dispatch
     Case("can_message", "dispatch", "route_policy", "can_message", args("ceo", "ceo/eng", "r1")),
     Case("_next_hops", "dispatch", "hop_counter", "next_hops", args("ceo")),
-    Case("send", "dispatch", "message_sender", "send", lambda w: _send_all(), lambda w: _send_expected()),
+    Case("send", "dispatch", "facade_sender", "send", lambda w: _send_all(), lambda w: _send_expected()),
     Case("delegate", "dispatch", "task_assigner", "delegate", args("ceo", "ceo/eng", "T", "goal", "accept", ["/in"], 2, "r2")),
     Case("_normalize_artifact", "dispatch", "artifact_normalizer", "normalize", args("ceo", "ceo/AGENT.md", "2020-01-01T00:00:00")),
     Case("report", "dispatch", "task_reporter", "report", with_task(lambda t: (("ceo", t.id, "done", "summary", ["ceo/AGENT.md"], "lessons"), {}))),

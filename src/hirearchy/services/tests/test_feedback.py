@@ -54,7 +54,7 @@ def test_feedback_on_a_rework_belongs_to_the_case_and_the_latest_is_the_final_ve
     first = request(org)
     deliver(org, "ceo", first)
     org.feedback(ROOT, first.id, "reject", "Too long.")
-    rework = org.delegate(ROOT, "ceo", "Shorten", "g", "c", budget=3, revises=first.id)
+    rework = request(org, revises=first.id, budget=3, source="human")  # root sends a request back with `request` (`delegate` is refused, P4)
     deliver(org, "ceo", rework)
     (case,) = org.runtime.case_history.cases("ceo", "weekly-brief")
     assert case.verdict == "reject"  # feedback on the first task counts for the case

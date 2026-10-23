@@ -6,7 +6,7 @@ import subprocess
 
 import pytest
 from testkit import e4_replay
-from testkit.e4_replay import EV, EV3, ReplayIds, evidence, lena_line, scripted_report, tool_call
+from testkit.e4_replay import EV, EV3, ReplayIds, delegation, evidence, lena_line, scripted_report, tool_call
 
 from hirearchy.kernel import ROOT
 
@@ -66,6 +66,21 @@ def test_lena_line_reads_e4_prompt_files_and_e3_lena_lines():
     assert e3.startswith("No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09.") and "\n" not in e3
     with pytest.raises(Failed, match="no turn"):
         lena_line(EV / "s1r", 99)
+
+
+def test_delegation_reads_the_task_the_recorded_lead_sent():
+    args = delegation("s2r/msgs/lead-sent/20261022T211355821063-lead-608b.md")  # the writer's rework while the lead worked the relayed rework
+    assert args["title"] == "Rework memo 2026-10-05: fix two Due values and add Open questions" and args["budget"] == 1
+    assert args["revises"] == "20261022T210338775220-lead-7124"
+    assert args["goal"].startswith("Fix two incorrect Due values in lead/writer/work/2026-10-05-memo.md") and "Marta's Due must be none" in args["acceptance"]
+    assert "revises" not in delegation("s3/msgs/lead-sent/20261022T214139482031-lead-da7e.md")  # the first task of a case revises nothing
+
+
+def test_a_file_that_is_not_a_delegated_task_fails_the_delegation():
+    with pytest.raises(Failed, match="no goal"):
+        delegation("s3/msgs/lead-sent/20261022T214508787095-lead-de22.md")  # a result, not a task
+    with pytest.raises(Failed, match="no evidence file"):
+        delegation("s3/msgs/lead-sent/no-such-task.md")
 
 
 def test_replay_ids_map_e4_ids_and_pass_c_and_r_ids_through():

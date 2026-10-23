@@ -95,11 +95,13 @@ def test_request_revises_must_be_an_earlier_request_of_the_same_service(svc):
     assert rework.revises == first.id and rework.service == "weekly-brief"
 
 
-def test_delegate_revises_a_service_task_and_stays_in_the_case(org):
+def test_delegate_revises_a_plain_task_and_request_sends_a_service_request_back_inside_its_case(org):
     define(org, playbook="v1 steps.")
     first = request(org)
     deliver(org, "ceo", first)
-    rework = org.delegate(ROOT, "ceo", "Fix it", "Add sources", "Every claim has a URL", budget=3, revises=first.id)
+    with pytest.raises(OrgError, match="^refused: .* is a request for the service `weekly-brief`: send it back with request\\(service="):
+        org.delegate(ROOT, "ceo", "Fix it", "Add sources", "Every claim has a URL", budget=3, revises=first.id)  # P4-USE-REQUEST
+    rework = request(org, revises=first.id, budget=3)
     assert (rework.service, rework.contract, rework.playbook, rework.revises) == ("weekly-brief", 1, 1, first.id)
     plain = org.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
     assert plain.service is None and plain.contract is None and plain.playbook is None

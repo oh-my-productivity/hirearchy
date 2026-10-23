@@ -133,3 +133,36 @@ def test_the_order_of_the_refusals(w: DispatchWorld) -> None:
     with pytest.raises(OrgError, match="revises must be the id of an earlier task you sent to ceo/eng: whatever"):
         assigner.delegate("ceo", "ceo/eng", "t", "g", "a", budget=1, revises="whatever")
     assert sender.calls == []
+
+
+USE_REQUEST = (
+    "refused: {revises} is a request for the service `weekly-brief`: send it back with request(service=\"weekly-brief\", inputs=..., "
+    "revises=\"{revises}\", source=...) (CLI: hirearchy request weekly-brief --revises {revises}) so the rework stays in its case under the "
+    "contract (and names its base when a relayed rework changed the delivery). Nothing was sent."
+)
+
+
+def test_root_delegate_revising_a_service_request_is_refused_use_request(w: DispatchWorld) -> None:
+    first = w.assigner.delegate("root", "ceo", "Draft", "Draft it.", "one page", budget=3)
+    sender = Sender()
+    rework = FixedReworkContext({first.id: {"service": "weekly-brief", "contract": 3, "playbook": 2}})
+    with pytest.raises(OrgError) as refusal:
+        over(w, sender, rework=rework).delegate("root", "ceo", "Again", "Again.", "better", budget=2, revises=first.id, source="human")
+    assert str(refusal.value) == USE_REQUEST.format(revises=first.id) and sender.calls == []
+
+
+def test_root_delegate_revising_an_ordinary_task_or_an_agent_revising_a_service_task_is_not_refused(w: DispatchWorld) -> None:
+    grant(w, "root", "ceo", 20)
+    root_first = w.assigner.delegate("root", "ceo", "Draft", "Draft it.", "one page", budget=3)
+    sender = Sender()
+    over(w, sender).delegate("root", "ceo", "Again", "Again.", "better", budget=2, revises=root_first.id)
+    first = w.assigner.delegate("ceo", "ceo/eng", "Draft", "Draft it.", "one page", budget=3)
+    rework = FixedReworkContext({first.id: {"service": "weekly-brief", "contract": 3, "playbook": 2}})
+    over(w, sender, rework=rework).delegate("ceo", "ceo/eng", "Again", "Again.", "better", budget=2, revises=first.id)
+    assert len(sender.calls) == 2
+
+
+def test_the_use_request_refusal_comes_after_the_revises_check(w: DispatchWorld) -> None:
+    rework = FixedReworkContext({"nope": {"service": "weekly-brief"}})
+    with pytest.raises(OrgError, match="revises must be the id of an earlier task you sent to ceo: nope"):
+        over(w, Sender(), rework=rework).delegate("root", "ceo", "Again", "Again.", "better", budget=2, revises="nope")

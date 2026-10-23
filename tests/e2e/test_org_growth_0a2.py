@@ -6,15 +6,17 @@ deliverable path points into ``tmp_path``), then makes the calls the recorded as
 the lead's in-process MCP servers (``testkit.e4_replay`` reads the evidence; the lead's reports are the recorded results, played by ``scripted_report``).
 A missing evidence file, an absent call number or an unbound id FAILS the test (design 10, DR-42).
 
-This module holds the replays of the answer path and the gate (plan commit 14): s1r T5, s1r v3/v4, s1r's playbook v2 and E3 T5; and, from plan commit 24,
-s1r T8: the artifact path is withheld while the client's question is open, and the file the assistant edited is named (P3, partial).
+This module holds the replays of the answer path and the gate (plan commit 14): s1r T5, s1r v3/v4, s1r's playbook v2 and E3 T5; from plan commit 24,
+s1r T8: the artifact path is withheld while the client's question is open, and the file the assistant edited is named (P3, partial); and, from plan
+commit 28, the s2r chain and the s3 flow (P1, P2 and P4 together: the relayed rework changed what the user judged, so the human rework needs a base).
 """
 
+import json
 from dataclasses import dataclass, field
 
 import pytest
 from testkit.e2e_world import build_server
-from testkit.e4_replay import EV, EV3, ReplayIds, evidence, lena_line, scripted_report, tool_call
+from testkit.e4_replay import EV, EV3, ReplayIds, delegation, evidence, lena_line, scripted_report, tool_call
 from testkit.services_world import call, contract_meta, fails, playbook_meta
 
 from hirearchy.core import ROOT, Org
@@ -283,3 +285,177 @@ def test_s3_a_blocked_result_with_a_question_is_flagged(tmp_path):
     shown = call(w.root, "progress", task_id=task)
     assert ": blocked" in shown and FLAG in shown  # E4's s3 result 96e9: blocked on one ambiguous item, and progress used to say nothing of it
     assert "artifacts" not in shown
+
+
+# ------------------------------------------------------------------------------------------------------------------------ s2r and s3: the base
+
+
+def lead_delegates(w: World, bound_to: str, task_file: str, to: str = "lead/writer", **over) -> str:
+    """The lead's ``delegate`` as the recorded lead made it (title, goal, acceptance, budget and the task it revises, in the ids of the replay); the id of
+    the task is bound to the recorded one. ``over`` replaces arguments (``revises=None`` for a task that revised an earlier one the replay skips)."""
+    args = {**delegation(task_file), **over}
+    if args.get("revises"):
+        args["revises"] = w.ids.of(args["revises"])
+    w.org.begin_run("lead")
+    call(w.lead, "delegate", to=to, **{k: v for k, v in args.items() if v is not None})
+    w.org.end_run("lead", ok=True)
+    task = max(m.id for m in w.org.sent("lead") if m.type == "task" and m.to == to)
+    w.ids.bind(bound_to, task)
+    return task
+
+
+def writer_task(w: World, task: str):
+    return w.org.find_received("lead/writer", task)
+
+
+S2R = EV / "s2r"
+S2R_SERVICE = "s2r/service/history--SERVICE.v1.md"
+S2R_MEMO = "lead/writer/work/2026-10-05-memo.md"
+S2R_V2, S2R_V3 = "s2r/memos/versions/2026-10-05-memo.v2.0aa3d3b.md", "s2r/memos/versions/2026-10-05-memo.v3.d8fd320.md"
+S2R_SENT, S2R_READ, S2R_LEAD, S2R_WRITER = "s2r/msgs/sent/", "s2r/msgs/read/", "s2r/msgs/lead-sent/", "s2r/msgs/lead-writer-sent/"
+E2 = {
+    "f230": "20261022T205531258713-root-f230", "43b8": "20261022T211157827631-root-43b8", "a9fd": "20261022T212045243968-root-a9fd",
+    "342a": "20261022T212050615269-root-342a", "7124": "20261022T210338775220-lead-7124", "608b": "20261022T211355821063-lead-608b",
+    "0e90": "20261022T212415721677-lead-0e90",
+}
+
+
+def s2r_judged(tmp_path):
+    """s2r up to the delivery the user judged: the request ``f230`` is delivered as E4's result ``5314`` (the memo with Marta's ``2026-10-14``); the user has
+    not rated it. Returns the world, the request and the judged result."""
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    w = build(tmp_path, S2R_SERVICE, "s2r/playbook/PLAYBOOK.2b6438a.md", ("writer", "reviewer"))
+    f230 = w.request(E2["f230"], inputs={"notes_file": "2026-10-05.md"}, title="Memo for 2026-10-05 meeting")
+    t7124 = lead_delegates(w, E2["7124"], S2R_LEAD + "20261022T210338775220-lead-7124.md", revises=None)
+    scripted_report(w.org, t7124, S2R_WRITER + "20261022T210453926371-lead.writer-646c.md", {S2R_MEMO: raw(S2R_V2)})
+    judged = scripted_report(w.org, f230, S2R_READ + "20261022T210839231571-lead-5314.md", {})
+    return w, f230, judged
+
+
+def s2r_relayed_rework(w: World) -> str:
+    """The injected rework ``43b8`` (relayed: root's own reading), worked as the recorded lead worked it: the memo now has Marta's ``none`` (E4's ``c3dd``)."""
+    injected = json.loads((S2R / "injection" / "request-args.json").read_text(encoding="utf-8"))
+    injected["revises"] = w.ids.of(injected["revises"])
+    t43b8 = w.request(E2["43b8"], **injected)
+    t608b = lead_delegates(w, E2["608b"], S2R_LEAD + "20261022T211355821063-lead-608b.md")
+    assert writer_task(w, t608b).source == "relayed"  # (1) the writer's rework of a relayed rework is relayed
+    scripted_report(w.org, t608b, S2R_WRITER + "20261022T211525485549-lead.writer-d9ba.md", {S2R_MEMO: raw(S2R_V3)})
+    scripted_report(w.org, t43b8, S2R_READ + "20261022T211944433751-lead-c3dd.md", {})
+    return t43b8
+
+
+def test_s2r_the_wrong_rule_is_refused_and_the_human_rework_needs_a_base(tmp_path):
+    w, f230, judged = s2r_judged(tmp_path / "judged")
+    t43b8 = s2r_relayed_rework(w)
+    reject = tool_call(S2R, 27)  # the user's rejection of the judged delivery, as call #27 recorded it ...
+    reply = call(w.root, "feedback", **{**reject, "task_id": w.ids.of(reject["task_id"]), "criterion": ["C3"]})  # ... with the reading 0a.2 asks for (2a)
+    a9fd = w.last_verdict()
+    w.ids.bind(E2["a9fd"], a9fd)
+    assert 'in these words: "About C3: add "<the rule, in their words>" as a lasting rule? Yes or no."' in reply
+    assert f'answers="{a9fd}", about="C3"' in reply
+    plain, plain_f230, _ = s2r_judged(tmp_path / "without-a-reading")
+    unread = call(plain.root, "feedback", **{**reject, "task_id": plain_f230})  # E4's assistant passed no reading: the reply still gives the question's id
+    assert "About " in unread and ": add" in unread and "Next time, pass your reading as criterion on the rejection" in unread
+    assert "is one of" not in unread and "C1, C2, C3" in unread  # it lists the current ids and names no C<k> as the reading
+    # (3) the rework the user asked for, as call #28 made it: the relayed rework changed the memo after the delivery they judged
+    asked = {**tool_call(S2R, 28), "revises": w.ids.of(E2["f230"])}
+    sent = len(w.org.sent(ROOT))
+    refusal = fails(w.root, "request", **asked)
+    assert f"refused: since the delivery the client judged (task {f230}, result {judged.id}), relayed rework {t43b8} " in refusal
+    assert f"changed {S2R_MEMO}. Say which version the user's corrections apply to" in refusal and "Nothing was sent." in refusal
+    assert 'base="delivered"' in refusal and len(w.org.sent(ROOT)) == sent
+    # (4) base="delivered": the task carries the version the user judged
+    reply = call(w.root, "request", **asked, base="delivered")
+    t342a = w.last_task()
+    w.ids.bind(E2["342a"], t342a)
+    assert "base delivered: the lead starts from the version the user judged." in reply
+    body = w.org.find_received("lead", t342a).body
+    commit = w.org.runtime.org_history.first_commit_with(f"lead/sent/{judged.id}.md")
+    assert commit and f"org-git commit {commit[:12]}" in body and "## Base: the version the client judged" in body
+    judged_text = body[body.index("### " + S2R_MEMO):]
+    assert "| Marta |" in judged_text and "| 2026-10-14 |" in judged_text and "Open questions" not in judged_text  # Marta's date survives
+    assert w.org.find_received("lead", t342a).source == "human" and body.rstrip().endswith("```")
+    t0e90 = lead_delegates(w, E2["0e90"], S2R_LEAD + "20261022T212415721677-lead-0e90.md")
+    assert writer_task(w, t0e90).source == "human"  # the writer's rework for it is the user's
+    # (2) what the scheduler puts in the lead's prompt for the batch [a9fd, 342a]: the lesson of the relayed rework is marked
+    batch = [w.org.find_received("lead", a9fd), w.org.find_received("lead", t342a)]
+    assert all(batch)
+    sections = w.org.runtime.service_prompt_sections.prompt_sections("lead", batch)
+    assert 'lessons (from a relayed rework, not the client\'s): "Rework needed' in sections
+    # (5) the user's yes, recorded with the answer
+    c31 = tool_call(S2R, 31)
+    assert "Recorded as the user's answer to R1" in call(w.root, "define_service", **c31, answers=a9fd, about="C3", words="Yes, add it.")
+    (link,) = [m for m in w.org.sent(ROOT) if m.reply_to == a9fd and m.criterion]
+    assert (link.criterion, link.source) == ("C9", "human") and contract_meta(w.org, "lead", w.service)[0]["version"] == 2
+    # (6) E4's playbook v2 rested on the wrong rule: it is refused line by line
+    v2, v1 = evidence("s2r/playbook/PLAYBOOK.6b06123.md"), evidence("s2r/playbook/PLAYBOOK.2b6438a.md")
+    refused = fails(w.lead, "revise_playbook", service=w.service, content=v2[1], reason=v2[0]["reason"], evidence=["R1", "C9"])
+    assert "refused: every line a revision adds or changes must rest on the evidence it cites" in refused and "are not C9's words" in refused
+    assert "Flag any vague deadline as `none`" in refused and "Vague deadlines:" in refused
+    assert playbook_meta(w.org, "lead", w.service)[0]["version"] == 1
+    # (7) the criterion's own words, as one line with its id, are admitted
+    c9 = next(c.text for c in w.org.runtime.service_catalog.criteria("lead", w.service) if c.id == "C9")
+    none_yet = "none yet: add them from lessons and feedback"
+    assert "now v2" in call(w.lead, "revise_playbook", service=w.service, content=v1[1].strip().replace(none_yet, f"- C9: {c9}"), reason="C9 confirmed", evidence=["C9"])
+    meta, _ = playbook_meta(w.org, "lead", w.service)
+    assert meta["version"] == 2 and meta["admitted"] == "c"
+    assert f"[C9] - C9: {c9[:40]}" in next(m.body for m in w.org.received(ROOT) if "admitted:" in m.body)
+
+
+S3 = EV / "s3"
+S3_MEMO = "lead/writer/work/memo-2026-10-05.md"
+S3_LEAD, S3_WRITER, S3_READ = "s3/msgs/lead-sent/", "s3/msgs/lead-writer-sent/", "s3/msgs/read/"
+E3 = {
+    "88b2": "20261022T214057425390-root-88b2", "4510": "20261022T214612649634-root-4510", "fe20": "20261022T215128895860-root-fe20",
+    "ac19": "20261022T215730383010-root-ac19", "ff36": "20261022T215730424416-root-ff36", "da7e": "20261022T214139482031-lead-da7e",
+    "0ebf": "20261022T214714927747-lead-0ebf", "5559": "20261022T215309118322-lead-5559", "1fb7": "20261022T215837117856-root-1fb7",
+}
+
+
+def test_s3_the_answered_amendment_is_admitted_and_only_its_words_enter_the_playbook(tmp_path):
+    w = build(tmp_path, "s3/service/history--SERVICE.v1.md", "s3/playbook/PLAYBOOK.f6d34a7.md", ("reviewer", "writer"))
+    r88b2 = w.request(E3["88b2"], inputs={"notes_file": "2026-10-05.md"}, title="Memo for 2026-10-05 meeting")
+    tda7e = lead_delegates(w, E3["da7e"], S3_LEAD + "20261022T214139482031-lead-da7e.md")
+    scripted_report(w.org, tda7e, S3_WRITER + "20261022T214218308119-lead.writer-5d79.md", {S3_MEMO: raw("s3/memos/versions/memo-2026-10-05.v1.4884355.md")})
+    scripted_report(w.org, r88b2, S3_READ + "20261022T214508787095-lead-de22.md", {})
+    c23 = tool_call(S3, 23)  # the user's rework (call #23): the dates he wants
+    t4510 = w.request(E3["4510"], **{**c23, "revises": w.ids.of(c23["revises"])})
+    t0ebf = lead_delegates(w, E3["0ebf"], S3_LEAD + "20261022T214714927747-lead-0ebf.md")
+    assert writer_task(w, t0ebf).source == "human"
+    scripted_report(w.org, t0ebf, S3_WRITER + "20261022T214743679928-lead.writer-2ac3.md", {S3_MEMO: raw("s3/memos/versions/memo-2026-10-05.v2.a526bb3.md")})
+    judged = scripted_report(w.org, t4510, S3_READ + "20261022T214955106608-lead-ffba.md", {})
+    injected = json.loads((S3 / "injection" / "request-args.json").read_text(encoding="utf-8"))  # E4's relayed rework (fe20)
+    injected["revises"] = w.ids.of(injected["revises"])
+    tfe20 = w.request(E3["fe20"], **injected)
+    t5559 = lead_delegates(w, E3["5559"], S3_LEAD + "20261022T215309118322-lead-5559.md")
+    assert writer_task(w, t5559).source == "relayed"
+    scripted_report(w.org, t5559, S3_WRITER + "20261022T215346200018-lead.writer-7d10.md", {S3_MEMO: raw("s3/memos/versions/memo-2026-10-05.v3.b7f83c8.md")})
+    scripted_report(w.org, tfe20, S3_READ + "20261022T215618947365-lead-40d8.md", {})
+    c30 = tool_call(S3, 30)  # the rejection (call #30), with the reading E4's assistant did not give
+    reply = call(w.root, "feedback", **{**c30, "task_id": w.ids.of(c30["task_id"]), "criterion": ["C3"]})
+    ac19 = w.last_verdict()
+    w.ids.bind(E3["ac19"], ac19)
+    assert "About C3: add" in reply
+    c31 = {**tool_call(S3, 31), "revises": w.ids.of(tool_call(S3, 31)["revises"])}  # the human rework after the injected one changed the memo
+    refusal = fails(w.root, "request", **c31)
+    assert f"relayed rework {tfe20} " in refusal and f"changed {S3_MEMO}." in refusal and f"(task {t4510}, result {judged.id})" in refusal
+    assert "Nothing was sent." in refusal
+    call(w.root, "request", **c31, base="delivered")
+    w.ids.bind(E3["ff36"], w.last_task())
+    assert "## Base: the version the client judged" in w.org.find_received("lead", w.last_task()).body
+    c37, c38 = tool_call(S3, 37), tool_call(S3, 38)
+    assert "Recorded as the user's answer to R1" in call(w.root, "define_service", **c37, answers=ac19, about="C3", words=c38["note"])
+    (link,) = [m for m in w.org.sent(ROOT) if m.reply_to == ac19 and m.criterion]
+    assert (link.criterion, link.source) == ("C8", "human")
+    # the lead's attempt 1: the link note's id is evidence (F-E4-7), and what it rests on is the criterion's own words, nothing else
+    v2, v1 = evidence("s3/playbook/PLAYBOOK.dd2d1da.md"), evidence("s3/playbook/PLAYBOOK.f6d34a7.md")
+    refused = fails(w.lead, "revise_playbook", service=w.service, content=v2[1], reason=v2[0]["reason"], evidence=["C8", link.id, r88b2])
+    assert "unknown evidence" not in refused and "refused: every line a revision adds or changes must rest on the evidence it cites" in refused
+    for rider in ("(d) a 'Next meeting' footer", "No other sections", "(C1\u2013C8) and the regression list verbatim", "<checker's task id>"):
+        assert rider in refused, rider
+    assert playbook_meta(w.org, "lead", w.service)[0]["version"] == 1
+    c8 = next(c.text for c in w.org.runtime.service_catalog.criteria("lead", w.service) if c.id == "C8")
+    none_yet = "none yet: add them from lessons and feedback"
+    assert "now v2" in call(w.lead, "revise_playbook", service=w.service, content=v1[1].strip().replace(none_yet, f"- C8: {c8}"), reason="C8 confirmed", evidence=[link.id])
+    meta, _ = playbook_meta(w.org, "lead", w.service)
+    assert meta["version"] == 2 and meta["admitted"] == "c"

@@ -229,6 +229,8 @@ def fixed_rework(tmp_path: Path) -> ReworkContext:
     return FixedReworkContext({"20260101T000000000001-ceo-aaaa": {"service": "weekly-brief", "contract": 3, "playbook": 2}})
 
 
+PURE = {"GuardedSender"}  # one implementation over any sender (``GuardedRootSender``), no fake of its own: ``test_contract_guarded_sender`` runs it over three
+
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     MessageSender: [fs_world, memory_world, fixed_world, recording_world],
     TaskAssigner: [fs_world, memory_world, fixed_world],

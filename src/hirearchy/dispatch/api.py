@@ -1,7 +1,7 @@
 """The public surface of ``dispatch``: the protocol rules every message an agent or the human sends obeys.
 
 ``MessageSender`` validates (size, type, body, route, budget, hops) and delivers, ``TaskAssigner`` is how a manager gives a task to a direct
-report, ``TaskReporter`` is how an agent answers a task it was given. ``ReworkContext`` is the port that ``services`` implements: the service
+report, ``TaskReporter`` is how an agent answers a task it was given. ``GuardedSender`` is the sender behind ``Org.send``. ``ReworkContext`` is the port that ``services`` implements: the service
 fields a rework task inherits from the task it revises.
 
 The rules the three of them are made of are ports too, since the facade (``Org.can_message``, ``_next_hops``, ``_normalize_artifact``) and the
@@ -17,10 +17,12 @@ from typing import Protocol, runtime_checkable
 from ..kernel import Message
 from ._lessons import LESSONS_MAX_CHARS, check_lessons
 from ._protocols import ArtifactNormalizer, HopCounter, RoutePolicy
+from ._root_send import check_root_send
 
 __all__ = [
     "LESSONS_MAX_CHARS",
     "ArtifactNormalizer",
+    "GuardedSender",
     "HopCounter",
     "MessageSender",
     "ReworkContext",
@@ -28,6 +30,7 @@ __all__ = [
     "TaskAssigner",
     "TaskReporter",
     "check_lessons",
+    "check_root_send",
 ]
 
 
@@ -74,6 +77,12 @@ class MessageSender(Protocol):
 
 
 @runtime_checkable
+class GuardedSender(MessageSender, Protocol):
+    """The ``MessageSender`` the ``Org`` facade hands out for ``Org.send``: it refuses what only the rules of a case may send for root (``check_root_send``:
+    a task that names a service or revises another) and sends every other message exactly as the sender it guards would."""
+
+
+@runtime_checkable
 class TaskAssigner(Protocol):
     def delegate(
         self,
@@ -89,7 +98,8 @@ class TaskAssigner(Protocol):
     ) -> Message:
         """Assign a task to a direct report (root: to anyone) and return the delivered task. A title, a goal and acceptance criteria are
         required; ``budget`` defaults to what ``actor`` can afford (at least 1 run); ``revises`` must be the id of an earlier task ``actor``
-        sent to ``to`` and sends it back for rework, and a rework of a service request keeps the service fields of the original. ``source`` (root only) says
+        sent to ``to`` and sends it back for rework, and an agent's rework of a service request keeps the service fields of the original (root sends a service
+        request back with ``ServiceCommands.request``: ``delegate`` refuses it, so that the rules of the case apply). ``source`` (root only) says
         whether the user asked for the rework (``"human"``) or it is root's own reading (``"relayed"``, the default for a rework)."""
         ...
 

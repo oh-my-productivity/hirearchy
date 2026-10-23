@@ -150,10 +150,12 @@ def test_over_a_real_organization_a_service_request_gives_its_service_fields(tmp
     assert dict(context.fields_for("root", plain.id)) == {} and dict(context.fields_for("root", "nope")) == {}
 
 
-def test_a_rework_of_a_service_request_keeps_the_service_fields_through_the_assigner(tmp_path: Path) -> None:
+def test_root_sends_a_service_request_back_with_request_not_through_the_assigner(tmp_path: Path) -> None:
     org = Org.init(tmp_path / "org", "mission")
     org.hire("root", "ceo", "Chief", "Run it.", can_hire=True)
     org.define_service("root", "ceo", "weekly-brief", **BRIEF)  # type: ignore[arg-type]
     request = org.request("root", "weekly-brief", {"topic": "ai"})
-    again = org.delegate("root", "ceo", "Again", "g", "a", budget=2, revises=request.id)
+    with pytest.raises(OrgError, match="^refused: .* is a request for the service `weekly-brief`: send it back with request\\(service="):
+        org.delegate("root", "ceo", "Again", "g", "a", budget=2, revises=request.id)  # P4-USE-REQUEST: the rule classes of `request` keep the case
+    again = org.request("root", "weekly-brief", {"topic": "ai"}, budget=2, revises=request.id)
     assert (again.service, again.contract, again.playbook, again.revises) == ("weekly-brief", 1, 0, request.id)

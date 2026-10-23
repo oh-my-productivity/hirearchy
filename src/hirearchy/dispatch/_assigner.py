@@ -12,6 +12,12 @@ from ..mail import MailboxReader
 from ..templates import DocumentTemplates
 from .api import MessageSender, ReworkContext, TaskAssigner
 
+USE_REQUEST = (  # P4-USE-REQUEST
+    "refused: {revises} is a request for the service `{service}`: send it back with request(service=\"{service}\", inputs=..., "
+    "revises=\"{revises}\", source=...) (CLI: hirearchy request {service} --revises {revises}) so the rework stays in its case under the "
+    "contract (and names its base when a relayed rework changed the delivery). Nothing was sent."
+)
+
 
 class _ServiceFields(TypedDict, total=False):
     """The fields of a task that a rework of a service request inherits."""
@@ -73,6 +79,9 @@ class RuleTaskAssigner(TaskAssigner):
             raise OrgError(f"revises must be the id of an earlier task you sent to {to}: {revises}")
         body = self._templates.task_body(goal, acceptance, list(inputs or []))
         fields = self._rework.fields_for(actor, revises) if revises else {}  # rework of a service request is still part of its case
+        service = fields.get("service")
+        if actor == ROOT and revises and isinstance(service, str) and service:  # root's rework of a request goes through ``request``, which keeps the rules of the case
+            raise OrgError(USE_REQUEST.format(revises=revises, service=service))
         return self._sender.send(
             actor, to, body, type="task", title=title, budget=budget, revises=revises or None,
             source=source, inherited=_tier_of(fields), **_service_fields(fields),
