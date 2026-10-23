@@ -46,6 +46,20 @@ def test_a_contract_is_read_from_its_frontmatter(tmp_path: Path) -> None:
     assert c.defined == datetime(2026, 1, 2, tzinfo=timezone.utc) and c.created == datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 
+def test_contract_of_reads_answers_about_words_and_initiated() -> None:
+    answered = contract_of("ceo", "b", {"version": 2, "answers": "20261018T100000000012-root-0004", "about": "C2", "words": "Yes, add it."}, "", None)
+    assert (answered.answers, answered.about, answered.words, answered.initiated) == ("20261018T100000000012-root-0004", "C2", "Yes, add it.", "")
+    own = contract_of("ceo", "b", {"version": 2, "initiated": "user", "words": "Keep it to one page."}, "", None)
+    assert (own.answers, own.about, own.words, own.initiated) == ("", "", "Keep it to one page.", "user")
+    odd = contract_of("ceo", "b", {"answers": 7, "about": None, "words": ["x"], "initiated": False}, "", None)
+    assert (odd.answers, odd.about, odd.initiated) == ("7", "", "")  # text, or nothing for what is none
+
+
+def test_a_legacy_version_has_no_basis() -> None:
+    legacy = contract_of("ceo", "b", {"version": 3, "defined_by": "root", "acceptance": ["a"]}, "", None)
+    assert (legacy.answers, legacy.about, legacy.words, legacy.initiated) == ("", "", "", "")
+
+
 def test_a_required_input_is_required_unless_it_says_false() -> None:
     c = contract_of("ceo", "b", {"inputs": [{"name": "a", "required": False}, {"name": "b", "required": 0}, {"name": "c", "required": None}]}, "", None)
     assert [i["required"] for i in c.inputs] == [False, True, True]

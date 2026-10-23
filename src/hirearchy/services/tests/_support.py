@@ -58,6 +58,17 @@ def amend(w: ServicesWorld, owner: str = "ceo", name: str = "weekly-brief", acto
     return w.commands.define_service(actor, owner, name, **over)
 
 
+def write_version(w: ServicesWorld, version: int, acceptance: Sequence[str], owner: str = "ceo", name: str = "weekly-brief", **basis: str) -> None:
+    """Write contract version ``version`` of the service straight into the store (the current one is archived), with ``basis`` keys in its
+    frontmatter (``answers``, ``about``, ``words``, ``initiated``), as a version of 0a.2 carries them."""
+    found = w.store.read_contract(owner, name)
+    assert found is not None
+    meta, body = found
+    for key in ("answers", "about", "words", "initiated"):
+        meta.pop(key, None)  # a version's basis is its own: the next version never copies it
+    w.store.write_contract(owner, name, {**meta, "version": version, "acceptance": list(acceptance), "defined_by": "root", **basis}, body, version - 1)
+
+
 def grant(w: ServicesWorld, to: str, runs: int) -> Message:
     """A note from root that carries ``runs`` runs, delivered whatever the rules say."""
     return w.d.post(Message(sender="root", to=to, type="note", body="runs for you", title="grant", budget=runs))

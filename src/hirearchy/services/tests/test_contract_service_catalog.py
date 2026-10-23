@@ -12,7 +12,7 @@ import pytest
 from hirearchy.services import ServiceCatalog
 from hirearchy.services.testing import IMPLEMENTATIONS, ServicesWorld
 
-from ._support import BRIEF, STEPS, define, implementations, make
+from ._support import BRIEF, STEPS, define, implementations, make, write_version
 
 
 @pytest.fixture(params=implementations(IMPLEMENTATIONS[ServiceCatalog]))
@@ -131,6 +131,16 @@ def test_criteria_of_a_service_carry_their_ids(w: ServicesWorld) -> None:
         ("C3", "Dates are written in full", 2, True, True),
     ]
     assert w.catalog.criteria("ceo", "no-such-service") == []
+
+
+def test_criteria_carry_their_basis(w: ServicesWorld) -> None:
+    define(w, acceptance=["A", "B"])
+    write_version(w, 2, ["A", "B", "C"], answers="20261018T100000000012-root-0004", about="C1", words="Yes, add it.")
+    write_version(w, 3, ["A", "B", "C", "D"], initiated="user", words="Add D.")
+    found = w.catalog.criteria("ceo", "weekly-brief")
+    assert [(c.id, c.since, c.answers, c.user) for c in found] == [
+        ("C1", 1, "", False), ("C2", 1, "", False), ("C3", 2, "20261018T100000000012-root-0004", False), ("C4", 3, "", True),
+    ]
 
 
 def test_playbook_versions_are_oldest_first(w: ServicesWorld) -> None:

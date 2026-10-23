@@ -48,8 +48,14 @@ def contract_of(owner: str, name: str, meta: JsonObject, body: str, path: Path |
         budget=max(1, as_int(meta.get("budget"), 1)), locked=meta.get("locked") is True,
         version=max(1, as_int(meta.get("version"), 1)), defined_by=str(meta.get("defined_by") or ""),
         defined=as_time(meta.get("defined")), created=as_time(meta.get("created") or meta.get("defined")),
-        notes=body.strip(), path=path,
+        notes=body.strip(), path=path, answers=_text(meta.get("answers")), about=_text(meta.get("about")), words=_text(meta.get("words")),
+        initiated=_text(meta.get("initiated")),
     )
+
+
+def _text(value: object) -> str:
+    """A frontmatter field as text; nothing (absent, false, empty) is ``""``."""
+    return str(value) if value else ""
 
 
 def merged_versions(kind: str, files: Iterable[tuple[JsonObject, str]]) -> list[tuple[int, JsonObject, str]]:

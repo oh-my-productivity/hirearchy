@@ -3,17 +3,17 @@
 
 from __future__ import annotations
 
-from collections.abc import Collection
+from collections.abc import Collection, Mapping
 from pathlib import Path
 
 import hirearchy.services as services
 from hirearchy.services.testing import fs_world
 
-from ._support import amend, define, populated
+from ._support import amend, define, populated, write_version
 
 
-def numbered(*versions: tuple[int, str, list[str]]) -> list[services.Criterion]:
-    return services.number_criteria(list(versions))
+def numbered(*versions: tuple[int, str, list[str]], basis: Mapping[int, tuple[str, bool]] | None = None) -> list[services.Criterion]:
+    return services.number_criteria(list(versions), basis)
 
 
 def ids(criteria: list[services.Criterion]) -> dict[str, str]:
@@ -80,6 +80,46 @@ def test_confirmed_amendments_needs_both() -> None:
     assert ids_of({"C1"}) == []  # a confirmed v1 criterion is no amendment
     assert ids_of({"C2"}) == []  # a removed criterion is out, confirmed or not
     assert ids_of({"C9"}) == [] and services.confirmed_amendments([], {"C1"}) == []  # an id the contract never had; an empty contract
+
+
+def test_number_criteria_carries_the_basis_of_the_version_that_added_a_text() -> None:
+    found = numbered(
+        (1, "root", ["A", "B"]), (2, "root", ["A", "B", "C"]), (3, "root", ["A", "B", "C", "D"]), (4, "root", ["A", "C", "D"]), (5, "root", ["A", "C", "D", "B"]),
+        basis={2: ("N2", False), 3: ("", True), 4: ("N4", False), 5: ("N5", False)},
+    )
+    assert {c.text: (c.answers, c.user) for c in found} == {
+        "A": ("", False),  # in v1: no basis
+        "B": ("N5", False),  # in v1, removed in v4, added again in v5: the latest version that added it
+        "C": ("N2", False),  # added by v2 and kept by v3, v4, v5: the basis of v2, not of the later versions
+        "D": ("", True),  # added by v3, user-initiated
+    }
+    assert [c.since for c in found] == [1, 1, 2, 3]  # the basis does not move `since`
+
+
+def test_v1_texts_have_no_basis() -> None:
+    found = numbered((1, "root", ["A", "B"]), basis={1: ("N1", True)})
+    assert [(c.answers, c.user) for c in found] == [("", False), ("", False)]
+    assert all(c.answers == "" and not c.user for c in numbered((1, "root", ["A"])))  # no basis at all: the default
+
+
+def test_a_text_added_by_a_version_without_a_basis_has_none() -> None:
+    found = numbered((1, "root", ["A"]), (2, "ceo", ["A", "B"]), basis={3: ("N3", False)})
+    assert [(c.answers, c.user) for c in found] == [("", False), ("", False)]  # a legacy version, an agent's version
+
+
+def test_stored_basis_reads_the_map_from_stored_versions(tmp_path: Path) -> None:
+    from hirearchy.services._criteria import stored_basis
+
+    w = populated(fs_world(tmp_path))
+    define(w, acceptance=["A", "B"])
+    assert stored_basis(w.store, "ceo", "weekly-brief") == {1: ("", False)}
+    write_version(w, 2, ["A", "B", "C"], answers="20261018T100000000012-root-0004", about="C1", words="Yes, add it.")
+    write_version(w, 3, ["A", "B", "C", "D"], initiated="user", words="Add D.")
+    write_version(w, 4, ["A", "B", "C", "D", "E"])
+    assert stored_basis(w.store, "ceo", "weekly-brief") == {
+        1: ("", False), 2: ("20261018T100000000012-root-0004", False), 3: ("", True), 4: ("", False),
+    }
+    assert stored_basis(w.store, "ceo", "no-such-service") == {}
 
 
 def test_criteria_of_follows_the_order_of_texts_and_skips_unknown() -> None:

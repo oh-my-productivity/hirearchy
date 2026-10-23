@@ -111,6 +111,10 @@ class Contract:
     created: datetime | None = None  # when the service was first defined (requests before it belong to an older service)
     notes: str = ""  # free text body: notes from the client
     path: Path | None = None
+    answers: str = ""  # the basis of this version: the rejection (its message id) it records the user's answer to; "" when it answers none
+    about: str = ""  # ... the C<k> or R<k> id the user's question named (with ``answers``)
+    words: str = ""  # ... the user's words, verbatim (with ``answers``, or with ``initiated``)
+    initiated: str = ""  # ... "user": a change the user asked for on their own, outside any rejection; "" otherwise
 
 
 @dataclass(frozen=True)
@@ -122,6 +126,8 @@ class Criterion:
     since: int  # the contract version that first had it
     by: str  # who defined that version (its ``defined_by``): "root" for the user's seat
     current: bool  # it is in the latest version given to ``number_criteria``
+    answers: str = ""  # the rejection (message id) the latest version that added the text answers; "" for a v1 text or an unanswered amendment
+    user: bool = False  # the latest version that added the text was a change the user asked for on their own
 
     @property
     def amended(self) -> bool:
@@ -130,18 +136,31 @@ class Criterion:
         return self.since >= 2 and self.by == ROOT and self.current
 
 
-def number_criteria(versions: Sequence[tuple[int, str, Sequence[str]]]) -> list[Criterion]:
+def number_criteria(
+    versions: Sequence[tuple[int, str, Sequence[str]]], basis: Mapping[int, tuple[str, bool]] | None = None,
+) -> list[Criterion]:
     """``(version, defined_by, acceptance)`` of every contract version, oldest first -> every criterion it ever had, by id (pure).
 
     The id of a criterion is fixed by the order in which its exact text first appeared: versions in the order given, each version's
     ``acceptance`` in list order, the first sight of a text takes ``C<k>``, ``k`` = 1 + the distinct texts seen before. Removing a criterion
-    never renumbers the others, a reworded text is a new criterion, and a text that comes back keeps its first id."""
+    never renumbers the others, a reworded text is a new criterion, and a text that comes back keeps its first id.
+
+    ``basis`` maps a version to ``(answers, user)``, the basis it records (``stored_basis``). A criterion carries the basis of the latest version
+    that added its text (present in that version, absent from the one before): a text of v1 has none, and a version without an entry adds with none."""
     seen: dict[str, tuple[int, str]] = {}  # text -> (the version that first had it, who defined that version)
+    added: dict[str, tuple[str, bool]] = {}  # text -> the basis of the latest version that added it
+    before: set[str] = set()
     for version, defined_by, acceptance in versions:
         for text in acceptance:
             seen.setdefault(text, (version, defined_by))
+            if version > 1 and text not in before:
+                added[text] = (basis or {}).get(version, ("", False))
+        before = set(acceptance)
     latest = set(versions[-1][2]) if versions else set()
-    return [Criterion(f"C{k}", text, since, by, text in latest) for k, (text, (since, by)) in enumerate(seen.items(), start=1)]
+    return [
+        Criterion(f"C{k}", text, since, by, text in latest, *added.get(text, ("", False)))
+        for k, (text, (since, by)) in enumerate(seen.items(), start=1)
+    ]
 
 
 def confirmed_amendments(criteria: Sequence[Criterion], confirmed: Collection[str]) -> list[Criterion]:

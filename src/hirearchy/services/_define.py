@@ -8,7 +8,7 @@ from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
 from ..kernel import NAME_RE, ROOT, Clock, EventSink, JsonObject, OrgError, parent
 from ._lines import criteria_lines
-from ._criteria import stored_versions
+from ._criteria import stored_basis, stored_versions
 from ._protocols import ContractAmendment, ContractDefinitions, OwnerAddresses, PlaybookTexts, PlaybookWriter, ServicePlaces
 from .api import (
     DESCRIPTION_MAX, Contract, ContractNormalizer, Criterion, ServiceCatalog, ServiceEvidence, ServiceStore, criteria_of, number_criteria, quoting_lines,
@@ -112,7 +112,8 @@ class RuleContractDefiner(ContractDefinitions):
         inputs_n = self._normalizer.inputs(inputs) if inputs is not None or old is None else old.inputs
         deliverable_n = self._normalizer.deliverable(deliverable) if deliverable is not None else (old.deliverable if old else {})
         stored = stored_versions(self._store, owner, name) if old is not None else []  # the ids of the versions on disk (3.3)
-        current = criteria_of(number_criteria(stored), old.acceptance) if old is not None else []  # the old contract's criteria, with ids
+        basis = stored_basis(self._store, owner, name) if old is not None else {}  # what each of them records
+        current = criteria_of(number_criteria(stored, basis), old.acceptance) if old is not None else []  # the old contract's criteria, with ids
         if acceptance is not None:
             accept_n = criteria_lines(acceptance, "acceptance", required=True)
         elif old is None:
@@ -137,7 +138,7 @@ class RuleContractDefiner(ContractDefinitions):
         }
         changes: list[str] = []
         confirmed: Collection[str] = frozenset()
-        after = number_criteria([*stored, (new.version, actor, accept_n)])  # the new version is numbered in memory, before it is written
+        after = number_criteria([*stored, (new.version, actor, accept_n)], basis)  # the new version is numbered in memory, before it is written
         if old is not None:
             changes = self._amendment.changes(old, new, {c.text: c.id for c in after})
             if not changes:
