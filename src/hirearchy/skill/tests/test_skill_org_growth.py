@@ -91,3 +91,10 @@ def test_the_skill_asks_before_the_copy_and_never_answers_a_question_with_a_rewo
         "4. then copy the deliverable",
     ):
         assert needle in text, needle
+
+
+def test_the_delivery_report_shows_the_assistants_relayed_runs_apart_as_its_own():
+    """DR-0a3-8 (D-E5-1): the case total of a delivery report names root's relayed runs apart, as the assistant's own, and keeps the approved-runs example."""
+    text = flat()
+    assert "your relayed runs apart, as yours" in text
+    assert '"19 runs of the 15 approved per request"' in text  # the needle of test_round_g_assistant stays
