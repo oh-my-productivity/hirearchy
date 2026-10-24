@@ -94,7 +94,9 @@ class TextPlanDetails(PlanDetailing):
             if agents:
                 split_lines(total)
         else:
-            L += ["", "Budget per request" + (f" (your cap: {cap})" if cap else " (no cap given)") + f", estimate {est['total']} for one pass + one review/rework cycle:",
+            round_runs = self._budgets.client_round(agents)
+            L += ["", "Budget per request" + (f" (your cap: {cap})" if cap else " (no cap given)") + f", estimate {est['total']} for one pass + one review/rework cycle"
+                  + (f", {est['total'] + round_runs} with one round of your questions or a rejection" if round_runs else "") + ":",
                   "  A ceiling: runs the team does not spend come back automatically with the final report of each request."]
             for name, n in svc_budgets.items():
                 L.append(f"  service {name}: {n} runs per request")

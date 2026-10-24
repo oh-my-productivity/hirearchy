@@ -92,11 +92,15 @@ class ServiceBlueprintRules(ServiceRules):
             if b is not None and (not isinstance(b, int) or isinstance(b, bool) or b < 1):
                 issues.append(Issue("error", f"{where}.budget", "budget is the number of runs handed down with each request: a whole number >= 1", "service"))
             elif agents:
-                total = self._budgets.service_budget(sv, est_total, cap, round_runs=self._budgets.client_round(agents))
+                round_runs = self._budgets.client_round(agents)
+                total = self._budgets.service_budget(sv, est_total, cap, round_runs=round_runs)
                 if cap is not None and total > cap:
                     issues.append(Issue("error", f"{where}.budget", f"planned budget {total} runs per request is above the user's cap of {cap} (the cap is for ONE request); lower the service's budget or shrink the team", "budget-cap"))
                 if total < est_total:
                     issues.append(Issue("error", f"{where}.budget" if b is not None else "needs.budget_runs", f"{total} runs per request cannot cover the pipeline: the estimate with one review and one rework cycle is {est_total} (see estimate()); raise the budget or drop a role", "budget-low"))
+                elif total < est_total + round_runs:
+                    lead = top.name if top is not None else "the top agent"
+                    issues.append(Issue("warning", f"{where}.budget" if b is not None else "needs.budget_runs", f"{total} runs per request covers one pass and one internal rework (the estimate is {est_total}), not a round of your questions or a rejection, which takes about {round_runs} more (1, plus 2 for each agent below {lead}): {est_total + round_runs} per request covers one such round", "budget-tight"))
                 elif total < math.ceil(est_total * TIGHT):
                     issues.append(Issue("warning", f"{where}.budget", f"{total} runs per request leaves almost no slack over the estimate of {est_total}; expect a stall on the first surprise", "budget-tight"))
             if sv.get("playbook") is not None:

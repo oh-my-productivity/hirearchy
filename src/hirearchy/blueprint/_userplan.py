@@ -140,10 +140,12 @@ class TextUserPlan(UserPlanning):
         cap = needs.get("budget_runs")
         if not is_plain(bp):  # services only: the budget is per request
             budgets = self._budgets.service_budgets(bp, agents)
+            round_runs = self._budgets.client_round(agents)
             top = max(budgets.values(), default=0)
             out = [f"Budget: up to {top} runs per request (one run = one working session of one agent), "
-                   + (f"your cap per request is {cap}" if cap else "you gave no cap") + f"; the minimum for one review and rework is {est['total']}. "
-                   "Unspent runs come back to you."]
+                   + (f"your cap per request is {cap}" if cap else "you gave no cap") + f"; the minimum for one review and rework is {est['total']}"
+                   + (f", and a round of your questions or a rejection takes about {round_runs} more ({est['total'] + round_runs} in all)" if round_runs else "")
+                   + ". Unspent runs come back to you."]
             if agents and len(budgets) == 1:
                 split = self._budgets.budget_split(agents, top)
                 for a in agents:

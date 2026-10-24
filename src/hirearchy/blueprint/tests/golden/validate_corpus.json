@@ -358,6 +358,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "org:small-playbook-cap": [
@@ -366,6 +372,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ],
   [
    "error",
@@ -1982,6 +1994,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:acceptance-text": [
@@ -2002,6 +2020,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:acceptance-vague": [
@@ -2016,6 +2040,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:bad-name": [
@@ -2030,6 +2060,12 @@
    "services[Weekly Brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[Weekly Brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:budget-default": [
@@ -2092,7 +2128,7 @@
   [
    "warning",
    "services[weekly-brief].budget",
-   "18 runs per request leaves almost no slack over the estimate of 17; expect a stall on the first surprise",
+   "18 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
    "budget-tight"
   ]
  ],
@@ -2172,6 +2208,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 18), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 25 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:deliverable-bad-max-words": [
@@ -2180,6 +2222,12 @@
    "services[weekly-brief].deliverable",
    "deliverable.max_words must be a whole number of at least 1",
    "deliverable"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:deliverable-no-description": [
@@ -2188,6 +2236,12 @@
    "services[weekly-brief].deliverable",
    "deliverable needs a description: what the owner hands back (e.g. one markdown file)",
    "deliverable"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:deliverable-no-format": [
@@ -2196,6 +2250,12 @@
    "services[weekly-brief].deliverable.format",
    "no format given (e.g. markdown with a comparison table); the writer will guess",
    "deliverable-format"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:deliverable-path-parent": [
@@ -2210,6 +2270,12 @@
    "services[weekly-brief].deliverable.path",
    "<TMP>/nowhere/at does not exist; the copy step will create it",
    "path-parent"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:deliverable-relative": [
@@ -2218,6 +2284,12 @@
    "services[weekly-brief].deliverable",
    "deliverable.path must be an absolute path (got 'relative/dir')",
    "deliverable"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:deliverable-text": [
@@ -2226,6 +2298,12 @@
    "services[weekly-brief].deliverable.format",
    "no format given (e.g. markdown with a comparison table); the writer will guess",
    "deliverable-format"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:deliverable-unknown-key": [
@@ -2234,6 +2312,12 @@
    "services[weekly-brief].deliverable",
    "unknown key(s) in deliverable: colour. Use description, format, max_words, path",
    "deliverable"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:description-lines": [
@@ -2248,6 +2332,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:description-long": [
@@ -2262,6 +2352,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:duplicate": [
@@ -2272,10 +2368,22 @@
    "path-delivery"
   ],
   [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
+  ],
+  [
    "error",
    "services[weekly-brief]",
    "duplicate service name 'weekly-brief'; requests name the service only, so each name must be unique",
    "service-name"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:empty": [
@@ -2328,6 +2436,12 @@
    "services[0].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[0].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:inputs-bad-name": [
@@ -2342,6 +2456,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:inputs-text": [
@@ -2356,6 +2476,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:inputs-twice": [
@@ -2370,6 +2496,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:inputs-unknown-key": [
@@ -2384,6 +2516,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:item-not-a-mapping": [
@@ -2438,6 +2576,12 @@
    "path-delivery"
   ],
   [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
+  ],
+  [
    "error",
    "services[weekly-brief].locked",
    "locked is true or false (true: the team lead may not improve the playbook)",
@@ -2470,6 +2614,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:no-limit-criterion": [
@@ -2484,6 +2634,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:no-task": [
@@ -2492,6 +2648,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:no-web-text": [
@@ -2500,6 +2662,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:not-a-list": [
@@ -2584,6 +2752,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:owner-worker": [
@@ -2598,6 +2772,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:plain-task-beside": [
@@ -2618,6 +2798,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:playbook-blank": [
@@ -2626,6 +2812,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ],
   [
    "error",
@@ -2642,6 +2834,12 @@
    "path-delivery"
   ],
   [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
+  ],
+  [
    "error",
    "services[weekly-brief].playbook",
    "the playbook is 1001 words; the limit is 1000 (playbook_max_words): condense it to the steps that matter",
@@ -2654,6 +2852,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:request": [
@@ -2662,6 +2866,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:request-bad-inputs-spec": [
@@ -2676,6 +2886,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:request-blank-input": [
@@ -2684,6 +2900,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ],
   [
    "error",
@@ -2700,6 +2922,12 @@
    "path-delivery"
   ],
   [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
+  ],
+  [
    "error",
    "task.inputs",
    "for a request, inputs is a mapping {input name: value}",
@@ -2712,6 +2940,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ],
   [
    "error",
@@ -2770,6 +3004,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:request-to-worker": [
@@ -2778,6 +3018,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ],
   [
    "error",
@@ -2794,6 +3040,12 @@
    "path-delivery"
   ],
   [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
+  ],
+  [
    "error",
    "task.inputs",
    "unknown input(s) for `weekly-brief`: colour. Its inputs: topic, week",
@@ -2808,6 +3060,12 @@
    "path-delivery"
   ],
   [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
+  ],
+  [
    "error",
    "task.service",
    "'nope' is not one of the blueprint's services (weekly-brief); name one of them",
@@ -2820,6 +3078,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ],
   [
    "error",
@@ -2840,6 +3104,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:two": [
@@ -2848,6 +3118,18 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
+  ],
+  [
+   "warning",
+   "services[daily-digest].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:unknown-service-key": [
@@ -2862,6 +3144,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ],
  "services:valid": [
@@ -2870,6 +3158,12 @@
    "services[weekly-brief].deliverable.path",
    "no agent can write to <TMP>/deliverables/briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)",
    "path-delivery"
+  ],
+  [
+   "warning",
+   "services[weekly-brief].budget",
+   "22 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round",
+   "budget-tight"
   ]
  ]
 }

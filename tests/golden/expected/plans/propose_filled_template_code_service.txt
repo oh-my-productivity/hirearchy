@@ -15,7 +15,7 @@ Team (4 agents):
   - dev (Engineer, model claude-sonnet-5.5): can read files in <CWD>/proj and the organization's own files; changes files only in <CWD>/proj; can run commands, which are NOT confined: it is told to stay in <CWD>/proj, but nothing enforces that
   - qa (Tester, model claude-sonnet-5.5): can read files in <CWD>/proj and the organization's own files; changes files only in <CWD>/proj; can run commands, which are NOT confined: it is told to stay in <CWD>/proj, but nothing enforces that
   - cr (Code Reviewer, model claude-sonnet-5.5): can read files only in <CWD>/proj and the organization's own files; can run commands, which are NOT confined: it is told to stay in <CWD>/proj, but nothing enforces that
-Budget: up to 25 runs per request (one run = one working session of one agent), your cap per request is 30; the minimum for one review and rework is 18. Unspent runs come back to you.
+Budget: up to 25 runs per request (one run = one working session of one agent), your cap per request is 30; the minimum for one review and rework is 18, and a round of your questions or a rejection takes about 7 more (25 in all). Unspent runs come back to you.
   lead starts with 25, hands down dev 5, qa 3, cr 3 and keeps 14 for planning, checking and rework.
 If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
 Checking: qa, cr review the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
@@ -64,7 +64,7 @@ Organization (4 agents):
   - cr [code-reviewer] Code Reviewer: model=claude-sonnet-5.5, tools=read,shell ws=<CWD>/proj
     Access: kiro read only in <CWD>/proj and in the organization's own files (read-only); shell NOT confined (instructed only)
 
-Budget per request (your cap: 30), estimate 18 for one pass + one review/rework cycle:
+Budget per request (your cap: 30), estimate 18 for one pass + one review/rework cycle, 25 with one round of your questions or a rejection:
   A ceiling: runs the team does not spend come back automatically with the final report of each request.
   service my-service: 25 runs per request
     lead: starts with 25, hands down dev 5, qa 3, cr 3 (each includes its rework/re-check run), keeps 14 (own 7 + slack 7)

@@ -15,7 +15,7 @@ Team (4 agents):
   - researcher (Researcher, model claude-sonnet-5.5): can read web pages and search the web; cannot change your files
   - writer (Writer, model claude-sonnet-5.5): cannot change your files
   - factcheck (Independent Fact-Checker, model claude-sonnet-5.5): can read web pages and search the web; cannot change your files
-Budget: up to 24 runs per request (one run = one working session of one agent), your cap per request is 25; the minimum for one review and rework is 17. Unspent runs come back to you.
+Budget: up to 24 runs per request (one run = one working session of one agent), your cap per request is 25; the minimum for one review and rework is 17, and a round of your questions or a rejection takes about 7 more (24 in all). Unspent runs come back to you.
   lead starts with 24, hands down researcher 4, writer 3, factcheck 3 and keeps 14 for planning, checking and rework.
 If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
 Checking: factcheck reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
@@ -57,7 +57,7 @@ Organization (4 agents):
   - writer [writer] Writer: model=claude-sonnet-5.5, tools=none
   - factcheck [fact-checker] Independent Fact-Checker: model=claude-sonnet-5.5, tools=web_fetch,web_search
 
-Budget per request (your cap: 25), estimate 17 for one pass + one review/rework cycle:
+Budget per request (your cap: 25), estimate 17 for one pass + one review/rework cycle, 24 with one round of your questions or a rejection:
   A ceiling: runs the team does not spend come back automatically with the final report of each request.
   service weekly-brief: 24 runs per request
     lead: starts with 24, hands down researcher 4, writer 3, factcheck 3 (each includes its rework/re-check run), keeps 14 (own 7 + slack 7)

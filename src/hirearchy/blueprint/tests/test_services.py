@@ -87,6 +87,23 @@ def paths(found, code):
     return [i.path for i in found if i.code == code]
 
 
+def e5_blueprint(tmp_path, **service_over):
+    """The blueprint of the E5 run: lead with a writer and a reviewer (estimate 11, a client round of 5), cap 12, one service with budget 12."""
+    (tmp_path / "deliverables").mkdir(exist_ok=True)
+    bp = yaml.safe_load(RESEARCH.read_text())
+    bp["needs"].pop("deliverable"), bp["needs"].pop("sources"), bp.pop("task")
+    bp["needs"].update(budget_runs=12, quality_bar="Every decision and action is taken from the notes.")
+    bp["agents"] = [{"name": "lead", "template": "manager", "children": [{"name": "writer", "template": "writer"}, {"name": "reviewer", "template": "reviewer"}]}]
+    bp["services"] = [service(name="weekly-meeting-memo", budget=12, acceptance=["At most 600 words as counted by read.", 'Has exactly the sections "Decisions" and "Actions", in that order.'],
+                              deliverable={"description": "One markdown file", "format": "markdown", "max_words": 600, "path": str(tmp_path / "deliverables" / "memos")})]
+    bp["services"][0].update(service_over)
+    return bp
+
+
+E5_TIGHT = ("{total} runs per request covers one pass and one internal rework (the estimate is 11), not a round of your questions or a rejection, "
+            "which takes about 5 more (1, plus 2 for each agent below lead): 16 per request covers one such round")
+
+
 def block(bp, roots, **kw) -> str:
     text = bpm.plan_for_user(bp, allowed_roots=roots, **kw)
     return text
@@ -94,7 +111,8 @@ def block(bp, roots, **kw) -> str:
 
 # ------------------------------------------------------------------------------------------ validation
 def test_a_services_only_blueprint_needs_no_deliverable_task_or_acceptance(svc_bp, roots):
-    found = issues(svc_bp, roots)
+    """D-E5-2: the services-only blueprint asks for 24 runs per request (the estimate 17 plus one client round of 7), so it gets no budget warning."""
+    found = issues(mutate(svc_bp, lambda b: b["services"][0].update(budget=24)), roots)
     assert not bpm.errors(found), [i.render() for i in found]
     assert codes(found, "warning") <= {"path-delivery", "path-parent"}
 
@@ -233,6 +251,49 @@ def test_code_service_needs_tests_in_its_criteria(tmp_path, roots):
     found = issues(bp, roots)
     assert not bpm.errors(found)
     assert paths(found, "code-criteria") == ["services[feature].acceptance"]
+
+
+def test_a_budget_that_keeps_the_estimate_but_not_a_client_round_says_what_covers_one(tmp_path):
+    """D-E5-2: the E5 blueprint (cap 12, budget 12, estimate 11, round 5) is told the number that covers one round of the user's questions."""
+    found = issues(e5_blueprint(tmp_path), [tmp_path])
+    assert not bpm.errors(found), [i.render() for i in found]
+    (tight,) = [i for i in found if i.code == "budget-tight"]
+    assert tight.level == "warning" and tight.path == "services[weekly-meeting-memo].budget" and tight.message == E5_TIGHT.format(total=12)
+
+
+def test_a_default_budget_that_a_cap_keeps_under_a_client_round_says_so_at_the_cap(tmp_path):
+    bp = e5_blueprint(tmp_path)
+    bp["services"][0].pop("budget")
+    found = issues(bp, [tmp_path])
+    assert not bpm.errors(found), [i.render() for i in found]
+    (tight,) = [i for i in found if i.code == "budget-tight"]
+    assert tight.path == "needs.budget_runs" and tight.message == E5_TIGHT.format(total=12)
+
+
+def test_a_budget_that_covers_the_estimate_and_a_client_round_gets_no_warning(tmp_path):
+    bp = e5_blueprint(tmp_path, budget=16)
+    bp["needs"]["budget_runs"] = 20
+    assert "budget-tight" not in codes(issues(bp, [tmp_path]))
+    just_under = e5_blueprint(tmp_path, budget=15)
+    just_under["needs"]["budget_runs"] = 20
+    assert [i.message for i in issues(just_under, [tmp_path]) if i.code == "budget-tight"] == [E5_TIGHT.format(total=15)]
+
+
+def test_a_budget_under_the_estimate_keeps_the_budget_low_error(tmp_path):
+    found = issues(e5_blueprint(tmp_path, budget=10), [tmp_path])
+    (low,) = [i for i in found if i.code == "budget-low"]
+    assert low.level == "error" and low.path == "services[weekly-meeting-memo].budget"
+    assert low.message == ("10 runs per request cannot cover the pipeline: the estimate with one review and one rework cycle is 11 (see estimate()); "
+                           "raise the budget or drop a role")
+    assert "budget-tight" not in codes(found)
+
+
+def test_without_a_cap_the_default_budget_is_the_estimate_plus_one_client_round(tmp_path):
+    bp = e5_blueprint(tmp_path)
+    bp["services"][0].pop("budget"), bp["needs"].pop("budget_runs")
+    found = issues(bp, [tmp_path])
+    assert not bpm.errors(found) and "budget-tight" not in codes(found)
+    assert "Budget: up to 16 runs per request" in bpm.plan_for_user(bp, found, allowed_roots=[tmp_path])
 
 
 def test_the_budget_cap_is_per_request(svc_bp, roots, plain_bp):

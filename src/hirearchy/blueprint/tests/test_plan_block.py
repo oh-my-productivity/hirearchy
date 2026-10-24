@@ -80,3 +80,21 @@ def test_clip_helper_and_other_lines_do_not_cut_mid_sentence(tmp_path, monkeypat
     assert f"  1. {long_criterion}" in block  # the contract is shown in full
     scope = next(x for x in block.splitlines() if x.startswith("- Scope: "))
     assert scope.endswith(" (the rest is in the details)") and "..." not in scope
+
+
+def test_a_services_plan_names_the_client_round_in_the_budget_line_and_the_details_header(tmp_path):
+    """D-E5-2: E5's numbers (cap 12, estimate 11, a round of 5) show the number that covers one round of the user's questions."""
+    from .test_services import e5_blueprint
+
+    bp = e5_blueprint(tmp_path)
+    block = bp_mod.plan_for_user(bp, allowed_roots=[tmp_path])
+    assert ("Budget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review "
+            "and rework is 11, and a round of your questions or a rejection takes about 5 more (16 in all). Unspent runs come back to you.") in block
+    details = bp_mod.render_plan(bp, allowed_roots=[tmp_path])
+    assert ("Budget per request (your cap: 12), estimate 11 for one pass + one review/rework cycle, "
+            "16 with one round of your questions or a rejection:") in details
+
+
+def test_a_plain_task_plan_has_no_client_round(tmp_path, monkeypatch):
+    bp = doc_bp(tmp_path, monkeypatch)
+    assert "round of your questions" not in bp_mod.plan_for_user(bp) and "round of your questions" not in bp_mod.render_plan(bp)

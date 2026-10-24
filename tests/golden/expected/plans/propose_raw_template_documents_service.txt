@@ -14,7 +14,7 @@ Team (4 agents):
   - reader (Reader of the user's files, model claude-sonnet-5.5): can read no files outside the organization; cannot change your files
   - writer (Writer, model claude-sonnet-5.5): cannot change your files
   - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read no files outside the organization; cannot change your files
-Budget: up to 22 runs per request (one run = one working session of one agent), your cap per request is 25; the minimum for one review and rework is 15. Unspent runs come back to you.
+Budget: up to 22 runs per request (one run = one working session of one agent), your cap per request is 25; the minimum for one review and rework is 15, and a round of your questions or a rejection takes about 7 more (22 in all). Unspent runs come back to you.
   lead starts with 22, hands down reader 3, writer 3, reviewer 2 and keeps 14 for planning, checking and rework.
 If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
 Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
@@ -66,7 +66,7 @@ Organization (4 agents):
   - reviewer [reviewer] Independent Reviewer: model=claude-sonnet-5.5, tools=read
     Access: kiro read only in the organization's own files (read-only)
 
-Budget per request (your cap: 25), estimate 15 for one pass + one review/rework cycle:
+Budget per request (your cap: 25), estimate 15 for one pass + one review/rework cycle, 22 with one round of your questions or a rejection:
   A ceiling: runs the team does not spend come back automatically with the final report of each request.
   service <service-name>: 22 runs per request
     lead: starts with 22, hands down reader 3, writer 3, reviewer 2 (each includes its rework/re-check run), keeps 14 (own 7 + slack 7)
