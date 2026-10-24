@@ -1,6 +1,6 @@
 # Org growth, Phase 0a.3: the batch after the E5 FAIL (technical design)
 
-Status: design, revision 2. Revision 1 (`8a60035`) was reviewed with CHANGES_REQUESTED (3 HIGH, 8 MEDIUM, 10 LOW); every finding is resolved
+Status: design, revision 2, approved as amended by Appendix A.2, which overrides the body where they differ. Revision 1 (`8a60035`) was reviewed with CHANGES_REQUESTED (3 HIGH, 8 MEDIUM, 10 LOW); every finding is resolved
 below, and Appendix A says how. Branch `feat/org-growth-phase-0a3` off `main` `3cd28b3` (the E5 study commit; product code identical to
 `6618c0d`); worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0a3`. Baseline at `3cd28b3`: `skills/hirearchy/SKILL.md` 125 lines;
 `ROOT_INSTRUCTIONS` 2 565 characters raw, 2 642 at the reference path (`/` + 59 `r`, the measure of `skill/tests/test_skill_services.py`), cap 2 700.
@@ -154,7 +154,7 @@ it must not let the new default hand down more than the user approved. Three rea
 
 The ceiling reading says: a hand-down approves only what it hands beyond what was still committed. A human rework without `budget` is handed
 `left = approved - committed` when `left >= 1`, so its ceiling equals the approval and raises nothing. An explicit `budget` above what is left,
-or a grant, raises the approval by exactly the excess: SKILL.md step 4 has root ask the user before it hands down beyond the approved budget, so
+or a grant, raises the approval by exactly the excess: the SKILL.md rule on budget requests (lines 69-72) has root ask the user before it hands down beyond the approved budget, so
 the product reads such a hand-down as the user's yes, as it reads `source="human"` as root's word. Taking the highest ceiling (not the latest)
 keeps a later small hand-down from lowering the approval.
 
@@ -360,7 +360,8 @@ After its line `request <id> -> <owner> (service ..., budget N...)`, when `--rev
 line when that is not empty, under the rule of the MCP tool's `_step`: an `OrgError` or `OSError` while reading gives nothing (the request is
 already sent and committed), any other error propagates. `SRC/app/wire_cli.py` passes `get(ServiceSteps)` (`cli` already imports `reflection`
 for `ServiceReports`: no new edge). The CLI therefore shows the top-up advice of a human rework and, for `--source relayed`, the client
-questions, exactly as root's MCP reply does.
+questions, exactly as root's MCP reply does. The CLI prints the same root-addressed `TOPUP` and `REWORK` texts on purpose: the CLI's user
+is root, and every text carries its CLI form.
 
 **Docstrings and help.**
 - Root's `request` tool, the `budget` line: `budget: runs handed down (default: the contract's; for a rework the user asked for, source="human",
@@ -476,6 +477,7 @@ test (`pytest.fail`), as in `e4_replay.py`. The kit reads the evidence only; 0b'
 | `RELAYED_SPEND` / `RELAYED_NONE_YET` | no relayed task | neither |
 | `RELAYED_NONE_YET` | relayed task(s), 0 relayed runs (just sent, or their runs fell in a later interval) | printed instead of form 2 and `RELAYED_SPEND` |
 | overlapped relayed task | its runs after the successor's send | counted as the user's in the head (0b's split, unchanged); the overspend sentence compares `user_cost`, which removes up to `relayed_overlap` |
+| window reopened by a later rework (4.3 limit 2) | another request's runs after the rework | counted as the user's and not as approved: `OVER_APPROVED` can fire on them, as today's sentence does; not corrected in 0a.3 (0b's window rule) |
 | `case_total` | agent client | today's text byte for byte, whatever its relayed reworks |
 | `case_total` | runs that cannot be read | raises as today (no change in 0a.3; 0b adds `runs_unknown`) |
 | `CaseAllowance.left` | no case, no contract, agent client | None: the contract's budget |
@@ -1155,7 +1157,7 @@ budget estimate is the plan's number of 5.1.
 2. **A, per stream:** every `case total:` line whose chain holds a relayed rework names the relayed runs apart, or says the relayed rework has
    used no run yet; no "tell the user" fires on relayed runs alone; the turns in which the assistant asked the user to fund runs of its own
    relayed rework (E5 s1: 1; target 0); the turns in which it reported relayed runs as its own; chains with an overlapped relayed task (4.8)
-   and chains whose window reopened (4.3 limit 2), with what the sentence said on them.
+   and chains whose window reopened (4.3 limit 2), with what the sentence said on them and whether it said "exceeds".
 3. **A, the default:** root's human reworks sent without `budget`, with the budget each got and `left` at that moment; those sent with 1 run
    because nothing was left, and what followed; `TOPUP` replies, and whether the assistant asked the user with that number in the same turn;
    grants after a yes; on the CLI, the same if any stream uses it.
@@ -1184,7 +1186,7 @@ Declared limits (each stated where it arises, and pinned by a test where one can
    exceed the approval; the files cannot tell it from an explicit `budget=1` (4.3 limit 1; `test_cases.py`).
 2. The case window reopens when a later task joins the chain: another case's runs between the chain's last final result and the rework count
    as the user's and as approved, and the other case's later runs keep counting in this case, as today's `case.runs` and today's sentence
-   already do (4.3 limit 2; `test_cases.py`).
+   already do, which can make the overspend sentence fire (4.3 limit 2; `test_cases.py`).
 3. Overlapping intervals: an overlapped relayed rework's later runs count as the user's in the head and in `user_committed` (so the default
    can hand down less and `TOPUP` can ask for more than a split by task would); the overspend sentence removes up to `relayed_overlap` of them,
    which can also hide an overrun of that size. The reverse direction is not corrected: a human rework overlapped by a relayed one moves user
@@ -1231,3 +1233,38 @@ kiro-cli that ignores `KIRO_HOME` (6.1's stop conditions).
 | 19 | LOW | Deliverable note, folder with only relayed findings | Addressed: no block heading; each `relayed` finding is its own line, in the order of the findings (7.2); a test in `test_deliverables_note.py`. |
 | 20 | LOW | Zombie scheduler counts as gone | Addressed: `ps -o stat=` prints nothing or a state starting with `Z` (6.4 step 5, and 6.1 step 8). |
 | 21 | LOW | Explicit-budget validation position; `rework_step` docstring | Addressed: the explicit check stays before `revises`, only the default moves after `_base` (4.5, 10); the docstring text is given (4.5). |
+
+### A.2 Design review of revision 2 (13 findings: 3 MEDIUM, 10 LOW), binding amendments
+
+The review of revision 2 ended with CHANGES_REQUESTED. The manager closed the design loop by approving revision 2 as amended below
+(`.agents/tasks/manager-decision-design-loop.md`). These amendments bind and override the body where the two differ. `{n}` is a number, and
+`{s}`, `{has}`, `{it}`, `{its}`, `{Its}` follow the rule of 4.4 (one id: "", "has", "it", "its", "Its"; several: "s", "have", "they", "their",
+"Their").
+
+| # | Sev. | Finding | Binding resolution |
+|---|---|---|---|
+| DR-0a3-1 | MEDIUM | `RELAYED_NONE_YET` ("has used no run yet") is false when the relayed rework's runs fell in a later user interval | `RELAYED_NONE_YET` is printed only when `relayed_overlap == 0`. When `relayed_runs == 0` and `relayed_overlap > 0`, `case_total` prints head form 1 and the new `RELAYED_UNSPLIT`. **P-1:** `Case.unsplit_runs: int = 0` is the charged runs in the intervals of the user tasks after the first relayed task whose term of `relayed_overlap` is above 0 (0 when `relayed_overlap` is 0); it is computed in `_cases.py` in the same loop as `relayed_overlap`: keep the indices `k` whose overlap term is positive, `first = min(...)`, and count the stamps of `charged` that lie in `bounds[j]` for some `j > first` with `tasks[j].source != "relayed"`; on 0b's `runs=False` path it is 0. **P-2, the text of `RELAYED_UNSPLIT`** (`{n}` is `c.unsplit_runs`): `Your relayed rework{s} {ids} {has} no run counted apart: a request of the user's followed before {it} finished, so {its} runs could not be split from the user's interval, which holds {n} run(s) since then, all counted with the user's requests. {Its} runs are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them.` The print rule for a human client with relayed task(s): `relayed_runs == 0` and `relayed_overlap == 0`: form 1 and `RELAYED_NONE_YET`; `relayed_runs == 0` and `relayed_overlap > 0`: form 1 and `RELAYED_UNSPLIT`; `relayed_runs >= 1`: form 2 and `RELAYED_SPEND`. The overspend sentence is unchanged (`OVER_APPROVED` when `U > A`). 4.4's table row for `relayed_runs == 0` and 4.8's row for `RELAYED_NONE_YET` read this way. Tests: `test_cases.py` (`unsplit_runs`), and three cases in `test_reports.py` (R of budget 6 followed by H before any run, 4 runs in H's interval, no result for R: form 1 and `RELAYED_UNSPLIT` with "4 run(s)", never "has used no run yet"; the same chain with R's result returning 6: `RELAYED_NONE_YET`; R alone and just sent: `RELAYED_NONE_YET`). |
+| DR-0a3-2 | MEDIUM | `examples/blueprint-service.yaml` sets `budget: 22` itself and is not a listed site | The file is a site of B. Line 13 becomes `  budget_runs: 25   # the user's cap for ONE request; the service below asks for 24`; line 46 becomes `    budget: 24                         # runs per request; leave it out for the plan's number (the estimate + 25%, or + one client round when more)`. The word "cheaper" stays out of the comments (`test_models.py:156-161` scans `examples/*.yaml`). `examples/blueprint-service.yaml` gets no `budget-tight`; its goldens (`plans/example_blueprint-service.txt`, `charters/apply_service_example.md`) show 24; `test_examples.py:233` reads `s.budget == 24` (line 226 passes unchanged) and line 160 replaces `budget: 24` by `budget: 23`. README line 279's sample (`budget: 22`) is an explicit value and may stay. Commits: A0 (this text), B1. |
+| DR-0a3-3 | MEDIUM | The reproduction's after-the-fix step calls `hirearchy stop`, which does not exist | The step stops the scheduler through the control the MCP `stop` tool uses (`SchedulerControl.stop(self, wait: float = 15.0) -> str`, `SRC/daemon/api.py:71`): `HIREARCHY_STATE_DIR=$SB/kiro-state $WT/.venv/bin/python -c 'import sys; from hirearchy.app import Org; print(Org(sys.argv[1]).runtime.scheduler_control.stop())' "$SB/org"`. It must record `run.end` (`killed: true`) and `scheduler.exit` (`stopped by SIGTERM`). Clean-up (6.1 step 9) runs after it. Commits: A0 (this text), C0, C2. |
+| DR-0a3-4 | LOW | The profile prompt does not say that the hirearchy tools are deferred | The profile's `"prompt"` and the chat input of 6.1 step 6 are both exactly: `The hirearchy tools are deferred: load them with tool_load (tool_ids ["hirearchy::*"]), then call tool_call with tool_id "hirearchy::start" once, with its defaults, and reply with its result only.` Loading all is harmless: the permission rule allows only `hirearchy/start`. Commits: A0 (this text), C0, C2. |
+| DR-0a3-5 | LOW | Sites that the commits change are not listed | Added to the commits that change them. B: `blueprint/_protocols.py` (`BudgetPlanning.service_budget` gains `*, round_runs: int` and the 5.2 docstring); `blueprint/tests/test_services.py:99` (`svc_bp` runs on `mutate(svc_bp, lambda b: b["services"][0].update(budget=24))`, the docstring names D-E5-2) and `:487` (`== 24`); `blueprint/tests/test_budget_planner.py:80` (`"b": 24`). C1: the users of the handle that `spawn_detached` returns build it with `table.spawn(...)` or work on the returned pid (`processes/tests/test_fake_process_table.py:109`, `daemon/tests/test_signal_stopper.py:27`, `daemon/tests/test_fakes.py:155, 166`, `daemon/tests/test_pidfile_status.py:109`, `daemon/tests/test_startup_watch.py:43`, `daemon/tests/test_detached_launcher.py:68-71`, `processes/testing.py`, `daemon/testing.py`, `scheduler/testing.py`). D1: `tests/e2e/test_no_bypass_0a2.py:243` asserts the full new P2-UNRATED text and `tests/e2e/test_org_growth_0a2.py:123` its new prefix; both files go into D1's TARGETS (`test_no_bypass_0a2.py:298` and `test_contract_service_commands.py:463` are `RETIRE_UNRATED` and stay). |
+| DR-0a3-6 | LOW | The F-E5-5 walk's result shape and the `_entry` branch are not specified | `_folder_rule` and `_file_rule` return `tuple[str, _Pair \| None, tuple[str, ...]]`: the kind, the pair (for `relayed`, the delivery's pair) and the relayed task ids, oldest first (`()` otherwise). `_entry` unpacks the 3-tuple; for `kind == "relayed"` it returns `[]` when `self._settled(entry.mtime_us, [pair.case] if pair.case else [])`, else `[DeliverableFinding(folder, group.services, entry.name, "relayed", task=pair.task.id, relayed=ids, file=single)]`. The `kind` comment in `api.py` gains `relayed`. `_entry` is a site of 7.2. Commit: D2. |
+| DR-0a3-7 | LOW | What the case total says after a reopened window is not stated | Stated in 4.8 (a new row), in 17 limit 2 ("can make the overspend sentence fire") and in 16 item 2 ("and whether it said 'exceeds'"). After the reopened window of 4.3 limit 2, `OVER_APPROVED` can fire on another request's later runs: the existing window rule, which is also 0b's, counts them as the user's and not as approved. Not corrected in 0a.3. A test in `test_reports.py` pins it (docstring names declared limit 2 and DR-0a3-7). Commits: A0 (doc), A3 (test). |
+| DR-0a3-8 | LOW | SKILL.md's delivery report folds root's relayed runs into the total | SKILL.md line 97 becomes exactly `   (met / unmet), then runs used of planned (with reworks, the case total: "19 runs of the 15 approved per request", your relayed runs apart, as yours). Nothing else.` The needle of `test_round_g_assistant.py:38` is kept; the new needle `your relayed runs apart, as yours` goes in `SRC/skill/tests/test_skill_org_growth.py`; the file stays at 125 lines. Commit: A6. |
+| DR-0a3-9 | LOW | A3's progress golden is given as "form 2 ... or form 1" | The scenario (`progress/tests/_scenario.py:119-121`) has one run in the relayed interval, so form 2 applies. The case total in `SRC/progress/tests/expected/all.txt` line 2 and `task_1_weekly-brief.txt` is exactly `case total: 3 runs used: 2 by the user's requests, 1 by your relayed rework 20260101T120440001000-root-001e; 16 handed down (contract: 10 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20260101T120200002000-root-0015)`, with the line's prefix unchanged; line 3 of `all.txt` and `task_2_weekly-brief.txt` get the same case-total text. Commit: A3. |
+| DR-0a3-10 | LOW | 4.3 cites the wrong SKILL.md rule | 4.3 cites the budget-request bullet of SKILL.md (lines 69-72: before a rework that would take the case past the approved per-request budget, ask the user, with the number), not "step 4". Done in the body by A0. |
+| DR-0a3-11 | LOW | `topped` calls a head budget above the contract a top-up | `topped` is `, plus {A - B} approved beyond it` when `A > B`, else empty. `OVER_APPROVED` therefore reads `The user's requests now cost {U} runs, more than the {A} the user approved for this case (contract: {B} per request{topped}): tell the user.` Tests: a head with an explicit budget of 15 on a contract of 12, then an overspend (`, plus 3 approved beyond it`). Commits: A0 (this text), A3. |
+| DR-0a3-12 | LOW | `case_spend`'s docstring becomes untrue | Option (a): the body stays byte for byte and the docstring becomes **P-3**, exactly: `"""The runs a case costs against its contract's per-request budget (pure): the runs its team used, plus, while it is not finished (open or blocked), the runs handed down for it that were neither used nor returned (the team may still spend them). It is the case's total, the user's requests and root's relayed reworks together: ``case_total`` warns on it for an agent client's case, and D-E5-6 has Phase 0b's cost alarm split it (``user_cost`` against ``user_approved``, the comparison ``case_total`` makes for a human client's case)."""` 4.1's "word for word" holds for the body. Commits: A0 (this text), A2. |
+| DR-0a3-13 | LOW | The CLI prints root's advice text to the user | Deliberate: the CLI prints the same root-addressed `TOPUP` and `REWORK` texts as root's MCP reply. The CLI's user is root (the person at the CLI plays the assistant's part), and every text carries its CLI form. Stated in 4.5 ("The CLI"). `test_commands_services.py` asserts that the CLI line equals `rework_step(msg)`. Commits: A0 (doc), A5. |
+
+**Plan-level refinements** (the plan, `.agents/tasks/plan.md` section 2, settles these where the amendments leave a choice):
+- **P-4.** The reflection re-run of the `CaseAllowance` suite is `SRC/reflection/tests/test_case_allowance.py`, not `test_contract_case_allowance.py`,
+  following `test_case_judged_versions.py`. R8 needs only `SRC/services/tests/test_contract_case_allowance.py`.
+- **P-5.** Root's `request` docstring changes in two commits, so that each commit documents what it ships: A4 changes the `budget:` line and the
+  case-total reply sentence, without the top-up clause; A5 adds `, and names the top-up to ask for when a rework the user asked for gets less
+  than a round of the team needs`. The three MCP surface goldens are regenerated in A4 and again in A5; the distinct golden files stay 24.
+- **P-6.** Replay-kit timing: `tests/testkit/e5_replay.py` is created in A3 without `inflight`, and D3 adds the `inflight=` keyword, which only the
+  s3 replays use. Each version gets kit tests in `tests/meta/test_e5_replay_kit.py`, the pattern of `tests/meta/test_e4_replay_kit.py`.
+- **P-7.** The Linux run (6.4): first the design's command, which mounts the worktree read-only; when `/w` is empty inside the container
+  (podman machine shares `/Users` and `/private`, not always `/Volumes`), mount a `git archive HEAD` copy under `/tmp` read-only instead. The
+  evidence records which one ran. Both leave the worktree untouched and test the committed HEAD.
