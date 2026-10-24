@@ -98,3 +98,16 @@ def test_the_delivery_report_shows_the_assistants_relayed_runs_apart_as_its_own(
     text = flat()
     assert "your relayed runs apart, as yours" in text
     assert '"19 runs of the 15 approved per request"' in text  # the needle of test_round_g_assistant stays
+
+
+def test_the_skill_records_the_users_keep_as_is_as_their_accept_on_its_task():
+    """L-ASIS (D-E5-5): when the user keeps the version they have as it is, even after a reject, root records that as their accept with their words;
+    "deliver as is" and "I'll read it myself" stay no accept. The file stays at 125 lines."""
+    assert len(SKILL.read_text().splitlines()) <= 125
+    text = flat()
+    for needle in (
+        'when they keep the version they have as it is ("i\'ll take it as it is"), record that accept on its task',
+        "with their words, also after a reject",
+        '"deliver as is" or "i\'ll read it myself" is not an accept: ask, or record nothing yet',
+    ):
+        assert needle in text, needle
