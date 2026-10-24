@@ -7,7 +7,9 @@ one moment, and the product's own code reads it (no scheduler, no LLM, no networ
 * each ``org-files/<a-b>-AGENT.md`` as ``<a>/<b>/AGENT.md`` (the evidence names an address by joining its parts with ``-``);
 * ``service/history--SERVICE.v1.md`` as ``lead/services/weekly-meeting-memo/SERVICE.md`` (the contract of every E5 stream);
 * every file of ``msgs/<box>`` (root's) and ``msgs/<a-b>-<box>`` (the agent ``a/b``'s) whose id starts with a stamp ``<= cut``, in that box;
-* an empty ``<a>/<b>/runs/<stamp>.log`` for every file of ``run-logs/<a-b>/`` with ``stamp <= cut``: the case counts read the names of the logs only.
+* an empty ``<a>/<b>/runs/<stamp>.log`` for every file of ``run-logs/<a-b>/`` with ``stamp <= cut``: the case counts read the names of the logs only;
+* with ``inflight={"lead": [<message id>, ...]}``, those messages of the agent are in its ``inflight/`` box instead of ``inbox``/``read``: the batch its
+  run was handling at ``cut`` (the evidence keeps only the boxes after the run). A message that is not in the organization at ``cut`` fails the test.
 
 ``Org(dest)`` opens it as it stands: ``ORG.md`` and the agents' directories are all the product reads here (the organization's git repository,
 ``.runtime/`` and the settings file ``Org.init`` writes are created lazily or not needed by the readers the replays call). The kit reads the evidence only and
@@ -17,6 +19,7 @@ never writes into it. A missing evidence file fails the test (``pytest.fail``), 
 from __future__ import annotations
 
 import shutil
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import pytest
@@ -50,7 +53,7 @@ def _dir(path: Path) -> Path:
     return path
 
 
-def materialize(stream: str, cut: str, dest: Path) -> Path:
+def materialize(stream: str, cut: str, dest: Path, inflight: Mapping[str, Sequence[str]] | None = None) -> Path:
     """Write the organization ``EV5/<stream>`` had at ``cut`` at ``dest`` (created) and return ``dest``; see the module docstring."""
     source = _dir(EV5 / stream)
     if len(cut) != 21:
@@ -82,4 +85,11 @@ def materialize(stream: str, cut: str, dest: Path) -> Path:
                 target = dest / _addr(logs.name) / "runs" / log.name
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text("", encoding="utf-8")
+    for agent, ids in (inflight or {}).items():
+        for msg_id in ids:
+            held = [dest / agent / box / f"{msg_id}.md" for box in ("inbox", "read") if (dest / agent / box / f"{msg_id}.md").is_file()]
+            if not held:
+                pytest.fail(f"inflight message {msg_id} is not in the organization of {agent} at the cut {cut}")
+            (dest / agent / "inflight").mkdir(exist_ok=True)
+            shutil.move(held[0], dest / agent / "inflight" / held[0].name)
     return dest

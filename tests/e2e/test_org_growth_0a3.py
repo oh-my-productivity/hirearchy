@@ -4,7 +4,8 @@
 No scheduler, no LLM, no network: ``testkit.e5_replay.materialize`` rebuilds the organization a stream had at one moment (messages, run-log names,
 agents, contract), and the product's own ``case_total`` and ``user_*`` functions read it. A missing evidence file fails the test, never skips it.
 
-This module holds the replays of proposal A (D-E5-1): the case total of E5 s1 at T6 and of E5 s2 at T5.
+This module holds the replays of proposal A (D-E5-1): the case total of E5 s1 at T6 and of E5 s2 at T5; and those of D-E5-5 (F-E5-7): the tier of the
+rework delegations of E5 s3 memo 2.
 """
 
 import pytest
@@ -58,3 +59,18 @@ def test_e5_s2_t5_the_rework_lena_funded_does_not_exceed(tmp_path, cut, runs):
     org, task, case = replay(tmp_path, "s2", cut, "20261024T034308207974-root-6c4f")
     assert org.runtime.service_reports.case_total(task) == f"case total: {runs} runs used of 17 handed down (contract: 12 per request)"
     assert user_spend(case) == 14 and user_approved(case, 12) == 14 and case.relayed_runs == 0
+
+
+def test_e5_s3_the_rework_delegation_of_memo_2_inherits_the_human_tier(tmp_path):
+    """F-E5-7, D-E5-5: the writer delegation 0a56 of memo 2 has no trace (the lead also held memo 1's blocked task). The lead's run 04:31:38 sent the
+    rework df89 that revises it; the batch of that run was root's human rework 57b3 (trace dd39). 0a.2 gave df89 no ``source``; the tier is now looked
+    up through the run's batch."""
+    org = Org(materialize("s3", "20261024T043138264197", tmp_path / "org", inflight={"lead": ["20261024T043106950333-root-57b3"]}))
+    assert org.runtime.rework_context.fields_for("lead", "20261024T042806761805-lead-0a56") == {"source": "human"}
+
+
+def test_e5_s3_the_re_check_delegation_of_memo_2_inherits_the_human_tier(tmp_path):
+    """F-E5-7, D-E5-5: the reviewer delegation 16f9 of memo 2 has no trace either. The run 04:32:31 that sent the rework caa9 had the writer's result
+    d2ef as its batch (trace dd39): a result, not a task, and the stamper's batch rule takes its trace all the same."""
+    org = Org(materialize("s3", "20261024T043231631185", tmp_path / "org", inflight={"lead": ["20261024T043159758365-lead.writer-d2ef"]}))
+    assert org.runtime.rework_context.fields_for("lead", "20261024T042855998356-lead-16f9") == {"source": "human"}

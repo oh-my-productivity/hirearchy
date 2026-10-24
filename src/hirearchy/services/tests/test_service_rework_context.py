@@ -156,3 +156,73 @@ def test_a_leads_rework_of_a_service_request_keeps_the_case_and_gets_the_tier(w:
     sent = w.d.post(Message(sender="ceo", to="ceo/eng", type="task", body="b", title="T", service="weekly-brief", contract=1, trace=TRACE))
     received(w, "human")
     assert dict(w.rework.fields_for("ceo", sent.id)) == {"service": "weekly-brief", "contract": 1, "playbook": 0, "source": "human"}
+
+
+# ------------------------------------------------------------------------------ a revised delegation with no trace: the tier through the run's batch (F-E5-7, D-E5-5)
+
+BATCH = "20260101T000000000002-root-bbbb"
+
+
+def human_task(w: ServicesWorld, trace: str, **kw: object) -> Message:
+    """A human-tier task of root's that the lead ``ceo`` receives (it stays in the inbox until the lead's next run begins)."""
+    return received(w, "human", trace=trace, **kw)
+
+
+def run_of_lead(w: ServicesWorld) -> None:
+    """The lead's run begins (what is in its inbox is now its batch, in ``inflight``)."""
+    w.d.begin_run("ceo")
+
+
+def delegation_with_no_trace(w: ServicesWorld) -> Message:
+    """E5 s3: the lead holds memo 1's blocked task (case A, read in an earlier run) and the human task of memo 2 (case B); its delegation is stamped by
+    neither the open-task rule (two cases) nor the batch rule (nothing in flight), so it carries no trace. The lead's next run is not begun."""
+    blocked = human_task(w, TRACE)
+    answer(w, blocked, status="blocked")
+    run_of_lead(w)
+    w.d.end_run("ceo")
+    human_task(w, BATCH)
+    task = worker_task(w, trace=None)
+    assert task.trace is None
+    return task
+
+
+def test_a_delegation_with_no_trace_gets_the_tier_of_the_case_of_its_batch(w: ServicesWorld) -> None:
+    """E5 s3 ``0a56``: the revising run's batch is root's human rework of memo 2 (case B), the one open task of the lead in that case."""
+    task = delegation_with_no_trace(w)
+    run_of_lead(w)
+    assert dict(w.rework.fields_for("ceo", task.id)) == {"source": "human"}
+
+
+def test_a_delegation_with_no_trace_gets_the_tier_when_the_batch_holds_only_a_result_of_the_case(w: ServicesWorld) -> None:
+    """E5 s3 ``16f9``: the batch is the writer's result to the delegation (a result, not a task); the stamper's batch rule takes its trace too."""
+    task = delegation_with_no_trace(w)
+    run_of_lead(w)
+    w.d.end_run("ceo")
+    w.d.post(Message(sender="ceo/eng", to="ceo", type="result", status="done", reply_to=task.id, body="b", title="Result", trace=BATCH))
+    run_of_lead(w)
+    assert dict(w.rework.fields_for("ceo", task.id)) == {"source": "human"}
+
+
+def test_a_delegation_with_no_trace_gets_no_tier_when_the_batch_holds_two_cases(w: ServicesWorld) -> None:
+    task = delegation_with_no_trace(w)
+    human_task(w, TRACE)  # a second human task of case A arrives: the next batch holds both cases
+    run_of_lead(w)
+    assert dict(w.rework.fields_for("ceo", task.id)) == {}
+
+
+def test_a_delegation_with_no_trace_gets_no_tier_without_a_batch_or_when_it_has_no_trace(w: ServicesWorld) -> None:
+    task = delegation_with_no_trace(w)
+    run_of_lead(w)
+    w.d.end_run("ceo")
+    assert dict(w.rework.fields_for("ceo", task.id)) == {}  # no batch at all
+    w.d.post(Message(sender="ceo/eng", to="ceo", type="note", body="b", title="N"))  # a message with no trace
+    run_of_lead(w)
+    assert dict(w.rework.fields_for("ceo", task.id)) == {}
+
+
+def test_a_revised_task_with_a_trace_keeps_its_own_case_whatever_the_batch_holds(w: ServicesWorld) -> None:
+    received(w, "relayed")  # the lead's open task of case A
+    task = worker_task(w)  # sent with the trace of case A
+    human_task(w, BATCH)
+    run_of_lead(w)  # the batch holds only case B
+    assert task.trace == TRACE and dict(w.rework.fields_for("ceo", task.id)) == {"source": "relayed"}

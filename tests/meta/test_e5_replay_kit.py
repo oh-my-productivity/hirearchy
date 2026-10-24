@@ -76,3 +76,29 @@ def test_a_missing_evidence_file_fails_the_test(tmp_path):
 def test_a_cut_that_is_not_a_stamp_fails_the_test(tmp_path):
     with pytest.raises(Failed, match="21-character stamp"):
         materialize("s1", "20261024T0317", tmp_path / "short")
+
+
+S3_CUT = "20261024T043138264197"  # s3: the lead's run that sent the rework delegation df89 (its batch was root's human rework 57b3)
+S3_57B3 = "20261024T043106950333-root-57b3"
+
+
+def test_the_inflight_messages_of_an_agent_are_in_its_inflight_box_and_nowhere_else(tmp_path):
+    plain = materialize("s3", S3_CUT, tmp_path / "plain")
+    assert (plain / "lead" / "read" / f"{S3_57B3}.md").is_file() and not (plain / "lead" / "inflight").exists()
+    root = materialize("s3", S3_CUT, tmp_path / "org", inflight={"lead": [S3_57B3]})
+    assert names(root / "lead" / "inflight") == [f"{S3_57B3}.md"]
+    assert not (root / "lead" / "read" / f"{S3_57B3}.md").exists() and not (root / "lead" / "inbox" / f"{S3_57B3}.md").exists()
+    assert (root / "lead" / "inflight" / f"{S3_57B3}.md").read_bytes() == (EV5 / "s3" / "msgs" / "lead-read" / f"{S3_57B3}.md").read_bytes()
+    assert names(root / "lead" / "read") == [n for n in names(plain / "lead" / "read") if n != f"{S3_57B3}.md"]  # the rest stays where it was
+
+
+def test_the_product_reads_the_inflight_box_as_the_batch(tmp_path):
+    org = Org(materialize("s3", S3_CUT, tmp_path / "org", inflight={"lead": [S3_57B3]}))
+    assert [m.id for m in org.messages("lead", "inflight")] == [S3_57B3]
+
+
+def test_an_inflight_message_that_is_not_in_the_stream_at_the_cut_fails_the_test(tmp_path):
+    with pytest.raises(Failed, match="inflight message .*57b3.* is not in the organization of lead at the cut"):
+        materialize("s3", "20261024T043106950332", tmp_path / "early", inflight={"lead": [S3_57B3]})  # one microsecond before 57b3
+    with pytest.raises(Failed, match="inflight message .*nope"):
+        materialize("s3", S3_CUT, tmp_path / "unknown", inflight={"lead": ["20261024T043106950333-root-nope"]})
