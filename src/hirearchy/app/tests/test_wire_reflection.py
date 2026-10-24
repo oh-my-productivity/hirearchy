@@ -14,12 +14,13 @@ from hirearchy.reflection import CaseHistory, ReflectionDigest, ServicePromptSec
 from hirearchy.reflection._cases import DerivedCaseHistory
 from hirearchy.reflection._digest import DigestBuilder
 from hirearchy.reflection._evidence import CaseServiceEvidence
+from hirearchy.reflection._allowance import CaseAllowanceOf
 from hirearchy.reflection._judged import CaseJudgedVersions
 from hirearchy.reflection._reports import TextServiceReports
 from hirearchy.reflection._sections import OwnerPromptSections
 from hirearchy.reflection.testing import FixedCaseHistory
-from hirearchy.services import JudgedVersions, ServiceEvidence
-from hirearchy.services.testing import FixedJudgedVersions, RefusingServiceEvidence
+from hirearchy.services import CaseAllowance, JudgedVersions, ServiceEvidence
+from hirearchy.services.testing import FixedAllowance, FixedJudgedVersions, RefusingServiceEvidence
 
 
 def test_the_runtime_has_the_reflection_ports(tmp_path: Path) -> None:
@@ -69,6 +70,14 @@ def test_the_runtime_has_the_judged_versions_that_reflection_implements(tmp_path
     assert runtime.judged_versions is runtime.judged_versions and runtime.judged_versions.base("ceo", "brief", "no-such-task") is None
     fixed = FixedJudgedVersions()
     assert wiring.open_runtime(tmp_path, {JudgedVersions: fixed}).judged_versions is fixed
+
+
+def test_the_runtime_has_the_case_allowance_that_reflection_implements(tmp_path: Path) -> None:
+    runtime = wiring.open_runtime(tmp_path)
+    assert isinstance(runtime.case_allowance, CaseAllowanceOf) and isinstance(runtime.case_allowance, CaseAllowance)
+    assert runtime.case_allowance is runtime.case_allowance and runtime.case_allowance.left("ceo", "brief", "no-such-task") is None
+    fixed = FixedAllowance()
+    assert wiring.open_runtime(tmp_path, {CaseAllowance: fixed}).case_allowance is fixed
 
 
 def test_the_evidence_reads_the_history_of_the_runtime_and_can_be_overridden(tmp_path: Path) -> None:

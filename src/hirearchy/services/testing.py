@@ -42,6 +42,7 @@ from ._texts import CappedPlaybookTexts, DirectReportOwners, EventedPlaybookWrit
 from .api import (
     Admission,
     AmendmentBasis,
+    CaseAllowance,
     ContractNormalizer,
     JudgedBase,
     JudgedVersions,
@@ -343,9 +344,11 @@ def memory_store(tmp_path: Path) -> StoreHarness:
 def _world(
     d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
     delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, judged: JudgedVersions | None = None,
+    allowance: CaseAllowance | None = None,
 ) -> ServicesWorld:
     """``links`` and ``delivery`` wrap the link writer and the delivery of the runtime's notes (a write that fails, a call that is watched);
-    ``judged`` is the base a human rework is checked against (``NoJudgedVersions``: none needs one)."""
+    ``judged`` is the base a human rework is checked against (``NoJudgedVersions``: none needs one); ``allowance`` is what is left of a case's approved
+    runs (``FixedAllowance({})``: every answer None, so a rework gets the contract's budget, as before 0a.3)."""
     places, store = harness.places, harness.store
     gate = evidence or AdmittingServiceEvidence()
     link_notes: LinkNotes = SenderLinkNotes(d.sender)
@@ -364,7 +367,7 @@ def _world(
         ),
         RuleServiceRetirement(d.agents, catalog, store, owners, notes, d.clock, events, gate),
         RulePlaybookReviser(d.agents, catalog, texts, playbooks, notes, gate),
-        RuleServiceRequester(d.agents, catalog, d.mail, TextRequestBodies(), d.sender, judged or NoJudgedVersions()),
+        RuleServiceRequester(d.agents, catalog, d.mail, TextRequestBodies(), d.sender, judged or NoJudgedVersions(), allowance or FixedAllowance({})),
         RuleClientFeedback(d.agents, d.mail, d.sender, gate, store),
     )
     return ServicesWorld(
@@ -378,17 +381,18 @@ def _world(
 def fs_world(
     tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
     delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, writer: Callable[[AtomicWriter], AtomicWriter] | None = None,
-    judged: JudgedVersions | None = None,
+    judged: JudgedVersions | None = None, allowance: CaseAllowance | None = None,
 ) -> ServicesWorld:
     """``writer`` wraps the atomic writer of the store (a write that fails)."""
-    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path, writer), evidence, links, delivery, judged)
+    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path, writer), evidence, links, delivery, judged, allowance)
 
 
 def memory_world(
     tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
     delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, judged: JudgedVersions | None = None,
+    allowance: CaseAllowance | None = None,
 ) -> ServicesWorld:
-    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence, links, delivery, judged)
+    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence, links, delivery, judged, allowance)
 
 
 def fs_rework(tmp_path: Path) -> ReworkContext:
@@ -430,7 +434,24 @@ class FixedJudgedVersions(JudgedVersions):
         return self.bases.get(revises)
 
 
+class FixedAllowance(CaseAllowance):
+    """What is left of the approved runs of a case, by the task a rework revises (``answers``; a missing key is None). ``error``, when set, is raised
+    instead; ``asked`` records every question as ``(owner, service, revises)``."""
+
+    def __init__(self, answers: Mapping[str, int | None] | None = None, error: Exception | None = None) -> None:
+        self.answers = dict(answers or {})
+        self.error = error
+        self.asked: list[tuple[str, str, str]] = []
+
+    def left(self, owner: str, service: str, revises: str) -> int | None:
+        self.asked.append((owner, service, revises))
+        if self.error is not None:
+            raise self.error
+        return self.answers.get(revises)
+
+
 JUDGED_TASK = "20260101T000000000001-root-aaaa"  # the task ``fixed_judged_versions`` has a base for
+ALLOWANCE_TASK = "20260101T000000000001-root-bbbb"  # the task ``fixed_case_allowance`` has an answer for
 
 
 def no_judged_versions(tmp_path: Path) -> JudgedVersions:
@@ -442,6 +463,14 @@ def fixed_judged_versions(tmp_path: Path) -> JudgedVersions:
         task=JUDGED_TASK, result="20260101T000000000002-ceo-bbbb", commit="a" * 40, relayed=("20260101T000000000003-root-cccc",),
         changed=("ceo/memo.md", "ceo/other.md"), texts=(("ceo/memo.md", "the judged text"),),
     )})
+
+
+def no_case_allowance(tmp_path: Path) -> CaseAllowance:
+    return FixedAllowance({})
+
+
+def fixed_case_allowance(tmp_path: Path) -> CaseAllowance:
+    return FixedAllowance({ALLOWANCE_TASK: 7})
 
 
 def hints_fs(tmp_path: Path) -> ServiceHints:
@@ -463,4 +492,5 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     ReworkContext: [fs_rework, memory_rework],
     ServiceEvidence: [admitting_evidence, refusing_evidence],
     JudgedVersions: [no_judged_versions, fixed_judged_versions],
+    CaseAllowance: [no_case_allowance, fixed_case_allowance],
 }

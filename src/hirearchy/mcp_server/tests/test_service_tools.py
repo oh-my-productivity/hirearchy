@@ -188,6 +188,19 @@ def test_the_rework_the_user_asked_for_states_the_case_total_without_the_relayed
     assert "relayed" not in reply.split("case total:")[1] and "exceeds" not in reply and "tell the user" not in reply
 
 
+def test_a_human_rework_without_a_budget_is_handed_what_is_left_of_the_approved_runs(svc):
+    """D-E5-1 (4.5): the first request used 3 of its 10 runs and 7 came back, so the rework the user asked for, sent without a budget, gets 7."""
+    server = build_server(svc, ROOT)
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, runs=3)
+    reply = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, source="human")
+    (rework,) = [m for m in svc.sent(ROOT) if m.revises == first.id]
+    assert rework.budget == 7 and "budget 7" in reply
+    assert "case total: 3 runs used of 17 handed down (contract: 10 per request)" in reply
+    relayed = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id)  # no source: the assistant's own, the contract's 10
+    assert "budget 10" in relayed
+
+
 def test_a_rework_within_the_contract_budget_gets_no_warning(svc):
     server = build_server(svc, ROOT)
     first = svc.request(ROOT, WEEKDAY, {"topic": "ai"}, budget=3)

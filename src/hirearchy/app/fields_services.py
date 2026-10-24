@@ -1,14 +1,14 @@
 """Runtime fields of ``services`` (ARCHITECTURE.md 3.21): one field per port that ``wire_services.py`` builds.
 
 ``ReworkContext`` (the field ``rework_context`` of ``fields_dispatch``) is a port of ``dispatch`` that ``services`` implements: ``wire_services`` provides it.
-``ServiceEvidence`` (the field ``service_evidence``) and ``JudgedVersions`` (``judged_versions``) are ports of ``services`` that ``reflection`` implements,
-because ``services`` cannot read the cases: ``wire_reflection`` provides them."""
+``ServiceEvidence`` (the field ``service_evidence``), ``JudgedVersions`` (``judged_versions``) and ``CaseAllowance`` (``case_allowance``) are ports of
+``services`` that ``reflection`` implements, because ``services`` cannot read the cases: ``wire_reflection`` provides them."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..services import ContractNormalizer, JudgedVersions, ServiceCatalog, ServiceCommands, ServiceEvidence, ServiceHints, ServiceStore
+from ..services import CaseAllowance, ContractNormalizer, JudgedVersions, ServiceCatalog, ServiceCommands, ServiceEvidence, ServiceHints, ServiceStore
 
 STEP: str | None = "C-services"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
@@ -23,3 +23,4 @@ class Fields:
     contract_normalizer: ContractNormalizer
     service_evidence: ServiceEvidence  # a port of ``services`` that ``reflection`` implements: ``wire_reflection`` provides it
     judged_versions: JudgedVersions  # a port of ``services`` that ``reflection`` implements: ``wire_reflection`` provides it
+    case_allowance: CaseAllowance  # a port of ``services`` that ``reflection`` implements: ``wire_reflection`` provides it

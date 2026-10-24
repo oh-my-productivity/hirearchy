@@ -105,7 +105,11 @@ class RequestCommand(Command):
         s.add_argument("--input", action="append", metavar="KEY=VALUE", help="a value for an input of the service (repeatable)")
         s.add_argument("--title", default="")
         s.add_argument("--note", default="", help="free text for the owner")
-        s.add_argument("--budget", type=int, help="runs handed down (default: the contract's)")
+        s.add_argument(
+            "--budget", type=int,
+            help="runs handed down (default: the contract's; for a rework you asked for, what is left of the runs you approved for the case, at most the "
+                 "contract's, 1 when none is left)",
+        )
         s.add_argument("--revises", metavar="TASK_ID", help="send back an earlier request of this service for rework")
         s.add_argument("--source", choices=("human", "relayed"), help="who asked for a rework (--revises): human (you, the default) or relayed")
         s.add_argument("--base", choices=("delivered", "latest"), help="which version a rework you asked for starts from, when the team's own rework changed the "

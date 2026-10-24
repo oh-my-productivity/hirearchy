@@ -1051,9 +1051,11 @@ Ask a direct report for one of its services (see `services`): a task built from 
 
         inputs: {input name: value}; required ones must be present. note: free text for the owner. extra_acceptance:
         criteria added after the contract's (the contract's always apply). budget: runs handed down (default: the
-        contract's; the usual reserve rule applies). revises: id of an earlier request of this service to send back for
-        rework; the reply then states the case total (runs used by the whole chain, runs handed down, the contract's
-        budget per request) and tells you to inform the user when the case exceeds that budget.
+        contract's; for a rework the user asked for, source="human", what is left of the runs the user approved for the
+        case, at most the contract's, and 1 when nothing is left; the usual reserve rule applies). revises: id of an
+        earlier request of this service to send back for rework; the reply then states the case total (runs used by the
+        whole chain, the user's and your relayed reworks' apart, runs handed down, the contract's budget per request)
+        and tells you to inform the user when the user's requests cost more than they approved.
         source (with revises): "human" when the user asked for this rework
         (a rework after their own rejection, carrying their corrections, is one), "relayed" (the default) when it is your
         own reading; the owner sees which.

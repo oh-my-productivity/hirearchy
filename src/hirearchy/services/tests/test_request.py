@@ -230,3 +230,106 @@ def test_a_base_when_none_is_needed_changes_nothing(svc):
     assert "## Base: " not in plain.body
     plain_with_base = request(svc, revises=first.id, source="human", base="delivered")
     assert plain_with_base.body == plain.body and plain_with_base.source == "human"
+
+
+# ------------------------------------------------------------------------------ the default budget of a rework the user asked for (D-E5-1, 4.5)
+from pathlib import Path  # noqa: E402
+
+from hirearchy.kernel import OrgError as KernelOrgError  # noqa: E402
+from hirearchy.services.testing import FixedAllowance, fs_world, memory_world  # noqa: E402
+
+from . import _support as sup  # noqa: E402
+
+
+@pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
+def allowed(request, tmp_path: Path):
+    """A services world whose requester asks a ``FixedAllowance`` (``answers``: revised task -> what is left), the service defined (contract 10)."""
+    allowance = FixedAllowance()
+    w = sup.populated(request.param(tmp_path, allowance=allowance))
+    sup.define(w)
+    return w, allowance
+
+
+def ask_first(w):
+    return w.commands.request("root", "weekly-brief", {"topic": "ai"})
+
+
+def user_rework(w, first, **kw):
+    """The rework the user asked for: root sends the request back with ``source="human"``."""
+    return w.commands.request("root", "weekly-brief", {"topic": "ai"}, revises=first.id, source="human", **kw)
+
+
+@pytest.mark.parametrize(("left", "budget"), [(6, 6), (10, 10), (25, 10), (1, 1), (0, 1), (-3, 1)])
+def test_a_rework_the_user_asked_for_gets_what_is_left_at_most_the_contracts_and_one_when_nothing_is_left(allowed, left, budget):
+    """4.5: ``min(left, contract)`` when ``left >= 1``; the contract's budget above it; 1 run (the minimum a task carries) when nothing is left, and
+    nothing is refused."""
+    w, allowance = allowed
+    first = ask_first(w)
+    allowance.answers[first.id] = left
+    assert user_rework(w, first).budget == budget
+    assert allowance.asked == [("ceo", "weekly-brief", first.id)]
+
+
+def test_a_rework_with_no_answer_about_its_case_gets_the_contracts_budget(allowed):
+    w, allowance = allowed
+    first = ask_first(w)  # the allowance has no answer for this task: it is in no case it knows
+    assert user_rework(w, first).budget == 10 and allowance.asked == [("ceo", "weekly-brief", first.id)]
+
+
+@pytest.mark.parametrize("error", [KernelOrgError("a mailbox cannot be read"), OSError("a run log directory cannot be read")], ids=["OrgError", "OSError"])
+def test_a_record_that_cannot_be_read_gives_the_contracts_budget_and_refuses_nothing(allowed, error):
+    w, allowance = allowed
+    first = ask_first(w)
+    allowance.error = error
+    assert user_rework(w, first).budget == 10
+
+
+@pytest.mark.parametrize("source", [None, "relayed"], ids=["no source (relayed by default)", "relayed"])
+def test_a_relayed_rework_keeps_the_contracts_budget_and_is_never_asked(allowed, source):
+    w, allowance = allowed
+    first = ask_first(w)
+    allowance.answers[first.id] = 3
+    again = w.commands.request("root", "weekly-brief", {"topic": "ai"}, revises=first.id, source=source)
+    assert again.budget == 10 and allowance.asked == []
+
+
+def test_an_agents_rework_keeps_the_contracts_budget_and_is_never_asked(allowed):
+    w, allowance = allowed
+    sup.grant(w, "ceo", 60)
+    sup.define(w, owner="ceo/eng", name="inner", actor="ceo", budget=4)
+    first = w.commands.request("ceo", "inner", {"topic": "x"})
+    allowance.answers[first.id] = 1
+    again = w.commands.request("ceo", "inner", {"topic": "x"}, revises=first.id)
+    assert again.budget == 4 and allowance.asked == []
+
+
+def test_a_fresh_request_keeps_the_contracts_budget_and_is_never_asked(allowed):
+    w, allowance = allowed
+    assert ask_first(w).budget == 10 and ask_first(w).budget == 10 and allowance.asked == []
+
+
+def test_an_explicit_budget_is_kept_and_never_asked(allowed):
+    w, allowance = allowed
+    first = ask_first(w)
+    allowance.answers[first.id] = 2
+    assert user_rework(w, first, budget=7).budget == 7 and allowance.asked == []
+
+
+def test_an_explicit_budget_of_zero_is_refused_before_a_wrong_revises(allowed):
+    """The precedence of the refusals is unchanged: the explicit budget is checked first."""
+    w, allowance = allowed
+    with pytest.raises(KernelOrgError, match="a request needs a budget of at least 1 run"):
+        w.commands.request("root", "weekly-brief", {"topic": "ai"}, revises="20260101T000000000001-root-0000", source="human", budget=0)
+    assert allowance.asked == []
+
+
+def test_the_refusals_of_revises_and_base_still_come_before_the_default_is_computed(allowed):
+    w, allowance = allowed
+    first = ask_first(w)
+    with pytest.raises(KernelOrgError, match="revises must be the id of an earlier request"):
+        user_rework(w, type(first)(sender="root", to="ceo", type="task", body="", id="20260101T000000000001-root-0000"))
+    with pytest.raises(KernelOrgError, match="base must be"):
+        user_rework(w, first, base="oops")
+    with pytest.raises(KernelOrgError, match="base goes only with a rework the user asked for"):
+        w.commands.request("root", "weekly-brief", {"topic": "ai"}, base="latest")
+    assert allowance.asked == []

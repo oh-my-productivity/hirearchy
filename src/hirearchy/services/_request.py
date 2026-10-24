@@ -11,7 +11,7 @@ from ..kernel import ROOT, TITLE_MAX, Message, OrgError, clip_line
 from ..mail import MailboxReader
 from ._lines import criteria_lines
 from ._protocols import RequestBodies, ServiceRequests
-from .api import JUDGED_BYTES, Contract, Criterion, JudgedBase, JudgedVersions, ServiceCatalog, criteria_of
+from .api import JUDGED_BYTES, CaseAllowance, Contract, Criterion, JudgedBase, JudgedVersions, ServiceCatalog, criteria_of
 
 BASES = ("delivered", "latest")
 BASE_VALUE = 'refused: base must be "delivered" or "latest": {base}. Nothing was sent.'  # P4-BASE-VALUE
@@ -103,7 +103,7 @@ class RuleServiceRequester(ServiceRequests):
 
     def __init__(
         self, agents: AgentDirectory, catalog: ServiceCatalog, mail: MailboxReader, bodies: RequestBodies, sender: MessageSender,
-        judged: JudgedVersions,
+        judged: JudgedVersions, allowance: CaseAllowance,
     ) -> None:
         self._agents = agents
         self._catalog = catalog
@@ -111,6 +111,7 @@ class RuleServiceRequester(ServiceRequests):
         self._bodies = bodies
         self._sender = sender
         self._judged = judged
+        self._allowance = allowance
 
     def request(
         self, actor: str, service: str, inputs: Mapping[str, object] | None, *, title: str, note: str,
@@ -136,9 +137,7 @@ class RuleServiceRequester(ServiceRequests):
         if missing:
             raise OrgError(f"missing required input(s) for `{service}`: {', '.join(missing)}. Pass them in `inputs`.")
         given = {k: v for k, v in given.items() if v}
-        if budget is None:
-            budget = contract.budget
-        if isinstance(budget, bool) or int(budget) < 1:
+        if budget is not None and (isinstance(budget, bool) or int(budget) < 1):
             raise OrgError("a request needs a budget of at least 1 run")
         if revises and not any(
             m.id == revises and m.type == "task" and m.to == contract.owner and m.service == service for m in self._mail.sent(actor)
@@ -147,6 +146,8 @@ class RuleServiceRequester(ServiceRequests):
                 f"revises must be the id of an earlier request for `{service}` that you sent to {contract.owner}: {revises}"
             )
         judged = self._base(actor, contract.owner, service, revises, source, base)
+        if budget is None:
+            budget = self._default_budget(actor, contract, revises, source)
         extra = criteria_lines(extra_acceptance, "extra_acceptance", required=False)
         criteria = criteria_of(self._catalog.criteria(contract.owner, service), contract.acceptance)
         body = self._bodies.body(contract, criteria, given, extra, note, base=None if base is None else (base, judged))
@@ -157,6 +158,21 @@ class RuleServiceRequester(ServiceRequests):
             actor, contract.owner, body, type="task", title=title.strip(), budget=int(budget), revises=revises or None,
             source=source, service=service, contract=contract.version, playbook=self._catalog.read_playbook(contract.owner, service).version,
         )
+
+    def _default_budget(self, actor: str, contract: Contract, revises: str | None, source: str | None) -> int:
+        """The budget of a request that names none: the contract's, except for root's rework the user asked for, which gets what is left of the runs
+        the user approved for its case (at most the contract's; 1 when nothing is left). Never refuses."""
+        if not (actor == ROOT and revises and source == "human"):
+            return contract.budget  # a fresh request, a relayed rework, an agent's request: unchanged
+        try:
+            left = self._allowance.left(contract.owner, contract.name, revises)
+        except (OrgError, OSError):
+            return contract.budget  # a record that cannot be read: the contract's, as before 0a.3
+        if left is None:
+            return contract.budget
+        if left >= 1:
+            return min(left, contract.budget)  # what is left, never more than a fresh request gets
+        return 1  # nothing left: the minimum a task carries; the reply names the top-up
 
     def _base(self, actor: str, owner: str, service: str, revises: str | None, source: str | None, base: str | None) -> JudgedBase | None:
         """What a human rework of ``revises`` starts from (P4): refuses a ``base`` that is not one, or not for this request, and a rework that

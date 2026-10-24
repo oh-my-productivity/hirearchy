@@ -34,6 +34,7 @@ __all__ = [
     "Admission",
     "AmendmentBasis",
     "BASE_HEADING",
+    "CaseAllowance",
     "Contract",
     "ContractNormalizer",
     "Criterion",
@@ -558,4 +559,14 @@ class JudgedVersions(Protocol):
         its result, else the latest ``done`` result of a task that was not relayed) and what relayed reworks sent after it changed in its artifacts.
         None when the task is in no case, nothing was judged or delivered, no relayed rework came after it, or none of its artifacts differs now: no
         base needs to be named."""
+        ...
+
+
+@runtime_checkable
+class CaseAllowance(Protocol):
+    def left(self, owner: str, service: str, revises: str) -> int | None:
+        """For a rework of ``revises``, a task of a case of ``owner``'s ``service``: what is left of the runs the user approved for that case,
+        the approved runs less what the user's requests used or the team still holds for them (0 or below when nothing is left). None when the
+        task is in no case of the service (one sent before the service was last defined from scratch), the service has no contract, or the
+        case's client is an agent. ``OrgError``/``OSError`` when a contract, a mailbox or a run log directory cannot be read."""
         ...

@@ -21,6 +21,7 @@ from ..reflection._deliverables import FsDeliverableFolder
 from ..reflection._digest import DigestBuilder
 from ..reflection._evidence import CaseServiceEvidence
 from ..reflection._files import OrgServicePaths
+from ..reflection._allowance import CaseAllowanceOf
 from ..reflection._judged import CaseJudgedVersions
 from ..reflection._reports import TextServiceReports
 from ..reflection._runs import LogRunCounter
@@ -28,7 +29,7 @@ from ..reflection._sections import EvidenceReflectSection, MailRejectedServices,
 from ..reflection._steps import TextServiceSteps
 from ..reflection._timeline import StorePlaybookTimelines
 from ..runs import RunLogReader
-from ..services import JudgedVersions, ServiceCatalog, ServiceEvidence, ServiceHints, ServiceStore
+from ..services import CaseAllowance, JudgedVersions, ServiceCatalog, ServiceEvidence, ServiceHints, ServiceStore
 from ..settings import OrgSettings
 from ..snapshots import OrgHistory
 from ._builder import Builder
@@ -49,6 +50,7 @@ def register(b: Builder) -> None:
         JudgedVersions,
         lambda b: CaseJudgedVersions(b.get(CaseHistory), b.get(MailboxReader), GitCheckedVersions(b.get(OrgHistory), b.get(OrgLayout))),
     )
+    b.provide(CaseAllowance, lambda b: CaseAllowanceOf(b.get(CaseHistory), b.get(ServiceCatalog)))
     b.provide(
         ServiceReports,
         lambda b: TextServiceReports(b.get(AgentDirectory), b.get(ServiceCatalog), b.get(CaseHistory), OrgServicePaths(b.get(OrgLayout))),

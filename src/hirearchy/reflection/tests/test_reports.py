@@ -171,7 +171,7 @@ def test_a_relayed_rework_answered_with_its_whole_budget_before_the_next_request
     deliver(svc, "ceo", first, runs=1)
     relayed = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=first.id, budget=6)
     deliver(svc, "ceo", relayed, runs=0)  # the runtime hands the whole 6 back with the result
-    human = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=relayed.id, source="human")
+    human = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=relayed.id, source="human", budget=10)  # the contract's, as before 0a.3 (Rule B)
     work(svc, "ceo", 4)
     total = svc.runtime.service_reports.case_total(human)
     assert f"Your relayed rework {relayed.id} has used no run yet; its runs will be your own spend" in total
@@ -186,7 +186,7 @@ def test_a_relayed_rework_followed_by_the_users_request_before_it_ran_says_its_r
     first = request(svc, "ai")
     deliver(svc, "ceo", first, runs=1)
     relayed = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=first.id, budget=6)
-    human = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=relayed.id, source="human")
+    human = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=relayed.id, source="human", budget=10)  # the contract's, as before 0a.3 (Rule B)
     work(svc, "ceo", 4)
     total = svc.runtime.service_reports.case_total(human)
     assert total == (

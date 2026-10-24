@@ -11,7 +11,9 @@ options:
   --input KEY=VALUE     a value for an input of the service (repeatable)
   --title TITLE
   --note NOTE           free text for the owner
-  --budget BUDGET       runs handed down (default: the contract's)
+  --budget BUDGET       runs handed down (default: the contract's; for a rework you asked for,
+                        what is left of the runs you approved for the case, at most the
+                        contract's, 1 when none is left)
   --revises TASK_ID     send back an earlier request of this service for rework
   --source {human,relayed}
                         who asked for a rework (--revises): human (you, the default) or relayed

@@ -17,7 +17,7 @@ from hirearchy.kernel import EventSink, Message, OrgError, OrgPaths
 from hirearchy.kernel.testing import FakeClock, ListEventSink, SequenceIdGenerator
 from hirearchy.mail import MailboxReader
 from hirearchy.mail.testing import MemoryMailbox
-from hirearchy.services import ContractNormalizer, ServiceCatalog, ServiceCommands, ServiceHints, ServiceStore
+from hirearchy.services import CaseAllowance, ContractNormalizer, ServiceCatalog, ServiceCommands, ServiceHints, ServiceStore
 from hirearchy.services._catalog import ContractServiceCatalog
 from hirearchy.services._commands import RuleServiceCommands
 from hirearchy.services._hints import ServiceReportHints
@@ -25,7 +25,7 @@ from hirearchy.services._normalizer import TextContractNormalizer
 from hirearchy.services._places import OrgServicePlaces
 from hirearchy.services._rework import ServiceReworkContext
 from hirearchy.services._store import FsServiceStore
-from hirearchy.services.testing import MemoryServiceStore
+from hirearchy.services.testing import FixedAllowance, MemoryServiceStore
 from hirearchy.settings import OrgSettings
 from hirearchy.settings.testing import MemoryOrgSettings
 
@@ -159,3 +159,26 @@ def test_root_sends_a_service_request_back_with_request_not_through_the_assigner
         org.delegate("root", "ceo", "Again", "g", "a", budget=2, revises=request.id)  # P4-USE-REQUEST: the rule classes of `request` keep the case
     again = org.request("root", "weekly-brief", {"topic": "ai"}, budget=2, revises=request.id)
     assert (again.service, again.contract, again.playbook, again.revises) == ("weekly-brief", 1, 0, request.id)
+
+
+def test_the_requester_of_the_runtime_asks_the_case_allowance_of_the_runtime(tmp_path: Path) -> None:
+    """D-E5-1: the rework the user asked for, sent without a budget, is handed what the allowance of the runtime says is left."""
+    org = Org.init(tmp_path / "org", "mission")
+    org.hire("root", "ceo", "Chief", "Run it.", can_hire=True)
+    org.define_service("root", "ceo", "weekly-brief", **BRIEF)  # type: ignore[arg-type]
+    request = org.request("root", "weekly-brief", {"topic": "ai"})
+    fixed = FixedAllowance({request.id: 2})
+    again = wiring.open_runtime(org.root, {CaseAllowance: fixed}).service_commands.request(
+        "root", "weekly-brief", {"topic": "ai"}, revises=request.id, source="human",
+    )
+    assert again.budget == 2 and fixed.asked == [("ceo", "weekly-brief", request.id)]
+
+
+def test_over_a_real_organization_a_rework_with_nothing_left_is_handed_one_run(tmp_path: Path) -> None:
+    """The allowance of the runtime is reflection's: the request's 4 runs are all still held, so nothing is left and the rework gets 1 run."""
+    org = Org.init(tmp_path / "org", "mission")
+    org.hire("root", "ceo", "Chief", "Run it.", can_hire=True)
+    org.define_service("root", "ceo", "weekly-brief", **BRIEF)  # type: ignore[arg-type]
+    request = org.request("root", "weekly-brief", {"topic": "ai"})
+    again = org.request("root", "weekly-brief", {"topic": "ai"}, revises=request.id, source="human")
+    assert again.budget == 1
