@@ -201,6 +201,43 @@ def test_a_human_rework_without_a_budget_is_handed_what_is_left_of_the_approved_
     assert "budget 10" in relayed
 
 
+def hire_second_report(svc):
+    svc.hire("ceo", "qa", "Tester", "Test things.")  # ceo now has two agents below: a round of its team is 1 + 2 * 2 = 5
+
+
+TOP_UP = (
+    "This rework has {budget} run(s), and a rework of this team needs about 5 (1, plus 2 for each agent below ceo). Nothing else is left of the runs "
+    'the user approved for this case. Ask the user now for {ask} more run(s), with that number; on yes, grant {ask}: send(to="ceo", budget={ask}, '
+    'body=<why>) (CLI: hirearchy send ceo "<why>" --budget {ask}).'
+)
+
+
+def test_the_reply_to_a_user_rework_below_a_round_of_the_team_names_the_top_up_after_the_case_total(svc):
+    """D-E5-1 (4.5): 8 of the first request's 10 runs were used and 2 came back, so the rework without a budget gets the 2 that are left; a round is 5."""
+    hire_second_report(svc)
+    server = build_server(svc, ROOT)
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, runs=8)
+    reply = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, source="human")
+    (rework,) = [m for m in svc.sent(ROOT) if m.revises == first.id]
+    total = "case total: 8 runs used of 12 handed down (contract: 10 per request)"
+    assert rework.budget == 2 and f"budget 2 " in reply
+    assert reply.endswith(f"\n{total}\n{TOP_UP.format(budget=2, ask=3)}")  # the top-up comes after the case total
+    assert "exceeds" not in reply
+
+
+def test_a_user_rework_with_nothing_left_is_sent_with_one_run_and_the_reply_asks_for_the_rest(svc):
+    """Nothing is refused: the rework carries 1 run, the reply holds the case total and the top-up for ``need - 1``."""
+    hire_second_report(svc)
+    server = build_server(svc, ROOT)
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, runs=10)  # all 10 used, none back
+    reply = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, source="human")
+    (rework,) = [m for m in svc.sent(ROOT) if m.revises == first.id]
+    assert rework.budget == 1 and "case total: 10 runs used of 11 handed down (contract: 10 per request)" in reply
+    assert reply.endswith(TOP_UP.format(budget=1, ask=4))
+
+
 def test_a_rework_within_the_contract_budget_gets_no_warning(svc):
     server = build_server(svc, ROOT)
     first = svc.request(ROOT, WEEKDAY, {"topic": "ai"}, budget=3)

@@ -8,10 +8,10 @@ import pytest
 
 from hirearchy.cli._commands_services import DefineServiceCommand, FeedbackCommand, RequestCommand, RetireServiceCommand, ServicesCommand
 from hirearchy.cli.testing import MemoryText
-from hirearchy.kernel import OrgError
+from hirearchy.kernel import Message, OrgError
 from hirearchy.services import Contract
 
-from ._fakes import FakeOffice, FakeReadings, FakeServices, new_office, new_readings, new_services
+from ._fakes import FakeOffice, FakeReadings, FakeServices, new_office, new_readings, new_services, new_steps
 from ._support import Fixture, go, parse
 
 
@@ -98,7 +98,7 @@ def test_a_refused_definition_is_not_committed(tmp_path: Path) -> None:
 
 def test_request_turns_the_inputs_into_a_mapping(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly", "--input", "topic=tests", "--input", " k = a=b",
+    go(RequestCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "request", "weekly", "--input", "topic=tests", "--input", " k = a=b",
        "--title", "Weekly", "--note", "Please.", "--budget", "3", "--revises", "r-0")
     assert f.session.calls == [("open", True)]
     assert services.last("request") == (("root", "weekly", {"topic": "tests", "k": " a=b"}),
@@ -109,23 +109,23 @@ def test_request_turns_the_inputs_into_a_mapping(tmp_path: Path) -> None:
 
 def test_request_with_revises_is_stamped_human_by_default(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly", "--revises", "r-0")
+    go(RequestCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "request", "weekly", "--revises", "r-0")
     assert services.last("request")[1]["source"] == "human"  # the human typed it: a rework they asked for
-    go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly")
+    go(RequestCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "request", "weekly")
     assert services.last("request")[1]["source"] is None  # a fresh request is not stamped
 
 
 def test_request_source_relayed_is_passed(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly", "--revises", "r-0", "--source", "relayed")
+    go(RequestCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "request", "weekly", "--revises", "r-0", "--source", "relayed")
     assert services.last("request")[1]["source"] == "relayed"
     with pytest.raises(SystemExit):
-        go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly", "--source", "assistant")
+        go(RequestCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "request", "weekly", "--source", "assistant")
 
 
 def test_request_passes_base(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    command = RequestCommand(f.session, lambda: services, lambda: office, f.out)
+    command = RequestCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out)
     go(command, "request", "weekly", "--revises", "r-0", "--base", "delivered")
     assert services.last("request")[1]["base"] == "delivered" and services.last("request")[1]["source"] == "human"
     assert f.out.stdout == "request r-1 -> ceo (service weekly, budget 4, base delivered)\n"
@@ -137,10 +137,50 @@ def test_request_passes_base(tmp_path: Path) -> None:
         go(command, "request", "weekly", "--revises", "r-0", "--base", "both")  # the parser refuses a value that is neither
 
 
+TOP_UP = 'This rework has 4 run(s), and a rework of this team needs about 5. Ask the user now for 1 more run(s). (CLI: hirearchy send ceo "<why>" --budget 1).'
+
+
+def test_a_request_with_revises_prints_the_step_of_the_rework_on_the_line_after_its_own(tmp_path: Path) -> None:
+    """D-E5-1 (4.5, DR-0a3-13): the CLI's user is root, so it prints the same root-addressed text the MCP reply carries, once the request is committed."""
+    f, services, office, steps = Fixture(tmp_path), new_services(), new_office(), new_steps({"r-1": TOP_UP})
+    go(RequestCommand(f.session, lambda: services, lambda: office, lambda: steps, f.out), "request", "weekly", "--revises", "r-0")
+    sent = Message(sender="root", to="ceo", type="task", body="", id="r-1")
+    line, step = f.out.stdout.splitlines()
+    assert line == "request r-1 -> ceo (service weekly, budget 4)" and step == steps.rework_step(sent) == TOP_UP  # the line equals rework_step(msg)
+    assert steps.names() == ["rework_step", "rework_step"] and steps.calls[0][1] == ("r-1",)
+    assert office.names() == ["commit"]  # the request was committed before the step was asked
+
+
+def test_a_step_that_is_empty_prints_nothing_more(tmp_path: Path) -> None:
+    f, services, office, steps = Fixture(tmp_path), new_services(), new_office(), new_steps()
+    go(RequestCommand(f.session, lambda: services, lambda: office, lambda: steps, f.out), "request", "weekly", "--revises", "r-0")
+    assert f.out.stdout == "request r-1 -> ceo (service weekly, budget 4)\n" and steps.names() == ["rework_step"]
+
+
+@pytest.mark.parametrize("error", [OrgError("the result cannot be read"), OSError("disk")], ids=["OrgError", "OSError"])
+def test_a_step_that_cannot_be_read_prints_nothing_more_and_the_request_stands(tmp_path: Path, error: Exception) -> None:
+    f, services, office, steps = Fixture(tmp_path), new_services(), new_office(), new_steps(error=error)
+    go(RequestCommand(f.session, lambda: services, lambda: office, lambda: steps, f.out), "request", "weekly", "--revises", "r-0")
+    assert f.out.stdout == "request r-1 -> ceo (service weekly, budget 4)\n" and office.names() == ["commit"]
+
+
+def test_a_bug_in_the_step_is_not_hidden(tmp_path: Path) -> None:
+    f, services, office, steps = Fixture(tmp_path), new_services(), new_office(), new_steps(error=ValueError("a bug in the step"))
+    with pytest.raises(ValueError, match="a bug in the step"):
+        go(RequestCommand(f.session, lambda: services, lambda: office, lambda: steps, f.out), "request", "weekly", "--revises", "r-0")
+    assert office.names() == ["commit"]  # the request is already sent and committed
+
+
+def test_a_fresh_request_never_asks_for_a_step(tmp_path: Path) -> None:
+    f, services, office, steps = Fixture(tmp_path), new_services(), new_office(), new_steps({"r-1": TOP_UP})
+    go(RequestCommand(f.session, lambda: services, lambda: office, lambda: steps, f.out), "request", "weekly")
+    assert f.out.stdout == "request r-1 -> ceo (service weekly, budget 4)\n" and steps.calls == []
+
+
 def test_an_input_without_an_equals_sign_is_refused_before_anything_is_asked(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
     with pytest.raises(OrgError, match=r"--input must be key=value \(got 'topic'\)"):
-        go(RequestCommand(f.session, lambda: services, lambda: office, f.out), "request", "weekly", "--input", "topic")
+        go(RequestCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "request", "weekly", "--input", "topic")
     assert f.session.calls == [("open", True)] and services.calls == [] and office.calls == []
 
 

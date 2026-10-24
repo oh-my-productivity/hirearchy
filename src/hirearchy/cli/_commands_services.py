@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import argparse
 
-from ..kernel import ROOT, OrgError, Provider, norm
-from ..reflection import ServiceReports
+from ..kernel import ROOT, Message, OrgError, Provider, norm
+from ..reflection import ServiceReports, ServiceSteps
 from ..services import ContractNormalizer, ServiceCatalog, ServiceCommands
 from ..snapshots import OrgSnapshotter
 from ._ports import Arguments, Command, OrgSession, Output, TextSource
@@ -93,10 +93,13 @@ class DefineServiceCommand(Command):
 
 
 class RequestCommand(Command):
-    def __init__(self, session: OrgSession, commands: Provider[ServiceCommands], snapshots: Provider[OrgSnapshotter], out: Output) -> None:
+    def __init__(
+        self, session: OrgSession, commands: Provider[ServiceCommands], snapshots: Provider[OrgSnapshotter], steps: Provider[ServiceSteps], out: Output,
+    ) -> None:
         self._session = session
         self._commands = commands
         self._snapshots = snapshots
+        self._steps = steps
         self._out = out
 
     def add_arguments(self, sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -130,6 +133,18 @@ class RequestCommand(Command):
         self._snapshots().commit(f"root: request {msg.id} -> {msg.to}")
         based = f", base {args.base}" if args.base else ""
         self._out.say(f"request {msg.id} -> {msg.to} (service {msg.service}, budget {msg.budget}{based})")
+        if args.revises:  # the same advice root's MCP reply carries; the CLI's user is root, and every text carries its CLI form
+            step = self._step(msg)
+            if step:
+                self._out.say(step)
+
+    def _step(self, msg: Message) -> str:
+        """The next step for a rework just sent ("" when there is none). It is advice about a request already sent and committed, so a record that
+        cannot be read (``OrgError``, ``OSError``) gives no step and never fails the command; any other error is a bug in the step and propagates."""
+        try:
+            return self._steps().rework_step(msg)
+        except (OrgError, OSError):
+            return ""
 
 
 class FeedbackCommand(Command):

@@ -306,6 +306,14 @@ def test_a_relayed_rework_reply_repeats_the_client_questions() -> None:
     assert bare.endswith("Call start() if the scheduler is not running.\ncase total: 3 of 9")  # nothing to repeat: the reply is as before
 
 
+def test_a_human_reworks_step_is_appended_after_the_case_total_like_the_relayed_one() -> None:
+    """D-E5-1 (4.5): whatever the step is (the client questions of a relayed rework, the top-up of the user's), the reply puts it after the total."""
+    steps = ScriptedSteps(rework=REWORK_STEP)
+    group, commands = tools(steps=steps)
+    out = call(serve(group, ROOT), "request", service="brief", revises="old", source="human")
+    assert out.endswith(f"Call start() if the scheduler is not running.\ncase total: 3 of 9\n{REWORK_STEP}") and steps.asked == [("rework", "req-1")]
+
+
 def test_an_agents_rework_reply_carries_no_client_questions() -> None:
     steps = ScriptedSteps(rework=REWORK_STEP)
     out = call(serve(tools(steps=steps)[0], "ceo"), "request", service="brief", revises="old")

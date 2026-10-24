@@ -406,9 +406,10 @@ class ServiceSteps(Protocol):
         ...
 
     def rework_step(self, task: Message) -> str:
-        """For a rework root just sent with ``source: relayed`` (``task``, a request that ``revises`` another), the client questions of the latest
-        result of the request it revises, in one sentence that tells root to ask the user (a rework does not answer them); "" for a rework the
-        user asked for, a result without a ``Questions for the client:`` block, or a request it cannot place. A nudge: nothing is refused."""
+        """For a rework root just sent (``task``, a request that ``revises`` another): with source "relayed", the client questions of the revised
+        request's latest result; with source "human", the top-up to ask the user for when the rework has less than one client round of the owner's
+        team (1, plus 2 per agent below the owner) and the runs the user approved but has not used do not cover it; "" otherwise, and always for an
+        agent client's case. A nudge: nothing is refused."""
         ...
 
 

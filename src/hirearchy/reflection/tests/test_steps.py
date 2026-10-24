@@ -199,6 +199,14 @@ REWORK = (
 )
 
 
+TOPUP = (
+    "This rework has {budget} run(s), and a rework of this team needs about {need} (1, plus 2 for each agent below {owner}). {left} Ask the user now "
+    'for {ask} more run(s), with that number; on yes, grant {grant}: send(to="{owner}", budget={grant}, body=<why>) '
+    '(CLI: hirearchy send {owner} "<why>" --budget {grant}).'
+)
+NOTHING_LEFT = "Nothing else is left of the runs the user approved for this case."
+
+
 def deliver_asking(w: ReflectionWorld, task: Message, *questions: str, block: str | None = None) -> Message:
     """The owner answers ``task`` with a done result whose summary ends in a ``Questions for the client:`` block (``block`` replaces it)."""
     w.use_run(task.to)
@@ -217,9 +225,11 @@ def test_rework_step_repeats_the_revised_results_questions(w: ReflectionWorld) -
 
 
 def test_rework_step_is_empty_for_a_human_rework_or_a_result_without_questions(w: ReflectionWorld) -> None:
+    """The user asked for the human rework, so it answers the client questions; and 0a.3's top-up step is empty too, because the round of ``ceo``'s
+    team (1, plus 2 for each of its 2 reports: 5) fits the 10 runs the rework carries (D-E5-1)."""
     first = ask(w)
     deliver_asking(w, first, "Keep Marta's row?")
-    assert w.steps.rework_step(ask(w, "ai", revises=first.id, source="human")) == ""  # the user asked for it: it answers them
+    assert w.steps.rework_step(ask(w, "ai", revises=first.id, source="human")) == ""  # the user asked for it: it answers them; its 10 runs cover the round of 5
     quiet = ask(w, "b")
     deliver_asking(w, quiet, block="Questions for the client: none.")
     assert w.steps.rework_step(ask(w, "b", revises=quiet.id)) == ""  # zero questions
@@ -253,3 +263,71 @@ def test_rework_step_clips_and_counts(w: ReflectionWorld) -> None:
     seven = ask(w, "d")
     deliver_asking(w, seven, *[f"q{i}?" for i in range(1, 8)])
     assert "q5?; and 2 more. Ask the user" in w.steps.rework_step(ask(w, "d", revises=seven.id))
+
+
+# ------------------------------------------------------------------------------ the top-up of a rework the user asked for (D-E5-1, design 4.5)
+def test_a_user_rework_below_the_round_with_nothing_spare_asks_for_the_rest(w: ReflectionWorld) -> None:
+    """Design 4.5's first example (contract 10 here): 8 used and 2 back, so 8 are committed and the rework gets the 2 that are left; ``ceo`` has 2
+    reports, so a round is 5."""
+    first = ask(w)
+    deliver(w, first, runs=8, budget=2)
+    again = w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=first.id, budget=2, source="human")  # what the default hands down
+    text = w.steps.rework_step(again)
+    assert text == TOPUP.format(budget=2, need=5, owner="ceo", left=NOTHING_LEFT, ask=3, grant=3)
+    assert 'send(to="ceo", budget=3, body=<why>) (CLI: hirearchy send ceo "<why>" --budget 3).' in text
+
+
+def test_a_user_rework_of_one_run_asks_for_the_four_more_it_needs(w: ReflectionWorld) -> None:
+    """Design 4.5's second example: nothing was left, the rework was sent with 1 run."""
+    first = ask(w)
+    deliver(w, first, runs=8)  # 10 handed down, 8 used, none back
+    again = w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=first.id, budget=1, source="human")
+    assert w.steps.rework_step(again) == TOPUP.format(budget=1, need=5, owner="ceo", left=NOTHING_LEFT, ask=4, grant=4)
+
+
+def test_a_user_rework_with_some_runs_spare_says_how_many_are_left(w: ReflectionWorld) -> None:
+    """Contract 3: 1 used, 2 back, the rework gets 1: approved 3, committed 2, so 1 run is spare and the user is asked for the other 3 (a grant of 4)."""
+    define(w, name="small", budget=3)
+    first = w.s.commands.request("root", "small", {"topic": "ai"})
+    deliver(w, first, runs=1, budget=2)
+    again = w.s.commands.request("root", "small", {"topic": "ai"}, revises=first.id, budget=1, source="human")
+    assert w.steps.rework_step(again) == TOPUP.format(
+        budget=1, need=5, owner="ceo", left="1 more of the 3 runs the user approved for this case are left.", ask=3, grant=4,
+    )
+
+
+def test_a_user_rework_at_the_round_or_covered_by_spare_runs_has_no_top_up(w: ReflectionWorld) -> None:
+    first = ask(w)
+    deliver(w, first, runs=1, budget=9)
+    assert w.steps.rework_step(w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=first.id, budget=5, source="human")) == ""  # at the round
+    second = ask(w, "again")
+    deliver(w, second, runs=1, budget=9)
+    spare = w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=second.id, budget=2, source="human")
+    assert w.steps.rework_step(spare) == ""  # 2 + the 7 that are spare cover the round of 5: root may grant them without asking
+
+
+def test_an_owner_with_no_agent_below_needs_a_round_of_one_so_no_top_up_is_asked(w: ReflectionWorld) -> None:
+    define(w, "ops", "ops-brief")
+    first = w.s.commands.request("root", "ops-brief", {"topic": "ai"})
+    deliver(w, first, runs=10)
+    again = w.s.commands.request("root", "ops-brief", {"topic": "ai"}, revises=first.id, budget=1, source="human")
+    assert w.steps.rework_step(again) == ""
+
+
+def test_an_agent_clients_rework_has_no_top_up(w: ReflectionWorld) -> None:
+    w.s.d.post(Message(sender="root", to="ceo", type="note", body="runs for you", title="grant", budget=60))
+    define(w, "ceo/eng", "inner", actor="ceo")
+    first = w.s.commands.request("ceo", "inner", {"topic": "ai"})
+    deliver(w, first, runs=10)
+    again = w.s.d.post(Message(
+        sender="ceo", to="ceo/eng", type="task", title="inner: ai", body="again", budget=1, revises=first.id, service="inner", source="human",
+    ))
+    assert w.steps.rework_step(again) == ""
+
+
+def test_a_human_rework_of_a_retired_service_has_no_top_up(w: ReflectionWorld) -> None:
+    first = ask(w)
+    deliver(w, first, runs=10)
+    again = w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=first.id, budget=1, source="human")
+    w.s.commands.retire_service("root", "ceo", SERVICE, "obsolete")
+    assert w.steps.rework_step(again) == ""

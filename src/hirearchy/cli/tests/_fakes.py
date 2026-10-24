@@ -31,7 +31,7 @@ from hirearchy.observability import (
 )
 from hirearchy.overview import OrgTree
 from hirearchy.progress import ProgressReporter
-from hirearchy.reflection import ServiceReports
+from hirearchy.reflection import ServiceReports, ServiceSteps
 from hirearchy.review import HealthReviewer, Note, Review
 from hirearchy.services import Contract, ContractNormalizer, Criterion, Playbook, ServiceCatalog, ServiceCommands, number_criteria
 from hirearchy.skill import SkillInstaller
@@ -142,6 +142,25 @@ class FakeServices(Recording, ServiceCommands, ServiceCatalog, ContractNormalize
         self.note("parse_input_spec", spec)
         name, _, text = spec.partition(":")
         return {"name": name.rstrip("*"), "description": text, "required": name.endswith("*")}
+
+
+class FakeSteps(Recording, ServiceSteps):
+    """What root is told to do next: ``rework`` is the text ``rework_step`` answers for a task, by its id ("" for any other); ``error`` is raised instead."""
+
+    def __init__(self, rework: Mapping[str, str] | None = None, error: Exception | None = None) -> None:
+        super().__init__()
+        self.rework = dict(rework or {})
+        self.error = error
+
+    def feedback_step(self, note: Message) -> str:
+        self.note("feedback_step", note.id)
+        return ""
+
+    def rework_step(self, task: Message) -> str:
+        self.note("rework_step", task.id)
+        if self.error is not None:
+            raise self.error
+        return self.rework.get(task.id, "")
 
 
 class FakeReadings(Recording, OrgTree, TaskQuery, SchedulerStatus, HealthAnalyzer, HealthRenderer, ProgressReporter, ServiceReports, SnapshotRenderer):
@@ -335,6 +354,10 @@ def new_office() -> FakeOffice:
 
 def new_services(contracts: Mapping[tuple[str, str], Contract] | None = None) -> FakeServices:
     return FakeServices(contracts)  # type: ignore[abstract]
+
+
+def new_steps(rework: Mapping[str, str] | None = None, error: Exception | None = None) -> FakeSteps:
+    return FakeSteps(rework, error)
 
 
 def new_readings() -> FakeReadings:

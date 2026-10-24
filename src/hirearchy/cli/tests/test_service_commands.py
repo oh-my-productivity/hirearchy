@@ -117,3 +117,23 @@ def test_a_terminal_reject_without_criterion_then_define_service_answers_records
     assert (meta["version"], meta["answers"], meta["about"], meta["words"]) == (2, verdict.id, "C1", "Yes, add it.")
     (link,) = [m for m in svc.sent(ROOT) if m.reply_to == verdict.id and m.criterion]
     assert (link.criterion, link.source) == ("C3", "human")
+
+
+def test_a_cli_rework_with_nothing_left_is_sent_with_one_run_and_prints_the_top_up(org, capsys):
+    """D-E5-1 (4.5): ``ceo`` has two agents below (a round of the team is 5). The first request's team uses all but... none of the 10 runs come back,
+    so a rework the user asks for at the terminal gets 1 run, and the next line asks for the 4 more, with the CLI form of the grant."""
+    org.hire("ceo", "qa", "Tester", "Test things.")
+    define(org)
+    first = request(org)
+    deliver(org, "ceo", first, runs=10)  # all 10 handed down used, none back
+    capsys.readouterr()
+    cli(org, "request", "weekly-brief", "--input", "topic=ai", "--revises", first.id)
+    line, step = capsys.readouterr().out.splitlines()
+    (rework,) = [m for m in org.sent(ROOT) if m.revises == first.id]
+    assert line == f"request {rework.id} -> ceo (service weekly-brief, budget 1)" and rework.budget == 1 and rework.source == "human"
+    assert step == (
+        "This rework has 1 run(s), and a rework of this team needs about 5 (1, plus 2 for each agent below ceo). Nothing else is left of the runs the "
+        "user approved for this case. Ask the user now for 4 more run(s), with that number; on yes, grant 4: send(to=\"ceo\", budget=4, body=<why>) "
+        "(CLI: hirearchy send ceo \"<why>\" --budget 4)."
+    )
+

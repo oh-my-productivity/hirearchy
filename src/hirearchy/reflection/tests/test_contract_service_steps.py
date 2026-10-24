@@ -39,9 +39,11 @@ def test_an_accept_has_no_feedback_step(steps: ServiceSteps) -> None:
     assert steps.feedback_step(accept) == ""
 
 
-def test_a_rework_the_user_asked_for_has_no_rework_step(steps: ServiceSteps) -> None:
-    human = Message(sender="root", to="ceo", type="task", body="x", service=SERVICE, revises="20260101T000000000000-root-0001", source="human")
+def test_a_rework_the_user_asked_for_that_it_cannot_place_has_no_rework_step(steps: ServiceSteps) -> None:
+    """The top-up step of a rework the user asked for (0a.3) needs the case and the contract; without them it is advice about nothing."""
+    human = Message(sender="root", to="ceo", type="task", body="x", service=SERVICE, revises="20260101T000000000000-root-0001", source="human", budget=1)
     assert steps.rework_step(human) == ""
+    assert steps.rework_step(Message(sender="root", to="ceo", type="task", body="x", revises="20260101T000000000000-root-0001", source="human")) == ""
 
 
 def test_a_rework_it_cannot_place_has_no_rework_step(steps: ServiceSteps) -> None:

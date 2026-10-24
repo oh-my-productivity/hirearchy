@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from ..agents import AgentDirectory
 from collections.abc import Sequence
+
+from ..agents import AgentDirectory
 
 from ..kernel import Message, client_questions, clip_line, latest_results, link_ids, verdict_tier
 from ..mail import MailboxReader
 from ..services import ServiceCatalog
-from .api import CaseHistory, ServiceSteps, regressions
+from .api import CaseHistory, ServiceSteps, regressions, user_approved, user_committed
 
 ASK_C = 'About {id}: add "<the rule, in their words>" as a lasting rule? Yes or no.'
 ASK_R = "Same as {id}: a one-off? Yes or no."
@@ -39,8 +40,21 @@ REWORK = (
     "{revised}'s result asked the client: {questions}. Ask the user these questions, unless the user asked for this change: "
     "a rework does not answer them."
 )
+TOPUP = (  # a rework the user asked for gets less than one round of the team needs (design 4.5)
+    "This rework has {budget} run(s), and a rework of this team needs about {need} (1, plus 2 for each agent below {owner}). {left} Ask the user now "
+    'for {ask} more run(s), with that number; on yes, grant {grant}: send(to="{owner}", budget={grant}, body=<why>) '
+    '(CLI: hirearchy send {owner} "<why>" --budget {grant}).'
+)
+NOTHING_LEFT = "Nothing else is left of the runs the user approved for this case."
+SOME_LEFT = "{spare} more of the {approved} runs the user approved for this case are left."
 QUESTION_CHARS = 160  # each repeated question is cut to this many characters
 QUESTIONS_SHOWN = 5  # at most this many are repeated; the rest are counted
+
+
+def client_round(agents: AgentDirectory, owner: str) -> int:
+    """The runs one round of the client's questions or a rejection takes the team of ``owner``: the owner reads the client's rework (1), and each
+    agent below it gets one rework or re-check delegation of about 2 runs (its run and the run of its manager that processes the result)."""
+    return 1 + 2 * (len(agents.subtree(owner)) - 1)
 
 
 def reading_of(note: Message, criteria: Sequence[str], earlier: Sequence[str]) -> str:
@@ -91,7 +105,11 @@ class TextServiceSteps(ServiceSteps):
         return f"{own}This rejection is {mine.id}. " + step
 
     def rework_step(self, task: Message) -> str:
-        if task.type != "task" or task.source != "relayed" or not task.revises:
+        if task.type != "task" or not task.revises:
+            return ""
+        if task.source == "human":
+            return self._top_up(task)
+        if task.source != "relayed":
             return ""
         results = latest_results(m for m in self._mail.received(task.sender) if m.reply_to == task.revises)
         revised = results.get(task.revises)
@@ -102,3 +120,22 @@ class TextServiceSteps(ServiceSteps):
         more = len(questions) - len(shown)
         listing = "; ".join(shown) + (f"; and {more} more" if more > 0 else "")
         return REWORK.format(revised=task.revises, questions=listing)
+
+    def _top_up(self, task: Message) -> str:
+        """What to ask the user for when the rework they asked for carries less than one round of the owner's team and the approved runs not yet used
+        do not cover the rest; "" when the case, its contract or its human client cannot be found, and when nothing needs asking."""
+        case = self._history.case_of(task)
+        contract = self._catalog.read_contract(task.to, task.service) if task.service else None
+        if case is None or contract is None or case.client_kind != "human":
+            return ""
+        need = client_round(self._agents, task.to)
+        if task.budget >= need:
+            return ""
+        approved = user_approved(case, contract.budget)
+        spare = max(0, approved - user_committed(case))  # the case now holds this rework's budget too
+        ask = need - task.budget - spare
+        if ask <= 0:
+            return ""  # what is approved and unused covers the round: root may grant it without asking
+        left = SOME_LEFT.format(spare=spare, approved=approved) if spare else NOTHING_LEFT
+        return TOPUP.format(budget=task.budget, need=need, owner=task.to, left=left, ask=ask, grant=need - task.budget)
+

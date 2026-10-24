@@ -247,3 +247,19 @@ def test_nothing_but_the_run_of_a_command_imports_the_framework_of_the_server_or
     done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=120)
     assert done.returncode == 0, done.stderr
     assert done.stdout.strip() == "[]"
+
+
+def test_the_request_command_prints_the_step_of_the_runtime(team: Org, capsys: pytest.CaptureFixture[str]) -> None:
+    """``RequestCommand`` gets the runtime's ``ServiceSteps``: a rework with nothing left prints the top-up of the real organization."""
+    team.hire("ceo", "eng", "Engineer", "Build things.")
+    team.hire("ceo", "qa", "Tester", "Test things.")
+    team.define_service(
+        ROOT, "ceo", "brief", description="A brief.", inputs=[{"name": "topic", "description": "what", "required": True}], acceptance=["Short"],
+        deliverable={"description": "one file"}, budget=4,
+    )
+    first = team.request(ROOT, "brief", {"topic": "ai"})  # 4 runs handed down, none used yet: all still held
+    wire_cli.run_cli(["--root", str(team.root), "request", "brief", "--input", "topic=ai", "--revises", first.id])
+    out = capsys.readouterr().out
+    assert "budget 1)" in out and "This rework has 1 run(s), and a rework of this team needs about 5 (1, plus 2 for each agent below ceo)." in out
+    assert 'Ask the user now for 4 more run(s)' in out
+

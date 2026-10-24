@@ -89,7 +89,7 @@ from ..observability import (
 from ..observability._util import matcher, plain
 from ..overview import OrgTree
 from ..progress import ProgressReporter
-from ..reflection import ServiceReports
+from ..reflection import ServiceReports, ServiceSteps
 from ..review import HealthReviewer
 from ..scheduler._ports import Console
 from ..scheduler._run import LoopState
@@ -338,7 +338,7 @@ def commands_over(session: OrgSession, out: Output, terminal: Terminal, clock: C
         TaskCommand(session, get(TaskAssigner), snapshots, text, out),
         ServicesCommand(session, get(ServiceReports), out),
         DefineServiceCommand(session, commands, get(ServiceCatalog), get(ContractNormalizer), snapshots, text, out),
-        RequestCommand(session, commands, snapshots, out),
+        RequestCommand(session, commands, snapshots, get(ServiceSteps), out),
         FeedbackCommand(session, commands, snapshots, out),
         RetireServiceCommand(session, commands, snapshots, out),
         PlanCommand(session, loader, validator_of(session, plan_time), renderer_of(session, plan_time), out),
