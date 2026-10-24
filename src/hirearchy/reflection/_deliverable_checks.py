@@ -165,7 +165,7 @@ class FolderDeliverableChecks(DeliverableChecks):
         if basis.floor is not None and entry.mtime_us < basis.floor:
             return []  # written before the earliest contract of the group: the user's own older file
         by_file_rule = single or entry.name in group.files
-        kind, pair = self._file_rule(call, basis, entry) if by_file_rule else self._folder_rule(call, basis, entry)
+        kind, pair, ids = self._file_rule(call, basis, entry) if by_file_rule else self._folder_rule(call, basis, entry)
         if not kind:
             return []
         if pair is None or kind == "unknown":
@@ -174,36 +174,57 @@ class FolderDeliverableChecks(DeliverableChecks):
             return [DeliverableFinding(folder, group.services, entry.name, "unknown", file=single)]
         if self._settled(entry.mtime_us, [pair.case] if pair.case is not None else []):
             return []
+        if kind == "relayed":
+            return [DeliverableFinding(folder, group.services, entry.name, "relayed", task=pair.task.id, relayed=ids, file=single)]
         withheld = questions_open(pair.task, pair.result, pair.case, call.sent or []) > 0
         return [DeliverableFinding(folder, group.services, entry.name, "differs", pair.path, pair.task.id, withheld, file=single)]
 
-    def _folder_rule(self, call: _Call, basis: _Basis, entry: FolderFile) -> tuple[str, _Pair | None]:
-        """A file of a folder contract: compared with the checked version of the team's artifact of the same name; else with any version the team has."""
+    def _folder_rule(self, call: _Call, basis: _Basis, entry: FolderFile) -> tuple[str, _Pair | None, tuple[str, ...]]:
+        """A file of a folder contract: compared with the checked version of the team's artifact of the same name, newest first; else with any
+        version the team has. Past a newest version that root's relayed rework wrote, the file may equal the delivery the user saw: ``relayed``, with the
+        delivery's pair and the ids of the relayed reworks after it, oldest first (design 7.2)."""
+        newest: _Pair | None = None
+        relayed: list[str] = []  # the relayed tasks of the pairs walked past, newest first
         for pair in (p for p in basis.pairs if PurePosixPath(p.path).name == entry.name):  # newest first
             checked = self._checked(call, pair)
-            if checked is not None:  # a pair unknown on both sides (git and the organization) is dropped
-                return ("" if self._same(entry, checked) else "differs"), pair
+            if checked is None:  # a pair unknown on both sides (git and the organization) is dropped
+                continue
+            if self._same(entry, checked):
+                return ("relayed", pair, tuple(reversed(relayed))) if newest is not None else ("", None, ())
+            newest = newest or pair
+            if pair.task.source != "relayed":
+                break  # a task that is not a relayed rework ends the walk
+            relayed.append(pair.task.id)
+        if newest is not None:
+            return "differs", newest, ()
         if any(self._same(entry, now) for pair in basis.pairs if (now := self._now(call, pair.path)) is not None):
-            return "", None  # a renamed copy of something the organization holds now
+            return "", None, ()  # a renamed copy of something the organization holds now
         if any(self._same(entry, checked) for pair in basis.pairs if (checked := self._checked(call, pair)) is not None):
-            return "", None  # ... or of something the team checked
-        return "unknown", None
+            return "", None, ()  # ... or of something the team checked
+        return "unknown", None, ()
 
-    def _file_rule(self, call: _Call, basis: _Basis, entry: FolderFile) -> tuple[str, _Pair | None]:
+    def _file_rule(self, call: _Call, basis: _Basis, entry: FolderFile) -> tuple[str, _Pair | None, tuple[str, ...]]:
         """A file a contract names: compared with the team's artifacts of the same name, else with those of its newest result (a contract that names
-        ``memo.md`` while the team writes ``2026-10-05-memo.md``). Never ``unknown`` while the group has a result to compare with (DR-45)."""
+        ``memo.md`` while the team writes ``2026-10-05-memo.md``). Never ``unknown`` while the group has a result to compare with (DR-45). A file equal
+        to an artifact that only relayed reworks' artifacts are newer than is ``relayed``; with the user's own rework in between it is no finding."""
         if not basis.pairs:
-            return "unknown", None
+            return "unknown", None, ()
         same_name = [p for p in basis.pairs if PurePosixPath(p.path).name == entry.name]
         pairs = same_name or [p for p in basis.pairs if p.result.id == basis.pairs[0].result.id]
-        known = False
+        known, only_relayed = False, True
+        relayed: list[str] = []  # the relayed tasks of the known pairs walked past, newest first
         for pair in pairs:
             checked = self._checked(call, pair)
-            if checked is not None:
-                known = True
-                if self._same(entry, checked):
-                    return "", None
-        return ("differs", pairs[0]) if known else ("unknown", None)
+            if checked is None:
+                continue
+            known = True
+            if self._same(entry, checked):
+                return ("relayed", pair, tuple(reversed(relayed))) if relayed and only_relayed else ("", None, ())
+            if pair.task.source == "relayed":
+                relayed.append(pair.task.id)
+            else:
+                only_relayed = False
+        return ("differs", pairs[0], ()) if known else ("unknown", None, ())
 
     def _same(self, entry: FolderFile, blob: str) -> bool:
         return self._blobs.of(entry.data, len(blob)) == blob

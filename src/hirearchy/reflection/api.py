@@ -431,12 +431,13 @@ class DeliverableFinding:
     folder: str  # the folder as resolved (for a contract that names a file: that file's folder)
     services: tuple[str, ...]  # every service whose contract names this folder (or this file), sorted
     name: str  # the file name inside it ("" for the folder itself)
-    kind: str  # "differs" | "unknown" | "link" | "large" | "limit" | "unreadable"
+    kind: str  # "differs" | "relayed" | "unknown" | "link" | "large" | "limit" | "unreadable"
     artifact: str = ""  # the team's artifact it was compared with ("" unless "differs")
-    task: str = ""  # the task whose done result last listed that artifact ("" unless "differs")
+    task: str = ""  # the task whose done result last listed that artifact ("" unless "differs"); for "relayed": the delivery the file equals
     withheld: bool = False  # that result still has open client questions (``questions_open`` > 0): its artifact path is not shown
     error: str = ""  # for "unreadable": the operating system's words for it
     file: bool = False  # the contract names this file itself, not a folder
+    relayed: tuple[str, ...] = ()  # for "relayed": the ids of root's relayed reworks that changed the team's copy after that delivery, oldest first
 
 
 @runtime_checkable
@@ -451,6 +452,7 @@ class DeliverableChecks(Protocol):
 
 _NOTE_HEAD = "Tell the user what changed and why; never patch a deliverable yourself (send it back with revises):"
 _NOTE_LINES = 10  # file lines of one block that are shown; the rest is counted
+_RELAYED_TAIL = "(your own reading, not the user's) changed the team's copy after that delivery, so the file is not a deviation."
 
 
 def _what(f: DeliverableFinding) -> str:
@@ -474,6 +476,14 @@ def _services(f: DeliverableFinding) -> str:
     return ("service " if len(f.services) == 1 else "services ") + ", ".join(f"`{name}`" for name in f.services)
 
 
+def _relayed_line(f: DeliverableFinding) -> str:
+    """The one line of a ``relayed`` finding: the file is the delivery the team checked, and root's own rework changed the team's copy after it."""
+    reworks = f"your relayed rework{'s' if len(f.relayed) > 1 else ''} {', '.join(f.relayed)} {_RELAYED_TAIL}"
+    if f.file:
+        return f"Deliverable file {shown_name(f'{f.folder}/{f.name}', FOLDER_SHOWN)} ({_services(f)}): it is the delivery of task {f.task} as the team checked it; {reworks}"
+    return f"Deliverable folder {shown_name(f.folder, FOLDER_SHOWN)} ({_services(f)}): {shown_name(f.name, NAME_SHOWN)} is the delivery of task {f.task} as the team checked it; {reworks}"
+
+
 def _block(key: tuple[str, tuple[str, ...]], found: Sequence[DeliverableFinding]) -> list[str]:
     """The block of a folder: its heading, at most 10 file lines, and the count of the rest."""
     folder, _ = key
@@ -486,13 +496,16 @@ def _block(key: tuple[str, tuple[str, ...]], found: Sequence[DeliverableFinding]
 
 def deliverables_note(findings: Sequence[DeliverableFinding]) -> str:
     """The note root reads when files of a deliverable folder are not what the team delivered as checked (pure): one block per folder, at most 10 file
-    lines each; a contract that names a file has a heading of its own, and a folder that cannot be read, or is a link, is one line. ``""`` for none.
+    lines each; a contract that names a file has a heading of its own, and a folder that cannot be read, or is a link, is one line; a ``relayed``
+    finding is one line of its own, left out of the block's count. ``""`` for none.
     File names and folders are rendered by :func:`shown_name`: a name is a prompt-injection channel, so it is never shown raw."""
     entries: list[list[str] | tuple[str, tuple[str, ...]]] = []  # in the order of the findings: lines already made, or the key of a block
     blocks: dict[tuple[str, tuple[str, ...]], list[DeliverableFinding]] = {}
     for f in findings:
         place = shown_name(f.folder, FOLDER_SHOWN)
-        if f.file:
+        if f.kind == "relayed":  # a line of its own, never counted in a block and never the reason for a heading
+            entries.append([_relayed_line(f)])
+        elif f.file:
             heading = f"Deliverable file {shown_name(f'{f.folder}/{f.name}', FOLDER_SHOWN)} ({_services(f)}): it is not what the team delivered as checked. {_NOTE_HEAD}"
             entries.append([heading, f"- {_what(f)}"])
         elif not f.name and f.kind == "unreadable":

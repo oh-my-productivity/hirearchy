@@ -82,7 +82,7 @@ def put(r: Rig, files: dict[str, bytes], *, folder: str = FOLDER, mtime: int | N
 
 
 def finding(name: str, kind: str, services: tuple[str, ...] = (SERVICE,), **over: object) -> DeliverableFinding:
-    base: dict[str, object] = dict(folder=FOLDER, services=services, name=name, kind=kind, artifact="", task="", withheld=False, error="", file=False)
+    base: dict[str, object] = dict(folder=FOLDER, services=services, name=name, kind=kind, artifact="", task="", relayed=(), withheld=False, error="", file=False)
     return DeliverableFinding(**{**base, **over})  # type: ignore[arg-type]
 
 
@@ -237,6 +237,88 @@ def test_withheld_while_questions_are_open(w: ReflectionWorld) -> None:
     assert r.findings()[0].withheld is True
     rework(w, task)  # the user asked for it
     assert r.findings()[0].withheld is False and r.findings()[0].artifact == MEMO
+
+
+# ------------------------------------------------------------------------------------------------------------------------ a relayed rework changed the copy (F-E5-5)
+
+
+def e5_chain(r: Rig, *relayed_data: bytes) -> tuple[Message, list[Message]]:
+    """E5 s1's shape: a request, the user's rework of it delivered with ``team v2`` (the delivery the user saw), then one relayed rework of the
+    previous task for each of ``relayed_data``, each delivered with its own copy. Returns the delivery's task and the relayed tasks, oldest first."""
+    first, _ = delivered(r, b"team v1\n")
+    human = rework(r.w, first)
+    checked(r, done(r.w, human, MEMO), MEMO, b"team v2\n", commit="c2")
+    previous, relayed = human, []
+    for n, data in enumerate(relayed_data, start=3):
+        previous = rework(r.w, previous, source="relayed")
+        checked(r, done(r.w, previous, MEMO), MEMO, data, commit=f"c{n}")
+        relayed.append(previous)
+    return human, relayed
+
+
+def test_a_file_equal_to_the_delivery_a_relayed_rework_changed_is_relayed(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    human, (relayed,) = e5_chain(r, b"team v3\n")
+    put(r, {"memo.md": b"team v2\n"})  # the copy the user saw and the team checked, before the assistant's own rework changed the team's
+    assert r.findings() == [finding("memo.md", "relayed", task=human.id, relayed=(relayed.id,))]
+
+
+def test_two_relayed_reworks_give_both_ids_oldest_first(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    human, (first, second) = e5_chain(r, b"team v3\n", b"team v4\n")
+    put(r, {"memo.md": b"team v2\n"})
+    assert r.findings() == [finding("memo.md", "relayed", task=human.id, relayed=(first.id, second.id))]
+
+
+def test_a_human_rework_that_differs_in_between_gives_differs_from_the_newest(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    _, (relayed,) = e5_chain(r, b"team v3\n")
+    put(r, {"memo.md": b"team v1\n"})  # equal to the first delivery, with the user's own rework (v2) between it and the relayed one
+    assert r.findings() == [finding("memo.md", "differs", artifact=MEMO, task=relayed.id)]
+
+
+def test_a_file_equal_to_the_newest_relayed_pair_gives_nothing(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    e5_chain(r, b"team v3\n")
+    put(r, {"memo.md": b"team v3\n"})
+    assert r.findings() == []
+
+
+def test_a_file_that_equals_no_pair_differs_from_the_newest_relayed_one(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    _, (relayed,) = e5_chain(r, b"team v3\n")
+    put(r, {"memo.md": b"edited by the assistant\n"})
+    assert r.findings() == [finding("memo.md", "differs", artifact=MEMO, task=relayed.id)]
+
+
+def test_a_human_verdict_after_the_edit_settles_a_relayed_finding(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    human, _ = e5_chain(r, b"team v3\n")
+    put(r, {"memo.md": b"team v2\n"})
+    assert [f.kind for f in r.findings()] == ["relayed"]
+    w.s.d.clock.advance(1)
+    rate(w, human, "accept", source="relayed")  # the assistant's own verdict never settles it
+    assert [f.kind for f in r.findings()] == ["relayed"]
+    rate(w, human, "accept")  # the user's does
+    assert r.findings() == []
+
+
+def test_the_file_rule_names_the_relayed_rework_too(w: ReflectionWorld) -> None:
+    service(w, "/deliverables/memo.md")
+    r = rig(w)
+    human, (relayed,) = e5_chain(r, b"team v3\n")
+    r.folder.file("/deliverables/memo.md", b"team v2\n", r.later())
+    assert r.findings() == [finding("memo.md", "relayed", folder="/deliverables", task=human.id, relayed=(relayed.id,), file=True)]
+    r.folder.file("/deliverables/memo.md", b"team v1\n", r.later())
+    assert r.findings() == []  # equal to an older pair with the user's own rework newer than it: no finding, as before
+    r.folder.file("/deliverables/memo.md", b"edited\n", r.later())
+    assert r.findings() == [finding("memo.md", "differs", folder="/deliverables", artifact=MEMO, task=relayed.id, file=True)]
 
 
 # ------------------------------------------------------------------------------------------------------------------------ the git bound
