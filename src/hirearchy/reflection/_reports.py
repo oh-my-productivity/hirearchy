@@ -8,9 +8,34 @@ from ..agents import AgentDirectory
 from ..kernel import Message, clip_line
 from ..services import Contract, Criterion, ServiceCatalog, confirmed_amendments, criteria_of
 from ._ports import ServicePaths
-from .api import Assertion, CaseHistory, ServiceReports, case_spend, confirmed_criteria, regressions, summarize
+from .api import (
+    Assertion, CaseHistory, ServiceReports, case_spend, confirmed_criteria, regressions, summarize, user_approved, user_cost,
+)
 
 CLIP_ASSERTION = 160  # characters of the client's words shown for an assertion in the listing
+
+# The texts of ``case_total`` (design 4.4). ``{s}``, ``{has}``, ``{it}``, ``{its}`` and ``{Its}`` are the singular or plural of the relayed reworks' ids.
+HEAD = "case total: {runs} runs used of {budget} handed down (contract: {B} per request)"
+HEAD_SPLIT = (
+    "case total: {runs} runs used: {user} by the user's requests, {relayed} by your relayed rework{s} {ids}; {budget} handed down "
+    "(contract: {B} per request)"
+)
+OVER_CONTRACT = "This case now exceeds the per-request budget of {B}: tell the user."
+OVER_APPROVED = (  # DR-0a3-11: ``topped`` is ", plus {A - B} approved beyond it" when the approval is above the contract's budget
+    "The user's requests now cost {U} runs, more than the {A} the user approved for this case (contract: {B} per request{topped}): tell the user."
+)
+RELAYED_SPEND = (
+    "The runs of your relayed rework{s} are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them."
+)
+RELAYED_NONE_YET = (
+    "Your relayed rework{s} {ids} {has} used no run yet; {its} runs will be your own spend, not the user's: report them to the user as yours, "
+    "and never ask the user to fund them."
+)
+RELAYED_UNSPLIT = (  # DR-0a3-1, P-2: the relayed rework's runs fell in the interval of a later request of the user's
+    "Your relayed rework{s} {ids} {has} no run counted apart: a request of the user's followed before {it} finished, so {its} runs could not be "
+    "split from the user's interval, which holds {n} run(s) since then, all counted with the user's requests. {Its} runs are your own spend, not "
+    "the user's: report them to the user as yours, and never ask the user to fund them."
+)
 
 
 def marked(ids: Sequence[str], current: Collection[str]) -> str:
@@ -103,7 +128,33 @@ class TextServiceReports(ServiceReports):
         contract = self._catalog.read_contract(task.to, task.service) if known and task.service else None
         if c is None or contract is None:
             return ""
-        text = f"case total: {c.runs} runs used of {c.budget} handed down (contract: {contract.budget} per request)"
-        if case_spend(c) > contract.budget:
-            text += f". This case now exceeds the per-request budget of {contract.budget}: tell the user."
-        return text
+        budget = contract.budget
+        if c.client_kind == "agent":  # an agent client's case reads as before 0a.3, whatever its relayed reworks (I6)
+            text = HEAD.format(runs=c.runs, budget=c.budget, B=budget)
+            return f"{text}. {OVER_CONTRACT.format(B=budget)}" if case_spend(c) > budget else text
+        relayed = [t.id for t in c.tasks if t.source == "relayed"]
+        approved, cost = user_approved(c, budget), user_cost(c)
+        several = len(relayed) > 1
+        words = {
+            "s": "s" if several else "", "has": "have" if several else "has", "it": "they" if several else "it",
+            "its": "their" if several else "its", "Its": "Their" if several else "Its", "ids": ", ".join(relayed),
+        }
+        if c.relayed_runs >= 1:
+            head = HEAD_SPLIT.format(runs=c.runs, user=c.runs - c.relayed_runs, relayed=c.relayed_runs, budget=c.budget, B=budget, **words)
+        else:
+            head = HEAD.format(runs=c.runs, budget=c.budget, B=budget)
+        sentences: list[str] = []
+        if cost > approved:
+            if approved == budget and not relayed:
+                sentences.append(OVER_CONTRACT.format(B=budget))  # today's sentence, today's bytes
+            else:
+                topped = f", plus {approved - budget} approved beyond it" if approved > budget else ""
+                sentences.append(OVER_APPROVED.format(U=cost, A=approved, B=budget, topped=topped))
+        if relayed:
+            if c.relayed_runs >= 1:
+                sentences.append(RELAYED_SPEND.format(**words))
+            elif c.relayed_overlap > 0:
+                sentences.append(RELAYED_UNSPLIT.format(n=c.unsplit_runs, **words))
+            else:
+                sentences.append(RELAYED_NONE_YET.format(**words))
+        return head + "".join(". " + x if i == 0 else " " + x for i, x in enumerate(sentences))

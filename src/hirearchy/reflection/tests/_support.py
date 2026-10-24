@@ -122,3 +122,15 @@ def amend_legacy(w: ReflectionWorld, add_acceptance: Sequence[str] = (), remove_
         owner, SERVICE, {**meta, "version": version, "acceptance": [*kept, *add_acceptance], "defined_by": "root",
                          "defined": w.s.d.clock.now().isoformat(timespec="microseconds")}, body, version - 1,
     )
+
+
+def s1_t6(w: ReflectionWorld) -> Message:
+    """E5 s1 at T6 (contract 12): f07a (12 handed down, 5 runs, 7 returned), aae2 human (12, 5, 7), 963a relayed (6, 5, 1); the relayed task is returned."""
+    first = ask(w, "s1")
+    deliver(w, first, runs=5, budget=7)
+    human = rework(w, first, budget=12)
+    deliver(w, human, runs=5, budget=7)
+    relayed = rework(w, human, source="relayed", budget=6)
+    deliver(w, relayed, runs=5, budget=1)
+    return relayed
+

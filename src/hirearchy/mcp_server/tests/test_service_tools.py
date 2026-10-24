@@ -163,15 +163,29 @@ def test_root_request_rework_without_source_is_relayed(svc):
 
 
 # ----------------------------------------------------------------------------------------- 4. case totals
-def test_the_rework_reply_states_the_case_total_and_warns_when_it_exceeds_the_contract(svc):
+def test_the_rework_reply_states_the_case_total_in_its_relayed_form(svc):
+    """D-E5-1 (A3): root's rework without a source is relayed. Its reply states the case total, says the rework has used no run yet and that its
+    runs are the assistant's own spend, and no longer says "exceeds ... tell the user" on the runs handed down for it (0a.2 did)."""
     server = build_server(svc, ROOT)
     first = request(svc, "ai")  # 10 runs handed down (the contract's); 4 used, 6 come back
     deliver(svc, "ceo", first, runs=4)
     plain = call(server, "request", service=WEEKDAY, inputs={"topic": "other"})
     assert "case total" not in plain  # not a rework: nothing to total
     reply = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, budget=8)  # 18 handed down, 6 came back: 12 can be spent
+    (rework,) = [m for m in svc.sent(ROOT) if m.revises == first.id]
     assert "case total: 4 runs used of 18 handed down (contract: 10 per request)" in reply
-    assert "This case now exceeds the per-request budget of 10: tell the user." in reply
+    assert f"Your relayed rework {rework.id} has used no run yet; its runs will be your own spend, not the user's: report them to the user as yours" in reply
+    assert "exceeds" not in reply and "tell the user" not in reply
+
+
+def test_the_rework_the_user_asked_for_states_the_case_total_without_the_relayed_sentences(svc):
+    """D-E5-1 (A3): a human rework (source "human") with a budget of 8 raises the approval to 4 + 6 + 8 = 18: its reply holds the case total only."""
+    server = build_server(svc, ROOT)
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, runs=4)
+    reply = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, budget=8, source="human")
+    assert "case total: 4 runs used of 18 handed down (contract: 10 per request)" in reply
+    assert "relayed" not in reply.split("case total:")[1] and "exceeds" not in reply and "tell the user" not in reply
 
 
 def test_a_rework_within_the_contract_budget_gets_no_warning(svc):

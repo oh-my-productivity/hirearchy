@@ -327,20 +327,10 @@ def test_an_agent_clients_case_has_no_user_grants_and_no_user_ceiling(tmp_path):
     assert case.client_kind == "agent" and case.user_granted == case.user_ceiling == 0
 
 
-def s1_t6(w):
-    """E5 s1 at T6: f07a (12 runs handed down, 5 used, 7 returned), aae2 human (12, 5, 7), 963a relayed (6, 5, 1)."""
-    first = sup.ask(w, "s1")
-    sup.deliver(w, first, runs=5, budget=7)
-    human = sup.rework(w, first, budget=12)
-    sup.deliver(w, human, runs=5, budget=7)
-    relayed = sup.rework(w, human, source="relayed", budget=6)
-    sup.deliver(w, relayed, runs=5, budget=1)
-
-
 def test_the_ceiling_of_e5s_s1_t6_is_17(tmp_path):
     """Ceilings 12 and 5 + 12 = 17 (design 4.3): the old default handed the contract's 12 again, and the files cannot tell that from a top-up."""
     w = ceiling_world(tmp_path)
-    s1_t6(w)
+    sup.s1_t6(w)
     case = the_case(w)
     assert (case.runs, case.relayed_runs, case.relayed_returned, case.user_ceiling, case.user_granted, case.relayed_overlap) == (15, 5, 1, 17, 0, 0)
     assert reflection.user_spend(case) == 10 and reflection.user_approved(case, 12) == 17

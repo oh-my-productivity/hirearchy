@@ -95,6 +95,20 @@ def test_a_rework_chain_adds_the_total_of_the_case_without_a_dangling_full_stop(
     assert "case total" not in lines(w, history=single, totals=FixedCaseTotals({first.id: total})).line(first, None, NOW)
 
 
+def test_a_total_of_several_sentences_joins_with_full_stops_and_never_doubles_them(w: ProgressWorld) -> None:
+    """D-E5-1: the case total can now hold the overspend sentence and the relayed sentence; each ends in a full stop, and the line joins them with
+    ". " and strips only the last one."""
+    first, second = request(w), request(w, "brief: ai again")
+    total = (
+        "case total: 14 runs used: 11 by the user's requests, 3 by your relayed rework R; 13 handed down (contract: 10 per request). "
+        "The user's requests now cost 11 runs, more than the 10 the user approved for this case (contract: 10 per request): tell the user. "
+        "The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them."
+    )
+    chain = FixedCaseHistory([case([first, second], reworks=1)])
+    out = lines(w, history=chain, totals=FixedCaseTotals({first.id: total})).line(first, None, NOW)
+    assert out.endswith(f"{total} (task {first.id})") and ".." not in out
+
+
 def test_artifacts_of_drops_the_word_counts_and_the_bullets() -> None:
     result = Message(sender="ceo", to=ROOT, type="result", body="## Summary\nx\n## Artifacts\n- ceo/a.md (12 words)\n\n* ceo/b.md\n## Lessons\n- not me")
     assert artifacts_of(result) == ["ceo/a.md", "ceo/b.md"]

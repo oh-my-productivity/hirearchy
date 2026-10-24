@@ -115,12 +115,13 @@ def test_the_services_listing_marks_a_removed_criterion(svc):
 
 
 def test_case_total_warns_on_spend_not_on_runs_handed_down(svc):
+    """Rule R (design 13): the rework is the user's (``source="human"``); a relayed default would be named apart and called the assistant's spend."""
     from testkit.services_world import deliver, request
 
     first = request(svc, "ai")  # the contract hands down 10
     deliver(svc, "ceo", first, runs=3)
     svc.feedback(ROOT_ADDR, first.id, "reject", "Too long.", source="human")
-    rework = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=first.id, budget=8)  # 18 handed down: more than the contract's 10
+    rework = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=first.id, budget=8, source="human")  # 18 handed down: past the contract's 10
     deliver(svc, "ceo", rework, runs=4)  # but 7 runs used
     done = svc.runtime.service_reports.case_total(rework)
     assert done == "case total: 7 runs used of 18 handed down (contract: 10 per request)"
@@ -143,3 +144,55 @@ def test_case_total_with_one_credited_run_does_not_say_exceeds(svc):
     throttled = svc.runtime.run_log_reader.files("ceo")[-1].stem  # one of them ended on a model-service throttle and was not charged
     svc.runtime.delivery.deliver(Message(sender=RUNTIME, to="ceo", type="note", budget=1, wake=False, title=run_credit_title("ceo", throttled), body="returned"))
     assert svc.runtime.service_reports.case_total(over) == "case total: 10 runs used of 10 handed down (contract: 10 per request)"
+
+
+# ------------------------------------------------------------------ D-E5-1 and DR-0a3-1 over the Org facade
+def test_a_relayed_rework_just_sent_says_it_has_used_no_run_yet(svc):
+    """DR-0a3-1: R alone and just sent (no run in its interval, nothing after it): form 1 and RELAYED_NONE_YET, never "0 by your relayed rework"."""
+    from testkit.services_world import deliver, request
+
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, runs=3)
+    relayed = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=first.id, budget=6)  # root's rework without a source is relayed
+    total = svc.runtime.service_reports.case_total(relayed)
+    assert total == (
+        "case total: 3 runs used of 16 handed down (contract: 10 per request). "
+        f"Your relayed rework {relayed.id} has used no run yet; its runs will be your own spend, not the user's: report them to the user as yours, "
+        "and never ask the user to fund them."
+    )
+    assert "by your relayed rework" not in total
+
+
+def test_a_relayed_rework_answered_with_its_whole_budget_before_the_next_request_still_says_none_yet(svc):
+    """DR-0a3-1: R (6) answers with 6 back and no run before H is sent; H's 4 runs are the user's: RELAYED_NONE_YET."""
+    from testkit.services_world import deliver, request, work
+
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, runs=1)
+    relayed = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=first.id, budget=6)
+    deliver(svc, "ceo", relayed, runs=0)  # the runtime hands the whole 6 back with the result
+    human = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=relayed.id, source="human")
+    work(svc, "ceo", 4)
+    total = svc.runtime.service_reports.case_total(human)
+    assert f"Your relayed rework {relayed.id} has used no run yet; its runs will be your own spend" in total
+    assert "no run counted apart" not in total
+
+
+def test_a_relayed_rework_followed_by_the_users_request_before_it_ran_says_its_runs_could_not_be_split(svc):
+    """DR-0a3-1: R (6) is followed by H before any run and has no result; 4 runs fall in H's interval. Form 1 and RELAYED_UNSPLIT with
+    "4 run(s)", never "has used no run yet"."""
+    from testkit.services_world import deliver, request, work
+
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, runs=1)
+    relayed = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=first.id, budget=6)
+    human = svc.request(ROOT_ADDR, "weekly-brief", {"topic": "ai"}, revises=relayed.id, source="human")
+    work(svc, "ceo", 4)
+    total = svc.runtime.service_reports.case_total(human)
+    assert total == (
+        "case total: 5 runs used of 26 handed down (contract: 10 per request). "
+        f"Your relayed rework {relayed.id} has no run counted apart: a request of the user's followed before it finished, so its runs could not be "
+        "split from the user's interval, which holds 4 run(s) since then, all counted with the user's requests. Its runs are your own spend, not "
+        "the user's: report them to the user as yours, and never ask the user to fund them."
+    )
+    assert "has used no run yet" not in total

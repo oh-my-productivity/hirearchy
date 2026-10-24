@@ -387,7 +387,10 @@ class ServiceReports(Protocol):
         """The whole case in one sentence: runs used by the chain against the runs handed down, and the contract's budget.
 
         ``case total: 19 runs used of 27 handed down (contract: 15 per request)``; when the runs used, plus the runs still out on an open case
-        (``case_spend``), exceed the contract's budget, it adds that the case exceeds the budget and that the user must be told. Empty for a task that is not a service request."""
+        (``case_spend``), exceed the contract's budget, it adds that the case exceeds the budget and that the user must be told. For a human
+        client, the runs of root's relayed reworks are named apart and called root's own spend; when the user's requests cost more than the user
+        approved (``user_cost`` against ``user_approved``) it adds that the user must be told. An agent client's case reads as before 0a.3.
+        Empty for a task that is not a service request."""
         ...
 
 
