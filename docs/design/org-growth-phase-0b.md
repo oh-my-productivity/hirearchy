@@ -1,24 +1,29 @@
 # Org growth, Phase 0b: Measure (technical design)
 
-Status: design, revision 2 (answers the design review of revision 1, 25 findings; resolutions in Appendix A). Branch `feat/org-growth-phase-0b`,
-worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0b`, based on `main` `6618c0d` (0a.2 merged; the floor batch merged before it).
-Design only: no production code is written in this run. The build starts after study E5's live streams finish, and 0b merges only if E5
-passes (`e4-gate.md` section 3 "After the decision"; `e4-decision.md` D-E4-7).
+Status: design, revision 3. It answers the design review of revision 2 (14 findings, `DR2-1` to `DR2-14`) and the manager's binding decision
+of 2026-10-24 on that review (owner questions Q1-Q5 decided, section 28); resolutions in Appendix A.2, revision 1's in A.1. Branch
+`feat/org-growth-phase-0b`, worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0b`, based on `main` `6618c0d` (0a.2 merged; the floor
+batch merged before it). Design only: no production code is written in this run. The build starts after study E5's live streams finish, and
+0b merges only if E5 passes (`e4-gate.md` section 3 "After the decision"; `e4-decision.md` D-E4-7).
 
-Sources of truth, read in full:
-- `docs/research/org-growth/08-synthesis.md` ("08"): sections 2, 3.1-3.3, 6, 7, 8 (row 0b is the scope).
-- `docs/research/org-growth/phase-0a/go-no-go-0b.md` ("go/no-go"): section 4 items 2-8 and the section 3 ride-alongs (binding).
-- `docs/research/org-growth/phase-0a1/e4-gate.md` ("the gate"): section 4 items 1-8 (binding).
-- `docs/research/org-growth/phase-0a1/e4-decision.md`: D-E4-5 (reviewer ambiguity recall is a measure), D-E4-8 and D-E4-9 (every seat
-  claude-sonnet-5.5 at effort high).
-- `docs/research/org-growth/phase-0a/followups.md` item 3 (the flaky golden screen test).
-- `docs/design/org-growth-phase-0a.md`, `-0a1.md`, `-0a2.md` (sections 20-22) and `org-agent-model-floor.md`; the 0a.2 report sections 6-8.
-- `ARCHITECTURE.md` (R1-R13, 2.2, 2.3), `docs/refactor-principles.md`, and the code at `6618c0d` that writes every record read below.
-- The replay corpora under `studies/` (E, E2, A5, E3, E4 s1r/s2r/s3), all tracked in git (checked with `git ls-files`: 110, 121, 43, 371
-  and 1634 files).
-- E5: `studies/E5-org-growth-0a2-recheck/` exists in the main checkout, untracked and in progress (stream `s1`, `evidence/protocol.md` of
-  1 527 lines, md5 `afd437c103407ec5899e4993b465cf25` as its `protocol.md5` records). Its gate (`phase-0a2/e5-gate.md`) does not exist yet
-  (checked). Section 27 says how both are adopted by amendment.
+Sources of truth, read in full. `docs/research/` is untracked in the main checkout and absent from the worktree, so its files are named by
+absolute path (`RESEARCH` = `/Volumes/workspace/hirearchy/docs/research/org-growth`):
+- `RESEARCH/08-synthesis.md` ("08"): sections 2, 3.1-3.3, 6, 7, 8 (row 0b is the scope).
+- `RESEARCH/phase-0a/go-no-go-0b.md` ("go/no-go"): section 4 items 2-8 and the section 3 ride-alongs (binding).
+- `RESEARCH/phase-0a1/e4-gate.md` ("the gate"): section 4 items 1-8 (binding).
+- `RESEARCH/phase-0a1/e4-decision.md`: D-E4-5 (reviewer ambiguity recall is a measure), D-E4-8 and D-E4-9 (every seat claude-sonnet-5.5 at
+  effort high).
+- `RESEARCH/phase-0a/followups.md` item 3 (the flaky golden screen test).
+- `RESEARCH/phase-0a2/test-policy.md` (the owner's scoped test policy, 18.3) and `RESEARCH/phase-0a2/org-growth-0a2-report.md` sections 6-8.
+- In the worktree: `docs/design/org-growth-phase-0a.md`, `-0a1.md`, `-0a2.md` (sections 20-22) and `org-agent-model-floor.md`;
+  `ARCHITECTURE.md` (R1-R13, 2.2, 2.3), `docs/refactor-principles.md`, and the code at `6618c0d` that writes every record read below.
+- The replay corpora under `studies/` (E, E2, A5, E3, E4 s1r/s2r/s3), all tracked in git and present in the worktree (checked with
+  `git ls-files`: 110, 121, 43, 371 and 1634 files).
+- E5: `/Volumes/workspace/hirearchy/studies/E5-org-growth-0a2-recheck/` exists in the main checkout only, untracked and not yet scored: its
+  `evidence/INDEX.md` records streams `s1` and `s2` VALID and, at this revision's check (2026-10-24 07:17 UTC), `s3` VALID too (it was still
+  running when the manager's decision was written); `evidence/protocol.md` has 1 527 lines and md5 `afd437c103407ec5899e4993b465cf25`, as its
+  `protocol.md5` records. Its gate (`RESEARCH/phase-0a2/e5-gate.md`) does not exist yet (checked at this revision). Section 27 says how both
+  are adopted by amendment. This paragraph is a snapshot of 2026-10-24.
 
 Abbreviations: `SRC` = `src/hirearchy`, `TESTS` = `tests` (in the worktree); `ST` = `studies`. Ids such as `...-root-dd87` abbreviate full
 message ids (`20261021T152347923195-root-dd87`); the design states the full id wherever a test pins it.
@@ -50,7 +55,7 @@ The binding definitions are settled against what 0a.2 built:
 
 The exit criterion is "noise baseline measured; alarms checked on replayed E/E2/A5 files". 0b checks the alarms deterministically on the
 files E, E2, A5, E3 and E4 (s1r, s2r, s3) kept (section 19), with expectations pre-registered here, and specifies the noise study (study
-G0, section 20): the same script repeated k >= 3 times per arm, every seat claude-sonnet-5.5 at effort high, on the V3 runtime, stratified by
+G0, section 20): the same script repeated k = 3 times per arm (the gate's floor; Q3, decided), every seat claude-sonnet-5.5 at effort high, on the V3 runtime, stratified by
 memory presence (controlled) and skill activation (observed), measuring the team, the assistant layer and the product's own counts. G0 runs
 after E5 passes and 0b merges, and Phase 0b closes with G0's report (20.1).
 
@@ -84,16 +89,18 @@ no new file kind in an organization, no event field. Strict TDD (R11) under the 
 | top-ups | `reflection` (`Case.top_ups`, new) | The budgets of the chain's later tasks, by their `source` (`human`, `relayed`, or not recorded), plus the budget of every note the client sent to an agent of the team inside the case window (progress's grant rule, `LogRunCounts._window`). |
 | run window | `reflection._cases` (unchanged) | From the head task's id to the final result of the latest task, ending early at the client's next task to the same owner outside the chain. A window that ended early is `cut` (new flag). |
 | charged run, credited run | `kernel.credited_stems` | A run log whose stem a run credit names (`run credit <addr>@<stem>`, `kernel.RUN_CREDIT_TITLE = "run credit"`) is credited: not charged, not counted in `runs` (0a.2 9.2, already so in `LogRunCounter`). |
-| moved past (budget sense) | `mail.moved_past` (0a.1, unchanged) | A later task from the same sender revises the blocked task (or what it revised), or the sender gave a verdict on its chain after the block: its budget is released. |
+| moved past, released (budget sense) | `mail.moved_past` (0a.1, unchanged) | A later task from the same sender revises the blocked task (or what it revised), or the sender gave a verdict on its chain after the block: its budget is released. This design says **released** for this sense, so "moved past" in the view always has the gate's sense (left blocked, below). |
 | held task (new) | `progress._quality` | A task in `TaskQuery.blocked_tasks(A)` that `mail.moved_past` does not release: `budget.ReserveAllocationPolicy.budget_to_return` treats `A` as busy while one exists. |
 | left blocked (new) | `progress._quality` | A held task whose sender has since sent the assignee another task outside its chain: "moved past without a verdict" (the gate's words). |
 | hand edit | `reflection.DeliverableChecks` (0a.2 P3) | A `differs` finding: a file of a contract's deliverable folder that is not the team's checked version of the artifact of the delivery whose task the finding names (`DeliverableFinding.task`). |
-| `LASTING_WORDS` | `reflection.api` (new) | `("always", "never", "from now on")`, matched case-insensitively on word boundaries; the default of `cause_of`'s `lasting` argument (a pack passes its own in Phase 3). |
+| `LASTING_WORDS` | `reflection.api` (new) | `("always", "never", "from now on")`, matched case-insensitively on word boundaries; the default of `cause_of`'s `lasting` argument (tests pass other words). No port carries a pack's own words in 0b: that hook is Phase-3 work (backlog, 23). |
 | `CAUSES` | `reflection.api` (new) | `("relayed-error", "relayed-carry-over", "contract-gap", "reviewer-miss", "untyped")`. |
 | `FAILURE_CLASSES` | `reflection.api` (new) | `("wrong", "missing", "off_spec", "unusable", "out_of_authority", "process_skipped", "wasteful")` (08 3.2), the closed core vocabulary packs map onto (Phase 3). |
 | `QUALITY_DEFAULTS` | `reflection.api` (new) | `{"min_judged": 3, "repeat_window": 3, "repeat_failures": 2, "cost_ratio": "1.25"}`, tunable defaults (section 6); `cost_ratio` is held as `Fraction("1.25")`. |
 | `Mark` | `reflection.api` (new type alias) | `ContractMark \| PlaybookMark \| CharterMark \| ModelMark \| TopUpMark`, the items of `ServiceRecord.timeline`. |
 | `ratio(k, n)` | `progress._quality_render` (new, pure) | `"{k} of {n}"`; `"n/a (0 of 0)"` when `n == 0`. Every rate in the view goes through it. |
+| carried criteria | `reflection._causes` | The `C<k>` ids of the contract version the rejected task carried (`task.contract`; a legacy task without it uses the version in force at the task's time, `services`' `in_force` rule; a one-off has none). **Unknown** (`None`) when that version is not among the stored versions. |
+| answering version | `reflection._marks` | Of a rejection: the oldest stored contract version whose frontmatter `answers` is the rejection's id (the rule of `services._criteria.answering_version`, applied to the contract marks of section 7); none for a version written before 0a.2. Its **removed ids** are its mark's `removes` (the rule of `services._criteria.amendment_ids`). |
 
 ## 4. Data model of every derived count
 
@@ -107,19 +114,26 @@ derives it. "Root's boxes" are `<org>/{inbox,inflight,read,sent}/*.md`; an agent
 
 | Count | Definition | Files | Function |
 |---|---|---|---|
-| cases | Service cases of a service; one-off cases of root | client's `sent/` (tasks), contract `created` from `SERVICE.md` | `CaseHistory.cases` (unchanged), `CaseHistory.one_off_cases` (new) |
+| cases | Service cases of a service; one-off cases of root | client's `sent/` (tasks), contract `created` from `SERVICE.md` | `CaseHistory.cases` (unchanged), `CaseHistory.chains` and `CaseHistory.one_off_cases` (new) |
 | state | `done`, `failed`, `blocked` from the latest task's latest result, else `open` | client's received boxes (results) | unchanged |
 | stalled | an `open` case whose latest task `progress`'s `TaskStates.state_of` calls stalled now (its `state` starts with `stalled (`) | the team's boxes, pause flags, run registry | `progress` (current state only, no history) |
 | reworks, relayed reworks | tasks after the head; those with `source: relayed` | client's `sent/` | `Case.reworks`, `Case.relayed_reworks` (unchanged) |
 | cut | the window ended at the client's next task to the owner before the final result | client's `sent/`, received boxes | `Case.cut` (new) |
-| runs not counted | the case's team cannot be read for runs: the one-off assignee no longer exists (`assignee retired`), or the head task is older than the owner's (or assignee's) charter `created` (`sent before {owner} was hired again: the retired team's run logs are not read`; 0a.2 section 22, a continued service's old cases) | `<addr>/AGENT.md` frontmatter `created` (`agents.CharterReader`); a charter without `created`, or one that cannot be read (`OSError`), gives no mark | `Case.runs_unknown: str` (new, `""` when counted) |
+| runs not counted | the case's runs cannot be read, for the first of these reasons that applies: (1) the one-off assignee no longer exists (`assignee retired`); (2) the head task is older than the owner's (or assignee's) charter `created` (`sent before {owner} was hired again: the retired team's run logs are not read`; 0a.2 section 22, a continued service's old cases); (3) the case is `done` or `failed`, its window is not `cut`, and the window holds no run log of the team, charged or credited (`no run log in its window`): live, the run that wrote the result started inside the window, so a case without one is a corpus that kept no run log or a run that began before the task arrived (26). Evaluated only when runs are counted (`runs=True`) | `<addr>/AGENT.md` frontmatter `created` (`agents.CharterReader`); the run log names (4.2). A charter without `created`, with a `created` that `parse_time` rejects, or one whose read raises (`OSError`, text that is not UTF-8, frontmatter that does not parse) gives no mark for reason (2) | `Case.runs_unknown: str` (new, `""` when counted) |
 
-One-off cases (`DerivedCaseHistory.one_off_cases()`, new): root's sent tasks with no `service`, grouped by `revises` exactly as service
+One-off cases (`CaseHistory.one_off_cases(*, runs=True)`, new): root's sent tasks with no `service`, grouped by `revises` exactly as service
 chains are (`head()` follows `revises` within root's one-off tasks to the same `to`; a rework to another assignee heads its own case). `Case`
 for a one-off: `service = ""`, `owner = head.to`, `playbook = used = 0`, `client_kind = "human"`; verdicts are root's notes with `feedback`
 that reply to a task of the chain (section 8); runs use the same window rule over `agents.subtree(head.to)`. `case_of(task)` stays
-service-only, so `progress`, P3 and P4 behave as today. One private chain builder serves `cases` and `one_off_cases`; it takes the floor
-(`since: datetime | None`) and whether to count runs, so health's reads (section 10) need neither a contract nor the run logs.
+service-only, so `progress`, P3 and P4 behave as today.
+
+Service chains get a public method too, so that `DerivedCaseRecords`, typed against the `CaseHistory` Protocol (R6), can ask for chains
+without a contract and without runs: `CaseHistory.chains(owner, service, *, since: datetime | None, runs: bool) -> list[Case]` (new) builds
+the service's cases from the client's mailboxes alone, keeping requests at or after `since` (`None`: every request), and reads no contract.
+`cases(owner, service)` becomes `chains(owner, service, since=contract.created, runs=True)` after the contract read (`[]` without a contract,
+unchanged). With `runs=False` the builder reads the mailboxes only (no run log, charter or playbook file): `runs`, `credited`,
+`relayed_runs` and `used` are 0 and `runs_unknown` is `""`; the other fields (`returned`, `cut`, `top_ups`) are mail-only and always filled.
+One private builder in `_cases.py` serves `chains` and `one_off_cases`. Health's reads (section 10) use `runs=False`.
 
 ### 4.2 Runs, spend, top-ups
 
@@ -129,8 +143,8 @@ service-only, so `progress`, P3 and P4 behave as today. One private chain builde
 | credited | credited run logs in the window | same | `Case.credited` (new) |
 | relayed runs | charged runs whose stamp `s` satisfies `t.id[:21] <= s < next.id[:21]` for a relayed task `t` of the chain (`next` its successor in the chain; the last task's interval ends at the window's end, inclusive) | same | `Case.relayed_runs` (new) |
 | spend | `case_spend(case)` | as above plus result `budget` headers | unchanged |
-| ratio | `Fraction(spend, approved)`, shown with two decimals rounded half up (`Decimal.quantize(Decimal("0.01"), ROUND_HALF_UP)`); `n/a (budget 0)` when the approved budget is 0 or below | current `SERVICE.md` `budget`, head task `budget` | `progress` renderer |
-| top-ups | `{"human": h, "relayed": r, "unrecorded": u, "granted": g}`: budgets of `tasks[1:]` by `source` (`None` = unrecorded, a legacy rework), and `g` = the budget of the client's notes (`type == "note"`, `budget > 0`, `to` in the team) with an id inside the window | client's `sent/` | `Case.top_ups` (new) |
+| ratio | `Fraction(spend, approved)`, shown with two decimals rounded half up (`Decimal.quantize(Decimal("0.01"), ROUND_HALF_UP)`); `n/a (budget 0)` when the approved budget is 0 or below; not shown when the runs are not counted. The JSON carries the same two-decimal string (`"0.93"`) or `null` | current `SERVICE.md` `budget`, head task `budget` | `progress` renderer |
+| top-ups | `TopUps(items: tuple[TopUp, ...])`, one `TopUp(id, kind, amount)` per budget added after the head task, in id order: each of `tasks[1:]` with its budget and its `source` as kind (`human`, `relayed`, or `unrecorded` for `None`, a legacy rework), and each client note (`type == "note"`, `budget > 0`, `to` in the team) with an id inside the window, kind `granted`; properties `human`, `relayed`, `unrecorded`, `granted` sum the amounts | client's `sent/` | `Case.top_ups` (new) |
 
 `RunCounter` gains `stamps(team, start, end) -> list[tuple[str, bool]]`: the 21-character stamps of the team's run logs in the inclusive window,
 each with whether a run credit names its stem. `runs_between` becomes the count of the uncredited stamps (no caller changes). `Case.runs`,
@@ -146,7 +160,7 @@ For each task `t` of a case, `r` is its latest result in the client's received b
 | verdicts on a delivery | notes with `feedback` that reply to `t` with an id above `r.id`, every tier, oldest first | client's `sent/` | `Delivery.verdicts` |
 | counted, voided | counted: the human-tier ones of `Delivery.verdicts` whose time (`msg_time`, in microseconds) is below `edited_at`, all of them when `edited_at == 0`; voided: the human-tier ones at or after `edited_at` (`edited_at > 0` only) | as above, plus the deliverable folder | `Delivery.counted`, `Delivery.voided` |
 | outcome | `rejected` when a counted verdict is a reject (an escape); `accepted` when judged and not an escape; `neither` when nothing is counted and something is voided (judged after a hand edit); `none` otherwise | derived | `Delivery.outcome` |
-| first delivery | the head task's delivery and its outcome | as above | `Delivery.step == 0` |
+| first delivery | the case's delivery with the lowest `step` (the head task's when it was delivered; else the first rework that was), and its outcome; none when no task of the case was delivered, and the line then reads `never delivered ({case state})` | as above | `Delivery.step`, minimum per case |
 | superseded | section 3 | client's `sent/` | `Delivery.superseded` (the later task's id) |
 | judged | deliveries with a counted verdict | client's `sent/` (notes) | `Delivery.judged` |
 | without a verdict | cases in state `done` whose latest delivery has no human-tier verdict on it (neither counted nor voided); `relayed only` = those of them with a relayed- or agent-tier verdict on it | client's `sent/` | `unjudged_cases` (new, pure; defined by `Delivery` only, never by `reflection.rated`) |
@@ -188,7 +202,7 @@ a deviation from the gate's item 4.
 
 | Count | Definition | Files | Function |
 |---|---|---|---|
-| held tasks | for every agent `A`: every `t` in `TaskQuery.blocked_tasks(A)` with `not moved_past(t, latest[t.id], received(A))` (the tasks `budget_to_return` holds on) | `A`'s boxes | `progress._quality.held_tasks` (new, pure over mail reads) |
+| held tasks | for every agent `A`: every `t` in `TaskQuery.blocked_tasks(A)` with `not moved_past(t, latest[t.id], received(A))`, i.e. not released (the tasks `budget_to_return` holds on) | `A`'s boxes | `progress._quality.held_tasks` (new, pure over mail reads) |
 | left blocked | a held task `t` such that `received(A)` holds a task from `t.sender` with an id above the blocked result's id that is outside `t`'s chain (the chain of `mail.moved_past`) | `A`'s boxes | `progress._quality.left_blocked` (new, pure) |
 | held | `BudgetQuery.budget(A)` for an agent with at least one left-blocked task | everything `budget` derives from | `progress` |
 
@@ -213,12 +227,15 @@ budget of 0 or below reads `holds no run (budget {b})`. The service block counts
 
 ### 5.1 The rules, in order
 
-`cause_of(delivery, case, assertion, carried, results, lasting=LASTING_WORDS) -> Cause` (pure; `reflection/_causes.py`, exported from
-`reflection.api`) types an escape. `v` is the delivery's decisive verdict; `assertion` is its `R<k>` (`regressions`); `carried` is the set of
-`C<k>` ids current in the contract version the rejected task carried (`task.contract`; a legacy task without it uses the version in force at
-the task's time; a one-off has none); `results` maps each task of the case to its latest result; `lasting` is the words rule's vocabulary
-(a pack passes its own in Phase 3, so no core edit is needed). The rules are tried in this order; the first that matches gives the type and
-the rule:
+`cause_of(delivery, case, assertion, carried, answer_removes, results, lasting=LASTING_WORDS) -> Cause` (pure; `reflection/_causes.py`,
+exported from `reflection.api`) types an escape. `v` is the delivery's decisive verdict; `assertion` is its `R<k>` (`regressions`);
+`carried: frozenset[str] | None` is the task's carried criteria (section 3; `None` when the version is not stored); `answer_removes:
+tuple[str, ...]` is the removed ids of the rejection's answering version (section 3; `()` when no version answers it); `results` maps each
+task of the case to its latest result; `lasting` is the words rule's vocabulary (tests pass other words; 0b has no port through which a
+pack supplies its own, which is Phase-3 work: backlog, 23). The **named criteria** of the escape are the `C<k>` ids of the human-tier answer,
+in order and each once: those of `v.confirmed` (the human-tier link notes of the verdict, including 0a.2's product link), then those of
+`assertion.about` when `assertion.link == "confirmed"` (a "same as R<j>" link resolved). The rules are tried in this order; the first that
+matches gives the type and the rule:
 
 1. **`relayed-error`**: the rejected delivery answers a relayed task (`delivery.task.source == "relayed"`). The team did what the assistant
    asked on its own reading.
@@ -231,42 +248,58 @@ the rule:
      qualifies. After 0a.2, P4 adds no base section only when no relayed rework changed the judged artifact, so a relayed rework that
      touched other files does not match the shared-artifact clause in practice, and a legacy chain is judged by the artifact lists (the P4
      no-history rule, 0a.2 D11).
-3. **`contract-gap`, by answer**: a human-tier answer to this rejection names a criterion that `carried` lacks: a `C<k>` in
-   `v.confirmed` (the human-tier link notes of the verdict, including 0a.2's product link), or in `assertion.about` when
-   `assertion.link == "confirmed"` (a "same as R<j>" link resolved). The client said yes to a lasting rule the task's contract did not have.
-4. **`reviewer-miss`**: a human-tier answer names a criterion that `carried` has. The team reported `done`, which asserts every criterion met
-   (`services.FEEDBACK_HEADER`: "report `done` only if every criterion is met"), so its sign-off passed a criterion the client says failed.
+3. **`reviewer-miss`** (rule `link`): a named criterion is in `carried` and not in `answer_removes`. The team reported `done`, which asserts
+   every criterion met (`services.FEEDBACK_HEADER`: "report `done` only if every criterion is met"), so its sign-off passed a criterion the
+   client says failed and keeps.
+4. **`contract-gap`, by answer** (rule `answer`): a named criterion is not in `carried` (the client said yes to a lasting rule the task's
+   contract did not have), or is in `answer_removes` (the client answered the rejection by taking the criterion out of the contract: 0a.2
+   writes the product link of an answering version that adds nothing with the ids it removed, `services._criteria.answer_ids`, 0a.2 D8; a
+   "drop C6" answer names C6, and C6 was carried).
 5. **`contract-gap`, by words**: the client's words (`v.note`) contain a word of `lasting` (08 3.2's rule).
 6. **`untyped`**: nothing matched; when the human-tier link is `none`, the detail says "the user said it is no lasting rule".
 
-`Cause` (frozen dataclass): `type` (one of `CAUSES`), `rule` (`"relayed task"`, `"carry-over"`, `"answer"`, `"link"`, `"words"`, `"none"`,
-or `"unreadable"` for 10's fallback), `detail` (the ids the rule read: the relayed task, the shared artifact, the link note and criterion, or
-the matched word), `rules` (every rule that matches, in order, the winner first), `also` (the **distinct types, other than the winning
-type,** of the later rules that match: a disputed cause, retro material), `before_verdict` (the id of a relayed task of the case whose `done`
-result lies between the rejected delivery's result and the decisive verdict: "the user may have judged that version"; `""` otherwise).
-A later rule of the same type as the winner is visible in `rules` (the JSON), not in `also` (the text). Rules 3 and 4 never match a
-one-off rejection: a one-off verdict takes no link (8.1).
+**A stored version is missing.** When the escape has named criteria and `carried` is `None` (the task's contract version is not among the
+stored versions), rules 3 and 4 cannot be decided: after rules 1 and 2, the escape is typed `Cause("untyped", "unreadable", ("contract v{n}
+is not stored",))`, the fallback of section 10, so it stays counted against the verifier and visible. Without named criteria, rules 5 and 6
+run as usual (they need no contract).
+
+**Mixed links.** A link that names a carried, kept criterion and a missing or removed one matches rules 3 and 4: `reviewer-miss` wins and
+`contract-gap` is listed in `also`, so a possible miss of the verifier is never hidden behind the gap.
+
+`Cause` (frozen dataclass): `type` (one of `CAUSES`), `rule` (`"relayed task"`, `"carry-over"`, `"link"`, `"answer"`, `"words"`, `"none"`,
+or `"unreadable"` for the fallbacks), `detail` (the ids the rule read, as strings: the relayed task; the shared artifact's org-relative path;
+the link note's id followed by the criteria of that rule in named order; or the matched word), `rules` (every rule that matches, in order, the
+winner first), `also` (the **distinct types, other than the winning type,** of the later rules that match: a disputed cause, retro material),
+`before_verdict` (the id of a relayed task of the case whose `done` result lies between the rejected delivery's result and the decisive
+verdict: "the user may have judged that version"; `""` otherwise). A later rule of the same type as the winner is visible in `rules` (the
+JSON), not in `also` (the text). Rules 3 and 4 never match a one-off rejection: a one-off verdict takes no link (8.1). `{link}` in the texts
+below is the latest human-tier link note that names the rule's first criterion.
 
 ### 5.2 Why this order
 
 The structural relayed rules come first because they name a cause outside the team that the data shows directly, and they must win over the
 answer that followed: in E4 s2r the Marta escape was introduced by the injected relayed rework, inherited by Lena's rework, and then answered
-with a new criterion C10; the gate pre-registers it as relayed carry-over (rule 2 before rule 3). The recorded answer comes before the reviewer
-rule because the same link that names a criterion says whether the task's contract had it; rules 3 and 4 partition the human-linked rejections.
-The words rule is the weakest evidence (a phrase in a note) and comes after the link rules, so a reject that names a criterion the reviewer
-passed is a reviewer miss even if the note says "always" (`contract-gap` is then listed in `also`). Section 24 D1-D3 records the departures
-from 08's list.
+with a new criterion C10; the gate pre-registers it as relayed carry-over (rule 2 before rule 4). The two link rules come next because the
+client's recorded answer is the strongest evidence after the structure. They do not partition the human-linked rejections: a link can name
+both a criterion the task carried and kept and one it lacked, or one the answer removed. The reviewer rule goes first so that such a mixed
+link is typed `reviewer-miss` with `contract-gap` in `also`: the alternative (the gap first) would hide a possible miss of the verifier
+behind a contract change, and health counts a miss but not a gap (D7). A criterion the answering version removed is a contract defect the
+client named, never a miss: the client did not say the criterion failed, it said the criterion should not be there. The words rule is the
+weakest evidence (a phrase in a note) and comes after the link rules, so a reject that names a criterion the reviewer passed is a reviewer
+miss even if the note says "always" (`contract-gap` is then listed in `also`). Section 24 D1-D3 records the departures from 08's list.
 
 ### 5.3 The texts (the view; `progress/_quality_render.py`)
 
 | Type (rule) | Text after the escape's head (9.2) |
 |---|---|
 | relayed-error | `relayed-error (the rejected delivery is your relayed rework {task})` |
-| relayed-carry-over | `relayed-carry-over (your relayed rework {R} changed {path} after the delivery the user judged, and this rework started from it)` |
-| contract-gap (answer) | `contract-gap (the user's answer, link {link}, names {C}, which contract v{n} of the task did not have)` |
-| reviewer-miss | `reviewer-miss (the user's confirmed link {link} names {C}, which contract v{n} of the task had; the team reported done)` |
+| relayed-carry-over | `relayed-carry-over (your relayed rework {R} delivered {path} after the delivery the user judged, and the rejected delivery lists it too)` |
+| reviewer-miss (link) | `reviewer-miss (the user's confirmed link {link} names {C}, which contract v{n} of the task had; the team reported done)` |
+| contract-gap (answer) | `contract-gap (the user's answer, link {link}, names {C}, which contract v{n} of the task did not have)`; for ids the answering version removed, `contract-gap (the user's answer, link {link}, names {C}, which the answering contract v{m} removes)`; when both kinds occur, the second clause is joined to the first: `... did not have, and {C'}, which the answering contract v{m} removes)` |
 | contract-gap (words) | `contract-gap (the user's words say "{word}")` |
-| untyped | `untyped (no rule matched)`, `untyped (the user said it is no lasting rule)` or, for 10's fallback, `untyped (the contract could not be read: {error})` |
+| untyped | `untyped (no rule matched)`, `untyped (the user said it is no lasting rule)` or, for the fallbacks, `untyped (the contract could not be read: {error})` (section 10) and `untyped (the contract could not be read: contract v{n} is not stored)` (5.1) |
+
+`{C}` lists the rule's criteria, comma-joined in named order.
 
 Then, when present: `; also {types}` and `; your relayed rework {id} delivered after it and before the verdict: the user may have judged
 that version`. `{path}` is the org-relative artifact path, rendered with `reflection.shown_name` (an artifact path is agent-written text).
@@ -299,14 +332,20 @@ The view's header always says which applied.
 
 **Repeat** (`repeat_alarm(record, t)`, pure). The last `repeat_window` judged cases. The subjects of a case are, for each counted human-tier
 reject `v` of its deliveries with assertion `a`: `a.id`, every `C<k>` of `v.confirmed`, every id of `a.about`, and the `R<j>` ids of `v.links`
-when `v.links_tier == "human"` (`none` excluded). A subject in at least `repeat_failures` of the window's cases fires the alarm. A criterion
-that only a relayed reading names (the rejection's own `criterion`, or a relayed link) is never a subject; such links are listed as `not
-counted`. A rejection not on a delivery gives no subject. States: `fires`, `no`, `n/a ({k} of {min_judged} judged cases)`, and for root's
-one-off tasks `does not apply (one-off tasks name no criterion ids)`.
+when `v.links_tier == "human"` (`none` excluded). A subject in at least `repeat_failures` of the window's cases fires the alarm; when several
+fire, each is listed. Fired subjects, and the `counted` list of the `no` state, are ordered `R` ids first, then `C` ids, each by number (E3:
+`R1, R2, C11`). A criterion that only a relayed reading names (the rejection's own
+`criterion`, or a relayed link) is never a subject; such links are listed as `not counted`, under every state (also `n/a`), so the user
+always sees which readings the alarm ignored: those of the window's cases, and below `min_judged` those of every judged case. A rejection not on a delivery gives no subject. States: `fires`, `no`, `n/a ({k} of
+{min_judged} judged cases)`, and for root's one-off tasks `does not apply (one-off tasks name no criterion ids)`.
 
-**Cost** (`cost_alarm(record, t)`, pure). Evaluated once the record has `min_judged` judged cases; fires for every case of the record (any
-state) with `Fraction(case_spend(case)) > t.cost_ratio * approved` (exact, no division: 0a.1 section 13). A case whose approved budget is 0
-or below, or whose runs are not counted (4.1), is skipped and named. The alarm compares with the approved budget only: top-ups (human
+**Cost** (`cost_alarm(record, t)`, pure). A case of the record (any state) is **skipped**, and named with its reason, when its approved budget
+is 0 or below (`budget 0`) or its runs are not counted (`runs not counted`, 4.1); every other case is **compared**. `n` is the number of
+compared cases. The alarm is evaluated once the record has `min_judged` judged cases; it then fires for every compared case with
+`Fraction(case_spend(case)) > t.cost_ratio * approved` (exact, no division: 0a.1 section 13), reads `no (0 of {n} cases above
+{cost_ratio}x)` when none does, and reads `n/a (0 of 0 cases compared)` when `n == 0` (JSON `state: "n/a"`, `compared: 0`): nothing was
+compared, so it is never `no`. A continued service whose old cases all predate the re-hire (0a.2 section 22) and E2's files (19.3) are such
+records. The skipped cases are listed under every state. The alarm compares with the approved budget only: top-ups (human
 reworks, relayed reworks, unrecorded reworks, grants), relayed runs and credited runs are shown beside it (go/no-go item 3, the gate's item 5).
 Each case line shows its ratio whatever the alarm says, and `case_total` keeps warning at 1.0x on any case, so the user is told of an
 overspend before three cases are judged. `over_cost(case, approved, ratio) -> bool` is the per-case predicate the alarm applies; 19.4 tests it
@@ -328,13 +367,15 @@ them and no mark says "improved".
 | top-up | the cases (4.2) | case, task or note id, amount, kind | `top-up +{n} run(s) to case {case}: {human rework {id} \| your relayed rework {id} (your own spend) \| rework {id} (tier not recorded) \| your grant {id}}` |
 
 **Contract marks.** v1: `contract v1 ({ids})`. A later version: `contract v{n} ({by}): adds {ids}; removes {ids}` (each part only when
-non-empty; `criteria unchanged` when neither), then its basis:
+non-empty, `adds` first; `criteria unchanged` when neither; the added ids in the order of the version's acceptance list and the removed ids in
+the order of the version before it, as `services._criteria.amendment_ids` gives them), then its basis, whose per-id parts follow the order
+of the added ids:
 - `answers` set (0a.2 P2): `: the user's answer to {R}`, then per added id `{id} confirmed (link {link})` when `confirmed_criteria(cases,
   criteria)` names it (for an answered version only the human link on that rejection counts: 0a.2's rule), else `{id} not confirmed (the link
   was not recorded)` (0a.2 DR-30: the product's link write can fail after the contract);
 - `initiated: user`: `: asked for by the user on their own: {ids} user-initiated (never admit a playbook revision)`;
-- a root version without either (written before 0a.2): per added id, `confirmed (link {id})` when `confirmed_criteria` names it (0a.1's rule),
-  else `not confirmed`; the mark ends `: not confirmed` when none is;
+- a root version without either (written before 0a.2): per added id, `{id} confirmed (link {link})` when `confirmed_criteria` names it (0a.1's
+  rule), else `{id} not confirmed`; the mark ends `: not confirmed` instead when none is;
 - `defined_by` an agent: `: by {agent}, an agent client (its verdicts are hypotheses)`.
 
 **Playbook marks.** `playbook v{n} ({by})`, then:
@@ -363,17 +404,21 @@ MCP text.
 `GitBarHistory(history: OrgHistory, clock: Clock)`:
 1. `history.changes([f"{a}/AGENT.md" for a in addrs] + ["ORG.md"], limit=40)` (new `OrgHistory` method, 12.3): `(commit, committed time,
    path)` per changed path, newest first, at most 40 commits; `None` without a repository or git.
-2. For each path, consecutive listed versions (newer, older): `history.text(commit, path, 65536)` of each (memoized per pair). AGENT.md:
-   bodies differ (after `kernel.split_frontmatter`) -> a charter mark; frontmatter `model` differs (stripped, `""` shown as `the org
-   default`) -> a model mark. ORG.md: `settings.config_default_model(meta)` or `settings.config_effort(meta)` differs (the same readers the
-   runtime uses, so `null`, empty and missing compare as the default) -> a model mark. A `text` that returns `None` (the file is above 64 KiB at
-   that commit, or cannot be read) gives no mark for that pair and counts in `skipped`. The oldest listed version of a path has no predecessor
+2. For each path, consecutive listed versions (newer, older): `history.text(commit, path, 65536)` of each (memoized per version), decoded
+   strictly as UTF-8 and split with `kernel.split_frontmatter` (the parser `settings` applies to ORG.md). AGENT.md: bodies differ -> a
+   charter mark; frontmatter `model` differs (stripped, `""` shown as `the org default`) -> a model mark. ORG.md: `settings.config_default_model(meta)`
+   or `settings.config_effort(meta)` differs (the same readers the runtime uses, so `null`, empty and missing compare as the default) -> a
+   model mark. A version is **not compared** when `text` returns `None` (the file is above 64 KiB at that commit, or cannot be read), when its
+   bytes are not UTF-8, or when its frontmatter does not parse (PyYAML may be imported only by `kernel` and `blueprint`, import-linter
+   contract `yaml-only-where-needed`, so the adapter follows the repository's pattern for YAML errors, `except Exception:  # noqa: BLE001 -
+   not UTF-8, or YAML that does not parse`, around the decode and the split only, as `agents/_budget.py` and `mail/_index.py` do). Such a
+   version gives no mark for either pair it belongs to and counts once in `skipped`. The oldest listed version of a path has no predecessor
    in the list: no mark (its creation, or beyond the bound; `truncated=True` when the list was full).
 3. A bound of 5 s of git time per call (`Clock.monotonic`, read before each read) and 2 s per git subprocess; past it the rest is not read and
    `truncated=True`.
 The result is `BarChanges(known: bool, marks, truncated: bool, skipped: int)`. `known=False` renders `charter edits and model changes:
 unknown (no org history: the organization is not a git repository, or git is missing)`; `truncated` adds `(the newest 40 commits were
-read)`; `skipped` adds `({k} version(s) not compared: larger than 64 KiB or unreadable)`. Charter and model marks are listed in the block of
+read)`; `skipped` adds `({k} version(s) not compared: larger than 64 KiB, unreadable or not parseable)`. Charter and model marks are listed in the block of
 every service whose owner subtree contains the addr (ORG.md marks in every block), and in the one-off block for the assignees' subtrees. A
 retired agent's AGENT.md moved under `.retired/` is not followed (section 26).
 
@@ -399,7 +444,7 @@ Agents' `feedback` is unchanged: an agent's non-service task is refused with tod
 **The provenance rules from day one** (go/no-go item 6):
 - `source` defaults to `relayed` on root's MCP `feedback` (its signature already says `source="relayed"`) and on `Org.feedback` (its
   `source=None` is stamped `relayed` by `dispatch.provenance_source`, unchanged). The CLI keeps its default `--source human`
-  (`cli/_commands_services.py:143`), because the terminal is the user's own seat.
+  (`cli/_commands_services.py:143`), because the terminal is the user's own seat; this departs from go/no-go item 6 (D24).
 - The user's words are verbatim: the docstring and the skill say so; the product cannot check it (declared provenance, section 26).
 - The reply names the next step (8.2). Because a one-off has no contract to fall back on, a relayed one-off verdict counts as no verdict in
   `quality`, and the reply says so.
@@ -419,7 +464,8 @@ The CLI prints the same step after its own receipt line, as it does for service 
 
 - **ONE-OFF-UNKNOWN** (root only; replaces today's text for root): `` refused: {task_id} is not a task you sent: feedback records the user's
   verdict on one of your service requests or one-off tasks that has a result. Your newest: {up to 10 ids, newest first, or "none"}. Nothing
-  was recorded. `` Agents keep today's text.
+  was recorded. `` The ids are root's sent tasks that have a result in root's received boxes, service requests (and reworks) and one-off tasks
+  alike, by id, newest first. Agents keep today's text.
 - **ONE-OFF-NO-LINK**: `refused: {task_id} is a one-off task: it has no contract, so its verdict names no criterion and answers no rejection.
   Leave out criterion and confirms (CLI: --criterion, --confirms). Nothing was recorded.`
 - **ONE-OFF-GONE**: `refused: {to}, who did {task_id}, was retired, so the verdict has no one to tell. Nothing was recorded.`
@@ -447,7 +493,8 @@ one-off hand-edit note by a verdict (unchanged; backlog, section 23); `delivered
 | CLI | `hirearchy quality [service] [--json]` | the terminal (the user's seat) | `SRC/cli/_commands_views.py:QualityCommand(session, report: Provider[QualityReport], out)` |
 | Python | `progress.QualityReport.quality_text(service=None) -> str`, `.quality_data(service=None) -> JsonObject` | app, tests | `SRC/progress/_quality.py:DerivedQualityReport` |
 
-The MCP text and the CLI text are the same string. `--json` prints `quality_data` with `json.dumps(indent=2, sort_keys=True)`; it exists
+The MCP text and the CLI text are the same string. `--json` prints `quality_data` with `json.dumps(data, indent=2, sort_keys=True)` and a
+newline (ASCII output: a non-ASCII character is a `\uXXXX` escape, as in the CLI's other `--json` views); its schema is 9.4. It exists
 for the study harness (section 20), scripts, and the user who wants a playbook version's changed lines (section 7). In setup mode (no org
 bound) the MCP tool returns `SetupMode.state()`, like `progress`.
 
@@ -477,40 +524,62 @@ tests pin the totals, and a needle test pins the line.
 
 ### 9.2 The text (`SRC/progress/_quality_render.py`, pure)
 
-Order: header, notes, one block per service root requests (top-level agents' services, by owner then name), the one-off block, the line for
-nested services, the moved-past section. With `service`, only that service's blocks (every owner offering that name) and no one-off block.
-In the template, `{...}` parts in braces are shown only when non-empty or non-zero; `|` separates alternatives.
+Order: the header block (the title line, the `Thresholds:` line, then each note of 6 and 16, one per line), one block per service root
+requests (top-level agents' services, by owner then name), the one-off block, the nested-services section, the moved-past section.
+**Layout**: exactly one blank line between two blocks or sections, none inside a block (the header block included), and no blank line at
+the start or the end of the text. In the template, `{...}` parts in braces are shown only when non-empty or non-zero, whatever the alarm's
+state; `|` separates alternatives.
+
+**Which blocks appear.**
+- `No cases yet: you have requested no service and given no task.` replaces the service blocks, the one-off block and the nested section
+  exactly when no agent offers a service (top-level or nested) and root gave no one-off task; the moved-past section follows it. A service
+  defined with no request yet renders its full block (9.3, the empty-service sample).
+- The one-off block reads `One-off tasks you gave: none.` when root gave no one-off task and some service exists.
+- The nested section is absent when no nested service exists.
+- With `service=x`: the header block, then every top-level block of a service named `x` (every owner offering that name), then, when a
+  nested service is named `x`, the nested heading with its one line or lines; no one-off block, no `No cases yet`; the moved-past section is
+  shown in full, because a held task blocks every service of its assignee. A name no agent offers is the error of section 13, which lists
+  the distinct service names, top-level ones in the view's order first, then nested ones in theirs.
 
 ```
 Quality of the work you asked for (derived from the files, nothing stored; for you and the user, never for agents).
 Thresholds: {the defaults | from ORG.md quality:} (tunable): alarms need {min_judged} judged cases; repeat: one id failing in {repeat_failures} of the last {repeat_window} judged cases; cost: a case above {cost_ratio}x its approved budget.
 {each note of 6 and 16, one per line}
 
-{service} (offered by {owner}; client: you, human; unit: case; contract v{c}, playbook v{p}; approved {budget} runs per request)
-  cases: {n} (done {d}, failed {f}, blocked {b}, open {o}, stalled {s}){; {m} blocked and moved past without a verdict}
+{service} (offered by {owner}; client: you, human; unit: case; contract v{c}, {playbook v{p} | no playbook}; approved {budget} runs per request)
+  cases: {n} (done {d}, failed {f}, blocked {b}, open {o} ({stalled {s} | stalled: unknown ({error})})){; {m} blocked and moved past without a verdict}
   first deliveries: {a} accepted, {r} rejected, {w} without a verdict{ ({x} superseded by a rework before a verdict)}{, {v} judged after a hand edit (neither)}{; {y} never delivered}
     {first-delivery line, one per case}
   judged by the user: {ratio(judged, deliveries)} deliveries; without a verdict: {u} case(s){ ({ids}): never counted as accepted}{ ({q} with only your own relayed verdict)}; hand-edited: {h}{ ({ids})}{; {k} judged after the edit: neither pass nor escape ({ids})}{ (compared with the team's current files: no org history)}
-  {legacy verdicts (no source, counted as the user's, the 0a rule): {g}}{; }{verdicts not on a delivery (on a blocked or failed result, or before the done result): {z} ({ids})}
+  {legacy verdicts (no source: read as the user's, the 0a rule): {g}}{; }{verdicts not on a delivery (on a blocked or failed result, or before the done result): {z} ({ids})}
   escapes (the team reported done, then the user rejected it): {e | none (judged: {ratio(judged, deliveries)})}
     {R} case {case id}, signed off by {signer}: {cause text of 5.3}
-  verifiers: none (every delivery was signed off by {owner} itself) | verifiers:
-    {signer}: escapes {e} of {j} judged{ ({m} reviewer-miss, {u} untyped)}{; not its: {cg} contract-gap, {re} relayed-error, {co} relayed-carry-over}; PASS precision {ratio(j - e, j)}; its FAILs before delivery: {rc} re-check(s), {rw} author rework run(s)
-  runs per case (spend = runs used, plus runs still out while a case is open or blocked; approved {budget}):
+  verifiers: none (no delivery yet) | verifiers: none (every delivery was signed off by {owner} itself) | verifiers:
+    {signer}: escapes {ratio(e, j)} judged{ ({m} reviewer-miss, {u} untyped)}{; not its: {cg} contract-gap, {re} relayed-error, {co} relayed-carry-over}; PASS precision {ratio(j - e, j)}; its FAILs before delivery: {rc} re-check(s), {rw} author rework run(s)
+  runs per case (spend = runs used, plus runs still out while a case is open or blocked; approved {budget}):{ none}
     {case id} "{title}": {spend} ({x.xx}x){, {k} in your relayed reworks}{, {c} not charged (model-service throttle)}; top-ups: {none | +{n} human rework {id}, +{n} your relayed rework {id}, +{n} rework {id} (tier not recorded), +{n} your grant {id}}{; window cut by a later request}
     {case id} "{title}": runs not counted ({reason of 4.1}); top-ups: ...
   alarms:
-    repeat: {FIRES: {id} failed in {k} of the last {w} judged cases (cases {ids}) | no ({w} judged cases; counted: {ids or "none"}) | n/a ({k} of {min} judged cases)}{; not counted: {R}'s reading {ids} (not confirmed), ...}
-    cost: {FIRES: case {id} {spend} of {budget} ({x.xx}x){, {k} in your relayed reworks}, ... | no (0 of {n} cases above {cost_ratio}x) | n/a ({k} of {min} judged cases)}{; skipped: {ids} ({budget 0 | runs not counted})}
+    repeat: {FIRES: {id} failed in {k} of the last {w} judged cases (cases {ids}){; {id} failed in ...} | no ({w} judged cases; counted: {ids or "none"}) | n/a ({k} of {min} judged cases)}{; not counted: {R}'s reading {ids} (not confirmed), ...}
+    cost: {FIRES: case {id} {spend} of {budget} ({x.xx}x){, {k} in your relayed reworks}, ... | no (0 of {n} cases above {cost_ratio}x) | n/a (0 of 0 cases compared) | n/a ({k} of {min} judged cases)}{; skipped: {ids} (runs not counted){, {ids} (budget 0)}}
   timeline (bar changes, UTC; marked, never used to split the counts):
     {YYYY-MM-DD HH:MM} {mark of section 7}
     {charter edits and model changes: unknown (...) | none}
   run attribution is by time window (08 3.3): {k} case(s) had their window cut by a later request{; their later runs count for that request}.
 ```
+- **Counts of states**: `done`, `failed`, `blocked` and `open` partition the cases; `stalled` counts the open cases that are stalled now, so
+  it is written inside `open`'s parentheses.
+- **The verifiers line**: `none (no delivery yet)` when the record has no delivery; `none (every delivery was signed off by {owner}
+  itself)` when it has deliveries and no signer other than the owner (in the one-off block `{owner}` is the assignees, comma-joined in case
+  order); otherwise one line per signer other than the owner, by address. A signer with no judged delivery reads `escapes n/a (0 of 0)
+  judged` and `PASS precision n/a (0 of 0)`.
+- **The runs header** ends `: none` when the record has no case; otherwise it is followed by one line per case.
 - **First-delivery lines**: `{case id}: rejected: "{words}"`, `{case id}: accepted: "{words}"`, `{case id}: accepted (no words)`, `{case id}:
   no verdict{ (superseded by {human rework | your relayed rework | rework} {id}{ (tier not recorded)})}`, `{case id}: judged after a hand edit
-  (neither): the user's verdict came after the file was changed`, `{case id}: never delivered ({blocked | failed | open})`. The words are the
-  decisive verdict's.
+  (neither): the user's verdict came after the file was changed`, `{case id}: never delivered ({case state})`. The line is the first
+  delivery's (4.3: the case's delivery with the lowest step), so a case whose head was blocked and whose rework was done shows the rework's
+  outcome; `never delivered` appears only for a case none of whose tasks was delivered, with the case's state (`blocked`, `failed` or
+  `open`). The words are the decisive verdict's.
 - **The legacy and not-on-a-delivery line** is shown when either count is above 0; its two parts are joined by `; `.
 - **The no-history remark** on the `hand-edited` segment is shown when `h > 0` and the org has no history (`BarChanges.known` is false): P3
   then compared with the team's current files (0a.2 P3's no-history rule).
@@ -524,23 +593,24 @@ Thresholds: {the defaults | from ORG.md quality:} (tunable): alarms need {min_ju
 **The one-off block** has the heading `One-off tasks you gave (client: you, human; unit: case; approved budget: each task's own)` and the
 same lines as a service block, with these variants: the runs header reads `runs per case (spend = runs used, plus runs still out while a
 case is open or blocked; approved: each task's own budget):` and each case line reads `{case id} "{title}" ({assignee}): {spend} of
-{approved} ({x.xx}x)...`; an escape line reads `rejected case {case id} ({assignee}), signed off by {signer}: {cause}` (a one-off rejection is
+{approved} ({x.xx}x)...` or `{case id} "{title}" ({assignee}): runs not counted ({reason}); top-ups: ...`; an escape line reads `rejected case {case id} ({assignee}), signed off by {signer}: {cause}` (a one-off rejection is
 no `R<k>`); the repeat line reads `repeat: does not apply (one-off tasks name no criterion ids)`; the timeline has top-up marks and the
-assignees' charter and model marks (no contract or playbook mark). Without any one-off task the block is `One-off tasks you gave: none.` when
-a service exists, and absent otherwise.
+assignees' charter and model marks (no contract or playbook mark). Which of `One-off tasks you gave: none.`, the block or nothing appears is
+decided by the rules above ("Which blocks appear").
 
 **Nested services** are one line each under `Services your agents request (the client is an agent: its verdicts are hypotheses, never
-counted):` as `- {service} (offered by {owner}; client {client}): {n} case(s), {d} delivered, {v} agent verdict(s)`.
+counted):` as `- {service} (offered by {owner}; client {client}): {n} case(s), {d} delivered, {v} agent verdict(s)`, by owner then name.
 
 **The moved-past section**:
 ```
 Blocked tasks moved past without a verdict (while one stays blocked, its assignee's later results return no runs):
   {addr} {holds {n} run(s) | holds no run (budget {b}) | holds an unknown number of runs ({error})}:
-    task {id} from {you ("{title}") | {sender}}, blocked {YYYY-MM-DD HH:MM}: {moved past: {you have | {sender} has} sent {addr} {j} task(s) since | not moved past (nothing sent since)}
+    task {id} from {you ("{title}") | {sender}}, blocked {YYYY-MM-DD HH:MM}: {left blocked: {you have | {sender} has} sent {addr} {j} task(s) since | blocked, nothing sent since}
 ```
 one agent line per agent with a left-blocked task, then one line per held task of that agent, oldest block first; or `Blocked tasks moved
-past without a verdict: none.` An org with no case at all: `No cases yet: you have requested no service and given no task.` followed by the
-moved-past section.
+past without a verdict: none.` The heading keeps the gate's words; each task line says `left blocked` (moved past in the gate's sense) or
+`blocked, nothing sent since` (held, not yet moved past). A released task (`mail.moved_past`) is never listed, so the view uses "moved past"
+in one sense only.
 
 **A record that cannot be read** (13): `{service} (offered by {owner}): cannot be read ({error}).` or `One-off tasks you gave: cannot be read
 ({error}).`; the other blocks render.
@@ -553,7 +623,7 @@ Quality of the work you asked for (derived from the files, nothing stored; for y
 Thresholds: the defaults (tunable): alarms need 3 judged cases; repeat: one id failing in 2 of the last 3 judged cases; cost: a case above 1.25x its approved budget.
 
 weekly-meeting-memo (offered by lead; client: you, human; unit: case; contract v3, playbook v1; approved 15 runs per request)
-  cases: 3 (done 3, failed 0, blocked 0, open 0, stalled 0)
+  cases: 3 (done 3, failed 0, blocked 0, open 0 (stalled 0))
   first deliveries: 0 accepted, 2 rejected, 1 without a verdict (1 superseded by a rework before a verdict)
     20261021T152347923195-root-dd87: rejected: "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09. And Marta's room is for the training on the 14th, so I want 2026-10-14 t…"
     20261021T153031017749-root-207b: no verdict (superseded by your relayed rework 20261021T153213891373-root-248f)
@@ -597,7 +667,7 @@ to a missing one: 19.1).
 **E4 s1r's files, excerpt** (values in angle brackets are pinned by the replay, not restated here):
 ```
 weekly-memo (offered by lead; client: you, human; unit: case; contract v5, playbook v2; approved 15 runs per request)
-  cases: 3 (done 2, failed 0, blocked 1, open 0, stalled 0); 1 blocked and moved past without a verdict
+  cases: 3 (done 2, failed 0, blocked 1, open 0 (stalled 0)); 1 blocked and moved past without a verdict
   first deliveries: 0 accepted, 1 rejected, 2 without a verdict
     20261022T182945409755-root-ed94: rejected: "<the user's words>"
     20261022T191407596413-root-114d: no verdict
@@ -612,40 +682,43 @@ weekly-memo (offered by lead; client: you, human; unit: case; contract v5, playb
     20261022T191407596413-root-114d "<title>": 7 (0.47x); top-ups: none
     20261022T192724706946-root-2efa "<title>": 9 (0.60x); top-ups: none
   alarms:
-    repeat: n/a (1 of 3 judged cases)
+    repeat: n/a (1 of 3 judged cases); not counted: R1's reading C5 (not confirmed)
     cost: n/a (1 of 3 judged cases)
   timeline (bar changes, UTC; marked, never used to split the counts):
-    2026-10-22 18:58 contract v2 (root): adds C8, C9: C9 confirmed (link 20261022T190014222948-root-1753), C8 not confirmed
+    <the earlier marks: contract v1, playbook v1, the top-up of 9ce9>
+    2026-10-22 18:58 contract v2 (root): adds C8, C9; removes C5: C8 not confirmed, C9 confirmed (link 20261022T190014222948-root-1753)
+    <the marks in between: the top-up of 3559>
     2026-10-22 19:03 playbook v2 (lead): admitted (c) on <ids>: <k> changed line(s): <w> the cited criteria's own words, <b> beyond them
-    ... <v3, v4 (removes C9, adds C11), v5: every added criterion not confirmed>
+    <v3 (adds C10), v4 (adds C11; removes C9), v5 (adds C12, C13; removes C10): every added criterion not confirmed>
     charter edits and model changes: unknown (no org history: the organization is not a git repository, or git is missing)
   run attribution is by time window (08 3.3): 1 case(s) had their window cut by a later request; their later runs count for that request.
 
 Blocked tasks moved past without a verdict (while one stays blocked, its assignee's later results return no runs):
   lead holds 12 run(s):
-    task 20261022T190015448581-root-3559 from you ("Rework memo 2026-10-05: Summary line first, Sam's CI due date"), blocked 2026-10-22 19:11: moved past: you have sent lead 2 task(s) since
+    task 20261022T190015448581-root-3559 from you ("Rework memo 2026-10-05: Summary line first, Sam's CI due date"), blocked 2026-10-22 19:11: left blocked: you have sent lead 2 task(s) since
   lead/writer holds 4 run(s):
-    task 20261022T191728726797-lead-e679 from lead, blocked 2026-10-22 19:18: moved past: lead has sent lead/writer 1 task(s) since
-    task 20261022T193406984560-lead-808c from lead, blocked 2026-10-22 19:35: not moved past (nothing sent since)
+    task 20261022T191728726797-lead-e679 from lead, blocked 2026-10-22 19:18: left blocked: lead has sent lead/writer 1 task(s) since
+    task 20261022T193406984560-lead-808c from lead, blocked 2026-10-22 19:35: blocked, nothing sent since
 ```
 Case ed94's window is cut: its latest task (3559) is blocked, so the window runs to the next request, 114d. The writer's third blocked task,
 `...-lead-0d54`, is not listed: `...-lead-cc98` revises it, so `mail.moved_past` released it. The held figures 12 and 4 are s1r's own final
 `status` (`final-services-progress-status-health.txt` lines 31 and 34), and the FAIL counts its final health line for the checker (line 41).
 
-**A5's files, the one-off block** (A5 kept no run log, so its runs read 0: section 19):
+**A5's files, the one-off block** (A5 kept no run log, so its done, uncut case reads `runs not counted (no run log in its window)`: 4.1
+reason 3, section 19):
 ```
 One-off tasks you gave (client: you, human; unit: case; approved budget: each task's own)
-  cases: 1 (done 1, failed 0, blocked 0, open 0, stalled 0)
+  cases: 1 (done 1, failed 0, blocked 0, open 0 (stalled 0))
   first deliveries: 0 accepted, 0 rejected, 1 without a verdict (1 superseded by a rework before a verdict)
     20261017T214038108044-root-f768: no verdict (superseded by rework 20261017T215450859628-root-dfe0 (tier not recorded))
   judged by the user: 0 of 3 deliveries; without a verdict: 1 case(s) (20261017T214038108044-root-f768): never counted as accepted; hand-edited: 0
   escapes (the team reported done, then the user rejected it): none (judged: 0 of 3)
   verifiers: none (every delivery was signed off by lead itself)
   runs per case (spend = runs used, plus runs still out while a case is open or blocked; approved: each task's own budget):
-    20261017T214038108044-root-f768 "Competitor analysis of self-hosted note-taking apps" (lead): 0 of 22 (0.00x); top-ups: +4 rework 20261017T215111184137-root-00cd (tier not recorded), +4 rework 20261017T215450859628-root-dfe0 (tier not recorded), +3 your grant 20261017T215533405230-root-7620
+    20261017T214038108044-root-f768 "Competitor analysis of self-hosted note-taking apps" (lead): runs not counted (no run log in its window); top-ups: +4 rework 20261017T215111184137-root-00cd (tier not recorded), +4 rework 20261017T215450859628-root-dfe0 (tier not recorded), +3 your grant 20261017T215533405230-root-7620
   alarms:
     repeat: does not apply (one-off tasks name no criterion ids)
-    cost: n/a (0 of 3 judged cases)
+    cost: n/a (0 of 3 judged cases); skipped: 20261017T214038108044-root-f768 (runs not counted)
   timeline (bar changes, UTC; marked, never used to split the counts):
     2026-10-17 21:51 top-up +4 run(s) to case 20261017T214038108044-root-f768: rework 20261017T215111184137-root-00cd (tier not recorded)
     2026-10-17 21:54 top-up +4 run(s) to case 20261017T214038108044-root-f768: rework 20261017T215450859628-root-dfe0 (tier not recorded)
@@ -656,49 +729,136 @@ One-off tasks you gave (client: you, human; unit: case; approved budget: each ta
 f768's first delivery (`...-lead-463e`, 21:54:32) came after the rework `...-root-00cd` (21:51:11, sent while f768 was blocked), so the task
 that superseded it is `...-root-dfe0` (21:54:50), the first task sent after it. Both reworks revise f768, so the chain is f768, 00cd, dfe0.
 
-**An empty organization; an ORG.md that does not parse; no git** (lines of the header and the timeline):
+**An empty organization; an ORG.md that does not parse; no git** (the whole text):
 ```
 Quality of the work you asked for (derived from the files, nothing stored; for you and the user, never for agents).
 Thresholds: the defaults (tunable): alarms need 3 judged cases; repeat: one id failing in 2 of the last 3 judged cases; cost: a case above 1.25x its approved budget.
 ORG.md cannot be read (its settings block does not parse): the default thresholds are used.
+
 No cases yet: you have requested no service and given no task.
 
 Blocked tasks moved past without a verdict: none.
 ```
 
-**`--json`, abbreviated (E3)**:
-```json
-{
-  "thresholds": {"cost_ratio": "1.25", "min_judged": 3, "repeat_failures": 2, "repeat_window": 3, "source": "defaults"},
-  "notes": [],
-  "services": [{
-    "owner": "lead", "service": "weekly-meeting-memo", "client": "root", "client_kind": "human", "unit": "case", "error": "",
-    "contract": 3, "playbook": 1, "budget": 15,
-    "cases": [{"id": "20261021T152347923195-root-dd87", "state": "done", "stalled": false, "tasks": 2, "runs": 12, "spend": 12, "ratio": 0.8,
-               "relayed_runs": 0, "credited": 0, "cut": false, "runs_unknown": "",
-               "top_ups": {"granted": 0, "human": 6, "relayed": 0, "unrecorded": 0},
-               "first": {"outcome": "rejected", "tier": "human", "superseded_by": null}}],
-    "deliveries": {"total": 6, "judged": 5, "superseded": 1, "without_verdict": [], "relayed_only": [], "hand_edited": [], "voided": [],
-                   "legacy_verdicts": 0, "not_on_a_delivery": []},
-    "escapes": [{"assertion": "R1", "case": "20261021T152347923195-root-dd87", "task": "20261021T152347923195-root-dd87", "signer": "lead/reviewer",
-                 "cause": "contract-gap", "rule": "words", "rules": ["words"], "detail": ["always"], "also": [], "before_verdict": "",
-                 "attribution": "not its", "class": null}],
-    "verifiers": [{"addr": "lead/reviewer", "judged": 5, "escapes": {"counted": {}, "not_its": {"contract-gap": 2}},
-                   "pass_precision": [5, 5], "rechecks": 2, "rework_runs": 2}],
-    "alarms": {"repeat": {"state": "no", "judged": 3, "subjects": {"C11": 1, "R1": 1, "R2": 1}, "not_counted": {"R1": ["C6", "C3"]}},
-               "cost": {"state": "no", "judged": 3, "cases": [], "skipped": []}},
-    "timeline": [{"kind": "contract", "when": "2026-10-21T15:27:53Z", "version": 2, "by": "root", "adds": ["C9", "C10"], "removes": ["C3", "C6"],
-                  "basis": "legacy", "confirmed": []}],
-    "history": {"known": false, "truncated": false, "skipped": 0}
-  }],
-  "one_off": null,
-  "nested": [],
-  "moved_past": []
-}
+**A service defined with no request yet** (the whole text). The fixture is an fs world at the golden clock's start (`golden_support.START`,
+2026-01-15 09:00 UTC) with one top-level agent `lead` offering `weekly-report`: contract v1 defined by root at that time with two acceptance
+criteria and budget 10, playbook v1 written by root with it (no `admitted`), no task of root at all, no git:
 ```
-`state` values: `fires`, `no`, `n/a`, `does not apply`. `ratio` is `null` when the approved budget is 0 or the runs are not counted.
-`one_off` is `null` when root gave no one-off task. A playbook mark carries `cited`, `lines`, `lines_more` and `agent_written` (section 7).
-`cost_ratio` is the decimal as written (a string), so the JSON is exact.
+Quality of the work you asked for (derived from the files, nothing stored; for you and the user, never for agents).
+Thresholds: the defaults (tunable): alarms need 3 judged cases; repeat: one id failing in 2 of the last 3 judged cases; cost: a case above 1.25x its approved budget.
+
+weekly-report (offered by lead; client: you, human; unit: case; contract v1, playbook v1; approved 10 runs per request)
+  cases: 0 (done 0, failed 0, blocked 0, open 0 (stalled 0))
+  first deliveries: 0 accepted, 0 rejected, 0 without a verdict
+  judged by the user: n/a (0 of 0) deliveries; without a verdict: 0 case(s); hand-edited: 0
+  escapes (the team reported done, then the user rejected it): none (judged: n/a (0 of 0))
+  verifiers: none (no delivery yet)
+  runs per case (spend = runs used, plus runs still out while a case is open or blocked; approved 10): none
+  alarms:
+    repeat: n/a (0 of 3 judged cases)
+    cost: n/a (0 of 3 judged cases)
+  timeline (bar changes, UTC; marked, never used to split the counts):
+    2026-01-15 09:00 contract v1 (C1, C2)
+    2026-01-15 09:00 playbook v1 (root): written by the client (no admission needed)
+    charter edits and model changes: unknown (no org history: the organization is not a git repository, or git is missing)
+  run attribution is by time window (08 3.3): 0 case(s) had their window cut by a later request.
+
+One-off tasks you gave: none.
+
+Blocked tasks moved past without a verdict: none.
+```
+The block is the service's own: a defined service with no request is never `No cases yet` (9.2, "Which blocks appear"). Both empty samples
+are goldens (22) and are among the cases of I3's parametrized renderer test (17 item 1).
+
+**`--json` (E3)**: the full output on E3's files is the replay golden `tests/golden/expected/quality/e3.json` (19.3 E3-8), with the schema of
+9.4. Each count in it equals the figure of the E3 text above that 9.4's source column names, and its ids and times are those of E3's files;
+its bytes are `json.dumps(data, indent=2, sort_keys=True)` of that content.
+
+### 9.4 The JSON schema (`quality_data`, `quality --json`)
+
+Every key is always present (a record with `error` keeps its heading keys, `owner` to `unit`, and has every other key at its empty value: `0`,
+`""`, `[]`, `{}` or `null` as the table says). The JSON carries every case, escape, mark and id: the text's limits (9.2 "Limits") do not apply.
+Times are UTC strings, `YYYY-MM-DDTHH:MM:SSZ` (type `time` below). Ids are full message ids. `ratio` values are the two-decimal string the
+text shows (`"0.93"`), never a float. Agent-written strings appear only where the table says `agent-written` (the playbook lines); paths,
+model names and titles are the stored strings (the text, not the JSON, goes through `shown_name` and `clip_line`, I8). A change of shape
+raises `schema`.
+
+| Object | Key | Type | Empty or null rule | Source (text of 9.2) |
+|---|---|---|---|---|
+| top level | `schema` | int | always `1` | - |
+| | `thresholds` | `{min_judged: int, repeat_window: int, repeat_failures: int, cost_ratio: str, source: "defaults" \| "ORG.md"}` | - | `Thresholds:` line (`cost_ratio` as written) |
+| | `notes` | `[str]` | `[]` | the notes of the header block, in order |
+| | `services` | `[record]` | `[]` | the top-level service blocks, in the view's order; with `service=x` those named `x` |
+| | `one_off` | `record \| null` | `null` when root gave no one-off task, and always with `service` | the one-off block |
+| | `nested` | `[{owner: str, service: str, client: str, cases: int, delivered: int, agent_verdicts: int, error: str}]` | `[]` | the nested lines; with `service=x` those named `x` |
+| | `moved_past` | `[{addr: str, held: int \| null, held_error: str, error: str, tasks: [held task]}]` | `[]`; `held` null when `held_error` (or `error`) is set | the moved-past section, one object per agent line |
+| held task | `id`, `sender` | str | - | the task line |
+| | `title` | `str \| null` | `null` unless the sender is root (root's own title, I8) | `you ("{title}")` |
+| | `blocked` | time | - | `blocked {time}` (the blocked result's) |
+| | `left_blocked`, `sent_since` | bool, int | `sent_since` 0 when not left blocked | `left blocked: ... {j} task(s) since` / `blocked, nothing sent since` |
+| record | `owner`, `service` | str | `""` for the one-off record | the block's heading |
+| | `client`, `client_kind`, `unit` | str | `client` `"root"`, `client_kind` `"human"`, `unit` `"case"` | heading |
+| | `error`, `hand_edits`, `stalled_error` | str | `""` unless the part cannot be read (13) | `cannot be read ({error})`, `hand-edited: unknown ({error})`, `stalled: unknown ({error})` |
+| | `contract`, `playbook` | int | `0` for the one-off record; `playbook` `0` when there is none | `contract v{c}, playbook v{p}` / `no playbook` |
+| | `budget` | `int \| null` | `null` for the one-off record (each task's own) | `approved {budget} runs per request` |
+| | `cases` | `[case]` | `[]` | `cases:` line and the runs lines, oldest first |
+| | `first_deliveries` | `{accepted: int, rejected: int, no_verdict: int, superseded: int, neither: int, never_delivered: int}` | zeros | `first deliveries:` line |
+| | `deliveries` | `{total: int, judged: int, unjudged_cases: [id], relayed_only: [id], hand_edited: [{case, task}], neither: [{case, task}], legacy_verdicts: int, not_on_a_delivery: [id]}` | zeros and `[]` | `judged by the user:` and the legacy line (`unjudged_cases`, `relayed_only`: case ids; `not_on_a_delivery`: verdict note ids) |
+| | `escapes` | `[escape]` | `[]` | the escape lines, oldest first |
+| | `verifiers` | `[verifier]` | `[]` (both `none (...)` texts; `deliveries.total` tells which) | `verifiers:` lines, by address |
+| | `alarms` | `{repeat: repeat, cost: cost}` | - | `alarms:` |
+| | `timeline` | `[mark]` | `[]` | the timeline lines, oldest first, all of them |
+| | `history` | `{known: bool, truncated: bool, skipped: int}` | `BarChanges` | the charter and model line and its remarks |
+| case | `id`, `title`, `assignee` | str | `assignee` is the owner for a service case | the case line |
+| | `state` | `"done" \| "failed" \| "blocked" \| "open"` | - | `cases:` counts |
+| | `stalled` | `bool \| null` | `null` when the record's `stalled_error` is set | `stalled {s}` |
+| | `tasks`, `approved` | int | - | the case line (`of {approved}` in the one-off block) |
+| | `runs`, `credited`, `relayed_runs`, `spend` | `int \| null` | `null` when `runs_unknown` is set | the case line (`{spend}`, `{k} in your relayed reworks`, `{c} not charged`) |
+| | `ratio` | `str \| null` | `null` when the approved budget is 0 or below, or `runs_unknown` is set | `({x.xx}x)` |
+| | `cut` | bool | - | `window cut by a later request` |
+| | `runs_unknown` | str | `""` when counted | `runs not counted ({reason})` |
+| | `top_ups` | `[{id: str, source: "human" \| "relayed" \| "unrecorded" \| "granted", amount: int}]` | `[]` | `top-ups:` (id order) |
+| | `first` | `{task: str, outcome: "accepted" \| "rejected" \| "neither" \| "none", superseded_by: str \| null, superseded_source: "human" \| "relayed" \| "unrecorded" \| null} \| null` | `null` when the case was never delivered | the first-delivery line (4.3: the lowest-step delivery) |
+| escape | `assertion` | `str \| null` | `null` in the one-off record | `R<k>` |
+| | `case`, `task`, `verdict`, `signer` | str | - | the escape line (`task`: the rejected delivery's task; `verdict`: the decisive verdict's note id) |
+| | `cause`, `rule` | str | one of `CAUSES`; a rule of `Cause.rule` | the cause text of 5.3 |
+| | `rules`, `detail`, `also` | `[str]` | `[]` | `Cause.rules`, `Cause.detail` (strings, 5.1), `Cause.also` |
+| | `before_verdict` | str | `""` | `; your relayed rework {id} delivered after it ...` |
+| | `attribution` | `"counted" \| "not its"` | - | the verifier line |
+| | `class` | `"off_spec" \| null` | `null` unless `reviewer-miss` | `failure_class` (4.4) |
+| verifier | `addr`, `judged` | str, int | - | `{signer}: escapes {ratio(e, j)} judged` |
+| | `escapes` | `{counted: {cause: int}, not_its: {cause: int}}` | `{}` per part | `({m} reviewer-miss, {u} untyped)`, `not its: ...` |
+| | `pass_precision` | `[int, int]` | `[0, 0]` when `judged` is 0 | `PASS precision {ratio}` |
+| | `rechecks`, `rework_runs` | `int \| null` | `null` when `fails_error` is set | `its FAILs before delivery:` |
+| | `fails_error` | str | `""` | `its FAILs before delivery: unknown` |
+| repeat | `state` | `"fires" \| "no" \| "n/a" \| "does not apply"` | - | `repeat:` |
+| | `judged` | int | judged cases of the record | `n/a ({k} of {min} judged cases)` |
+| | `window` | `[id]` | `[]` below `min_judged` | the last `repeat_window` judged cases |
+| | `subjects` | `{id: int}` | `{}` | cases per subject in the window |
+| | `fired` | `[id]` | `[]` | `FIRES: ...` (6's order) |
+| | `not_counted` | `{R: [C ids]}` | `{}`; present under every state | `not counted: {R}'s reading ...` |
+| cost | `state` | `"fires" \| "no" \| "n/a"` | - | `cost:` |
+| | `judged`, `compared` | int | `compared` is 6's `n`, the cases not skipped, under every state | `n/a ({k} of {min} judged cases)`, `n/a (0 of 0 cases compared)`, `no (0 of {n} ...)` |
+| | `cases` | `[{case: str, spend: int, approved: int, ratio: str, relayed_runs: int}]` | `[]` | `FIRES: case ...` |
+| | `skipped` | `[{case: str, reason: "budget 0" \| "runs not counted"}]` | `[]`; present under every state | `; skipped: ...` |
+| contract mark | `kind`, `when`, `version`, `by` | `"contract"`, time, int, str | - | `contract v{n} ({by})` |
+| | `adds`, `removes` | `[id]` | v1: every id in `adds` | `adds ...; removes ...` |
+| | `basis` | `"first" \| "answers" \| "user" \| "legacy" \| "agent"` | - | the basis of section 7 |
+| | `answers` | `str \| null` | `null` unless `basis` is `answers` | `the user's answer to {R}` (the `R<k>`) |
+| | `confirmed`, `not_confirmed` | `[{id, link}]`, `[id]` | `[]` | per added id |
+| playbook mark | `kind`, `when`, `version`, `by` | `"playbook"`, time, int, str | - | `playbook v{n} ({by})` |
+| | `basis`, `restores` | `"c" \| "b" \| "first" \| "restore" \| "client" \| "legacy"`, `int \| null` | `restores` null unless `restore` | the basis of section 7 |
+| | `evidence`, `evidence_other` | `[id]`, int | `[]`, 0 | `on {cited ids}` and `and {k} other id(s)` |
+| | `changed`, `removed` | int | - | `{k} changed line(s)`, `{r} line(s) removed` |
+| | `own_words`, `beyond`, `tagged`, `untagged` | `int \| null` | the first two for `c`, the last two for `b`, else `null` | the counts of section 7 |
+| | `cited` | `[{id: str, text: str}]` | `[]` | the cited criteria's texts (the client's own) |
+| | `lines`, `lines_more`, `agent_written` | `[{text: str, own_words: bool}]`, int, `true` | `[]`, 0 | agent-written, JSON only (section 7, D22) |
+| charter mark | `kind`, `when`, `addr`, `commit` | `"charter"`, time, str, str | - | `{addr}: charter edited (commit ...)` |
+| model mark | `kind`, `when`, `addr`, `key`, `before`, `after`, `commit` | `"model"`, time, str (`"ORG.md"` for ORG.md), `"model" \| "default_model" \| "effort"`, str, str, str | `before`/`after` `""` = the org default | `{addr}: model ...`, `ORG.md: ...` |
+| top-up mark | `kind`, `when`, `case`, `id`, `source`, `amount` | `"top-up"`, time, str, str, as in `top_ups`, int | - | `top-up +{n} run(s) to case ...` |
+
+`stalled_error`, `fails_error` and `held_error` are new beside 13's texts so a script can tell "0" from "unknown". A test checks every replay
+corpus's `quality_data` against this table (keys, types, null rules) and, for E3, every count against its text figure (19.3 E3-8).
 
 ## 10. Health rebased on typed escapes (go/no-go section 3, F-E3-10)
 
@@ -713,11 +873,13 @@ not import `reflection` (graph 2.2), so the conversion lives in `app`.
   deliveries of the owner's services' cases and of root's one-off cases assigned to it, and `unknown`) into `Signed`, calling
   `reflection.attribution(cause)` for each escape.
 - `CaseRecords.deliveries(owner)` reads no deliverable folder and counts no runs (hand edits are a quality-view input only: D7). Per service of
-  the owner it builds the cases and the carried criteria sets; when the contract or its stored versions cannot be read (`OrgError`/`OSError`
-  from `ServiceCatalog.read_contract` or `ContractVersions.versions`), it builds that service's cases from the mailboxes alone (the chain
-  builder with `since=None`), types every escape `Cause("untyped", "unreadable", (clip_line(error, 200),))` (counted: the conservative side,
-  so no escape disappears from a verifier's count) and adds `{service}: {error}` to `OwnerDeliveries.unknown`. A mailbox that cannot be read
-  raises, as health does today.
+  the owner it reads the contract and its stored versions (12.1's read rule), builds the cases with `CaseHistory.chains(owner, service,
+  since=contract.created, runs=False)` and the carried criteria sets; root's one-off cases assigned to the owner come from
+  `CaseHistory.one_off_cases(runs=False)`. When the contract or its stored versions cannot be read (`OrgError`/`OSError` from
+  `ServiceCatalog.read_contract` or `ContractVersions.versions`, or a file among them that does not parse), it builds that service's cases from
+  the mailboxes alone (`CaseHistory.chains(owner, service, since=None, runs=False)`), types every escape `Cause("untyped", "unreadable",
+  (clip_line(error, 200),))` (counted: the conservative side, so no escape disappears from a verifier's count) and adds `{service}: {error}`
+  to `OwnerDeliveries.unknown`. A mailbox that cannot be read raises, as health does today.
 - `SRC/health/_escapes.py:MailEscapeCounter` gets `deliveries: SignedDeliveries` as its 5th collaborator and loses `_deliveries`; `counts(addr)`
   keeps today's composition (the owner's deliveries, plus the parent's deliveries `addr` signed off when the parent is not root) and:
   - `judged` = deliveries with `judged`: a human-tier verdict after the delivery's `done` result (today's timing rule), now including relayed
@@ -746,7 +908,8 @@ not import `reflection` (graph 2.2), so the conversion lives in `app`.
 
 ## 11. Ride-alongs (go/no-go section 3, followups item 3)
 
-The go/no-go's stale-installed-skill item is already done (0a.1; `followups.md` "Status after 0a.1"), so it is not repeated here.
+The go/no-go's stale-installed-skill item is already done (0a.1; `RESEARCH/phase-0a/followups.md`, that is
+`/Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a/followups.md`, "Status after 0a.1"), so it is not repeated here.
 
 ### 11.1 Show all plan checks up to 10 (F-E3-8)
 
@@ -766,7 +929,8 @@ Section 10.
 - line 98 (step 5.6): `6. A service request: after the delivery ask ONE short question` becomes `6. A service request (a one-off task:
   record only a verdict the user states, no question, no criterion): after the delivery ask ONE short question`, re-wrapped within
   lines 98-100 by shortening `"keep it" / "what's wrong"` to `"keep it"/"what's wrong"` and joining one short line.
-The planner measures both lines against the line-length rule the skill tests apply and records the result.
+No line-length rule applies to SKILL.md: the skill tests cap only the file, at 125 lines (its longest line has 317 characters today). The
+planner checks the 125-line cap after both edits and records the line count.
 
 ### 11.4 Owner prompt growth
 
@@ -775,6 +939,7 @@ Phase 1. No product change.
 
 ### 11.5 The flaky golden screen test (followups item 3; a plan item)
 
+Source: item 3 of `/Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a/followups.md` (untracked, in the main checkout only).
 `SRC/dashboard/tests/test_golden_screens.py::test_a_screen_is_what_its_golden_says[given_queries-narrow-2-workflows]` failed once
 under a full `check.sh` and passed alone and on a rerun. The plan item, done first in its FEAT and test-first:
 1. Reproduce: run the module's capture of `narrow-2-workflows` (`_screens.demo_screens`) in a loop of at least 200 captures under CPU load (a
@@ -799,7 +964,8 @@ and its "reads" column gains the org's git history of `*/AGENT.md` and `ORG.md` 
   `TopUpMark`, `ServiceRecord`, `OwnerDeliveries`, `RepeatAlarm`, `CostAlarm`, `QualityThresholds`; the type alias `Mark`; constants `CAUSES`,
   `FAILURE_CLASSES`, `LASTING_WORDS`, `QUALITY_DEFAULTS`; pure functions `signer_of`, `deliveries_of`, `unjudged_cases`, `not_on_a_delivery`,
   `judged_cases`, `cause_of`, `attribution`, `failure_class`, `repeat_alarm`, `cost_alarm`, `over_cost`, `quality_thresholds`;
-  `CaseHistory.one_off_cases()` (3 -> 4 methods); the `DeliverableFinding` fields `written: int = 0`, `settled: bool = False`;
+  `CaseHistory.chains(owner, service, *, since, runs)` and `CaseHistory.one_off_cases(*, runs=True)` (4.1; 3 -> 5 methods, within R7's 8);
+  the `DeliverableFinding` fields `written: int = 0`, `settled: bool = False`;
   `DeliverableChecks.findings(actor, service=None, *, settled=False)`. `shown_name` (already imported into `api.py` from `_deliverables`) is
   added to `__all__`, so `reflection/__init__.py` re-exports it (R1) and `progress._quality_render` can use it.
 - New Protocol `CaseRecords` (2 methods):
@@ -825,16 +991,44 @@ and its "reads" column gains the org's git history of `*/AGENT.md` and `ORG.md` 
   delivery, oldest first), `superseded: str = ""`, `edited_at: int = 0`, `edited: bool = False`; properties `counted: tuple[Verdict, ...]`,
   `voided: tuple[Verdict, ...]`, `judged: bool`, `escape: bool`, `decisive: Verdict | None`, `outcome: str`.
 - `OwnerDeliveries` (frozen): `deliveries: tuple[Delivery, ...]`, `causes: tuple[Cause | None, ...]` (parallel), `unknown: str`.
-- `_cases.py`: one private chain builder serves `cases` and `one_off_cases` (`since`, `count_runs`); it fills the new fields from one
-  `RunCounter.stamps` call per case, and `runs_unknown` from `agents.exists` and `CharterReader.charter(addr)[0].get("created")`.
+- `_cases.py`: `DerivedCaseHistory(catalog, agents, mail, words, timelines, counter, charters: CharterReader)`: the 7th collaborator is
+  `agents.CharterReader` (reflection already depends on `agents`, so no edge is added). One private chain builder serves `chains` (and
+  `cases` through it) and `one_off_cases`; it fills the new fields from one `RunCounter.stamps` call per case, and `runs_unknown` from
+  `agents.exists`, `CharterReader.charter(addr)[0].get("created")` and the stamps (4.1's three reasons).
+- **Reads that may not parse** (DR2-2). A file of the org whose frontmatter does not parse raises `yaml.YAMLError` out of
+  `kernel.split_frontmatter`, and one that is not UTF-8 raises `UnicodeDecodeError`; the readers `quality` calls do not catch either
+  (`agents.FsCharterReader.charter`, `services` `ServiceStore.versions` and `read_contract`, which `ServiceCatalog.read_contract`, `criteria`,
+  `playbook_versions` and `requestable_services` use). PyYAML may be imported only by `kernel` and `blueprint` (import-linter contract
+  `yaml-only-where-needed`), so the error cannot be named here. `quality` therefore treats a parse failure like `OSError` at each read it
+  makes, with the repository's pattern `except Exception as exc:  # noqa: BLE001 - yaml errors of any kind, text that is not UTF-8` (as
+  `agents/_budget.py`, `mail/_index.py` and `settings/_readable.py` do) around each collaborator call that reads files, never around the
+  rules that compute from what was read:
+  - `_records.py` makes each of its reads through one private helper that turns `OrgError`, `OSError` or any other exception of that call
+    into the record's `error`, with the text `{label}: {words}`: the label names the read (`SERVICE.md`, `the stored contract versions`,
+    `the criteria`, `the playbook versions`, `the cases`), and the words are `clip_line(str(exc), 200)` for `OrgError`/`OSError`, else
+    `does not parse ({exception type})`. The reads are the contract (`catalog.read_contract`), the criteria (`catalog.criteria`), the stored
+    versions (`versions.versions(owner, name, "SERVICE")`), the playbook versions (`catalog.playbook_versions`) and the cases
+    (`history.chains(owner, service, since=contract.created, runs=True)`, which reads the playbook timeline, and `history.one_off_cases()`;
+    their mailbox reads raise only `OrgError`/`OSError`, because the mail index already leaves a message that does not parse out).
+    `deliveries(owner)` uses the same helper for 10's fallback; its `chains(..., runs=False)` reads mail only (4.1).
+  - `_records.py` makes the P3 call through the same helper (P3's `requestable_services(ROOT)` reads every contract): a failure sets every
+    record's `hand_edits` to the error (13).
+  - `_cases.py` reads a charter's `created` with the same pattern around `charters.charter(addr)`: a charter that cannot be read or does not
+    parse gives no mark for reason (2) of 4.1, and the case's runs are counted.
+  - `app/_bar_history.py` skips a git version that is not UTF-8 or does not parse (section 7) and counts it in `skipped`.
+  - ORG.md's thresholds already come through `settings.readable_config`, which turns any failure into `OrgError(UNREADABLE)` (section 6).
+  So `quality` never raises on a file that does not parse, current or committed: the floor batch's rule that a bad ORG.md does not break a
+  read-only view, applied to every file the view reads. 18.1 and 18.2 test each read.
 - `_runs.py`: `LogRunCounter.stamps` (4.2); `runs_between` counts the uncredited stamps.
 - `_ports.py`: `RunCounter.stamps`; `ContractVersions` (`versions(owner, name, kind)`, satisfied by `services.ServiceStore`); `BarHistory`
   (`changes(addrs) -> BarChanges`) and `BarChanges`.
-- New modules: `_records.py` (`DerivedCaseRecords(history, catalog, agents, charters, mail, versions, bars, deliverables)`), `_causes.py`,
-  `_quality_rules.py` (deliveries, signers, unjudged, alarms, thresholds), `_marks.py` (contract and playbook marks).
+- New modules: `_records.py` (`DerivedCaseRecords(history: CaseHistory, catalog, agents, mail, versions, bars, deliverables)`, 7
+  collaborators: it reads no charter, `DerivedCaseHistory` does), `_causes.py`, `_quality_rules.py` (deliveries, signers, unjudged, alarms,
+  thresholds), `_marks.py` (contract and playbook marks).
 - `_steps.py`: `feedback_step` for one-off verdict notes (8.2). `_deliverable_checks.py`: `settled`, `written`. `_evidence.py`: `_words_of`
   becomes `services.criterion_words` (no behaviour change).
-- `testing.py`: `FixedCaseRecords`, `NoBarHistory`, `FixedBarHistory`; `IMPLEMENTATIONS[CaseRecords]`.
+- `testing.py`: `FixedCaseRecords`, `NoBarHistory`, `FixedBarHistory`; `IMPLEMENTATIONS[CaseRecords]`; the package's `CaseHistory` fakes
+  gain `chains` and `one_off_cases`.
 
 ### 12.2 `services`
 
@@ -874,7 +1068,8 @@ and its "reads" column gains the org's git history of `*/AGENT.md` and `ORG.md` 
   `_fail_counts.py:HealthFailCounts(counter: EscapeCounter)` (`fails(addr)` = `(counts.rechecks, counts.rework_runs)`);
   `_readable_config.py:ReadableOrgConfig(settings: OrgSettings)` (`config()` = `settings.readable_config(settings)`, which raises
   `OrgError(UNREADABLE)` for an ORG.md that does not parse).
-- Wiring: `wire_reflection.py` (`DerivedCaseRecords`), `wire_health.py` (the 5th collaborator), `wire_progress.py` (`DerivedQualityReport`),
+- Wiring: `wire_reflection.py` (`DerivedCaseRecords`, and `DerivedCaseHistory`'s new `CharterReader` collaborator), `wire_health.py` (the 5th
+  collaborator), `wire_progress.py` (`DerivedQualityReport`),
   `wire_mcp_server.py` (`QualityTools` in `root_only` after `ProgressTools`), `wire_cli.py` (`QualityCommand`).
 
 ### 12.6 Single writer and stored state
@@ -887,26 +1082,28 @@ like every verdict note (2.3 unchanged). `quality`, `health` and the timeline on
 | Operation | Failure | Recoverable? | Caller receives | Logged |
 |---|---|---|---|---|
 | `quality` (MCP) in setup mode | no org bound | yes | `SetupMode.state()` text | tool call recorded (`ToolRecorder`), no extra log |
-| `quality(service=x)` | no agent offers `x` | yes | `OrgError`: ``no service named `{x}`: the services are {names or "none"}. Call quality() without a service for everything.`` | tool call event with the error, as for every tool |
+| `quality(service=x)` | no agent offers `x` | yes | `OrgError`: ``no service named `{x}`: the services are {names or "none"}. Call quality() without a service for everything.`` (the distinct names, top-level ones first, then nested ones, each in the view's order: 9.2) | tool call event with the error, as for every tool |
 | `quality(service=x)` | `x` longer than 80 characters or not a string | yes | `OrgError`: `service is a service name (at most 80 characters): {clipped}` | same |
 | `records()` | the agents cannot be listed | yes (retry) | the `OrgError`/`OSError` propagates: no record can be built | tool call event with the error |
-| one service's record | `OrgError`/`OSError` from the catalog, the store or a mailbox while building it | yes (other records build) | `ServiceRecord(error=...)`; the block becomes `{service} (offered by {owner}): cannot be read ({error}).` | no extra log |
+| one service's record | `OrgError`/`OSError` from the catalog, the store or a mailbox while building it, or a contract or playbook file (current or stored) that does not parse (12.1's read rule) | yes (other records build) | `ServiceRecord(error=...)`; the block becomes `{service} (offered by {owner}): cannot be read ({error}).` (e.g. `SERVICE.md: does not parse (ScannerError)`) | no extra log |
 | root's one-off record | same | yes | `One-off tasks you gave: cannot be read ({error}).` | no |
-| the P3 call | the deliverable checks never raise for a folder, file or history (0a.2 6.3); a catalog or mailbox error raises | yes | every record gets `hand_edits = error`; the segment reads `hand-edited: unknown ({error})` and no verdict is voided | no |
+| `runs_unknown`'s charter read | the charter cannot be read, is not UTF-8 or its frontmatter does not parse | yes | no mark for reason (2) of 4.1; the case's runs are counted | no |
+| the P3 call | the deliverable checks never raise for a folder, file or history (0a.2 6.3); a catalog or mailbox error, or a contract that does not parse, raises | yes | every record gets `hand_edits = error`; the segment reads `hand-edited: unknown ({error})` and no verdict is voided | no |
 | thresholds | ORG.md does not parse (`OrgError(UNREADABLE)` from `ReadableOrgConfig`) | yes | defaults and the note of section 6 | no |
 | thresholds | a `quality:` value fails validation, or a key is unknown | yes | its default (or nothing) and the note | no |
 | stalled states, held runs, FAIL counts | `OrgError`/`OSError` from `TaskStates`, `BudgetQuery`, `FailCounts` | yes | the part reads `unknown ({error})` (`stalled unknown`, `holds an unknown number of runs ({error})`, `its FAILs before delivery: unknown`) | no |
 | moved-past section | a mailbox of an agent cannot be read | yes | that agent's line reads `{addr}: blocked tasks cannot be read ({error})` | no |
-| timeline git reads | no repository, no git, a timeout, the bound, a version above 64 KiB | yes | `known=False` (the unknown line), `truncated` or `skipped` | no (git errors are never raised: `OrgHistory`'s rule) |
+| timeline git reads | no repository, no git, a timeout, the bound, a version above 64 KiB, a version that is not UTF-8 or whose frontmatter does not parse | yes | `known=False` (the unknown line), `truncated` or `skipped` | no (git errors are never raised: `OrgHistory`'s rule) |
 | CLI `quality` | as above; no organization found | yes | the text, or the CLI's existing "no organization" error and exit code | the CLI's own handling |
 | one-off `feedback` | 8.3's refusals, the existing validation | yes | `OrgError` with the text; nothing written | tool call event |
 | one-off `feedback` | the note's delivery fails (`OSError`) | yes (retry) | the error; the pipeline writes the file last and atomically, so nothing half-written | as today |
 | one-off `feedback` reply step | `feedback_step` raises `OrgError`/`OSError` | yes | no step (MCP `_step`'s rule, unchanged) | no |
 | health `counts` | a mailbox cannot be read | as today | the error propagates to the health caller (MCP tool error, CLI error, the review cycle as today) | as today |
-| health `counts` | a service's contract or stored versions cannot be read | yes | that service's escapes are `untyped` (counted); root's text adds `causes unknown ({service}: {error})` | no |
+| health `counts` | a service's contract or stored versions cannot be read or do not parse | yes | that service's escapes are `untyped` (counted); root's text adds `causes unknown ({service}: {error})` | no |
 | `OrgHistory.changes` | anything | n/a | `None` or `[]`, never raises | no |
 
-Errors are never swallowed silently: each one becomes visible text in the part it affects, with the error's words (`clip_line(str(exc), 200)`).
+Errors are never swallowed silently: each one becomes visible text in the part it affects, with the error's words (`clip_line(str(exc), 200)`),
+or `does not parse ({exception type})` for a file that does not parse. `quality` never raises on a file that does not parse (12.1).
 
 ## 14. Validation of external inputs
 
@@ -934,26 +1131,33 @@ Errors are never swallowed silently: each one becomes visible text in the part i
 |---|---|---|---|
 | I1 | No count reads team-written or relayed text as client evidence | `reflection`'s pure rules (`deliveries_of`, `cause_of`, `repeat_alarm`, `judged_cases`) filter on `verdict_tier(m) == "human"`, human-tier links and the verdict-after-the-result rule | one place derives every case for `quality`, health and `services`; `progress` and health only render or compose |
 | I2 | No new stored state | the architecture tests (`ownership.py` unchanged) and a test that calls `DerivedQualityReport.quality_text`/`quality_data` and `HealthAnalyzer.org_health` with `TextHealthRenderer.render_text` directly over an fs world (no MCP or CLI layer, so no tool-call event is written) and asserts every file's path, bytes and mtime unchanged | storage rules are enforced where every writer is listed |
-| I3 | A zero denominator is never a pass | `progress._quality_render.ratio` and the alarm states (`n/a`) | the renderer is the only place rates become text |
+| I3 | A zero denominator is never a pass, and nothing compared is never `no` | `progress._quality_render.ratio` and the alarm states (`n/a ({k} of {min} judged cases)`, `n/a (0 of 0 cases compared)`) | the renderer is the only place rates become text |
 | I4 | One spend function | `reflection.case_spend`, called by `case_total` and `cost_alarm` (a test asserts equal spend on the same case) | 0a.1 put it in reflection for this purpose |
 | I5 | One cause typing and one attribution | `reflection.cause_of` and `reflection.attribution`, read by the view's verifier line directly and by health through `CaseSignedDeliveries` (a test on one world compares, per verifier, the view's counted and `not its` escapes with health's `escapes` and `not_its`; hand-edited deliveries are left out of that world, D7) | health may not import reflection; the adapter only converts |
 | I6 | One-off verdicts default to `relayed` on root's MCP tool and `Org` | `dispatch.provenance_source` (existing) and MCP root `feedback`'s default; the CLI's `human` default is the user's own seat | the sender is the single layer every write passes |
 | I7 | `quality` is root's only, and so is health's `not its` split | `mcp_server` (`root_only` group; `causes=(me == ROOT)`) and the surface goldens | the factory decides each identity's tools and texts |
 | I8 | Agent-written text never enters root's view verbatim | `progress._quality_render` (only root's titles and human-tier words are quoted; paths and model names through `shown_name`; evidence ids filtered; playbook lines only in `--json`, marked `agent_written`) | the renderer is the boundary between files and root's prompt |
-| I9 | The core is domain-agnostic | `reflection.api` vocabularies; a needle test over the new production modules matches the words `memo`, `meeting`, `code`, `test`, `pull request`, `ticket`, `research` case-insensitively as whole words (`\b...\b`, identifiers split on `_` and case changes) in identifiers and string literals | the vocabularies are the extension points packs replace |
+| I9 | The core is domain-agnostic | `reflection.api` vocabularies; a needle test over the new production modules matches the words `memo`, `meeting`, `code`, `test`, `pull request`, `ticket`, `research` case-insensitively as whole words (`\b...\b`, identifiers split on `_` and case changes) in identifiers and string literals | the vocabularies are named constants of one module, so the pack port of Phase 3 (backlog, 23) has one place to replace them |
 
 ## 16. Zero denominators, empty cases, ORG.md and git
 
-- **Rates**: judged coverage, PASS precision and every `k of n` use `ratio`; with `n == 0` they read `n/a (0 of 0)`. A ratio of spend to a
-  budget of 0 or below reads `n/a (budget 0)`, and the case is named among the cost alarm's skipped cases.
-- **Alarms** below `min_judged` judged cases read `n/a ({k} of {min} judged cases)`, never `no`; `no` needs the evaluation to have run.
-- **A service with no request**: `cases: 0 (...)`; every line after it reads `none` or `n/a (0 of 0)`; alarms `n/a (0 of 3 judged cases)`.
-- **No service and no one-off task**: the empty sample of 9.3; root's one-off block is left out when root gave none (`One-off tasks you gave:
-  none.` when a service exists).
-- **A team whose runs cannot be counted** (4.1): the case line reads `runs not counted ({reason})`, its ratio is `null`, and the cost alarm
-  skips it by name.
+- **Rates**: judged coverage, PASS precision, a verifier's escapes and every `k of n` use `ratio`; with `n == 0` they read `n/a (0 of 0)`
+  (a verifier with no judged delivery: `escapes n/a (0 of 0) judged`, `PASS precision n/a (0 of 0)`). A ratio of spend to a budget of 0 or
+  below reads `n/a (budget 0)`, and the case is named among the cost alarm's skipped cases.
+- **Alarms** below `min_judged` judged cases read `n/a ({k} of {min} judged cases)`, never `no`; `no` needs the evaluation to have run. A cost
+  alarm whose every case is skipped (`n == 0` compared cases, for example a continued service whose old cases all predate the re-hire) reads
+  `n/a (0 of 0 cases compared)`, never `no` (6).
+- **A service with no request**: its full block, the exact sample of 9.3 (`cases: 0 (...)`, `verifiers: none (no delivery yet)`, the runs
+  header ending `: none`, alarms `n/a (0 of 3 judged cases)`, its contract and playbook marks).
+- **No service and no one-off task**: `No cases yet` exactly when no agent offers a service, top-level or nested, and root gave no one-off
+  task (9.2 "Which blocks appear"; the empty sample of 9.3). Root's one-off block reads `One-off tasks you gave: none.` when a service exists
+  and root gave none.
+- **A team whose runs cannot be counted** (4.1, its three reasons, including a done or failed, uncut case with no run log in its window): the
+  case line reads `runs not counted ({reason})`, its ratio is `null`, and the cost alarm skips it by name.
 - **ORG.md that does not parse**: section 6's defaults and note; every other count still renders (none reads ORG.md, and the auxiliary parts
-  degrade per section 13).
+  degrade per section 13). A committed ORG.md or AGENT.md version that does not parse or is not UTF-8 is not compared and counts in the
+  timeline's `skipped`; a charter, contract or playbook file that does not parse degrades its part (12.1's read rule, 13). No file that does
+  not parse makes `quality` raise.
 - **No git history** (no repository, git missing): the timeline's contract, playbook and top-up marks still render (they come from
   `history/` files and mailboxes); charter and model marks read `unknown (...)`; hand edits are compared with the team's current files, which
   is 0a.2 P3's no-history rule, and the `hand-edited` segment adds `(compared with the team's current files: no org history)` whenever it
@@ -961,10 +1165,12 @@ Errors are never swallowed silently: each one becomes visible text in the part i
 
 ## 17. The four review checks, and how each passes
 
-1. **Zero denominators and empty cases.** Every rate goes through `ratio` (`n/a (0 of 0)`); alarms below the minimum read `n/a (k of 3
-   judged cases)` and never `no`; a 0 budget reads `n/a (budget 0)`; an empty service, an empty org, a corpus without run logs and a team whose
-   runs cannot be counted each have a defined text (16, 9.3). Tests: a parametrized renderer test over every rate with `n == 0`; alarm tests at
-   0, 1 and 2 judged cases; the empty sample as a golden.
+1. **Zero denominators and empty cases.** Every rate goes through `ratio` (`n/a (0 of 0)`), a verifier's escapes included; alarms below the
+   minimum read `n/a (k of 3 judged cases)` and never `no`; a cost alarm with no compared case reads `n/a (0 of 0 cases compared)`; a 0 budget
+   reads `n/a (budget 0)`; an empty service, an empty org, a record with no delivery (`verifiers: none (no delivery yet)`), a corpus without
+   run logs and a team whose runs cannot be counted each have a defined text (16, 9.3). Tests: a parametrized renderer test (I3) over every
+   rate with `n == 0`, both empty samples of 9.3 and the no-delivery verifier line; alarm tests at 0, 1 and 2 judged cases, and a cost alarm
+   over 3 judged cases whose runs are all not counted; the empty samples as goldens.
 2. **No count reads team-written or relayed text as client evidence.** Section 4 lists each count with its tier filter: verdicts count only at
    `human` tier and only on the delivery they follow (a verdict on a blocked result is never the accept of a later delivery); links count
    only from human-tier link notes (`Verdict.confirmed`, `links_tier == "human"`); the rejection's own `criterion` (root's reading) is relayed
@@ -978,7 +1184,8 @@ Errors are never swallowed silently: each one becomes visible text in the part i
    note, an existing file kind through the existing writer.
 4. **Domain-agnostic core.** The vocabulary is cases, deliveries, tiers, client kind, unit, failure classes and causes (4.6, 5); the rules read
    message fields, contract versions, artifact lists and base headings, all generic; `LASTING_WORDS` are English words, not domain terms, and
-   `cause_of` takes them as an argument so a pack passes its own in Phase 3. I9's needle test fails on a domain word in the new modules. The
+   `cause_of` takes them as an argument (tests pass other words). 0b adds no port through which a pack supplies its own words or its mapping
+   onto the failure classes; that port is Phase-3 work (backlog, 23). I9's needle test fails on a domain word in the new modules. The
    samples' memo titles are data.
 
 ## 18. Testability and the test plan
@@ -989,14 +1196,29 @@ Errors are never swallowed silently: each one becomes visible text in the part i
   task sent after the result; counted and voided around an edit with verdicts before and after it; `written == 0`), `not_on_a_delivery`,
   `signer_of` (moved tests from health), `unjudged_cases`, `judged_cases`, `cause_of` (one test per rule, every precedence pair, `also` with a
   same-type later rule (empty) and a different-type one, `rules`, `before_verdict`, legacy reworks, a `none` link, a "same as R<j>" link
-  resolved, a custom `lasting`), `attribution`, `failure_class`, `repeat_alarm` (window, subjects from `confirmed`, `about` and R links,
-  unconfirmed links, a reject not on a delivery, one-off), `cost_alarm` and `over_cost` (exact equality at 1.25 x 20 = 25, 0 budget, runs not
-  counted, open and blocked spend), `quality_thresholds` (each validation rule, unknown keys, numeric strings, the clamp note), the playbook
-  mark counts against the cited criteria (P1's own replays as fixtures), the one-off chain builder, `runs_unknown` (assignee retired; a
-  charter `created` after the head task), `RunCounter.stamps` (credited stems, boundaries of the relayed interval).
+  resolved, a custom `lasting`; a removal-only answer: the answering version removes C6 and its product link names C6, a carried criterion,
+  so the escape is `contract-gap` by rule `answer` with the "removes" text, never `reviewer-miss`; a mixed link naming a carried, kept
+  criterion and a missing one: `reviewer-miss` with `contract-gap` in `also`; named criteria with `carried=None`: `untyped`, rule
+  `unreadable`, `contract v{n} is not stored`), `attribution`, `failure_class`, `repeat_alarm` (window, subjects from `confirmed`, `about`
+  and R links, unconfirmed links, a reject not on a delivery, one-off, two subjects firing in 6's order, `not counted` under `n/a`),
+  `cost_alarm` and `over_cost` (exact equality at 1.25 x 20 = 25, 0 budget, runs not counted, open and blocked spend; 3 judged cases whose
+  runs are all not counted read `n/a (0 of 0 cases compared)` with JSON `compared: 0`; the skipped list under `n/a` by `min_judged`),
+  `quality_thresholds` (each validation rule, unknown keys, numeric strings, the clamp note), the first delivery (4.3: a head blocked and its
+  rework done gives the rework's delivery and outcome; no delivery at all gives `never delivered ({case state})`), the playbook
+  mark counts against the cited criteria (P1's own replays as fixtures), the one-off chain builder, `chains` (`since=None` keeps every
+  request; `runs=False` reads no run log, charter or playbook file), `runs_unknown` (assignee retired; a charter `created` after the head
+  task; a charter that cannot be read, is not UTF-8 or does not parse gives no mark; a done or failed, uncut case with no stamp in its window
+  gets `no run log in its window`, while a cut, blocked or open one does not), `RunCounter.stamps` (credited stems, boundaries of the
+  relayed interval); `DerivedCaseRecords` over fakes whose `SERVICE.md` read, stored versions, playbook versions or P3 call raise a
+  non-`OSError` exception: the record's `error` (or `hand_edits`) is set, the other records build, and `deliveries()` types the escapes
+  `untyped` with the service in `unknown`.
 - `progress`: `ratio`; the renderer over `FixedCaseRecords` (every line and variant of 9.2, limits, `shown_name` on paths, the no-history
-  remark, a record with `error`); `held_tasks` and `left_blocked` (mail.moved_past released, superseded, verdict after the block, a later task
+  remark, a record with `error`, the blank-line layout, `No cases yet` against a defined service with no request, `verifiers: none (no
+  delivery yet)`, a signer with no judged delivery, a nested service named by `service=`); `quality_data` against 9.4 (keys, types, null
+  rules); `held_tasks` and `left_blocked` (mail.moved_past released, superseded, verdict after the block, a later task
   inside the chain, a held task with nothing sent since, budget 0).
+- `app`: `GitBarHistory` over a fake `OrgHistory` (a version that is not UTF-8 and one whose frontmatter does not parse are not compared,
+  give no mark for either pair they belong to, and count once each in `skipped`; the bound and `truncated`).
 - `services`: the one-off branch and its three refusals; `criterion_words` (P1's tests keep passing).
 - `snapshots`: `GitOrgHistory.changes` parsing (sha1 and sha256 ids, a malformed record, invalid paths dropped, no repository).
 - `health`: `MailEscapeCounter` over a fake `SignedDeliveries` (counted and `not its` causes, F-E3-10's relayed accept, one-off deliveries,
@@ -1012,7 +1234,13 @@ Errors are never swallowed silently: each one becomes visible text in the part i
   the surface goldens) and the CLI (`--json` keys, playbook lines only there); health's text for root (with `not its`) and for an agent
   (without), and its JSON with `not_its` and `causes_unknown`; ORG.md that does not parse; an org that is a git repository with a charter
   edit, a `default_model` change and an `effort` change written through the product's `DEFAULT_CONFIG` (the timeline marks), and the same org
-  without `.git`.
+  without `.git`; **files that do not parse** (DR2-2), in one git org: snapshot 1 commits a good ORG.md and AGENT.md, snapshot 2 an AGENT.md
+  whose frontmatter does not parse, snapshot 3 that AGENT.md repaired with an edited body, snapshot 4 an ORG.md that does not parse (also the
+  working file); `quality` renders the thresholds' defaults and their note, every count of the service block, no charter mark (both pairs of
+  the bad AGENT.md version are not compared) and `(2 version(s) not compared: larger than 64 KiB, unreadable or not parseable)`, and raises
+  nothing; in the same org, a working AGENT.md that does not parse leaves its cases' runs counted, and a stored `SERVICE.v1.md` that does not
+  parse turns that service's block into `{service} (offered by {owner}): cannot be read ({label}: does not parse (...)).` while the one-off
+  block and the moved-past section render.
 - e2e: the replays of section 19 (`TESTS/e2e/test_org_growth_0b_replays.py`) and the published-count cost checks
   (`TESTS/e2e/test_org_growth_0b_costs.py`).
 - What stays manual: nothing in the product; the noise study (section 20) is a study.
@@ -1020,7 +1248,7 @@ Errors are never swallowed silently: each one becomes visible text in the part i
 ### 18.3 Test policy (the owner's, binding from the first commit)
 
 The owner's rule ("scope tests to verify changes and run all of them only in the end after everything is integrated") applies as written in
-`docs/research/org-growth/phase-0a2/test-policy.md`: per commit a FAST scoped run (the commit's targets, `tests/golden`,
+`/Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a2/test-policy.md` (untracked, in the main checkout only): per commit a FAST scoped run (the commit's targets, `tests/golden`,
 `tests/architecture` without the static-checks test, `src/hirearchy/app/tests` only when the commit touches `app/`, an `api.py` Protocol or
 the wiring, and `scripts/static_checks.py all`); per FEAT one SCOPED run (the union of the FEAT's targets plus `tests/e2e`, `tests/golden`,
 `tests/architecture`, `src/hirearchy/app/tests`); no full suite during development; one `scripts/check.sh` on the integrated, rebased branch in
@@ -1094,7 +1322,7 @@ read-only derivations of the files, so 0b's kit materializes the kept files with
 | tiers | all legacy (no `source`: human, 0a 3.1) | all legacy | no verdicts | yes | yes |
 | signers | yes | yes | the lead only (no report's box kept) | yes | yes |
 | causes | the relayed rules cannot fire (reworks' `source` never recorded) | same | none to type | yes | yes |
-| runs, spend, relayed runs | no (no logs: the view reads 0) | no | no | yes | yes (credits: none existed) |
+| runs, spend, relayed runs | no (no logs: done or failed, uncut cases read `runs not counted (no run log in its window)`, 4.1 reason 3; the others read 0) | no (same) | no (same) | yes | yes (credits: none existed) |
 | cost alarm | by published counts (19.4) | by published counts | by published counts | yes | yes |
 | repeat alarm | yes | yes | does not apply | yes | yes |
 | top-ups | yes | yes | yes | yes | yes |
@@ -1106,6 +1334,11 @@ read-only derivations of the files, so 0b's kit materializes the kept files with
 
 ### 19.3 Pre-registered expectations (one test per id)
 
+**When an expectation fails** (DR2-13). Each expectation below is written before its test runs. If a replay computes another value, the
+coder does not edit the expectation, the golden or the rule to make them agree: the FEAT stops, and the coder sends the manager a warning
+with the expectation's id, the computed value, the expected one and the kept files that show it. The expectation changes only by an
+amendment to this design that the manager approves; the same holds for 19.4 and for the goldens of 9.3.
+
 **E**
 - E-1: one record `weekly-memo` (lead; client root, human); 3 cases (`20261018T021644679563-root-b495`, `20261018T022344643603-root-c686`,
   `20261018T024234965290-root-2c75`); 3 deliveries (b495 by `...-lead-e6b8`, c686 by `...-lead-52d5`, rework
@@ -1115,13 +1348,14 @@ read-only derivations of the files, so 0b's kit materializes the kept files with
   `20261018T024152961586-root-550c`, 02:41:52, was given on 5bae's blocked result `...-lead-4b37` and is not read as the accept of e73a);
   2 verdicts not on a delivery (550c, and `20261018T025414374460-root-86de` on 2c75's blocked result); 0 escapes; 3 legacy verdicts;
   c686's window is cut by 2c75 (1 cut case).
-- E-2: repeat `n/a (1 of 3 judged cases)`; cost `n/a (1 of 3 judged cases)`; 0 runs in every case (no run log kept), asserted together with
-  the corpus note in the test's docstring.
+- E-2: repeat `n/a (1 of 3 judged cases)`; cost `n/a (1 of 3 judged cases); skipped: 20261018T021644679563-root-b495 (runs not counted)`;
+  b495 (done, its window not cut, no run log kept) reads `runs not counted (no run log in its window)`; c686 (its window cut) and 2c75
+  (blocked) read 0 runs; asserted together with the corpus note (no run log kept) in the test's docstring.
 - E-3: top-ups of c686: +5 rework 5bae (tier not recorded), +3 and +1 grants (`...-root-c1c5`, `...-root-f2a7`).
 - E-4: timeline: contract v2 and v3 `not confirmed`; playbook v2 and v3 `no admission recorded (written before the evidence gate)`; charter
   and model marks unknown.
 - E-5: moved past: `lead/writer` with one task, `20261018T023352181048-lead-a489` from lead, blocked 2026-10-18 02:34 (`...-lead.writer-f27d`),
-  `moved past: lead has sent lead/writer 3 task(s) since` (5875, 50f8, b6a7); no other held task of the writer; root's 2c75 is released by
+  `left blocked: lead has sent lead/writer 3 task(s) since` (5875, 50f8, b6a7); no other held task of the writer; root's 2c75 is released by
   the verdict 86de (`mail.moved_past`) and not listed; the held figure is not asserted (19.2).
 
 **E2**
@@ -1131,7 +1365,10 @@ read-only derivations of the files, so 0b's kit materializes the kept files with
 - E2-2: 2 escapes, both `untyped` (no rule matched): R1 on `...-root-d90e` (the assistant's own rework, whose `source` was never recorded, so
   `relayed-error` cannot fire on these files) and R2 on `...-root-e29b` (the Marta row); no link exists and no lasting word occurs. The
   view's verifier line: `lead/reviewer: escapes 2 of 5 judged (2 untyped); PASS precision 3 of 5; ...`.
-- E2-3: repeat `no (3 judged cases; counted: R1, R2)`.
+- E2-3: repeat `no (3 judged cases; counted: R1, R2)`; cost `n/a (0 of 0 cases compared); skipped:
+  20261018T034955412135-root-d22b, 20261018T040120119761-root-55ff, 20261018T040509774983-root-e29b (runs not counted)`: the three cases are
+  done, no window is cut and no run log was kept, so each case line reads `runs not counted (no run log in its window)` (4.1 reason 3) and
+  nothing is compared (6).
 - E2-4: health on these files: lead/reviewer judged 5, escapes 2 (untyped, counted), not flagged (0.4 is not above 0.5), as 0a 5.5 predicted;
   root's text has no `not its` part.
 - E2-5: timeline: contract v2 and v3 not confirmed; playbook v2 (lead) and v3 with no admission recorded.
@@ -1142,8 +1379,9 @@ read-only derivations of the files, so 0b's kit materializes the kept files with
   both reworks revising f768 with the tier not recorded); 3 deliveries (`...-lead-463e`, `...-lead-82b3`, `...-lead-26db`); judged 0 of 3;
   the first delivery without a verdict, superseded by dfe0 (the first task sent after 463e); 1 case without a verdict (f768), never counted as
   accepted; escapes `none (judged: 0 of 3)`; 0 verdicts not on a delivery.
-- A5-2: repeat `does not apply`; cost `n/a (0 of 3 judged cases)`; top-ups +4, +4 (tier not recorded) and +3 (grant `...-root-7620`); runs 0
-  (no log kept).
+- A5-2: repeat `does not apply`; cost `n/a (0 of 3 judged cases); skipped: 20261017T214038108044-root-f768 (runs not counted)`; top-ups +4,
+  +4 (tier not recorded) and +3 (grant `...-root-7620`); the case reads `runs not counted (no run log in its window)` (done, uncut, no log
+  kept; the lead's charter `created`, 21:40:38, is not after the head task, 21:40:38.108044, so reason 2 does not apply).
 - A5-3: every delivery is signed off by `lead` (the reports' boxes were not kept).
 - A5-4: the one-off block of 9.3's A5 sample equals the output's block byte for byte; moved past: none.
 
@@ -1160,10 +1398,15 @@ read-only derivations of the files, so 0b's kit materializes the kept files with
 - E3-7 (the variant `r2-links-r1` of 19.1, so that a replay on real files shows the repeat alarm firing): `repeat: FIRES: R1 failed in 2 of
   the last 3 judged cases (cases 20261021T152347923195-root-dd87, 20261021T153809201054-root-ab46)`; R2's cause is unchanged (contract-gap by
   answer: C11 stays in R2's `confirmed`); the cost line is unchanged.
+- E3-8 (DR2-7): `quality --json` on E3's files conforms to 9.4 (keys, types, null rules) and equals the golden
+  `tests/golden/expected/quality/e3.json`; every count in it equals the figure of the E3 text sample (9.3) that 9.4's source column names
+  (for example `deliveries.total` 6 and `judged` 5, `cases[*].spend` 12, 15, 14 and `ratio` `"0.80"`, `"1.00"`, `"0.93"`,
+  `alarms.cost.compared` 3, `alarms.repeat.not_counted` `{"R1": ["C6", "C3"]}`, `verifiers[0].pass_precision` `[5, 5]`). The golden is
+  written once, deliberately (`HIREARCHY_UPDATE_GOLDEN=1`), in FEAT-6 and reviewed key by key against 9.4 and the text sample.
 
 **E4** (the gate's item 8, then 0b's own)
 - S2R-1: s2r's playbook v2 is shown with content beyond C9: its mark reads `admitted (c) on R1, C9: 7 changed line(s): 0 the cited criteria's
-  own words, 7 beyond them`, and its `--json` `lines` carry the two vague-deadline lines the gate quotes, next to C9's text in `cited`.
+  own words, 7 beyond them; 4 line(s) removed`, and its `--json` `lines` carry the two vague-deadline lines the gate quotes, next to C9's text in `cited`.
 - S1R-1: s1r's four unconfirmed amendments are not counted as client evidence: every criterion v2-v5 added except C9 is marked `not
   confirmed`; none is a repeat subject or a contract-gap answer; C9 is confirmed by link `...-root-1753` (0a.1's rule for a version without
   `answers`).
@@ -1173,10 +1416,11 @@ read-only derivations of the files, so 0b's kit materializes the kept files with
   `...-root-43b8` and `lead/writer/work/2026-10-05-memo.md`, `also contract-gap` (the link `...-root-d23a` names C10, which contract v1 of
   342a lacks); `rules` starts `["carry-over", "answer"]`.
 - S1R-3: s1r's 16 runs are shown as held behind blocks the conversation moved past: `lead holds 12 run(s)` with task `...-root-3559`
-  (moved past: 2 tasks since), and `lead/writer holds 4 run(s)` with `...-lead-e679` (moved past: 1 task since) and `...-lead-808c` (not
-  moved past); `...-lead-0d54` is not listed (`...-lead-cc98` revises it). The replay derives 12 and 4 from the materialized files; they must
-  equal s1r's final `status` (lines 31 and 34 of `final-services-progress-status-health.txt`), and a difference fails the test (the
-  expectation is not adjusted).
+  (`left blocked: you have sent lead 2 task(s) since`), and `lead/writer holds 4 run(s)` with `...-lead-e679` (`left blocked: lead has sent
+  lead/writer 1 task(s) since`) and `...-lead-808c` (`blocked, nothing sent since`); `...-lead-0d54` is not listed (`...-lead-cc98` revises
+  it, so it is released). The replay derives 12 and 4 from the materialized files; they must equal s1r's final `status` (lines 31 and 34 of
+  `final-services-progress-status-health.txt`), and a difference fails the test and stops the FEAT (the rule above: the expectation is not
+  adjusted).
 - S1R-4: the three final memos are hand-edited (they differ from the team's current files), with the no-history remark; R1 (recorded
   18:59:00) predates the last write of `memo-2026-10-05.md` (19:12:45.031, pinned in the manifest), so it is counted and stays an escape (D20);
   the deliveries of `...-114d` and `...-2efa` have no verdict, so they count as neither pass nor escape; 0 deliveries judged after an edit.
@@ -1205,7 +1449,8 @@ read-only derivations of the files, so 0b's kit materializes the kept files with
 
 E, E2 and A5 kept no run log, so their spend is checked with `over_cost(case, approved, ratio)`, the per-case predicate `cost_alarm` applies,
 over `Case` values that carry the published run counts (their docstrings cite the source lines). The alarm's state on the files themselves is
-the one 19.3 states (E: `n/a (1 of 3 judged cases)`, E2: `no` on 0 runs, A5: `n/a (0 of 3 judged cases)`).
+the one 19.3 states (E: `n/a (1 of 3 judged cases)` with b495 skipped, E2: `n/a (0 of 0 cases compared)` with its three cases skipped, A5:
+`n/a (0 of 3 judged cases)` with f768 skipped).
 - E (`STUDY.md` focus item (c): "R1 8 of 12; R2 17 (12 + 5 rework + 3 + 1 granted = 21 handed out); R3 10 of 12"; approved 12, the current
   contract's budget): over on R2 only (17 > 15, 1.42x); R3 (blocked, 10 used, 2 still out) spends 12.
 - E2 (`evidence/run-counts.txt`: "R1 first pass 9, rework1 5, rework2 5 = 19; R2 5; R3 first pass 6, rework 5 = 11"; approved 15): over on R1
@@ -1214,7 +1459,8 @@ the one 19.3 states (E: `n/a (1 of 3 judged cases)`, E2: `no` on 0 runs, A5: `n/
 
 ### 19.5 E5, by amendment (a plan item)
 
-E5's evidence exists in the main checkout but is untracked and in progress, and its gate is not written. When E5's evidence is committed and
+E5's evidence exists in the main checkout only (`/Volumes/workspace/hirearchy/studies/E5-org-growth-0a2-recheck/evidence/`, streams `s1`,
+`s2` and `s3`), untracked and not yet scored, and its gate is not written. When E5's evidence is committed and
 its gate exists, its streams join the replays: the planner adds each E5 stream's manifest to the kit (19.1) and, before any E5 replay test is
 written, an amendment to this section pre-registers E5's expectations from its gate document and evidence (at least: every `answers`
 amendment marked confirmed with its link, or `not confirmed (the link was not recorded)`; the base sections' effect on the carry-over rule;
@@ -1254,7 +1500,9 @@ no pass rule: it reports values and their spread.
   `disclose_context` of the skill is checked against that md5 (E5 4.4). The arms then differ only in the memories index.
 - **Stratifier (observed)**: skill activation, E5 4.4.1's strata A (activated before the first `propose_org` and the first `feedback`), B
   (activated only after one of them), N (never), n/a (neither call). Forcing activation would test another product.
-- **Repeats**: k >= 3 valid streams per arm, so at least 6 streams. k = 3 is a floor that gives a range, not a rate (the gate's item 7).
+- **Repeats**: k = 3 valid streams per arm, so 6 streams (Q3, decided by the manager; the owner may raise it). k = 3 is the gate's floor and
+  gives a range, not a rate (the gate's item 7). The harness can add streams to an arm afterwards (`run_arm.sh <arm> <k>` starts at the
+  arm's next stream number), so thin skill strata can be filled later by the owner's decision.
   Every cell of arm x skill stratum with fewer than 3 streams reports its values and `n/a (k of 3)` for its spread.
 - **Validity**: E4's H8 rule and 0a.2's throttle rule (a credited run is not charged and is retried once) as in E5; an invalid stream is
   replaced once per arm with the manager's approval, recorded before it starts.
@@ -1306,7 +1554,7 @@ test of significance is made.
 ### 20.6 Cost
 
 About 40-50 org runs and 12 user turns per stream (E4 s1r: 39 org runs, 12 turns), so about 300 org runs plus the assistant sessions for 6
-streams. The number of streams is an open question for the owner (Q3).
+streams (k = 3 per arm, Q3). The plan states this estimate on a line of its own, for the owner's approval before G0 runs.
 
 ## 21. What the 0b study must check (pre-registration input)
 
@@ -1315,7 +1563,7 @@ streams. The number of streams is an open question for the owner (Q3).
 - **Model set and effort**: every seat claude-sonnet-5.5 at effort high, checked per run log and for the assistant; a seat outside the set
   invalidates the stream (20.1).
 - **Runtime**: V3 everywhere; A3 patterns; every org run's `# cwd:` and model lines checked.
-- **Arms and strata**: k >= 3 valid streams per memory arm; the skill md5 rule of 20.1 in both arms; skill activation recorded per stream
+- **Arms and strata**: k = 3 valid streams per memory arm (Q3); the skill md5 rule of 20.1 in both arms; skill activation recorded per stream
   before any score is read; cells under 3 streams reported as such.
 - **The view is right on live files**: for every stream, every count of `quality --json` equals the harness's re-derivation from the raw files;
   each mismatch is listed with the files that show it.
@@ -1346,38 +1594,47 @@ streams. The number of streams is an open question for the owner (Q3).
 | health, agents' text and review notes | goldens of agent health and of review notes whose judged deliveries or escapes change (relayed accepts, one-offs, typed escapes) (about 2-6); the wording is unchanged | section 10 (the numbers) |
 | health JSON | every health JSON golden gains `not_its` and `causes_unknown` | `to_dict` |
 | dashdata / dashboard | 0 expected (the dashboard shows flags, which keep their wording); any dashdata snapshot that embeds `AgentHealth` JSON changes (checked by the planner) | `to_dict` |
-| replays | new goldens for 9.3's samples (E3 full, A5's one-off block, the empty org) | 19.3 E3-5, A5-4 |
+| replays | new goldens in `tests/golden/expected/quality/` for 9.3's samples (E3 full, A5's one-off block, the empty org, the empty service) and E3's `--json` (`e3.json`) | 19.3 E3-5, E3-8, A5-4; 17 item 1 |
 | prompts, ORG.md, charters | 0 | agents' prompts are unchanged |
 Total: about 25-40 regenerated, plus the new ones. Each diff is reviewed and counted in the phase report (08 D1).
 
 ## 23. Plan items for the planner, and the backlog
 
 Plan items (in this order of FEATs; each FEAT ends with its SCOPED run):
-1. **FEAT-1 reflection and snapshots**: `RunCounter.stamps`, the new `Case` fields (`runs_unknown` included), one-off cases and the chain
-   builder's `since`/`count_runs`, `Delivery`/`signer_of` (moved from health with its tests), `not_on_a_delivery`, `cause_of` with `lasting`,
-   `attribution`, alarms (exact `Fraction` comparison) and thresholds, marks, `ContractVersions`, `OrgHistory.changes` + `GitClient.log`,
-   `BarHistory` + `GitBarHistory`, `CaseRecords` + `DerivedCaseRecords` (one P3 call, per-record `error`, `deliveries()` with its fallback),
+1. **FEAT-1 reflection and snapshots**: `RunCounter.stamps`, the new `Case` fields (`runs_unknown` and its three reasons included),
+   `CaseHistory.chains` and `CaseHistory.one_off_cases` with `DerivedCaseHistory`'s 7th collaborator `CharterReader`, `Delivery`/`signer_of`
+   (moved from health with its tests), `not_on_a_delivery`, `cause_of` with `lasting`, `answer_removes` and the `carried=None` fallback,
+   `attribution`, alarms (exact `Fraction` comparison; `n/a (0 of 0 cases compared)`) and thresholds, marks, `ContractVersions`,
+   `OrgHistory.changes` + `GitClient.log`, `BarHistory` + `GitBarHistory` (versions that do not parse are skipped),
+   `CaseRecords` + `DerivedCaseRecords` (one P3 call, per-record `error`, 12.1's read rule, `deliveries()` with its fallback),
    `DeliverableChecks(settled=...)` and `written`, `shown_name` in `__all__`, `services.criterion_words` and the base heading constants
    (byte-identical moves first, each its own commit).
 2. **FEAT-2 one-off verdicts**: the `feedback` branch, refusals, `feedback_step` (no leading newline), docstrings and help, the skill's
    line 98.
-3. **FEAT-3 the view**: `QualityReport`, `held_tasks`, `left_blocked`, the renderer (every variant of 9.2), `FailCounts` + `HealthFailCounts`,
+3. **FEAT-3 the view**: `QualityReport`, `held_tasks`, `left_blocked`, the renderer (every variant of 9.2, the JSON of 9.4, the empty
+   samples of 9.3 as goldens), `FailCounts` + `HealthFailCounts`,
    `ReadableOrgConfig`, `QualityTools`, `QualityCommand`, the ROOT_INSTRUCTIONS line, README section "Quality (phase 0b)" within the README
    line caps.
 4. **FEAT-4 health rebase**: section 10 (the port, the 5th collaborator, `render_text(causes=...)`, root-only split).
 5. **FEAT-5 ride-alongs**: 11.1, the skill's line 88, 11.5 (the flaky golden screen test: find the nondeterminism, make the capture
    deterministic, no retry).
-6. **FEAT-6 replays**: the kit, its manifest, its meta tests, 19.3 (with E3-7's variant) and 19.4.
-7. **FEAT-7 docs**: ARCHITECTURE (2.2 row 31, section 3's Protocol lists for reflection, progress, snapshots, health's port, the entry points),
-   README, and amendments to this design for anything the build changed.
-8. **E5 adoption** (19.5, section 27): once E5's evidence is committed and its gate exists, E5's manifests in the kit and an amendment to this
-   design that pre-registers E5's expectations, before any E5 replay test; G0 pins E5's committed protocol md5.
+6. **FEAT-6 replays**: the kit, its manifest, its meta tests, 19.3 (with E3-7's variant and E3-8's JSON golden) and 19.4; a failed
+   expectation stops the FEAT and goes to the manager (19.3, "When an expectation fails").
+7. **FEAT-7 docs**: ARCHITECTURE (2.2 row 31, section 3's Protocol lists for reflection, progress, snapshots, health's port, the entry points,
+   and 3.22's collaborator sentence: `DerivedCaseHistory` takes seven collaborators, as do `OwnerPromptSections` and `DerivedCaseRecords`;
+   no class of the package takes more), README, and amendments to this design for anything the build changed.
+8. **E5 adoption** (19.5, section 27): once E5's evidence (`/Volumes/workspace/hirearchy/studies/E5-org-growth-0a2-recheck/evidence/`,
+   streams `s1`-`s3`) is committed and its gate exists, E5's manifests in the kit and an amendment to this design that pre-registers E5's
+   expectations, before any E5 replay test; G0 pins E5's committed protocol md5.
 
 Backlog (out of scope, with the reason):
 - A one-off verdict settling P3 hand-edit notes and one-off client questions (8.5): consistent, but changes 0a.2 behaviour the row does not ask
   for.
 - Semantic failure classes beyond `off_spec` and `wasteful` (packs, Phase 3); `period` units, the `external` tier and `timing` (delayed
   oracles) (Phase 3, 4.6).
+- A port through which a pack supplies its own lasting words to `cause_of` and its mapping onto `FAILURE_CLASSES` (for example a private
+  `CauseVocabulary` of `DerivedCaseRecords`, wired in `app`): Phase 3 owns packs, and 0b adds no port it does not use, so today a pack's
+  words would need an edit of the reflection core (DR2-8).
 - A full git replay of E4's history (its log text cannot rebuild the repository).
 - Health reading hand edits (it runs per agent and in the review cycle; 10).
 - Reading a retired team's run logs for a continued service's old cases (0a.2 section 22; 4.1 marks them instead).
@@ -1387,9 +1644,10 @@ Backlog (out of scope, with the reason):
 ## 24. Deviations from 08, go/no-go and the gate (with reasons)
 
 - **D1 (08 3.2; go/no-go item 4's caveat) A contract-gap rule by answer.** 08 types contract-gap by trigger words only, and go/no-go expected
-  E3's reject 2 to type as `reviewer-miss`. 0b adds: the client's human-tier answer names a criterion the rejected task's contract lacked.
-  Reason: it is the client's recorded yes, stronger than a phrase; without it E3's reject 2 (C11), and E4's s1r/s2r/s3 first rejects, type as
-  a reviewer miss or by an "always" that happens to be there.
+  E3's reject 2 to type as `reviewer-miss`. 0b adds: the client's human-tier answer names a criterion the rejected task's contract lacked, or
+  one the rejection's answering contract version removed (a "drop C6" answer). Reason: it is the client's recorded yes, stronger than a
+  phrase; without it E3's reject 2 (C11), and E4's s1r/s2r/s3 first rejects, type as a reviewer miss or by an "always" that happens to be
+  there, and a removal answer would count against the verifier although the client said the criterion should not be there.
 - **D2 (08 3.2) A fixed order of the rules, with `also` and `rules`.** 08 gives the rules as a list. The order of 5.1 makes the type
   deterministic and keeps the gate's pre-registered s2r carry-over; the other matching rules stay visible as disputed causes.
 - **D3 (08 3.2) "The reviewer PASSed" read from `done` and the task's contract version.** Parsing review reports would be domain- and
@@ -1428,26 +1686,32 @@ Backlog (out of scope, with the reason):
 - **D18 (the gate's item 4) "Deliveries without a verdict" is read per case** (the latest delivery, as 0a.2 D4's `delivered_unrated`), at the
   human tier and with the verdict-after-the-result rule; deliveries superseded before a verdict are counted apart.
 - **D19 (the gate's item 6) Held runs are the assignee's whole derived budget**, with the mechanism named (`budget_to_return` treats a blocked
-  task not moved past as busy), not a per-task split.
+  task not released as busy), not a per-task split.
 - **D20 (the gate's item 4) A hand-edited delivery keeps a verdict given before the edit.** The gate says a delivered file that differs from the
   team's artifact "counts as neither the team's pass nor its escape". 0b applies that to every verdict given at or after the file's last write,
   and keeps a verdict given before it, because that verdict judged the team's file: in s1r, R1 (18:59:00) judged the memo copied from the
   team's file at 18:46:13, and the hand edit came at 19:12:45. So s1r's R1 stays an escape (S1R-4). Only the file as it is now is known.
-- **D21 (0a 3.1, kept) Legacy verdicts count as the user's** (`verdict_tier`), and the view marks them as legacy.
+- **D21 (0a 3.1, kept) Legacy verdicts are read as the user's** (`verdict_tier`), and the view marks them as legacy; like every verdict, one
+  counts only on the delivery it follows (D4).
 - **D22 (the gate's item 2) The playbook diff is in `--json`, not in the text.** The gate asks to show a (c) admission "with its diff beside the
   cited criterion's text". Playbook lines are written by an agent, and I8 keeps agent-written text out of root's prompt, so the MCP and CLI
   text show counts against the cited criteria and the CLI's `--json` carries the changed lines beside the cited criteria's texts. Root can
   already read PLAYBOOK.md through its shell, so the JSON opens no new channel.
 - **D23 (the gate's item 6) The writer's held tasks are the two the budget holds on.** The gate says the writer holds 4 runs "behind three
   `blocked` results". One of the three (`...-lead-0d54`) was revised by `...-lead-cc98`, so `mail.moved_past` released it and it holds no run;
-  the view lists e679 (moved past) and 808c (not moved past). The gate's total of 16 held runs is unchanged.
+  the view lists e679 (left blocked) and 808c (held, nothing sent since). The gate's total of 16 held runs is unchanged.
+- **D24 (go/no-go item 6) The CLI's `feedback --source` keeps its default `human`.** Go/no-go item 6 says one-off verdicts carry the
+  provenance rules, with `source` defaulting to `relayed`. 0b applies that default where the assistant writes (MCP root `feedback`, whose
+  signature already says `source="relayed"`, and `Org.feedback`, stamped by `dispatch.provenance_source`) and keeps the CLI's existing
+  `--source human` (`cli/_commands_services.py:143`). Reason: the terminal is the user's own seat, so a verdict typed there is the user's,
+  and changing the default would change an existing command for service verdicts too, which row 0b does not ask for (8.1, I6).
 
 ## 25. User-visible changes beyond 08 row 0b (named)
 
 Row 0b builds the quality view, one-off cases, the timeline and the noise study. These changes go beyond the row's words; each is either a
 binding ride-along or required to build the row:
 1. Root's `feedback` accepts one-off tasks (its docstring, its CLI help and a new refusal text for root): required by "cases for one-off tasks
-   (root notes)".
+   (root notes)". Its `source` defaults to `relayed` on MCP and `Org`; the CLI keeps its existing default `--source human` (D24).
 2. The skill: step 5.1 reads results with `inbox` (go/no-go section 3, binding); step 5.6 records a one-off verdict the user states, with no
    extra question.
 3. ROOT_INSTRUCTIONS gains the line `` `quality`: how the work went. `` (32 characters).
@@ -1473,65 +1737,83 @@ binding ride-along or required to build the row:
   chain touched an artifact both list, whatever the rejection is about; a one-file deliverable always shares its artifact. The escape then
   leaves health's count (D7). The shared-artifact test reads the team's own `## Artifacts` lists, so a team that lists a file it did not
   change moves blame onto the assistant. The rules that also matched stay in `also` (a `reviewer-miss` stays visible there), G0 re-types every
-  carry-over by hand (21), and Q2 asks the owner whether health should keep counting them.
+  carry-over by hand (21), and health does not count carry-overs against the verifier (Q2, decided by the manager: the reviewer is not blamed
+  for the assistant's own reworks; untyped escapes stay counted).
 - **Run attribution** is window-based (08 3.3): a case cut by a later request gives its later runs to that request; the view counts the cut
   cases. Relayed runs are counted by the relayed task's interval, so a relayed rework running in parallel with another task shares runs.
+- **A case with no run log in its window** (4.1 reason 3): a done or failed case whose window is not cut always holds, live, the run that
+  wrote its result; one without any is a corpus that kept no run log, or a run that started before the head task arrived (an agent that
+  picked the task up during a run it was already in). Its runs are then not attributed to the case: the view marks it `runs not counted (no
+  run log in its window)` and the cost alarm skips it, instead of showing 0 runs. The window's start is not moved.
 - **A continued service's old cases** (0a.2 5.10) count no runs when their team was retired, because their logs stay in the retired tree; the
-  view marks them `runs not counted (...)` by the charter's `created`, and the cost alarm skips them. A charter without `created` gives no
-  mark, so such a case reads 0 runs.
+  view marks them `runs not counted (...)` by the charter's `created`, and the cost alarm skips them. A charter without `created` (or one that
+  does not parse) gives no mark for that reason; such a case then reads `no run log in its window` when it is done or failed and uncut, and
+  0 runs otherwise.
 - **reviewer-miss** is inferred from `done` and the contract version, not from what the reviewer wrote; a team that reports `done` without a
   check is typed the same way.
 - **The words rule** is English and lexical; "never" in "never mind" matches.
 - **Cases** exist only for live services (and continued ones); a retired service's history leaves the view and health.
 - **Charter and model marks** need git; a retired agent's charter is not followed; at most 40 commits and 5 s of git time per call; a version
-  above 64 KiB is not compared.
+  above 64 KiB, not UTF-8 or with a frontmatter that does not parse is not compared, and the change across it is not marked.
 - **The noise study** at k = 3 gives a range, not a rate.
 - **Agent-client services** never alarm; their counts are hypotheses.
 - **Stalled** is a current state, not a history.
-- **E, E2, A5** kept no run logs; their spends are not derivable from their files, and the held figure is not asserted on them.
+- **E, E2, A5** kept no run logs: their done, uncut cases read `runs not counted (no run log in its window)` and the others 0; their spends
+  are not derivable from their files (19.4 checks them from published counts), and the held figure is not asserted on them.
 - **A one-off verdict on a retired assignee's task** cannot be recorded (ONE-OFF-GONE); the view counts it as without a verdict.
 - **Cost of a call**: `quality` runs the P3 checks once (one call: at most 40 git pairs and 5 s of git, about 11 s worst case with its
   subprocess bounds, 0a.2 DR-33/DR-43) and the bar history once (at most 5 s).
 
 ## 27. E5: adoption by amendment, and the definitions most likely to move
 
-E5's evidence is in progress (untracked) and its gate is not written. 0b's build may start after E5's live streams finish, and 0b merges only
+E5's evidence (`/Volumes/workspace/hirearchy/studies/E5-org-growth-0a2-recheck/evidence/`, streams `s1`-`s3`) is untracked and not yet
+scored, and its gate is not written. 0b's build may start after E5's live streams finish, and 0b merges only
 if E5 passes. When E5 reports, the manager amends this design before the plan freezes, or by a design amendment during the build, for each
 finding that touches:
 1. **The carry-over rule (5.1 rule 2)**: E5 is the first live data with P4's base sections; if a `base="delivered"` rework still carries a
    relayed change, the base clause moves.
-2. **Contract-gap by answer (rule 3)** and **reviewer-miss (rule 4)**: E5's `answers` amendments and product links are their first live input.
+2. **Reviewer-miss (rule 3)** and **contract-gap by answer (rule 4)**: E5's `answers` amendments and product links are their first live input,
+   including any removal-only answer (`define_service(answers=..., remove_acceptance=...)`, whose product link names the removed ids: rule 4's
+   `answer_removes`) and any mixed link (rule 3 before rule 4).
 3. **Hand-edit voiding (4.3, D20)**: E5 counts P3 notes and hand edits; their timing decides whether "edited before the verdict" is the right cut.
 4. **Without a verdict and the verdict-after-the-result rule (4.3)**: P2-UNRATED makes root record verdicts; E5's counts of 0a.2 D4's friction,
    and any verdict recorded on a blocked result, may move the per-case reading.
 5. **Credited and relayed runs (4.2)**: E5's throttle credits are the first live credits.
 6. **Reviewer ambiguity recall (20.4 A)**: G0 copies E5's D21 verbatim; a change there changes G0.
 7. **Moved past without a verdict and held tasks (4.5)**: P2's retire gate and continuations may change which blocks stay open.
-8. **Continued services' run marks (4.1)**: E5 counts retire/define pairs; their cases test the `created` rule.
+8. **Continued services' run marks (4.1)**: E5 counts retire/define pairs; their cases test the `created` rule. A live done case with no run
+   log in its window (reason 3) would show that a run started before its task arrived, and would move the window's start.
 9. **The replays (19.5)**: E5's streams join them with expectations pre-registered by amendment.
 
-## 28. Open questions for the owner
+## 28. Owner questions: decided (manager, 2026-10-24; owner may override)
 
-- **Q1. Ask after a one-off delivery?** The design records a one-off verdict only when the user states one (no extra question, within 08's D3
-  friction). Asking "Keep it, or what should change?" after every one-off delivery, as for services, would make one-off cases measurable at the
-  cost of one question per one-off task.
-- **Q2. Which escapes health counts against a verifier.** The design keeps untyped escapes counted (unknown causes stay visible) and drops
-  `relayed-carry-over` ones, although rule 2 can over-attribute (section 26). Excluding untyped escapes too would remove more false alarms and
-  hide real misses; counting carry-overs again would keep misses visible and blame the reviewer for the assistant's own reworks.
-- **Q3. The size of G0.** 2 arms x k = 3 is about 300 org runs plus 6 assistant sessions. More streams per arm (k = 5) narrow the band; adding
-  streams to fill thin skill strata is possible only after the fact.
-- **Q4. The cost alarm and the assistant's own spend.** The design fires on total spend and shows the relayed runs apart (the user pays both).
-  Excluding relayed runs from the comparison would make the alarm about the team only.
-- **Q5. The 3-judged-case minimum for the cost alarm.** It follows 08; `case_total` already warns per case at 1.0x. A per-case cost alarm
-  without the minimum would repeat that warning.
+The manager decided the five questions of revision 2 on 2026-10-24 (`.agents/tasks/manager-decision-design-loop.md`); the design is built
+to these decisions, and the owner may override any of them. No question is open in this revision.
+
+- **Q1. Ask after a one-off delivery? Decided (manager, 2026-10-24; owner may override): no extra question.** A one-off verdict is recorded
+  only when the user gives one (8.1, the skill's step 5.6 in 8.4 and 11.3). Why: 08's D3 bounds client friction, and one-off cases are a 0b
+  measurement, not a gate. Revisit if 0b's data (G0 or live use) shows one-off coverage too thin to use. The alternative was to ask "Keep it,
+  or what should change?" after every one-off delivery, as for services, at one question per one-off task.
+- **Q2. Which escapes health counts against a verifier? Decided (manager, 2026-10-24; owner may override): as designed.** Untyped escapes
+  count against the verifier and stay visible; `relayed-carry-over` escapes do not, nor do `relayed-error` and `contract-gap` ones (D7,
+  `reflection.attribution`). Why: the reviewer must not be blamed for the assistant's own reworks. Rule 2's over-attribution stays a declared
+  limit (26), checked by hand in G0 (21).
+- **Q3. The size of G0? Decided (manager, 2026-10-24; owner may override): k = 3 streams per arm, the gate's floor.** That is 6 streams,
+  about 300 org runs plus 6 assistant sessions (20.6); the harness can add streams afterwards (20.1). Why: the cost is the owner's to raise.
+  The plan states the G0 run estimate on a line of its own, for the owner's approval before G0 runs.
+- **Q4. The cost alarm and the assistant's own spend? Decided (manager, 2026-10-24; owner may override): as designed.** The alarm fires on
+  total spend, relayed runs included, and shows the relayed runs apart (6). Why: the user pays for both.
+- **Q5. The 3-judged-case minimum for the cost alarm? Decided (manager, 2026-10-24; owner may override): as designed.** The minimum stays
+  (08 3.3); `case_total` already warns per case at 1.0x, and each case line shows its ratio whatever the alarm says (6).
 
 ## Appendix A. Review resolutions
 
 ### A.1 Design review of revision 1 (25 findings: 3 HIGH, 12 MEDIUM, 10 LOW)
 
-Every finding is addressed in this revision; none is backlogged or declined. No resolution changes what the user sees or how the system
+Every finding was addressed in revision 2; none was backlogged or declined. No resolution changed what the user sees or how the system
 behaves beyond 08 row 0b and the binding gate items: where a finding offered a choice, the behaviour-preserving option was taken (DR-11,
-DR-12).
+DR-12). This table is kept as written for revision 2; where revision 3 changed a text it cites (for example the moved-past wording of DR-2,
+or the A5 runs line of DR-4), A.2 says so.
 
 | Id | Sev. | Resolution | Where |
 |---|---|---|---|
@@ -1560,3 +1842,31 @@ DR-12).
 | DR-23 | LOW | `Mark` is defined; the held line for budget <= 0 and per-task block times are specified; unknown `quality:` keys get a note; numeric strings are accepted by rule; the clamp has a note; `history.text` returning `None` counts in `skipped`; an `answers` version without its link reads `not confirmed (the link was not recorded)`; base literals are only in `_request.py`; stalled is matched by the prefix `stalled (`. | 3, 4.1, 4.5, 6, 7, 9.2, 12.2, 14 |
 | DR-24 | LOW | E3-7: a replay variant on E3's files with one human-tier "same as R1" link on R2 pins `repeat: FIRES: R1 failed in 2 of the last 3 judged cases`. | 19.1, 19.3 |
 | DR-25 | LOW | `cause_of(..., lasting=LASTING_WORDS)`; 08 3.1's `timing` (delayed oracles) is named as the Phase-3 extension of "without a verdict". | 3, 4.6, 5.1, 17, 23 |
+
+### A.2 Design review of revision 2 (14 findings: 2 HIGH, 6 MEDIUM, 6 LOW) and the manager's decision of 2026-10-24
+
+Every finding is addressed in revision 3 with the reviewer's fix, as the manager's decision directs; none is declined. One part is
+backlogged by that decision (DR2-8's port). Where a finding offered a choice, the choice is named below. No resolution changes what the user
+sees or how the system behaves beyond 08 row 0b, the binding gate items and the manager's decision.
+
+| Id | Sev. | Resolution | Where |
+|---|---|---|---|
+| DR2-1 | HIGH | The cost alarm's `n` is the number of compared cases (skipped ones excluded); with `min_judged` met and `n == 0` it reads `n/a (0 of 0 cases compared)` (JSON `state: "n/a"`, `compared: 0`), never `no`; the skipped list shows under every state. The verifier line goes through `ratio`: `escapes n/a (0 of 0) judged`. With no delivery the line reads `verifiers: none (no delivery yet)`. `No cases yet` appears exactly when no agent offers a service (top-level or nested) and root gave no one-off task; a defined service with no request renders its block, pinned as the exact "service defined with no request yet" golden and in I3's parametrized test. A unit test covers 3 judged cases whose runs are all not counted. | 6, 9.2, 9.3, 15 I3, 16, 17, 18.1, 22 |
+| DR2-2 | HIGH | A git version of ORG.md or AGENT.md that is not UTF-8 (strict decoding) or whose frontmatter does not parse is not compared, gives no mark for either pair it belongs to and counts once in `skipped` (`... unreadable or not parseable`). 12.1's read rule treats a parse failure like `OSError` at every read `quality` makes (contracts, stored versions, playbook versions, the cases, the P3 call, `runs_unknown`'s charter read), with the repository's `except Exception  # noqa: BLE001` pattern because PyYAML may not be imported outside `kernel` and `blueprint`; `quality` never raises on a file that does not parse. Unit tests per read; an integration test in a git org with an AGENT.md version and an ORG.md that do not parse (defaults note, every count, `2 version(s) not compared`), a working charter and a stored contract version that do not parse. | 4.1, 7, 10, 12.1, 13, 16, 18.1, 18.2, 26 |
+| DR2-3 | MEDIUM | Per-id basis parts follow the added-id order (added ids in the version's acceptance order, removed ids in the previous version's order, `amendment_ids`); the legacy basis part is `{id} confirmed (link {link})` / `{id} not confirmed`. The s1r excerpt's v2 mark reads `adds C8, C9; removes C5: C8 not confirmed, C9 confirmed (link ...-1753)` (v3-v5 recomputed with `amendment_ids` and given in brackets). `not counted` shows under every state, `n/a` included, so the repeat line reads `n/a (1 of 3 judged cases); not counted: R1's reading C5 (not confirmed)`; the JSON's `not_counted` is present under every state. Every unbracketed line of the E3, s1r and A5 samples was re-checked against 7 and 9.2. | 6, 7, 9.3, 9.4 |
+| DR2-4 | MEDIUM | The answering version of a rejection (`answers` == the rejection's id) gives `answer_removes`; a named criterion that version removed types `contract-gap` by rule `answer` with its own text, never `reviewer-miss`. Rule order: `reviewer-miss` (a named criterion carried and kept) is rule 3, `contract-gap` by answer rule 4, so a mixed link is `reviewer-miss` with `contract-gap` in `also`; the "partition" claim is replaced by this choice and its reason. Unit tests for the removal-only answer and the mixed link; 27 item 2 names both cases; D1 covers removals. No pre-registered expectation changes (none has a carried criterion in its link). | 3, 5.1, 5.2, 5.3, 18.1, 24 D1, 27 |
+| DR2-5 | MEDIUM | Option (a): `CaseHistory.chains(owner, service, *, since, runs)` and `CaseHistory.one_off_cases(*, runs=True)` (3 -> 5 methods); `runs=False` reads mail only (no run log, charter or playbook file). `DerivedCaseHistory(catalog, agents, mail, words, timelines, counter, charters: CharterReader)` reads the charters; `DerivedCaseRecords(history, catalog, agents, mail, versions, bars, deliverables)` loses `charters` (7 collaborators). FEAT-7 updates ARCHITECTURE 3.22's collaborator sentence. | 4.1, 10, 12.1, 12.5, 23 |
+| DR2-6 | MEDIUM | The first delivery is the case's delivery with the lowest step; `never delivered ({case state})` only when no task of the case was delivered. Unit test: head blocked, rework done. | 4.3, 9.2, 9.4, 18.1 |
+| DR2-7 | MEDIUM | New 9.4: a schema table for every object (key, type, empty/null rule, source text), top-level `"schema": 1`, `ratio` as the text's two-decimal string, every case, escape, mark and id without the text's limits, and new `stalled_error`, `fails_error`, `held_error` so "0" and "unknown" differ. The abbreviated sample is removed; the full E3 JSON is the golden `tests/golden/expected/quality/e3.json` (E3-8), whose every count is fixed by the E3 text through 9.4's source column, plus a schema-conformance test for every replay corpus. | 4.2, 9.1, 9.3, 9.4, 18.1, 19.3 E3-8, 22 |
+| DR2-8 | MEDIUM | Second option, as the manager directs: the claim that a pack passes its own lasting words with no core edit is removed from 3, 5.1 and 17.4 (and I9's reason no longer calls the vocabularies extension points); `cause_of(lasting=...)` stays for tests; a `CauseVocabulary`-style port for a pack's words and failure-class mapping is in the backlog, because Phase 3 owns packs and 0b adds no port it does not use. | 3, 5.1, 15 I9, 17, 23 |
+| DR2-9 | LOW | D24 records the CLI's `--source human` default as a deviation from go/no-go item 6, with its reason; 8.1 and 25 item 1 cite it. | 8.1, 24 D24, 25 |
+| DR2-10 | LOW | S2R-1 pins `...; 4 line(s) removed`; the legacy count reads `legacy verdicts (no source: read as the user's, the 0a rule)` and D21 says "read as the user's"; the carry-over text reads `your relayed rework {R} delivered {path} after the delivery the user judged, and the rejected delivery lists it too` (what rule 2 checks). | 5.3, 9.2, 19.3 S2R-1, 24 D21 |
+| DR2-11 | LOW | One blank line between blocks and sections, none inside a block (header included), applied to every sample (the empty-org sample gains its blank lines); `open {o} (stalled {s})`; several fired subjects listed in one line, `R` ids then `C` ids by number (also for `counted`); ONE-OFF-UNKNOWN lists root's sent tasks with a result, service and one-off alike; `service=` naming a nested service renders the nested heading and its line; the unknown-service error lists top-level names first, then nested ones; "released" is the budget sense and every task line reads `left blocked: ...` or `blocked, nothing sent since` (E-5, S1R-3, D19, D23 reworded). | 3, 4.5, 6, 8.3, 9.2, 9.3, 13, 19.3, 24 |
+| DR2-12 | LOW | First option: a done or failed case whose window is not cut and holds no run log, charged or credited, gets `runs_unknown = "no run log in its window"` (reason 3) and is skipped by the cost alarm. Pre-registered effects: E2's cost reads `n/a (0 of 0 cases compared)` with its three cases skipped (E2-3); E's alarm stays `n/a (1 of 3 judged cases)` and lists b495 skipped (E-2); A5's alarm stays `n/a (0 of 3 judged cases)`, lists f768 skipped, and the A5 sample's runs line reads `runs not counted (no run log in its window)` (A5-2, A5-4). Declared in 26; E5 data that hits it would move the window (27 item 8). | 4.1, 6, 9.3, 16, 19.2, 19.3, 19.4, 26, 27 |
+| DR2-13 | LOW | (a) Named criteria whose task's contract version is not stored give `Cause("untyped", "unreadable", ("contract v{n} is not stored",))`, counted, with a unit test. (b) A failed pre-registered expectation stops the FEAT and the coder sends the manager a warning with the id, both values and the files; the coder never edits an expectation, golden or rule to match, and only a manager-approved amendment changes it (19.3, FEAT-6). (c) 11.3 says no line-length rule applies to SKILL.md, only the 125-line cap. | 5.1, 5.3, 11.3, 18.1, 19.3, 23 |
+| DR2-14 | LOW | The header names `docs/research/` files by absolute path (`RESEARCH` = `/Volumes/workspace/hirearchy/docs/research/org-growth`); 11, 11.5 and 18.3 give `followups.md` and `test-policy.md` absolutely; E5's path is absolute in the header, 19.5, 23 and 27, and the snapshot records `s1` and `s2` VALID and, at this revision's check, `s3` VALID too. | header, 11, 11.5, 18.3, 19.5, 23, 27 |
+| Q1 | decision | Decided (manager, 2026-10-24; owner may override): no extra question after a one-off delivery; a verdict is recorded only when the user gives one. Already the design (8.1, 8.4, 11.3); revisit if one-off coverage proves too thin. | 28 |
+| Q2 | decision | Decided: as designed. Untyped escapes count against the verifier and stay visible; relayed carry-overs (and relayed errors and contract gaps) do not. 26 no longer says the question is open. | 26, 28 |
+| Q3 | decision | Decided: k = 3 streams per arm (the gate's floor), about 300 org runs; the harness can add streams afterwards; the plan states the G0 run estimate on its own line for the owner's approval before G0 runs. The overview, 20.1, 20.6 and 21 say k = 3. | 1, 20.1, 20.6, 21, 28 |
+| Q4 | decision | Decided: as designed. The cost alarm fires on total spend; relayed runs are shown apart. | 6, 28 |
+| Q5 | decision | Decided: as designed. The 3-judged-case minimum stays; `case_total` warns per case. | 6, 28 |
