@@ -245,7 +245,7 @@ still shown). Playbook and contract notices to root are quiet (not under "Needs 
 `inputs`, `model`, ...), and the write reply lists the kept and changed keys. The feedback note says it is for reflection only and never
 waives an acceptance criterion (ORG.md rule 10 too); the assistant records `feedback` only on the user's own judgement, not on "deliver as
 is". `lessons` are required for `done`, `failed` and `blocked` service reports, and the digest shows each case's latest lessons first.
-`send(budget=N)` replies with what the recipient can now hand down (size a request at the estimate + 25%, about 2 runs per delegation + 1).
+`send(budget=N)` replies with what the recipient can now hand down (size a request at the plan's number: the estimate + 25%, or + one client round for a service; about 2 runs per delegation + 1).
 Agents with the built-in `read` can also read the organization's files (read-only; the org root is in their allowedPaths), so a reviewer
 opens an author's `work/` file directly. Verifiers report doubtful items as `ambiguous`.
 
@@ -276,7 +276,7 @@ services:
     inputs: [{name: topic, description: what it is about, required: true}]   # what changes per request
     acceptance: [exact, checkable criteria]    # the contract: only the user changes it, through define_service
     deliverable: {description: one markdown file, format: markdown, max_words: 600, path: /abs/folder}
-    budget: 22                        # runs per request; default = estimate + 25%; also optional: locked: true
+    budget: 22                        # runs per request; default = the plan's number (estimate + 25%, or + one client round when more); also optional: locked: true
     playbook: |                       # optional initial workflow; default generated from the team (steps, budget plan, pitfalls)
 task: {service: weekly-brief, inputs: {topic: solid-state batteries}}   # optional: a first request; or omit and request later
 ```
@@ -767,6 +767,24 @@ The enforcement batch after study E4 (design: `docs/design/org-growth-phase-0a2.
 - *A throttled run is not charged.* A run that ends on a model-service throttle (kiro's `retryErrorType: THROTTLING`) before any tool call that changes something is given back
   by a run credit (a quiet note of the runtime that carries the run) and retried once without counting as a failure; a second throttle in a row is credited but counted. Case totals,
   the overspend warning and `runs n of m` leave credited runs out, and `check` counts credits in the budget equation.
+
+## Org growth: phase 0a.3
+
+The batch after study E5 (design: `docs/design/org-growth-phase-0a3.md`); it builds on phase 0a.2 above. Everything stays derived from the mail and the run logs: no ledger, no new file.
+
+- *The case total tells the user's runs from root's own.* For a service whose client is the user, the `case total:` sentence names the runs of root's relayed reworks apart ("N runs used: U by the user's
+  requests, R by your relayed rework `<id>`") and tells root they are its own spend, to report as such and never to ask the user to fund. "exceeds ... tell the user" fires only when the user's requests cost
+  more than the runs the user approved. A relayed rework whose runs cannot be split from a later request of the user's says so. A case whose client is an agent keeps its text.
+- *A rework the user asks for, sent without `budget`,* is handed what is left of the runs the user approved for the case (at most the contract's budget; 1 run when nothing is left). When that is less than one round of the
+  team needs, the reply to `request` (the MCP tool, and `hirearchy request --revises`) names the top-up to ask the user for. Nothing is refused.
+- *A service's suggested budget covers one client round.* The plan's number for a service is the larger of the estimate + 25% and the estimate plus one round of the user's questions or a rejection (1 run, plus 2
+  for each agent below the top one), within the user's cap; the shipped service templates carry it. When a cap or an explicit `budget` keeps a service below it, the `budget-tight` warning gives the number and
+  what it covers. `budget-low` is unchanged, so no plan is newly refused.
+- *The scheduler outlives the chat call.* `start` launches the scheduler through an intermediate process that exits at once, so the scheduler is re-parented (to launchd or init) and is no descendant of the
+  MCP server: ending the chat call no longer ends it. The launcher takes the scheduler's pid from its pid file.
+- *Smaller fixes.* The refusal that asks for a verdict before an amendment says that root's own relayed verdict settles a relayed rework the user never saw. The deliverable note names the delivery a later relayed
+  rework changed instead of calling the file a deviation. A rework delegation whose revised task has no trace finds its `human` or `relayed` tier through the trace of the run's batch. The skill tells root to record
+  the user's keep-as-is as their accept, with their words, also after a reject.
 
 ## Security notes
 

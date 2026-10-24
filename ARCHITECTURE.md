@@ -452,8 +452,8 @@ class ProcessHandle(Protocol):
 class ProcessSpawner(Protocol):
     def spawn(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], stdin: object | None, stdout: object | None) -> ProcessHandle:
         """Start in its own session (pgid == pid), stderr merged into stdout."""
-    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> ProcessHandle:
-        """Detached scheduler: stdin devnull, output appended to log, own session."""
+    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> int:
+        """Detached scheduler (phase 0a.3): returns its pid. An intermediate process (`_detach.py`) starts argv in its own session, stdin devnull, output appended to log, prints the pid and exits at once, so argv is re-parented and is no descendant of the caller."""
 
 class ProcessInspector(Protocol):
     def info(self, pid: int) -> ProcessInfo | None: """None: no such process. Raises ProcessTableError if ps cannot run."""
@@ -471,7 +471,7 @@ class OrphanJudge(Protocol):
     def judge(self, record: Mapping[str, object]) -> str: """'gone', 'foreign', 'ours' or 'doubt' (rules of today's judge_orphan)."""
 ```
 Exceptions in `api`: `ProcessTableError` (ps cannot run), `ProcessGone`, `ProcessDenied`.
-Impl: `PopenProcessSpawner`, `PopenHandle`, `PsProcessInspector`, `OsProcessSignaller`, `PsOrphanJudge(ProcessInspector)`.
+Impl: `PopenProcessSpawner` (`spawn_detached` runs `_detach.py`), `PopenHandle`, `PsProcessInspector`, `OsProcessSignaller`, `PsOrphanJudge(ProcessInspector)`.
 Fakes: `FakeProcessTable` (one object implementing spawner, inspector, signaller; scripted exits) used by all scheduler/daemon unit tests.
 Real-process contract tests (a real child in its own session) exist once, in `processes/tests/`.
 
@@ -857,6 +857,10 @@ class JudgedBase: task: str; result: str; commit: str; relayed: tuple[str, ...];
 class JudgedVersions(Protocol):   # port, implemented by `reflection` (phase 0a.2)
     def base(self, owner: str, service: str, revises: str) -> JudgedBase | None:
         """For a rework of `revises`: the delivery the client judged (its org-git commit) and what relayed reworks sent after it changed in its artifacts; None when no base needs to be named."""
+
+class CaseAllowance(Protocol):   # port, implemented by `reflection` (phase 0a.3)
+    def left(self, owner: str, service: str, revises: str) -> int | None:
+        """For a rework of `revises`: the runs the user approved for its case less what the user's requests used or the team still holds for them (0 or below when nothing is left); None when the task is in no case of the service, the service has no contract, or the client is an agent."""
 ```
 Impl: `FsServiceStore`, `ContractServiceCatalog`, `RuleServiceCommands`, `ServiceReportHints`, `TextContractNormalizer`, `ServiceReworkContext(ReworkContext)`; fake `MemoryServiceStore`.
 `ServiceEvidence` is implemented by `reflection._evidence.CaseServiceEvidence` (it needs the cases, which `services` cannot read), provided by `wire_reflection` and held in the runtime field
@@ -866,13 +870,17 @@ Phase 0a.2 (the enforcement batch after study E4, `docs/design/org-growth-phase-
 and a service defined again after its owner was retired continues the retired record (`RecordedContinuations`, `ContinuedServices`, `ServiceRestorer` and `ServiceFiles`, private ports; `FsServiceStore.restore` writes `SERVICE.md` last). `RuleServiceRequester` takes
 `JudgedVersions` (a sixth collaborator) and refuses a human rework that needs a base (`BASES`, `NEEDS_BASE`); `JudgedVersions` is the runtime field `judged_versions`, implemented by `reflection._judged.CaseJudgedVersions`. `ServiceReworkContext.fields_for` also returns the tier a rework
 delegation inherits, `source`, taken from the newest open task its sender received in the same trace, never for root. Every refusal text names the CLI form of the argument it mentions.
+Phase 0a.3 (the batch after study E5, `docs/design/org-growth-phase-0a3.md`): `CaseAllowance` is the runtime field `case_allowance`, implemented by `reflection._allowance.CaseAllowanceOf`, with the fake `FixedAllowance` (`services/testing.py`) and the contract suite `test_contract_case_allowance.py`;
+`RuleServiceRequester` takes it as a seventh collaborator and, for a rework the user asked for (`source="human"`) sent without `budget`, hands down what is left of the approved runs (at most the contract's budget, 1 run when nothing is left) and refuses nothing. `ServiceReworkContext.fields_for`
+takes the trace of the sender's run batch (its `inflight` box, the stamper's `batch` rule) when the revised task has none. The refusal of an amendment over unrated deliveries (`UNRATED`) says that root's own `source="relayed"` verdict settles a relayed rework the user never saw.
 `RuleServiceCommands` only offers the five commands together; each rule is a part with its own private Protocol (in `_protocols.py`, made by `wire_services`, not runtime fields): `ContractDefinitions` -> `RuleContractDefiner`, `ServiceRetirement` -> `RuleServiceRetirement`, `PlaybookRevisions` -> `RulePlaybookReviser`, `ServiceRequests` -> `RuleServiceRequester`, `ClientFeedback` -> `RuleClientFeedback`. Their collaborators, also private: `ServicePlaces` -> `OrgServicePlaces` (where the files are; `Contract.path` and the relative paths in the texts come from it), `OwnerAddresses` -> `DirectReportOwners`, `PlaybookTexts` -> `CappedPlaybookTexts` (the cap is read from `OrgSettings.config()["playbook_max_words"]` exactly as the old `_word_cap` did: `OrgSettings.number` would read a bool as the default and an infinity as a crash), `PlaybookWriter` -> `EventedPlaybookWriter` (writes through the store and emits `service.revise`), `ContractAmendment` -> `ContractAmender`, `RequestBodies` -> `TextRequestBodies`. `ServiceStore.write_contract` / `write_playbook` write the file, `archive_version` names the old version to keep; the events (`service.define`, `service.revise`, `service.retire`) and the quiet notes (`MessageDelivery.notify(..., wake=False)`) are the commands'. Requests and feedback go through the runtime's `MessageSender`.
 The part of the old `services.py` that is derived from the message files (cases, statistics, digest, `services_text`, `case_total`, the prompt sections) was the seam in `services/_legacy.py` until C-reflection; it is `reflection` now (3.22). `services._clip` is left as an alias of `kernel.clip_line` for `kernel/tests/test_text.py`, which compares the three copies; it goes with that test in E3. `services.api` also exports the pure `playbook_word_cap(config)` (C-reflection), so that the sections of the run prompt read the setting exactly as the commands do.
 
 ### 3.22 `reflection`
 
 Data: `Case Verdict Stats` (as today; `Stats` subclasses the pure port `StatsReport`: `finished`, `avg_runs`, `line()`) and, from phase 0a, `Assertion` (a regression assertion `R<k>`: a rejection by the human client). `Verdict` gains `tier`, `links` and `links_tier`; `Case` gains `client_kind` (`human` when the owner's parent is root) and `relayed_reworks`. Pure public functions in `api.py` (no collaborators): `summarize(items) -> Stats`, `stats_by_version(items) -> dict[int, Stats]`, `version_at(timeline, when) -> int`, `lessons_of(result) -> str`, `regressions(cases) -> list[Assertion]`.
-Phase 0a.1 adds `Verdict.confirmed` (the `C<k>` ids named by the human-tier link notes of a verdict; the verdict's own `criterion` is relayed and never confirms), `Case.returned` (the runs the results of the chain carried back, each clamped to its own task's budget) and the pure functions `confirmed_criteria(cases) -> frozenset[str]` and `case_spend(case) -> int` (the runs used plus, while the case is not finished, the runs still out; `case_total` warns on it and Phase 0b's cost alarm will read the same number).
+Phase 0a.1 adds `Verdict.confirmed` (the `C<k>` ids named by the human-tier link notes of a verdict; the verdict's own `criterion` is relayed and never confirms), `Case.returned` (the runs the results of the chain carried back, each clamped to its own task's budget) and the pure functions `confirmed_criteria(cases) -> frozenset[str]` and `case_spend(case) -> int` (the runs used plus, while the case is not finished, the runs still out; `case_total` warns on it for an agent client and Phase 0b's cost alarm will read the same number).
+Phase 0a.3 splits a human client's case: `Case` gains `relayed_runs`, `relayed_returned`, `relayed_overlap`, `unsplit_runs`, `user_granted` and `user_ceiling` (all default 0, derived per call, nothing stored), and the pure functions `user_spend`, `user_cost`, `user_committed` and `user_approved` (the runs of the user's requests, the least they cost, the runs they used plus what the team still holds for them, and the runs the user approved) are exported. `case_total` names root's relayed runs apart as root's own spend and warns only when `user_cost` exceeds `user_approved`.
 
 ```python
 class CaseHistory(Protocol):
@@ -899,6 +907,7 @@ class DeliverableChecks(Protocol):   # phase 0a.2: read-only; never reads outsid
         """The files in the deliverable folders of the services `actor` requests that differ from the team's last checked version, that the team never wrote, or that could not be read."""
 ```
 Impl: `DerivedCaseHistory`, `DigestBuilder`, `TextServiceReports`, `OwnerPromptSections`, `TextServiceSteps(AgentDirectory, ServiceCatalog, CaseHistory, MailboxReader)`; runtime fields `case_history`, `reflection_digest`, `service_reports`, `service_prompt_sections`, `service_steps`. `StatsReport` is `testing.PURE` and `NOT_A_FIELD`.
+Phase 0a.3 adds `CaseAllowanceOf(history, catalog)` (`services.CaseAllowance`, runtime field `case_allowance`, built by `wire_reflection`), the method `RunCounter.stamps(team, start, end)` (the stamps of the run logs of a window, each with whether a run credit names it), the reply text `TOPUP` of `rework_step` when a rework the user asked for gets less than one round of the team (`client_round`), and the `DeliverableFinding` kind `relayed` (the file is the delivery the user saw, and root's own relayed rework changed the team's copy after it; `DeliverableFinding.relayed` lists those tasks).
 Phase 0a.2 adds `DeliverableChecks` (runtime field `deliverable_checks`; `FolderDeliverableChecks` over the private ports `DeliverableFolder` (a contract's folder walked from a descriptor, no link followed, only the names and hashes of the direct files, at most 200 entries and 32 MiB), `CheckedVersions` (what the team last checked, implemented in `app` by `GitCheckedVersions` over `snapshots.OrgHistory`)
 and `BlobIds`), the pure `deliverables_note(findings)` that `progress`, `status` and `whoami` show to root, `questions_open(task, result, case, root_sent)` (the client questions a `done` or `blocked` result still has open), `Case.lesson_sources` (the digest marks lessons from relayed reworks),
 `Verdict.link_notes`, `amendment_basis` and `CaseJudgedVersions(history, mail, versions)` (`services.JudgedVersions`, runtime field `judged_versions`). `CaseServiceEvidence` admits playbook lines one by one.
@@ -1038,10 +1047,10 @@ class SchedulerCommand(Protocol):
 Impl: `PidFileSchedulerStatus(OrgLayout, ProcessInspector, SchedulerRecognizer, Children, ExitMarker, TaskQuery, WaitingOnUser)`, `DetachedSchedulerControl(SchedulerLauncher, SchedulerStopper)`,
 `PidFileSchedulerLock(OrgLayout, ProcessInspector)`, `FileExitMarker(OrgLayout, AtomicWriter)`, `VenvSchedulerCommand(OrgLayout, executable)`.
 `SchedulerControl` is composed of consumer-owned private ports (`_ports.py`, not in the api): `DetachedLauncher(SchedulerStatus, LaunchSite, LaunchEnvironment, SchedulerCommand,
-ProcessSpawner, Children, StartupWatch)` is `start`; `SignalSchedulerStopper(SchedulerStatus, ProcessSignaller, ProcessInspector, Children, Clock)` is `stop`. `RuntimeLaunchSite(OrgLayout,
+ProcessSpawner, StartupWatch)` is `start` (six collaborators; `ProcessSpawner.spawn_detached` returns the pid of a scheduler that is no descendant of the caller, 3.8); `SignalSchedulerStopper(SchedulerStatus, ProcessSignaller, ProcessInspector, Children, Clock)` is `stop`. `RuntimeLaunchSite(OrgLayout,
 IgnoreList, ExitMarker, Clock)` readies `.runtime`, keeps the runtime files out of the snapshots (`IgnoreList.ensure_runtime_files`), forgets the last exit reason and writes the
 `# --- scheduler started <time>: <argv>` line of the log; `ScrubbedLaunchEnvironment(OrgLayout, Environment)` is the environment bound to the org without `ORG_AGENT` /
-`ORG_REQUIRE_AGENT`; `PidFileStartupWatch(OrgLayout, ExitMarker, Clock)` waits up to ten seconds (every 0.05) for the scheduler to write its pid. `SchedulerIdentity`
+`ORG_REQUIRE_AGENT`; `PidFileStartupWatch(OrgLayout, ExitMarker, Clock, ProcessInspector)` takes the pid `spawn_detached` returned (`StartupWatch.await_start(pid, log)`) and waits up to ten seconds (every 0.05) for the scheduler to write its pid, the pid file naming that pid. `SchedulerIdentity`
 (`SchedulerRecognizer`, `_identity.py`) is `_looks_like_scheduler_of` with `--root X` / `--root=X`, symlinked and `~` roots and the old `hirearchy --root X run` command lines;
 `ChildRegistry` (`Children`, `_children.py`) is `ProcessResources.children`, which only reaps and is never reset. Pure private helpers: `_describe.describe_state` (the line of
 `describe`, shared with the fake), `_refusals.check_startable` / `check_stoppable` and the texts `NO_SCHEDULER`, `SINCE_FORMAT` (shared with the fake), `_files` (the three file names).
@@ -1416,7 +1425,7 @@ Screen goldens (`dashboard/tests/golden`, 34 plain-text screens) were taken from
 ### 3.37 Interface count and widths
 
 Totals and the split into I/O Protocols and role interfaces are in 4.5 (counted by a script over the code blocks of this section). The widest Protocol has 8 methods (`Notices`); `MailboxReader`, `RunLogReader`, `ServiceStore` have 7; kernel ports have at most 4. Package-private Protocols (collaborators inside one package, e.g. `IntegrityCheck`, `RoutePolicy`, `ArtifactNormalizer`, `LineWriter`) live in `_protocols.py`, follow the same rules (R6, R7) and are not counted.
-Phase 0a.2 adds the public Protocols `OrgHistory` (3.5), `JudgedVersions` (3.21), `DeliverableChecks` (3.22) and `GuardedSender` (3.20), and grows `GitClient` to 7 methods, `ServiceEvidence` to 4 and `RetiredArchive` to 4; `ServiceSteps` has 2. No Protocol has more than 8 methods.
+Phase 0a.2 adds the public Protocols `OrgHistory` (3.5), `JudgedVersions` (3.21), `DeliverableChecks` (3.22) and `GuardedSender` (3.20), and grows `GitClient` to 7 methods, `ServiceEvidence` to 4 and `RetiredArchive` to 4; `ServiceSteps` has 2. Phase 0a.3 adds the public Protocol `CaseAllowance` (3.21) and grows the private `RunCounter` (`stamps`) and `BudgetPlanning` (`client_round`, 6 methods). No Protocol has more than 8 methods.
 
 ---
 
