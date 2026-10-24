@@ -1,6 +1,6 @@
 # Org growth, Phase 0a.4: the batch after the E6 FAIL (technical design)
 
-Status: design, revision 1 (design loop pass 1; no review yet). Branch `feat/org-growth-phase-0a4` off `main` `fe0c9fd` (the E6 study commit;
+Status: design, revision 2 (design loop pass 2; resolves the 21 findings of `.agents/tasks/design-review.md`, one by one in Appendix A). Branch `feat/org-growth-phase-0a4` off `main` `fe0c9fd` (the E6 study commit;
 product code identical to `18c4ffb`); worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0a4`. Baseline at `fe0c9fd`:
 `skills/hirearchy/SKILL.md` 125 lines; `ROOT_INSTRUCTIONS` is not edited by this batch (2 642 characters at the reference path at 0a.3, cap 2 700).
 
@@ -28,12 +28,12 @@ new event kind is `scheduler.signal`.
 
 | Item | Decision in this design | Where |
 |---|---|---|
-| A1 (D-E6-1) | **Ship.** The marker line's tail is no item when list items follow it (the line is a heading), or when it is wrapped in parentheses and names no criterion id. An inline question with no list after it stays an item. | 4.2 |
+| A1 (D-E6-1) | **Ship.** The marker line's tail is no item when list items follow it (the line is a heading), or when it is wrapped in parentheses; both rules apply only to a tail that names no criterion id (a tail that names one is always an item, so A1 never hides a `C<k>` question). An inline question with no list after it stays an item. | 4.2 |
 | A2 (D-E6-1) | **Ship.** One function, `kernel.client_items(body)`, splits the parsed items: those naming `\bC[0-9]+\b` are questions (they flag the result, withhold the path, enter the relayed rework's reply); the others are notes, shown in `progress` as `k notes for the client (no criterion): <items>` and never withheld. Every reader calls it. | 4.3 |
 | B (D-E6-2) | **Ship.** A relayed result's return beyond what its relayed task still had goes back to the user's side, in every user figure (`user_spend`, `user_committed`, the approval ceiling). While the revised task is open, the top-up counts the user's runs the team still holds, and the reply says `The team still holds N of the user's runs for <task>; the rework can use them.` in place of `TOPUP`. The default hand-down is unchanged. | 5 |
-| C1 (D-E6-3 step 1) | **First build item, no commit.** A reproduction under the streams' conditions (sandbox `KIRO_HOME`, real org run in flight, `uv --directory ... run hirearchy mcp`, all-tools profile, `--trust-all-tools`, `--resume`), sampled every 0.1 s, one condition varied at a time, recorded in `.agents/tasks/c1-reproduction.md`. | 6.1 |
+| C1 (D-E6-3 step 1) | **First build item, no commit.** A zero-cost sign-in preflight, then a reproduction under the streams' conditions (sandbox `KIRO_HOME`, real org run in flight, `uv --directory ... run hirearchy mcp`, all-tools profile, `--trust-all-tools`, `--resume`), sampled every 0.1 s, one condition varied at a time in a fixed order under a bound of 30 chat calls, recorded in `.agents/tasks/c1-reproduction.md`. | 6.1 |
 | C2 (D-E6-3 step 2) | **Ship, always.** The scheduler's SIGTERM and SIGHUP handlers write `scheduler.signal` at once, before any grace period. The event writer becomes safe to call from a signal handler. | 6.2 |
-| C3 (D-E6-3 step 3) | **Conditional on C1's evidence**, by the decision table of 6.3: SIGHUP ignored (M5), the call's marker variables dropped from the scheduler's environment (M2), or the macOS service manager (M1). If C1 does not reproduce the death, or its evidence fits no row, **C3 is not shipped** and C2 ships alone. | 6.3 |
+| C3 (D-E6-3 step 3) | **Conditional on C1's evidence**, by the decision table of 6.3: SIGHUP ignored (M5), the call's marker variables dropped from the scheduler's environment (M2), or the macOS service manager (M1). Each ships only with an integration test that fails in at least 2 of 3 valid runs at `18c4ffb` and passes 3 of 3 with the fix. If C1 does not reproduce the death, or its evidence fits no row, **C3 is not shipped** and C2 ships alone. | 6.3 |
 | F-E6-6 (D-E6-5) | **Ship.** SKILL.md line 100: the keep-as-is accept is recorded only when the user keeps a delivered version after seeing it; a "keep it" about one part, or before they saw it, is no accept. | 7.1, 8 |
 | F-E6-7 (D-E6-5) | **Ship (today's behaviour is not correct by design).** An agent's delegation without `revises` inherits the tier of the work it does, found through the trace of its open received work (the stamper's own rules), test-first. | 7.2 |
 | SKILL.md spend ask (D-E6-5) | **Ship by replacing text in line 72**: the spend is asked "in the same message as the question or yes/no item that needs the rework". No line has to be freed; no tested needle is lost. | 7.3, 8 |
@@ -43,11 +43,11 @@ Not in this batch (the brief): A3 and D (rejected), Phase 0b, the E7 study, a cr
 ## 2. Technology stack (locked)
 
 Python 3.11, the existing packages only (`mcp`/FastMCP, PyYAML; Textual untouched), the standard library (`re`, `dataclasses`, `signal`, `os`,
-`threading`, `subprocess`), `git` (already required), uv, pytest, `mypy==2.4.0 --strict`, `import-linter==2.15`, `scripts/static_checks.py`,
-`scripts/check.sh`. No new runtime dependency, no new package, no new dependency edge between packages, no new file kind in an organization, no
-new message field. One new event kind (`scheduler.signal`). Strict TDD (R11) under the owner's test policy (section 14). Tools used by hand only,
-never by the default test suite: kiro-cli 2.33.0 (C1, and the C3 integration test, which is marked `integration`); `launchctl` only if C3 takes
-branch M1 (macOS, part of the OS).
+`threading`, `subprocess`, `tempfile`), `git` (already required), uv, pytest, `mypy==2.4.0 --strict`, `import-linter==2.15`, `scripts/static_checks.py`,
+`scripts/check.sh`. No new runtime dependency, no new package, no new dependency edge between packages, no new file kind in an organization (M1's
+transient files live in a private temporary directory outside it, 6.3), no new message field. One new event kind (`scheduler.signal`). Strict TDD
+(R11) under the owner's test policy (section 14). Tools used by hand only, never by the default test suite: kiro-cli 2.33.0 (C1, and the C3
+integration test, which is marked `integration`); `launchctl` only if C3 takes branch M1 (macOS, part of the OS).
 
 ## 3. Shared definitions (each defined once)
 
@@ -69,11 +69,13 @@ branch M1 (macOS, part of the OS).
 
 ### 4.1 Decision
 
-A1 and A2 as decided, with one narrowing of A1 (Deviation 1) that keeps a criterion-tagged question from being dropped. A3 stays rejected:
+A1 and A2 as decided, with one narrowing of A1 (Deviation 1): neither A1 rule drops a tail that names a criterion id, so A1 never drops a
+criterion-tagged question. A3 stays rejected:
 `roles/manager.md` line 27 and its goldens are not touched. The split is decided in exactly one place, `kernel.client_items`, which calls the
 parser `kernel.client_questions`; no product module outside `kernel` calls `client_questions` (pinned by an architecture test, 4.7). A2 never
 hides a criterion-tagged question: the split is exhaustive and disjoint, every item that names an id is a question, and every reader that
-counts, flags, withholds or repeats questions reads `client_items(...).questions`.
+counts, flags, withholds or repeats questions reads `client_items(...).questions`. Together with A1's narrowing, every criterion-tagged text of
+the block (a list item or the marker line's tail) reaches `.questions`.
 
 ### 4.2 A1: the marker line's tail (`SRC/kernel/_text.py:client_questions`)
 
@@ -81,17 +83,39 @@ Today (lines 26-50) the text after the phrase on the marker line is one item unl
 lines that follow (after blank lines) are items. 762f's line `Questions for the client: (reviewer flags; I did not settle them, and they touch
 your answers)` therefore gave a fourth item.
 
-New rule. With `inline` the tail as today (stripped of `:*_ `) and `listed` the list lines that follow the marker after any blank lines (the
-same `_LIST_LINE` loop as today, which ends at the first blank, heading or non-list line):
-1. **heading:** when `listed` holds at least one item (a list line that is not only a none word), the tail is no item, whatever it says;
-2. **remark:** when the tail starts with `(` and ends with `)` and names no criterion id, it is no item;
-3. otherwise the tail is one item unless it is empty or its first word is a none word (today's rule). So an inline question with no list
-   after it stays an item, and so does a parenthesized tail that names an id (`(C3: keep Marta's row?)`).
+New rule. With `inline` the tail as today (stripped of `:*_ `), `names_id` whether `inline` names a criterion id (`\bC[0-9]+\b`), and `listed`
+the list lines that follow the marker after any blank lines (the same `_LIST_LINE` loop as today, which ends at the first blank, heading or
+non-list line):
+1. **a tail that names a criterion id is one item**, whatever its shape and whatever follows (`Questions for the client: C4: should
+   non-actions be excluded?` before a list; `(C3: keep Marta's row?)`; `(C4-C6)` before a list). A1 never drops a `C<k>` question (Deviation 1);
+2. **heading:** otherwise, when `listed` holds at least one item (a list line that is not only a none word), the tail is no item;
+3. **remark:** otherwise, when the tail is wrapped in parentheses (`_wrapped`: all of it is one parenthesized group, its first `(` closed by
+   its last `)`, one final `.` allowed), it is no item. `(reviewer flags; I did not settle them, and they touch your answers)` and the same with a
+   final `.` are remarks; `(a) keep Sam's row? (b) drop Lee's line (style)` is not wrapped (its first `(` closes at the third character), so it
+   stays one item;
+4. otherwise the tail is one item unless it is empty or its first word is a none word (today's rule). So an inline question with no list after it
+   stays an item.
 
-The list items are unchanged. The docstring states the three rules. Code (the shape the implementation follows):
+The list items are unchanged. The docstring states the four rules. Code (the shape the implementation follows):
 
 ```python
 _CRITERION_ID = re.compile(r"\bC[0-9]+\b")  # a criterion id: what makes a client item a question for the client (D-E6-1)
+
+
+def _wrapped(text: str) -> bool:
+    """Is all of ``text`` one parenthesized group: its first "(" closed by its last ")", one final "." allowed (A1's remark)?"""
+    text = text.removesuffix(".")
+    if not (text.startswith("(") and text.endswith(")")):
+        return False
+    depth = 0
+    for i, ch in enumerate(text):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                return i == len(text) - 1  # the first "(" closes here: wrapped only if this is the last character
+    return False
 
 
 def client_questions(body: str) -> list[str]:
@@ -101,7 +125,7 @@ def client_questions(body: str) -> list[str]:
         if not text.lower().startswith(_QUESTIONS_MARKER):
             continue
         inline = text[len(_QUESTIONS_MARKER):].strip(":*_ ")
-        listed = []
+        listed: list[str] = []
         for ln in itertools.dropwhile(lambda x: not x.strip(), lines[start + 1:]):  # blank lines right after the marker are skipped
             m = _LIST_LINE.fullmatch(ln)
             if m is None:
@@ -110,12 +134,16 @@ def client_questions(body: str) -> list[str]:
             if item and not _is_none_word(item):
                 listed.append(item)
         first_word = next(iter(inline.replace(";", " ").replace(",", " ").split()), "")
-        heading = bool(listed)  # list items follow: the marker line is a heading (A1)
-        remark = inline.startswith("(") and inline.endswith(")") and not _CRITERION_ID.search(inline)  # "(reviewer flags; ...)" (A1)
+        names_id = _CRITERION_ID.search(inline) is not None  # such a tail is always an item: A1 never hides a C<k> question (Deviation 1)
+        heading = bool(listed) and not names_id  # list items follow: the marker line is a heading (A1)
+        remark = _wrapped(inline) and not names_id  # "(reviewer flags; I did not settle them, ...)" (A1)
         own = [inline] if first_word and not _is_none_word(first_word) and not heading and not remark else []
         return own + listed
     return []
 ```
+
+`str.removesuffix` strips at most one `.` (a tail ending `..` is not wrapped). The loop's `depth` never goes below 0 before the first `(`
+closes, because the text starts with `(`.
 
 ### 4.3 A2: one function for the split, and its readers
 
@@ -198,9 +226,13 @@ the two constants removed); `SRC/progress/_lines.py` (`_open_items`, the notes p
 | a block with only questions | today's line, byte for byte |
 | questions and notes | today's questions part and the path withheld, then the notes part |
 | an inline tail and no list | one item (a question if it names an id, else a note) |
-| a parenthesized tail without an id and no list | no item |
+| a parenthesized tail without an id and no list (`(...)` or `(...).`) | no item |
+| a tail of several parenthesized parts without an id (`(a) ... (b) ... (style)`) and no list | one item (a note): it is not wrapped |
 | a parenthesized tail with an id and no list | one question |
-| a heading tail before a list | the list items only, whatever the tail says (declared limit 1) |
+| a tail without an id before a list (a heading) | the list items only |
+| a tail with an id before a list, parenthesized or not | the tail is one question, then the list items (declared limit 1) |
+| a tail with an id before a list of notes only | 1 question: the result is flagged and its path withheld (never hidden) |
+| a tail followed only by a `- none` list line | the tail stays an item (no list item follows) |
 | more than 5 notes | 5 listed, then `; and {k} more` |
 | a settled result (rated, or revised by a human rework) | neither part |
 | a `failed` result, or no result | neither part (today's status rule) |
@@ -210,12 +242,17 @@ the two constants removed); `SRC/progress/_lines.py` (`_open_items`, the notes p
 ### 4.7 Tests to write first (each RED before its code)
 
 - `SRC/kernel/tests/test_client_questions.py`: a parenthesized tail without an id, with and without a list after it, gives no item (762f's
-  exact line); a tail followed by list items is a heading (with and without blank lines between); a tail followed only by a `- none` list
-  line stays an item; an inline question with no list stays one (today's tests kept); a parenthesized tail that names an id with no list is
-  one item; a tail that only starts with `(` (`(C3) Keep Marta's row?`) is one item. The existing tests pass unchanged.
+  exact line, and the same line with a final `.`); a tail without an id followed by list items is a heading (with and without blank lines
+  between); a tail that names an id followed by list items is an item before them (`Questions for the client: C4: should non-actions be
+  excluded?` then `- Style: 'himself' (reviewer: harmless).` gives both, the tail first), parenthesized or not (`(C3: keep Marta's row?)` then a
+  list); a tail followed only by a `- none` list line stays an item; an inline question with no list stays one (today's tests kept); a
+  parenthesized tail that names an id with no list is one item; a tail that only starts with `(` (`(C3) Keep Marta's row?`) is one item; a tail
+  of two parenthesized parts and a third (`(a) keep Sam's row? (b) drop Lee's line (style)`) is one item; a nested wrapped tail (`(see (b))`) is
+  no item. The existing tests pass unchanged. `_wrapped` is private: its shapes are pinned through `client_questions` only.
 - `SRC/kernel/tests/test_client_items.py` (new): the split by `\bC[0-9]+\b` (`C3/C4:`, `(C5;`, `AMB1 (C5)`, `Criterion: C4.`, `C12` are ids;
   `CI`, `c5`, `C2C`, `ABC1` are not); order kept; `questions + notes` is every item of `client_questions(body)`, each once (a property over
-  the E3 bodies of the existing tests and the E6 bodies of 4.8); the empty body.
+  the E3 bodies of the existing tests and the E6 bodies of 4.8); the id-tagged tail before a notes-only list gives 1 question and the notes; the
+  empty body.
 - `SRC/reflection/tests/test_pure_functions.py`: `open_client_items` (each settling rule for both parts; a relayed rework keeps both; `failed`
   gives none); `questions_open` counts only criterion-tagged items; `items_listing` (5 shown, `and 1 more`, clipping).
 - `SRC/reflection/tests/test_steps.py`: the relayed rework of a result with only notes gets `""`; with both, `REWORK` lists only the
@@ -223,7 +260,8 @@ the two constants removed); `SRC/progress/_lines.py` (`_open_items`, the notes p
 - `SRC/reflection/tests/test_deliverable_checks.py`: a file that differs from a result with only notes is `differs` with its path (not
   withheld); with a criterion question it is withheld (today).
 - `SRC/progress/tests/test_lines.py`: the notes part (singular and plural, its place before `no feedback yet`, the stripped final `.`, the
-  `and k more` form); only notes: path shown and no flag; both: flag, withheld path and notes; settled: neither.
+  `and k more` form); only notes: path shown and no flag; both: flag, withheld path and notes; an id-tagged marker tail before a notes-only
+  list: `1 question for the client`, the path withheld and the notes listed; settled: neither.
 - `TESTS/architecture/test_client_items_single_reader.py` (new, a source scan like `test_policy_free_primitives.py`): no module of
   `SRC` outside `SRC/kernel/` and outside `tests/` directories contains `client_questions(`.
 - Replays, `TESTS/e2e/test_org_growth_0a4.py` (new, over the E6 kit of 17.1): section 17, items A-1 to A-5.
@@ -234,7 +272,8 @@ Over the 19 results root received with a `Questions for the client:` block in s1
 and 2 notes after A2 (8613's `Style: 'himself' ...` and 6c63's `Keep or delete the '## Open, not decided' section ...`). Per result: 8613 gives
 2 questions and 1 note (the path stays withheld: its two other items name C6 and C3); 762f gives 3 questions; 6c63 gives 1 note and its path is
 shown (A2's cost: Lena was asked it anyway in T8); d80f gives 2 questions (unchanged). Both items that decided s1's clause 3 FAIL are no longer
-flagged; no turn count changes (gate 3 A).
+flagged; no turn count changes (gate 3 A). No marker line that root received in E5 or E6 has a tail naming an id before a list (the review's
+survey of every marker line), so the narrowing of Deviation 1 changes none of these numbers.
 
 ## 5. D-E6-2: B, the top-up counts the user's runs the team holds or got back
 
@@ -252,7 +291,8 @@ B in full, in two parts, both inside `reflection`, both derived:
 
 **The default hand-down is unchanged** (`services._request._default_budget`, `min(left, contract)`, 1 when nothing is left; `CaseAllowance.left`
 = `user_approved - user_committed`). Held runs are already handed down: handing them down again would give the team the same runs twice and raise
-the approval by them, against 0a.3's invariant that the default never hands down a run the user did not approve (Deviation 3). `left` changes
+the approval by them, against 0a.3 I4's rule, under which the default hands down at most what the user approved and has not committed (0a.3's
+limit 1 aside: Deviation 3). `left` changes
 only through part 1 (the user's returned runs are no longer read as held), which is what gives s3's 9a5b its runs.
 
 ### 5.2 The return attribution (`SRC/reflection/_cases.py:_spend`, `SRC/reflection/api.py`)
@@ -369,6 +409,11 @@ The literal reading ("beyond its own task's budget": 7 - 6 = 1 back) gives commi
 removes neither false top-up, which is why Deviation 2 reads it by what the task still had. The gate's "6 of them the user's" and "9a5b: 5 left"
 are this design's figures.
 
+E5's replays (`TESTS/e2e/test_org_growth_0a3.py`) stay byte-identical under B1, by the same rule (computed on `EV5` for this revision): s1's
+relayed 963a had `budget: 6` and 5 charged runs, and its result 592f returned `budget: 1`, at most the 1 it still had, so its share is 0 and
+s1 T6's `user_spend == 10` and `user_approved == 17` hold; s2's relayed tasks f3df and a9cb were sent after both of s2's cuts
+(`034308207974`, `034512547000`), so s2 T5's figures do not read them; s3's replays pin tiers only.
+
 ### 5.6 Code sites
 
 `SRC/reflection/_cases.py` (`_Spend.relayed_to_user`, `back_to_user`, the ceiling's `back`, `open_tasks`); `SRC/reflection/api.py` (`Case` fields,
@@ -405,6 +450,8 @@ are this design's figures.
   reduced ask and grant, in both `{left}` wordings; a closed revised task keeps today's `TOPUP` (the existing pins, unchanged).
 - `SRC/mcp_server/tests/test_service_tools.py` and `SRC/cli/tests/test_service_commands.py`: a human rework of a request whose result is
   `blocked` with runs unspent: the reply (and the CLI's line after the request line) is the `HELD` sentence, nothing asked.
+- `SRC/app/tests/test_wire_cli.py::test_the_request_command_prints_the_step_of_the_runtime` (changed deliberately, 13 Rule B): it already
+  revises an open task (no result), so after B2 its expected step is the `HELD` sentence with 4 held.
 - Replays (`TESTS/e2e/test_org_growth_0a4.py`): section 17, items B-1 and B-2.
 
 ## 6. D-E6-3: C, redone and bounded
@@ -421,19 +468,46 @@ showed that signature (gate discrepancy 1). C1 shows what dies, when, by which s
 - `SB=/tmp/hirearchy-0a4-c1-$(date +%s)`; `WT=/Volumes/workspace/hirearchy/.worktrees/org-growth-0a4`; every kiro-cli call runs with
   `KIRO_HOME=$SB/kiro-home`; every hirearchy command and the MCP server with `HIREARCHY_STATE_DIR=$SB/kiro-state` and the org at `$SB/org`; every
   call's cwd is `$SB`. The org runs get their per-org kiro home under `$SB/kiro-state` (`kiro/_env.py:run_environment`).
+- The C1 shell is the build step's own shell. Like the E6 streams' harness, it runs inside a kiro session and inherits that session's variables,
+  `KIRO_API_KEY` among them: the streams' kiro-cli signed in by it (`EV6/s3/turn-05.stderr.txt` line 2, `Auth: KIRO_API_KEY env var`), and
+  `run_environment` keeps it for every org run (its docstring). The record lists the shell's `KIRO_*` variable names once (names only).
 - Nothing under `~/.kiro`, `/Users/aminalizadeh/organization` or `.worktrees/org-growth-0b` is listed, opened, hashed or written. The MCP server
   (and so the scheduler and the org's runs) gets `HOME=$SB/home` and `UV_CACHE_DIR=<the output of uv cache dir>` (uv then runs from the existing
-  cache), so the product's stale-skill check reads `$SB/home/.kiro/skills`, never the user's. The assistant's own kiro-cli keeps the user's
-  `HOME` with the sandbox `KIRO_HOME`, as 0a.3's C0 did. After each call its session record (under `$SB/kiro-home`) is read: a tool call other
-  than `tool_load` and the `hirearchy::*` tools stops C1 (warning).
-- Environment variables are recorded by **name only**, never by value.
+  cache), so the product's stale-skill check reads `$SB/home/.kiro/skills`, never the user's. The org's runs sign in under that `HOME` through the
+  inherited `KIRO_API_KEY` (Setup 0 checks it before any model call). The assistant's own kiro-cli keeps the user's `HOME` with the sandbox
+  `KIRO_HOME`, as 0a.3's C0 and the streams did. After each call its session record (under `$SB/kiro-home`) is read: a tool call other than
+  `tool_load` and the `hirearchy::*` tools stops C1 (warning).
+- Environment variables are recorded by **name only**, never by value. The account `whoami` names is never recorded.
 - Clean-up after each attempt: kill only the pids C1 learned (the scheduler's pid file, each `run.start`'s `child_pid`/`pgid`, the chat's pid
   and the descendants the sampler saw) and processes whose command line names `$SB`; remove `$SB` after its record is written.
-- **Stop conditions (send `warning`, ship C2 only, record the conditions tried):** `KIRO_HOME=$SB/kiro-home kiro-cli whoami` fails (the owner
-  decides whether a `KIRO_API_KEY` may be used; never fall back to the user's kiro home); the profile does not validate; no session record under
-  `$SB/kiro-home` (kiro-cli ignored `KIRO_HOME`: never repeat the call); the call starts no scheduler; the org's first run never reaches
-  `# kiro: run started` in its run log (the org's runs cannot sign in under the sandbox); a forbidden tool call; more than 30 kiro-cli chat
-  calls in C1 and C1b together (the bound).
+- **Bounds, each a stop condition:** C1 (V0, D-ENV, D-OUT, V1-V5, every attempt and repeat) at most **30** kiro-cli chat calls; C1b at most **6**;
+  the C3 step's integration-test runs at most **12** (6.3). Setup 0's `whoami` makes no model call and is not counted. A bound reached before
+  V0, D-ENV and (when D-ENV died) D-OUT are decided stops C1; reached later, it only skips the informational variants, which is recorded.
+- **Stop conditions (send `warning`, ship C2 only, record the conditions tried):** Setup 0 fails (the owner chooses, below); the profile does
+  not validate; no session record under `$SB/kiro-home` (kiro-cli ignored `KIRO_HOME`: never repeat the call); turn 2's `start` starts no
+  scheduler (in every run but D-OUT, where the shell starts it); the org's first run never reaches `# kiro: run started` in its run log in 2 V0
+  attempts (the org's runs cannot sign in: Setup 5 records whether `KIRO_API_KEY` reached the server); a forbidden tool call; a bound, as above.
+
+**Setup 0, the sign-in preflight (once, before any chat call; no model call).**
+
+```sh
+mkdir -p $SB/home $SB/kiro-probe
+(cd $SB && HOME=$SB/home KIRO_HOME=$SB/kiro-probe kiro-cli whoami </dev/null)   # must exit 0
+rm -rf $SB/kiro-probe
+```
+
+The record keeps the exit code and the first output line only if it starts with `Authenticated` (a line that names the account is never written).
+At design time (this revision) the probe exited 0 in the workflow's own shell with `Authenticated with API key`, so the default above is
+expected to hold. On a non-zero exit, the step sends `warning` before any chat call, with the owner's choice:
+- (a) `KIRO_API_KEY` in the MCP server's `env` block (named only in the record; the value is the owner's and is never written), keeping
+  `HOME=$SB/home`; or
+- (b) the MCP server keeps the user's `HOME`, as the streams and `tests/integration` do. The prompts never name `whoami` or `status`, and a root
+  `hirearchy::whoami` or `hirearchy::status` call in a session record becomes a stop condition: those two tools are the only readers of
+  `<HOME>/.kiro/skills/hirearchy/SKILL.md` (read-only; `mcp_server/_tools_identity.py` and `_tools_status.py`, through
+  `app/wire_mcp_server.py:PackagedInstalledSkill`), and with `HIREARCHY_STATE_DIR` set nothing else these calls run reads `HOME`
+  (`kiro/_places.py`). Under (b), declared limit 8 drops "the user's HOME for root's MCP server", and the profile's `env` has no `HOME` key.
+
+The integration test of 6.3 uses the same probe as its skip condition, under the same choice.
 
 **Setup (once per attempt).**
 1. `h() { HIREARCHY_STATE_DIR=$SB/kiro-state $WT/.venv/bin/hirearchy "$@"; }`; `h init $SB/org --mission "0a.4 C1 reproduction (throwaway)"
@@ -450,40 +524,63 @@ showed that signature (gate discrepancy 1). C1 shows what dies, when, by which s
 3. The two calls of the streams' shape (`EV6/s3/turn-05.cmd.txt`):
    - turn 1: `KIRO_HOME=$SB/kiro-home kiro-cli chat --v3 --no-interactive --trust-all-tools --effort high --agent c1-<epoch> "Load the hirearchy
      tools with tool_load, call hirearchy::progress once with its defaults, and reply with its result only."`;
-   - turn 2: the same with `--resume` and `"Call hirearchy::start once with its defaults, then reply with its result only."`. The call returns
-     seconds after `start`, while the scheduler's first real run is in its start phase (s3: 2.25 s after `run.start`).
+   - turn 2: the same with `--resume` and `"Call hirearchy::progress once with its defaults, then hirearchy::start once with its defaults, then
+     reply with the result of start only."`. The call returns seconds after `start`, while the scheduler's first real run is in its start phase
+     (s3: 2.25 s after `run.start`). The `progress` call first gives D-OUT a point inside the call to start the scheduler from, with the call's
+     shape unchanged.
 4. The sampler (a throwaway script under `$SB`, not committed), from turn 2's start until 15 s after its return, every 0.1 s: a UTC-stamped
    `ps -o pid,ppid,pgid,sess,stat,lstart,command` of exactly these processes: the turn-2 chat process and its descendants (re-walked by parent
    pid at each sample), the scheduler (its pid file) and its descendants, and each run (`child_pid` of its `run.start` event). Nothing else of
-   the process table is recorded (other processes' command lines can hold the user's prompts).
-5. Per attempt, `.agents/tasks/c1-reproduction.md` records: the commands; the call's start and return (UTC, ms), exit code, stdout and stderr;
-   the samples; the org's events (`scheduler.start`/`exit`, `run.start`/`end`, `tool.call`); kiro-cli's own log lines of the call from
-   `$SB/kiro-home` (files newer than the call's start; the shutdown, signal and kill lines such as `kas.server.signal_shutdown`); the session
-   record's path; the names of the variables in the MCP server's and the scheduler's environment that the C1 shell's environment lacks (from
-   `ps -E`/`ps eww` of those two processes, names only); and the verdict: **died** (the scheduler's pid gone within 5 s of the return, with no
-   `scheduler.exit` reason starting `finished`) or **survived** (scheduler and run alive 5 s after the return); for a death, the last sample
-   alive, the first sample gone, the STAT and parent pid just before, and whether `scheduler.exit` and `run.end` exist.
+   the process table is recorded (other processes' command lines can hold the user's prompts). It also follows the org's event files (for
+   D-OUT's trigger and the verdicts).
+5. Per attempt, `.agents/tasks/c1-reproduction.md` records:
+   - the commands; the call's start and return (UTC, ms), exit code, stdout and stderr (stderr carries kiro-cli's own `[INFO]` lines, as
+     `EV6/s3/turn-05.stderr.txt` does); the samples; the org's events (`scheduler.start`/`exit`/`signal`, `run.start`/`end`, `tool.call`); the
+     session record's path;
+   - kiro-cli's own log of the call: the files newer than the call's start under `$SB/kiro-home`, with their shutdown, signal and kill lines
+     (such as `kas.server.signal_shutdown`). The record states whether such a file was found; when none was, the log is recorded as missing. It
+     is never searched for under `~/.kiro` or elsewhere in the user's `HOME`;
+   - **the changed names**: the names whose value in the MCP server's or the scheduler's environment is absent from, or differs from, the C1
+     shell's (the sampler reads `ps -E -ww -o command= -p <pid>` of those two processes once, compares the values in memory and writes names
+     only; a name inside a value may be listed too, which only makes D-ENV unset one harmless name more). They are split into: the keys of the
+     profile's `env` block; `VIRTUAL_ENV` and names starting `UV_`; the M2 refusal list of section 10; and the rest, **D-ENV's names**. Every
+     group is recorded, and whether `KIRO_API_KEY` is in the server's environment (yes/no). A name present in the shell with another value (an
+     inner `KIRO_SESSION_ID`, for one) is a changed name: comparing names alone would miss it, because the C1 shell already carries its own
+     session's `KIRO_*` names;
+   - the verdict, by the first class that matches, in this order:
+     - **no-run** (invalid: repeated, counted in the bound): no org `run.start` before the return, or the run ended before it;
+     - **finished** (invalid: repeated, counted): the scheduler exited with a reason starting `finished`;
+     - **died**: the scheduler's pid gone within 5 s of the return;
+     - **run-only**: the scheduler alive 5 s after the return and the run gone without a `run.end` with `ok: true`: a signature of its own,
+       recorded; it counts as not reproduced in 6.3's first row, and the final message names it;
+     - **survived**: the scheduler and the run alive 5 s after the return;
+   - for a death: the last sample alive, the first sample gone, the STAT and parent pid just before, and whether `scheduler.exit`,
+     `scheduler.signal` (C1b) and `run.end` exist.
 
-**The runs, one condition varied at a time.**
+   A variant whose attempts are invalid 3 times running is recorded as "could not be set up": for V0 that is "not reproduced" with that reason;
+   for D-ENV or D-OUT no row of 6.3 can match on it.
 
-| Run | Change from V0 | Attempts | Purpose |
-|---|---|---|---|
-| V0 | none: the streams' conditions (sandbox `KIRO_HOME`, uv-started server, all-tools profile, `--trust-all-tools`, turn 2 with `--resume`, a real org run in its start phase at the return) | up to 3 | reproduces: **reproduced** when it dies in at least 2 of 3; **not reproduced** when it survives 3 of 3; ambiguous (1 of 3) counts as not reproduced |
-| V1 | the server `"command": "<WT>/.venv/bin/hirearchy", "args": ["mcp"]` (no uv) | 1 (a 2nd if it survives) | which condition matters |
-| V2 | profile `"tools": ["@hirearchy"]` with a permission rule allowing `hirearchy/progress` and `hirearchy/start` only; no `--trust-all-tools` | 1 (2) | which condition matters |
-| V3 | one call: turn 1 calls `start` (no `--resume`) | 1 (2) | which condition matters |
-| V4 | the org runs through a stub kiro-cli (`runStarted`, `sleep 60`, `runFinished`) on the server's `PATH` only | 1 (2) | which condition matters |
-| V5 | turn 2 calls `start`, then `progress(wait_seconds=60)`, then replies (an older scheduler, a run past its start phase) | 1 (2) | which condition matters |
-| D-ENV | the server's command is `/usr/bin/env` with one `-u NAME` per variable step 5 found that kiro-cli adds (then `uv --directory ...`), so the server and the scheduler lack them | 1 (2), then at most 2 more to narrow the names | mechanism: an inherited marker |
-| D-OUT | the scheduler is started from the C1 shell (`h --root $SB/org start`, the product's own detached start, with the shell's own environment, which lacks only the variables kiro-cli adds and which D-ENV showed do not matter) just before turn 2; turn 2 calls only `progress` and replies | 1 (2) | mechanism: ancestry inside the call's tree |
-| C1b | V0 on the C2 commit (6.2), once | 1 | which signal reached the scheduler (`scheduler.signal`), if any |
+**The runs, one condition varied at a time, in this order.**
 
-V1-V5, D-ENV and D-OUT run only when V0 reproduced. A variant "survives" only when it survives 2 attempts; one death decides "dies". D-OUT runs
-only when D-ENV died. C1b runs as the first act of the C3 step, on the C2 commit. Every attempt spends real model calls; the bound is above.
+| Order | Run | Change from V0 | Valid attempts | Purpose |
+|---|---|---|---|---|
+| 1 | V0 | none: the streams' conditions (sandbox `KIRO_HOME`, uv-started server, all-tools profile, `--trust-all-tools`, turn 2 with `--resume`, a real org run in its start phase at the return) | up to 3 | **reproduced** when it dies in at least 2 of 3; **not reproduced** when it survives (or is run-only) in 3 of 3, or dies in only 1 of 3 |
+| 2 | D-ENV | the server's `"command"` is `/usr/bin/env`, its `"args"` one `-u NAME` per D-ENV name (Setup 5, from V0's attempts) and then `uv --directory <WT> run hirearchy mcp`, so the server and the scheduler lack exactly those names | up to 2; then at most 2 narrowing attempts, one each (half of the names, then half of the half that survived) | mechanism: an inherited marker |
+| 3 | D-OUT (only when D-ENV died) | the scheduler is started by the C1 shell, not by the call: as soon as the sampler sees turn 2's server write its `tool.call` line for `progress`, the shell runs `HOME=$SB/home h --root $SB/org start &` (the product's own detached start; the shell's environment lacks D-ENV's names, which D-ENV showed do not matter). Turn 2 still calls `start` once; its reply is the existing `a scheduler is already running for this org (pid N, since ...); call stop() first to restart it` (no new refusal). The attempt is valid only when the pid file names the scheduler the shell's `start` reported and its `run.start`-to-return time is within 3 s of V0's median; otherwise it is repeated (counted) | up to 2 | mechanism: ancestry inside the call's tree |
+| 4 | V3 | one call: turn 1 calls `progress`, then `start` (no `--resume`) | up to 2 | informational |
+| 5 | V2 | profile `"tools": ["@hirearchy"]` with a permission rule allowing `hirearchy/progress` and `hirearchy/start` only; no `--trust-all-tools` | up to 2 | informational |
+| 6 | V1 | the server `"command": "<WT>/.venv/bin/hirearchy", "args": ["mcp"]` (no uv) | up to 2 | informational |
+| 7 | V5 | turn 2 calls `progress`, `start`, then `progress(wait_seconds=60)`, then replies (an older scheduler, a run past its start phase) | up to 2 | informational |
+| 8 | V4 | the org runs through a stub kiro-cli (`runStarted`, `sleep 60`, `runFinished`) on the server's `PATH` only | up to 2 | informational |
+| C3 step | C1b | V0 on the C2 commit (6.2) | up to 3, stopping at the first death | which signal reached the scheduler (`scheduler.signal`), if any |
 
-**Outcome.** C1's record ends with one of the rows of 6.3's table and the evidence that selects it. When V0 is not reproduced, C1 records the
-conditions tried (and the ones the sandbox could not give: declared limit 8 of section 16) and the batch ships C2 alone; the final message says so
-(D-E6-3: "E7's preflight then checks survival under the streams' conditions").
+Orders 2-8 run only when V0 reproduced. A variant "survives" when it survives 2 valid attempts; one death decides "dies". V1-V5 never select a
+row of 6.3; one skipped because the bound was reached is recorded as skipped, not a stop. C1b runs as the first act of the C3 step, on the C2
+commit; if its 3 attempts all survive, that is recorded and the M5 row cannot match. Every attempt spends real model calls; the bounds are above.
+
+**Outcome.** C1's record ends with one of the rows of 6.3's table and the evidence that selects it. When V0 is not reproduced (or is run-only,
+or could not be set up), C1 records the conditions tried (and the ones the sandbox could not give: declared limit 8 of section 16) and the batch
+ships C2 alone; the final message says so (D-E6-3: "E7's preflight then checks survival under the streams' conditions").
 
 ### 6.2 C2: the `scheduler.signal` event (always shipped)
 
@@ -527,7 +624,7 @@ STOP_SIGNALS = (signal.SIGTERM, signal.SIGHUP)  # recorded at once (scheduler.si
                 self.release()
             finally:
                 for sig, handler in previous.items():
-                    signal.signal(sig, handler)  # the process is left as it was found (the tests' process, too)
+                    signal.signal(sig, handler if handler is not None else signal.SIG_DFL)  # as found (the tests' process, too); None: not set from Python
 ```
 
 `run_once` installs no handler (unchanged). A second signal is recorded too; the first one names the exit reason.
@@ -600,45 +697,76 @@ C3's mechanism is chosen **only** by C1's recorded evidence, by the first row th
 
 | C1 shows | C3 | Shipped? |
 |---|---|---|
-| V0 not reproduced (survives 3 of 3, or dies 1 of 3) | none | **C3 not shipped; C2 ships alone**; the report and the final message list the conditions tried |
-| V0 reproduced, and C1b shows `scheduler.signal` with `signal: SIGHUP` as the first signal the scheduler got, followed by its own `scheduler.exit` `stopped by SIGHUP` (no KILL) | **M5**: SIGHUP is recorded and always ignored | yes, if the integration test passes |
-| V0 reproduced, D-ENV survives | **M2**: the scheduler's environment drops the variables C1 named | yes, if none of those variables is needed by the org's runs (D-ENV's own org run must have completed), else not shipped (warning) |
-| V0 reproduced, D-ENV dies, D-OUT survives | **M1** (macOS): the scheduler is started through launchd, never a descendant of the call | yes, if the integration test passes within the C3 step |
+| V0 not reproduced (survives or is run-only in 3 of 3, dies in only 1 of 3, or could not be set up) | none | **C3 not shipped; C2 ships alone**; the report and the final message list the conditions tried |
+| V0 reproduced, and C1b shows `scheduler.signal` with `signal: SIGHUP` as the first signal the scheduler got, followed by its own `scheduler.exit` `stopped by SIGHUP` (no KILL) | **M5**: SIGHUP is recorded and always ignored | yes, if the integration test passes (its RED and GREEN rule below) |
+| V0 reproduced, D-ENV survives | **M2**: the scheduler's environment drops the variables C1 named | yes, if none of those variables is needed by the org's runs (D-ENV's own org run must have completed) and the integration test passes; else not shipped (warning) |
+| V0 reproduced, D-ENV dies, D-OUT survives | **M1** (macOS): the scheduler is started through launchd, never a descendant of the call | yes, if the integration test passes |
 | V0 reproduced, and none of the rows above | none | **not shipped**: `warning` with the evidence; the design must be redone (0a.3 6.1's stop condition) |
 
 **M5 (SIGHUP).** `SRC/scheduler/_loop.py`: `ignored = {signal.SIGHUP}` always. `scheduler.signal` then says `action: ignored`; SIGTERM keeps
-today's clean stop (`hirearchy stop` is unchanged).
+today's clean stop (`hirearchy stop` is unchanged). The M5 commit changes, deliberately, the C2 tests that expect a SIGHUP stop (the
+`test_loop.py` stop case under `sighup_default` and the second test of `TESTS/e2e/test_scheduler_signal.py`) to expect `action: ignored` and no
+stop, their docstrings naming C1b's evidence.
 
 **M2 (an inherited marker).** `SRC/daemon/_site.py:ScrubbedLaunchEnvironment.variables` (line 41) also pops the names in a new constant
-`CALL_MARKERS = (<the names C1 recorded>,)` (names only, from the evidence), as it pops `ORG_AGENT` and `ORG_REQUIRE_AGENT` today. Test:
-`SRC/daemon/tests/test_detached_launcher.py` (or `test_site.py`): the scheduler's environment lacks each name and keeps every other variable.
+`CALL_MARKERS = (<the names C1 recorded>,)` (names only, from the evidence: D-ENV's names, or the narrowed half that survived alone), as it pops
+`ORG_AGENT` and `ORG_REQUIRE_AGENT` today. Test: `SRC/daemon/tests/test_launch_site.py`: the scheduler's environment lacks each name and keeps
+every other variable.
 
-**M1 (macOS launchd).** A new private class `SRC/processes/_launchd.py:LaunchdDetachedSpawner(ProcessSpawner)` wraps `PopenProcessSpawner`:
-`spawn` delegates; `spawn_detached(argv, cwd, env, log)`:
+**M1 (macOS launchd).** A new private class `SRC/processes/_launchd.py:LaunchdDetachedSpawner(ProcessSpawner)` wraps a `PopenProcessSpawner`
+(the fallback): `spawn` delegates; `spawn_detached(argv, cwd, env, log)`:
 1. `label = "com.hirearchy.scheduler." + sha256(str(cwd)).hexdigest()[:16]` (one per organization, derived; no stored state);
-2. `launchctl remove <label>` (its failure, "no such job", is ignored: `start` already refused while a live scheduler holds the pid file);
-3. the environment is written as JSON to `<log's folder>/detach-<label>.json` (`O_CREAT | O_EXCL`, mode `0600`) and never put on a command line;
-4. `launchctl submit -l <label> -o <log> -e <log> -- <sys.executable> -I <processes/_detach.py> --env <file> --cwd <cwd> --pid
-   <log's folder>/detach-<label>.pid <log> -- <argv...>`: launchd starts the intermediate, which reads and deletes the env file, changes to
-   `cwd`, starts `argv` in a session of its own (today's `_detach.py` body), writes its pid to the pid file and exits 0;
-5. wait up to 10 s for the pid file, read the pid, then `launchctl remove <label>` (the intermediate has exited; launchd never restarts it),
-   delete the pid file and return the pid;
-6. failures: `launchctl` missing, or `submit` exiting non-zero before anything ran: the detach falls back to `PopenProcessSpawner.spawn_detached`
-   (today's), and the scheduler log gets the line `# --- started without launchd: <reason>`; no pid within 10 s: `launchctl remove <label>`,
-   the files deleted, and `OSError("could not start <argv[0]> detached: no pid was reported within 10 seconds")` (today's error, so `start`
-   reports it as today). Nothing new is refused.
-`_detach.py` gains the optional `--env FILE --cwd DIR --pid FILE` arguments before `<log> -- <argv>` (exit 2 on a malformed command line, as
-today). `SRC/app/wire_processes.py` builds `LaunchdDetachedSpawner` when `sys.platform == "darwin"`, else today's spawner. Linux keeps today's
-detach: C1 runs on macOS only, so no Linux mechanism rests on evidence (Deviation 9, declared limit 9).
+2. `launchctl remove <label>` (its failure, "no such job", is ignored: `start` already refused while a live scheduler holds the pid file), then
+   wait until `launchctl list <label>` exits non-zero, polling every 0.1 s for at most 2 s, because `remove` returns before the job has stopped
+   (`man launchctl`). Still listed after 2 s: fall back (step 6) with the reason `an earlier job <label> is still loaded`;
+3. `d = tempfile.mkdtemp(prefix="hirearchy-detach-")` (mode `0700`, in the system's temporary directory, outside the organization; removed with
+   `shutil.rmtree(d, ignore_errors=True)` in a `finally` of `spawn_detached`). The environment is written as JSON to `d/env.json` (`O_CREAT |
+   O_EXCL`, mode `0600`) and is never put on a command line;
+4. `launchctl submit -l <label> -o <log> -e <log> -- <sys.executable> -I <processes/_detach.py> --env d/env.json --cwd <cwd> --pid d/pid <log>
+   -- <argv...>`. launchd starts the intermediate. With `--env`, the intermediate exits 0 at once when the env file is missing (a launchd
+   respawn: `submit` keeps a job alive after a failure, `man launchctl`); otherwise it reads and deletes the file, changes to `cwd`, starts
+   `argv` in a session of its own (today's `_detach.py` body), and writes `<pid>\n` to `d/pid`, or `error: <reason>\n` when `argv` cannot be
+   started. It exits 0 in each case, so launchd has no failure to restart;
+5. wait up to 10 s for a complete line in `d/pid`. A pid: `launchctl remove <label>` (the intermediate has exited; the scheduler is in a session
+   of its own), and return the pid. That `remove` runs inside `start`, before the call returns, so the integration test's check 5 s after the
+   return also shows that removing the job left the scheduler alive (unverified until then: `man launchctl` does not say);
+6. fall back, in every other case: `launchctl` missing, `submit` exiting non-zero, the earlier job still loaded (step 2), `error: <reason>` in
+   `d/pid`, or no line within 10 s. Then `launchctl remove <label>` (when a job was submitted), the scheduler log gets the line
+   `# --- started without launchd: <reason>` (`launchctl not found`, `launchctl submit exited <code>`, `an earlier job <label> is still loaded`,
+   the intermediate's `<reason>`, or `no pid within 10 seconds`), and the fallback's `spawn_detached(argv, cwd, env, log)` runs: today's detach,
+   whose own failure raises today's `OSError` text. So M1 adds no new failure of `start` and no refusal: at worst `start` behaves as today. A
+   scheduler that a late intermediate starts after the fallback has started one is refused by its own claim (`daemon/_lock.py`, today's `a
+   scheduler is already running for this org (pid N)`) and exits, as two concurrent starts do today.
+`_detach.py` gains the optional `--env FILE --cwd DIR --pid FILE` arguments before `<log> -- <argv>`; without `--env` it is today's (exit 2 on a
+malformed command line). `SRC/app/wire_processes.py` builds `LaunchdDetachedSpawner` when `sys.platform == "darwin"`, else today's spawner.
+Linux keeps today's detach: C1 runs on macOS only, so no Linux mechanism rests on evidence (Deviation 9, declared limit 9). The C3 step records
+`launchctl list <label>` once, right after a `submit`, in `c1-reproduction.md`. Unit tests (`SRC/processes/tests/test_launchd_spawner.py`, over
+a fake `launchctl` script on `PATH` and a fake fallback): each fallback reason and its log line; the wait for `list` to fail before `submit`;
+the env file's mode and its absence from every command line; `d` removed in every case; and `_detach.py` with `--env` exits 0 when the file is
+missing and writes `error: ...` for an `argv` that cannot start.
 
 **The integration test (every shipped row).** `TESTS/integration/test_scheduler_survives_the_call.py::test_the_scheduler_and_its_run_outlive_the_kiro_cli_call_that_started_them`,
-marked `integration` (its directory marks it; `--run-integration` runs it) and skipped when `shutil.which("kiro-cli")` is None or
-`KIRO_HOME=<tmp>/kiro-home kiro-cli whoami` fails. It runs V0 (6.1 steps 1-3) in the test's tmp dir, with `KIRO_HOME` and `HIREARCHY_STATE_DIR`
-under it and the safety rules of 6.1 (it never reads `~/.kiro`, so it does not use `testkit/kiro_sandbox.py`'s `~/.kiro` fence), then asserts:
-5 s after turn 2 returns, the scheduler (pid file) and the run (`child_pid`) are alive (`ps -o stat=`, not empty and not `Z`); within the run's
-timeout the run ends with `run.end` `ok: true` and `killed: false`, the task's result is `done`, and `scheduler.exit` says `finished: no open
-tasks`. `finally`: kill only the pids it learned. It is RED on the C2 commit (its detach is `18c4ffb`'s; the C3 step runs it once there before
-the fix and records the RED result in `c1-reproduction.md`) and GREEN after the fix.
+marked `integration` (its directory marks it; `--run-integration` runs it). It is skipped, with a named reason, when `shutil.which("kiro-cli")`
+is None or Setup 0's probe (6.1) fails with the server `HOME` the test uses (the module constant `SERVER_HOME = "sandbox"`, `<tmp>/home`; set
+to `"user"` only if the owner chose (b) in C1). It runs V0 (6.1 Setup 1-3) in the test's tmp dir, with `KIRO_HOME` and `HIREARCHY_STATE_DIR`
+under it and the safety rules of 6.1. Its MCP server is `uv --directory <the checkout the test file is in> run hirearchy mcp`, so a copy of the
+file runs that checkout's product. It imports only the standard library and pytest, so it runs unchanged on `18c4ffb`. It does not use the
+`real_kiro` fixture (Deviation 13). First the validity checks: no org `run.start` before the return, the run ended before it, or the scheduler
+`finished` before the 5 s check gives `pytest.fail("INVALID: <which>")`, which counts as neither RED nor GREEN. Then it asserts: 5 s after
+turn 2 returns, the scheduler (pid file) and the run (`child_pid`) are alive (`ps -o stat=`, not empty and not `Z`); within the run's timeout
+the run ends with `run.end` `ok: true` and `killed: false`, the task's result is `done`, and `scheduler.exit` says `finished: no open tasks`.
+`finally`: kill only the pids it learned.
+
+**Its RED and GREEN proof (the C3 step, by hand; one run is one pytest invocation of the test with `--run-integration`, 2 chat calls; at most 12
+runs, invalid ones included):**
+- **RED at `18c4ffb`:** `git -C /Volumes/workspace/hirearchy worktree add --detach /tmp/hirearchy-0a4-red-<epoch> 18c4ffb`, `uv sync` there,
+  the new test file copied into its `tests/integration/`; 3 valid runs, of which at least 2 fail on the survival assertion (V0's criterion);
+  then `git -C /Volumes/workspace/hirearchy worktree remove --force /tmp/hirearchy-0a4-red-<epoch>` (this step's own throwaway checkout,
+  outside `.worktrees/`; nothing in it is committed).
+- **GREEN:** 3 of 3 valid runs pass on the C3 change in this worktree, before it is committed.
+- **Otherwise** (not RED by that rule, not GREEN 3 of 3, or the 12 runs used first): no C3 commit (the C3 changes are discarded with
+  `git restore` and its new files deleted), `c1-reproduction.md` records every run, and the step sends `warning` (0a.3 6.1's stop condition:
+  the design must be redone). C2 has already shipped.
 
 ### 6.4 Zero and empty cases (C2)
 
@@ -674,7 +802,10 @@ the fix and records the RED result in `c1-reproduction.md`) and GREEN after the 
   - SIGTERM raised in phase `a` is recorded before phase `b` runs (`journal == ["open", "a", "signal", "b", "pause", "close"]`), reason
     `stopped by SIGTERM`, the record `("SIGTERM", "stop", [])`;
   - SIGHUP stops the loop the same way (`stopped by SIGHUP`);
-  - with SIGHUP set to `SIG_IGN` before `serve` (the fixture restores it), a SIGHUP is recorded `ignored` and the loop ends by its exit policy;
+  - with SIGHUP set to `SIG_IGN` before `serve`, a SIGHUP is recorded `ignored` and the loop ends by its exit policy;
+  - the SIGHUP disposition is set by a fixture, never inherited from the runner: `sighup_default` sets `signal.signal(signal.SIGHUP,
+    signal.SIG_DFL)` for the stop cases, `sighup_ignored` sets `SIG_IGN` for the ignored case, and each restores the disposition it found in
+    its teardown (a runner under `nohup`, or a background `check.sh`, starts with SIGHUP ignored; `SIG_IGN` survives `fork` and `exec`);
   - two signals give two records and the first one's reason;
   - a run in the table is named in `running`;
   - `serve` leaves the SIGTERM and SIGHUP handlers it found;
@@ -688,7 +819,11 @@ the fix and records the RED result in `c1-reproduction.md`) and GREEN after the 
   inside the run's 10 s grace). Asserts: a `scheduler.signal` line exists with the keys `v, ts, seq, proc, pid, kind, actor, run, trace, signal,
   action, ppid, running` in that order and types `int, str, int, str, int, str, str, NoneType, NoneType, str, str, int, list`, `signal ==
   "SIGTERM"`, `action == "stop"`, `running == [<the run id>]`, its `ts` before the KILL; and no `scheduler.exit`. A second test sends SIGHUP
-  alone to a scheduler whose stub run dies on TERM: `scheduler.signal` (`SIGHUP`, `stop`), then `scheduler.exit` `stopped by SIGHUP`.
+  alone to a scheduler whose stub run dies on TERM: `scheduler.signal` (`SIGHUP`, `stop`), then `scheduler.exit` `stopped by SIGHUP`. A third
+  test starts the scheduler with SIGHUP ignored, sends SIGHUP, and expects `scheduler.signal` with `action: ignored`, the scheduler still alive
+  1 s later and no `scheduler.exit` until the test's SIGTERM (`stopped by SIGTERM`). The starter script (the parent process that calls
+  `scheduler_control.start`) sets `signal.signal(signal.SIGHUP, signal.SIG_DFL)` before the call for the first two tests and `SIG_IGN` for the
+  third, so the scheduler's disposition never depends on the runner's (it is inherited through `_detach.py`).
   `finally`: kill the run's group and the scheduler (only pids it learned). RED today (no such event).
 
 ## 7. D-E6-5: the small items
@@ -774,7 +909,7 @@ New:
 New:
 
 ```
-3. A done or blocked report's "Questions for the client:" (ambiguous items; `progress` flags them and withholds the path; the ones it lists as notes, with no criterion, you only pass on with the delivery): ask them in plain words, with any question from item 2, in ONE
+3. A done or blocked report's "Questions for the client:" (ambiguous items; `progress` flags them and withholds the path; the ones it lists as notes, with no criterion, you only pass on with the delivery): ask the others in plain words, with any question from item 2, in ONE
 ```
 
 **Line 100** (section 5, item 6; F-E6-6, 7.1). Today:
@@ -800,7 +935,9 @@ Needles (matched on the flattened, lower-cased text, so line breaks do not matte
   (`test_skill_org_growth.py::test_the_skill_records_the_users_keep_as_is_as_their_accept_on_its_task`) becomes `when they keep a delivered
   version as it is after seeing it ("i'll take it as it is"), record that accept on its task`; the test's docstring names F-E6-6;
 - new: `a "keep it" about one part of it, or before they saw it, is no accept`, `in the same message as the question or yes/no item that needs
-  the rework`, `the ones it lists as notes, with no criterion, you only pass on with the delivery`.
+  the rework`, `the ones it lists as notes, with no criterion, you only pass on with the delivery): ask the others in plain words`. Line 92's
+  "ask them" becomes "ask the others" (the questions, not the notes the new parenthetical just named); no tested needle contains `ask them` or
+  `in plain words` (`grep -rn` over `src/hirearchy/*/tests` and `tests` at `fe0c9fd`).
 
 The installed copy under `~/.kiro/skills/` is never touched by this batch; `whoami`/`status` will show the stale-skill note to a user whose
 installed copy is older, as for every SKILL.md change (E7's harness installs the skill it pins).
@@ -818,11 +955,15 @@ installed copy is older, as for every SKILL.md change (E7's harness installs the
 | the signal handler's record | a bug raises in `signalled` | yes | swallowed in the handler; the stop flag is still set; the interrupted code goes on | none |
 | a line queued by a handler | `OSError` when the writer writes it | yes | counted as dropped by the emit that was writing; lines still queued are written by the next append | stderr, once per process |
 | `delegate` (agent, no `revises`) | `work_tier` cannot read a mailbox | yes | the delegation is sent without a tier (as today) | none |
-| C1 (manual) | a stop condition of 6.1 | n/a | the step sends `warning` and ships C2 only | `.agents/tasks/c1-reproduction.md` |
-| C3 M1 `spawn_detached` | `launchctl` missing, or `submit` exits non-zero before anything ran | yes | today's detach (`PopenProcessSpawner`) | the line `# --- started without launchd: <reason>` in `scheduler.log` |
-| C3 M1 `spawn_detached` | no pid within 10 s | yes (start again) | `OSError("could not start <argv[0]> detached: no pid was reported within 10 seconds")` (today's text); the job is removed and the files deleted | `tool.call` with `ok: false`, as today |
+| C1 (manual) | Setup 0's probe fails | n/a | the step sends `warning` before any chat call, with the owner's choice (a) or (b) of 6.1 | `.agents/tasks/c1-reproduction.md` (exit code only) |
+| C1 (manual) | another stop condition of 6.1, or a bound reached before the mechanism-selecting variants are decided | n/a | the step sends `warning` and ships C2 only | `.agents/tasks/c1-reproduction.md` |
+| C1 (manual) | an invalid attempt (no-run, finished) | yes | the attempt is repeated, counted in the bound; 3 running: "could not be set up" | `.agents/tasks/c1-reproduction.md` |
+| C3 M1 `spawn_detached` | `launchctl` missing, `submit` exits non-zero, the earlier job still loaded after 2 s, the intermediate reports `error: <reason>`, or no pid within 10 s | yes | today's detach (`PopenProcessSpawner.spawn_detached`) runs; only its own failure raises today's `OSError` | the line `# --- started without launchd: <reason>` in `scheduler.log` |
+| C3 M1 intermediate | its `--env` file is missing (a launchd respawn) | yes | exits 0, starts nothing | none |
 | C3 M2 | a name C1 recorded is one the org's runs need | n/a (build time) | M2 is not built; the C3 step sends `warning` | `c1-reproduction.md` |
-| the integration test | no kiro-cli, or no sign-in under the sandbox kiro home | n/a | skipped with the reason | test output |
+| C3's integration test (the C3 step) | not RED at `18c4ffb` (fewer than 2 of 3 valid runs fail), not GREEN 3 of 3, or 12 runs used | n/a (build time) | no C3 commit (changes discarded); `warning`: the design must be redone; C2 stays shipped | `c1-reproduction.md`, every run |
+| the integration test | no kiro-cli, or Setup 0's probe fails | n/a | skipped with the reason | test output |
+| the integration test | no run in flight at the return, or the scheduler finished first | n/a | `pytest.fail("INVALID: ...")`: neither RED nor GREEN | test output |
 | the replays | an evidence file is missing | fatal for the test | `pytest.fail` naming it (never a skip) | test output |
 
 ## 10. Validation of external inputs
@@ -839,8 +980,12 @@ installed copy is older, as for every SKILL.md change (E7's harness installs the
   prompts are fixed texts.
 - **M2's names:** each must match `[A-Z_][A-Z0-9_]*` and must not be one of `PATH`, `HOME`, `KIRO_API_KEY`, `KIRO_HOME`, `ORG_ROOT`,
   `HIREARCHY_STATE_DIR`, `PYTHONUNBUFFERED` (the C3 step does not build M2 otherwise).
-- **M1's files:** the env file is created with `O_CREAT | O_EXCL` and mode `0600`, read and deleted by the intermediate before it starts the
-  scheduler; `_detach.py`'s `--env`, `--cwd` and `--pid` are validated (exit 2 on a malformed command line, as today).
+- **M1's files:** they live in a private `tempfile.mkdtemp` directory (mode `0700`, outside the organization, removed in a `finally`); the env
+  file is created with `O_CREAT | O_EXCL` and mode `0600`, read and deleted by the intermediate before it starts the scheduler; `_detach.py`'s
+  `--env`, `--cwd` and `--pid` are validated (exit 2 on a malformed command line without `--env`, as today; with `--env`, every outcome exits 0
+  and is reported in the pid file).
+- **D-ENV's names (C1):** the changed names of 6.1 Setup 5 less the profile's `env` keys, `VIRTUAL_ENV`, names starting `UV_` and the M2 refusal
+  list above; each must match `[A-Z_][A-Z0-9_]*` (anything else is dropped and recorded as dropped).
 - **The E6 kit:** `cut` must be a 21-character stamp; a missing evidence file fails the test.
 
 ## 11. Invariants and their owners
@@ -848,18 +993,18 @@ installed copy is older, as for every SKILL.md change (E7's harness installs the
 | # | Invariant | Owner | Why there |
 |---|---|---|---|
 | I1 | One parser and one split decide what is a question for the client: `kernel.client_items`; no product module outside `kernel` calls `client_questions` | `kernel`; pinned by `TESTS/architecture/test_client_items_single_reader.py` | the brief: "one function, used everywhere" |
-| I2 | Every client item that names a criterion id is a question: the split is exhaustive and disjoint (A2 never hides a criterion-tagged question) | `kernel.client_items`; a property test | clause 3's guarantee rests on it |
+| I2 | Every criterion-tagged text of the block is a question: A1 drops no tail that names an id, and the split is exhaustive and disjoint (A1 and A2 never hide a criterion-tagged question) | `kernel.client_questions` and `kernel.client_items`; the tests of 4.7 and a property test | clause 3's guarantee rests on it |
 | I3 | Only questions flag a result and withhold a path, in `progress` and in the deliverable checks | `reflection.open_client_items`, `questions_open` | one settlement rule for both readers |
 | I4 | Questions and notes are settled by the same rule | `reflection.open_client_items` | a settled result shows neither |
 | I5 | `user_spend`, `user_committed` and the approval ceiling read the same user returns | `reflection` (`_user_back`; `_spend`'s `to_user`) | 0b reuses `user_spend` and `user_approved` |
-| I6 | The default hand-down never includes runs the team holds, and a default hand-down never raises the approval | `services._request` (unchanged) with `reflection` | 0a.3 I4 |
+| I6 | A default hand-down of `left` (`left >= 1`) never includes runs the team holds and never raises the approval; with nothing left, the 1-run floor raises it by 1 | `services._request` (unchanged) with `reflection` | 0a.3 I4 and limit 1; limit 6 here |
 | I7 | `user_committed` is at least the user's charged runs, whatever the attribution | `reflection.api` | no run is credited to the user that they did not have |
 | I8 | `case_spend` and an agent client's case total are unchanged | `reflection` | 0a.3 I1 and I6 |
 | I9 | `scheduler.signal` is written before `release()` terminates the runs | `scheduler._loop.HeartbeatLoop` | C2's purpose: a TERM then KILL leaves a record |
 | I10 | An event emitted from a signal handler never waits on itself and keeps `seq` in file order | `telemetry._writer`, `telemetry._pool` | `check` invariant (e); a hung scheduler |
 | I11 | A delegation's tier comes from the runtime's mailboxes, never from the agent | `services._rework` (facts), `dispatch.provenance_source` (stamp) | 0a.2 7.6, 0a.3 I11 |
 | I12 | C3's mechanism is the one C1's recorded evidence selects | the plan's C3 step; checked by the final validator against `c1-reproduction.md` | D-E6-3 |
-| I13 | No new refusal | every surface | the brief; the review's check 2 |
+| I13 | No new refusal, and no new failure of an existing call (M1 falls back to today's detach in every case it cannot finish) | every surface | the brief; the review's check 2 |
 
 ## 12. Golden impact
 
@@ -876,18 +1021,29 @@ everything under `TESTS/golden/expected/` (`events/line_shapes.txt`, `mcp/surfac
 - **Rule A (A2).** Sites: `grep -rn "Questions for the client" src/hirearchy/*/tests tests/e2e tests/meta tests/testkit` and `grep -rn
   "questions_open\|client_questions" src/hirearchy/*/tests`. A fixture whose items name no criterion id, in a test that asserts the question path
   (the count, the flag, the withheld path, the `REWORK` listing, `questions_open`), gets ids on its items (`C1: Keep Marta's row?`, `C2: Which
-  Friday?`) so that it keeps testing the question path; its docstring names D-E6-1. The notes path is tested by the new tests of 4.7. Sites at
+  Friday?`) so that it keeps testing the question path; its docstring names D-E6-1. All of these fixtures change in commit A2 (the commit that
+  makes `questions_open` count only id-naming items), `SRC/progress/tests/test_lines.py` included, so no commit leaves a red suite; A2's TARGETS
+  include `src/hirearchy/progress/tests`. The notes path is tested by the new tests of 4.7. Sites at
   `fe0c9fd`: `SRC/progress/tests/test_lines.py` (`QUESTIONS` and the inline one-question body), `SRC/reflection/tests/test_steps.py` (the
   `deliver_asking` callers), `SRC/reflection/tests/test_pure_functions.py` (`ASKED` and the inline body), `SRC/reflection/tests/
   test_deliverable_checks.py` (the callers of its `questions` helper argument). Not affected: `TESTS/e2e/test_org_growth_0a.py`
   (`AMBIGUOUS_MARTA` names C5), `TESTS/e2e/test_org_growth_0a2.py` (E4's fa63 and 96e9 name C4), `TESTS/meta/test_e4_replay_kit.py` (the block's
   presence only), `SRC/mcp_server/tests/test_tools_services.py` (a fake step's text), `SRC/kernel/tests/test_client_questions.py` (A1 adds tests,
   none changes).
-- **Rule B (B).** Every existing `TOPUP` pin revises a task with a `done` result (`SRC/reflection/tests/test_steps.py`, the top-up tests;
-  `SRC/mcp_server/tests/test_service_tools.py`, the two top-up tests; `SRC/cli/tests/test_service_commands.py`, the CLI top-up test;
-  `SRC/cli/tests/test_commands_services.py`, over a fake text), so `user_held` is 0 and they stay byte-identical. The coder re-runs `grep -rn
-  "Ask the user now\|Nothing else is left" src tests` at B2 and states the result in the commit body; a pin whose revised task is open would get
-  the new text and is changed deliberately, its docstring naming D-E6-2.
+- **Rule B (B).** The existing `TOPUP` pins (`grep -rn "Ask the user now\|Nothing else is left" src tests` at `fe0c9fd`):
+  - `SRC/reflection/tests/test_steps.py` (the top-up tests), `SRC/mcp_server/tests/test_service_tools.py` (the two top-up tests) and
+    `SRC/cli/tests/test_service_commands.py` (the CLI top-up test) revise a task with a `done` result (`_support.deliver` and
+    `testkit/services_world.deliver` report `done`), so `user_held` is 0 and they stay byte-identical; `SRC/cli/tests/test_commands_services.py`
+    pins a fake step's text and is not affected.
+  - `SRC/app/tests/test_wire_cli.py::test_the_request_command_prints_the_step_of_the_runtime` revises an **open** task (`first` has no result;
+    its comment: "4 runs handed down, none used yet: all still held"). After B2: committed 5, approved 5, spare 0, `user_held` = 5 - 0 - 1 = 4,
+    ask = 5 - 1 - 0 - 4 = 0, so the step is the `HELD` sentence alone. Its two assertions after the CLI call change, deliberately, to
+    `assert "budget 1)" in out and f"The team still holds 4 of the user's runs for {first.id}; the rework can use them." in out` and
+    `assert "This rework has" not in out and "Ask the user now" not in out`,
+    and its docstring names D-E6-2: "the CLI's end-to-end case of B's second part: the team still holds the 4 runs of the open request". It is in
+    B2's TARGETS.
+  - The coder re-runs the grep at B2 and states the result in the commit body; any other pin whose revised task is open is changed the same
+    way.
 - **Rule T (F-E6-7).** `SRC/dispatch/tests/test_rule_message_sender.py::test_inherited_outside_a_rework_task_is_ignored`: its first parameter
   (`{"type": "task"}`, a fresh task) moves to a new test `test_an_agents_fresh_task_carries_the_inherited_tier`; the four others (a note, a
   result, `"garbage"`, None) stay, and the test is renamed `test_inherited_outside_a_task_is_ignored`. `test_rule_task_assigner.py`'s root
@@ -903,31 +1059,35 @@ Conventional commits, one logical change each, a failing test first (R11), `coun
 `test-policy.md` rule 2 (`cd /Volumes/workspace/hirearchy/.worktrees/org-growth-0a4 && UV_LINK_MODE=copy uv run pytest -q <TARGETS> tests/golden
 tests/architecture --deselect tests/architecture/test_static_checks.py`, plus `src/hirearchy/app/tests` when the commit touches `app/`, a
 Protocol in an `api.py` or the wiring, then `UV_LINK_MODE=copy uv run python scripts/static_checks.py all`). At each FEAT's end, ONE SCOPED run:
-the union of its TARGETS plus `tests/e2e tests/golden tests/architecture src/hirearchy/app/tests`. No full pytest and no `scripts/check.sh`
-during development; `UV_LINK_MODE=copy bash scripts/check.sh` runs once, in the final validation, after the rebase onto `main`. A known flaky
-test (`given_queries-narrow-2-workflows`, the 2.5 s `READINESS_TIMEOUT`) is retried once, file only, and noted. The integration test of C3 is
-never in these runs (it is skipped without `--run-integration`); the C3 step runs it by hand, RED on C2b and GREEN on C3, and records both.
+the union of its TARGETS plus `tests/e2e tests/golden tests/architecture src/hirearchy/app/tests`. At each fix pass of the code-review loop: ONE
+SCOPED union run of the touched commits' TARGETS plus `tests/e2e` (and `tests/golden tests/architecture`), then `static_checks.py all`. No full
+pytest and no `scripts/check.sh` during development; `UV_LINK_MODE=copy bash scripts/check.sh` runs once, in the final validation, after the
+rebase onto `main`. A known flaky test (`given_queries-narrow-2-workflows`, the 2.5 s `READINESS_TIMEOUT`) is retried once, file only, and
+noted. The integration test of C3 is never in these runs (it is skipped without `--run-integration`); the C3 step runs it by hand, RED at
+`18c4ffb` (3 valid runs, at least 2 failing) and GREEN on the C3 change (3 of 3), and records every run (6.3).
 
 | # | Commit | TARGETS |
 |---|---|---|
 | C1 | the reproduction of 6.1 (no commit; `.agents/tasks/c1-reproduction.md`), **first** | - |
-| A1 | `fix(kernel): a heading's tail, or a parenthesized remark, is no question for the client` | `src/hirearchy/kernel/tests` |
-| A2 | `feat(kernel,reflection): only items that name a criterion id are questions for the client; the others are notes` (`ClientItems`, `client_items`, `open_client_items`, `questions_open`, `items_listing`, the relayed rework step) | `src/hirearchy/kernel/tests src/hirearchy/reflection/tests src/hirearchy/mcp_server/tests` |
-| A3 | `feat(progress): the task line lists the notes for the client and withholds nothing for them` (+ the architecture test, the E6 kit and its meta test, replays A-1 to A-5) | `src/hirearchy/progress/tests src/hirearchy/reflection/tests tests/architecture tests/meta/test_e6_replay_kit.py tests/meta/test_e5_replay_kit.py tests/e2e/test_org_growth_0a4.py tests/e2e/test_org_growth_0a3.py` |
+| T0 | `test(testkit): the E6 replay kit` (`tests/testkit/e6_replay.py`, `e5_replay.materialize`'s keyword-only `evidence` and `service`, `tests/meta/test_e6_replay_kit.py`; 17.1). Test-only, before A1, so B's and F's replays do not depend on A's commits (the owner may override A2) | `tests/meta/test_e6_replay_kit.py tests/meta/test_e5_replay_kit.py tests/e2e/test_org_growth_0a3.py` |
+| A1 | `fix(kernel): a heading's tail, or a parenthesized remark, is no question for the client unless it names a criterion id` | `src/hirearchy/kernel/tests` |
+| A2 | `feat(kernel,reflection): only items that name a criterion id are questions for the client; the others are notes` (`ClientItems`, `client_items`, `open_client_items`, `questions_open`, `items_listing`, the relayed rework step; every Rule A fixture, 13) | `src/hirearchy/kernel/tests src/hirearchy/reflection/tests src/hirearchy/progress/tests src/hirearchy/mcp_server/tests` |
+| A3 | `feat(progress): the task line lists the notes for the client and withholds nothing for them` (+ the architecture test, replays A-1 to A-5) | `src/hirearchy/progress/tests src/hirearchy/reflection/tests tests/architecture tests/e2e/test_org_growth_0a4.py` |
 | A4 | `docs(skill): notes for the client are passed on with the delivery` (line 92) | `src/hirearchy/skill/tests src/hirearchy/blueprint/tests/test_round_f_guidance.py src/hirearchy/blueprint/tests/test_round_g_assistant.py` |
-| B1 | `fix(reflection): a relayed result's return beyond what its task still had goes back to the user's side` (+ replay B-2) | `src/hirearchy/reflection/tests tests/e2e/test_org_growth_0a4.py tests/e2e/test_org_growth_0a3.py` |
-| B2 | `fix(reflection): a rework of a request that is still open counts the runs the team holds for it` (+ replay B-1) | `src/hirearchy/reflection/tests src/hirearchy/mcp_server/tests src/hirearchy/cli/tests tests/e2e/test_org_growth_0a4.py` |
+| B1 | `fix(reflection): a relayed result's return beyond what its task still had goes back to the user's side` (+ replay B-2) | `src/hirearchy/reflection/tests src/hirearchy/progress/tests tests/e2e/test_org_growth_0a4.py tests/e2e/test_org_growth_0a3.py` |
+| B2 | `fix(reflection): a rework of a request that is still open counts the runs the team holds for it` (+ replay B-1; the `test_wire_cli.py` pin, 13 Rule B) | `src/hirearchy/reflection/tests src/hirearchy/mcp_server/tests src/hirearchy/cli/tests src/hirearchy/app/tests/test_wire_cli.py tests/e2e/test_org_growth_0a4.py` |
 | C2a | `fix(telemetry): an event a signal handler emits while a line is written follows that line` | `src/hirearchy/telemetry/tests` |
 | C2b | `feat(scheduler): SIGTERM and SIGHUP are recorded at once as scheduler.signal` | `src/hirearchy/scheduler/tests tests/e2e/test_scheduler_signal.py tests/e2e/test_scheduler_detach.py` |
 | C1b | V0 on C2b (no commit; `c1-reproduction.md`) | - |
-| C3 | conditional (6.3): M5 `fix(scheduler): the scheduler ignores SIGHUP and records it`; M2 `fix(daemon): the scheduler's environment drops the call's marker variables`; M1 `fix(processes,app): on macOS the scheduler is started through launchd`; each with the integration test; or no commit | M5 `src/hirearchy/scheduler/tests`; M2 `src/hirearchy/daemon/tests`; M1 `src/hirearchy/processes/tests src/hirearchy/daemon/tests src/hirearchy/app/tests`; each plus `tests/e2e/test_scheduler_detach.py tests/e2e/test_scheduler_signal.py` |
+| C3 | conditional (6.3): M5 `fix(scheduler): the scheduler ignores SIGHUP and records it`; M2 `fix(daemon): the scheduler's environment drops the call's marker variables`; M1 `fix(processes,app): on macOS the scheduler is started through launchd`; each with the integration test; or no commit | M5 `src/hirearchy/scheduler/tests`; M2 `src/hirearchy/daemon/tests` (`test_launch_site.py` among them); M1 `src/hirearchy/processes/tests src/hirearchy/daemon/tests src/hirearchy/app/tests`; each plus `tests/e2e/test_scheduler_detach.py tests/e2e/test_scheduler_signal.py` |
 | D1 | `fix(dispatch,services): an agent's delegation without revises inherits the tier of its work` (+ replays F-1, F-2) | `src/hirearchy/dispatch/tests src/hirearchy/services/tests src/hirearchy/app/tests tests/e2e/test_org_growth_0a4.py` |
 | D2 | `docs(skill): a keep-as-is accept needs a delivered version the user saw` (line 100) | `src/hirearchy/skill/tests src/hirearchy/blueprint/tests/test_round_f_guidance.py` |
 | D3 | `docs(skill): a rework's spend is asked with the question or item that needs it` (line 72) | `src/hirearchy/skill/tests src/hirearchy/blueprint/tests/test_round_f_guidance.py src/hirearchy/blueprint/tests/test_round_g_assistant.py` |
-| E1 | `docs: README and ARCHITECTURE for phase 0a.4` | `src/hirearchy/skill/tests tests/architecture` |
+| E1 | `docs: README and ARCHITECTURE for phase 0a.4` | `src/hirearchy/skill/tests tests/architecture src/hirearchy/blueprint/tests/test_round_g_assistant.py src/hirearchy/blueprint/tests/test_round_f_guidance.py tests/e2e/test_round7.py` |
 
-FEATs: C1 (alone, first); A (A1-A4); B (B1-B2); C (C2a, C2b, C1b, C3); D (D1-D3, E1). E1's README gains `## Org growth: phase 0a.4` after the
-0a.3 section, and the event table row after `scheduler.start` / `scheduler.exit`:
+FEATs: C1 (alone, first); A (T0, A1-A4); B (B1-B2); C (C2a, C2b, C1b, C3); D (D1-D3, E1). E1 adds nothing to README's `## Services and
+reflection` (97 lines today, under `test_round_g_assistant.py`'s cap of fewer than 98). E1's README gains `## Org growth: phase 0a.4` after the
+0a.3 section, and the event table row (under `## Observability`) after `scheduler.start` / `scheduler.exit`:
 
 ```
 | `scheduler.signal` | the scheduler got SIGTERM or SIGHUP, written by its handler at once, before the runs' grace period, so a TERM that a KILL follows still leaves it: `signal`, `action` (`stop`; `ignored` for a SIGHUP the scheduler was started with ignored), `ppid` (its parent pid then), `running` (run ids) |
@@ -937,7 +1097,7 @@ ARCHITECTURE gains the facts of this batch where the 0a.3 ones are: 3.1 (`client
 `provenance_source` for every agent task), 3.22 (`open_client_items`, `user_held`, `items_listing`, `Case.relayed_to_user`, `Case.open_tasks`),
 3.7 (the re-entrant writer) and the scheduler paragraph (`SessionEvents`/`SchedulerSession.signalled`; `scheduler.signal`).
 
-Sizes (production lines, estimates): A about 70, B about 50, C2 about 70, C3 5 (M5), 10 (M2) or about 120 (M1), D about 40. Testability: unit
+Sizes (production lines, estimates): A about 75, B about 50, C2 about 70, C3 5 (M5), 10 (M2) or about 150 (M1), D about 40. Testability: unit
 (the parser and the split, the pure functions, the share and the held runs over fs worlds with run logs and results, the steps, the loop over
 `RecordingSession` with `signal.raise_signal`, the writer with a re-entrant `on_fresh` and a real `SIGUSR1`, the tier over the memory world);
 contract suites (`ReworkContext`, `ServiceSteps`, the telemetry writer's); end to end (the E6 replays, the scheduler's TERM-then-KILL record, the
@@ -945,9 +1105,12 @@ tree-kill test kept); manual and `integration` only (C1, the C3 test with real k
 
 ## 15. Deviations from e6-decision.md, e6-gate.md and the brief, with reasons
 
-1. **A1's parentheses rule applies only to a tail that names no criterion id.** The decision drops a parenthesized tail without condition; a
-   tail such as `(C3: keep Marta's row?)` with no list after it is then the block's only question, and dropping it would hide a criterion-tagged
-   question. 762f's tail names no id, so E6's effect is unchanged (4.8). The heading rule (a list follows) is applied as decided.
+1. **A1's two rules apply only to a tail that names no criterion id.** The decision drops a parenthesized tail, and a tail before a list,
+   without condition. A tail that names an id (`(C3: keep Marta's row?)` with no list; `C4: should non-actions be excluded?` before a list of
+   notes) would then be dropped, and with A2 nothing would flag the result: a criterion-tagged question hidden (the brief's check 3). So a tail
+   that names an id is always an item. The cost is stricter, never hidden: a scope label such as `(C4-C6)` before a list counts as one more
+   question (declared limit 1). E5 and E6 had no marker tail naming an id before a list, and 762f's tail names no id, so E6's effect is unchanged
+   (4.8). The decision's own cases (a heading, a parenthesized remark) are applied as decided.
 2. **"Beyond its own task's budget" is read as "beyond what its own task still had of its budget"** (its budget and the client's grants in its
    interval, less its charged runs). With the literal reading, s3's 406b gives 1 run back to the user, #36 still reads committed 17 and spare 0,
    and the reply still asks for 4 (5.5): the false top-up the decision removes stays. The gate's own accounting ("7 runs back to root, 6 of them
@@ -973,6 +1136,13 @@ tree-kill test kept); manual and `integration` only (C1, the C3 test with real k
     `service: str = SERVICE_NAME` (defaults: today's behaviour); `TESTS/testkit/e6_replay.py` passes `EV6` and `weekly-memo` (17.1).
 12. **The `HELD` text is a sentence of its own** (`The team still holds ...`), the brief's words with a capital letter, because it replaces
     `TOPUP` as the reply's last line.
+13. **C3's integration test does not use the `real_kiro` fixture**, against `tests/testkit/fixtures.py:isolated_kiro`'s rule that integration
+    tests must. That fixture's fence hashes `~/.kiro/agents/` and `~/.kiro/settings/mcp.json` (`tests/testkit/kiro_sandbox.py`), which the brief
+    forbids touching. This test sets `KIRO_HOME` to its tmp dir for every kiro-cli call, so no profile lands under `~/.kiro`, and it reads
+    nothing there; its own checks (the session record under its `KIRO_HOME`, only `tool_load` and `hirearchy::*` calls) take the fence's place.
+14. **C1's verdicts add three classes the brief does not name** (no-run and finished are invalid and repeated; run-only is its own signature,
+    not reproduced), and C1's turn 2 calls `progress` before `start`, so D-OUT can start the scheduler at the same point of the call without
+    changing its shape. Both keep "vary one condition at a time" exact; neither changes what C1 must record.
 
 ## 16. Declared limits, out of scope, backlog and risks
 
@@ -980,8 +1150,8 @@ Out of scope (the brief): A3 and D (rejected, D-E6-1 and D-E6-4), Phase 0b, the 
 a credit for runs the product lost (deferred).
 
 Declared limits (each pinned by a test where one can show it):
-1. A1 drops a tail before a list even when it names a criterion id (`Questions for the client: Should C4 exclude non-actions? Also:` and a
-   list): the decision defines that line as a heading. E6 had 0 such tails. E7 counts them (17, item 1).
+1. A1 keeps every marker tail that names a criterion id as a question, even one that only introduces the list (`Questions for the client
+   (C4-C6):` and a list): stricter, never hidden (Deviation 1). E5 and E6 had 0 such tails. E7 counts them (17.3, item 1).
 2. A2's cost: a real question with no criterion id is a note and holds nothing (E6: 1 of 49, 6c63, asked anyway in T8).
 3. A2 trusts the lead's ids: the id is matched as text, not checked against the contract; a note tagged with an id becomes a question (stricter).
 4. 8613's two items that restate Lena's answers name C6 and C3, so its path stays withheld after A2; only A3 (rejected) would have moved them.
@@ -992,8 +1162,10 @@ Declared limits (each pinned by a test where one can show it):
 7. C2 does not record a signal that arrives before `serve` installs its handlers (the claim, the orphan settling, the recovery), nor SIGKILL;
    a Python handler cannot see who sent the signal.
 8. C1 runs under a sandbox `KIRO_HOME` (the brief), so four conditions of the streams are not reproducible: the user's kiro home, the state
-   directory under it, the user's global skills, and the user's `HOME` for root's MCP server (C1 gives it `$SB/home` so that the product never
-   reads the user's installed skill); and it runs on macOS only.
+   directory under it, the user's global skills, and the user's `HOME` for root's MCP server (C1 gives it `$SB/home`, where the org's runs sign
+   in through the inherited `KIRO_API_KEY`, so that the product never reads the user's installed skill; under the owner's choice (b) of 6.1 this
+   last one is reproduced and drops from the list); and it runs on macOS only. C1's `ps -E` reading of the changed names is best-effort (a value
+   holding ` NAME=` adds a name), which can only make D-ENV unset a name more.
 9. C3's M1 is macOS only (Deviation 9).
 10. F-E6-7 covers `delegate`: an agent client's service request (`request` without `revises`) still carries no tier.
 
@@ -1002,8 +1174,9 @@ service requests (limit 10); a Linux reproduction (limits 8 and 9); a dedicated 
 growth of the approval (0a.3 limit 1).
 
 Risks: the notes are shown, not held, so a user sees them only if the assistant passes them on (SKILL.md line 92; LLM behaviour, E7 item 1);
-C1 spends real model calls (bounded at 30 chat calls); M1 is the largest C3 branch and depends on a legacy `launchctl` subcommand, so it ships
-only if its integration test passes within the C3 step; the re-entrant writer is shared by every process (covered by the telemetry contract
+C1 spends real model calls (bounded: 30 chat calls for C1, 6 for C1b, 12 integration-test runs for C3); M1 is the largest C3 branch and depends
+on a legacy `launchctl` subcommand, so it ships only if its integration test is RED at `18c4ffb` and GREEN 3 of 3, and every case it cannot
+finish falls back to today's detach; the re-entrant writer is shared by every process (covered by the telemetry contract
 suites and the new tests).
 
 ## 17. What E7 must check
@@ -1017,7 +1190,7 @@ The changed texts are pinned by the exact strings of 4.4, 5.4, 6.2 and 8; E7's p
 organization `EV6/<stream>` had at the 21-character stamp `cut` (inclusive), the contract `service/history--SERVICE.v1.md` (budget 16) at
 `lead/services/weekly-memo/SERVICE.md`. `TESTS/meta/test_e6_replay_kit.py`: s3 at bc02's cut holds 4a3e and bc02 in root's `sent/`, 11cc in
 root's `read/`, the 5 run logs of 4a3e's interval and the contract with `budget: 16`; a missing evidence file fails the test. If `progress`
-needs a file the kit does not write, the kit writes it (test-only) and the A3 commit says so.
+needs a file the kit does not write, the kit writes it (test-only), and the commit whose replay needs it says so.
 
 ### 17.2 Deterministic, at the merged sha (`TESTS/e2e/test_org_growth_0a4.py` unless named)
 
@@ -1040,11 +1213,15 @@ needs a file the kit does not write, the kit writes it (test-only) and the A3 co
   `user_spend(case) == 12`, and `rework_step(9a5b)` (budget 1, as recorded) is `""`; at cut `20261024T172453163610`,
   `case_allowance.left("lead", "weekly-memo", bc02) == 6`.
 - **C-1:** `TESTS/e2e/test_scheduler_signal.py` (a TERM then a KILL 0.2 s later leaves `scheduler.signal` and no `scheduler.exit`; a SIGHUP alone
-  gives `stopped by SIGHUP`), on macOS (the final validation's `check.sh`) and on Linux (the merge's CI run of `check.sh`).
+  gives `stopped by SIGHUP`, or `action: ignored` if M5 shipped; a SIGHUP the scheduler was started with ignored gives `action: ignored`), on
+  macOS, in the final validation's `check.sh`. Linux is not run in this batch: nothing is pushed, and the merge does not re-run `check.sh`. E7's
+  deterministic part records the CI result of the merged sha once the owner pushes `main`, or cites a no-change `git diff --stat` of the
+  `scheduler`, `processes` and `telemetry` packages as E6 did (`deterministic/SUMMARY.md`, Linux).
 - **C-2:** `TESTS/e2e/test_scheduler_detach.py`, kept, passes.
 - **C-3, the C1 reproduction:** if C3 shipped, `TESTS/integration/test_scheduler_survives_the_call.py` passes with `--run-integration` under a
-  sandbox kiro home; and E7's preflight repeats C1's V0 (6.1) under the streams' conditions whether or not C3 shipped (D-E6-7), recording its
-  `scheduler.signal` lines. If C1 did not reproduce, E7 replays no kill and says so.
+  sandbox kiro home (E7 cites the C3 step's record: RED in at least 2 of 3 valid runs at `18c4ffb`, GREEN 3 of 3), and E7's preflight repeats
+  C1's V0 (6.1, Setup 0 first) under the streams' conditions whether or not C3 shipped (D-E6-7), recording its `scheduler.signal` lines. If C1
+  did not reproduce (or was run-only), E7 replays no kill and says so, citing `c1-reproduction.md`'s conditions tried.
 - **F-1, dd34 (s1; cut `20261024T154745377872`):** `rework_context.work_tier("lead") == "relayed"` (root's relayed 3a54 is the lead's open task).
 - **F-2, 395b and d13d (s3; cuts `20261024T172627799242` and `20261024T172724489270`):** `work_tier("lead") == "human"` (9a5b is open).
 - **S-1:** SKILL.md has at most 125 lines and the needles of section 8.
@@ -1053,7 +1230,7 @@ needs a file the kit does not write, the kit writes it (test-only) and the A3 co
 
 1. **A:** per result with a block: its questions and notes; copies made while `artifacts withheld (ask first)` showed (E6: 8 of 9) and the
    questions asked before each; notes passed on with the delivery; questions without an id (A2's cost) and whether they were asked; marker tails
-   A1 dropped that named an id (target 0).
+   that named an id before a list and so counted as questions (declared limit 1; E6 had 0).
 2. **B:** every human rework: its budget, `left`, `user_held` and `spare` at that moment, from the files; each `HELD` and `TOPUP` reply and
    whether its premise held (the runs really held, or really spare); top-ups the assistant asked for, and grants after a yes.
 3. **C:** every `scheduler.signal` (signal, action, ppid, running, and what followed: `scheduler.exit` or nothing); schedulers alive at a turn's
@@ -1070,5 +1247,33 @@ needs a file the kit does not write, the kit writes it (test-only) and the A3 co
 
 ## Appendix A. Review resolutions
 
-Revision 1: no review yet.
+Revision 1 (`46273df`) had no review. Revision 2 answers the design review of pass 1 (`.agents/tasks/design-review.md`, CHANGES_REQUESTED: 1
+HIGH, 10 MEDIUM, 10 NIT). Every finding is addressed; none is backlogged or ignored, and none changes the product behaviour e6-decision.md
+decides (finding 6 narrows A1 in a case E5 and E6 never had; Deviation 1).
+
+| # | Sev. | Finding | Resolution | Where |
+|---|---|---|---|---|
+| 1 | HIGH | C1 and the C3 test give the org's runs `HOME=$SB/home`, where they may not sign in | Addressed. Setup 0, a zero-cost `HOME=$SB/home KIRO_HOME=$SB/kiro-probe kiro-cli whoami` preflight, before any chat call; on failure `warning` with the owner's choice (a) `KIRO_API_KEY` in the server's `env`, or (b) the user's `HOME` with `whoami`/`status` calls as a stop condition (verified: the only readers of the installed skill). The integration test uses the same probe as its skip condition. Run once at design time: it exited 0 (`Authenticated with API key`, through the `KIRO_API_KEY` the shell inherits; the E6 streams signed in the same way, `EV6/s3/turn-05.stderr.txt`; `run_environment` keeps the key for runs) | 6.1 Safety, Setup 0; 6.3; limit 8 |
+| 2 | MED | The 30-call bound can run out before D-ENV/D-OUT | Addressed. Fixed order V0, D-ENV (+2 narrowing), D-OUT, then V3, V2, V1, V5, V4; separate bounds C1 <= 30 chat calls, C1b <= 6, C3 integration runs <= 12; a bound before the mechanism variants are decided stops C1, later it only skips (recorded) | 6.1 Safety, runs table |
+| 3 | MED | D-ENV's names, D-OUT's three changes, missing verdicts, C1b once | Addressed. (a) D-ENV's names: the changed names (value absent or different, so an inner `KIRO_SESSION_ID` is caught although the C1 shell carries its own session's `KIRO_*` names) less the profile's `env` keys, `VIRTUAL_ENV`, `UV_*` and the M2 refusal list. (b) D-OUT: the shell starts the scheduler when turn 2's `progress` `tool.call` appears; turn 2 still calls `start` (V0's turn 2 also calls `progress` first, so the shape is the same); validity and run-age checks. (c) Verdicts no-run, finished (invalid, repeated) and run-only (not reproduced). (d) C1b up to 3 attempts | 6.1 Setup 3, 5, runs table; Deviation 14 |
+| 4 | MED | RED on C2b, one RED/GREEN run, M2 row, no outcome when GREEN fails | Addressed. RED on a throwaway detached checkout of `18c4ffb` (the brief's sha; no deviation), 3 valid runs with at least 2 failing; GREEN 3 of 3 on the C3 change; the M2 row requires the test; otherwise no C3 commit, every run recorded, `warning` | 6.3; 9; 14 |
+| 5 | MED | M1's new failure of `start`, launchd respawn, non-blocking `remove` | Addressed. Every case M1 cannot finish falls back to today's detach with a log line; the intermediate exits 0 in every case (and at once when its env file is missing); `submit` waits until `launchctl list <label>` fails (at most 2 s); `launchctl list` recorded after a `submit`; the 5-s survival check follows the `remove` | 6.3 M1; 9; I13 |
+| 6 | MED | A1's heading rule drops a criterion-tagged tail before a list | Addressed, more strictly than the review's code: a tail that names an id is always an item (the review's `wrapped or not names_id` would still drop `(C3: keep Marta's row?)` before a list of notes). Cost: a scope label like `(C4-C6)` before a list is one more question (limit 1). E5/E6 effect unchanged | 4.2, 4.6, 4.7, 4.8; Deviation 1; limit 1; I2 |
+| 7 | MED | I6 contradicts limit 6, B-1 and 0a.3 limit 1 | Addressed with the review's wording; 5.1's parenthetical attributes the rule to 0a.3 I4 | 11 I6; 5.1 |
+| 8 | MED | A2 leaves the `progress` tests red | Addressed. A2 updates every Rule A fixture, `progress/tests/test_lines.py` included; A2's TARGETS add `src/hirearchy/progress/tests` | 13 Rule A; 14 |
+| 9 | MED | `test_wire_cli.py` revises an open task and gets `HELD` | Addressed. Rule B names the pin, its computed `HELD` text (4 held) and its new assertions; B2's TARGETS add it; 5.8 lists it | 13 Rule B; 14; 5.8 |
+| 10 | MED | SIGHUP tests depend on the runner's disposition | Addressed. `sighup_default`/`sighup_ignored` fixtures restore what they found; the e2e starter sets the disposition before `start`; a third e2e case expects `action: ignored`; M5 changes the stop cases deliberately | 6.5; 6.3 M5 |
+| 11 | MED | C-1 claims a Linux CI run | Addressed with the review's wording: macOS only in this batch; E7 records CI after the owner pushes, or a no-change diff | 17.2 C-1 |
+| 12 | NIT | The parentheses test is too loose and too tight | Addressed. `_wrapped` (balanced, one final `.`), with tests for both shapes and a nested one | 4.2; 4.7 |
+| 13 | NIT | The fix-pass rule is missing | Addressed | 14 |
+| 14 | NIT | TARGETS miss direct readers | Addressed. E1 adds `test_round_g_assistant.py`, `test_round_f_guidance.py`, `tests/e2e/test_round7.py` (and E1 adds nothing to `## Services and reflection`); B1 adds `src/hirearchy/progress/tests` | 14 |
+| 15 | NIT | M1's files under `.runtime/` | Addressed. A private `tempfile.mkdtemp` directory (0700) outside the organization, removed in a `finally` | 6.3 M1; 2; 10 |
+| 16 | NIT | Restoring a `None` handler raises | Addressed: `handler if handler is not None else signal.SIG_DFL` | 6.2 |
+| 17 | NIT | kiro-cli's log only looked for under `$SB/kiro-home` | Addressed. The record states whether a log was found there and records it missing otherwise; never searched under `~/.kiro`; stderr (kiro-cli's `[INFO]` lines) is kept per call | 6.1 Setup 5 |
+| 18 | NIT | Wrong test file name | Addressed: `src/hirearchy/daemon/tests/test_launch_site.py` | 6.3 M2; 14 |
+| 19 | NIT | "ask them" is ambiguous | Addressed: "ask the others in plain words"; no needle holds `ask them` or `in plain words` | 8 |
+| 20 | NIT | The integration test departs from the `real_kiro` rule silently | Addressed: Deviation 13 with the reason | 15; 6.3 |
+| 21 | NIT | The E6 kit lands in A3 | Addressed: commit T0, `test(testkit): the E6 replay kit`, before A1 | 14; 17.1 |
+
+The review's unverified point on B1 and the E5 replays is now verified (5.5: 963a's share is 0; s2's relayed tasks come after both cuts).
 
