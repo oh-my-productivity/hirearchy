@@ -38,9 +38,10 @@ WORDS_LONG = (
     "Nothing was written."
 )
 UNRATED = (
-    "refused: {n} delivered request(s) of `{name}` have no verdict yet: {tasks}. Record the user's verdict on each with feedback first, a rejection "
-    "then its one question (CLI: hirearchy feedback <task id> accept|reject --note ...); the contract changes only after the verdicts. "
-    "Nothing was written."
+    "refused: {n} delivered request(s) of `{name}` have no verdict yet: {tasks}. Record a verdict on each with feedback first: on a delivery the "
+    "user saw, the user's own, a rejection then its one question (CLI: hirearchy feedback <task id> accept|reject --note ...); on a relayed "
+    'rework the user never saw, your own, with source="relayed" (CLI: --source relayed), settles it. The contract changes only after the '
+    "verdicts. Nothing was written."
 )
 NEEDS_WORDS = (
     "refused: a change of the acceptance criteria of `{name}` records the user's words. If it answers a rejection, pass answers=<the rejection's "

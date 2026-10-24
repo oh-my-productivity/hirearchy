@@ -120,7 +120,7 @@ def test_s1r_t5_an_amendment_before_the_verdict_is_refused(tmp_path):
     w = s1r_world(tmp_path)
     task = first_delivery(w)
     t5, c21 = lena_line(S1R, 5), tool_call(S1R, 21)  # Lena's turn 5, and the amendment the assistant made 0.46 s before the rejection
-    unrated = f"refused: 1 delivered request(s) of `{SERVICE}` have no verdict yet: {task}. Record the user's verdict on each with feedback first, "
+    unrated = f"refused: 1 delivered request(s) of `{SERVICE}` have no verdict yet: {task}. Record a verdict on each with feedback first: "
     before = state(w)
     for given in ({}, {"words": t5}):  # the verdicts come first, with or without her words
         assert unrated in fails(w.root, "define_service", **c21, **given)

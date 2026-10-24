@@ -240,9 +240,10 @@ def test_p2_gate_refusals_on_every_surface(svc, capsys, surface, case):
         deliver(svc, "ceo", task)
         kw = {"add_acceptance": [RULE], "words": YES}
         text = (
-            f"refused: 1 delivered request(s) of `weekly-brief` have no verdict yet: {task.id}. Record the user's verdict on each with feedback first, "
-            "a rejection then its one question (CLI: hirearchy feedback <task id> accept|reject --note ...); the contract changes only after the "
-            "verdicts. Nothing was written."
+            f"refused: 1 delivered request(s) of `weekly-brief` have no verdict yet: {task.id}. Record a verdict on each with feedback first: "
+            "on a delivery the user saw, the user's own, a rejection then its one question (CLI: hirearchy feedback <task id> accept|reject --note ...); "
+            'on a relayed rework the user never saw, your own, with source="relayed" (CLI: --source relayed), settles it. The contract changes only '
+            "after the verdicts. Nothing was written."
         )
     elif case == "needs-words":
         kw = {"add_acceptance": [RULE]}

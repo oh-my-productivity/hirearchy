@@ -30,9 +30,10 @@ def test_an_amendment_while_a_delivery_has_no_verdict_is_refused_whatever_else_i
     found = reject(w, basis)
     first, second = delivered(w, basis, "a"), delivered(w, basis, "b")
     text = (
-        f"refused: 2 delivered request(s) of `weekly-brief` have no verdict yet: {first}, {second}. Record the user's verdict on each with feedback "
-        "first, a rejection then its one question (CLI: hirearchy feedback <task id> accept|reject --note ...); the contract changes only after the "
-        "verdicts. Nothing was written."
+        f"refused: 2 delivered request(s) of `weekly-brief` have no verdict yet: {first}, {second}. Record a verdict on each with feedback first: "
+        "on a delivery the user saw, the user's own, a rejection then its one question (CLI: hirearchy feedback <task id> accept|reject --note ...); "
+        'on a relayed rework the user never saw, your own, with source="relayed" (CLI: --source relayed), settles it. The contract changes only '
+        "after the verdicts. Nothing was written."
     )
     for given in (
         {}, {"words": WORDS_ALONE}, {"words": "x" * 2000}, {"answers": found.note}, {"answers": found.note, "about": "C1", "words": YES},
