@@ -7,7 +7,10 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from hirearchy.kernel import Message
-from hirearchy.reflection import Case, Verdict, case_spend, confirmed_criteria, delivered_unrated, lessons_of, questions_open, rated, version_at
+from hirearchy.reflection import (
+    Case, Verdict, case_spend, confirmed_criteria, delivered_unrated, lessons_of, questions_open, rated, user_approved, user_committed, user_cost,
+    user_spend, version_at,
+)
 from hirearchy.services import Criterion
 
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -100,6 +103,73 @@ def test_case_spend_never_counts_a_negative_rest() -> None:
 
 def test_case_spend_of_a_case_with_nothing_handed_down_is_its_runs() -> None:
     assert spent("open", 0, 0, 0) == 0 and spent("open", 2, 0, 0) == 2
+
+
+# ------------------------------------------------------------------------------ user_spend, user_cost, user_committed, user_approved
+
+
+def hand_built(
+    tasks: list[tuple[int, str | None]], state: str = "done", runs: int = 0, returned: int = 0, *, relayed_runs: int = 0, relayed_returned: int = 0,
+    relayed_overlap: int = 0, user_granted: int = 0, user_ceiling: int = 0,
+) -> Case:
+    """A case of a chain of ``(budget, source)`` tasks, with the numbers the pure functions read."""
+    chain = [Message(sender="root", to="ceo", type="task", body="b", title="t", budget=b, source=src) for b, src in tasks]
+    return Case(
+        id="A", service="s", owner="ceo", tasks=chain, result=None, state=state, playbook=0, used=0, reworks=len(chain) - 1,
+        budget=sum(b for b, _ in tasks), runs=runs, lessons=[], verdicts=[], started=None, finished=None, returned=returned, relayed_runs=relayed_runs,
+        relayed_returned=relayed_returned, relayed_overlap=relayed_overlap, user_granted=user_granted, user_ceiling=user_ceiling,
+    )
+
+
+CHAINS = [[(21, None)], [(10, None), (11, "human")], [(5, None), (8, "human"), (8, None)], [(0, None)]]
+NUMBERS = [(12, 0), (15, 0), (14, 0), (16, 0), (7, 8), (9, 15), (20, 0), (0, 0), (2, 0), (7, 21)]
+
+
+@pytest.mark.parametrize("state", ["done", "failed", "open", "blocked"])
+@pytest.mark.parametrize("tasks", CHAINS)
+def test_without_a_relayed_task_the_user_spend_and_cost_are_the_case_spend(state: str, tasks: list[tuple[int, str | None]]) -> None:
+    """I1 (D-E5-1): a chain without a relayed task costs the user exactly what ``case_spend`` says, so the human client's text is today's text."""
+    for runs, returned in NUMBERS:
+        case = hand_built(tasks, state, runs, returned)
+        assert user_spend(case) == user_cost(case) == case_spend(case)
+
+
+def test_user_spend_leaves_the_runs_of_a_relayed_rework_out() -> None:
+    """E5 s1 T6: 15 runs, 5 of them root's relayed rework's, and 1 of the relayed task's 6 returned: the user's requests cost 10."""
+    done = hand_built([(12, None), (12, "human"), (6, "relayed")], "done", runs=15, returned=15, relayed_runs=5, relayed_returned=1)
+    assert user_spend(done) == 10
+
+
+def test_user_spend_leaves_the_runs_still_out_of_a_relayed_task_out() -> None:
+    """While the case is open, only the user tasks' unused, unreturned budget is still out: the relayed task's 10 are not the user's."""
+    case = hand_built([(4, None), (10, "relayed")], "open", runs=2, returned=0)
+    assert case_spend(case) == 14 and user_spend(case) == 4  # 2 used + 2 still out of the head's 4; the relayed task's 10 are not the user's
+
+
+def test_user_spend_of_an_open_case_counts_what_the_user_tasks_returned_only() -> None:
+    case = hand_built([(12, None), (6, "relayed")], "open", runs=7, returned=9, relayed_runs=3, relayed_returned=4)
+    assert user_spend(case) == 4 + max(0, 12 - 4 - 5)  # 4 user runs; 12 handed down, 5 returned by the user tasks' results
+
+
+def test_user_cost_subtracts_the_relayed_overlap_and_is_never_below_zero() -> None:
+    case = hand_built([(10, None), (6, "relayed"), (5, "human")], "done", runs=9, relayed_runs=2, relayed_overlap=3)
+    assert user_spend(case) == 7 and user_cost(case) == 4
+    assert user_cost(hand_built([(10, None)], "done", runs=2, relayed_overlap=5)) == 0
+
+
+def test_user_committed_ignores_the_state_and_counts_the_user_grants() -> None:
+    """What a new rework draws on: the user's runs plus what the team still holds for them, whether or not the case is finished."""
+    for state in ("done", "failed", "open", "blocked"):
+        case = hand_built([(12, None)], state, runs=5, returned=0, user_granted=3)
+        assert user_committed(case) == 5 + (12 + 3 - 5)
+    assert user_committed(hand_built([(12, None), (6, "relayed")], "done", runs=9, returned=5, relayed_runs=4, relayed_returned=1)) == 5 + (12 - 5 - 4)
+
+
+def test_user_approved_is_the_contract_budget_for_a_hand_built_case_and_the_ceiling_when_that_is_higher() -> None:
+    case = hand_built([(12, None)])
+    assert user_approved(case, 12) == 12 and user_approved(case, 7) == 7
+    assert user_approved(hand_built([(12, None)], user_ceiling=17), 12) == 17
+    assert user_approved(hand_built([(12, None)], user_ceiling=5), 12) == 12
 
 
 # ------------------------------------------------------------------------------ confirmed_criteria

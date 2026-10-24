@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from datetime import datetime
 
 from ..agents import AgentDirectory
@@ -15,6 +17,61 @@ from .api import Case, CaseHistory, Verdict, lessons_of, version_at
 def _within(stamp: str, bounds: tuple[str, str | None]) -> bool:
     """Is ``stamp`` in the interval of a task: from its send up to its successor's send (exclusive), or to the window's end for the last one?"""
     return bounds[0] <= stamp and (bounds[1] is None or stamp < bounds[1])
+
+
+@dataclass(frozen=True)
+class _Spend:
+    """The numbers of a case that split the user's requests from root's relayed reworks (design 4.2, 4.3)."""
+
+    relayed_runs: int
+    relayed_returned: int
+    relayed_overlap: int
+    unsplit_runs: int
+    user_granted: int
+    user_ceiling: int
+
+
+def _spend(
+    tasks: list[Message], results: Mapping[str, Message], sent: Sequence[Message], team: Sequence[str], human: bool, start: str, end: str | None,
+    charged: Sequence[str],
+) -> _Spend:
+    """The relayed and user numbers of the chain ``tasks``, from the client's ``sent`` box, the latest ``results`` it received, the stamps of the
+    charged runs ``charged`` in the case window (``start`` to ``end``, inclusive) and whether the client is ``human`` (root)."""
+    bounds = [(t.id[:21], tasks[k + 1].id[:21] if k + 1 < len(tasks) else None) for k, t in enumerate(tasks)]
+    relayed = [b for t, b in zip(tasks, bounds) if t.source == "relayed"]
+
+    def in_relayed(s: str) -> bool:
+        return any(_within(s, b) for b in relayed)
+
+    handed_down = [m for m in sent if m.type == "note" and m.budget > 0 and m.to in team and m.id[:21] >= start and (end is None or m.id[:21] <= end)]
+    grants = sorted((m for m in handed_down if human and not in_relayed(m.id[:21])), key=lambda m: m.id)  # the user grants
+    users = [t for t in tasks if t.source != "relayed"]
+    ceiling = 0
+    for h in sorted([*users, *grants], key=lambda m: m.id) if human else []:  # the hand-downs, oldest first
+        runs = sum(1 for s in charged if s < h.id[:21] and not in_relayed(s))
+        handed = sum(t.budget for t in users if t.id < h.id) + sum(g.budget for g in grants if g.id < h.id)
+        back = sum(min(r.budget, t.budget) for t in users if t.id < h.id and (r := results.get(t.id)) is not None and r.id < h.id)
+        ceiling = max(ceiling, runs + max(0, handed - runs - back) + h.budget)
+    overlap, overlapped = 0, []
+    for k, t in enumerate(tasks[:-1]):  # relayed runs that can lie in a later user interval
+        r = results.get(t.id)
+        if t.source != "relayed" or not any(u.source != "relayed" for u in tasks[k + 1:]) or (r is not None and r.id < tasks[k + 1].id):
+            continue  # not relayed, no user task after it, or answered before its successor
+        funds = t.budget + sum(n.budget for n in handed_down if _within(n.id[:21], bounds[k]))
+        ran = sum(1 for s in charged if _within(s, bounds[k]))
+        term = max(0, funds - (min(r.budget, t.budget) if r is not None else 0) - ran)
+        overlap += term
+        if term > 0:
+            overlapped.append(k)
+    unsplit = 0
+    if overlapped:  # the runs of the user intervals after the first overlapped relayed task: counted with the user's, not apart
+        later = [bounds[j] for j in range(overlapped[0] + 1, len(tasks)) if tasks[j].source != "relayed"]
+        unsplit = sum(1 for s in charged if any(_within(s, b) for b in later))
+    return _Spend(
+        relayed_runs=sum(1 for s in charged if in_relayed(s)),
+        relayed_returned=sum(min(r.budget, t.budget) for t in tasks if t.source == "relayed" and (r := results.get(t.id)) is not None),
+        relayed_overlap=overlap, unsplit_runs=unsplit, user_granted=sum(g.budget for g in grants), user_ceiling=ceiling,
+    )
 
 
 class DerivedCaseHistory(CaseHistory):
@@ -82,8 +139,7 @@ class DerivedCaseHistory(CaseHistory):
                 end = later[:21]
             start = tasks[0].id[:21]
             charged = [s for s, credited in self._counter.stamps(team, start, end) if not credited]
-            bounds = [(t.id[:21], tasks[k + 1].id[:21] if k + 1 < len(tasks) else None) for k, t in enumerate(tasks)]
-            relayed = [b for t, b in zip(tasks, bounds) if t.source == "relayed"]
+            spend = _spend(tasks, results, sent, team, kind == "human", start, end, charged)
             step = {t.id: i for i, t in enumerate(tasks)}
             verdicts = [
                 self._verdict(n, step[n.reply_to], [m for m in link_notes if m.reply_to == n.id]) for n in notes if n.reply_to in ids
@@ -93,7 +149,7 @@ class DerivedCaseHistory(CaseHistory):
                 playbook=tasks[0].playbook or 0,
                 used=version_at(timeline, msg_time(first_result) if (first_result := results.get(tasks[0].id)) else None),
                 reworks=len(tasks) - 1, budget=sum(t.budget for t in tasks),
-                runs=len(charged), relayed_runs=sum(1 for s in charged if any(_within(s, b) for b in relayed)),
+                runs=len(charged), relayed_runs=spend.relayed_runs,
                 lessons=[x for t in tasks if (r := results.get(t.id)) is not None and (x := lessons_of(r))],
                 lesson_ids=[r.id for t in tasks if (r := results.get(t.id)) is not None and lessons_of(r)],
                 lesson_sources=[t.source or "" for t in tasks if (r := results.get(t.id)) is not None and lessons_of(r)],
@@ -101,6 +157,8 @@ class DerivedCaseHistory(CaseHistory):
                 finished=msg_time(res) if res is not None and final else None,
                 client_kind=kind, relayed_reworks=sum(t.source == "relayed" for t in tasks[1:]),
                 returned=sum(min(r.budget, t.budget) for t in tasks if (r := results.get(t.id)) is not None),
+                relayed_returned=spend.relayed_returned, relayed_overlap=spend.relayed_overlap, unsplit_runs=spend.unsplit_runs,
+                user_granted=spend.user_granted, user_ceiling=spend.user_ceiling,
             ))
         return out
 

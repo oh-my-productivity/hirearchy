@@ -46,6 +46,10 @@ __all__ = [
     "regressions",
     "stats_by_version",
     "summarize",
+    "user_approved",
+    "user_committed",
+    "user_cost",
+    "user_spend",
     "version_at",
 ]
 
@@ -92,6 +96,11 @@ class Case:
     relayed_reworks: int = 0  # the tasks of the chain after the first that root stamped ``source: relayed``
     returned: int = 0  # the runs the results of the chain carried back: each result counts at most its own task's budget
     relayed_runs: int = 0  # 0b 4.2: the charged runs whose stamp lies in the interval of a relayed task, from its send to its successor's (the window's end for the last task, inclusive)
+    relayed_returned: int = 0  # the runs the results of the relayed tasks carried back: each counts at most its own task's budget
+    relayed_overlap: int = 0  # the most of an unanswered relayed task's runs that can lie in a later user interval (its split is by send time)
+    unsplit_runs: int = 0  # the charged runs in the user intervals after the first overlapped relayed task: counted with the user's, 0 without overlap
+    user_granted: int = 0  # the budgets of the user grants: notes of a human client (root) in a user interval; 0 for an agent client
+    user_ceiling: int = 0  # the highest ceiling over the user's hand-downs (the most the user's requests could cost right after one); 0 for an agent client
 
     @property
     def title(self) -> str:
@@ -136,10 +145,40 @@ class Assertion:
 
 def case_spend(case: Case) -> int:
     """The runs a case costs against its contract's per-request budget (pure): the runs its team used, plus, while it is not finished (open or
-    blocked), the runs handed down for it that were neither used nor returned (the team may still spend them). ``case_total`` warns on it;
-    Phase 0b's cost alarm reads the same number."""
+    blocked), the runs handed down for it that were neither used nor returned (the team may still spend them). It is the case's total, the
+    user's requests and root's relayed reworks together: ``case_total`` warns on it for an agent client's case, and D-E5-6 has Phase 0b's cost
+    alarm split it (``user_cost`` against ``user_approved``, the comparison ``case_total`` makes for a human client's case)."""
     still_out = 0 if case.state in ("done", "failed") else max(0, case.budget - case.runs - case.returned)
     return case.runs + still_out
+
+
+def user_spend(case: Case) -> int:
+    """The runs a case costs the user (pure): ``case_spend`` restricted to the user's requests, the tasks of the chain that are not relayed
+    reworks. Equal to ``case_spend`` when the chain has no relayed rework."""
+    runs = case.runs - case.relayed_runs
+    if case.state in ("done", "failed"):
+        return runs
+    budget = sum(t.budget for t in case.tasks if t.source != "relayed")
+    return runs + max(0, budget - runs - (case.returned - case.relayed_returned))
+
+
+def user_cost(case: Case) -> int:
+    """The runs the user's requests cost at least (pure): ``user_spend`` less the runs of relayed reworks that can lie in a user's interval
+    (``case.relayed_overlap``). The warning of ``case_total``, and 0b's cost alarm, compare it with ``user_approved`` (D-E5-6)."""
+    return max(0, user_spend(case) - case.relayed_overlap)
+
+
+def user_committed(case: Case) -> int:
+    """What the user's requests used or the team still holds for them, whatever the case's state (pure): what a new rework draws on."""
+    runs = case.runs - case.relayed_runs
+    budget = sum(t.budget for t in case.tasks if t.source != "relayed") + case.user_granted
+    return runs + max(0, budget - runs - (case.returned - case.relayed_returned))
+
+
+def user_approved(case: Case, budget: int) -> int:
+    """The runs the user approved for a case (pure): the contract's per-request ``budget``, raised to the highest ceiling root set for the
+    user's requests (``case.user_ceiling``; 0 for an agent client, whose case therefore reads the contract's budget)."""
+    return max(budget, case.user_ceiling)
 
 
 def confirmed_criteria(cases: Sequence[Case], criteria: Sequence[Criterion]) -> frozenset[str]:
