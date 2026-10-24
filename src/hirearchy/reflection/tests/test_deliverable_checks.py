@@ -402,6 +402,16 @@ def test_artifact_paths_with_dotdot_or_absolute_are_not_compared(w: ReflectionWo
     assert r.versions.asked == [] and r.versions.currents == []
 
 
+def test_an_artifact_path_with_a_nul_byte_is_not_compared_and_nothing_raises(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    task = ask(w, "ai")
+    done(w, task, "lead/work/a\x00b.md")  # an agent's result summary can list any text as an artifact
+    put(r, {"memo.md": b"team\n"})
+    assert r.findings() == [finding("memo.md", "unknown")]
+    assert r.versions.asked == [] and r.versions.currents == []
+
+
 def test_only_the_newest_20_results_and_10_paths_are_candidates(w: ReflectionWorld) -> None:
     service(w)
     r = rig(w)

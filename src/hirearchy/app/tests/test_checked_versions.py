@@ -181,6 +181,13 @@ def test_current_refuses_paths_outside_the_org_links_and_large_files(org: Org, t
     assert org.versions.current(MEMO, 40) == blob_id(b"now\n")  # and the good one still answers
 
 
+def test_current_of_a_path_with_a_nul_byte_is_none(org: Org) -> None:
+    org.write(MEMO, "now\n")
+    assert org.versions.current("lead/work/a\x00b.md", 40) is None
+    assert org.versions.current("lead/work/memo.md\x00", 40) is None
+    assert org.versions.current(MEMO, 40) == blob_id(b"now\n")
+
+
 def test_current_follows_no_link_of_the_organization_root_itself_only_resolves_it(tmp_path: Path) -> None:
     """The organization directory may itself be reached through a link (``/tmp`` on macOS): that is the user's own layout, not a component of an artifact."""
     real = tmp_path / "real-org"

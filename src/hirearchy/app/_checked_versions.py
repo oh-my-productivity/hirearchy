@@ -61,7 +61,7 @@ class GitCheckedVersions(CheckedVersions):
         """The bytes of the organization's file ``path``: component by component from the organization's directory, never through a link, only a
         regular file, at most 4 MiB; None otherwise."""
         parts = path.split("/")
-        if not path or any(part in ("", ".", "..") for part in parts):
+        if not path or "\0" in path or any(part in ("", ".", "..") for part in parts):
             return None
         if self._root is None:
             self._root = Path(self._paths.root).resolve()  # the organization directory may itself be reached through a link: the user's layout

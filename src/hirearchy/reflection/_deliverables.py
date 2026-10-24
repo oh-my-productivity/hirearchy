@@ -179,7 +179,7 @@ class FsDeliverableFolder(DeliverableFolder):
     """The deliverable places on disk (see the module)."""
 
     def locate(self, raw: object) -> Located | None:
-        if not isinstance(raw, str) or not raw.strip():
+        if not isinstance(raw, str) or not raw.strip() or "\0" in raw:  # no path has a NUL byte
             return None
         try:
             given = Path(raw).expanduser()

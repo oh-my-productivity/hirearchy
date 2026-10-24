@@ -65,6 +65,12 @@ def test_a_relative_or_non_string_path_is_skipped() -> None:
         assert folder.locate(raw) is None, raw
 
 
+def test_a_path_with_a_nul_byte_is_skipped() -> None:
+    folder = FsDeliverableFolder()
+    for raw in ("/tmp/a\x00b", "/tmp/\x00", "\x00/tmp"):
+        assert folder.locate(raw) is None, raw
+
+
 def test_dotdot_in_the_contract_path_is_normalized(tmp_path: Path) -> None:
     make(tmp_path / "b" / "inside.md")
     make(tmp_path / "a" / "elsewhere.md")

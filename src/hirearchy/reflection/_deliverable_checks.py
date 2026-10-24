@@ -32,8 +32,8 @@ def _us(moment: datetime | None) -> int | None:
 
 def _in_the_organization(path: str) -> bool:
     """An artifact path that can be compared: relative to the organization, without a ``..``, ``.`` or empty segment (a directory listed with a trailing
-    slash has one)."""
-    return bool(path) and not path.startswith("/") and all(part not in ("", ".", "..") for part in path.split("/"))
+    slash has one) and without a NUL byte (no file has one; an agent's result can list one)."""
+    return bool(path) and "\0" not in path and not path.startswith("/") and all(part not in ("", ".", "..") for part in path.split("/"))
 
 
 @dataclass(frozen=True)
