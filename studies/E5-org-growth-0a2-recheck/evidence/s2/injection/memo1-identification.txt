@@ -1,0 +1,8 @@
+memo-1 task identification (protocol 5.3)
+date_utc: 2026-10-24T03:45:54Z
+root tasks when memo 1 was first delivered (turn 5 copy, deliverables/memo-2026-10-05.md, md5 e988abb443ca3d4ee60114243c68ce77):
+  20261024T033732488726-root-ebe2 (first request, source: -) -> result lead-f023 (done, 03:41:51Z)
+  20261024T034308207974-root-6c4f (human rework 'Rework memo for 2026-10-05: user's date answers', revises ebe2, source: human) -> result lead-35b2 (done, 03:45:11Z, reply_to 6c4f)
+The delivered file's md5 equals lead/writer/work/memo-2026-10-05.md (e988abb443ca3d4ee60114243c68ce77), the artifact named in result lead-35b2 (reply_to 6c4f, 'modified 03:43:58 UTC'); the copy call (deliverables mtime 04:45:21 local = 03:45:21Z) was after 35b2 (03:45:11Z). So the version delivered at memo 1's first delivery is the done result of 6c4f -> revises target = 20261024T034308207974-root-6c4f (as in E5 s1 and E4 s3).
+scheduler before injection: scheduler.exit 'finished: no open tasks'; processes referencing the sandbox:        0
+root tasks open at that moment: none (file listing: org/inbox empty; both results in read/)

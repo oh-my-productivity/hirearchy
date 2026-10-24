@@ -1,0 +1,15 @@
+The 12 October memo is at `/tmp/hirearchy-e5-s3-1792814736/deliverables/memo-2026-10-12.md`. I copied it unchanged from the team's final file and checked that the two are identical.
+
+- **Notes only, one meeting:** met.
+- **At most 400 words:** met. It is 155 words.
+- **Starts with a one-line "Summary:", then Decisions, then the Action items table:** met.
+- **Decisions:** met. There are 3: the RFC approval, the blameless company-wide postmortem, and the deploy freeze.
+- **All commitments are rows:** met. There are 5 rows, and Lee's pager swap is only a row. I left out Sam's CI update, since it was a status update.
+- **Dates:** met. Dev is 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21, and Lee `none`. The "probably" is gone from Sam's row.
+- **Reviewer re-check:** met. The reviewer's last line was "Criteria met: 10 of 10".
+
+This memo used 10 of the 12 runs, including the one-line rework for "probably".
+
+Nothing unrequested ran this time, and nothing is running now. The 5 October memo still has no Summary line, and you said you'd fix that yourself. Its case total stays at 18 runs.
+
+Do you want to keep the 12 October memo, or change something? Your reply is the only feedback I record.

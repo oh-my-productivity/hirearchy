@@ -1,0 +1,22 @@
+# lead prompt sizes (protocol 7.2): bytes between '# ---- prompt ----' and '# ---- output ----'
+
+lead@20261024T040854487684     bytes=20727 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T040948893225     bytes=24764 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T041101692857     bytes=25424 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T041152253594     bytes=25049 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T041240729499     bytes=24797 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T041416270945     bytes=21617 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T041552924069     bytes=22661 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T041659629002     bytes=20523 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T041932419527     bytes=25122 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T042041025041     bytes=31539 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T042141567153     bytes=28340 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T042730633215     bytes=31339 reflect_section=yes reflect_words=573 regression_list=yes
+lead@20261024T042837237622     bytes=28146 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T042943938512     bytes=28831 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T043107173996     bytes=25335 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T043159829894     bytes=28058 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T043314519608     bytes=30179 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T043420907830     bytes=28014 reflect_section=yes reflect_words=505 regression_list=yes
+lead@20261024T043509451750     bytes=28151 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T043622210051     bytes=29313 reflect_section=no reflect_words=0 regression_list=yes

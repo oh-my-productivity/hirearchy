@@ -1,0 +1,9 @@
+# apply_org at 2026-10-24T03:06:42.351Z; args: {"approved": true, "plan_id": "60264bd9a1c9"}
+
+applied the blueprint to /private/tmp/hirearchy-e5-s1-1792811051/org
+created 3 agents: lead, lead/writer, lead/reviewer
+defined 1 service(s) of lead: weekly-meeting-memo (contract and playbook v1)
+no task was given: the services are ready and nothing runs yet. To use one: request(service, inputs) (or `hirearchy request SERVICE --input key=value`), then start()
+warning: services[weekly-meeting-memo].deliverable.path: no agent can write to /private/tmp/hirearchy-e5-s1-1792811051/deliverables (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)
+warning: services[weekly-meeting-memo].budget: 12 runs per request leaves almost no slack over the estimate of 11; expect a stall on the first surprise
+Nothing runs yet: the services are ready. When the user asks for one, call request(service, inputs) (see services()), then start() if the scheduler is not running.

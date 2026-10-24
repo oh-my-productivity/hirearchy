@@ -1,0 +1,82 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-24T03:13:17Z .. 2026-10-24T03:15:41Z; injected task 20261024T031317713451-root-963a; revised (memo 1) task 20261024T031013210098-root-aae2
+
+## run lead@20261024T031317912646 agent=lead model=claude-sonnet-5.5 start=2026-10-24T03:13:17.923821+00:00 end=2026-10-24T03:13:58.242678+00:00 exit=0 secs=40 session=sess_da58ca0b-a431-411a-95e2-0a0c218be575
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 13
+  lead message 20261024T031351091248-lead-1d59 to=lead/writer type=task status=None created=2026-10-24T03:13:51+00:00
+  ## Lessons: (none)
+  org-git commit 650f010 MEMORY.md diff:
+    commit 650f010a771753d6702397fdf264f3b20cb58fa3
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 04:13:58 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T031317912646.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index c952167..40ef113 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,3 @@
+     # Memory
+    -Task 20261024T031013210098-root-aae2 (memo 2026-10-05 rework) reported done; reviewer 6 of 6. Nothing outstanding.
+    -Future: ask writer to flag vague deadlines and 'we agreed' items as client questions up front (playbook idea; needs client-rejection evidence to revise).
+    +Task 20261024T031317713451-root-963a (rework: Sam/Marta Due -> none + Open questions) open. Delegated writer task 20261024T031351091248-lead-1d59 (revises ...2f58, budget 1). Next: read memo, then delegate reviewer (revises 20261024T031132436417-lead-e10e, budget 1) to re-check EVERY Due value vs notes, then report to root with reviewer's coverage line. Own budget 4 after delegation.
+    +Future: ask writer to flag vague deadlines and 'we agreed' items as Open questions up front (playbook idea; needs client-rejection evidence).
+    \ No newline at end of file
+
+## run lead/writer@20261024T031352196877 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-24T03:13:52.202552+00:00 end=2026-10-24T03:14:18.434111+00:00 exit=0 secs=26 session=sess_a7743d7e-4eea-4406-a7a3-ac8736356a99
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261024T031412374476 agent=lead model=claude-sonnet-5.5 start=2026-10-24T03:14:12.393505+00:00 end=2026-10-24T03:14:38.637477+00:00 exit=0 secs=26 session=sess_65e464ad-c6e1-4b37-aba2-bae0f2f781e0
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261024T031432418284-lead-20c3 to=lead/reviewer type=task status=None created=2026-10-24T03:14:32+00:00
+  ## Lessons: (none)
+  org-git commit d0bb021 MEMORY.md diff:
+    commit d0bb021cd0d0fdbdc7e59e7313064c9d102148c5
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 04:14:38 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T031412374476.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 40ef113..ee8b3de 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,3 @@
+     # Memory
+    -Task 20261024T031317713451-root-963a (rework: Sam/Marta Due -> none + Open questions) open. Delegated writer task 20261024T031351091248-lead-1d59 (revises ...2f58, budget 1). Next: read memo, then delegate reviewer (revises 20261024T031132436417-lead-e10e, budget 1) to re-check EVERY Due value vs notes, then report to root with reviewer's coverage line. Own budget 4 after delegation.
+    -Future: ask writer to flag vague deadlines and 'we agreed' items as Open questions up front (playbook idea; needs client-rejection evidence).
+    \ No newline at end of file
+    +Task 20261024T031317713451-root-963a (rework: Sam/Marta Due -> none + Open questions) open. Writer rework done (lead/writer/work/memo-2026-10-05.md, 151 words, I read it: Sam/Marta none, Open questions present). Delegated reviewer re-check (revises ...e10e, budget 1). Next: on result, verify coverage 'criteria met n of m' n=m, copy any Questions for the client, then report root done with the coverage line verbatim + path; lessons required. Deliverable path: /tmp/hirearchy-e5-s1-1792811051/deliverables (memo-2026-10-05.md).
+    +Future: ask writer to flag vague deadlines and 'we agreed' items as Open questions up front (playbook idea; needs client-rejection evidence).
+
+## run lead/reviewer@20261024T031432580757 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-24T03:14:32.590265+00:00 end=2026-10-24T03:15:16.984112+00:00 exit=0 secs=44 session=sess_d4792eee-4e6c-4a6d-ab8b-4cc31c4e9406
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261024T031510904981 agent=lead model=claude-sonnet-5.5 start=2026-10-24T03:15:10.925881+00:00 end=2026-10-24T03:15:41.220631+00:00 exit=0 secs=30 session=sess_d6852427-4125-4e1f-9277-833f59652e29
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261024T031535111416-lead-592f to=root type=result status=done created=2026-10-24T03:15:35+00:00
+  ## Lessons: Rework came from two Due values resolved from vague/event dates ("before Friday", "for Oct 14"). Playbook idea: tell the writer up front to use Due none for vague or event-date deadlines and list them under Open questions, and to ask the reviewer to check every Due row. Used: 1 rework + 1 re-check; reviewer passed 7 of 7.
+  org-git commit 534abab MEMORY.md diff:
+    commit 534ababac3533ced955c0da01c1099f4a3271809
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 04:15:41 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T031510904981.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index ee8b3de..40c0a71 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,4 @@
+     # Memory
+    -Task 20261024T031317713451-root-963a (rework: Sam/Marta Due -> none + Open questions) open. Writer rework done (lead/writer/work/memo-2026-10-05.md, 151 words, I read it: Sam/Marta none, Open questions present). Delegated reviewer re-check (revises ...e10e, budget 1). Next: on result, verify coverage 'criteria met n of m' n=m, copy any Questions for the client, then report root done with the coverage line verbatim + path; lessons required. Deliverable path: /tmp/hirearchy-e5-s1-1792811051/deliverables (memo-2026-10-05.md).
+    -Future: ask writer to flag vague deadlines and 'we agreed' items as Open questions up front (playbook idea; needs client-rejection evidence).
+    +Task 20261024T031317713451-root-963a (memo 2026-10-05 rework) reported done: reviewer 'criteria met: 7 of 7'. Nothing pending. Deliverable: lead/writer/work/memo-2026-10-05.md -> /tmp/hirearchy-e5-s1-1792811051/deliverables.
+    +Open question passed to client: RFC team review at next meeting has no owner (left out).
+    +Future playbook idea (needs client-rejection evidence): tell writer up front to set Due none for vague/event-date deadlines and list them in Open questions; reviewer to check every Due row.
+

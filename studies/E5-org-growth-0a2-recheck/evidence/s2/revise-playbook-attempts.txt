@@ -1,0 +1,70 @@
+# revise_playbook attempts (protocol 7.2; amendment 1 A3.3 10.1(c)); facts only
+
+tool.call events with tool == revise_playbook: 1
+- 2026-10-24T03:51:30.944323+00:00 actor=lead run=lead@20261024T035110143468 trace=None ok=True error_type=None
+  error (verbatim): None
+  args: {"service": "weekly-meeting-memo", "content_chars": 2198, "reason_chars": 115, "evidence_n": 3, "evidence_chars": 35}
+
+run-log patterns per run (after '# ---- output ----'): P1 revise_playbook call lines | P2 end lines | P3 all hirearchy call lines | tool.call events whose run is this run
+  lead@20261024T033734372585                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261024T033752512885            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T033822892573                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261024T033847228333          P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261024T033935681443                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261024T034001950062            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T034026183003                   P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead/reviewer@20261024T034054444673          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T034124781991                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261024T034309988730                   P1=0 P2=0 P3=11 events(all)=11 events(revise_playbook)=0
+  lead/writer@20261024T034342218842            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T034404421885                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261024T034422590108          P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261024T034450864796                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261024T034559945086                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261024T034632186884            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T034656435460                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261024T034716654792          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T034803009555                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261024T035110143468                   P1=1 P2=1 P3=4 events(all)=4 events(revise_playbook)=1
+      [tool] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-meeting-memo","content":"## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable
+      [tool ok] @hirearchy/revise_playbook {"tool_id":"hirearchy::revise_playbook","arguments":{"service":"weekly-meeting-memo","content":"## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable
+  lead/writer@20261024T035140370724            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T035210772782                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261024T035233082127          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T035317429006                   P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261024T035511966313                   P1=0 P2=0 P3=11 events(all)=11 events(revise_playbook)=0
+  lead/writer@20261024T035544180459            P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T035608433258                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261024T035626710610          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T035701173141                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261024T035805267650                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261024T035829460187            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261024T035901763080                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261024T035924008284          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261024T040010577014                   P1=0 P2=0 P3=4 events(all)=3 events(revise_playbook)=0   <-- MISMATCH between run-log lines and events
+
+full arguments and result verbatim, from the org-run session (tool_call with args.tool_id == hirearchy::revise_playbook):
+--- run lead@20261024T035110143468 session sess_e4f1f978-f3bc-4d8b-9f12-59cb1ab90f2d call toolu_bdrk_01Q4FizSwc9ENh2NU7KNT6yv at 2026-10-24T03:51:30.948Z
+ARGUMENTS: {
+ "tool_id": "hirearchy::revise_playbook",
+ "arguments": {
+  "service": "weekly-meeting-memo",
+  "content": "## Steps\n1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.\n2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet.\n3. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.\n4. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.\n5. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.\n6. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /tmp/hirearchy-e5-s2-1792812864/deliverables) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).\n\n## Budget plan\nRequest budget: 12 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:\n- writer: 3 runs (2 work + 1 rework or re-check)\n- reviewer: 2 runs (1 work + 1 rework or re-check)\n- you (lead): keep 7 runs: your own 6 (plan, process each result, final check, report, one rework cycle) and 1 of slack.\nUnspent runs return to your parent with your final report.\n\n## Pitfalls\nnone yet: add them from lessons and feedback\n- C8: The memo starts with a one-line 'Summary:' of the meeting, then the Decisions section, then the action-items table, in that order.\n",
+  "reason": "Client confirmed C8 (link note 20261024T035002043490-root-6162 on rejection R1, case ...-root-ebe2): add its words.",
+  "evidence": [
+   "C8",
+   "R1",
+   "20261024T035002043490-root-6162"
+  ]
+ }
+}
+RESULT: playbook of `weekly-meeting-memo` is now v2; root was told without being woken
+
+service.revise events:
+- 2026-10-24T03:37:32.487977+00:00 {"ts": "2026-10-24T03:37:32.487977+00:00", "proc": "mcp", "pid": 13204, "kind": "service.revise", "actor": "root", "run": null, "trace": null, "owner": "lead", "service": "weekly-meeting-memo", "version": 1, "by": "root", "admitted": "client"}
+- 2026-10-24T03:51:30.943347+00:00 {"ts": "2026-10-24T03:51:30.943347+00:00", "proc": "mcp", "pid": 17267, "kind": "service.revise", "actor": "lead", "run": "lead@20261024T035110143468", "trace": null, "owner": "lead", "service": "weekly-meeting-memo", "version": 2, "by": "lead", "admitted": "c"}
+
+PLAYBOOK versions (org git history of lead/services/weekly-meeting-memo/PLAYBOOK.md and history/):
+a36dbb5 2026-10-24T04:37:32+01:00 root: applied blueprint (3 agents), task 20261024T033732488726-root-ebe2 -> lead, services: weekly-meeting-memo
+bc0730e 2026-10-24T04:51:46+01:00 lead: run ok, 5 message(s) [lead/runs/20261024T035110143468.log]
+history files now: PLAYBOOK.v1.md, SERVICE.v1.md

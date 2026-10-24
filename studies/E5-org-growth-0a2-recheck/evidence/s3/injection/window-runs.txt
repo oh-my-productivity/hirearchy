@@ -1,0 +1,95 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-24T04:19:32Z .. 2026-10-24T04:22:20Z; injected task 20261024T041932216940-root-daff; revised (memo 1) task 20261024T041412342994-root-c209
+
+## run lead@20261024T041932419527 agent=lead model=claude-sonnet-5.5 start=2026-10-24T04:19:32.431356+00:00 end=2026-10-24T04:20:20.828975+00:00 exit=0 secs=48 session=sess_bfefa7b3-5060-4cf6-9b39-122eb8aae2c5
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261024T042013251839-lead-711a to=lead/writer type=task status=None created=2026-10-24T04:20:13+00:00
+  ## Lessons: (none)
+  org-git commit 0acd1c4 MEMORY.md diff:
+    commit 0acd1c4a6caca5976dd8d5bf130fac0d86e0a8f5
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 05:20:20 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T041932419527.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index aabb12f..f556a82 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,5 @@
+     # Memory
+    -- root-e268 (memo 2026-10-05) reported DONE earlier. root-c209 (rework, 5 client corrections): memo lead/writer/work/memo-2026-10-05.md (140 words, mod 04:15:17) has all 5 corrections (re-read this run, matches). Writer task ...-bed1 still open, writer paused budget 0 (its run was killed before reporting); ignore the runtime 'writer out of budget' note, no writer work is needed.
+    -- root-c209 reported BLOCKED on C8: reviewer re-check not run, I cannot afford it (lead budget 1, delegate needs reserve 2 while bed1 is outstanding). Already asked root for 1+ more runs (need budget 3: 1 to reviewer, keep 2). Do not ask again.
+    -- If a grant arrives: delegate reviewer (revises 20261024T041211848635-lead-d22a, budget 1) with all 8 criteria + the 5 corrections; need 'criteria met: n of m'; then re-report root-c209 done with that line verbatim. No more rework.
+    -- Lesson for playbook (needs rejection evidence): keep vague deadline text (e.g. 'before Friday') in Action when Due=none. Also: a writer run can be killed before reporting, leaving a task open and reserve blocked.
+    +- Memo lead/writer/work/memo-2026-10-05.md. Two root tasks open/blocked: c209 (blocked, C8 re-check) and daff (rework of Due values, current, supersedes c209 Sam/Marta values; budget 6).
+    +- daff: I judged that root's 'Open questions' section violates C3 (no other section), so told writer: Sam Due=none (keep 'before Friday' in Action), Marta Due=none (explain 14 Oct = training date, no booking deadline in Action cell). Delegated writer task 20261024T042013251839-lead-711a (revises bed1, budget 1). Must tell root about this deviation in the report.
+    +- NEXT (when writer result arrives): read file, check; delegate reviewer (revises 20261024T041211848635-lead-d22a, budget 1) with all 8 criteria + 'recheck EVERY Due value against notes text' + corrections list (no Next-meeting decision; first decision rationale kept; Lee action row only; Sam/Marta Due none). Need 'criteria met: n of m'. Then report daff done (paste line verbatim) and also re-report c209 (done, same line) or reference. Lead budget 5 now; reviewer needs 1.
+    +- Lessons for playbook: keep vague deadline text in Action when Due=none; a writer run can be killed before reporting; requester asks for Open questions section conflict with C3 -> put in Action cell.
+
+## run lead/writer@20261024T042014770433 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-24T04:20:14.780152+00:00 end=2026-10-24T04:20:47.103433+00:00 exit=0 secs=32 session=sess_c3fda15c-6308-4030-85ff-ff87a1b8c099
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 5
+
+## run lead@20261024T042041025041 agent=lead model=claude-sonnet-5.5 start=2026-10-24T04:20:41.048949+00:00 end=2026-10-24T04:21:13.312200+00:00 exit=0 secs=32 session=sess_d1991b02-3808-4ea0-9155-4247d31b62ea
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261024T042105172929-lead-1bcf to=lead/reviewer type=task status=None created=2026-10-24T04:21:05+00:00
+  ## Lessons: (none)
+  org-git commit 282d831 MEMORY.md diff:
+    commit 282d831ad63de383e875d39be56953cbe28744c2
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 05:21:13 2026 +0100
+    
+        lead: run ok, 2 message(s) [lead/runs/20261024T042041025041.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index f556a82..ccabf52 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,6 @@
+     # Memory
+    -- Memo lead/writer/work/memo-2026-10-05.md. Two root tasks open/blocked: c209 (blocked, C8 re-check) and daff (rework of Due values, current, supersedes c209 Sam/Marta values; budget 6).
+    -- daff: I judged that root's 'Open questions' section violates C3 (no other section), so told writer: Sam Due=none (keep 'before Friday' in Action), Marta Due=none (explain 14 Oct = training date, no booking deadline in Action cell). Delegated writer task 20261024T042013251839-lead-711a (revises bed1, budget 1). Must tell root about this deviation in the report.
+    -- NEXT (when writer result arrives): read file, check; delegate reviewer (revises 20261024T041211848635-lead-d22a, budget 1) with all 8 criteria + 'recheck EVERY Due value against notes text' + corrections list (no Next-meeting decision; first decision rationale kept; Lee action row only; Sam/Marta Due none). Need 'criteria met: n of m'. Then report daff done (paste line verbatim) and also re-report c209 (done, same line) or reference. Lead budget 5 now; reviewer needs 1.
+    -- Lessons for playbook: keep vague deadline text in Action when Due=none; a writer run can be killed before reporting; requester asks for Open questions section conflict with C3 -> put in Action cell.
+    +- Memo lead/writer/work/memo-2026-10-05.md (149 words, read by me 04:20:36; Sam/Marta Due none, no Next-meeting decision, Lee action row only). Verified by me against notes.
+    +- Root tasks open: daff (current, rework of Due values) and c209 (blocked; superseded by daff values).
+    +- Delegated reviewer re-check (revises 20261024T041211848635-lead-d22a, budget 1), waiting. Lead budget 3.
+    +- NEXT when reviewer result arrives: read its report; if 'criteria met: 7 of 7' report daff done (paste line verbatim, path of its ledger, tell root: Open questions section not added because C3 forbids; explanations in Action cell; Sam/Marta Due none) and re-report c209 done/blocked consistently (c209 asked Sam 2026-10-09, Marta 2026-10-14, which daff superseded: report c209 blocked/explain superseded). Include any reviewer 'ambiguous' items under 'Questions for the client:'. If fails: one rework (writer has 0 budget -> needs budget from me, I have 3) then report blocked.
+    +- Lessons for playbook: keep vague deadline text in Action when Due=none; writer run can be killed before reporting; requester asks for Open questions section conflict with C3 -> put in Action cell.
+
+## run lead/reviewer@20261024T042105252799 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-24T04:21:05.260195+00:00 end=2026-10-24T04:21:47.635972+00:00 exit=0 secs=42 session=sess_a1776fd8-5157-4fbc-a735-017a25e63a7e
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261024T042141567153 agent=lead model=claude-sonnet-5.5 start=2026-10-24T04:21:41.587700+00:00 end=2026-10-24T04:22:17.954568+00:00 exit=0 secs=36 session=sess_9eb95b2c-0e8b-4540-9764-63a595e4d38d
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261024T042204607622-lead-1a15 to=root type=result status=done created=2026-10-24T04:22:04+00:00
+  ## Lessons: Keep vague deadline wording in the Action cell when Due=none. A requested 'Open questions' section conflicts with C3; put explanations in the Action cell. Rework cycles cost the writer a run each; the first writer run was killed before reporting. Add to playbook: tell the writer to resolve Due strictly by C6 (only dates the notes state).
+  lead message 20261024T042209687998-lead-d32d to=root type=result status=blocked created=2026-10-24T04:22:09+00:00
+  ## Lessons: Two successive reworks gave conflicting Due values. When a client asks for a Due the notes do not state, C6 wins; flag it to the client rather than writing the date.
+  org-git commit 6b47eaf MEMORY.md diff:
+    commit 6b47eaf34afe3a6bf490fbec77965748607f21eb
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 05:22:18 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T042141567153.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index ccabf52..feaf1b4 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,6 +1,5 @@
+     # Memory
+    -- Memo lead/writer/work/memo-2026-10-05.md (149 words, read by me 04:20:36; Sam/Marta Due none, no Next-meeting decision, Lee action row only). Verified by me against notes.
+    -- Root tasks open: daff (current, rework of Due values) and c209 (blocked; superseded by daff values).
+    -- Delegated reviewer re-check (revises 20261024T041211848635-lead-d22a, budget 1), waiting. Lead budget 3.
+    -- NEXT when reviewer result arrives: read its report; if 'criteria met: 7 of 7' report daff done (paste line verbatim, path of its ledger, tell root: Open questions section not added because C3 forbids; explanations in Action cell; Sam/Marta Due none) and re-report c209 done/blocked consistently (c209 asked Sam 2026-10-09, Marta 2026-10-14, which daff superseded: report c209 blocked/explain superseded). Include any reviewer 'ambiguous' items under 'Questions for the client:'. If fails: one rework (writer has 0 budget -> needs budget from me, I have 3) then report blocked.
+    -- Lessons for playbook: keep vague deadline text in Action when Due=none; writer run can be killed before reporting; requester asks for Open questions section conflict with C3 -> put in Action cell.
+    +- Memo lead/writer/work/memo-2026-10-05.md (149 words) final; reviewer 'criteria met: 7 of 7' (lead/reviewer/work/re-check-2026-10-05-due.md).
+    +- Reported daff done and c209 blocked (superseded by daff). Nothing open. Lead budget returned to root.
+    +- Lessons: keep vague deadline text in Action when Due=none; requested 'Open questions' section conflicts with C3 -> explain in Action cell; C6 beats client-requested dates the notes do not state.
+    +- If new rework arrives: writer has 0 budget, needs budget from me.
+

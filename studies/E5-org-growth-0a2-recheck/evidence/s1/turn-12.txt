@@ -1,0 +1,7 @@
+######## TURN 12  start 04:28:25  end 04:28:45  elapsed 20s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T03:28:25Z end 2026-10-24T03:28:45Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks - keep it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+I recorded your "keep it" for the 2026-10-19 memo.
+
+The team is set up and idle. For future weeks, tell me which notes file to use (for example "do 2026-10-26.md") and I'll run it. Every memo has to start with the Summary line, then the decisions, then the action items table.

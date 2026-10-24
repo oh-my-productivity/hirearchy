@@ -1,0 +1,5 @@
+I've recorded your rejection of the memo. It stays in `deliverables/` for now, and nothing else has changed. One question before I change the contract:
+
+About C3: add "Start the memo with a one-line 'Summary:' of the meeting, then the Decisions section, then the action items table" as a lasting rule? Yes or no.
+
+If yes, I'll add it to the contract so every future memo follows it. I'll also send this week's memo back for a rework, which will take the case past the 12-run budget. The first pass and the earlier rework used 10 runs. This rework needs about 5 more, so about 15 in total. Please also confirm that extra spend.

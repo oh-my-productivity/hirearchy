@@ -1,0 +1,57 @@
+mission: >
+  Each week, turn the notes of one platform team weekly meeting into a short memo that says what the team decided and who does what, so the team lead can send it out.
+needs:
+  kind: writing
+  scope: "One memo per request, from the one notes file the requester names: the decisions made in that meeting and the action items (every commitment someone made, labelled ACTION or said in passing). Nothing from other meetings and no recap of the discussion."
+  inputs:
+    - /tmp/hirearchy-e5-s3-1792814736/notes
+  quality_bar: Every decision and every commitment in the notes file is in the memo, and nothing is in the memo that the notes do not say.
+  sources: Only the files in needs.inputs; no web.
+  budget_runs: 12
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - name: writer
+        template: writer
+        model: cheap
+        tools: [read]
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]
+services:
+  - name: weekly-meeting-memo
+    owner: lead
+    description: One short memo with the decisions and the action items of one weekly meeting, from its notes file.
+    inputs:
+      - name: notes_file
+        description: The file name of the meeting notes inside the notes folder, for example 2026-10-05.md
+        required: true
+    acceptance:
+      - The memo is based only on the named notes file and covers only that meeting.
+      - At most 400 words as counted by read.
+      - "The memo is markdown with a Decisions section (a list) and an Action items section (a table with exactly the columns Owner | Action | Due), and no other section."
+      - Every decision made in the meeting is listed, including logistics decisions and decisions to keep things as they are.
+      - Every commitment in the notes is a row in the table with its owner, including informal ones where someone said they would do something, not only items labelled ACTION.
+      - "Due is an ISO date (YYYY-MM-DD). A relative or vague deadline (for example 'before Friday') becomes a date only when the notes make the date clear, using the meeting date as the reference; otherwise Due is 'none'. No date is invented."
+      - Nothing in the memo is missing from or contradicts the notes file.
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: One markdown memo for one meeting.
+      format: markdown
+      max_words: 400
+      path: /tmp/hirearchy-e5-s3-1792814736/deliverables
+    budget: 12
+    locked: false
+task:
+  service: weekly-meeting-memo
+  inputs:
+    notes_file: 2026-10-05.md
+  title: Memo for the 5 October 2026 weekly

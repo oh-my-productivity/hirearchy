@@ -1,0 +1,117 @@
+# contract loop (protocol 7.2); facts only, time order
+
+Lena reject turns (D1 candidates: turns whose line starts with 'No, not right yet' / 'Not right yet' / 'Almost'):
+- turn 5: script UTC 2026-10-24T03:15:57Z - 2026-10-24T03:16:33Z; session turn_start 2026-10-24T03:16:10.142Z turn_end 2026-10-24T03:16:32.612Z; line: No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.
+
+assistant calls to feedback, define_service, request, services (full arguments and replies):
+[2026-10-24T03:06:44.003Z] call #11 turn 3 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"service": "weekly-meeting-memo", "inputs": {"notes_file": "2026-10-05.md"}, "title": "Memo for meeting 2026-10-05"}}
+REPLY (2026-10-24T03:06:44.003Z): requested service `weekly-meeting-memo` from lead: task 20261024T030644000395-root-f07a, budget 12 (contract v1, playbook v1). Call start() if the scheduler is not running.
+
+[2026-10-24T03:10:13.215Z] call #18 turn 4 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"service": "weekly-meeting-memo", "inputs": {"notes_file": "2026-10-05.md"}, "title": "Memo for meeting 2026-10-05 (rework)", "revises": "20261024T030644000395-root-f07a", "source": "human", "note": "The user answered the client questions. Required changes: (1) Sam's flaky-CI action: Due 2026-10-09. (2) Lee's SSO vendor ping is an action item only: remove it from the Decisions section, keep it in the table. (3) Marta's room booking: Due 2026-10-14. Change nothing else. All contract criteria still apply, including 400 words max and the exact Owner | Action | Due columns."}}
+REPLY (2026-10-24T03:10:13.215Z): requested service `weekly-meeting-memo` from lead: task 20261024T031013210098-root-aae2, budget 12 (contract v1, playbook v1). Call start() if the scheduler is not running.
+case total: 5 runs used of 24 handed down (contract: 12 per request). This case now exceeds the per-request budget of 12: tell the user.
+
+[2026-10-24T03:16:22.809Z] call #25 turn 5 hirearchy::services status=completed
+ARGS: {"tool_id": "hirearchy::services", "arguments": {}}
+REPLY (2026-10-24T03:16:22.809Z): Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v1, playbook v1): One short markdown memo of the decisions and action items from one weekly meeting's notes file.
+  inputs: notes_file* (The notes file for the meeting, inside the notes folder (for example 2026-10-19.md))   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Built only from the named notes file.
+    C2: At most 400 words as counted by read.
+    C3: A markdown memo with a Decisions section that lists every decision in the notes, including ones stated in prose without a label.
+    C4: An action items section that is a markdown table with exactly the columns Owner | Action | Due.
+    C5: The table lists every commitment in the notes, including informal ones in prose and ones not labelled ACTION, each with the person who made it as Owner.
+    C6: Every Due value is an ISO date (YYYY-MM-DD) or none. A vague or relative deadline becomes a date only when the notes make the date clear; otherwise Due is none.
+    C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+  record: 1 request(s): 1 done, 0 failed, 0 open; 1 reworked; avg 15 runs; no feedback
+  playbook v1 (2026-10-24): "initial playbook"
+
+[2026-10-24T03:16:28.911Z] call #26 turn 5 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"task_id": "20261024T031013210098-root-aae2", "verdict": "reject", "note": "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.", "source": "human", "criterion": ["C3"]}}
+REPLY (2026-10-24T03:16:28.911Z): feedback reject recorded on 20261024T031013210098-root-aae2 for lead (message 20261024T031628904053-root-99d4, source human, about C3 (not confirmed)); it does not wake lead
+The criterion on the rejection itself (C3) is recorded as not confirmed. This rejection is R1. Next: ask the user exactly ONE yes/no question, in these words: "About C3: add "<the rule, in their words>" as a lasting rule? Yes or no." Change nothing in this turn: an "always ..." in the rejection is not their yes. On yes: define_service(owner="lead", name="weekly-meeting-memo", add_acceptance=["<the rule>"], answers="20261024T031628904053-root-99d4", about="C3", words="<their answer, verbatim>"). On no, a one-off or "as it is": feedback(task_id="20261024T031013210098-root-aae2", verdict="reject", confirms="20261024T031628904053-root-99d4", criterion=["none"] or ["C3"], source="human", note="<their answer, verbatim>").
+
+[2026-10-24T03:16:59.615Z] call #27 turn 6 hirearchy::define_service status=failed
+ARGS: {"tool_id": "hirearchy::define_service", "arguments": {"owner": "lead", "name": "weekly-meeting-memo", "add_acceptance": ["The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the action items table, in that order."], "answers": "20261024T031628904053-root-99d4", "about": "C3", "words": "Yes, add it. Yes, fund it - but please keep an eye on the cost."}}
+REPLY (2026-10-24T03:16:59.615Z): MCP tool error: Error executing tool define_service: refused: 1 delivered request(s) of `weekly-meeting-memo` have no verdict yet: 20261024T031317713451-root-963a. Record the user's verdict on each with feedback first, a rejection then its one question (CLI: hirearchy feedback <task id> accept|reject --note ...); the contract changes only after the verdicts. Nothing was written.
+
+[2026-10-24T03:17:31.571Z] call #34 turn 6 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"task_id": "20261024T031317713451-root-963a", "verdict": "reject", "source": "relayed", "criterion": ["none"], "note": "Not requested by the assistant in this conversation and not seen by the user. It set Sam's and Marta's Due to none, which contradicts the user's explicit answers (Sam 2026-10-09, Marta 2026-10-14). Superseded by the user's verdict on the previous rework."}}
+REPLY (2026-10-24T03:17:31.571Z): feedback reject recorded on 20261024T031317713451-root-963a for lead (message 20261024T031731568552-root-61fd, source relayed, about none (not confirmed)); it does not wake lead
+
+[2026-10-24T03:17:33.597Z] call #35 turn 6 hirearchy::define_service status=completed
+ARGS: {"tool_id": "hirearchy::define_service", "arguments": {"owner": "lead", "name": "weekly-meeting-memo", "answers": "20261024T031628904053-root-99d4", "about": "C3", "words": "Yes, add it. Yes, fund it - but please keep an eye on the cost.", "add_acceptance": ["The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the action items table, in that order."]}}
+REPLY (2026-10-24T03:17:33.597Z): redefined service `weekly-meeting-memo` of lead: contract v1 -> v2 (lead/services/weekly-meeting-memo/SERVICE.md); the old one is kept at lead/services/weekly-meeting-memo/history/SERVICE.v1.md. lead was told (without waking it).
+Changed:
++ acceptance added: C8: The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the action items table, in that order.
+Acceptance criteria now (8):
+C1: Built only from the named notes file.
+C2: At most 400 words as counted by read.
+C3: A markdown memo with a Decisions section that lists every decision in the notes, including ones stated in prose without a label.
+C4: An action items section that is a markdown table with exactly the columns Owner | Action | Due.
+C5: The table lists every commitment in the notes, including informal ones in prose and ones not labelled ACTION, each with the person who made it as Owner.
+C6: Every Due value is an ISO date (YYYY-MM-DD) or none. A vague or relative deadline becomes a date only when the notes make the date clear; otherwise Due is none.
+C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+C8: The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the action items table, in that order.
+Recorded as the user's answer to R1 (rejection 20261024T031628904053-root-99d4; your question named C3): link 20261024T031733594650-root-8376 names C8. C8 is client-confirmed: a playbook revision citing it may add its words (rule (c)).
+
+[2026-10-24T03:18:43.936Z] call #36 turn 8 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"service": "weekly-meeting-memo", "inputs": {"notes_file": "2026-10-12.md"}, "title": "Memo for meeting 2026-10-12"}}
+REPLY (2026-10-24T03:18:43.936Z): requested service `weekly-meeting-memo` from lead: task 20261024T031843932122-root-f549, budget 12 (contract v2, playbook v1). Call start() if the scheduler is not running.
+
+[2026-10-24T03:22:46.945Z] call #44 turn 10 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"note": "That one is right, all the items are there - keep it.", "task_id": "20261024T031843932122-root-f549", "source": "human", "verdict": "accept"}}
+REPLY (2026-10-24T03:22:46.945Z): feedback accept recorded on 20261024T031843932122-root-f549 for lead (message 20261024T032246934196-root-4265, source human); it does not wake lead
+
+[2026-10-24T03:22:46.945Z] call #45 turn 10 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"title": "Memo for meeting 2026-10-19", "service": "weekly-meeting-memo", "inputs": {"notes_file": "2026-10-19.md"}}}
+REPLY (2026-10-24T03:22:46.945Z): requested service `weekly-meeting-memo` from lead: task 20261024T032246939392-root-312a, budget 12 (contract v2, playbook v2). Call start() if the scheduler is not running.
+
+[2026-10-24T03:25:36.871Z] call #50 turn 11 hirearchy::request status=completed
+ARGS: {"tool_id": "hirearchy::request", "arguments": {"note": "The user answered the client questions. Required changes: (1) Remove the action row 'Marta | Keep the demo agenda as sent' (nothing for Marta to do there). (2) Lee's SSO sign-off row: Due 2026-10-30. Keep everything else, including Sam's pairing row with Due none, and the Summary-first order. All contract criteria still apply.", "revises": "20261024T032246939392-root-312a", "source": "human", "title": "Memo for meeting 2026-10-19 (rework)", "service": "weekly-meeting-memo", "inputs": {"notes_file": "2026-10-19.md"}}}
+REPLY (2026-10-24T03:25:36.871Z): requested service `weekly-meeting-memo` from lead: task 20261024T032536636989-root-ee21, budget 12 (contract v2, playbook v2). Call start() if the scheduler is not running.
+case total: 5 runs used of 24 handed down (contract: 12 per request). This case now exceeds the per-request budget of 12: tell the user.
+
+[2026-10-24T03:28:40.974Z] call #59 turn 12 hirearchy::feedback status=completed
+ARGS: {"tool_id": "hirearchy::feedback", "arguments": {"note": "This version is right now, thanks - keep it.", "task_id": "20261024T032536636989-root-ee21", "source": "human", "verdict": "accept"}}
+REPLY (2026-10-24T03:28:40.974Z): feedback accept recorded on 20261024T032536636989-root-ee21 for lead (message 20261024T032840970281-root-359a, source human); it does not wake lead
+
+root notes in S/org/sent with a feedback: or criterion: header:
+--- 20261024T031628904053-root-99d4.md id=20261024T031628904053-root-99d4 created=2026-10-24T03:16:28+00:00
+headers: {"id": "20261024T031628904053-root-99d4", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Memo for meeting 2026-10-05 (rework)\": reject", "created": "2026-10-24T03:16:28+00:00", "hops": "0", "wake": "false", "reply_to": "20261024T031013210098-root-aae2", "feedback": "reject", "source": "human", "criterion": "C3", "trace": "20261024T030644000395-root-f07a"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.
+
+--- 20261024T031731568552-root-61fd.md id=20261024T031731568552-root-61fd created=2026-10-24T03:17:31+00:00
+headers: {"id": "20261024T031731568552-root-61fd", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Rework memo 2026-10-05: unclear due dates\": reject", "created": "2026-10-24T03:17:31+00:00", "hops": "0", "wake": "false", "reply_to": "20261024T031317713451-root-963a", "feedback": "reject", "source": "relayed", "criterion": "none", "trace": "20261024T030644000395-root-f07a"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+Not requested by the assistant in this conversation and not seen by the user. It set Sam's and Marta's Due to none, which contradicts the user's explicit answers (Sam 2026-10-09, Marta 2026-10-14). Superseded by the user's verdict on the previous rework.
+
+--- 20261024T031733594650-root-8376.md id=20261024T031733594650-root-8376 created=2026-10-24T03:17:33+00:00
+headers: {"id": "20261024T031733594650-root-8376", "from": "root", "to": "lead", "type": "note", "title": "criterion link on \"Memo for meeting 2026-10-05 (rework)\": C8", "created": "2026-10-24T03:17:33+00:00", "hops": "0", "wake": "false", "reply_to": "20261024T031628904053-root-99d4", "source": "human", "criterion": "C8", "trace": "20261024T030644000395-root-f07a"}
+body:
+The client says what their rejection 20261024T031628904053-root-99d4 was about, for reflection only: it does not change any task's acceptance criteria or outcome.
+
+Yes, add it. Yes, fund it - but please keep an eye on the cost.
+
+--- 20261024T032246934196-root-4265.md id=20261024T032246934196-root-4265 created=2026-10-24T03:22:46+00:00
+headers: {"id": "20261024T032246934196-root-4265", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Memo for meeting 2026-10-12\": accept", "created": "2026-10-24T03:22:46+00:00", "hops": "0", "wake": "false", "reply_to": "20261024T031843932122-root-f549", "feedback": "accept", "source": "human", "trace": "20261024T031843932122-root-f549"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+That one is right, all the items are there - keep it.
+
+--- 20261024T032840970281-root-359a.md id=20261024T032840970281-root-359a created=2026-10-24T03:28:40+00:00
+headers: {"id": "20261024T032840970281-root-359a", "from": "root", "to": "lead", "type": "note", "title": "feedback on \"Memo for meeting 2026-10-19 (rework)\": accept", "created": "2026-10-24T03:28:40+00:00", "hops": "0", "wake": "false", "reply_to": "20261024T032536636989-root-ee21", "feedback": "accept", "source": "human", "trace": "20261024T032246939392-root-312a"}
+body:
+Client feedback for reflection only: it does not change this task's acceptance criteria or outcome; report `done` only if every criterion is met.
+
+This version is right now, thanks - keep it.
+

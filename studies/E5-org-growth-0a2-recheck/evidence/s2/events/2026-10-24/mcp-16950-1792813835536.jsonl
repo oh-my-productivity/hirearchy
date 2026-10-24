@@ -1,0 +1,2 @@
+{"v":1,"ts":"2026-10-24T03:50:35.537198+00:00","seq":1,"proc":"mcp","pid":16950,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"observe","ok":true,"ms":3.09,"error":null,"error_type":null,"args":{"view":"events","target":"20261024T034559745842-root-f3df","since":"24h","errors_only":false,"limit":10}}
+{"v":1,"ts":"2026-10-24T03:50:35.607509+00:00","seq":2,"proc":"mcp","pid":16950,"kind":"tool.call","actor":"root","run":null,"trace":null,"tool":"progress","ok":true,"ms":68.38,"error":null,"error_type":null,"args":{"wait_seconds":0}}

@@ -1,0 +1,41 @@
+######## hirearchy --root /tmp/hirearchy-e5-s1-1792811051/org services
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v2, playbook v2): One short markdown memo of the decisions and action items from one weekly meeting's notes file.
+  inputs: notes_file* (The notes file for the meeting, inside the notes folder (for example 2026-10-19.md))   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Built only from the named notes file.
+    C2: At most 400 words as counted by read.
+    C3: A markdown memo with a Decisions section that lists every decision in the notes, including ones stated in prose without a label.
+    C4: An action items section that is a markdown table with exactly the columns Owner | Action | Due.
+    C5: The table lists every commitment in the notes, including informal ones in prose and ones not labelled ACTION, each with the person who made it as Owner.
+    C6: Every Due value is an ISO date (YYYY-MM-DD) or none. A vague or relative deadline becomes a date only when the notes make the date clear; otherwise Due is none.
+    C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C8: The memo starts with a one-line 'Summary:' of the meeting, followed by the Decisions section, then the action items table, in that order.
+  record: 3 request(s): 3 done, 0 failed, 0 open; 2 reworked; avg 10 runs; feedback 2 accept, 1 reject
+  regression list (the client's rejections):
+    R1 (case 20261024T030644000395-root-f07a, about C8): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+  playbook v2 (2026-10-24): "Client confirmed C8 (link note 20261024T031733594650-root-8376, after rejection R1 on case 20261024T030644000395-root-f…"
+
+######## hirearchy --root /tmp/hirearchy-e5-s1-1792811051/org progress
+"Memo for meeting 2026-10-05" [service weekly-meeting-memo v1]: done. runs 5 of 12 (7 returned). last activity 16s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/review-memo-2026-10-05.md. case total: 15 runs used of 30 handed down (contract: 12 per request). This case now exceeds the per-request budget of 12: tell the user. (task 20261024T030644000395-root-f07a)
+"Memo for meeting 2026-10-05 (rework)" [service weekly-meeting-memo v1]: done. runs 5 of 12 (7 returned). last activity 16s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/review-memo-2026-10-05-r2.md. case total: 15 runs used of 30 handed down (contract: 12 per request). This case now exceeds the per-request budget of 12: tell the user. (task 20261024T031013210098-root-aae2)
+"Rework memo 2026-10-05: unclear due dates" [service weekly-meeting-memo v1]: done. runs 5 of 6 (1 returned). last activity 16s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/review-memo-2026-10-05-r3.md. case total: 15 runs used of 30 handed down (contract: 12 per request). This case now exceeds the per-request budget of 12: tell the user. (task 20261024T031317713451-root-963a)
+"Memo for meeting 2026-10-12" [service weekly-meeting-memo v1]: done. runs 5 of 12 (7 returned). last activity 16s ago. artifacts: lead/writer/work/memo-2026-10-12.md, lead/reviewer/work/review-2026-10-12.md. (task 20261024T031843932122-root-f549)
+"Memo for meeting 2026-10-19" [service weekly-meeting-memo v2]: done. runs 5 of 12 (7 returned). last activity 16s ago. artifacts: lead/writer/work/memo-2026-10-19.md, lead/reviewer/work/review-2026-10-19.md. case total: 10 runs used of 24 handed down (contract: 12 per request). (task 20261024T032246939392-root-312a)
+"Memo for meeting 2026-10-19 (rework)" [service weekly-meeting-memo v2]: done. runs 5 of 12 (7 returned). last activity 16s ago. artifacts: lead/writer/work/memo-2026-10-19.md, lead/reviewer/work/review-2026-10-19.md. case total: 10 runs used of 24 handed down (contract: 12 per request). (task 20261024T032536636989-root-ee21)
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-e5-s1-1792811051/org status
+root (human): unread 1, delegated 0
+  lead [Manager] idle  budget=0 open=0 delegated=0 unread=0 services: weekly-meeting-memo
+    reviewer [Independent Reviewer] idle  budget=0 open=0 delegated=0 unread=0
+    writer [Writer] idle  budget=0 open=0 delegated=0 unread=0
+
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-e5-s1-1792811051/org health
+3 agents, 0 flagged
+lead idle, budget 0/78, runs 18, open 0, done 6 failed 0 blocked 0 rework 0 (+3 by the client), escapes 1 of 3 judged, re-checks after a FAIL 0 (author rework runs 0), runs/task 3.0, empty 0, last activity 51s ago | branch: runs 30, open 0, done 18, failed 0, blocked 0, rework 0, worst none
+  reviewer idle, budget 0/11, runs 6, open 0, done 6 failed 0 blocked 0 rework 0 (+3 by the client), escapes 1 of 3 judged, re-checks after a FAIL 0 (author rework runs 0), runs/task 1.0, empty 0, last activity 1m ago
+  writer idle, budget 0/13, runs 6, open 0, done 6 failed 0 blocked 0 rework 0 (+3 by the client), runs/task 1.0, empty 0, last activity 2m ago
+

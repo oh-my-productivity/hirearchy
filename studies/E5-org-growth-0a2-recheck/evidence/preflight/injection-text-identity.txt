@@ -1,0 +1,27 @@
+# 2026-10-24T03:01:06Z
+REPO: E4='/Volumes/workspace/hirearchy' E5='/Volumes/workspace/hirearchy' same=True
+E2_FILE: E4=PosixPath('/Volumes/workspace/hirearchy/studies/E2-service-reflection-regression/evidence/msgs/root-sent/20261018T035429740646-root-d90e.md') E5=PosixPath('/Volumes/workspace/hirearchy/studies/E2-service-reflection-regression/evidence/msgs/root-sent/20261018T035429740646-root-d90e.md') same=True
+TITLE_MD5: E4='849fe21b104be883af9b3c06367d4445' E5='849fe21b104be883af9b3c06367d4445' same=True
+NOTE_MD5: E4='4cdbcb9b682f2f25dcb31c83d3743fec' E5='4cdbcb9b682f2f25dcb31c83d3743fec' same=True
+NOTE_LEN: E4=866 E5=866 same=True
+BUDGET: E4=6 E5=6 same=True
+SOURCE: E4='relayed' E5='relayed' same=True
+NOTE_HEADING: E4='## Note from the requester' E5='## Note from the requester' same=True
+WAIT_STEP: E4=300 E5=300 same=True
+WINDOW_MAX: E4=1200 E5=1200 same=True
+injected_text() title identical (str ==): True bytes == True
+injected_text() note identical (str ==): True bytes == True
+title md5 849fe21b104be883af9b3c06367d4445 | note len 866 md5 4cdbcb9b682f2f25dcb31c83d3743fec
+source of md5 identical: True
+source of frontmatter_and_body identical: True
+source of note_of identical: True
+source of injected_text identical: True
+source of revised_task identical: True
+source of find_task_file identical: True
+source of server_params identical: True
+source of text_of identical: True
+source of call identical: True
+$ E4 --dry-run
+title md5 849fe21b104be883af9b3c06367d4445 ok; note len 866 md5 4cdbcb9b682f2f25dcb31c83d3743fec ok
+$ E5 --dry-run
+title md5 849fe21b104be883af9b3c06367d4445 ok; note len 866 md5 4cdbcb9b682f2f25dcb31c83d3743fec ok

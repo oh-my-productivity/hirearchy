@@ -1,0 +1,41 @@
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org services
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v2, playbook v2): One short markdown memo (decisions, and an action table of who does what by when) from one weekly meeting note file.
+  inputs: notes_file* (File name of the meeting notes inside the notes folder, for example 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Uses only the note file named in the request.
+    C2: At most 400 words as counted by read.
+    C3: The memo is markdown with a section titled Decisions and an action-items table with exactly the columns Owner | Action | Due.
+    C4: Every decision stated in the note file is in the Decisions section, and no decision is added that the notes do not state.
+    C5: Every commitment in the note file has one row in the action table, including informal ones written in prose and ones that are not labelled as actions. A commitment the notes state as uncertain (for example 'will probably') is marked 'tentative' in its Action cell.
+    C6: Every Due cell is an ISO date (YYYY-MM-DD). A vague deadline (for example 'before the freeze' or 'next week') is turned into a date only when the notes and the meeting date make that date clear; otherwise the cell is 'none'. No date is guessed.
+    C7: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C8: The memo starts with a one-line 'Summary:' of the meeting, then the Decisions section, then the action-items table, in that order.
+  record: 3 request(s): 3 done, 0 failed, 0 open; 2 reworked; avg 11.3 runs; feedback 1 accept, 1 reject
+  regression list (the client's rejections):
+    R1 (case 20261024T033732488726-root-ebe2, about C8): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+  playbook v2 (2026-10-24): "Client confirmed C8 (link note 20261024T035002043490-root-6162 on rejection R1, case ...-root-ebe2): add its words."
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org progress
+"Memo for the 2026-10-05 team meeting" [service weekly-meeting-memo v1]: done. runs 9 of 12 (3 returned). last activity 17s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/review-2026-10-05.md. case total: 19 runs used of 23 handed down (contract: 12 per request). This case now exceeds the per-request budget of 12: tell the user. (task 20261024T033732488726-root-ebe2)
+"Rework memo for 2026-10-05: user's date answers" [service weekly-meeting-memo v1]: done. runs 5 of 5. last activity 17s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/review-2026-10-05-r3.md. case total: 19 runs used of 23 handed down (contract: 12 per request). This case now exceeds the per-request budget of 12: tell the user. (task 20261024T034308207974-root-6c4f)
+"Rework memo 2026-10-05: unclear due dates" [service weekly-meeting-memo v1]: done. runs 5 of 6 (1 returned). last activity 17s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/review-2026-10-05-r4.md. case total: 19 runs used of 23 handed down (contract: 12 per request). This case now exceeds the per-request budget of 12: tell the user. (task 20261024T034559745842-root-f3df)
+"Memo for the 2026-10-12 team meeting" [service weekly-meeting-memo v1]: done. runs 5 of 12 (5 returned). last activity 17s ago. artifacts: lead/writer/work/memo-2026-10-12.md, lead/reviewer/work/review-2026-10-12.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261024T035108035115-root-bfa8)
+"Rework memo for 2026-10-12: drop 'probably' from Sam's row" [service weekly-meeting-memo v2]: done. runs 5 of 5 (2 returned). last activity 17s ago. artifacts: lead/writer/work/memo-2026-10-12.md, lead/reviewer/work/review-2026-10-12-r2.md. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261024T035511749327-root-367d)
+"Memo for the 2026-10-19 team meeting" [service weekly-meeting-memo v2]: done. runs 5 of 12 (7 returned). last activity 17s ago. artifacts withheld (ask first). 3 questions for the client: ask the user before you copy or deliver. no feedback yet. (task 20261024T035805054975-root-e9ee)
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org status
+root (human): unread 0, delegated 0
+  lead [Manager] idle  budget=0 open=0 delegated=0 unread=0 services: weekly-meeting-memo
+    reviewer [Independent Reviewer] idle  budget=0 open=0 delegated=0 unread=0
+    writer [Writer] idle  budget=0 open=0 delegated=0 unread=0
+
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org health
+3 agents, 0 flagged
+lead idle, budget 0/61, runs 20, open 0, done 6 failed 0 blocked 0 rework 0 (+3 by the client), escapes 1 of 2 judged, re-checks after a FAIL 0 (author rework runs 0), runs/task 3.3, empty 0, last activity 18s ago | branch: runs 34, open 0, done 19, failed 0, blocked 1, rework 2, worst none
+  reviewer idle, budget 0/10, runs 7, open 0, done 7 failed 0 blocked 0 rework 1 (+3 by the client), escapes 1 of 2 judged, re-checks after a FAIL 1 (author rework runs 1), runs/task 1.0, empty 0, last activity 48s ago
+  writer idle, budget 0/13, runs 7, open 0, done 6 failed 0 blocked 1 rework 1 (+3 by the client), runs/task 1.0, empty 0, last activity 1m ago
+

@@ -1,0 +1,13 @@
+Yes. Because this repeats every week, I'll set it up as a standing service. You'd ask for it after each meeting by naming that week's notes file. I need a few answers before I draft the plan. Reply "defaults" to accept the proposed ones.
+
+I read your 19 October notes. Only 3 items are labelled "ACTION". Other commitments are in plain prose, such as Sam offering to pair with Jo, and Lee saying he'd sign off on the renewal once legal replies. That affects the questions below.
+
+1. **What changes each week:** the notes file, which you'd name per request. The format, checks and place stay fixed. Is that right?
+2. **What counts as an action item.** Proposed default: every commitment counts, including informal ones in prose. Examples are "Sam offered to pair with Jo" and "Lee will sign off once legal replies". Each is listed with its owner. The alternative is to list only items labelled ACTION.
+3. **Dates.** Proposed default: turn relative dates ("end of next week", "before Friday") into a calendar date using the meeting date. If the notes give no date, the memo says "no date given" and the team doesn't guess.
+4. **Decisions.** Proposed default: list each decision with a one-line reason, such as "renew the SSO vendor for 12 months". Does a "we agreed to…" in prose count even without a label? I'd say yes.
+5. **Memo format.** Proposed default: markdown, at most 300 words, with two sections ("Decisions" and "Action items: who, what, when"). It would go in a new `deliverables/` folder here, at `/tmp/hirearchy-e5-s1-1792811051/deliverables/memo-<meeting date>.md`.
+6. **Sources:** only your notes (read-only), with no web. I'd point the team at `/tmp/hirearchy-e5-s1-1792811051/notes`. Is that right?
+7. **Checks:** every decision and every action item in the notes appears in the memo with the right owner. A second agent reviews the memo against the notes, which is the default.
+8. **Budget:** I'll propose a per-request budget in runs when I draft the plan. Every agent runs claude-sonnet-5.5 at high effort, as no cheaper model is available.
+9. **Weekly trigger.** I can't schedule it to run on its own. You'd ask me after each meeting ("do this week's memo"). Is that OK?

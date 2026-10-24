@@ -1,0 +1,40 @@
+# run-session map (amendment 1 A3.2)
+state dir: /Users/aminalizadeh/Library/Application Support/hirearchy
+first run log # cwd: /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e5-s3-17928147-3afa64a909202d97/lead-8cb33b27
+kiro home: /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-e5-s3-17928147-3afa64a909202d97
+every run log shows the same <state>/kiro-cwd/<org-id>/: True ({'/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e5-s3-17928147-3afa64a909202d97': 33})
+org kiro sessions copied: 33 (to org-kiro-sessions/<hash>/<session id>/)
+run lead@20261024T040854487684               20261024T040854487684 model=claude-sonnet-5.5 exit=0 secs=32 -> session sess_8d43f402-ac74-4978-b9da-74352790cd36 credits 0.777298
+run lead/writer@20261024T040918658868        20261024T040918658868 model=claude-sonnet-5.5 exit=0 secs=36 -> session sess_a1f5ce4a-d7aa-4706-98e7-eb7a6f10569b credits 0.909202
+run lead@20261024T040948893225               20261024T040948893225 model=claude-sonnet-5.5 exit=0 secs=28 -> session sess_0bc629e8-77a0-47af-ba23-287b23cc33ac credits 0.755857
+run lead/reviewer@20261024T041011108349      20261024T041011108349 model=claude-sonnet-5.5 exit=0 secs=57 -> session sess_0001c5c6-b61d-41b5-b76f-cf87f3d4828f credits 1.412823
+run lead@20261024T041101692857               20261024T041101692857 model=claude-sonnet-5.5 exit=0 secs=36 -> session sess_040da9cc-1f64-4819-82fb-de56e115ffff credits 1.103651
+run lead/writer@20261024T041130044717        20261024T041130044717 model=claude-sonnet-5.5 exit=0 secs=26 -> session sess_cf394233-698f-4c65-a76b-31947b83e6fb credits 0.666350
+run lead@20261024T041152253594               20261024T041152253594 model=claude-sonnet-5.5 exit=0 secs=26 -> session sess_a681a0c8-c521-464d-9fef-83518bfdfeaf credits 0.726412
+run lead/reviewer@20261024T041212452986      20261024T041212452986 model=claude-sonnet-5.5 exit=0 secs=34 -> session sess_f2989ffd-028f-4738-b460-d4782d9299b8 credits 0.923930
+run lead@20261024T041240729499               20261024T041240729499 model=claude-sonnet-5.5 exit=0 secs=30 -> session sess_e97502a9-6468-4d82-8d07-e0cc9c74bcf2 credits 0.838278
+run lead@20261024T041416270945               20261024T041416270945 model=claude-sonnet-5.5 exit=0 secs=59 -> session sess_2540102c-e179-487f-afd7-ba09e565d42a credits 2.013091
+run lead/writer@20261024T041458746130        20261024T041458746130 model=claude-sonnet-5.5 exit=None secs=None -> session NOT MATCHED (5 candidates) credits not recorded
+run lead@20261024T041552924069               20261024T041552924069 model=claude-sonnet-5.5 exit=0 secs=67 -> session sess_6e88ea35-0922-4e5f-a5d0-dc5db6ed1984 credits 1.791736
+run lead@20261024T041659629002               20261024T041659629002 model=claude-sonnet-5.5 exit=0 secs=32 -> session sess_e8007de4-8b48-4666-a8e8-2f0b465cf801 credits 0.850425
+run lead@20261024T041932419527               20261024T041932419527 model=claude-sonnet-5.5 exit=0 secs=48 -> session sess_bfefa7b3-5060-4cf6-9b39-122eb8aae2c5 credits 1.046420
+run lead/writer@20261024T042014770433        20261024T042014770433 model=claude-sonnet-5.5 exit=0 secs=32 -> session sess_c3fda15c-6308-4030-85ff-ff87a1b8c099 credits 0.805145
+run lead@20261024T042041025041               20261024T042041025041 model=claude-sonnet-5.5 exit=0 secs=32 -> session sess_d1991b02-3808-4ea0-9155-4247d31b62ea credits 0.827317
+run lead/reviewer@20261024T042105252799      20261024T042105252799 model=claude-sonnet-5.5 exit=0 secs=42 -> session sess_a1776fd8-5157-4fbc-a735-017a25e63a7e credits 1.068603
+run lead@20261024T042141567153               20261024T042141567153 model=claude-sonnet-5.5 exit=0 secs=36 -> session sess_9eb95b2c-0e8b-4540-9764-63a595e4d38d credits 0.974371
+run lead@20261024T042730633215               20261024T042730633215 model=claude-sonnet-5.5 exit=0 secs=42 -> session sess_8c3b3dfe-9f93-406f-aa3c-568e1b9142c0 credits 1.328296
+run lead/writer@20261024T042806925661        20261024T042806925661 model=claude-sonnet-5.5 exit=0 secs=36 -> session sess_5fd8b2a7-2a9a-477a-81c3-bb5eaedd09e0 credits 0.979550
+run lead@20261024T042837237622               20261024T042837237622 model=claude-sonnet-5.5 exit=0 secs=28 -> session sess_ede4b636-67b3-4599-ae3f-61a6e384574e credits 0.903317
+run lead/reviewer@20261024T042857462305      20261024T042857462305 model=claude-sonnet-5.5 exit=0 secs=55 -> session sess_052e2279-aa37-44e7-a004-81d43465a77c credits 1.354563
+run lead@20261024T042943938512               20261024T042943938512 model=claude-sonnet-5.5 exit=0 secs=36 -> session sess_f16d0c96-5592-4168-a773-076c556ec2cb credits 1.022404
+run lead@20261024T043107173996               20261024T043107173996 model=claude-sonnet-5.5 exit=0 secs=36 -> session sess_2c49170b-e969-45f5-9fef-57e9c545ef8c credits 1.196157
+run lead/writer@20261024T043139561113        20261024T043139561113 model=claude-sonnet-5.5 exit=0 secs=26 -> session sess_7fe1d6f4-6896-4830-8c76-6cd8c9d911df credits 0.692483
+run lead@20261024T043159829894               20261024T043159829894 model=claude-sonnet-5.5 exit=0 secs=40 -> session sess_a54848f9-7b1e-4be7-b266-2b6a9d9d0124 credits 1.334548
+run lead/reviewer@20261024T043232179263      20261024T043232179263 model=claude-sonnet-5.5 exit=0 secs=48 -> session sess_eadeb7ee-6a3a-44cc-ab1c-0443ce73f357 credits 1.235958
+run lead@20261024T043314519608               20261024T043314519608 model=claude-sonnet-5.5 exit=0 secs=30 -> session sess_ff14e5e0-4af7-49bc-9b4c-249d020fe7d2 credits 0.904135
+run lead@20261024T043420907830               20261024T043420907830 model=claude-sonnet-5.5 exit=0 secs=30 -> session sess_f08d4c3c-575a-45b9-942a-66d970faf67f credits 0.839858
+run lead/writer@20261024T043443149646        20261024T043443149646 model=claude-sonnet-5.5 exit=0 secs=32 -> session sess_e74c2881-53de-4831-8712-084f75275c9d credits 0.837952
+run lead@20261024T043509451750               20261024T043509451750 model=claude-sonnet-5.5 exit=0 secs=32 -> session sess_0e98e353-fede-4e43-a928-5c40b7c4e7d7 credits 0.867472
+run lead/reviewer@20261024T043533781962      20261024T043533781962 model=claude-sonnet-5.5 exit=0 secs=54 -> session sess_35e515b8-8665-4b3b-a5eb-7066dde2dd24 credits 1.387368
+run lead@20261024T043622210051               20261024T043622210051 model=claude-sonnet-5.5 exit=0 secs=34 -> session sess_25978430-9dcc-4870-ac28-0e15bf006f25 credits 0.951142
+unmatched runs: [('20261024T041458746130', 5)]; sessions without a run: ['sess_8ca28c8c-506d-41d2-9870-6f73b1ca1ca9']

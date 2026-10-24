@@ -1,0 +1,83 @@
+# E5 s1 setup (recorded before turn 1)
+date: Sat Oct 24 04:04:22 WEST 2026; utc: 2026-10-24T03:04:22Z
+S: /tmp/hirearchy-e5-s1-1792811051  epoch: 1792811051  (sandbox created at epoch 1792811051)
+== repo checks (4.1)
+git rev-parse HEAD: 6618c0d80401233675366684fc86dc566657e8db
+git status --porcelain:
+?? docs/research/
+?? studies/E5-org-growth-0a2-recheck/
+git diff --stat 6618c0d HEAD -- src skills pyproject.toml uv.lock: []
+== kiro-cli --version: kiro-cli 2.33.0
+== model list: see model-checks.txt (zsh harness/model_check.sh listed 1: RESULT OK; claude-sonnet-5.5 listed, no substitution)
+== assistant profile (first stream: reference for later diffs)
+MD5 (/Users/aminalizadeh/.kiro/agents/hirearchy-study-e5-s1-assistant.json) = 835ce37ccffae88600de81c892a74aa3
+(diff against first stream's profile: this is the first stream, no reference)
+== workspace settings
+MD5 (/tmp/hirearchy-e5-s1-1792811051/.kiro/settings/cli.json) = 05d30ccbfd35530747c8a542eb67985c
+{"chat.disableInheritingDefaultResources": true, "chat.enableWorkflows": false}MD5 (harness/workspace-cli.json) = 05d30ccbfd35530747c8a542eb67985c
+== skill copies
+MD5 (/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md) = b7187d6ef749505893e9aef99276ef7c
+MD5 (/tmp/hirearchy-e5-s1-1792811051/.kiro/skills/hirearchy/SKILL.md) = b7187d6ef749505893e9aef99276ef7c
+MD5 (/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md) = b7187d6ef749505893e9aef99276ef7c
+     125 /Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md
+     125 /tmp/hirearchy-e5-s1-1792811051/.kiro/skills/hirearchy/SKILL.md
+     125 /Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md
+     375 total
+== notes
+MD5 (/tmp/hirearchy-e5-s1-1792811051/notes/2026-10-05.md) = 903e3bbf5f35df2c17444f3313c12395
+MD5 (/tmp/hirearchy-e5-s1-1792811051/notes/2026-10-12.md) = 3893bd637c87760b43be4894b47fdb53
+MD5 (/tmp/hirearchy-e5-s1-1792811051/notes/2026-10-19.md) = 9976a7653a6346b0976c3c38b1c697dd
+== protocol.md vs protocol.md5
+MD5 (protocol.md) = afd437c103407ec5899e4993b465cf25
+afd437c103407ec5899e4993b465cf25
+zsh:20: no matches found: protocol-amendment-*
+== amendments: none
+== harness/MD5SUMS check (prints MISMATCH lines only)
+(done, 16 lines)
+global SKILL.md md5: b7187d6ef749505893e9aef99276ef7c (required b7187d6ef749505893e9aef99276ef7c)
+injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd
+== HIREARCHY_STATE_DIR set? no
+== org dir exists before turn 1? no
+== ps: processes referencing the sandbox
+(none)
+== other E5 streams running (s2/s3/s1r)
+(none)
+== hirearchy mcp servers running (user's own sessions, informational)
+ 4207 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+ 4212 /Volumes/workspace/hirearchy/.venv/bin/python3 /Volumes/workspace/hirearchy/.venv/bin/hirearchy mcp
+13857 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+13861 /Volumes/workspace/hirearchy/.venv/bin/python3 /Volumes/workspace/hirearchy/.venv/bin/hirearchy mcp
+17460 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+17461 /Volumes/workspace/hirearchy/.venv/bin/python3 /Volumes/workspace/hirearchy/.venv/bin/hirearchy mcp
+21747 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+21748 /Volumes/workspace/hirearchy/.venv/bin/python3 /Volumes/workspace/hirearchy/.venv/bin/hirearchy mcp
+37885 uv --directory /Users/aminalizadeh/workspace/hirearchy run hirearchy mcp
+37886 /Volumes/workspace/hirearchy/.venv/bin/python3 /Volumes/workspace/hirearchy/.venv/bin/hirearchy mcp
+== ~/.kiro/agents
+agent_config.json.example
+claude-opus-5.5.json
+claude-sonnet-5.5.json
+evolve.json
+hirearchy-organization-9d66c1-web-fetch-web-search.json
+hirearchy-study-e5-s1-assistant.json
+telegram_bot.json
+
+== AFTER the last turn (4.1)
+date: Sat Oct 24 04:30:30 WEST 2026; utc: 2026-10-24T03:30:30Z
+git rev-parse HEAD: 6618c0d80401233675366684fc86dc566657e8db
+git status --porcelain:
+?? docs/research/
+?? studies/E5-org-growth-0a2-recheck/
+git diff --stat 6618c0d HEAD -- src skills pyproject.toml uv.lock: []
+kiro-cli --version: kiro-cli 2.33.0
+protocol.md md5: afd437c103407ec5899e4993b465cf25  (protocol.md5: afd437c103407ec5899e4993b465cf25)
+amendments: none present
+harness/MD5SUMS check:
+(done, no MISMATCH lines above = all 16 files match)
+global SKILL.md md5: b7187d6ef749505893e9aef99276ef7c
+injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd
+workspace settings md5: 05d30ccbfd35530747c8a542eb67985c; skill copy md5: b7187d6ef749505893e9aef99276ef7c
+notes: 903e3bbf5f35df2c17444f3313c12395 3893bd637c87760b43be4894b47fdb53 9976a7653a6346b0976c3c38b1c697dd 
+ps (sandbox): 0 process(es)
+profile ~/.kiro/agents/hirearchy-study-e5-s1-assistant.json exists: no
+answer-key copied into sandbox? 0 files named answer-key in S

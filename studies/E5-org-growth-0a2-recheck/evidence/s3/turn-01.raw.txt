@@ -1,0 +1,28 @@
+The notes are readable and consistent, so I can build this. Nothing exists yet and I won't build until you approve a plan. I need a few answers first. Reply "defaults" to accept everything I've proposed.
+
+I'd set this up as a standing weekly service. Each week you ask for a memo and say which notes file to use. Everything else stays fixed.
+
+1. **Informal commitments.** Your notes contain two kinds of commitments:
+   - Labelled ones: "ACTION: Priya to … by Oct 9".
+   - Ones in prose: "Sam said he'd look into the flaky CI before Friday", "Sam offered to pair with Jo", "Lee will swap shifts with Dev".
+
+   Should the memo include the prose ones? **Default: yes, every commitment, labelled or not.**
+2. **Vague or missing dates.** Examples are "before Friday", "probably by end of next week", and "this week, no hard date".
+   - **Default A:** turn a relative date into a calendar date, using the meeting date as the reference, and show the original wording next to it. For example, "Fri 9 Oct (said 'before Friday')".
+   - **Default B:** where no date was given, write "no date set" and don't invent one.
+3. **Decisions.** Should the memo list decisions that change nothing to do, such as "Marta keeps the agenda as sent"? **Default: yes, list all of them, including logistics like the meeting time change.**
+4. **Memo format.** **Default:** markdown, at most 400 words, with two sections: "Decisions" and "Who does what". The second is a table with owner, task, due date. No other sections.
+5. **Where it goes.** **Default:** a new `deliverables/` folder here, at `/tmp/hirearchy-e5-s3-1792814736/deliverables/memo-<meeting date>.md`.
+6. **Sources.** Only your notes folder, `/tmp/hirearchy-e5-s3-1792814736/notes`, read-only, with no web access. The team can't change your notes.
+7. **Checks.** I'd write these as criteria:
+   - Every decision in the notes is listed.
+   - Every commitment appears with its owner, including the prose ones.
+   - No item is invented.
+   - Every date is traceable to the notes.
+   - The memo is within the word limit.
+
+   **Default:** a second agent reviews the memo against the notes, separate from the one who writes it.
+8. **Budget and models.** Every agent uses claude-sonnet-5.5 at high effort, which is the only option. **Default:** the budget is the plan's estimate plus 25%, which I'll show in the plan. If a memo needs rework past that budget, I'll ask you first.
+9. **Approval.** **Default:** you approve the plan before anything is built. Once it's approved, you ask for a memo each week and I run it. A memo is only ready when you've seen it, and I can't start one on my own when the meeting ends.
+
+Also, should the first request be for the latest meeting (19 October), so you get a sample memo right away? **Default: yes.**

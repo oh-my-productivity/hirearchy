@@ -1,0 +1,567 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-24T04:19:32Z .. 2026-10-24T04:22:20Z; injected task 20261024T041932216940-root-daff; revised (memo 1) task 20261024T041412342994-root-c209
+
+## run lead@20261024T041932419527 agent=lead model=['claude-sonnet-5.5'] effort=['high'] start=2026-10-24T04:19:32.431356+00:00 end=2026-10-24T04:20:20.828975+00:00 exit_code=0
+revise_playbook calls in this run (events): 0; run-log RL1 lines: 0; RL3 lines: 2
+  lead message 20261024T042013251839-lead-711a to=lead/writer type=task status=None source=relayed created=2026-10-24T04:20:13+00:00
+  org-git commit for this run (MEMORY.md lines of its diff):
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    -- root-e268 (memo 2026-10-05) reported DONE earlier. root-c209 (rework, 5 client corrections): memo lead/writer/work/memo-2026-10-05.md (140 words, mod 04:15:17) has all 5 corrections (re-read this run, matches). Writer task ...-bed1 still open, writer paused budget 0 (its run was killed before reporting); ignore the runtime 'writer out of budget' note, no writer work is needed.
+    -- root-c209 reported BLOCKED on C8: reviewer re-check not run, I cannot afford it (lead budget 1, delegate needs reserve 2 while bed1 is outstanding). Already asked root for 1+ more runs (need budget 3: 1 to reviewer, keep 2). Do not ask again.
+    -- If a grant arrives: delegate reviewer (revises 20261024T041211848635-lead-d22a, budget 1) with all 8 criteria + the 5 corrections; need 'criteria met: n of m'; then re-report root-c209 done with that line verbatim. No more rework.
+    -- Lesson for playbook (needs rejection evidence): keep vague deadline text (e.g. 'before Friday') in Action when Due=none. Also: a writer run can be killed before reporting, leaving a task open and reserve blocked.
+    +- Memo lead/writer/work/memo-2026-10-05.md. Two root tasks open/blocked: c209 (blocked, C8 re-check) and daff (rework of Due values, current, supersedes c209 Sam/Marta values; budget 6).
+    +- daff: I judged that root's 'Open questions' section violates C3 (no other section), so told writer: Sam Due=none (keep 'before Friday' in Action), Marta Due=none (explain 14 Oct = training date, no booking deadline in Action cell). Delegated writer task 20261024T042013251839-lead-711a (revises bed1, budget 1). Must tell root about this deviation in the report.
+    +- NEXT (when writer result arrives): read file, check; delegate reviewer (revises 20261024T041211848635-lead-d22a, budget 1) with all 8 criteria + 'recheck EVERY Due value against notes text' + corrections list (no Next-meeting decision; first decision rationale kept; Lee action row only; Sam/Marta Due none). Need 'criteria met: n of m'. Then report daff done (paste line verbatim) and also re-report c209 (done, same line) or reference. Lead budget 5 now; reviewer needs 1.
+    +- Lessons for playbook: keep vague deadline text in Action when Due=none; a writer run can be killed before reporting; requester asks for Open questions section conflict with C3 -> put in Action cell.
+    --- /dev/null
+    +++ b/lead/read/20261024T041932216940-root-daff.md
+    +---
+    +id: 20261024T041932216940-root-daff
+    +from: root
+    +to: lead
+    +type: task
+    +title: 'Rework memo 2026-10-05: unclear due dates'
+    +created: '2026-10-24T04:19:32+00:00'
+    +hops: 0
+    +budget: 6
+    +revises: 20261024T041412342994-root-c209
+    +service: weekly-meeting-memo
+    +contract: 1
+    +playbook: 1
+    +source: relayed
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Goal
+    +Deliver the service `weekly-meeting-memo`: One short memo with the decisions and the action items of one weekly meeting, from its notes file.
+    +
+    +## Request
+    +- notes_file: 2026-10-05.md
+    +
+    +## Acceptance criteria
+    +- C1: The memo is based only on the named notes file and covers only that meeting.
+    +- C2: At most 400 words as counted by read.
+    +- C3: The memo is markdown with a Decisions section (a list) and an Action items section (a table with exactly the columns Owner | Action | Due), and no other section.
+    +- C4: Every decision made in the meeting is listed, including logistics decisions and decisions to keep things as they are.
+    +- C5: Every commitment in the notes is a row in the table with its owner, including informal ones where someone said they would do something, not only items labelled ACTION.
+    +- C6: Due is an ISO date (YYYY-MM-DD). A relative or vague deadline (for example 'before Friday') becomes a date only when the notes make the date clear, using the meeting date as the reference; otherwise Due is 'none'. No date is invented.
+    +- C7: Nothing in the memo is missing from or contradicts the notes file.
+    +- C8: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    +
+    +## Deliverable
+    +One markdown memo for one meeting. (format: markdown; at most 400 words; path: /tmp/hirearchy-e5-s3-1792814736/deliverables)
+    +
+    +## Note from the requester
+    +Rework needed on two Due values that the notes do not state as dates. (1) Sam, flaky CI: the notes say "before Friday"; the memo has 2026-10-09, which is Friday itself, not "before" it. Either use the last day before Friday if you resolve it (2026-10-08, a Thursday) and say how it was derived in Open questions, or use none and put "before Friday" in Open questions; do not leave an ambiguous resolved date silently in the table. (2) Marta, on-call training room: the notes say "book the room for Oct 14", and Oct 14 is the date of the training, not a stated deadline for booking; the memo wrongly shows 2026-10-14 as her Due. Use none and list in Open questions that 14 Oct is the training date and no booking deadline is given. Keep everything else that already passes. Have the reviewer re-check every Due value against the notes text, not only the changed rows.
+    --- /dev/null
+    +++ b/lead/sent/20261024T042013251839-lead-711a.md
+    +---
+    +id: 20261024T042013251839-lead-711a
+    +from: lead
+    +to: lead/writer
+    +type: task
+    +title: Fix Sam and Marta Due values in 2026-10-05 memo
+    +created: '2026-10-24T04:20:13+00:00'
+    +hops: 1
+    +budget: 1
+    +revises: 20261024T041457446825-lead-bed1
+    +source: relayed
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Goal
+    +Edit your memo lead/writer/work/memo-2026-10-05.md (same file, same path). Change ONLY the two Due cells below and keep everything else exactly as it is (the other corrections already applied stay: no 'Next meeting' decision, first-decision rationale sentence unchanged, Lee only as an action row; Dev, Priya, Lee rows unchanged). Notes file: /private/tmp/hirearchy-e5-s3-1792814736/notes/2026-10-05.md (read-only).
+    +
+    +Required changes (these replace the earlier Sam=2026-10-09 and Marta=2026-10-14 values):
+    +1. Sam row: Due = none. Keep 'before Friday' in the Action column (the notes say 'before Friday' and do not make the date clear; Friday itself 2026-10-09 is not 'before' Friday and 2026-10-08 would be our inference).
+    +2. Marta row: Due = none. 14 Oct is the training date, not a stated booking deadline. Say so inside the Action cell, e.g. 'Book the on-call training room (the training is on Oct 14; the notes give no booking deadline)'.
+    +Do NOT add an 'Open questions' section or any other section: criterion C3 allows only Decisions and Action items. Put the explanations in the Action cell only.
+    +When done, report with the final file path.
+    +
+    +## Acceptance criteria
+    +- C1: The memo is based only on the named notes file and covers only that meeting.
+    +- C2: At most 400 words as counted by read.
+    +- C3: The memo is markdown with a Decisions section (a list) and an Action items section (a table with exactly the columns Owner | Action | Due), and no other section.
+    +- C4: Every decision made in the meeting is listed, including logistics decisions and decisions to keep things as they are.
+    +- C5: Every commitment in the notes is a row in the table with its owner, including informal ones where someone said they would do something, not only items labelled ACTION.
+    +- C6: Due is an ISO date (YYYY-MM-DD). A relative or vague deadline (for example 'before Friday') becomes a date only when the notes make the date clear, using the meeting date as the reference; otherwise Due is 'none'. No date is invented.
+    +- C7: Nothing in the memo is missing from or contradicts the notes file.
+    +Plus: Sam's and Marta's Due = none as above; no other cell changed.
+    +
+    +## Inputs
+    +- lead/writer/work/memo-2026-10-05.md
+    +- /private/tmp/hirearchy-e5-s3-1792814736/notes/2026-10-05.md
+    --- a/lead/writer/.paused
+    +++ /dev/null
+    -budget
+    --- /dev/null
+    +++ b/lead/writer/inflight/20261024T042013251839-lead-711a.md
+    +---
+    +id: 20261024T042013251839-lead-711a
+    +from: lead
+    +to: lead/writer
+    +type: task
+    +title: Fix Sam and Marta Due values in 2026-10-05 memo
+    +created: '2026-10-24T04:20:13+00:00'
+    +hops: 1
+    +budget: 1
+    +revises: 20261024T041457446825-lead-bed1
+    +source: relayed
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Goal
+    +Edit your memo lead/writer/work/memo-2026-10-05.md (same file, same path). Change ONLY the two Due cells below and keep everything else exactly as it is (the other corrections already applied stay: no 'Next meeting' decision, first-decision rationale sentence unchanged, Lee only as an action row; Dev, Priya, Lee rows unchanged). Notes file: /private/tmp/hirearchy-e5-s3-1792814736/notes/2026-10-05.md (read-only).
+    +
+    +Required changes (these replace the earlier Sam=2026-10-09 and Marta=2026-10-14 values):
+    +1. Sam row: Due = none. Keep 'before Friday' in the Action column (the notes say 'before Friday' and do not make the date clear; Friday itself 2026-10-09 is not 'before' Friday and 2026-10-08 would be our inference).
+    +2. Marta row: Due = none. 14 Oct is the training date, not a stated booking deadline. Say so inside the Action cell, e.g. 'Book the on-call training room (the training is on Oct 14; the notes give no booking deadline)'.
+    +Do NOT add an 'Open questions' section or any other section: criterion C3 allows only Decisions and Action items. Put the explanations in the Action cell only.
+    +When done, report with the final file path.
+    +
+    +## Acceptance criteria
+    +- C1: The memo is based only on the named notes file and covers only that meeting.
+    +- C2: At most 400 words as counted by read.
+    +- C3: The memo is markdown with a Decisions section (a list) and an Action items section (a table with exactly the columns Owner | Action | Due), and no other section.
+    +- C4: Every decision made in the meeting is listed, including logistics decisions and decisions to keep things as they are.
+    +- C5: Every commitment in the notes is a row in the table with its owner, including informal ones where someone said they would do something, not only items labelled ACTION.
+    +- C6: Due is an ISO date (YYYY-MM-DD). A relative or vague deadline (for example 'before Friday') becomes a date only when the notes make the date clear, using the meeting date as the reference; otherwise Due is 'none'. No date is invented.
+    +- C7: Nothing in the memo is missing from or contradicts the notes file.
+    +Plus: Sam's and Marta's Due = none as above; no other cell changed.
+    +
+    +## Inputs
+    +- lead/writer/work/memo-2026-10-05.md
+    +- /private/tmp/hirearchy-e5-s3-1792814736/notes/2026-10-05.md
+    --- /dev/null
+    +++ b/sent/20261024T041932216940-root-daff.md
+    +---
+    +id: 20261024T041932216940-root-daff
+    +from: root
+    +to: lead
+    +type: task
+    +title: 'Rework memo 2026-10-05: unclear due dates'
+    +created: '2026-10-24T04:19:32+00:00'
+    +hops: 0
+    +budget: 6
+    +revises: 20261024T041412342994-root-c209
+    +service: weekly-meeting-memo
+    +contract: 1
+    +playbook: 1
+    +source: relayed
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Goal
+    +Deliver the service `weekly-meeting-memo`: One short memo with the decisions and the action items of one weekly meeting, from its notes file.
+    +
+    +## Request
+    +- notes_file: 2026-10-05.md
+    +
+    +## Acceptance criteria
+    +- C1: The memo is based only on the named notes file and covers only that meeting.
+    +- C2: At most 400 words as counted by read.
+    +- C3: The memo is markdown with a Decisions section (a list) and an Action items section (a table with exactly the columns Owner | Action | Due), and no other section.
+    +- C4: Every decision made in the meeting is listed, including logistics decisions and decisions to keep things as they are.
+    +- C5: Every commitment in the notes is a row in the table with its owner, including informal ones where someone said they would do something, not only items labelled ACTION.
+    +- C6: Due is an ISO date (YYYY-MM-DD). A relative or vague deadline (for example 'before Friday') becomes a date only when the notes make the date clear, using the meeting date as the reference; otherwise Due is 'none'. No date is invented.
+    +- C7: Nothing in the memo is missing from or contradicts the notes file.
+    +- C8: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    +
+    +## Deliverable
+    +One markdown memo for one meeting. (format: markdown; at most 400 words; path: /tmp/hirearchy-e5-s3-1792814736/deliverables)
+    +
+    +## Note from the requester
+    +Rework needed on two Due values that the notes do not state as dates. (1) Sam, flaky CI: the notes say "before Friday"; the memo has 2026-10-09, which is Friday itself, not "before" it. Either use the last day before Friday if you resolve it (2026-10-08, a Thursday) and say how it was derived in Open questions, or use none and put "before Friday" in Open questions; do not leave an ambiguous resolved date silently in the table. (2) Marta, on-call training room: the notes say "book the room for Oct 14", and Oct 14 is the date of the training, not a stated deadline for booking; the memo wrongly shows 2026-10-14 as her Due. Use none and list in Open questions that 14 Oct is the training date and no booking deadline is given. Keep everything else that already passes. Have the reviewer re-check every Due value against the notes text, not only the changed rows.
+
+## run lead/writer@20261024T042014770433 agent=lead/writer model=['claude-sonnet-5.5'] effort=['high'] start=2026-10-24T04:20:14.780152+00:00 end=2026-10-24T04:20:47.103433+00:00 exit_code=0
+revise_playbook calls in this run (events): 0; run-log RL1 lines: 0; RL3 lines: 5
+  lead/writer message 20261024T042039219291-lead.writer-983e to=lead type=result status=done source=None created=2026-10-24T04:20:39+00:00
+  ## Lessons: (none)
+  lead/writer message 20261024T042040404132-lead.writer-70d4 to=lead type=result status=blocked source=None created=2026-10-24T04:20:40+00:00
+  ## Lessons: (none)
+  org-git commit for this run (MEMORY.md lines of its diff):
+    --- /dev/null
+    +++ b/lead/inflight/20261024T042039219291-lead.writer-983e.md
+    +---
+    +id: 20261024T042039219291-lead.writer-983e
+    +from: lead/writer
+    +to: lead
+    +type: result
+    +title: Fix Sam and Marta Due values in 2026-10-05 memo
+    +created: '2026-10-24T04:20:39+00:00'
+    +hops: 2
+    +reply_to: 20261024T042013251839-lead-711a
+    +status: done
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Summary
+    +Changed only Sam's and Marta's Due cells to none. Marta's Action cell now reads 'Book the on-call training room (the training is on Oct 14; the notes give no booking deadline)'. Sam's Action still says 'before Friday'. No section added; other rows, decisions unchanged. 149 words per read (limit 400).
+    +
+    +## Artifacts
+    +- lead/writer/work/memo-2026-10-05.md (149 words, modified 04:20:36 UTC)
+    --- /dev/null
+    +++ b/lead/inflight/20261024T042040404132-lead.writer-70d4.md
+    +---
+    +id: 20261024T042040404132-lead.writer-70d4
+    +from: lead/writer
+    +to: lead
+    +type: result
+    +title: Apply client corrections to 2026-10-05 memo
+    +created: '2026-10-24T04:20:40+00:00'
+    +hops: 2
+    +reply_to: 20261024T041457446825-lead-bed1
+    +status: blocked
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Summary
+    +Corrections (3)-(5) are applied. Corrections (1) and (2) (Sam Due=2026-10-09, Marta Due=2026-10-14) were replaced by task 711a, which sets both to none. The file now follows 711a, so it does not match bed1's required Sam/Marta rows. C8 (reviewer report) is outside my control. Final file is 149 words per read. Treat 711a as the governing task.
+    +
+    +## Artifacts
+    +- lead/writer/work/memo-2026-10-05.md (149 words, modified 04:20:36 UTC)
+    diff --git a/lead/writer/MEMORY.md b/lead/writer/MEMORY.md
+    --- a/lead/writer/MEMORY.md
+    +++ b/lead/writer/MEMORY.md
+    -Memo 2026-10-05 at lead/writer/work/memo-2026-10-05.md (140 words). Client corrections (task ...-bed1) applied: Sam due 2026-10-09, Marta due 2026-10-14, 'Next meeting' decision removed. Lee due=none (lead's call). Nothing pending.
+    +Memo 2026-10-05 at lead/writer/work/memo-2026-10-05.md (149 words). Final state per task 711a: Sam, Marta, Lee Due=none; Priya 2026-10-09, Dev 2026-10-08; no 'Next meeting' decision; Lee only an action row. Task bed1 reported blocked (superseded by 711a on Sam/Marta Due); 711a reported done. Nothing pending.
+    --- /dev/null
+    +++ b/lead/writer/sent/20261024T042039219291-lead.writer-983e.md
+    +---
+    +id: 20261024T042039219291-lead.writer-983e
+    +from: lead/writer
+    +to: lead
+    +type: result
+    +title: Fix Sam and Marta Due values in 2026-10-05 memo
+    +created: '2026-10-24T04:20:39+00:00'
+    +hops: 2
+    +reply_to: 20261024T042013251839-lead-711a
+    +status: done
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Summary
+    +Changed only Sam's and Marta's Due cells to none. Marta's Action cell now reads 'Book the on-call training room (the training is on Oct 14; the notes give no booking deadline)'. Sam's Action still says 'before Friday'. No section added; other rows, decisions unchanged. 149 words per read (limit 400).
+    +
+    +## Artifacts
+    +- lead/writer/work/memo-2026-10-05.md (149 words, modified 04:20:36 UTC)
+    --- /dev/null
+    +++ b/lead/writer/sent/20261024T042040404132-lead.writer-70d4.md
+    +---
+    +id: 20261024T042040404132-lead.writer-70d4
+    +from: lead/writer
+    +to: lead
+    +type: result
+    +title: Apply client corrections to 2026-10-05 memo
+    +created: '2026-10-24T04:20:40+00:00'
+    +hops: 2
+    +reply_to: 20261024T041457446825-lead-bed1
+    +status: blocked
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Summary
+    +Corrections (3)-(5) are applied. Corrections (1) and (2) (Sam Due=2026-10-09, Marta Due=2026-10-14) were replaced by task 711a, which sets both to none. The file now follows 711a, so it does not match bed1's required Sam/Marta rows. C8 (reviewer report) is outside my control. Final file is 149 words per read. Treat 711a as the governing task.
+    +
+    +## Artifacts
+    +- lead/writer/work/memo-2026-10-05.md (149 words, modified 04:20:36 UTC)
+    --- a/lead/writer/work/memo-2026-10-05.md
+    +++ b/lead/writer/work/memo-2026-10-05.md
+    -| Sam | Look into the flaky CI before Friday (he suspects the shared build cache) | 2026-10-09 |
+    -| Marta | Book the on-call training room (for Oct 14) | 2026-10-14 |
+    +| Sam | Look into the flaky CI before Friday (he suspects the shared build cache) | none |
+    +| Marta | Book the on-call training room (the training is on Oct 14; the notes give no booking deadline) | none |
+
+## run lead@20261024T042041025041 agent=lead model=['claude-sonnet-5.5'] effort=['high'] start=2026-10-24T04:20:41.048949+00:00 end=2026-10-24T04:21:13.312200+00:00 exit_code=0
+revise_playbook calls in this run (events): 0; run-log RL1 lines: 0; RL3 lines: 2
+  lead message 20261024T042105172929-lead-1bcf to=lead/reviewer type=task status=None source=relayed created=2026-10-24T04:21:05+00:00
+  org-git commit for this run (MEMORY.md lines of its diff):
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    -- Memo lead/writer/work/memo-2026-10-05.md. Two root tasks open/blocked: c209 (blocked, C8 re-check) and daff (rework of Due values, current, supersedes c209 Sam/Marta values; budget 6).
+    -- daff: I judged that root's 'Open questions' section violates C3 (no other section), so told writer: Sam Due=none (keep 'before Friday' in Action), Marta Due=none (explain 14 Oct = training date, no booking deadline in Action cell). Delegated writer task 20261024T042013251839-lead-711a (revises bed1, budget 1). Must tell root about this deviation in the report.
+    -- NEXT (when writer result arrives): read file, check; delegate reviewer (revises 20261024T041211848635-lead-d22a, budget 1) with all 8 criteria + 'recheck EVERY Due value against notes text' + corrections list (no Next-meeting decision; first decision rationale kept; Lee action row only; Sam/Marta Due none). Need 'criteria met: n of m'. Then report daff done (paste line verbatim) and also re-report c209 (done, same line) or reference. Lead budget 5 now; reviewer needs 1.
+    -- Lessons for playbook: keep vague deadline text in Action when Due=none; a writer run can be killed before reporting; requester asks for Open questions section conflict with C3 -> put in Action cell.
+    +- Memo lead/writer/work/memo-2026-10-05.md (149 words, read by me 04:20:36; Sam/Marta Due none, no Next-meeting decision, Lee action row only). Verified by me against notes.
+    +- Root tasks open: daff (current, rework of Due values) and c209 (blocked; superseded by daff values).
+    +- Delegated reviewer re-check (revises 20261024T041211848635-lead-d22a, budget 1), waiting. Lead budget 3.
+    +- NEXT when reviewer result arrives: read its report; if 'criteria met: 7 of 7' report daff done (paste line verbatim, path of its ledger, tell root: Open questions section not added because C3 forbids; explanations in Action cell; Sam/Marta Due none) and re-report c209 done/blocked consistently (c209 asked Sam 2026-10-09, Marta 2026-10-14, which daff superseded: report c209 blocked/explain superseded). Include any reviewer 'ambiguous' items under 'Questions for the client:'. If fails: one rework (writer has 0 budget -> needs budget from me, I have 3) then report blocked.
+    +- Lessons for playbook: keep vague deadline text in Action when Due=none; writer run can be killed before reporting; requester asks for Open questions section conflict with C3 -> put in Action cell.
+    --- /dev/null
+    +++ b/lead/reviewer/inflight/20261024T042105172929-lead-1bcf.md
+    +---
+    +id: 20261024T042105172929-lead-1bcf
+    +from: lead
+    +to: lead/reviewer
+    +type: task
+    +title: Re-check memo 2026-10-05 (Due values reworked)
+    +created: '2026-10-24T04:21:05+00:00'
+    +hops: 3
+    +budget: 1
+    +revises: 20261024T041211848635-lead-d22a
+    +source: relayed
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Goal
+    +Independently re-check the FINAL file lead/writer/work/memo-2026-10-05.md against the notes /private/tmp/hirearchy-e5-s3-1792814736/notes/2026-10-05.md (read-only) and every criterion below. Recheck EVERY Due value against the notes text, not only the changed rows. Client corrections that must hold: no 'Next meeting' decision; the rationale sentence in the first decision is kept; Lee's ping only as an action row, not a decision; Sam Due = none with 'before Friday' kept in the Action cell; Marta Due = none with the Oct 14 training-date explanation in the Action cell (an 'Open questions' section was requested by the client but C3 forbids any other section, so the explanation sits in the Action cell). Do not edit the file. Report findings and REQUIRED CHANGES in your report summary (detail in your work/ file), and give the line 'criteria met: n of m' (m = 7, C1-C7) with the word count as shown by read. List as 'ambiguous' anything you cannot judge against a criterion.
+    +
+    +## Acceptance criteria
+    +- C1: The memo is based only on the named notes file and covers only that meeting.
+    +- C2: At most 400 words as counted by read.
+    +- C3: The memo is markdown with a Decisions section (a list) and an Action items section (a table with exactly the columns Owner | Action | Due), and no other section.
+    +- C4: Every decision made in the meeting is listed, including logistics decisions and decisions to keep things as they are.
+    +- C5: Every commitment in the notes is a row in the table with its owner, including informal ones where someone said they would do something, not only items labelled ACTION.
+    +- C6: Due is an ISO date (YYYY-MM-DD). A relative or vague deadline (for example 'before Friday') becomes a date only when the notes make the date clear, using the meeting date as the reference; otherwise Due is 'none'. No date is invented.
+    +- C7: Nothing in the memo is missing from or contradicts the notes file.
+    +- Report line 'criteria met: n of m' and the check of every Due value against the notes text.
+    +
+    +## Inputs
+    +- lead/writer/work/memo-2026-10-05.md
+    +- /private/tmp/hirearchy-e5-s3-1792814736/notes/2026-10-05.md
+    --- /dev/null
+    +++ b/lead/sent/20261024T042105172929-lead-1bcf.md
+    +---
+    +id: 20261024T042105172929-lead-1bcf
+    +from: lead
+    +to: lead/reviewer
+    +type: task
+    +title: Re-check memo 2026-10-05 (Due values reworked)
+    +created: '2026-10-24T04:21:05+00:00'
+    +hops: 3
+    +budget: 1
+    +revises: 20261024T041211848635-lead-d22a
+    +source: relayed
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Goal
+    +Independently re-check the FINAL file lead/writer/work/memo-2026-10-05.md against the notes /private/tmp/hirearchy-e5-s3-1792814736/notes/2026-10-05.md (read-only) and every criterion below. Recheck EVERY Due value against the notes text, not only the changed rows. Client corrections that must hold: no 'Next meeting' decision; the rationale sentence in the first decision is kept; Lee's ping only as an action row, not a decision; Sam Due = none with 'before Friday' kept in the Action cell; Marta Due = none with the Oct 14 training-date explanation in the Action cell (an 'Open questions' section was requested by the client but C3 forbids any other section, so the explanation sits in the Action cell). Do not edit the file. Report findings and REQUIRED CHANGES in your report summary (detail in your work/ file), and give the line 'criteria met: n of m' (m = 7, C1-C7) with the word count as shown by read. List as 'ambiguous' anything you cannot judge against a criterion.
+    +
+    +## Acceptance criteria
+    +- C1: The memo is based only on the named notes file and covers only that meeting.
+    +- C2: At most 400 words as counted by read.
+    +- C3: The memo is markdown with a Decisions section (a list) and an Action items section (a table with exactly the columns Owner | Action | Due), and no other section.
+    +- C4: Every decision made in the meeting is listed, including logistics decisions and decisions to keep things as they are.
+    +- C5: Every commitment in the notes is a row in the table with its owner, including informal ones where someone said they would do something, not only items labelled ACTION.
+    +- C6: Due is an ISO date (YYYY-MM-DD). A relative or vague deadline (for example 'before Friday') becomes a date only when the notes make the date clear, using the meeting date as the reference; otherwise Due is 'none'. No date is invented.
+    +- C7: Nothing in the memo is missing from or contradicts the notes file.
+    +- Report line 'criteria met: n of m' and the check of every Due value against the notes text.
+    +
+    +## Inputs
+    +- lead/writer/work/memo-2026-10-05.md
+    +- /private/tmp/hirearchy-e5-s3-1792814736/notes/2026-10-05.md
+
+## run lead/reviewer@20261024T042105252799 agent=lead/reviewer model=['claude-sonnet-5.5'] effort=['high'] start=2026-10-24T04:21:05.260195+00:00 end=2026-10-24T04:21:47.635972+00:00 exit_code=0
+revise_playbook calls in this run (events): 0; run-log RL1 lines: 0; RL3 lines: 4
+  lead/reviewer message 20261024T042139929190-lead.reviewer-c62b to=lead type=result status=done source=None created=2026-10-24T04:21:39+00:00
+  ## Lessons: (none)
+  org-git commit for this run (MEMORY.md lines of its diff):
+    --- /dev/null
+    +++ b/lead/inflight/20261024T042139929190-lead.reviewer-c62b.md
+    +---
+    +id: 20261024T042139929190-lead.reviewer-c62b
+    +from: lead/reviewer
+    +to: lead
+    +type: result
+    +title: Re-check memo 2026-10-05 (Due values reworked)
+    +created: '2026-10-24T04:21:39+00:00'
+    +hops: 4
+    +reply_to: 20261024T042105172929-lead-1bcf
+    +status: done
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Summary
+    +Opened memo (149 words per read) and notes in full. criteria met: 7 of 7 (C1-C7). Verdict: pass.
+    +Due check vs notes: Priya 'by Oct 9' -> 2026-10-09 ok; Dev 'by Oct 8' -> 2026-10-08 ok; Sam 'before Friday' -> none ok (10-08 or 10-09 unclear), phrase kept in Action cell; Marta 'for Oct 14' is the training date, not a deadline -> none ok, explanation in Action cell; Lee 'this week, no hard date' -> none ok. No date invented.
+    +Client corrections hold: no Next-meeting decision; first decision keeps rationale; Lee only as action row.
+    +REQUIRED CHANGES: none. Ambiguous/optional: (M1) 'the training is on Oct 14' is an inference from 'book the room for Oct 14'; optional wording 'room needed for Oct 14'. (M2) 'Meeting date' line under title read as header, not a section. Not a fact-check beyond the notes.
+    +
+    +## Artifacts
+    +- lead/reviewer/work/re-check-2026-10-05-due.md (570 words, modified 04:21:36 UTC)
+    diff --git a/lead/reviewer/MEMORY.md b/lead/reviewer/MEMORY.md
+    --- a/lead/reviewer/MEMORY.md
+    +++ b/lead/reviewer/MEMORY.md
+    -Memo 2026-10-05: first review (task ...52fa) 6 of 8; re-review (task ...d22a) 8 of 8, reported done. Files: lead/reviewer/work/review-2026-10-05.md, re-re-review-2026-10-05.md (named re-review-2026-10-05.md). Open ambiguities left to lead: A1 (next meeting as decision), A2 (Lee agreement as decision), A4 (Sam date, settled none by C8), A5 (Marta due). Nothing pending. Budget 0; ask lead for runs if another re-review is needed.
+    +Memo 2026-10-05: reviews done: first 6 of 8, re-review 8 of 8, third re-check (task ...1bcf, Due values reworked) 7 of 7 pass, reported done. Files in lead/reviewer/work/: review-2026-10-05.md, re-review-2026-10-05.md, re-check-2026-10-05-due.md. Open ambiguities left to lead: M1 ('training is on Oct 14' is inference), M2 (Meeting date line), Next meeting not a decision. Nothing pending. Budget 0; ask lead for runs if another re-review is needed.
+    --- /dev/null
+    +++ b/lead/reviewer/sent/20261024T042139929190-lead.reviewer-c62b.md
+    +---
+    +id: 20261024T042139929190-lead.reviewer-c62b
+    +from: lead/reviewer
+    +to: lead
+    +type: result
+    +title: Re-check memo 2026-10-05 (Due values reworked)
+    +created: '2026-10-24T04:21:39+00:00'
+    +hops: 4
+    +reply_to: 20261024T042105172929-lead-1bcf
+    +status: done
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Summary
+    +Opened memo (149 words per read) and notes in full. criteria met: 7 of 7 (C1-C7). Verdict: pass.
+    +Due check vs notes: Priya 'by Oct 9' -> 2026-10-09 ok; Dev 'by Oct 8' -> 2026-10-08 ok; Sam 'before Friday' -> none ok (10-08 or 10-09 unclear), phrase kept in Action cell; Marta 'for Oct 14' is the training date, not a deadline -> none ok, explanation in Action cell; Lee 'this week, no hard date' -> none ok. No date invented.
+    +Client corrections hold: no Next-meeting decision; first decision keeps rationale; Lee only as action row.
+    +REQUIRED CHANGES: none. Ambiguous/optional: (M1) 'the training is on Oct 14' is an inference from 'book the room for Oct 14'; optional wording 'room needed for Oct 14'. (M2) 'Meeting date' line under title read as header, not a section. Not a fact-check beyond the notes.
+    +
+    +## Artifacts
+    +- lead/reviewer/work/re-check-2026-10-05-due.md (570 words, modified 04:21:36 UTC)
+    --- /dev/null
+    +++ b/lead/reviewer/work/re-check-2026-10-05-due.md
+    +# Re-check memo 2026-10-05 (Due values reworked), task ...1bcf
+    +
+    +Opened: lead/writer/work/memo-2026-10-05.md (149 words per org_read, modified 04:20:36 UTC); /private/tmp/hirearchy-e5-s3-1792814736/notes/2026-10-05.md (opened in full). Nothing unopened.
+    +
+    +## My own list from the notes
+    +Decisions: D1 push gateway migration from week of 12 Oct to week of 26 Oct (reason: 2 of 5 services fail contract tests, header casing; extra time for them). D2 adopt Renovate, weekly Monday batch, three core repos first, widen later if noise acceptable.
+    +Commitments: A1 Priya RFC per-key rate limiter, "by Oct 9". A2 Dev enable Renovate on three core repos "by Oct 8". A3 Sam "he'd look into the flaky CI before Friday" (informal). A4 Marta book on-call training room "for Oct 14". A5 Lee ping vendor re SSO cert "this week and report back, no hard date attached" (informal, "We agreed").
+    +Ambiguous: "Next meeting Monday 12 October" (not listed as a decision; client says no). Lee's "we agreed" (kept as action row only, as client requires).
+    +
+    +## Due check (against notes text)
+    +- Priya: "by Oct 9" -> 2026-10-09. Year from meeting date 2026. Correct.
+    +- Dev: "by Oct 8" -> 2026-10-08. Correct.
+    +- Sam: "before Friday" -> none. Friday is 2026-10-09 by the meeting date, but "before Friday" could mean 10-08 or 10-09, so the date is not clear. none is correct; "before Friday" kept in Action cell.
+    +- Marta: "for Oct 14" is the training date, not a booking deadline -> none. Correct. Explanation in Action cell.
+    +- Lee: "this week", "no hard date attached" -> none. Correct.
+    +No invented date.
+    +
+    +## Criteria
+    +- C1 met. Only content from the 2026-10-05 notes; no other meeting. "Next meeting 12 October" is not used.
+    +- C2 met. 149 words per read (limit 400).
+    +- C3 met. Markdown; "## Decisions" is a bullet list; "## Action items" is a table with header "| Owner | Action | Due |". No other section (the "Meeting date: 2026-10-05" line under the title is a header line, not a section; flagged as minor ambiguity below).
+    +- C4 met. D1 and D2 both listed; no Next-meeting decision; rationale sentence kept in D1 ("Two of the five services still fail the contract tests, and the extra time goes to fixing them."). Lee's ping is not a decision.
+    +- C5 met. Five rows (Priya, Dev, Sam, Marta, Lee) match A1-A5 incl. the informal Sam and Lee items.
+    +- C6 met. ISO dates 2026-10-09, 2026-10-08; three "none"; checked above.
+    +- C7 met. Nothing contradicts the notes. Marta cell says "the training is on Oct 14"; notes say "book the on-call training room for Oct 14", so this is a reasonable reading (see ambiguous). Parenthetical "the notes give no booking deadline" is a statement about the notes and is true.
+    +
+    +## Ambiguous (not decided)
+    +- M1: "the training is on Oct 14" is an inference from "book the ... room for Oct 14"; the notes do not say outright that the training is on that day. Optional rewording: "(room needed for Oct 14; the notes give no booking deadline)".
+    +- M2: the "Meeting date: 2026-10-05" line is outside both sections; C3 says no other section. I read it as a title line, not a section.
+    +- M3: the parenthetical about the notes in the Marta cell is commentary rather than an action; the client asked for it.
+    +- M4: "Next meeting" is a logistics item the client excluded; C4 says logistics decisions count. The notes state it as a fact, not a decision, so I did not count it.
+    +
+    +## REQUIRED CHANGES
+    +None. Optional: M1 rewording.
+    +
+    +Not a fact-check beyond comparison with the notes.
+
+## run lead@20261024T042141567153 agent=lead model=['claude-sonnet-5.5'] effort=['high'] start=2026-10-24T04:21:41.587700+00:00 end=2026-10-24T04:22:17.954568+00:00 exit_code=0
+revise_playbook calls in this run (events): 0; run-log RL1 lines: 0; RL3 lines: 3
+  lead message 20261024T042204607622-lead-1a15 to=root type=result status=done source=None created=2026-10-24T04:22:04+00:00
+  ## Lessons: Keep vague deadline wording in the Action cell when Due=none. A requested 'Open questions' section conflicts with C3; put explanations in the Action cell. Rework cycles cost the writer a run each; the first writer run was killed before reporting. Add to playbook: tell the writer to resolve Due strictly by C6 (only dates the notes state).
+  lead message 20261024T042209687998-lead-d32d to=root type=result status=blocked source=None created=2026-10-24T04:22:09+00:00
+  ## Lessons: Two successive reworks gave conflicting Due values. When a client asks for a Due the notes do not state, C6 wins; flag it to the client rather than writing the date.
+  org-git commit for this run (MEMORY.md lines of its diff):
+    --- /dev/null
+    +++ b/inbox/20261024T042204607622-lead-1a15.md
+    +---
+    +id: 20261024T042204607622-lead-1a15
+    +from: lead
+    +to: root
+    +type: result
+    +title: 'Rework memo 2026-10-05: unclear due dates'
+    +created: '2026-10-24T04:22:04+00:00'
+    +hops: 5
+    +reply_to: 20261024T041932216940-root-daff
+    +status: done
+    +budget: 2
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Summary
+    +Questions for the client:
+    +- M1 (C7): reviewer: "'the training is on Oct 14' is an inference from 'book the room for Oct 14'"; optional wording "room needed for Oct 14". Kept as is.
+    +- M2 (C3): reviewer: the "Meeting date: 2026-10-05" line sits outside both sections; read as a title line, not a section.
+    +- M4 (C4): reviewer: "Next meeting Monday 12 October" is stated as a fact, not a decision, so it is not listed (as you asked).
+    +
+    +Due values, each checked by me against the notes: Priya "by Oct 9" = 2026-10-09; Dev "by Oct 8" = 2026-10-08; Sam "before Friday" = none (phrase kept in Action cell); Marta "for Oct 14" = none (Action cell says the notes give no booking deadline); Lee "no hard date attached" = none. No Open questions section: C3 allows only Decisions and Action items, so the explanations sit in the Action cells.
+    +Other corrections hold: no Next-meeting decision, first decision keeps its rationale, Lee only as an action row. 149 words (limit 400).
+    +Reviewer's final line: criteria met: 7 of 7 (ledger: lead/reviewer/work/re-check-2026-10-05-due.md).
+    +
+    +## Lessons
+    +Keep vague deadline wording in the Action cell when Due=none. A requested 'Open questions' section conflicts with C3; put explanations in the Action cell. Rework cycles cost the writer a run each; the first writer run was killed before reporting. Add to playbook: tell the writer to resolve Due strictly by C6 (only dates the notes state).
+    +
+    +## Artifacts
+    +- lead/writer/work/memo-2026-10-05.md (149 words, modified 04:20:36 UTC)
+    +- lead/reviewer/work/re-check-2026-10-05-due.md (570 words, modified 04:21:36 UTC)
+    --- /dev/null
+    +++ b/inbox/20261024T042209687998-lead-d32d.md
+    +---
+    +id: 20261024T042209687998-lead-d32d
+    +from: lead
+    +to: root
+    +type: result
+    +title: Rework memo for 5 October 2026 weekly
+    +created: '2026-10-24T04:22:09+00:00'
+    +hops: 5
+    +reply_to: 20261024T041412342994-root-c209
+    +status: blocked
+    +supersedes: 20261024T041653491321-lead-d8cc
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Summary
+    +Superseded by task daff (reported done). c209 asked for Sam Due = 2026-10-09 and Marta Due = 2026-10-14. The notes say "before Friday" for Sam and "book ... for Oct 14" (the training date, no booking deadline) for Marta, so C6 requires none for both. daff replaced those two values, and the final memo follows daff: lead/writer/work/memo-2026-10-05.md (reviewer: criteria met: 7 of 7). The other c209 corrections hold: no Next-meeting decision, first-decision rationale kept, Lee only as an action row. Decision for you: treat daff as the answer to c209.
+    +
+    +## Lessons
+    +Two successive reworks gave conflicting Due values. When a client asks for a Due the notes do not state, C6 wins; flag it to the client rather than writing the date.
+    +
+    +## Artifacts
+    +- lead/writer/work/memo-2026-10-05.md (149 words, modified 04:20:36 UTC)
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    -- Memo lead/writer/work/memo-2026-10-05.md (149 words, read by me 04:20:36; Sam/Marta Due none, no Next-meeting decision, Lee action row only). Verified by me against notes.
+    -- Root tasks open: daff (current, rework of Due values) and c209 (blocked; superseded by daff values).
+    -- Delegated reviewer re-check (revises 20261024T041211848635-lead-d22a, budget 1), waiting. Lead budget 3.
+    -- NEXT when reviewer result arrives: read its report; if 'criteria met: 7 of 7' report daff done (paste line verbatim, path of its ledger, tell root: Open questions section not added because C3 forbids; explanations in Action cell; Sam/Marta Due none) and re-report c209 done/blocked consistently (c209 asked Sam 2026-10-09, Marta 2026-10-14, which daff superseded: report c209 blocked/explain superseded). Include any reviewer 'ambiguous' items under 'Questions for the client:'. If fails: one rework (writer has 0 budget -> needs budget from me, I have 3) then report blocked.
+    -- Lessons for playbook: keep vague deadline text in Action when Due=none; writer run can be killed before reporting; requester asks for Open questions section conflict with C3 -> put in Action cell.
+    +- Memo lead/writer/work/memo-2026-10-05.md (149 words) final; reviewer 'criteria met: 7 of 7' (lead/reviewer/work/re-check-2026-10-05-due.md).
+    +- Reported daff done and c209 blocked (superseded by daff). Nothing open. Lead budget returned to root.
+    +- Lessons: keep vague deadline text in Action when Due=none; requested 'Open questions' section conflicts with C3 -> explain in Action cell; C6 beats client-requested dates the notes do not state.
+    +- If new rework arrives: writer has 0 budget, needs budget from me.
+    --- /dev/null
+    +++ b/lead/sent/20261024T042204607622-lead-1a15.md
+    +---
+    +id: 20261024T042204607622-lead-1a15
+    +from: lead
+    +to: root
+    +type: result
+    +title: 'Rework memo 2026-10-05: unclear due dates'
+    +created: '2026-10-24T04:22:04+00:00'
+    +hops: 5
+    +reply_to: 20261024T041932216940-root-daff
+    +status: done
+    +budget: 2
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Summary
+    +Questions for the client:
+    +- M1 (C7): reviewer: "'the training is on Oct 14' is an inference from 'book the room for Oct 14'"; optional wording "room needed for Oct 14". Kept as is.
+    +- M2 (C3): reviewer: the "Meeting date: 2026-10-05" line sits outside both sections; read as a title line, not a section.
+    +- M4 (C4): reviewer: "Next meeting Monday 12 October" is stated as a fact, not a decision, so it is not listed (as you asked).
+    +
+    +Due values, each checked by me against the notes: Priya "by Oct 9" = 2026-10-09; Dev "by Oct 8" = 2026-10-08; Sam "before Friday" = none (phrase kept in Action cell); Marta "for Oct 14" = none (Action cell says the notes give no booking deadline); Lee "no hard date attached" = none. No Open questions section: C3 allows only Decisions and Action items, so the explanations sit in the Action cells.
+    +Other corrections hold: no Next-meeting decision, first decision keeps its rationale, Lee only as an action row. 149 words (limit 400).
+    +Reviewer's final line: criteria met: 7 of 7 (ledger: lead/reviewer/work/re-check-2026-10-05-due.md).
+    +
+    +## Lessons
+    +Keep vague deadline wording in the Action cell when Due=none. A requested 'Open questions' section conflicts with C3; put explanations in the Action cell. Rework cycles cost the writer a run each; the first writer run was killed before reporting. Add to playbook: tell the writer to resolve Due strictly by C6 (only dates the notes state).
+    +
+    +## Artifacts
+    +- lead/writer/work/memo-2026-10-05.md (149 words, modified 04:20:36 UTC)
+    +- lead/reviewer/work/re-check-2026-10-05-due.md (570 words, modified 04:21:36 UTC)
+    --- /dev/null
+    +++ b/lead/sent/20261024T042209687998-lead-d32d.md
+    +---
+    +id: 20261024T042209687998-lead-d32d
+    +from: lead
+    +to: root
+    +type: result
+    +title: Rework memo for 5 October 2026 weekly
+    +created: '2026-10-24T04:22:09+00:00'
+    +hops: 5
+    +reply_to: 20261024T041412342994-root-c209
+    +status: blocked
+    +supersedes: 20261024T041653491321-lead-d8cc
+    +trace: 20261024T040852855822-root-e268
+    +---
+    +## Summary
+    +Superseded by task daff (reported done). c209 asked for Sam Due = 2026-10-09 and Marta Due = 2026-10-14. The notes say "before Friday" for Sam and "book ... for Oct 14" (the training date, no booking deadline) for Marta, so C6 requires none for both. daff replaced those two values, and the final memo follows daff: lead/writer/work/memo-2026-10-05.md (reviewer: criteria met: 7 of 7). The other c209 corrections hold: no Next-meeting decision, first-decision rationale kept, Lee only as an action row. Decision for you: treat daff as the answer to c209.
+    +
+    +## Lessons
+    +Two successive reworks gave conflicting Due values. When a client asks for a Due the notes do not state, C6 wins; flag it to the client rather than writing the date.
+    +
+    +## Artifacts
+    +- lead/writer/work/memo-2026-10-05.md (149 words, modified 04:20:36 UTC)

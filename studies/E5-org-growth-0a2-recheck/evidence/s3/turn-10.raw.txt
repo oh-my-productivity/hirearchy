@@ -1,0 +1,7 @@
+I've asked for the 12 October memo, with a budget of 12 runs. It's running, and I'll wait.The 12 October memo is written and the reviewer passed it on its first check. I haven't copied it to `deliverables/` yet, because three judgment calls are yours to make. The draft is 161 words, and it starts with the one-line Summary, then 3 decisions, then 5 action items. It used 5 of the 12 runs, with no rework.
+
+1. **Lee's pager swap.** Lee will carry the pager during demo week and swap shifts with Dev, and nobody objected. The draft lists it only as an action row for Lee, with Due `none`. It could also count as a logistics decision. I'd leave it as an action row. Is that right, or should it also be a decision?
+2. **Sam's CI update.** Sam said the CI fix needs more than a quick patch because it touches the runner image. He didn't say he'd do anything about it. I'd leave it out, since nobody committed to anything. Is that right?
+3. **Sam's staging test data.** The notes say he "will probably sort it out himself" before the freeze. The draft keeps it as a row with the hedge in the Action column and Due 2026-10-21, the day before the freeze starts. That date is clear from the notes. Keep it, or drop the row because it's hedged?
+
+Reply "as is" to keep the draft unchanged. A change would be another rework with a cost, and I'd ask you before spending.

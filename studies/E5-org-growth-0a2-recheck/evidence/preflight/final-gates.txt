@@ -1,0 +1,10 @@
+2026-10-24T03:01:42Z final gates
+protocol OK
+harness: no MISMATCH lines above = OK
+b7187d6ef749505893e9aef99276ef7c
+6618c0d
+       0
+?? docs/research/
+?? studies/E5-org-growth-0a2-recheck/
+hirearchy-e5-probe-1792810812
+0

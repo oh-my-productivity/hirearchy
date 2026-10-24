@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e5-s1-assistant 'Great, approve. Please do this week'\''s: 2026-10-05.md. I'\''ll wait.'

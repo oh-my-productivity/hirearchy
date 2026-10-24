@@ -1,0 +1,95 @@
+
+# --- scheduler started 2026-10-24 04:08:54Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e5-s3-1792814736/org run --until-done
+org: /private/tmp/hirearchy-e5-s3-1792814736/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 32s
+lead: started run (1 message(s))
+lead/writer: run finished in 36s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 28s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 57s
+lead/writer: started run (1 message(s))
+lead: run finished in 36s
+lead: started run (1 message(s))
+lead/writer: run finished in 26s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 26s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 34s
+lead: run finished in 30s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-24 04:14:16Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e5-s3-1792814736/org run --until-done
+org: /private/tmp/hirearchy-e5-s3-1792814736/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 59s
+
+# --- scheduler started 2026-10-24 04:15:52Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e5-s3-1792814736/org run --until-done
+org: /private/tmp/hirearchy-e5-s3-1792814736/org
+recovered interrupted run of lead/writer
+lead: started run (1 message(s))
+lead/writer: out of budget, paused, parent notified
+lead: run finished in 67s
+lead: started run (1 message(s))
+lead: run finished in 32s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-24 04:19:32Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e5-s3-1792814736/org run --until-done
+org: /private/tmp/hirearchy-e5-s3-1792814736/org
+lead: started run (1 message(s))
+lead/writer: budget is back, resumed
+lead/writer: started run (2 message(s))
+lead: run finished in 48s
+lead: started run (2 message(s))
+lead/writer: run finished in 32s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 32s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 42s
+lead: run finished in 36s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-24 04:27:30Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e5-s3-1792814736/org run --until-done
+org: /private/tmp/hirearchy-e5-s3-1792814736/org
+lead: started run (5 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 42s
+lead: started run (1 message(s))
+lead/writer: run finished in 36s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 28s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 55s
+lead: run finished in 36s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-24 04:31:06Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e5-s3-1792814736/org run --until-done
+org: /private/tmp/hirearchy-e5-s3-1792814736/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 36s
+lead: started run (1 message(s))
+lead/writer: run finished in 26s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 40s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 48s
+lead: run finished in 30s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-24 04:34:20Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e5-s3-1792814736/org run --until-done
+org: /private/tmp/hirearchy-e5-s3-1792814736/org
+lead: started run (2 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 30s
+lead: started run (1 message(s))
+lead/writer: run finished in 32s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 32s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 54s
+lead: run finished in 34s
+scheduler exiting: finished: no open tasks

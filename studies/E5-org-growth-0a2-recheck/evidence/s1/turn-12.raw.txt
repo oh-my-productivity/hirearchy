@@ -1,0 +1,3 @@
+I recorded your "keep it" for the 2026-10-19 memo.
+
+The team is set up and idle. For future weeks, tell me which notes file to use (for example "do 2026-10-26.md") and I'll run it. Every memo has to start with the Summary line, then the decisions, then the action items table.

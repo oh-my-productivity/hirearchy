@@ -1,0 +1,3 @@
+# propose_org call 1 at 2026-10-24T04:07:38.497Z; result at 2026-10-24T04:07:38.497Z
+
+Tool "hirearchy::propose_org" has not been loaded yet. Load it first — tool_load({ "tool_ids": ["hirearchy::propose_org"] }) — and read the schema it returns before calling. If you requested the load and this call in the same response, the schema was not available yet: call again now that the load result is in front of you.

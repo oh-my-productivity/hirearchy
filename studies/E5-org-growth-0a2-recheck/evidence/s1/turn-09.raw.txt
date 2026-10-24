@@ -1,0 +1,16 @@
+The memo is at `/tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-12.md`, exactly as drafted.
+
+I read "keep it as it is" to mean deliver it unchanged, with no rework and no more spend. That means the line "Open question: Sam's staging commitment was stated as 'probably'." is still at the bottom, after the table. If you meant that line to go, it's a one-line deletion you can make by hand. I can also send it back for a rework, but I'd need your OK for the cost.
+
+- Built only from 2026-10-12.md: met.
+- At most 400 words: met (148 by the team's count).
+- Decisions lists every decision: met (3). Lee's swap is only in the table, as you said.
+- Action table has columns Owner | Action | Due: met.
+- Table lists every commitment, including informal ones: met (5 rows, including Sam and Lee).
+- Due is an ISO date or `none`: met. Sam is 2026-10-21, as you confirmed.
+- Reviewer shows every criterion met: met (8 of 8).
+- Summary line first, then decisions, then action items: met for the order. The trailing line after the table is the one open point.
+
+Runs used: 5 of 12. The team is idle.
+
+Do you want to keep this memo, or change something?

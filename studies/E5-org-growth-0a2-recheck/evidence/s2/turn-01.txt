@@ -1,0 +1,17 @@
+######## TURN 1  start 04:34:46  end 04:35:20  elapsed 34s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T03:34:46Z end 2026-10-24T03:35:20Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-e5-s2-1792812864/notes (one file per meeting). Can you set up a team that does this for me every week?
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+I've read one of your notes files, and I can set this up as a weekly service. I need a few answers before I draft the plan. Reply "defaults" to accept any of the proposed ones.
+
+1. **Which meeting each week?** Each run needs to know which note file to read. Default: you tell me the file (for example `2026-10-19.md`) when you ask for the memo. The team reads only that file and nothing else in the folder.
+2. **Where do the memos go?** Default: a new `deliverables/` folder here, with one file per meeting (`/tmp/hirearchy-e5-s2-1792812864/deliverables/memo-<meeting date>.md`).
+3. **Format and length.** Default: markdown, at most 400 words, with two sections: "Decisions" and "Who does what" (owner, task, due date).
+4. **What counts as an action?** Some of your commitments are in plain prose, not labelled ACTION. In the 12 Oct notes, Sam says he will probably sort out the staging test data before the freeze, and Lee will swap pager shifts with Dev. Should these count?
+   - Default: yes. Every commitment counts, including informal ones in prose, and uncertain ones are marked as tentative.
+5. **Vague dates** ("before the freeze", "next week", "by Friday"). Default: convert them to a calendar date using the meeting date, and write "no date" where none can be worked out. The team won't guess a date.
+6. **Review.** Default: a second agent checks every decision and action in the memo against your notes, and nothing is skipped. Nothing is added that the notes don't say.
+7. **Budget.** Each agent wake-up is one run. I'll give the exact figure in the plan. Every agent runs claude-sonnet-5.5 at high effort, and a cheaper option isn't available.
+8. **Approval.** Default: you approve the plan before anything starts, and I ask you before any spending beyond the plan.
+
+I'd also like to run the first memo straight after you approve, on the most recent note (`2026-10-19.md`). Is that OK?

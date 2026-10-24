@@ -1,0 +1,12 @@
+# injection facts (protocol 5.4; facilitator summary; the script's own log is injection-log.txt)
+script md5: 1c4e7824e448a3a34e24a7b759a59fcd (MD5SUMS: 1c4e7824e448a3a34e24a7b759a59fcd); run as: uv --directory /Volumes/workspace/hirearchy run python <script> --org /tmp/hirearchy-e5-s3-1792814736/org --revises 20261024T041412342994-root-c209 --out /tmp/hirearchy-e5-s3-1792814736/injection (no --force; exit 0)
+moment: after turn 6 (memo 1's first delivery: copy at 2026-10-24T04:18:31Z; turn 6 end 04:18:40Z) and before turn 7 (D8). model_check org/assistant OK at 04:19:25Z before and 04:23:30Z after. Precondition: scheduler.exit 'finished: no open tasks', no process referencing the sandbox; the script's first progress() ended 'scheduler: stopped (finished: no open tasks)'. Root tasks open at that moment: c209 (blocked result d8cc). 
+memo-1 task id: 20261024T041412342994-root-c209 (how identified: memo1-identification.txt)
+injected task id: 20261024T041932216940-root-daff (service weekly-meeting-memo, budget 6, source relayed, revises c209, inputs notes_file 2026-10-05.md)
+window: 2026-10-24T04:19:32Z .. 2026-10-24T04:22:20Z (window.txt)
+the script's server pid: 25326 (tool.call events: root progress x6, request x1, start x1, status x1 = 9); scheduler pid 25330
+polling: 4 polls (first waited 152.7 s, then 2 quick replies, paused 15.0 s in all), final line 'polling ended (settled ...)'
+injected task final state: done, runs 5 of 6 (2 returned); result lead-1a15 carries 3 questions for the client (progress flag shown); the lead also sent a blocked result d32d for c209 ('Superseded by task daff')
+window runs: 5 (lead x3, lead/writer x1, lead/reviewer x1); revise_playbook calls in the window: 0 (events and RL1)
+delivered copy deliverables/memo-2026-10-05.md md5 after the window: 0e54cf01763effec9cdffd0dc78fb8da (unchanged: 0e54cf01763effec9cdffd0dc78fb8da)
+unexpected: root's first progress() already said the case was 13 of 12 runs used (turn-5 overrun); progress shows 'differs from the team's checked version' for the deliverable.

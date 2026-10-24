@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e5-s2-assistant 'Yes, fund it - but please keep an eye on the cost.'

@@ -1,0 +1,17 @@
+######## TURN 5  start 04:42:46  end 04:45:26  elapsed 160s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T03:42:46Z end 2026-10-24T03:45:26Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, fund it - but please keep an eye on the cost.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-05.stderr.txt):
+The rework is running. I handed down 5 runs, which makes the case 9 used of 17 handed down, against the 12 you approved. Unspent runs come back to the budget. I'll wait for the result.I'll check the memo myself against the criteria, then copy it.The memo is at `/tmp/hirearchy-e5-s2-1792812864/deliverables/memo-2026-10-05.md`.
+
+- **Only the 5 Oct note file:** met.
+- **At most 400 words:** met (184 by `wc`; the team's count was 154).
+- **Decisions section and an Owner | Action | Due table:** met.
+- **Both decisions listed, none added:** met.
+- **All 5 commitments in the table:** met. There were no hedged ones, so none are marked "tentative".
+- **ISO dates or `none`:** met. Sam is 2026-10-09, Marta is 2026-10-14, and Lee is `none`. The notes say "no hard date attached" for Lee.
+- **Reviewer 6 of 6 and changes applied:** met.
+
+The case used 14 runs against the 12 approved per request, so it ran 2 over, and you approved the extra spend.
+
+The team can now take any note file by name, for example "memo for 2026-10-12.md". Do you want to keep this memo, or change something?

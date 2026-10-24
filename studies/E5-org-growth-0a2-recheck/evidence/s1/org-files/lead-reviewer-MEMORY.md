@@ -1,0 +1,1 @@
+Run 1-3: memo 2026-10-05, 7/7. Run 4: memo 2026-10-12, 8/8. Run 5: memo 2026-10-19 (task ...192c) 7/7. Run 6: re-check of 10-19 after client changes (task ...aec7): 7/7, no required changes, reported done (work/review-2026-10-19.md). Client rulings: Marta 'keep agenda' not an action; Lee Due 2026-10-30; Sam Due none. Nothing pending; re-review only if lead sends a revised memo.

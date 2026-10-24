@@ -1,0 +1,13 @@
+turn 1: user_ts 2026-10-24T03:34:57.905Z turn_start 2026-10-24T03:34:58.286Z turn_end 2026-10-24T03:35:19.796Z stop end_turn status success elapsed_ms 21510 credits 0.9695
+turn 2: user_ts 2026-10-24T03:36:33.735Z turn_start 2026-10-24T03:36:33.836Z turn_end 2026-10-24T03:37:00.685Z stop end_turn status success elapsed_ms 26849 credits 1.2461
+turn 3: user_ts 2026-10-24T03:37:18.299Z turn_start 2026-10-24T03:37:18.631Z turn_end 2026-10-24T03:42:09.044Z stop end_turn status success elapsed_ms 290413 credits 2.2493
+turn 4: user_ts 2026-10-24T03:42:30.211Z turn_start 2026-10-24T03:42:30.650Z turn_end 2026-10-24T03:42:39.063Z stop end_turn status success elapsed_ms 8413 credits 0.5051
+turn 5: user_ts 2026-10-24T03:42:58.628Z turn_start 2026-10-24T03:42:59.032Z turn_end 2026-10-24T03:45:25.905Z stop end_turn status success elapsed_ms 146872 credits 1.6449
+turn 6: user_ts 2026-10-24T03:48:59.389Z turn_start 2026-10-24T03:48:59.784Z turn_end 2026-10-24T03:49:13.480Z stop end_turn status success elapsed_ms 13696 credits 1.1940
+turn 7: user_ts 2026-10-24T03:49:33.842Z turn_start 2026-10-24T03:49:34.174Z turn_end 2026-10-24T03:50:06.677Z stop end_turn status success elapsed_ms 32503 credits 2.0879
+turn 8: user_ts 2026-10-24T03:50:29.325Z turn_start 2026-10-24T03:50:29.710Z turn_end 2026-10-24T03:50:40.968Z stop end_turn status success elapsed_ms 11258 credits 1.0402
+turn 9: user_ts 2026-10-24T03:51:02.250Z turn_start 2026-10-24T03:51:02.343Z turn_end 2026-10-24T03:53:52.895Z stop end_turn status success elapsed_ms 170551 credits 1.8197
+turn 10: user_ts 2026-10-24T03:54:27.389Z turn_start 2026-10-24T03:54:27.751Z turn_end 2026-10-24T03:54:36.829Z stop end_turn status success elapsed_ms 9077 credits 0.4145
+turn 11: user_ts 2026-10-24T03:55:04.989Z turn_start 2026-10-24T03:55:05.371Z turn_end 2026-10-24T03:57:38.037Z stop end_turn status success elapsed_ms 152665 credits 1.6534
+turn 12: user_ts 2026-10-24T03:57:59.835Z turn_start 2026-10-24T03:58:00.226Z turn_end 2026-10-24T04:00:45.331Z stop end_turn status success elapsed_ms 165105 credits 1.5793
+total assistant credits: 16.4039

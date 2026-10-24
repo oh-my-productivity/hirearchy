@@ -1,0 +1,8 @@
+2026-10-24T02:58:53Z
+$ perl -e 'alarm shift; exec @ARGV' 900 hirearchy --root P/org run --until-done --max-runs 2
+org: /private/tmp/hirearchy-e5-preflight-1792810596/org
+lead: started run (1 message(s))
+lead: run finished in 24s
+scheduler exiting: finished: no open tasks
+exit 0
+2026-10-24T02:59:17Z

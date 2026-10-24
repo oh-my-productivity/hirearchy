@@ -1,0 +1,9 @@
+/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd:
+hirearchy-e4-s1r-1792693-bfcddd47e6ecb16c
+hirearchy-e4-s2-17926988-212f59b7daf49c3f
+hirearchy-e4-s2r-1792702-b0c5db682e7e6ab7
+hirearchy-e4-s3-17927050-8f0c59d32ad49337
+hirearchy-e5-preflight-1-cfccbe52ec29dae5
+
+/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home:
+hirearchy-e5-preflight-1-cfccbe52ec29dae5

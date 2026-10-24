@@ -1,0 +1,9 @@
+######## TURN 5  start 04:15:57  end 04:16:33  elapsed 36s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T03:15:57Z end 2026-10-24T03:16:33Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-05.stderr.txt):
+I've recorded your rejection of the memo. It stays in `deliverables/` for now, and nothing else has changed. One question before I change the contract:
+
+About C3: add "Start the memo with a one-line 'Summary:' of the meeting, then the Decisions section, then the action items table" as a lasting rule? Yes or no.
+
+If yes, I'll add it to the contract so every future memo follows it. I'll also send this week's memo back for a rework, which will take the case past the 12-run budget. The first pass and the earlier rework used 10 runs. This rework needs about 5 more, so about 15 in total. Please also confirm that extra spend.

@@ -1,0 +1,17 @@
+######## TURN 4  start 04:09:57  end 04:12:39  elapsed 162s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T03:09:57Z end 2026-10-24T03:12:39Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's should be 2026-10-09. Lee's ping is an action item, so the table is enough. Marta's should be 2026-10-14.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+The memo is at `/tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-05.md`.
+
+- Built only from 2026-10-05.md: met.
+- At most 400 words: met (115 by the team's count, 151 by `wc`, which counts the table pipes).
+- Decisions section lists every decision: met (2 decisions; Lee's ping moved to the table as you asked).
+- Action table has columns Owner | Action | Due: met.
+- Table lists every commitment, including informal ones: met (5 rows, including Sam and Lee).
+- Due is an ISO date or `none`: met (Sam 2026-10-09, Marta 2026-10-14, Lee `none`).
+- Reviewer shows every criterion met: met (6 of 6).
+
+Runs used: 10 of the 12 approved per request, across the first pass and the rework.
+
+Do you want to keep the memo, or change something?

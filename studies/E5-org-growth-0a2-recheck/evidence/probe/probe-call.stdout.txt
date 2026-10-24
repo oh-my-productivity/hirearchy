@@ -1,0 +1,7 @@
+autoresearch
+commit-work
+hirearchy
+reverse-engineer-anything
+skill-generation
+test-driven-development
+workflow-suggest

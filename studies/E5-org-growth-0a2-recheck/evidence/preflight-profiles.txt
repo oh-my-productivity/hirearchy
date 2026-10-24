@@ -1,0 +1,6 @@
+# E5 preflight: study-created profiles in ~/.kiro/agents (created and deleted by the preflight step)
+1. hirearchy-study-e5-probe.json (protocol 4.5 / 4.14 item 6 ambient probe)
+created 2026-10-24T03:00:12Z hirearchy-study-e5-probe.json md5 041d7f457c454d4df9541a40c1c37e95
+deleted 2026-10-24T03:00:55Z /Users/aminalizadeh/.kiro/agents/hirearchy-study-e5-probe.json md5 041d7f457c454d4df9541a40c1c37e95 (copy verified byte-identical: /Volumes/workspace/hirearchy/studies/E5-org-growth-0a2-recheck/evidence/probe/hirearchy-study-e5-probe.json)
+No prep assistant profile was needed for the org run: the org-agent scheduler profile lives in the per-org kiro home (not ~/.kiro/agents).
+Files in ~/.kiro/agents after: agent_config.json.example claude-opus-5.5.json claude-sonnet-5.5.json evolve.json hirearchy-organization-9d66c1-web-fetch-web-search.json telegram_bot.json 

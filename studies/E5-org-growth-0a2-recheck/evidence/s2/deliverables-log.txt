@@ -1,0 +1,34 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-24T03:45:21.122Z] call #27 turn 5 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-e5-s2-1792812864/deliverables && cp /private/tmp/hirearchy-e5-s2-1792812864/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e5-s2-1792812864/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-e5-s2-1792812864/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e5-s2-1792812864/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e5-s2-1792812864/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: e4d0466 2026-10-24T04:44:08+01:00', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: e4d0466 2026-10-24T04:44:08+01:00']
+result: Output:
+     184 /tmp/hirearchy-e5-s2-1792812864/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-24T03:57:34.246Z] call #50 turn 11 execute_bash
+COMMAND: S=/private/tmp/hirearchy-e5-s2-1792812864/org/lead/writer/work/memo-2026-10-12.md; D=/tmp/hirearchy-e5-s2-1792812864/deliverables/memo-2026-10-12.md; cp "$S" "$D" && cmp "$S" "$D" && wc -w "$D" && ls /tmp/hirearchy-e5-s2-1792812864/deliverables && grep -ci probably "$D"
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 04890a1 2026-10-24T04:56:12+01:00']
+result: Output:
+     190 /tmp/hirearchy-e5-s2-1792812864/deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+0
+
+
+Exit Code: 1
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 978 mtime 04:45:21 local md5 e988abb443ca3d4ee60114243c68ce77
+  memo-2026-10-12.md size 1030 mtime 04:57:34 local md5 084c623cad30fa3c9bd4f85645f7de02
+
+final ls -la:
+total 16
+drwxr-xr-x@ 4 aminalizadeh  wheel   128 Oct 24 04:57 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 24 04:45 ..
+-rw-r--r--@ 1 aminalizadeh  wheel   978 Oct 24 04:45 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1030 Oct 24 04:57 memo-2026-10-12.md
+

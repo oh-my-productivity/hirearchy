@@ -1,0 +1,6 @@
+# 2026-10-24T02:55:14Z HEAD 6618c0d
+$ uv run pytest -q -p no:cacheprovider tests/e2e/test_org_growth_0a.py tests/e2e/test_org_growth_0a2.py tests/e2e/test_no_bypass_0a2.py
+........................................................................ [ 92%]
+......                                                                   [100%]
+78 passed in 35.27s
+exit code: 0 (elapsed 57s)

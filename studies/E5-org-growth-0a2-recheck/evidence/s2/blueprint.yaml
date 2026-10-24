@@ -1,0 +1,52 @@
+mission: >
+  Every week, turn the user's notes from one team meeting into a short memo that says what was decided and who does what, for the user and the team.
+needs:
+  kind: writing
+  scope: "One memo per request, from the one note file named in the request: the decisions made and the action items (who does what, by when). Nothing from other note files, and nothing the notes do not say."
+  inputs:
+    - /tmp/hirearchy-e5-s2-1792812864/notes
+  quality_bar: Every decision and every commitment in the note file appears in the memo; nothing is added that the notes do not say.
+  sources: Only the files in needs.inputs; no web.
+  budget_runs: 12
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {name: writer, template: writer, model: strong, tools: [read]}
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]
+services:
+  - name: weekly-meeting-memo
+    owner: lead
+    description: One short markdown memo (decisions, and an action table of who does what by when) from one weekly meeting note file.
+    inputs:
+      - name: notes_file
+        description: File name of the meeting notes inside the notes folder, for example 2026-10-05.md
+        required: true
+    acceptance:
+      - Uses only the note file named in the request.
+      - At most 400 words as counted by read.
+      - "The memo is markdown with a section titled Decisions and an action-items table with exactly the columns Owner | Action | Due."
+      - Every decision stated in the note file is in the Decisions section, and no decision is added that the notes do not state.
+      - Every commitment in the note file has one row in the action table, including informal ones written in prose and ones that are not labelled as actions. A commitment the notes state as uncertain (for example 'will probably') is marked 'tentative' in its Action cell.
+      - "Every Due cell is an ISO date (YYYY-MM-DD). A vague deadline (for example 'before the freeze' or 'next week') is turned into a date only when the notes and the meeting date make that date clear; otherwise the cell is 'none'. No date is guessed."
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: One markdown memo for the requested meeting
+      format: markdown
+      max_words: 400
+      path: /tmp/hirearchy-e5-s2-1792812864/deliverables
+    budget: 12
+task:
+  service: weekly-meeting-memo
+  inputs:
+    notes_file: 2026-10-05.md
+  title: Memo for the 2026-10-05 team meeting

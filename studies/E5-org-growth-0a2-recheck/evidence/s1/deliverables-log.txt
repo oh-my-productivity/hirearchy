@@ -1,0 +1,50 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-24T03:12:35.854Z] call #23 turn 4 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-e5-s1-1792811051/deliverables && cp /private/tmp/hirearchy-e5-s1-1792811051/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-e5-s1-1792811051/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 8037193 2026-10-24T04:11:13+01:00', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 8037193 2026-10-24T04:11:13+01:00']
+result: Output:
+     151 /tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-24T03:22:12.233Z] call #42 turn 9 execute_bash
+COMMAND: cp /private/tmp/hirearchy-e5-s1-1792811051/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-12.md && cmp /private/tmp/hirearchy-e5-s1-1792811051/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-12.md && ls -l /tmp/hirearchy-e5-s1-1792811051/deliverables && head -c 300 /tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-12.md
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: ca0ba8a 2026-10-24T04:19:57+01:00', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: ca0ba8a 2026-10-24T04:19:57+01:00']
+result: Output:
+total 16
+-rw-r--r--@ 1 aminalizadeh  wheel   759 Oct 24 04:12 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1006 Oct 24 04:22 memo-2026-10-12.md
+Summary: Platform team weekly, 2026-10-12: rate limiter RFC approved, blameless postmortem, deploy freeze set for demo week.
+
+## Decisions
+- Approve the rate limiter RFC with the token bucket design (per API key) and ship it behind a feature flag first.
+- The postmortem for the Oct 8 billing outage 
+
+Exit Code: 0
+
+[2026-10-24T03:28:11.906Z] call #58 turn 11 execute_bash
+COMMAND: cp /private/tmp/hirearchy-e5-s1-1792811051/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-19.md && cmp /private/tmp/hirearchy-e5-s1-1792811051/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-19.md && ls /tmp/hirearchy-e5-s1-1792811051/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: dcf4b4c 2026-10-24T04:26:39+01:00', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: dcf4b4c 2026-10-24T04:26:39+01:00']
+result: Output:
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 759 mtime 04:12:35 local md5 9b0c922458c56a01709a32ed01b48857
+  memo-2026-10-12.md size 1006 mtime 04:22:12 local md5 b0616bd62340e54b1194ec3dbaccf5a1
+  memo-2026-10-19.md size 859 mtime 04:28:11 local md5 098a9fee001217145973c0f767cc2911
+
+final ls -la:
+total 24
+drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 24 04:28 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 24 04:13 ..
+-rw-r--r--@ 1 aminalizadeh  wheel   759 Oct 24 04:12 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1006 Oct 24 04:22 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel   859 Oct 24 04:28 memo-2026-10-19.md
+

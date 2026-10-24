@@ -1,0 +1,16 @@
+The memo is at `/tmp/hirearchy-e5-s3-1792814736/deliverables/memo-2026-10-05.md`. I copied it unchanged from the writer's corrected file, and it has all your corrections.
+
+- **Notes only, one meeting:** met. It covers only 2026-10-05.md.
+- **At most 400 words:** met. It is 140 words by the team's count and 170 by a plain `wc`, which also counts the table pipes.
+- **Format:** met. It has a Decisions list and an Action items table with the columns Owner | Action | Due, and no other sections.
+- **All decisions listed:** met, by my reading. The "Next meeting" line is gone, as you asked.
+- **All commitments are table rows, including informal ones:** met. There are 5 rows.
+- **Dates:** met. Sam is 2026-10-09 and Marta is 2026-10-14, as you said. Lee is `none`, because the notes give no date.
+- **Nothing missing or contradicting the notes:** met, by my own check against the notes.
+- **Independent reviewer sign-off on the corrected file:** **unmet.** The reviewer passed 8 of 8 on the first draft, but nobody re-checked the corrected version. I read it against the notes myself.
+
+The team's own record flags this file as "differing from what the team checked". That is because your corrections came after the reviewer's pass. The rework task also stays open as blocked, and nothing is running.
+
+The case used 13 runs against your 12. The extra one came from a scheduler restart that killed the writer's run partway through. I haven't recorded any feedback on this memo, so tell me whether to keep it as it is or change something.
+
+The weekly service stays set up. Next week, ask me for a memo and name the notes file, for example 2026-10-12.md. Each memo is budgeted at 12 runs. The restart left the lead holding 1 spare run, and the rework task is still open and blocked, so the first normal memo may be affected. If it is, I'll tell you before spending anything.

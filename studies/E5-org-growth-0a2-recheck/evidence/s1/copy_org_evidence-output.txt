@@ -1,0 +1,6 @@
+# output of: zsh harness/copy_org_evidence.sh /tmp/hirearchy-e5-s1-1792811051 1   (run once, 2026-10-24 after turn 12; stdout+stderr as shown)
+harness/copy_org_evidence.sh:14: no matches found: /tmp/hirearchy-e5-s1-1792811051/org/lead/reviewer/inbox/*
+harness/copy_org_evidence.sh:14: no matches found: /tmp/hirearchy-e5-s1-1792811051/org/lead/writer/inbox/*
+copied; lead lead-reviewer lead-writer 
+# (the two "no matches found" lines are zsh's nomatch on empty inbox directories; the cp for those two was skipped, nothing to copy; same as E4)
+# then: hirearchy --root S/org check -> observe-check.txt (all 6 checks PASS, exit code 0)

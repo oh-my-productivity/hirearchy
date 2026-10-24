@@ -1,0 +1,8 @@
+memo-1 task identification (protocol 5.3)
+date_utc: 2026-10-24T04:19:25Z
+Memo 1's first delivery = turn 6 (copy deliverables/memo-2026-10-05.md, mtime 05:18:31 local = 04:18:31Z, md5 0e54cf01763effec9cdffd0dc78fb8da; the assistant's turn-6 text presents it as the memo).
+root tasks when memo 1 was first delivered:
+  20261024T040852855822-root-e268 (first request, source: -) -> result lead-30ba (done, 04:13:04Z); artifact lead/writer/work/memo-2026-10-05.md "145 words, modified 04:11:48" (the first version; org-git ac9b094/7371710)
+  20261024T041412342994-root-c209 (human rework 'Rework memo for 5 October 2026 weekly', revises e268, source: human, budget 3) -> result lead-d8cc (status BLOCKED, 04:16:53Z; "C8 not met: the reviewer re-check could not be delegated"); artifact lead/writer/work/memo-2026-10-05.md "140 words, modified 04:15:17"
+The delivered file's md5 (0e54cf01...) equals lead/writer/work/memo-2026-10-05.md at org-git 79e86be, which is the artifact named in lead-d8cc (reply_to c209). No root task has a 'done' result for the delivered version: e268's done result carried the earlier 145-word version; c209's result is blocked.
+Judgement (recorded as a fact, not a rule): protocol 5.3 says the memo-1 task is the one "whose done result was the version delivered ... identified from the copy's source path and the result's artifacts". The only root task whose result names the delivered file as its artifact is c209 (the assistant's human rework, as in E4 s3 and E5 s1). So revises = 20261024T041412342994-root-c209.

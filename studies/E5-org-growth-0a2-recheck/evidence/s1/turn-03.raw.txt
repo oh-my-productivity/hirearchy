@@ -1,0 +1,29 @@
+The team is built and running the memo for 2026-10-05.md, with a ceiling of 12 runs. I'll wait for it now.The memo is drafted and checked. The reviewer met 6 of 6 criteria, and it used 5 of 12 runs. I haven't copied it to `deliverables/` yet, because the team has two questions for you.
+
+1. **Sam's "before Friday" (flaky CI).** The meeting was Monday 5 October, so this could mean Thursday 2026-10-08 or Friday 2026-10-09. The notes don't settle it, so the memo currently says `none`. Should it be a date, and which one?
+2. **Lee pinging the vendor about the SSO certificate.** The notes say "We agreed Lee would ping the vendor". The memo lists it both under Decisions and in the action table, with Due `none`. Is that right, or should it appear only in the action table?
+
+Here is the current draft, 134 words:
+
+```
+# Platform team weekly memo, 2026-10-05
+
+## Decisions
+- Push the API gateway migration from the week of 12 October to the week of 26 October, and use the extra time for the failing services.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+- Lee will ping the vendor about the SSO certificate renewal this week and report back (agreed in the meeting).
+
+## Action items
+| Owner | Action | Due |
+| Priya | Draft the RFC for the new per-key rate limiter | 2026-10-09 |
+| Dev   | Enable Renovate on the three core repos | 2026-10-08 |
+| Sam   | Look into the flaky CI (before Friday) | none |
+| Marta | Book the on-call training room for Oct 14 | none |
+| Lee   | Ping the vendor about the SSO certificate renewal and report back (this week) | none |
+```
+
+I abbreviated the table here. The real file has the standard markdown header and separator row.
+
+Marta's Due is `none` because "Oct 14" is the training date, not a deadline for booking. Tell me if you read it differently.
+
+I'll apply your answers and deliver the final file.

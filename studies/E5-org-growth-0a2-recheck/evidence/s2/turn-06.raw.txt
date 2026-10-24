@@ -1,0 +1,5 @@
+I've recorded your rejection of the memo. It stays in `deliverables/` as it is, and nothing has been sent back to the team yet.
+
+About C3: add "The memo starts with a one-line 'Summary:' of the meeting, then the Decisions section, then the action-items table" as a lasting rule? Yes or no.
+
+C3 is the check for the memo's structure (the Decisions section and the action table). Answer yes and the rule applies to every future memo, with a rework of the 5 Oct memo to follow. That rework will cost runs. Answer no and I'll treat it as a one-off.

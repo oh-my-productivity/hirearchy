@@ -1,0 +1,474 @@
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org obs trace 20261024T033732488726-root-ebe2
+trace 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team meeting" -> lead: done
+     +0s  root -> lead task "Memo for the 2026-10-05 team meeting" +12 run(s)
+     +0s  root apply_org ok
+     +1s    run 20261024T033734372585 ok, ran 22s, queued 1.9s, 2 call(s) [delegate×1 write×1]
+    +19s    lead -> lead/writer task "Memo for the 2026-10-05 team meeting" +3 run(s)
+    +20s      run 20261024T033752512885 ok, ran 34s, queued 335ms, 4 call(s) [write×2 org_read×1 report×1]
+    +48s      lead/writer -> lead result (done) "Memo for the 2026-10-05 team meeting" +2 run(s)
+    +50s    run 20261024T033822892573 ok, ran 28s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +1m13s    lead -> lead/reviewer task "Review memo for 2026-10-05 meeting" +2 run(s)
+  +1m14s      run 20261024T033847228333 ok, ran 55s, queued 1.7s, 5 call(s) [org_read×2 write×2 report×1]
+  +2m01s      lead/reviewer -> lead result (done) "Review memo for 2026-10-05 meeting" +1 run(s)
+  +2m03s    run 20261024T033935681443 ok, ran 34s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +2m29s    lead -> lead/writer task "Rework memo 2026-10-05: Marta row" +1 run(s)
+  +2m29s      run 20261024T034001950062 ok, ran 30s, queued 263ms, 4 call(s) [write×2 org_read×1 report×1]
+  +2m53s      lead/writer -> lead result (done) "Rework memo 2026-10-05: Marta row"
+  +2m53s    run 20261024T034026183003 ok, ran 34s, queued 419ms, 4 call(s) [org_read×2 delegate×1 write×1]
+  +3m19s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after rework" +1 run(s)
+  +3m21s      run 20261024T034054444673 ok, ran 36s, queued 2.0s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m51s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after rework"
+  +3m52s    run 20261024T034124781991 ok, ran 32s, queued 1.0s, 3 call(s) [org_read×1 report×1 write×1]
+  +4m18s    lead -> root result (done) "Memo for the 2026-10-05 team meeting" +3 run(s)
+  +5m35s  root -> lead task "Rework memo for 2026-10-05: user's date answers" +5 run(s)
+  +5m35s  root request ok
+  +5m37s    run 20261024T034309988730 ok, ran 40s, queued 1.8s, 11 call(s) [org_read×9 delegate×1 write×1]
+  +6m07s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05" +1 run(s)
+  +6m09s      run 20261024T034342218842 ok, ran 26s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +6m30s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05"
+  +6m31s    run 20261024T034404421885 ok, ran 24s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +6m49s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after two Due changes" +1 run(s)
+  +6m50s      run 20261024T034422590108 ok, ran 32s, queued 210ms, 6 call(s) [org_read×3 write×2 report×1]
+  +7m17s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after two Due changes"
+  +7m18s    run 20261024T034450864796 ok, ran 26s, queued 1.4s, 3 call(s) [org_read×1 report×1 write×1]
+  +7m39s    lead -> root result (done) "Rework memo for 2026-10-05: user's date answers"
+  +8m27s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+  +8m27s  root request ok
+  +8m27s    run 20261024T034559945086 ok, ran 38s, queued 211ms, 2 call(s) [delegate×1 write×1]
+  +8m59s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05 (root rework)" +1 run(s)
+  +8m59s      run 20261024T034632186884 ok, ran 28s, queued 356ms, 4 call(s) [write×2 org_read×1 report×1]
+  +9m22s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05 (root rework)"
+  +9m23s    run 20261024T034656435460 ok, ran 26s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +9m43s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after Due rework" +1 run(s)
+  +9m44s      run 20261024T034716654792 ok, ran 52s, queued 1.1s, 4 call(s) [write×2 org_read×1 report×1]
+ +10m29s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after Due rework"
+ +10m30s    run 20261024T034803009555 ok, ran 28s, queued 549ms, 2 call(s) [report×1 write×1]
+ +10m52s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +10m54s  root progress ok
+ +10m54s  root progress ok
+ +10m59s  root progress ok
+ +11m38s  root -> lead note "feedback on "Rework memo for 2026-10-05: user's date answer…"
+ +11m38s  root feedback ok
+ +12m09s  root progress ok
+ +12m27s  root -> lead note "feedback on "Rework memo 2026-10-05: unclear due dates": re…"
+ +12m27s  root feedback ok
+ +12m29s  root -> lead note "criterion link on "Rework memo for 2026-10-05: user's date…"
+ +12m29s  root define_service ok
+tasks: 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team…" done 9 run(s) | 20261024T034308207974-root-6c4f "Rework memo for 2026-10-05: u…" done 5 run(s) | 20261024T034559745842-root-f3df "Rework memo 2026-10-05: uncle…" done 5 run(s)
+totals: wall 10m53s | runs 19 (budget given 23, returned 4) | run time 10m30s | queue 21s | waiting on you 0s | tool calls 80 (0 refused)
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org obs trace 20261024T034308207974-root-6c4f
+trace 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team meeting" -> lead: done
+     +0s  root -> lead task "Memo for the 2026-10-05 team meeting" +12 run(s)
+     +0s  root apply_org ok
+     +1s    run 20261024T033734372585 ok, ran 22s, queued 1.9s, 2 call(s) [delegate×1 write×1]
+    +19s    lead -> lead/writer task "Memo for the 2026-10-05 team meeting" +3 run(s)
+    +20s      run 20261024T033752512885 ok, ran 34s, queued 335ms, 4 call(s) [write×2 org_read×1 report×1]
+    +48s      lead/writer -> lead result (done) "Memo for the 2026-10-05 team meeting" +2 run(s)
+    +50s    run 20261024T033822892573 ok, ran 28s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +1m13s    lead -> lead/reviewer task "Review memo for 2026-10-05 meeting" +2 run(s)
+  +1m14s      run 20261024T033847228333 ok, ran 55s, queued 1.7s, 5 call(s) [org_read×2 write×2 report×1]
+  +2m01s      lead/reviewer -> lead result (done) "Review memo for 2026-10-05 meeting" +1 run(s)
+  +2m03s    run 20261024T033935681443 ok, ran 34s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +2m29s    lead -> lead/writer task "Rework memo 2026-10-05: Marta row" +1 run(s)
+  +2m29s      run 20261024T034001950062 ok, ran 30s, queued 263ms, 4 call(s) [write×2 org_read×1 report×1]
+  +2m53s      lead/writer -> lead result (done) "Rework memo 2026-10-05: Marta row"
+  +2m53s    run 20261024T034026183003 ok, ran 34s, queued 419ms, 4 call(s) [org_read×2 delegate×1 write×1]
+  +3m19s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after rework" +1 run(s)
+  +3m21s      run 20261024T034054444673 ok, ran 36s, queued 2.0s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m51s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after rework"
+  +3m52s    run 20261024T034124781991 ok, ran 32s, queued 1.0s, 3 call(s) [org_read×1 report×1 write×1]
+  +4m18s    lead -> root result (done) "Memo for the 2026-10-05 team meeting" +3 run(s)
+  +5m35s  root -> lead task "Rework memo for 2026-10-05: user's date answers" +5 run(s)
+  +5m35s  root request ok
+  +5m37s    run 20261024T034309988730 ok, ran 40s, queued 1.8s, 11 call(s) [org_read×9 delegate×1 write×1]
+  +6m07s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05" +1 run(s)
+  +6m09s      run 20261024T034342218842 ok, ran 26s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +6m30s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05"
+  +6m31s    run 20261024T034404421885 ok, ran 24s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +6m49s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after two Due changes" +1 run(s)
+  +6m50s      run 20261024T034422590108 ok, ran 32s, queued 210ms, 6 call(s) [org_read×3 write×2 report×1]
+  +7m17s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after two Due changes"
+  +7m18s    run 20261024T034450864796 ok, ran 26s, queued 1.4s, 3 call(s) [org_read×1 report×1 write×1]
+  +7m39s    lead -> root result (done) "Rework memo for 2026-10-05: user's date answers"
+  +8m27s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+  +8m27s  root request ok
+  +8m27s    run 20261024T034559945086 ok, ran 38s, queued 211ms, 2 call(s) [delegate×1 write×1]
+  +8m59s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05 (root rework)" +1 run(s)
+  +8m59s      run 20261024T034632186884 ok, ran 28s, queued 356ms, 4 call(s) [write×2 org_read×1 report×1]
+  +9m22s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05 (root rework)"
+  +9m23s    run 20261024T034656435460 ok, ran 26s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +9m43s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after Due rework" +1 run(s)
+  +9m44s      run 20261024T034716654792 ok, ran 52s, queued 1.1s, 4 call(s) [write×2 org_read×1 report×1]
+ +10m29s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after Due rework"
+ +10m30s    run 20261024T034803009555 ok, ran 28s, queued 549ms, 2 call(s) [report×1 write×1]
+ +10m52s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +10m54s  root progress ok
+ +10m54s  root progress ok
+ +10m59s  root progress ok
+ +11m38s  root -> lead note "feedback on "Rework memo for 2026-10-05: user's date answer…"
+ +11m38s  root feedback ok
+ +12m09s  root progress ok
+ +12m27s  root -> lead note "feedback on "Rework memo 2026-10-05: unclear due dates": re…"
+ +12m27s  root feedback ok
+ +12m29s  root -> lead note "criterion link on "Rework memo for 2026-10-05: user's date…"
+ +12m29s  root define_service ok
+tasks: 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team…" done 9 run(s) | 20261024T034308207974-root-6c4f "Rework memo for 2026-10-05: u…" done 5 run(s) | 20261024T034559745842-root-f3df "Rework memo 2026-10-05: uncle…" done 5 run(s)
+totals: wall 10m53s | runs 19 (budget given 23, returned 4) | run time 10m30s | queue 21s | waiting on you 0s | tool calls 80 (0 refused)
+note: 20261024T034308207974-root-6c4f belongs to the request 20261024T033732488726-root-ebe2; showing that
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org obs trace 20261024T034559745842-root-f3df
+trace 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team meeting" -> lead: done
+     +0s  root -> lead task "Memo for the 2026-10-05 team meeting" +12 run(s)
+     +0s  root apply_org ok
+     +1s    run 20261024T033734372585 ok, ran 22s, queued 1.9s, 2 call(s) [delegate×1 write×1]
+    +19s    lead -> lead/writer task "Memo for the 2026-10-05 team meeting" +3 run(s)
+    +20s      run 20261024T033752512885 ok, ran 34s, queued 335ms, 4 call(s) [write×2 org_read×1 report×1]
+    +48s      lead/writer -> lead result (done) "Memo for the 2026-10-05 team meeting" +2 run(s)
+    +50s    run 20261024T033822892573 ok, ran 28s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +1m13s    lead -> lead/reviewer task "Review memo for 2026-10-05 meeting" +2 run(s)
+  +1m14s      run 20261024T033847228333 ok, ran 55s, queued 1.7s, 5 call(s) [org_read×2 write×2 report×1]
+  +2m01s      lead/reviewer -> lead result (done) "Review memo for 2026-10-05 meeting" +1 run(s)
+  +2m03s    run 20261024T033935681443 ok, ran 34s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +2m29s    lead -> lead/writer task "Rework memo 2026-10-05: Marta row" +1 run(s)
+  +2m29s      run 20261024T034001950062 ok, ran 30s, queued 263ms, 4 call(s) [write×2 org_read×1 report×1]
+  +2m53s      lead/writer -> lead result (done) "Rework memo 2026-10-05: Marta row"
+  +2m53s    run 20261024T034026183003 ok, ran 34s, queued 419ms, 4 call(s) [org_read×2 delegate×1 write×1]
+  +3m19s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after rework" +1 run(s)
+  +3m21s      run 20261024T034054444673 ok, ran 36s, queued 2.0s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m51s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after rework"
+  +3m52s    run 20261024T034124781991 ok, ran 32s, queued 1.0s, 3 call(s) [org_read×1 report×1 write×1]
+  +4m18s    lead -> root result (done) "Memo for the 2026-10-05 team meeting" +3 run(s)
+  +5m35s  root -> lead task "Rework memo for 2026-10-05: user's date answers" +5 run(s)
+  +5m35s  root request ok
+  +5m37s    run 20261024T034309988730 ok, ran 40s, queued 1.8s, 11 call(s) [org_read×9 delegate×1 write×1]
+  +6m07s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05" +1 run(s)
+  +6m09s      run 20261024T034342218842 ok, ran 26s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +6m30s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05"
+  +6m31s    run 20261024T034404421885 ok, ran 24s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +6m49s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after two Due changes" +1 run(s)
+  +6m50s      run 20261024T034422590108 ok, ran 32s, queued 210ms, 6 call(s) [org_read×3 write×2 report×1]
+  +7m17s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after two Due changes"
+  +7m18s    run 20261024T034450864796 ok, ran 26s, queued 1.4s, 3 call(s) [org_read×1 report×1 write×1]
+  +7m39s    lead -> root result (done) "Rework memo for 2026-10-05: user's date answers"
+  +8m27s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+  +8m27s  root request ok
+  +8m27s    run 20261024T034559945086 ok, ran 38s, queued 211ms, 2 call(s) [delegate×1 write×1]
+  +8m59s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05 (root rework)" +1 run(s)
+  +8m59s      run 20261024T034632186884 ok, ran 28s, queued 356ms, 4 call(s) [write×2 org_read×1 report×1]
+  +9m22s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05 (root rework)"
+  +9m23s    run 20261024T034656435460 ok, ran 26s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +9m43s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after Due rework" +1 run(s)
+  +9m44s      run 20261024T034716654792 ok, ran 52s, queued 1.1s, 4 call(s) [write×2 org_read×1 report×1]
+ +10m29s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after Due rework"
+ +10m30s    run 20261024T034803009555 ok, ran 28s, queued 549ms, 2 call(s) [report×1 write×1]
+ +10m52s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +10m54s  root progress ok
+ +10m54s  root progress ok
+ +10m59s  root progress ok
+ +11m38s  root -> lead note "feedback on "Rework memo for 2026-10-05: user's date answer…"
+ +11m38s  root feedback ok
+ +12m09s  root progress ok
+ +12m27s  root -> lead note "feedback on "Rework memo 2026-10-05: unclear due dates": re…"
+ +12m27s  root feedback ok
+ +12m29s  root -> lead note "criterion link on "Rework memo for 2026-10-05: user's date…"
+ +12m29s  root define_service ok
+tasks: 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team…" done 9 run(s) | 20261024T034308207974-root-6c4f "Rework memo for 2026-10-05: u…" done 5 run(s) | 20261024T034559745842-root-f3df "Rework memo 2026-10-05: uncle…" done 5 run(s)
+totals: wall 10m53s | runs 19 (budget given 23, returned 4) | run time 10m30s | queue 21s | waiting on you 0s | tool calls 80 (0 refused)
+note: 20261024T034559745842-root-f3df belongs to the request 20261024T033732488726-root-ebe2; showing that
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org obs trace 20261024T034910526824-root-ec12
+trace 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team meeting" -> lead: done
+     +0s  root -> lead task "Memo for the 2026-10-05 team meeting" +12 run(s)
+     +0s  root apply_org ok
+     +1s    run 20261024T033734372585 ok, ran 22s, queued 1.9s, 2 call(s) [delegate×1 write×1]
+    +19s    lead -> lead/writer task "Memo for the 2026-10-05 team meeting" +3 run(s)
+    +20s      run 20261024T033752512885 ok, ran 34s, queued 335ms, 4 call(s) [write×2 org_read×1 report×1]
+    +48s      lead/writer -> lead result (done) "Memo for the 2026-10-05 team meeting" +2 run(s)
+    +50s    run 20261024T033822892573 ok, ran 28s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +1m13s    lead -> lead/reviewer task "Review memo for 2026-10-05 meeting" +2 run(s)
+  +1m14s      run 20261024T033847228333 ok, ran 55s, queued 1.7s, 5 call(s) [org_read×2 write×2 report×1]
+  +2m01s      lead/reviewer -> lead result (done) "Review memo for 2026-10-05 meeting" +1 run(s)
+  +2m03s    run 20261024T033935681443 ok, ran 34s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +2m29s    lead -> lead/writer task "Rework memo 2026-10-05: Marta row" +1 run(s)
+  +2m29s      run 20261024T034001950062 ok, ran 30s, queued 263ms, 4 call(s) [write×2 org_read×1 report×1]
+  +2m53s      lead/writer -> lead result (done) "Rework memo 2026-10-05: Marta row"
+  +2m53s    run 20261024T034026183003 ok, ran 34s, queued 419ms, 4 call(s) [org_read×2 delegate×1 write×1]
+  +3m19s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after rework" +1 run(s)
+  +3m21s      run 20261024T034054444673 ok, ran 36s, queued 2.0s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m51s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after rework"
+  +3m52s    run 20261024T034124781991 ok, ran 32s, queued 1.0s, 3 call(s) [org_read×1 report×1 write×1]
+  +4m18s    lead -> root result (done) "Memo for the 2026-10-05 team meeting" +3 run(s)
+  +5m35s  root -> lead task "Rework memo for 2026-10-05: user's date answers" +5 run(s)
+  +5m35s  root request ok
+  +5m37s    run 20261024T034309988730 ok, ran 40s, queued 1.8s, 11 call(s) [org_read×9 delegate×1 write×1]
+  +6m07s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05" +1 run(s)
+  +6m09s      run 20261024T034342218842 ok, ran 26s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +6m30s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05"
+  +6m31s    run 20261024T034404421885 ok, ran 24s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +6m49s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after two Due changes" +1 run(s)
+  +6m50s      run 20261024T034422590108 ok, ran 32s, queued 210ms, 6 call(s) [org_read×3 write×2 report×1]
+  +7m17s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after two Due changes"
+  +7m18s    run 20261024T034450864796 ok, ran 26s, queued 1.4s, 3 call(s) [org_read×1 report×1 write×1]
+  +7m39s    lead -> root result (done) "Rework memo for 2026-10-05: user's date answers"
+  +8m27s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+  +8m27s  root request ok
+  +8m27s    run 20261024T034559945086 ok, ran 38s, queued 211ms, 2 call(s) [delegate×1 write×1]
+  +8m59s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05 (root rework)" +1 run(s)
+  +8m59s      run 20261024T034632186884 ok, ran 28s, queued 356ms, 4 call(s) [write×2 org_read×1 report×1]
+  +9m22s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05 (root rework)"
+  +9m23s    run 20261024T034656435460 ok, ran 26s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +9m43s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after Due rework" +1 run(s)
+  +9m44s      run 20261024T034716654792 ok, ran 52s, queued 1.1s, 4 call(s) [write×2 org_read×1 report×1]
+ +10m29s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after Due rework"
+ +10m30s    run 20261024T034803009555 ok, ran 28s, queued 549ms, 2 call(s) [report×1 write×1]
+ +10m52s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +10m54s  root progress ok
+ +10m54s  root progress ok
+ +10m59s  root progress ok
+ +11m38s  root -> lead note "feedback on "Rework memo for 2026-10-05: user's date answer…"
+ +11m38s  root feedback ok
+ +12m09s  root progress ok
+ +12m27s  root -> lead note "feedback on "Rework memo 2026-10-05: unclear due dates": re…"
+ +12m27s  root feedback ok
+ +12m29s  root -> lead note "criterion link on "Rework memo for 2026-10-05: user's date…"
+ +12m29s  root define_service ok
+tasks: 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team…" done 9 run(s) | 20261024T034308207974-root-6c4f "Rework memo for 2026-10-05: u…" done 5 run(s) | 20261024T034559745842-root-f3df "Rework memo 2026-10-05: uncle…" done 5 run(s)
+totals: wall 10m53s | runs 19 (budget given 23, returned 4) | run time 10m30s | queue 21s | waiting on you 0s | tool calls 80 (0 refused)
+note: 20261024T034910526824-root-ec12 belongs to the request 20261024T033732488726-root-ebe2; showing that
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org obs trace 20261024T034959598068-root-a9cb
+trace 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team meeting" -> lead: done
+     +0s  root -> lead task "Memo for the 2026-10-05 team meeting" +12 run(s)
+     +0s  root apply_org ok
+     +1s    run 20261024T033734372585 ok, ran 22s, queued 1.9s, 2 call(s) [delegate×1 write×1]
+    +19s    lead -> lead/writer task "Memo for the 2026-10-05 team meeting" +3 run(s)
+    +20s      run 20261024T033752512885 ok, ran 34s, queued 335ms, 4 call(s) [write×2 org_read×1 report×1]
+    +48s      lead/writer -> lead result (done) "Memo for the 2026-10-05 team meeting" +2 run(s)
+    +50s    run 20261024T033822892573 ok, ran 28s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +1m13s    lead -> lead/reviewer task "Review memo for 2026-10-05 meeting" +2 run(s)
+  +1m14s      run 20261024T033847228333 ok, ran 55s, queued 1.7s, 5 call(s) [org_read×2 write×2 report×1]
+  +2m01s      lead/reviewer -> lead result (done) "Review memo for 2026-10-05 meeting" +1 run(s)
+  +2m03s    run 20261024T033935681443 ok, ran 34s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +2m29s    lead -> lead/writer task "Rework memo 2026-10-05: Marta row" +1 run(s)
+  +2m29s      run 20261024T034001950062 ok, ran 30s, queued 263ms, 4 call(s) [write×2 org_read×1 report×1]
+  +2m53s      lead/writer -> lead result (done) "Rework memo 2026-10-05: Marta row"
+  +2m53s    run 20261024T034026183003 ok, ran 34s, queued 419ms, 4 call(s) [org_read×2 delegate×1 write×1]
+  +3m19s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after rework" +1 run(s)
+  +3m21s      run 20261024T034054444673 ok, ran 36s, queued 2.0s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m51s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after rework"
+  +3m52s    run 20261024T034124781991 ok, ran 32s, queued 1.0s, 3 call(s) [org_read×1 report×1 write×1]
+  +4m18s    lead -> root result (done) "Memo for the 2026-10-05 team meeting" +3 run(s)
+  +5m35s  root -> lead task "Rework memo for 2026-10-05: user's date answers" +5 run(s)
+  +5m35s  root request ok
+  +5m37s    run 20261024T034309988730 ok, ran 40s, queued 1.8s, 11 call(s) [org_read×9 delegate×1 write×1]
+  +6m07s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05" +1 run(s)
+  +6m09s      run 20261024T034342218842 ok, ran 26s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +6m30s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05"
+  +6m31s    run 20261024T034404421885 ok, ran 24s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +6m49s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after two Due changes" +1 run(s)
+  +6m50s      run 20261024T034422590108 ok, ran 32s, queued 210ms, 6 call(s) [org_read×3 write×2 report×1]
+  +7m17s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after two Due changes"
+  +7m18s    run 20261024T034450864796 ok, ran 26s, queued 1.4s, 3 call(s) [org_read×1 report×1 write×1]
+  +7m39s    lead -> root result (done) "Rework memo for 2026-10-05: user's date answers"
+  +8m27s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+  +8m27s  root request ok
+  +8m27s    run 20261024T034559945086 ok, ran 38s, queued 211ms, 2 call(s) [delegate×1 write×1]
+  +8m59s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05 (root rework)" +1 run(s)
+  +8m59s      run 20261024T034632186884 ok, ran 28s, queued 356ms, 4 call(s) [write×2 org_read×1 report×1]
+  +9m22s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05 (root rework)"
+  +9m23s    run 20261024T034656435460 ok, ran 26s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +9m43s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after Due rework" +1 run(s)
+  +9m44s      run 20261024T034716654792 ok, ran 52s, queued 1.1s, 4 call(s) [write×2 org_read×1 report×1]
+ +10m29s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after Due rework"
+ +10m30s    run 20261024T034803009555 ok, ran 28s, queued 549ms, 2 call(s) [report×1 write×1]
+ +10m52s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +10m54s  root progress ok
+ +10m54s  root progress ok
+ +10m59s  root progress ok
+ +11m38s  root -> lead note "feedback on "Rework memo for 2026-10-05: user's date answer…"
+ +11m38s  root feedback ok
+ +12m09s  root progress ok
+ +12m27s  root -> lead note "feedback on "Rework memo 2026-10-05: unclear due dates": re…"
+ +12m27s  root feedback ok
+ +12m29s  root -> lead note "criterion link on "Rework memo for 2026-10-05: user's date…"
+ +12m29s  root define_service ok
+tasks: 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team…" done 9 run(s) | 20261024T034308207974-root-6c4f "Rework memo for 2026-10-05: u…" done 5 run(s) | 20261024T034559745842-root-f3df "Rework memo 2026-10-05: uncle…" done 5 run(s)
+totals: wall 10m53s | runs 19 (budget given 23, returned 4) | run time 10m30s | queue 21s | waiting on you 0s | tool calls 80 (0 refused)
+note: 20261024T034959598068-root-a9cb belongs to the request 20261024T033732488726-root-ebe2; showing that
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org obs trace 20261024T035002043490-root-6162
+trace 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team meeting" -> lead: done
+     +0s  root -> lead task "Memo for the 2026-10-05 team meeting" +12 run(s)
+     +0s  root apply_org ok
+     +1s    run 20261024T033734372585 ok, ran 22s, queued 1.9s, 2 call(s) [delegate×1 write×1]
+    +19s    lead -> lead/writer task "Memo for the 2026-10-05 team meeting" +3 run(s)
+    +20s      run 20261024T033752512885 ok, ran 34s, queued 335ms, 4 call(s) [write×2 org_read×1 report×1]
+    +48s      lead/writer -> lead result (done) "Memo for the 2026-10-05 team meeting" +2 run(s)
+    +50s    run 20261024T033822892573 ok, ran 28s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +1m13s    lead -> lead/reviewer task "Review memo for 2026-10-05 meeting" +2 run(s)
+  +1m14s      run 20261024T033847228333 ok, ran 55s, queued 1.7s, 5 call(s) [org_read×2 write×2 report×1]
+  +2m01s      lead/reviewer -> lead result (done) "Review memo for 2026-10-05 meeting" +1 run(s)
+  +2m03s    run 20261024T033935681443 ok, ran 34s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +2m29s    lead -> lead/writer task "Rework memo 2026-10-05: Marta row" +1 run(s)
+  +2m29s      run 20261024T034001950062 ok, ran 30s, queued 263ms, 4 call(s) [write×2 org_read×1 report×1]
+  +2m53s      lead/writer -> lead result (done) "Rework memo 2026-10-05: Marta row"
+  +2m53s    run 20261024T034026183003 ok, ran 34s, queued 419ms, 4 call(s) [org_read×2 delegate×1 write×1]
+  +3m19s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after rework" +1 run(s)
+  +3m21s      run 20261024T034054444673 ok, ran 36s, queued 2.0s, 4 call(s) [write×2 org_read×1 report×1]
+  +3m51s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after rework"
+  +3m52s    run 20261024T034124781991 ok, ran 32s, queued 1.0s, 3 call(s) [org_read×1 report×1 write×1]
+  +4m18s    lead -> root result (done) "Memo for the 2026-10-05 team meeting" +3 run(s)
+  +5m35s  root -> lead task "Rework memo for 2026-10-05: user's date answers" +5 run(s)
+  +5m35s  root request ok
+  +5m37s    run 20261024T034309988730 ok, ran 40s, queued 1.8s, 11 call(s) [org_read×9 delegate×1 write×1]
+  +6m07s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05" +1 run(s)
+  +6m09s      run 20261024T034342218842 ok, ran 26s, queued 1.8s, 4 call(s) [write×2 org_read×1 report×1]
+  +6m30s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05"
+  +6m31s    run 20261024T034404421885 ok, ran 24s, queued 1.7s, 2 call(s) [delegate×1 write×1]
+  +6m49s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after two Due changes" +1 run(s)
+  +6m50s      run 20261024T034422590108 ok, ran 32s, queued 210ms, 6 call(s) [org_read×3 write×2 report×1]
+  +7m17s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after two Due changes"
+  +7m18s    run 20261024T034450864796 ok, ran 26s, queued 1.4s, 3 call(s) [org_read×1 report×1 write×1]
+  +7m39s    lead -> root result (done) "Rework memo for 2026-10-05: user's date answers"
+  +8m27s  root -> lead task "Rework memo 2026-10-05: unclear due dates" +6 run(s)
+  +8m27s  root request ok
+  +8m27s    run 20261024T034559945086 ok, ran 38s, queued 211ms, 2 call(s) [delegate×1 write×1]
+  +8m59s    lead -> lead/writer task "Fix two Due cells in memo 2026-10-05 (root rework)" +1 run(s)
+  +8m59s      run 20261024T034632186884 ok, ran 28s, queued 356ms, 4 call(s) [write×2 org_read×1 report×1]
+  +9m22s      lead/writer -> lead result (done) "Fix two Due cells in memo 2026-10-05 (root rework)"
+  +9m23s    run 20261024T034656435460 ok, ran 26s, queued 1.4s, 2 call(s) [delegate×1 write×1]
+  +9m43s    lead -> lead/reviewer task "Re-check memo 2026-10-05 after Due rework" +1 run(s)
+  +9m44s      run 20261024T034716654792 ok, ran 52s, queued 1.1s, 4 call(s) [write×2 org_read×1 report×1]
+ +10m29s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-05 after Due rework"
+ +10m30s    run 20261024T034803009555 ok, ran 28s, queued 549ms, 2 call(s) [report×1 write×1]
+ +10m52s    lead -> root result (done) "Rework memo 2026-10-05: unclear due dates" +1 run(s)
+ +10m54s  root progress ok
+ +10m54s  root progress ok
+ +10m59s  root progress ok
+ +11m38s  root -> lead note "feedback on "Rework memo for 2026-10-05: user's date answer…"
+ +11m38s  root feedback ok
+ +12m09s  root progress ok
+ +12m27s  root -> lead note "feedback on "Rework memo 2026-10-05: unclear due dates": re…"
+ +12m27s  root feedback ok
+ +12m29s  root -> lead note "criterion link on "Rework memo for 2026-10-05: user's date…"
+ +12m29s  root define_service ok
+tasks: 20261024T033732488726-root-ebe2 "Memo for the 2026-10-05 team…" done 9 run(s) | 20261024T034308207974-root-6c4f "Rework memo for 2026-10-05: u…" done 5 run(s) | 20261024T034559745842-root-f3df "Rework memo 2026-10-05: uncle…" done 5 run(s)
+totals: wall 10m53s | runs 19 (budget given 23, returned 4) | run time 10m30s | queue 21s | waiting on you 0s | tool calls 80 (0 refused)
+note: 20261024T035002043490-root-6162 belongs to the request 20261024T033732488726-root-ebe2; showing that
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org obs trace 20261024T035108035115-root-bfa8
+trace 20261024T035108035115-root-bfa8 "Memo for the 2026-10-12 team meeting" -> lead: done
+     +0s  root -> lead task "Memo for the 2026-10-12 team meeting" +12 run(s)
+     +0s  root request ok
+     +2s    run 20261024T035110143468 ok, ran 36s, queued 2m00s, 4 call(s) [delegate×1 org_read×1 revise_playbook×1 write×1], shared with 1 other request(s)
+    +30s    lead -> lead/writer task "Write memo for 2026-10-12 meeting" +3 run(s)
+    +32s      run 20261024T035140370724 ok, ran 37s, queued 1.9s, 4 call(s) [write×2 org_read×1 report×1]
+  +1m01s      lead/writer -> lead result (blocked) "Write memo for 2026-10-12 meeting"
+  +1m02s    run 20261024T035210772782 ok, ran 30s, queued 1.1s, 2 call(s) [delegate×1 write×1]
+  +1m24s    lead -> lead/reviewer task "Review memo for 2026-10-12 meeting" +2 run(s)
+  +1m25s      run 20261024T035233082127 ok, ran 50s, queued 118ms, 4 call(s) [write×2 org_read×1 report×1]
+  +2m07s      lead/reviewer -> lead result (done) "Review memo for 2026-10-12 meeting" +1 run(s)
+  +2m09s    run 20261024T035317429006 ok, ran 30s, queued 1.8s, 5 call(s) [org_read×3 report×1 write×1]
+  +2m32s    lead -> root result (done) "Memo for the 2026-10-12 team meeting" +5 run(s)
+  +4m03s  root -> lead task "Rework memo for 2026-10-12: drop 'probably' from Sam's row" +5 run(s)
+  +4m03s  root request ok
+  +4m03s    run 20261024T035511966313 ok, ran 38s, queued 235ms, 11 call(s) [org_read×8 delegate×1 whoami×1 write×1]
+  +4m36s    lead -> lead/writer task "Memo 2026-10-12: drop 'probably' from Sam's row" +1 run(s)
+  +4m36s      run 20261024T035544180459 ok, ran 28s, queued 108ms, 4 call(s) [write×2 org_read×1 report×1]
+  +4m59s      lead/writer -> lead result (done) "Memo 2026-10-12: drop 'probably' from Sam's row" +2 run(s)
+  +5m00s    run 20261024T035608433258 ok, ran 24s, queued 871ms, 2 call(s) [delegate×1 write×1]
+  +5m18s    lead -> lead/reviewer task "Re-check memo 2026-10-12 after client change" +1 run(s)
+  +5m18s      run 20261024T035626710610 ok, ran 39s, queued 284ms, 4 call(s) [write×2 org_read×1 report×1]
+  +5m51s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-12 after client change"
+  +5m53s    run 20261024T035701173141 ok, ran 32s, queued 1.7s, 3 call(s) [org_read×1 report×1 write×1]
+  +6m19s    lead -> root result (done) "Rework memo for 2026-10-12: drop 'probably' from Sam's row" +2 run(s)
+  +6m20s  root progress ok
+  +6m56s  root -> lead note "feedback on "Rework memo for 2026-10-12: drop 'probably' fr…"
+  +6m56s  root feedback ok
+tasks: 20261024T035108035115-root-bfa8 "Memo for the 2026-10-12 team…" done 5 run(s) | 20261024T035511749327-root-367d "Rework memo for 2026-10-12: d…" done 5 run(s)
+totals: wall 6m20s | runs 10 (budget given 17, returned 7) | run time 5m45s | queue 2m08s | waiting on you 0s | tool calls 47 (0 refused)
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org obs trace 20261024T035511749327-root-367d
+trace 20261024T035108035115-root-bfa8 "Memo for the 2026-10-12 team meeting" -> lead: done
+     +0s  root -> lead task "Memo for the 2026-10-12 team meeting" +12 run(s)
+     +0s  root request ok
+     +2s    run 20261024T035110143468 ok, ran 36s, queued 2m00s, 4 call(s) [delegate×1 org_read×1 revise_playbook×1 write×1], shared with 1 other request(s)
+    +30s    lead -> lead/writer task "Write memo for 2026-10-12 meeting" +3 run(s)
+    +32s      run 20261024T035140370724 ok, ran 37s, queued 1.9s, 4 call(s) [write×2 org_read×1 report×1]
+  +1m01s      lead/writer -> lead result (blocked) "Write memo for 2026-10-12 meeting"
+  +1m02s    run 20261024T035210772782 ok, ran 30s, queued 1.1s, 2 call(s) [delegate×1 write×1]
+  +1m24s    lead -> lead/reviewer task "Review memo for 2026-10-12 meeting" +2 run(s)
+  +1m25s      run 20261024T035233082127 ok, ran 50s, queued 118ms, 4 call(s) [write×2 org_read×1 report×1]
+  +2m07s      lead/reviewer -> lead result (done) "Review memo for 2026-10-12 meeting" +1 run(s)
+  +2m09s    run 20261024T035317429006 ok, ran 30s, queued 1.8s, 5 call(s) [org_read×3 report×1 write×1]
+  +2m32s    lead -> root result (done) "Memo for the 2026-10-12 team meeting" +5 run(s)
+  +4m03s  root -> lead task "Rework memo for 2026-10-12: drop 'probably' from Sam's row" +5 run(s)
+  +4m03s  root request ok
+  +4m03s    run 20261024T035511966313 ok, ran 38s, queued 235ms, 11 call(s) [org_read×8 delegate×1 whoami×1 write×1]
+  +4m36s    lead -> lead/writer task "Memo 2026-10-12: drop 'probably' from Sam's row" +1 run(s)
+  +4m36s      run 20261024T035544180459 ok, ran 28s, queued 108ms, 4 call(s) [write×2 org_read×1 report×1]
+  +4m59s      lead/writer -> lead result (done) "Memo 2026-10-12: drop 'probably' from Sam's row" +2 run(s)
+  +5m00s    run 20261024T035608433258 ok, ran 24s, queued 871ms, 2 call(s) [delegate×1 write×1]
+  +5m18s    lead -> lead/reviewer task "Re-check memo 2026-10-12 after client change" +1 run(s)
+  +5m18s      run 20261024T035626710610 ok, ran 39s, queued 284ms, 4 call(s) [write×2 org_read×1 report×1]
+  +5m51s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-12 after client change"
+  +5m53s    run 20261024T035701173141 ok, ran 32s, queued 1.7s, 3 call(s) [org_read×1 report×1 write×1]
+  +6m19s    lead -> root result (done) "Rework memo for 2026-10-12: drop 'probably' from Sam's row" +2 run(s)
+  +6m20s  root progress ok
+  +6m56s  root -> lead note "feedback on "Rework memo for 2026-10-12: drop 'probably' fr…"
+  +6m56s  root feedback ok
+tasks: 20261024T035108035115-root-bfa8 "Memo for the 2026-10-12 team…" done 5 run(s) | 20261024T035511749327-root-367d "Rework memo for 2026-10-12: d…" done 5 run(s)
+totals: wall 6m20s | runs 10 (budget given 17, returned 7) | run time 5m45s | queue 2m08s | waiting on you 0s | tool calls 47 (0 refused)
+note: 20261024T035511749327-root-367d belongs to the request 20261024T035108035115-root-bfa8; showing that
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org obs trace 20261024T035805031447-root-a539
+trace 20261024T035108035115-root-bfa8 "Memo for the 2026-10-12 team meeting" -> lead: done
+     +0s  root -> lead task "Memo for the 2026-10-12 team meeting" +12 run(s)
+     +0s  root request ok
+     +2s    run 20261024T035110143468 ok, ran 36s, queued 2m00s, 4 call(s) [delegate×1 org_read×1 revise_playbook×1 write×1], shared with 1 other request(s)
+    +30s    lead -> lead/writer task "Write memo for 2026-10-12 meeting" +3 run(s)
+    +32s      run 20261024T035140370724 ok, ran 37s, queued 1.9s, 4 call(s) [write×2 org_read×1 report×1]
+  +1m01s      lead/writer -> lead result (blocked) "Write memo for 2026-10-12 meeting"
+  +1m02s    run 20261024T035210772782 ok, ran 30s, queued 1.1s, 2 call(s) [delegate×1 write×1]
+  +1m24s    lead -> lead/reviewer task "Review memo for 2026-10-12 meeting" +2 run(s)
+  +1m25s      run 20261024T035233082127 ok, ran 50s, queued 118ms, 4 call(s) [write×2 org_read×1 report×1]
+  +2m07s      lead/reviewer -> lead result (done) "Review memo for 2026-10-12 meeting" +1 run(s)
+  +2m09s    run 20261024T035317429006 ok, ran 30s, queued 1.8s, 5 call(s) [org_read×3 report×1 write×1]
+  +2m32s    lead -> root result (done) "Memo for the 2026-10-12 team meeting" +5 run(s)
+  +4m03s  root -> lead task "Rework memo for 2026-10-12: drop 'probably' from Sam's row" +5 run(s)
+  +4m03s  root request ok
+  +4m03s    run 20261024T035511966313 ok, ran 38s, queued 235ms, 11 call(s) [org_read×8 delegate×1 whoami×1 write×1]
+  +4m36s    lead -> lead/writer task "Memo 2026-10-12: drop 'probably' from Sam's row" +1 run(s)
+  +4m36s      run 20261024T035544180459 ok, ran 28s, queued 108ms, 4 call(s) [write×2 org_read×1 report×1]
+  +4m59s      lead/writer -> lead result (done) "Memo 2026-10-12: drop 'probably' from Sam's row" +2 run(s)
+  +5m00s    run 20261024T035608433258 ok, ran 24s, queued 871ms, 2 call(s) [delegate×1 write×1]
+  +5m18s    lead -> lead/reviewer task "Re-check memo 2026-10-12 after client change" +1 run(s)
+  +5m18s      run 20261024T035626710610 ok, ran 39s, queued 284ms, 4 call(s) [write×2 org_read×1 report×1]
+  +5m51s      lead/reviewer -> lead result (done) "Re-check memo 2026-10-12 after client change"
+  +5m53s    run 20261024T035701173141 ok, ran 32s, queued 1.7s, 3 call(s) [org_read×1 report×1 write×1]
+  +6m19s    lead -> root result (done) "Rework memo for 2026-10-12: drop 'probably' from Sam's row" +2 run(s)
+  +6m20s  root progress ok
+  +6m56s  root -> lead note "feedback on "Rework memo for 2026-10-12: drop 'probably' fr…"
+  +6m56s  root feedback ok
+tasks: 20261024T035108035115-root-bfa8 "Memo for the 2026-10-12 team…" done 5 run(s) | 20261024T035511749327-root-367d "Rework memo for 2026-10-12: d…" done 5 run(s)
+totals: wall 6m20s | runs 10 (budget given 17, returned 7) | run time 5m45s | queue 2m08s | waiting on you 0s | tool calls 47 (0 refused)
+note: 20261024T035805031447-root-a539 belongs to the request 20261024T035108035115-root-bfa8; showing that
+
+######## hirearchy --root /tmp/hirearchy-e5-s2-1792812864/org obs trace 20261024T035805054975-root-e9ee
+trace 20261024T035805054975-root-e9ee "Memo for the 2026-10-19 team meeting" -> lead: done
+     +0s  root -> lead task "Memo for the 2026-10-19 team meeting" +12 run(s)
+     +0s  root request ok
+     +0s    run 20261024T035805267650 ok, ran 30s, queued 267ms, 2 call(s) [delegate×1 write×1], shared with 1 other request(s)
+    +23s    lead -> lead/writer task "Memo for 2026-10-19 meeting" +3 run(s)
+    +24s      run 20261024T035829460187 ok, ran 38s, queued 1.1s, 5 call(s) [write×3 org_read×1 report×1]
+    +56s      lead/writer -> lead result (done) "Memo for 2026-10-19 meeting" +2 run(s)
+    +56s    run 20261024T035901763080 ok, ran 30s, queued 237ms, 2 call(s) [delegate×1 write×1]
+  +1m18s    lead -> lead/reviewer task "Review memo 2026-10-19" +2 run(s)
+  +1m18s      run 20261024T035924008284 ok, ran 51s, queued 470ms, 4 call(s) [write×2 org_read×1 report×1]
+  +2m03s      lead/reviewer -> lead result (done) "Review memo 2026-10-19" +1 run(s)
+  +2m05s    run 20261024T040010577014 ok, ran 34s, queued 1.9s, 3 call(s) [org_read×1 report×1 write×1]
+  +2m28s    lead -> root result (done) "Memo for the 2026-10-19 team meeting" +7 run(s)
+  +2m30s  root progress ok
+totals: wall 2m29s | runs 5 (budget given 12, returned 7) | run time 3m04s | queue 4.0s | waiting on you 0s | tool calls 18 (0 refused)
+

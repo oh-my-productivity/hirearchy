@@ -1,0 +1,16 @@
+The rule is now in the contract as check 8. I also need to tell you about an unplanned rework.
+
+**Unplanned rework.** The team ran a third request that I did not send and you did not ask for, "Rework memo 2026-10-05: unclear due dates". I don't know where it came from. It used 5 runs and changed the team's copy of the memo in two ways:
+- It set Sam's and Marta's Due cells back to `none`, which undoes your answers.
+- It added an "Open questions" section, which the contract doesn't ask for.
+
+The copy in `deliverables/memo-2026-10-05.md` is not affected. I made that copy before the stray change, and it still has your dates, 2026-10-09 and 2026-10-14. I logged a rejection against that third request, as my own reading and not your verdict.
+
+**Budget.** For this memo the case is now at 19 runs used of 23 handed down, against the 12 you approved per request. Part of that overage is the stray request.
+
+**Applying the rule.** To bring the 5 Oct memo in line with the new rule, I'd ask the team to do three things:
+- Start from the version you judged, the delivered one with your dates.
+- Add the `Summary:` line above the Decisions section.
+- Change nothing else.
+
+I estimate 5 more runs, which would bring the case to about 24 used. Do you approve those 5 runs? I'll not start the rework until you say yes.

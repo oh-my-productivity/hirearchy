@@ -1,0 +1,17 @@
+# P=/tmp/hirearchy-e5-preflight-1792810596 epoch=1792810596 2026-10-24T02:56:36Z
+$ hirearchy init P/org --mission "E5 harness preflight (throwaway)" --model claude-sonnet-5.5
+org: /private/tmp/hirearchy-e5-preflight-1792810596/org
+initialized organization at /private/tmp/hirearchy-e5-preflight-1792810596/org
+edit /private/tmp/hirearchy-e5-preflight-1792810596/org/ORG.md to set the mission and limits
+exit 0
+$ grep -n "effort\|model" P/org/ORG.md
+15:default_model: claude-sonnet-5.5
+16:effort: high
+$ hirearchy --root P/org hire root lead ...
+org: /private/tmp/hirearchy-e5-preflight-1792810596/org
+hired lead
+exit 0
+$ hirearchy --root P/org task lead ...
+org: /private/tmp/hirearchy-e5-preflight-1792810596/org
+task 20261024T025636794645-root-0325 -> lead (budget 2)
+exit 0

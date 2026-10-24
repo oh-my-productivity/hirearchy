@@ -1,0 +1,11 @@
+######## TURN 4  start 05:13:47  end 05:15:21  elapsed 94s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T04:13:47Z end 2026-10-24T04:15:21Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's should be 2026-10-09. Marta's should be 2026-10-14. The next meeting isn't a decision, drop it. Keep it as it is. Lee's ping is an action item, so the table is enough.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+The rework needs 2 more runs than I gave it, and that takes this memo over your 12-run budget, so I need your OK.
+
+- **Where it stands:** the writer is applying your corrections now. The lead has 1 run left. It still needs a run for the reviewer to re-check the changed memo and a run to read that result and report.
+- **Cost:** the memo has used 11 runs so far. With the 2 extra runs it would end at 13 or 14 of the 12 you approved. No spare runs are sitting idle that I could reuse.
+- **My recommendation:** grant the 2 runs. Without them the re-check can't happen, and the memo would come back unreviewed.
+
+Reply "grant 2" and I'll continue. If you'd rather not, I'll stop and give you the corrected memo as the writer leaves it, without the independent re-check.

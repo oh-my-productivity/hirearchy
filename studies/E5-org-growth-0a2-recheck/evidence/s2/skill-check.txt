@@ -1,0 +1,9 @@
+# s2 skill check (protocol 4.4)
+/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md: 125 lines md5 b7187d6ef749505893e9aef99276ef7c
+/tmp/hirearchy-e5-s2-1792812864/.kiro/skills/hirearchy/SKILL.md: md5 b7187d6ef749505893e9aef99276ef7c, 125 lines
+/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md: md5 b7187d6ef749505893e9aef99276ef7c, 125 lines (read-only check)
+required: b7187d6ef749505893e9aef99276ef7c
+first disclose_context(hirearchy): call #1, turn 1, 2026-10-24T03:35:02.526Z; disclosed uri file:///private/tmp/hirearchy-e5-s2-1792812864/.kiro/skills/hirearchy/SKILL.md (the workspace copy); result completed (not an error); md5 of the SKILL.md at that path: b7187d6ef749505893e9aef99276ef7c -> valid.
+skill-activation stratum (4.4.1): A. First hirearchy::propose_org call #8 (turn 2, 2026-10-24T03:36:52.950Z) and first hirearchy::feedback call #30 (turn 6, 2026-10-24T03:49:10.534Z); activation at 2026-10-24T03:35:02.526Z (turn 1).
+'Note: the installed skill at' occurrences in the whole transcript: 0 (assistant-tool-calls.txt: 0)
+stale-skill case: not exercised (would require changing the global skill, which is forbidden).

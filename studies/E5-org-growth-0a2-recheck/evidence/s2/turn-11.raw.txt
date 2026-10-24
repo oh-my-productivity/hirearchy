@@ -1,0 +1,14 @@
+The rework is running: one change to Sam's row and nothing else. Use so far is 5 runs, and I expect about 10 of the 12 when it finishes. I'll wait.The 12 Oct memo is at `/tmp/hirearchy-e5-s2-1792812864/deliverables/memo-2026-10-12.md`.
+
+- **Only the 12 Oct note file:** met.
+- **At most 400 words:** met (190 by `wc`; the team counted 160).
+- **Decisions section and Owner | Action | Due table:** met.
+- **All 3 decisions, none added:** met.
+- **All 5 commitments in the table:** met. Sam's row is marked "tentative" and no longer contains "probably" (0 matches).
+- **ISO dates or `none`:** met. The dates are 2026-10-14, 2026-10-16, 2026-10-20 and 2026-10-21, and Lee is `none`.
+- **Reviewer all criteria met, changes applied:** met.
+- **Starts with the one-line `Summary:`, then Decisions, then the action table:** met.
+
+Both memos are now in `deliverables/`, but the 5 Oct one still has no `Summary:` line. You said you'd fix that yourself.
+
+This request used 10 of the 12 runs. Do you want to keep the 12 Oct memo, or change something?

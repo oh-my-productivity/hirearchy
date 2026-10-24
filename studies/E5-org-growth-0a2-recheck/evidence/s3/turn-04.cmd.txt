@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e5-s3-assistant Sam\''s should be 2026-10-09. Marta'\''s should be 2026-10-14. The next meeting isn'\''t a decision, drop it. Keep it as it is. Lee'\''s ping is an action item, so the table is enough.'

@@ -1,0 +1,8 @@
+$ dry-run
+title md5 849fe21b104be883af9b3c06367d4445 ok; note len 866 md5 4cdbcb9b682f2f25dcb31c83d3743fec ok
+exit 0
+$ selftest
+[10/24/26 03:56:41] INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+tools: apply_org, blueprint_example, create_org, define_service, delegate, feedback, health, hire, inbox, observe, progress, propose_org, read, reclaim, report, request, retire, send, services, start, status, stop, whoami, write
+exit 0

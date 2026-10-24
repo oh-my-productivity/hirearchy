@@ -1,0 +1,1 @@
+deleted 2026-10-24T04:01:52Z name hirearchy-study-e5-s2-assistant path /Users/aminalizadeh/.kiro/agents/hirearchy-study-e5-s2-assistant.json md5 eb0f2a7cf21b2e1f1e6256126821865f; copy kept at s2/profiles/hirearchy-study-e5-s2-assistant.json (cmp identical before deletion; ORG_ROOT inside the sandbox)

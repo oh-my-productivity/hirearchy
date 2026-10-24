@@ -1,0 +1,17 @@
+######## TURN 11  start 04:25:19  end 04:28:16  elapsed 177s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T03:25:19Z end 2026-10-24T03:28:16Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, nothing for Marta to do there, leave it out. Yes, that counts. Lee's should be 2026-10-30. Sam's none is right.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-11.stderr.txt):
+The memo is at `/tmp/hirearchy-e5-s1-1792811051/deliverables/memo-2026-10-19.md`. I checked that the file matches the team's final version.
+
+- Built only from 2026-10-19.md: met.
+- At most 400 words: met (130 by the reviewer's count).
+- Decisions lists every decision: met (3).
+- Action table has columns Owner | Action | Due: met.
+- Table lists every commitment, including informal ones: met (5 rows). Marta's "keep the agenda" row is removed and Sam's pairing is kept, as you said.
+- Due is an ISO date or `none`: met. Lee is 2026-10-30 and Sam is `none`.
+- Reviewer shows every criterion met: met (7 of 7). The reviewer's report doesn't list C8 as a separate line, so I checked it myself: the memo starts with the one-line Summary, then Decisions, then the action table.
+
+Runs used: 10 of the 12 approved per request, across the first pass and the rework.
+
+Do you want to keep this memo, or change something?

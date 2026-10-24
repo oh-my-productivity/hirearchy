@@ -1,0 +1,36 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-24T04:18:31.904Z] call #39 turn 6 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-e5-s3-1792814736/deliverables && cp /tmp/hirearchy-e5-s3-1792814736/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e5-s3-1792814736/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-e5-s3-1792814736/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e5-s3-1792814736/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e5-s3-1792814736/deliverables/memo-2026-10-05.md && ls -l /tmp/hirearchy-e5-s3-1792814736/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 79e86be 2026-10-24T05:16:59+01:00', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 79e86be 2026-10-24T05:16:59+01:00']
+result: Output:
+     170 /tmp/hirearchy-e5-s3-1792814736/deliverables/memo-2026-10-05.md
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  901 Oct 24 05:18 memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-24T04:33:46.819Z] call #65 turn 11 execute_bash
+COMMAND: cd /tmp/hirearchy-e5-s3-1792814736 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo IDENTICAL && ls -l deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 042f1f4 2026-10-24T05:32:05+01:00', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 042f1f4 2026-10-24T05:32:05+01:00']
+result: Output:
+IDENTICAL
+total 16
+-rw-r--r--@ 1 aminalizadeh  wheel  901 Oct 24 05:18 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  974 Oct 24 05:33 memo-2026-10-12.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 901 mtime 05:18:31 local md5 0e54cf01763effec9cdffd0dc78fb8da
+  memo-2026-10-12.md size 974 mtime 05:33:46 local md5 2a13fe9a4e82800e2f35a9fd1399191f
+
+final ls -la:
+total 16
+drwxr-xr-x@ 4 aminalizadeh  wheel  128 Oct 24 05:33 .
+drwxr-xr-x@ 7 aminalizadeh  wheel  224 Oct 24 05:19 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  901 Oct 24 05:18 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  974 Oct 24 05:33 memo-2026-10-12.md
+

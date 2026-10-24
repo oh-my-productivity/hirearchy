@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e5-s2-assistant 'No more spend, please deliver as is. I don'\''t know anything about that rework - I didn'\''t ask for it.'

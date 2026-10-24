@@ -1,0 +1,7 @@
+memo-1 task identification (protocol 5.3)
+date_utc: 2026-10-24T03:13:13Z
+root tasks when memo 1 was first delivered (turn 4 copy, deliverables/memo-2026-10-05.md, md5 9b0c922458c56a01709a32ed01b48857):
+  20261024T030644000395-root-f07a (first request, source: -)  -> result lead-bb5a (done, 03:09:05Z)
+  20261024T031013210098-root-aae2 (human rework 'Memo for meeting 2026-10-05 (rework)', revises f07a, source: human) -> result lead-5cbe (done, 03:12:27Z)
+The delivered file's md5 equals lead/writer/work/memo-2026-10-05.md, the artifact named in result lead-5cbe (reply_to aae2); the copy call was after 5cbe (deliverables mtime 04:12:35 local = 03:12:35Z). So the version delivered at memo 1's first delivery is the done result of aae2 -> revises target = 20261024T031013210098-root-aae2 (as in E4 s3).
+lead/writer/work/memo-2026-10-05.md md5: 9b0c922458c56a01709a32ed01b48857

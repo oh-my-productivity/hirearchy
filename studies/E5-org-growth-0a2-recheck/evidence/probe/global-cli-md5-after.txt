@@ -1,0 +1,2 @@
+MD5 (/Users/aminalizadeh/.kiro/settings/cli.json) = 05c63a68e44a5d7f907e7e505eba8927
+MD5 (/Users/aminalizadeh/.kiro/settings/cli.json.lock) = 9070b152a85eb85fd8d103b52c33325d

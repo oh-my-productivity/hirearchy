@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e5-s1-assistant Lee\''s swap is an action item, so the table is enough. No need for '\'probably\''. Sam'\''s 2026-10-21 is right. Keep it as it is.'

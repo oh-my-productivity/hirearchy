@@ -1,0 +1,18 @@
+The corrected memo is written, but its independent re-check didn't happen, so I haven't copied it to `deliverables/` yet. The case has used 13 runs against your 12.
+
+**What went wrong:** the writer's run was killed partway through by a scheduler restart, after it had edited the file but before it reported. That left an open task holding one of the lead's reserved runs. The lead then couldn't pay for the reviewer's re-check, and the 2 extra runs you approved went on the lead's own runs. Nothing more can run until you decide.
+
+**The memo as it stands:** I read it against your notes myself. It is 140 words, and all your corrections are in:
+- Sam's due date is 2026-10-09, with "before Friday" kept in the Action column.
+- Marta's due date is 2026-10-14.
+- The "Next meeting" decision is gone.
+- The first decision's reason is unchanged.
+- Lee's ping appears only as an action row.
+
+The other rows match the notes, and I found nothing missing or contradicted. The one unmet check is the contract's last criterion: no reviewer has signed off on the corrected file.
+
+**Your options:**
+1. **Accept the memo as it is.** This costs nothing more and leaves the reviewer check unmet. I recommend it, since the edits are three small changes that I could verify directly.
+2. **Fund the re-check.** I'd add 2 more runs, so the case would end at about 15 runs against your 12. It's an independent confirmation of the same edits.
+
+Which one? Once you answer, I'll copy the memo into `/tmp/hirearchy-e5-s3-1792814736/deliverables`, or fund the re-check first.

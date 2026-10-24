@@ -1,0 +1,37 @@
+The plan is below. It fits your 12-run cap, but that leaves almost no slack. One pass plus a review and rework cycle is estimated at 11 runs. If the first check fails twice, I'll come back to you before spending more.
+
+PLAN FOR YOU
+Goal: Each week, turn the notes of one platform team weekly meeting into a short memo that says what the team decided and who does what, so the team lead can send it out.
+What I understood you need:
+- Scope: One memo per request, from the one notes file the requester names: the decisions made in that meeting and the action items (every commitment someone made, labelled ACTION or said in passing). Nothing from other meetings and no recap of the discussion.
+- Your files (read-only): /tmp/hirearchy-e5-s3-1792814736/notes
+- Quality bar: Every decision and every commitment in the notes file is in the memo, and nothing is in the memo that the notes do not say.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 (high effort) for every agent
+Team (3 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-e5-s3-1792814736/notes and the organization's own files; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-e5-s3-1792814736/notes and the organization's own files; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-e5-s3-1792814736/notes and the organization's own files; cannot change your files
+Budget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 11. Unspent runs come back to you.
+  lead starts with 12, hands down writer 3, reviewer 2 and keeps 7 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One short memo with the decisions and the action items of one weekly meeting, from its notes file.
+  You provide: notes_file (required)
+  Each request: up to 12 runs
+  Checks:
+    1. The memo is based only on the named notes file and covers only that meeting.
+    2. At most 400 words as counted by read.
+    3. The memo is markdown with a Decisions section (a list) and an Action items section (a table with exactly the columns Owner | Action | Due), and no other section.
+    4. Every decision made in the meeting is listed, including logistics decisions and decisions to keep things as they are.
+    5. Every commitment in the notes is a row in the table with its owner, including informal ones where someone said they would do something, not only items labelled ACTION.
+    ... and 3 more (see the details)
+  Delivered to: /tmp/hirearchy-e5-s3-1792814736/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+First request, started on approval: weekly-meeting-memo (notes_file: 2026-10-05.md).
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (1):
+- 12 runs per request leaves almost no slack over the estimate of 11; expect a stall on the first surprise
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.

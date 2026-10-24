@@ -1,0 +1,15 @@
+# deletions 2026-10-24T03:01:19Z (each guarded by an exact-path/prefix check; evidence copied first)
+deleted /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-e5-preflight-1-cfccbe52ec29dae5
+deleted /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e5-preflight-1-cfccbe52ec29dae5
+deleted /tmp/hirearchy-e5-preflight-1792810596
+state dir existed before the preflight (E4 leftovers kiro-cwd/hirearchy-e4-*), so it and kiro-home/kiro-cwd are kept
+--- after:
+/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd:
+hirearchy-e4-s1r-1792693-bfcddd47e6ecb16c
+hirearchy-e4-s2-17926988-212f59b7daf49c3f
+hirearchy-e4-s2r-1792702-b0c5db682e7e6ab7
+hirearchy-e4-s3-17927050-8f0c59d32ad49337
+
+/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home:
+/tmp/hirearchy-e5-probe-1792810812
+no process

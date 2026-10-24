@@ -1,0 +1,19 @@
+## date: 2026-10-24T02:54:26Z (local 2026-10-24T03:54:26+0100)
+$ md5 -q protocol.md; cat protocol.md5
+afd437c103407ec5899e4993b465cf25
+afd437c103407ec5899e4993b465cf25
+protocol: MATCH
+$ ls protocol-amendment-*.md (any amendment?)
+zsh:5: no matches found: protocol-amendment-*
+$ cd harness; while read h f; do [ "$(md5 -q "$f")" = "$h" ] || echo "MISMATCH $f"; done < MD5SUMS
+lines checked: 16; (nothing above = all match)
+$ md5 -q ~/.kiro/skills/hirearchy/SKILL.md; md5 -q repo skill
+b7187d6ef749505893e9aef99276ef7c
+b7187d6ef749505893e9aef99276ef7c
+$ git show 6618c0d:skills/hirearchy/SKILL.md | md5 -q
+b7187d6ef749505893e9aef99276ef7c
+$ md5 notes + answer key
+903e3bbf5f35df2c17444f3313c12395
+3893bd637c87760b43be4894b47fdb53
+9976a7653a6346b0976c3c38b1c697dd
+2fb69bbef857c2bd4862cd5dd8be9da8

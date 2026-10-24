@@ -1,0 +1,56 @@
+=== final  snapshot 2026-10-24T04:01:10Z (local 05:01:10)
+injection window (UTC, from window.txt): 2026-10-24T03:45:59 .. 2026-10-24T03:48:31
+org runs total: 34  (injection-window runs: 5; counted toward the 45 cap: 29)
+  lead                           claude-sonnet-5.5    20
+  lead/reviewer                  claude-sonnet-5.5    7
+  lead/writer                    claude-sonnet-5.5    7
+  run 20261024T033734372585 agent=lead model=claude-sonnet-5.5 exit=0 secs=22
+  run 20261024T033752512885 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=34
+  run 20261024T033822892573 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261024T033847228333 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=54
+  run 20261024T033935681443 agent=lead model=claude-sonnet-5.5 exit=0 secs=34
+  run 20261024T034001950062 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261024T034026183003 agent=lead model=claude-sonnet-5.5 exit=0 secs=34
+  run 20261024T034054444673 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=36
+  run 20261024T034124781991 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261024T034309988730 agent=lead model=claude-sonnet-5.5 exit=0 secs=40
+  run 20261024T034342218842 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=26
+  run 20261024T034404421885 agent=lead model=claude-sonnet-5.5 exit=0 secs=24
+  run 20261024T034422590108 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261024T034450864796 agent=lead model=claude-sonnet-5.5 exit=0 secs=26
+  run 20261024T034559945086 agent=lead model=claude-sonnet-5.5 exit=0 secs=38 [INJECTION WINDOW]
+  run 20261024T034632186884 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=28 [INJECTION WINDOW]
+  run 20261024T034656435460 agent=lead model=claude-sonnet-5.5 exit=0 secs=26 [INJECTION WINDOW]
+  run 20261024T034716654792 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=52 [INJECTION WINDOW]
+  run 20261024T034803009555 agent=lead model=claude-sonnet-5.5 exit=0 secs=28 [INJECTION WINDOW]
+  run 20261024T035110143468 agent=lead model=claude-sonnet-5.5 exit=0 secs=36
+  run 20261024T035140370724 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=37
+  run 20261024T035210772782 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261024T035233082127 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=50
+  run 20261024T035317429006 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261024T035511966313 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261024T035544180459 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261024T035608433258 agent=lead model=claude-sonnet-5.5 exit=0 secs=24
+  run 20261024T035626710610 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=39
+  run 20261024T035701173141 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261024T035805267650 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261024T035829460187 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261024T035901763080 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261024T035924008284 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=51
+  run 20261024T040010577014 agent=lead model=claude-sonnet-5.5 exit=0 secs=34
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 04:45:21 size 978 md5 e988abb443ca3d4ee60114243c68ce77
+  deliverables/memo-2026-10-12.md mtime 04:57:34 size 1030 md5 084c623cad30fa3c9bd4f85645f7de02
+processes referencing the sandbox name (0):
+
+
+runs per user-turn window (UTC turn_start .. next turn_start / end):
+  during/after turn 3 start: 9 runs, lead-reviewer=claude-sonnet-5.5, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 5 start: 10 runs, lead-reviewer=claude-sonnet-5.5, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 9 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 11 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 12 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5

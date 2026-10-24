@@ -1,0 +1,26 @@
+233,235c233,235
+< o.append("PLAYBOOK versions (org git history of lead/services/weekly-memo/PLAYBOOK.md and history/):")
+< o.append(git("log", "--reverse", "--format=%h %cI %s", "--", "lead/services/weekly-memo/PLAYBOOK.md", "lead/services/weekly-memo/history").strip())
+< hist = sorted(glob.glob(str(ORG / "lead/services/weekly-memo/history/*")))
+---
+> o.append("PLAYBOOK versions (org git history of lead/services/weekly-meeting-memo/PLAYBOOK.md and history/):")
+> o.append(git("log", "--reverse", "--format=%h %cI %s", "--", "lead/services/weekly-meeting-memo/PLAYBOOK.md", "lead/services/weekly-meeting-memo/history").strip())
+> hist = sorted(glob.glob(str(ORG / "lead/services/weekly-meeting-memo/history/*")))
+242c242
+< for h in glob.glob(str(ORG / "lead/services/weekly-memo/history/SERVICE.v*.md")):
+---
+> for h in glob.glob(str(ORG / "lead/services/weekly-meeting-memo/history/SERVICE.v*.md")):
+244,245c244,245
+< shutil.copy2(ORG / "lead/services/weekly-memo/SERVICE.md", D / "service" / "current-SERVICE.md")
+< shutil.copy2(ORG / "lead/services/weekly-memo/PLAYBOOK.md", D / "playbook" / "current-PLAYBOOK.md")
+---
+> shutil.copy2(ORG / "lead/services/weekly-meeting-memo/SERVICE.md", D / "service" / "current-SERVICE.md")
+> shutil.copy2(ORG / "lead/services/weekly-meeting-memo/PLAYBOOK.md", D / "playbook" / "current-PLAYBOOK.md")
+387c387
+< for f in sorted(glob.glob(str(D / "msgs" / "*checker*" / "*.md"))):
+---
+> for f in sorted(glob.glob(str(D / "msgs" / "*reviewer*" / "*.md"))):
+391c391
+<         (D / "regression-list" / f"checker-task-{Path(f).name}").write_text(body[i - 2:i + 3000])
+---
+>         (D / "regression-list" / f"reviewer-task-{Path(f).name}").write_text(body[i - 2:i + 3000])

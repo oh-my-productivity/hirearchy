@@ -1,0 +1,10 @@
+I can't make those two changes myself. The team has to rework the memo, and that costs more than I told you.
+
+I said a rework would take about 3 runs. Two delegations (writer, then reviewer re-check) plus the lead's own runs come to about 5. The first memo has used 9 of its 12 runs, so a rework would bring it to about 14 of 12. That is 2 runs over the budget you approved. I'm sorry for the earlier figure.
+
+Do you approve up to 5 more runs for this rework? If yes, I'll send the lead these changes:
+- Sam's Due becomes 2026-10-09.
+- Marta's Due becomes 2026-10-14.
+- Lee's ping stays as a table row only, with no change.
+
+If you'd rather not spend the extra runs, I can stop here and leave the memo undelivered. I won't edit it myself.

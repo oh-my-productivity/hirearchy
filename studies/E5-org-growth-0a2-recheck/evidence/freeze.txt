@@ -1,0 +1,19 @@
+E5 protocol freeze (pre-registration step 1 of workflow wf_a0d2c6f21a51f12c)
+freeze_utc: 2026-10-24T02:52:52Z
+protocol.md md5 (md5 -q): afd437c103407ec5899e4993b465cf25
+protocol.md bytes: 135928  lines: 1527
+== git -C /Volumes/workspace/hirearchy rev-parse HEAD
+6618c0d80401233675366684fc86dc566657e8db
+== git -C /Volumes/workspace/hirearchy rev-parse --short HEAD
+6618c0d
+== git -C /Volumes/workspace/hirearchy diff --stat 6618c0d HEAD -- src skills pyproject.toml uv.lock (empty below means no product change)
+== (end of diff output)
+== git -C /Volumes/workspace/hirearchy status --porcelain
+?? docs/research/
+?? studies/E5-org-growth-0a2-recheck/
+== harness/MD5SUMS md5: 5d22bf230cefe21f3477cb1f6dc1aaa6
+== injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd
+== state at freeze: no E5 sandbox (/tmp/hirearchy-e5-*), no E5 profile (~/.kiro/agents/hirearchy-study-e5-*), no stream folder (evidence/s*)
+(no /tmp/hirearchy-e5-* dir)
+(no hirearchy-study-e5-* profile)
+(no evidence/s* folder)
