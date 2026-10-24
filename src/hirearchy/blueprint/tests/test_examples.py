@@ -13,6 +13,9 @@ from testkit.blueprint_world import server_of_the_environment
 
 from testkit.blueprint_world import bpm, services_mod
 
+from hirearchy.blueprint._budgeting import BudgetPlanner
+from hirearchy.blueprint._example_texts import SERVICE_BUDGETS
+
 ROOT_DIR = testkit.REPO
 
 
@@ -49,6 +52,17 @@ def test_service_templates_validate_once_filled(kind, tmp_path):
     assert "task" not in bp and len(bp["services"]) == 1 and "deliverable" not in bp["needs"]
     out = bpm.propose_text(bp, allowed_roots=[tmp_path])
     assert bpm.PLAN_HEADING in out and "Nothing runs until you ask for a request" in out and re.search(r"^plan_id: [0-9a-f]{12}$", out, re.M)
+
+
+@pytest.mark.parametrize("kind", ex.KINDS)
+def test_the_service_template_budgets_follow_the_planners_rule(kind, tmp_path):
+    """D-E5-2: each template carries the number the planner gives a service without a budget, so the templates cannot drift from the rule."""
+    bp = filled_service(kind, tmp_path)
+    agents = bpm._resolve(bp, None, [tmp_path], [])
+    planner = BudgetPlanner()
+    expected = planner.service_budget({}, planner.estimate(agents)["total"], bp["needs"]["budget_runs"], round_runs=planner.client_round(agents))
+    assert SERVICE_BUDGETS[kind] == expected
+    assert bp["services"][0]["budget"] == expected
 
 
 @pytest.mark.parametrize("kind", ex.KINDS)
@@ -157,7 +171,7 @@ def test_propose_and_apply_a_services_only_blueprint_through_the_tools(root_serv
     assert pid == bpm.plan_id(bpm.load_text(text))
     call(server, "create_org", mission="services")
     with pytest.raises(Exception, match="plan_id does not match"):
-        call(server, "apply_org", blueprint=text.replace("budget: 22", "budget: 21"), approved=True, plan_id=pid)
+        call(server, "apply_org", blueprint=text.replace("budget: 24", "budget: 23"), approved=True, plan_id=pid)
     reply = call(server, "apply_org", blueprint=text, approved=True, plan_id=pid)
     assert "defined 1 service(s) of lead: my-service" in reply and "Nothing runs yet" in reply
     assert "request(service, inputs)" in reply and "Next step: call start()" not in reply
@@ -218,6 +232,7 @@ def test_readme_lists_every_msg_deliver_key_in_pipeline_order():
 
 
 def test_the_shipped_service_example_validates_plans_and_applies(tmp_path):
+    """The service example asks for 24 runs per request: the 0a.3 rule (D-E5-2) of one client round on the estimate, as the research template."""
     (tmp_path / "deliverables").mkdir()
     text = EXAMPLE.read_text().replace("~/deliverables/weekly-briefs", str(tmp_path / "deliverables" / "weekly-briefs"))
     bp = bpm.load_text(text)
@@ -230,7 +245,7 @@ def test_the_shipped_service_example_validates_plans_and_applies(tmp_path):
     assert "First request, started on approval: weekly-brief (topic: solid-state batteries)." in block
     org = Org.init(tmp_path / "org", "x", {"poll_seconds": 0.05})
     s = bpm.apply(org, bp, allowed_roots=[tmp_path])
-    assert s.services == ["weekly-brief"] and s.budget == 22 and s.service_request == "weekly-brief"
+    assert s.services == ["weekly-brief"] and s.budget == 24 and s.service_request == "weekly-brief"
     task = org.find_received("lead", s.task_id)
     assert task.service == "weekly-brief" and task.playbook == 1 and "- topic: solid-state batteries" in task.body
     assert services_mod.read_playbook(org, "lead", "weekly-brief").body.startswith("## Steps")

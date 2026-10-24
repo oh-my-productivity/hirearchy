@@ -92,7 +92,7 @@ class ServiceBlueprintRules(ServiceRules):
             if b is not None and (not isinstance(b, int) or isinstance(b, bool) or b < 1):
                 issues.append(Issue("error", f"{where}.budget", "budget is the number of runs handed down with each request: a whole number >= 1", "service"))
             elif agents:
-                total = self._budgets.service_budget(sv, est_total, cap)
+                total = self._budgets.service_budget(sv, est_total, cap, round_runs=self._budgets.client_round(agents))
                 if cap is not None and total > cap:
                     issues.append(Issue("error", f"{where}.budget", f"planned budget {total} runs per request is above the user's cap of {cap} (the cap is for ONE request); lower the service's budget or shrink the team", "budget-cap"))
                 if total < est_total:

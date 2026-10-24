@@ -33,6 +33,7 @@ class BudgetPlanner(BudgetPlanning):
         ``total`` is the sum over all agents of pass + rework: the minimum budget for a pipeline with one review and one rework cycle
         (``budget_split`` hands each worker its pass and its rework/re-check run together).
         The planned budget is ``ceil(total * 1.25)`` unless the task names one; below ``total * 1.1`` is flagged as having no slack.
+        A service's planned budget also covers one client round (see ``service_budget``).
         """
         per: dict[str, AgentRuns] = {}
         for a in agents:
@@ -80,16 +81,22 @@ class BudgetPlanner(BudgetPlanning):
                 fill(a.addr, total)
         return out
 
-    def service_budget(self, sv: Mapping[str, object], est_total: int, cap: int | None) -> int:
-        """Runs handed down with each request of service ``sv``: its own ``budget``, else the estimate plus slack within the cap."""
+    def client_round(self, agents: Sequence[Agent]) -> int:
+        """The runs one round of the client's questions or a rejection takes: 1 for the owner, plus 2 for each agent below it (0 for no agents)."""
+        return 1 + 2 * sum(1 for a in agents if a.parent is not None) if agents else 0
+
+    def service_budget(self, sv: Mapping[str, object], est_total: int, cap: int | None, *, round_runs: int) -> int:
+        """Runs handed down with each request of service ``sv``: its own ``budget``, else the larger of the estimate plus slack and the
+        estimate plus one client round (``round_runs``), within the cap."""
         b = sv.get("budget")
         if isinstance(b, int) and not isinstance(b, bool):
             return b
-        plan = math.ceil(est_total * SLACK)
+        plan = max(math.ceil(est_total * SLACK), est_total + round_runs)
         return min(plan, cap) if cap is not None else plan
 
     def service_budgets(self, bp: Mapping[str, object], agents: Sequence[Agent]) -> dict[str, int]:
         """The runs per request of every service of the blueprint, by name."""
         est = self.estimate(agents)["total"] if agents else 0
         cap = cap_of(needs_of(bp))
-        return {s(x.get("name")): self.service_budget(x, est, cap) for x in services_of(bp)}
+        round_runs = self.client_round(agents)
+        return {s(x.get("name")): self.service_budget(x, est, cap, round_runs=round_runs) for x in services_of(bp)}

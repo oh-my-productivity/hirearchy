@@ -163,8 +163,8 @@ class World:
     def budget_split(self, agents, total):
         return {addr: dict(split) for addr, split in BudgetPlanner().budget_split(agents, total).items()}
 
-    def service_budget(self, s, est_total, cap):
-        return BudgetPlanner().service_budget(s, est_total, cap)
+    def service_budget(self, s, est_total, cap, round_runs=0):
+        return BudgetPlanner().service_budget(s, est_total, cap, round_runs=round_runs)
 
     # ------------------------------------------------------------------ what an agent may reach
     def org_files_readable(self, a):

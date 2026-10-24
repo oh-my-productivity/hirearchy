@@ -14,14 +14,14 @@ Team (4 agents):
   - analyst (Data Analyst, model claude-sonnet-5.5): can read files only in <CWD>/analysis-work and the organization's own files; can run commands, which are NOT confined: it is told to stay in <CWD>/analysis-work, but nothing enforces that
   - checker (Independent Data Checker, model claude-sonnet-5.5): can read files only in <CWD>/analysis-work and the organization's own files; can run commands, which are NOT confined: it is told to stay in <CWD>/analysis-work, but nothing enforces that
   - writer (Writer, model claude-sonnet-5.5): can read files only in <CWD>/analysis-work and the organization's own files; cannot change your files
-Budget: up to 23 runs per request (one run = one working session of one agent), your cap per request is 25; the minimum for one review and rework is 18. Unspent runs come back to you.
-  lead starts with 23, hands down analyst 5, checker 3, writer 3 and keeps 12 for planning, checking and rework.
+Budget: up to 25 runs per request (one run = one working session of one agent), your cap per request is 25; the minimum for one review and rework is 18. Unspent runs come back to you.
+  lead starts with 25, hands down analyst 5, checker 3, writer 3 and keeps 14 for planning, checking and rework.
 If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
 Checking: checker reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
 Services (kept ready, requested whenever you want):
 - <service-name>: <One line saying what one request delivers>
   You provide: (see the errors)
-  Each request: up to 23 runs
+  Each request: up to 25 runs
   Checks:
     1. Uses only the data files in the data folder, and the checker confirmed they are unchanged (same checksums before and after).
     2. One script in the workspace regenerates every figure in the report; running it twice from a clean state gives identical output.
@@ -70,8 +70,8 @@ Organization (4 agents):
 
 Budget per request (your cap: 25), estimate 18 for one pass + one review/rework cycle:
   A ceiling: runs the team does not spend come back automatically with the final report of each request.
-  service <service-name>: 23 runs per request
-    lead: starts with 23, hands down analyst 5, checker 3, writer 3 (each includes its rework/re-check run), keeps 12 (own 7 + slack 5)
+  service <service-name>: 25 runs per request
+    lead: starts with 25, hands down analyst 5, checker 3, writer 3 (each includes its rework/re-check run), keeps 14 (own 7 + slack 7)
     lead/analyst: 5 runs (4 work + 1 rework)
     lead/checker: 3 runs (2 work + 1 rework)
     lead/writer: 3 runs (2 work + 1 rework)
@@ -86,7 +86,7 @@ Deliverable:
 Services (1), offered by lead and defined by root (the contract: only root can change it):
 - <service-name>: <One line saying what one request delivers>
   inputs: (see the errors)
-  budget: 23 runs per request
+  budget: 25 runs per request
   deliverable: <What one request produces, e.g. a report on the question of the request> [markdown, max 1000 words]; delivered to: <CWD>/deliverables/<name> (I copy each result there after checking it)
   acceptance (the contract, travels with every request):
     1. Uses only the data files in the data folder, and the checker confirmed they are unchanged (same checksums before and after).
@@ -106,11 +106,11 @@ Services (1), offered by lead and defined by root (the contract: only root can c
     7. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to <CWD>/deliverables/<name>) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).
     
     ## Budget plan
-    Request budget: 23 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
+    Request budget: 25 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
     - analyst: 5 runs (4 work + 1 rework or re-check)
     - checker: 3 runs (2 work + 1 rework or re-check)
     - writer: 3 runs (2 work + 1 rework or re-check)
-    - you (lead): keep 12 runs: your own 7 (plan, process each result, final check, report, one rework cycle) and 5 of slack.
+    - you (lead): keep 14 runs: your own 7 (plan, process each result, final check, report, one rework cycle) and 7 of slack.
     Unspent runs return to your parent with your final report.
     
     ## Pitfalls

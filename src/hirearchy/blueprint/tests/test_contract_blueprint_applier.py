@@ -82,7 +82,7 @@ def test_services_are_defined_for_the_top_agent_with_their_contract_and_playbook
     summary = h.applier.apply(bp_of("research-service/filled", h), allowed_roots=[base])
     assert h.log.names() == ["hire"] * 4 + ["define_service", "commit"]
     (define,) = h.log.of("define_service")
-    assert define.args == ("root", "lead", "my-service") and define.kwargs["budget"] == 22 and define.kwargs["locked"] is False
+    assert define.args == ("root", "lead", "my-service") and define.kwargs["budget"] == 24 and define.kwargs["locked"] is False  # the template: the estimate plus one client round
     assert define.kwargs["inputs"] == [{"name": "topic", "description": "Sample text", "required": True}]
     assert isinstance(define.kwargs["acceptance"], list) and define.kwargs["acceptance"] and define.kwargs["deliverable"]["format"] == "markdown"  # type: ignore[index]
     assert scrub(str(define.kwargs["playbook"]), base) == golden()["playbooks"]["research-service/my-service"]

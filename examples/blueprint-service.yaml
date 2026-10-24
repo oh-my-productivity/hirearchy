@@ -10,7 +10,7 @@ needs:
   scope: "One topic per request; news and developments of the past week only; sources are public web pages."
   quality_bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations.
   sources: Web access to news sites, official sites and documentation; a source URL per claim.
-  budget_runs: 25   # the user's cap for ONE request; the service below asks for 22
+  budget_runs: 25   # the user's cap for ONE request; the service below asks for 24
   models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}   # same model for both tiers: the floor is claude-sonnet-5.5, nothing below it is available
   model_policy: one model for all (claude-sonnet-5.5 at high effort for every agent; nothing below it is available)
   review: true   # independent fact-check by someone who did not write the brief
@@ -43,7 +43,7 @@ services:
       format: markdown
       max_words: 600
       path: ~/deliverables/weekly-briefs   # a folder; the assistant copies each checked brief into it
-    budget: 22                         # runs per request; leave it out for the estimate + 25%
+    budget: 24                         # runs per request; leave it out for the plan's number (the estimate + 25%, or + one client round when more)
     locked: false                      # true: the lead may not revise the playbook
     # playbook: |                      # optional first workflow; left out, one is generated from the team
 task:                                  # optional: a first request, started on approval

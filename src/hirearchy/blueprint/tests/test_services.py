@@ -237,7 +237,7 @@ def test_code_service_needs_tests_in_its_criteria(tmp_path, roots):
 
 def test_the_budget_cap_is_per_request(svc_bp, roots, plain_bp):
     no_budget = mutate(svc_bp, lambda b: b["services"][0].pop("budget"))
-    assert not bpm.errors(issues(no_budget, roots))  # default: the estimate + 25% (22), within the cap of 25
+    assert not bpm.errors(issues(no_budget, roots))  # default: the estimate plus one client round (24), within the cap of 25
     assert bpm.service_budget(no_budget["services"][0], 17, 25) == 22 and bpm.service_budget({}, 17, 20) == 20
     assert bpm.service_budget({"budget": 7}, 17, 20) == 7 and bpm.service_budget({}, 17, None) == 22
     low_cap = mutate(svc_bp, lambda b: (b["services"][0].pop("budget"), b["needs"].update(budget_runs=15)))
@@ -485,7 +485,7 @@ def test_apply_two_services_and_the_default_budget(svc_bp, roots, empty_org):
     bp = mutate(svc_bp, lambda b: (b["services"][0].pop("budget"), b["services"].append(service(name="daily-digest", budget=19))))
     s = bpm.apply(empty_org, bp, allowed_roots=roots)
     assert s.services == ["weekly-brief", "daily-digest"]
-    assert services_mod.read_contract(empty_org, "lead", "weekly-brief").budget == 22  # estimate 17 + 25%
+    assert services_mod.read_contract(empty_org, "lead", "weekly-brief").budget == 24  # the estimate plus one client round
     digest = services_mod.read_playbook(empty_org, "lead", "daily-digest").body
     assert "Request budget: 19 runs" in digest and "you (lead): keep 9 runs" in digest
 

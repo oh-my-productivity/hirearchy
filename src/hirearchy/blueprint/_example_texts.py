@@ -242,7 +242,7 @@ services:                          # work the lead offers again and again; each 
 """
 
 SERVICE_TAIL = """\
-    budget: {budget}                     # runs handed down with each request; within needs.budget_runs (the cap for ONE request); leave out for the estimate + 25%
+    budget: {budget}                     # runs handed down with each request; within needs.budget_runs (the cap for ONE request); leave out for the plan's number (the estimate + 25%, or + one round of client questions when more)
     locked: false                  # true: the lead may not improve the playbook (default false: it may, but never lower the checks above)
     # playbook: |                  # optional first workflow (steps, budget plan, pitfalls); leave out and one is generated from the team
 # task:                            # OPTIONAL first request, started on approval. Leave it out to build the team now and request later
@@ -303,4 +303,4 @@ SERVICE_BODIES = {
       path: {base}/deliverables/<name>   # a FOLDER: the assistant copies each checked result into it
 """,
 }
-SERVICE_BUDGETS = {"research": 22, "documents": 19, "code": 23, "analysis": 23}
+SERVICE_BUDGETS = {"research": 24, "documents": 22, "code": 25, "analysis": 25}

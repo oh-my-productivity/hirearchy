@@ -91,8 +91,13 @@ class BudgetPlanning(Protocol):
         """addr -> what the parent hands down at first, and what the agent keeps for itself."""
         ...
 
-    def service_budget(self, sv: Mapping[str, object], est_total: int, cap: int | None) -> int:
-        """The runs handed down with each request of a service: its own ``budget``, else the estimate plus slack within the cap."""
+    def client_round(self, agents: Sequence[Agent]) -> int:
+        """The runs one round of the client's questions or a rejection takes: 1 for the owner plus 2 for each agent below it (0 for no agents)."""
+        ...
+
+    def service_budget(self, sv: Mapping[str, object], est_total: int, cap: int | None, *, round_runs: int) -> int:
+        """The runs handed down with each request of a service: its own ``budget``, else the larger of the estimate plus slack and the
+        estimate plus one client round (``round_runs``), within the cap."""
         ...
 
     def service_budgets(self, bp: Mapping[str, object], agents: Sequence[Agent]) -> dict[str, int]:

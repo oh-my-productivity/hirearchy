@@ -14,14 +14,14 @@ Team (4 agents):
   - reader (Reader of the user's files, model claude-sonnet-5.5): can read no files outside the organization; cannot change your files
   - writer (Writer, model claude-sonnet-5.5): cannot change your files
   - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read no files outside the organization; cannot change your files
-Budget: up to 19 runs per request (one run = one working session of one agent), your cap per request is 25; the minimum for one review and rework is 15. Unspent runs come back to you.
-  lead starts with 19, hands down reader 3, writer 3, reviewer 2 and keeps 11 for planning, checking and rework.
+Budget: up to 22 runs per request (one run = one working session of one agent), your cap per request is 25; the minimum for one review and rework is 15. Unspent runs come back to you.
+  lead starts with 22, hands down reader 3, writer 3, reviewer 2 and keeps 14 for planning, checking and rework.
 If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
 Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
 Services (kept ready, requested whenever you want):
 - <service-name>: <One line saying what one request delivers>
   You provide: (see the errors)
-  Each request: up to 19 runs
+  Each request: up to 22 runs
   Checks:
     1. Covers <the topic of the request> and nothing else.
     2. At most 1500 words as counted by read.
@@ -68,8 +68,8 @@ Organization (4 agents):
 
 Budget per request (your cap: 25), estimate 15 for one pass + one review/rework cycle:
   A ceiling: runs the team does not spend come back automatically with the final report of each request.
-  service <service-name>: 19 runs per request
-    lead: starts with 19, hands down reader 3, writer 3, reviewer 2 (each includes its rework/re-check run), keeps 11 (own 7 + slack 4)
+  service <service-name>: 22 runs per request
+    lead: starts with 22, hands down reader 3, writer 3, reviewer 2 (each includes its rework/re-check run), keeps 14 (own 7 + slack 7)
     lead/reader: 3 runs (2 work + 1 rework)
     lead/writer: 3 runs (2 work + 1 rework)
     lead/reviewer: 2 runs (1 work + 1 rework)
@@ -84,7 +84,7 @@ Deliverable:
 Services (1), offered by lead and defined by root (the contract: only root can change it):
 - <service-name>: <One line saying what one request delivers>
   inputs: (see the errors)
-  budget: 19 runs per request
+  budget: 22 runs per request
   deliverable: <What one request produces, e.g. one markdown section for the topic> [markdown, max 1500 words]; delivered to: <CWD>/deliverables/<name> (I copy each result there after checking it)
   acceptance (the contract, travels with every request):
     1. Covers <the topic of the request> and nothing else.
@@ -102,11 +102,11 @@ Services (1), offered by lead and defined by root (the contract: only root can c
     7. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to <CWD>/deliverables/<name>) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).
     
     ## Budget plan
-    Request budget: 19 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
+    Request budget: 22 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
     - reader: 3 runs (2 work + 1 rework or re-check)
     - writer: 3 runs (2 work + 1 rework or re-check)
     - reviewer: 2 runs (1 work + 1 rework or re-check)
-    - you (lead): keep 11 runs: your own 7 (plan, process each result, final check, report, one rework cycle) and 4 of slack.
+    - you (lead): keep 14 runs: your own 7 (plan, process each result, final check, report, one rework cycle) and 7 of slack.
     Unspent runs return to your parent with your final report.
     
     ## Pitfalls

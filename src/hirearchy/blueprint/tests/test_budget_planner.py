@@ -70,12 +70,33 @@ def test_a_deeper_tree_hands_down_the_subtree_of_a_child() -> None:
 
 def test_a_service_costs_its_own_budget_else_the_estimate_plus_slack_within_the_cap() -> None:
     planner = BudgetPlanner()
-    assert planner.service_budget({"budget": 7}, 17, 20) == 7
-    assert planner.service_budget({}, 17, 25) == 22 and planner.service_budget({}, 17, 20) == 20 and planner.service_budget({}, 17, None) == 22
-    assert planner.service_budget({"budget": True}, 17, 20) == 20  # a bool is no number of runs
+    assert planner.service_budget({"budget": 7}, 17, 20, round_runs=0) == 7
+    assert planner.service_budget({}, 17, 25, round_runs=0) == 22 and planner.service_budget({}, 17, 20, round_runs=0) == 20
+    assert planner.service_budget({}, 17, None, round_runs=0) == 22
+    assert planner.service_budget({"budget": True}, 17, 20, round_runs=0) == 20  # a bool is no number of runs
+
+
+def test_the_client_round_is_one_run_plus_two_for_each_agent_below_the_owner() -> None:
+    planner = BudgetPlanner()
+    assert planner.client_round(TEAM) == 7  # lead, researcher, writer, check: 1 + 2 * 3
+    assert planner.client_round([agent("lead", "manager", ("lead/w", "lead/r")), agent("lead/w", "author"), agent("lead/r", "verifier")]) == 5
+    assert planner.client_round([agent("a", "manager", ("a/b",)), agent("a/b", "manager", ("a/b/c",)), agent("a/b/c", "author")]) == 5  # nested agents count
+    assert planner.client_round([agent("solo", "manager")]) == 1  # an owner alone
+    assert planner.client_round([]) == 0
+
+
+def test_a_service_budget_covers_one_client_round_when_that_is_more_than_the_slack() -> None:
+    """D-E5-2: the larger of the estimate plus 25% and the estimate plus one client round, within the cap."""
+    planner = BudgetPlanner()
+    assert planner.service_budget({}, 17, 25, round_runs=7) == 24  # 17 + 7 beats ceil(17 * 1.25) = 22
+    assert planner.service_budget({}, 17, 20, round_runs=7) == 20  # the cap wins
+    assert planner.service_budget({}, 11, 12, round_runs=5) == 12
+    assert planner.service_budget({}, 11, None, round_runs=5) == 16
+    assert planner.service_budget({}, 40, None, round_runs=7) == 50  # the slack is larger
+    assert planner.service_budget({"budget": 7}, 17, 25, round_runs=7) == 7  # an explicit budget is kept
 
 
 def test_every_service_of_the_blueprint_has_its_budget_by_name() -> None:
     bp = {"needs": {"budget_runs": 25}, "services": [{"name": "a", "budget": 9}, {"name": "b"}, "junk"]}
-    assert BudgetPlanner().service_budgets(bp, TEAM) == {"a": 9, "b": 22}  # b: ceil(17 * 1.25), under the cap of 25
+    assert BudgetPlanner().service_budgets(bp, TEAM) == {"a": 9, "b": 24}  # b: the estimate plus one client round, under the cap of 25
     assert BudgetPlanner().service_budgets(bp, []) == {"a": 9, "b": 0}

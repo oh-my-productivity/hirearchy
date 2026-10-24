@@ -1,7 +1,7 @@
 ##### summary
 created 4 agents: lead, lead/researcher, lead/writer, lead/factcheck
 defined 1 service(s) of lead: weekly-brief (contract and playbook v1)
-first request: service weekly-brief, task 20260115T090100000000-root-0000 -> lead (budget 22)
+first request: service weekly-brief, task 20260115T090100000000-root-0000 -> lead (budget 24)
 warning: services[weekly-brief].deliverable.path: no agent can write to <HOME>/deliverables/weekly-briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)
 warning: services[weekly-brief].deliverable.path: <HOME>/deliverables does not exist; the copy step will create it
 
@@ -228,7 +228,7 @@ type: task
 title: Weekly brief - solid-state batteries
 created: '2026-01-15T09:01:00+00:00'
 hops: 0
-budget: 22
+budget: 24
 service: weekly-brief
 contract: 1
 playbook: 1
@@ -277,7 +277,7 @@ deliverable:
   format: markdown
   max_words: 600
   path: <HOME>/deliverables/weekly-briefs
-budget: 22
+budget: 24
 locked: false
 version: 1
 defined_by: root
@@ -304,11 +304,11 @@ reason: initial playbook
 7. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to ~/deliverables/weekly-briefs) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).
 
 ## Budget plan
-Request budget: 22 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
+Request budget: 24 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
 - researcher: 4 runs (3 work + 1 rework or re-check)
 - writer: 3 runs (2 work + 1 rework or re-check)
 - factcheck: 3 runs (2 work + 1 rework or re-check)
-- you (lead): keep 12 runs: your own 7 (plan, process each result, final check, report, one rework cycle) and 5 of slack.
+- you (lead): keep 14 runs: your own 7 (plan, process each result, final check, report, one rework cycle) and 7 of slack.
 Unspent runs return to your parent with your final report.
 
 ## Pitfalls
