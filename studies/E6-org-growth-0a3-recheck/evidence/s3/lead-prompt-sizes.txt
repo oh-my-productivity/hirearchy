@@ -1,0 +1,21 @@
+# lead prompt sizes (protocol 7.2): bytes between '# ---- prompt ----' and '# ---- output ----'
+
+lead@20261024T171012998633     bytes=20486 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T171115450136     bytes=23907 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T171236209901     bytes=25104 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T171439357825     bytes=23719 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T171531639509     bytes=25737 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T171636204113     bytes=26357 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T171716483127     bytes=20382 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T171910062928     bytes=25170 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T172040462401     bytes=25365 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T172152957007     bytes=25474 reflect_section=no reflect_words=0 regression_list=no
+lead@20261024T172552387860     bytes=31541 reflect_section=yes reflect_words=574 regression_list=yes
+lead@20261024T172656983519     bytes=30030 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T172809563668     bytes=28589 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T173003063834     bytes=25749 reflect_section=yes reflect_words=549 regression_list=yes
+lead@20261024T173105446166     bytes=25330 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T173228014254     bytes=26599 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T173452535391     bytes=26200 reflect_section=yes reflect_words=628 regression_list=yes
+lead@20261024T173559121045     bytes=26172 reflect_section=no reflect_words=0 regression_list=yes
+lead@20261024T173719700863     bytes=26472 reflect_section=no reflect_words=0 regression_list=yes

@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e6-s3-assistant 'No, not right yet. Always start the memo with a one-line '\'Summary:\'' of the meeting, then the decisions, then the action items.'

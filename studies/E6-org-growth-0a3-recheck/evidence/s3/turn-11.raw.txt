@@ -1,0 +1,14 @@
+The 12 Oct memo is at `/tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-12.md`. I checked that it matches the team's file.
+
+- **Meeting only:** met.
+- **Length:** met. It's 277 words by `wc` against the 400 limit.
+- **Decisions:** met, with 3 firm decisions. Lee's swap stays out, as you ruled.
+- **Action items table:** met. The columns are Owner | Action | Due, with 5 rows including the informal ones.
+- **Due values:** met. All are ISO dates, except Lee's pager swap, which is none.
+- **Traceable to the notes:** met.
+- **Reviewer report:** met. It shows 8 of 8 on the final check.
+- **Summary line first:** met.
+
+I treated your "keep it" on the "Open, not decided" section as applying to this memo only. I did not add it as a standing rule, so the team may ask again next week. Tell me if you want it made permanent.
+
+Runs: this memo used 5 of the 16 runs, and the rest came back automatically.

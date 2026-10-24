@@ -1,0 +1,8 @@
+387c387
+< for f in sorted(glob.glob(str(D / "msgs" / "*checker*" / "*.md"))):
+---
+> for f in sorted(glob.glob(str(D / "msgs" / "*reviewer*" / "*.md"))):
+391c391
+<         (D / "regression-list" / f"checker-task-{Path(f).name}").write_text(body[i - 2:i + 3000])
+---
+>         (D / "regression-list" / f"reviewer-task-{Path(f).name}").write_text(body[i - 2:i + 3000])

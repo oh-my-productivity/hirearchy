@@ -1,0 +1,14 @@
+== stop 15:26:56
+scheduler stopped (pid 86761)
+stop exit 0
+== ps after stop
+(scheduler gone)
+(run gone)
+== events
+2026-10-24T15:26:24.121505+00:00 scheduler scheduler.start {}
+2026-10-24T15:26:24.132161+00:00 scheduler run.start {'child_pid': 86774, 'pgid': 86774}
+2026-10-24T15:26:24.140044+00:00 scheduler scheduler.heartbeat {}
+2026-10-24T15:26:24.143641+00:00 mcp tool.call {'ok': True, 'tool': 'start'}
+2026-10-24T15:26:58.356494+00:00 scheduler run.end {'ok': False, 'killed': True}
+2026-10-24T15:26:58.357203+00:00 scheduler scheduler.exit {'reason': 'stopped by SIGTERM'}
+

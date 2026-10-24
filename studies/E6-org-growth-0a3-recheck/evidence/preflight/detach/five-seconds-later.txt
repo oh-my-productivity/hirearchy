@@ -1,0 +1,51 @@
+== ps 5 s+ after the return, 15:26:45
+86761     1 86761 Ss  
+86774 86761 86774 Ss  
+== event files
+total 40
+drwxr-xr-x@ 7 aminalizadeh  wheel  224 Oct 24 16:26 .
+drwxr-xr-x@ 3 aminalizadeh  wheel   96 Oct 24 16:25 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  210 Oct 24 16:25 cli-86576-1792855545179.jsonl
+-rw-r--r--@ 1 aminalizadeh  wheel  428 Oct 24 16:25 cli-86583-1792855545308.jsonl
+-rw-r--r--@ 1 aminalizadeh  wheel  667 Oct 24 16:25 cli-86588-1792855545476.jsonl
+-rw-r--r--@ 1 aminalizadeh  wheel  234 Oct 24 16:26 mcp-86758-1792855584143.jsonl
+-rw-r--r--@ 1 aminalizadeh  wheel  835 Oct 24 16:26 scheduler-86761-1792855584121.jsonl
+mcp event file: mcp-86758-1792855584143.jsonl
+mcp pid 86758
+== ps mcp pid
+(MCP server gone)
+== events (kind per file)
+2026-10-24T15:25:45.179494+00:00 cli cli.command {'ok': True}
+2026-10-24T15:25:45.308110+00:00 cli agent.hire {}
+2026-10-24T15:25:45.353486+00:00 cli cli.command {'ok': True}
+2026-10-24T15:25:45.476245+00:00 cli msg.deliver {}
+2026-10-24T15:25:45.520278+00:00 cli cli.command {'ok': True}
+2026-10-24T15:26:24.121505+00:00 scheduler scheduler.start {}
+2026-10-24T15:26:24.132161+00:00 scheduler run.start {'child_pid': 86774, 'pgid': 86774}
+2026-10-24T15:26:24.140044+00:00 scheduler scheduler.heartbeat {}
+2026-10-24T15:26:24.143641+00:00 mcp tool.call {'ok': True, 'tool': 'start'}
+== scheduler.exit / run.end present now?
+none (no scheduler.exit, no run.end)
+== files newer than marker in kiro-home
+/tmp/hirearchy-e6-detach-1792855531/kiro-home/settings/cli.json
+/tmp/hirearchy-e6-detach-1792855531/kiro-home/agents/e6-detach-1792855531.json
+/tmp/hirearchy-e6-detach-1792855531/kiro-home/enterprise-management/0e1ae1cbb4a69f6a9215ad8c2eac0017172ffc69e3b872ec4e3d061032827767/entry.json
+/tmp/hirearchy-e6-detach-1792855531/kiro-home/sessions/4d20a325e69231d1/.index/.lock
+/tmp/hirearchy-e6-detach-1792855531/kiro-home/sessions/4d20a325e69231d1/sess_904a6f25-6314-4111-888d-1ca5ca03429b/messages.jsonl
+/tmp/hirearchy-e6-detach-1792855531/kiro-home/sessions/4d20a325e69231d1/sess_904a6f25-6314-4111-888d-1ca5ca03429b/session.json
+/tmp/hirearchy-e6-detach-1792855531/kiro-home/logs/20261024T152617267/mcp.log
+/tmp/hirearchy-e6-detach-1792855531/kiro-home/logs/20261024T152617267/kiro.log
+/tmp/hirearchy-e6-detach-1792855531/kiro-home/logs/20261024T152617267/powers.log
+/tmp/hirearchy-e6-detach-1792855531/kiro-home/session-index/4d20a325e69231d1.jsonl
+== stdout of call
+scheduler started (pid 86761; it exits by itself when the work is done); log: /private/tmp/hirearchy-e6-detach-1792855531/org/.runtime/scheduler.log
+== stderr
+[INFO] kas.server.starting {"product":"KAS (Kiro Agent Server)","version":"0.66.48"}
+[INFO] Auth: KIRO_API_KEY env var (api_key) {"regionDiscovery":true}
+[INFO] acp.content_collection.resolved {"enabled":true}
+[INFO] acp.remote_sessions.enabled {"endpoint":"https://app.kiro.dev"}
+[INFO] agent.userConfigDir.resolved {"name":"kiro-home","source":"env"}
+[INFO] [KiroAgent] MCP subsystem initialized
+[ERROR] (node:86681) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[INFO] fs.workflow.recipe

@@ -1,0 +1,594 @@
+## model check listed s1 at 2026-10-24T15:31:11Z (set: claude-sonnet-5.5 at effort high)
+kiro-cli chat --list-models: exit 0
+  Available models (* = default):
+  
+  * auto                 1.00x credits      Models chosen by task for optimal usage and consistent quality
+    claude-opus-5.5      2.00x credits      Experimental preview of Claude Opus 5.5 model with 1M context window
+    claude-sonnet-5.5    1.30x credits      Claude Sonnet 5.5 model with 1M context window
+    claude-haiku-5.5     0.06x credits      Experimental preview of Claude Haiku 5.5 model with 1M context window
+    gpt-5.6-sol          4.40x credits      Experimental preview of OpenAI GPT 5.6 Sol with 1M context window
+    gpt-5.6-terra        2.20x credits      OpenAI GPT 5.6 Terra with 1M context window
+    gpt-5.6-luna         0.60x credits      OpenAI GPT 5.6 Luna with 1M context window
+    kimi-k3              2.40x credits      Experimental preview of Kimi K3. Kimi K3 is a Kiro Excluded Model. For more info, see documentation.
+    claude-opus-5        2.20x credits      Claude Opus 5 model with 1M context window
+    claude-sonnet-5      1.30x credits      Claude Sonnet 5 model with 1M context window
+    claude-opus-4.8      2.20x credits      Claude Opus 4.8 model with 1M context window
+    claude-opus-4.7      2.20x credits      Claude Opus 4.7 model with 1M context window
+    claude-opus-4.6      2.20x credits      Claude Opus 4.6 model with 1M context window
+    claude-sonnet-4.6    1.30x credits      Claude Sonnet 4.6 model with 1M context window
+    claude-opus-4.5      2.20x credits      Claude Opus 4.5 model
+    claude-sonnet-4.5    1.30x credits      Claude Sonnet 4.5 model
+    claude-haiku-4.5     0.40x credits      The latest Claude Haiku model
+    deepseek-3.2         0.25x credits      Experimental preview of DeepSeek V3.2
+    minimax-m2.5         0.25x credits      MiniMax M2.5 model
+    minimax-m2.1         0.15x credits      Experimental preview of MiniMax M2.1
+    glm-5                0.50x credits      GLM-5 model
+    qwen3-coder-next     0.05x credits      Experimental preview of Qwen3 Coder Next
+listed: claude-sonnet-5.5: yes (claude-sonnet-5.5    1.30x credits      Claude Sonnet 5.5 model with 1M context window)
+RESULT: s1 listed: OK (2026-10-24T15:31:11Z)
+## model check org s1 at 2026-10-24T15:32:57Z (set: claude-sonnet-5.5 at effort high)
+org run logs checked: 0
+NOT CHECKED: no org run log yet
+RESULT: s1 org: INCOMPLETE (nothing to check yet; not a pass) (2026-10-24T15:32:57Z)
+## model check assistant s1 at 2026-10-24T15:32:57Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 4}
+RESULT: s1 assistant: OK (2026-10-24T15:32:57Z)
+## model check org s1 at 2026-10-24T15:34:21Z (set: claude-sonnet-5.5 at effort high)
+org run logs checked: 0
+NOT CHECKED: no org run log yet
+RESULT: s1 org: INCOMPLETE (nothing to check yet; not a pass) (2026-10-24T15:34:21Z)
+## model check assistant s1 at 2026-10-24T15:34:21Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 6}
+RESULT: s1 assistant: OK (2026-10-24T15:34:21Z)
+## model check org s1 at 2026-10-24T15:35:20Z (set: claude-sonnet-5.5 at effort high)
+org run logs checked: 0
+NOT CHECKED: no org run log yet
+RESULT: s1 org: INCOMPLETE (nothing to check yet; not a pass) (2026-10-24T15:35:20Z)
+## model check assistant s1 at 2026-10-24T15:35:20Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 7}
+RESULT: s1 assistant: OK (2026-10-24T15:35:20Z)
+## model check org s1 at 2026-10-24T15:41:56Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 9
+RESULT: s1 org: OK (2026-10-24T15:41:56Z)
+## model check assistant s1 at 2026-10-24T15:41:56Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 11}
+RESULT: s1 assistant: OK (2026-10-24T15:41:56Z)
+## model check org s1 at 2026-10-24T15:45:40Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 14
+RESULT: s1 org: OK (2026-10-24T15:45:40Z)
+## model check assistant s1 at 2026-10-24T15:45:40Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel None (not recorded by the session file)
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 13}
+RESULT: s1 assistant: OK (2026-10-24T15:45:40Z)
+## model check org s1 at 2026-10-24T15:46:40Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 14
+RESULT: s1 org: OK (2026-10-24T15:46:40Z)
+## model check assistant s1 at 2026-10-24T15:46:40Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel None (not recorded by the session file)
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 13}
+RESULT: s1 assistant: OK (2026-10-24T15:46:40Z)
+## model check org s1 at 2026-10-24T15:50:39Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154842007731.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154651492785.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154815853142.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154932239676.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154745702811.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 19
+RESULT: s1 org: OK (2026-10-24T15:50:39Z)
+## model check assistant s1 at 2026-10-24T15:50:39Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel None (not recorded by the session file)
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 13}
+RESULT: s1 assistant: OK (2026-10-24T15:50:39Z)
+## model check org s1 at 2026-10-24T15:50:45Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154842007731.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154651492785.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154815853142.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154932239676.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154745702811.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 19
+RESULT: s1 org: OK (2026-10-24T15:50:45Z)
+## model check assistant s1 at 2026-10-24T15:50:45Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel None (not recorded by the session file)
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 13}
+RESULT: s1 assistant: OK (2026-10-24T15:50:45Z)
+## model check org s1 at 2026-10-24T15:51:47Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154842007731.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154651492785.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154815853142.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154932239676.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154745702811.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 19
+RESULT: s1 org: OK (2026-10-24T15:51:47Z)
+## model check assistant s1 at 2026-10-24T15:51:47Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-06.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 16}
+RESULT: s1 assistant: OK (2026-10-24T15:51:47Z)
+## model check org s1 at 2026-10-24T15:58:32Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154842007731.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T155537036673.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154651492785.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154815853142.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154932239676.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155334353565.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155506822742.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155705550726.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154745702811.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T155440640572.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 24
+RESULT: s1 org: OK (2026-10-24T15:58:32Z)
+## model check assistant s1 at 2026-10-24T15:58:32Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-06.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-07.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 22}
+RESULT: s1 assistant: OK (2026-10-24T15:58:32Z)
+## model check org s1 at 2026-10-24T15:59:43Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154842007731.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T155537036673.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154651492785.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154815853142.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154932239676.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155334353565.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155506822742.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155705550726.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154745702811.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T155440640572.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 24
+RESULT: s1 org: OK (2026-10-24T15:59:43Z)
+## model check assistant s1 at 2026-10-24T15:59:43Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-06.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-07.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-08.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 23}
+RESULT: s1 assistant: OK (2026-10-24T15:59:43Z)
+## model check org s1 at 2026-10-24T16:04:45Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154842007731.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T155537036673.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T160147072656.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154651492785.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154815853142.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154932239676.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155334353565.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155506822742.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155705550726.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160024452770.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160118863527.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160235341735.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154745702811.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T155440640572.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T160046609039.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 29
+RESULT: s1 org: OK (2026-10-24T16:04:45Z)
+## model check assistant s1 at 2026-10-24T16:04:45Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-06.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-07.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-08.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-09.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 25}
+RESULT: s1 assistant: OK (2026-10-24T16:04:45Z)
+## model check org s1 at 2026-10-24T16:09:46Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154842007731.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T155537036673.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T160147072656.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T160730571089.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154651492785.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154815853142.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154932239676.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155334353565.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155506822742.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155705550726.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160024452770.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160118863527.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160235341735.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160535661898.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160654277947.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160816862206.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154745702811.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T155440640572.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T160046609039.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T160626018122.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 34
+RESULT: s1 org: OK (2026-10-24T16:09:46Z)
+## model check assistant s1 at 2026-10-24T16:09:46Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-06.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-07.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-08.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-09.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-10.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 29}
+RESULT: s1 assistant: OK (2026-10-24T16:09:46Z)
+## model check org s1 at 2026-10-24T16:14:09Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154842007731.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T155537036673.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T160147072656.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T160730571089.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T161204026485.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154651492785.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154815853142.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154932239676.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155334353565.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155506822742.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155705550726.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160024452770.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160118863527.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160235341735.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160535661898.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160654277947.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160816862206.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161027314051.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161133779138.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161304330157.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154745702811.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T155440640572.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T160046609039.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T160626018122.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T161059530446.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 39
+RESULT: s1 org: OK (2026-10-24T16:14:09Z)
+## model check assistant s1 at 2026-10-24T16:14:09Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-06.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-07.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-08.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-09.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-10.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-11.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 31}
+RESULT: s1 assistant: OK (2026-10-24T16:14:09Z)
+## model check org s1 at 2026-10-24T16:21:34Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154842007731.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T155537036673.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T160147072656.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T160730571089.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T161204026485.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T161639166561.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154651492785.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154815853142.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154932239676.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155334353565.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155506822742.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155705550726.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160024452770.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160118863527.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160235341735.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160535661898.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160654277947.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160816862206.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161027314051.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161133779138.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161304330157.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161442556986.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161606966565.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161743624978.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154745702811.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T155440640572.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T160046609039.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T160626018122.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T161059530446.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T161528759297.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 44
+RESULT: s1 org: OK (2026-10-24T16:21:34Z)
+## model check assistant s1 at 2026-10-24T16:21:34Z (set: claude-sonnet-5.5 at effort high)
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-06.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-07.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-08.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-09.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-10.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-11.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-12.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 32}
+RESULT: s1 assistant: OK (2026-10-24T16:21:34Z)
+## model check all s1 at 2026-10-24T16:23:18Z (set: claude-sonnet-5.5 at effort high)
+  lead/reviewer/runs/20261024T153759316975.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154014679888.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154415525507.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T154842007731.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T155537036673.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T160147072656.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T160730571089.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T161204026485.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/reviewer/runs/20261024T161639166561.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153622486115.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153731028636.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153853757244.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T153954462653.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154059063487.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154234595254.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154347243092.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154453827374.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154651492785.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154815853142.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T154932239676.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155334353565.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155506822742.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T155705550726.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160024452770.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160118863527.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160235341735.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160535661898.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160654277947.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T160816862206.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161027314051.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161133779138.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161304330157.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161442556986.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161606966565.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/runs/20261024T161743624978.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153648662585.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T153920116099.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154310923415.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T154745702811.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T155440640572.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T160046609039.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T160626018122.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T161059530446.log: --model ['claude-sonnet-5.5'] --effort ['high']
+  lead/writer/runs/20261024T161528759297.log: --model ['claude-sonnet-5.5'] --effort ['high']
+org run logs checked: 44
+  profile /Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s1-assistant.json: model 'claude-sonnet-5.5'
+  turn-01.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-02.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-03.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-04.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-05.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-06.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-07.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-08.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-09.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-10.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-11.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  turn-12.cmd.txt: --effort ['high'] --model (the profile) --agent ['hirearchy-study-e6-s1-assistant']
+  session sess_733fac56-a2c8-4d12-8ac6-a1583963467c: modelId 'claude-sonnet-5.5' effortLevel 'high'
+  reasoningModelId values in the session messages: {'qdev::claude-sonnet-5.5': 32}
+RESULT: s1 all: OK (2026-10-24T16:23:18Z)

@@ -1,0 +1,9 @@
+The 19 Oct memo is written and reviewed with no rework: 174 words, Summary first, 3 decisions and 6 action items. The reviewer shows 8 of 8 checks met, and I read it against the notes. It's held back because three points are yours to decide.
+
+1. **Marta, "will keep the agenda as sent".** The memo has it as a row with Due none. It's a statement of intent more than a task. Keep the row? My recommendation is to keep it, since your rule was that if someone said they'd do something, it counts.
+2. **Lee, SSO sign-off "probably by end of next week".** The memo says none. Should the Due be a date? The meeting was Monday 19 Oct, so end of next week is **2026-10-30**. My recommendation is 2026-10-30, since the notes make the date clear. The "probably" only hedges it.
+3. **Sam, pairing with Jo "during that first week".** The memo says none. Jo starts 26 Oct, so the week ends **2026-10-30**. My recommendation is none. This is a window, not a deadline.
+
+Your answers can change the table: a "no" on item 1 drops Marta's row and the Summary becomes five action items. A date for Lee or Sam costs one small rework, which fits the 16-run cap. So far this memo has used 5 of the 16 runs.
+
+If you say "keep it as it is", the memo goes over unchanged.

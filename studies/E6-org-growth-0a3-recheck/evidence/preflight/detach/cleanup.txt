@@ -1,0 +1,7 @@
+== processes naming /tmp/hirearchy-e6-detach-1792855531
+none
+== pids learned
+all gone
+removed 2026-10-24T15:27:10Z /tmp/hirearchy-e6-detach-1792855531
+/tmp/hirearchy-e6-probe-1792855143
+sandbox KIRO_HOME only; user's ~/.kiro untouched by this check

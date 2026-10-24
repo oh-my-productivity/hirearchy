@@ -1,0 +1,8 @@
+H1 event, turn 3 attempt 1 (protocol 11, H1) -- recorded 2026-10-24T16:34:17Z
+Call: harness/run_turn.sh /tmp/hirearchy-e6-s2-1792859296 2 3 prompts/t03.txt (H5 line, sent verbatim); start 2026-10-24T16:31:19Z, end 2026-10-24T16:32:53Z, exit code 1.
+stderr (last line): Error: A network error occurred. Please check your connection and try again. (code -32000): {"errorType":"ClientNetworkError","retryErrorType":"TRANSIENT"}
+Session store: usage_summary status=failed, turn_end stopReason=error, 1.4675 credits. Not a usage-limit/quota error (a transient client network error of the assistant's own kiro call).
+State when it aborted (tool effects before the abort, from turn-03.stderr.txt and the org): the assistant called create_org, apply_org and request (task 20261024T163213630553-root-1d33 in lead/inbox, 0 org runs, no scheduler started: no start call, no scheduler.pid) before the error.
+Evidence of the failed attempt: harness-failures/turn-03-attempt1/ (turn-03 files, org state, session copy).
+Handling: one retry of the same line with --resume is allowed (11, H1); it is not a user turn. The retry follows below in this file once done.
+Retry (attempt 2, same line, --resume): turn 3: 17:34:17 - 17:37:53  1792859873-1792859657=216s  utc 2026-10-24T16:34:17Z - 2026-10-24T16:37:53Z  exit 0

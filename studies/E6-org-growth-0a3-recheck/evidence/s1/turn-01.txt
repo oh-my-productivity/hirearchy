@@ -1,0 +1,16 @@
+######## TURN 1  start 16:31:48  end 16:32:22  elapsed 34s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T15:31:48Z end 2026-10-24T15:32:22Z; exit code 0)
+######## LENA (prompt sent verbatim):
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+Yes, I can set this up as a standing weekly service. I read one of your notes files to see its shape. Some commitments are tagged ACTION. Others are only in prose, like "Sam said he'd look into the flaky CI before Friday" or "Lee would ping the vendor, no hard date". A few quick questions first. Reply "defaults" to accept the proposed answers.
+
+1. **Which notes each week:** I'd have you name the meeting file per request, e.g. `2026-10-19.md` in your notes folder. The team reads only that folder and never changes it. Default: yes.
+2. **What counts as a decision or task:** Should informal commitments in prose (like Sam's and Lee's above) count, or only items marked ACTION? Default: count both, with decisions and tasks listed separately.
+3. **Vague deadlines** like "before Friday" or "this week": turn them into a date from the meeting date, or leave the date blank and quote the wording? Default: convert to a date from the meeting date and show the original wording next to it. Where there's no deadline, it says "no date".
+4. **Memo format:** Markdown, at most 400 words. It has a "Decisions" list and a "Who does what" table (person, task, due date). Default: that.
+5. **Where it goes:** A new `deliverables/` folder here, one file per meeting, e.g. `deliverables/memo-2026-10-19.md`. Default: that.
+6. **Review:** A second agent checks every decision and task in the memo against your notes before it reaches you. Default: yes.
+7. **Budget:** I'll propose a per-memo run budget in the plan (estimate plus 25%). All agents use claude-sonnet-5.5 at high effort. I can't offer cheaper models.
+8. **Approval:** You approve the plan once before anything is built. Nothing runs until you ask for a memo. Default: that.
+
+One thing to know: I can't make this run on its own every Monday. You ask me for a memo after each meeting, naming the notes file, and the team does the rest.

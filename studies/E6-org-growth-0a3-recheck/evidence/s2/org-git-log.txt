@@ -1,0 +1,423 @@
+commit c90fe1c64852bcfa59777250b65741d5f9666098
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:59:00 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T165828535346.log]
+
+ lead/MEMORY.md                                     |  6 ++---
+ .../20261024T165826844421-lead.reviewer-6dad.md    |  0
+ lead/sent/20261024T165855100260-lead-5ff1.md       | 28 ++++++++++++++++++++++
+ read/20261024T165855100260-lead-5ff1.md            | 28 ++++++++++++++++++++++
+ 4 files changed, 59 insertions(+), 3 deletions(-)
+
+commit 9630fe985b488e65ef34d4d2c1c581ece32e6011
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:58:34 +0100
+
+    lead/reviewer: run ok, 1 message(s) [lead/reviewer/runs/20261024T165740158167.log]
+
+ .../20261024T165826844421-lead.reviewer-6dad.md    | 20 ++++++++++
+ lead/reviewer/MEMORY.md                            |  2 +-
+ .../20261024T165739822862-lead-79cd.md             |  0
+ .../20261024T165826844421-lead.reviewer-6dad.md    | 20 ++++++++++
+ lead/reviewer/work/review-memo-2026-10-12-r2.md    | 45 ++++++++++++++++++++++
+ 5 files changed, 86 insertions(+), 1 deletion(-)
+
+commit afb602a220bc5813182be0500de87e77bef86f96
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:57:46 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T165720007923.log]
+
+ lead/MEMORY.md                                     |  3 +-
+ .../20261024T165719055987-lead.writer-0bdd.md      |  0
+ .../inflight/20261024T165739822862-lead-79cd.md    | 33 ++++++++++++++++++++++
+ lead/sent/20261024T165739822862-lead-79cd.md       | 33 ++++++++++++++++++++++
+ 4 files changed, 68 insertions(+), 1 deletion(-)
+
+commit d099369e3ce9ba327798affd23c7bdfa3b68eb95
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:57:24 +0100
+
+    lead/writer: run ok, 1 message(s) [lead/writer/runs/20261024T165653849576.log]
+
+ .../20261024T165719055987-lead.writer-0bdd.md       | 21 +++++++++++++++++++++
+ lead/writer/MEMORY.md                               |  2 +-
+ .../20261024T165653034066-lead-f667.md              |  0
+ .../sent/20261024T165719055987-lead.writer-0bdd.md  | 21 +++++++++++++++++++++
+ lead/writer/work/memo-2026-10-12.md                 |  5 ++---
+ 5 files changed, 45 insertions(+), 4 deletions(-)
+
+commit fa7bc2b89943343c8a3e45e739a9c3f2e25f098f
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:57:03 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T165629706344.log]
+
+ .runtime/reviews.json                              |  4 +--
+ lead/MEMORY.md                                     |  5 +--
+ lead/read/20261024T165622122673-root-40f3.md       | 40 ++++++++++++++++++++++
+ lead/sent/20261024T165653034066-lead-f667.md       | 27 +++++++++++++++
+ .../inflight/20261024T165653034066-lead-f667.md    | 27 +++++++++++++++
+ sent/20261024T165622122673-root-40f3.md            | 40 ++++++++++++++++++++++
+ 6 files changed, 139 insertions(+), 4 deletions(-)
+
+commit 8dbca2588d5e3d3ac3038f2b0b50e1b3502e5fbc
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:55:30 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T165453834830.log]
+
+ lead/MEMORY.md                                     |  2 +-
+ .../20261024T165452162021-lead.reviewer-f525.md    |  0
+ lead/sent/20261024T165521289942-lead-2e4f.md       | 29 ++++++++++++++++++++++
+ {inbox => read}/20261024T164827382688-lead-3e7e.md |  0
+ .../20261024T165256765367-runtime-f76f.md          |  0
+ read/20261024T165521289942-lead-2e4f.md            | 29 ++++++++++++++++++++++
+ 6 files changed, 59 insertions(+), 1 deletion(-)
+
+commit f62a39faa7257be24a239a10000ece42c107187d
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:55:01 +0100
+
+    lead/reviewer: run ok, 1 message(s) [lead/reviewer/runs/20261024T165403258693.log]
+
+ .../20261024T165452162021-lead.reviewer-f525.md    | 22 +++++++++++
+ lead/reviewer/MEMORY.md                            |  4 +-
+ .../20261024T165402137646-lead-95e7.md             |  0
+ .../20261024T165452162021-lead.reviewer-f525.md    | 22 +++++++++++
+ lead/reviewer/work/review-memo-2026-10-12.md       | 44 ++++++++++++++++++++++
+ 5 files changed, 91 insertions(+), 1 deletion(-)
+
+commit e68aa733c43ce516e30c5c5591ac5e97fcb0834a
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:54:09 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T165336948324.log]
+
+ lead/MEMORY.md                                     |  4 +--
+ .../20261024T165336707295-lead.writer-2ce5.md      |  0
+ .../inflight/20261024T165402137646-lead-95e7.md    | 33 ++++++++++++++++++++++
+ lead/sent/20261024T165402137646-lead-95e7.md       | 33 ++++++++++++++++++++++
+ 4 files changed, 68 insertions(+), 2 deletions(-)
+
+commit 0d4dbeaa8fe0a4f14e050939b2442014bbef0f73
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:53:45 +0100
+
+    lead/writer: run ok, 1 message(s) [lead/writer/runs/20261024T165306656650.log]
+
+ .../20261024T165336707295-lead.writer-2ce5.md        | 14 ++++++++++++++
+ lead/writer/MEMORY.md                                |  4 +++-
+ .../20261024T165305744776-lead-ff9d.md               |  0
+ .../sent/20261024T165336707295-lead.writer-2ce5.md   | 14 ++++++++++++++
+ lead/writer/work/memo-2026-10-12.md                  | 20 ++++++++++++++++++++
+ 5 files changed, 51 insertions(+), 1 deletion(-)
+
+commit 6345ac712b33e97b495913b06c57a35c6dbc98f3
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:53:12 +0100
+
+    lead: run ok, 6 message(s) [lead/runs/20261024T165228438817.log]
+
+ inbox/20261024T165256765367-runtime-f76f.md        | 16 +++++++++
+ lead/MEMORY.md                                     |  3 +-
+ lead/read/20261024T165003119224-root-7682.md       | 18 ++++++++++
+ lead/read/20261024T165056075236-root-217c.md       | 18 ++++++++++
+ lead/read/20261024T165100357598-root-8211.md       | 17 +++++++++
+ lead/read/20261024T165100358955-runtime-2a97.md    | 27 ++++++++++++++
+ lead/read/20261024T165226015428-root-6271.md       | 17 +++++++++
+ lead/read/20261024T165226023852-root-0aff.md       | 35 ++++++++++++++++++
+ lead/sent/20261024T165305744776-lead-ff9d.md       | 29 +++++++++++++++
+ lead/services/weekly-memo/PLAYBOOK.md              | 15 +++++---
+ lead/services/weekly-memo/SERVICE.md               |  9 +++--
+ lead/services/weekly-memo/history/PLAYBOOK.v1.md   | 24 +++++++++++++
+ lead/services/weekly-memo/history/SERVICE.v1.md    | 41 ++++++++++++++++++++++
+ .../inflight/20261024T165305744776-lead-ff9d.md    | 29 +++++++++++++++
+ sent/20261024T165003119224-root-7682.md            | 18 ++++++++++
+ sent/20261024T165056075236-root-217c.md            | 18 ++++++++++
+ sent/20261024T165100357598-root-8211.md            | 17 +++++++++
+ sent/20261024T165226015428-root-6271.md            | 17 +++++++++
+ sent/20261024T165226023852-root-0aff.md            | 35 ++++++++++++++++++
+ 19 files changed, 396 insertions(+), 7 deletions(-)
+
+commit 8387b00877559063189ff27fb89d8d4ff43d515a
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:48:36 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T164802452772.log]
+
+ inbox/20261024T164827382688-lead-3e7e.md           | 29 ++++++++++++++++++++++
+ lead/MEMORY.md                                     |  2 +-
+ .../20261024T164802372659-lead.reviewer-572a.md    |  0
+ lead/sent/20261024T164827382688-lead-3e7e.md       | 29 ++++++++++++++++++++++
+ 4 files changed, 59 insertions(+), 1 deletion(-)
+
+commit 192d64c2848464759fb9e38f68a0de35a9662f83
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:48:10 +0100
+
+    lead/reviewer: run ok, 1 message(s) [lead/reviewer/runs/20261024T164730175547.log]
+
+ .../20261024T164802372659-lead.reviewer-572a.md    | 20 +++++++++++++
+ lead/reviewer/MEMORY.md                            |  2 +-
+ .../20261024T164729991935-lead-362d.md             |  0
+ .../20261024T164802372659-lead.reviewer-572a.md    | 20 +++++++++++++
+ lead/reviewer/work/rereview3-memo-2026-10-05.md    | 34 ++++++++++++++++++++++
+ 5 files changed, 75 insertions(+), 1 deletion(-)
+
+commit 702163f7a7ff7b69ec9d2772d6fd4e78453e833e
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:47:36 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T164709958832.log]
+
+ lead/MEMORY.md                                     |  2 +-
+ .../20261024T164709600845-lead.writer-a13e.md      |  0
+ .../inflight/20261024T164729991935-lead-362d.md    | 31 ++++++++++++++++++++++
+ lead/sent/20261024T164729991935-lead-362d.md       | 31 ++++++++++++++++++++++
+ 4 files changed, 63 insertions(+), 1 deletion(-)
+
+commit b38c26b2231fc63d2da78844e1daa10e9fd52d39
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:47:14 +0100
+
+    lead/writer: run ok, 1 message(s) [lead/writer/runs/20261024T164641697983.log]
+
+ lead/inflight/20261024T164709600845-lead.writer-a13e.md | 17 +++++++++++++++++
+ lead/writer/MEMORY.md                                   |  2 +-
+ .../20261024T164641426849-lead-e590.md                  |  0
+ .../sent/20261024T164709600845-lead.writer-a13e.md      | 17 +++++++++++++++++
+ lead/writer/work/memo-2026-10-05.md                     |  9 +++++++--
+ 5 files changed, 42 insertions(+), 3 deletions(-)
+
+commit 96eae9a2b878fc6d920a4281ec1deb4724261187
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:46:49 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T164609519605.log]
+
+ lead/MEMORY.md                                     |  2 +-
+ lead/read/20261024T164609285022-root-4ccc.md       | 39 ++++++++++++++++++++++
+ lead/sent/20261024T164641426849-lead-e590.md       | 31 +++++++++++++++++
+ .../inflight/20261024T164641426849-lead-e590.md    | 31 +++++++++++++++++
+ {inbox => read}/20261024T164505104303-lead-b322.md |  0
+ sent/20261024T164609285022-root-4ccc.md            | 39 ++++++++++++++++++++++
+ 6 files changed, 141 insertions(+), 1 deletion(-)
+
+commit 0f5d40487c9919720f17eb696f8e217bad7bd3d3
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:45:11 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T164441195083.log]
+
+ inbox/20261024T164505104303-lead-b322.md           | 30 ++++++++++++++++++++++
+ lead/MEMORY.md                                     |  2 +-
+ .../20261024T164439537295-lead.reviewer-1637.md    |  0
+ lead/sent/20261024T164505104303-lead-b322.md       | 30 ++++++++++++++++++++++
+ 4 files changed, 61 insertions(+), 1 deletion(-)
+
+commit 84d9fc749dd361a347b7729be976ad6782eeac13
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:44:47 +0100
+
+    lead/reviewer: run ok, 1 message(s) [lead/reviewer/runs/20261024T164356841414.log]
+
+ .../20261024T164439537295-lead.reviewer-1637.md    | 21 ++++++++++++
+ lead/reviewer/MEMORY.md                            |  2 +-
+ .../20261024T164355795643-lead-832b.md             |  0
+ .../20261024T164439537295-lead.reviewer-1637.md    | 21 ++++++++++++
+ lead/reviewer/work/rereview2-memo-2026-10-05.md    | 39 ++++++++++++++++++++++
+ 5 files changed, 82 insertions(+), 1 deletion(-)
+
+commit 3eb2c009a8be2d34f493b096d5561378e3069b71
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:44:00 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T164332563638.log]
+
+ lead/MEMORY.md                                     |  2 +-
+ .../20261024T164332298065-lead.writer-6f4a.md      |  0
+ .../inflight/20261024T164355795643-lead-832b.md    | 32 ++++++++++++++++++++++
+ lead/sent/20261024T164355795643-lead-832b.md       | 32 ++++++++++++++++++++++
+ 4 files changed, 65 insertions(+), 1 deletion(-)
+
+commit 218f4c7615682d44e6f6600d8821585cd632eae7
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:43:36 +0100
+
+    lead/writer: run ok, 1 message(s) [lead/writer/runs/20261024T164308325830.log]
+
+ lead/inflight/20261024T164332298065-lead.writer-6f4a.md | 17 +++++++++++++++++
+ lead/writer/MEMORY.md                                   |  2 +-
+ .../20261024T164306362114-lead-47ee.md                  |  0
+ .../sent/20261024T164332298065-lead.writer-6f4a.md      | 17 +++++++++++++++++
+ lead/writer/work/memo-2026-10-05.md                     |  1 -
+ 5 files changed, 35 insertions(+), 2 deletions(-)
+
+commit b186a936c8e9f1b5af788da654fc06acd5aa7139
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:43:14 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T164234090635.log]
+
+ lead/MEMORY.md                                     |  2 +-
+ lead/read/20261024T164233848320-root-4ecb.md       | 39 ++++++++++++++++++++++
+ lead/sent/20261024T164306362114-lead-47ee.md       | 31 +++++++++++++++++
+ .../inflight/20261024T164306362114-lead-47ee.md    | 31 +++++++++++++++++
+ sent/20261024T164233848320-root-4ecb.md            | 39 ++++++++++++++++++++++
+ 5 files changed, 141 insertions(+), 1 deletion(-)
+
+commit da7f3e41f848ad87ff56e2f2313f2f947f9624c1
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:41:25 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T164049446409.log]
+
+ lead/MEMORY.md                                     |  4 +---
+ .../20261024T164047809375-lead.reviewer-a0da.md    |  0
+ lead/sent/20261024T164118938770-lead-831f.md       | 27 ++++++++++++++++++++++
+ read/20261024T164118938770-lead-831f.md            | 27 ++++++++++++++++++++++
+ 4 files changed, 55 insertions(+), 3 deletions(-)
+
+commit 0ae93c9a1b8bbc2031f196ad974ab19a11458d50
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:40:57 +0100
+
+    lead/reviewer: run ok, 1 message(s) [lead/reviewer/runs/20261024T164001163400.log]
+
+ .../20261024T164047809375-lead.reviewer-a0da.md    | 22 ++++++++++++
+ lead/reviewer/MEMORY.md                            |  2 +-
+ .../20261024T163959306557-lead-a8a9.md             |  0
+ .../20261024T164047809375-lead.reviewer-a0da.md    | 22 ++++++++++++
+ lead/reviewer/work/rereview-memo-2026-10-05.md     | 39 ++++++++++++++++++++++
+ 5 files changed, 84 insertions(+), 1 deletion(-)
+
+commit d9ed273ee9f1b44203f0bf1075ed19b2392c7294
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:40:07 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T163934969806.log]
+
+ lead/MEMORY.md                                     |  6 ++--
+ .../20261024T163934720405-lead.writer-0232.md      |  0
+ .../inflight/20261024T163959306557-lead-a8a9.md    | 32 ++++++++++++++++++++++
+ lead/sent/20261024T163959306557-lead-a8a9.md       | 32 ++++++++++++++++++++++
+ 4 files changed, 67 insertions(+), 3 deletions(-)
+
+commit f0333ca0b2566f28d08681665cbcb9312e651a5c
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:39:39 +0100
+
+    lead/writer: run ok, 1 message(s) [lead/writer/runs/20261024T163910784562.log]
+
+ lead/inflight/20261024T163934720405-lead.writer-0232.md | 17 +++++++++++++++++
+ lead/writer/MEMORY.md                                   |  2 +-
+ .../20261024T163909975516-lead-71d3.md                  |  0
+ .../sent/20261024T163934720405-lead.writer-0232.md      | 17 +++++++++++++++++
+ lead/writer/work/memo-2026-10-05.md                     |  2 +-
+ 5 files changed, 36 insertions(+), 2 deletions(-)
+
+commit 96fb11c0b53ff2ed2d6b0c6ac8e4a7c151266456
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:39:16 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T163836515742.log]
+
+ lead/MEMORY.md                                     |  4 ++-
+ lead/read/20261024T163832084175-root-99f6.md       | 39 ++++++++++++++++++++++
+ lead/sent/20261024T163909975516-lead-71d3.md       | 31 +++++++++++++++++
+ .../inflight/20261024T163909975516-lead-71d3.md    | 31 +++++++++++++++++
+ sent/20261024T163832084175-root-99f6.md            | 39 ++++++++++++++++++++++
+ 5 files changed, 143 insertions(+), 1 deletion(-)
+
+commit 241a1c593437395f48f0d607aa4ef44806fa2d8a
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:37:43 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T163706936010.log]
+
+ lead/MEMORY.md                                     |  2 +-
+ .../20261024T163704939822-lead.reviewer-7abc.md    |  0
+ lead/sent/20261024T163735280308-lead-12d1.md       | 27 ++++++++++++++++++++++
+ read/20261024T163735280308-lead-12d1.md            | 27 ++++++++++++++++++++++
+ 4 files changed, 55 insertions(+), 1 deletion(-)
+
+commit dfa752447aa898f3e76d044c9e3b0b54218a2480
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:37:13 +0100
+
+    lead/reviewer: run ok, 1 message(s) [lead/reviewer/runs/20261024T163556540870.log]
+
+ .../20261024T163704939822-lead.reviewer-7abc.md    | 24 +++++++++
+ lead/reviewer/MEMORY.md                            |  1 +
+ .../20261024T163555250326-lead-a0de.md             |  0
+ .../20261024T163704939822-lead.reviewer-7abc.md    | 24 +++++++++
+ lead/reviewer/work/review-memo-2026-10-05.md       | 57 ++++++++++++++++++++++
+ 5 files changed, 106 insertions(+)
+
+commit 326a5dbf86b1e5c9e004b04c54475b9d7090f249
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:36:02 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T163530337582.log]
+
+ lead/MEMORY.md                                     |  2 +-
+ .../20261024T163530174993-lead.writer-7e61.md      |  0
+ .../inflight/20261024T163555250326-lead-a0de.md    | 29 ++++++++++++++++++++++
+ lead/sent/20261024T163555250326-lead-a0de.md       | 29 ++++++++++++++++++++++
+ 4 files changed, 59 insertions(+), 1 deletion(-)
+
+commit 6fb3c88d070a3d7ad3294071229a98cf78bdfab4
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:35:38 +0100
+
+    lead/writer: run ok, 1 message(s) [lead/writer/runs/20261024T163454136433.log]
+
+ .../20261024T163530174993-lead.writer-7e61.md       | 18 ++++++++++++++++++
+ lead/writer/MEMORY.md                               |  1 +
+ .../20261024T163453026495-lead-4fd0.md              |  0
+ .../sent/20261024T163530174993-lead.writer-7e61.md  | 18 ++++++++++++++++++
+ lead/writer/work/memo-2026-10-05.md                 | 21 +++++++++++++++++++++
+ 5 files changed, 58 insertions(+)
+
+commit 3ebec84ce57d427451b1787f65a08c521942be90
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:34:58 +0100
+
+    lead: run ok, 1 message(s) [lead/runs/20261024T163436032285.log]
+
+ .runtime/reviews.json                              |  5 ++++
+ lead/MEMORY.md                                     |  2 ++
+ lead/read/20261024T163213630553-root-1d33.md       | 34 ++++++++++++++++++++++
+ lead/sent/20261024T163453026495-lead-4fd0.md       | 27 +++++++++++++++++
+ .../inflight/20261024T163453026495-lead-4fd0.md    | 27 +++++++++++++++++
+ sent/20261024T163213630553-root-1d33.md            | 34 ++++++++++++++++++++++
+ 6 files changed, 129 insertions(+)
+
+commit e2ac82d418dd6a0291ad7262a057e3cec91e3455
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:31:47 +0100
+
+    root: applied blueprint (3 agents), no task, services: weekly-memo
+
+ .gitignore                            |  3 ++
+ lead/AGENT.md                         | 70 +++++++++++++++++++++++++++++++++++
+ lead/MEMORY.md                        |  0
+ lead/reviewer/AGENT.md                | 49 ++++++++++++++++++++++++
+ lead/reviewer/MEMORY.md               |  0
+ lead/services/weekly-memo/PLAYBOOK.md | 24 ++++++++++++
+ lead/services/weekly-memo/SERVICE.md  | 41 ++++++++++++++++++++
+ lead/writer/AGENT.md                  | 46 +++++++++++++++++++++++
+ lead/writer/MEMORY.md                 |  0
+ 9 files changed, 233 insertions(+)
+
+commit ef267ba455af4e43d2f83e0972e1f3b97f69b2c7
+Author: hirearchy <hirearchy@localhost>
+Date:   2026-10-24 17:31:37 +0100
+
+    init organization
+
+ .gitignore |  5 +++++
+ ORG.md     | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 79 insertions(+)

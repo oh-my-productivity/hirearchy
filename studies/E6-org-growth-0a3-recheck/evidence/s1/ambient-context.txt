@@ -1,0 +1,13 @@
+session id: sess_733fac56-a2c8-4d12-8ac6-a1583963467c  agentMode: hirearchy-study-e6-s1-assistant  modelId: claude-sonnet-5.5  effortLevel: high
+workspacePaths: ['/private/tmp/hirearchy-e6-s1-1792855848']  workflowsEnabled: False  memoryConfig: {'mode': 'read_write', 'reflection': True}
+session_start id: session_start_sess_733fac56-a2c8-4d12-8ac6-a1583963467c_hirearchy-study-e6-s1-assistant  timestamp: 2026-10-24T15:32:22.282Z  agentType: hirearchy-study-e6-s1-assistant
+session_start composition: {"schema": 1, "contentChars": 4979, "learningsChars": 2954}
+session_start content length: 4979 chars
+<memories> block present: True
+memory index titles (12): TITLE, docker-for-installs, youtube-script-org, always-tdd, edit-mcp-json-python, whatsapp-contact-lookup, research-then-reuse, avoid-popular-tts-voices, katana-video-project, use-evolve-subagents, ui-port-preferences, use-uv-for-python
+scope lines: ['## Global (11 shown / 11 total)']
+<steering-files> block present: False
+'Workflow Orchestration' text present: False
+md5 of content with sandbox path replaced by <S>: 5f199eaf92190d4a74233a41117ce509
+other top-level tags in content: ['index', 'memories']
+MD5 (/tmp/hirearchy-e6-s1-1792855848/.kiro/settings/cli.json) = 05d30ccbfd35530747c8a542eb67985c

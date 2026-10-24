@@ -1,0 +1,24 @@
+I read your latest notes (19 Oct) to see what the memo has to capture. Since this repeats every week, I'll set it up as a standing service that you ask for after each meeting. Before I draft the plan, I need a few answers. Reply "defaults" to accept the proposed ones.
+
+1. **Input per week:** which note file to summarize, for example `2026-10-26.md`. Everything else stays fixed. Is that right?
+
+2. **What counts as an action item.** Your notes have formal lines starting with "ACTION:". They also have informal commitments in prose:
+   - Lee will sign off the SSO renewal once legal replies.
+   - Sam will pair with Jo on CI in Jo's first week.
+   - Marta will keep the agenda as sent.
+
+   Should the memo include those informal ones as well as the labelled ones? My default is yes, every commitment who-does-what, including informal ones in prose.
+
+3. **Vague or relative dates** ("by end of next week", "first week", "next meeting"):
+   - **Default:** turn them into a concrete date when the notes make it clear. Otherwise write the vague wording as given, with no invented date.
+   - **Alternative:** never convert; always keep the notes' wording.
+
+4. **Decisions:** should the memo list only firm decisions (go ahead with the demo without the rate limiter, renew SSO for 12 months, move the meeting to Monday 14:00)? Or also items that were discussed but left open? My default is firm decisions only.
+
+5. **Deliverable:** a markdown memo of at most 300 words, with a "Decisions" section and a "Who does what" section (owner, task, due date). I'll put it in a new `deliverables/` folder here: `/tmp/hirearchy-e6-s3-1792861552/deliverables/memo-<meeting date>.md`. Is that fine?
+
+6. **Sources:** only your notes folder, with no web. Your notes are read-only for the team.
+
+7. **Team and budget:** a lead plus a writer, with a separate reviewer who checks every item against the notes. Every agent runs claude-sonnet-5.5 at high effort. I'll propose a per-request budget of the estimate plus 25% in the plan. Do you want a lower cap?
+
+8. **Approvals:** you approve the plan before anything is created. After that, nothing runs until you ask for a memo. First memo: should I run it right away for 19 Oct as a test, or wait for you to ask?

@@ -1,0 +1,19 @@
+## gates run 2026-10-24T15:17:26Z
+md5 -q protocol.md = 31410741088523af23875aef34167bac
+cat protocol.md5 = 31410741088523af23875aef34167bac
+zsh:5: no matches found: protocol-amendment-*
+== harness MD5SUMS check (MISMATCH lines only)
+(done, 16 lines)
+md5 harness/MD5SUMS = d8ad3b83897114b5118a78852060d68b
+== skill
+b2469838032374807e3608631c9fb1d2
+b2469838032374807e3608631c9fb1d2
+b2469838032374807e3608631c9fb1d2
+== injection script
+1c4e7824e448a3a34e24a7b759a59fcd
+== notes / answer key
+903e3bbf5f35df2c17444f3313c12395
+3893bd637c87760b43be4894b47fdb53
+9976a7653a6346b0976c3c38b1c697dd
+2fb69bbef857c2bd4862cd5dd8be9da8
+== E5 protocol source: afd437c103407ec5899e4993b465cf25

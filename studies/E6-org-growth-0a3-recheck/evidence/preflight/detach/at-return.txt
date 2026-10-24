@@ -1,0 +1,10 @@
+call start 2026-10-24T15:26:08Z
+call exit 0
+call returned 2026-10-24T15:26:28Z
+scheduler.pid: [86761]
+run child/pgid: 86774 86774
+== ps at the return
+15:26:28
+86761     1 86761 Ss  
+86774 86761 86774 Ss   /Volumes/workspace/hirearchy/.venv/bin/python3 -I -S /Volumes/workspace/hirearchy/src/hirearchy/kiro/_launch.py --start-deadlin
+2026-10-24

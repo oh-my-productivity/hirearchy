@@ -1,0 +1,5 @@
+deleted 2026-10-24T15:25:09Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-e6-preflight-1-e64263f3ed456421
+deleted 2026-10-24T15:25:09Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e6-preflight-1-e64263f3ed456421
+deleted 2026-10-24T15:25:09Z /tmp/hirearchy-e6-preflight-1792855201
+probe profile: deleted earlier (see probe/probe-profile-deletion.txt); probe dir /tmp/hirearchy-e6-probe-1792855143 left in place
+state dir existed before the preflight (kiro-cwd/hirearchy-e4-* and e5-* leftovers): kept

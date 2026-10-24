@@ -1,0 +1,37 @@
+{
+  "name": "e6-detach-1792855531",
+  "description": "internal: hirearchy E6 detach preflight; deleted with its sandbox",
+  "prompt": "The hirearchy tools are deferred: load them with tool_load (tool_ids [\"hirearchy::*\"]), then call tool_call with tool_id \"hirearchy::start\" once, with its defaults, and reply with its result only.",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "/Volumes/workspace/hirearchy/.venv/bin/hirearchy",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/tmp/hirearchy-e6-detach-1792855531/org",
+        "HIREARCHY_STATE_DIR": "/tmp/hirearchy-e6-detach-1792855531/kiro-state",
+        "HOME": "/tmp/hirearchy-e6-detach-1792855531/home",
+        "PATH": "/tmp/hirearchy-e6-detach-1792855531/bin:/Users/aminalizadeh/.local/bin:/Users/aminalizadeh/.local/bin/:/Users/aminalizadeh/.codeium/windsurf/bin:/Users/aminalizadeh/.composer/vendor/bin:/Users/aminalizadeh/.bun/bin:/Users/aminalizadeh/.symfony5/bin:/Users/aminalizadeh/.bun/bin:/Users/aminalizadeh/bin:/usr/local/bin:/opt/homebrew/bin/:/Users/aminalizadeh/.local/bin:/Users/aminalizadeh/.local/bin/:/Users/aminalizadeh/.codeium/windsurf/bin:/Users/aminalizadeh/.composer/vendor/bin:/Users/aminalizadeh/.bun/bin:/Users/aminalizadeh/.symfony5/bin:/Users/aminalizadeh/.bun/bin:/Users/aminalizadeh/bin:/usr/local/bin:/opt/homebrew/bin/:/Users/aminalizadeh/.local/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/co.palokaj.battery:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/usr/local/go/bin:/Users/aminalizadeh/.cargo/bin:/Users/aminalizadeh/Applications/iTerm.app/Contents/Resources/utilities:/Users/aminalizadeh/.local/bin:/Users/aminalizadeh/.local/bin:/Users/aminalizadeh/.local/bin:/Users/aminalizadeh/.local/bin"
+      }
+    }
+  },
+  "tools": [
+    "@hirearchy"
+  ],
+  "resources": [],
+  "hooks": [],
+  "includeMcpJson": false,
+  "includePowers": false,
+  "permissions": {
+    "rules": [
+      {
+        "capability": "mcp",
+        "match": [
+          "hirearchy/start"
+        ],
+        "effect": "allow"
+      }
+    ]
+  }
+}

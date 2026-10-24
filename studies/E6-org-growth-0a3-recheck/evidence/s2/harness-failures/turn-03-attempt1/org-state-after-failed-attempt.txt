@@ -1,0 +1,13 @@
+--- org state after the failed attempt (file reads only), 2026-10-24T16:34:07Z
+=== after turn 3 attempt 1 (failed, exit 1)  snapshot 2026-10-24T16:34:07Z (local 17:34:07)
+org runs total: 0  (injection-window runs: 0; counted toward the 45 cap: 0)
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  lead/inbox/20261024T163213630553-root-1d33.md
+  (1 item(s))
+running.json: (none)
+scheduler.exit: (none)
+deliverables/:
+  (none)
+processes referencing the sandbox name (0):
+20261024T163213630553-root-1d33.md
+events

@@ -1,0 +1,7 @@
+I've recorded your rejection of the 5 Oct memo. The memo hasn't been changed.
+
+The 5 Oct memo has no Summary line, and the current checks don't ask for one. Before I change the checks, one yes/no question:
+
+About C4 (the memo's required layout: a "Decisions" section, then an "Action items" table): add "The memo starts with one line beginning 'Summary:' that summarizes the meeting, followed by the Decisions section and then the Action items section" as a lasting rule for every weekly memo? Yes or no.
+
+If you say yes, I'll add it to the checks for all future memos. I'll then ask for a rework of the 5 Oct memo under the new rule. Because of the 16-run cap, the rework might need a small budget top-up. I'll tell you the number before spending anything.

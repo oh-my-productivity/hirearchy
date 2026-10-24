@@ -1,0 +1,1 @@
+Memos in lead/writer/work/: 2026-10-05 (142w, task dfec blocked on C7, lead's call), 2026-10-12 (158w, done), 2026-10-19 (135w; client answers applied in task 340c, reported done; prev copy memo-2026-10-19.prev.md; a7f6 still blocked on C7 pending reviewer). If revisions: change minimally, re-count with org_read, re-report. Budget: 0 left after this run.

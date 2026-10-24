@@ -1,0 +1,3 @@
+The memo now has Lee's swap only in the table, and Sam's row has no "probably" (Due still 2026-10-21). The closing line stays, as you said. The reviewer's report says 10 of 10 criteria met, the Summary-first order is met, and the memo is 201 words. The case is at 10 of your 12 runs.
+
+One question is left before I copy it to `deliverables/`. Lee's row has Due = `none`, because the notes say "during demo week" and give no exact date. Is `none` right, or should it be a date? I'd keep `none`, since "demo week" isn't one date and the contract says `none` when the notes give no deadline. Reply "keep" or give me the date.

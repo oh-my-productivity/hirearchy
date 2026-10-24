@@ -1,0 +1,47 @@
+1,3c1,3
+< label: s3-before
+< date: Sat Oct 24 18:05:52 WEST 2026
+< date_utc: 2026-10-24T17:05:52Z  epoch: 1792861552
+---
+> label: s3-after
+> date: Sat Oct 24 18:40:21 WEST 2026
+> date_utc: 2026-10-24T17:40:21Z  epoch: 1792863621
+18c18
+< MD5 (/Users/aminalizadeh/.kiro/memories/memories.db) = 3f53a1d90a590b253fc33aaa1c11342c
+---
+> MD5 (/Users/aminalizadeh/.kiro/memories/memories.db) = 4b45c15d0e0b9291f0137589ad35bc30
+20c20
+< drwx------@  3 aminalizadeh  staff     96 Oct 24 18:04 .
+---
+> drwx------@  3 aminalizadeh  staff     96 Oct 24 18:26 .
+22c22
+< -rw-------@  1 aminalizadeh  staff  94208 Oct 21 05:43 memories.db
+---
+> -rw-------@  1 aminalizadeh  staff  94208 Oct 24 18:26 memories.db
+25c25
+< drwx------@  8 aminalizadeh  staff   256 Oct 24 18:01 .
+---
+> drwx------@  8 aminalizadeh  staff   256 Oct 24 18:40 .
+42a43
+> agents
+44a46
+> dubbing
+46a49,51
+> music
+> onboarding
+> realtime
+47a53
+> setup-api-key
+48a55,57
+> sound-effects
+> speech-engine
+> speech-to-text
+49a59,62
+> text-to-speech
+> update-skills-from-changelog
+> voice-changer
+> voice-isolator
+56c69
+< drwxr-x---+ 141 aminalizadeh  staff  4512 Oct 24 18:03 ..
+---
+> drwxr-x---+ 145 aminalizadeh  staff  4640 Oct 24 18:26 ..

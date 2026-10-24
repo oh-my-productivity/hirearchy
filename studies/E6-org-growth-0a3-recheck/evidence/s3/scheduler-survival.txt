@@ -1,0 +1,67 @@
+# s3 scheduler survival (D-SURVIVE; facts only, from events/, session-turn-times-utc.txt, injection-log.txt)
+Per scheduler: pid, who started it (the last `start` tool.call before its scheduler.start whose mcp file/pid is the assistant's per-turn server, or the injection script's), its start/exit,
+the turn it began in, whether it was running at any turn's end, runs in flight at a turn's end, and kills/stops.
+
+scheduler pid 8731: scheduler.start 2026-10-24T17:10:12.996008+00:00; starter: assistant's MCP server (mcp pid 8704, file mcp-8704-1792861788063.jsonl, start tool.call at 2026-10-24T17:10:13.028759+00:00); began in assistant turn: 4
+  scheduler.exit 2026-10-24T17:13:14.578241+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 4): 11.6 s
+
+scheduler pid 9756: scheduler.start 2026-10-24T17:14:39.354265+00:00; starter: assistant's MCP server (mcp pid 9724, file mcp-9724-1792862065098.jsonl, start tool.call at 2026-10-24T17:14:39.350531+00:00); began in assistant turn: 5
+  scheduler.exit: NONE
+  runs: 6 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: ['lead@20261024T171716483127']
+  RUNNING at the end of turn 5 (2026-10-24T17:17:18.744000+00:00); runs in flight: ['lead@20261024T171716483127']
+  RUNNING at the end of turn 6 (2026-10-24T17:23:50.500000+00:00); runs in flight: ['lead@20261024T171716483127']
+  RUNNING at the end of turn 7 (2026-10-24T17:25:02.203000+00:00); runs in flight: ['lead@20261024T171716483127']
+  RUNNING at the end of turn 8 (2026-10-24T17:28:46.400000+00:00); runs in flight: ['lead@20261024T171716483127']
+  RUNNING at the end of turn 9 (2026-10-24T17:29:25.788000+00:00); runs in flight: ['lead@20261024T171716483127']
+  RUNNING at the end of turn 10 (2026-10-24T17:33:23.227000+00:00); runs in flight: ['lead@20261024T171716483127']
+  RUNNING at the end of turn 11 (2026-10-24T17:34:08.463000+00:00); runs in flight: ['lead@20261024T171716483127']
+  RUNNING at the end of turn 12 (2026-10-24T17:38:07.672000+00:00); runs in flight: ['lead@20261024T171716483127']
+
+scheduler pid 10927: scheduler.start 2026-10-24T17:19:10.053011+00:00; starter: injection script (mcp pid 10918, file mcp-10918-1792862349782.jsonl, start tool.call at 2026-10-24T17:19:10.061222+00:00); began in assistant turn: none (between turns: the injection window)
+  scheduler.exit 2026-10-24T17:22:23.273283+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 6): 87.2 s
+
+scheduler pid 12716: scheduler.start 2026-10-24T17:25:52.381772+00:00; starter: assistant's MCP server (mcp pid 12671, file mcp-12671-1792862752095.jsonl, start tool.call at 2026-10-24T17:25:52.381584+00:00); began in assistant turn: 8
+  scheduler.exit 2026-10-24T17:28:39.877289+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 8): 6.5 s
+
+scheduler pid 14886: scheduler.start 2026-10-24T17:30:03.058793+00:00; starter: assistant's MCP server (mcp pid 14880, file mcp-14880-1792863000622.jsonl, start tool.call at 2026-10-24T17:30:03.079013+00:00); began in assistant turn: 10
+  scheduler.exit 2026-10-24T17:33:08.500035+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 10): 14.7 s
+
+scheduler pid 16017: scheduler.start 2026-10-24T17:34:52.527975+00:00; starter: assistant's MCP server (mcp pid 16006, file mcp-16006-1792863292120.jsonl, start tool.call at 2026-10-24T17:34:52.574743+00:00); began in assistant turn: 12
+  scheduler.exit 2026-10-24T17:37:56.009803+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 12): 11.7 s
+
+stop tool.calls of the assistant: 0; injection script --stop: False
+schedulers: 6; started by the assistant's server: 5; started by the injection script: 1
+(turn end, scheduler) pairs with the scheduler running: 8
+schedulers with a scheduler.exit: 5 of 6
+reasons: 'finished: no open tasks'
+run.end with killed=true in the stream: 0
+run.orphan events: 1
+
+Per-turn ps records (run-counts-by-turn.txt 'scheduler record after turn N'): see that file; every record shows 'scheduler.pid: (no file)' unless noted.
+
+## Facilitator's added facts (read-only; corroboration per protocol 6 and D-SURVIVE; not a score)
+scheduler pid 9756 (assistant-started, user turn 5, scheduler.start 17:14:39.354Z):
+- The script above lists it as "running" at the end of turns 5-12 only because it never wrote a `scheduler.exit` (the definition of D-SURVIVE). The process was in fact gone at turn 5's end:
+  - its last event is `run.start lead@20261024T171716483127` (child_pid 10491, pgid 10491) at 17:17:16.494Z, 2.25 s before the session's `turn_end` of user turn 5 (17:17:18.744Z); its last `run.end` was 17:17:16.434Z;
+  - the facilitator's per-turn record after turn 5 (17:17:19Z, `run-counts-by-turn.txt`): `scheduler.pid: 9756`, `ps -p 9756`: `(not running)`, `scheduler.exit: (none)`, no process names the sandbox;
+  - `ps`/`kill -0` at 17:17:30Z: pid 9756 and the run's child pid 10491: "no such process"; `.runtime/running.json` still listed the lead run (`scheduler` 9756); `lead/inflight/` held the reviewer message `...-lead.reviewer-915f.md`; the run log `lead/runs/20261024T171716483127.log` ends at `# ---- output ----` (no output line, no `# exit` line);
+  - full state before the injection: `injection/pre-injection-state.txt` (17:19:00Z).
+- The assistant's turn 5 ended (`turn_end` 17:17:18.744Z) with a `request` follow-up already done: its last tool calls were `progress(wait_seconds=240)` (returned 17:17:06Z), `read`, `inbox` and the copy of `memo-2026-10-05.md` into `deliverables/` (17:17:13Z); it did not wait for the lead's post-result run.
+- The injection script's `start()` at 17:19:10.053Z (new scheduler pid 10927) recorded `run.orphan` for `lead@20261024T171716483127` (`action: redelivered`, "the process of a dead scheduler's run is gone; its batch is redelivered"). That run has no `run.end` event and no `# exit` line; it is the stream's one unmatched run (`run-session-map.txt`: session NOT MATCHED; no credits recorded).
+- By D-SURVIVE's classes: no `scheduler.exit` by the stream's end, no recorded stop, a run in flight at the `turn_end` with no `run.end` -> "died with the call" (the `ps` corroboration agrees). Classification and scoring are the scoring step's.
+- Every other scheduler (8731, 10927, 12716, 14886, 16017) wrote `scheduler.exit` 'finished: no open tasks' before the `turn_end` of the turn it began in (or in the injection window) and had no kill: not running at any turn end.

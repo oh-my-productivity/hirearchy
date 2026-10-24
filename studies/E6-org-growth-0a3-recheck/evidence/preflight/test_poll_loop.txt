@@ -1,0 +1,8 @@
+PASS test_a_server_that_waits_is_not_paused
+PASS test_s2_state_progress_returns_at_once_and_nothing_moves
+PASS test_s3_state_done_while_the_scheduler_still_runs_then_stops
+PASS test_settled_on_the_first_poll
+PASS test_the_pause_resets_after_a_reply_that_waited
+PASS test_the_poll_cap_bounds_the_calls
+PASS test_the_poll_check_window
+7 passed, 0 failed

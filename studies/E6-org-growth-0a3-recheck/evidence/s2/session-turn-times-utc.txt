@@ -1,0 +1,14 @@
+turn 1: user_ts 2026-10-24T16:29:02.867Z turn_start 2026-10-24T16:29:02.887Z turn_end 2026-10-24T16:29:28.356Z stop end_turn status success elapsed_ms 25469 credits 1.0477
+turn 2: user_ts 2026-10-24T16:29:56.453Z turn_start 2026-10-24T16:29:56.882Z turn_end 2026-10-24T16:30:47.921Z stop end_turn status success elapsed_ms 51039 credits 2.3090
+turn 3: user_ts 2026-10-24T16:31:31.643Z turn_start 2026-10-24T16:31:32.289Z turn_end 2026-10-24T16:32:52.735Z stop error status failed elapsed_ms 80445 credits 1.4675
+turn 4: user_ts 2026-10-24T16:34:30.098Z turn_start 2026-10-24T16:34:30.117Z turn_end 2026-10-24T16:37:53.174Z stop end_turn status success elapsed_ms 203056 credits 1.7901
+turn 5: user_ts 2026-10-24T16:38:24.398Z turn_start 2026-10-24T16:38:24.858Z turn_end 2026-10-24T16:41:32.395Z stop end_turn status success elapsed_ms 187537 credits 1.8869
+turn 6: user_ts 2026-10-24T16:41:59.910Z turn_start 2026-10-24T16:42:01.005Z turn_end 2026-10-24T16:42:08.538Z stop end_turn status success elapsed_ms 7532 credits 0.6881
+turn 7: user_ts 2026-10-24T16:42:28.092Z turn_start 2026-10-24T16:42:28.421Z turn_end 2026-10-24T16:45:27.059Z stop end_turn status success elapsed_ms 178638 credits 1.7107
+turn 8: user_ts 2026-10-24T16:49:52.579Z turn_start 2026-10-24T16:49:52.881Z turn_end 2026-10-24T16:50:08.263Z stop end_turn status success elapsed_ms 15381 credits 1.3774
+turn 9: user_ts 2026-10-24T16:50:27.256Z turn_start 2026-10-24T16:50:27.467Z turn_end 2026-10-24T16:51:09.235Z stop end_turn status success elapsed_ms 41768 credits 2.5833
+turn 10: user_ts 2026-10-24T16:51:36.463Z turn_start 2026-10-24T16:51:36.954Z turn_end 2026-10-24T16:51:52.680Z stop end_turn status success elapsed_ms 15725 credits 1.5995
+turn 11: user_ts 2026-10-24T16:52:18.072Z turn_start 2026-10-24T16:52:18.306Z turn_end 2026-10-24T16:55:35.957Z stop end_turn status success elapsed_ms 197650 credits 2.1046
+turn 12: user_ts 2026-10-24T16:56:11.417Z turn_start 2026-10-24T16:56:11.789Z turn_end 2026-10-24T16:59:03.912Z stop end_turn status success elapsed_ms 172123 credits 2.4522
+turn 13: user_ts 2026-10-24T16:59:25.158Z turn_start 2026-10-24T16:59:25.910Z turn_end 2026-10-24T16:59:45.230Z stop end_turn status success elapsed_ms 19320 credits 1.6886
+total assistant credits: 22.7056

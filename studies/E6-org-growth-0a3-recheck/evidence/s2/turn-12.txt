@@ -1,0 +1,20 @@
+######## TURN 12  start 17:59:13  end 17:59:45  elapsed 32s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T16:59:13Z end 2026-10-24T16:59:45Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Lee's none is right.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+The 12 Oct memo is at `/tmp/hirearchy-e6-s2-1792859296/deliverables/memo-2026-10-12.md`. I copied it from the team's file and confirmed the two are identical.
+
+- Only the 12 Oct meeting is covered: met.
+- Length is at most 400 words: met (231 by `wc`, 201 by the team's count).
+- It starts with a one-line "Summary:", then Decisions, then Action items (C11): met.
+- Decisions, with reasons: met. There are 3.
+- The table columns are exactly Owner | Action | Due: met.
+- Every commitment is a row: met. That includes Sam's and Lee's informal ones.
+- Owners and dates are right: met. Dev is 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21, and Lee `none`.
+- Nothing is invented: met.
+- The reviewer's report shows every criterion met: met (10 of 10).
+
+Runs: 10 of the 12 approved, 5 for the first pass and 5 for your fix.
+
+Keep it, or what should change?

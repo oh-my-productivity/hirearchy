@@ -1,0 +1,18 @@
+######## TURN 12  start 17:14:23  end 17:21:24  elapsed 421s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T16:14:23Z end 2026-10-24T16:21:24Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, nothing for Marta to do there, leave it out. Lee's should be 2026-10-30. Sam's should be none. The meeting move is a decision, so it doesn't need an action row.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+The memo is at `/tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-19.md`. I checked that it matches the team's version.
+
+- Summary line first, then Decisions, then the table: met.
+- Decisions: 3 items, including the move of the weekly to Monday 14:00. It has no action row: met.
+- Marta's "keep the agenda as sent" row is removed: met.
+- Due values: Lee 2026-10-30, Marta 2026-10-23, Dev 2026-10-24, Priya 2026-10-26, Sam `none`: met.
+- Under 400 words (135): met.
+- Reviewer passed all checks, and only the rows you named changed.
+
+I applied your answers for this memo only and didn't change the permanent contract. The reviewer pointed out that "prose commitments count" could be read to include non-actions like Marta's. If you want a rule that excludes them for future memos, tell me and I'll make it permanent. Otherwise it stays as is.
+
+Cost for this memo: 10 runs of the 16 approved.
+
+Keep it, or what should change?

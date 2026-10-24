@@ -1,0 +1,1 @@
+inject script byte-identical to E5's (md5 1c4e7824...)

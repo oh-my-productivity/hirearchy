@@ -1,0 +1,8 @@
+The memo for 2026-10-12 is drafted and passed review (7 of 7 criteria), but I haven't copied it to `deliverables`. The reviewer raised two questions for you:
+
+1. **Sam's staging test data:** The notes say he'll "probably sort it out himself" so it's ready the day before the freeze. I listed it as an action with Due 2026-10-21, because the freeze starts on Oct 22. Should it stay, or come out because "probably" isn't a firm commitment?
+2. **Lee's pager swap with Dev:** I listed it only as an action (Due `none`), since the notes give no date beyond "demo week". Is that right, or should it also appear under Decisions?
+
+The memo has the Summary line first, then 3 decisions (RFC approved with token bucket per key behind a feature flag, blameless company-wide postmortem, deploy freeze on Oct 22–23). The table has 5 rows: Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21, Lee `none`.
+
+It used 5 of the 16 runs. Answer the two questions, or say "as is" to keep it unchanged.

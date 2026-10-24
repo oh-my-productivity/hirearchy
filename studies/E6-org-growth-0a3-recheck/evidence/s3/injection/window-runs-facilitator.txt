@@ -1,0 +1,89 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-24T17:19:09Z .. 2026-10-24T17:22:23Z; injected task 20261024T171909790362-root-5d4a; revised (memo 1) task 20261024T171425096624-root-bc02
+
+run.orphan events in the window: 2026-10-24T17:19:10.057477+00:00 lead@20261024T171716483127 (scheduler pid 10927)
+
+## run lead@20261024T171910062928 agent=lead model=claude-sonnet-5.5 cmd[--model claude-sonnet-5.5 --effort high] start=2026-10-24T17:19:10.078955+00:00 end=2026-10-24T17:20:16.308011+00:00 ok=True killed=False exit=0
+revise_playbook calls in this run (events): 0; run-log RL1 lines: 0; RL3 lines: 3; hirearchy tool.call events: inbox, delegate, write
+  lead message 20261024T172008216087-lead-cceb to=lead/writer type=task status=None source=relayed revises=20261024T171503780721-lead-c7de created=2026-10-24T17:20:08+00:00
+  org-git commit e3156ae MEMORY.md diff:
+    commit e3156aee205b312ecc0fe23cdfa09860d159dc66
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 18:20:16 2026 +0100
+    
+        lead: run ok, 2 message(s) [lead/runs/20261024T171910062928.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 4ffd4ba..a862263 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,6 @@
+     # Memory
+     Service weekly-memo, notes 2026-10-05.md. Playbook v1.
+    -DONE: both tasks (20261024T171425096624-root-bc02 and 20261024T170957358424-root-4a3e) reported done with reviewer coverage 13 of 13 / 7 of 7. Deliverable lead/writer/work/memo-2026-10-05.md (201 words).
+    -Nothing pending. Lesson for playbook: vague deadlines in notes -> reviewer flags them to client upfront (C6 ambiguity caused the first block).
+    +Earlier tasks (…root-bc02, …root-4a3e) reported done. Now rework task 20261024T171909790362-root-5d4a (revises bc02): Sam Due -> none, Marta Due -> none, both explained in 'Open questions'; reviewer must re-check EVERY Due value vs notes.
+    +Delegated: writer (revises c7de, budget 2). NEXT: when writer finishes, delegate lead/reviewer (revises 20261024T171557887401-lead-bda2, budget 2) on lead/writer/work/memo-2026-10-05.md with criteria C1-C8 + client note; then read memo myself, paste reviewer coverage line verbatim, report 5d4a done with lessons.
+    +Reviewer's earlier result 915f (8 of 8) was for the OLD memo (Sam 10-09, Marta 10-14): superseded, do not use.
+    +Lesson: vague deadlines (before Friday, training date) -> default to none + Open questions upfront.
+    \ No newline at end of file
+
+## run lead/writer@20261024T172008263068 agent=lead/writer model=claude-sonnet-5.5 cmd[--model claude-sonnet-5.5 --effort high] start=2026-10-24T17:20:08.270192+00:00 end=2026-10-24T17:20:46.505430+00:00 ok=True killed=False exit=0
+revise_playbook calls in this run (events): 0; run-log RL1 lines: 0; RL3 lines: 6; hirearchy tool.call events: read, read, write, read, write, report
+
+## run lead@20261024T172040462401 agent=lead model=claude-sonnet-5.5 cmd[--model claude-sonnet-5.5 --effort high] start=2026-10-24T17:20:40.476930+00:00 end=2026-10-24T17:21:12.673013+00:00 ok=True killed=False exit=0
+revise_playbook calls in this run (events): 0; run-log RL1 lines: 0; RL3 lines: 2; hirearchy tool.call events: delegate, write
+  lead message 20261024T172105270413-lead-7161 to=lead/reviewer type=task status=None source=relayed revises=20261024T171557887401-lead-bda2 created=2026-10-24T17:21:05+00:00
+  org-git commit cf18a9f MEMORY.md diff:
+    commit cf18a9f37209b30170f7e0bf0abe44118c5c5301
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 18:21:12 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T172040462401.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index a862263..6df63e3 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,6 +1,7 @@
+     # Memory
+     Service weekly-memo, notes 2026-10-05.md. Playbook v1.
+    -Earlier tasks (…root-bc02, …root-4a3e) reported done. Now rework task 20261024T171909790362-root-5d4a (revises bc02): Sam Due -> none, Marta Due -> none, both explained in 'Open questions'; reviewer must re-check EVERY Due value vs notes.
+    -Delegated: writer (revises c7de, budget 2). NEXT: when writer finishes, delegate lead/reviewer (revises 20261024T171557887401-lead-bda2, budget 2) on lead/writer/work/memo-2026-10-05.md with criteria C1-C8 + client note; then read memo myself, paste reviewer coverage line verbatim, report 5d4a done with lessons.
+    -Reviewer's earlier result 915f (8 of 8) was for the OLD memo (Sam 10-09, Marta 10-14): superseded, do not use.
+    -Lesson: vague deadlines (before Friday, training date) -> default to none + Open questions upfront.
+    \ No newline at end of file
+    +Rework task 20261024T171909790362-root-5d4a (revises bc02): Sam Due -> none, Marta Due -> none, explained in 'Open questions'.
+    +Writer done (253 words, I read memo: Sam/Marta none, Priya 10-09, Dev 10-08, Lee none, Open questions present). Delegated lead/reviewer re-check (revises 20261024T171557887401-lead-bda2, budget 2), waiting.
+    +NEXT: when reviewer result arrives, read it + memo; if n=m, report 5d4a done pasting reviewer coverage line verbatim + ledger path, with lessons. Copy any 'ambiguous' items under 'Questions for the client:'. If fail: one rework to writer, one re-check, else blocked.
+    +Old reviewer result 915f (8 of 8) was for OLD memo: superseded.
+    +Lesson: vague deadlines (before Friday, training date) -> default to none + Open questions upfront.
+
+## run lead/reviewer@20261024T172106635303 agent=lead/reviewer model=claude-sonnet-5.5 cmd[--model claude-sonnet-5.5 --effort high] start=2026-10-24T17:21:06.641355+00:00 end=2026-10-24T17:22:01.046108+00:00 ok=True killed=False exit=0
+revise_playbook calls in this run (events): 0; run-log RL1 lines: 0; RL3 lines: 4; hirearchy tool.call events: org_read, write, write, report
+
+## run lead@20261024T172152957007 agent=lead model=claude-sonnet-5.5 cmd[--model claude-sonnet-5.5 --effort high] start=2026-10-24T17:21:52.986348+00:00 end=2026-10-24T17:22:23.208342+00:00 ok=True killed=False exit=0
+revise_playbook calls in this run (events): 0; run-log RL1 lines: 0; RL3 lines: 2; hirearchy tool.call events: report, write
+  lead message 20261024T172216685049-lead-406b to=root type=result status=done source=None revises=None created=2026-10-24T17:22:16+00:00
+  ## Lessons: Vague deadlines (before Friday, event date, this week) -> default Due to none and explain in Open questions from the first draft; this avoided a second rework. Add to Pitfalls: an event date is not a deadline. Evidence: 1 rework + 2 re-checks; final review 7 of 7, 14 of 14.
+  org-git commit 0e45c3d MEMORY.md diff:
+    commit 0e45c3d16904379d8c31be8333a4d1d0b207ddfb
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 18:22:23 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T172152957007.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 6df63e3..a48848e 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,7 +1,4 @@
+     # Memory
+     Service weekly-memo, notes 2026-10-05.md. Playbook v1.
+    -Rework task 20261024T171909790362-root-5d4a (revises bc02): Sam Due -> none, Marta Due -> none, explained in 'Open questions'.
+    -Writer done (253 words, I read memo: Sam/Marta none, Priya 10-09, Dev 10-08, Lee none, Open questions present). Delegated lead/reviewer re-check (revises 20261024T171557887401-lead-bda2, budget 2), waiting.
+    -NEXT: when reviewer result arrives, read it + memo; if n=m, report 5d4a done pasting reviewer coverage line verbatim + ledger path, with lessons. Copy any 'ambiguous' items under 'Questions for the client:'. If fail: one rework to writer, one re-check, else blocked.
+    -Old reviewer result 915f (8 of 8) was for OLD memo: superseded.
+    -Lesson: vague deadlines (before Friday, training date) -> default to none + Open questions upfront.
+    +Task 5d4a (rework) reported DONE: memo lead/writer/work/memo-2026-10-05.md (253 words), reviewer 7 of 7, 14 of 14. Questions for the client passed up. Nothing pending.
+    +Lesson: vague deadlines (before Friday, event date, this week) -> Due none + Open questions upfront. Not yet added to playbook Pitfalls.
+

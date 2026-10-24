@@ -1,0 +1,86 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-24T15:46:51Z .. 2026-10-24T15:50:17Z; injected task 20261024T154651259477-root-3a54; revised (memo 1) task 20261024T154227019921-root-f06d
+
+## run lead@20261024T154651492785 agent=lead model=claude-sonnet-5.5 start=2026-10-24T15:46:51.506137+00:00 end=2026-10-24T15:47:57.749117+00:00 exit=0 secs=66 session=sess_7dcf6566-3bcf-44f5-9868-854f4345e5f7
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 13
+  lead message 20261024T154745377873-lead-dd34 to=lead/writer type=task status=None created=2026-10-24T15:47:45+00:00
+  ## Lessons: (none)
+  org-git commit 719ebe9 MEMORY.md diff:
+    commit 719ebe99015858511b7de8295557e3d6e29f2df4
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 16:47:57 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T154651492785.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 6e3ba14..776fa38 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,4 @@
+     # Memory
+    -Task 7dcd (memo 2026-10-05) DONE earlier. Task 20261024T154227019921-root-f06d (client due-date answers) reported DONE; reviewer 7 of 7. Nothing outstanding.
+    -Lessons: tell writer up front: no attendees/next-meeting lines, Action text close to notes, Due none for vague relative dates unless the request gives the date.
+    +Task 7dcd and f06d done earlier. NOW: root task 20261024T154651259477-root-3a54 (rework: Sam & Marta Due -> none + Open questions section; reviewer must re-check EVERY Due value vs notes).
+    +Delegated writer task 20261024T154745377873-lead-dd34 (budget 2). Next: on result, read lead/writer/work/memo-2026-10-05.md, delegate lead/reviewer (revises=20261024T154414494097-lead-61f6 is its previous task; budget 1-2) to check all criteria C1-C6 + request C7 and every Due value, then report root with reviewer coverage line verbatim, lessons, 'Questions for the client' if reviewer lists ambiguities.
+    +Lessons: tell writer up front: no attendees/next-meeting lines, Action text close to notes, Due none for vague relative dates unless the request gives the date. Set revises= when reworking.
+
+## run lead/writer@20261024T154745702811 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-24T15:47:45.709007+00:00 end=2026-10-24T15:48:21.887601+00:00 exit=0 secs=36 session=sess_05c7c54c-6f7c-4d5d-b3c2-ce8d8191a5da
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261024T154815853142 agent=lead model=claude-sonnet-5.5 start=2026-10-24T15:48:15.866460+00:00 end=2026-10-24T15:48:54.068238+00:00 exit=0 secs=38 session=sess_5cbf36ea-f5c9-4090-9266-6274361ecd0b
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261024T154841189831-lead-28c8 to=lead/reviewer type=task status=None created=2026-10-24T15:48:41+00:00
+  ## Lessons: (none)
+  org-git commit 0dfcc3e MEMORY.md diff:
+    commit 0dfcc3e5da3594ace238e823aa436fd631f3a8b3
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 16:48:54 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T154815853142.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 776fa38..d00a6e5 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,5 @@
+     # Memory
+    -Task 7dcd and f06d done earlier. NOW: root task 20261024T154651259477-root-3a54 (rework: Sam & Marta Due -> none + Open questions section; reviewer must re-check EVERY Due value vs notes).
+    -Delegated writer task 20261024T154745377873-lead-dd34 (budget 2). Next: on result, read lead/writer/work/memo-2026-10-05.md, delegate lead/reviewer (revises=20261024T154414494097-lead-61f6 is its previous task; budget 1-2) to check all criteria C1-C6 + request C7 and every Due value, then report root with reviewer coverage line verbatim, lessons, 'Questions for the client' if reviewer lists ambiguities.
+    -Lessons: tell writer up front: no attendees/next-meeting lines, Action text close to notes, Due none for vague relative dates unless the request gives the date. Set revises= when reworking.
+    +Root task 20261024T154651259477-root-3a54 (rework Due values) open. Writer rework done (task dd34): memo lead/writer/work/memo-2026-10-05.md, 146 words, I read it: Sam & Marta none, Open questions section, matches notes.
+    +Delegated reviewer task 20261024T154841189831-lead-28c8 (budget 2, revises 61f6). Budget left: 1 (mine).
+    +Next: on result, read reviewer report; if criteria met 6 of 6 report root done: paste reviewer coverage line verbatim + ledger path, lessons, 'Questions for the client' for any ambiguity. If it fails: report blocked w/ options (writer budget 0 now).
+    +Lessons: tell writer up front: no attendees/next-meeting lines, Action text close to notes, Due none for vague/relative dates ('before Friday', event date != deadline) unless request gives date; put such in Open questions. Set revises= when reworking.
+
+## run lead/reviewer@20261024T154842007731 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-24T15:48:42.014594+00:00 end=2026-10-24T15:49:40.292081+00:00 exit=0 secs=58 session=sess_bd90af24-57b1-472a-b597-d1a0086151b2
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261024T154932239676 agent=lead model=claude-sonnet-5.5 start=2026-10-24T15:49:32.254614+00:00 end=2026-10-24T15:50:08.434852+00:00 exit=0 secs=36 session=sess_d2a58a3e-4dd1-4dae-a7d6-a61533ee9f70
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261024T154959991979-lead-3f72 to=root type=result status=done created=2026-10-24T15:49:59+00:00
+  ## Lessons: Tell the writer up front: no attendees or next-meeting lines, keep Action text close to the notes, Due none for vague or relative dates ('before Friday', or an event date that is not a deadline) unless the request gives a date, and put those in Open questions. Add this to the playbook pitfalls. Evidence: first draft needed one rework for Sam and Marta Due values; the re-check passed 6 of 6.
+  org-git commit b37e776 MEMORY.md diff:
+    commit b37e776244f6718e570874a2cd807893e7828e93
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 16:50:08 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T154932239676.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index d00a6e5..b0971b3 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,4 @@
+     # Memory
+    -Root task 20261024T154651259477-root-3a54 (rework Due values) open. Writer rework done (task dd34): memo lead/writer/work/memo-2026-10-05.md, 146 words, I read it: Sam & Marta none, Open questions section, matches notes.
+    -Delegated reviewer task 20261024T154841189831-lead-28c8 (budget 2, revises 61f6). Budget left: 1 (mine).
+    -Next: on result, read reviewer report; if criteria met 6 of 6 report root done: paste reviewer coverage line verbatim + ledger path, lessons, 'Questions for the client' for any ambiguity. If it fails: report blocked w/ options (writer budget 0 now).
+    -Lessons: tell writer up front: no attendees/next-meeting lines, Action text close to notes, Due none for vague/relative dates ('before Friday', event date != deadline) unless request gives date; put such in Open questions. Set revises= when reworking.
+    +Root task 20261024T154651259477-root-3a54 (rework Due values) reported DONE (reviewer 6 of 6). Nothing open, nothing awaited.
+    +Deliverable: lead/writer/work/memo-2026-10-05.md (146 words).
+    +Lessons for next weekly-memo request: tell writer up front: no attendees/next-meeting lines, Action text close to notes, Due none for vague/relative dates ('before Friday', event date != deadline) unless request gives a date; put such items in Open questions. Set revises= when reworking.
+

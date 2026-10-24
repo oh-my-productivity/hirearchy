@@ -1,0 +1,1 @@
+The hirearchy tools are deferred: load them with tool_load (tool_ids ["hirearchy::*"]), then call tool_call with tool_id "hirearchy::start" once, with its defaults, and reply with its result only.

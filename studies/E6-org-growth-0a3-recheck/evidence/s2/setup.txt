@@ -1,0 +1,92 @@
+# E6 s2 setup (recorded before turn 1)
+date: Sat Oct 24 17:28:28 WEST 2026; utc: 2026-10-24T16:28:28Z
+S: /tmp/hirearchy-e6-s2-1792859296  epoch: 1792859296  (sandbox created at epoch 1792859296)
+== repo checks (4.1) BEFORE turn 1
+git rev-parse HEAD: 18c4ffb7d2dc0ea2a04b07c478397c9d1c89ad29
+git status --porcelain:
+?? docs/research/
+?? studies/E6-org-growth-0a3-recheck/
+git diff --stat 18c4ffb HEAD -- src skills pyproject.toml uv.lock: []
+== kiro-cli --version: kiro-cli 2.33.0
+== model_check.sh listed 2
+RESULT: s2 listed: OK (2026-10-24T16:28:36Z)
+== protocol.md vs protocol.md5
+MD5 (protocol.md) = 31410741088523af23875aef34167bac
+31410741088523af23875aef34167bac
+== amendments:
+zsh:15: no matches found: protocol-amendment-*
+none
+== manager-decision files:
+zsh:16: no matches found: manager-decision-*
+none
+== harness/MD5SUMS check (prints MISMATCH lines only)
+(done, 16 lines)
+global SKILL.md md5: b2469838032374807e3608631c9fb1d2 (required b2469838032374807e3608631c9fb1d2)
+repo SKILL.md md5: b2469838032374807e3608631c9fb1d2
+injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd
+preflight.md result: Result: PASS
+== HIREARCHY_STATE_DIR set? no
+== processes referencing any E6 sandbox
+(none)
+== other E6 streams running
+(none)
+== assistant profile
+MD5 (/Users/aminalizadeh/.kiro/agents/hirearchy-study-e6-s2-assistant.json) = 57be8de017cac87d145a1936e890aa9d
+diff against first stream's (s1) profile (profiles/hirearchy-study-e6-s1-assistant.json from the s1 copy):
+2,3c2,3
+<   "name": "hirearchy-study-e6-s1-assistant",
+<   "description": "internal: hirearchy usability study E6 stream s1 assistant; deleted after the stream",
+---
+>   "name": "hirearchy-study-e6-s2-assistant",
+>   "description": "internal: hirearchy usability study E6 stream s2 assistant; deleted after the stream",
+8c8
+<       "env": { "ORG_ROOT": "/tmp/hirearchy-e6-s1-1792855848/org" }
+---
+>       "env": { "ORG_ROOT": "/tmp/hirearchy-e6-s2-1792859296/org" }
+== workspace settings
+MD5 (/tmp/hirearchy-e6-s2-1792859296/.kiro/settings/cli.json) = 05d30ccbfd35530747c8a542eb67985c
+{"chat.disableInheritingDefaultResources": true, "chat.enableWorkflows": false}MD5 (harness/workspace-cli.json) = 05d30ccbfd35530747c8a542eb67985c
+== skill copies
+MD5 (/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md) = b2469838032374807e3608631c9fb1d2
+MD5 (/tmp/hirearchy-e6-s2-1792859296/.kiro/skills/hirearchy/SKILL.md) = b2469838032374807e3608631c9fb1d2
+MD5 (/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md) = b2469838032374807e3608631c9fb1d2
+     125 /Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md
+     125 /tmp/hirearchy-e6-s2-1792859296/.kiro/skills/hirearchy/SKILL.md
+     125 /Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md
+     375 total
+== notes
+MD5 (/tmp/hirearchy-e6-s2-1792859296/notes/2026-10-05.md) = 903e3bbf5f35df2c17444f3313c12395
+MD5 (/tmp/hirearchy-e6-s2-1792859296/notes/2026-10-12.md) = 3893bd637c87760b43be4894b47fdb53
+MD5 (/tmp/hirearchy-e6-s2-1792859296/notes/2026-10-19.md) = 9976a7653a6346b0976c3c38b1c697dd
+== org dir exists before turn 1? no
+== ps: processes referencing the sandbox
+(none)
+== ~/.kiro/agents
+agent_config.json.example
+claude-opus-5.5.json
+claude-sonnet-5.5.json
+evolve.json
+hirearchy-organization-9d66c1-web-fetch-web-search.json
+hirearchy-study-e6-s2-assistant.json
+telegram_bot.json
+== answer key copied into S?        0 files
+
+== AFTER the last turn (4.1)
+date: Sat Oct 24 18:01:55 WEST 2026; utc: 2026-10-24T17:01:55Z
+git rev-parse HEAD: 18c4ffb7d2dc0ea2a04b07c478397c9d1c89ad29
+git status --porcelain:
+?? docs/research/
+?? studies/E6-org-growth-0a3-recheck/
+git diff --stat 18c4ffb HEAD -- src skills pyproject.toml uv.lock: []
+kiro-cli --version: kiro-cli 2.33.0
+protocol.md md5: 31410741088523af23875aef34167bac  (protocol.md5: 31410741088523af23875aef34167bac)
+amendments: none present
+harness/MD5SUMS check:
+(done, no MISMATCH lines above = all files match)
+global SKILL.md md5: b2469838032374807e3608631c9fb1d2
+injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd
+workspace settings md5: 05d30ccbfd35530747c8a542eb67985c; skill copy md5: b2469838032374807e3608631c9fb1d2
+notes: 903e3bbf5f35df2c17444f3313c12395 3893bd637c87760b43be4894b47fdb53 9976a7653a6346b0976c3c38b1c697dd
+assistant profile in ~/.kiro/agents: 0 (deleted; see profiles/deletions.txt)
+processes referencing the sandbox: 0
+user org untouched: see safety-diff.txt

@@ -1,0 +1,5 @@
+SB=/tmp/hirearchy-e6-detach-1792855531  epoch=1792855531  start 2026-10-24T15:25:31Z
+== sign-in: KIRO_HOME=$SB/kiro-home kiro-cli whoami
+Authenticated with API key
+Email: (redacted in evidence)
+whoami exit 0

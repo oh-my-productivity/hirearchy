@@ -1,0 +1,24 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.11.6, pytest-8.4.2, pluggy-1.7.0 -- /Volumes/workspace/hirearchy/.venv/bin/python3
+rootdir: /Volumes/workspace/hirearchy
+configfile: pyproject.toml
+plugins: platformdirs-4.13.4, anyio-4.15.1
+collecting ... collected 15 items
+
+tests/e2e/test_org_growth_0a2.py::test_s1r_t5_an_amendment_before_the_verdict_is_refused PASSED [  6%]
+tests/e2e/test_org_growth_0a2.py::test_s1r_v3_and_v4_without_a_verdict_are_refused PASSED [ 13%]
+tests/e2e/test_org_growth_0a2.py::test_s1r_playbook_v2_of_e4_is_refused_line_by_line PASSED [ 20%]
+tests/e2e/test_org_growth_0a2.py::test_e3_turn_5_an_amendment_in_the_reject_turn_is_refused PASSED [ 26%]
+tests/e2e/test_org_growth_0a2.py::test_s1r_t8_the_artifact_path_is_withheld_while_the_question_is_open PASSED [ 33%]
+tests/e2e/test_org_growth_0a2.py::test_s1r_t8_a_human_rework_answers_the_question_and_the_path_returns PASSED [ 40%]
+tests/e2e/test_org_growth_0a2.py::test_s3_a_blocked_result_with_a_question_is_flagged PASSED [ 46%]
+tests/e2e/test_org_growth_0a2.py::test_s2r_the_wrong_rule_is_refused_and_the_human_rework_needs_a_base PASSED [ 53%]
+tests/e2e/test_org_growth_0a2.py::test_s3_the_answered_amendment_is_admitted_and_only_its_words_enter_the_playbook PASSED [ 60%]
+tests/e2e/test_org_growth_0a3.py::test_e5_s1_t6_the_case_reads_ten_user_runs_and_five_relayed_without_exceeds PASSED [ 66%]
+tests/e2e/test_org_growth_0a3.py::test_e5_s2_t5_the_rework_lena_funded_does_not_exceed[#21: the user's rework just sent] PASSED [ 73%]
+tests/e2e/test_org_growth_0a3.py::test_e5_s2_t5_the_rework_lena_funded_does_not_exceed[#23: the rework delivered] PASSED [ 80%]
+tests/e2e/test_org_growth_0a3.py::test_e5_s3_the_rework_delegation_of_memo_2_inherits_the_human_tier PASSED [ 86%]
+tests/e2e/test_org_growth_0a3.py::test_e5_s3_the_re_check_delegation_of_memo_2_inherits_the_human_tier PASSED [ 93%]
+tests/e2e/test_scheduler_detach.py::test_the_scheduler_and_its_run_finish_after_its_starter_and_every_descendant_are_killed PASSED [100%]
+
+============================== 15 passed in 8.46s ==============================

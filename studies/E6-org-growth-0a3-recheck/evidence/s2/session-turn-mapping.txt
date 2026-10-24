@@ -1,0 +1,8 @@
+Mapping of the assistant session store's turn numbers (as printed in session-turn-times-utc.txt, assistant-tool-calls.txt and scheduler-survival.txt)
+to Lena's user turns (turn-NN.* files, lena-lines.txt). The H1 abort of user turn 3 (harness-failures/turn-03-h1-network-error.txt) produced one extra
+session turn, so the session numbers run one ahead of the user turns from the retry on:
+  session turn 1  = user turn 1
+  session turn 2  = user turn 2
+  session turn 3  = user turn 3, attempt 1 (FAILED, stop error: create_org, apply_org, request; not a user turn)
+  session turn 4  = user turn 3, the retry (completed)
+  session turn k+1 = user turn k, for k = 4 .. 12   (session turn 13 = user turn 12)

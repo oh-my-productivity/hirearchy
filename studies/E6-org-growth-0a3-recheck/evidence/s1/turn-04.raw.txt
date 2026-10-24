@@ -1,0 +1,8 @@
+Team is built. Requesting this week's memo: input `2026-10-05.md`, up to 16 runs.The memo is drafted and passed review (7 of 7 criteria). I haven't copied it to `deliverables` yet because I need your call on two due dates:
+
+- **Sam, flaky CI:** the notes say "before Friday" (meeting was Monday 5 Oct). Should Due be 2026-10-08 (Thursday), 2026-10-09 (Friday), or `none`? It's `none` now.
+- **Marta, training room:** the notes say "book the room for Oct 14". Oct 14 is when the training takes place, not clearly a deadline for booking. Keep `none`, or use 2026-10-14?
+
+Two other rows are set and need no answer. Lee's row is `none`, because the notes say "no hard date attached". Renovate appears under both Decisions and as Dev's action, which is intended.
+
+Tell me your answers and I'll send the memo back for that one change. Or say "keep as is" and I'll copy it unchanged.

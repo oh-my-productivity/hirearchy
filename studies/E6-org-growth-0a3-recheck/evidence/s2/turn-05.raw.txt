@@ -1,0 +1,5 @@
+Before I send this back, I need your OK on the cost. I told you the Lee fix would take about 2 runs. That counted only the writer and reviewer. Your last fix cost 5 runs once the lead's runs were included, and this one would be the same. The case is at 10 of your 12 runs, so it would end at about 15.
+
+Options:
+- **Approve about 5 more runs (recommended).** The team removes Lee's line from Decisions, the reviewer re-checks, and I copy the memo to `deliverables/`.
+- **Keep it as is.** I deliver the current memo with Lee in both places, which needs no more runs.

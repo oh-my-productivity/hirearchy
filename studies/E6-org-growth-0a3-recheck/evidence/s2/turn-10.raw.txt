@@ -1,0 +1,7 @@
+I recorded your acceptance of the 5 Oct memo. The 12 Oct memo is running under the updated contract (11 checks, including the Summary-first order), with a ceiling of 12 runs. I'll wait for it now.The 12 Oct memo is ready. It starts with the one-line Summary, then Decisions, then Action items. The reviewer's report says 11 of 11 criteria met and the memo is 246 words, and it cost 5 runs so far. I haven't copied it to `deliverables/`, because the team has three questions for you.
+
+1. **Lee's pager swap.** It appears under Decisions and also as a row in the table (Lee, due `none`). For the 5 Oct memo you said Lee's vendor ping was an action item, so the table was enough. Should the swap be in both places or only the table? Keeping both costs nothing. Table only is a fix of about 5 more runs, and I'd ask for your OK first.
+2. **Sam's staging test data.** The notes say he'll "probably sort it out himself". I counted it as a commitment, kept the hedge in the row, and set the due date to 2026-10-21, the day before the 22 Oct freeze. Is that right?
+3. **The last line, "Next meeting: Monday 19 October."** It's in the notes and is neither a decision nor an action, and the 5 Oct memo has the same line. Keep it?
+
+My suggestions are to keep the swap in both places (it's free and the notes say the team agreed to it), keep Sam's row as written, and keep the closing line so the memos match. Reply "keep" to accept all three and I'll copy it over. Otherwise tell me which to change.

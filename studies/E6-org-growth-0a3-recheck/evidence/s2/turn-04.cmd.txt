@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e6-s2-assistant Marta\''s should be 2026-10-14. Sam'\''s should be 2026-10-09.'

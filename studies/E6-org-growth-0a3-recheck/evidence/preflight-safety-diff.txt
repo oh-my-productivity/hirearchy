@@ -1,0 +1,16 @@
+1,3c1,3
+< label: preflight-before
+< date: Sat Oct 24 16:17:33 WEST 2026
+< date_utc: 2026-10-24T15:17:33Z  epoch: 1792855053
+---
+> label: preflight-after
+> date: Sat Oct 24 16:27:16 WEST 2026
+> date_utc: 2026-10-24T15:27:16Z  epoch: 1792855636
+20c20
+< drwx------@  3 aminalizadeh  staff     96 Oct 24 16:16 .
+---
+> drwx------@  3 aminalizadeh  staff     96 Oct 24 16:19 .
+25c25
+< drwx------@  8 aminalizadeh  staff   256 Oct 24 05:38 .
+---
+> drwx------@  8 aminalizadeh  staff   256 Oct 24 16:19 .

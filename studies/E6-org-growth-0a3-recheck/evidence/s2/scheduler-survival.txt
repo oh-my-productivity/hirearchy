@@ -1,0 +1,51 @@
+# s2 scheduler survival (D-SURVIVE; facts only, from events/, session-turn-times-utc.txt, injection-log.txt)
+Per scheduler: pid, who started it (the last `start` tool.call before its scheduler.start whose mcp file/pid is the assistant's per-turn server, or the injection script's), its start/exit,
+the turn it began in, whether it was running at any turn's end, runs in flight at a turn's end, and kills/stops.
+
+scheduler pid 99196: scheduler.start 2026-10-24T16:34:36.029733+00:00; starter: assistant's MCP server (mcp pid 99194, file mcp-99194-1792859676049.jsonl, start tool.call at 2026-10-24T16:34:36.050103+00:00); began in assistant turn: 4
+  scheduler.exit 2026-10-24T16:37:43.228096+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 4): 9.9 s
+
+scheduler pid 290: scheduler.start 2026-10-24T16:38:36.512690+00:00; starter: assistant's MCP server (mcp pid 285, file mcp-285-1792859912085.jsonl, start tool.call at 2026-10-24T16:38:36.541571+00:00); began in assistant turn: 5
+  scheduler.exit 2026-10-24T16:41:25.803852+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 5): 6.6 s
+
+scheduler pid 1942: scheduler.start 2026-10-24T16:42:34.087076+00:00; starter: assistant's MCP server (mcp pid 1939, file mcp-1939-1792860153849.jsonl, start tool.call at 2026-10-24T16:42:34.116872+00:00); began in assistant turn: 7
+  scheduler.exit 2026-10-24T16:45:11.507696+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 7): 15.6 s
+
+scheduler pid 2864: scheduler.start 2026-10-24T16:46:09.515234+00:00; starter: injection script (mcp pid 2859, file mcp-2859-1792860369277.jsonl, start tool.call at 2026-10-24T16:46:09.543899+00:00); began in assistant turn: none (between turns: the injection window)
+  scheduler.exit 2026-10-24T16:48:36.817960+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 8): 91.4 s
+
+scheduler pid 4539: scheduler.start 2026-10-24T16:52:28.432914+00:00; starter: assistant's MCP server (mcp pid 4514, file mcp-4514-1792860746017.jsonl, start tool.call at 2026-10-24T16:52:28.429361+00:00); began in assistant turn: 11
+  scheduler.exit 2026-10-24T16:55:30.204473+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 11): 5.8 s
+
+scheduler pid 5524: scheduler.start 2026-10-24T16:56:29.700623+00:00; starter: assistant's MCP server (mcp pid 5491, file mcp-5491-1792860982123.jsonl, start tool.call at 2026-10-24T16:56:29.721897+00:00); began in assistant turn: 12
+  scheduler.exit 2026-10-24T16:59:00.878794+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 12): 3.0 s
+
+stop tool.calls of the assistant: 0; injection script --stop: False
+schedulers: 6; started by the assistant's server: 5; started by the injection script: 1
+(turn end, scheduler) pairs with the scheduler running: 0
+schedulers with a scheduler.exit: 6 of 6
+reasons: 'finished: no open tasks'
+run.end with killed=true in the stream: 0
+run.orphan events: 0
+
+Per-turn ps records (run-counts-by-turn.txt 'scheduler record after turn N'): see that file; every record shows 'scheduler.pid: (no file)' unless noted.
+
+NOTE: turn numbers in this file are SESSION turn numbers; see session-turn-mapping.txt (session turn k+1 = user turn k from user turn 3's retry on).

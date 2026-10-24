@@ -1,0 +1,13 @@
+The memo is at `/tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-05.md`.
+
+- Only that meeting's notes are used: met.
+- At most 400 words: met (117 by the team's count; `wc` gives 147 because it counts table pipes and dashes).
+- Decisions section lists exactly the two decisions: met.
+- One Owner | Action | Due table with all 5 commitments, including Sam's and Lee's informal ones: met.
+- Due holds ISO dates or `none`: met. Sam is 2026-10-09 and Marta is 2026-10-14, from your answers. Lee stays `none`.
+- Owners, actions and dates match the notes: met.
+- Reviewer shows 7 of 7 criteria met: met.
+
+Runs used: 14 of the 16 approved for this memo, including the rework for your two date answers.
+
+Do you want to keep it, or change something?

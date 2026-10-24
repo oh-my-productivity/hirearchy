@@ -1,0 +1,44 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-24T17:17:13.383Z] call #25 turn 5 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-e6-s3-1792861552/deliverables && cp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 7a6b64a 2026-10-24T18:15:35+01:00', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 7a6b64a 2026-10-24T18:15:35+01:00']
+result: Output:
+     233 /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-24T17:29:19.322Z] call #44 turn 9 execute_bash
+COMMAND: cp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md && head -1 /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md | cut -c1-60 && ls /tmp/hirearchy-e6-s3-1792861552/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: eb809c2 2026-10-24T18:27:01+01:00', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: eb809c2 2026-10-24T18:27:01+01:00']
+result: Output:
+     258 /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md
+Summary: At the Platform team weekly on Monday 2026-10-05 (P
+memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-24T17:33:53.245Z] call #52 turn 11 execute_bash
+COMMAND: cp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-12.md && cmp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-12.md && wc -w /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-12.md && ls /tmp/hirearchy-e6-s3-1792861552/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: a521981 2026-10-24T18:31:13+01:00', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: a521981 2026-10-24T18:31:13+01:00']
+result: Output:
+     277 /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 1440 mtime 18:29:19 local md5 2a906d23378ab5101c30f04ee3868d72
+  memo-2026-10-12.md size 1556 mtime 18:33:53 local md5 daad1ccd09bd49dc51da829ed0c7a205
+
+final ls -la:
+total 16
+drwxr-xr-x@ 4 aminalizadeh  wheel   128 Oct 24 18:33 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 24 18:19 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  1440 Oct 24 18:29 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1556 Oct 24 18:33 memo-2026-10-12.md
+

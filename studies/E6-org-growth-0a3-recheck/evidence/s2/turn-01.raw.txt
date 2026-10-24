@@ -1,0 +1,10 @@
+Before I draft a plan, I need a few answers. The notes have some informal items, so the first two matter most. Reply "defaults" to accept everything I've proposed.
+
+1. **Informal commitments.** Some tasks are in prose with no ACTION: label. Examples are "Sam offered to pair with Jo on CI", "Lee will sign off on the renewal once legal replies" and "Lee will swap pager shifts with Dev". Should the memo list them as "who does what"? My default is yes: every commitment counts, labelled or not.
+2. **Vague dates.** Some items say "end of next week", "the day before the freeze starts" or "first week". Should the memo turn them into a calendar date, or keep the notes' wording? My default is to give a date only when the notes state one or it follows directly from another stated date. Otherwise it keeps the notes' wording and marks the date as unspecified. It never guesses.
+3. **Decisions.** Should the memo include small ones, like moving the meeting time, or only the main ones? My default is all decisions, each with a one-line reason if the notes give one.
+4. **Format and place.** My default is a markdown memo of at most 400 words with a "Decisions" section and an "Actions" table (owner, task, due date). One memo per meeting goes in a new folder called `deliverables/` here (`/tmp/hirearchy-e6-s2-1792859296/deliverables/memo-<meeting date>.md`).
+5. **Sources.** I'll use only your notes folder, read-only, with no web.
+6. **Review.** My default is that a second agent checks the memo against the notes: every decision and action is covered, each has the right owner and date, and nothing is invented.
+7. **Weekly timing.** I can't trigger it on a schedule myself. Each week you tell me "memo for <date>" and I run it. The meeting file is the only input that changes, and everything else stays fixed.
+8. **Budget.** A memo should take about 4 to 5 runs per request (writer, reviewer, lead). My default is 8 per request, which covers one rework. Every agent runs claude-sonnet-5.5 at high effort. I'll show you the plan for approval before anything starts.

@@ -1,0 +1,58 @@
+pre-injection state (facilitator, read-only), 2026-10-24T17:19:00Z
+scheduler.pid: 9756
+ps -p 9756:
+(not running)
+ps -p 10491 (the lead run's child_pid):
+(not running)
+scheduler.exit: (none)
+running.json:
+{
+  "lead": {
+    "pgid": 10491,
+    "lstart": "Sat Oct 24 17:17:16 2026",
+    "started": 1792862236.4937742,
+    "scheduler": 9756,
+    "log": "lead/runs/20261024T171716483127.log"
+  }
+}
+
+scheduler.log:
+
+# --- scheduler started 2026-10-24 17:10:12Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e6-s3-1792861552/org run --until-done
+org: /private/tmp/hirearchy-e6-s3-1792861552/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 36s
+lead: started run (1 message(s))
+lead/writer: run finished in 36s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 28s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 69s
+lead: run finished in 38s
+scheduler exiting: finished: no open tasks
+
+# --- scheduler started 2026-10-24 17:14:39Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e6-s3-1792861552/org run --until-done
+org: /private/tmp/hirearchy-e6-s3-1792861552/org
+lead: started run (1 message(s))
+lead/writer: started run (1 message(s))
+lead: run finished in 40s
+lead: started run (1 message(s))
+lead/writer: run finished in 30s
+lead/reviewer: started run (1 message(s))
+lead: run finished in 34s
+lead: started run (1 message(s))
+lead/reviewer: run finished in 44s
+lead: run finished in 40s
+lead: started run (1 message(s))
+lead/inflight:
+20261024T171637422252-lead.reviewer-915f.md
+tail of the in-flight run log lead/runs/20261024T171716483127.log:
+Handle every new message above with the hirearchy tools, following the protocol.
+Messages may be redelivered after a crash: if your state shows one was already handled, skip it.
+Before you stop, update your memory with `@hirearchy/write`(path="lead/MEMORY.md", ...) (the hirearchy tool, not a built-in `write`). Do not wait for replies; end the run when done.
+
+# ---- output ----
+processes referencing the sandbox:
+(none)
+session turn_end of user turn 5 (UTC): 2026-10-24T17:17:18.744Z

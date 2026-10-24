@@ -1,0 +1,1 @@
+{'id': 'sess_904a6f25-6314-4111-888d-1ca5ca03429b', 'agentMode': 'e6-detach-1792855531', 'modelId': 'claude-sonnet-5.5', 'effortLevel': 'high', 'workspacePaths': ['/private/tmp/hirearchy-e6-detach-1792855531'], 'createdAt': '2026-10-24T15:26:18.808Z'}

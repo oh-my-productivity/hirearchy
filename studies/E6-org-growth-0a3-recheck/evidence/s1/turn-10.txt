@@ -1,0 +1,16 @@
+######## TURN 10  start 17:05:15  end 17:09:41  elapsed 266s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T16:05:15Z end 2026-10-24T16:09:41Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, that counts. No need for 'probably'. Sam's 2026-10-21 is right. Lee's swap is an action item, so the table is enough. Lee's none is right.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-10.stderr.txt):
+The memo is at `/tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-12.md`. I checked that it matches the team's version.
+
+- Summary line first, then Decisions, then the table: met.
+- Decisions: 3 items, and Lee's swap is not among them: met.
+- Table has all 5 commitments, including Sam's. His action no longer says "probably" and his Due is 2026-10-21: met.
+- Due values: Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21, Lee `none`: met.
+- Under 400 words (158): met.
+- Reviewer passed all checks.
+
+Cost for this memo: 10 runs of the 16 approved. No unrequested reworks this time.
+
+Keep it, or what should change?

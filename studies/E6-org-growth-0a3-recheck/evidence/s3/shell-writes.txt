@@ -1,0 +1,30 @@
+# shell writes (protocol 7.2): every execute_bash call of the assistant; facts only
+
+[2026-10-24T17:17:13.383Z] call #25 turn 5 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: mkdir -p /tmp/hirearchy-e6-s3-1792861552/deliverables && cp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md
+RESULT: Output:
+     233 /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-24T17:29:19.322Z] call #44 turn 9 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md && head -1 /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md | cut -c1-60 && ls /tmp/hirearchy-e6-s3-1792861552/deliverables
+RESULT: Output:
+     258 /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md
+Summary: At the Platform team weekly on Monday 2026-10-05 (P
+memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-24T17:33:53.245Z] call #52 turn 11 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-12.md && cmp /tmp/hirearchy-e6-s3-1792861552/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-12.md && wc -w /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-12.md && ls /tmp/hirearchy-e6-s3-1792861552/deliverables
+RESULT: Output:
+     277 /tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+

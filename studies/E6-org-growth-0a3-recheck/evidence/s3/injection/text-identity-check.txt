@@ -1,0 +1,4 @@
+stored file: /tmp/hirearchy-e6-s3-1792861552/org/sent/20261024T171909790362-root-5d4a.md
+title: 'Rework memo 2026-10-05: unclear due dates'
+ title md5 849fe21b104be883af9b3c06367d4445  expected 849fe21b104be883af9b3c06367d4445  MATCH
+note length 866 md5 4cdbcb9b682f2f25dcb31c83d3743fec  expected 866 / 4cdbcb9b682f2f25dcb31c83d3743fec  MATCH

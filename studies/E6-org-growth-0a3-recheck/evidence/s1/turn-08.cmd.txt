@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e6-s1-assistant Lee\''s ping is an action item, so the table is enough. I don'\''t know anything about that rework - I didn'\''t ask for it.'

@@ -1,0 +1,10 @@
+The org looks right: three agents, the service defined, and the first request pending with a budget of 16. Starting it now.The team's first memo for 5 Oct is written and reviewed. It's held back (I haven't copied it to your deliverables folder) because four points are yours to decide, and the rest of the checks passed. The memo is 201 words, with 2 decisions and 5 action items. The reviewer verified 13 of 13 factual claims against your notes.
+
+Please answer these four:
+
+1. **Sam, "before Friday" (flaky CI):** Friday is 9 Oct. Should the Due be **2026-10-08** (strictly before Friday) or **2026-10-09**? The memo currently says 2026-10-09.
+2. **Marta, book the training room "for Oct 14":** 14 Oct is the training date, not a booking deadline. Should the Due be **none** (the memo's current value) or **2026-10-14**?
+3. **Lee, ping the vendor "this week, no hard date attached":** should the Due be **none** (the memo's current value) or **2026-10-09**? The notes say no hard date, which points to none.
+4. **Lee pinging the vendor:** should that also be listed under Decisions, since the notes say "we agreed"? The memo currently has it only as an action item, because it reads as a commitment rather than a decision.
+
+I'd keep the memo as it is, apart from your answer on question 1. The reviewer suggested the same reading. Any change you choose means one small rework by the writer and a re-check, which fits inside the 16-run budget. So far the memo has used 5 of 16 runs.

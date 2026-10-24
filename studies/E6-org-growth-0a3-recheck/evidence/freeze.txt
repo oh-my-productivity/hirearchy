@@ -1,0 +1,35 @@
+E6 protocol freeze (pre-registration step 1 of 9 of workflow wf_25265920a47bd720)
+freeze_utc: 2026-10-24T15:15:53Z
+protocol.md md5 (md5 -q): 31410741088523af23875aef34167bac
+protocol.md bytes: 184753  lines: 1964
+source: E5 protocol.md md5 afd437c103407ec5899e4993b465cf25 (E5 protocol.md5: afd437c103407ec5899e4993b465cf25)
+== git -C /Volumes/workspace/hirearchy rev-parse HEAD
+18c4ffb7d2dc0ea2a04b07c478397c9d1c89ad29
+== git -C /Volumes/workspace/hirearchy rev-parse --short HEAD; branch
+18c4ffb
+main
+== git -C /Volumes/workspace/hirearchy diff --stat 18c4ffb HEAD -- src skills pyproject.toml uv.lock (empty below means no product change)
+== (end of diff output)
+== git -C /Volumes/workspace/hirearchy status --porcelain
+?? docs/research/
+?? studies/E6-org-growth-0a3-recheck/
+== skill md5: repo b2469838032374807e3608631c9fb1d2, git blob 18c4ffb b2469838032374807e3608631c9fb1d2, global (read-only) b2469838032374807e3608631c9fb1d2; repo lines 125
+== harness/MD5SUMS md5: d8ad3b83897114b5118a78852060d68b
+== harness/MD5SUMS check (MISMATCH lines only):
+(done, 16 lines)
+== injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd
+== notes and answer key: 903e3bbf5f35df2c17444f3313c12395 3893bd637c87760b43be4894b47fdb53 9976a7653a6346b0976c3c38b1c697dd; answer-key 2fb69bbef857c2bd4862cd5dd8be9da8
+== detach code unchanged since the 0a.3 Linux run (git diff --stat e417c95 18c4ffb -- <4.9 paths>; empty below):
+== (end of diff output)
+== kiro-cli --version: kiro-cli 2.33.0
+== state at freeze: no E6 sandbox (/tmp/hirearchy-e6-*), no E6 profile (~/.kiro/agents/hirearchy-study-e6-*), no stream folder (evidence/s*)
+(no /tmp/hirearchy-e6-* dir)
+(no hirearchy-study-e6-* profile)
+(no evidence/s* folder)
+== ~/.kiro/agents (names only):
+agent_config.json.example
+claude-opus-5.5.json
+claude-sonnet-5.5.json
+evolve.json
+hirearchy-organization-9d66c1-web-fetch-web-search.json
+telegram_bot.json

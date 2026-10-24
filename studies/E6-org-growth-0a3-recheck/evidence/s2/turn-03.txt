@@ -1,0 +1,13 @@
+######## TURN 3  start 17:34:17  end 17:37:53  elapsed 216s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T16:34:17Z end 2026-10-24T16:37:53Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Great, approve. Please do this week's: 2026-10-05.md. I'll wait.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-03.stderr.txt):
+The team is created and the memo for 2026-10-05.md is running, with up to 12 runs planned. I'll wait for it now.The memo for 2026-10-05 is written and checked, but I haven't put it in `deliverables/` yet. Two due dates are open to interpretation, and I want your call first.
+
+1. **Marta, booking the on-call training room.** The notes say "book the room for Oct 14", which is the date of the training. They give no deadline for the booking itself. The memo has Due = 2026-10-14. A stricter reading would be `none`. Which do you want?
+2. **Sam, looking into the flaky CI.** The notes say "before Friday". Friday is 9 Oct and "before" excludes it, so the memo has Due = 2026-10-08. Is that right?
+
+My suggestion is `none` for Marta, since 14 Oct is the training date and not a deadline. I'd keep 2026-10-08 for Sam. Reply with your answers, or "keep as is", and I'll copy it over. If you pick `none` for Marta, I'll send it back to the team for a fix. That costs about 3 more runs, and the first pass used 5 of the 12.
+
+The checks passed: the reviewer's report says 10 of 10 criteria met and 17 of 17 claims verified. The memo is 224 words. It has 3 decisions, each with its reason, and 5 action items, including Sam's and Lee's informal ones. Lee's row is `none` because the notes say "no hard date attached". The reviewer judged Lee's vendor ping a decision, and I left that classification as it is.

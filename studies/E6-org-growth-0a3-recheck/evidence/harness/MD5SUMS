@@ -1,0 +1,16 @@
+a0669ec87affb936670ad3ac56797b91  CHANGES.md
+c40d05929771b0fcbc7f0491df79d195  ambient_context.py
+4ac217c718776d4767635aa5ba2a4181  copy_org_evidence.sh
+f1b194564197838be255930d5e26c56a  extract_mechanical.py
+be617e63e1376c7949ff8278fa7e3b73  extract_mechanical_s2.py
+a64a05b570432e4d330d089511264181  extract_mechanical_s3.py
+41f317d85f10cd0da284dc10398dd138  extract_proposals.py
+da57d91e9beea0f1947ffb126ea92c88  extract_tool_calls.py
+1c4e7824e448a3a34e24a7b759a59fcd  inject_root_rework.py
+7b2b9b043308805146237640b899c6d2  model_check.sh
+7ecff16396b4fda6bf453947d172e94a  org_state.py
+a5f44bc2b5c78dfe2b61d165e393d86c  profile-template.json
+2e90f0dc40c8b7c895c992f1955afcb3  run_turn.sh
+517f875bb4ca60a4ca154461dbec1cff  safety-snapshot.sh
+0b269d00bcd8ce4e7c4498e270960c30  test_poll_loop.py
+05d30ccbfd35530747c8a542eb67985c  workspace-cli.json

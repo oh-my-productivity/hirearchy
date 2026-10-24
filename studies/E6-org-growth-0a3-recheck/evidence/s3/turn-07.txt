@@ -1,0 +1,11 @@
+######## TURN 7  start 18:23:58  end 18:25:02  elapsed 64s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T17:23:58Z end 2026-10-24T17:25:02Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-07.stderr.txt):
+The new rule is now in the checks as C9. The memo hasn't been reworked yet because that needs 4 more runs from you.
+
+**Unplanned rework:** a rework named "Rework memo 2026-10-05: unclear due dates" ran under the root seat. I didn't send it, and I don't know where it came from. It rewrote the memo to set Sam, Marta and Lee to "none" and added an "Open questions" section. That contradicts your rulings. It cost 5 runs, which I count as my spend, not yours. I rejected it on my own judgment and told the team to build from the version you judged.
+
+**The memo you reviewed:** the copy in `deliverables/memo-2026-10-05.md` is the version you saw, with Sam 2026-10-09, Marta 2026-10-14 and Lee none. It's unchanged and doesn't have the Summary line yet.
+
+**What I need from you:** the Summary rework needs about 5 runs. The lead has 1, and no other team member holds unspent runs. Can I grant the lead 4 more runs (the 16-run cap becomes 20 for this memo)? If you agree, I'll grant them, start the rework, and wait for the result. The memo goes into the deliverables folder only after it passes all 9 checks.

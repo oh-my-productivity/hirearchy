@@ -1,0 +1,66 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-24T15:45:29.452Z] call #26 turn 5 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-e6-s1-1792855848/deliverables && cp /private/tmp/hirearchy-e6-s1-1792855848/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-e6-s1-1792855848/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 61119b8 2026-10-24T16:43:53+01:00', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 61119b8 2026-10-24T16:43:53+01:00']
+result: Output:
+     147 /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-24T15:59:09.266Z] call #45 turn 8 execute_bash
+COMMAND: cp /private/tmp/hirearchy-e6-s1-1792855848/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-e6-s1-1792855848/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-05.md && head -3 /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-05.md && ls /tmp/hirearchy-e6-s1-1792855848/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 59647dd 2026-10-24T16:55:12+01:00', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 59647dd 2026-10-24T16:55:12+01:00']
+result: Output:
+Summary: The team pushed the API gateway migration to the week of 26 October, adopted Renovate for weekly dependency PRs, and assigned five action items.
+
+# Platform team weekly memo, 2026-10-05
+memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-24T16:09:25.486Z] call #61 turn 10 execute_bash
+COMMAND: cp /private/tmp/hirearchy-e6-s1-1792855848/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-12.md && cmp /private/tmp/hirearchy-e6-s1-1792855848/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-12.md && grep -ci probably /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-12.md; ls /tmp/hirearchy-e6-s1-1792855848/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 6831650 2026-10-24T17:07:00+01:00', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 6831650 2026-10-24T17:07:00+01:00']
+result: Output:
+0
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-24T16:20:53.664Z] call #73 turn 12 execute_bash
+COMMAND: cp /private/tmp/hirearchy-e6-s1-1792855848/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-19.md && cmp /private/tmp/hirearchy-e6-s1-1792855848/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-19.md && cat /tmp/hirearchy-e6-s1-1792855848/deliverables/memo-2026-10-19.md | tail -8; ls /tmp/hirearchy-e6-s1-1792855848/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: a3dda6d 2026-10-24T17:16:17+01:00', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: a3dda6d 2026-10-24T17:16:17+01:00']
+result: Output:
+
+| Owner | Action | Due |
+|---|---|---|
+| Lee | Sign off on the SSO renewal once legal replies | 2026-10-30 |
+| Marta | Collect demo feedback and circulate it | 2026-10-23 |
+| Dev | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting | 2026-10-26 |
+| Sam | Pair with Jo on the CI pipeline during Jo's first week | none |
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 936 mtime 16:59:09 local md5 970196fc0da4bfe36f5f5c20beaadf17
+  memo-2026-10-12.md size 1002 mtime 17:09:25 local md5 1b7541202526ab25ee3f8be9c6afa8ee
+  memo-2026-10-19.md size 865 mtime 17:20:53 local md5 8d5ae0769dfedfdc2db2bbe7edcb8bf8
+
+final ls -la:
+total 24
+drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 24 17:20 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 24 16:46 ..
+-rw-r--r--@ 1 aminalizadeh  wheel   936 Oct 24 16:59 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1002 Oct 24 17:09 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel   865 Oct 24 17:20 memo-2026-10-19.md
+

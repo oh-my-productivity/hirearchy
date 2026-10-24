@@ -1,0 +1,5 @@
+Facilitator slip (harness use, not a harness failure; no retry; the assistant call was normal). At turn 1 I passed the prompt file as a relative
+path (prompts/t01.txt) to run_turn.sh. The script reads the prompt (PROMPT="$(cat "$PF")") and copies it BEFORE it cds into S, so the prompt was
+sent verbatim (turn-01.cmd.txt and turn-01.prompt.txt hold it). The later `cat "$PF"` that echoes the prompt into turn-01.txt runs AFTER the cd
+and failed ("cat: prompts/t01.txt: No such file or directory"), so turn-01.txt has an empty "LENA" section. turn-01.prompt.txt has the text.
+Turns 2-12 use absolute prompt-file paths. turn-01.txt was not edited.

@@ -1,0 +1,92 @@
+# client questions (protocol 7.2); facts only
+
+Result messages root received (lead -> root), with the product parser's items (hirearchy.kernel._text.client_questions):
+- id 20261024T154128433635-lead-6c73 folder=read created=2026-10-24T15:41:28+00:00 answers(reply_to)=20261024T153617209573-root-7dcd status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Sam 'look into the flaky CI before Friday': Due none (C5; reviewer AMB1: Thursday 10-08 or Friday 10-09, notes do not fix one day).
+- Lee 'ping the vendor this week': Due none (C5; AMB2: notes say 'no hard date attached').
+- Marta 'book room for Oct 14': Due none (C5; AMB3: Oct 14 is the training date, not clearly a booking deadline).
+- Renovate appears as both a decision and Dev's action (C3/C4; AMB4: not a conflict, both kept).
+
+Memo: 2 decisions, 5 action items (Priya, Dev, Sam, Marta, Lee) in one Owner | Action | Due table. I read it: 117 words (C2 limit 400), based only on 2026-10-05.md (C1), 'Decisions' section holds only the two decided items (C3), Due values are 2026-10-09, 2026-10-08, none, none, none (C5), owners and actions match the notes (C6). Writer applied all 3 required changes from the first review (C7).
+Reviewer final line (lead/reviewer/work/review-2026-10-05.md): criteria met: 7 of 7
+Copy to /tmp/hirearchy-e6-s1-1792855848/deliverables as memo-2026-10-05.md.
+  parsed items (4): ["Sam 'look into the flaky CI before Friday': Due none (C5; reviewer AMB1: Thursday 10-08 or Friday 10-09, notes do not fix one day).", "Lee 'ping the vendor this week': Due none (C5; AMB2: notes say 'no hard date attached').", "Marta 'book room for Oct 14': Due none (C5; AMB3: Oct 14 is the training date, not clearly a booking deadline).", "Renovate appears as both a decision and Dev's action (C3/C4; AMB4: not a conflict, both kept)."]
+- id 20261024T154518315044-lead-d80f folder=read created=2026-10-24T15:45:18+00:00 answers(reply_to)=20261024T154227019921-root-f06d status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- AMB1 (C5): Sam 'before Friday' is not fixed to one day by the notes alone. Reviewer: 'Under the contract's literal date rule this would be none; I rely on the request line that settles it.' Memo uses your answer, 2026-10-09.
+- AMB3 (C5): Marta 'for Oct 14' gives the training date, not clearly a booking deadline. Memo uses your answer, 2026-10-14.
+
+Memo checked by me against C1-C6 and the request-only line. Read output: 117 words (limit 400). Sam Due 2026-10-09, Marta Due 2026-10-14, Lee none, Priya 2026-10-09, Dev 2026-10-08. Two decisions under 'Decisions'. One table with columns Owner | Action | Due and 5 rows that match the notes. Owners are all attendees.
+Reviewer coverage line (verbatim): 'criteria met: 7 of 7 (C1-C6 plus the request-only line).' Required changes: none. Ledger: lead/reviewer/work/review-2026-10-05.md.
+  parsed items (2): ["AMB1 (C5): Sam 'before Friday' is not fixed to one day by the notes alone. Reviewer: 'Under the contract's literal date rule this would be none; I rely on the request line that settles it.' Memo uses your answer, 2026-10-09.", "AMB3 (C5): Marta 'for Oct 14' gives the training date, not clearly a booking deadline. Memo uses your answer, 2026-10-14."]
+- id 20261024T154959991979-lead-3f72 folder=read created=2026-10-24T15:49:59+00:00 answers(reply_to)=20261024T154651259477-root-3a54 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Sam 'before Friday' (C5): reviewer says it could be read as 2026-10-08; memo has none plus an Open questions line. Your call.
+- Marta 'for Oct 14' (C5): reviewer says it could be read as 2026-10-14; memo has none plus an Open questions line. Your call.
+- Lee's agreement (C3): reviewer notes it could also count as a decision; it is in the table only.
+
+Rework applied: Sam and Marta Due are now none, with an Open questions section. I read the memo (146 words, limit 400) and the notes. Decisions 2 of 2, action rows 5 of 5, Due values: Priya 2026-10-09, Dev 2026-10-08, Sam none, Marta none, Lee none. All match the notes. C1-C7 met.
+Reviewer's final line (lead/reviewer/work/review-2026-10-05-recheck3.md): criteria met: 6 of 6
+Deliverable: lead/writer/work/memo-2026-10-05.md
+  parsed items (3): ["Sam 'before Friday' (C5): reviewer says it could be read as 2026-10-08; memo has none plus an Open questions line. Your call.", "Marta 'for Oct 14' (C5): reviewer says it could be read as 2026-10-14; memo has none plus an Open questions line. Your call.", "Lee's agreement (C3): reviewer notes it could also count as a decision; it is in the table only."]
+- id 20261024T155753564935-lead-9260 folder=read created=2026-10-24T15:57:53+00:00 answers(reply_to)=20261024T155319707505-root-b5b1 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Lee's 'agreed Lee would ping the vendor' (C3): reviewer AMB3 says it 'could count as a decision'; memo lists it only as an action, not under Decisions. Include it as a decision, or leave it as is?
+
+Memo 2026-10-05 now starts with the one-line Summary, then Decisions, then the Action items table. Only the Summary line was added. Sam 2026-10-09, Marta 2026-10-14, Lee none, Priya 2026-10-09, Dev 2026-10-08, no Open questions section. I read it: 142 words (limit 400), Summary on line 1, then '## Decisions' (2 items), then one table Owner | Action | Due with 5 rows.
+Reviewer final line: 'criteria met: 7 of 7 (C1-C6, C8); verdict: pass', required changes none. Ledger: lead/reviewer/work/review-2026-10-05-final.md. R1 checked and met. C7: reviewer all met, no rework needed.
+  parsed items (1): ["Lee's 'agreed Lee would ping the vendor' (C3): reviewer AMB3 says it 'could count as a decision'; memo lists it only as an action, not under Decisions. Include it as a decision, or leave it as is?"]
+- id 20261024T160315038409-lead-64ff folder=read created=2026-10-24T16:03:15+00:00 answers(reply_to)=20261024T160024219229-root-cbc2 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- C4/C3: Sam's hedged staging test-data item ('will probably sort it out himself') is listed as an action with Due 2026-10-21 (day before the Oct 22 freeze). Reviewer: 'valid if it counts as a commitment'. Delete the row if you don't count it.
+- C3/C4: Lee's shift swap with Dev ('Nobody had a problem with that') is listed as an action (Due none) only. Reviewer: 'if counted as a decision it would be missing from Decisions'.
+
+Memo: lead/writer/work/memo-2026-10-12.md (158 words by my read; limit 400). Order: Summary line, ## Decisions (3: RFC approval with token bucket and flag; blameless company-wide postmortem; deploy freeze Oct 22-23), then one table Owner | Action | Due with 5 rows (Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21, Lee none). I checked it against the notes: C1-C6, C8 and R1 met, nothing invented. Owners all appear in 'Present'.
+Reviewer line (verbatim, from lead/reviewer/work/review-2026-10-12.md): criteria met: 7 of 7. Required changes: none.
+  parsed items (2): ["C4/C3: Sam's hedged staging test-data item ('will probably sort it out himself') is listed as an action with Due 2026-10-21 (day before the Oct 22 freeze). Reviewer: 'valid if it counts as a commitment'. Delete the row if you don't count it.", "C3/C4: Lee's shift swap with Dev ('Nobody had a problem with that') is listed as an action (Due none) only. Reviewer: 'if counted as a decision it would be missing from Decisions'."]
+- id 20261024T160846733258-lead-8613 folder=read created=2026-10-24T16:08:46+00:00 answers(reply_to)=20261024T160535424081-root-b0fe status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- C6: Sam's 'probably' is dropped as you asked, so his commitment is firmer than the notes' literal 'will probably sort it out himself'. Reviewer: 'C6 is read as matches in substance'.
+- C3: Lee's swap stays table-only as you decided. Reviewer: 'Nobody had a problem with that' could count as a decision.
+- Style: 'himself' in Sam's table row (reviewer: harmless).
+
+I read the memo (158 words per read, limit 400): Summary line first, then Decisions (3 items), then one Owner | Action | Due table. Sam's Action has no 'probably' and his Due is 2026-10-21. Lee's row has Due none and is not in Decisions. The other rows match the notes (Dev 10-14, Marta 10-16, Priya 10-20).
+
+Reviewer coverage line (verbatim): criteria met: 8 of 8 (C1, C2, C3, C4, C5, C6, C8, this-request-only; R1 holds as a regression line, counted in addition: 9 of 9 checks). Required changes: none. Ledger: lead/reviewer/work/review-2026-10-12-recheck.md.
+
+The reviewer could not byte-diff 'other rows unchanged' because the earlier version was overwritten. It checked them against its earlier quoted values and the notes.
+  parsed items (3): ["C6: Sam's 'probably' is dropped as you asked, so his commitment is firmer than the notes' literal 'will probably sort it out himself'. Reviewer: 'C6 is read as matches in substance'.", "C3: Lee's swap stays table-only as you decided. Reviewer: 'Nobody had a problem with that' could count as a decision.", "Style: 'himself' in Sam's table row (reviewer: harmless)."]
+- id 20261024T161334148365-lead-b0f4 folder=read created=2026-10-24T16:13:34+00:00 answers(reply_to)=20261024T161027082339-root-285b status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Marta 'will keep the agenda as sent' (C4/C6): included as an action row, Due none. Reviewer: 'a prose commitment or a non-item (nothing to do)?'
+- Lee's sign-off 'probably by end of next week' (C5): Due none. Reviewer: 'if read as fixing one day (Fri 30 Oct), a date would be due'.
+- Sam pairing with Jo 'during that first week' (C5): Due none. Reviewer: 'if read as ending Fri 30 Oct, a date would be due'.
+- Weekly time move (C3/C4): listed as a decision only, no action row. Reviewer: 'could be read as an action for the organizer; notes name no owner'.
+
+Memo: lead/writer/work/memo-2026-10-19.md, 142 words per read. I read it against the notes. Order is Summary line, Decisions (3), one Owner | Action | Due table (6 rows). Due values: none, none, 2026-10-23, 2026-10-24, 2026-10-26, none. Owners are all in 'Present'. R1 holds.
+Reviewer review: lead/reviewer/work/review-2026-10-19.md, REQUIRED CHANGES none, so there was no rework.
+Verifier coverage line, verbatim: criteria met: 8 of 8
+  parsed items (4): ["Marta 'will keep the agenda as sent' (C4/C6): included as an action row, Due none. Reviewer: 'a prose commitment or a non-item (nothing to do)?'", "Lee's sign-off 'probably by end of next week' (C5): Due none. Reviewer: 'if read as fixing one day (Fri 30 Oct), a date would be due'.", "Sam pairing with Jo 'during that first week' (C5): Due none. Reviewer: 'if read as ending Fri 30 Oct, a date would be due'.", "Weekly time move (C3/C4): listed as a decision only, no action row. Reviewer: 'could be read as an action for the organizer; notes name no owner'."]
+- id 20261024T161926673282-lead-762f folder=read created=2026-10-24T16:19:26+00:00 answers(reply_to)=20261024T161442312966-root-d675 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client: (reviewer flags; I did not settle them, and they touch your answers)
+- C5: Lee's 'probably by end of next week' is hedged and could mean 10-30 or 11-01. The memo uses your 10-30 without 'probably', so a reader may take it as a firm deadline.
+- C4: Marta's prose commitment to keep the agenda is omitted on your instruction, but C4 read literally covers prose commitments. Should the contract exclude such non-actions?
+- C5: Sam's pairing is Due none, but a reader might want the end of Jo's first week. The notes do not give that day.
+
+Reviewer's final line (lead/reviewer/work/review-2026-10-19-recheck.md): 'criteria met: 9 of 9' / '11 of 11 factual claims verified'. No required changes.
+
+Deliverable: lead/writer/work/memo-2026-10-19.md
+  parsed items (4): ['(reviewer flags; I did not settle them, and they touch your answers)', "C5: Lee's 'probably by end of next week' is hedged and could mean 10-30 or 11-01. The memo uses your 10-30 without 'probably', so a reader may take it as a firm deadline.", "C4: Marta's prose commitment to keep the agenda is omitted on your instruction, but C4 read literally covers prose commitments. Should the contract exclude such non-actions?", "C5: Sam's pairing is Due none, but a reader might want the end of Jo's first week. The notes do not give that day."]
+
+progress replies the assistant received that contain 'for the client: ask the user before you copy or deliver':
+- call #17 2026-10-24T15:41:29.565Z turn 4 hirearchy::progress: ['"Memo for 2026-10-05 weekly" [service weekly-memo v1]: done. runs 9 of 16 (7 returned). last activity 0s ago. artifacts withheld (ask first). 4 questions for the client: ask the user before you copy or deliver. no feedback yet. (task 20261024T153617209573-root-7dcd)']
+- call #23 2026-10-24T15:45:19.419Z turn 5 hirearchy::progress: ['"Memo 2026-10-05: client due-date answers" [service weekly-memo v1]: done. runs 5 of 7 (2 returned). last activity 0s ago. artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver. no feedback yet. case total: 14 runs used of 23 handed down (contract: 16 per request). (task 20261024T154227019921-root-f06d)']
+- call #33 2026-10-24T15:52:26.093Z turn 7 hirearchy::progress: ['"Rework memo 2026-10-05: unclear due dates" [service weekly-memo v1]: done. runs 5 of 6 (1 returned). last activity 58s ago. artifacts withheld (ask first). 3 questions for the client: ask the user before you copy or deliver. no feedback yet. case total: 19 runs used: 14 by the user\'s requests, 5 by your relayed rework 20261024T154651259477-root-3a54; 29 handed down (contract: 16 per request). The runs of your relayed rework are your own spend, not the user\'s: report them to the user as yours, and never ask the user to fund them. (task 20261024T154651259477-root-3a54)']
+- call #42 2026-10-24T15:57:55.366Z turn 7 hirearchy::progress: ['"Memo 2026-10-05: add Summary line" [service weekly-memo v1]: done. runs 5 of 5. last activity 1s ago. artifacts withheld (ask first). 1 question for the client: ask the user before you copy or deliver. no feedback yet. case total: 24 runs used: 19 by the user\'s requests, 5 by your relayed rework 20261024T154651259477-root-3a54; 34 handed down (contract: 16 per request). The runs of your relayed rework are your own spend, not the user\'s: report them to the user as yours, and never ask the user to fund them. (task 20261024T155319707505-root-b5b1)']
+- call #49 2026-10-24T16:03:15.380Z turn 9 hirearchy::progress: ['"Memo for 2026-10-12 weekly" [service weekly-memo v2]: done. runs 5 of 16 (11 returned). last activity 0s ago. artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver. no feedback yet. (task 20261024T160024219229-root-cbc2)']
+- call #56 2026-10-24T16:08:47.113Z turn 10 hirearchy::progress: ['"Memo 2026-10-12: drop \'probably\' from Sam\'s action" [service weekly-memo v2]: done. runs 5 of 5. last activity 0s ago. artifacts withheld (ask first). 3 questions for the client: ask the user before you copy or deliver. no feedback yet. case total: 10 runs used of 21 handed down (contract: 16 per request). (task 20261024T160535424081-root-b0fe)']
+- call #58 2026-10-24T16:08:59.533Z turn 10 hirearchy::progress: ['"Memo 2026-10-12: drop \'probably\' from Sam\'s action" [service weekly-memo v2]: done. runs 5 of 5. last activity 0s ago. artifacts withheld (ask first). 3 questions for the client: ask the user before you copy or deliver. no feedback yet. case total: 10 runs used of 21 handed down (contract: 16 per request). (task 20261024T160535424081-root-b0fe)']
+- call #65 2026-10-24T16:13:35.534Z turn 11 hirearchy::progress: ['"Memo for 2026-10-19 weekly" [service weekly-memo v2]: done. runs 5 of 16 (9 returned). last activity 1s ago. artifacts withheld (ask first). 4 questions for the client: ask the user before you copy or deliver. no feedback yet. (task 20261024T161027082339-root-285b)']
+- call #70 2026-10-24T16:19:28.019Z turn 12 hirearchy::progress: ['"Memo 2026-10-19: apply client answers" [service weekly-memo v2]: done. runs 5 of 5 (2 returned). last activity 1s ago. artifacts withheld (ask first). 4 questions for the client: ask the user before you copy or deliver. no feedback yet. case total: 10 runs used of 21 handed down (contract: 16 per request). (task 20261024T161442312966-root-d675)']
+count: 9

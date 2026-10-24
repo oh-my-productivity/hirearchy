@@ -1,0 +1,73 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-24T16:46:09Z .. 2026-10-24T16:48:43Z; injected task 20261024T164609285022-root-4ccc; revised (memo 1) task 20261024T164233848320-root-4ecb
+
+## run lead@20261024T164609519605 agent=lead model=claude-sonnet-5.5 start=2026-10-24T16:46:09.533055+00:00 end=2026-10-24T16:46:49.767286+00:00 exit=0 secs=40 session=sess_63e00b27-cb08-4442-b1c5-dcd3d285bc86
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 9
+  lead message 20261024T164641426849-lead-e590 to=lead/writer type=task status=None created=2026-10-24T16:46:41+00:00
+  ## Lessons: (none)
+  org-git commit 96eae9a MEMORY.md diff:
+    commit 96eae9a2b878fc6d920a4281ec1deb4724261187
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 17:46:49 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T164609519605.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 50e0b35..518724b 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,2 +1,2 @@
+     # Memory
+    -Task 20261024T164233848320-root-4ecb (memo 2026-10-05, drop Lee from Decisions) reported done with coverage lines and questions for client. Nothing open. Deliverable: lead/writer/work/memo-2026-10-05.md.
+    +Task 20261024T164609285022-root-4ccc (rework memo 2026-10-05: Sam & Marta Due -> none + Open questions) open. Delegated writer rework 20261024T164641426849-lead-e590 (revises ...47ee, budget 1). Next: when writer done, read lead/writer/work/memo-2026-10-05.md, delegate reviewer re-check (revises 20261024T164355795643-lead-832b, budget 1, tell it to re-check EVERY Due value vs notes and the whole file; criteria C1-C9 + C10 verbatim from the task), then report done to root with reviewer's coverage lines + lessons. Earlier reviewer ledgers in lead/reviewer/work/. Budget after delegation: 4 (writer 1; reviewer 1 to give).
+
+## run lead/writer@20261024T164641697983 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-24T16:46:41.710877+00:00 end=2026-10-24T16:47:14.007987+00:00 exit=0 secs=32 session=sess_3c8aded1-60bc-48f1-9e90-688b379b9cfe
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 5
+
+## run lead@20261024T164709958832 agent=lead model=claude-sonnet-5.5 start=2026-10-24T16:47:09.984374+00:00 end=2026-10-24T16:47:36.239065+00:00 exit=0 secs=26 session=sess_d2f717c0-eb56-4c52-bad7-b91faae445ec
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261024T164729991935-lead-362d to=lead/reviewer type=task status=None created=2026-10-24T16:47:29+00:00
+  ## Lessons: (none)
+  org-git commit 702163f MEMORY.md diff:
+    commit 702163f7a7ff7b69ec9d2772d6fd4e78453e833e
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 17:47:36 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T164709958832.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 518724b..13d57f3 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,2 +1,2 @@
+     # Memory
+    -Task 20261024T164609285022-root-4ccc (rework memo 2026-10-05: Sam & Marta Due -> none + Open questions) open. Delegated writer rework 20261024T164641426849-lead-e590 (revises ...47ee, budget 1). Next: when writer done, read lead/writer/work/memo-2026-10-05.md, delegate reviewer re-check (revises 20261024T164355795643-lead-832b, budget 1, tell it to re-check EVERY Due value vs notes and the whole file; criteria C1-C9 + C10 verbatim from the task), then report done to root with reviewer's coverage lines + lessons. Earlier reviewer ledgers in lead/reviewer/work/. Budget after delegation: 4 (writer 1; reviewer 1 to give).
+    +Task 20261024T164609285022-root-4ccc (rework memo 2026-10-05) open. Writer rework done (memo read by me: Sam/Marta Due none + Open questions, 217 words per writer). Delegated reviewer re-check (revises ...832b, budget 1). Next: when reviewer result arrives, read its ledger, confirm n=m for criteria C1-C9, then report done to root (path lead/writer/work/memo-2026-10-05.md, paste reviewer coverage lines verbatim, C10 = reviewer all met, lessons). If it fails, report blocked with options (no budget for more cycles). Lessons: ambiguous 'before X'/event dates should be none + Open questions; add to playbook pitfalls.
+
+## run lead/reviewer@20261024T164730175547 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-24T16:47:30.185918+00:00 end=2026-10-24T16:48:10.526576+00:00 exit=0 secs=40 session=sess_10bb7c63-efa7-4c87-92a7-dd8b743b4ef3
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261024T164802452772 agent=lead model=claude-sonnet-5.5 start=2026-10-24T16:48:02.468466+00:00 end=2026-10-24T16:48:36.751443+00:00 exit=0 secs=34 session=sess_fb67e2b3-7d9e-4441-89aa-8b0347005092
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+  lead message 20261024T164827382688-lead-3e7e to=root type=result status=done created=2026-10-24T16:48:27+00:00
+  ## Lessons: Rework cycle fixed the two Due values (Sam, Marta) with one writer run + one reviewer re-check. Playbook pitfall to add: 'before X' deadlines and event dates (training date) are not deadlines; use none and list in Open questions. Tell reviewer to check every Due value against the notes text from the first review.
+  org-git commit 8387b00 MEMORY.md diff:
+    commit 8387b00877559063189ff27fb89d8d4ff43d515a
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sat Oct 24 17:48:36 2026 +0100
+    
+        lead: run ok, 1 message(s) [lead/runs/20261024T164802452772.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 13d57f3..564a1f4 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,2 +1,2 @@
+     # Memory
+    -Task 20261024T164609285022-root-4ccc (rework memo 2026-10-05) open. Writer rework done (memo read by me: Sam/Marta Due none + Open questions, 217 words per writer). Delegated reviewer re-check (revises ...832b, budget 1). Next: when reviewer result arrives, read its ledger, confirm n=m for criteria C1-C9, then report done to root (path lead/writer/work/memo-2026-10-05.md, paste reviewer coverage lines verbatim, C10 = reviewer all met, lessons). If it fails, report blocked with options (no budget for more cycles). Lessons: ambiguous 'before X'/event dates should be none + Open questions; add to playbook pitfalls.
+    +Task 20261024T164609285022-root-4ccc (rework memo 2026-10-05) reported done; reviewer 10 of 10, 14 of 14. Nothing pending. Deliverable: lead/writer/work/memo-2026-10-05.md. Lesson: 'before X' deadlines and event dates are Due none + Open questions; reviewer should check every Due value vs notes text from the start (playbook pitfall, not yet revised: no evidence threshold).
+

@@ -1,0 +1,14 @@
+######## TURN 10  start 18:29:44  end 18:33:23  elapsed 219s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T17:29:44Z end 2026-10-24T17:33:23Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks. Please do 2026-10-12.md. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-10.stderr.txt):
+The 12 Oct memo is written and reviewed with no rework: 245 words, Summary line first, 3 decisions and 5 action items. The reviewer shows 8 of 8 checks met, and I read it against your notes and agree. It hasn't been copied to your deliverables folder because the team has two questions.
+
+1. **"Open, not decided" section.** The memo ends with a short section noting that the CI fix needs more than a quick patch and has no decision recorded. You kept the same kind of section in the 5 Oct memo, but no check covers it, so the reviewer couldn't call it allowed. My recommendation is to keep it. Keep it for 12 Oct only, or make it standing for every memo?
+2. **Lee's pager swap.** The notes say Lee will swap shifts with Dev and "nobody had a problem with that". It's in the table as Lee's action with Due none. Should it also appear under Decisions? My recommendation is no, because it reads as a commitment, as with Lee's vendor ping.
+
+The other Due values are Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20 and Sam 2026-10-21. Sam's date is my reading of his informal "ready the day before the freeze starts", which begins 22 Oct.
+
+Cost so far for this memo: 5 of the 16 runs, with the rest returned.
+
+If you answer "keep as is" to both, I'll copy the memo over as it stands.

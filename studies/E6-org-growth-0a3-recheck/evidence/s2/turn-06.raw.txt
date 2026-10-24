@@ -1,0 +1,16 @@
+The memo is at `/tmp/hirearchy-e6-s2-1792859296/deliverables/memo-2026-10-05.md`. I copied it from the team's file and confirmed the two are identical.
+
+- Only the 5 Oct meeting is covered: met.
+- Length is at most 400 words: met (216 by `wc`, 186 by the team's count).
+- It has "Decisions" and "Action items" sections: met.
+- Decisions, with reasons: met. There are two, the gateway migration move and adopting Renovate.
+- The table columns are exactly Owner | Action | Due: met.
+- Every commitment is a row, including Sam's and Lee's informal ones: met.
+- Owners match the notes: met.
+- Dates are ISO or `none`: met. These are your rulings: Sam 2026-10-09, Marta 2026-10-14 and Lee `none`.
+- Nothing is invented: met. The reviewer verified 11 of 11 claims.
+- The reviewer's report shows 10 of 10 criteria met: met.
+
+The case cost 15 runs against the 12 you approved: 5 for the first pass and 5 for each of the two fixes. The extra 3 were the two changes you asked for. A first pass with no changes should cost about 5 runs.
+
+Keep it, or what should change?

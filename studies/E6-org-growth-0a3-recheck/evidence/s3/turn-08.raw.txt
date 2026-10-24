@@ -1,0 +1,8 @@
+The memo now starts with the Summary line, then Decisions, then Action items. The reviewer checked it at 8 of 8 criteria (including the new C9), and the lead counts 227 words.
+
+It isn't in the deliverables folder yet because the team has one question for you. The version you judged has a short "Open, not decided" section at the end with one line: "No decision was recorded on the flaky CI itself; Sam is investigating." Do you want to keep that section, or delete it?
+
+- **Why it came up:** my rework note said "no Open questions section beyond what that version had". The reviewer read that as a ruling to remove the section. You never said that.
+- **My recommendation:** keep it. It's one line, it's accurate, and it's in the version you already reviewed. If you'd rather delete it, that costs one more small rework.
+
+Cost so far: this Summary rework used 5 of the 5 runs you funded. The runs on your side of the 5 Oct case total 16. That is the original 16-run cap plus the 4 you added, and 4 are left unspent. The 5 runs for the rework you didn't ask for come on top, and I'm counting those as my spend.

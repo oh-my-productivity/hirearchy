@@ -1,0 +1,1 @@
+deleted hirearchy-study-e6-s3-assistant.json md5 c259f6eac03e9e80148ac49c4ee0d2d0 at 2026-10-24T17:40:21Z (copy verified identical by cmp before deletion)

@@ -1,0 +1,12 @@
+######## TURN 11  start 17:10:04  end 17:14:00  elapsed 236s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T16:10:04Z end 2026-10-24T16:14:00Z; exit code 0)
+######## LENA (prompt sent verbatim):
+That one is right, all the items are there - keep it. Now 2026-10-19.md please. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-11.stderr.txt):
+The memo for 2026-10-19 is drafted and passed review (8 of 8 criteria). I haven't copied it to `deliverables` yet. The reviewer raised four open points, and I need your answer on each:
+
+1. **Marta, "will keep the agenda as sent":** I listed it as an action row with Due `none`. It's more a decision not to change anything than something to do. Keep the row, or remove it?
+2. **Lee, SSO sign-off:** The notes say "probably by end of next week". The meeting was Monday 19 Oct, so that would be Friday 2026-10-30. Use 2026-10-30, or keep `none`?
+3. **Sam, pairing with Jo:** The notes say "during that first week", and Jo starts Monday 26 Oct. Is it an ongoing activity with Due `none`, or should it end 2026-10-30?
+4. **Moving the weekly to Monday 14:00:** It's listed under Decisions only. Is that enough, or does someone need an action row? The notes name no owner.
+
+The rest is set. Summary line first, then 3 decisions, then 6 table rows. Marta's feedback is due 2026-10-23, Dev's freeze removal 2026-10-24 and Priya's benchmark 2026-10-26. This memo has used 5 of 16 runs so far.

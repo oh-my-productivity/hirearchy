@@ -1,0 +1,20 @@
+######## TURN 5  start 18:14:09  end 18:17:19  elapsed 190s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T17:14:09Z end 2026-10-24T17:17:19Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's should be 2026-10-09. Marta's should be 2026-10-14. Lee's none is right. Lee's ping is an action item, so the table is enough.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-05.stderr.txt):
+The memo for 5 Oct is at `/tmp/hirearchy-e6-s3-1792861552/deliverables/memo-2026-10-05.md`. It's 233 words by `wc`, under the 400 limit.
+
+- **Meeting only:** met. It covers only the 5 Oct notes.
+- **Word limit:** met. The writer's count was 201 words and mine is 233.
+- **Decisions:** met. It lists the 2 firm decisions, and Lee's vendor ping stays out of it, as you ruled.
+- **Action items table:** met. The columns are exactly Owner | Action | Due.
+- **Every commitment:** met. There are 5 rows, including the informal ones from Sam and Lee.
+- **Due values:** met. Sam is 2026-10-09, Marta is 2026-10-14, Lee is none, and the other two rows have ISO dates.
+- **Traceable to the notes:** met. The reviewer verified 13 of 13 claims.
+- **Reviewer report:** met. It shows criteria met 7 of 7 on the re-check, and the writer applied the change.
+
+Runs: 10 used, against the 16 approved per memo. The rework came out of the lead's own reserve, so no extra spend was needed.
+
+The team is now a standing service. After each meeting, tell me the notes file name, for example `2026-10-12.md`, and I'll request the next memo.
+
+Do you want to keep this memo as it is, or change anything?

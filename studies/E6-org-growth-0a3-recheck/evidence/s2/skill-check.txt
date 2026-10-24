@@ -1,0 +1,16 @@
+# s2 skill check (protocol 4.4)
+repo skill:      b2469838032374807e3608631c9fb1d2  lines 125
+workspace copy:  b2469838032374807e3608631c9fb1d2  lines 125  (/tmp/hirearchy-e6-s2-1792859296/.kiro/skills/hirearchy/SKILL.md)
+global (read-only): b2469838032374807e3608631c9fb1d2  lines 125
+required: b2469838032374807e3608631c9fb1d2
+
+first disclose_context call for the skill: [2026-10-24T16:29:07.252Z] CALL #2 turn=1 disclose_context
+  md5 of the SKILL.md at the disclosed path (workspace copy): b2469838032374807e3608631c9fb1d2 (valid: = b2469838...)
+
+skill-activation stratum (4.4.1): first propose_org = CALL #9 turn=2 2026-10-24T16:30:23.362Z; first feedback = CALL #32 turn=8 2026-10-24T16:50:03.129Z
+  (turn numbers are SESSION turns, see session-turn-mapping.txt)
+  disclose_context 2026-10-24T16:29:07.252Z is earlier than both -> stratum A (activated before the first propose_org and before the first feedback).
+
+occurrences of 'Note: the installed skill at' in the whole transcript: 0 (assistant-session-messages.jsonl); 0 (assistant-tool-calls.txt)
+disclose_context calls in the session: 1
+disclosed={"type": "skill", "displayName": "hirearchy", "uri": "file:///private/tmp/hirearchy-e6-s2-1792859296/.kiro/skills/hirearchy/SKILL.md"} args={"name": "hirearchy"}

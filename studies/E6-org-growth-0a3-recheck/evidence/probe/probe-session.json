@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_21794034-1831-4489-9f44-396639ff99a1",
+  "title": "List the names of the skills you can activate, one per line. Do not activate ...",
+  "agentMode": "hirearchy-study-e6-probe",
+  "workspacePaths": [
+    "/private/tmp/hirearchy-e6-probe-1792855143"
+  ],
+  "rootPaths": [
+    "/private/tmp/hirearchy-e6-probe-1792855143"
+  ],
+  "createdAt": "2026-10-24T15:19:32.756Z",
+  "lastModifiedAt": "2026-10-24T15:19:39.361Z",
+  "modelId": "claude-sonnet-5.5",
+  "autopilot": true,
+  "effortLevel": "high",
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-sonnet-5.5",
+    "display": "Claude Sonnet 5.5"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "read_write",
+    "reflection": true
+  },
+  "memoryConfigSource": "explicit",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "read_write",
+          "reflection": true
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

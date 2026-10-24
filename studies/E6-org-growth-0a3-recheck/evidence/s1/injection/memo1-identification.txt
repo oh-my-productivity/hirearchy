@@ -1,0 +1,6 @@
+memo-1 task identification (protocol 5.3)
+date_utc: 2026-10-24T15:46:40Z
+root tasks when memo 1 was first delivered (turn 5 copy, deliverables/memo-2026-10-05.md, md5 d93281f174f8ff4701d615875dcb4bda; mtime 16:45:29 local = 15:45:29Z):
+  20261024T153617209573-root-7dcd (first request, source: -) -> result lead-6c73 (done, 15:41:28Z; "Questions for the client:" 4 items; Sam/Lee/Marta Due none)
+  20261024T154227019921-root-f06d (human rework 'Memo 2026-10-05: client due-date answers', revises 7dcd, source: human, budget 7) -> result lead-d80f (done, 15:45:18Z)
+The delivered file's md5 equals lead/writer/work/memo-2026-10-05.md (md5 d93281f174f8ff4701d615875dcb4bda), the artifact of the done result lead-d80f (reply_to f06d, 'Reviewer coverage line ... Ledger: lead/reviewer/work/review-2026-10-05.md'). The copy was after d80f. So the version delivered at memo 1's first delivery is the done result of f06d -> revises target = 20261024T154227019921-root-f06d (as in E4 s3 and E5 s1).

@@ -1,0 +1,8 @@
+######## TURN 4  start 17:38:09  end 17:41:32  elapsed 203s  (local, 2026-10-24; UTC wall-clock start 2026-10-24T16:38:09Z end 2026-10-24T16:41:32Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Marta's should be 2026-10-14. Sam's should be 2026-10-09.
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+I've sent the team back to change one date. Sam's row moves to 2026-10-09 and Marta's stays at 2026-10-14. I'll wait for it now.Sam's row now reads 2026-10-09 and Marta's reads 2026-10-14. The reviewer re-checked the memo and found nothing else changed (10 of 10 criteria met, 17 of 17 claims verified). It's still 224 words. I haven't copied it to `deliverables/` yet, because one question is left.
+
+Lee's task to ping the identity vendor appears twice: as the third item under Decisions ("we agreed Lee would ping the vendor") and as a row in the action table. Should it stay in both places, or only in the table? I'd keep both, since the notes say the group agreed to it. Reply "keep" or "table only". Dropping it from Decisions is a small fix (about 2 runs), and the case so far is at 10 runs.
