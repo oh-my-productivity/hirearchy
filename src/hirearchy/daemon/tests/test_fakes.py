@@ -152,9 +152,9 @@ def test_the_scripted_spawner_plays_the_scheduler_that_comes_up(tmp_path: Path) 
     layout = OrgPaths(tmp_path)
     table = FakeProcessTable()
     spawner = ScriptedSchedulerSpawner(table, layout)
-    handle = spawner.spawn_detached(["hirearchy", "run"], cwd=tmp_path, env={}, log=tmp_path / "scheduler.log")
-    assert (tmp_path / ".runtime" / "scheduler.pid").read_text() == str(handle.pid)
-    assert table.spawned[0].argv == ("hirearchy", "run") and table.is_alive(handle.pid)
+    pid = spawner.spawn_detached(["hirearchy", "run"], cwd=tmp_path, env={}, log=tmp_path / "scheduler.log")
+    assert (tmp_path / ".runtime" / "scheduler.pid").read_text() == str(pid)
+    assert table.spawned[0].argv == ("hirearchy", "run") and table.is_alive(pid)
 
 
 def test_the_scripted_spawner_can_play_a_scheduler_that_ends_at_once_with_a_reason(tmp_path: Path) -> None:
@@ -163,6 +163,6 @@ def test_the_scripted_spawner_can_play_a_scheduler_that_ends_at_once_with_a_reas
     spawner = ScriptedSchedulerSpawner(table, layout)
     spawner.starts_up, spawner.exit_reason = False, "finished: no open tasks"
     table.will_exit(0)
-    handle = spawner.spawn_detached(["hirearchy", "run"], cwd=tmp_path, env={}, log=tmp_path / "scheduler.log")
+    pid = spawner.spawn_detached(["hirearchy", "run"], cwd=tmp_path, env={}, log=tmp_path / "scheduler.log")
     assert not (tmp_path / ".runtime" / "scheduler.pid").exists()
-    assert (tmp_path / ".runtime" / "scheduler.exit").read_text() == "finished: no open tasks\n" and handle.poll() == 0
+    assert (tmp_path / ".runtime" / "scheduler.exit").read_text() == "finished: no open tasks\n" and table.info(pid) is None

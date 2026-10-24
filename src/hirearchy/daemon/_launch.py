@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from ..kernel import OrgError
 from ..processes import ProcessSpawner
-from ._ports import Children, LaunchEnvironment, LaunchSite, SchedulerLauncher, StartupWatch
+from ._ports import LaunchEnvironment, LaunchSite, SchedulerLauncher, StartupWatch
 from ._refusals import check_startable
 from .api import SchedulerCommand, SchedulerStatus
 
@@ -17,7 +17,6 @@ class DetachedLauncher(SchedulerLauncher):
         environment: LaunchEnvironment,
         command: SchedulerCommand,
         spawner: ProcessSpawner,
-        children: Children,
         watch: StartupWatch,
     ) -> None:
         self._status = status
@@ -25,7 +24,6 @@ class DetachedLauncher(SchedulerLauncher):
         self._environment = environment
         self._command = command
         self._spawner = spawner
-        self._children = children
         self._watch = watch
 
     def start(self, max_runs: int | None, until_done: bool) -> int:
@@ -36,7 +34,5 @@ class DetachedLauncher(SchedulerLauncher):
         env = self._environment.variables()
         argv = self._command.argv(max_runs, until_done)
         self._site.announce(log, argv)
-        handle = self._spawner.spawn_detached(argv, cwd=self._site.directory(), env=env, log=log)
-        self._children.adopt(handle)
-        self._watch.await_start(handle, log)
-        return handle.pid
+        pid = self._spawner.spawn_detached(argv, cwd=self._site.directory(), env=env, log=log)
+        return self._watch.await_start(pid, log)

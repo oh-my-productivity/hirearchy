@@ -24,7 +24,7 @@ class Rig:
         self.clock = FakeClock()
         self.table = FakeProcessTable(self.clock)
         self.children = ChildRegistry()
-        self.handle: ProcessHandle = self.table.spawn_detached(["hirearchy", "run"], cwd=tmp_path, env={}, log=tmp_path / "log")
+        self.handle: ProcessHandle = self.table.spawn(["hirearchy", "run"], cwd=tmp_path, env={}, stdin=None, stdout=None)
         self.pid = self.handle.pid
         self.status = FakeSchedulerStatus(SchedulerState("running", self.pid, RUNNING))
         self.stopper = SignalSchedulerStopper(self.status, self.table, self.table, self.children, self.clock)

@@ -62,7 +62,7 @@ def control(b: PortResolver, scheduler_status: SchedulerStatus) -> DetachedSched
     layout, marker, clock, children = b.get(OrgLayout), b.get(ExitMarker), b.get(Clock), b.get(ProcessResources).children
     launcher = DetachedLauncher(
         scheduler_status, RuntimeLaunchSite(layout, b.get(IgnoreList), marker, clock), ScrubbedLaunchEnvironment(layout, b.get(Environment)),
-        b.get(SchedulerCommand), b.get(ProcessSpawner), children, PidFileStartupWatch(layout, marker, clock),
+        b.get(SchedulerCommand), b.get(ProcessSpawner), PidFileStartupWatch(layout, marker, clock, b.get(ProcessInspector)),
     )
     return DetachedSchedulerControl(
         launcher, SignalSchedulerStopper(scheduler_status, b.get(ProcessSignaller), b.get(ProcessInspector), children, clock),

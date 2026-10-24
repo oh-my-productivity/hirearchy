@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import IO, Any, cast
 
 from .api import ProcessHandle, ProcessSpawner
+
+DETACH_SECONDS = 10  # how long the intermediate has to report the pid
+MESSAGE_CUT = 200  # the reason of a failure is clipped to this many characters
 
 
 class PopenHandle(ProcessHandle):
@@ -53,10 +57,28 @@ class PopenProcessSpawner(ProcessSpawner):
         )
         return PopenHandle(proc)
 
-    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> ProcessHandle:
-        with open(log, "ab") as out:
+    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> int:
+        # An intermediate process (``_detach.py``) starts ``argv`` and exits at once, so ``argv`` is re-parented and is no descendant of this process.
+        command = [sys.executable, "-I", str(Path(__file__).with_name("_detach.py")), str(log), "--", *argv]
+        try:
             proc = subprocess.Popen(
-                list(argv), cwd=cwd, env=dict(env), stdin=subprocess.DEVNULL, stdout=out,
-                stderr=subprocess.STDOUT, start_new_session=True,
+                command, cwd=cwd, env=dict(env), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                start_new_session=True,
             )
-        return PopenHandle(proc)
+        except OSError as error:
+            raise _not_started(argv, str(error)) from error
+        try:
+            out, err = proc.communicate(timeout=DETACH_SECONDS)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.communicate()  # reaped
+            raise _not_started(argv, f"no pid was reported within {DETACH_SECONDS} seconds") from None
+        words = out.split()
+        if proc.returncode != 0 or len(words) != 1 or not words[0].isdigit() or int(words[0]) < 1:
+            lines = [line for line in err.splitlines() if line.strip()]
+            raise _not_started(argv, lines[-1] if lines else f"the intermediate exited with {proc.returncode} and reported no pid")
+        return int(words[0])
+
+
+def _not_started(argv: Sequence[str], reason: str) -> OSError:
+    return OSError(f"could not start {argv[0] if argv else '(nothing)'} detached: {reason[:MESSAGE_CUT]}")

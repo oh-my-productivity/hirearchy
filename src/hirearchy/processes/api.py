@@ -79,8 +79,11 @@ class ProcessSpawner(Protocol):
         """Start in its own session (pgid == pid), stderr merged into stdout."""
         ...
 
-    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> ProcessHandle:
-        """Detached scheduler: stdin devnull, output appended to log, own session."""
+    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> int:
+        """Start ``argv`` so that it is no descendant of this process: an intermediate process starts it in a session of its own (stdin /dev/null,
+        stdout and stderr appended to ``log``, created if missing), reports its pid and exits at once, so it is re-parented (to launchd or init, or
+        to the nearest subreaper on Linux) and outlives this process and every process of this process's tree. Returns its pid. ``OSError`` when
+        the intermediate cannot be started, fails, or reports no pid within 10 seconds."""
         ...
 
 

@@ -106,7 +106,7 @@ def test_a_relative_root_cannot_be_compared_and_is_unverified(tmp_path: Path) ->
 
 def test_asking_for_the_state_reaps_the_children_that_ended(tmp_path: Path) -> None:
     rig = Rig(tmp_path)
-    handle = rig.table.spawn_detached(["hirearchy", "run"], cwd=tmp_path, env={}, log=tmp_path / "log")
+    handle = rig.table.spawn(["hirearchy", "run"], cwd=tmp_path, env={}, stdin=None, stdout=None)
     rig.children.adopt(handle)
     rig.table.exit(handle.pid, 0)
     rig.pidfile(str(handle.pid))

@@ -222,17 +222,23 @@ class FakeProcessTable(ProcessSpawner, ProcessInspector, ProcessSignaller):
             _write(stdout, script.output)
         return handle
 
-    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> ProcessHandle:
+    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> int:
+        """Not our child (its row has ``ours=False``): when it exits it is gone, there is no zombie and no handle to poll."""
         script = self._script
         with open(log, "ab") as out:  # like the real one: created if missing, appended to
-            handle = self._start(argv, cwd, env, log)
+            handle = self._start(argv, cwd, env, log, ours=False)
             if script is not None and script.output:
                 out.write(script.output.encode("utf-8"))
-        return handle
+        return handle.pid
 
-    def _start(self, argv: Sequence[str], cwd: Path, env: Mapping[str, str], log: Path | None) -> ProcessHandle:
+    def is_child(self, pid: int) -> bool:
+        """Is the process a child of the judging process (a zombie when it exits, until its handle polls)?"""
+        process = self._processes.get(pid)
+        return process is not None and process.ours
+
+    def _start(self, argv: Sequence[str], cwd: Path, env: Mapping[str, str], log: Path | None, *, ours: bool = True) -> ProcessHandle:
         pid = self._new_pid()
-        process = _Process(pid, pid, pid, "S", self._lstart(), " ".join(argv), ours=True)
+        process = _Process(pid, pid, pid, "S", self._lstart(), " ".join(argv), ours=ours)
         script, self._script = self._script, None
         if script is not None:
             process.exit_at, process.exit_code = self._clock.time() + script.after, script.code
@@ -395,7 +401,8 @@ class ProcessWorld:
     start_group: Callable[[], tuple[ProcessHandle, int]]  # such a leader and the pid of a grandchild in its group
     start_term_proof: Callable[[], ProcessHandle]  # ignores SIGTERM
     start_exiting: Callable[[int], ProcessHandle]  # exits at once with the code
-    start_echo: Callable[[str, Path], ProcessHandle]  # spawn_detached: prints the text, exits 0
+    start_echo: Callable[[str, Path], int]  # spawn_detached: prints the text, exits 0; returns the pid
+    is_child: Callable[[int], bool]  # the process is a child of this process (real: ``os.waitpid`` finds it; fake: the row's ``ours``)
     start_bystander: Callable[[], int]  # alive, in the test's own process group, not a session leader
     start_zombie: Callable[[], int]  # exited and not reaped
     gone_pid: Callable[[], int]  # a pid of a process that does not exist
@@ -407,6 +414,7 @@ class _TrackingSpawner(PopenProcessSpawner):
 
     def __init__(self) -> None:
         self.started: list[ProcessHandle] = []
+        self.detached: list[int] = []  # pids; each leads its own group and is nobody's child
 
     def spawn(
         self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], stdin: object | None, stdout: object | None
@@ -415,10 +423,10 @@ class _TrackingSpawner(PopenProcessSpawner):
         self.started.append(handle)
         return handle
 
-    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> ProcessHandle:
-        handle = super().spawn_detached(argv, cwd=cwd, env=env, log=log)
-        self.started.append(handle)
-        return handle
+    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> int:
+        pid = super().spawn_detached(argv, cwd=cwd, env=env, log=log)
+        self.detached.append(pid)
+        return pid
 
 
 def _wait_for(condition: Callable[[], bool], what: str, timeout: float = 10.0) -> None:
@@ -470,9 +478,15 @@ def real_world(tmp_path: Path) -> ProcessWorld:
     def exiting(code: int) -> ProcessHandle:
         return spawn("sh", "-c", f"exit {code}")
 
-    def echo(text: str, log: Path) -> ProcessHandle:
-        handle = spawner.spawn_detached(["sh", "-c", 'printf %s "$0"', text], cwd=tmp_path, env=env(), log=log)
-        return handle
+    def echo(text: str, log: Path) -> int:
+        return spawner.spawn_detached(["sh", "-c", 'printf %s "$0"', text], cwd=tmp_path, env=env(), log=log)
+
+    def is_child(pid: int) -> bool:
+        try:
+            os.waitpid(pid, os.WNOHANG)
+        except ChildProcessError:
+            return False
+        return True
 
     def bystander() -> int:
         proc = subprocess.Popen(["sleep", "60"])  # same session and group as the test run itself
@@ -500,6 +514,12 @@ def real_world(tmp_path: Path) -> ProcessWorld:
                     os.kill(member, signal.SIGKILL)
             except OSError:
                 pass
+        for pid in spawner.detached:  # started by the world, each leads its own group: only that group is signalled
+            try:
+                if os.getpgid(pid) == pid:
+                    os.killpg(pid, signal.SIGKILL)
+            except OSError:
+                pass
         for handle in spawner.started:
             handle.wait(timeout=10)
         for proc in own:
@@ -511,7 +531,7 @@ def real_world(tmp_path: Path) -> ProcessWorld:
         spawner=spawner, inspector=inspector, signaller=OsProcessSignaller(inspector, system_clock(tmp_path)),
         judge=PsOrphanJudge(inspector), blind_inspector=blind, blind_judge=PsOrphanJudge(blind), directory=tmp_path,
         start_leader=leader, start_group=group, start_term_proof=term_proof, start_exiting=exiting, start_echo=echo,
-        start_bystander=bystander, start_zombie=zombie, gone_pid=gone, close=close,
+        is_child=is_child, start_bystander=bystander, start_zombie=zombie, gone_pid=gone, close=close,
     )
 
 
@@ -536,7 +556,7 @@ def fake_world(tmp_path: Path) -> ProcessWorld:
         table.will_exit(code)
         return table.spawn(["sh", "-c", f"exit {code}"], cwd=tmp_path, env=env, stdin=None, stdout=None)
 
-    def echo(text: str, log: Path) -> ProcessHandle:
+    def echo(text: str, log: Path) -> int:
         table.will_exit(0, output=text)
         return table.spawn_detached(["sh", "-c", "echo"], cwd=tmp_path, env=env, log=log)
 
@@ -553,7 +573,7 @@ def fake_world(tmp_path: Path) -> ProcessWorld:
     return ProcessWorld(
         spawner=table, inspector=table, signaller=table, judge=PsOrphanJudge(table), blind_inspector=blind, blind_judge=PsOrphanJudge(blind),
         directory=tmp_path, start_leader=leader, start_group=group, start_term_proof=term_proof, start_exiting=exiting,
-        start_echo=echo, start_bystander=bystander, start_zombie=zombie, gone_pid=gone, close=lambda: None,
+        start_echo=echo, is_child=table.is_child, start_bystander=bystander, start_zombie=zombie, gone_pid=gone, close=lambda: None,
     )
 
 

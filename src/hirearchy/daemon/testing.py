@@ -221,17 +221,17 @@ class ScriptedSchedulerSpawner(ProcessSpawner):
     ) -> ProcessHandle:
         return self._table.spawn(argv, cwd=cwd, env=env, stdin=stdin, stdout=stdout)
 
-    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> ProcessHandle:
-        handle = self._table.spawn_detached(argv, cwd=cwd, env=env, log=log)
+    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> int:
+        pid = self._table.spawn_detached(argv, cwd=cwd, env=env, log=log)
         if self.starts_up:
             path = pidfile_of(self._layout)
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(str(handle.pid))
+            path.write_text(str(pid))
         if self.exit_reason is not None:
             path = exit_file_of(self._layout)
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(self.exit_reason + "\n")
-        return handle
+        return pid
 
 
 # ------------------------------------------------------------------------------ the process stage
@@ -444,7 +444,7 @@ def _control_world(tmp_path: Path, stage: ProcessStage, spawner: ProcessSpawner,
     status = PidFileSchedulerStatus(layout, stage.inspector, SchedulerIdentity(), children, marker, FixedTasks(), FixedWaiting())
     launcher = DetachedLauncher(
         status, RuntimeLaunchSite(layout, MemoryIgnoreList(), marker, stage.clock), ScrubbedLaunchEnvironment(layout, os_environment(tmp_path).env), command, spawner,
-        children, PidFileStartupWatch(layout, marker, stage.clock),
+        PidFileStartupWatch(layout, marker, stage.clock, stage.inspector),
     )
     stopper = SignalSchedulerStopper(status, stage.signaller, stage.inspector, children, stage.clock)
 

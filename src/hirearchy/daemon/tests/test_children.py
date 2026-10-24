@@ -12,7 +12,7 @@ from hirearchy.processes.testing import FakeProcessTable
 
 
 def spawn(table: FakeProcessTable, tmp_path: Path) -> ProcessHandle:
-    return table.spawn_detached(["hirearchy", "run"], cwd=tmp_path, env={}, log=tmp_path / "scheduler.log")
+    return table.spawn(["hirearchy", "run"], cwd=tmp_path, env={}, stdin=None, stdout=None)
 
 
 def test_a_child_that_ended_is_reaped_when_the_registry_reaps(tmp_path: Path) -> None:

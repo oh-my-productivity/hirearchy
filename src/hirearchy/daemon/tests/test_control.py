@@ -93,7 +93,7 @@ def test_start_passes_max_runs_and_logs_to_the_runtime_dir(org, reap_schedulers)
 def test_start_reports_a_scheduler_that_dies_at_once(org):
     dies = FixedSchedulerCommand([sys.executable, "-c", "import sys; print('boom'); sys.exit(3)"])
     with_ports(org, {SchedulerCommand: dies})
-    with pytest.raises(OrgError, match=r"exited at once \(exit 3\)[\s\S]*boom"):
+    with pytest.raises(OrgError, match=r"exited at once;[\s\S]*boom"):
         start_scheduler(org)
 
 

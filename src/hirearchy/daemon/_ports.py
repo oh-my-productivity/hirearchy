@@ -53,8 +53,9 @@ class LaunchEnvironment(Protocol):
 
 @runtime_checkable
 class StartupWatch(Protocol):
-    def await_start(self, handle: ProcessHandle, log: Path) -> None:
-        """Wait for a scheduler that was just started to say it is up (it writes its pid). Raises ``OrgError`` when it exits at once."""
+    def await_start(self, pid: int, log: Path) -> int:
+        """Wait for the scheduler that was just started as ``pid`` (not our child) to say it is up (it writes its pid). Returns the pid in the pid file.
+        Raises ``OrgError`` when it exits at once."""
         ...
 
 

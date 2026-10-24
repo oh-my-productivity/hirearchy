@@ -106,9 +106,16 @@ def test_the_scripted_output_of_a_detached_process_is_appended_to_its_log(table:
     log = tmp_path / "scheduler.log"
     log.write_text("# before\n", encoding="utf-8")
     table.will_exit(0, output="line\n")
-    handle = table.spawn_detached(["hirearchy", "run"], cwd=tmp_path, env={}, log=log)
+    pid = table.spawn_detached(["hirearchy", "run"], cwd=tmp_path, env={}, log=log)
     assert log.read_text(encoding="utf-8") == "# before\nline\n"
-    assert table.spawned[-1].log == log and handle.wait() == 0
+    assert table.spawned[-1].log == log and table.spawned[-1].pid == pid
+
+
+def test_a_detached_process_is_no_child_and_is_gone_when_it_exits(table: FakeProcessTable, tmp_path: Path) -> None:
+    pid = table.spawn_detached(["hirearchy", "run"], cwd=tmp_path, env={}, log=tmp_path / "scheduler.log")
+    assert table.is_alive(pid) and table.is_session_leader(pid) is True
+    table.exit(pid, 0)
+    assert table.info(pid) is None  # no zombie: init reaps it, not us
 
 
 def test_sigterm_ends_a_process_unless_it_ignores_it(table: FakeProcessTable, tmp_path: Path) -> None:

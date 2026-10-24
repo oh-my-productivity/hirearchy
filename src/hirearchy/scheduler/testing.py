@@ -132,7 +132,7 @@ class CapturingSpawner(ProcessSpawner):
             self.table.will_exit(self.default_exit[0], after=self.default_exit[1])
         return self.table.spawn(argv, cwd=cwd, env=env, stdin=stdin, stdout=stdout)
 
-    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> ProcessHandle:
+    def spawn_detached(self, argv: Sequence[str], *, cwd: Path, env: Mapping[str, str], log: Path) -> int:
         return self.table.spawn_detached(argv, cwd=cwd, env=env, log=log)
 
 
