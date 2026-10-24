@@ -12,6 +12,11 @@ from ._ports import FeedbackWords, PlaybookTimelines, RunCounter
 from .api import Case, CaseHistory, Verdict, lessons_of, version_at
 
 
+def _within(stamp: str, bounds: tuple[str, str | None]) -> bool:
+    """Is ``stamp`` in the interval of a task: from its send up to its successor's send (exclusive), or to the window's end for the last one?"""
+    return bounds[0] <= stamp and (bounds[1] is None or stamp < bounds[1])
+
+
 class DerivedCaseHistory(CaseHistory):
     """Reads a service's requests from what its client sent, their results from what the client received, and the client's verdicts from the
     notes it sent; nothing is kept."""
@@ -75,6 +80,10 @@ class DerivedCaseHistory(CaseHistory):
             later = next((i for i in others if i > last.id and i not in ids), None)
             if later and (end is None or later[:21] < end):
                 end = later[:21]
+            start = tasks[0].id[:21]
+            charged = [s for s, credited in self._counter.stamps(team, start, end) if not credited]
+            bounds = [(t.id[:21], tasks[k + 1].id[:21] if k + 1 < len(tasks) else None) for k, t in enumerate(tasks)]
+            relayed = [b for t, b in zip(tasks, bounds) if t.source == "relayed"]
             step = {t.id: i for i, t in enumerate(tasks)}
             verdicts = [
                 self._verdict(n, step[n.reply_to], [m for m in link_notes if m.reply_to == n.id]) for n in notes if n.reply_to in ids
@@ -84,7 +93,7 @@ class DerivedCaseHistory(CaseHistory):
                 playbook=tasks[0].playbook or 0,
                 used=version_at(timeline, msg_time(first_result) if (first_result := results.get(tasks[0].id)) else None),
                 reworks=len(tasks) - 1, budget=sum(t.budget for t in tasks),
-                runs=self._counter.runs_between(team, tasks[0].id[:21], end),
+                runs=len(charged), relayed_runs=sum(1 for s in charged if any(_within(s, b) for b in relayed)),
                 lessons=[x for t in tasks if (r := results.get(t.id)) is not None and (x := lessons_of(r))],
                 lesson_ids=[r.id for t in tasks if (r := results.get(t.id)) is not None and lessons_of(r)],
                 lesson_sources=[t.source or "" for t in tasks if (r := results.get(t.id)) is not None and lessons_of(r)],

@@ -6,7 +6,12 @@ import time
 from testkit.reach.hirearchy.core import ROOT
 from testkit.services_world import contract_meta, define, deliver, request, svc, work
 
+from hirearchy.kernel import RUNTIME, Message, run_credit_title
 from hirearchy.reflection import stats_by_version, summarize
+from hirearchy.reflection.testing import fs_world
+
+from . import _support as sup
+from ._support import SERVICE, populated
 
 WEEKDAY = "weekly-brief"
 
@@ -188,3 +193,77 @@ def test_a_service_defined_again_after_a_delivery_continues_its_cases(svc):
     assert [c.id for c in org.runtime.case_history.cases("ceo", "weekly-brief")] == [old.id]
     meta = contract_meta(org)[0]
     assert meta["version"] == 2 and meta["created"] == created
+
+
+# ------------------------------------------------------------------------- relayed_runs (0b 4.2, built in 0a.3)
+def chain_world(tmp_path):
+    """The reflection world over files, with ``ceo`` offering weekly-brief to root; its clock stamps messages and run logs alike."""
+    w = populated(fs_world(tmp_path))
+    sup.define(w)
+    return w
+
+
+def the_case(w):
+    (case,) = w.history.cases("ceo", SERVICE)
+    return case
+
+
+def test_relayed_runs_are_the_runs_of_the_last_interval_of_a_chain_that_ends_with_a_relayed_rework(tmp_path):
+    """0b 4.2: the charged runs from a relayed task's send up to its successor's send (the window's end for the last one)."""
+    w = chain_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=2)
+    human = sup.rework(w, head)
+    sup.deliver(w, human, runs=1)
+    relayed = sup.rework(w, human, source="relayed")
+    sup.deliver(w, relayed, runs=3)
+    case = the_case(w)
+    assert (case.runs, case.relayed_runs) == (6, 3)
+
+
+def test_the_interval_of_a_relayed_rework_ends_at_the_id_of_the_next_task(tmp_path):
+    w = chain_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=1)
+    relayed = sup.rework(w, head, source="relayed")
+    sup.deliver(w, relayed, runs=2)
+    human = sup.rework(w, relayed)
+    sup.deliver(w, human, runs=4)
+    case = the_case(w)
+    assert (case.runs, case.relayed_runs) == (7, 2)
+
+
+def test_a_case_without_a_relayed_task_has_no_relayed_runs(tmp_path):
+    w = chain_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=2)
+    sup.deliver(w, sup.rework(w, head), runs=3)
+    case = the_case(w)
+    assert (case.runs, case.relayed_runs) == (5, 0)
+
+
+def test_credited_runs_are_in_neither_count(tmp_path):
+    w = chain_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=1)
+    relayed = sup.rework(w, head, source="relayed")
+    sup.deliver(w, relayed, runs=3)
+    last = max(w.runs.files("ceo"), key=lambda f: f.stem).stem  # the relayed rework's last run ended on a throttle and was given back
+    w.s.d.post(Message(sender=RUNTIME, to="ceo", type="note", budget=1, wake=False, title=run_credit_title("ceo", last), body="returned"))
+    case = the_case(w)
+    assert (case.runs, case.relayed_runs) == (3, 2)
+
+
+def test_an_agent_clients_case_with_an_inherited_relayed_rework_still_gets_relayed_runs(tmp_path):
+    """0b's definition holds for every client kind: a rework that carries ``source: relayed`` (inherited from the work it was made in) counts."""
+    w = chain_world(tmp_path)
+    w.s.d.post(Message(sender="root", to="ceo", type="note", body="runs for you", title="grant", budget=20))
+    sup.define(w, "ceo/eng", "inner", actor="ceo")
+    first = w.s.commands.request("ceo", "inner", {"topic": "ai"})
+    sup.deliver(w, first, runs=2)
+    second = w.s.d.post(Message(
+        sender="ceo", to="ceo/eng", type="task", title="inner: ai", body="again", budget=5, revises=first.id, service="inner", source="relayed",
+    ))
+    sup.deliver(w, second, runs=3)
+    (case,) = w.history.cases("ceo/eng", "inner")
+    assert case.client_kind == "agent" and (case.runs, case.relayed_runs) == (5, 3)

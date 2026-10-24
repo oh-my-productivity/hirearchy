@@ -74,6 +74,11 @@ class RunCounter(Protocol):
         before it."""
         ...
 
+    def stamps(self, team: Sequence[str], start: str, end: str | None) -> list[tuple[str, bool]]:
+        """The 21-character stamps of the run logs of the agents of ``team`` in the same inclusive window, oldest first, one per log (two agents
+        may share a stamp), each with whether a run credit in that agent's received box names the log (a credited run was not charged)."""
+        ...
+
 
 @runtime_checkable
 class RejectedServices(Protocol):

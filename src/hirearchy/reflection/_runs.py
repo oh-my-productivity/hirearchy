@@ -19,12 +19,15 @@ class LogRunCounter(RunCounter):
         self._logs, self._mail = logs, mail
 
     def runs_between(self, team: Sequence[str], start: str, end: str | None) -> int:
-        used = 0
+        return sum(1 for _, credited in self.stamps(team, start, end) if not credited)
+
+    def stamps(self, team: Sequence[str], start: str, end: str | None) -> list[tuple[str, bool]]:
+        found: list[tuple[str, bool]] = []
         for addr in team:
             logs = self._logs.files(addr)
             credited = credited_stems(self._mail.received(addr)) if logs else set()
             for log in logs:
                 name = f"{log.stem}.log"[:21]
-                if name >= start and (end is None or name <= end) and log.stem not in credited:
-                    used += 1
-        return used
+                if name >= start and (end is None or name <= end):
+                    found.append((name, log.stem in credited))
+        return sorted(found)

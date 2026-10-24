@@ -91,6 +91,7 @@ class Case:
     client_kind: str = "human"  # "human" when the owner's parent is root, else "agent"
     relayed_reworks: int = 0  # the tasks of the chain after the first that root stamped ``source: relayed``
     returned: int = 0  # the runs the results of the chain carried back: each result counts at most its own task's budget
+    relayed_runs: int = 0  # 0b 4.2: the charged runs whose stamp lies in the interval of a relayed task, from its send to its successor's (the window's end for the last task, inclusive)
 
     @property
     def title(self) -> str:
