@@ -23,30 +23,58 @@ def _is_none_word(word: str) -> bool:
     return word.strip(":*_").lower().rstrip(".") in _NONE_WORDS
 
 
+_CRITERION_ID = re.compile(r"\bC[0-9]+\b")  # a criterion id: what makes a client item a question for the client (D-E6-1)
+
+
+def _wrapped(text: str) -> bool:
+    """Is all of ``text`` one parenthesized group: its first "(" closed by its last ")", one final "." allowed (A1's remark)?"""
+    text = text.removesuffix(".")
+    if not (text.startswith("(") and text.endswith(")")):
+        return False
+    depth = 0
+    for i, ch in enumerate(text):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                return i == len(text) - 1  # the first "(" closes here: wrapped only if this is the last character
+    return False
+
+
 def client_questions(body: str) -> list[str]:
     """The items of the first "Questions for the client:" block of a message body, in order (pure).
 
-    The marker line (a leading list marker, ``#``, ``*`` and ``_`` are ignored) starts with "questions for the client" in any case. What
-    follows the phrase on that line is one item, unless it is empty or its first word is a "none" word (``none``, ``no``, ``n/a``, ``-``).
-    The list lines after it (``-``, ``*``, ``+``, ``\u2022``, ``1.`` or ``1)``), after any blank lines, are items too; the block ends at the
-    first blank line, heading or non-list line. A list line that is only a "none" word is no item."""
+    The marker line (a leading list marker, ``#``, ``*`` and ``_`` are ignored) starts with "questions for the client" in any case. The list
+    lines after it (``-``, ``*``, ``+``, ``\u2022``, ``1.`` or ``1)``), after any blank lines, are items; the block ends at the first blank
+    line, heading or non-list line. A list line that is only a "none" word is no item. What follows the phrase on the marker line (the tail)
+    is decided by four rules (D-E6-1, A1):
+
+    1. a tail that names a criterion id (``\\bC[0-9]+\\b``) is one item, whatever follows and whether or not it is parenthesized, unless its
+       first word is a "none" word (rule 4): A1 never drops a ``C<k>`` question;
+    2. otherwise, when list items follow, the tail is a heading and no item;
+    3. otherwise, when all of the tail is one parenthesized group (one final ``.`` allowed), it is a remark and no item;
+    4. otherwise the tail is one item, unless it is empty or its first word is a "none" word (``none``, ``no``, ``n/a``, ``-``)."""
     lines = body.splitlines()
     for start, line in enumerate(lines):
         text = _LIST_PREFIX.sub("", line.strip(), count=1).lstrip("#*_ ")
         if not text.lower().startswith(_QUESTIONS_MARKER):
             continue
         inline = text[len(_QUESTIONS_MARKER):].strip(":*_ ")
-        first_word = next(iter(inline.replace(";", " ").replace(",", " ").split()), "")  # "" when the line holds only separators
-        items = [inline] if first_word and not _is_none_word(first_word) else []
-        following = iter(lines[start + 1:])
-        for ln in itertools.dropwhile(lambda x: not x.strip(), following):  # blank lines right after the marker are skipped
+        listed: list[str] = []
+        for ln in itertools.dropwhile(lambda x: not x.strip(), lines[start + 1:]):  # blank lines right after the marker are skipped
             m = _LIST_LINE.fullmatch(ln)
             if m is None:
                 break
             item = m.group(1).strip()
             if item and not _is_none_word(item):
-                items.append(item)
-        return items
+                listed.append(item)
+        first_word = next(iter(inline.replace(";", " ").replace(",", " ").split()), "")  # "" when the line holds only separators
+        names_id = _CRITERION_ID.search(inline) is not None  # such a tail is always an item: A1 never hides a C<k> question
+        heading = bool(listed) and not names_id  # list items follow: the marker line is a heading
+        remark = _wrapped(inline) and not names_id  # "(reviewer flags; I did not settle them, ...)"
+        own = [inline] if first_word and not _is_none_word(first_word) and not heading and not remark else []
+        return own + listed
     return []
 
 

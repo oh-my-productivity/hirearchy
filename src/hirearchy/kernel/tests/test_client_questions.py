@@ -105,3 +105,72 @@ def test_no_block_no_questions() -> None:
     assert client_questions("") == []
     assert client_questions("## Summary\nAll criteria met.\n- a list\n- of things\n") == []
     assert client_questions("We have questions for the client later.") == []
+
+
+# D-E6-1, A1: the marker line's tail is no item when list items follow it (a heading) or when it is a parenthesized remark, unless it names a
+# criterion id (Deviation 1) or starts with a none word (DR-0a4-8).
+E6_762F_TAIL = "Questions for the client: (reviewer flags; I did not settle them, and they touch your answers)"  # s1 #70, 762f's exact line
+E6_762F_LIST = (
+    "- C5: Lee's 'probably by end of next week' is hedged and could mean 10-30 or 11-01.\n"
+    "- C4: Marta's prose commitment to keep the agenda is omitted on your instruction. Should the contract exclude such non-actions?\n"
+    "- C5: Sam's pairing is Due none, but a reader might want the end of Jo's first week.\n"
+)
+
+
+@pytest.mark.parametrize("final", ["", "."])
+def test_762f_marker_tail_is_no_item_and_the_list_items_are_the_questions(final: str) -> None:
+    items = client_questions(f"{E6_762F_TAIL}{final}\n{E6_762F_LIST}\nReviewer's final line: criteria met.")
+    assert len(items) == 3 and items[0].startswith("C5: Lee's") and items[1].startswith("C4: Marta's") and items[2].startswith("C5: Sam's")
+
+
+@pytest.mark.parametrize("final", ["", "."])
+def test_a_parenthesized_remark_with_no_list_is_no_item(final: str) -> None:
+    assert client_questions(f"{E6_762F_TAIL}{final}") == []
+    assert client_questions(f"{E6_762F_TAIL}{final}\n\nNext paragraph.") == []
+
+
+@pytest.mark.parametrize("gap", ["", "\n", "\n\n"])
+def test_a_tail_without_an_id_before_list_items_is_a_heading(gap: str) -> None:
+    assert client_questions(f"Questions for the client: reviewer flags, not settled{gap}\n- first?\n- second?") == ["first?", "second?"]
+    assert client_questions(f"**Questions for the client:** see below{gap}\n1. first?") == ["first?"]
+
+
+def test_a_tail_that_names_an_id_before_a_list_is_an_item_before_it() -> None:
+    body = "Questions for the client: C4: should non-actions be excluded?\n- Style: 'himself' (reviewer: harmless).\n"
+    assert client_questions(body) == ["C4: should non-actions be excluded?", "Style: 'himself' (reviewer: harmless)."]
+
+
+def test_a_parenthesized_tail_that_names_an_id_is_an_item_with_or_without_a_list() -> None:
+    assert client_questions("Questions for the client: (C3: keep Marta's row?)") == ["(C3: keep Marta's row?)"]
+    assert client_questions("Questions for the client: (C3: keep Marta's row?)\n- a note\n- another") == ["(C3: keep Marta's row?)", "a note", "another"]
+    assert client_questions("Questions for the client: (C4-C6)\n- one?\n- two?") == ["(C4-C6)", "one?", "two?"]
+
+
+def test_a_tail_followed_only_by_a_none_list_line_stays_an_item() -> None:
+    assert client_questions("Questions for the client: keep the date?\n- none") == ["keep the date?"]
+    assert client_questions("Questions for the client: (a remark)\n- none") == []  # a remark alone is still no item
+
+
+def test_a_tail_that_only_starts_with_a_parenthesis_is_one_item() -> None:
+    assert client_questions("Questions for the client: (C3) Keep Marta's row?") == ["(C3) Keep Marta's row?"]
+    assert client_questions("Questions for the client: (a) keep Sam's row? (b) drop Lee's line (style)") == [
+        "(a) keep Sam's row? (b) drop Lee's line (style)"
+    ]
+    assert client_questions("Questions for the client: (a) keep Sam's row? (b) drop Lee's line (style).") == [
+        "(a) keep Sam's row? (b) drop Lee's line (style)."
+    ]
+
+
+def test_a_nested_wrapped_tail_is_no_item() -> None:
+    assert client_questions("Questions for the client: (see (b))") == []
+    assert client_questions("Questions for the client: (see (b)).") == []
+
+
+def test_a_tail_ending_in_two_dots_is_not_wrapped() -> None:
+    assert client_questions("Questions for the client: (maybe..") == ["(maybe.."]
+    assert client_questions("Questions for the client: (see below)..") == ["(see below).."]
+
+
+def test_a_none_word_tail_naming_an_id_is_no_item() -> None:  # DR-0a4-8: rule 1 yields to the none word of rule 4
+    assert client_questions("Questions for the client: None (C3 was settled).") == []
+    assert client_questions("Questions for the client: None (C3 was settled).\n- later?") == ["later?"]
