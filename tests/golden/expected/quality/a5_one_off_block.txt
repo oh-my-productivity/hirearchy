@@ -1,0 +1,18 @@
+One-off tasks you gave (client: you, human; unit: case; approved budget: each task's own)
+  cases: 1 (done 1, failed 0, blocked 0, open 0 (stalled 0))
+  first deliveries: 0 accepted, 0 rejected, 1 without a verdict (1 superseded by a rework before a verdict)
+    20261017T214038108044-root-f768: no verdict (superseded by rework 20261017T215450859628-root-dfe0 (tier not recorded))
+  judged by the user: 0 of 3 deliveries; without a verdict: 1 case(s) (20261017T214038108044-root-f768): never counted as accepted; not as delivered: 0
+  escapes (the team reported done, then the user rejected it): none (judged: 0 of 3)
+  verifiers: none (every delivery was signed off by lead itself)
+  runs per case (the user's runs: runs used outside your relayed reworks, plus runs still out while a case is open or blocked; approved: each task's own budget, or more where your hand-downs raised it (runs used + held + new, at that moment)):
+    20261017T214038108044-root-f768 "Competitor analysis of self-hosted note-taking apps" (lead): runs not counted (no run log in its window); top-ups: +4 rework 20261017T215111184137-root-00cd (tier not recorded), +4 rework 20261017T215450859628-root-dfe0 (tier not recorded), +3 your grant 20261017T215533405230-root-7620
+  alarms:
+    repeat: does not apply (one-off tasks name no criterion ids)
+    cost: n/a (0 of 3 judged cases); skipped: 20261017T214038108044-root-f768 (runs not counted)
+  timeline (bar changes, UTC; marked, never used to split the counts):
+    2026-10-17 21:51 top-up +4 run(s) to case 20261017T214038108044-root-f768: rework 20261017T215111184137-root-00cd (tier not recorded)
+    2026-10-17 21:54 top-up +4 run(s) to case 20261017T214038108044-root-f768: rework 20261017T215450859628-root-dfe0 (tier not recorded)
+    2026-10-17 21:55 top-up +3 run(s) to case 20261017T214038108044-root-f768: your grant 20261017T215533405230-root-7620
+    charter edits and model changes: unknown (no org history: the organization is not a git repository, or git is missing)
+  run attribution is by time window (08 3.3): 0 case(s) had their window cut by a later request.
