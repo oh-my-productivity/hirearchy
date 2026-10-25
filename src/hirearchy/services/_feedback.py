@@ -26,6 +26,16 @@ CONFIRMS_RECOVERY = (
     'still takes is that one: feedback(task_id="{task}", verdict="reject", confirms="{confirms}", criterion=[{ids}], source="human", '
     "note=<the user's answer, verbatim>) (CLI: --confirms, --criterion, --source human, --note). Nothing was recorded."
 )
+ONE_OFF_UNKNOWN = (  # root only: a one-off task is a task root sent without a service (design 8.3)
+    "refused: {task_id} is not a task you sent: feedback records the user's verdict on one of your service requests or one-off tasks that has a "
+    "result. Your newest: {newest}. Nothing was recorded."
+)
+ONE_OFF_NO_LINK = (
+    "refused: {task_id} is a one-off task: it has no contract, so its verdict names no criterion and answers no rejection. Leave out criterion "
+    "and confirms (CLI: --criterion, --confirms). Nothing was recorded."
+)
+ONE_OFF_GONE = "refused: {to}, who did {task_id}, was retired, so the verdict has no one to tell. Nothing was recorded."
+NEWEST = 10  # the ids ONE_OFF_UNKNOWN names
 
 
 class SenderLinkNotes(LinkNotes):
@@ -44,6 +54,7 @@ class SenderLinkNotes(LinkNotes):
 
 class RuleClientFeedback(ClientFeedback):
     """A verdict is ``accept`` or ``reject`` (a rejection says what was wrong), on a request that has a result; it is a quiet note to the owner.
+    Root also rates its one-off tasks (tasks without a service) the same way, but names no criterion on them: a one-off has no contract.
 
     Root may say what a rejection is about (``criterion``: ids the contract or the earlier rejections have, see ``ServiceEvidence.links``) and where
     the verdict comes from (``source``). When the user answers only after the rejection was recorded, ``confirms`` names it and a link note
@@ -66,19 +77,13 @@ class RuleClientFeedback(ClientFeedback):
         actor = self._agents.require(actor)
         task = next((m for m in self._mail.sent(actor) if m.id == task_id and m.type == "task"), None)
         if task is None or not task.service:
+            if actor == ROOT:
+                return self._one_off(actor, task_id, task, verdict, note, source, criterion, confirms)
             mine = ", ".join(m.id for m in self._mail.sent(actor) if m.type == "task" and m.service) or "none"
             raise OrgError(
                 f"{task_id} is not a service request you sent. Feedback is for requests made with `request`. Yours: {mine}"
             )
-        if verdict not in VERDICTS:
-            raise OrgError(f"verdict must be one of {VERDICTS}")
-        note = (note or "").strip()
-        if verdict == "reject" and not note:
-            raise OrgError("a rejection needs a note: say what was wrong, so the owner can change its playbook")
-        if len(note) > FEEDBACK_MAX:
-            raise OrgError(f"the note is {len(note)} characters; the limit is {FEEDBACK_MAX}. Keep it to what was wrong or good.")
-        if task.id not in latest_results(self._mail.received(actor)):
-            raise OrgError(f"task {task_id} has no result yet: wait for the result, then give feedback.")
+        note = self._checked(actor, task_id, verdict, note)
         if actor != ROOT and (criterion or confirms):
             raise OrgError(CLIENT_ONLY)
         ids = normalize_links(criterion)
@@ -90,11 +95,45 @@ class RuleClientFeedback(ClientFeedback):
             ids = self._evidence.links(task.to, task.service, ids, verdict=confirms)
         if confirms is not None:
             return self._links.write(actor, task.to, task.title, confirms, ids, note, source=source)
-        body = FEEDBACK_HEADER + "\n\n" + (note or "accepted")
+        return self._record(actor, task, verdict, note, source, ", ".join(ids) or None)
+
+    def _checked(self, actor: str, task_id: str, verdict: str, note: str) -> str:
+        """The checks every verdict takes, in this order: the verdict, the note (a rejection needs one, at most ``FEEDBACK_MAX`` characters) and
+        the task's result. Returns the note, stripped."""
+        if verdict not in VERDICTS:
+            raise OrgError(f"verdict must be one of {VERDICTS}")
+        note = (note or "").strip()
+        if verdict == "reject" and not note:
+            raise OrgError("a rejection needs a note: say what was wrong, so the owner can change its playbook")
+        if len(note) > FEEDBACK_MAX:
+            raise OrgError(f"the note is {len(note)} characters; the limit is {FEEDBACK_MAX}. Keep it to what was wrong or good.")
+        if task_id not in latest_results(self._mail.received(actor)):
+            raise OrgError(f"task {task_id} has no result yet: wait for the result, then give feedback.")
+        return note
+
+    def _record(self, actor: str, task: Message, verdict: str, note: str, source: str | None, criterion: str | None) -> Message:
+        """The verdict as a quiet note to the task's assignee: it wakes nobody and costs no run."""
         return self._sender.send(
-            actor, task.to, body, type="note", title=f'feedback on "{task.title}": {verdict}',
-            reply_to=task.id, feedback=verdict, criterion=", ".join(ids) or None, source=source, wake=False,
+            actor, task.to, FEEDBACK_HEADER + "\n\n" + (note or "accepted"), type="note", title=f'feedback on "{task.title}": {verdict}',
+            reply_to=task.id, feedback=verdict, criterion=criterion, source=source, wake=False,
         )
+
+    def _one_off(
+        self, actor: str, task_id: str, task: Message | None, verdict: str, note: str, source: str | None, criterion: Sequence[str] | None,
+        confirms: str | None,
+    ) -> Message:
+        """Root's verdict on a task it sent without a service (design 8.1): the same quiet note, no criterion and no confirmation (there is no
+        contract to name one in), and an assignee that still exists to receive it."""
+        if task is None:
+            results = latest_results(self._mail.received(actor))
+            sent = sorted((m.id for m in self._mail.sent(actor) if m.type == "task" and m.id in results), reverse=True)
+            raise OrgError(ONE_OFF_UNKNOWN.format(task_id=task_id, newest=", ".join(sent[:NEWEST]) or "none"))
+        if criterion or confirms:
+            raise OrgError(ONE_OFF_NO_LINK.format(task_id=task_id))
+        note = self._checked(actor, task_id, verdict, note)
+        if not self._agents.exists(task.to):
+            raise OrgError(ONE_OFF_GONE.format(to=task.to, task_id=task_id))
+        return self._record(actor, task, verdict, note, source, None)
 
     def _check_confirmation(
         self, actor: str, task: Message, verdict: str, ids: Sequence[str], confirms: str, source: str | None,

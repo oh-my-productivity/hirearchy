@@ -39,13 +39,13 @@ def test_only_the_requester_gives_feedback_on_a_service_request(org):
     org.delegate(ROOT, "ceo", "Project", "g", "c", budget=10)
     task = org.request("ceo", "eng-brief", {"topic": "x"}, budget=3)
     deliver(org, ENG, task)
-    with pytest.raises(OrgError, match="not a service request you sent"):
+    with pytest.raises(OrgError, match="is not a task you sent"):
         org.feedback(ROOT, task.id, "accept")  # root did not send it
     with pytest.raises(OrgError, match="not a service request you sent"):
         org.feedback("ceo", "nope", "accept")
     plain = org.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
-    with pytest.raises(OrgError, match="not a service request you sent"):
-        org.feedback(ROOT, plain.id, "accept")  # not a service task
+    with pytest.raises(OrgError, match="has no result yet"):
+        org.feedback(ROOT, plain.id, "accept")  # a one-off task of root's: it takes a verdict once it has a result
     assert org.feedback("ceo", task.id, "accept").to == ENG
 
 
@@ -140,3 +140,111 @@ def test_the_confirms_link_note_is_byte_identical(svc):
         f"The client says what their rejection {no.id} was about, for reflection only: it does not change any task's acceptance criteria or outcome."
         "\n\nYes, add it."
     )
+
+
+# ----------------------------------------------------------------------------------------- feedback on a one-off task (design 8.1, 8.3)
+def one_off(org, to="ceo", status="done", title="Plain"):
+    """Root's task without a service, answered by ``to``."""
+    task = org.delegate(ROOT, to, title, "g", "c", budget=2)
+    deliver(org, to, task, status=status)
+    return task
+
+
+def test_root_records_a_verdict_on_a_one_off_task_as_a_quiet_note(svc):
+    org = svc
+    task = one_off(org)
+    ceo_unread = org.unread("ceo")
+    note = org.feedback(ROOT, task.id, "reject", "  Too long.  ", source="human")
+    assert (note.sender, note.to, note.type, note.reply_to, note.feedback, note.wake) == (ROOT, "ceo", "note", task.id, "reject", False)
+    assert (note.source, note.criterion, note.budget) == ("human", None, 0)
+    assert note.title == f'feedback on "{task.title}": reject'
+    assert note.body == FEEDBACK_HEADER + "\n\nToo long."
+    assert org.unread("ceo") == ceo_unread
+    accepted = org.feedback(ROOT, task.id, "accept")
+    assert accepted.body == FEEDBACK_HEADER + "\n\naccepted" and accepted.source == "relayed"  # the default of a root verdict
+
+
+def test_a_one_off_verdict_on_a_blocked_or_failed_result_is_recorded(svc):
+    org = svc
+    for status in ("blocked", "failed"):
+        task = one_off(org, status=status, title=f"Plain {status}")
+        assert org.feedback(ROOT, task.id, "reject", "No.", source="human").reply_to == task.id
+
+
+def test_a_one_off_task_without_a_result_keeps_todays_text(svc):
+    org = svc
+    task = org.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
+    with pytest.raises(OrgError) as info:
+        org.feedback(ROOT, task.id, "accept")
+    assert str(info.value) == f"task {task.id} has no result yet: wait for the result, then give feedback."
+
+
+def test_a_one_off_verdict_with_criterion_or_confirms_is_refused_one_off_no_link(svc):
+    org = svc
+    task = one_off(org)
+    refusal = (
+        f"refused: {task.id} is a one-off task: it has no contract, so its verdict names no criterion and answers no rejection. "
+        "Leave out criterion and confirms (CLI: --criterion, --confirms). Nothing was recorded."
+    )
+    for extra in ({"criterion": ["none"]}, {"criterion": ["C1"]}, {"confirms": "20261017T000000000000-root-abcd"}):
+        with pytest.raises(OrgError) as info:
+            org.feedback(ROOT, task.id, "reject", "No.", source="human", **extra)
+        assert str(info.value) == refusal
+    assert not [m for m in org.sent(ROOT) if m.feedback]  # nothing was recorded
+
+
+def test_a_one_off_verdict_on_a_retired_assignees_task_is_refused_one_off_gone(svc):
+    org = svc
+    org.hire(ROOT, "ops", "Operations", "Run ops.")
+    task = one_off(org, to="ops")
+    org.retire(ROOT, "ops", "closed")
+    with pytest.raises(OrgError) as info:
+        org.feedback(ROOT, task.id, "reject", "No.", source="human")
+    assert str(info.value) == f"refused: ops, who did {task.id}, was retired, so the verdict has no one to tell. Nothing was recorded."
+    assert not [m for m in org.sent(ROOT) if m.feedback]
+
+
+def test_an_unknown_task_id_is_refused_one_off_unknown_with_roots_newest_ten_with_a_result(svc):
+    org = svc
+    with pytest.raises(OrgError) as info:
+        org.feedback(ROOT, "nope", "accept")
+    assert str(info.value) == (
+        "refused: nope is not a task you sent: feedback records the user's verdict on one of your service requests or one-off tasks that has a "
+        "result. Your newest: none. Nothing was recorded."
+    )
+    open_task = org.delegate(ROOT, "ceo", "Still open", "g", "c", budget=2)  # no result: not listed
+    ids = []
+    for n in range(6):
+        service_task = request(org, topic=f"t{n}")
+        deliver(org, "ceo", service_task)
+        ids.append(service_task.id)
+        ids.append(one_off(org, title=f"Plain {n}").id)
+    with pytest.raises(OrgError) as info:
+        org.feedback(ROOT, "nope", "accept")
+    newest = ", ".join(sorted(ids, reverse=True)[:10])
+    assert open_task.id not in newest and len(ids) == 12
+    assert str(info.value) == (
+        "refused: nope is not a task you sent: feedback records the user's verdict on one of your service requests or one-off tasks that has a "
+        f"result. Your newest: {newest}. Nothing was recorded."
+    )
+
+
+def test_a_reject_needs_a_note_and_the_note_limit_holds_for_one_offs(svc):
+    org = svc
+    task = one_off(org)
+    with pytest.raises(OrgError, match="rejection needs a note"):
+        org.feedback(ROOT, task.id, "reject", "  ")
+    with pytest.raises(OrgError, match="limit is 1000"):
+        org.feedback(ROOT, task.id, "reject", "x" * 1001)
+    with pytest.raises(OrgError, match="verdict must be"):
+        org.feedback(ROOT, task.id, "meh")
+
+
+def test_an_agents_feedback_on_a_non_service_task_keeps_todays_refusal(svc):
+    org = svc
+    org.send(ROOT, "ceo", "runs", budget=5)
+    delegated = org.delegate("ceo", ENG, "Plain", "g", "c", budget=1)
+    deliver(org, ENG, delegated)
+    with pytest.raises(OrgError) as info:
+        org.feedback("ceo", delegated.id, "accept")
+    assert str(info.value) == f"{delegated.id} is not a service request you sent. Feedback is for requests made with `request`. Yours: none"

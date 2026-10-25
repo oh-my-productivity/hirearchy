@@ -804,17 +804,34 @@ def test_a_blocked_result_is_a_result(w: ServicesWorld) -> None:
     assert w.commands.feedback("root", task.id, "reject", "Blocked for no reason.").feedback == "reject"
 
 
-def test_feedback_is_for_requests_the_actor_sent(w: ServicesWorld) -> None:
+def test_root_feedback_on_an_unknown_id_names_its_newest_tasks_with_a_result(w: ServicesWorld) -> None:
     task = delivered(w)
     plain = w.d.post(Message(sender="root", to="ceo", type="task", body="plain", title="Plain", budget=2))
+    expected = (
+        "refused: {target} is not a task you sent: feedback records the user's verdict on one of your service requests or one-off tasks that has "
+        "a result. Your newest: {listed}. Nothing was recorded."
+    )
+    with pytest.raises(OrgError) as e:
+        w.commands.feedback("root", "nope", "accept")
+    assert str(e.value) == expected.format(target="nope", listed=task.id)  # the plain task has no result yet
+    answer(w, plain)
+    with pytest.raises(OrgError) as e:
+        w.commands.feedback("root", "nope", "accept")
+    assert str(e.value) == expected.format(target="nope", listed=f"{plain.id}, {task.id}")  # one-off tasks count, newest first
+    assert w.commands.feedback("root", plain.id, "accept").reply_to == plain.id
+
+
+def test_an_agents_feedback_names_only_its_service_requests(w: ServicesWorld) -> None:
+    task = delivered_to_an_agent(w)
+    plain = w.d.post(Message(sender="ceo", to="ceo/eng", type="task", body="plain", title="Plain", budget=1))
     for target in ("nope", plain.id):
         with pytest.raises(OrgError) as e:
-            w.commands.feedback("root", target, "accept")
+            w.commands.feedback("ceo", target, "accept")
         assert str(e.value) == (
             f"{target} is not a service request you sent. Feedback is for requests made with `request`. Yours: {task.id}"
         )
     with pytest.raises(OrgError) as e:
-        w.commands.feedback("ceo", task.id, "accept")
+        w.commands.feedback("ceo/eng", task.id, "accept")
     assert str(e.value).endswith("Yours: none")
 
 
