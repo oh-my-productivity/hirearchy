@@ -30,7 +30,7 @@ Services (kept ready, requested whenever you want):
     3. Each number in the report appears together with its label in the script output; the checker verified every label and number pair.
     4. No conclusion is drawn from a slice with fewer than 30 rows; such slices are marked "too small".
     5. At most 1000 words as counted by read; recommendations are in a section labelled as our assessment (judgement).
-    ... and 1 more (see the details)
+    6. The checker's line reads 'Figures checked: n of m match' with n = m, and the writer applied every required change.
   Delivered to: <CWD>/deliverables/briefs (I copy each result there after checking it)
 After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
 Nothing runs until you ask for a request: approving only creates the team and the services.

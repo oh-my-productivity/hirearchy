@@ -13,6 +13,6 @@ SHOWN_CRITERIA = 8  # the block stays compact (about 40 lines); the full lists a
 SHOWN_WARNINGS = 5
 HIDDEN_WARNINGS = {"path-delivery", "path-parent", "needs-scope", "needs-approval", "needs-progress"}  # said elsewhere in the block
 PLAN_ID_LENGTH = 12
-SHOWN_SERVICE_CRITERIA = 5  # per service in the block; the details have them all
+SHOWN_SERVICE_CRITERIA = 10  # per service in the block; the details have them all
 BUDGET_QUESTION = "Use {n} runs per request (covers one round of your questions or a rejection), or keep {m}?"  # D-E7-3: the block's last line
 BUDGET_QUESTION_FOR = "Use {n} runs per request for {name} (covers one round of your questions or a rejection), or keep {m}?"  # one per service when several

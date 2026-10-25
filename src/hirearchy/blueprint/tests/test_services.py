@@ -435,12 +435,20 @@ def test_budget_lines_of_a_services_blueprint_are_per_request(svc_bp, roots):
     assert text.count("  Each request: up to") == 2
 
 
+def test_up_to_ten_checks_are_shown(svc_bp, roots):
+    ten = [f"Section number {n} is present and has exactly 3 bullets." for n in range(1, 11)]
+    bp = mutate(svc_bp, lambda b: b["services"][0].update(acceptance=ten))
+    text = block(bp, roots)
+    assert all(f"    {n}. {c}" in text for n, c in enumerate(ten, 1))
+    assert "more (see the details)" not in text
+
+
 def test_more_than_the_shown_criteria_are_counted_not_hidden_silently(svc_bp, roots):
-    many = [f"Section number {n} is present and has exactly 3 bullets." for n in range(1, 9)]
+    many = [f"Section number {n} is present and has exactly 3 bullets." for n in range(1, 13)]
     bp = mutate(svc_bp, lambda b: b["services"][0].update(acceptance=many))
     text = block(bp, roots)
-    assert "    5. Section number 5" in text and "    6. Section" not in text
-    assert "... and 3 more (see the details)" in text
+    assert "    10. Section number 10" in text and "    11. Section" not in text
+    assert "... and 2 more (see the details)" in text
     assert all(f"{n}. {c}" in bpm.render_plan(bp, allowed_roots=roots) for n, c in enumerate(many, 1))  # all in the details
 
 
