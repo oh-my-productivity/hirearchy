@@ -36,6 +36,8 @@ __all__ = [
     "Cause",
     "CharterMark",
     "ContractMark",
+    "CostAlarm",
+    "CostCase",
     "DeliverableChecks",
     "DeliverableFinding",
     "Delivery",
@@ -50,6 +52,7 @@ __all__ = [
     "QUALITY_DEFAULTS",
     "QualityThresholds",
     "ReflectionDigest",
+    "RepeatAlarm",
     "ServicePromptSections",
     "ServiceRecord",
     "ServiceReports",
@@ -64,18 +67,22 @@ __all__ = [
     "case_spend",
     "cause_of",
     "confirmed_criteria",
+    "cost_alarm",
     "deliveries_of",
     "delivered_unrated",
     "deliverables_note",
     "failure_class",
     "items_listing",
+    "judged_cases",
     "lessons_of",
     "not_on_a_delivery",
+    "over_cost",
     "open_client_items",
     "quality_thresholds",
     "questions_open",
     "rated",
     "regressions",
+    "repeat_alarm",
     "signer_of",
     "stats_by_version",
     "summarize",
@@ -921,6 +928,54 @@ def deliverables_note(findings: Sequence[DeliverableFinding]) -> str:
 
 
 @dataclass(frozen=True)
+class RepeatAlarm:
+    """The repeat alarm of a record (0b 6): one criterion or assertion failing again and again in the user's recent judged cases. ``state`` is
+    ``fires``, ``no``, ``n/a`` (fewer judged cases than ``min_judged``) or ``does not apply`` (root's one-off tasks name no criterion ids).
+    ``window`` holds the ids of the last ``repeat_window`` judged cases; ``subjects`` has, for every subject the window's rejections name, the
+    number of window cases it failed in (``R`` ids first, then ``C`` ids, each by number); ``fired`` the subjects in at least ``repeat_failures``
+    cases, with ``cases`` the window cases of each. ``not_counted`` has, under every state, the readings the alarm ignored: for a rejection whose only
+    link is a relayed one (the assistant's own reading), its ``R<k>`` and the ids that link names, in the order it recorded them."""
+
+    state: str
+    judged: int = 0
+    window: tuple[str, ...] = ()
+    subjects: tuple[tuple[str, int], ...] = ()
+    fired: tuple[str, ...] = ()
+    cases: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    not_counted: tuple[tuple[str, tuple[str, ...]], ...] = ()
+
+
+@dataclass(frozen=True)
+class CostCase:
+    """A case the cost alarm fires for: the user's runs (``user_cost``) against the runs the user approved (``user_approved``), with the assistant's
+    own relayed runs and the total (``case_spend``) apart."""
+
+    case: str
+    user_cost: int
+    user_approved: int
+    relayed_runs: int
+    total: int
+
+    @property
+    def ratio(self) -> Fraction:
+        return Fraction(self.user_cost, self.user_approved)
+
+
+@dataclass(frozen=True)
+class CostAlarm:
+    """The cost alarm of a record (0b 6): a case whose user's runs are above ``cost_ratio`` times the user's approved runs. ``state`` is ``fires``,
+    ``no`` or ``n/a`` (fewer judged cases than ``min_judged``, or no case to compare). ``compared`` is the number of cases that were not skipped;
+    ``cases`` are the ones it fires for; ``skipped`` has, under every state, each case that cannot be compared with its reason: ``runs not counted``
+    or ``budget 0`` (the user's approved runs are 0 or below)."""
+
+    state: str
+    judged: int = 0
+    compared: int = 0
+    cases: tuple[CostCase, ...] = ()
+    skipped: tuple[tuple[str, str], ...] = ()
+
+
+@dataclass(frozen=True)
 class OwnerDeliveries:
     """Every delivery of one owner's cases, for health (0b 10): ``causes`` is parallel to ``deliveries``, a ``Cause`` for each escape and ``None``
     for every other delivery. ``unknown`` lists, as ``{service}: {error}`` joined by ``; ``, the services whose contract could not be read: their
@@ -974,4 +1029,6 @@ class CaseRecords(Protocol):
 
 # Pure rules re-exported from their modules; they import the types above, so these imports come last.
 from ._causes import attribution, cause_of, failure_class  # noqa: E402
-from ._quality_rules import deliveries_of, not_on_a_delivery, quality_thresholds, signer_of, unjudged_cases  # noqa: E402
+from ._quality_rules import (  # noqa: E402
+    cost_alarm, deliveries_of, judged_cases, not_on_a_delivery, over_cost, quality_thresholds, repeat_alarm, signer_of, unjudged_cases,
+)

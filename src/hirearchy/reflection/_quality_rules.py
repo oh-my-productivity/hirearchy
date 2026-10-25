@@ -1,5 +1,5 @@
 """The pure rules of the quality view: deliveries, who signed them off, the verdicts that are on none, the cases without a verdict (0b 3, 4.3, 4.4),
-and the thresholds of its alarms (6).
+the thresholds of its alarms and the alarms themselves (6).
 
 They read values (cases, messages), never files. ``reflection.api`` re-exports them from its end, because this module needs the types above them."""
 
@@ -7,11 +7,14 @@ from __future__ import annotations
 
 import math
 import re
+from collections import Counter
 from collections.abc import Collection, Mapping, Sequence
 from fractions import Fraction
 
 from ..kernel import Message
-from .api import Case, Delivery, QualityThresholds
+from .api import (
+    Case, CostAlarm, CostCase, Delivery, QualityThresholds, RepeatAlarm, ServiceRecord, Verdict, case_spend, user_approved, user_cost,
+)
 
 
 def signer_of(owner: str, task_id: str, done_id: str, owner_sent: Sequence[Message], owner_received: Sequence[Message], reports: Collection[str]) -> str:
@@ -143,3 +146,96 @@ def quality_thresholds(config: Mapping[str, object]) -> tuple[QualityThresholds,
             (ratio, text), applied = read, True
     notes += [f"quality.{key} in ORG.md is not a threshold: ignored (the thresholds are {_THRESHOLD_KEYS})." for key in raw if str(key) not in _THRESHOLD_KEYS.split(", ")]
     return QualityThresholds(min_judged, window, failures, ratio, text, "ORG.md" if applied else "defaults"), tuple(notes)
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the alarms (6)
+
+
+def judged_cases(record: ServiceRecord) -> tuple[Case, ...]:
+    """The cases of ``record`` with at least one judged delivery (a counted human-tier verdict), ordered by the id of their latest counted verdict
+    (pure): the order in which the user last judged them."""
+    latest: dict[str, str] = {}
+    for d in record.deliveries:
+        if d.judged:
+            latest[d.case] = max(latest.get(d.case, ""), *(v.message.id for v in d.counted))
+    by_id = {c.id: c for c in record.cases}
+    return tuple(by_id[case] for case in sorted(latest, key=latest.__getitem__) if case in by_id)
+
+
+def _number(subject: str) -> tuple[int, int, str]:
+    """The order of the ids in the view: ``R`` ids first, then ``C`` ids, each by its number."""
+    return (0 if subject.startswith("R") else 1, int(subject[1:]) if subject[1:].isdigit() else 0, subject)
+
+
+def _rejections(record: ServiceRecord, cases: Sequence[Case]) -> list[tuple[str, Verdict, str, tuple[str, ...], str]]:
+    """The counted human-tier rejections on the deliveries of ``cases``: ``(case, verdict, assertion, what the assertion is about, its link)``, oldest
+    first. A rejection that is on no delivery, or whose verdict the file's change voided, is not among them."""
+    wanted = {c.id for c in cases}
+    by_verdict = {a.verdict.message.id: a for a in record.assertions}
+    found = [
+        (d.case, v, a.id, a.about, a.link) for d in record.deliveries if d.case in wanted for v in d.counted
+        if v.verdict == "reject" and (a := by_verdict.get(v.message.id)) is not None
+    ]
+    return sorted(found, key=lambda item: item[1].message.id)
+
+
+def _not_counted(record: ServiceRecord, cases: Sequence[Case]) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    """The readings the repeat alarm ignores in ``cases``: for a rejection whose only link is a relayed one, its ``R<k>`` and the ids that link names, in
+    the order the rejection recorded them."""
+    found: dict[str, tuple[str, ...]] = {}
+    for _, v, assertion, _, link in _rejections(record, cases):
+        reading = tuple(x for x in v.links if x != "none")
+        if link == "unconfirmed" and reading:
+            found.setdefault(assertion, reading)
+    return tuple(sorted(found.items(), key=lambda item: _number(item[0])))
+
+
+def repeat_alarm(record: ServiceRecord, t: QualityThresholds) -> RepeatAlarm:
+    """The repeat alarm of ``record`` (pure; 6): the last ``t.repeat_window`` judged cases, and the subjects that failed in at least ``t.repeat_failures``
+    of them. The subjects of a case are, for each counted human-tier rejection, its assertion ``R<k>``, the ``C<k>`` of its human link notes, what the
+    assertion is about (a "same as R<j>" resolved) and the ``R<j>`` its human link names; a criterion that only a relayed reading names is no subject
+    and is listed in ``not_counted``, under every state."""
+    judged = judged_cases(record)
+    if not record.service:
+        return RepeatAlarm("does not apply", len(judged))  # root's one-off tasks name no criterion ids
+    if len(judged) < t.min_judged:
+        return RepeatAlarm("n/a", len(judged), not_counted=_not_counted(record, judged))
+    window = judged[-t.repeat_window:]
+    in_case: dict[str, set[str]] = {c.id: set() for c in window}
+    for case, v, assertion, about, _ in _rejections(record, window):
+        in_case[case] |= {assertion, *v.confirmed, *about}
+        if v.links_tier == "human":
+            in_case[case] |= {x for x in v.links if x[:1] == "R" and x[1:].isdigit()}
+    count = Counter(subject for subjects in in_case.values() for subject in subjects)
+    subjects = tuple(sorted(count.items(), key=lambda item: _number(item[0])))
+    fired = tuple(subject for subject, n in subjects if n >= t.repeat_failures)
+    where = tuple((subject, tuple(case for case, found in in_case.items() if subject in found)) for subject in fired)
+    return RepeatAlarm("fires" if fired else "no", len(judged), tuple(in_case), subjects, fired, where, _not_counted(record, window))
+
+
+def over_cost(case: Case, approved: int, ratio: Fraction) -> bool:
+    """Is the user's cost of ``case`` (``user_cost``) strictly above ``ratio`` times ``approved``, the runs the user approved for it (pure; exact, no
+    division: 1.25 x 20 is 25, and 25 runs are not above it)?"""
+    return Fraction(user_cost(case)) > ratio * approved
+
+
+def cost_alarm(record: ServiceRecord, t: QualityThresholds) -> CostAlarm:
+    """The cost alarm of ``record`` (pure; 6, D-E5-6): it compares the user's runs of each case with the runs the user approved (the contract's budget,
+    raised by the user's hand-downs; a one-off case's own budget), the two figures ``case_total`` compares, and shows the assistant's relayed runs and
+    the total apart. A case whose runs are not counted, or whose approved runs are 0 or below, is skipped by name (under every state); with fewer judged
+    cases than ``t.min_judged``, or when nothing is left to compare, the state is ``n/a``, never ``no``."""
+    judged = len(judged_cases(record))
+    compared: list[tuple[Case, int]] = []
+    skipped: list[tuple[str, str]] = []
+    for case in record.cases:
+        approved = user_approved(case, record.budget if record.service else case.tasks[0].budget)
+        if case.runs_unknown:
+            skipped.append((case.id, "runs not counted"))
+        elif approved <= 0:
+            skipped.append((case.id, "budget 0"))
+        else:
+            compared.append((case, approved))
+    if judged < t.min_judged or not compared:
+        return CostAlarm("n/a", judged, len(compared), (), tuple(skipped))
+    fired = tuple(CostCase(c.id, user_cost(c), a, c.relayed_runs, case_spend(c)) for c, a in compared if over_cost(c, a, t.cost_ratio))
+    return CostAlarm("fires" if fired else "no", judged, len(compared), fired, tuple(skipped))
