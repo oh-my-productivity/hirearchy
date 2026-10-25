@@ -118,11 +118,22 @@ class DerivedCaseHistory(CaseHistory):
 
     def cases(self, owner: str, service: str) -> list[Case]:
         contract = self._catalog.read_contract(owner, service)
+        if contract is None:
+            return []
+        return self._chains(owner, service, since=contract.created, runs=True, per_request=contract.budget)
+
+    def chains(self, owner: str, service: str, *, since: datetime | None, runs: bool) -> list[Case]:
+        """The service's cases from the client's mailboxes, with no contract: its per-request budget is unknown, so the approval before any hand-down
+        raised it reads 0 (``cases`` hands the contract's down)."""
+        return self._chains(owner, service, since=since, runs=runs, per_request=0)
+
+    def _chains(self, owner: str, service: str, *, since: datetime | None, runs: bool, per_request: int) -> list[Case]:
+        """The one builder of ``cases`` and ``chains``: with ``runs`` false it reads the mailboxes and the agents' tree only (no run log, no playbook
+        file), so the run numbers are 0 and the version used is 0."""
         client = parent(owner)
-        if contract is None or client is None:
+        if client is None:
             return []
         sent = self._mail.sent(client)
-        since = contract.created
         mine = sorted(
             (m for m in sent if m.type == "task" and m.to == owner and m.service == service
              and (since is None or (msg_time(m) or since) >= since)),
@@ -149,7 +160,7 @@ class DerivedCaseHistory(CaseHistory):
         kind = "human" if client == ROOT else "agent"
         others = sorted(m.id for m in sent if m.type == "task" and m.to == owner)
         team = self._agents.subtree(owner)
-        timeline = self.playbook_timeline(owner, service)
+        timeline = self.playbook_timeline(owner, service) if runs else []
         out = []
         for first, tasks in chains.items():
             ids = {t.id for t in tasks}
@@ -162,8 +173,8 @@ class DerivedCaseHistory(CaseHistory):
             if later and (end is None or later[:21] < end):
                 end = later[:21]
             start = tasks[0].id[:21]
-            charged = [s for s, credited in self._counter.stamps(team, start, end) if not credited]
-            spend = _spend(tasks, results, sent, team, kind == "human", start, end, charged, per_request=contract.budget)
+            charged = [s for s, credited in self._counter.stamps(team, start, end) if not credited] if runs else []
+            spend = _spend(tasks, results, sent, team, kind == "human", start, end, charged, per_request=per_request)
             step = {t.id: i for i, t in enumerate(tasks)}
             verdicts = [
                 self._verdict(n, step[n.reply_to], [m for m in link_notes if m.reply_to == n.id]) for n in notes if n.reply_to in ids

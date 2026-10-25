@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
 
-from hirearchy.kernel import Message
+from hirearchy.kernel import Message, msg_time
 from hirearchy.reflection import CaseHistory
+from hirearchy.reflection._cases import DerivedCaseHistory
+from hirearchy.reflection._ports import PlaybookTimelines, RunCounter
 from hirearchy.reflection.testing import IMPLEMENTATIONS, ReflectionWorld, fs_world, memory_world
 
 from ._support import SERVICE, STEPS, ask, define, deliver, implementations, nested, note_on, populated, rate, revise, rework
@@ -473,3 +477,81 @@ def test_a_service_without_a_playbook_has_an_empty_timeline(w: ReflectionWorld) 
 
 def test_the_implementations_read_the_same_world(history: CaseHistory) -> None:
     assert history.cases("ceo", SERVICE) == []
+
+
+# ------------------------------------------------------------------------------ chains (0b 4.1)
+
+
+def test_chains_without_since_keep_every_request(w: ReflectionWorld) -> None:
+    define(w)
+    old = ask(w, "old")
+    w.s.commands.retire_service("root", "ceo", SERVICE, "obsolete")
+    w.s.d.clock.advance(1)
+    define(w)
+    new = ask(w, "new")
+    assert [c.id for c in w.history.cases("ceo", SERVICE)] == [new.id]
+    assert [c.id for c in w.history.chains("ceo", SERVICE, since=None, runs=True)] == [old.id, new.id]
+
+
+def test_chains_since_a_time_keep_the_requests_at_or_after_it(w: ReflectionWorld) -> None:
+    define(w)
+    first = ask(w, "a")
+    w.s.d.clock.advance(1)
+    second = ask(w, "b")
+    w.s.d.clock.advance(1)
+    third = ask(w, "c")
+    since = msg_time(second)
+    assert since is not None and msg_time(first) is not None and msg_time(third) is not None
+    assert [c.id for c in w.history.chains("ceo", SERVICE, since=since, runs=True)] == [second.id, third.id]  # at the time itself: kept
+    assert [c.id for c in w.history.chains("ceo", SERVICE, since=since + timedelta(microseconds=1), runs=True)] == [third.id]
+
+
+def test_chains_with_runs_false_read_no_run_log_charter_or_playbook(w: ReflectionWorld) -> None:
+    """Mail only: a run counter and a playbook timeline that raise are never asked, and the run numbers are 0."""
+    define(w)
+    first = ask(w)
+    w.use_run("ceo")
+    deliver(w, first, runs=2, budget=1)
+    relayed = rework(w, first, source="relayed", budget=3)
+    revise(w)
+    mail_only = DerivedCaseHistory(w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, _Refusing(), _Refusing())
+    (case,) = mail_only.chains("ceo", SERVICE, since=None, runs=False)
+    assert (case.runs, case.relayed_runs, case.used) == (0, 0, 0)
+    assert [t.id for t in case.tasks] == [first.id, relayed.id] and (case.returned, case.relayed_returned, case.budget) == (1, 0, 13)
+
+
+def test_cases_equal_chains_since_the_contract_created_with_runs(w: ReflectionWorld) -> None:
+    define(w)
+    old = ask(w, "old")
+    w.s.commands.retire_service("root", "ceo", SERVICE, "obsolete")
+    w.s.d.clock.advance(1)
+    define(w)
+    first = ask(w, "new")
+    w.use_run("ceo")
+    deliver(w, first, runs=2, budget=1)
+    rate(w, first, "reject", "No.")
+    deliver(w, rework(w, first, budget=3), runs=1)
+    contract = w.s.catalog.read_contract("ceo", SERVICE)
+    assert contract is not None and contract.created is not None and old.id != first.id
+    assert w.history.cases("ceo", SERVICE) == w.history.chains("ceo", SERVICE, since=contract.created, runs=True) != []
+
+
+def test_chains_need_no_contract(w: ReflectionWorld) -> None:
+    """A request of a service nobody defined (or whose contract cannot be read) still has its chain; ``cases`` stays ``[]`` without a contract."""
+    task = w.s.d.post(Message(sender="root", to="ceo", type="task", body="b", title="t", service=SERVICE, budget=4))
+    assert w.history.cases("ceo", SERVICE) == []
+    (case,) = w.history.chains("ceo", SERVICE, since=None, runs=True)
+    assert (case.id, case.owner, case.service, case.client_kind) == (task.id, "ceo", SERVICE, "human")
+
+
+class _Refusing(RunCounter, PlaybookTimelines):
+    """A run counter and a playbook timeline that fail the test when asked."""
+
+    def runs_between(self, team: Sequence[str], start: str, end: str | None) -> int:
+        raise AssertionError("a run log was read")
+
+    def stamps(self, team: Sequence[str], start: str, end: str | None) -> list[tuple[str, bool]]:
+        raise AssertionError("a run log was read")
+
+    def timeline(self, owner: str, service: str) -> list[tuple[int, datetime]]:
+        raise AssertionError("a playbook was read")

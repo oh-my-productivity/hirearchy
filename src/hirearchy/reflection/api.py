@@ -404,6 +404,14 @@ class CaseHistory(Protocol):
         the service was (last) created from scratch are not part of it. ``[]`` when there is no such service."""
         ...
 
+    def chains(self, owner: str, service: str, *, since: datetime | None, runs: bool) -> list[Case]:
+        """The cases of ``owner``'s service built from the client's mailboxes alone, oldest first: no contract is read (a request of a service nobody
+        defined, or whose contract cannot be read, still has its chain), and the requests kept are those at or after ``since`` (``None``: every
+        one). ``cases`` is this after the contract read, with ``since`` the contract's creation and ``runs`` true. With ``runs`` false no run log,
+        charter or playbook file is read: ``runs``, ``credited``, ``relayed_runs``, ``used`` and the mark of runs not counted are 0 or empty, and
+        the fields that come from mail alone are filled (the runs before each hand-down are read as 0, so ``user_ceiling`` is a lower bound)."""
+        ...
+
     def case_of(self, task: Message) -> Case | None:
         """The case a service task belongs to (None for a task that is not a service request, or an unknown one)."""
         ...

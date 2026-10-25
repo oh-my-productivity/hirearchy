@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -43,6 +43,16 @@ def test_every_task_of_a_chain_finds_its_case() -> None:
 def test_the_timeline_is_the_one_put_in() -> None:
     history = FixedCaseHistory(timelines={("ceo", "brief"): [(1, T)]})
     assert history.playbook_timeline("ceo", "brief") == [(1, T)] and history.playbook_timeline("ceo", "other") == []
+
+
+def test_its_chains_are_its_cases_kept_since_a_time_whatever_the_runs() -> None:
+    early, late = case("T1"), case("T2")
+    early.started, late.started = T, T + timedelta(days=1)
+    unstarted = case("T3")
+    history = FixedCaseHistory([early, late, unstarted, case("T4", owner="ops")])
+    assert history.chains("ceo", "brief", since=None, runs=False) == [early, late, unstarted]
+    assert history.chains("ceo", "brief", since=T + timedelta(days=1), runs=True) == [late, unstarted]  # a case without a start is kept
+    assert history.chains("ghost", "brief", since=None, runs=True) == []
 
 
 def test_an_empty_history_has_nothing() -> None:
