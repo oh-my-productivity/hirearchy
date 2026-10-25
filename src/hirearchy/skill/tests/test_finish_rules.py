@@ -16,3 +16,9 @@ def test_skill_carries_the_finishing_rules():
                    "shorter still when the user asks for a short answer", "one line per criterion",
                    "`stop()` only if the user cancels"):
         assert needle in skill, needle
+
+
+def test_step_5_1_reads_the_result_with_inbox_never_with_shell_reads():
+    skill = skill_source().read_text()
+    assert "Read the result with `inbox` (never with shell reads of the org's boxes)" in skill
+    assert len(skill.splitlines()) == 125  # (the line count after the rebase onto 0a.3 to 0a.5: the edit adds no line)

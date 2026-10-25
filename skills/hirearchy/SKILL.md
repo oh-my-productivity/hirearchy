@@ -85,7 +85,7 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
   ("finished") and you sent more work, call `start()` again. Pass source="human" only on a rework the user asked for (the default is relayed); if a relayed rework changed the file after their verdict, also base="delivered" (what they judged) or base="latest" (say so).
 
 ## 5. Finish
-1. Read the final deliverable and check it yourself against EVERY acceptance criterion (counts, sections, URLs, tests run).
+1. Read the result with `inbox` (never with shell reads of the org's boxes), then the final deliverable, and check it yourself against EVERY acceptance criterion (counts, sections, URLs, tests run).
 2. An omission or clear violation verified against the source: send it back with `revises` (never patch it yourself), say what you did.
    If the reviewer evidenced a PASS and your doubt is how to READ a criterion (dates, what counts as an item, wording), ask the user
    one short question first; never send it back on your own reading or say the reviewer "missed" what you read differently.
