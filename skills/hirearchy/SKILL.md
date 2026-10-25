@@ -95,7 +95,7 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 4. Then copy the deliverable to the requested path (the plan lists this step) and check it exists and matches. If `progress`, `status` or `whoami` name a file there the team did not deliver as checked, tell the user what changed and why.
 5. Reply briefly, and shorter still when the user asks for a short answer: the deliverable path, then one line per criterion
    (met / unmet), then runs used of planned (with reworks, the case total: "19 runs of the 15 approved per request", your relayed runs apart, as yours). Nothing else.
-6. A service request: after the delivery ask ONE short question ("Keep it, or what should change?") and record
+6. A service request (a one-off task: record only a verdict the user states, no question, no criterion): after the delivery ask ONE short question ("Keep it, or what should change?") and record
    `feedback(task_id, accept|reject, note, source="human")` only on the user's own judgement of the delivered result, in their words
    ("keep it" / "what's wrong"); when they keep a delivered version as it is after seeing it ("I'll take it as it is"), record that accept on its task, `source="human"`, with their words, also after a reject; a "keep it" about one part of it, or before they saw it, is no accept; "deliver as is" or "I'll read it myself" is not an accept: ask, or record nothing yet. A known unmet
    criterion stays unmet: say so; feedback never waives it; reject needs the user's reason in their words. Your own reading is relayed

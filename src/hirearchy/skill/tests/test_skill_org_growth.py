@@ -145,3 +145,12 @@ def test_the_skill_asks_the_spend_of_a_rework_in_the_message_of_the_question_tha
         "never wait until the reserve",
     ):
         assert needle in text, needle
+
+
+def test_one_off_tasks_are_rated_only_on_a_verdict_the_user_states():
+    """Design 8.4 and 11.3: step 5.6 covers root's one-off tasks without asking one more question, in the same number of lines."""
+    assert len(SKILL.read_text().splitlines()) <= 125
+    text = flat()
+    assert "a one-off task: record only a verdict the user states, no question, no criterion" in text
+    assert "6. a service request (a one-off task: record only a verdict the user states, no question, no criterion): after the delivery ask one short" in text
+    assert "when they keep a delivered version as it is after seeing it" in text  # 0a.4's line stays
