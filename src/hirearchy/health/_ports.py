@@ -51,6 +51,8 @@ class EscapeCounts(NamedTuple):
     judged: int  # deliveries the human client gave a verdict on
     rechecks: int  # re-checks the agent had to make after a FAIL
     rework_runs: int  # runs of the authors that those FAILs cost
+    not_its: tuple[tuple[str, int], ...] = ()  # judged escapes that are not the verifier's, by cause (``contract-gap``, ``relayed-error``, ...)
+    unknown: str = ""  # the services whose escapes could not be typed (``{service}: {error}`` joined by ``; ``); "" when none
 
 
 @runtime_checkable

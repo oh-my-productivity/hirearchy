@@ -85,6 +85,8 @@ class AgentHealth:
     judged: int = 0  # service deliveries it signed off (or owned) that the human client gave a verdict on
     rechecks: int = 0  # received reworks of a check it had reported done, after the owner sent the author a rework (a FAIL)
     rework_runs: int = 0  # runs of the authors between each such FAIL and the re-check
+    not_its: dict[str, int] = field(default_factory=dict)  # escapes that are not the verifier's (contract-gap, ...), by cause; the view shows root only
+    causes_unknown: str = ""  # the services whose escapes could not be typed ("" when none); the view shows root only
 
     @property
     def worst_flag(self) -> str | None:

@@ -49,6 +49,11 @@ def test_an_agent_that_has_done_nothing(w: HealthWorld) -> None:
     )
 
 
+def test_not_its_and_causes_unknown_default_empty(w: HealthWorld) -> None:
+    h = w.analyzer.agent_health("ceo/eng", at(100))
+    assert h.not_its == {} and h.causes_unknown == ""
+
+
 def test_tasks_are_counted_once_by_their_latest_result(w: HealthWorld) -> None:
     done, failed, later_done, open_one = (give(w, when=10 + i) for i in range(4))
     answer(w, done, "done", 20)

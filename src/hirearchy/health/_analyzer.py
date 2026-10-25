@@ -120,7 +120,7 @@ class FileHealthAnalyzer(HealthAnalyzer):
             runs_per_task=runs_per_task, last_activity=last, since_activity=since, flags=flags,
             done=by_status["done"], failed=by_status["failed"], blocked=by_status["blocked"],
             failed_runs=len(failed), runtime_runs=len(runtime_only - failed), escapes=escapes.escapes, judged=escapes.judged,
-            rechecks=escapes.rechecks, rework_runs=escapes.rework_runs,
+            rechecks=escapes.rechecks, rework_runs=escapes.rework_runs, not_its=dict(escapes.not_its), causes_unknown=escapes.unknown,
         )
 
     def org_health(self, root: str = ROOT, now: datetime | None = None) -> OrgHealth:

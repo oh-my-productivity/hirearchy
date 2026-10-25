@@ -332,3 +332,10 @@ def test_to_dict_is_json(troubled):
     eng = data["agents"][1]
     assert eng["flags"]["stuck"] and eng["last_activity"] == at(450).isoformat()
     assert data["branches"]["ceo"]["worst_flag"] == "stuck"
+
+
+def test_to_dict_carries_not_its_and_causes_unknown(troubled):
+    data = json.loads(json.dumps(org_health(troubled, now=at(5000)).to_dict()))
+    for agent in data["agents"]:
+        assert agent["not_its"] == {} and agent["causes_unknown"] == ""
+        assert list(agent)[-3:] == ["rework_runs", "not_its", "causes_unknown"]

@@ -27,7 +27,9 @@
       "escapes": 0,
       "judged": 0,
       "rechecks": 0,
-      "rework_runs": 0
+      "rework_runs": 0,
+      "not_its": {},
+      "causes_unknown": ""
     },
     {
       "addr": "ceo/eng",
@@ -54,7 +56,9 @@
       "escapes": 0,
       "judged": 0,
       "rechecks": 0,
-      "rework_runs": 0
+      "rework_runs": 0,
+      "not_its": {},
+      "causes_unknown": ""
     },
     {
       "addr": "ceo/qa",
@@ -81,7 +85,9 @@
       "escapes": 0,
       "judged": 0,
       "rechecks": 0,
-      "rework_runs": 0
+      "rework_runs": 0,
+      "not_its": {},
+      "causes_unknown": ""
     },
     {
       "addr": "ops",
@@ -108,7 +114,9 @@
       "escapes": 0,
       "judged": 0,
       "rechecks": 0,
-      "rework_runs": 0
+      "rework_runs": 0,
+      "not_its": {},
+      "causes_unknown": ""
     }
   ],
   "branches": {
