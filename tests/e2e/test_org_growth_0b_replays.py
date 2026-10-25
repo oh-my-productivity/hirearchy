@@ -7,7 +7,7 @@ One test per expectation id of design 19.3, each written from the design's text 
 if a replay computes another value, the FEAT stops and the manager is told (19.3, "When an expectation fails"). A listed file that is missing, or a
 message that does not parse, fails the test; nothing here skips.
 
-This module holds E (E-1..E-5), E2 (E2-1..E2-6), A5 (A5-1..A5-4) and E3 (E3-1..E3-7). A5-4 is also the golden ``quality/a5_one_off_block.txt``, E3-5 the
+This module holds E (E-1..E-5), E2 (E2-1..E2-6), A5 (A5-1..A5-4) and E3 (E3-1..E3-7 and the constructed variant of E3-9). A5-4 is also the golden ``quality/a5_one_off_block.txt``, E3-5 the
 golden ``quality/e3.txt``, E3-8 the golden ``quality/e3.json`` with the schema and figure checks (``tests/golden/test_golden_quality.py``). E4 s1r, s2r and
 s3 are the last block (S1R-1..S1R-6, S2R-1..S2R-3, S3-1..S3-5, E4-all).
 """
@@ -448,6 +448,31 @@ def test_e3_7(replays):
     assert "C11" in delivery.decisive.confirmed
     assert record["escapes"][1]["cause"] == "contract-gap" and record["escapes"][1]["rule"] == "answer"
     assert "    cost: no (0 of 3 cases above 1.25x)" in replay.lines
+
+
+@pytest.mark.parametrize(
+    "count, user_cost, fires, ratio",
+    [(12, 26, True, "1.30"), (11, 25, False, "1.25")],
+    ids=["N=12 fires at 1.30x", "N=11 is exactly 1.25x and reads no"],
+)
+def test_e3_9_the_constructed_variant_r3_overspend(replays, count, user_cost, fires, ratio):
+    """E3-9 (D-E5-6; **a constructed variant, not an observation**, 19.1): N empty run logs of `lead` are added inside ab46's window, so that the cost
+    alarm has a case to fire on: no study corpus fires it under this rule. N=12 gives 26 charged runs, the user's runs 26 against 20 approved (1.30x) and
+    `cost: FIRES: case ...-root-ab46 26 of 20 approved (1.30x)`; N=11 gives 25, exactly 1.25 x 20, and `cost: no (0 of 3 cases above 1.25x)`. The two
+    replays pin the boundary of `Fraction(user_cost) > cost_ratio * user_approved` on files."""
+    replay = replays("E3", f"r3-overspend-{count}")
+    record = service(replay)
+    ab46 = case(record, "ab46")
+    assert (ab46["runs"], ab46["user_cost"], ab46["user_approved"], ab46["ratio"], ab46["relayed_runs"], ab46["spend"]) == (user_cost, user_cost, 20, ratio, 0, user_cost)
+    (cost_line,) = [x for x in replay.lines if x.startswith("    cost:")]
+    if fires:
+        assert cost_line == f"    cost: FIRES: case {E3_AB46} 26 of 20 approved (1.30x)"
+        assert record["alarms"]["cost"]["state"] == "fires"
+        assert record["alarms"]["cost"]["cases"] == [{"case": E3_AB46, "user_cost": 26, "user_approved": 20, "ratio": "1.30", "relayed_runs": 0, "total": 26}]
+    else:
+        assert cost_line == "    cost: no (0 of 3 cases above 1.25x)"
+        assert record["alarms"]["cost"]["state"] == "no" and record["alarms"]["cost"]["cases"] == []
+    assert [c["user_cost"] for c in record["cases"] if not c["id"].endswith("ab46")] == [12, 5]  # the other cases are the observed ones
 
 
 # ------------------------------------------------------------------------------------------------------------------ E4
