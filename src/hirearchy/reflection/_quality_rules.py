@@ -1,13 +1,17 @@
-"""The pure rules of the quality view: deliveries, who signed them off, the verdicts that are on none, the cases without a verdict (0b 3, 4.3, 4.4).
+"""The pure rules of the quality view: deliveries, who signed them off, the verdicts that are on none, the cases without a verdict (0b 3, 4.3, 4.4),
+and the thresholds of its alarms (6).
 
 They read values (cases, messages), never files. ``reflection.api`` re-exports them from its end, because this module needs the types above them."""
 
 from __future__ import annotations
 
+import math
+import re
 from collections.abc import Collection, Mapping, Sequence
+from fractions import Fraction
 
 from ..kernel import Message
-from .api import Case, Delivery
+from .api import Case, Delivery, QualityThresholds
 
 
 def signer_of(owner: str, task_id: str, done_id: str, owner_sent: Sequence[Message], owner_received: Sequence[Message], reports: Collection[str]) -> str:
@@ -64,3 +68,78 @@ def not_on_a_delivery(case: Case, deliveries: Sequence[Delivery]) -> tuple[Messa
     result, or before the ``done`` result arrived. Counted apart, never read as the verdict on a later delivery. Oldest first."""
     on_one = {v.message.id for d in deliveries for v in d.verdicts}
     return tuple(v.message for v in case.verdicts if v.tier == "human" and v.message.id not in on_one)
+
+
+_THRESHOLD_KEYS = "min_judged, repeat_window, repeat_failures, cost_ratio"
+_WHOLE = "a whole number of at least 1"
+
+
+def _count(value: object) -> int | None:
+    """``value`` as a whole number of at least 1: an int (not a bool), an integral float or a string of digits; else None."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        number: int | None = value
+    elif isinstance(value, float):
+        number = int(value) if value.is_integer() else None  # inf and nan are not integral
+    elif isinstance(value, str) and re.fullmatch(r"[0-9]+", value):
+        number = int(value)
+    else:
+        number = None
+    return number if number is not None and number >= 1 else None
+
+
+def _ratio(value: object) -> tuple[Fraction, str] | None:
+    """``value`` as a ratio above 0 with the text it was written as: an int or finite float (not a bool) or a decimal string; else None."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    if isinstance(value, (int, float)):
+        text = str(value)
+    elif isinstance(value, str) and re.fullmatch(r"[0-9]+(\.[0-9]+)?", value):
+        text = value
+    else:
+        return None
+    ratio = Fraction(text)
+    return (ratio, text) if ratio > 0 else None
+
+
+def quality_thresholds(config: Mapping[str, object]) -> tuple[QualityThresholds, tuple[str, ...]]:
+    """The thresholds of the alarms from the optional ``quality:`` mapping of ORG.md's frontmatter ``config``, and the notes for what was ignored
+    (pure; design 6, 14). A value that fails keeps its default and adds a note; an unknown key and a ``quality`` that is no mapping are ignored with a
+    note. ``repeat_failures`` is checked against the ``repeat_window`` in force; its default is clamped to a window below 2."""
+    if "quality" not in config:
+        return QualityThresholds(), ()
+    raw = config["quality"]
+    if not isinstance(raw, Mapping):
+        return QualityThresholds(), ("quality in ORG.md is not a mapping: the defaults are used.",)
+    notes: list[str] = []
+    applied = False
+
+    def counted(key: str, default: int, what: str, ceiling: int | None = None) -> int:
+        nonlocal applied
+        if key not in raw:
+            return default
+        value = _count(raw[key])
+        if value is None or (ceiling is not None and value > ceiling):
+            notes.append(f"quality.{key} in ORG.md is not {what}: the default {default} is used.")
+            return default
+        applied = True
+        return value
+
+    min_judged = counted("min_judged", 3, _WHOLE)
+    window = counted("repeat_window", 3, _WHOLE)
+    default_failures = min(2, window)
+    if "repeat_failures" not in raw and window < 2:
+        notes.append(f"quality.repeat_failures: the default 2 is above repeat_window {window}, so {default_failures} is used.")
+    failures = counted("repeat_failures", default_failures, f"a whole number from 1 to {window}", ceiling=window)
+    ratio, text = Fraction("1.25"), "1.25"
+    if "cost_ratio" in raw:
+        read = _ratio(raw["cost_ratio"])
+        if read is None:
+            notes.append(f"quality.cost_ratio in ORG.md is not a number above 0: the default {text} is used.")
+        else:
+            (ratio, text), applied = read, True
+    notes += [f"quality.{key} in ORG.md is not a threshold: ignored (the thresholds are {_THRESHOLD_KEYS})." for key in raw if str(key) not in _THRESHOLD_KEYS.split(", ")]
+    return QualityThresholds(min_judged, window, failures, ratio, text, "ORG.md" if applied else "defaults"), tuple(notes)

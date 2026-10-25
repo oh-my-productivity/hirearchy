@@ -14,9 +14,11 @@ The contracts and playbooks are ``services``' (``ServiceCatalog``); this package
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
+from types import MappingProxyType
 from typing import Protocol, runtime_checkable
 
 from ..kernel import ClientItems, Message, client_items, clip_line, msg_time
@@ -36,6 +38,8 @@ __all__ = [
     "ITEMS_SHOWN",
     "ITEM_CHARS",
     "LASTING_WORDS",
+    "QUALITY_DEFAULTS",
+    "QualityThresholds",
     "ReflectionDigest",
     "ServicePromptSections",
     "ServiceReports",
@@ -57,6 +61,7 @@ __all__ = [
     "lessons_of",
     "not_on_a_delivery",
     "open_client_items",
+    "quality_thresholds",
     "questions_open",
     "rated",
     "regressions",
@@ -223,6 +228,21 @@ class Cause:
     version: int = 0  # the contract version the rejected task carried (0 when it recorded none)
     answering: int = 0  # the version that answered the rejection (0 when none)
     removes: tuple[str, ...] = ()  # the named ids that the answering version removes, in named order (a contract-gap by answer)
+
+
+QUALITY_DEFAULTS: Mapping[str, int | str] = MappingProxyType({"min_judged": 3, "repeat_window": 3, "repeat_failures": 2, "cost_ratio": "1.25"})
+
+
+@dataclass(frozen=True)
+class QualityThresholds:
+    """The tunable thresholds of the quality view's alarms (0b section 6); the defaults are ``QUALITY_DEFAULTS``. ``quality_thresholds`` reads them."""
+
+    min_judged: int = 3  # an alarm is evaluated only once the record has this many judged cases
+    repeat_window: int = 3  # the repeat alarm looks at this many most recent judged cases
+    repeat_failures: int = 2  # ... and fires when one subject failed in at least this many of them
+    cost_ratio: Fraction = Fraction("1.25")  # the cost alarm fires above this times the user's approved runs (exact)
+    cost_ratio_text: str = "1.25"  # the ratio as the user wrote it, for the view
+    source: str = "defaults"  # "defaults", or "ORG.md" when at least one value came from its ``quality:`` mapping
 
 
 _EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
@@ -727,4 +747,4 @@ def deliverables_note(findings: Sequence[DeliverableFinding]) -> str:
 
 # Pure rules re-exported from their modules; they import the types above, so these imports come last.
 from ._causes import attribution, cause_of, failure_class  # noqa: E402
-from ._quality_rules import deliveries_of, not_on_a_delivery, signer_of, unjudged_cases  # noqa: E402
+from ._quality_rules import deliveries_of, not_on_a_delivery, quality_thresholds, signer_of, unjudged_cases  # noqa: E402
