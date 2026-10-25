@@ -9,7 +9,11 @@ message that does not parse, fails the test; nothing here skips.
 
 This module holds E (E-1..E-5), E2 (E2-1..E2-6), A5 (A5-1..A5-4) and E3 (E3-1..E3-7 and the constructed variant of E3-9). A5-4 is also the golden ``quality/a5_one_off_block.txt``, E3-5 the
 golden ``quality/e3.txt``, E3-8 the golden ``quality/e3.json`` with the schema and figure checks (``tests/golden/test_golden_quality.py``). E4 s1r, s2r and
-s3 are the last block (S1R-1..S1R-6, S2R-1..S2R-3, S3-1..S3-5, E4-all).
+s3 are the next block (S1R-1..S1R-6, S2R-1..S2R-3, S3-1..S3-5, E4-all); E5's three streams are the last (E5S1-1..E5S3-7, E5-all; design 19.3 "E5").
+
+**Kit limit (E5).** The replay has no org git history, so OQ-2's given-delivery path and P3's `relayed` finding cannot run; with history the evidence shows
+s1 and s2 relayed (no hand edit) and s3 differs (the md5 facts of E5S1-6, E5S2-6 and E5S3-6). Those two paths run on a real git history in
+`test_org_growth_0b_given.py`. Every E5 test below says so in its docstring.
 """
 
 import json
@@ -20,7 +24,8 @@ from typing import Any, NamedTuple
 import pytest
 from testkit import REPO
 from testkit.e4_replay import EV, evidence
-from testkit.org_replay import materialize
+from testkit.e5_replay import EV5
+from testkit.org_replay import index_entries, materialize, md5_of, utc_us
 
 from hirearchy.core import ROOT, Org
 from hirearchy.mail import moved_past
@@ -739,3 +744,586 @@ def test_e4_all(replays, corpus):
     assert service(replay)["history"] == {"known": False, "truncated": False, "skipped": 0}
     blocks = len(replay.data["services"]) + (replay.data["one_off"] is not None)
     assert replay.lines.count(f"    {NO_HISTORY}") == blocks == 1
+
+
+# ------------------------------------------------------------------------------------------------------------------ E5 (design 19.3 "E5")
+
+KIT_LIMIT = (
+    "\n\n    Kit limit: the replay has no org git history, so OQ-2's given-delivery path and P3's `relayed` finding cannot run; with history the evidence shows\n"
+    "    s1 and s2 relayed (no hand edit) and s3 differs (the md5 facts of E5S<n>-6). Both paths run on a real git history in test_org_growth_0b_given.py.\n    "
+)
+
+
+def kit_limit(test):
+    """Appends the kit limit to a test's docstring (the manager's condition for the E5, E6 and E7 replays)."""
+    test.__doc__ = (test.__doc__ or "") + KIT_LIMIT
+    return test
+
+
+WEEKLY = "weekly-meeting-memo"
+GAP = "contract-gap"
+C1_C7 = ["C1", "C2", "C3", "C4", "C5", "C6", "C7"]
+JUDGED_LINE = "  judged by the user: {j} of {n} deliveries; without a verdict: {u} case(s) ({ids}): never counted as accepted ({r} with only your own relayed verdict); not as delivered: 1"
+NO_HISTORY_REMARK = "(compared with the team's current files: no org history)"
+CASES_LINE = "  cases: 3 (done 3, failed 0, blocked 0, open 0 (stalled 0))"
+NO_CUT = "  run attribution is by time window (08 3.3): 0 case(s) had their window cut by a later request."
+
+
+def recorded_fails(stream: str) -> tuple[int, int]:
+    """The reviewer's re-checks after a FAIL and author rework runs on the recorded health line of the stream (0a's `MailEscapeCounter`, unchanged)."""
+    lines = (EV5 / stream / "final-services-progress-status-health.txt").read_text(encoding="utf-8").splitlines()
+    (line,) = [x for x in lines if x.startswith("  reviewer idle")]
+    found = re.search(r"re-checks after a FAIL (\d+) \(author rework runs (\d+)\)", line)
+    return int(found[1]), int(found[2])
+
+
+def mark_times(record: dict[str, Any], kind: str) -> list[tuple[str, int]]:
+    return [(m["when"][:16], m["version"]) for m in marks(record, kind)]
+
+
+def top_ups(record: dict[str, Any]) -> list[tuple[str, str, str, int]]:
+    """``(minute, short task id, source, amount)`` of the top-up marks."""
+    return [(m["when"][:16], m["id"][-4:], m["source"], m["amount"]) for m in marks(record, "top-up")]
+
+
+def case_figures(record: dict[str, Any]) -> list[tuple[str, int, int, str, int, int, int, int, bool, str, int]]:
+    return [
+        (c["id"][-4:], c["user_cost"], c["user_approved"], c["ratio"], c["relayed_runs"], c["spend"], c["runs"], c["credited"], c["cut"], c["runs_unknown"], c["budget"])
+        for c in record["cases"]
+    ]
+
+
+def evidence_versions(stream: str, memo: str) -> tuple[Any, dict[int, dict[str, object]]]:
+    """The delivered file of the stream and the versions INDEX.txt lists for the team's file of that name."""
+    index = EV5 / stream / "memos" / "versions" / "INDEX.txt"
+    return EV5 / stream / "memos" / memo, {int(v["k"]): v for v in index_entries(index)[f"lead/writer/work/{memo}"]}
+
+
+def check_common(replay: Replay, stream: str) -> None:
+    """What every E5 stream shares (E5-all, per stream): the record, the thresholds, the unknown history, no one-off record, no nested service."""
+    record = service(replay)
+    assert (record["service"], record["owner"], record["client"], record["client_kind"], record["unit"]) == (WEEKLY, "lead", "root", "human", "case")
+    assert (record["contract"], record["playbook"], record["budget"]) == (2, 2, 12)
+    assert replay.data["one_off"] is None and replay.data["nested"] == [] and replay.data["notes"] == []
+    assert replay.data["thresholds"]["source"] == "defaults" and THRESHOLDS in replay.lines
+    assert CASES_LINE in replay.lines and NO_CUT in replay.lines and "One-off tasks you gave: none." in replay.lines
+    assert [c["state"] for c in record["cases"]] == ["done"] * 3 and [c["cut"] for c in record["cases"]] == [False] * 3
+    assert [c["credited"] for c in record["cases"]] == [0, 0, 0] and [c["stalled"] for c in record["cases"]] == [False] * 3
+    assert record["history"] == {"known": False, "truncated": False, "skipped": 0} and f"    {NO_HISTORY}" in replay.lines
+    assert [m for m in record["timeline"] if m["kind"] in ("charter", "model")] == []
+    assert record["error"] == record["files_error"] == record["stalled_error"] == ""
+
+
+# ---------------------------------------------------------------------------------------------------------------------- s1
+
+F07A, AAE2, R963A = "20261024T030644000395-root-f07a", "20261024T031013210098-root-aae2", "20261024T031317713451-root-963a"
+F549, A312, EE21 = "20261024T031843932122-root-f549", "20261024T032246939392-root-312a", "20261024T032536636989-root-ee21"
+S1_LINK = "20261024T031733594650-root-8376"
+
+
+@kit_limit
+def test_e5s1_1(replays):
+    """E5S1-1: s1's record, cases, deliveries and what the user judged: 6 deliveries, 3 judged (the human rework aae2 rejected, f549 and the human rework
+    ee21 accepted); memo 1's case f07a is without a verdict because its latest delivery is the relayed rework 963a, which carries only the assistant's
+    relayed reject (`relayed only`); 0 verdicts not on a delivery."""
+    replay = replays("E5-s1")
+    check_common(replay, "s1")
+    record = service(replay)
+    assert [c["id"] for c in record["cases"]] == [F07A, F549, A312] and [c["tasks"] for c in record["cases"]] == [3, 1, 2]
+    assert deliveries(service_record(replay)) == [
+        (F07A, "20261024T030905425682-lead-bb5a"), (AAE2, "20261024T031227292670-lead-5cbe"), (R963A, "20261024T031535111416-lead-592f"),
+        (F549, "20261024T032121583165-lead-9525"), (A312, "20261024T032454611999-lead-8fdf"), (EE21, "20261024T032800275791-lead-1757"),
+    ]
+    assert (record["deliveries"]["total"], record["deliveries"]["judged"]) == (6, 3)
+    by_task = {d.task.id: d for d in service_record(replay).deliveries}
+    assert {t: [(v.verdict, v.message.id) for v in d.counted] for t, d in by_task.items() if d.judged} == {
+        AAE2: [("reject", "20261024T031628904053-root-99d4")], F549: [("accept", "20261024T032246934196-root-4265")],
+        EE21: [("accept", "20261024T032840970281-root-359a")],
+    }
+    assert [(v.verdict, v.tier) for v in by_task[R963A].verdicts] == [("reject", "relayed")] and by_task[R963A].counted == ()
+    assert record["first_deliveries"] == {"accepted": 1, "rejected": 0, "no_verdict": 2, "superseded": 2, "neither": 0, "never_delivered": 0}
+    assert case(record, "f07a")["first"] == {"task": F07A, "outcome": "none", "superseded_by": AAE2, "superseded_source": "human"}
+    assert case(record, "f549")["first"]["outcome"] == "accepted"
+    assert case(record, "312a")["first"] == {"task": A312, "outcome": "none", "superseded_by": EE21, "superseded_source": "human"}
+    assert "  first deliveries: 1 accepted, 0 rejected, 2 without a verdict (2 superseded by a rework before a verdict)" in replay.lines
+    assert f'    {F549}: accepted: "That one is right, all the items are there - keep it."' in replay.lines
+    assert f"    {F07A}: no verdict (superseded by human rework {AAE2})" in replay.lines
+    deliveries_ = record["deliveries"]
+    assert (deliveries_["unjudged_cases"], deliveries_["relayed_only"], deliveries_["unseen_relayed"]) == ([F07A], [F07A], [])
+    assert (deliveries_["not_on_a_delivery"], deliveries_["legacy_verdicts"], deliveries_["neither"]) == ([], 0, [])
+    (judged_line,) = [x for x in replay.lines if x.startswith("  judged by the user:")]
+    assert judged_line.startswith(JUDGED_LINE.format(j=3, n=6, u=1, ids=F07A, r=1))
+    assert not any("verdicts not on a delivery" in x for x in replay.lines)
+
+
+@kit_limit
+def test_e5s1_2(replays):
+    """E5S1-2: the one escape, R1 on aae2: contract-gap by the user's answer (the link names C8, which contract v1 lacks), signed off by lead/reviewer, not
+    its; the relayed rework 963a was delivered between the delivery and the verdict. Health reads it as a gap, not a miss."""
+    replay = replays("E5-s1")
+    record = service(replay)
+    (escape,) = record["escapes"]
+    assert (escape["assertion"], escape["case"], escape["task"], escape["verdict"], escape["signer"]) == (
+        "R1", F07A, AAE2, "20261024T031628904053-root-99d4", "lead/reviewer",
+    )
+    assert (escape["cause"], escape["rule"], escape["rules"], escape["detail"], escape["also"], escape["attribution"], escape["class"]) == (
+        GAP, "answer", ["answer", "words"], [S1_LINK, "C8"], [], "not its", None,
+    )
+    assert escape["before_verdict"] == R963A
+    assert (
+        f"    R1 case {F07A}, signed off by lead/reviewer: contract-gap (the user's answer, link {S1_LINK}, names C8, which contract v1 of the task did not have); "
+        f"your relayed rework {R963A} delivered after it and before the verdict: the user may have judged that version"
+    ) in replay.lines
+    (_, cause) = service_record(replay).escapes[0]
+    assert cause.version == 1  # the rejected task carried contract v1, which lacks C8
+    assert not any(m.source == "human" and m.revises and m.revises.endswith("-root-963a") for m in replay.org.sent(ROOT))  # no human rework followed the injection
+    rechecks, rework = recorded_fails("s1")
+    (verifier,) = record["verifiers"]
+    assert (verifier["addr"], verifier["judged"], verifier["escapes"], verifier["pass_precision"], verifier["fails_error"]) == (
+        "lead/reviewer", 3, {"counted": {}, "not_its": {GAP: 1}}, [3, 3], "",
+    )
+    assert (verifier["rechecks"], verifier["rework_runs"]) == (rechecks, rework) == (0, 0)
+    assert "    lead/reviewer: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; its FAILs before delivery: 0 re-check(s), 0 author rework run(s)" in replay.lines
+    assert "escapes 0 of 3 judged (+1 not its: 1 contract-gap)" in replay.root_health
+    assert "escapes 0 of 3 judged" in replay.agent_health and "not its" not in replay.agent_health
+    reviewer = replay.agents["lead/reviewer"]
+    assert (reviewer.judged, reviewer.escapes, reviewer.not_its) == (3, 0, {GAP: 1})
+
+
+@kit_limit
+def test_e5s1_3(replays):
+    """E5S1-3: the timeline: the contract v2 answers R1 and is confirmed by the link (DR3-1's form), the playbook v2 adds C8's own words, the top-ups of
+    the human reworks and of the relayed rework; no charter or model mark."""
+    replay = replays("E5-s1")
+    record = service(replay)
+    contracts = {m["version"]: m for m in marks(record, "contract")}
+    assert (contracts[1]["adds"], contracts[1]["basis"]) == (C1_C7, "first")
+    assert (contracts[2]["by"], contracts[2]["adds"], contracts[2]["removes"], contracts[2]["basis"], contracts[2]["answers"]) == ("root", ["C8"], [], "answers", "R1")
+    assert (contracts[2]["confirmed"], contracts[2]["not_confirmed"]) == ([{"id": "C8", "link": S1_LINK}], [])
+    playbooks = {m["version"]: m for m in marks(record, "playbook")}
+    assert (playbooks[1]["by"], playbooks[1]["basis"]) == ("root", "client")
+    v2 = playbooks[2]
+    assert (v2["by"], v2["basis"], v2["evidence"], v2["changed"], v2["own_words"], v2["beyond"], v2["removed"]) == ("lead", "c", ["C8", "R1", S1_LINK], 1, 1, 0, 0)
+    assert mark_times(record, "contract") == [("2026-10-24T03:06", 1), ("2026-10-24T03:17", 2)]
+    assert mark_times(record, "playbook") == [("2026-10-24T03:06", 1), ("2026-10-24T03:19", 2)]
+    assert top_ups(record) == [
+        ("2026-10-24T03:10", "aae2", "human", 12), ("2026-10-24T03:13", "963a", "relayed", 6), ("2026-10-24T03:25", "ee21", "human", 12),
+    ]
+    for line in (
+        "    2026-10-24 03:06 contract v1 (C1, C2, C3, C4, C5, C6, C7)",
+        "    2026-10-24 03:06 playbook v1 (root): written by the client (no admission needed)",
+        f"    2026-10-24 03:17 contract v2 (root): adds C8: the user's answer to R1: C8 confirmed (link {S1_LINK})",
+        f"    2026-10-24 03:19 playbook v2 (lead): admitted (c) on C8, R1, {S1_LINK}: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them",
+        f"    2026-10-24 03:10 top-up +12 run(s) to case {F07A}: human rework {AAE2}",
+        f"    2026-10-24 03:13 top-up +6 run(s) to case {F07A}: your relayed rework {R963A} (your own spend)",
+        f"    2026-10-24 03:25 top-up +12 run(s) to case {A312}: human rework {EE21}",
+    ):
+        assert line in replay.lines
+
+
+@kit_limit
+def test_e5s1_4(replays):
+    """E5S1-4: runs per case under 0a.5 A2: memo 1 used 10 of the user's runs against 17 approved (5 + the rework's 12), the injected rework's 5 runs are
+    the assistant's own spend (total 15); memo 3 likewise 10 of 17; memo 2 5 of 12."""
+    replay = replays("E5-s1")
+    record = service(replay)
+    assert case_figures(record) == [
+        ("f07a", 10, 17, "0.59", 5, 15, 15, 0, False, "", 12), ("f549", 5, 12, "0.42", 0, 5, 5, 0, False, "", 12),
+        ("312a", 10, 17, "0.59", 0, 10, 10, 0, False, "", 12),
+    ]
+    assert [c["top_ups"] for c in record["cases"]] == [
+        [{"id": AAE2, "source": "human", "amount": 12}, {"id": R963A, "source": "relayed", "amount": 6}], [], [{"id": EE21, "source": "human", "amount": 12}],
+    ]
+    for line in (
+        f'    {F07A} "Memo for meeting 2026-10-05": 10 of 17 approved (0.59x); top-ups: +12 human rework {AAE2}, +6 your relayed rework {R963A}',
+        f'    {F549} "Memo for meeting 2026-10-12": 5 of 12 approved (0.42x); top-ups: none',
+        f'    {A312} "Memo for meeting 2026-10-19": 10 of 17 approved (0.59x); top-ups: +12 human rework {EE21}',
+        "      your relayed reworks: 5 run(s), your own spend; total 15",
+    ):
+        assert line in replay.lines
+    assert sum("your relayed reworks:" in x for x in replay.lines) == 1
+
+
+@kit_limit
+def test_e5s1_5(replays):
+    """E5S1-5: three judged cases, so both alarms are evaluated: repeat `no` (R1 and C8 each failed once), cost `no` (the user's runs are far under 1.25x
+    of the approved runs); R1's own reading C3, which the human link C8 does not confirm, is listed as not counted."""
+    replay = replays("E5-s1")
+    alarms = service(replay)["alarms"]
+    assert alarms["repeat"] == {
+        "state": "no", "judged": 3, "window": [F07A, F549, A312], "subjects": {"R1": 1, "C8": 1}, "fired": [], "not_counted": {"R1": ["C3"]},
+    }
+    assert alarms["cost"] == {"state": "no", "judged": 3, "compared": 3, "cases": [], "skipped": []}
+    assert "    repeat: no (3 judged cases; counted: R1, C8); not counted: R1's reading C3 (not confirmed)" in replay.lines
+    assert "    cost: no (0 of 3 cases above 1.25x)" in replay.lines
+
+
+@kit_limit
+def test_e5s1_6(replays):
+    """E5S1-6: files not as delivered. Evidence fact: the delivered memo 1 is v2 of the team's file, the checked artifact of aae2's delivery, so nobody
+    edited it; the team's current file is v3 (the relayed rework's). On the replay (no history) it is `not as delivered` against the injected delivery 963a,
+    with nothing voided; memos 2 and 3 equal the current files and give no finding."""
+    replay = replays("E5-s1")
+    delivered, versions = evidence_versions("s1", "memo-2026-10-05.md")
+    assert md5_of(delivered) == versions[2]["md5"] == "9b0c922458c56a01709a32ed01b48857" and versions[3]["md5"] != versions[2]["md5"]
+    for memo in ("memo-2026-10-12.md", "memo-2026-10-19.md"):
+        file, listed = evidence_versions("s1", memo)
+        assert md5_of(file) == listed[max(listed)]["md5"]
+    record = service(replay)
+    assert record["deliveries"]["not_as_delivered"] == [{"case": F07A, "task": R963A}] and record["deliveries"]["neither"] == []
+    assert record["files_error"] == ""
+    by_task = {d.task.id: d for d in service_record(replay).deliveries}
+    assert by_task[R963A].edited and by_task[R963A].edited_at == utc_us("2026-10-24T03:12:35.854Z")
+    assert not [d for d in service_record(replay).deliveries if d.voided]
+    (judged_line,) = [x for x in replay.lines if x.startswith("  judged by the user:")]
+    assert judged_line.endswith(NO_HISTORY_REMARK) and "not as delivered: 1 (" in judged_line
+
+
+@kit_limit
+def test_e5s1_7(replays):
+    """E5S1-7: moved past: none; no task of s1 was blocked."""
+    replay = replays("E5-s1")
+    assert replay.data["moved_past"] == [] and "Blocked tasks moved past without a verdict: none." in replay.lines
+    assert {m.status for m in replay.org.received(ROOT) if m.type == "result"} == {"done"}
+
+
+# ---------------------------------------------------------------------------------------------------------------------- s2
+
+EBE2, S6C4F, F3DF = "20261024T033732488726-root-ebe2", "20261024T034308207974-root-6c4f", "20261024T034559745842-root-f3df"
+BFA8, D367, E9EE = "20261024T035108035115-root-bfa8", "20261024T035511749327-root-367d", "20261024T035805054975-root-e9ee"
+S2_LINK = "20261024T035002043490-root-6162"
+
+
+@kit_limit
+def test_e5s2_1(replays):
+    """E5S2-1: s2's record and deliveries: 6 deliveries (memo 3's, e9ee, is the team's done result that the assistant never copied), 2 judged (the human
+    rework 6c4f rejected, the human rework 367d accepted); memo 1 and memo 3 are without a verdict (memo 1's latest delivery f3df carries only the
+    relayed reject)."""
+    replay = replays("E5-s2")
+    check_common(replay, "s2")
+    record = service(replay)
+    assert [c["id"] for c in record["cases"]] == [EBE2, BFA8, E9EE] and [c["tasks"] for c in record["cases"]] == [3, 2, 1]
+    assert deliveries(service_record(replay)) == [
+        (EBE2, "20261024T034151220778-lead-f023"), (S6C4F, "20261024T034511890889-lead-35b2"), (F3DF, "20261024T034825233641-lead-0cc8"),
+        (BFA8, "20261024T035340880335-lead-4e2a"), (D367, "20261024T035727794165-lead-a65c"), (E9EE, "20261024T040033674800-lead-75c7"),
+    ]
+    assert (record["deliveries"]["total"], record["deliveries"]["judged"]) == (6, 2)
+    by_task = {d.task.id: d for d in service_record(replay).deliveries}
+    assert {t: [(v.verdict, v.message.id) for v in d.counted] for t, d in by_task.items() if d.judged} == {
+        S6C4F: [("reject", "20261024T034910526824-root-ec12")], D367: [("accept", "20261024T035805031447-root-a539")],
+    }
+    assert [(v.verdict, v.tier) for v in by_task[F3DF].verdicts] == [("reject", "relayed")] and by_task[F3DF].counted == ()
+    assert record["first_deliveries"] == {"accepted": 0, "rejected": 0, "no_verdict": 3, "superseded": 2, "neither": 0, "never_delivered": 0}
+    assert case(record, "ebe2")["first"] == {"task": EBE2, "outcome": "none", "superseded_by": S6C4F, "superseded_source": "human"}
+    assert case(record, "bfa8")["first"] == {"task": BFA8, "outcome": "none", "superseded_by": D367, "superseded_source": "human"}
+    assert case(record, "e9ee")["first"] == {"task": E9EE, "outcome": "none", "superseded_by": None, "superseded_source": None}
+    assert "  first deliveries: 0 accepted, 0 rejected, 3 without a verdict (2 superseded by a rework before a verdict)" in replay.lines
+    deliveries_ = record["deliveries"]
+    assert (deliveries_["unjudged_cases"], deliveries_["relayed_only"], deliveries_["unseen_relayed"]) == ([EBE2, E9EE], [EBE2], [])
+    assert (deliveries_["not_on_a_delivery"], deliveries_["legacy_verdicts"], deliveries_["neither"]) == ([], 0, [])
+    (judged_line,) = [x for x in replay.lines if x.startswith("  judged by the user:")]
+    assert judged_line.startswith(f"  judged by the user: 2 of 6 deliveries; without a verdict: 2 case(s) ({EBE2}, {E9EE}): never counted as accepted (1 with only your own relayed verdict); not as delivered: 1")
+
+
+@kit_limit
+def test_e5s2_2(replays):
+    """E5S2-2: the one escape, R1 on 6c4f: contract-gap by the user's answer (the link names C8), signed off by lead/reviewer, not its; the relayed rework
+    f3df was delivered between the delivery and the verdict."""
+    replay = replays("E5-s2")
+    record = service(replay)
+    (escape,) = record["escapes"]
+    assert (escape["assertion"], escape["case"], escape["task"], escape["verdict"], escape["signer"]) == (
+        "R1", EBE2, S6C4F, "20261024T034910526824-root-ec12", "lead/reviewer",
+    )
+    assert (escape["cause"], escape["rule"], escape["rules"], escape["detail"], escape["also"], escape["attribution"]) == (
+        GAP, "answer", ["answer", "words"], [S2_LINK, "C8"], [], "not its",
+    )
+    assert escape["before_verdict"] == F3DF
+    assert (
+        f"    R1 case {EBE2}, signed off by lead/reviewer: contract-gap (the user's answer, link {S2_LINK}, names C8, which contract v1 of the task did not have); "
+        f"your relayed rework {F3DF} delivered after it and before the verdict: the user may have judged that version"
+    ) in replay.lines
+    rechecks, rework = recorded_fails("s2")
+    (verifier,) = record["verifiers"]
+    assert (verifier["addr"], verifier["judged"], verifier["escapes"], verifier["pass_precision"]) == ("lead/reviewer", 2, {"counted": {}, "not_its": {GAP: 1}}, [2, 2])
+    assert (verifier["rechecks"], verifier["rework_runs"]) == (rechecks, rework) == (1, 1)
+    assert "    lead/reviewer: escapes 0 of 2 judged; not its: 1 contract-gap; PASS precision 2 of 2; its FAILs before delivery: 1 re-check(s), 1 author rework run(s)" in replay.lines
+    assert "escapes 0 of 2 judged (+1 not its: 1 contract-gap)" in replay.root_health
+    assert "escapes 0 of 2 judged" in replay.agent_health and "not its" not in replay.agent_health
+    reviewer = replay.agents["lead/reviewer"]
+    assert (reviewer.judged, reviewer.escapes, reviewer.not_its) == (2, 0, {GAP: 1})
+
+
+@kit_limit
+def test_e5s2_3(replays):
+    """E5S2-3: the timeline: contract v2 answers R1 and is confirmed by the link, playbook v2 adds C8's own words, the top-ups of the two human reworks and
+    of the relayed rework; no charter or model mark."""
+    replay = replays("E5-s2")
+    record = service(replay)
+    contracts = {m["version"]: m for m in marks(record, "contract")}
+    assert (contracts[1]["adds"], contracts[1]["basis"]) == (C1_C7, "first")
+    assert (contracts[2]["adds"], contracts[2]["removes"], contracts[2]["basis"], contracts[2]["answers"]) == (["C8"], [], "answers", "R1")
+    assert (contracts[2]["confirmed"], contracts[2]["not_confirmed"]) == ([{"id": "C8", "link": S2_LINK}], [])
+    v2 = {m["version"]: m for m in marks(record, "playbook")}[2]
+    assert (v2["by"], v2["basis"], v2["evidence"], v2["changed"], v2["own_words"], v2["beyond"], v2["removed"]) == ("lead", "c", ["C8", "R1", S2_LINK], 1, 1, 0, 0)
+    assert mark_times(record, "contract") == [("2026-10-24T03:37", 1), ("2026-10-24T03:50", 2)]
+    assert mark_times(record, "playbook") == [("2026-10-24T03:37", 1), ("2026-10-24T03:51", 2)]
+    assert top_ups(record) == [
+        ("2026-10-24T03:43", "6c4f", "human", 5), ("2026-10-24T03:45", "f3df", "relayed", 6), ("2026-10-24T03:55", "367d", "human", 5),
+    ]
+    for line in (
+        "    2026-10-24 03:37 contract v1 (C1, C2, C3, C4, C5, C6, C7)",
+        "    2026-10-24 03:37 playbook v1 (root): written by the client (no admission needed)",
+        f"    2026-10-24 03:50 contract v2 (root): adds C8: the user's answer to R1: C8 confirmed (link {S2_LINK})",
+        f"    2026-10-24 03:51 playbook v2 (lead): admitted (c) on C8, R1, {S2_LINK}: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them",
+        f"    2026-10-24 03:43 top-up +5 run(s) to case {EBE2}: human rework {S6C4F}",
+        f"    2026-10-24 03:45 top-up +6 run(s) to case {EBE2}: your relayed rework {F3DF} (your own spend)",
+        f"    2026-10-24 03:55 top-up +5 run(s) to case {BFA8}: human rework {D367}",
+    ):
+        assert line in replay.lines
+
+
+@kit_limit
+def test_e5s2_4(replays):
+    """E5S2-4: runs per case: memo 1 used 14 of the user's runs against 14 approved (9 + the rework's 5; 1.00x, not over), the injected rework's 5 runs
+    are the assistant's own (total 19); memo 2 10 of 12; memo 3 5 of 12."""
+    replay = replays("E5-s2")
+    record = service(replay)
+    assert case_figures(record) == [
+        ("ebe2", 14, 14, "1.00", 5, 19, 19, 0, False, "", 12), ("bfa8", 10, 12, "0.83", 0, 10, 10, 0, False, "", 12),
+        ("e9ee", 5, 12, "0.42", 0, 5, 5, 0, False, "", 12),
+    ]
+    assert [c["top_ups"] for c in record["cases"]] == [
+        [{"id": S6C4F, "source": "human", "amount": 5}, {"id": F3DF, "source": "relayed", "amount": 6}], [{"id": D367, "source": "human", "amount": 5}], [],
+    ]
+    for line in (
+        f'    {EBE2} "Memo for the 2026-10-05 team meeting": 14 of 14 approved (1.00x); top-ups: +5 human rework {S6C4F}, +6 your relayed rework {F3DF}',
+        f'    {BFA8} "Memo for the 2026-10-12 team meeting": 10 of 12 approved (0.83x); top-ups: +5 human rework {D367}',
+        f'    {E9EE} "Memo for the 2026-10-19 team meeting": 5 of 12 approved (0.42x); top-ups: none',
+        "      your relayed reworks: 5 run(s), your own spend; total 19",
+    ):
+        assert line in replay.lines
+    assert sum("your relayed reworks:" in x for x in replay.lines) == 1
+
+
+@kit_limit
+def test_e5s2_5(replays):
+    """E5S2-5: two judged cases, below the minimum: both alarms read `n/a (2 of 3 judged cases)`; R1's reading C3 is listed as not counted."""
+    replay = replays("E5-s2")
+    alarms = service(replay)["alarms"]
+    assert alarms["repeat"] == {"state": "n/a", "judged": 2, "window": [], "subjects": {}, "fired": [], "not_counted": {"R1": ["C3"]}}
+    assert alarms["cost"] == {"state": "n/a", "judged": 2, "compared": 3, "cases": [], "skipped": []}
+    assert "    repeat: n/a (2 of 3 judged cases); not counted: R1's reading C3 (not confirmed)" in replay.lines
+    assert "    cost: n/a (2 of 3 judged cases)" in replay.lines
+
+
+@kit_limit
+def test_e5s2_6(replays):
+    """E5S2-6: files not as delivered. Evidence fact: the delivered memo 1 is v3 of the team's file, the checked artifact of 6c4f's delivery; the current file
+    is v4 (the relayed rework f3df's). On the replay (no history) it is `not as delivered` against the injected delivery f3df; memo 2 equals the current file."""
+    replay = replays("E5-s2")
+    delivered, versions = evidence_versions("s2", "memo-2026-10-05.md")
+    assert md5_of(delivered) == versions[3]["md5"] == "e988abb443ca3d4ee60114243c68ce77" and versions[4]["md5"] == "55c23e3980eac289550e03050bc765df"
+    file, listed = evidence_versions("s2", "memo-2026-10-12.md")
+    assert md5_of(file) == listed[max(listed)]["md5"]
+    record = service(replay)
+    assert record["deliveries"]["not_as_delivered"] == [{"case": EBE2, "task": F3DF}] and record["deliveries"]["neither"] == [] and record["files_error"] == ""
+    by_task = {d.task.id: d for d in service_record(replay).deliveries}
+    assert by_task[F3DF].edited and by_task[F3DF].edited_at == utc_us("2026-10-24T03:45:21.122Z")
+    assert not [d for d in service_record(replay).deliveries if d.voided]
+    (judged_line,) = [x for x in replay.lines if x.startswith("  judged by the user:")]
+    assert judged_line.endswith(NO_HISTORY_REMARK) and "not as delivered: 1 (" in judged_line
+
+
+@kit_limit
+def test_e5s2_7(replays):
+    """E5S2-7: moved past: none. The writer's one blocked task d3a1 is released by lead's 7713, which revises it."""
+    replay = replays("E5-s2")
+    assert replay.data["moved_past"] == [] and "Blocked tasks moved past without a verdict: none." in replay.lines
+    task = next(m for m in replay.org.sent("lead") if m.id.endswith("-lead-d3a1"))
+    blocked = [m for m in replay.org.sent("lead/writer") if m.reply_to == task.id and m.status == "blocked"]
+    assert len(blocked) == 1 and moved_past(task, blocked[0], replay.org.received("lead/writer"))
+    assert any(m.id.endswith("-lead-7713") and m.revises == task.id for m in replay.org.sent("lead"))
+    assert [m.status for m in replay.org.sent("lead/writer") if m.type == "result"].count("blocked") == 1
+
+
+# ---------------------------------------------------------------------------------------------------------------------- s3
+
+E268, C209, DAFF = "20261024T040852855822-root-e268", "20261024T041412342994-root-c209", "20261024T041932216940-root-daff"
+DD39, B57B3, E0C8 = "20261024T042728475839-root-dd39", "20261024T043106950333-root-57b3", "20261024T043420692975-root-e0c8"
+GRANT, S3_LINK, A6FE = "20261024T041550995741-root-595d", "20261024T042515118836-root-d735", "20261024T042421215723-root-a6fe"
+
+
+@kit_limit
+def test_e5s3_1(replays):
+    """E5S3-1: s3's record and deliveries: 5 deliveries (c209 is no delivery: both its results are `blocked`), 1 judged (the human rework 57b3 accepted);
+    memo 1 (case e268) is not a judged case: its only human reject, R1 `a6fe`, is a verdict not on a delivery, and its latest delivery daff carries only
+    the relayed reject; memo 3 is without a verdict."""
+    replay = replays("E5-s3")
+    check_common(replay, "s3")
+    record = service(replay)
+    assert [c["id"] for c in record["cases"]] == [E268, DD39, E0C8] and [c["tasks"] for c in record["cases"]] == [3, 2, 1]
+    assert deliveries(service_record(replay)) == [
+        (E268, "20261024T041304738049-lead-30ba"), (DAFF, "20261024T042204607622-lead-1a15"), (DD39, "20261024T043014402277-lead-9037"),
+        (B57B3, "20261024T043337138383-lead-15b2"), (E0C8, "20261024T043647137647-lead-462b"),
+    ]
+    results = {m.reply_to: m for m in sorted(replay.org.received(ROOT), key=lambda m: m.id) if m.type == "result"}
+    assert results[C209].id.endswith("-lead-d32d") and results[C209].status == "blocked"  # both results of c209 are blocked: d8cc, then d32d
+    assert sum(m.reply_to == C209 and m.status == "blocked" for m in replay.org.received(ROOT)) == 2
+    assert (record["deliveries"]["total"], record["deliveries"]["judged"]) == (5, 1)
+    by_task = {d.task.id: d for d in service_record(replay).deliveries}
+    assert {t: [(v.verdict, v.message.id) for v in d.counted] for t, d in by_task.items() if d.judged} == {B57B3: [("accept", "20261024T043420685025-root-33b9")]}
+    assert [(v.verdict, v.tier) for v in by_task[DAFF].verdicts] == [("reject", "relayed")] and by_task[DAFF].counted == ()
+    assert record["first_deliveries"] == {"accepted": 0, "rejected": 0, "no_verdict": 3, "superseded": 2, "neither": 0, "never_delivered": 0}
+    assert case(record, "e268")["first"] == {"task": E268, "outcome": "none", "superseded_by": C209, "superseded_source": "human"}
+    assert case(record, "dd39")["first"] == {"task": DD39, "outcome": "none", "superseded_by": B57B3, "superseded_source": "human"}
+    deliveries_ = record["deliveries"]
+    assert (deliveries_["unjudged_cases"], deliveries_["relayed_only"], deliveries_["unseen_relayed"]) == ([E268, E0C8], [E268], [])
+    assert (deliveries_["not_on_a_delivery"], deliveries_["legacy_verdicts"], deliveries_["neither"]) == ([A6FE], 0, [])
+    assert E268 not in record["alarms"]["repeat"]["window"] and not [d for d in service_record(replay).deliveries if d.task.id == E268 and d.judged]
+    assert f"  verdicts not on a delivery (on a blocked or failed result, or before the done result): 1 ({A6FE})" in replay.lines
+    (judged_line,) = [x for x in replay.lines if x.startswith("  judged by the user:")]
+    assert judged_line.startswith(f"  judged by the user: 1 of 5 deliveries; without a verdict: 2 case(s) ({E268}, {E0C8}): never counted as accepted (1 with only your own relayed verdict); not as delivered: 1")
+
+
+@kit_limit
+def test_e5s3_2(replays):
+    """E5S3-2: no escape: the user's only reject is not on a delivery (the team did not report `done`, so the re-check never ran, e5-gate 4 item 3). The
+    verifier line carries no `not its` part and health no `not its` for the reviewer."""
+    replay = replays("E5-s3")
+    record = service(replay)
+    assert record["escapes"] == [] and record["deliveries"]["not_on_a_delivery"] == [A6FE]
+    assert "  escapes (the team reported done, then the user rejected it): none (judged: 1 of 5)" in replay.lines
+    rechecks, rework = recorded_fails("s3")
+    (verifier,) = record["verifiers"]
+    assert (verifier["addr"], verifier["judged"], verifier["escapes"], verifier["pass_precision"]) == ("lead/reviewer", 1, {"counted": {}, "not_its": {}}, [1, 1])
+    assert (verifier["rechecks"], verifier["rework_runs"]) == (rechecks, rework) == (1, 1)
+    assert "    lead/reviewer: escapes 0 of 1 judged; PASS precision 1 of 1; its FAILs before delivery: 1 re-check(s), 1 author rework run(s)" in replay.lines
+    assert "escapes 0 of 1 judged" in replay.root_health and "not its" not in replay.root_health
+    reviewer = replay.agents["lead/reviewer"]
+    assert (reviewer.judged, reviewer.escapes, reviewer.not_its) == (1, 0, {})
+    assert record["alarms"]["repeat"]["subjects"] == {}  # a rejection not on a delivery gives no subject
+
+
+@kit_limit
+def test_e5s3_3(replays):
+    """E5S3-3: the timeline: contract v2 answers R1 (the rejection that is no escape) and is confirmed by the link, playbook v2 adds C9's own words; the
+    top-ups include root's grant after the user's yes; no charter or model mark. v1 has 8 criteria in s3."""
+    replay = replays("E5-s3")
+    record = service(replay)
+    contracts = {m["version"]: m for m in marks(record, "contract")}
+    assert (contracts[1]["adds"], contracts[1]["basis"]) == ([*C1_C7, "C8"], "first")
+    assert (contracts[2]["adds"], contracts[2]["removes"], contracts[2]["basis"], contracts[2]["answers"]) == (["C9"], [], "answers", "R1")
+    assert (contracts[2]["confirmed"], contracts[2]["not_confirmed"]) == ([{"id": "C9", "link": S3_LINK}], [])
+    v2 = {m["version"]: m for m in marks(record, "playbook")}[2]
+    assert (v2["by"], v2["basis"], v2["evidence"], v2["changed"], v2["own_words"], v2["beyond"], v2["removed"]) == ("lead", "c", ["C9", "R1", S3_LINK], 1, 1, 0, 0)
+    assert mark_times(record, "contract") == [("2026-10-24T04:08", 1), ("2026-10-24T04:25", 2)]
+    assert mark_times(record, "playbook") == [("2026-10-24T04:08", 1), ("2026-10-24T04:27", 2)]
+    assert top_ups(record) == [
+        ("2026-10-24T04:14", "c209", "human", 3), ("2026-10-24T04:15", "595d", "granted", 2), ("2026-10-24T04:19", "daff", "relayed", 6),
+        ("2026-10-24T04:31", "57b3", "human", 5),
+    ]
+    for line in (
+        "    2026-10-24 04:08 contract v1 (C1, C2, C3, C4, C5, C6, C7, C8)",
+        "    2026-10-24 04:08 playbook v1 (root): written by the client (no admission needed)",
+        f"    2026-10-24 04:25 contract v2 (root): adds C9: the user's answer to R1: C9 confirmed (link {S3_LINK})",
+        f"    2026-10-24 04:27 playbook v2 (lead): admitted (c) on C9, R1, {S3_LINK}: 1 changed line(s): 1 the cited criteria's own words, 0 beyond them",
+        f"    2026-10-24 04:14 top-up +3 run(s) to case {E268}: human rework {C209}",
+        f"    2026-10-24 04:15 top-up +2 run(s) to case {E268}: your grant {GRANT}",
+        f"    2026-10-24 04:19 top-up +6 run(s) to case {E268}: your relayed rework {DAFF} (your own spend)",
+        f"    2026-10-24 04:31 top-up +5 run(s) to case {DD39}: human rework {B57B3}",
+    ):
+        assert line in replay.lines
+
+
+@kit_limit
+def test_e5s3_4(replays):
+    """E5S3-4: runs per case: memo 1 used 13 of the user's runs against 14 approved (9 + 3, then the grant after the user's yes: 11 used + 1 held + 2),
+    the injected rework's 5 runs are the assistant's own (total 18); the killed writer run is one of the 18 charged runs and `credited` is 0."""
+    replay = replays("E5-s3")
+    record = service(replay)
+    assert case_figures(record) == [
+        ("e268", 13, 14, "0.93", 5, 18, 18, 0, False, "", 12), ("dd39", 10, 12, "0.83", 0, 10, 10, 0, False, "", 12),
+        ("e0c8", 5, 12, "0.42", 0, 5, 5, 0, False, "", 12),
+    ]
+    assert [c["top_ups"] for c in record["cases"]] == [
+        [{"id": C209, "source": "human", "amount": 3}, {"id": GRANT, "source": "granted", "amount": 2}, {"id": DAFF, "source": "relayed", "amount": 6}],
+        [{"id": B57B3, "source": "human", "amount": 5}], [],
+    ]
+    assert (replay.org.root / "lead" / "writer" / "runs" / "20261024T041458746130.log").is_file()  # the writer run killed at the end of turn 4
+    for line in (
+        f'    {E268} "Memo for the 5 October 2026 weekly": 13 of 14 approved (0.93x); top-ups: +3 human rework {C209}, +2 your grant {GRANT}, +6 your relayed rework {DAFF}',
+        f'    {DD39} "Memo for the 12 October 2026 weekly": 10 of 12 approved (0.83x); top-ups: +5 human rework {B57B3}',
+        f'    {E0C8} "Memo for the 19 October 2026 weekly": 5 of 12 approved (0.42x); top-ups: none',
+        "      your relayed reworks: 5 run(s), your own spend; total 18",
+    ):
+        assert line in replay.lines
+    assert sum("your relayed reworks:" in x for x in replay.lines) == 1
+
+
+@kit_limit
+def test_e5s3_5(replays):
+    """E5S3-5: one judged case, below the minimum: both alarms read `n/a (1 of 3 judged cases)`, and the repeat line has no `not counted` part (the
+    rejection a6fe belongs to no judged case)."""
+    replay = replays("E5-s3")
+    alarms = service(replay)["alarms"]
+    assert alarms["repeat"] == {"state": "n/a", "judged": 1, "window": [], "subjects": {}, "fired": [], "not_counted": {}}
+    assert alarms["cost"] == {"state": "n/a", "judged": 1, "compared": 3, "cases": [], "skipped": []}
+    assert "    repeat: n/a (1 of 3 judged cases)" in replay.lines and "    cost: n/a (1 of 3 judged cases)" in replay.lines
+
+
+@kit_limit
+def test_e5s3_6(replays):
+    """E5S3-6: files not as delivered. Evidence fact: the delivered memo 1 is v3 of the team's file, the writer's own rework of c209 that no reviewer
+    checked: it is the checked artifact of no done delivery (e268's is v2, daff's is v4, the current file), and nobody edited it by hand. On the replay
+    (no history) it is `not as delivered` against the injected delivery daff (with history too: it equals no checked version); memo 2 equals the
+    current file."""
+    replay = replays("E5-s3")
+    delivered, versions = evidence_versions("s3", "memo-2026-10-05.md")
+    assert md5_of(delivered) == versions[3]["md5"] == "0e54cf01763effec9cdffd0dc78fb8da" and versions[4]["md5"] == "8c5df76116067327ef79e4d9880240ea"
+    assert md5_of(delivered) not in (versions[2]["md5"], versions[4]["md5"])
+    file, listed = evidence_versions("s3", "memo-2026-10-12.md")
+    assert md5_of(file) == listed[max(listed)]["md5"]
+    record = service(replay)
+    assert record["deliveries"]["not_as_delivered"] == [{"case": E268, "task": DAFF}] and record["deliveries"]["neither"] == [] and record["files_error"] == ""
+    by_task = {d.task.id: d for d in service_record(replay).deliveries}
+    assert by_task[DAFF].edited and by_task[DAFF].edited_at == utc_us("2026-10-24T04:18:31.904Z")
+    assert not [d for d in service_record(replay).deliveries if d.voided]
+    (judged_line,) = [x for x in replay.lines if x.startswith("  judged by the user:")]
+    assert judged_line.endswith(NO_HISTORY_REMARK) and "not as delivered: 1 (" in judged_line
+
+
+@kit_limit
+def test_e5s3_7(replays):
+    """E5S3-7: moved past: none. FINDING for the manager (OQ-4, decided: no): the writer holds 2 runs (the recorded `status`, `budget=2`) behind its blocked
+    task 4a85 (memo 3), which `moved_past` does not release and after which nothing was sent to the writer, so no task is left blocked and the section
+    lists no agent. Its other blocked tasks are released by the tasks that revise them, and so is root's blocked c209."""
+    replay = replays("E5-s3")
+    assert replay.data["moved_past"] == [] and "Blocked tasks moved past without a verdict: none." in replay.lines
+    assert "budget=2" in (EV5 / "s3" / "final-services-progress-status-health.txt").read_text(encoding="utf-8").split("    writer [Writer]")[1].splitlines()[0]
+    received = replay.org.received("lead/writer")
+    sent = {m.id[-4:]: m for m in replay.org.sent("lead")}
+    blocked = {m.reply_to[-4:]: m for m in replay.org.sent("lead/writer") if m.type == "result" and m.status == "blocked"}
+    assert set(blocked) == {"0a56", "bed1", "4a85"}
+    released = {short: moved_past(sent[short], blocked[short], received) for short in blocked}
+    assert released == {"0a56": True, "bed1": True, "4a85": False}
+    assert sent_to(replay, "lead", "lead/writer", blocked["4a85"].id) == []  # nothing sent to the writer since: not left blocked
+    assert sent["df89"].revises == sent["0a56"].id and sent["711a"].revises == sent["bed1"].id
+    root_task = next(m for m in replay.org.sent(ROOT) if m.id == C209)
+    latest = max((m for m in replay.org.received(ROOT) if m.reply_to == C209), key=lambda m: m.id)
+    assert latest.status == "blocked" and moved_past(root_task, latest, replay.org.received("lead"))  # daff revises c209
+
+
+# ---------------------------------------------------------------------------------------------------------------------- all
+
+@pytest.mark.parametrize("corpus", ["E5-s1", "E5-s2", "E5-s3"])
+@kit_limit
+def test_e5_all(replays, corpus):
+    """E5-all: no charter or model mark and the unknown history line once; `credited` 0 in every case; no one-off record and no nested service; the JSON
+    conforms to 9.4 (the schema test of tests/golden also covers the three manifests)."""
+    from testkit.quality_schema import problems
+
+    replay = replays(corpus)
+    check_common(replay, corpus)
+    assert replay.lines.count(f"    {NO_HISTORY}") == 1
+    assert problems(replay.data) == []

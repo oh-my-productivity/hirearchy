@@ -57,7 +57,7 @@ def test_e3_json(tmp_path) -> None:
 
 
 def test_every_corpus_conforms_to_the_schema(tmp_path) -> None:
-    """E3-8, DR3-3: the JSON of every replay corpus (the seven of the manifest and E3's two constructed variants) conforms to 9.4: its keys, types and null
+    """E3-8, DR3-3: the JSON of every replay corpus (the ten of the manifest, E5's three streams included, and E3's two constructed variants) conforms to 9.4: its keys, types and null
     rules, through `testkit.quality_schema.problems`; and so does an error record (a service whose SERVICE.md does not parse: `budget` null, `alarms` empty,
     `history` null)."""
     found: dict[str, list[str]] = {}
