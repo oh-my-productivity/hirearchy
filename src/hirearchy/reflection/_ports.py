@@ -10,11 +10,14 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from ..kernel import JsonObject, Message
 from ..runs import RunLogFile
 from ..services import Contract
+
+if TYPE_CHECKING:  # the marks are defined in ``api``, which imports this module
+    from .api import CharterMark, ModelMark
 
 
 @runtime_checkable
@@ -193,4 +196,26 @@ class CheckedVersions(Protocol):
 class BlobIds(Protocol):
     def of(self, data: bytes, hexlen: int) -> str:
         """The git blob id of ``data`` in an object format of ``hexlen`` hex digits (40 or 64)."""
+        ...
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the org's git history
+
+
+@dataclass(frozen=True)
+class BarChanges:
+    """The changes of the bars (charters and models) the organization's git history shows. ``known`` is false without a history (no repository, no
+    git): nothing is known, and the marks are empty."""
+
+    known: bool = False
+    marks: tuple[CharterMark | ModelMark, ...] = ()  # newest first within one file; the files in the order asked, ORG.md last
+    truncated: bool = False  # the list of commits was full, or the time bound stopped the reading: older changes may exist
+    skipped: int = 0  # versions that were not compared: above 64 KiB, unreadable, not UTF-8 or not parseable (each counted once)
+
+
+@runtime_checkable
+class BarHistory(Protocol):
+    def changes(self, addrs: Sequence[str]) -> BarChanges:
+        """The charter changes of the agents ``addrs`` (``<addr>/AGENT.md``: body edits, ``model`` changes) and the model settings of ORG.md
+        (``default_model``, ``effort``) in the organization's history. Never raises."""
         ...

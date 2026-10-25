@@ -24,13 +24,16 @@ from typing import Protocol, runtime_checkable
 from ..kernel import ClientItems, Message, client_items, clip_line, msg_time
 from ..services import Criterion
 from ._deliverables import FOLDER_SHOWN, NAME_SHOWN, shown_name
+from ._ports import BarChanges
 
 __all__ = [
     "Assertion",
+    "BarChanges",
     "CAUSES",
     "Case",
     "CaseHistory",
     "Cause",
+    "CharterMark",
     "DeliverableChecks",
     "DeliverableFinding",
     "Delivery",
@@ -38,6 +41,7 @@ __all__ = [
     "ITEMS_SHOWN",
     "ITEM_CHARS",
     "LASTING_WORDS",
+    "ModelMark",
     "QUALITY_DEFAULTS",
     "QualityThresholds",
     "ReflectionDigest",
@@ -102,6 +106,29 @@ class TopUp:
     id: str  # the id of the task or note
     kind: str  # "human" | "relayed" | "unrecorded" (a rework with no recorded ``source``) for a task; "granted" for a note
     amount: int
+
+
+@dataclass(frozen=True)
+class CharterMark:
+    """A mark of the timeline (0b 7): the charter ``<addr>/AGENT.md`` changed its body in this commit of the organization's history."""
+
+    addr: str
+    commit: str  # the full object id of the commit that holds the new version
+    when: datetime  # the commit's time, with its offset
+
+
+@dataclass(frozen=True)
+class ModelMark:
+    """A mark of the timeline (0b 7): a model setting changed in this commit. ``addr`` is an agent, or ``"ORG.md"``; ``key`` is ``model`` (the
+    charter's, ``""`` = the org default), ``default_model`` or ``effort`` (ORG.md's, read as the runtime reads them, so a missing value is the
+    default)."""
+
+    addr: str
+    key: str  # "model" | "default_model" | "effort"
+    before: str
+    after: str
+    commit: str
+    when: datetime
 
 
 def _total(items: Sequence[TopUp], kind: str) -> int:

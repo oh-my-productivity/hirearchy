@@ -32,13 +32,55 @@ from ._deliverables import FsDeliverableFolder
 from ._digest import DigestBuilder
 from ._evidence import CaseServiceEvidence
 from ._files import OrgServicePaths
-from ._ports import BlobIds, CheckedVersions, DeliverableFolder, FolderFile, FolderRead, Located, RejectedServices, ServicePaths
+from ._ports import (
+    BarChanges,
+    BarHistory,
+    BlobIds,
+    CheckedVersions,
+    DeliverableFolder,
+    FolderFile,
+    FolderRead,
+    Located,
+    RejectedServices,
+    ServicePaths,
+)
 from ._reports import TextServiceReports
 from ._runs import LogRunCounter
 from ._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection, RegressionListSection
 from ._steps import TextServiceSteps
 from ._timeline import StorePlaybookTimelines
-from .api import Case, CaseHistory, DeliverableChecks, DeliverableFinding, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
+from .api import (
+    Case,
+    CaseHistory,
+    CharterMark,
+    DeliverableChecks,
+    DeliverableFinding,
+    ModelMark,
+    ReflectionDigest,
+    ServicePromptSections,
+    ServiceReports,
+    ServiceSteps,
+)
+
+# ------------------------------------------------------------------------------ the fake bar histories
+
+
+class NoBarHistory(BarHistory):
+    """An organization with no history: nothing is known."""
+
+    def changes(self, addrs: Sequence[str]) -> BarChanges:
+        return BarChanges()
+
+
+class FixedBarHistory(BarHistory):
+    """The changes a test puts in, whatever the agents asked for."""
+
+    def __init__(self, marks: Sequence[CharterMark | ModelMark] = (), *, truncated: bool = False, skipped: int = 0) -> None:
+        self._found = BarChanges(known=True, marks=tuple(marks), truncated=truncated, skipped=skipped)
+
+    def changes(self, addrs: Sequence[str]) -> BarChanges:
+        return self._found
+
 
 # ------------------------------------------------------------------------------ the fake history
 

@@ -7,8 +7,9 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from hirearchy.kernel import Message
-from hirearchy.reflection import Case, CaseHistory
-from hirearchy.reflection.testing import FixedCaseHistory
+from hirearchy.reflection import BarChanges, CharterMark, Case, CaseHistory, ModelMark
+from hirearchy.reflection._ports import BarHistory
+from hirearchy.reflection.testing import FixedBarHistory, FixedCaseHistory, NoBarHistory
 
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
@@ -65,3 +66,12 @@ def test_its_one_off_cases_are_the_cases_it_holds_without_a_service() -> None:
 def test_an_empty_history_has_nothing() -> None:
     history = FixedCaseHistory()
     assert history.cases("ceo", "brief") == [] and history.case_of(task("T1")) is None and history.one_off_cases() == []
+
+
+def test_no_bar_history_is_unknown_and_fixed_bar_history_returns_its_marks() -> None:
+    assert isinstance(NoBarHistory(), BarHistory) and isinstance(FixedBarHistory(), BarHistory)
+    assert NoBarHistory().changes(["lead"]) == BarChanges(known=False)
+    marks = (CharterMark("lead", "a" * 40, T), ModelMark("ORG.md", "effort", "high", "xhigh", "b" * 40, T))
+    assert FixedBarHistory(marks).changes(["lead"]) == BarChanges(known=True, marks=marks)
+    assert FixedBarHistory(marks, truncated=True, skipped=2).changes([]) == BarChanges(known=True, marks=marks, truncated=True, skipped=2)
+    assert FixedBarHistory().changes(["lead"]) == BarChanges(known=True)
