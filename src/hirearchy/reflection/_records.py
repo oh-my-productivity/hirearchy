@@ -223,7 +223,7 @@ class DerivedCaseRecords(CaseRecords):
             raw = _read("the stored contract versions", lambda: self._versions.versions(owner, name, "SERVICE"))
             facts = _read("the stored contract versions", lambda: _versions_of(owner, name, raw))
             playbooks = _read("the playbook versions", lambda: self._catalog.playbook_versions(owner, name))
-            cases = _read("the cases", lambda: self._history.chains(owner, name, since=contract.created, runs=True))
+            cases = _read("the cases", lambda: self._history.cases(owner, name))  # the cases ``case_total`` reads: built with the contract's per-request budget
             deliveries = _attributed(_read("the mailboxes", lambda: self._all(mail, client, cases)), findings)
             assertions = regressions(cases)
             marks: list[Mark] = [

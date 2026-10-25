@@ -353,6 +353,36 @@ def test_the_alarm_and_case_total_read_one_user_spend_and_one_approved_rule(tmp_
     assert f"cost {entry.user_cost} runs, more than the {entry.user_approved} the user approved" in v.reports.case_total(again)
 
 
+def test_the_record_reads_the_contracts_budget_as_the_approval_of_a_one_run_rework(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    """CR1-1: the record's cases are built with the contract's per-request budget, as ``case_total``'s are, so a 1-run rework of the user is an approval
+    in both or in neither."""
+    from hirearchy.reflection.testing import memory_world
+
+    from ._support import SERVICE, ask, define, deliver, populated, rate, rework
+
+    w = populated(memory_world(tmp_path))
+    define(w, budget=15)
+    head = ask(w, budget=5)  # handed less than the contract's 15
+    deliver(w, head, runs=5)
+    w.s.d.clock.advance(1)
+    rate(w, head, "reject", "again please")
+    one = rework(w, head, budget=1)  # the user's 1 run: with 15 per request there was room, so nothing is unapproved
+    deliver(w, one, runs=1)
+    w.s.d.clock.advance(1)
+    rate(w, one, "reject", "again please")
+    big = rework(w, one, budget=20)
+    deliver(w, big, runs=20)
+    w.s.d.clock.advance(1)
+    rate(w, big, "accept", "fine")
+    record = w.records.records(SERVICE)[0]
+    (case,) = record.cases
+    (read,) = w.history.cases("ceo", SERVICE)  # the case ``case_total`` reads
+    assert case.user_ceiling == read.user_ceiling and user_approved(case, record.budget) == user_approved(read, record.budget) == 26
+    assert user_cost(case) == user_cost(read) == 26
+    assert cost_alarm(record, QualityThresholds(min_judged=1)).state == "no"  # 26 of 26 approved, as ``case_total`` (silent) reads it
+    assert "more than the" not in w.reports.case_total(big)
+
+
 def test_an_agent_clients_case_never_alarms() -> None:
     record = make([Spec(None, runs=90) for _ in range(4)], client_kind="agent")  # an agent client's verdicts are hypotheses: none is judged
     assert repeat_alarm(record, T) == RepeatAlarm("n/a", 0)

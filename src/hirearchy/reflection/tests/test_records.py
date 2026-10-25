@@ -94,11 +94,14 @@ class BreakingHistory(CaseHistory):
     def __init__(self, inner: CaseHistory, raises: Mapping[str, BaseException] | None = None, chains: list[Case] | None = None) -> None:
         self._inner = inner
         self._raises = raises or {}
-        self._chains = chains  # the chains to answer instead of the inner history's
+        self._chains = chains  # the cases and chains to answer instead of the inner history's
         self.calls: list[tuple[str, dict[str, object]]] = []
 
     def cases(self, owner: str, service: str) -> list[Case]:
-        return self._inner.cases(owner, service)
+        self.calls.append(("cases", {}))
+        if "cases" in self._raises:
+            raise self._raises["cases"]
+        return self._inner.cases(owner, service) if self._chains is None else self._chains
 
     def chains(self, owner: str, service: str, *, since: datetime | None, runs: bool) -> list[Case]:
         self.calls.append(("chains", {"since": since, "runs": runs}))
@@ -257,7 +260,7 @@ def test_a_playbook_versions_read_that_raises_sets_the_record_error(w: Reflectio
 
 def test_a_cases_read_that_raises_sets_the_record_error_labelled_the_cases(w: ReflectionWorld) -> None:
     define(w)
-    history = BreakingHistory(w.history, {"chains": OSError(5, "I/O error")})
+    history = BreakingHistory(w.history, {"cases": OSError(5, "I/O error")})
     found = records_of(w, history=history).records()
     assert only(found).error == "the cases: [Errno 5] I/O error"
     assert one_off(found).error == ""  # the one-off record has its own read
