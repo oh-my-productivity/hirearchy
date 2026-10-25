@@ -26,6 +26,7 @@ __all__ = [
     "MessageParser",
     "TaskQuery",
     "moved_past",
+    "still_open",
 ]
 
 
@@ -65,6 +66,16 @@ def moved_past(task: Message, blocked: Message, received: Sequence[Message]) -> 
         m.type == "note" and m.feedback and m.sender == task.sender and m.reply_to in chain and m.id > blocked.id for m in received
     )
     return later or verdict
+
+
+def still_open(task: Message, latest: Message | None, received: Sequence[Message]) -> bool:
+    """Does the assignee of ``task`` still owe a report on it (pure)? ``latest``: its latest result, None when it has none; ``received``: what the
+    assignee received. Yes without a result, and with a ``blocked`` one its assigner has not moved past (``moved_past``: a later task of the same
+    sender revises it or what it revised, or the sender gave a verdict on its chain after the block; the user's accept of what it delivered is one
+    such verdict, D-E7-2 F-E7-7). No after a ``done`` or ``failed`` result."""
+    if latest is None:
+        return True
+    return latest.status == "blocked" and not moved_past(task, latest, received)
 
 
 @runtime_checkable

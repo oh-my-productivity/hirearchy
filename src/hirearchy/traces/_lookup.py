@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ..kernel import ROOT, RUNTIME, latest_results, norm
-from ..mail import MailboxReader
+from ..mail import MailboxReader, still_open
 from ._ports import AgentPresence
 from .api import TraceLookup
 
@@ -26,10 +26,8 @@ class MailboxTraceLookup(TraceLookup):
         if a in (ROOT, RUNTIME) or not self._agents.exists(a):
             return []
         latest = latest_results(self._mail.sent(a))
-        return [
-            t.trace for t in self._mail.received(a)
-            if t.type == "task" and ((r := latest.get(t.id)) is None or r.status == "blocked")
-        ]
+        received = self._mail.received(a)
+        return [t.trace for t in received if t.type == "task" and still_open(t, latest.get(t.id), received)]
 
     def context_trace(self, addr: str) -> tuple[str | None, str, list[str]]:
         a = norm(addr)

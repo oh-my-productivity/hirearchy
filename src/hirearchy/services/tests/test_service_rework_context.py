@@ -261,6 +261,17 @@ def test_a_blocked_task_is_still_open_for_the_work_tier(w: ServicesWorld) -> Non
     assert w.rework.work_tier("ceo") == "human"
 
 
+def test_an_accepted_blocked_task_is_no_longer_open_for_the_work_tier(w: ServicesWorld) -> None:
+    """D-E7-2 F-E7-7 (E7 s3): the user's accept after the block moves its assigner past the human task (``mail.still_open``), so the one open trace is
+    the fresh relayed task's and the work tier is its tier; without the accept the lead holds two traces, no batch, and no tier (as before)."""
+    blocked = human_task(w, TRACE)
+    answer(w, blocked, status="blocked")
+    received(w, "relayed", trace=BATCH)
+    assert w.rework.work_tier("ceo") is None  # two open traces, no batch
+    w.d.post(Message(sender="root", to="ceo", type="note", body="accepted", title="Accept", feedback="accept", reply_to=blocked.id, source="human"))
+    assert w.rework.work_tier("ceo") == "relayed"
+
+
 def test_root_and_an_agent_without_a_task_have_no_work_tier(w: ServicesWorld) -> None:
     received(w, "human")
     assert w.rework.work_tier("root") is None and w.rework.work_tier("ceo/eng") is None

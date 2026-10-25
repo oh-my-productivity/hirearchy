@@ -46,7 +46,8 @@ class FilesLines(Protocol):
 class UpstreamTasks(Protocol):
     def upstream(self, addr: str, delegated: Message) -> tuple[Message, Message | None] | None:
         """The one task of ``addr`` that the delegation ``delegated`` probably serves, with its latest result (None = still open); None when there
-        is not exactly one candidate."""
+        is not exactly one candidate. A candidate was still open when the delegation was sent: no result, a result only after it, or a ``blocked``
+        one its assigner had not moved past by then (``mail.still_open``)."""
         ...
 
 

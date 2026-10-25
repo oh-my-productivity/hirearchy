@@ -97,6 +97,27 @@ def test_a_blocked_result_leaves_the_task_open_and_a_later_final_one_closes_it(h
     assert h.lookup.open_task_traces("ceo") == []
 
 
+def test_a_blocked_task_its_sender_accepted_after_the_block_is_no_longer_open(h: TraceHarness) -> None:
+    """D-E7-2 F-E7-7 (E7 s3's d9bc): the sender's verdict after the block moves it past the task (``mail.still_open``), so the lead's open work is
+    the other task and ``context_trace`` gives its trace by ``open-task``."""
+    blocked = put(h, "ceo", "read", 1, trace="A")
+    other = put(h, "ceo", "inbox", 4, trace="B")
+    result(h, "ceo", 2, blocked, "blocked")
+    assert h.lookup.open_task_traces("ceo") == ["A", "B"]
+    assert h.lookup.context_trace("ceo") == (None, "ambiguous", ["A", "B"])
+    put(h, "ceo", "inbox", 3, kind="note", feedback="accept", reply_to=blocked)  # the sender's accept, after the block
+    assert other and h.lookup.open_task_traces("ceo") == ["B"]
+    assert h.lookup.context_trace("ceo") == ("B", "open-task", [])
+
+
+def test_a_grant_note_after_the_block_leaves_the_blocked_task_open(h: TraceHarness) -> None:
+    """D-E7-2 F-E7-7 (E7 s1's 0036): a note that carries runs and no verdict moves nobody past the task."""
+    blocked = put(h, "ceo", "read", 1, trace="A")
+    result(h, "ceo", 2, blocked, "blocked")
+    put(h, "ceo", "inbox", 3, kind="note", reply_to=blocked, budget=3)
+    assert h.lookup.open_task_traces("ceo") == ["A"]
+
+
 def test_only_tasks_count(h: TraceHarness) -> None:
     put(h, "ceo", "inbox", 1, trace="A", kind="note")
     put(h, "ceo", "inbox", 2, trace="A", kind="result", reply_to="x", status="done")

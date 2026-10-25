@@ -32,6 +32,18 @@ class Story:
         self.box.store(msg)
         return msg
 
+    def verdict(self, n: int, task: Message) -> Message:
+        """Root's verdict on ``task`` (a note with ``feedback`` replying to it)."""
+        msg = Message(sender="root", to="ceo", type="note", title="v", body="b", id=at(n), reply_to=task.id, feedback="accept")
+        self.box.store(msg)
+        return msg
+
+    def rework(self, n: int, task: Message) -> Message:
+        """Root sends ``task`` back to ``ceo``."""
+        msg = Message(sender="root", to="ceo", type="task", title=f"R{n}", body="b", id=at(n), revises=task.id)
+        self.box.store(msg)
+        return msg
+
 
 def test_the_one_task_received_before_the_delegation_and_still_open() -> None:
     s = Story()
@@ -79,3 +91,43 @@ def test_only_tasks_count_not_notes() -> None:
     s = Story()
     s.box.store(Message(sender="root", to="ceo", type="note", title="n", body="b", id=at(1)))
     assert s.upstream.upstream("ceo", s.task(5, "ceo/eng", "ceo")) is None
+
+
+# ------------------------------------------------------------------------------ D-E7-2 F-E7-7: a blocked task its assigner moved past is no candidate
+
+
+def test_a_blocked_task_the_assigner_accepted_leaves_the_second_task_as_the_one_candidate() -> None:
+    """E7 s3 (d9bc and a443): blocked at 2, the accept at 3, a second task at 4, the delegation at 5."""
+    s = Story()
+    mine = s.task(1)
+    s.result(2, mine, "blocked")
+    s.verdict(3, mine)
+    second = s.task(4)
+    assert s.upstream.upstream("ceo", s.task(5, "ceo/eng", "ceo")) == (second, None)
+
+
+def test_a_blocked_task_the_assigner_accepted_before_the_delegation_is_no_candidate() -> None:
+    s = Story()
+    mine = s.task(1)
+    s.result(2, mine, "blocked")
+    s.verdict(3, mine)
+    assert s.upstream.upstream("ceo", s.task(5, "ceo/eng", "ceo")) is None
+
+
+def test_a_verdict_sent_after_the_delegation_does_not_move_it_to_another_task() -> None:
+    """The candidates are read as of the delegation's send: the accept at 7 came later, so the blocked task was still a candidate."""
+    s = Story()
+    mine = s.task(1)
+    blocked = s.result(2, mine, "blocked")
+    sub = s.task(5, "ceo/eng", "ceo")
+    s.verdict(7, mine)
+    assert s.upstream.upstream("ceo", sub) == (mine, blocked)
+
+
+def test_a_blocked_task_its_assigner_sent_back_leaves_the_rework_as_the_one_candidate() -> None:
+    """E7 s1 and s2: the head 5efc/3ca4 blocked, then its rework (``revises``) at 3, the delegation at 5."""
+    s = Story()
+    mine = s.task(1)
+    s.result(2, mine, "blocked")
+    rework = s.rework(3, mine)
+    assert s.upstream.upstream("ceo", s.task(5, "ceo/eng", "ceo")) == (rework, None)

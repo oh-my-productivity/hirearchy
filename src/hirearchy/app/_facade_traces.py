@@ -18,7 +18,7 @@ class TracesMixin:
         return self.runtime.trace_lookup.trace_of(addr, msg_id)
 
     def open_task_traces(self, addr: str) -> list[str | None]:
-        """Traces of the tasks ``addr`` received and has not finished (no result, or only a ``blocked`` one)."""
+        """Traces of the tasks ``addr`` received and has not finished (no result, or a ``blocked`` one its assigner has not moved past: ``mail.still_open``)."""
         return self.runtime.trace_lookup.open_task_traces(addr)
 
     def context_trace(self, addr: str) -> tuple[str | None, str, list[str]]:

@@ -7,7 +7,7 @@ from collections.abc import Mapping
 from ..agents import AgentDirectory
 from ..dispatch import ReworkContext
 from ..kernel import ROOT, RUNTIME, SOURCES, latest_results
-from ..mail import MailboxReader
+from ..mail import MailboxReader, still_open
 from .api import ServiceCatalog
 
 
@@ -42,13 +42,12 @@ class ServiceReworkContext(ReworkContext):
         return self._tier(actor, trace) if trace else None
 
     def _open_trace(self, actor: str) -> str | None:
-        """The one trace of the tasks ``actor`` received and has not answered finally, the stamper's ``open-task`` rule (``traces``' ``open_task_traces``);
-        None for none, for several and when one of them has no trace."""
+        """The one trace of the tasks ``actor`` received and has not finished (no result, or a ``blocked`` one its assigner has not moved past:
+        ``mail.still_open``), the stamper's ``open-task`` rule (``traces``' ``open_task_traces``); None for none, for several and when one of them has
+        no trace."""
         results = latest_results(self._mail.sent(actor))
-        open_traces = [
-            t.trace for t in self._mail.received(actor)
-            if t.type == "task" and ((r := results.get(t.id)) is None or r.status == "blocked")
-        ]
+        received = self._mail.received(actor)
+        open_traces = [t.trace for t in received if t.type == "task" and still_open(t, results.get(t.id), received)]
         distinct = {t for t in open_traces if t}
         return next(iter(distinct)) if len(distinct) == 1 and None not in open_traces else None
 

@@ -25,8 +25,8 @@ class TraceLookup(Protocol):
         ...
 
     def open_task_traces(self, addr: str) -> list[str | None]:
-        """The trace of every task ``addr`` received and has not finished (it sent no result, or only a ``blocked`` one), sorted by task
-        id; None for a task without a trace. ``[]`` for root, for the runtime and for an address that is not an agent."""
+        """The trace of every task ``addr`` received and has not finished (no result, or a ``blocked`` one its assigner has not moved past:
+        ``mail.still_open``), sorted by task id; None for a task without a trace. ``[]`` for root, for the runtime and for an address that is not an agent."""
         ...
 
     def context_trace(self, addr: str) -> tuple[str | None, str, list[str]]:
