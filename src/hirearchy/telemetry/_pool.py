@@ -18,7 +18,7 @@ class EventWriterPool(LineWriters, DropLog):
 
     def __init__(self, clock: Clock) -> None:
         self._clock = clock
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()  # re-entrant: a signal handler of the thread that holds it can emit (DR-0a4-9)
         self._writers: dict[tuple[str, str, int], LineWriter] = {}
         self._dropped = 0
         self._warned = False

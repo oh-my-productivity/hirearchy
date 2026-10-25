@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import threading
 from pathlib import Path
 
 import pytest
@@ -32,6 +33,22 @@ def test_the_file_name_is_the_process_the_pid_and_the_start_in_epoch_millisecond
     writer.append({"seq": 0}, "2026-10-18", clock, 5.0, lambda: None)
     (path,) = (tmp_path / ".runtime" / "events" / "2026-10-18").glob("*.jsonl")
     assert path.name == f"scheduler-4242-{int(clock.time() * 1000)}.jsonl"
+
+
+def test_the_lock_lets_the_thread_that_holds_it_in_again(tmp_path: Path) -> None:
+    """DR-0a4-9, P-6: a writer made while the same thread holds the pool's lock (a signal handler's emit) does not wait on itself."""
+    pool = EventWriterPool(FakeClock())
+    made: list[object] = []
+
+    def work() -> None:
+        with pool._lock:
+            made.append(pool.writer(str(tmp_path), "scheduler", 1))
+
+    thread = threading.Thread(target=work, daemon=True)
+    thread.start()
+    thread.join(5.0)
+    assert not thread.is_alive(), "the pool waits on a lock its own thread holds"
+    assert len(made) == 1
 
 
 def test_dropping_counts_and_the_first_one_is_reported_once_on_stderr(capsys: pytest.CaptureFixture[str]) -> None:
