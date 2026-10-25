@@ -467,7 +467,10 @@ class ServiceCommands(Protocol):
         Root only: ``source`` (``"human"``: the user's own judgement, in their words; ``"relayed"``, the default of a root verdict: anything root
         concluded itself), ``criterion`` (a rejection only: what it is about, as ids ``C<k>`` of the contract, ``R<k>`` of an earlier rejection
         it repeats, or ``none``: the client said it is no lasting rule) and ``confirms`` (the id of a rejection recorded on ``task_id``: ``criterion``
-        is then recorded for it in a link note, which is no new verdict)."""
+        is then recorded for it in a link note, which is no new verdict).
+
+        Root also rates its one-off tasks (tasks it sent without a service) the same way: ``task_id`` is then such a task with a result whose assignee
+        still exists, and ``criterion`` and ``confirms`` are refused (a one-off has no contract)."""
         ...
 
 

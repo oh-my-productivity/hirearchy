@@ -62,6 +62,16 @@ def test_root_define_service_docstring_names_changing_the_criteria(svc):
     assert text.endswith("Every delivered request of the service needs its verdict first.")
 
 
+def test_root_feedback_docstring_names_one_off_tasks(svc):
+    text = " ".join(described(svc, ROOT)["feedback"].description.split())
+    assert text.startswith(
+        'Record the user\'s verdict on a delivered task: one of your service requests (or a rework) or one of your one-off tasks: verdict "accept" or "reject". '
+    )
+    assert 'it is shown to the owner but weighs nothing when it revises its playbook. A one-off task takes no criterion or confirms (it has no contract). ' \
+           'criterion (reject only): what the rejection is about' in text
+    assert " ".join(described(svc, "ceo")["feedback"].description.split()).startswith("Tell the owner of a service whether a delivered request was good")
+
+
 def test_root_feedback_docstring_asks_for_the_reading(svc):
     text = " ".join(described(svc, ROOT)["feedback"].description.split())
     assert "on the rejection itself it is shown as not confirmed, whatever the source. Pass your reading there (one id: what you read the rejection as), and the reply gives the exact question naming it. " in text

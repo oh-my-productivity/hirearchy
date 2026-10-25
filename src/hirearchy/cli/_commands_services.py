@@ -156,7 +156,7 @@ class FeedbackCommand(Command):
 
     def add_arguments(self, sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
         s = sub.add_parser("feedback", help="accept or reject a delivered service request (as root)")
-        s.add_argument("task_id")
+        s.add_argument("task_id", help="the service request, rework or one-off task the verdict is on")
         s.add_argument("verdict", choices=["accept", "reject"])
         s.add_argument("--note", default="", help="what was wrong (required for reject)")
         s.add_argument("--source", choices=("human", "relayed"), default="human",

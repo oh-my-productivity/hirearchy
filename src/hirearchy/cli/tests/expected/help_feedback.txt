@@ -3,7 +3,7 @@ usage: hirearchy feedback [-h] [--note NOTE] [--source {human,relayed}] [--crite
                           task_id {accept,reject}
 
 positional arguments:
-  task_id
+  task_id               the service request, rework or one-off task the verdict is on
   {accept,reject}
 
 options:

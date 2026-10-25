@@ -1138,7 +1138,8 @@ output: {
 }
 other: {}
 description:
-Tell the owner of a service whether a delivered request was good: verdict "accept" or "reject".
+Record the user's verdict on a delivered task: one of your service requests (or a rework) or one of your
+        one-off tasks: verdict "accept" or "reject".
 
         task_id: a service request (or rework) you sent that has a result. note: required for reject (what was wrong),
         optional for accept: the user's own words, verbatim. It costs no run and does not wake the owner; it shows up in
@@ -1146,9 +1147,10 @@ Tell the owner of a service whether a delivered request was good: verdict "accep
         own judgement of each delivery, also on a rework: every verdict stays in the case's history, the latest one is the
         final verdict, and an earlier reject is still shown to the owner with your words. source: "human" only when the
         verdict is the user's own judgement and note holds their words; "relayed" (the default) for anything you concluded
-        yourself: it is shown to the owner but weighs nothing when it revises its playbook. criterion (reject only): what
-        the rejection is about, as ids: "C<k>" (a contract criterion, see `services`), "R<k>" (an earlier rejection it
-        repeats) or "none" (no lasting rule); on the rejection itself it is shown as not confirmed, whatever the source.
+        yourself: it is shown to the owner but weighs nothing when it revises its playbook. A one-off task takes no
+        criterion or confirms (it has no contract). criterion (reject only): what the rejection is about, as ids: "C<k>"
+        (a contract criterion, see `services`), "R<k>" (an earlier rejection it repeats) or "none" (no lasting rule); on
+        the rejection itself it is shown as not confirmed, whatever the source.
         Pass your reading there (one id: what you read the rejection as), and the reply gives the exact question naming it.
         confirms: the user's answer that changes no criterion ("no", "a one-off", "about C<k> as it is"): call again with
         the same task_id, verdict "reject", confirms=<the rejection's message id>, criterion ("none", "R<j>" or "C<k>"),

@@ -8,6 +8,7 @@ import pytest
 
 from hirearchy.kernel import OrgError, OrgPaths
 from hirearchy.kernel.testing import FakeClock, ListEventSink
+from hirearchy.services import ServiceCommands
 from hirearchy.services._places import OrgServicePlaces
 from hirearchy.services._texts import CappedPlaybookTexts, DirectReportOwners, EventedPlaybookWriter
 from hirearchy.services.testing import MemoryServiceStore, ServicesWorld, memory_world
@@ -152,3 +153,13 @@ def test_the_extra_frontmatter_goes_after_the_reason_and_its_admitted_is_the_eve
     assert list(meta) == ["service", "version", "revised", "by", "reason", "evidence", "admitted", "restores"]
     assert (meta["evidence"], meta["admitted"], meta["restores"]) == (["R1"], "b", 1)
     assert [e.fields["admitted"] for e in events.events] == ["client", "b"]
+
+
+# ------------------------------------------------------------------------------ the docstring of feedback
+
+
+def test_service_commands_feedback_docstring_names_one_off_tasks() -> None:
+    doc = " ".join((ServiceCommands.feedback.__doc__ or "").split())
+    assert "Root also rates its one-off tasks (tasks it sent without a service) the same way" in doc
+    assert "``criterion`` and ``confirms`` are refused (a one-off has no contract)" in doc
+    assert "replaces" not in doc and "stays in the case" in doc

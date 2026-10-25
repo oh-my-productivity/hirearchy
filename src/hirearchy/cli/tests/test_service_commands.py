@@ -167,3 +167,9 @@ def test_the_cli_prints_no_step_after_a_one_off_verdict(svc, capsys):
     verdict = [m for m in svc.sent(ROOT) if m.feedback][-1]
     assert (verdict.reply_to, verdict.source, verdict.criterion) == (plain.id, "human", None)  # the CLI keeps --source human
     assert capsys.readouterr().out == f"feedback reject on {plain.id} -> ceo (message {verdict.id}, source human)\n"
+
+
+def test_feedback_help_names_the_one_off_task(org, capsys):
+    with pytest.raises(SystemExit):
+        cli(org, "feedback", "--help")
+    assert "task_id the service request, rework or one-off task the verdict is on" in " ".join(capsys.readouterr().out.split())
