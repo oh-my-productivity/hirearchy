@@ -93,6 +93,22 @@ def test_the_skill_asks_before_the_copy_and_never_answers_a_question_with_a_rewo
         assert needle in text, needle
 
 
+def test_the_skill_passes_the_notes_on_with_the_delivery_and_asks_only_the_others_first():
+    """D-E6-1 (A2): `progress` lists the items that name no criterion as notes and withholds nothing for them, so item 3 asks the others in plain words
+    before the copy and only passes the notes on with the delivery. The file stays at 125 lines."""
+    assert len(SKILL.read_text().splitlines()) <= 125
+    text = flat()
+    for needle in (
+        "the ones it lists as notes, with no criterion, you only pass on with the delivery): ask the others in plain words",
+        "`progress` flags them and withholds the path; the ones it lists as notes",
+        "with any question from item 2, in one message before you deliver",
+        "copy nothing until they are answered",
+        "never answer one with a rework",
+    ):
+        assert needle in text, needle
+    assert "withholds the path): ask them in plain words" not in text
+
+
 def test_the_delivery_report_shows_the_assistants_relayed_runs_apart_as_its_own():
     """DR-0a3-8 (D-E5-1): the case total of a delivery report names root's relayed runs apart, as the assistant's own, and keeps the approved-runs example."""
     text = flat()
