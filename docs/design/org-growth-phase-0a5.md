@@ -1,6 +1,7 @@
 # Org growth, Phase 0a.5: the batch after E7 (technical design)
 
-Status: design, revision 1 (no review yet). Branch `feat/org-growth-phase-0a5` off `main` `3a0bf49` (the E7 study commit; product code identical
+Status: design, revision 2, after design review 1 (`.agents/tasks/design-review.md`, CHANGES_REQUESTED: 3 MEDIUM, 9 NIT; each finding is answered
+in 19). Branch `feat/org-growth-phase-0a5` off `main` `3a0bf49` (the E7 study commit; product code identical
 to `18a4531`); worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0a5`. Baseline at `3a0bf49`: `skills/hirearchy/SKILL.md` has 125 lines
 and md5 `fd89a7fda55b8f342cf0306173c363fb`; `ROOT_INSTRUCTIONS` is not edited by this batch (under its 2 700 cap).
 
@@ -32,9 +33,9 @@ dependency.
 | Item | Decision in this design | Where |
 |---|---|---|
 | A2 (D-E7-2) | **Ship.** One derived marker, computed where the ceiling is computed (`reflection._cases._spend`): a human rework of 1 run whose `left` at its send, recomputed from the files, was 0 or below. Its term raises no ceiling, and later terms leave its run out of what they count as committed until its result gives it back. Grants (notes) always count. `Case.unapproved_reworks` exposes the marker. | 4.2, 4.3 |
-| A1 (D-E7-2) | **Ship.** For a marked rework the top-up counts the rework's own run in the ask and in the grant: `ask = need - budget - spare - held + 1`, `grant = need - budget - held + 1`, with one new sentence in `{left}`. E7 s2 #20 asks for 2 and grants 2. `_default_budget` keeps handing 1 run. | 4.4, 4.5 |
+| A1 (D-E7-2) | **Ship.** For a marked rework the top-up counts the rework's own run in the ask and in the grant: `ask = need - budget - spare - held + 1`, `grant = need - budget - held + 1`, with one new sentence in `{left}` (`DEFAULT_RUN`). When the runs the team holds cover the round without that run, nothing is asked and the `HELD` sentence is followed by a second new sentence (`DEFAULT_RUN_HELD`): tell the user that run is beyond their approval. E7 s2 #20 asks for 2 and grants 2; E6 s3 #19 asks for nothing and names the run. `_default_budget` keeps handing 1 run. | 4.4, 4.5 |
 | C (D-E7-2) | **Ship.** `open_client_items` settles a result's items only by a human-tier verdict (or the user's own rework of the task), through `rated(case, task, human=True)`. `delivered_unrated` and progress's `no feedback yet` keep reading any tier. | 5 |
-| F-E7-7 (D-E7-2) | **Ship (today's behaviour is not correct).** A `blocked` task its assigner has moved past (`mail.moved_past`: the user's accept after the block is one case) is no longer the assignee's open work. One pure rule, `mail.still_open`, is read by the trace stamper's `open-task` rule and its mirror in `services`. The record stays as the lead wrote it (single writer): the result stays `blocked`, and so do `Case.state` and the progress line. | 6 |
+| F-E7-7 (D-E7-2) | **Ship (today's behaviour is not correct).** A `blocked` task its assigner has moved past (`mail.moved_past`: the user's accept after the block is one case) is no longer the assignee's open work. One pure rule, `mail.still_open`, is read by the trace stamper's `open-task` rule, its mirror in `services`, and the batch's upstream hint (`prompts.SoleUpstreamTask`, read as of the delegation's send). The record stays as the lead wrote it (single writer): the result stays `blocked`, and so do `Case.state` and the progress line. | 6 |
 | F-E7-8 (D-E7-2) | **Defect, fixed test-first.** The owner's prompt sections pick "the services it is working on" from `TaskQuery.open_tasks`, which leaves out a task with a `blocked` result. They now read `mail.still_open` too, so a `blocked` request the client has not moved past keeps its `# Playbook` and `# Regression list`. | 7 |
 | B (D-E7-3) | **Ship, product form.** When the plan has no error and a service's budget covers one pass and one internal rework but not a client round (the `budget-tight` warning's client-round form), the PLAN FOR YOU block ends with `Use {N} runs per request (covers one round of your questions or a rejection), or keep {M}?`. One pure predicate feeds the warning and the line. SKILL.md line 39 replaces its own offer with what to do on the answer. | 8, 9 |
 
@@ -45,7 +46,7 @@ F-E7-6, F-E7-9, F-E7-10, F-E7-11).
 
 Python 3.11 and the existing packages only (`mcp`/FastMCP, PyYAML; Textual untouched), the standard library, uv, pytest, `mypy==2.4.0 --strict`,
 `import-linter==2.15`, `scripts/static_checks.py`, `scripts/check.sh`. No new runtime dependency, no new package, no new dependency edge between
-packages (`reflection`, `traces` and `services` already depend on `mail`), no new Protocol method, no new file kind in an organization, no new
+packages (`reflection`, `traces`, `services` and `prompts` already depend on `mail`), no new Protocol method, no new file kind in an organization, no new
 message field, no new event kind. One new public pure function (`mail.still_open`), one new `Case` field (`unapproved_reworks`), one new keyword of
 `reflection.rated` (`human`). Strict TDD (R11) under the owner's test policy (15).
 
@@ -58,6 +59,7 @@ message field, no new event kind. One new public pure function (`mail.still_open
 | D: the default's run with nothing left | `reflection._cases._spend`, exposed as `Case.unapproved_reworks` | A hand-down `h` that is a task with `source == "human"`, a `revises`, `budget == 1`, and left at `h` of 0 or below. Only a human client's case (root) has one. |
 | a D's run still out at `h` | `reflection._cases._spend` | 1 for a D sent before `h` unless its latest result came before `h` with `budget >= 1` (it gave its run back), else 0. |
 | still open (for its assignee) | `mail.still_open(task, latest, received)` | A received task with no result, or whose latest result is `blocked` and whose assigner has not moved past it (`mail.moved_past`, 0a.1). |
+| still open when a delegation was sent | `prompts._upstream.SoleUpstreamTask.upstream` | A task received before the delegation whose latest result is missing, came after the delegation, or is `blocked` and `still_open` over what the assignee had received before the delegation. |
 | client-round offer | `blueprint._budgeting.round_offer(total, est_total, round_runs)` | `est_total + round_runs` when `round_runs > 0` and `est_total <= total < est_total + round_runs`, else None: the number the `budget-tight` warning's client-round form gives. |
 | human-tier verdict | `kernel.verdict_tier`, `Verdict.tier` | Unchanged: a feedback note root sent with `source="human"` after the user's yes. |
 
@@ -77,7 +79,8 @@ can only learn that the user approved that run from the grant root then sends: t
 | A2 lifted by any later user grant in the D's interval, grant 1 | 14 | 14 | 5 | rejected: it reads E7 s2's recorded files (a 1-run grant after Lena's yes to 1 run, approval 13) as 14, so A2 removes nothing in the case that motivated it; and the decision says the default's run "is left out of `user_ceiling`" |
 | **A2 literal, grant = the ask (2)** (chosen) | 14 | 14 | 6 (one more than the round) | consistent: the product's approval equals the user's yes in 0a.5 flows, and recorded s2 reads 13, as Lena approved |
 
-The chosen pairing keeps 0a.3 and 0a.4's rule that a grant after the user's yes raises the approval by exactly `{ask}`. Its cost is one run handed
+The chosen pairing keeps 0a.3 and 0a.4's rule that a grant after the user's yes raises the approval by exactly `{ask}` (when no result returns
+runs and no run beyond the held ones is charged between the `TOPUP` and the grant, I-A3). Its cost is one run handed
 down beyond the round in the D case (Deviation 1). That run is no cost while unused: `user_spend` counts grants only once they are charged. If the
 team spends it, the overspend sentence fires, which is then true.
 
@@ -109,7 +112,7 @@ to a note. A grant root sends without asking (F-E7-5) still counts: that is 0b's
 ### 4.3 A2: the ceiling (`SRC/reflection/_cases.py:_spend`, `SRC/reflection/api.py`)
 
 `_spend` gains the keyword `per_request: int` (the current contract's `budget`, which `DerivedCaseHistory.cases` already reads as `contract`) and
-returns `_Spend.unapproved: tuple[str, ...]`. The ceiling loop (today's lines 52-58) becomes:
+returns `_Spend.unapproved: tuple[str, ...]`. The ceiling loop (today's lines 62-69 of `_cases.py`) becomes:
 
 ```python
     users = [t for t in tasks if t.source != "relayed"]
@@ -169,8 +172,8 @@ approval of the user's (D-E7-2 A2)".
         held = user_held(case, task)
         ask = need - task.budget - spare - held + own
         still = HELD.format(held=held, revised=task.revises) if held else ""
-        if ask <= 0:
-            return still  # the team holds the rest of the round: nothing to ask the user (D-E6-2)
+        if ask <= 0:  # the team holds the rest of the round: nothing to ask the user (D-E6-2)
+            return f"{still} {DEFAULT_RUN_HELD}" if own else still  # D-E7-2 A1: a D's run is still named, though nothing is asked
         left = DEFAULT_RUN if own else SOME_LEFT.format(spare=spare, approved=approved) if spare else NOTHING_LEFT
         return TOPUP.format(
             budget=task.budget, need=need, owner=task.to, left=f"{still} {left}" if still else left, ask=ask, grant=need - task.budget - held + own,
@@ -178,27 +181,42 @@ approval of the user's (D-E7-2 A2)".
 ```
 
 The rework reads the marker from its own case and never recomputes it, so there is one definition of D (I-A4). `grant - ask = spare`, as in
-0a.3, and in the D case `spare` is 0 (D means nothing was left), so the grant equals the ask (4.1). Without `own` every line computes today's
-values, so a rework that is not D keeps today's text byte for byte.
+0a.3, and in the D case `spare` is 0 (D means nothing was left), so the grant equals the ask (4.1).
+
+In the D case `ask <= 0` holds exactly when `held >= need`: with `budget` 1 and `spare` 0, `ask = need - held`. The team then holds the whole
+round without the D's run (E6 s3 #19: 11 held, round 5). Nothing needs asking, but the D's run is still beyond the user's approval. Under A2 it
+counts in `user_cost` while the case is open, so the case total can print `OVER_CONTRACT` or `OVER_APPROVED` in the same reply (it does at
+E6 s3 #19 and in the MCP HELD test; the CLI's `request` prints no case total). `HELD` alone would leave that "tell the user" without content,
+and would contradict it ("the rework can use them", while the total says the case exceeds the budget). So the step is `HELD` followed by
+`DEFAULT_RUN_HELD` (4.5): ask for nothing, and tell the user that this 1 run is beyond their approval. In that branch `still` is never empty,
+because `held >= need >= 1`. The alternative, `HELD` alone with a rewritten limit, was rejected: root would then tell the user "this case
+exceeds the per-request budget" with 5 of 16 runs used, and nothing would say why.
+
+Without `own` every line computes today's values. A rework that is not a D, in a case with no earlier D, keeps today's text byte for byte. After
+an earlier D in the same case, the approval reads 1 lower than at `18a4531`, so `spare` (and the numbers of `SOME_LEFT`, the ask and the grant)
+of a later rework that is not a D read 1 lower too. 0a.4's B-2 replay pins this: spare 5 becomes 4, and the step stays `""` (4.7).
 
 `SRC/services/_request.py:_default_budget` is unchanged in code: with nothing left it still hands 1 run, the minimum a task carries, so the lead
 can read the rework. Holding the rework back or refusing it would be a new refusal. Its docstring and its last comment change: "1 when nothing is
-left; that run is beyond the user's approval, so the reply's top-up asks for it too (D-E7-2 A1)". Root's `request` tool docstring, the CLI help and
-`HELD` are unchanged, so no MCP surface golden moves. `ServiceSteps.rework_step`'s docstring (`api.py`) adds: "when the rework is the default's 1
-run with nothing left (`Case.unapproved_reworks`), the top-up asks for that run too, and its grant is what it asks".
+left: that run is beyond the user's approval, and the reply names it: its top-up asks for it too, or, when the runs the team holds cover the
+round, the step says to tell the user (D-E7-2 A1)". Root's `request` tool docstring, the CLI help and `HELD` are unchanged, so no MCP surface
+golden moves. `ServiceSteps.rework_step`'s docstring (`api.py`) adds: "when the rework is the default's 1 run with nothing left
+(`Case.unapproved_reworks`), the top-up asks for that run too and its grant is what it asks; when the runs the team holds cover the round, the
+`HELD` sentence is followed by one that tells root to say that run is beyond the user's approval".
 
 ### 4.5 Texts
 
 - `TOPUP`, `HELD`, `NOTHING_LEFT`, `SOME_LEFT`: unchanged templates.
 - New, `SRC/reflection/_steps.py`: `DEFAULT_RUN = "Nothing was left of the runs the user approved for this case when this rework was sent: its own run is beyond them, and the ask includes it."` It takes `NOTHING_LEFT`'s place in `{left}` for a D, after `HELD` when the team holds runs.
-- The overspend sentences (`OVER_CONTRACT`, `OVER_APPROVED`, `RELAYED_*`) are unchanged texts. They print in more cases (4.7).
+- New, `SRC/reflection/_steps.py`: `DEFAULT_RUN_HELD = "Nothing was left of the runs the user approved for this case when this rework was sent: its own run is beyond them, and the runs the team holds cover the round without it. Ask for nothing; tell the user that this 1 run is beyond their approval."` It follows `HELD`, after one space, for a D whose team holds the round (`ask <= 0`). It does not contain `Ask the user now` or `Nothing else is left`, so the existing "asks nothing" assertions keep their meaning.
+- The overspend sentences (`OVER_CONTRACT`, `OVER_APPROVED`, `RELAYED_*`) are unchanged texts. They print in more cases (4.7, limit 5).
 
 ### 4.6 Code sites
 
 `SRC/reflection/_cases.py` (`_Spend.unapproved`, `_spend(..., per_request)`, the ceiling loop, `cases()` passes `contract.budget` and fills the
 field); `SRC/reflection/api.py` (`Case.unapproved_reworks`, the comments and docstrings of `user_ceiling`, `user_approved`, `case_total`,
-`rework_step`); `SRC/reflection/_steps.py` (`DEFAULT_RUN`, `_top_up`); `SRC/reflection/_allowance.py` (docstring); `SRC/services/_request.py`
-(docstring and comment only). `SRC/reflection/_reports.py`: no code change.
+`rework_step`); `SRC/reflection/_steps.py` (`DEFAULT_RUN`, `DEFAULT_RUN_HELD`, `_top_up`); `SRC/reflection/_allowance.py` (docstring);
+`SRC/services/_request.py` (`_default_budget`'s docstring and last comment only, worded as in 4.4). `SRC/reflection/_reports.py`: no code change.
 
 ### 4.7 Replays (`TESTS/e2e/test_org_growth_0a5.py`, over the E7 kit of 15)
 
@@ -233,12 +251,21 @@ the same files differently:
 
 | 0a.4 replay | `18a4531` | 0a.5 | Why |
 |---|---|---|---|
-| B-1, after bc02 (`20261024T171425096624`) | `user_approved(case, 16) == 17` | **16** | bc02 is the default with nothing left; the step stays the `HELD` sentence (own 1: ask 5 - 1 - 0 - 11 + 1 < 0) |
+| B-1, after bc02 (`20261024T171425096624`) | `user_approved(case, 16) == 17`; `case_total(bc02)` = `case total: 5 runs used of 17 handed down (contract: 16 per request)`; step `HELD` (11 held) | **16**; the case total is the head followed by `. This case now exceeds the per-request budget of 16: tell the user.`; the step is **`HELD` + " " + `DEFAULT_RUN_HELD`** | bc02 is the default with nothing left. `user_cost` (open) 5 + (17 - 5) = 17 > 16, the approval equals the contract and there is no relayed task yet, so `OVER_CONTRACT`. own 1: ask 5 - 1 - 0 - 11 + 1 = -6 <= 0 |
 | B-2, before 9a5b (`20261024T172453163610`) | `left == 6` | **5** | approval 16, committed 11 |
-| B-2, at 9a5b (`20261024T172453163611`) | approved - committed `== 5`, `user_spend == 12`, step `""` | **4**, 12, `""` | spare 4 still covers the round with 9a5b's 1 run |
+| B-2, at 9a5b (`20261024T172453163611`) | approved - committed `== 5`, `user_spend == 12`, step `""` | **4**, 12, `""` | spare 4 still covers the round with 9a5b's 1 run. 9a5b is not a D, and its `spare` reads the approval that left bc02 out (4.4, last paragraph) |
 
-E5's replays (`TESTS/e2e/test_org_growth_0a3.py`) do not move: no E5 human rework carries 1 run (aae2 12, 6c4f 5, c209 3). Neither do E7 s1 and s3,
-whose human reworks carry 7, 5, 3, 5 and 7, 5, 5, 5 (STUDY M-A-6).
+The whole B-1 reply at E6 s3 #19 under 0a.5 is therefore:
+
+```
+case total: 5 runs used of 17 handed down (contract: 16 per request). This case now exceeds the per-request budget of 16: tell the user.
+The team still holds 11 of the user's runs for 20261024T170957358424-root-4a3e; the rework can use them. Nothing was left of the runs the user approved for this case when this rework was sent: its own run is beyond them, and the runs the team holds cover the round without it. Ask for nothing; tell the user that this 1 run is beyond their approval.
+```
+
+The B-1 replay asserts `service_reports.case_total(bc02)` and `service_steps.rework_step(bc02)` to these two lines exactly.
+
+E5's replays (`TESTS/e2e/test_org_growth_0a3.py`) do not move. E5's six human reworks carry 12, 12, 5, 5, 3 and 5 runs (aae2, ee21, 6c4f, 367d,
+c209, 57b3), so none is a D. Neither do E7 s1 and s3, whose human reworks carry 7, 5, 3, 5 and 7, 5, 5, 5 (STUDY M-A-6).
 
 ### 4.8 Zero and empty cases
 
@@ -254,10 +281,12 @@ whose human reworks carry 7, 5, 3, 5 and 7, 5, 5, 5 (STUDY M-A-6).
 | a grant (a note) | never marked; its own term counts its budget |
 | two Ds in one chain | both marked; each run counts in `out` while not given back |
 | a D whose result came back with `budget >= 1` before a later term | that term leaves nothing out for it |
-| `_top_up`, a D whose team holds the whole round without its run (`held >= need`) | `HELD` alone, as today; the case total then says the case exceeds the approval by that run (limit 5) |
+| `_top_up`, a D whose team holds the whole round without its run (`held >= need`) | `HELD` + " " + `DEFAULT_RUN_HELD`: nothing asked, the run named (today: `HELD` alone). The case total may print an overspend sentence in the same reply when the held runs are task budgets (limit 5) |
 | `_top_up`, a D with nothing held | ask = grant = `need` (E7-shaped: 5) |
-| `_top_up`, a D of an owner with no agent below (`need` 1) | ask 1, grant 1 (today `""`: the rework's own run is the round, and it is unapproved) |
-| `_top_up`, not a D | today's text and numbers, byte for byte |
+| `_top_up`, a D with some runs held (`0 < held < need`) | ask = grant = `need - held`, `{left}` = `HELD` + " " + `DEFAULT_RUN` |
+| `_top_up`, a D of an owner with no agent below (`need` 1) | with nothing held: ask 1, grant 1 (today `""`: the rework's own run is the round, and it is unapproved); with 1 or more runs held: as the `held >= need` row |
+| `_top_up`, not a D, and no earlier D in the case | today's text and numbers, byte for byte |
+| `_top_up`, not a D, after an earlier D in the case | `spare` reads the approval that leaves the earlier D out, so it is 1 lower than at `18a4531` (B-2: 5 becomes 4) |
 | `_default_budget` | unchanged: `min(left, B)`, 1 when `left <= 0`, the contract's when `left` is None or unreadable |
 
 ### 4.9 Tests to write first (each RED before its code)
@@ -277,12 +306,13 @@ whose human reworks carry 7, 5, 3, 5 and 7, 5, 5, 5 (STUDY M-A-6).
   - `user_committed`, `user_spend` and `user_held` are unchanged by the marker (the same shapes, compared with a run of the old loop's numbers
     pinned as literals).
 - `SRC/reflection/tests/test_pure_functions.py`: a hand-built `Case` has `unapproved_reworks == ()`, so `user_approved` is today's.
-- `SRC/reflection/tests/test_steps.py` and `test_contract_service_steps.py`:
-  - the D form exactly, with `HELD` in `{left}` (round 5, 2 held: ask 3, grant 3) and without it (ask 5, grant 5);
-  - `held >= need`: `HELD` alone;
-  - `need` 1 and a D: ask 1;
-  - a 1-run rework sent with 1 left: today's text.
-- `SRC/mcp_server/tests/test_service_tools.py` and `SRC/cli/tests/test_service_commands.py`: the nothing-left pins take the D form (14 Rule A1).
+- `SRC/reflection/tests/test_steps.py` and `test_contract_service_steps.py`. The changed existing tests of 14 Rule A1 are the RED tests of the
+  D form: with `HELD` in `{left}` (round 5, 2 held: ask 3, grant 3), without it (ask 5, grant 5), `held >= need` (`HELD` + `DEFAULT_RUN_HELD`)
+  and `need` 1 (the renamed `test_an_owner_with_no_agent_below_asks_for_its_own_default_run`: ask 1, grant 1). New tests:
+  - a 1-run rework sent with 1 left: not a D, today's text;
+  - a D of an owner with no agent below while 1 run is held: `HELD` + " " + `DEFAULT_RUN_HELD` (4.8).
+- `SRC/mcp_server/tests/test_service_tools.py` and `SRC/cli/tests/test_service_commands.py`: the nothing-left pins take the D form, and the HELD
+  pins take `HELD` + `DEFAULT_RUN_HELD` (14 Rule A1).
 - `SRC/app/tests/test_wire_cli.py::test_the_request_command_prints_the_step_of_the_runtime` (14 Rule A1).
 - Replays: 4.7 (`test_a1_e7_s2_20_...`, `test_a2_e7_s2_24_...`, and the grant's cut), and the three 0a.4 replays changed as 4.7 states.
 
@@ -375,7 +405,9 @@ So "closing" the task cannot mean writing anything.
 
 The fix is in the readers. In s3, after Lena's accept dd46, the budget already treated d9bc as moved past, so the lead's runs could go back. The
 trace stamper's `open-task` rule (`traces/_lookup.py:open_task_traces`) and its mirror (`services/_rework.py:_open_trace`) did not: they kept d9bc
-open, so the lead held two open traces (09df's case and a443) and its next delegations got `trace_rule: ambiguous` (9838, 59a9, fe01, 7459). Today's
+open, so the lead held two open traces (09df's case and a443) and its next delegations got `trace_rule: ambiguous` (9838, 59a9, fe01, 7459). The
+batch's upstream hint (`prompts/_upstream.py:SoleUpstreamTask.upstream`, the "[It was the only task assigned to you before you delegated this
+...]" line under a delegation's result) also counted d9bc as a candidate, so the 8 delegation results of s3 after dd46 got no hint (6.4). Today's
 behaviour is therefore a disagreement between readers of the same state, not a design choice.
 
 ### 6.2 Decision and rule
@@ -399,28 +431,54 @@ Readers:
   result, or a `blocked` one its assigner has not moved past: `mail.still_open`)".
 - `SRC/services/_rework.py:ServiceReworkContext._open_trace`: the same expression (it mirrors the stamper's rule, 0a.4 Deviation 10). `_tier` is
   unchanged (limit 8).
+- `SRC/prompts/_upstream.py:SoleUpstreamTask.upstream`, read as of the delegation's send, so that a verdict or a rework sent after the delegation
+  cannot move the delegation to another task:
+  ```python
+          latest = latest_results(self._mail.sent(addr))
+          received = self._mail.received(addr)
+          before = [m for m in received if m.id < delegated.id]  # what addr had received when it delegated
+          found = [
+              (t, latest.get(t.id)) for t in received if t.type == "task" and t.id < delegated.id
+              and ((r := latest.get(t.id)) is None or r.id > delegated.id or still_open(t, r, before))
+          ]
+          return found[0] if len(found) == 1 else None
+  ```
+  Its docstring: "A candidate was assigned before the delegation and was still open when it was sent: no result, a result only after the
+  delegation, or a `blocked` one its assigner had not moved past by then (`mail.still_open` over what `addr` had received before the
+  delegation; D-E7-2 F-E7-7)." The `UpstreamTasks` Protocol docstring (`SRC/prompts/_ports.py`) adds the same clause. `BatchRenderer`'s three
+  hint texts are unchanged.
 - `SRC/reflection/_sections.py` (F-E7-8, 7.2).
 
 The rule is `moved_past`, not only "a human-tier accept" (Deviation 5). It is the one rule the product already has for "the assigner no longer waits
 on this blocked task". Narrowing it here would leave the budget and the stamper disagreeing on the same task in the other moved-past shapes: a later
-rework, or any verdict after the block. The human accept the decision names is one of those shapes.
+rework, or any verdict after the block. The human accept the decision names is one of those shapes. The broader rule has one shape the decision
+does not name, stated here so that nobody meets it by surprise: a verdict of the task's sender on **another** task of its chain after the block,
+of any tier, a relayed one included, closes the blocked task too. Example: the lead reported a rework `blocked`, then root sent a relayed
+reject on the chain's head. The stamper, its mirror, the upstream hint and the owner's prompt sections then drop the blocked task, while the
+lead's `# Your state` still lists it with "you may re-report it" (limit 9). The budget already reads it this way (`budget/_policy.py`).
 
 What does not change, and why:
 - **the record.** d9bc's latest result stays da3c, `blocked`: only the lead writes it.
 - **`Case.state`.** It stays `blocked`, and so does the progress line `blocked: Questions for the client:.`. Progress keeps listing the task, since
-  blocked tasks are listed always. 0b's view decides how to show such a case (18).
+  blocked tasks are listed always (`progress/_listing.py`, `progress/_render.py`). 0b's view decides how to show such a case (18).
 - **`Case.open_tasks` and `user_held`.** 0a.4 B keeps "missing or `blocked`". `moved_past`'s rework branch would close the revised task the
   moment root sends the rework, which is exactly when `user_held` must count it.
-- **the lead's state section `Tasks you reported blocked (not final)`** (`prompts/_tasks.py`). It keeps listing every blocked task, so the lead
-  still re-reports a head after its rework, which 0b pins (gate 5 item 7).
+- **the lead's state section `Tasks you reported blocked (not final)`** (`prompts/_tasks.py`, over `TaskQuery.blocked_tasks`). It keeps
+  listing every blocked task, so the lead still re-reports a head after its rework, which 0b pins (gate 5 item 7).
+- **the reporter's re-report rule** (`dispatch/_reporter.py`: a `blocked` result is not final). The lead may still re-report a moved-past
+  blocked task: that is the only way its own record can change, and only the lead writes it.
 - **`TaskQuery.open_tasks`** (no result at all). Its callers (attention, retirement, the reporter, the dashboards) count unanswered work.
+- **`_tier`** (`services/_rework.py`, "not answered finally") and the health analyzer's counts by status (`health/_analyzer.py`): they count
+  results as written (limit 8).
 
 No refusal is added, and no write.
 
 ### 6.3 Code sites
 
-`SRC/mail/api.py` (`still_open`, `__all__`); `SRC/traces/_lookup.py`; `SRC/traces/api.py` (docstring); `SRC/services/_rework.py` (`_open_trace`
-and its docstring).
+`SRC/mail/api.py` (`still_open`, `__all__`); `SRC/traces/_lookup.py`; `SRC/traces/api.py` (docstring); `SRC/app/_facade_traces.py`
+(`open_task_traces`'s docstring: "... and has not finished (no result, or a `blocked` one its assigner has not moved past: `mail.still_open`)");
+`SRC/services/_rework.py` (`_open_trace` and its docstring); `SRC/prompts/_upstream.py` (`upstream` and its docstring); `SRC/prompts/_ports.py`
+(the `UpstreamTasks` docstring).
 
 ### 6.4 Replay: E7 s3 d9bc (`TESTS/e2e/test_org_growth_0a5.py`)
 
@@ -441,6 +499,24 @@ s3, the lead's received tasks at the cut `20261025T084354396140` (just before 98
 Live, 8 of s3's 10 `ambiguous` stamps would have resolved: 9838 and 59a9 to a443, fe01 and 7459 to a74a (each by `open-task`), and the results
 answering them (e4c7, 3bcb, 8377, 579e) by `link`. The two runtime notes (8051, 63ed) come before dd46 and stay `ambiguous`.
 
+**The upstream hint, at the cut `20261025T084422364417`** (e4c7, the writer's result on 9838, is in; the lead has not rendered it yet). 9838 was
+sent at 08:43:54, after dd46 (08:43:26.230467) and a443 (08:43:26.297193). What the lead had received before 9838: d9bc `blocked` (da3c) and moved
+past by dd46; a443 with no result. 09df, 62a5 and 5834 were answered `done` before 9838.
+
+| Reader | `18a4531` | 0a.5 |
+|---|---|---|
+| `runtime.upstream_tasks.upstream("lead", 9838)` | None (two candidates: d9bc, blocked, and a443) | `(a443, None)` |
+| `runtime.context_renderer.render("lead", e4c7)` | holds no `probably serves` | contains `[It was the only task assigned to you before you delegated this, so it probably serves your open task 20261025T084326297193-root-a443 "Memo for 2026-10-12 meeting": the result must also satisfy that task's criteria (shown in full in this prompt).]` |
+
+Measured over E7's recorded files with the rule of 6.2 (a read-only script over the E5 kit pointed at EV7, each result at its own cut), the
+hint changes for 12 of the 47 results that answer a lead delegation, each from no hint to one, and none loses a hint:
+- s3, 8 of 16: e4c7 and 3bcb (a443), ce97 and c49c (b576), 8377 and 579e (a74a), 025f and 6178 (f83d). In each case d9bc, moved past by dd46,
+  was the second candidate;
+- s1, 2 of 16: cdbc and 183e (5e3e: the head 5efc, `blocked`, was moved past by its rework 5e3e);
+- s2, 2 of 15: 5b30 and e61e (c671: the head 3ca4, `blocked`, was moved past by its rework c671).
+
+The replay asserts the s3 rows above. The other 11 are 0b's to re-pin if it reads the hint (18).
+
 ### 6.5 Zero and empty cases
 
 | Case | `still_open` / `open_task_traces` |
@@ -450,21 +526,46 @@ answering them (e4c7, 3bcb, 8377, 579e) by `link`. The two runtime notes (8051, 
 | `blocked`, nothing after it (s1's faaa, before its re-report) | open (today) |
 | `blocked`, then a grant note (no `feedback`) | open (today: s1's 0036) |
 | `blocked`, then a verdict of its sender on its chain (the user's accept dd46; also a reject or a relayed verdict) | **closed** (today: open) |
+| `blocked`, then its sender's verdict on **another** task of its chain, of any tier (a relayed reject of the head included) | **closed** (today: open; Deviation 5, limit 9) |
 | `blocked`, then a later task of its sender that revises it or what it revised | **closed** (today: open; the new task is open in the same trace, so the trace does not change) |
 | `blocked`, a verdict before the block, or a verdict or rework from another sender | open (`moved_past`) |
 | an agent with no received task; root; the runtime; a non-agent | `[]` (today) |
 | a still-open task without a trace | None in the list: the `open-task` rule fails as today |
 
+`SoleUpstreamTask.upstream(addr, delegated)` (the candidates, read as of the delegation's send):
+
+| Case | Result |
+|---|---|
+| no task received before the delegation; only notes | None (today) |
+| one task, no result | `(task, None)` (today) |
+| one task, answered `done` or `failed` before the delegation | None (today) |
+| one task, any result only after the delegation | `(task, result)` (today) |
+| one task, `blocked` before the delegation, nothing after it before the delegation (a verdict after the delegation included) | `(task, blocked)` (today) |
+| one task, `blocked`, then its sender's verdict on its chain, both before the delegation | **None** (today: `(task, blocked)`): the delegation was sent after the assigner moved past the task. E7: 0 cases |
+| a `blocked` task moved past by a later rework before the delegation, and that rework open | **`(rework, None)`** (today: None, two candidates; E7 s1 and s2) |
+| a `blocked` task moved past before the delegation, and another open task (s3: d9bc and a443) | **the other task** (today: None) |
+| two tasks still open at the delegation | None (today) |
+
 ### 6.6 Tests to write first
 
-- `SRC/mail/tests/test_still_open.py`: every row of 6.5 over plain `Message`s, in the style of `test_moved_past.py`.
+- `SRC/mail/tests/test_still_open.py`: every row of the first table of 6.5 over plain `Message`s, in the style of `test_moved_past.py`, including
+  "blocked, then the sender's relayed verdict on another task of the chain: closed".
 - `SRC/traces/tests/test_contract_trace_lookup.py` (every implementation):
   - a `blocked` task whose sender accepted it after the block is not in `open_task_traces`, and `context_trace` then returns the other open
     task's trace with `open-task`;
   - a grant note after the block leaves it open (the existing blocked-task tests stay).
 - `SRC/services/tests/test_service_rework_context.py`: `work_tier` with an accepted `blocked` human task and a fresh relayed task in another trace
   gives `relayed`; with the accept missing, two traces, and no batch gives None (as today).
-- Replay 6.4.
+- `SRC/prompts/tests/test_sole_upstream_task.py` (its `Story` gains a `verdict(n, task)` helper, a root note with `feedback` and `reply_to`), every
+  row of the second table of 6.5:
+  - blocked at 2, an accept at 3, a second task at 4, the delegation at 5: the second task;
+  - blocked at 2, an accept at 3, the delegation at 5, nothing else: None;
+  - blocked at 2, the delegation at 5, an accept at 7: `(task, blocked)` (the existing `test_a_task_reported_blocked_is_a_candidate_with_its_result`
+    stays as it is);
+  - blocked at 2, a rework of its sender at 3 (`revises` the task), the delegation at 5: `(rework, None)`.
+- `SRC/prompts/tests/test_batch_renderer.py` and the prompt snapshots (`SRC/app/tests/snapshots/prompts/`) are unchanged: their blocked tasks
+  are reported after the delegation, which is a candidate today and at 0a.5.
+- Replay 6.4, both tables.
 
 ## 7. F-E7-8: lead prompts after a `blocked` result lost their playbook and regression list
 
@@ -526,14 +627,18 @@ playbook heading reads `v0`. The replay asserts the headings only. Measured live
 | a `blocked` request the client has not moved past, nothing else open | **`# Playbook` and `# Regression list` (when it has assertions) for its service** (today: the listing alone) |
 | a `blocked` request the client moved past (an accept, a verdict, a later rework), nothing else open | the listing alone (today) |
 | a `blocked` request of a service with no regression yet | `# Playbook` only (the regression section is `""` without assertions, today) |
-| a new request or a rejection in the batch | as today (the reflect section and its regression list) |
+| a new request or a rejection in the batch, and no `blocked` request of that service the client has not moved past | as today (the playbook of the open new request, the reflect section and its regression list) |
+| a rejection in the batch (no new request), and a `blocked` request of the same service the client has not moved past also held (another case) | **`# Playbook` (its `reflecting` variant), `# Regression list`, then the Reflect section** (today: the regression list and the Reflect section, with no playbook) |
+| a rejection in the batch on the chain of the `blocked` request itself, after the block | that rejection moves the request past, so as today (the regression list and the Reflect section) |
 
 ### 7.5 Tests to write first
 
 - `SRC/reflection/tests/test_prompt_sections.py`:
   - an owner whose only request has a `blocked` result, with a batch holding only a grant note, gets `# Playbook: <svc>` and, after a human
     rejection on an earlier case of the service, `# Regression list: <svc>`;
-  - the same request after the client's accept on it after the block gets the listing alone.
+  - the same request after the client's accept on it after the block gets the listing alone;
+  - a human rejection of another case of the service in the batch, while the `blocked` request is held and not moved past: the sections hold
+    `# Playbook: <svc>`, `# Regression list: <svc>` and `# Reflect before you start: <svc>`, in that order (7.4, the second-to-last row).
 - `SRC/app/tests` (the wiring tests that build the sections): `wire_reflection` passes the `MailboxReader`.
 - Replay 7.3.
 
@@ -661,12 +766,14 @@ as for every SKILL.md change.
 New:
 
 ```
-   in one line what that risks; the block's last line asks whether to use the plan's number: if they take it, set `needs.budget_runs` and any service `budget` to it and propose again (they may keep theirs). Nothing below claude-sonnet-5.5 at high effort is available: never offer a cheaper model, tiers to
+   in one line what that risks; the block's last line asks whether to use the plan's number: if they take it, set any service `budget` to it, raise `needs.budget_runs` to it if lower, and propose again (they may keep theirs). Nothing below claude-sonnet-5.5 at high effort is available: never offer a cheaper model, tiers to
 ```
 
 Why: the block now asks, and the skill already says to show it exactly (line 48). The assistant's own offer would ask the same question twice, and
-the skill did not say what to do with a yes. On a yes, the re-proposed plan (cap and budget 16 for E5-E7's team) carries no client-round warning,
-so it has no line. Its new `plan_id` is shown and approved as SKILL.md 2.3 says for any revision.
+the skill did not say what to do with a yes. The words "raise `needs.budget_runs` to it if lower" keep a cap that is already above N: a plan with
+a cap of 20 and a service budget of 12 carries the warning (N 16 for E5-E7's team), and setting the cap to 16 would lower the user's cap. On a
+yes, the re-proposed plan (service budget 16, and a cap of at least 16) carries no client-round warning, so it has no line. Its new `plan_id` is
+shown and approved as SKILL.md 2.3 says for any revision.
 
 Needles (`flat()`: lower-cased, whitespace collapsed):
 - kept: `say in one line what that risks` (line 38's `say`, then line 39), `per-request budget is the plan's: the estimate + 25%, or more to cover
@@ -674,8 +781,8 @@ Needles (`flat()`: lower-cased, whitespace collapsed):
   92 and 100 (0a.4 8);
 - replaced, deliberately, in `SRC/blueprint/tests/test_round_f_guidance.py::test_skill_sizes_service_budgets_and_reads_the_send_reply`:
   `offer them the number the plan's warning gives` becomes `the block's last line asks whether to use the plan's number: if they take it, set
-  \`needs.budget_runs\` and any service \`budget\` to it and propose again`. The docstring names D-E7-3. `grep -rn "offer them"` over
-  `src/hirearchy/*/tests tests` finds no other pin.
+  any service \`budget\` to it, raise \`needs.budget_runs\` to it if lower, and propose again`. The docstring names D-E7-3. `grep -rn "offer them"`
+  over `src/hirearchy/*/tests tests` finds no other pin.
 
 ## 10. Error handling
 
@@ -690,6 +797,7 @@ Needles (`flat()`: lower-cased, whitespace collapsed):
 | `progress`, the deliverable checks | as today | as today | as today | as today |
 | `still_open` | none: pure | n/a | a bool | none |
 | `open_task_traces`, `context_trace`, `_open_trace` | a mailbox cannot be read | as today | as today (the stamper's and `work_tier`'s existing handling; `delegate` sends without a tier on `OrgError`/`OSError`, 0a.4 7.2) | as today |
+| `SoleUpstreamTask.upstream` | a mailbox cannot be read | as today | propagates to the prompt builder as today (it read the same two boxes) | as today |
 | `prompt_sections` | a mailbox cannot be read | as today | propagates as `TaskQuery.open_tasks` did (it read the same boxes) | as today |
 | `round_offer`, `_budget_question` | none: pure over computed budgets | n/a | lines (possibly none) | none |
 | the replays | an evidence file is missing | fatal for the test | `pytest.fail` naming it, never a skip | test output |
@@ -713,11 +821,12 @@ Needles (`flat()`: lower-cased, whitespace collapsed):
 |---|---|---|---|
 | I-A1 | No default hand-down raises `user_approved`. With `left >= 1` it equals the approval (0a.3 I4); with nothing left its 1 run is left out, whether held or charged | `reflection._cases._spend` (the only computation of the ceiling) | D-E7-2 A2; replaces 0a.4 I6's "with nothing left, the floor raises it by 1" |
 | I-A2 | A grant (a note root sends) always counts its own amount in the ceiling | `reflection._cases._spend` | the user's yes reaches the files only as root's hand-down (review check 3) |
-| I-A3 | After a `TOPUP` and the user's yes, root's grant of `{grant}` raises `user_approved` by exactly `{ask}` (D case included: grant = ask) | `reflection._steps._top_up` with `_cases._spend` | the product's approval equals the user's yes; 0a.3 4.5 and 0a.4 5.3 |
+| I-A3 | After a `TOPUP` and the user's yes, root's grant of `{grant}` raises `user_approved` by exactly `{ask}` (D case included: grant = ask), when no result returns runs and no run beyond the held ones is charged between the `TOPUP` and the grant. Otherwise the raise is the grant term `max(0, committed at the grant - out) + grant` taken through `max` with the ceiling, which can differ from `{ask}` | `reflection._steps._top_up` with `_cases._spend` | the product's approval equals the user's yes; 0a.3 4.5 and 0a.4 5.3 |
 | I-A4 | One definition of D: `Case.unapproved_reworks`, computed in `_spend`; `_top_up` reads it and never recomputes it | `reflection` | A1 and A2 must agree on every rework |
 | I-A5 | `user_spend`, `user_cost`, `user_committed`, `user_held`, `case_spend` and an agent client's case total are unchanged by A | `reflection.api` | 0b reuses them (D-E5-6) |
+| I-A6 | Every reply to a D names its run as beyond the user's approval: `DEFAULT_RUN` in a `TOPUP`, `DEFAULT_RUN_HELD` after `HELD` | `reflection._steps._top_up` | A1: the user hears of the run whether or not something is asked |
 | I-C1 | Only a human-tier verdict, or the user's own rework of the task, settles a result's client items; `delivered_unrated` and `no feedback yet` keep any tier | `reflection.api` (`open_client_items`, `rated`) | 0a.1 DR-17, 0a.2 6.3, D19 |
-| I-F1 | A received task is the assignee's open work iff `mail.still_open`; the trace stamper's `open-task` rule, its `services` mirror and the owner's prompt sections read it, and the budget policy's reading (`open_tasks` plus `_blocked_not_moved_past`) agrees with it | `mail` (it derives task state from the messages) | one rule for one state |
+| I-F1 | A received task is the assignee's open work iff `mail.still_open`. Four readers read it: the trace stamper's `open-task` rule, its `services` mirror, the owner's prompt sections, and the batch's upstream hint (over what the assignee had received before the delegation). The budget policy's reading (`open_tasks` plus `_blocked_not_moved_past`) agrees with it. The readers listed in 6.2 under "What does not change" keep "no result or `blocked`" on purpose, each with its reason | `mail` (it derives task state from the messages) | one rule for one state |
 | I-F2 | No package writes a result, a state or any file for a task it does not own: the latest result is the assignee's alone | `dispatch` (reporter) and `mail` (R9), unchanged | single writer |
 | I-B1 | The plan's budget line appears iff the `budget-tight` warning's client-round form holds for a service and the plan has no error; one predicate feeds both | `blueprint._budgeting.round_offer` | the line must never contradict the warning |
 | I-B2 | Every blueprint validates with the same issues as at `3a0bf49` | `blueprint` | no new refusal (review check 2) |
@@ -730,7 +839,9 @@ Needles (`flat()`: lower-cased, whitespace collapsed):
 Each of these must stay byte-identical, and a commit stops until a diff is explained:
 - `TESTS/golden/expected/` (plans, MCP surfaces, CLI, prompts, messages, events, kiro, charters, files, services);
 - `SRC/blueprint/tests/golden/second_half.json` and `validate_corpus.json`;
+- `SRC/cli/tests/expected/` (`plan.txt`, `plan_with_errors.txt`, `plan_without_org.txt`: plan texts, none with the client-round warning);
 - `SRC/progress/tests/expected/`, `SRC/reflection/tests/expected/` and `SRC/observability/tests/expected/`;
+- `SRC/app/tests/snapshots/prompts/` (the `link_to_a_blocked_task` scenario reports the block after the delegation: a candidate today and at 0a.5);
 - `TESTS/testkit/expected_dash/`.
 
 The reasons:
@@ -753,32 +864,65 @@ in the commit body.
   pin whose chain holds a human rework of 1 run sent with nothing left changes deliberately, and its docstring names D-E7-2 A2:
   - `SRC/reflection/tests/test_cases.py::test_limit_1_with_nothing_left_a_rework_of_one_run_raises_the_approval_by_one` becomes
     `test_a2_with_nothing_left_a_rework_of_one_run_raises_no_approval` (13 becomes 12);
-  - `TESTS/e2e/test_org_growth_0a4.py::test_b1_...` (17 becomes 16), `::test_b2_9a5b_...` (5 becomes 4) and `::test_b2_just_before_9a5b_...`
-    (6 becomes 5), each with 4.7's reason.
+  - `TESTS/e2e/test_org_growth_0a4.py::test_b1_...` (17 becomes 16; it gains the `service_reports.case_total(bc02)` pin of 4.7, with
+    `OVER_CONTRACT`), `::test_b2_9a5b_...` (5 becomes 4) and `::test_b2_just_before_9a5b_...` (6 becomes 5), each with 4.7's reason.
 
   Sentence pins (`grep -rnE "exceeds|more than the" src/hirearchy/*/tests tests`) are checked the same way. The MCP nothing-left test asserts its
-  case total as a substring, and that substring still holds. The coder re-runs both greps at A2 and lists every kept site in the commit body.
-- **Rule A1 (`TOPUP` pins).** Sites: `grep -rn "Ask the user now\|Nothing else is left\|This rework has" src tests`. A pin whose rework is a 1-run
-  rework sent with nothing left takes the D form (4.5, `ask` and `grant` per 4.4):
-  - `SRC/mcp_server/tests/test_service_tools.py::test_a_user_rework_with_nothing_left_is_sent_with_one_run_and_the_reply_asks_for_the_rest`
-    (ask 4 becomes 5, grant 5, `DEFAULT_RUN`);
-  - `SRC/cli/tests/test_service_commands.py::test_a_cli_rework_with_nothing_left_is_sent_with_one_run_and_prints_the_top_up` (the same);
-  - `SRC/reflection/tests/test_steps.py::test_a_user_rework_of_one_run_asks_for_the_four_more_it_needs` (renamed `..._the_five_...`: ask 5,
-    grant 5);
-  - `test_steps.py::test_held_runs_that_cover_part_of_the_round_are_in_the_left_part_and_reduce_the_ask_and_the_grant` (contract 3, 1 used: left 0,
-    so a D; ask 3, grant 3, `left` = `HELD` + `DEFAULT_RUN`);
-  - `SRC/app/tests/test_wire_cli.py::test_the_request_command_prints_the_step_of_the_runtime` (contract 4, none used: left 0, so a D; held 4,
-    need 5, so ask 1, grant 1). Its second assertion becomes the D text with `HELD` in `{left}`, and its docstring names D-E7-2 A1.
+  case total as a substring, and that substring still holds. The MCP HELD test asserts `endswith(HELD)`, which still holds at the A2 commit (A1
+  then pins its whole reply). The coder re-runs both greps at A2 and lists every kept site in the commit body.
+- **Rule A1 (`TOPUP` and `HELD` pins).** Sites: `grep -rnE "TOPUP|TOP_UP|NOTHING_LEFT|HELD|still holds|rework_step\(" src/hirearchy/*/tests
+  tests`. In `reflection/tests/test_steps.py` the texts are local constants (`TOPUP`, `NOTHING_LEFT`, `HELD`, lines 202-209), so the grep is over
+  their uses, not only the texts. Each test whose rework is a 1-run human rework sent with nothing left (a D) changes deliberately: its new
+  expectation is computed with 4.4, and its docstring names D-E7-2 A1. The A1 commit body lists every changed `rework_step` expectation with its
+  old and new value. The D form of `TOPUP` (ask and grant include the run, `{left}` holds `DEFAULT_RUN`):
+  1. `SRC/reflection/tests/test_steps.py::test_a_user_rework_of_one_run_asks_for_the_four_more_it_needs` becomes
+     `test_a_user_rework_of_one_run_asks_for_the_five_more_it_needs` (contract 10, 8 used, 0 back, done: ask 4 becomes 5, grant 5);
+  2. `test_steps.py::test_held_runs_that_cover_part_of_the_round_are_in_the_left_part_and_reduce_the_ask_and_the_grant` (contract 3, 1 used, open:
+     left 0, so a D; ask 2 becomes 3, grant 3, `{left}` = `HELD` (2) + " " + `DEFAULT_RUN`; its second assertion's numbers too);
+  3. `test_steps.py::test_a_closed_revised_task_holds_nothing_and_keeps_todays_top_up` becomes
+     `test_a_closed_revised_task_holds_nothing_and_asks_for_the_default_run_too` (contract 10, 2 used, `done` with 0 back: committed 10, left 0;
+     ask 4 becomes 5, grant 5);
+  4. `test_steps.py::test_an_open_request_whose_team_holds_nothing_keeps_todays_top_up` becomes
+     `test_an_open_request_whose_team_holds_nothing_asks_for_the_default_run_too` (contract 3, all 3 used, open: left 0, held 0; ask 4 becomes 5,
+     grant 5);
+  5. `test_steps.py::test_an_owner_with_no_agent_below_needs_a_round_of_one_so_no_top_up_is_asked` becomes
+     `test_an_owner_with_no_agent_below_asks_for_its_own_default_run` (`ops-brief`, 10 used, 0 back: left 0, `need` 1; `""` becomes
+     `TOPUP(budget=1, need=1, owner="ops", left=DEFAULT_RUN, ask=1, grant=1)`). This rename is 4.9's need-1 test: no second test is written;
+  6. `SRC/mcp_server/tests/test_service_tools.py::test_a_user_rework_with_nothing_left_is_sent_with_one_run_and_the_reply_asks_for_the_rest`
+     (ask 4 becomes 5, grant 5, `DEFAULT_RUN`; its local `TOP_UP` takes `{left}`);
+  7. `SRC/cli/tests/test_service_commands.py::test_a_cli_rework_with_nothing_left_is_sent_with_one_run_and_prints_the_top_up` (the same);
+  8. `SRC/app/tests/test_wire_cli.py::test_the_request_command_prints_the_step_of_the_runtime` (contract 4, none used: left 0, so a D; held 4,
+     need 5, so ask 0 becomes 1, grant 1). Its `HELD` assertion becomes the whole D text, with `HELD` (4) + " " + `DEFAULT_RUN` in `{left}`, and
+     its two negative assertions (`"This rework has"`, `"Ask the user now"` not in the output) go, with the reason in its docstring.
 
-  Unchanged, checked: `test_steps.py`'s HELD-only tests (held 8 covers the round), the spare test (left 3), the CLI fake pin
-  (`test_commands_services.py`, a fake step's text), and `test_service_tools.py`'s HELD test (its reply ends with `HELD`; its case total gains
-  `OVER_CONTRACT` before it, and the test's assertions still hold).
+  `HELD` followed by `DEFAULT_RUN_HELD` (a D whose team holds the round):
+  9. `test_steps.py::test_an_open_request_whose_team_holds_the_rest_of_the_round_says_so_and_asks_nothing` (contract 10, 2 used, open; held 8):
+     `HELD` (8) + " " + `DEFAULT_RUN_HELD`;
+  10. `test_steps.py::test_a_blocked_request_is_open_too` (the same numbers, `blocked`): the same;
+  11. `SRC/mcp_server/tests/test_service_tools.py::test_the_reply_to_a_user_rework_of_a_blocked_request_with_unspent_runs_says_the_team_holds_them`:
+      the reply ends with `"\ncase total: 2 runs used of 11 handed down (contract: 10 per request). This case now exceeds the per-request budget of
+      10: tell the user.\n"` + `HELD` (8) + " " + `DEFAULT_RUN_HELD`; `"Ask the user now" not in reply and "Nothing else is left" not in reply`
+      stay;
+  12. `SRC/cli/tests/test_service_commands.py::test_a_cli_rework_of_a_blocked_request_with_unspent_runs_prints_that_the_team_holds_them`:
+      `step == HELD (8) + " " + DEFAULT_RUN_HELD` (still one line);
+  13. `TESTS/e2e/test_org_growth_0a4.py::test_b1_bc02_...`: `rework_step(bc02)` is `HELD` (11) + " " + `DEFAULT_RUN_HELD` (4.7).
+
+  Unchanged, checked against 4.4: in `test_steps.py`, `test_a_user_rework_below_the_round_with_nothing_spare_asks_for_the_rest` (budget 2),
+  `test_a_user_rework_with_some_runs_spare_says_how_many_are_left` (contract 3, 1 used, 2 back: left 2), `..._at_the_round_or_covered_by_spare_runs_...`
+  (budgets 5 and 2), `test_held_runs_and_spare_runs_together_use_the_some_left_wording` (left 3), `..._with_spare_runs_covering_the_round_...`
+  (left 28), `test_rework_step_is_empty_for_a_human_rework_or_a_result_without_questions` (10 runs: the world's `FixedAllowance` hands the
+  contract's), the agent-client and retired-service tests; `test_contract_service_steps.py` (no case); MCP's
+  `test_the_reply_to_a_user_rework_below_a_round_...` (left 2); the CLI fake pin (`test_commands_services.py`, a fake step's text); 0a.4's B-2
+  step at 9a5b (`""`). A pin of a rework that is not a D but follows a D in the same chain would change through `spare` (4.4); none exists at
+  `3a0bf49`.
 - **Rule C.** Sites: `grep -rnE "relayed" src/hirearchy/{reflection,progress}/tests tests/e2e` near `questions_open`, `open_client_items`, `withheld`,
   `questions for the client`. A test whose questions are settled only by a relayed verdict changes to keep them open, and its docstring names
   D-E7-2 C. At `3a0bf49` none is known: the E4-E6 replays (A-1 to A-5, F-E4-4) have no relayed verdict before their cut on the flagged task.
 - **Rule F.** `SRC/traces/tests`, `SRC/services/tests/test_service_rework_context.py`: every existing `blocked` test has no verdict or rework after
-  the block, so it stays open and stays green. `SRC/reflection/tests/test_prompt_sections.py` and the contract suite of `ServicePromptSections` build
-  the sections through `reflection.testing`, whose constructor call follows 7.2.
+  the block, so it stays open and stays green. `SRC/prompts/tests/test_sole_upstream_task.py`, `test_batch_renderer.py`, `test_final_word.py`,
+  `test_contract.py` and the prompt snapshots: their blocked tasks have no verdict or rework before the delegation, so their candidates are
+  unchanged. `SRC/reflection/tests/test_prompt_sections.py` and the contract suite of `ServicePromptSections` build the sections through
+  `reflection.testing`, whose constructor call follows 7.2.
 - **Rule S.** The one replaced needle of 9.
 - No assertion is weakened. Each changed expectation names the decision it follows in its docstring.
 
@@ -802,20 +946,20 @@ runs once, in the final validation, after the rebase onto the current `main`. Th
 |---|---|---|
 | T0 | `test(testkit): the E7 replay kit` (`TESTS/testkit/e7_replay.py`: `EV7 = REPO / "studies" / "E7-org-growth-0a4-recheck" / "evidence"`, `SERVICE_NAME = "weekly-meeting-memo"`, `materialize` = `e5_replay.materialize(..., evidence=EV7, service=SERVICE_NAME)`; `TESTS/meta/test_e7_replay_kit.py`: s2 at c671's cut holds 3ca4 and c671 in root's `sent/`, d5c7 in root's `read/`, the 9 run logs (lead 5, writer 2, reviewer 2) and the contract with `budget: 12`; a missing evidence file fails) | `tests/meta/test_e7_replay_kit.py tests/meta/test_e6_replay_kit.py tests/meta/test_e5_replay_kit.py` |
 | A2 | `fix(reflection): the default's 1-run hand-down with nothing left is no approval of the user's` (4.3; Rule A2; replay #24 and the grant's cut; the 0a.4 B-1 and B-2 changes) | `src/hirearchy/reflection/tests src/hirearchy/progress/tests src/hirearchy/mcp_server/tests tests/e2e/test_org_growth_0a5.py tests/e2e/test_org_growth_0a4.py tests/e2e/test_org_growth_0a3.py` |
-| A1 | `fix(reflection,services): a top-up after the 1-run default asks for that run too` (4.4, 4.5; Rule A1; replay #20) | `src/hirearchy/reflection/tests src/hirearchy/services/tests src/hirearchy/mcp_server/tests src/hirearchy/cli/tests src/hirearchy/app/tests/test_wire_cli.py tests/e2e/test_org_growth_0a5.py tests/e2e/test_org_growth_0a4.py` |
+| A1 | `fix(reflection,services): a reply to the 1-run default with nothing left names that run and asks for it too` (4.4, 4.5; Rule A1 items 1-13, each listed in the commit body; replay #20) | `src/hirearchy/reflection/tests src/hirearchy/services/tests src/hirearchy/mcp_server/tests src/hirearchy/cli/tests src/hirearchy/app/tests/test_wire_cli.py tests/e2e/test_org_growth_0a5.py tests/e2e/test_org_growth_0a4.py` |
 | C | `fix(reflection): only the user's verdict settles a result's questions for the client` (5; replay 6920) | `src/hirearchy/reflection/tests src/hirearchy/progress/tests tests/e2e/test_org_growth_0a5.py tests/e2e/test_org_growth_0a4.py tests/e2e/test_org_growth_0a2.py tests/e2e/test_org_growth_0a.py` |
-| F7 | `fix(mail,traces,services): a blocked task its assigner moved past is no longer open work` (6; replay d9bc) | `src/hirearchy/mail/tests src/hirearchy/traces/tests src/hirearchy/services/tests src/hirearchy/budget/tests tests/e2e/test_org_growth_0a5.py tests/e2e/test_org_growth_0a4.py tests/e2e/test_org_growth_0a3.py` |
+| F7 | `fix(mail,traces,services,prompts): a blocked task its assigner moved past is no longer open work` (6; replay d9bc, both tables; the `app/_facade_traces.py` docstring) | `src/hirearchy/mail/tests src/hirearchy/traces/tests src/hirearchy/services/tests src/hirearchy/budget/tests src/hirearchy/prompts/tests src/hirearchy/app/tests tests/e2e/test_org_growth_0a5.py tests/e2e/test_org_growth_0a4.py tests/e2e/test_org_growth_0a3.py` |
 | F8 | `fix(reflection,app): a blocked request the owner may still report keeps its playbook and regression list` (7; replay s1) | `src/hirearchy/reflection/tests src/hirearchy/prompts/tests src/hirearchy/app/tests tests/e2e/test_org_growth_0a5.py` |
 | B1 | `feat(blueprint): the plan asks whether to use the plan's number when a request's budget covers no client round` (8; the new golden) | `src/hirearchy/blueprint/tests src/hirearchy/mcp_server/tests/test_blueprint_tools.py src/hirearchy/mcp_server/tests/test_tools_blueprint.py` |
 | B2 | `docs(skill): the plan's budget question and what to do with the answer` (9, line 39) | `src/hirearchy/skill/tests src/hirearchy/blueprint/tests/test_round_f_guidance.py src/hirearchy/blueprint/tests/test_round_g_assistant.py src/hirearchy/mcp_server/tests/test_reclaim_tool.py` |
 | E1 | `docs: README and ARCHITECTURE for phase 0a.5` (README `## Org growth: phase 0a.5` after 0a.4's, from section 1's table, nothing added to `## Services and reflection`; ARCHITECTURE 3.10 `still_open`, 3.14 the open-task rule, 3.22 `Case.unapproved_reworks` and `rated(..., human=)`, 3.32 the plan's budget question) | `src/hirearchy/skill/tests tests/architecture src/hirearchy/blueprint/tests/test_round_g_assistant.py src/hirearchy/blueprint/tests/test_round_f_guidance.py tests/e2e/test_round7.py` |
 
 FEATs, a proposal for the plan: A (T0, A2, A1); C; F (F7, F8, in that order: F8 reads `still_open`); B (B1, B2); docs (E1). Sizes (production
-lines, estimates): A about 30, C about 5, F about 20, B about 30, docs about 15.
+lines, estimates): A about 35, C about 5, F about 25, B about 30, docs about 15.
 
 Testability:
 - **unit:** the pure functions (`still_open`, `round_offer`, `rated`, `open_client_items`); `_spend` over fs worlds with run logs and results;
-  `_top_up` over the reflection worlds; the sections; the plan block;
+  `_top_up` over the reflection worlds; `SoleUpstreamTask` over a memory mailbox; the sections; the plan block;
 - **contract suites:** `ServiceSteps`, `TraceLookup`, `ServicePromptSections`, `CaseAllowance`, over every implementation;
 - **end to end:** the E7 replays (4.7, 5.3, 6.4, 7.3) and the changed E6 replays;
 - **golden:** one new plan;
@@ -835,8 +979,12 @@ Testability:
 4. **A2 changes three replays of 0a.4 and one test of 0a.3's limit 1** (4.7, 14 Rule A2). They pinned the growth that A2 removes.
 5. **F-E7-7 closes the task by `mail.moved_past`, not only by the user's human-tier accept.** The accept is one of its shapes. It is the one rule
    for "the assigner moved past this blocked task" that the budget already reads, and the stamper and the budget should not disagree on the same
-   task. "Closed" applies to the assignee's open work only (the stamper, its mirror, the prompt sections). The record, `Case.state`,
-   `Case.open_tasks`, progress and the lead's blocked-task list are unchanged, for the single writer and for 0a.4 B (6.2).
+   task. "Closed" applies to the assignee's open work only (the stamper, its mirror, the upstream hint, the prompt sections). The record,
+   `Case.state`, `Case.open_tasks`, progress and the lead's blocked-task list are unchanged, for the single writer and for 0a.4 B (6.2). The
+   broader rule also closes a blocked task on a verdict of its sender, of any tier and a relayed one included, on **another** task of its chain
+   after the block. There the stamper, the upstream hint and the owner's prompt sections drop the task while the lead's `# Your state` still
+   says it may re-report it, so a re-report prompt in that shape has no `# Playbook` or `# Regression list` unless another request of the service
+   is open (limit 9). E7 has no such shape: dd46 replies to d9bc itself.
 6. **F-E7-8 changes `OwnerPromptSections`'s collaborator** from `TaskQuery` to `MailboxReader`. `TaskQuery` has no view of "blocked and not
    moved past", and adding a Protocol method would ripple into its contract suite, two fakes (`daemon.testing.FixedTasks`,
    `stalls.testing.CountingTasks`) and the facade.
@@ -846,6 +994,12 @@ Testability:
 9. **B reads "the plan's own estimate number" as the warning's number, estimate plus round** (16, not 11). The line says it "covers one round",
    and the decision says "up to about 4 more runs per request".
 10. **B's plan goldens:** 0 regenerated and 1 new (8.5), where the brief expected regenerations. No existing golden has the warning.
+11. **A1 adds a second sentence for the `HELD` case** (`DEFAULT_RUN_HELD`, 4.4). The decision says `TOPUP` names the run. When the team holds
+    the round there is no `TOPUP`, but the run is still beyond the approval and the case total can say "tell the user" in the same reply. The
+    sentence keeps the decision's naming in that case too, and asks for nothing, as D-E6-2 requires.
+12. **F-E7-7 changes the batch's upstream hint too** (`SoleUpstreamTask`, read as of the delegation's send). It is a reader of the same state,
+    and the decision's "closes the rework task" holds only if every reader of the assignee's open work agrees. In E7 it adds a hint to 12 of 47
+    delegation results and removes none (6.4).
 
 ## 17. Declared limits, out of scope, backlog and risks
 
@@ -862,19 +1016,27 @@ Declared limits (each pinned by a test where one can show it):
    higher and a later rework's `left` reads 1 lower (conservative, like 0a.4 limits 5 and 6). If the team spends it, `OVER_APPROVED` fires, and it
    is true.
 4. A grant root sends without asking (F-E7-5) still raises the approval (0b OQ-1).
-5. While a D is open, its run counts in `user_cost`, so the case total says the case exceeds the approval by that run: E7 s2 #20 and E6 s3 #19. With
-   A1's ask in the same reply that is the intended message. When the team holds the whole round without that run, the reply is `HELD` plus that
-   sentence, and root tells the user that the default's run is beyond their approval.
+5. While a D is open, its run counts in `user_cost` when the runs held for the case are task budgets (`user_spend` counts unused task budgets and
+   leaves grants out until charged). The case total then prints `OVER_CONTRACT` or `OVER_APPROVED` in the reply to the D's send: E7 s2 #20,
+   E6 s3 #19, and the MCP HELD test. The step in the same reply gives that "tell the user" its content: `DEFAULT_RUN` with the ask in a `TOPUP`,
+   or `DEFAULT_RUN_HELD` after `HELD` (I-A6). When the held runs are grants, the case total can print nothing while the step still names the run.
+   The sentence stops once the case is `done` or `failed` and the team did not spend the run, because `user_spend` then counts charged runs only.
 6. C: a human rework that revises an earlier task of the chain does not settle a later relayed task's questions. 066f revises 5e3e, so 6920 stays
    withheld until the user's verdict at its step or later (#47). The settled rule (0a.1 DR-17) names a human rework of the task itself.
 7. F-E7-7: an accepted `blocked` root task stays `blocked` in `progress`, in `Case.state` and in `summarize`'s open count, and progress lists it
    always. Only its assignee can change its record.
 8. F-E7-7: `_tier` still reads "not answered finally" (a `blocked` result is not final). A moved-past `blocked` task can give its case's tier when the
    agent acts in that case again with no newer open task there.
-9. F-E7-8: the lead's `# Your state` keeps listing every `blocked` task with "you may re-report it", moved past or not.
+9. F-E7-8: the lead's `# Your state` keeps listing every `blocked` task with "you may re-report it", moved past or not. When the task was moved past
+   by a verdict of its sender on another task of its chain (a relayed one included, Deviation 5), the prompt sections drop its service's
+   `# Playbook` and `# Regression list` while that line still invites a re-report, unless another request of the service is open. The F-E7-8
+   symptom can then come back in that shape. E7 has none.
 10. B acts through the assistant showing the block exactly (SKILL.md line 48). E7 s1 dropped the warning block once (F-E7-6). A user's "approve"
     with no answer to the question keeps their number.
 11. B: a yes costs one more plan turn (propose again, a new `plan_id`, approve), as the decision says ("one plan-time question").
+12. F-E7-7, the upstream hint: a delegation sent after its assigner moved past the agent's only blocked task, with no other open task, now gets no
+    hint where today it got "which you already reported blocked. That is not final: you may `report` it again". E7 has no such delegation (0 of
+    47 hints lost).
 
 Backlog:
 - progress's listing of a `blocked` root task its client moved past (age it out like a finished task), if 0b's view needs it;
@@ -884,10 +1046,10 @@ Backlog:
 - splitting `budget-tight` into two codes, if a reader other than the plan needs the client-round form.
 
 Risks:
-- The new overspend sentence at a D's send (limit 5) is new text in a reply root already reads. Its wording is today's `OVER_CONTRACT` or
-  `OVER_APPROVED`.
-- A1 asks the user for one more run than 0a.4 did, in every D case (E6: 1 case in 3 streams, bc02, since 9a5b had 5 left by 0a.4's attribution;
-  E7: 1 in 3, c671). The 2 instead of 1 is what the user was in fact over.
+- The overspend sentence at a D's send (limit 5) is new in a reply root already reads. Its wording is today's `OVER_CONTRACT` or `OVER_APPROVED`,
+  and the step's new sentence in the same reply says why.
+- A1 asks the user for one more run than 0a.4 did in every D case whose team does not hold the round (E7: c671, in 1 of 3 streams). The 2
+  instead of 1 is what the user was in fact over. In E6 the one D, bc02, had its round held (11 runs), so its reply asks nothing and names the run.
 - B adds one line to every plan whose cap is below the round (E7: 3 of 3), and a yes adds a turn. It is the owner's decision (D-E7-3), and the
   owner may override it.
 
@@ -910,17 +1072,25 @@ Risks:
    - E6 s3 prints `OVER_CONTRACT` at #19 (17 of 16, bc02 open).
    - E7's S17-4a ("0 printed") becomes 1 due and printed in s2 on a replay.
 4. **`CaseAllowance.left` after a D:** 1 lower. E6 s3 just before 9a5b: 6 becomes 5.
-5. **`TOPUP` (A1).** E7 s2 #20: ask 1 becomes **2**, grant 1 becomes **2**, with the new `DEFAULT_RUN` sentence. 0b reads M-A-8 and M-A-9 against
-   that `{ask}` and `{grant}`. In a D case the team then holds one run beyond the round (limit 3).
+5. **`TOPUP` and `HELD` (A1).**
+   - E7 s2 #20: ask 1 becomes **2**, grant 1 becomes **2**, with the new `DEFAULT_RUN` sentence. 0b reads M-A-8 and M-A-9 against that `{ask}`
+     and `{grant}`. In a D case the team then holds one run beyond the round (limit 3).
+   - E6 s3 #19 (bc02): still no ask, and `HELD` (11) is now followed by `DEFAULT_RUN_HELD`. The whole reply is in 4.7. A premise count over
+     HELD/TOPUP texts (E7-decision: "each HELD/TOPUP premise was true") must read the new sentence's premise too: "nothing was left ... when
+     this rework was sent".
 6. **Questions open and withheld paths (C).** A result whose case has only relayed verdicts at or after its step stays flagged. E7 s1 6920 is
    flagged from #39 to #47, where it was settled at #39. 0b's counts that read `questions_open` or `open_client_items` move with it. `rated` without
    `human` and `delivered_unrated` are unchanged, and gate 5 item 12's rule (0b's "without a verdict" never reads `reflection.rated`) still holds.
-7. **Open work and trace stamps (F-E7-7).**
+7. **Open work, trace stamps and the upstream hint (F-E7-7).**
    - `mail.still_open(d9bc, ...)` is False after dd46. 0b's D4 may read it as "closed by the client" (gate 5 items 6 and 14).
    - `Case.state` is still `blocked` for s3 memo 1, so D4's input from `reflection` is unchanged. The choice of reading is 0b's.
    - Stamps of new messages change: in an E7-s3-shaped stream, 8 of 10 `ambiguous` stamps become `open-task` or `link`. E7's recorded files keep
      their stamps.
    - The tier is unchanged in E7 (a443 and a74a carry none).
+   - The batch's upstream hint is added to 12 of E7's 47 delegation results (s1 2, s2 2, s3 8) and removed from none (6.4). Lead prompt bytes
+     (S17-6) grow by one hint line in those runs.
+   - The broader `moved_past` rule (Deviation 5) also closes a blocked task on its sender's relayed verdict on another task of its chain. 0b's
+     D4 must not read `still_open` as "the user accepted it"; only a human-tier accept replying to the task says that.
 8. **Lead prompts (F-E7-8).** While a `blocked` service request the client has not moved past is the lead's only open work, its prompts carry
    `# Playbook` and `# Regression list`. s1 becomes 16 of 16 (E7: 14 of 16). Lead prompt bytes (S17-6) grow in such runs.
 9. **The PLAN FOR YOU block (B).** It gains a last line wherever the client-round `budget-tight` warning holds: E7's three plans (and E5's
@@ -931,7 +1101,31 @@ Risks:
 11. **Replays.**
     - `TESTS/testkit/e7_replay.py` exists (T0). FEAT-013 may reuse it for its manifests; its manifests stay 0b's.
     - `TESTS/e2e/test_org_growth_0a5.py` holds the E7 replays of 4.7, 5.3, 6.4 and 7.3.
-    - 0a.4's B-1 and B-2 expectations are 16, 4 and 5 (4.7).
+    - 0a.4's B-1 and B-2 expectations are 16, 4 and 5, and B-1's step is `HELD` + `DEFAULT_RUN_HELD` with its case total pinned (4.7).
 12. **Unchanged, for 0b's re-pinning:** `user_spend`, `user_cost`'s definition, `user_committed`, `user_held`, `case_spend`, `Case.open_tasks`,
-    `Case.state`, `delivered_unrated`, `regressions`, every `HEAD`/`HEAD_SPLIT` text, `RELAYED_*`, `HELD`, the `budget-tight` text, and the
-    template budgets.
+    `Case.state`, `delivered_unrated`, `regressions`, every `HEAD`/`HEAD_SPLIT` text, `RELAYED_*`, the `HELD` and `TOPUP` templates (A1 adds
+    sentences beside them), the three upstream hint texts, the `budget-tight` text, and the template budgets.
+
+## 19. Responses to design review 1
+
+Review 1 (`.agents/tasks/design-review.md`, at `ed9da9b9`) passed the four mandatory checks and asked for changes on 3 MEDIUM and 9 NIT findings.
+Each one is addressed below; none is backlogged or ignored.
+
+| # | Severity | Finding | Response | Where |
+|---|---|---|---|---|
+| 1 | MEDIUM | A D whose team holds the round got `HELD` alone, while the case total said "exceeds ... tell the user" | **Addressed, option (a).** A new pinned sentence, `DEFAULT_RUN_HELD`, follows `HELD` when the rework is a D and `ask <= 0`. It tells root to ask for nothing and to tell the user that this 1 run is beyond their approval. It is worded without "the case total exceeds", because with held grants the total can print nothing (limit 5). Option (b) was rejected: root would tell the user "this case exceeds the budget" with 5 of 16 runs used and no reason. The HELD-only pins that change are listed (Rule A1 items 9-13, including the CLI twin of the MCP HELD test, which the review did not name). The whole E6 s3 #19 reply is pinned in B-1. Limit 5 and the `_default_budget` comment are rewritten to match | 4.4, 4.5, 4.7, 4.8, 12 (I-A6), 14 Rule A1, 16 (Deviation 11), 17 (limit 5), 18 item 5 |
+| 2 | MEDIUM | Three D-shaped `test_steps.py` pins were not listed, and the grep could not find them | **Addressed.** The three tests are listed with their new names and values (Rule A1 items 3, 4, 5). 4.9's duplicate need-1 test is dropped: it is item 5's rename. The grep is now `grep -rnE "TOPUP\|TOP_UP\|NOTHING_LEFT\|HELD\|still holds\|rework_step\("` over the tests, which finds uses of the local constants. The A1 commit body lists every changed `rework_step` expectation | 4.9, 14 Rule A1, 15 (A1 row) |
+| 3 | MEDIUM | `prompts/_upstream.py:SoleUpstreamTask.upstream` still read "no result or blocked" | **Addressed, option (a).** The candidate rule reads `still_open` over what the agent had received before the delegation, plus today's "no result" and "reported after the delegation" branches. Zero and empty cases are in 6.5's second table, tests in 6.6, and the replay asserts that 9838 resolves to a443 and that e4c7's rendering names it (6.4). Over E7 the hint is added to 12 of 47 delegation results and removed from none, measured with a read-only script. `src/hirearchy/prompts/tests` and `src/hirearchy/app/tests` are in F7's TARGETS. I-F1 names the four readers and points to the list of readers that keep "no result or `blocked`" on purpose, which now also names the reporter's re-report rule and the health analyzer | 3, 6.1-6.6, 12 (I-F1), 15 (F7 row), 16 (Deviation 12), 17 (limit 12), 18 item 7 |
+| 4 | NIT | "Not a D: today's text byte for byte" is false after an earlier D | **Addressed.** The claim now holds only with no earlier D in the case. After an earlier D, `spare` reads the lower approval (B-2: 5 becomes 4). Rule A1 says that a non-D pin after a D in the same chain would change too, and that none exists at `3a0bf49` | 4.4, 4.8, 14 Rule A1 |
+| 5 | NIT | The need-1 D row holds only with nothing held | **Addressed.** The row now says "with nothing held: ask 1, grant 1; with 1 or more runs held: as the `held >= need` row". A new test pins the held case | 4.8, 4.9 |
+| 6 | NIT | I-A3's "exactly `{ask}`" needs its condition | **Addressed.** I-A3 and 4.1 state the condition: no result returns runs and no run beyond the held ones is charged between the `TOPUP` and the grant | 4.1, 12 |
+| 7 | NIT | The broader `moved_past` rule closes a blocked task on its sender's verdict on another task of its chain | **Addressed.** The case is named in 6.2, in Deviation 5 and in limit 9, with the F-E7-8 consequence. 6.5 has the row and `test_still_open.py` the test ("blocked, then the sender's relayed verdict on another task of the chain: closed"). Item 7 of 18 tells 0b not to read `still_open` as the user's accept | 6.2, 6.5, 6.6, 16, 17, 18 |
+| 8 | NIT | "Set `needs.budget_runs` ... to it" can lower a higher cap | **Addressed.** Line 39 now says "if they take it, set any service `budget` to it, raise `needs.budget_runs` to it if lower, and propose again", and the replaced needle follows these words. The line count stays 125 | 9 |
+| 9 | NIT | Two stale docstrings were not listed | **Addressed.** `app/_facade_traces.py:open_task_traces` is in 6.3 with its new text, and so is the `UpstreamTasks` Protocol docstring. The `_default_budget` comment is worded to match finding 1 (4.4, 4.6) | 4.4, 4.6, 6.3 |
+| 10 | NIT | Section 13 left out `src/hirearchy/cli/tests/expected/` | **Addressed.** It is in the byte-identical list, and so are the prompt snapshots of `app/tests` | 13 |
+| 11 | NIT | Factual slips | **Addressed.** The ceiling loop is at `_cases.py:62-69`. The spare test has `left` 2. E5's six human reworks are listed (aae2 12, ee21 12, 6c4f 5, 367d 5, c209 3, 57b3 5), none of 1 run | 4.3, 4.7, 14 |
+| 12 | NIT | The last row of 7.4 holds only when no blocked request of the same service is held | **Addressed.** 7.4 splits the row: with a held blocked request not moved past, `# Playbook` (its `reflecting` variant) now comes before the Reflect section. A rejection on the blocked request's own chain moves it past, so that case is as today. 7.5 has the test | 7.4, 7.5 |
+
+The answers keep to the binding scope. No refusal is added: `DEFAULT_RUN_HELD` and the upstream hint are texts. No grant is dropped (I-A2 is
+unchanged). The single writer still holds: the upstream hint is a reader of what the lead and root wrote. No stored state, ledger or runtime
+dependency is added.
