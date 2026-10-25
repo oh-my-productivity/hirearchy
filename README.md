@@ -811,6 +811,27 @@ The batch after study E6 (design: `docs/design/org-growth-phase-0a4.md`); it bui
 - *Smaller fixes in the skill.* Root records the user's keep-as-is as their accept only for a delivered version they kept after seeing it: a "keep it" about one part of it, or before they saw it, is no accept. Root asks the
   spend of a rework in the same message as the question or yes/no item that needs the rework.
 
+## Org growth: phase 0a.5
+
+The batch after study E7 (design: `docs/design/org-growth-phase-0a5.md`); it builds on phase 0a.4 above. Everything stays derived from the mail and the run logs: no ledger, no stored state, no new message field, no new event kind, no new refusal.
+
+- *The default's 1 run with nothing left is no approval of the user's.* A rework a human client asks for without `budget`, while nothing is left of the runs the user approved for the case, is handed the default's 1 run. That run no longer raises the user's
+  approval, and the later terms of the case leave it out of what they count as committed until its result gives it back; grants (`note`s) always count. The reply to `request` then asks the user for that run too (`ask = need - budget - spare - held + 1`) and says `Nothing else was left of the runs the user approved for
+  this case when this rework was sent: its own run is beyond them, and the ask includes it.` When the runs the team holds cover the round without that run, the reply asks nothing and says to tell the user that this 1 run is beyond their approval. With it, the case total prints the overspend sentence
+  in the reply to that send and on every `progress` line of the chain, until a grant covers the run or the case ends without the run spent. Limits: an explicit `budget=1` sent while nothing was left is read as the default; the marker recomputes what was left from today's files, so it can only read lower than what the default saw;
+  a grant root sends without asking still raises the approval.
+- *Only the user's verdict settles a result's questions for the client.* A result's client questions stay open, and its artifact path stays withheld, under a relayed or agent verdict; a verdict the user gave through root (`source="human"`) or the user's own rework of the task settles them.
+  `progress`'s `no feedback yet` and the unrated-delivery note still read any verdict. Limit: a human rework that revises an earlier task of the chain does not settle a later relayed task's questions.
+- *A blocked task its assigner moved past is no longer open work.* One pure rule, `mail.still_open`, says that an agent still owes a report on a task with no result, or with a `blocked` result its assigner has not moved past (the user's accept of what it delivered is such a move). The trace stamper's open-task rule, its mirror in `services`
+  and the batch's upstream hint read it, so a new task of the lead no longer takes the trace of a finished request. Nothing is written: the result stays `blocked`, and so do `Case.state` and the `progress` line. Limits: how a view shows a case the client moved past is for the next phase; a delegation sent after the assigner moved past the agent's only
+  blocked task gets no upstream hint.
+- *A blocked request the owner may still report keeps its playbook and regression list.* The lead's prompt picked "the services it is working on" from the open tasks, which left out a task with a `blocked` result; it now reads `mail.still_open` too, so `# Playbook` and `# Regression list` stay while the client has not moved past
+  the block. Limit: the lead's `# Your state` still lists every blocked task with "you may re-report it", moved past or not.
+- *The plan asks whether to use the plan's number.* When a plan has no error and a service's budget per request covers one pass and one internal rework but not one round of your questions or a rejection (the `budget-tight` warning's client-round form), the PLAN FOR YOU block ends with
+  `Use {N} runs per request (covers one round of your questions or a rejection), or keep {M}?` (N: the estimate plus one client round; M: the service's budget). With more than one service every line names its service (`... for {name} ...`). The line appears only when that warning is among the issues the block is
+  rendered with. The warning's text and every other issue are unchanged, so no plan is newly refused. The skill tells the assistant to show the block exactly and, on a yes, to set that service's `budget` to the number, raise `needs.budget_runs` to it if lower, and propose again. Limit: a yes costs one more plan turn (a new `plan_id`);
+  an `approve` with no answer to the question keeps your number.
+
 ## Security notes
 
 - Everything is local stdio with no network listener. Identity is enforced by the process environment, not by
