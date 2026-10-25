@@ -7,11 +7,16 @@ both (``tests/test_contract_*.py``), so a consumer's unit test may use the memor
 
 ``FixedHealthAnalyzer`` is the stand-in for the analyzer itself: a consumer (``review``, ``dashdata``, ...) that wants to test what it does
 with a report puts the ``AgentHealth`` it needs in, and gets the same guards and the same branch totals as from the real one.
+
+The deliveries the escape counter counts come from a ``SignedDeliveries``. The worlds use ``MailSignedDeliveries``, the rule health had before
+phase 0b kept as a fake (PC-3): it reads messages only, needs no contract and types every escape ``untyped``. ``FixedSignedDeliveries`` answers what
+a test put in, for the counter's own tests (``fixed_signed_world``).
 """
 
 from __future__ import annotations
 
 import itertools
+from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -23,8 +28,9 @@ from ..agents.testing import fs_agents
 from ..budget.testing import FixedBudget
 from ..eligibility import AgentStates
 from ..eligibility.testing import PauseHarness, fs_pauses, memory_pauses
-from ..kernel import ROOT, Clock, Message, OrgError, OrgPaths, aware
+from ..kernel import ROOT, Clock, Message, OrgError, OrgPaths, aware, latest_results, verdict_tier
 from ..kernel.testing import FakeClock
+from ..mail import MailboxReader
 from ..mail.testing import MailHarness, MemoryMailbox, fs_mailbox, memory_mailbox
 from ..runs.testing import RunsHarness, fs_runs, memory_runs
 from ..settings.testing import SettingsHarness, fs_org_settings, memory_org_settings
@@ -32,7 +38,7 @@ from ._analyzer import FileHealthAnalyzer
 from ._branches import branch_totals
 from ._escapes import MailEscapeCounter
 from ._hired import CharterHireDates
-from ._ports import CharterStamp, FsCharterStamp
+from ._ports import CharterStamp, FsCharterStamp, Signed, SignedDelivery, SignedDeliveries
 from ._rework import MailClientRework
 from ._thresholds import SettingsHealthThresholds
 from .api import AgentHealth, HealthAnalyzer, HealthThresholds, OrgHealth
@@ -67,6 +73,53 @@ class MemoryCharterStamps(CharterStamp):
         if addr not in self.times:
             raise FileNotFoundError(2, "No such file or directory", f"{addr}/AGENT.md")
         return self.times[addr]
+
+
+class MailSignedDeliveries(SignedDeliveries):
+    """The deliveries health counted before phase 0b, from the messages alone (PC-3): the tasks of a service (relayed reworks and tasks of no
+    service left out) whose latest result is ``done``, each signed off by the last report to be ``done`` before the owner (else the owner), judged by a
+    human-tier verdict after that ``done``. Every escape is ``untyped`` and counted; nothing is unknown."""
+
+    def __init__(self, agents: AgentDirectory, mail: MailboxReader) -> None:
+        self._agents = agents
+        self._mail = mail
+
+    def deliveries(self, owner: str) -> Signed:
+        received, sent = self._mail.received(owner), self._mail.sent(owner)
+        results = latest_results(sent)
+        sent_tasks = sorted(m.id for m in sent if m.type == "task")
+        reports = set(self._agents.children(owner))
+        done_by_reports = [m for m in received if m.type == "result" and m.status == "done" and m.sender in reports and m.reply_to]
+        verdicts: dict[str, list[Message]] = defaultdict(list)
+        for m in received:
+            if m.type == "note" and m.feedback and m.reply_to:
+                verdicts[m.reply_to].append(m)
+        out = []
+        for t in received:
+            done = results.get(t.id)
+            if t.type != "task" or not t.service or t.source == "relayed" or done is None or done.status != "done":
+                continue
+            later = {i for i in sent_tasks if i > t.id}
+            signed = [r for r in done_by_reports if r.reply_to in later and r.id < done.id]
+            signer = max(signed, key=lambda r: r.id).sender if signed else owner
+            human = [v for v in verdicts[t.id] if v.id > done.id and verdict_tier(v) == "human"]
+            escape = any(v.feedback == "reject" for v in human)
+            out.append(SignedDelivery(signer, bool(human), escape, True, "untyped" if escape else ""))
+        return Signed(tuple(out), "")
+
+
+class FixedSignedDeliveries(SignedDeliveries):
+    """The deliveries a test put in for each owner (an owner it never heard of has none and nothing unknown)."""
+
+    def __init__(self) -> None:
+        self._signed: dict[str, Signed] = {}
+
+    def put(self, owner: str, *items: SignedDelivery, unknown: str = "") -> None:
+        """What ``deliveries(owner)`` will say from now on."""
+        self._signed[owner] = Signed(tuple(items), unknown)
+
+    def deliveries(self, owner: str) -> Signed:
+        return self._signed.get(owner, Signed((), ""))
 
 
 class StateWords(AgentStates):
@@ -177,7 +230,8 @@ def _world(
     analyzer = FileHealthAnalyzer(
         agents, mail.reader, runs.reader, runs.reader, budgets, pauses.store, StateWords(mail, pauses),
         SettingsHealthThresholds(settings.settings), MailClientRework(agents, mail.reader),
-        MailEscapeCounter(agents, mail.reader, runs.reader, MailClientRework(agents, mail.reader)), CharterHireDates(charters, stamps), runs.clock,
+        MailEscapeCounter(agents, mail.reader, runs.reader, MailClientRework(agents, mail.reader), MailSignedDeliveries(agents, mail.reader)),
+        CharterHireDates(charters, stamps), runs.clock,
     )
     numbers = itertools.count(1)
 
@@ -233,6 +287,24 @@ def memory_world(tmp_path: Path) -> HealthWorld:
     assert isinstance(box, MemoryMailbox)
     stamps = MemoryCharterStamps()
     return _world(mail, memory_runs(tmp_path), memory_pauses(tmp_path), memory_org_settings(tmp_path), box.agents, box.agents, stamps)
+
+
+@dataclass(frozen=True)
+class SignedWorld:
+    """The escape counter over ``FixedSignedDeliveries`` (memory mailboxes and run logs): ``signed.put(owner, ...)`` says what each owner delivered."""
+
+    counter: MailEscapeCounter
+    signed: FixedSignedDeliveries
+    agent: Callable[[str], None]  # the agent exists (its mailbox is empty)
+
+
+def fixed_signed_world(tmp_path: Path) -> SignedWorld:
+    mail = memory_mailbox(tmp_path)
+    box = mail.reader
+    assert isinstance(box, MemoryMailbox)
+    signed = FixedSignedDeliveries()
+    counter = MailEscapeCounter(box.agents, box, memory_runs(tmp_path).reader, MailClientRework(box.agents, box), signed)
+    return SignedWorld(counter, signed, mail.agent)
 
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {

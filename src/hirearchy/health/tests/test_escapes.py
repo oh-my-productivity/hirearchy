@@ -1,4 +1,9 @@
-"""Escapes: the deliveries a team signed off that the client rejected after ``done`` (``MailEscapeCounter``, design 5.5).
+"""Escapes: the numbers ``MailEscapeCounter`` makes of the signed deliveries it is given (design 5.5, 10), and the re-checks a FAIL cost.
+
+The counter has no rule of its own about what a delivery is: ``SignedDeliveries`` says which deliveries an owner has, who signed them off, whether
+the client judged them and, for an escape, its cause and whether that counts against a verifier. Those rules are ``reflection``'s (its tests) and
+``app``'s conversion (its tests); here the counter is tested over ``FixedSignedDeliveries``. The re-check tests need messages: they run over the
+worlds of ``testing.py`` (disk and memory), whose deliveries are ``MailSignedDeliveries``'s (the pre-0b rule kept as a fake, PC-3).
 
 The organization is ``root -> ceo`` (the owner of the service) ``-> ceo/eng`` (an author) and ``ceo/chk`` (a checker). Times are seconds after the
 origin of the worlds; message ids start with their time, so a larger time is a later id. The numbers are read from ``AgentHealth``, over disk and
@@ -6,17 +11,17 @@ over memory."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 
 from hirearchy.health import AgentHealth
-from hirearchy.health.testing import HealthWorld
+from hirearchy.health._ports import EscapeCounts, SignedDelivery
+from hirearchy.health.testing import HealthWorld, SignedWorld, fixed_signed_world
 
-from ._support import at, runs
+from ._support import AUTHOR, CHECKER, OWNER, at, request, runs
 
-OWNER, AUTHOR, CHECKER = "ceo", "ceo/eng", "ceo/chk"
-SERVICE = "weekly-brief"
+COUNTED = ("reviewer-miss", "untyped")  # the causes that count against a verifier (reflection.attribution)
 
 
 @pytest.fixture
@@ -24,6 +29,14 @@ def e(w: HealthWorld) -> HealthWorld:
     w.agent(CHECKER, 0)
     w.set_budget(CHECKER, 10)
     return w
+
+
+@pytest.fixture
+def s(tmp_path: Path) -> SignedWorld:
+    world = fixed_signed_world(tmp_path)
+    for addr in (OWNER, AUTHOR, CHECKER, "ops"):
+        world.agent(addr)
+    return world
 
 
 def health(w: HealthWorld, addr: str) -> AgentHealth:
@@ -35,157 +48,74 @@ def numbers(w: HealthWorld, addr: str) -> tuple[int, int, int, int]:
     return (h.escapes, h.judged, h.rechecks, h.rework_runs)
 
 
-@dataclass
-class Delivery:
-    request: str  # T
-    done: str  # D
-    author_task: str | None = None
-    check_task: str | None = None
+def accepted(signer: str) -> SignedDelivery:
+    """A delivery the client judged and accepted (no escape, no cause)."""
+    return SignedDelivery(signer, True, False, True, "")
 
 
-def request(w: HealthWorld, when: float, *, source: str | None = None, sender: str = "root", service: str | None = SERVICE, revises: str | None = None) -> str:
-    task = w.send(sender, OWNER, "task", when, service=service, source=source, revises=revises)
-    w.read(OWNER)
-    return task.id
+def escaped(signer: str, cause: str) -> SignedDelivery:
+    """A judged delivery the client rejected, typed ``cause``."""
+    return SignedDelivery(signer, True, True, cause in COUNTED, cause)
 
 
-def deliver(w: HealthWorld, when: float, *, team: bool = True, source: str | None = None, check_first: bool = False) -> Delivery:
-    """The owner gets a request at ``when``; with ``team`` its author drafts and its checker passes it; then it reports ``done`` (all within 9 s)."""
-    t = request(w, when, source=source)
-    author = check = None
-    if team:
-        author = w.send(OWNER, AUTHOR, "task", when + 1).id
-        w.send(AUTHOR, OWNER, "result", when + 2, status="done", reply_to=author)
-        check = w.send(OWNER, CHECKER, "task", when + 3).id
-        w.send(CHECKER, OWNER, "result", when + 4, status="done", reply_to=check)
-    d = w.send(OWNER, "root", "result", when + 6, status="done", reply_to=t).id
-    return Delivery(t, d, author, check)
+# ------------------------------------------------------------------------------------------------------------------------ the numbers
 
 
-def verdict(w: HealthWorld, task_id: str, when: float, kind: str = "reject", *, source: str | None = "human", sender: str = "root") -> str:
-    return w.send(sender, OWNER, "note", when, reply_to=task_id, feedback=kind, source=source).id
+def test_counted_causes_are_escapes_and_the_others_are_not_its(s: SignedWorld) -> None:
+    s.signed.put(
+        OWNER, accepted(OWNER), escaped(OWNER, "reviewer-miss"), escaped(OWNER, "untyped"), escaped(OWNER, "relayed-carry-over"),
+        escaped(OWNER, "contract-gap"), escaped(OWNER, "relayed-error"), escaped(OWNER, "contract-gap"),
+    )
+    counts = s.counter.counts(OWNER)
+    assert (counts.escapes, counts.judged) == (2, 7)  # the not-its are judged deliveries, and no escape of the verifier
+    assert counts.not_its == (("contract-gap", 2), ("relayed-error", 1), ("relayed-carry-over", 1))  # in the order of the view, whatever the input's
+    assert (counts.rechecks, counts.rework_runs, counts.unknown) == (0, 0, "")
 
 
-# ------------------------------------------------------------------------------------------------------------------------ the sign-off
+def test_a_cause_health_does_not_know_is_a_not_its_too_and_comes_last(s: SignedWorld) -> None:
+    s.signed.put(OWNER, escaped(OWNER, "a-later-cause"), escaped(OWNER, "relayed-error"), escaped(OWNER, "another-cause"))
+    assert s.counter.counts(OWNER).not_its == (("relayed-error", 1), ("a-later-cause", 1), ("another-cause", 1))
 
 
-def test_the_sign_off_is_the_last_report_done_before_the_owners_done(e: HealthWorld) -> None:
-    d = deliver(e, 10)
-    verdict(e, d.request, 30)
-    assert numbers(e, CHECKER) == (1, 1, 0, 0)  # the checker passed the delivered version
-    assert numbers(e, AUTHOR) == (0, 0, 0, 0)  # the author did not sign it off
-    assert numbers(e, OWNER) == (1, 1, 0, 0)  # the owner reported done
-    late = e.send(AUTHOR, OWNER, "result", 40, status="done", reply_to=d.author_task)  # a result after the owner's done signs nothing off
-    assert late and numbers(e, AUTHOR) == (0, 0, 0, 0)
+def test_an_accepted_relayed_rework_counts_as_judged(s: SignedWorld) -> None:
+    """F-E3-10: the client's accept on a relayed rework is a judged delivery of its case (the rule is reflection's); the counter counts what it is given."""
+    s.signed.put(OWNER, accepted(OWNER))
+    assert s.counter.counts(OWNER) == EscapeCounts(0, 1, 0, 0)
 
 
-def test_a_report_that_is_not_done_signs_nothing_off(e: HealthWorld) -> None:
-    t = request(e, 10)
-    author = e.send(OWNER, AUTHOR, "task", 11).id
-    e.send(AUTHOR, OWNER, "result", 12, status="done", reply_to=author)
-    check = e.send(OWNER, CHECKER, "task", 13).id
-    e.send(CHECKER, OWNER, "result", 14, status="failed", reply_to=check)  # not a done
-    e.send(OWNER, "root", "result", 16, status="done", reply_to=t)
-    verdict(e, t, 30)
-    assert numbers(e, AUTHOR) == (1, 1, 0, 0) and numbers(e, CHECKER) == (0, 0, 0, 0)
+def test_a_one_off_delivery_counts_as_judged(s: SignedWorld) -> None:
+    """A task of root's without a service: its verdict names no criterion, so its escape is ``untyped``, which counts against the assignee."""
+    s.signed.put(OWNER, escaped(OWNER, "untyped"))
+    assert s.counter.counts(OWNER) == EscapeCounts(1, 1, 0, 0)
 
 
-def test_the_owner_signs_alone_without_a_report(e: HealthWorld) -> None:
-    d = deliver(e, 10, team=False)
-    verdict(e, d.request, 30)
-    assert numbers(e, OWNER) == (1, 1, 0, 0)  # once, as the owner and as the sign-off
-    assert numbers(e, AUTHOR) == numbers(e, CHECKER) == (0, 0, 0, 0)
+def test_reject_then_accept_stays_an_escape(s: SignedWorld) -> None:
+    """A delivery the rule calls an escape (a counted reject, however many accepts follow) is one judged delivery and one escape."""
+    s.signed.put(OWNER, escaped(OWNER, "untyped"))
+    assert s.counter.counts(OWNER) == EscapeCounts(1, 1, 0, 0)
+    s.signed.put(OWNER, SignedDelivery(OWNER, False, True, True, "untyped"))  # an escape flag on a delivery nobody judged counts for nothing
+    assert s.counter.counts(OWNER) == EscapeCounts(0, 0, 0, 0)
 
 
-def test_an_accepted_delivery_is_judged_and_not_an_escape(e: HealthWorld) -> None:
-    d = deliver(e, 10)
-    verdict(e, d.request, 30, "accept")
-    assert numbers(e, CHECKER) == (0, 1, 0, 0) and numbers(e, OWNER) == (0, 1, 0, 0)
+def test_unknown_is_carried(s: SignedWorld) -> None:
+    s.signed.put(OWNER, accepted(OWNER), unknown="weekly-brief: SERVICE.md: does not parse (ScannerError)")
+    assert s.counter.counts(OWNER).unknown == "weekly-brief: SERVICE.md: does not parse (ScannerError)"
+    assert s.counter.counts(CHECKER).unknown == "weekly-brief: SERVICE.md: does not parse (ScannerError)"  # the parent's services are read for a signer
+    assert s.counter.counts("ops").unknown == ""
+    s.signed.put(CHECKER, unknown="memo: the stored contract versions: is not UTF-8")
+    assert s.counter.counts(CHECKER).unknown == "memo: the stored contract versions: is not UTF-8; weekly-brief: SERVICE.md: does not parse (ScannerError)"
 
 
-def test_a_delivery_without_a_verdict_is_not_judged(e: HealthWorld) -> None:
-    deliver(e, 10)
-    assert numbers(e, CHECKER) == numbers(e, OWNER) == (0, 0, 0, 0)
-
-
-def test_a_task_that_is_not_done_is_not_a_delivery(e: HealthWorld) -> None:
-    t = request(e, 10)
-    e.send(OWNER, "root", "result", 16, status="failed", reply_to=t)
-    verdict(e, t, 30)
-    assert numbers(e, OWNER) == (0, 0, 0, 0)
-
-
-def test_a_task_of_no_service_is_not_a_delivery(e: HealthWorld) -> None:
-    t = request(e, 10, service=None)
-    e.send(OWNER, "root", "result", 16, status="done", reply_to=t)
-    verdict(e, t, 30)
-    assert numbers(e, OWNER) == (0, 0, 0, 0)
-
-
-# ------------------------------------------------------------------------------------------------------------------------ what is not judged
-
-
-def test_a_relayed_rework_is_not_a_delivery(e: HealthWorld) -> None:
-    d = deliver(e, 10, source="relayed")  # the assistant sent this rework on its own reading
-    verdict(e, d.request, 30)
-    assert numbers(e, OWNER) == numbers(e, CHECKER) == (0, 0, 0, 0)
-    stamped = deliver(e, 100, source="human")  # the user asked for this one: a delivery
-    verdict(e, stamped.request, 130)
-    assert numbers(e, OWNER) == (1, 1, 0, 0)
-
-
-def test_an_agent_clients_verdict_is_not_judged(e: HealthWorld) -> None:
-    e.agent("ops", 0)
-    e.set_budget("ops", 10)
-    d = deliver(e, 10)
-    verdict(e, d.request, 30, sender="ops", source=None)
-    verdict(e, d.request, 31, sender="ops", source="human")  # an agent cannot claim a source
-    assert numbers(e, OWNER) == numbers(e, CHECKER) == (0, 0, 0, 0)
-
-
-def test_a_relayed_verdict_is_not_judged(e: HealthWorld) -> None:
-    d = deliver(e, 10)
-    verdict(e, d.request, 30, source="relayed")
-    assert numbers(e, OWNER) == (0, 0, 0, 0)
-
-
-def test_a_verdict_before_the_done_is_not_judged(e: HealthWorld) -> None:
-    t = request(e, 10)
-    verdict(e, t, 12)  # before the owner's done (a verdict on an earlier delivery of this task)
-    e.send(OWNER, "root", "result", 16, status="done", reply_to=t)
-    assert numbers(e, OWNER) == (0, 0, 0, 0)
-
-
-def test_a_verdict_on_another_task_is_not_judged(e: HealthWorld) -> None:
-    d = deliver(e, 10)
-    other = deliver(e, 100)
-    verdict(e, other.request, 130)
-    assert d and numbers(e, OWNER) == (1, 1, 0, 0)
-
-
-# ------------------------------------------------------------------------------------------------------------------------ escapes
-
-
-def test_an_escape_counts_once_for_the_owner_and_once_for_the_sign_off(e: HealthWorld) -> None:
-    d = deliver(e, 10)
-    verdict(e, d.request, 30, "accept")
-    verdict(e, d.request, 31, "reject")  # one of the human verdicts is a reject: an escape
-    verdict(e, d.request, 32, "reject")  # ... however many there are
-    assert numbers(e, OWNER) == (1, 1, 0, 0) and numbers(e, CHECKER) == (1, 1, 0, 0)
-    assert numbers(e, AUTHOR) == (0, 0, 0, 0)
-
-
-def test_a_legacy_root_reject_counts_as_human(e: HealthWorld) -> None:
-    d = deliver(e, 10)
-    verdict(e, d.request, 30, source=None)  # written before sources existed
-    assert numbers(e, CHECKER) == (1, 1, 0, 0)
-
-
-def test_the_top_level_agents_have_only_their_own_deliveries(e: HealthWorld) -> None:
-    d = deliver(e, 10)
-    verdict(e, d.request, 30)
-    e.agent("ops", 0)
-    assert numbers(e, "ops") == (0, 0, 0, 0)  # root is no owner
+def test_the_parent_composition_is_unchanged(s: SignedWorld) -> None:
+    s.signed.put(OWNER, accepted(CHECKER), escaped(CHECKER, "reviewer-miss"), accepted(AUTHOR), accepted(OWNER), escaped(OWNER, "contract-gap"))
+    s.signed.put(CHECKER, accepted(CHECKER))
+    s.signed.put("ops", accepted("ops"))
+    # the owner: its own deliveries, whoever signed them off (its parent is root, nobody's owner)
+    assert s.counter.counts(OWNER) == EscapeCounts(1, 5, 0, 0, (("contract-gap", 1),), "")
+    # a checker: its own deliveries, plus those of its parent that it signed off
+    assert s.counter.counts(CHECKER) == EscapeCounts(1, 3, 0, 0)
+    assert s.counter.counts(AUTHOR) == EscapeCounts(0, 1, 0, 0)  # only the one it signed off
+    assert s.counter.counts("ops") == EscapeCounts(0, 1, 0, 0)  # a top-level agent has only its own
 
 
 # ------------------------------------------------------------------------------------------------------------------------ re-checks and rework runs

@@ -2,6 +2,7 @@
 
 The analyzer is built from the ports of the organization it measures; the small collaborators that are not ports of the package's api
 (who counts as the client's rework, what the client's verdicts count as escapes, when an agent was hired) are built here too, as the composition root builds everything.
+The deliveries the escape counter counts are ``reflection``'s, converted here (``CaseSignedDeliveries``): health may not import ``reflection``.
 """
 
 from __future__ import annotations
@@ -19,16 +20,19 @@ from ..health._rework import MailClientRework
 from ..health._thresholds import SettingsHealthThresholds
 from ..kernel import Clock, OrgLayout
 from ..mail import MailboxReader
+from ..reflection import CaseRecords
 from ..runs import RunLogReader
 from ..settings import OrgSettings
 from ._builder import Builder
 from ._lazy import PortResolver
+from ._signed_deliveries import CaseSignedDeliveries
 
 
 def escape_counter(b: PortResolver) -> MailEscapeCounter:
-    """Health's escape counter over the mailboxes and run logs of ``b``: the analyzer's and the quality view's FAIL counts are made of the same one."""
+    """Health's escape counter over the mailboxes and run logs of ``b``, and the deliveries of ``reflection``'s case records: the analyzer's and
+    the quality view's FAIL counts are made of the same one."""
     agents, mail = b.get(AgentDirectory), b.get(MailboxReader)
-    return MailEscapeCounter(agents, mail, b.get(RunLogReader), MailClientRework(agents, mail))
+    return MailEscapeCounter(agents, mail, b.get(RunLogReader), MailClientRework(agents, mail), CaseSignedDeliveries(b.get(CaseRecords)))
 
 
 def register(b: Builder) -> None:

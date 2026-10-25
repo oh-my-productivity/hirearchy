@@ -46,6 +46,29 @@ class ClientRework(Protocol):
         ...
 
 
+class SignedDelivery(NamedTuple):
+    """One delivery of a service case, as health counts it."""
+
+    signer: str  # the agent that signed it off: the last report to be done before the owner, else the owner
+    judged: bool  # the human client gave a verdict on it after the owner's ``done``
+    escape: bool  # judged, and one of those verdicts is a reject (a later accept does not undo it)
+    counted: bool  # for an escape: its cause counts against the verifier that signed it off (``reviewer-miss``, ``untyped``); true otherwise
+    cause: str  # the escape's cause (``contract-gap``, ``relayed-error``, ...); "" unless an escape
+
+
+class Signed(NamedTuple):
+    items: tuple[SignedDelivery, ...]
+    unknown: str  # the services whose contract could not be read, ``{service}: {error}`` joined by ``; `` ("" when none): their escapes are ``untyped``
+
+
+@runtime_checkable
+class SignedDeliveries(Protocol):
+    def deliveries(self, owner: str) -> Signed:
+        """Every delivery of the cases of ``owner``'s services, and of the one-off tasks assigned to it, with who signed it off, whether the client
+        judged it and, for an escape, its cause."""
+        ...
+
+
 class EscapeCounts(NamedTuple):
     escapes: int  # judged deliveries the client rejected after ``done``
     judged: int  # deliveries the human client gave a verdict on

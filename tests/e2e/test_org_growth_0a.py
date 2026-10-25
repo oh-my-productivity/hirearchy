@@ -294,14 +294,17 @@ def test_12_a_reviewers_ambiguous_item_reaches_roots_progress_before_delivery(tm
     assert "artifacts withheld (ask first)" not in call(w.root, "progress", task_id=a1)  # the user's rework answered them: the path is back
 
 
-def test_8_health_counts_the_escape_and_not_the_relayed_rework(tmp_path):
+def test_8_health_counts_the_escape_and_types_the_relayed_reworks_as_not_the_verifiers(tmp_path):
+    """0b (F-E3-10) changed this block: the user's verdict on a relayed rework is a judged delivery of its case, and its rejection is typed
+    ``relayed-error``, which health shows as ``not_its`` instead of counting against the verifier."""
     w = world(tmp_path)
     chain(w, 7)
     reviewer = agent_health(w.org, "lead/reviewer")
-    assert (reviewer.judged, reviewer.escapes, reviewer.rechecks) == (2, 1, 0)  # judged: A3 and B1; A2's rejection is not counted
-    assert "low_quality" not in reviewer.flags  # 2 judged are fewer than min_judged_for_quality
+    assert (reviewer.judged, reviewer.escapes, reviewer.rechecks) == (3, 1, 0)  # judged: A2, A3 and B1; A2's rejection is not the reviewer's escape
+    assert reviewer.not_its == {"relayed-error": 1} and reviewer.causes_unknown == ""
+    assert "low_quality" not in reviewer.flags  # 1 of 3 judged is not above max_escape_ratio
     lead = agent_health(w.org, "lead")
-    assert (lead.judged, lead.escapes) == (2, 1)
+    assert (lead.judged, lead.escapes, lead.not_its) == (3, 1, {"relayed-error": 1})
 
 
 def test_9_a_non_root_lead_cannot_grant_hiring_rights(tmp_path):
