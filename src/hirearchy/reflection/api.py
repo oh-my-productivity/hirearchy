@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Protocol, runtime_checkable
 
-from ..kernel import Message, clip_line, client_questions, msg_time
+from ..kernel import ClientItems, Message, client_items, clip_line, msg_time
 from ..services import Criterion
 from ._deliverables import FOLDER_SHOWN, NAME_SHOWN, shown_name
 
@@ -29,6 +29,8 @@ __all__ = [
     "CaseHistory",
     "DeliverableChecks",
     "DeliverableFinding",
+    "ITEMS_SHOWN",
+    "ITEM_CHARS",
     "ReflectionDigest",
     "ServicePromptSections",
     "ServiceReports",
@@ -40,7 +42,9 @@ __all__ = [
     "confirmed_criteria",
     "delivered_unrated",
     "deliverables_note",
+    "items_listing",
     "lessons_of",
+    "open_client_items",
     "questions_open",
     "rated",
     "regressions",
@@ -205,18 +209,37 @@ def rated(case: Case | None, task: Message) -> bool:
     return any(v.step >= step for v in case.verdicts)
 
 
-def questions_open(task: Message, result: Message, case: Case | None, root_sent: Sequence[Message]) -> int:
-    """The client questions (``kernel.client_questions``) of a ``done`` or ``blocked`` result that nothing has settled (pure): 0 when there are none,
-    when ``task`` is a service request and ``rated(case, task)``, or when ``root_sent`` holds a task with ``revises == task.id`` and ``source ==
-    "human"``; else their number. The user's own rework of the task or the client's verdict on the delivery settles them; the assistant's own
-    (relayed) rework does not (0a.1 DR-17). ``progress`` withholds the artifact path while this is above 0 and the deliverable checks do the same."""
+ITEM_CHARS = 160  # each listed client item is cut to this many characters
+ITEMS_SHOWN = 5  # at most this many are listed; the rest are counted
+
+
+def open_client_items(task: Message, result: Message, case: Case | None, root_sent: Sequence[Message]) -> ClientItems:
+    """The client items (``kernel.client_items``: questions and notes) of a ``done`` or ``blocked`` result that nothing has settled (pure): none when
+    there are none, when ``task`` is a service request and ``rated(case, task)``, or when ``root_sent`` holds a task with ``revises == task.id`` and
+    ``source == "human"``; else the split. The user's own rework of the task or the client's verdict on the delivery settles questions and notes
+    together; the assistant's own (relayed) rework settles neither (0a.1 DR-17)."""
     if result.status not in ("done", "blocked"):
-        return 0
-    asked = len(client_questions(result.body))
-    if asked == 0 or (task.service and rated(case, task)):
-        return 0
+        return ClientItems()
+    items = client_items(result.body)
+    if not (items.questions or items.notes) or (task.service and rated(case, task)):
+        return ClientItems()
     reworked = any(t.type == "task" and t.revises == task.id and t.source == "human" for t in root_sent)
-    return 0 if reworked else asked
+    return ClientItems() if reworked else items
+
+
+def questions_open(task: Message, result: Message, case: Case | None, root_sent: Sequence[Message]) -> int:
+    """The questions for the client of a ``done`` or ``blocked`` result that nothing has settled (pure): the open client items that name a criterion
+    id (``C<k>``; the others are notes, D-E6-1), counted as ``open_client_items`` settles them. ``progress`` withholds the artifact path while this
+    is above 0 and the deliverable checks do the same."""
+    return len(open_client_items(task, result, case, root_sent).questions)
+
+
+def items_listing(items: Sequence[str]) -> str:
+    """``items`` for a sentence (pure): each cut to ``ITEM_CHARS`` characters, at most ``ITEMS_SHOWN`` of them joined with ``; ``, then ``; and {k}
+    more`` when more remain."""
+    shown = [clip_line(i, ITEM_CHARS) for i in items[:ITEMS_SHOWN]]
+    more = len(items) - len(shown)
+    return "; ".join(shown) + (f"; and {more} more" if more > 0 else "")
 
 
 def delivered_unrated(cases: Sequence[Case]) -> tuple[str, ...]:

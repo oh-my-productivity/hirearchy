@@ -6,10 +6,10 @@ from collections.abc import Sequence
 
 from ..agents import AgentDirectory
 
-from ..kernel import Message, client_questions, clip_line, latest_results, link_ids, verdict_tier
+from ..kernel import Message, client_items, latest_results, link_ids, verdict_tier
 from ..mail import MailboxReader
 from ..services import ServiceCatalog
-from .api import CaseHistory, ServiceSteps, regressions, user_approved, user_committed
+from .api import CaseHistory, ServiceSteps, items_listing, regressions, user_approved, user_committed
 
 ASK_C = 'About {id}: add "<the rule, in their words>" as a lasting rule? Yes or no.'
 ASK_R = "Same as {id}: a one-off? Yes or no."
@@ -47,8 +47,6 @@ TOPUP = (  # a rework the user asked for gets less than one round of the team ne
 )
 NOTHING_LEFT = "Nothing else is left of the runs the user approved for this case."
 SOME_LEFT = "{spare} more of the {approved} runs the user approved for this case are left."
-QUESTION_CHARS = 160  # each repeated question is cut to this many characters
-QUESTIONS_SHOWN = 5  # at most this many are repeated; the rest are counted
 
 
 def client_round(agents: AgentDirectory, owner: str) -> int:
@@ -113,13 +111,10 @@ class TextServiceSteps(ServiceSteps):
             return ""
         results = latest_results(m for m in self._mail.received(task.sender) if m.reply_to == task.revises)
         revised = results.get(task.revises)
-        questions = client_questions(revised.body) if revised is not None else []
+        questions = client_items(revised.body).questions if revised is not None else ()  # D-E6-1: the notes are not repeated
         if not questions:
             return ""
-        shown = [clip_line(q, QUESTION_CHARS) for q in questions[:QUESTIONS_SHOWN]]
-        more = len(questions) - len(shown)
-        listing = "; ".join(shown) + (f"; and {more} more" if more > 0 else "")
-        return REWORK.format(revised=task.revises, questions=listing)
+        return REWORK.format(revised=task.revises, questions=items_listing(questions))
 
     def _top_up(self, task: Message) -> str:
         """What to ask the user for when the rework they asked for carries less than one round of the owner's team and the approved runs not yet used

@@ -6,10 +6,10 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from hirearchy.kernel import Message
+from hirearchy.kernel import ClientItems, Message, clip_line
 from hirearchy.reflection import (
-    Case, Verdict, case_spend, confirmed_criteria, delivered_unrated, lessons_of, questions_open, rated, user_approved, user_committed, user_cost,
-    user_spend, version_at,
+    ITEM_CHARS, ITEMS_SHOWN, Case, Verdict, case_spend, confirmed_criteria, delivered_unrated, items_listing, lessons_of, open_client_items,
+    questions_open, rated, user_approved, user_committed, user_cost, user_spend, version_at,
 )
 from hirearchy.services import Criterion
 
@@ -290,7 +290,8 @@ def test_no_cases_gives_no_unrated() -> None:
 
 # ------------------------------------------------------------------------------ questions_open
 
-ASKED = "## Summary\nok\n\nQuestions for the client:\n- Keep Marta's row?\n- Which Friday?\n\n## Artifacts\n- a/b.md"
+# D-E6-1 (A2): ``questions_open`` counts only the items that name a criterion id (``C<k>``); these two do, so the tests below keep testing the question path.
+ASKED = "## Summary\nok\n\nQuestions for the client:\n- C1: Keep Marta's row?\n- C2: Which Friday?\n\n## Artifacts\n- a/b.md"
 
 
 def answered(task: Message, status: str, body: str) -> Message:
@@ -307,7 +308,7 @@ def test_questions_open_counts_done_and_blocked_results() -> None:
     assert questions_open(task, answered(task, "done", ASKED), found, []) == 2
     assert questions_open(task, answered(task, "blocked", ASKED), found, []) == 2  # a blocked result asks too (6.1)
     assert questions_open(task, answered(task, "failed", ASKED), found, []) == 0  # a failed one has nothing to copy or deliver
-    one = answered(task, "done", "Questions for the client: Which Friday?\n\n## Artifacts\n- a.md")
+    one = answered(task, "done", "Questions for the client: C2: Which Friday?\n\n## Artifacts\n- a.md")  # D-E6-1: the item names C2
     assert questions_open(task, one, found, []) == 1
 
 
@@ -336,3 +337,62 @@ def test_no_questions_gives_0() -> None:
     assert questions_open(task, answered(task, "done", ASKED), None, []) == 2  # a one-off task has no case: only a human rework settles it
     one_off = Message(id="9", sender="root", to="ceo", type="task", body="b", title="one off")  # no service: a verdict cannot settle it
     assert questions_open(one_off, answered(one_off, "done", ASKED), case_with(chain("9"), verdict_at(0, chain("9"), kind="accept")), []) == 2
+
+
+# ------------------------------------------------------------------------------ open_client_items, items_listing (D-E6-1, A2)
+
+MIXED = "## Summary\nok\n\nQuestions for the client:\n- C1: Keep Marta's row?\n- Style: 'himself' in Sam's row (reviewer: harmless).\n- C2: Which Friday?\n\n## Artifacts\n- a/b.md"
+BOTH = ClientItems(("C1: Keep Marta's row?", "C2: Which Friday?"), ("Style: 'himself' in Sam's row (reviewer: harmless).",))
+
+
+def test_open_client_items_splits_the_block_into_questions_and_notes() -> None:
+    (task,) = chain("1")
+    found = case_with([task])
+    assert open_client_items(task, answered(task, "done", MIXED), found, []) == BOTH
+    assert open_client_items(task, answered(task, "blocked", MIXED), found, []) == BOTH  # a blocked result asks too
+    assert open_client_items(task, answered(task, "failed", MIXED), found, []) == ClientItems()  # a failed one has nothing to copy or deliver
+    assert open_client_items(task, answered(task, "done", "ok, nothing asked"), found, []) == ClientItems()
+    assert open_client_items(task, answered(task, "done", "Questions for the client: none."), found, []) == ClientItems()
+
+
+def test_open_client_items_settles_questions_and_notes_together() -> None:
+    first, second = chain("1", "2")
+    result = answered(first, "done", MIXED)
+    rated_case = case_with([first, second], verdict_at(0, [first, second], kind="accept"))
+    assert open_client_items(first, result, rated_case, []) == ClientItems()  # the client's verdict
+    assert open_client_items(first, result, case_with([first, second]), [root_rework(first, "human")]) == ClientItems()  # the user asked for the rework
+    assert open_client_items(first, result, case_with([first, second]), [root_rework(second, "human")]) == BOTH  # a rework of another task settles nothing
+    later = case_with([first, second], verdict_at(1, [first, second], kind="accept"))
+    assert open_client_items(first, result, later, []) == ClientItems()  # a later rework's verdict
+
+
+def test_open_client_items_keeps_both_parts_under_a_relayed_rework() -> None:
+    (task,) = chain("1")
+    for source in (None, "relayed"):
+        assert open_client_items(task, answered(task, "done", MIXED), case_with([task]), [root_rework(task, source)]) == BOTH  # 0a.1 DR-17
+    assert open_client_items(task, answered(task, "done", MIXED), None, []) == BOTH  # a one-off task has no case
+
+
+def test_questions_open_counts_only_the_items_that_name_a_criterion_id() -> None:
+    (task,) = chain("1")
+    found = case_with([task])
+    assert questions_open(task, answered(task, "done", MIXED), found, []) == 2
+    notes_only = "Questions for the client:\n- Style: 'himself' (reviewer: harmless).\n- Typo in row 2."
+    assert questions_open(task, answered(task, "done", notes_only), found, []) == 0
+    assert questions_open(task, answered(task, "blocked", notes_only), found, []) == 0
+    assert questions_open(task, answered(task, "done", "Questions for the client: C4: exclude non-actions?\n- a note"), found, []) == 1
+
+
+def test_items_listing_shows_five_and_counts_the_rest() -> None:
+    assert (ITEM_CHARS, ITEMS_SHOWN) == (160, 5)
+    assert items_listing([]) == ""
+    assert items_listing(["a?"]) == "a?"
+    assert items_listing([f"q{i}?" for i in range(1, 6)]) == "q1?; q2?; q3?; q4?; q5?"  # five: no suffix
+    assert items_listing([f"q{i}?" for i in range(1, 7)]) == "q1?; q2?; q3?; q4?; q5?; and 1 more"
+    assert items_listing([f"q{i}?" for i in range(1, 9)]) == "q1?; q2?; q3?; q4?; q5?; and 3 more"
+
+
+def test_items_listing_clips_each_item_to_160_characters() -> None:
+    long = "Is this the long item? " * 12
+    out = items_listing([long, "second?"])
+    assert out == f"{clip_line(long, 160)}; second?" and len(clip_line(long, 160)) == 160 and long.strip() not in out

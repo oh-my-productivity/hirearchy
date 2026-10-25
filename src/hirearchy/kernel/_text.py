@@ -5,6 +5,7 @@ from __future__ import annotations
 import itertools
 import re
 from collections.abc import Iterable
+from dataclasses import dataclass
 
 TITLE_MAX = 80  # default length of a title-like text
 
@@ -76,6 +77,23 @@ def client_questions(body: str) -> list[str]:
         own = [inline] if first_word and not _is_none_word(first_word) and not heading and not remark else []
         return own + listed
     return []
+
+
+@dataclass(frozen=True)
+class ClientItems:
+    """The items of a result's "Questions for the client:" block, split (D-E6-1): ``questions`` name a criterion id (``C<k>``): the client decides
+    them, they flag the result and withhold its artifact path; ``notes`` name none: they are shown and never withheld. Each keeps the block's order;
+    together they are every item of the block, each once."""
+
+    questions: tuple[str, ...] = ()
+    notes: tuple[str, ...] = ()
+
+
+def client_items(body: str) -> ClientItems:
+    """``client_questions(body)`` split by whether an item names a criterion id (``\\bC[0-9]+\\b``): the one place that decides what is a question
+    for the client (pure)."""
+    items = client_questions(body)
+    return ClientItems(tuple(i for i in items if _CRITERION_ID.search(i)), tuple(i for i in items if not _CRITERION_ID.search(i)))
 
 
 def artifact_paths(body: str) -> list[str]:

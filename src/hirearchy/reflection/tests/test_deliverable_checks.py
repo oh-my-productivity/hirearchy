@@ -226,10 +226,11 @@ def test_files_older_than_the_earliest_created_are_ignored_and_no_created_means_
 
 
 def test_withheld_while_questions_are_open(w: ReflectionWorld) -> None:
+    """D-E6-1 (A2): the question names a criterion id (``C1``), the only kind that withholds the path; an item without one is a note (next test)."""
     service(w)
     r = rig(w)
     task = ask(w, "ai")
-    checked(r, done(w, task, MEMO, questions=["Keep Marta's row?"]), MEMO, b"team v1\n")
+    checked(r, done(w, task, MEMO, questions=["C1: Keep Marta's row?"]), MEMO, b"team v1\n")
     put(r, {"memo.md": b"edited\n"})
     (found,) = r.findings()
     assert (found.kind, found.withheld, found.task) == ("differs", True, task.id)
@@ -237,6 +238,22 @@ def test_withheld_while_questions_are_open(w: ReflectionWorld) -> None:
     assert r.findings()[0].withheld is True
     rework(w, task)  # the user asked for it
     assert r.findings()[0].withheld is False and r.findings()[0].artifact == MEMO
+
+
+def test_notes_only_withhold_nothing_and_a_question_with_the_notes_does(w: ReflectionWorld) -> None:
+    """D-E6-1 (A2): a result whose block holds only notes (no criterion id) is not withheld, so the finding carries its path; with a ``C<k>`` question it is."""
+    service(w)
+    r = rig(w)
+    task = ask(w, "ai")
+    checked(r, done(w, task, MEMO, questions=["Style: 'himself' (reviewer: harmless)."]), MEMO, b"team v1\n")
+    put(r, {"memo.md": b"edited\n"})
+    (found,) = r.findings()
+    assert (found.kind, found.withheld, found.artifact, found.task) == ("differs", False, MEMO, task.id)
+    other = ask(w, "bob")
+    checked(r, done(w, other, MEMO, questions=["Style: a note.", "C2: Which Friday?"]), MEMO, b"team v2\n", commit="c2")
+    put(r, {"memo.md": b"edited again\n"})
+    (again,) = r.findings()
+    assert (again.kind, again.withheld, again.task) == ("differs", True, other.id)
 
 
 # ------------------------------------------------------------------------------------------------------------------------ a relayed rework changed the copy (F-E5-5)

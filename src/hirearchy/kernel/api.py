@@ -25,12 +25,13 @@ from ._message import (
 )
 from ._paths import OrgLayout, OrgPaths, inside, visible
 from ._ports import AtomicWriter, Clock, Environment, EventSink, IdGenerator, JsonObject, LedgerStore, Provider, TokenSource, TraceTap
-from ._text import TITLE_MAX, artifact_paths, client_questions, clip, clip_line, single, strip_markers, word_count
+from ._text import TITLE_MAX, ClientItems, artifact_paths, client_items, client_questions, clip, clip_line, single, strip_markers, word_count
 from ._timeutil import STAMP_FORMAT, aware, fmt_dur, fmt_duration, msg_time, parse_time, stamp_of
 
 __all__ = [
     "AtomicWriter",
     "BOXES",
+    "ClientItems",
     "Clock",
     "Environment",
     "EventSink",
@@ -60,6 +61,7 @@ __all__ = [
     "artifact_paths",
     "aware",
     "child_addr",
+    "client_items",
     "client_questions",
     "clip",
     "clip_line",

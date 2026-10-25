@@ -208,7 +208,8 @@ NOTHING_LEFT = "Nothing else is left of the runs the user approved for this case
 
 
 def deliver_asking(w: ReflectionWorld, task: Message, *questions: str, block: str | None = None) -> Message:
-    """The owner answers ``task`` with a done result whose summary ends in a ``Questions for the client:`` block (``block`` replaces it)."""
+    """The owner answers ``task`` with a done result whose summary ends in a ``Questions for the client:`` block (``block`` replaces it). D-E6-1: the
+    callers pass items that name a criterion id (``C<k>``), the questions the relayed rework repeats; items without one are notes."""
     w.use_run(task.to)
     listing = block if block is not None else "Questions for the client:\n" + "\n".join(f"- {q}" for q in questions)
     return w.s.d.post(Message(
@@ -218,17 +219,17 @@ def deliver_asking(w: ReflectionWorld, task: Message, *questions: str, block: st
 
 def test_rework_step_repeats_the_revised_results_questions(w: ReflectionWorld) -> None:
     first = ask(w)
-    deliver_asking(w, first, "Keep Marta's row?", "Which Friday?")
+    deliver_asking(w, first, "C1: Keep Marta's row?", "C2: Which Friday?")
     rework = ask(w, "ai", revises=first.id)  # root's own reading: relayed
     assert rework.source == "relayed"
-    assert w.steps.rework_step(rework) == REWORK.format(revised=first.id, questions="Keep Marta's row?; Which Friday?")
+    assert w.steps.rework_step(rework) == REWORK.format(revised=first.id, questions="C1: Keep Marta's row?; C2: Which Friday?")
 
 
 def test_rework_step_is_empty_for_a_human_rework_or_a_result_without_questions(w: ReflectionWorld) -> None:
     """The user asked for the human rework, so it answers the client questions; and 0a.3's top-up step is empty too, because the round of ``ceo``'s
     team (1, plus 2 for each of its 2 reports: 5) fits the 10 runs the rework carries (D-E5-1)."""
     first = ask(w)
-    deliver_asking(w, first, "Keep Marta's row?")
+    deliver_asking(w, first, "C1: Keep Marta's row?")
     assert w.steps.rework_step(ask(w, "ai", revises=first.id, source="human")) == ""  # the user asked for it: it answers them; its 10 runs cover the round of 5
     quiet = ask(w, "b")
     deliver_asking(w, quiet, block="Questions for the client: none.")
@@ -243,26 +244,40 @@ def test_rework_step_is_empty_for_a_human_rework_or_a_result_without_questions(w
 
 def test_rework_step_reads_the_latest_result_of_the_revised_task(w: ReflectionWorld) -> None:
     first = ask(w)
-    deliver_asking(w, first, "Old question?")
+    deliver_asking(w, first, "C1: Old question?")
     w.s.d.post(Message(sender="ceo", to="root", type="result", status="done", reply_to=first.id, body="Questions for the client: none.", title="Again"))
     assert w.steps.rework_step(ask(w, "ai", revises=first.id)) == ""
 
 
+def test_a_relayed_rework_of_a_result_with_only_notes_gets_no_reply(w: ReflectionWorld) -> None:
+    """D-E6-1 (A2): the items that name no criterion id are notes; they are passed on with the delivery and the rework does not repeat them."""
+    first = ask(w)
+    deliver_asking(w, first, "Style: 'himself' in Sam's row (reviewer: harmless).", "Keep or delete the Open section?")
+    assert w.steps.rework_step(ask(w, "ai", revises=first.id)) == ""
+
+
+def test_a_relayed_rework_lists_only_the_questions_of_a_result_with_both(w: ReflectionWorld) -> None:
+    first = ask(w)
+    deliver_asking(w, first, "Style: 'himself' (reviewer: harmless).", "C3: Keep Marta's row?", "A typo in row 2.", "C4: Which Friday?")
+    rework = ask(w, "ai", revises=first.id)
+    assert w.steps.rework_step(rework) == REWORK.format(revised=first.id, questions="C3: Keep Marta's row?; C4: Which Friday?")
+
+
 def test_rework_step_clips_and_counts(w: ReflectionWorld) -> None:
-    long = "Is this the long question? " * 12
+    long = "C1: " + "Is this the long question? " * 12
     first = ask(w, "a")
-    deliver_asking(w, first, long, "second?")
+    deliver_asking(w, first, long, "C2: second?")
     text = w.steps.rework_step(ask(w, "a", revises=first.id))
     assert clip_line(long, 160) in text and len(clip_line(long, 160)) == 160 and long.strip() not in text
     five = ask(w, "b")
-    deliver_asking(w, five, *[f"q{i}?" for i in range(1, 6)])
-    assert w.steps.rework_step(ask(w, "b", revises=five.id)) == REWORK.format(revised=five.id, questions="q1?; q2?; q3?; q4?; q5?")  # no suffix
+    deliver_asking(w, five, *[f"C{i}: q{i}?" for i in range(1, 6)])
+    assert w.steps.rework_step(ask(w, "b", revises=five.id)) == REWORK.format(revised=five.id, questions="C1: q1?; C2: q2?; C3: q3?; C4: q4?; C5: q5?")  # no suffix
     six = ask(w, "c")
-    deliver_asking(w, six, *[f"q{i}?" for i in range(1, 7)])
-    assert w.steps.rework_step(ask(w, "c", revises=six.id)) == REWORK.format(revised=six.id, questions="q1?; q2?; q3?; q4?; q5?; and 1 more")
+    deliver_asking(w, six, *[f"C{i}: q{i}?" for i in range(1, 7)])
+    assert w.steps.rework_step(ask(w, "c", revises=six.id)) == REWORK.format(revised=six.id, questions="C1: q1?; C2: q2?; C3: q3?; C4: q4?; C5: q5?; and 1 more")
     seven = ask(w, "d")
-    deliver_asking(w, seven, *[f"q{i}?" for i in range(1, 8)])
-    assert "q5?; and 2 more. Ask the user" in w.steps.rework_step(ask(w, "d", revises=seven.id))
+    deliver_asking(w, seven, *[f"C{i}: q{i}?" for i in range(1, 8)])
+    assert "C5: q5?; and 2 more. Ask the user" in w.steps.rework_step(ask(w, "d", revises=seven.id))
 
 
 # ------------------------------------------------------------------------------ the top-up of a rework the user asked for (D-E5-1, design 4.5)

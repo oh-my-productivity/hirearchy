@@ -142,7 +142,9 @@ def test_a_line_says_who_kept_the_runs(w: ProgressWorld, task: Message) -> None:
     assert "kept by" not in lines(w).line(task, None, NOW)
 
 
-QUESTIONS = "## Summary\nok\n\nQuestions for the client:\n- Keep Marta's row?\n- Which Friday?\n\n## Artifacts\n- a/b.md (3 words)"
+# D-E6-1 (A2): only an item that names a criterion id (``C<k>``) is a question for the client; these items name one, so the tests below keep exercising
+# the question path (the flag, the withheld path). The notes (items without an id) are tested in their own tests.
+QUESTIONS = "## Summary\nok\n\nQuestions for the client:\n- C1: Keep Marta's row?\n- C2: Which Friday?\n\n## Artifacts\n- a/b.md (3 words)"
 FLAG = "for the client: ask the user before you copy or deliver"
 
 
@@ -157,7 +159,7 @@ def test_a_done_result_with_client_questions_is_flagged(w: ProgressWorld, task: 
 
 
 def test_one_question_is_singular(w: ProgressWorld, task: Message) -> None:
-    done = w.answer(task, "done", "Questions for the client: Keep Marta's row?\n\n## Artifacts\n- a.md", 0)
+    done = w.answer(task, "done", "Questions for the client: C1: Keep Marta's row?\n\n## Artifacts\n- a.md", 0)  # D-E6-1: the item names C1
     out = lines(w).line(task, done, NOW)
     assert f". 1 question {FLAG}. " in out and "1 questions" not in out
 
