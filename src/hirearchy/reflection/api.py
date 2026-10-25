@@ -25,13 +25,17 @@ from ._deliverables import FOLDER_SHOWN, NAME_SHOWN, shown_name
 
 __all__ = [
     "Assertion",
+    "CAUSES",
     "Case",
     "CaseHistory",
+    "Cause",
     "DeliverableChecks",
     "DeliverableFinding",
     "Delivery",
+    "FAILURE_CLASSES",
     "ITEMS_SHOWN",
     "ITEM_CHARS",
+    "LASTING_WORDS",
     "ReflectionDigest",
     "ServicePromptSections",
     "ServiceReports",
@@ -41,11 +45,14 @@ __all__ = [
     "TopUp",
     "TopUps",
     "Verdict",
+    "attribution",
     "case_spend",
+    "cause_of",
     "confirmed_criteria",
     "deliveries_of",
     "delivered_unrated",
     "deliverables_note",
+    "failure_class",
     "items_listing",
     "lessons_of",
     "not_on_a_delivery",
@@ -196,6 +203,26 @@ class Assertion:
     verdict: Verdict
     about: tuple[str, ...]  # the criteria (C<k>) the client confirmed it is about, "the same as R<j>" resolved; an R<j> that is about nothing stays
     link: str  # "confirmed" (a human link naming ids) | "none" (a human link "none": no lasting rule) | "unconfirmed" (only a relayed link) | ""
+
+
+CAUSES = ("relayed-error", "relayed-carry-over", "contract-gap", "reviewer-miss", "untyped")  # the types a rejection gets (0b 5.1)
+FAILURE_CLASSES = ("wrong", "missing", "off_spec", "unusable", "out_of_authority", "process_skipped", "wasteful")  # the closed core vocabulary (08 3.2)
+LASTING_WORDS = ("always", "never", "from now on")  # the words of the client that make a rule lasting: rule 5's default vocabulary
+
+
+@dataclass(frozen=True)
+class Cause:
+    """Why an escape happened, typed by the first rule that matches (0b 5.1). Derived by :func:`cause_of`; the view writes its words (5.3)."""
+
+    type: str  # one of ``CAUSES``
+    rule: str  # "relayed task" | "carry-over" | "link" | "answer" | "words" | "none"; "unreadable" for the fallback that its contract could not be read
+    detail: tuple[str, ...] = ()  # the ids the rule read: the relayed task; the relayed task and the shared artifact's path; the link note and the criteria; the matched word
+    rules: tuple[str, ...] = ()  # every rule that matches, in order, the winner first (empty for ``untyped``)
+    also: tuple[str, ...] = ()  # the distinct types, other than the winner's, of the later rules that match: a disputed cause
+    before_verdict: str = ""  # a relayed rework of the case delivered after the rejected delivery and before the verdict: the user may have judged that version
+    version: int = 0  # the contract version the rejected task carried (0 when it recorded none)
+    answering: int = 0  # the version that answered the rejection (0 when none)
+    removes: tuple[str, ...] = ()  # the named ids that the answering version removes, in named order (a contract-gap by answer)
 
 
 _EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
@@ -699,4 +726,5 @@ def deliverables_note(findings: Sequence[DeliverableFinding]) -> str:
 
 
 # Pure rules re-exported from their modules; they import the types above, so these imports come last.
+from ._causes import attribution, cause_of, failure_class  # noqa: E402
 from ._quality_rules import deliveries_of, not_on_a_delivery, signer_of, unjudged_cases  # noqa: E402
