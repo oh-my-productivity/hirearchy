@@ -32,9 +32,14 @@ def done(for_task: Message, n: int, status: str = "done") -> Message:
     return Message(sender=OWNER, to="root", type="result", body="Delivered.", id=ident(n), reply_to=for_task.id, status=status)
 
 
-def verdict(on: Message, n: int, kind: str, *, links: tuple[str, ...] = (), link_source: str | None = "human", tier: str = "human") -> Verdict:
-    """A verdict of ``kind`` on ``on`` sent at second ``n`` (source ``tier``) with one link note naming ``links``, sent a second later."""
-    note = Message(sender="root", to=OWNER, type="note", body="no", id=ident(n, "root"), reply_to=on.id, feedback=kind, source=tier)
+def verdict(
+    on: Message, n: int, kind: str, *, links: tuple[str, ...] = (), link_source: str | None = "human", tier: str = "human", own: tuple[str, ...] = (),
+) -> Verdict:
+    """A verdict of ``kind`` on ``on`` sent at second ``n`` (source ``tier``, its own ``criterion`` field ``own``) with one link note naming ``links``, sent
+    a second later."""
+    note = Message(
+        sender="root", to=OWNER, type="note", body="no", id=ident(n, "root"), reply_to=on.id, feedback=kind, source=tier, criterion=", ".join(own) or None,
+    )
     link_notes: list[Message] = []
     confirmed: tuple[str, ...] = ()
     link_tier = ""
@@ -58,6 +63,7 @@ class Spec:
     runs: int = 4
     handed: int = 10  # the budget of its task
     over: dict[str, object] | None = None  # Case fields to override
+    own: tuple[str, ...] = ()  # the rejection's own `criterion` field: the assistant's reading, before any link note
 
 
 def make(specs: list[Spec], *, budget: int = 10, service: str = "s", client_kind: str = "human") -> ServiceRecord:
@@ -72,12 +78,12 @@ def make(specs: list[Spec], *, budget: int = 10, service: str = "s", client_kind
         elif spec.on_a_blocked_result:
             finals.append(done(t, base + 10, "blocked"))
             if spec.verdict:
-                verdicts.append(verdict(t, base + 20, spec.verdict, links=spec.links, link_source=spec.link_source))
+                verdicts.append(verdict(t, base + 20, spec.verdict, links=spec.links, link_source=spec.link_source, own=spec.own))
             finals.append(done(t, base + 30))  # the done result comes after the verdict
         else:
             finals.append(done(t, base + 10, "done" if spec.state == "done" else spec.state))
             if spec.verdict:
-                verdicts.append(verdict(t, base + 20, spec.verdict, links=spec.links, link_source=spec.link_source))
+                verdicts.append(verdict(t, base + 20, spec.verdict, links=spec.links, link_source=spec.link_source, own=spec.own))
         result = next((r for r in reversed(finals) if r.reply_to == t.id), None)
         case = Case(
             id=t.id, service=service, owner=OWNER, tasks=[t], result=result, state=spec.state, playbook=0, used=0, reworks=0, budget=spec.handed, runs=spec.runs,
@@ -193,6 +199,24 @@ def test_one_off_records_read_does_not_apply() -> None:
 def test_not_counted_ids_keep_the_rejections_recorded_order() -> None:
     record = make([rejecting("C9", "C3", "R7", link_source="relayed"), rejecting("C1"), rejecting("C1")])
     assert repeat_alarm(record, T).not_counted == (("R1", ("C9", "C3", "R7")),)  # not sorted: the order the rejection recorded
+
+
+def test_a_rejections_own_reading_that_a_human_link_does_not_confirm_is_listed_as_not_counted() -> None:
+    """Design 9.3, DR2-3 (s1r): the rejection's own `criterion` says C5, the user's link says C9: the reading C5 is not confirmed by any human link, so it is
+    listed, under every state, and it is no subject; the confirmed C9 is."""
+    record = make([rejecting("C9", own=("C5",))])
+    alarm = repeat_alarm(record, T)
+    assert alarm.state == "n/a" and alarm.not_counted == (("R1", ("C5",)),)
+    three = make([rejecting("C9", own=("C5",)), rejecting("C9"), rejecting("C1")])
+    alarm = repeat_alarm(three, T)
+    assert alarm.not_counted == (("R1", ("C5",)),) and "C5" not in dict(alarm.subjects) and dict(alarm.subjects)["C9"] == 2 and alarm.fired == ("C9",)
+
+
+def test_a_reading_that_a_human_link_names_too_is_confirmed_and_not_listed() -> None:
+    record = make([rejecting("C9", "C3", own=("C3", "C5")), rejecting("C1", own=("C1",)), rejecting("C1")])
+    assert repeat_alarm(record, T).not_counted == (("R1", ("C5",)),)  # C3 is confirmed by the link, C1 likewise; only C5 is left
+    assert repeat_alarm(make([rejecting("none", own=("C5",))]), T).not_counted == (("R1", ("C5",)),)  # "none" confirms nothing
+    assert repeat_alarm(make([rejecting("C9"), rejecting("C1")]), T).not_counted == ()  # no own reading: nothing to list
 
 
 def test_the_thresholds_are_the_defaults_of_the_design() -> None:

@@ -934,8 +934,9 @@ class RepeatAlarm:
     ``fires``, ``no``, ``n/a`` (fewer judged cases than ``min_judged``) or ``does not apply`` (root's one-off tasks name no criterion ids).
     ``window`` holds the ids of the last ``repeat_window`` judged cases; ``subjects`` has, for every subject the window's rejections name, the
     number of window cases it failed in (``R`` ids first, then ``C`` ids, each by number); ``fired`` the subjects in at least ``repeat_failures``
-    cases, with ``cases`` the window cases of each. ``not_counted`` has, under every state, the readings the alarm ignored: for a rejection whose only
-    link is a relayed one (the assistant's own reading), its ``R<k>`` and the ids that link names, in the order it recorded them."""
+    cases, with ``cases`` the window cases of each. ``not_counted`` has, under every state, the readings the alarm ignored: for a rejection, its ``R<k>``
+    and the ids of the assistant's own reading (a relayed link, or the rejection's own ``criterion``) that no human link confirms, in the order it
+    recorded them; a human link that names another criterion does not hide the reading (DR2-3)."""
 
     state: str
     judged: int = 0

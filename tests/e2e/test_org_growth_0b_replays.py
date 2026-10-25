@@ -9,7 +9,7 @@ message that does not parse, fails the test; nothing here skips.
 
 This module holds E (E-1..E-5), E2 (E2-1..E2-6), A5 (A5-1..A5-4) and E3 (E3-1..E3-7). A5-4 is also the golden ``quality/a5_one_off_block.txt``, E3-5 the
 golden ``quality/e3.txt``, E3-8 the golden ``quality/e3.json`` with the schema and figure checks (``tests/golden/test_golden_quality.py``). E4 s1r, s2r and
-s3 are the last block (S1R-1..S1R-5, S2R-1..S2R-3, S3-1..S3-5, E4-all).
+s3 are the last block (S1R-1..S1R-6, S2R-1..S2R-3, S3-1..S3-5, E4-all).
 """
 
 import json
@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 from typing import Any, NamedTuple
 
 import pytest
+from testkit import REPO
 from testkit.e4_replay import EV, evidence
 from testkit.org_replay import materialize
 
@@ -451,7 +452,19 @@ def test_e3_7(replays):
 
 # ------------------------------------------------------------------------------------------------------------------ E4
 
+DESIGN = REPO / "docs" / "design" / "org-growth-phase-0b.md"
 S1R = "E4-s1r"
+
+
+def s1r_excerpt() -> list[str]:
+    """The lines of the code block that follows the heading of 9.3's E4 s1r excerpt in the design."""
+    lines = DESIGN.read_text(encoding="utf-8").splitlines()
+    start = next((i for i, line in enumerate(lines) if line.startswith("**E4 s1r's files, excerpt**")), None)
+    if start is None:
+        pytest.fail(f"{DESIGN} has no `**E4 s1r's files, excerpt**` heading: S1R-6 has nothing to compare with")
+    opening = next(i for i in range(start, len(lines)) if lines[i] == "```")
+    closing = next(i for i in range(opening + 1, len(lines)) if lines[i] == "```")
+    return lines[opening + 1 : closing]
 
 
 def final_status_line(stream: str, number: int) -> str:
@@ -579,6 +592,19 @@ def test_s1r_5(replays):
     assert any(line.startswith("    repeat: n/a (1 of 3 judged cases)") for line in replay.lines) and "    cost: n/a (1 of 3 judged cases)" in replay.lines
     assert (record["alarms"]["repeat"]["state"], record["alarms"]["cost"]["state"]) == ("n/a", "n/a")
     assert "(0.95x)" in next(line for line in replay.lines if "-root-ed94 " in line and "approved" in line)
+
+
+def test_s1r_6(replays):
+    """S1R-6: every line of 9.3's s1r excerpt that has no angle brackets equals the output's line byte for byte (in the excerpt's order)."""
+    replay = replays(S1R)
+    excerpt = s1r_excerpt()
+    plain = [line for line in excerpt if "<" not in line and ">" not in line]
+    assert len(excerpt) > 25 and len(plain) > 20
+    position = 0
+    for line in plain:
+        found = next((i for i in range(position, len(replay.lines)) if replay.lines[i] == line), None)
+        assert found is not None, f"the line of the excerpt is not in the output, in order: {line!r}"
+        position = found + 1
 
 
 def test_s2r_2(replays):

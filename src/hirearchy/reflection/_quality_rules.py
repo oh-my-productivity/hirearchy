@@ -11,7 +11,7 @@ from collections import Counter
 from collections.abc import Collection, Mapping, Sequence
 from fractions import Fraction
 
-from ..kernel import Message
+from ..kernel import Message, link_ids
 from .api import (
     Case, CostAlarm, CostCase, Delivery, QualityThresholds, RepeatAlarm, ServiceRecord, Verdict, case_spend, user_approved, user_cost,
 )
@@ -179,13 +179,22 @@ def _rejections(record: ServiceRecord, cases: Sequence[Case]) -> list[tuple[str,
     return sorted(found, key=lambda item: item[1].message.id)
 
 
+def _reading(v: Verdict) -> tuple[str, ...]:
+    """The ids the assistant's reading of a rejection names that no human link confirms, in the order the rejection recorded them (pure): a relayed link's
+    ids (the effective link), or, when a human link is the effective one, the rejection's own ``criterion`` ids that the link does not name. ``none`` is no id."""
+    if v.links_tier == "human":
+        confirmed = set(v.links)
+        return tuple(x for x in link_ids(v.message) if x != "none" and x not in confirmed)
+    return tuple(x for x in v.links if x != "none")
+
+
 def _not_counted(record: ServiceRecord, cases: Sequence[Case]) -> tuple[tuple[str, tuple[str, ...]], ...]:
-    """The readings the repeat alarm ignores in ``cases``: for a rejection whose only link is a relayed one, its ``R<k>`` and the ids that link names, in
-    the order the rejection recorded them."""
+    """The readings the repeat alarm ignores in ``cases`` (DR2-3): for a rejection, its ``R<k>`` and the ids that its relayed reading names and no human link
+    confirms, in the order the rejection recorded them. A human link that names another criterion does not hide the reading."""
     found: dict[str, tuple[str, ...]] = {}
-    for _, v, assertion, _, link in _rejections(record, cases):
-        reading = tuple(x for x in v.links if x != "none")
-        if link == "unconfirmed" and reading:
+    for _, v, assertion, _, _ in _rejections(record, cases):
+        reading = _reading(v)
+        if reading:
             found.setdefault(assertion, reading)
     return tuple(sorted(found.items(), key=lambda item: _number(item[0])))
 
@@ -194,7 +203,7 @@ def repeat_alarm(record: ServiceRecord, t: QualityThresholds) -> RepeatAlarm:
     """The repeat alarm of ``record`` (pure; 6): the last ``t.repeat_window`` judged cases, and the subjects that failed in at least ``t.repeat_failures``
     of them. The subjects of a case are, for each counted human-tier rejection, its assertion ``R<k>``, the ``C<k>`` of its human link notes, what the
     assertion is about (a "same as R<j>" resolved) and the ``R<j>`` its human link names; a criterion that only a relayed reading names is no subject
-    and is listed in ``not_counted``, under every state."""
+    and is listed in ``not_counted``, under every state, unless a human link confirms it."""
     judged = judged_cases(record)
     if not record.service:
         return RepeatAlarm("does not apply", len(judged))  # root's one-off tasks name no criterion ids
