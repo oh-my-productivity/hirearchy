@@ -83,6 +83,7 @@ __all__ = [
     "rated",
     "regressions",
     "repeat_alarm",
+    "shown_name",
     "signer_of",
     "stats_by_version",
     "summarize",

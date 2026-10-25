@@ -70,3 +70,9 @@ def test_the_package_exports_the_api_and_nothing_else() -> None:
 
 def test_the_api_names_what_the_ports_return() -> None:
     assert {"Case", "Verdict", "Stats", "summarize", "stats_by_version", "version_at", "lessons_of"} <= set(api.__all__)
+
+
+def test_shown_name_is_exported() -> None:
+    from hirearchy.reflection import shown_name
+
+    assert "shown_name" in api.__all__ and shown_name("a\nb", 20) == '"a\\nb"'  # a name is shown as one quoted line, never raw
