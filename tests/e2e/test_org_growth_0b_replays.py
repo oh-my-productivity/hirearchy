@@ -7,8 +7,9 @@ One test per expectation id of design 19.3, each written from the design's text 
 if a replay computes another value, the FEAT stops and the manager is told (19.3, "When an expectation fails"). A listed file that is missing, or a
 message that does not parse, fails the test; nothing here skips.
 
-This module holds E (E-1..E-5), E2 (E2-1..E2-6) and A5 (A5-1..A5-3); A5-4 is the golden ``quality/a5_one_off_block.txt``
-(``tests/golden/test_golden_quality.py``). E3 and E4 follow in the same module.
+This module holds E (E-1..E-5), E2 (E2-1..E2-6), A5 (A5-1..A5-4) and E3 (E3-1..E3-7). A5-4 is also the golden ``quality/a5_one_off_block.txt``, E3-5 the
+golden ``quality/e3.txt``, E3-8 the golden ``quality/e3.json`` with the schema and figure checks (``tests/golden/test_golden_quality.py``). E4 follows in
+the same module.
 """
 
 import json
@@ -339,3 +340,107 @@ def test_a5_4(replays):
     `tests/golden/test_golden_quality.py::test_a5_one_off_block`); moved past: none."""
     replay = replays("A5")
     assert replay.data["moved_past"] == [] and "Blocked tasks moved past without a verdict: none." in replay.lines
+
+
+# ------------------------------------------------------------------------------------------------------------------ E3
+
+E3_DD87, E3_207B, E3_AB46 = "20261021T152347923195-root-dd87", "20261021T153031017749-root-207b", "20261021T153809201054-root-ab46"
+E3_CONTRACT_GAP = "lead/reviewer: escapes 0 of 5 judged; not its: 2 contract-gap; PASS precision 5 of 5; its FAILs before delivery: 2 re-check(s), 2 author rework run(s)"
+
+
+def e3_cases(replay: Replay) -> list[Any]:
+    return service_record(replay).cases
+
+
+def test_e3_1(replays):
+    """E3-1: no cost alarm: the user's runs 12, 5 and 14 against 15, 15 and 20 approved (0.80x, 0.33x, 0.70x; the totals 12, 15, 14). The approved runs
+    are the contract's 15, raised only at ab46's rework (`...-2ccf`: 9 used + 6 held + 5 = 20); at dd87's rework (`...-d995`: 4 used + 2 held + 6 = 12)
+    nothing is raised."""
+    replay = replays("E3")
+    record = service(replay)
+    assert [(c["id"], c["budget"], c["user_cost"], c["user_approved"], c["ratio"], c["spend"]) for c in record["cases"]] == [
+        (E3_DD87, 15, 12, 15, "0.80", 12), (E3_207B, 15, 5, 15, "0.33", 15), (E3_AB46, 15, 14, 20, "0.70", 14),
+    ]
+    assert [c.user_ceiling for c in e3_cases(replay)] == [15, 15, 20]  # the ceiling of dd87's rework is 12, below the contract's 15: no rise
+    assert record["alarms"]["cost"] == {"state": "no", "judged": 3, "compared": 3, "cases": [], "skipped": []}
+    assert "    cost: no (0 of 3 cases above 1.25x)" in replay.lines
+    assert "    20261021T153809201054-root-ab46 \"Memo for the meeting of 2026-10-19\": 14 of 20 approved (0.70x); top-ups: +5 human rework 20261021T154215162562-root-2ccf" in replay.lines
+
+
+def test_e3_2(replays):
+    """E3-2: R1's unconfirmed link (C6, C3, the rejection's own `criterion`) is not counted by the repeat alarm and is listed as `not counted`."""
+    replay = replays("E3")
+    repeat = service(replay)["alarms"]["repeat"]
+    assert repeat["not_counted"] == {"R1": ["C6", "C3"]} and repeat["state"] == "no"
+    assert "R1" in repeat["subjects"] and "C6" not in repeat["subjects"] and "C3" not in repeat["subjects"]
+    assert "    repeat: no (3 judged cases; counted: R1, R2, C11); not counted: R1's reading C6, C3 (not confirmed)" in replay.lines
+
+
+def test_e3_3(replays):
+    """E3-3: the superseded `...-root-248f` (its result `...-lead-e0d6` is blocked, and rework 52d7 follows) is not counted as a block moved past: the
+    section is `none`."""
+    replay = replays("E3")
+    assert any(m.id == "20261021T153358013532-lead-e0d6" and m.status == "blocked" and m.reply_to.endswith("-root-248f") for m in replay.org.sent("lead"))
+    assert replay.data["moved_past"] == []
+    assert "Blocked tasks moved past without a verdict: none." in replay.lines
+
+
+def test_e3_4(replays):
+    """E3-4: contract-gap rejects are not shown as the verifier's escapes: R1 `contract-gap` (words, "always"), R2 `contract-gap` (answer, the link
+    `...-root-8ca0` names C11, which contract v2 does not have), both attributed `not its`."""
+    replay = replays("E3")
+    record = service(replay)
+    first, second = record["escapes"]
+    assert (first["assertion"], first["cause"], first["rule"], first["detail"], first["attribution"]) == ("R1", "contract-gap", "words", ["always"], "not its")
+    assert (second["assertion"], second["cause"], second["rule"], second["detail"], second["attribution"]) == (
+        "R2", "contract-gap", "answer", ["20261021T154557001479-root-8ca0", "C11"], "not its",
+    )
+    assert first["signer"] == second["signer"] == "lead/reviewer"
+    (verifier,) = record["verifiers"]
+    assert (verifier["addr"], verifier["judged"], verifier["escapes"], verifier["pass_precision"]) == (
+        "lead/reviewer", 5, {"counted": {}, "not_its": {"contract-gap": 2}}, [5, 5],
+    )
+    assert f"    {E3_CONTRACT_GAP}" in replay.lines
+    assert "escapes 0 of 5 judged (+2 not its: 2 contract-gap)" in replay.root_health  # root's reading of health
+    assert "escapes 0 of 5 judged" in replay.agent_health and "not its" not in replay.agent_health  # an agent's
+    assert "low_quality" not in replay.agents["lead/reviewer"].flags  # not flagged
+    (reviewer,) = [a for a in [replay.agents["lead/reviewer"]]]
+    assert (reviewer.judged, reviewer.escapes, reviewer.not_its) == (5, 0, {"contract-gap": 2})
+
+
+def test_e3_5(replays):
+    """E3-5: the text of 9.3's E3 sample equals the output byte for byte (the P golden `quality/e3.txt` is the design's sample; `test_golden_quality.py::
+    test_e3_text` checks it through `golden_support.check`)."""
+    from testkit import TESTS
+
+    sample = (TESTS / "golden" / "expected" / "quality" / "e3.txt").read_text(encoding="utf-8")
+    assert replays("E3").text + "\n" == sample
+
+
+def test_e3_6(replays):
+    """E3-6: case 207b has 10 runs in relayed reworks; its user's runs are 5 (total 15), and its relayed line reads `your relayed reworks: 10 run(s), your
+    own spend; total 15`."""
+    replay = replays("E3")
+    c207b = case(service(replay), "207b")
+    assert (c207b["relayed_runs"], c207b["user_cost"], c207b["spend"], c207b["runs"]) == (10, 5, 15, 15)
+    assert "      your relayed reworks: 10 run(s), your own spend; total 15" in replay.lines
+    assert sum("your relayed reworks:" in line for line in replay.lines) == 1  # shown only for a case that has relayed runs
+
+
+def test_e3_7(replays):
+    """E3-7 (the variant `r2-links-r1`, constructed: one more human-tier link, 'same as R1', on R2's rejection): the repeat alarm fires on real files with
+    `repeat: FIRES: R1 failed in 2 of the last 3 judged cases (cases ...dd87, ...ab46)`; R2's cause is unchanged (contract-gap by answer: C11 stays in R2's
+    `confirmed`); the cost line is unchanged. The unconfirmed reading of R1 stays on the line as `not counted`."""
+    replay = replays("E3", "r2-links-r1")
+    record = service(replay)
+    fires = f"    repeat: FIRES: R1 failed in 2 of the last 3 judged cases (cases {E3_DD87}, {E3_AB46})"
+    (line,) = [x for x in replay.lines if x.startswith("    repeat:")]
+    assert line == f"{fires}; not counted: R1's reading C6, C3 (not confirmed)"
+    assert (record["alarms"]["repeat"]["state"], record["alarms"]["repeat"]["fired"]) == ("fires", ["R1"])
+    assert record["alarms"]["repeat"]["window"] == [E3_DD87, E3_207B, E3_AB46]
+    (_, second) = service_record(replay).escapes
+    delivery, cause = second
+    assert (cause.type, cause.rule, cause.detail) == ("contract-gap", "answer", ("20261021T154557001479-root-8ca0", "C11"))
+    assert "C11" in delivery.decisive.confirmed
+    assert record["escapes"][1]["cause"] == "contract-gap" and record["escapes"][1]["rule"] == "answer"
+    assert "    cost: no (0 of 3 cases above 1.25x)" in replay.lines

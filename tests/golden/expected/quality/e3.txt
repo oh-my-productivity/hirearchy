@@ -1,0 +1,38 @@
+Quality of the work you asked for (derived from the files, nothing stored; for you and the user, never for agents).
+Thresholds: the defaults (tunable): alarms need 3 judged cases; repeat: one id failing in 2 of the last 3 judged cases; cost: a case above 1.25x its approved runs.
+
+weekly-meeting-memo (offered by lead; client: you, human; unit: case; contract v3, playbook v1; approved 15 runs per request)
+  cases: 3 (done 3, failed 0, blocked 0, open 0 (stalled 0))
+  first deliveries: 0 accepted, 2 rejected, 1 without a verdict (1 superseded by a rework before a verdict)
+    20261021T152347923195-root-dd87: rejected: "No, not right yet. Sam's CI item says 'before Friday', so that has a date, 2026-10-09. And Marta's room is for the training on the 14th, so I want 2026-10-14 t…"
+    20261021T153031017749-root-207b: no verdict (superseded by your relayed rework 20261021T153213891373-root-248f)
+    20261021T153809201054-root-ab46: rejected: "Almost, but not right yet: 'Marta keeps the agenda as sent' isn't an action item, nobody has to do anything there. Take that row out. Lee's Friday is right, an…"
+  judged by the user: 5 of 6 deliveries; without a verdict: 0 case(s); not as delivered: 0
+  escapes (the team reported done, then the user rejected it): 2
+    R1 case 20261021T152347923195-root-dd87, signed off by lead/reviewer: contract-gap (the user's words say "always")
+    R2 case 20261021T153809201054-root-ab46, signed off by lead/reviewer: contract-gap (the user's answer, link 20261021T154557001479-root-8ca0, names C11, which contract v2 of the task did not have)
+  verifiers:
+    lead/reviewer: escapes 0 of 5 judged; not its: 2 contract-gap; PASS precision 5 of 5; its FAILs before delivery: 2 re-check(s), 2 author rework run(s)
+  runs per case (the user's runs: runs used outside your relayed reworks, plus runs still out while a case is open or blocked; approved: the contract's 15 per request, or more where your hand-downs raised it (runs used + held + new, at that moment)):
+    20261021T152347923195-root-dd87 "Memo for the meeting of 2026-10-05": 12 of 15 approved (0.80x); top-ups: +6 human rework 20261021T152757534448-root-d995
+    20261021T153031017749-root-207b "Memo for the meeting of 2026-10-12": 5 of 15 approved (0.33x); top-ups: +5 your relayed rework 20261021T153213891373-root-248f, +5 your relayed rework 20261021T153557949152-root-52d7
+      your relayed reworks: 10 run(s), your own spend; total 15
+    20261021T153809201054-root-ab46 "Memo for the meeting of 2026-10-19": 14 of 20 approved (0.70x); top-ups: +5 human rework 20261021T154215162562-root-2ccf
+  alarms:
+    repeat: no (3 judged cases; counted: R1, R2, C11); not counted: R1's reading C6, C3 (not confirmed)
+    cost: no (0 of 3 cases above 1.25x)
+  timeline (bar changes, UTC; marked, never used to split the counts):
+    2026-10-21 15:23 contract v1 (C1, C2, C3, C4, C5, C6, C7, C8)
+    2026-10-21 15:23 playbook v1 (root): written by the client (no admission needed)
+    2026-10-21 15:27 contract v2 (root): adds C9, C10; removes C3, C6: not confirmed
+    2026-10-21 15:27 top-up +6 run(s) to case 20261021T152347923195-root-dd87: human rework 20261021T152757534448-root-d995
+    2026-10-21 15:32 top-up +5 run(s) to case 20261021T153031017749-root-207b: your relayed rework 20261021T153213891373-root-248f (your own spend)
+    2026-10-21 15:35 top-up +5 run(s) to case 20261021T153031017749-root-207b: your relayed rework 20261021T153557949152-root-52d7 (your own spend)
+    2026-10-21 15:42 top-up +5 run(s) to case 20261021T153809201054-root-ab46: human rework 20261021T154215162562-root-2ccf
+    2026-10-21 15:45 contract v3 (root): adds C11: C11 confirmed (link 20261021T154557001479-root-8ca0)
+    charter edits and model changes: unknown (no org history: the organization is not a git repository, or git is missing)
+  run attribution is by time window (08 3.3): 0 case(s) had their window cut by a later request.
+
+One-off tasks you gave: none.
+
+Blocked tasks moved past without a verdict: none.
