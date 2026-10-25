@@ -11,7 +11,7 @@ from ..kernel import ROOT, TITLE_MAX, Message, OrgError, clip_line
 from ..mail import MailboxReader
 from ._lines import criteria_lines
 from ._protocols import RequestBodies, ServiceRequests
-from .api import JUDGED_BYTES, CaseAllowance, Contract, Criterion, JudgedBase, JudgedVersions, ServiceCatalog, criteria_of
+from .api import BASE_DELIVERED_HEADING, BASE_LATEST_HEADING, JUDGED_BYTES, CaseAllowance, Contract, Criterion, JudgedBase, JudgedVersions, ServiceCatalog, criteria_of
 
 BASES = ("delivered", "latest")
 BASE_VALUE = 'refused: base must be "delivered" or "latest": {base}. Nothing was sent.'  # P4-BASE-VALUE
@@ -47,7 +47,7 @@ def _delivered(judged: JudgedBase) -> str:
     """The base section for ``base="delivered"``: the judged delivery, and the judged text of the paths that changed after it."""
     texts = dict(judged.texts)
     lines = [
-        "## Base: the version the client judged",
+        BASE_DELIVERED_HEADING,
         f"The client's corrections apply to the version they judged: the delivery of task {judged.task} (result {judged.result}"
         f"{_commit(judged, ', org-git commit ')}). Relayed rework {', '.join(judged.relayed)} {_RELAYED} changed {', '.join(judged.changed)} "
         "after it. Start from that version: restore each file below to it, then make only the changes this request asks for.",
@@ -65,7 +65,7 @@ def _delivered(judged: JudgedBase) -> str:
 
 def _latest(judged: JudgedBase) -> str:
     return (
-        "## Base: the current version\n"
+        f"{BASE_LATEST_HEADING}\n"
         f"The client's corrections apply to the current version, which keeps the changes relayed rework {', '.join(judged.relayed)} {_RELAYED} "
         f"made to {', '.join(judged.changed)} after the delivery they judged (task {judged.task}). Keep those changes unless this request says otherwise."
     )

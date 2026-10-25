@@ -153,3 +153,19 @@ def test_long_criteria_and_note_stay_inside_the_rendered_prompt_and_the_cut_poin
     assert note in shown and 'see "## Base" at the end of this task.' in shown
     assert "## Base: the version the client judged" in shown and "[... message cut: " in shown
     assert 'Read the rest with read(path="lead/<box>/20261022T100000000001-root-1234.md")' in shown
+
+
+def test_the_base_headings_are_the_api_constants() -> None:
+    from hirearchy.services import BASE_DELIVERED_HEADING, BASE_LATEST_HEADING
+
+    assert BASE_DELIVERED_HEADING == "## Base: the version the client judged"
+    assert BASE_LATEST_HEADING == "## Base: the current version"
+    delivered = based("delivered", judged(texts=((PATH, "j"),)))
+    latest = based("latest", judged())
+    assert delivered.count(BASE_DELIVERED_HEADING + "\n") == 1 and latest.count(BASE_LATEST_HEADING + "\n") == 1
+
+
+def test_the_base_headings_start_with_base_heading() -> None:
+    from hirearchy.services import BASE_DELIVERED_HEADING, BASE_LATEST_HEADING
+
+    assert BASE_DELIVERED_HEADING.startswith(BASE_HEADING) and BASE_LATEST_HEADING.startswith(BASE_HEADING)

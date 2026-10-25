@@ -33,7 +33,9 @@ from ._cap import playbook_word_cap
 __all__ = [
     "Admission",
     "AmendmentBasis",
+    "BASE_DELIVERED_HEADING",
     "BASE_HEADING",
+    "BASE_LATEST_HEADING",
     "CaseAllowance",
     "Contract",
     "ContractNormalizer",
@@ -85,6 +87,8 @@ LINK_HEADER = (
     "The client says what their rejection {confirms} was about, for reflection only: it does not change any task's acceptance criteria or outcome."
 )
 BASE_HEADING = "## Base: "  # the heading of the base section of a rework's task body (P4)
+BASE_DELIVERED_HEADING = "## Base: the version the client judged"  # the base section of base="delivered"
+BASE_LATEST_HEADING = "## Base: the current version"  # the base section of base="latest"
 JUDGED_BYTES = 6000  # bytes of the judged versions a rework's task body carries, in all (P4)
 EVIDENCE_MAX = 20  # ids a playbook revision may cite
 EVIDENCE_ID_MAX = 80  # characters of one cited id
