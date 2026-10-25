@@ -11,12 +11,24 @@ from ..kernel import ROOT, Message, latest_results, link_ids, msg_time, parent, 
 from ..mail import MailboxReader
 from ..services import ServiceCatalog
 from ._ports import FeedbackWords, PlaybookTimelines, RunCounter
-from .api import Case, CaseHistory, Verdict, lessons_of, version_at
+from .api import Case, CaseHistory, TopUp, TopUps, Verdict, lessons_of, version_at
 
 
 def _within(stamp: str, bounds: tuple[str, str | None]) -> bool:
     """Is ``stamp`` in the interval of a task: from its send up to its successor's send (exclusive), or to the window's end for the last one?"""
     return bounds[0] <= stamp and (bounds[1] is None or stamp < bounds[1])
+
+
+def _handed_down(sent: Sequence[Message], team: Sequence[str], start: str, end: str | None) -> list[Message]:
+    """The notes the client sent to an agent of ``team`` with runs, inside the window ``start`` to ``end`` (inclusive, on the 21-character stamps)."""
+    return [m for m in sent if m.type == "note" and m.budget > 0 and m.to in team and m.id[:21] >= start and (end is None or m.id[:21] <= end)]
+
+
+def _top_ups(tasks: list[Message], handed_down: Sequence[Message]) -> TopUps:
+    """The runs added after the head task (0b 4.2): the budget of each later task, by its ``source`` (``unrecorded`` when none), and of each note
+    that handed runs down inside the window (``granted``), in id order."""
+    items = [TopUp(t.id, t.source or "unrecorded", t.budget) for t in tasks[1:]] + [TopUp(n.id, "granted", n.budget) for n in handed_down]
+    return TopUps(tuple(sorted(items, key=lambda t: t.id)))
 
 
 @dataclass(frozen=True)
@@ -46,7 +58,7 @@ def _spend(
     def in_relayed(s: str) -> bool:
         return any(_within(s, b) for b in relayed)
 
-    handed_down = [m for m in sent if m.type == "note" and m.budget > 0 and m.to in team and m.id[:21] >= start and (end is None or m.id[:21] <= end)]
+    handed_down = _handed_down(sent, team, start, end)
     grants = sorted((m for m in handed_down if human and not in_relayed(m.id[:21])), key=lambda m: m.id)  # the user grants
 
     def back_to_user(k: int, t: Message) -> int:
@@ -170,10 +182,12 @@ class DerivedCaseHistory(CaseHistory):
             final = res is not None and res.status in ("done", "failed")
             end = res.id[:21] if res is not None and final else None
             later = next((i for i in others if i > last.id and i not in ids), None)
-            if later and (end is None or later[:21] < end):
+            cut = later is not None and (end is None or later[:21] < end)  # the window ends at the client's next task to the owner
+            if later is not None and cut:
                 end = later[:21]
             start = tasks[0].id[:21]
-            charged = [s for s, credited in self._counter.stamps(team, start, end) if not credited] if runs else []
+            stamps = self._counter.stamps(team, start, end) if runs else []  # the one read of the run logs of this case
+            charged = [s for s, credited in stamps if not credited]
             spend = _spend(tasks, results, sent, team, kind == "human", start, end, charged, per_request=per_request)
             step = {t.id: i for i, t in enumerate(tasks)}
             verdicts = [
@@ -184,7 +198,7 @@ class DerivedCaseHistory(CaseHistory):
                 playbook=tasks[0].playbook or 0,
                 used=version_at(timeline, msg_time(first_result) if (first_result := results.get(tasks[0].id)) else None),
                 reworks=len(tasks) - 1, budget=sum(t.budget for t in tasks),
-                runs=len(charged), relayed_runs=spend.relayed_runs,
+                runs=len(charged), relayed_runs=spend.relayed_runs, credited=sum(1 for _, credited in stamps if credited),
                 lessons=[x for t in tasks if (r := results.get(t.id)) is not None and (x := lessons_of(r))],
                 lesson_ids=[r.id for t in tasks if (r := results.get(t.id)) is not None and lessons_of(r)],
                 lesson_sources=[t.source or "" for t in tasks if (r := results.get(t.id)) is not None and lessons_of(r)],
@@ -195,6 +209,7 @@ class DerivedCaseHistory(CaseHistory):
                 open_tasks=tuple(t.id for t in tasks if (r := results.get(t.id)) is None or r.status not in ("done", "failed")),
                 relayed_returned=spend.relayed_returned, relayed_to_user=spend.relayed_to_user, relayed_overlap=spend.relayed_overlap, unsplit_runs=spend.unsplit_runs,
                 user_granted=spend.user_granted, user_ceiling=spend.user_ceiling, unapproved_reworks=spend.unapproved,
+                top_ups=_top_ups(tasks, _handed_down(sent, team, start, end)), cut=cut,
             ))
         return out
 

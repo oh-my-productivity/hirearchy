@@ -37,6 +37,8 @@ __all__ = [
     "ServiceSteps",
     "Stats",
     "StatsReport",
+    "TopUp",
+    "TopUps",
     "Verdict",
     "case_spend",
     "confirmed_criteria",
@@ -76,6 +78,42 @@ class Verdict:
     link_notes: tuple[Message, ...] = ()  # the link notes that reply to this verdict, of every tier, in id order (a cited note id is evidence, 4.3)
 
 
+@dataclass(frozen=True)
+class TopUp:
+    """Runs added to a case after its first request (0b 4.2): the budget of a later task of the chain, or of a note the client sent to the team."""
+
+    id: str  # the id of the task or note
+    kind: str  # "human" | "relayed" | "unrecorded" (a rework with no recorded ``source``) for a task; "granted" for a note
+    amount: int
+
+
+def _total(items: Sequence[TopUp], kind: str) -> int:
+    return sum(t.amount for t in items if t.kind == kind)
+
+
+@dataclass(frozen=True)
+class TopUps:
+    """The top-ups of a case in id order, and their sums by kind."""
+
+    items: tuple[TopUp, ...] = ()
+
+    @property
+    def human(self) -> int:
+        return _total(self.items, "human")
+
+    @property
+    def relayed(self) -> int:
+        return _total(self.items, "relayed")
+
+    @property
+    def unrecorded(self) -> int:
+        return _total(self.items, "unrecorded")
+
+    @property
+    def granted(self) -> int:
+        return _total(self.items, "granted")
+
+
 @dataclass
 class Case:
     """One request of a service plus its rework chain (derived from the message files)."""
@@ -109,6 +147,9 @@ class Case:
     open_tasks: tuple[str, ...] = ()  # the chain's tasks whose latest result is missing or blocked, oldest first (D-E6-2)
     user_ceiling: int = 0  # the highest ceiling over the user's hand-downs (the most the user's requests could cost right after one), leaving out the default's 1-run hand-downs with nothing left (``unapproved_reworks``, D-E7-2 A2); 0 for an agent client
     unapproved_reworks: tuple[str, ...] = ()  # D-E7-2 A2: the human reworks handed the default's 1 run while nothing was left (or an explicit 1 then, which the files cannot tell apart), oldest first: no approval of the user's; () for an agent client
+    credited: int = 0  # 0b 4.2: the credited run logs in the case window (a run credit names them: they are not charged and not in ``runs``)
+    top_ups: TopUps = TopUps()  # 0b 4.2: the budgets of the chain's later tasks by source, and of the client's notes to the team inside the window
+    cut: bool = False  # 0b 4.1: the window ended at the client's next task to the owner, before the case's final result
 
     @property
     def title(self) -> str:

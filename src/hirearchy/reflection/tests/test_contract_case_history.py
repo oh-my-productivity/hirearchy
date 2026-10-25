@@ -516,7 +516,7 @@ def test_chains_with_runs_false_read_no_run_log_charter_or_playbook(w: Reflectio
     revise(w)
     mail_only = DerivedCaseHistory(w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, _Refusing(), _Refusing())
     (case,) = mail_only.chains("ceo", SERVICE, since=None, runs=False)
-    assert (case.runs, case.relayed_runs, case.used) == (0, 0, 0)
+    assert (case.runs, case.credited, case.relayed_runs, case.used) == (0, 0, 0, 0)
     assert [t.id for t in case.tasks] == [first.id, relayed.id] and (case.returned, case.relayed_returned, case.budget) == (1, 0, 13)
 
 

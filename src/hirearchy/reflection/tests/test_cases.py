@@ -2,6 +2,7 @@
 # A test moved from tests/ by refactor step E1: not type-checked strictly (production code is). Delete the first line when this file is typed.
 
 import time
+from datetime import datetime, timedelta
 
 from testkit.reach.hirearchy.core import ROOT
 from testkit.services_world import contract_meta, define, deliver, request, svc, work
@@ -9,6 +10,9 @@ from testkit.services_world import contract_meta, define, deliver, request, svc,
 from hirearchy.kernel import RUNTIME, Message, run_credit_title
 import hirearchy.reflection as reflection
 from hirearchy.reflection import stats_by_version, summarize
+from hirearchy.reflection._cases import DerivedCaseHistory
+from hirearchy.reflection._ports import RunCounter
+from hirearchy.reflection._timeline import StorePlaybookTimelines
 from hirearchy.reflection.testing import fs_world
 
 from . import _support as sup
@@ -664,3 +668,135 @@ def test_limit_2_a_reopened_window_counts_another_requests_runs_as_the_users_and
     sup.rework(w, memo1, budget=4)
     case = next(c for c in w.history.cases("ceo", SERVICE) if c.id == memo1.id)
     assert case.runs == 8 + 4 and case.user_ceiling == 12 + 4 and reflection.user_spend(case) == 12
+
+
+# ------------------------------------------------------------------------- credited, top-ups and cut (0b 4.1, 4.2)
+class FixedStamps(RunCounter):
+    """A run counter that answers the stamps it was given (the 21-character name of each log with whether a credit names it), and counts its calls."""
+
+    def __init__(self, stamps):
+        self.found = sorted(stamps)
+        self.calls = []
+
+    def runs_between(self, team, start, end):
+        return sum(1 for _, credited in self.stamps(team, start, end) if not credited)
+
+    def stamps(self, team, start, end):
+        self.calls.append((tuple(team), start, end))
+        return [(s, credited) for s, credited in self.found if s >= start and (end is None or s <= end)]
+
+
+def with_counter(w, counter):
+    """The history of ``w`` over the same files, counting runs with ``counter``."""
+    return DerivedCaseHistory(w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, StorePlaybookTimelines(w.s.store), counter)
+
+
+def before(stamp):
+    """The stamp one microsecond earlier."""
+    return (datetime.strptime(stamp, "%Y%m%dT%H%M%S%f") - timedelta(microseconds=1)).strftime("%Y%m%dT%H%M%S%f")
+
+
+def test_credited_counts_the_credited_logs_in_the_window(tmp_path):
+    w = chain_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=3)
+    last = max(w.runs.files("ceo"), key=lambda f: f.stem).stem  # the last run ended on a throttle and was given back
+    w.s.d.post(Message(sender=RUNTIME, to="ceo", type="note", budget=1, wake=False, title=run_credit_title("ceo", last), body="returned"))
+    case = the_case(w)
+    assert (case.runs, case.credited) == (2, 1)
+
+
+def test_a_case_without_a_credit_has_no_credited_runs(tmp_path):
+    w = chain_world(tmp_path)
+    sup.deliver(w, sup.ask(w), runs=2)
+    assert (the_case(w).runs, the_case(w).credited) == (2, 0)
+
+
+def test_relayed_runs_follow_the_interval_rule_of_4_2(tmp_path):
+    """Charged runs at a relayed task's own stamp and just below its successor's are in its interval; one at the successor's stamp is the user's;
+    the last task's interval runs to the window's end, inclusive. The value is 0a.3's, unchanged by 0b."""
+    w = chain_world(tmp_path)
+    head = sup.ask(w)
+    relayed = sup.rework(w, head, source="relayed", budget=4)
+    human = sup.rework(w, relayed, budget=3)
+    last_relayed = sup.rework(w, human, source="relayed", budget=2)
+    result = sup.deliver(w, last_relayed, runs=0)
+    r, h, l = relayed.id[:21], human.id[:21], last_relayed.id[:21]
+    stamps = [
+        (r, False), (before(h), False), (h, False),  # the first relayed interval is [r, h): two runs; h is the user's
+        (before(l), False),  # the user's
+        (l, False), (result.id[:21], False),  # the last relayed interval is [l, end], end = the final result's stamp, inclusive
+        (head.id[:21], False),  # the head's own interval starts at its stamp
+        (before(h), True),  # credited: in no count
+    ]
+    case = with_counter(w, FixedStamps(stamps)).cases("ceo", SERVICE)[0]
+    assert (case.runs, case.relayed_runs, case.credited) == (7, 4, 1)
+
+
+def test_top_ups_list_later_tasks_by_source_and_grants_inside_the_window(tmp_path):
+    w = ceiling_world(tmp_path)
+    grant(w, 9)  # before the request: not in the window
+    head = sup.ask(w)
+    first = grant(w, 2)
+    human = sup.rework(w, head, budget=3)
+    second = grant(w, 5, to="ceo/eng")
+    grant(w, 6, to="ops")  # not to the team
+    w.s.d.post(Message(sender="root", to="ceo", type="note", body="no runs", title="n", budget=0))
+    relayed = sup.rework(w, human, source="relayed", budget=4)
+    legacy = w.s.d.post(Message(sender="root", to="ceo", type="task", title="again", body="b", service=SERVICE, revises=relayed.id, budget=7))
+    sup.deliver(w, legacy, runs=1)
+    grant(w, 8)  # after the final result: not in the window
+    case = the_case(w)
+    assert case.top_ups.items == (
+        reflection.TopUp(first.id, "granted", 2), reflection.TopUp(human.id, "human", 3), reflection.TopUp(second.id, "granted", 5),
+        reflection.TopUp(relayed.id, "relayed", 4), reflection.TopUp(legacy.id, "unrecorded", 7),
+    )
+    assert (case.top_ups.human, case.top_ups.relayed, case.top_ups.unrecorded, case.top_ups.granted) == (3, 4, 7, 7)
+
+
+def test_a_case_with_one_task_and_no_grant_has_no_top_ups(tmp_path):
+    w = chain_world(tmp_path)
+    sup.deliver(w, sup.ask(w), runs=1)
+    top_ups = the_case(w).top_ups
+    assert top_ups.items == () and (top_ups.human, top_ups.relayed, top_ups.unrecorded, top_ups.granted) == (0, 0, 0, 0)
+
+
+def test_a_window_that_ended_at_the_next_request_is_cut(tmp_path):
+    w = chain_world(tmp_path)
+    open_one = sup.ask(w, "a")
+    answered = sup.ask(w, "b")  # the first is still open when the second is sent
+    sup.deliver(w, answered, runs=1)
+    sup.ask(w, "c")  # the second was answered before the third was sent
+    one, two, three = w.history.cases("ceo", SERVICE)
+    assert (one.id, one.cut, two.cut, three.cut) == (open_one.id, True, False, False)
+
+
+def test_a_case_answered_after_the_next_request_was_sent_is_cut(tmp_path):
+    w = chain_world(tmp_path)
+    first = sup.ask(w, "a")
+    sup.ask(w, "b")
+    sup.deliver(w, first, runs=1)  # its result comes after the second request: the window ended at the second
+    one, two = w.history.cases("ceo", SERVICE)
+    assert (one.state, one.cut, two.cut) == ("done", True, False)
+
+
+def test_a_blocked_case_followed_by_a_request_is_cut_and_a_rework_of_its_chain_is_not(tmp_path):
+    w = chain_world(tmp_path)
+    blocked = sup.ask(w, "a")
+    sup.deliver(w, blocked, status="blocked", runs=1)
+    again = sup.rework(w, blocked)  # the same chain: no cut
+    assert the_case(w).cut is False
+    sup.deliver(w, again, status="blocked", runs=1)
+    sup.ask(w, "b")
+    one, _ = w.history.cases("ceo", SERVICE)
+    assert (one.state, one.cut) == ("blocked", True)
+
+
+def test_each_case_makes_one_stamps_call(tmp_path):
+    w = chain_world(tmp_path)
+    head = sup.ask(w, "a")
+    sup.deliver(w, sup.rework(w, head, source="relayed"), runs=1)
+    sup.ask(w, "b")
+    counter = FixedStamps([])
+    cases = with_counter(w, counter).cases("ceo", SERVICE)
+    assert len(cases) == 2 and len(counter.calls) == 2
