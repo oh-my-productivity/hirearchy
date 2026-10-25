@@ -255,3 +255,83 @@ def test_quality_and_health_write_nothing(org):
     report = org.runtime.health_analyzer.org_health(ROOT)
     org.runtime.health_renderer.render_text(report)
     assert tree(org.root) == before
+
+
+# ------------------------------------------------------------------------------------------------- the view and health agree (I5)
+
+REVIEWER = "lead/reviewer"
+
+
+def signed_off(org: Org, task, signer: str, artifacts: list[str] | None = None):
+    """The lead's team delivers ``task``: ``signer`` (the reviewer) passes it first unless the lead signs it off alone."""
+    org.begin_run("lead")
+    org.start_run_log("lead")
+    if signer != "lead":
+        check = org.delegate("lead", signer, "Check", "goal", "criteria", budget=2)
+        deliver(org, check, owner=signer)
+    result = org.report("lead", task.id, "done", "Delivered.", artifacts=artifacts, lessons="Worked.")
+    org.end_run("lead", ok=True)
+    return result
+
+
+def reject(org: Org, task, words: str, *, criterion: list[str] | None = None) -> None:
+    note = org.feedback(ROOT, task.id, "reject", words, source="human")
+    if criterion:  # the user's confirmed link: the rejection is about this criterion
+        org.feedback(ROOT, task.id, "reject", f"It is about {criterion[0]}.", source="human", criterion=criterion, confirms=note.id)
+
+
+def test_the_views_counted_and_not_its_escapes_equal_healths_per_verifier(org):
+    """I5, D7: the view's verifier lines and health read one cause typing and one attribution. One world with every cause and no hand edit (no
+    deliverable folder): the reviewer signs four deliveries (a miss, an untyped rejection, a gap in the contract, an accept) and the lead two alone (a
+    relayed rework the user rejected, and a rejection of a delivery that carries over a relayed rework's artifact)."""
+    org.hire("lead", "reviewer", "Reviewer", "Check.")
+    artifact = org.root / "lead" / "work" / "out.md"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text("The memo.\n", encoding="utf-8")
+    shared = ["lead/work/out.md"]
+
+    def ask(topic: str, **more):
+        return org.request(ROOT, SERVICE, {"topic": topic}, **more)
+
+    miss, plain, gap, good = (ask(t) for t in ("miss", "plain", "gap", "good"))
+    for task in (miss, plain, gap, good):
+        signed_off(org, task, REVIEWER)
+    reject(org, miss, "Too long.", criterion=["C1"])  # the user confirms C1, which the task carried: reviewer-miss
+    reject(org, plain, "No: not right.")  # nothing a rule can read: untyped
+    reject(org, gap, "Always lead with the date.")  # a lasting word: contract-gap
+    org.feedback(ROOT, good.id, "accept", source="human")
+
+    first = ask("relayed")
+    signed_off(org, first, "lead")
+    relayed = ask("relayed", revises=first.id)  # no source: the assistant's own reading
+    signed_off(org, relayed, "lead")
+    reject(org, relayed, "No: not it.")  # a relayed-error
+
+    base = ask("carry")
+    signed_off(org, base, "lead", shared)
+    carried = ask("carry", revises=base.id)  # relayed
+    signed_off(org, carried, "lead", shared)
+    again = ask("carry", revises=carried.id, source="human", base="latest")  # the user's own rework, from the current version, delivers the same file
+    signed_off(org, again, "lead", shared)
+    reject(org, again, "No: not it.")  # relayed-carry-over
+
+    (record,) = json.loads(json.dumps(org.runtime.quality_report.quality_data()))["services"]
+    assert record["files_error"] == "" and record["deliveries"]["not_as_delivered"] == []  # no hand edit
+    assert sorted(e["cause"] for e in record["escapes"]) == ["contract-gap", "relayed-carry-over", "relayed-error", "reviewer-miss", "untyped"]
+    view = {v["addr"]: v for v in record["verifiers"]}
+    assert set(view) == {REVIEWER}  # the lead is the owner: when it signs off alone it is no verifier, its escapes are in the escape lines
+    health = {addr: org.runtime.health_analyzer.agent_health(addr) for addr in ("lead", REVIEWER)}
+    reviewer = health[REVIEWER]
+    assert view[REVIEWER]["escapes"] == {"counted": {"reviewer-miss": 1, "untyped": 1}, "not_its": {"contract-gap": 1}}
+    assert view[REVIEWER]["judged"] == 4 and (reviewer.escapes, reviewer.not_its, reviewer.judged) == (2, {"contract-gap": 1}, 4)
+    # the owner holds every delivery of its service, whoever signed it off: its numbers are those of all the escape lines
+    lead = health["lead"]
+    by_attribution = {kind: [e["cause"] for e in record["escapes"] if e["attribution"] == kind] for kind in ("counted", "not its")}
+    assert sorted(by_attribution["counted"]) == ["reviewer-miss", "untyped"]
+    assert lead.escapes == len(by_attribution["counted"]) and lead.judged == record["deliveries"]["judged"] == 6
+    assert lead.not_its == {cause: by_attribution["not its"].count(cause) for cause in sorted(by_attribution["not its"])}
+    assert lead.not_its == {"contract-gap": 1, "relayed-carry-over": 1, "relayed-error": 1}
+    text = org.runtime.health_renderer.render_text(org.runtime.health_analyzer.org_health(ROOT), causes=True)
+    assert "escapes 2 of 4 judged (+1 not its: 1 contract-gap)" in text  # the reviewer, as root reads it
+    assert "(+3 not its: 1 contract-gap, 1 relayed-error, 1 relayed-carry-over)" in text  # the lead, who owns all six
+
