@@ -207,6 +207,11 @@ TOPUP = (
 NOTHING_LEFT = "Nothing else is left of the runs the user approved for this case."
 SOME_LEFT = "{spare} more of the {approved} runs the user approved for this case are left."
 HELD = "The team still holds {held} of the user's runs for {revised}; the rework can use them."
+DEFAULT_RUN = "Nothing else was left of the runs the user approved for this case when this rework was sent: its own run is beyond them, and the ask includes it."
+DEFAULT_RUN_HELD = (
+    "Nothing else was left of the runs the user approved for this case when this rework was sent: its own run is beyond them, and the runs the team "
+    "holds cover the round without it. Ask for nothing; tell the user that this 1 run is beyond their approval."
+)
 
 
 def deliver_asking(w: ReflectionWorld, task: Message, *questions: str, block: str | None = None) -> Message:
@@ -294,12 +299,13 @@ def test_a_user_rework_below_the_round_with_nothing_spare_asks_for_the_rest(w: R
     assert 'send(to="ceo", budget=3, body=<why>) (CLI: hirearchy send ceo "<why>" --budget 3).' in text
 
 
-def test_a_user_rework_of_one_run_asks_for_the_four_more_it_needs(w: ReflectionWorld) -> None:
-    """Design 4.5's second example: nothing was left, the rework was sent with 1 run."""
+def test_a_user_rework_of_one_run_asks_for_the_five_more_it_needs(w: ReflectionWorld) -> None:
+    """Design 4.5's second example, as D-E7-2 A1 amends it (14 Rule A1, item 1): nothing was left, the rework was sent with 1 run. That run is beyond
+    the user's approval, so the ask and the grant include it (5, was 4) and ``{left}`` names it."""
     first = ask(w)
     deliver(w, first, runs=8)  # 10 handed down, 8 used, none back
     again = w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=first.id, budget=1, source="human")
-    assert w.steps.rework_step(again) == TOPUP.format(budget=1, need=5, owner="ceo", left=NOTHING_LEFT, ask=4, grant=4)
+    assert w.steps.rework_step(again) == TOPUP.format(budget=1, need=5, owner="ceo", left=DEFAULT_RUN, ask=5, grant=5)
 
 
 def test_a_user_rework_with_some_runs_spare_says_how_many_are_left(w: ReflectionWorld) -> None:
@@ -340,26 +346,29 @@ def human_rework(w: ReflectionWorld, first: Message, budget: int, name: str = SE
 
 def test_an_open_request_whose_team_holds_the_rest_of_the_round_says_so_and_asks_nothing(w: ReflectionWorld) -> None:
     """D-E6-2, B2 (design 5.3; E6 s3's bc02): 10 handed down, 2 used and the case open: the team holds 10 - 2 = 8 of the user's runs, and the rework's
-    1 run plus 8 cover the round of 5, so the step is the HELD sentence alone (0a.3 asked for 4 more)."""
+    1 run plus 8 cover the round of 5, so nothing is asked (0a.3 asked for 4 more). The rework is the default with nothing left (D-E7-2 A1, 14 Rule A1,
+    item 9): the HELD sentence is followed by the one that names its run as beyond the user's approval, as DR-0a5-7 words it."""
     first = open_request(w, runs=2)
-    assert w.steps.rework_step(human_rework(w, first, 1)) == HELD.format(held=8, revised=first.id)
+    assert w.steps.rework_step(human_rework(w, first, 1)) == f"{HELD.format(held=8, revised=first.id)} {DEFAULT_RUN_HELD}"
 
 
 def test_a_blocked_request_is_open_too(w: ReflectionWorld) -> None:
+    """D-E7-2 A1 (14 Rule A1, item 10): the same numbers with a ``blocked`` result; the default's run is still named."""
     first = open_request(w, runs=2, status="blocked")
-    assert w.steps.rework_step(human_rework(w, first, 1)) == HELD.format(held=8, revised=first.id)
+    assert w.steps.rework_step(human_rework(w, first, 1)) == f"{HELD.format(held=8, revised=first.id)} {DEFAULT_RUN_HELD}"
 
 
 def test_held_runs_that_cover_part_of_the_round_are_in_the_left_part_and_reduce_the_ask_and_the_grant(w: ReflectionWorld) -> None:
     """D-E6-2, B2 (design 5.4's example): round 5, a rework of 1 run, nothing spare, 2 held: the team holds 2, the user is asked for the other 2 and a
-    grant of 2 raises the ceiling by exactly the ask."""
+    grant of 2 raises the ceiling by exactly the ask. D-E7-2 A1 (14 Rule A1, item 2): contract 3 with 1 used leaves nothing for the rework, so it is the
+    default with nothing left: its run is in the ask and the grant (3, was 2), and ``{left}`` is HELD followed by the sentence that names it."""
     define(w, name="small", budget=3)
     first = open_request(w, "small", runs=1)
     text = w.steps.rework_step(human_rework(w, first, 1, "small"))
     assert text == TOPUP.format(
-        budget=1, need=5, owner="ceo", left=f"{HELD.format(held=2, revised=first.id)} {NOTHING_LEFT}", ask=2, grant=2,
+        budget=1, need=5, owner="ceo", left=f"{HELD.format(held=2, revised=first.id)} {DEFAULT_RUN}", ask=3, grant=3,
     )
-    assert 'Ask the user now for 2 more run(s), with that number; on yes, grant 2: send(to="ceo", budget=2, body=<why>)' in text
+    assert 'Ask the user now for 3 more run(s), with that number; on yes, grant 3: send(to="ceo", budget=3, body=<why>)' in text
 
 
 def test_held_runs_and_spare_runs_together_use_the_some_left_wording(w: ReflectionWorld) -> None:
@@ -372,17 +381,19 @@ def test_held_runs_and_spare_runs_together_use_the_some_left_wording(w: Reflecti
     assert text == TOPUP.format(budget=1, need=5, owner="ceo", left=left, ask=1, grant=3)
 
 
-def test_a_closed_revised_task_holds_nothing_and_keeps_todays_top_up(w: ReflectionWorld) -> None:
-    """D-E6-2, B2 (design 5.7): the same numbers as the first test, with the request delivered: 0a.3's top-up, no HELD sentence."""
+def test_a_closed_revised_task_holds_nothing_and_asks_for_the_default_run_too(w: ReflectionWorld) -> None:
+    """D-E6-2, B2 (design 5.7): the same numbers as the first test, with the request delivered: no HELD sentence. D-E7-2 A1 (14 Rule A1, item 3):
+    10 are committed (2 used, none back), so the rework is the default with nothing left: ask 5 and grant 5 (was 4)."""
     first = open_request(w, runs=2, status="done")
-    assert w.steps.rework_step(human_rework(w, first, 1)) == TOPUP.format(budget=1, need=5, owner="ceo", left=NOTHING_LEFT, ask=4, grant=4)
+    assert w.steps.rework_step(human_rework(w, first, 1)) == TOPUP.format(budget=1, need=5, owner="ceo", left=DEFAULT_RUN, ask=5, grant=5)
 
 
-def test_an_open_request_whose_team_holds_nothing_keeps_todays_top_up(w: ReflectionWorld) -> None:
-    """D-E6-2, B2: contract 3, all 3 runs used, the case still open: nothing is held, so the step is 0a.3's."""
+def test_an_open_request_whose_team_holds_nothing_asks_for_the_default_run_too(w: ReflectionWorld) -> None:
+    """D-E6-2, B2: contract 3, all 3 runs used, the case still open: nothing is held, so there is no HELD sentence. D-E7-2 A1 (14 Rule A1, item 4):
+    nothing was left, so the rework's own run is in the ask and the grant (5, was 4)."""
     define(w, name="small", budget=3)
     first = open_request(w, "small", runs=3)
-    assert w.steps.rework_step(human_rework(w, first, 1, "small")) == TOPUP.format(budget=1, need=5, owner="ceo", left=NOTHING_LEFT, ask=4, grant=4)
+    assert w.steps.rework_step(human_rework(w, first, 1, "small")) == TOPUP.format(budget=1, need=5, owner="ceo", left=DEFAULT_RUN, ask=5, grant=5)
 
 
 def test_an_open_request_with_spare_runs_covering_the_round_has_no_step(w: ReflectionWorld) -> None:
@@ -392,12 +403,33 @@ def test_an_open_request_with_spare_runs_covering_the_round_has_no_step(w: Refle
     assert w.steps.rework_step(human_rework(w, first, 1, "big")) == ""
 
 
-def test_an_owner_with_no_agent_below_needs_a_round_of_one_so_no_top_up_is_asked(w: ReflectionWorld) -> None:
+def test_an_owner_with_no_agent_below_asks_for_its_own_default_run(w: ReflectionWorld) -> None:
+    """D-E7-2 A1 (14 Rule A1, item 5; 4.9's need-1 test): ``ops`` has no agent below it, so a round is 1 and the rework's 1 run would cover it, but
+    10 were used and nothing was left: the run is beyond the approval, and the ask is that 1 run (it was ``""``)."""
     define(w, "ops", "ops-brief")
     first = w.s.commands.request("root", "ops-brief", {"topic": "ai"})
     deliver(w, first, runs=10)
     again = w.s.commands.request("root", "ops-brief", {"topic": "ai"}, revises=first.id, budget=1, source="human")
-    assert w.steps.rework_step(again) == ""
+    assert w.steps.rework_step(again) == TOPUP.format(budget=1, need=1, owner="ops", left=DEFAULT_RUN, ask=1, grant=1)
+
+
+def test_a_user_rework_of_one_run_with_one_left_is_no_default_and_keeps_todays_top_up(w: ReflectionWorld) -> None:
+    """D-E7-2 A1: 9 used and 1 back leaves 1 of the 10 approved runs for the rework, so it is not the default with nothing left: today's text, with the
+    runs it takes from the approval."""
+    first = ask(w)
+    deliver(w, first, runs=9, budget=1)
+    again = w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=first.id, budget=1, source="human")
+    assert w.steps.rework_step(again) == TOPUP.format(budget=1, need=5, owner="ceo", left=NOTHING_LEFT, ask=4, grant=4)
+
+
+def test_a_default_run_of_an_owner_with_no_agent_below_while_one_run_is_held_asks_nothing_and_names_the_run(w: ReflectionWorld) -> None:
+    """D-E7-2 A1 (design 4.8): ``ops-brief`` ran 9 of its 10 runs and is still open; the rework (1 run, nothing left) leaves 1 run held, which covers the
+    round of 1 without the rework's own: HELD, then the sentence that tells root to say that run is beyond the user's approval."""
+    define(w, "ops", "ops-brief")
+    first = w.s.commands.request("root", "ops-brief", {"topic": "ai"})
+    for _ in range(9):
+        w.use_run("ops")
+    assert w.steps.rework_step(human_rework(w, first, 1, "ops-brief")) == f"{HELD.format(held=1, revised=first.id)} {DEFAULT_RUN_HELD}"
 
 
 def test_an_agent_clients_rework_has_no_top_up(w: ReflectionWorld) -> None:

@@ -48,6 +48,13 @@ TOPUP = (  # a rework the user asked for gets less than one round of the team ne
 HELD = "The team still holds {held} of the user's runs for {revised}; the rework can use them."  # D-E6-2: the open request's runs count for the rework
 NOTHING_LEFT = "Nothing else is left of the runs the user approved for this case."
 SOME_LEFT = "{spare} more of the {approved} runs the user approved for this case are left."
+DEFAULT_RUN = (  # D-E7-2 A1: it takes NOTHING_LEFT's place in {left} for the default's 1 run with nothing left (DR-0a5-7)
+    "Nothing else was left of the runs the user approved for this case when this rework was sent: its own run is beyond them, and the ask includes it."
+)
+DEFAULT_RUN_HELD = (  # D-E7-2 A1: after HELD, when the runs the team holds cover the round without that run: nothing to ask, the run is still named
+    "Nothing else was left of the runs the user approved for this case when this rework was sent: its own run is beyond them, and the runs the team "
+    "holds cover the round without it. Ask for nothing; tell the user that this 1 run is beyond their approval."
+)
 
 
 def client_round(agents: AgentDirectory, owner: str) -> int:
@@ -121,24 +128,27 @@ class TextServiceSteps(ServiceSteps):
         """What to ask the user for when the rework they asked for carries less than one round of the owner's team and the approved runs not yet used
         do not cover the rest; "" when the case, its contract or its human client cannot be found, and when nothing needs asking. While the revised task
         is still open, the user's runs the team still holds count toward the round (``user_held``): when they cover it the step is the ``HELD``
-        sentence, else ``TOPUP`` carries it in its ``left`` part and asks for the rest."""
+        sentence, else ``TOPUP`` carries it in its ``left`` part and asks for the rest. A rework that is the default's 1 run with nothing left
+        (``Case.unapproved_reworks``, D-E7-2 A1) is beyond the user's approval: its own run is in the ask and the grant, ``DEFAULT_RUN`` takes
+        ``NOTHING_LEFT``'s place, and when the held runs cover the round without it the step is ``HELD`` followed by ``DEFAULT_RUN_HELD``."""
         case = self._history.case_of(task)
         contract = self._catalog.read_contract(task.to, task.service) if task.service else None
         if case is None or contract is None or case.client_kind != "human":
             return ""
         need = client_round(self._agents, task.to)
-        if task.budget >= need:
+        own = 1 if task.id in case.unapproved_reworks else 0  # D-E7-2 A1: the rework's own run is beyond the user's approval too
+        if task.budget >= need and not own:
             return ""
         approved = user_approved(case, contract.budget)
         spare = max(0, approved - user_committed(case))  # the case now holds this rework's budget too
-        if need - task.budget - spare <= 0:
+        if need - task.budget - spare + own <= 0:
             return ""  # what is approved and unused covers the round: root may grant it without asking
         held = user_held(case, task)
-        ask = need - task.budget - spare - held
+        ask = need - task.budget - spare - held + own
         still = HELD.format(held=held, revised=task.revises) if held else ""
-        if ask <= 0:
-            return still  # the team holds the rest of the round: nothing to ask the user (D-E6-2)
-        left = SOME_LEFT.format(spare=spare, approved=approved) if spare else NOTHING_LEFT
+        if ask <= 0:  # the team holds the rest of the round: nothing to ask the user (D-E6-2)
+            return f"{still} {DEFAULT_RUN_HELD}" if own else still  # D-E7-2 A1: a D's run is still named, though nothing is asked
+        left = DEFAULT_RUN if own else SOME_LEFT.format(spare=spare, approved=approved) if spare else NOTHING_LEFT
         return TOPUP.format(
-            budget=task.budget, need=need, owner=task.to, left=f"{still} {left}" if still else left, ask=ask, grant=need - task.budget - held,
+            budget=task.budget, need=need, owner=task.to, left=f"{still} {left}" if still else left, ask=ask, grant=need - task.budget - held + own,
         )

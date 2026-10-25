@@ -205,10 +205,16 @@ def hire_second_report(svc):
     svc.hire("ceo", "qa", "Tester", "Test things.")  # ceo now has two agents below: a round of its team is 1 + 2 * 2 = 5
 
 
+NOTHING_LEFT = "Nothing else is left of the runs the user approved for this case."
+DEFAULT_RUN = "Nothing else was left of the runs the user approved for this case when this rework was sent: its own run is beyond them, and the ask includes it."
+DEFAULT_RUN_HELD = (
+    "Nothing else was left of the runs the user approved for this case when this rework was sent: its own run is beyond them, and the runs the team "
+    "holds cover the round without it. Ask for nothing; tell the user that this 1 run is beyond their approval."
+)
 TOP_UP = (
-    "This rework has {budget} run(s), and a rework of this team needs about 5 (1, plus 2 for each agent below ceo). Nothing else is left of the runs "
-    'the user approved for this case. Ask the user now for {ask} more run(s), with that number; on yes, grant {ask}: send(to="ceo", budget={ask}, '
-    'body=<why>) (CLI: hirearchy send ceo "<why>" --budget {ask}).'
+    "This rework has {budget} run(s), and a rework of this team needs about 5 (1, plus 2 for each agent below ceo). {left} Ask the user now "
+    'for {ask} more run(s), with that number; on yes, grant {ask}: send(to="ceo", budget={ask}, body=<why>) '
+    '(CLI: hirearchy send ceo "<why>" --budget {ask}).'
 )
 
 
@@ -222,12 +228,13 @@ def test_the_reply_to_a_user_rework_below_a_round_of_the_team_names_the_top_up_a
     (rework,) = [m for m in svc.sent(ROOT) if m.revises == first.id]
     total = "case total: 8 runs used of 12 handed down (contract: 10 per request)"
     assert rework.budget == 2 and f"budget 2 " in reply
-    assert reply.endswith(f"\n{total}\n{TOP_UP.format(budget=2, ask=3)}")  # the top-up comes after the case total
+    assert reply.endswith(f"\n{total}\n{TOP_UP.format(budget=2, ask=3, left=NOTHING_LEFT)}")  # the top-up comes after the case total
     assert "exceeds" not in reply
 
 
 def test_a_user_rework_with_nothing_left_is_sent_with_one_run_and_the_reply_asks_for_the_rest(svc):
-    """Nothing is refused: the rework carries 1 run, the reply holds the case total and the top-up for ``need - 1``."""
+    """Nothing is refused: the rework carries 1 run, the reply holds the case total and the top-up for ``need``. D-E7-2 A1 (14 Rule A1, item 6): that 1
+    run is beyond the user's approval, so the ask and the grant include it (5, was 4) and the reply names it."""
     hire_second_report(svc)
     server = build_server(svc, ROOT)
     first = request(svc, "ai")
@@ -235,12 +242,14 @@ def test_a_user_rework_with_nothing_left_is_sent_with_one_run_and_the_reply_asks
     reply = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, source="human")
     (rework,) = [m for m in svc.sent(ROOT) if m.revises == first.id]
     assert rework.budget == 1 and "case total: 10 runs used of 11 handed down (contract: 10 per request)" in reply
-    assert reply.endswith(TOP_UP.format(budget=1, ask=4))
+    assert reply.endswith(TOP_UP.format(budget=1, ask=5, left=DEFAULT_RUN))
 
 
 def test_the_reply_to_a_user_rework_of_a_blocked_request_with_unspent_runs_says_the_team_holds_them(svc):
     """D-E6-2 (B2): the first request is blocked with 2 of its 10 runs used, so the team still holds 8 of the user's runs for it: the rework without a
-    budget gets 1 run, and the reply ends with the HELD sentence after the case total, asking nothing (0a.3 asked for 4 more)."""
+    budget gets 1 run, and the reply ends with the HELD sentence after the case total, asking nothing (0a.3 asked for 4 more). D-E7-2 A1 (14 Rule A1,
+    item 11): that 1 run is the default with nothing left, so the HELD sentence is followed by the one that names it, and the case total says the case
+    exceeds the contract's budget (A2: 2 used and 8 held, plus the 1 run, are 11 of 10)."""
     hire_second_report(svc)
     server = build_server(svc, ROOT)
     first = request(svc, "ai")
@@ -248,7 +257,9 @@ def test_the_reply_to_a_user_rework_of_a_blocked_request_with_unspent_runs_says_
     reply = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, source="human")
     (rework,) = [m for m in svc.sent(ROOT) if m.revises == first.id]
     assert rework.budget == 1 and "budget 1 " in reply
-    assert reply.endswith(f"\nThe team still holds 8 of the user's runs for {first.id}; the rework can use them.")
+    held = f"The team still holds 8 of the user's runs for {first.id}; the rework can use them."
+    total = "case total: 2 runs used of 11 handed down (contract: 10 per request). This case now exceeds the per-request budget of 10: tell the user."
+    assert reply.endswith(f"\n{total}\n{held} {DEFAULT_RUN_HELD}")
     assert "Ask the user now" not in reply and "Nothing else is left" not in reply
 
 

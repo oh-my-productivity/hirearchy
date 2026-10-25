@@ -104,11 +104,16 @@ def test_b1_bc02_the_team_holds_the_users_runs_of_the_open_request_and_the_reply
     """B-1 (E6 s3 #19, D-E6-2): bc02 revises 4a3e, whose only result (11cc) is ``blocked``, so the request is open and the team holds 17 - 5 - 1 = 11 of the
     user's runs. 0a.3 said "Nothing else is left ... Ask the user now for 4 more run(s)" there; the default hand-down is unchanged (1 run, nothing is
     left of the approval), and after bc02 the approval is 16: the default's run with nothing left is no approval of the user's (D-E7-2 A2, design 4.7),
-    so the case total names the overspend of the contract (17 of 16) in the same reply."""
+    so the case total names the overspend of the contract (17 of 16) in the same reply, and the step (D-E7-2 A1, 14 Rule A1 item 13, DR-0a5-7) follows
+    HELD with the sentence that names bc02's run as beyond the user's approval, asking nothing."""
     org = Org(materialize("s3", "20261024T171425096624", tmp_path / "org"))
     bc02 = next(m for m in org.sent(ROOT) if m.id == "20261024T171425096624-root-bc02")
     four = "20261024T170957358424-root-4a3e"
-    assert org.runtime.service_steps.rework_step(bc02) == f"The team still holds 11 of the user's runs for {four}; the rework can use them."
+    assert org.runtime.service_steps.rework_step(bc02) == (
+        f"The team still holds 11 of the user's runs for {four}; the rework can use them. Nothing else was left of the runs the user approved for this "
+        "case when this rework was sent: its own run is beyond them, and the runs the team holds cover the round without it. Ask for nothing; tell the "
+        "user that this 1 run is beyond their approval."
+    )
     case = the_case(org, bc02.id)
     assert case.open_tasks == (four, bc02.id) and user_approved(case, 16) == 16
     assert org.runtime.service_reports.case_total(bc02) == (

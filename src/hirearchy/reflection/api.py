@@ -457,7 +457,10 @@ class ServiceSteps(Protocol):
         request's latest result; with source "human", the top-up to ask the user for when the rework has less than one client round of the owner's
         team (1, plus 2 per agent below the owner) and the runs the user approved but has not used do not cover it; "" otherwise, and always for an
         agent client's case. While the revised task is still open (no result, or a blocked one), the user's runs the team still holds for the case
-        count toward the round; when they cover it, the step says so instead of asking. A nudge: nothing is refused."""
+        count toward the round; when they cover it, the step says so instead of asking. When the rework is the default's 1 run with nothing left
+        (``Case.unapproved_reworks``), the top-up asks for that run too and its grant is what it asks; when the runs the team holds cover the round,
+        the ``HELD`` sentence is followed by one that tells root to say that run is beyond the user's approval (D-E7-2 A1). A nudge: nothing is
+        refused."""
         ...
 
 

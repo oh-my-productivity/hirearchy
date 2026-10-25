@@ -161,7 +161,8 @@ class RuleServiceRequester(ServiceRequests):
 
     def _default_budget(self, actor: str, contract: Contract, revises: str | None, source: str | None) -> int:
         """The budget of a request that names none: the contract's, except for root's rework the user asked for, which gets what is left of the runs
-        the user approved for its case (at most the contract's; 1 when nothing is left). Never refuses."""
+        the user approved for its case (at most the contract's; 1 when nothing is left: that run is beyond the user's approval, and the reply names it,
+        D-E7-2 A1). Never refuses."""
         if not (actor == ROOT and revises and source == "human"):
             return contract.budget  # a fresh request, a relayed rework, an agent's request: unchanged
         try:
@@ -172,7 +173,7 @@ class RuleServiceRequester(ServiceRequests):
             return contract.budget
         if left >= 1:
             return min(left, contract.budget)  # what is left, never more than a fresh request gets
-        return 1  # nothing left: the minimum a task carries; the reply names the top-up
+        return 1  # nothing left: the minimum a task carries. That run is beyond the user's approval, so the reply names it: its top-up asks for it too, or, when the runs the team holds cover the round, the step says to tell the user (D-E7-2 A1)
 
     def _base(self, actor: str, owner: str, service: str, revises: str | None, source: str | None, base: str | None) -> JudgedBase | None:
         """What a human rework of ``revises`` starts from (P4): refuses a ``base`` that is not one, or not for this request, and a rework that

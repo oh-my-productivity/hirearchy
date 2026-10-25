@@ -70,3 +70,15 @@ def test_a2_e7_s2_24_the_case_total_says_14_is_more_than_the_13_approved(tmp_pat
         "case total: 14 runs used of 13 handed down (contract: 12 per request). The user's requests now cost 14 runs, more than the 13 the user "
         "approved for this case (contract: 12 per request, plus 1 approved beyond it): tell the user."
     )
+
+
+def test_a1_e7_s2_20_the_top_up_asks_for_2_and_names_the_default_run(tmp_path):
+    """A1 (E7 s2 #20, D-E7-2, design 4.4 and 4.7, DR-0a5-7): the top-up asked for 1 run at 18a4531 and Lena's yes to 1 was an approval of 13. Now the
+    default's own run is in the ask and the grant: 5 - 1 - 0 - 3 held + 1 = 2, and the reply says that nothing else was left of the approval."""
+    org = Org(materialize("s2", "20261025T075038845671", tmp_path / "org"))
+    assert org.runtime.service_steps.rework_step(sent(org, C671)) == (
+        "This rework has 1 run(s), and a rework of this team needs about 5 (1, plus 2 for each agent below lead). The team still holds 3 of the user's "
+        f"runs for {THREE_CA4}; the rework can use them. Nothing else was left of the runs the user approved for this case when this rework was sent: "
+        "its own run is beyond them, and the ask includes it. Ask the user now for 2 more run(s), with that number; on yes, grant 2: "
+        'send(to="lead", budget=2, body=<why>) (CLI: hirearchy send lead "<why>" --budget 2).'
+    )

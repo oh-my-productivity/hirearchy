@@ -121,7 +121,8 @@ def test_a_terminal_reject_without_criterion_then_define_service_answers_records
 
 def test_a_cli_rework_with_nothing_left_is_sent_with_one_run_and_prints_the_top_up(org, capsys):
     """D-E5-1 (4.5): ``ceo`` has two agents below (a round of the team is 5). The first request's team uses all but... none of the 10 runs come back,
-    so a rework the user asks for at the terminal gets 1 run, and the next line asks for the 4 more, with the CLI form of the grant."""
+    so a rework the user asks for at the terminal gets 1 run, and the next line asks for the 5 it needs, with the CLI form of the grant. D-E7-2 A1
+    (14 Rule A1, item 7): that 1 run is beyond the user's approval, so the ask and the grant include it (5, was 4) and the line names it."""
     org.hire("ceo", "qa", "Tester", "Test things.")
     define(org)
     first = request(org)
@@ -132,15 +133,16 @@ def test_a_cli_rework_with_nothing_left_is_sent_with_one_run_and_prints_the_top_
     (rework,) = [m for m in org.sent(ROOT) if m.revises == first.id]
     assert line == f"request {rework.id} -> ceo (service weekly-brief, budget 1)" and rework.budget == 1 and rework.source == "human"
     assert step == (
-        "This rework has 1 run(s), and a rework of this team needs about 5 (1, plus 2 for each agent below ceo). Nothing else is left of the runs the "
-        "user approved for this case. Ask the user now for 4 more run(s), with that number; on yes, grant 4: send(to=\"ceo\", budget=4, body=<why>) "
-        "(CLI: hirearchy send ceo \"<why>\" --budget 4)."
+        "This rework has 1 run(s), and a rework of this team needs about 5 (1, plus 2 for each agent below ceo). Nothing else was left of the runs the "
+        "user approved for this case when this rework was sent: its own run is beyond them, and the ask includes it. Ask the user now for 5 more "
+        "run(s), with that number; on yes, grant 5: send(to=\"ceo\", budget=5, body=<why>) (CLI: hirearchy send ceo \"<why>\" --budget 5)."
     )
 
 
 def test_a_cli_rework_of_a_blocked_request_with_unspent_runs_prints_that_the_team_holds_them(org, capsys):
     """D-E6-2 (B2): the first request is blocked with 2 of its 10 runs used: the team holds 8, so the line after the request line is the HELD
-    sentence and nothing is asked (0a.3 printed the top-up for 4 more runs)."""
+    sentence and nothing is asked (0a.3 printed the top-up for 4 more runs). D-E7-2 A1 (14 Rule A1, item 12): the HELD sentence is followed by the one
+    that names the default's run as beyond the user's approval (still one line)."""
     org.hire("ceo", "qa", "Tester", "Test things.")
     define(org)
     first = request(org)
@@ -150,4 +152,8 @@ def test_a_cli_rework_of_a_blocked_request_with_unspent_runs_prints_that_the_tea
     line, step = capsys.readouterr().out.splitlines()
     (rework,) = [m for m in org.sent(ROOT) if m.revises == first.id]
     assert line == f"request {rework.id} -> ceo (service weekly-brief, budget 1)" and rework.budget == 1
-    assert step == f"The team still holds 8 of the user's runs for {first.id}; the rework can use them."
+    assert step == (
+        f"The team still holds 8 of the user's runs for {first.id}; the rework can use them. Nothing else was left of the runs the user approved for "
+        "this case when this rework was sent: its own run is beyond them, and the runs the team holds cover the round without it. Ask for nothing; "
+        "tell the user that this 1 run is beyond their approval."
+    )
