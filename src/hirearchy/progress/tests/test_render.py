@@ -137,7 +137,7 @@ class RaisingChecks(DeliverableChecks):
     def __init__(self, error: Exception) -> None:
         self._error = error
 
-    def findings(self, actor: str, service: str | None = None) -> list[DeliverableFinding]:
+    def findings(self, actor: str, service: str | None = None, *, settled: bool = False) -> list[DeliverableFinding]:
         raise self._error
 
 

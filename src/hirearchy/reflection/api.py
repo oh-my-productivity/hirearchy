@@ -832,15 +832,18 @@ class DeliverableFinding:
     error: str = ""  # for "unreadable": the operating system's words for it
     file: bool = False  # the contract names this file itself, not a folder
     relayed: tuple[str, ...] = ()  # for "relayed": the ids of root's relayed reworks that changed the team's copy after that delivery, oldest first
+    written: int = 0  # for "differs", "relayed" and "unknown": the file's last write, in microseconds since the epoch (0 when it is not known)
+    settled: bool = False  # the user's own verdict was recorded at or after that write; only ``findings(..., settled=True)`` returns such a finding
 
 
 @runtime_checkable
 class DeliverableChecks(Protocol):
-    def findings(self, actor: str, service: str | None = None) -> list[DeliverableFinding]:
+    def findings(self, actor: str, service: str | None = None, *, settled: bool = False) -> list[DeliverableFinding]:
         """The files in the deliverable folders (``deliverable.path`` of the contracts) of the services ``actor`` requests (or only the folder of
         ``service``) that differ from the team's last checked version, that the team never wrote, or that could not be read; the ones the user's own
-        verdict settled are left out. Never reads outside a folder; never raises for an unreadable folder, file or history (a catalog or a mailbox
-        that cannot be read does raise ``OrgError`` or ``OSError``)."""
+        verdict settled are left out, unless ``settled`` is true: then they are returned too, with ``DeliverableFinding.settled`` set. Never reads
+        outside a folder; never raises for an unreadable folder, file or history (a catalog or a mailbox that cannot be read does raise ``OrgError``
+        or ``OSError``)."""
         ...
 
 

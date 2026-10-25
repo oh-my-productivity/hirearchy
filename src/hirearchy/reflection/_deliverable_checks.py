@@ -77,6 +77,7 @@ class _Call:
 
     actor: str
     started: float
+    settled: bool = False  # settled findings are returned, marked, instead of left out
     left: int = READ_TOTAL
     hexlen: int = 40  # the length of the ids of the repository's object format, once git has answered one
     asked: set[tuple[str, str]] = field(default_factory=set)
@@ -99,11 +100,11 @@ class FolderDeliverableChecks(DeliverableChecks):
         self._blobs = blobs
         self._clock = clock
 
-    def findings(self, actor: str, service: str | None = None) -> list[DeliverableFinding]:
+    def findings(self, actor: str, service: str | None = None, *, settled: bool = False) -> list[DeliverableFinding]:
         chosen = [g for g in self._groups(actor) if service is None or any(c.name == service for c in g.members)]
         if not chosen:
             return []
-        call = _Call(actor, self._clock.monotonic())
+        call = _Call(actor, self._clock.monotonic(), settled)
         return [found for group in chosen for found in self._group(call, group)]
 
     # ---------------------------------------------------------------------------------------------------- groups
@@ -169,15 +170,25 @@ class FolderDeliverableChecks(DeliverableChecks):
         if not kind:
             return []
         if pair is None or kind == "unknown":
-            if self._settled(entry.mtime_us, basis.cases):  # a verdict on any case of the group
+            settled = self._settled(entry.mtime_us, basis.cases)  # a verdict on any case of the group
+            if settled and not call.settled:
                 return []
-            return [DeliverableFinding(folder, group.services, entry.name, "unknown", file=single)]
-        if self._settled(entry.mtime_us, [pair.case] if pair.case is not None else []):
+            return [DeliverableFinding(folder, group.services, entry.name, "unknown", file=single, written=entry.mtime_us, settled=settled)]
+        settled = self._settled(entry.mtime_us, [pair.case] if pair.case is not None else [])
+        if settled and not call.settled:
             return []
         if kind == "relayed":
-            return [DeliverableFinding(folder, group.services, entry.name, "relayed", task=pair.task.id, relayed=ids, file=single)]
+            return [
+                DeliverableFinding(
+                    folder, group.services, entry.name, "relayed", task=pair.task.id, relayed=ids, file=single, written=entry.mtime_us, settled=settled,
+                )
+            ]
         withheld = questions_open(pair.task, pair.result, pair.case, call.sent or []) > 0
-        return [DeliverableFinding(folder, group.services, entry.name, "differs", pair.path, pair.task.id, withheld, file=single)]
+        return [
+            DeliverableFinding(
+                folder, group.services, entry.name, "differs", pair.path, pair.task.id, withheld, file=single, written=entry.mtime_us, settled=settled,
+            )
+        ]
 
     def _folder_rule(self, call: _Call, basis: _Basis, entry: FolderFile) -> tuple[str, _Pair | None, tuple[str, ...]]:
         """A file of a folder contract: compared with the checked version of the team's artifact of the same name, newest first; else with any

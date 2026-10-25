@@ -5,7 +5,7 @@ mail of the services world, as they are for real."""
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -48,7 +48,8 @@ class Rig:
         return us(self.w.s.d.clock.now())
 
     def findings(self, service: str | None = None) -> list[DeliverableFinding]:
-        return self.checks.findings(ROOT, service)
+        """The findings with their write time left out: these tests compare whole findings, and the time is tested apart (the contract suite)."""
+        return [replace(found, written=0) for found in self.checks.findings(ROOT, service)]
 
 
 def rig(w: ReflectionWorld, clock: Clock | None = None, versions: FixedCheckedVersions | None = None) -> Rig:

@@ -109,7 +109,8 @@ class FixedCaseHistory(CaseHistory):
 
 
 class FixedDeliverableChecks(DeliverableChecks):
-    """The findings a test puts in, by actor; ``findings`` answers them (only those of ``service`` when it is given)."""
+    """The findings a test puts in, by actor; ``findings`` answers them (only those of ``service`` when it is given, and the ones marked ``settled``
+    only when ``settled`` is true)."""
 
     def __init__(self, findings: Mapping[str, Sequence[DeliverableFinding]] | None = None) -> None:
         self._by_actor = {actor: list(found) for actor, found in (findings or {}).items()}
@@ -117,8 +118,8 @@ class FixedDeliverableChecks(DeliverableChecks):
     def put(self, actor: str, *found: DeliverableFinding) -> None:
         self._by_actor.setdefault(actor, []).extend(found)
 
-    def findings(self, actor: str, service: str | None = None) -> list[DeliverableFinding]:
-        return [f for f in self._by_actor.get(actor, []) if service is None or service in f.services]
+    def findings(self, actor: str, service: str | None = None, *, settled: bool = False) -> list[DeliverableFinding]:
+        return [f for f in self._by_actor.get(actor, []) if (settled or not f.settled) and (service is None or service in f.services)]
 
 
 class HashBlobIds(BlobIds):
