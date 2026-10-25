@@ -137,3 +137,17 @@ def test_a_cli_rework_with_nothing_left_is_sent_with_one_run_and_prints_the_top_
         "(CLI: hirearchy send ceo \"<why>\" --budget 4)."
     )
 
+
+def test_a_cli_rework_of_a_blocked_request_with_unspent_runs_prints_that_the_team_holds_them(org, capsys):
+    """D-E6-2 (B2): the first request is blocked with 2 of its 10 runs used: the team holds 8, so the line after the request line is the HELD
+    sentence and nothing is asked (0a.3 printed the top-up for 4 more runs)."""
+    org.hire("ceo", "qa", "Tester", "Test things.")
+    define(org)
+    first = request(org)
+    deliver(org, "ceo", first, status="blocked", runs=2)
+    capsys.readouterr()
+    cli(org, "request", "weekly-brief", "--input", "topic=ai", "--revises", first.id)
+    line, step = capsys.readouterr().out.splitlines()
+    (rework,) = [m for m in org.sent(ROOT) if m.revises == first.id]
+    assert line == f"request {rework.id} -> ceo (service weekly-brief, budget 1)" and rework.budget == 1
+    assert step == f"The team still holds 8 of the user's runs for {first.id}; the rework can use them."

@@ -250,7 +250,9 @@ def test_nothing_but_the_run_of_a_command_imports_the_framework_of_the_server_or
 
 
 def test_the_request_command_prints_the_step_of_the_runtime(team: Org, capsys: pytest.CaptureFixture[str]) -> None:
-    """``RequestCommand`` gets the runtime's ``ServiceSteps``: a rework with nothing left prints the top-up of the real organization."""
+    """``RequestCommand`` gets the runtime's ``ServiceSteps``: a rework of an open request prints the step of the real organization. D-E6-2 (B2) changed
+    this case on purpose: it is the CLI's end-to-end case of B's second part, where the team still holds the 4 runs of the open request, so the step
+    is the HELD sentence (0a.3 printed the top-up for 4 more runs)."""
     team.hire("ceo", "eng", "Engineer", "Build things.")
     team.hire("ceo", "qa", "Tester", "Test things.")
     team.define_service(
@@ -260,6 +262,6 @@ def test_the_request_command_prints_the_step_of_the_runtime(team: Org, capsys: p
     first = team.request(ROOT, "brief", {"topic": "ai"})  # 4 runs handed down, none used yet: all still held
     wire_cli.run_cli(["--root", str(team.root), "request", "brief", "--input", "topic=ai", "--revises", first.id])
     out = capsys.readouterr().out
-    assert "budget 1)" in out and "This rework has 1 run(s), and a rework of this team needs about 5 (1, plus 2 for each agent below ceo)." in out
-    assert 'Ask the user now for 4 more run(s)' in out
+    assert "budget 1)" in out and f"The team still holds 4 of the user's runs for {first.id}; the rework can use them." in out
+    assert "This rework has" not in out and "Ask the user now" not in out
 

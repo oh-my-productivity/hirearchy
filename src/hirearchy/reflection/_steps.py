@@ -9,7 +9,7 @@ from ..agents import AgentDirectory
 from ..kernel import Message, client_items, latest_results, link_ids, verdict_tier
 from ..mail import MailboxReader
 from ..services import ServiceCatalog
-from .api import CaseHistory, ServiceSteps, items_listing, regressions, user_approved, user_committed
+from .api import CaseHistory, ServiceSteps, items_listing, regressions, user_approved, user_committed, user_held
 
 ASK_C = 'About {id}: add "<the rule, in their words>" as a lasting rule? Yes or no.'
 ASK_R = "Same as {id}: a one-off? Yes or no."
@@ -45,6 +45,7 @@ TOPUP = (  # a rework the user asked for gets less than one round of the team ne
     'for {ask} more run(s), with that number; on yes, grant {grant}: send(to="{owner}", budget={grant}, body=<why>) '
     '(CLI: hirearchy send {owner} "<why>" --budget {grant}).'
 )
+HELD = "The team still holds {held} of the user's runs for {revised}; the rework can use them."  # D-E6-2: the open request's runs count for the rework
 NOTHING_LEFT = "Nothing else is left of the runs the user approved for this case."
 SOME_LEFT = "{spare} more of the {approved} runs the user approved for this case are left."
 
@@ -118,7 +119,9 @@ class TextServiceSteps(ServiceSteps):
 
     def _top_up(self, task: Message) -> str:
         """What to ask the user for when the rework they asked for carries less than one round of the owner's team and the approved runs not yet used
-        do not cover the rest; "" when the case, its contract or its human client cannot be found, and when nothing needs asking."""
+        do not cover the rest; "" when the case, its contract or its human client cannot be found, and when nothing needs asking. While the revised task
+        is still open, the user's runs the team still holds count toward the round (``user_held``): when they cover it the step is the ``HELD``
+        sentence, else ``TOPUP`` carries it in its ``left`` part and asks for the rest."""
         case = self._history.case_of(task)
         contract = self._catalog.read_contract(task.to, task.service) if task.service else None
         if case is None or contract is None or case.client_kind != "human":
@@ -128,9 +131,14 @@ class TextServiceSteps(ServiceSteps):
             return ""
         approved = user_approved(case, contract.budget)
         spare = max(0, approved - user_committed(case))  # the case now holds this rework's budget too
-        ask = need - task.budget - spare
-        if ask <= 0:
+        if need - task.budget - spare <= 0:
             return ""  # what is approved and unused covers the round: root may grant it without asking
+        held = user_held(case, task)
+        ask = need - task.budget - spare - held
+        still = HELD.format(held=held, revised=task.revises) if held else ""
+        if ask <= 0:
+            return still  # the team holds the rest of the round: nothing to ask the user (D-E6-2)
         left = SOME_LEFT.format(spare=spare, approved=approved) if spare else NOTHING_LEFT
-        return TOPUP.format(budget=task.budget, need=need, owner=task.to, left=left, ask=ask, grant=need - task.budget)
-
+        return TOPUP.format(
+            budget=task.budget, need=need, owner=task.to, left=f"{still} {left}" if still else left, ask=ask, grant=need - task.budget - held,
+        )

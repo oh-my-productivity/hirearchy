@@ -172,6 +172,7 @@ class DerivedCaseHistory(CaseHistory):
                 finished=msg_time(res) if res is not None and final else None,
                 client_kind=kind, relayed_reworks=sum(t.source == "relayed" for t in tasks[1:]),
                 returned=sum(min(r.budget, t.budget) for t in tasks if (r := results.get(t.id)) is not None),
+                open_tasks=tuple(t.id for t in tasks if (r := results.get(t.id)) is None or r.status not in ("done", "failed")),
                 relayed_returned=spend.relayed_returned, relayed_to_user=spend.relayed_to_user, relayed_overlap=spend.relayed_overlap, unsplit_runs=spend.unsplit_runs,
                 user_granted=spend.user_granted, user_ceiling=spend.user_ceiling,
             ))

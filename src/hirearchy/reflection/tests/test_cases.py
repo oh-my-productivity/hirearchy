@@ -427,6 +427,29 @@ def test_the_ceiling_after_a_relayed_return_does_not_grow_when_the_user_rework_t
     assert (case.user_ceiling, reflection.user_approved(case, 12), reflection.user_committed(case)) == (12, 12, 12)
 
 
+def test_open_tasks_are_the_tasks_of_the_chain_without_a_result_or_with_a_blocked_one(tmp_path):
+    """D-E6-2, B2 (P-8): a task is open until a ``done`` or ``failed`` result answers it; ``open_tasks`` lists them oldest first."""
+    w = chain_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=1)  # done
+    blocked = sup.rework(w, head)
+    sup.deliver(w, blocked, status="blocked")
+    failed = sup.rework(w, blocked)
+    sup.deliver(w, failed, status="failed")
+    unanswered = sup.rework(w, failed)
+    assert the_case(w).open_tasks == (blocked.id, unanswered.id)
+
+
+def test_a_blocked_task_answered_again_by_a_done_result_is_closed(tmp_path):
+    w = chain_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, status="blocked")
+    assert the_case(w).open_tasks == (head.id,)
+    time.sleep(0.002)
+    sup.deliver(w, head)  # the latest result of the task is done
+    assert the_case(w).open_tasks == ()
+
+
 def s2_t5(w, answered):
     """E5 s2 at T5: ebe2 (12, 9 runs, 3 returned) and 6c4f human (5 handed down), answered (5 runs, none returned) or still open."""
     first = sup.ask(w, "s2")

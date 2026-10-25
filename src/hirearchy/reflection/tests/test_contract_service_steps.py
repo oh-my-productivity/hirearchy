@@ -50,3 +50,13 @@ def test_a_rework_it_cannot_place_has_no_rework_step(steps: ServiceSteps) -> Non
     lost = Message(sender="root", to="ceo", type="task", body="x", service=SERVICE, revises="20260101T000000000000-root-0001", source="relayed")
     assert steps.rework_step(lost) == ""
     assert steps.rework_step(Message(sender="root", to="ceo", type="task", body="x", service=SERVICE, source="relayed")) == ""
+
+
+def test_a_human_rework_of_an_open_request_it_cannot_place_has_no_held_step(steps: ServiceSteps) -> None:
+    """D-E6-2, B2: the runs the team holds are read from the case; a rework whose revised task is in no case of the service (and has no result) is
+    advice about nothing, whatever its budget."""
+    for budget in (0, 1, 4):
+        human = Message(
+            sender="root", to="ceo", type="task", body="x", service=SERVICE, revises="20260101T000000000000-root-0001", source="human", budget=budget,
+        )
+        assert steps.rework_step(human) == ""

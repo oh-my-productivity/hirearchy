@@ -53,6 +53,7 @@ __all__ = [
     "user_approved",
     "user_committed",
     "user_cost",
+    "user_held",
     "user_spend",
     "version_at",
 ]
@@ -105,6 +106,7 @@ class Case:
     relayed_overlap: int = 0  # the most of an unanswered relayed task's runs that can lie in a later user interval (its split is by send time)
     unsplit_runs: int = 0  # the charged runs in the user intervals after the first overlapped relayed task: counted with the user's, 0 without overlap
     user_granted: int = 0  # the budgets of the user grants: notes of a human client (root) in a user interval; 0 for an agent client
+    open_tasks: tuple[str, ...] = ()  # the chain's tasks whose latest result is missing or blocked, oldest first (D-E6-2)
     user_ceiling: int = 0  # the highest ceiling over the user's hand-downs (the most the user's requests could cost right after one); 0 for an agent client
 
     @property
@@ -186,6 +188,16 @@ def user_committed(case: Case) -> int:
     runs = case.runs - case.relayed_runs
     budget = sum(t.budget for t in case.tasks if t.source != "relayed") + case.user_granted
     return runs + max(0, budget - runs - _user_back(case))
+
+
+def user_held(case: Case, rework: Message) -> int:
+    """The user's runs the team still holds for the case when ``rework`` (a task of the case root just sent) revises a task that is still open:
+    what the user's requests and grants handed down, less the user's charged runs and what came back to the user, less the rework's own budget,
+    at least 0 (pure). 0 when the revised task has a done or failed result, or is not a task of the case. Read when the rework is sent: its own
+    runs are not counted then."""
+    if not rework.revises or rework.revises not in case.open_tasks:
+        return 0
+    return max(0, user_committed(case) - (case.runs - case.relayed_runs) - rework.budget)
 
 
 def user_approved(case: Case, budget: int) -> int:
@@ -441,7 +453,8 @@ class ServiceSteps(Protocol):
         """For a rework root just sent (``task``, a request that ``revises`` another): with source "relayed", the client questions of the revised
         request's latest result; with source "human", the top-up to ask the user for when the rework has less than one client round of the owner's
         team (1, plus 2 per agent below the owner) and the runs the user approved but has not used do not cover it; "" otherwise, and always for an
-        agent client's case. A nudge: nothing is refused."""
+        agent client's case. While the revised task is still open (no result, or a blocked one), the user's runs the team still holds for the case
+        count toward the round; when they cover it, the step says so instead of asking. A nudge: nothing is refused."""
         ...
 
 

@@ -238,6 +238,20 @@ def test_a_user_rework_with_nothing_left_is_sent_with_one_run_and_the_reply_asks
     assert reply.endswith(TOP_UP.format(budget=1, ask=4))
 
 
+def test_the_reply_to_a_user_rework_of_a_blocked_request_with_unspent_runs_says_the_team_holds_them(svc):
+    """D-E6-2 (B2): the first request is blocked with 2 of its 10 runs used, so the team still holds 8 of the user's runs for it: the rework without a
+    budget gets 1 run, and the reply ends with the HELD sentence after the case total, asking nothing (0a.3 asked for 4 more)."""
+    hire_second_report(svc)
+    server = build_server(svc, ROOT)
+    first = request(svc, "ai")
+    deliver(svc, "ceo", first, status="blocked", runs=2)
+    reply = call(server, "request", service=WEEKDAY, inputs={"topic": "ai"}, revises=first.id, source="human")
+    (rework,) = [m for m in svc.sent(ROOT) if m.revises == first.id]
+    assert rework.budget == 1 and "budget 1 " in reply
+    assert reply.endswith(f"\nThe team still holds 8 of the user's runs for {first.id}; the rework can use them.")
+    assert "Ask the user now" not in reply and "Nothing else is left" not in reply
+
+
 def test_a_rework_within_the_contract_budget_gets_no_warning(svc):
     server = build_server(svc, ROOT)
     first = svc.request(ROOT, WEEKDAY, {"topic": "ai"}, budget=3)

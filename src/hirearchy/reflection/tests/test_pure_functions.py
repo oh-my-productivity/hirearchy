@@ -9,7 +9,7 @@ import pytest
 from hirearchy.kernel import ClientItems, Message, clip_line
 from hirearchy.reflection import (
     ITEM_CHARS, ITEMS_SHOWN, Case, Verdict, case_spend, confirmed_criteria, delivered_unrated, items_listing, lessons_of, open_client_items,
-    questions_open, rated, user_approved, user_committed, user_cost, user_spend, version_at,
+    questions_open, rated, user_approved, user_committed, user_cost, user_held, user_spend, version_at,
 )
 from hirearchy.reflection.api import _user_back
 from hirearchy.services import Criterion
@@ -112,6 +112,7 @@ def test_case_spend_of_a_case_with_nothing_handed_down_is_its_runs() -> None:
 def hand_built(
     tasks: list[tuple[int, str | None]], state: str = "done", runs: int = 0, returned: int = 0, *, relayed_runs: int = 0, relayed_returned: int = 0,
     relayed_overlap: int = 0, user_granted: int = 0, user_ceiling: int = 0, relayed_to_user: int = 0,
+    open_tasks: tuple[str, ...] = (),
 ) -> Case:
     """A case of a chain of ``(budget, source)`` tasks, with the numbers the pure functions read."""
     chain = [Message(sender="root", to="ceo", type="task", body="b", title="t", budget=b, source=src) for b, src in tasks]
@@ -119,7 +120,7 @@ def hand_built(
         id="A", service="s", owner="ceo", tasks=chain, result=None, state=state, playbook=0, used=0, reworks=len(chain) - 1,
         budget=sum(b for b, _ in tasks), runs=runs, lessons=[], verdicts=[], started=None, finished=None, returned=returned, relayed_runs=relayed_runs,
         relayed_returned=relayed_returned, relayed_overlap=relayed_overlap, user_granted=user_granted, user_ceiling=user_ceiling,
-        relayed_to_user=relayed_to_user,
+        relayed_to_user=relayed_to_user, open_tasks=open_tasks,
     )
 
 
@@ -192,6 +193,41 @@ def test_user_committed_is_never_below_the_users_charged_runs() -> None:
         for state in ("done", "open", "blocked"):
             case = hand_built([(12, None), (6, "relayed")], state, runs=10, returned=6, relayed_runs=5, relayed_returned=6, relayed_to_user=to_user)
             assert user_committed(case) >= case.runs - case.relayed_runs and user_spend(case) >= case.runs - case.relayed_runs
+
+
+def rework_of(task_id: str, budget: int) -> Message:
+    return Message(sender="root", to="ceo", type="task", body="b", title="t", budget=budget, revises=task_id, source="human")
+
+
+def test_user_held_is_what_the_team_still_holds_of_the_users_runs_for_an_open_revised_task() -> None:
+    """D-E6-2, B2 (design 5.3): committed 10 (2 used, 8 held, the rework's 1 among them), less the 2 used and the rework's own 1: 7 are held."""
+    case = hand_built([(9, None), (1, "human")], "open", runs=2, open_tasks=("T1",))
+    assert user_committed(case) == 2 + (10 - 2) and user_held(case, rework_of("T1", 1)) == 7
+
+
+def test_user_held_leaves_the_relayed_runs_and_what_came_back_to_the_user_out() -> None:
+    """E6 s3's bc02 shape: 17 committed, 5 charged, the rework's 1: 11 are held. The relayed runs are not the user's, and what a relayed
+    result carried back to the user is no longer held."""
+    case = hand_built([(16, None), (1, "human")], "open", runs=5, open_tasks=("T1",))
+    assert user_held(case, rework_of("T1", 1)) == 11
+    relayed = hand_built(
+        [(12, None), (6, "relayed"), (1, "human")], "open", runs=9, returned=6, relayed_runs=4, relayed_returned=6, relayed_to_user=6,
+        open_tasks=("T1",),
+    )
+    assert user_committed(relayed) == 5 + (13 - 5 - 6) and user_held(relayed, rework_of("T1", 1)) == 1  # 7 committed, 5 used by the user, 1 the rework's
+
+
+def test_user_held_is_zero_when_the_revised_task_is_closed_or_not_in_the_case() -> None:
+    case = hand_built([(10, None)], "done", runs=2, open_tasks=("T1",))
+    assert user_held(case, rework_of("T2", 1)) == 0  # not an open task of the case
+    assert user_held(case, rework_of("", 1)) == 0
+    assert user_held(hand_built([(10, None)], "done", runs=2), rework_of("T1", 1)) == 0  # a hand-built Case has no open task
+
+
+def test_user_held_is_never_below_zero() -> None:
+    case = hand_built([(3, None)], "open", runs=9, open_tasks=("T1",))  # more used than handed down
+    assert user_held(case, rework_of("T1", 5)) == 0
+    assert user_held(hand_built([(3, None)], "open", runs=3, open_tasks=("T1",)), rework_of("T1", 1)) == 0  # all used
 
 
 def test_user_approved_is_the_contract_budget_for_a_hand_built_case_and_the_ceiling_when_that_is_higher() -> None:
