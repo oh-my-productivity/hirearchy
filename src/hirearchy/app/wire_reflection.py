@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from ..agents import AgentDirectory
 from ..kernel import Clock, OrgLayout
-from ..mail import MailboxReader, TaskQuery
+from ..mail import MailboxReader
 from ..reflection import CaseHistory, DeliverableChecks, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
 from ..reflection._cases import DerivedCaseHistory
 from ..reflection._deliverable_checks import FolderDeliverableChecks
@@ -72,7 +72,7 @@ def register(b: Builder) -> None:
 def _sections(b: Builder) -> ServicePromptSections:
     catalog, history, paths = b.get(ServiceCatalog), b.get(CaseHistory), OrgServicePaths(b.get(OrgLayout))
     return OwnerPromptSections(
-        catalog, OwnedServicesListing(catalog, history, paths), b.get(ReflectionDigest), b.get(TaskQuery),
+        catalog, OwnedServicesListing(catalog, history, paths), b.get(ReflectionDigest), b.get(MailboxReader),
         MailRejectedServices(b.get(MailboxReader)), QuotedPlaybookSection(catalog, paths), EvidenceReflectSection(catalog, b.get(OrgSettings), paths, history),
         RegressionListSection(catalog, history),
     )

@@ -468,8 +468,9 @@ class ServiceSteps(Protocol):
 @runtime_checkable
 class ServicePromptSections(Protocol):
     def prompt_sections(self, addr: str, batch: Sequence[Message]) -> str:
-        """The sections of an owner's run prompt: its services, the playbook of each service it has an open request for, and (when the batch
-        holds a new request, or the client's rejection of a delivery) what to reflect on first. Empty for an agent that owns no service.
+        """The sections of an owner's run prompt: its services, the playbook of each service it still owes a report on (no result, or a ``blocked``
+        one its client has not moved past: ``mail.still_open``, D-E7-2 F-E7-8), and (when the batch holds a new request, or the client's rejection of
+        a delivery) what to reflect on first. Empty for an agent that owns no service.
 
         Each section starts and ends with a newline, to be appended after the notice and before "# New messages"."""
         ...

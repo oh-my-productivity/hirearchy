@@ -680,3 +680,51 @@ def test_raise_bar_for_a_human_client_locked_says_do_not_send_it_yourself(svc):
 def test_raise_bar_for_an_agent_client_is_unchanged(svc):
     section = agent_client_section(svc)
     assert AGENT_RAISE_BAR in numbered(section, 4) and "do not send it yourself" not in section
+
+
+# ------------------------------------------------------------------------------------------ D-E7-2 F-E7-8: a blocked request the client has not moved past is still working
+def blocked_after_a_rejection(org):
+    """The client rejected a delivery (R1, read in an earlier run), then asked again; the owner reported that request ``blocked``. Returns that request."""
+    first = request(org, "ai")
+    deliver(org, "ceo", first, lessons="Fine.")
+    org.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+    second = request(org, "chips")
+    deliver(org, "ceo", second, status="blocked", lessons="Waiting on the client.")
+    return second
+
+
+def test_a_blocked_request_with_only_a_grant_in_the_batch_keeps_its_playbook_and_regression_list(svc):
+    """F-E7-8 (E7 s1, runs after the lead's blocked report): the batch holds only the grant note, and the request is blocked, not answered."""
+    org = svc
+    second = blocked_after_a_rejection(org)
+    org.send(ROOT, "ceo", "Three more runs.", reply_to=second.id, budget=3)
+    prompt = org.run_prompt("ceo", org.begin_run("ceo"))
+    assert "# Playbook: weekly-brief (" in prompt
+    assert "# Regression list: weekly-brief (the client's rejections, verbatim)" in prompt
+    assert "# Reflect" not in prompt  # no new request and no rejection in the batch
+    assert prompt.index("# Your services") < prompt.index("# Playbook: weekly-brief") < prompt.index("# Regression list: weekly-brief")
+    org.end_run("ceo", ok=True)
+
+
+def test_a_blocked_request_the_client_accepted_after_the_block_leaves_the_listing_alone(svc):
+    org = svc
+    second = blocked_after_a_rejection(org)
+    org.feedback(ROOT, second.id, "accept", "Fine.", source="human")  # the client moved past the blocked request
+    org.send(ROOT, "ceo", "Three more runs.", reply_to=second.id, budget=3)
+    prompt = org.run_prompt("ceo", org.begin_run("ceo"))
+    assert "# Your services" in prompt and "# Playbook" not in prompt and "# Regression list" not in prompt and "# Reflect" not in prompt
+    org.end_run("ceo", ok=True)
+
+
+def test_a_rejection_in_the_batch_with_a_blocked_request_held_gives_playbook_regression_list_and_reflect_in_that_order(svc):
+    """F-E7-8 (design 7.4): the rejection is of another case; the blocked request is not moved past, so the service is still being worked on."""
+    org = svc
+    first = request(org, "ai")
+    deliver(org, "ceo", first, lessons="Thin on sources.")
+    second = request(org, "chips")
+    deliver(org, "ceo", second, status="blocked", lessons="Waiting on the client.")
+    org.feedback(ROOT, first.id, "reject", "Too long.", source="human")
+    prompt = org.run_prompt("ceo", org.begin_run("ceo"))
+    order = [prompt.index(h) for h in ("# Playbook: weekly-brief", "# Regression list: weekly-brief", "# Reflect before you start: weekly-brief")]
+    assert order == sorted(order) and prompt.count("# Playbook: weekly-brief") == 1
+    org.end_run("ceo", ok=True)

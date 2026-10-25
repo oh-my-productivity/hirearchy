@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from ..kernel import RENDER_BODY_CHARS, ROOT, Message, clip_line, parent, verdict_tier
-from ..mail import MailboxReader, TaskQuery
+from ..kernel import RENDER_BODY_CHARS, ROOT, Message, clip_line, latest_results, parent, verdict_tier
+from ..mail import MailboxReader, still_open
 from ..services import Contract, ServiceCatalog, confirmed_amendments, playbook_word_cap
 from ._ports import ConfigSource, PlaybookSection, RegressionSection, RejectedServices, ReflectSection, ServicePaths, ServicesListing
 from ._reports import marked
@@ -254,16 +254,17 @@ class OwnedServicesListing(ServicesListing):
 
 
 class OwnerPromptSections(ServicePromptSections):
-    """The services an agent owns, the playbook of each it is working on, and the reflection a new request or a rejection calls for."""
+    """The services an agent owns, the playbook of each it still owes a report on (``mail.still_open``), and the reflection a new request or a rejection
+    calls for."""
 
     def __init__(
-        self, catalog: ServiceCatalog, listing: ServicesListing, digest: ReflectionDigest, tasks: TaskQuery, rejections: RejectedServices,
+        self, catalog: ServiceCatalog, listing: ServicesListing, digest: ReflectionDigest, mail: MailboxReader, rejections: RejectedServices,
         playbooks: PlaybookSection, reflections: ReflectSection, regressions: RegressionSection,
     ) -> None:
         self._catalog = catalog
         self._listing = listing
         self._digest = digest
-        self._tasks = tasks
+        self._mail = mail
         self._rejections = rejections
         self._playbooks = playbooks
         self._reflections = reflections
@@ -274,7 +275,9 @@ class OwnerPromptSections(ServicePromptSections):
         if not owned:
             return ""
         sections = [self._listing.listing(addr, owned)]
-        working = {t.service for t in self._tasks.open_tasks(addr) if t.service}
+        received = self._mail.received(addr)
+        latest = latest_results(self._mail.sent(addr))
+        working = {t.service for t in received if t.type == "task" and t.service and still_open(t, latest.get(t.id), received)}  # D-E7-2 F-E7-8
         new = {m.service for m in batch if m.type == "task" and m.service and not m.revises and m.to == addr}
         rejected = self._rejections.among(addr, batch)
         digests = {

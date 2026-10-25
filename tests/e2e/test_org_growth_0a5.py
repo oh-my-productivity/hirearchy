@@ -5,8 +5,8 @@ No scheduler, no LLM, no network: ``testkit.e7_replay.materialize`` rebuilds the
 agents, contract), and the product's own readers read it. A missing evidence file fails the test, never skips it.
 
 This module holds the replays of D-E7-2 A (A2 and A1): E7 s2 memo 1, where the user's rework c671 was handed the default's 1 run while nothing was left
-of the 12 runs the user approved; those of D-E7-2 C (E7 s1 6920: only the user's verdict settles the questions for the client) and F-E7-7 (E7 s3 d9bc: a blocked task
-its assigner moved past is no longer open work).
+of the 12 runs the user approved; those of D-E7-2 C (E7 s1 6920: only the user's verdict settles the questions for the client) F-E7-7 (E7 s3 d9bc: a blocked task
+its assigner moved past is no longer open work) and F-E7-8 (E7 s1: the lead's prompt after it reported faaa blocked).
 """
 
 import pytest
@@ -156,3 +156,21 @@ def test_f7_e7_s3_9838_the_upstream_hint_names_a443_once_d9bc_was_moved_past(tmp
         "[It was the only task assigned to you before you delegated this, so it probably serves your open task "
         f'{S3_A443} "Memo for 2026-10-12 meeting": the result must also satisfy that task\'s criteria (shown in full in this prompt).]'
     ) in runtime.context_renderer.render("lead", e4c7)
+
+
+@pytest.mark.parametrize(
+    "cut, batch",
+    [
+        ("20261025T072625893903", "20261025T072621895274-root-0036"),  # the grant 3 runs (F-E7-5)
+        ("20261025T072718351439", "20261025T072718311804-lead.reviewer-1df0"),  # the reviewer's result
+    ],
+)
+def test_f8_e7_s1_after_faaa_was_reported_blocked_the_lead_prompt_keeps_its_playbook_and_regression_list(tmp_path, cut, batch):
+    """F8 (E7 s1, D-E7-2 F-E7-8, design 7.3): the lead reported memo 2's rework faaa ``blocked`` (ed63); the client had not moved past it. The next two
+    runs' prompts held ``# Your services`` alone (no unanswered task), although the lead re-checked faaa in them. Now the playbook and the regression list
+    (R1, the client's rejection of 5efc) are there. The headings only are asserted: the kit writes no playbook file, so it reads ``v0``."""
+    org = Org(materialize("s1", cut, tmp_path / "org", inflight={"lead": [batch]}))
+    sections = org.runtime.service_prompt_sections.prompt_sections("lead", org.messages("lead", "inflight"))
+    lines = sections.splitlines()
+    assert any(line.startswith("# Playbook: weekly-meeting-memo (") for line in lines)
+    assert "# Regression list: weekly-meeting-memo (the client's rejections, verbatim)" in lines

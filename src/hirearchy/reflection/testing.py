@@ -191,7 +191,7 @@ def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder) -> R
     digest = DigestBuilder(s.catalog, history)
     rejections = MailRejectedServices(d.mail)
     sections = OwnerPromptSections(
-        s.catalog, OwnedServicesListing(s.catalog, history, paths), digest, d.tasks, rejections, QuotedPlaybookSection(s.catalog, paths),
+        s.catalog, OwnedServicesListing(s.catalog, history, paths), digest, d.mail, rejections, QuotedPlaybookSection(s.catalog, paths),
         EvidenceReflectSection(s.catalog, d.settings, paths, history),
         RegressionListSection(s.catalog, history),
     )
