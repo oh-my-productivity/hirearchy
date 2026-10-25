@@ -14,15 +14,22 @@ import shutil
 import subprocess
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from ..kernel import OrgPaths
 from ..kernel.testing import fs_atomic_writer
 from ._git import GitOrgHistory, GitOrgSnapshotter, SubprocessGit, is_history_path, is_object_id
 from ._ignore import FsIgnoreList
-from .api import RUNTIME_IGNORE_LINES, GitClient, IgnoreList, OrgHistory, OrgSnapshotter, blob_id
+from .api import RUNTIME_IGNORE_LINES, Change, GitClient, IgnoreList, OrgHistory, OrgSnapshotter, blob_id
 
 AUTHOR = "hirearchy <hirearchy@localhost>"
+FIRST_COMMIT_TIME = datetime(2026, 1, 1, tzinfo=timezone.utc)  # the fakes' commits are one minute apart from here, in order
+
+
+def commit_time(position: int) -> datetime:
+    """The time the fakes give the commit at ``position`` (0 is the oldest)."""
+    return FIRST_COMMIT_TIME + timedelta(minutes=position)
 NO_GIT = "hirearchy-test-no-such-git-program"  # an executable name that exists nowhere
 
 
@@ -45,7 +52,8 @@ class RecordingGit(GitClient):
     def __init__(self, available: bool = True) -> None:
         self._available = available
         self.calls: list[tuple[str, ...]] = []  # ("init", root) and ("commit_all", root, message), in order
-        self.reads: list[tuple[str, ...]] = []  # ("added_by", root, path), ("object_id", root, spec), ("cat", root, obj, limit), in order
+        self.reads: list[tuple[str, ...]] = []  # ("added_by", root, path), ("object_id", root, spec), ("cat", root, obj, limit), ("log", root,
+        # limit, *paths), in order
         self.repositories: set[Path] = set()
         self.commits: dict[Path, list[GitCommit]] = {}
         self.broken: set[Path] = set()  # repositories git refuses to work in
@@ -106,6 +114,22 @@ class RecordingGit(GitClient):
         found = next((data for _, tree in self._history(root) for data in tree.values() if blob_id(data, len(obj)) == obj), None)
         return found if found is not None and len(found) <= limit else None
 
+    def log(self, root: Path, paths: Sequence[str], limit: int) -> bytes | None:
+        self.reads.append(("log", str(root), str(limit), *paths))
+        if not paths or limit < 1:
+            return b""
+        history = self._history(root)
+        if not history:
+            return None
+        out = b""
+        listed = 0
+        for position in reversed(range(len(history))):  # newest first; the commits of ``commits`` and the trees are made together
+            changed = sorted(self.commits[root][position].files.intersection(paths))
+            if changed and listed < limit:
+                out += f"\0{history[position][0]}\t{commit_time(position).isoformat()}\n\n".encode() + "".join(f"{p}\n" for p in changed).encode()
+                listed += 1
+        return out
+
     def _history(self, root: Path) -> list[tuple[str, dict[str, bytes]]]:
         """The commits git would answer from: none when git is missing, ``root`` is no repository or its repository is broken."""
         if not self._available or root not in self.repositories or root in self.broken:
@@ -149,16 +173,20 @@ class MemoryOrgHistory(OrgHistory):
 
     def __init__(self) -> None:
         self._commits: list[tuple[str, dict[str, bytes]]] = []
+        self._changed: list[tuple[datetime, frozenset[str]]] = []  # per commit: its time and the paths whose content it changed
 
-    def commit(self, files: Mapping[str, bytes | None]) -> str:
-        """A new commit: the tree of the last one with ``files`` changed (a value of None deletes the file). Returns its id."""
-        tree = dict(self._commits[-1][1]) if self._commits else {}
+    def commit(self, files: Mapping[str, bytes | None], when: datetime | None = None) -> str:
+        """A new commit: the tree of the last one with ``files`` changed (a value of None deletes the file). Returns its id. ``when`` is its time
+        (``commit_time`` of its position, with its offset, when omitted)."""
+        before = self._commits[-1][1] if self._commits else {}
+        tree = dict(before)
         for name, data in files.items():
             if data is None:
                 tree.pop(name, None)
             else:
                 tree[name] = data
         made = hashlib.sha1(f"memory commit {len(self._commits)}".encode(), usedforsecurity=False).hexdigest()
+        self._changed.append((commit_time(len(self._commits)) if when is None else when, frozenset(n for n in files if before.get(n) != tree.get(n))))
         self._commits.append((made, tree))
         return made
 
@@ -175,6 +203,19 @@ class MemoryOrgHistory(OrgHistory):
 
     def head(self) -> str | None:
         return self._commits[-1][0] if self._commits else None
+
+    def changes(self, paths: Sequence[str], limit: int) -> list[Change] | None:
+        if not self._commits:
+            return None
+        asked = [path for path in dict.fromkeys(paths) if is_history_path(path)]
+        found: list[Change] = []
+        listed = 0
+        for (commit_id, _), (when, changed) in zip(reversed(self._commits), reversed(self._changed), strict=True):
+            names = [path for path in sorted(asked) if path in changed]
+            if names and listed < limit:
+                found.extend(Change(commit_id, when, name) for name in names)
+                listed += 1
+        return found
 
     def _data(self, commit: str, path: str) -> bytes | None:
         if not (is_object_id(commit) and is_history_path(path)):

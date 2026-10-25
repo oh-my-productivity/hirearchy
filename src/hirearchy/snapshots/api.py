@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Sequence
+from datetime import datetime
 from pathlib import Path
-from typing import Protocol, runtime_checkable
+from typing import NamedTuple, Protocol, runtime_checkable
 
 # The lines ``IgnoreList.ensure_runtime_files`` adds when they are missing: files that change constantly stay out of the snapshots
 # (``git add -A`` runs after every run). They are paths inside ``.runtime/``.
@@ -20,6 +21,14 @@ RUNTIME_IGNORE_LINES: tuple[str, ...] = (
     ".runtime/scheduler.exit",
     ".runtime/events/",
 )
+
+
+class Change(NamedTuple):
+    """One path changed by one commit: the commit (a full object id), the time it was committed (with its offset) and the path."""
+
+    commit: str
+    when: datetime
+    path: str
 
 
 @runtime_checkable
@@ -71,6 +80,12 @@ class OrgHistory(Protocol):
         """The commit ``HEAD`` names now (the key under which a caller memoizes a None answer: it can change only with a new commit)."""
         ...
 
+    def changes(self, paths: Sequence[str], limit: int) -> list[Change] | None:
+        """The paths among ``paths`` that each of the newest ``limit`` commits changed, newest commit first (git's order inside a commit): one
+        ``Change`` per commit and path. A path that cannot be asked of the history is left out, and with none left the answer is ``[]`` without
+        asking git; a commit whose record cannot be read is skipped. None when there is no repository, no git, or git fails."""
+        ...
+
 
 @runtime_checkable
 class GitClient(Protocol):
@@ -108,6 +123,14 @@ class GitClient(Protocol):
         read); None when it is larger, is no blob, on a failure or a timeout; never raises."""
         ...
 
+    def log(self, root: Path, paths: Sequence[str], limit: int) -> bytes | None:
+        """The newest ``limit`` commits of ``root``'s repository that changed some of ``paths`` (relative to ``root``, read literally), as one
+        record per commit, newest first: NUL, the commit id, TAB, the commit time in ISO 8601 with its offset, a newline, then the changed paths
+        among ``paths`` one per line (blank lines between the parts are none of the answer). A path that cannot be asked of the history is left out; with none left, or a ``limit``
+        below 1, the answer is ``b""`` without running git. None when there is no repository or commit, no git, a failure or a timeout; never
+        raises."""
+        ...
+
 
 def blob_id(data: bytes, hexlen: int = 40) -> str:
     """The git object id of a blob with these bytes, as ``git hash-object`` computes it (pure): ``sha1(b"blob <size>\\0" + data)`` for ``hexlen``
@@ -119,4 +142,4 @@ def blob_id(data: bytes, hexlen: int = 40) -> str:
     return digest(b"blob %d\0" % len(data) + data, usedforsecurity=False).hexdigest()
 
 
-__all__ = ["GitClient", "IgnoreList", "OrgHistory", "OrgSnapshotter", "RUNTIME_IGNORE_LINES", "blob_id"]
+__all__ = ["Change", "GitClient", "IgnoreList", "OrgHistory", "OrgSnapshotter", "RUNTIME_IGNORE_LINES", "blob_id"]

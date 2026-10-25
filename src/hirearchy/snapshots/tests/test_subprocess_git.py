@@ -132,3 +132,26 @@ def test_the_read_methods_answer_none_when_the_program_is_missing(root: Path) ->
     git = SubprocessGit(NO_GIT)
     assert (git.added_by(root, "a.md"), git.object_id(root, "HEAD"), git.cat(root, "0" * 40, 10)) == (None, None, None)
     assert os.path.isdir(root)
+
+
+def test_log_runs_literal_pathspecs_with_the_read_timeout(tmp_path: Path, root: Path) -> None:
+    git, log = logging_git(tmp_path)
+    git.init(root)
+    (root / "a*.md").write_text("a\n", encoding="utf-8")
+    git.commit_all(root, "m")
+    log.unlink(missing_ok=True)
+    out = git.log(root, ["a*.md", "../escape.md", "-x", "a:b"], 5)  # the paths that cannot be asked of the history are dropped
+    assert out is not None and out.startswith(b"\0") and out.endswith(b"\na*.md\n")
+    assert log.read_text(encoding="utf-8").splitlines() == ["--literal-pathspecs log -n 5 --format=%x00%H%x09%cI --name-only -- a*.md"]
+    log.unlink()
+    assert git.log(root, ["../escape.md"], 5) == b"" and not log.exists()  # nothing left to ask: git is not run
+    assert git.log(root, ["a*.md"], 0) == b"" and not log.exists()  # and no unlimited read from a limit git would take as "no limit"
+    slow = SubprocessGit(wrapper(tmp_path, "exec sleep 5\n"), timeout=0.3)
+    started = time.monotonic()
+    assert slow.log(root, ["a.md"], 5) is None
+    assert time.monotonic() - started < 3.0
+
+
+def test_log_without_the_program_answers_none_or_nothing_to_ask(root: Path) -> None:
+    git = SubprocessGit(NO_GIT)
+    assert (git.log(root, ["a.md"], 5), git.log(root, [], 5)) == (None, b"")

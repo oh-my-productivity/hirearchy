@@ -7,6 +7,7 @@ from __future__ import annotations
 import os
 import subprocess
 import threading
+from collections.abc import Sequence
 from pathlib import Path
 
 import pytest
@@ -14,7 +15,7 @@ import pytest
 from hirearchy.app._checked_versions import GitBlobIds, GitCheckedVersions
 from hirearchy.kernel import Message, OrgPaths
 from hirearchy.reflection._ports import BlobIds, CheckedVersions
-from hirearchy.snapshots import OrgHistory, blob_id
+from hirearchy.snapshots import Change, OrgHistory, blob_id
 from hirearchy.snapshots._git import GitOrgHistory, SubprocessGit
 
 MIB = 1024 * 1024
@@ -51,6 +52,10 @@ class CountingHistory(OrgHistory):
     def head(self) -> str | None:
         self.calls.append(("head",))
         return self.inner.head()
+
+    def changes(self, paths: Sequence[str], limit: int) -> list[Change] | None:
+        self.calls.append(("changes", str(limit), *paths))
+        return self.inner.changes(paths, limit)
 
     def asked(self, name: str) -> int:
         return sum(1 for call in self.calls if call[0] == name)

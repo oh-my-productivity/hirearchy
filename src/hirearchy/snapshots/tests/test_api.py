@@ -12,7 +12,7 @@ from hirearchy.snapshots import api
 
 
 def test_the_package_re_exports_exactly_the_api() -> None:
-    assert snapshots.__all__ == api.__all__ == ["GitClient", "IgnoreList", "OrgHistory", "OrgSnapshotter", "RUNTIME_IGNORE_LINES", "blob_id"]
+    assert snapshots.__all__ == api.__all__ == ["Change", "GitClient", "IgnoreList", "OrgHistory", "OrgSnapshotter", "RUNTIME_IGNORE_LINES", "blob_id"]
     assert all(getattr(snapshots, name) is getattr(api, name) for name in api.__all__)
 
 

@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import cast
 
 import pytest
 
 from hirearchy.kernel import OrgPaths
-from hirearchy.snapshots import OrgHistory, blob_id
+from hirearchy.snapshots import Change, OrgHistory, blob_id
 from hirearchy.snapshots._git import GitOrgHistory
 from hirearchy.snapshots.testing import IMPLEMENTATIONS, HistoryHarness, RecordingGit
 
@@ -93,3 +94,100 @@ def test_no_repository_runs_no_git(tmp_path: Path) -> None:
     history = GitOrgHistory(OrgPaths(root), git)
     assert (history.head(), history.first_commit_with("a.md"), history.blob("0" * 40, "a.md"), history.text("0" * 40, "a.md", 1)) == (None,) * 4
     assert git.reads == []
+
+
+# ------------------------------------------------------------------------------ changes (the commits that changed some paths)
+
+
+def test_changes_list_the_commits_that_changed_the_paths_newest_first(h: HistoryHarness) -> None:
+    first = h.commit({"a.md": b"1\n", "b.md": b"1\n", "c.md": b"1\n"})
+    second = h.commit({"a.md": b"2\n", "c.md": b"2\n"})
+    found = h.history.changes(["a.md", "b.md"], 40)
+    assert found is not None
+    assert [(c.commit, c.path) for c in found] == [(second, "a.md"), (first, "a.md"), (first, "b.md")]
+    assert all(c.when.utcoffset() is not None for c in found)
+    limited = h.history.changes(["a.md", "b.md"], 1)
+    assert limited is not None and [(c.commit, c.path) for c in limited] == [(second, "a.md")]  # the limit counts commits
+    assert h.history.changes(["nothing.md"], 40) == []  # a repository that never changed it
+
+
+def test_changes_is_none_without_a_repository_or_git(h: HistoryHarness, tmp_path: Path) -> None:
+    assert h.history.changes(["a.md"], 40) is None  # no repository yet
+    root = tmp_path / "no-git"
+    root.mkdir()
+    git = RecordingGit(available=False)
+    git.repositories.add(root)  # a repository, but no git program to ask
+    assert GitOrgHistory(OrgPaths(root), git).changes(["a.md"], 40) is None
+    plain = RecordingGit()
+    assert GitOrgHistory(OrgPaths(root), plain).changes(["a.md"], 40) is None and plain.reads == []  # not a repository: git is not asked
+
+
+def at(shift: int = 0) -> str:
+    return (datetime(2026, 10, 22, 19, 12, 45, tzinfo=timezone(timedelta(hours=1))) + timedelta(minutes=shift)).isoformat()
+
+
+class CannedLog(RecordingGit):
+    """A repository whose ``log`` answers fixed bytes: what git can print that a real small repository cannot (a sha256 id, a bad record)."""
+
+    def __init__(self, answer: bytes) -> None:
+        super().__init__()
+        self.answer = answer
+
+    def log(self, root: Path, paths: Sequence[str], limit: int) -> bytes | None:
+        return self.answer
+
+
+def canned(tmp_path: Path, answer: bytes) -> GitOrgHistory:
+    root = tmp_path / "org"
+    root.mkdir()
+    git = CannedLog(answer)
+    git.repositories.add(root)
+    return GitOrgHistory(OrgPaths(root), git)
+
+
+SHA1, SHA256, OTHER = "a" * 40, "b" * 64, "c" * 40
+
+
+def test_changes_parses_sha1_and_sha256_commits(tmp_path: Path) -> None:
+    answer = f"\0{SHA1}\t{at()}\nORG.md\nlead/AGENT.md\n\n\0{SHA256}\t{at(-5)}\nlead/AGENT.md\n\n".encode()
+    assert canned(tmp_path, answer).changes(["ORG.md", "lead/AGENT.md"], 40) == [
+        Change(SHA1, datetime.fromisoformat(at()), "ORG.md"),
+        Change(SHA1, datetime.fromisoformat(at()), "lead/AGENT.md"),
+        Change(SHA256, datetime.fromisoformat(at(-5)), "lead/AGENT.md"),
+    ]
+
+
+def test_changes_skip_a_record_that_does_not_parse(tmp_path: Path) -> None:
+    answer = (
+        f"\0{SHA1}\t{at()}\nORG.md\n\n"
+        f"\0not-an-id\t{at(-1)}\nORG.md\n\n"  # the id is no object id
+        f"\0{OTHER.upper()}\t{at(-2)}\nORG.md\n\n"  # upper case is none
+        f"\0{OTHER}\tyesterday\nORG.md\n\n"  # the time is none
+        f"\0{OTHER}{at(-3)}\nORG.md\n\n"  # no tab
+        f"\0\xff\xfe\nORG.md\n\n"  # not even text
+        f"\0{SHA256}\t{at(-4)}\nORG.md\n\n"
+    ).encode("latin-1")
+    found = canned(tmp_path, answer).changes(["ORG.md"], 40)
+    assert found is not None and [c.commit for c in found] == [SHA1, SHA256]
+
+
+def test_changes_keep_only_the_asked_paths(tmp_path: Path) -> None:
+    answer = f"\0{SHA1}\t{at()}\nlead/AGENT.md\nlead/AGENT.md.bak\nlead/sub/AGENT.md\nother.md\n\n".encode()
+    found = canned(tmp_path, answer).changes(["lead/AGENT.md", "ORG.md"], 40)
+    assert found == [Change(SHA1, datetime.fromisoformat(at()), "lead/AGENT.md")]
+
+
+def test_changes_drop_paths_that_fail_is_history_path(tmp_path: Path) -> None:
+    root = tmp_path / "org"
+    root.mkdir()
+    git = RecordingGit()
+    git.init(root)
+    git.touch(root, "ORG.md", b"x\n")
+    git.commit_all(root, "first")
+    git.reads.clear()
+    history = GitOrgHistory(OrgPaths(root), git)
+    found = history.changes(["ORG.md", "../x.md", "-y", "a:b.md", "", "a//b.md"], 40)
+    assert found is not None and [c.path for c in found] == ["ORG.md"]
+    assert git.reads == [("log", str(root), "40", "ORG.md")]  # only the path that can be asked
+    git.reads.clear()
+    assert history.changes(["../x.md", "-y"], 40) == [] and git.reads == []  # nothing left to ask: git is not run

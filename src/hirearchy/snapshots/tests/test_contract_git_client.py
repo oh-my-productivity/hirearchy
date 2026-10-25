@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from datetime import datetime
 from pathlib import Path
 from typing import cast
 
@@ -166,3 +167,46 @@ def test_a_path_with_star_and_colon_paren_is_read_literally(h: GitHarness) -> No
     assert h.git.added_by(h.root, ":(exclude)b.md") == magic  # magic would find z.md, added by the first commit
     assert h.git.added_by(h.root, "a?.md") is None  # nothing is named that
     assert h.git.object_id(h.root, f"{star}:a*.md") == blob_id(h.read("a*.md"))
+
+
+# ------------------------------------------------------------------------------ log (the commits that changed some paths)
+
+
+def log_records(out: bytes | None) -> list[tuple[str, str, list[str]]]:
+    """``(commit, time, paths)`` per record of ``GitClient.log``'s answer: each record is NUL, ``<id>`` TAB ``<ISO time>``, a newline, the paths."""
+    assert out is not None
+    records = []
+    for chunk in out.decode("utf-8").split("\0")[1:]:
+        head, _, rest = chunk.partition("\n")
+        commit_id, _, when = head.partition("\t")
+        records.append((commit_id, when, [line for line in rest.splitlines() if line]))
+    return records
+
+
+def test_log_lists_commit_time_and_paths_newest_first(h: GitHarness) -> None:
+    h.git.init(h.root)
+    first = commit(h, "first", "a.txt", "sub/b.txt")
+    second = commit(h, "second", "a.txt", "c.txt")
+    commit(h, "third", "other.txt")  # touches none of the asked paths
+    records = log_records(h.git.log(h.root, ["a.txt", "sub/b.txt", "c.txt"], 40))
+    assert [(c, sorted(paths)) for c, _, paths in records] == [(second, ["a.txt", "c.txt"]), (first, ["a.txt", "sub/b.txt"])]
+    assert all(datetime.fromisoformat(when).utcoffset() is not None for _, when, _ in records)  # an ISO time with its offset
+    assert [(c, paths) for c, _, paths in log_records(h.git.log(h.root, ["a.txt"], 40))] == [(second, ["a.txt"]), (first, ["a.txt"])]
+    assert [c for c, _, _ in log_records(h.git.log(h.root, ["a.txt"], 1))] == [second]  # the newest commit only
+
+
+def test_log_answers_none_without_a_repository(h: GitHarness) -> None:
+    assert h.git.log(h.root, ["a.txt"], 40) is None
+    h.git.init(h.root)
+    assert h.git.log(h.root, ["a.txt"], 40) is None  # a repository without a commit
+    commit(h, "first", "a.txt")
+    assert log_records(h.git.log(h.root, ["a.txt"], 40)) != []
+    h.break_repository()
+    assert h.git.log(h.root, ["a.txt"], 40) is None
+
+
+def test_log_of_no_path_answers_an_empty_list_without_git(h: GitHarness) -> None:
+    assert h.git.log(h.root, [], 40) == b""  # no repository yet, and no question to ask
+    h.git.init(h.root)
+    commit(h, "first", "a.txt")
+    assert h.git.log(h.root, [], 40) == b""

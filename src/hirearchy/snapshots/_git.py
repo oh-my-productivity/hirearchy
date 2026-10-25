@@ -5,10 +5,12 @@ from __future__ import annotations
 import re
 import shutil
 import subprocess
+from collections.abc import Sequence
+from datetime import datetime
 from pathlib import Path
 
 from ..kernel import OrgLayout
-from .api import GitClient, OrgHistory, OrgSnapshotter
+from .api import Change, GitClient, OrgHistory, OrgSnapshotter
 
 _OBJECT_ID = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")  # sha1 and sha256 repositories
 _NOT_IN_A_PATH = (":", "^", "~", "@{", "\\", "\0")  # revision syntax (``<commit>:<path>``) and a byte no argument can hold
@@ -30,8 +32,17 @@ def is_history_path(path: str) -> bool:
     )
 
 
+def _commit_time(text: str) -> datetime | None:
+    """The ISO 8601 time with an offset that ``%cI`` prints; None for anything else."""
+    try:
+        when = datetime.fromisoformat(text)
+    except ValueError:
+        return None
+    return when if when.utcoffset() is not None else None
+
+
 class SubprocessGit(GitClient):
-    """``git`` run as a child process (``executable`` is looked up on PATH). The read questions (``added_by``, ``object_id``, ``cat``) run as
+    """``git`` run as a child process (``executable`` is looked up on PATH). The read questions (``added_by``, ``object_id``, ``cat``, ``log``) run as
     ``git --literal-pathspecs ...`` in the repository, wait at most ``timeout`` seconds, and answer None on anything but success."""
 
     def __init__(self, executable: str = "git", timeout: float = READ_TIMEOUT) -> None:
@@ -71,6 +82,12 @@ class SubprocessGit(GitClient):
         if size is None or not size.strip().isdigit() or int(size) > limit:
             return None  # too large, not an object: the blob is not read
         return self._read(root, "cat-file", "blob", obj)
+
+    def log(self, root: Path, paths: Sequence[str], limit: int) -> bytes | None:
+        asked = [path for path in paths if is_history_path(path)]
+        if not asked or limit < 1:  # nothing to ask (a negative limit would be git's "no limit")
+            return b""
+        return self._read(root, "log", "-n", str(limit), "--format=%x00%H%x09%cI", "--name-only", "--", *asked)
 
     def _read(self, root: Path, *args: str) -> bytes | None:
         """The output of ``git --literal-pathspecs <args>`` in ``root``; None on a non-zero exit, a timeout or a program that cannot run."""
@@ -127,6 +144,24 @@ class GitOrgHistory(OrgHistory):
 
     def head(self) -> str | None:
         return self._git.object_id(self._paths.root, "HEAD") if self._repository() else None
+
+    def changes(self, paths: Sequence[str], limit: int) -> list[Change] | None:
+        if not self._repository():
+            return None
+        asked = [path for path in dict.fromkeys(paths) if is_history_path(path)]
+        if not asked:
+            return []
+        out = self._git.log(self._paths.root, asked, limit)
+        if out is None:
+            return None
+        found: list[Change] = []
+        for record in out.decode("utf-8", "replace").split("\0")[1:]:
+            head, _, rest = record.partition("\n")
+            commit, _, stamp = head.partition("\t")
+            when = _commit_time(stamp)
+            if is_object_id(commit) and when is not None:  # a record that does not parse is skipped
+                found.extend(Change(commit, when, line) for line in rest.splitlines() if line in asked)
+        return found
 
     def _repository(self) -> bool:
         try:

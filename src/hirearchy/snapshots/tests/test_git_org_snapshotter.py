@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 
 import pytest
@@ -78,6 +79,9 @@ class RefusingGit(GitClient):
         return None
 
     def cat(self, root: Path, obj: str, limit: int) -> bytes | None:
+        return None
+
+    def log(self, root: Path, paths: Sequence[str], limit: int) -> bytes | None:
         return None
 
 
