@@ -1,0 +1,9 @@
+memo-1 task identification (protocol 5.3)
+date_utc: 2026-10-25T08:32:44Z
+Memo 1's first delivery = user turn 5 (copy deliverables/memo-2026-10-05.md, mtime 2026-10-25T08:31:41Z, md5 f5378a551302660467c09c55b2d05af4; the assistant's turn-5 text says "The memo is at .../deliverables/memo-2026-10-05.md. I copied it from the team's file and checked that the two are identical." and asks "Do you keep this memo as it is, or should anything change?").
+root tasks when memo 1 was first delivered:
+  20261025T082434523661-root-09df (first request, source: -, budget 12) -> result lead-17e3 (done, 08:26:58Z; "Questions for the client:" 4 items)
+  20261025T082820566824-root-62a5 (human rework 'Memo for 2026-10-05 meeting: client corrections', revises 09df, source: human, budget 7) -> result lead-c2f9 (done, 08:30:38Z; "Questions for the client:" with 2 items; "Only the two Due values changed: Sam 2026-10-09, Marta 2026-10-14")
+The delivered file equals lead/writer/work/memo-2026-10-05.md (md5 f5378a55..., modified 08:29:11Z), the artifact named by the done result c2f9 (62a5); the copy (08:31:41Z) came after it. Judgement (recorded as a fact, not a rule): as in E4 s3, E5 s1, E6 s1-s3 and E7 s1-s2, the root task is the assistant's human rework whose own done result delivered the version, 62a5. So revises = 20261025T082820566824-root-62a5.
+At that moment: no scheduler running (scheduler.exit 'finished: no open tasks'; ps: none references the sandbox); root inbox empty; root tasks still open: none seen in the file listing (read from the file listing only; the script never calls inbox). model_check org and assistant: see the lines printed just before this file was written (model-checks.txt).
+post-injection model checks done at 2026-10-25T08:35:53Z

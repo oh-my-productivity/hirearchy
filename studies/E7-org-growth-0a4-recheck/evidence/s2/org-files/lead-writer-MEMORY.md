@@ -1,0 +1,5 @@
+Memos: lead/writer/work/memo-2026-10-05.md (done), memo-2026-10-12.md (158 words), memo-2026-10-19.md (142 words, client rulings applied, reported done for task d7a8; awaiting reviewer re-check by lead).
+Blocked reports awaiting reviewer findings (C7): task 20261025T080214459188-lead-1add (10-12) and 20261025T080640855539-lead-17a9 (10-19). When lead sends a revises task: apply changes minimally, re-report (once per blocked report).
+Client due-date rulings: event date = Due; 'before Friday' = that Friday; 'this week'/no date/period = none; relative to dated event = resolved date. Informal and hedged commitments are rows (but 'nothing for her to do' like Marta keeping agenda is NOT a row); status-only is not. Decision = notes say decided/agreed. Format: 'Summary:' line, Decisions bullets, Actions table Owner | Action | Due. No Open questions section; ambiguities go in report under 'Questions for the client'.
+10-12 open questions sent: Sam 'probably' (put 2026-10-21), Lee swap (none). 10-19 rulings: Lee sign-off 2026-10-30, Sam pairing none, Marta agenda row removed.
+Tip: when rewriting a file, read it first (do not read in parallel with write).

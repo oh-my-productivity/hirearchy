@@ -1,0 +1,2 @@
+profile created 2026-10-25T08:21:01Z: /Users/aminalizadeh/.kiro/agents/hirearchy-study-e7-s3-assistant.json md5 3a5c38de582e9ada0d697aa23764c386
+profile deleted 2026-10-25T08:59:47Z: /Users/aminalizadeh/.kiro/agents/hirearchy-study-e7-s3-assistant.json md5 3a5c38de582e9ada0d697aa23764c386

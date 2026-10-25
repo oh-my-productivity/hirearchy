@@ -1,0 +1,7 @@
+memo-1 task identification (protocol 5.3)
+date_utc: 2026-10-25T07:11:46Z
+Memo 1's first delivery = user turn 4 (copy deliverables/memo-2026-10-05.md, mtime 07:10:39 local = UTC, md5 e4cd88c73b9470d67af10e7382fe1284; the assistant's turn-4 text presents it as the memo and asks "Do you want to keep this one as it is, or change something?").
+root tasks when memo 1 was first delivered:
+  20261025T070423629042-root-5efc (first request, source: -, budget 12) -> result lead-e88a (BLOCKED, 07:06:46Z; "Questions for the client:" Sam, Marta, Lee, each naming C6); later result lead-2426 (done, 07:10:34Z, supersedes e88a; "Blocker resolved: the client answered the C6 questions in task 5e3e ...")
+  20261025T070822368798-root-5e3e (human rework 'Memo for the 5 October 2026 meeting (client answers)', revises 5efc, source: human, budget 7) -> result lead-0341 (done, 07:10:31Z; "Memo for 2026-10-05 with your C6 answers applied ... Deliverable: lead/writer/work/memo-2026-10-05.md")
+The delivered file equals lead/writer/work/memo-2026-10-05.md (modified 07:09:08Z; the artifact named by both done results, 0341 for 5e3e and 2426 for 5efc); the copy (07:10:39Z) came after both. Judgement (recorded as a fact, not a rule): as in E4 s3, E5 s1 and E6 s1, s2 and s3, the root task is the assistant's human rework whose own done result delivered the version, 5e3e (2426 is the superseding result of the first request, written 3 seconds after 0341 for the same rework chain). So revises = 20261025T070822368798-root-5e3e.

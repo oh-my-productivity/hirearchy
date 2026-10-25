@@ -1,0 +1,1 @@
+76914     1 76914 Ss   /Volumes/workspace/hirearchy/.venv/bin/python3 /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e7-detach-1

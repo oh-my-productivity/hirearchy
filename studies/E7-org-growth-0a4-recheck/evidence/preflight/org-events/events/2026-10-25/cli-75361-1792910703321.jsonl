@@ -1,0 +1,2 @@
+{"v":1,"ts":"2026-10-25T06:45:03.321471+00:00","seq":1,"proc":"cli","pid":75361,"kind":"agent.hire","actor":"root","run":null,"trace":null,"agent":"lead","by":"root","role":"Lead","model":"claude-sonnet-5.5","tools":["read","write"]}
+{"v":1,"ts":"2026-10-25T06:45:03.359726+00:00","seq":2,"proc":"cli","pid":75361,"kind":"cli.command","actor":"root","run":null,"trace":null,"command":"hire","ok":true,"ms":40.46,"error":null,"error_type":null}

@@ -1,0 +1,5 @@
+(e) PASS event files have no seq gaps
+      8 event file(s) checked
+(f) PASS scheduler pid file matches a live scheduler
+      no pid file: no scheduler claims to run
+all checks passed

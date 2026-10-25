@@ -1,0 +1,25 @@
+######## TURN 12  start 08:54:38  end 08:57:21  elapsed 163s  (local, 2026-10-25; UTC wall-clock start 2026-10-25T08:54:38Z end 2026-10-25T08:57:21Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Lee's 2026-10-30 is right. Sam's should be none. No, nothing for Marta to do there, leave it out. Keep it as it is.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+The memo is at `/tmp/hirearchy-e7-s3-1792916437/deliverables/memo-2026-10-19.md`. I copied it from the team's file and checked that the two are identical.
+
+I applied your answers:
+- Lee's Due is 2026-10-30.
+- Sam's Due stays `none`.
+- Marta's "keep the agenda as sent" row is gone.
+- Open items stays "None."
+
+- Covers only 2026-10-19.md: met.
+- At most 400 words: met. `wc` counts 221.
+- Starts with a one-line `Summary:`, then Decisions, then Action items: met, with the title above the Summary as you ruled earlier.
+- Decisions, Action items and Open items sections: met.
+- Every decision listed once: met (3 decisions).
+- Action table with Owner | Action | Due, including prose commitments: met (5 rows).
+- ISO dates or `none`: met. The dates are 2026-10-23, 2026-10-24, 2026-10-26, 2026-10-30 and `none`.
+- Nothing missing or contradicting the notes: met.
+- Reviewer's report shows every criterion met: met, 9 of 9, and 17 of 17 factual claims verified.
+
+Runs used: 10 of the 12 approved. There were no unrequested reworks.
+
+All three memos are in `deliverables`. Do you keep this one as it is, or should anything change?

@@ -1,0 +1,16 @@
+1,3c1,3
+< label: s2-before
+< date: Sun Oct 25 07:41:32 WET 2026
+< date_utc: 2026-10-25T07:41:32Z  epoch: 1792914092
+---
+> label: s2-after
+> date: Sun Oct 25 08:16:36 WET 2026
+> date_utc: 2026-10-25T08:16:36Z  epoch: 1792916196
+20c20
+< drwx------@  3 aminalizadeh  staff      96 Oct 25 07:39 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 25 07:42 .
+25c25
+< drwx------@  8 aminalizadeh  staff   256 Oct 25 07:37 .
+---
+> drwx------@  8 aminalizadeh  staff   256 Oct 25 08:16 .

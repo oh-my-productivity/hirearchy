@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e7-s1-assistant 'Great, approve. I'\''ll wait.'

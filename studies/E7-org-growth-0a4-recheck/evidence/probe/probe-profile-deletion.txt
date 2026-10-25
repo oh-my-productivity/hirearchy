@@ -1,0 +1,1 @@
+deleted 2026-10-25T06:44:40Z /Users/aminalizadeh/.kiro/agents/hirearchy-study-e7-probe.json md5 603327270f6c0efa420715ccaa569124 (copy verified byte-identical: /Volumes/workspace/hirearchy/studies/E7-org-growth-0a4-recheck/evidence/probe/hirearchy-study-e7-probe.json)

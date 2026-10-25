@@ -1,0 +1,17 @@
+######## TURN 7  start 08:37:13  end 08:40:57  elapsed 224s  (local, 2026-10-25; UTC wall-clock start 2026-10-25T08:37:13Z end 2026-10-25T08:40:57Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it. Yes, fund it - but please keep an eye on the cost.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-07.stderr.txt):
+The Summary rework is blocked on one wording question, and the cause is my instruction. I told the team to put the Summary line "directly under the title". The reviewer reads your rule literally, so the Summary has to be the first line of the memo and the title can't sit above it. The team has no runs left to settle this.
+
+Everything else passed. The current version in the team's folder has this order: title, `Summary:` (one line), Decisions, Action items, Open items. The `Present:` line moves to the end. Sam's Due is 2026-10-09, Marta's is 2026-10-14, and Lee's is `none`.
+
+**Question:** can the memo keep a title heading above the Summary line?
+- **Yes (what I recommend).** It needs one more reviewer run, and nothing else changes.
+- **No.** The title is deleted so the Summary is line 1. That needs two more runs, one writer and one reviewer.
+
+Either way, this memo goes to 16 or 17 runs against the 15 you funded. Do you OK that one or two extra run?
+
+The copy in `deliverables` is still the earlier version, without the Summary. I'll replace it only after you answer.
+
+I also need to flag something I can't fully explain. The trace shows a rework request, "unclear due dates", that I didn't knowingly send. It was sent under my seat, and it used 5 runs. It reverted your Sam and Marta dates in the team's working copy. It did not touch the delivered file, and I've marked it as rejected. I'm counting those 5 runs as my own spend, not yours.

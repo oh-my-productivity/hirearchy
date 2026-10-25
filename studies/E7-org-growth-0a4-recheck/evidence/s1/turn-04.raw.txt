@@ -1,0 +1,14 @@
+The first memo is done and the copy matches the checked file: `/tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-05.md`
+
+- **Notes file only:** it uses just `2026-10-05.md`.
+- **Structure:** it has a title line with the date, then Decisions and Actions, and nothing else.
+- **Decisions:** it lists both decisions in the notes, moving the gateway migration to the week of 26 October and adopting Renovate.
+- **Actions table:** it has five rows, including Sam's and Lee's prose commitments.
+- **Owners:** all five are people named in the notes.
+- **Due dates:** they are ISO dates, with Sam on 2026-10-09, Marta on 2026-10-14 and Lee as `none`, as you said.
+- **Length:** it is 103 words by the reviewer's count, under the 400 limit. `wc` counts 133 because it counts the table's `|` and `---` characters.
+- **Review:** the reviewer reported "criteria met: 7 of 7". I also checked the memo against the notes myself.
+
+The memo took 10 runs of the 12 you set.
+
+Each week, tell me the notes file, for example `2026-10-12.md`, and I'll request the next memo. Do you want to keep this one as it is, or change something?

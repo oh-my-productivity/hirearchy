@@ -1,0 +1,24 @@
+{
+  "name": "hirearchy-study-e7-s1-assistant",
+  "description": "internal: hirearchy usability study E7 stream s1 assistant; deleted after the stream",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "uv",
+      "args": ["--directory", "/Volumes/workspace/hirearchy", "run", "hirearchy", "mcp"],
+      "env": { "ORG_ROOT": "/tmp/hirearchy-e7-s1-1792911600/org" }
+    }
+  },
+  "tools": ["*"],
+  "permissions": {
+    "rules": [
+      { "capability": "all", "effect": "allow" }
+    ]
+  },
+  "resources": [
+    "skill:///Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md",
+    "skill://.kiro/skills/*/SKILL.md"
+  ],
+  "hooks": [],
+  "includeMcpJson": false,
+  "model": "claude-sonnet-5.5"
+}

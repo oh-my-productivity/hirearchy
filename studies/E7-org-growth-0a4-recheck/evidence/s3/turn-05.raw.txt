@@ -1,0 +1,14 @@
+The memo is at `/tmp/hirearchy-e7-s3-1792916437/deliverables/memo-2026-10-05.md`. I copied it from the team's file and checked that the two are identical.
+
+- Covers only 2026-10-05.md: met.
+- At most 400 words: met. `wc` counts 251 words, and the team's own count was 216.
+- Decisions, Action items and Open items sections: met.
+- Every decision listed once: met (2 decisions).
+- Action table with Owner | Action | Due, including prose commitments: met (5 rows).
+- Due values are ISO dates or `none`: met. Sam and Marta use your rulings.
+- Nothing missing or contradicting the notes: met.
+- Reviewer's final report, 7 of 7 criteria met: met.
+
+Runs used: 10 of the 12 approved for this memo, rework included.
+
+Next week, ask me "memo for <date>" and I'll run it. Do you keep this memo as it is, or should anything change?

@@ -1,0 +1,16 @@
+# P=/tmp/hirearchy-e7-preflight-1792910702  2026-10-25T06:45:02Z
+$ hirearchy init /tmp/hirearchy-e7-preflight-1792910702/org --mission "E7 harness preflight (throwaway)" --model claude-sonnet-5.5
+org: /private/tmp/hirearchy-e7-preflight-1792910702/org
+initialized organization at /private/tmp/hirearchy-e7-preflight-1792910702/org
+edit /private/tmp/hirearchy-e7-preflight-1792910702/org/ORG.md to set the mission and limits
+exit 0
+15:default_model: claude-sonnet-5.5
+16:effort: high
+$ hirearchy --root /tmp/hirearchy-e7-preflight-1792910702/org hire root lead --role Lead --charter ... --tools read,write --model claude-sonnet-5.5
+org: /private/tmp/hirearchy-e7-preflight-1792910702/org
+hired lead
+exit 0
+$ hirearchy --root /tmp/hirearchy-e7-preflight-1792910702/org task lead --title "Preflight note" --goal ... --budget 2
+org: /private/tmp/hirearchy-e7-preflight-1792910702/org
+task 20261025T064503483287-root-08c9 -> lead (budget 2)
+exit 0

@@ -1,0 +1,27 @@
+I haven't copied the 19 October memo to `deliverables/` yet. The team raised three judgement calls that are yours to make.
+
+```
+Summary: Platform team weekly on 19 October 2026: the team agreed to go ahead with the customer demo without the rate limiter, to renew the SSO vendor for twelve months, and to move this weekly to Monday 14:00.
+
+## Decisions
+- Go ahead with the customer demo, leaving the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move this weekly from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Actions
+| Owner | Action | Due |
+| Marta | Keep the demo agenda as sent | none |
+| Lee | Sign off on the SSO vendor renewal once legal replies | none |
+| Marta | Collect demo feedback and circulate it | 2026-10-23 |
+| Dev | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting | 2026-10-26 |
+| Sam | Pair with Jo on the CI pipeline during Jo's first week | none |
+```
+
+It is 150 words and starts with the Summary line. The reviewer reports 8 of 8 criteria met, and I checked each row against the notes.
+
+1. **Marta, "will keep the agenda as sent".** I listed it as an action with no date. It could also be read as a status, not something she will do. Keep the row or drop it? I'd keep it, since the notes say she "will".
+2. **Lee, sign off on the renewal "probably by end of next week".** The memo has Due `none`. The other option is 2026-10-30, the Friday of next week. I'd use 2026-10-30, because the notes give a clear target. Which do you want?
+3. **Sam, pair with Jo "during that first week".** Jo starts on 26 October. This is a period, like Lee's pager swap last week, so Due is `none`. Keep `none`?
+
+If you change anything, a rework costs about 5 runs. This request has used 5 of its 12, so it fits within the budget. Tell me what to change, or say "keep it" and I'll copy the memo over now.

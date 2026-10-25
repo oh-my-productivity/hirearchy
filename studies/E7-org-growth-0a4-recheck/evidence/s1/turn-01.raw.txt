@@ -1,0 +1,12 @@
+I read your three meeting notes, and I'll set this up as a standing weekly service. Each week you ask for it with a notes file, and it returns the memo. Please answer these in one reply, or say "defaults" to accept my proposals.
+
+1. **Informal items.** Your notes contain commitments that aren't labelled ACTION. Examples are Sam pairing with Jo on CI, Lee signing off the SSO renewal, Sam refreshing the staging test data, and Lee and Dev swapping pager shifts. Should the memo list these as well as the ACTION lines? **Default: yes, every decision and every commitment, including ones written in prose.**
+2. **Vague dates.** Examples are "by end of next week" and "the day before the freeze starts". Should the memo turn them into a calendar date, or leave the due date empty when the notes give no exact one? **Default: give a date only when the notes state one or it follows directly from one. Otherwise show the wording from the notes, and invent no date.**
+3. **Memo contents.** **Default: a "Decisions" section and an "Actions" section. Each action has an owner, the task and its due date. Nothing else, such as attendee lists or discussion recaps. Markdown, at most 400 words.**
+4. **Place.** **Default: a new `deliverables/` folder in /tmp/hirearchy-e7-s1-1792911600, with one file per meeting, for example `deliverables/memo-2026-10-19.md`.**
+5. **Sources.** Only your notes folder, /tmp/hirearchy-e7-s1-1792911600/notes. The team can't change those files, and it won't use the web. **Default: yes.**
+6. **Each week.** You tell me which notes file to use. Everything else stays fixed. **Default: yes.**
+7. **Review.** A second agent checks every decision and action against the notes before I hand you the memo. **Default: yes.**
+8. **Budget and models.** All agents run claude-sonnet-5.5 at high effort. That is the only option available. The plan will show a run budget per memo, the estimate plus 25%. **Default: accept that.**
+9. **Approvals.** You approve the plan before anything is built. Nothing runs until you ask for a memo. **Default: yes.**
+10. **First memo.** Should I also request the memo for the 19 October meeting once the team is approved and built? **Default: yes, as a first test.**

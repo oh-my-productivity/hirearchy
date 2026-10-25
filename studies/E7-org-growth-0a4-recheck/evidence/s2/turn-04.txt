@@ -1,0 +1,9 @@
+######## TURN 4  start 07:50:22  end 07:50:47  elapsed 25s  (local, 2026-10-25; UTC wall-clock start 2026-10-25T07:50:22Z end 2026-10-25T07:50:47Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Marta's should be 2026-10-14. Sam's should be 2026-10-09. Lee's none is right. Yes, leave Lee's vendor ping as an action only.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+The fix needs more runs than I told you. I said about 2, but each rework run only counts for the writer or reviewer. The lead also has to wake once for the request, once for the writer's result and once for the reviewer's result. That makes about 5 runs in all. The team still holds 3 unspent runs from your 12 and the rework got 1, so 4 are available. That is 1 short of the 5 it needs.
+
+May I grant 1 more run, which would take this memo to 13 runs against your 12? Without it, the rework may stop before the reviewer's re-check. In that case the memo would be unchecked, and I wouldn't copy it to `deliverables/`. Nothing has started yet.
+
+Reply "yes" to grant 1 run and start the rework. Reply "no" and I'll deliver the current memo to `deliverables/` as it is, with the three date rulings that differ from it listed beside it.

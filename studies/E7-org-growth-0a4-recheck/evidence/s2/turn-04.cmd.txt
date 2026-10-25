@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e7-s2-assistant Marta\''s should be 2026-10-14. Sam'\''s should be 2026-10-09. Lee'\''s none is right. Yes, leave Lee'\''s vendor ping as an action only.'

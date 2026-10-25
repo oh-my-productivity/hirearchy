@@ -1,0 +1,143 @@
+{
+ "attempt": "B1",
+ "turn": "2",
+ "events_of_interest": [
+  {
+   "ts": "2026-10-25T06:52:40.415881+00:00",
+   "proc": "mcp",
+   "pid": 77807,
+   "kind": "tool.call",
+   "tool": "progress",
+   "ok": true
+  },
+  {
+   "ts": "2026-10-25T06:53:27.338948+00:00",
+   "proc": "mcp",
+   "pid": 78392,
+   "kind": "tool.call",
+   "tool": "progress",
+   "ok": true
+  },
+  {
+   "ts": "2026-10-25T06:53:30.190703+00:00",
+   "proc": "scheduler",
+   "pid": 78480,
+   "kind": "scheduler.start"
+  },
+  {
+   "ts": "2026-10-25T06:53:30.197823+00:00",
+   "proc": "scheduler",
+   "pid": 78480,
+   "kind": "run.start",
+   "child_pid": 78496,
+   "pgid": 78496,
+   "agent": "ceo"
+  },
+  {
+   "ts": "2026-10-25T06:53:30.233309+00:00",
+   "proc": "mcp",
+   "pid": 78392,
+   "kind": "tool.call",
+   "tool": "start",
+   "ok": true
+  },
+  {
+   "ts": "2026-10-25T06:53:31.806632+00:00",
+   "proc": "scheduler",
+   "pid": 78480,
+   "kind": "scheduler.signal",
+   "signal": "SIGTERM",
+   "action": "stop",
+   "ppid": 1,
+   "running": [
+    "ceo@20261025T065330192469"
+   ]
+  },
+  {
+   "ts": "2026-10-25T06:53:32.214187+00:00",
+   "proc": "scheduler",
+   "pid": 78480,
+   "kind": "run.end",
+   "ok": false,
+   "killed": true,
+   "timed_out": false,
+   "duration_ms": 2016,
+   "agent": "ceo"
+  },
+  {
+   "ts": "2026-10-25T06:53:32.214713+00:00",
+   "proc": "scheduler",
+   "pid": 78480,
+   "kind": "scheduler.exit",
+   "reason": "stopped by SIGTERM"
+  }
+ ],
+ "return": "2026-10-25T06:53:33.037+00:00",
+ "scheduler_pid": 78480,
+ "start_to_return_ms": null,
+ "run_pid": 78496,
+ "run_start_to_return_ms": 2840,
+ "run_ended_before_return_by_scheduler_stop": true,
+ "at_plus_5s_sample": "2026-10-25T06:53:38.130+00:00",
+ "scheduler_alive_at_plus_5s": false,
+ "run_alive_at_plus_5s": false,
+ "scheduler_first_sample_alive": "2026-10-25T06:53:30.169+00:00",
+ "scheduler_last_sample_alive": "2026-10-25T06:53:32.192+00:00",
+ "scheduler_last_alive_stat_ppid_pgid": [
+  "Ss",
+  1,
+  78480
+ ],
+ "scheduler_first_sample_gone": "2026-10-25T06:53:32.301+00:00",
+ "scheduler_gone_relative_to_return_ms": -737,
+ "scheduler_alive_at_end_of_samples": false,
+ "run_last_sample_alive": "2026-10-25T06:53:31.760+00:00",
+ "run_first_sample_gone": "2026-10-25T06:53:31.866+00:00",
+ "run_last_alive_stat_ppid_pgid": [
+  "Ss",
+  78480,
+  78496
+ ],
+ "scheduler.exit": [
+  {
+   "ts": "2026-10-25T06:53:32.214713+00:00",
+   "reason": "stopped by SIGTERM"
+  }
+ ],
+ "scheduler.signal": [
+  {
+   "ts": "2026-10-25T06:53:31.806632+00:00",
+   "signal": "SIGTERM",
+   "action": "stop",
+   "ppid": 1,
+   "running": [
+    "ceo@20261025T065330192469"
+   ]
+  }
+ ],
+ "run.end": [
+  {
+   "ts": "2026-10-25T06:53:32.214187+00:00",
+   "ok": false,
+   "killed": true,
+   "timed_out": false,
+   "duration_ms": 2016
+  }
+ ],
+ "verdict": "died",
+ "valid": true,
+ "c1b": {
+  "first_signal": {
+   "ts": "2026-10-25T06:53:31.806632+00:00",
+   "signal": "SIGTERM",
+   "action": "stop",
+   "ppid": 1,
+   "running": [
+    "ceo@20261025T065330192469"
+   ]
+  },
+  "exit_reason": "stopped by SIGTERM",
+  "m5_signature": false,
+  "any_signal_recorded": true
+ }
+}

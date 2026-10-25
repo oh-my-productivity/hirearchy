@@ -1,0 +1,72 @@
+# E7 s1 setup (recorded before turn 1)
+date: Sun Oct 25 06:59:54 WET 2026; utc: 2026-10-25T06:59:54Z
+== protocol.md vs protocol.md5
+md5 -q protocol.md: 0acc2b4191b8cbfa5f4bb6197b877de1
+protocol.md5: 0acc2b4191b8cbfa5f4bb6197b877de1
+== amendments:
+zsh:11: no matches found: /Volumes/workspace/hirearchy/studies/E7-org-growth-0a4-recheck/evidence/protocol-amendment-*
+none
+== manager-decision files:
+zsh:12: no matches found: /Volumes/workspace/hirearchy/studies/E7-org-growth-0a4-recheck/evidence/manager-decision-*
+none
+== harness/MD5SUMS check (prints MISMATCH lines only)
+(done, 17 lines)
+MD5SUMS md5: d1f24687c9cd1587466d24db42ce59d0
+global SKILL.md md5: fd89a7fda55b8f342cf0306173c363fb (required fd89a7fda55b8f342cf0306173c363fb)
+repo SKILL.md md5: fd89a7fda55b8f342cf0306173c363fb
+injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd
+preflight.md result: Result: PASS
+== HIREARCHY_STATE_DIR set? no
+== processes referencing any E7 sandbox
+(none)
+== ~/.kiro/agents
+agent_config.json.example
+claude-opus-5.5.json
+claude-sonnet-5.5.json
+evolve.json
+hirearchy-organization-9d66c1-web-fetch-web-search.json
+telegram_bot.json
+== repo checks (4.1) BEFORE turn 1
+git rev-parse HEAD: 18a4531662060ddf0b78923edee8d61909bc9d6d
+git status --porcelain:
+?? docs/research/
+?? studies/E7-org-growth-0a4-recheck/
+git diff --stat 18a4531 HEAD -- src skills pyproject.toml uv.lock: []
+== kiro-cli --version: kiro-cli 2.33.0
+== S: /tmp/hirearchy-e7-s1-1792911600  epoch: 1792911600 (sandbox created at epoch 1792911600)
+== model_check.sh listed 1: listed: claude-sonnet-5.5: yes (claude-sonnet-5.5    1.30x credits      Claude Sonnet 5.5 model with 1M context window) RESULT: s1 listed: OK (2026-10-25T07:00:17Z) 
+== assistant profile (first stream: reference for later diffs)
+MD5 (/Users/aminalizadeh/.kiro/agents/hirearchy-study-e7-s1-assistant.json) = 21c7aaaf85ffc860ff21913b446c5b01
+(diff against first stream's profile: this is the first stream, no reference)
+== workspace settings
+MD5 (/tmp/hirearchy-e7-s1-1792911600/.kiro/settings/cli.json) = 05d30ccbfd35530747c8a542eb67985c
+{"chat.disableInheritingDefaultResources": true, "chat.enableWorkflows": false}MD5 (/Volumes/workspace/hirearchy/studies/E7-org-growth-0a4-recheck/evidence/harness/workspace-cli.json) = 05d30ccbfd35530747c8a542eb67985c
+== skill copies
+MD5 (/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md) = fd89a7fda55b8f342cf0306173c363fb
+MD5 (/tmp/hirearchy-e7-s1-1792911600/.kiro/skills/hirearchy/SKILL.md) = fd89a7fda55b8f342cf0306173c363fb
+MD5 (/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md) = fd89a7fda55b8f342cf0306173c363fb
+     125 /Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md
+     125 /tmp/hirearchy-e7-s1-1792911600/.kiro/skills/hirearchy/SKILL.md
+     125 /Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md
+     375 total
+== notes
+MD5 (/tmp/hirearchy-e7-s1-1792911600/notes/2026-10-05.md) = 903e3bbf5f35df2c17444f3313c12395
+MD5 (/tmp/hirearchy-e7-s1-1792911600/notes/2026-10-12.md) = 3893bd637c87760b43be4894b47fdb53
+MD5 (/tmp/hirearchy-e7-s1-1792911600/notes/2026-10-19.md) = 9976a7653a6346b0976c3c38b1c697dd
+== org dir exists before turn 1? no
+== ps: processes referencing the sandbox
+(none)
+== other E7 streams running: 0 processes
+== safety-before.txt taken: date_utc: 2026-10-25T07:00:00Z  epoch: 1792911600; ambient/setup.txt taken
+
+== AFTER the last turn (2026-10-25T07:37:47Z) (protocol 4.1, 6 item 5)
+git rev-parse HEAD: 18a4531662060ddf0b78923edee8d61909bc9d6d
+git status --porcelain:
+?? docs/research/
+?? studies/E7-org-growth-0a4-recheck/
+git diff --stat 18a4531 HEAD -- src skills pyproject.toml uv.lock: []
+kiro-cli --version: kiro-cli 2.33.0
+protocol.md md5: 0acc2b4191b8cbfa5f4bb6197b877de1 (protocol.md5 0acc2b4191b8cbfa5f4bb6197b877de1); harness/MD5SUMS mismatches: 0
+global SKILL.md md5: fd89a7fda55b8f342cf0306173c363fb
+processes referencing the sandbox: 0
+~/.kiro/agents: agent_config.json.example claude-opus-5.5.json claude-sonnet-5.5.json evolve.json hirearchy-organization-9d66c1-web-fetch-web-search.json telegram_bot.json 

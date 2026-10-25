@@ -1,0 +1,5 @@
+I recorded your approval of the 19 October memo, so all three memos are accepted and in `/tmp/hirearchy-e7-s1-1792911600/deliverables/`.
+
+Nothing runs until you ask. Each week, send me the notes file name, for example `2026-10-26.md`, and I'll request the memo. Your rules now apply to every memo: title line with the date, a one-line Summary, Decisions, then an Actions table with Owner, Action and Due. Anything someone said they'd do counts, due dates are ISO or `none`, and it stays under 400 words.
+
+The 5 October memo still includes the unexplained rework request that I reported earlier. It's marked rejected, and nothing else came from it.

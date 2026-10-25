@@ -1,0 +1,8 @@
+[INFO] [KRS] <-- GenerateAssistantResponseCommand done totalEvents=10
+[tool] Load context: hirearchy
+[tool] status: InProgress
+[tool] status: Failed: Load context: hirearchy
+[tool] status: Completed
+[tool] @hirearchy/progress
+[tool] status: InProgress
+[tool] status: Completed

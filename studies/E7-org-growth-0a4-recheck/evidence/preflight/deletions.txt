@@ -1,0 +1,22 @@
+deleted 2026-10-25T06:48:01Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-e7-preflight-1-fe3128d7faad4dfa
+deleted 2026-10-25T06:48:01Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-e7-preflight-1-fe3128d7faad4dfa
+deleted 2026-10-25T06:48:01Z /tmp/hirearchy-e7-preflight-1792910702
+probe profile: deleted earlier (probe/probe-profile-deletion.txt)
+probe dir /tmp/hirearchy-e7-probe-1792910605 left in place
+/Users/aminalizadeh/Library/Application Support/hirearchy:
+kiro-cwd
+kiro-home
+
+/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd:
+hirearchy-e4-s1r-1792693-bfcddd47e6ecb16c
+hirearchy-e4-s2-17926988-212f59b7daf49c3f
+hirearchy-e4-s2r-1792702-b0c5db682e7e6ab7
+hirearchy-e4-s3-17927050-8f0c59d32ad49337
+hirearchy-e5-s1-17928110-79a97641d74dd37d
+hirearchy-e5-s2-17928128-86c02ffe84a33875
+hirearchy-e5-s3-17928147-3afa64a909202d97
+hirearchy-e6-s1-17928558-6a43f953dd5df144
+hirearchy-e6-s2-17928592-fa2d6cf9a0cd7209
+hirearchy-e6-s3-17928615-64110e24af48ba66
+
+/Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home:

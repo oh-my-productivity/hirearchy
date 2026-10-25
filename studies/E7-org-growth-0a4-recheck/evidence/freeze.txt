@@ -1,0 +1,117 @@
+E7 protocol freeze (pre-registration step 1 of 9 of workflow wf_31a4e82c906df7ea)
+freeze_utc: 2026-10-25T06:40:28Z
+protocol.md md5 (md5 -q): 0acc2b4191b8cbfa5f4bb6197b877de1
+protocol.md5 file holds: 0acc2b4191b8cbfa5f4bb6197b877de1
+protocol.md bytes: 260399  lines: 2609
+source: E6 protocol.md md5 31410741088523af23875aef34167bac (E6 protocol.md5: 31410741088523af23875aef34167bac; required 31410741088523af23875aef34167bac)
+== E6 harness/MD5SUMS check (MISMATCH lines only; E6's MD5SUMS md5 d8ad3b83897114b5118a78852060d68b, E6 freeze.txt: d8ad3b83897114b5118a78852060d68b)
+(done, 16 lines)
+== git -C /Volumes/workspace/hirearchy rev-parse HEAD
+18a4531662060ddf0b78923edee8d61909bc9d6d
+== git -C /Volumes/workspace/hirearchy rev-parse --short HEAD; branch
+18a4531
+main
+== git -C /Volumes/workspace/hirearchy diff --stat 18a4531 HEAD -- src skills pyproject.toml uv.lock (empty below means no product change)
+== (end of diff output)
+== git -C /Volumes/workspace/hirearchy status --porcelain
+?? docs/research/
+?? studies/E7-org-growth-0a4-recheck/
+== commits above E6's study commit fe0c9fd: 18; the product at fe0c9fd equals 18c4ffb (git diff --stat 18c4ffb fe0c9fd -- src skills pyproject.toml uv.lock: '')
+== skill md5: repo fd89a7fda55b8f342cf0306173c363fb, git blob 18a4531 fd89a7fda55b8f342cf0306173c363fb, global (read-only) fd89a7fda55b8f342cf0306173c363fb; required fd89a7fda55b8f342cf0306173c363fb; repo lines 125
+== E7 harness/MD5SUMS md5: d1f24687c9cd1587466d24db42ce59d0
+== E7 harness/MD5SUMS check (MISMATCH lines only):
+(done, 17 lines)
+== injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd (= E6's 1c4e7824e448a3a34e24a7b759a59fcd)
+== notes and answer key: 903e3bbf5f35df2c17444f3313c12395 3893bd637c87760b43be4894b47fdb53 9976a7653a6346b0976c3c38b1c697dd; answer-key 2fb69bbef857c2bd4862cd5dd8be9da8
+== C1 tools (protocol 4.14 item 10 copies these; md5 -r, read-only):
+a3e8468e0b18f4d62995fe3e7fdc97ce after.sh
+61739fe70bbddaa077a300d1d2fef334 allowed.py
+1bab40813be21c4520b01ac7eb564aa4 logfilter.py
+be9628471df2b7344b5aa110d3cb5d5e mkprofile.py
+72ca914dce05e2761d7f2e29a4da9a31 sampler.py
+31606b36075980299626dc47f40a264d setup.sh
+ddcdb0c711ef9a1b6a47e9f20407f38b summary.py
+e5d4fd364a260f35046142fa0991cfce timeline.py
+cfa0c14791d058a730e7ebe0c88d5f40 verdict.py
+== sources (md5 -r, read-only):
+5c639e6ed8d2d9f271fc5e8a5e6de1a1 docs/research/org-growth/phase-0a4/e7-brief.md
+b5e7c195b7551ff3b2f3545fecf7e877 docs/research/org-growth/phase-0a3/e6-gate.md
+beadb401d12dfd81f49ef5a2306fc5fc docs/research/org-growth/phase-0a3/e6-decision.md
+762c746a40c0c792df725a5eff36a7c8 docs/design/org-growth-phase-0a4.md
+e93c82ef97af879806f5ecb282df7a83 docs/research/org-growth/phase-0a4/org-growth-0a4-report.md
+8e4c3132f1e712d95f6906d29edbbb3b docs/research/org-growth/phase-0a4/c1-reproduction.md
+d49c9c7a70daec1a108d54c2e92e746e docs/research/org-growth/phase-0a4/manager-decision-c1.md
+0891efa8da90c2c93830a81c92f2ca9b docs/research/org-growth/phase-0a1/e4-decision.md
+8fe2bceab2219c3eb6fae865e0e70f96 docs/research/org-growth/phase-0a2/e5-decision.md
+ec163449376207ffb5e3e2a69458091c studies/E6-org-growth-0a3-recheck/STUDY.md
+== the deterministic grep at 18a4531 (protocol 4.9 command 2): git grep -l -E "e4_replay|e5_s|e5_replay|e6_replay" 18a4531 -- tests
+tests/e2e/test_org_growth_0a2.py
+tests/e2e/test_org_growth_0a3.py
+tests/e2e/test_org_growth_0a4.py
+tests/meta/test_e4_replay_kit.py
+tests/meta/test_e5_replay_kit.py
+tests/meta/test_e6_replay_kit.py
+tests/testkit/e6_replay.py
+== Linux record (protocol 4.9): git diff --stat 18c4ffb 18a4531 -- src/hirearchy/scheduler src/hirearchy/processes src/hirearchy/telemetry
+ src/hirearchy/scheduler/_events.py                 |  8 +-
+ src/hirearchy/scheduler/_loop.py                   | 35 +++++---
+ src/hirearchy/scheduler/_ports.py                  |  9 ++
+ src/hirearchy/scheduler/_session.py                |  3 +
+ src/hirearchy/scheduler/testing.py                 | 13 +++
+ src/hirearchy/scheduler/tests/count.txt            |  2 +-
+ src/hirearchy/scheduler/tests/test_events.py       | 14 +++-
+ src/hirearchy/scheduler/tests/test_loop.py         | 96 +++++++++++++++++++++-
+ src/hirearchy/scheduler/tests/test_session.py      | 16 +++-
+ src/hirearchy/telemetry/_pool.py                   |  2 +-
+ src/hirearchy/telemetry/_writer.py                 | 52 ++++++++----
+ src/hirearchy/telemetry/tests/count.txt            |  2 +-
+ .../telemetry/tests/test_event_writer_pool.py      | 17 ++++
+ .../telemetry/tests/test_file_line_writer.py       | 51 +++++++++++-
+ 14 files changed, 281 insertions(+), 39 deletions(-)
+== (end of diff output: not empty, so 'Linux not shown at 18a4531')
+== kiro-cli --version: kiro-cli 2.33.0
+== state at freeze: no E7 sandbox (/tmp/hirearchy-e7-*), no E7 profile (~/.kiro/agents/hirearchy-study-e7-*), no stream folder (evidence/s*), no preflight output
+(no /tmp/hirearchy-e7-* dir)
+(no hirearchy-study-e7-* profile)
+(no evidence/s* folder)
+(no preflight/, probe/ or deterministic/ folder)
+== ~/.kiro/agents (names only):
+agent_config.json.example
+claude-opus-5.5.json
+claude-sonnet-5.5.json
+evolve.json
+hirearchy-organization-9d66c1-web-fetch-web-search.json
+telegram_bot.json
+== evidence files at freeze (find, sorted):
+./answer-key.md
+./freeze.txt
+./harness/ambient_context.py
+./harness/ambient_snapshot.sh
+./harness/CHANGES.md
+./harness/copy_org_evidence.sh
+./harness/extract_mechanical_s2.py
+./harness/extract_mechanical_s3.py
+./harness/extract_mechanical.py
+./harness/extract_proposals.py
+./harness/extract_tool_calls.py
+./harness/inject_root_rework.py
+./harness/MD5SUMS
+./harness/model_check.sh
+./harness/org_state.py
+./harness/profile-template.json
+./harness/run_turn.sh
+./harness/safety-snapshot.sh
+./harness/test_poll_loop.py
+./harness/workspace-cli.json
+./INDEX.md
+./notes/2026-10-05.md
+./notes/2026-10-12.md
+./notes/2026-10-19.md
+./protocol.md
+./protocol.md5
+== side effects of the pre-registration step (recorded after the lines above were printed)
+Scratch files in /tmp, none a sandbox: the harness edit script, its diff file, the ambient snapshot's self-test output and a stat-format test
+directory (harness/CHANGES.md lists them), and the step's protocol-editing helpers and text blocks (/tmp/e7-prereg-*: block.py, sub.py,
+edits.py, new.md, 421.md, 416.md, defs.md, 1010.md, 13new.md, skill-lines.txt, readme-limit.txt, freeze.sh). All were deleted;
+`find /tmp -maxdepth 1 -name 'e7-prereg*'` lists none. No org, profile, session, scheduler, sandbox or stream was made; nothing under
+~/.kiro was written; no E6 file was changed; nothing was staged, committed or pushed.

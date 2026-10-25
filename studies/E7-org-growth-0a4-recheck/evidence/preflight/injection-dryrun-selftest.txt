@@ -1,0 +1,17 @@
+md5 script: 1c4e7824e448a3a34e24a7b759a59fcd
+$ --dry-run
+title md5 849fe21b104be883af9b3c06367d4445 ok; note len 866 md5 4cdbcb9b682f2f25dcb31c83d3743fec ok
+exit 0
+$ --selftest
+tools: apply_org, blueprint_example, create_org, define_service, delegate, feedback, health, hire, inbox, observe, progress, propose_org, read, reclaim, report, request, retire, send, services, start, status, stop, whoami, write
+exit 0
+$ python3 -B harness/test_poll_loop.py
+PASS test_a_server_that_waits_is_not_paused
+PASS test_s2_state_progress_returns_at_once_and_nothing_moves
+PASS test_s3_state_done_while_the_scheduler_still_runs_then_stops
+PASS test_settled_on_the_first_poll
+PASS test_the_pause_resets_after_a_reply_that_waited
+PASS test_the_poll_cap_bounds_the_calls
+PASS test_the_poll_check_window
+7 passed, 0 failed
+exit 0

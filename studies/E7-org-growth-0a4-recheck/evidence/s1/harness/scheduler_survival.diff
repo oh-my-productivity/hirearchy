@@ -1,0 +1,37 @@
+2,3c2,3
+< """E6 s1 facilitator extract (facts only; protocol 6, 7.2, D-SURVIVE). Reads s1/events/*/ and s1/session-turn-times-utc.txt and
+< s1/injection/injection-log.txt (read-only) and writes s1/scheduler-survival.txt. Usage: scheduler_survival.py <stream dir>"""
+---
+> """E7 s1 facilitator extract (facts only; protocol 6, 7.2, D-SURVIVE and D-SIGNAL; E6 s1's extract with the signal listing added). Reads s1/events/*/ and s1/session-turn-times-utc.txt and
+> s1/injection/injection-log.txt (read-only) and writes s1/scheduler-survival.txt (E7: also every scheduler.signal). Usage: scheduler_survival.py <stream dir>"""
+48c48
+< w("# s1 scheduler survival (D-SURVIVE; facts only, from events/, session-turn-times-utc.txt, injection-log.txt)")
+---
+> w("# E7 s1 scheduler survival (D-SURVIVE and D-SIGNAL; facts only, from events/, session-turn-times-utc.txt, injection-log.txt)")
+107a108,133
+> 
+> # ---- E7 addition (protocol 4.11, 6, 9 D-SIGNAL): every scheduler.signal and what followed it (facts only)
+> w("")
+> w("# D-SIGNAL: every scheduler.signal line of the stream")
+> sigs = [d for d in ev if d["kind"] == "scheduler.signal"]
+> w(f"scheduler.signal lines: {len(sigs)}")
+> for g in sigs:
+>     gt = ts(g["ts"])
+>     before = [(t, (gt - turn_end[t]).total_seconds()) for t in sorted(turn_end) if turn_end[t] <= gt]
+>     after = [(t, (turn_end[t] - gt).total_seconds()) for t in sorted(turn_end) if turn_end[t] > gt]
+>     ex = exits.get(g["pid"])
+>     w(f"scheduler.signal {g['ts']} pid {g['pid']}: signal={g.get('signal')} action={g.get('action')} ppid={g.get('ppid')} running={g.get('running')}")
+>     w(f"  nearest turn_end before: {before[-1] if before else None}; after: {after[0] if after else None} (turn, seconds)")
+>     w(f"  scheduler.exit after it: " + (f"{ex['ts']} reason={ex.get('reason')!r} ({(ts(ex['ts']) - gt).total_seconds():.2f} s later)" if ex and ts(ex['ts']) >= gt else "NONE"))
+>     for r in (g.get("running") or []):
+>         e = [d for d in ev if d["kind"] == "run.end" and d.get("run") == r]
+>         w(f"  run in flight {r}: " + (f"run.end {e[0]['ts']} ok={e[0].get('ok')} killed={e[0].get('killed')}" if e else "no run.end"))
+>     stopc = [d for d in stops if 0 <= (gt - ts(d['ts'])).total_seconds() <= 30]
+>     w(f"  explained by a recorded stop (assistant stop tool.call within 30 s before, or injection --stop / facilitator stop per injection-log.txt and run-log.md): assistant stop tool.call: {bool(stopc)}; injection --stop: {inj_stop}")
+> w("")
+> w("# Schedulers alive at a turn's end (from the pairs above) and whether each survived (D-SURVIVE)")
+> if not running_pairs:
+>     w("(turn end, scheduler) pairs with the scheduler running: 0 -> n/a (0 of 0) for survival")
+> for (pid, t, infl, ex) in running_pairs:
+>     w(f"pid {pid} running at the end of turn {t}; runs in flight {infl}; scheduler.exit: {ex.get('reason') if ex else 'NONE'}")
+> 

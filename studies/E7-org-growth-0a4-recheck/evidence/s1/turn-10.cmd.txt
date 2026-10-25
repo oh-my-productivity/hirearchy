@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e7-s1-assistant 'No, nothing for Marta to do there, leave it out. Lee'\''s should be 2026-10-30. Sam'\''s should be none.'

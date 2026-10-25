@@ -1,0 +1,38 @@
+Here is the plan. Two notes first. With your cap of 12 runs, a memo gets one pass and one rework. If you ask for changes afterwards, that takes about 5 more runs (16 in all), and I'll ask you before spending them. The team can't write to `deliverables/` itself, so I copy each checked memo there.
+
+PLAN FOR YOU
+Goal: Turn the notes of the user's weekly platform team meeting into a short memo after each meeting: what the team decided and who does what, with due dates. The memo is for the team and is written only from the user's own notes files.
+What I understood you need:
+- Scope: One memo per meeting, from the one notes file named in the request: the decisions made and the actions (who does what, by when), including commitments that someone voiced in prose. Nothing else: no attendee list, no discussion recap.
+- Your files (read-only): /tmp/hirearchy-e7-s1-1792911600/notes
+- Quality bar: Every statement comes from the requested notes file; nothing is invented, no commitment is missed, and no due date is guessed.
+- Sources: Only the files in needs.inputs; no web.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 (high effort) for every agent
+Team (3 agents):
+- lead (Manager, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read files only in /private/tmp/hirearchy-e7-s1-1792911600/notes and the organization's own files; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-e7-s1-1792911600/notes and the organization's own files; cannot change your files
+  - reviewer (Independent Reviewer, model claude-sonnet-5.5): can read files only in /private/tmp/hirearchy-e7-s1-1792911600/notes and the organization's own files; cannot change your files
+Budget: up to 12 runs per request (one run = one working session of one agent), your cap per request is 12; the minimum for one review and rework is 11, and a round of your questions or a rejection takes about 5 more (16 in all). Unspent runs come back to you.
+  lead starts with 12, hands down writer 3, reviewer 2 and keeps 7 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: reviewer reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-meeting-memo: One memo of the decisions and the actions (owner, action, due date) from one weekly meeting notes file.
+  You provide: notes_file (required)
+  Each request: up to 12 runs
+  Checks:
+    1. Built only from the requested notes file; the other notes files are not used.
+    2. The memo has a title line with the meeting date, then exactly two sections titled Decisions and Actions, and nothing else (no attendee list, no discussion recap).
+    3. Decisions lists every decision the notes state, one bullet each, and no item the notes do not present as decided.
+    4. Actions is a markdown table with the columns Owner | Action | Due. It has one row for every commitment in the notes, including informal ones in prose (someone says they will do something, offers to, or agrees to), not only lines labelled ACTION.
+    5. Every Owner is a person named in the notes.
+    6. Every Due value is an ISO date (YYYY-MM-DD) when the notes give a date, or give a relative deadline that points to one clear day counted from the meeting date; otherwise it is the word none. No date is guessed.
+    7. At most 400 words as counted by read.
+    8. The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+  Delivered to: /tmp/hirearchy-e7-s1-1792911600/deliverables (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+First request, started on approval: weekly-meeting-memo (notes_file: 2026-10-05.md).
+Checkpoints: approval - Plan first; ask before any spend beyond the budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+
+Reply "approve" to build the team and start the first memo, or tell me what to change.

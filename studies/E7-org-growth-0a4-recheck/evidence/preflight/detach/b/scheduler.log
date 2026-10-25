@@ -1,0 +1,4 @@
+
+# --- scheduler started 2026-10-25 06:53:29Z: /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-e7-detach-1792911121/org run --until-done
+org: /private/tmp/hirearchy-e7-detach-1792911121/org
+ceo: started run (1 message(s))

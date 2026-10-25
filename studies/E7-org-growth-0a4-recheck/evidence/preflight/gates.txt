@@ -1,0 +1,31 @@
+# E7 preflight gates 2026-10-25T06:42:54Z
+protocol.md md5: 0acc2b4191b8cbfa5f4bb6197b877de1; protocol.md5: 0acc2b4191b8cbfa5f4bb6197b877de1; freeze.txt: 0acc2b4191b8cbfa5f4bb6197b877de1
+zsh:5: no matches found: protocol-amendment-*
+(no protocol-amendment-* files)
+== harness/MD5SUMS check
+lines checked: 17
+MD5SUMS md5: d1f24687c9cd1587466d24db42ce59d0 (freeze.txt: d1f24687c9cd1587466d24db42ce59d0)
+injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd
+notes: 903e3bbf5f35df2c17444f3313c12395 3893bd637c87760b43be4894b47fdb53 9976a7653a6346b0976c3c38b1c697dd; answer-key 2fb69bbef857c2bd4862cd5dd8be9da8
+== c1-tools source md5 (freeze.txt list)
+a3e8468e0b18f4d62995fe3e7fdc97ce after.sh
+61739fe70bbddaa077a300d1d2fef334 allowed.py
+1bab40813be21c4520b01ac7eb564aa4 logfilter.py
+be9628471df2b7344b5aa110d3cb5d5e mkprofile.py
+72ca914dce05e2761d7f2e29a4da9a31 sampler.py
+31606b36075980299626dc47f40a264d setup.sh
+ddcdb0c711ef9a1b6a47e9f20407f38b summary.py
+e5d4fd364a260f35046142fa0991cfce timeline.py
+cfa0c14791d058a730e7ebe0c88d5f40 verdict.py
+== skills
+global (read-only): fd89a7fda55b8f342cf0306173c363fb
+repo working tree: fd89a7fda55b8f342cf0306173c363fb
+git blob 18a4531: fd89a7fda55b8f342cf0306173c363fb
+required: fd89a7fda55b8f342cf0306173c363fb
+== freeze
+18a4531662060ddf0b78923edee8d61909bc9d6d
+main
+git diff --stat 18a4531 HEAD -- src skills pyproject.toml uv.lock:
+(end of diff)
+?? docs/research/
+?? studies/E7-org-growth-0a4-recheck/

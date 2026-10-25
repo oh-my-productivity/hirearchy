@@ -1,0 +1,24 @@
+I'll start by looking at your notes.I read your notes (5 Oct, 12 Oct, 19 Oct). This is recurring work, so I'd set it up as a standing service. Each week you ask for a memo for one meeting file and a small team produces it from your notes only, with no web. Nothing is built until you approve a plan.
+
+A few questions. Reply "defaults" to accept the proposed answers.
+
+1. **Which meeting each week.** I'd take the meeting file name (for example `2026-10-26.md`) as the one input that changes per request, and keep the notes folder fixed at `/tmp/hirearchy-e7-s3-1792916437/notes`. Is that right?
+
+2. **What counts as an action.** Your notes mix labelled `ACTION:` lines with commitments stated in prose. Examples are Sam offering to pair with Jo on CI, Lee signing off the SSO renewal once legal replies, Lee taking the pager from Dev, and Sam sorting out the staging test data. Should the memo include the informal ones too?
+   - Proposed: yes. Every commitment counts, including informal ones in prose, each with one owner.
+
+3. **Dates.** Vague deadlines appear, such as "probably by end of next week" or "the day before the freeze starts". Should I turn them into a calendar date when the notes allow it, or only use dates that are written explicitly?
+   - Proposed: convert a relative date only when it can be worked out exactly from the notes. Otherwise write the vague wording as-is and mark it "no firm date". The team never guesses.
+
+4. **Decisions.** Should the memo list decisions that were only agreed in conversation, such as moving the meeting to Monday 14:00, or only formal ones?
+   - Proposed: list all of them, one line each, with the reason only if the notes give one.
+
+5. **Format and place.** Proposed: markdown, at most 300 words, with three sections: Decisions, Actions (owner, task, date), and Open items. I'd put it in a new folder called `deliverables` here, at `/tmp/hirearchy-e7-s3-1792916437/deliverables/memo-<meeting date>.md`. Is "Open items" useful to you, or should I drop it?
+
+6. **Checks.** Proposed: a separate reviewer checks every decision and action in the memo against the notes. Nothing may be missing or invented, and every action has a named owner.
+
+7. **Budget and models.** Each agent runs claude-sonnet-5.5 at high effort. That is the lowest model available, so there are no cheaper options. I'll set the per-memo budget as the estimate plus 25% when I draft the plan and show you the number.
+
+8. **Approvals.** Proposed: you approve the plan before anything starts, and I ask you before any spend beyond the budget.
+
+9. **Running it.** I can't run it on a timer. Each week you ask me "memo for <date>" and I run it. Is that fine?

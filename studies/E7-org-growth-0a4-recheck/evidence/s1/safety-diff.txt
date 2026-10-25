@@ -1,0 +1,8 @@
+17c17
+< drwx------@  3 aminalizadeh  staff      96 Oct 25 06:58 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 25 07:01 .
+22c22
+< drwx------@  8 aminalizadeh  staff   256 Oct 25 06:44 .
+---
+> drwx------@  8 aminalizadeh  staff   256 Oct 25 07:37 .

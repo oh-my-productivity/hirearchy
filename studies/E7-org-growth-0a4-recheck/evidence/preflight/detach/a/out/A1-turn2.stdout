@@ -1,0 +1,5 @@
+Result of `start`:
+
+```
+scheduler started (pid 76914; it runs until stop()); log: /private/tmp/hirearchy-e7-detach-1792910942/org/.runtime/scheduler.log
+```

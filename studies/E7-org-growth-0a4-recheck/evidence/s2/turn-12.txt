@@ -1,0 +1,9 @@
+######## TURN 12  start 08:14:45  end 08:15:04  elapsed 19s  (local, 2026-10-25; UTC wall-clock start 2026-10-25T08:14:45Z end 2026-10-25T08:15:04Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks - keep it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+I recorded your "keep it" for the 19 October memo, so the team has your verdict.
+
+All three memos are in `/tmp/hirearchy-e7-s2-1792914064/deliverables/`: `memo-2026-10-05.md`, `memo-2026-10-12.md` and `memo-2026-10-19.md`.
+
+Each week, ask me for "the memo for <notes file>" and I'll run the team. Memos now follow the Summary, Decisions, Actions order, and the team applies your date readings from the start. Nothing is running now.

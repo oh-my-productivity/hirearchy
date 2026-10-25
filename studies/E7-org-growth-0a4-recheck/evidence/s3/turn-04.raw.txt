@@ -1,0 +1,9 @@
+The memo now has the two Due changes you asked for (Sam 2026-10-09, Marta 2026-10-14). Lee stays `none` and the vendor ping is still an action only. The reviewer passed all 7 checks. I haven't copied the memo to `deliverables` yet because of one new question.
+
+The reviewer says two Open items are borderline. They restate facts from the notes instead of listing questions the notes leave unresolved:
+- Nobody is named to fix the two gateway services that fail contract tests.
+- The SSO certificate expires at the end of the month, and the paperwork is in a shared inbox.
+
+I suggest keeping both. They are real follow-ups with no owner or date in the notes. Keep them, or drop them?
+
+Runs so far: 10 for this memo, within the 12 approved.

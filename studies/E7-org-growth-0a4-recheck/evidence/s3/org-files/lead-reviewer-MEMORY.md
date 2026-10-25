@@ -1,0 +1,4 @@
+Runs 1-3: memo 2026-10-05 passed 7/7. Run 4: C9 + R1, 7 of 9 then. Runs 5-6: memo 2026-10-12 9/9 (work/review-2026-10-12.md).
+Run 7: memo 2026-10-19 9/9 (work/review-2026-10-19.md). Run 8: task ...-lead-cfc2, revised memo 2026-10-19 (189 words), client answers applied: 9 of 9, 17/17 claims, no required changes, reported done (work/review-2026-10-19-r2.md).
+Client rulings: title above 'Summary:' accepted; Present: at end; 'before Friday' = ISO date; event date in task = Due; 'this week' no hard date = none; commitment in table is not also a decision; hedged commitments = row (but Marta 'keep agenda as sent' row removed by client); plain status = not an open item ('None.'); one decision per sentence = one line; pager = action row only; RFC = one decision; Sam staging = row; CI fix status left out; Lee 'end of next week' = 2026-10-30; Sam pairing Due none.
+Budget 0. Re-review only if lead sends a revised memo: re-check changed parts and every criterion not met.

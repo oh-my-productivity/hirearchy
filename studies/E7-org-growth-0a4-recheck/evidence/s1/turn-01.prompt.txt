@@ -1,0 +1,1 @@
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-e7-s1-1792911600/notes (one file per meeting). Can you set up a team that does this for me every week?

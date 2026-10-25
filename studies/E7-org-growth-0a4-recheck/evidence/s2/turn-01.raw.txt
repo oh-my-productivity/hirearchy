@@ -1,0 +1,16 @@
+Your notes folder has three meetings, and they show a few things I'd like your call on before I draft the plan. The team will be a standing service, so each week you point it at that week's notes file and it writes the memo. It runs when you ask for it, not on a timer.
+
+1. **Informal items.** Some commitments and decisions aren't labelled. Sam "would look into the flaky CI before Friday", Lee would "ping the vendor this week", and Sam would fix staging data "the day before the freeze". Should these count as who-does-what? I propose yes, every decision and every commitment, labelled or not, including ones said in passing.
+2. **Vague dates.** Should "before Friday", "this week" and "the day before the freeze" be turned into a real date using the meeting date, or listed with no date? I propose converting them to a date and marking it as inferred, for example "Oct 9 (inferred from 'before Friday')". If there's nothing to infer from, such as "no hard date attached", it says "no date".
+3. **Memo layout.** I propose a markdown memo of at most 400 words with two sections: "Decisions" (a bulleted list) and "Actions" (a table with owner, task and due date). It would go in a new `deliverables/` folder here, as `deliverables/memo-<meeting date>.md`. Do you want a different format, length or location?
+4. **Sources.** The team reads only your notes folder, `/tmp/hirearchy-e7-s2-1792914064/notes`, with no web. It can't change your notes. Each week you'd tell it which file to use.
+5. **Checks.** I propose these criteria:
+   - Every decision in the notes appears in the memo.
+   - Every commitment appears with its owner.
+   - Nothing appears that isn't in the notes.
+   - The memo is within the word limit.
+   - A second agent reviews every memo.
+6. **Budget and models.** I'll work out the number of runs per memo for the plan, and it will include some room for a rework. All agents run claude-sonnet-5.5 at high effort. That is the only option available.
+7. **Approvals.** I'll show you the plan before anything is built, then ask whether to keep or change each memo after it arrives.
+
+Reply "defaults" to accept everything I proposed, or tell me what to change.

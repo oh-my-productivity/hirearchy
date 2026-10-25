@@ -1,0 +1,408 @@
+label: s1 after turn 1
+date_utc: 2026-10-25T07:02:03Z  epoch: 1792911723
+== ~/.kiro/skills, links not followed (find -P): mtime_epoch|mtime_utc|type|size|path|link target (173 entries)
+1792862739|2026-10-24T17:25:39Z|Directory|736|/Users/aminalizadeh/.kiro/skills|
+1792862738|2026-10-24T17:25:38Z|Symbolic Link|27|/Users/aminalizadeh/.kiro/skills/agents|../../.agents/skills/agents
+1775150396|2026-04-02T17:19:56Z|Directory|128|/Users/aminalizadeh/.kiro/skills/autoresearch|
+1775150396|2026-04-02T17:19:56Z|Directory|96|/Users/aminalizadeh/.kiro/skills/autoresearch/scripts|
+1775150396|2026-04-02T17:19:56Z|Regular File|3510|/Users/aminalizadeh/.kiro/skills/autoresearch/scripts/log_result.py|
+1775150418|2026-04-02T17:20:18Z|Regular File|12804|/Users/aminalizadeh/.kiro/skills/autoresearch/SKILL.md|
+1777614971|2026-05-01T05:56:11Z|Directory|128|/Users/aminalizadeh/.kiro/skills/commit|
+1777614971|2026-05-01T05:56:11Z|Directory|96|/Users/aminalizadeh/.kiro/skills/commit/references|
+1777614980|2026-05-01T05:56:20Z|Regular File|2169|/Users/aminalizadeh/.kiro/skills/commit/references/COMMIT.md|
+1777615008|2026-05-01T05:56:48Z|Regular File|385|/Users/aminalizadeh/.kiro/skills/commit/SKILL.md|
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|28|/Users/aminalizadeh/.kiro/skills/dubbing|../../.agents/skills/dubbing
+1791105374|2026-10-04T09:16:14Z|Directory|416|/Users/aminalizadeh/.kiro/skills/gmail|
+1776143926|2026-04-14T05:18:46Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/__pycache__|
+1776143926|2026-04-14T05:18:46Z|Regular File|17540|/Users/aminalizadeh/.kiro/skills/gmail/__pycache__/server.cpython-311.pyc|
+1777999932|2026-05-05T16:52:12Z|Directory|288|/Users/aminalizadeh/.kiro/skills/gmail/.git|
+1777999932|2026-05-05T16:52:12Z|Regular File|137|/Users/aminalizadeh/.kiro/skills/gmail/.git/config|
+1777999932|2026-05-05T16:52:12Z|Regular File|73|/Users/aminalizadeh/.kiro/skills/gmail/.git/description|
+1777999932|2026-05-05T16:52:12Z|Regular File|21|/Users/aminalizadeh/.kiro/skills/gmail/.git/HEAD|
+1777999932|2026-05-05T16:52:12Z|Directory|512|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks|
+1777999932|2026-05-05T16:52:12Z|Regular File|478|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/applypatch-msg.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|896|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/commit-msg.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|4726|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/fsmonitor-watchman.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|189|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/post-update.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|424|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-applypatch.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|1649|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-commit.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|416|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-merge-commit.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|1374|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-push.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|4898|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-rebase.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|544|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-receive.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|1492|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/prepare-commit-msg.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|2783|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/push-to-checkout.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|2308|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/sendemail-validate.sample|
+1777999932|2026-05-05T16:52:12Z|Regular File|3650|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/update.sample|
+1777999932|2026-05-05T16:52:12Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/.git/info|
+1777999932|2026-05-05T16:52:12Z|Regular File|240|/Users/aminalizadeh/.kiro/skills/gmail/.git/info/exclude|
+1777999932|2026-05-05T16:52:12Z|Directory|128|/Users/aminalizadeh/.kiro/skills/gmail/.git/objects|
+1777999932|2026-05-05T16:52:12Z|Directory|64|/Users/aminalizadeh/.kiro/skills/gmail/.git/objects/info|
+1777999932|2026-05-05T16:52:12Z|Directory|64|/Users/aminalizadeh/.kiro/skills/gmail/.git/objects/pack|
+1777999932|2026-05-05T16:52:12Z|Directory|128|/Users/aminalizadeh/.kiro/skills/gmail/.git/refs|
+1777999932|2026-05-05T16:52:12Z|Directory|64|/Users/aminalizadeh/.kiro/skills/gmail/.git/refs/heads|
+1777999932|2026-05-05T16:52:12Z|Directory|64|/Users/aminalizadeh/.kiro/skills/gmail/.git/refs/tags|
+1777999932|2026-05-05T16:52:12Z|Regular File|109|/Users/aminalizadeh/.kiro/skills/gmail/.gitignore|
+1777999932|2026-05-05T16:52:12Z|Regular File|5|/Users/aminalizadeh/.kiro/skills/gmail/.python-version|
+1777999940|2026-05-05T16:52:20Z|Directory|224|/Users/aminalizadeh/.kiro/skills/gmail/.venv|
+1777999940|2026-05-05T16:52:20Z|Regular File|1|/Users/aminalizadeh/.kiro/skills/gmail/.venv/.gitignore|
+1777999941|2026-05-05T16:52:21Z|Directory|480|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin|
+1777999940|2026-05-05T16:52:20Z|Regular File|3730|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate|
+1777999940|2026-05-05T16:52:20Z|Regular File|2388|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate_this.py|
+1777999940|2026-05-05T16:52:20Z|Regular File|2281|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate.bat|
+1777999940|2026-05-05T16:52:20Z|Regular File|2637|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate.csh|
+1777999940|2026-05-05T16:52:20Z|Regular File|4201|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate.fish|
+1777999940|2026-05-05T16:52:20Z|Regular File|3886|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate.nu|
+1777999940|2026-05-05T16:52:20Z|Regular File|2772|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate.ps1|
+1777999940|2026-05-05T16:52:20Z|Regular File|1728|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/deactivate.bat|
+1777999941|2026-05-05T16:52:21Z|Regular File|4742|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/google|
+1777999940|2026-05-05T16:52:20Z|Regular File|1215|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/pydoc.bat|
+1777999940|2026-05-05T16:52:20Z|Symbolic Link|91|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/python|/Users/aminalizadeh/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/bin/python3.13
+1777999940|2026-05-05T16:52:20Z|Symbolic Link|6|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/python3|python
+1777999940|2026-05-05T16:52:20Z|Symbolic Link|6|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/python3.13|python
+1777999940|2026-05-05T16:52:20Z|Regular File|43|/Users/aminalizadeh/.kiro/skills/gmail/.venv/CACHEDIR.TAG|
+1777999940|2026-05-05T16:52:20Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib|
+1777999940|2026-05-05T16:52:20Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13|
+1777999941|2026-05-05T16:52:21Z|Directory|384|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages|
+1777999940|2026-05-05T16:52:20Z|Regular File|18|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/_virtualenv.pth|
+1777999940|2026-05-05T16:52:20Z|Regular File|4342|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/_virtualenv.py|
+1777999941|2026-05-05T16:52:21Z|Directory|256|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info|
+1777999941|2026-05-05T16:52:21Z|Regular File|2|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/INSTALLER|
+1777999941|2026-05-05T16:52:21Z|Directory|128|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/licenses|
+1777999941|2026-05-05T16:52:21Z|Regular File|2201|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/licenses/AUTHORS|
+1777999941|2026-05-05T16:52:21Z|Regular File|1441|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/licenses/LICENSE|
+1777999941|2026-05-05T16:52:21Z|Regular File|3812|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/METADATA|
+1777999941|2026-05-05T16:52:21Z|Regular File|1816|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/RECORD|
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/REQUESTED|
+1777999941|2026-05-05T16:52:21Z|Regular File|87|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/WHEEL|
+1777999941|2026-05-05T16:52:21Z|Directory|480|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4|
+1777999941|2026-05-05T16:52:21Z|Regular File|44386|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/__init__.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|2408|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/_deprecation.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|7549|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/_typing.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|4711|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/_warnings.py|
+1777999941|2026-05-05T16:52:21Z|Directory|192|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/builder|
+1777999941|2026-05-05T16:52:21Z|Regular File|31194|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/builder/__init__.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|23607|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/builder/_html5lib.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|17445|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/builder/_htmlparser.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|18969|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/builder/_lxml.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|12713|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/css.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|57024|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/dammit.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|7846|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/diagnose.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|120237|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/element.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|951|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/exceptions.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|29201|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/filter.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|10478|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/formatter.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/py.typed|
+1777999941|2026-05-05T16:52:21Z|Directory|320|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info|
+1777999941|2026-05-05T16:52:21Z|Regular File|10|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/DESCRIPTION.rst|
+1777999941|2026-05-05T16:52:21Z|Regular File|2|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/INSTALLER|
+1777999941|2026-05-05T16:52:21Z|Regular File|627|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/METADATA|
+1777999941|2026-05-05T16:52:21Z|Regular File|790|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/metadata.json|
+1777999941|2026-05-05T16:52:21Z|Regular File|898|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/RECORD|
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/REQUESTED|
+1777999941|2026-05-05T16:52:21Z|Regular File|13|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/top_level.txt|
+1777999941|2026-05-05T16:52:21Z|Regular File|110|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/WHEEL|
+1777999941|2026-05-05T16:52:21Z|Directory|128|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/googlesearch|
+1777999941|2026-05-05T16:52:21Z|Regular File|12981|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/googlesearch/__init__.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|36068|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/googlesearch/user_agents.txt.gz|
+1777999941|2026-05-05T16:52:21Z|Directory|320|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve|
+1777999941|2026-05-05T16:52:21Z|Directory|256|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info|
+1777999941|2026-05-05T16:52:21Z|Regular File|2|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/INSTALLER|
+1777999941|2026-05-05T16:52:21Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/licenses|
+1777999941|2026-05-05T16:52:21Z|Regular File|1096|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/licenses/LICENSE.md|
+1777999941|2026-05-05T16:52:21Z|Regular File|4635|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/METADATA|
+1777999941|2026-05-05T16:52:21Z|Regular File|1110|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/RECORD|
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/REQUESTED|
+1777999941|2026-05-05T16:52:21Z|Regular File|87|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/WHEEL|
+1777999941|2026-05-05T16:52:21Z|Regular File|4581|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/__init__.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|6766|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/__meta__.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|61404|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/css_match.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|47222|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/css_parser.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|9940|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/css_types.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|4362|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/pretty.py|
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/py.typed|
+1777999941|2026-05-05T16:52:21Z|Regular File|3352|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/util.py|
+1777999941|2026-05-05T16:52:21Z|Directory|256|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info|
+1777999941|2026-05-05T16:52:21Z|Regular File|2|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/INSTALLER|
+1777999941|2026-05-05T16:52:21Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/licenses|
+1772696220|2026-03-05T07:37:00Z|Regular File|13936|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/licenses/LICENSE|
+1772696220|2026-03-05T07:37:00Z|Regular File|3259|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/METADATA|
+1777999941|2026-05-05T16:52:21Z|Regular File|623|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/RECORD|
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/REQUESTED|
+1772696220|2026-03-05T07:37:00Z|Regular File|82|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/WHEEL|
+1772696220|2026-03-05T07:37:00Z|Regular File|160429|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions.py|
+1777999940|2026-05-05T16:52:20Z|Regular File|198|/Users/aminalizadeh/.kiro/skills/gmail/.venv/pyvenv.cfg|
+1777999940|2026-05-05T16:52:20Z|Regular File|173|/Users/aminalizadeh/.kiro/skills/gmail/pyproject.toml|
+1777999932|2026-05-05T16:52:12Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/README.md|
+1778001426|2026-05-05T17:17:06Z|Regular File|8777|/Users/aminalizadeh/.kiro/skills/gmail/server.py|
+1776144797|2026-04-14T05:33:17Z|Regular File|3356|/Users/aminalizadeh/.kiro/skills/gmail/SKILL.md|
+1791621829|2026-10-10T08:43:49Z|Regular File|741|/Users/aminalizadeh/.kiro/skills/gmail/token.json|
+1777999940|2026-05-05T16:52:20Z|Regular File|2877|/Users/aminalizadeh/.kiro/skills/gmail/uv.lock|
+1792596028|2026-10-21T15:20:28Z|Directory|96|/Users/aminalizadeh/.kiro/skills/hirearchy|
+1792907776|2026-10-25T05:56:16Z|Regular File|14886|/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md|
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|26|/Users/aminalizadeh/.kiro/skills/music|../../.agents/skills/music
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|31|/Users/aminalizadeh/.kiro/skills/onboarding|../../.agents/skills/onboarding
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|29|/Users/aminalizadeh/.kiro/skills/realtime|../../.agents/skills/realtime
+1792035371|2026-10-15T03:36:11Z|Directory|128|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything|
+1792035371|2026-10-15T03:36:11Z|Directory|256|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references|
+1792035371|2026-10-15T03:36:11Z|Regular File|1992|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/android-applications.md|
+1792035371|2026-10-15T03:36:11Z|Regular File|8823|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/connection-and-recovery.md|
+1792035371|2026-10-15T03:36:11Z|Regular File|4363|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/evidence-workflows.md|
+1792035371|2026-10-15T03:36:11Z|Regular File|9949|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/javascript-applications.md|
+1792035371|2026-10-15T03:36:11Z|Regular File|17722|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/native-and-artifacts.md|
+1792035371|2026-10-15T03:36:11Z|Regular File|4798|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/runtime-observation.md|
+1792035371|2026-10-15T03:36:11Z|Regular File|22500|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/SKILL.md|
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|34|/Users/aminalizadeh/.kiro/skills/setup-api-key|../../.agents/skills/setup-api-key
+1775150533|2026-04-02T17:22:13Z|Directory|128|/Users/aminalizadeh/.kiro/skills/skill-generation|
+1775150533|2026-04-02T17:22:13Z|Directory|96|/Users/aminalizadeh/.kiro/skills/skill-generation/scripts|
+1775150533|2026-04-02T17:22:13Z|Regular File|3028|/Users/aminalizadeh/.kiro/skills/skill-generation/scripts/new_skill.py|
+1775150517|2026-04-02T17:21:57Z|Regular File|3011|/Users/aminalizadeh/.kiro/skills/skill-generation/SKILL.md|
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|34|/Users/aminalizadeh/.kiro/skills/sound-effects|../../.agents/skills/sound-effects
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|34|/Users/aminalizadeh/.kiro/skills/speech-engine|../../.agents/skills/speech-engine
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|35|/Users/aminalizadeh/.kiro/skills/speech-to-text|../../.agents/skills/speech-to-text
+1777608791|2026-05-01T04:13:11Z|Directory|160|/Users/aminalizadeh/.kiro/skills/test-driven-development|
+1777608766|2026-05-01T04:12:46Z|Regular File|12288|/Users/aminalizadeh/.kiro/skills/test-driven-development/.SKILL.md.swp|
+1777608843|2026-05-01T04:14:03Z|Regular File|10004|/Users/aminalizadeh/.kiro/skills/test-driven-development/SKILL.md|
+1777608791|2026-05-01T04:13:11Z|Regular File|8251|/Users/aminalizadeh/.kiro/skills/test-driven-development/testing-anti-patterns.md|
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|35|/Users/aminalizadeh/.kiro/skills/text-to-speech|../../.agents/skills/text-to-speech
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|49|/Users/aminalizadeh/.kiro/skills/update-skills-from-changelog|../../.agents/skills/update-skills-from-changelog
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|34|/Users/aminalizadeh/.kiro/skills/voice-changer|../../.agents/skills/voice-changer
+1792862739|2026-10-24T17:25:39Z|Symbolic Link|35|/Users/aminalizadeh/.kiro/skills/voice-isolator|../../.agents/skills/voice-isolator
+1775151837|2026-04-02T17:43:57Z|Directory|128|/Users/aminalizadeh/.kiro/skills/workflow-suggest|
+1775151815|2026-04-02T17:43:35Z|Directory|160|/Users/aminalizadeh/.kiro/skills/workflow-suggest/scripts|
+1775152569|2026-04-02T17:56:09Z|Regular File|6659|/Users/aminalizadeh/.kiro/skills/workflow-suggest/scripts/collect_browser.py|
+1775151815|2026-04-02T17:43:35Z|Regular File|5867|/Users/aminalizadeh/.kiro/skills/workflow-suggest/scripts/collect_project.py|
+1775151763|2026-04-02T17:42:43Z|Regular File|5182|/Users/aminalizadeh/.kiro/skills/workflow-suggest/scripts/collect_shell.py|
+1775151921|2026-04-02T17:45:21Z|Regular File|2937|/Users/aminalizadeh/.kiro/skills/workflow-suggest/SKILL.md|
+skills listing md5: 6ee25f86b6fa88b4c5b4cdcf3e91c8c8
+== ~/.kiro/skills through the links (find -L): mtime_epoch|mtime_utc|type|size|path (224 entries)
+1792862739|2026-10-24T17:25:39Z|Directory|736|/Users/aminalizadeh/.kiro/skills
+1792862738|2026-10-24T17:25:38Z|Directory|128|/Users/aminalizadeh/.kiro/skills/agents
+1792862738|2026-10-24T17:25:38Z|Directory|288|/Users/aminalizadeh/.kiro/skills/agents/references
+1792862738|2026-10-24T17:25:38Z|Regular File|35296|/Users/aminalizadeh/.kiro/skills/agents/references/agent-configuration.md
+1792862738|2026-10-24T17:25:38Z|Regular File|20259|/Users/aminalizadeh/.kiro/skills/agents/references/client-tools.md
+1792862738|2026-10-24T17:25:38Z|Regular File|4309|/Users/aminalizadeh/.kiro/skills/agents/references/installation.md
+1792862738|2026-10-24T17:25:38Z|Regular File|8861|/Users/aminalizadeh/.kiro/skills/agents/references/outbound-calls.md
+1792862738|2026-10-24T17:25:38Z|Regular File|17272|/Users/aminalizadeh/.kiro/skills/agents/references/using-procedure-api.md
+1792862738|2026-10-24T17:25:38Z|Regular File|8328|/Users/aminalizadeh/.kiro/skills/agents/references/widget-embedding.md
+1792862738|2026-10-24T17:25:38Z|Regular File|11189|/Users/aminalizadeh/.kiro/skills/agents/references/writing-procedures.md
+1792862738|2026-10-24T17:25:38Z|Regular File|26836|/Users/aminalizadeh/.kiro/skills/agents/SKILL.md
+1775150396|2026-04-02T17:19:56Z|Directory|128|/Users/aminalizadeh/.kiro/skills/autoresearch
+1775150396|2026-04-02T17:19:56Z|Directory|96|/Users/aminalizadeh/.kiro/skills/autoresearch/scripts
+1775150396|2026-04-02T17:19:56Z|Regular File|3510|/Users/aminalizadeh/.kiro/skills/autoresearch/scripts/log_result.py
+1775150418|2026-04-02T17:20:18Z|Regular File|12804|/Users/aminalizadeh/.kiro/skills/autoresearch/SKILL.md
+1777614971|2026-05-01T05:56:11Z|Directory|128|/Users/aminalizadeh/.kiro/skills/commit
+1777614971|2026-05-01T05:56:11Z|Directory|96|/Users/aminalizadeh/.kiro/skills/commit/references
+1777614980|2026-05-01T05:56:20Z|Regular File|2169|/Users/aminalizadeh/.kiro/skills/commit/references/COMMIT.md
+1777615008|2026-05-01T05:56:48Z|Regular File|385|/Users/aminalizadeh/.kiro/skills/commit/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/dubbing
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/dubbing/references
+1792862739|2026-10-24T17:25:39Z|Regular File|13987|/Users/aminalizadeh/.kiro/skills/dubbing/references/api-reference.md
+1792862739|2026-10-24T17:25:39Z|Regular File|2902|/Users/aminalizadeh/.kiro/skills/dubbing/references/installation.md
+1792862739|2026-10-24T17:25:39Z|Regular File|13395|/Users/aminalizadeh/.kiro/skills/dubbing/SKILL.md
+1791105374|2026-10-04T09:16:14Z|Directory|416|/Users/aminalizadeh/.kiro/skills/gmail
+1776143926|2026-04-14T05:18:46Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/__pycache__
+1776143926|2026-04-14T05:18:46Z|Regular File|17540|/Users/aminalizadeh/.kiro/skills/gmail/__pycache__/server.cpython-311.pyc
+1777999932|2026-05-05T16:52:12Z|Directory|288|/Users/aminalizadeh/.kiro/skills/gmail/.git
+1777999932|2026-05-05T16:52:12Z|Regular File|137|/Users/aminalizadeh/.kiro/skills/gmail/.git/config
+1777999932|2026-05-05T16:52:12Z|Regular File|73|/Users/aminalizadeh/.kiro/skills/gmail/.git/description
+1777999932|2026-05-05T16:52:12Z|Regular File|21|/Users/aminalizadeh/.kiro/skills/gmail/.git/HEAD
+1777999932|2026-05-05T16:52:12Z|Directory|512|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks
+1777999932|2026-05-05T16:52:12Z|Regular File|478|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/applypatch-msg.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|896|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/commit-msg.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|4726|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/fsmonitor-watchman.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|189|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/post-update.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|424|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-applypatch.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|1649|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-commit.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|416|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-merge-commit.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|1374|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-push.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|4898|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-rebase.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|544|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/pre-receive.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|1492|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/prepare-commit-msg.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|2783|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/push-to-checkout.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|2308|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/sendemail-validate.sample
+1777999932|2026-05-05T16:52:12Z|Regular File|3650|/Users/aminalizadeh/.kiro/skills/gmail/.git/hooks/update.sample
+1777999932|2026-05-05T16:52:12Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/.git/info
+1777999932|2026-05-05T16:52:12Z|Regular File|240|/Users/aminalizadeh/.kiro/skills/gmail/.git/info/exclude
+1777999932|2026-05-05T16:52:12Z|Directory|128|/Users/aminalizadeh/.kiro/skills/gmail/.git/objects
+1777999932|2026-05-05T16:52:12Z|Directory|64|/Users/aminalizadeh/.kiro/skills/gmail/.git/objects/info
+1777999932|2026-05-05T16:52:12Z|Directory|64|/Users/aminalizadeh/.kiro/skills/gmail/.git/objects/pack
+1777999932|2026-05-05T16:52:12Z|Directory|128|/Users/aminalizadeh/.kiro/skills/gmail/.git/refs
+1777999932|2026-05-05T16:52:12Z|Directory|64|/Users/aminalizadeh/.kiro/skills/gmail/.git/refs/heads
+1777999932|2026-05-05T16:52:12Z|Directory|64|/Users/aminalizadeh/.kiro/skills/gmail/.git/refs/tags
+1777999932|2026-05-05T16:52:12Z|Regular File|109|/Users/aminalizadeh/.kiro/skills/gmail/.gitignore
+1777999932|2026-05-05T16:52:12Z|Regular File|5|/Users/aminalizadeh/.kiro/skills/gmail/.python-version
+1777999940|2026-05-05T16:52:20Z|Directory|224|/Users/aminalizadeh/.kiro/skills/gmail/.venv
+1777999940|2026-05-05T16:52:20Z|Regular File|1|/Users/aminalizadeh/.kiro/skills/gmail/.venv/.gitignore
+1777999941|2026-05-05T16:52:21Z|Directory|480|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin
+1777999940|2026-05-05T16:52:20Z|Regular File|3730|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate
+1777999940|2026-05-05T16:52:20Z|Regular File|2388|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate_this.py
+1777999940|2026-05-05T16:52:20Z|Regular File|2281|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate.bat
+1777999940|2026-05-05T16:52:20Z|Regular File|2637|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate.csh
+1777999940|2026-05-05T16:52:20Z|Regular File|4201|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate.fish
+1777999940|2026-05-05T16:52:20Z|Regular File|3886|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate.nu
+1777999940|2026-05-05T16:52:20Z|Regular File|2772|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/activate.ps1
+1777999940|2026-05-05T16:52:20Z|Regular File|1728|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/deactivate.bat
+1777999941|2026-05-05T16:52:21Z|Regular File|4742|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/google
+1777999940|2026-05-05T16:52:20Z|Regular File|1215|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/pydoc.bat
+1752524004|2025-07-14T20:13:24Z|Regular File|49968|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/python
+1752524004|2025-07-14T20:13:24Z|Regular File|49968|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/python3
+1752524004|2025-07-14T20:13:24Z|Regular File|49968|/Users/aminalizadeh/.kiro/skills/gmail/.venv/bin/python3.13
+1777999940|2026-05-05T16:52:20Z|Regular File|43|/Users/aminalizadeh/.kiro/skills/gmail/.venv/CACHEDIR.TAG
+1777999940|2026-05-05T16:52:20Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib
+1777999940|2026-05-05T16:52:20Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13
+1777999941|2026-05-05T16:52:21Z|Directory|384|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages
+1777999940|2026-05-05T16:52:20Z|Regular File|18|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/_virtualenv.pth
+1777999940|2026-05-05T16:52:20Z|Regular File|4342|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/_virtualenv.py
+1777999941|2026-05-05T16:52:21Z|Directory|256|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info
+1777999941|2026-05-05T16:52:21Z|Regular File|2|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/INSTALLER
+1777999941|2026-05-05T16:52:21Z|Directory|128|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/licenses
+1777999941|2026-05-05T16:52:21Z|Regular File|2201|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/licenses/AUTHORS
+1777999941|2026-05-05T16:52:21Z|Regular File|1441|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/licenses/LICENSE
+1777999941|2026-05-05T16:52:21Z|Regular File|3812|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/METADATA
+1777999941|2026-05-05T16:52:21Z|Regular File|1816|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/RECORD
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/REQUESTED
+1777999941|2026-05-05T16:52:21Z|Regular File|87|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/beautifulsoup4-4.14.3.dist-info/WHEEL
+1777999941|2026-05-05T16:52:21Z|Directory|480|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4
+1777999941|2026-05-05T16:52:21Z|Regular File|44386|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/__init__.py
+1777999941|2026-05-05T16:52:21Z|Regular File|2408|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/_deprecation.py
+1777999941|2026-05-05T16:52:21Z|Regular File|7549|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/_typing.py
+1777999941|2026-05-05T16:52:21Z|Regular File|4711|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/_warnings.py
+1777999941|2026-05-05T16:52:21Z|Directory|192|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/builder
+1777999941|2026-05-05T16:52:21Z|Regular File|31194|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/builder/__init__.py
+1777999941|2026-05-05T16:52:21Z|Regular File|23607|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/builder/_html5lib.py
+1777999941|2026-05-05T16:52:21Z|Regular File|17445|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/builder/_htmlparser.py
+1777999941|2026-05-05T16:52:21Z|Regular File|18969|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/builder/_lxml.py
+1777999941|2026-05-05T16:52:21Z|Regular File|12713|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/css.py
+1777999941|2026-05-05T16:52:21Z|Regular File|57024|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/dammit.py
+1777999941|2026-05-05T16:52:21Z|Regular File|7846|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/diagnose.py
+1777999941|2026-05-05T16:52:21Z|Regular File|120237|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/element.py
+1777999941|2026-05-05T16:52:21Z|Regular File|951|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/exceptions.py
+1777999941|2026-05-05T16:52:21Z|Regular File|29201|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/filter.py
+1777999941|2026-05-05T16:52:21Z|Regular File|10478|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/formatter.py
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/bs4/py.typed
+1777999941|2026-05-05T16:52:21Z|Directory|320|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info
+1777999941|2026-05-05T16:52:21Z|Regular File|10|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/DESCRIPTION.rst
+1777999941|2026-05-05T16:52:21Z|Regular File|2|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/INSTALLER
+1777999941|2026-05-05T16:52:21Z|Regular File|627|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/METADATA
+1777999941|2026-05-05T16:52:21Z|Regular File|790|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/metadata.json
+1777999941|2026-05-05T16:52:21Z|Regular File|898|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/RECORD
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/REQUESTED
+1777999941|2026-05-05T16:52:21Z|Regular File|13|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/top_level.txt
+1777999941|2026-05-05T16:52:21Z|Regular File|110|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/google-3.0.0.dist-info/WHEEL
+1777999941|2026-05-05T16:52:21Z|Directory|128|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/googlesearch
+1777999941|2026-05-05T16:52:21Z|Regular File|12981|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/googlesearch/__init__.py
+1777999941|2026-05-05T16:52:21Z|Regular File|36068|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/googlesearch/user_agents.txt.gz
+1777999941|2026-05-05T16:52:21Z|Directory|320|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve
+1777999941|2026-05-05T16:52:21Z|Directory|256|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info
+1777999941|2026-05-05T16:52:21Z|Regular File|2|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/INSTALLER
+1777999941|2026-05-05T16:52:21Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/licenses
+1777999941|2026-05-05T16:52:21Z|Regular File|1096|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/licenses/LICENSE.md
+1777999941|2026-05-05T16:52:21Z|Regular File|4635|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/METADATA
+1777999941|2026-05-05T16:52:21Z|Regular File|1110|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/RECORD
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/REQUESTED
+1777999941|2026-05-05T16:52:21Z|Regular File|87|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve-2.8.3.dist-info/WHEEL
+1777999941|2026-05-05T16:52:21Z|Regular File|4581|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/__init__.py
+1777999941|2026-05-05T16:52:21Z|Regular File|6766|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/__meta__.py
+1777999941|2026-05-05T16:52:21Z|Regular File|61404|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/css_match.py
+1777999941|2026-05-05T16:52:21Z|Regular File|47222|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/css_parser.py
+1777999941|2026-05-05T16:52:21Z|Regular File|9940|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/css_types.py
+1777999941|2026-05-05T16:52:21Z|Regular File|4362|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/pretty.py
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/py.typed
+1777999941|2026-05-05T16:52:21Z|Regular File|3352|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/soupsieve/util.py
+1777999941|2026-05-05T16:52:21Z|Directory|256|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info
+1777999941|2026-05-05T16:52:21Z|Regular File|2|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/INSTALLER
+1777999941|2026-05-05T16:52:21Z|Directory|96|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/licenses
+1772696220|2026-03-05T07:37:00Z|Regular File|13936|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/licenses/LICENSE
+1772696220|2026-03-05T07:37:00Z|Regular File|3259|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/METADATA
+1777999941|2026-05-05T16:52:21Z|Regular File|623|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/RECORD
+1777999941|2026-05-05T16:52:21Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/REQUESTED
+1772696220|2026-03-05T07:37:00Z|Regular File|82|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions-4.15.0.dist-info/WHEEL
+1772696220|2026-03-05T07:37:00Z|Regular File|160429|/Users/aminalizadeh/.kiro/skills/gmail/.venv/lib/python3.13/site-packages/typing_extensions.py
+1777999940|2026-05-05T16:52:20Z|Regular File|198|/Users/aminalizadeh/.kiro/skills/gmail/.venv/pyvenv.cfg
+1777999940|2026-05-05T16:52:20Z|Regular File|173|/Users/aminalizadeh/.kiro/skills/gmail/pyproject.toml
+1777999932|2026-05-05T16:52:12Z|Regular File|0|/Users/aminalizadeh/.kiro/skills/gmail/README.md
+1778001426|2026-05-05T17:17:06Z|Regular File|8777|/Users/aminalizadeh/.kiro/skills/gmail/server.py
+1776144797|2026-04-14T05:33:17Z|Regular File|3356|/Users/aminalizadeh/.kiro/skills/gmail/SKILL.md
+1791621829|2026-10-10T08:43:49Z|Regular File|741|/Users/aminalizadeh/.kiro/skills/gmail/token.json
+1777999940|2026-05-05T16:52:20Z|Regular File|2877|/Users/aminalizadeh/.kiro/skills/gmail/uv.lock
+1792596028|2026-10-21T15:20:28Z|Directory|96|/Users/aminalizadeh/.kiro/skills/hirearchy
+1792907776|2026-10-25T05:56:16Z|Regular File|14886|/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/music
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/music/references
+1792862739|2026-10-24T17:25:39Z|Regular File|18526|/Users/aminalizadeh/.kiro/skills/music/references/api_reference.md
+1792862739|2026-10-24T17:25:39Z|Regular File|2284|/Users/aminalizadeh/.kiro/skills/music/references/installation.md
+1792862739|2026-10-24T17:25:39Z|Regular File|14225|/Users/aminalizadeh/.kiro/skills/music/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|96|/Users/aminalizadeh/.kiro/skills/onboarding
+1792862739|2026-10-24T17:25:39Z|Regular File|4882|/Users/aminalizadeh/.kiro/skills/onboarding/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/realtime
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/realtime/references
+1792862739|2026-10-24T17:25:39Z|Regular File|4629|/Users/aminalizadeh/.kiro/skills/realtime/references/browser-audio.md
+1792862739|2026-10-24T17:25:39Z|Regular File|5598|/Users/aminalizadeh/.kiro/skills/realtime/references/session-config.md
+1792862739|2026-10-24T17:25:39Z|Regular File|24058|/Users/aminalizadeh/.kiro/skills/realtime/SKILL.md
+1792035371|2026-10-15T03:36:11Z|Directory|128|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything
+1792035371|2026-10-15T03:36:11Z|Directory|256|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references
+1792035371|2026-10-15T03:36:11Z|Regular File|1992|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/android-applications.md
+1792035371|2026-10-15T03:36:11Z|Regular File|8823|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/connection-and-recovery.md
+1792035371|2026-10-15T03:36:11Z|Regular File|4363|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/evidence-workflows.md
+1792035371|2026-10-15T03:36:11Z|Regular File|9949|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/javascript-applications.md
+1792035371|2026-10-15T03:36:11Z|Regular File|17722|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/native-and-artifacts.md
+1792035371|2026-10-15T03:36:11Z|Regular File|4798|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/references/runtime-observation.md
+1792035371|2026-10-15T03:36:11Z|Regular File|22500|/Users/aminalizadeh/.kiro/skills/reverse-engineer-anything/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|96|/Users/aminalizadeh/.kiro/skills/setup-api-key
+1792862739|2026-10-24T17:25:39Z|Regular File|3988|/Users/aminalizadeh/.kiro/skills/setup-api-key/SKILL.md
+1775150533|2026-04-02T17:22:13Z|Directory|128|/Users/aminalizadeh/.kiro/skills/skill-generation
+1775150533|2026-04-02T17:22:13Z|Directory|96|/Users/aminalizadeh/.kiro/skills/skill-generation/scripts
+1775150533|2026-04-02T17:22:13Z|Regular File|3028|/Users/aminalizadeh/.kiro/skills/skill-generation/scripts/new_skill.py
+1775150517|2026-04-02T17:21:57Z|Regular File|3011|/Users/aminalizadeh/.kiro/skills/skill-generation/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/sound-effects
+1792862739|2026-10-24T17:25:39Z|Directory|96|/Users/aminalizadeh/.kiro/skills/sound-effects/references
+1792862739|2026-10-24T17:25:39Z|Regular File|2239|/Users/aminalizadeh/.kiro/skills/sound-effects/references/installation.md
+1792862739|2026-10-24T17:25:39Z|Regular File|4229|/Users/aminalizadeh/.kiro/skills/sound-effects/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/speech-engine
+1792862739|2026-10-24T17:25:39Z|Directory|160|/Users/aminalizadeh/.kiro/skills/speech-engine/references
+1792862739|2026-10-24T17:25:39Z|Regular File|2935|/Users/aminalizadeh/.kiro/skills/speech-engine/references/installation.md
+1792862739|2026-10-24T17:25:39Z|Regular File|4465|/Users/aminalizadeh/.kiro/skills/speech-engine/references/javascript-sdk-reference.md
+1792862739|2026-10-24T17:25:39Z|Regular File|4694|/Users/aminalizadeh/.kiro/skills/speech-engine/references/python-sdk-reference.md
+1792862739|2026-10-24T17:25:39Z|Regular File|10317|/Users/aminalizadeh/.kiro/skills/speech-engine/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/speech-to-text
+1792862739|2026-10-24T17:25:39Z|Directory|256|/Users/aminalizadeh/.kiro/skills/speech-to-text/references
+1792862739|2026-10-24T17:25:39Z|Regular File|2984|/Users/aminalizadeh/.kiro/skills/speech-to-text/references/installation.md
+1792862739|2026-10-24T17:25:39Z|Regular File|7033|/Users/aminalizadeh/.kiro/skills/speech-to-text/references/realtime-client-side.md
+1792862739|2026-10-24T17:25:39Z|Regular File|4707|/Users/aminalizadeh/.kiro/skills/speech-to-text/references/realtime-commit-strategies.md
+1792862739|2026-10-24T17:25:39Z|Regular File|8679|/Users/aminalizadeh/.kiro/skills/speech-to-text/references/realtime-events.md
+1792862739|2026-10-24T17:25:39Z|Regular File|10971|/Users/aminalizadeh/.kiro/skills/speech-to-text/references/realtime-server-side.md
+1792862739|2026-10-24T17:25:39Z|Regular File|10920|/Users/aminalizadeh/.kiro/skills/speech-to-text/references/transcription-options.md
+1792862739|2026-10-24T17:25:39Z|Regular File|10850|/Users/aminalizadeh/.kiro/skills/speech-to-text/SKILL.md
+1777608791|2026-05-01T04:13:11Z|Directory|160|/Users/aminalizadeh/.kiro/skills/test-driven-development
+1777608766|2026-05-01T04:12:46Z|Regular File|12288|/Users/aminalizadeh/.kiro/skills/test-driven-development/.SKILL.md.swp
+1777608843|2026-05-01T04:14:03Z|Regular File|10004|/Users/aminalizadeh/.kiro/skills/test-driven-development/SKILL.md
+1777608791|2026-05-01T04:13:11Z|Regular File|8251|/Users/aminalizadeh/.kiro/skills/test-driven-development/testing-anti-patterns.md
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/text-to-speech
+1792862739|2026-10-24T17:25:39Z|Directory|160|/Users/aminalizadeh/.kiro/skills/text-to-speech/references
+1792862739|2026-10-24T17:25:39Z|Regular File|2904|/Users/aminalizadeh/.kiro/skills/text-to-speech/references/installation.md
+1792862739|2026-10-24T17:25:39Z|Regular File|12626|/Users/aminalizadeh/.kiro/skills/text-to-speech/references/streaming.md
+1792862739|2026-10-24T17:25:39Z|Regular File|3698|/Users/aminalizadeh/.kiro/skills/text-to-speech/references/voice-settings.md
+1792862739|2026-10-24T17:25:39Z|Regular File|10727|/Users/aminalizadeh/.kiro/skills/text-to-speech/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|96|/Users/aminalizadeh/.kiro/skills/update-skills-from-changelog
+1792862739|2026-10-24T17:25:39Z|Regular File|15005|/Users/aminalizadeh/.kiro/skills/update-skills-from-changelog/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/voice-changer
+1792862739|2026-10-24T17:25:39Z|Directory|96|/Users/aminalizadeh/.kiro/skills/voice-changer/references
+1792862739|2026-10-24T17:25:39Z|Regular File|2307|/Users/aminalizadeh/.kiro/skills/voice-changer/references/installation.md
+1792862739|2026-10-24T17:25:39Z|Regular File|12156|/Users/aminalizadeh/.kiro/skills/voice-changer/SKILL.md
+1792862739|2026-10-24T17:25:39Z|Directory|128|/Users/aminalizadeh/.kiro/skills/voice-isolator
+1792862739|2026-10-24T17:25:39Z|Directory|96|/Users/aminalizadeh/.kiro/skills/voice-isolator/references
+1792862739|2026-10-24T17:25:39Z|Regular File|2215|/Users/aminalizadeh/.kiro/skills/voice-isolator/references/installation.md
+1792862739|2026-10-24T17:25:39Z|Regular File|3981|/Users/aminalizadeh/.kiro/skills/voice-isolator/SKILL.md
+1775151837|2026-04-02T17:43:57Z|Directory|128|/Users/aminalizadeh/.kiro/skills/workflow-suggest
+1775151815|2026-04-02T17:43:35Z|Directory|160|/Users/aminalizadeh/.kiro/skills/workflow-suggest/scripts
+1775152569|2026-04-02T17:56:09Z|Regular File|6659|/Users/aminalizadeh/.kiro/skills/workflow-suggest/scripts/collect_browser.py
+1775151815|2026-04-02T17:43:35Z|Regular File|5867|/Users/aminalizadeh/.kiro/skills/workflow-suggest/scripts/collect_project.py
+1775151763|2026-04-02T17:42:43Z|Regular File|5182|/Users/aminalizadeh/.kiro/skills/workflow-suggest/scripts/collect_shell.py
+1775151921|2026-04-02T17:45:21Z|Regular File|2937|/Users/aminalizadeh/.kiro/skills/workflow-suggest/SKILL.md
+skills-through-links listing md5: c21852c34d4010af1374fd5021386df7
+== ~/.kiro/memories, metadata only: mtime_epoch|mtime_utc|type|size|path|link target
+1792911702|2026-10-25T07:01:42Z|Directory|96|/Users/aminalizadeh/.kiro/memories|
+1792899579|2026-10-25T03:39:39Z|Regular File|102400|/Users/aminalizadeh/.kiro/memories/memories.db|
+memories listing md5: ed9c24e7f233f61c6aa7f9afefee236e
+memories.db md5 (a digest only; its contents are never read): d91d954fc5ff92c41d0c285e812684c4

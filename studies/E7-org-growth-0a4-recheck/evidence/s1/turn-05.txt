@@ -1,0 +1,9 @@
+######## TURN 5  start 07:15:13  end 07:15:47  elapsed 34s  (local, 2026-10-25; UTC wall-clock start 2026-10-25T07:15:13Z end 2026-10-25T07:15:47Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-05.stderr.txt):
+I recorded your rejection. The Summary line conflicts with a current rule. Rule C2 says the memo has a title, exactly two sections (Decisions and Actions) and nothing else, so a Summary line would break it. Here is the one question:
+
+About C2: replace it with "The memo has a title line with the meeting date, then a one-line 'Summary:' of the meeting, then a Decisions section, then an Actions section, and nothing else", as a lasting rule for every memo? Yes or no.
+
+If you say yes, I'll also rework this week's memo to match. That takes about 5 more runs, so the case would total about 15 against your 12. Please count your "yes" as approving those extra runs, or tell me if you'd rather not spend them.

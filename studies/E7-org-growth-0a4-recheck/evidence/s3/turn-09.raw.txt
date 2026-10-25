@@ -1,0 +1,10 @@
+The 2026-10-12 memo is drafted and passed review (9 of 9, no rework, 5 runs of 12). I haven't copied it to `deliverables` yet. Four judgement calls are yours, and my suggested answer comes first.
+
+1. **Lee taking the pager in demo week and swapping shifts with Dev.** The memo lists this as an action row with Due `none`. Keep it as an action only?
+2. **Sam on the staging test data ("probably sort it out himself", ready the day before the freeze).** It's a row with Due 2026-10-21, one day before the freeze on 22 October. Keep the row, or is "probably" too soft to count?
+3. **Sam's CI update (the cache theory held up, the fix needs more than a quick patch).** It's an Open item, because the notes give no commitment, owner or date. Keep it as an Open item?
+4. **The RFC decision.** "Approve the RFC with the token bucket design, and ship it behind a feature flag first" is one decision line. Keep one line, or split it into two?
+
+Reply "defaults" to keep the memo as it is, or name the items to change. Any change needs a rework, which is another 3 to 5 runs. The 12-run budget has 7 left over from this request.
+
+One thing to check from me. I told the team that your 2026-10-05 rulings also apply to this memo. These included "before Friday" meaning that Friday's date, and an event date in an action meaning that Due. That affected no date here. Tell me if you didn't mean them as general rules.

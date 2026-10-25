@@ -1,0 +1,11 @@
+$ hirearchy obs events --kind tool.call
+9 of 9 matching event(s), oldest first
+06:45:08.584 mcp root tool.call progress ok 4ms args=task_id=20261025T064503483287-root-08c9,wait_seconds=119 trace=20261025T064503483287-root-08c9
+06:45:13.601 mcp root tool.call progress ok 5ms args=task_id=20261025T064503483287-root-08c9,wait_seconds=114 trace=20261025T064503483287-root-08c9
+06:45:23.616 mcp root tool.call progress ok 5ms args=task_id=20261025T064503483287-root-08c9,wait_seconds=104 trace=20261025T064503483287-root-08c9
+06:45:43.628 mcp root tool.call progress ok 4ms args=task_id=20261025T064503483287-root-08c9,wait_seconds=84 trace=20261025T064503483287-root-08c9
+06:46:23.644 mcp root tool.call progress ok 6ms args=task_id=20261025T064503483287-root-08c9,wait_seconds=44 trace=20261025T064503483287-root-08c9
+06:47:32.650 mcp lead tool.call org_write ok 1ms args=path=lead/work/preflight.txt,content_chars=15,append=False run=lead@20261025T064721480309 trace=20261025T064503483287-root-08c9
+06:47:33.985 mcp lead tool.call org_read ok 1ms args=path=lead/work/preflight.txt run=lead@20261025T064721480309 trace=20261025T064503483287-root-08c9
+06:47:36.596 mcp lead tool.call org_write ok 1ms args=path=lead/MEMORY.md,content_chars=112,append=False run=lead@20261025T064721480309 trace=20261025T064503483287-root-08c9
+06:47:37.128 mcp lead tool.call report ok 5ms args=task_id=20261025T064503483287-root-08c9,status=done,summary_chars=86,artifacts=['lead/work/preflight.txt'] run=lead@20261025T064721480309 trace=20261025T064503483287-root-08c9

@@ -1,0 +1,8 @@
+The hirearchy skill wasn't available. `disclose_context` reported no skills or steering files, so I couldn't read it. I ran the other two steps.
+
+Result of `hirearchy::progress`:
+
+```
+"Reproduction": working. unread work: ceo. runs 0 of 2. last activity 38s ago. (task 20261025T065201858917-root-dce8)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+```

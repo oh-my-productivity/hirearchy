@@ -1,0 +1,87 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-25T07:54:56Z .. 2026-10-25T07:57:30Z; injected task 20261025T075456327958-root-37b7; revised (memo 1) task 20261025T075038845671-root-c671
+
+## run lead@20261025T075456551343 agent=lead model=claude-sonnet-5.5 start=2026-10-25T07:54:56.564577+00:00 end=2026-10-25T07:55:42.866588+00:00 exit=0 secs=46 session=sess_b6ea8878-876c-46c8-b639-9455dc57ce12
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+  lead message 20261025T075532837013-lead-870e to=lead/writer type=task status=None created=2026-10-25T07:55:32+00:00
+  ## Lessons: (none)
+  org-git commit 688a3a5 MEMORY.md diff:
+    commit 688a3a5fedeac0e28bb19047e081e3c82c1cb22a
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sun Oct 25 07:55:42 2026 +0000
+    
+        lead: run ok, 2 message(s) [lead/runs/20261025T075456551343.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 2139dbb..c21d2f3 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,4 @@
+     # Memory
+    -Tasks c671 and 3ca4 (memo 2026-10-05) both reported done; reviewer coverage 'criteria met: 7 of 7'. Nothing outstanding, no open delegations.
+    -Lesson: writer must not add wording absent from notes; ambiguous due phrases ('before Friday', 'for Oct 14', 'this week') should be raised with the client up front; client rulings: 'before Friday' = the Friday itself, 'for Oct 14' = Due 2026-10-14, 'this week' with no hard date = none.
+    -Next run: wait for new requests; follow playbook.
+    +Memo 2026-10-05: earlier tasks c671, 3ca4 reported done (7 of 7 under old rulings). Now rework task root-37b7 (revises c671) OVERRIDES old rulings: Sam 'before Friday' = 2026-10-08 + Open questions note; Marta 'Oct 14' = none + Open questions note; Priya 2026-10-09, Dev 2026-10-08, Lee none.
+    +In flight: writer task ...-870e (revises 5809, budget 2). Next: when writer done, read lead/writer/work/memo-2026-10-05.md, then delegate lead/reviewer (revises 20261025T075249462824-lead-3ee6, budget 1-2) to re-check EVERY Due value vs notes, criteria C1-C7 of 37b7 verbatim. Then check myself and report 37b7 with reviewer's coverage line verbatim + lessons.
+    +Lesson: ambiguous due phrases ('before Friday', 'for Oct 14', 'this week') should be raised/flagged in an Open questions section, not silently resolved; client rulings changed between requests, follow the latest task.
+
+## run lead/writer@20261025T075534809775 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-25T07:55:34.820230+00:00 end=2026-10-25T07:56:05.041203+00:00 exit=0 secs=30 session=sess_ea8c0c17-b78b-46aa-b56e-bb3cdc2fc07b
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261025T075601008492 agent=lead model=claude-sonnet-5.5 start=2026-10-25T07:56:01.023083+00:00 end=2026-10-25T07:56:29.176336+00:00 exit=0 secs=28 session=sess_6c3f84dc-7fdb-45de-b588-6bcf3fdb9f46
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261025T075621375893-lead-e69f to=lead/reviewer type=task status=None created=2026-10-25T07:56:21+00:00
+  ## Lessons: (none)
+  org-git commit 34927e5 MEMORY.md diff:
+    commit 34927e5693a2f8abdfdb3ed5b4bff66c6b049b43
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sun Oct 25 07:56:29 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261025T075601008492.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index c21d2f3..12358d5 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,5 @@
+     # Memory
+    -Memo 2026-10-05: earlier tasks c671, 3ca4 reported done (7 of 7 under old rulings). Now rework task root-37b7 (revises c671) OVERRIDES old rulings: Sam 'before Friday' = 2026-10-08 + Open questions note; Marta 'Oct 14' = none + Open questions note; Priya 2026-10-09, Dev 2026-10-08, Lee none.
+    -In flight: writer task ...-870e (revises 5809, budget 2). Next: when writer done, read lead/writer/work/memo-2026-10-05.md, then delegate lead/reviewer (revises 20261025T075249462824-lead-3ee6, budget 1-2) to re-check EVERY Due value vs notes, criteria C1-C7 of 37b7 verbatim. Then check myself and report 37b7 with reviewer's coverage line verbatim + lessons.
+    -Lesson: ambiguous due phrases ('before Friday', 'for Oct 14', 'this week') should be raised/flagged in an Open questions section, not silently resolved; client rulings changed between requests, follow the latest task.
+    +Memo 2026-10-05, open task root-37b7 (rework; overrides old rulings): Sam 2026-10-08 + Open questions; Marta none + Open questions; Priya 2026-10-09, Dev 2026-10-08, Lee none.
+    +Done: writer reworked lead/writer/work/memo-2026-10-05.md (I read it: 5 rows, Open questions OK, ~200 words).
+    +In flight: reviewer re-check (revises 20261025T075249462824-lead-3ee6, budget 1). Next: read its report/coverage line ('criteria met n of m', 'n of m factual claims verified'), verify memo myself vs C1-C7, then report 37b7 done with coverage line verbatim, artifact lead/writer/work/memo-2026-10-05.md, lessons. If it fails: one writer rework (revises 870e), one re-check, else blocked.
+    +Lesson: ambiguous due phrases ('before Friday', 'for Oct 14') go in an Open questions section, not silently resolved; follow the latest client ruling.
+
+## run lead/reviewer@20261025T075623145972 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-25T07:56:23.152284+00:00 end=2026-10-25T07:57:05.353799+00:00 exit=0 secs=42 session=sess_5c8532b4-7731-4bbd-8ca6-52abe5a6b83b
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261025T075701326122 agent=lead model=claude-sonnet-5.5 start=2026-10-25T07:57:01.339745+00:00 end=2026-10-25T07:57:29.472471+00:00 exit=0 secs=28 session=sess_9e257cc7-e4f0-4b90-a3f8-0c3325bce279
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261025T075723074733-lead-d91e to=root type=result status=done created=2026-10-25T07:57:23+00:00
+  ## Lessons: Putting ambiguous due phrases ('before Friday', 'for Oct 14') in an Open questions section and following the client's ruling passed on re-check. Playbook idea: tell the writer up front to use none for dates that are event dates, not deadlines, and have the reviewer check every Due value. Evidence: 4 review rounds incl. this rework; final 7 of 7, 20 of 20.
+  org-git commit e793ad6 MEMORY.md diff:
+    commit e793ad6cfad8b1d638821eae111cf0de475a7ae5
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sun Oct 25 07:57:29 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261025T075701326122.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 12358d5..445d60f 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,4 @@
+     # Memory
+    -Memo 2026-10-05, open task root-37b7 (rework; overrides old rulings): Sam 2026-10-08 + Open questions; Marta none + Open questions; Priya 2026-10-09, Dev 2026-10-08, Lee none.
+    -Done: writer reworked lead/writer/work/memo-2026-10-05.md (I read it: 5 rows, Open questions OK, ~200 words).
+    -In flight: reviewer re-check (revises 20261025T075249462824-lead-3ee6, budget 1). Next: read its report/coverage line ('criteria met n of m', 'n of m factual claims verified'), verify memo myself vs C1-C7, then report 37b7 done with coverage line verbatim, artifact lead/writer/work/memo-2026-10-05.md, lessons. If it fails: one writer rework (revises 870e), one re-check, else blocked.
+    -Lesson: ambiguous due phrases ('before Friday', 'for Oct 14') go in an Open questions section, not silently resolved; follow the latest client ruling.
+    +Memo 2026-10-05, task root-37b7: reviewer re-check passed (7 of 7, 20 of 20 claims verified, review lead/reviewer/work/review-memo-2026-10-05-r4.md). I verified memo vs notes myself. Reporting 37b7 done. Nothing pending after that.
+    +Final Dues: Priya 2026-10-09, Dev 2026-10-08, Sam 2026-10-08 (Open questions), Marta none (Open questions), Lee none.
+    +Lesson: ambiguous due phrases ('before Friday', 'for Oct 14') go in an Open questions section, not silently resolved; follow the latest client ruling. Ask reviewer to re-check every Due value, not only changed rows.
+

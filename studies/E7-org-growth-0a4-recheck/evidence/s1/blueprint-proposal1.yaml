@@ -1,0 +1,57 @@
+mission: >
+  Turn the notes of the user's weekly platform team meeting into a short memo after each meeting: what the team decided and who does what, with due dates. The memo is for the team and is written only from the user's own notes files.
+needs:
+  kind: writing
+  scope: "One memo per meeting, from the one notes file named in the request: the decisions made and the actions (who does what, by when), including commitments that someone voiced in prose. Nothing else: no attendee list, no discussion recap."
+  inputs:
+    - /tmp/hirearchy-e7-s1-1792911600/notes
+  quality_bar: Every statement comes from the requested notes file; nothing is invented, no commitment is missed, and no due date is guessed.
+  sources: Only the files in needs.inputs; no web.
+  budget_runs: 12
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - name: writer
+        template: writer
+        model: cheap
+        tools: [read]
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]
+services:
+  - name: weekly-meeting-memo
+    owner: lead
+    description: One memo of the decisions and the actions (owner, action, due date) from one weekly meeting notes file.
+    inputs:
+      - name: notes_file
+        description: File name of the meeting notes in the notes folder, for example 2026-10-05.md
+        required: true
+    acceptance:
+      - Built only from the requested notes file; the other notes files are not used.
+      - "The memo has a title line with the meeting date, then exactly two sections titled Decisions and Actions, and nothing else (no attendee list, no discussion recap)."
+      - "Decisions lists every decision the notes state, one bullet each, and no item the notes do not present as decided."
+      - "Actions is a markdown table with the columns Owner | Action | Due. It has one row for every commitment in the notes, including informal ones in prose (someone says they will do something, offers to, or agrees to), not only lines labelled ACTION."
+      - "Every Owner is a person named in the notes."
+      - "Every Due value is an ISO date (YYYY-MM-DD) when the notes give a date, or give a relative deadline that points to one clear day counted from the meeting date; otherwise it is the word none. No date is guessed."
+      - At most 400 words as counted by read.
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: One markdown memo for one meeting, named memo-<meeting date>.md, for example memo-2026-10-05.md.
+      format: markdown
+      max_words: 400
+      path: /tmp/hirearchy-e7-s1-1792911600/deliverables
+    budget: 12
+    locked: false
+task:
+  service: weekly-meeting-memo
+  inputs:
+    notes_file: 2026-10-05.md
+  title: Memo for the 5 October 2026 meeting

@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e7-s3-assistant 'Yes, that counts. Yes, that counts. No need for '\'probably\''. No, that'\''s just a status update, leave it out. It'\''s one decision, keep it as one line.'

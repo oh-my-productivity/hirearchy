@@ -1,0 +1,4 @@
+/Volumes/workspace/hirearchy/studies/E7-org-growth-0a4-recheck/evidence/harness/copy_org_evidence.sh:11: no matches found: /tmp/hirearchy-e7-s3-1792916437/org/inbox/*
+/Volumes/workspace/hirearchy/studies/E7-org-growth-0a4-recheck/evidence/harness/copy_org_evidence.sh:14: no matches found: /tmp/hirearchy-e7-s3-1792916437/org/lead/reviewer/inbox/*
+/Volumes/workspace/hirearchy/studies/E7-org-growth-0a4-recheck/evidence/harness/copy_org_evidence.sh:14: no matches found: /tmp/hirearchy-e7-s3-1792916437/org/lead/writer/inbox/*
+copied; lead lead-reviewer lead-writer 

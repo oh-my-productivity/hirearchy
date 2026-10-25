@@ -1,0 +1,1 @@
+- Facilitator note (turn 3): the prompt file copy, the lena-lines entry and run_turn.sh were run in one tool call (protocol 4.2.1 says run_turn.sh alone). The run_turn.sh chat line was followed by sleep 20 in the same script as always; the tool call returned after run_turn.sh printed its last line. Turns >= 4 use a tool call of their own.

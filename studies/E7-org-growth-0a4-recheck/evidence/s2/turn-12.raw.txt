@@ -1,0 +1,5 @@
+I recorded your "keep it" for the 19 October memo, so the team has your verdict.
+
+All three memos are in `/tmp/hirearchy-e7-s2-1792914064/deliverables/`: `memo-2026-10-05.md`, `memo-2026-10-12.md` and `memo-2026-10-19.md`.
+
+Each week, ask me for "the memo for <notes file>" and I'll run the team. Memos now follow the Summary, Decisions, Actions order, and the team applies your date readings from the start. Nothing is running now.

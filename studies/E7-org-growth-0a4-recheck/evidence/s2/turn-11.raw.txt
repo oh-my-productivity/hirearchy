@@ -1,0 +1,14 @@
+I applied your three answers, and the 19 October memo is at `/tmp/hirearchy-e7-s2-1792914064/deliverables/memo-2026-10-19.md`. The copy matches the team's file.
+
+- **Memo covers only the 19 October meeting:** met.
+- **Decisions:** met. The three decisions are listed.
+- **Commitments:** met. Marta's "keep the agenda" row is gone, and the other five commitments are rows in the Actions table.
+- **Table columns:** met (Owner | Action | Due).
+- **Due dates:** met under your rulings. Lee is 2026-10-30, Marta 2026-10-23, Dev 2026-10-24, Priya 2026-10-26 and Sam none.
+- **At most 400 words:** met, 142 words.
+- **Reviewer shows every criterion met:** met, 8 of 8.
+- **Summary line first, then Decisions, then Actions:** met.
+
+This case used 10 runs against the 12 approved.
+
+Keep it, or what should change?

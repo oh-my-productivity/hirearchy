@@ -1,0 +1,1 @@
+kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-e7-s1-assistant 'This version is right now, thanks. I don'\''t know anything about that rework - I didn'\''t ask for it. Please do 2026-10-12.md. I'\''ll wait.'

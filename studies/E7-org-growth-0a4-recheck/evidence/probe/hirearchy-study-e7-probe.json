@@ -1,0 +1,24 @@
+{
+  "name": "hirearchy-study-e7-probe",
+  "description": "internal: hirearchy usability study E7 probe; deleted after the probe",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "uv",
+      "args": ["--directory", "/Volumes/workspace/hirearchy", "run", "hirearchy", "mcp"],
+      "env": { "ORG_ROOT": "/tmp/hirearchy-e7-probe-1792910605/org" }
+    }
+  },
+  "tools": ["*"],
+  "permissions": {
+    "rules": [
+      { "capability": "all", "effect": "allow" }
+    ]
+  },
+  "resources": [
+    "skill:///Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md",
+    "skill://.kiro/skills/*/SKILL.md"
+  ],
+  "hooks": [],
+  "includeMcpJson": false,
+  "model": "claude-sonnet-5.5"
+}

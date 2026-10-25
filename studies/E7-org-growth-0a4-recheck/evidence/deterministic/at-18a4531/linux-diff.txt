@@ -1,0 +1,15 @@
+ src/hirearchy/scheduler/_events.py                 |  8 +-
+ src/hirearchy/scheduler/_loop.py                   | 35 +++++---
+ src/hirearchy/scheduler/_ports.py                  |  9 ++
+ src/hirearchy/scheduler/_session.py                |  3 +
+ src/hirearchy/scheduler/testing.py                 | 13 +++
+ src/hirearchy/scheduler/tests/count.txt            |  2 +-
+ src/hirearchy/scheduler/tests/test_events.py       | 14 +++-
+ src/hirearchy/scheduler/tests/test_loop.py         | 96 +++++++++++++++++++++-
+ src/hirearchy/scheduler/tests/test_session.py      | 16 +++-
+ src/hirearchy/telemetry/_pool.py                   |  2 +-
+ src/hirearchy/telemetry/_writer.py                 | 52 ++++++++----
+ src/hirearchy/telemetry/tests/count.txt            |  2 +-
+ .../telemetry/tests/test_event_writer_pool.py      | 17 ++++
+ .../telemetry/tests/test_file_line_writer.py       | 51 +++++++++++-
+ 14 files changed, 281 insertions(+), 39 deletions(-)

@@ -1,0 +1,7 @@
+######## TURN 6  start 08:36:06  end 08:36:36  elapsed 30s  (local, 2026-10-25; UTC wall-clock start 2026-10-25T08:36:06Z end 2026-10-25T08:36:36Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-06.stderr.txt):
+About C3 (the check that the memo has Decisions, Action items and Open items sections): add "Every memo starts with a one-line 'Summary:' of the meeting, then the decisions, then the action items" as a lasting rule? Yes or no.
+
+Regardless of your answer, I'd have the team redo this memo with the Summary line. That needs about 5 more runs, which brings this memo to about 15 against the 12 you approved. Is it OK to spend those 3 extra runs?

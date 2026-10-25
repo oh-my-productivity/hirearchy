@@ -1,0 +1,22 @@
+######## TURN 3  start 07:04:04  end 07:07:02  elapsed 178s  (local, 2026-10-25; UTC wall-clock start 2026-10-25T07:04:04Z end 2026-10-25T07:07:02Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Great, approve. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-03.stderr.txt):
+The first memo is drafted, but I haven't delivered it. Three due dates are ambiguous under your "turn vague deadlines into a date" rule, and the reviewer wouldn't pass them either way. Here is the draft:
+
+| Owner | Action | Due |
+|---|---|---|
+| Priya | Draft the RFC for the new per-key rate limiter | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos | 2026-10-08 |
+| Sam | Look into the flaky CI | none |
+| Marta | Book the on-call training room (for 14 October) | none |
+| Lee | Ping the identity vendor about the SSO certificate renewal and report back | none |
+
+It also lists two decisions: moving the gateway migration to the week of 26 October, and adopting Renovate.
+
+Which date should each of these three get?
+1. **Sam**: the notes say "before Friday". Should the due date be 2026-10-08, the day before Friday? The other readings are 2026-10-09 (Friday itself) or none. I'd use 2026-10-08.
+2. **Marta**: the notes say "for Oct 14", which is the training date. Should the due date be 2026-10-14, or none because the notes give no booking deadline? I'd use none. The memo already mentions 14 October in the action text.
+3. **Lee**: the notes say "this week ... no hard date attached". Should the due date be none? I'd use none.
+
+Tell me your answers, for example "1: 10-08, 2: none, 3: none". If you accept my picks, only Sam's row changes. The team has used 5 of 12 runs, and fixing the memo should fit in the rest.

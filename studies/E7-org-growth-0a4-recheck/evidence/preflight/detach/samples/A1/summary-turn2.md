@@ -1,0 +1,21 @@
+- call start (UTC): 2026-10-25T06:50:22.3NZ; chat first seen 2026-10-25T06:50:22.610+00:00; chat gone (the return) 2026-10-25T06:50:47.548+00:00
+- stdout: `Result of `start`: ``` scheduler started (pid 76914; it runs until stop()); log: /private/tmp/hirearchy-e7-detach-1792910942/org/.runtime/scheduler.log ````
+- stderr: 10 lines; tool/err lines: `[tool] Load skill: hirearchy | [tool] status: InProgress | [tool] status: Completed | [tool] status: Completed | [tool] @hirearchy/progress | [tool] status: InProgress | [tool] status: Completed | [tool] @hirearchy/start | [tool] status: InProgress | [tool] status: Completed`
+- KIRO_CHAT_LOG_FILE written: yes (1000 bytes)
+- samples: 517 (file `c1-tools/samples/A1/A1-turn2.jsonl`); roles (first seen, last seen, pid, pgid, first ppid, first stat):
+  - chat: 06:50:22.610+00:00 .. 06:50:47.440+00:00, pid 76582, pgid 76580, ppid 76580, S
+  - chat-tree: 06:50:22.610+00:00 .. 06:50:47.440+00:00, pid 76585, pgid 76580, ppid 76582, R
+  - server: 06:50:36.301+00:00 .. 06:50:36.520+00:00, pid 76803, pgid 76728, ppid 76802, R
+  - scheduler: 06:50:44.472+00:00 .. 06:51:12.629+00:00, pid 76914, pgid 76914, ppid 1, Ss
+  - run: 06:50:44.472+00:00 .. 06:51:12.629+00:00, pid 76944, pgid 76944, ppid 76914, Ss
+  - run-tree: 06:50:44.472+00:00 .. 06:51:12.629+00:00, pid 76947, pgid 76944, ppid 76944, S
+- org events of interest:
+  - ts=2026-10-25T06:49:44.285299+00:00, proc=mcp, pid=76134, kind=tool.call, tool=progress, ok=True
+  - ts=2026-10-25T06:50:41.932017+00:00, proc=mcp, pid=76834, kind=tool.call, tool=progress, ok=True
+  - ts=2026-10-25T06:50:44.410969+00:00, proc=mcp, pid=76834, kind=tool.call, tool=start, ok=True
+  - ts=2026-10-25T06:50:44.418295+00:00, proc=scheduler, pid=76914, kind=scheduler.start
+  - ts=2026-10-25T06:50:44.425654+00:00, proc=scheduler, pid=76914, kind=run.start, child_pid=76944, pgid=76944, agent=ceo
+- verdict json: `{"attempt": "A1", "turn": "2", "return": "2026-10-25T06:50:47.548+00:00", "scheduler_pid": 76914, "start_to_return_ms": null, "run_pid": 76944, "run_start_to_return_ms": 3123, "at_plus_5s_sample": "2026-10-25T06:50:52.632+00:00", "scheduler_alive_at_plus_5s": true, "run_alive_at_plus_5s": true, "scheduler_first_sample_alive": "2026-10-25T06:50:44.472+00:00", "scheduler_last_sample_alive": "2026-10-25T06:51:12.629+00:00", "scheduler_last_alive_stat_ppid_pgid": ["Ss", 1, 76914], "scheduler_first_sample_gone": null, "scheduler_gone_relative_to_return_ms": null, "scheduler_alive_at_end_of_samples": true, "run_last_sample_alive": "2026-10-25T06:51:12.629+00:00", "run_first_sample_gone": null, "run_last_alive_stat_ppid_pgid": ["Ss", 76914, 76944], "scheduler.exit": [], "scheduler.signal": [], "run.end": [], "verdict": "survived", "valid": true}`
+- changed names in the server's environment (names only): d_env_names: AWS_SDK_UA_APP_ID,KIRO_CONTENT_COLLECTION_ENABLED,KIRO_CUSTOM_USER_AGENT,KIRO_TELEMETRY_IS_INTERNAL_AMAZON,UV,_; dropped_invalid: -; kiro_chat_log_file: KIRO_CHAT_LOG_FILE; m2_refusal_list: KIRO_HOME,PATH; profile_env_keys: HIREARCHY_STATE_DIR,HOME,ORG_ROOT,UV_CACHE_DIR; virtual_env_and_uv: UV_RUN_RECURSION_DEPTH,VIRTUAL_ENV
+- changed names in the scheduler's environment (names only): d_env_names: AWS_SDK_UA_APP_ID,KIRO_CONTENT_COLLECTION_ENABLED,KIRO_CUSTOM_USER_AGENT,KIRO_TELEMETRY_IS_INTERNAL_AMAZON,UV,_; dropped_invalid: -; kiro_chat_log_file: KIRO_CHAT_LOG_FILE; m2_refusal_list: KIRO_HOME,PATH,PYTHONUNBUFFERED; profile_env_keys: HIREARCHY_STATE_DIR,HOME,ORG_ROOT,UV_CACHE_DIR; virtual_env_and_uv: UV_RUN_RECURSION_DEPTH,VIRTUAL_ENV
+- KIRO_API_KEY in server env: yes; in scheduler env: yes

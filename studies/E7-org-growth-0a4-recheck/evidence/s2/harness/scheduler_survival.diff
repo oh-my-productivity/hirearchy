@@ -1,0 +1,10 @@
+2,3c2,3
+< """E7 s1 facilitator extract (facts only; protocol 6, 7.2, D-SURVIVE and D-SIGNAL; E6 s1's extract with the signal listing added). Reads s1/events/*/ and s1/session-turn-times-utc.txt and
+< s1/injection/injection-log.txt (read-only) and writes s1/scheduler-survival.txt (E7: also every scheduler.signal). Usage: scheduler_survival.py <stream dir>"""
+---
+> """E7 s2 facilitator extract (facts only; protocol 6, 7.2, D-SURVIVE and D-SIGNAL; E6 s1's extract with the signal listing added). Reads s2/events/*/ and s2/session-turn-times-utc.txt and
+> s2/injection/injection-log.txt (read-only) and writes s2/scheduler-survival.txt (E7: also every scheduler.signal). Usage: scheduler_survival.py <stream dir>"""
+48c48
+< w("# E7 s1 scheduler survival (D-SURVIVE and D-SIGNAL; facts only, from events/, session-turn-times-utc.txt, injection-log.txt)")
+---
+> w("# E7 s2 scheduler survival (D-SURVIVE and D-SIGNAL; facts only, from events/, session-turn-times-utc.txt, injection-log.txt)")

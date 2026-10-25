@@ -1,0 +1,13 @@
+The 12 October memo is done: `/tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-12.md`. The copy matches the checked file.
+
+- **Structure (C9):** title with the date, a one-line Summary, Decisions, then Actions.
+- **Built from the notes:** only `2026-10-12.md` was used.
+- **Decisions:** three, each one the notes state as decided.
+- **Actions table:** five rows. Sam's "probably" is gone, Lee's row stands in for the pager swap, and Dev has no extra row.
+- **Owners and due dates:** every owner is named in the notes. Dates are ISO or `none`, with Sam on 2026-10-21 as you decided.
+- **Length:** it is 169 words, under the 400 limit.
+- **Review:** the reviewer reported "criteria met: 7 of 7" on the final file, and I read the memo against the notes myself.
+
+**Cost:** it took 11 runs, under your 12. I gave the correction too small a budget at first, so the final check stalled and I added 3 runs to finish it. Both memos so far needed a round of your answers on due dates and hedged commitments.
+
+Do you want to keep this memo as it is? Next week, send me the notes file name and I'll request the memo.

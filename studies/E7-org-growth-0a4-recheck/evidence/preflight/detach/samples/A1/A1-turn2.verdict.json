@@ -1,0 +1,75 @@
+{
+ "attempt": "A1",
+ "turn": "2",
+ "events_of_interest": [
+  {
+   "ts": "2026-10-25T06:49:44.285299+00:00",
+   "proc": "mcp",
+   "pid": 76134,
+   "kind": "tool.call",
+   "tool": "progress",
+   "ok": true
+  },
+  {
+   "ts": "2026-10-25T06:50:41.932017+00:00",
+   "proc": "mcp",
+   "pid": 76834,
+   "kind": "tool.call",
+   "tool": "progress",
+   "ok": true
+  },
+  {
+   "ts": "2026-10-25T06:50:44.410969+00:00",
+   "proc": "mcp",
+   "pid": 76834,
+   "kind": "tool.call",
+   "tool": "start",
+   "ok": true
+  },
+  {
+   "ts": "2026-10-25T06:50:44.418295+00:00",
+   "proc": "scheduler",
+   "pid": 76914,
+   "kind": "scheduler.start"
+  },
+  {
+   "ts": "2026-10-25T06:50:44.425654+00:00",
+   "proc": "scheduler",
+   "pid": 76914,
+   "kind": "run.start",
+   "child_pid": 76944,
+   "pgid": 76944,
+   "agent": "ceo"
+  }
+ ],
+ "return": "2026-10-25T06:50:47.548+00:00",
+ "scheduler_pid": 76914,
+ "start_to_return_ms": null,
+ "run_pid": 76944,
+ "run_start_to_return_ms": 3123,
+ "at_plus_5s_sample": "2026-10-25T06:50:52.632+00:00",
+ "scheduler_alive_at_plus_5s": true,
+ "run_alive_at_plus_5s": true,
+ "scheduler_first_sample_alive": "2026-10-25T06:50:44.472+00:00",
+ "scheduler_last_sample_alive": "2026-10-25T06:51:12.629+00:00",
+ "scheduler_last_alive_stat_ppid_pgid": [
+  "Ss",
+  1,
+  76914
+ ],
+ "scheduler_first_sample_gone": null,
+ "scheduler_gone_relative_to_return_ms": null,
+ "scheduler_alive_at_end_of_samples": true,
+ "run_last_sample_alive": "2026-10-25T06:51:12.629+00:00",
+ "run_first_sample_gone": null,
+ "run_last_alive_stat_ppid_pgid": [
+  "Ss",
+  76914,
+  76944
+ ],
+ "scheduler.exit": [],
+ "scheduler.signal": [],
+ "run.end": [],
+ "verdict": "survived",
+ "valid": true
+}

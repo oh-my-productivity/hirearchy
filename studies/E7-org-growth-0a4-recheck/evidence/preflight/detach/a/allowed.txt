@@ -1,0 +1,10 @@
+record: /tmp/hirearchy-e7-detach-1792910942/kiro-home/sessions/5e4ae68161d0fded/sess_87782186-f6c2-4e28-ae98-067f19e5bc78/messages.jsonl
+session: sess_87782186-f6c2-4e28-ae98-067f19e5bc78
+  2026-10-25T06:49:39.305Z disclose_context {"name": "hirearchy"}
+  2026-10-25T06:49:42.987Z tool_load {"tool_ids": ["hirearchy::progress"]}
+  2026-10-25T06:49:44.288Z tool_call {"tool_id": "hirearchy::progress", "arguments": {}}
+  2026-10-25T06:50:39.592Z disclose_context {"name": "hirearchy"}
+  2026-10-25T06:50:41.904Z tool_load {"tool_ids": ["hirearchy::start"]}
+  2026-10-25T06:50:41.935Z tool_call {"tool_id": "hirearchy::progress", "arguments": {}}
+  2026-10-25T06:50:44.413Z tool_call {"tool_id": "hirearchy::start", "arguments": {"until_done": false}}
+ALLOWED

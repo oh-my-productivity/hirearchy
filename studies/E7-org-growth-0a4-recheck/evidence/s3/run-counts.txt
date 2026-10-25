@@ -1,0 +1,67 @@
+=== final  snapshot 2026-10-25T08:59:21Z (local 08:59:21)
+injection window (UTC, from window.txt): 2026-10-25T08:32:49 .. 2026-10-25T08:35:39
+org runs total: 40  (injection-window runs: 5; counted toward the 45 cap: 35)
+  lead                           claude-sonnet-5.5    24
+  lead/reviewer                  claude-sonnet-5.5    8
+  lead/writer                    claude-sonnet-5.5    8
+  run 20261025T082436179642 agent=lead model=claude-sonnet-5.5 exit=0 secs=24
+  run 20261025T082456319427 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261025T082522608279 agent=lead model=claude-sonnet-5.5 exit=0 secs=34
+  run 20261025T082550857213 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=50
+  run 20261025T082633115693 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261025T082823142625 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261025T082853360965 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261025T082915570043 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261025T082937736145 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=42
+  run 20261025T083013942976 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261025T083249757903 agent=lead model=claude-sonnet-5.5 exit=0 secs=46 [INJECTION WINDOW]
+  run 20261025T083331923079 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30 [INJECTION WINDOW]
+  run 20261025T083356064133 agent=lead model=claude-sonnet-5.5 exit=0 secs=32 [INJECTION WINDOW]
+  run 20261025T083422221735 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=50 [INJECTION WINDOW]
+  run 20261025T083504416295 agent=lead model=claude-sonnet-5.5 exit=0 secs=34 [INJECTION WINDOW]
+  run 20261025T083810288617 agent=lead model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261025T083846569963 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261025T083910772051 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261025T083934983660 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=52
+  run 20261025T084017220138 agent=lead model=claude-sonnet-5.5 exit=0 secs=34
+  run 20261025T084331384527 agent=lead model=claude-sonnet-5.5 exit=0 secs=34
+  run 20261025T084355507450 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=34
+  run 20261025T084423687784 agent=lead model=claude-sonnet-5.5 exit=0 secs=34
+  run 20261025T084451922917 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=52
+  run 20261025T084538231882 agent=lead model=claude-sonnet-5.5 exit=0 secs=34
+  run 20261025T084738150624 agent=lead model=claude-sonnet-5.5 exit=0 secs=26
+  run 20261025T084758268051 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=26
+  run 20261025T084820433704 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261025T084846644269 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261025T084918840394 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261025T085105462421 agent=lead model=claude-sonnet-5.5 exit=0 secs=36
+  run 20261025T085133658420 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261025T085207903573 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261025T085230097546 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261025T085308302551 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261025T085455808946 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261025T085519943441 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261025T085544127399 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261025T085610306043 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=40
+  run 20261025T085642517531 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  lead/inbox/20261025T085808797104-root-b43a.md
+  (1 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 08:42:13 size 1570 md5 fc20d12c8c8993772ffd35e348d5368e
+  deliverables/memo-2026-10-12.md mtime 08:49:57 size 1245 md5 d9b96f216459d7a5380658912dd5332d
+  deliverables/memo-2026-10-19.md mtime 08:57:16 size 1215 md5 30933ac60ef09478d15aadaeeb66d400
+processes referencing the sandbox name (0):
+
+
+runs per user-turn window (UTC turn_start .. next turn_start / end):
+  during/after turn 3 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 4 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 5 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 7 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 9 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 10 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 11 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
+  during/after turn 12 start: 5 runs, lead-reviewer=claude-sonnet-5.5, lead-writer=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5, lead=claude-sonnet-5.5
