@@ -1,0 +1,125 @@
+Target organization: <ORG> (exists, 0 agent(s) besides root; apply_org adds to it)
+
+Show the block below to the user exactly as written, from its first line up to (not including) the marker line; one plain-words intro line before it is fine.
+
+PLAN FOR YOU
+Goal: Offer a weekly, sourced one-page brief on a topic the requester names, and get better at it with every request.
+What I understood you need:
+- Scope: One topic per request; news and developments of the past week only; sources are public web pages.
+- Quality bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations.
+- Sources: Web access to news sites, official sites and documentation; a source URL per claim.
+- Workspace: none (nothing writes files or runs commands)
+- Models: claude-sonnet-5.5 (high effort) for every agent
+Team (4 agents):
+- lead (Research lead, model claude-sonnet-5.5): directs the team; does not produce the work itself; can read web pages and search the web; cannot change your files
+  - researcher (Researcher, model claude-sonnet-5.5): can read web pages and search the web; cannot change your files
+  - writer (Writer, model claude-sonnet-5.5): cannot change your files
+  - factcheck (Independent Fact-Checker, model claude-sonnet-5.5): can read web pages and search the web; cannot change your files
+Budget: up to 20 runs per request (one run = one working session of one agent), your cap per request is 20; the minimum for one review and rework is 17, and a round of your questions or a rejection takes about 7 more (24 in all). Unspent runs come back to you.
+  lead starts with 20, hands down researcher 4, writer 3, factcheck 3 and keeps 10 for planning, checking and rework.
+If a check still fails after one rework, I'll come back to you with options before spending the reserve; nothing beyond a request's budget is spent without your OK.
+Checking: factcheck reviews the work independently (they did not write it); required changes go back to the author. I then re-check the final result against every service check below.
+Services (kept ready, requested whenever you want):
+- weekly-brief: A one-page, sourced brief on the past week's news about a topic.
+  You provide: topic (required), week (optional)
+  Each request: up to 20 runs
+  Checks:
+    1. At most 600 words as counted by read.
+    2. Has exactly the sections "This week", "Changes since last week" and "Our assessment", in that order.
+    3. Every sentence with a number, name, version, date, price or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+    4. The "Our assessment" section is judgement, with no citations or new facts, and rests only on claims verified elsewhere in the brief.
+    5. The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim.
+  Delivered to: ~/deliverables/weekly-briefs (I copy each result there after checking it)
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+First request, started on approval: weekly-brief (topic: solid-state batteries).
+Checkpoints: approval - Approve this plan before anything is created or started; ask before spending beyond a request's budget; progress - One line when I ask; any spend beyond the budget needs your OK.
+Warnings (1):
+- 20 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round
+Nothing is created or started until you approve. Reply 'approve', or tell me what to change.
+Use 24 runs per request (covers one round of your questions or a rejection), or keep 20?
+
+--- machine marker: the user block ends above; do not show this line or anything below it ---
+
+Details (the full plan, for you; the user need not read it):
+# Plan for approval
+
+Goal: Offer a weekly, sourced one-page brief on a topic the requester names, and get better at it with every request.
+
+Needs as understood:
+- Scope: One topic per request; news and developments of the past week only; sources are public web pages.
+- Deliverable: per service (see Services below)
+- Quality bar: Every factual claim cites the page that states it; opinions are labelled as judgement, without citations.
+- Sources / tools: Web access to news sites, official sites and documentation; a source URL per claim.
+- Workspace: none (no agent writes files or runs commands)
+- Model policy: one model for all (claude-sonnet-5.5 at high effort for every agent; nothing below it is available)
+- Review: required
+
+Organization (4 agents):
+- lead [manager] Research lead: model=claude-sonnet-5.5, tools=web_fetch,web_search
+  - researcher [researcher] Researcher: model=claude-sonnet-5.5, tools=web_fetch,web_search
+  - writer [writer] Writer: model=claude-sonnet-5.5, tools=none
+  - factcheck [fact-checker] Independent Fact-Checker: model=claude-sonnet-5.5, tools=web_fetch,web_search
+
+Budget per request (your cap: 20), estimate 17 for one pass + one review/rework cycle, 24 with one round of your questions or a rejection:
+  A ceiling: runs the team does not spend come back automatically with the final report of each request.
+  service weekly-brief: 20 runs per request
+    lead: starts with 20, hands down researcher 4, writer 3, factcheck 3 (each includes its rework/re-check run), keeps 10 (own 7 + slack 3)
+    lead/researcher: 4 runs (3 work + 1 rework)
+    lead/writer: 3 runs (2 work + 1 rework)
+    lead/factcheck: 3 runs (2 work + 1 rework)
+
+Review / verification:
+- lead/factcheck checks the work of lead/researcher, lead/writer independently; findings go to their manager, who sends required changes back to the author (nobody edits another agent's file).
+- the assistant re-checks the final deliverable against every acceptance criterion before telling you it is done
+
+Deliverable:
+- per service (see Services below)
+
+Services (1), offered by lead and defined by root (the contract: only root can change it):
+- weekly-brief: A one-page, sourced brief on the past week's news about a topic.
+  inputs: topic (required), week (optional)
+  budget: 20 runs per request
+  deliverable: One markdown file with the brief [markdown, max 600 words]; delivered to: ~/deliverables/weekly-briefs (I copy each result there after checking it)
+  acceptance (the contract, travels with every request):
+    1. At most 600 words as counted by read.
+    2. Has exactly the sections "This week", "Changes since last week" and "Our assessment", in that order.
+    3. Every sentence with a number, name, version, date, price or "no/only/all" is a factual claim and cites the URL of the page that states it; the fact-checker fetched that page and quoted the sentence.
+    4. The "Our assessment" section is judgement, with no citations or new facts, and rests only on claims verified elsewhere in the brief.
+    5. The fact-checker's final coverage line reads 'n of m factual claims verified' with n = m, and the lead's report pastes it verbatim.
+  playbook v1: generated from the team (steps, budget plan, pitfalls):
+    ## Steps
+    1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate.
+    2. Delegate to `researcher` (Researcher) with `budget=4`: its part of the request, with the criteria it must meet.
+    3. When the previous result is in, read its artifact yourself, then delegate to `writer` (Writer) with `budget=3`, naming the artifact it builds on. Never delegate a step before its inputs exist, and send no status messages: results wake you.
+    4. When the work exists, delegate to `factcheck` (Independent Fact-Checker) with `budget=3` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file.
+    5. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle.
+    6. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim.
+    7. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to ~/deliverables/weekly-briefs) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings).
+    
+    ## Budget plan
+    Request budget: 20 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:
+    - researcher: 4 runs (3 work + 1 rework or re-check)
+    - writer: 3 runs (2 work + 1 rework or re-check)
+    - factcheck: 3 runs (2 work + 1 rework or re-check)
+    - you (lead): keep 10 runs: your own 7 (plan, process each result, final check, report, one rework cycle) and 3 of slack.
+    Unspent runs return to your parent with your final report.
+    
+    ## Pitfalls
+    none yet: add them from lessons and feedback
+After each request the lead records lessons; before the next one it reviews them with your feedback and may improve how the team works (its playbook). It cannot change these checks: only you can, through me.
+First request: service weekly-brief: topic: solid-state batteries; title: Weekly brief - solid-state batteries
+
+Checkpoints:
+- Approval: Approve this plan before anything is created or started; ask before spending beyond a request's budget.
+- Progress: One line when I ask.
+- Any spend beyond the budget needs your OK.
+
+Warnings (3):
+- services[weekly-brief].deliverable.path: no agent can write to <HOME>/deliverables/weekly-briefs (agents write only inside their own directory or workspace); the assistant must copy each result there and verify it (the plan lists this step)
+- services[weekly-brief].deliverable.path: <HOME>/deliverables does not exist; the copy step will create it
+- services[weekly-brief].budget: 20 runs per request covers one pass and one internal rework (the estimate is 17), not a round of your questions or a rejection, which takes about 7 more (1, plus 2 for each agent below lead): 24 per request covers one such round
+
+Reply 'approve' or tell me what to change.
+
+plan_id: d70a3414bf22
+Next: show the PLAN FOR YOU block above to the user exactly as written (a plain-words intro line before it is fine) and wait for their explicit approval. Then apply_org(blueprint=<this exact YAML>, approved=True, plan_id="d70a3414bf22"). If you change the blueprint, call propose_org again: the plan_id changes.

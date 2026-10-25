@@ -9,7 +9,7 @@ from typing import cast
 
 from ..kernel import NAME_RE, JsonObject, OrgError
 from ..services import DESCRIPTION_MAX, ContractNormalizer
-from ._budgeting import TIGHT
+from ._budgeting import TIGHT, round_offer
 from ._protocols import BudgetPlanning, OrgContext, PathChecking, ServiceRules
 from ._rules import delivers_directly, vague
 from ._view import REQUEST_KEYS, SERVICE_KEYS, is_request, s, svc_criteria, svc_deliverable, unknown
@@ -98,9 +98,9 @@ class ServiceBlueprintRules(ServiceRules):
                     issues.append(Issue("error", f"{where}.budget", f"planned budget {total} runs per request is above the user's cap of {cap} (the cap is for ONE request); lower the service's budget or shrink the team", "budget-cap"))
                 if total < est_total:
                     issues.append(Issue("error", f"{where}.budget" if b is not None else "needs.budget_runs", f"{total} runs per request cannot cover the pipeline: the estimate with one review and one rework cycle is {est_total} (see estimate()); raise the budget or drop a role", "budget-low"))
-                elif total < est_total + round_runs:
+                elif (offer := round_offer(total, est_total, round_runs)) is not None:
                     lead = top.name if top is not None else "the top agent"
-                    issues.append(Issue("warning", f"{where}.budget" if b is not None else "needs.budget_runs", f"{total} runs per request covers one pass and one internal rework (the estimate is {est_total}), not a round of your questions or a rejection, which takes about {round_runs} more (1, plus 2 for each agent below {lead}): {est_total + round_runs} per request covers one such round", "budget-tight"))
+                    issues.append(Issue("warning", f"{where}.budget" if b is not None else "needs.budget_runs", f"{total} runs per request covers one pass and one internal rework (the estimate is {est_total}), not a round of your questions or a rejection, which takes about {round_runs} more (1, plus 2 for each agent below {lead}): {offer} per request covers one such round", "budget-tight"))
                 elif total < math.ceil(est_total * TIGHT):
                     issues.append(Issue("warning", f"{where}.budget", f"{total} runs per request leaves almost no slack over the estimate of {est_total}; expect a stall on the first surprise", "budget-tight"))
             if sv.get("playbook") is not None:

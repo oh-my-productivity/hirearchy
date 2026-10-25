@@ -82,6 +82,16 @@ def test_the_plan_block_is_compact_and_has_everything_the_user_approves(setup, e
         assert needle in b, needle
 
 
+def test_the_budget_question_comes_before_the_machine_marker(setup, tmp_path):
+    """D-E7-3: the plan's budget question ends the block, so the assistant shows it with the rest."""
+    from hirearchy.blueprint.tests.test_services import e5_blueprint
+
+    server, _ = setup
+    out = call(server, "propose_org", blueprint=yaml.safe_dump(e5_blueprint(tmp_path)))
+    ask = "Use 16 runs per request (covers one round of your questions or a rejection), or keep 12?"
+    assert block(out).splitlines()[-1] == ask and out.index(ask) < out.index(bp_mod.PLAN_END)
+
+
 def test_block_shows_a_code_workspace_and_write_access(setup, env):
     server, _ = setup
     b = block(call(server, "propose_org", blueprint=example(server, "code")))

@@ -49,6 +49,17 @@ def test_propose_org_for_the_shipped_examples(name, gorg, cwd, norm):
     assert re.search(r"plan_id: [0-9a-f]{12}", out)
 
 
+def test_propose_org_when_the_cap_keeps_the_service_below_one_client_round(gorg, cwd, norm):
+    """D-E7-3: a cap of 20 holds the shipped service example (estimate 17, a round of 7) below the 24 that covers one round, so the block ends by asking."""
+    text = (PROJECT / "examples" / "blueprint-service.yaml").read_text(encoding="utf-8")
+    assert text.count("budget_runs: 25") == 1 and text.count("budget: 24 ") == 1
+    text = text.replace("budget_runs: 25", "budget_runs: 20").replace("budget: 24 ", "budget: 20 ")
+    out = norm(call(root_server(gorg), "propose_org", blueprint=text))
+    assert ("Reply 'approve', or tell me what to change.\nUse 24 runs per request (covers one round of your questions or a rejection), or keep 20?\n\n"
+            "--- machine marker") in out
+    check("plans/example_blueprint-service_cap_20.txt", out)
+
+
 def test_propose_org_without_an_organization(tmp_path, cwd, norm):
     text = (PROJECT / "examples" / "blueprint-research.yaml").read_text(encoding="utf-8")
     where = tmp_path / "later" / "org"

@@ -14,6 +14,16 @@ from .api import Agent
 
 SLACK = 1.25  # planned budget = estimate * SLACK when the task names no budget
 TIGHT = 1.10  # a budget under estimate * TIGHT is flagged as having no slack
+
+
+def round_offer(total: int, est_total: int, round_runs: int) -> int | None:
+    """The plan's number for a service whose per-request budget ``total`` covers one pass and one internal rework (the estimate ``est_total``) but
+    not one round of the client's questions or a rejection (``round_runs``): ``est_total + round_runs``; None when ``total`` is below the estimate
+    (``budget-low``), already covers the round, or there is no round (no agents). The ``budget-tight`` warning's client-round form and the plan's
+    budget question both read it (pure)."""
+    return est_total + round_runs if round_runs > 0 and est_total <= total < est_total + round_runs else None
+
+
 REWORK_RUNS = {"manager": 2, "author": 1, "verifier": 1}  # one rework cycle, see ``estimate``
 KINDS = ("manager", "author", "verifier")
 

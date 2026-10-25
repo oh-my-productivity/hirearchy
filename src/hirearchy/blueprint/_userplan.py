@@ -6,7 +6,10 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from ..settings import DEFAULT_MODEL, config_effort
+from ._budgeting import round_offer
 from ._plan_texts import (
+    BUDGET_QUESTION,
+    BUDGET_QUESTION_FOR,
     HIDDEN_WARNINGS,
     PLAN_DRAFT_HEADING,
     PLAN_HEADING,
@@ -118,7 +121,22 @@ class TextUserPlan(UserPlanning):
             L += [f"- {e.path}: {clip(e.message)}" for e in errs[:SHOWN_WARNINGS]]
         L.append("Nothing is created or started until you approve. Reply 'approve', or tell me what to change." if not errs
                  else "Cannot apply yet.")
+        if not errs:
+            L += self._budget_question(bp, agents, issues)
         return "\n".join(L)
+
+    def _budget_question(self, bp: Mapping[str, object], agents: Sequence[Agent], issues: Sequence[Issue]) -> list[str]:
+        """D-E7-3: the yes/no line that ends the block when a service's budget per request covers one pass and one internal rework but not a round
+        of the user's questions or a rejection (``round_offer``, the ``budget-tight`` warning's client-round form). Only when such a warning is
+        among ``issues`` (DR-0a5-5); one line for a blueprint with one service, one line naming its service per offer when it has several
+        (DR-0a5-4); none for a plain task and without agents."""
+        if not services_of(bp) or not agents or not any(i.level == "warning" and i.code == "budget-tight" for i in issues):
+            return []
+        est, round_runs = self._budgets.estimate(agents)["total"], self._budgets.client_round(agents)
+        offers = [(name, n, m) for name, m in self._budgets.service_budgets(bp, agents).items() if (n := round_offer(m, est, round_runs)) is not None]
+        if len(offers) == 1 and len(services_of(bp)) == 1:
+            return [BUDGET_QUESTION.format(n=offers[0][1], m=offers[0][2])]
+        return [BUDGET_QUESTION_FOR.format(n=n, name=name, m=m) for name, n, m in offers]
 
     def _user_tree(self, agents: Sequence[Agent]) -> list[str]:
         by = {a.addr: a for a in agents}

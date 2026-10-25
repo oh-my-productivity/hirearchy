@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from hirearchy.blueprint._budgeting import KINDS, REWORK_RUNS, SLACK, TIGHT, BudgetPlanner
+from hirearchy.blueprint._budgeting import KINDS, REWORK_RUNS, SLACK, TIGHT, BudgetPlanner, round_offer
 from hirearchy.blueprint._protocols import BudgetPlanning
 from hirearchy.blueprint.api import Agent
 
@@ -100,3 +100,11 @@ def test_every_service_of_the_blueprint_has_its_budget_by_name() -> None:
     bp = {"needs": {"budget_runs": 25}, "services": [{"name": "a", "budget": 9}, {"name": "b"}, "junk"]}
     assert BudgetPlanner().service_budgets(bp, TEAM) == {"a": 9, "b": 24}  # b: the estimate plus one client round, under the cap of 25
     assert BudgetPlanner().service_budgets(bp, []) == {"a": 9, "b": 0}
+
+
+@pytest.mark.parametrize(("total", "est", "round_runs", "offer"), [
+    (10, 11, 5, None), (11, 11, 5, 16), (12, 11, 5, 16), (15, 11, 5, 16), (16, 11, 5, None), (12, 11, 0, None),
+])
+def test_the_plans_number_is_offered_only_when_a_budget_covers_the_estimate_but_not_a_client_round(total: int, est: int, round_runs: int, offer: int | None) -> None:
+    """D-E7-3: ``round_offer`` is the estimate plus one client round exactly where the ``budget-tight`` warning's client-round form fires."""
+    assert round_offer(total, est, round_runs) == offer
