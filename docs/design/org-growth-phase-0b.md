@@ -1,7 +1,8 @@
 # Org growth, Phase 0b: Measure (technical design)
 
 Status: design, revision 3, amended by review pass 3's LOW findings (A.3), the planner's corrections (A.4), the manager's decisions after the
-E5 FAIL (D-E5-6 and `e5-gate.md` section 4), the E6 FAIL (D-E6-8, D-E6-9) and the E7 FAIL (D-E7-1 to D-E7-7, `e7-gate.md` section 5; all in A.3).
+E5 FAIL (D-E5-6 and `e5-gate.md` section 4), the E6 FAIL (D-E6-8, D-E6-9) and the E7 FAIL (D-E7-1 to D-E7-7, `e7-gate.md` section 5; all in A.3). **As built (plan commit 49):** Appendix A.5 records the commit numbering, the golden
+list and counts, and every deviation of the build; where A.5 differs from an earlier section, A.5 wins, as A.3 and A.4 do.
 Revision 3 answers the design review of revision 2 (14 findings, `DR2-1` to `DR2-14`) and the manager's binding decision of 2026-10-24 on that
 review (owner questions Q1-Q5, section 28); resolutions in Appendix A.2, revision 1's in A.1. Branch `feat/org-growth-phase-0b`, worktree
 `/Volumes/workspace/hirearchy/.worktrees/org-growth-0b`. Revision 3 was written on `main` `6618c0d` (0a.2 merged); the branch is rebased onto
@@ -500,7 +501,7 @@ newline after today's receipt line `feedback {verdict} recorded on {task_id} for
 - human reject: `Next: if the user wants it redone, send it back with delegate(to="{to}", title=..., goal=<their corrections, in their
   words>, acceptance=<the criteria, verbatim>, revises="{task}", source="human"). A one-off task has no contract: no criterion changes.`
 - human accept: `""`.
-The CLI prints the same step after its own receipt line, as it does for service verdicts.
+The CLI prints no step after its receipt line: `FeedbackCommand` prints none for service verdicts either (A.4 PC-5; as built).
 
 ### 8.3 Refusal texts (constants in `SRC/services/_feedback.py`)
 
@@ -979,10 +980,10 @@ Section 10.
 `skills/hirearchy/SKILL.md` stays at 125 lines (the cap is asserted in `skill/tests/test_finish_rules.py`, `test_observe_skill.py`,
 `test_skill_org_growth.py`, `test_skill_services.py` and `TESTS/e2e/test_round7.py`):
 - line 88 (step 5.1): `1. Read the final deliverable and check it yourself ...` becomes `1. Read the result with `inbox` (never with shell
-  reads of the org's boxes), then the final deliverable, and check it yourself ...`, re-wrapped within lines 88-89;
+  reads of the org's boxes), then the final deliverable, and check it yourself ...` (as built: inside the one line, 125 lines before and after);
 - line 98 (step 5.6): `6. A service request: after the delivery ask ONE short question` becomes `6. A service request (a one-off task:
-  record only a verdict the user states, no question, no criterion): after the delivery ask ONE short question`, re-wrapped within
-  lines 98-100 by shortening `"keep it" / "what's wrong"` to `"keep it"/"what's wrong"` and joining one short line.
+  record only a verdict the user states, no question, no criterion): after the delivery ask ONE short question` (as built: the first line of the step
+  is longer and lines 99-100 are untouched, so 0a.4's line 100 stays word for word; the re-wrap this design planned is not done, A.5.3 B5.3).
 No line-length rule applies to SKILL.md: the skill tests cap only the file, at 125 lines (its longest line has 317 characters today). The
 planner checks the 125-line cap after both edits and records the line count.
 
@@ -1004,6 +1005,8 @@ under a full `check.sh` and passed alone and on a rerun. The plan item, done fir
    read, inject the fixed clock, or sort the collection. No retry, no `flaky` marker, no sleep, no regenerated golden.
 4. Prove it: the loop of step 1 shows 0 differences, and a new test pins the waited-for condition. If no source is found after the loop, the
    item stops and reports to the manager with the evidence (it is not closed by a retry).
+
+As built (plan commit 37): the source was in the table widget, not in the capture path, and the fix is in `SRC/dashboard/_widgets.py` (A.5.3 B8.1).
 
 ## 12. Packages, ports, wiring and files
 
@@ -1858,11 +1861,12 @@ the owner's yes, and never as part of the build.
 | dashdata / dashboard | 0 expected (the dashboard shows flags, which keep their wording); any dashdata snapshot that embeds `AgentHealth` JSON changes (checked by the planner) | `to_dict` |
 | replays | new goldens in `tests/golden/expected/quality/` for 9.3's samples (E3 full, A5's one-off block, the empty org, the empty service) and E3's `--json` (`e3.json`) | 19.3 E3-5, E3-8, A5-4; 17 item 1 |
 | prompts, ORG.md, charters | 0 | agents' prompts are unchanged |
-Total (measured, plan PC-8): 15 files regenerated (18 file changes) plus 7 new, counted before any change 0a.3 to 0a.5 made to the same files. Each diff is reviewed and counted in the phase report (08 D1).
+Total (measured, plan PC-8): 15 files regenerated (18 file changes) plus 7 new, counted before any change 0a.3 to 0a.5 made to the same files. Each diff is reviewed and counted in the phase report (08 D1). As built: 17 files regenerated (20 file changes) and 8 new: the plan's 15, 18 and 7, plus `cli/tests/expected/no_command.txt` and
+`unknown_command.txt` (regenerated) and `cli/tests/expected/quality.txt` (new), which the new command made necessary (A.5.2).
 
 ## 23. Plan items for the planner, and the backlog
 
-Plan items (in this order of FEATs; each FEAT ends with its SCOPED run; 55 commits in 13 FEATs, the plan's numbering):
+Plan items (in this order of FEATs; each FEAT ends with its SCOPED run; 55 commits in 13 FEATs, the plan's numbering; A.5.1 lists what was built, with shas):
 1. **FEAT-001 integration** (step 0 without a commit, commits 1-4): the rebase onto `main`, this amendment, and the byte-identical moves that
    make shared rules public: the base-heading constants, `services.criterion_words`, and `contract_of`, `amendment_ids` and `version_in_force`
    in `services.api` (A.4 PC-1).
@@ -1890,8 +1894,8 @@ Plan items (in this order of FEATs; each FEAT ends with its SCOPED run; 55 commi
     and committed evidence, before any replay test of that study (19.5, 27). FEAT-012 and FEAT-013 are no longer conditional (their evidence
     is committed).
 11. **FEAT-011 docs** (48-49): ARCHITECTURE (2.2 row 31, section 3's Protocol lists for reflection, progress, snapshots, health's port, the entry
-    points, and 3.22's collaborator sentence: `DerivedCaseHistory` takes seven collaborators, as do `OwnerPromptSections` and
-    `DerivedCaseRecords`; no class of the package takes more), README, and amendments to this design for anything the build changed.
+    points, and 3.22's collaborator sentence: `DerivedCaseHistory` takes seven collaborators, as do `DerivedCaseRecords` and
+    `FolderDeliverableChecks`, and `OwnerPromptSections` eight; no class of the package takes more; as built, A.5.3 B11.1), README, and amendments to this design for anything the build changed.
 
 Backlog (out of scope, with the reason):
 - A one-off verdict settling P3 not-as-delivered notes and one-off client questions (8.5): consistent, but changes 0a.2 behaviour the row does not ask
@@ -2247,3 +2251,164 @@ decisions that followed. "Built in" names the plan commits (the plan is `.agents
 | PC-10 | `app/wire_health.py` gains `escape_counter(b) -> MailEscapeCounter`, used by the analyzer's provider and by `wire_progress.py`'s `HealthFailCounts` | 28, 34 |
 | PC-11 | The reflection test world passes a `CharterReader` as `DerivedCaseHistory`'s 7th collaborator (the charters of `agents.testing.fs_agents(d.root)` over disk, `d.agents` over memory) | 9 |
 | PC-12 | The README section is `## Quality (phase 0b)`, after the last `## Org growth: phase ...` section and before `## Security notes`, at most 30 lines (a new test caps it) | 32 |
+
+### A.5 As built (plan commit 49)
+
+Written after FEAT-001 to FEAT-010 and ARCHITECTURE.md (commit 48). Test runs and SCOPED summaries are in `.agents/tasks/verification.md` (never
+committed), not here. Where this appendix differs from an earlier section, this appendix wins. FEAT-012 (E6 replays, commits 50-52) and FEAT-013 (E7
+replays, commits 53-55) come after the code-review loop; each adds its pre-registration to 19.5 and its commits to the table below.
+
+#### A.5.1 Commit numbering
+
+The plan's numbering (section 23) held, with these differences: commit 5 was not needed (B2.1), and four commits were added (marked `extra`). 48 plan
+commits and 4 extra commits make 52 build commits, on top of the three design revisions.
+
+| Plan # | Commit | Subject | Note |
+|---|---|---|---|
+| rev 1-3 | `6e88ec1e` | docs(design): phase 0b, the quality view, rule-typed causes, the timeline, one-off cases and the noise study |  |
+| rev 1-3 | `37adc6ff` | docs(design): phase 0b revision 2, resolving the 25 design-review findings |  |
+| rev 1-3 | `522df84a` | docs(design): phase 0b revision 3, resolving review findings DR2-1 to DR2-14 and recording the manager's Q1-Q5 decisions | design revisions 1-3, rebased onto `b252d77c` |
+| 1 | `949f7681` | docs(design): phase 0b amended: review pass 3 (DR3-1 to DR3-7), the planner's corrections, the E5 decision (D-E5-6) and e5-gate section 4, D-E6-8 and e7-gate section 5 |  |
+| 2 | `23984bbb` | refactor(services): the base headings of a rework body are constants of services.api |  |
+| 3 | `ca4c0ecc` | refactor(services,reflection): P1's own-words rule is services.criterion_words |  |
+| 4 | `54bf7548` | refactor(services): contract_of, amendment_ids and version_in_force are public |  |
+| 5 | - | - | none: 0a.3 built `RunCounter.stamps` in 4.2's exact form (B2.1) |
+| 6 | `62916dde` | feat(reflection): CaseHistory.chains builds a service's cases from the mailboxes, with or without runs |  |
+| 7 | `3a54005f` | feat(reflection): a case counts its credited runs, its top-ups and whether its window was cut |  |
+| 8 | `b02b8293` | feat(reflection): root's one-off tasks are cases too |  |
+| 9 | `4de6b3b8` | feat(reflection,app): a case whose runs cannot be read says why; the case history reads the charters |  |
+| 10 | `40e780f1` | feat(reflection): deliveries, the verdicts that count for them, and who signed them off |  |
+| 11 | `a10f8ce0` | feat(reflection): every escape gets a cause typed by rule, and one attribution |  |
+| 12 | `f7df183a` | feat(reflection): the quality thresholds are tunable defaults from ORG.md |  |
+| 13 | `9c13952e` | feat(snapshots): the org's history lists the commits that changed some paths |  |
+| 14 | `d760a79d` | feat(reflection,app): charter and model changes come from the org's git history |  |
+| 15 | `0c595230` | feat(reflection): contract and playbook marks on the timeline (DR3-1) |  |
+| 16 | `eff90753` | feat(reflection): the deliverable checks return the file's write time and the settled findings |  |
+| 17 | `37c7294c` | feat(reflection,app): the records of the cases, with typed escapes and the timeline (CaseRecords) |  |
+| 18 | `783a4f54` | feat(reflection): the repeat and cost alarms, over the judged cases |  |
+| 19 | `4332ba2a` | feat(reflection): shown_name is public |  |
+| 20 | `12eaa3fb` | feat(services): root's feedback records the user's verdict on a one-off task |  |
+| 21 | `c9e9e879` | feat(reflection,mcp_server): the reply to a one-off verdict names the next step |  |
+| 22 | `a811ff59` | docs(mcp_server,services,cli): feedback says it takes one-off tasks |  |
+| 23 | `21b7c026` | docs(skill): step 5.6 records a one-off verdict the user states, with no extra question |  |
+| 24 | `fb60e4e6` | feat(progress): the tasks a blocked result holds runs on, and those left blocked |  |
+| 25 | `29dbd3be` | feat(progress): the text of a service block (DR3-2, DR3-6, PC-6, D-E5-6) |  |
+| 26 | `c9614f28` | feat(progress): the header, the one-off block, nested services and the moved-past section |  |
+| 27 | `4356dedf` | feat(progress): the same data as JSON (DR3-3, D-E5-6) |  |
+| 28 | `a28fcb5a` | feat(progress,app): the quality report over the records, the states, the budgets and the FAILs (PC-10) |  |
+| 29 | `0518a483` | feat(mcp_server,app,observability,kiro): root's quality tool, and its line in the instructions (PC-2) |  |
+| 30 | `a563fc89` | feat(cli,app): hirearchy quality [service] [--json] (PC-9) |  |
+| 31 | `48e6e39f` | test(e2e,reflection,progress): quality on real organizations, files that do not parse, no writes, no domain words |  |
+| 32 | `e757c0fb` | docs(readme): the quality view (PC-12) |  |
+| 33 | `afd81dc9` | feat(health): the health JSON carries the escapes that are not the verifier's and the causes it could not read |  |
+| 34 | `ff695605` | feat(health,app): health counts escapes by their typed cause (PC-3, PC-9, PC-10) |  |
+| 35 | `2e122807` | feat(health,mcp_server,cli): root's health shows the escapes that are not the verifier's (PC-9) |  |
+| 36 | `879455b8` | test(e2e): the view's verifier counts equal health's (I5) |  |
+| 37 | `3d761189` | fix(dashboard): the narrow workflows screen is captured only once its refresh is done |  |
+| 38 | `ee310aef` | feat(blueprint): the plan block shows up to 10 service checks |  |
+| 39 | `b7d59c74` | docs(skill): step 5.1 reads the result with inbox |  |
+| 40 | `a3b68b51` | test(testkit): the kit that builds an organization from a corpus's kept files |  |
+| 41 | `08742c9f` | test(e2e,golden): the replays of E, E2 and A5 (19.3 E-1..E-5, E2-1..E2-6, A5-1..A5-4) |  |
+| 42 | `be667225` | test(e2e,golden): the replays of E3, its firing variant and its JSON (E3-1..E3-8, DR3-3) |  |
+| 43 | `a8dc0a48` | test(e2e): the replays of E4 s1r, s2r and s3 (S1R-1..S1R-5, S2R-1..S2R-3, S3-1..S3-5, E4-all) |  |
+| 44 | `76f2ee66` | test(e2e): the cost check on corpora without run logs (19.4 as amended) |  |
+| extra | `10c77a10` | fix(reflection): the repeat line lists a rejection's reading that no human link confirms (design 9.3, DR2-3) | the manager's decision of 2026-10-25, option B for S1R-6 (B9.2) |
+| extra | `2d2f9c24` | docs(design): wasteful is the cost alarm's class by definition, not a field (design correction) | the manager's decision of 2026-10-25, option A for E3-9's `wasteful` clause (B9.2) |
+| extra | `a172a004` | test(e2e): the constructed variant of E3 that fires the cost alarm (E3-9) | E3-9, the constructed variant `r3-overspend`, added by commit 1 (B9.2) |
+| 45 | `6c419701` | docs(design): E5's expectations, pre-registered before any E5 replay test |  |
+| extra | `91e19597` | test(e2e): OQ-2's given delivery and P3's relayed finding on a real git history | the manager's condition on commit 45: OQ-2's main path and P3's `relayed` finding on a real git history (B10.1) |
+| 46 | `f08f5edb` | test(testkit): manifests for E5's streams |  |
+| 47 | `da20f537` | test(e2e): the replays of E5's three streams |  |
+| 48 | `f8ce0892` | docs(architecture): phase 0b's ports, records and the quality view |  |
+| 49 | the commit that adds this appendix | docs(design): phase 0b as built | this appendix, the as-built corrections of 8.2, 11.3, 11.5, 22 and 23, and the header |
+| 50-55 | after the code-review loop | E6 and E7 pre-registrations, manifests and replays | FEAT-012 and FEAT-013 |
+
+#### A.5.2 Goldens as built
+
+Against the plan (section 22, PC-8: 15 files regenerated, 18 file changes, 7 new): **17 files regenerated, 20 file changes, 8 new files.** The
+differences are three files that the new `quality` command made necessary (B6.4). `git diff --name-status main...HEAD` over the golden paths lists
+25 files: `tests/golden/expected` 14 (8 changed, 6 new; 661 insertions, 21 deletions) and the colocated `expected/` and `golden/` directories 11
+(9 changed, 2 new). No other golden changed: the dashboard goldens, `surface_manager*`, `surface_worker`, the health text goldens, `messages/*`,
+`events/*`, `files/*`, `charters/*` and `prompts/*` are byte-identical to `main`.
+
+| File | Method | Commit | Lines | Why |
+|---|---|---|---|---|
+| `tests/golden/expected/mcp/surface_root.txt`, `surface_root_unbound.txt`, `surface_root_setup_mode.txt` | G | 22, then 29 | 10 each, then +44 each | root `feedback` docstring (one-off tasks); the `quality` tool and its instructions line |
+| `tests/golden/expected/cli/help_feedback.txt` | G | 22 | 1 | the `task_id` help |
+| `src/hirearchy/cli/tests/expected/help_feedback.txt` | H | 22 | 1 | same |
+| `tests/golden/expected/cli/help.txt` | G | 30 | 4 added, 2 removed | `quality` in the command list |
+| `src/hirearchy/cli/tests/expected/help.txt` | H | 30 | same | same |
+| `tests/golden/expected/cli/health_json.txt` | G | 33 | +12, -4 | `not_its`, `causes_unknown` in `to_dict` |
+| `src/hirearchy/cli/tests/expected/health_json.txt`, `src/hirearchy/health/tests/expected/org_4000.json`, `org_3d.json`, `eng_4000_repr.txt` | H | 33 | the two fields per agent | same |
+| `tests/golden/expected/plans/propose_raw_template_analysis_service.txt`, `propose_filled_template_analysis_service.txt` | G | 38 | 1 each | the 6th check is shown |
+| `src/hirearchy/blueprint/tests/golden/second_half.json` | H | 38 | 2 | same |
+| `src/hirearchy/cli/tests/expected/no_command.txt`, `unknown_command.txt` | H | 30 | 3 | `quality` in the usage line and argparse's choices (**not in the plan**, B6.4) |
+| `tests/golden/expected/cli/help_quality.txt` | N | 30 | 8 | new command |
+| `src/hirearchy/cli/tests/expected/help_quality.txt` | H (copy of the N output) | 30 | 8 | same |
+| `src/hirearchy/cli/tests/expected/quality.txt` | N | 30 | 37 | the colocated suite requires a scenario for every command (**not in the plan**, B6.4) |
+| `tests/golden/expected/quality/empty_org.txt` | P | 28 | 7 | 9.3's empty-org sample |
+| `tests/golden/expected/quality/empty_service.txt` | P | 28 | 22 | 9.3's empty-service sample |
+| `tests/golden/expected/quality/a5_one_off_block.txt` | P | 41 | 18 | A5-4 |
+| `tests/golden/expected/quality/e3.txt` | P | 42 | 38 | E3-5 |
+| `tests/golden/expected/quality/e3.json` | N, reviewed key by key against 9.4 and the E3 text | 42 | 399 | E3-8 |
+
+Method: G = generated with `HIREARCHY_UPDATE_GOLDEN=1` and reviewed, H = a hand edit of the changed lines, P = pre-registered (copied by hand from this
+design, never generated), N = new file generated once.
+
+Count floors raised (`count.txt`, `main` to the build; none lowered, `tests/architecture/baseline_test_count.txt` unchanged): `reflection/tests`
+973 to 1306, `progress/tests` 348 to 465, `services/tests` 987 to 1005, `snapshots/tests` 153 to 169, `health/tests` 366 to 381, `mcp_server/tests` 391 to
+403, `cli/tests` 344 to 355, `app/tests` 1012 to 1045 (1043 before commit 48, which added the two parametrized ports), `blueprint/tests` 1310 to 1312,
+`kiro/tests` 723 to 724, `observability/tests` 597 to 598, `dashboard/tests` 108 to 109, `skill/tests` 131 to 133. `tests/` has no per-directory floor.
+`pyproject.toml` and `uv.lock` are unchanged. ROOT_INSTRUCTIONS measures `2597 2674 2814 27 120` (the plan's expectation, base plus 32); SKILL.md has
+125 lines.
+
+#### A.5.3 Deviations
+
+Each deviation was recorded in `verification.md` in its FEAT's section; this table is their consolidation. "Section" names the part of this design
+that an earlier text states differently; the as-built reading is the one here.
+
+| Id | Deviation | Why | Section |
+|---|---|---|---|
+| B2.1 | Commit 5 has no commit. | 0a.3 built `RunCounter.stamps` and the uncredited count of `runs_between` in 4.2's exact form, with their tests. | 4.2, 23 item 2 |
+| B2.2 | `chains` reads no contract, so the hand-down ceiling it computes starts from 0 where `cases` starts from the contract's budget. In the tested worlds `cases(...)` equals `chains(since=contract.created, runs=True)`, but the two can differ in `user_ceiling` and `unapproved_reworks` for a chain whose head task was handed less than the contract's budget. `user_approved(case, budget)` takes the budget from its caller, so the records and health read `max(budget, user_ceiling)` as designed. The pre-registered figures of E, E2 and A5 (on `chains(runs=False)`) held. | 0a.3's `_spend` takes the per-request budget; "chains reads no contract" and "cases becomes chains" cannot both hold. | 4.1 |
+| B2.3 | The fakes `FixedCaseHistory.chains` and `ListCaseHistory.chains` keep a case with no `started` time or `started >= since`; their `one_off_cases` return the cases with `service == ""`. | The plan did not specify the fakes. | 12.1 |
+| B3.1 | `not_on_a_delivery(case, deliveries)` has no `results` parameter. | The deliveries already carry the verdicts that are on a delivery. | 12.1 |
+| B3.2 | `unjudged_cases(cases, deliveries, *, relayed_only=False)` returns a tuple of case ids; `unseen_relayed` is derived by the renderer from `Delivery.given`. | A keyword keeps the return type and adds no public name. | 4.3, 12.1 |
+| B3.3 | `cause_of` has two keyword-only parameters beyond the plan, `version` (the carried contract version) and `answering` (the answering version). | Only the caller, which reads the stored versions, knows them (PC-4, `contract v{n} is not stored`). | 5.1, 12.1 |
+| B3.4 | In `cause_of`, rule 2's judged delivery uses the earliest human-tier verdict after each delivery's `done` result. It differs from `Delivery.counted` only for a delivery whose every human verdict is voided. | `cause_of` does not know a file's edit time. | 5.1 |
+| B3.5 | Details the design left open: `Cause.rules` lists only the matching rules 1 to 5 (empty for `untyped`); rule 2 picks the oldest matching relayed rework and the first shared path; `before_verdict` is the latest relayed rework delivered between the result and the verdict; rule 5's `detail` is the vocabulary entry in the order of `lasting`; the link a rule cites is the latest human-tier link note naming its first criterion, else the latest human-tier link note, else the verdict's own note; `Cause.removes` is set only when rule 4 wins. | Choices where 5.1 and 5.3 are silent. | 5.1, 5.3 |
+| B3.6 | `QualityThresholds` has two fields the design does not list, `cost_ratio_text` (the ratio as written) and `source` (`defaults`, or `ORG.md` when at least one valid value was read). The `{what}` words of the "is not {what}" notes are `a whole number of at least 1`, `a whole number from 1 to {window}` and `a number above 0`. A `quality:` key with a null value gets the "not a mapping" note. | The header and the notes need them. | 6 |
+| B4.1 | `GitClient.log` answers bytes: no path, or a limit below 1, answers `b""` without running git; `OrgHistory.changes` answers `[]` for it. | A negative limit would be git's "no limit". | 12.3 |
+| B4.2 | `BarChanges` is defined in `reflection/_ports.py`; its marks are annotations only there (`TYPE_CHECKING`), and `api.py` re-exports it. | `api.py` imports `_deliverables`, which imports `_ports`. | 12.1 |
+| B4.3 | The marks carry their words in a `.text` property, `ContractMark.parts` has one `(id, link)` per id of the answer, and `when` is `None` for a version whose file gives no time. An `answers` version is confirmed only by the user's link on the answered rejection, for removed ids as well as added ones. A removed `R<k>` that matches no assertion is shown as the rejection's message id. | DR3-1's tests live in `reflection`; a link on another rejection must not confirm a removal. | 7 |
+| B4.4 | `GitBarHistory` returns each file's marks newest first (files in the order asked, ORG.md last). `DerivedCaseRecords` asks `BarHistory.changes` once per `records()` call for every agent and gives each record the marks of its owner's team and ORG.md's (the one-off record: its assignees' teams), so the 40-commit bound is shared. A version that was deleted or is above 64 KiB counts in `skipped`. | One git read per call. | 7, 12.1 |
+| B4.5 | A delivery with several files that are not as delivered counts as edited since the earliest known write time (a write time of 0 is ignored; when none is known, nothing is voided). A `relayed` finding sets `Delivery.given` on the delivery it names. | 4.3 left several files open. | 4.3 |
+| B4.6 | `records(service)` raises the unknown-service `OrgError` with 13's text itself (top-level names first, then nested). The one-off record is always the last record and is present even when root gave no one-off task; the renderer decides what to print. | `progress` need not repeat the text. | 12.1, 13 |
+| B4.7 | The cost alarm skips a case with `runs not counted` before it tests `budget 0`. A one-off record's approved runs use each case's head task budget. | 6 lists the two reasons without an order. | 6 |
+| B4.8 | `Case.top_ups` marks take their time from the id of the task or note (`kernel.stamp_of`). A `PlaybookMark` counts the cited criteria from human-tier link notes only (P1's rule). `Rig.findings` in `test_deliverable_checks.py` zeroes `written` (those tests compare whole findings). `written` is set for the kinds `differs`, `relayed` and `unknown` only. | Reading the ids; P1's rule. | 7, 12.1 |
+| B5.1 | Two tests that the plan did not name pinned the pre-0b behaviour and were updated: `test_feedback.py::test_only_the_requester_gives_feedback_on_a_service_request` (root's refusal text) and `test_steps.py::test_feedback_step_is_empty_for_a_note_it_cannot_place` (a human reject on root's plain task now has the one-off step). | They pinned what 8 changes. | 8.1, 8.2 |
+| B5.2 | 8.2's last sentence ("the CLI prints the same step") is superseded by PC-5; the body is corrected above. | `FeedbackCommand` prints no step for service verdicts. | 8.2 |
+| B5.3 | SKILL.md step 5.6: the first line of the step is lengthened; the re-wrap of lines 98-100 is not done. The file keeps 125 lines. | The re-wrap would change 0a.4's line 100, which is kept word for word; SKILL.md has no line-length rule. | 11.3 |
+| B6.1 | A shared module `progress/_quality_facts.py` holds `RecordView`, `QualityView`, `MovedPast`, `HeldTask` and the pure fact functions that the text and the JSON both read, so the two cannot disagree. `_quality.py` also has `blocked_listing` and `service_name`. | One reader of each fact. | 12.4 |
+| B6.2 | Test names carry the label `not as delivered` in place of `hand-edited`; the plan's `..._has_null_ratio` is `..._has_no_ratio` in the text suite (the JSON null is in `test_null_rules_of_9_4`). | OQ-3. | 9 |
+| B6.3 | Choices the design left open: the notices `and {k} earlier case(s), counted above`, `and {k} earlier escape(s)` and `and {k} earlier` (timeline) follow the lines they cut; an id list shows the 10 newest, then `, and {k} more`; a mark whose file gives no time prints `time unknown`; the not-as-delivered and neither lists show the delivery's task id; `unseen_relayed` counts cases; several fired repeat subjects are joined by `; ` and several FIRES cost cases by `, `; the history line reads `none (...)` or `unknown (...)` followed by the remarks, and only the remarks when marks are listed; the `Thresholds:` line reads `from ORG.md quality:` literally; a signer missing from the FAIL counts reads `0 re-check(s), 0 author rework run(s)`; `its FAILs before delivery: unknown ({error})` carries the error; a nested record that cannot be read is `- {service} (offered by {owner}): cannot be read ({error}).`; an agent mailbox that cannot be read is listed in the moved-past section as `{addr}: blocked tasks cannot be read ({error})`. | 9.2 is silent on them. | 9.2 |
+| B6.4 | Goldens beyond the plan: `cli/tests/expected/no_command.txt` and `unknown_command.txt` (3 lines) and a new scenario `quality` with `cli/tests/expected/quality.txt` (37 lines). | The colocated suite pins the whole command list and requires a scenario for every command. | 22 |
+| B6.5 | `Org.init` makes the organization a git repository, so the fixture of the P golden `empty_service.txt` deletes `.git` (the sample says "no git"). The expected file is the design's sample, unchanged. | A fixture fix, not an edit of an expectation. | 9.3 |
+| B6.6 | `FixedQualityReport` renders the real text over the records a test puts in (default thresholds, no stalled state, no FAIL counts, no moved-past section) instead of answering a fixed string. | The contract suite then passes on both implementations. | 12.4 |
+| B7.1 | The 13 delivery-derivation tests of `health/tests/test_escapes.py` moved to `test_mail_signed_deliveries.py`, where they pin the fake `MailSignedDeliveries` that the flag and analyzer suites rely on (PC-3); two that pinned the changed behaviour are replaced (PC-9). | The `health/tests` floor holds. | 10 |
+| B7.2 | `tests/e2e/test_org_growth_0a.py::test_8_health_counts_the_escape_and_not_the_relayed_rework` pinned the pre-0b rule and is renamed `..._and_types_the_relayed_reworks_as_not_the_verifiers`: the user's reject of a relayed rework is now a judged delivery of type `relayed-error`. | It is the user-visible effect of 10. | 10, 25 |
+| B7.3 | `health/_escapes.py` holds `NOT_ITS`, the three cause names in the view's order; an unknown cause follows them in first-seen order. `health/tests/_support.py` gained the shared builders of the two escape test files. | One order for root's health text and the view. | 10 |
+| B7.4 | The escapes segment keeps its rule "shown only when `judged > 0`", and `not its` and `causes unknown` show inside it; the e2e check of I5 compares the owner with the escape lines, not with a verifier line, because the view lists no verifier line for an owner that signed alone. | 9.3's s1r sample. | 10, 15 I5 |
+| B8.1 | The flaky screen test was fixed in `SRC/dashboard/_widgets.py:NavTable.watch_virtual_size` (`notify_style_update()` drops the cell, row and line caches once the table has measured its columns), not in `_screens.py`, `_worlds.py` or `_app.py`. On the old code 20 of 3 100 captures differed (about 0.65 %), always `narrow-2-workflows`, always with the same cut table; a frame drawn before the table measured its columns stayed cached, so waiting never helped and a user could see it. After the fix, 0 of 300 under the same load, and the deterministic reproduction (a frame drawn just before the measure) went from 20 of 20 differing to 0 of 100, twice. No retry, no marker, no sleep, no golden changed. | The race is inside the app. | 11.5 |
+| B8.2 | The new test pins the condition through a host app that is one `NavTable` and a draw queued behind the table's wake-up, not through a capture of the demo screens. | The race cannot be made to happen in a capture without monkeypatching Textual. | 11.5 |
+| B8.3 | Plan section 4's three files for commit 38 were checked against the files rebased onto `b252d77c`: no difference. | 0a.3 and 0a.5 regenerated them for the budget text only. | 11.1, 22 |
+| B9.1 | The replay kit's `materialize(corpus, root, variant=None, *, manifest=None)` returns `root/org`; deliverables are `root/deliverables` (E4) or the never-created `root/no-deliverables`. The manifest has a `VARIANTS` entry, so it says "constructed". | The kit's own tests; 19.1 asked for the variant to be labelled. | 19.1 |
+| B9.2 | FEAT-009 has eight commits, not five. Two pre-registered expectations stopped it and the manager decided on 2026-10-25: S1R-6 follows the design (option B, `10c77a10`: a rejection's own reading that no human link confirms is listed as `not counted`, under every state), and E3-9's `failure_class wasteful` clause is dropped by a design correction (option A, `2d2f9c24`: `wasteful` is the class of a case the cost alarm counts, by definition, and is not a field). E3-9 itself is `a172a004`. No other expectation moved. | The design contradicted itself on `wasteful`; the code differed from 9.3 on the S1R-6 line. | 4.4, 9.3, 19.3 |
+| B9.3 | The per-id replay tests passed on arrival (the kit existed from commit 40), so their RED is the missing golden or kit file where there is one; mutations of their expectations each failed exactly one test. E2's kept charters: only the reviewer's is kept. | No RED is possible for a test written after what it tests. | 19.3 |
+| B10.1 | One commit beyond the plan, `91e19597`: tests on a real git history for OQ-2's main path (the delivery the user was given) and P3's `relayed` finding. The replay kit has no org git history, so the replays pin the no-git readings and label them "kit limit". | The manager's condition on commit 45. | 19.3, 19.5, 23 backlog |
+| B10.2 | The E5 expectation ids are `E5S<n>-k`, seven per stream, grouping the gate's items 2 to 8; the approved runs under 0a.5 A2 are 17, 14 and 14 for memo 1 (17 for s1's memo 3), where e5-gate section 4 item 2 read 15, 17 and 14. All 24 E5 tests passed on arrival: no pre-registered expectation failed. | A.3 and 19.3. | 19.3 |
+| B10.3 | OQ-4 on s3: the writer holds 2 runs behind its blocked task `...-lead-4a85`, which `mail.moved_past` does not release, and the lead sent the writer nothing afterwards, so nothing is left blocked and the moved-past section lists no agent. Recorded as a finding for the manager; the section is unchanged. | OQ-4 decided "no". | 4.5, 28.1 |
+| B11.1 | `OwnerPromptSections` takes eight collaborators, not seven (0a.5 added the regressions part, and the listing is a collaborator). `DerivedCaseHistory`, `DerivedCaseRecords` and `FolderDeliverableChecks` take seven. ARCHITECTURE.md 3.22 states the real counts. | The plan's sentence predates 0a.5. | 23 item 11 |
+| B11.2 | `DerivedQualityReport` takes nine collaborators (12.4 lists them). R7 caps the methods of a Protocol, not constructor parameters. | Each is a narrow port. | 12.4 |
+| B11.3 | ARCHITECTURE.md 3.21 (`services`) does not list the new public names of `services.api` (`contract_of`, `amendment_ids`, `version_in_force`, `criterion_words`, the base-heading constants, the one-off refusals in `_feedback.py`). Commit 48's list did not include them. | Out of the plan's scope for commit 48. | 12.2 |
+| M1 | Commit messages carry figures that are wrong and are not amended: commit 7 (`984 -> 995`, real 993), 21 (the `cli` and `mcp_server` raises named the wrong way round), 22 (an unfinished phrase in its golden list; real 6 added and 4 removed per `surface_root*`), 26 (`411 -> 435`, `24 added`; real 427 and 16), 30 (`3 new files`; real 4), 33 ("5 below"; real 2). | Commits are never amended. | - |
