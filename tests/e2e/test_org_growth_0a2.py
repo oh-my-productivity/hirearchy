@@ -247,6 +247,7 @@ def assistant_edits_the_copy(tmp_path):
 
 
 def test_s1r_t8_the_artifact_path_is_withheld_while_the_question_is_open(tmp_path):
+    """E4's calls #36 to #40. D-E7-2 C (DR-0a5-1): the assistant's own (relayed) accept settles neither the flag nor the withheld finding; the user's does."""
     w, task = memo_2_delivered(tmp_path)
     shown = call(w.root, "progress", task_id=task)  # E4's call #36: it flagged the question and still gave the path
     assert "artifacts withheld (ask first)" in shown and FLAG in shown and MEMO_2 not in shown
@@ -258,11 +259,13 @@ def test_s1r_t8_the_artifact_path_is_withheld_while_the_question_is_open(tmp_pat
         assert withheld in out and MEMO_2 not in out, tool  # root is told, in all three, and the path is in none of them
     listed = call(w.root, "progress", task_id=task)
     assert listed.index("Deliverable folder") > listed.index(f"(task {task})")  # the note follows the task line
-    call(w.root, "feedback", task_id=task, verdict="accept")  # the assistant's own accept after its own edit (relayed): it rates the case ...
+    call(w.root, "feedback", task_id=task, verdict="accept")  # the assistant's own accept (relayed): since D-E7-2 C it settles nothing
     shown = call(w.root, "progress", task_id=task)
-    assert "withheld" not in shown and f"artifacts: {MEMO_2}," in shown  # ... so the flag ends,
-    assert f'"memo-2026-10-12.md": differs from {MEMO_2} as the team checked it (task {task})' in shown  # ... but the finding stays
-    call(w.root, "feedback", task_id=task, verdict="accept", source="human")  # the user's own verdict after the edit settles it
+    assert "artifacts withheld (ask first)" in shown and FLAG in shown and MEMO_2 not in shown  # the flag stays ...
+    assert withheld in shown  # ... and so does the withheld finding
+    call(w.root, "feedback", task_id=task, verdict="accept", source="human")  # the user's own verdict settles both
+    shown = call(w.root, "progress", task_id=task)
+    assert f"artifacts: {MEMO_2}," in shown and "withheld" not in shown and FLAG not in shown
     for tool, args in (("progress", {"task_id": task}), ("status", {}), ("whoami", {})):
         assert "Deliverable" not in call(w.root, tool, **args), tool
 

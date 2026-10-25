@@ -36,8 +36,8 @@ def case(tasks: list[Message], verdicts: list[Verdict] | None = None, reworks: i
     )
 
 
-def verdict(step: int, task: Message) -> Verdict:
-    return Verdict("accept", "", None, task.id, step, task)
+def verdict(step: int, task: Message, tier: str = "human") -> Verdict:
+    return Verdict("accept", "", None, task.id, step, task, tier=tier)
 
 
 def test_it_is_a_task_lines(w: ProgressWorld) -> None:
@@ -185,6 +185,20 @@ def test_a_relayed_rework_keeps_the_flag(w: ProgressWorld) -> None:  # DR-17
     done = w.answer(first, "done", QUESTIONS, 0)
     rework(w, first, "relayed")
     assert "2 questions for the client: ask the user before you copy or deliver" in lines(w).line(first, done, NOW)
+
+
+def test_a_relayed_reject_keeps_the_path_withheld_and_still_counts_as_feedback(w: ProgressWorld) -> None:
+    """D-E7-2 C: the assistant's own (relayed) verdict settles no question (flag and withheld path stay) but is still a verdict, so no ``no feedback yet``;
+    the user's own verdict settles the questions."""
+    first = request(w)
+    done = w.answer(first, "done", QUESTIONS, 0)
+    relayed = FixedCaseHistory([case([first], [verdict(0, first, tier="relayed")])])
+    out = lines(w, history=relayed).line(first, done, NOW)
+    assert f". artifacts withheld (ask first). 2 questions {FLAG}. " in out and "a/b.md" not in out
+    assert "no feedback yet" not in out
+    human = FixedCaseHistory([case([first], [verdict(0, first)])])
+    settled = lines(w, history=human).line(first, done, NOW)
+    assert ". artifacts: a/b.md. " in settled and FLAG not in settled and "no feedback yet" not in settled
 
 
 def test_a_one_off_task_keeps_its_flag_until_a_human_rework_revises_it(w: ProgressWorld, task: Message) -> None:

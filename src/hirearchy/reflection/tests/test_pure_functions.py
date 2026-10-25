@@ -359,6 +359,29 @@ def test_no_cases_gives_no_unrated() -> None:
     assert delivered_unrated([]) == ()
 
 
+def test_rated_human_counts_only_the_users_own_verdict() -> None:
+    """D-E7-2 C: ``rated(case, task, human=True)`` is ``rated`` with only human-tier verdicts; the default stays any tier."""
+    first, second = chain("1", "2")
+    for tier, counts in (("human", True), ("relayed", False), ("agent", False)):
+        found = case_with([first, second], verdict_at(0, [first, second], tier=tier, kind="accept"))
+        assert rated(found, first, human=True) is counts, tier
+        assert rated(found, first) is True, tier  # any tier, as before
+
+
+def test_rated_human_follows_the_step_of_the_task() -> None:
+    """D-E7-2 C: a human verdict at the task's step or after it rates the task; one before it does not; a relayed one after it does not either."""
+    first, second, third = chain("1", "2", "3")
+    tasks = [first, second, third]
+    at = case_with(tasks, verdict_at(1, tasks))
+    assert rated(at, second, human=True) is True  # at the task's step
+    assert rated(at, first, human=True) is True  # after the task's step (a later rework's verdict)
+    assert rated(at, third, human=True) is False  # before the task's step
+    relayed_after = case_with(tasks, verdict_at(0, tasks, tier="human"), verdict_at(2, tasks, tier="relayed", n=2))
+    assert rated(relayed_after, second, human=True) is False  # the human verdict is before step 1 and the relayed one does not count
+    assert rated(relayed_after, second) is True
+    assert rated(None, first, human=True) is False and rated(case_with(tasks), first, human=True) is False
+
+
 # ------------------------------------------------------------------------------ questions_open
 
 # D-E6-1 (A2): ``questions_open`` counts only the items that name a criterion id (``C<k>``); these two do, so the tests below keep testing the question path.
@@ -399,6 +422,26 @@ def test_a_relayed_rework_does_not_settle_questions() -> None:
         assert questions_open(task, result, case_with([task]), [root_rework(task, source)]) == 2  # 0a.1 DR-17
     not_a_rework = Message(sender="root", to="ceo", type="note", body="b", revises=task.id, source="human")
     assert questions_open(task, result, case_with([task]), [not_a_rework]) == 2
+
+
+def test_a_relayed_or_agent_verdict_settles_no_question_and_a_human_one_does() -> None:
+    """D-E7-2 C: only the user's own verdict (human tier) on the delivery or on a later rework of it settles the questions and the notes."""
+    first, second = chain("1", "2")
+    tasks = [first, second]
+    result = answered(first, "done", MIXED)
+    for tier in ("relayed", "agent"):
+        for kind in ("accept", "reject"):
+            for step in (0, 1):  # at the task's step and at a later one
+                case = case_with(tasks, verdict_at(step, tasks, tier=tier, kind=kind))
+                assert questions_open(first, result, case, []) == 2, (tier, kind, step)
+                assert open_client_items(first, result, case, []) == BOTH, (tier, kind, step)
+    for kind in ("accept", "reject"):
+        for step in (0, 1):
+            case = case_with(tasks, verdict_at(step, tasks, kind=kind))
+            assert questions_open(first, result, case, []) == 0, (kind, step)
+            assert open_client_items(first, result, case, []) == ClientItems(), (kind, step)
+    relayed_then_human = case_with(tasks, verdict_at(0, tasks, tier="relayed", n=1), verdict_at(1, tasks, tier="human", kind="accept", n=2))
+    assert questions_open(first, result, relayed_then_human, []) == 0  # a human verdict on the later rework settles it
 
 
 def test_no_questions_gives_0() -> None:

@@ -240,6 +240,21 @@ def test_withheld_while_questions_are_open(w: ReflectionWorld) -> None:
     assert r.findings()[0].withheld is False and r.findings()[0].artifact == MEMO
 
 
+def test_a_relayed_verdict_alone_keeps_the_path_withheld(w: ReflectionWorld) -> None:
+    """D-E7-2 C: the assistant's own (relayed) verdict on the delivery settles no question, so the finding stays withheld ("path withheld: ask first");
+    the user's own rework releases it."""
+    service(w)
+    r = rig(w)
+    task = ask(w, "ai")
+    checked(r, done(w, task, MEMO, questions=["C1: Keep Marta's row?"]), MEMO, b"team v1\n")
+    put(r, {"memo.md": b"edited\n"})
+    rate(w, task, "accept", source="relayed")
+    (found,) = r.findings()
+    assert (found.kind, found.withheld, found.task) == ("differs", True, task.id)
+    rework(w, task)  # the user's own rework answers the questions (a human verdict after the edit settles the finding itself)
+    assert r.findings()[0].withheld is False and r.findings()[0].artifact == MEMO
+
+
 def test_notes_only_withhold_nothing_and_a_question_with_the_notes_does(w: ReflectionWorld) -> None:
     """D-E6-1 (A2): a result whose block holds only notes (no criterion id) is not withheld, so the finding carries its path; with a ``C<k>`` question it is."""
     service(w)

@@ -5,14 +5,15 @@ No scheduler, no LLM, no network: ``testkit.e7_replay.materialize`` rebuilds the
 agents, contract), and the product's own readers read it. A missing evidence file fails the test, never skips it.
 
 This module holds the replays of D-E7-2 A (A2 and A1): E7 s2 memo 1, where the user's rework c671 was handed the default's 1 run while nothing was left
-of the 12 runs the user approved.
+of the 12 runs the user approved; those of D-E7-2 C (E7 s1 6920: only the user's verdict settles the questions for the client).
 """
 
 import pytest
 from testkit.e7_replay import materialize
 
 from hirearchy.core import ROOT, Org
-from hirearchy.reflection import user_approved, user_cost
+from hirearchy.progress import progress
+from hirearchy.reflection import questions_open, user_approved, user_cost
 
 SERVICE = "weekly-meeting-memo"
 THREE_CA4 = "20261025T074451197103-root-3ca4"
@@ -82,3 +83,32 @@ def test_a1_e7_s2_20_the_top_up_asks_for_2_and_names_the_default_run(tmp_path):
         "its own run is beyond them, and the ask includes it. Ask the user now for 2 more run(s), with that number; on yes, grant 2: "
         'send(to="lead", budget=2, body=<why>) (CLI: hirearchy send lead "<why>" --budget 2).'
     )
+
+
+S1_6920 = "20261025T071152630842-root-6920"
+
+
+def s1_6920(tmp_path, cut):
+    """E7 s1 at ``cut``: the questions still open on 6920's result c3d0, and 6920's own line (the first line of its progress)."""
+    org = Org(materialize("s1", cut, tmp_path / "org"))
+    task = sent(org, S1_6920)
+    result = next(m for box in ("read", "inbox") for m in org.messages(ROOT, box) if m.id.endswith("-lead-c3d0"))
+    case = the_case(org, S1_6920)
+    return questions_open(task, result, case, org.sent(ROOT)), progress(org, task_id=S1_6920).splitlines()[0]
+
+
+def test_c_e7_s1_6920_a_relayed_reject_leaves_the_4_questions_open_and_the_path_withheld(tmp_path):
+    """C (E7 s1 after #39, D-E7-2, design 5.3): the assistant's own reject 1b8f of 6920 (relayed) settled the 4 questions of c3d0 at 18a4531 and the
+    path was shown. Now they stay open: the path is withheld and the flag is there. A relayed verdict still counts as feedback (no ``no feedback yet``)."""
+    open_questions, line = s1_6920(tmp_path, "20261025T071711763028")
+    assert open_questions == 4
+    assert "artifacts withheld (ask first). 4 questions for the client: ask the user before you copy or deliver." in line
+    assert "no feedback yet" not in line
+
+
+def test_c_e7_s1_6920_the_human_accept_settles_them(tmp_path):
+    """C (E7 s1 after #47, D-E7-2, design 5.3): the user's own accept 9496 (of 066f, the rework of the chain) settles the questions: the path returns."""
+    open_questions, line = s1_6920(tmp_path, "20261025T072107513137")
+    assert open_questions == 0
+    assert "artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/review-memo-2026-10-05.md" in line
+    assert "questions for the client" not in line

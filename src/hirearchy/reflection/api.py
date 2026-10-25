@@ -224,12 +224,13 @@ def confirmed_criteria(cases: Sequence[Case], criteria: Sequence[Criterion]) -> 
     return frozenset(x for c in cases for v in c.verdicts for x in v.confirmed if counts(v, x))
 
 
-def rated(case: Case | None, task: Message) -> bool:
-    """Has the client given a verdict (any tier) on this delivery or on a later rework of it? An earlier verdict does not count (pure)."""
+def rated(case: Case | None, task: Message, *, human: bool = False) -> bool:
+    """Has the client given a verdict on this delivery or on a later rework of it? Any tier; with ``human``, only the user's own (``tier ==
+    "human"``, D-E7-2 C). An earlier verdict does not count (pure)."""
     if case is None:
         return False
     step = next((i for i, t in enumerate(case.tasks) if t.id == task.id), 0)
-    return any(v.step >= step for v in case.verdicts)
+    return any(v.step >= step and (not human or v.tier == "human") for v in case.verdicts)
 
 
 ITEM_CHARS = 160  # each listed client item is cut to this many characters
@@ -238,13 +239,13 @@ ITEMS_SHOWN = 5  # at most this many are listed; the rest are counted
 
 def open_client_items(task: Message, result: Message, case: Case | None, root_sent: Sequence[Message]) -> ClientItems:
     """The client items (``kernel.client_items``: questions and notes) of a ``done`` or ``blocked`` result that nothing has settled (pure): none when
-    there are none, when ``task`` is a service request and ``rated(case, task)``, or when ``root_sent`` holds a task with ``revises == task.id`` and
-    ``source == "human"``; else the split. The user's own rework of the task or the client's verdict on the delivery settles questions and notes
-    together; the assistant's own (relayed) rework settles neither (0a.1 DR-17)."""
+    there are none, when ``task`` is a service request and ``rated(case, task, human=True)``, or when ``root_sent`` holds a task with ``revises ==
+    task.id`` and ``source == "human"``; else the split. The user's own rework of the task or the user's verdict (human tier) on the delivery or on a
+    later rework of it settles questions and notes together; the assistant's own (relayed) rework or verdict settles neither (0a.1 DR-17; D-E7-2 C)."""
     if result.status not in ("done", "blocked"):
         return ClientItems()
     items = client_items(result.body)
-    if not (items.questions or items.notes) or (task.service and rated(case, task)):
+    if not (items.questions or items.notes) or (task.service and rated(case, task, human=True)):
         return ClientItems()
     reworked = any(t.type == "task" and t.revises == task.id and t.source == "human" for t in root_sent)
     return ClientItems() if reworked else items
@@ -252,8 +253,8 @@ def open_client_items(task: Message, result: Message, case: Case | None, root_se
 
 def questions_open(task: Message, result: Message, case: Case | None, root_sent: Sequence[Message]) -> int:
     """The questions for the client of a ``done`` or ``blocked`` result that nothing has settled (pure): the open client items that name a criterion
-    id (``C<k>``; the others are notes, D-E6-1), counted as ``open_client_items`` settles them. ``progress`` withholds the artifact path while this
-    is above 0 and the deliverable checks do the same."""
+    id (``C<k>``; the others are notes, D-E6-1), counted as ``open_client_items`` settles them: only the user's own rework or human-tier verdict
+    does (D-E7-2 C). ``progress`` withholds the artifact path while this is above 0 and the deliverable checks do the same."""
     return len(open_client_items(task, result, case, root_sent).questions)
 
 
