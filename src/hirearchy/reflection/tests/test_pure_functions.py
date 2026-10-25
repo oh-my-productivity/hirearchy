@@ -11,6 +11,7 @@ from hirearchy.reflection import (
     ITEM_CHARS, ITEMS_SHOWN, Case, Verdict, case_spend, confirmed_criteria, delivered_unrated, items_listing, lessons_of, open_client_items,
     questions_open, rated, user_approved, user_committed, user_cost, user_spend, version_at,
 )
+from hirearchy.reflection.api import _user_back
 from hirearchy.services import Criterion
 
 T = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -110,7 +111,7 @@ def test_case_spend_of_a_case_with_nothing_handed_down_is_its_runs() -> None:
 
 def hand_built(
     tasks: list[tuple[int, str | None]], state: str = "done", runs: int = 0, returned: int = 0, *, relayed_runs: int = 0, relayed_returned: int = 0,
-    relayed_overlap: int = 0, user_granted: int = 0, user_ceiling: int = 0,
+    relayed_overlap: int = 0, user_granted: int = 0, user_ceiling: int = 0, relayed_to_user: int = 0,
 ) -> Case:
     """A case of a chain of ``(budget, source)`` tasks, with the numbers the pure functions read."""
     chain = [Message(sender="root", to="ceo", type="task", body="b", title="t", budget=b, source=src) for b, src in tasks]
@@ -118,6 +119,7 @@ def hand_built(
         id="A", service="s", owner="ceo", tasks=chain, result=None, state=state, playbook=0, used=0, reworks=len(chain) - 1,
         budget=sum(b for b, _ in tasks), runs=runs, lessons=[], verdicts=[], started=None, finished=None, returned=returned, relayed_runs=relayed_runs,
         relayed_returned=relayed_returned, relayed_overlap=relayed_overlap, user_granted=user_granted, user_ceiling=user_ceiling,
+        relayed_to_user=relayed_to_user,
     )
 
 
@@ -163,6 +165,33 @@ def test_user_committed_ignores_the_state_and_counts_the_user_grants() -> None:
         case = hand_built([(12, None)], state, runs=5, returned=0, user_granted=3)
         assert user_committed(case) == 5 + (12 + 3 - 5)
     assert user_committed(hand_built([(12, None), (6, "relayed")], "done", runs=9, returned=5, relayed_runs=4, relayed_returned=1)) == 5 + (12 - 5 - 4)
+
+
+def test_user_spend_and_user_committed_read_the_runs_a_relayed_result_carried_back_to_the_user() -> None:
+    """D-E6-2, B1 (E6 s3's 9a5b): 5 user runs, 12 handed down, 6 of the relayed result's return are the user's: 5 + (12 - 5 - 6) = 6, in both."""
+    for state in ("open", "blocked"):
+        case = hand_built([(12, None), (6, "relayed")], state, runs=10, returned=6, relayed_runs=5, relayed_returned=6, relayed_to_user=6)
+        before = hand_built([(12, None), (6, "relayed")], state, runs=10, returned=6, relayed_runs=5, relayed_returned=6)
+        assert user_spend(case) == user_committed(case) == 5 + (12 - 5 - 6)
+        assert user_spend(before) == user_committed(before) == 5 + (12 - 5)  # the 6 read as held, as before B1
+    done = hand_built([(12, None), (6, "relayed")], "done", runs=10, returned=6, relayed_runs=5, relayed_returned=6, relayed_to_user=6)
+    assert user_spend(done) == 5 and user_committed(done) == 6  # a finished case costs its runs; a new rework still draws on what is held
+
+
+def test_user_spend_and_user_committed_use_one_helper() -> None:
+    """D-E6-2, B1: both read ``_user_back``, so they cannot drift apart (0b reuses ``user_spend`` and ``user_approved``)."""
+    case = hand_built([(12, None), (6, "relayed")], "open", runs=10, returned=7, relayed_runs=5, relayed_returned=6, relayed_to_user=2)
+    assert _user_back(case) == 7 - 6 + 2
+    assert user_spend(case) == user_committed(case) == 5 + max(0, 12 - 5 - _user_back(case))
+
+
+def test_user_committed_is_never_below_the_users_charged_runs() -> None:
+    """D-E6-2, B1: whatever the relayed results carried back, the user is credited no more than the team held: ``left`` never exceeds what the user
+    approved and has not used."""
+    for to_user in (0, 1, 6, 50, 10_000):
+        for state in ("done", "open", "blocked"):
+            case = hand_built([(12, None), (6, "relayed")], state, runs=10, returned=6, relayed_runs=5, relayed_returned=6, relayed_to_user=to_user)
+            assert user_committed(case) >= case.runs - case.relayed_runs and user_spend(case) >= case.runs - case.relayed_runs
 
 
 def test_user_approved_is_the_contract_budget_for_a_hand_built_case_and_the_ceiling_when_that_is_higher() -> None:

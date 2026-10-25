@@ -25,6 +25,7 @@ class _Spend:
 
     relayed_runs: int
     relayed_returned: int
+    relayed_to_user: int
     relayed_overlap: int
     unsplit_runs: int
     user_granted: int
@@ -45,12 +46,26 @@ def _spend(
 
     handed_down = [m for m in sent if m.type == "note" and m.budget > 0 and m.to in team and m.id[:21] >= start and (end is None or m.id[:21] <= end)]
     grants = sorted((m for m in handed_down if human and not in_relayed(m.id[:21])), key=lambda m: m.id)  # the user grants
+
+    def back_to_user(k: int, t: Message) -> int:
+        """What the latest result of the relayed task ``t`` (the k-th of the chain) carried back beyond what ``t`` still had: its budget and the
+        client's grants in its interval, less the charged runs in its interval. Those were the user's runs the team held. 0 for an agent client, a
+        task that is not relayed, no result, and a result that came after ``t``'s successor was sent (its interval then misses some of its runs)."""
+        r = results.get(t.id)
+        if not human or t.source != "relayed" or r is None or (k + 1 < len(tasks) and r.id >= tasks[k + 1].id):
+            return 0
+        funds = t.budget + sum(n.budget for n in handed_down if _within(n.id[:21], bounds[k]))
+        ran = sum(1 for s in charged if _within(s, bounds[k]))
+        return max(0, r.budget - max(0, funds - ran))
+
+    to_user = {t.id: back_to_user(k, t) for k, t in enumerate(tasks)}
     users = [t for t in tasks if t.source != "relayed"]
     ceiling = 0
     for h in sorted([*users, *grants], key=lambda m: m.id) if human else []:  # the hand-downs, oldest first
         runs = sum(1 for s in charged if s < h.id[:21] and not in_relayed(s))
         handed = sum(t.budget for t in users if t.id < h.id) + sum(g.budget for g in grants if g.id < h.id)
         back = sum(min(r.budget, t.budget) for t in users if t.id < h.id and (r := results.get(t.id)) is not None and r.id < h.id)
+        back += sum(to_user[t.id] for t in tasks if t.id < h.id and (r := results.get(t.id)) is not None and r.id < h.id)
         ceiling = max(ceiling, runs + max(0, handed - runs - back) + h.budget)
     overlap, overlapped = 0, []
     for k, t in enumerate(tasks[:-1]):  # relayed runs that can lie in a later user interval
@@ -70,7 +85,7 @@ def _spend(
     return _Spend(
         relayed_runs=sum(1 for s in charged if in_relayed(s)),
         relayed_returned=sum(min(r.budget, t.budget) for t in tasks if t.source == "relayed" and (r := results.get(t.id)) is not None),
-        relayed_overlap=overlap, unsplit_runs=unsplit, user_granted=sum(g.budget for g in grants), user_ceiling=ceiling,
+        relayed_to_user=sum(to_user.values()), relayed_overlap=overlap, unsplit_runs=unsplit, user_granted=sum(g.budget for g in grants), user_ceiling=ceiling,
     )
 
 
@@ -157,7 +172,7 @@ class DerivedCaseHistory(CaseHistory):
                 finished=msg_time(res) if res is not None and final else None,
                 client_kind=kind, relayed_reworks=sum(t.source == "relayed" for t in tasks[1:]),
                 returned=sum(min(r.budget, t.budget) for t in tasks if (r := results.get(t.id)) is not None),
-                relayed_returned=spend.relayed_returned, relayed_overlap=spend.relayed_overlap, unsplit_runs=spend.unsplit_runs,
+                relayed_returned=spend.relayed_returned, relayed_to_user=spend.relayed_to_user, relayed_overlap=spend.relayed_overlap, unsplit_runs=spend.unsplit_runs,
                 user_granted=spend.user_granted, user_ceiling=spend.user_ceiling,
             ))
         return out

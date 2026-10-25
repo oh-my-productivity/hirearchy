@@ -5,7 +5,7 @@ No scheduler, no LLM, no network: ``testkit.e6_replay.materialize`` rebuilds the
 agents, contract), and the product's own ``progress`` and ``client_items`` read it. A missing evidence file fails the test, never skips it.
 
 This module holds the replays of D-E6-1 (A1 and A2): A-1 to A-5, the question block of the results 8613, 762f, 6c63 and d80f, and of every result with a
-block that root received in E6's three streams.
+block that root received in E6's three streams; and those of D-E6-2 (B): B-1 and B-2, the user's runs the team held or got back in E6's s3 memo 1.
 """
 
 import re
@@ -16,6 +16,7 @@ from testkit.e6_replay import EV6, materialize
 from hirearchy.core import ROOT, Org
 from hirearchy.kernel import client_items
 from hirearchy.progress import progress
+from hirearchy.reflection import user_approved, user_committed, user_spend
 
 SERVICE = "weekly-memo"
 
@@ -91,3 +92,27 @@ def test_a5_every_recorded_result_holds_49_items_47_questions_and_2_notes():
     assert len(results) == 19
     assert sum(len(r.questions) + len(r.notes) for r in results) == 49
     assert sum(len(r.questions) for r in results) == 47 and sum(len(r.notes) for r in results) == 2
+
+
+def the_case(org, task_id):
+    """The case of ``lead``'s service that holds the task ``task_id``."""
+    (case,) = [c for c in org.runtime.case_history.cases("lead", SERVICE) if task_id in {t.id for t in c.tasks}]
+    return case
+
+
+def test_b2_9a5b_the_runs_the_relayed_result_carried_back_are_the_users_and_the_rework_asks_for_nothing(tmp_path):
+    """B-2 (E6 s3 #36, D-E6-2): 5d4a (relayed, 6 runs, 5 charged) was answered by 406b with a return of 7: 6 are the user's runs coming back. At 9a5b the
+    user has committed 12 of the 17 approved (0a.3 read 18 of 18 and said "Ask the user now for 4 more run(s)"), so the step is empty."""
+    org = Org(materialize("s3", "20261024T172453163611", tmp_path / "org"))
+    nine = next(m for m in org.sent(ROOT) if m.id == "20261024T172453163611-root-9a5b")
+    case = the_case(org, nine.id)
+    assert case.relayed_to_user == 6
+    assert user_approved(case, 16) - user_committed(case) == 5 and user_spend(case) == 12
+    assert org.runtime.service_steps.rework_step(nine) == ""
+
+
+def test_b2_just_before_9a5b_the_default_hand_down_is_what_the_user_has_left(tmp_path):
+    """B-2 (E6 s3 #36, D-E6-2): before 9a5b, 5d4a's 1 unspent run was all it still had, so 406b's 7 carry 6 back to the user: the default hand-down is 6
+    (it was 1: nothing was left)."""
+    org = Org(materialize("s3", "20261024T172453163610", tmp_path / "org"))
+    assert org.runtime.case_allowance.left("lead", SERVICE, "20261024T171425096624-root-bc02") == 6

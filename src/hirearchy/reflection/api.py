@@ -101,6 +101,7 @@ class Case:
     returned: int = 0  # the runs the results of the chain carried back: each result counts at most its own task's budget
     relayed_runs: int = 0  # 0b 4.2: the charged runs whose stamp lies in the interval of a relayed task, from its send to its successor's (the window's end for the last task, inclusive)
     relayed_returned: int = 0  # the runs the results of the relayed tasks carried back: each counts at most its own task's budget
+    relayed_to_user: int = 0  # the user's runs that results of relayed tasks carried back beyond what each relayed task still had (D-E6-2); 0 for an agent client and without a relayed task
     relayed_overlap: int = 0  # the most of an unanswered relayed task's runs that can lie in a later user interval (its split is by send time)
     unsplit_runs: int = 0  # the charged runs in the user intervals after the first overlapped relayed task: counted with the user's, 0 without overlap
     user_granted: int = 0  # the budgets of the user grants: notes of a human client (root) in a user interval; 0 for an agent client
@@ -156,14 +157,21 @@ def case_spend(case: Case) -> int:
     return case.runs + still_out
 
 
+def _user_back(case: Case) -> int:
+    """What came back of the user's runs: their own results' returns (each at most its task's budget) and the user's runs that relayed results
+    carried back (``relayed_to_user``). The one helper of ``user_spend`` and ``user_committed``."""
+    return case.returned - case.relayed_returned + case.relayed_to_user
+
+
 def user_spend(case: Case) -> int:
     """The runs a case costs the user (pure): ``case_spend`` restricted to the user's requests, the tasks of the chain that are not relayed
-    reworks. Equal to ``case_spend`` when the chain has no relayed rework."""
+    reworks, less the user's runs that a relayed result carried back (``_user_back``). Equal to ``case_spend`` when the chain has no relayed
+    rework."""
     runs = case.runs - case.relayed_runs
     if case.state in ("done", "failed"):
         return runs
     budget = sum(t.budget for t in case.tasks if t.source != "relayed")
-    return runs + max(0, budget - runs - (case.returned - case.relayed_returned))
+    return runs + max(0, budget - runs - _user_back(case))
 
 
 def user_cost(case: Case) -> int:
@@ -173,10 +181,11 @@ def user_cost(case: Case) -> int:
 
 
 def user_committed(case: Case) -> int:
-    """What the user's requests used or the team still holds for them, whatever the case's state (pure): what a new rework draws on."""
+    """What the user's requests used or the team still holds for them, whatever the case's state (pure): what a new rework draws on. The user's
+    runs that a relayed result carried back (``_user_back``) are no longer held."""
     runs = case.runs - case.relayed_runs
     budget = sum(t.budget for t in case.tasks if t.source != "relayed") + case.user_granted
-    return runs + max(0, budget - runs - (case.returned - case.relayed_returned))
+    return runs + max(0, budget - runs - _user_back(case))
 
 
 def user_approved(case: Case, budget: int) -> int:

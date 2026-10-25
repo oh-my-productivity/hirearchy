@@ -336,6 +336,97 @@ def test_the_ceiling_of_e5s_s1_t6_is_17(tmp_path):
     assert reflection.user_spend(case) == 10 and reflection.user_approved(case, 12) == 17
 
 
+def relayed_return(w, *, returned, runs=5, grant_to=None, successor=False):
+    """A user request, then a relayed rework (6 runs handed down) with ``runs`` runs in its interval, optionally a grant of 4 to the team inside it,
+    answered with ``returned`` runs; ``successor``: the user's rework was sent first, so the relayed result came after its successor."""
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=1)
+    relayed = sup.rework(w, head, source="relayed", budget=6)
+    if grant_to:
+        grant(w, 4, to=grant_to)
+    if successor:
+        sup.rework(w, relayed, budget=2)
+    sup.deliver(w, relayed, runs=runs, budget=returned)
+    return relayed
+
+
+def test_relayed_to_user_is_the_return_beyond_what_the_relayed_task_still_had(tmp_path):
+    """D-E6-2, B1 (E6 s3's 406b): the relayed task had 6 and 5 runs in its interval, so it still had 1; its result returns 7: 6 are the user's."""
+    w = ceiling_world(tmp_path)
+    relayed_return(w, returned=7)
+    case = the_case(w)
+    assert (case.relayed_runs, case.relayed_returned, case.relayed_to_user) == (5, 6, 6)
+
+
+def test_a_relayed_result_returning_at_most_what_the_task_still_had_gives_the_user_nothing_back(tmp_path):
+    """D-E6-2, B1 (E5 s1's 592f): 6 handed down, 5 used, 1 returned: that is the relayed task's own; nothing, and no result at all, the same."""
+    for n, returned in enumerate((1, 0)):
+        (tmp_path / str(n)).mkdir()
+        w = ceiling_world(tmp_path / str(n))
+        relayed_return(w, returned=returned)
+        assert the_case(w).relayed_to_user == 0
+
+
+def test_a_grant_in_the_relayed_interval_is_part_of_what_the_relayed_task_had(tmp_path):
+    """D-E6-2, B1: a grant of 4 in the interval of the relayed task makes its funds 10: with 5 runs it still had 5, so a return of 9 gives 4 back."""
+    w = ceiling_world(tmp_path)
+    relayed_return(w, returned=9, grant_to="ceo/eng")
+    case = the_case(w)
+    assert (case.relayed_returned, case.relayed_to_user) == (6, 4)
+
+
+def test_a_relayed_result_that_came_after_its_successor_gives_the_user_nothing_back(tmp_path):
+    """D-E6-2, B1, conservative (design 5.7, declared limit 6): the interval of the relayed task ends at its successor, so the runs it spent after
+    that are not in the interval and what it still had cannot be told."""
+    w = ceiling_world(tmp_path)
+    relayed_return(w, returned=7, successor=True)
+    assert the_case(w).relayed_to_user == 0
+
+
+def test_a_relayed_task_without_a_result_gives_the_user_nothing_back(tmp_path):
+    w = ceiling_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=1)
+    sup.rework(w, head, source="relayed", budget=6)
+    assert the_case(w).relayed_to_user == 0
+
+
+def test_an_agent_clients_case_has_no_relayed_to_user(tmp_path):
+    """D-E6-2, B1: an agent client has no user; the same shape as the 406b case gives 0 (``case_spend`` and the agent's text are today's)."""
+    w = ceiling_world(tmp_path)
+    grant(w, 40, to="ceo")
+    sup.define(w, "ceo/eng", "inner", actor="ceo")
+    first = w.s.commands.request("ceo", "inner", {"topic": "ai"})
+    sup.deliver(w, first, runs=2)
+    second = w.s.d.post(Message(
+        sender="ceo", to="ceo/eng", type="task", title="inner: ai", body="again", budget=6, revises=first.id, service="inner", source="relayed",
+    ))
+    sup.deliver(w, second, runs=5, budget=7)
+    (case,) = w.history.cases("ceo/eng", "inner")
+    assert case.client_kind == "agent" and case.relayed_returned == 6 and case.relayed_to_user == 0
+
+
+def test_a_case_without_a_relayed_task_has_no_relayed_to_user(tmp_path):
+    w = ceiling_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=2, budget=3)
+    sup.deliver(w, sup.rework(w, head, budget=4), runs=1, budget=9)
+    assert the_case(w).relayed_to_user == 0
+
+
+def test_the_ceiling_after_a_relayed_return_does_not_grow_when_the_user_rework_takes_what_is_left(tmp_path):
+    """D-E6-2, B1 (E6 s3's 9a5b): the 6 runs the relayed result carried back are the user's, so a rework handed down what is left (6) raises no
+    ceiling: the approval stays 12. Read as held (before B1), they put the ceiling at 18."""
+    w = ceiling_world(tmp_path)
+    relayed = relayed_return(w, returned=7)
+    case = the_case(w)
+    left = reflection.user_approved(case, 12) - reflection.user_committed(case)
+    assert (case.relayed_to_user, left) == (6, 6)
+    sup.rework(w, relayed, budget=left)
+    case = the_case(w)
+    assert (case.user_ceiling, reflection.user_approved(case, 12), reflection.user_committed(case)) == (12, 12, 12)
+
+
 def s2_t5(w, answered):
     """E5 s2 at T5: ebe2 (12, 9 runs, 3 returned) and 6c4f human (5 handed down), answered (5 runs, none returned) or still open."""
     first = sup.ask(w, "s2")
