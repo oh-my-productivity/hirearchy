@@ -233,7 +233,7 @@ verdict on another task of its chain (0a.5 section 18 item 7). Only a human-tier
 | verifier FAILs | per signer: `rechecks` and `rework_runs` of `health.MailEscapeCounter` (0a 5.5, unchanged) | the signer's boxes, authors' run logs | `FailCounts` (progress port, app adapter over health) |
 | assertion | `R<k>`: the k-th human-tier rejection of the service (any rejection, also one not on a delivery) | client's `sent/` | `regressions` (unchanged) |
 | cause | section 5 | as section 5 | `cause_of` |
-| failure class | `off_spec` for an escape typed `reviewer-miss`; `wasteful` for a case above the cost threshold; no other class is derived in 0b (`null`) | derived | `failure_class` (new, pure) |
+| failure class | `off_spec` for an escape typed `reviewer-miss`; no other class is derived in 0b (`null`). `wasteful` is the failure class of a case the cost alarm counts, by definition: 0b neither stores nor shows it as a field (the cost line and `cost.cases` carry no class, 9.4); Phase 3's packs map onto it, and showing it is backlog (design correction, manager decision of 2026-10-25) | derived | `failure_class` (new, pure) |
 
 ### 4.5 Blocks moved past without a verdict, held runs
 
@@ -1479,8 +1479,8 @@ amendment to this design that the manager approves; the same holds for 19.4 and 
   written once, deliberately (`HIREARCHY_UPDATE_GOLDEN=1`), in FEAT-9 and reviewed key by key against 9.4 and the text sample. The
   conformance test also checks one error record (DR3-3).
 - E3-9 (D-E5-6; **a constructed variant, not an observation**, 19.1): with `r3-overspend-12`, case `...-root-ab46` has 26 charged runs, the
-  user's runs 26 against 20 approved (1.30x), and the alarm reads `cost: FIRES: case 20261021T153809201054-root-ab46 26 of 20 approved (1.30x)`
-  with `failure_class` `wasteful`; with `r3-overspend-11` the user's runs are 25, exactly 1.25 x 20, and the alarm reads `cost: no (0 of 3
+  user's runs 26 against 20 approved (1.30x), and the alarm reads `cost: FIRES: case 20261021T153809201054-root-ab46 26 of 20 approved (1.30x)`;
+  with `r3-overspend-11` the user's runs are 25, exactly 1.25 x 20, and the alarm reads `cost: no (0 of 3
   cases above 1.25x)`. The two replays pin the boundary of `Fraction(user_cost) > cost_ratio * user_approved` on files. **No study corpus fires
   the cost alarm under this rule** (E3, E4's three streams: 19.3; E, E2, A5: 19.4), which is why the variant exists.
 
@@ -1741,7 +1741,7 @@ Plan items (in this order of FEATs; each FEAT ends with its SCOPED run; 55 commi
 Backlog (out of scope, with the reason):
 - A one-off verdict settling P3 not-as-delivered notes and one-off client questions (8.5): consistent, but changes 0a.2 behaviour the row does not ask
   for.
-- Semantic failure classes beyond `off_spec` and `wasteful` (packs, Phase 3); `period` units, the `external` tier and `timing` (delayed
+- Semantic failure classes beyond `off_spec`, and showing `wasteful` (packs, Phase 3); `period` units, the `external` tier and `timing` (delayed
   oracles) (Phase 3, 4.6).
 - A port through which a pack supplies its own lasting words to `cause_of` and its mapping onto `FAILURE_CLASSES` (for example a private
   `CauseVocabulary` of `DerivedCaseRecords`, wired in `app`): Phase 3 owns packs, and 0b adds no port it does not use, so today a pack's
@@ -1778,8 +1778,10 @@ Backlog (out of scope, with the reason):
   contract). The `not its` split is shown to root only (I7), because 08 principle 6 has agents see facts, not targets.
 - **D8 (08 3.2) One-off cases are root's tasks only.** 08's "one sender" is applied where a client verdict can exist; agents' delegations are
   not cases.
-- **D9 (08 3.2) Failure classes: vocabulary now, two derived classes.** Only `off_spec` (reviewer-miss) and `wasteful` (above the cost threshold)
-  are derived; the rest are `unclassed`, because a class assigned by the assistant would be relayed text.
+- **D9 (08 3.2) Failure classes: vocabulary now, one derived class.** Only `off_spec` (reviewer-miss) is derived and shown; the rest are `unclassed`,
+  because a class assigned by the assistant would be relayed text. `wasteful` is the failure class of a case the cost alarm counts, by definition: 0b
+  neither stores nor shows it as a field (the cost line and `cost.cases` carry no class, 9.4); Phase 3's packs map onto it; showing it is backlog.
+  (Design correction, manager decision of 2026-10-25: the earlier text named `wasteful` as derived, but the approved 9.4 schema has nowhere to show it.)
 - **D10 (08 3.3) Model changes include ORG.md's `default_model` and `effort`.** A change there changes every agent's runs as much as a
   charter's `model:`.
 - **D11 (the gate's item 2) The playbook content check is recomputed for every version**, not only for versions before P1, so a hand-written or
