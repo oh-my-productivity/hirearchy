@@ -72,3 +72,15 @@ def test_setup_mode_ends_when_the_organization_exists() -> None:
 
 def test_finder_litter_has_a_name() -> None:
     assert DS_STORE == ".DS_Store"
+
+
+def test_root_instructions_name_quality_on_its_own_line() -> None:
+    """0b 9.1: one line after the reject line, `quality`: how the work went. The totals are the base 2565 / 2642 / 2782 plus its 32 characters."""
+    reject = "  On a reject: `feedback` first, then ONE yes/no question naming an id, then the change (`define_service(answers=...)`).\n"
+    assert reject + "  `quality`: how the work went.\nWhen the user asks for an org, team or agents for a goal:\n" in ROOT_INSTRUCTIONS
+
+    def sent(n: int) -> str:
+        return InstructionText(MemoryBinding(Path("/" + "r" * n), exists=True)).for_identity(ROOT)
+
+    lines = ROOT_INSTRUCTIONS.splitlines()
+    assert (len(ROOT_INSTRUCTIONS), len(sent(59)), len(sent(199)), len(lines), max(map(len, lines))) == (2597, 2674, 2814, 27, 120)

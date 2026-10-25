@@ -32,6 +32,7 @@ READ_ONLY_TOOL_IDS = (
     "hirearchy::observe",
     "hirearchy::org_read",
     "hirearchy::progress",
+    "hirearchy::quality",
     "hirearchy::read",
     "hirearchy::services",
     "hirearchy::status",

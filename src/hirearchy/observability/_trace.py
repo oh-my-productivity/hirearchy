@@ -17,7 +17,7 @@ from ._runs import run_dict, run_events
 from ._util import iso, ms_between, plain
 from .api import TraceQueries
 
-READ_ONLY_TOOLS = {"inbox", "read", "status", "health", "progress", "whoami", "services", "observe", "org_read"}
+READ_ONLY_TOOLS = {"inbox", "read", "status", "health", "progress", "quality", "whoami", "services", "observe", "org_read"}
 _LIFECYCLE = ("agent.pause", "agent.resume", "agent.failure", "stall.nudge", "run.orphan")
 
 

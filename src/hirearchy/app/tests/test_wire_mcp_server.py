@@ -68,7 +68,7 @@ def test_the_tools_of_each_role(team: Org) -> None:
 
     assert tools(ROOT) == ["whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health", "services",
                            "define_service", "request", "feedback", "observe", "create_org", "start", "stop", "blueprint_example", "propose_org",
-                           "apply_org", "progress"]
+                           "apply_org", "progress", "quality"]
     assert tools("ceo") == ["whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health", "services",
                             "define_service", "request", "feedback"]
     assert tools("ceo/eng") == ["whoami", "inbox", "delegate", "report", "send", "reclaim", "hire", "retire", "read", "write", "status", "health"]

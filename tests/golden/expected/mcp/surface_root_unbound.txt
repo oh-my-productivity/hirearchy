@@ -6,6 +6,7 @@ You are connected to ONE hirearchy organization as `root`, the human's seat. No 
 - `whoami` and `status` show the state; `start`/`stop` control the scheduler. `observe` (read-only): what ran or failed.
 - Services: `services` (check it before building a new org), `request`, `feedback` (rate a delivery), `define_service`.
   On a reject: `feedback` first, then ONE yes/no question naming an id, then the change (`define_service(answers=...)`).
+  `quality`: how the work went.
 When the user asks for an org, team or agents for a goal:
 1. Ask what you need in ONE message. Propose defaults only where a generic one exists; ASK for any list not
    given, never invent. Default deliverable place: a new `deliverables/` folder here (say so). Also ask: format,
@@ -1572,4 +1573,47 @@ One plain status line per task you (root) gave, then what needs your decision, t
         told when the work is done: tell them you will wait now, call progress(wait_seconds=...) and repeat as long
         as they want (a turn cannot notify them later). Never poll with shell sleeps. Without wait_seconds it answers
         "status?".
+        
+
+### tool: quality
+input: {
+  "properties": {
+    "service": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Service"
+    }
+  },
+  "title": "qualityArguments",
+  "type": "object"
+}
+output: {
+  "properties": {
+    "result": {
+      "title": "Result",
+      "type": "string"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "qualityOutput",
+  "type": "object"
+}
+other: {}
+description:
+How the work you asked for has gone, from the files: per service, and for your one-off tasks, the cases; the user's verdicts on first
+        deliveries, in their words; escapes (the team reported done, then the user rejected it) with the verifier that signed them off and the
+        cause a rule typed; deliveries without a verdict (never counted as accepts) and files not as delivered; runs per case, the user's against
+        the runs you approved, with top-ups, your own relayed reworks (your own spend) and runs not charged shown apart; blocked tasks moved past without a verdict and the runs
+        held behind them; two alarms (repeat, cost; tunable defaults) and the timeline of bar changes. Read-only, root only: agents never see it,
+        and you never pass these counts to an agent. service: one service's block (default: everything). Use it when the user asks how a service
+        or the org is doing, and say what it shows in plain words.
         

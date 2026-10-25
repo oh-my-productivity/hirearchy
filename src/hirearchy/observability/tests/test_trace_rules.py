@@ -88,6 +88,14 @@ def test_a_state_changing_tool_call_of_root_is_an_action_and_reading_is_not() ->
     assert user_wait([t, blocked], events, "T", stamp(100)) == 40000.0
 
 
+def test_a_quality_call_of_root_does_not_end_the_wait_either() -> None:
+    """`quality` changes nothing, as `progress` and `health` do not (A.4 PC-2): the span runs to root's next state-changing call."""
+    t = task(0)
+    blocked = Msg(**{**result(20, "blocked", t).__dict__, "to": "root"})
+    events = [tool_call(30, "root", "quality", "T"), tool_call(60, "root", "delegate", "T")]
+    assert user_wait([t, blocked], events, "T", stamp(100)) == 40000.0
+
+
 def test_what_does_not_need_the_human_is_not_waited_for() -> None:
     t = task(0)
     done = Msg(**{**result(20, "done", t).__dict__, "to": "root"})

@@ -588,5 +588,9 @@ def test_false_with_tool_effects_1() -> None:
     assert not _launch.throttled_without_effect("")
 
 
+def test_the_quality_tool_changes_nothing_so_it_is_a_read_only_tool() -> None:
+    assert "hirearchy::quality" in _launch.READ_ONLY_TOOL_IDS
+
+
 def test_the_read_only_tools_are_the_sorted_hirearchy_tool_ids() -> None:
     assert _launch.READ_ONLY_TOOL_IDS == tuple(sorted(_launch.READ_ONLY_TOOL_IDS)) and all(i.startswith("hirearchy::") for i in _launch.READ_ONLY_TOOL_IDS)
