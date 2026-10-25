@@ -5,7 +5,8 @@ one moment, and the product's own code reads it (no scheduler, no LLM, no networ
 
 * ``org-files/ORG.md`` as ``ORG.md``;
 * each ``org-files/<a-b>-AGENT.md`` as ``<a>/<b>/AGENT.md`` (the evidence names an address by joining its parts with ``-``);
-* ``service/history--SERVICE.v1.md`` as ``lead/services/weekly-meeting-memo/SERVICE.md`` (the contract of every E5 stream);
+* ``service/history--SERVICE.v1.md`` as ``lead/services/<service>/SERVICE.md`` (``service`` defaults to ``weekly-meeting-memo``, the contract of every E5
+  stream; the E6 kit passes its own evidence and service name);
 * every file of ``msgs/<box>`` (root's) and ``msgs/<a-b>-<box>`` (the agent ``a/b``'s) whose id starts with a stamp ``<= cut``, in that box;
 * an empty ``<a>/<b>/runs/<stamp>.log`` for every file of ``run-logs/<a-b>/`` with ``stamp <= cut``: the case counts read the names of the logs only;
 * with ``inflight={"lead": [<message id>, ...]}``, those messages of the agent are in its ``inflight/`` box instead of ``inbox``/``read``: the batch its
@@ -53,9 +54,20 @@ def _dir(path: Path) -> Path:
     return path
 
 
-def materialize(stream: str, cut: str, dest: Path, inflight: Mapping[str, Sequence[str]] | None = None) -> Path:
-    """Write the organization ``EV5/<stream>`` had at ``cut`` at ``dest`` (created) and return ``dest``; see the module docstring."""
-    source = _dir(EV5 / stream)
+def materialize(
+    stream: str,
+    cut: str,
+    dest: Path,
+    inflight: Mapping[str, Sequence[str]] | None = None,
+    *,
+    evidence: Path | None = None,
+    service: str = SERVICE_NAME,
+) -> Path:
+    """Write the organization ``<evidence>/<stream>`` had at ``cut`` at ``dest`` (created) and return ``dest``; see the module docstring.
+
+    ``evidence`` (default ``EV5``, read when called, so a test can point the module at a copy) and ``service`` (default ``SERVICE_NAME``) are E5's
+    today; the contract goes to ``lead/services/<service>/SERVICE.md``."""
+    source = _dir((EV5 if evidence is None else evidence) / stream)
     if len(cut) != 21:
         pytest.fail(f"cut must be a 21-character stamp, got {cut!r}")
     dest.mkdir(parents=True, exist_ok=True)
@@ -65,7 +77,7 @@ def materialize(stream: str, cut: str, dest: Path, inflight: Mapping[str, Sequen
         target = dest / _addr(agent.name.removesuffix("-AGENT.md")) / "AGENT.md"
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(agent, target)
-    contract = dest / "lead" / "services" / SERVICE_NAME / "SERVICE.md"
+    contract = dest / "lead" / "services" / service / "SERVICE.md"
     contract.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(_file(source / "service" / "history--SERVICE.v1.md"), contract)
     for box_dir in sorted(_dir(source / "msgs").iterdir()):
