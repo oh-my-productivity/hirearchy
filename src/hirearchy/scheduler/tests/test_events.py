@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import os
+
 from hirearchy.access.testing import StaticAccess
 from hirearchy.budget.testing import FixedBudget
 from hirearchy.kernel.testing import FakeClock, ListEventSink
 from hirearchy.mail.testing import memory_mailbox
 from hirearchy.processes.testing import FakeProcessTable
-from hirearchy.scheduler._events import ERROR_MAX, LifecycleEvents, SchedulerEvents
+from hirearchy.scheduler._events import ERROR_MAX, LifecycleEvents, SchedulerEvents, SessionAnnouncer
 
 from ._support import ROOT_DIR, a_run, message, prepared
 
@@ -24,6 +26,16 @@ def test_what_the_caller_says_wins() -> None:
     SchedulerEvents(sink).emit("x", actor="ceo", proc="cli", run="r", trace="t", a=1)
     (event,) = sink.events
     assert (event.actor, event.proc, event.run, event.trace, event.fields) == ("ceo", "cli", "r", "t", {"a": 1})
+
+
+def test_a_signal_is_a_scheduler_signal_event_with_the_signal_the_action_the_parent_and_the_runs_in_flight() -> None:
+    """D-E6-3 C2, design 6.2: ``ppid`` is read when the signal arrives (1 when the scheduler was re-parented)."""
+    sink = ListEventSink()
+    announcer = SessionAnnouncer(SchedulerEvents(sink), StaticAccess(ROOT_DIR).settings, lambda: "9.9")
+    announcer.signalled("SIGHUP", "ignored", ["ceo@2026-10-18T10-00-00", "ops@2026-10-18T10-00-01"])
+    (event,) = sink.events
+    assert (event.kind, event.proc, event.actor, event.run, event.trace) == ("scheduler.signal", "scheduler", "runtime", None, None)
+    assert event.fields == {"signal": "SIGHUP", "action": "ignored", "ppid": os.getppid(), "running": ["ceo@2026-10-18T10-00-00", "ops@2026-10-18T10-00-01"]}
 
 
 class World:

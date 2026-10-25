@@ -54,3 +54,6 @@ class ClaimedSession(SchedulerSession):
         self._runs.terminate_all(runs)
         self._claim.give_up()
         self._events.exited(exit_reason, started)
+
+    def signalled(self, name: str, action: str, runs: RunTable) -> None:
+        self._events.signalled(name, action, sorted(r.run_id for r in tuple(runs.values())))  # a copy: the handler runs between two bytecodes

@@ -13,6 +13,9 @@ from ._run import LoopState, Standing, StopWhen
 from .api import SchedulerLoop
 
 
+STOP_SIGNALS = (signal.SIGTERM, signal.SIGHUP)  # recorded at once (scheduler.signal); each ends the loop cleanly, unless SIGHUP came ignored
+
+
 class PollPacing(Pacing):
     """Waits ``poll_seconds`` on its clock."""
 
@@ -62,15 +65,23 @@ class HeartbeatLoop(SchedulerLoop):
         s.mode = "until_done" if until_done else "until_idle" if until_idle else "daemon"
         s.max_runs = max_runs
         self.acquire()
-        stop = False
+        stopped_by: str | None = None
+        ignored = {signal.SIGHUP} if signal.getsignal(signal.SIGHUP) == signal.SIG_IGN else set()  # the scheduler was started with it ignored
 
-        def on_signal(*_: object) -> None:
-            nonlocal stop
-            stop = True
+        def on_signal(signum: int, _frame: object) -> None:
+            nonlocal stopped_by
+            name = signal.Signals(signum).name
+            action = "ignored" if signum in ignored else "stop"
+            try:
+                self._session.signalled(name, action, s.runs)  # written now, before any grace: a KILL that follows still leaves this record
+            except Exception:  # noqa: BLE001 - the record must never change what the interrupted code does
+                pass
+            if action == "stop" and stopped_by is None:
+                stopped_by = name
 
-        signal.signal(signal.SIGTERM, on_signal)
+        previous = {sig: signal.signal(sig, on_signal) for sig in STOP_SIGNALS}
         try:
-            while not stop:
+            while stopped_by is None:
                 active = self.tick(max_runs=max_runs)
                 reason = self._exits.after_tick(StopWhen(until_idle, until_done), active, self._standing(max_runs))
                 if reason is not None:
@@ -78,14 +89,18 @@ class HeartbeatLoop(SchedulerLoop):
                     break
                 self._pacing.pause()
             else:
-                s.exit_reason = "stopped by SIGTERM"
+                s.exit_reason = f"stopped by {stopped_by}"
         except KeyboardInterrupt:
             s.exit_reason = "interrupted (KeyboardInterrupt)"
         except Exception as exc:
             s.exit_reason = f"error: {type(exc).__name__}: {exc}"
             raise
         finally:
-            self.release()
+            try:
+                self.release()
+            finally:
+                for sig, handler in previous.items():
+                    signal.signal(sig, handler if handler is not None else signal.SIG_DFL)  # as found; None: not set from Python
 
     def run_once(self, max_runs: int | None = None) -> None:
         s = self._state

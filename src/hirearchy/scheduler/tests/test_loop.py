@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import signal
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 
 import pytest
 
@@ -16,7 +16,7 @@ from hirearchy.review.testing import ScriptedHealthReviewer
 from hirearchy.scheduler._loop import HeartbeatLoop, PollPacing
 from hirearchy.scheduler._phases import GuardedPhase
 from hirearchy.scheduler._ports import Lifecycle
-from hirearchy.scheduler._run import LoopState, RunRecord, StopWhen
+from hirearchy.scheduler._run import LoopState, RunRecord, Standing, StopWhen
 from hirearchy.scheduler.testing import (
     RecordingPacing, RecordingPhase, RecordingReaper, RecordingSession, RecordingStarter, ScriptedExit, ScriptedWork, build_heartbeat_world,
 )
@@ -39,6 +39,43 @@ def sigterm() -> Iterator[None]:
     old = signal.getsignal(signal.SIGTERM)
     yield
     signal.signal(signal.SIGTERM, old)
+
+
+def keeping(signum: signal.Signals, disposition: Callable[..., object] | int) -> Iterator[None]:
+    found = signal.getsignal(signum)
+    signal.signal(signum, disposition)
+    yield
+    signal.signal(signum, found if found is not None else signal.SIG_DFL)
+
+
+@pytest.fixture
+def sighup_default() -> Iterator[None]:
+    """The SIGHUP disposition never comes from the runner (a runner under ``nohup`` starts with it ignored): default, and what was found back."""
+    yield from keeping(signal.SIGHUP, signal.SIG_DFL)
+
+
+@pytest.fixture
+def sighup_ignored() -> Iterator[None]:
+    yield from keeping(signal.SIGHUP, signal.SIG_IGN)
+
+
+class SignallingPhase(RecordingPhase):
+    """A phase that raises the signals it is given, one per pass, in the pass it runs in."""
+
+    def __init__(self, name: str, journal: list[str], *signals: signal.Signals) -> None:
+        super().__init__(name, journal)
+        self.signals = list(signals)
+
+    def run(self, standing: Standing, max_runs: int | None) -> None:
+        super().run(standing, max_runs)
+        if self.signals:
+            signal.raise_signal(self.signals.pop(0))
+
+
+def signalling(kit: Kit, a: tuple[signal.Signals, ...] = (), b: tuple[signal.Signals, ...] = ()) -> HeartbeatLoop:
+    """The kit's loop with signals raised from its phases ``a`` and ``b``."""
+    phases = [SignallingPhase("a", kit.journal, *a), SignallingPhase("b", kit.journal, *b)]
+    return HeartbeatLoop(kit.session, phases, Lifecycle(kit.starter, kit.reaper), kit.work, kit.exits, kit.pacing, kit.state)
 
 
 # ------------------------------------------------------------------------------ one pass
@@ -153,6 +190,61 @@ def test_sigterm_ends_the_loop_cleanly_after_the_pass_it_arrives_in(sigterm: Non
     kit.pacing.on_pause = lambda: signal.raise_signal(signal.SIGTERM)
     kit.loop.serve()
     assert kit.session.closed == [("stopped by SIGTERM", 0, 0)] and kit.pacing.pauses == 1
+
+
+# ------------------------------------------------------------------------------ scheduler.signal (C2, design 6.2, 6.4)
+
+
+def test_a_sigterm_is_recorded_at_once_before_the_phase_after_the_one_it_arrives_in(sighup_default: None) -> None:
+    """D-E6-3 C2: the record is written in the handler, so a KILL during the grace period of a stop still leaves it."""
+    kit = Kit()
+    signalling(kit, a=(signal.SIGTERM,)).serve()
+    assert kit.journal == ["open", "a", "signal", "b", "pause", "close"]
+    assert kit.session.signals == [("SIGTERM", "stop", [])] and kit.session.closed == [("stopped by SIGTERM", 0, 0)]
+
+
+def test_a_sighup_stops_the_loop_the_same_way(sighup_default: None) -> None:
+    kit = Kit()
+    signalling(kit, a=(signal.SIGHUP,)).serve()
+    assert kit.session.signals == [("SIGHUP", "stop", [])] and kit.session.closed == [("stopped by SIGHUP", 0, 0)]
+
+
+def test_a_sighup_the_scheduler_was_started_ignoring_is_recorded_ignored_and_the_loop_goes_on(sighup_ignored: None) -> None:
+    kit = Kit(None, "idle: nothing left to do")
+    signalling(kit, a=(signal.SIGHUP,)).serve()
+    assert kit.session.signals == [("SIGHUP", "ignored", [])]
+    assert kit.session.closed == [("idle: nothing left to do", 0, 0)] and kit.pacing.pauses == 1
+
+
+def test_two_signals_are_two_records_and_the_first_names_the_reason(sighup_default: None) -> None:
+    kit = Kit()
+    signalling(kit, a=(signal.SIGTERM,), b=(signal.SIGHUP,)).serve()
+    assert kit.session.signals == [("SIGTERM", "stop", []), ("SIGHUP", "stop", [])]
+    assert kit.session.closed == [("stopped by SIGTERM", 0, 0)]
+
+
+def test_the_runs_in_flight_are_named_in_the_record(sighup_default: None) -> None:
+    kit = Kit()
+    table = FakeProcessTable()
+    kit.state.runs["ops"] = a_run(table, FakeClock(), "ops")
+    kit.state.runs["ceo"] = a_run(table, FakeClock(), "ceo")
+    signalling(kit, a=(signal.SIGTERM,)).serve()
+    (_, _, running) = kit.session.signals[0]
+    assert running == sorted(r.run_id for r in kit.state.runs.values()) and len(running) == 2
+
+
+def test_serve_leaves_the_sigterm_and_sighup_handlers_it_found(sighup_default: None, sigterm: None) -> None:
+    kit = Kit(FINISHED)
+    before = signal.getsignal(signal.SIGTERM), signal.getsignal(signal.SIGHUP)
+    kit.loop.serve()
+    assert (signal.getsignal(signal.SIGTERM), signal.getsignal(signal.SIGHUP)) == before
+
+
+def test_a_record_that_raises_changes_nothing_and_the_loop_still_stops(sighup_default: None) -> None:
+    kit = Kit()
+    kit.session.fail_signal = RuntimeError("the event log is gone")
+    signalling(kit, a=(signal.SIGTERM,)).serve()
+    assert kit.session.closed == [("stopped by SIGTERM", 0, 0)]
 
 
 def test_a_refused_open_is_not_closed() -> None:

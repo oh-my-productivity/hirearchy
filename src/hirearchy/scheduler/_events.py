@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+from collections.abc import Sequence
+
 from ..access import ModelResolver
 from ..agents import AgentDirectory
 from ..budget import BudgetQuery
@@ -53,7 +56,7 @@ class LifecycleEvents(RunEvents):
 
 
 class SessionAnnouncer(SessionEvents):
-    """``scheduler.start`` and ``scheduler.exit``."""
+    """``scheduler.start``, ``scheduler.exit`` and ``scheduler.signal``."""
 
     def __init__(self, events: EventSink, settings: OrgSettings, version: Provider[str]) -> None:
         self._events, self._settings, self._version = events, settings, version
@@ -64,3 +67,6 @@ class SessionAnnouncer(SessionEvents):
 
     def exited(self, reason: str, runs_started: int) -> None:
         self._events.emit("scheduler.exit", reason=clip(reason, ERROR_MAX), runs_started=runs_started)
+
+    def signalled(self, name: str, action: str, running: Sequence[str]) -> None:
+        self._events.emit("scheduler.signal", signal=name, action=action, ppid=os.getppid(), running=list(running))

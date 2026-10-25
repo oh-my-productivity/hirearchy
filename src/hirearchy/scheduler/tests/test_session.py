@@ -6,7 +6,7 @@ import pytest
 
 from hirearchy.daemon.testing import MemoryExitMarker, MemorySchedulerLock
 from hirearchy.kernel import OrgError
-from hirearchy.kernel.testing import ListEventSink
+from hirearchy.kernel.testing import FakeClock, ListEventSink
 from hirearchy.access.testing import StaticAccess
 from hirearchy.processes.testing import FakeProcessTable
 from hirearchy.scheduler._events import SchedulerEvents, SessionAnnouncer
@@ -17,7 +17,7 @@ from hirearchy.scheduler.testing import (
 from hirearchy.snapshots.testing import MemoryIgnoreList
 from hirearchy.telemetry.testing import MemoryProcessLabel
 
-from ._support import ROOT_DIR
+from ._support import ROOT_DIR, a_run
 
 
 def test_taking_the_claim_names_the_process_takes_the_pidfile_forgets_the_last_exit_and_ignores_the_runtime_files() -> None:
@@ -87,3 +87,15 @@ def test_closing_interrupts_the_runs_lets_go_of_the_pidfile_and_announces_the_ex
     session = ClaimedSession(RecordingClaim(journal), events, RecordingSettler(journal), RecordingRecovery(journal), RecordingReaper(journal))
     session.close("stopped by SIGTERM", {}, 6)
     assert journal == ["terminate", "give up", "exited"] and events.exits == [("stopped by SIGTERM", 6)]
+
+
+def test_a_signal_is_announced_with_the_run_ids_in_flight_sorted() -> None:
+    journal: list[str] = []
+    events = RecordingSessionEvents(journal)
+    session = ClaimedSession(RecordingClaim(journal), events, RecordingSettler(journal), RecordingRecovery(journal), RecordingReaper(journal))
+    table = FakeProcessTable()
+    clock = FakeClock()
+    runs = {"ops": a_run(table, clock, "ops"), "ceo": a_run(table, clock, "ceo")}
+    session.signalled("SIGTERM", "stop", runs)
+    assert journal == ["signal"] and events.signals == [("SIGTERM", "stop", sorted(r.run_id for r in runs.values()))]
+    assert len(events.signals[0][2]) == 2

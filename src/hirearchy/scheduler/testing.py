@@ -534,7 +534,9 @@ class RecordingSession(SchedulerSession):
         self.journal = journal if journal is not None else []
         self.opened: list[tuple[str, int | None]] = []
         self.closed: list[tuple[str, int, int]] = []  # (reason, runs in flight, runs started)
+        self.signals: list[tuple[str, str, list[str]]] = []  # (signal, action, run ids in flight, sorted)
         self.fail: Exception | None = None
+        self.fail_signal: Exception | None = None
 
     def open(self, mode: str, max_runs: int | None, runs: RunTable, blocked: set[str]) -> None:
         self.journal.append("open")
@@ -545,6 +547,12 @@ class RecordingSession(SchedulerSession):
     def close(self, exit_reason: str, runs: RunTable, started: int) -> None:
         self.journal.append("close")
         self.closed.append((exit_reason, len(runs), started))
+
+    def signalled(self, name: str, action: str, runs: RunTable) -> None:
+        self.journal.append("signal")
+        self.signals.append((name, action, sorted(r.run_id for r in tuple(runs.values()))))
+        if self.fail_signal is not None:
+            raise self.fail_signal
 
 
 class RecordingClaim(Claim):
@@ -566,6 +574,7 @@ class RecordingSessionEvents(SessionEvents):
         self.journal = journal if journal is not None else []
         self.starts: list[tuple[str, int | None]] = []
         self.exits: list[tuple[str, int]] = []
+        self.signals: list[tuple[str, str, list[str]]] = []
 
     def started(self, mode: str, max_runs: int | None) -> None:
         self.journal.append("started")
@@ -574,6 +583,10 @@ class RecordingSessionEvents(SessionEvents):
     def exited(self, reason: str, runs_started: int) -> None:
         self.journal.append("exited")
         self.exits.append((reason, runs_started))
+
+    def signalled(self, name: str, action: str, running: Sequence[str]) -> None:
+        self.journal.append("signal")
+        self.signals.append((name, action, list(running)))
 
 
 class RecordingRecovery(InterruptedRuns):

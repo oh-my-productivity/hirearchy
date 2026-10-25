@@ -238,6 +238,11 @@ class SessionEvents(Protocol):
         """The ``scheduler.exit`` event."""
         ...
 
+    def signalled(self, name: str, action: str, running: Sequence[str]) -> None:
+        """The ``scheduler.signal`` event: the scheduler got ``name`` (``SIGTERM`` or ``SIGHUP``) and does ``action`` (``stop`` or ``ignored``);
+        ``running`` are the runs in flight. Called from the signal handler, before any grace period."""
+        ...
+
 
 class InterruptedRuns(Protocol):
     def recover(self) -> None:
@@ -252,6 +257,10 @@ class SchedulerSession(Protocol):
 
     def close(self, exit_reason: str, runs: RunTable, started: int) -> None:
         """Interrupt the runs in flight, let go of the pidfile and announce the exit."""
+        ...
+
+    def signalled(self, name: str, action: str, runs: RunTable) -> None:
+        """Announce the signal the scheduler got and what it does about it, naming the runs in flight. Called from the signal handler."""
         ...
 
 
