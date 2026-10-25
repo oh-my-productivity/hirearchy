@@ -84,15 +84,23 @@ class NoReworkContext(ReworkContext):
     def fields_for(self, actor: str, revises: str) -> Mapping[str, object]:
         return {}
 
+    def work_tier(self, actor: str) -> str | None:
+        return None
+
 
 class FixedReworkContext(ReworkContext):
-    """The service fields of the tasks a test names: ``{task id: {"service": ..., "contract": ..., "playbook": ...}}``; any other task is ordinary."""
+    """The service fields of the tasks a test names: ``{task id: {"service": ..., "contract": ..., "playbook": ...}}``; any other task is ordinary.
+    ``tiers`` is the tier of the work each actor it names does (``{actor: "human"}``); any other actor works at none."""
 
-    def __init__(self, fields: Mapping[str, Mapping[str, object]]) -> None:
+    def __init__(self, fields: Mapping[str, Mapping[str, object]], tiers: Mapping[str, str] | None = None) -> None:
         self._fields = {task_id: dict(given) for task_id, given in fields.items()}
+        self._tiers = dict(tiers or {})
 
     def fields_for(self, actor: str, revises: str) -> Mapping[str, object]:
         return dict(self._fields.get(revises, {}))
+
+    def work_tier(self, actor: str) -> str | None:
+        return self._tiers.get(actor)
 
 
 class PostedDelivery(MessageDelivery):

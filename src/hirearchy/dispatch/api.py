@@ -70,9 +70,8 @@ class MessageSender(Protocol):
         (``criterion``, ids joined by ``", "``): an agent that passes either, or a ``source`` that is neither value, is refused. ``criterion``
         goes only on a verdict note (a note with ``feedback``) or on a link note (a note without ``feedback`` that replies to one). A task from
         root that ``revises`` another (a rework), a verdict note and a link note without a ``source`` are stamped ``"relayed"`` (root's own
-        reading); a fresh task, any other note and every message of an agent stay unstamped unless root says. A task of an
-        agent that revises another carries the tier its sender works under (``inherited``, from ``ReworkContext``): the runtime's copy, never the
-        agent's declaration."""
+        reading); a fresh task of root, any other note and every message of an agent stay unstamped unless root says. A task of an
+        agent carries the tier its sender works under (``inherited``, from ``ReworkContext``): the runtime's copy, never the agent's declaration."""
         ...
 
 
@@ -129,4 +128,10 @@ class ReworkContext(Protocol):
         """The fields a rework task inherits from the task ``actor`` sent with id ``revises``: ``service`` and ``contract`` of that task and the
         ``playbook`` version current now when it is a service request, and, for an agent, the ``source`` of the open task it received in the
         same trace. Empty when the task is not one of ``actor``'s."""
+        ...
+
+    def work_tier(self, actor: str) -> str | None:
+        """The tier (``source``) of the work ``actor`` does now, for a task it sends without ``revises``: the ``source`` of its newest open received
+        task in the trace its next message is stamped with (the one trace of its open received tasks, else the one trace of its run batch). None for
+        root, without such a trace or task, and for a task without a tier."""
         ...

@@ -119,6 +119,41 @@ def test_delegate_passes_the_inherited_tier(w: DispatchWorld) -> None:
     assert sender.calls[0][1] == {"type": "task", "title": "Again", "budget": 2, "revises": first.id, "source": None, "inherited": "human"}
 
 
+class FailingContext(FixedReworkContext):
+    """A ``ReworkContext`` whose mailboxes cannot be read."""
+
+    def __init__(self, error: Exception) -> None:
+        super().__init__({})
+        self._error = error
+
+    def work_tier(self, actor: str) -> str | None:
+        raise self._error
+
+
+def fresh(w: DispatchWorld, actor: str, to: str, rework: FixedReworkContext) -> dict[str, object]:
+    sender = Sender()
+    over(w, sender, rework=rework).delegate(actor, to, "Draft", "Draft it.", "one page", budget=2)
+    return sender.calls[0][1]
+
+
+def test_an_agents_fresh_delegation_passes_the_tier_of_its_work(w: DispatchWorld) -> None:
+    """F-E6-7 (D-E6-5): a delegation without ``revises`` carries ``inherited=<work_tier>`` for an agent."""
+    grant(w, "root", "ceo", 20)
+    assert fresh(w, "ceo", "ceo/eng", FixedReworkContext({}, {"ceo": "human"})) == {
+        "type": "task", "title": "Draft", "budget": 2, "revises": None, "source": None, "inherited": "human",
+    }
+
+
+def test_roots_fresh_delegation_passes_no_tier_whatever_the_context_says(w: DispatchWorld) -> None:
+    assert fresh(w, "root", "ceo", FixedReworkContext({}, {"root": "human", "ceo": "human"}))["inherited"] is None
+
+
+@pytest.mark.parametrize("error", [OrgError("unreadable"), OSError("unreadable")], ids=["OrgError", "OSError"])
+def test_a_context_that_cannot_read_gives_a_delegation_without_a_tier(w: DispatchWorld, error: Exception) -> None:
+    grant(w, "root", "ceo", 20)
+    assert fresh(w, "ceo", "ceo/eng", FailingContext(error))["inherited"] is None
+
+
 def test_the_order_of_the_refusals(w: DispatchWorld) -> None:
     sender = Sender()
     assigner = over(w, sender)

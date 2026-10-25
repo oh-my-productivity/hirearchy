@@ -79,10 +79,18 @@ class RuleTaskAssigner(TaskAssigner):
             raise OrgError(f"revises must be the id of an earlier task you sent to {to}: {revises}")
         body = self._templates.task_body(goal, acceptance, list(inputs or []))
         fields = self._rework.fields_for(actor, revises) if revises else {}  # rework of a service request is still part of its case
+        inherited = _tier_of(fields) if revises else (self._work_tier(actor) if actor != ROOT else None)  # an agent's fresh task carries the tier of its work (F-E6-7)
         service = fields.get("service")
         if actor == ROOT and revises and isinstance(service, str) and service:  # root's rework of a request goes through ``request``, which keeps the rules of the case
             raise OrgError(USE_REQUEST.format(revises=revises, service=service))
         return self._sender.send(
             actor, to, body, type="task", title=title, budget=budget, revises=revises or None,
-            source=source, inherited=_tier_of(fields), **_service_fields(fields),
+            source=source, inherited=inherited, **_service_fields(fields),
         )
+
+    def _work_tier(self, actor: str) -> str | None:
+        """The tier of the work ``actor`` does now; None when the mailboxes cannot be read (the delegation is sent as it was: the tier is advice)."""
+        try:
+            return self._rework.work_tier(actor)
+        except (OrgError, OSError):
+            return None

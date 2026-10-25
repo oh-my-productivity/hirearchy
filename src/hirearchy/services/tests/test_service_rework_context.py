@@ -16,6 +16,8 @@ from hirearchy.dispatch.tests.test_contract_rework_context import (  # noqa: F40
     test_the_answer_for_a_task_is_the_same_every_time,
     test_a_tier_is_human_or_relayed,
     test_root_never_gets_a_tier,
+    test_root_never_gets_a_work_tier,
+    test_a_work_tier_is_none_human_or_relayed_and_the_same_every_time,
     test_the_answer_holds_only_the_service_fields_and_the_tier,
     test_what_the_caller_does_with_the_answer_does_not_change_the_next_one,
 )
@@ -226,3 +228,70 @@ def test_a_revised_task_with_a_trace_keeps_its_own_case_whatever_the_batch_holds
     human_task(w, BATCH)
     run_of_lead(w)  # the batch holds only case B
     assert task.trace == TRACE and dict(w.rework.fields_for("ceo", task.id)) == {"source": "relayed"}
+
+
+# ------------------------------------------------------------------------------ the tier of the work an agent does now, for a delegation without ``revises`` (F-E6-7, D-E6-5)
+
+
+def test_the_lead_holding_roots_open_human_rework_in_one_trace_works_at_the_human_tier(w: ServicesWorld) -> None:
+    received(w, "human")
+    assert w.rework.work_tier("ceo") == "human"
+
+
+def test_the_lead_holding_roots_open_relayed_rework_works_at_the_relayed_tier(w: ServicesWorld) -> None:
+    received(w, "relayed")
+    assert w.rework.work_tier("ceo") == "relayed"
+
+
+def test_the_newest_open_task_of_the_one_trace_gives_the_work_tier(w: ServicesWorld) -> None:
+    received(w, "relayed")
+    done = received(w, "human")
+    assert w.rework.work_tier("ceo") == "human"
+    answer(w, done)
+    assert w.rework.work_tier("ceo") == "relayed"
+
+
+def test_a_closed_task_gives_no_work_tier(w: ServicesWorld) -> None:
+    answer(w, received(w, "human"))
+    assert w.rework.work_tier("ceo") is None
+
+
+def test_a_blocked_task_is_still_open_for_the_work_tier(w: ServicesWorld) -> None:
+    answer(w, received(w, "human"), status="blocked")
+    assert w.rework.work_tier("ceo") == "human"
+
+
+def test_root_and_an_agent_without_a_task_have_no_work_tier(w: ServicesWorld) -> None:
+    received(w, "human")
+    assert w.rework.work_tier("root") is None and w.rework.work_tier("ceo/eng") is None
+
+
+def test_an_open_task_without_a_tier_gives_no_work_tier(w: ServicesWorld) -> None:
+    received(w, None)
+    assert w.rework.work_tier("ceo") is None
+
+
+def test_two_open_traces_and_a_batch_of_one_give_the_tier_of_the_batch(w: ServicesWorld) -> None:
+    """The stamper's rules: the open tasks name two traces, so the one trace of the run's batch is the case."""
+    received(w, "relayed", trace=TRACE)
+    run_of_lead(w)  # the first task is read in an earlier run and stays open
+    w.d.end_run("ceo")
+    human_task(w, BATCH)
+    run_of_lead(w)  # the batch holds only the second task
+    assert w.rework.work_tier("ceo") == "human"
+
+
+def test_two_open_traces_and_no_batch_give_no_work_tier(w: ServicesWorld) -> None:
+    received(w, "relayed", trace=TRACE)
+    human_task(w, BATCH)
+    assert w.rework.work_tier("ceo") is None
+
+
+def test_an_open_task_without_a_trace_leaves_the_case_to_the_batch(w: ServicesWorld) -> None:
+    """``open_task_traces`` lists a missing trace, and the stamper then takes no open-task case: the batch decides."""
+    received(w, "relayed", trace=None)
+    run_of_lead(w)
+    w.d.end_run("ceo")
+    human_task(w, BATCH)
+    run_of_lead(w)
+    assert w.rework.work_tier("ceo") == "human"

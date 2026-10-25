@@ -284,14 +284,21 @@ def test_an_agents_own_source_is_still_refused(w: DispatchWorld) -> None:
     assert w.inbox("ceo/eng") == []
 
 
+def test_an_agents_fresh_task_carries_the_inherited_tier(w: DispatchWorld) -> None:
+    """F-E6-7 (D-E6-5): a task of an agent that does not revise another carries the tier of the work it does, like a rework."""
+    msg = w.sender.send("ceo", "ceo/eng", "write it", type="task", inherited="human")
+    assert msg.source == "human" and [m.source for m in w.inbox("ceo/eng")] == ["human"]
+    assert w.sender.send("ceo", "ceo/eng", "write more", type="task", inherited="relayed").source == "relayed"
+    assert w.sender.send("ceo", "ceo/eng", "write again", type="task", inherited="garbage").source is None
+
+
 @pytest.mark.parametrize("fields", [
-    {"type": "task"},  # a fresh task is no rework
     {"type": "note", "revises": EARLIER},
     {"type": "result", "revises": EARLIER},
     {"type": "task", "revises": EARLIER, "inherited": "garbage"},
     {"type": "task", "revises": EARLIER, "inherited": None},
 ])
-def test_inherited_outside_a_rework_task_is_ignored(w: DispatchWorld, fields: dict[str, str | None]) -> None:
+def test_inherited_outside_a_task_is_ignored(w: DispatchWorld, fields: dict[str, str | None]) -> None:
     msg = w.sender.send("ceo", "ceo/eng", "x", **{"inherited": "human", **fields})  # type: ignore[arg-type]
     assert msg.source is None
 

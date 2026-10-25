@@ -14,7 +14,8 @@ from .api import ServiceCatalog
 class ServiceReworkContext(ReworkContext):
     """``service`` and ``contract`` are copied from the revised request; ``playbook`` is the version current now. An agent's rework also gets
     the ``source`` (tier) of the work it does in that case, which its own earlier task does not carry (design 7.6); when that task has no trace, the case is
-    the one of the run's batch (0a.3 7.3)."""
+    the one of the run's batch (0a.3 7.3). ``work_tier`` is the tier of the work an agent does now, for the delegation it sends without ``revises``
+    (D-E6-5)."""
 
     def __init__(self, mail: MailboxReader, agents: AgentDirectory, catalog: ServiceCatalog) -> None:
         self._mail = mail
@@ -35,6 +36,21 @@ class ServiceReworkContext(ReworkContext):
             if tier is not None:
                 fields["source"] = tier
         return fields
+
+    def work_tier(self, actor: str) -> str | None:
+        trace = None if actor == ROOT else self._open_trace(actor) or self._batch_trace(actor)  # the case the stamper gives actor's next message
+        return self._tier(actor, trace) if trace else None
+
+    def _open_trace(self, actor: str) -> str | None:
+        """The one trace of the tasks ``actor`` received and has not answered finally, the stamper's ``open-task`` rule (``traces``' ``open_task_traces``);
+        None for none, for several and when one of them has no trace."""
+        results = latest_results(self._mail.sent(actor))
+        open_traces = [
+            t.trace for t in self._mail.received(actor)
+            if t.type == "task" and ((r := results.get(t.id)) is None or r.status == "blocked")
+        ]
+        distinct = {t for t in open_traces if t}
+        return next(iter(distinct)) if len(distinct) == 1 and None not in open_traces else None
 
     def _batch_trace(self, actor: str) -> str | None:
         """The one trace of the messages in ``actor``'s run batch (its ``inflight`` box), the stamper's ``batch`` rule; None for none or several."""

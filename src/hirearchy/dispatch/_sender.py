@@ -21,8 +21,8 @@ def provenance_source(
     only root records ``source`` and ``criterion`` (an agent that passes either is refused, S1), ``source`` is ``human`` or ``relayed`` (S2),
     ``criterion`` goes only on a verdict note (a note with ``feedback``) or a link note (a note that replies to one, S3), and a rework from
     root (a task that ``revises`` another), a verdict note or a link note without a ``source`` is ``relayed``: root's own reading, unless the
-    caller says the user asked for it. A fresh task, any other note and every message of an agent stay unstamped, except that a task of an agent
-    that revises another carries ``inherited``, the tier of the work it does (``ReworkContext``: the runtime's copy, never the agent's declaration)."""
+    caller says the user asked for it. A fresh task of root, any other note and every message of an agent stay unstamped, except that a task of an
+    agent carries ``inherited``, the tier of the work it does (``ReworkContext``: the runtime's copy, never the agent's declaration)."""
     if (source is not None or criterion is not None) and actor != ROOT:
         raise OrgError(
             "only root (the human's seat) records where a verdict, a link or a rework comes from (`source`, `criterion`); "
@@ -35,7 +35,7 @@ def provenance_source(
         raise OrgError("criterion goes only on a verdict (a note with `feedback`) or on a link note that replies to one: use `feedback(..., criterion=...)`.")
     if source is None and actor == ROOT and ((type == "task" and revises) or (type == "note" and (feedback or criterion))):
         return "relayed"
-    if source is None and actor != ROOT and type == "task" and revises and inherited in SOURCES:
+    if source is None and actor != ROOT and type == "task" and inherited in SOURCES:
         return inherited
     return source
 

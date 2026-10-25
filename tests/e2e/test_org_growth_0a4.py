@@ -130,3 +130,18 @@ def test_b2_just_before_9a5b_the_default_hand_down_is_what_the_user_has_left(tmp
     (it was 1: nothing was left)."""
     org = Org(materialize("s3", "20261024T172453163610", tmp_path / "org"))
     assert org.runtime.case_allowance.left("lead", SERVICE, "20261024T171425096624-root-bc02") == 6
+
+
+def test_f1_dd34_the_lead_works_at_the_relayed_tier_while_roots_relayed_rework_is_open(tmp_path):
+    """F-1 (E6 s1; D-E6-5, F-E6-7): at dd34's cut roots relayed 3a54 is the lead's open task, so the delegation the lead sends without ``revises`` (the
+    window writer task ``...-lead-dd34``, unstamped in E6) inherits ``relayed``."""
+    org = Org(materialize("s1", "20261024T154745377872", tmp_path / "org"))
+    assert org.runtime.rework_context.work_tier("lead") == "relayed"
+    assert org.runtime.rework_context.work_tier(ROOT) is None
+
+
+@pytest.mark.parametrize("cut", ["20261024T172627799242", "20261024T172724489270"], ids=["395b", "d13d"])
+def test_f2_395b_and_d13d_the_lead_works_at_the_human_tier_while_9a5b_is_open(tmp_path, cut):
+    """F-2 (E6 s3; D-E6-5, F-E6-7): the user's rework 9a5b is the lead's open task at the cuts of 395b and d13d, so their delegations inherit ``human``."""
+    org = Org(materialize("s3", cut, tmp_path / "org"))
+    assert org.runtime.rework_context.work_tier("lead") == "human"

@@ -45,11 +45,26 @@ def test_the_answer_for_a_task_is_the_same_every_time(context: ReworkContext) ->
     assert dict(context.fields_for("ceo", KNOWN)) == dict(context.fields_for("ceo", KNOWN))
 
 
+def test_root_never_gets_a_work_tier(context: ReworkContext) -> None:
+    """F-E6-7 (D-E6-5): ``work_tier`` is the tier of the work an agent does now; root has none."""
+    assert context.work_tier("root") is None
+
+
+def test_a_work_tier_is_none_human_or_relayed_and_the_same_every_time(context: ReworkContext) -> None:
+    assert context.work_tier("ceo") in (None, "human", "relayed")
+    assert context.work_tier("ceo") == context.work_tier("ceo")
+
+
 def test_what_the_caller_does_with_the_answer_does_not_change_the_next_one(context: ReworkContext) -> None:
     answer = context.fields_for("ceo", KNOWN)
     if isinstance(answer, dict):
         answer["service"] = "changed"
     assert context.fields_for("ceo", KNOWN).get("service") != "changed"
+
+
+def test_a_fixed_context_answers_the_tier_it_was_given_to_the_actor_named() -> None:
+    fixed = FixedReworkContext({}, {"ceo": "human"})
+    assert fixed.work_tier("ceo") == "human" and fixed.work_tier("ceo/eng") is None
 
 
 def test_a_fixed_context_answers_with_what_it_was_given() -> None:
