@@ -1,4 +1,4 @@
-"""The commands that show the organization: ``status health progress dash``."""
+"""The commands that show the organization: ``status health progress quality dash``."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from ..health import HealthAnalyzer, HealthRenderer
 from ..kernel import ROOT, Provider
 from ..mail import TaskQuery
 from ..overview import OrgTree
-from ..progress import ProgressReporter
+from ..progress import ProgressReporter, QualityReport
 from ._ports import Arguments, Command, DashboardRunner, OrgSession, Output, Terminal
 
 
@@ -75,6 +75,24 @@ class ProgressCommand(Command):
     def run(self, args: Arguments) -> None:
         self._session.open(args)
         self._out.say(self._progress().describe_progress(args.task_id, args.wait))
+
+
+class QualityCommand(Command):
+    def __init__(self, session: OrgSession, report: Provider[QualityReport], out: Output) -> None:
+        self._session = session
+        self._report = report
+        self._out = out
+
+    def add_arguments(self, sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+        s = sub.add_parser("quality", help="how the work root asked for has gone: verdicts, escapes and their causes, runs per case, alarms, bar changes")
+        s.add_argument("service", nargs="?", help="only this service")
+        s.add_argument("--json", action="store_true", help="the same data as JSON (with each playbook version's changed lines)")
+        s.set_defaults(fn=self.run)
+
+    def run(self, args: Arguments) -> None:
+        self._session.open(args)
+        report = self._report()
+        self._out.say(json.dumps(report.quality_data(args.service), indent=2, sort_keys=True) if args.json else report.quality_text(args.service))
 
 
 class DashCommand(Command):

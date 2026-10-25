@@ -1,4 +1,4 @@
-"""``wire_cli``: the command line over a real organization - the 25 commands in the order of the parser, the session that opens the runtime, the process's own
+"""``wire_cli``: the command line over a real organization - the 26 commands in the order of the parser, the session that opens the runtime, the process's own
 output and terminal, the tail of the event files, the scheduler's loop and the other entry points behind their ports, the plan before there is an organization."""
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ from hirearchy.snapshots import RUNTIME_IGNORE_LINES
 
 COMMANDS = [
     "init", "hire", "task", "services", "define-service", "request", "feedback", "retire-service", "plan", "apply", "send", "status", "health", "progress",
-    "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash", "obs", "check", "kiro-profile",
+    "quality", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash", "obs", "check", "kiro-profile",
 ]
 
 

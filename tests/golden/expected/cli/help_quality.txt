@@ -1,0 +1,8 @@
+usage: hirearchy quality [-h] [--json] [service]
+
+positional arguments:
+  service     only this service
+
+options:
+  -h, --help  show this help message and exit
+  --json      the same data as JSON (with each playbook version's changed lines)

@@ -50,7 +50,7 @@ from ..cli._commands_services import (
     RetireServiceCommand,
     ServicesCommand,
 )
-from ..cli._commands_views import DashCommand, HealthCommand, ProgressCommand, StatusCommand
+from ..cli._commands_views import DashCommand, HealthCommand, ProgressCommand, QualityCommand, StatusCommand
 from ..cli._ports import (
     Command,
     DashboardRunner,
@@ -88,7 +88,7 @@ from ..observability import (
 )
 from ..observability._util import matcher, plain
 from ..overview import OrgTree
-from ..progress import ProgressReporter
+from ..progress import ProgressReporter, QualityReport
 from ..reflection import ServiceReports, ServiceSteps
 from ..review import HealthReviewer
 from ..scheduler._ports import Console
@@ -347,6 +347,7 @@ def commands_over(session: OrgSession, out: Output, terminal: Terminal, clock: C
         StatusCommand(session, get(OrgTree), get(TaskQuery), get(SchedulerStatus), out),
         HealthCommand(session, get(HealthAnalyzer), get(HealthRenderer), out),
         ProgressCommand(session, get(ProgressReporter), out),
+        QualityCommand(session, get(QualityReport), out),
         UpgradeRulesCommand(session, get(RulesUpgrader), out),
         InstallSkillCommand(unbound.get(SkillInstaller), out),
         ReviewCommand(session, get(HealthReviewer), snapshots, out),

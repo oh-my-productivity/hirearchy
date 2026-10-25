@@ -246,6 +246,7 @@ SCENARIOS: dict[str, Scenario] = {
     "health_agent": sc(f"{R} health --agent ceo"),
     "progress": sc(f"{R} progress"),
     "progress_unknown_task": sc(f"{R} progress nope"),
+    "quality": sc(f"{R} quality"),
     "dash_once": sc(f"{R} dash --once"),
     "dash_root_after_the_command": sc("dash --root {org} --once"),
     "dash_global_root_wins_when_alone": sc(f"{R} dash --once --interval 5"),
@@ -286,7 +287,7 @@ SCENARIOS: dict[str, Scenario] = {
 
 SUBCOMMANDS = (
     "init", "hire", "task", "services", "define-service", "request", "feedback", "retire-service", "plan", "apply", "send", "status", "health",
-    "progress", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash", "obs", "check", "kiro-profile",
+    "progress", "quality", "upgrade-rules", "install-skill", "review", "inbox", "resume", "run", "mcp", "dash", "obs", "check", "kiro-profile",
 )
 OBS_VIEWS = ("now", "trace", "metrics", "events")
 

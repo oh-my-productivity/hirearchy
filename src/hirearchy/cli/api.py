@@ -1,6 +1,6 @@
 """The public surface of ``cli``: the command line of the human (root) and of the runtime.
 
-``hirearchy [--root DIR] COMMAND ...``: 25 commands that read or change the organization at the root (the global ``--root``, else ``$ORG_ROOT``, else
+``hirearchy [--root DIR] COMMAND ...``: 26 commands that read or change the organization at the root (the global ``--root``, else ``$ORG_ROOT``, else
 the nearest directory above the working directory that has an ORG.md). The entry point publishes one interface, ``CliApp``: it parses the command line,
 runs the command, records a ``cli.command`` event for it and turns an ``OrgError`` into the message ``error: ...`` on the standard error and the exit
 status 1. Every command, the ports it consumes (the organization it opens, the other entry points it launches, the terminal) and the parser are private
