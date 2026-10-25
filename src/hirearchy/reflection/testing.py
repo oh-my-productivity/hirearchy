@@ -17,6 +17,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from ..agents import CharterReader
+from ..agents.testing import fs_agents
 from ..kernel import ROOT, STAMP_FORMAT, Message, OrgPaths
 from ..runs import RunLogReader
 from ..runs.testing import RunsHarness, fs_runs, memory_runs
@@ -190,10 +192,10 @@ class ReflectionWorld:
     deliverables: DeliverableChecks  # the checks of the deliverable folders over this world's cases (no checked versions: git knows nothing here)
 
 
-def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder) -> ReflectionWorld:
+def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder, charters: CharterReader) -> ReflectionWorld:
     d = s.d
     paths = OrgServicePaths(OrgPaths(d.root))
-    history = DerivedCaseHistory(s.catalog, d.agents, d.mail, s.hints, StorePlaybookTimelines(s.store), LogRunCounter(runs.reader, d.mail))
+    history = DerivedCaseHistory(s.catalog, d.agents, d.mail, s.hints, StorePlaybookTimelines(s.store), LogRunCounter(runs.reader, d.mail), charters)
     digest = DigestBuilder(s.catalog, history)
     rejections = MailRejectedServices(d.mail)
     sections = OwnerPromptSections(
@@ -214,11 +216,13 @@ def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder) -> R
 
 
 def fs_world(tmp_path: Path) -> ReflectionWorld:
-    return _world(services_fs_world(tmp_path), fs_runs(tmp_path), FsDeliverableFolder())
+    return _world(services_fs_world(tmp_path), fs_runs(tmp_path), FsDeliverableFolder(), fs_agents(tmp_path).charters)
 
 
 def memory_world(tmp_path: Path) -> ReflectionWorld:
-    return _world(services_memory_world(tmp_path), memory_runs(tmp_path), MemoryDeliverableFolder())
+    s = services_memory_world(tmp_path)
+    assert isinstance(s.d.agents, CharterReader)  # the in-memory agents of the world are also its charters (``MemoryAgents``)
+    return _world(s, memory_runs(tmp_path), MemoryDeliverableFolder(), s.d.agents)
 
 
 def history_fs(tmp_path: Path) -> CaseHistory:

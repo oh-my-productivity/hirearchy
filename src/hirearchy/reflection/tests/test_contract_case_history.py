@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from hirearchy.kernel import Message, msg_time
+from hirearchy.agents import CharterReader
+from hirearchy.kernel import JsonObject, Message, msg_time
 from hirearchy.reflection import CaseHistory
 from hirearchy.reflection._cases import DerivedCaseHistory
 from hirearchy.reflection._ports import PlaybookTimelines, RunCounter
@@ -514,9 +515,10 @@ def test_chains_with_runs_false_read_no_run_log_charter_or_playbook(w: Reflectio
     deliver(w, first, runs=2, budget=1)
     relayed = rework(w, first, source="relayed", budget=3)
     revise(w)
-    mail_only = DerivedCaseHistory(w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, _Refusing(), _Refusing())
+    refusing = _Refusing()
+    mail_only = DerivedCaseHistory(w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, refusing, refusing, refusing)
     (case,) = mail_only.chains("ceo", SERVICE, since=None, runs=False)
-    assert (case.runs, case.credited, case.relayed_runs, case.used) == (0, 0, 0, 0)
+    assert (case.runs, case.credited, case.relayed_runs, case.used, case.runs_unknown) == (0, 0, 0, 0, "") and refusing.charters_asked == []
     assert [t.id for t in case.tasks] == [first.id, relayed.id] and (case.returned, case.relayed_returned, case.budget) == (1, 0, 13)
 
 
@@ -617,13 +619,26 @@ def test_one_off_cases_with_runs_false_read_mail_only(w: ReflectionWorld) -> Non
     first = one_off(w, "ceo")
     w.use_run("ceo")
     deliver(w, first, runs=1, budget=2)
-    mail_only = DerivedCaseHistory(w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, _Refusing(), _Refusing())
+    refusing = _Refusing()
+    mail_only = DerivedCaseHistory(w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, refusing, refusing, refusing)
     (case,) = mail_only.one_off_cases(runs=False)
     assert (case.runs, case.credited, case.relayed_runs, case.used, case.returned, case.state) == (0, 0, 0, 0, 2, "done")
+    assert case.runs_unknown == "" and refusing.charters_asked == []  # a done case with no run log is not marked when no run is counted
 
 
-class _Refusing(RunCounter, PlaybookTimelines):
-    """A run counter and a playbook timeline that fail the test when asked."""
+class _Refusing(RunCounter, PlaybookTimelines, CharterReader):
+    """A run counter, a playbook timeline and a charter reader that fail the test when asked (a charter that is asked for is also recorded: a read
+    that fails is caught by the history)."""
+
+    def __init__(self) -> None:
+        self.charters_asked: list[str] = []
+
+    def charter(self, addr: str) -> tuple[JsonObject, str]:
+        self.charters_asked.append(addr)
+        raise AssertionError("a charter was read")
+
+    def memory(self, addr: str) -> str:
+        raise AssertionError("a memory was read")
 
     def runs_between(self, team: Sequence[str], start: str, end: str | None) -> int:
         raise AssertionError("a run log was read")

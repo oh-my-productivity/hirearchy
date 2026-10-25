@@ -4,6 +4,8 @@
 import time
 from datetime import datetime, timedelta
 
+import pytest
+
 from testkit.reach.hirearchy.core import ROOT
 from testkit.services_world import contract_meta, define, deliver, request, svc, work
 
@@ -14,6 +16,7 @@ from hirearchy.reflection._cases import DerivedCaseHistory
 from hirearchy.reflection._ports import RunCounter
 from hirearchy.reflection._timeline import StorePlaybookTimelines
 from hirearchy.reflection.testing import fs_world
+from hirearchy.agents.testing import fs_agents
 
 from . import _support as sup
 from ._support import SERVICE, populated
@@ -686,9 +689,11 @@ class FixedStamps(RunCounter):
         return [(s, credited) for s, credited in self.found if s >= start and (end is None or s <= end)]
 
 
-def with_counter(w, counter):
-    """The history of ``w`` over the same files, counting runs with ``counter``."""
-    return DerivedCaseHistory(w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, StorePlaybookTimelines(w.s.store), counter)
+def with_counter(w, counter, charters=None):
+    """The history of ``w`` over the same files, counting runs with ``counter`` (and reading charters with ``charters``, the files' by default)."""
+    return DerivedCaseHistory(
+        w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, StorePlaybookTimelines(w.s.store), counter, charters or fs_agents(w.s.d.root).charters,
+    )
 
 
 def before(stamp):
@@ -800,3 +805,133 @@ def test_each_case_makes_one_stamps_call(tmp_path):
     counter = FixedStamps([])
     cases = with_counter(w, counter).cases("ceo", SERVICE)
     assert len(cases) == 2 and len(counter.calls) == 2
+
+
+# ------------------------------------------------------------------------- runs not counted (0b 4.1)
+HIRED_AGAIN = "sent before ceo was hired again: the retired team's run logs are not read"
+
+
+def one_off(w, to="ceo", **kw):
+    """Root hands ``to`` a task that is no service request."""
+    return w.s.d.post(Message(sender="root", to=to, type="task", title="a task", body="b", budget=kw.pop("budget", 5), **kw))
+
+
+def one_off_case(w):
+    (case,) = w.history.one_off_cases()
+    return case
+
+
+def charter(w, frontmatter, addr="ceo"):
+    """The charter of ``addr`` becomes this text (``frontmatter`` is the text between the dashes; bytes are written as they are)."""
+    path = w.s.d.root / addr / "AGENT.md"
+    if isinstance(frontmatter, bytes):
+        path.write_bytes(frontmatter)
+    else:
+        path.write_text(f"---\n{frontmatter}\n---\n# Role\n", encoding="utf-8")
+
+
+class Unreadable:
+    """A charter reader that cannot read (an ``OSError``)."""
+
+    def charter(self, addr):
+        raise PermissionError("denied")
+
+
+def test_a_retired_one_off_assignee_reads_assignee_retired(tmp_path):
+    w = chain_world(tmp_path)
+    sup.deliver(w, one_off(w), runs=1)
+    (w.s.d.root / "ceo" / "AGENT.md").unlink()  # the assignee was retired
+    assert one_off_case(w).runs_unknown == "assignee retired"
+
+
+def test_the_assignee_of_a_service_case_is_not_checked_for_retirement(tmp_path):
+    w = chain_world(tmp_path)
+    sup.deliver(w, sup.ask(w), runs=1)
+    case = the_case(w)
+    assert case.runs_unknown == "" and case.runs == 1
+
+
+@pytest.mark.parametrize("service", [True, False], ids=["service", "one-off"])
+def test_a_head_task_before_the_owners_charter_created_reads_sent_before_hired_again(tmp_path, service):
+    w = chain_world(tmp_path)
+    sup.deliver(w, sup.ask(w) if service else one_off(w), runs=2)
+    charter(w, 'role: Lead\ncan_hire: true\ncreated: "2099-01-01T00:00:00+00:00"')
+    case = the_case(w) if service else one_off_case(w)
+    assert case.runs_unknown == HIRED_AGAIN
+
+
+@pytest.mark.parametrize("service", [True, False], ids=["service", "one-off"])
+def test_a_head_task_after_the_owners_charter_created_is_counted(tmp_path, service):
+    w = chain_world(tmp_path)
+    sup.deliver(w, sup.ask(w) if service else one_off(w), runs=2)
+    charter(w, 'role: Lead\ncan_hire: true\ncreated: "2000-01-01T00:00:00+00:00"')
+    case = the_case(w) if service else one_off_case(w)
+    assert (case.runs_unknown, case.runs) == ("", 2)
+
+
+@pytest.mark.parametrize(
+    "text", [b"\xff\xfe", "key: [unclosed"], ids=["not-utf8", "does-not-parse"],
+)
+def test_a_charter_that_cannot_be_read_is_not_utf8_or_does_not_parse_gives_no_mark(tmp_path, text):
+    w = chain_world(tmp_path)
+    sup.deliver(w, sup.ask(w), runs=2)
+    charter(w, text)
+    case = the_case(w)  # the history of the world reads the charters of its files, and does not raise
+    assert (case.runs_unknown, case.runs) == ("", 2)
+
+
+def test_a_charter_that_raises_an_os_error_gives_no_mark(tmp_path):
+    w = chain_world(tmp_path)
+    sup.deliver(w, sup.ask(w), runs=2)
+    (case,) = with_counter(w, w.history._counter, Unreadable()).cases("ceo", SERVICE)
+    assert (case.runs_unknown, case.runs) == ("", 2)
+
+
+@pytest.mark.parametrize("created", ["", "created: not a time", "created: 12"], ids=["absent", "unparseable", "a-number"])
+def test_a_charter_without_created_or_with_an_unparseable_created_gives_no_mark(tmp_path, created):
+    w = chain_world(tmp_path)
+    sup.deliver(w, sup.ask(w), runs=2)
+    charter(w, f"role: Lead\ncan_hire: true\n{created}")
+    case = the_case(w)
+    assert (case.runs_unknown, case.runs) == ("", 2)
+
+
+@pytest.mark.parametrize("status", ["done", "failed"])
+def test_a_done_uncut_case_without_a_run_log_reads_no_run_log_in_its_window(tmp_path, status):
+    w = chain_world(tmp_path)
+    sup.deliver(w, sup.ask(w), status=status, runs=0)
+    case = the_case(w)
+    assert (case.state, case.cut, case.runs, case.runs_unknown) == (status, False, 0, "no run log in its window")
+
+
+def test_a_cut_blocked_or_open_case_without_a_run_log_is_counted(tmp_path):
+    w = chain_world(tmp_path)
+    cut = sup.ask(w, "a")
+    blocked = sup.ask(w, "b")
+    sup.deliver(w, blocked, status="blocked", runs=0)
+    open_one = sup.ask(w, "c")
+    sup.deliver(w, cut, runs=0)  # answered after the second request was sent: its window ended there
+    first, second, third = w.history.cases("ceo", SERVICE)
+    assert [(c.id, c.state, c.cut, c.runs_unknown) for c in (first, second, third)] == [
+        (cut.id, "done", True, ""), (blocked.id, "blocked", True, ""), (open_one.id, "open", False, ""),
+    ]
+
+
+def test_a_credited_log_alone_counts_as_a_run_log_of_the_window(tmp_path):
+    w = chain_world(tmp_path)
+    sup.deliver(w, sup.ask(w), runs=1)
+    only = max(w.runs.files("ceo"), key=lambda f: f.stem).stem
+    w.s.d.post(Message(sender=RUNTIME, to="ceo", type="note", budget=1, wake=False, title=run_credit_title("ceo", only), body="returned"))
+    case = the_case(w)
+    assert (case.runs, case.credited, case.runs_unknown) == (0, 1, "")
+
+
+def test_the_first_reason_that_applies_wins(tmp_path):
+    w = chain_world(tmp_path)
+    service = sup.deliver(w, sup.ask(w), runs=0)  # no run log in its window ...
+    one = sup.deliver(w, one_off(w), runs=0)
+    assert service is not None and one is not None
+    charter(w, 'role: Lead\ncan_hire: true\ncreated: "2099-01-01T00:00:00+00:00"')  # ... but it was sent before the hire
+    assert the_case(w).runs_unknown == HIRED_AGAIN and one_off_case(w).runs_unknown == HIRED_AGAIN
+    (w.s.d.root / "ceo" / "AGENT.md").unlink()  # ... and the one-off assignee is gone, which comes before
+    assert one_off_case(w).runs_unknown == "assignee retired"

@@ -11,7 +11,7 @@ here, inside the providers of the ports that use them.
 
 from __future__ import annotations
 
-from ..agents import AgentDirectory
+from ..agents import AgentDirectory, CharterReader
 from ..kernel import Clock, OrgLayout
 from ..mail import MailboxReader
 from ..reflection import CaseHistory, DeliverableChecks, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
@@ -41,7 +41,7 @@ def register(b: Builder) -> None:
         CaseHistory,
         lambda b: DerivedCaseHistory(
             b.get(ServiceCatalog), b.get(AgentDirectory), b.get(MailboxReader), b.get(ServiceHints),
-            StorePlaybookTimelines(b.get(ServiceStore)), LogRunCounter(b.get(RunLogReader), b.get(MailboxReader)),
+            StorePlaybookTimelines(b.get(ServiceStore)), LogRunCounter(b.get(RunLogReader), b.get(MailboxReader)), b.get(CharterReader),
         ),
     )
     b.provide(ReflectionDigest, lambda b: DigestBuilder(b.get(ServiceCatalog), b.get(CaseHistory)))

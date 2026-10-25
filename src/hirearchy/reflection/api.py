@@ -150,6 +150,7 @@ class Case:
     credited: int = 0  # 0b 4.2: the credited run logs in the case window (a run credit names them: they are not charged and not in ``runs``)
     top_ups: TopUps = TopUps()  # 0b 4.2: the budgets of the chain's later tasks by source, and of the client's notes to the team inside the window
     cut: bool = False  # 0b 4.1: the window ended at the client's next task to the owner, before the case's final result
+    runs_unknown: str = ""  # 0b 4.1: why the case's runs cannot be read (``assignee retired``, ``sent before {owner} was hired again: ...``, ``no run log in its window``); "" when they are counted
 
     @property
     def title(self) -> str:

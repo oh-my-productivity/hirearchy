@@ -86,3 +86,13 @@ def test_the_evidence_reads_the_history_of_the_runtime_and_can_be_overridden(tmp
         runtime.service_evidence.links("ceo", "brief", ["R1"])
     refusing = RefusingServiceEvidence("no")
     assert wiring.open_runtime(tmp_path, {ServiceEvidence: refusing}).service_evidence is refusing
+
+
+def test_the_case_history_reads_the_charters(tmp_path: Path) -> None:
+    """The 7th collaborator of the history is the runtime's charter reader: a task sent before its assignee's charter says it was created reads as such."""
+    org = Org.init(tmp_path / "org", "mission")
+    org.hire("root", "ceo", "Chief", "Run it.", can_hire=True, max_children=2)
+    org.delegate("root", "ceo", "a task", "do it", "it is done", budget=3)
+    (org.root / "ceo" / "AGENT.md").write_text("---\nrole: Chief\ncan_hire: true\ncreated: '2099-01-01T00:00:00+00:00'\n---\nbody\n", encoding="utf-8")
+    (case,) = org.runtime.case_history.one_off_cases()
+    assert case.runs_unknown == "sent before ceo was hired again: the retired team's run logs are not read"

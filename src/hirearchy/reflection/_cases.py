@@ -6,8 +6,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
-from ..agents import AgentDirectory
-from ..kernel import ROOT, Message, latest_results, link_ids, msg_time, parent, verdict_tier
+from ..agents import AgentDirectory, CharterReader
+from ..kernel import ROOT, Message, latest_results, link_ids, msg_time, parent, parse_time, verdict_tier
 from ..mail import MailboxReader
 from ..services import ServiceCatalog
 from ._ports import FeedbackWords, PlaybookTimelines, RunCounter
@@ -116,7 +116,7 @@ class DerivedCaseHistory(CaseHistory):
 
     def __init__(
         self, catalog: ServiceCatalog, agents: AgentDirectory, mail: MailboxReader, words: FeedbackWords, timelines: PlaybookTimelines,
-        counter: RunCounter,
+        counter: RunCounter, charters: CharterReader,
     ) -> None:
         self._catalog = catalog
         self._agents = agents
@@ -124,6 +124,7 @@ class DerivedCaseHistory(CaseHistory):
         self._words = words
         self._timelines = timelines
         self._counter = counter
+        self._charters = charters
 
     def playbook_timeline(self, owner: str, service: str) -> list[tuple[int, datetime]]:
         return self._timelines.timeline(owner, service)
@@ -222,8 +223,29 @@ class DerivedCaseHistory(CaseHistory):
                 relayed_returned=spend.relayed_returned, relayed_to_user=spend.relayed_to_user, relayed_overlap=spend.relayed_overlap, unsplit_runs=spend.unsplit_runs,
                 user_granted=spend.user_granted, user_ceiling=spend.user_ceiling, unapproved_reworks=spend.unapproved,
                 top_ups=_top_ups(tasks, _handed_down(sent, team, start, end)), cut=cut,
+                runs_unknown=self._runs_unknown(owner, service, tasks[0], state, cut, stamps) if runs else "",
             ))
         return out
+
+    def _hired(self, addr: str) -> datetime | None:
+        """When the charter of ``addr`` says it was created; None when it says nothing, nothing that is a time, or cannot be read."""
+        try:
+            return parse_time(self._charters.charter(addr)[0].get("created"))
+        except Exception:  # noqa: BLE001 - yaml errors of any kind, text that is not UTF-8, a charter that cannot be read
+            return None
+
+    def _runs_unknown(self, owner: str, service: str, head: Message, state: str, cut: bool, stamps: Sequence[tuple[str, bool]]) -> str:
+        """Why the runs of a case cannot be read, for the first reason that applies (design 4.1); "" when they can. (1) a one-off assignee that no
+        longer exists; (2) the head task was sent before the owner's charter was created: its team is the retired one, whose logs are not read;
+        (3) a done or failed case whose window was not cut holds no run log of the team, charged or credited."""
+        if not service and not self._agents.exists(owner):
+            return "assignee retired"
+        hired, sent = self._hired(owner), msg_time(head)
+        if hired is not None and sent is not None and sent < hired:
+            return f"sent before {owner} was hired again: the retired team's run logs are not read"
+        if state in ("done", "failed") and not cut and not stamps:
+            return "no run log in its window"
+        return ""
 
     def _verdict(self, note: Message, step: int, links: list[Message]) -> Verdict:
         """The verdict a feedback note is. Its link is the latest human-tier candidate, else the latest candidate of any tier. A candidate is the
