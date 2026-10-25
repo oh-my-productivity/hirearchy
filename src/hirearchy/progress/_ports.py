@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import NamedTuple, Protocol, runtime_checkable
 
-from ..kernel import Message
+from ..kernel import JsonObject, Message
 
 
 class TaskState(NamedTuple):
@@ -117,4 +117,18 @@ class Snapshots(Protocol):
 class ProgressView(Protocol):
     def progress(self, task_id: str | None = None, now: datetime | None = None, *, wait_seconds: int = 0) -> str:
         """``ProgressReporter.progress``."""
+        ...
+
+
+@runtime_checkable
+class FailCounts(Protocol):
+    def fails(self, addr: str) -> tuple[int, int]:
+        """``(re-checks, author rework runs)`` that a FAIL of ``addr`` cost before it signed a delivery off (0 and 0 for an agent that took no part)."""
+        ...
+
+
+@runtime_checkable
+class ConfigSource(Protocol):
+    def config(self) -> JsonObject:
+        """The settings of ORG.md (its frontmatter over the defaults). ``OrgError`` when ORG.md cannot be read or parsed."""
         ...

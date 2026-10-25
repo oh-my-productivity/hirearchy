@@ -22,6 +22,13 @@ from ..mail import MailboxReader
 from ..runs import RunLogReader
 from ..settings import OrgSettings
 from ._builder import Builder
+from ._lazy import PortResolver
+
+
+def escape_counter(b: PortResolver) -> MailEscapeCounter:
+    """Health's escape counter over the mailboxes and run logs of ``b``: the analyzer's and the quality view's FAIL counts are made of the same one."""
+    agents, mail = b.get(AgentDirectory), b.get(MailboxReader)
+    return MailEscapeCounter(agents, mail, b.get(RunLogReader), MailClientRework(agents, mail))
 
 
 def register(b: Builder) -> None:
@@ -31,9 +38,7 @@ def register(b: Builder) -> None:
         lambda b: FileHealthAnalyzer(
             b.get(AgentDirectory), b.get(MailboxReader), b.get(RunLogReader), b.get(RunLogReader), b.get(BudgetQuery), b.get(PauseStore),
             b.get(AgentStates), b.get(HealthThresholds), MailClientRework(b.get(AgentDirectory), b.get(MailboxReader)),
-            MailEscapeCounter(
-                b.get(AgentDirectory), b.get(MailboxReader), b.get(RunLogReader), MailClientRework(b.get(AgentDirectory), b.get(MailboxReader)),
-            ),
+            escape_counter(b),
             CharterHireDates(b.get(CharterReader), FsCharterStamp(b.get(OrgLayout))), b.get(Clock),
         ),
     )

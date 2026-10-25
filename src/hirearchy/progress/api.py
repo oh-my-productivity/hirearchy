@@ -17,8 +17,11 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Protocol, runtime_checkable
 
+from ..kernel import JsonObject
+
 __all__ = [
     "ProgressReporter",
+    "QualityReport",
     "WAIT_MAX",
 ]
 
@@ -52,4 +55,21 @@ class ProgressReporter(Protocol):
     def work_in_flight(self, task_id: str | None = None) -> bool:
         """Could anything move for the listed root tasks right now: a task that is working or waiting, or blocked or stalled while an agent
         below it is running or could run. Read-only."""
+        ...
+
+
+@runtime_checkable
+class QualityReport(Protocol):
+    def quality_text(self, service: str | None = None) -> str:
+        """How the work root asked for has gone, from the files (0b 9): per service, and for root's one-off tasks, the cases, the user's verdicts on first
+        deliveries in their words, escapes with the verifier that signed them off and the cause a rule typed, deliveries without a verdict and files not
+        as delivered, the user's runs against the runs the user approved, two alarms (repeat, cost), the timeline of bar changes, and the blocked tasks
+        moved past without a verdict. ``service`` limits it to one service (empty or ``None``: everything). Read-only. ``OrgError`` for a ``service`` no agent
+        offers (it lists the names) or one longer than 80 characters; ``OrgError``/``OSError`` when the agents cannot be listed. A file that does not parse
+        degrades the part it feeds and is never raised."""
+        ...
+
+    def quality_data(self, service: str | None = None) -> JsonObject:
+        """The same data as ``quality_text`` as plain JSON values (schema 1, 0b 9.4): every key always present, no text limits, the playbook versions'
+        changed lines included. Same errors."""
         ...

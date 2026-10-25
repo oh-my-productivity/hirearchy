@@ -19,25 +19,29 @@ from pathlib import Path
 from ..agents import AgentDirectory, AgentRegistry
 from ..agents.testing import fs_agents
 from ..attention.testing import FixedWaiting, ListHumanQueue
+from ..budget import BudgetQuery
 from ..budget.testing import BudgetWorld, FixedBudget
 from ..budget.testing import fixed_world as memory_budget_world
 from ..budget.testing import fs_world as fs_budget_world
 from ..daemon.testing import FakeSchedulerStatus
 from ..eligibility import PauseStore, RunnableQuery
 from ..eligibility.testing import PauseHarness, fs_pauses, memory_pauses, runnable_over
-from ..kernel import Clock, Message, OrgLayout, OrgPaths
+from ..kernel import ROOT, Clock, JsonObject, Message, OrgLayout, OrgPaths
 from ..kernel.testing import FakeClock
 from ..mail import MailboxReader, TaskQuery
 from ..mail.testing import MemoryMailbox
-from ..reflection import ServiceReports
-from ..reflection.testing import FixedCaseHistory, FixedDeliverableChecks
+from ..reflection import CaseRecords, OwnerDeliveries, QualityThresholds, ServiceRecord, ServiceReports
+from ..reflection.testing import FixedCaseHistory, FixedCaseRecords, FixedDeliverableChecks
 from ..runs import RunLogReader
 from ..runs.testing import RunsHarness, fs_runs, memory_runs
 from ._activity import FsTeamActivity
 from ._lines import CaseTaskLines
 from ._liveness import RunnableTeams
 from ._listing import MailRootTasks
-from ._ports import ProgressText, ProgressView, Snapshot, Snapshots, TeamActivity
+from ._ports import ConfigSource, FailCounts, ProgressText, ProgressView, Snapshot, Snapshots, TaskStates, TaskTeams, TeamActivity
+from ._quality import DerivedQualityReport, service_name
+from ._quality_facts import QualityView, RecordView
+from ._quality_render import quality_data, quality_text
 from ._render import RootTaskReport
 from ._reporter import DerivedProgressReporter
 from ._counts import LogRunCounts
@@ -45,7 +49,7 @@ from ._snapshot import TeamSnapshots
 from ._states import MailTaskStates
 from ._teams import AgentTaskTeams
 from ._wait import PollingProgress
-from .api import ProgressReporter
+from .api import ProgressReporter, QualityReport
 
 STAMP = "%Y%m%dT%H%M%S%f"
 
@@ -176,6 +180,9 @@ class ProgressWorld:
     history: FixedCaseHistory
     totals: FixedCaseTotals
     deliverables: FixedDeliverableChecks  # the findings of the deliverable folders root is shown (none unless a test puts some in)
+    states: TaskStates
+    teams: TaskTeams
+    budget: BudgetQuery
     queue: ListHumanQueue
     scheduler: FakeSchedulerStatus
     waiting: FixedWaiting
@@ -239,7 +246,8 @@ def _world(
 
     return ProgressWorld(
         reporter=reporter, text=text, snapshots=snapshots, mail=budgets.mail, tasks=budgets.tasks, agents=budgets.agents, pauses=pauses.store,
-        runnable=runnable, runs=runs.reader, layout=layout, clock=wait_clock, history=history, totals=totals, deliverables=deliverables, queue=queue, scheduler=scheduler,
+        runnable=runnable, runs=runs.reader, layout=layout, clock=wait_clock, history=history, totals=totals, deliverables=deliverables, states=states, teams=teams, budget=budgets.query,
+        queue=queue, scheduler=scheduler,
         waiting=waiting, activity=team_activity, hire=hire, retire=retire, delegate=delegate,
         answer=answer, write=write, post=budgets.post, use_run=use_run, begin_run=budgets.begin_run, end_run=budgets.end_run, pause=pauses.store.pause,
         advance=budgets.clock.advance,
@@ -262,6 +270,107 @@ def memory_world(tmp_path: Path) -> ProgressWorld:
     return _world(tmp_path, budgets, memory_runs(tmp_path), memory_pauses(tmp_path), box.agents, lambda layout: FixedTeamActivity(), ScriptedClock(budgets.clock))
 
 
+# ------------------------------------------------------------------------------ the quality view
+
+
+class FixedFailCounts(FailCounts):
+    """The FAIL counts of each address in ``counts`` (``(re-checks, author rework runs)``); an address not in it has none."""
+
+    def __init__(self, counts: Mapping[str, tuple[int, int]] | None = None) -> None:
+        self.counts = dict(counts or {})
+
+    def fails(self, addr: str) -> tuple[int, int]:
+        return self.counts.get(addr, (0, 0))
+
+
+class FixedConfigSource(ConfigSource):
+    """ORG.md's settings are ``config`` (none: empty); with ``error`` they cannot be read."""
+
+    def __init__(self, config: JsonObject | None = None, *, error: Exception | None = None) -> None:
+        self.settings = dict(config or {})
+        self.error = error
+
+    def config(self) -> JsonObject:
+        if self.error is not None:
+            raise self.error
+        return dict(self.settings)
+
+
+class FixedQualityReport(QualityReport):
+    """The quality view over the ``records`` a test puts in (the real renderers, the default thresholds, no stalled state, no FAIL counts, no moved-past
+    section); each call is kept in ``calls`` as ``(method, service)`` with the service as it was asked for."""
+
+    def __init__(self, records: Sequence[ServiceRecord] = ()) -> None:
+        self.records = list(records)
+        self.calls: list[tuple[str, str | None]] = []
+
+    def _view(self, service: str | None) -> QualityView:
+        name = service_name(service)
+        found = FixedCaseRecords(self.records).records(name)
+        return QualityView(QualityThresholds(), (), tuple(RecordView(r) for r in found), (), name)
+
+    def quality_text(self, service: str | None = None) -> str:
+        self.calls.append(("quality_text", service))
+        return quality_text(self._view(service))
+
+    def quality_data(self, service: str | None = None) -> JsonObject:
+        self.calls.append(("quality_data", service))
+        return quality_data(self._view(service))
+
+
+@dataclass(frozen=True)
+class QualityHarness:
+    """A ``QualityReport`` and the means to prepare it. After ``populate``, root has two services, ``service`` offered by ``owner`` and ``other`` by
+    ``ops``, and no task."""
+
+    report: QualityReport
+    populate: Callable[[], None]
+    owner: str
+    service: str
+    other: str
+
+
+def _two_services() -> list[ServiceRecord]:
+    return [
+        ServiceRecord("ceo", "weekly-brief", ROOT, "human", contract=1, playbook=1, budget=10),
+        ServiceRecord("ops", "daily-digest", ROOT, "human", contract=1, budget=6),
+        ServiceRecord("", "", ROOT, "human"),
+    ]
+
+
+def quality_fs(tmp_path: Path) -> QualityHarness:
+    """The report over the mailboxes, budgets and flags of an organization directory; the records are fixed (``FixedCaseRecords``)."""
+    w = fs_world(tmp_path)
+    w.hire("ceo")
+    w.hire("ops")
+    held = {"records": FixedCaseRecords([ServiceRecord("", "", ROOT, "human")])}
+
+    class Switch(CaseRecords):
+        """The fixed records a harness can swap, so that ``populate`` changes what the report is made of."""
+
+        def records(self, service: str | None = None) -> list[ServiceRecord]:
+            return held["records"].records(service)
+
+        def deliveries(self, owner: str) -> OwnerDeliveries:
+            return held["records"].deliveries(owner)
+
+    def populate() -> None:
+        held["records"] = FixedCaseRecords(_two_services())
+
+    report = DerivedQualityReport(Switch(), w.states, w.teams, w.tasks, w.mail, w.budget, w.agents, FixedFailCounts(), FixedConfigSource())
+    return QualityHarness(report, populate, "ceo", "weekly-brief", "daily-digest")
+
+
+def quality_fixed(tmp_path: Path) -> QualityHarness:
+    fixed = FixedQualityReport([ServiceRecord("", "", ROOT, "human")])
+
+    def populate() -> None:
+        fixed.records[:] = _two_services()
+
+    return QualityHarness(fixed, populate, "ceo", "weekly-brief", "daily-digest")
+
+
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     ProgressReporter: [fs_world, memory_world],
+    QualityReport: [quality_fs, quality_fixed],
 }

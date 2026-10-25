@@ -1,0 +1,22 @@
+Quality of the work you asked for (derived from the files, nothing stored; for you and the user, never for agents).
+Thresholds: the defaults (tunable): alarms need 3 judged cases; repeat: one id failing in 2 of the last 3 judged cases; cost: a case above 1.25x its approved runs.
+
+weekly-report (offered by lead; client: you, human; unit: case; contract v1, playbook v1; approved 10 runs per request)
+  cases: 0 (done 0, failed 0, blocked 0, open 0 (stalled 0))
+  first deliveries: 0 accepted, 0 rejected, 0 without a verdict
+  judged by the user: n/a (0 of 0) deliveries; without a verdict: 0 case(s); not as delivered: 0
+  escapes (the team reported done, then the user rejected it): none (judged: n/a (0 of 0))
+  verifiers: none (no delivery yet)
+  runs per case (the user's runs: runs used outside your relayed reworks, plus runs still out while a case is open or blocked; approved: the contract's 10 per request, or more where your hand-downs raised it (runs used + held + new, at that moment)): none
+  alarms:
+    repeat: n/a (0 of 3 judged cases)
+    cost: n/a (0 of 3 judged cases)
+  timeline (bar changes, UTC; marked, never used to split the counts):
+    2026-01-15 09:00 contract v1 (C1, C2)
+    2026-01-15 09:00 playbook v1 (root): written by the client (no admission needed)
+    charter edits and model changes: unknown (no org history: the organization is not a git repository, or git is missing)
+  run attribution is by time window (08 3.3): 0 case(s) had their window cut by a later request.
+
+One-off tasks you gave: none.
+
+Blocked tasks moved past without a verdict: none.

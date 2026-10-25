@@ -1,12 +1,23 @@
-"""The quality view (0b): the tasks a blocked result holds runs on, and those left blocked (4.5), pure over what ``mail`` reads."""
+"""The quality view (0b): the tasks a blocked result holds runs on, and those left blocked (4.5), pure over what ``mail`` reads; and
+``DerivedQualityReport``, which puts a view together from the records, the task states, the budgets, the FAIL counts and ORG.md and renders it."""
 
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
-from ..kernel import Message
-from ..mail import moved_past
-from ._quality_facts import HeldTask
+from ..agents import AgentDirectory
+from ..budget import BudgetQuery
+from ..kernel import JsonObject, Message, OrgError, clip_line, latest_results
+from ..mail import MailboxReader, TaskQuery, moved_past
+from ..reflection import CaseRecords, QualityThresholds, ServiceRecord, quality_thresholds
+from ._ports import ConfigSource, FailCounts, TaskStates, TaskTeams
+from ._quality_facts import HeldTask, MovedPast, QualityView, RecordView, verifiers
+from ._quality_render import quality_data, quality_text
+from .api import QualityReport
+
+SERVICE_CHARS = 80  # the longest service name `quality` accepts
+ERROR_CHARS = 200  # characters of an exception's words in the view
+ORG_MD_UNREADABLE = "ORG.md cannot be read (its settings block does not parse): the default thresholds are used."
 
 
 def held_tasks(tasks: Sequence[Message], latest: Mapping[str, Message], received: Sequence[Message]) -> list[Message]:
@@ -42,3 +53,96 @@ def blocked_listing(tasks: Sequence[Message], latest: Mapping[str, Message], rec
         (HeldTask(t, latest[t.id], left_blocked(t, latest[t.id], received)) for t in held_tasks(tasks, latest, received)), key=lambda h: h.blocked.id,
     )
     return tuple(held) if any(h.left_blocked for h in held) else ()
+
+
+def service_name(service: str | None) -> str | None:
+    """The service a call asks for (13, 14): stripped, ``None`` when empty; an ``OrgError`` for a name of more than 80 characters."""
+    name = (service or "").strip()
+    if len(name) > SERVICE_CHARS:
+        raise OrgError(f"service is a service name (at most {SERVICE_CHARS} characters): {clip_line(name, SERVICE_CHARS)}")
+    return name or None
+
+
+class DerivedQualityReport(QualityReport):
+    """The quality view over the records of the cases, the states of the open tasks, the budgets the held tasks hold, the FAIL counts of the signers
+    and ORG.md's thresholds. Everything is read again per call and nothing is stored or written. A part that cannot be read reads ``unknown`` with the
+    error's words; the records that cannot be built are lines of the view (13)."""
+
+    def __init__(
+        self, records: CaseRecords, states: TaskStates, teams: TaskTeams, tasks: TaskQuery, mail: MailboxReader, budgets: BudgetQuery,
+        agents: AgentDirectory, fails: FailCounts, config: ConfigSource,
+    ) -> None:
+        self._records = records
+        self._states = states
+        self._teams = teams
+        self._tasks = tasks
+        self._mail = mail
+        self._budgets = budgets
+        self._agents = agents
+        self._fails = fails
+        self._config = config
+
+    def quality_text(self, service: str | None = None) -> str:
+        return quality_text(self._view(service))
+
+    def quality_data(self, service: str | None = None) -> JsonObject:
+        return quality_data(self._view(service))
+
+    def _view(self, service: str | None) -> QualityView:
+        name = service_name(service)
+        records = self._records.records(name)
+        thresholds, notes = self._thresholds()
+        moved = self._moved_past()
+        left = frozenset(h.task.id for m in moved for h in m.tasks if h.left_blocked)
+        return QualityView(thresholds, notes, tuple(self._record_view(r, left) for r in records), moved, name)
+
+    def _thresholds(self) -> tuple[QualityThresholds, tuple[str, ...]]:
+        try:
+            config = self._config.config()
+        except (OrgError, OSError):  # ORG.md does not parse: the defaults, and the user is told
+            return QualityThresholds(), (ORG_MD_UNREADABLE,)
+        return quality_thresholds(config)
+
+    def _record_view(self, record: ServiceRecord, left: frozenset[str]) -> RecordView:
+        if record.error or record.client_kind != "human":  # a nested service is one line of counts
+            return RecordView(record, left_blocked=left)
+        stalled, stalled_error = self._stalled(record)
+        fails: dict[str, tuple[int, int]] = {}
+        errors: dict[str, str] = {}
+        for v in verifiers(record):
+            try:
+                fails[v.addr] = self._fails.fails(v.addr)
+            except (OrgError, OSError) as exc:
+                errors[v.addr] = clip_line(str(exc), ERROR_CHARS)
+        return RecordView(record, stalled, stalled_error, left, fails, errors)
+
+    def _stalled(self, record: ServiceRecord) -> tuple[dict[str, bool], str]:
+        """Which open cases are stalled now (`TaskStates`: the state starts with ``stalled (``), or why that is unknown."""
+        try:
+            return {
+                c.id: self._states.state_of(c.tasks[-1], c.result, self._teams.team_of(c.tasks[-1])).state.startswith("stalled (")
+                for c in record.cases if c.state == "open"
+            }, ""
+        except (OrgError, OSError) as exc:
+            return {}, clip_line(str(exc), ERROR_CHARS)
+
+    def _moved_past(self) -> tuple[MovedPast, ...]:
+        out: list[MovedPast] = []
+        for addr in self._agents.agents():
+            try:
+                blocked = self._tasks.blocked_tasks(addr)
+                if not blocked:
+                    continue
+                received = self._mail.received(addr)
+                listing = blocked_listing(blocked, latest_results(self._mail.sent(addr)), received)
+            except (OrgError, OSError) as exc:
+                out.append(MovedPast(addr, None, error=clip_line(str(exc), ERROR_CHARS)))
+                continue
+            if not listing:
+                continue
+            try:
+                held = self._budgets.budget(addr)
+                out.append(MovedPast(addr, held, "" if held is not None else "no budget is derived for it", tasks=listing))
+            except (OrgError, OSError) as exc:
+                out.append(MovedPast(addr, None, clip_line(str(exc), ERROR_CHARS), tasks=listing))
+        return tuple(out)

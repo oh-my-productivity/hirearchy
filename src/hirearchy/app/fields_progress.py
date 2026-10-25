@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..progress import ProgressReporter
+from ..progress import ProgressReporter, QualityReport
 
 STEP: str | None = "C-progress"  # the step that filled this part (see test_runtime_fields)
 NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a value, a factory, ...)
@@ -13,3 +13,4 @@ NOT_A_FIELD: dict[str, str] = {}  # port -> why it is not a runtime field (a val
 @dataclass(frozen=True)
 class Fields:
     progress_reporter: ProgressReporter
+    quality_report: QualityReport

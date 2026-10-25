@@ -1,0 +1,7 @@
+Quality of the work you asked for (derived from the files, nothing stored; for you and the user, never for agents).
+Thresholds: the defaults (tunable): alarms need 3 judged cases; repeat: one id failing in 2 of the last 3 judged cases; cost: a case above 1.25x its approved runs.
+ORG.md cannot be read (its settings block does not parse): the default thresholds are used.
+
+No cases yet: you have requested no service and given no task.
+
+Blocked tasks moved past without a verdict: none.

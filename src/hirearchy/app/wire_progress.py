@@ -13,22 +13,28 @@ from ..daemon import SchedulerStatus
 from ..eligibility import PauseStore, RunnableQuery
 from ..kernel import Clock, OrgLayout
 from ..mail import MailboxReader, TaskQuery
-from ..progress import ProgressReporter
+from ..budget import BudgetQuery
+from ..progress import ProgressReporter, QualityReport
 from ..progress._activity import FsTeamActivity
 from ..progress._counts import LogRunCounts
 from ..progress._lines import CaseTaskLines
 from ..progress._listing import MailRootTasks
 from ..progress._liveness import RunnableTeams
 from ..progress._render import RootTaskReport
+from ..progress._quality import DerivedQualityReport
 from ..progress._reporter import DerivedProgressReporter
 from ..progress._snapshot import TeamSnapshots
 from ..progress._states import MailTaskStates
 from ..progress._teams import AgentTaskTeams
 from ..progress._wait import PollingProgress
-from ..reflection import CaseHistory, DeliverableChecks, ServiceReports
+from ..reflection import CaseHistory, CaseRecords, DeliverableChecks, ServiceReports
 from ..runs import RunLogReader
+from ..settings import OrgSettings
 from ._builder import Builder
+from ._fail_counts import HealthFailCounts
 from ._lazy import PortResolver
+from ._readable_config import ReadableOrgConfig
+from .wire_health import escape_counter
 
 
 def reporter(b: PortResolver) -> DerivedProgressReporter:
@@ -45,5 +51,15 @@ def reporter(b: PortResolver) -> DerivedProgressReporter:
     )
 
 
+def quality_report(b: PortResolver) -> DerivedQualityReport:
+    """The quality view over the records of the cases, the states and teams of the tasks, the budgets, health's FAIL counts and ORG.md of ``b``."""
+    mail = b.get(MailboxReader)
+    return DerivedQualityReport(
+        b.get(CaseRecords), MailTaskStates(mail, b.get(PauseStore), b.get(TaskQuery)), AgentTaskTeams(b.get(AgentDirectory)), b.get(TaskQuery), mail,
+        b.get(BudgetQuery), b.get(AgentDirectory), HealthFailCounts(escape_counter(b)), ReadableOrgConfig(b.get(OrgSettings)),
+    )
+
+
 def register(b: Builder) -> None:
     b.provide(ProgressReporter, reporter)
+    b.provide(QualityReport, quality_report)
