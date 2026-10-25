@@ -2,7 +2,7 @@
 implements.
 
 ``DeliverableChecks`` is joined here: ``reflection`` reads the deliverable folders itself, and the team's checked versions come from the organization's
-git history (``snapshots``), which only the composition root may put beside it.
+git history (``snapshots``), which only the composition root may put beside it. So are the charter and model changes of ``CaseRecords`` (``GitBarHistory``).
 
 The history is built from the ports of the organization it reads; the small parts the digest, the listing and the prompt sections are made of (who counts
 the runs, when a playbook was written, where the files are named, which services a batch rejects, the two sections) are private to the package and made
@@ -14,7 +14,7 @@ from __future__ import annotations
 from ..agents import AgentDirectory, CharterReader
 from ..kernel import Clock, OrgLayout
 from ..mail import MailboxReader
-from ..reflection import CaseHistory, DeliverableChecks, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
+from ..reflection import CaseHistory, CaseRecords, DeliverableChecks, ReflectionDigest, ServicePromptSections, ServiceReports, ServiceSteps
 from ..reflection._cases import DerivedCaseHistory
 from ..reflection._deliverable_checks import FolderDeliverableChecks
 from ..reflection._deliverables import FsDeliverableFolder
@@ -23,6 +23,7 @@ from ..reflection._evidence import CaseServiceEvidence
 from ..reflection._files import OrgServicePaths
 from ..reflection._allowance import CaseAllowanceOf
 from ..reflection._judged import CaseJudgedVersions
+from ..reflection._records import DerivedCaseRecords
 from ..reflection._reports import TextServiceReports
 from ..reflection._runs import LogRunCounter
 from ..reflection._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection, RegressionListSection
@@ -33,6 +34,7 @@ from ..services import CaseAllowance, JudgedVersions, ServiceCatalog, ServiceEvi
 from ..settings import OrgSettings
 from ..snapshots import OrgHistory
 from ._builder import Builder
+from ._bar_history import GitBarHistory
 from ._checked_versions import GitBlobIds, GitCheckedVersions
 
 
@@ -65,6 +67,13 @@ def register(b: Builder) -> None:
         lambda b: FolderDeliverableChecks(
             b.get(ServiceCatalog), b.get(CaseHistory), b.get(MailboxReader), FsDeliverableFolder(),
             GitCheckedVersions(b.get(OrgHistory), b.get(OrgLayout)), GitBlobIds(), b.get(Clock),
+        ),
+    )
+    b.provide(
+        CaseRecords,
+        lambda b: DerivedCaseRecords(
+            b.get(CaseHistory), b.get(ServiceCatalog), b.get(AgentDirectory), b.get(MailboxReader), b.get(ServiceStore),
+            GitBarHistory(b.get(OrgHistory), b.get(Clock)), b.get(DeliverableChecks),
         ),
     )
 

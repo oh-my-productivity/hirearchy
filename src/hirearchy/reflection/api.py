@@ -32,6 +32,7 @@ __all__ = [
     "CAUSES",
     "Case",
     "CaseHistory",
+    "CaseRecords",
     "Cause",
     "CharterMark",
     "ContractMark",
@@ -44,11 +45,13 @@ __all__ = [
     "LASTING_WORDS",
     "Mark",
     "ModelMark",
+    "OwnerDeliveries",
     "PlaybookMark",
     "QUALITY_DEFAULTS",
     "QualityThresholds",
     "ReflectionDigest",
     "ServicePromptSections",
+    "ServiceRecord",
     "ServiceReports",
     "ServiceSteps",
     "Stats",
@@ -915,6 +918,58 @@ def deliverables_note(findings: Sequence[DeliverableFinding]) -> str:
                 entries.append(key)
             blocks.setdefault(key, []).append(f)
     return "\n".join(line for entry in entries for line in (_block(entry, blocks[entry]) if isinstance(entry, tuple) else entry))
+
+
+@dataclass(frozen=True)
+class OwnerDeliveries:
+    """Every delivery of one owner's cases, for health (0b 10): ``causes`` is parallel to ``deliveries``, a ``Cause`` for each escape and ``None``
+    for every other delivery. ``unknown`` lists, as ``{service}: {error}`` joined by ``; ``, the services whose contract could not be read: their
+    escapes are typed ``untyped`` with the error as the detail (still counted against a verifier), and the text is ``""`` when none."""
+
+    deliveries: tuple[Delivery, ...] = ()
+    causes: tuple[Cause | None, ...] = ()
+    unknown: str = ""
+
+
+@dataclass(frozen=True)
+class ServiceRecord:
+    """What the files show of one service (or of root's one-off tasks), derived for the quality view (0b 12.1). ``error`` is set, with nothing else
+    but the heading, when the record could not be read (``"{read}: {words}"``); ``files_error`` when the deliverable folders could not be checked
+    (no delivery is then counted as not as delivered, and no verdict is voided). The one-off record has ``owner`` and ``service`` empty."""
+
+    owner: str
+    service: str
+    client: str
+    client_kind: str  # "human" when root is the client, else "agent"
+    unit: str = "case"
+    error: str = ""
+    contract: int = 0  # the version in force now
+    playbook: int = 0  # the playbook version in force now; 0 when there is none
+    budget: int = 0  # the contract's runs per request
+    cases: tuple[Case, ...] = ()
+    deliveries: tuple[Delivery, ...] = ()
+    assertions: tuple[Assertion, ...] = ()
+    escapes: tuple[tuple[Delivery, Cause], ...] = ()  # the escapes with their cause, oldest decisive verdict first
+    timeline: tuple[Mark, ...] = ()  # oldest first
+    history: BarChanges = BarChanges()
+    files_error: str = ""
+
+
+@runtime_checkable
+class CaseRecords(Protocol):
+    def records(self, service: str | None = None) -> list[ServiceRecord]:
+        """Root's view of the record: one per service of every agent (top-level first, then nested, each by owner and name; only those named
+        ``service`` when given) and, without ``service``, one for root's one-off tasks (``service == ""``, last), with cases, deliveries (files not
+        as delivered read from the deliverable folders by one P3 call), assertions, typed escapes and the timeline. A record that cannot be read
+        carries ``error`` and nothing else. ``OrgError`` for a ``service`` no agent offers; ``OrgError``/``OSError`` when the agents cannot be
+        listed."""
+        ...
+
+    def deliveries(self, owner: str) -> OwnerDeliveries:
+        """Every delivery of ``owner``'s services' cases and of root's one-off cases assigned to ``owner``, with signer and cause, without reading
+        any deliverable folder or run log (health's input); a service whose contract cannot be read is typed ``untyped`` and named in ``unknown``.
+        ``OrgError``/``OSError`` when a mailbox cannot be read."""
+        ...
 
 
 # Pure rules re-exported from their modules; they import the types above, so these imports come last.

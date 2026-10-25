@@ -19,7 +19,7 @@ from pathlib import Path
 
 from ..agents import CharterReader
 from ..agents.testing import fs_agents
-from ..kernel import ROOT, STAMP_FORMAT, Message, OrgPaths
+from ..kernel import ROOT, STAMP_FORMAT, Message, OrgError, OrgPaths
 from ..runs import RunLogReader
 from ..runs.testing import RunsHarness, fs_runs, memory_runs
 from ..services import ServiceEvidence
@@ -44,6 +44,7 @@ from ._ports import (
     RejectedServices,
     ServicePaths,
 )
+from ._records import DerivedCaseRecords
 from ._reports import TextServiceReports
 from ._runs import LogRunCounter
 from ._sections import EvidenceReflectSection, MailRejectedServices, OwnedServicesListing, OwnerPromptSections, QuotedPlaybookSection, RegressionListSection
@@ -52,12 +53,15 @@ from ._timeline import StorePlaybookTimelines
 from .api import (
     Case,
     CaseHistory,
+    CaseRecords,
     CharterMark,
     DeliverableChecks,
     DeliverableFinding,
     ModelMark,
+    OwnerDeliveries,
     ReflectionDigest,
     ServicePromptSections,
+    ServiceRecord,
     ServiceReports,
     ServiceSteps,
 )
@@ -80,6 +84,27 @@ class FixedBarHistory(BarHistory):
 
     def changes(self, addrs: Sequence[str]) -> BarChanges:
         return self._found
+
+
+# ------------------------------------------------------------------------------ the fake records
+
+
+class FixedCaseRecords(CaseRecords):
+    """The records a test puts in. ``records`` answers the ones of ``service`` when it is given (an ``OrgError`` for a name none has), ``deliveries``
+    the ``OwnerDeliveries`` put in for the owner (none: nothing)."""
+
+    def __init__(self, records: Sequence[ServiceRecord] = (), deliveries: Mapping[str, OwnerDeliveries] | None = None) -> None:
+        self._records = list(records)
+        self._deliveries = dict(deliveries or {})
+
+    def records(self, service: str | None = None) -> list[ServiceRecord]:
+        if service is not None and not any(r.service == service for r in self._records):
+            names = ", ".join(dict.fromkeys(r.service for r in self._records if r.service)) or "none"
+            raise OrgError(f"no service named `{service}`: the services are {names}. Call quality() without a service for everything.")
+        return [r for r in self._records if service is None or r.service == service]
+
+    def deliveries(self, owner: str) -> OwnerDeliveries:
+        return self._deliveries.get(owner, OwnerDeliveries())
 
 
 # ------------------------------------------------------------------------------ the fake history
@@ -233,6 +258,7 @@ class ReflectionWorld:
     runs: RunLogReader  # the run logs the history counts
     use_run: Callable[[str], None]  # the agent makes one run: a log stamped now, by the clock of the messages
     deliverables: DeliverableChecks  # the checks of the deliverable folders over this world's cases (no checked versions: git knows nothing here)
+    records: CaseRecords  # the records of the cases over this world (no org history: ``NoBarHistory``)
 
 
 def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder, charters: CharterReader) -> ReflectionWorld:
@@ -251,10 +277,11 @@ def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder, char
         runs.add_agent(addr)
         runs.put_log(addr, f"{d.clock.now():{STAMP_FORMAT}}.log", "# run\n")
 
+    checks = FolderDeliverableChecks(s.catalog, history, d.mail, folders, FixedCheckedVersions(), HashBlobIds(), d.clock)
     return ReflectionWorld(
         history=history, digest=digest, reports=TextServiceReports(d.agents, s.catalog, history, paths), sections=sections,
         steps=TextServiceSteps(d.agents, s.catalog, history, d.mail), rejections=rejections, evidence=CaseServiceEvidence(history, s.catalog), paths=paths, s=s, runs=runs.reader, use_run=use_run,
-        deliverables=FolderDeliverableChecks(s.catalog, history, d.mail, folders, FixedCheckedVersions(), HashBlobIds(), d.clock),
+        deliverables=checks, records=DerivedCaseRecords(history, s.catalog, d.agents, d.mail, s.store, NoBarHistory(), checks),
     )
 
 
@@ -348,6 +375,74 @@ def deliverable_checks_fixed(tmp_path: Path) -> DeliverableHarness:
     return DeliverableHarness(fixed, lambda: fixed.put(ROOT, finding), SERVICE)
 
 
+@dataclass(frozen=True)
+class RecordsHarness:
+    """A ``CaseRecords`` and the means to prepare it. After ``populate`` root's ``weekly-brief``, offered by ``ceo``, has one record with a case
+    (``ceo`` has the delivery); ``corrupt`` then makes that service unreadable (its stored contract versions do not parse)."""
+
+    records: CaseRecords
+    populate: Callable[[], None]
+    corrupt: Callable[[], None]
+    owner: str
+    service: str
+
+
+def records_fs(tmp_path: Path) -> RecordsHarness:
+    return _records_world(fs_world(tmp_path))
+
+
+def records_memory(tmp_path: Path) -> RecordsHarness:
+    return _records_world(memory_world(tmp_path))
+
+
+def _records_world(w: ReflectionWorld) -> RecordsHarness:
+    def populate() -> None:
+        w.s.d.agent("ceo", True)
+        w.s.d.agent("ceo/eng", False)
+        w.s.commands.define_service(
+            ROOT, "ceo", SERVICE, description="A brief.", inputs=[{"name": "topic", "description": "what", "required": True}],
+            acceptance=["At most 600 words"], deliverable={"description": "one markdown file"}, budget=10,
+        )
+        task = w.s.commands.request(ROOT, SERVICE, {"topic": "ai"})
+        w.s.d.post(Message(sender=task.to, to=task.sender, type="result", status="done", reply_to=task.id, body="Delivered.", title="Result"))
+
+    def corrupt() -> None:
+        w.s.put(f"ceo/services/{SERVICE}/SERVICE.md", "---\nkey: [unclosed\n---\n")
+
+    return RecordsHarness(w.records, populate, corrupt, "ceo", SERVICE)
+
+
+def records_fixed(tmp_path: Path) -> RecordsHarness:
+    one_off = ServiceRecord("", "", ROOT, "human")
+    held = {"records": FixedCaseRecords([one_off])}  # an empty organization: root's one-off record only
+
+    class Switch(CaseRecords):
+        """The fixed records a harness can swap, so that ``populate`` and ``corrupt`` change what it answers."""
+
+        def records(self, service: str | None = None) -> list[ServiceRecord]:
+            return held["records"].records(service)
+
+        def deliveries(self, owner: str) -> OwnerDeliveries:
+            return held["records"].deliveries(owner)
+
+    case = Case(
+        id="c1", service=SERVICE, owner="ceo", tasks=[], result=None, state="open", playbook=0, used=0, reworks=0, budget=10, runs=0, lessons=[],
+        verdicts=[], started=None, finished=None,
+    )
+    good = ServiceRecord("ceo", SERVICE, ROOT, "human", contract=1, budget=10, cases=(case,))
+    bad = ServiceRecord("ceo", SERVICE, ROOT, "human", error="the stored contract versions: does not parse (ScannerError)")
+
+    def populate() -> None:
+        held["records"] = FixedCaseRecords([good, one_off])
+
+    def corrupt() -> None:
+        held["records"] = FixedCaseRecords(
+            [bad, one_off], {"ceo": OwnerDeliveries(unknown=f"{SERVICE}: the stored contract versions: does not parse (ScannerError)")},
+        )
+
+    return RecordsHarness(Switch(), populate, corrupt, "ceo", SERVICE)
+
+
 PURE = {"StatsReport"}  # data with derived views (counts that print themselves): one implementation, no fake
 
 IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
@@ -357,4 +452,5 @@ IMPLEMENTATIONS: Mapping[type, Sequence[Callable[[Path], object]]] = {
     ServicePromptSections: [sections_fs, sections_memory],
     ServiceSteps: [steps_fs, steps_memory],
     DeliverableChecks: [deliverable_checks_fs, deliverable_checks_fixed],
+    CaseRecords: [records_fs, records_fixed],
 }

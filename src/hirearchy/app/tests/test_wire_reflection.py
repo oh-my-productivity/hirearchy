@@ -10,9 +10,10 @@ import pytest
 from hirearchy.agents import AgentDirectory
 from hirearchy.app import Org, wire_reflection, wiring
 from hirearchy.kernel import OrgError
-from hirearchy.reflection import CaseHistory, ReflectionDigest, ServicePromptSections, ServiceReports
+from hirearchy.reflection import CaseHistory, CaseRecords, ReflectionDigest, ServicePromptSections, ServiceReports
 from hirearchy.reflection._cases import DerivedCaseHistory
 from hirearchy.reflection._digest import DigestBuilder
+from hirearchy.reflection._records import DerivedCaseRecords
 from hirearchy.reflection._evidence import CaseServiceEvidence
 from hirearchy.reflection._allowance import CaseAllowanceOf
 from hirearchy.reflection._judged import CaseJudgedVersions
@@ -96,3 +97,10 @@ def test_the_case_history_reads_the_charters(tmp_path: Path) -> None:
     (org.root / "ceo" / "AGENT.md").write_text("---\nrole: Chief\ncan_hire: true\ncreated: '2099-01-01T00:00:00+00:00'\n---\nbody\n", encoding="utf-8")
     (case,) = org.runtime.case_history.one_off_cases()
     assert case.runs_unknown == "sent before ceo was hired again: the retired team's run logs are not read"
+
+
+def test_the_runtime_has_case_records(tmp_path: Path) -> None:
+    runtime = wiring.open_runtime(tmp_path)
+    assert isinstance(runtime.case_records, DerivedCaseRecords) and isinstance(runtime.case_records, CaseRecords)
+    assert [r.service for r in runtime.case_records.records()] == [""]  # an empty organization: root's one-off record only
+    assert runtime.case_records.deliveries("ceo").deliveries == ()
