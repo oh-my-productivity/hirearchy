@@ -61,8 +61,10 @@ __all__ = [
     "ServiceHints",
     "ServiceStore",
     "VERDICTS",
+    "amendment_ids",
     "changed_lines",
     "confirmed_amendments",
+    "contract_of",
     "criteria_of",
     "criterion_words",
     "line_key",
@@ -72,6 +74,7 @@ __all__ = [
     "playbook_word_cap",
     "quoting_lines",
     "repeats_rejection",
+    "version_in_force",
 ]
 
 INPUT_RE = re.compile(r"[a-z][a-z0-9_]{0,31}\Z")
@@ -586,3 +589,8 @@ class CaseAllowance(Protocol):
         task is in no case of the service (one sent before the service was last defined from scratch), the service has no contract, or the
         case's client is an agent. ``OrgError``/``OSError`` when a contract, a mailbox or a run log directory cannot be read."""
         ...
+
+
+# Pure rules re-exported from their modules; they import the types above, so these imports come last.
+from ._criteria import amendment_ids, version_in_force  # noqa: E402
+from ._parse import contract_of  # noqa: E402

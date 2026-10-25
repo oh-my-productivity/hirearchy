@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from datetime import datetime
 
 from ._parse import contract_of
-from .api import Criterion, ServiceStore, criteria_of, number_criteria
+from .api import Contract, Criterion, ServiceStore, criteria_of, number_criteria
 
 
 def stored_versions(store: ServiceStore, owner: str, name: str) -> list[tuple[int, str, list[str]]]:
@@ -58,16 +58,24 @@ def answer_ids(store: ServiceStore, owner: str, name: str, version: int) -> tupl
     return added or removed
 
 
+def version_in_force(contracts: Sequence[Contract], when: datetime | None) -> Contract | None:
+    """The version in force at ``when`` among ``contracts`` (oldest first, as :meth:`ServiceStore.versions` lists them): the latest whose ``defined``
+    is at or before ``when``; the oldest when none is (a version written before ``defined`` existed, no time); None when there is no version (pure)."""
+    if not contracts:
+        return None
+    dated = [c for c in contracts if when is not None and c.defined is not None and c.defined <= when]
+    return max(dated, key=lambda c: c.version) if dated else contracts[0]
+
+
 def in_force(store: ServiceStore, owner: str, name: str, when: datetime | None) -> tuple[int, list[Criterion]]:
     """The stored contract version in force at ``when`` and its criteria, with their ids: the latest whose ``defined`` is at or before ``when``;
     the oldest when none is (a version written before ``defined`` existed, a missing history file, no time) or ``(0, [])`` for a service the store
     does not have. The current version is always stored."""
     contracts = [contract_of(owner, name, meta, body, None) for _, meta, body in store.versions(owner, name, "SERVICE")]
-    if not contracts:
+    chosen = version_in_force(contracts, when)
+    if chosen is None:
         return 0, []
     numbered = number_criteria(
         [(c.version, c.defined_by or "", c.acceptance) for c in contracts], {c.version: (c.answers, c.initiated == "user") for c in contracts},
     )
-    dated = [c for c in contracts if when is not None and c.defined is not None and c.defined <= when]
-    chosen = max(dated, key=lambda c: c.version) if dated else contracts[0]
     return chosen.version, criteria_of(numbered, chosen.acceptance)

@@ -189,3 +189,41 @@ def test_missing_history_files_are_skipped(tmp_path: Path) -> None:
     versions = stored_versions(w.store, "ceo", "weekly-brief")
     assert versions == [(1, "root", ["A", "B"]), (3, "root", ["A", "C", "D"])]
     assert ids(services.number_criteria(versions)) == {"A": "C1", "B": "C2", "C": "C3", "D": "C4"}
+
+
+def test_contract_of_is_public_in_services_api() -> None:
+    from hirearchy.services import contract_of
+    from hirearchy.services._parse import contract_of as private
+
+    assert contract_of is private
+    found = contract_of("lead", "brief", {"name": "brief", "version": 2, "acceptance": ["A"], "budget": 5}, "notes", None)
+    assert (found.owner, found.name, found.version, found.acceptance, found.budget) == ("lead", "brief", 2, ["A"], 5)
+
+
+def test_amendment_ids_is_public_and_unchanged() -> None:
+    from hirearchy.services import amendment_ids
+
+    assert amendment_ids([(1, "root", ["A", "B"]), (2, "root", ["A", "B", "C", "D"])], 2) == (("C3", "C4"), ())  # added in acceptance order
+    assert amendment_ids([(1, "root", ["A", "B", "C"]), (2, "root", ["B", "D"])], 2) == (("C4",), ("C1", "C3"))  # removed in the previous order
+    assert amendment_ids([(1, "root", ["A"])], 1) == ((), ()) and amendment_ids([(1, "root", ["A"])], 5) == ((), ())  # v1, and a missing version
+
+
+def test_version_in_force_picks_the_latest_defined_at_or_before_the_time_else_the_oldest() -> None:
+    from datetime import datetime, timedelta, timezone
+
+    from hirearchy.services import Contract, version_in_force
+
+    def at(day: int) -> datetime:
+        return datetime(2026, 1, 1, tzinfo=timezone.utc) + timedelta(days=day)
+
+    v1, v2, v3 = (Contract("brief", "lead", version=n, defined=at(10 * n)) for n in (1, 2, 3))
+    versions = [v1, v2, v3]
+    assert version_in_force(versions, at(5)) is v1  # before every `defined`: the oldest
+    assert version_in_force(versions, at(10)) is v1 and version_in_force(versions, at(15)) is v1  # at, and between two
+    assert version_in_force(versions, at(25)) is v2 and version_in_force(versions, at(30)) is v3
+    assert version_in_force(versions, at(99)) is v3  # after all
+    assert version_in_force(versions, None) is v1  # no time: the oldest
+    legacy = Contract("brief", "lead", version=1)  # written before `defined` existed
+    assert version_in_force([legacy], at(5)) is legacy and version_in_force([legacy, v2], at(15)) is legacy  # a version without `defined` is never dated
+    assert version_in_force([legacy, v2], at(25)) is v2
+    assert version_in_force([], at(5)) is None
