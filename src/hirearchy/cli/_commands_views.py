@@ -56,7 +56,7 @@ class HealthCommand(Command):
     def run(self, args: Arguments) -> None:
         self._session.open(args)
         report = self._analyzer().org_health(args.agent or ROOT)
-        self._out.say(json.dumps(report.to_dict(), indent=2) if args.json else self._renderer().render_text(report))
+        self._out.say(json.dumps(report.to_dict(), indent=2) if args.json else self._renderer().render_text(report, causes=True))
 
 
 class ProgressCommand(Command):

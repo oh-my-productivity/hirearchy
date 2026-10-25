@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from testkit.cli_world import clock_is, main
 from testkit.reach.hirearchy.core import ROOT
+from testkit.services_world import define, deliver, request
 
 from hirearchy.kernel.testing import FakeClock
 
@@ -85,3 +86,20 @@ def test_cli_health(troubled, capsys):
     with pytest.raises(SystemExit):
         main(["--root", str(troubled.root), "health", "--agent", "nobody"])
     assert "no such agent" in capsys.readouterr().err
+
+
+def test_cli_health_shows_not_its(org, clock, capsys):
+    """The CLI is the user's reading: like root's health tool it shows the escapes that are not the verifier's, and the JSON carries them."""
+    define(org)
+    clock.at(20)
+    task = request(org, budget=5)
+    deliver(org, "ceo", task)
+    clock.at(30)
+    org.feedback(ROOT, task.id, "reject", "Always put the date first.", source="human")
+    main(["--root", str(org.root), "health"])
+    line = next(line for line in capsys.readouterr().out.splitlines() if line.startswith("ceo "))
+    assert "escapes 0 of 1 judged (+1 not its: 1 contract-gap), re-checks after a FAIL 0 (author rework runs 0)" in line
+    main(["--root", str(org.root), "health", "--json"])
+    ceo = next(a for a in json.loads(capsys.readouterr().out)["agents"] if a["addr"] == "ceo")
+    assert (ceo["escapes"], ceo["judged"], ceo["not_its"], ceo["causes_unknown"]) == (0, 1, {"contract-gap": 1}, "")
+

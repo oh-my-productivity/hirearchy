@@ -121,7 +121,7 @@ def test_readme_health_row_says_escapes_and_old_keys_are_unread():
     health = README.split("\n## Health")[1].split("\n## ")[0]
     row = flat(next(line for line in health.splitlines() if line.startswith("| `low_quality` |")))
     for phrase in ("escapes / judged deliveries above the ratio", "the human client gave a verdict after it",
-                   "an *escape* when that verdict was a reject", "(`source: relayed`) are not judged",
+                   "an *escape* when that verdict was a reject", "count only when the user judged them", "typed by rule",
                    "the agent's re-checks after a fail and the author rework runs they cost",
                    "`max_escape_ratio` (0.5)", "`min_judged_for_quality` (3)"):
         assert phrase in row, phrase

@@ -187,7 +187,7 @@ class FakeReadings(Recording, OrgTree, TaskQuery, SchedulerStatus, HealthAnalyze
         self.note("org_health", root)
         return OrgHealth(root, T0, [], {})
 
-    def render_text(self, health: OrgHealth) -> str:
+    def render_text(self, health: OrgHealth, *, causes: bool = False) -> str:
         self.note("render_text", health.root)
         return f"{len(health.agents)} agents, {len(health.flagged)} flagged"
 

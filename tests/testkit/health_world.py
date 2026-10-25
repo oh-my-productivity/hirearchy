@@ -152,6 +152,6 @@ def thresholds(org: Any) -> dict[str, float]:
     return org.runtime.health_thresholds.thresholds()  # type: ignore[no-any-return]
 
 
-def render_text(health: OrgHealth) -> str:
+def render_text(health: OrgHealth, *, causes: bool = False) -> str:
     """The report as text (the renderer is a pure function of its argument: any runtime has it)."""
-    return wiring.open_runtime(Path.cwd()).health_renderer.render_text(health)  # type: ignore[no-any-return]
+    return wiring.open_runtime(Path.cwd()).health_renderer.render_text(health, causes=causes)  # type: ignore[no-any-return]

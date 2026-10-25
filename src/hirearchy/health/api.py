@@ -159,6 +159,8 @@ class HealthAnalyzer(Protocol):
 
 @runtime_checkable
 class HealthRenderer(Protocol):
-    def render_text(self, health: OrgHealth) -> str:
-        """The human report: a summary line, then one line per agent (indented by depth) with its branch totals, flags and reasons."""
+    def render_text(self, health: OrgHealth, *, causes: bool = False) -> str:
+        """The human report: a summary line, then one line per agent (indented by depth) with its branch totals, flags and reasons. With ``causes``
+        (root's reading) the escapes segment also shows the escapes that are not the verifier's, ``(+k not its: ...)``, and the services whose
+        causes could not be read, ``; causes unknown (...)``; an agent never gets them."""
         ...

@@ -8,6 +8,7 @@ import pytest
 from testkit.clocks import clock_ports
 from testkit.reach.hirearchy.core import ROOT
 from testkit.mcp_server_world import build_server
+from testkit.services_world import define, deliver, request
 
 T0 = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
 ENG = "ceo/eng"
@@ -57,3 +58,20 @@ def test_mcp_health_permissions(org):
             call(who, "health", agent=target)
     with pytest.raises(Exception, match="no such agent"):
         call(root, "health", agent="nobody")
+
+
+def test_root_health_shows_not_its_and_an_agents_does_not(org, clock):
+    """0b 10: the escapes that are not the verifier's (here the contract's gap: the user's "always") are root's reading only."""
+    define(org)
+    clock.at(20)
+    task = request(org, budget=5)
+    deliver(org, "ceo", task)
+    clock.at(30)
+    org.feedback(ROOT, task.id, "reject", "Always put the date first.", source="human")
+    root_line = next(line for line in call(build_server(org, ROOT), "health").splitlines() if line.startswith("ceo "))
+    assert "escapes 0 of 1 judged (+1 not its: 1 contract-gap), re-checks after a FAIL 0 (author rework runs 0)" in root_line
+    ceo = build_server(org, "ceo")
+    own_line = next(line for line in call(ceo, "health").splitlines() if line.startswith("ceo "))
+    assert "escapes 0 of 1 judged, re-checks after a FAIL 0 (author rework runs 0)" in own_line
+    assert "not its" not in call(ceo, "health") and "causes unknown" not in call(ceo, "health")
+

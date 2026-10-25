@@ -112,3 +112,49 @@ def test_the_segment_shows_only_when_judged(renderer: HealthRenderer) -> None:
 def test_the_segment_follows_the_rework_part_with_the_client_count(renderer: HealthRenderer) -> None:
     text = renderer.render_text(report([agent("ceo", client_rework=2, escapes=0, judged=1)], [branch("ceo")]))
     assert "rework 0 (+2 by the client), escapes 0 of 1 judged, re-checks after a FAIL 0 (author rework runs 0), runs/task" in text
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the causes (root only)
+
+CAUSES_UNKNOWN = "weekly-brief: SERVICE.md: does not parse (ScannerError)"
+
+
+def judged_line(renderer: HealthRenderer, *, causes: bool | None = None, **fields: object) -> str:
+    """The second line of the report of one agent with 5 judged deliveries and these fields (``causes`` left out: the default)."""
+    health = report([agent("ceo", escapes=1, judged=5, **fields)], [branch("ceo")])
+    text = renderer.render_text(health) if causes is None else renderer.render_text(health, causes=causes)
+    return text.splitlines()[1]
+
+
+def test_causes_true_shows_not_its_and_causes_unknown(renderer: HealthRenderer) -> None:
+    line = judged_line(
+        renderer, causes=True, not_its={"contract-gap": 2, "relayed-error": 1, "relayed-carry-over": 3}, causes_unknown=CAUSES_UNKNOWN,
+    )
+    assert line == (
+        "ceo idle, budget 3/5, runs 2, open 0, done 1 failed 0 blocked 0 rework 0, escapes 1 of 5 judged "
+        f"(+6 not its: 2 contract-gap, 1 relayed-error, 3 relayed-carry-over); causes unknown ({CAUSES_UNKNOWN}), "
+        "re-checks after a FAIL 0 (author rework runs 0), runs/task 2.0, empty 0, last activity 1m ago"
+    )
+    only_unknown = judged_line(renderer, causes=True, causes_unknown=CAUSES_UNKNOWN)
+    assert f"escapes 1 of 5 judged; causes unknown ({CAUSES_UNKNOWN}), re-checks after a FAIL 0" in only_unknown
+
+
+def test_causes_false_is_todays_text(renderer: HealthRenderer) -> None:
+    plain = judged_line(renderer)
+    assert plain == (
+        "ceo idle, budget 3/5, runs 2, open 0, done 1 failed 0 blocked 0 rework 0, escapes 1 of 5 judged, re-checks after a FAIL 0 "
+        "(author rework runs 0), runs/task 2.0, empty 0, last activity 1m ago"
+    )
+    split = {"contract-gap": 2}
+    assert judged_line(renderer, causes=False, not_its=split, causes_unknown=CAUSES_UNKNOWN) == plain  # an agent never sees the split
+    assert judged_line(renderer, not_its=split, causes_unknown=CAUSES_UNKNOWN) == plain  # and it is off by default
+
+
+def test_zero_parts_and_empty_parentheses_are_left_out(renderer: HealthRenderer) -> None:
+    assert judged_line(renderer, causes=True, not_its={"contract-gap": 0, "relayed-error": 2}).count("(+2 not its: 2 relayed-error)") == 1
+    nothing = judged_line(renderer, causes=True, not_its={"contract-gap": 0, "relayed-error": 0})
+    assert nothing == judged_line(renderer) and "not its" not in nothing and "()" not in nothing
+    assert judged_line(renderer, causes=True) == judged_line(renderer)  # no not-its, nothing unknown: today's text
+    unjudged = renderer.render_text(report([agent("ceo", not_its={"contract-gap": 1}, causes_unknown="x")], [branch("ceo")]), causes=True)
+    assert "escapes" not in unjudged and "not its" not in unjudged  # the segment shows only when something was judged
+

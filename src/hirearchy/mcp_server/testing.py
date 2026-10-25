@@ -457,7 +457,7 @@ class ScriptedHealth(HealthAnalyzer, HealthRenderer):
         self.asked.append(root)
         return OrgHealth(root, now or datetime(2026, 1, 1, tzinfo=timezone.utc), [], {})
 
-    def render_text(self, health: OrgHealth) -> str:
+    def render_text(self, health: OrgHealth, *, causes: bool = False) -> str:
         return f"HEALTH of {health.root}"
 
 

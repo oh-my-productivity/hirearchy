@@ -57,4 +57,4 @@ class StatusTools(ToolGroup):
             target = directory.require(agent or me)
             if me != ROOT and target not in directory.subtree(me):
                 raise OrgError(f"you can only view health for yourself or agents in your own subtree ({me}/...), not {target}")
-            return self._renderer().render_text(self._analyzer().org_health(target))
+            return self._renderer().render_text(self._analyzer().org_health(target), causes=me == ROOT)
