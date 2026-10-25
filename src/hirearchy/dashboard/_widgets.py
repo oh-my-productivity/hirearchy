@@ -12,6 +12,7 @@ from textual import events
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Vertical, VerticalScroll
+from textual.geometry import Size
 from textual.screen import ModalScreen, Screen
 from textual.widgets import DataTable, Footer, Static, Tree
 from textual.widgets.tree import TreeNode
@@ -79,6 +80,12 @@ class NavTable(DataTable[Text]):
         self._cells: dict[str, list[Text]] = {}
         self._keys: list[str] = []
         self._columns: list[tuple[str, str]] = []
+
+    def watch_virtual_size(self, old: Size, new: Size) -> None:
+        """``DataTable`` measures its columns when it is idle and keeps what it drew under a key that the measure leaves as it was. A frame drawn between
+        the rows being added and the measure (the screen updates on its own clock) has the cells cut to the width of their labels, and without this it would
+        stay on the screen. The measure changes the virtual size, so that is when what was drawn is dropped; the size change repaints the table."""
+        self.notify_style_update()
 
     def action_top(self) -> None:
         if self.row_count:
