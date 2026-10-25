@@ -639,6 +639,8 @@ read-only; with none it writes a `# kiro: throttled by the model service ...; to
 - **The `start` tool's environment.** A scheduler started by root's `start` tool inherits the environment of root's hirearchy MCP server, not your shell's.
   Put `KIRO_API_KEY` (and `HIREARCHY_STATE_DIR`, if you use it) in the `env` of the hirearchy entry of your client's MCP configuration; otherwise `start`
   refuses (no credential) or uses another kiro home than `hirearchy run` does in a shell.
+- **Driven from another agent host's shell tool.** A scheduler started in a tool call of another agent host can be stopped when the call ends, if the chat command is the call's last command.
+  Keep the call open after the chat returns (for example `; sleep 20`), or start the scheduler outside it. The scheduler's `scheduler.signal` event records such a stop.
 - **Where kiro's state lives.** One kiro home per organization, `0700`: `~/Library/Application Support/hirearchy/kiro-home/<org-id>/` on macOS,
   `$XDG_STATE_HOME/hirearchy/kiro-home/<org-id>/` or `~/.local/state/hirearchy/kiro-home/<org-id>/` elsewhere; `HIREARCHY_STATE_DIR` moves it. It holds the
   profiles and kiro's own sessions, logs and snapshots of the files agents wrote (about 80 KB per run, not pruned). Every run starts in an emptied scratch
