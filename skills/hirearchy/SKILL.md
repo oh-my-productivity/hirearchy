@@ -69,7 +69,7 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
 - If a result comes back `blocked`, or `inbox` shows an escalation or budget request: tell the user what happened and give a
   recommended decision (grant N runs with `send(to=<agent>, body=<why>, budget=N)`, rework, change criteria). Spend beyond the
   approved budget needs the user's OK. A service request plus its reworks is one case: before a rework that would take the case past
-  the approved per-request budget, ask the user, with the number. A rework needs about 2 runs per delegation it requires + 1. The
+  the approved per-request budget, ask the user, with the number, in the same message as the question or yes/no item that needs the rework (never a turn later). A rework needs about 2 runs per delegation it requires + 1. The
   `send(budget=N)` reply says what the recipient can hand down: read it; if it cannot delegate, grant enough in one go (ask the user
   once, with that number). Ask at the FIRST budget request, with your recommendation; never wait until the reserve is spent. Before
   asking for more, look for stranded runs (`status`/`progress`/`health`: an idle team holding unspent runs): `reclaim(report=<agent>)`

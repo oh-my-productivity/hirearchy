@@ -129,3 +129,19 @@ def test_the_skill_records_the_users_keep_as_is_as_their_accept_on_its_task():
         '"deliver as is" or "i\'ll read it myself" is not an accept: ask, or record nothing yet',
     ):
         assert needle in text, needle
+
+
+def test_the_skill_asks_the_spend_of_a_rework_in_the_message_of_the_question_that_needs_it():
+    """D-E6-5 (7.3): E6's s2 lost two turns asking a rework's spend a turn after the question or the yes/no item that needs the rework. Line 72 asks it
+    in the same message, with the number, and keeps the needles of the budget rules. The file stays at 125 lines."""
+    assert len(SKILL.read_text().splitlines()) <= 125
+    text = flat()
+    for needle in (
+        "in the same message as the question or yes/no item that needs the rework",
+        "per-request budget, ask the user, with the number",
+        "a rework needs about 2 runs per delegation it requires + 1",
+        "ask the user once, with that number",
+        "ask at the first budget request",
+        "never wait until the reserve",
+    ):
+        assert needle in text, needle
