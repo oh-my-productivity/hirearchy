@@ -24,6 +24,7 @@ from typing import Any
 
 from . import REPO
 from .e4_replay import EV, EV3
+from .e5_replay import EV5
 
 STUDIES = REPO / "studies"
 EV_E = STUDIES / "E-service-reflection" / "evidence"
@@ -75,6 +76,15 @@ E4_REVIEWER_BOXES = prefixed(
     ("lead-writer", "read"), ("lead-writer", "sent"),
 )
 E4_REVIEWER_LOGS = (("run-logs/lead", "lead"), ("run-logs/lead-reviewer", "lead/reviewer"), ("run-logs/lead-writer", "lead/writer"))
+
+E5_COMMON = {**E4_COMMON, "service": "weekly-meeting-memo", "contracts": versions("service/history--SERVICE.v{k}.md", 2, "service/current-SERVICE.md"),
+             "playbooks": versions("playbook/history--PLAYBOOK.v{k}.md", 2, "playbook/current-PLAYBOOK.md"), "run_logs": E4_REVIEWER_LOGS,
+             "charters": E4_REVIEWER_TEAM}
+# E5 kept no `lead-inbox` in s2 and s3, and root's and lead's `inbox` in s1 only.
+E5_BOXES = prefixed(
+    ("", "read"), ("", "sent"), ("lead", "read"), ("lead", "sent"), ("lead-reviewer", "read"), ("lead-reviewer", "sent"), ("lead-writer", "read"),
+    ("lead-writer", "sent"),
+)
 
 MANIFESTS: dict[str, dict[str, Any]] = {
     "E": {
@@ -199,6 +209,34 @@ MANIFESTS: dict[str, dict[str, Any]] = {
             delivered("memos/memo-2026-10-19.md", "2026-10-22T22:33:02.155Z", 39, 87),
         ),
         "charters": E4_REVIEWER_TEAM,
+    },
+    "E5-s1": {
+        **E5_COMMON,
+        "evidence": EV5 / "s1",
+        "boxes": (*prefixed(("", "inbox"), ("lead", "inbox")), *E5_BOXES),
+        "deliverables": (
+            delivered("memos/memo-2026-10-05.md", "2026-10-24T03:12:35.854Z", 3, 23),
+            delivered("memos/memo-2026-10-12.md", "2026-10-24T03:22:12.233Z", 12, 42),
+            delivered("memos/memo-2026-10-19.md", "2026-10-24T03:28:11.906Z", 27, 58),
+        ),
+    },
+    "E5-s2": {
+        **E5_COMMON,
+        "evidence": EV5 / "s2",
+        "boxes": E5_BOXES,
+        "deliverables": (
+            delivered("memos/memo-2026-10-05.md", "2026-10-24T03:45:21.122Z", 3, 27),
+            delivered("memos/memo-2026-10-12.md", "2026-10-24T03:57:34.246Z", 12, 50),
+        ),
+    },
+    "E5-s3": {
+        **E5_COMMON,
+        "evidence": EV5 / "s3",
+        "boxes": E5_BOXES,
+        "deliverables": (
+            delivered("memos/memo-2026-10-05.md", "2026-10-24T04:18:31.904Z", 3, 39),
+            delivered("memos/memo-2026-10-12.md", "2026-10-24T04:33:46.819Z", 14, 65),
+        ),
     },
 }
 
