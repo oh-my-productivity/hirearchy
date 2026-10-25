@@ -11,9 +11,10 @@ from datetime import datetime, timezone
 from fractions import Fraction
 from typing import TypeVar
 
-from ..kernel import ROOT, clip_line, msg_time
+from ..kernel import ROOT, JsonObject, clip_line, msg_time
 from ..reflection import (
-    Case, Cause, CharterMark, Mark, ModelMark, QualityThresholds, case_spend, cost_alarm, repeat_alarm, shown_name, user_cost,
+    Case, Cause, CharterMark, ContractMark, Mark, ModelMark, PlaybookMark, QualityThresholds, ServiceRecord, TopUpMark, case_spend, cost_alarm,
+    attribution, failure_class, repeat_alarm, shown_name, user_cost,
 )
 from ._quality_facts import (
     EscapeRow, FirstLine, HeldTask, MovedPast, QualityView, RecordView, approved_of, delivery_facts, escape_rows, first_lines, verifiers,
@@ -431,3 +432,172 @@ def quality_text(view: QualityView) -> str:
         sections.append(["No cases yet: you have requested no service and given no task."])
     sections.append(moved_past_lines(view.moved_past))
     return "\n\n".join("\n".join(lines) for lines in sections)
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the JSON (9.4)
+
+
+def _stamp(when: datetime | None) -> str | None:
+    return when.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ") if when is not None else None
+
+
+def _mark_data(mark: Mark) -> JsonObject:
+    when = _stamp(getattr(mark, "when", None))
+    if isinstance(mark, ContractMark):
+        return {
+            "kind": "contract", "when": when, "version": mark.version, "by": mark.by, "adds": list(mark.adds), "removes": list(mark.removes),
+            "basis": mark.basis, "answers": mark.answers if mark.basis == "answers" else None,
+            "confirmed": [{"id": i, "link": link} for i, link in mark.confirmed], "not_confirmed": list(mark.not_confirmed),
+        }
+    if isinstance(mark, PlaybookMark):
+        return {
+            "kind": "playbook", "when": when, "version": mark.version, "by": mark.by, "basis": mark.basis, "restores": mark.restores,
+            "evidence": list(mark.evidence), "evidence_other": mark.evidence_other, "changed": mark.changed, "removed": mark.removed,
+            "own_words": mark.own_words, "beyond": mark.beyond, "tagged": mark.tagged, "untagged": mark.untagged,
+            "cited": [{"id": i, "text": text} for i, text in mark.cited], "lines": [{"text": text, "own_words": own} for text, own in mark.lines],
+            "lines_more": mark.lines_more, "agent_written": mark.agent_written,
+        }
+    if isinstance(mark, CharterMark):
+        return {"kind": "charter", "when": when, "addr": mark.addr, "commit": mark.commit}
+    if isinstance(mark, ModelMark):
+        return {"kind": "model", "when": when, "addr": mark.addr, "key": mark.key, "before": mark.before, "after": mark.after, "commit": mark.commit}
+    assert isinstance(mark, TopUpMark)
+    return {"kind": "top-up", "when": when, "case": mark.case, "id": mark.id, "source": mark.source, "amount": mark.amount}
+
+
+def _first_data(first: FirstLine) -> JsonObject | None:
+    if first.delivery is None:
+        return None
+    source = first.superseded.source if first.superseded is not None else None
+    return {
+        "task": first.delivery.task.id, "outcome": first.outcome, "superseded_by": first.superseded.id if first.superseded is not None else None,
+        "superseded_source": None if first.superseded is None else (source or "unrecorded"),
+    }
+
+
+def _case_data(view: RecordView, first: FirstLine) -> JsonObject:
+    r, case = view.record, first.case
+    counted = not case.runs_unknown
+    approved = approved_of(r, case)
+    return {
+        "id": case.id, "title": case.title, "assignee": case.owner, "state": case.state,
+        "stalled": None if view.stalled_error else (case.state == "open" and view.stalled.get(case.id, False)),
+        "tasks": len(case.tasks), "budget": r.budget if r.service else case.tasks[0].budget, "user_approved": approved,
+        "runs": case.runs if counted else None, "credited": case.credited if counted else None, "relayed_runs": case.relayed_runs if counted else None,
+        "spend": case_spend(case) if counted else None, "user_cost": user_cost(case) if counted else None,
+        "ratio": two_decimals(Fraction(user_cost(case), approved)) if counted and approved > 0 else None,
+        "cut": case.cut, "runs_unknown": case.runs_unknown,
+        "top_ups": [{"id": t.id, "source": t.kind, "amount": t.amount} for t in case.top_ups.items], "first": _first_data(first),
+    }
+
+
+def _escape_data(row: EscapeRow) -> JsonObject:
+    c, d = row.cause, row.delivery
+    return {
+        "assertion": row.assertion or None, "case": row.case.id, "task": d.task.id, "verdict": d.decisive.message.id if d.decisive is not None else "",
+        "signer": d.signer, "cause": c.type, "rule": c.rule, "rules": list(c.rules), "detail": list(c.detail), "also": list(c.also),
+        "before_verdict": c.before_verdict, "attribution": attribution(c), "class": failure_class(c),
+    }
+
+
+def _verifier_data(view: RecordView) -> list[JsonObject]:
+    out: list[JsonObject] = []
+    for v in verifiers(view.record):
+        error = view.fails_errors.get(v.addr, "")
+        rechecks, rework = (None, None) if error else view.fails.get(v.addr, (0, 0))
+        out.append({
+            "addr": v.addr, "judged": v.judged, "escapes": {"counted": dict(v.counted), "not_its": dict(v.not_its)},
+            "pass_precision": [v.judged - v.escapes, v.judged], "rechecks": rechecks, "rework_runs": rework, "fails_error": error,
+        })
+    return out
+
+
+def _alarm_data(view: RecordView, t: QualityThresholds) -> JsonObject:
+    repeat, cost = repeat_alarm(view.record, t), cost_alarm(view.record, t)
+    return {
+        "repeat": {
+            "state": repeat.state, "judged": repeat.judged, "window": list(repeat.window), "subjects": dict(repeat.subjects), "fired": list(repeat.fired),
+            "not_counted": {r: list(ids) for r, ids in repeat.not_counted},
+        },
+        "cost": {
+            "state": cost.state, "judged": cost.judged, "compared": cost.compared,
+            "cases": [
+                {"case": c.case, "user_cost": c.user_cost, "user_approved": c.user_approved, "ratio": two_decimals(c.ratio), "relayed_runs": c.relayed_runs, "total": c.total}
+                for c in cost.cases
+            ],
+            "skipped": [{"case": case, "reason": why} for case, why in cost.skipped],
+        },
+    }
+
+
+def _record_data(view: RecordView, t: QualityThresholds) -> JsonObject:
+    r = view.record
+    head: JsonObject = {"owner": r.owner, "service": r.service, "client": r.client, "client_kind": r.client_kind, "unit": r.unit}
+    if r.error:
+        return {
+            **head, "error": r.error, "files_error": "", "stalled_error": "", "contract": 0, "playbook": 0, "budget": None, "cases": [],
+            "first_deliveries": {"accepted": 0, "rejected": 0, "no_verdict": 0, "superseded": 0, "neither": 0, "never_delivered": 0},
+            "deliveries": _deliveries_data(ServiceRecord("", "", ROOT, "human")), "escapes": [], "verifiers": [], "alarms": {}, "timeline": [], "history": None,
+        }
+    firsts = first_lines(r)
+    count = {o: sum(1 for f in firsts if f.outcome == o) for o in ("accepted", "rejected", "none", "neither", "never")}
+    return {
+        **head, "error": "", "files_error": r.files_error, "stalled_error": view.stalled_error, "contract": r.contract, "playbook": r.playbook,
+        "budget": r.budget if r.service else None, "cases": [_case_data(view, f) for f in firsts],
+        "first_deliveries": {
+            "accepted": count["accepted"], "rejected": count["rejected"], "no_verdict": count["none"],
+            "superseded": sum(1 for f in firsts if f.outcome == "none" and f.superseded is not None), "neither": count["neither"],
+            "never_delivered": count["never"],
+        },
+        "deliveries": _deliveries_data(r), "escapes": [_escape_data(row) for row in escape_rows(r)], "verifiers": _verifier_data(view),
+        "alarms": _alarm_data(view, t), "timeline": [_mark_data(m) for m in r.timeline],
+        "history": {"known": r.history.known, "truncated": r.history.truncated, "skipped": r.history.skipped},
+    }
+
+
+def _deliveries_data(r: ServiceRecord) -> JsonObject:
+    f = delivery_facts(r)
+    return {
+        "total": f.total, "judged": f.judged, "unjudged_cases": list(f.unjudged), "relayed_only": list(f.relayed_only), "unseen_relayed": list(f.unseen_relayed),
+        "not_as_delivered": [{"case": d.case, "task": d.task.id} for d in f.not_as_delivered], "neither": [{"case": d.case, "task": d.task.id} for d in f.neither],
+        "legacy_verdicts": f.legacy, "not_on_a_delivery": list(f.not_on_a_delivery),
+    }
+
+
+def _moved_data(m: MovedPast) -> JsonObject:
+    return {
+        "addr": m.addr, "held": m.held, "held_error": m.held_error, "error": m.error,
+        "tasks": [
+            {
+                "id": h.task.id, "sender": h.task.sender, "title": h.task.title if h.task.sender == ROOT else None, "blocked": _stamp(msg_time(h.blocked)),
+                "left_blocked": h.left_blocked, "sent_since": h.sent_since,
+            }
+            for h in m.tasks
+        ],
+    }
+
+
+def quality_data(view: QualityView) -> JsonObject:
+    """The same data as the text, as plain JSON values (9.4): every key always present, the text's limits not applied, times as UTC strings, ratios as
+    the two-decimal strings the text shows. ``one_off`` is ``None`` when root gave no one-off task, and always with ``service``."""
+    t = view.thresholds
+    records = view.records
+    off = next((v for v in records if not v.record.service), None)
+    top = [v for v in records if v.record.service and v.record.client_kind == "human"]
+    nested = [v for v in records if v.record.service and v.record.client_kind != "human"]
+    return {
+        "schema": 1,
+        "thresholds": {
+            "min_judged": t.min_judged, "repeat_window": t.repeat_window, "repeat_failures": t.repeat_failures, "cost_ratio": t.cost_ratio_text, "source": t.source,
+        },
+        "notes": list(view.notes), "services": [_record_data(v, t) for v in top],
+        "one_off": _record_data(off, t) if off is not None and view.service is None and (off.record.cases or off.record.error) else None,
+        "nested": [
+            {
+                "owner": v.record.owner, "service": v.record.service, "client": v.record.client, "cases": len(v.record.cases),
+                "delivered": len(v.record.deliveries), "agent_verdicts": sum(len(c.verdicts) for c in v.record.cases), "error": v.record.error,
+            }
+            for v in nested
+        ],
+        "moved_past": [_moved_data(m) for m in view.moved_past],
+    }
