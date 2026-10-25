@@ -118,11 +118,13 @@ def test_the_delivery_report_shows_the_assistants_relayed_runs_apart_as_its_own(
 
 def test_the_skill_records_the_users_keep_as_is_as_their_accept_on_its_task():
     """L-ASIS (D-E5-5): when the user keeps the version they have as it is, even after a reject, root records that as their accept with their words;
-    "deliver as is" and "I'll read it myself" stay no accept. The file stays at 125 lines."""
+    "deliver as is" and "I'll read it myself" stay no accept. F-E6-6 (D-E6-5) narrows it deliberately: only a delivered version the user kept after
+    seeing it; a "keep it" about one part of it, or one given before they saw it, is no accept. The file stays at 125 lines."""
     assert len(SKILL.read_text().splitlines()) <= 125
     text = flat()
     for needle in (
-        'when they keep the version they have as it is ("i\'ll take it as it is"), record that accept on its task',
+        'when they keep a delivered version as it is after seeing it ("i\'ll take it as it is"), record that accept on its task',
+        'a "keep it" about one part of it, or before they saw it, is no accept',
         "with their words, also after a reject",
         '"deliver as is" or "i\'ll read it myself" is not an accept: ask, or record nothing yet',
     ):

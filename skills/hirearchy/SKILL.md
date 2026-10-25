@@ -97,7 +97,7 @@ Tell the user it is running and how many runs were planned (a ceiling: runs the 
    (met / unmet), then runs used of planned (with reworks, the case total: "19 runs of the 15 approved per request", your relayed runs apart, as yours). Nothing else.
 6. A service request: after the delivery ask ONE short question ("Keep it, or what should change?") and record
    `feedback(task_id, accept|reject, note, source="human")` only on the user's own judgement of the delivered result, in their words
-   ("keep it" / "what's wrong"); when they keep the version they have as it is ("I'll take it as it is"), record that accept on its task, `source="human"`, with their words, also after a reject; "deliver as is" or "I'll read it myself" is not an accept: ask, or record nothing yet. A known unmet
+   ("keep it" / "what's wrong"); when they keep a delivered version as it is after seeing it ("I'll take it as it is"), record that accept on its task, `source="human"`, with their words, also after a reject; a "keep it" about one part of it, or before they saw it, is no accept; "deliver as is" or "I'll read it myself" is not an accept: ask, or record nothing yet. A known unmet
    criterion stays unmet: say so; feedback never waives it; reject needs the user's reason in their words. Your own reading is relayed
    (the default). With each human reject propose exactly ONE item they answer yes or no, naming what it is about by the ids `services()`
    shows, as one yes/no question ("About C6: add '...' as a criterion?" or "Same as R3: a one-off?"); if the new criterion would pull against
