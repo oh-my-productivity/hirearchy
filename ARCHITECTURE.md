@@ -257,7 +257,7 @@ Data and pure vocabulary (not Protocols): `ROOT="root"`, `RUNTIME="runtime"`, `B
 `word_count clip clip_line single`; time helpers `aware parse_time stamp_of msg_time fmt_duration fmt_dur`; `inside visible`;
 `latest_results`; `verdict_tier(note)` (`human` | `relayed` | `agent`) and `link_ids(note)` (pure; org growth phase 0a);
 `client_questions(body) -> list[str]` (phase 0a.1, pure: the items of the first `Questions for the client:` block of a message body, `[]` when there is none or it says none;
-`progress` and `reflection` read a result's questions through it, nobody else parses the block); phase 0a.2 adds the pure `strip_markers(line)` (a playbook line without its leading markdown markers: lines are compared on their words),
+`progress` and `reflection` read a result's questions through it, nobody else parses the block; phase 0a.4 makes a marker line's tail or a parenthesized remark no item unless it names a criterion id) and, from phase 0a.4, the frozen `ClientItems(questions, notes)` and the pure `client_items(body) -> ClientItems` (the one place that splits the items: those that name a criterion id, `\bC[0-9]+\b`, are questions, the others notes; no module outside `kernel` calls `client_questions`); phase 0a.2 adds the pure `strip_markers(line)` (a playbook line without its leading markdown markers: lines are compared on their words),
 `artifact_paths(body)` (the paths of a result's `## Artifacts` section) and the run-credit vocabulary `RUN_CREDIT_TITLE`, `run_credit_title(addr, stem)`, `is_run_credit(note)` and
 `credited_stems(received) -> set[str]` (a run credit is a note of the runtime that carries runs and whose title `run credit <addr>@<run-log stem>` names its own recipient; budget stays derived, so the note is the credit);
 `@dataclass class Message` (fields as today, plus `source` and `criterion` after `feedback` and before `trace`: provenance of a root verdict, link or rework, and
@@ -433,6 +433,7 @@ class TraceScope(Protocol):
 Impl: `FsEventSinks(EventSinks)` creating `FsEventSink(EventSink)` over the shared `EventWriterPool`; `MutableProcessLabel`; `FsEventRetention`;
 `JsonArgumentSummarizer`; `ThreadLocalTraceScope(TraceScope, TraceTap)`. Fakes: kernel's `ListEventSink`, `MemoryProcessLabel`.
 Emission contract suite (the three below must hold for the fake and the real sink): never raises; envelope fields; file per process and day.
+Phase 0a.4: the lock that `EventWriterPool` shares with every `FileLineWriter` is a `threading.RLock`, so an event that a signal handler emits (`scheduler.signal`, 3.36) while the same thread is writing a line follows that line instead of deadlocking.
 
 ### 3.8 `processes`
 
@@ -769,7 +770,7 @@ class MessageSender(Protocol):
              feedback: str | None = None, source: str | None = None, criterion: str | None = None, wake: bool = True,
              skip_route_check: bool = False, inherited: str | None = None) -> Message:
         """Validate (cap, route, budget, hops) then deliver. The facade maps skip_route_check to today's _skip_route_check. `source` and `criterion` are root's
-        only (an agent that passes either is refused); a root rework, verdict or link without a `source` is stamped `relayed`. `inherited` (from `ReworkContext`) is the tier an agent's rework carries."""
+        only (an agent that passes either is refused); a root rework, verdict or link without a `source` is stamped `relayed`. `inherited` (from `ReworkContext`) is the tier a task of an agent carries."""
 
 class TaskAssigner(Protocol):
     def delegate(self, actor: str, to: str, title: str, goal: str, acceptance: str, inputs: Sequence[str] | None = None,
@@ -782,6 +783,7 @@ class TaskReporter(Protocol):
 
 class ReworkContext(Protocol):   # port, implemented by `services`
     def fields_for(self, actor: str, revises: str) -> Mapping[str, object]: """service/contract/playbook a rework inherits ({} for an ordinary task) and, for an agent, the `source` tier of the open task it received in the same trace."""
+    def work_tier(self, actor: str) -> str | None: """Phase 0a.4: the tier (`human` or `relayed`) of the work `actor` does now, for a task it sends without `revises`: the `source` of its newest open received task in the trace its next message is stamped with (the one trace of its open received tasks, else the one trace of its run batch); None for root and without such a task."""
 
 class GuardedSender(MessageSender, Protocol):   # phase 0a.2: the sender behind `Org.send`; no method of its own
     """Refuses what only the rules of a case may send for root (`check_root_send`: a task that names a service or revises another, a note that carries a verdict or a link); every other message passes unchanged."""
@@ -789,7 +791,8 @@ class GuardedSender(MessageSender, Protocol):   # phase 0a.2: the sender behind 
 Impl: `RuleMessageSender`, `RuleTaskAssigner` (consumes a `MessageSender` and a `ReworkContext`), `RuleTaskReporter` (consumes a `MessageSender`); private collaborators (in `_protocols.py`, made by `wire_dispatch`, not runtime fields): `RoutePolicy` -> `ParentSiblingRoutePolicy`, `HopCounter` -> `InflightHopCounter`, `ArtifactNormalizer` -> `ArtifactAnnotator`, `LessonsCheck` -> `LessonsPolicy`.
 Phase 0a.2: the pure `check_root_send(actor, type, service, revises, feedback, criterion)` (in `dispatch/_root_send.py`, exported by `api`) holds the refusal texts; `GuardedRootSender(MessageSender)` (`dispatch/_guarded.py`) applies it and then calls the sender it guards; `wire_dispatch` provides it as the runtime field `facade_sender: GuardedSender`
 and `Org.send` delegates to that field (the facade stays one delegation statement per method), while the rule classes keep `message_sender`. `RuleTaskAssigner` refuses root's `delegate(revises=<service request>)` (`USE_REQUEST`).
-Fakes: `RecordingSender`, `NoReworkContext`, `FixedReworkContext`. `ReworkContext` is provided by `wire_services` (`ServiceReworkContext`, step C-services); `wire_dispatch` has no provider of it (two providers of one port are refused), but its `RuleTaskAssigner` takes it from the runtime.
+Phase 0a.4: `provenance_source` stamps `inherited` on every task of an agent, not only on a rework (an agent's own `source` is still refused); `RuleTaskAssigner.delegate` asks `ReworkContext.work_tier` for an agent's task without `revises` (never for root; `OrgError` or `OSError` give no tier) and `ServiceReworkContext.work_tier` mirrors the stamper's open-task rule, then its batch rule (`_open_trace`, `_batch_trace`).
+Fakes: `RecordingSender`, `NoReworkContext`, `FixedReworkContext(fields, tiers=None)`. `ReworkContext` is provided by `wire_services` (`ServiceReworkContext`, step C-services); `wire_dispatch` has no provider of it (two providers of one port are refused), but its `RuleTaskAssigner` takes it from the runtime.
 
 ### 3.21 `services`
 
@@ -908,6 +911,7 @@ class DeliverableChecks(Protocol):   # phase 0a.2: read-only; never reads outsid
 ```
 Impl: `DerivedCaseHistory`, `DigestBuilder`, `TextServiceReports`, `OwnerPromptSections`, `TextServiceSteps(AgentDirectory, ServiceCatalog, CaseHistory, MailboxReader)`; runtime fields `case_history`, `reflection_digest`, `service_reports`, `service_prompt_sections`, `service_steps`. `StatsReport` is `testing.PURE` and `NOT_A_FIELD`.
 Phase 0a.3 adds `CaseAllowanceOf(history, catalog)` (`services.CaseAllowance`, runtime field `case_allowance`, built by `wire_reflection`), the method `RunCounter.stamps(team, start, end)` (the stamps of the run logs of a window, each with whether a run credit names it), the reply text `TOPUP` of `rework_step` when a rework the user asked for gets less than one round of the team (`client_round`), and the `DeliverableFinding` kind `relayed` (the file is the delivery the user saw, and root's own relayed rework changed the team's copy after it; `DeliverableFinding.relayed` lists those tasks).
+Phase 0a.4 adds `open_client_items(task, result, case, root_sent) -> ClientItems` (the client items of a `done` or `blocked` result that nothing has settled; `questions_open` counts only its questions), `items_listing(items)` (the listing of the notes, `ITEM_CHARS` each and at most `ITEMS_SHOWN`), `Case.relayed_to_user` (the user's runs that results of relayed tasks carried back beyond what each relayed task still had, read by `user_spend` and `user_committed` through one helper), `Case.open_tasks` (the chain's tasks with no final result, oldest first) and the pure `user_held(case, rework)` (the user's runs the team still holds for a rework that revises an open task; `rework_step` then says `HELD` in place of `TOPUP`). `user_spend` and `user_committed` count the runs a relayed result carried back as the user's again, so `CaseAllowanceOf` no longer treats them as held.
 Phase 0a.2 adds `DeliverableChecks` (runtime field `deliverable_checks`; `FolderDeliverableChecks` over the private ports `DeliverableFolder` (a contract's folder walked from a descriptor, no link followed, only the names and hashes of the direct files, at most 200 entries and 32 MiB), `CheckedVersions` (what the team last checked, implemented in `app` by `GitCheckedVersions` over `snapshots.OrgHistory`)
 and `BlobIds`), the pure `deliverables_note(findings)` that `progress`, `status` and `whoami` show to root, `questions_open(task, result, case, root_sent)` (the client questions a `done` or `blocked` result still has open), `Case.lesson_sources` (the digest marks lessons from relayed reworks),
 `Verdict.link_notes`, `amendment_basis` and `CaseJudgedVersions(history, mail, versions)` (`services.JudgedVersions`, runtime field `judged_versions`). `CaseServiceEvidence` admits playbook lines one by one.
@@ -1327,8 +1331,8 @@ roles the loop is made of, each a small Protocol: `OrphanSettler` (`LedgerOrphan
 `FailureLedgerRepair`, `ReapPhase`, `OrphanCheck`, `FundedResume`, `RunLaunch`, `StallCheck`, `ReviewCheck`, `HeartbeatUpkeep`, and `GuardedPhase(name, phase, guard)` for the
 best-effort ones), `WorkLeft` (`QueriedWork`: `remains`, `finished`, `waiting` over `attention.OpenWork`, `eligibility.RunnableQuery` and `attention.WaitingOnUser`), `WaitGrace`
 (`GraceWait`), `ExitPolicy` (`GraceExitPolicy`), `Pacing` (`PollPacing`), and the session: `Claim` (`ProcessClaim`: process label, `SchedulerLock`, `ExitMarker`, `IgnoreList`),
-`SessionEvents` (`SessionAnnouncer` in `_events.py`), `InterruptedRuns` (`BatchRecovery`), `SchedulerSession` (`ClaimedSession`: `open` = claim, `scheduler.start`, orphans,
-recover; `close` = terminate the runs, give up the claim, `scheduler.exit`). `PhaseGuard` is `LoggingPhaseGuard`. `HeartbeatLoop(session, phases, lifecycle, work, exits, pacing,
+`SessionEvents` (`SessionAnnouncer` in `_events.py`; phase 0a.4 adds `signalled(name, action, running)`, which writes `scheduler.signal`), `InterruptedRuns` (`BatchRecovery`), `SchedulerSession` (`ClaimedSession`: `open` = claim, `scheduler.start`, orphans,
+recover; `close` = terminate the runs, give up the claim, `scheduler.exit`; phase 0a.4 adds `signalled(name, action, runs)`, called from the signal handler). `PhaseGuard` is `LoggingPhaseGuard`. `HeartbeatLoop(session, phases, lifecycle, work, exits, pacing,
 state)` owns a `LoopState` (the `RunTable`, the `blocked` set, the `RunCount`, `mode`, `max_runs`, `exit_reason`) and passes it to the phases as a `Standing` (the live runs and
 blocked set, and whether `max_runs` allows another run); what the collaborators remember between two ticks (the guard's last errors, the heartbeat and prune times, the start of
 the grace count, the memo of the stall ladder's task views) is a `LoopMemory` handed to them, so a loop made again over another runtime goes on where the old one was.
@@ -1339,6 +1343,7 @@ agents itself (lazily, when a heartbeat is due) instead of taking `runnable: int
 the loop owns the runs; the tick order is the order of the list in `assemble_loop`. `finished()` asks `attention.OpenWork.nothing_to_do(running=, blocked=, can_start=)` (the port
 gained those keyword arguments, defaulting to the old question) instead of keeping a copy of its rule. The two clocks: the loop times runs by the run clock (`SystemClock`) and
 the stall ladder, the review, the heartbeat, the grace count and the guard by the cadence clock (`wire_stalls.ladder_on(ports, cadence)`).
+Phase 0a.4: `HeartbeatLoop.serve` installs one handler for `STOP_SIGNALS` (SIGTERM and SIGHUP). It calls `SchedulerSession.signalled` at once, before any grace period, which emits `scheduler.signal` (`signal`, `action`, `running`) through `SessionEvents.signalled`, and it ends the loop cleanly (`stopped by <signal>`) unless SIGHUP was inherited ignored (`action: ignored`); the handlers set before are restored on exit. No code changes how the scheduler is detached (study E6's reproduction found its trigger in the calling host; README, Kiro integration).
 
 ```python
 # mcp_server/api.py

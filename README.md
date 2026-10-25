@@ -406,6 +406,7 @@ Everything is derived from **one append-only event log** written by the runtime 
 | Kind | When (extra fields) |
 | --- | --- |
 | `scheduler.start` / `scheduler.exit` | `mode`, `max_runs`, `max_parallel`, `version` / `reason`, `runs_started` |
+| `scheduler.signal` | the scheduler got SIGTERM or SIGHUP, written by its handler at once, before the runs' grace period, so a TERM that a KILL follows still leaves it: `signal`, `action` (`stop`; `ignored` for a SIGHUP the scheduler was started with ignored), `ppid` (its parent pid then), `running` (run ids) |
 | `scheduler.heartbeat` | every `heartbeat_seconds`: `running` (run ids), `runnable`, `waiting_on_you` |
 | `scheduler.error` | a tick phase raised (`phase`, `error`); the tick goes on |
 | `run.start` | `agent`, `run`, `batch` (message ids), `traces`, `child_pid`/`pgid` (the kiro process; the envelope `pid` is the scheduler's), `model`, `budget_before` |
@@ -787,6 +788,27 @@ The batch after study E5 (design: `docs/design/org-growth-phase-0a3.md`); it bui
 - *Smaller fixes.* The refusal that asks for a verdict before an amendment says that root's own relayed verdict settles a relayed rework the user never saw. The deliverable note names the delivery a later relayed
   rework changed instead of calling the file a deviation. A rework delegation whose revised task has no trace finds its `human` or `relayed` tier through the trace of the run's batch. The skill tells root to record
   the user's keep-as-is as their accept, with their words, also after a reject.
+
+## Org growth: phase 0a.4
+
+The batch after study E6 (design: `docs/design/org-growth-phase-0a4.md`); it builds on phase 0a.3 above. Everything stays derived from the mail and the run logs: no ledger, no stored state, no new message field. The only new event kind is `scheduler.signal`.
+
+- *Only a criterion makes an item a question for the client.* In a result's `Questions for the client:` block, an item that names a criterion id (`C<k>`) is a question: it flags the result, withholds its artifact path and enters the
+  relayed rework's reply. Any other item is a note: `progress` lists it (`k notes for the client (no criterion): ...`) and withholds nothing for it, and the skill tells root to pass the notes on with the delivery. A marker line's
+  tail, or a parenthesized remark, is no item unless it names a criterion id. Limits: a real question without an id is a note and holds nothing; the id is matched as text, not checked against the contract.
+- *The top-up counts the user's runs.* A relayed result's return beyond what its relayed task still had goes back to the user's side in every user figure, so the approval does not grow after it. While the task a rework
+  revises is still open, the reply to `request` says `The team still holds N of the user's runs for <task>; the rework can use them.` in place of the top-up ask. The default hand-down is unchanged. Limits: the held runs
+  are the case's by its own accounting, not split per task; with the revised task closed nothing is held; nothing is given back from a relayed result that came after its successor was sent.
+- *The scheduler records the signal that stops it.* The scheduler's SIGTERM and SIGHUP handlers write `scheduler.signal` at once, before the runs' grace period, so a TERM that a KILL follows still leaves a record; the event
+  writer is re-entrant for this. SIGHUP is now a clean stop (`stopped by SIGHUP`), unless the scheduler was started with it ignored (`action: ignored`). A scheduler that was started with SIGHUP ignored no longer passes the
+  ignore to its runs: they start with SIGHUP at its default and lead sessions of their own. A signal that arrives before the handlers are installed, and SIGKILL, are not recorded.
+- *No change to how the scheduler starts.* The study's reproduction (a scheduler started in the last command of another agent host's tool call was stopped at the call's end, 2 of 2) showed a trigger that lies in
+  that host's harness: with `; sleep 20` after the chat command in the same call the scheduler survived 2 of 2. Unsetting the call's marker variables also saved it, but nothing is shipped for it (the declared limit is
+  under "Kiro integration"). A `scheduler.signal` of an unexplained source in real use is the reason to reopen it.
+- *A delegation of an agent inherits the tier of its work.* A task an agent sends without `revises` carries the `human` or `relayed` tier of its newest open received task, found through the trace the runtime stamps its
+  next message with; root never gets one, and a mailbox that cannot be read sends the task without. An agent's own `source` is still refused. The tier of an agent client's service request is not carried.
+- *Smaller fixes in the skill.* Root records the user's keep-as-is as their accept only for a delivered version they kept after seeing it: a "keep it" about one part of it, or before they saw it, is no accept. Root asks the
+  spend of a rework in the same message as the question or yes/no item that needs the rework.
 
 ## Security notes
 
