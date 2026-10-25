@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Protocol, runtime_checkable
 
 from ..kernel import ClientItems, Message, client_items, clip_line, msg_time
@@ -29,6 +29,7 @@ __all__ = [
     "CaseHistory",
     "DeliverableChecks",
     "DeliverableFinding",
+    "Delivery",
     "ITEMS_SHOWN",
     "ITEM_CHARS",
     "ReflectionDigest",
@@ -42,16 +43,20 @@ __all__ = [
     "Verdict",
     "case_spend",
     "confirmed_criteria",
+    "deliveries_of",
     "delivered_unrated",
     "deliverables_note",
     "items_listing",
     "lessons_of",
+    "not_on_a_delivery",
     "open_client_items",
     "questions_open",
     "rated",
     "regressions",
+    "signer_of",
     "stats_by_version",
     "summarize",
+    "unjudged_cases",
     "user_approved",
     "user_committed",
     "user_cost",
@@ -191,6 +196,68 @@ class Assertion:
     verdict: Verdict
     about: tuple[str, ...]  # the criteria (C<k>) the client confirmed it is about, "the same as R<j>" resolved; an R<j> that is about nothing stays
     link: str  # "confirmed" (a human link naming ids) | "none" (a human link "none": no lasting rule) | "unconfirmed" (only a relayed link) | ""
+
+
+_EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
+
+
+def _micros(when: datetime) -> int:
+    """``when`` in whole microseconds since the epoch (exact; the unit of a file's write time, ``Delivery.edited_at``)."""
+    return (when - _EPOCH) // timedelta(microseconds=1)
+
+
+@dataclass(frozen=True)
+class Delivery:
+    """A task of a case whose latest result is ``done`` (0b section 3, 4.3): the team reported it finished. Derived by :func:`deliveries_of`; the
+    deliverable check sets ``edited_at``, ``edited`` and ``given`` afterwards."""
+
+    case: str  # the id of the case
+    task: Message
+    result: Message  # the task's latest result, the one with status ``done``
+    step: int  # 0 for the head task of the case, n for the n-th rework
+    signer: str  # who signed the delivery off (``signer_of``): the owner when nobody else did
+    verdicts: tuple[Verdict, ...] = ()  # the verdicts on the delivery's task given after its ``done`` result, every tier, oldest first
+    superseded: str = ""  # the first task of the case sent after the result, when the delivery got no human-tier verdict ("" otherwise)
+    edited_at: int = 0  # when the delivered file last changed, in microseconds since the epoch; 0 when it did not or the time is not known
+    edited: bool = False  # the delivered file is not as delivered (``edited_at`` may be 0: the time is not known, and then nothing is voided)
+    given: bool = False  # the delivery the user was given: the case's given delivery (section 3)
+
+    @property
+    def counted(self) -> tuple[Verdict, ...]:
+        """The human-tier verdicts recorded before the file changed: all of them when it did not (or its time is not known). A verdict with no time is counted."""
+        human = tuple(v for v in self.verdicts if v.tier == "human")
+        if self.edited_at <= 0:
+            return human
+        return tuple(v for v in human if v.created is None or _micros(v.created) < self.edited_at)
+
+    @property
+    def voided(self) -> tuple[Verdict, ...]:
+        """The human-tier verdicts recorded at or after the file changed (none when its change time is not known)."""
+        if self.edited_at <= 0:
+            return ()
+        return tuple(v for v in self.verdicts if v.tier == "human" and v.created is not None and _micros(v.created) >= self.edited_at)
+
+    @property
+    def judged(self) -> bool:
+        return bool(self.counted)
+
+    @property
+    def escape(self) -> bool:
+        """Judged, with a counted reject: the team reported ``done`` and the human client rejected it (a later accept does not undo it)."""
+        return any(v.verdict == "reject" for v in self.counted)
+
+    @property
+    def decisive(self) -> Verdict | None:
+        """The latest counted reject, else the latest counted verdict; None when nothing is counted."""
+        rejects = [v for v in self.counted if v.verdict == "reject"]
+        return rejects[-1] if rejects else self.counted[-1] if self.counted else None
+
+    @property
+    def outcome(self) -> str:
+        """``rejected`` (an escape), ``accepted`` (judged, no escape), ``neither`` (nothing counted, something voided), else ``none``."""
+        if self.escape:
+            return "rejected"
+        return "accepted" if self.judged else "neither" if self.voided else "none"
 
 
 def case_spend(case: Case) -> int:
@@ -629,3 +696,7 @@ def deliverables_note(findings: Sequence[DeliverableFinding]) -> str:
                 entries.append(key)
             blocks.setdefault(key, []).append(f)
     return "\n".join(line for entry in entries for line in (_block(entry, blocks[entry]) if isinstance(entry, tuple) else entry))
+
+
+# Pure rules re-exported from their modules; they import the types above, so these imports come last.
+from ._quality_rules import deliveries_of, not_on_a_delivery, signer_of, unjudged_cases  # noqa: E402
