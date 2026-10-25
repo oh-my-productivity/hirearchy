@@ -76,3 +76,22 @@ def test_an_empty_key_criterion_is_quoted_by_id_only() -> None:
     """A criterion with no letter or digit has an empty key, which every line would "contain": it is matched by its id alone."""
     assert quoting_lines("- ???\n- C9: the rule\nplain", criterion("???")) == ["- C9: the rule"]
 
+
+
+def test_criterion_words_names_the_criterion_whose_own_words_a_line_is() -> None:
+    from hirearchy.services import criterion_words
+
+    c9 = criterion("Every Due value is an ISO date.", "C9")
+    c10 = criterion("Next meeting is stated.", "C10")
+    for line in ("- C9: Every Due value is an ISO date.", "2. C9: every due value is an iso date", "Every Due value is an ISO date. (C9)"):
+        assert criterion_words(line, [c9, c10]) == "C9"
+    assert criterion_words("- C10: Next meeting is stated.", [c9, c10]) == "C10"
+    assert criterion_words("- C9: Every Due value is an ISO date, always.", [c9]) is None
+    assert criterion_words("Every Due value is an ISO date.", [c9]) is None  # its words without its id are not its words
+
+
+def test_a_criterion_with_an_empty_key_admits_no_line() -> None:
+    from hirearchy.services import criterion_words
+
+    assert criterion_words("- C9: ---", [criterion("---", "C9")]) is None
+    assert criterion_words("C9", [criterion("", "C9")]) is None

@@ -14,8 +14,8 @@ from collections.abc import Callable, Mapping, Sequence
 
 from ..kernel import ROOT, OrgError, clip_line, link_ids, parent, verdict_tier
 from ..services import (
-    Admission, AmendmentBasis, Criterion, Rejection, ServiceCatalog, ServiceEvidence, confirmed_amendments, line_key, normalize_evidence,
-    normalize_links,
+    Admission, AmendmentBasis, Criterion, Rejection, ServiceCatalog, ServiceEvidence, confirmed_amendments, criterion_words, line_key,
+    normalize_evidence, normalize_links,
 )
 from ._steps import question_for
 from .api import Assertion, CaseHistory, Verdict, confirmed_criteria, delivered_unrated, regressions
@@ -194,7 +194,7 @@ class CaseServiceEvidence(ServiceEvidence):
         offending: list[str] = []
         tagged = False  # some admitted line rests on rule (b)
         for line in lines:
-            words, tag = _words_of(line, added), _tag_of(line, tags)
+            words, tag = criterion_words(line, added), _tag_of(line, tags)
             if words or tag:
                 admitted.append((words or tag or "", line))
                 tagged = tagged or not words
@@ -208,17 +208,6 @@ class CaseServiceEvidence(ServiceEvidence):
             return Admission("c", ids, detail, lines=tuple(admitted))
         failed = cases_of(qualifying[0])
         return Admission("b", ids, f"{qualifying[0]} failed in {len(failed)} cases the client rejected: {', '.join(failed)}", lines=tuple(admitted))
-
-
-def _words_of(line: str, added: Sequence[Criterion]) -> str | None:
-    """The id of the cited confirmed criterion whose own words ``line`` is (``- C9: <its text>``, ``2. C9: <its text>`` or ``<its text> (C9)``), else
-    None. A criterion whose text has no letter or digit has an empty key and admits no line: a bare id would otherwise be its "words"."""
-    key = line_key(line)
-    for c in added:
-        text = line_key(c.text)
-        if text and key in (line_key(c.id) + text, text + line_key(c.id)):
-            return c.id
-    return None
 
 
 def _tag_of(line: str, tags: Sequence[str]) -> str | None:

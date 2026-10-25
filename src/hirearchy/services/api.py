@@ -64,6 +64,7 @@ __all__ = [
     "changed_lines",
     "confirmed_amendments",
     "criteria_of",
+    "criterion_words",
     "line_key",
     "normalize_evidence",
     "normalize_links",
@@ -239,6 +240,17 @@ def quoting_lines(body: str, criterion: Criterion) -> list[str]:
         stripped for line in body.splitlines()
         if (key := line_key(line)) and (stripped := line.strip()) and (token.search(line) or (text and text in key))
     ]
+
+
+def criterion_words(line: str, criteria: Sequence[Criterion]) -> str | None:
+    """The id of the criterion in ``criteria`` whose own words ``line`` is (``- C9: <its text>``, ``2. C9: <its text>`` or ``<its text> (C9)``), else
+    None (pure). A criterion whose text has no letter or digit has an empty key and admits no line: a bare id would otherwise be its "words"."""
+    key = line_key(line)
+    for c in criteria:
+        text = line_key(c.text)
+        if text and key in (line_key(c.id) + text, text + line_key(c.id)):
+            return c.id
+    return None
 
 
 def normalize_evidence(ids: object) -> tuple[str, ...]:
