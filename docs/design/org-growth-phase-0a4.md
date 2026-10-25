@@ -1,6 +1,6 @@
 # Org growth, Phase 0a.4: the batch after the E6 FAIL (technical design)
 
-Status: design, revision 2 (design loop pass 2; resolves the 21 findings of `.agents/tasks/design-review.md`, one by one in Appendix A). Branch `feat/org-growth-phase-0a4` off `main` `fe0c9fd` (the E6 study commit;
+Status: design, revision 2, approved as amended by Appendix A.2, which overrides the body where they differ (design loop pass 2; resolves the 21 findings of `.agents/tasks/design-review.md`, one by one in Appendix A). Branch `feat/org-growth-phase-0a4` off `main` `fe0c9fd` (the E6 study commit;
 product code identical to `18c4ffb`); worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0a4`. Baseline at `fe0c9fd`:
 `skills/hirearchy/SKILL.md` 125 lines; `ROOT_INSTRUCTIONS` is not edited by this batch (2 642 characters at the reference path at 0a.3, cap 2 700).
 
@@ -86,8 +86,9 @@ your answers)` therefore gave a fourth item.
 New rule. With `inline` the tail as today (stripped of `:*_ `), `names_id` whether `inline` names a criterion id (`\bC[0-9]+\b`), and `listed`
 the list lines that follow the marker after any blank lines (the same `_LIST_LINE` loop as today, which ends at the first blank, heading or
 non-list line):
-1. **a tail that names a criterion id is one item**, whatever its shape and whatever follows (`Questions for the client: C4: should
-   non-actions be excluded?` before a list; `(C3: keep Marta's row?)`; `(C4-C6)` before a list). A1 never drops a `C<k>` question (Deviation 1);
+1. **a tail that names a criterion id is one item**, whatever follows and whether or not it is parenthesized, unless its first word is a none
+   word (rule 4) (`Questions for the client: C4: should non-actions be excluded?` before a list; `(C3: keep Marta's row?)`; `(C4-C6)` before a
+   list; `None (C3 was settled).` is no item). A1 never drops a `C<k>` question (Deviation 1);
 2. **heading:** otherwise, when `listed` holds at least one item (a list line that is not only a none word), the tail is no item;
 3. **remark:** otherwise, when the tail is wrapped in parentheses (`_wrapped`: all of it is one parenthesized group, its first `(` closed by
    its last `)`, one final `.` allowed), it is no item. `(reviewer flags; I did not settle them, and they touch your answers)` and the same with a
@@ -230,7 +231,8 @@ the two constants removed); `SRC/progress/_lines.py` (`_open_items`, the notes p
 | a tail of several parenthesized parts without an id (`(a) ... (b) ... (style)`) and no list | one item (a note): it is not wrapped |
 | a parenthesized tail with an id and no list | one question |
 | a tail without an id before a list (a heading) | the list items only |
-| a tail with an id before a list, parenthesized or not | the tail is one question, then the list items (declared limit 1) |
+| a tail with an id before a list, parenthesized or not, unless its first word is a none word | the tail is one question, then the list items (declared limit 1) |
+| a tail whose first word is a none word and that names an id (`None (C3 was settled).`) | no item (rule 4: the none word wins) |
 | a tail with an id before a list of notes only | 1 question: the result is flagged and its path withheld (never hidden) |
 | a tail followed only by a `- none` list line | the tail stays an item (no list item follows) |
 | more than 5 notes | 5 listed, then `; and {k} more` |
@@ -475,7 +477,7 @@ showed that signature (gate discrepancy 1). C1 shows what dies, when, by which s
   (and so the scheduler and the org's runs) gets `HOME=$SB/home` and `UV_CACHE_DIR=<the output of uv cache dir>` (uv then runs from the existing
   cache), so the product's stale-skill check reads `$SB/home/.kiro/skills`, never the user's. The org's runs sign in under that `HOME` through the
   inherited `KIRO_API_KEY` (Setup 0 checks it before any model call). The assistant's own kiro-cli keeps the user's `HOME` with the sandbox
-  `KIRO_HOME`, as 0a.3's C0 and the streams did. After each call its session record (under `$SB/kiro-home`) is read: a tool call other than
+  `KIRO_HOME`, as 0a.3's C0 and E6's preflight detach check did (the streams used the user's kiro home: limit 8). After each call its session record (under `$SB/kiro-home`) is read: a tool call other than
   `tool_load` and the `hirearchy::*` tools stops C1 (warning).
 - Environment variables are recorded by **name only**, never by value. The account `whoami` names is never recorded.
 - Clean-up after each attempt: kill only the pids C1 learned (the scheduler's pid file, each `run.start`'s `child_pid`/`pgid`, the chat's pid
@@ -664,7 +666,8 @@ emits on the main thread between two bytecodes, possibly while that thread is in
 a `threading.Lock`: the handler would block on it forever (a hung scheduler). And a re-entrant write in the middle of another line could give
 the file's lines out of `seq` order, which `check`'s invariant (e) reports. So:
 - `EventWriterPool._lock = threading.RLock()` (the same lock is still shared by the pool and its writers; one thread re-enters, other threads
-  still wait);
+  still wait); `FileLineWriter`'s lock annotation changes with it, from `threading.Lock` to `threading.RLock`, in the pool and in the writer
+  alike (mypy --strict stays clean; DR-0a4-9);
 - `FileLineWriter` keeps a queue and a flag; today's `append` body becomes `_write(...)`:
 
 ```python
@@ -775,7 +778,7 @@ runs, invalid ones included):**
 | no signal | no `scheduler.signal`; exit reasons as today |
 | SIGTERM | one record (`action: stop`), the loop ends after its pass, `scheduler.exit` `stopped by SIGTERM` unless a KILL comes first |
 | SIGHUP, inherited default | one record (`stop`), `stopped by SIGHUP` |
-| SIGHUP, inherited ignored | one record (`ignored`); the loop goes on |
+| SIGHUP, inherited ignored | one record (`ignored`); the loop goes on; the scheduler now catches SIGHUP to record it, so its runs start with SIGHUP at its default (today they inherit the ignore); runs lead sessions of their own (declared limit 11; DR-0a4-6) |
 | a second signal | a second record; the reason stays the first signal's |
 | no run in flight | `running: []` |
 | `run_once` | no handler (unchanged) |
@@ -1085,7 +1088,7 @@ noted. The integration test of C3 is never in these runs (it is skipped without 
 | D3 | `docs(skill): a rework's spend is asked with the question or item that needs it` (line 72) | `src/hirearchy/skill/tests src/hirearchy/blueprint/tests/test_round_f_guidance.py src/hirearchy/blueprint/tests/test_round_g_assistant.py` |
 | E1 | `docs: README and ARCHITECTURE for phase 0a.4` | `src/hirearchy/skill/tests tests/architecture src/hirearchy/blueprint/tests/test_round_g_assistant.py src/hirearchy/blueprint/tests/test_round_f_guidance.py tests/e2e/test_round7.py` |
 
-FEATs: C1 (alone, first); A (T0, A1-A4); B (B1-B2); C (C2a, C2b, C1b, C3); D (D1-D3, E1). E1 adds nothing to README's `## Services and
+FEATs: C1 (alone, first); A (T0, A1-A4); B (B1-B2); C (C2a, C2b, C1b, C3); D (D1-D3, E1). E1 writes `## Org growth: phase 0a.4` from section 1's table (no test pins it; DR-0a4-12). E1 adds nothing to README's `## Services and
 reflection` (97 lines today, under `test_round_g_assistant.py`'s cap of fewer than 98). E1's README gains `## Org growth: phase 0a.4` after the
 0a.3 section, and the event table row (under `## Observability`) after `scheduler.start` / `scheduler.exit`:
 
@@ -1168,6 +1171,11 @@ Declared limits (each pinned by a test where one can show it):
    holding ` NAME=` adds a name), which can only make D-ENV unset a name more.
 9. C3's M1 is macOS only (Deviation 9).
 10. F-E6-7 covers `delegate`: an agent client's service request (`request` without `revises`) still carries no tier.
+11. With SIGHUP inherited ignored, the scheduler catches SIGHUP to record it (C2), so the runs it starts now have SIGHUP at its default; today
+    they inherit the ignore. The runs lead sessions of their own (DR-0a4-6).
+12. When hirearchy is driven from another agent host's shell tool, a scheduler started in that tool call can be stopped when the call ends, if
+    the chat command is the call's last command. To avoid it, keep the call open after the chat returns, or start the scheduler outside it.
+    C2's event records any such stop (C1's outcome, A.2; the manager's decision on C1).
 
 Backlog: A3, if E7 counts paths withheld only by restated answers (D-E5-4's reopen condition, the owner's call); the tier of an agent client's
 service requests (limit 10); a Linux reproduction (limits 8 and 9); a dedicated dashboard line for `scheduler.signal`; the 1-run default's
@@ -1277,3 +1285,83 @@ decides (finding 6 narrows A1 in a case E5 and E6 never had; Deviation 1).
 
 The review's unverified point on B1 and the E5 replays is now verified (5.5: 963a's share is 0; s2's relayed tasks come after both cuts).
 
+
+### A.2 Design review of revision 2 (12 findings: 5 MEDIUM, 7 NIT), binding amendments
+
+Review pass 2 (`.agents/tasks/design-review.json`) found 12 points in revision 2 (`b769e6c`): 0 HIGH, 5 MEDIUM, 7 NIT, all five MEDIUM in C1, the
+reproduction protocol, a manual study procedure. The manager closed the design loop (`.agents/tasks/manager-decision-design-loop.md`) and adopted
+each fix as written. **This appendix binds the planner, the coder and the reviewers and overrides the body where they differ.** The body is edited
+only where an amendment says "declare" or "say" (4.2 rule 1 and 4.6 for DR-0a4-8, 6.1 Safety for DR-0a4-7, 6.2 for DR-0a4-9, 6.4 row and
+declared limit 11 for DR-0a4-6, 14 for DR-0a4-12); the C1 protocol rows (DR-0a4-1 to 5, 10, 11) are overridden here, not rewritten in 6.1.
+
+| # | Sev. | Finding (where) | Binding resolution (the reviewer's fix, adopted as written) |
+|---|---|---|---|
+| DR-0a4-1 | MED | V0 does not reproduce or specify the streams' harness boundary (the chat call ended its outer tool call) (6.1 Setup 3-5 and the runs table (V0)) | Run V0's turns as run_turn.sh did: the kiro-cli chat call is the last command of its own outer tool call (explicit timeout >= 600000 ms, nothing after it). Start the sampler earlier with run_in_background (writes only under $SB, stops itself 15 s after the call's process ends). Read the 5 s verdict in a later call. Add D-HARN (only when V0 died): the same turn 2 followed by sleep 20 in the same tool call; if it survives, no 6.3 row matches (warning), and E7's harness must not end a tool call at the return. Record the outer session's KIRO_* names (names only). |
+| DR-0a4-2 | MED | The session-record stop condition misnames tool calls (hirearchy tools arrive as tool_call; skill activation is disclose_context) and would stop C1 on benign calls (6.1 Safety; 6.3 integration test checks; Setup 0 choice (b)) | Allowed calls: tool_load whose tool_ids all start with hirearchy::, tool_call whose tool_id starts with hirearchy::, and disclose_context of the hirearchy skill; any other tool stops C1. Under (b), tool_call with hirearchy::whoami or hirearchy::status stops C1, and the profile's resources drop the skill entry (recorded in limit 8). The integration test applies the same set. |
+| DR-0a4-3 | MED | D-OUT's start command does not exist (no CLI 'start'), and D-OUT also changes the scheduler's environment (KIRO_HOME, VIRTUAL_ENV, UV_*, PATH, profile env keys) (6.1, the D-OUT row) | Start D-OUT's scheduler with: env HIREARCHY_STATE_DIR=$SB/kiro-state HOME=$SB/home <the names excluded from D-ENV, with the values the sampler read from turn 2's MCP server via ps -E, in memory only> $WT/.venv/bin/python -I -c 'import sys; from hirearchy.app import Org; print(Org(sys.argv[1]).runtime.scheduler_control.start(None, True))' "$SB/org" &. List the names set this way in the record. |
+| DR-0a4-4 | MED | kiro-cli's own log is looked for under $SB/kiro-home, but kiro-cli logs to $TMPDIR/kiro-log/ (verified), so the brief's 'keep kiro-cli's own log' is lost (6.1 Setup 5) | Every C1 kiro-cli call sets KIRO_CHAT_LOG_FILE=$SB/logs/<attempt>-turn<k>.log (a kiro variable kiro/_env.py already scrubs from runs). V0's first attempt records whether the file was written, and the name is excluded from D-ENV. If it was not written, keep only the lines of $TMPDIR/kiro-log/kiro-chat.log and cli.log stamped within [call start, return + 15 s] that carry the call's pid or session id or signal/kill/shutdown/terminate. Never copy the files whole (they are shared with the user's other sessions). |
+| DR-0a4-5 | MED | C1b's stopping rule ('first death'; 'all 3 survive -> M5 cannot match') contradicts the M5 row under C2's clean SIGHUP stop, which can outlast the 5 s verdict (6.1 C1b row and text; 6.3 M5 row) | Read C1b's outcome from the events: a 30 s sampler window, with the events re-read after the scheduler's pid is gone. Stop at the first attempt with a scheduler.signal or a gone scheduler. M5 matches when that attempt's first scheduler.signal is SIGHUP/stop and its scheduler.exit is 'stopped by SIGHUP'. 'M5 cannot match' only when no attempt recorded a scheduler.signal. |
+| DR-0a4-6 | NIT | Catching SIGHUP drops an inherited ignore for the runs (exec resets caught signals to their default) (6.2 SIGHUP; 6.4; 16) | Declare it in 6.4 and in the limits: with SIGHUP inherited ignored, runs now start with SIGHUP at its default (today they inherit the ignore); runs lead their own sessions. |
+| DR-0a4-7 | NIT | 'as 0a.3's C0 and the streams did' (sandbox KIRO_HOME) is wrong for the streams (6.1 Safety) | Say '... as 0a.3's C0 and E6's preflight detach check did (the streams used the user's kiro home: limit 8)'. |
+| DR-0a4-8 | NIT | A1 rule 1's prose says 'whatever its shape', but the code applies the none-word rule first (4.2 rule 1; 4.6) | Say '... one item, whatever follows and whether or not it is parenthesized, unless its first word is a none word (rule 4)'. Add a test: 'None (C3 was settled).' -> []. |
+| DR-0a4-9 | NIT | FileLineWriter's lock annotation (threading.Lock) must change with the RLock, or mypy --strict fails (6.2, the re-entrant writer) | State the new annotation (_thread.RLock, or threading.RLock in the pool and the writer alike) in 6.2's code sites. |
+| DR-0a4-10 | NIT | macOS ps: SESS always reads 0, and ps -E shows nothing for platform binaries such as zsh (6.1 Setup 4-5) | Infer sessions from pgid and ppid only. Read the C1 shell's environment from the sampler's own os.environ, never from ps -E. |
+| DR-0a4-11 | NIT | The run sign-in stop condition offers no owner choice (no real run has started under a sandbox HOME) (6.1 stop conditions) | On that stop, the warning offers Setup 0's choices (a) and (b). The calls already made count against the bound. |
+| DR-0a4-12 | NIT | README's '## Org growth: phase 0a.4' text is not given (14, E1) | Give its bullets, or state that E1 writes it from section 1's table and that no test pins it. |
+
+**Also binding (manager).**
+- C1 is the first build item. C3 ships only on C1's evidence: if C1 does not reproduce the death, C2 ships, the conditions tried are recorded and
+  no fix is guessed.
+- C1 runs against the real kiro-cli and the model service, bounded by the design's call bound. It ends before the build loop and before any other
+  heavy step of the workflow. On a usage limit: stop and send a warning; never retry in a loop.
+- The owner's test policy: FAST, scoped, for each commit; one SCOPED run for each FEAT end and for each fix pass; the full
+  `UV_LINK_MODE=copy bash scripts/check.sh` runs once, in the final validation, after the rebase onto `main`; the merge does not re-run it after a
+  no-op rebase.
+- The final validation checks every amendment above by its number (DR-0a4-1 to DR-0a4-12).
+
+**Plan-level refinements (planner decisions P-1 to P-11).**
+
+- **P-1 (C1 is FEAT-001 alone).** FEAT-001 makes no commit and changes no tracked file, so it has no FAST and no SCOPED run (nothing to verify by
+  tests); its verification is the completed record. A0, the first commit of the build, opens FEAT-002 and records C1's outcome, so the design
+  carries the evidence C3 rests on in the repository (`c1-reproduction.md` itself is never committed).
+- **P-2 (D-HARN's place and rule).** D-HARN is order 4, after D-ENV and D-OUT (the review's "a row after D-OUT"), and runs only when V0 was
+  reproduced. It counts with V0, D-ENV and D-OUT as a mechanism-deciding variant for the bound rule (a bound reached before it is decided stops
+  C1). Up to 2 valid attempts; one death decides "dies"; it "survives" when it survives 2. Its survival overrides 6.3: no row matches, C1 sends
+  `warning` (with what D-ENV/D-OUT showed), and C3 is not built unless the owner's answer says otherwise.
+- **P-3 (early decision).** A variant stops as soon as its verdict is decided: V0 after 2 deaths (reproduced) or after 2 valid non-deaths (not
+  reproduced: at most 1 of 3 can then die); any other variant after its first death or its second valid survival. This only saves chat calls.
+- **P-4 (C1b only when needed).** C1b runs only when C1 recorded "V0 reproduced" and no D-HARN override stands (or the owner lifted it). Without a
+  reproduced death there is no signal to see and C3 is not built (6.3 row 1).
+- **P-5 (the C1 tools).** The throwaway scripts (`sampler.py`, `verdict.py`, `allowed.py`, `logfilter.py`, stdlib only) are kept in
+  `WT/.agents/tasks/c1-tools/` (never committed; the merge copies them with `.agents/tasks/` for E7's preflight, D-E6-7) and copied into each `$SB`
+  before use, so they run from under `$SB` as design 6.1 Setup 4 says. They write only under `$SB` (plus the record, which the coder writes).
+- **P-6 (the lock type).** `threading.RLock` (typeshed: an alias of `_thread.RLock`) in `EventWriterPool` and `FileLineWriter`; the three test
+  constructions in `SRC/telemetry/tests/test_file_line_writer.py` (lines 32, 65, 74: `threading.Lock()`) become `threading.RLock()` in C2a.
+- **P-7 (fake names).** `RecordingSession.signals: list[tuple[str, str, list[str]]]` and `fail_signal: Exception | None = None`;
+  `RecordingSessionEvents.signals` the same list; each `signalled` appends `"signal"` to the journal.
+- **P-8 (where `Case.open_tasks` lands).** In B2 (its only reader is `user_held`), with its `test_cases.py` tests; B1 adds only
+  `relayed_to_user`. Each commit stays one logical change.
+- **P-9 (extra TARGETS).** The SKILL.md commits (A4, D2, D3) add every test file that reads the packaged SKILL.md (`src/hirearchy/skill/tests`, `test_round_f_guidance.py`, `test_round_g_assistant.py`, `test_apply.py`, `src/hirearchy/mcp_server/tests`, `test_commands_ops.py`, `test_wire_skill.py`, `tests/e2e/test_round7.py`); E1 adds the
+  README readers `SRC/blueprint/tests/test_examples.py` and `SRC/mcp_server/tests/test_tool_names.py`; FEAT-004's SCOPED union adds
+  `SRC/observability/tests` (the writer is shared by every process; `check`'s invariant (e) reads `seq`).
+- **P-10 (turn texts of the informational variants).** V3's one call: `Load the hirearchy tools with tool_load, call hirearchy::progress once with
+  its defaults, then hirearchy::start once with its defaults, then reply with the result of start only.` V5's turn 2: `Call hirearchy::progress
+  once with its defaults, then hirearchy::start once with its defaults, then hirearchy::progress once with wait_seconds=60, then reply with the
+  result of start only.`
+- **P-11 (the integration test and the harness boundary).** The C3 integration test runs turn 2 inside one pytest process, so its outer tool call
+  outlives the return. That is valid evidence only because C3 is built only when D-HARN died (the death does not need the outer call's end);
+  the test's docstring says so.
+
+**C1's outcome** (`.agents/tasks/c1-reproduction.md`, 18 of 30 chat calls; the merge copies the record to `docs/research/org-growth/phase-0a4/`).
+- **REPRODUCED, with the D-HARN override (P-2): no row of 6.3 matches.** V0 died in 2 of 2 valid attempts: the detached scheduler and its run were
+  gone, with no `scheduler.exit` and no `run.end`, 0.5 to 0.7 s before the chat process ended, during kiro-cli's shutdown (the MCP server first, then
+  the run and the scheduler). The one visible signal (the narrowing attempt DENn2) was SIGTERM.
+- D-ENV: unsetting seven inherited names on the MCP server's command (`AWS_SDK_UA_APP_ID`, `KIRO_CONTENT_COLLECTION_ENABLED`,
+  `KIRO_CUSTOM_USER_AGENT`, `KIRO_TELEMETRY_IS_INTERNAL_AMAZON`, `SHLVL`, `UV`, `_`) saved the scheduler in 2 of 2 attempts; the marker is among
+  `KIRO_CUSTOM_USER_AGENT` and `KIRO_TELEMETRY_IS_INTERNAL_AMAZON` (single-attempt narrowing). D-HARN: with `; sleep 20` after the chat command in the
+  same tool call, the scheduler survived in 2 of 2 attempts, so the trigger is a chat call that is the last command of another agent host's tool call.
+  D-OUT was not run (D-ENV survived); V3, V2, V1, V5, V4 were skipped. C1b (M5) is not run.
+- **Owner decision (option 1; `.agents/tasks/manager-decision-c1.md`): C2 ships alone, C3 is NOT built.** E7's harness never ends a tool call at the
+  chat command's return (it keeps D-HARN's `; sleep 20`), and its preflight checks survival in that exact form. Reopen trigger: build M2 as a
+  follow-up only if a `scheduler.signal` from an unexplained source appears in E7's streams or in real use. The declared limit is limit 12 of
+  section 16.
