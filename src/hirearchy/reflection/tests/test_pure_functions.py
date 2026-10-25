@@ -237,6 +237,12 @@ def test_user_approved_is_the_contract_budget_for_a_hand_built_case_and_the_ceil
     assert user_approved(hand_built([(12, None)], user_ceiling=5), 12) == 12
 
 
+def test_a_hand_built_case_has_no_unapproved_rework_and_the_approval_reads_as_before() -> None:
+    """D-E7-2 A2: ``Case.unapproved_reworks`` defaults to ``()``, so every hand-built case keeps today's approval."""
+    case = hand_built([(12, None), (1, "human")], user_ceiling=12)
+    assert case.unapproved_reworks == () and user_approved(case, 12) == 12
+
+
 # ------------------------------------------------------------------------------ confirmed_criteria
 
 

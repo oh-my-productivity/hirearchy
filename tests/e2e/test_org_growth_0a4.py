@@ -103,33 +103,38 @@ def the_case(org, task_id):
 def test_b1_bc02_the_team_holds_the_users_runs_of_the_open_request_and_the_reply_says_so(tmp_path):
     """B-1 (E6 s3 #19, D-E6-2): bc02 revises 4a3e, whose only result (11cc) is ``blocked``, so the request is open and the team holds 17 - 5 - 1 = 11 of the
     user's runs. 0a.3 said "Nothing else is left ... Ask the user now for 4 more run(s)" there; the default hand-down is unchanged (1 run, nothing is
-    left of the approval), and after bc02 the approval is 17."""
+    left of the approval), and after bc02 the approval is 16: the default's run with nothing left is no approval of the user's (D-E7-2 A2, design 4.7),
+    so the case total names the overspend of the contract (17 of 16) in the same reply."""
     org = Org(materialize("s3", "20261024T171425096624", tmp_path / "org"))
     bc02 = next(m for m in org.sent(ROOT) if m.id == "20261024T171425096624-root-bc02")
     four = "20261024T170957358424-root-4a3e"
     assert org.runtime.service_steps.rework_step(bc02) == f"The team still holds 11 of the user's runs for {four}; the rework can use them."
     case = the_case(org, bc02.id)
-    assert case.open_tasks == (four, bc02.id) and user_approved(case, 16) == 17
+    assert case.open_tasks == (four, bc02.id) and user_approved(case, 16) == 16
+    assert org.runtime.service_reports.case_total(bc02) == (
+        "case total: 5 runs used of 17 handed down (contract: 16 per request). This case now exceeds the per-request budget of 16: tell the user."
+    )
     before = Org(materialize("s3", "20261024T171425096623", tmp_path / "before"))
     assert before.runtime.case_allowance.left("lead", SERVICE, four) == 0  # the held runs are not handed down again: bc02 got 1
 
 
 def test_b2_9a5b_the_runs_the_relayed_result_carried_back_are_the_users_and_the_rework_asks_for_nothing(tmp_path):
     """B-2 (E6 s3 #36, D-E6-2): 5d4a (relayed, 6 runs, 5 charged) was answered by 406b with a return of 7: 6 are the user's runs coming back. At 9a5b the
-    user has committed 12 of the 17 approved (0a.3 read 18 of 18 and said "Ask the user now for 4 more run(s)"), so the step is empty."""
+    user has committed 12 of the 16 approved (0a.3 read 18 of 18 and said "Ask the user now for 4 more run(s)"; 0a.4 read 17: bc02's default run with
+    nothing left is no approval of the user's, D-E7-2 A2, design 4.7), so the step is empty."""
     org = Org(materialize("s3", "20261024T172453163611", tmp_path / "org"))
     nine = next(m for m in org.sent(ROOT) if m.id == "20261024T172453163611-root-9a5b")
     case = the_case(org, nine.id)
     assert case.relayed_to_user == 6
-    assert user_approved(case, 16) - user_committed(case) == 5 and user_spend(case) == 12
+    assert user_approved(case, 16) - user_committed(case) == 4 and user_spend(case) == 12
     assert org.runtime.service_steps.rework_step(nine) == ""
 
 
 def test_b2_just_before_9a5b_the_default_hand_down_is_what_the_user_has_left(tmp_path):
-    """B-2 (E6 s3 #36, D-E6-2): before 9a5b, 5d4a's 1 unspent run was all it still had, so 406b's 7 carry 6 back to the user: the default hand-down is 6
-    (it was 1: nothing was left)."""
+    """B-2 (E6 s3 #36, D-E6-2): before 9a5b, 5d4a's 1 unspent run was all it still had, so 406b's 7 carry 6 back to the user: the default hand-down is what
+    is left of the approval (it was 1: nothing was left). bc02's own run is no approval of the user's (D-E7-2 A2, design 4.7), so that is 5 (0a.4 read 6)."""
     org = Org(materialize("s3", "20261024T172453163610", tmp_path / "org"))
-    assert org.runtime.case_allowance.left("lead", SERVICE, "20261024T171425096624-root-bc02") == 6
+    assert org.runtime.case_allowance.left("lead", SERVICE, "20261024T171425096624-root-bc02") == 5
 
 
 def test_f1_dd34_the_lead_works_at_the_relayed_tier_while_roots_relayed_rework_is_open(tmp_path):

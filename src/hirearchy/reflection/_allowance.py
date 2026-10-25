@@ -9,8 +9,9 @@ from .api import CaseHistory, user_approved, user_committed
 class CaseAllowanceOf(CaseAllowance):
     """The approved runs of the case that holds the revised task (``user_approved``: the contract's budget, raised to the highest ceiling root set),
     less what the user's requests used or the team still holds for them (``user_committed``; the user's runs that a relayed result carried back are
-    no longer held, D-E6-2). None when the task is in no case of the service, the
-    service has no contract, or the case's client is an agent (it has no user)."""
+    no longer held, D-E6-2). After a user rework of 1 run sent with nothing left, ``left`` is one lower: that run is committed and not approved
+    (``Case.unapproved_reworks``, D-E7-2 A2). None when the task is in no case of the service, the service has no contract, or the case's client is
+    an agent (it has no user)."""
 
     def __init__(self, history: CaseHistory, catalog: ServiceCatalog) -> None:
         self._history = history

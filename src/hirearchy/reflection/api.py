@@ -107,7 +107,8 @@ class Case:
     unsplit_runs: int = 0  # the charged runs in the user intervals after the first overlapped relayed task: counted with the user's, 0 without overlap
     user_granted: int = 0  # the budgets of the user grants: notes of a human client (root) in a user interval; 0 for an agent client
     open_tasks: tuple[str, ...] = ()  # the chain's tasks whose latest result is missing or blocked, oldest first (D-E6-2)
-    user_ceiling: int = 0  # the highest ceiling over the user's hand-downs (the most the user's requests could cost right after one); 0 for an agent client
+    user_ceiling: int = 0  # the highest ceiling over the user's hand-downs (the most the user's requests could cost right after one), leaving out the default's 1-run hand-downs with nothing left (``unapproved_reworks``, D-E7-2 A2); 0 for an agent client
+    unapproved_reworks: tuple[str, ...] = ()  # D-E7-2 A2: the human reworks handed the default's 1 run while nothing was left (or an explicit 1 then, which the files cannot tell apart), oldest first: no approval of the user's; () for an agent client
 
     @property
     def title(self) -> str:
@@ -202,7 +203,8 @@ def user_held(case: Case, rework: Message) -> int:
 
 def user_approved(case: Case, budget: int) -> int:
     """The runs the user approved for a case (pure): the contract's per-request ``budget``, raised to the highest ceiling root set for the
-    user's requests (``case.user_ceiling``; 0 for an agent client, whose case therefore reads the contract's budget)."""
+    user's requests (``case.user_ceiling``; 0 for an agent client, whose case therefore reads the contract's budget). ``case.user_ceiling`` leaves out
+    the default's 1-run hand-downs with nothing left (``case.unapproved_reworks``), so only root's own hand-downs raise it (D-E7-2 A2)."""
     return max(budget, case.user_ceiling)
 
 
@@ -433,7 +435,8 @@ class ServiceReports(Protocol):
         ``case total: 19 runs used of 27 handed down (contract: 15 per request)``; when the runs used, plus the runs still out on an open case
         (``case_spend``), exceed the contract's budget, it adds that the case exceeds the budget and that the user must be told. For a human
         client, the runs of root's relayed reworks are named apart and called root's own spend; when the user's requests cost more than the user
-        approved (``user_cost`` against ``user_approved``) it adds that the user must be told. An agent client's case reads as before 0a.3.
+        approved (``user_cost`` against ``user_approved``) it adds that the user must be told; the default's 1-run hand-down with nothing left is no approval
+        of the user's (D-E7-2 A2). An agent client's case reads as before 0a.3.
         Empty for a task that is not a service request."""
         ...
 

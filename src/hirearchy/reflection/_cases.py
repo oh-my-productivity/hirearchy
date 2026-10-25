@@ -30,14 +30,16 @@ class _Spend:
     unsplit_runs: int
     user_granted: int
     user_ceiling: int
+    unapproved: tuple[str, ...]
 
 
 def _spend(
     tasks: list[Message], results: Mapping[str, Message], sent: Sequence[Message], team: Sequence[str], human: bool, start: str, end: str | None,
-    charged: Sequence[str],
+    charged: Sequence[str], *, per_request: int,
 ) -> _Spend:
     """The relayed and user numbers of the chain ``tasks``, from the client's ``sent`` box, the latest ``results`` it received, the stamps of the
-    charged runs ``charged`` in the case window (``start`` to ``end``, inclusive) and whether the client is ``human`` (root)."""
+    charged runs ``charged`` in the case window (``start`` to ``end``, inclusive) and whether the client is ``human`` (root). ``per_request`` is the
+    current contract's budget: the approval before any hand-down raised it (D-E7-2 A2)."""
     bounds = [(t.id[:21], tasks[k + 1].id[:21] if k + 1 < len(tasks) else None) for k, t in enumerate(tasks)]
     relayed = [b for t, b in zip(tasks, bounds) if t.source == "relayed"]
 
@@ -61,12 +63,18 @@ def _spend(
     to_user = {t.id: back_to_user(k, t) for k, t in enumerate(tasks)}
     users = [t for t in tasks if t.source != "relayed"]
     ceiling = 0
+    unapproved: list[str] = []
     for h in sorted([*users, *grants], key=lambda m: m.id) if human else []:  # the hand-downs, oldest first
         runs = sum(1 for s in charged if s < h.id[:21] and not in_relayed(s))
         handed = sum(t.budget for t in users if t.id < h.id) + sum(g.budget for g in grants if g.id < h.id)
         back = sum(min(r.budget, t.budget) for t in users if t.id < h.id and (r := results.get(t.id)) is not None and r.id < h.id)
         back += sum(to_user[t.id] for t in tasks if t.id < h.id and (r := results.get(t.id)) is not None and r.id < h.id)
-        ceiling = max(ceiling, runs + max(0, handed - runs - back) + h.budget)
+        committed = runs + max(0, handed - runs - back)  # what the user's requests used or the team held just before h
+        if h.type == "task" and h.source == "human" and h.revises and h.budget == 1 and max(per_request, ceiling) - committed <= 0:
+            unapproved.append(h.id)  # D-E7-2 A2: the default's 1 run with nothing left (or an explicit 1 then): nobody approved it
+            continue
+        out = sum(1 for d in unapproved if not ((r := results.get(d)) is not None and r.id < h.id and r.budget >= 1))  # their runs not given back
+        ceiling = max(ceiling, max(0, committed - out) + h.budget)
     overlap, overlapped = 0, []
     for k, t in enumerate(tasks[:-1]):  # relayed runs that can lie in a later user interval
         r = results.get(t.id)
@@ -86,6 +94,7 @@ def _spend(
         relayed_runs=sum(1 for s in charged if in_relayed(s)),
         relayed_returned=sum(min(r.budget, t.budget) for t in tasks if t.source == "relayed" and (r := results.get(t.id)) is not None),
         relayed_to_user=sum(to_user.values()), relayed_overlap=overlap, unsplit_runs=unsplit, user_granted=sum(g.budget for g in grants), user_ceiling=ceiling,
+        unapproved=tuple(unapproved),
     )
 
 
@@ -154,7 +163,7 @@ class DerivedCaseHistory(CaseHistory):
                 end = later[:21]
             start = tasks[0].id[:21]
             charged = [s for s, credited in self._counter.stamps(team, start, end) if not credited]
-            spend = _spend(tasks, results, sent, team, kind == "human", start, end, charged)
+            spend = _spend(tasks, results, sent, team, kind == "human", start, end, charged, per_request=contract.budget)
             step = {t.id: i for i, t in enumerate(tasks)}
             verdicts = [
                 self._verdict(n, step[n.reply_to], [m for m in link_notes if m.reply_to == n.id]) for n in notes if n.reply_to in ids
@@ -174,7 +183,7 @@ class DerivedCaseHistory(CaseHistory):
                 returned=sum(min(r.budget, t.budget) for t in tasks if (r := results.get(t.id)) is not None),
                 open_tasks=tuple(t.id for t in tasks if (r := results.get(t.id)) is None or r.status not in ("done", "failed")),
                 relayed_returned=spend.relayed_returned, relayed_to_user=spend.relayed_to_user, relayed_overlap=spend.relayed_overlap, unsplit_runs=spend.unsplit_runs,
-                user_granted=spend.user_granted, user_ceiling=spend.user_ceiling,
+                user_granted=spend.user_granted, user_ceiling=spend.user_ceiling, unapproved_reworks=spend.unapproved,
             ))
         return out
 

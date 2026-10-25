@@ -528,15 +528,128 @@ def test_a_relayed_rework_that_is_the_last_task_overlaps_nothing(tmp_path):
     assert (case.relayed_overlap, case.unsplit_runs) == (0, 0)
 
 
-def test_limit_1_with_nothing_left_a_rework_of_one_run_raises_the_approval_by_one(tmp_path):
-    """Declared limit 1 (design 4.3): the default's 1 run (here the explicit ``budget=1``, which the files cannot tell it from) has the ceiling
-    committed + 1."""
-    w = ceiling_world(tmp_path)
+def nothing_left(w):
+    """The head used the contract's 12 runs and returned none, then the user's rework of 1 run (the default with nothing left); both returned."""
     head = sup.ask(w)
     sup.deliver(w, head, runs=12)  # the contract's 12, all used, none returned
+    return head, sup.rework(w, head, budget=1)
+
+
+def test_a2_with_nothing_left_a_rework_of_one_run_raises_no_approval(tmp_path):
+    """D-E7-2 A2 and declared limit 1 (design 4.3): the default's 1 run with nothing left (here the explicit ``budget=1``, which the files cannot tell it
+    from) is no approval of the user's: the case marks it in ``unapproved_reworks`` and the ceiling stays 12 (it was 13)."""
+    w = ceiling_world(tmp_path)
+    _, rework = nothing_left(w)
+    case = the_case(w)
+    assert case.unapproved_reworks == (rework.id,)
+    assert case.user_ceiling == 12 and reflection.user_approved(case, 12) == 12
+
+
+def test_a2_the_marker_changes_no_spend_figure(tmp_path):
+    """D-E7-2 A2 changes only the ceiling: ``user_committed``, ``user_spend`` and ``user_held`` are today's numbers (13, 13, 0), pinned as literals."""
+    w = ceiling_world(tmp_path)
+    _, rework = nothing_left(w)
+    case = the_case(w)
+    assert (reflection.user_committed(case), reflection.user_spend(case), reflection.user_held(case, rework)) == (13, 13, 0)
+
+
+def test_a2_a_grant_after_the_marked_rework_counts_in_full(tmp_path):
+    """D-E7-2 A2, I-A2: root's grant of 2 after the user's yes counts in full. 13 are committed (12 used, the marked run held) and the marked run is
+    left out, so the grant term is 12 + 2 = 14."""
+    w = ceiling_world(tmp_path)
+    nothing_left(w)
+    grant(w, 2)
+    case = the_case(w)
+    assert reflection.user_approved(case, 12) == 14
+
+
+def test_a2_the_marked_run_is_left_out_whether_it_is_held_or_charged(tmp_path):
+    """D-E7-2 A2, Deviation 2: the marked run charged before the grant (nothing else held) is not counted again through the runs: still 14."""
+    w = ceiling_world(tmp_path)
+    nothing_left(w)
+    w.use_run("ceo")  # the marked rework's run
+    grant(w, 2)
+    assert reflection.user_approved(the_case(w), 12) == 14
+
+
+def test_a2_e7_s2_shape_a_grant_of_one_approves_13_and_a_cost_of_14_is_over_it(tmp_path):
+    """D-E7-2 A2 (E7 s2): 9 runs used of 12, the rework of 1 run (3 held + 1 = 12 committed, nothing left), a grant of 1: the approval is 13; the
+    rework then uses 5 runs, so the user's requests cost 14, and the case total says so."""
+    w = ceiling_world(tmp_path)
+    head = sup.ask(w)
+    for _ in range(9):
+        w.use_run("ceo")
+    rework = sup.rework(w, head, budget=1)
+    grant(w, 1)
+    assert the_case(w).unapproved_reworks == (rework.id,) and reflection.user_approved(the_case(w), 12) == 13
+    sup.deliver(w, rework, runs=5)
+    case = the_case(w)
+    assert reflection.user_cost(case) == 14 and reflection.user_approved(case, 12) == 13
+    assert w.reports.case_total(rework).endswith(
+        "The user's requests now cost 14 runs, more than the 13 the user approved for this case (contract: 12 per request, plus 1 approved beyond it): "
+        "tell the user."
+    )
+
+
+def test_a2_a_rework_of_one_run_with_one_left_is_no_default_with_nothing_left(tmp_path):
+    """D-E7-2 A2: 11 of 12 used and 1 returned leaves 1 run held for the user's requests (11 committed): the 1-run rework had 1 left, so it is not
+    marked, and the approval stays 12."""
+    w = ceiling_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=11, budget=1)
     sup.rework(w, head, budget=1)
     case = the_case(w)
-    assert case.user_ceiling == 12 + 1 and reflection.user_approved(case, 12) == 13
+    assert case.unapproved_reworks == () and reflection.user_approved(case, 12) == 12
+
+
+def test_a2_a_rework_of_two_runs_with_nothing_left_is_root_s_own_hand_down_and_raises_the_approval(tmp_path):
+    """D-E7-2 A2: only the 1-run rework is the default; a rework of 2 runs sent with nothing left is root's explicit hand-down: 12 + 2 = 14."""
+    w = ceiling_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=12)
+    sup.rework(w, head, budget=2)
+    case = the_case(w)
+    assert case.unapproved_reworks == () and reflection.user_approved(case, 12) == 14
+
+
+def test_a2_a_marked_rework_that_gave_its_run_back_leaves_nothing_out_at_a_later_grant(tmp_path):
+    """D-E7-2 A2: the marked rework was answered ``blocked`` with its run returned and not used, so a later grant of 2 finds nothing to leave out:
+    12 committed + 2 = 14 (the window stays open: ``blocked`` is not final)."""
+    w = ceiling_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=12)
+    marked = sup.rework(w, head, budget=1)
+    sup.deliver(w, marked, status="blocked", runs=0, budget=1)
+    grant(w, 2)
+    case = the_case(w)
+    assert case.unapproved_reworks == (marked.id,) and reflection.user_approved(case, 12) == 14
+
+
+def test_a2_two_reworks_of_one_run_in_a_row_are_both_marked(tmp_path):
+    """D-E7-2 A2: the second default also had nothing left (the first one's run is committed), so both are marked and the approval stays 12."""
+    w = ceiling_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=12)
+    first = sup.rework(w, head, budget=1)
+    second = sup.rework(w, first, budget=1)
+    case = the_case(w)
+    assert case.unapproved_reworks == (first.id, second.id) and reflection.user_approved(case, 12) == 12
+
+
+def test_a2_an_agent_clients_case_and_a_relayed_rework_have_no_marker(tmp_path):
+    """D-E7-2 A2: an agent client has no user and no approval; a relayed rework of 1 run is not the default's case (root's own, ``source="relayed"``)."""
+    w = ceiling_world(tmp_path)
+    head = sup.ask(w)
+    sup.deliver(w, head, runs=12)
+    sup.rework(w, head, source="relayed", budget=1)
+    assert the_case(w).unapproved_reworks == ()
+    grant(w, 40, to="ceo")
+    sup.define(w, "ceo/eng", "inner", actor="ceo")
+    first = w.s.commands.request("ceo", "inner", {"topic": "ai"})
+    sup.deliver(w, first, runs=12)
+    w.s.commands.request("ceo", "inner", {"topic": "ai"}, revises=first.id, budget=1)
+    (case,) = w.history.cases("ceo/eng", "inner")
+    assert case.client_kind == "agent" and case.unapproved_reworks == ()
 
 
 def test_limit_2_a_reopened_window_counts_another_requests_runs_as_the_users_and_as_approved(tmp_path):
