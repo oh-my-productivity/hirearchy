@@ -28,6 +28,14 @@ class PlaybookHistory(Protocol):
 
 
 @runtime_checkable
+class ContractVersions(Protocol):
+    def versions(self, owner: str, name: str, kind: str) -> list[tuple[int, JsonObject, str]]:
+        """``(version, frontmatter, body)`` of every stored file of ``kind`` (``"SERVICE"`` or ``"PLAYBOOK"``) of the service: the kept ones, then the
+        current one, sorted by the version they state."""
+        ...
+
+
+@runtime_checkable
 class FeedbackWords(Protocol):
     def feedback_text(self, msg: Message) -> str:
         """The client's own words in a feedback note (``""`` for a bare accept); the fixed header is not part of them."""

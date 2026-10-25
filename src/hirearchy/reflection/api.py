@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
 from types import MappingProxyType
-from typing import Protocol, runtime_checkable
+from typing import Protocol, TypeAlias, runtime_checkable
 
 from ..kernel import ClientItems, Message, client_items, clip_line, msg_time
 from ..services import Criterion
@@ -34,6 +34,7 @@ __all__ = [
     "CaseHistory",
     "Cause",
     "CharterMark",
+    "ContractMark",
     "DeliverableChecks",
     "DeliverableFinding",
     "Delivery",
@@ -41,7 +42,9 @@ __all__ = [
     "ITEMS_SHOWN",
     "ITEM_CHARS",
     "LASTING_WORDS",
+    "Mark",
     "ModelMark",
+    "PlaybookMark",
     "QUALITY_DEFAULTS",
     "QualityThresholds",
     "ReflectionDigest",
@@ -51,6 +54,7 @@ __all__ = [
     "Stats",
     "StatsReport",
     "TopUp",
+    "TopUpMark",
     "TopUps",
     "Verdict",
     "attribution",
@@ -108,6 +112,111 @@ class TopUp:
     amount: int
 
 
+def _ids(ids: Sequence[str]) -> str:
+    return ", ".join(ids)
+
+
+@dataclass(frozen=True)
+class ContractMark:
+    """A mark of the timeline (0b 7): a stored version of the contract. ``adds`` and ``removes`` are the criteria ids it has and the version before
+    it lacks, and the other way round (every id for the first version, in ``adds``). ``basis`` says where the change comes from: ``first``;
+    ``answers`` (the user's answer to the rejection ``answers``, an ``R<k>`` id); ``user`` (a change the user asked for on their own); ``legacy``
+    (the user's seat, written before 0a.2); ``agent`` (an agent client's version). ``parts`` has, for an ``answers`` version, one ``(id, link)``
+    per id of the answer (the added ids, else the removed ones, in the order of ``amendment_ids``), and for a ``legacy`` version one per added
+    id; ``link`` is the id of the user's link note that confirms the id, ``""`` when none is recorded."""
+
+    version: int
+    when: datetime | None  # when the version was defined; None when the file says nothing
+    by: str
+    adds: tuple[str, ...]
+    removes: tuple[str, ...]
+    basis: str  # "first" | "answers" | "user" | "legacy" | "agent"
+    answers: str = ""
+    parts: tuple[tuple[str, str], ...] = ()
+
+    @property
+    def confirmed(self) -> tuple[tuple[str, str], ...]:
+        return tuple(part for part in self.parts if part[1])
+
+    @property
+    def not_confirmed(self) -> tuple[str, ...]:
+        return tuple(i for i, link in self.parts if not link)
+
+    @property
+    def text(self) -> str:
+        """The words of the mark (design 7)."""
+        if self.basis == "first":
+            return f"contract v{self.version} ({_ids(self.adds)})"
+        changes = "; ".join(x for x in (f"adds {_ids(self.adds)}" if self.adds else "", f"removes {_ids(self.removes)}" if self.removes else "") if x)
+        head = f"contract v{self.version} ({self.by or 'no author recorded'}): {changes or 'criteria unchanged'}"
+        if self.basis == "answers":
+            said = ", ".join(f"{i} confirmed (link {link})" if link else f"{i} not confirmed (the link was not recorded)" for i, link in self.parts)
+            return f"{head}: the user's answer to {self.answers}" + (f": {said}" if said else "")
+        if self.basis == "user":
+            return f"{head}: asked for by the user on their own: {_ids(self.adds or self.removes)} user-initiated (never admit a playbook revision)"
+        if self.basis == "agent":
+            return f"{head}: by {self.by}, an agent client (its verdicts are hypotheses)"
+        if not self.parts:
+            return head
+        if not self.confirmed:
+            return f"{head}: not confirmed"
+        return f"{head}: " + ", ".join(f"{i} confirmed (link {link})" if link else f"{i} not confirmed" for i, link in self.parts)
+
+
+@dataclass(frozen=True)
+class PlaybookMark:
+    """A mark of the timeline (0b 7): a stored version of the playbook. ``basis`` is the admission rule (``c``, ``b``, ``first``, ``restore``) or, for
+    a version with none, ``client`` (the client wrote it: no admission needed) or ``legacy`` (written by its owner before the evidence gate).
+    ``evidence`` holds only the cited ids that are criteria, assertions or message ids; ``evidence_other`` counts the rest (agent-written, so never
+    shown). ``changed`` and ``removed`` are the lines it adds or changes and the lines it drops, against the version before it (the first version
+    against nothing). Rule (c): ``own_words`` of the changed lines are a cited criterion's own words, ``beyond`` are not; rule (b): ``tagged`` carry a
+    ``C<k>`` or ``R<k>``, ``untagged`` do not; the others are ``None``. ``cited`` are the criteria the evidence names, directly or through the
+    user's link notes. ``lines`` (at most 10, each clipped) and ``lines_more`` are the changed lines themselves, with whether each is a cited
+    criterion's own words: text an agent wrote (``agent_written``), for the JSON only."""
+
+    version: int
+    when: datetime | None
+    by: str
+    basis: str  # "c" | "b" | "first" | "restore" | "client" | "legacy"
+    restores: int | None = None
+    evidence: tuple[str, ...] = ()
+    evidence_other: int = 0
+    changed: int = 0
+    removed: int = 0
+    own_words: int | None = None
+    beyond: int | None = None
+    tagged: int | None = None
+    untagged: int | None = None
+    cited: tuple[tuple[str, str], ...] = ()
+    lines: tuple[tuple[str, bool], ...] = ()
+    lines_more: int = 0
+    agent_written: bool = True
+
+    @property
+    def text(self) -> str:
+        """The words of the mark (design 7); the playbook's reason and lines are never in them."""
+        head = f"playbook v{self.version} ({self.by})"
+        if self.basis in ("c", "b"):
+            shown = _ids(self.evidence)
+            if self.evidence_other:
+                other = f"{self.evidence_other} other id(s)"
+                shown = f"{shown} and {other}" if shown else other
+            parts = (
+                f"{self.own_words} the cited criteria's own words, {self.beyond} beyond them" if self.basis == "c"
+                else f"{self.tagged} tagged with an id, {self.untagged} untagged"
+            )
+            tail = f"admitted ({self.basis}) on {shown}: {self.changed} changed line(s): {parts}"
+        elif self.basis == "first":
+            tail = "first version"
+        elif self.basis == "restore":
+            tail = f"restores v{self.restores}" if self.restores is not None else "restores an earlier version"
+        elif self.basis == "client":
+            tail = "written by the client (no admission needed)"
+        else:
+            tail = "no admission recorded (written before the evidence gate)"
+        return f"{head}: {tail}" + (f"; {self.removed} line(s) removed" if self.removed else "")
+
+
 @dataclass(frozen=True)
 class CharterMark:
     """A mark of the timeline (0b 7): the charter ``<addr>/AGENT.md`` changed its body in this commit of the organization's history."""
@@ -115,6 +224,10 @@ class CharterMark:
     addr: str
     commit: str  # the full object id of the commit that holds the new version
     when: datetime  # the commit's time, with its offset
+
+    @property
+    def text(self) -> str:
+        return f"{self.addr}: charter edited (commit {self.commit[:12]})"
 
 
 @dataclass(frozen=True)
@@ -129,6 +242,35 @@ class ModelMark:
     after: str
     commit: str
     when: datetime
+
+    @property
+    def text(self) -> str:
+        """The words of the mark; a model name or an effort is written by whoever edited the file, so it is shown as a quoted line (``shown_name``)."""
+        before, after = (shown_name(x, NAME_SHOWN) if x else "the org default" for x in (self.before, self.after))
+        label = {"model": f"{self.addr}: model", "default_model": f"{self.addr}: default model"}.get(self.key, f"{self.addr}: {self.key}")
+        return f"{label} {before} -> {after}"
+
+
+@dataclass(frozen=True)
+class TopUpMark:
+    """A mark of the timeline (0b 7): runs added to a case after its first request (``TopUp``); ``source`` is the top-up's kind."""
+
+    when: datetime | None
+    case: str
+    id: str  # the task or note that added the runs
+    source: str  # "human" | "relayed" | "unrecorded" | "granted"
+    amount: int
+
+    @property
+    def text(self) -> str:
+        what = {
+            "human": f"human rework {self.id}", "relayed": f"your relayed rework {self.id} (your own spend)",
+            "unrecorded": f"rework {self.id} (tier not recorded)", "granted": f"your grant {self.id}",
+        }.get(self.source, f"rework {self.id}")
+        return f"top-up +{self.amount} run(s) to case {self.case}: {what}"
+
+
+Mark: TypeAlias = ContractMark | PlaybookMark | CharterMark | ModelMark | TopUpMark
 
 
 def _total(items: Sequence[TopUp], kind: str) -> int:
