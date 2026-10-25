@@ -19,10 +19,13 @@ def mid(n: int, who: str = ROOT) -> str:
     return f"20261021T15{n:02d}00000000-{who}-{n:04d}"
 
 
-def request(n: int, *, title: str = "Memo for the meeting", source: str | None = None, revises: str | None = None, budget: int = 5, to: str = OWNER) -> Message:
+def request(
+    n: int, *, title: str = "Memo for the meeting", source: str | None = None, revises: str | None = None, budget: int = 5, to: str = OWNER,
+    service: str | None = SERVICE,
+) -> Message:
     return Message(
-        id=mid(n), sender=ROOT, to=to, type="task", title=title, body="goal", budget=budget, service=SERVICE if to == OWNER else None, source=source,
-        revises=revises, contract=1,
+        id=mid(n), sender=ROOT, to=to, type="task", title=title, body="goal", budget=budget, service=service if to == OWNER else None, source=source,
+        revises=revises, contract=1 if service else None,
     )
 
 

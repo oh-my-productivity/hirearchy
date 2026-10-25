@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 
 from ..kernel import Message
 from ..reflection import (
-    Case, Cause, Delivery, ServiceRecord, attribution, not_on_a_delivery, unjudged_cases, user_approved,
+    Case, Cause, Delivery, QualityThresholds, ServiceRecord, attribution, not_on_a_delivery, unjudged_cases, user_approved,
 )
 
 COUNTED_CAUSES = ("reviewer-miss", "untyped")  # the verifier's possible misses (``attribution`` says ``counted``), in the view's order
@@ -139,3 +139,41 @@ def verifiers(record: ServiceRecord) -> tuple[VerifierFacts, ...]:
         ))
     return tuple(out)
 
+
+
+@dataclass(frozen=True)
+class HeldTask:
+    """A task whose blocked result still holds runs on its assignee (``task``), with that result (``blocked``) and the number of tasks its sender has
+    sent the assignee since, outside the chain (``sent_since``): above 0 it is left blocked, the sender moved past it without a verdict."""
+
+    task: Message
+    blocked: Message
+    sent_since: int = 0
+
+    @property
+    def left_blocked(self) -> bool:
+        return self.sent_since > 0
+
+
+@dataclass(frozen=True)
+class MovedPast:
+    """An agent of the moved-past section (4.5): the runs it holds (``held``; ``held_error`` says why that is unknown), its held tasks, or ``error``
+    when its mailbox could not be read."""
+
+    addr: str
+    held: int | None
+    held_error: str = ""
+    error: str = ""
+    tasks: tuple[HeldTask, ...] = ()
+
+
+@dataclass(frozen=True)
+class QualityView:
+    """Everything the text and the JSON of the quality view are made of: the thresholds in force with the notes about them, the records in the view's
+    order (top-level services, nested ones, then root's one-off tasks), the moved-past section, and the ``service`` asked for (``None``: everything)."""
+
+    thresholds: QualityThresholds
+    notes: tuple[str, ...]
+    records: tuple[RecordView, ...]
+    moved_past: tuple[MovedPast, ...] = ()
+    service: str | None = None

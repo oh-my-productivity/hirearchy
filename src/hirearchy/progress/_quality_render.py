@@ -11,11 +11,13 @@ from datetime import datetime, timezone
 from fractions import Fraction
 from typing import TypeVar
 
-from ..kernel import clip_line
+from ..kernel import ROOT, clip_line, msg_time
 from ..reflection import (
     Case, Cause, CharterMark, Mark, ModelMark, QualityThresholds, case_spend, cost_alarm, repeat_alarm, shown_name, user_cost,
 )
-from ._quality_facts import EscapeRow, FirstLine, RecordView, approved_of, delivery_facts, escape_rows, first_lines, verifiers
+from ._quality_facts import (
+    EscapeRow, FirstLine, HeldTask, MovedPast, QualityView, RecordView, approved_of, delivery_facts, escape_rows, first_lines, verifiers,
+)
 
 T = TypeVar("T")
 
@@ -29,6 +31,10 @@ NAME_CHARS = 120
 _RUNS_HEAD = (
     "  runs per case (the user's runs: runs used outside your relayed reworks, plus runs still out while a case is open or blocked; approved: the contract's "
     "{budget} per request, or more where your hand-downs raised it (runs used + held + new, at that moment)):"
+)
+_ONE_OFF_RUNS_HEAD = (
+    "  runs per case (the user's runs: runs used outside your relayed reworks, plus runs still out while a case is open or blocked; approved: each task's own "
+    "budget, or more where your hand-downs raised it (runs used + held + new, at that moment)):"
 )
 _NO_HISTORY = "unknown (no org history: the organization is not a git repository, or git is missing)"
 _SKIPPED = "{n} version(s) not compared: larger than 64 KiB, unreadable or not parseable"
@@ -192,12 +198,13 @@ def _escape_lines(view: RecordView) -> list[str]:
     if not rows:
         return [f"{head}none (judged: {ratio(f.judged, f.total)})"]
     shown, more = _newest(rows)
-    lines = [f"{head}{len(rows)}", *(_escape_row(row) for row in shown)]
+    lines = [f"{head}{len(rows)}", *(_escape_row(row, not r.service) for row in shown)]
     return lines + ([f"    and {more} earlier escape(s)"] if more else [])
 
 
-def _escape_row(row: EscapeRow) -> str:
-    return f"    {row.assertion} case {row.case.id}, signed off by {row.delivery.signer}: {cause_text(row.cause)}"
+def _escape_row(row: EscapeRow, one_off: bool) -> str:
+    who = f"signed off by {row.delivery.signer}: {cause_text(row.cause)}"
+    return f"    rejected case {row.case.id} ({row.case.owner}), {who}" if one_off else f"    {row.assertion} case {row.case.id}, {who}"
 
 
 def _verifier_lines(view: RecordView) -> list[str]:
@@ -206,7 +213,8 @@ def _verifier_lines(view: RecordView) -> list[str]:
         return ["  verifiers: none (no delivery yet)"]
     found = verifiers(r)
     if not found:
-        return [f"  verifiers: none (every delivery was signed off by {r.owner} itself)"]
+        owners = r.owner if r.service else ", ".join(dict.fromkeys(c.owner for c in r.cases))
+        return [f"  verifiers: none (every delivery was signed off by {owners} itself)"]
     lines = ["  verifiers:"]
     for v in found:
         text = f"    {v.addr}: escapes {ratio(v.escapes, v.judged)} judged"
@@ -231,7 +239,8 @@ def _top_ups(case: Case) -> str:
 
 def _case_line(view: RecordView, case: Case) -> list[str]:
     r = view.record
-    head = f'    {case.id} "{clip_line(case.title, TITLE_CHARS)}": '
+    who = "" if r.service else f" ({case.owner})"
+    head = f'    {case.id} "{clip_line(case.title, TITLE_CHARS)}"{who}: '
     tail = f"; top-ups: {_top_ups(case)}" + ("; window cut by a later request" if case.cut else "")
     if case.runs_unknown:
         return [f"{head}runs not counted ({case.runs_unknown}){tail}"]
@@ -246,7 +255,7 @@ def _case_line(view: RecordView, case: Case) -> list[str]:
 
 def _runs_lines(view: RecordView) -> list[str]:
     r = view.record
-    head = _RUNS_HEAD.format(budget=r.budget)
+    head = _RUNS_HEAD.format(budget=r.budget) if r.service else _ONE_OFF_RUNS_HEAD
     if not r.cases:
         return [f"{head} none"]
     shown, more = _newest(r.cases)
@@ -258,6 +267,8 @@ def _runs_lines(view: RecordView) -> list[str]:
 
 def _repeat_text(view: RecordView, t: QualityThresholds) -> str:
     a = repeat_alarm(view.record, t)
+    if a.state == "does not apply":
+        return "does not apply (one-off tasks name no criterion ids)"
     if a.state == "fires":
         text = "FIRES: " + "; ".join(f"{s} failed in {len(ids)} of the last {len(a.window)} judged cases (cases {', '.join(ids)})" for s, ids in a.cases)
     elif a.state == "no":
@@ -318,21 +329,29 @@ def _attribution_line(view: RecordView) -> str:
     return f"  run attribution is by time window (08 3.3): {cut} case(s) had their window cut by a later request{tail}."
 
 
+def _block(view: RecordView, t: QualityThresholds, heading: str) -> list[str]:
+    firsts = first_lines(view.record)
+    shown, more = _newest(firsts)
+    lines = [heading, _cases_line(view), _first_summary(firsts), *(_first_line(f) for f in shown)]
+    if more:
+        lines.append(f"    and {more} earlier case(s), counted above")
+    lines += [_judged_line(view), *_legacy_line(view), *_escape_lines(view), *_verifier_lines(view), *_runs_lines(view), *_alarm_lines(view, t)]
+    return lines + [*_timeline_lines(view), _attribution_line(view)]
+
+
 def service_block(view: RecordView, t: QualityThresholds) -> list[str]:
     """The block of a service root requests (9.2), without blank lines: its heading, then cases, first deliveries, verdict counts, escapes, verifiers,
     runs per case, the alarms, the timeline and the run attribution."""
     r = view.record
     playbook = f"playbook v{r.playbook}" if r.playbook else "no playbook"
-    firsts = first_lines(r)
-    shown, more = _newest(firsts)
-    lines = [
-        f"{r.service} (offered by {r.owner}; client: you, human; unit: case; contract v{r.contract}, {playbook}; approved {r.budget} runs per request)",
-        _cases_line(view), _first_summary(firsts), *(_first_line(f) for f in shown),
-    ]
-    if more:
-        lines.append(f"    and {more} earlier case(s), counted above")
-    lines += [_judged_line(view), *_legacy_line(view), *_escape_lines(view), *_verifier_lines(view), *_runs_lines(view), *_alarm_lines(view, t)]
-    return lines + [*_timeline_lines(view), _attribution_line(view)]
+    heading = f"{r.service} (offered by {r.owner}; client: you, human; unit: case; contract v{r.contract}, {playbook}; approved {r.budget} runs per request)"
+    return _block(view, t, heading)
+
+
+def one_off_block(view: RecordView, t: QualityThresholds) -> list[str]:
+    """The block of the tasks root gave without a service (9.2): the lines of a service block, with each task's own budget as the approval, the assignee
+    on each case and escape line, no ``R<k>``, and no criterion ids for the repeat alarm to read."""
+    return _block(view, t, "One-off tasks you gave (client: you, human; unit: case; approved budget: each task's own)")
 
 
 def nested_line(view: RecordView) -> str:
@@ -340,3 +359,75 @@ def nested_line(view: RecordView) -> str:
     r = view.record
     verdicts = sum(len(c.verdicts) for c in r.cases)
     return f"- {r.service} (offered by {r.owner}; client {r.client}): {len(r.cases)} case(s), {len(r.deliveries)} delivered, {verdicts} agent verdict(s)"
+
+
+def header_lines(t: QualityThresholds, notes: Sequence[str]) -> list[str]:
+    """The title, the thresholds in force and each note about them (6, 16), one per line."""
+    where = "from ORG.md quality:" if t.source == "ORG.md" else "the defaults"
+    return [
+        "Quality of the work you asked for (derived from the files, nothing stored; for you and the user, never for agents).",
+        f"Thresholds: {where} (tunable): alarms need {t.min_judged} judged cases; repeat: one id failing in {t.repeat_failures} of the last "
+        f"{t.repeat_window} judged cases; cost: a case above {t.cost_ratio_text}x its approved runs.",
+        *notes,
+    ]
+
+
+def _held_line(addr: str, held: HeldTask) -> str:
+    who = f'you ("{clip_line(held.task.title, TITLE_CHARS)}")' if held.task.sender == ROOT else held.task.sender
+    since = f"{'you have' if held.task.sender == ROOT else f'{held.task.sender} has'} sent {addr} {held.sent_since} task(s) since"
+    status = f"left blocked: {since}" if held.left_blocked else "blocked, nothing sent since"
+    return f"    task {held.task.id} from {who}, blocked {_time(msg_time(held.blocked))}: {status}"
+
+
+def moved_past_lines(moved: Sequence[MovedPast]) -> list[str]:
+    """The moved-past section (4.5): the agents with a task left blocked, each with every task it holds, or ``none``."""
+    if not moved:
+        return ["Blocked tasks moved past without a verdict: none."]
+    lines = ["Blocked tasks moved past without a verdict (while one stays blocked, its assignee's later results return no runs):"]
+    for m in moved:
+        if m.error:
+            lines.append(f"  {m.addr}: blocked tasks cannot be read ({m.error})")
+            continue
+        if m.held is None:
+            holds = f"holds an unknown number of runs ({m.held_error})"
+        else:
+            holds = f"holds {m.held} run(s)" if m.held > 0 else f"holds no run (budget {m.held})"
+        lines += [f"  {m.addr} {holds}:", *(_held_line(m.addr, h) for h in m.tasks)]
+    return lines
+
+
+def _record_lines(view: RecordView, t: QualityThresholds) -> list[str]:
+    r = view.record
+    if not r.error:
+        return service_block(view, t)
+    return [f"{r.service} (offered by {r.owner}): cannot be read ({r.error})."]
+
+
+def _nested_section(views: Sequence[RecordView]) -> list[str]:
+    head = "Services your agents request (the client is an agent: its verdicts are hypotheses, never counted):"
+    return [head, *(nested_line(v) if not v.record.error else f"- {v.record.service} (offered by {v.record.owner}): cannot be read ({v.record.error})." for v in views)]
+
+
+def quality_text(view: QualityView) -> str:
+    """The whole text (9.2): the header block, a block per service root requests, the one-off block, the nested services and the moved-past section,
+    one blank line between two of them and none inside, none at either end. Without ``service`` ``No cases yet`` replaces the blocks when nothing was
+    requested or given; with it only the blocks of that service appear."""
+    t = view.thresholds
+    top = [v for v in view.records if v.record.service and v.record.client_kind == "human"]
+    nested = [v for v in view.records if v.record.service and v.record.client_kind != "human"]
+    off = next((v for v in view.records if not v.record.service), None)
+    sections: list[list[str]] = [header_lines(t, view.notes)]
+    sections += [_record_lines(v, t) for v in top]
+    if view.service is None:
+        if off is not None and off.record.error:
+            sections.append([f"One-off tasks you gave: cannot be read ({off.record.error})."])
+        elif off is not None and off.record.cases:
+            sections.append(one_off_block(off, t))
+        elif top or nested:
+            sections.append(["One-off tasks you gave: none."])
+    if nested:
+        sections.append(_nested_section(nested))
+    if view.service is None and not top and not nested and (off is None or not (off.record.cases or off.record.error)):
+        sections.append(["No cases yet: you have requested no service and given no task."])
+    sections.append(moved_past_lines(view.moved_past))
+    return "\n\n".join("\n".join(lines) for lines in sections)

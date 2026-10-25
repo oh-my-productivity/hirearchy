@@ -3,20 +3,21 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from fractions import Fraction
 from typing import Any
 
 import pytest
 
-from hirearchy.kernel import ROOT
-from hirearchy.progress._quality_facts import RecordView
-from hirearchy.progress._quality_render import nested_line, ratio, service_block
+from hirearchy.kernel import ROOT, Message
+from hirearchy.progress._quality_facts import HeldTask, MovedPast, QualityView, RecordView
+from hirearchy.progress._quality_render import nested_line, one_off_block, quality_text, ratio, service_block
 from hirearchy.reflection import (
     Assertion, BarChanges, Case, Cause, CharterMark, ContractMark, Delivery, ModelMark, PlaybookMark, QualityThresholds, ServiceRecord, TopUpMark,
     shown_name,
 )
 
 from ._quality_records import (
-    OWNER, case, delivery, mid, record, request, top_ups, verdict,
+    OWNER, case, contract_mark, delivery, mid, record, request, top_ups, verdict,
 )
 
 T = QualityThresholds()
@@ -569,3 +570,210 @@ def test_an_agent_client_service_is_one_line_of_counts() -> None:
     assert nested_line(RecordView(record(owner="lead/writer", service="draft", client="lead", client_kind="agent"))) == (
         "- draft (offered by lead/writer; client lead): 0 case(s), 0 delivered, 0 agent verdict(s)"
     )
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the whole text (commit 26)
+
+TITLE = "Quality of the work you asked for (derived from the files, nothing stored; for you and the user, never for agents)."
+DEFAULTS = (
+    "Thresholds: the defaults (tunable): alarms need 3 judged cases; repeat: one id failing in 2 of the last 3 judged cases; cost: a case above 1.25x its approved runs."
+)
+NO_MOVED_PAST = "Blocked tasks moved past without a verdict: none."
+NO_CASES = "No cases yet: you have requested no service and given no task."
+MOVED_PAST_HEAD = "Blocked tasks moved past without a verdict (while one stays blocked, its assignee's later results return no runs):"
+
+
+def whole(*records: ServiceRecord, t: QualityThresholds = T, notes: tuple[str, ...] = (), moved_past: tuple[MovedPast, ...] = (), service: str | None = None) -> str:
+    return quality_text(QualityView(t, notes, tuple(RecordView(r) for r in records), moved_past, service))
+
+
+def one_off(*cases: Case, deliveries: tuple[Delivery, ...] = (), **more: Any) -> ServiceRecord:
+    return record(owner="", service="", cases=list(cases), deliveries=deliveries, contract=0, playbook=0, budget=0, **more)
+
+
+def a_nested(owner: str = "lead/writer", service: str = "draft") -> ServiceRecord:
+    return record(owner=owner, service=service, client="lead", client_kind="agent", budget=3)
+
+
+def test_the_header_block_and_its_notes() -> None:
+    notes = ("ORG.md cannot be read (its settings block does not parse): the default thresholds are used.", "quality.min_judged in ORG.md is not a whole number of at least 1: the default 3 is used.")
+    t = QualityThresholds(min_judged=5, repeat_window=4, repeat_failures=2, cost_ratio=Fraction("1.5"), cost_ratio_text="1.5", source="ORG.md")
+    lines = whole(t=t, notes=notes).splitlines()
+    assert lines[0] == TITLE
+    assert lines[1] == (
+        "Thresholds: from ORG.md quality: (tunable): alarms need 5 judged cases; repeat: one id failing in 2 of the last 4 judged cases; cost: a case above 1.5x its approved runs."
+    )
+    assert lines[2:4] == list(notes) and lines[4] == ""  # the notes follow the thresholds with no blank line between them
+    assert whole().splitlines()[1] == DEFAULTS
+
+
+def test_the_layout_has_one_blank_line_between_blocks_and_none_inside() -> None:
+    c, d = made(3, "accept", "ok", runs=3)
+    text = whole(record(cases=[c], deliveries=(d,)), one_off(), a_nested(), moved_past=(MovedPast("lead", 4, "", "", (HeldTask(request(40, to="lead"), done(41), 1),)),))
+    assert not text.startswith("\n") and not text.endswith("\n") and "\n\n\n" not in text
+    blocks = text.split("\n\n")
+    assert [b.splitlines()[0] for b in blocks] == [
+        TITLE, blocks[1].splitlines()[0], "One-off tasks you gave: none.", "Services your agents request (the client is an agent: its verdicts are hypotheses, never counted):", MOVED_PAST_HEAD,
+    ]
+    assert blocks[1].startswith("weekly-memo (offered by lead;") and all(x.strip() for b in blocks for x in b.splitlines())  # no blank line inside a block
+
+
+def done(n: int) -> Message:
+    return Message(id=mid(n, "lead"), sender="lead", to=ROOT, type="result", status="blocked", body="stuck", title="re", reply_to=mid(40))
+
+
+@pytest.mark.parametrize(
+    ("records", "present", "absent"),
+    [
+        ((one_off(),), [NO_CASES], ["One-off tasks you gave", "Services your agents request"]),
+        ((record(), one_off()), ["weekly-memo (offered by lead;", "One-off tasks you gave: none."], [NO_CASES]),
+        ((one_off(made(3)[0], deliveries=(made(3)[1],)),), ["One-off tasks you gave (client: you, human; unit: case; approved budget: each task's own)"], [NO_CASES, "One-off tasks you gave: none."]),
+        ((a_nested(), one_off()), ["Services your agents request (the client is an agent", "- draft (offered by lead/writer; client lead)", "One-off tasks you gave: none."], [NO_CASES]),
+    ],
+    ids=["nothing at all", "a defined service without a request", "one-off tasks only", "a nested service only"],
+)
+def test_which_blocks_appear(records: tuple[ServiceRecord, ...], present: list[str], absent: list[str]) -> None:
+    text = whole(*records)
+    for needle in present:
+        assert needle in text
+    for needle in absent:
+        assert needle not in text
+    assert text.endswith(NO_MOVED_PAST)  # the moved-past section follows in every case
+
+
+def test_the_one_off_block_variants() -> None:
+    first, second = request(3, service=None, to="ops"), request(9, service=None, to="ops", revises=mid(3))
+    judged = verdict(first, 5, "reject", "Not this.")
+    c = case([first, second], owner="ops", service="", verdicts=[judged], runs=4, ceiling=0, top_ups=top_ups(("T9", "unrecorded", 5)))
+    blind = case([request(15, service=None, to="ops")], owner="ops", service="", runs_unknown="no run log in its window")
+    d = delivery(c, 0, result_n=4, signer="ops/checker", verdicts=(judged,))
+    r = one_off(c, blind, deliveries=(d,), escapes=((d, Cause("untyped", "none")),), timeline=(TopUpMark(at(9), c.id, "T9", "unrecorded", 5),))
+    out = one_off_block(RecordView(r, fails={"ops/checker": (1, 1)}), QualityThresholds(min_judged=1))
+    assert out[0] == "One-off tasks you gave (client: you, human; unit: case; approved budget: each task's own)"
+    assert out[1].startswith("  cases: 2 (done 2, ")
+    assert f"    rejected case {c.id} (ops), signed off by ops/checker: untyped (no rule matched)" in out
+    assert "    ops/checker: escapes 1 of 1 judged (1 untyped); PASS precision 0 of 1; its FAILs before delivery: 1 re-check(s), 1 author rework run(s)" in out
+    head = out.index(
+        "  runs per case (the user's runs: runs used outside your relayed reworks, plus runs still out while a case is open or blocked; approved: each task's own budget, "
+        "or more where your hand-downs raised it (runs used + held + new, at that moment)):"
+    )
+    assert out[head + 1] == f'    {c.id} "Memo for the meeting" (ops): 4 of 5 approved (0.80x); top-ups: +5 rework T9 (tier not recorded)'
+    assert out[head + 2] == f'    {blind.id} "Memo for the meeting" (ops): runs not counted (no run log in its window); top-ups: none'
+    assert "    repeat: does not apply (one-off tasks name no criterion ids)" in out
+    assert f"    2026-10-21 15:09 top-up +5 run(s) to case {c.id}: rework T9 (tier not recorded)" in out
+    assert "  verifiers:" in out and not any("contract v" in x for x in out)
+
+
+def test_the_one_off_verifiers_name_the_assignees_when_nobody_else_signed() -> None:
+    a, da = made(3, "accept", "ok", owner="ops", service="", signer="ops")
+    b, db = made(9, "accept", "ok", owner="eng", service="", signer="eng")
+    out = one_off_block(RecordView(one_off(a, b, deliveries=(da, db))), T)
+    assert "  verifiers: none (every delivery was signed off by ops, eng itself)" in out
+
+
+def test_one_off_tasks_you_gave_none() -> None:
+    assert whole(record(), one_off()).splitlines()[-3] == "One-off tasks you gave: none."
+
+
+def test_nested_services_one_line_each_by_owner_and_name() -> None:
+    text = whole(record(), a_nested("lead/writer", "draft"), a_nested("lead/writer", "edit"), a_nested("ops/clerk", "file"), one_off())
+    section = text.split("\n\n")[3].splitlines()
+    assert section == [
+        "Services your agents request (the client is an agent: its verdicts are hypotheses, never counted):",
+        "- draft (offered by lead/writer; client lead): 0 case(s), 0 delivered, 0 agent verdict(s)",
+        "- edit (offered by lead/writer; client lead): 0 case(s), 0 delivered, 0 agent verdict(s)",
+        "- file (offered by ops/clerk; client lead): 0 case(s), 0 delivered, 0 agent verdict(s)",
+    ]
+
+
+def test_a_nested_service_named_by_service() -> None:
+    text = whole(a_nested("lead/writer", "draft"), service="draft")
+    assert text.split("\n\n") == [
+        f"{TITLE}\n{DEFAULTS}",
+        "Services your agents request (the client is an agent: its verdicts are hypotheses, never counted):\n"
+        "- draft (offered by lead/writer; client lead): 0 case(s), 0 delivered, 0 agent verdict(s)",
+        NO_MOVED_PAST,
+    ]
+    named = whole(record(), service="weekly-memo")  # no one-off block and no "No cases yet" with a service
+    assert "One-off tasks" not in named and NO_CASES not in named and named.split("\n\n")[1].startswith("weekly-memo (offered by lead;")
+
+
+def test_the_moved_past_section_lines() -> None:
+    mine = request(40, to="lead", title="Rework memo: summary line first")
+    theirs = Message(id=mid(44, "lead"), sender="lead", to="lead/writer", type="task", title="AGENT TITLE", body="b")
+    block_ = Message(id=mid(45, "lead"), sender="lead", to="lead", type="result", status="blocked", body="stuck", title="re", reply_to=mine.id)
+    block_w = Message(id=mid(46, "lead/writer"), sender="lead/writer", to="lead", type="result", status="blocked", body="stuck", title="re", reply_to=theirs.id)
+    moved = (
+        MovedPast("lead", 12, "", "", (HeldTask(mine, block_, 2),)),
+        MovedPast("lead/writer", 0, "", "", (HeldTask(theirs, block_w, 0), HeldTask(mine, block_, 1))),
+        MovedPast("ops", None, "no budget", "", (HeldTask(theirs, block_, 1),)),
+        MovedPast("eng", None, "", "mailbox gone", ()),
+    )
+    lines = whole(moved_past=moved).splitlines()
+    assert lines[lines.index(MOVED_PAST_HEAD):] == [
+        MOVED_PAST_HEAD,
+        "  lead holds 12 run(s):",
+        f'    task {mine.id} from you ("Rework memo: summary line first"), blocked 2026-10-21 15:45: left blocked: you have sent lead 2 task(s) since',
+        "  lead/writer holds no run (budget 0):",
+        f"    task {theirs.id} from lead, blocked 2026-10-21 15:46: blocked, nothing sent since",
+        f'    task {mine.id} from you ("Rework memo: summary line first"), blocked 2026-10-21 15:45: left blocked: you have sent lead/writer 1 task(s) since',
+        "  ops holds an unknown number of runs (no budget):",
+        f"    task {theirs.id} from lead, blocked 2026-10-21 15:45: left blocked: lead has sent ops 1 task(s) since",
+        "  eng: blocked tasks cannot be read (mailbox gone)",
+    ]
+    assert "AGENT TITLE" not in "\n".join(lines)  # an agent's task title is never shown
+
+
+def test_moved_past_none() -> None:
+    assert whole().splitlines()[-1] == NO_MOVED_PAST
+
+
+def test_a_record_that_cannot_be_read_is_one_line() -> None:
+    broken = ServiceRecord("lead", "weekly-memo", ROOT, "human", error="SERVICE.md: does not parse (ScannerError)")
+    bad_off = ServiceRecord("", "", ROOT, "human", error="the cases: boom")
+    nested = ServiceRecord("lead/writer", "draft", "lead", "agent", error="the cases: boom")
+    text = whole(broken, record(service="other", owner="ops"), nested, bad_off)
+    assert "weekly-memo (offered by lead): cannot be read (SERVICE.md: does not parse (ScannerError))." in text.splitlines()
+    assert "One-off tasks you gave: cannot be read (the cases: boom)." in text.splitlines()
+    assert "- draft (offered by lead/writer): cannot be read (the cases: boom)." in text.splitlines()
+    assert "other (offered by ops; client: you, human;" in text  # the other blocks render
+
+
+def test_the_empty_org_sample_of_9_3() -> None:
+    note = "ORG.md cannot be read (its settings block does not parse): the default thresholds are used."
+    assert whole(one_off(), notes=(note,)) == "\n".join([
+        "Quality of the work you asked for (derived from the files, nothing stored; for you and the user, never for agents).",
+        "Thresholds: the defaults (tunable): alarms need 3 judged cases; repeat: one id failing in 2 of the last 3 judged cases; cost: a case above 1.25x its approved runs.",
+        note, "", "No cases yet: you have requested no service and given no task.", "", "Blocked tasks moved past without a verdict: none.",
+    ])
+
+
+def test_the_empty_service_sample_of_9_3() -> None:
+    start = datetime(2026, 1, 15, 9, 0, tzinfo=timezone.utc)
+    marks = (ContractMark(1, start, ROOT, ("C1", "C2"), (), "first"), PlaybookMark(1, start, ROOT, "client"))
+    service = record(service="weekly-report", budget=10, contract=1, playbook=1, timeline=marks)
+    assert whole(service, one_off()) == "\n".join([
+        "Quality of the work you asked for (derived from the files, nothing stored; for you and the user, never for agents).",
+        "Thresholds: the defaults (tunable): alarms need 3 judged cases; repeat: one id failing in 2 of the last 3 judged cases; cost: a case above 1.25x its approved runs.",
+        "",
+        "weekly-report (offered by lead; client: you, human; unit: case; contract v1, playbook v1; approved 10 runs per request)",
+        "  cases: 0 (done 0, failed 0, blocked 0, open 0 (stalled 0))",
+        "  first deliveries: 0 accepted, 0 rejected, 0 without a verdict",
+        "  judged by the user: n/a (0 of 0) deliveries; without a verdict: 0 case(s); not as delivered: 0",
+        "  escapes (the team reported done, then the user rejected it): none (judged: n/a (0 of 0))",
+        "  verifiers: none (no delivery yet)",
+        "  runs per case (the user's runs: runs used outside your relayed reworks, plus runs still out while a case is open or blocked; approved: the contract's 10 per request, "
+        "or more where your hand-downs raised it (runs used + held + new, at that moment)): none",
+        "  alarms:",
+        "    repeat: n/a (0 of 3 judged cases)",
+        "    cost: n/a (0 of 3 judged cases)",
+        "  timeline (bar changes, UTC; marked, never used to split the counts):",
+        "    2026-01-15 09:00 contract v1 (C1, C2)",
+        "    2026-01-15 09:00 playbook v1 (root): written by the client (no admission needed)",
+        "    charter edits and model changes: unknown (no org history: the organization is not a git repository, or git is missing)",
+        "  run attribution is by time window (08 3.3): 0 case(s) had their window cut by a later request.",
+        "",
+        "One-off tasks you gave: none.",
+        "",
+        "Blocked tasks moved past without a verdict: none.",
+    ])

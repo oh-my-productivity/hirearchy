@@ -3,24 +3,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
 
 from ..kernel import Message
 from ..mail import moved_past
-
-
-@dataclass(frozen=True)
-class HeldTask:
-    """A task whose blocked result still holds runs on its assignee (``task``), with that result (``blocked``) and the number of tasks its sender has
-    sent the assignee since, outside the chain (``sent_since``): above 0 it is left blocked, the sender moved past it without a verdict."""
-
-    task: Message
-    blocked: Message
-    sent_since: int = 0
-
-    @property
-    def left_blocked(self) -> bool:
-        return self.sent_since > 0
+from ._quality_facts import HeldTask
 
 
 def held_tasks(tasks: Sequence[Message], latest: Mapping[str, Message], received: Sequence[Message]) -> list[Message]:
