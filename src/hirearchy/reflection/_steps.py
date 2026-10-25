@@ -35,6 +35,14 @@ STEP_NONE = (  # no reading: the question names the id root chooses now
     'words="<their answer, verbatim>"). On no, a one-off or "as it is": feedback(task_id="{task}", verdict="reject", confirms="{note}", '
     'criterion=["none"], ["R<j>"] or ["C<k>"], source="human", note="<their answer, verbatim>").'
 )
+ONE_OFF_RELAYED = (  # root's own reading of a one-off result: no weight in quality, and a one-off has no contract to fall back on (design 8.2)
+    'Recorded as relayed (your own reading): quality counts it as no verdict of the user. If the user said it, record their words, verbatim, '
+    'with source="human".'
+)
+ONE_OFF_REJECTED = (  # the user's rejection of a one-off result: a one-off has no criterion to change
+    'Next: if the user wants it redone, send it back with delegate(to="{to}", title=..., goal=<their corrections, in their words>, '
+    'acceptance=<the criteria, verbatim>, revises="{task}", source="human"). A one-off task has no contract: no criterion changes.'
+)
 REPEAT = '; for a repeat: "Same as R<j>: a one-off? Yes or no.", with R<j> one of {rejections}'
 REWORK = (
     "{revised}'s result asked the client: {questions}. Ask the user these questions, unless the user asked for this change: "
@@ -89,10 +97,14 @@ class TextServiceSteps(ServiceSteps):
         self._mail = mail
 
     def feedback_step(self, note: Message) -> str:
-        if note.feedback != "reject" or verdict_tier(note) != "human" or not note.reply_to:
+        if not note.feedback or not note.reply_to:
             return ""
         task = next((m for m in self._mail.sent(note.sender) if m.id == note.reply_to and m.type == "task"), None)
-        if task is None or not task.service or self._history.case_of(task) is None:
+        if task is None:
+            return ""
+        if not task.service:
+            return self._one_off_step(task, note)
+        if note.feedback != "reject" or verdict_tier(note) != "human" or self._history.case_of(task) is None:
             return ""
         found = regressions(self._history.cases(task.to, task.service))
         mine = next((a for a in found if a.verdict.message.id == note.id), None)
@@ -109,6 +121,17 @@ class TextServiceSteps(ServiceSteps):
             repeat = REPEAT.format(rejections=", ".join(earlier)) if earlier else ""
             step = STEP_NONE.format(criteria=", ".join(criteria) or "none", repeat=repeat, **ids)
         return f"{own}This rejection is {mine.id}. " + step
+
+    @staticmethod
+    def _one_off_step(task: Message, note: Message) -> str:
+        """What follows a verdict on a task root sent without a service (design 8.2): a relayed verdict counts as no verdict of the user, whatever
+        it says; the user's rejection says how to send the task back; their accept needs nothing."""
+        tier = verdict_tier(note)
+        if tier == "relayed":
+            return ONE_OFF_RELAYED
+        if tier == "human" and note.feedback == "reject":
+            return ONE_OFF_REJECTED.format(to=task.to, task=task.id)
+        return ""
 
     def rework_step(self, task: Message) -> str:
         if task.type != "task" or not task.revises:

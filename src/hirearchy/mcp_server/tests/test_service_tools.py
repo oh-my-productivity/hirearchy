@@ -94,6 +94,29 @@ def test_root_feedback_reply_names_message_and_source(svc):
     assert (link.reply_to, link.source) == (no.id, "human")
 
 
+def test_root_one_off_feedback_reply_is_the_receipt_then_the_step(svc):
+    server = build_server(svc, ROOT)
+    plain = svc.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
+    deliver(svc, "ceo", plain)
+    reply = call(server, "feedback", task_id=plain.id, verdict="reject", note="Too long.")
+    relayed = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    assert reply == (
+        f"feedback reject recorded on {plain.id} for ceo (message {relayed.id}, source relayed); it does not wake ceo\n"
+        'Recorded as relayed (your own reading): quality counts it as no verdict of the user. If the user said it, record their words, verbatim, '
+        'with source="human".'
+    )
+    reply = call(server, "feedback", task_id=plain.id, verdict="reject", note="Too long.", source="human")
+    human = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    assert reply == (
+        f"feedback reject recorded on {plain.id} for ceo (message {human.id}, source human); it does not wake ceo\n"
+        'Next: if the user wants it redone, send it back with delegate(to="ceo", title=..., goal=<their corrections, in their words>, '
+        f'acceptance=<the criteria, verbatim>, revises="{plain.id}", source="human"). A one-off task has no contract: no criterion changes.'
+    )
+    reply = call(server, "feedback", task_id=plain.id, verdict="accept", source="human")
+    accepted = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    assert reply == f"feedback accept recorded on {plain.id} for ceo (message {accepted.id}, source human); it does not wake ceo"
+
+
 def test_mcp_reject_with_a_reading_then_define_service_answers_is_admitted(svc):
     """DR-46: root passes its reading as `criterion` on the rejection; the reply gives the exact question with that id, and the user's yes is
     recorded by define_service(answers=..., about=<that id>, words=...), which writes the link itself."""

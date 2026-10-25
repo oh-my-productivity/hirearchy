@@ -157,3 +157,13 @@ def test_a_cli_rework_of_a_blocked_request_with_unspent_runs_prints_that_the_tea
         "this case when this rework was sent: its own run is beyond them, and the runs the team holds cover the round without it. Ask for nothing; "
         "tell the user that this 1 run is beyond their approval."
     )
+
+
+def test_the_cli_prints_no_step_after_a_one_off_verdict(svc, capsys):
+    """PC-5: the CLI prints the receipt line only, for a one-off verdict as for a service verdict; the next step is the MCP reply's."""
+    plain = svc.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
+    deliver(svc, "ceo", plain)
+    cli(svc, "feedback", plain.id, "reject", "--note", "Too long.")
+    verdict = [m for m in svc.sent(ROOT) if m.feedback][-1]
+    assert (verdict.reply_to, verdict.source, verdict.criterion) == (plain.id, "human", None)  # the CLI keeps --source human
+    assert capsys.readouterr().out == f"feedback reject on {plain.id} -> ceo (message {verdict.id}, source human)\n"

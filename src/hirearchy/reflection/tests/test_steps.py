@@ -66,6 +66,47 @@ def rejected(w: ReflectionWorld, words: str = "Too long.", *, topic: str = "ai",
 # ------------------------------------------------------------------------------ feedback_step
 
 
+ONE_OFF_RELAYED = (
+    'Recorded as relayed (your own reading): quality counts it as no verdict of the user. If the user said it, record their words, verbatim, '
+    'with source="human".'
+)
+ONE_OFF_REJECTED = (
+    'Next: if the user wants it redone, send it back with delegate(to="ceo", title=..., goal=<their corrections, in their words>, '
+    'acceptance=<the criteria, verbatim>, revises="{task}", source="human"). A one-off task has no contract: no criterion changes.'
+)
+
+
+def one_off(w: ReflectionWorld, status: str = "done") -> Message:
+    """A task root sent to ``ceo`` without a service, and ``ceo``'s result."""
+    task = w.s.d.post(Message(sender="root", to="ceo", type="task", body="plain", title="Plain", budget=2))
+    deliver(w, task, status)
+    return task
+
+
+def test_a_relayed_one_off_verdict_says_it_counts_as_no_verdict_of_the_user(w: ReflectionWorld) -> None:
+    task = one_off(w)
+    for verdict, words in (("accept", ""), ("reject", "Too long.")):
+        note = w.s.commands.feedback("root", task.id, verdict, words, source="relayed")
+        assert w.steps.feedback_step(note) == ONE_OFF_RELAYED
+    assert w.steps.feedback_step(w.s.commands.feedback("root", task.id, "reject", "Again.")) == ONE_OFF_RELAYED  # the default source is relayed
+
+
+def test_a_human_one_off_reject_says_how_to_send_it_back_with_revises(w: ReflectionWorld) -> None:
+    task = one_off(w)
+    note = rate(w, task, "reject", "Too long.")
+    assert w.steps.feedback_step(note) == ONE_OFF_REJECTED.format(task=task.id)
+
+
+def test_a_human_one_off_accept_has_no_step(w: ReflectionWorld) -> None:
+    assert w.steps.feedback_step(rate(w, one_off(w), "accept")) == ""
+
+
+def test_one_off_steps_have_no_leading_newline(w: ReflectionWorld) -> None:
+    task = one_off(w)
+    for note in (rate(w, task, "reject", "Too long."), w.s.commands.feedback("root", task.id, "accept", source="relayed")):
+        assert w.steps.feedback_step(note).startswith(("Next:", "Recorded"))
+
+
 def test_feedback_step_names_the_ids_and_the_confirmation(w: ReflectionWorld) -> None:
     rejected(w, "First.", topic="a")  # two earlier human rejections, in other cases: the new one is the third of the service (DR-19)
     rejected(w, "Second.", topic="b")
@@ -160,8 +201,8 @@ def test_feedback_step_is_empty_for_a_note_it_cannot_place(w: ReflectionWorld) -
     lost = Message(sender="root", to="ceo", type="note", body="x", feedback="reject", source="human", reply_to="20260101T000000000000-root-0001")
     assert w.steps.feedback_step(lost) == ""
     assert w.steps.feedback_step(Message(sender="root", to="ceo", type="note", body="x", feedback="reject", source="human")) == ""
-    plain = w.s.d.post(Message(sender="root", to="ceo", type="task", title="Plain", body="Do it."))  # a task that is no service request
-    assert w.steps.feedback_step(Message(sender="root", to="ceo", type="note", body="x", feedback="reject", source="human", reply_to=plain.id)) == ""
+    mine = w.s.d.post(Message(sender="ceo", to="ceo/eng", type="task", title="Plain", body="Do it.", budget=1))  # an agent's task of no service
+    assert w.steps.feedback_step(Message(sender="ceo", to="ceo/eng", type="note", body="x", feedback="reject", reply_to=mine.id)) == ""
 
 
 # ------------------------------------------------------------------------------ no step before the yes
