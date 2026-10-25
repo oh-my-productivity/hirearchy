@@ -1,0 +1,93 @@
+# mypy: ignore-errors
+"""Phase 0a.4, end to end: E6's recorded streams replayed against the new code, read from the raw evidence files (design 17.2).
+
+No scheduler, no LLM, no network: ``testkit.e6_replay.materialize`` rebuilds the organization a stream had at one moment (messages, run-log names,
+agents, contract), and the product's own ``progress`` and ``client_items`` read it. A missing evidence file fails the test, never skips it.
+
+This module holds the replays of D-E6-1 (A1 and A2): A-1 to A-5, the question block of the results 8613, 762f, 6c63 and d80f, and of every result with a
+block that root received in E6's three streams.
+"""
+
+import re
+
+import pytest
+from testkit.e6_replay import EV6, materialize
+
+from hirearchy.core import ROOT, Org
+from hirearchy.kernel import client_items
+from hirearchy.progress import progress
+
+SERVICE = "weekly-memo"
+
+
+@pytest.fixture(autouse=True)
+def clean_env(monkeypatch, tmp_path):
+    for var in ("ORG_ROOT", "ORG_AGENT", "ORG_REQUIRE_AGENT"):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("HIREARCHY_WORKSPACE_ROOTS", str(tmp_path))
+
+
+def replay(tmp_path, stream, cut, task_id, result_id):
+    """The organization of ``stream`` at ``cut``; the line of the task ``task_id`` root sent in it, and the result ``result_id`` that answered it."""
+    org = Org(materialize(stream, cut, tmp_path / "org"))
+    assert any(m.id == task_id for m in org.sent(ROOT)), f"{task_id} is not in root's sent box at {cut}"
+    result = next(m for box in ("read", "inbox") for m in org.messages(ROOT, box) if m.id.endswith(f"-lead-{result_id}"))
+    return progress(org, task_id=task_id), client_items(result.body)
+
+
+def test_a1_8613_lists_the_style_item_as_a_note_and_flags_the_two_questions(tmp_path):
+    """A-1 (E6 s1 #56): 8613's block holds two items that name C6 and C3 (questions) and ``Style: 'himself' ...`` (a note). 0a.3 flagged three questions,
+    and the style note decided s1's clause 3 FAIL; now the path stays withheld for the two questions and the note is only listed (D-E6-1)."""
+    line, items = replay(tmp_path, "s1", "20261024T160847113000", "20261024T160535424081-root-b0fe", "8613")
+    assert [q.split(":")[0] for q in items.questions] == ["C6", "C3"]
+    assert items.notes == ("Style: 'himself' in Sam's table row (reviewer: harmless).",)
+    assert (
+        "artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver. "
+        "1 note for the client (no criterion): Style: 'himself' in Sam's table row (reviewer: harmless). no feedback yet."
+    ) in line
+
+
+def test_a2_762f_the_marker_tail_is_no_item_and_the_three_list_items_are_the_questions(tmp_path):
+    """A-2 (E6 s1 #70): 762f's marker line is ``Questions for the client: (reviewer flags; I did not settle them, and they touch your answers)`` before a
+    list of three items (C5, C4, C5). 0a.3 counted the tail as a fourth question; A1 reads it as a remark."""
+    line, items = replay(tmp_path, "s1", "20261024T161928019000", "20261024T161442312966-root-d675", "762f")
+    assert len(items.questions) == 3 and items.notes == ()
+    assert "3 questions for the client" in line and "note for the client" not in line
+    assert "4 questions" not in line
+
+
+def test_a3_6c63_the_one_question_without_a_criterion_is_a_note_and_its_path_is_shown(tmp_path):
+    """A-3, A2's cost (E6 s3 #42): 6c63's one item names no criterion id, so it is a note: the path is shown (it was withheld for a question that Lena was
+    asked anyway in T8, a declared limit of the design)."""
+    line, items = replay(tmp_path, "s3", "20261024T172839677000", "20261024T172453163611-root-9a5b", "6c63")
+    assert items.questions == () and len(items.notes) == 1
+    assert "artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/review-memo-2026-10-05-summary-line.md" in line
+    assert "1 note for the client (no criterion): Keep or delete the '## Open, not decided' section" in line
+    assert "questions for the client" not in line and "withheld" not in line
+
+
+def test_a4_d80f_two_questions_and_no_note_as_before(tmp_path):
+    """A-4 (E6 s1 #23): d80f holds two items that name criteria: two questions, no note, the path withheld, as 0a.3 did."""
+    line, items = replay(tmp_path, "s1", "20261024T154519419000", "20261024T154227019921-root-f06d", "d80f")
+    assert len(items.questions) == 2 and items.notes == ()
+    assert "artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver." in line
+    assert "note for the client" not in line
+
+
+def test_a5_every_recorded_result_holds_49_items_47_questions_and_2_notes():
+    """A-5: over the 19 results with a ``Questions for the client:`` block that root received in E6's s1, s2 and s3 (49 items after A1, which drops
+    762f's tail from 50): 47 name a criterion id and 2 do not (8613's style item and 6c63's section item)."""
+    marker = re.compile(r"^\W*questions for the client", re.IGNORECASE | re.MULTILINE)
+    results = []
+    for stream in ("s1", "s2", "s3"):
+        for box in ("read", "inbox"):
+            folder = EV6 / stream / "msgs" / box
+            if not folder.is_dir() and box == "read":
+                pytest.fail(f"no evidence directory {folder}")
+            for path in sorted(folder.glob("*.md")) if folder.is_dir() else []:
+                text = path.read_text(encoding="utf-8")
+                if "type: result" in text.split("---")[1] and marker.search(text):
+                    results.append(client_items(text))
+    assert len(results) == 19
+    assert sum(len(r.questions) + len(r.notes) for r in results) == 49
+    assert sum(len(r.questions) for r in results) == 47 and sum(len(r.notes) for r in results) == 2

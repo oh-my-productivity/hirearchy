@@ -34,8 +34,9 @@ class ProgressReporter(Protocol):
         state, who is busy, runs used against the budget given (every run of any agent in the task's subtree from its creation to its final result,
         or now, against its budget plus the later grants), the time since the team's last activity, for a finished task its artifacts and the runs
         it returned, for a service request the tag ``[service <name> v<n>]``, whether the client has rated it and the total of a rework chain.
-        A done result that carries a ``Questions for the client:`` block is flagged "ask the user before you copy or deliver" until the user's own
-        rework or the client's verdict answers it (a rework root relayed does not).
+        A done or blocked result whose ``Questions for the client:`` block holds a question that names a criterion id (``C<k>``) is flagged "ask the
+        user before you copy or deliver", and its path withheld, until the user's own rework or the client's verdict answers it (a rework root
+        relayed does not); the block's other items are listed as notes for the client, never withheld.
 
         ``wait_seconds`` > 0 (at most ``WAIT_MAX``): first block until a listed task changes state, something new needs the user, or the time
         is up; the text then starts with a line saying which. Raises ``OrgError`` for a ``task_id`` root did not give."""

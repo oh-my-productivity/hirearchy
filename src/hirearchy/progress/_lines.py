@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from ..kernel import ROOT, Message, artifact_paths, client_questions, fmt_duration
+from ..kernel import ROOT, ClientItems, Message, artifact_paths, client_items, fmt_duration
 from ..mail import MailboxReader
-from ..reflection import Case, CaseHistory, ServiceReports, questions_open, rated
+from ..reflection import Case, CaseHistory, ServiceReports, items_listing, open_client_items, rated
 from ._ports import RunCounts, TaskLines, TaskStates, TaskTeams, TeamActivity
+
+NOTES_PART = "{n} note{s} for the client (no criterion): {listing}"  # the items of the block that name no criterion id (D-E6-1)
 
 
 def artifacts_of(result: Message) -> list[str]:
@@ -42,7 +44,8 @@ class CaseTaskLines(TaskLines):
         if last is not None:
             parts.append(f"last activity {fmt_duration(max(0.0, (now - last).total_seconds()))} ago")
         case = self._history.case_of(task) if task.service else None
-        asked = self._questions_open(task, result, case)
+        items = self._open_items(task, result, case)
+        asked = len(items.questions)  # only the questions flag the result and withhold its path; the notes withhold nothing
         if result is not None and result.status in ("done", "failed"):
             arts = artifacts_of(result)
             if asked:
@@ -51,6 +54,8 @@ class CaseTaskLines(TaskLines):
                 parts.append("artifacts: " + ", ".join(arts) if arts else "no artifacts")
         if asked:
             parts.append(f"{asked} question{'' if asked == 1 else 's'} for the client: ask the user before you copy or deliver")
+        if items.notes:
+            parts.append(NOTES_PART.format(n=len(items.notes), s="" if len(items.notes) == 1 else "s", listing=items_listing(items.notes)).rstrip("."))
         if task.service:
             if result is not None and result.status in ("done", "failed") and not rated(case, task):
                 parts.append("no feedback yet")
@@ -58,8 +63,11 @@ class CaseTaskLines(TaskLines):
                 parts.append(self._reports.case_total(task).rstrip("."))
         return ". ".join(parts) + f". (task {task.id})"
 
-    def _questions_open(self, task: Message, result: Message | None, case: Case | None) -> int:
-        """``reflection.questions_open`` of a result that asked something; the sent box is read only then."""
-        if result is None or not client_questions(result.body):
-            return 0
-        return questions_open(task, result, case, self._mail.sent(ROOT))
+    def _open_items(self, task: Message, result: Message | None, case: Case | None) -> ClientItems:
+        """``reflection.open_client_items`` of a result that asked something; the sent box is read only then."""
+        if result is None:
+            return ClientItems()
+        items = client_items(result.body)
+        if not (items.questions or items.notes):
+            return ClientItems()
+        return open_client_items(task, result, case, self._mail.sent(ROOT))

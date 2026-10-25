@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from hirearchy.kernel import ROOT, Message, artifact_paths
+from hirearchy.kernel import ROOT, Message, artifact_paths, clip_line
 from hirearchy.progress._lines import CaseTaskLines, artifacts_of
 from hirearchy.progress._ports import TaskLines
 from hirearchy.progress._counts import LogRunCounts
@@ -237,3 +237,101 @@ def test_the_path_returns_once_the_questions_are_settled(w: ProgressWorld) -> No
 def test_a_result_whose_questions_are_none_is_not_flagged(w: ProgressWorld, task: Message) -> None:  # zero pin: no items, no flag
     for body in ("Questions for the client: none.\n\n## Artifacts\n- a.md", "ok, nothing asked", "Questions for the client:\n\n## Lessons\n- x"):
         assert "for the client" not in lines(w).line(task, w.answer(task, "done", body, 0), NOW)
+
+
+# ------------------------------------------------------------------------------ the notes for the client (D-E6-1, A2/A3)
+
+STYLE = "Style: 'himself' in Sam's table row (reviewer: harmless)."
+NOTES = f"## Summary\nok\n\nQuestions for the client:\n- {STYLE}\n- Keep the title short?\n\n## Artifacts\n- a/b.md (3 words)"
+MIXED = f"## Summary\nok\n\nQuestions for the client:\n- C3: Keep Marta's row?\n- {STYLE}\n- C4: Which Friday?\n\n## Artifacts\n- a/b.md (3 words)"
+ONE_NOTE = f"## Summary\nok\n\nQuestions for the client:\n- {STYLE}\n\n## Artifacts\n- a/b.md (3 words)"
+NOTE_PART = "note for the client (no criterion)"
+
+
+def test_a_note_is_listed_and_withholds_nothing(w: ProgressWorld, task: Message) -> None:
+    """D-E6-1: an item without a criterion id is a note: the line lists it, the path stays, no flag."""
+    done = w.answer(task, "done", ONE_NOTE, 0)
+    out = lines(w).line(task, done, NOW)
+    assert f". artifacts: a/b.md. 1 {NOTE_PART}: Style: 'himself' in Sam's table row (reviewer: harmless). (task {task.id})" in out
+    assert "withheld" not in out and FLAG not in out and "1 notes" not in out
+
+
+def test_notes_are_plural_and_keep_the_order_of_the_block(w: ProgressWorld, task: Message) -> None:
+    done = w.answer(task, "done", NOTES, 0)
+    out = lines(w).line(task, done, NOW)
+    assert f". artifacts: a/b.md. 2 notes for the client (no criterion): {STYLE}; Keep the title short?. (task {task.id})" in out
+    assert FLAG not in out
+
+
+def test_only_the_last_full_stop_of_the_notes_part_is_stripped(w: ProgressWorld, task: Message) -> None:
+    done = w.answer(task, "done", "Questions for the client:\n- first note.\n- last note.\n\n## Artifacts\n- a.md", 0)
+    out = lines(w).line(task, done, NOW)
+    assert f". 2 notes for the client (no criterion): first note.; last note. (task {task.id})" in out  # "last note" + the join's ". " + the task id
+    assert ".." not in out
+
+
+def test_more_than_five_notes_are_counted(w: ProgressWorld, task: Message) -> None:
+    body = "Questions for the client:\n" + "\n".join(f"- note {i}" for i in range(1, 8)) + "\n\n## Artifacts\n- a.md"
+    out = lines(w).line(task, w.answer(task, "done", body, 0), NOW)
+    assert f". 7 notes for the client (no criterion): note 1; note 2; note 3; note 4; note 5; and 2 more. (task {task.id})" in out
+
+
+def test_each_note_is_cut_to_160_characters(w: ProgressWorld, task: Message) -> None:
+    long = "A long note about the memo? " * 12
+    out = lines(w).line(task, w.answer(task, "done", f"Questions for the client:\n- {long}\n\n## Artifacts\n- a.md", 0), NOW)
+    assert f"(no criterion): {clip_line(long.strip(), 160)}" in out and len(clip_line(long.strip(), 160)) == 160 and long.strip() not in out
+
+
+def test_questions_and_notes_flag_withhold_and_list_the_notes_after_the_questions(w: ProgressWorld, task: Message) -> None:
+    done = w.answer(task, "done", MIXED, 0)
+    out = lines(w).line(task, done, NOW)
+    assert (
+        f". artifacts withheld (ask first). 2 questions {FLAG}. 1 {NOTE_PART}: Style: 'himself' in Sam's table row (reviewer: harmless). (task {task.id})" in out
+    )
+    assert "a/b.md" not in out
+
+
+def test_the_notes_part_comes_before_no_feedback_yet(w: ProgressWorld) -> None:
+    first = request(w)
+    done = w.answer(first, "done", MIXED, 0)
+    assert (
+        f". 2 questions {FLAG}. 1 {NOTE_PART}: Style: 'himself' in Sam's table row (reviewer: harmless). no feedback yet. " in lines(w).line(first, done, NOW)
+    )
+    notes_only = w.answer(first, "done", ONE_NOTE, 0)
+    assert f". artifacts: a/b.md. 1 {NOTE_PART}: Style: 'himself' in Sam's table row (reviewer: harmless). no feedback yet. " in lines(w).line(first, notes_only, NOW)
+
+
+def test_an_id_tagged_marker_tail_before_a_list_of_notes_is_still_a_question(w: ProgressWorld, task: Message) -> None:
+    """A1/Deviation 1: the tail names C4, so it is a question; its path is withheld although the list holds only notes."""
+    body = f"Questions for the client: C4: should non-actions be excluded?\n- {STYLE}\n\n## Artifacts\n- a/b.md"
+    out = lines(w).line(task, w.answer(task, "done", body, 0), NOW)
+    assert f". artifacts withheld (ask first). 1 question {FLAG}. 1 {NOTE_PART}: Style: 'himself' in Sam's table row (reviewer: harmless). (task {task.id})" in out
+    assert "a/b.md" not in out
+
+
+def test_a_blocked_result_lists_its_notes_without_an_artifact_part(w: ProgressWorld, task: Message) -> None:
+    out = lines(w).line(task, w.answer(task, "blocked", ONE_NOTE, 0), NOW)
+    assert f". 1 {NOTE_PART}: " in out and "artifacts" not in out and FLAG not in out
+
+
+def test_a_failed_result_and_no_result_list_no_notes(w: ProgressWorld, task: Message) -> None:
+    assert NOTE_PART not in lines(w).line(task, w.answer(task, "failed", ONE_NOTE, 0), NOW)
+    assert NOTE_PART not in lines(w).line(task, None, NOW)
+
+
+def test_settled_notes_are_no_longer_listed(w: ProgressWorld) -> None:
+    first = request(w)
+    done = w.answer(first, "done", MIXED, 0)
+    assert NOTE_PART in lines(w).line(first, done, NOW)
+    rework(w, first, "relayed")
+    assert NOTE_PART in lines(w).line(first, done, NOW)  # the assistant's own rework settles neither part (DR-17)
+    rated_case = FixedCaseHistory([case([first], [verdict(0, first)])])
+    assert NOTE_PART not in lines(w, history=rated_case).line(first, done, NOW) and "for the client" not in lines(w, history=rated_case).line(first, done, NOW)
+    rework(w, first, "human")
+    out = lines(w).line(first, done, NOW)
+    assert NOTE_PART not in out and FLAG not in out  # the user asked for the rework: neither part
+
+
+def test_a_block_that_says_none_adds_no_part(w: ProgressWorld, task: Message) -> None:
+    out = lines(w).line(task, w.answer(task, "done", "Questions for the client: none.\n\n## Artifacts\n- a.md", 0), NOW)
+    assert "for the client" not in out and ". artifacts: a.md. " in out
