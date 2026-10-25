@@ -36,7 +36,7 @@ proposed default where a generic default exists, and say "reply 'defaults' to ac
 5. Code only: workspace (one new project directory), tests, packaging, commits. Default: tests per criterion, uv/pytest for Python, local commits, never push.
 6. Budget in runs (each agent wake-up is one run). Default: the estimate + 25%; every agent runs claude-sonnet-5.5 at high effort. A service's per-request
    budget is the plan's: the estimate + 25%, or more to cover one round of the user's questions or a rejection (the lead wakes once per result: about 2 runs per delegation + 1); if the user's cap is lower, say
-   in one line what that risks and offer them the number the plan's warning gives (they may keep theirs). Nothing below claude-sonnet-5.5 at high effort is available: never offer a cheaper model, tiers to
+   in one line what that risks; the block ends by asking whether to use the plan's number: if they take it, set that service's `budget` to it, raise `needs.budget_runs` to it if lower, and propose again (they may keep theirs). Nothing below claude-sonnet-5.5 at high effort is available: never offer a cheaper model, tiers to
    save runs or a lower effort; if the user asks for one, say so in one line.
 7. Review by another agent (default yes); approvals (default: the plan before anything starts, and spend beyond budget); progress (default: one line).
 

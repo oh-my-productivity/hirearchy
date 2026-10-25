@@ -83,10 +83,11 @@ def test_skill_records_feedback_only_on_the_users_own_judgement():
 
 
 def test_skill_sizes_service_budgets_and_reads_the_send_reply():
-    """D-E5-2: a service's per-request budget covers one round of the user's questions or a rejection, and step 6 offers the number the plan's warning gives."""
+    """D-E5-2: a service's per-request budget covers one round of the user's questions or a rejection. D-E7-3: the plan's block ends by asking whether to use the
+    plan's number, and step 6 says what to do with a yes."""
     text = flat(SKILL)
     for phrase in ("per-request budget is the plan's: the estimate + 25%, or more to cover one round of the user's questions or a rejection",
-                   "offer them the number the plan's warning gives", "about 2 runs per delegation + 1",
+                   "the block ends by asking whether to use the plan's number: if they take it, set that service's `budget` to it, raise `needs.budget_runs` to it if lower, and propose again", "about 2 runs per delegation + 1",
                    "say in one line what that risks", "a rework needs about 2 runs per delegation it requires + 1",
                    "the `send(budget=n)` reply says what the recipient can hand down", "grant enough in one go",
                    "ask the user once, with that number"):
