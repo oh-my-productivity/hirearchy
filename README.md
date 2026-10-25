@@ -832,6 +832,21 @@ The batch after study E7 (design: `docs/design/org-growth-phase-0a5.md`); it bui
   rendered with. The warning's text and every other issue are unchanged, so no plan is newly refused. The skill tells the assistant to show the block exactly and, on a yes, to set that service's `budget` to the number, raise `needs.budget_runs` to it if lower, and propose again. Limit: a yes costs one more plan turn (a new `plan_id`);
   an `approve` with no answer to the question keeps your number.
 
+## Quality (phase 0b)
+
+How the work you asked for has gone, derived from the files at each call (design: `docs/design/org-growth-phase-0b.md`): no ledger, no stored state, no new message field or event. `hirearchy quality [service] [--json]` prints it; root's MCP tool `quality(service=None)` returns the same text and is root only (agents never get it, and it
+changes nothing, so it does not end a request's "waiting on root" span in `observe trace`). `--json` prints the same data (schema 1, every key always present, no text limits) and is the only place a playbook version's changed lines appear.
+
+- *Per service, and for root's one-off tasks.* Cases by state; the user's verdict on each first delivery, in their words; escapes (the team reported `done`, then the user rejected it) with the verifier that signed them off and the cause a rule typed (`relayed-error`, `relayed-carry-over`, `contract-gap`, `reviewer-miss`, `untyped`), so a possible miss of the verifier
+  is told apart from a gap in the contract or an error of your own relayed rework. Only the user's verdicts count; your relayed readings and agents' verdicts are shown apart. A delivery with no verdict is "without a verdict" and never counted as accepted; files of a deliverable folder that are not what the team delivered are named
+  as not as delivered. Every rate with a zero denominator reads `n/a (0 of 0)`, never a pass.
+- *Runs.* Each case line compares the user's runs with the runs the user approved (the contract's budget, or more where your hand-downs raised it); your relayed reworks and the total are one line below it, your own spend. Top-ups, credited runs and a window cut by a later request are shown apart. Blocked tasks you moved past without a verdict
+  are listed with the runs their assignee still holds.
+- *Two alarms, tunable.* The repeat alarm (one id failing in 2 of the last 3 judged cases) and the cost alarm (a case above 1.25x its approved runs) are evaluated once 3 cases are judged, and read `n/a (k of 3 judged cases)` before. An optional `quality:` mapping in ORG.md sets `min_judged`, `repeat_window`, `repeat_failures`, `cost_ratio`;
+  an ORG.md that does not parse gives the defaults and a note.
+- *The timeline of bar changes.* Contract versions (and whether the user's answer confirmed each criterion), playbook versions, top-ups, and charter and model changes from the organization's git history (`unknown` without git). The marks are facts; no count is split by them.
+- *One-off tasks.* `feedback` also rates a task you sent without a service (no criterion, no link). The MCP tool and `Org` record it as your own `relayed` reading by default; the CLI records the user's (`--source human`).
+
 ## Security notes
 
 - Everything is local stdio with no network listener. Identity is enforced by the process environment, not by

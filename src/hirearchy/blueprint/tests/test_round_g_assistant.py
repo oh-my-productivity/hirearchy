@@ -107,6 +107,16 @@ def test_readme_documents_the_round_g_behaviours():
     assert "end-of-block marker sit outside it" in flat(README)
 
 
+def test_readme_quality_section_names_the_view_and_stays_short():
+    """PC-12: `## Quality (phase 0b)` sits after the last `## Org growth: phase ...` section and before `## Security notes`, in fewer than 30 lines."""
+    assert README.index("## Org growth: phase 0a.5") < README.index("\n## Quality (phase 0b)") < README.index("\n## Security notes")
+    section = README.split("\n## Quality (phase 0b)")[1].split("\n## ")[0]
+    text = flat(section)
+    for needle in ("hirearchy quality", "--json", "n/a (0 of 0)", "never counted as accepted", "relayed", "root only", "one-off", "`quality:`", "no ledger"):
+        assert needle in text, needle
+    assert len(section.splitlines()) < 30
+
+
 def test_readme_health_row_says_escapes_and_old_keys_are_unread():
     health = README.split("\n## Health")[1].split("\n## ")[0]
     row = flat(next(line for line in health.splitlines() if line.startswith("| `low_quality` |")))
