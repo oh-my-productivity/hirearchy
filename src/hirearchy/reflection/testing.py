@@ -54,6 +54,9 @@ class FixedCaseHistory(CaseHistory):
     def chains(self, owner: str, service: str, *, since: datetime | None, runs: bool) -> list[Case]:
         return [c for c in self.cases(owner, service) if since is None or c.started is None or c.started >= since]
 
+    def one_off_cases(self, *, runs: bool = True) -> list[Case]:
+        return [c for c in self._cases if c.service == ""]
+
     def case_of(self, task: Message) -> Case | None:
         return next((c for c in self._cases if task.id in {t.id for t in c.tasks}), None)
 

@@ -544,6 +544,84 @@ def test_chains_need_no_contract(w: ReflectionWorld) -> None:
     assert (case.id, case.owner, case.service, case.client_kind) == (task.id, "ceo", SERVICE, "human")
 
 
+# ------------------------------------------------------------------------------ one-off cases (0b 4.1, section 8)
+
+
+def one_off(w: ReflectionWorld, to: str = "ceo", title: str = "t", **kw: object) -> Message:
+    """Root hands ``to`` a task that is no service request."""
+    return w.s.d.post(Message(sender="root", to=to, type="task", title=title, body="b", budget=kw.pop("budget", 5), **kw))  # type: ignore[arg-type]
+
+
+def test_one_off_cases_group_roots_tasks_without_a_service_by_revises_to_one_assignee(w: ReflectionWorld) -> None:
+    define(w)
+    ask(w)  # a service request: not a one-off case
+    first = one_off(w, "ceo", "a")
+    other = one_off(w, "ops", "b")
+    again = one_off(w, "ceo", "a again", revises=first.id)
+    again_again = one_off(w, "ceo", "a once more", revises=again.id)
+    one, two = w.history.one_off_cases()
+    assert [t.id for t in one.tasks] == [first.id, again.id, again_again.id] and [t.id for t in two.tasks] == [other.id]
+    assert (one.id, one.owner, one.reworks, one.budget) == (first.id, "ceo", 2, 15) and (two.owner, two.reworks) == ("ops", 0)
+
+
+def test_a_rework_to_another_assignee_heads_its_own_case(w: ReflectionWorld) -> None:
+    first = one_off(w, "ceo")
+    moved = one_off(w, "ops", revises=first.id)  # the chain is followed within one assignee only
+    one, two = w.history.one_off_cases()
+    assert ([t.id for t in one.tasks], one.owner) == ([first.id], "ceo") and ([t.id for t in two.tasks], two.owner, two.id) == ([moved.id], "ops", moved.id)
+
+
+def test_one_off_verdicts_are_roots_feedback_notes_on_the_chain(w: ReflectionWorld) -> None:
+    first = one_off(w, "ceo", "a")
+    deliver(w, first)
+    no = note_on(w, first, verdict="reject", source="human", body="Too long.")
+    again = one_off(w, "ceo", "a again", revises=first.id)
+    deliver(w, again)
+    yes = note_on(w, again, verdict="accept", source="relayed")
+    other = one_off(w, "ops", "b")
+    deliver(w, other)
+    note_on(w, other, body="no verdict")  # a note without feedback
+    (case, elsewhere) = w.history.one_off_cases()
+    assert [(v.verdict, v.tier, v.step, v.task_id, v.message) for v in case.verdicts] == [("reject", "human", 0, first.id, no), ("accept", "relayed", 1, again.id, yes)]
+    assert elsewhere.verdicts == [] and case.state == "done" and case.verdict == "accept"
+
+
+def test_a_one_off_case_has_no_service_no_playbook_and_a_human_client(w: ReflectionWorld) -> None:
+    define(w)
+    revise(w)
+    task = one_off(w, "ceo")
+    deliver(w, task)
+    (case,) = w.history.one_off_cases()
+    assert (case.service, case.owner, case.playbook, case.used, case.client_kind, case.state) == ("", "ceo", 0, 0, "human", "done")
+    assert case.title == "t" and case.started is not None and case.finished is not None
+
+
+def test_case_of_stays_service_only(w: ReflectionWorld) -> None:
+    task = one_off(w, "ceo")
+    assert w.history.case_of(task) is None and [c.id for c in w.history.one_off_cases()] == [task.id]
+
+
+def test_the_runs_of_a_one_off_case_are_counted_over_the_assignees_team_and_its_window_ends_at_the_next_task(w: ReflectionWorld) -> None:
+    first = one_off(w, "ceo", "a")
+    w.use_run("ceo")
+    w.use_run("ceo/eng")
+    w.use_run("ops")  # not the team of ceo
+    one_off(w, "ceo", "b")  # the next task to the same assignee ends the first window
+    w.use_run("ceo")
+    one, two = w.history.one_off_cases()
+    assert (one.id, one.runs, one.cut, two.runs, two.cut) == (first.id, 2, True, 1, False)
+    assert [c.runs for c in w.history.one_off_cases(runs=False)] == [0, 0]
+
+
+def test_one_off_cases_with_runs_false_read_mail_only(w: ReflectionWorld) -> None:
+    first = one_off(w, "ceo")
+    w.use_run("ceo")
+    deliver(w, first, runs=1, budget=2)
+    mail_only = DerivedCaseHistory(w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, _Refusing(), _Refusing())
+    (case,) = mail_only.one_off_cases(runs=False)
+    assert (case.runs, case.credited, case.relayed_runs, case.used, case.returned, case.state) == (0, 0, 0, 0, 2, "done")
+
+
 class _Refusing(RunCounter, PlaybookTimelines):
     """A run counter and a playbook timeline that fail the test when asked."""
 

@@ -55,6 +55,13 @@ def test_its_chains_are_its_cases_kept_since_a_time_whatever_the_runs() -> None:
     assert history.chains("ghost", "brief", since=None, runs=True) == []
 
 
+def test_its_one_off_cases_are_the_cases_it_holds_without_a_service() -> None:
+    plain, service_case = case("T1", service=""), case("T2")
+    history = FixedCaseHistory([plain, service_case])
+    assert history.one_off_cases() == history.one_off_cases(runs=False) == [plain]
+    assert history.cases("ceo", "") == [plain]
+
+
 def test_an_empty_history_has_nothing() -> None:
     history = FixedCaseHistory()
-    assert history.cases("ceo", "brief") == [] and history.case_of(task("T1")) is None
+    assert history.cases("ceo", "brief") == [] and history.case_of(task("T1")) is None and history.one_off_cases() == []

@@ -453,6 +453,14 @@ class CaseHistory(Protocol):
         the fields that come from mail alone are filled (the runs before each hand-down are read as 0, so ``user_ceiling`` is a lower bound)."""
         ...
 
+    def one_off_cases(self, *, runs: bool = True) -> list[Case]:
+        """Root's one-off tasks as cases, oldest first: the tasks root sent without a ``service``, grouped by ``revises`` within one assignee (a
+        rework to another assignee heads its own case). A one-off case has ``service == ""``, ``owner`` the head's assignee, no playbook
+        (``playbook == used == 0``), a human client, and as verdicts root's feedback notes on a task of the chain; its runs are those of the
+        assignee's subtree in the same window as a service case's. With ``runs`` false only the mailboxes are read, as in ``chains``. ``case_of``
+        stays service-only."""
+        ...
+
     def case_of(self, task: Message) -> Case | None:
         """The case a service task belongs to (None for a task that is not a service request, or an unknown one)."""
         ...

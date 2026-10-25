@@ -139,8 +139,14 @@ class DerivedCaseHistory(CaseHistory):
         raised it reads 0 (``cases`` hands the contract's down)."""
         return self._chains(owner, service, since=since, runs=runs, per_request=0)
 
+    def one_off_cases(self, *, runs: bool = True) -> list[Case]:
+        """Root's tasks that are no service request, grouped by ``revises`` within one assignee (a rework to another assignee heads its own case)."""
+        sent = self._mail.sent(ROOT)
+        mine = sorted((m for m in sent if m.type == "task" and not m.service), key=lambda m: m.id)
+        return self._build(ROOT, sent, mine, "", runs=runs, per_request=0)
+
     def _chains(self, owner: str, service: str, *, since: datetime | None, runs: bool, per_request: int) -> list[Case]:
-        """The one builder of ``cases`` and ``chains``: with ``runs`` false it reads the mailboxes and the agents' tree only (no run log, no playbook
+        """The builder of ``cases`` and ``chains``: with ``runs`` false it reads the mailboxes and the agents' tree only (no run log, no playbook
         file), so the run numbers are 0 and the version used is 0."""
         client = parent(owner)
         if client is None:
@@ -151,11 +157,16 @@ class DerivedCaseHistory(CaseHistory):
              and (since is None or (msg_time(m) or since) >= since)),
             key=lambda m: m.id,
         )
+        return self._build(client, sent, mine, service, runs=runs, per_request=per_request)
+
+    def _build(self, client: str, sent: Sequence[Message], mine: Sequence[Message], service: str, *, runs: bool, per_request: int) -> list[Case]:
+        """The cases that the tasks ``mine`` of the client (oldest first, all of ``service``, "" for one-off tasks) make, from its ``sent`` box.
+        One chain is a head task and the tasks that revise it, or a task of the chain, to the same assignee, who owns the case."""
         by_id = {m.id: m for m in mine}
 
         def head(m: Message) -> str:
             seen = {m.id}
-            while m.revises in by_id and m.revises not in seen:
+            while m.revises in by_id and m.revises not in seen and by_id[m.revises].to == m.to:
                 m = by_id[m.revises]
                 seen.add(m.id)
             return m.id
@@ -170,11 +181,12 @@ class DerivedCaseHistory(CaseHistory):
             (m for m in sent if m.type == "note" and not m.feedback and link_ids(m) and m.reply_to in by_note), key=lambda m: m.id,
         )
         kind = "human" if client == ROOT else "agent"
-        others = sorted(m.id for m in sent if m.type == "task" and m.to == owner)
-        team = self._agents.subtree(owner)
-        timeline = self.playbook_timeline(owner, service) if runs else []
         out = []
         for first, tasks in chains.items():
+            owner = tasks[0].to
+            others = sorted(m.id for m in sent if m.type == "task" and m.to == owner)
+            team = self._agents.subtree(owner)
+            timeline = self.playbook_timeline(owner, service) if runs and service else []
             ids = {t.id for t in tasks}
             last = tasks[-1]
             res = results.get(last.id)
