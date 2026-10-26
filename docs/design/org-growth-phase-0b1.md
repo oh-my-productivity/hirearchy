@@ -1,6 +1,6 @@
 # Org growth, Phase 0b.1: the batch after G0 (technical design)
 
-Status: design, revision 1. Branch `feat/org-growth-phase-0b1` off `main` `c68ae679` (the G0 study commit; product code identical to `3c841bb9`);
+Status: design, revision 2 (the 14 findings of the design review's pass 1 resolved; responses in 13). Branch `feat/org-growth-phase-0b1` off `main` `c68ae679` (the G0 study commit; product code identical to `3c841bb9`);
 worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0b1`. Baseline: `skills/hirearchy/SKILL.md` has 125 lines, md5
 `a3e46347b70a7ece5f734f70198c607f`; this batch does not edit it unless F-G0-7 is the product's (9).
 
@@ -26,7 +26,8 @@ the rework. **F-G0-3:** `progress` raised `FileNotFoundError` on a result that `
 **E7S3-6:** 0b 19.3 claims that replay and history agree for E7 s3; with history they do not. **F-G0-7:** every M0 stream had 15-19 failed
 `tool_call` calls with empty arguments and no M1 stream had any; the cause is found from G0's raw evidence and fixed only if it is the product's.
 Nothing new is stored: no ledger, no state, no message field, no event, no new refusal and no new runtime dependency. SKILL.md and every MCP tool
-docstring are unchanged (unless F-G0-7's cause is in them). **One pre-registered expectation moves under F-G0-2 (3.5); the manager ruled it
+docstring are unchanged (unless F-G0-7's cause is in them). P3's notes in `progress`, `status` and `whoami` change in one way only: a `relayed`
+line can name the tie rule's chosen delivery instead of the head's late result; its words are unchanged (4.4). **One pre-registered expectation moves under F-G0-2 (3.5); the manager ruled it
 (R-0b1-1, 12): it is amended in the fix commit, under stated conditions.**
 
 ## 2. Technology stack (locked)
@@ -55,8 +56,10 @@ def user_spend(case: Case) -> int:
     return user_committed(case)  # the user's runs, plus what the user's requests and grants handed down and nobody used or got back
 ```
 `user_cost`, `user_committed`, `user_held`, `user_approved` and `_cases._spend` are unchanged (`user_committed` is defined below `user_spend`; the
-call resolves at run time). This supersedes 0a.3 4.2's "user spend" row (the tasks' budgets only) and makes the code match 0b section 3 and 4.2 as
-written ("the user's runs the team still holds"; "the runs handed down that were neither used nor returned").
+call resolves at run time). This makes the code match 0b section 3 and 4.2 as written ("the user's runs the team still holds"; "the runs handed
+down that were neither used nor returned"). It supersedes, as written there: 0a.1 6.1's `case_spend` (the tasks' runs still out only); 0a.3 4.2's
+"user spend" row (the tasks' budgets only) and the first clause of 0a.3's I1 ("`case_spend` is unchanged"); and 0b 3's `case_spend` row ("0a.1 6.1,
+unchanged"). Those documents are not edited; the one design text this fix edits is 0a.5 4.7's row, under R-0b1-1 (12).
 
 **3.3 Zero and empty cases.**
 - No grant (`user_granted == 0`: every agent client's case, every hand-built `Case`): both functions return today's value.
@@ -75,7 +78,9 @@ has a held grant: m0-s1 `6c7a` (m1-s3 `b5e4`'s grant is on a `done` case).
 
 **3.5 The replays it moves (computed for this design).** Old and new formulas were evaluated on every case of every materialization the e2e tests
 make: the 16 corpora of `org_replay_manifest.MANIFESTS` at their end, and the 26 time cuts of `test_org_growth_0a3.py` (E5), `0a4.py` (E6) and
-`0a5.py` (E7) (a one-off script, not kept). Every grant case at a corpus end is `done` (E `c686`, A5 `f768`, E4 s3 `6947`, E5 s3 `e268`, E6 s3 `4a3e`,
+`0a5.py` (E7) (a one-off script, not kept). The 16 are the 16 keys of `MANIFESTS` (E, E2, A5, E3, E4-s1r, E4-s2r, E4-s3, E5-s1 to E7-s3). E3's two
+constructed `VARIANTS` (`r2-links-r1`, `r3-overspend-<N>`) are not among them and were not computed: they add a link note without `budget` and empty
+run logs of `lead` to E3, which has no grant, so `user_granted` stays 0 and 3.3's first rule leaves both figures as today. Every grant case at a corpus end is `done` (E `c686`, A5 `f768`, E4 s3 `6947`, E5 s3 `e268`, E6 s3 `4a3e`,
 E7 s1 `fb17`, E7 s2 `3ca4`): 0 moves. Four time cuts move:
 
 | Cut | Case | Old -> new (`user_spend`, `case_spend`) | What the test there asserts |
@@ -106,7 +111,7 @@ the design stopped and asked: the manager ruled **R-0b1-1: yes** (12). The appro
   `blocked`; a grant of 2; 1 more run: `user_granted` 2, `runs` 13, `user_spend` 14, `case_spend` 14, `user_committed` 14, `user_approved(case, 12)` 14.
 - The amended replay (R-0b1-1, 12): in the fix commit, `test_a2_e7_s2_the_grant_68df_approves_13` becomes
   `test_a2_e7_s2_the_grant_68df_cost_14_over_13`, asserting `user_approved(case, 12) == 13`, `user_cost(case) == 14` and `case_total(c671)` equal to
-  the text of 3.5. Its docstring says the published 13 was superseded by 0b.1 F-G0-2 (R-0b1-1). It is RED at `c68ae679` (13) and GREEN with the fix.
+  the text of 3.5. Its docstring says the published 13 was superseded by 0b.1 F-G0-2 (R-0b1-1) and decomposes the 14 in 12's words (condition 3). It is RED at `c68ae679` (13) and GREEN with the fix.
 - No existing unit test pins today's figure for an open or blocked case with a held grant (searched: `test_cases.py`, `test_pure_functions.py`,
   `test_alarms.py`, `test_steps.py`, `progress/tests`). If the build finds one, the fix commit changes it and names it with the old and new value;
   a pre-registered replay value is never such a pin (7).
@@ -116,7 +121,10 @@ the design stopped and asked: the manager ruled **R-0b1-1: yes** (12). The appro
 **4.1 The rule** (the ruling, item 2, as `protocol.md` 3.5 states it and `harness/rederive_quality.py:_attributed` implements it). OQ-2's given
 delivery is the delivery whose checked artifact equals the user's file. When deliveries of the case qualify, it is the one that carries a human-tier
 verdict (of several, the newest result among them). When none carries one, it is the latest: the one P3's `relayed` finding names, or, with no
-finding, the case's latest delivery (`_quality_rules._given`'s fallback), as today.
+finding, the case's latest delivery (`_quality_rules._given`'s fallback), as today. This supersedes, as written there: 0b 3's "given delivery"
+row and 0b 4.3's "without a verdict" row (the delivery a `relayed` finding names, else the case's latest delivery), which now read with the tie rule
+in front; and the `DeliverableFinding.kind` lists of 0a.3 (DR-0a3-6: the `kind` comment gains `relayed`) and 0b (B4.8: `written` is set for
+`differs`, `relayed` and `unknown` only), which gain `given` (4.4; `written` is set for it too). Those documents are not edited.
 
 **4.2 Where.** Only P3 knows checked artifacts, so the rule is applied in `SRC/reflection/_deliverable_checks.py:FolderDeliverableChecks._folder_rule`,
 the site the brief names; `_records._attributed` keeps only flagging the delivery a finding names. A records-side choice was rejected: records sees
@@ -135,20 +143,42 @@ checked version equals the file:
    `_latest_delivery(case, call.latest)`: the last task of `case.tasks` whose latest result is `done`, the delivery `_given` falls back to), return
    `("given", chosen, ())`; otherwise `("", None, ())`, as today.
 
-The scan of step 2 runs only when `P` carries no human-tier verdict and covers pairs of the same file name and case: a few more `at_result` calls,
-inside the existing bound of 40 pairs and 5 s.
+The scan of step 2 runs only when `P` carries no human-tier verdict and covers pairs of the same file name and case: a few more `at_result` calls.
+They count against the call's existing bound of 40 pairs and 5 s, so in a folder with many files the files walked later can reach the fallback to
+the team's current file sooner than today (a declared limit, 11).
 
-**4.4 The `given` kind** (new value of `DeliverableFinding.kind`; `task` names the chosen delivery; `written` and `settled` as for `relayed`). It says
-the file is as delivered and names the given delivery. `_entry` returns it **only when `call.settled` is true** (the quality view's one call:
-`records()` asks `findings(ROOT, None, settled=True)`); P3's notes in `progress`, `status` and `whoami` call without `settled` and never see it, so
-`deliverables_note` and its texts are unchanged. `_records._attributed` treats `given` as `relayed`: the delivery it names is the given one; it voids
-nothing and is not counted. `api.py` documents the kind on `DeliverableFinding.kind`, `.task` and `DeliverableChecks.findings`. It is emitted only
-when it changes the given delivery (step 4), so a file equal to the case's latest delivery yields no new finding.
+**4.4 The `given` kind, P3's notes and the fake** (new value of `DeliverableFinding.kind`; `task` names the chosen delivery; `written` and `settled`
+as for `relayed`). It says the file is as delivered and names the given delivery. `_entry` returns it **only when `call.settled` is true** (the
+quality view's one call: `records()` asks `findings(ROOT, None, settled=True)`), whatever its own `settled` mark; P3's notes in `progress`, `status`
+and `whoami` call without `settled` and never see it. `_records._attributed` treats `given` as `relayed`: the delivery it names is the given one; it
+voids nothing and is not counted. `api.py` documents the kind on `DeliverableFinding.kind` and `.task`, and documents on `DeliverableChecks.findings`
+the Protocol rule "a `given` finding is returned only with `settled=True`". It is emitted only when it changes the given delivery (step 4), so a file
+equal to the case's latest delivery yields no new finding.
+
+**P3's notes and a `relayed` tie.** Step 3 applies in every call, the default one included, so that P3 names one delivery for one file in every
+view. A `relayed` finding that the default call shows (one that is not settled: no human-tier verdict on its case at or after the file's last write)
+can therefore name the tie rule's chosen delivery, an older equal delivery with a human-tier verdict, where today it names the head's late result.
+That happens when the user's verdict on that delivery was recorded before the user's copy was written (she accepted `b`, then the assistant copied
+it, then the head's late result and a relayed rework followed). The line's words (`_relayed_line`) are unchanged; only its task id differs. This is
+the one change to the notes' content (1); `deliverables_note` and its texts are otherwise unchanged. Applying step 2 only when `call.settled` is true
+was rejected: the notes would then name a delivery the quality view does not, for the same file.
+
+**The fake.** `reflection/testing.py:FixedDeliverableChecks.findings` keeps the rule too: it returns `f` when `(settled or (not f.settled and
+f.kind != "given")) and (service is None or service in f.services)`, and its docstring says so. Without it a test could get a `given` finding from a
+default call, and `deliverables_note` would render it inside a "not what the team delivered as checked" block (R8; refactor-principles "L").
+`DeliverableHarness` gains `populate_given: Callable[[], str]`, used instead of `populate`: afterwards root's `weekly-brief` has exactly one finding,
+of kind `given`, not settled, naming the returned task id. `deliverable_checks_fixed` puts such a finding (`settled=False`).
+`deliverable_checks_fs` builds the real class itself, `FolderDeliverableChecks(w.s.catalog, w.history, w.s.d.mail, FsDeliverableFolder(), versions,
+HashBlobIds(), w.s.d.clock)` with a `FixedCheckedVersions` it holds, instead of `w.deliverables`: `_world` builds `w.deliverables` the same way with an
+empty `FixedCheckedVersions`, so `populate`'s `unknown` finding is unchanged. Its `populate_given` builds the m0-s2 shape (4.8) over the fs world:
+root asks (`a`); `ceo` answers `a` `blocked`; root's human rework `b` (`revises` `a`); `ceo` answers `b` `done` listing `ceo/work/memo.md`
+(`at[(b's result, path)]` = V2); `ceo` answers `a` `done` listing it (`at` = V2, the head's late result); root's human accept on `a`; then the user's
+`deliverables/memo.md` is written with V2 and an mtime one day after the fake clock's now, after the accept, so the finding is not settled.
 
 **4.5 Why git-given versions only.** Without git (every replay, and every pair past P3's bound), `_checked` falls back to the team's current file, so
-every delivery that lists the file name reads the same version and "ties". The rule would then act on the fallback, not on what the team checked
-(on E7 s3's replay it would flag `62a5` and move E7S3-1). So no candidate is added where git did not answer; the replays without history are
-untouched by construction.
+every delivery that lists the file name reads the same version and "ties". The rule would then choose by verdicts alone among versions nobody
+checked, not by what the team checked. So no candidate is added where git did not answer; the replays without history are untouched by
+construction.
 
 **4.6 Zero and empty cases.**
 - One delivery equals the file: `P` is the only candidate. With a human verdict and `P` the case's latest delivery: no finding, as today; with a
@@ -168,17 +198,22 @@ the case is blocked and Lena's reject `...-root-02c4` is on `52e3`, the case's l
 `differs` finding still names the newest pair (the rule is about equal files only).
 
 **4.8 Tests.**
-- Real git, `TESTS/e2e/test_org_growth_0b_given.py` (its helpers `commit`, `deliver` (gains `status=`), `judge`, `record_of`), new fixture `tie` of
-  E7 s2's shape: head `a` reported `blocked`; human rework `b` (revises `a`) delivered with V2; the lead then reports `a` `done` listing the same
-  file, unchanged (the head's late result); relayed rework `c` delivered with V3; the user's copy is V2. Each delivery is committed as today.
-  - `test_the_head_s_late_result_ties_with_the_rework_the_user_judged_and_her_verdict_decides` (Lena's reject then accept on `b`, the relayed reject
-    on `c`): one finding, `relayed`, task `b`, relayed `(c,)` (at `c68ae679`: task `a`); `unjudged_cases []`, `relayed_only []`,
+- Real git, `TESTS/e2e/test_org_growth_0b_given.py` (its helpers `commit`, `deliver`, `judge`, `record_of`; `deliver` gains `status="done"` and
+  `commit=True`: with `commit=False` it reports without committing, so that two results can share one commit), new fixture `tie` of E7 s2's shape:
+  head `a` reported `blocked`; human rework `b` (revises `a`) delivered with V2; the lead then reports `a` `done` listing the same file, unchanged
+  (the head's late result); relayed rework `c` delivered with V3. Each delivery is committed as today. Each test writes the user's copy (V2) itself.
+  - `test_the_head_s_late_result_ties_with_the_rework_the_user_judged_and_her_verdict_decides` (the copy, then Lena's reject and accept on `b`, the
+    relayed reject on `c`): one finding, `relayed`, task `b`, relayed `(c,)` (at `c68ae679`: task `a`); `unjudged_cases []`, `relayed_only []`,
     `unseen_relayed [a]`, `not_as_delivered []`, deliveries 3, judged 1. RED first.
   - `..._with_no_human_verdict_the_newest_result_is_named` (only the relayed reject on `c`): task `a`, as today; `unjudged_cases [a]`. Guard.
-  - The m0-s2 shape (`tie` without `c`; `b`'s and `a`'s late results committed in **one** commit): no verdict: `findings(ROOT, SERVICE,
-    settled=True) == []`, `unjudged_cases [a]` (guard); the user's reject on `b` (the case's latest delivery): `[]`, `unjudged_cases []` (guard);
-    the user's accept on `a`'s late delivery: `settled=True` gives one `given` finding naming `a`, the default call gives `[]`, and
-    `unjudged_cases []` (at `c68ae679`: `[a]`, the latest delivery `b` has no verdict). RED first.
+  - The m0-s2 shape, fixture `tie_m0_s2` (`tie` without `c`; `b`'s and `a`'s late results reported with `commit=False`, then one `commit`; the one
+    commit is cosmetic: `at_result` gives V2 either way). Three tests, each with one state of the verdicts, never cumulative:
+    - no verdict: `findings(ROOT, SERVICE, settled=True) == []`, `unjudged_cases [a]`. Guard.
+    - only the user's reject on `b` (the case's latest delivery): `[]`, `unjudged_cases []`. Guard.
+    - only the user's accept on `a`'s late delivery, **then** the copy written (so the verdict is older than the file and the finding is not
+      settled): `findings(ROOT, SERVICE, settled=True)` is one `given` finding naming `a` with `settled` False; the default call gives `[]` (here
+      the `given` rule's doing, not the settled filter's); `unjudged_cases []` (at `c68ae679`: `[a]`, the given delivery being the latest, `b`,
+      which has no verdict). RED first.
   - The existing three tests stay as they are (`b` carries the accept and is the walk's own pair).
 - Replay of m0-s2 T4 **on a git history built from the kept files** (`test_org_growth_0b1.py::test_f_g0_1_m0_s2_t4_the_tie_without_a_verdict_is_the_latest_delivery`,
   git-guarded): the G0 kit at `m0-s2`, cut `20261026T062340000000` (G0's `quality/turn-04.json` was written at 06:23:40; no message lies between
@@ -190,12 +225,25 @@ the case is blocked and Lena's reject `...-root-02c4` is on `52e3`, the case's l
   Evidence facts on the kept files: commit `0491b2b` (06:23:12) holds `lead/sent/...-e876.md` and `...-f5df.md` (`org-git-log.txt`); v2 `0d07ec4` was
   committed at 06:21:48 and v3 at 06:25:26, after the cut (`memos/versions/INDEX.txt`). It is GREEN at `c68ae679` too: the zero case of the rule on
   kept history, which must not move.
-- Unit (`SRC/reflection/tests/test_deliverable_checks.py`, `FixedCheckedVersions`: `at` is git-given, `now` the fallback): every case of 4.6;
-  `relayed` names the older equal pair with the human verdict; several with verdicts: the newest result; a fallback-equal pair is no candidate; a
-  `P` from the fallback keeps today's walk; another case's pair is no candidate; a one-off pair keeps today's choice; `given` only with
-  `settled=True`; `given` only when the chosen delivery is not the case's latest; `findings()` never holds `given`. A test that pins P3's
-  newest-first choice in a tie with a human verdict pins the defect: the commit changes it and names it.
+- Unit (`SRC/reflection/tests/test_deliverable_checks.py`, `Rig` with `FixedCheckedVersions`: `at` is git-given, `now` the fallback; the world's
+  `FakeClock`, whose `monotonic` moves 1 µs per reading, so P3's 5-s bound is never reached): every case of 4.6; `relayed` names the older equal pair
+  with the human verdict; several with verdicts: the newest result; a fallback-equal pair is no candidate; a `P` from the fallback keeps today's walk;
+  another case's pair is no candidate; a one-off pair keeps today's choice; `given` only when the chosen delivery is not the case's latest. And two
+  tests with the verdict **older than the file** (finding not settled):
+  - the default call (no `settled`) on a `relayed` tie (the `tie` shape: the accept on `b`, then the copy): one `relayed` finding naming `b`,
+    relayed `(c,)`, `settled` False (at `c68ae679`: `a`); `deliverables_note` of it is today's line with `b`'s id;
+  - the m0-s2 shape (the accept on `a`, then the copy): `findings(ROOT, SERVICE) == []` and `findings(ROOT, SERVICE, settled=True)` is one `given`
+    finding naming `a`, `settled` False.
+  A test that pins P3's newest-first choice in a tie with a human verdict pins the defect: the commit changes it and names it.
+- Contract (`SRC/reflection/tests/test_contract_deliverable_checks.py`, over `IMPLEMENTATIONS[DeliverableChecks]`):
+  `test_a_given_finding_is_returned_only_with_settled_true`: after `populate_given` (4.4), `findings(ROOT) == [] == findings(ROOT, service)`, and
+  `findings(ROOT, settled=True)` and `findings(ROOT, service, settled=True)` are the one finding, `("given", <the returned task>, False)` for
+  `(kind, task, settled)`. The fake's RED is its filter of today; the real class's RED is that `given` does not exist yet.
 - `SRC/reflection/tests/test_records.py`: a `given` finding flags its delivery `given` like `relayed`, voids nothing and is not counted.
+- Determinism of the real-git tests. They run on the system clock, as `test_org_growth_0b_given.py` does today: P3 asks git only while its call is
+  under 5 s (`clock.monotonic()`; `testkit.clocks.ClockReading` keeps the system's monotonic, and a frozen one would freeze the runtime's waits too).
+  Each call here asks at most 6 pairs of a local repository. A git slower than that makes P3 compare with the team's current file (V3 for `tie`):
+  the `tie` tests then fail, never pass falsely; the m0-s2 T4 replay is a zero case whose expected values the fallback gives too.
 
 ## 5. F-G0-3: a message file that moves between the listing and the read
 
@@ -204,15 +252,16 @@ the case is blocked and Lena's reject `...-root-02c4` is on `52e3`, the case's l
 open `inflight/...-3386.md`. The raise comes from `FsMailbox.messages` (`SRC/mail/_mailbox.py`), the runtime's `MailboxReader` (`app/wire_mail.py`),
 which parses every listed file with no guard (`CachingMessageParser.parse_as` opens the path); every `progress` read of root's boxes goes through it.
 
-**5.2 The rule.** A file listed in a received box but gone when it is read is read from its new place when that place is another of the received
-boxes the call asked for, and is otherwise left out of this call. A message is returned once per call. Nothing else changes: the order (by id), the
-boxes, and every other error (a file that does not parse, a permission error) still raise as today.
+**5.2 The rule.** A file listed in a received box (`RECEIVED_BOXES`: `inbox`, `inflight`, `read`) but gone when it is read is read from its new
+place when that place is another of the received boxes the call asked for, and is otherwise left out of this call. A message is returned once per
+call. Nothing else changes: the order (by id), the boxes, the `sent` box's reads, and every other error (a file that does not parse, a permission
+error) still raise as today.
 
 **5.3 The change, in the reader** (`FsMailbox.messages`). For each listed file of each asked box: parse it; on `FileNotFoundError`, when the box is one
 of `RECEIVED_BOXES`, try the same file name in each other asked box of `RECEIVED_BOXES`, in that order (a second `FileNotFoundError` goes on to the
 next); found nowhere, skip it. A file name already read from one received box in this call is not read again from another: the walk can meet a
-moving file twice (in `inbox` before the move, in `read` after it). The `sent` box never moves and keeps today's reads, except that a `sent` file
-that is gone (an agent retired mid-call) is skipped. The fix is in `mail` rather than in `progress` because the race is the reader's: a guard in
+moving file twice (in `inbox` before the move, in `read` after it). The `sent` box keeps today's reads: a `sent` file that is gone still raises (no
+writer moves a sent copy, and the brief's defect is a result that `inbox` moved). The fix is in `mail` rather than in `progress` because the race is the reader's: a guard in
 `progress` would leave `status`, `quality` and the scheduler's counts raising on the same race. `DirMtimeCachingMailbox` (the dashboard's) already
 skips such a file and is unchanged; `find_anywhere` already never raises and is unchanged (11). **The single writer is unchanged:** `FsBatchStore`
 stays the only writer of `inflight/` and `read/`; `inbox` still moves the file; `FsMailbox` only reads (R9).
@@ -221,20 +270,27 @@ stays the only writer of `inflight/` and `read/`; `inbox` still moves the file; 
 Moved back (a failed run's `end(ok=False)`, inflight -> inbox) after `inbox` was listed: found by the lookup, once. Moved twice before the read: the
 lookup tries every other asked received box. Moved to a box the call did not ask for (`messages(addr, "inflight")`): skipped. Removed: skipped. A
 missing box directory: `[]`, as today. The same name present in two received boxes at once (an anomaly no writer makes): returned once, from the
-first box listed.
+first box listed. A `sent` file gone between the listing and the read: raises, as today (tested, 5.5).
 
 **5.5 Tests** (deterministic: the move is injected between the listing and the read).
-- `SRC/mail/testing.py` gains `MovingMessageParser(CachingMessageParser)`: given `{source path: target path}`, the first `parse` of a source path
-  `os.replace`s it to its target, then parses as usual, and so raises the real `FileNotFoundError`. It is the seam of the race: the listing has
-  happened, the read has not.
-- `SRC/mail/tests/test_fs_mailbox.py`: each case of 5.4 with the parser; `received(ROOT)` holds the moved message once; a file that does not parse
-  still raises; a listing without a move is equal to today's.
-- Replay of m1-s3 T7 (`test_org_growth_0b1.py::test_f_g0_3_m1_s3_t7_progress_reads_the_result_inbox_moved`): the G0 kit at `m1-s3`, cut
+- `SRC/mail/testing.py` gains `MovingMessageParser(CachingMessageParser)`, beside `CountingMessageParser`: given `{source: target}` (paths), it
+  overrides `parse_as`; the first parse of a path whose `Path.resolve()` equals a source's `resolve()` `os.replace`s it to its target and appends
+  the source to `moved: list[Path]`, then parses the path as usual, and so raises the real `FileNotFoundError`. Resolving both sides makes the match
+  independent of how `OrgLayout` spells the path (macOS's `/private/var` against `tmp_path`'s `/var`). It is the seam of the race: the listing has
+  happened, the read has not. Every test that uses it asserts `moved` holds its source once, so a move that did not happen fails the test.
+- `SRC/mail/tests/test_fs_mailbox.py`: each case of 5.4 with the parser; `received(ROOT)` holds the moved message once; a `sent` file moved away
+  (to a path outside the boxes) still raises `FileNotFoundError` from `messages(addr, "sent")`; a file that does not parse still raises; a listing
+  without a move is equal to today's.
+- Replay of m1-s3 T7 (`test_org_growth_0b1.py::test_f_g0_3_m1_s3_t7_progress_reads_the_result_inbox_moved`; `from testkit.progress_world import
+  describe_progress`): the G0 kit at `m1-s3`, cut
   `20261026T085214255000` (#33's time), `inflight={ROOT: ["20261026T084941501890-lead-3386"]}` (between `begin` and `end` of root's `inbox`). The
   organization is opened inside `wiring.overriding({**clock_ports(fixed), MessageParser: MovingMessageParser({<org>/inflight/...-3386.md:
   <org>/read/...-3386.md})})`: `describe_progress(org, "20261026T084600894818-root-68a8")` does not raise, names the task and its `done` state, and
-  equals the text of the control (the same cut with the result in `read/`, the same fixed clock). Root's `inflight/` is read only through `messages`
-  here (`has_inflight` is asked of agents only: `progress/_states.py`, `_liveness.py`, `attention/_waiting.py`), so the two texts can be equal. At
+  equals the text of the control (the same cut with the result in `read/`, the same fixed clock), and the parser's `moved` holds the source once.
+  Root's `inflight/` is read only through `messages`
+  here (`has_inflight` is asked of agents only: `progress/_states.py`, `_liveness.py`, `attention/_waiting.py`), so the two texts can be equal. If
+  the RED run shows that another reader opens the file first (the text then differs from the control), the coder reports it with the reader's
+  name; the comparison with the control is never loosened. At
   `c68ae679` it raises the m1-s3 error, `[Errno 2] No such file or directory: '.../inflight/20261026T084941501890-lead-3386.md'`.
 - No contract-suite change: the race needs a parser seam that only the file implementation has (R8's suites are unchanged).
 
@@ -249,8 +305,12 @@ had at the 21-character stamp `cut` (inclusive) at `root/org` and returns it:
   `root/no-deliverables` (never created): the only edit of a kept record, as in `org_replay`. The kept contracts name
   `/tmp/hirearchy-g0-<stream>-<epoch>/deliverables`, and G0's sandboxes are still in `/tmp`, so without it P3 would read a folder outside the test;
 - each pinned deliverable is `(name, version file under memos/versions/, UTC mtime, deliverables-log line)`; the file is written with those bytes
-  and that mtime. m0-s2 T4 pins `("memo-2026-10-05.md", "memo-2026-10-05.v2.0d07ec4.md", "2026-10-26T06:23:13.513Z", 3)` (call #26's `cp`; md5
-  `47d12bc382b8200461240047cb3a935c`);
+  and that mtime. The log line is 1-based and read with `org_replay.log_block` (its convention: the line must be a header `[<time>] call #<n> ...`).
+  m0-s2 T4 pins `("memo-2026-10-05.md", "memo-2026-10-05.v2.0d07ec4.md", "2026-10-26T06:23:13.513Z", 3)`: line 3 of m0-s2's `deliverables-log.txt`
+  is `[2026-10-26T06:23:13.513Z] call #26 turn 4 execute_bash`, the `cp` (md5 `47d12bc382b8200461240047cb3a935c`);
+- an INDEX entry `<path> v<k> <sha7> <time> md5 <md5>` (`org_replay.index_entries`, reused; the `working tree` lines are not versions) maps to its
+  version file `memos/versions/<stem of path>.v<k>.<sha7>.md`, the sha taken from the entry's third column (`org_replay.newest_version`'s rule):
+  `lead/writer/work/memo-2026-10-05.md v2 0d07ec4 ...` is `memo-2026-10-05.v2.0d07ec4.md`. The kit checks the file's md5 against the entry;
 - with `team_files`, for each path of `memos/versions/INDEX.txt`, the newest version committed at or before `cut` (G0's INDEX times are `Z`) is
   written at its org path (m0-s2 T4: `lead/writer/work/memo-2026-10-05.md` = v2);
 - with `history` (requires `team_files`), the organization becomes a git repository of **one commit** holding everything materialized (`git init
@@ -259,7 +319,8 @@ had at the 21-character stamp `cut` (inclusive) at `root/org` and returns it:
   first checks: for every `done` result in root's received boxes at the cut, no INDEX version of a path it lists was committed after the result's
   stamp and at or before the cut; a violation fails the test (m0-s2 T4: none; v3 came at 06:25:26).
 
-A missing evidence file, a bad cut, a pin whose log line does not start with `[<the pinned time>] call #`, an unfaithful history or a failing git
+A missing evidence file, a bad cut, a pin whose log line is not a header with the pinned time, an INDEX entry whose version file is missing or
+whose md5 differs, an unfaithful history or a failing git
 call fails the test, never skips it (the tests that use `history` carry the git `skipif` of `test_org_growth_0b_given.py`). The tests set
 `HIREARCHY_WORKSPACE_ROOTS` to their `tmp_path`. `TESTS/meta/test_g0_replay_kit.py` tests it: the cut (inclusive), the root `inflight` mapping, the
 contract equal to `service/history--SERVICE.v1.md` except the one rewritten line (never a `/tmp/hirearchy-g0-` path), the pinned file's md5 against
@@ -289,11 +350,14 @@ history-path view (`harness-selfcheck/e7-s3/rederived.json`) has `not_as_deliver
   5834 (...-lead-f639, checked v3 1c5b8a5), and reports differs naming 5834: not_as_delivered [{"case": 09df, "task": 5834}], nothing voided (5834
   carries only the relayed reject ...-root-2da1), and the judged line reads "not as delivered: 1 (...-root-5834)". The replay compares with the
   team's current file, v4, and finds nothing.` (ids and code spans formatted as the paragraph around it).
-- **19.3, E7S3-6.** `the checked artifact of d9bc (whose result is blocked)` becomes `the version d9bc's run committed (its result ...-lead-da3c is
-  blocked, so it is no delivery's checked artifact: D4)`; the item ends with `With history (G0's self-check, SELFCHECK.md item 3; not a replay
-  expectation): not_as_delivered [{"case": 09df, "task": 5834}], as the kit-limit paragraph says.`
+- **19.3, E7S3-6.** `the three delivered memos equal the team's current files` becomes `the three memos the user was given equal the team's current
+  files` (memo 1's file came from a blocked result, which is no delivery: D4); `the checked artifact of d9bc (whose result is blocked)` becomes `the
+  version d9bc's run committed (its result ...-lead-da3c is blocked, so it is no delivery's checked artifact: D4)`; the item ends with `With history
+  (G0's self-check, SELFCHECK.md item 3; not a replay expectation): not_as_delivered [{"case": 09df, "task": 5834}], as the kit-limit paragraph
+  says.` E6S1-6 and E7S1-6 keep their wording: their memo 1 is a delivery's checked artifact.
 - **19.2:** checked; its E7 paragraph says only that the replay compares with the team's current files and never finds a `relayed` file. It makes
-  no "agree" claim, so it is unchanged. (The E6 block of 19.3 has a like sentence; it is outside this correction and was not re-derived.)
+  no "agree" claim, so it is unchanged. The E6 block of 19.3 has a like sentence ("in s1 and s3 the replay and the history agree"); it is outside
+  this correction, was not re-derived on the history path, and is backlog (11).
 
 ## 9. F-G0-7: the investigation plan (fix only if it is the product's)
 
@@ -317,12 +381,17 @@ but they reach org runs only, never the assistant's session (to be confirmed in 
 4. What the product served both arms: the skill md5 (`skill-check.txt`, equal in 6 of 6), the MCP server's instructions and tool descriptions as the
    session recorded them, the org profiles under `profiles/`.
 
-**How to classify.** **Product:** the failing calls follow from text or behaviour the product ships (SKILL.md, the MCP server's instructions, a
-tool's description or schema, an error the server returns) that reaches one arm differently or makes a model emit an empty call, and the evidence
-shows the link (the text the model saw before each failure). **Harness or environment:** the product's bytes are equal in both arms and the
-difference follows from what only the arms differ in: the dedicated `KIRO_HOME` (no `memories/`, `sessions/`, `steering/` or other kiro state;
-settings copied without `mcp.json*`), the harness's turn driver, or kiro-cli's own behaviour in a fresh home (for example its deferred-tool catalog or
-session context built differently). **Not determined:** the evidence cannot separate them; this is no product cause.
+**How to classify.** The rule decides whether product code changes, so it is applied in this order, and the first that holds decides:
+1. **Product** only when (a) a product byte the assistant's session received differs between the arms (SKILL.md, the MCP server's instructions,
+   a tool's description or schema, or a server error, as the session stores recorded them), and the failures follow it in the M0 sessions; or
+   (b) a product text itself tells the model to make the empty-argument call: the note quotes it, with its file and line.
+2. **Harness or environment** when the product bytes the sessions received are equal in both arms and the failures occur in one arm only. The
+   cause is then what only the arms differ in: the dedicated `KIRO_HOME` (no `memories/`, `sessions/`, `steering/` or other kiro state; settings
+   copied without `mcp.json*`), the harness's turn driver, or kiro-cli's own behaviour in a fresh home (for example its deferred-tool catalog or
+   session context built differently). This holds even when a product text change could mask the failures: such a mitigation is backlog, never
+   this batch.
+3. **Not determined** when the evidence cannot show 1 or 2 (for example, the sessions did not record the bytes needed to compare). It is no
+   product cause, and no product code changes.
 
 **What follows.**
 - The finding goes to `.agents/tasks/f-g0-7.md` (never staged): the counts per stream, the classification, the files and lines that show it, and
@@ -342,10 +411,10 @@ session context built differently). **Not determined:** the evidence cannot sepa
 |---|---|---|---|---|
 | `user_spend`, `case_spend` | none (pure; a negative held figure is floored at 0) | n/a | an int | no |
 | `_folder_rule`'s tie scan | `at_result` raises nothing (the port's contract: an unreadable history is `None`); `None` or a fallback version: no candidate | yes | today's walk result | no |
-| `_entry` with `given` and `settled=False` | not an error | n/a | no finding | no |
-| `FsMailbox.messages`, a listed file gone | `FileNotFoundError` | yes: new place, else skipped for this call | the list without the file, or with it read at its new place | no (the normal race; the dashboard's reader does not log it either) |
-| `FsMailbox.messages`, any other read error | parse error, `PermissionError`, ... | no (unchanged) | the exception, as today | as today |
-| `g0_replay.materialize` | missing evidence, bad cut, bad pin, unfaithful history, git failing | no | `pytest.fail` (never a skip) | the test report |
+| `_entry` with `given`, a call without `settled` | not an error (the Protocol rule, 4.4) | n/a | no finding | no |
+| `FsMailbox.messages`, a file listed in a received box gone | `FileNotFoundError` | yes: new place, else skipped for this call | the list without the file, or with it read at its new place | no (the normal race; the dashboard's reader does not log it either) |
+| `FsMailbox.messages`, a `sent` file gone, or any other read error | `FileNotFoundError` in `sent`, parse error, `PermissionError`, ... | no (unchanged) | the exception, as today | as today |
+| `g0_replay.materialize` | missing evidence, bad cut, bad pin, a version file missing or with another md5, unfaithful history, git failing | no | `pytest.fail` (never a skip) | the test report |
 
 **Validation of external inputs.** No new external input: no tool argument, no message field, no config key. The `given` kind is internal to
 `reflection`. The kit validates its own inputs (cut length 21, files exist, the pin's log line, the history's faithfulness).
@@ -355,14 +424,15 @@ session context built differently). **Not determined:** the evidence cannot sepa
 |---|---|---|
 | `user_spend == user_committed` while open or blocked; I1 (`user_spend == user_cost == case_spend` with no relayed task) | `reflection.api` (pure functions, property tests) | the one home of the spend arithmetic |
 | The delivery P3 names as equal to the file is a delivery of that case whose git-given checked version equals it; ties are broken by the human-tier verdict | `reflection._deliverable_checks` | only P3 knows checked versions; records only flags |
-| P3's notes (`findings` without `settled`) never hold `given` | `FolderDeliverableChecks._entry` | keeps `progress`, `status` and `whoami` byte-identical |
+| A `given` finding is returned only with `settled=True` (P3's notes, `findings` without `settled`, never hold it); a `relayed` line they show can name the tie rule's chosen delivery, with today's words (4.4) | `FolderDeliverableChecks._entry`; the fake `FixedDeliverableChecks.findings` too; the contract suite tests both | the notes render no `given` kind; one rule for every implementation (R8) |
 | One message per file name in a received-box read; a moved file never raises | `mail.FsMailbox` | the reader of the boxes |
 | `inflight/` and `read/` have one writer | `mail.FsBatchStore` (unchanged) | R9 |
 
 **Testability.** Pure: the spend functions (hand-built `Case`). Unit with fakes: the P3 walk (`FixedCheckedVersions`, `HashBlobIds`), the records'
 attribution (fixed findings), the reader's race (`MovingMessageParser` on a real directory). Integration: the fs worlds of `reflection/tests`. E2e
-on kept files: the G0 kit's three replays (one with a one-commit git history). E2e on real git: the `tie` fixture. Every RED is deterministic: no
-clock race, no LLM, no network.
+on kept files: the G0 kit's three replays (one with a one-commit git history). E2e on real git: the `tie` fixtures. Contract: `given` only with `settled=True`, over both implementations. Every RED is deterministic (no LLM,
+no network, the move injected) except for one bound: the real-git and one-commit-history tests run on the system's monotonic clock, under P3's
+5-s git bound, as `test_org_growth_0b_given.py` does today; a slow git can make the `tie` tests fail, never pass falsely (4.8).
 
 **Test policy (the owner's).** Per commit, FAST and scoped: the touched packages' colocated tests (`SRC/reflection/tests`, `SRC/mail/tests`), the test
 files the commit adds or changes under `TESTS/e2e` or `TESTS/meta`, `tests/golden`, `tests/architecture --deselect
@@ -387,15 +457,21 @@ correction. FEAT-5, only for a product cause: F-G0-7's fix.
   - `FsMailbox.find_anywhere` returns None for a file that moves between its check and its read, where the next box would hold it. No caller of
     `progress` uses it.
   - A label "from a blocked result" for a file copied from a blocked result (the ruling, item 3; F-G0-13).
-- **Declared limits (0b 26 gains):** the tie rule considers only versions git gave, inside P3's bounds (20 results per service, 10 paths per result,
-  40 git pairs, 5 s); a one-off task's tie keeps P3's newest-first choice. A received-box file that moved to a box the call did not ask for is missing
-  from that call only.
+  - 0b 19.3's E6 block says "in s1 and s3 the replay and the history agree", which was not re-derived on the history path (E7S3-6 corrects only
+    the E7 block's sentence, 8). A re-derivation of E6 s1 and s3 with history is a separate check.
+- **Declared limits** (declared here; 0b 26 is not edited):
+  - the tie rule considers only versions git gave, inside P3's bounds (20 results per service, 10 paths per result, 40 git pairs, 5 s);
+  - the tie scan's git questions count against the call's 40-pair and 5-s bound, so in a folder with many files the files walked later can be
+    compared without git sooner than today;
+  - a one-off task's tie keeps P3's newest-first choice;
+  - a received-box file that moved to a box the call did not ask for is missing from that call only.
 
 ## 12. The manager's ruling R-0b1-1 (2026-10-27)
 
 **Asked.** F-G0-2's rule moves one pre-registered expectation (3.5): 0a.5 4.7's row "after the grant 68df" and its test
 `TESTS/e2e/test_org_growth_0a5.py::test_a2_e7_s2_the_grant_68df_approves_13` (E7 s2, cut `20261025T075138446837`). Published: `user_cost` 13, no
-sentence in `case_total`. With the fix: `user_cost` 14 (9 used + 3 + 1 + 1 held) against the approval 13, and `case_total` adds `OVER_APPROVED`
+sentence in `case_total`. With the fix: `user_cost` 14 (9 used + 5 held: 3 of 3ca4's 12, c671's default run and the granted run) against the
+approval 13, and `case_total` adds `OVER_APPROVED`
 (text in 3.5). May the fix commit amend them?
 
 **Ruling: yes** (`.agents/tasks/manager-decision-design-loop.md`). 0a.5 4.7's own table reads the case over at #20 (`OVER_CONTRACT`, 13 > 12; c671
@@ -408,9 +484,35 @@ team still held: that is F-G0-2. The grant of 1 covered half of the 2-run ask, s
 2. The test is renamed to say what it asserts: `test_a2_e7_s2_the_grant_68df_cost_14_over_13` (3.6).
 3. In `docs/design/org-growth-phase-0a5.md` 4.7, the 0a.5 cell of the row "after the grant 68df" becomes:
 
-   > grant term: committed 9 + (13 - 9) = 13, less c671's run still out 1, plus 1: approval **13**; `user_cost` (open) **14** (9 used + 4 held,
-   > the granted run included): `OVER_APPROVED` (published: `user_cost` (open) 13, no sentence; superseded by 0b.1 F-G0-2 (R-0b1-1))
+   > grant term: committed 9 + (13 - 9) = 13, less c671's run still out 1, plus 1: approval **13**; `user_cost` (open) **14** (9 used + 5 held:
+   > 3 of 3ca4's 12, c671's default run and the granted run): `OVER_APPROVED` (published: `user_cost` (open) 13, no sentence; superseded by 0b.1
+   > F-G0-2 (R-0b1-1))
 
-   The test's docstring states the same.
+   The test's docstring states the same figures in the same words ("9 used + 5 held: 3 of 3ca4's 12, c671's default run and the granted run").
+   (0a.5's `user_held` at this cut is 4: it leaves out the rework c671's own run, so it is not the whole cost.)
 4. The fix commit's message names R-0b1-1 and the old and new values (`user_cost` 13 -> 14; no sentence -> `OVER_APPROVED`).
 5. Section 7's stop rule stands for every other expectation: if one moves, the FEAT stops and asks.
+
+## 13. Responses to the design review, pass 1 (`.agents/tasks/design-review.md`, 0 HIGH, 5 MEDIUM, 9 NIT)
+
+Every finding is addressed; none is backlogged or ignored.
+
+| # | Severity | Response |
+|---|---|---|
+| 1 | MEDIUM | Addressed (12, condition 3 and "Asked"; 3.6). The 14 is "9 used + 5 held: 3 of 3ca4's 12, c671's default run and the granted run", in the 0a.5 cell, the test docstring and "Asked"; it agrees with 3.5. The 4 was 0a.5's `user_held`, which leaves out c671's own run (stated). |
+| 2 | MEDIUM | Addressed with the review's option (a) (4.4, 1, 10's invariant row, 4.8). Step 3 applies in every call, so an unsettled `relayed` line can name the tie rule's chosen delivery; its words are unchanged. The "byte-identical" claim is withdrawn. New unit test: a default call on a `relayed` tie, verdict older than the file, names `b`. Option (b) was rejected: the notes and the quality view would name different deliveries for one file. |
+| 3 | MEDIUM | Addressed (4.4, 4.8, 10). `FixedDeliverableChecks.findings` filters with `(settled or (not f.settled and f.kind != "given"))`. `DeliverableHarness` gains `populate_given`. The new contract test `test_a_given_finding_is_returned_only_with_settled_true` runs over `IMPLEMENTATIONS[DeliverableChecks]`: the real class uses the m0-s2 shape with the accept older than the file, the fake a `given` finding with `settled=False`. In the e2e m0-s2-shape test the copy is now written after the accept, so its default-call `[]` comes from the rule. |
+| 4 | MEDIUM | Addressed with the recommended option (5.2, 5.3, 5.4, 5.5, 10). The `sent` skip is dropped: a `sent` file that is gone still raises, and a `test_fs_mailbox.py` test pins that. |
+| 5 | MEDIUM | Addressed (9, "How to classify"). There is now an ordered rule. Product only for (a) a differing product byte the session received, or (b) a quoted product text that asks for the empty call. Equal bytes with failures in one arm only is harness or environment, even when a product change could mask it (that mitigation is backlog). Not determined means no product change. |
+| 6 | NIT | Addressed (3.2, 4.1). Each superseded definition is named, and the documents that hold them are not edited: 0a.1 6.1, 0a.3 4.2 and I1, 0b 3's `case_spend` and "given delivery" rows, 0b 4.3's "without a verdict", and the `kind` lists of 0a.3 DR-0a3-6 and 0b B4.8. |
+| 7 | NIT | Addressed (11): the limits are "declared here; 0b 26 is not edited". FEAT-4's commit edits 0b 19.3 only. |
+| 8 | NIT | Addressed (4.3, 11): the tie scan's draw on the shared 40-pair and 5-s budget is a declared limit. |
+| 9 | NIT | Addressed (5.5). `MovingMessageParser` matches by `Path.resolve()` on both sides and records `moved`, and each test asserts the move happened. The import is named: `from testkit.progress_world import describe_progress`. The review's unverified point about another reader opening the file first is handled too: it would show as a text that differs from the control, and the coder reports it. |
+| 10 | NIT | Addressed (8, 11): the E6 block's sentence is backlog. |
+| 11 | NIT | Addressed (4.8). `deliver` gains `commit=True`, and `commit=False` lets two results share one commit (cosmetic for `at_result`). The m0-s2-shape states are three separate tests, never cumulative: at `c68ae679`, a reject on `b` plus an accept on `a` would already read `unjudged_cases []`. |
+| 12 | NIT | Addressed (3.5, 6). The log line is 1-based (`org_replay.log_block`), and line 3 is quoted. An INDEX entry maps to `<stem>.v<k>.<sha7>.md` (`index_entries` and `newest_version`, reused). `MANIFESTS` has 16 keys: the review's 17 counted E3's `VARIANTS`, which are not in `MANIFESTS` and were not computed. 3.5 says why they cannot move: E3 has no grant. |
+| 13 | NIT | Addressed (8): E7S3-6 reads "the three memos the user was given". E6S1-6 and E7S1-6 keep their wording. |
+| 14 | NIT | Addressed by qualifying the claim (4.8, 10). The real-git tests keep the system's monotonic clock, as today: `ClockReading` keeps it, and a frozen one would also freeze the runtime's waits. A slow git can make the `tie` tests fail, never pass falsely. The unit tests run on `FakeClock`, whose monotonic moves 1 µs per reading. |
+
+The review also flagged one claim as unverified: "on E7 s3's replay it would flag `62a5`" (4.5). It is withdrawn. 4.5 now gives only the reason
+that does not depend on it.
