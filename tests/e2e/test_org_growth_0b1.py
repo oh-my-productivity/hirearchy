@@ -4,9 +4,11 @@
 No scheduler, no LLM, no network: ``testkit.g0_replay.materialize`` rebuilds the organization a G0 stream had at one moment from ``studies/G0-noise-baseline/
 evidence``, and the product's own readers read it. A missing evidence file fails the test, never skips it.
 
-This module holds F-G0-2 (held user grants count in the user's runs and in the total). An expectation is never edited to match the product."""
+This module holds F-G0-2 (held user grants count in the user's runs and in the total) and F-G0-1 (the given-delivery tie rule, m0-s2 T4's zero case
+on a history built from the kept files). An expectation is never edited to match the product."""
 
 import json
+import shutil
 
 import pytest
 from testkit.g0_replay import EVG0, materialize
@@ -20,6 +22,9 @@ C492D = "20261026T052441602675-root-492d"
 C7EA7 = "20261026T052636885352-root-7ea7"
 CECE7 = "20261026T045511617097-root-ece7"
 CA7EF = "20261026T051255161913-root-a7ef"
+M0_S2_T4_CUT = "20261026T062340000000"  # m0-s2 turn 4: G0's quality/turn-04.json was written at 06:23:40
+C6F1D = "20261026T061639840350-root-6f1d"
+M0_S2_PIN = ("memo-2026-10-05.md", "memo-2026-10-05.v2.0d07ec4.md", "2026-10-26T06:23:13.513Z", 3)
 
 
 @pytest.fixture(autouse=True)
@@ -71,3 +76,30 @@ def test_f_g0_2_m0_s1_memo_3_holds_the_grant_run_14_of_14(tmp_path):
     # the total of 492d's request: 14 is not above the 14 the user approved at that moment, so no sentence (the head leaves the grant out of M: backlog)
     assert org.runtime.service_reports.case_total(sent(org, C492D)) == "case total: 13 runs used of 15 handed down (contract: 12 per request)"
     the_kept_files_show_the_14_runs_and_the_held_one("m0-s1")
+
+
+@pytest.mark.skipif(shutil.which("git") is None, reason="git is not installed")
+def test_f_g0_1_m0_s2_t4_the_tie_without_a_verdict_is_the_latest_delivery(tmp_path):
+    """F-G0-1's zero case (G0 m0-s2, T4; design 4.8): on a git history built from the kept files P3 reads v2 for both of the lead's results, ``f5df`` (the
+    head 6f1d's late one) and ``e876`` (the rework 52e3's), which equal the user's copy: a tie in which neither delivery has a verdict. The rule leaves
+    today's choice, the case's latest delivery, and says nothing: no finding, one case without a verdict. G0's ``turn-04.json`` read the same. A guard:
+    the tie rule must not move it (green at c68ae679)."""
+    org = Org(materialize("m0-s2", M0_S2_T4_CUT, tmp_path, deliverables=[M0_S2_PIN], team_files=True, history=True))
+    (record,) = json.loads(json.dumps(org.runtime.quality_report.quality_data()))["services"]
+    (found,) = record["cases"]
+    assert found["id"] == C6F1D
+    assert {k: found[k] for k in ("state", "tasks", "runs", "user_cost", "user_approved", "ratio", "spend")} == {
+        "state": "done", "tasks": 2, "runs": 10, "user_cost": 10, "user_approved": 12, "ratio": "0.83", "spend": 10,
+    }
+    deliveries = record["deliveries"]
+    assert (deliveries["total"], deliveries["judged"], deliveries["unjudged_cases"]) == (2, 0, [C6F1D])
+    assert [deliveries[k] for k in ("relayed_only", "unseen_relayed", "not_as_delivered", "neither", "not_on_a_delivery")] == [[], [], [], [], []]
+    assert (found["first"]["task"], found["first"]["outcome"], found["first"]["superseded_by"]) == (C6F1D, "none", None)
+    assert record["history"]["known"] is True
+    assert org.runtime.deliverable_checks.findings(ROOT, None, settled=True) == []
+    # the evidence behind it: both sent copies are in one commit, and v2 was committed before the cut, v3 after it
+    log = (EVG0 / "m0-s2" / "org-git-log.txt").read_text(encoding="utf-8")
+    block = log[log.index("commit 0491b2b") :].split("\ncommit ", 1)[0]
+    assert "lead/sent/20261026T062305224870-lead-e876.md" in block and "lead/sent/20261026T062307517536-lead-f5df.md" in block
+    index = (EVG0 / "m0-s2" / "memos" / "versions" / "INDEX.txt").read_text(encoding="utf-8")
+    assert "memo-2026-10-05.md v2 0d07ec4 2026-10-26T06:21:48Z" in index and "memo-2026-10-05.md v3 b389f15 2026-10-26T06:25:26Z" in index
