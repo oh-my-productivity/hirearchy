@@ -1329,7 +1329,7 @@ the final validation. A flake in a scoped run is re-run once as one file and not
 
 `materialize(corpus, root, variant=None) -> Path` builds an organization directory from a corpus's kept files, read-only from the repository
 (`testkit.REPO / "studies" / ...`), following the corpus's **manifest** (`org_replay_manifest.MANIFESTS[corpus]`, plain data, one entry per
-corpus E, E2, A5, E3, E4-s1r, E4-s2r, E4-s3 and, by the amendment of 19.5, E5-s1, E5-s2, E5-s3, E6-s1, E6-s2, E6-s3). A manifest pins:
+corpus E, E2, A5, E3, E4-s1r, E4-s2r, E4-s3 and, by the amendment of 19.5, E5-s1, E5-s2, E5-s3, E6-s1, E6-s2, E6-s3, E7-s1, E7-s2, E7-s3). A manifest pins:
 - `evidence`: the evidence directory;
 - `boxes`: each kept message folder with the address and box it holds. E and E2: `msgs/root-sent` (root, sent), `msgs/lead-sent` (lead,
   sent), `msgs/writer-sent` (lead/writer, sent), `msgs/reviewer-sent` (lead/reviewer, sent). A5: `msgs/sent__*.md` (root, sent),
@@ -1371,11 +1371,19 @@ Rules of materialization:
     `memo-2026-10-05.md` 2026-10-24T15:59:09.266Z (line 12, call #45), `memo-2026-10-12.md` 16:09:25.486Z (line 24, call #61), `memo-2026-10-19.md`
     16:20:53.664Z (line 35, call #73); s2 `memo-2026-10-05.md` 16:45:22.100Z (line 3, call #31), `memo-2026-10-12.md` 16:59:33.715Z (line 13, call #53);
     s3 `memo-2026-10-05.md` 17:29:19.322Z (line 12, call #44), `memo-2026-10-12.md` 17:33:53.245Z (line 23, call #52). The final `memos/` files equal the
-    sandboxes' `deliverables/` copies by md5 (e6-gate 1.4: 7 of 7).
-- E5's and E6's three streams each keep E4's layout: `msgs/` (E5: no `inbox` folder in s2 and s3; E6: the eight non-empty boxes `read`, `sent` and
-  `lead-`, `lead-reviewer-`, `lead-writer-` `read`/`sent`, no `inbox` folder), `run-logs/{lead,lead-reviewer,lead-writer}`, `service/` and
-  `playbook/` (`history--*.md` and `current-*.md`; the `SERVICE.<hash>.md` copies are not read), `org-files/`, and `memos/` with
-  `versions/INDEX.txt`.
+    sandboxes' `deliverables/` copies by md5 (e6-gate 1.4: 7 of 7);
+  - E7 (the assistant's `cp` of the team's file, `deliverables-log.txt`; memo 1 was copied twice in s1 and s3, and the pin is the last write): s1
+    `memo-2026-10-05.md` 2026-10-25T07:20:03.021Z (line 12, call #46), `memo-2026-10-12.md` 07:27:49.121Z (line 22, call #72), `memo-2026-10-19.md`
+    07:34:38.119Z (line 33, call #90); s2 `memo-2026-10-05.md` 07:53:54.962Z (line 3, call #28), `memo-2026-10-12.md` 08:05:21.844Z (line 12, call #43),
+    `memo-2026-10-19.md` 08:14:08.939Z (line 23, call #55); s3 `memo-2026-10-05.md` 08:42:13.530Z (line 13, call #46), `memo-2026-10-12.md`
+    08:49:57.666Z (line 24, call #61), `memo-2026-10-19.md` 08:57:16.924Z (line 36, call #73). The final `memos/` files equal the sandboxes'
+    `deliverables/` copies by md5 (e7-gate 1.4: 9 of 9).
+- E5's, E6's and E7's three streams each keep E4's layout: `msgs/` (E5: no `inbox` folder in s2 and s3; E6: the eight non-empty boxes `read`,
+  `sent` and `lead-`, `lead-reviewer-`, `lead-writer-` `read`/`sent`, no `inbox` folder; E7: those eight and lead's `inbox`, which holds root's last
+  accept, unread; git keeps no empty folder, so root's, the reviewer's and the writer's `inbox` are not in the repository),
+  `run-logs/{lead,lead-reviewer,lead-writer}`, `service/` and `playbook/` (`history--*.md` and `current-*.md`; the `SERVICE.<hash>.md` copies are not
+  read), `org-files/`, and `memos/` with `versions/INDEX.txt`. The streams' `events/` lack the stream steps' own after-stream `cli-*.jsonl` files
+  (E7 STUDY correction 11); the kit reads no `events/` file, so the manifest does not expect them.
 - `variant` (E3 only, `"r2-links-r1"`, 19.3 E3-7): one more root note, a copy of `...-root-8ca0`'s frontmatter with `id:
   20261021T154600000000-root-0b01`, `created: '2026-10-21T15:46:00+00:00'`, `criterion: R1`, title `criterion link on "Memo for the meeting
   of 2026-10-19": R1`, replying to `...-root-5c11`, `source: human`: a human-tier "same as R1" link on R2, written to root's `sent/` and
@@ -1431,6 +1439,13 @@ column of the table, with two differences from E5. No run credit exists (0 throt
 asserted in s2 and s3, where the lead's writer holds a blocked task that the lead moved past by sending it another task (4.5 lists it): 2 and 4
 runs, equal to the recorded `status` (`budget=2`, `budget=4`); s1 has no held task. Because the organization has no git history, P3 compares each
 deliverable with the team's current file and never finds a `relayed` file (19.3 E6).
+
+**E7 s1-s3** (`E7-org-growth-0a4-recheck/evidence/<s>/`; kept as E5 and E6 kept, service `weekly-meeting-memo`; no git, `org-git-log.txt` is a text
+log) take the E4 column of the table, with these differences from E6. No run credit exists (0 throttles in 115 runs: `credited` is 0 in every
+case). The held figure is asserted in s2 only: the lead's writer holds 4 runs, equal to the recorded `status` (`budget=4`), behind a task the lead
+moved past by sending it others (4.5 lists it); s1 and s3 hold none. s3's memo 1 ends `blocked` (its accepted rework's result is `blocked`: D4) and
+its window is cut by memo 2's request (4.1). Because the organization has no git history, P3 compares each deliverable with the team's current file
+and never finds a `relayed` file (19.3 E7).
 
 ### 19.3 Pre-registered expectations (one test per id)
 
@@ -1856,6 +1871,200 @@ and `...-root-24bb` were recorded a turn before Lena saw the versions; 4.3 count
 - E6-all: no charter or model mark and `history` `{known: false, truncated: false, skipped: 0}` (the unknown line, once); `credited` 0 in all eight cases; no
   one-off record and no nested service; every `quality_data` conforms to 9.4 (`test_every_corpus_conforms_to_the_schema` covers the three manifests).
 
+**E7** (amendment of 19.5, written for plan commit 53 from `RESEARCH/phase-0a4/e7-gate.md` sections 1 to 5 and the committed evidence
+`studies/E7-org-growth-0a4-recheck/evidence/s1` to `s3`, never from the product's output). Every stream is one service `weekly-meeting-memo` (offered
+by `lead`, client root, human; contract v1, v2 after the user's answer, with a per-request budget of 12 in the three streams; playbook v1, v2 after the
+lead's revision) with three cases, one per memo the user requested. Memo 1's chain holds the facilitator's injected relayed rework (5 runs). The run
+figures come from a throwaway ledger that reads the kept files and the published counts and imports no product code (commit 1's, extended to E7),
+under `b252d77c`'s rules; the structural facts (cases, deliveries, verdicts, links, signers) are read from the message files, the FAIL counts from
+the recorded `final-services-progress-status-health.txt` of each stream. Short ids below are the suffixes of full ids: `...-root-5efc` is
+`20261025T070423629042-root-5efc`.
+
+**What a replay of these files cannot show (kit limit).** Kit limit: the replay has no org git history, so OQ-2's given-delivery path and P3's
+`relayed` finding cannot run; with history the evidence shows s2 relayed (no hand edit: 0 hand edits in 11 copies, e7-gate 5 item 9) and s1 and s3
+equal to the team's current files (the md5 facts of E7S1-6, E7S2-6 and E7S3-6). The kit materializes no git repository, so P3 does not know the
+checked artifact of a past delivery and compares each file with the team's current one (4.3, "no org history"). Two consequences, stated once for the
+three streams: no `relayed` finding (0a.3, F-E5-5) arises, so the given delivery of every case is its latest delivery (OQ-2's "else"), and in s2 memo
+1's file is `not as delivered` against the injected relayed rework 37b7 and its case reads `without a verdict (relayed only)` (D18; e7-gate 5 item 6),
+where OQ-2's main path, with history, would read Lena's reject `...-root-ce17` and her L-ASIS accept `...-root-4a88` on c671, the delivery whose file she
+has; in s1 and s3 the replay and the history agree (memo 1's file is the current one). The facts that an org history would show for s2 are
+pre-registered below as **evidence facts** and asserted on the kept files (md5 against `memos/versions/INDEX.txt`), not on the product; the two paths
+the replays cannot take are run on a real git history by `tests/e2e/test_org_growth_0b_given.py`.
+
+**The user's approved runs** (OQ-1, 0a.5 A2): the rule is `max(budget, ceiling)`, with the ceiling at each hand-down of the user's requests = the runs
+those requests had used + what the team still held + the hand-down's budget, the head's own hand-down (budget 12 at 0 used) giving 12, and the
+default's 1-run rework with nothing left no approval (`Case.unapproved_reworks`). s1 memo 1: at the human rework `...-5e3e` (an explicit `budget: 7`)
+the request had used 5 runs and the lead still held 7 (5 + 7 = 12), so 12 + 7 = 19 (F-E7-9); at `...-066f` it had used 10 (10 + 2 held + 5 = 17 less than
+19), so the approval stays 19. s1 memo 2: at `...-faaa` 5 used + 3 = 8, at root's grant `...-0036` (3 runs, sent without the user's yes: F-E7-5) 8 used + 3 =
+11, both below the contract's 12, so the approval stays 12 and the grant is only a top-up. s2 memo 1: the human rework `...-c671` is the default's 1 run
+with nothing left (9 used and 3 held make the 12 handed down), so it approves nothing (`unapproved_reworks` = `(c671)`); Lena's yes funded one more run,
+root's grant `...-68df` (1 run, after the yes) came with 9 used, 3 held and c671's unapproved run set aside (9 + 3 + 1 = 13), so the approval is 13,
+equal to Lena's (D14). s3 memo 1: `...-62a5` (explicit 7) found 5 used and nothing held (the first request's 7 had come back), so 5 + 7 = 12;
+`...-d9bc` (explicit 5) found 10 used and nothing held, so 15.
+The other cases stay at the head's 12. These are the product's approvals: 19, 13 and 15 for memo 1 (e7-gate 5 item 4 had 19 for s1, 14 for s2 under
+`18a4531`, and left s3 to derive; 0a.5 A2 moves s2 to 13, 0a.5 section 18 item 1). Lena's own D14 approvals were 15, 13 and 15 (e7-gate 1.4): the alarm
+reads the product's, so it cannot see s1's 19 against her 15 (F-E7-9); the declared limit of 26 (the approved runs are root's hand-downs) covers it.
+It is a finding, not an expectation.
+
+**E7 s1** (`E7-s1`; cases `...-root-5efc`, `...-root-fb17`, `...-root-eb65`)
+- E7S1-1: the record `weekly-meeting-memo` (lead; client root, human; contract v2, playbook v2, budget 12); 3 cases (4, 2 and 2 tasks), done 3, none
+  cut; no one-off record and no nested service; 8 deliveries: 5efc by `...-lead-2426` (its first result `...-lead-e88a` is `blocked`; the later result
+  2426, three seconds after the human rework's own, is `done` and decides: e7-gate 5 item 7), its human rework `...-root-5e3e` by `...-lead-0341`, the
+  relayed rework `...-root-6920` by `...-lead-c3d0`, the human rework `...-root-066f` by `...-lead-1c9d`, fb17 by `...-lead-82a1`, its human rework
+  `...-root-faaa` by `...-lead-adc0` (its first result `...-lead-ed63` is `blocked`), eb65 by `...-lead-d20d`, its human rework `...-root-deb0` by
+  `...-lead-50be`; judged 4 of 8 (5e3e: reject `...-root-905b`; 066f: accept `...-root-9496`; faaa: accept `...-root-7cbd`; deb0: accept
+  `...-root-eafa`); first deliveries 0 accepted, 0 rejected, 3 without a verdict, 3 superseded: **the head 5efc, memo 1's first delivery, is superseded
+  by the injected relayed rework 6920** (the first task of the case sent after its late result 2426; the human rework 5e3e was sent before it), fb17 by
+  the human rework faaa and eb65 by the human rework deb0; the delivery of 6920 carries only the assistant's relayed reject `...-root-1b8f` and is
+  superseded by the human rework 066f; 0 cases without a verdict (each latest delivery was accepted: `relayed only` 0, `unseen relayed` none); 0
+  verdicts not on a delivery; 0 legacy verdicts. The first-delivery line of memo 1 is `...-root-5efc: no verdict (superseded by your relayed rework
+  ...-root-6920)` and the summary `first deliveries: 0 accepted, 0 rejected, 3 without a verdict (3 superseded by a rework before a verdict)`. The
+  line is `judged by the user: 4 of 8 deliveries; without a verdict: 0 case(s); not as delivered: 0`.
+- E7S1-2: one escape, R1 = `...-root-905b` (a human reject; its own `criterion` is C2) on the delivery of 5e3e, case 5efc, signed off by
+  lead/reviewer (the latest done result of a direct report before the delivery is `...-lead.reviewer-183e`): `contract-gap` by rule `answer` (the human
+  link `...-root-6096` names C9, which contract v1 of 5e3e, with C1 to C8, lacks), `rules` `["answer", "words"]` (the user's words "Always start the
+  memo" carry a lasting word), `detail` `["20261025T071714388062-root-6096", "C9"]`, `also` none, `before_verdict` `...-root-6920` (its done result
+  `...-lead-c3d0`, 07:14:27, lies between the delivery's, 07:10:31, and the verdict, 07:15:37), attribution `not its`. **The answering contract v2
+  removes C2 and adds C9, the first live answering version that removes a criterion** (e7-gate 5 item 8): the link names C9 only, so the escape's
+  `removes` is empty and the cause text has no "which the answering contract v2 removes" clause (DR3-2's split has no id that is only in the removed
+  set); the removal shows in the contract mark (E7S1-3). The escape line is `R1 case 20261025T070423629042-root-5efc, signed off by lead/reviewer:
+  contract-gap (the user's answer, link 20261025T071714388062-root-6096, names C9, which contract v1 of the task did not have); your relayed rework
+  20261025T071152630842-root-6920 delivered after it and before the verdict: the user may have judged that version`. Rule 2 cannot match (the relayed
+  rework 6920 was sent after the rejected task 5e3e; the human rework after it, 066f, was accepted, so no escape reads the base clause: M-P4-1 n/a
+  (0 of 0)). The verifier line is `lead/reviewer: escapes 0 of 4 judged; not its: 1 contract-gap; PASS precision 4 of 4; its FAILs
+  before delivery: 0 re-check(s), 0 author rework run(s)` (the recorded health line of the reviewer: re-checks after a FAIL 0, author rework runs 0);
+  health for root `escapes 0 of 4 judged (+1 not its: 1 contract-gap)`, for an agent `escapes 0 of 4 judged`. All four judged deliveries are
+  signed off by lead/reviewer.
+- E7S1-3: contract v1 `2026-10-25 07:04 contract v1 (C1, C2, C3, C4, C5, C6, C7, C8)`; playbook v1 `07:04 playbook v1 (root): written by the client (no
+  admission needed)`; **contract v2 `07:17 contract v2 (root): adds C9; removes C2: the user's answer to R1: C9 confirmed (link
+  20261025T071714388062-root-6096)`** (DR3-1; JSON `basis` `answers`, `answers` `R1`, `adds` `["C9"]`, `removes` `["C2"]`, `confirmed` `[{"id": "C9",
+  "link": "20261025T071714388062-root-6096"}]`, `not_confirmed` `[]`: the answer's ids are the added ones, so the removed C2 has no part of its own);
+  playbook v2 `07:17 playbook v2 (lead): admitted (c) on C9, R1, 20261025T071714388062-root-6096: 1 changed line(s): 1 the cited criteria's own words,
+  0 beyond them` (the line it adds is `- C9: ` and C9's text, `removed` 0; the contract's `about` C2 is the assistant's item, the link names C9);
+  top-up marks at 07:08 (+7 human rework 5e3e), 07:11 (+6 your relayed rework 6920, your own spend), 07:17 (+5 human rework 066f), 07:24 (+3 human
+  rework faaa), 07:26 (+3 your grant `...-root-0036`) and 07:32 (+5 human rework deb0); no charter or model mark, and the unknown line.
+- E7S1-4: 5efc "Memo for the 5 October 2026 meeting": the user's runs 15 of 19 approved (0.79x), top-ups `+7 human rework ...-5e3e, +6 your relayed
+  rework ...-6920, +5 human rework ...-066f`, relayed runs 5, total 20 (`your relayed reworks: 5 run(s), your own spend; total 20`), 20 charged runs,
+  `credited` 0, `user_ceiling` 19; fb17 "Memo for the 12 October 2026 meeting": 11 of 12 (0.92x), top-ups `+3 human rework ...-faaa, +3 your grant
+  ...-0036`, `user_granted` 3, `user_ceiling` 12; eb65 "Memo for the 19 October 2026 meeting": 10 of 12 (0.83x), top-up `+5 human rework ...-deb0`;
+  none cut ("0 case(s) had their window cut"). Lena's D14 approval for memo 1 was 15: the gap is F-E7-9 (a finding).
+- E7S1-5: three judged cases, the minimum, so both alarms are live. Repeat `no (3 judged cases; counted: R1, C9); not counted: R1's reading C2 (not
+  confirmed)` (`window` the three cases in the order of their latest counted verdict (5efc, fb17, eb65), `subjects` `{"R1": 1, "C9": 1}`, `fired`
+  `[]`, `not_counted` `{"R1": ["C2"]}`: R1's own reading C2, which the human link C9 does not confirm; C2 is the criterion contract v2 removes). Cost
+  `no (0 of 3 cases above 1.25x)` (`judged` 3, `compared` 3, `cases` `[]`, `skipped` `[]`; the dearest ratio is 0.92x).
+- E7S1-6: evidence facts: the three delivered memos equal the team's current files: `memo-2026-10-05.md` (md5 `77a615e1b8a6cd7b9cdc5ed97b693671`) is `v4`
+  (`f6f27c0`, 07:18:35Z), written by the human rework 066f ("restore judged version, add Summary line") and the checked artifact of 066f's delivery
+  (the relayed rework 6920's `v3`, `9514169`, is not the file); `memo-2026-10-12.md` (`578b9fb048b6a93573083176be347ff2`) is `v2` and
+  `memo-2026-10-19.md` (`ffbf533bccba3986720e6d7645940b49`) is `v2`. On the replay: `not_as_delivered` `[]`, `neither` `[]`, `files_error` `""`, nothing
+  voided, and the judged line ends `not as delivered: 0` with no no-history remark.
+- E7S1-7: moved past: none (the reviewer's blocked `...-lead-d5e2`, result `...-lead.reviewer-853f`, is released by `...-lead-8c3d`, which revises it);
+  the recorded `status` shows budget 0 for every agent.
+
+**E7 s2** (`E7-s2`; cases `...-root-3ca4`, `...-root-ae3f`, `...-root-96a5`)
+- E7S2-1: contract v2, playbook v2, budget 12; 3 cases (3, 1 and 2 tasks), done 3, none cut; 6 deliveries: 3ca4 by `...-lead-a112` (its first result
+  `...-lead-d5c7` is `blocked`; the later result a112, two seconds after the human rework's own, is `done` and decides), its human rework `...-root-c671` by
+  `...-lead-64cb`, the relayed rework `...-root-37b7` by `...-lead-d91e`, ae3f by `...-lead-433a`, 96a5 by `...-lead-f890`, its human rework
+  `...-root-2272` by `...-lead-02da`; judged 3 of 6 (c671: reject `...-root-ce17`, then the accept `...-root-4a88`, Lena's "OK, I'll take it as it is"
+  recorded as her accept, on the same delivery: both are counted and the delivery stays an escape; ae3f: accept `...-root-1906`; 2272: accept
+  `...-root-32af`); first deliveries 1 accepted (ae3f: "That one is right, all the items are there - keep it."), 0 rejected, 2 without a verdict, 2
+  superseded: **the head 3ca4 is superseded by the injected relayed rework 37b7** (the first task of the case sent after its late result a112) and 96a5 by
+  the human rework 2272; the delivery of 37b7 carries only the relayed reject `...-root-644d`; 1 case without a verdict, 3ca4 (its latest delivery is
+  the injected 37b7: **`relayed only` 1**; `unseen relayed` none; the kit limit above: with history OQ-2 would read c671, which Lena judged); 0
+  verdicts not on a delivery; 0 legacy verdicts. The line is `judged by the user: 3 of 6 deliveries; without a verdict: 1 case(s) (20261025T074451197103-root-3ca4):
+  never counted as accepted (1 with only your own relayed verdict); not as delivered: 1 ...`. The first-delivery lines are `...-root-3ca4: no verdict
+  (superseded by your relayed rework ...-root-37b7)`, `...-root-ae3f: accepted: "That one is right, all the items are there - keep it."` and
+  `...-root-96a5: no verdict (superseded by human rework ...-root-2272)`.
+- E7S2-2: one escape, R1 = `...-root-ce17` (a human reject, own `criterion` C4) on the delivery of c671, case 3ca4, signed off by lead/reviewer (the
+  latest done result of a direct report before the delivery, answering a task sent after c671, is `...-lead.reviewer-e61e`): `contract-gap`, rule
+  `answer` (the human link `...-root-356e` names C8, which contract v1 of c671, with C1 to C7, lacks), `rules` `["answer", "words"]`, `detail`
+  `["20261025T080029734610-root-356e", "C8"]`, `also` none, `before_verdict` `...-root-37b7` (its done result `...-lead-d91e`, 07:57:23, lies between the
+  delivery's, 07:53:46, and the verdict, 07:59:10), attribution `not its`; the decisive verdict is the reject ce17, not the later accept; rule 2 cannot
+  match. The verifier line is `lead/reviewer: escapes 0 of 3 judged; not its: 1 contract-gap; PASS precision 3 of 3; its FAILs before delivery: 1
+  re-check(s), 1 author rework run(s)` (recorded health line: re-checks after a FAIL 1, author rework runs 1); health for root `escapes 0 of 3 judged
+  (+1 not its: 1 contract-gap)`, for an agent `escapes 0 of 3 judged`.
+- E7S2-3: contract v1 `2026-10-25 07:44 contract v1 (C1, C2, C3, C4, C5, C6, C7)`; playbook v1 `07:44 playbook v1 (root): written by the client (no
+  admission needed)`; contract v2 `08:00 contract v2 (root): adds C8: the user's answer to R1: C8 confirmed (link 20261025T080029734610-root-356e)`;
+  playbook v2 `08:02 playbook v2 (lead): admitted (c) on C8, R1, 20261025T080029734610-root-356e: 1 changed line(s): 1 the cited criteria's own words,
+  0 beyond them`; top-up marks at 07:50 (+1 human rework c671), 07:51 (+1 your grant `...-root-68df`), 07:54 (+6 your relayed rework 37b7, your own
+  spend) and 08:11 (+5 human rework 2272); no charter or model mark.
+- E7S2-4: 3ca4 "Memo for 2026-10-05 meeting": the user's runs 14 of 13 approved (1.08x), top-ups `+1 human rework ...-c671, +1 your grant ...-68df, +6 your
+  relayed rework ...-37b7`, relayed runs 5, total 19 (`your relayed reworks: 5 run(s), your own spend; total 19`), 19 charged runs, `credited` 0,
+  `user_ceiling` 13, `user_granted` 1, `unapproved_reworks` `(c671)`: **the 1-run default with nothing left raises nothing (A2) and the run is still
+  spent: 14 of 13**, the cost alarm's ratio stays below 1.25; ae3f "Memo for 2026-10-12 meeting": 5 of 12 (0.42x), top-ups none; 96a5 "Memo for
+  2026-10-19 meeting": 10 of 12 (0.83x), top-up `+5 human rework ...-2272`; none cut. Lena's D14 approval was 13: the approval equals it.
+- E7S2-5: three judged cases: repeat `no (3 judged cases; counted: R1, C8); not counted: R1's reading C4 (not confirmed)` (`window` 3ca4, ae3f, 96a5,
+  `subjects` `{"R1": 1, "C8": 1}`, `fired` `[]`, `not_counted` `{"R1": ["C4"]}`); cost `no (0 of 3 cases above 1.25x)` (`compared` 3; the dearest ratio
+  is 14 of 13 = 1.08x).
+- E7S2-6: evidence facts: the delivered `memo-2026-10-05.md` (`7bbd2abb23bc7b65c3be403ecfd4dd38`) is `v3` (`9ce1e39`, 07:52:28Z), the checked artifact of
+  c671's delivery; the current file is `v4` (`5e2dd06`, `985fd9b1abe3fd9cd8784a557489b79c`, 07:56:05Z), written by the relayed rework 37b7;
+  `memo-2026-10-12.md` (`010655e912ad6264d9384860f505b1b8`) is the current `v1` and `memo-2026-10-19.md` (`6dadbcdbc5780ea3cd1ed9aff998c57c`) the current `v2`.
+  On the replay: `not_as_delivered` `[{"case": 3ca4, "task": 37b7}]` (the newest delivery that lists the file is 37b7, a relayed rework), the delivery
+  is `edited` since the copy's write time (07:53:54.962Z), nothing voided (37b7 has no human verdict), `neither` `[]`; the judged line ends with the
+  no-history remark. With history this would be a `relayed` finding that names c671 as the delivery Lena was given.
+- E7S2-7: moved past: one agent, `lead/writer` (`status`: `budget=4`, so it holds 4 runs): its blocked task `...-lead-1add` (memo 2; blocked result `...-lead.writer-cee2`, 08:02:43) is not released (`...-lead-17a9`, the
+  next task to the writer, does not revise it) and the lead has sent the writer 2 tasks since (17a9 and its revision `...-lead-d7a8`): `task
+  20261025T080214459188-lead-1add from lead, blocked 2026-10-25 08:02: left blocked: lead has sent lead/writer 2 task(s) since`. 17a9 (blocked result
+  `...-lead.writer-7a34`, 08:09:09) is released by d7a8, which revises it, so it is not listed: the section lists one task for 4 runs and does not split
+  the figure (D19). This is 4.5's positive path on E7's files; the answer to e7-gate 5 item 10 and OQ-4 is **yes, a left-blocked task**.
+
+**E7 s3** (`E7-s3`; cases `...-root-09df`, `...-root-a443`, `...-root-a74a`)
+- E7S3-1: contract v2, playbook v2, budget 12; 3 cases (4, 2 and 2 tasks), **done 2, blocked 1 (memo 1), none open**; 7 deliveries (d9bc is no
+  delivery: its result `...-lead-da3c` is `blocked`): 09df by `...-lead-17e3`, its human rework `...-root-62a5` by `...-lead-c2f9`, the relayed rework
+  `...-root-5834` by `...-lead-f639`, a443 by `...-lead-b4bd`, its human rework `...-root-b576` by `...-lead-b03f`, a74a by `...-lead-e9ee`, its human
+  rework `...-root-f83d` by `...-lead-a184`; judged 3 of 7 (62a5: reject `...-root-c370`; b576: accept `...-root-454b`; f83d: accept `...-root-b43a`);
+  first deliveries 0 accepted, 0 rejected, 3 without a verdict, 3 superseded (09df by the human rework 62a5, a443 by b576, a74a by f83d; the heads'
+  results came before the reworks, so none is a late result); **Lena's accept `...-root-dd46` of the copied memo 1 is on d9bc, whose result is
+  `blocked`: a verdict not on a delivery (D4; e7-gate 5 item 6)**: 1 verdict not on a delivery (`...-root-dd46`), and memo 1 is judged through R1's
+  reject on 62a5 (an escape), not through the accept; its state is `blocked` (d9bc is its latest task), so it is not listed as a case without a
+  verdict; its given delivery in the replay is the relayed 5834 (the latest delivery), which carries only the relayed reject `...-root-2da1`;
+  0 cases without a verdict, `relayed only` 0, `unseen relayed` none; 0 legacy verdicts. The lines are `cases: 3 (done 2, failed 0, blocked 1, open 0
+  (stalled 0))`, `judged by the user: 3 of 7 deliveries; without a verdict: 0 case(s); not as delivered: 0` and `verdicts not on a delivery (on a blocked or
+  failed result, or before the done result): 1 (20261025T084326230467-root-dd46)`. 0a.5 makes `mail.still_open(d9bc, ...)` false after dd46 (F-E7-7);
+  the view does not read it, and `Case.state` stays `blocked` (4.3). The e7-gate calls memo 1 "no judged case"; under 3 and 4.3 as written it is
+  judged by R1's reject, and only the accept is not on a delivery (a finding for the manager).
+- E7S3-2: one escape, R1 = `...-root-c370` (a human reject, own `criterion` C3) on the delivery of 62a5, case 09df, signed off by lead/reviewer (the
+  latest done result of a direct report before the delivery, answering a task sent after 62a5, is `...-lead.reviewer-fb75`): `contract-gap`, rule
+  `answer` (the human link `...-root-43ce` names C9, which contract v1 of 62a5, with C1 to C8, lacks), `rules` `["answer", "words"]`, `detail`
+  `["20261025T083800404013-root-43ce", "C9"]`, `also` none, `before_verdict` `...-root-5834` (its done result `...-lead-f639`, 08:35:32, lies between the
+  delivery's, 08:30:38, and the verdict, 08:36:30), attribution `not its`; rule 2 cannot match (5834 was sent after 62a5; the human rework d9bc after
+  it was never rejected: it was accepted on its `blocked` result). The verifier line is `lead/reviewer: escapes 0 of 3 judged; not its: 1
+  contract-gap; PASS precision 3 of 3; its FAILs before delivery: 0 re-check(s), 0 author rework run(s)` (recorded health line: 0 and 0); health for
+  root `escapes 0 of 3 judged (+1 not its: 1 contract-gap)`, for an agent `escapes 0 of 3 judged`.
+- E7S3-3: contract v1 `2026-10-25 08:24 contract v1 (C1, C2, C3, C4, C5, C6, C7, C8)`; playbook v1 `08:24 playbook v1 (root): written by the client (no
+  admission needed)`; contract v2 `08:38 contract v2 (root): adds C9: the user's answer to R1: C9 confirmed (link 20261025T083800404013-root-43ce)`;
+  playbook v2 `08:38 playbook v2 (lead): admitted (c) on C9, R1, 20261025T083630462812-root-c370, 20261025T083800404013-root-43ce: 1 changed line(s): 1 the
+  cited criteria's own words, 0 beyond them` (its evidence cites the rejection as well as the link, four ids); top-up marks at 08:28 (+7 human rework
+  62a5), 08:32 (+6 your relayed rework 5834, your own spend), 08:38 (+5 human rework d9bc), 08:47 (+5 human rework b576) and 08:54 (+5 human rework
+  f83d); no charter or model mark.
+- E7S3-4: 09df "Memo for 2026-10-05 meeting": the user's runs 15 of 15 approved (1.00x), top-ups `+7 human rework ...-62a5, +6 your relayed rework
+  ...-5834, +5 human rework ...-d9bc`, relayed runs 5, total 20, 20 charged runs, `credited` 0, `user_ceiling` 15, **window cut by a later request**
+  (a443, sent when d9bc's result was `blocked`; the case line ends `; window cut by a later request`, and the attribution line reads `1 case(s) had
+  their window cut by a later request; their later runs count for that request.`); a443 "Memo for 2026-10-12 meeting": 10 of 12 (0.83x), top-up
+  `+5 human rework ...-b576`; a74a "Memo for 2026-10-19 meeting": 10 of 12 (0.83x), top-up `+5 human rework ...-f83d`. Lena's D14 approval was 15: the
+  approval equals it.
+- E7S3-5: three judged cases: repeat `no (3 judged cases; counted: R1, C9); not counted: R1's reading C3 (not confirmed)` (`window` 09df, a443, a74a, in
+  the order of their latest counted verdict, `subjects` `{"R1": 1, "C9": 1}`, `fired` `[]`, `not_counted` `{"R1": ["C3"]}`); cost `no (0 of 3 cases above
+  1.25x)` (`compared` 3, the blocked and cut memo 1 included: 15 of 15 = 1.00x).
+- E7S3-6: evidence facts: the three delivered memos equal the team's current files: `memo-2026-10-05.md` (`fc20d12c8c8993772ffd35e348d5368e`) is `v4`
+  (`b5f1411`, 08:39:14Z), the checked artifact of d9bc (whose result is `blocked`); `memo-2026-10-12.md` (`d9b96f216459d7a5380658912dd5332d`) is `v2`
+  and `memo-2026-10-19.md` (`30933ac60ef09478d15aadaeeb66d400`) is `v2`. On the replay: `not_as_delivered` `[]`, `neither` `[]`, nothing voided,
+  `files_error` `""`, and no no-history remark.
+- E7S3-7: moved past: none (the lead's blocked `...-root-d9bc`, result `...-lead-da3c`, is released by Lena's accept `...-root-dd46`, a verdict on its chain
+  after the block: 0a.5 F-E7-7; no agent holds a left-blocked task); the recorded `status` shows budget 0 for every agent.
+
+**E7 findings (not expectations; manager decision of 2026-10-25).** (1) s3 memo 1 is a judged case under 3 and 4.3 as written (R1's reject is on the
+`done` delivery 62a5); e7-gate 5 item 6 reads it as "no judged case". Only Lena's accept `...-root-dd46`, on the `blocked` d9bc, is not on a delivery.
+(2) s1's `not counted: R1's reading C2 (not confirmed)` is right under the S1R-6 rule (the product's link names C9 only), but C2 is the criterion the
+answering version removed; a clearer label is backlog (23). (3) F-E7-9: s1 memo 1's approval 19 against Lena's 15 is invisible to the alarm (15 of 19).
+(4) F-E7-5: s1 memo 2's grant `...-0036` was sent without the user's yes; it is a top-up and raises nothing (ceiling 11 under the contract's 12).
+(5) s2 memo 1 reads 14 of 13 approved (1.08x), the first live input in which 0a.5 A2 makes the approval equal Lena's own (13): the case line carries
+the over-approval figure and the cost alarm at 1.25x stays `no`.
+
+**E7 (all three)**
+- E7-all: no charter or model mark and `history` `{known: false, truncated: false, skipped: 0}` (the unknown line, once); `credited` 0 in all nine cases;
+  no one-off record and no nested service; every `quality_data` conforms to 9.4 (`test_every_corpus_conforms_to_the_schema` covers the three
+  manifests); the cases' states are done in s1 and s2, and done, done, blocked in s3 (the cut one).
+
 ### 19.4 The cost comparison on corpora without run logs (`TESTS/e2e/test_org_growth_0b_costs.py`)
 
 E, E2 and A5 kept no run log, so their runs are checked with `over_cost(case, approved, ratio)`, the per-case predicate `cost_alarm` applies,
@@ -1890,7 +2099,7 @@ at least the e7-gate section 5 items 4-10 per stream, each R1's cause (rule 4, w
 C8, C9), s2's `relayed only` and s3's blocked memo 1 (OQ-2 and D4), the heads' first deliveries (e7-gate 5 item 7), `credited` 0, and s2's
 writer (OQ-4). A failed pre-registered expectation stops the FEAT (19.3).
 
-E5's and E6's expectations are the lists `E5` and `E6` in 19.3 (plan commits 45 and 50); E7's follow by the same rule.
+E5's, E6's and E7's expectations are the lists `E5`, `E6` and `E7` in 19.3 (plan commits 45, 50 and 53).
 
 ## 20. The noise study (study G0): protocol and harness
 
@@ -2078,6 +2287,9 @@ Backlog (out of scope, with the reason):
   `CauseVocabulary` of `DerivedCaseRecords`, wired in `app`): Phase 3 owns packs, and 0b adds no port it does not use, so today a pack's
   words would need an edit of the reflection core (DR2-8).
 - A full git replay of E4's history (its log text cannot rebuild the repository).
+- When the answering contract version removed the criterion that root read (E7 s1: R1's reading C2, which v2 removes), the repeat alarm's `not counted:
+  R1's reading C2 (not confirmed)` undersells it, because the user acted on that reading. A clearer label such as "(removed by the answer)" is a
+  later product change; 0b changes nothing (manager decision of 2026-10-25, E7 expectations).
 - A replay kit that builds an org git history from the kept versions (`memos/versions/`, the result times), so that the replays of E5, E6 and E7
   can run OQ-2's given-delivery path and P3's `relayed` finding; not built in 0b, because the unit and integration tests run both on a real
   git history and G0 exercises the live path (19.3 E5, kit limit).
