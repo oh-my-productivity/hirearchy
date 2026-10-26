@@ -14,8 +14,9 @@ from testkit.org_replay_manifest import MANIFESTS, PREFIXES, VARIANTS
 
 Failed = pytest.fail.Exception
 E5_CORPORA = ("E5-s1", "E5-s2", "E5-s3")
-CORPORA = ("E", "E2", "A5", "E3", "E4-s1r", "E4-s2r", "E4-s3", *E5_CORPORA)
-WITH_DELIVERABLES = ("E4-s1r", "E4-s2r", "E4-s3", *E5_CORPORA)
+E6_CORPORA = ("E6-s1", "E6-s2", "E6-s3")
+CORPORA = ("E", "E2", "A5", "E3", "E4-s1r", "E4-s2r", "E4-s3", *E5_CORPORA, *E6_CORPORA)
+WITH_DELIVERABLES = ("E4-s1r", "E4-s2r", "E4-s3", *E5_CORPORA, *E6_CORPORA)
 WITH_SERVICE = tuple(c for c in CORPORA if c != "A5")
 
 
@@ -404,3 +405,60 @@ def test_e5_manifests_list_only_existing_files(corpus, runs, tmp_path):
     org = materialize(corpus, tmp_path)
     assert len({p.name for p in org.rglob("runs/*.log")}) == runs
     assert evidence(source / entry["contracts"][-1][0])[0]["version"] == 2 and evidence(source / entry["playbooks"][-1][0])[0]["version"] == 2
+
+
+# ------------------------------------------------------------------------------------------------- E6's streams (design 19.1, 19.3 E6)
+
+# The version of `lead/writer/work/<memo>` that INDEX.txt lists and that each delivered `memos/` file is, by md5 (the evidence facts of E6S1-6, E6S2-6,
+# E6S3-6): only s2's memo 1 is NOT the team's current file (the injected relayed rework changed it after the copy).
+E6_DELIVERED_VERSIONS = {
+    "E6-s1": {"memo-2026-10-05.md": 5, "memo-2026-10-12.md": 3, "memo-2026-10-19.md": 2},
+    "E6-s2": {"memo-2026-10-05.md": 3, "memo-2026-10-12.md": 2},
+    "E6-s3": {"memo-2026-10-05.md": 4, "memo-2026-10-12.md": 1},
+}
+E6_CURRENT_VERSIONS = {
+    "E6-s1": {"memo-2026-10-05.md": 5, "memo-2026-10-12.md": 3, "memo-2026-10-19.md": 2},
+    "E6-s2": {"memo-2026-10-05.md": 4, "memo-2026-10-12.md": 2},
+    "E6-s3": {"memo-2026-10-05.md": 4, "memo-2026-10-12.md": 1},
+}
+
+
+@pytest.mark.parametrize("corpus", E6_CORPORA)
+def test_each_e6_pinned_deliverable_time_is_its_log_line(corpus, tmp_path):
+    """The pins of E6's deliverables: the log line starts `[<time>] call #<n>` and its command copies the file (memo 1 of s1 and s3 was copied twice: the pin
+    is the last write); the replay's file has that modification time; and each delivered file is, by md5, the version of the team's file that the evidence
+    facts name (INDEX.txt), which is the current one for every memo but s2's memo 1."""
+    entry = MANIFESTS[corpus]
+    source = Path(entry["evidence"])
+    materialize(corpus, tmp_path)
+    index = source / entry["team_files"]
+    listed = index_entries(index)
+    assert [Path(item["file"]).name for item in entry["deliverables"]] == list(E6_DELIVERED_VERSIONS[corpus])
+    for item in entry["deliverables"]:
+        time, block = log_block(source / item["log"], item["line"])
+        assert time == item["mtime"] and block.startswith(f"[{item['mtime']}] call #{item['call']} ")
+        name = Path(item["file"]).name
+        assert "cp " in block and name in block  # the assistant's copy of the team's file
+        made = deliverable_folder(tmp_path.resolve(), corpus) / name
+        assert made.stat().st_mtime_ns == utc_us(item["mtime"]) * 1000
+        versions = {int(v["k"]): v for v in listed[f"lead/writer/work/{name}"]}
+        assert md5_of(made) == versions[E6_DELIVERED_VERSIONS[corpus][name]]["md5"]
+        assert max(versions) == E6_CURRENT_VERSIONS[corpus][name]
+        assert (md5_of(made) == versions[max(versions)]["md5"]) == (E6_DELIVERED_VERSIONS[corpus][name] == E6_CURRENT_VERSIONS[corpus][name])
+
+
+@pytest.mark.parametrize("corpus, runs", [("E6-s1", 44), ("E6-s2", 30), ("E6-s3", 31)])
+def test_e6_manifests_list_only_existing_files(corpus, runs, tmp_path):
+    """Every file or folder an E6 manifest names is in the evidence (a missing one would fail `materialize`, never skip), the run logs are the 44, 30 and
+    31 org runs the study kept (s3's killed lead run included), and the organization has the contract at v2 and the playbook at v2."""
+    entry = MANIFESTS[corpus]
+    source = Path(entry["evidence"])
+    assert source.is_dir() and source.parts[-3:-1] == ("E6-org-growth-0a3-recheck", "evidence")
+    files = [file for file, _ in (*entry["contracts"], *entry["playbooks"])] + list(entry["charters"].values()) + [entry["org_md"], entry["team_files"]]
+    files += [item["file"] for item in entry["deliverables"]] + [item["log"] for item in entry["deliverables"]]
+    assert all((source / file).is_file() for file in files)
+    assert all((source / folder).is_dir() for folder, _, _ in entry["boxes"]) and all((source / folder).is_dir() for folder, _ in entry["run_logs"])
+    org = materialize(corpus, tmp_path)
+    assert len({p.name for p in org.rglob("runs/*.log")}) == runs
+    assert evidence(source / entry["contracts"][-1][0])[0]["version"] == 2 and evidence(source / entry["playbooks"][-1][0])[0]["version"] == 2
+    assert entry["service"] == "weekly-memo"

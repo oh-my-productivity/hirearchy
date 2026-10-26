@@ -25,6 +25,7 @@ from typing import Any
 from . import REPO
 from .e4_replay import EV, EV3
 from .e5_replay import EV5
+from .e6_replay import EV6
 
 STUDIES = REPO / "studies"
 EV_E = STUDIES / "E-service-reflection" / "evidence"
@@ -85,6 +86,9 @@ E5_BOXES = prefixed(
     ("", "read"), ("", "sent"), ("lead", "read"), ("lead", "sent"), ("lead-reviewer", "read"), ("lead-reviewer", "sent"), ("lead-writer", "read"),
     ("lead-writer", "sent"),
 )
+
+# E6 keeps E5's layout (service `weekly-memo`); the non-empty message folders are the eight of `E5_BOXES` in every stream.
+E6_COMMON = {**E5_COMMON, "service": "weekly-memo"}
 
 MANIFESTS: dict[str, dict[str, Any]] = {
     "E": {
@@ -236,6 +240,36 @@ MANIFESTS: dict[str, dict[str, Any]] = {
         "deliverables": (
             delivered("memos/memo-2026-10-05.md", "2026-10-24T04:18:31.904Z", 3, 39),
             delivered("memos/memo-2026-10-12.md", "2026-10-24T04:33:46.819Z", 14, 65),
+        ),
+    },
+    "E6-s1": {
+        **E6_COMMON,
+        "evidence": EV6 / "s1",
+        "boxes": E5_BOXES,
+        # memo 1 was copied twice (call #26, then #45 after the human rework): the pin is the last write
+        "deliverables": (
+            delivered("memos/memo-2026-10-05.md", "2026-10-24T15:59:09.266Z", 12, 45),
+            delivered("memos/memo-2026-10-12.md", "2026-10-24T16:09:25.486Z", 24, 61),
+            delivered("memos/memo-2026-10-19.md", "2026-10-24T16:20:53.664Z", 35, 73),
+        ),
+    },
+    "E6-s2": {
+        **E6_COMMON,
+        "evidence": EV6 / "s2",
+        "boxes": E5_BOXES,
+        "deliverables": (
+            delivered("memos/memo-2026-10-05.md", "2026-10-24T16:45:22.100Z", 3, 31),
+            delivered("memos/memo-2026-10-12.md", "2026-10-24T16:59:33.715Z", 13, 53),
+        ),
+    },
+    "E6-s3": {
+        **E6_COMMON,
+        "evidence": EV6 / "s3",
+        "boxes": E5_BOXES,
+        # memo 1 was copied twice (call #25, then #44 after the human rework): the pin is the last write
+        "deliverables": (
+            delivered("memos/memo-2026-10-05.md", "2026-10-24T17:29:19.322Z", 12, 44),
+            delivered("memos/memo-2026-10-12.md", "2026-10-24T17:33:53.245Z", 23, 52),
         ),
     },
 }

@@ -1,7 +1,7 @@
 """The kit of the exit-check replays of phase 0b (design 19.1): it builds, from the files a study kept, an organization directory that the product's own
 code reads (no scheduler, no LLM, no network, no git).
 
-``materialize(corpus, root, variant=None)`` follows ``org_replay_manifest.MANIFESTS[corpus]`` (E, E2, A5, E3, E4-s1r, E4-s2r, E4-s3) and builds, below the
+``materialize(corpus, root, variant=None)`` follows ``org_replay_manifest.MANIFESTS[corpus]`` (E, E2, A5, E3, E4-s1r, E4-s2r, E4-s3, E5-s1..s3, E6-s1..s3) and builds, below the
 directory ``root`` (created), the organization ``root/org`` and returns it; ``Org(materialize(...))`` opens it. A deliverable folder is ``root/deliverables``
 when the corpus kept deliverables (E4), else ``root/no-deliverables``, which is never created, so the deliverable checks find nothing.
 
