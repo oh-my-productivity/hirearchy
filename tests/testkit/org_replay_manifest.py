@@ -26,6 +26,7 @@ from . import REPO
 from .e4_replay import EV, EV3
 from .e5_replay import EV5
 from .e6_replay import EV6
+from .e7_replay import EV7
 
 STUDIES = REPO / "studies"
 EV_E = STUDIES / "E-service-reflection" / "evidence"
@@ -89,6 +90,10 @@ E5_BOXES = prefixed(
 
 # E6 keeps E5's layout (service `weekly-memo`); the non-empty message folders are the eight of `E5_BOXES` in every stream.
 E6_COMMON = {**E5_COMMON, "service": "weekly-memo"}
+
+# E7 keeps E5's layout (service `weekly-meeting-memo`); git keeps nine message folders per stream: E4's reviewer layout, with lead's `inbox` (root's last
+# accept, unread) and without the empty `inbox` of root, the reviewer and the writer.
+E7_COMMON = {**E5_COMMON, "boxes": E4_REVIEWER_BOXES}
 
 MANIFESTS: dict[str, dict[str, Any]] = {
     "E": {
@@ -270,6 +275,35 @@ MANIFESTS: dict[str, dict[str, Any]] = {
         "deliverables": (
             delivered("memos/memo-2026-10-05.md", "2026-10-24T17:29:19.322Z", 12, 44),
             delivered("memos/memo-2026-10-12.md", "2026-10-24T17:33:53.245Z", 23, 52),
+        ),
+    },
+    "E7-s1": {
+        **E7_COMMON,
+        "evidence": EV7 / "s1",
+        # memo 1 was copied twice (call #27, then #46 after the human rework): the pin is the last write
+        "deliverables": (
+            delivered("memos/memo-2026-10-05.md", "2026-10-25T07:20:03.021Z", 12, 46),
+            delivered("memos/memo-2026-10-12.md", "2026-10-25T07:27:49.121Z", 22, 72),
+            delivered("memos/memo-2026-10-19.md", "2026-10-25T07:34:38.119Z", 33, 90),
+        ),
+    },
+    "E7-s2": {
+        **E7_COMMON,
+        "evidence": EV7 / "s2",
+        "deliverables": (
+            delivered("memos/memo-2026-10-05.md", "2026-10-25T07:53:54.962Z", 3, 28),
+            delivered("memos/memo-2026-10-12.md", "2026-10-25T08:05:21.844Z", 12, 43),
+            delivered("memos/memo-2026-10-19.md", "2026-10-25T08:14:08.939Z", 23, 55),
+        ),
+    },
+    "E7-s3": {
+        **E7_COMMON,
+        "evidence": EV7 / "s3",
+        # memo 1 was copied twice (call #27, then #46 after the human rework): the pin is the last write
+        "deliverables": (
+            delivered("memos/memo-2026-10-05.md", "2026-10-25T08:42:13.530Z", 13, 46),
+            delivered("memos/memo-2026-10-12.md", "2026-10-25T08:49:57.666Z", 24, 61),
+            delivered("memos/memo-2026-10-19.md", "2026-10-25T08:57:16.924Z", 36, 73),
         ),
     },
 }
