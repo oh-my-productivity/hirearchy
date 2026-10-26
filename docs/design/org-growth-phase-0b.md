@@ -1881,13 +1881,17 @@ the recorded `final-services-progress-status-health.txt` of each stream. Short i
 `20261025T070423629042-root-5efc`.
 
 **What a replay of these files cannot show (kit limit).** Kit limit: the replay has no org git history, so OQ-2's given-delivery path and P3's
-`relayed` finding cannot run; with history the evidence shows s2 relayed (no hand edit: 0 hand edits in 11 copies, e7-gate 5 item 9) and s1 and s3
-equal to the team's current files (the md5 facts of E7S1-6, E7S2-6 and E7S3-6). The kit materializes no git repository, so P3 does not know the
+`relayed` finding cannot run; with history the evidence shows s2 relayed (no hand edit: 0 hand edits in 11 copies, e7-gate 5 item 9) and s1's and s3's files
+equal to the team's current files (in s3 a version no delivery checked: below). The kit materializes no git repository, so P3 does not know the
 checked artifact of a past delivery and compares each file with the team's current one (4.3, "no org history"). Two consequences, stated once for the
 three streams: no `relayed` finding (0a.3, F-E5-5) arises, so the given delivery of every case is its latest delivery (OQ-2's "else"), and in s2 memo
 1's file is `not as delivered` against the injected relayed rework 37b7 and its case reads `without a verdict (relayed only)` (D18; e7-gate 5 item 6),
 where OQ-2's main path, with history, would read Lena's reject `...-root-ce17` and her L-ASIS accept `...-root-4a88` on c671, the delivery whose file she
-has; in s1 and s3 the replay and the history agree (memo 1's file is the current one). The facts that an org history would show for s2 are
+has; in s1 the replay and the history agree (memo 1's file is the current one, the checked artifact of 066f's delivery). In s3 they do not (corrected by
+0b.1: F-G0-13, manager decision of 2026-10-25 item 3): memo 1's file is v4 (b5f1411), written by d9bc, whose result ...-lead-da3c is blocked, so no
+delivery checked it (D4); with history P3 compares the file with the newest delivery that lists it, the relayed 5834 (...-lead-f639, checked v3 1c5b8a5),
+and reports differs naming 5834: not_as_delivered [{"case": 09df, "task": 5834}], nothing voided (5834 carries only the relayed reject ...-root-2da1),
+and the judged line reads "not as delivered: 1 (...-root-5834)". The replay compares with the team's current file, v4, and finds nothing. The facts that an org history would show for s2 are
 pre-registered below as **evidence facts** and asserted on the kept files (md5 against `memos/versions/INDEX.txt`), not on the product; the two paths
 the replays cannot take are run on a real git history by `tests/e2e/test_org_growth_0b_given.py`.
 
@@ -2045,10 +2049,12 @@ It is a finding, not an expectation.
 - E7S3-5: three judged cases: repeat `no (3 judged cases; counted: R1, C9); not counted: R1's reading C3 (not confirmed)` (`window` 09df, a443, a74a, in
   the order of their latest counted verdict, `subjects` `{"R1": 1, "C9": 1}`, `fired` `[]`, `not_counted` `{"R1": ["C3"]}`); cost `no (0 of 3 cases above
   1.25x)` (`compared` 3, the blocked and cut memo 1 included: 15 of 15 = 1.00x).
-- E7S3-6: evidence facts: the three delivered memos equal the team's current files: `memo-2026-10-05.md` (`fc20d12c8c8993772ffd35e348d5368e`) is `v4`
-  (`b5f1411`, 08:39:14Z), the checked artifact of d9bc (whose result is `blocked`); `memo-2026-10-12.md` (`d9b96f216459d7a5380658912dd5332d`) is `v2`
+- E7S3-6: evidence facts: the three memos the user was given equal the team's current files: `memo-2026-10-05.md` (`fc20d12c8c8993772ffd35e348d5368e`) is `v4`
+  (`b5f1411`, 08:39:14Z), the version d9bc's run committed (its result ...-lead-da3c is blocked, so it is no delivery's checked artifact: D4);
+  `memo-2026-10-12.md` (`d9b96f216459d7a5380658912dd5332d`) is `v2`
   and `memo-2026-10-19.md` (`30933ac60ef09478d15aadaeeb66d400`) is `v2`. On the replay: `not_as_delivered` `[]`, `neither` `[]`, nothing voided,
-  `files_error` `""`, and no no-history remark.
+  `files_error` `""`, and no no-history remark. With history (G0's self-check, SELFCHECK.md item 3; not a replay expectation): `not_as_delivered`
+  `[{"case": 09df, "task": 5834}]`, as the kit-limit paragraph says.
 - E7S3-7: moved past: none (the lead's blocked `...-root-d9bc`, result `...-lead-da3c`, is released by Lena's accept `...-root-dd46`, a verdict on its chain
   after the block: 0a.5 F-E7-7; no agent holds a left-blocked task); the recorded `status` shows budget 0 for every agent.
 
