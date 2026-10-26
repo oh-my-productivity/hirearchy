@@ -105,6 +105,14 @@ def test_find_received_looks_in_the_three_received_boxes_only(h: MailHarness) ->
     assert h.reader.find_received("ceo", "missing") is None
 
 
+def test_a_name_in_two_received_boxes_at_once_reads_as_two_messages(h: MailHarness) -> None:
+    """The anomaly no writer makes (A5): the same message file in ``inbox`` and in ``read`` is read twice, by every implementation."""
+    put(h, "ceo", "inbox", 1)
+    put(h, "ceo", "read", 1)
+    assert [m.id for m in h.reader.received("ceo")] == [mid(1), mid(1)]
+    assert [m.id for m in h.reader.messages("ceo", "inbox", "read")] == [mid(1), mid(1)]
+
+
 # ------------------------------------------------------------------------------ find_anywhere
 
 

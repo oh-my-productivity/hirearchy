@@ -12,7 +12,9 @@ from hirearchy.kernel import Message, OrgPaths
 from hirearchy.kernel.testing import FailingAtomicWriter, MemoryAtomicWriter
 from hirearchy.mail import MailboxReader, MailboxWriter, MailFingerprint, MessageParser
 from hirearchy.mail._mailbox import FsMailbox
-from hirearchy.mail.testing import CountingMessageParser
+from hirearchy.mail._parser import CachingMessageParser
+from hirearchy.mail._rules import RECEIVED_BOXES
+from hirearchy.mail.testing import CountingMessageParser, MovingMessageParser
 
 from ._support import BAD_BUDGET, BAD_YAML, message_text, mid, note, raises_a_parse_error
 
@@ -27,7 +29,7 @@ def inbox(root: Path, n: int, **kw: object) -> Path:
     return path
 
 
-def mailbox(root: Path, parser: CountingMessageParser | None = None, writer: object | None = None) -> FsMailbox:
+def mailbox(root: Path, parser: CachingMessageParser | None = None, writer: object | None = None) -> FsMailbox:
     return FsMailbox(OrgPaths(root), parser or CountingMessageParser(), writer or MemoryAtomicWriter())  # type: ignore[arg-type]
 
 
@@ -167,3 +169,89 @@ def test_the_fingerprint_reads_no_file(tmp_path: Path) -> None:
     for n in range(10):
         inbox(tmp_path, n)
     assert len(box.fingerprint("ceo")[0]) == 10 and parser.loaded == []
+
+
+# ------------------------------------------------------------------------------ a message that moves between the listing and the read (F-G0-3)
+
+
+def at(root: Path, box: str, n: int = 1) -> Path:
+    """The file of message ``n`` in a box of ``ceo`` (the directory is made, the file is not)."""
+    path = root / "ceo" / box / f"{mid(n)}.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def put_in(root: Path, box: str, n: int = 1) -> Path:
+    path = at(root, box, n)
+    path.write_text(message_text(mid(n), to="ceo"), encoding="utf-8")
+    return path
+
+
+def ids(messages: list[Message]) -> list[str]:
+    return [m.id for m in messages]
+
+
+@pytest.mark.parametrize(
+    ("start", "end"),
+    [("inflight", "read"), ("inbox", "inflight"), ("inbox", "read"), ("inflight", "inbox")],
+    ids=["forward-inflight-to-read", "forward-inbox-to-inflight", "forward-inbox-to-read", "back-inflight-to-inbox"],
+)
+def test_a_received_message_that_moves_to_another_asked_box_is_read_there_once(tmp_path: Path, start: str, end: str) -> None:
+    """The move is injected between the listing and the read (``MovingMessageParser``); the message is returned once, wherever the walk meets it."""
+    source = put_in(tmp_path, start)
+    parser = MovingMessageParser({source: at(tmp_path, end)})
+    box = mailbox(tmp_path, parser)
+    assert ids(box.messages("ceo", *RECEIVED_BOXES)) == [mid(1)]
+    assert parser.moved == [source]
+    assert not source.exists() and box.messages("ceo", *RECEIVED_BOXES)[0].path == at(tmp_path, end)
+
+
+def test_a_message_that_moves_twice_is_read_at_its_last_place_once(tmp_path: Path) -> None:
+    source = put_in(tmp_path, "inbox")
+    middle = at(tmp_path, "inflight")
+    parser = MovingMessageParser({source: middle, middle: at(tmp_path, "read")})
+    assert ids(mailbox(tmp_path, parser).messages("ceo", *RECEIVED_BOXES)) == [mid(1)]
+    assert parser.moved == [source, middle]
+
+
+def test_the_moved_message_keeps_its_place_in_the_order_by_id(tmp_path: Path) -> None:
+    put_in(tmp_path, "inbox", 1)
+    source = put_in(tmp_path, "inbox", 2)
+    put_in(tmp_path, "read", 3)
+    parser = MovingMessageParser({source: at(tmp_path, "read", 2)})
+    assert ids(mailbox(tmp_path, parser).messages("ceo", *RECEIVED_BOXES)) == [mid(1), mid(2), mid(3)]
+    assert parser.moved == [source]
+
+
+def test_a_message_that_moves_to_a_box_the_call_did_not_ask_for_is_left_out(tmp_path: Path) -> None:
+    source = put_in(tmp_path, "inflight")
+    parser = MovingMessageParser({source: at(tmp_path, "read")})
+    assert mailbox(tmp_path, parser).messages("ceo", "inflight") == []
+    assert parser.moved == [source]
+
+
+def test_a_message_that_is_removed_is_left_out(tmp_path: Path) -> None:
+    source = put_in(tmp_path, "inflight")
+    other = put_in(tmp_path, "inflight", 2)
+    parser = MovingMessageParser({source: tmp_path / "gone.md"})
+    assert ids(mailbox(tmp_path, parser).messages("ceo", *RECEIVED_BOXES)) == [mid(2)]
+    assert parser.moved == [source] and other.is_file()
+
+
+def test_a_sent_file_that_is_gone_still_raises(tmp_path: Path) -> None:
+    """Guard: the race is the one of a received message that ``inbox`` moves; no writer moves a sent copy."""
+    source = put_in(tmp_path, "sent")
+    parser = MovingMessageParser({source: tmp_path / "gone.md"})
+    with pytest.raises(FileNotFoundError):
+        mailbox(tmp_path, parser).messages("ceo", "sent")
+    assert parser.moved == [source]
+
+
+def test_a_received_listing_with_no_move_is_what_it_was(tmp_path: Path) -> None:
+    """Guard: no move, today's list."""
+    for n, box in enumerate(("read", "inbox", "inflight", "read"), 1):
+        put_in(tmp_path, box, n)
+    parser = MovingMessageParser({})
+    assert ids(mailbox(tmp_path, parser).messages("ceo", *RECEIVED_BOXES)) == [mid(n) for n in (1, 2, 3, 4)]
+    assert ids(mailbox(tmp_path, parser).messages("ceo", "read", "inbox")) == [mid(1), mid(2), mid(4)]
+    assert parser.moved == []

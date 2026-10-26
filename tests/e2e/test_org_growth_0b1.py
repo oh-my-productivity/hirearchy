@@ -4,16 +4,22 @@
 No scheduler, no LLM, no network: ``testkit.g0_replay.materialize`` rebuilds the organization a G0 stream had at one moment from ``studies/G0-noise-baseline/
 evidence``, and the product's own readers read it. A missing evidence file fails the test, never skips it.
 
-This module holds F-G0-2 (held user grants count in the user's runs and in the total) and F-G0-1 (the given-delivery tie rule, m0-s2 T4's zero case
-on a history built from the kept files). An expectation is never edited to match the product."""
+This module holds F-G0-2 (held user grants count in the user's runs and in the total), F-G0-1 (the given-delivery tie rule, m0-s2 T4's zero case
+on a history built from the kept files) and F-G0-3 (``progress`` meets a result that ``inbox`` moves between the listing and the read, m1-s3 T7). An expectation is never edited to match the product."""
 
 import json
 import shutil
+from datetime import datetime, timezone
 
 import pytest
+from testkit.clocks import clock_ports
 from testkit.g0_replay import EVG0, materialize
+from testkit.progress_world import describe_progress
+from testkit.reach.hirearchy.app import wiring
 
 from hirearchy.core import ROOT, Org
+from hirearchy.mail import MessageParser
+from hirearchy.mail.testing import MovingMessageParser
 
 SERVICE = "weekly-meeting-memo"
 M0_S1_CUT = "20261026T052934311534"  # m0-s1: root's accept ...-root-00d1, the last kept message (no run log after it)
@@ -24,6 +30,9 @@ CECE7 = "20261026T045511617097-root-ece7"
 CA7EF = "20261026T051255161913-root-a7ef"
 M0_S2_T4_CUT = "20261026T062340000000"  # m0-s2 turn 4: G0's quality/turn-04.json was written at 06:23:40
 C6F1D = "20261026T061639840350-root-6f1d"
+M1_S3_T7_CUT = "20261026T085214255000"  # m1-s3 #33: root's ``inbox`` has begun the batch (the result is in ``inflight/``) and not yet ended it
+M1_S3_RESULT = "20261026T084941501890-lead-3386"
+M1_S3_TASK = "20261026T084600894818-root-68a8"
 M0_S2_PIN = ("memo-2026-10-05.md", "memo-2026-10-05.v2.0d07ec4.md", "2026-10-26T06:23:13.513Z", 3)
 
 
@@ -103,3 +112,23 @@ def test_f_g0_1_m0_s2_t4_the_tie_without_a_verdict_is_the_latest_delivery(tmp_pa
     assert "lead/sent/20261026T062305224870-lead-e876.md" in block and "lead/sent/20261026T062307517536-lead-f5df.md" in block
     index = (EVG0 / "m0-s2" / "memos" / "versions" / "INDEX.txt").read_text(encoding="utf-8")
     assert "memo-2026-10-05.md v2 0d07ec4 2026-10-26T06:21:48Z" in index and "memo-2026-10-05.md v3 b389f15 2026-10-26T06:25:26Z" in index
+
+
+def test_f_g0_3_m1_s3_t7_progress_reads_the_result_inbox_moved(tmp_path):
+    """F-G0-3 (G0 m1-s3, T7; design 5.5): root's ``inbox`` moved the lead's result ``3386`` inbox -> inflight -> read and ``progress`` (1 ms later) had listed
+    ``inflight/`` and then failed to open the file there: ``[Errno 2] No such file or directory``. Here the cut is the moment ``inbox`` has begun the batch (the
+    result in ``inflight/``) and the move to ``read/`` is injected between the listing and the read. ``progress`` does not raise, reads the result at its new place
+    once, and says what it says when the result is in ``read/`` from the start (the control): no other reader opened the file first."""
+    fixed = lambda: datetime(2026, 10, 26, 8, 52, 14, 256000, tzinfo=timezone.utc)  # noqa: E731 - #33's time, 1 ms after the cut
+    path = materialize("m1-s3", M1_S3_T7_CUT, tmp_path / "a", inflight={ROOT: [M1_S3_RESULT]})
+    parser = MovingMessageParser({path / "inflight" / f"{M1_S3_RESULT}.md": path / "read" / f"{M1_S3_RESULT}.md"})
+    assert (path / "inflight" / f"{M1_S3_RESULT}.md").is_file() and not (path / "read" / f"{M1_S3_RESULT}.md").exists()
+    with wiring.overriding({**clock_ports(fixed), MessageParser: parser}):
+        text = describe_progress(Org(path), M1_S3_TASK)
+    assert parser.moved == [path / "inflight" / f"{M1_S3_RESULT}.md"]
+    assert (path / "read" / f"{M1_S3_RESULT}.md").is_file()
+    assert M1_S3_TASK in text and "done" in text
+    control = materialize("m1-s3", M1_S3_T7_CUT, tmp_path / "b")
+    assert (control / "read" / f"{M1_S3_RESULT}.md").is_file() and not (control / "inflight").exists()
+    with wiring.overriding(clock_ports(fixed)):
+        assert text == describe_progress(Org(control), M1_S3_TASK)

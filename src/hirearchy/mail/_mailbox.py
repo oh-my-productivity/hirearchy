@@ -23,12 +23,42 @@ class FsMailbox(DerivedMailboxReads, MailboxWriter, MailFingerprint):
     # ------------------------------------------------------------------ MailboxReader
 
     def messages(self, addr: str, *boxes: str) -> list[Message]:
+        """The messages of the boxes, sorted by id.
+
+        A file listed in a received box that is gone when it is read has been moved by the batch store (``inbox`` -> ``inflight`` -> ``read``, or
+        back): it is read at its new place when that is another received box this call asked for, and is otherwise left out of this call. A message
+        read at a new place is returned once per call. A ``sent`` file that is gone, and every other error, raise.
+        """
         out: list[Message] = []
+        moved: set[str] = set()  # the names this call read at a new place: the walk may meet them again in the box they moved to
         for box in boxes:
             d = self._layout.box(addr, box)
-            if d.is_dir():
-                out += [self._parser.parse(p) for p in visible(d.glob("*.md"))]
+            if not d.is_dir():
+                continue
+            for p in visible(d.glob("*.md")):
+                if p.name in moved:
+                    continue
+                try:
+                    out.append(self._parser.parse(p))
+                except FileNotFoundError:
+                    if box not in RECEIVED_BOXES:
+                        raise
+                    found = self._read_where_it_moved(addr, p.name, box, boxes)
+                    if found is not None:
+                        out.append(found)
+                        moved.add(p.name)
         return sorted(out, key=lambda m: m.id)
+
+    def _read_where_it_moved(self, addr: str, name: str, gone_from: str, boxes: tuple[str, ...]) -> Message | None:
+        """The message file ``name`` in another received box the call asked for (in ``RECEIVED_BOXES`` order), or ``None`` when it is nowhere."""
+        for box in RECEIVED_BOXES:
+            if box == gone_from or box not in boxes:
+                continue
+            try:
+                return self._parser.parse(self._layout.box(addr, box) / name)
+            except FileNotFoundError:
+                continue
+        return None
 
     def find_anywhere(self, addr: str, msg_id: str) -> Message | None:
         if not is_plain_id(msg_id):

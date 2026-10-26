@@ -3,7 +3,7 @@
 ``MemoryMailbox`` is the reader, the writer, the batch store, the fingerprint and the index at once, over the in-memory file tree of a
 ``MemoryAgents``. It passes the same contract suites as the real implementations (``tests/test_contract_*.py``), so a consumer's unit
 test may use it instead of directories on disk. ``CountingMessageParser`` is the real parse cache with counters, for the tests that
-guard the cache hits (the count, not a time).
+guard the cache hits (the count, not a time). ``MovingMessageParser`` moves a file between a listing and its read, to test the race.
 """
 
 from __future__ import annotations
@@ -54,6 +54,28 @@ class CountingMessageParser(CachingMessageParser):
     def _split_text(self, text: str) -> tuple[JsonObject, str]:
         self.parses += 1
         return super()._split_text(text)
+
+
+class MovingMessageParser(CachingMessageParser):
+    """A ``CachingMessageParser`` that moves a file just before it reads it: the seam of the race between a listing and a read (F-G0-3).
+
+    Given ``{source: target}``, the first parse of a path whose ``resolve()`` equals a source's ``os.replace``s the source to its target and
+    appends it to ``moved``, then parses the path as usual: so the real ``FileNotFoundError`` is raised, after the listing and before the read.
+    Both sides are resolved, so the match does not depend on how the layout spells a path (``/private/var`` against ``/var``). Each source moves once.
+    """
+
+    def __init__(self, moves: Mapping[Path, Path], max_entries: int = 50_000, split: Split = split_frontmatter) -> None:
+        super().__init__(max_entries, split)
+        self._moves = {source.resolve(): (source, target) for source, target in moves.items()}
+        self.moved: list[Path] = []
+
+    def parse_as(self, cls: type[M], path: Path) -> M:
+        due = self._moves.pop(path.resolve(), None)
+        if due is not None:
+            source, target = due
+            os.replace(source, target)
+            self.moved.append(source)
+        return super().parse_as(cls, path)
 
 
 class MemoryMailbox(DerivedMailboxReads, MailboxWriter, BatchStore, MailFingerprint, MessageIndex):
