@@ -8,7 +8,7 @@ tasks, because the default ``deliverables/`` folder is shared by everything root
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta, timezone
 from pathlib import PurePosixPath
 
@@ -53,6 +53,11 @@ def _judged(pair: _Pair) -> bool:
     return pair.case is not None and any(
         v.tier == "human" and v.task_id == pair.task.id and v.message.id > pair.result.id for v in pair.case.verdicts
     )
+
+
+def _latest_delivery(case: Case, latest: Mapping[str, Message]) -> str:
+    """The id of the case's latest delivery: the last of its tasks whose latest result is ``done`` (``_quality_rules._given``'s fallback); "" for none."""
+    return next((t.id for t in reversed(case.tasks) if (r := latest.get(t.id)) is not None and r.status == "done"), "")
 
 
 @dataclass
@@ -185,8 +190,12 @@ class FolderDeliverableChecks(DeliverableChecks):
                 return []
             return [DeliverableFinding(folder, group.services, entry.name, "unknown", file=single, written=entry.mtime_us, settled=settled)]
         settled = self._settled(entry.mtime_us, [pair.case] if pair.case is not None else [])
-        if settled and not call.settled:
+        if (settled or kind == "given") and not call.settled:  # a `given` finding is for the quality view alone, whatever its own mark
             return []
+        if kind == "given":
+            return [
+                DeliverableFinding(folder, group.services, entry.name, "given", task=pair.task.id, file=single, written=entry.mtime_us, settled=settled)
+            ]
         if kind == "relayed":
             return [
                 DeliverableFinding(
@@ -204,7 +213,9 @@ class FolderDeliverableChecks(DeliverableChecks):
         """A file of a folder contract: compared with the checked version of the team's artifact of the same name, newest first; else with any
         version the team has. Past a newest version that root's relayed rework wrote, the file may equal the delivery the user saw: ``relayed``, with the
         delivery's pair and the ids of the relayed reworks after it, oldest first (design 7.2). When several deliveries of the case equal the file as git
-        has it, the pair is the one the user judged (``_judged_tie``: of several, the newest result among them), else the newest as before (F-G0-1)."""
+        has it, the pair is the one the user judged (``_judged_tie``: of several, the newest result among them), else the newest as before (F-G0-1).
+        A file that equals the newest version (no relayed rework walked past) is no finding, except for the quality view (``call.settled``): when the
+        delivery the user judged is not the case's latest delivery, ``given`` names it, so that the given delivery is not taken to be the latest."""
         newest: _Pair | None = None
         relayed: list[str] = []  # the relayed tasks of the pairs walked past, newest first
         named = [p for p in basis.pairs if PurePosixPath(p.path).name == entry.name]  # newest first
@@ -213,9 +224,13 @@ class FolderDeliverableChecks(DeliverableChecks):
             if checked is None:  # a pair unknown on both sides (git and the organization) is dropped
                 continue
             if self._same(entry, checked):
-                if newest is None:
-                    return "", None, ()
-                return "relayed", self._judged_tie(call, entry, pair, named[at + 1 :]) or pair, tuple(reversed(relayed))
+                if newest is not None:
+                    return "relayed", self._judged_tie(call, entry, pair, named[at + 1 :]) or pair, tuple(reversed(relayed))
+                case = pair.case
+                chosen = self._judged_tie(call, entry, pair, named[at + 1 :]) if call.settled and case is not None else None
+                if chosen is not None and case is not None and call.latest is not None and chosen.task.id != _latest_delivery(case, call.latest):
+                    return "given", chosen, ()  # the user was given a delivery that is not the case's latest (the quality view's alone)
+                return "", None, ()
             newest = newest or pair
             if pair.task.source != "relayed":
                 break  # a task that is not a relayed rework ends the walk

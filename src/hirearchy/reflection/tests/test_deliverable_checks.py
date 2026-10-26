@@ -496,6 +496,56 @@ def test_a_one_off_pair_keeps_today_s_choice(w: ReflectionWorld) -> None:
     assert r.findings() == [finding("memo.md", "relayed", task=goal.id, relayed=(again.id,))]  # the one-off pair `goal`, as before
 
 
+def with_settled(r: Rig, service: str | None = SERVICE) -> list[DeliverableFinding]:
+    """The call of the quality view: the settled findings and the ``given`` ones are returned too (write times left out)."""
+    return [replace(found, written=0) for found in r.checks.findings(ROOT, service, settled=True)]
+
+
+def test_a_given_finding_names_the_judged_delivery_when_it_is_not_the_cases_latest(w: ReflectionWorld) -> None:
+    """The m0-s2 shape (``tie_shape`` without the relayed rework): ``b`` is the case's latest delivery; the user judged the head's late result ``a``."""
+    service(w)
+    r = rig(w)
+    head, human, _ = tie_shape(r, relayed=False)
+    rate(w, head, "accept")  # her verdict on `a`'s late delivery, before she copied the file
+    put(r, {"memo.md": b"team v2\n"})
+    assert r.findings(SERVICE) == []  # a `given` finding is for the quality view alone
+    assert with_settled(r) == [finding("memo.md", "given", task=head.id)]
+    assert with_settled(r, None) == with_settled(r)
+
+
+def test_no_given_finding_when_the_chosen_delivery_is_the_cases_latest(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    head, human, _ = tie_shape(r, relayed=False)
+    rate(w, human, "reject", "not quite")  # the user judged `b`, the latest delivery: it is what `_given` falls back to
+    put(r, {"memo.md": b"team v2\n"})
+    assert with_settled(r) == [] and r.findings(SERVICE) == []
+
+
+def test_a_single_equal_delivery_the_user_judged_is_given_when_a_later_delivery_does_not_list_the_file(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    first, _ = delivered(r, b"team v2\n")
+    rate(w, first, "accept")
+    done(w, rework(w, first), "lead/work/other.md")  # the latest delivery lists another file
+    put(r, {"memo.md": b"team v2\n"})
+    assert with_settled(r) == [finding("memo.md", "given", task=first.id)]
+    assert r.findings(SERVICE) == []
+
+
+def test_a_single_equal_delivery_with_no_human_verdict_that_is_not_the_latest_gives_no_finding(w: ReflectionWorld) -> None:
+    """A3: today's result. The given delivery is the case's latest (``_given``'s fallback), as the harness's re-derivation has it."""
+    service(w)
+    r = rig(w)
+    first, _ = delivered(r, b"team v2\n")
+    done(w, rework(w, first), "lead/work/other.md")
+    put(r, {"memo.md": b"team v2\n"})
+    assert with_settled(r) == [] and r.findings(SERVICE) == []
+    rate(w, first, "accept", source="relayed")  # not the user's
+    put(r, {"memo.md": b"team v2\n"})
+    assert with_settled(r) == []
+
+
 # ------------------------------------------------------------------------------------------------------------------------ the git bound
 
 

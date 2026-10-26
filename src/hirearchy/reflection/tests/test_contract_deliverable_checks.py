@@ -137,3 +137,22 @@ def test_the_fixed_checks_keep_the_settled_ones_apart_too() -> None:
     assert fixed.findings(ROOT) == [open_one] and fixed.findings(ROOT, settled=False) == [open_one]
     assert fixed.findings(ROOT, settled=True) == [settled, open_one]
     assert fixed.findings(ROOT, SERVICE, settled=True) == [settled, open_one] and fixed.findings(ROOT, "other", settled=True) == []
+
+
+def test_the_fixed_checks_return_a_given_finding_only_with_settled_true() -> None:
+    """The rule of the protocol, kept by the fake: a `given` finding is not returned by a default call even when it is not settled (the notes would
+    render it in the block of files the team did not deliver as checked)."""
+    given = DeliverableFinding(folder="/f", services=(SERVICE,), name="a.md", kind="given", task="t1")
+    open_one = DeliverableFinding(folder="/f", services=(SERVICE,), name="b.md", kind="unknown")
+    fixed = FixedDeliverableChecks({ROOT: [given, open_one]})
+    assert fixed.findings(ROOT) == [open_one] == fixed.findings(ROOT, SERVICE)
+    assert fixed.findings(ROOT, settled=True) == [given, open_one] and fixed.findings(ROOT, "other", settled=True) == []
+
+
+def test_a_given_finding_is_returned_only_with_settled_true(h: DeliverableHarness) -> None:
+    """Design 4.4, the protocol rule: a `given` finding says which delivery the file equals when it is not the case's latest, for the quality view alone.
+    The default call (the notes') never returns it, whatever its own `settled`; the call with `settled=True` does."""
+    task = h.populate_given()
+    assert h.checks.findings(ROOT) == [] == h.checks.findings(ROOT, h.service)
+    for found in (h.checks.findings(ROOT, settled=True), h.checks.findings(ROOT, h.service, settled=True)):
+        assert [(f.kind, f.task, f.settled) for f in found] == [("given", task, False)]

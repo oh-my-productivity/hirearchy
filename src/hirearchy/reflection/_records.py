@@ -134,14 +134,14 @@ def _deliveries_in(boxes: _Boxes, client: str, case: Case) -> tuple[Delivery, ..
 
 def _attributed(deliveries: Sequence[Delivery], findings: Sequence[DeliverableFinding]) -> tuple[Delivery, ...]:
     """The deliveries with what the deliverable folders say (design 4.3): a delivery a ``differs`` finding names is not as delivered since the earliest
-    write time among its files (``edited_at``; 0 when no time is known, and then nothing is voided); the delivery a ``relayed`` finding names is the one
-    the user was given, and is not a deviation. Other kinds name no delivery."""
+    write time among its files (``edited_at``; 0 when no time is known, and then nothing is voided); the delivery a ``relayed`` or a ``given`` finding names
+    is the one the user was given, and is not a deviation. Other kinds name no delivery."""
     writes: dict[str, list[int]] = {}
     given: set[str] = set()
     for found in findings:
         if found.kind == "differs":
             writes.setdefault(found.task, []).append(found.written)
-        elif found.kind == "relayed":
+        elif found.kind in ("relayed", "given"):
             given.add(found.task)
     out = []
     for d in deliveries:

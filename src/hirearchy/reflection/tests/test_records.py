@@ -506,6 +506,25 @@ def test_a_finding_whose_file_equals_another_deliverys_checked_artifact_is_no_ha
     assert all(not d.voided for d in record.deliveries)
 
 
+def test_a_given_finding_flags_its_delivery_given_like_a_relayed_one_and_voids_nothing(w: ReflectionWorld) -> None:
+    define(w)
+    first = ask(w)
+    deliver(w, first)
+    w.s.d.clock.advance(1)
+    rate(w, first, "accept", "good")
+    w.s.d.clock.advance(1)
+    second = rework(w, first)
+    deliver(w, second)
+    stamp = micros(w.s.d.clock.now())
+    given = finding("given", first.id, written=stamp)  # the file equals the first delivery, which the user judged; the second is the latest
+    record = only(records_of(w, checks=CountingChecks([given])).records())
+    by_task = {d.task.id: d for d in record.deliveries}
+    assert (by_task[first.id].given, by_task[first.id].edited, by_task[first.id].judged) == (True, False, True)
+    assert (by_task[second.id].given, by_task[second.id].edited) == (False, False)
+    assert all(not d.voided for d in record.deliveries) and record.files_error == ""
+    assert [t for t in record.timeline if type(t).__name__ == "TopUpMark"] == [t for t in only(records_of(w).records()).timeline if type(t).__name__ == "TopUpMark"]
+
+
 def test_a_finding_of_no_record_is_dropped(w: ReflectionWorld) -> None:
     task, _ = judged(w)
     checks = CountingChecks([finding("differs", "20260101T000000000000-root-0000", written=5), finding("relayed", "20260101T000000000001-root-0001")])

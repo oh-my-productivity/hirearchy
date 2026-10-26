@@ -198,3 +198,59 @@ def test_the_head_s_late_result_ties_with_the_rework_and_with_no_human_verdict_t
     (found,) = org.runtime.deliverable_checks.findings(ROOT, SERVICE, settled=True)
     assert (found.name, found.kind, found.task, found.relayed) == ("memo.md", "relayed", a.id, (c.id,))
     assert record_of(org)["deliveries"]["unjudged_cases"] == [a.id]
+
+
+@pytest.fixture
+def tie_m0_s2(tmp_path):
+    """The m0-s2 shape (design 4.8): `tie` without `c`. The head `a` is reported `blocked`; the user's rework `b` is delivered with V2 and the lead then
+    reports `a` `done` listing the same file; both late results are reported with no commit in between and one commit holds them (cosmetic: git gives V2
+    for both either way). The case's latest delivery is `b`. The user's copy and her verdicts are each test's own."""
+    org = Org.init(tmp_path / "org", "Mission.", {"poll_seconds": 0.05})
+    org.hire(ROOT, "lead", "Lead", "Run the memos.", can_hire=True, max_children=2)
+    folder = tmp_path / "deliverables"
+    org.define_service(
+        ROOT, "lead", SERVICE, description="A memo.", inputs=[{"name": "topic", "description": "what it is about", "required": True}],
+        acceptance=["A Summary line first"], deliverable={"description": "one markdown file", "path": str(folder)}, budget=10,
+        playbook="# Memo\n\n1. Write it.\n",
+    )
+    commit_all(org, "the org as hired")
+    a = org.request(ROOT, SERVICE, {"topic": "memo"})
+    deliver(org, a, V1, status="blocked")
+    b = org.request(ROOT, SERVICE, {"topic": "memo"}, revises=a.id, source="human")
+    deliver(org, b, V2, commit=False)
+    deliver(org, a, V2, commit=False)
+    commit_all(org, "lead: run ok [b and a]")
+    folder.mkdir()
+    return org, folder, a, b
+
+
+def test_m0_s2_shape_with_no_verdict_the_tie_gives_no_finding_and_the_case_is_without_a_verdict(tie_m0_s2):
+    """Guard: the user's copy equals both late results and she judged neither: no finding (the given delivery is the case's latest, `b`), the case is
+    without a verdict."""
+    org, folder, a, b = tie_m0_s2
+    (folder / "memo.md").write_text(V2, encoding="utf-8")
+    assert org.runtime.deliverable_checks.findings(ROOT, SERVICE, settled=True) == []
+    assert record_of(org)["deliveries"]["unjudged_cases"] == [a.id]
+
+
+def test_m0_s2_shape_with_only_her_reject_of_the_latest_delivery_there_is_no_finding(tie_m0_s2):
+    """Guard: she rejected `b`, the case's latest delivery and the one the tie rule would choose: nothing to name, and the case has a verdict."""
+    org, folder, a, b = tie_m0_s2
+    (folder / "memo.md").write_text(V2, encoding="utf-8")
+    org.feedback(ROOT, b.id, "reject", "Not quite.", source="human")
+    assert org.runtime.deliverable_checks.findings(ROOT, SERVICE, settled=True) == []
+    assert record_of(org)["deliveries"]["unjudged_cases"] == []
+
+
+def test_m0_s2_shape_with_her_accept_of_the_head_s_late_delivery_the_given_delivery_is_named(tie_m0_s2):
+    """F-G0-1 on the m0-s2 pattern (design 4.4): she accepted `a`'s late delivery and only then copied the file, which equals `a`'s and `b`'s result alike.
+    The delivery she judged is the one she was given, though `b` is the case's latest: a `given` finding names `a`, only for the quality view (settled=True),
+    not settled (her verdict is older than the file); the notes' call sees nothing; the case is no longer without a verdict (at c68ae679: `[a]`)."""
+    org, folder, a, b = tie_m0_s2
+    org.feedback(ROOT, a.id, "accept", "That one is right - keep it.", source="human")
+    (folder / "memo.md").write_text(V2, encoding="utf-8")
+    (found,) = org.runtime.deliverable_checks.findings(ROOT, SERVICE, settled=True)
+    assert (found.name, found.kind, found.task, found.relayed, found.settled) == ("memo.md", "given", a.id, (), False)
+    assert org.runtime.deliverable_checks.findings(ROOT, SERVICE) == []
+    deliveries = record_of(org)["deliveries"]
+    assert deliveries["unjudged_cases"] == [] and deliveries["not_as_delivered"] == [] and deliveries["unseen_relayed"] == []

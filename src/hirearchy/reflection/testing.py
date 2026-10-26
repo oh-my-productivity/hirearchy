@@ -134,8 +134,8 @@ class FixedCaseHistory(CaseHistory):
 
 
 class FixedDeliverableChecks(DeliverableChecks):
-    """The findings a test puts in, by actor; ``findings`` answers them (only those of ``service`` when it is given, and the ones marked ``settled``
-    only when ``settled`` is true)."""
+    """The findings a test puts in, by actor; ``findings`` answers them (only those of ``service`` when it is given, the ones marked ``settled``
+    only when ``settled`` is true, and a ``given`` finding only when ``settled`` is true, whatever its own mark: the rule of the protocol)."""
 
     def __init__(self, findings: Mapping[str, Sequence[DeliverableFinding]] | None = None) -> None:
         self._by_actor = {actor: list(found) for actor, found in (findings or {}).items()}
@@ -144,7 +144,10 @@ class FixedDeliverableChecks(DeliverableChecks):
         self._by_actor.setdefault(actor, []).extend(found)
 
     def findings(self, actor: str, service: str | None = None, *, settled: bool = False) -> list[DeliverableFinding]:
-        return [f for f in self._by_actor.get(actor, []) if (settled or not f.settled) and (service is None or service in f.services)]
+        return [
+            f for f in self._by_actor.get(actor, [])
+            if (settled or (not f.settled and f.kind != "given")) and (service is None or service in f.services)
+        ]
 
 
 class HashBlobIds(BlobIds):
@@ -338,41 +341,75 @@ def steps_memory(tmp_path: Path) -> ServiceSteps:
 @dataclass(frozen=True)
 class DeliverableHarness:
     """A ``DeliverableChecks`` and the means to give it one finding: after ``populate``, root's ``weekly-brief`` has exactly one: ``x.md``, a file the
-    team never wrote (``unknown``)."""
+    team never wrote (``unknown``). ``populate_given`` is used instead of ``populate``: afterwards root's ``weekly-brief`` has exactly one finding, of
+    kind ``given`` and not settled, and the task id it names is returned."""
 
     checks: DeliverableChecks
     populate: Callable[[], None]
     service: str
+    populate_given: Callable[[], str]
 
 
 SERVICE = "weekly-brief"
 
 
 def deliverable_checks_fs(tmp_path: Path) -> DeliverableHarness:
-    """The real checks over the fs world, with a real deliverable folder."""
+    """The real checks over the fs world, with a real deliverable folder (and a ``FixedCheckedVersions`` the harness holds, for ``populate_given``)."""
     w = fs_world(tmp_path)
     folder = tmp_path / "deliverables"
+    versions = FixedCheckedVersions()
+    checks = FolderDeliverableChecks(w.s.catalog, w.history, w.s.d.mail, FsDeliverableFolder(), versions, HashBlobIds(), w.s.d.clock)
+    memo, team = "ceo/work/memo.md", b"team v2\n"
 
-    def populate() -> None:
-        w.s.d.agent("ceo", True)
-        w.s.d.agent("ceo/eng", False)
-        w.s.commands.define_service(
-            ROOT, "ceo", SERVICE, description="A brief.", inputs=[], acceptance=["At most 600 words"],
-            deliverable={"description": "one markdown file", "path": str(folder)}, budget=10,
-        )
-        folder.mkdir()
-        written = folder / "x.md"
-        written.write_text("somebody's file\n", encoding="utf-8")
+    def write(name: str, data: bytes) -> None:
+        folder.mkdir(exist_ok=True)
+        written = folder / name
+        written.write_bytes(data)
         later = w.s.d.clock.now() + timedelta(days=1)  # the clock of the messages is a fake: a file written "now" must be after the contract
         os.utime(written, ns=(int(later.timestamp() * 1e9),) * 2)
 
-    return DeliverableHarness(w.deliverables, populate, SERVICE)
+    def define() -> None:
+        w.s.d.agent("ceo", True)
+        w.s.d.agent("ceo/eng", False)
+        w.s.commands.define_service(
+            ROOT, "ceo", SERVICE, description="A brief.", inputs=[{"name": "topic", "description": "what", "required": True}],
+            acceptance=["At most 600 words"], deliverable={"description": "one markdown file", "path": str(folder)}, budget=10,
+        )
+
+    def answer(task: Message, status: str) -> Message:
+        body = f"## Summary\nok\n\n## Artifacts\n- {memo} (3 words)\n"
+        return w.s.d.post(Message(sender=task.to, to=task.sender, type="result", status=status, reply_to=task.id, body=body, title="Result"))
+
+    def populate() -> None:
+        define()
+        write("x.md", b"somebody's file\n")
+
+    def populate_given() -> str:
+        """The m0-s2 shape (design 4.8): the head ``a`` is reported blocked, the user's rework ``b`` is delivered with v2, the head's late result lists
+        the same file, the user accepts ``a``'s late delivery and only then copies the file (v2): it equals ``a`` and ``b``, and ``b`` is the latest."""
+        define()
+        head = w.s.commands.request(ROOT, SERVICE, {"topic": "ai"})
+        answer(head, "blocked")
+        rework = w.s.commands.request(ROOT, SERVICE, {"topic": "ai"}, revises=head.id, source="human")
+        versions.at[(answer(rework, "done").id, memo)] = ("c1", blob(team))
+        versions.at[(answer(head, "done").id, memo)] = ("c1", blob(team))
+        w.s.commands.feedback(ROOT, head.id, "accept", "", source="human")
+        write("memo.md", team)
+        return head.id
+
+    return DeliverableHarness(checks, populate, SERVICE, populate_given)
 
 
 def deliverable_checks_fixed(tmp_path: Path) -> DeliverableHarness:
     fixed = FixedDeliverableChecks()
     finding = DeliverableFinding(folder=str(tmp_path / "deliverables"), services=(SERVICE,), name="x.md", kind="unknown")
-    return DeliverableHarness(fixed, lambda: fixed.put(ROOT, finding), SERVICE)
+    given = DeliverableFinding(folder=str(tmp_path / "deliverables"), services=(SERVICE,), name="memo.md", kind="given", task="20261018T100000000000-root-0000")
+
+    def populate_given() -> str:
+        fixed.put(ROOT, given)
+        return given.task
+
+    return DeliverableHarness(fixed, lambda: fixed.put(ROOT, finding), SERVICE, populate_given)
 
 
 @dataclass(frozen=True)

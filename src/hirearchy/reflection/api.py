@@ -834,14 +834,14 @@ class DeliverableFinding:
     folder: str  # the folder as resolved (for a contract that names a file: that file's folder)
     services: tuple[str, ...]  # every service whose contract names this folder (or this file), sorted
     name: str  # the file name inside it ("" for the folder itself)
-    kind: str  # "differs" | "relayed" | "unknown" | "link" | "large" | "limit" | "unreadable"
+    kind: str  # "differs" | "relayed" | "given" | "unknown" | "link" | "large" | "limit" | "unreadable"
     artifact: str = ""  # the team's artifact it was compared with ("" unless "differs")
-    task: str = ""  # the task whose done result last listed that artifact ("" unless "differs"); for "relayed": the delivery the file equals
+    task: str = ""  # the task whose done result last listed that artifact ("" unless "differs"); for "relayed" and "given": the delivery the file equals (of several, the one the user judged)
     withheld: bool = False  # that result still has open client questions (``questions_open`` > 0): its artifact path is not shown
     error: str = ""  # for "unreadable": the operating system's words for it
     file: bool = False  # the contract names this file itself, not a folder
     relayed: tuple[str, ...] = ()  # for "relayed": the ids of root's relayed reworks that changed the team's copy after that delivery, oldest first
-    written: int = 0  # for "differs", "relayed" and "unknown": the file's last write, in microseconds since the epoch (0 when it is not known)
+    written: int = 0  # for "differs", "relayed", "given" and "unknown": the file's last write, in microseconds since the epoch (0 when it is not known)
     settled: bool = False  # the user's own verdict was recorded at or after that write; only ``findings(..., settled=True)`` returns such a finding
 
 
@@ -850,7 +850,8 @@ class DeliverableChecks(Protocol):
     def findings(self, actor: str, service: str | None = None, *, settled: bool = False) -> list[DeliverableFinding]:
         """The files in the deliverable folders (``deliverable.path`` of the contracts) of the services ``actor`` requests (or only the folder of
         ``service``) that differ from the team's last checked version, that the team never wrote, or that could not be read; the ones the user's own
-        verdict settled are left out, unless ``settled`` is true: then they are returned too, with ``DeliverableFinding.settled`` set. Never reads
+        verdict settled are left out, unless ``settled`` is true: then they are returned too, with ``DeliverableFinding.settled`` set. A ``given`` finding
+        (the file equals a delivery the user judged that is not the case's latest) is returned only with ``settled=True``, whatever its own mark. Never reads
         outside a folder; never raises for an unreadable folder, file or history (a catalog or a mailbox that cannot be read does raise ``OrgError``
         or ``OSError``)."""
         ...
