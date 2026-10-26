@@ -75,12 +75,12 @@ def test_a_second_lessons_section_adds_to_the_first() -> None:
 # ------------------------------------------------------------------------------ case_spend
 
 
-def spent(state: str, runs: int, budget: int, returned: int) -> int:
+def spent(state: str, runs: int, budget: int, returned: int, granted: int = 0) -> int:
     """``case_spend`` of a case with these numbers (nothing else of a case matters to it)."""
     task = Message(sender="root", to="ceo", type="task", body="b", title="t")
     case = Case(
         id="A", service="s", owner="ceo", tasks=[task], result=None, state=state, playbook=0, used=0, reworks=0, budget=budget, runs=runs,
-        lessons=[], verdicts=[], started=None, finished=None, returned=returned,
+        lessons=[], verdicts=[], started=None, finished=None, returned=returned, user_granted=granted,
     )
     return case_spend(case)
 
@@ -104,6 +104,19 @@ def test_case_spend_never_counts_a_negative_rest() -> None:
 
 def test_case_spend_of_a_case_with_nothing_handed_down_is_its_runs() -> None:
     assert spent("open", 0, 0, 0) == 0 and spent("open", 2, 0, 0) == 2
+
+
+def test_case_spend_counts_the_user_s_grants_still_held_while_the_case_is_open_or_blocked() -> None:
+    """F-G0-2 (m0-s1 6c7a, design 3.2): 15 handed down and 3 granted, 7 used, 8 returned: 7 + (15 + 3 - 7 - 8) = 10; a finished case holds nothing."""
+    assert spent("open", 7, 15, 8, granted=3) == 10 and spent("blocked", 7, 15, 8, granted=3) == 10
+    assert spent("done", 7, 15, 8, granted=3) == 7 and spent("failed", 7, 15, 8, granted=3) == 7
+
+
+def test_case_spend_adds_nothing_for_a_grant_that_is_used_up() -> None:
+    assert spent("open", 15, 12, 0, granted=3) == 15  # 12 + 3 handed down, all used
+    assert spent("blocked", 20, 12, 0, granted=3) == 20  # more used than handed down: never below the runs used
+    assert spent("open", 9, 12, 7, granted=3) == 9  # returned beyond what is left: nothing is still out
+    assert spent("open", 4, 12, 0, granted=0) == 12  # no grant: today's figure
 
 
 # ------------------------------------------------------------------------------ user_spend, user_cost, user_committed, user_approved
@@ -131,10 +144,12 @@ NUMBERS = [(12, 0), (15, 0), (14, 0), (16, 0), (7, 8), (9, 15), (20, 0), (0, 0),
 @pytest.mark.parametrize("state", ["done", "failed", "open", "blocked"])
 @pytest.mark.parametrize("tasks", CHAINS)
 def test_without_a_relayed_task_the_user_spend_and_cost_are_the_case_spend(state: str, tasks: list[tuple[int, str | None]]) -> None:
-    """I1 (D-E5-1): a chain without a relayed task costs the user exactly what ``case_spend`` says, so the human client's text is today's text."""
+    """I1 (D-E5-1): a chain without a relayed task costs the user exactly what ``case_spend`` says, so the human client's text is today's text; with
+    the user's grants too (0b.1 F-G0-2: both count them while the case is open or blocked)."""
     for runs, returned in NUMBERS:
-        case = hand_built(tasks, state, runs, returned)
-        assert user_spend(case) == user_cost(case) == case_spend(case)
+        for granted in (0, 3):
+            case = hand_built(tasks, state, runs, returned, user_granted=granted)
+            assert user_spend(case) == user_cost(case) == case_spend(case)
 
 
 def test_user_spend_leaves_the_runs_of_a_relayed_rework_out() -> None:
@@ -152,6 +167,29 @@ def test_user_spend_leaves_the_runs_still_out_of_a_relayed_task_out() -> None:
 def test_user_spend_of_an_open_case_counts_what_the_user_tasks_returned_only() -> None:
     case = hand_built([(12, None), (6, "relayed")], "open", runs=7, returned=9, relayed_runs=3, relayed_returned=4)
     assert user_spend(case) == 4 + max(0, 12 - 4 - 5)  # 4 user runs; 12 handed down, 5 returned by the user tasks' results
+
+
+def test_user_spend_counts_the_grants_still_held_beside_a_relayed_task() -> None:
+    """F-G0-2: 12 handed down for the user, 2 granted, 6 for a relayed rework; 10 runs, 5 of them the relayed task's: the user's 5 + (12 + 2 - 5), and
+    the case's 10 + (18 + 2 - 10)."""
+    case = hand_built([(12, None), (6, "relayed")], "open", runs=10, returned=0, relayed_runs=5, user_granted=2)
+    assert user_spend(case) == 14 and case_spend(case) == 20
+    finished = hand_built([(12, None), (6, "relayed")], "done", runs=10, returned=0, relayed_runs=5, user_granted=2)
+    assert user_spend(finished) == 5 and case_spend(finished) == 10
+
+
+@pytest.mark.parametrize("state", ["open", "blocked"])
+@pytest.mark.parametrize("tasks", [*CHAINS, [(12, None), (6, "relayed")], [(10, None), (6, "relayed"), (5, "human")]])
+def test_while_open_or_blocked_the_user_spend_is_what_the_user_committed(state: str, tasks: list[tuple[int, str | None]]) -> None:
+    """F-G0-2 (design 3.3): the user's spend and the user's committed runs are one figure while the case can still draw on its runs."""
+    for runs, returned in NUMBERS:
+        for granted in (0, 3):
+            for relayed_runs, relayed_to_user in ((0, 0), (min(runs, 2), 1)):
+                case = hand_built(
+                    tasks, state, runs, returned, user_granted=granted, relayed_runs=relayed_runs,
+                    relayed_returned=min(returned, 4) if relayed_runs else 0, relayed_to_user=relayed_to_user if relayed_runs else 0,
+                )
+                assert user_spend(case) == user_committed(case)
 
 
 def test_user_cost_subtracts_the_relayed_overlap_and_is_never_below_zero() -> None:

@@ -492,6 +492,22 @@ def test_the_ceiling_of_e5s_s3_final_is_14_and_the_grant_in_the_human_interval_c
     assert reflection.user_spend(case) == 13 and reflection.user_approved(case, 12) == 14
 
 
+def test_a_blocked_case_holds_the_run_of_the_grant_it_has_not_used(tmp_path):
+    """F-G0-2 (G0 m0-s1, memo 3, case 6c7a; design 3.6): the head had 12 and 9 runs, returning 3; the user's rework had 3 and 3 runs and is blocked;
+    root granted 2; the team used 1 more. The user's requests cost 13 used + 1 granted run held = 14, as the approval (12, +3 -> 12, +2 -> 14) says."""
+    w = ceiling_world(tmp_path)
+    first = sup.ask(w, "s1")
+    sup.deliver(w, first, runs=9, budget=3)
+    blocked = sup.rework(w, first, budget=3)
+    sup.deliver(w, blocked, status="blocked", runs=3)
+    grant(w, 2)
+    w.use_run("ceo")  # the team resumes on the grant
+    case = the_case(w)
+    assert (case.state, case.runs, case.relayed_runs, case.user_granted) == ("blocked", 13, 0, 2)
+    assert reflection.user_spend(case) == reflection.case_spend(case) == reflection.user_committed(case) == 14
+    assert reflection.user_cost(case) == 14 and reflection.user_approved(case, 12) == 14
+
+
 def overlapping_chain(w, answered):
     """A done request; a relayed rework R (budget 6) with 2 runs; then a human rework H; R's 4 later runs fall in H's interval. ``answered``: R was
     answered (with its whole budget back) before H was sent, so nothing of it can lie in H's interval."""

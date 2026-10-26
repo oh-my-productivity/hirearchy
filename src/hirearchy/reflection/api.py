@@ -489,10 +489,10 @@ class Delivery:
 
 def case_spend(case: Case) -> int:
     """The runs a case costs against its contract's per-request budget (pure): the runs its team used, plus, while it is not finished (open or
-    blocked), the runs handed down for it that were neither used nor returned (the team may still spend them). It is the case's total, the
-    user's requests and root's relayed reworks together: ``case_total`` warns on it for an agent client's case, and D-E5-6 has Phase 0b's cost
-    alarm split it (``user_cost`` against ``user_approved``, the comparison ``case_total`` makes for a human client's case)."""
-    still_out = 0 if case.state in ("done", "failed") else max(0, case.budget - case.runs - case.returned)
+    blocked), the runs handed down for it and the user's grants that were neither used nor returned (the team may still spend them). It is the case's
+    total, the user's requests and root's relayed reworks together: ``case_total`` warns on it for an agent client's case, and D-E5-6 has Phase 0b's
+    cost alarm split it (``user_cost`` against ``user_approved``, the comparison ``case_total`` makes for a human client's case)."""
+    still_out = 0 if case.state in ("done", "failed") else max(0, case.budget + case.user_granted - case.runs - case.returned)
     return case.runs + still_out
 
 
@@ -504,13 +504,11 @@ def _user_back(case: Case) -> int:
 
 def user_spend(case: Case) -> int:
     """The runs a case costs the user (pure): ``case_spend`` restricted to the user's requests, the tasks of the chain that are not relayed
-    reworks, less the user's runs that a relayed result carried back (``_user_back``). Equal to ``case_spend`` when the chain has no relayed
-    rework."""
-    runs = case.runs - case.relayed_runs
+    reworks, and the user's grants, less the user's runs that a relayed result carried back (``_user_back``). Equal to ``case_spend`` when the chain
+    has no relayed rework. While the case is open or blocked it is ``user_committed``: the runs used and the runs the team still holds."""
     if case.state in ("done", "failed"):
-        return runs
-    budget = sum(t.budget for t in case.tasks if t.source != "relayed")
-    return runs + max(0, budget - runs - _user_back(case))
+        return case.runs - case.relayed_runs
+    return user_committed(case)
 
 
 def user_cost(case: Case) -> int:

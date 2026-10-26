@@ -54,14 +54,18 @@ def test_a2_e7_s2_20_c671_is_the_default_with_nothing_left_and_the_approval_stay
     assert before.runtime.case_allowance.left("lead", SERVICE, THREE_CA4) == 0  # nothing was left: the default handed 1
 
 
-def test_a2_e7_s2_the_grant_68df_approves_13(tmp_path):
-    """A2 (E7 s2, D-E7-2): Lena said yes to one more run and root granted it (68df, 1 run). The approval is 13, as she approved it (it read 14), and
-    the case costs 13: no overspend sentence."""
+def test_a2_e7_s2_the_grant_68df_cost_14_over_13(tmp_path):
+    """A2 (E7 s2, D-E7-2; amended by 0b.1 F-G0-2, R-0b1-1): Lena said yes to one more run and root granted it (68df, 1 run). The approval is 13, as she
+    approved it (it read 14), and the user's requests cost **14** (9 used + 5 held: 3 of 3ca4's 12, c671's default run and the granted run): the case
+    is over the 13 approved, and ``case_total`` says so (``OVER_APPROVED``), as #24 does two minutes later. The published figure was 13 and no
+    sentence (0a.5 4.7); the cost left out the granted run the team still held. Superseded by 0b.1 F-G0-2 (R-0b1-1)."""
     org = Org(materialize("s2", "20261025T075138446837", tmp_path / "org"))
     case = the_case(org, C671)
-    assert user_approved(case, 12) == 13 and user_cost(case) == 13
-    total = org.runtime.service_reports.case_total(sent(org, C671))
-    assert "exceeds" not in total and "more than" not in total
+    assert user_approved(case, 12) == 13 and user_cost(case) == 14
+    assert org.runtime.service_reports.case_total(sent(org, C671)) == (
+        "case total: 9 runs used of 13 handed down (contract: 12 per request). The user's requests now cost 14 runs, more than the 13 the user "
+        "approved for this case (contract: 12 per request, plus 1 approved beyond it): tell the user."
+    )
 
 
 def test_a2_e7_s2_24_the_case_total_says_14_is_more_than_the_13_approved(tmp_path):
