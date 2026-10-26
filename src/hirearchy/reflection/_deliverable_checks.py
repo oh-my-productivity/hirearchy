@@ -8,6 +8,7 @@ tasks, because the default ``deliverables/`` folder is shared by everything root
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from collections.abc import Sequence
 from datetime import datetime, timedelta, timezone
 from pathlib import PurePosixPath
 
@@ -46,6 +47,14 @@ class _Pair:
     case: Case | None
 
 
+def _judged(pair: _Pair) -> bool:
+    """Does the pair's delivery carry a human-tier verdict: the user's own, given on its task after its result (``deliveries_of``'s rule; counted or
+    voided)? One given on an earlier blocked result is on no delivery."""
+    return pair.case is not None and any(
+        v.tier == "human" and v.task_id == pair.task.id and v.message.id > pair.result.id for v in pair.case.verdicts
+    )
+
+
 @dataclass
 class _Group:
     place: Located
@@ -82,6 +91,7 @@ class _Call:
     hexlen: int = 40  # the length of the ids of the repository's object format, once git has answered one
     asked: set[tuple[str, str]] = field(default_factory=set)
     known: dict[tuple[str, str], str | None] = field(default_factory=dict)
+    from_git: set[tuple[str, str]] = field(default_factory=set)  # the (result id, path) keys of ``known`` that git answered, not the organization's file now
     current: dict[tuple[str, int], str | None] = field(default_factory=dict)
     sent: list[Message] | None = None
     latest: dict[str, Message] | None = None
@@ -193,15 +203,19 @@ class FolderDeliverableChecks(DeliverableChecks):
     def _folder_rule(self, call: _Call, basis: _Basis, entry: FolderFile) -> tuple[str, _Pair | None, tuple[str, ...]]:
         """A file of a folder contract: compared with the checked version of the team's artifact of the same name, newest first; else with any
         version the team has. Past a newest version that root's relayed rework wrote, the file may equal the delivery the user saw: ``relayed``, with the
-        delivery's pair and the ids of the relayed reworks after it, oldest first (design 7.2)."""
+        delivery's pair and the ids of the relayed reworks after it, oldest first (design 7.2). When several deliveries of the case equal the file as git
+        has it, the pair is the one the user judged (``_judged_tie``: of several, the newest result among them), else the newest as before (F-G0-1)."""
         newest: _Pair | None = None
         relayed: list[str] = []  # the relayed tasks of the pairs walked past, newest first
-        for pair in (p for p in basis.pairs if PurePosixPath(p.path).name == entry.name):  # newest first
+        named = [p for p in basis.pairs if PurePosixPath(p.path).name == entry.name]  # newest first
+        for at, pair in enumerate(named):
             checked = self._checked(call, pair)
             if checked is None:  # a pair unknown on both sides (git and the organization) is dropped
                 continue
             if self._same(entry, checked):
-                return ("relayed", pair, tuple(reversed(relayed))) if newest is not None else ("", None, ())
+                if newest is None:
+                    return "", None, ()
+                return "relayed", self._judged_tie(call, entry, pair, named[at + 1 :]) or pair, tuple(reversed(relayed))
             newest = newest or pair
             if pair.task.source != "relayed":
                 break  # a task that is not a relayed rework ends the walk
@@ -213,6 +227,23 @@ class FolderDeliverableChecks(DeliverableChecks):
         if any(self._same(entry, checked) for pair in basis.pairs if (checked := self._checked(call, pair)) is not None):
             return "", None, ()  # ... or of something the team checked
         return "unknown", None, ()
+
+    def _judged_tie(self, call: _Call, entry: FolderFile, pair: _Pair, later: Sequence[_Pair]) -> _Pair | None:
+        """The delivery the file equals that the user judged, when ``pair`` (the newest result that equals it) is one of several (F-G0-1, the manager's
+        ruling): ``pair`` itself when it carries a human-tier verdict, else the first of the ``later`` (older) pairs of the same case that git gave an
+        equal version for and that carries one. None when nothing was given by git, for a one-off task, or when no equal delivery was judged: the
+        caller keeps ``pair``. A version from the organization's file now is no candidate: it is not what the team checked at that result (design 4.5)."""
+        if pair.case is None or (pair.result.id, pair.path) not in call.from_git:
+            return None
+        if _judged(pair):
+            return pair
+        for other in later:
+            if other.case is None or other.case.id != pair.case.id or not _judged(other):
+                continue
+            checked = self._checked(call, other)
+            if checked is not None and (other.result.id, other.path) in call.from_git and self._same(entry, checked):
+                return other
+        return None
 
     def _file_rule(self, call: _Call, basis: _Basis, entry: FolderFile) -> tuple[str, _Pair | None, tuple[str, ...]]:
         """A file a contract names: compared with the team's artifacts of the same name, else with those of its newest result (a contract that names
@@ -286,6 +317,7 @@ class FolderDeliverableChecks(DeliverableChecks):
                 at = self._versions.at_result(pair.result, pair.path)
                 if at is not None:
                     blob = at[1]
+                    call.from_git.add(key)
                     call.hexlen = len(blob)
             call.known[key] = blob if blob is not None else self._now(call, pair.path)
         return call.known[key]

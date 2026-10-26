@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 from hirearchy.kernel import ROOT, Clock, Message
-from hirearchy.reflection import DeliverableChecks, DeliverableFinding
+from hirearchy.reflection import DeliverableChecks, DeliverableFinding, deliverables_note
 from hirearchy.reflection._deliverable_checks import FolderDeliverableChecks
 from hirearchy.reflection._ports import FolderFile, FolderRead
 from hirearchy.reflection.testing import FixedCheckedVersions, HashBlobIds, MemoryDeliverableFolder, ReflectionWorld, blob, fs_world, memory_world
@@ -352,6 +352,148 @@ def test_the_file_rule_names_the_relayed_rework_too(w: ReflectionWorld) -> None:
     assert r.findings() == []  # equal to an older pair with the user's own rework newer than it: no finding, as before
     r.folder.file("/deliverables/memo.md", b"edited\n", r.later())
     assert r.findings() == [finding("memo.md", "differs", folder="/deliverables", artifact=MEMO, task=relayed.id, file=True)]
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the tie of equal deliveries (F-G0-1)
+
+
+def tie_shape(r: Rig, *, relayed: bool = True) -> tuple[Message, Message, Message | None]:
+    """E7 s2's shape: the head ``a`` is reported ``blocked``; the user's rework ``b`` is delivered with ``team v2``; ``a`` is then reported ``done`` listing
+    the same file, unchanged (``team v2`` too: the head's late result); with ``relayed``, the assistant's rework ``c`` of ``b`` follows with ``team v3``.
+    Returns ``a``, ``b`` and ``c`` (None without ``relayed``)."""
+    head = ask(r.w, "head")
+    done(r.w, head, MEMO, status="blocked")
+    human = rework(r.w, head)
+    checked(r, done(r.w, human, MEMO), MEMO, b"team v2\n", commit="c2")
+    checked(r, done(r.w, head, MEMO), MEMO, b"team v2\n", commit="c3")
+    if not relayed:
+        return head, human, None
+    third = rework(r.w, human, source="relayed")
+    checked(r, done(r.w, third, MEMO), MEMO, b"team v3\n", commit="c4")
+    return head, human, third
+
+
+def test_a_relayed_tie_names_the_equal_delivery_the_user_judged(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    head, human, third = tie_shape(r)
+    assert third is not None
+    rate(w, human, "accept")  # the user's verdict on `b`, before she copied the file
+    put(r, {"memo.md": b"team v2\n"})
+    assert r.findings() == [finding("memo.md", "relayed", task=human.id, relayed=(third.id,))]  # not the head's later result
+
+
+def test_the_default_call_on_the_tie_names_the_judged_delivery_and_the_line_has_its_id(w: ReflectionWorld) -> None:
+    """Design 4.4: step 3 applies in every call. The accept is older than the file, so the finding is not settled and the notes see it; the line is
+    today's, with the id of the delivery the user judged."""
+    service(w)
+    r = rig(w)
+    head, human, third = tie_shape(r)
+    assert third is not None
+    rate(w, human, "accept")
+    put(r, {"memo.md": b"team v2\n"})
+    (found,) = r.checks.findings(ROOT)
+    assert (found.kind, found.task, found.relayed, found.settled) == ("relayed", human.id, (third.id,), False)
+    note = deliverables_note([found])
+    assert f"is the delivery of task {human.id} as the team checked it; your relayed rework {third.id}" in note and head.id not in note
+
+
+def test_several_equal_deliveries_with_verdicts_name_the_newest_result_among_them(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    first, _ = delivered(r, b"team v2\n")
+    second = rework(w, first)
+    checked(r, done(w, second, MEMO), MEMO, b"team v2\n", commit="c2")
+    third = rework(w, second)
+    checked(r, done(w, third, MEMO), MEMO, b"team v2\n", commit="c3")
+    relayed = rework(w, third, source="relayed")
+    checked(r, done(w, relayed, MEMO), MEMO, b"team v3\n", commit="c4")
+    rate(w, first, "reject", "not quite")
+    rate(w, second, "accept")  # the newest equal delivery, `third`, has none
+    put(r, {"memo.md": b"team v2\n"})
+    assert r.findings() == [finding("memo.md", "relayed", task=second.id, relayed=(relayed.id,))]  # the newest result among the judged ones
+    rate(w, third, "accept")
+    put(r, {"memo.md": b"team v2\n"})  # the user copies it again, after her verdict (or the verdict settles the finding)
+    assert r.findings() == [finding("memo.md", "relayed", task=third.id, relayed=(relayed.id,))]  # `third` is the walk's own pair: it has one now
+
+
+def test_several_equal_deliveries_with_no_human_verdict_keep_the_newest_result(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    head, _, third = tie_shape(r)
+    assert third is not None
+    put(r, {"memo.md": b"team v2\n"})
+    assert r.findings() == [finding("memo.md", "relayed", task=head.id, relayed=(third.id,))]  # today's: the head's late result
+
+
+def test_only_relayed_verdicts_do_not_decide_the_tie(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    head, human, third = tie_shape(r)
+    assert third is not None
+    rate(w, human, "accept", source="relayed")  # the assistant's own, not the user's
+    put(r, {"memo.md": b"team v2\n"})
+    assert r.findings() == [finding("memo.md", "relayed", task=head.id, relayed=(third.id,))]
+
+
+def test_an_equal_pair_the_organization_gave_is_no_candidate_of_the_tie(w: ReflectionWorld) -> None:
+    """``b``'s result has no checked version in git: the pair equals the file by the team's current file (``now``), the fallback. It is no candidate,
+    whatever its verdict."""
+    service(w)
+    r = rig(w)
+    head = ask(w, "head")
+    done(w, head, MEMO, status="blocked")
+    human = rework(w, head)
+    done(w, human, MEMO)  # git knows nothing of it
+    r.versions.now[MEMO] = blob(b"team v2\n")
+    checked(r, done(w, head, MEMO), MEMO, b"team v2\n", commit="c3")
+    third = rework(w, human, source="relayed")
+    checked(r, done(w, third, MEMO), MEMO, b"team v3\n", commit="c4")
+    rate(w, human, "accept")
+    put(r, {"memo.md": b"team v2\n"})
+    assert r.findings() == [finding("memo.md", "relayed", task=head.id, relayed=(third.id,))]
+
+
+def test_a_walk_that_stops_at_a_pair_from_the_fallback_keeps_today_s_choice(w: ReflectionWorld) -> None:
+    """The head's late result equals the file by the team's current file only; the rule needs a pair git answered for, so the judged ``b`` is not chosen."""
+    service(w)
+    r = rig(w)
+    head = ask(w, "head")
+    done(w, head, MEMO, status="blocked")
+    human = rework(w, head)
+    checked(r, done(w, human, MEMO), MEMO, b"team v2\n", commit="c2")
+    done(w, head, MEMO)  # git knows nothing of the late result
+    r.versions.now[MEMO] = blob(b"team v2\n")
+    third = rework(w, human, source="relayed")
+    checked(r, done(w, third, MEMO), MEMO, b"team v3\n", commit="c4")
+    rate(w, human, "accept")
+    put(r, {"memo.md": b"team v2\n"})
+    assert r.findings() == [finding("memo.md", "relayed", task=head.id, relayed=(third.id,))]
+
+
+def test_an_equal_pair_of_another_case_is_no_candidate_of_the_tie(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    judged, _ = delivered(r, b"team v2\n", topic="one")  # another case: equal to the file, with the user's verdict
+    rate(w, judged, "accept")
+    other, _ = delivered(r, b"team v2\n", topic="two")  # this case: equal too, no verdict
+    third = rework(w, other, source="relayed")
+    checked(r, done(w, third, MEMO), MEMO, b"team v3\n", commit="c4")
+    put(r, {"memo.md": b"team v2\n"})
+    assert r.findings() == [finding("memo.md", "relayed", task=other.id, relayed=(third.id,))]
+
+
+def test_a_one_off_pair_keeps_today_s_choice(w: ReflectionWorld) -> None:
+    service(w)
+    r = rig(w)
+    judged, _ = delivered(r, b"team v2\n")  # a case with an equal, judged delivery
+    rate(w, judged, "accept")
+    goal = w.s.d.post(Message(sender=ROOT, to="ceo", type="task", title="A one-off goal", body="goal", budget=3))
+    checked(r, done(w, goal, MEMO), MEMO, b"team v2\n", commit="c2")
+    again = w.s.d.post(Message(sender=ROOT, to="ceo", type="task", title="Again", body="goal", budget=3, source="relayed"))
+    checked(r, done(w, again, MEMO), MEMO, b"team v3\n", commit="c3")
+    put(r, {"memo.md": b"team v2\n"})
+    assert r.findings() == [finding("memo.md", "relayed", task=goal.id, relayed=(again.id,))]  # the one-off pair `goal`, as before
 
 
 # ------------------------------------------------------------------------------------------------------------------------ the git bound

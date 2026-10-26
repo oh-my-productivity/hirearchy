@@ -37,22 +37,24 @@ def clean_env(monkeypatch, tmp_path):
     monkeypatch.setenv("GIT_COMMITTER_EMAIL", "t@t")
 
 
-def commit(org: Org, message: str) -> None:
+def commit_all(org: Org, message: str) -> None:
     subprocess.run(["git", "add", "-A"], cwd=org.root, check=True, capture_output=True, env=os.environ)
     subprocess.run(["git", "commit", "-q", "--allow-empty", "-m", message], cwd=org.root, check=True, capture_output=True, env=os.environ)
 
 
-def deliver(org: Org, task, text: str):
-    """The lead writes the team's file as ``text`` and reports ``task`` done with it listed; then the org's snapshot is committed (the commit holds the
-    file as the team reported it, and the result's sent copy)."""
+def deliver(org: Org, task, text: str, status: str = "done", commit: bool = True):
+    """The lead writes the team's file as ``text`` and reports ``task`` with ``status`` and the file listed; then the org's snapshot is committed (the
+    commit holds the file as the team reported it, and the result's sent copy). With ``commit=False`` the result is reported and nothing is committed, so
+    that two results can share one commit."""
     file = org.root / MEMO
     file.parent.mkdir(parents=True, exist_ok=True)
     file.write_text(text, encoding="utf-8")
     org.begin_run("lead")
     org.start_run_log("lead")
-    result = org.report("lead", task.id, "done", "Delivered.", artifacts=[MEMO], lessons="Worked.")
+    result = org.report("lead", task.id, status, "Delivered.", artifacts=[MEMO], lessons="Worked.")
     org.end_run("lead", ok=True)
-    commit(org, f"lead: run ok [{task.id[-4:]}]")
+    if commit:
+        commit_all(org, f"lead: run ok [{task.id[-4:]}]")
     return result
 
 
@@ -68,7 +70,7 @@ def world(tmp_path):
         acceptance=["A Summary line first"], deliverable={"description": "one markdown file", "path": str(folder)}, budget=10,
         playbook="# Memo\n\n1. Write it.\n",
     )
-    commit(org, "the org as hired")
+    commit_all(org, "the org as hired")
     a = org.request(ROOT, SERVICE, {"topic": "memo"})
     deliver(org, a, V1)
     b = org.request(ROOT, SERVICE, {"topic": "memo"}, revises=a.id, source="human")
@@ -140,3 +142,59 @@ def test_a_file_no_delivery_checked_is_not_as_delivered_even_with_git(world):
     assert deliveries["not_as_delivered"] == [{"case": a.id, "task": c.id}]
     assert deliveries["unjudged_cases"] == [a.id] and deliveries["unseen_relayed"] == []
     assert "no org history" not in org.runtime.quality_report.quality_text()
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the tie (F-G0-1)
+
+
+@pytest.fixture
+def tie(tmp_path):
+    """E7 s2's shape (design 4.8): the head ``a`` is reported ``blocked``; the user's own rework ``b`` (revises ``a``) is delivered with V2; the lead
+    then reports ``a`` ``done`` listing the same file, unchanged (the head's late result); the assistant's relayed rework ``c`` (revises ``b``) is
+    delivered with V3. Every delivery is committed. The user's copy is written by each test."""
+    org = Org.init(tmp_path / "org", "Mission.", {"poll_seconds": 0.05})
+    org.hire(ROOT, "lead", "Lead", "Run the memos.", can_hire=True, max_children=2)
+    folder = tmp_path / "deliverables"
+    org.define_service(
+        ROOT, "lead", SERVICE, description="A memo.", inputs=[{"name": "topic", "description": "what it is about", "required": True}],
+        acceptance=["A Summary line first"], deliverable={"description": "one markdown file", "path": str(folder)}, budget=10,
+        playbook="# Memo\n\n1. Write it.\n",
+    )
+    commit_all(org, "the org as hired")
+    a = org.request(ROOT, SERVICE, {"topic": "memo"})
+    deliver(org, a, V1, status="blocked")
+    b = org.request(ROOT, SERVICE, {"topic": "memo"}, revises=a.id, source="human")
+    deliver(org, b, V2)
+    deliver(org, a, V2)  # the head's late result: the same file, unchanged
+    c = org.request(ROOT, SERVICE, {"topic": "memo"}, revises=b.id, source="relayed")
+    deliver(org, c, V3)
+    folder.mkdir()
+    return org, folder, a, b, c
+
+
+def test_the_head_s_late_result_ties_with_the_rework_the_user_judged_and_her_verdict_decides(tie):
+    """F-G0-1 (E7 s2's `3ca4`; design 4.1, 4.8): the head `a`'s late result and the user's rework `b` both list the file the team checked as V2, which
+    equals the user's copy: a tie. Lena judged `b` (her reject, then her accept); `a` has no verdict. The tie goes to the delivery she judged: the
+    finding names `b` (not the newer result `a`), and the given delivery is `b`, so the case is not without a verdict."""
+    org, folder, a, b, c = tie
+    (folder / "memo.md").write_text(V2, encoding="utf-8")  # the copy the user was given
+    org.feedback(ROOT, b.id, "reject", "Not quite.", source="human")
+    org.feedback(ROOT, b.id, "accept", "That one is right - keep it.", source="human")
+    org.feedback(ROOT, c.id, "reject", "Not requested by the user.", source="relayed")
+    (found,) = org.runtime.deliverable_checks.findings(ROOT, SERVICE, settled=True)
+    assert (found.name, found.kind, found.task, found.relayed) == ("memo.md", "relayed", b.id, (c.id,))
+    deliveries = record_of(org)["deliveries"]
+    assert (deliveries["total"], deliveries["judged"]) == (3, 1)
+    assert deliveries["unjudged_cases"] == [] and deliveries["relayed_only"] == [] and deliveries["unseen_relayed"] == [a.id]
+    assert deliveries["not_as_delivered"] == [] and deliveries["neither"] == []
+
+
+def test_the_head_s_late_result_ties_with_the_rework_and_with_no_human_verdict_the_newest_result_is_named(tie):
+    """Guard: the same tie with no verdict of the user's (only the assistant's relayed reject of `c`): today's choice, the newest result among the equal
+    ones, the head's late result `a`; the case is without a verdict (relayed only)."""
+    org, folder, a, b, c = tie
+    (folder / "memo.md").write_text(V2, encoding="utf-8")
+    org.feedback(ROOT, c.id, "reject", "Not requested by the user.", source="relayed")
+    (found,) = org.runtime.deliverable_checks.findings(ROOT, SERVICE, settled=True)
+    assert (found.name, found.kind, found.task, found.relayed) == ("memo.md", "relayed", a.id, (c.id,))
+    assert record_of(org)["deliveries"]["unjudged_cases"] == [a.id]
