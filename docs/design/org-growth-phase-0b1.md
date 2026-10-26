@@ -1,6 +1,6 @@
 # Org growth, Phase 0b.1: the batch after G0 (technical design)
 
-Status: design, revision 2 (the 14 findings of the design review's pass 1 resolved; responses in 13). Branch `feat/org-growth-phase-0b1` off `main` `c68ae679` (the G0 study commit; product code identical to `3c841bb9`);
+Status: design, revision 2 (the 14 findings of the design review's pass 1 resolved; responses in 13) with the manager's amendments A1-A7 (section 14; the design loop is closed). Branch `feat/org-growth-phase-0b1` off `main` `c68ae679` (the G0 study commit; product code identical to `3c841bb9`);
 worktree `/Volumes/workspace/hirearchy/.worktrees/org-growth-0b1`. Baseline: `skills/hirearchy/SKILL.md` has 125 lines, md5
 `a3e46347b70a7ece5f734f70198c607f`; this batch does not edit it unless F-G0-7 is the product's (9).
 
@@ -184,6 +184,8 @@ construction.
 - One delivery equals the file: `P` is the only candidate. With a human verdict and `P` the case's latest delivery: no finding, as today; with a
   human verdict and a later delivery that does not list the file: `given` names `P` (4.1's first sentence). In the 23 given-delivery choices the
   harness made on G0's 6 and E7's 3 streams (`given_deliveries` in each `rederived.json`) this form never differs from P3's.
+- One delivery equals the file and carries no human-tier verdict: today's result (no finding; the given delivery is the case's latest, `_given`'s
+  fallback, as `rederive_quality.py` does) (A3).
 - Several equal, none with a human-tier verdict: today's result (`relayed` naming `P`, or no finding and the case's latest delivery).
 - Several equal, one or more with a human-tier verdict: the newest result among those with one.
 - Only relayed- or agent-tier verdicts: not human; ignored.
@@ -226,9 +228,11 @@ the case is blocked and Lena's reject `...-root-02c4` is on `52e3`, the case's l
   committed at 06:21:48 and v3 at 06:25:26, after the cut (`memos/versions/INDEX.txt`). It is GREEN at `c68ae679` too: the zero case of the rule on
   kept history, which must not move.
 - Unit (`SRC/reflection/tests/test_deliverable_checks.py`, `Rig` with `FixedCheckedVersions`: `at` is git-given, `now` the fallback; the world's
-  `FakeClock`, whose `monotonic` moves 1 µs per reading, so P3's 5-s bound is never reached): every case of 4.6; `relayed` names the older equal pair
+  `FakeClock`, whose `monotonic` moves only with `now()` (1 µs each) and `advance`, so P3's 5-s bound is not reached within one `findings` call): every case of 4.6; `relayed` names the older equal pair
   with the human verdict; several with verdicts: the newest result; a fallback-equal pair is no candidate; a `P` from the fallback keeps today's walk;
-  another case's pair is no candidate; a one-off pair keeps today's choice; `given` only when the chosen delivery is not the case's latest. And two
+  another case's pair is no candidate; a one-off pair keeps today's choice; `given` only when the chosen delivery is not the case's latest; and
+  (A3) one delivery equals the file, is not the case's latest delivery and carries no human-tier verdict: no finding, and the given delivery is the
+  case's latest (`_given`'s fallback). And two
   tests with the verdict **older than the file** (finding not settled):
   - the default call (no `settled`) on a `relayed` tie (the `tie` shape: the accept on `b`, then the copy): one `relayed` finding naming `b`,
     relayed `(c,)`, `settled` False (at `c68ae679`: `a`); `deliverables_note` of it is today's line with `b`'s id;
@@ -253,14 +257,15 @@ open `inflight/...-3386.md`. The raise comes from `FsMailbox.messages` (`SRC/mai
 which parses every listed file with no guard (`CachingMessageParser.parse_as` opens the path); every `progress` read of root's boxes goes through it.
 
 **5.2 The rule.** A file listed in a received box (`RECEIVED_BOXES`: `inbox`, `inflight`, `read`) but gone when it is read is read from its new
-place when that place is another of the received boxes the call asked for, and is otherwise left out of this call. A message is returned once per
-call. Nothing else changes: the order (by id), the boxes, the `sent` box's reads, and every other error (a file that does not parse, a permission
+place when that place is another of the received boxes the call asked for, and is otherwise left out of this call. A moved message is returned once per
+call (A5). Nothing else changes: the order (by id), the boxes, the `sent` box's reads, and every other error (a file that does not parse, a permission
 error) still raise as today.
 
 **5.3 The change, in the reader** (`FsMailbox.messages`). For each listed file of each asked box: parse it; on `FileNotFoundError`, when the box is one
 of `RECEIVED_BOXES`, try the same file name in each other asked box of `RECEIVED_BOXES`, in that order (a second `FileNotFoundError` goes on to the
-next); found nowhere, skip it. A file name already read from one received box in this call is not read again from another: the walk can meet a
-moving file twice (in `inbox` before the move, in `read` after it). The `sent` box keeps today's reads: a `sent` file that is gone still raises (no
+next); found nowhere, skip it. A name that this call read at a new place after a `FileNotFoundError` is not read again when the walk meets it later
+in another received box: the walk can meet a moving file twice (in `inbox` before the move, in `read` after it). Only such names are skipped; no
+other name is deduplicated (A5). The `sent` box keeps today's reads: a `sent` file that is gone still raises (no
 writer moves a sent copy, and the brief's defect is a result that `inbox` moved). The fix is in `mail` rather than in `progress` because the race is the reader's: a guard in
 `progress` would leave `status`, `quality` and the scheduler's counts raising on the same race. `DirMtimeCachingMailbox` (the dashboard's) already
 skips such a file and is unchanged; `find_anywhere` already never raises and is unchanged (11). **The single writer is unchanged:** `FsBatchStore`
@@ -269,8 +274,8 @@ stays the only writer of `inflight/` and `read/`; `inbox` still moves the file; 
 **5.4 Zero and empty cases.** No move: today's list, byte for byte. Moved forward (inbox -> inflight -> read) into an asked box: read there, once.
 Moved back (a failed run's `end(ok=False)`, inflight -> inbox) after `inbox` was listed: found by the lookup, once. Moved twice before the read: the
 lookup tries every other asked received box. Moved to a box the call did not ask for (`messages(addr, "inflight")`): skipped. Removed: skipped. A
-missing box directory: `[]`, as today. The same name present in two received boxes at once (an anomaly no writer makes): returned once, from the
-first box listed. A `sent` file gone between the listing and the read: raises, as today (tested, 5.5).
+missing box directory: `[]`, as today. The same name present in two received boxes at once (an anomaly no writer makes): reads as today, both copies,
+on `FsMailbox` too, as on `MemoryMailbox` and the caching reader, so the `MailboxReader` implementations keep one behaviour (R8, A5). A `sent` file gone between the listing and the read: raises, as today (tested, 5.5).
 
 **5.5 Tests** (deterministic: the move is injected between the listing and the read).
 - `SRC/mail/testing.py` gains `MovingMessageParser(CachingMessageParser)`, beside `CountingMessageParser`: given `{source: target}` (paths), it
@@ -292,7 +297,9 @@ first box listed. A `sent` file gone between the listing and the read: raises, a
   the RED run shows that another reader opens the file first (the text then differs from the control), the coder reports it with the reader's
   name; the comparison with the control is never loosened. At
   `c68ae679` it raises the m1-s3 error, `[Errno 2] No such file or directory: '.../inflight/20261026T084941501890-lead-3386.md'`.
-- No contract-suite change: the race needs a parser seam that only the file implementation has (R8's suites are unchanged).
+- Contract (`SRC/mail/tests/test_contract_mailbox_reader.py`, over every `MailboxReader` implementation: `fs_mailbox`, `memory_mailbox`,
+  `caching_mailbox`): a name listed in two received boxes at once reads as today, on every implementation (A5). The race itself needs a parser
+  seam that only the file implementation has, so its tests stay in `test_fs_mailbox.py`.
 
 ## 6. The G0 replay kit (`TESTS/testkit/g0_replay.py`, test-only)
 
@@ -312,7 +319,8 @@ had at the 21-character stamp `cut` (inclusive) at `root/org` and returns it:
   version file `memos/versions/<stem of path>.v<k>.<sha7>.md`, the sha taken from the entry's third column (`org_replay.newest_version`'s rule):
   `lead/writer/work/memo-2026-10-05.md v2 0d07ec4 ...` is `memo-2026-10-05.v2.0d07ec4.md`. The kit checks the file's md5 against the entry;
 - with `team_files`, for each path of `memos/versions/INDEX.txt`, the newest version committed at or before `cut` (G0's INDEX times are `Z`) is
-  written at its org path (m0-s2 T4: `lead/writer/work/memo-2026-10-05.md` = v2);
+  written at its org path (m0-s2 T4: `lead/writer/work/memo-2026-10-05.md` = v2). A path with no INDEX version at or before `cut` is not written, and
+  this is no failure (m0-s2 T4: `memo-2026-10-12.md` and `memo-2026-10-19.md`) (A4);
 - with `history` (requires `team_files`), the organization becomes a git repository of **one commit** holding everything materialized (`git init
   -q`, `git add -A`, `git commit -q`, with a fixed author and committer in the environment of the call). `CheckedVersions.at_result` then answers
   every result's artifact with its version at the cut. That is faithful only when no listed file changed between a result and the cut, so the kit
@@ -325,7 +333,8 @@ call fails the test, never skips it (the tests that use `history` carry the git 
 `HIREARCHY_WORKSPACE_ROOTS` to their `tmp_path`. `TESTS/meta/test_g0_replay_kit.py` tests it: the cut (inclusive), the root `inflight` mapping, the
 contract equal to `service/history--SERVICE.v1.md` except the one rewritten line (never a `/tmp/hirearchy-g0-` path), the pinned file's md5 against
 INDEX and its mtime, the team file at the cut, the one commit (`git rev-list --count HEAD` is 1, it holds `lead/sent/...-e876.md`), and the
-faithfulness check failing at m0-s2 `20261026T062600000000` (after v3 `b389f15`, 06:25:26, while `e876` lists the memo).
+faithfulness check failing at m0-s2 `20261026T062600000000` (after v3 `b389f15`, 06:25:26, while `e876` lists the memo), and a path with no INDEX
+version at or before the cut being left unwritten without a failure (m0-s2 `20261026T062340000000`: `memo-2026-10-12.md`, `memo-2026-10-19.md`).
 
 ## 7. The replays and the stop rule
 
@@ -343,7 +352,10 @@ One `docs(design)` commit edits `docs/design/org-growth-phase-0b.md`; no replay 
 Facts checked on `studies/E7-org-growth-0a4-recheck/evidence/s3`: `f639` answers 5834 `done` (v3 `1c5b8a5`, 08:34:02, was the file then); `c2f9`
 answers 62a5 `done`; `da3c` answers d9bc `blocked`; v4 `b5f1411` (08:39:14) is the file now; `2da1` is a relayed reject of 5834; the harness's
 history-path view (`harness-selfcheck/e7-s3/rederived.json`) has `not_as_delivered [{09df, 5834}]`.
-- **19.3, "What a replay of these files cannot show (kit limit)", E7 block.** Replace `in s1 and s3 the replay and the history agree (memo 1's file is
+- **19.3, "What a replay of these files cannot show (kit limit)", E7 block.** First (A2), in the paragraph's "with history the evidence shows s2 relayed
+  (...) and s1 and s3 equal to the team's current files (the md5 facts of E7S1-6, E7S2-6 and E7S3-6)", replace the clause `and s1 and s3 equal to the
+  team's current files (the md5 facts of E7S1-6, E7S2-6 and E7S3-6)` with `and s1's and s3's files equal to the team's current files (in s3 a
+  version no delivery checked: below)`; this is made in the E7S3-6 commit. Then replace `in s1 and s3 the replay and the history agree (memo 1's file is
   the current one).` with: `in s1 the replay and the history agree (memo 1's file is the current one, the checked artifact of 066f's delivery). In s3
   they do not (corrected by 0b.1: F-G0-13, manager decision of 2026-10-25 item 3): memo 1's file is v4 (b5f1411), written by d9bc, whose result
   ...-lead-da3c is blocked, so no delivery checked it (D4); with history P3 compares the file with the newest delivery that lists it, the relayed
@@ -382,24 +394,28 @@ but they reach org runs only, never the assistant's session (to be confirmed in 
    session recorded them, the org profiles under `profiles/`.
 
 **How to classify.** The rule decides whether product code changes, so it is applied in this order, and the first that holds decides:
-1. **Product** only when (a) a product byte the assistant's session received differs between the arms (SKILL.md, the MCP server's instructions,
-   a tool's description or schema, or a server error, as the session stores recorded them), and the failures follow it in the M0 sessions; or
-   (b) a product text itself tells the model to make the empty-argument call: the note quotes it, with its file and line.
-2. **Harness or environment** when the product bytes the sessions received are equal in both arms and the failures occur in one arm only. The
-   cause is then what only the arms differ in: the dedicated `KIRO_HOME` (no `memories/`, `sessions/`, `steering/` or other kiro state; settings
-   copied without `mcp.json*`), the harness's turn driver, or kiro-cli's own behaviour in a fresh home (for example its deferred-tool catalog or
-   session context built differently). This holds even when a product text change could mask the failures: such a mitigation is backlog, never
-   this batch.
+1. **Product** only when (a) the product's own output differs between the arms: SKILL.md as installed, the MCP server's `instructions`, a tool's
+   description or input schema as the server returned it, or a server error the product raised. The note must also name the product file and line
+   that emit the M0 bytes, and the input that made them differ must be one the product controls; or (b) a product text itself tells the model to
+   make the empty-argument call: the note quotes it, with its file and line.
+2. **Harness or environment** when the product's own output is equal in both arms, or differs only because of what kiro-cli did with it (its
+   deferred-tool catalog, truncation, ordering) or what the harness put in the M0 home (name the file or setting). The failures occur in one arm
+   only. The cause is then what only the arms differ in: the dedicated `KIRO_HOME` (no `memories/`, `sessions/`, `steering/` or other kiro state;
+   settings copied without `mcp.json*`), the harness's turn driver, or kiro-cli's own behaviour in a fresh home (for example its deferred-tool
+   catalog or session context built differently). This holds even when a product text change could mask the failures: such a mitigation is
+   backlog, never this batch. A product that fails in a home the product's own setup creates is product. A product that fails in a home the
+   harness built without that setup is harness.
 3. **Not determined** when the evidence cannot show 1 or 2 (for example, the sessions did not record the bytes needed to compare). It is no
    product cause, and no product code changes.
 
 **What follows.**
 - The finding goes to `.agents/tasks/f-g0-7.md` (never staged): the counts per stream, the classification, the files and lines that show it, and
   whether the M0 assistant-credit gap (26.79-29.12 against 21.92-24.74) is explained by it.
-- **Product:** a FEAT that fixes the cause test-first and adds no behaviour beyond the fix (a test that fails on the shipped text first). A SKILL.md
+- **Product:** a FEAT that fixes the cause test-first and adds no behaviour beyond the fix (a test that fails on the shipped text first). A product
+  change under 1(a) or 1(b) stops and asks the manager first, with the evidence (a `warning`), before any fix commit (A1). A SKILL.md
   edit keeps it at 125 lines or fewer, its 0a.4 and 0a.5 lines word for word; an MCP docstring or instructions edit regenerates its golden
   deliberately, with the count stated.
-- **Harness or environment, or not determined:** no product code changes. The note states what a future study harness must do, at least: build the
+- **Harness or environment (rule 2), or not determined (rule 3):** FEAT-0 changes no product code and records its finding for Phase 1 (A1). The note states what a future study harness must do, at least: build the
   M0 home with the same kiro state as M1 except the memories index (naming the files); run a preflight probe that compares both arms'
   `session_start` and tool catalog before turn 1 and stops on any difference other than `<memories>`; count empty-argument failed tool calls per arm
   as a validity measure; and, for "not determined", the probe that would decide it (it needs the owner's OK on spend).
@@ -425,7 +441,7 @@ but they reach org runs only, never the assistant's session (to be confirmed in 
 | `user_spend == user_committed` while open or blocked; I1 (`user_spend == user_cost == case_spend` with no relayed task) | `reflection.api` (pure functions, property tests) | the one home of the spend arithmetic |
 | The delivery P3 names as equal to the file is a delivery of that case whose git-given checked version equals it; ties are broken by the human-tier verdict | `reflection._deliverable_checks` | only P3 knows checked versions; records only flags |
 | A `given` finding is returned only with `settled=True` (P3's notes, `findings` without `settled`, never hold it); a `relayed` line they show can name the tie rule's chosen delivery, with today's words (4.4) | `FolderDeliverableChecks._entry`; the fake `FixedDeliverableChecks.findings` too; the contract suite tests both | the notes render no `given` kind; one rule for every implementation (R8) |
-| One message per file name in a received-box read; a moved file never raises | `mail.FsMailbox` | the reader of the boxes |
+| A moved message is returned once per call; a moved file never raises | `mail.FsMailbox` | the reader of the boxes |
 | `inflight/` and `read/` have one writer | `mail.FsBatchStore` (unchanged) | R9 |
 
 **Testability.** Pure: the spend functions (hand-built `Case`). Unit with fakes: the P3 walk (`FixedCheckedVersions`, `HashBlobIds`), the records'
@@ -464,7 +480,9 @@ correction. FEAT-5, only for a product cause: F-G0-7's fix.
   - the tie scan's git questions count against the call's 40-pair and 5-s bound, so in a folder with many files the files walked later can be
     compared without git sooner than today;
   - a one-off task's tie keeps P3's newest-first choice;
-  - a received-box file that moved to a box the call did not ask for is missing from that call only.
+  - a received-box file that moved to a box the call did not ask for is missing from that call only;
+  - the user's runs of an open or blocked case read the grant runs that a result carried back beyond its own task's budget as still held (0a.1's
+    `returned`; the rule of `user_committed` and the ceiling). Seen in G0 on a finished case only: m0-s2 `e876` (A6).
 
 ## 12. The manager's ruling R-0b1-1 (2026-10-27)
 
@@ -512,7 +530,26 @@ Every finding is addressed; none is backlogged or ignored.
 | 11 | NIT | Addressed (4.8). `deliver` gains `commit=True`, and `commit=False` lets two results share one commit (cosmetic for `at_result`). The m0-s2-shape states are three separate tests, never cumulative: at `c68ae679`, a reject on `b` plus an accept on `a` would already read `unjudged_cases []`. |
 | 12 | NIT | Addressed (3.5, 6). The log line is 1-based (`org_replay.log_block`), and line 3 is quoted. An INDEX entry maps to `<stem>.v<k>.<sha7>.md` (`index_entries` and `newest_version`, reused). `MANIFESTS` has 16 keys: the review's 17 counted E3's `VARIANTS`, which are not in `MANIFESTS` and were not computed. 3.5 says why they cannot move: E3 has no grant. |
 | 13 | NIT | Addressed (8): E7S3-6 reads "the three memos the user was given". E6S1-6 and E7S1-6 keep their wording. |
-| 14 | NIT | Addressed by qualifying the claim (4.8, 10). The real-git tests keep the system's monotonic clock, as today: `ClockReading` keeps it, and a frozen one would also freeze the runtime's waits. A slow git can make the `tie` tests fail, never pass falsely. The unit tests run on `FakeClock`, whose monotonic moves 1 µs per reading. |
+| 14 | NIT | Addressed by qualifying the claim (4.8, 10). The real-git tests keep the system's monotonic clock, as today: `ClockReading` keeps it, and a frozen one would also freeze the runtime's waits. A slow git can make the `tie` tests fail, never pass falsely. The unit tests run on `FakeClock`, whose `monotonic` moves only with `now()` (1 µs each) and `advance`, so P3's 5-s bound is not reached within one `findings` call (A7). |
 
 The review also flagged one claim as unverified: "on E7 s3's replay it would flag `62a5`" (4.5). It is withdrawn. 4.5 now gives only the reason
 that does not depend on it.
+
+## 14. Manager amendments (design loop closed)
+
+Pass 2 of this design (revision 2, `efcd46a0`) found 0 HIGH, 1 MEDIUM and 6 NIT (`.agents/tasks/design-review.md`). The manager closed the design loop
+and approved the design with seven amendments, which are binding and are applied by the commit that adds this section. Where a FEAT prompt and the
+amended design disagree, the amended design wins.
+
+| # | Pass 2 finding | Amendment | Landed in |
+|---|---|---|---|
+| A1 | 1 (MEDIUM): rule 1(a) also matched rule 2's own environment example | F-G0-7's rule compares what the product emits (SKILL.md as installed, the MCP `instructions`, a tool's description or schema as the server returned it, a server error the product raised); 1(a) must name the product file and line and an input the product controls; rule 2 is equal output, or a difference only through kiro-cli or the harness's M0 home; "a product that fails in a home the product's own setup creates is product ..."; rule 3 unchanged; at rule 2 or 3 FEAT-0 changes no product code and records its finding for Phase 1; a product change under 1(a)/1(b) stops and asks the manager first | 9 ("How to classify", "What follows") |
+| A2 | 2 (NIT): a sentence beside the correction still read as "history finds nothing in s3" | 0b 19.3's paragraph reads "and s1's and s3's files equal to the team's current files (in s3 a version no delivery checked: below)", edited in the E7S3-6 commit | 8 |
+| A3 | 3 (NIT): the single-candidate case without a human verdict | One delivery equals the file and carries no human-tier verdict: today's result (no finding; the given delivery is the case's latest, `_given`'s fallback); a unit test for it | 4.6, 4.8 |
+| A4 | 4 (NIT): a path with no version at or before the cut | The kit does not write it and this is no failure (m0-s2 T4: `memo-2026-10-12.md`, `memo-2026-10-19.md`); `test_g0_replay_kit.py` asserts it | 6 |
+| A5 | 5 (NIT): the per-call name dedup changed the anomaly on `FsMailbox` only | Option 1: skip only names this call read at a new place after a `FileNotFoundError`; "a moved message is returned once per call"; a name in two received boxes at once reads as today on `FsMailbox` too; the guard test goes into `test_contract_mailbox_reader.py` over every `MailboxReader` implementation (replaces "No contract-suite change") | 5.2, 5.3, 5.4, 5.5, 10 |
+| A6 | 6 (NIT): the cap on returned runs missing from the declared limits | Grant runs a result carried back beyond its own task's budget still read as held while the case is open or blocked (G0: m0-s2 `e876`, a finished case) | 11 |
+| A7 | 7 (NIT): the `FakeClock` sentence | `monotonic` moves only with `now()` (1 µs each) and `advance`, so P3's 5-s bound is not reached within one `findings` call | 4.8, 13 (row 14) |
+
+The manager's decisions are in `.agents/tasks/manager-decision-design-loop.md` (copied to `docs/research/org-growth/phase-0b1/` at merge). R-0b1-1
+(12) and its five conditions, the stop rule of 7 and the test policy of 10 are unchanged.
