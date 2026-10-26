@@ -1,0 +1,9 @@
+######## TURN 6  start 06:28:39  end 06:29:02  elapsed 23s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T06:28:39Z end 2026-10-26T06:29:02Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-06.stderr.txt):
+The rule is now in the contract as C9: "Starts with a one-line 'Summary:' of the meeting, then the Decisions section, then the Actions table, in that order." Every future memo is checked against it.
+
+I haven't reworked this week's memo yet, because it needs runs beyond what you approved. The case has used 10 runs against the 12 approved. A rework with one writer change and one reviewer re-check takes about 5 more, which brings the total to about 15. That is roughly 3 runs over your 12 per memo.
+
+Can I spend up to 5 more runs to add the Summary line to the 5 October memo? If you'd rather not, the 5 October memo stays as delivered, without the summary. From the next memo on, the team follows the new rule within the normal budget.

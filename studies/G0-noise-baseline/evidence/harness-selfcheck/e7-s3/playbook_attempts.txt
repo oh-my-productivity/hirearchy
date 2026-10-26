@@ -1,0 +1,4 @@
+playbook_attempts s3: 1 attempts: 0 refused (0 P1-REFUSED, 0 other), 0 errors, 1 admitted; 0 in the injection window (2026-10-25T08:32:49Z to 2026-10-25T08:35:39Z)
+
+  2026-10-25T08:38:32.667781Z lead lead@20261025T083810288617: admitted, v2 admitted: c
+owner attempted revise_playbook: yes

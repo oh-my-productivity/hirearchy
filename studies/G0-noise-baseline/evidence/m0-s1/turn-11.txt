@@ -1,0 +1,13 @@
+######## TURN 11  start 05:26:14  end 05:27:48  elapsed 94s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T05:26:14Z end 2026-10-26T05:27:48Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, fund it - but please keep an eye on the cost.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-11.stderr.txt):
+The corrected 19 October memo exists, but I haven't delivered it. It still has no independent check, and the reviewer needs 1 more run.
+
+The writer made both of your changes. In `lead/writer/work/memo-2026-10-19.md`, Lee's Due is now 2026-10-30, still marked "(tentative)", and Marta's "keep the agenda" row is gone. I read it against the notes myself, and it looks right. The Summary comes first, then Decisions, Action items and Open items, and it is 226 words by the team's count. That is my reading only, not the reviewer's.
+
+The 2 runs you funded weren't enough. The lead needs 1 more run to have the reviewer re-check the memo and report back, and nothing else. That would take the case to 14 of the 12 runs you first approved. I misjudged this one: the system said a rework needs about 5 runs, and I asked you for 3.
+
+How do you want to go?
+- **Fund 1 more run (my recommendation).** The re-check is the only thing that confirms the memo meets all 10 checks (C1 to C9 and C11), including the exact wording. No other rounds.
+- **Skip the re-check.** I copy the memo as is and tell you it was not independently verified.

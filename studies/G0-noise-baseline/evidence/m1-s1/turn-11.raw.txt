@@ -1,0 +1,9 @@
+The 19 October memo is written and passed review (8 of 8 checks, 11 of 11 facts verified), using 5 of the 12 runs. I haven't copied it to `deliverables` yet because three points are yours to decide:
+
+1. **Marta, "will keep the agenda as sent".** The memo lists it as an action row, "Keep the demo agenda as sent", with Due = none. Keep that row, or drop it as a status note rather than a commitment?
+2. **Sam, pairing with Jo.** Sam "offered to pair with Jo on the CI pipeline" during Jo's first week, and everyone thought it was a good idea. The memo lists it as a row with Due = none. Keep it as a commitment, or leave it out because it was only an offer?
+3. **Lee's sign-off.** The notes say he'll sign off on the SSO renewal once legal replies, "probably by end of next week". From a Monday 19 October meeting, that is Friday 30 October. The memo currently has Due = none, with the wording kept in the Action cell. Keep none, or use 2026-10-30?
+
+The memo has three decisions (go ahead with the demo without the rate limiter, renew the SSO vendor for twelve months, and move this weekly to Monday 14:00 from 26 October) and six action rows. Marta's feedback task is 2026-10-23, Dev's freeze removal is 2026-10-24, and Priya's benchmarks are 2026-10-26. The Summary says "six action items".
+
+Reply "as it is" to keep it all, or give your choices. A change would be a rework of about 5 runs, which I'd ask you about first.

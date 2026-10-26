@@ -1,0 +1,11 @@
+######## TURN 3  start 08:34:30  end 08:40:14  elapsed 344s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T08:34:30Z end 2026-10-26T08:40:14Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Keep it as it is. Great, approve. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-03.stderr.txt):
+The team is built and running on the 2026-10-05 notes, with a ceiling of 12 runs. I'll wait for it now.The memo is drafted (252 words, within your 400 limit). Three due dates were judgment calls, so please answer these before I save it to `deliverables/`. All three are about the Due column.
+
+1. **Marta, book the on-call training room "for Oct 14".** The notes give 14 October as the training date and no deadline for booking. I read it as no deadline, so the Due is `none`. Should it be `2026-10-14` instead?
+2. **Sam, look into the flaky CI "before Friday".** The meeting was on Monday 5 October. I read "before Friday" as the day before, so the Due is `2026-10-08`. Should it be `2026-10-09`?
+3. **Lee, ping the vendor about the SSO certificate "this week, no hard date attached".** Because the notes say there's no hard date, the Due is `none`. Should it be `2026-10-09`, the end of that week?
+
+Reply "as is" to keep all three, or tell me which to change. If any change, I'll send the memo back to the team for a fix, which uses extra runs. So far it has used 9 of the 12 runs.

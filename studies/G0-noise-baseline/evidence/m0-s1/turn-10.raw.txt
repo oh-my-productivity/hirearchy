@@ -1,0 +1,5 @@
+The team ran out of runs for the reviewer re-check, so I need your OK to fund it.
+
+The correction for the 19 October memo is under way: Lee's Due becomes 2026-10-30 and Marta's row comes out. The case has used 11 of the 12 runs you approved. The writer is working, but the lead says it has no runs left for the reviewer's re-check, and the memo shouldn't go out unchecked.
+
+May I grant 2 more runs, so the case ends at about 13 of 12? That is one reviewer check and the lead's final read. I'd keep it to exactly that. If you'd rather not, I'll stop, and the memo wouldn't be copied to `deliverables` without a re-check, or I'd copy it and say so plainly.

@@ -1,0 +1,203 @@
+# shell writes (protocol 7.2): every execute_bash call of the assistant; facts only
+
+[2026-10-26T07:08:41.949Z] call #25 turn 6 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: mkdir -p /tmp/hirearchy-g0-m1-s2-1792997653/deliverables && cp /private/tmp/hirearchy-g0-m1-s2-1792997653/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-g0-m1-s2-1792997653/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-05.md && ls -l /tmp/hirearchy-g0-m1-s2-1792997653/deliverables
+RESULT: Output:
+     156 /tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-05.md
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  830 Oct 26 07:08 memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T07:15:12.096Z] call #33 turn 8 status=completed flags=['touches S/org']
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s2-1792997653 && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md; echo "cmp exit $?"; ls -l --time-style=full-iso org/lead/writer/work/ deliverables/ 2>/dev/null || ls -lT org/lead/writer/work/ deliverables/
+RESULT: Output:
+org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md differ: char 549, line 16
+cmp exit 1
+deliverables/:
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  830 Oct 26 07:08:41 2026 memo-2026-10-05.md
+
+org/lead/writer/work/:
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  967 Oct 26 07:10:42 2026 memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T07:18:07.028Z] call #42 turn 8 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s2-1792997653 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && wc -w deliverables/memo-2026-10-05.md && head -1 deliverables/memo-2026-10-05.md | cut -c1-40
+RESULT: Output:
+     157 deliverables/memo-2026-10-05.md
+Summary: Platform weekly, 5 October 2026
+
+
+Exit Code: 0
+
+[2026-10-26T07:22:18.757Z] call #48 turn 9 status=completed flags=['touches S/org']
+COMMAND: ls -l /private/tmp/hirearchy-g0-m1-s2-1792997653/org/lead/writer/work/
+RESULT: Output:
+total 16
+-rw-r--r--@ 1 aminalizadeh  wheel   823 Oct 26 07:16 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1314 Oct 26 07:20 memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-26T07:26:18.652Z] call #56 turn 10 status=completed flags=['touches S/org']
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s2-1792997653/org/lead && ls -l writer/work reviewer/work && cat writer/work/memo-2026-10-12.md
+RESULT: Output:
+reviewer/work:
+total 64
+-rw-r--r--@ 1 aminalizadeh  wheel  3350 Oct 26 07:01 recheck-memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  3916 Oct 26 07:07 recheck2-memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  3319 Oct 26 07:11 recheck3-memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  2809 Oct 26 07:17 review-memo-2026-10-05-summary-first.md
+-rw-r--r--@ 1 aminalizadeh  wheel  4739 Oct 26 06:59 review-memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  3039 Oct 26 07:25 review-memo-2026-10-12-recheck.md
+-rw-r--r--@ 1 aminalizadeh  wheel  3893 Oct 26 07:21 review-memo-2026-10-12.md
+
+writer/work:
+total 16
+-rw-r--r--@ 1 aminalizadeh  wheel   823 Oct 26 07:16 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1075 Oct 26 07:24 memo-2026-10-12.md
+Summary: Platform weekly, 12 October 2026: rate limiter RFC approved, postmortem and deploy freeze decided, and five actions assigned.
+
+## Decisions
+
+- Approve the rate limiter RFC with the token bucket (per API key) design, and ship it behind a feature flag first.
+- The postmortem for the Oct 8 outage will be blameless and shared with the whole company, not just engineering.
+- Deploy freeze on Oct 22 and Oct 23, because of the customer demo in the week of 19 October.
+
+## Actions
+
+| Owner | Action | Due |
+|---|---|---|
+| Dev | Write the postmortem for the Oct 8 outage | 2026-10-14 |
+| Marta | Send the demo agenda to the customer | 2026-10-16 |
+| Priya | Start implementing the rate limiter behind a feature flag |
+
+[2026-10-26T07:27:26.872Z] call #59 turn 11 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s2-1792997653 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md && ls -l deliverables
+RESULT: Output:
+     203 deliverables/memo-2026-10-12.md
+total 16
+-rw-r--r--@ 1 aminalizadeh  wheel   823 Oct 26 07:18 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1075 Oct 26 07:27 memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-26T07:28:50.471Z] call #65 turn 12 status=completed flags=['touches S/org']
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s2-1792997653/org && grep -rl "070939625591-root-ca4f" --include=*.jsonl --include=*.log --include=*.json . 2>/dev/null | head; grep -h "ca4f" .runtime/*.jsonl 2>/dev/null | head -3 | cut -c1-600
+RESULT: Output:
+zsh:1: no matches found: --include=*.jsonl
+zsh:1: no matches found: .runtime/*.jsonl
+
+
+Exit Code: 0
+
+[2026-10-26T07:31:21.784Z] call #68 turn 12 status=completed flags=['touches S/org']
+COMMAND: cat /private/tmp/hirearchy-g0-m1-s2-1792997653/org/lead/writer/work/memo-2026-10-19.md
+RESULT: Output:
+Summary: Platform weekly, 19 October 2026: demo goes ahead without the rate limiter, SSO vendor renewed, meeting moves to 14:00, and six actions assigned.
+
+## Decisions
+
+- Go ahead with the customer demo, leaving the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move this weekly from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Actions
+
+| Owner | Action | Due |
+|---|---|---|
+| Marta | Keep the demo agenda as sent | none |
+| Lee | Sign off on the SSO renewal once legal replies | none |
+| Marta | Collect demo feedback and circulate it | 2026-10-23 |
+| Dev | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting | 2026-10-26 |
+| Sam | Pair with Jo on the CI pipeline during Jo's first week | none |
+
+
+Exit Code: 0
+
+[2026-10-26T07:32:55.166Z] call #72 turn 13 status=completed flags=['touches S/org']
+COMMAND: cat /private/tmp/hirearchy-g0-m1-s2-1792997653/org/lead/writer/work/memo-2026-10-19.md
+RESULT: Output:
+Summary: Platform weekly, 19 October 2026: demo goes ahead without the rate limiter, SSO vendor renewed, meeting moves to 14:00, and six actions assigned.
+
+## Decisions
+
+- Go ahead with the customer demo, leaving the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move this weekly from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Actions
+
+| Owner | Action | Due |
+|---|---|---|
+| Marta | Keep the demo agenda as sent | none |
+| Lee | Sign off on the SSO renewal once legal replies | none |
+| Marta | Collect demo feedback and circulate it | 2026-10-23 |
+| Dev | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting | 2026-10-26 |
+| Sam | Pair with Jo on the CI pipeline during Jo's first week | none |
+
+
+Exit Code: 0
+
+[2026-10-26T07:35:56.395Z] call #74 turn 13 status=completed flags=['touches S/org']
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s2-1792997653/org/lead && ls -l writer/work reviewer/work | grep 10-19; echo ----; cat reviewer/work/review-memo-2026-10-19-recheck.md
+RESULT: Output:
+-rw-r--r--@ 1 aminalizadeh  wheel  3136 Oct 26 07:35 review-memo-2026-10-19-recheck.md
+-rw-r--r--@ 1 aminalizadeh  wheel  3773 Oct 26 07:30 review-memo-2026-10-19.md
+-rw-r--r--@ 1 aminalizadeh  wheel   842 Oct 26 07:33 memo-2026-10-19.md
+----
+# Re-check: memo-2026-10-19 (task 73c6)
+
+Opened: lead/writer/work/memo-2026-10-19.md (127 words, 17 lines, modified 07:33:53 UTC); notes/2026-10-19.md (full). Both opened. Earlier review: lead/reviewer/work/review-memo-2026-10-19.md (my own list of 3 decisions, 6 commitments reused after re-reading the notes).
+
+## Changed since last review
+- Summary now says "five actions assigned" (was six).
+- Marta 'keep the agenda as sent' row removed (client answer).
+- Lee Due now 2026-10-30 (client answer).
+- Sam row kept, Due none. Heading stays "Actions".
+
+## Criteria
+- C2 met: 127 words (read) <= 400.
+- C3 met: "## Decisions" lists 3 bullets = my D1 demo without rate limiter, D2 renew SSO 12 months and revisit next year, D3 weekly Mon 10:00 -> 14:00 from 26 Oct. None missing, none invented.
+- C4 met: header "| Owner | Action | Due |" exact; 5 rows, one each: Lee sign-off, Marta feedback, Dev freeze, Priya benchmark, Sam pairing (prose commitment kept). My list had 6 commitments; the 6th (Marta agenda) was removed by client decision, so not counted as a defect.
+- C5 met: Due 2026-10-30 (Lee, client decided), 2026-10-23 ("by Oct 23"), 2026-10-24 ("on Oct 24"), 2026-10-26 ("next meeting on Oct 26"), "none" for Sam (client decided). All ISO.
+
+
+[2026-10-26T07:36:02.571Z] call #75 turn 13 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s2-1792997653 && cat org/lead/writer/work/memo-2026-10-19.md && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && wc -w deliverables/memo-2026-10-19.md && ls -l deliverables
+RESULT: Output:
+Summary: Platform weekly, 19 October 2026: demo goes ahead without the rate limiter, SSO vendor renewed, meeting moves to 14:00, and five actions assigned.
+
+## Decisions
+
+- Go ahead with the customer demo, leaving the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move this weekly from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Actions
+
+| Owner | Action | Due |
+|---|---|---|
+| Lee | Sign off on the SSO renewal once legal replies | 2026-10-30 |
+| Marta | Collect demo feedback and circulate it | 2026-10-23 |
+| Dev | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting | 2026-10-26 |
+| Sam | Pair with Jo on the CI pipeline during Jo's first week | none |
+     157 deliverables/memo-2026-10-19.md
+total 24
+-rw-r--r--@ 1 aminalizadeh  wheel   823 Oct 26 07:18 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1075 Oct 26 07:27 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel   842 Oct 26 07:36 memo-2026-10-19.md
+
+
+Exit Code: 0
+

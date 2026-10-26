@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-g0-m1-s3-assistant 'Yes, it should start with the one-line Summary, then the decisions, then the action items. No, nothing for Marta to do there, leave it out. Lee'\''s 2026-10-30 is right. Sam'\''s none is right.'

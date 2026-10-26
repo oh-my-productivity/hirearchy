@@ -1,0 +1,87 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-26T06:24:13Z .. 2026-10-26T06:27:10Z; injected task 20261026T062413119254-root-9279; revised (memo 1) task 20261026T062052962599-root-52e3
+
+## run lead@20261026T062413371591 agent=lead model=claude-sonnet-5.5 start=2026-10-26T06:24:13.383075+00:00 end=2026-10-26T06:25:01.726432+00:00 exit=0 secs=48 session=sess_f8164558-cca6-4c6d-a75a-36e2bd76adc7
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261026T062455001357-lead-674c to=lead/writer type=task status=None created=2026-10-26T06:24:55+00:00
+  ## Lessons: (none)
+  org-git commit ef3446b MEMORY.md diff:
+    commit ef3446bd869f56781aa7a798d07fcb81e16c9dc2
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 06:25:01 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T062413371591.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index e92311b..9b6b237 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,4 @@
+     # Memory
+    -Both tasks for memo 2026-10-05 (52e3 and 6f1d) reported done; reviewer coverage 'criteria met: 7 of 7'. Nothing outstanding.
+    -Deliverable: lead/writer/work/memo-2026-10-05.md (98 words).
+    -Playbook lesson: ask client ambiguous Due or decision-vs-action questions earlier; reviewer gives coverage line under memo's reading plus per-alternative changes.
+    +Memo 2026-10-05 was delivered earlier (tasks 52e3, 6f1d). Now open: rework task 20261026T062413119254-root-9279 (Sam Due 2026-10-08 + Open questions section; Marta Due none + Open questions; reviewer re-checks EVERY Due value vs notes).
+    +Delegated writer rework 1 run (revises e6c1) at run start. Next: when writer reports, read memo, then delegate lead/reviewer (revises 20261026T061814352079-lead-6554 or 08b9, budget 2) with the 7 criteria + C8 context, ask every Due checked, coverage 'criteria met: n of m', list ambiguous. Then report root task 9279 with verbatim coverage line + lessons.
+    +Playbook lesson: ask client ambiguous Due/decision-vs-action questions earlier; Due resolution of 'before <day>' and event-date vs deadline are ambiguous: use none or flag in Open questions.
+
+## run lead/writer@20261026T062455662202 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-26T06:24:55.673740+00:00 end=2026-10-26T06:25:25.983122+00:00 exit=0 secs=30 session=sess_dd59f610-8750-4ef0-87dc-d0bb9c961389
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261026T062519915084 agent=lead model=claude-sonnet-5.5 start=2026-10-26T06:25:19.936041+00:00 end=2026-10-26T06:25:52.215531+00:00 exit=0 secs=32 session=sess_ac70c857-3c4b-4290-9665-e7f69df3d5b9
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261026T062541920198-lead-f0f2 to=lead/reviewer type=task status=None created=2026-10-26T06:25:41+00:00
+  ## Lessons: (none)
+  org-git commit e03ddfb MEMORY.md diff:
+    commit e03ddfb4e0d453c7c132cb615b0f6a030ce9cce8
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 06:25:52 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T062519915084.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 9b6b237..6f6d2ff 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,5 @@
+     # Memory
+    -Memo 2026-10-05 was delivered earlier (tasks 52e3, 6f1d). Now open: rework task 20261026T062413119254-root-9279 (Sam Due 2026-10-08 + Open questions section; Marta Due none + Open questions; reviewer re-checks EVERY Due value vs notes).
+    -Delegated writer rework 1 run (revises e6c1) at run start. Next: when writer reports, read memo, then delegate lead/reviewer (revises 20261026T061814352079-lead-6554 or 08b9, budget 2) with the 7 criteria + C8 context, ask every Due checked, coverage 'criteria met: n of m', list ambiguous. Then report root task 9279 with verbatim coverage line + lessons.
+    -Playbook lesson: ask client ambiguous Due/decision-vs-action questions earlier; Due resolution of 'before <day>' and event-date vs deadline are ambiguous: use none or flag in Open questions.
+    +Open root task 20261026T062413119254-root-9279 (rework: Sam Due 2026-10-08 + Open questions; Marta Due none). Writer rework done: lead/writer/work/memo-2026-10-05.md (144 words, I read it, rows match notes).
+    +Delegated reviewer re-check 20261026T062541920198-lead-f0f2 (budget 2, every Due checked). I have 1 run left.
+    +Next: when reviewer reports, read its report, verify 'criteria met: n of m' n=m (m=7); then report root 9279 done with verbatim coverage line, deliverable path lead/writer/work/memo-2026-10-05.md, Questions for the client from reviewer ambiguous items, and lessons. If fail: report blocked (no runs for another cycle).
+    +Playbook lesson: ask client ambiguous Due/decision-vs-action questions earlier; 'before <day>' and event-date vs deadline are ambiguous: use none or flag in Open questions.
+
+## run lead/reviewer@20261026T062542147077 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-26T06:25:42.156177+00:00 end=2026-10-26T06:26:38.652660+00:00 exit=0 secs=56 session=sess_c60a4ed0-c842-46fc-ab81-226c1300e4f7
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 5
+
+## run lead@20261026T062628539476 agent=lead model=claude-sonnet-5.5 start=2026-10-26T06:26:28.561654+00:00 end=2026-10-26T06:27:06.942710+00:00 exit=0 secs=38 session=sess_7e824cf7-b322-40bc-b466-583bccb83cba
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261026T062700538553-lead-e318 to=root type=result status=blocked created=2026-10-26T06:27:00+00:00
+  ## Lessons: Reviewer re-applied C6 literally and contradicted the client's rework ruling on Sam/Marta. Playbook change: pass the client's latest rulings to the reviewer as a regression list and ask ambiguous Due questions before the first draft. Evidence: 2 review cycles, 6 of 7 criteria both times, remaining failure is a client-decidable reading of C6.
+  org-git commit bed908d MEMORY.md diff:
+    commit bed908d8b5b06e0b03685a6783b3e2e40d26f822
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 06:27:06 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T062628539476.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 6f6d2ff..7663019 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,4 @@
+     # Memory
+    -Open root task 20261026T062413119254-root-9279 (rework: Sam Due 2026-10-08 + Open questions; Marta Due none). Writer rework done: lead/writer/work/memo-2026-10-05.md (144 words, I read it, rows match notes).
+    -Delegated reviewer re-check 20261026T062541920198-lead-f0f2 (budget 2, every Due checked). I have 1 run left.
+    -Next: when reviewer reports, read its report, verify 'criteria met: n of m' n=m (m=7); then report root 9279 done with verbatim coverage line, deliverable path lead/writer/work/memo-2026-10-05.md, Questions for the client from reviewer ambiguous items, and lessons. If fail: report blocked (no runs for another cycle).
+    -Playbook lesson: ask client ambiguous Due/decision-vs-action questions earlier; 'before <day>' and event-date vs deadline are ambiguous: use none or flag in Open questions.
+    +Root task 20261026T062413119254-root-9279 (rework Due values): reviewer re-check returned 'criteria met: 6 of 7' (C6 fail: reviewer wants Sam 2026-10-09, Marta 2026-10-14, which reverses the client's rework note). I reported BLOCKED to root with options; memo lead/writer/work/memo-2026-10-05.md (144 words) follows client's note. 0 runs left for another cycle.
+    +If woken again: only act on root's decision (if given budget, delegate writer revises + reviewer re-check; else nothing).
+    +Playbook lesson: ask client ambiguous Due questions early ('before <day>', event date vs deadline); verifier and client rulings can conflict, so pass the client's latest ruling verbatim to the reviewer as a regression line.
+

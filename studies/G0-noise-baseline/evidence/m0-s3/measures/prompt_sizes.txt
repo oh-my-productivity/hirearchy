@@ -1,0 +1,34 @@
+prompt_sizes m0-s3: owner lead (detected from root tasks), 26 runs
+
+prompt bytes: first 20943, max 31359, last 30968, last minus first 10025
+Reflect section words: min 554, max 627 (3 sections)
+reference E3: 20.2 KB -> 29.9 KB, 452-679 words
+
+  20261026T074520506993  bytes=20943  reflect=no  reflect_words=0
+  20261026T074616881205  bytes=25173  reflect=no  reflect_words=0
+  20261026T074729395594  bytes=25107  reflect=no  reflect_words=0
+  20261026T074939789382  bytes=21791  reflect=no  reflect_words=0
+  20261026T075036140138  bytes=24641  reflect=no  reflect_words=0
+  20261026T075140851166  bytes=24950  reflect=no  reflect_words=0
+  20261026T075326984385  bytes=22046  reflect=no  reflect_words=0
+  20261026T075439497437  bytes=26037  reflect=no  reflect_words=0
+  20261026T075556172102  bytes=25675  reflect=no  reflect_words=0
+  20261026T080011330402  bytes=31359  reflect=yes  reflect_words=570
+  20261026T080119894533  bytes=29024  reflect=no  reflect_words=0
+  20261026T080244735208  bytes=28452  reflect=no  reflect_words=0
+  20261026T080601577044  bytes=30994  reflect=yes  reflect_words=554
+  20261026T080658248349  bytes=30823  reflect=no  reflect_words=0
+  20261026T080808897651  bytes=31294  reflect=no  reflect_words=0
+  20261026T080955267059  bytes=27079  reflect=no  reflect_words=0
+  20261026T081053930192  bytes=30561  reflect=no  reflect_words=0
+  20261026T081238711524  bytes=30923  reflect=no  reflect_words=0
+  20261026T081427797364  bytes=31011  reflect=yes  reflect_words=627
+  20261026T081534149000  bytes=30537  reflect=no  reflect_words=0
+  20261026T081650757844  bytes=31032  reflect=no  reflect_words=0
+  20261026T081737120228  bytes=29159  reflect=no  reflect_words=0
+  20261026T081831570854  bytes=30565  reflect=no  reflect_words=0
+  20261026T082116461596  bytes=27198  reflect=no  reflect_words=0
+  20261026T082226832738  bytes=30676  reflect=no  reflect_words=0
+  20261026T082347315560  bytes=30968  reflect=no  reflect_words=0
+
+lead-prompt-sizes.txt: compared 26 runs, 0 differences

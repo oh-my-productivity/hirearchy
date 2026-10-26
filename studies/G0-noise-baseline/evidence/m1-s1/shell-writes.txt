@@ -1,0 +1,310 @@
+# shell writes (protocol 7.2): every execute_bash call of the assistant; facts only
+
+[2026-10-26T05:46:43.190Z] call #21 turn 5 status=completed flags=['touches S/org']
+COMMAND: cat /private/tmp/hirearchy-g0-m1-s1-1792992820/org/lead/writer/work/memo-2026-10-05.md; echo ---; wc -w /private/tmp/hirearchy-g0-m1-s1-1792992820/org/lead/writer/work/memo-2026-10-05.md
+RESULT: Output:
+# Platform team weekly memo, 2026-10-05
+
+## Decisions
+
+- Push the API gateway migration to the week of 26 October.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Priya | Draft the RFC for the new per-key rate limiter by Oct 9 | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos by Oct 8 | 2026-10-08 |
+| Sam | Look into the flaky CI before Friday | 2026-10-09 |
+| Marta | Book the on-call training room for Oct 14 | 2026-10-14 |
+| Lee | Ping the vendor about the SSO certificate this week and report back (no hard date attached) | none |
+---
+     139 /private/tmp/hirearchy-g0-m1-s1-1792992820/org/lead/writer/work/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T05:46:46.922Z] call #22 turn 5 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: mkdir -p /tmp/hirearchy-g0-m1-s1-1792992820/deliverables && cp /private/tmp/hirearchy-g0-m1-s1-1792992820/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s1-1792992820/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-g0-m1-s1-1792992820/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s1-1792992820/deliverables/memo-2026-10-05.md && ls -l /tmp/hirearchy-g0-m1-s1-1792992820/deliverables
+RESULT: Output:
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  706 Oct 26 05:46 memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T05:52:38.783Z] call #29 turn 7 status=failed flags=['touches S/org']
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820 && cat deliverables/memo-2026-10-05.md; echo ---; diff deliverables/memo-2026-10-05.md org/lead/writer/work/memo-2026-10-05.md
+RESULT: Output:
+# Platform team weekly memo, 2026-10-05
+
+## Decisions
+
+- Push the API gateway migration to the week of 26 October.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Priya | Draft the RFC for the new per-key rate limiter by Oct 9 | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos by Oct 8 | 2026-10-08 |
+| Sam | Look into the flaky CI before Friday | 2026-10-09 |
+| Marta | Book the on-call training room for Oct 14 | 2026-10-14 |
+| Lee | Ping the vendor about the SSO certificate this week and report back (no hard date attached) | none |
+---
+14,15c14,15
+< | Sam | Look into the flaky CI before Friday | 2026-10-09 |
+< | Marta | Book the on-call training room for Oct 14 | 2026-10-14 |
+---
+> | Sam | Look into the flaky CI before Friday | none |
+> | Marta | Book the on-call training room for Oct 14 (no booking deadline given) | none |
+
+
+Exit Code: 1
+
+[2026-10-26T05:55:28.974Z] call #39 turn 7 status=completed flags=['touches S/org']
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820/org && cat lead/writer/work/memo-2026-10-05.md; echo ---; wc -w lead/writer/work/memo-2026-10-05.md; ls lead/reviewer/work/; tail -15 lead/reviewer/work/recheck4-memo-2026-10-05.md 2>/dev/null
+RESULT: Output:
+# Platform team weekly memo, 2026-10-05
+
+Summary: The team pushed the API gateway migration to the week of 26 October, adopted Renovate, and assigned five action items.
+
+## Decisions
+
+- Push the API gateway migration to the week of 26 October.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Priya | Draft the RFC for the new per-key rate limiter by Oct 9 | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos by Oct 8 | 2026-10-08 |
+| Sam | Look into the flaky CI before Friday | 2026-10-09 |
+| Marta | Book the on-call training room for Oct 14 | 2026-10-14 |
+| Lee | Ping the vendor about the SSO certificate this week and report back (no hard date attached) | none |
+---
+     160 lead/writer/work/memo-2026-10-05.md
+recheck-memo-2026-10-05.md
+recheck2-memo-2026-10-05.md
+recheck3-memo-2026-10-05.md
+recheck4-memo-2026-10-05.md
+review-memo-2026-10-05.md
+- C10 met: line 3 "Summary: ..." one line directly under the title, then `## Decisions`, then `## Action items`; nothing else besides the title.
+- R1 met: starts with one-line Summary, then decisions, then action items.
+
+criteria met: 8 of 8 (C1, C2, C4, C5, C6, C7, C8, C10) plus R1 met.
+
+## Ambiguities (not decided, same as before)
+- Sam: "before Friday" read strictly could be 2026-10-08; memo uses 2026-10-09 (client-judged version).
+- Marta: Oct 14 is the training 
+
+[2026-10-26T05:56:38.759Z] call #41 turn 8 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && wc -w deliverables/memo-2026-10-05.md && cat deliverables/memo-2026-10-05.md
+RESULT: Output:
+     160 deliverables/memo-2026-10-05.md
+# Platform team weekly memo, 2026-10-05
+
+Summary: The team pushed the API gateway migration to the week of 26 October, adopted Renovate, and assigned five action items.
+
+## Decisions
+
+- Push the API gateway migration to the week of 26 October.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Priya | Draft the RFC for the new per-key rate limiter by Oct 9 | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos by Oct 8 | 2026-10-08 |
+| Sam | Look into the flaky CI before Friday | 2026-10-09 |
+| Marta | Book the on-call training room for Oct 14 | 2026-10-14 |
+| Lee | Ping the vendor about the SSO certificate this week and report back (no hard date attached) | none |
+
+
+Exit Code: 0
+
+[2026-10-26T06:00:17.627Z] call #48 turn 9 status=completed flags=['touches S/org']
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820/org && ls -t lead/writer/work/ lead/reviewer/work/ | head -20; cat lead/writer/work/memo-2026-10-12.md; wc -w lead/writer/work/memo-2026-10-12.md
+RESULT: Output:
+lead/reviewer/work/:
+review-memo-2026-10-12.md
+recheck4-memo-2026-10-05.md
+recheck3-memo-2026-10-05.md
+recheck2-memo-2026-10-05.md
+recheck-memo-2026-10-05.md
+review-memo-2026-10-05.md
+
+lead/writer/work/:
+memo-2026-10-12.md
+memo-2026-10-05.md
+# Platform team weekly memo, 2026-10-12
+
+Summary: The team approved the rate limiter RFC, agreed a blameless company-wide postmortem and a deploy freeze on Oct 22 and 23, and assigned five action items.
+
+## Decisions
+
+- Approve the rate limiter RFC with the token bucket per API key design, and ship it behind a feature flag first.
+- The postmortem for the Oct 8 outage will be blameless and shared with the whole company, not just engineering.
+- Deploy freeze on Oct 22 and Oct 23.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Dev | Write the postmortem for the Oct 8 outage by Oct 14 | 2026-10-14 |
+| Marta | Send the demo agenda to the customer by Oct 16 | 2026-10-16 |
+| Priya | Start implementing the rate limiter behind a feature flag by Oct 20 | 2026-10-20 |
+| Sam | Sort out the out-of-date staging test data so it is ready the day before the freeze starts (freeze starts Oct 22) | 2026-10-21 |
+| Lee | Swap pager shifts with Dev for the demo week (week of 19 October) | none |
+     194 lead/writer/work/memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-26T06:01:19.827Z] call #49 turn 10 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && ls -l deliverables && cat deliverables/memo-2026-10-12.md
+RESULT: Output:
+total 16
+-rw-r--r--@ 1 aminalizadeh  wheel   835 Oct 26 05:56 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1000 Oct 26 06:01 memo-2026-10-12.md
+# Platform team weekly memo, 2026-10-12
+
+Summary: The team approved the rate limiter RFC, agreed a blameless company-wide postmortem and a deploy freeze on Oct 22 and 23, and assigned five action items.
+
+## Decisions
+
+- Approve the rate limiter RFC with the token bucket per API key design, and ship it behind a feature flag first.
+- The postmortem for the Oct 8 outage will be blameless and shared with the whole company, not just engineering.
+- Deploy freeze on Oct 22 and Oct 23.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Dev | Write the postmortem for the Oct 8 outage by Oct 14 | 2026-10-14 |
+| Marta | Send the demo agenda to the customer by Oct 16 | 2026-10-16 |
+| Priya | Start implementing the rate limiter behind a feature flag by Oct 20 | 2026-10-20 |
+| Sam | Sort out the out-of-date staging test data so it is ready the day before the freeze starts (freeze starts Oct 22) | 2026-10-21 |
+| Lee | Swap pager shifts with Dev for the demo week (week of 19 October) | none |
+
+
+Exit Code: 0
+
+[2026-10-26T06:04:46.718Z] call #56 turn 11 status=completed flags=['touches S/org']
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820/org && cat lead/writer/work/memo-2026-10-19.md; wc -w lead/writer/work/memo-2026-10-19.md
+RESULT: Output:
+# Platform team weekly memo, 2026-10-19
+
+Summary: The team decided to go ahead with the customer demo without the rate limiter, renew the SSO vendor for twelve months, and move this weekly to Monday 14:00 from 26 October, and recorded six action items.
+
+## Decisions
+
+- Go ahead with the customer demo, leaving the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move this weekly from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Marta | Keep the demo agenda as sent | none |
+| Lee | Sign off on the SSO renewal once legal replies, probably by end of next week | none |
+| Marta | Collect demo feedback and circulate it by Oct 23 | 2026-10-23 |
+| Dev | Remove the deploy freeze in the pipeline config on Oct 24 | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting on Oct 26 | 2026-10-26 |
+| Sam | Offered to pair with Jo on the CI pipeline during Jo's first week (Jo starts Monday 26 October) | none |
+     211 lead/writer/work/memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-26T06:05:54.034Z] call #60 turn 12 status=completed flags=['touches S/org']
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820/org && cat lead/writer/work/memo-2026-10-19.md; wc -w lead/writer/work/memo-2026-10-19.md
+RESULT: Output:
+# Platform team weekly memo, 2026-10-19
+
+Summary: The team decided to go ahead with the customer demo without the rate limiter, renew the SSO vendor for twelve months, and move this weekly to Monday 14:00 from 26 October, and recorded six action items.
+
+## Decisions
+
+- Go ahead with the customer demo, leaving the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move this weekly from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Marta | Keep the demo agenda as sent | none |
+| Lee | Sign off on the SSO renewal once legal replies, probably by end of next week | none |
+| Marta | Collect demo feedback and circulate it by Oct 23 | 2026-10-23 |
+| Dev | Remove the deploy freeze in the pipeline config on Oct 24 | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting on Oct 26 | 2026-10-26 |
+| Sam | Offered to pair with Jo on the CI pipeline during Jo's first week (Jo starts Monday 26 October) | none |
+     211 lead/writer/work/memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-26T06:08:21.461Z] call #63 turn 12 status=completed flags=['touches S/org']
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820/org && ls -lT lead/writer/work lead/reviewer/work | sort -k6,8 | tail -12; date -u
+RESULT: Output:
+total 96
+-rw-r--r--@ 1 aminalizadeh  wheel  4664 Oct 26 05:39:12 2026 review-memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  4333 Oct 26 05:41:13 2026 recheck-memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  6048 Oct 26 05:46:05 2026 recheck2-memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  3279 Oct 26 05:49:51 2026 recheck3-memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel   835 Oct 26 05:53:52 2026 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  2416 Oct 26 05:54:55 2026 recheck4-memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1000 Oct 26 05:58:31 2026 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  3490 Oct 26 05:59:37 2026 review-memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  4456 Oct 26 06:04:13 2026 review-memo-2026-10-19.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1046 Oct 26 06:06:41 2026 memo-2026-10-19.md
+-rw-r--r--@ 1 aminalizadeh  wheel  2619 Oct 26 06:07:49 2026 review-memo-2026-10-19-v2.md
+Mon Oct 26 06:08:21 UTC 2026
+
+
+Exit Code: 0
+
+[2026-10-26T06:08:24.072Z] call #64 turn 12 status=completed flags=['touches S/org']
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820 && cat org/lead/writer/work/memo-2026-10-19.md && wc -w org/lead/writer/work/memo-2026-10-19.md
+RESULT: Output:
+# Platform team weekly memo, 2026-10-19
+
+Summary: The team decided to go ahead with the customer demo without the rate limiter, renew the SSO vendor for twelve months, and move this weekly to Monday 14:00 from 26 October, and recorded five action items.
+
+## Decisions
+
+- Go ahead with the customer demo, leaving the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move this weekly from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Lee | Sign off on the SSO renewal once legal replies, probably by end of next week | 2026-10-30 |
+| Marta | Collect demo feedback and circulate it by Oct 23 | 2026-10-23 |
+| Dev | Remove the deploy freeze in the pipeline config on Oct 24 | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting on Oct 26 | 2026-10-26 |
+| Sam | Offered to pair with Jo on the CI pipeline during Jo's first week (Jo starts Monday 26 October) | none |
+     199 org/lead/writer/work/memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-26T06:08:26.530Z] call #65 turn 12 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && ls -l deliverables
+RESULT: Output:
+total 24
+-rw-r--r--@ 1 aminalizadeh  wheel   835 Oct 26 05:56 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1000 Oct 26 06:01 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1046 Oct 26 06:08 memo-2026-10-19.md
+
+
+Exit Code: 0
+

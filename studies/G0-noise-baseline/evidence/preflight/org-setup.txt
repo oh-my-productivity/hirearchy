@@ -1,0 +1,13 @@
++zsh:4> hirearchy init /tmp/hirearchy-g0-preflight-1792989703/org --mission 'G0 harness preflight (throwaway)' --model claude-sonnet-5.5
+org: /private/tmp/hirearchy-g0-preflight-1792989703/org
+initialized organization at /private/tmp/hirearchy-g0-preflight-1792989703/org
+edit /private/tmp/hirearchy-g0-preflight-1792989703/org/ORG.md to set the mission and limits
++zsh:5> grep -n 'effort\|default_model' /tmp/hirearchy-g0-preflight-1792989703/org/ORG.md
+15:default_model: claude-sonnet-5.5
+16:effort: high
++zsh:6> hirearchy --root /tmp/hirearchy-g0-preflight-1792989703/org hire root lead --role Lead --charter 'You are the lead of a throwaway preflight org. Do exactly the task you are given, using your hirearchy tools, then report it done.' --tools read,write --model claude-sonnet-5.5
+org: /private/tmp/hirearchy-g0-preflight-1792989703/org
+hired lead
++zsh:7> hirearchy --root /tmp/hirearchy-g0-preflight-1792989703/org task lead --title 'Preflight note' --goal 'Use the hirearchy org_write tool to write the file lead/work/preflight.txt in the organization with the single line: G0-PREFLIGHT-OK. Then call the hirearchy report tool with status done.' --acceptance 'lead/work/preflight.txt holds G0-PREFLIGHT-OK; reported done.' --budget 2
+org: /private/tmp/hirearchy-g0-preflight-1792989703/org
+task 20261026T044144236971-root-8142 -> lead (budget 2)

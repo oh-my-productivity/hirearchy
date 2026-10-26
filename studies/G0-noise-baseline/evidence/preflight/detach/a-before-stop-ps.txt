@@ -1,0 +1,1 @@
+21150     1 Ss   /Volumes/workspace/hirearchy/.venv/bin/python3 /Volumes/workspace/hirearchy/.venv/bin/hirearchy --root /private/tmp/hirearchy-g0-detach-1792989925/org run

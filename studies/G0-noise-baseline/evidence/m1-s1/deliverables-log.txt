@@ -1,0 +1,74 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-26T05:46:46.922Z] call #22 turn 5 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-g0-m1-s1-1792992820/deliverables && cp /private/tmp/hirearchy-g0-m1-s1-1792992820/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s1-1792992820/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-g0-m1-s1-1792992820/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s1-1792992820/deliverables/memo-2026-10-05.md && ls -l /tmp/hirearchy-g0-m1-s1-1792992820/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: b981427 2026-10-26T05:45:00Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: b981427 2026-10-26T05:45:00Z']
+result: Output:
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  706 Oct 26 05:46 memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T05:56:38.759Z] call #41 turn 8 execute_bash
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && wc -w deliverables/memo-2026-10-05.md && cat deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 003b89f 2026-10-26T05:54:06Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 003b89f 2026-10-26T05:54:06Z']
+result: Output:
+     160 deliverables/memo-2026-10-05.md
+# Platform team weekly memo, 2026-10-05
+
+Summary: The team pushed the API gateway migration to the week of 26 October, adopted Renovate, and assigned five action items.
+
+## Decisions
+
+- Push the API gateway migration to the week of 26 October.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Priya | Draft the RFC for the new per-key rate limiter by Oct 9 | 2026-10-09 |
+| Dev | Enable Renovate 
+
+[2026-10-26T06:01:19.827Z] call #49 turn 10 execute_bash
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && ls -l deliverables && cat deliverables/memo-2026-10-12.md
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 5d74168 2026-10-26T05:58:42Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 5d74168 2026-10-26T05:58:42Z']
+result: Output:
+total 16
+-rw-r--r--@ 1 aminalizadeh  wheel   835 Oct 26 05:56 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1000 Oct 26 06:01 memo-2026-10-12.md
+# Platform team weekly memo, 2026-10-12
+
+Summary: The team approved the rate limiter RFC, agreed a blameless company-wide postmortem and a deploy freeze on Oct 22 and 23, and assigned five action items.
+
+## Decisions
+
+- Approve the rate limiter RFC with the token bucket per API key design, and ship it behind a feature flag first.
+- The postmortem for the Oct 8 outage will be blameless and shared with the whole company, not just enginee
+
+[2026-10-26T06:08:26.530Z] call #65 turn 12 execute_bash
+COMMAND: cd /tmp/hirearchy-g0-m1-s1-1792992820 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && ls -l deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 6399954 2026-10-26T06:06:52Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 6399954 2026-10-26T06:06:52Z']
+result: Output:
+total 24
+-rw-r--r--@ 1 aminalizadeh  wheel   835 Oct 26 05:56 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1000 Oct 26 06:01 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1046 Oct 26 06:08 memo-2026-10-19.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 835 mtime 05:56:38 local md5 41c11ea065fbb1bdce72f24feeb7cc0e
+  memo-2026-10-12.md size 1000 mtime 06:01:19 local md5 893b0535716c6b840f01408d9bd2af0f
+  memo-2026-10-19.md size 1046 mtime 06:08:26 local md5 b3b4da71800fb3f05d1fabcd42953708
+
+final ls -la:
+total 24
+drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 26 06:08 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 26 05:47 ..
+-rw-r--r--@ 1 aminalizadeh  wheel   835 Oct 26 05:56 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1000 Oct 26 06:01 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1046 Oct 26 06:08 memo-2026-10-19.md
+

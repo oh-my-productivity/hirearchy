@@ -1,0 +1,1 @@
+env KIRO_HOME=/tmp/hirearchy-g0-m0home-m0-s3-1793000481/.kiro kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-g0-m0-s3-assistant 'Yes, add it.'

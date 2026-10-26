@@ -1,0 +1,15 @@
+Sent back with your four answers. I'll wait for the team to finish.The memo for `2026-10-19.md` is saved at `/tmp/hirearchy-g0-m1-s3-1793003475/deliverables/memo-2026-10-19.md`. It's 232 words.
+
+- **Summary first:** the file starts with the one-line "Summary:", then the decisions, then the action table. The title heading is gone.
+- **Marta:** the "keep the agenda as sent" row is out of the table. It stays as a decision, because you only asked me to drop the row.
+- **Action table:** it has Owner | Action | Due with 5 rows. Lee is 2026-10-30 and Sam is `none`, as you confirmed.
+- **Reviewer:** passed it, 8 of 8, with 18 of 18 factual claims verified.
+- **Within 400 words and only this meeting:** met.
+
+The memo has a short "Open questions" section after the table, which explains Lee's date. You told me to keep this section on the 12 October memo, but I didn't ask you about it for this one. Delete it if you don't want it.
+
+Dev's deadline for removing the deploy freeze is 2026-10-24, and that is a Saturday. The notes say "Oct 24", so I left it as written.
+
+This memo used 10 of the 12 runs you approved (5 for the first pass, 5 for the fix). The three memos are now in `deliverables/`.
+
+Is this one OK as it stands?

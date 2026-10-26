@@ -1,0 +1,1246 @@
+{
+  "arm": "m0",
+  "copies": {
+    "ask_first": {
+      "k": 2,
+      "n": 4
+    },
+    "count": 4,
+    "hand_edits": {
+      "k": 0,
+      "n": 4
+    },
+    "list": [
+      {
+        "ask_first_shown": true,
+        "call": 26,
+        "case": "2026-10-05",
+        "checked_version": {
+          "md5": "16b0d84a7bf28b2f8704949a88583537",
+          "path": "lead/writer/work/memo-2026-10-05.md",
+          "sha": "c0ecc31",
+          "time": "2026-10-26T07:50:42Z"
+        },
+        "command": "mkdir -p /tmp/hirearchy-g0-m0-s3-1793000481/deliverables && cp /private/tmp/hirearchy-g0-m0-s3-1793000481/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m0-s3-1793000481/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-g0-m0-s3-1793000481/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m0-s3-1793000481/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-g0-m0-",
+        "hand_edit": false,
+        "human_feedback_after": [
+          {
+            "call": 31,
+            "task": "20261026T074936893313-root-ce42",
+            "turn": 5,
+            "verdict": "reject"
+          },
+          {
+            "call": 55,
+            "task": "20261026T074936893313-root-ce42",
+            "turn": 9,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-26T07:52:07+00:00",
+          "id": "20261026T075207002484-lead-1cb9",
+          "reply_to": "20261026T074936893313-root-ce42",
+          "status": "done"
+        },
+        "progress_call": 23,
+        "source_path": "lead/writer/work/memo-2026-10-05.md",
+        "source_version": {
+          "md5": "16b0d84a7bf28b2f8704949a88583537",
+          "path": "lead/writer/work/memo-2026-10-05.md",
+          "sha": "c0ecc31",
+          "time": "2026-10-26T07:50:42Z"
+        },
+        "tool": "execute_bash",
+        "ts": "2026-10-26T07:52:23.274Z",
+        "turn": 4
+      },
+      {
+        "ask_first_shown": true,
+        "call": 74,
+        "case": "2026-10-12",
+        "checked_version": {
+          "md5": "ee1b244297426b76eb52efc4af0d8570",
+          "path": "lead/writer/work/memo-2026-10-12.md",
+          "sha": "1668114",
+          "time": "2026-10-26T08:11:02Z"
+        },
+        "command": "cd /tmp/hirearchy-g0-m0-s3-1793000481 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo MATCH && wc -w deliverables/memo-2026-10-12.md && grep -c probably deliverables/memo-2026-10-12.md; ls deliverables",
+        "hand_edit": false,
+        "human_feedback_after": [
+          {
+            "call": 75,
+            "task": "20261026T080954982406-root-0b0b",
+            "turn": 11,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-26T08:12:59+00:00",
+          "id": "20261026T081259998242-lead-5681",
+          "reply_to": "20261026T080954982406-root-0b0b",
+          "status": "done"
+        },
+        "progress_call": 69,
+        "source_path": "lead/writer/work/memo-2026-10-12.md",
+        "source_version": {
+          "md5": "ee1b244297426b76eb52efc4af0d8570",
+          "path": "lead/writer/work/memo-2026-10-12.md",
+          "sha": "1668114",
+          "time": "2026-10-26T08:11:02Z"
+        },
+        "tool": "execute_bash",
+        "ts": "2026-10-26T08:13:21.320Z",
+        "turn": 10
+      },
+      {
+        "ask_first_shown": false,
+        "call": 90,
+        "case": "2026-10-19",
+        "checked_version": {
+          "md5": "6ac1e8d5c93fa0dded032e51a43d0652",
+          "path": "lead/writer/work/memo-2026-10-19.md",
+          "sha": "c8a30e9",
+          "time": "2026-10-26T08:22:34Z"
+        },
+        "command": "cd /tmp/hirearchy-g0-m0-s3-1793000481 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo MATCH && wc -w deliverables/memo-2026-10-19.md && ls deliverables",
+        "hand_edit": false,
+        "human_feedback_after": [
+          {
+            "call": 93,
+            "task": "20261026T082116199481-root-59ec",
+            "turn": 14,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-26T08:24:15+00:00",
+          "id": "20261026T082415086090-lead-407a",
+          "reply_to": "20261026T082116199481-root-59ec",
+          "status": "done"
+        },
+        "progress_call": 87,
+        "source_path": "lead/writer/work/memo-2026-10-19.md",
+        "source_version": {
+          "md5": "6ac1e8d5c93fa0dded032e51a43d0652",
+          "path": "lead/writer/work/memo-2026-10-19.md",
+          "sha": "c8a30e9",
+          "time": "2026-10-26T08:22:34Z"
+        },
+        "tool": "execute_bash",
+        "ts": "2026-10-26T08:24:25.709Z",
+        "turn": 13
+      },
+      {
+        "ask_first_shown": false,
+        "call": 91,
+        "case": "2026-10-19",
+        "checked_version": {
+          "md5": "6ac1e8d5c93fa0dded032e51a43d0652",
+          "path": "lead/writer/work/memo-2026-10-19.md",
+          "sha": "c8a30e9",
+          "time": "2026-10-26T08:22:34Z"
+        },
+        "command": "cd /tmp/hirearchy-g0-m0-s3-1793000481 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo MATCH && wc -w deliverables/memo-2026-10-19.md && grep -c \"agenda as sent\" deliverables/memo-2026-10-19.md; grep \"Lee\" deliverables/memo-2026-10-19.md",
+        "hand_edit": false,
+        "human_feedback_after": [
+          {
+            "call": 93,
+            "task": "20261026T082116199481-root-59ec",
+            "turn": 14,
+            "verdict": "accept"
+          }
+        ],
+        "latest_result": {
+          "created": "2026-10-26T08:24:15+00:00",
+          "id": "20261026T082415086090-lead-407a",
+          "reply_to": "20261026T082116199481-root-59ec",
+          "status": "done"
+        },
+        "progress_call": 87,
+        "source_path": "lead/writer/work/memo-2026-10-19.md",
+        "source_version": {
+          "md5": "6ac1e8d5c93fa0dded032e51a43d0652",
+          "path": "lead/writer/work/memo-2026-10-19.md",
+          "sha": "c8a30e9",
+          "time": "2026-10-26T08:22:34Z"
+        },
+        "tool": "execute_bash",
+        "ts": "2026-10-26T08:24:46.094Z",
+        "turn": 13
+      }
+    ]
+  },
+  "cost": {
+    "assistant_credits": 26.8582,
+    "assistant_seconds": 1746,
+    "org_credits": {
+      "outside": 39.2654,
+      "window": 5.2853
+    },
+    "org_runs": {
+      "outside": 39,
+      "outside_by_seat": {
+        "lead": 23,
+        "lead-reviewer": 8,
+        "lead-writer": 8
+      },
+      "total": 44,
+      "window": 5,
+      "window_by_seat": {
+        "lead": 3,
+        "lead-reviewer": 1,
+        "lead-writer": 1
+      }
+    },
+    "org_seconds": {
+      "outside": 1558,
+      "window": 204
+    },
+    "user_turns": 15,
+    "wall_seconds": 2711,
+    "wall_time": "45:11"
+  },
+  "flagged": {
+    "by_result": {
+      "20261026T074802460120-lead-1505": {
+        "case": "2026-10-05",
+        "created": "2026-10-26T07:48:02+00:00",
+        "first_flag_call": 15,
+        "needs_d5": 0,
+        "never_copied": 0,
+        "notes": 0,
+        "questions": 4,
+        "reply_to": "20261026T074518776162-root-e415",
+        "status": "done",
+        "superseded": 4
+      },
+      "20261026T075207002484-lead-1cb9": {
+        "case": "2026-10-05",
+        "created": "2026-10-26T07:52:07+00:00",
+        "first_flag_call": 21,
+        "needs_d5": 2,
+        "never_copied": 0,
+        "notes": 0,
+        "questions": 2,
+        "reply_to": "20261026T074936893313-root-ce42",
+        "status": "done",
+        "superseded": 0
+      },
+      "20261026T075618747289-lead-fd9b": {
+        "case": "2026-10-05",
+        "created": "2026-10-26T07:56:18+00:00",
+        "first_flag_call": 35,
+        "needs_d5": 0,
+        "never_copied": 0,
+        "notes": 0,
+        "questions": 3,
+        "reply_to": "20261026T075326752629-root-9de8",
+        "status": "done",
+        "superseded": 3
+      },
+      "20261026T080316250340-lead-bd32": {
+        "case": "2026-10-05",
+        "created": "2026-10-26T08:03:16+00:00",
+        "first_flag_call": 45,
+        "needs_d5": 0,
+        "never_copied": 4,
+        "notes": 0,
+        "questions": 4,
+        "reply_to": "20261026T080011089548-root-53b3",
+        "status": "blocked",
+        "superseded": 0
+      },
+      "20261026T080832382363-lead-3e2c": {
+        "case": "2026-10-12",
+        "created": "2026-10-26T08:08:32+00:00",
+        "first_flag_call": 58,
+        "needs_d5": 0,
+        "never_copied": 0,
+        "notes": 0,
+        "questions": 2,
+        "reply_to": "20261026T080557284311-root-3e5e",
+        "status": "done",
+        "superseded": 2
+      },
+      "20261026T081259998242-lead-5681": {
+        "case": "2026-10-12",
+        "created": "2026-10-26T08:12:59+00:00",
+        "first_flag_call": 69,
+        "needs_d5": 1,
+        "never_copied": 0,
+        "notes": 0,
+        "questions": 1,
+        "reply_to": "20261026T080954982406-root-0b0b",
+        "status": "done",
+        "superseded": 0
+      },
+      "20261026T081855341826-lead-0c29": {
+        "case": "2026-10-19",
+        "created": "2026-10-26T08:18:55+00:00",
+        "first_flag_call": 80,
+        "needs_d5": 0,
+        "never_copied": 0,
+        "notes": 0,
+        "questions": 3,
+        "reply_to": "20261026T081424472572-root-c118",
+        "status": "done",
+        "superseded": 3
+      }
+    },
+    "counts": {
+      "items": 19,
+      "needs_d5": 3,
+      "never_copied": 4,
+      "notes": 0,
+      "questions": 19,
+      "results_with_items": 7,
+      "superseded": 12
+    },
+    "items": [
+      {
+        "case": "2026-10-05",
+        "class": "superseded",
+        "copy": {
+          "call": 26,
+          "ts": "2026-10-26T07:52:23.274Z",
+          "turn": 4
+        },
+        "created": "2026-10-26T07:48:02+00:00",
+        "flagged_by": [
+          {
+            "call": 15,
+            "source": "assistant",
+            "ts": "2026-10-26T07:48:03.595Z",
+            "turn": 3
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T074802460120-lead-1505",
+        "reworks_between": [
+          "20261026T074936893313-root-ce42"
+        ],
+        "text": "Sam 'before Friday' -> Due 2026-10-08 (C6): reviewer: 'defensible, a range reading would give none'."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "superseded",
+        "copy": {
+          "call": 26,
+          "ts": "2026-10-26T07:52:23.274Z",
+          "turn": 4
+        },
+        "created": "2026-10-26T07:48:02+00:00",
+        "flagged_by": [
+          {
+            "call": 15,
+            "source": "assistant",
+            "ts": "2026-10-26T07:48:03.595Z",
+            "turn": 3
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T074802460120-lead-1505",
+        "reworks_between": [
+          "20261026T074936893313-root-ce42"
+        ],
+        "text": "Lee 'this week' -> Due none (C6): reviewer: 'no hard date attached, none is consistent'; Friday 2026-10-09 would contradict it."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "superseded",
+        "copy": {
+          "call": 26,
+          "ts": "2026-10-26T07:52:23.274Z",
+          "turn": 4
+        },
+        "created": "2026-10-26T07:48:02+00:00",
+        "flagged_by": [
+          {
+            "call": 15,
+            "source": "assistant",
+            "ts": "2026-10-26T07:48:03.595Z",
+            "turn": 3
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T074802460120-lead-1505",
+        "reworks_between": [
+          "20261026T074936893313-root-ce42"
+        ],
+        "text": "Marta, room for Oct 14 -> Due none (C6): reviewer: 'Oct 14 is the training date, not clearly a booking deadline'; could be read as 2026-10-14."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "superseded",
+        "copy": {
+          "call": 26,
+          "ts": "2026-10-26T07:52:23.274Z",
+          "turn": 4
+        },
+        "created": "2026-10-26T07:48:02+00:00",
+        "flagged_by": [
+          {
+            "call": 15,
+            "source": "assistant",
+            "ts": "2026-10-26T07:48:03.595Z",
+            "turn": 3
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T074802460120-lead-1505",
+        "reworks_between": [
+          "20261026T074936893313-root-ce42"
+        ],
+        "text": "'Attendees' and 'Next meeting' lines (C1/C7): reviewer: 'a strict C1 reader might call the next-meeting line extra'; both come from the notes."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "needs D5 judgement (copy at T)",
+        "copy": {
+          "call": 26,
+          "ts": "2026-10-26T07:52:23.274Z",
+          "turn": 4
+        },
+        "created": "2026-10-26T07:52:07+00:00",
+        "flagged_by": [
+          {
+            "call": 21,
+            "source": "assistant",
+            "ts": "2026-10-26T07:52:08.403Z",
+            "turn": 4
+          },
+          {
+            "call": 23,
+            "source": "assistant",
+            "ts": "2026-10-26T07:52:12.768Z",
+            "turn": 4
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:53:26Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:35Z"
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T075207002484-lead-1cb9",
+        "reworks_between": [],
+        "text": "C6, Sam: notes say \"before Friday\"; read literally that is 2026-10-08, the memo has 2026-10-09 (your decision)."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "needs D5 judgement (copy at T)",
+        "copy": {
+          "call": 26,
+          "ts": "2026-10-26T07:52:23.274Z",
+          "turn": 4
+        },
+        "created": "2026-10-26T07:52:07+00:00",
+        "flagged_by": [
+          {
+            "call": 21,
+            "source": "assistant",
+            "ts": "2026-10-26T07:52:08.403Z",
+            "turn": 4
+          },
+          {
+            "call": 23,
+            "source": "assistant",
+            "ts": "2026-10-26T07:52:12.768Z",
+            "turn": 4
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:53:26Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:35Z"
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T075207002484-lead-1cb9",
+        "reworks_between": [],
+        "text": "C6, Marta: notes give Oct 14 only as the training date, not a booking deadline; memo has 2026-10-14 (your decision)."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "superseded",
+        "copy": null,
+        "created": "2026-10-26T07:56:18+00:00",
+        "flagged_by": [
+          {
+            "call": 35,
+            "source": "assistant",
+            "ts": "2026-10-26T07:58:43.159Z",
+            "turn": 6
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:19Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:24Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:34Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:35Z"
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T075618747289-lead-fd9b",
+        "reworks_between": [
+          "20261026T080011089548-root-53b3"
+        ],
+        "text": "Sam, 'before Friday' (C6): reviewer A1 says it 'can mean Thursday 2026-10-08 (strictly before) or Friday 2026-10-09 (by Friday)'. Memo uses 2026-10-08 and explains it in Open questions."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "superseded",
+        "copy": null,
+        "created": "2026-10-26T07:56:18+00:00",
+        "flagged_by": [
+          {
+            "call": 35,
+            "source": "assistant",
+            "ts": "2026-10-26T07:58:43.159Z",
+            "turn": 6
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:19Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:24Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:34Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:35Z"
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T075618747289-lead-fd9b",
+        "reworks_between": [
+          "20261026T080011089548-root-53b3"
+        ],
+        "text": "Marta, 'book the room for Oct 14' (C6): reviewer A2 says it 'could be read as a due date of 2026-10-14 ... or as no deadline'. Memo uses none and explains it in Open questions."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "superseded",
+        "copy": null,
+        "created": "2026-10-26T07:56:18+00:00",
+        "flagged_by": [
+          {
+            "call": 35,
+            "source": "assistant",
+            "ts": "2026-10-26T07:58:43.159Z",
+            "turn": 6
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:19Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:24Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:34Z"
+          },
+          {
+            "source": "injection-log",
+            "ts": "2026-10-26T07:56:35Z"
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T075618747289-lead-fd9b",
+        "reworks_between": [
+          "20261026T080011089548-root-53b3"
+        ],
+        "text": "Open questions section (C1/C7): reviewer A3 says it 'is not decision or action content'. Kept because your note asked for the explanations there."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "never copied",
+        "copy": null,
+        "created": "2026-10-26T08:03:16+00:00",
+        "flagged_by": [
+          {
+            "call": 45,
+            "source": "assistant",
+            "ts": "2026-10-26T08:03:17.048Z",
+            "turn": 7
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T080316250340-lead-bd32",
+        "reworks_between": [],
+        "text": "A3, C9/R1: does a title heading line count as 'starting' the memo? The reviewer read it strictly (not met), and said that if a title is allowed the score is 10 of 11, with only C8 open."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "never copied",
+        "copy": null,
+        "created": "2026-10-26T08:03:16+00:00",
+        "flagged_by": [
+          {
+            "call": 45,
+            "source": "assistant",
+            "ts": "2026-10-26T08:03:17.048Z",
+            "turn": 7
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T080316250340-lead-bd32",
+        "reworks_between": [],
+        "text": "A4, C9 scope: are the Attendees and Next meeting lines allowed extras? The reviewer says 'Nothing else from the notes beyond what is needed' could be read both ways."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "never copied",
+        "copy": null,
+        "created": "2026-10-26T08:03:16+00:00",
+        "flagged_by": [
+          {
+            "call": 45,
+            "source": "assistant",
+            "ts": "2026-10-26T08:03:17.048Z",
+            "turn": 7
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T080316250340-lead-bd32",
+        "reworks_between": [],
+        "text": "A1, C6: Sam 'before Friday' could be 2026-10-08. The request fixes 2026-10-09."
+      },
+      {
+        "case": "2026-10-05",
+        "class": "never copied",
+        "copy": null,
+        "created": "2026-10-26T08:03:16+00:00",
+        "flagged_by": [
+          {
+            "call": 45,
+            "source": "assistant",
+            "ts": "2026-10-26T08:03:17.048Z",
+            "turn": 7
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T080316250340-lead-bd32",
+        "reworks_between": [],
+        "text": "A2, C6: Marta 'for Oct 14' is the training date and not clearly a deadline. The request fixes 2026-10-14."
+      },
+      {
+        "case": "2026-10-12",
+        "class": "superseded",
+        "copy": {
+          "call": 74,
+          "ts": "2026-10-26T08:13:21.320Z",
+          "turn": 10
+        },
+        "created": "2026-10-26T08:08:32+00:00",
+        "flagged_by": [
+          {
+            "call": 58,
+            "source": "assistant",
+            "ts": "2026-10-26T08:08:34.492Z",
+            "turn": 9
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T080832382363-lead-3e2c",
+        "reworks_between": [
+          "20261026T080954982406-root-0b0b"
+        ],
+        "text": "Sam's staging row (C5): hedged 'will probably sort it out himself'; reviewer: 'a stricter reading of \"no row for something nobody committed to\" could drop it' (ambiguous A-1). Kept as a row, Due 2026-10-21 (day before the Oct 22 freeze)."
+      },
+      {
+        "case": "2026-10-12",
+        "class": "superseded",
+        "copy": {
+          "call": 74,
+          "ts": "2026-10-26T08:13:21.320Z",
+          "turn": 10
+        },
+        "created": "2026-10-26T08:08:32+00:00",
+        "flagged_by": [
+          {
+            "call": 58,
+            "source": "assistant",
+            "ts": "2026-10-26T08:08:34.492Z",
+            "turn": 9
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T080832382363-lead-3e2c",
+        "reworks_between": [
+          "20261026T080954982406-root-0b0b"
+        ],
+        "text": "Lee's pager/swap row (C6): reviewer lists Due none vs. 'demo week' as ambiguous (A-2); 'demo week' is not a single day, so none."
+      },
+      {
+        "case": "2026-10-12",
+        "class": "needs D5 judgement (copy at T)",
+        "copy": {
+          "call": 74,
+          "ts": "2026-10-26T08:13:21.320Z",
+          "turn": 10
+        },
+        "created": "2026-10-26T08:12:59+00:00",
+        "flagged_by": [
+          {
+            "call": 69,
+            "source": "assistant",
+            "ts": "2026-10-26T08:13:00.378Z",
+            "turn": 10
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T081259998242-lead-5681",
+        "reworks_between": [],
+        "text": "Sam row (C5/C7): the notes hedge it (\"will probably sort it out himself\"); the memo now states it flatly, as you asked. Reviewer A-1: \"whether a hedged statement is a commitment (C5) and whether dropping 'probably' still counts as traceable without overstatement (C7) is lead's call.\" Kept as you directed (row kept, Due 2026-10-21)."
+      },
+      {
+        "case": "2026-10-19",
+        "class": "superseded",
+        "copy": {
+          "call": 90,
+          "ts": "2026-10-26T08:24:25.709Z",
+          "turn": 13
+        },
+        "created": "2026-10-26T08:18:55+00:00",
+        "flagged_by": [
+          {
+            "call": 80,
+            "source": "assistant",
+            "ts": "2026-10-26T08:18:56.075Z",
+            "turn": 11
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T081855341826-lead-0c29",
+        "reworks_between": [
+          "20261026T082116199481-root-59ec"
+        ],
+        "text": "Lee 'probably by end of next week': Due none or 2026-10-30? (C6; reviewer: 'can be read two ways')"
+      },
+      {
+        "case": "2026-10-19",
+        "class": "superseded",
+        "copy": {
+          "call": 90,
+          "ts": "2026-10-26T08:24:25.709Z",
+          "turn": 13
+        },
+        "created": "2026-10-26T08:18:55+00:00",
+        "flagged_by": [
+          {
+            "call": 80,
+            "source": "assistant",
+            "ts": "2026-10-26T08:18:56.075Z",
+            "turn": 11
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T081855341826-lead-0c29",
+        "reworks_between": [
+          "20261026T082116199481-root-59ec"
+        ],
+        "text": "Marta 'Marta will keep the agenda as sent': a row (commitment) or only a status statement? (C5; reviewer: ambiguous)"
+      },
+      {
+        "case": "2026-10-19",
+        "class": "superseded",
+        "copy": {
+          "call": 90,
+          "ts": "2026-10-26T08:24:25.709Z",
+          "turn": 13
+        },
+        "created": "2026-10-26T08:18:55+00:00",
+        "flagged_by": [
+          {
+            "call": 80,
+            "source": "assistant",
+            "ts": "2026-10-26T08:18:56.075Z",
+            "turn": 11
+          }
+        ],
+        "kind": "question",
+        "result": "20261026T081855341826-lead-0c29",
+        "reworks_between": [
+          "20261026T082116199481-root-59ec"
+        ],
+        "text": "Sam 'offered to pair with Jo on the CI pipeline': a row (commitment) or only an offer? (C5; reviewer: ambiguous)"
+      }
+    ]
+  },
+  "grants": [],
+  "human_reworks": {
+    "count": 4,
+    "list": [
+      {
+        "budget_arg": null,
+        "call": 18,
+        "held": false,
+        "reply_budget": 7,
+        "topup": false,
+        "turn": 4
+      },
+      {
+        "budget_arg": 5,
+        "call": 42,
+        "held": false,
+        "reply_budget": 5,
+        "topup": false,
+        "turn": 7
+      },
+      {
+        "budget_arg": 5,
+        "call": 65,
+        "held": false,
+        "reply_budget": 5,
+        "topup": false,
+        "turn": 10
+      },
+      {
+        "budget_arg": 5,
+        "call": 85,
+        "held": false,
+        "reply_budget": 5,
+        "topup": false,
+        "turn": 13
+      }
+    ],
+    "without_budget": 1
+  },
+  "injected_task": "20261026T075326752629-root-9de8",
+  "lasis": {
+    "accepted": {
+      "k": 1,
+      "n": 1
+    },
+    "accepted_turns": [
+      9
+    ],
+    "turns": [
+      9
+    ],
+    "uses": 1
+  },
+  "measures": {
+    "ask_first_copies": {
+      "k": 2,
+      "n": 4
+    },
+    "assistant_credits": 26.8582,
+    "assistant_seconds": 1746,
+    "boundary_failure_files": 0,
+    "copies": 4,
+    "d1_never_recorded": {
+      "k": 0,
+      "n": 1
+    },
+    "d23_about_differs": {
+      "k": 0,
+      "n": 0
+    },
+    "d23_without_reading": {
+      "k": 1,
+      "n": 1
+    },
+    "deliverable_notes": 0,
+    "delivered_without_verdict": {
+      "k": 0,
+      "n": 3
+    },
+    "facade_refusals": 0,
+    "flagged_items": 19,
+    "flagged_needs_d5": 3,
+    "flagged_never_copied": 4,
+    "flagged_notes": 0,
+    "flagged_questions": 19,
+    "flagged_results": 7,
+    "flagged_superseded": 12,
+    "grants": 0,
+    "hand_edits": {
+      "k": 0,
+      "n": 4
+    },
+    "held_replies": 0,
+    "human_rejects": 1,
+    "human_reworks": 4,
+    "human_reworks_without_budget": 1,
+    "inbox_calls": 9,
+    "lasis_accepted": {
+      "k": 1,
+      "n": 1
+    },
+    "lasis_uses": 1,
+    "lena_keep_l_budget_q": 1,
+    "lena_yes_h4": 0,
+    "m_c_8": {
+      "k": 15,
+      "n": 15
+    },
+    "memo1_turns": 7,
+    "memo2_turns": 3,
+    "memo3_turns": 4,
+    "org_credits_outside": 39.2654,
+    "org_credits_window": 5.2853,
+    "org_runs_outside": 39,
+    "org_runs_window": 5,
+    "org_seconds_outside": 1558,
+    "org_seconds_window": 204,
+    "other_refusals": 0,
+    "p2_refusals": 1,
+    "p2_unrated": 1,
+    "p4_refusals": 0,
+    "plans": 1,
+    "plans_with_budget_line": {
+      "k": 1,
+      "n": 1
+    },
+    "relayed_reworks_by_assistant": 0,
+    "root_unread_at_end": 0,
+    "run_end_killed": 0,
+    "run_orphan": 0,
+    "scheduler_signals": 0,
+    "schedulers_assistant": 7,
+    "schedulers_running_at_turn_end": {
+      "k": 0,
+      "n": 7
+    },
+    "schedulers_script": 1,
+    "schedulers_total": 8,
+    "schedulers_with_exit": {
+      "k": 8,
+      "n": 8
+    },
+    "shell_commands": 12,
+    "shell_reads": 0,
+    "skill_stratum": "A",
+    "sleep_entries": 15,
+    "survival_pairs": {
+      "k": 0,
+      "n": 0
+    },
+    "topup_replies": 0,
+    "turns_showing_budget_line": 1,
+    "unexplained_signals": {
+      "k": 0,
+      "n": 0
+    },
+    "user_turns": 15,
+    "wall_seconds": 2711,
+    "wall_time": "45:11"
+  },
+  "memo_turns": [
+    {
+      "accept_call": 55,
+      "accept_turn": 9,
+      "case": "2026-10-05",
+      "copies": [
+        4
+      ],
+      "request_call": 13,
+      "request_turn": 3,
+      "turns": 7
+    },
+    {
+      "accept_call": 75,
+      "accept_turn": 11,
+      "case": "2026-10-12",
+      "copies": [
+        10
+      ],
+      "request_call": 56,
+      "request_turn": 9,
+      "turns": 3
+    },
+    {
+      "accept_call": 93,
+      "accept_turn": 14,
+      "case": "2026-10-19",
+      "copies": [
+        13,
+        13
+      ],
+      "request_call": 76,
+      "request_turn": 11,
+      "turns": 4
+    }
+  ],
+  "owner": "lead",
+  "plan": {
+    "lena_keep_l_budget_q": 1,
+    "lena_yes_h4": 0,
+    "list": [
+      {
+        "call": 8,
+        "has_budget_line": true,
+        "lines": [
+          "Use 16 runs per request (covers one round of your questions or a rejection), or keep 12?"
+        ],
+        "shown_verbatim_in_turn": true,
+        "turn": 2
+      }
+    ],
+    "plans": 1,
+    "plans_with_budget_line": {
+      "k": 1,
+      "n": 1
+    },
+    "turns_showing_line": 1
+  },
+  "reads": {
+    "inbox_calls": 9,
+    "read_calls": 0,
+    "root_unread_at_end": 0,
+    "shell_reads": 0
+  },
+  "refusals": {
+    "by_kind": {
+      "P2-UNRATED": 1
+    },
+    "facade_total": 0,
+    "list": [
+      {
+        "call": 33,
+        "kind": "P2-UNRATED",
+        "text": "MCP tool error: Error executing tool define_service: refused: 1 delivered request(s) of `weekly-meeting-memo` have no verdict yet: 20261026T075326752629-root-9de8. Record a verdict on each with feedback first: on a delivery the user saw, the user's own, a rejection then its one question (CLI: hirear",
+        "tool": "define_service",
+        "turn": 6
+      }
+    ],
+    "other_total": 0,
+    "p2_total": 1,
+    "p4_total": 0
+  },
+  "rejects": {
+    "about_differs_from_reading": {
+      "k": 0,
+      "n": 0
+    },
+    "d1_candidate_turns": [
+      5
+    ],
+    "d1_never_recorded": [],
+    "human_rejects": [
+      {
+        "call": 31,
+        "criterion": [
+          "none"
+        ],
+        "defines_after": [
+          {
+            "about": "C4",
+            "answers": "20261026T075734957467-root-7ce6",
+            "call": 33,
+            "refusal": "P2-UNRATED",
+            "status": "refused",
+            "ts": "2026-10-26T07:58:39.110Z",
+            "turn": 6
+          },
+          {
+            "about": "C4",
+            "answers": "20261026T075734957467-root-7ce6",
+            "call": 39,
+            "refusal": null,
+            "status": "admitted",
+            "ts": "2026-10-26T07:59:02.239Z",
+            "turn": 6
+          }
+        ],
+        "task": "20261026T074936893313-root-ce42",
+        "ts": "2026-10-26T07:57:34.965Z",
+        "turn": 5,
+        "turn_files_between": [
+          "turn-05.txt"
+        ],
+        "window_end": {
+          "call": 39,
+          "kind": "define_service",
+          "turn": 6
+        }
+      }
+    ],
+    "without_reading": {
+      "k": 1,
+      "n": 1
+    }
+  },
+  "relayed_reworks": {
+    "injected": "20261026T075326752629-root-9de8",
+    "sent": []
+  },
+  "schedulers": {
+    "assistant_started": 7,
+    "boundary_failure_files": [],
+    "m_c_1": {
+      "k": 0,
+      "n": 7
+    },
+    "m_c_2_pairs": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_2_runs": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_4": {
+      "k": 8,
+      "n": 8
+    },
+    "m_c_6": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_7": {
+      "k": 0,
+      "n": 0
+    },
+    "m_c_8": {
+      "k": 15,
+      "n": 15
+    },
+    "per_scheduler": [
+      {
+        "began_in_turn": 3,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 75205,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 4,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 76353,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": null,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 77360,
+        "starter": "script"
+      },
+      {
+        "began_in_turn": 7,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 79195,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 9,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 80783,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 10,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 81924,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 11,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 83108,
+        "starter": "assistant"
+      },
+      {
+        "began_in_turn": 13,
+        "classes": [],
+        "exit_reason": "finished: no open tasks",
+        "pid": 85228,
+        "starter": "assistant"
+      }
+    ],
+    "reasons": [
+      "finished: no open tasks"
+    ],
+    "run_end_killed": 0,
+    "run_orphan": 0,
+    "script_started": 1,
+    "signals": [],
+    "sleep_entries": 15,
+    "stop_calls": 1,
+    "total": 8,
+    "unknown_starter": 0
+  },
+  "script": {
+    "md5": "61f51c012dfff9305836990bef47cf4d",
+    "name": "assistant_facts.py"
+  },
+  "seat": "lead-reviewer",
+  "service": "weekly-meeting-memo",
+  "skill": {
+    "disclose_calls": 1,
+    "first_disclose": {
+      "call": 1,
+      "ts": "2026-10-26T07:42:13.136Z",
+      "turn": 1,
+      "uri": "file:///private/tmp/hirearchy-g0-m0-s3-1793000481/.kiro/skills/hirearchy/SKILL.md"
+    },
+    "first_feedback": {
+      "call": 31,
+      "ts": "2026-10-26T07:57:34.965Z",
+      "turn": 5,
+      "uri": null
+    },
+    "first_propose_org": {
+      "call": 8,
+      "ts": "2026-10-26T07:43:58.522Z",
+      "turn": 2,
+      "uri": null
+    },
+    "installed_skill_notes": 0,
+    "skill_md5": "a3e46347b70a7ece5f734f70198c607f",
+    "stratum": "A"
+  },
+  "source_files": [
+    "assistant-session-messages.jsonl",
+    "client-questions.txt",
+    "events/",
+    "lena-lines.txt",
+    "memos/versions/INDEX.txt",
+    "msgs/",
+    "session-turn-times-utc.txt",
+    "skill-check.txt",
+    "turn-times.txt"
+  ],
+  "stream": "m0-s3",
+  "topup_held": {
+    "held": [],
+    "topup": []
+  },
+  "verdicts": {
+    "delivered_versions": 3,
+    "delivered_without_verdict": {
+      "k": 0,
+      "n": 3
+    }
+  }
+}

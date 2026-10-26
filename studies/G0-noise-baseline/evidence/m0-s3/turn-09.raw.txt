@@ -1,0 +1,30 @@
+The 12 October memo is ready and passed review, 8 of 8 checks, using 5 of 12 runs. I haven't copied it to `deliverables` yet because two judgment calls are yours to make.
+
+Here is the draft:
+
+```
+Summary: The team approved the rate limiter RFC (token bucket per API key, behind a feature flag), agreed a blameless company-wide postmortem for the Oct 8 outage, and set a deploy freeze for Oct 22 and 23.
+
+## Decisions
+- Approve the rate limiter RFC with the token bucket per API key design, and ship it behind a feature flag first.
+- The postmortem for the Oct 8 billing service outage will be blameless and shared with the whole company, not just engineering.
+- Deploy freeze on Oct 22 and Oct 23, for the customer demo in the week of 19 October.
+
+## Action items
+| Owner | Action | Due |
+| Dev   | Write the postmortem for the Oct 8 outage | 2026-10-14 |
+| Marta | Send the demo agenda to the customer | 2026-10-16 |
+| Priya | Start implementing the rate limiter behind a feature flag | 2026-10-20 |
+| Sam   | Update the out-of-date staging test data (said he will probably do it himself) so it is ready the day before the freeze starts | 2026-10-21 |
+| Lee   | Carry the pager during demo week by swapping shifts with Dev | none |
+
+Attendees: Priya, Sam, Lee, Marta, Dev.
+Next meeting: Monday 19 October.
+```
+
+It starts with the Summary line, then Decisions, then Action items, as you asked. Attendees and Next meeting come last.
+
+1. **Sam's staging row.** He said he'll "probably sort it out himself", which is a hedged commitment. I kept it as a row, with Due 2026-10-21, the day before the freeze. Keep it, or drop it because it isn't a firm commitment?
+2. **Lee's due date.** The notes say only "demo week", which isn't a single day, so the memo says `none`. Is that right?
+
+Reply with your answers, or "as is" to take the draft unchanged. If you want a change, I'll need your OK for the extra runs, which would be about 3 to 5 more.

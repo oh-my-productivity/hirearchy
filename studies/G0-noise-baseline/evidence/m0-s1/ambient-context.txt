@@ -1,0 +1,12 @@
+session id: sess_efde2b12-1cab-4cd6-b421-ae22f3ed4476  agentMode: hirearchy-study-g0-m0-s1-assistant  modelId: claude-sonnet-5.5  effortLevel: high
+workspacePaths: ['/private/tmp/hirearchy-g0-m0-s1-1792990299']  workflowsEnabled: False  memoryConfig: {'mode': 'read_write', 'reflection': True}
+session_start id: session_start_sess_efde2b12-1cab-4cd6-b421-ae22f3ed4476_hirearchy-study-g0-m0-s1-assistant  timestamp: 2026-10-26T04:52:46.971Z  agentType: hirearchy-study-g0-m0-s1-assistant
+session_start composition: {"schema": 1, "contentChars": 2026}
+session_start content length: 2026 chars
+<memories> block present: False
+memory index titles (0): 
+scope lines: []
+<steering-files> block present: False
+'Workflow Orchestration' text present: False
+md5 of content with sandbox path replaced by <S>: 857c531c5c049d57d86a42a28eadea74
+other top-level tags in content: []

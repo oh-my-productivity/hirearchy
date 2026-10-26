@@ -1,0 +1,20 @@
+######## TURN 1  start 06:54:44  end 06:55:18  elapsed 34s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T06:54:44Z end 2026-10-26T06:55:18Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-g0-m1-s2-1792997653/notes (one file per meeting). Can you set up a team that does this for me every week?
+
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+Thanks, I read the notes and have a few questions before I propose a team. One thing to know up front: I can't schedule it. The team will be a standing service, and each week you ask for it ("memo for the 26 October notes") and it runs then.
+
+Reply "defaults" to accept the proposed answers.
+
+1. What goes in the memo: the decisions and who does what, nothing else. Default: yes.
+2. Informal commitments: your notes contain items that aren't labelled ACTION. Examples are Sam pairing with Jo on CI, Sam sorting out the staging test data, Lee swapping pager shifts with Dev, and Lee signing off the SSO renewal. Should these count as action items? Default: yes, every commitment counts, including ones in prose.
+3. Decisions without an owner, such as moving the meeting to 14:00: list them under decisions with no owner. Default: yes.
+4. Vague dates like "end of next week" or "the day before the freeze": turn them into a calendar date based on the meeting date, or write them as stated in the notes? Default: write them as stated and add the calendar date only when the notes make it unambiguous.
+5. Format: markdown, at most 300 words, with a "Decisions" section and an "Actions (who / what / by when)" section. Default: that.
+6. Where it goes: a new `deliverables/` folder in /tmp/hirearchy-g0-m1-s2-1792997653, one file per meeting, for example `memo-2026-10-19.md`. Default: that.
+7. Sources: only your notes folder (/tmp/hirearchy-g0-m1-s2-1792997653/notes), no web. Each week's request names which meeting file to use. Default: that.
+8. Review: a second agent checks every decision and action against the notes before delivery. Default: yes.
+9. Budget and models: I'll size the budget per memo in the plan. Every agent runs claude-sonnet-5.5 at high effort, and that's the only option available.
+10. Approval: you approve the plan before anything is built. Default: yes.
+11. First run: should the team also write the memo for the latest meeting (19 October) once it's set up? Default: yes.

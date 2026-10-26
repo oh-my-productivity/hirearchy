@@ -1,0 +1,86 @@
+# G0 m0-s2 setup (recorded before turn 1)
+date: Mon Oct 26 06:13:18 WET 2026; utc: 2026-10-26T06:13:18Z
+arm: m0
+M0 home: /tmp/hirearchy-g0-m0home-m0-s2-1792995184 (kiro home for the chat: /tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro; /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/m0-s2/m0-home/setup.txt)
+== protocol.md vs protocol.md5
+md5 -q protocol.md: 08cccd6458f5f418b4d388cb93d633b5
+protocol.md5: 08cccd6458f5f418b4d388cb93d633b5
+== amendments:
+none
+== manager-decision files:
+/Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/manager-decision-selfcheck.md
+== harness/MD5SUMS check (prints MISMATCH lines only)
+(done, 48 lines)
+MD5SUMS md5: be21347995b821185a2adaba36d8390c
+global SKILL.md md5: a3e46347b70a7ece5f734f70198c607f (required a3e46347b70a7ece5f734f70198c607f)
+repo SKILL.md md5: a3e46347b70a7ece5f734f70198c607f
+injection script md5: 1c4e7824e448a3a34e24a7b759a59fcd
+== HIREARCHY_STATE_DIR set? no
+== processes referencing any G0 sandbox
+(none)
+== ~/.kiro/agents
+agent_config.json.example
+claude-opus-5.5.json
+claude-sonnet-5.5.json
+evolve.json
+hirearchy-organization-9d66c1-web-fetch-web-search.json
+telegram_bot.json
+== /tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/agents
+hirearchy-study-g0-m0-s2-assistant.json
+== repo checks (4.1) BEFORE turn 1
+git rev-parse HEAD: 3c841bb9cdde666c6ea8b00bb2edfeae68c256db
+git status --porcelain:
+?? docs/research/
+?? studies/G0-noise-baseline/
+git diff --stat 3c841bb9 HEAD -- src skills pyproject.toml uv.lock: []
+== kiro-cli --version: kiro-cli 2.33.0
+== S: /tmp/hirearchy-g0-m0-s2-1792995184  epoch: 1792995184 (sandbox created at epoch 1792995184)
+== model_check.sh listed m0-s2: RESULT: m0-s2 listed: OK (2026-10-26T06:13:18Z) (exit 0)
+== assistant profile (/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/agents/hirearchy-study-g0-m0-s2-assistant.json; copy in profiles/)
+MD5 (/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/agents/hirearchy-study-g0-m0-s2-assistant.json) = 79d3e1571402a2cbdd861ffe81fa9df1
+kiro-cli agent validate --path: exit 0 (output in profiles/validate.txt)
+(diff against the study's first profile copy /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/m0-s1/profiles/hirearchy-study-g0-m0-s1-assistant.json:)
+2,3c2,3
+<   "name": "hirearchy-study-g0-m0-s1-assistant",
+<   "description": "internal: hirearchy usability study G0 stream m0-s1 assistant; deleted after the stream",
+---
+>   "name": "hirearchy-study-g0-m0-s2-assistant",
+>   "description": "internal: hirearchy usability study G0 stream m0-s2 assistant; deleted after the stream",
+8c8
+<       "env": { "ORG_ROOT": "/tmp/hirearchy-g0-m0-s1-1792990299/org" }
+---
+>       "env": { "ORG_ROOT": "/tmp/hirearchy-g0-m0-s2-1792995184/org" }
+(diff exit 1)
+== workspace settings
+MD5 (/tmp/hirearchy-g0-m0-s2-1792995184/.kiro/settings/cli.json) = 05d30ccbfd35530747c8a542eb67985c
+{"chat.disableInheritingDefaultResources": true, "chat.enableWorkflows": false}MD5 (/Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/harness/workspace-cli.json) = 05d30ccbfd35530747c8a542eb67985c
+== skill copies
+MD5 (/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md) = a3e46347b70a7ece5f734f70198c607f
+MD5 (/tmp/hirearchy-g0-m0-s2-1792995184/.kiro/skills/hirearchy/SKILL.md) = a3e46347b70a7ece5f734f70198c607f
+global: md5 a3e46347b70a7ece5f734f70198c607f (/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md)
+MD5 (/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/hirearchy/SKILL.md) = a3e46347b70a7ece5f734f70198c607f
+     125 /Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md
+     125 /tmp/hirearchy-g0-m0-s2-1792995184/.kiro/skills/hirearchy/SKILL.md
+     250 total
+== notes
+MD5 (/tmp/hirearchy-g0-m0-s2-1792995184/notes/2026-10-05.md) = 903e3bbf5f35df2c17444f3313c12395
+MD5 (/tmp/hirearchy-g0-m0-s2-1792995184/notes/2026-10-12.md) = 3893bd637c87760b43be4894b47fdb53
+MD5 (/tmp/hirearchy-g0-m0-s2-1792995184/notes/2026-10-19.md) = 9976a7653a6346b0976c3c38b1c697dd
+== org dir exists before turn 1? no
+== ps: processes referencing the sandbox
+(none)
+== other G0 streams running: 0 processes
+== safety-before.txt taken: date_utc: 2026-10-26T06:13:04Z  epoch: 1792995184; ambient/setup.txt taken
+
+== AFTER the last turn (2026-10-26T06:50:38Z) (protocol 4.1, 6 item 5)
+git rev-parse HEAD: 3c841bb9cdde666c6ea8b00bb2edfeae68c256db
+git status --porcelain:
+?? docs/research/
+?? studies/G0-noise-baseline/
+git diff --stat 3c841bb9 HEAD -- src skills pyproject.toml uv.lock: []
+kiro-cli --version: kiro-cli 2.33.0
+protocol.md md5: 08cccd6458f5f418b4d388cb93d633b5 (protocol.md5 08cccd6458f5f418b4d388cb93d633b5); harness/MD5SUMS mismatches: 0
+global SKILL.md md5: a3e46347b70a7ece5f734f70198c607f
+processes referencing the sandbox: 0
+~/.kiro/agents: agent_config.json.example claude-opus-5.5.json claude-sonnet-5.5.json evolve.json hirearchy-organization-9d66c1-web-fetch-web-search.json telegram_bot.json 
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/agents:  (the M0 home is left for the teardown)

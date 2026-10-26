@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_a73645a6-b633-418c-b81f-b1c22aaf341d",
+  "title": "Weekly Meeting Memo Automation",
+  "agentMode": "hirearchy-study-g0-m1-s1-assistant",
+  "workspacePaths": [
+    "/private/tmp/hirearchy-g0-m1-s1-1792992820"
+  ],
+  "rootPaths": [
+    "/private/tmp/hirearchy-g0-m1-s1-1792992820"
+  ],
+  "createdAt": "2026-10-26T05:34:18.370Z",
+  "lastModifiedAt": "2026-10-26T06:09:27.064Z",
+  "modelId": "claude-sonnet-5.5",
+  "autopilot": true,
+  "effortLevel": "high",
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-sonnet-5.5",
+    "display": "Claude Sonnet 5.5"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "read_write",
+    "reflection": true
+  },
+  "memoryConfigSource": "explicit",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "read_write",
+          "reflection": true
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

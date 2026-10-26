@@ -1,0 +1,12 @@
+files in /tmp/hirearchy-g0-m0home-m0-s1-1792990299 before delete: 44
+deleted 2026-10-26T09:18:17Z /tmp/hirearchy-g0-m0home-m0-s1-1792990299 exists_after=no
+files in /tmp/hirearchy-g0-m0home-m0-s2-1792995184 before delete: 44
+deleted 2026-10-26T09:18:17Z /tmp/hirearchy-g0-m0home-m0-s2-1792995184 exists_after=no
+files in /tmp/hirearchy-g0-m0home-m0-s3-1793000481 before delete: 44
+deleted 2026-10-26T09:18:17Z /tmp/hirearchy-g0-m0home-m0-s3-1793000481 exists_after=no
+deleted 2026-10-26T09:18:17Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-g0-m0-s1-17929-33e62c5799a5c0c7 exists_after=no
+deleted 2026-10-26T09:18:17Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-g0-m0-s2-17929-5efce31e3a09a8e9 exists_after=no
+deleted 2026-10-26T09:18:17Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-g0-m0-s3-17930-ec05daf2f4c4e5e1 exists_after=no
+deleted 2026-10-26T09:18:17Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-g0-m1-s1-17929-9eefc3fd042dbc94 exists_after=no
+deleted 2026-10-26T09:18:17Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-g0-m1-s2-17929-f6c7232ac7f305ec exists_after=no
+deleted 2026-10-26T09:18:18Z /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-g0-m1-s3-17930-56715956f09491c4 exists_after=no

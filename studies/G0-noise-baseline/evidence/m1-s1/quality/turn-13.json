@@ -1,0 +1,394 @@
+{
+  "moved_past": [],
+  "nested": [],
+  "notes": [],
+  "one_off": null,
+  "schema": 1,
+  "services": [
+    {
+      "alarms": {
+        "cost": {
+          "cases": [],
+          "compared": 3,
+          "judged": 3,
+          "skipped": [],
+          "state": "no"
+        },
+        "repeat": {
+          "fired": [],
+          "judged": 3,
+          "not_counted": {
+            "R1": [
+              "C3"
+            ]
+          },
+          "state": "no",
+          "subjects": {
+            "C10": 1,
+            "R1": 1
+          },
+          "window": [
+            "20261026T053717246839-root-0b12",
+            "20261026T055741850381-root-2165",
+            "20261026T060219686409-root-2758"
+          ]
+        }
+      },
+      "budget": 12,
+      "cases": [
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "none",
+            "superseded_by": "20261026T054345276316-root-245b",
+            "superseded_source": "human",
+            "task": "20261026T053717246839-root-0b12"
+          },
+          "id": "20261026T053717246839-root-0b12",
+          "ratio": "1.00",
+          "relayed_runs": 5,
+          "runs": 24,
+          "runs_unknown": "",
+          "spend": 24,
+          "stalled": false,
+          "state": "done",
+          "tasks": 4,
+          "title": "Memo for the 5 October 2026 meeting",
+          "top_ups": [
+            {
+              "amount": 5,
+              "id": "20261026T054345276316-root-245b",
+              "source": "human"
+            },
+            {
+              "amount": 6,
+              "id": "20261026T054752706554-root-5079",
+              "source": "relayed"
+            },
+            {
+              "amount": 5,
+              "id": "20261026T055257368806-root-36e8",
+              "source": "human"
+            }
+          ],
+          "user_approved": 19,
+          "user_cost": 19
+        },
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "accepted",
+            "superseded_by": null,
+            "superseded_source": null,
+            "task": "20261026T055741850381-root-2165"
+          },
+          "id": "20261026T055741850381-root-2165",
+          "ratio": "0.42",
+          "relayed_runs": 0,
+          "runs": 5,
+          "runs_unknown": "",
+          "spend": 5,
+          "stalled": false,
+          "state": "done",
+          "tasks": 1,
+          "title": "Memo for the 12 October 2026 meeting",
+          "top_ups": [],
+          "user_approved": 12,
+          "user_cost": 5
+        },
+        {
+          "assignee": "lead",
+          "budget": 12,
+          "credited": 0,
+          "cut": false,
+          "first": {
+            "outcome": "none",
+            "superseded_by": "20261026T060547491368-root-51b6",
+            "superseded_source": "human",
+            "task": "20261026T060219686409-root-2758"
+          },
+          "id": "20261026T060219686409-root-2758",
+          "ratio": "0.83",
+          "relayed_runs": 0,
+          "runs": 10,
+          "runs_unknown": "",
+          "spend": 10,
+          "stalled": false,
+          "state": "done",
+          "tasks": 2,
+          "title": "Memo for the 19 October 2026 meeting",
+          "top_ups": [
+            {
+              "amount": 5,
+              "id": "20261026T060547491368-root-51b6",
+              "source": "human"
+            }
+          ],
+          "user_approved": 12,
+          "user_cost": 10
+        }
+      ],
+      "client": "root",
+      "client_kind": "human",
+      "contract": 2,
+      "deliveries": {
+        "judged": 4,
+        "legacy_verdicts": 0,
+        "neither": [],
+        "not_as_delivered": [],
+        "not_on_a_delivery": [],
+        "relayed_only": [],
+        "total": 7,
+        "unjudged_cases": [],
+        "unseen_relayed": []
+      },
+      "error": "",
+      "escapes": [
+        {
+          "also": [],
+          "assertion": "R1",
+          "attribution": "not its",
+          "before_verdict": "20261026T054752706554-root-5079",
+          "case": "20261026T053717246839-root-0b12",
+          "cause": "contract-gap",
+          "class": null,
+          "detail": [
+            "20261026T055250664955-root-dd57",
+            "C10"
+          ],
+          "rule": "answer",
+          "rules": [
+            "answer",
+            "words"
+          ],
+          "signer": "lead/reviewer",
+          "task": "20261026T054345276316-root-245b",
+          "verdict": "20261026T055114787042-root-c881"
+        }
+      ],
+      "files_error": "",
+      "first_deliveries": {
+        "accepted": 1,
+        "neither": 0,
+        "never_delivered": 0,
+        "no_verdict": 2,
+        "rejected": 0,
+        "superseded": 2
+      },
+      "history": {
+        "known": true,
+        "skipped": 0,
+        "truncated": false
+      },
+      "owner": "lead",
+      "playbook": 2,
+      "service": "weekly-memo",
+      "stalled_error": "",
+      "timeline": [
+        {
+          "adds": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6",
+            "C7",
+            "C8",
+            "C9"
+          ],
+          "answers": null,
+          "basis": "first",
+          "by": "root",
+          "confirmed": [],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [],
+          "version": 1,
+          "when": "2026-10-26T05:37:17Z"
+        },
+        {
+          "agent_written": true,
+          "basis": "client",
+          "beyond": null,
+          "by": "root",
+          "changed": 15,
+          "cited": [],
+          "evidence": [],
+          "evidence_other": 0,
+          "kind": "playbook",
+          "lines": [
+            {
+              "own_words": false,
+              "text": "## Steps"
+            },
+            {
+              "own_words": false,
+              "text": "1. Read the request in your prompt: its inputs, every acceptance criterion and the deliverable. The criteria come from the contract and can only be met, never changed; copy the relevant ones verbatim into every task you delegate."
+            },
+            {
+              "own_words": false,
+              "text": "2. Delegate to `writer` (Writer) with `budget=3`: its part of the request, with the criteria it must meet."
+            },
+            {
+              "own_words": false,
+              "text": "3. When the work exists, delegate to `reviewer` (Independent Reviewer) with `budget=2` to check the final file independently against every criterion. It reports findings and required changes to you and never edits the author's file."
+            },
+            {
+              "own_words": false,
+              "text": "4. If a check fails: send the required changes, quoted verbatim, to the AUTHOR of the failing file (`delegate(to=<author>, revises=<that author's task id>, budget=1)`; for the deliverable usually `writer`), then have the checker re-check that same file (`delegate(to=<checker>, revises=<the checker's task id>)`). One rework and one re-check; if it still fails, report `blocked` with options and the checker's final line instead of starting another cycle."
+            },
+            {
+              "own_words": false,
+              "text": "5. Read the final artifact yourself and check it against EVERY criterion of the request, quoting counts from your own `read` output, and paste the checker's final coverage line verbatim."
+            },
+            {
+              "own_words": false,
+              "text": "6. Report: `done` only if every criterion is met (else `blocked` with the deviation and a recommended decision). Name the deliverable's path (the assistant copies it to /tmp/hirearchy-g0-m1-s1-1792992820/deliverables) and pass `lessons`: 1-3 lines for the next request - what worked, what to change in this playbook, and the evidence (runs used, rework, review findings)."
+            },
+            {
+              "own_words": false,
+              "text": "## Budget plan"
+            },
+            {
+              "own_words": false,
+              "text": "Request budget: 12 runs (the contract's). Hand down no more than this up front, each with `budget=` set explicitly:"
+            },
+            {
+              "own_words": false,
+              "text": "- writer: 3 runs (2 work + 1 rework or re-check)"
+            }
+          ],
+          "lines_more": 5,
+          "own_words": null,
+          "removed": 0,
+          "restores": null,
+          "tagged": null,
+          "untagged": null,
+          "version": 1,
+          "when": "2026-10-26T05:37:17Z"
+        },
+        {
+          "amount": 5,
+          "case": "20261026T053717246839-root-0b12",
+          "id": "20261026T054345276316-root-245b",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-26T05:43:45Z"
+        },
+        {
+          "amount": 6,
+          "case": "20261026T053717246839-root-0b12",
+          "id": "20261026T054752706554-root-5079",
+          "kind": "top-up",
+          "source": "relayed",
+          "when": "2026-10-26T05:47:52Z"
+        },
+        {
+          "adds": [
+            "C10"
+          ],
+          "answers": "R1",
+          "basis": "answers",
+          "by": "root",
+          "confirmed": [
+            {
+              "id": "C10",
+              "link": "20261026T055250664955-root-dd57"
+            }
+          ],
+          "kind": "contract",
+          "not_confirmed": [],
+          "removes": [
+            "C3"
+          ],
+          "version": 2,
+          "when": "2026-10-26T05:52:50Z"
+        },
+        {
+          "amount": 5,
+          "case": "20261026T053717246839-root-0b12",
+          "id": "20261026T055257368806-root-36e8",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-26T05:52:57Z"
+        },
+        {
+          "agent_written": true,
+          "basis": "c",
+          "beyond": 0,
+          "by": "lead",
+          "changed": 1,
+          "cited": [
+            {
+              "id": "C10",
+              "text": "Start the memo with a one-line 'Summary:' of the meeting, then the Decisions, then the Action items. Besides a title line with the meeting date, the memo has exactly these three parts."
+            }
+          ],
+          "evidence": [
+            "C10",
+            "R1",
+            "20261026T055250664955-root-dd57"
+          ],
+          "evidence_other": 0,
+          "kind": "playbook",
+          "lines": [
+            {
+              "own_words": true,
+              "text": "- C10: Start the memo with a one-line 'Summary:' of the meeting, then the Decisions, then the Action items. Besides a title line with the meeting date, the memo has exactly these three parts."
+            }
+          ],
+          "lines_more": 0,
+          "own_words": 1,
+          "removed": 0,
+          "restores": null,
+          "tagged": null,
+          "untagged": null,
+          "version": 2,
+          "when": "2026-10-26T05:53:22Z"
+        },
+        {
+          "amount": 5,
+          "case": "20261026T060219686409-root-2758",
+          "id": "20261026T060547491368-root-51b6",
+          "kind": "top-up",
+          "source": "human",
+          "when": "2026-10-26T06:05:47Z"
+        }
+      ],
+      "unit": "case",
+      "verifiers": [
+        {
+          "addr": "lead/reviewer",
+          "escapes": {
+            "counted": {},
+            "not_its": {
+              "contract-gap": 1
+            }
+          },
+          "fails_error": "",
+          "judged": 4,
+          "pass_precision": [
+            4,
+            4
+          ],
+          "rechecks": 1,
+          "rework_runs": 1
+        }
+      ]
+    }
+  ],
+  "thresholds": {
+    "cost_ratio": "1.25",
+    "min_judged": 3,
+    "repeat_failures": 2,
+    "repeat_window": 3,
+    "source": "defaults"
+  }
+}

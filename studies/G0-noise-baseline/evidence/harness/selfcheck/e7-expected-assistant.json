@@ -1,0 +1,1799 @@
+[
+ {
+  "expected": "A",
+  "key": "skill.stratum",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 175 (all three streams in stratum A)",
+  "stream": "s1"
+ },
+ {
+  "expected": "A",
+  "key": "skill.stratum",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 175 (all three streams in stratum A)",
+  "stream": "s2"
+ },
+ {
+  "expected": "A",
+  "key": "skill.stratum",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 175 (all three streams in stratum A)",
+  "stream": "s3"
+ },
+ {
+  "expected": 6,
+  "key": "skill.first_disclose.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178 (s1 #6, s2 #2, s3 #6)",
+  "stream": "s1"
+ },
+ {
+  "expected": 2,
+  "key": "skill.first_disclose.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178 (s1 #6, s2 #2, s3 #6)",
+  "stream": "s2"
+ },
+ {
+  "expected": 6,
+  "key": "skill.first_disclose.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178 (s1 #6, s2 #2, s3 #6)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "skill.first_disclose.turn",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 175 ('activated in turn 1') and validity table (s2 'skill #2 in T1')",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "skill.first_disclose.turn",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 175 ('activated in turn 1') and validity table (s2 'skill #2 in T1')",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "skill.first_disclose.turn",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 175 ('activated in turn 1') and validity table (s2 'skill #2 in T1')",
+  "stream": "s3"
+ },
+ {
+  "expected": "2026-10-25T07:01:29.788Z",
+  "key": "skill.first_disclose.ts",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178",
+  "stream": "s1"
+ },
+ {
+  "expected": "2026-10-25T07:42:16.597Z",
+  "key": "skill.first_disclose.ts",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178",
+  "stream": "s2"
+ },
+ {
+  "expected": "2026-10-25T08:21:56.137Z",
+  "key": "skill.first_disclose.ts",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178",
+  "stream": "s3"
+ },
+ {
+  "expected": 11,
+  "key": "skill.first_propose_org.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178 (propose_org #11 / #9 / #11)",
+  "stream": "s1"
+ },
+ {
+  "expected": 9,
+  "key": "skill.first_propose_org.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178 (propose_org #11 / #9 / #11)",
+  "stream": "s2"
+ },
+ {
+  "expected": 11,
+  "key": "skill.first_propose_org.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178 (propose_org #11 / #9 / #11)",
+  "stream": "s3"
+ },
+ {
+  "expected": 30,
+  "key": "skill.first_feedback.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178 (feedback #30 / #31 / #30)",
+  "stream": "s1"
+ },
+ {
+  "expected": 31,
+  "key": "skill.first_feedback.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178 (feedback #30 / #31 / #30)",
+  "stream": "s2"
+ },
+ {
+  "expected": 30,
+  "key": "skill.first_feedback.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 176-178 (feedback #30 / #31 / #30)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "skill.installed_skill_notes",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 179 ('\"Note: the installed skill at\" occurs 0 times')",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "skill.installed_skill_notes",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 179 ('\"Note: the installed skill at\" occurs 0 times')",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "skill.installed_skill_notes",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 179 ('\"Note: the installed skill at\" occurs 0 times')",
+  "stream": "s3"
+ },
+ {
+  "expected": "fd89a7fda55b8f342cf0306173c363fb",
+  "key": "skill.skill_md5",
+  "source": "E7 protocol.md 4.4 (line ~393: the skill's md5 fd89a7fda55b8f342cf0306173c363fb; STUDY line 179 'md5 fd89a7fd...')",
+  "stream": "s1"
+ },
+ {
+  "expected": "fd89a7fda55b8f342cf0306173c363fb",
+  "key": "skill.skill_md5",
+  "source": "E7 protocol.md 4.4 (line ~393: the skill's md5 fd89a7fda55b8f342cf0306173c363fb; STUDY line 179 'md5 fd89a7fd...')",
+  "stream": "s2"
+ },
+ {
+  "expected": "fd89a7fda55b8f342cf0306173c363fb",
+  "key": "skill.skill_md5",
+  "source": "E7 protocol.md 4.4 (line ~393: the skill's md5 fd89a7fda55b8f342cf0306173c363fb; STUDY line 179 'md5 fd89a7fd...')",
+  "stream": "s3"
+ },
+ {
+  "expected": "A",
+  "key": "measures.skill_stratum",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 175",
+  "stream": "s1"
+ },
+ {
+  "expected": "A",
+  "key": "measures.skill_stratum",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 175",
+  "stream": "s2"
+ },
+ {
+  "expected": "A",
+  "key": "measures.skill_stratum",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 175",
+  "stream": "s3"
+ },
+ {
+  "expected": 9,
+  "key": "measures.schedulers_total",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 431 (Schedulers 9 / 6 / 8)",
+  "stream": "s1"
+ },
+ {
+  "expected": 6,
+  "key": "measures.schedulers_total",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 431 (Schedulers 9 / 6 / 8)",
+  "stream": "s2"
+ },
+ {
+  "expected": 8,
+  "key": "measures.schedulers_total",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 431 (Schedulers 9 / 6 / 8)",
+  "stream": "s3"
+ },
+ {
+  "expected": 8,
+  "key": "measures.schedulers_assistant",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 431 (assistant 8 / 5 / 7)",
+  "stream": "s1"
+ },
+ {
+  "expected": 5,
+  "key": "measures.schedulers_assistant",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 431 (assistant 8 / 5 / 7)",
+  "stream": "s2"
+ },
+ {
+  "expected": 7,
+  "key": "measures.schedulers_assistant",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 431 (assistant 8 / 5 / 7)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "measures.schedulers_script",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 431 (script 1 / 1 / 1)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "measures.schedulers_script",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 431 (script 1 / 1 / 1)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "measures.schedulers_script",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 431 (script 1 / 1 / 1)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 8
+  },
+  "key": "measures.schedulers_running_at_turn_end",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 432 (M-C-1: 0 of 8 / 0 of 5 / 0 of 7)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 5
+  },
+  "key": "measures.schedulers_running_at_turn_end",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 432 (M-C-1: 0 of 8 / 0 of 5 / 0 of 7)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 7
+  },
+  "key": "measures.schedulers_running_at_turn_end",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 432 (M-C-1: 0 of 8 / 0 of 5 / 0 of 7)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 0
+  },
+  "key": "measures.survival_pairs",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 433 (M-C-2 n/a (0 of 0))",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 0
+  },
+  "key": "measures.survival_pairs",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 433 (M-C-2 n/a (0 of 0))",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 0
+  },
+  "key": "measures.survival_pairs",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 433 (M-C-2 n/a (0 of 0))",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "k": 9,
+   "n": 9
+  },
+  "key": "measures.schedulers_with_exit",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 436 (M-C-4: 9 of 9 / 6 of 6 / 8 of 8)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "k": 6,
+   "n": 6
+  },
+  "key": "measures.schedulers_with_exit",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 436 (M-C-4: 9 of 9 / 6 of 6 / 8 of 8)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "k": 8,
+   "n": 8
+  },
+  "key": "measures.schedulers_with_exit",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 436 (M-C-4: 9 of 9 / 6 of 6 / 8 of 8)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.run_orphan",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 435 (M-C-3: 0 / 0 / 0)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.run_orphan",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 435 (M-C-3: 0 / 0 / 0)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.run_orphan",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 435 (M-C-3: 0 / 0 / 0)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.run_end_killed",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 440 ('0 `run.end` with `killed: true`')",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.run_end_killed",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 440 ('0 `run.end` with `killed: true`')",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.run_end_killed",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 440 ('0 `run.end` with `killed: true`')",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.scheduler_signals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md 17.3 item 3 (M-C-6 / M-C-7 n/a (0 of 0)): 'scheduler.signal: 0 in the study's streams'",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.scheduler_signals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md 17.3 item 3 (M-C-6 / M-C-7 n/a (0 of 0)): 'scheduler.signal: 0 in the study's streams'",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.scheduler_signals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md 17.3 item 3 (M-C-6 / M-C-7 n/a (0 of 0)): 'scheduler.signal: 0 in the study's streams'",
+  "stream": "s3"
+ },
+ {
+  "expected": [
+   "finished: no open tasks"
+  ],
+  "key": "schedulers.reasons",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 439 ('Every scheduler exited \"finished: no open tasks\"')",
+  "stream": "s1"
+ },
+ {
+  "expected": [
+   "finished: no open tasks"
+  ],
+  "key": "schedulers.reasons",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 439 ('Every scheduler exited \"finished: no open tasks\"')",
+  "stream": "s2"
+ },
+ {
+  "expected": [
+   "finished: no open tasks"
+  ],
+  "key": "schedulers.reasons",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 439 ('Every scheduler exited \"finished: no open tasks\"')",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "k": 11,
+   "n": 11
+  },
+  "key": "measures.m_c_8",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 515 (M-C-8: 11 of 11 / 12 of 12 / 13 of 13)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "k": 12,
+   "n": 12
+  },
+  "key": "measures.m_c_8",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 515 (M-C-8: 11 of 11 / 12 of 12 / 13 of 13)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "k": 13,
+   "n": 13
+  },
+  "key": "measures.m_c_8",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 515 (M-C-8: 11 of 11 / 12 of 12 / 13 of 13)",
+  "stream": "s3"
+ },
+ {
+  "expected": 11,
+  "key": "measures.sleep_entries",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 515 (36 of 36 turns with a sleep; brief X: 36 'sleep 20 ended' entries = 11 + 12 + 13)",
+  "stream": "s1"
+ },
+ {
+  "expected": 12,
+  "key": "measures.sleep_entries",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 515 (36 of 36 turns with a sleep; brief X: 36 'sleep 20 ended' entries = 11 + 12 + 13)",
+  "stream": "s2"
+ },
+ {
+  "expected": 13,
+  "key": "measures.sleep_entries",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 515 (36 of 36 turns with a sleep; brief X: 36 'sleep 20 ended' entries = 11 + 12 + 13)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.boundary_failure_files",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 516 (harness-failures/boundary-turn-NN.txt: 0)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.boundary_failure_files",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 516 (harness-failures/boundary-turn-NN.txt: 0)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.boundary_failure_files",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 516 (harness-failures/boundary-turn-NN.txt: 0)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "measures.copies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 148-150 (s1 #27 #46 #72 #90; s2 3 copies; s3 4 copies) and brief X (copies 4/3/4)",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "measures.copies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 148-150 (s1 #27 #46 #72 #90; s2 3 copies; s3 4 copies) and brief X (copies 4/3/4)",
+  "stream": "s2"
+ },
+ {
+  "expected": 4,
+  "key": "measures.copies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 148-150 (s1 #27 #46 #72 #90; s2 3 copies; s3 4 copies) and brief X (copies 4/3/4)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 4
+  },
+  "key": "measures.hand_edits",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 171 ('Assistant-edited memos (10.4(a)): none') and line 250 (M-P3-2: 0 hand edits in 11 copies)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 3
+  },
+  "key": "measures.hand_edits",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 171 ('Assistant-edited memos (10.4(a)): none') and line 250 (M-P3-2: 0 hand edits in 11 copies)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 4
+  },
+  "key": "measures.hand_edits",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 171 ('Assistant-edited memos (10.4(a)): none') and line 250 (M-P3-2: 0 hand edits in 11 copies)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 4
+  },
+  "key": "measures.ask_first_copies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 148-150 / 473 (M-Q-2: 0 of 4 / 1 of 3 / 1 of 4)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "k": 1,
+   "n": 3
+  },
+  "key": "measures.ask_first_copies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 148-150 / 473 (M-Q-2: 0 of 4 / 1 of 3 / 1 of 4)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "k": 1,
+   "n": 4
+  },
+  "key": "measures.ask_first_copies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 148-150 / 473 (M-Q-2: 0 of 4 / 1 of 3 / 1 of 4)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 4
+  },
+  "key": "measures.delivered_without_verdict",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 331 (Deliveries without a verdict: 0 of 4 / 0 of 3 / 0 of 4)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 3
+  },
+  "key": "measures.delivered_without_verdict",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 331 (Deliveries without a verdict: 0 of 4 / 0 of 3 / 0 of 4)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 4
+  },
+  "key": "measures.delivered_without_verdict",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 331 (Deliveries without a verdict: 0 of 4 / 0 of 3 / 0 of 4)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "measures.flagged_results",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (M-Q-1 results with a block: 4 / 3 / 6)",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "measures.flagged_results",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (M-Q-1 results with a block: 4 / 3 / 6)",
+  "stream": "s2"
+ },
+ {
+  "expected": 6,
+  "key": "measures.flagged_results",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (M-Q-1 results with a block: 4 / 3 / 6)",
+  "stream": "s3"
+ },
+ {
+  "expected": 13,
+  "key": "measures.flagged_items",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (items 13 / 11 / 21)",
+  "stream": "s1"
+ },
+ {
+  "expected": 11,
+  "key": "measures.flagged_items",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (items 13 / 11 / 21)",
+  "stream": "s2"
+ },
+ {
+  "expected": 21,
+  "key": "measures.flagged_items",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (items 13 / 11 / 21)",
+  "stream": "s3"
+ },
+ {
+  "expected": 13,
+  "key": "measures.flagged_questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (questions 13 / 11 / 20)",
+  "stream": "s1"
+ },
+ {
+  "expected": 11,
+  "key": "measures.flagged_questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (questions 13 / 11 / 20)",
+  "stream": "s2"
+ },
+ {
+  "expected": 20,
+  "key": "measures.flagged_questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (questions 13 / 11 / 20)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.flagged_notes",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (notes 0 / 0 / 1)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.flagged_notes",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (notes 0 / 0 / 1)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "measures.flagged_notes",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (notes 0 / 0 / 1)",
+  "stream": "s3"
+ },
+ {
+  "expected": 13,
+  "key": "measures.flagged_superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 142-144 (s1 13 superseded; s2 7; s3 16)",
+  "stream": "s1"
+ },
+ {
+  "expected": 7,
+  "key": "measures.flagged_superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 142-144 (s1 13 superseded; s2 7; s3 16)",
+  "stream": "s2"
+ },
+ {
+  "expected": 16,
+  "key": "measures.flagged_superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 142-144 (s1 13 superseded; s2 7; s3 16)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.flagged_needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 129, 133, 135 (s2 433a 4; s3 c2f9 2 + da3c 2 'asked before delivery' = classes needing D5)",
+  "stream": "s1"
+ },
+ {
+  "expected": 4,
+  "key": "measures.flagged_needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 129, 133, 135 (s2 433a 4; s3 c2f9 2 + da3c 2 'asked before delivery' = classes needing D5)",
+  "stream": "s2"
+ },
+ {
+  "expected": 4,
+  "key": "measures.flagged_needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 129, 133, 135 (s2 433a 4; s3 c2f9 2 + da3c 2 'asked before delivery' = classes needing D5)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.flagged_never_copied",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 145 ('none ... never copied')",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.flagged_never_copied",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 145 ('none ... never copied')",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.flagged_never_copied",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 145 ('none ... never copied')",
+  "stream": "s3"
+ },
+ {
+  "expected": 3,
+  "key": "flagged.by_result.20261025T070646261143-lead-e88a.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 124 (clause 3 table: superseded count)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T070646261143-lead-e88a.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 124 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "flagged.by_result.20261025T070646261143-lead-e88a.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 124 (clause 3 table: number of questions)",
+  "stream": "s1"
+ },
+ {
+  "expected": 16,
+  "key": "flagged.by_result.20261025T070646261143-lead-e88a.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 124 (flagged by progress call #16)",
+  "stream": "s1"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T071427223224-lead-c3d0.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 125 (clause 3 table: superseded count)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T071427223224-lead-c3d0.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 125 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s1"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T071427223224-lead-c3d0.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 125 (clause 3 table: number of questions)",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "flagged.by_result.20261025T072321297669-lead-82a1.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 126 (clause 3 table: superseded count)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T072321297669-lead-82a1.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 126 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "flagged.by_result.20261025T072321297669-lead-82a1.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 126 (clause 3 table: number of questions)",
+  "stream": "s1"
+ },
+ {
+  "expected": 50,
+  "key": "flagged.by_result.20261025T072321297669-lead-82a1.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 126 (flagged by progress call #50)",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "flagged.by_result.20261025T073111296557-lead-d20d.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 127 (clause 3 table: superseded count)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T073111296557-lead-d20d.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 127 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "flagged.by_result.20261025T073111296557-lead-d20d.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 127 (clause 3 table: number of questions)",
+  "stream": "s1"
+ },
+ {
+  "expected": 79,
+  "key": "flagged.by_result.20261025T073111296557-lead-d20d.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 127 (flagged by progress call #79)",
+  "stream": "s1"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T074917047599-lead-d5c7.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 128 (clause 3 table: superseded count)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T074917047599-lead-d5c7.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 128 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s2"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T074917047599-lead-d5c7.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 128 (clause 3 table: number of questions)",
+  "stream": "s2"
+ },
+ {
+  "expected": 16,
+  "key": "flagged.by_result.20261025T074917047599-lead-d5c7.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 128 (flagged by progress call #16)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T080407667524-lead-433a.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 129 (clause 3 table: superseded count)",
+  "stream": "s2"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T080407667524-lead-433a.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 129 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s2"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T080407667524-lead-433a.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 129 (clause 3 table: number of questions)",
+  "stream": "s2"
+ },
+ {
+  "expected": 40,
+  "key": "flagged.by_result.20261025T080407667524-lead-433a.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 129 (flagged by progress call #40)",
+  "stream": "s2"
+ },
+ {
+  "expected": 3,
+  "key": "flagged.by_result.20261025T081037538558-lead-f890.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 130 (clause 3 table: superseded count)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T081037538558-lead-f890.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 130 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s2"
+ },
+ {
+  "expected": 3,
+  "key": "flagged.by_result.20261025T081037538558-lead-f890.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 130 (clause 3 table: number of questions)",
+  "stream": "s2"
+ },
+ {
+  "expected": 47,
+  "key": "flagged.by_result.20261025T081037538558-lead-f890.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 130 (flagged by progress call #47)",
+  "stream": "s2"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T082658949703-lead-17e3.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 132 (clause 3 table: superseded count)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T082658949703-lead-17e3.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 132 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T082658949703-lead-17e3.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 132 (clause 3 table: number of questions)",
+  "stream": "s3"
+ },
+ {
+  "expected": 16,
+  "key": "flagged.by_result.20261025T082658949703-lead-17e3.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 132 (flagged by progress call #16)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T083038053571-lead-c2f9.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 133 (clause 3 table: superseded count)",
+  "stream": "s3"
+ },
+ {
+  "expected": 2,
+  "key": "flagged.by_result.20261025T083038053571-lead-c2f9.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 133 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s3"
+ },
+ {
+  "expected": 2,
+  "key": "flagged.by_result.20261025T083038053571-lead-c2f9.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 133 (clause 3 table: number of questions)",
+  "stream": "s3"
+ },
+ {
+  "expected": 24,
+  "key": "flagged.by_result.20261025T083038053571-lead-c2f9.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 133 (flagged by progress call #24)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T083532641493-lead-f639.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 134 (clause 3 table: superseded count)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T083532641493-lead-f639.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 134 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T083532641493-lead-f639.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 134 (clause 3 table: number of questions)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T084045856175-lead-da3c.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 135 (clause 3 table: superseded count)",
+  "stream": "s3"
+ },
+ {
+  "expected": 2,
+  "key": "flagged.by_result.20261025T084045856175-lead-da3c.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 135 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s3"
+ },
+ {
+  "expected": 2,
+  "key": "flagged.by_result.20261025T084045856175-lead-da3c.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 135 (clause 3 table: number of questions)",
+  "stream": "s3"
+ },
+ {
+  "expected": 41,
+  "key": "flagged.by_result.20261025T084045856175-lead-da3c.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 135 (flagged by progress call #41)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T084605815481-lead-b4bd.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 136 (clause 3 table: superseded count)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T084605815481-lead-b4bd.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 136 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T084605815481-lead-b4bd.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 136 (clause 3 table: number of questions)",
+  "stream": "s3"
+ },
+ {
+  "expected": 50,
+  "key": "flagged.by_result.20261025T084605815481-lead-b4bd.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 136 (flagged by progress call #50)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T085332642703-lead-e9ee.superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 137 (clause 3 table: superseded count)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "flagged.by_result.20261025T085332642703-lead-e9ee.needs_d5",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 137 (clause 3 table: asked before delivery, no human rework between R and the copy)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "flagged.by_result.20261025T085332642703-lead-e9ee.questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 137 (clause 3 table: number of questions)",
+  "stream": "s3"
+ },
+ {
+  "expected": 65,
+  "key": "flagged.by_result.20261025T085332642703-lead-e9ee.first_flag_call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 137 (flagged by progress call #65)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "flagged.by_result.20261025T085332642703-lead-e9ee.notes",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 137 and line 177 ('4 questions ... 1 note')",
+  "stream": "s3"
+ },
+ {
+  "expected": 6,
+  "key": "measures.shell_commands",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 86 (shell-writes.txt: 6, 4 and 5 commands) and S17-2c line 312",
+  "stream": "s1"
+ },
+ {
+  "expected": 4,
+  "key": "measures.shell_commands",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 86 (shell-writes.txt: 6, 4 and 5 commands) and S17-2c line 312",
+  "stream": "s2"
+ },
+ {
+  "expected": 5,
+  "key": "measures.shell_commands",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 86 (shell-writes.txt: 6, 4 and 5 commands) and S17-2c line 312",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.root_unread_at_end",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md 'Clause 3' paragraph (msgs/inbox/ is empty in every stream)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.root_unread_at_end",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md 'Clause 3' paragraph (msgs/inbox/ is empty in every stream)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.root_unread_at_end",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md 'Clause 3' paragraph (msgs/inbox/ is empty in every stream)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "measures.p2_unrated",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 205 (M-P2-2: P2-UNRATED 1 / 1 / 1)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "measures.p2_unrated",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 205 (M-P2-2: P2-UNRATED 1 / 1 / 1)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "measures.p2_unrated",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 205 (M-P2-2: P2-UNRATED 1 / 1 / 1)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "measures.p2_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 205 ('every other kind 0')",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "measures.p2_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 205 ('every other kind 0')",
+  "stream": "s2"
+ },
+ {
+  "expected": 1,
+  "key": "measures.p2_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 205 ('every other kind 0')",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.other_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 205 ('other' 0)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.other_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 205 ('other' 0)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.other_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 205 ('other' 0)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.p4_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 241 (M-P4-4: 0)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.p4_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 241 (M-P4-4: 0)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.p4_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 241 (M-P4-4: 0)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.facade_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 241 (M-P4-4: P4-BASE-VALUE, P4-BASE-WHERE, P4-NEEDS-BASE, P4-USE-REQUEST, FACADE-*: 0)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.facade_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 241 (M-P4-4: P4-BASE-VALUE, P4-BASE-WHERE, P4-NEEDS-BASE, P4-USE-REQUEST, FACADE-*: 0)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.facade_refusals",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 241 (M-P4-4: P4-BASE-VALUE, P4-BASE-WHERE, P4-NEEDS-BASE, P4-USE-REQUEST, FACADE-*: 0)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 1
+  },
+  "key": "measures.d23_without_reading",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 220 (M-D23-1: 0 of 1 each)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 1
+  },
+  "key": "measures.d23_without_reading",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 220 (M-D23-1: 0 of 1 each)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 1
+  },
+  "key": "measures.d23_without_reading",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 220 (M-D23-1: 0 of 1 each)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 1
+  },
+  "key": "measures.d1_never_recorded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 220 (M-D23-1: D1 rejects never recorded 0 of 1)",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 1
+  },
+  "key": "measures.d1_never_recorded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 220 (M-D23-1: D1 rejects never recorded 0 of 1)",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 1
+  },
+  "key": "measures.d1_never_recorded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 220 (M-D23-1: D1 rejects never recorded 0 of 1)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "plan.plans_with_budget_line.k",
+  "source": "G0 protocol 3.3: T-BUDGETQ is 0a.5 B's line (D-E7-3), and E7 ran 18a4531, before 0a.5; E7's s1|s2|s3/PLAN-FOR-YOU-product-proposal1.txt hold no 'runs per request (covers one round' line",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "plan.plans_with_budget_line.k",
+  "source": "G0 protocol 3.3: T-BUDGETQ is 0a.5 B's line (D-E7-3), and E7 ran 18a4531, before 0a.5; E7's s1|s2|s3/PLAN-FOR-YOU-product-proposal1.txt hold no 'runs per request (covers one round' line",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "plan.plans_with_budget_line.k",
+  "source": "G0 protocol 3.3: T-BUDGETQ is 0a.5 B's line (D-E7-3), and E7 ran 18a4531, before 0a.5; E7's s1|s2|s3/PLAN-FOR-YOU-product-proposal1.txt hold no 'runs per request (covers one round' line",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.turns_showing_budget_line",
+  "source": "same as plan.plans_with_budget_line (no line in E7's plans, so no turn can show it)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.turns_showing_budget_line",
+  "source": "same as plan.plans_with_budget_line (no line in E7's plans, so no turn can show it)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.turns_showing_budget_line",
+  "source": "same as plan.plans_with_budget_line (no line in E7's plans, so no turn can show it)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.lena_yes_h4",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 654 ('No H4 turn') and line 415 (M-B-3 0 of 3)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.lena_yes_h4",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 654 ('No H4 turn') and line 415 (M-B-3 0 of 3)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.lena_yes_h4",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 654 ('No H4 turn') and line 415 (M-B-3 0 of 3)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.lena_keep_l_budget_q",
+  "source": "no L-BUDGET-Q line exists in E7's protocol (it is G0's, 0a.5)",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.lena_keep_l_budget_q",
+  "source": "no L-BUDGET-Q line exists in E7's protocol (it is G0's, 0a.5)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.lena_keep_l_budget_q",
+  "source": "no L-BUDGET-Q line exists in E7's protocol (it is G0's, 0a.5)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.topup_replies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 488 (M-H-2: n/a / 1 of 1 / n/a) and line 401 (M-A-8)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "measures.topup_replies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 488 (M-H-2: n/a / 1 of 1 / n/a) and line 401 (M-A-8)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.topup_replies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 488 (M-H-2: n/a / 1 of 1 / n/a) and line 401 (M-A-8)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.held_replies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 488 (M-H-2: HELD and TOPUP replies, 1 in s2)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "measures.held_replies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 488 (M-H-2: HELD and TOPUP replies, 1 in s2)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.held_replies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 488 (M-H-2: HELD and TOPUP replies, 1 in s2)",
+  "stream": "s3"
+ },
+ {
+  "expected": 1,
+  "key": "measures.grants",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 402 (M-A-9: s1 #66 without a yes; s2 #22 after her yes; s3 none)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "measures.grants",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 402 (M-A-9: s1 #66 without a yes; s2 #22 after her yes; s3 none)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.grants",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 402 (M-A-9: s1 #66 without a yes; s2 #22 after her yes; s3 none)",
+  "stream": "s3"
+ },
+ {
+  "expected": 66,
+  "key": "grants.0.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 402 (s1 #66, s2 #22)",
+  "stream": "s1"
+ },
+ {
+  "expected": 22,
+  "key": "grants.0.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 402 (s1 #66, s2 #22)",
+  "stream": "s2"
+ },
+ {
+  "expected": null,
+  "key": "grants.0.call",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 402 (s1 #66, s2 #22)",
+  "stream": "s3"
+ },
+ {
+  "expected": 3,
+  "key": "grants.0.budget",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 402-407 (s1 #66 3 runs; s2 #22 1 run)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "grants.0.budget",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 402-407 (s1 #66 3 runs; s2 #22 1 run)",
+  "stream": "s2"
+ },
+ {
+  "expected": null,
+  "key": "grants.0.budget",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 402-407 (s1 #66 3 runs; s2 #22 1 run)",
+  "stream": "s3"
+ },
+ {
+  "expected": 4,
+  "key": "measures.human_reworks",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 487 (M-H-1: 4 / 2 / 4)",
+  "stream": "s1"
+ },
+ {
+  "expected": 2,
+  "key": "measures.human_reworks",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 487 (M-H-1: 4 / 2 / 4)",
+  "stream": "s2"
+ },
+ {
+  "expected": 4,
+  "key": "measures.human_reworks",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 487 (M-H-1: 4 / 2 / 4)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.human_reworks_without_budget",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 399 (M-A-6: s1 all 4 carried a budget; s2 2 without; s3 all 4 carried one)",
+  "stream": "s1"
+ },
+ {
+  "expected": 2,
+  "key": "measures.human_reworks_without_budget",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 399 (M-A-6: s1 all 4 carried a budget; s2 2 without; s3 all 4 carried one)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.human_reworks_without_budget",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 399 (M-A-6: s1 all 4 carried a budget; s2 2 without; s3 all 4 carried one)",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.relayed_reworks_by_assistant",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 378 ('the only relayed reworks are the three injected ones (the assistants sent none)')",
+  "stream": "s1"
+ },
+ {
+  "expected": 0,
+  "key": "measures.relayed_reworks_by_assistant",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 378 ('the only relayed reworks are the three injected ones (the assistants sent none)')",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.relayed_reworks_by_assistant",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 378 ('the only relayed reworks are the three injected ones (the assistants sent none)')",
+  "stream": "s3"
+ },
+ {
+  "expected": 0,
+  "key": "measures.lasis_uses",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 453 (M-S-4: n/a / 1 of 1 / n/a)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1,
+  "key": "measures.lasis_uses",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 453 (M-S-4: n/a / 1 of 1 / n/a)",
+  "stream": "s2"
+ },
+ {
+  "expected": 0,
+  "key": "measures.lasis_uses",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 453 (M-S-4: n/a / 1 of 1 / n/a)",
+  "stream": "s3"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 0
+  },
+  "key": "measures.lasis_accepted",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 453 (M-S-4: n/a (0 of 0) / 1 of 1 / n/a (0 of 0))",
+  "stream": "s1"
+ },
+ {
+  "expected": {
+   "k": 1,
+   "n": 1
+  },
+  "key": "measures.lasis_accepted",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 453 (M-S-4: n/a (0 of 0) / 1 of 1 / n/a (0 of 0))",
+  "stream": "s2"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 0
+  },
+  "key": "measures.lasis_accepted",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 453 (M-S-4: n/a (0 of 0) / 1 of 1 / n/a (0 of 0))",
+  "stream": "s3"
+ },
+ {
+  "expected": 11,
+  "key": "measures.user_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (User turns 11 / 12 / 13)",
+  "stream": "s1"
+ },
+ {
+  "expected": 12,
+  "key": "measures.user_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (User turns 11 / 12 / 13)",
+  "stream": "s2"
+ },
+ {
+  "expected": 13,
+  "key": "measures.user_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (User turns 11 / 12 / 13)",
+  "stream": "s3"
+ },
+ {
+  "expected": 25.3791,
+  "key": "measures.assistant_credits",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s1"
+ },
+ {
+  "expected": 19.3269,
+  "key": "measures.assistant_credits",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s2"
+ },
+ {
+  "expected": 24.3012,
+  "key": "measures.assistant_credits",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s3"
+ },
+ {
+  "expected": 1318,
+  "key": "measures.assistant_seconds",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (1,318 / 1,173 / 1,326)",
+  "stream": "s1"
+ },
+ {
+  "expected": 1173,
+  "key": "measures.assistant_seconds",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (1,318 / 1,173 / 1,326)",
+  "stream": "s2"
+ },
+ {
+  "expected": 1326,
+  "key": "measures.assistant_seconds",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (1,318 / 1,173 / 1,326)",
+  "stream": "s3"
+ },
+ {
+  "expected": 36,
+  "key": "measures.org_runs_outside",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 and brief X (36 / 29 / 35)",
+  "stream": "s1"
+ },
+ {
+  "expected": 29,
+  "key": "measures.org_runs_outside",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 and brief X (36 / 29 / 35)",
+  "stream": "s2"
+ },
+ {
+  "expected": 35,
+  "key": "measures.org_runs_outside",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 and brief X (36 / 29 / 35)",
+  "stream": "s3"
+ },
+ {
+  "expected": 22,
+  "key": "cost.org_runs.outside_by_seat.lead",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (lead of 22 / 7 / 7, 17 / 6 / 6, 21 / 7 / 7)",
+  "stream": "s1"
+ },
+ {
+  "expected": 17,
+  "key": "cost.org_runs.outside_by_seat.lead",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (lead of 22 / 7 / 7, 17 / 6 / 6, 21 / 7 / 7)",
+  "stream": "s2"
+ },
+ {
+  "expected": 21,
+  "key": "cost.org_runs.outside_by_seat.lead",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (lead of 22 / 7 / 7, 17 / 6 / 6, 21 / 7 / 7)",
+  "stream": "s3"
+ },
+ {
+  "expected": 7,
+  "key": "cost.org_runs.outside_by_seat.lead-reviewer",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (reviewer)",
+  "stream": "s1"
+ },
+ {
+  "expected": 6,
+  "key": "cost.org_runs.outside_by_seat.lead-reviewer",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (reviewer)",
+  "stream": "s2"
+ },
+ {
+  "expected": 7,
+  "key": "cost.org_runs.outside_by_seat.lead-reviewer",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (reviewer)",
+  "stream": "s3"
+ },
+ {
+  "expected": 7,
+  "key": "cost.org_runs.outside_by_seat.lead-writer",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (writer)",
+  "stream": "s1"
+ },
+ {
+  "expected": 6,
+  "key": "cost.org_runs.outside_by_seat.lead-writer",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (writer)",
+  "stream": "s2"
+ },
+ {
+  "expected": 7,
+  "key": "cost.org_runs.outside_by_seat.lead-writer",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (writer)",
+  "stream": "s3"
+ },
+ {
+  "expected": 5,
+  "key": "measures.org_runs_window",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (Window runs 5)",
+  "stream": "s1"
+ },
+ {
+  "expected": 5,
+  "key": "measures.org_runs_window",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (Window runs 5)",
+  "stream": "s2"
+ },
+ {
+  "expected": 5,
+  "key": "measures.org_runs_window",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (Window runs 5)",
+  "stream": "s3"
+ },
+ {
+  "expected": 32.0404,
+  "key": "measures.org_credits_outside",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s1"
+ },
+ {
+  "expected": 27.467,
+  "key": "measures.org_credits_outside",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s2"
+ },
+ {
+  "expected": 32.839,
+  "key": "measures.org_credits_outside",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s3"
+ },
+ {
+  "expected": 6.0367,
+  "key": "measures.org_credits_window",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s1"
+ },
+ {
+  "expected": 4.611,
+  "key": "measures.org_credits_window",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s2"
+ },
+ {
+  "expected": 5.4552,
+  "key": "measures.org_credits_window",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s3"
+ },
+ {
+  "expected": 1206,
+  "key": "measures.org_seconds_outside",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s1"
+ },
+ {
+  "expected": 1200,
+  "key": "measures.org_seconds_outside",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s2"
+ },
+ {
+  "expected": 1206,
+  "key": "measures.org_seconds_outside",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s3"
+ },
+ {
+  "expected": 182,
+  "key": "measures.org_seconds_window",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s1"
+ },
+ {
+  "expected": 174,
+  "key": "measures.org_seconds_window",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s2"
+ },
+ {
+  "expected": 192,
+  "key": "measures.org_seconds_window",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304",
+  "stream": "s3"
+ },
+ {
+  "expected": "34:25",
+  "key": "measures.wall_time",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (Wall time)",
+  "stream": "s1"
+ },
+ {
+  "expected": "32:53",
+  "key": "measures.wall_time",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (Wall time)",
+  "stream": "s2"
+ },
+ {
+  "expected": "36:37",
+  "key": "measures.wall_time",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md lines 302-304 (Wall time)",
+  "stream": "s3"
+ },
+ {
+  "expected": 5,
+  "key": "measures.memo1_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 416 (M-B-4 memo 1: 5 (T3-T7) / 6 (T3-T8) / 7 (T3-T9))",
+  "stream": "s1"
+ },
+ {
+  "expected": 6,
+  "key": "measures.memo1_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 416 (M-B-4 memo 1: 5 (T3-T7) / 6 (T3-T8) / 7 (T3-T9))",
+  "stream": "s2"
+ },
+ {
+  "expected": 7,
+  "key": "measures.memo1_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 416 (M-B-4 memo 1: 5 (T3-T7) / 6 (T3-T8) / 7 (T3-T9))",
+  "stream": "s3"
+ },
+ {
+  "expected": 3,
+  "key": "measures.memo2_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 417 (memo 2: 3 (T7-T9) / 3 (T8-T10) / 3 (T9-T11))",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "measures.memo2_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 417 (memo 2: 3 (T7-T9) / 3 (T8-T10) / 3 (T9-T11))",
+  "stream": "s2"
+ },
+ {
+  "expected": 3,
+  "key": "measures.memo2_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 417 (memo 2: 3 (T7-T9) / 3 (T8-T10) / 3 (T9-T11))",
+  "stream": "s3"
+ },
+ {
+  "expected": 3,
+  "key": "measures.memo3_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 418 (memo 3: 3 (T9-T11) / 3 (T10-T12) / 3 (T11-T13))",
+  "stream": "s1"
+ },
+ {
+  "expected": 3,
+  "key": "measures.memo3_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 418 (memo 3: 3 (T9-T11) / 3 (T10-T12) / 3 (T11-T13))",
+  "stream": "s2"
+ },
+ {
+  "expected": 3,
+  "key": "measures.memo3_turns",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 418 (memo 3: 3 (T9-T11) / 3 (T10-T12) / 3 (T11-T13))",
+  "stream": "s3"
+ },
+ {
+  "expected": 11,
+  "key": "sum:measures.copies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 151 and TL;DR (copies while ask-first showed 2 of 11); brief X (11 in all)",
+  "stream": "all"
+ },
+ {
+  "expected": {
+   "k": 2,
+   "n": 11
+  },
+  "key": "pool:measures.ask_first_copies",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 151 (Pooled: 2 of 11)",
+  "stream": "all"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 11
+  },
+  "key": "pool:measures.hand_edits",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 250 (M-P3-2: 0 hand edits in 11 copies)",
+  "stream": "all"
+ },
+ {
+  "expected": 44,
+  "key": "sum:measures.flagged_questions",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (44 questions)",
+  "stream": "all"
+ },
+ {
+  "expected": 1,
+  "key": "sum:measures.flagged_notes",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (1 note)",
+  "stream": "all"
+ },
+ {
+  "expected": 45,
+  "key": "sum:measures.flagged_items",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (45 items)",
+  "stream": "all"
+ },
+ {
+  "expected": 13,
+  "key": "sum:measures.flagged_results",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 470 (13 results with a block)",
+  "stream": "all"
+ },
+ {
+  "expected": 36,
+  "key": "sum:measures.sleep_entries",
+  "source": "e7-gate.md section 2 ('Validity ... Turns: turn-times.txt: 11, 12 and 13 turns, each exit 0, 36 `sleep 20 ended` entries') and E7 STUDY line 515 (36 of 36)",
+  "stream": "all"
+ },
+ {
+  "expected": 23,
+  "key": "sum:measures.schedulers_total",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 431 (23 schedulers)",
+  "stream": "all"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 20
+  },
+  "key": "pool:measures.schedulers_running_at_turn_end",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 432 (0 of 20)",
+  "stream": "all"
+ },
+ {
+  "expected": {
+   "k": 23,
+   "n": 23
+  },
+  "key": "pool:measures.schedulers_with_exit",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 436 (23 of 23)",
+  "stream": "all"
+ },
+ {
+  "expected": 3,
+  "key": "sum:measures.p2_unrated",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 205 (P2-UNRATED 3)",
+  "stream": "all"
+ },
+ {
+  "expected": 36,
+  "key": "sum:measures.flagged_superseded",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md TL;DR ('36 superseded')",
+  "stream": "all"
+ },
+ {
+  "expected": {
+   "k": 0,
+   "n": 11
+  },
+  "key": "pool:measures.delivered_without_verdict",
+  "source": "studies/E7-org-growth-0a4-recheck/STUDY.md line 331 (0 of 4, 0 of 3, 0 of 4)",
+  "stream": "all"
+ }
+]

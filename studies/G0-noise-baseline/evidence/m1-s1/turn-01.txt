@@ -1,0 +1,18 @@
+######## TURN 1  start 05:34:11  end 05:34:43  elapsed 32s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T05:34:11Z end 2026-10-26T05:34:43Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-g0-m1-s1-1792992820/notes (one file per meeting). Can you set up a team that does this for me every week?
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+I've read your notes and the hirearchy setup is ready, but no team exists yet. Before I propose one, I need a few answers. Reply "defaults" to accept the proposed ones.
+
+What I'd set up is a standing weekly service. Each week you ask for a memo and name that week's notes file, for example `2026-10-26.md`. A small team (a writer and a separate reviewer who checks the memo against the notes) works only from your `notes` folder. It reads that folder and never changes it.
+
+1. **Informal items.** Your notes mix labelled "ACTION:" lines with commitments made in prose. Examples are "Sam offered to pair with Jo on CI" and "Lee said he'd sign off once legal replies". Should the memo list every commitment, including those, or only the labelled ACTIONs? My default is every commitment, with the informal ones marked as such.
+2. **Vague dates.** For "by end of next week", "the day before the freeze" or "next meeting", should the memo turn them into a calendar date based on the meeting date, or keep the original wording and leave the date blank? My default is to convert them and show the original wording next to the date.
+3. **Memo format.** Markdown, at most 400 words, with two sections: "Decisions" and "Action items (owner, task, due)". Should it also have a short "Open questions" section? My default is no, since you didn't ask for one.
+4. **Where it goes.** A new folder called `deliverables` in `/tmp/hirearchy-g0-m1-s1-1792992820`, with one file per meeting such as `memo-2026-10-19.md`.
+5. **Sources.** Only your notes in `/tmp/hirearchy-g0-m1-s1-1792992820/notes`, with no web.
+6. **Checks.** Every decision and every action in the notes appears in the memo. Each action has a named owner. Nothing appears that isn't in the notes. The memo is at most 400 words. A separate reviewer checks all of this.
+7. **Budget and models.** Each agent runs claude-sonnet-5.5 at high effort, which is the only option available. I'll set the per-memo budget in runs when I propose the plan, with a margin for one round of corrections.
+8. **Approval.** I show you the plan first and build nothing until you approve. After that, each week you ask for a memo and I run it.
+
+I can also make the first request for the 19 October notes, so you can check the result before relying on it. Should I do that?

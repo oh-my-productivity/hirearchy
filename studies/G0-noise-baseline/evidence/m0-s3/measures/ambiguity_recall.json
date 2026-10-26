@@ -1,0 +1,151 @@
+{
+  "could_not_derive": [],
+  "items": {
+    "AMB-1": {
+      "memo": "2026-10-19",
+      "owner": "Marta",
+      "recall": {
+        "k": 2,
+        "n": 2
+      },
+      "recall_literal_timing": {
+        "k": 2,
+        "n": 2
+      },
+      "versions": [
+        {
+          "commit_time": "2026-10-26T08:15:38Z",
+          "contains": true,
+          "lead_forwarded": false,
+          "lead_item": null,
+          "lead_item_names_criterion": null,
+          "lead_result": null,
+          "listed_ambiguous": true,
+          "listed_by": "ambiguous token",
+          "listed_line": "Ambiguous (lead decides): Marta agenda row (commitment or status? which agenda?); Lee \"probably by end of next week\" -> none vs date; Sam pairing offer row (offer vs commitment).",
+          "literal_listed_ambiguous": true,
+          "literal_reviewed": true,
+          "next_version": 2,
+          "progress_call": null,
+          "progress_flagged": false,
+          "progress_source": null,
+          "progress_time": null,
+          "review_result": "20261026T081650179522-lead.reviewer-70c0",
+          "review_sent_before_commit_s": 0,
+          "review_task": "20261026T081556548490-lead-4832",
+          "reviewed": true,
+          "row": "Marta | Keep the demo agenda as sent | none",
+          "sha": "aa229c1",
+          "version": 1,
+          "writer_left_out": false
+        },
+        {
+          "commit_time": "2026-10-26T08:17:43Z",
+          "contains": true,
+          "lead_forwarded": true,
+          "lead_item": "Marta 'Marta will keep the agenda as sent': a row (commitment) or only a status statement? (C5; reviewer: ambiguous)",
+          "lead_item_names_criterion": true,
+          "lead_result": "20261026T081855341826-lead-0c29",
+          "listed_ambiguous": true,
+          "listed_by": "ambiguous token",
+          "listed_line": "Ambiguous, left to you: Marta 'keep the agenda as sent' as a row; Lee due none vs 2026-10-30 ('probably by end of next week'); Sam's offer to pair with Jo as a row. If you rule that Marta's or Sam's item is not a commitment, the row must go",
+          "literal_listed_ambiguous": true,
+          "literal_reviewed": true,
+          "next_version": 3,
+          "progress_call": 80,
+          "progress_flagged": true,
+          "progress_source": "assistant-tool-calls.txt",
+          "progress_time": "2026-10-26T08:18:56.075Z",
+          "review_result": "20261026T081829954162-lead.reviewer-c512",
+          "review_sent_before_commit_s": 0,
+          "review_task": "20261026T081802563669-lead-7d7a",
+          "reviewed": true,
+          "row": "Marta | Keep the agenda as sent | none",
+          "sha": "a351a6c",
+          "version": 2,
+          "writer_left_out": true
+        }
+      ],
+      "versions_containing": 2,
+      "versions_of_the_memo": 3
+    },
+    "AMB-2": {
+      "memo": "2026-10-12",
+      "owner": "Sam",
+      "recall": {
+        "k": 0,
+        "n": 0
+      },
+      "recall_literal_timing": {
+        "k": 0,
+        "n": 0
+      },
+      "versions": [],
+      "versions_containing": 0,
+      "versions_of_the_memo": 2
+    }
+  },
+  "label": "m0-s3",
+  "recall": {
+    "k": 2,
+    "n": 2
+  },
+  "recall_literal_timing": {
+    "k": 2,
+    "n": 2
+  },
+  "roles": {
+    "children": [
+      "lead/reviewer",
+      "lead/writer"
+    ],
+    "detected_by": "charter",
+    "owner": "lead",
+    "reviewer": "lead/reviewer",
+    "reviewer_dir": "lead-reviewer",
+    "roles": {
+      "lead/reviewer": "Independent Reviewer",
+      "lead/writer": "Writer"
+    }
+  },
+  "script": {
+    "md5": "92b67f74a38c04895402803e9388e718",
+    "name": "ambiguity_recall.py"
+  },
+  "source_files": [
+    "assistant-tool-calls.txt",
+    "injection/injection-log.txt",
+    "memos/versions/INDEX.txt",
+    "memos/versions/memo-2026-10-05.v1.95d408c.md",
+    "memos/versions/memo-2026-10-05.v2.c0ecc31.md",
+    "memos/versions/memo-2026-10-05.v3.1dbc97d.md",
+    "memos/versions/memo-2026-10-05.v4.756b323.md",
+    "memos/versions/memo-2026-10-12.v1.e5e2062.md",
+    "memos/versions/memo-2026-10-12.v2.1668114.md",
+    "memos/versions/memo-2026-10-19.v1.aa229c1.md",
+    "memos/versions/memo-2026-10-19.v2.a351a6c.md",
+    "memos/versions/memo-2026-10-19.v3.c8a30e9.md",
+    "msgs/lead-read/20261026T074729234771-lead.reviewer-a720.md",
+    "msgs/lead-read/20261026T075139464796-lead.reviewer-17ae.md",
+    "msgs/lead-read/20261026T075554587633-lead.reviewer-015e.md",
+    "msgs/lead-read/20261026T080243658598-lead.reviewer-85c1.md",
+    "msgs/lead-read/20261026T080808196280-lead.reviewer-e985.md",
+    "msgs/lead-read/20261026T081238158323-lead.reviewer-b2fb.md",
+    "msgs/lead-read/20261026T081650179522-lead.reviewer-70c0.md",
+    "msgs/lead-read/20261026T081829954162-lead.reviewer-c512.md",
+    "msgs/lead-read/20261026T082346241708-lead.reviewer-7653.md",
+    "msgs/lead-reviewer-read/20261026T074639926547-lead-ebbb.md",
+    "msgs/lead-reviewer-read/20261026T075101392533-lead-ee26.md",
+    "msgs/lead-reviewer-read/20261026T075512445316-lead-fbdd.md",
+    "msgs/lead-reviewer-read/20261026T080149063052-lead-03e2.md",
+    "msgs/lead-reviewer-read/20261026T080721771887-lead-9e38.md",
+    "msgs/lead-reviewer-read/20261026T081128622467-lead-f9cc.md",
+    "msgs/lead-reviewer-read/20261026T081556548490-lead-4832.md",
+    "msgs/lead-reviewer-read/20261026T081802563669-lead-7d7a.md",
+    "msgs/lead-reviewer-read/20261026T082308287676-lead-8fe7.md",
+    "msgs/lead-sent/20261026T081855341826-lead-0c29.md",
+    "org-files/lead-reviewer-AGENT.md",
+    "org-files/lead-writer-AGENT.md",
+    "org-git-log.txt"
+  ]
+}

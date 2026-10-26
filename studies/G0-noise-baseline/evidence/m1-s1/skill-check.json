@@ -1,0 +1,30 @@
+{
+  "disclose_calls": 1,
+  "first_disclose": {
+    "call": 2,
+    "path": "/private/tmp/hirearchy-g0-m1-s1-1792992820/.kiro/skills/hirearchy/SKILL.md",
+    "skill_file_md5": "a3e46347b70a7ece5f734f70198c607f",
+    "status": "completed",
+    "turn": 1,
+    "uri": "file:///private/tmp/hirearchy-g0-m1-s1-1792992820/.kiro/skills/hirearchy/SKILL.md",
+    "utc": "2026-10-26T05:34:24.065Z",
+    "valid": true
+  },
+  "first_feedback": null,
+  "first_propose_org": null,
+  "note_count": {
+    "messages": 0,
+    "tool_calls": null
+  },
+  "required_md5": "a3e46347b70a7ece5f734f70198c607f",
+  "script": {
+    "md5": "df7bd77dd2b7fc9eb6681e677b6c7e7c",
+    "name": "skill_check.py"
+  },
+  "skill_disclose_calls": 1,
+  "source_files": [
+    "assistant-session-messages.jsonl"
+  ],
+  "stratum": "n/a",
+  "streamdir": "/Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/m1-s1"
+}

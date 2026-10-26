@@ -1,0 +1,13 @@
+The 19 October memo now has your four answers applied, but I haven't delivered it. The independent re-check didn't happen, because the team ran out of runs after the one-cell edit. The reviewer's pass on the earlier version (9 of 9) is the last one on record.
+
+I read the memo myself against your notes and answers:
+- **Summary first:** "Summary:" is the first line, with nothing before it.
+- **Decisions:** the 3 decisions are unchanged, and the demo go-ahead is still one line.
+- **Actions:** Lee is now 2026-10-30, and the rows for Marta, Dev, Priya and Sam are unchanged. Sam stays at none, and there is no Marta "keep the agenda" row.
+- **Next meeting:** the line is still after the table.
+
+That is my own check, not the reviewer's. So the rule that the reviewer's report must show every criterion met is not satisfied for this version.
+
+This memo has used 8 runs of the 12, and nothing has gone beyond your approval. Which do you want?
+- **Take it as it is:** I copy it to `deliverables/` now, and no more runs are used. This is what I suggest, since the change was one cell and I verified it.
+- **Fund the re-check:** about 2 more runs, 10 in total and still within the 12. Say "re-check" if you want this.

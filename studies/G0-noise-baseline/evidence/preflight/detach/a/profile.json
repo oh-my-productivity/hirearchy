@@ -1,0 +1,40 @@
+{
+  "name": "c1-1792989925",
+  "description": "internal: hirearchy 0a.4 C1 reproduction; deleted after the attempt",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/Volumes/workspace/hirearchy",
+        "run",
+        "hirearchy",
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/tmp/hirearchy-g0-detach-1792989925/org",
+        "HIREARCHY_STATE_DIR": "/tmp/hirearchy-g0-detach-1792989925/kiro-state",
+        "HOME": "/tmp/hirearchy-g0-detach-1792989925/home",
+        "UV_CACHE_DIR": "/Users/aminalizadeh/.cache/uv"
+      }
+    }
+  },
+  "tools": [
+    "*"
+  ],
+  "permissions": {
+    "rules": [
+      {
+        "capability": "all",
+        "effect": "allow"
+      }
+    ]
+  },
+  "resources": [
+    "skill:///Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md",
+    "skill://.kiro/skills/*/SKILL.md"
+  ],
+  "hooks": [],
+  "includeMcpJson": false,
+  "model": "claude-sonnet-5.5"
+}

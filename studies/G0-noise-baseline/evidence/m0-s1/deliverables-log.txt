@@ -1,0 +1,59 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-26T05:01:43.325Z] call #25 turn 4 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-g0-m0-s1-1792990299/deliverables && cp /tmp/hirearchy-g0-m0-s1-1792990299/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-g0-m0-s1-1792990299/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: b00bd38 2026-10-26T05:00:14Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: b00bd38 2026-10-26T05:00:14Z']
+result: Output:
+     304 /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T05:11:36.609Z] call #49 turn 6 execute_bash
+COMMAND: cp /tmp/hirearchy-g0-m0-s1-1792990299/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-g0-m0-s1-1792990299/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-05.md && echo same && ls /tmp/hirearchy-g0-m0-s1-1792990299/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: d7a5b45 2026-10-26T05:09:40Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: d7a5b45 2026-10-26T05:09:40Z']
+result: Output:
+same
+memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T05:17:50.325Z] call #61 turn 8 execute_bash
+COMMAND: cp /tmp/hirearchy-g0-m0-s1-1792990299/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-12.md && cmp /tmp/hirearchy-g0-m0-s1-1792990299/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-12.md && echo same && ls /tmp/hirearchy-g0-m0-s1-1792990299/deliverables && wc -w /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-12.md
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 01e4a4a 2026-10-26T05:13:52Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 01e4a4a 2026-10-26T05:13:52Z']
+result: Output:
+same
+memo-2026-10-05.md
+memo-2026-10-12.md
+     321 /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-26T05:28:31.450Z] call #84 turn 12 execute_bash
+COMMAND: cp /tmp/hirearchy-g0-m0-s1-1792990299/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-19.md && cmp /tmp/hirearchy-g0-m0-s1-1792990299/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-19.md && echo same && ls /tmp/hirearchy-g0-m0-s1-1792990299/deliverables && wc -w /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-19.md
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: e9db496 2026-10-26T05:25:54Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: e9db496 2026-10-26T05:25:54Z']
+result: Output:
+same
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+     260 /tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-19.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 1727 mtime 05:11:36 local md5 5e8a02bd18e262eded1ebb70d0ec7634
+  memo-2026-10-12.md size 1768 mtime 05:17:50 local md5 1c9a2061f26eaac9050f534719dc2be3
+  memo-2026-10-19.md size 1438 mtime 05:28:31 local md5 8dfdb2954db548da5bf3def0d9344092
+
+final ls -la:
+total 24
+drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 26 05:28 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 26 05:02 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  1727 Oct 26 05:11 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1768 Oct 26 05:17 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1438 Oct 26 05:28 memo-2026-10-19.md
+

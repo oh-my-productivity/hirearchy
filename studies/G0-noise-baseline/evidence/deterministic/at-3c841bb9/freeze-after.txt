@@ -1,0 +1,5 @@
+HEAD 3c841bb9cdde666c6ea8b00bb2edfeae68c256db
+(end diff)
+?? docs/research/
+?? studies/G0-noise-baseline/
+2026-10-26T04:38:54Z

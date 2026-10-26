@@ -1,0 +1,17 @@
+The memo is saved at `/tmp/hirearchy-g0-m1-s3-1793003475/deliverables/memo-2026-10-05.md`. It's 277 words by `wc` (the team counted 247 with their own method), well under the 400 limit.
+
+- **Only this meeting, nothing extra:** met
+- **At most 400 words:** met
+- **Decisions section, all decisions listed (gateway migration pushed back, Renovate adopted):** met
+- **Action table with columns Owner | Action | Due:** met
+- **Every commitment is a row, including Sam's and Lee's, which were only said in the meeting:** met (5 rows)
+- **Due dates:** met. They are Priya 2026-10-09, Dev 2026-10-08, Sam 2026-10-09, Marta 2026-10-14 and Lee none.
+- **Reviewer passed every criterion:** met (6 of 6)
+
+The memo has a short "Assumptions" line explaining that Sam's and Marta's dates came from you and Lee's has no date. You didn't ask for that line. The team added it to explain the vague dates, and I only noticed it when I read the file.
+
+The first pass took 9 runs. The rework took 5 more, so the total was 14 against the 12 per memo you set. You approved up to 5 more runs, and I kept to that.
+
+Next week, ask for the new notes file by name, for example `2026-10-12.md`. The team has recorded that "for <date>" means an event date, not a deadline, so Due would be none unless you say otherwise.
+
+Do you want to keep this memo as it is, or change something?

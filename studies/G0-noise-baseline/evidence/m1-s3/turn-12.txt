@@ -1,0 +1,9 @@
+######## TURN 12  start 09:13:50  end 09:14:15  elapsed 25s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T09:13:50Z end 2026-10-26T09:14:15Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks - keep it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+I recorded that you kept the 19 October memo. All three memos are saved in `/tmp/hirearchy-g0-m1-s3-1793003475/deliverables/`: `memo-2026-10-05.md`, `memo-2026-10-12.md` and `memo-2026-10-19.md`.
+
+The 5 October memo was delivered before the Summary rule existed, so it has no "Summary:" line. You said you'd fix that one yourself.
+
+For next week, ask for the new notes file by name (for example `2026-10-26.md`). The team will use the current rules, including the Summary-first one.

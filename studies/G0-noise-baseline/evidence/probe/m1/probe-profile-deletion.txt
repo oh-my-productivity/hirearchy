@@ -1,0 +1,1 @@
+2026-10-26T04:48:17Z deleting ~/.kiro/agents/hirearchy-study-g0-probe-m1.json md5 33670628ac52d1a2d194a78e497db267 (byte-equal to probe/m1 copy: yes)

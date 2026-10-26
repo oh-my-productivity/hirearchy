@@ -1,0 +1,52 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-25T07:10:39.888Z] call #27 turn 4 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-e7-s1-1792911600/deliverables && cp /private/tmp/hirearchy-e7-s1-1792911600/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-e7-s1-1792911600/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 0e4883d 2026-10-25T07:09:21Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 0e4883d 2026-10-25T07:09:21Z']
+result: Output:
+     133 /tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-25T07:20:03.021Z] call #46 turn 6 execute_bash
+COMMAND: cp /private/tmp/hirearchy-e7-s1-1792911600/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-e7-s1-1792911600/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-05.md && echo identical && ls /tmp/hirearchy-e7-s1-1792911600/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: f6f27c0 2026-10-25T07:18:35Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: f6f27c0 2026-10-25T07:18:35Z']
+result: Output:
+identical
+memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-25T07:27:49.121Z] call #72 turn 8 execute_bash
+COMMAND: cp /private/tmp/hirearchy-e7-s1-1792911600/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-12.md && cmp /private/tmp/hirearchy-e7-s1-1792911600/org/lead/writer/work/memo-2026-10-12.md /tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-12.md && echo identical && ls /tmp/hirearchy-e7-s1-1792911600/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 3eb3258 2026-10-25T07:25:36Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 3eb3258 2026-10-25T07:25:36Z']
+result: Output:
+identical
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-25T07:34:38.119Z] call #90 turn 10 execute_bash
+COMMAND: cp /private/tmp/hirearchy-e7-s1-1792911600/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-19.md && cmp /private/tmp/hirearchy-e7-s1-1792911600/org/lead/writer/work/memo-2026-10-19.md /tmp/hirearchy-e7-s1-1792911600/deliverables/memo-2026-10-19.md && echo identical && ls /tmp/hirearchy-e7-s1-1792911600/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: e927d39 2026-10-25T07:33:15Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: e927d39 2026-10-25T07:33:15Z']
+result: Output:
+identical
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 832 mtime 07:20:03 local md5 77a615e1b8a6cd7b9cdc5ed97b693671
+  memo-2026-10-12.md size 1065 mtime 07:27:49 local md5 578b9fb048b6a93573083176be347ff2
+  memo-2026-10-19.md size 939 mtime 07:34:38 local md5 ffbf533bccba3986720e6d7645940b49
+
+final ls -la:
+(no sandbox: the listing above is of the stream dir's memos/ copy)
+

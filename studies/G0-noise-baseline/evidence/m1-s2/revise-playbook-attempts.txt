@@ -1,0 +1,59 @@
+# revise_playbook attempts (protocol 7.2; amendment 1 A3.3 10.1(c)); facts only
+
+tool.call events with tool == revise_playbook: 0
+
+run-log patterns per run (after '# ---- output ----'): P1 revise_playbook call lines | P2 end lines | P3 all hirearchy call lines | tool.call events whose run is this run
+  lead@20261026T065738755263                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261026T065800983752            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261026T065835408298                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261026T065859723382          P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261026T065954239239                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261026T070024521535            P1=0 P2=0 P3=7 events(all)=7 events(revise_playbook)=0
+  lead@20261026T070058936941                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261026T070119195835          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261026T070151560711                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261026T070446685785                   P1=0 P2=0 P3=13 events(all)=13 events(revise_playbook)=0
+  lead/writer@20261026T070523082909            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261026T070553421736                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/reviewer@20261026T070617707418          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261026T070706170344                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261026T070939867540                   P1=0 P2=0 P3=11 events(all)=11 events(revise_playbook)=0
+  lead/writer@20261026T071020174683            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261026T071052501958                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261026T071114726573          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261026T071157105838                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261026T071534069038                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261026T071606315508            P1=0 P2=0 P3=5 events(all)=5 events(revise_playbook)=0
+  lead@20261026T071636634801                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261026T071656938074          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261026T071733341841                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261026T071926601719                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261026T071954888178            P1=0 P2=0 P3=7 events(all)=7 events(revise_playbook)=0
+  lead@20261026T072033266848                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261026T072059528891          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261026T072145997911                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead@20261026T072340259295                   P1=0 P2=0 P3=3 events(all)=3 events(revise_playbook)=0
+  lead/writer@20261026T072420697932            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261026T072453046510                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261026T072515301186          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261026T072549634761                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261026T072846535005                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/writer@20261026T072910831980            P1=0 P2=0 P3=8 events(all)=7 events(revise_playbook)=0   <-- MISMATCH between run-log lines and events
+  lead@20261026T072947187823                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead/reviewer@20261026T073011381310          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261026T073051605613                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+  lead@20261026T073249293454                   P1=0 P2=0 P3=11 events(all)=11 events(revise_playbook)=0
+  lead/writer@20261026T073331563563            P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead@20261026T073409828291                   P1=0 P2=0 P3=6 events(all)=6 events(revise_playbook)=0
+  lead/reviewer@20261026T073450087805          P1=0 P2=0 P3=4 events(all)=4 events(revise_playbook)=0
+  lead@20261026T073526326901                   P1=0 P2=0 P3=2 events(all)=2 events(revise_playbook)=0
+
+full arguments and result verbatim, from the org-run session (tool_call with args.tool_id == hirearchy::revise_playbook):
+
+service.revise events:
+- 2026-10-26T06:57:36.665467+00:00 {"ts": "2026-10-26T06:57:36.665467+00:00", "proc": "mcp", "pid": 61491, "kind": "service.revise", "actor": "root", "run": null, "trace": null, "owner": "lead", "service": "weekly-meeting-memo", "version": 1, "by": "root", "admitted": "client"}
+
+PLAYBOOK versions (org git history of lead/services/weekly-meeting-memo/PLAYBOOK.md and history/):
+4caac1a 2026-10-26T06:57:36Z root: applied blueprint (3 agents), task 20261026T065736666388-root-89a4 -> lead, services: weekly-meeting-memo
+852c433 2026-10-26T07:16:18Z lead: run ok, 5 message(s) [lead/runs/20261026T071534069038.log]
+history files now: SERVICE.v1.md

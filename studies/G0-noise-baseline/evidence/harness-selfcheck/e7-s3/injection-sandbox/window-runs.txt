@@ -1,0 +1,86 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-25T08:32:49Z .. 2026-10-25T08:35:39Z; injected task 20261025T083249523405-root-5834; revised (memo 1) task 20261025T082820566824-root-62a5
+
+## run lead@20261025T083249757903 agent=lead model=claude-sonnet-5.5 start=2026-10-25T08:32:49.769874+00:00 end=2026-10-25T08:33:35.953712+00:00 exit=0 secs=46 session=sess_60c47d1e-3b8b-4925-9ed4-bd2c5fe46e6a
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261025T083330522531-lead-574f to=lead/writer type=task status=None created=2026-10-25T08:33:30+00:00
+  ## Lessons: (none)
+  org-git commit 874ce84 MEMORY.md diff:
+    commit 874ce8404892186369b3272c805dabd10ba69912
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sun Oct 25 08:33:35 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261025T083249757903.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 0c4063e..13509e7 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,4 @@
+     # Memory
+    -Request 20261025T082434523661-root-09df (memo 2026-10-05) done earlier.
+    -Client-correction task 20261025T082820566824-root-62a5: reviewer re-check 'criteria met 7 of 7' PASS; I verified memo (216 words) and reported done to root with questions for the client. Nothing outstanding.
+    -Playbook lesson: ambiguous Due readings (relative day, event date vs booking deadline) go to client up front.
+    +Request 20261025T082434523661-root-09df (memo 2026-10-05) done earlier; client correction 62a5 done (reviewer 7 of 7).
+    +Current: rework task 20261025T083249523405-root-5834 (Sam Due -> 2026-10-08 + derivation in Open items; Marta Due -> none + note in Open items). Delegated to writer (revises ...-lead-1ffd, budget 1). NEXT: when writer reports, read memo, then delegate reviewer re-check (revises 20261025T082936980102-lead-86fc, budget 1) of WHOLE memo, explicitly checking every Due value vs notes text; then verify myself and report done to root with reviewer's coverage line verbatim and lessons.
+    +Playbook lesson: ambiguous Due readings (relative day, event date vs booking deadline) go to client up front; event date != deadline.
+
+## run lead/writer@20261025T083331923079 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-25T08:33:31.930548+00:00 end=2026-10-25T08:34:02.096245+00:00 exit=0 secs=30 session=sess_6455e2cd-5dab-479f-92c0-62d34d6cb550
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261025T083356064133 agent=lead model=claude-sonnet-5.5 start=2026-10-25T08:33:56.075325+00:00 end=2026-10-25T08:34:28.268476+00:00 exit=0 secs=32 session=sess_73eae49f-e5c1-4438-a00e-cd47fe348e2a
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+  lead message 20261025T083420945855-lead-cc66 to=lead/reviewer type=task status=None created=2026-10-25T08:34:20+00:00
+  ## Lessons: (none)
+  org-git commit 12b7bf7 MEMORY.md diff:
+    commit 12b7bf7ce39907f1163c25e3b1687e006b08da8e
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sun Oct 25 08:34:28 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261025T083356064133.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 13509e7..5cf99ee 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,5 @@
+     # Memory
+    -Request 20261025T082434523661-root-09df (memo 2026-10-05) done earlier; client correction 62a5 done (reviewer 7 of 7).
+    -Current: rework task 20261025T083249523405-root-5834 (Sam Due -> 2026-10-08 + derivation in Open items; Marta Due -> none + note in Open items). Delegated to writer (revises ...-lead-1ffd, budget 1). NEXT: when writer reports, read memo, then delegate reviewer re-check (revises 20261025T082936980102-lead-86fc, budget 1) of WHOLE memo, explicitly checking every Due value vs notes text; then verify myself and report done to root with reviewer's coverage line verbatim and lessons.
+    +Request 20261025T082434523661-root-09df (memo 2026-10-05) done earlier; client correction 62a5 done.
+    +Current: rework task 20261025T083249523405-root-5834. Writer reworked lead/writer/work/memo-2026-10-05.md (253 words, I read it: Sam 2026-10-08 + Open item, Marta none + Open item; looks right). Delegated reviewer re-check of whole memo (revises 20261025T082936980102-lead-86fc, budget 1).
+    +NEXT: when reviewer reports, read its report; if criteria met n of m with n=m and no ambiguous items, report done to root (memo path lead/writer/work/memo-2026-10-05.md, deliverable memo-2026-10-05.md, paste reviewer coverage line verbatim, lessons). Ambiguous items -> 'Questions for the client:' at top of report.
+     Playbook lesson: ambiguous Due readings (relative day, event date vs booking deadline) go to client up front; event date != deadline.
+
+## run lead/reviewer@20261025T083422221735 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-25T08:34:22.232505+00:00 end=2026-10-25T08:35:12.461829+00:00 exit=0 secs=50 session=sess_6783715c-4e41-494e-83a8-810f1f52b7db
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261025T083504416295 agent=lead model=claude-sonnet-5.5 start=2026-10-25T08:35:04.429136+00:00 end=2026-10-25T08:35:38.593239+00:00 exit=0 secs=34 session=sess_ab72a43b-022f-4aa6-8410-1fe4c6bde52c
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 3
+  lead message 20261025T083532641493-lead-f639 to=root type=result status=done created=2026-10-25T08:35:32+00:00
+  ## Lessons: Due values: an event date in prose ("book the room for Oct 14") is not a deadline, and "before <weekday>" needs an explicit derived date explained in Open items. Playbook: have the writer check each Due against the notes wording up front. Evidence: 2 rework rounds on Due values, the final re-check passed 7 of 7.
+  org-git commit 0c86c20 MEMORY.md diff:
+    commit 0c86c203e5f5f11239a2c097b1143fceb85aa0b4
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Sun Oct 25 08:35:38 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261025T083504416295.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 5cf99ee..d0f8e87 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,4 @@
+     # Memory
+    -Request 20261025T082434523661-root-09df (memo 2026-10-05) done earlier; client correction 62a5 done.
+    -Current: rework task 20261025T083249523405-root-5834. Writer reworked lead/writer/work/memo-2026-10-05.md (253 words, I read it: Sam 2026-10-08 + Open item, Marta none + Open item; looks right). Delegated reviewer re-check of whole memo (revises 20261025T082936980102-lead-86fc, budget 1).
+    -NEXT: when reviewer reports, read its report; if criteria met n of m with n=m and no ambiguous items, report done to root (memo path lead/writer/work/memo-2026-10-05.md, deliverable memo-2026-10-05.md, paste reviewer coverage line verbatim, lessons). Ambiguous items -> 'Questions for the client:' at top of report.
+    -Playbook lesson: ambiguous Due readings (relative day, event date vs booking deadline) go to client up front; event date != deadline.
+    +Request 20261025T082434523661-root-09df (memo 2026-10-05) done; client correction 62a5 done; rework 20261025T083249523405-root-5834 reported done (reviewer 7 of 7, memo 253 words).
+    +Nothing outstanding. If a new request comes, follow the playbook.
+    +Playbook lesson: ambiguous Due readings (relative day, event date vs booking deadline) go to client up front; event date != deadline; 'before <weekday>' -> derived date explained in Open items.
+

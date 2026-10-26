@@ -1,0 +1,647 @@
+=== after turn 1  snapshot 2026-10-26T05:35:07Z (local 05:35:07)
+org runs total: 0  (injection-window runs: 0; counted toward the 45 cap: 0)
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: (none)
+scheduler.exit: (none)
+deliverables/:
+  (none)
+processes referencing the sandbox name (1):
+  36101       00:00 /bin/zsh -c cd /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence && zsh harness/after_turn.sh m1-s1 1 2>&1 | tail -30; E=/Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/m1-
+--- scheduler record after turn 1 at 2026-10-26T05:35:07Z
+scheduler.pid: (no file)
+scheduler.exit: (none)
+processes referencing the sandbox name:
+36101 97243 Ss         00:00 /bin/zsh -c cd /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence && zsh harness/after_turn.sh m1-s1 1 2>&1 | tail -30; E=/Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/m1-s1; python3 -B harness/ambient_context.py $E/assistant-session-messages.jsonl $E/assistant-session.json /tmp/hirearchy-g0-m1-s1-1792992820 > $E/ambient-context.txt; cat $E/ambient-context.txt | head -40; zsh harness/skill_check.sh m1-s1 turn1 | tail -15
+--- signal record after turn 1 at 2026-10-26T05:35:07Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(no events dir)
+(turn 1 end per turn-times.txt:)
+turn 1: 05:34:11 - 05:34:43  1792992883-1792992851=32s  utc 2026-10-26T05:34:11Z - 2026-10-26T05:34:43Z  exit 0  sleep 20 ended utc 2026-10-26T05:35:03Z
+--- throttle/exit-75 scan after turn 1
+(end of scan)
+=== after turn 2  snapshot 2026-10-26T05:36:32Z (local 05:36:32)
+org runs total: 0  (injection-window runs: 0; counted toward the 45 cap: 0)
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: (none)
+scheduler.exit: (none)
+deliverables/:
+  (none)
+processes referencing the sandbox name (0):
+--- scheduler record after turn 2 at 2026-10-26T05:36:32Z
+scheduler.pid: (no file)
+scheduler.exit: (none)
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 2 at 2026-10-26T05:36:32Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(no events dir)
+(turn 2 end per turn-times.txt:)
+turn 2: 05:35:25 - 05:36:08  1792992968-1792992925=43s  utc 2026-10-26T05:35:25Z - 2026-10-26T05:36:08Z  exit 0  sleep 20 ended utc 2026-10-26T05:36:28Z
+--- throttle/exit-75 scan after turn 2
+(end of scan)
+=== after turn 3  snapshot 2026-10-26T05:42:17Z (local 05:42:17)
+org runs total: 9  (injection-window runs: 0; counted toward the 45 cap: 9)
+  lead                           claude-sonnet-5.5    5
+  lead/reviewer                  claude-sonnet-5.5    2
+  lead/writer                    claude-sonnet-5.5    2
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  (none)
+processes referencing the sandbox name (0):
+--- scheduler record after turn 3 at 2026-10-26T05:42:17Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 3 at 2026-10-26T05:42:17Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+(run.orphan lines):
+(turn 3 end per turn-times.txt:)
+turn 3: 05:36:43 - 05:41:53  1792993313-1792993003=310s  utc 2026-10-26T05:36:43Z - 2026-10-26T05:41:53Z  exit 0  sleep 20 ended utc 2026-10-26T05:42:13Z
+--- throttle/exit-75 scan after turn 3
+(end of scan)
+=== after turn 4  snapshot 2026-10-26T05:43:20Z (local 05:43:20)
+org runs total: 9  (injection-window runs: 0; counted toward the 45 cap: 9)
+  lead                           claude-sonnet-5.5    5
+  lead/reviewer                  claude-sonnet-5.5    2
+  lead/writer                    claude-sonnet-5.5    2
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  (none)
+processes referencing the sandbox name (0):
+--- scheduler record after turn 4 at 2026-10-26T05:43:20Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 4 at 2026-10-26T05:43:21Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+(run.orphan lines):
+(turn 4 end per turn-times.txt:)
+turn 4: 05:42:34 - 05:42:56  1792993376-1792993354=22s  utc 2026-10-26T05:42:34Z - 2026-10-26T05:42:56Z  exit 0  sleep 20 ended utc 2026-10-26T05:43:16Z
+--- throttle/exit-75 scan after turn 4
+(end of scan)
+=== after turn 5  snapshot 2026-10-26T05:47:24Z (local 05:47:24)
+org runs total: 14  (injection-window runs: 0; counted toward the 45 cap: 14)
+  lead                           claude-sonnet-5.5    8
+  lead/reviewer                  claude-sonnet-5.5    3
+  lead/writer                    claude-sonnet-5.5    3
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054348095433 agent=lead model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T054428385499 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054456655472 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054522978628 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=55
+  run 20261026T054613487445 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 05:46:46 size 706 md5 72931fe5f7a8595287248073e557678c
+processes referencing the sandbox name (0):
+--- scheduler record after turn 5 at 2026-10-26T05:47:24Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 5 at 2026-10-26T05:47:24Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+2026-10-26/scheduler-38713-1792993428092.jsonl:{"v":1,"ts":"2026-10-26T05:46:41.905642+00:00","seq":15,"proc":"scheduler","pid":38713,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+(run.orphan lines):
+(turn 5 end per turn-times.txt:)
+turn 5: 05:43:28 - 05:47:00  1792993620-1792993408=212s  utc 2026-10-26T05:43:28Z - 2026-10-26T05:47:00Z  exit 0  sleep 20 ended utc 2026-10-26T05:47:20Z
+--- throttle/exit-75 scan after turn 5
+(end of scan)
+=== after turn 6  snapshot 2026-10-26T05:51:47Z (local 05:51:47)
+injection window (UTC, from window.txt): 2026-10-26T05:47:52 .. 2026-10-26T05:50:24
+org runs total: 19  (injection-window runs: 5; counted toward the 45 cap: 14)
+  lead                           claude-sonnet-5.5    11
+  lead/reviewer                  claude-sonnet-5.5    4
+  lead/writer                    claude-sonnet-5.5    4
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054348095433 agent=lead model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T054428385499 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054456655472 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054522978628 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=55
+  run 20261026T054613487445 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054752951814 agent=lead model=claude-sonnet-5.5 exit=0 secs=40 [INJECTION WINDOW]
+  run 20261026T054827195850 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32 [INJECTION WINDOW]
+  run 20261026T054855453202 agent=lead model=claude-sonnet-5.5 exit=0 secs=28 [INJECTION WINDOW]
+  run 20261026T054917705722 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44 [INJECTION WINDOW]
+  run 20261026T054958067361 agent=lead model=claude-sonnet-5.5 exit=0 secs=26 [INJECTION WINDOW]
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  inbox/20261026T055018639106-lead-7435.md
+  lead/inbox/20261026T055114787042-root-c881.md
+  (2 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 05:46:46 size 706 md5 72931fe5f7a8595287248073e557678c
+processes referencing the sandbox name (0):
+--- scheduler record after turn 6 at 2026-10-26T05:51:47Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 6 at 2026-10-26T05:51:47Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+2026-10-26/scheduler-38713-1792993428092.jsonl:{"v":1,"ts":"2026-10-26T05:46:41.905642+00:00","seq":15,"proc":"scheduler","pid":38713,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-39691-1792993672947.jsonl:{"v":1,"ts":"2026-10-26T05:50:24.446437+00:00","seq":15,"proc":"scheduler","pid":39691,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+(run.orphan lines):
+(turn 6 end per turn-times.txt:)
+turn 6: 05:50:52 - 05:51:23  1792993883-1792993852=31s  utc 2026-10-26T05:50:52Z - 2026-10-26T05:51:23Z  exit 0  sleep 20 ended utc 2026-10-26T05:51:43Z
+--- throttle/exit-75 scan after turn 6
+(end of scan)
+=== after turn 7  snapshot 2026-10-26T05:56:06Z (local 05:56:06)
+injection window (UTC, from window.txt): 2026-10-26T05:47:52 .. 2026-10-26T05:50:24
+org runs total: 24  (injection-window runs: 5; counted toward the 45 cap: 19)
+  lead                           claude-sonnet-5.5    14
+  lead/reviewer                  claude-sonnet-5.5    5
+  lead/writer                    claude-sonnet-5.5    5
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054348095433 agent=lead model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T054428385499 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054456655472 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054522978628 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=55
+  run 20261026T054613487445 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054752951814 agent=lead model=claude-sonnet-5.5 exit=0 secs=40 [INJECTION WINDOW]
+  run 20261026T054827195850 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32 [INJECTION WINDOW]
+  run 20261026T054855453202 agent=lead model=claude-sonnet-5.5 exit=0 secs=28 [INJECTION WINDOW]
+  run 20261026T054917705722 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44 [INJECTION WINDOW]
+  run 20261026T054958067361 agent=lead model=claude-sonnet-5.5 exit=0 secs=26 [INJECTION WINDOW]
+  run 20261026T055257615310 agent=lead model=claude-sonnet-5.5 exit=0 secs=42
+  run 20261026T055333880335 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T055402165944 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055426416595 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=39
+  run 20261026T055500857802 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 05:46:46 size 706 md5 72931fe5f7a8595287248073e557678c
+processes referencing the sandbox name (0):
+--- scheduler record after turn 7 at 2026-10-26T05:56:06Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 7 at 2026-10-26T05:56:07Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+2026-10-26/scheduler-38713-1792993428092.jsonl:{"v":1,"ts":"2026-10-26T05:46:41.905642+00:00","seq":15,"proc":"scheduler","pid":38713,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-39691-1792993672947.jsonl:{"v":1,"ts":"2026-10-26T05:50:24.446437+00:00","seq":15,"proc":"scheduler","pid":39691,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-41062-1792993977610.jsonl:{"v":1,"ts":"2026-10-26T05:55:29.302617+00:00","seq":15,"proc":"scheduler","pid":41062,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+(run.orphan lines):
+(turn 7 end per turn-times.txt:)
+turn 7: 05:52:06 - 05:55:42  1792994142-1792993926=216s  utc 2026-10-26T05:52:06Z - 2026-10-26T05:55:42Z  exit 0  sleep 20 ended utc 2026-10-26T05:56:02Z
+--- throttle/exit-75 scan after turn 7
+(end of scan)
+=== after turn 8  snapshot 2026-10-26T05:57:11Z (local 05:57:11)
+injection window (UTC, from window.txt): 2026-10-26T05:47:52 .. 2026-10-26T05:50:24
+org runs total: 24  (injection-window runs: 5; counted toward the 45 cap: 19)
+  lead                           claude-sonnet-5.5    14
+  lead/reviewer                  claude-sonnet-5.5    5
+  lead/writer                    claude-sonnet-5.5    5
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054348095433 agent=lead model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T054428385499 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054456655472 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054522978628 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=55
+  run 20261026T054613487445 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054752951814 agent=lead model=claude-sonnet-5.5 exit=0 secs=40 [INJECTION WINDOW]
+  run 20261026T054827195850 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32 [INJECTION WINDOW]
+  run 20261026T054855453202 agent=lead model=claude-sonnet-5.5 exit=0 secs=28 [INJECTION WINDOW]
+  run 20261026T054917705722 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44 [INJECTION WINDOW]
+  run 20261026T054958067361 agent=lead model=claude-sonnet-5.5 exit=0 secs=26 [INJECTION WINDOW]
+  run 20261026T055257615310 agent=lead model=claude-sonnet-5.5 exit=0 secs=42
+  run 20261026T055333880335 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T055402165944 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055426416595 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=39
+  run 20261026T055500857802 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 05:56:38 size 835 md5 41c11ea065fbb1bdce72f24feeb7cc0e
+processes referencing the sandbox name (0):
+--- scheduler record after turn 8 at 2026-10-26T05:57:11Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 8 at 2026-10-26T05:57:11Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+2026-10-26/scheduler-38713-1792993428092.jsonl:{"v":1,"ts":"2026-10-26T05:46:41.905642+00:00","seq":15,"proc":"scheduler","pid":38713,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-39691-1792993672947.jsonl:{"v":1,"ts":"2026-10-26T05:50:24.446437+00:00","seq":15,"proc":"scheduler","pid":39691,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-41062-1792993977610.jsonl:{"v":1,"ts":"2026-10-26T05:55:29.302617+00:00","seq":15,"proc":"scheduler","pid":41062,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+(run.orphan lines):
+(turn 8 end per turn-times.txt:)
+turn 8: 05:56:19 - 05:56:46  1792994206-1792994179=27s  utc 2026-10-26T05:56:19Z - 2026-10-26T05:56:46Z  exit 0  sleep 20 ended utc 2026-10-26T05:57:06Z
+--- throttle/exit-75 scan after turn 8
+(end of scan)
+=== after turn 9  snapshot 2026-10-26T06:00:49Z (local 06:00:49)
+injection window (UTC, from window.txt): 2026-10-26T05:47:52 .. 2026-10-26T05:50:24
+org runs total: 29  (injection-window runs: 5; counted toward the 45 cap: 24)
+  lead                           claude-sonnet-5.5    17
+  lead/reviewer                  claude-sonnet-5.5    6
+  lead/writer                    claude-sonnet-5.5    6
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054348095433 agent=lead model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T054428385499 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054456655472 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054522978628 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=55
+  run 20261026T054613487445 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054752951814 agent=lead model=claude-sonnet-5.5 exit=0 secs=40 [INJECTION WINDOW]
+  run 20261026T054827195850 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32 [INJECTION WINDOW]
+  run 20261026T054855453202 agent=lead model=claude-sonnet-5.5 exit=0 secs=28 [INJECTION WINDOW]
+  run 20261026T054917705722 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44 [INJECTION WINDOW]
+  run 20261026T054958067361 agent=lead model=claude-sonnet-5.5 exit=0 secs=26 [INJECTION WINDOW]
+  run 20261026T055257615310 agent=lead model=claude-sonnet-5.5 exit=0 secs=42
+  run 20261026T055333880335 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T055402165944 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055426416595 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=39
+  run 20261026T055500857802 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T055742113561 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055806301563 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=37
+  run 20261026T055836788300 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055859129668 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T055943504684 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 05:56:38 size 835 md5 41c11ea065fbb1bdce72f24feeb7cc0e
+processes referencing the sandbox name (0):
+--- scheduler record after turn 9 at 2026-10-26T06:00:49Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 9 at 2026-10-26T06:00:49Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+2026-10-26/scheduler-38713-1792993428092.jsonl:{"v":1,"ts":"2026-10-26T05:46:41.905642+00:00","seq":15,"proc":"scheduler","pid":38713,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-39691-1792993672947.jsonl:{"v":1,"ts":"2026-10-26T05:50:24.446437+00:00","seq":15,"proc":"scheduler","pid":39691,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-41062-1792993977610.jsonl:{"v":1,"ts":"2026-10-26T05:55:29.302617+00:00","seq":15,"proc":"scheduler","pid":41062,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-42538-1792994262108.jsonl:{"v":1,"ts":"2026-10-26T06:00:21.986565+00:00","seq":16,"proc":"scheduler","pid":42538,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+(run.orphan lines):
+(turn 9 end per turn-times.txt:)
+turn 9: 05:57:24 - 06:00:24  1792994424-1792994244=180s  utc 2026-10-26T05:57:24Z - 2026-10-26T06:00:24Z  exit 0  sleep 20 ended utc 2026-10-26T06:00:44Z
+--- throttle/exit-75 scan after turn 9
+(end of scan)
+=== after turn 10  snapshot 2026-10-26T06:01:50Z (local 06:01:50)
+injection window (UTC, from window.txt): 2026-10-26T05:47:52 .. 2026-10-26T05:50:24
+org runs total: 29  (injection-window runs: 5; counted toward the 45 cap: 24)
+  lead                           claude-sonnet-5.5    17
+  lead/reviewer                  claude-sonnet-5.5    6
+  lead/writer                    claude-sonnet-5.5    6
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054348095433 agent=lead model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T054428385499 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054456655472 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054522978628 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=55
+  run 20261026T054613487445 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054752951814 agent=lead model=claude-sonnet-5.5 exit=0 secs=40 [INJECTION WINDOW]
+  run 20261026T054827195850 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32 [INJECTION WINDOW]
+  run 20261026T054855453202 agent=lead model=claude-sonnet-5.5 exit=0 secs=28 [INJECTION WINDOW]
+  run 20261026T054917705722 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44 [INJECTION WINDOW]
+  run 20261026T054958067361 agent=lead model=claude-sonnet-5.5 exit=0 secs=26 [INJECTION WINDOW]
+  run 20261026T055257615310 agent=lead model=claude-sonnet-5.5 exit=0 secs=42
+  run 20261026T055333880335 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T055402165944 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055426416595 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=39
+  run 20261026T055500857802 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T055742113561 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055806301563 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=37
+  run 20261026T055836788300 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055859129668 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T055943504684 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 05:56:38 size 835 md5 41c11ea065fbb1bdce72f24feeb7cc0e
+  deliverables/memo-2026-10-12.md mtime 06:01:19 size 1000 md5 893b0535716c6b840f01408d9bd2af0f
+processes referencing the sandbox name (0):
+--- scheduler record after turn 10 at 2026-10-26T06:01:50Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 10 at 2026-10-26T06:01:50Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+2026-10-26/scheduler-38713-1792993428092.jsonl:{"v":1,"ts":"2026-10-26T05:46:41.905642+00:00","seq":15,"proc":"scheduler","pid":38713,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-39691-1792993672947.jsonl:{"v":1,"ts":"2026-10-26T05:50:24.446437+00:00","seq":15,"proc":"scheduler","pid":39691,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-41062-1792993977610.jsonl:{"v":1,"ts":"2026-10-26T05:55:29.302617+00:00","seq":15,"proc":"scheduler","pid":41062,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-42538-1792994262108.jsonl:{"v":1,"ts":"2026-10-26T06:00:21.986565+00:00","seq":16,"proc":"scheduler","pid":42538,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+(run.orphan lines):
+(turn 10 end per turn-times.txt:)
+turn 10: 06:01:05 - 06:01:26  1792994486-1792994465=21s  utc 2026-10-26T06:01:05Z - 2026-10-26T06:01:26Z  exit 0  sleep 20 ended utc 2026-10-26T06:01:46Z
+--- throttle/exit-75 scan after turn 10
+(end of scan)
+=== after turn 11  snapshot 2026-10-26T06:05:18Z (local 06:05:18)
+injection window (UTC, from window.txt): 2026-10-26T05:47:52 .. 2026-10-26T05:50:24
+org runs total: 34  (injection-window runs: 5; counted toward the 45 cap: 29)
+  lead                           claude-sonnet-5.5    20
+  lead/reviewer                  claude-sonnet-5.5    7
+  lead/writer                    claude-sonnet-5.5    7
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054348095433 agent=lead model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T054428385499 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054456655472 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054522978628 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=55
+  run 20261026T054613487445 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054752951814 agent=lead model=claude-sonnet-5.5 exit=0 secs=40 [INJECTION WINDOW]
+  run 20261026T054827195850 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32 [INJECTION WINDOW]
+  run 20261026T054855453202 agent=lead model=claude-sonnet-5.5 exit=0 secs=28 [INJECTION WINDOW]
+  run 20261026T054917705722 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44 [INJECTION WINDOW]
+  run 20261026T054958067361 agent=lead model=claude-sonnet-5.5 exit=0 secs=26 [INJECTION WINDOW]
+  run 20261026T055257615310 agent=lead model=claude-sonnet-5.5 exit=0 secs=42
+  run 20261026T055333880335 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T055402165944 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055426416595 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=39
+  run 20261026T055500857802 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T055742113561 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055806301563 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=37
+  run 20261026T055836788300 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055859129668 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T055943504684 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T060219980910 agent=lead model=claude-sonnet-5.5 exit=0 secs=36
+  run 20261026T060242167650 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T060312496478 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T060334804996 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=49
+  run 20261026T060417265192 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 05:56:38 size 835 md5 41c11ea065fbb1bdce72f24feeb7cc0e
+  deliverables/memo-2026-10-12.md mtime 06:01:19 size 1000 md5 893b0535716c6b840f01408d9bd2af0f
+processes referencing the sandbox name (0):
+--- scheduler record after turn 11 at 2026-10-26T06:05:18Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 11 at 2026-10-26T06:05:18Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+2026-10-26/scheduler-38713-1792993428092.jsonl:{"v":1,"ts":"2026-10-26T05:46:41.905642+00:00","seq":15,"proc":"scheduler","pid":38713,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-39691-1792993672947.jsonl:{"v":1,"ts":"2026-10-26T05:50:24.446437+00:00","seq":15,"proc":"scheduler","pid":39691,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-41062-1792993977610.jsonl:{"v":1,"ts":"2026-10-26T05:55:29.302617+00:00","seq":15,"proc":"scheduler","pid":41062,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-42538-1792994262108.jsonl:{"v":1,"ts":"2026-10-26T06:00:21.986565+00:00","seq":16,"proc":"scheduler","pid":42538,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-44012-1792994539974.jsonl:{"v":1,"ts":"2026-10-26T06:04:49.651176+00:00","seq":15,"proc":"scheduler","pid":44012,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+(run.orphan lines):
+(turn 11 end per turn-times.txt:)
+turn 11: 06:02:02 - 06:04:54  1792994694-1792994522=172s  utc 2026-10-26T06:02:02Z - 2026-10-26T06:04:54Z  exit 0  sleep 20 ended utc 2026-10-26T06:05:14Z
+--- throttle/exit-75 scan after turn 11
+(end of scan)
+=== after turn 12  snapshot 2026-10-26T06:08:55Z (local 06:08:55)
+injection window (UTC, from window.txt): 2026-10-26T05:47:52 .. 2026-10-26T05:50:24
+org runs total: 39  (injection-window runs: 5; counted toward the 45 cap: 34)
+  lead                           claude-sonnet-5.5    23
+  lead/reviewer                  claude-sonnet-5.5    8
+  lead/writer                    claude-sonnet-5.5    8
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054348095433 agent=lead model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T054428385499 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054456655472 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054522978628 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=55
+  run 20261026T054613487445 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054752951814 agent=lead model=claude-sonnet-5.5 exit=0 secs=40 [INJECTION WINDOW]
+  run 20261026T054827195850 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32 [INJECTION WINDOW]
+  run 20261026T054855453202 agent=lead model=claude-sonnet-5.5 exit=0 secs=28 [INJECTION WINDOW]
+  run 20261026T054917705722 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44 [INJECTION WINDOW]
+  run 20261026T054958067361 agent=lead model=claude-sonnet-5.5 exit=0 secs=26 [INJECTION WINDOW]
+  run 20261026T055257615310 agent=lead model=claude-sonnet-5.5 exit=0 secs=42
+  run 20261026T055333880335 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T055402165944 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055426416595 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=39
+  run 20261026T055500857802 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T055742113561 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055806301563 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=37
+  run 20261026T055836788300 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055859129668 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T055943504684 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T060219980910 agent=lead model=claude-sonnet-5.5 exit=0 secs=36
+  run 20261026T060242167650 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T060312496478 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T060334804996 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=49
+  run 20261026T060417265192 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T060547757416 agent=lead model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T060622019449 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T060650313122 agent=lead model=claude-sonnet-5.5 exit=0 secs=39
+  run 20261026T060718792191 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=40
+  run 20261026T060753179556 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  (0 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 05:56:38 size 835 md5 41c11ea065fbb1bdce72f24feeb7cc0e
+  deliverables/memo-2026-10-12.md mtime 06:01:19 size 1000 md5 893b0535716c6b840f01408d9bd2af0f
+  deliverables/memo-2026-10-19.md mtime 06:08:26 size 1046 md5 b3b4da71800fb3f05d1fabcd42953708
+processes referencing the sandbox name (0):
+--- scheduler record after turn 12 at 2026-10-26T06:08:56Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 12 at 2026-10-26T06:08:56Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+2026-10-26/scheduler-38713-1792993428092.jsonl:{"v":1,"ts":"2026-10-26T05:46:41.905642+00:00","seq":15,"proc":"scheduler","pid":38713,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-39691-1792993672947.jsonl:{"v":1,"ts":"2026-10-26T05:50:24.446437+00:00","seq":15,"proc":"scheduler","pid":39691,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-41062-1792993977610.jsonl:{"v":1,"ts":"2026-10-26T05:55:29.302617+00:00","seq":15,"proc":"scheduler","pid":41062,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-42538-1792994262108.jsonl:{"v":1,"ts":"2026-10-26T06:00:21.986565+00:00","seq":16,"proc":"scheduler","pid":42538,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-44012-1792994539974.jsonl:{"v":1,"ts":"2026-10-26T06:04:49.651176+00:00","seq":15,"proc":"scheduler","pid":44012,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-45125-1792994747751.jsonl:{"v":1,"ts":"2026-10-26T06:08:23.577450+00:00","seq":15,"proc":"scheduler","pid":45125,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+(run.orphan lines):
+(turn 12 end per turn-times.txt:)
+turn 12: 06:05:28 - 06:08:31  1792994911-1792994728=183s  utc 2026-10-26T06:05:28Z - 2026-10-26T06:08:31Z  exit 0  sleep 20 ended utc 2026-10-26T06:08:51Z
+--- throttle/exit-75 scan after turn 12
+(end of scan)
+=== after turn 13  snapshot 2026-10-26T06:09:51Z (local 06:09:51)
+injection window (UTC, from window.txt): 2026-10-26T05:47:52 .. 2026-10-26T05:50:24
+org runs total: 39  (injection-window runs: 5; counted toward the 45 cap: 34)
+  lead                           claude-sonnet-5.5    23
+  lead/reviewer                  claude-sonnet-5.5    8
+  lead/writer                    claude-sonnet-5.5    8
+  run 20261026T053719224445 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T053743397026 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053809637805 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T053831885334 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=53
+  run 20261026T053920402796 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T053950729322 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054016997935 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054039235462 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T054117578202 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T054348095433 agent=lead model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T054428385499 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054456655472 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T054522978628 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=55
+  run 20261026T054613487445 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T054752951814 agent=lead model=claude-sonnet-5.5 exit=0 secs=40 [INJECTION WINDOW]
+  run 20261026T054827195850 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32 [INJECTION WINDOW]
+  run 20261026T054855453202 agent=lead model=claude-sonnet-5.5 exit=0 secs=28 [INJECTION WINDOW]
+  run 20261026T054917705722 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=44 [INJECTION WINDOW]
+  run 20261026T054958067361 agent=lead model=claude-sonnet-5.5 exit=0 secs=26 [INJECTION WINDOW]
+  run 20261026T055257615310 agent=lead model=claude-sonnet-5.5 exit=0 secs=42
+  run 20261026T055333880335 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T055402165944 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055426416595 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=39
+  run 20261026T055500857802 agent=lead model=claude-sonnet-5.5 exit=0 secs=28
+  run 20261026T055742113561 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055806301563 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=37
+  run 20261026T055836788300 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T055859129668 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=48
+  run 20261026T055943504684 agent=lead model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T060219980910 agent=lead model=claude-sonnet-5.5 exit=0 secs=36
+  run 20261026T060242167650 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=38
+  run 20261026T060312496478 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T060334804996 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=49
+  run 20261026T060417265192 agent=lead model=claude-sonnet-5.5 exit=0 secs=32
+  run 20261026T060547757416 agent=lead model=claude-sonnet-5.5 exit=0 secs=44
+  run 20261026T060622019449 agent=lead/writer model=claude-sonnet-5.5 exit=0 secs=30
+  run 20261026T060650313122 agent=lead model=claude-sonnet-5.5 exit=0 secs=39
+  run 20261026T060718792191 agent=lead/reviewer model=claude-sonnet-5.5 exit=0 secs=40
+  run 20261026T060753179556 agent=lead model=claude-sonnet-5.5 exit=0 secs=30
+open items (files in inbox/ dirs and inflight/ dirs, excluding root read/sent):
+  lead/inbox/20261026T060923498621-root-ac96.md
+  (1 item(s))
+running.json: {} 
+scheduler.exit: finished: no open tasks 
+deliverables/:
+  deliverables/memo-2026-10-05.md mtime 05:56:38 size 835 md5 41c11ea065fbb1bdce72f24feeb7cc0e
+  deliverables/memo-2026-10-12.md mtime 06:01:19 size 1000 md5 893b0535716c6b840f01408d9bd2af0f
+  deliverables/memo-2026-10-19.md mtime 06:08:26 size 1046 md5 b3b4da71800fb3f05d1fabcd42953708
+processes referencing the sandbox name (0):
+--- scheduler record after turn 13 at 2026-10-26T06:09:51Z
+scheduler.pid: (no file)
+scheduler.exit: finished: no open tasks 
+processes referencing the sandbox name:
+(none)
+--- signal record after turn 13 at 2026-10-26T06:09:51Z: every scheduler.signal line now in S/org/.runtime/events/ (cumulative)
+(scheduler.signal lines):
+(scheduler.exit lines):
+2026-10-26/scheduler-36690-1792993039221.jsonl:{"v":1,"ts":"2026-10-26T05:41:47.950644+00:00","seq":25,"proc":"scheduler","pid":36690,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":9}
+2026-10-26/scheduler-38713-1792993428092.jsonl:{"v":1,"ts":"2026-10-26T05:46:41.905642+00:00","seq":15,"proc":"scheduler","pid":38713,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-39691-1792993672947.jsonl:{"v":1,"ts":"2026-10-26T05:50:24.446437+00:00","seq":15,"proc":"scheduler","pid":39691,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-41062-1792993977610.jsonl:{"v":1,"ts":"2026-10-26T05:55:29.302617+00:00","seq":15,"proc":"scheduler","pid":41062,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-42538-1792994262108.jsonl:{"v":1,"ts":"2026-10-26T06:00:21.986565+00:00","seq":16,"proc":"scheduler","pid":42538,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-44012-1792994539974.jsonl:{"v":1,"ts":"2026-10-26T06:04:49.651176+00:00","seq":15,"proc":"scheduler","pid":44012,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+2026-10-26/scheduler-45125-1792994747751.jsonl:{"v":1,"ts":"2026-10-26T06:08:23.577450+00:00","seq":15,"proc":"scheduler","pid":45125,"kind":"scheduler.exit","actor":"runtime","run":null,"trace":null,"reason":"finished: no open tasks","runs_started":5}
+(run.orphan lines):
+(turn 13 end per turn-times.txt:)
+turn 13: 06:09:07 - 06:09:27  1792994967-1792994947=20s  utc 2026-10-26T06:09:07Z - 2026-10-26T06:09:27Z  exit 0  sleep 20 ended utc 2026-10-26T06:09:47Z
+--- throttle/exit-75 scan after turn 13
+(end of scan)

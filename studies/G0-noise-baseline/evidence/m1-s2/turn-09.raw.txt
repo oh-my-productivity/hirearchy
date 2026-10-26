@@ -1,0 +1,9 @@
+The 2026-10-12 memo is drafted and the reviewer passed 8 of 8, but I need five answers from you before I copy it. It's 212 words, with the Summary line first, then 4 decisions and 5 action rows.
+
+1. **Lee's pager swap:** it's in both Decisions and the table. Keep both, or in one place only? My suggestion is the table only. The notes say "nobody had a problem", not that it was decided.
+2. **Sam's staging test data:** he "will probably sort it out himself". Count it as a commitment? The draft does and marks it hedged. My suggestion is to keep it.
+3. **Sam's Due:** I'd keep 2026-10-21. The notes say "ready the day before the freeze starts", and the freeze starts 22 October. Is that right?
+4. **Lee's Due:** it's `none`, because the notes only say "demo week". Keep `none`, or use a date?
+5. **"Notes on unclear items" section:** it sits below the table and is neither summary, decisions nor actions. Keep it, or drop it? My suggestion is to drop it, and the table cells already carry the hedges.
+
+If any answer changes the memo, the rework needs about 5 more runs. This memo has used 5 of its 12, so that fits in the approved budget.

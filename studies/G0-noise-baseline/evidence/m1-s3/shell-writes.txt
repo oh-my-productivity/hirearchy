@@ -1,0 +1,55 @@
+# shell writes (protocol 7.2): every execute_bash call of the assistant; facts only
+
+[2026-10-26T08:44:57.111Z] call #27 turn 5 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: mkdir -p /tmp/hirearchy-g0-m1-s3-1793003475/deliverables && cp /private/tmp/hirearchy-g0-m1-s3-1793003475/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s3-1793003475/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-g0-m1-s3-1793003475/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s3-1793003475/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-g0-m1-s3-1793003475/deliverables/memo-2026-10-05.md
+RESULT: Output:
+     277 /tmp/hirearchy-g0-m1-s3-1793003475/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T08:52:21.484Z] call #36 turn 7 status=failed flags=['touches S/org']
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s3-1793003475 && cat deliverables/memo-2026-10-05.md; echo ======; cat org/lead/writer/work/memo-2026-10-05.md; ls -la deliverables
+RESULT: Output:
+# Memo: Platform team weekly, Monday 2026-10-05
+
+Present: Priya, Sam, Lee, Marta, Dev. Meeting closed at 10:55. Next meeting: Monday 2026-10-12.
+
+## Decisions
+
+1. **API gateway migration pushed to the week of 26 October.** Two of the five services still fail the contract tests, mostly because of header casing, and nobody was comfortable cutting over in the week of 12 October. The extra time goes to the failing services.
+2. **Adopt Renovate** with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable. Reason: three incidents this quarter traced back to stale libraries.
+
+## Action items
+
+| Owner | Action | Due |
+|---|---|---|
+| Priya | Draft the RFC for the new per-key rate limiter, so the team can review it at the following meeting | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos (app install on the organisation) | 2026-10-08 |
+| Sam | Look into the flaky CI (main pipeline fails roughly one run in eight without code change; he suspects the shared build cache) before Friday | 2026-10-09 |
+| Marta | Book the on-call training room for Oct 14 (fits eight people, with a screen; for the two newest engineers) | 2026-10-14 |
+| Lee | Ping the identity vendor about the SSO certificate renewal (expires end of the month) this week and report back; no hard date attached | none |
+
+Assumptions: Sam's Due (2026-10-09) and Marta's Due (2026-10-14) are dates provided by the client, not stated as deadlines 
+
+[2026-10-26T09:05:07.994Z] call #56 turn 9 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s3-1793003475 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md && ls deliverables
+RESULT: Output:
+     279 deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-26T09:13:09.997Z] call #70 turn 11 status=completed flags=['writes into the deliverable folder', 'touches S/org']
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s3-1793003475 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && wc -w deliverables/memo-2026-10-19.md && head -c 40 deliverables/memo-2026-10-19.md && ls deliverables
+RESULT: Output:
+     232 deliverables/memo-2026-10-19.md
+Summary: The team agreed to go ahead witmemo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+

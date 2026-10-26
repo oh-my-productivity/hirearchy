@@ -1,0 +1,56 @@
+mission: >
+  Every week, turn the platform team's meeting notes into a short memo that says what was decided and who does what.
+  The memo is for the team lead and the team. It is written only from the notes file of that meeting.
+needs:
+  kind: writing
+  scope: "One memo per weekly team meeting, written from that meeting's notes file only: the decisions taken and the action items (who does what, by when). Nothing else from the notes (discussion, background) and nothing from outside the notes."
+  inputs:
+    - /tmp/hirearchy-g0-m1-s1-1792992820/notes
+  quality_bar: Every statement comes from the notes file; every decision and every commitment in it is in the memo.
+  sources: Only the files in the notes folder; no web.
+  budget_runs: 12
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {name: writer, template: writer}
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]
+services:
+  - name: weekly-memo
+    owner: lead
+    description: One short memo (decisions and action items) from one meeting's notes file
+    inputs:
+      - name: notes_file
+        description: File name of the meeting notes in the notes folder, for example 2026-10-05.md
+        required: true
+    acceptance:
+      - Covers only the meeting in the requested notes file and nothing else.
+      - At most 400 words as counted by read.
+      - Besides a title line with the meeting date, the memo has exactly two sections, titled "Decisions" and "Action items".
+      - "Decisions lists every decision recorded in the notes file, and no decision that is not in it."
+      - "Action items is a markdown table with the columns Owner | Action | Due, with one row for every commitment in the notes, including informal ones made in prose (someone said they would do something), not only lines labelled ACTION."
+      - "Every row has a named person as Owner."
+      - "Due is an ISO date (YYYY-MM-DD). A vague deadline ('before Friday', 'next week') becomes an ISO date only when the notes make the date clear, and the original wording is kept in the Action cell; otherwise Due is 'none'. No date is ever invented."
+      - Every statement is traceable to the notes file.
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: One markdown memo named memo-<meeting date>.md
+      format: markdown
+      max_words: 400
+      path: /tmp/hirearchy-g0-m1-s1-1792992820/deliverables
+    budget: 12
+    locked: false
+task:
+  service: weekly-memo
+  inputs:
+    notes_file: 2026-10-05.md
+  title: Memo for the 5 October 2026 meeting

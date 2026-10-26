@@ -1,0 +1,14 @@
+The 2026-10-12 memo is at `/tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-12.md`, and I checked it matches the team's file.
+
+- **Word limit:** met. It's 203 words by `wc`, and the team counted 171.
+- **Order (Summary line, Decisions, then the action table):** met.
+- **Decisions section:** met, with 3 decisions and Lee's pager swap now only in the table.
+- **Action table (Owner | Action | Due, informal items included):** met, with 5 rows.
+- **Due dates in ISO format:** met. Sam is 2026-10-21 and Lee is `none`.
+- **Traceable to the notes, nothing invented:** met.
+- **Reviewer check:** met. It reported 7 of 7 reviewable criteria and no required changes.
+- **Only summary, decisions and who does what (C9):** strictly unmet. The "Notes on unclear items" section you chose to keep goes beyond that. You approved it, so I delivered it, but the contract itself hasn't changed.
+
+This memo used 10 runs, within the 12 approved. The unrequested rework from earlier is still counted separately at 5 runs.
+
+Keep it, or is there anything you'd like changed?

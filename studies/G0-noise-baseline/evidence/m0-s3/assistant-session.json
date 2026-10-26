@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_9f42e7e8-f372-470a-8942-9a9890a3f317",
+  "title": "Generate Weekly Team Memos From Notes",
+  "agentMode": "hirearchy-study-g0-m0-s3-assistant",
+  "workspacePaths": [
+    "/private/tmp/hirearchy-g0-m0-s3-1793000481"
+  ],
+  "rootPaths": [
+    "/private/tmp/hirearchy-g0-m0-s3-1793000481"
+  ],
+  "createdAt": "2026-10-26T07:42:06.952Z",
+  "lastModifiedAt": "2026-10-26T08:27:18.947Z",
+  "modelId": "claude-sonnet-5.5",
+  "autopilot": true,
+  "effortLevel": "high",
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-sonnet-5.5",
+    "display": "Claude Sonnet 5.5"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "read_write",
+    "reflection": true
+  },
+  "memoryConfigSource": "explicit",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "read_write",
+          "reflection": true
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

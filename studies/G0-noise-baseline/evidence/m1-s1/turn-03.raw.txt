@@ -1,0 +1,10 @@
+The team is built and running. I'll wait for it to finish.The memo for 5 October is written and reviewed, and it passed all 8 checks. The reviewer also verified 13 of 13 factual claims. I haven't copied it to `deliverables` yet because four points are yours to decide:
+
+1. **Sam, "look into the flaky CI before Friday".** Friday is 9 Oct, but "before Friday" could mean 8 or 9 Oct. The memo currently has Due = none and keeps the wording. Should it say 2026-10-09, 2026-10-08, or stay none?
+2. **Marta, "book the on-call training room for Oct 14".** Oct 14 is the date of the training, not clearly the deadline for booking. The memo currently has Due = none and says so. Should the due date be 2026-10-14, or stay none?
+3. **Lee, "ping the vendor this week and report back, no hard date attached".** The notes say there is no hard date, so the memo has Due = none. Is that right?
+4. **Lee and the vendor.** "We agreed Lee would ping the vendor" could count as a decision as well as an action. The memo lists it only as an action item. Should it also appear under Decisions?
+
+The memo as it stands has two decisions (gateway migration pushed to the week of 26 October, and Renovate adopted) and five action items. Priya's is due 2026-10-09 and Dev's 2026-10-08. The other three have no due date.
+
+Reply with your choice for each, or "as it is" to keep the memo as written. Any change goes back to the team as a rework. It uses runs beyond the 12 you approved, so I'd ask you before sending it.

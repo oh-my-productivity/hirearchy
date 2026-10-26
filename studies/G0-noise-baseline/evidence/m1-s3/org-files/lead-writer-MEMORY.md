@@ -1,0 +1,4 @@
+# Memory
+- Memos done: 2026-10-05 (276w), 2026-10-12 (246w, reworked), 2026-10-19 (199w, reworked: title removed so file starts with Summary:, Marta 'keep agenda' row dropped; lead/writer/work/memo-2026-10-19.md, reported done).
+- Conventions: memo starts with 'Summary:' line (no title heading, per client). 'before Friday' -> Thursday date, derivation in Open questions; 'end of next week' -> Friday date, derivation in Open questions; 'for Oct N' (event date) or 'no hard date' -> Due none unless notes give a deadline. Notes only. Use the notes' own words ('offered to', 'would rather'), never stronger. Prose commitments ('will keep', 'offered to', 'said he'd') are rows, except client said 'keep the agenda as sent' is not an action (decision bullet only).
+- Waiting for: nothing. If revision arrives, change minimally.

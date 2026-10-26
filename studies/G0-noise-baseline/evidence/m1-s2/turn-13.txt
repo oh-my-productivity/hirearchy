@@ -1,0 +1,20 @@
+######## TURN 13  start 07:32:31  end 07:36:07  elapsed 216s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T07:32:31Z end 2026-10-26T07:36:07Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, nothing for Marta to do there, leave it out. Lee's should be 2026-10-30. Yes, that counts. Sam's should be none. Keep it as it is.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-13.stderr.txt):
+The 2026-10-19 memo is at `/tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-19.md`, and I checked it matches the team's file.
+
+- **Word limit:** met. It's 157 words by `wc`, and the team counted 127.
+- **Order (Summary line, Decisions, then the action table):** met.
+- **Decisions section:** met, with 3 decisions.
+- **Action table (Owner | Action | Due, informal items included):** met, with 5 rows. Marta's "keep the agenda" row is gone and Sam's pairing is kept.
+- **Due dates in ISO format:** met. Lee is 2026-10-30 and Sam is `none`.
+- **Traceable to the notes, nothing invented:** met.
+- **Only the summary, decisions and who does what (C9):** met.
+- **Reviewer check:** met. It reported 8 of 8 and no required changes.
+
+This memo used 10 runs, within the 12 approved. Across all three memos:
+- **Your requests:** 29 runs (19 + 10), counting the 5 extra runs you OK'd for the first memo.
+- **The unrequested rework:** 5 more runs, which I'm reporting as my own spend.
+
+All three memos are now in `deliverables/`. Keep this one, or is there anything you'd like changed?

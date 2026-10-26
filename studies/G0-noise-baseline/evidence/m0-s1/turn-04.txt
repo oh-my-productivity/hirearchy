@@ -1,0 +1,20 @@
+######## TURN 4  start 04:58:43  end 05:01:48  elapsed 185s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T04:58:43Z end 2026-10-26T05:01:48Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's should be 2026-10-09. Lee's should be none. Keep it as it is. No, it's just an action, not a decision. Keep it as it is.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+Your memo is at `/tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-05.md`. The copy matches the team's file.
+
+I checked it against the notes and all ten criteria are met:
+- **Scope:** it covers only the 5 October meeting.
+- **Length:** 304 words by `wc` (the team counted 269), under the 400 limit.
+- **Sections:** Decisions, Action items and Open or tentative items.
+- **Decisions:** both are in: the gateway migration moves to the week of 26 October, and the team adopts Renovate.
+- **Action items:** all five commitments are in the table, including the ones said in prose. Sam's is 2026-10-09 and Lee's is none, as you decided.
+- **Format and names:** the table columns are Owner | Action | Due, and names match the notes.
+- **Review:** the reviewer passed 9 of 9 criteria with every factual claim verified.
+
+The memo still has a title and "Present:" and "Next meeting:" lines outside the three sections, as you chose.
+
+The case used 10 runs, within the 12 you set. The first pass took 5 and your corrections took 5 more.
+
+For next week, ask me for the weekly-meeting-memo with the new file name (for example `2026-10-12.md`). Say so if you'd like this turned into a standing instruction. The team only runs when you ask. Do you want to keep this memo as it is, or change anything?

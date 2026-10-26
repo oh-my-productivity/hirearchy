@@ -1,0 +1,1 @@
+env KIRO_HOME=/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-g0-m0-s2-assistant Marta\''s should be 2026-10-14. Sam'\''s 2026-10-09 is right. Yes, leave Lee'\''s vendor ping as an action only. Keep it as it is. Yes, leave both out.'

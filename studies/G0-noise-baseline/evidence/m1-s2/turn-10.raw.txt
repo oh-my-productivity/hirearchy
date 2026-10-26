@@ -1,0 +1,9 @@
+The 2026-10-12 memo is ready with all your changes (171 words, reviewer passed 7 of 7). One question remains before I copy it.
+
+- Lee's pager swap is out of Decisions and stays in the table.
+- Sam's row has no hedge, and his Due is 2026-10-21.
+- Lee's Due is `none`.
+
+The reviewer flagged a leftover from your last answer. I read your "keep it as it is" as keeping the "Notes on unclear items" section below the table. It has two bullets, one explaining Sam's 2026-10-21 and one explaining Lee's `none`. The contract (C9) says a memo contains only the summary, decisions and who does what. The reviewer says a strict reading would exclude that section.
+
+Did you mean to keep that section? If yes, I deliver the memo as it is. The contract still says "only", so future memos may need that exception added. If no, removing it takes about 5 more runs. This memo is at 10 of 12, so that would go past the approved number.

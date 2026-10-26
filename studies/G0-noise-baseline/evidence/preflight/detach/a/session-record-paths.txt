@@ -1,0 +1,2 @@
+kiro-home/sessions/8c6d026379875f97/sess_1c559e0c-c8b2-47b1-83eb-36667ce34848/messages.jsonl
+kiro-home/sessions/8c6d026379875f97/sess_1c559e0c-c8b2-47b1-83eb-36667ce34848/session.json

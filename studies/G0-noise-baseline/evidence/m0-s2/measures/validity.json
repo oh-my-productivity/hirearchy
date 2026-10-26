@@ -1,0 +1,4 @@
+{
+ "valid": false,
+ "reason": "INVALID from turn 7 under H7 (manager-decision-m0-s2-validity.md, ruling (b), no replacement): L-KEEP answered the turn-7 question that D17 settles, then turn 9 rejected on that point. This column shows whole-stream values for the record only; the values before the failure (turns 1-6) are in STUDY.md and are not pooled."
+}

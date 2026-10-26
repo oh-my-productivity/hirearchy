@@ -1,0 +1,2 @@
+KIRO_HOME=/tmp/hirearchy-g0-m0home-preflight-1792989639/.kiro kiro-cli whoami </dev/null at 2026-10-26T04:40:51Z: first line (recorded only if it starts with 'Authenticated'):
+Authenticated with API key

@@ -1,0 +1,13 @@
+I've read the first set of notes, and this works as a standing weekly service. You'd ask for it each week with that meeting's notes file. Reply "defaults" to accept everything I've proposed, or change any item.
+
+1. **Weekly input.** Each week you tell me which notes file to use, for example `2026-10-19.md`. The notes folder, the memo format and the memo location stay fixed. Is the notes folder `/tmp/hirearchy-g0-m0-s3-1793000481/notes` the right one to keep reading from?
+2. **Memo.** Default: markdown, at most 400 words, with two sections, "Decisions" and "Who does what". Each owner line gives the person, the task and the due date. I'll save each memo in a new folder called `deliverables` here, named after the meeting date, such as `deliverables/memo-2026-10-05.md`.
+3. **Informal commitments.** Your notes mix items labelled "ACTION:" with commitments buried in prose. In the 5 Oct notes, Sam says he'll look into the flaky CI "before Friday", and Lee will ping the vendor "this week" with no hard date. Default: every commitment counts, labelled or not, so Sam and Lee would be listed.
+4. **Vague dates.** Default: turn them into a real date using the meeting date, so Sam's task becomes "by Fri 9 Oct" and Lee's becomes "week of 5 Oct". Where there is no date, as with Lee's hard date, the memo says "no date set" and doesn't guess. Do you prefer to leave such dates exactly as written?
+5. **Sources.** Only your notes files, with no web.
+6. **Checks.** The memo must:
+   - include every decision in the notes;
+   - include every commitment, with its owner;
+   - add nothing that isn't in the notes;
+   - stay within the word limit.
+7. **Review and approval.** A second agent checks the memo against your notes before you see it. You approve the plan before anything is built. After that, each weekly request runs without further approval, within the per-request run budget I'll show in the plan.

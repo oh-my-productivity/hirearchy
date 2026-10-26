@@ -1,0 +1,8 @@
+The memo now passes all 6 reviewer checks, with Sam on 2026-10-09 and Marta on 2026-10-14. I haven't copied it to `deliverables/` yet because of one question.
+
+The memo ends with the line "Notes on dates: Sam's and Marta's dates were confirmed by the client. Lee's task has no hard date." The "client" sentence isn't from your meeting notes, and your team would see it in the memo. Do you want it removed?
+
+- **Keep it as is:** I deliver now, at no extra cost. The case has used 14 runs, which is the 14 you approved.
+- **Remove the sentence:** this takes another writer edit and a reviewer re-check, about 5 more runs (about 19 in all). I'd need your OK for that.
+
+Which would you like?

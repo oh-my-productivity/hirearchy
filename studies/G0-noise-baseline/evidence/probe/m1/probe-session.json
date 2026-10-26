@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_8384846b-8864-4164-bed5-6d4015f8f8fa",
+  "title": "Kiro Skills and Capabilities Overview",
+  "agentMode": "hirearchy-study-g0-probe-m1",
+  "workspacePaths": [
+    "/private/tmp/hirearchy-g0-probe-m1-1792989560"
+  ],
+  "rootPaths": [
+    "/private/tmp/hirearchy-g0-probe-m1-1792989560"
+  ],
+  "createdAt": "2026-10-26T04:39:52.950Z",
+  "lastModifiedAt": "2026-10-26T04:39:56.229Z",
+  "modelId": "claude-sonnet-5.5",
+  "autopilot": true,
+  "effortLevel": "high",
+  "contextSnapshotModelDisplay": {
+    "modelId": "claude-sonnet-5.5",
+    "display": "Claude Sonnet 5.5"
+  },
+  "semanticReviewEnabled": true,
+  "disableAutoCompaction": false,
+  "ftaEnabled": false,
+  "workflowsEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "memoryConfig": {
+    "mode": "read_write",
+    "reflection": true
+  },
+  "memoryConfigSource": "explicit",
+  "status": "idle",
+  "_meta": {
+    "kiro": {
+      "settings": {
+        "memory": {
+          "mode": "read_write",
+          "reflection": true
+        },
+        "workflows": {
+          "enabled": false
+        },
+        "goal": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

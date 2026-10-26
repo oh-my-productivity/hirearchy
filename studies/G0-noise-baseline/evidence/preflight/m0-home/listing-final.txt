@@ -1,0 +1,49 @@
+# M0 preflight home listing before deletion 2026-10-26T04:48:03Z
+M0H /tmp/hirearchy-g0-m0home-preflight-1792989639
+.
+./agents
+./agents/hirearchy-study-g0-probe-m0.json
+./enterprise-management
+./enterprise-management/a7a3c3a001a89685c589b8c4c142f69567cab8c1ff7603316d990c258754c39c
+./logs
+./logs/20261026T044059897
+./memories
+./memories/memories.db
+./session-index
+./session-index/23c197fa16c2b698.jsonl
+./sessions
+./sessions/23c197fa16c2b698
+./settings
+./settings/cli.json
+./settings/cli.json.lock
+./settings/session-response-indexing.json
+./settings/survey_state.json
+./settings/workflow_survey_state.json
+./skills
+./skills/agents
+./skills/autoresearch
+./skills/commit
+./skills/dubbing
+./skills/gmail
+./skills/hirearchy
+./skills/music
+./skills/onboarding
+./skills/realtime
+./skills/reverse-engineer-anything
+./skills/setup-api-key
+./skills/skill-generation
+./skills/sound-effects
+./skills/speech-engine
+./skills/speech-to-text
+./skills/test-driven-development
+./skills/text-to-speech
+./skills/update-skills-from-changelog
+./skills/voice-changer
+./skills/voice-isolator
+./skills/workflow-suggest
+== any credential-like file names (secrets.json, auth, token, mcp.json*):
+(end)
+total 56
+drwx------@  3 aminalizadeh  wheel     96 Oct 26 04:41 .
+drwx------@ 10 aminalizadeh  wheel    320 Oct 26 04:41 ..
+-rw-------@  1 aminalizadeh  wheel  28672 Oct 26 04:41 memories.db

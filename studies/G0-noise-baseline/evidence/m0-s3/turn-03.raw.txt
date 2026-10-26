@@ -1,0 +1,31 @@
+The team is built and running on the 2026-10-05 memo, with a planned ceiling of 12 runs. I'll wait for it now.The memo is drafted and passed review, 7 of 7 checks, using 5 of 12 runs. I haven't copied it to `deliverables` yet. The reviewer flagged four judgment calls, and I need your answers first.
+
+Here is the draft:
+
+```
+# Memo: Platform team weekly, 2026-10-05
+
+Attendees: Priya, Sam, Lee, Marta, Dev.
+
+## Decisions
+- Push the API gateway migration to the week of 26 October, using the extra time for the failing services.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos and widening later if the noise is acceptable.
+
+## Action items
+| Owner | Action | Due |
+| Priya | Draft the RFC for the new per-key rate limiter | 2026-10-09 |
+| Dev   | Enable Renovate on the three core repos | 2026-10-08 |
+| Sam   | Look into the flaky CI | 2026-10-08 |
+| Marta | Book the on-call training room for 14 October | none |
+| Lee   | Ping the vendor about the SSO certificate renewal and report back | none |
+
+Next meeting: Monday 12 October.
+```
+
+Questions:
+1. **Sam's due date.** He said "before Friday", and the memo uses Thursday 2026-10-08. I earlier told you I'd use Friday 2026-10-09. Do you want Thursday, which is the literal reading of "before", or Friday?
+2. **Lee's due date.** He said "this week" with no hard date, so the memo says `none`. Is that right?
+3. **Marta's due date.** The notes only give 14 October as the training date, not a booking deadline, so the memo says `none`. Should it be 2026-10-14 instead?
+4. **Extra lines.** The memo includes an "Attendees" line and a "Next meeting" line, both taken from the notes. Keep them or drop them?
+
+Reply with your answers, or "as is" to take the draft unchanged. If you want changes, I'll send the memo back to the team before copying it.

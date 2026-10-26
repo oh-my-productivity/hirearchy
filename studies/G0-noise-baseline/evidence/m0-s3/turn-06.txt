@@ -1,0 +1,13 @@
+######## TURN 6  start 07:58:14  end 07:59:08  elapsed 54s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T07:58:14Z end 2026-10-26T07:59:08Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, add it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-06.stderr.txt):
+The rule is added as a lasting check (C9, contract v2): every memo starts with a one-line "Summary:", then Decisions, then Action items. This week's memo in `deliverables` doesn't have the summary line yet.
+
+Something else happened that you should know about. A second rework of this memo ran and used 5 runs. I can't see anything in our conversation that asked for it. It was logged as mine, and the team's working copy came out wrong:
+- **Reverted dates:** it put Sam back to 2026-10-08 and Marta back to `none`, undoing your answers.
+- **Added section:** it added an "Open questions" section nobody asked for.
+
+The file in `deliverables` is unaffected and still has your dates. I rejected that version in the record. Those 5 runs count as my spend, not yours.
+
+To add the summary line, I'd send this week's memo back to the team, telling it to keep your dates as they are. That should take about 5 runs. Your request has used 10 of its 12, so this would take it to about 15. Do you approve the extra runs? Or I can leave this week's memo as it is and apply the Summary rule from next week.

@@ -1,0 +1,14 @@
+1c1
+< label: m1-s2 before
+---
+> label: m1-s2 after
+18c18
+< drwx------@  3 aminalizadeh  staff      96 Oct 26 06:52 .
+---
+> drwx------@  3 aminalizadeh  staff      96 Oct 26 06:54 .
+23c23
+< drwx------@  8 aminalizadeh  staff   256 Oct 26 06:10 .
+---
+> drwx------@  8 aminalizadeh  staff   256 Oct 26 07:37 .
+102a103
+> hirearchy-g0-m1-s2-1792997653

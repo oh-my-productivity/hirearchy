@@ -1,0 +1,45 @@
+######## hirearchy --root /tmp/hirearchy-g0-m0-s2-1792995184/org services
+Services you can request (from your direct reports):
+- weekly-meeting-memo (offered by lead; contract v4, playbook v1): One markdown memo with the decisions and the action-item table for one weekly meeting
+  inputs: notes_file* (File name of the meeting notes inside the notes folder, for example 2026-10-05.md)   (* required)
+  each request: 12 runs; acceptance criteria (lead/services/weekly-meeting-memo/SERVICE.md):
+    C1: Covers only the meeting in the requested notes file and nothing else.
+    C2: At most 400 words as counted by read.
+    C3: Has a section titled Decisions that lists every decision the notes record as made (decided or agreed), one line each, and no item that is not a decision.
+    C4: Has a section titled Actions with a markdown table whose columns are exactly Owner | Action | Due.
+    C5: The table has one row for every commitment in the notes, including informal ones stated in prose (for example someone saying they will look into something), not only items labelled ACTION.
+    C6: Due is an ISO date (YYYY-MM-DD) when the notes give a date, or a deadline that resolves to one from the meeting date (a named weekday means that weekday of the meeting's week; the next meeting means the date the notes give for it). Due is 'none' when the notes give no date, say no hard date, or give only a loose period such as 'this week'.
+    C7: Every decision and every table row is traceable to the notes file; no owner, action or date is invented.
+    C8: The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change.
+    C11: The memo's first line is a one-line 'Summary:' of the meeting, with nothing before it (no title and no Source line), followed by the Decisions section, then the Actions table, in that order. (amendment, user-initiated: never admits a playbook revision)
+  record: 3 request(s): 1 done, 0 failed, 2 open; 2 reworked; avg 5 runs; feedback 3 accept (1 after a reject), 0 reject
+  regression list (the client's rejections):
+    R1 (case 20261026T061639840350-root-6f1d, about C9 (removed)): "No, not right yet. Always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items."
+    R2 (case 20261026T061639840350-root-6f1d, about C9 (removed)): "Not right yet: it should start with the one-line Summary, then the decisions, then the action items."
+  playbook v1 (2026-10-26): "initial playbook"
+
+######## hirearchy --root /tmp/hirearchy-g0-m0-s2-1792995184/org progress
+"Memo for the 2026-10-05 weekly meeting" [service weekly-meeting-memo v1]: done. runs 5 of 12. 0 returned (kept by lead). last activity 37s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/review-memo-2026-10-05.md. case total: 20 runs used: 15 by the user's requests, 5 by your relayed rework 20261026T062413119254-root-9279; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261026T061639840350-root-6f1d)
+"Memo for the 2026-10-05 weekly meeting (client answers)" [service weekly-meeting-memo v1]: done. runs 5 of 1 (3 returned). last activity 37s ago. artifacts: lead/writer/work/memo-2026-10-05.md, lead/reviewer/work/review-memo-2026-10-05.md. case total: 20 runs used: 15 by the user's requests, 5 by your relayed rework 20261026T062413119254-root-9279; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261026T062052962599-root-52e3)
+"Rework memo 2026-10-05: unclear due dates" [service weekly-meeting-memo v1]: blocked: Cannot report done: C8 not met. Reviewer's final line: 'criteria met: 6 of 7' (C6 fail), ledger lead/reviewer…. runs 5 of 6. last activity 37s ago. case total: 20 runs used: 15 by the user's requests, 5 by your relayed rework 20261026T062413119254-root-9279; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261026T062413119254-root-9279)
+"Memo for 2026-10-05: add Summary line (C9)" [service weekly-meeting-memo v1]: blocked: Questions for the client:. runs 5 of 5. last activity 37s ago. case total: 20 runs used: 15 by the user's requests, 5 by your relayed rework 20261026T062413119254-root-9279; 24 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user's: report them to the user as yours, and never ask the user to fund them. (task 20261026T062958314306-root-943c)
+"Memo for the 2026-10-12 weekly meeting" [service weekly-meeting-memo v1]: done. runs 5 of 12 (8 returned). last activity 37s ago. artifacts: lead/writer/work/memo-2026-10-12.md, lead/reviewer/work/review-2026-10-12.md. (task 20261026T063822256206-root-2817)
+"Memo for the 2026-10-19 weekly meeting" [service weekly-meeting-memo v1]: done. runs 5 of 12 (7 returned). last activity 37s ago. artifacts: lead/writer/work/memo-2026-10-19.md, lead/reviewer/work/review-2026-10-19.md. case total: 8 runs used of 15 handed down (contract: 12 per request). (task 20261026T064304929942-root-3bf0)
+"Memo for 2026-10-19: Lee's Due 2026-10-30" [service weekly-meeting-memo v1]: blocked: C8 is not met: the reviewer re-check is unaffordable. I have 0 runs and the reviewer has 0, so I cannot deleg…. runs 3 of 3. last activity 37s ago. case total: 8 runs used of 15 handed down (contract: 12 per request). (task 20261026T064643299609-root-a676)
+Needs you: blocked result from lead "Memo for 2026-10-19: Lee's Due 2026-10-30": C8 is not met: the reviewer re-check is unaffordable. I have 0 runs and the reviewer has 0, so I cannot deleg… (message 20261026T064831453695-lead-e60e)
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-g0-m0-s2-1792995184/org status
+root (human): unread 1, delegated 0
+  lead [Manager] idle  budget=0 open=0 delegated=0 unread=0 services: weekly-meeting-memo
+    reviewer [Independent Reviewer] idle  budget=0 open=0 delegated=0 unread=0
+    writer [Writer] idle  budget=0 open=0 delegated=0 unread=0
+
+scheduler: stopped (finished: no open tasks)
+
+######## hirearchy --root /tmp/hirearchy-g0-m0-s2-1792995184/org health
+3 agents, 0 flagged
+lead idle, budget 0/61, runs 20, open 0, done 4 failed 0 blocked 3 rework 1 (+3 by the client), escapes 0 of 2 judged (+1 not its: 1 contract-gap), re-checks after a FAIL 0 (author rework runs 0), runs/task 2.9, empty 0, last activity 1m ago | branch: runs 33, open 0, done 16, failed 0, blocked 4, rework 3, worst none
+  reviewer idle, budget 0/10, runs 6, open 0, done 5 failed 0 blocked 1 rework 1 (+1 by the client), escapes 0 of 2 judged (+1 not its: 1 contract-gap), re-checks after a FAIL 0 (author rework runs 0), runs/task 1.0, empty 0, last activity 5m ago
+  writer idle, budget 0/13, runs 7, open 0, done 7 failed 0 blocked 0 rework 1 (+1 by the client), runs/task 1.0, empty 0, last activity 2m ago
+

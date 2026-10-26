@@ -1,0 +1,77 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-26T07:53:26Z .. 2026-10-26T07:56:35Z; injected task 20261026T075326752629-root-9de8; revised (memo 1) task 20261026T074936893313-root-ce42
+
+## run lead@20261026T075326984385 agent=lead model=claude-sonnet-5.5 start=2026-10-26T07:53:26.995477+00:00 end=2026-10-26T07:54:17.312208+00:00 exit=0 secs=50 session=sess_fef3c488-9428-479f-b624-919acec23c50
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 9
+  lead message 20261026T075408805413-lead-7cd6 to=lead/writer type=task status=None created=2026-10-26T07:54:08+00:00
+  ## Lessons: (none)
+  org-git commit e140399 MEMORY.md diff:
+    commit e1403991dc951ea105e9875f6ccb5c3bbde563e2
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 07:54:17 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T075326984385.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 286b6b2..196b406 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,2 +1,3 @@
+     # Memory
+    -Task ce42 (memo 2026-10-05 rework) reported done; reviewer 'criteria met: 8 of 8'. Nothing outstanding. Idea for playbook: ambiguous 'before Friday' -> ask client early.
+    +Task ce42 done earlier. Now task 9de8 (root rework: Sam due, Marta due, Open questions section). Delegated writer 7cd6 (revises f71e, budget 2). Next: when writer reports, read lead/writer/work/memo-2026-10-05.md, delegate reviewer (revises its earlier task, budget 1; copy criteria + 'check EVERY Due value vs notes'), then verify and report 9de8 with reviewer's coverage line + lessons. Plan: Sam 2026-10-08 (Open questions explains), Marta none.
+    +Idea for playbook: ambiguous 'before Friday' -> ask client early.
+
+## run lead/writer@20261026T075409256683 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-26T07:54:09.269194+00:00 end=2026-10-26T07:54:45.561085+00:00 exit=0 secs=36 session=sess_b6fe475f-f001-498f-a61a-03767de6f078
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261026T075439497437 agent=lead model=claude-sonnet-5.5 start=2026-10-26T07:54:39.515489+00:00 end=2026-10-26T07:55:19.873852+00:00 exit=0 secs=40 session=sess_d86737ef-e2d4-4f89-aff5-023fbfb80765
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+  lead message 20261026T075512445316-lead-fbdd to=lead/reviewer type=task status=None created=2026-10-26T07:55:12+00:00
+  ## Lessons: (none)
+  org-git commit 9ffbdbf MEMORY.md diff:
+    commit 9ffbdbfebe26f25f1146fad5ad7d4dcc73c13e20
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 07:55:19 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T075439497437.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 196b406..c877fb1 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,3 @@
+     # Memory
+    -Task ce42 done earlier. Now task 9de8 (root rework: Sam due, Marta due, Open questions section). Delegated writer 7cd6 (revises f71e, budget 2). Next: when writer reports, read lead/writer/work/memo-2026-10-05.md, delegate reviewer (revises its earlier task, budget 1; copy criteria + 'check EVERY Due value vs notes'), then verify and report 9de8 with reviewer's coverage line + lessons. Plan: Sam 2026-10-08 (Open questions explains), Marta none.
+    -Idea for playbook: ambiguous 'before Friday' -> ask client early.
+    +Task 9de8 (root rework: Sam due, Marta due, Open questions) open. Writer 7cd6 done: memo lead/writer/work/memo-2026-10-05.md (152 words; I read it: Sam 2026-10-08, Marta none, Open questions ok, Priya 10-09, Dev 10-08, Lee none). Delegated reviewer re-check (revises ee26, budget 1). Next: when reviewer reports, read its review, verify, report 9de8 done with reviewer's 'criteria met: n of m' line verbatim + path + lessons (artifact: lead/writer/work/memo-2026-10-05.md). If fail: one writer rework (revises 7cd6) + re-check, else blocked.
+    +Playbook idea: ambiguous relative deadline ('before Friday') or event date used as deadline -> Open questions section / ask client early.
+
+## run lead/reviewer@20261026T075513817468 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-26T07:55:13.826348+00:00 end=2026-10-26T07:56:02.240650+00:00 exit=0 secs=48 session=sess_e4e2756d-5e7a-450d-bee0-5b6186120846
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261026T075556172102 agent=lead model=claude-sonnet-5.5 start=2026-10-26T07:55:56.193583+00:00 end=2026-10-26T07:56:26.476799+00:00 exit=0 secs=30 session=sess_d8b1173c-04dd-4201-a89f-b0aadb822ce1
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261026T075618747289-lead-fd9b to=root type=result status=done created=2026-10-26T07:56:18+00:00
+  ## Lessons: Relative deadlines ('before Friday') and event dates ('book room for Oct 14') are easy to turn into wrong Due values. Add to playbook: tell the writer to use none or a stated interpretation in Open questions, and the reviewer to check every Due value against the notes wording. Evidence: this case needed one writer rework and two reviewer re-checks.
+  org-git commit 77e6fc2 MEMORY.md diff:
+    commit 77e6fc21e34d12ec2179c8958ddaf7bf75438ce7
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 07:56:26 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T075556172102.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index c877fb1..bf31556 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,3 +1,3 @@
+     # Memory
+    -Task 9de8 (root rework: Sam due, Marta due, Open questions) open. Writer 7cd6 done: memo lead/writer/work/memo-2026-10-05.md (152 words; I read it: Sam 2026-10-08, Marta none, Open questions ok, Priya 10-09, Dev 10-08, Lee none). Delegated reviewer re-check (revises ee26, budget 1). Next: when reviewer reports, read its review, verify, report 9de8 done with reviewer's 'criteria met: n of m' line verbatim + path + lessons (artifact: lead/writer/work/memo-2026-10-05.md). If fail: one writer rework (revises 7cd6) + re-check, else blocked.
+    +Task 9de8 (root rework: Sam due, Marta due, Open questions): reviewer re-check passed (criteria met: 7 of 7, review lead/reviewer/work/review-memo-2026-10-05-v3.md). I verified memo lead/writer/work/memo-2026-10-05.md (152 words). Reporting done to root with Questions for the client (A1 Sam inclusive Friday, A2 Marta Oct 14, A3 Open questions section extra). Nothing pending after the report.
+     Playbook idea: ambiguous relative deadline ('before Friday') or event date used as deadline -> Open questions section / ask client early.
+

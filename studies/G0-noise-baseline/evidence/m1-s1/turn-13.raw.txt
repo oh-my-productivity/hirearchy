@@ -1,0 +1,3 @@
+I've recorded your approval of the 19 October memo, so all three memos are accepted and in `deliverables`.
+
+The weekly service is ready. Each week, tell me the notes file name (for example `2026-10-26.md`) and I'll request the memo. Every memo will start with the Summary line.

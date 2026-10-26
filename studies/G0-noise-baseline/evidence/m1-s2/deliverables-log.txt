@@ -1,0 +1,67 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-26T07:08:41.949Z] call #25 turn 6 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-g0-m1-s2-1792997653/deliverables && cp /private/tmp/hirearchy-g0-m1-s2-1792997653/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-g0-m1-s2-1792997653/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-05.md && ls -l /tmp/hirearchy-g0-m1-s2-1792997653/deliverables
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 9cba4e7 2026-10-26T07:05:59Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 9cba4e7 2026-10-26T07:05:59Z']
+result: Output:
+     156 /tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-05.md
+total 8
+-rw-r--r--@ 1 aminalizadeh  wheel  830 Oct 26 07:08 memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T07:18:07.028Z] call #42 turn 8 execute_bash
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s2-1792997653 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && wc -w deliverables/memo-2026-10-05.md && head -1 deliverables/memo-2026-10-05.md | cut -c1-40
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 7ed5555 2026-10-26T07:16:44Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 7ed5555 2026-10-26T07:16:44Z']
+result: Output:
+     157 deliverables/memo-2026-10-05.md
+Summary: Platform weekly, 5 October 2026
+
+
+Exit Code: 0
+
+[2026-10-26T07:27:26.872Z] call #59 turn 11 execute_bash
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s2-1792997653 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md && ls -l deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 070b4e8 2026-10-26T07:24:59Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 070b4e8 2026-10-26T07:24:59Z']
+result: Output:
+     203 deliverables/memo-2026-10-12.md
+total 16
+-rw-r--r--@ 1 aminalizadeh  wheel   823 Oct 26 07:18 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1075 Oct 26 07:27 memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-26T07:36:02.571Z] call #75 turn 13 execute_bash
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s2-1792997653 && cat org/lead/writer/work/memo-2026-10-19.md && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && wc -w deliverables/memo-2026-10-19.md && ls -l deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 9cf8854 2026-10-26T07:34:13Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 9cf8854 2026-10-26T07:34:13Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 9cf8854 2026-10-26T07:34:13Z']
+result: Output:
+Summary: Platform weekly, 19 October 2026: demo goes ahead without the rate limiter, SSO vendor renewed, meeting moves to 14:00, and five actions assigned.
+
+## Decisions
+
+- Go ahead with the customer demo, leaving the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move this weekly from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Actions
+
+| Owner | Action | Due |
+|---|---|---|
+| Lee | Sign off on the SSO renewal once legal replies | 2026-10-30 |
+| Marta | Collect demo feedback and circulate
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 823 mtime 07:18:07 local md5 99388d9e0544e7994f91cc075499a8c6
+  memo-2026-10-12.md size 1075 mtime 07:27:26 local md5 43489270a00848fe159eb9f5fc5cacda
+  memo-2026-10-19.md size 842 mtime 07:36:02 local md5 d151c38cf10ceaad0872d15a82ce789b
+
+final ls -la:
+total 24
+drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 26 07:36 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 26 07:09 ..
+-rw-r--r--@ 1 aminalizadeh  wheel   823 Oct 26 07:18 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1075 Oct 26 07:27 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel   842 Oct 26 07:36 memo-2026-10-19.md
+

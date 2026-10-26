@@ -1,0 +1,10 @@
+2026-10-26T04:48:17Z deleted /tmp/hirearchy-g0-detach-1792989925
+2026-10-26T04:48:17Z deleted /Users/aminalizadeh/.kiro/agents/hirearchy-study-g0-probe-m1.json
+-rw-r--r--@ 1 aminalizadeh  staff  1367 Oct 26 04:48 /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/preflight/m0-home/listing-final.txt
+-rw-r--r--@ 1 aminalizadeh  staff  7149 Oct 26 04:40 /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/preflight/m0-home/setup.txt
+-rw-------@ 1 aminalizadeh  staff  4901 Oct 26 04:41 /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/probe/m0/probe-session-messages.jsonl
+-rw-------@ 1 aminalizadeh  staff  1302 Oct 26 04:41 /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/probe/m0/probe-session.json
+2026-10-26T04:48:17Z deleted /tmp/hirearchy-g0-m0home-preflight-1792989639
+2026-10-26T04:48:17Z deleted /tmp/hirearchy-g0-preflight-1792989703
+2026-10-26T04:48:17Z deleted /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-home/hirearchy-g0-preflight-1-ec7753e74d43fc47
+2026-10-26T04:48:17Z deleted /Users/aminalizadeh/Library/Application Support/hirearchy/kiro-cwd/hirearchy-g0-preflight-1-ec7753e74d43fc47

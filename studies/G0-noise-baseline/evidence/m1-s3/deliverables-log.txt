@@ -1,0 +1,47 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-26T08:44:57.111Z] call #27 turn 5 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-g0-m1-s3-1793003475/deliverables && cp /private/tmp/hirearchy-g0-m1-s3-1793003475/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s3-1793003475/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-g0-m1-s3-1793003475/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m1-s3-1793003475/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-g0-m1-s3-1793003475/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 7f22547 2026-10-26T08:43:23Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 7f22547 2026-10-26T08:43:23Z']
+result: Output:
+     277 /tmp/hirearchy-g0-m1-s3-1793003475/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T09:05:07.994Z] call #56 turn 9 execute_bash
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s3-1793003475 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && wc -w deliverables/memo-2026-10-12.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: ff1b0e2 2026-10-26T09:02:31Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: ff1b0e2 2026-10-26T09:02:31Z']
+result: Output:
+     279 deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-26T09:13:09.997Z] call #70 turn 11 execute_bash
+COMMAND: cd /private/tmp/hirearchy-g0-m1-s3-1793003475 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && wc -w deliverables/memo-2026-10-19.md && head -c 40 deliverables/memo-2026-10-19.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 1da384e 2026-10-26T09:11:27Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: 1da384e 2026-10-26T09:11:27Z']
+result: Output:
+     232 deliverables/memo-2026-10-19.md
+Summary: The team agreed to go ahead witmemo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 1571 mtime 08:44:57 local md5 cba66dba5d663dc59547d92284e38362
+  memo-2026-10-12.md size 1483 mtime 09:05:07 local md5 c22e4ae4ea90c86975546661803ce174
+  memo-2026-10-19.md size 1275 mtime 09:13:09 local md5 7a98439689044675d8d7f04e06280d04
+
+final ls -la:
+total 24
+drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 26 09:13 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 26 08:46 ..
+-rw-r--r--@ 1 aminalizadeh  wheel  1571 Oct 26 08:44 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1483 Oct 26 09:05 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1275 Oct 26 09:13 memo-2026-10-19.md
+

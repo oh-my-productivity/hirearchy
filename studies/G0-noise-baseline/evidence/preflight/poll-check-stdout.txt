@@ -1,0 +1,13 @@
+[10/26/26 04:41:53] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+                    INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+[10/26/26 04:41:58] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+[10/26/26 04:42:08] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+[10/26/26 04:42:28] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+[10/26/26 04:43:08] INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+{"polls": 5, "quick_replies": 5, "paused_seconds": 119.9, "end": "window cap: 120 seconds passed"}

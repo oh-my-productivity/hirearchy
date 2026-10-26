@@ -1,0 +1,90 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-26T05:02:37Z .. 2026-10-26T05:05:30Z; injected task 20261026T050237786004-root-a8e1; revised (memo 1) task 20261026T045907020580-root-49d7
+
+## run lead@20261026T050238039058 agent=lead model=claude-sonnet-5.5 start=2026-10-26T05:02:38.050112+00:00 end=2026-10-26T05:03:22.362916+00:00 exit=0 secs=44 session=sess_8ccc50cc-1e4e-42ad-adc7-2f7b5ee3fab7
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 10
+  lead message 20261026T050315637446-lead-92ef to=lead/writer type=task status=None created=2026-10-26T05:03:15+00:00
+  ## Lessons: (none)
+  org-git commit ddf2f11 MEMORY.md diff:
+    commit ddf2f11e2cf4a71e7c5a5538d6f80e7eb6fc9396
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 05:03:22 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T050238039058.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index a4bf994..9a2f5f5 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,4 +1,5 @@
+     # Memory
+    -Request ...-ece7 (memo 2026-10-05) done earlier (292 words, reviewer 9 of 9).
+    -Task 20261026T045907020580-root-49d7 (client corrections): reviewer re-check PASS (9 of 9, 32 of 32), memo 269 words. Reporting done to root this run. Nothing outstanding after that.
+    -Memo deliverable: lead/writer/work/memo-2026-10-05.md.
+    +Earlier requests done (ece7, 49d7). Memo deliverable: lead/writer/work/memo-2026-10-05.md.
+    +Task a8e1 (root rework: Sam Due -> none + 'before Friday' in Open items; Marta Due none + 14 Oct is training date, no booking deadline in Open items; reviewer must re-check EVERY Due vs notes) in progress.
+    +Delegated to writer (revises 9a8a, budget 1). Next run: read memo, then delegate re-check to lead/reviewer (revises 20261026T050029562865-lead-8b63, budget 1) naming the memo, with C1-C9 verbatim + 'check every Due value against notes text'; coverage line 'criteria met: n of m' (m=9) and 'n of m factual claims verified'.
+    +Then report done to root with coverage line, flag: earlier client decision had Sam=2026-10-09 (task 49d7); this newer note overrides it. Playbook idea: ask client on vague deadlines up front; Due only from explicit dates.
+
+## run lead/writer@20261026T050316299536 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-26T05:03:16.306095+00:00 end=2026-10-26T05:03:44.615603+00:00 exit=0 secs=28 session=sess_7d39143e-eab0-4051-bf6d-bc7a24403859
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261026T050342572434 agent=lead model=claude-sonnet-5.5 start=2026-10-26T05:03:42.595708+00:00 end=2026-10-26T05:04:10.882507+00:00 exit=0 secs=28 session=sess_40b30981-3237-4f45-9fed-5884b13d2946
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261026T050405010732-lead-b9cc to=lead/reviewer type=task status=None created=2026-10-26T05:04:05+00:00
+  ## Lessons: (none)
+  org-git commit bb7d2a9 MEMORY.md diff:
+    commit bb7d2a9a74255eb2bef0e24db28aa325bffe45b4
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 05:04:10 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T050342572434.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 9a2f5f5..bfd81cb 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,5 @@
+     # Memory
+    -Earlier requests done (ece7, 49d7). Memo deliverable: lead/writer/work/memo-2026-10-05.md.
+    -Task a8e1 (root rework: Sam Due -> none + 'before Friday' in Open items; Marta Due none + 14 Oct is training date, no booking deadline in Open items; reviewer must re-check EVERY Due vs notes) in progress.
+    -Delegated to writer (revises 9a8a, budget 1). Next run: read memo, then delegate re-check to lead/reviewer (revises 20261026T050029562865-lead-8b63, budget 1) naming the memo, with C1-C9 verbatim + 'check every Due value against notes text'; coverage line 'criteria met: n of m' (m=9) and 'n of m factual claims verified'.
+    -Then report done to root with coverage line, flag: earlier client decision had Sam=2026-10-09 (task 49d7); this newer note overrides it. Playbook idea: ask client on vague deadlines up front; Due only from explicit dates.
+    +Earlier requests done (ece7, 49d7). Memo: lead/writer/work/memo-2026-10-05.md.
+    +Task a8e1 (root rework: Sam/Marta Due none) in progress. Writer applied fixes (read by me: Due = Priya 10-09, Dev 10-08, Sam/Marta/Lee none; Open bullets present). Re-check delegated to lead/reviewer (revises 8b63, budget 1), waiting.
+    +Next run: read reviewer result + its file; verify word count via org_read (<=400); if all 9 met, report done to a8e1 with reviewer's coverage lines verbatim (criteria met n of m; n of m factual claims verified) + path; flag: earlier client decision had Sam=2026-10-09 (49d7), newer note overrides. Deliverable path /tmp/hirearchy-g0-m0-s1-1792990299/deliverables (assistant copies). Questions for the client: copy any 'ambiguous' items.
+    +Playbook idea: ask client on vague deadlines up front; Due only from explicit dates.
+    \ No newline at end of file
+
+## run lead/reviewer@20261026T050406831129 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-26T05:04:06.843073+00:00 end=2026-10-26T05:04:55.269362+00:00 exit=0 secs=48 session=sess_289cd31f-4a34-4e3c-8111-33e6ccb76298
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261026T050451214161 agent=lead model=claude-sonnet-5.5 start=2026-10-26T05:04:51.236764+00:00 end=2026-10-26T05:05:21.586096+00:00 exit=0 secs=30 session=sess_883a076e-fc70-4af3-922f-15d1c000911b
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+  lead message 20261026T050513876985-lead-c37a to=root type=result status=done created=2026-10-26T05:05:13+00:00
+  ## Lessons: Vague deadlines ('before Friday', event dates like 'book room for Oct 14') caused client rework; add playbook pitfall: Due only from explicit deadline dates, else none plus an Open bullet. Rework cost 1 writer + 1 reviewer run; reviewer re-check of all Due rows worked.
+  org-git commit 380efac MEMORY.md diff:
+    commit 380efac3280794564ca31e64afcdf82937094197
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 05:05:21 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T050451214161.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index bfd81cb..1e3431b 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,3 @@
+     # Memory
+    -Earlier requests done (ece7, 49d7). Memo: lead/writer/work/memo-2026-10-05.md.
+    -Task a8e1 (root rework: Sam/Marta Due none) in progress. Writer applied fixes (read by me: Due = Priya 10-09, Dev 10-08, Sam/Marta/Lee none; Open bullets present). Re-check delegated to lead/reviewer (revises 8b63, budget 1), waiting.
+    -Next run: read reviewer result + its file; verify word count via org_read (<=400); if all 9 met, report done to a8e1 with reviewer's coverage lines verbatim (criteria met n of m; n of m factual claims verified) + path; flag: earlier client decision had Sam=2026-10-09 (49d7), newer note overrides. Deliverable path /tmp/hirearchy-g0-m0-s1-1792990299/deliverables (assistant copies). Questions for the client: copy any 'ambiguous' items.
+    -Playbook idea: ask client on vague deadlines up front; Due only from explicit dates.
+    \ No newline at end of file
+    +Requests done: ece7, 49d7, a8e1 (reported done, reviewer 9 of 9, 43 of 43). Memo: lead/writer/work/memo-2026-10-05.md.
+    +Nothing outstanding. Playbook pitfall idea: Due only from explicit deadline dates (not 'before Friday', not event dates); else none + Open bullet. Could add via revise_playbook if a new request arrives.
+

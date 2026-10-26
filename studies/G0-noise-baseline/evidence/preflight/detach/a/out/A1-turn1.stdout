@@ -1,0 +1,4 @@
+"Reproduction": working. unread work: ceo. runs 0 of 2. last activity 35s ago. (task 20261026T044526052722-root-cd75)
+scheduler: stopped - open tasks do not move until it is started (start() or `hirearchy run`)
+
+The hirearchy skill wasn't available through disclose_context, so I skipped reading it.

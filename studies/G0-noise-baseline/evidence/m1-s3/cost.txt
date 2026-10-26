@@ -1,0 +1,43 @@
+# m1-s3 cost; facts only
+
+turn 1: user_ts 2026-10-26T08:31:58.364Z turn_start 2026-10-26T08:31:58.885Z turn_end 2026-10-26T08:32:27.713Z stop end_turn status success elapsed_ms 28828 credits 1.7286
+turn 2: user_ts 2026-10-26T08:33:14.978Z turn_start 2026-10-26T08:33:15.351Z turn_end 2026-10-26T08:33:51.333Z stop end_turn status success elapsed_ms 35982 credits 1.5460
+turn 3: user_ts 2026-10-26T08:34:42.019Z turn_start 2026-10-26T08:34:42.429Z turn_end 2026-10-26T08:40:14.256Z stop end_turn status success elapsed_ms 331827 credits 2.0011
+turn 4: user_ts 2026-10-26T08:41:10.088Z turn_start 2026-10-26T08:41:10.198Z turn_end 2026-10-26T08:41:19.571Z stop end_turn status success elapsed_ms 9373 credits 0.5912
+turn 5: user_ts 2026-10-26T08:42:00.507Z turn_start 2026-10-26T08:42:00.687Z turn_end 2026-10-26T08:45:02.856Z stop end_turn status success elapsed_ms 182168 credits 2.4837
+turn 6: user_ts 2026-10-26T08:50:44.663Z turn_start 2026-10-26T08:50:45.160Z turn_end 2026-10-26T08:51:03.896Z stop end_turn status success elapsed_ms 18736 credits 1.4500
+turn 7: user_ts 2026-10-26T08:51:56.301Z turn_start 2026-10-26T08:51:56.681Z turn_end 2026-10-26T08:52:42.446Z stop end_turn status success elapsed_ms 45765 credits 2.2343
+turn 8: user_ts 2026-10-26T08:53:39.558Z turn_start 2026-10-26T08:53:39.956Z turn_end 2026-10-26T08:57:31.561Z stop end_turn status success elapsed_ms 231605 credits 2.4393
+turn 9: user_ts 2026-10-26T09:00:48.278Z turn_start 2026-10-26T09:01:10.469Z turn_end 2026-10-26T09:05:14.506Z stop end_turn status success elapsed_ms 244037 credits 2.9224
+turn 10: user_ts 2026-10-26T09:06:14.742Z turn_start 2026-10-26T09:06:15.294Z turn_end 2026-10-26T09:09:07.957Z stop end_turn status success elapsed_ms 172663 credits 2.2518
+turn 11: user_ts 2026-10-26T09:10:04.494Z turn_start 2026-10-26T09:10:04.861Z turn_end 2026-10-26T09:13:15.189Z stop end_turn status success elapsed_ms 190328 credits 2.1121
+turn 12: user_ts 2026-10-26T09:14:01.531Z turn_start 2026-10-26T09:14:01.845Z turn_end 2026-10-26T09:14:15.130Z stop end_turn status success elapsed_ms 13285 credits 1.6924
+total assistant credits: 23.4530
+
+Assistant seconds per turn (turn-times.txt wall clock):
+turn 1: 08:31:44 - 08:32:28  1793003548-1793003504=44s  utc 2026-10-26T08:31:44Z - 2026-10-26T08:32:28Z  exit 0  sleep 20 ended utc 2026-10-26T08:32:48Z
+turn 2: 08:33:05 - 08:33:51  1793003631-1793003585=46s  utc 2026-10-26T08:33:05Z - 2026-10-26T08:33:51Z  exit 0  sleep 20 ended utc 2026-10-26T08:34:11Z
+turn 3: 08:34:30 - 08:40:14  1793004014-1793003670=344s  utc 2026-10-26T08:34:30Z - 2026-10-26T08:40:14Z  exit 0  sleep 20 ended utc 2026-10-26T08:40:34Z
+turn 4: 08:40:59 - 08:41:20  1793004080-1793004059=21s  utc 2026-10-26T08:40:59Z - 2026-10-26T08:41:20Z  exit 0  sleep 20 ended utc 2026-10-26T08:41:40Z
+turn 5: 08:41:51 - 08:45:03  1793004303-1793004111=192s  utc 2026-10-26T08:41:51Z - 2026-10-26T08:45:03Z  exit 0  sleep 20 ended utc 2026-10-26T08:45:23Z
+turn 6: 08:50:36 - 08:51:04  1793004664-1793004636=28s  utc 2026-10-26T08:50:36Z - 2026-10-26T08:51:04Z  exit 0  sleep 20 ended utc 2026-10-26T08:51:24Z
+turn 7: 08:51:46 - 08:52:42  1793004762-1793004706=56s  utc 2026-10-26T08:51:46Z - 2026-10-26T08:52:42Z  exit 0  sleep 20 ended utc 2026-10-26T08:53:02Z
+turn 8: 08:53:30 - 08:57:32  1793005052-1793004810=242s  utc 2026-10-26T08:53:30Z - 2026-10-26T08:57:32Z  exit 0  sleep 20 ended utc 2026-10-26T08:57:52Z
+turn 9: 09:00:14 - 09:05:15  1793005515-1793005214=301s  utc 2026-10-26T09:00:14Z - 2026-10-26T09:05:15Z  exit 0  sleep 20 ended utc 2026-10-26T09:05:35Z
+turn 10: 09:06:02 - 09:09:08  1793005748-1793005562=186s  utc 2026-10-26T09:06:02Z - 2026-10-26T09:09:08Z  exit 0  sleep 20 ended utc 2026-10-26T09:09:28Z
+turn 11: 09:09:52 - 09:13:15  1793005995-1793005792=203s  utc 2026-10-26T09:09:52Z - 2026-10-26T09:13:15Z  exit 0  sleep 20 ended utc 2026-10-26T09:13:35Z
+turn 12: 09:13:50 - 09:14:15  1793006055-1793006030=25s  utc 2026-10-26T09:13:50Z - 2026-10-26T09:14:15Z  exit 0  sleep 20 ended utc 2026-10-26T09:14:35Z
+
+Org runs by agent and model; seconds from '# exit N after Ns'; injection window apart:
+  outside the injection window (counted toward the 45 cap):
+    lead           claude-sonnet-5.5    runs  21 secs   805 credits 19.7764
+    lead-reviewer  claude-sonnet-5.5    runs   7 secs   412 credits 8.1263
+    lead-writer    claude-sonnet-5.5    runs   7 secs   250 credits 6.9940
+    total runs 35 secs 1467 credits 34.8966
+  injection window:
+    lead           claude-sonnet-5.5    runs   3 secs   184 credits 3.2818
+    lead-reviewer  claude-sonnet-5.5    runs   1 secs    48 credits 0.9990
+    lead-writer    claude-sonnet-5.5    runs   1 secs    36 credits 0.8552
+    total runs 5 secs 268 credits 5.1359
+org-run credits are read from each run's kiro session (usage_summary); runs without a matched session: 0
+  per-model credits (all runs): {'claude-sonnet-5.5': 40.0326}

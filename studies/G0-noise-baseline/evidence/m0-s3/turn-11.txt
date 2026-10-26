@@ -1,0 +1,34 @@
+######## TURN 11  start 08:14:06  end 08:19:10  elapsed 304s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T08:14:06Z end 2026-10-26T08:19:10Z; exit code 0)
+######## LENA (prompt sent verbatim):
+That one is right, all the items are there - keep it. Now 2026-10-19.md please. I'll wait.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-11.stderr.txt):
+I recorded your "keep it" for the 12 October memo, in your words. The 19 October memo is running under the same contract, including Summary first, with a budget of 12 runs. I'll wait.The 19 October memo is ready and passed review, 8 of 8 checks, using 9 of 12 runs. I haven't copied it to `deliverables` yet because three items in your notes could be read two ways.
+
+Here is the draft:
+
+```
+Summary: The team agreed to go ahead with the customer demo without the rate limiter, to renew the SSO vendor for twelve months, and to move the weekly to Monday 14:00 from 26 October.
+
+## Decisions
+- Go ahead with the customer demo, leaving the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move the weekly meeting from Monday 10:00 to Monday 14:00, starting with the meeting on 26 October.
+
+## Action items
+| Owner | Action | Due |
+| Marta | Keep the agenda as sent | none |
+| Lee   | Sign off on the SSO renewal once legal replies | none |
+| Marta | Collect demo feedback and circulate it | 2026-10-23 |
+| Dev   | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting | 2026-10-26 |
+| Sam   | Pair with Jo on the CI pipeline during Jo's first week | none |
+
+Attendees: Priya, Sam, Lee, Marta, Dev.
+Next meeting: Monday 26 October at 14:00.
+```
+
+1. **Lee's due date.** The notes say he'll sign off "probably by end of next week". Should that be 2026-10-30, the Friday of next week, or `none` because of the "probably"? The memo uses `none` now.
+2. **Marta, "will keep the agenda as sent".** Is that a commitment that belongs in the table, or just a status note to drop?
+3. **Sam, "offered to pair with Jo".** Is that a commitment, since everyone agreed it was a good idea, or only an offer to drop?
+
+Reply with your answers, or "as is" to take the draft unchanged. A change means a rework of about 3 to 5 runs, which fits in the 3 runs left only if it's small. If it needs more, I'll ask you first.

@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-g0-m1-s3-assistant 'That one is right, all the items are there - keep it. I don'\''t know anything about that rework - I didn'\''t ask for it. Now 2026-10-19.md please. I'\''ll wait.'

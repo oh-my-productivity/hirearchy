@@ -1,0 +1,67 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-25T07:54:56Z .. 2026-10-25T07:57:30Z; injected task 20261025T075456327958-root-37b7; revised (memo 1) task 20261025T075038845671-root-c671
+
+## run lead@20261025T075456551343 agent=lead model=claude-sonnet-5.5 start=2026-10-25T07:54:56.564577+00:00 end=2026-10-25T07:55:42.866588+00:00 exit=0 secs=46 session=sess_b6ea8878-876c-46c8-b639-9455dc57ce12
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+  lead message 20261025T075532837013-lead-870e to=lead/writer type=task status=None created=2026-10-25T07:55:32+00:00
+  ## Lessons: (none)
+  org-git commit 688a3a5 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+    commit 688a3a5fedeac0e28bb19047e081e3c82c1cb22a
+    Author: hirearchy <hirearchy@localhost>
+    Date:   2026-10-25 07:55:42 +0000
+    
+        lead: run ok, 2 message(s) [lead/runs/20261025T075456551343.log]
+    
+     inbox/20261025T075355025199-runtime-d13a.md        | 12 ++++++++
+     lead/MEMORY.md                                     |  6 ++--
+     .../20261025T075322851493-lead.reviewer-5a3e.md    |  0
+     lead/read/20261025T075456327958-root-37b7.md       | 36 ++++++++++++++++++++++
+     lead/sent/20261025T075532837013-lead-870e.md       | 29 +++++++++++++++++
+     .../inflight/20261025T075532837013-lead-870e.md    | 29 +++++++++++++++++
+     sent/20261025T075456327958-root-37b7.md            | 36 ++++++++++++++++++++++
+     7 files changed, 145 insertions(+), 3 deletions(-)
+
+## run lead/writer@20261025T075534809775 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-25T07:55:34.820230+00:00 end=2026-10-25T07:56:05.041203+00:00 exit=0 secs=30 session=sess_ea8c0c17-b78b-46aa-b56e-bb3cdc2fc07b
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261025T075601008492 agent=lead model=claude-sonnet-5.5 start=2026-10-25T07:56:01.023083+00:00 end=2026-10-25T07:56:29.176336+00:00 exit=0 secs=28 session=sess_6c3f84dc-7fdb-45de-b588-6bcf3fdb9f46
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261025T075621375893-lead-e69f to=lead/reviewer type=task status=None created=2026-10-25T07:56:21+00:00
+  ## Lessons: (none)
+  org-git commit 34927e5 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+    commit 34927e5693a2f8abdfdb3ed5b4bff66c6b049b43
+    Author: hirearchy <hirearchy@localhost>
+    Date:   2026-10-25 07:56:29 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261025T075601008492.log]
+    
+     lead/MEMORY.md                                     |  7 +++---
+     .../20261025T075559910596-lead.writer-cc0f.md      |  0
+     .../inflight/20261025T075621375893-lead-e69f.md    | 29 ++++++++++++++++++++++
+     lead/sent/20261025T075621375893-lead-e69f.md       | 29 ++++++++++++++++++++++
+     4 files changed, 62 insertions(+), 3 deletions(-)
+
+## run lead/reviewer@20261025T075623145972 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-25T07:56:23.152284+00:00 end=2026-10-25T07:57:05.353799+00:00 exit=0 secs=42 session=sess_5c8532b4-7731-4bbd-8ca6-52abe5a6b83b
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261025T075701326122 agent=lead model=claude-sonnet-5.5 start=2026-10-25T07:57:01.339745+00:00 end=2026-10-25T07:57:29.472471+00:00 exit=0 secs=28 session=sess_9e257cc7-e4f0-4b90-a3f8-0c3325bce279
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261025T075723074733-lead-d91e to=root type=result status=done created=2026-10-25T07:57:23+00:00
+  ## Lessons: Putting ambiguous due phrases ('before Friday', 'for Oct 14') in an Open questions section and following the client's ruling passed on re-check. Playbook idea: tell the writer up front to use none for dates that are event dates, not deadlines, and have the reviewer check every Due value. Evidence: 4 review rounds incl. this rework; final 7 of 7, 20 of 20.
+  org-git commit e793ad6 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+    commit e793ad6cfad8b1d638821eae111cf0de475a7ae5
+    Author: hirearchy <hirearchy@localhost>
+    Date:   2026-10-25 07:57:29 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261025T075701326122.log]
+    
+     inbox/20261025T075723074733-lead-d91e.md           | 26 ++++++++++++++++++++++
+     lead/MEMORY.md                                     |  7 +++---
+     .../20261025T075700175452-lead.reviewer-5fde.md    |  0
+     lead/sent/20261025T075723074733-lead-d91e.md       | 26 ++++++++++++++++++++++
+     4 files changed, 55 insertions(+), 4 deletions(-)
+

@@ -1,0 +1,3 @@
+Understood. I won't add the standing note about hedged commitments, and the team and the weekly memo contract stay as they are. Nothing is running, and no more runs will be spent.
+
+When you want next week's memo, send me the notes file name (for example `2026-10-26.md`) and I'll start it.

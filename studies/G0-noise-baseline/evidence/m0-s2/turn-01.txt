@@ -1,0 +1,22 @@
+######## TURN 1  start 06:13:33  end 06:14:09  elapsed 37s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T06:13:33Z end 2026-10-26T06:14:09Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-g0-m0-s2-1792995184/notes (one file per meeting). Can you set up a team that does this for me every week?
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+Before I draft a plan, I need a few answers. This is weekly work, so I'll set it up as a standing service you can ask for each week. I've read the 19 October notes to see what they contain. Reply "defaults" to accept the proposed answers.
+
+1. **Input each week:** the notes file for that meeting, for example `notes/2026-10-26.md`. The team reads only your notes and uses no web. The notes folder is read-only for them. Does that fit?
+
+2. **Memo format:** markdown, at most 300 words, with two sections ("Decisions" and "Who does what"). I'd put it in a new `deliverables/` folder here, as `deliverables/memo-<meeting date>.md`. Do you want a different length, sections or place?
+
+3. **What counts as an item:** this changes the result most.
+   - Informal commitments: the 19 October notes have items without an ACTION label. Sam offered to pair with Jo on CI, and Lee will sign off the SSO renewal once legal replies. Should these count as who-does-what? My default is yes, every commitment counts, including ones written in prose.
+   - Vague dates: for "by end of next week" or "at the next meeting", should the memo turn them into a concrete date, or give no date? My default is to write a date only when the notes give one, and otherwise say "no date given". I'd also write "no owner named" where an item has no owner.
+   - Decisions: should the memo list only real decisions, such as moving the meeting or renewing the vendor, or also things like "keep the agenda as sent"? My default is only real decisions.
+
+4. **Review:** a second agent checks each memo against your notes before I hand it over. My default is yes.
+
+5. **Budget:** each agent wake-up counts as one run, and every agent runs claude-sonnet-5.5 at high effort. The plan will set a per-memo run budget of the estimate plus 25%, and I'll show you the number.
+
+6. **Approvals and first run:** I'll show you the plan and start nothing until you approve. After you approve, do you want me to produce the 19 October memo straight away as a first test?
+
+The team can't run by itself on a schedule. Each week you ask me, for example "memo for the 26 October notes", and it runs then.

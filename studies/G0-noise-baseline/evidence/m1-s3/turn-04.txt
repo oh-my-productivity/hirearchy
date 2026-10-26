@@ -1,0 +1,9 @@
+######## TURN 4  start 08:40:59  end 08:41:20  elapsed 21s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T08:40:59Z end 2026-10-26T08:41:20Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Marta's should be 2026-10-14. Sam's should be 2026-10-09. Lee's none is right.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+Both changes mean sending the memo back to the team. I need your OK on the cost first.
+
+A rework is the writer fixing the two dates and the reviewer re-checking. That takes about 5 more runs. The case would then total about 14 runs, which is 2 over the 12 you approved. The change itself is small, so it may come in lower, but 14 is the ceiling to expect. I'm not allowed to edit the team's file myself.
+
+Should I go ahead with the rework, up to 5 more runs (about 14 in total)? Your answers will go in as instructions: Marta `2026-10-14`, Sam `2026-10-09`, Lee `none`.

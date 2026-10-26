@@ -1,0 +1,94 @@
+# window runs (protocol 5.4): runs that started in the injection window 2026-10-26T07:09:39Z .. 2026-10-26T07:12:39Z; injected task 20261026T070939625591-root-ca4f; revised (memo 1) task 20261026T070444333415-root-80c3
+
+## run lead@20261026T070939867540 agent=lead model=claude-sonnet-5.5 start=2026-10-26T07:09:39.879573+00:00 end=2026-10-26T07:10:32.269172+00:00 exit=0 secs=52 session=sess_d495a2b1-ed43-47cb-a096-059b06b4e185
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 11
+  lead message 20261026T071018980433-lead-c946 to=lead/writer type=task status=None created=2026-10-26T07:10:18+00:00
+  ## Lessons: (none)
+  org-git commit 539bc1c MEMORY.md diff:
+    commit 539bc1cbc0afa154ceb0c3786c75b4f9bc006a26
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 07:10:32 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T070939867540.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 7b7bd0e..2dec1f5 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,5 @@
+     # Memory
+    -Case memo 2026-10-05 (weekly-meeting-memo): task 80c3 reported DONE (reviewer 6 of 6, 7 of 7). Task 89a4 (blocked earlier) superseded by 80c3; re-report only if root asks.
+    -Open question for client: closing 'confirmed by the client' line (AMB-1).
+    -Playbook lesson: tell reviewer upfront ambiguity goes to client; keep process notes out of the memo body; ask client about vague deadlines early.
+    -Nothing pending.
+    +Case memo 2026-10-05 (weekly-meeting-memo). Earlier task 80c3 done; root now sent rework task ca4f (open, mine): Sam and Marta Due -> none, add 'Open questions' section, drop 'confirmed by client' line; reviewer must re-check EVERY Due value vs notes.
+    +Decided: Sam none, Marta none (conservative per C5).
+    +Delegated to writer task c946 (budget 1, revises not set since writer's old task id unknown). NEXT: when writer reports, read lead/writer/work/memo-2026-10-05.md, then delegate reviewer (budget 2, revises 4d97-style prior reviewer task if known) with all C1-C7 verbatim + note to check every Due vs notes + ambiguity goes to client. Then report ca4f done with reviewer's coverage line verbatim + lessons.
+    +Playbook lesson: keep process notes out of memo body; ask client about vague deadlines early; vague dates (before Friday, event date) default to none.
+
+## run lead/writer@20261026T071020174683 agent=lead-writer model=claude-sonnet-5.5 start=2026-10-26T07:10:20.188070+00:00 end=2026-10-26T07:10:58.575705+00:00 exit=0 secs=38 session=sess_d93c742b-47a0-48e0-bc06-c0e3d4d11d27
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 6
+
+## run lead@20261026T071052501958 agent=lead model=claude-sonnet-5.5 start=2026-10-26T07:10:52.526456+00:00 end=2026-10-26T07:11:26.824588+00:00 exit=0 secs=34 session=sess_0a44e538-7c3b-459a-8771-983ad4482d00
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261026T071114574407-lead-95bd to=lead/reviewer type=task status=None created=2026-10-26T07:11:14+00:00
+  ## Lessons: (none)
+  org-git commit 5d7e4e8 MEMORY.md diff:
+    commit 5d7e4e8e31e4b810855f5afacf5f9b93ffb5e9db
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 07:11:26 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T071052501958.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 2dec1f5..65cd9f2 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,5 +1,6 @@
+     # Memory
+    -Case memo 2026-10-05 (weekly-meeting-memo). Earlier task 80c3 done; root now sent rework task ca4f (open, mine): Sam and Marta Due -> none, add 'Open questions' section, drop 'confirmed by client' line; reviewer must re-check EVERY Due value vs notes.
+    -Decided: Sam none, Marta none (conservative per C5).
+    -Delegated to writer task c946 (budget 1, revises not set since writer's old task id unknown). NEXT: when writer reports, read lead/writer/work/memo-2026-10-05.md, then delegate reviewer (budget 2, revises 4d97-style prior reviewer task if known) with all C1-C7 verbatim + note to check every Due vs notes + ambiguity goes to client. Then report ca4f done with reviewer's coverage line verbatim + lessons.
+    -Playbook lesson: keep process notes out of memo body; ask client about vague deadlines early; vague dates (before Friday, event date) default to none.
+    +Case memo 2026-10-05 (weekly-meeting-memo). Open task ca4f (root rework): Sam/Marta Due none, Open questions, no 'confirmed by client' line.
+    +Writer finished (task c946, memo lead/writer/work/memo-2026-10-05.md, 154 words, I read it: matches notes; Decisions 2, rows Priya 10-09, Dev 10-08, Sam none, Marta none, Lee none, Open questions 3 bullets).
+    +Delegated reviewer task 95bd (budget 2). NEXT: when reviewer reports, read its review; if 'criteria met n of m' n=m and no ambiguous items -> report ca4f done pasting its coverage line verbatim + lessons, artifact lead/writer/work/memo-2026-10-05.md. Ambiguous items -> 'Questions for the client:' at top of report. If fails: one rework (writer has budget 0; ask root for runs) .
+    +Also task 89a4 is blocked (not final); may re-report. My budget: 1 run.
+    +Playbook lesson: keep process notes out of memo body; ask client about vague deadlines early; vague dates default to none.
+    \ No newline at end of file
+
+## run lead/reviewer@20261026T071114726573 agent=lead-reviewer model=claude-sonnet-5.5 start=2026-10-26T07:11:14.733290+00:00 end=2026-10-26T07:12:05.213163+00:00 exit=0 secs=50 session=sess_80995e39-7c51-4aac-9901-dad530f3ac22
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 4
+
+## run lead@20261026T071157105838 agent=lead model=claude-sonnet-5.5 start=2026-10-26T07:11:57.128969+00:00 end=2026-10-26T07:12:33.539266+00:00 exit=0 secs=36 session=sess_97b91a50-e748-4b1e-8e32-561712898adf
+revise_playbook calls in this run (events): 0
+run-log P1 lines: 0; P3 lines: 2
+  lead message 20261026T071223654793-lead-8910 to=root type=result status=done created=2026-10-26T07:12:23+00:00
+  ## Lessons: Ask the requester early how to resolve 'before <day>' and 'for <date>' phrases; default is Due none with the wording in Open questions. Keep process info out of the memo body. Evidence: rework on Sam/Marta Due values; the reviewer re-checked every Due value and found no changes needed.
+  org-git commit 20d9e85 MEMORY.md diff:
+    commit 20d9e85acff7ac713d3a8c1d0add3101a3e35fd6
+    Author: hirearchy <hirearchy@localhost>
+    Date:   Mon Oct 26 07:12:33 2026 +0000
+    
+        lead: run ok, 1 message(s) [lead/runs/20261026T071157105838.log]
+    
+    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+    index 65cd9f2..728ac30 100644
+    --- a/lead/MEMORY.md
+    +++ b/lead/MEMORY.md
+    @@ -1,6 +1,4 @@
+     # Memory
+    -Case memo 2026-10-05 (weekly-meeting-memo). Open task ca4f (root rework): Sam/Marta Due none, Open questions, no 'confirmed by client' line.
+    -Writer finished (task c946, memo lead/writer/work/memo-2026-10-05.md, 154 words, I read it: matches notes; Decisions 2, rows Priya 10-09, Dev 10-08, Sam none, Marta none, Lee none, Open questions 3 bullets).
+    -Delegated reviewer task 95bd (budget 2). NEXT: when reviewer reports, read its review; if 'criteria met n of m' n=m and no ambiguous items -> report ca4f done pasting its coverage line verbatim + lessons, artifact lead/writer/work/memo-2026-10-05.md. Ambiguous items -> 'Questions for the client:' at top of report. If fails: one rework (writer has budget 0; ask root for runs) .
+    -Also task 89a4 is blocked (not final); may re-report. My budget: 1 run.
+    -Playbook lesson: keep process notes out of memo body; ask client about vague deadlines early; vague dates default to none.
+    \ No newline at end of file
+    +Case memo 2026-10-05 (weekly-meeting-memo). Task ca4f reported DONE (reviewer 6 of 6; 9 of 10 claims, 2 ambiguous items passed to client as Questions). Artifact lead/writer/work/memo-2026-10-05.md (154 words).
+    +Task 89a4 was blocked earlier (not final); superseded by ca4f's rework; not re-reported. Nothing else pending. Budget returned to root.
+    +Playbook lesson: keep process notes out of memo body; ask client early about vague deadlines ('before Friday', 'for Oct 14'); vague dates default to none with wording in Open questions.
+

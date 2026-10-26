@@ -1,0 +1,9 @@
+The memo now has the Summary line, but I haven't copied it to `deliverables` yet because of one open question. The version in `deliverables` is still the previous one, with your dates for Sam and Marta and no Summary line.
+
+The new Summary line reads: "The team pushed the API gateway migration to the week of 26 October, adopted Renovate, and assigned five action items." The count of five comes from the table, not from the notes. The reviewer judged it traceable. Keep "assigned five action items", or should the Summary only describe the two decisions? I'll apply whichever you choose.
+
+The other two points the team raised are Sam's and Marta's dates, which you already decided. The memo keeps 2026-10-09 for Sam and 2026-10-14 for Marta.
+
+- **Contract:** the lasting rule is saved as C10. It replaces the old "exactly two sections" check, so every future memo starts with the Summary line.
+- **Unrequested rework:** a rework request called "unclear due dates" went out under my seat at about the 10-minute mark, between your two corrections. I didn't send it in this conversation, and I can't tell where it came from. It set Sam's and Marta's dates back to none, which went against what you told me. I rejected it and made the latest rework start from the version you approved, so nothing from it is in the memo. It cost 5 runs, which count as my side's spend, not yours.
+- **Runs:** 19 used on your requests (the 12 you approved plus the 2 corrections and this Summary rework), plus those 5 of mine.

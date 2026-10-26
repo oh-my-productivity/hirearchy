@@ -1,0 +1,63 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-26T07:52:23.274Z] call #26 turn 4 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-g0-m0-s3-1793000481/deliverables && cp /private/tmp/hirearchy-g0-m0-s3-1793000481/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m0-s3-1793000481/deliverables/memo-2026-10-05.md && cmp /private/tmp/hirearchy-g0-m0-s3-1793000481/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m0-s3-1793000481/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-g0-m0-s3-1793000481/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: c0ecc31 2026-10-26T07:50:42Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: c0ecc31 2026-10-26T07:50:42Z']
+result: Output:
+     145 /tmp/hirearchy-g0-m0-s3-1793000481/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T08:13:21.320Z] call #74 turn 10 execute_bash
+COMMAND: cd /tmp/hirearchy-g0-m0-s3-1793000481 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo MATCH && wc -w deliverables/memo-2026-10-12.md && grep -c probably deliverables/memo-2026-10-12.md; ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 1668114 2026-10-26T08:11:02Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: 1668114 2026-10-26T08:11:02Z']
+result: Output:
+MATCH
+     205 deliverables/memo-2026-10-12.md
+0
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-26T08:24:25.709Z] call #90 turn 13 execute_bash
+COMMAND: cd /tmp/hirearchy-g0-m0-s3-1793000481 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo MATCH && wc -w deliverables/memo-2026-10-19.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: c8a30e9 2026-10-26T08:22:34Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: c8a30e9 2026-10-26T08:22:34Z']
+result: Output:
+MATCH
+     182 deliverables/memo-2026-10-19.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+[2026-10-26T08:24:46.094Z] call #91 turn 13 execute_bash
+COMMAND: cd /tmp/hirearchy-g0-m0-s3-1793000481 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo MATCH && wc -w deliverables/memo-2026-10-19.md && grep -c "agenda as sent" deliverables/memo-2026-10-19.md; grep "Lee" deliverables/memo-2026-10-19.md
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: c8a30e9 2026-10-26T08:22:34Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: c8a30e9 2026-10-26T08:22:34Z']
+result: Output:
+MATCH
+     182 deliverables/memo-2026-10-19.md
+0
+| Lee | Sign off on the SSO renewal once legal replies | 2026-10-30 |
+Attendees: Priya, Sam, Lee, Marta, Dev.
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 775 mtime 07:52:23 local md5 16b0d84a7bf28b2f8704949a88583537
+  memo-2026-10-12.md size 1084 mtime 08:13:21 local md5 ee1b244297426b76eb52efc4af0d8570
+  memo-2026-10-19.md size 967 mtime 08:24:46 local md5 6ac1e8d5c93fa0dded032e51a43d0652
+
+final ls -la:
+total 24
+drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 26 08:24 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 26 07:53 ..
+-rw-r--r--@ 1 aminalizadeh  wheel   775 Oct 26 07:52 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1084 Oct 26 08:13 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel   967 Oct 26 08:24 memo-2026-10-19.md
+

@@ -1,0 +1,67 @@
+# m0-s2 arm M0 home (prepare_m0_home.sh), created 2026-10-26T06:13:04Z
+M0H: /tmp/hirearchy-g0-m0home-m0-s2-1792995184
+kiro home for the chat (KIRO_HOME): /tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro
+== settings: byte copies (cp -p) of the owner's regular files except mcp.json* (4 file(s) matching mcp.json* not copied)
+8b4f05992f5a17fb453b2d7643dd4203  /tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/settings/cli.json  (source md5 8b4f05992f5a17fb453b2d7643dd4203)
+9070b152a85eb85fd8d103b52c33325d  /tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/settings/cli.json.lock  (source md5 9070b152a85eb85fd8d103b52c33325d)
+b326b5062b2f0e69046810717534cb09  /tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/settings/session-response-indexing.json  (source md5 b326b5062b2f0e69046810717534cb09)
+f40574c6fbf6162026f9b8c21182a7a7  /tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/settings/survey_state.json  (source md5 f40574c6fbf6162026f9b8c21182a7a7)
+2122f6c965b6958795ba7444821216cd  /tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/settings/workflow_survey_state.json  (source md5 2122f6c965b6958795ba7444821216cd)
+== skills: the owner's top-level entries by name, links to /Users/aminalizadeh/.kiro/skills/<name>; hirearchy is not linked
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/agents -> /Users/aminalizadeh/.kiro/skills/agents
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/autoresearch -> /Users/aminalizadeh/.kiro/skills/autoresearch
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/commit -> /Users/aminalizadeh/.kiro/skills/commit
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/dubbing -> /Users/aminalizadeh/.kiro/skills/dubbing
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/gmail -> /Users/aminalizadeh/.kiro/skills/gmail
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/music -> /Users/aminalizadeh/.kiro/skills/music
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/onboarding -> /Users/aminalizadeh/.kiro/skills/onboarding
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/realtime -> /Users/aminalizadeh/.kiro/skills/realtime
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/reverse-engineer-anything -> /Users/aminalizadeh/.kiro/skills/reverse-engineer-anything
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/setup-api-key -> /Users/aminalizadeh/.kiro/skills/setup-api-key
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/skill-generation -> /Users/aminalizadeh/.kiro/skills/skill-generation
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/sound-effects -> /Users/aminalizadeh/.kiro/skills/sound-effects
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/speech-engine -> /Users/aminalizadeh/.kiro/skills/speech-engine
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/speech-to-text -> /Users/aminalizadeh/.kiro/skills/speech-to-text
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/test-driven-development -> /Users/aminalizadeh/.kiro/skills/test-driven-development
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/text-to-speech -> /Users/aminalizadeh/.kiro/skills/text-to-speech
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/update-skills-from-changelog -> /Users/aminalizadeh/.kiro/skills/update-skills-from-changelog
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/voice-changer -> /Users/aminalizadeh/.kiro/skills/voice-changer
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/voice-isolator -> /Users/aminalizadeh/.kiro/skills/voice-isolator
+/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/workflow-suggest -> /Users/aminalizadeh/.kiro/skills/workflow-suggest
+== SKILL.md md5s (the global file is only digested)
+repo (/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md): a3e46347b70a7ece5f734f70198c607f
+global (/Users/aminalizadeh/.kiro/skills/hirearchy/SKILL.md): a3e46347b70a7ece5f734f70198c607f
+M0 copy (/tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills/hirearchy/SKILL.md): a3e46347b70a7ece5f734f70198c607f
+M0 skill rule: copied: the global file's md5 equals the repo's (a3e46347b70a7ece5f734f70198c607f)
+== ls -la /tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro
+total 0
+drwx------@  5 aminalizadeh  wheel  160 Oct 26 06:13 .
+drwx------@  3 aminalizadeh  wheel   96 Oct 26 06:13 ..
+drwxr-xr-x@  2 aminalizadeh  wheel   64 Oct 26 06:13 agents
+drwxr-xr-x@  7 aminalizadeh  wheel  224 Oct 26 06:13 settings
+drwxr-xr-x@ 23 aminalizadeh  wheel  736 Oct 26 06:13 skills
+== ls -la /tmp/hirearchy-g0-m0home-m0-s2-1792995184/.kiro/skills
+total 0
+drwxr-xr-x@ 23 aminalizadeh  wheel  736 Oct 26 06:13 .
+drwx------@  5 aminalizadeh  wheel  160 Oct 26 06:13 ..
+lrwxr-xr-x@  1 aminalizadeh  wheel   39 Oct 26 06:13 agents -> /Users/aminalizadeh/.kiro/skills/agents
+lrwxr-xr-x@  1 aminalizadeh  wheel   45 Oct 26 06:13 autoresearch -> /Users/aminalizadeh/.kiro/skills/autoresearch
+lrwxr-xr-x@  1 aminalizadeh  wheel   39 Oct 26 06:13 commit -> /Users/aminalizadeh/.kiro/skills/commit
+lrwxr-xr-x@  1 aminalizadeh  wheel   40 Oct 26 06:13 dubbing -> /Users/aminalizadeh/.kiro/skills/dubbing
+lrwxr-xr-x@  1 aminalizadeh  wheel   38 Oct 26 06:13 gmail -> /Users/aminalizadeh/.kiro/skills/gmail
+drwxr-xr-x@  3 aminalizadeh  wheel   96 Oct 26 06:13 hirearchy
+lrwxr-xr-x@  1 aminalizadeh  wheel   38 Oct 26 06:13 music -> /Users/aminalizadeh/.kiro/skills/music
+lrwxr-xr-x@  1 aminalizadeh  wheel   43 Oct 26 06:13 onboarding -> /Users/aminalizadeh/.kiro/skills/onboarding
+lrwxr-xr-x@  1 aminalizadeh  wheel   41 Oct 26 06:13 realtime -> /Users/aminalizadeh/.kiro/skills/realtime
+lrwxr-xr-x@  1 aminalizadeh  wheel   58 Oct 26 06:13 reverse-engineer-anything -> /Users/aminalizadeh/.kiro/skills/reverse-engineer-anything
+lrwxr-xr-x@  1 aminalizadeh  wheel   46 Oct 26 06:13 setup-api-key -> /Users/aminalizadeh/.kiro/skills/setup-api-key
+lrwxr-xr-x@  1 aminalizadeh  wheel   49 Oct 26 06:13 skill-generation -> /Users/aminalizadeh/.kiro/skills/skill-generation
+lrwxr-xr-x@  1 aminalizadeh  wheel   46 Oct 26 06:13 sound-effects -> /Users/aminalizadeh/.kiro/skills/sound-effects
+lrwxr-xr-x@  1 aminalizadeh  wheel   46 Oct 26 06:13 speech-engine -> /Users/aminalizadeh/.kiro/skills/speech-engine
+lrwxr-xr-x@  1 aminalizadeh  wheel   47 Oct 26 06:13 speech-to-text -> /Users/aminalizadeh/.kiro/skills/speech-to-text
+lrwxr-xr-x@  1 aminalizadeh  wheel   56 Oct 26 06:13 test-driven-development -> /Users/aminalizadeh/.kiro/skills/test-driven-development
+lrwxr-xr-x@  1 aminalizadeh  wheel   47 Oct 26 06:13 text-to-speech -> /Users/aminalizadeh/.kiro/skills/text-to-speech
+lrwxr-xr-x@  1 aminalizadeh  wheel   61 Oct 26 06:13 update-skills-from-changelog -> /Users/aminalizadeh/.kiro/skills/update-skills-from-changelog
+lrwxr-xr-x@  1 aminalizadeh  wheel   46 Oct 26 06:13 voice-changer -> /Users/aminalizadeh/.kiro/skills/voice-changer
+lrwxr-xr-x@  1 aminalizadeh  wheel   47 Oct 26 06:13 voice-isolator -> /Users/aminalizadeh/.kiro/skills/voice-isolator
+lrwxr-xr-x@  1 aminalizadeh  wheel   49 Oct 26 06:13 workflow-suggest -> /Users/aminalizadeh/.kiro/skills/workflow-suggest

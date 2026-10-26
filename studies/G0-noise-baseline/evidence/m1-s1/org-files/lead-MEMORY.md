@@ -1,0 +1,3 @@
+# Memory
+Done: 5 Oct, 12 Oct memos (accepted); 19 Oct memo reported done twice (task 2758; rework task ...-root-51b6 reported done, reviewer 8 of 8, 12 of 12). Nothing open. Budget 0.
+Playbook ideas: Summary line under title (C10/R1); omit background; Due=none unless notes state a date or client confirms; writer keeps hedges in Action cell; writer path is lead/writer/work/; reviewer ambiguity items go to 'Questions for the client:'; copy regression list verbatim to reviewer; no row for 'will keep as sent' non-actions; Summary action count must equal table rows; informal 'offered' commitments are rows (Due none).

@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-26T09:02:01+00:00",
+  "runs": 26,
+  "notified": {
+    "lead": [
+      "lead/writer:out_of_budget"
+    ],
+    "root": [
+      "lead/writer:out_of_budget"
+    ]
+  }
+}

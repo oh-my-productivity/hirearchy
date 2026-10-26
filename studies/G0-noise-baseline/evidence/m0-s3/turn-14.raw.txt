@@ -1,0 +1,7 @@
+I recorded your "keep it" for the 19 October memo, in your words. All three memos are in `/tmp/hirearchy-g0-m0-s3-1793000481/deliverables`, and the scheduler stops by itself when no work is open.
+
+For next week, ask for the memo with the notes file name, for example `2026-10-26.md`. The team will follow the Summary-first rule from the start.
+
+Two things to know:
+- **Cost:** every rework past the first draft took the runs past the 12 per request, so I asked you before each one. Reworks happen when your notes can be read two ways. Telling me up front how to treat hedged commitments ("probably", "offered to") would avoid most of them. You've already said that a commitment counts and "probably" can be dropped, and I can pass that to the team as a standing note. Do you want that?
+- **The 5 October memo:** it still lacks the Summary line, which you said you'd fix yourself.

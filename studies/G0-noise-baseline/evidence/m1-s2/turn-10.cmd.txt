@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-g0-m1-s2-assistant It\''s just an action, not a decision. Yes, that counts. No need for '\'probably\''. Sam'\''s 2026-10-21 is right. Lee'\''s none is right. Keep it as it is.'

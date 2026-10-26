@@ -1,0 +1,17 @@
+######## TURN 10  start 08:09:31  end 08:13:27  elapsed 236s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T08:09:31Z end 2026-10-26T08:13:27Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, that counts. No need for 'probably'. Sam's 2026-10-21 is right. Lee's none is right.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-10.stderr.txt):
+The 12 October memo is at `/tmp/hirearchy-g0-m0-s3-1793000481/deliverables/memo-2026-10-12.md`. I copied it from the team's file and confirmed the two match.
+
+- **Summary first:** met. It starts with the one-line Summary, then Decisions, then Action items, with Attendees and Next meeting after the table.
+- **Word limit:** met. It is 205 words by `wc` (the team counted 175), under 400.
+- **Decisions:** met. All three from the notes are there, and nothing else.
+- **Action items table:** met. The columns are Owner | Action | Due, with five rows, and Sam's and Lee's commitments, which were in prose, are included.
+- **Due dates:** met. They are Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21 and Lee `none`.
+- **Traceable to the notes:** met. Sam's row no longer says "probably", as you asked. The memo now reads slightly firmer than the notes do.
+- **Review:** met. The reviewer reported 10 of 10 criteria met, covering the 9 contract checks, your Sam change and the Summary-first rule.
+
+This memo used 10 runs of the 12 approved, 5 for the first pass and 5 for the Sam wording change. No rework you didn't ask for ran this time.
+
+Keep it, or what should change?

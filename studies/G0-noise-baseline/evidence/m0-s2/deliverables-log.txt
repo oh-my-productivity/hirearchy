@@ -1,0 +1,73 @@
+# deliverables log (protocol 7.2, D6); facts only
+
+[2026-10-26T06:23:13.513Z] call #26 turn 4 execute_bash
+COMMAND: mkdir -p /tmp/hirearchy-g0-m0-s2-1792995184/deliverables && cp /tmp/hirearchy-g0-m0-s2-1792995184/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m0-s2-1792995184/deliverables/memo-2026-10-05.md && cmp /tmp/hirearchy-g0-m0-s2-1792995184/org/lead/writer/work/memo-2026-10-05.md /tmp/hirearchy-g0-m0-s2-1792995184/deliverables/memo-2026-10-05.md && wc -w /tmp/hirearchy-g0-m0-s2-1792995184/deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 0d07ec4 2026-10-26T06:21:48Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 0d07ec4 2026-10-26T06:21:48Z']
+result: Output:
+     128 /tmp/hirearchy-g0-m0-s2-1792995184/deliverables/memo-2026-10-05.md
+
+
+Exit Code: 0
+
+[2026-10-26T06:34:12.233Z] call #46 turn 8 execute_bash
+COMMAND: cd /tmp/hirearchy-g0-m0-s2-1792995184 && cp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && cmp org/lead/writer/work/memo-2026-10-05.md deliverables/memo-2026-10-05.md && echo MATCH && cat deliverables/memo-2026-10-05.md
+source file(s): ['lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 16feaeb 2026-10-26T06:31:13Z', 'lead/writer/work/memo-2026-10-05.md -> org-git commit at that time: 16feaeb 2026-10-26T06:31:13Z']
+result: Output:
+MATCH
+# Memo: Platform team weekly, Monday 2026-10-05
+
+Source: notes/2026-10-05.md
+
+Summary: The API gateway migration is pushed to the week of 26 October, Renovate is adopted, and five actions are assigned.
+
+## Decisions
+
+- Push the API gateway migration from the week of 12 October to the week of 26 October.
+- Adopt Renovate with a weekly Monday batch of dependency PRs, starting with the three core repos.
+
+## Actions
+
+| Owner | Action | Due |
+|-------|--------|-----|
+| Priya | Draft the RFC for the new per-key rate limiter | 2026-10-09 |
+| Dev | Enable Renovate on the three core repos
+
+[2026-10-26T06:42:01.204Z] call #70 turn 12 execute_bash
+COMMAND: cd /tmp/hirearchy-g0-m0-s2-1792995184 && cp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && cmp org/lead/writer/work/memo-2026-10-12.md deliverables/memo-2026-10-12.md && echo MATCH && head -1 deliverables/memo-2026-10-12.md | cut -c1-40 && wc -w deliverables/memo-2026-10-12.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: bfa3356 2026-10-26T06:39:20Z', 'lead/writer/work/memo-2026-10-12.md -> org-git commit at that time: bfa3356 2026-10-26T06:39:20Z']
+result: Output:
+MATCH
+Summary: The 2026-10-12 platform meeting
+     198 deliverables/memo-2026-10-12.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+
+
+Exit Code: 0
+
+[2026-10-26T06:49:49.073Z] call #93 turn 15 execute_bash
+COMMAND: cd /tmp/hirearchy-g0-m0-s2-1792995184 && cp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && cmp org/lead/writer/work/memo-2026-10-19.md deliverables/memo-2026-10-19.md && echo MATCH && wc -w deliverables/memo-2026-10-19.md && ls deliverables
+source file(s): ['lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: eacc3d0 2026-10-26T06:48:06Z', 'lead/writer/work/memo-2026-10-19.md -> org-git commit at that time: eacc3d0 2026-10-26T06:48:06Z']
+result: Output:
+MATCH
+     167 deliverables/memo-2026-10-19.md
+memo-2026-10-05.md
+memo-2026-10-12.md
+memo-2026-10-19.md
+
+
+Exit Code: 0
+
+any other write into the deliverable folder (not by the assistant): none can be seen from the assistant session; the folder holds:
+  memo-2026-10-05.md size 830 mtime 06:34:12 local md5 0aea28662684b6794ba2b118a3204096
+  memo-2026-10-12.md size 1039 mtime 06:42:01 local md5 f11cfee51c2e85ae649bdd26eab81908
+  memo-2026-10-19.md size 885 mtime 06:49:49 local md5 cd2cd7dd4cef315fa8a83ffb8af2a176
+
+final ls -la:
+total 24
+drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 26 06:49 .
+drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 26 06:24 ..
+-rw-r--r--@ 1 aminalizadeh  wheel   830 Oct 26 06:34 memo-2026-10-05.md
+-rw-r--r--@ 1 aminalizadeh  wheel  1039 Oct 26 06:42 memo-2026-10-12.md
+-rw-r--r--@ 1 aminalizadeh  wheel   885 Oct 26 06:49 memo-2026-10-19.md
+

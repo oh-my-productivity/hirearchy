@@ -1,0 +1,4 @@
+/Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/harness/copy_org_evidence.sh:11: no matches found: /tmp/hirearchy-g0-m1-s3-1793003475/org/inbox/*
+/Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/harness/copy_org_evidence.sh:14: no matches found: /tmp/hirearchy-g0-m1-s3-1793003475/org/lead/reviewer/inbox/*
+/Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/harness/copy_org_evidence.sh:14: no matches found: /tmp/hirearchy-g0-m1-s3-1793003475/org/lead/writer/inbox/*
+copied; lead lead-reviewer lead-writer 

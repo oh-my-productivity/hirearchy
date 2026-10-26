@@ -1,0 +1,1 @@
+2026-10-26T04:48:17Z M0 probe profile /tmp/hirearchy-g0-m0home-preflight-1792989639/.kiro/agents/hirearchy-study-g0-probe-m0.json md5 8f79cc7cbbbf1ca39155427470603173 (byte-equal to probe/m0 copy: yes); deleted with the M0 home

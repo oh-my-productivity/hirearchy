@@ -1,0 +1,8 @@
+The 2026-10-19 memo is drafted. The reviewer passed 8 of 8, but four points need your call before I copy it. It's 135 words, with the Summary line, 3 decisions and 6 action rows. I also noted that you didn't ask for the earlier rework, and I recorded it that way.
+
+1. **Marta, "keep the agenda as sent":** it's a row in the table now, with Due `none`. It isn't something she has to do. I suggest dropping the row. Also, "demo" in that row is the writer's wording, and the notes only say "agenda".
+2. **Lee, SSO sign-off:** the notes say "probably by end of next week", and the draft has `none`. I suggest 2026-10-30, the Friday of next week. Is that right, or keep `none`?
+3. **Sam, pairing with Jo:** Jo starts Monday 26 October and Sam offered to pair "during that first week". The draft has `none`. I suggest 2026-10-30, the end of that week, and counting it as a commitment. Is that right?
+4. **Heading:** it says "Actions", where the rule says "action items table". The reviewer reads that as fine. I suggest keeping it.
+
+If any answer changes the memo, the rework needs about 5 more runs. This memo is at 5 of 12, so that fits in the approved budget.

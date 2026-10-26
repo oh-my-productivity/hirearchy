@@ -1,0 +1,246 @@
+{
+  "bytes": {
+    "first": 20943,
+    "last": 30968,
+    "last_minus_first": 10025,
+    "max": 31359,
+    "runs": 26
+  },
+  "could_not_parse": [],
+  "label": "m0-s3",
+  "lead_prompt_sizes_txt": {
+    "compared": 26,
+    "differences": [],
+    "present": true
+  },
+  "lead_runs": [
+    {
+      "bytes": 20943,
+      "file": "run-logs/lead/20261026T074520506993.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T074520506993"
+    },
+    {
+      "bytes": 25173,
+      "file": "run-logs/lead/20261026T074616881205.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T074616881205"
+    },
+    {
+      "bytes": 25107,
+      "file": "run-logs/lead/20261026T074729395594.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T074729395594"
+    },
+    {
+      "bytes": 21791,
+      "file": "run-logs/lead/20261026T074939789382.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T074939789382"
+    },
+    {
+      "bytes": 24641,
+      "file": "run-logs/lead/20261026T075036140138.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T075036140138"
+    },
+    {
+      "bytes": 24950,
+      "file": "run-logs/lead/20261026T075140851166.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T075140851166"
+    },
+    {
+      "bytes": 22046,
+      "file": "run-logs/lead/20261026T075326984385.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T075326984385"
+    },
+    {
+      "bytes": 26037,
+      "file": "run-logs/lead/20261026T075439497437.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T075439497437"
+    },
+    {
+      "bytes": 25675,
+      "file": "run-logs/lead/20261026T075556172102.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T075556172102"
+    },
+    {
+      "bytes": 31359,
+      "file": "run-logs/lead/20261026T080011330402.log",
+      "reflect": true,
+      "reflect_words": 570,
+      "stamp": "20261026T080011330402"
+    },
+    {
+      "bytes": 29024,
+      "file": "run-logs/lead/20261026T080119894533.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T080119894533"
+    },
+    {
+      "bytes": 28452,
+      "file": "run-logs/lead/20261026T080244735208.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T080244735208"
+    },
+    {
+      "bytes": 30994,
+      "file": "run-logs/lead/20261026T080601577044.log",
+      "reflect": true,
+      "reflect_words": 554,
+      "stamp": "20261026T080601577044"
+    },
+    {
+      "bytes": 30823,
+      "file": "run-logs/lead/20261026T080658248349.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T080658248349"
+    },
+    {
+      "bytes": 31294,
+      "file": "run-logs/lead/20261026T080808897651.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T080808897651"
+    },
+    {
+      "bytes": 27079,
+      "file": "run-logs/lead/20261026T080955267059.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T080955267059"
+    },
+    {
+      "bytes": 30561,
+      "file": "run-logs/lead/20261026T081053930192.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T081053930192"
+    },
+    {
+      "bytes": 30923,
+      "file": "run-logs/lead/20261026T081238711524.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T081238711524"
+    },
+    {
+      "bytes": 31011,
+      "file": "run-logs/lead/20261026T081427797364.log",
+      "reflect": true,
+      "reflect_words": 627,
+      "stamp": "20261026T081427797364"
+    },
+    {
+      "bytes": 30537,
+      "file": "run-logs/lead/20261026T081534149000.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T081534149000"
+    },
+    {
+      "bytes": 31032,
+      "file": "run-logs/lead/20261026T081650757844.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T081650757844"
+    },
+    {
+      "bytes": 29159,
+      "file": "run-logs/lead/20261026T081737120228.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T081737120228"
+    },
+    {
+      "bytes": 30565,
+      "file": "run-logs/lead/20261026T081831570854.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T081831570854"
+    },
+    {
+      "bytes": 27198,
+      "file": "run-logs/lead/20261026T082116461596.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T082116461596"
+    },
+    {
+      "bytes": 30676,
+      "file": "run-logs/lead/20261026T082226832738.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T082226832738"
+    },
+    {
+      "bytes": 30968,
+      "file": "run-logs/lead/20261026T082347315560.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T082347315560"
+    }
+  ],
+  "owner": "lead",
+  "owner_detected_by": "root tasks",
+  "reference_E3": {
+    "first_kb": 20.2,
+    "peak_kb": 29.9,
+    "reflect_words_max": 679,
+    "reflect_words_min": 452
+  },
+  "reflect_words": {
+    "max": 627,
+    "min": 554,
+    "sections": 3
+  },
+  "script": {
+    "md5": "1faad9255523d37a86795838a006e6dc",
+    "name": "prompt_sizes.py"
+  },
+  "source_files": [
+    "lead-prompt-sizes.txt",
+    "run-logs/lead/20261026T074520506993.log",
+    "run-logs/lead/20261026T074616881205.log",
+    "run-logs/lead/20261026T074729395594.log",
+    "run-logs/lead/20261026T074939789382.log",
+    "run-logs/lead/20261026T075036140138.log",
+    "run-logs/lead/20261026T075140851166.log",
+    "run-logs/lead/20261026T075326984385.log",
+    "run-logs/lead/20261026T075439497437.log",
+    "run-logs/lead/20261026T075556172102.log",
+    "run-logs/lead/20261026T080011330402.log",
+    "run-logs/lead/20261026T080119894533.log",
+    "run-logs/lead/20261026T080244735208.log",
+    "run-logs/lead/20261026T080601577044.log",
+    "run-logs/lead/20261026T080658248349.log",
+    "run-logs/lead/20261026T080808897651.log",
+    "run-logs/lead/20261026T080955267059.log",
+    "run-logs/lead/20261026T081053930192.log",
+    "run-logs/lead/20261026T081238711524.log",
+    "run-logs/lead/20261026T081427797364.log",
+    "run-logs/lead/20261026T081534149000.log",
+    "run-logs/lead/20261026T081650757844.log",
+    "run-logs/lead/20261026T081737120228.log",
+    "run-logs/lead/20261026T081831570854.log",
+    "run-logs/lead/20261026T082116461596.log",
+    "run-logs/lead/20261026T082226832738.log",
+    "run-logs/lead/20261026T082347315560.log"
+  ]
+}

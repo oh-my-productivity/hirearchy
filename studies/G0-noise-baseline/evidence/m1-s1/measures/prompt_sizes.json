@@ -1,0 +1,222 @@
+{
+  "bytes": {
+    "first": 20704,
+    "last": 27008,
+    "last_minus_first": 6304,
+    "max": 30741,
+    "runs": 23
+  },
+  "could_not_parse": [],
+  "label": "m1-s1",
+  "lead_prompt_sizes_txt": {
+    "compared": 23,
+    "differences": [],
+    "present": true
+  },
+  "lead_runs": [
+    {
+      "bytes": 20704,
+      "file": "run-logs/lead/20261026T053719224445.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T053719224445"
+    },
+    {
+      "bytes": 24369,
+      "file": "run-logs/lead/20261026T053809637805.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T053809637805"
+    },
+    {
+      "bytes": 25720,
+      "file": "run-logs/lead/20261026T053920402796.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T053920402796"
+    },
+    {
+      "bytes": 25046,
+      "file": "run-logs/lead/20261026T054016997935.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T054016997935"
+    },
+    {
+      "bytes": 24903,
+      "file": "run-logs/lead/20261026T054117578202.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T054117578202"
+    },
+    {
+      "bytes": 21542,
+      "file": "run-logs/lead/20261026T054348095433.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T054348095433"
+    },
+    {
+      "bytes": 24845,
+      "file": "run-logs/lead/20261026T054456655472.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T054456655472"
+    },
+    {
+      "bytes": 25853,
+      "file": "run-logs/lead/20261026T054613487445.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T054613487445"
+    },
+    {
+      "bytes": 21965,
+      "file": "run-logs/lead/20261026T054752951814.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T054752951814"
+    },
+    {
+      "bytes": 25596,
+      "file": "run-logs/lead/20261026T054855453202.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T054855453202"
+    },
+    {
+      "bytes": 25764,
+      "file": "run-logs/lead/20261026T054958067361.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T054958067361"
+    },
+    {
+      "bytes": 30741,
+      "file": "run-logs/lead/20261026T055257615310.log",
+      "reflect": true,
+      "reflect_words": 573,
+      "stamp": "20261026T055257615310"
+    },
+    {
+      "bytes": 28437,
+      "file": "run-logs/lead/20261026T055402165944.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T055402165944"
+    },
+    {
+      "bytes": 28016,
+      "file": "run-logs/lead/20261026T055500857802.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T055500857802"
+    },
+    {
+      "bytes": 25580,
+      "file": "run-logs/lead/20261026T055742113561.log",
+      "reflect": true,
+      "reflect_words": 549,
+      "stamp": "20261026T055742113561"
+    },
+    {
+      "bytes": 25345,
+      "file": "run-logs/lead/20261026T055836788300.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T055836788300"
+    },
+    {
+      "bytes": 26119,
+      "file": "run-logs/lead/20261026T055943504684.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T055943504684"
+    },
+    {
+      "bytes": 26110,
+      "file": "run-logs/lead/20261026T060219980910.log",
+      "reflect": true,
+      "reflect_words": 621,
+      "stamp": "20261026T060219980910"
+    },
+    {
+      "bytes": 25418,
+      "file": "run-logs/lead/20261026T060312496478.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T060312496478"
+    },
+    {
+      "bytes": 26323,
+      "file": "run-logs/lead/20261026T060417265192.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T060417265192"
+    },
+    {
+      "bytes": 22807,
+      "file": "run-logs/lead/20261026T060547757416.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T060547757416"
+    },
+    {
+      "bytes": 26670,
+      "file": "run-logs/lead/20261026T060650313122.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T060650313122"
+    },
+    {
+      "bytes": 27008,
+      "file": "run-logs/lead/20261026T060753179556.log",
+      "reflect": false,
+      "reflect_words": 0,
+      "stamp": "20261026T060753179556"
+    }
+  ],
+  "owner": "lead",
+  "owner_detected_by": "root tasks",
+  "reference_E3": {
+    "first_kb": 20.2,
+    "peak_kb": 29.9,
+    "reflect_words_max": 679,
+    "reflect_words_min": 452
+  },
+  "reflect_words": {
+    "max": 621,
+    "min": 549,
+    "sections": 3
+  },
+  "script": {
+    "md5": "1faad9255523d37a86795838a006e6dc",
+    "name": "prompt_sizes.py"
+  },
+  "source_files": [
+    "lead-prompt-sizes.txt",
+    "run-logs/lead/20261026T053719224445.log",
+    "run-logs/lead/20261026T053809637805.log",
+    "run-logs/lead/20261026T053920402796.log",
+    "run-logs/lead/20261026T054016997935.log",
+    "run-logs/lead/20261026T054117578202.log",
+    "run-logs/lead/20261026T054348095433.log",
+    "run-logs/lead/20261026T054456655472.log",
+    "run-logs/lead/20261026T054613487445.log",
+    "run-logs/lead/20261026T054752951814.log",
+    "run-logs/lead/20261026T054855453202.log",
+    "run-logs/lead/20261026T054958067361.log",
+    "run-logs/lead/20261026T055257615310.log",
+    "run-logs/lead/20261026T055402165944.log",
+    "run-logs/lead/20261026T055500857802.log",
+    "run-logs/lead/20261026T055742113561.log",
+    "run-logs/lead/20261026T055836788300.log",
+    "run-logs/lead/20261026T055943504684.log",
+    "run-logs/lead/20261026T060219980910.log",
+    "run-logs/lead/20261026T060312496478.log",
+    "run-logs/lead/20261026T060417265192.log",
+    "run-logs/lead/20261026T060547757416.log",
+    "run-logs/lead/20261026T060650313122.log",
+    "run-logs/lead/20261026T060753179556.log"
+  ]
+}

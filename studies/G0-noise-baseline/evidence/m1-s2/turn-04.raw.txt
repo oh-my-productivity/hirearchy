@@ -1,0 +1,3 @@
+Before I send these two values back for a rework, there's a cost to flag. The team has used 9 of the 12 approved runs. The edit and a re-check by the reviewer need about 5 more, so about 14 in all, 2 over your cap. The reviewer re-check is what makes check 7 (6 of 6) pass.
+
+Do you approve up to 14 runs for this memo? If not, I can deliver the current draft with `none` for both dates, but then check 5 stays unmet for those two rows.

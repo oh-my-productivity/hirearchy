@@ -1,0 +1,86 @@
+# client questions (protocol 7.2); facts only
+
+Result messages root received (lead -> root), with the product parser's items (hirearchy.kernel._text.client_questions):
+- id 20261026T074802460120-lead-1505 folder=read created=2026-10-26T07:48:02+00:00 answers(reply_to)=20261026T074518776162-root-e415 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Sam 'before Friday' -> Due 2026-10-08 (C6): reviewer: 'defensible, a range reading would give none'.
+- Lee 'this week' -> Due none (C6): reviewer: 'no hard date attached, none is consistent'; Friday 2026-10-09 would contradict it.
+- Marta, room for Oct 14 -> Due none (C6): reviewer: 'Oct 14 is the training date, not clearly a booking deadline'; could be read as 2026-10-14.
+- 'Attendees' and 'Next meeting' lines (C1/C7): reviewer: 'a strict C1 reader might call the next-meeting line extra'; both come from the notes.
+
+Deliverable: lead/writer/work/memo-2026-10-05.md (my read: 115 words, 20 lines, modified 07:46:05 UTC; final file, reviewed as is). Copy to deliverables as memo-2026-10-05.md.
+My check: C1 only the 5 Oct meeting; C2 115 <= 400; C3 2 decisions (gateway push to week of 26 Oct, adopt Renovate), both in the notes, no others; C4 header '| Owner | Action | Due |'; C5 5 rows (Priya, Dev, Marta labelled; Sam and Lee in prose), matching the notes; C6 all values ISO or none (Fri = 2026-10-09); C7 every line traces to the notes; C8 reviewer found no required changes, so none to apply.
+Reviewer coverage line (verbatim): criteria met: 7 of 7 (review: lead/reviewer/work/review-memo-2026-10-05.md). Required changes: none.
+  parsed items (4): ["Sam 'before Friday' -> Due 2026-10-08 (C6): reviewer: 'defensible, a range reading would give none'.", "Lee 'this week' -> Due none (C6): reviewer: 'no hard date attached, none is consistent'; Friday 2026-10-09 would contradict it.", "Marta, room for Oct 14 -> Due none (C6): reviewer: 'Oct 14 is the training date, not clearly a booking deadline'; could be read as 2026-10-14.", "'Attendees' and 'Next meeting' lines (C1/C7): reviewer: 'a strict C1 reader might call the next-meeting line extra'; both come from the notes."]
+- id 20261026T075207002484-lead-1cb9 folder=read created=2026-10-26T07:52:07+00:00 answers(reply_to)=20261026T074936893313-root-ce42 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client (reviewer's ambiguous items; both values already set by your answer, listed so you can confirm):
+- C6, Sam: notes say "before Friday"; read literally that is 2026-10-08, the memo has 2026-10-09 (your decision).
+- C6, Marta: notes give Oct 14 only as the training date, not a booking deadline; memo has 2026-10-14 (your decision).
+
+Memo: lead/writer/work/memo-2026-10-05.md (115 words by my read). Checked against notes: C1 only the 5 Oct meeting; C2 115 <= 400; C3 two decisions (gateway push to week of 26 Oct, Renovate adoption), none extra; C4 table header is exactly Owner | Action | Due; C5 five rows (Priya, Dev, Sam, Marta, Lee), incl. prose commitments Sam and Lee; C6 all Due values are ISO or none; C7 all traceable. Request-only: Sam 2026-10-09, Marta 2026-10-14, Lee none, Attendees and Next meeting lines present; other rows unchanged.
+Reviewer's final coverage line: "criteria met: 8 of 8" (verdict pass, required changes none). Review: lead/reviewer/work/review-memo-2026-10-05-v2.md.
+  parsed items (2): ['C6, Sam: notes say "before Friday"; read literally that is 2026-10-08, the memo has 2026-10-09 (your decision).', 'C6, Marta: notes give Oct 14 only as the training date, not a booking deadline; memo has 2026-10-14 (your decision).']
+- id 20261026T075618747289-lead-fd9b folder=read created=2026-10-26T07:56:18+00:00 answers(reply_to)=20261026T075326752629-root-9de8 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Sam, 'before Friday' (C6): reviewer A1 says it 'can mean Thursday 2026-10-08 (strictly before) or Friday 2026-10-09 (by Friday)'. Memo uses 2026-10-08 and explains it in Open questions.
+- Marta, 'book the room for Oct 14' (C6): reviewer A2 says it 'could be read as a due date of 2026-10-14 ... or as no deadline'. Memo uses none and explains it in Open questions.
+- Open questions section (C1/C7): reviewer A3 says it 'is not decision or action content'. Kept because your note asked for the explanations there.
+
+Memo reworked: Sam Due 2026-10-08, Marta Due none, Open questions section added. I read it myself: 152 words (C2), Decisions has 2 items, Action items table is Owner | Action | Due with 5 rows (Priya 2026-10-09, Dev 2026-10-08, Sam 2026-10-08, Marta none, Lee none). Each row matches the notes text. The writer applied every change.
+Reviewer's final line: criteria met: 7 of 7 (lead/reviewer/work/review-memo-2026-10-05-v3.md). The reviewer re-checked every Due value, not only the changed rows.
+The memo is at lead/writer/work/memo-2026-10-05.md. It still has to be copied to /tmp/hirearchy-g0-m0-s3-1793000481/deliverables.
+  parsed items (3): ["Sam, 'before Friday' (C6): reviewer A1 says it 'can mean Thursday 2026-10-08 (strictly before) or Friday 2026-10-09 (by Friday)'. Memo uses 2026-10-08 and explains it in Open questions.", "Marta, 'book the room for Oct 14' (C6): reviewer A2 says it 'could be read as a due date of 2026-10-14 ... or as no deadline'. Memo uses none and explains it in Open questions.", "Open questions section (C1/C7): reviewer A3 says it 'is not decision or action content'. Kept because your note asked for the explanations there."]
+- id 20261026T080316250340-lead-bd32 folder=read created=2026-10-26T08:03:16+00:00 answers(reply_to)=20261026T080011089548-root-53b3 status=blocked from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- A3, C9/R1: does a title heading line count as 'starting' the memo? The reviewer read it strictly (not met), and said that if a title is allowed the score is 10 of 11, with only C8 open.
+- A4, C9 scope: are the Attendees and Next meeting lines allowed extras? The reviewer says 'Nothing else from the notes beyond what is needed' could be read both ways.
+- A1, C6: Sam 'before Friday' could be 2026-10-08. The request fixes 2026-10-09.
+- A2, C6: Marta 'for Oct 14' is the training date and not clearly a deadline. The request fixes 2026-10-14.
+  parsed items (4): ["A3, C9/R1: does a title heading line count as 'starting' the memo? The reviewer read it strictly (not met), and said that if a title is allowed the score is 10 of 11, with only C8 open.", "A4, C9 scope: are the Attendees and Next meeting lines allowed extras? The reviewer says 'Nothing else from the notes beyond what is needed' could be read both ways.", "A1, C6: Sam 'before Friday' could be 2026-10-08. The request fixes 2026-10-09.", "A2, C6: Marta 'for Oct 14' is the training date and not clearly a deadline. The request fixes 2026-10-14."]
+- id 20261026T080832382363-lead-3e2c folder=read created=2026-10-26T08:08:32+00:00 answers(reply_to)=20261026T080557284311-root-3e5e status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Sam's staging row (C5): hedged 'will probably sort it out himself'; reviewer: 'a stricter reading of "no row for something nobody committed to" could drop it' (ambiguous A-1). Kept as a row, Due 2026-10-21 (day before the Oct 22 freeze).
+- Lee's pager/swap row (C6): reviewer lists Due none vs. 'demo week' as ambiguous (A-2); 'demo week' is not a single day, so none.
+
+Memo: lead/writer/work/memo-2026-10-12.md (182 words per my read, modified 08:06:48 UTC). Starts with 'Summary:' (line 1, no title), then Decisions (3), then Action items table Owner | Action | Due (5 rows: Dev 2026-10-14, Marta 2026-10-16, Priya 2026-10-20, Sam 2026-10-21, Lee none); Attendees and Next meeting only after the table. I checked C1-C7, C9 and R1 against the notes myself: all met. C8: reviewer shows all met, no required changes, so no rework.
+Reviewer coverage line (verbatim): criteria met: 8 of 8. Ledger: lead/reviewer/work/review-memo-2026-10-12.md
+Deliverable name: memo-2026-10-12.md.
+  parsed items (2): ['Sam\'s staging row (C5): hedged \'will probably sort it out himself\'; reviewer: \'a stricter reading of "no row for something nobody committed to" could drop it\' (ambiguous A-1). Kept as a row, Due 2026-10-21 (day before the Oct 22 freeze).', "Lee's pager/swap row (C6): reviewer lists Due none vs. 'demo week' as ambiguous (A-2); 'demo week' is not a single day, so none."]
+- id 20261026T081259998242-lead-5681 folder=read created=2026-10-26T08:12:59+00:00 answers(reply_to)=20261026T080954982406-root-0b0b status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Sam row (C5/C7): the notes hedge it ("will probably sort it out himself"); the memo now states it flatly, as you asked. Reviewer A-1: "whether a hedged statement is a commitment (C5) and whether dropping 'probably' still counts as traceable without overstatement (C7) is lead's call." Kept as you directed (row kept, Due 2026-10-21).
+
+Memo: lead/writer/work/memo-2026-10-12.md (175 words per reviewer; I read it myself). Only change vs. the previous version: Sam's Action reads "Update the out-of-date staging test data so it is ready the day before the freeze starts" (no 'probably'), Due 2026-10-21; Lee Due none. Line 1 is "Summary: ...", then Decisions (3), then Action items table (Owner | Action | Due, 5 rows), then Attendees and Next meeting. C1-C7, C9 checked against the notes.
+Reviewer's final line: "criteria met: 10 of 10" (C1-C7, C9, this-request line, R1). Ledger: lead/reviewer/work/review-memo-2026-10-12-v2.md. Required changes: none.
+Deliverable: memo-2026-10-12.md (copy from lead/writer/work/memo-2026-10-12.md).
+  parsed items (1): ['Sam row (C5/C7): the notes hedge it ("will probably sort it out himself"); the memo now states it flatly, as you asked. Reviewer A-1: "whether a hedged statement is a commitment (C5) and whether dropping \'probably\' still counts as traceable without overstatement (C7) is lead\'s call." Kept as you directed (row kept, Due 2026-10-21).']
+- id 20261026T081855341826-lead-0c29 folder=read created=2026-10-26T08:18:55+00:00 answers(reply_to)=20261026T081424472572-root-c118 status=done from=lead
+  raw 'Questions for the client' text: Questions for the client:
+- Lee 'probably by end of next week': Due none or 2026-10-30? (C6; reviewer: 'can be read two ways')
+- Marta 'Marta will keep the agenda as sent': a row (commitment) or only a status statement? (C5; reviewer: ambiguous)
+- Sam 'offered to pair with Jo on the CI pipeline': a row (commitment) or only an offer? (C5; reviewer: ambiguous)
+Memo kept as verified, with all three rows and Lee Due none.
+
+Memo: lead/writer/work/memo-2026-10-19.md. I read it: 159 words (C2 met, limit 400), line 1 'Summary: ...' then ## Decisions (3 bullets) then ## Action items (table | Owner | Action | Due |, 6 rows), Attendees and Next meeting after the table (C9, R1 met). Due values: 2026-10-23, 2026-10-24, 2026-10-26, rest none (C6). Row 1 now 'Keep the agenda as sent', matching the notes (C7). Writer applied the one required change (C8).
+Reviewer final line: criteria met: 8 of 8
+Ledger: lead/reviewer/work/review-2026-10-19.md (traceability check only, not a fact-check).
+  parsed items (3): ["Lee 'probably by end of next week': Due none or 2026-10-30? (C6; reviewer: 'can be read two ways')", "Marta 'Marta will keep the agenda as sent': a row (commitment) or only a status statement? (C5; reviewer: ambiguous)", "Sam 'offered to pair with Jo on the CI pipeline': a row (commitment) or only an offer? (C5; reviewer: ambiguous)"]
+- id 20261026T082415086090-lead-407a folder=read created=2026-10-26T08:24:15+00:00 answers(reply_to)=20261026T082116199481-root-59ec status=done from=lead
+  raw 'Questions for the client' text: Questions for the client: none open. The reviewer called two items ambiguous (Sam's offer to pair as a commitment; Lee's hedged 'probably by end of next week'). You already ruled on both in this request: Sam row kept, Lee 2026-10-30.
+
+Reviewer coverage line (verbatim): criteria met: 9 of 9
+Review: lead/reviewer/work/review-2026-10-19-v3.md
+
+Deliverable: lead/writer/work/memo-2026-10-19.md
+  parsed items (0): []
+
+progress replies the assistant received that contain 'for the client: ask the user before you copy or deliver':
+- call #15 2026-10-26T07:48:03.595Z turn 3 hirearchy::progress: ['"Memo for the 2026-10-05 weekly meeting" [service weekly-meeting-memo v1]: done. runs 5 of 12 (7 returned). last activity 0s ago. artifacts withheld (ask first). 4 questions for the client: ask the user before you copy or deliver. no feedback yet. (task 20261026T074518776162-root-e415)']
+- call #21 2026-10-26T07:52:08.403Z turn 4 hirearchy::progress: ['"Rework memo 2026-10-05: two due dates" [service weekly-meeting-memo v1]: done. runs 5 of 7 (2 returned). last activity 0s ago. artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver. no feedback yet. case total: 10 runs used of 19 handed down (contract: 12 per request). (task 20261026T074936893313-root-ce42)']
+- call #23 2026-10-26T07:52:12.768Z turn 4 hirearchy::progress: ['"Rework memo 2026-10-05: two due dates" [service weekly-meeting-memo v1]: done. runs 5 of 7 (2 returned). last activity 1s ago. artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver. no feedback yet. case total: 10 runs used of 19 handed down (contract: 12 per request). (task 20261026T074936893313-root-ce42)']
+- call #35 2026-10-26T07:58:43.159Z turn 6 hirearchy::progress: ['"Rework memo 2026-10-05: unclear due dates" [service weekly-meeting-memo v1]: done. runs 5 of 6 (1 returned). last activity 1m ago. artifacts withheld (ask first). 3 questions for the client: ask the user before you copy or deliver. no feedback yet. case total: 15 runs used: 10 by the user\'s requests, 5 by your relayed rework 20261026T075326752629-root-9de8; 25 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user\'s: report them to the user as yours, and never ask the user to fund them. (task 20261026T075326752629-root-9de8)']
+- call #45 2026-10-26T08:03:17.048Z turn 7 hirearchy::progress: ['"Rework memo 2026-10-05: add Summary line" [service weekly-meeting-memo v1]: blocked: C9 and R1 are not met, so I can\'t report done. Reviewer coverage line (lead/reviewer/work/review-memo-2026-10…. runs 5 of 5. last activity 0s ago. 4 questions for the client: ask the user before you copy or deliver. case total: 20 runs used: 15 by the user\'s requests, 5 by your relayed rework 20261026T075326752629-root-9de8; 30 handed down (contract: 12 per request). The runs of your relayed rework are your own spend, not the user\'s: report them to the user as yours, and never ask the user to fund them. (task 20261026T080011089548-root-53b3)']
+- call #58 2026-10-26T08:08:34.492Z turn 9 hirearchy::progress: ['"Memo for the 2026-10-12 weekly meeting" [service weekly-meeting-memo v2]: done. runs 5 of 12 (7 returned). last activity 0s ago. artifacts withheld (ask first). 2 questions for the client: ask the user before you copy or deliver. no feedback yet. (task 20261026T080557284311-root-3e5e)']
+- call #69 2026-10-26T08:13:00.378Z turn 10 hirearchy::progress: ['"Rework memo 2026-10-12: Sam row wording" [service weekly-meeting-memo v2]: done. runs 5 of 5. last activity 0s ago. artifacts withheld (ask first). 1 question for the client: ask the user before you copy or deliver. no feedback yet. case total: 10 runs used of 17 handed down (contract: 12 per request). (task 20261026T080954982406-root-0b0b)']
+- call #80 2026-10-26T08:18:56.075Z turn 11 hirearchy::progress: ['"Memo for the 2026-10-19 weekly meeting" [service weekly-meeting-memo v2]: done. runs 9 of 12 (3 returned). last activity 0s ago. artifacts withheld (ask first). 3 questions for the client: ask the user before you copy or deliver. no feedback yet. (task 20261026T081424472572-root-c118)']
+count: 8

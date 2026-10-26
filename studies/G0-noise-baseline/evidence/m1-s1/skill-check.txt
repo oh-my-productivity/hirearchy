@@ -1,0 +1,21 @@
+# m1-s1 skill check (design 20.1; protocol 4.4) mode turn1 at 2026-10-26T05:35:07Z
+arm: m1
+repo skill:      a3e46347b70a7ece5f734f70198c607f  lines 125  (/Volumes/workspace/hirearchy/skills/hirearchy/SKILL.md)
+workspace copy:  a3e46347b70a7ece5f734f70198c607f  lines 125  (/tmp/hirearchy-g0-m1-s1-1792992820/.kiro/skills/hirearchy/SKILL.md)
+global (md5 only): a3e46347b70a7ece5f734f70198c607f
+M0 copy:         n/a (arm m1)
+required: a3e46347b70a7ece5f734f70198c607f
+rule: the workspace copy = the repo file = required; the global copy = the workspace copy or absent; arm m0: M0's copy exists exactly when the global copy exists, same md5
+
+first disclose_context call for the skill: CALL #2, turn 1, 2026-10-26T05:34:24.065Z, status completed (not an error),
+  disclosed uri: file:///private/tmp/hirearchy-g0-m1-s1-1792992820/.kiro/skills/hirearchy/SKILL.md
+  md5 of the SKILL.md at that path: a3e46347b70a7ece5f734f70198c607f (valid: = a3e46347b70a7ece5f734f70198c607f)
+
+skill-activation stratum (4.4.1): first propose_org call = none; first feedback call = none.
+  the session has neither a propose_org nor a feedback call -> stratum n/a.
+stratum: n/a
+
+occurrences of 'Note: the installed skill at' in the whole transcript: 0 (assistant-session-messages.jsonl); (file absent) (assistant-tool-calls.txt)
+disclose_context calls in the session: 1 (1 for the hirearchy skill)
+
+verdict: OK

@@ -1,0 +1,74 @@
+{
+  "name": "hirearchy-hirearchy-g0-m1-s2-17929-f6c723-read-xd20a231f",
+  "description": "internal: used by the hirearchy scheduler for /private/tmp/hirearchy-g0-m1-s2-1792997653/org; not a general-purpose agent (built-in tools: read)",
+  "prompt": "You are a member of a file-based agent organization. The user message contains your rules, charter, memory, state and new messages for this run. Follow it exactly, act through the hirearchy tools, and stop when the messages are handled. The hirearchy tools are deferred: load them with tool_load (tool_ids [\"hirearchy::*\"] loads all of them), then call each with tool_call and tool_id \"hirearchy::<name>\", for example hirearchy::whoami. Where the rules say @hirearchy/<name>, use hirearchy::<name>.",
+  "mcpServers": {
+    "hirearchy": {
+      "command": "/Volumes/workspace/hirearchy/.venv/bin/hirearchy",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "ORG_ROOT": "/private/tmp/hirearchy-g0-m1-s2-1792997653/org",
+        "ORG_REQUIRE_AGENT": "1"
+      }
+    }
+  },
+  "tools": [
+    "@hirearchy",
+    "read"
+  ],
+  "resources": [],
+  "hooks": [],
+  "includeMcpJson": false,
+  "includePowers": false,
+  "permissions": {
+    "rules": [
+      {
+        "capability": "mcp",
+        "match": [
+          "hirearchy/*"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "fs_read",
+        "effect": "allow",
+        "match": [
+          "/private/tmp/hirearchy-g0-m1-s2-1792997653/notes",
+          "/private/tmp/hirearchy-g0-m1-s2-1792997653/notes/**",
+          "/private/tmp/hirearchy-g0-m1-s2-1792997653/org",
+          "/private/tmp/hirearchy-g0-m1-s2-1792997653/org/**"
+        ]
+      },
+      {
+        "capability": "fs_read",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ],
+        "exclude": [
+          "/private/tmp/hirearchy-g0-m1-s2-1792997653/notes",
+          "/private/tmp/hirearchy-g0-m1-s2-1792997653/notes/**",
+          "/private/tmp/hirearchy-g0-m1-s2-1792997653/org",
+          "/private/tmp/hirearchy-g0-m1-s2-1792997653/org/**"
+        ]
+      },
+      {
+        "capability": "fs_write",
+        "effect": "deny",
+        "match": [
+          "/**"
+        ]
+      },
+      {
+        "capability": "skill",
+        "effect": "deny"
+      },
+      {
+        "capability": "context",
+        "effect": "deny"
+      }
+    ]
+  }
+}

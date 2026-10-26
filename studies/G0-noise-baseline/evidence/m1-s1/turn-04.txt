@@ -1,0 +1,9 @@
+######## TURN 4  start 05:42:34  end 05:42:56  elapsed 22s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T05:42:34Z end 2026-10-26T05:42:56Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Sam's should be 2026-10-09. Marta's should be 2026-10-14. Lee's none is right. No, it's just an action, not a decision.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-04.stderr.txt):
+Thanks, that settles all four. Sam's due date becomes 2026-10-09 and Marta's becomes 2026-10-14. Lee's stays none and stays only an action.
+
+These two date changes mean a rework: the writer edits the memo, and the reviewer re-checks it. The team has used 9 of the 12 runs, so 3 are left. A rework needs about 5, which would bring this memo to about 14 runs, 2 over what you approved. With only 3 runs the team might not finish the re-check.
+
+Should I send the rework with a budget of 5 (2 runs over your 12), or keep it to the 3 that are left and accept that risk?

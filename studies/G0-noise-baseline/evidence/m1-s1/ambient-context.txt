@@ -1,0 +1,12 @@
+session id: sess_a73645a6-b633-418c-b81f-b1c22aaf341d  agentMode: hirearchy-study-g0-m1-s1-assistant  modelId: claude-sonnet-5.5  effortLevel: high
+workspacePaths: ['/private/tmp/hirearchy-g0-m1-s1-1792992820']  workflowsEnabled: False  memoryConfig: {'mode': 'read_write', 'reflection': True}
+session_start id: session_start_sess_a73645a6-b633-418c-b81f-b1c22aaf341d_hirearchy-study-g0-m1-s1-assistant  timestamp: 2026-10-26T05:34:42.493Z  agentType: hirearchy-study-g0-m1-s1-assistant
+session_start composition: {"schema": 1, "contentChars": 6666, "learningsChars": 4638}
+session_start content length: 6666 chars
+<memories> block present: True
+memory index titles (20): TITLE, reply-in-english-despite-pt-es-links, transcribe-youtube-trimmed-audio, products-must-be-buyable-in-portugal, explain-anything-playbook, narrated-image-video-workflow, zsh-var-colon-modifier-ffmpeg, reference-images-for-multi-scene-consistency, host-npm-and-skills-cli-setup, docker-for-installs, youtube-script-org, always-tdd, edit-mcp-json-python, whatsapp-contact-lookup, research-then-reuse, avoid-popular-tts-voices, katana-video-project, use-evolve-subagents, ui-port-preferences, use-uv-for-python
+scope lines: ['## Global (19 shown / 19 total)']
+<steering-files> block present: False
+'Workflow Orchestration' text present: False
+md5 of content with sandbox path replaced by <S>: 8428498b361c4b0126bc0e648ed98d28
+other top-level tags in content: ['index', 'memories']

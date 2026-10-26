@@ -1,0 +1,2 @@
+Memos: 2026-10-05 (lead/writer/work/memo-2026-10-05.md, 140 words, done); 2026-10-12 (memo-2026-10-12.md, 175 words, rework done: Sam row 'probably' removed at human request; Lee none). 2026-10-19 (memo-2026-10-19.md, 152 words; rework task e956 done: Lee Due 2026-10-30, Marta agenda row removed, 5 rows; judgement calls in work/notes-2026-10-19.md). No open tasks.
+Format: Summary first line, Decisions, Action items table (Owner|Action|Due), Attendees/Next meeting after. Due only for single clear day, else none.

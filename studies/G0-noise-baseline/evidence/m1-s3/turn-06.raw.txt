@@ -1,0 +1,5 @@
+I've recorded your rejection. I haven't changed anything else yet. I have one yes/no question and one cost question.
+
+**Yes or no:** About C3: add "Start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items" as a lasting rule? If you say yes, it becomes a permanent check for every weekly memo, and the reviewer will enforce it.
+
+**Cost:** Fixing this week's memo means the writer adds the summary line and the reviewer re-checks it. That is about 5 more runs, which would put this memo's total at about 19. You approved 14 and the plan said 12. Do you want me to send it back for that rework?

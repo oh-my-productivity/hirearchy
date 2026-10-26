@@ -1,0 +1,9 @@
+I've recorded your rejection. Marta's 2026-10-14 and the Summary line both need a rework of this memo, and I haven't started it. Before I do, I need two things from you.
+
+1. **Lasting rule.** About C3: add "always start the memo with a one-line 'Summary:' of the meeting, then the decisions, then the action items" as a lasting rule? Yes or no.
+   - On yes, this applies to every future memo, and the new rule settles the "exactly these sections" check (C3).
+   - On no, I'll treat it as a one-off for this memo.
+
+2. **Extra runs.** The case has used 10 of the 12 runs you approved, and a rework costs about 5 (the last one did). May I spend about 5 more, for about 15 in total? If you'd rather not, I'll stop here and the current memo stays in `deliverables` as it is.
+
+Either way, the rework for this memo will set Marta's Due to 2026-10-14 and add the one-line Summary at the top.

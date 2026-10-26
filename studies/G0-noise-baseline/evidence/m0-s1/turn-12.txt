@@ -1,0 +1,19 @@
+######## TURN 12  start 05:28:18  end 05:28:40  elapsed 22s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T05:28:18Z end 2026-10-26T05:28:40Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No more spend, please deliver as is.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+I copied the 19 October memo to `/tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-19.md`, and the copy matches the team's file. No more runs were spent. The reviewer never re-checked this corrected version, so it is not independently verified.
+
+My own reading against your notes:
+- **Length and layout:** 260 words by `wc` (the team counted 226), under the 400 limit. It opens with the Summary, then Decisions, Action items and Open items.
+- **Decisions and actions:** all 3 decisions are there. The action table has 5 rows, with Owner | Action | Due columns.
+- **Your corrections:** Lee is 2026-10-30 "(tentative)", and Marta's "keep the agenda" row is gone.
+- **Left out:** the closing time and the "Present" and "Next meeting" lines, unlike the 5 and 12 October memos.
+
+The first version of this memo had passed the reviewer's checks, but it was before your two changes.
+
+The case used 13 of the 12 runs. The task stays marked blocked on the check I skipped, since I haven't recorded it as accepted. The scheduler is stopped.
+
+For the 5 October memo, the team spent 5 runs on a rework I can't explain and you didn't ask for. I've told you about that already, and those runs aren't yours to fund.
+
+The next memo is the same request with a new file name, for example `2026-10-26.md`. Two things to know: I budgeted about 3 runs for a correction and it needs about 5, so a rework can run over 12. If you want a ceiling that covers a correction round, say so and I'll set it.

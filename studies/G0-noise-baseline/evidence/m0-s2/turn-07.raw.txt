@@ -1,0 +1,20 @@
+The new memo is mostly done, but I haven't delivered it yet. The reviewer's check came back 7 of 8, because the title and "Source:" lines come before "Summary:". It reads "starts with" literally.
+
+The current draft:
+
+```
+# Memo: Platform team weekly, Monday 2026-10-05
+Source: notes/2026-10-05.md
+Summary: The API gateway migration is pushed to the week of 26 October, Renovate is adopted, and five actions are assigned.
+## Decisions … (2 items)
+## Actions … (table, Marta 2026-10-14, Sam 2026-10-09, Lee none)
+Next meeting: Monday 2026-10-12.
+```
+
+One question: is it fine to keep the title line (and the "Source:" line) above the Summary line?
+- **Yes:** I accept it as is, which costs no more runs. I'd clarify C9 so a title above the Summary is allowed.
+- **No, "Summary:" must be the very first line:** the team moves the title and source below the table. That costs about 3 more runs, which is within the 5 you funded for this rework.
+
+Cost so far, since you asked me to watch it:
+- **Your funding:** this memo has used 15 runs of the 17 you funded (12 approved, plus 5 for this rework).
+- **My spend:** a separate 5-run rework appears in the trace, titled "unclear due dates". I didn't knowingly send it, and the system logs it to me, not to you. It set Sam to 2026-10-08, Marta to none and added an "Open questions" section, which undid your answers. I discarded it by restoring the version you judged. I won't charge those 5 runs to you.

@@ -1,0 +1,2 @@
+2026-10-26T04:48:17Z processes naming /tmp/hirearchy-g0-detach-1792989925: 0
+2026-10-26T04:48:17Z check SB gone: gone

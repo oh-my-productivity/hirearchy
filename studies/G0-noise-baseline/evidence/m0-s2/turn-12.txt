@@ -1,0 +1,19 @@
+######## TURN 12  start 06:41:44  end 06:42:06  elapsed 22s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T06:41:44Z end 2026-10-26T06:42:06Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Yes, that counts. No need for 'probably'. Sam's 2026-10-21 is right. Action only, it's not a decision. Lee's row is enough, Dev doesn't need one.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+The 12 October memo is delivered, unchanged from the draft you saw: `/tmp/hirearchy-g0-m0-s2-1792995184/deliverables/memo-2026-10-12.md`. The copy matches the team's file.
+
+- Starts with the one-line "Summary:" and nothing before it, then Decisions, then Actions: met
+- Covers only the 12 October meeting: met
+- At most 400 words: met (198 by `wc`, 162 by the team's count)
+- Decisions list only real decisions (3 items): met
+- Actions table with columns Owner | Action | Due: met (5 rows)
+- Every commitment is a row, including Sam's and Lee's prose items: met
+- ISO dates, `none` where the notes give none: met (Sam 2026-10-21, Lee none)
+- Everything traces to the notes, nothing invented: met
+- Reviewer's report shows every criterion met: met (8 of 8)
+
+It used 5 of the 12 runs. Keep it, or what should change?
+
+For next week, ask me for the 26 October notes (`2026-10-26.md`) once they exist.

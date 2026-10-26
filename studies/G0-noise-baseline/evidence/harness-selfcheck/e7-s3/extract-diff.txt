@@ -1,0 +1,103 @@
+##### s3 deliverables-log.txt
+--- E7 committed deliverables-log.txt
++++ regenerated deliverables-log.txt
+@@ -55,6 +55 @@
+-total 24
+-drwxr-xr-x@ 5 aminalizadeh  wheel   160 Oct 25 08:57 .
+-drwxr-xr-x@ 7 aminalizadeh  wheel   224 Oct 25 08:32 ..
+--rw-r--r--@ 1 aminalizadeh  wheel  1570 Oct 25 08:42 memo-2026-10-05.md
+--rw-r--r--@ 1 aminalizadeh  wheel  1245 Oct 25 08:49 memo-2026-10-12.md
+--rw-r--r--@ 1 aminalizadeh  wheel  1215 Oct 25 08:57 memo-2026-10-19.md
++(no sandbox: the listing above is of the stream dir's memos/ copy)
+
+##### s3 run-session-map.txt
+--- E7 committed run-session-map.txt
++++ regenerated run-session-map.txt
+@@ -6 +6 @@
+-org kiro sessions copied: 40 (to org-kiro-sessions/<hash>/<session id>/)
++org kiro sessions read from the stream dir copy: 40 (org-kiro-sessions/<hash>/<session id>/)
+
+##### s3 injection/window-runs.txt
+--- E7 committed injection/window-runs.txt
++++ regenerated injection/window-runs.txt
+@@ -8 +8 @@
+-  org-git commit 874ce84 MEMORY.md diff:
++  org-git commit 874ce84 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+@@ -11 +11 @@
+-    Date:   Sun Oct 25 08:33:35 2026 +0000
++    Date:   2026-10-25 08:33:35 +0000
+@@ -15,12 +15,6 @@
+-    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+-    index 0c4063e..13509e7 100644
+-    --- a/lead/MEMORY.md
+-    +++ b/lead/MEMORY.md
+-    @@ -1,4 +1,4 @@
+-     # Memory
+-    -Request 20261025T082434523661-root-09df (memo 2026-10-05) done earlier.
+-    -Client-correction task 20261025T082820566824-root-62a5: reviewer re-check 'criteria met 7 of 7' PASS; I verified memo (216 words) and reported done to root with questions for the client. Nothing outstanding.
+-    -Playbook lesson: ambiguous Due readings (relative day, event date vs booking deadline) go to client up front.
+-    +Request 20261025T082434523661-root-09df (memo 2026-10-05) done earlier; client correction 62a5 done (reviewer 7 of 7).
+-    +Current: rework task 20261025T083249523405-root-5834 (Sam Due -> 2026-10-08 + derivation in Open items; Marta Due -> none + note in Open items). Delegated to writer (revises ...-lead-1ffd, budget 1). NEXT: when writer reports, read memo, then delegate reviewer re-check (revises 20261025T082936980102-lead-86fc, budget 1) of WHOLE memo, explicitly checking every Due value vs notes text; then verify myself and report done to root with reviewer's coverage line verbatim and lessons.
+-    +Playbook lesson: ambiguous Due readings (relative day, event date vs booking deadline) go to client up front; event date != deadline.
++     lead/MEMORY.md                                     |  6 ++--
++     lead/read/20261025T083249523405-root-5834.md       | 37 ++++++++++++++++++++++
++     lead/sent/20261025T083330522531-lead-574f.md       | 34 ++++++++++++++++++++
++     .../inflight/20261025T083330522531-lead-574f.md    | 34 ++++++++++++++++++++
++     sent/20261025T083249523405-root-5834.md            | 37 ++++++++++++++++++++++
++     5 files changed, 145 insertions(+), 3 deletions(-)
+@@ -37 +31 @@
+-  org-git commit 12b7bf7 MEMORY.md diff:
++  org-git commit 12b7bf7 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+@@ -40 +34 @@
+-    Date:   Sun Oct 25 08:34:28 2026 +0000
++    Date:   2026-10-25 08:34:28 +0000
+@@ -44,12 +38,5 @@
+-    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+-    index 13509e7..5cf99ee 100644
+-    --- a/lead/MEMORY.md
+-    +++ b/lead/MEMORY.md
+-    @@ -1,4 +1,5 @@
+-     # Memory
+-    -Request 20261025T082434523661-root-09df (memo 2026-10-05) done earlier; client correction 62a5 done (reviewer 7 of 7).
+-    -Current: rework task 20261025T083249523405-root-5834 (Sam Due -> 2026-10-08 + derivation in Open items; Marta Due -> none + note in Open items). Delegated to writer (revises ...-lead-1ffd, budget 1). NEXT: when writer reports, read memo, then delegate reviewer re-check (revises 20261025T082936980102-lead-86fc, budget 1) of WHOLE memo, explicitly checking every Due value vs notes text; then verify myself and report done to root with reviewer's coverage line verbatim and lessons.
+-    +Request 20261025T082434523661-root-09df (memo 2026-10-05) done earlier; client correction 62a5 done.
+-    +Current: rework task 20261025T083249523405-root-5834. Writer reworked lead/writer/work/memo-2026-10-05.md (253 words, I read it: Sam 2026-10-08 + Open item, Marta none + Open item; looks right). Delegated reviewer re-check of whole memo (revises 20261025T082936980102-lead-86fc, budget 1).
+-    +NEXT: when reviewer reports, read its report; if criteria met n of m with n=m and no ambiguous items, report done to root (memo path lead/writer/work/memo-2026-10-05.md, deliverable memo-2026-10-05.md, paste reviewer coverage line verbatim, lessons). Ambiguous items -> 'Questions for the client:' at top of report.
+-     Playbook lesson: ambiguous Due readings (relative day, event date vs booking deadline) go to client up front; event date != deadline.
++     lead/MEMORY.md                                     |  5 ++--
++     .../20261025T083355802246-lead.writer-2f21.md      |  0
++     .../inflight/20261025T083420945855-lead-cc66.md    | 29 ++++++++++++++++++++++
++     lead/sent/20261025T083420945855-lead-cc66.md       | 29 ++++++++++++++++++++++
++     4 files changed, 61 insertions(+), 2 deletions(-)
+@@ -66 +53 @@
+-  org-git commit 0c86c20 MEMORY.md diff:
++  org-git commit 0c86c20 (from org-git-log.txt; the MEMORY.md patch itself is in the org's git, which the stream dir does not hold):
+@@ -69 +56 @@
+-    Date:   Sun Oct 25 08:35:38 2026 +0000
++    Date:   2026-10-25 08:35:38 +0000
+@@ -73,13 +60,5 @@
+-    diff --git a/lead/MEMORY.md b/lead/MEMORY.md
+-    index 5cf99ee..d0f8e87 100644
+-    --- a/lead/MEMORY.md
+-    +++ b/lead/MEMORY.md
+-    @@ -1,5 +1,4 @@
+-     # Memory
+-    -Request 20261025T082434523661-root-09df (memo 2026-10-05) done earlier; client correction 62a5 done.
+-    -Current: rework task 20261025T083249523405-root-5834. Writer reworked lead/writer/work/memo-2026-10-05.md (253 words, I read it: Sam 2026-10-08 + Open item, Marta none + Open item; looks right). Delegated reviewer re-check of whole memo (revises 20261025T082936980102-lead-86fc, budget 1).
+-    -NEXT: when reviewer reports, read its report; if criteria met n of m with n=m and no ambiguous items, report done to root (memo path lead/writer/work/memo-2026-10-05.md, deliverable memo-2026-10-05.md, paste reviewer coverage line verbatim, lessons). Ambiguous items -> 'Questions for the client:' at top of report.
+-    -Playbook lesson: ambiguous Due readings (relative day, event date vs booking deadline) go to client up front; event date != deadline.
+-    +Request 20261025T082434523661-root-09df (memo 2026-10-05) done; client correction 62a5 done; rework 20261025T083249523405-root-5834 reported done (reviewer 7 of 7, memo 253 words).
+-    +Nothing outstanding. If a new request comes, follow the playbook.
+-    +Playbook lesson: ambiguous Due readings (relative day, event date vs booking deadline) go to client up front; event date != deadline; 'before <weekday>' -> derived date explained in Open items.
++     inbox/20261025T083532641493-lead-f639.md           | 31 ++++++++++++++++++++++
++     lead/MEMORY.md                                     |  7 +++--
++     .../20261025T083504210277-lead.reviewer-e32b.md    |  0
++     lead/sent/20261025T083532641493-lead-f639.md       | 31 ++++++++++++++++++++++
++     4 files changed, 65 insertions(+), 4 deletions(-)
+
+##### s3 sandbox:run-session-map.txt
+--- E7 committed run-session-map.txt
++++ regenerated run-session-map.txt
+@@ -6 +6 @@
+-org kiro sessions copied: 40 (to org-kiro-sessions/<hash>/<session id>/)
++org kiro sessions read from the stream dir copy: 40 (org-kiro-sessions/<hash>/<session id>/)

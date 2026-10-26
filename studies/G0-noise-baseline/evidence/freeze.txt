@@ -1,0 +1,161 @@
+G0 protocol and harness freeze (pre-registration, step 1 of 11 of workflow wf_c415acfac4f09f84)
+freeze_utc: 2026-10-26T04:36:49Z
+protocol.md md5 (md5 -q): 08cccd6458f5f418b4d388cb93d633b5
+protocol.md5 file holds: 08cccd6458f5f418b4d388cb93d633b5
+protocol.md bytes: 63442  lines: 571
+harness/MD5SUMS md5 (md5 -q): be21347995b821185a2adaba36d8390c  lines: 48
+== harness/MD5SUMS check (MISMATCH lines only):
+(done)
+script/MD5SUMS md5: d92eff5043ad1f3d0856a78cbccda796  lines: 41
+== script/MD5SUMS check (MISMATCH lines only):
+(done)
+== the pin: E7 protocol.md 0acc2b4191b8cbfa5f4bb6197b877de1 (required 0acc2b4191b8cbfa5f4bb6197b877de1; E7 protocol.md5 0acc2b4191b8cbfa5f4bb6197b877de1); copy script/e7-protocol.md 0acc2b4191b8cbfa5f4bb6197b877de1
+== E7 harness/MD5SUMS md5: d1f24687c9cd1587466d24db42ce59d0 (required d1f24687c9cd1587466d24db42ce59d0), 17 lines; check (MISMATCH lines only):
+(done)
+== injection script: harness/inject_root_rework.py 1c4e7824e448a3a34e24a7b759a59fcd (= E7's 1c4e7824e448a3a34e24a7b759a59fcd); text source script/injection/20261018T035429740646-root-d90e.md daf2085495c213ee9b1c3c6bff1bbd55 (= E2's daf2085495c213ee9b1c3c6bff1bbd55)
+== notes and answer key: 903e3bbf5f35df2c17444f3313c12395 3893bd637c87760b43be4894b47fdb53 9976a7653a6346b0976c3c38b1c697dd; answer-key 2fb69bbef857c2bd4862cd5dd8be9da8
+== git -C /Volumes/workspace/hirearchy rev-parse HEAD; branch
+3c841bb9cdde666c6ea8b00bb2edfeae68c256db
+main
+== git -C /Volumes/workspace/hirearchy diff --stat 3c841bb9 HEAD -- src skills pyproject.toml uv.lock (empty below means no product change)
+== (end of diff output)
+== git -C /Volumes/workspace/hirearchy status --porcelain
+?? docs/research/
+?? studies/G0-noise-baseline/
+== skill md5: repo a3e46347b70a7ece5f734f70198c607f, git blob 3c841bb9 a3e46347b70a7ece5f734f70198c607f, global (read-only, md5 only) a3e46347b70a7ece5f734f70198c607f; required a3e46347b70a7ece5f734f70198c607f; repo lines 125
+== kiro-cli --version: kiro-cli 2.33.0
+== sources (md5 -r, read-only):
+491c1e4b9fab489cdba055a7ccf4d894 docs/research/org-growth/phase-0b/g0-brief.md
+ab82c50074cdc7cbadb6ec122c37d9bb docs/design/org-growth-phase-0b.md
+31b20946c348bd538a26f74e67c084f5 docs/research/org-growth/phase-0a4/e7-gate.md
+aec19d74295a7f94051857a49ca63259 docs/research/org-growth/phase-0a4/e7-decision.md
+10de3c43388ac975bce72c32cf12d3e1 studies/E7-org-growth-0a4-recheck/STUDY.md
+afd437c103407ec5899e4993b465cf25 studies/E5-org-growth-0a2-recheck/evidence/protocol.md
+1ec9e658e3bd59ab9d9f785986a26c19 studies/E4-org-growth-0a1-recheck/evidence/protocol-amendment-1.md
+3e06b4e30ffd5c5adaaad361218235ea studies/G0-noise-baseline/evidence/manager-decision-selfcheck.md
+== the harness self-check (protocol 10; harness/selfcheck.sh, run at this freeze's step on E7's committed s1-s3):
+selfcheck ambiguity_recall: 59 of 59 OK
+selfcheck assistant: 281 of 281 OK
+selfcheck playbook_attempts: 34 of 34 OK
+selfcheck prompt_sizes: 15 of 15 OK
+selfcheck rederive: 372 of 372 OK
+selfcheck score_memos: 334 of 334 OK
+selfcheck skill_check: 21 of 21 OK
+outcome: PASSED: 7 of 7 modules OK, 299 tests passed; no MISMATCH; one DECLARED product deviation (F-G0-1, E7 s2 memo 1); first run's 7 mismatches ruled on in manager-decision-selfcheck.md (harness-selfcheck/SELFCHECK.md md5 6e2b2ec97b5a5596b6192b25a2b18761)
+== state at freeze: no G0 sandbox, profile, dedicated kiro home or stream
+(no /tmp/hirearchy-g0-* dir)
+(no hirearchy-study-g0-* profile in ~/.kiro/agents)
+(no stream, preflight, probe or deterministic folder)
+== ~/.kiro/agents (names only):
+agent_config.json.example
+claude-opus-5.5.json
+claude-sonnet-5.5.json
+evolve.json
+hirearchy-organization-9d66c1-web-fetch-web-search.json
+telegram_bot.json
+== evidence files at freeze (find, sorted; harness-selfcheck/ outputs summarized by count):
+./INDEX.md
+./answer-key.md
+./freeze.txt
+./harness/CHANGES.md
+./harness/MD5SUMS
+./harness/after_turn.sh
+./harness/aggregate.py
+./harness/ambient_context.py
+./harness/ambient_snapshot.sh
+./harness/ambiguity_recall.py
+./harness/assistant_facts.py
+./harness/copy_org_evidence.sh
+./harness/extract_mechanical.py
+./harness/extract_proposals.py
+./harness/extract_tool_calls.py
+./harness/finish_stream.sh
+./harness/inject_root_rework.py
+./harness/injection_files.py
+./harness/judged-template.json
+./harness/model_check.sh
+./harness/org_state.py
+./harness/playbook_attempts.py
+./harness/prepare_m0_home.sh
+./harness/profile-template.json
+./harness/prompt_sizes.py
+./harness/quality_snapshot.sh
+./harness/rederive_quality.py
+./harness/run_arm.sh
+./harness/run_turn.sh
+./harness/safety-snapshot.sh
+./harness/scheduler_survival.py
+./harness/score_memos.py
+./harness/selfcheck.sh
+./harness/selfcheck/e7-expected-assistant.json
+./harness/selfcheck/e7-expected-drivers.json
+./harness/selfcheck/e7-expected-rederive.json
+./harness/selfcheck/e7-expected-team.json
+./harness/setup_stream.sh
+./harness/skill_check.py
+./harness/skill_check.sh
+./harness/test_poll_loop.py
+./harness/tests/test_aggregate.py
+./harness/tests/test_ambiguity_recall.py
+./harness/tests/test_assistant_facts.py
+./harness/tests/test_drivers.py
+./harness/tests/test_extract_mechanical.py
+./harness/tests/test_playbook_attempts.py
+./harness/tests/test_prompt_sizes.py
+./harness/tests/test_rederive_quality.py
+./harness/tests/test_scheduler_survival.py
+./harness/tests/test_score_memos.py
+./harness/workspace-cli.json
+./manager-decision-selfcheck.md
+./notes/2026-10-05.md
+./notes/2026-10-12.md
+./notes/2026-10-19.md
+./protocol.md
+./protocol.md5
+./script/MD5SUMS
+./script/e7-protocol.md
+./script/e7-turn-files/s1/after_turn.sh
+./script/e7-turn-files/s1/t01.txt
+./script/e7-turn-files/s1/t02.txt
+./script/e7-turn-files/s1/t03.txt
+./script/e7-turn-files/s1/t04.txt
+./script/e7-turn-files/s1/t05.txt
+./script/e7-turn-files/s1/t06.txt
+./script/e7-turn-files/s1/t07.txt
+./script/e7-turn-files/s1/t08.txt
+./script/e7-turn-files/s1/t09.txt
+./script/e7-turn-files/s1/t10.txt
+./script/e7-turn-files/s1/t11.txt
+./script/e7-turn-files/s2/after_turn.sh
+./script/e7-turn-files/s2/t01.txt
+./script/e7-turn-files/s2/t02.txt
+./script/e7-turn-files/s2/t03.txt
+./script/e7-turn-files/s2/t04.txt
+./script/e7-turn-files/s2/t05.txt
+./script/e7-turn-files/s2/t06.txt
+./script/e7-turn-files/s2/t07.txt
+./script/e7-turn-files/s2/t08.txt
+./script/e7-turn-files/s2/t09.txt
+./script/e7-turn-files/s2/t10.txt
+./script/e7-turn-files/s2/t11.txt
+./script/e7-turn-files/s2/t12.txt
+./script/e7-turn-files/s3/after_turn.sh
+./script/e7-turn-files/s3/t01.txt
+./script/e7-turn-files/s3/t02.txt
+./script/e7-turn-files/s3/t03.txt
+./script/e7-turn-files/s3/t04.txt
+./script/e7-turn-files/s3/t05.txt
+./script/e7-turn-files/s3/t06.txt
+./script/e7-turn-files/s3/t07.txt
+./script/e7-turn-files/s3/t08.txt
+./script/e7-turn-files/s3/t09.txt
+./script/e7-turn-files/s3/t10.txt
+./script/e7-turn-files/s3/t11.txt
+./script/e7-turn-files/s3/t12.txt
+./script/e7-turn-files/s3/t13.txt
+./script/injection/20261018T035429740646-root-d90e.md
+harness-selfcheck/: 286 files
+== side effects of the pre-registration step
+Helper briefs for the harness build were written to docs/research/org-growth/phase-0b/g0-build/ (untracked research notes, never staged). Scratch
+files in /tmp (/tmp/g0-prereg*, the helpers' temporary dirs) were deleted. No org, profile, session, scheduler, sandbox, kiro home or stream was made;
+nothing under ~/.kiro was written (the global SKILL.md was read by md5 only); no E7, E5, E4 or E2 file was changed; nothing was staged, committed or pushed.

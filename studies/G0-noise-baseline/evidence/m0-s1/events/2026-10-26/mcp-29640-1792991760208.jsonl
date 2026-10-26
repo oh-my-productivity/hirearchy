@@ -1,0 +1,2 @@
+{"v":1,"ts":"2026-10-26T05:16:00.208422+00:00","seq":1,"proc":"mcp","pid":29640,"kind":"tool.call","actor":"lead","run":"lead@20261026T051543192276","trace":null,"tool":"status","ok":true,"ms":11.82,"error":null,"error_type":null,"args":{}}
+{"v":1,"ts":"2026-10-26T05:16:04.797925+00:00","seq":2,"proc":"mcp","pid":29640,"kind":"tool.call","actor":"lead","run":"lead@20261026T051543192276","trace":null,"tool":"write","ok":true,"ms":0.96,"error":null,"error_type":null,"args":{"path":"lead/MEMORY.md","content_chars":1229,"append":false}}

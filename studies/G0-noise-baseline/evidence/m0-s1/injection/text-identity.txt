@@ -1,0 +1,3 @@
+title as stored: 'Rework memo 2026-10-05: unclear due dates' md5 849fe21b104be883af9b3c06367d4445 (protocol 5.1: 849fe21b104be883af9b3c06367d4445) match=True
+note as stored: 866 chars md5 4cdbcb9b682f2f25dcb31c83d3743fec (protocol 5.1: 866 chars, 4cdbcb9b682f2f25dcb31c83d3743fec) match=True
+stored headers: {"id": "20261026T050237786004-root-a8e1", "from": "root", "to": "lead", "type": "task", "title": "Rework memo 2026-10-05: unclear due dates", "created": "2026-10-26T05:02:37+00:00", "hops": "0", "budget": "6", "revises": "20261026T045907020580-root-49d7", "service": "weekly-meeting-memo", "contract": "1", "playbook": "1", "source": "relayed", "trace": "20261026T045511617097-root-ece7"}

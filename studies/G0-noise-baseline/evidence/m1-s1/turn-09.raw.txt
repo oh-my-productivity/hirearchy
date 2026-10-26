@@ -1,0 +1,8 @@
+Your approval of the 5 October memo is recorded. The 12 October memo is now running with the usual 12-run budget and the Summary-first rule. I'll wait for it.The 12 October memo is written and passed review (9 of 9 checks, 12 of 12 facts verified), using 5 of the 12 runs. I haven't copied it to `deliverables` yet because four points are yours to decide:
+
+1. **Sam and the staging data.** The notes say he "will probably sort it out himself". The memo states it as a firm commitment, without "probably". Keep it that way, or add "(probably)" in the Action cell?
+2. **Sam's due date.** "The day before the freeze starts" became 2026-10-21, since the freeze starts 22 October. Keep 2026-10-21, or use none?
+3. **Lee's pager swap with Dev.** The memo lists it only as an action item, with Due = none because the notes give no date. Is that right, or should it also appear under Decisions?
+4. **The Summary line.** It says "assigned five action items", counting the two informal ones (Sam's and Lee's). You kept that wording for the 5 October memo. Keep it here too?
+
+The memo has three decisions (RFC approved with the token bucket design behind a feature flag, a blameless company-wide postmortem, and the deploy freeze on 22 and 23 October) and five action rows. Dev, Marta and Priya have dates (2026-10-14, 2026-10-16 and 2026-10-20). Reply "as it is" to keep it all, or give your choices. Any change would be a rework of about 5 runs, which I'd ask you about first.

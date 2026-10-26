@@ -1,0 +1,7 @@
+######## TURN 13  start 06:09:07  end 06:09:27  elapsed 20s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T06:09:07Z end 2026-10-26T06:09:27Z; exit code 0)
+######## LENA (prompt sent verbatim):
+This version is right now, thanks - keep it.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-13.stderr.txt):
+I've recorded your approval of the 19 October memo, so all three memos are accepted and in `deliverables`.
+
+The weekly service is ready. Each week, tell me the notes file name (for example `2026-10-26.md`) and I'll request the memo. Every memo will start with the Summary line.

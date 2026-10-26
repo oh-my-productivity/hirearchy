@@ -1,0 +1,1 @@
+env -u KIRO_HOME kiro-cli chat --v3 --no-interactive --trust-all-tools --resume --effort high --agent hirearchy-study-g0-m1-s3-assistant 'Use the words from the notes. Lee'\''s none is right. Yes, that counts. Keep it as it is. Yes, that'\''s right, it'\''s just a status update. I don'\''t know anything about that rework - I didn'\''t ask for it.'

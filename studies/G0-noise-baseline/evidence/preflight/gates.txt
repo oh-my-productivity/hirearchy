@@ -1,0 +1,31 @@
+# G0 preflight gates 2026-10-26T04:38:22Z
+== protocol.md md5: 08cccd6458f5f418b4d388cb93d633b5; protocol.md5 holds: 08cccd6458f5f418b4d388cb93d633b5; freeze.txt says: protocol.md md5 (md5 -q): 08cccd6458f5f418b4d388cb93d633b5
+zsh:5: no matches found: protocol-amendment-*
+== harness/MD5SUMS check (MISMATCH lines only)
+(done)
+harness/MD5SUMS md5: be21347995b821185a2adaba36d8390c lines: 48 (freeze: be21347995b821185a2adaba36d8390c, 48)
+== script/MD5SUMS check
+(done)
+script/MD5SUMS md5: d92eff5043ad1f3d0856a78cbccda796 (freeze: d92eff5043ad1f3d0856a78cbccda796)
+== E7 pin: script/e7-protocol.md 0acc2b4191b8cbfa5f4bb6197b877de1; E7 protocol.md 0acc2b4191b8cbfa5f4bb6197b877de1 (required 0acc2b4191b8cbfa5f4bb6197b877de1)
+== E7 harness/MD5SUMS md5 d1f24687c9cd1587466d24db42ce59d0 lines 17 (required d1f24687c9cd1587466d24db42ce59d0, 17)
+== injection script 1c4e7824e448a3a34e24a7b759a59fcd (required 1c4e7824e448a3a34e24a7b759a59fcd); text source daf2085495c213ee9b1c3c6bff1bbd55 (required daf2085495c213ee9b1c3c6bff1bbd55)
+== notes 903e3bbf5f35df2c17444f3313c12395 3893bd637c87760b43be4894b47fdb53 9976a7653a6346b0976c3c38b1c697dd (required 903e3bbf5f35df2c17444f3313c12395 3893bd637c87760b43be4894b47fdb53 9976a7653a6346b0976c3c38b1c697dd); answer-key 2fb69bbef857c2bd4862cd5dd8be9da8 (required 2fb69bbef857c2bd4862cd5dd8be9da8)
+== c1-tools in E7's preflight copy (source for check (a)):
+61739fe70bbddaa077a300d1d2fef334 allowed.py
+1bab40813be21c4520b01ac7eb564aa4 logfilter.py
+c57f82a0ec06e7b0986155e349e99036 mkprofile.py
+72ca914dce05e2761d7f2e29a4da9a31 sampler.py
+ddcdb0c711ef9a1b6a47e9f20407f38b summary.py
+e5d4fd364a260f35046142fa0991cfce timeline.py
+cfa0c14791d058a730e7ebe0c88d5f40 verdict.py
+0bf4ba590dee272e4fa2b692b5306d0b after.sh
+d91e6b3b6bfa45c15c8ece63057788a5 setup.sh
+== freeze
+HEAD: 3c841bb9cdde666c6ea8b00bb2edfeae68c256db branch main
+git diff --stat 3c841bb9 HEAD -- src skills pyproject.toml uv.lock:
+(end of diff output)
+git status --porcelain:
+?? docs/research/
+?? studies/G0-noise-baseline/
+== skill md5: repo a3e46347b70a7ece5f734f70198c607f; git blob a3e46347b70a7ece5f734f70198c607f; global (md5 only) a3e46347b70a7ece5f734f70198c607f; required a3e46347b70a7ece5f734f70198c607f

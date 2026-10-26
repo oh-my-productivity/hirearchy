@@ -1,0 +1,13 @@
+The memo is at `/tmp/hirearchy-g0-m1-s1-1792992820/deliverables/memo-2026-10-05.md`. I read it against your notes myself, and the reviewer also passed it (9 of 9 checks, 15 of 15 facts verified).
+
+- **Only that meeting:** met.
+- **At most 400 words:** met (139).
+- **Two sections, Decisions and Action items:** met, plus a dated title line.
+- **Every decision, nothing extra:** met. Two decisions: the gateway migration moves to the week of 26 October, and Renovate is adopted.
+- **Action table (Owner | Action | Due) with every commitment, including informal ones:** met, 5 rows. Sam's and Marta's are the informal ones.
+- **Dates:** met. Sam is 2026-10-09 and Marta is 2026-10-14, with their original wording kept in the Action cell. Lee is none.
+- **Traceable to the notes:** met.
+
+Runs: 14 used, against the 12 approved per request. The extra 2 were the rework you approved.
+
+Keep it, or what should change?

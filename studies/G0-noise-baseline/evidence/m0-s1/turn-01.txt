@@ -1,0 +1,18 @@
+######## TURN 1  start 04:52:07  end 04:52:47  elapsed 40s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T04:52:07Z end 2026-10-26T04:52:47Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Hi! After each of our weekly team meetings I want a short memo from my notes: what we decided and who does what. My notes are in /tmp/hirearchy-g0-m0-s1-1792990299/notes (one file per meeting). Can you set up a team that does this for me every week?
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-01.stderr.txt):
+Your notes have what I need: decisions, explicit ACTION lines, and some commitments buried in prose (for example "Sam said he'd look into the flaky CI"). I'll set this up as a standing service. Each week you tell me which notes file to use and the team writes the memo. It runs when you ask, not on a timer by itself. A few questions first. Reply "defaults" to accept everything I've proposed.
+
+1. **Informal commitments.** Should things said in passing count as "who does what"? Examples are Sam's CI check, Lee pinging the vendor, Lee swapping pager shifts and Sam pairing with Jo. Default: yes, list them, and mark the hedged ones (like "will probably sort it out") as tentative.
+2. **Vague dates.** For "before Friday", "end of next week" or "this week": turn them into a calendar date based on the meeting date, or write "no date given"? Default: convert to a date when it's clear, otherwise write "no date given". Either way the memo shows the original wording.
+3. **Format.** Markdown, at most 400 words, with three parts: decisions, action items (owner, task, due date), and open or tentative items. I'll put it in a new folder called `deliverables` here, as `/tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-<meeting date>.md`.
+4. **Checks I'd apply to every memo:**
+   - Every decision in the notes appears.
+   - Every commitment appears with its owner, including the informal ones.
+   - Nothing appears that isn't in the notes.
+   - Names are spelled as in the notes.
+   - It's no longer than 400 words.
+5. **Sources.** Only your notes (no web). I'll give the team read-only access to `/tmp/hirearchy-g0-m0-s1-1792990299/notes`, so it can't change your files. The input each week is the file name, for example `2026-10-19.md`.
+6. **Team and review.** A lead, a writer, and a separate reviewer who checks the memo against the notes. Every agent runs claude-sonnet-5.5 at high effort. The plan will show the runs per memo, and I'll ask you before anything goes beyond that.
+7. **First memo.** Should I run it on the latest notes (19 Oct) right after you approve the plan, so you can judge the result? Default: yes. Nothing starts until you approve the plan.

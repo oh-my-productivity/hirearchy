@@ -1,0 +1,5 @@
+I've recorded your rejection. Before I change anything, one yes/no question:
+
+About C3: add "Start every memo with a one-line 'Summary:' of the meeting, then the Decisions section, then the Actions table" as a lasting rule? Yes or no.
+
+Answering yes adds the rule to the contract, so every future memo is checked against it. I'd then send this week's memo back for rework with the summary line added. That rework would go beyond the 12 runs per request you approved, so I'll give you the number first.

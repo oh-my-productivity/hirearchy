@@ -1,0 +1,16 @@
+######## TURN 10  start 06:01:05  end 06:01:26  elapsed 21s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T06:01:05Z end 2026-10-26T06:01:26Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No need for 'probably'. Sam's 2026-10-21 is right. Lee's none is right. No, it's just an action, not a decision. Keep it as it is.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-10.stderr.txt):
+The 12 October memo is at `/tmp/hirearchy-g0-m1-s1-1792992820/deliverables/memo-2026-10-12.md`, exactly as the team delivered it with your four answers applied.
+
+- **Summary, Decisions, Action items:** met.
+- **Only that meeting, at most 400 words:** met (163 by the team's count).
+- **Decisions:** met. There are three, and Lee's swap is not one of them.
+- **Action table:** met. It has 5 rows, each with a named owner.
+- **Dates:** met. Sam is 2026-10-21 and Lee is none.
+- **Reviewer, every criterion met:** met (9 of 9).
+
+Runs: 5 of the 12 approved, so 7 came back.
+
+I haven't recorded a verdict on this memo yet. Do you want to keep it, or change anything?

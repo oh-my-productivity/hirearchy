@@ -1,0 +1,5 @@
+I've logged your rejection and haven't changed anything yet. Your "Always" would become a lasting rule for every future memo, so I need to confirm it first. It also conflicts with the current check C3, which says the memo has "exactly two sections", Decisions and Action items. A Summary line at the top would break that check, so the new rule would replace C3's wording.
+
+About C3: add "Start the memo with a one-line 'Summary:' of the meeting, then the Decisions, then the Action items" as a lasting rule? Yes or no.
+
+If you say yes, I'd also send this memo back for the fix. That costs about 5 more runs, bringing this memo to about 19 against the 12 approved. Tell me if you'd rather skip the rework and have the new rule apply only from the next memo.

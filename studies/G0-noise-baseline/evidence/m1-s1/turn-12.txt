@@ -1,0 +1,19 @@
+######## TURN 12  start 06:05:28  end 06:08:31  elapsed 183s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T06:05:28Z end 2026-10-26T06:08:31Z; exit code 0)
+######## LENA (prompt sent verbatim):
+No, nothing for Marta to do there, leave it out. Yes, that counts. Lee's should be 2026-10-30.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+The earlier read raced with the writer's edit. Re-reading now.The 19 October memo is at `/tmp/hirearchy-g0-m1-s1-1792992820/deliverables/memo-2026-10-19.md`, with your three answers applied. I read the final file myself, and it matches your notes.
+
+- **Summary, Decisions, Action items:** met.
+- **Only that meeting, at most 400 words:** met (168 by the team's count).
+- **Decisions:** met. There are three: the demo goes ahead without the rate limiter, the SSO vendor is renewed for twelve months, and the weekly moves to Monday 14:00 from 26 October.
+- **Action table:** met. It has 5 rows, each with a named owner, and Marta's "keep the agenda as sent" row is gone. Sam's pairing with Jo stays, with Due = none.
+- **Dates:** met. Lee is 2026-10-30, with "probably by end of next week" kept in the Action cell. The other dates are 2026-10-23, 2026-10-24 and 2026-10-26.
+- **Summary count:** the Summary says "five action items", which matches the table.
+- **Reviewer, every criterion met:** met (8 of 8, 12 of 12 facts verified).
+
+Runs: 10 of the 12 approved, with 7 returned from the first pass and 2 unspent from the rework.
+
+The weekly service is ready for next week. Ask for the next notes file by name, like `2026-10-26.md`. All three memos are now in `deliverables`.
+
+Keep this one, or what should change?

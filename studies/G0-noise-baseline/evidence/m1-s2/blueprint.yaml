@@ -1,0 +1,54 @@
+mission: >
+  Every week, turn the notes of the Platform team weekly meeting into a short memo that says what was decided and who does what.
+  The memo is written only from the user's own meeting notes (one file per meeting).
+needs:
+  kind: writing
+  scope: "For the one meeting named in the request: the decisions taken and who does what (action items). Nothing else from the notes."
+  inputs:
+    - /tmp/hirearchy-g0-m1-s2-1792997653/notes
+  quality_bar: Every decision and every commitment in the named notes file is in the memo, and nothing that is not in the notes.
+  sources: Only the files in the notes folder; no web.
+  budget_runs: 12
+  models: {cheap: claude-sonnet-5.5, strong: claude-sonnet-5.5}
+  model_policy: one model for all
+  review: true
+  approval: Plan first; ask before any spend beyond the budget.
+  progress: One line when I ask.
+agents:
+  - name: lead
+    template: manager
+    model: strong
+    children:
+      - {name: writer, template: writer}
+      - name: reviewer
+        template: reviewer
+        model: strong
+        tools: [read]
+services:
+  - name: weekly-meeting-memo
+    owner: lead
+    description: One memo of the decisions and the action items (who does what) from one weekly meeting's notes file.
+    inputs:
+      - name: notes_file
+        description: File name of the meeting notes inside the notes folder, for example 2026-10-05.md
+        required: true
+    acceptance:
+      - Covers only the meeting in the named notes file, and only its decisions and who does what.
+      - At most 400 words as counted by read.
+      - A section titled "Decisions" lists every decision made in the meeting, including decisions that have no owner.
+      - A markdown table with exactly the columns Owner | Action | Due lists every commitment in the meeting, one row each, including informal ones where someone said in prose that they would do something.
+      - Due is an ISO date (YYYY-MM-DD). A vague deadline is turned into a date only when the notes make it clear; otherwise Due is none, and Due is none when the notes give no date.
+      - Every decision and every row is traceable to the named notes file; nothing is invented.
+      - "The reviewer's report shows every criterion met (criteria met: n of m with n = m), and the writer applied every required change."
+    deliverable:
+      description: One markdown memo per meeting, named memo-<meeting date>.md
+      format: markdown
+      max_words: 400
+      path: /tmp/hirearchy-g0-m1-s2-1792997653/deliverables
+    budget: 12
+    locked: false
+task:
+  service: weekly-meeting-memo
+  inputs:
+    notes_file: 2026-10-05.md
+  title: Memo for the 2026-10-05 Platform team weekly

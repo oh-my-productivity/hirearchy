@@ -1,0 +1,3 @@
+Setup 0 sign-in probe 2026-10-26T04:45:24Z
+exit 0
+first line: Authenticated with API key

@@ -1,0 +1,10 @@
+The 12 October memo is at `/tmp/hirearchy-g0-m0-s1-1792990299/deliverables/memo-2026-10-12.md`. The copy matches the team's file.
+
+- **Scope, length and sections:** it covers only the 12 October meeting. It is 321 words by `wc`, under the 400 limit. It has the Summary first, then Decisions, Action items and Open or tentative items.
+- **Decisions and actions:** all 3 decisions are in. The action table has 5 rows with the columns Owner | Action | Due.
+- **Dates and tentative items:** Sam's staging test data is marked "(tentative)" with 2026-10-21. Lee's due date is none. Sam's CI update is left out, as you said.
+- **Review:** the reviewer passed 11 of 11 checks, with all 32 factual claims verified.
+
+It used 8 of the 12 runs, and nothing was spent on reworks.
+
+Keep it, or what should change?

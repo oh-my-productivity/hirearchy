@@ -1,0 +1,30 @@
+The 12 October memo is recorded as accepted. The 19 October memo is running with a budget of 12 runs, and I'm waiting on it now.The 19 October memo is drafted and the reviewer passed it 9 of 9. It used 5 of the 12 runs. I haven't delivered it, because four items can be read two ways and they're your call.
+
+Draft:
+
+```
+Summary: The team agreed to go ahead with the customer demo without the rate limiter, to renew the SSO vendor for twelve months, and to move the weekly to Monday 14:00.
+
+## Decisions
+- Go ahead with the customer demo, leaving the rate limiter out of it.
+- Renew with the current SSO vendor for twelve months and revisit the market next year.
+- Move the weekly meeting from Monday 10:00 to Monday 14:00, starting 26 October.
+
+## Actions
+| Owner | Action | Due |
+| Lee   | Sign off on the SSO renewal once legal replies | none |
+| Marta | Collect demo feedback and circulate it | 2026-10-23 |
+| Dev   | Remove the deploy freeze in the pipeline config | 2026-10-24 |
+| Priya | Present the rate limiter benchmark results at the next meeting | 2026-10-26 |
+| Sam   | Pair with Jo on the CI pipeline during Jo's first week | none |
+
+Next meeting: Monday 2026-10-26 at 14:00.
+```
+
+Questions, with my suggestion first:
+1. **Marta, "will keep the agenda as sent":** this is not a row today. Should it be one, with Due none? I suggest no, because it reads as a status ("don't change it") and not a task.
+2. **Lee's sign-off:** the notes say "probably by end of next week". The draft has Due none. The alternative is 2026-10-30, the Friday of next week. I suggest 2026-10-30, since the notes give a clear time frame, as with "before Friday" earlier. Say if you'd rather keep none, because of "probably".
+3. **Sam pairing with Jo:** the notes say "during that first week", and Jo starts 26 October. The draft has Due none. Alternatively it could be 2026-10-30, the end of that week. I suggest none, since the notes give a period and not a deadline.
+4. **Demo decision:** the notes give "go ahead with the demo, leave the rate limiter out" as one decision, and the draft lists it as one line. I suggest keeping it as one decision, not two.
+
+Reply "suggestions" to take all four as I've put them. That means Lee goes to 2026-10-30, and I'll have the team make that one-cell change. It costs about 3 runs, and you've used 5 of 12, so it fits. If you'd rather keep Lee at none, the memo is ready to copy as it is.

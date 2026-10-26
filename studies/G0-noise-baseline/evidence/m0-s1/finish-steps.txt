@@ -1,0 +1,20 @@
+# finish_stream.sh m0-s1 started 2026-10-26T05:30:09Z
+no scheduler running at 2026-10-26T05:30:09Z: no --stop
+copy_org_evidence exit 0  (2026-10-26T05:30:09Z .. 2026-10-26T05:30:12Z)  -> copy_org_evidence-output.txt
+copy injection folder exit 0  (2026-10-26T05:30:12Z .. 2026-10-26T05:30:12Z)  -> /dev/null
+observe check -> observe-check.txt (exit code: 0)
+quality_snapshot end exit 0  (2026-10-26T05:30:13Z .. 2026-10-26T05:30:13Z)  -> quality/end-snapshot-output.txt
+extract_tool_calls exit 0  (2026-10-26T05:30:13Z .. 2026-10-26T05:30:13Z)  -> extract_tool_calls-output.txt
+extract_proposals exit 0  (2026-10-26T05:30:13Z .. 2026-10-26T05:30:13Z)  -> measures/extract_proposals-output.txt
+extract_mechanical exit 0  (2026-10-26T05:30:13Z .. 2026-10-26T05:30:14Z)  -> extract_mechanical-output.txt
+scheduler_survival exit 0  (2026-10-26T05:30:14Z .. 2026-10-26T05:30:14Z)  -> measures/scheduler_survival-output.txt
+scheduler_survival (measures/) exit 0  (2026-10-26T05:30:14Z .. 2026-10-26T05:30:14Z)  -> measures/scheduler_survival-measures-output.txt
+injection_files exit 0  (2026-10-26T05:30:14Z .. 2026-10-26T05:30:14Z)  -> measures/injection_files-output.txt
+assistant_facts exit 0  (2026-10-26T05:30:14Z .. 2026-10-26T05:30:14Z)  -> measures/assistant_facts-output.txt
+score_memos exit 0  (2026-10-26T05:30:14Z .. 2026-10-26T05:30:14Z)  -> measures/score_memos-output.txt
+ambiguity_recall exit 0  (2026-10-26T05:30:14Z .. 2026-10-26T05:30:14Z)  -> measures/ambiguity_recall-output.txt
+prompt_sizes exit 0  (2026-10-26T05:30:14Z .. 2026-10-26T05:30:14Z)  -> measures/prompt_sizes-output.txt
+playbook_attempts exit 0  (2026-10-26T05:30:14Z .. 2026-10-26T05:30:14Z)  -> measures/playbook_attempts-output.txt
+rederive_quality exit 0  (2026-10-26T05:30:14Z .. 2026-10-26T05:30:14Z)  -> rederived/rederive_quality-output.txt
+model_check all exit 0 -> model-checks.txt
+# finish_stream.sh m0-s1 ended 2026-10-26T05:30:15Z; failed steps: 0

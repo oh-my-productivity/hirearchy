@@ -1,0 +1,23 @@
+score_memos m0-s2: 7 versions, 3 final memos; reviewer lead/reviewer (owner lead)
+
+memo       ver sha      D    A    wrong  extra  Summary order words copied  review
+2026-10-05 v1  6807f1d  2/2  5/5      1      0  no      yes     147 no      6 of 7 (blocked)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-05 v2  0d07ec4  2/2  5/5      0      0  no      yes     128 yes     7 of 7 (done)
+2026-10-05 v3  b389f15  2/2  5/5      2      0  no      yes     177 no      6 of 7 FAIL (done)
+    wrong date: Sam due 2026-10-08 (expected 2026-10-09)
+    wrong date: Marta due none (expected 2026-10-14)
+2026-10-05 v4  16feaeb  2/2  5/5      0      0  no      yes     149 yes     7 of 8 (done)
+2026-10-12 v1  bfa3356  3/3  5/5      0      0  yes     yes     198 yes     8 of 8 (done)
+2026-10-19 v1  d7d58b2  3/3  5/5      1      0  yes     yes     167 no      9 of 9 (done)
+    wrong date: Lee due none (expected 2026-10-30)
+2026-10-19 v2  eacc3d0  3/3  5/5      0      0  yes     yes     167 yes     -
+
+final memos: decisions 8 of 8, actions 15 of 15, wrong dates 0, extra rows 0, Summary 2 of 3
+  2026-10-05 md5 0aea28662684b6794ba2b118a3204096 = v4 16feaeb
+  2026-10-12 md5 f11cfee51c2e85ae649bdd26eab81908 = v1 bfa3356
+  2026-10-19 md5 cd2cd7dd4cef315fa8a83ffb8af2a176 = v2 eacc3d0
+delivered (copied) versions: 4 of 7
+
+could not derive:
+  review of 2026-10-19 v2 eacc3d0: no review task sent in its window

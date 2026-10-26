@@ -1,0 +1,8 @@
+ambiguity_recall m0-s3: reviewer lead/reviewer, owner lead
+
+AMB-1: 2 of 2 (memo 2026-10-19, Marta)   [D21's literal timing: 2 of 2]   versions of the memo 3, containing the row 2
+  v1 aa229c1: reviewed=True listed ambiguous=True (ambiguous token); lead forwarded=False; progress flagged=False; writer left it out of the next version=False
+  v2 a351a6c: reviewed=True listed ambiguous=True (ambiguous token); lead forwarded=True (20261026T081855341826-lead-0c29); progress flagged=True (#80); writer left it out of the next version=True
+AMB-2: n/a (0 of 0) (memo 2026-10-12, Sam)   [D21's literal timing: n/a (0 of 0)]   versions of the memo 2, containing the row 0
+
+all items: 2 of 2   [D21's literal timing: 2 of 2]

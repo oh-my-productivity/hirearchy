@@ -1,0 +1,13 @@
+The rework is running with a hard cap of 5 runs. That would put this request at about 14 of the 12 approved. I'll wait.The 19 October memo is at `/tmp/hirearchy-g0-m0-s3-1793000481/deliverables/memo-2026-10-19.md`. I copied it from the team's final file and confirmed the two match. My first copy ran while the team was still working, so I checked again and recopied the finished version.
+
+- **Summary first:** met. It starts with the one-line Summary, then Decisions, then Action items, with Attendees and Next meeting after the table.
+- **Word limit:** met. The file is 182 words by `wc` (the team counted 152), under 400.
+- **Decisions:** met. All three are there, and nothing else.
+- **Action items table:** met. The columns are Owner | Action | Due, with five rows. Sam's pairing with Jo, which was in prose, is included.
+- **Due dates:** met. They are Lee 2026-10-30, Marta 2026-10-23, Dev 2026-10-24, Priya 2026-10-26 and Sam `none`.
+- **Your two changes:** met. The "keep the agenda as sent" row is gone.
+- **Review:** met. The reviewer reported 9 of 9 criteria met.
+
+This memo used 14 runs against the 12 approved. That is 9 for the first pass and the questions, plus 5 for the rework you funded. No rework you didn't ask for ran this time.
+
+Keep it, or what should change?

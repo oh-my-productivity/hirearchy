@@ -1,0 +1,13 @@
+The memo for 2026-10-05 is at `/tmp/hirearchy-g0-m1-s2-1792997653/deliverables/memo-2026-10-05.md`. I copied it from the team's file and the two match.
+
+- **Covers only that meeting's decisions and who does what:** met.
+- **At most 400 words:** met. My count is 156 words with `wc` (the team's count was 126).
+- **"Decisions" section, including ownerless ones:** met, with 2 decisions.
+- **Table with columns Owner | Action | Due, one row per commitment, including prose ones:** met, with 5 rows including Sam's and Lee's.
+- **Due as ISO dates, `none` when there's no date:** met. Sam is 2026-10-09, Marta is 2026-10-14, and Lee is `none`.
+- **Everything traceable to the notes, nothing invented:** met, apart from the "confirmed by the client" line you chose to keep.
+- **Reviewer's report shows 6 of 6 criteria met:** met.
+
+The case used 14 runs. That is 12 approved plus the 2 extra you OK'd.
+
+Each week, ask for the memo with the notes file name, for example "memo for 2026-10-12.md". Keep it as it is, or is there anything you'd like changed?

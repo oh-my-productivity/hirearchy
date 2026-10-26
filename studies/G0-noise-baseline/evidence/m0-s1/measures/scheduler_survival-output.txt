@@ -1,0 +1,90 @@
+# m0-s1 scheduler survival (D-SURVIVE and D-SIGNAL; facts only, from events/, session-turn-times-utc.txt, injection-log.txt)
+Per scheduler: pid, who started it (the `start` tool.call, in an mcp-<pid> event file, whose interval [ts - ms, ts] holds the scheduler.start: the assistant's per-turn server, or the injection script's server when injection-log.txt names the scheduler's pid), its start/exit,
+the turn it began in, whether it was running at any turn's end, runs in flight at a turn's end, and kills/stops.
+
+scheduler pid 23856: scheduler.start 2026-10-26T04:55:13.426254+00:00; starter: assistant's MCP server (mcp pid 23837, file mcp-23837-1792990504864.jsonl, start tool.call at 2026-10-26T04:55:13.458453+00:00); began in assistant turn: 3
+  scheduler.exit 2026-10-26T04:57:49.143883+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 3): 7.5 s
+
+scheduler pid 24985: scheduler.start 2026-10-26T04:59:07.278906+00:00; starter: assistant's MCP server (mcp pid 24978, file mcp-24978-1792990747021.jsonl, start tool.call at 2026-10-26T04:59:07.297304+00:00); began in assistant turn: 4
+  scheduler.exit 2026-10-26T05:01:40.981334+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 4): 6.9 s
+
+scheduler pid 25981: scheduler.start 2026-10-26T05:02:38.035678+00:00; starter: injection script (mcp pid 25976, file mcp-25976-1792990957779.jsonl, start tool.call at 2026-10-26T05:02:38.068123+00:00); began in assistant turn: none (between turns: the injection window)
+  scheduler.exit 2026-10-26T05:05:21.663703+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 5): 92.8 s
+
+scheduler pid 27472: scheduler.start 2026-10-26T05:08:26.028644+00:00; starter: assistant's MCP server (mcp pid 27429, file mcp-27429-1792991270269.jsonl, start tool.call at 2026-10-26T05:08:26.069032+00:00); began in assistant turn: 6
+  scheduler.exit 2026-10-26T05:11:19.883296+00:00 reason='finished: no open tasks'
+  runs: 5 run.start, 5 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 6): 22.7 s
+
+scheduler pid 28648: scheduler.start 2026-10-26T05:12:55.409526+00:00; starter: assistant's MCP server (mcp pid 28644, file mcp-28644-1792991575137.jsonl, start tool.call at 2026-10-26T05:12:55.441699+00:00); began in assistant turn: 7
+  scheduler.exit 2026-10-26T05:16:37.948270+00:00 reason='finished: no open tasks'
+  runs: 8 run.start, 8 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 7): 9.9 s
+
+scheduler pid 30598: scheduler.start 2026-10-26T05:18:53.810885+00:00; starter: assistant's MCP server (mcp pid 30595, file mcp-30595-1792991930407.jsonl, start tool.call at 2026-10-26T05:18:53.842715+00:00); began in assistant turn: 9
+  scheduler.exit 2026-10-26T05:23:24.747260+00:00 reason='finished: no open tasks'
+  runs: 9 run.start, 9 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 9): 10.7 s
+
+scheduler pid 32317: scheduler.start 2026-10-26T05:24:41.862204+00:00; starter: assistant's MCP server (mcp pid 32308, file mcp-32308-1792992281603.jsonl, start tool.call at 2026-10-26T05:24:41.897828+00:00); began in assistant turn: 10
+  scheduler.exit 2026-10-26T05:26:23.111788+00:00 reason='finished: no open tasks'
+  runs: 3 run.start, 3 run.end; run.end with killed=true: 0; run.start without run.end: []
+  RUNNING at the end of turn 10 (2026-10-26T05:25:40.383000+00:00); runs in flight: ['lead@20261026T052441868582', 'lead/writer@20261026T052528366242']
+  scheduler.exit to the next turn_end (turn 11): 84.5 s
+
+scheduler pid 33142: scheduler.start 2026-10-26T05:26:37.225371+00:00; starter: assistant's MCP server (mcp pid 33131, file mcp-33131-1792992396886.jsonl, start tool.call at 2026-10-26T05:26:37.245648+00:00); began in assistant turn: 11
+  scheduler.exit 2026-10-26T05:27:33.767469+00:00 reason='finished: no open tasks'
+  runs: 1 run.start, 1 run.end; run.end with killed=true: 0; run.start without run.end: []
+  not running at the end of any assistant turn (scheduler.exit came before the turn_end of the turn it began in, or it ran between turns)
+  scheduler.exit to the next turn_end (turn 11): 13.8 s
+
+stop tool.calls of the assistant: 0; injection script --stop: False
+schedulers: 8; started by the assistant's server: 7; started by the injection script: 1
+(turn end, scheduler) pairs with the scheduler running: 1
+schedulers with a scheduler.exit: 8 of 8
+reasons: 'finished: no open tasks'
+run.end with killed=true in the stream: 0
+run.orphan events: 0
+
+Per-turn ps records (run-counts-by-turn.txt 'scheduler record after turn N'): see that file; every record shows 'scheduler.pid: (no file)' unless noted.
+
+# D-SIGNAL: every scheduler.signal line of the stream
+scheduler.signal lines: 0
+
+# Schedulers alive at a turn's end (from the pairs above) and whether each survived (D-SURVIVE)
+pid 32317 running at the end of turn 10; runs in flight ['lead@20261026T052441868582', 'lead/writer@20261026T052528366242']; scheduler.exit: finished: no open tasks
+
+# D-SURVIVE classes, M-C rates and M-C-8 (computed here; the text above is E7's)
+pid 32317 turn 10: survived
+M-C-1 assistant-started schedulers running at the end of at least one turn: 1 of 7
+M-C-2 (turn end, scheduler) pairs that survived: 1 of 1; runs in flight whose run.end is not a kill: 2 of 2
+M-C-3 run.orphan events: 0
+M-C-4 scheduler.start with a scheduler.exit by the stream's end: 8 of 8
+M-C-6 scheduler.signal lines followed by a scheduler.exit of the same scheduler: n/a (0 of 0)
+M-C-7 unexplained scheduler.signal lines, of all: n/a (0 of 0) (explained = a recorded stop within 30 s before: an assistant stop tool.call or the injection script's --stop; a facilitator stop recorded only in run-log.md is not read here)
+M-C-8 turns whose sleep ended at least 20 s after the chat's end: 13 of 13; 'sleep 20 ended' entries: 13; harness-failures/boundary-turn-*.txt: 0
+  turn 1: chat end 2026-10-26T04:52:47Z, sleep end 2026-10-26T04:53:07Z, 20.0 s, ok
+  turn 2: chat end 2026-10-26T04:54:06Z, sleep end 2026-10-26T04:54:26Z, 20.0 s, ok
+  turn 3: chat end 2026-10-26T04:57:57Z, sleep end 2026-10-26T04:58:17Z, 20.0 s, ok
+  turn 4: chat end 2026-10-26T05:01:48Z, sleep end 2026-10-26T05:02:08Z, 20.0 s, ok
+  turn 5: chat end 2026-10-26T05:06:54Z, sleep end 2026-10-26T05:07:14Z, 20.0 s, ok
+  turn 6: chat end 2026-10-26T05:11:43Z, sleep end 2026-10-26T05:12:03Z, 20.0 s, ok
+  turn 7: chat end 2026-10-26T05:16:48Z, sleep end 2026-10-26T05:17:08Z, 20.0 s, ok
+  turn 8: chat end 2026-10-26T05:17:55Z, sleep end 2026-10-26T05:18:15Z, 20.0 s, ok
+  turn 9: chat end 2026-10-26T05:23:35Z, sleep end 2026-10-26T05:23:55Z, 20.0 s, ok
+  turn 10: chat end 2026-10-26T05:25:40Z, sleep end 2026-10-26T05:26:00Z, 20.0 s, ok
+  turn 11: chat end 2026-10-26T05:27:48Z, sleep end 2026-10-26T05:28:08Z, 20.0 s, ok
+  turn 12: chat end 2026-10-26T05:28:40Z, sleep end 2026-10-26T05:29:00Z, 20.0 s, ok
+  turn 13: chat end 2026-10-26T05:29:38Z, sleep end 2026-10-26T05:29:58Z, 20.0 s, ok

@@ -1,0 +1,11 @@
+######## TURN 12  start 08:19:52  end 08:20:17  elapsed 25s  (local, 2026-10-26; UTC wall-clock start 2026-10-26T08:19:52Z end 2026-10-26T08:20:17Z; exit code 0)
+######## LENA (prompt sent verbatim):
+Lee's should be 2026-10-30. No, nothing for Marta to do there, leave it out. Yes, that counts.
+######## ASSISTANT (stdout, ANSI stripped; stderr is in turn-12.stderr.txt):
+I can do this, but it will go over budget, so I need your OK first.
+
+Your answers mean two changes to the draft: Lee's due date becomes 2026-10-30, and Marta's "Keep the agenda as sent" row comes out. Sam's row stays.
+
+A rework takes about 5 runs: the lead plans, the writer edits, the reviewer re-checks, and the lead checks and reports. This request has used 9 of its 12, so it would end at about 14, which is 2 over what you approved. With only the 3 runs left, the lead would likely run out before the reviewer's re-check and block, as it did on 5 October.
+
+My recommendation is to approve about 5 more runs. Should I go ahead, yes or no? If no, the draft stays undelivered, because I can't edit it myself. Say so and I'll deliver nothing for 19 October, or you can make the two edits by hand.

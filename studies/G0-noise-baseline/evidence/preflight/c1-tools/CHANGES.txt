@@ -1,0 +1,73 @@
+# C1 tools copied for G0 preflight check (a) (protocol 11 / E7 4.14 item 10; changes only as E7's item 10 lists, with G0's names)
+source: /Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a4/c1-tools (E7 freeze md5s: unchanged files equal E7's copies)
+
+## diff -u setup.sh
+--- /Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a4/c1-tools/setup.sh	2026-10-25 05:55:36
++++ /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/preflight/c1-tools/setup.sh	2026-10-26 04:45:02
+@@ -1,11 +1,11 @@
+ #!/bin/zsh
+ # C1 per-attempt setup (design 6.1 Setup 1-2 + the sandbox kiro-cli-chat symlink). Usage: setup.sh <variant> [mkprofile.py extra args...]; prints EPOCH.
+-WT=/Volumes/workspace/hirearchy/.worktrees/org-growth-0a4
++WT=/Volumes/workspace/hirearchy
+ VARIANT=$1; shift
+-EPOCH=$(date +%s); SB=/tmp/hirearchy-0a4-c1-$EPOCH; echo "EPOCH=$EPOCH"
++EPOCH=$(date +%s); SB=/tmp/hirearchy-g0-detach-$EPOCH; echo "EPOCH=$EPOCH"
+ mkdir -p $SB/home/.local/bin $SB/kiro-home/agents $SB/kiro-state $SB/logs $SB/samples $SB/out
+ ln -s /Users/aminalizadeh/.local/bin/kiro-cli-chat $SB/home/.local/bin/kiro-cli-chat
+-cp $WT/.agents/tasks/c1-tools/*.py $SB/
++cp /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/preflight/c1-tools/*.py $SB/
+ cd $SB
+ h() { HIREARCHY_STATE_DIR=$SB/kiro-state $WT/.venv/bin/hirearchy "$@"; }
+ h init $SB/org --mission "0a.4 C1 reproduction (throwaway)" --model claude-sonnet-5.5 >/dev/null 2>&1; echo init $?
+
+## diff -u after.sh
+--- /Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a4/c1-tools/after.sh	2026-10-25 05:55:36
++++ /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/preflight/c1-tools/after.sh	2026-10-26 04:45:02
+@@ -1,13 +1,13 @@
+ #!/bin/zsh
+ # C1 verdict call: after.sh <SB> <ID> <turn> [--c1b]. Waits for .done, runs verdict/summary/allowed/timeline, archives the sandbox data under c1-tools/samples/<ID>/.
+ SB=$1; ID=$2; T=$3; shift 3
+-WT=/Volumes/workspace/hirearchy/.worktrees/org-growth-0a4; PY="$WT/.venv/bin/python -I"; A=$WT/.agents/tasks/c1-tools/samples/$ID
++WT=/Volumes/workspace/hirearchy; PY="$WT/.venv/bin/python -I"; A=/Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/preflight/detach/samples/$ID
+ for i in {1..60}; do [[ -f $SB/samples/$ID-turn$T.done ]] && break; sleep 1; done
+ mkdir -p $A
+ $=PY $SB/verdict.py --sb $SB --attempt $ID --turn $T "$@" > /dev/null
+ $=PY $SB/summary.py --sb $SB --attempt $ID --turn $T > $A/summary-turn$T.md
+ $=PY $SB/allowed.py --kiro-home $SB/kiro-home > $A/allowed.txt
+-python3 $WT/.agents/tasks/c1-tools/timeline.py $SB/samples/$ID-turn$T.jsonl > $A/timeline-turn$T.txt
++python3 /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/preflight/c1-tools/timeline.py $SB/samples/$ID-turn$T.jsonl > $A/timeline-turn$T.txt
+ cp $SB/samples/$ID-turn$T* $SB/out/$ID-turn$T* $SB/logs/$ID-turn$T* $A/ 2>/dev/null
+ tail -1 $A/allowed.txt
+ python3 - <<P
+
+## diff -u mkprofile.py
+--- /Volumes/workspace/hirearchy/docs/research/org-growth/phase-0a4/c1-tools/mkprofile.py	2026-10-25 05:55:36
++++ /Volumes/workspace/hirearchy/studies/G0-noise-baseline/evidence/preflight/c1-tools/mkprofile.py	2026-10-26 04:45:02
+@@ -10,7 +10,7 @@
+ import os
+ import subprocess
+ 
+-WT = "/Volumes/workspace/hirearchy/.worktrees/org-growth-0a4"
++WT = "/Volumes/workspace/hirearchy"
+ 
+ 
+ def main() -> int:
+
+## unchanged:
+identical allowed.py
+identical logfilter.py
+identical sampler.py
+identical summary.py
+identical timeline.py
+identical verdict.py
+
+## md5 of the copies (md5 -r)
+61739fe70bbddaa077a300d1d2fef334 allowed.py
+1bab40813be21c4520b01ac7eb564aa4 logfilter.py
+c57f82a0ec06e7b0986155e349e99036 mkprofile.py
+72ca914dce05e2761d7f2e29a4da9a31 sampler.py
+ddcdb0c711ef9a1b6a47e9f20407f38b summary.py
+e5d4fd364a260f35046142fa0991cfce timeline.py
+cfa0c14791d058a730e7ebe0c88d5f40 verdict.py
+a637cd9ba40383e4d854a07f689b5e55 after.sh
+a2bea4981466b0742c1f6e0ed5c2f1d5 setup.sh
