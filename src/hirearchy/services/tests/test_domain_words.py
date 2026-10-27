@@ -8,7 +8,7 @@ from testkit.domain_words import violations
 
 import hirearchy.services
 
-MODULES = ("_items.py",)
+MODULES = ("_items.py", "_ops.py")
 PACKAGE = Path(hirearchy.services.__file__).resolve().parent
 
 
