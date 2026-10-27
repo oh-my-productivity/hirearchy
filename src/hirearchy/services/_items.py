@@ -6,7 +6,7 @@ from __future__ import annotations
 import re
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from ..kernel import JsonObject
 from .api import PlaybookItem, PlaybookSection, line_key
@@ -362,3 +362,96 @@ def migrate_body(body: str, *, splitters: Sequence[Splitter] = SPLITTERS) -> Mig
         if split_check(body, items, sections):
             return Migration(items, sections, reason)
     raise AssertionError("the migration of the playbook lost a line")
+
+
+# ----------------------------------------------------------------------------------------------------------------------- placement (4.1)
+
+
+class PlacementError(ValueError):
+    """An ``after`` that names no place for the item: the message is the clause of the PB-ARGS refusal (5.3)."""
+
+
+def _rebuilt(items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection]) -> Split:
+    """The items in the order of the sections, each carrying the heading of its section."""
+    by_id = {i.id: i for i in items}
+    return tuple(replace(by_id[i], section=s.heading) for s in sections for i in s.ids), tuple(sections)
+
+
+def _inserted(sections: Sequence[PlaybookSection], at: int, position: int, item_id: str) -> list[PlaybookSection]:
+    """``sections`` with ``item_id`` at ``position`` among the ids of the section ``at``."""
+    s = sections[at]
+    out = list(sections)
+    out[at] = PlaybookSection(s.heading, s.numbered, (*s.ids[:position], item_id, *s.ids[position:]))
+    return out
+
+
+def _rules_section(items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection]) -> int | None:
+    """The index of the rules section: the last one, while a rule is live."""
+    return len(sections) - 1 if sections and any(i.kind == "rule" for i in items) else None
+
+
+def _holding(sections: Sequence[PlaybookSection], item_id: str) -> int | None:
+    return next((k for k, s in enumerate(sections) if item_id in s.ids), None)
+
+
+def place_add(items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection], new: PlaybookItem, after: str | None = None) -> Split:
+    """The items and sections with ``new`` (its ``section`` is set here) placed by 4.1's rule (pure). A step without ``after`` goes after the last item
+    of the first section headed ``## Steps``, else of the first section whose first item is numbered, else into a new ``## Steps`` section placed
+    first (after the text before the first heading); with ``after``, a live step, right after it. A rule goes to the end of the rules section (created
+    last when no rule is live), or right after ``after``, a live rule. ``PlacementError`` (the PB-ARGS clause) when ``after`` is none of those."""
+    by_id = {i.id: i for i in items}
+    target = after.strip().upper() if after else None
+    if new.kind == "rule":
+        at = _rules_section(items, sections)
+        if target is not None and (by_id.get(target) is None or by_id[target].kind != "rule"):
+            raise PlacementError(f"after={after} is not a live rule")
+        if at is None:
+            return _rebuilt([*items, new], [*sections, PlaybookSection(RULES_HEADING, False, (new.id,))])
+        position = len(sections[at].ids) if target is None else sections[at].ids.index(target) + 1
+        return _rebuilt([*items, new], _inserted(sections, at, position, new.id))
+    if target is not None:
+        if target not in by_id:
+            raise PlacementError(f"after={after} is not a live item")
+        if by_id[target].kind == "rule":
+            raise PlacementError(f"after={after} is a rule: a step goes after a step (or leave after out)")
+        at = _holding(sections, target)
+        assert at is not None
+        return _rebuilt([*items, new], _inserted(sections, at, sections[at].ids.index(target) + 1, new.id))
+    named = next((k for k, s in enumerate(sections) if s.heading.rstrip() == STEPS_HEADING), None)
+    numbered = next((k for k, s in enumerate(sections) if s.ids and s.numbered and by_id[s.ids[0]].kind == "step"), None)
+    at = named if named is not None else numbered
+    if at is not None:
+        return _rebuilt([*items, new], _inserted(sections, at, len(sections[at].ids), new.id))
+    first = 1 if sections and sections[0].heading == "" else 0
+    created = PlaybookSection(STEPS_HEADING, True, (new.id,))
+    return _rebuilt([*items, new], [*sections[:first], created, *sections[first:]])
+
+
+def place_restore(
+    items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection], restored: PlaybookItem, earlier: Sequence[PlaybookSection],
+) -> Split:
+    """The items and sections with ``restored`` back where it was (pure). ``earlier`` is the layout of the version in which it was last live: it goes
+    back to the section it was in there (found by its heading line and its occurrence among the headings with that line; the section ``""`` is
+    recreated first when it is gone), right after the nearest item that preceded it there and is still live in that section, else first. A rule goes
+    to the rules section (created last) after the nearest preceding rule that is still live. An item that was in no section of ``earlier``, or
+    whose section is gone, is placed like an add."""
+    old = _holding(earlier, restored.id)
+    if old is None:
+        return place_add(items, sections, restored)
+    before = list(reversed(earlier[old].ids[: earlier[old].ids.index(restored.id)]))
+    if restored.kind == "rule":
+        at = _rules_section(items, sections)
+        if at is None:
+            return _rebuilt([*items, restored], [*sections, PlaybookSection(RULES_HEADING, False, (restored.id,))])
+        position = next((sections[at].ids.index(i) + 1 for i in before if i in sections[at].ids), 0)
+        return _rebuilt([*items, restored], _inserted(sections, at, position, restored.id))
+    heading = earlier[old].heading
+    occurrence = sum(1 for s in earlier[:old] if s.heading == heading)
+    same = [k for k, s in enumerate(sections) if s.heading == heading]
+    if occurrence < len(same):
+        at = same[occurrence]
+        position = next((sections[at].ids.index(i) + 1 for i in before if i in sections[at].ids), 0)
+        return _rebuilt([*items, restored], _inserted(sections, at, position, restored.id))
+    if heading == "":
+        return _rebuilt([*items, restored], [PlaybookSection("", earlier[old].numbered, (restored.id,)), *sections])
+    return place_add(items, sections, restored)
