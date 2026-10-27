@@ -233,6 +233,9 @@ def refs_of(records: Records, text: str, why: Sequence[str], live_from: datetime
 # ----------------------------------------------------------------------------------------------------------------- the texts of an item over time
 
 
+_Tokens = tuple[tuple[str, ...], tuple[str, ...]]  # the text tokens of an item's text and, for a rule, of its condition
+
+
 @dataclass
 class _Seg:
     """One text of an item, live from the version that gave it to the next change of it (its ``end``; None while it is live)."""
@@ -246,6 +249,7 @@ class _Seg:
     when: str
     why: tuple[str, ...]
     refs: frozenset[str]
+    tokens: _Tokens
 
 
 @dataclass
@@ -255,6 +259,7 @@ class _Change:
     version: int
     at: datetime
     excluded: frozenset[str]
+    tokens: _Tokens  # the tokens of the watched text: the item is "live in the watched text" while its text has them (W1)
 
 
 @dataclass
@@ -266,6 +271,11 @@ class _Track:
     segs: list[_Seg]
     live: bool = True
     changes: list[_Change] = field(default_factory=list)
+
+
+def _tokens_of(item: PlaybookItem) -> _Tokens:
+    """The text tokens of an item (section 3): two texts with equal tokens differ only in spacing, case, markdown and sentence punctuation."""
+    return tuple(text_tokens(item.text)), tuple(text_tokens(item.when)) if item.kind == "rule" else ()
 
 
 def _words_of(item: PlaybookItem) -> str:
@@ -291,9 +301,12 @@ def _tracks(versions: Sequence[Playbook], rec: Records) -> dict[str, _Track]:
                 track.segs[-1].end = at
             track.live = True
             track.kind = item.kind
-            track.segs.append(_Seg(item.id, v.version, at, None, item.kind, item.text, item.when, item.why, refs_of(rec, _words_of(item), item.why, at)))
+            tokens = _tokens_of(item)
+            track.segs.append(_Seg(
+                item.id, v.version, at, None, item.kind, item.text, item.when, item.why, refs_of(rec, _words_of(item), item.why, at), tokens,
+            ))
             if v.admitted in ("b", "c") and v.item == item.id:  # a gated change puts the text on trial
-                track.changes = [_Change(v.version, at, frozenset(rec.by_id[x].case for x in item.why if x in rec.by_id))]
+                track.changes = [_Change(v.version, at, frozenset(rec.by_id[x].case for x in item.why if x in rec.by_id), tokens)]
         live = now
     return tracks
 
@@ -339,42 +352,115 @@ def _judging(candidate: _Candidate) -> tuple[Verdict, Delivery] | None:
 
 
 @dataclass(frozen=True)
+class _Window:
+    """The first k candidates of a watched change, their judged deliveries and the window over them (section 3): the rejections in it, each with
+    the result it was given on. ``closed``: ``E`` is defined, each of the first k candidates has its judged delivery."""
+
+    first: list[_Candidate]
+    judged: list[tuple[Verdict, Delivery] | None]
+    closed: bool
+    judging: Message | None  # the verdict note that closes the window: the latest judging verdict of the first k candidates (``D``)
+    members: list[tuple[Assertion, Message]]
+
+
+def _window(rec: Records, change: _Change, k: int, upto: Moment | None = None) -> _Window:
+    """The window of ``change`` over ``rec`` (section 3): a human rejection on a result created at or after the live-from that was created at or
+    before ``E`` or recorded before ``D`` (every one while ``E`` is undefined); with ``upto`` (``K``), only those recorded at or before it."""
+    first = _candidates(rec, change)[:k]
+    judged = [_judging(c) for c in first]
+    done = [j for j in judged if j is not None]
+    closed = len(first) == k and len(done) == k
+    e = max(when_of(d.result) for _, d in done) if closed else None
+    judging = max((v.message for v, _ in done), key=lambda m: m.id) if closed else None
+    members: list[tuple[Assertion, Message]] = []
+    for a in rec.assertions:
+        if upto is not None and moment_of(a.verdict.message) > upto:
+            continue
+        result = rejected_result(rec, a)
+        if result is None or when_of(result) < change.at:
+            continue
+        if e is None or judging is None or when_of(result) <= e or a.verdict.message.id < judging.id:
+            members.append((a, result))
+    return _Window(first, judged, closed, judging, members)
+
+
+def _relations(rec: Records, track: _Track, members: Sequence[tuple[Assertion, Message]]) -> tuple[list[Assertion], list[Assertion]]:
+    """Of rejections with the result each was given on: those related to the item (not pending, given on a result created while a text of it was
+    live, and their subjects meet that text's refs) and those pending (no answer yet)."""
+    pending = [a for a, _ in members if pending_rejection(rec, a.id)]
+    held = {a.id for a in pending}
+    related = []
+    for a, result in members:
+        seg = _seg_at(track, when_of(result))
+        if a.id not in held and seg is not None and subjects_of(rec, a.id) & seg.refs:
+            related.append(a)
+    return related, pending
+
+
+def _records(rec: Records) -> list[Moment]:
+    """The places of the records that can change what the files derive: every verdict note, every human link note and every answering contract version."""
+    found = {moment_of(v.message) for c in rec.cases for v in c.verdicts}
+    found |= {moment_of(n) for c in rec.cases for v in c.verdicts for n in v.link_notes}
+    found |= {defined_moment(c) for c in rec.contracts if c.answers}
+    return sorted(found)
+
+
+def _watch_end(rec: Records, track: _Track, change: _Change, k: int) -> Moment | None:
+    """``K``, the end of the watch (section 3): the earliest record at or after ``D`` such that the files created up to and including it derive ``kept``
+    (``E`` defined, every rejection in the window answered and unrelated). None while the item has not reached ``kept``."""
+    judging = _window(rec, change, k).judging
+    if judging is None:
+        return None
+    for place in _records(rec):
+        if place < moment_of(judging):
+            continue
+        view = until(rec, place)
+        found = _window(view, change, k)
+        related, pending = _relations(view, track, found.members)
+        if found.closed and not related and not pending:
+            return place
+    return None
+
+
+@dataclass(frozen=True)
 class _Derived:
-    """What one watched change derives: its window's rejections (related and pending), the first k candidates' count, ``E`` and ``D``."""
+    """What one watched change derives: its related and pending rejections, the counts over its first k candidates and whether it reached ``kept``."""
 
     related: tuple[str, ...]
     pending: tuple[str, ...]
     clean: int
     waiting: int
-    closed: bool  # ``E`` is defined: each of the first k candidates has its judged delivery
+    kept: bool
+
+
+def _warned_window(rec: Records, track: _Track, change: _Change, known: set[str]) -> list[tuple[Assertion, Message]]:
+    """The warned window of ``change`` (B1): every human rejection on a result created at or after its live-from, recorded while the item was live
+    in the watched text, whatever ``E``, ``D`` and ``K`` are. Those in the window already (``known``) are left out."""
+    found = []
+    for a in rec.assertions:
+        result = rejected_result(rec, a)
+        if a.id in known or result is None or when_of(result) < change.at:
+            continue
+        seg = _seg_at(track, when_of(a.verdict.message))
+        if seg is not None and seg.tokens == change.tokens:
+            found.append((a, result))
+    return found
 
 
 def _derive(rec: Records, track: _Track, change: _Change, k: int) -> _Derived:
-    """The window and the counts of ``change`` over ``rec``: candidates, ``judged(c)``, ``E``, ``D``, the window, related and pending rejections."""
-    first = _candidates(rec, change)[:k]
-    judged = [_judging(c) for c in first]
-    closed = len(first) == k and all(j is not None for j in judged)
-    last = [j for j in judged if j is not None]
-    e = max(when_of(d.result) for _, d in last) if closed else None
-    d_id = max(v.message.id for v, _ in last) if closed else ""
-    window: list[tuple[Assertion, Message]] = []  # each rejection of the window with the result it was given on
-    for a in rec.assertions:
-        result = rejected_result(rec, a)
-        if result is None or when_of(result) < change.at:
-            continue
-        if e is None or when_of(result) <= e or a.verdict.message.id < d_id:
-            window.append((a, result))
-    pending = [a for a, _ in window if pending_rejection(rec, a.id)]
-    held = {a.id for a in pending}
-    related = []
-    for a, result in window:
-        seg = _seg_at(track, when_of(result))
-        if a.id not in held and seg is not None and subjects_of(rec, a.id) & seg.refs:
-            related.append(a)
+    """The counts of ``change`` over ``rec``: ``K``, the window closed at it, related and pending rejections, and, once the item has one related
+    rejection, the warned window in which a second retires it whatever the order of the records."""
+    end = _watch_end(rec, track, change, k)
+    window = _window(rec, change, k, end)
+    related, pending = _relations(rec, track, window.members)
+    if related:
+        extra = _warned_window(rec, track, change, {a.id for a, _ in window.members})
+        related += _relations(rec, track, extra)[0]
     unclean = {a.case for a in (*pending, *related)}
     return _Derived(
         tuple(sorted((a.id for a in related), key=number_of)), tuple(sorted((a.id for a in pending), key=number_of)),
-        sum(1 for c, j in zip(first, judged) if j is not None and c.case.id not in unclean), sum(1 for j in judged if j is None), closed,
+        sum(1 for c, j in zip(window.first, window.judged) if j is not None and c.case.id not in unclean),
+        sum(1 for j in window.judged if j is None), end is not None,
     )
 
 
@@ -408,7 +494,7 @@ def watch_states(
         change = track.changes[-1]
         found = _derive(rec, track, change, K_DEFAULT)
         due = len(found.related) >= 2
-        state = "retired" if not track.live else "warning" if found.related else "kept" if found.closed and not found.pending else "new"
+        state = "retired" if not track.live else "warning" if found.related else "kept" if found.kept else "new"
         out.append(ItemWatch(
             track.id, track.kind, state, change.version, change.at, K_DEFAULT, (0, 0), found.clean, found.waiting, found.related, found.pending,
             0, coverage, due and track.live,

@@ -199,3 +199,16 @@ class Watching:
             if link is not None:
                 self.bag.link(note, link[0], *link[1])
         return task
+
+
+def world() -> Watching:
+    """The standard world of the watch's tests: contract v1 with C1-C6 (C5 is "e"); playbook v1 (a step, never watched); R1, the rejection of case c0
+    answered about C5; and P2, a rule admitted at tick 10 on R1 and C5 (rule (c)), whose watch these tests read with k = 3."""
+    w = Watching()
+    w.contracts.append(contract(1, ["a", "b", "c", "d", "e", "f"], 0))
+    first = [step("P1", "Read the request.")]
+    w.versions.append(playbook(1, 0, first, op="first", admitted="first"))
+    w.case("c0", 1, 2, verdict=(3, "reject"), link=(4, ["C5"]))
+    rule2 = rule("P2", "a date is relative", "convert it from the date of the request", why=("R1", "C5"))
+    w.versions.append(playbook(2, 10, [*first, rule2], op="add", item="P2", admitted="c"))
+    return w

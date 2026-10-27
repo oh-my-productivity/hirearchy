@@ -10,18 +10,7 @@ from hirearchy.kernel import Message
 from hirearchy.reflection._watch import watch_states
 from hirearchy.services import ItemWatch, Playbook
 
-from ._watch_kit import Watching, contract, playbook, rule, step
-
-
-def setup() -> Watching:
-    w = Watching()
-    w.contracts.append(contract(1, ["a", "b", "c", "d", "e", "f"], 0))  # C1-C6: C5 is "e"
-    first = [step("P1", "Read the request.")]
-    w.versions.append(playbook(1, 0, first, op="first", admitted="first"))
-    w.case("c0", 1, 2, verdict=(3, "reject"), link=(4, ["C5"]))  # R1: the rejection P2 rests on, answered about C5
-    rule2 = rule("P2", "a date is relative", "convert it from the date of the request", why=("R1", "C5"))
-    w.versions.append(playbook(2, 10, [*first, rule2], op="add", item="P2", admitted="c"))
-    return w
+from ._watch_kit import Watching, contract, playbook, rule, step, world
 
 
 def p2(w: Watching) -> ItemWatch:
@@ -38,7 +27,7 @@ def accepted(w: Watching, n: int = 3, first: int = 20) -> None:
 
 
 def test_row_i_a_candidate_delivered_before_the_kth_and_judged_after_it_related_is_warning_never_kept() -> None:
-    w = setup()
+    w = world()
     w.case("c1", 20, 21, verdict=(30, "accept"))
     w.case("c2", 22, 23, verdict=(34, "reject"))  # delivered before c3, judged after it
     w.case("c3", 24, 25, verdict=(32, "accept"))
@@ -50,7 +39,7 @@ def test_row_i_a_candidate_delivered_before_the_kth_and_judged_after_it_related_
 
 
 def test_row_ii_the_same_candidate_unjudged_is_new_and_waiting_until_its_verdict() -> None:
-    w = setup()
+    w = world()
     w.case("c1", 20, 21, verdict=(30, "accept"))
     w.case("c2", 22, 23, verdict=(31, "accept"))
     c3 = w.case("c3", 24, 25)
@@ -61,7 +50,7 @@ def test_row_ii_the_same_candidate_unjudged_is_new_and_waiting_until_its_verdict
 
 
 def test_row_iii_a_related_rejection_after_e_and_recorded_after_d_is_outside_the_window() -> None:
-    w = setup()
+    w = world()
     accepted(w)  # E is c3's delivery (25), D is c3's verdict (32)
     w.case("c4", 40, 41, verdict=(42, "reject"), link=(43, ["C5"]))  # a result after E, recorded after D
     kept = p2(w)
@@ -69,7 +58,7 @@ def test_row_iii_a_related_rejection_after_e_and_recorded_after_d_is_outside_the
 
 
 def test_row_iv_a_related_rejection_on_a_blocked_result_before_e_is_related() -> None:
-    w = setup()
+    w = world()
     accepted(w)
     w.case("cb", 19, 20, status="blocked", verdict=(28, "reject"), link=(29, ["C5"]))  # a blocked result is no delivery, but a file from it can be rejected
     warned = p2(w)
@@ -77,7 +66,7 @@ def test_row_iv_a_related_rejection_on_a_blocked_result_before_e_is_related() ->
 
 
 def test_row_v_a_first_delivery_superseded_by_a_human_rework_the_user_accepts_is_clean() -> None:
-    w = setup()
+    w = world()
     c1 = w.case("c1", 20, 21)  # delivered, superseded before any verdict
     w.case("c1b", 22, 23, verdict=(33, "accept"), revises=c1, asked_by="human")
     w.case("c2", 24, 25, verdict=(30, "accept"))
@@ -87,7 +76,7 @@ def test_row_v_a_first_delivery_superseded_by_a_human_rework_the_user_accepts_is
 
 
 def test_row_vi_a_relayed_rework_the_user_rejects_about_the_items_refs_is_related() -> None:
-    w = setup()
+    w = world()
     c1 = w.case("c1", 20, 21)
     w.case("c1b", 22, 23, verdict=(33, "reject"), link=(34, ["C5"]), revises=c1, asked_by="relayed")
     w.case("c2", 24, 25, verdict=(30, "accept"))
@@ -97,7 +86,7 @@ def test_row_vi_a_relayed_rework_the_user_rejects_about_the_items_refs_is_relate
 
 
 def test_row_vii_the_kth_candidates_rework_rejected_about_the_item_is_related_inside_the_window() -> None:
-    w = setup()
+    w = world()
     w.case("c1", 20, 21, verdict=(30, "accept"))
     w.case("c2", 22, 23, verdict=(31, "accept"))
     c3 = w.case("c3", 24, 25)  # its first delivery is superseded by a rework
@@ -107,7 +96,7 @@ def test_row_vii_the_kth_candidates_rework_rejected_about_the_item_is_related_in
 
 
 def test_row_viii_a_late_verdict_on_the_superseded_first_delivery_leaves_judged_e_and_d_and_is_related_before_k() -> None:
-    w = setup()
+    w = world()
     w.case("c1", 20, 21, verdict=(28, "accept"))
     c3 = w.case("c3", 24, 25)
     w.case("c3b", 26, 27, verdict=(29, "accept"), revises=c3, asked_by="human")  # judged(c3) is the rework: J = 27
@@ -131,7 +120,7 @@ def delayed_verdict(w: Watching) -> tuple[Watching, Message]:
 
 
 def test_row_xiii_a_later_case_rejected_and_linked_before_the_kth_verdict_stays_warning_after_it() -> None:
-    w, c3 = delayed_verdict(setup())
+    w, c3 = delayed_verdict(world())
     w.case("c4", 28, 29, verdict=(30, "reject"), link=(31, ["C5"]))  # recorded before c3's verdict
     before = p2(w)
     assert (before.state, before.related, before.waiting) == ("warning", ("R2",), 1)
@@ -141,14 +130,14 @@ def test_row_xiii_a_later_case_rejected_and_linked_before_the_kth_verdict_stays_
 
 
 def test_row_xiv_the_same_rejection_recorded_after_the_kth_verdict_is_outside_the_window() -> None:
-    w, c3 = delayed_verdict(setup())
+    w, c3 = delayed_verdict(world())
     w.bag.verdict(c3, 40, "accept")
     w.case("c4", 28, 29, verdict=(41, "reject"), link=(42, ["C5"]))  # a result after E (27), recorded after D (40)
     assert (p2(w).state, p2(w).related, p2(w).clean) == ("kept", (), 3)
 
 
 def test_row_xv_a_relayed_verdict_before_the_link_and_the_human_verdict_after_it_stays_warning() -> None:
-    w, c3 = delayed_verdict(setup())
+    w, c3 = delayed_verdict(world())
     w.bag.verdict(c3, 30, "accept", source="relayed")  # root passes P2-UNRATED with its own reading: no judged(c3)
     w.case("c4", 28, 29, verdict=(31, "reject"), link=(32, ["C5"]))
     assert (p2(w).state, p2(w).waiting) == ("warning", 1)
@@ -171,7 +160,7 @@ def test_a_legacy_playbook_gives_its_virtual_items_all_kept() -> None:
 
 
 def test_0_deliveries_since_the_watch_start_is_new_with_no_clean_case() -> None:
-    w = setup()
+    w = world()
     new = p2(w)
     assert (new.state, new.clean, new.waiting, new.k, new.related, new.pending, new.retire_due) == ("new", 0, 0, 3, (), (), False)
     assert new.watch_start == w.versions[1].revised and new.text_version == 2
@@ -179,7 +168,7 @@ def test_0_deliveries_since_the_watch_start_is_new_with_no_clean_case() -> None:
 
 
 def test_a_judged_case_whose_only_rejection_is_pending_is_not_clean_not_related_and_listed_pending() -> None:
-    w = setup()
+    w = world()
     w.case("c1", 20, 21, verdict=(30, "accept"))
     w.case("c2", 22, 23, verdict=(31, "reject"))  # no answer yet
     w.case("c3", 24, 25, verdict=(32, "accept"))
@@ -188,7 +177,7 @@ def test_a_judged_case_whose_only_rejection_is_pending_is_not_clean_not_related_
 
 
 def test_a_rejection_linked_none_is_unrelated_and_its_case_is_clean() -> None:
-    w = setup()
+    w = world()
     w.case("c1", 20, 21, verdict=(30, "accept"))
     w.case("c2", 22, 23, verdict=(31, "reject"), link=(33, ["none"]))
     w.case("c3", 24, 25, verdict=(32, "accept"))
@@ -197,7 +186,7 @@ def test_a_rejection_linked_none_is_unrelated_and_its_case_is_clean() -> None:
 
 
 def test_a_rejection_the_user_never_answers_keeps_the_item_new_for_good() -> None:
-    w = setup()
+    w = world()
     accepted(w)
     w.case("c4", 26, 27, verdict=(28, "reject"))  # recorded before D (32) and never answered
     assert (p2(w).state, p2(w).pending) == ("new", ("R2",))
@@ -206,7 +195,7 @@ def test_a_rejection_the_user_never_answers_keeps_the_item_new_for_good() -> Non
 
 
 def test_an_agent_clients_verdicts_judge_no_candidate() -> None:
-    w = setup()
+    w = world()
     for i in range(1, 4):
         w.case(f"c{i}", 20 + 2 * i, 21 + 2 * i, verdict=(40 + i, "accept"), source="agent")
     held = p2(w)
@@ -214,7 +203,7 @@ def test_an_agent_clients_verdicts_judge_no_candidate() -> None:
 
 
 def test_relayed_and_agent_verdicts_judge_no_candidate() -> None:
-    w = setup()
+    w = world()
     w.case("c1", 20, 21, verdict=(30, "accept"), source="relayed")
     w.case("c2", 22, 23, verdict=(31, "reject"), source="relayed", link=(32, ["C5"]))  # a relayed rejection is no assertion
     w.case("c3", 24, 25, verdict=(33, "accept"), source="agent")
@@ -235,7 +224,7 @@ def test_a_contract_with_no_criteria_works_on_the_assertions_alone() -> None:
 
 
 def test_a_removed_criterion_is_no_coverage_but_still_a_subject_of_the_rejection_whose_answer_removed_it() -> None:
-    w = setup()
+    w = world()
     assert p2(w).coverage == ("R1", "C5")  # C5 is current, and R1 was confirmed about it
     w.case("c1", 20, 21, verdict=(30, "reject"))
     w.contracts.append(contract(2, ["a", "b", "c", "d", "f", "g"], 31, answers=w.notes["c1"].id, about="C5"))  # removes C5, adds C7
@@ -244,7 +233,7 @@ def test_a_removed_criterion_is_no_coverage_but_still_a_subject_of_the_rejection
 
 
 def test_every_item_retired_returns_the_retired_items_only() -> None:
-    w = setup()
+    w = world()
     w.versions.append(playbook(3, 50, [step("P1", "Read the request.")], op="retire", item="P2", admitted="exempt"))
     w.versions.append(playbook(4, 51, [], op="retire", item="P1", admitted="exempt"))
     found = w.states()
@@ -252,7 +241,7 @@ def test_every_item_retired_returns_the_retired_items_only() -> None:
 
 
 def test_a_candidate_with_no_counted_verdict_holds_the_item_new() -> None:
-    w = setup()
+    w = world()
     w.case("c1", 20, 21, verdict=(30, "accept"))
     w.case("c2", 22, 23, verdict=(31, "accept"))
     w.case("c3", 24, 25, verdict=(32, "accept"), source="relayed")
@@ -260,7 +249,7 @@ def test_a_candidate_with_no_counted_verdict_holds_the_item_new() -> None:
 
 
 def test_a_superseded_first_delivery_holds_nothing() -> None:
-    w = setup()
+    w = world()
     accepted(w, 2)
     c3 = w.case("c3", 24, 25)  # superseded by a relayed rework before any verdict
     w.case("c3b", 26, 27, verdict=(33, "accept"), revises=c3, asked_by="relayed")
@@ -268,7 +257,7 @@ def test_a_superseded_first_delivery_holds_nothing() -> None:
 
 
 def test_a_late_verdict_on_a_superseded_delivery_changes_nothing_for_judged() -> None:
-    w = setup()
+    w = world()
     accepted(w, 2)
     c3 = w.case("c3", 24, 25)
     w.case("c3b", 26, 27, verdict=(33, "accept"), revises=c3, asked_by="relayed")
@@ -278,24 +267,24 @@ def test_a_late_verdict_on_a_superseded_delivery_changes_nothing_for_judged() ->
 
 
 def test_a_later_case_rejected_before_the_kth_verdict_is_in_the_window_and_after_it_is_outside() -> None:
-    inside, c3 = delayed_verdict(setup())
+    inside, c3 = delayed_verdict(world())
     inside.case("c4", 28, 29, verdict=(30, "reject"), link=(31, ["C5"]))
     inside.bag.verdict(c3, 40, "accept")
-    outside, d3 = delayed_verdict(setup())
+    outside, d3 = delayed_verdict(world())
     outside.bag.verdict(d3, 40, "accept")
     outside.case("c4", 28, 29, verdict=(41, "reject"), link=(42, ["C5"]))
     assert (p2(inside).state, p2(outside).state) == ("warning", "kept")
 
 
 def test_a_blocked_result_that_is_never_rejected_holds_nothing() -> None:
-    w = setup()
+    w = world()
     w.case("cb", 19, 20, status="blocked")
     accepted(w)
     assert (p2(w).state, p2(w).clean, p2(w).waiting) == ("kept", 3, 0)  # a blocked result is no delivery and needs no verdict
 
 
 def test_two_related_rejections_set_retire_due_with_state_warning() -> None:
-    w = setup()
+    w = world()
     w.case("c1", 20, 21, verdict=(30, "accept"))
     w.case("c2", 22, 23, verdict=(31, "reject"), link=(32, ["C5"]))
     w.case("c3", 24, 25, verdict=(33, "reject"), link=(34, ["R1"]))
@@ -304,7 +293,7 @@ def test_two_related_rejections_set_retire_due_with_state_warning() -> None:
 
 
 def test_a_why_case_is_never_a_candidate() -> None:
-    w = setup()
+    w = world()
     w.case("c0b", 20, 21, verdict=(30, "accept"), revises=w.tasks["c0"], asked_by="human")  # a rework of c0, delivered after P2 went live
     w.case("c1", 22, 23, verdict=(31, "accept"))
     w.case("c2", 24, 25, verdict=(32, "accept"))
@@ -313,7 +302,7 @@ def test_a_why_case_is_never_a_candidate() -> None:
 
 
 def test_watch_states_is_a_function_of_the_files() -> None:
-    w = setup()
+    w = world()
     accepted(w, 2)
     w.case("c3", 24, 25, verdict=(35, "reject"), link=(36, ["C5"]))
     versions, cases, results = list(w.versions), w.bag.cases(), w.bag.results()
@@ -321,3 +310,73 @@ def test_watch_states_is_a_function_of_the_files() -> None:
     first = watch_states(versions, cases, results, [], w.contracts)
     again = watch_states(versions, cases, results, [], w.contracts)
     assert first == again and repr((versions, cases, results)) == snapshot  # the same inputs give equal outputs, nothing is changed
+
+
+# ------------------------------------------------------------------------------------------------ 8.1 rows xvi-xx: K and the warned window
+
+
+def test_row_xvi_a_rejection_recorded_after_k_leaves_kept() -> None:
+    w = world()
+    accepted(w)  # D is c3's verdict (32): the files up to it derive kept, so K = 32
+    assert p2(w).state == "kept"
+    late = w.bag.verdict(w.tasks["c2"], 40, "reject")  # a second verdict on c2's judged delivery (result 23, before E), recorded after K
+    w.bag.link(late, 41, "C5")
+    kept = p2(w)
+    assert (kept.state, kept.related, kept.clean) == ("kept", (), 3)  # after the watch: nothing recorded later joins the window
+
+
+def test_row_xvii_a_pending_rejection_at_d_then_a_related_one_is_warning() -> None:
+    w = world()
+    accepted(w)  # D = 32
+    w.case("c4", 26, 27, verdict=(28, "reject"))  # R2: in the window (recorded before D) and pending
+    assert (p2(w).state, p2(w).pending) == ("new", ("R2",))  # K is not reached while it is pending
+    later = w.bag.verdict(w.tasks["c1"], 40, "reject")  # R3: a second verdict on c1's judged delivery (result 21, before E)
+    w.bag.link(later, 41, "C5")
+    w.bag.link(w.notes["c4"], 50, "none")  # R2 answered, unrelated: the files up to here still hold R3 related
+    warned = p2(w)
+    assert (warned.state, warned.related, warned.pending) == ("warning", ("R3",), ())
+
+
+def test_row_xix_a_corrected_link_after_k_is_warning_and_a_second_the_retire() -> None:
+    w = world()
+    w.case("c1", 20, 21, verdict=(30, "accept"))
+    w.case("c2", 22, 23, verdict=(31, "reject"), link=(33, ["none"]))  # R2: no lasting rule
+    w.case("c3", 24, 25, verdict=(32, "reject"), link=(34, ["none"]))  # R3: the same; K is 34
+    assert (p2(w).state, p2(w).related) == ("kept", ())
+    w.bag.link(w.notes["c2"], 40, "C5")  # the user corrects the link of R2: it is about C5
+    one = p2(w)
+    assert (one.state, one.related, one.retire_due) == ("warning", ("R2",), False)
+    w.bag.link(w.notes["c3"], 41, "C5")  # and of R3
+    two = p2(w)
+    assert (two.state, two.related, two.retire_due) == ("warning", ("R2", "R3"), True)
+
+
+def row_xx(order: tuple[str, ...]) -> ItemWatch:
+    """B1, k = 3: R2 (c2's rejection) warns P2 inside the window; R3, on a delivery after E (c4: done 27), is the second related rejection. The
+    four records that can come in any order are c3's verdict, R2's answer, R3 and R3's answer."""
+    w = world()
+    w.case("c1", 20, 21, verdict=(30, "accept"))
+    w.case("c2", 22, 23, verdict=(31, "reject"))
+    c3 = w.case("c3", 24, 25)
+    c4 = w.case("c4", 26, 27)
+    for tick, record in enumerate(order, start=100):
+        if record == "verdict":
+            w.bag.verdict(c3, tick, "accept")
+        elif record == "answer":
+            w.bag.link(w.notes["c2"], tick, "C5")
+        elif record == "rejection":
+            w.notes["c4"] = w.bag.verdict(c4, tick, "reject")
+        else:
+            w.bag.link(w.notes["c4"], tick, "C5")
+    return p2(w)
+
+
+def test_row_xx_a_second_related_rejection_of_a_later_delivery_after_d_is_due_in_every_order() -> None:
+    """B1: whatever the order root records the k-th verdict, the first rejection's answer and the later rejection in, the second one retires it."""
+    from itertools import permutations
+
+    orders = [o for o in permutations(("verdict", "answer", "rejection", "link")) if o.index("rejection") < o.index("link")]
+    assert len(orders) == 12
+    for order in orders:
+        due = row_xx(order)
+        assert (due.state, due.related, due.retire_due) == ("warning", ("R2", "R3"), True), order
