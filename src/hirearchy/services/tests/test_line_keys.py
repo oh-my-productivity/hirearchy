@@ -90,6 +90,33 @@ def test_criterion_words_names_the_criterion_whose_own_words_a_line_is() -> None
     assert criterion_words("Every Due value is an ISO date.", [c9]) is None  # its words without its id are not its words
 
 
+def test_item_words_is_a_criterions_words_with_or_without_its_id() -> None:
+    from hirearchy.services import item_words
+
+    c9 = criterion("Every Due value is an ISO date.", "C9")
+    c10 = criterion("Next meeting is stated.", "C10")
+    for words in ("Every Due value is an ISO date.", "C9: every due value is an iso date", "Every Due value is an ISO date. (C9)"):
+        assert item_words(words, [c9, c10]) == "C9"
+    assert item_words("Next meeting is stated", [c9, c10]) == "C10"
+    assert item_words("Every Due value is an ISO date, always.", [c9]) is None
+    assert item_words("C10 Every Due value is an ISO date.", [c9]) is None
+
+
+def test_item_words_skips_a_criterion_with_an_empty_key() -> None:
+    from hirearchy.services import item_words
+
+    assert item_words("---", [criterion("---", "C9")]) is None
+    assert item_words("C9", [criterion("", "C9")]) is None
+    assert item_words("The rule", [criterion("???", "C8"), criterion("The rule", "C9")]) == "C9"
+
+
+def test_criterion_words_still_needs_the_id() -> None:
+    """P1's rule is unchanged (guard)."""
+    from hirearchy.services import criterion_words
+
+    assert criterion_words("Every Due value is an ISO date.", [criterion("Every Due value is an ISO date.", "C9")]) is None
+
+
 def test_a_criterion_with_an_empty_key_admits_no_line() -> None:
     from hirearchy.services import criterion_words
 

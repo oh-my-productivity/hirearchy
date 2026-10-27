@@ -53,6 +53,7 @@ __all__ = [
     "LINKS_MAX",
     "LINK_HEADER",
     "Playbook",
+    "PlaybookItem",
     "REASON_MAX",
     "Rejection",
     "ServiceCatalog",
@@ -60,20 +61,25 @@ __all__ = [
     "ServiceEvidence",
     "ServiceHints",
     "ServiceStore",
+    "TOKEN",
     "VERDICTS",
     "amendment_ids",
     "changed_lines",
     "confirmed_amendments",
+    "content_words",
     "contract_of",
     "criteria_of",
     "criterion_words",
+    "item_words",
     "line_key",
     "normalize_evidence",
     "normalize_links",
     "number_criteria",
+    "plain",
     "playbook_word_cap",
     "quoting_lines",
     "repeats_rejection",
+    "text_tokens",
     "version_in_force",
 ]
 
@@ -254,6 +260,56 @@ def criterion_words(line: str, criteria: Sequence[Criterion]) -> str | None:
         if text and key in (line_key(c.id) + text, text + line_key(c.id)):
             return c.id
     return None
+
+
+def item_words(words: str, criteria: Sequence[Criterion]) -> str | None:
+    """The id of the first criterion in ``criteria`` whose own words ``words`` are, with or without its id (``<its text>``, ``C9: <its text>`` or
+    ``<its text> (C9)``), else None (pure). A criterion whose text has no letter or digit has an empty key and admits no words. Unlike
+    :func:`criterion_words`, which refuses the words without the id, an item's ``WHY`` names the id anyway (design 5.4)."""
+    key = line_key(words)
+    for c in criteria:
+        text = line_key(c.text)
+        if text and key in (text, line_key(c.id) + text, text + line_key(c.id)):
+            return c.id
+    return None
+
+
+# The tokens of a text (design 3, 6.1, B9): numbers with their inner separators, runs of letters of any script, and every other symbol alone.
+TOKEN = re.compile(r"\d+(?:[.,:/-]\d+)*|[^\W\d_]+|[^\w\s.,;:!?'\"()\[\]*_`]")
+_LEADING_HASHES = re.compile(r"^\s*#+")
+
+
+def plain(line: str) -> str:
+    """``line`` without the strikethrough pair ``~~`` and the ``#`` run at its start; a single ``~`` and a ``#`` inside the line stay (B9)."""
+    return _LEADING_HASHES.sub("", line.replace("~~", ""))
+
+
+def text_tokens(t: str) -> list[str]:
+    """The tokens of ``t`` (pure): two texts with equal tokens differ only in spacing, case, markdown emphasis and sentence punctuation. The leading
+    list and heading markers are stripped on the second and later lines only, which only migrated items have (L13): a first line is the owner's or
+    the migration's words, so a leading ``>``, ``+``, ``-`` or ``1.`` there is a token."""
+    return [tok for i, line in enumerate(t.splitlines()) for tok in TOKEN.findall(plain(strip_markers(line) if i else line).casefold())]
+
+
+@dataclass(frozen=True)
+class PlaybookItem:
+    """One entry of an item-format playbook (design 3)."""
+
+    id: str  # "P<k>"
+    kind: str  # "step" | "rule"
+    section: str  # the heading line it sits under; "" for the text before the first heading
+    text: str  # a step's words (several lines only for a migrated one), or a rule's THEN
+    when: str = ""  # a rule's condition ("always" when none); "" for a step
+    why: tuple[str, ...] = ()  # the R and C ids the runtime wrote (the frontmatter `why` entry); () for an item never gated
+
+
+def content_words(items: Sequence[PlaybookItem] | None, headings: Sequence[str] = (), *, body: str = "") -> int:
+    """The words (``str.split``) of every live item's ``text`` and ``when`` (a ``when`` of ``"always"`` counts none) and of the section headings;
+    item markers, the WHEN/THEN/WHY keywords and the ids after WHY are no words. ``items`` None (a legacy playbook): the words of ``body``, as
+    always (pure)."""
+    if items is None:
+        return len(body.split())
+    return sum(len(i.text.split()) + (0 if i.when == "always" else len(i.when.split())) for i in items) + sum(len(h.split()) for h in headings)
 
 
 def normalize_evidence(ids: object) -> tuple[str, ...]:
