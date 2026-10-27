@@ -72,7 +72,7 @@ class CaseServiceEvidence(ServiceEvidence):
                 note=a.verdict.message.id, assertion=a.id, task=a.verdict.task_id, title=titles.get(a.verdict.task_id, ""),
                 earlier=tuple(x.id for x in found[:k]), words=a.verdict.note,
                 answered=next((m.id for m in a.verdict.link_notes if verdict_tier(m) == "human"), ""),
-                question=question_for(a.verdict.message, criteria, [x.id for x in found[:k]]),
+                question=question_for(a.verdict.message, criteria, [x.id for x in found[:k]]), case=a.case,
             )
             for k, a in enumerate(found)
         )

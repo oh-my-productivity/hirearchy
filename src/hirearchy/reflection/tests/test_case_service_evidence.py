@@ -25,6 +25,7 @@ from hirearchy.services.tests.test_contract_service_evidence import (  # noqa: F
     test_admit_accepts_lines,
     test_admit_returns_rule_b_or_c_or_raises_an_org_error,
     test_an_exempt_admit_returns_the_exemption_with_normalized_ids,
+    test_a_basis_rejection_carries_its_case,
     test_amendment_basis_of_a_service_without_cases_is_empty,
     test_an_exempt_admit_with_no_evidence_returns_the_exemption,
     test_links_accepts_none_alone,
@@ -625,6 +626,19 @@ def test_amendment_basis_lists_human_rejections_oldest_first_with_their_answers(
     link = next(m for m in w.s.d.mail.sent("root") if m.reply_to == one.id and m.criterion)
     assert [r.answered for r in basis.rejections] == [link.id, "", ""]
     assert basis.unrated == ()  # every delivery has its verdict
+
+
+def test_amendment_basis_names_the_case_of_each_rejection(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    """``Rejection.case`` is ``Assertion.case``: the id of the case's first task, shared by a rework of it and by a rejection of the rework."""
+    first, one = rejected(w, "Too long.", criterion="C1")
+    again = rework(w, first)
+    deliver(w, again)
+    two = rate(w, again, "reject", "Still long.")  # a second rejection in the same case, answered by the user's link
+    note_on(w, again, reply_to=two.id, source="human", criterion="C2")
+    second, three = rejected(w, "No dates.", topic="b")  # a new request: its own case
+    basis = evidence.amendment_basis("ceo", SERVICE)
+    assert [(r.note, r.case) for r in basis.rejections] == [(one.id, first.id), (two.id, first.id), (three.id, second.id)]
+    assert first.id != second.id
 
 
 def test_a_relayed_rejection_is_not_in_the_basis(w: ReflectionWorld, evidence: ServiceEvidence) -> None:

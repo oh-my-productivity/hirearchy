@@ -11,8 +11,8 @@ from pathlib import Path
 import pytest
 
 from hirearchy.kernel import OrgError
-from hirearchy.services import Admission, AmendmentBasis, ServiceEvidence
-from hirearchy.services.testing import IMPLEMENTATIONS
+from hirearchy.services import Admission, AmendmentBasis, Rejection, ServiceEvidence
+from hirearchy.services.testing import IMPLEMENTATIONS, AdmittingServiceEvidence
 
 from ._support import implementations
 
@@ -81,3 +81,12 @@ def test_amendment_basis_of_a_service_without_cases_is_empty(evidence: ServiceEv
     """No request yet: no rejection to answer and no delivery without a verdict (0a.2 adds no division: the empty case is the zero case)."""
     got = evidence.amendment_basis(OWNER, SERVICE)
     assert isinstance(got, AmendmentBasis) and got.rejections == () and got.unrated == ()
+
+
+def test_a_basis_rejection_carries_its_case(evidence: ServiceEvidence) -> None:
+    """Every rejection of the basis names its case (the id of the case's first task); a rejection built without one has the empty default, and the
+    stand-in that is given a basis hands it back with the case it was given."""
+    assert Rejection("n1", "R1", "t1", "title", (), "words", "").case == ""
+    assert all(rejection.case for rejection in evidence.amendment_basis(OWNER, SERVICE).rejections)
+    given = AmendmentBasis((Rejection("n1", "R1", "t1", "title", (), "words", "", case="t0"),), ())
+    assert AdmittingServiceEvidence(basis=given).amendment_basis(OWNER, SERVICE).rejections[0].case == "t0"

@@ -496,6 +496,7 @@ class Rejection:
     words: str  # the client's words in the rejection
     answered: str  # the id of the first human-tier link note that replies to it; "" while it has none
     question: str = ""  # the exact question to ask the user about it, with its ids filled in ("" until reflection words it)
+    case: str = ""  # the id of the rejection's case (its first task, `Assertion.case`); "" for a rejection built without one
 
 
 @dataclass(frozen=True)
