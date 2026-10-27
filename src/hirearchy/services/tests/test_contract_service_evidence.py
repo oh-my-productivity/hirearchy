@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from hirearchy.kernel import OrgError
-from hirearchy.services import Admission, AmendmentBasis, Rejection, ServiceEvidence
+from hirearchy.services import Admission, AmendmentBasis, ItemWatch, Rejection, ServiceEvidence
 from hirearchy.services.testing import IMPLEMENTATIONS, AdmittingServiceEvidence
 
 from ._support import implementations
@@ -90,3 +90,22 @@ def test_a_basis_rejection_carries_its_case(evidence: ServiceEvidence) -> None:
     assert all(rejection.case for rejection in evidence.amendment_basis(OWNER, SERVICE).rejections)
     given = AmendmentBasis((Rejection("n1", "R1", "t1", "title", (), "words", "", case="t0"),), ())
     assert AdmittingServiceEvidence(basis=given).amendment_basis(OWNER, SERVICE).rejections[0].case == "t0"
+
+
+def test_watch_of_a_service_without_a_playbook_is_empty(evidence: ServiceEvidence) -> None:
+    """No playbook yet: no item to watch (8.7). A service nobody defined has none either."""
+    assert evidence.watch(OWNER, SERVICE) == ()
+    assert evidence.watch(OWNER, "no-such-service") == ()
+
+
+def test_watch_gives_one_item_watch_per_item(evidence: ServiceEvidence) -> None:
+    """Whatever the service has, the watch is a tuple of ``ItemWatch``, one per item id, by number."""
+    found = evidence.watch(OWNER, SERVICE)
+    assert isinstance(found, tuple) and all(isinstance(i, ItemWatch) for i in found)
+    assert [i.id for i in found] == sorted({i.id for i in found}, key=lambda x: int(x[1:]))
+
+
+def test_the_stand_in_hands_back_the_watch_it_was_given() -> None:
+    given = (ItemWatch("P1", "step", "kept", 1), ItemWatch("P2", "rule", "warning", 2, related=("R1",)))
+    assert AdmittingServiceEvidence(watch=given).watch(OWNER, SERVICE) == given
+    assert AdmittingServiceEvidence().watch(OWNER, SERVICE) == ()

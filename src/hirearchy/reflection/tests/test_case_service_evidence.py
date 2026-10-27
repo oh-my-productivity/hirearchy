@@ -30,9 +30,11 @@ from hirearchy.services.tests.test_contract_service_evidence import (  # noqa: F
     test_an_exempt_admit_with_no_evidence_returns_the_exemption,
     test_links_accepts_none_alone,
     test_links_returns_normalized_ids_or_raises,
+    test_watch_gives_one_item_watch_per_item,
+    test_watch_of_a_service_without_a_playbook_is_empty,
 )
 
-from ._support import SERVICE, amend_legacy, ask, define, deliver, nested, note_on, populated, rate, rework
+from ._support import SERVICE, amend_legacy, ask, define, deliver, nested, note_on, populated, rate, revise, rework
 
 CASES = "cases the client rejected"
 
@@ -190,7 +192,7 @@ def test_an_agent_clients_verdict_note_is_a_hypothesis(w: ReflectionWorld) -> No
     case = w.history.cases("ceo", SERVICE)[0]
     agent = Verdict("reject", "y", None, task.id, 0, human, tier="agent")
     fixed: Case = replace(case, verdicts=[agent])
-    cited = CaseServiceEvidence(FixedCaseHistory([fixed]), w.s.catalog)
+    cited = CaseServiceEvidence(FixedCaseHistory([fixed]), w.s.catalog, w.s.store, w.s.d.mail)
     assert f"verdict {human.id} is an agent client's (a hypothesis)." in refusal(cited, [human.id])
 
 
@@ -690,3 +692,68 @@ def test_the_basis_question_is_the_replys_question(w: ReflectionWorld, evidence:
     assert f'in these words: "{third.question}"' in w.steps.feedback_step(by_c)
     assert rejections[0].question == 'About <its id>: add "<the rule, in their words>" as a lasting rule? Yes or no.'
     assert f'names the criterion you read the rejection as: "{rejections[0].question}"' in w.steps.feedback_step(plain)
+
+
+# ------------------------------------------------------------------------------ the watch (design 8.1, 20.1): derived once per call from the files
+
+BRIEF_ACCEPTANCE = ["At most 600 words", "Every factual claim has a source URL"]  # C1, C2 of the world's contract
+ITEMS = "## Steps\n1. [P1] Search the sources."
+RULE = ITEMS + "\n\n## Rules\n- [P2] WHEN always THEN cite every claim. WHY {why}"
+
+
+def write_items(w: ReflectionWorld, version: int, body: str, why: dict[str, list[str]] | None = None) -> None:
+    """The owner's playbook in item form, written to the store at the world's clock (the commands write the legacy form until the ops arrive)."""
+    w.s.d.clock.advance(1)
+    meta: dict[str, Any] = {
+        "service": SERVICE, "version": version, "revised": w.s.d.clock.now().isoformat(timespec="microseconds"), "by": "ceo", "reason": "why",
+        "evidence": [], "admitted": "c" if version > 1 else "first", "items_max": 2 if version > 1 else 1, "rules": ["P2"] if version > 1 else [],
+        "why": why or {}, "op": "add" if version > 1 else "first",
+    }
+    if version > 1:
+        meta["item"] = "P2"
+    w.s.store.write_playbook("ceo", SERVICE, version, meta, body, (version - 1) or None)
+    w.s.d.clock.advance(1)
+
+
+def test_watch_reads_every_result_of_every_task_from_the_clients_mail(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    """The rejection of a delivery that was blocked first and done later was given on the blocked result: a watch that read only each task's latest
+    result would find no result that came before the note, and the rule would not be warned."""
+    write_items(w, 1, ITEMS)
+    write_items(w, 2, RULE.format(why="C1"), {"P2": ["C1"]})
+    task = ask(w, "ai")
+    deliver(w, task, status="blocked")
+    verdict = note_on(w, task, verdict="reject", source="human", body="No.")
+    note_on(w, task, reply_to=verdict.id, source="human", criterion="C1")
+    deliver(w, task)  # done, after the rejection
+    found = {i.id: i for i in evidence.watch("ceo", SERVICE)}
+    assert (found["P1"].state, found["P2"].state, found["P2"].related, found["P2"].waiting) == ("kept", "warning", ("R1",), 1)
+
+
+def test_watch_reads_the_contract_versions_through_the_store(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    """The answering version alone relates the rejection to the rule that cites the criterion it removes (no link note was written)."""
+    write_items(w, 1, ITEMS)
+    write_items(w, 2, RULE.format(why="C2"), {"P2": ["C2"]})
+    task = ask(w, "ai")
+    deliver(w, task)
+    verdict = note_on(w, task, verdict="reject", source="human", body="No.")
+    found = w.s.store.read_contract("ceo", SERVICE)
+    assert found is not None
+    meta, body = found
+    w.s.d.clock.advance(1)
+    answer = {
+        **meta, "version": 2, "acceptance": [BRIEF_ACCEPTANCE[0], "Every claim has a date"], "defined_by": "root", "answers": verdict.id,
+        "about": "C1", "words": "Yes, add it.", "defined": w.s.d.clock.now().isoformat(timespec="microseconds"),
+    }
+    w.s.store.write_contract("ceo", SERVICE, answer, body, 1)  # removes C2, adds C3
+    watched = {i.id: i for i in evidence.watch("ceo", SERVICE)}["P2"]
+    assert (watched.state, watched.related, watched.pending) == ("warning", ("R1",), ())
+
+
+def test_watch_gives_one_item_watch_per_item_of_a_legacy_playbook(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    revise(w)  # the free text of three steps: it reads as it would migrate, every item kept
+    found = evidence.watch("ceo", SERVICE)
+    assert [(i.id, i.state) for i in found] == [("P1", "kept"), ("P2", "kept"), ("P3", "kept")]
+
+
+def test_watch_of_a_service_nobody_offers_is_empty(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    assert evidence.watch("ceo", "no-such-service") == () and evidence.watch("ops", SERVICE) == ()

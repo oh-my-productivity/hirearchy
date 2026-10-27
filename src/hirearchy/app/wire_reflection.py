@@ -47,7 +47,10 @@ def register(b: Builder) -> None:
         ),
     )
     b.provide(ReflectionDigest, lambda b: DigestBuilder(b.get(ServiceCatalog), b.get(CaseHistory)))
-    b.provide(ServiceEvidence, lambda b: CaseServiceEvidence(b.get(CaseHistory), b.get(ServiceCatalog)))
+    b.provide(
+        ServiceEvidence,
+        lambda b: CaseServiceEvidence(b.get(CaseHistory), b.get(ServiceCatalog), b.get(ServiceStore), b.get(MailboxReader)),
+    )
     b.provide(
         JudgedVersions,
         lambda b: CaseJudgedVersions(b.get(CaseHistory), b.get(MailboxReader), GitCheckedVersions(b.get(OrgHistory), b.get(OrgLayout))),

@@ -45,6 +45,7 @@ from .api import (
     AmendmentBasis,
     CaseAllowance,
     ContractNormalizer,
+    ItemWatch,
     JudgedBase,
     JudgedVersions,
     PlaybookRace,
@@ -180,17 +181,21 @@ class AdmittingServiceEvidence(ServiceEvidence):
     """The gate that lets everything through: admits every revision by rule ``b`` and accepts every link (the ids normalized). The default of the
     worlds: the tests of the commands that call the gate do not need its judgement, ``reflection`` has the real one. ``confirmed`` are the criterion
     ids it says the client confirmed (none by default); ``basis`` is the record it says the service has (no rejection, no delivery without a
-    verdict, by default)."""
+    verdict, by default); ``watch`` is the watch of the items it says every service has (none by default)."""
 
-    def __init__(self, confirmed: Iterable[str] = (), basis: AmendmentBasis | None = None) -> None:
+    def __init__(self, confirmed: Iterable[str] = (), basis: AmendmentBasis | None = None, watch: Iterable[ItemWatch] = ()) -> None:
         self._confirmed = frozenset(confirmed)
         self._basis = basis or AmendmentBasis((), ())
+        self._watch = tuple(watch)
 
     def confirmed(self, owner: str, service: str) -> frozenset[str]:
         return self._confirmed
 
     def amendment_basis(self, owner: str, service: str) -> AmendmentBasis:
         return self._basis
+
+    def watch(self, owner: str, service: str) -> tuple[ItemWatch, ...]:
+        return self._watch
 
     def links(self, owner: str, service: str, ids: Sequence[str], *, verdict: str | None = None) -> tuple[str, ...]:
         return normalize_links(list(ids))

@@ -4,12 +4,14 @@ the runtime - so a test that overrides them runs the rules over its own fakes.""
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from hirearchy.agents import AgentDirectory
 from hirearchy.app import Org, wire_reflection, wiring
 from hirearchy.kernel import OrgError
+from hirearchy.mail import MailboxReader
 from hirearchy.reflection import CaseHistory, CaseRecords, ReflectionDigest, ServicePromptSections, ServiceReports
 from hirearchy.reflection._cases import DerivedCaseHistory
 from hirearchy.reflection._digest import DigestBuilder
@@ -20,7 +22,7 @@ from hirearchy.reflection._judged import CaseJudgedVersions
 from hirearchy.reflection._reports import TextServiceReports
 from hirearchy.reflection._sections import OwnerPromptSections
 from hirearchy.reflection.testing import FixedCaseHistory
-from hirearchy.services import CaseAllowance, JudgedVersions, ServiceEvidence
+from hirearchy.services import CaseAllowance, JudgedVersions, ServiceEvidence, ServiceStore
 from hirearchy.services.testing import FixedAllowance, FixedJudgedVersions, RefusingServiceEvidence
 
 
@@ -104,3 +106,36 @@ def test_the_runtime_has_case_records(tmp_path: Path) -> None:
     assert isinstance(runtime.case_records, DerivedCaseRecords) and isinstance(runtime.case_records, CaseRecords)
     assert [r.service for r in runtime.case_records.records()] == [""]  # an empty organization: root's one-off record only
     assert runtime.case_records.deliveries("ceo").deliveries == ()
+
+
+class RecordingPort:
+    """A port that records every call made to it and hands them on to the real one."""
+
+    def __init__(self, inner: Any) -> None:
+        self._inner = inner
+        self.calls: list[tuple[str, tuple[Any, ...]]] = []
+
+    def __getattr__(self, name: str) -> Any:
+        found = getattr(self._inner, name)
+
+        def call(*args: Any, **kw: Any) -> Any:
+            self.calls.append((name, args))
+            return found(*args, **kw)
+
+        return call
+
+
+def test_service_evidence_reads_history_catalog_store_and_mail(tmp_path: Path) -> None:
+    org = Org.init(tmp_path / "org", "mission")
+    org.hire("root", "ceo", "Chief", "Run it.", can_hire=True, max_children=2)
+    org.define_service(
+        "root", "ceo", "brief", description="A brief.", inputs=[{"name": "topic", "description": "what", "required": True}], acceptance=["Short"],
+        deliverable={"description": "one file"}, budget=5, playbook="1. Search.\n2. Write.",
+    )
+    mail, store, history = RecordingPort(org.runtime.mailbox), RecordingPort(org.runtime.service_store), RecordingPort(FixedCaseHistory())
+    runtime = wiring.open_runtime(tmp_path / "org", {MailboxReader: mail, ServiceStore: store, CaseHistory: history})
+    found = runtime.service_evidence.watch("ceo", "brief")
+    assert [(i.id, i.state) for i in found] == [("P1", "kept"), ("P2", "kept")]  # the catalog's playbook, read as it would migrate
+    assert [name for name, _ in history.calls] == ["chains"]  # the cases come from the history port
+    assert ("received", ("root",)) in mail.calls and [c for c in mail.calls if c[0] == "received"] == [("received", ("root",))]  # one read of the client's mail
+    assert ("versions", ("ceo", "brief", "SERVICE")) in store.calls  # the contract versions come from the store

@@ -12,12 +12,15 @@ from __future__ import annotations
 import re
 from collections.abc import Callable, Mapping, Sequence
 
-from ..kernel import ROOT, OrgError, clip_line, link_ids, parent, verdict_tier
+from ..kernel import ROOT, Message, OrgError, clip_line, link_ids, parent, verdict_tier
+from ..mail import MailboxReader
 from ..services import (
-    Admission, AmendmentBasis, Criterion, Rejection, ServiceCatalog, ServiceEvidence, confirmed_amendments, criterion_words, line_key,
-    normalize_evidence, normalize_links,
+    Admission, AmendmentBasis, Criterion, ItemWatch, Rejection, ServiceCatalog, ServiceEvidence, confirmed_amendments, contract_of, criterion_words,
+    line_key, normalize_evidence, normalize_links,
 )
+from ._ports import ContractVersions
 from ._steps import question_for
+from ._watch import watch_states
 from .api import Assertion, CaseHistory, Verdict, confirmed_criteria, delivered_unrated, regressions
 
 REASON_CLIP = 200  # characters of the reason in the question of a refusal
@@ -37,11 +40,14 @@ LINES_REFUSED = (
 
 
 class CaseServiceEvidence(ServiceEvidence):
-    """Reads the cases of a service (``CaseHistory``) and its contract history (``ServiceCatalog``) to say what they prove."""
+    """Reads the cases of a service (``CaseHistory``), its contract and playbook (``ServiceCatalog``), the stored versions of its contract
+    (``ContractVersions``, the services store) and its client's mail (``MailboxReader``) to say what they prove."""
 
-    def __init__(self, history: CaseHistory, catalog: ServiceCatalog) -> None:
+    def __init__(self, history: CaseHistory, catalog: ServiceCatalog, versions: ContractVersions, mail: MailboxReader) -> None:
         self._history = history
         self._catalog = catalog
+        self._versions = versions
+        self._mail = mail
 
     def links(self, owner: str, service: str, ids: Sequence[str], *, verdict: str | None = None) -> tuple[str, ...]:
         wanted = normalize_links(list(ids))
@@ -77,6 +83,20 @@ class CaseServiceEvidence(ServiceEvidence):
             for k, a in enumerate(found)
         )
         return AmendmentBasis(rejections, delivered_unrated(cases))
+
+    def watch(self, owner: str, service: str) -> tuple[ItemWatch, ...]:
+        contract = self._catalog.read_contract(owner, service)
+        client = parent(owner)
+        playbooks = self._catalog.playbook_versions(owner, service)
+        if contract is None or client is None or not playbooks:
+            return ()
+        results: dict[str, list[Message]] = {}
+        for m in self._mail.received(client):  # the one read of the client's mail: every result of every task, oldest first
+            if m.type == "result" and m.reply_to:
+                results.setdefault(m.reply_to, []).append(m)
+        contracts = [contract_of(owner, service, meta, body, None) for _, meta, body in self._versions.versions(owner, service, "SERVICE")]
+        cases = self._history.chains(owner, service, since=contract.created, runs=False)
+        return watch_states(playbooks, cases, results, self._catalog.criteria(owner, service), contracts)
 
     def admit(
         self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),

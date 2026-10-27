@@ -651,6 +651,13 @@ class ServiceEvidence(Protocol):
         its answer, and the latest task of every case whose done delivery has no verdict yet. Empty for a service without cases."""
         ...
 
+    def watch(self, owner: str, service: str) -> tuple[ItemWatch, ...]:
+        """The watch of every item of the playbook of ``owner``'s ``service`` (design 8.1): its state (``new``, ``warning``, ``kept``, ``restored``,
+        ``retired``), k and r, the clean cases, the related and pending rejections and the rest of ``ItemWatch``, one per item, retired ones included,
+        by number. Derived from the files once per call (mail, contract and playbook versions), never stored: every reader of a watch state goes
+        through this one method. ``()`` when the service has no playbook or no contract, or its client is not an agent of the organization."""
+        ...
+
 
 @runtime_checkable
 class ServiceHints(Protocol):
