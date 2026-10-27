@@ -8,8 +8,10 @@ expectation is never edited to match the product.
 
 import json
 import os
+import re
 import shutil
 import subprocess
+from datetime import datetime, timezone
 
 from pathlib import Path
 
@@ -17,9 +19,12 @@ import pytest
 from testkit import REPO
 from testkit.e2e_world import build_server
 from testkit.e4_replay import evidence
-from testkit.e7_replay import materialize
+from testkit import REPO, org_replay
+from testkit.e7_replay import EV7, materialize
+from testkit.g0_replay import EVG0
+from testkit.g0_replay import materialize as g0_materialize
 from testkit.services_world import (  # noqa: F401  (svc is a fixture)
-    ENG, call, confirmed_amendment, define, deliver, fails, playbook_meta, request, svc,
+    ENG, call, confirmed_amendment, define, deliver, fails, legacy_playbook, playbook_meta, request, svc,
 )
 
 from hirearchy.core import ROOT, Org
@@ -565,3 +570,103 @@ def test_an_agent_clients_service_refuses_every_gated_op_and_watches_nothing(org
         assert org.runtime.service_catalog.read_playbook(ENG, "eng-brief").version == 2  # v1 and the exempt retire; nothing else
     states = {w.id: (w.state, w.watch_start) for w in org.runtime.service_evidence.watch(ENG, "eng-brief")}
     assert states == {"P1": ("kept", None), "P2": ("retired", None), "P3": ("kept", None)}  # nothing watched
+
+
+# ============================================================================================ legacy orgs and the study's own streams (design 20 e2e (6), (9))
+def test_e7_s1s_legacy_files_migrate_at_the_first_op_then_the_op_is_judged(tmp_path):
+    """Design 20 e2e (6), 4.4: E7 s1 at the user's answer 6096, with the kept contract v2 (C9 added, C2 removed) and the kept free-text playbook v1. Nothing is
+    rewritten by a read (the listing says `free text`). The owner's first op, E7's own (the words of C9, cited by it), first writes the migration (v2: the
+    lines as items P1-P11, no word lost, the legacy file archived byte for byte) and then the op (v3, admitted (c)); the migrated items are `kept`, the new
+    one is watched, and the next request, delivered and accepted by the client, is its first clean case."""
+    root = materialize("s1", S1_ANSWER[:21], tmp_path / "org")
+    kept = EV7 / "s1"
+    contract = root / "lead" / "services" / SERVICE
+    (contract / "history").mkdir(exist_ok=True)
+    shutil.copyfile(kept / "service" / "history--SERVICE.v1.md", contract / "history" / "SERVICE.v1.md")
+    shutil.copyfile(kept / "service" / "SERVICE.8b89a87.md", contract / "SERVICE.md")  # v2, the contract the user's yes made
+    legacy = split_frontmatter((kept / "playbook" / "PLAYBOOK.430909a.md").read_text(encoding="utf-8"))[1].strip()
+    recorded = split_frontmatter((kept / "playbook" / "PLAYBOOK.8b89a87.md").read_text(encoding="utf-8"))[1].strip()  # E7's own v2
+    org = Org(root)
+    legacy_playbook(org, legacy, owner="lead", name=SERVICE, by="root", reason="initial playbook")
+    catalog = org.runtime.service_catalog
+    c9 = next(c for c in catalog.criteria("lead", SERVICE) if c.id == "C9" and c.current)
+    assert changed_lines(legacy, recorded) == [f"- C9: {c9.text}"]  # what the recorded owner wrote: the criterion's words, one line
+    assert catalog.read_playbook("lead", SERVICE).items is None  # a read rewrites nothing
+    assert next(x for x in org.runtime.service_reports.services_text(ROOT).splitlines() if x.startswith("  playbook v")).endswith("free text (items when the owner first changes one)")
+    change = org.revise_playbook("lead", SERVICE, "add", "C9, confirmed by the client's yes", ["C9"], kind="step", text=c9.text)
+    assert (change.version, change.item, change.kind, change.admission.rule) == (3, "P12", "step", "c")
+    versions = {v.version: v for v in catalog.playbook_versions("lead", SERVICE)}
+    migration, op = versions[2], versions[3]
+    assert (migration.op, migration.by, migration.admitted) == ("migrate", "runtime (migration)", "migrate")
+    assert migration.reason == "the free-text v1 as 11 items (no change of words)" and (op.op, op.item, op.by) == ("add", "P12", "lead")
+    unmarked = "\n".join(re.sub(r"\[P\d+\] ", "", line) for line in migration.body.splitlines())
+    assert changed_lines(legacy, unmarked) == [] and changed_lines(unmarked, legacy) == []  # not one line lost, none made up
+    archived = (contract / "history" / "PLAYBOOK.v1.md").read_text(encoding="utf-8")
+    assert split_frontmatter(archived)[1].strip() == legacy  # the legacy file, byte for byte
+    note = next(m for m in org.received(ROOT) if m.title == f"playbook of {SERVICE} revised to v3")
+    assert note.body.startswith("Playbook v2 is the free text of v1 as 11 items (P1-P11), no change of words.\n")
+    states = {w.id: w.state for w in org.runtime.service_evidence.watch("lead", SERVICE)}
+    assert states == {**{f"P{k}": "kept" for k in range(1, 12)}, "P12": "new"}  # the migrated lines predate the watch
+    task = org.request(ROOT, SERVICE, {"notes_file": "2026-10-12.md"})  # 905b has its answer (6096 and the version): nothing is due
+    deliver(org, "lead", task)
+    org.feedback(ROOT, task.id, "accept", "Right.", source="human")
+    judged = next(w for w in org.runtime.service_evidence.watch("lead", SERVICE) if w.id == "P12")
+    assert (judged.state, judged.clean, judged.waiting, judged.related, judged.coverage) == ("new", 1, 0, (), ("R1", "C9"))
+    listed = next(x for x in org.runtime.service_reports.services_text(ROOT).splitlines() if x.startswith("  playbook v"))
+    assert listed.endswith("; 12 items (0 rules); watched: P12 new (1 of 3 clean cases, k 3)")
+
+
+G0_SERVICE = "weekly-memo"  # the service the messages of G0's streams name (the kit's contract directory is weekly-meeting-memo)
+G0_LIVE = datetime(2026, 10, 26, 5, 53, 41, tzinfo=timezone.utc)  # inside memo 1's rework run (05:52:57-05:55:23), after the user's yes (C10, link dd57, 05:52:50)
+M1_S1_CUTS = {  # the stream cut at: memo 1 accepted / memo 2 accepted / memo 3's rework delivered / memo 3 accepted
+    "memo 1": "20261026T055741839977",  # bc39: the human accept of memo 1's rework
+    "memo 2": "20261026T060218918402",  # fc0a: the human accept of memo 2
+    "rework": "20261026T060814481398",  # 6e04: the lead's result of memo 3's human rework, not judged yet
+    "memo 3": "20261026T060923498621",  # ac96: the human accept of memo 3's rework
+}
+
+
+def m1_s1_with_item_a(tmp_path, frozen_clock, cut):
+    """G0 m1-s1 at ``cut``, with the owner's playbook as a constructed history: the free-text v1 and item A, the step of C10's own words (the criterion the
+    user's yes added to the contract, which the kept contract v2 holds), added at ``G0_LIVE``, i.e. live from memo 1's rework run (18.4.1)."""
+    frozen_clock(lambda: G0_LIVE)
+    root = g0_materialize("m1-s1", cut, tmp_path)
+    kept = EVG0 / "m1-s1"
+    folder = root / "lead" / "services"
+    shutil.move(folder / "weekly-meeting-memo", folder / G0_SERVICE)  # the kit names the directory after E5's service; G0's messages name weekly-memo
+    (folder / G0_SERVICE / "history").mkdir(exist_ok=True)
+    nowhere = tmp_path / "no-deliverables"  # the kept contracts name G0's /tmp deliverables, which a test never reads
+    (folder / G0_SERVICE / "history" / "SERVICE.v1.md").write_bytes(org_replay._contract_text(kept / "service" / "history--SERVICE.v1.md", nowhere))
+    (folder / G0_SERVICE / "SERVICE.md").write_bytes(org_replay._contract_text(kept / "service" / "SERVICE.5828ac9.md", nowhere))  # v2: C3 out, C10 in
+    org = Org(root)
+    legacy_playbook(org, split_frontmatter((kept / "playbook" / "PLAYBOOK.8175cf2.md").read_text(encoding="utf-8"))[1].strip(), owner="lead",
+                    name=G0_SERVICE, by="root", reason="initial playbook")
+    c10 = next(c for c in org.runtime.service_catalog.criteria("lead", G0_SERVICE) if c.id == "C10" and c.current)
+    change = org.revise_playbook("lead", G0_SERVICE, "add", "C10, the user's yes", ["C10"], kind="step", text=c10.text)
+    assert (change.item, change.admission.rule, change.admission.why) == ("P12", "c", ("R1", "C10"))
+    return org
+
+
+def item_a(org):
+    return next(w for w in org.runtime.service_evidence.watch("lead", G0_SERVICE) if w.id == "P12")
+
+
+def test_g0_m1_s1_item_a_counts_its_case_through_the_judged_delivery(tmp_path, frozen_clock):
+    """Design 20 e2e (9), 18.4.1: G0 m1-s1's flow with a constructed item A (`WHY R1; C10`) live from memo 1's rework run. Memo 1's own reworks are A's `why`
+    case, no candidate. Memo 2 (accepted) is its first candidate. Memo 3's first delivery was superseded by the user's rework before any verdict: the case
+    holds nothing but waits for its verdict, and counts through the delivery Lena judged, the rework (ac96). With two candidates and k = 3, A stays `new`."""
+    seen = {}
+    for name, cut in M1_S1_CUTS.items():
+        org = m1_s1_with_item_a(tmp_path / name.replace(" ", "-"), frozen_clock, cut)
+        a = item_a(org)
+        seen[name] = (a.state, a.clean, a.waiting, a.related, a.pending)
+        assert (a.k, a.watch_start, a.coverage) == (3, G0_LIVE, ("R1", "C10"))
+    assert seen == {
+        "memo 1": ("new", 0, 0, (), ()),  # memo 1's rework (c93e, delivered after A went live) and its accept belong to A's `why` case
+        "memo 2": ("new", 1, 0, (), ()),  # memo 2: one delivery, accepted
+        "rework": ("new", 1, 1, (), ()),  # memo 3: delivered (34d6), superseded by the user's rework (51b6), delivered (6e04); no verdict yet
+        "memo 3": ("new", 2, 0, (), ()),  # the human accept ac96 judges the rework: the case counts through it
+    }
+    final = m1_s1_with_item_a(tmp_path / "final", frozen_clock, M1_S1_CUTS["memo 3"])
+    listed = next(x for x in final.runtime.service_reports.services_text(ROOT).splitlines() if x.startswith("  playbook v"))
+    assert listed.endswith("; watched: P12 new (2 of 3 clean cases, k 3)")
