@@ -517,15 +517,6 @@ def test_a_watch_retire_without_a_previous_text_reads_retired() -> None:
     w.versions.append(playbook(3, 40, [w.items(1)[0]], op="watch", item="P2", admitted="watch", related=("R2", "R3")))
     gone = p2(w)
     assert (gone.state, gone.related, gone.retire_due, gone.restores) == ("retired", ("R2", "R3"), False, 0)
-
-
-def test_a_watch_retire_without_a_previous_text_reads_retired() -> None:
-    w = world()
-    w.case("c1", 20, 21, verdict=(30, "reject"), link=(31, ["C5"]))
-    w.case("c2", 22, 23, verdict=(32, "reject"), link=(33, ["C5"]))
-    w.versions.append(playbook(3, 40, [w.items(1)[0]], op="watch", item="P2", admitted="watch", related=("R2", "R3")))
-    gone = p2(w)
-    assert (gone.state, gone.related, gone.retire_due, gone.restores) == ("retired", ("R2", "R3"), False, 0)
     assert gone.retires == ((3, ("R2", "R3")),)  # the retire v3 and the rejections still related to the watch it ended
 
 
