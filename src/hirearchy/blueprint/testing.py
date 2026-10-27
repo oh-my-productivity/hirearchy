@@ -20,7 +20,7 @@ from ..kernel import NAME_RE, JsonObject, Message, OrgError, child_addr
 from ..kernel.testing import DictEnvironment
 from ..kiro import Confinement, ConfinementPolicy
 from ..kiro.testing import kiro_confinement
-from ..services import ContractNormalizer, ServiceCommands
+from ..services import ContractNormalizer, PlaybookChange, ServiceCommands
 from ..services.testing import normalizer as contract_normalizer
 from ..settings import DEFAULT_CONFIG
 from ..snapshots import OrgSnapshotter
@@ -262,7 +262,11 @@ class RecordingServiceCommands(ServiceCommands):
         self._log.add("request", actor, service, inputs, title=title, note=note)
         return Message(actor, "lead", "task", "", title=title, budget=22, service=service, id=f"request-{len(self._log.of('request'))}")
 
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
+    def revise_playbook(
+        self, actor: str, service: str, op: str | None, reason: str, evidence: Sequence[str], *, item: str | None = None, kind: str | None = None,
+        text: str | None = None, when: str | None = None, then: str | None = None, after: str | None = None, version: int | None = None,
+        acknowledged: str | None = None, content: str | None = None,
+    ) -> PlaybookChange:
         raise OrgError("an application does not revise playbooks")
 
     def feedback(
@@ -370,8 +374,15 @@ class FlakyServiceCommands(ServiceCommands):
             base=base,
         )
 
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
-        return self._inner.revise_playbook(actor, service, content, reason, evidence)
+    def revise_playbook(
+        self, actor: str, service: str, op: str | None, reason: str, evidence: Sequence[str], *, item: str | None = None, kind: str | None = None,
+        text: str | None = None, when: str | None = None, then: str | None = None, after: str | None = None, version: int | None = None,
+        acknowledged: str | None = None, content: str | None = None,
+    ) -> PlaybookChange:
+        return self._inner.revise_playbook(
+            actor, service, op, reason, evidence, item=item, kind=kind, text=text, when=when, then=then, after=after, version=version,
+            acknowledged=acknowledged, content=content,
+        )
 
     def feedback(
         self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,

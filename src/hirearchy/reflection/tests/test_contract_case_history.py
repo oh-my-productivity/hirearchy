@@ -15,7 +15,7 @@ from hirearchy.reflection._cases import DerivedCaseHistory
 from hirearchy.reflection._ports import PlaybookTimelines, RunCounter
 from hirearchy.reflection.testing import IMPLEMENTATIONS, ReflectionWorld, fs_world, memory_world
 
-from ._support import SERVICE, STEPS, ask, define, deliver, implementations, nested, note_on, populated, rate, revise, rework
+from ._support import SERVICE, STEPS, add_step, ask, define, deliver, first_playbook, implementations, nested, note_on, populated, rate, rework
 
 
 @pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
@@ -397,7 +397,7 @@ def test_the_playbook_is_the_one_the_request_was_sent_under(w: ReflectionWorld) 
     define(w)
     before = ask(w, "a")
     deliver(w, before)
-    revise(w)
+    first_playbook(w)
     after = ask(w, "b")
     one, two = w.history.cases("ceo", SERVICE)
     assert (one.id, one.playbook, two.id, two.playbook) == (before.id, 0, after.id, 1)
@@ -406,7 +406,7 @@ def test_the_playbook_is_the_one_the_request_was_sent_under(w: ReflectionWorld) 
 def test_the_version_used_is_the_one_in_force_when_the_case_was_first_answered(w: ReflectionWorld) -> None:
     define(w)
     task = ask(w)
-    revise(w)  # the owner revises the playbook right after the request arrives ...
+    first_playbook(w)  # the owner revises the playbook right after the request arrives ...
     deliver(w, task)  # ... and the request is delivered under the new version
     (case,) = w.history.cases("ceo", SERVICE)
     assert (case.playbook, case.used) == (0, 1)
@@ -415,7 +415,7 @@ def test_the_version_used_is_the_one_in_force_when_the_case_was_first_answered(w
 def test_an_unanswered_case_uses_the_version_in_force_now(w: ReflectionWorld) -> None:
     define(w)
     ask(w)
-    revise(w)
+    first_playbook(w)
     (case,) = w.history.cases("ceo", SERVICE)
     assert case.used == 1
 
@@ -464,8 +464,8 @@ def test_a_request_of_a_retired_service_has_no_case(w: ReflectionWorld) -> None:
 
 def test_the_timeline_lists_every_version_with_its_time_oldest_first(w: ReflectionWorld) -> None:
     define(w)
-    revise(w, STEPS, "one")
-    revise(w, STEPS + "\n4. More.", "two")
+    first_playbook(w, STEPS, "one")
+    add_step(w, "More.", "two")
     timeline = w.history.playbook_timeline("ceo", SERVICE)
     assert [v for v, _ in timeline] == [1, 2] and timeline[0][1] < timeline[1][1]
 
@@ -514,7 +514,7 @@ def test_chains_with_runs_false_read_no_run_log_charter_or_playbook(w: Reflectio
     w.use_run("ceo")
     deliver(w, first, runs=2, budget=1)
     relayed = rework(w, first, source="relayed", budget=3)
-    revise(w)
+    add_step(w, "Check every claim.")  # a free v1 is refused once a rework exists (PB-FIRST-LATE)
     refusing = _Refusing()
     mail_only = DerivedCaseHistory(w.s.catalog, w.s.d.agents, w.s.d.mail, w.s.hints, refusing, refusing, refusing)
     (case,) = mail_only.chains("ceo", SERVICE, since=None, runs=False)
@@ -590,7 +590,7 @@ def test_one_off_verdicts_are_roots_feedback_notes_on_the_chain(w: ReflectionWor
 
 def test_a_one_off_case_has_no_service_no_playbook_and_a_human_client(w: ReflectionWorld) -> None:
     define(w)
-    revise(w)
+    first_playbook(w)
     task = one_off(w, "ceo")
     deliver(w, task)
     (case,) = w.history.one_off_cases()

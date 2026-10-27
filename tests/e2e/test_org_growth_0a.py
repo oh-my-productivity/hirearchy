@@ -29,6 +29,8 @@ CRITERIA = [
     "One row for every commitment, including informal ones",
     "A date is never invented",
 ]
+A_DATE = "A date is written only when the notes state it."  # the step C6's two rejections admit (rule (b))
+PLAYBOOK_ITEMS = "## Steps\n1. [P1] writer: read the notes and write the memo.\n2. [P2] reviewer: check every criterion and report PASS or FAIL.\n"  # as the runtime made it items
 PLAYBOOK_V1 = "## Steps\n1. writer: read the notes and write the memo.\n2. reviewer: check every criterion and report PASS or FAIL.\n"
 FRIDAY = "Sam's 'before Friday' has a date: Oct 9."
 LEE = "Lee's 'next week' has a date too."
@@ -120,8 +122,14 @@ def feedback(w: World, task_id: str, verdict: str, note: str = "", **extra) -> s
     return last_verdict(w)
 
 
-def revise(w: World, content: str, reason: str, evidence: list[str]) -> str:
-    return call(w.lead, "revise_playbook", service=SERVICE, content=content, reason=reason, evidence=evidence)
+def revise(w: World, text: str, reason: str, evidence: list[str]) -> str:
+    """The lead adds one step to its playbook (the item form of 5.1: one item per call)."""
+    return call(w.lead, "revise_playbook", service=SERVICE, op="add", kind="step", text=text, reason=reason, evidence=evidence)
+
+
+def refuse(w: World, text: str, reason: str, evidence: list[str]) -> str:
+    """The text of the refusal of the lead's ``add`` of one step."""
+    return fails(w.lead, "revise_playbook", service=SERVICE, op="add", kind="step", text=text, reason=reason, evidence=evidence)
 
 
 def chain(w: World, through: int) -> dict[str, str]:
@@ -143,7 +151,7 @@ def chain(w: World, through: int) -> dict[str, str]:
         deliver(w, ids["B1"])
         n = feedback(w, ids["B1"], "reject", LEE, source="human")
         feedback(w, ids["B1"], "reject", "It is about C6 too.", source="human", criterion=["C6"], confirms=n)
-        revise(w, PLAYBOOK_V1 + "3. A date is written only when the notes state it [C6].\n", "C6 failed in A1 and B1", ["C6"])
+        revise(w, A_DATE, "C6 failed in A1 and B1", ["C6"])
     return ids
 
 
@@ -175,15 +183,15 @@ def test_3_the_e2_rule_is_refused_at_zero_run_cost(tmp_path):
     ids = chain(w, 2)
     runs = lambda: len(list((w.org.dir("lead") / "runs").glob("*")))  # noqa: E731
     before = runs()
-    rule = PLAYBOOK_V1 + "3. Informal dates are none.\n"
+    rule = "Informal dates are none."
     reason = "Lesson: informal time references must be none"
-    refused = fails(w.lead, "revise_playbook", service=SERVICE, content=rule, reason=reason, evidence=[ids["A1"]])
+    refused = refuse(w, rule, reason, [ids["A1"]])
     assert "refused: none of this evidence is the client's own" in refused
     assert f"case {ids['A1']} has no rejection by the client; 1 of its reworks were relayed (the assistant's own reading)" in refused
     assert "by an amendment the client confirmed (none yet)" in refused  # a relayed rework is not the client's evidence, and rule (c) admits nothing yet
     assert f'"We would change how we deliver {SERVICE}: {reason}. Is that what you want from now on?' in refused
-    assert "C6 is in the contract since v1, not added by an amendment" in fails(w.lead, "revise_playbook", service=SERVICE, content=rule, reason=reason, evidence=["C6"])
-    assert "no evidence given" in fails(w.lead, "revise_playbook", service=SERVICE, content=rule, reason=reason, evidence=[])
+    assert "C6 is in the contract since v1, not added by an amendment" in refuse(w, rule, reason, ["C6"])
+    assert "no evidence given" in refuse(w, rule, reason, [])
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
     assert runs() == before  # a refusal is a tool call: no run was spent
 
@@ -213,7 +221,7 @@ def test_4_a_human_reject_names_its_criterion_and_reaches_the_owners_prompt(tmp_
 def test_5_one_case_is_a_question_not_a_rule(tmp_path):
     w = world(tmp_path)
     ids = chain(w, 4)
-    refused = fails(w.lead, "revise_playbook", service=SERVICE, content=PLAYBOOK_V1 + "3. No dates.\n", reason="R1 says so", evidence=["R1"])
+    refused = refuse(w, "No dates.", "R1 says so", ["R1"])
     assert f"the client rejected this in one case only ({ids['A1']})" in refused
     assert f'In case {ids["A1"]} you said: "{FRIDAY}"' in refused
     assert "a clarification of C6" in refused  # C6 is current
@@ -228,10 +236,10 @@ def test_6_a_second_independent_human_reject_admits_a_revision(tmp_path):
     deliver(w, ids["B1"])
     n = feedback(w, ids["B1"], "reject", LEE, source="human")
     feedback(w, ids["B1"], "reject", "It is about C6 too.", source="human", criterion=["C6"], confirms=n)
-    v2 = PLAYBOOK_V1 + "3. A date is written only when the notes state it [C6].\n"
-    assert "now v2" in revise(w, v2, "C6 failed in A1 and B1", ["C6"])
+    assert "now v2" in revise(w, A_DATE, "C6 failed in A1 and B1", ["C6"])
     meta, body = playbook_meta(w.org, "lead", SERVICE)
-    assert meta["version"] == 2 and meta["admitted"] == "b" and meta["evidence"] == ["C6"] and body.strip() == v2.strip()
+    assert meta["version"] == 2 and meta["admitted"] == "b" and meta["evidence"] == ["C6"] and meta["why"] == {"P3": ["R1", "R2", "C6"]}
+    assert body.strip() == f"{PLAYBOOK_ITEMS.strip()}\n3. [P3] {A_DATE} (WHY R1, R2; C6)"
     assert any(f"admitted: C6 failed in 2 cases the client rejected: {ids['A1']}, {ids['B1']}" in m.body for m in w.org.received(ROOT))  # root's quiet note
 
 
@@ -251,9 +259,8 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     assert all(f"C{k}: " in note for k in range(1, 8))
     assert f"C7: {added}\n" in note and "(not confirmed)" not in note.split("Rule (c)")[0]  # the lead sees that the client's yes to it is recorded
     assert "The client's yes to R2 (about C6) is recorded: C7 is client-confirmed." in note
-    v2 = PLAYBOOK_V1 + "- C7: " + added + "\n"  # rule (c): only the criterion's own words, one line, with its id
-    refused = fails(w.lead, "revise_playbook", service=SERVICE, content=v2 + "3. Check every date twice.\n", reason="C7 was added by the client", evidence=["C7"])
-    assert "refused: every line a revision adds or changes must rest on the evidence it cites, and 1 line(s) do not" in refused  # the other line is refused
+    refused = refuse(w, "Check every date twice.", "C7 was added by the client", ["C7"])  # rule (c): only the criterion's own words
+    assert "refused: C7 is confirmed by the client, so an item citing it may be only its own words: this item is not." in refused  # any other words are refused
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
     ids["B2"] = request(w)  # the owner's next prompt names what rule (c) admits now
     deliver(w, ids["B2"])
@@ -261,9 +268,10 @@ def test_7_an_amendment_admits_a_revision_only_once_the_client_confirmed_it(tmp_
     assert "amendment the client confirmed (now C7: a revision citing it may add its words)" in b2_prompt
     assert "not confirmed yet" not in b2_prompt.split("# Reflect before you start")[1].split("# New messages")[0]
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1  # nothing was revised yet
-    assert "now v2" in revise(w, v2, "C7 was added by the client", ["C7"])  # admitted after B2's delivery
-    meta, _ = playbook_meta(w.org, "lead", SERVICE)
-    assert meta["version"] == 2 and meta["admitted"] == "c" and meta["evidence"] == ["C7"]
+    assert "now v2" in revise(w, added, "C7 was added by the client", ["C7"])  # admitted after B2's delivery: the criterion's own words
+    meta, body = playbook_meta(w.org, "lead", SERVICE)
+    assert meta["version"] == 2 and meta["admitted"] == "c" and meta["evidence"] == ["C7"] and meta["why"] == {"P3": ["R2", "C7"]}
+    assert body.strip().endswith(f"3. [P3] {added} (WHY R2; C7)")
 
 
 # test_11 (E3 turn 5: an amendment in the reject turn is not the user's yes) is replayed from E3's own evidence in test_org_growth_0a2.py

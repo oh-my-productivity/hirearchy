@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from testkit.reach.hirearchy.core import ROOT
-from testkit.services_world import contract_meta, define, deliver, svc, work
+from testkit.services_world import contract_meta, define, deliver, legacy_playbook, svc, work
 from testkit.services_world import request_unheld as request  # a new request that clause 2 would hold: these tests are about other rules
 
 from hirearchy.kernel import RUNTIME, Message, run_credit_title
@@ -171,7 +171,7 @@ def test_stats_per_playbook_version_and_the_one_line_summary(svc):
     a = request(org, "a")
     deliver(org, "ceo", a, runs=2)
     org.feedback(ROOT, a.id, "reject", "Bad.")
-    org.revise_playbook("ceo", "weekly-brief", "Better steps.", "case a rejected", [])
+    legacy_playbook(org, "Better steps.", reason="case a rejected")  # after a verdict a free v1 is refused (PB-FIRST-LATE): the file is written straight
     b = request(org, "b")
     deliver(org, "ceo", b, runs=1)
     org.feedback(ROOT, b.id, "accept")

@@ -35,7 +35,7 @@ def test_service_events(org):
     brief = dict(description="A brief.", acceptance=["Short"], deliverable={"description": "one file"}, budget=4)
     org.define_service(ROOT, "ceo", "weekly", **brief)
     org.define_service(ROOT, "ceo", "weekly", add_acceptance=["Sourced"], words="Sourced, please.")
-    org.revise_playbook("ceo", "weekly", "1. Do the thing.", "first version", [])
+    org.revise_playbook("ceo", "weekly", "first", "first version", [], text="1. Do the thing.")
     org.retire_service(ROOT, "ceo", "weekly", "not needed")
     kinds = [e["kind"] for e in read_events(org) if e["kind"].startswith("service.")]
     assert kinds == ["service.define", "service.define", "service.revise", "service.retire"]

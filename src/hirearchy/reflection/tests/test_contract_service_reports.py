@@ -12,7 +12,7 @@ from hirearchy.reflection.testing import IMPLEMENTATIONS, ReflectionWorld, fs_wo
 
 from . import _stories
 from ._golden import expected
-from ._support import SERVICE, STEPS, ask, define, deliver, implementations, populated, revise, rework, s1_t6
+from ._support import SERVICE, STEPS, ask, define, deliver, implementations, populated, rework, s1_t6
 
 NO_SERVICES = (
     "No services yet. A parent defines a standing service for a direct report with define_service(owner, "

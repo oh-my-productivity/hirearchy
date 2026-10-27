@@ -1638,7 +1638,7 @@
      "default": null
     },
     {
-     "name": "content",
+     "name": "op",
      "kind": "POSITIONAL_OR_KEYWORD",
      "default": null
     },
@@ -1651,9 +1651,54 @@
      "name": "evidence",
      "kind": "POSITIONAL_OR_KEYWORD",
      "default": null
+    },
+    {
+     "name": "item",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "kind",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "text",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "when",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "then",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "after",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "version",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "acknowledged",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "content",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
     }
    ],
-   "annotated": "(self, actor: 'str', service: 'str', content: 'str', reason: 'str', evidence: 'Sequence[str]') -> 'int'"
+   "annotated": "(self, actor: 'str', service: 'str', op: 'str | None', reason: 'str', evidence: 'Sequence[str]', *, item: 'str | None' = None, kind: 'str | None' = None, text: 'str | None' = None, when: 'str | None' = None, then: 'str | None' = None, after: 'str | None' = None, version: 'int | None' = None, acknowledged: 'str | None' = None, content: 'str | None' = None) -> 'PlaybookChange'"
   },
   "rules": {
    "kind": "method",

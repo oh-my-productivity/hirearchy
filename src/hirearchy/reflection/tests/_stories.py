@@ -9,7 +9,7 @@ from hirearchy.reflection.testing import ReflectionWorld
 
 from collections.abc import Callable
 
-from ._support import STEPS, ask, define, deliver, rate, read_inbox, revise, rework
+from ._support import STEPS, add_step, ask, define, deliver, first_playbook, rate, read_inbox, rework
 
 LONG = "x" * 100
 
@@ -52,7 +52,7 @@ def three_playbook_versions(w: ReflectionWorld) -> Story:
     story = Story()
     for topic, text in (("ai", None), ("chips", "v1"), ("bio", "v2")):
         if text:
-            revise(w, STEPS + (f"\n4. {text}" if text == "v2" else ""), reason=f"playbook {text}")
+            first_playbook(w, STEPS, f"playbook {text}") if text == "v1" else add_step(w, text, f"playbook {text}")
         task = ask(w, topic)
         story.asks.append(task)
         story.results.append(deliver(w, task, runs=1, lessons=f"Lesson about {topic}."))
@@ -104,7 +104,7 @@ def locked_history_then_new_request(w: ReflectionWorld) -> Story:
 def playbook_and_rejection(w: ReflectionWorld) -> Story:
     """Playbook v1 exists; the batch holds the client's rejection of a delivery made under it."""
     define(w)
-    revise(w, STEPS, "start")
+    first_playbook(w, STEPS, "start")
     first = ask(w)
     result = deliver(w, first, runs=1, lessons="L.")
     w.s.d.clock.advance(1)
@@ -123,9 +123,11 @@ def second_playbook_and_new_request(w: ReflectionWorld) -> Story:
     """Playbook v2 exists, a case was delivered under it, and a new request arrives."""
     story = Story()
     define(w)
-    for topic, text, reason in (("ai", None, ""), ("chips", STEPS, "one"), ("bio", STEPS + "\n4. More.", "two")):
-        if text:
-            revise(w, text, reason)
+    for topic, text, reason in (("ai", None, ""), ("chips", STEPS, "one"), ("bio", "More.", "two")):
+        if text == STEPS:
+            first_playbook(w, text, reason)
+        elif text:
+            add_step(w, text, reason)
         task = ask(w, topic)
         story.asks.append(task)
         story.results.append(deliver(w, task, runs=1, lessons=f"Lesson about {topic}."))
@@ -138,7 +140,7 @@ def rejection_and_rework(w: ReflectionWorld) -> Story:
     define(w)
     first = ask(w)
     deliver(w, first, runs=1, lessons="L1.")
-    revise(w, STEPS, "one")
+    first_playbook(w, STEPS, "one")
     second = ask(w, "chips")
     result = deliver(w, second, runs=2, lessons="L2.")
     read_inbox(w)

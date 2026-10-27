@@ -291,3 +291,77 @@ def test_the_case_of_a_rework_is_one_case(w: ReflectionWorld, evidence: CaseServ
     second = note_on(w, again, verdict="reject", source="human", body="Second words.")
     note_on(w, again, reply_to=second.id, source="human", criterion="C2")
     assert refusal(evidence, ["C2"]).startswith(f"refused: the client rejected this in one case only ({task.id})")
+
+
+# ------------------------------------------------------------------------------ the rules compose (6.2: (c) first, then (b), then PB-C-WORDS)
+
+
+@pytest.mark.parametrize("kind", ["step", "rule"])
+def test_a_step_and_a_rule_are_judged_alike_by_rule_b(w: ReflectionWorld, evidence: CaseServiceEvidence, kind: str) -> None:
+    first, second = failed_twice(w)
+    got = item(evidence, ["C2"], "Cite every claim.", kind=kind, when="a claim has no source" if kind == "rule" else None)
+    assert (got.rule, got.why, got.detail) == ("b", ("R1", "R2", "C2"), f"C2 failed in 2 {CASES}: {first.id}, {second.id}")
+
+
+def test_admit_item_reads_the_record_and_writes_nothing(w: ReflectionWorld, evidence: CaseServiceEvidence) -> None:
+    failed_twice(w)
+    before = (w.s.rels(), len(w.s.d.inbox("ceo")), len(w.s.d.inbox("root")))
+    item(evidence, ["C2"], "Cite every claim.")
+    assert refusal(evidence, ["C1"])
+    assert (w.s.rels(), len(w.s.d.inbox("ceo")), len(w.s.d.inbox("root"))) == before
+
+
+def test_the_same_item_and_evidence_give_the_same_admission(w: ReflectionWorld, evidence: CaseServiceEvidence) -> None:
+    confirmed_c3(w)
+    failed_twice(w)
+    assert item(evidence, ["C3"], WEEK) == item(evidence, ["C3"], WEEK)
+    assert item(evidence, ["C2"], "Cite every claim.") == item(evidence, ["C2"], "Cite every claim.")
+    assert refusal(evidence, ["C1"]) == refusal(evidence, ["C1"])
+
+
+def test_a_blank_when_is_always_for_rule_c(w: ReflectionWorld, evidence: CaseServiceEvidence) -> None:
+    confirmed_c3(w)
+    for when in ("", "   ", " Always "):
+        assert item(evidence, ["C3"], WEEK, kind="rule", when=when).rule == "c"
+
+
+def test_each_confirmed_criterion_admits_only_its_own_words(w: ReflectionWorld, evidence: CaseServiceEvidence) -> None:
+    confirmed_c3(w)  # v2 adds C3, confirmed on R1
+    amend_legacy(w, add_acceptance=["Ends with one open question"])  # v3 adds C4
+    rejected(w, "No question.", topic="b", criterion="C4")  # confirmed on R2
+    assert (item(evidence, ["C3", "C4"], WEEK).detail, item(evidence, ["C3", "C4"], WEEK).why) == (
+        "cites C3, which root added to the contract (v2) and the client confirmed", ("R1", "C3"),
+    )
+    assert (item(evidence, ["C3", "C4"], "Ends with one open question").detail, item(evidence, ["C3", "C4"], "Ends with one open question").why) == (
+        "cites C4, which root added to the contract (v3) and the client confirmed", ("R2", "C4"),
+    )
+
+
+def test_rule_c_comes_before_rule_b_when_the_words_are_the_criterions(w: ReflectionWorld, evidence: CaseServiceEvidence) -> None:
+    confirmed_c3(w)
+    rejected(w, "No week again.", topic="b", criterion="C3")  # C3 also qualifies by rule (b): two cases
+    assert item(evidence, ["C3"], WEEK).rule == "c"
+    assert item(evidence, ["C3"], "Always name the week in the title.").rule == "b"  # other words: rule (b), with the same WHY ids
+    assert item(evidence, ["C3"], WEEK).why == item(evidence, ["C3"], "Always name the week in the title.").why == ("R1", "R2", "C3")
+
+
+def test_rule_b_admits_other_words_even_when_a_confirmed_criterion_is_cited_too(w: ReflectionWorld, evidence: CaseServiceEvidence) -> None:
+    confirmed_c3(w)
+    failed_twice(w, "C2")  # R2, R3: C2 qualifies by rule (b)
+    got = item(evidence, ["C3", "C2"], "Cite every claim.")
+    assert got.rule == "b" and got.why == ("R2", "R3", "C2")  # C3 is confirmed, but a single case: it is not a reason for these words
+
+
+def test_pb_c_words_names_the_ids_in_id_order(w: ReflectionWorld, evidence: CaseServiceEvidence) -> None:
+    confirmed_c3(w)
+    amend_legacy(w, add_acceptance=["Ends with one open question"])
+    rejected(w, "No question.", topic="b", criterion="C4")
+    message = refusal(evidence, ["C4", "C3"], "Something else.")
+    assert message.startswith("refused: C3, C4 are confirmed by the client, so an item citing them may be only their own words: this item is not.")
+    assert message.index("to add C3.") < message.index("to add C4.")
+
+
+def test_the_why_orders_the_r_ids_by_number_then_the_others() -> None:
+    from hirearchy.reflection._evidence import _by_number
+
+    assert _by_number({"C10", "C9", "R10", "R2", "R1"}) == ("R1", "R2", "R10", "C9", "C10")

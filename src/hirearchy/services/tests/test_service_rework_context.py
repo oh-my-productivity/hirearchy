@@ -41,7 +41,7 @@ def test_a_rework_of_a_request_inherits_its_service_and_contract_and_the_playboo
     define(w)
     first = request(w)
     answer(w, first)
-    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "after the first request", [])
+    w.commands.revise_playbook("ceo", "weekly-brief", "first", "after the first request", [], text=STEPS)
     w.commands.define_service("root", "ceo", "weekly-brief", budget=12)
     assert dict(w.rework.fields_for("root", first.id)) == {"service": "weekly-brief", "contract": 1, "playbook": 1}
 

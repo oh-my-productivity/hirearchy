@@ -54,6 +54,7 @@ __all__ = [
     "LINKS_MAX",
     "LINK_HEADER",
     "Playbook",
+    "PlaybookChange",
     "PlaybookItem",
     "PlaybookRace",
     "PlaybookSection",
@@ -80,6 +81,7 @@ __all__ = [
     "normalize_links",
     "number_criteria",
     "plain",
+    "playbook_reply",
     "playbook_word_cap",
     "quoting_lines",
     "repeats_rejection",
@@ -556,17 +558,26 @@ class ServiceCommands(Protocol):
         ``contract`` and ``playbook`` (versions at this moment) in its frontmatter."""
         ...
 
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
-        """Write the next version of the playbook of a service ``actor`` owns; returns the new version.
+    def revise_playbook(
+        self, actor: str, service: str, op: str | None, reason: str, evidence: Sequence[str], *, item: str | None = None, kind: str | None = None,
+        text: str | None = None, when: str | None = None, then: str | None = None, after: str | None = None, version: int | None = None,
+        acknowledged: str | None = None, content: str | None = None,
+    ) -> PlaybookChange:
+        """Change ONE item of the playbook of a service ``actor`` owns; returns what was written (design 5).
 
-        Refused when the contract is locked, when ``content`` is empty, over ``playbook_max_words`` or identical to the current playbook. A
-        frontmatter in ``content`` is stripped (the runtime writes it). The old version is archived to ``history/PLAYBOOK.v<n>.md`` and the client
-        gets a quiet (non-waking) note with the reason, the evidence and the rule that admitted it.
+        Refused when the contract is locked. ``op`` is ``first`` (the whole first version, ``text``: only before any verdict or rework), ``add``
+        (``kind`` ``step`` with ``text`` and optional ``after``, or ``rule`` with ``then``, optional ``when`` and ``after``), ``edit`` (``item`` and
+        its new ``text``, or a rule's ``then`` and/or ``when``), ``retire`` (``item``), ``restore`` (``item``, optional ``version``) or ``move``
+        (``item``, ``after``). ``reason`` is 1-400 characters. The old version is archived to ``history/PLAYBOOK.v<n>.md`` and the client gets a
+        quiet (non-waking) note with the op, the item ids, the reason, the evidence and the rule that admitted it.
 
-        ``evidence`` (required; a list of at most 20 ids): what the revision rests on, ``R<k>`` regression assertions, ``C<k>`` criteria, verdict
-        or case ids. The revision is admitted by ``ServiceEvidence``, by rule (b) the same criterion or assertion failed in 2 different cases
-        the human client rejected, or rule (c) it cites a criterion the client added by an amendment and confirmed. Exempt, with ``[]``: the first
-        playbook, and restoring unchanged a version the client wrote. A refusal writes nothing."""
+        ``evidence`` (a list of at most 20 ids): what a gated change rests on, ``R<k>`` regression assertions, ``C<k>`` criteria, verdict or case
+        ids. A gated change (an add, an edit whose words change, a restore of a text the client did not write) is admitted by ``ServiceEvidence``
+        by rule (b), the same criterion or assertion failed in 2 different cases the human client rejected, or rule (c), the item is the own words
+        of a criterion the client added by an amendment and confirmed; it is also refused above about 30% of the playbook's words and over
+        ``playbook_max_words``. Exempt: ``first``, ``move``, ``retire``, a formatting-only edit, and the restore of a text the client wrote.
+        ``acknowledged`` is ignored here unless the change needs the parent's acknowledgement. ``content`` is the old whole-text form: it is always
+        refused (PB-FORM). A refusal writes nothing, except the migration of a free-text playbook into items, which changes no word."""
         ...
 
     def feedback(
@@ -594,11 +605,34 @@ class ServiceCommands(Protocol):
 class Admission:
     """Why a playbook revision may be written."""
 
-    rule: str  # "b" | "c" | "first" | "restore"
+    rule: str  # "b" | "c" | "first" | "restore" | "exempt"
     evidence: tuple[str, ...]  # the normalized ids cited
     detail: str  # one line for the client's note, e.g. "C6 failed in 2 cases the client rejected: <id>, <id>"
-    lines: tuple[tuple[str, str], ...] = ()  # (the id that admits it, the line) of every line the revision added or changed; () when none/exempt
     why: tuple[str, ...] = ()  # the R and C ids the item rests on (design 6.3): the runtime writes them as its WHY; () for an exempt admission
+
+
+@dataclass(frozen=True)
+class PlaybookChange:
+    """What ``revise_playbook`` wrote: one item of one version (design 5.1). ``playbook_reply`` builds the reply to the owner from it alone."""
+
+    version: int  # the version the op wrote
+    op: str  # first | add | edit | retire | restore | move
+    item: str  # the id the op changed ("" for ``first``)
+    kind: str  # "step" | "rule" ("" for ``first``)
+    admission: Admission  # ``rule`` is ``exempt``, ``first`` or ``restore`` for an exempt op
+    migrated: int | None  # the version of a migration written first in this call (design 4.4), None when none
+    items: int  # the number of live items after the op
+    restored_from: int | None = None  # the version whose text came back
+    acknowledged: str = ""  # the id of the acknowledgement note the change rests on ("" when none)
+    ack_ignored: str = ""  # an ``acknowledged`` id the change did not need ("" when none)
+    formatting: bool = False  # an exempt edit
+    related: tuple[str, ...] = ()  # the related rejections the written item's watch holds
+    carried: str = ""  # the id whose watch the written item continues ("" when none)
+    client: str = ""  # who was told
+    after: str = ""  # a move: the item it now follows, or ``start``
+    sections: tuple[str, ...] = ()  # ``first``: the heading lines of the new body, without their ``#`` run
+    migration: str = ""  # the sentence the reply starts with when a migration ran first ("" when none)
+    watch_unread: bool = False  # the watch could not be read after the write: the reply says so
 
 
 @dataclass(frozen=True)
@@ -626,21 +660,11 @@ class AmendmentBasis:
 
 @runtime_checkable
 class ServiceEvidence(Protocol):
-    """What the history of a service proves: the ids a client's verdict may name, and whether a playbook revision is admitted."""
+    """What the history of a service proves: the ids a client's verdict may name, and whether a playbook item is admitted."""
 
     def links(self, owner: str, service: str, ids: Sequence[str], *, verdict: str | None = None) -> tuple[str, ...]:
         """``ids`` (normalized: ``normalize_links``) if each is a criterion the contract has had (C<k>), an existing regression assertion (R<k>,
         not the rejection ``verdict`` itself) or ``none``; ``OrgError`` naming the unknown ones and listing the valid ones otherwise."""
-        ...
-
-    def admit(
-        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),
-    ) -> Admission:
-        """Judge a revision of ``owner``'s playbook by rules (b) and (c) of the evidence gate (rule (c): it cites a criterion the client added by
-        an amendment and confirmed); ``exempt`` ("first", "restore"): only resolve the ids and return the exemption. ``lines`` are the lines the
-        revision adds or changes (``changed_lines``): under rule (c) each must be the cited criterion's own words with its id, under rule (b) each
-        must carry the id it rests on; the admission lists them with the id that admits each. ``OrgError`` with the client question when it is
-        refused (an offending line included), or naming unknown ids."""
         ...
 
     def admit_item(
@@ -733,3 +757,4 @@ class CaseAllowance(Protocol):
 from ._criteria import amendment_ids, version_in_force  # noqa: E402
 from ._items import migrate_body  # noqa: E402
 from ._parse import contract_of  # noqa: E402
+from ._reply import playbook_reply  # noqa: E402

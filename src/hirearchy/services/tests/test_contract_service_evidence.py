@@ -1,8 +1,8 @@
-"""Contract of ``ServiceEvidence``: what the history of a service proves, for the ids a client's verdict may name and for a playbook revision.
+"""Contract of ``ServiceEvidence``: what the history of a service proves, for the ids a client's verdict may name and for a playbook item.
 
 Every implementation is built over an organization where ``ceo`` offers ``weekly-brief`` with two criteria (``C1``, ``C2``) and no case yet. What the
-callers rely on: an exempt ``admit`` only resolves the ids and returns the exemption; any other ``admit`` returns rule ``b`` or ``c`` or raises an
-``OrgError`` (never anything else); the ids come back normalized."""
+callers rely on: ``admit_item`` returns rule ``b`` or ``c`` with the ids that make its ``why``, or raises an ``OrgError`` (never anything else); the
+ids come back normalized."""
 
 from __future__ import annotations
 
@@ -26,37 +26,25 @@ def evidence(request: pytest.FixtureRequest, tmp_path: Path) -> ServiceEvidence:
     return made
 
 
-@pytest.mark.parametrize("exempt", ["first", "restore"])
-def test_an_exempt_admit_returns_the_exemption_with_normalized_ids(evidence: ServiceEvidence, exempt: str) -> None:
-    got = evidence.admit(OWNER, SERVICE, [" c1 ", "C2", "c1"], "why", exempt=exempt)
-    assert isinstance(got, Admission) and (got.rule, got.evidence) == (exempt, ("C1", "C2"))
-
-
-@pytest.mark.parametrize("exempt", ["first", "restore"])
-def test_an_exempt_admit_with_no_evidence_returns_the_exemption(evidence: ServiceEvidence, exempt: str) -> None:
-    got = evidence.admit(OWNER, SERVICE, [], "why", exempt=exempt)
-    assert (got.rule, got.evidence) == (exempt, ())
-
-
-def test_admit_returns_rule_b_or_c_or_raises_an_org_error(evidence: ServiceEvidence) -> None:
+@pytest.mark.parametrize("kind", ["step", "rule"])
+def test_admit_item_returns_the_ids_normalized(evidence: ServiceEvidence, kind: str) -> None:
+    """Whatever the gate says, an admission carries the cited ids in their fixed form: stripped, upper-cased, once."""
     try:
-        got = evidence.admit(OWNER, SERVICE, ["c1"], "why")
+        got = evidence.admit_item(OWNER, SERVICE, [" c1 ", "C2", "c1"], "why", kind=kind, text="A new line", when=None)
     except OrgError as refusal:
         assert str(refusal)
     else:
-        assert isinstance(got, Admission) and got.rule in ("b", "c") and got.evidence == ("C1",) and got.detail
+        assert got.evidence == ("C1", "C2")
 
 
-def test_admit_accepts_lines(evidence: ServiceEvidence) -> None:
-    """The changed lines of a revision (P1): a gate that admits returns, with each line, the id that admits it; an exempt one ignores them."""
-    lines = ["A new line", "Another one"]
+def test_admit_item_with_no_evidence_is_admitted_or_refused_never_exempt(evidence: ServiceEvidence) -> None:
+    """The exemptions (the first version, a move, a retire, a formatting fix) are `services`' own: the gate never returns them."""
     try:
-        got = evidence.admit(OWNER, SERVICE, ["c1"], "why", lines=lines)
+        got = evidence.admit_item(OWNER, SERVICE, [], "why", kind="step", text="A new line", when=None)
     except OrgError as refusal:
         assert str(refusal)
     else:
-        assert got.rule in ("b", "c") and all(isinstance(i, str) and line in lines for i, line in got.lines)
-    assert evidence.admit(OWNER, SERVICE, [], "why", exempt="first", lines=lines).lines == ()
+        assert got.rule in ("b", "c") and got.evidence == ()
 
 
 def test_admit_item_returns_rule_b_or_c_with_a_why_or_raises_an_org_error(evidence: ServiceEvidence) -> None:

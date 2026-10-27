@@ -148,11 +148,11 @@ def test_criteria_carry_their_basis(w: ServicesWorld) -> None:
 def test_playbook_versions_are_oldest_first(w: ServicesWorld) -> None:
     define(w)
     assert w.catalog.playbook_versions("ceo", "weekly-brief") == []
-    w.commands.revise_playbook("ceo", "weekly-brief", STEPS, "first", [])
-    w.commands.revise_playbook("ceo", "weekly-brief", STEPS + "\n4. Publish.", "second", ["R1"])
+    w.commands.revise_playbook("ceo", "weekly-brief", "first", "first", [], text=STEPS)
+    w.commands.revise_playbook("ceo", "weekly-brief", "add", "second", ["R1"], kind="step", text="Publish.")
     found = w.catalog.playbook_versions("ceo", "weekly-brief")
     assert [(p.version, p.reason) for p in found] == [(1, "first"), (2, "second")]
-    assert found[0].body == STEPS and found[1].body.endswith("4. Publish.")
+    assert found[0].body == STEPS_ITEMS and found[1].body.endswith("[P4] Publish. (WHY R1)")
 
 
 def test_read_playbook_of_an_item_file_gives_its_items(w: ServicesWorld) -> None:

@@ -89,11 +89,26 @@ def nested(w: ReflectionWorld) -> Message:
     return deliver(w, task)
 
 
-def revise(w: ReflectionWorld, content: str = STEPS, reason: str = "first", owner: str = "ceo") -> int:
-    """The owner writes the next version of the playbook (the world's gate admits it: ``evidence=("R1",)``); time moves a second first, so
-    that it lies between the cases around it."""
+def first_playbook(w: ReflectionWorld, text: str = STEPS, reason: str = "first", owner: str = "ceo") -> int:
+    """The owner writes v1 (``op="first"``, exempt; before any verdict or rework exists); time moves a second first, so that it lies between the
+    cases around it."""
     w.s.d.clock.advance(1)
-    return w.s.commands.revise_playbook(owner, SERVICE, content, reason, evidence=("R1",))
+    return w.s.commands.revise_playbook(owner, SERVICE, "first", reason, [], text=text).version
+
+
+def add_step(w: ReflectionWorld, text: str, reason: str = "added", evidence: tuple[str, ...] = ("R1",), owner: str = "ceo") -> int:
+    """The owner adds one step (``op="add"``; the world's admitting gate admits it on ``evidence``); on a service with no playbook it writes v1. Time
+    moves a second first."""
+    w.s.d.clock.advance(1)
+    return w.s.commands.revise_playbook(owner, SERVICE, "add", reason, list(evidence), kind="step", text=text).version
+
+
+def legacy_playbook(w: ReflectionWorld, body: str = STEPS, version: int = 1, owner: str = "ceo", by: str = "ceo") -> None:
+    """A free-text playbook as an owner wrote it before Phase 1 (no `items_max`), written straight into the store: the first change through
+    `revise_playbook` migrates it to items."""
+    w.s.d.clock.advance(1)
+    meta = {"service": SERVICE, "version": version, "revised": w.s.d.clock.now().isoformat(timespec="microseconds"), "by": by, "reason": "earlier"}
+    w.s.store.write_playbook(owner, SERVICE, version, meta, body, version - 1 or None)
 
 
 def rework(w: ReflectionWorld, task: Message, **kw: Any) -> Message:

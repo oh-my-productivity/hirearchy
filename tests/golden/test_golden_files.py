@@ -167,8 +167,7 @@ def test_service_and_playbook_files(tmp_path, clock, norm):
     for task, no in ((first, no1), (second, no2)):  # the user's yes: a criterion on the rejection itself would be the assistant's reading
         org.feedback(ROOT, task.id, "reject", "Yes, it is about C1.", source="human", criterion=["C1"], confirms=no.id)
     clock.tick()
-    v1 = org.runtime.service_catalog.read_playbook("ceo", "weekly-brief").body  # root's v1 as the runtime made it items
-    org.revise_playbook("ceo", "weekly-brief", v1 + "\n4. Cut to 600 words before reporting [C1].\n", "Client rejected: too long.", ["C1"])
+    org.revise_playbook("ceo", "weekly-brief", "add", "Client rejected: too long.", ["C1"], kind="step", text="Cut to 600 words before reporting.")
     clock.tick()
     out = []
     for name in ("weekly-brief", "plain-brief"):

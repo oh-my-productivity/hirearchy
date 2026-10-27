@@ -155,32 +155,45 @@ def test_agent_feedback_surface_is_unchanged(svc):
     assert set(described(svc, ROOT)["feedback"].inputSchema["properties"]) == {"task_id", "verdict", "note", "source", "criterion", "confirms"}
 
 
-def test_revise_playbook_without_evidence_is_a_schema_error(svc):
+def test_an_old_form_call_reaches_pb_form_through_the_schema(svc):
+    """FastMCP's schema accepts `content` and an absent `op`, so an agent whose session holds the old docstring meets the refusal that says what to
+    do (PB-FORM) instead of a schema error."""
     ceo = build_server(svc, "ceo")
-    message = fails(ceo, "revise_playbook", service=WEEKDAY, content="## Steps\n1. Search.", reason="first draft")
-    assert "evidence" in message and "required" in message.lower()
+    message = fails(ceo, "revise_playbook", service=WEEKDAY, content="## Steps\n1. Search.", reason="first draft", evidence=[])
+    assert message.endswith("Nothing was written.") and "changes one item of the playbook per call" in message and "op=\"add\"" in message
+    assert fails(ceo, "revise_playbook", service=WEEKDAY, reason="first draft").count("changes one item of the playbook per call") == 1  # no op at all
     assert services.read_playbook(svc, "ceo", WEEKDAY).version == 0
     schema = {t.name: t for t in asyncio.run(ceo.list_tools())}["revise_playbook"].inputSchema
-    assert schema["required"] == ["service", "content", "reason", "evidence"]
-    assert schema["properties"]["evidence"] == {"items": {"type": "string"}, "title": "Evidence", "type": "array"}
-    assert "now v1" in call(ceo, "revise_playbook", service=WEEKDAY, content="## Steps\n1. Search.", reason="first draft", evidence=[])
+    assert schema["required"] == ["service", "reason"]
+    assert set(schema["properties"]) == {
+        "service", "reason", "op", "evidence", "item", "kind", "text", "when", "then", "after", "version", "acknowledged", "content",
+    }
+
+
+def test_revise_playbook_replies_from_playbook_change(svc):
+    ceo = build_server(svc, "ceo")
+    first = call(ceo, "revise_playbook", service=WEEKDAY, op="first", text="## Steps\n1. Search.", reason="first draft")
+    assert first.startswith(f"playbook of {WEEKDAY} is now v1: wrote playbook v1: 1 items (Steps). root was told without being woken.")
+    assert services.read_playbook(svc, "ceo", WEEKDAY).items is not None
 
 
 def test_the_revise_playbook_docstring_asks_for_the_clients_evidence(svc):
     text = " ".join(described(svc, "ceo")["revise_playbook"].description.split())
-    assert "evidence (required): the ids it rests on, from the regression list and the digest in your prompt" in text
-    assert "It is admitted only when the same criterion or regression assertion failed in 2 different cases the client rejected" in text
-    assert "Pass evidence=[] only for the first playbook (the steps your team followed, nothing more), or to restore unchanged a version your parent wrote." in text
+    assert "evidence: the ids it rests on, from the regression list and the digest in your prompt" in text
+    assert "are admitted only when the same criterion or regression assertion failed in 2 different cases the client rejected" in text
+    assert "A move, a retire, a formatting-only edit and \"first\" need no evidence (pass [])." in text
     assert "A refusal writes nothing and gives you a question to send your parent once; do not wait for the answer" in text
 
 
-def test_revise_playbook_docstring_says_line_by_line(svc):
+def test_revise_playbook_docstring_says_one_item_per_call(svc):
     text = " ".join(described(svc, "ceo")["revise_playbook"].description.split())
+    assert text.startswith("Change ONE item of the playbook of a service you offer, per call: how your team delivers it.")
     assert (
-        "contract by an amendment the client confirmed (your Reflect section and the amendment note name them); line by line: under the first "
-        'rule every line you add or change carries the id it rests on ("[C6]"), under the second it is only that criterion\'s words '
-        '("- C<k>: <its text>"); a link note id counts as its criterion; your lessons, relayed verdicts and an agent client\'s verdicts are not evidence.'
+        'or when the item is only the own words of a criterion your parent added to the contract by an amendment the client confirmed (your Reflect '
+        "section and the amendment note name them); a link note id counts as its criterion; your lessons, relayed verdicts and an agent client's "
+        "verdicts are not evidence."
     ) in text
+    assert 'op: "first"' in text and '"restore" (item, optional version' in text and '"move" (item, after' in text
 
 
 def test_root_request_rework_without_source_is_relayed(svc):
@@ -310,9 +323,9 @@ def test_angle_brackets_and_ampersands_are_stored_exactly_as_given(svc):
     reason = 'Cases rejected for <weekday> & "dates"; keep &lt;literal&gt; -> done'
     content = "## Steps\n1. Resolve <weekday> and <date> & check \"quotes\" and &amp; entities.\n"
     server = build_server(svc, "ceo")
-    call(server, "revise_playbook", service=WEEKDAY, content=content, reason=reason, evidence=[])
+    call(server, "revise_playbook", service=WEEKDAY, op="first", text=content, reason=reason)
     pb = services.read_playbook(svc, "ceo", WEEKDAY)
-    assert pb.reason == reason and pb.body == content.strip()
+    assert pb.reason == reason and pb.body == "## Steps\n1. [P1] Resolve <weekday> and <date> & check \"quotes\" and &amp; entities."
     raw = (svc.dir("ceo") / "services" / WEEKDAY / "PLAYBOOK.md").read_text()
     assert "<weekday>" in raw and "&lt;literal&gt;" in raw and "&amp;lt;" not in raw
     # the notice to the client, the listing and the owner's prompt carry the same characters
@@ -324,7 +337,7 @@ def test_angle_brackets_and_ampersands_are_stored_exactly_as_given(svc):
     # the same through the Org API, and in the archived history
     svc.end_run("ceo", ok=True)  # the run the prompt above opened
     c3 = confirmed_amendment(svc, "Names the week it covers")  # the user's amendment and their yes: the evidence of v2
-    svc.revise_playbook("ceo", WEEKDAY, content.rstrip() + "\n- C3: Names the week it covers", "second <i> & more", [c3])
+    svc.revise_playbook("ceo", WEEKDAY, "add", "second <i> & more", [c3], kind="step", text="Names the week it covers")
     assert services.read_playbook(svc, "ceo", WEEKDAY).reason == "second <i> & more"
     assert "<weekday>" in (svc.dir("ceo") / "services" / WEEKDAY / "history" / "PLAYBOOK.v1.md").read_text()
 
@@ -362,7 +375,7 @@ def test_the_services_tool_describes_what_you_can_request_and_offer(org):
     deliver(org, "ceo", t2, runs=2)
     no2 = org.feedback(ROOT, t2.id, "reject", "Still bad.", source="human")
     org.feedback(ROOT, t2.id, "reject", "Yes, it is about C2.", source="human", criterion=["C2"], confirms=no2.id)  # C2 failed in two cases: the evidence of v2
-    org.revise_playbook("ceo", "weekly-brief", "Better steps. [C2]", "Case rejected for missing sources", ["C2"])
+    org.revise_playbook("ceo", "weekly-brief", "add", "Case rejected for missing sources", ["C2"], kind="step", text="Better steps.")
     out = call(server, "services")
     assert out.splitlines()[0] == "Services you can request (from your direct reports):"
     assert "- weekly-brief (offered by ceo; contract v1, playbook v2): A one-page brief" in out
@@ -396,8 +409,7 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     out = call(ceo, "report", task_id=task.id, status="done", summary="Delivered.", lessons="Used 2 runs; no checks.")
     assert "reported done" in out and "This service has no playbook yet: write v1 now with revise_playbook" in out
     org.end_run("ceo", ok=True)
-    assert "now v1" in call(ceo, "revise_playbook", service="weekly-brief", content="## Steps\n1. Search.",
-                            reason="first draft", evidence=[])
+    assert "now v1" in call(ceo, "revise_playbook", service="weekly-brief", op="first", text="## Steps\n1. Search.", reason="first draft")
     assert services.read_playbook(org, "ceo", "weekly-brief").version == 1
 
     # the client rejects the delivery
@@ -417,9 +429,9 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     section = prompt.split("# Reflect before you start: weekly-brief")[1].split("# New messages")[0]
     assert "Evidence since v1:" in section and "Missing week-over-week changes." in section
     assert "Used 2 runs; no checks." in section
-    out = call(ceo, "revise_playbook", service="weekly-brief",
-               content="## Steps\n1. Search.\n- C3: Shows the changes since last week", reason=f"case {task.id} rejected: no changes", evidence=["C3"])
-    assert "playbook of `weekly-brief` is now v2" in out
+    out = call(ceo, "revise_playbook", service="weekly-brief", op="add", kind="step", text="Shows the changes since last week",
+               reason=f"case {task.id} rejected: no changes", evidence=["C3"])
+    assert "playbook of weekly-brief is now v2" in out
     out = call(ceo, "report", task_id=second.id, status="done", summary="Delivered again.", lessons="Step 2b worked.")
     assert "Lessons recorded: they are your team's view and are shown before the next request. A playbook revision rests on the client's evidence" in out
     org.end_run("ceo", ok=True)
@@ -449,7 +461,7 @@ def test_a_locked_service_reports_without_the_revision_hint(org):
     work(org, "ceo")
     out = call(ceo, "report", task_id=task.id, status="done", summary="Delivered.", lessons="Fine.")
     assert out.startswith("reported done") and "revise_playbook" not in out
-    assert "locked by root" in fails(ceo, "revise_playbook", service="weekly-brief", content="x", reason="r", evidence=[])
+    assert "locked by root" in fails(ceo, "revise_playbook", service="weekly-brief", op="first", text="x", reason="r")
 
 
 # ----------------------------------------------------------------------------------------- clause 2: a new request waits for the answers (design 13.1, 14.5)

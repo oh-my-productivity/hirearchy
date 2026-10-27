@@ -37,13 +37,16 @@ class CappedPlaybookTexts(PlaybookTexts):
         body = (split_frontmatter(text)[1] if text.startswith("---\n") else text).strip()
         if not body:
             raise OrgError("the playbook is empty: write the workflow (steps: who does what, in which order, which check)")
-        cap, words = playbook_word_cap(self._settings.config()), len(body.split())
+        cap, words = self.cap(), len(body.split())
         if words > cap:
             raise OrgError(
                 f"the playbook is {words} words; the limit is {cap} (playbook_max_words). Condense it to the steps that "
                 "matter and move detail into a file under your work/ directory."
             )
         return body
+
+    def cap(self) -> int:
+        return playbook_word_cap(self._settings.config())
 
 
 class EventedPlaybookWriter(PlaybookWriter):

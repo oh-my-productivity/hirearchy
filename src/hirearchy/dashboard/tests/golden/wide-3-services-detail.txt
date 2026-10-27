@@ -25,8 +25,8 @@
 
  Playbook v1
  # Playbook
- Start from the sources the client named.
- Keep it under 600 words.
+ - [P1] Start from the sources the client named.
+    Keep it under 600 words.
 
 
 

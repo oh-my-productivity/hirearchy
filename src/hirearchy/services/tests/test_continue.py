@@ -61,7 +61,7 @@ def delivered_and_rejected(org, status="done", topic="ai"):
 
 def test_redefining_with_other_criteria_after_retire_team_and_hire_is_refused_continues(svc):
     org = svc
-    org.revise_playbook("ceo", SERVICE, STEPS, "first draft", [])
+    org.revise_playbook("ceo", SERVICE, "first", "first draft", [], text=STEPS)
     task, _ = delivered_and_rejected(org)
     retire_team_and_hire(org)
     before = tree_of(org)
@@ -84,7 +84,7 @@ def test_redefining_with_other_criteria_after_retire_team_and_hire_is_refused_co
 
 def test_redefining_with_its_criteria_continues_contract_playbook_and_cases(svc):
     org = svc
-    org.revise_playbook("ceo", SERVICE, STEPS, "first draft", [])
+    org.revise_playbook("ceo", SERVICE, "first", "first draft", [], text=STEPS)
     task, no = delivered_and_rejected(org)
     first, _ = contract_meta(org)
     played = (org.dir("ceo") / "services" / SERVICE / "PLAYBOOK.md").read_text()
@@ -294,14 +294,16 @@ def test_a_continuation_with_answers_about_or_words_is_not_an_amendment(svc):
     assert org.service_names("ceo") == [] and tree_of(org) == before
 
 
-def test_a_continued_service_without_a_playbook_has_none_and_its_first_revision_is_exempt(svc):
+def test_a_continued_service_without_a_playbook_has_none_and_its_v1_is_pb_first_late(svc):
+    """D6: the record of the retired copy holds a verdict, so a free first version is no longer allowed; the playbook is built one item at a time."""
     org = svc
     delivered_and_rejected(org)
     retire_team_and_hire(org)
     assert "no playbook yet" in define(org)
     assert not (org.dir("ceo") / "services" / SERVICE / "PLAYBOOK.md").exists()
-    assert org.revise_playbook("ceo", SERVICE, STEPS, "first draft", []) == 1  # no evidence needed: the first version is exempt
-    assert playbook_meta(org)[0]["version"] == 1
+    with pytest.raises(OrgError, match=r"already has evidence \(a verdict on "):
+        org.revise_playbook("ceo", SERVICE, "first", "first draft", [], text=STEPS)
+    assert not (org.dir("ceo") / "services" / SERVICE / "PLAYBOOK.md").exists()
 
 
 # ------------------------------------------------------------------------------ writes that fail, the owner told, agents

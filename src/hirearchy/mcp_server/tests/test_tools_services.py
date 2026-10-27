@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -13,7 +14,7 @@ from hirearchy.kernel import ROOT, Message, OrgError
 from hirearchy.mcp_server._instructions import InstructionText
 from hirearchy.mcp_server._tools_services import DirectoryServiceRoles, ServiceTools
 from hirearchy.mcp_server.testing import HeldBudgets, MemoryBinding, ScriptedReports, ScriptedSteps, agents_in
-from hirearchy.services import BASE_HEADING, Contract, Criterion, Playbook, ServiceCatalog, ServiceCommands
+from hirearchy.services import BASE_HEADING, Admission, Contract, Criterion, Playbook, PlaybookChange, ServiceCatalog, ServiceCommands
 
 from ._support import call, described, fails, names, serve
 
@@ -63,9 +64,9 @@ class Commands(ServiceCommands):
         based = f"{BASE_HEADING}the version the client judged\n..." if self.needs_base and fields.get("base") else ""
         return Message(actor, "ceo", "task", based, budget=9, contract=2, playbook=3, service=service, id="req-1")
 
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
-        self.calls.append(("revise_playbook", (actor, service, content, reason, evidence), {}))
-        return 4
+    def revise_playbook(self, actor: str, service: str, op: str | None, reason: str, evidence: Sequence[str], **kw: Any) -> PlaybookChange:
+        self.calls.append(("revise_playbook", (actor, service, op, reason, evidence), {k: v for k, v in kw.items() if v is not None}))
+        return PlaybookChange(4, op or "", "P3", "step", Admission("b", ("R1", "C2"), "", why=("R1", "C2")), None, 3, client="ceo")
 
     def feedback(
         self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,
@@ -189,18 +190,20 @@ def test_feedback_says_who_it_did_not_wake() -> None:
 def test_revise_playbook_docstring_names_confirmed_amendments() -> None:
     text = " ".join(described(serve(tools(offered={"ceo/eng": ["brief"]})[0], "ceo/eng"))["revise_playbook"].split())
     assert (
-        "or when it cites a criterion your parent added to the contract by an amendment the client confirmed (your Reflect section and the "
-        "amendment note name them); line by line: under the first rule every line you add or change carries the id it rests on (\"[C6]\"), "
-        "under the second it is only that criterion's words (\"- C<k>: <its text>\"); a link note id counts as its criterion; "
-        "your lessons, relayed verdicts and an agent client's verdicts are not evidence." in text
+        "or when the item is only the own words of a criterion your parent added to the contract by an amendment the client confirmed (your Reflect "
+        "section and the amendment note name them); a link note id counts as its criterion; your lessons, relayed verdicts and an agent client's "
+        "verdicts are not evidence." in text
     )
 
 
 def test_revise_playbook_says_the_version_and_that_the_client_was_told_quietly() -> None:
     group, commands = tools(offered={"ceo/eng": ["brief"]})
-    out = call(serve(group, "ceo/eng"), "revise_playbook", service="brief", content="c", reason="r", evidence=["R1", "C2"])
-    assert out == "playbook of `brief` is now v4; ceo was told without being woken"
-    assert commands.calls[-1] == ("revise_playbook", ("ceo/eng", "brief", "c", "r", ["R1", "C2"]), {})
+    out = call(serve(group, "ceo/eng"), "revise_playbook", service="brief", op="add", kind="step", text="x", reason="r", evidence=["R1", "C2"])
+    assert out == (
+        "playbook of brief is now v4: added P3 (step), admitted (b) on R1, C2. It starts new and is watched: a related client rejection warns it, a "
+        "second retires it. ceo was told without being woken."
+    )
+    assert commands.calls[-1] == ("revise_playbook", ("ceo/eng", "brief", "add", "r", ["R1", "C2"]), {"kind": "step", "text": "x"})
 
 
 def test_a_missing_organization_is_the_refusal_of_a_client_tool() -> None:

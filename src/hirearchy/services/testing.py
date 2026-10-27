@@ -33,8 +33,10 @@ from ._hints import ServiceReportHints
 from ._normalizer import TextContractNormalizer
 from ._parse import FILE_SHAPE, as_int, merged_versions, playbook_version
 from ._places import OrgServicePlaces
-from ._playbook import RulePlaybookReviser
-from ._protocols import ContinuedServices, LinkNotes, RetiredService, ServiceFiles, ServicePlaces, ServiceRequests, ServiceRestorer
+from ._ops import RuleItemReviser
+from ._protocols import (
+    ContinuedServices, LinkNotes, PlaybookWriter, RetiredService, ServiceFiles, ServicePlaces, ServiceRequests, ServiceRestorer,
+)
 from ._request import RuleServiceRequester, TextRequestBodies
 from ._retire import RuleServiceRetirement
 from ._rework import ServiceReworkContext
@@ -178,7 +180,7 @@ class MemoryRetiredTrees(RetiredArchive):
 
 
 class AdmittingServiceEvidence(ServiceEvidence):
-    """The gate that lets everything through: admits every revision by rule ``b`` and accepts every link (the ids normalized). The default of the
+    """The gate that lets everything through: admits every item by rule ``b`` and accepts every link (the ids normalized). The default of the
     worlds: the tests of the commands that call the gate do not need its judgement, ``reflection`` has the real one. ``confirmed`` are the criterion
     ids it says the client confirmed (none by default); ``basis`` is the record it says the service has (no rejection, no delivery without a
     verdict, by default); ``watch`` is the watch of the items it says every service has (none by default)."""
@@ -200,15 +202,6 @@ class AdmittingServiceEvidence(ServiceEvidence):
     def links(self, owner: str, service: str, ids: Sequence[str], *, verdict: str | None = None) -> tuple[str, ...]:
         return normalize_links(list(ids))
 
-    def admit(
-        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),
-    ) -> Admission:
-        ids = normalize_evidence(list(evidence))
-        if exempt:
-            return Admission(exempt, ids, "no evidence needed")
-        admitting = ids[0] if ids else "b"  # every line rests on the first id it cites
-        return Admission("b", ids, "admitted by the stand-in for the gate", lines=tuple((admitting, line) for line in lines))
-
     def admit_item(
         self, owner: str, service: str, evidence: Sequence[str], reason: str, *, kind: str, text: str, when: str | None,
     ) -> Admission:
@@ -217,18 +210,11 @@ class AdmittingServiceEvidence(ServiceEvidence):
 
 
 class RefusingServiceEvidence(AdmittingServiceEvidence):
-    """The gate that refuses every revision that is not exempt, with the text it was given (the links as the admitting one)."""
+    """The gate that refuses every item, with the text it was given (the links as the admitting one)."""
 
     def __init__(self, text: str = "refused by the stand-in for the gate", basis: AmendmentBasis | None = None) -> None:
         super().__init__((), basis)
         self._text = text
-
-    def admit(
-        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),
-    ) -> Admission:
-        if exempt:
-            return super().admit(owner, service, evidence, reason, exempt=exempt, lines=lines)
-        raise OrgError(self._text)
 
     def admit_item(
         self, owner: str, service: str, evidence: Sequence[str], reason: str, *, kind: str, text: str, when: str | None,
@@ -367,9 +353,10 @@ def memory_store(tmp_path: Path) -> StoreHarness:
 def _world(
     d: DispatchWorld, harness: StoreHarness, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
     delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, judged: JudgedVersions | None = None,
-    allowance: CaseAllowance | None = None,
+    allowance: CaseAllowance | None = None, playbook_writer: Callable[[PlaybookWriter], PlaybookWriter] | None = None,
 ) -> ServicesWorld:
-    """``links`` and ``delivery`` wrap the link writer and the delivery of the runtime's notes (a write that fails, a call that is watched);
+    """``links``, ``delivery`` and ``playbook_writer`` wrap the link writer, the delivery of the runtime's notes and the writer of the playbooks (a
+    write that fails, a call that is watched, a write that finds another version);
     ``judged`` is the base a human rework is checked against (``NoJudgedVersions``: none needs one); ``allowance`` is what is left of a case's approved
     runs (``FixedAllowance({})``: every answer None, so a rework gets the contract's budget, as before 0a.3)."""
     places, store = harness.places, harness.store
@@ -381,7 +368,8 @@ def _world(
     normalizer = TextContractNormalizer()
     catalog = ContractServiceCatalog(store, d.agents, places)
     owners, texts = DirectReportOwners(d.agents), CappedPlaybookTexts(d.settings)
-    playbooks = EventedPlaybookWriter(store, d.clock, events)
+    playbooks: PlaybookWriter = EventedPlaybookWriter(store, d.clock, events)
+    playbooks = playbook_writer(playbooks) if playbook_writer else playbooks
     continued = RecordedContinuations(places, harness.archive, d.mail, harness.files)
     commands = RuleServiceCommands(
         RuleContractDefiner(
@@ -389,7 +377,7 @@ def _world(
             continued, harness.restorer,
         ),
         RuleServiceRetirement(d.agents, catalog, store, owners, notes, d.clock, events, gate),
-        RulePlaybookReviser(d.agents, catalog, texts, playbooks, notes, gate),
+        RuleItemReviser(d.agents, catalog, texts, playbooks, notes, gate, d.mail),
         RuleServiceRequester(
             d.agents, catalog, d.mail, TextRequestBodies(), d.sender, judged or NoJudgedVersions(), allowance or FixedAllowance({}), gate, store,
         ),
@@ -424,17 +412,18 @@ def fs_world(
     tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
     delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, writer: Callable[[AtomicWriter], AtomicWriter] | None = None,
     judged: JudgedVersions | None = None, allowance: CaseAllowance | None = None,
+    playbooks: Callable[[PlaybookWriter], PlaybookWriter] | None = None,
 ) -> ServicesWorld:
-    """``writer`` wraps the atomic writer of the store (a write that fails)."""
-    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path, writer), evidence, links, delivery, judged, allowance)
+    """``writer`` wraps the atomic writer of the store (a write that fails), ``playbooks`` the writer of the playbooks."""
+    return _world(dispatch_fs_world(tmp_path), fs_store(tmp_path, writer), evidence, links, delivery, judged, allowance, playbooks)
 
 
 def memory_world(
     tmp_path: Path, evidence: ServiceEvidence | None = None, links: Callable[[LinkNotes], LinkNotes] | None = None,
     delivery: Callable[[MessageDelivery], MessageDelivery] | None = None, judged: JudgedVersions | None = None,
-    allowance: CaseAllowance | None = None,
+    allowance: CaseAllowance | None = None, playbooks: Callable[[PlaybookWriter], PlaybookWriter] | None = None,
 ) -> ServicesWorld:
-    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence, links, delivery, judged, allowance)
+    return _world(dispatch_memory_world(tmp_path), memory_store(tmp_path), evidence, links, delivery, judged, allowance, playbooks)
 
 
 def fs_rework(tmp_path: Path) -> ReworkContext:

@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from ..kernel import Message
-from .api import Contract, Criterion, JudgedBase
+from .api import Contract, Criterion, JudgedBase, PlaybookChange
 
 
 @runtime_checkable
@@ -55,6 +55,10 @@ class OwnerAddresses(Protocol):
 class PlaybookTexts(Protocol):
     def body(self, content: str | None) -> str:
         """The playbook body: the frontmatter (if the caller wrote one) stripped, non-empty, within the word cap; an ``OrgError`` otherwise."""
+        ...
+
+    def cap(self) -> int:
+        """The most words a playbook may have: ``playbook_max_words`` of the settings (1000 when it is missing or malformed)."""
         ...
 
 
@@ -137,8 +141,12 @@ class ServiceRetirement(Protocol):
 
 @runtime_checkable
 class PlaybookRevisions(Protocol):
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
-        """Write the next version of a playbook (see ``ServiceCommands.revise_playbook``)."""
+    def revise_playbook(
+        self, actor: str, service: str, op: str | None, reason: str, evidence: Sequence[str], *, item: str | None = None, kind: str | None = None,
+        text: str | None = None, when: str | None = None, then: str | None = None, after: str | None = None, version: int | None = None,
+        acknowledged: str | None = None, content: str | None = None,
+    ) -> PlaybookChange:
+        """Change one item of a playbook (see ``ServiceCommands.revise_playbook``)."""
         ...
 
 

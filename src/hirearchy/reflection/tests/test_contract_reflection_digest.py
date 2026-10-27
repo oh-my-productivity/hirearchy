@@ -11,7 +11,7 @@ from hirearchy.reflection.testing import IMPLEMENTATIONS, ReflectionWorld, fs_wo
 
 from . import _stories
 from ._golden import expected
-from ._support import SERVICE, STEPS, ask, define, deliver, implementations, populated, rate, revise
+from ._support import SERVICE, STEPS, ask, define, deliver, first_playbook, implementations, populated, rate
 
 
 @pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
@@ -59,13 +59,13 @@ def test_feedback_alone_is_evidence(w: ReflectionWorld) -> None:
 def test_a_playbook_newer_than_all_the_evidence_leaves_nothing_to_reflect_on(w: ReflectionWorld) -> None:
     define(w)
     deliver(w, ask(w))
-    revise(w)
+    first_playbook(w)
     assert w.digest.reflection_digest("ceo", SERVICE) is None
 
 
 def test_a_case_that_finishes_after_the_playbook_is_new_evidence(w: ReflectionWorld) -> None:
     define(w)
-    revise(w)
+    first_playbook(w)
     task = ask(w)
     assert w.digest.reflection_digest("ceo", SERVICE) is None
     deliver(w, task)

@@ -6,7 +6,7 @@ from collections.abc import Mapping, Sequence
 
 from ..kernel import Message
 from ._protocols import ClientFeedback, ContractDefinitions, PlaybookRevisions, ServiceRequests, ServiceRetirement
-from .api import ServiceCommands
+from .api import PlaybookChange, ServiceCommands
 
 
 class RuleServiceCommands(ServiceCommands):
@@ -47,8 +47,15 @@ class RuleServiceCommands(ServiceCommands):
             base=base,
         )
 
-    def revise_playbook(self, actor: str, service: str, content: str, reason: str, evidence: Sequence[str]) -> int:
-        return self._revisions.revise_playbook(actor, service, content, reason, evidence)
+    def revise_playbook(
+        self, actor: str, service: str, op: str | None, reason: str, evidence: Sequence[str], *, item: str | None = None, kind: str | None = None,
+        text: str | None = None, when: str | None = None, then: str | None = None, after: str | None = None, version: int | None = None,
+        acknowledged: str | None = None, content: str | None = None,
+    ) -> PlaybookChange:
+        return self._revisions.revise_playbook(
+            actor, service, op, reason, evidence, item=item, kind=kind, text=text, when=when, then=then, after=after, version=version,
+            acknowledged=acknowledged, content=content,
+        )
 
     def feedback(
         self, actor: str, task_id: str, verdict: str, note: str = "", *, source: str | None = None, criterion: Sequence[str] | None = None,

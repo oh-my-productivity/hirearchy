@@ -79,4 +79,4 @@ def test_the_flaky_service_commands_fail_a_definition_or_a_request_and_do_the_re
     with pytest.raises(OrgError, match="disk full"):
         commands.request("root", "s", {})
     with pytest.raises(OrgError):
-        commands.revise_playbook("root", "s", "c", "r", [])  # the others are the inner ones: the recording ones refuse what an application never does
+        commands.revise_playbook("root", "s", "first", "r", [], text="c")  # the others are the inner ones: the recording ones refuse what an application never does

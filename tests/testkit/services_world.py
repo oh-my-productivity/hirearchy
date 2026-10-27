@@ -97,6 +97,13 @@ def amend_legacy(org, add_acceptance=(), remove_acceptance=(), owner="ceo", name
     write_version(org, current["version"] + 1, acceptance, owner=owner, name=name)
 
 
+def legacy_playbook(org, body="Steps.", version=1, owner="ceo", name="weekly-brief", by="ceo", reason="the owner's version"):
+    """A free-text playbook as an owner wrote it before Phase 1 (no `items_max`), written straight into the store: the test needs a playbook version
+    after a verdict or a rework, where `op="first"` is refused (PB-FIRST-LATE). The first change through `revise_playbook` migrates it to items."""
+    meta = {"service": name, "version": version, "revised": org.runtime.clock.now().isoformat(timespec="microseconds"), "by": by, "reason": reason}
+    org.runtime.service_store.write_playbook(owner, name, version, meta, body, version - 1 or None)
+
+
 def call(server, tool, **args):
     result = asyncio.run(server.call_tool(tool, args))
     blocks = result[0] if isinstance(result, tuple) else result

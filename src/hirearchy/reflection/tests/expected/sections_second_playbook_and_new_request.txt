@@ -5,10 +5,10 @@ The contract (SERVICE.md) is your parent's; the playbook (PLAYBOOK.md) is yours.
 
 # Playbook: weekly-brief (v2, yours to improve)
 > ## Steps
-> 1. Search.
-> 2. Write.
-> 3. Check every claim.
-> 4. More.
+> 1. [P1] Search.
+> 2. [P2] Write.
+> 3. [P3] Check every claim.
+> 4. [P4] More. (WHY R1)
 
 # Reflect before you start: weekly-brief
 Your playbook is how your team delivers this service; you own it and improve it. Evidence since v2:

@@ -55,7 +55,7 @@ def test_a_single_request_case_has_no_case_total_line(svc):
 # ---------------------------------------------------------------------------- progress and status
 def test_progress_tags_service_tasks_and_notes_missing_feedback(svc):
     org = svc
-    org.revise_playbook("ceo", "weekly-brief", "Steps.", "r", [])
+    org.revise_playbook("ceo", "weekly-brief", "first", "r", [], text="Steps.")
     task = request(org, "ai")
     (line,) = progress(org).splitlines()
     assert line.startswith('"weekly-brief: ai" [service weekly-brief v1]: working.') and "no feedback yet" not in line
@@ -72,7 +72,7 @@ def test_progress_tags_service_tasks_and_notes_missing_feedback(svc):
 
 def test_playbook_revisions_are_quiet_notices_for_root(svc):
     org = svc
-    org.revise_playbook("ceo", "weekly-brief", "Steps.", "first", [])
+    org.revise_playbook("ceo", "weekly-brief", "first", "first", [], text="Steps.")
     assert org.messages(ROOT, "inbox") and "Needs you" not in progress(org)
     org.notify(ROOT, "loud", "Needs a decision")
     assert "Needs you: runtime notice" in progress(org)

@@ -197,7 +197,7 @@ CASES: list[Case | FunctionCase] = [
     Case("retire_service", "services", "service_commands", "retire_service", args("root", "ceo", "svc", "gone")),
     Case("request", "services", "service_commands", "request", args(
         "root", "svc", {"x": "1"}, title="T", note="n", extra_acceptance=["e"], budget=2, revises="r1")),
-    Case("revise_playbook", "services", "service_commands", "revise_playbook", args("ceo", "svc", "content", "why", ["R1"])),
+    Case("revise_playbook", "services", "service_commands", "revise_playbook", args("ceo", "svc", "add", "why", ["R1"], kind="step", text="content")),
     Case("feedback", "services", "service_commands", "feedback", args("root", "t1", "accept", "good")),
     # overview
     Case("tree", "overview", "org_tree", "tree"),

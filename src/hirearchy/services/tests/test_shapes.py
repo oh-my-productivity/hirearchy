@@ -28,7 +28,7 @@ from hirearchy.services._feedback import RuleClientFeedback
 from hirearchy.services._hints import ServiceReportHints
 from hirearchy.services._normalizer import TextContractNormalizer
 from hirearchy.services._places import OrgServicePlaces
-from hirearchy.services._playbook import RulePlaybookReviser
+from hirearchy.services._ops import RuleItemReviser
 from hirearchy.services._protocols import (
     ClientFeedback,
     ContractAmendment,
@@ -62,7 +62,7 @@ def test_the_real_classes_are_known_by_their_interfaces() -> None:
 def test_the_parts_of_the_commands_are_known_by_their_interfaces() -> None:
     assert issubclass(RuleContractDefiner, ContractDefinitions)
     assert issubclass(RuleServiceRetirement, ServiceRetirement)
-    assert issubclass(RulePlaybookReviser, PlaybookRevisions)
+    assert issubclass(RuleItemReviser, PlaybookRevisions)
     assert issubclass(RuleServiceRequester, ServiceRequests)
     assert issubclass(RuleClientFeedback, ClientFeedback)
 

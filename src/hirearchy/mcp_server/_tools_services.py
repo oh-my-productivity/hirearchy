@@ -8,9 +8,9 @@ from typing import TYPE_CHECKING
 
 from ..agents import AgentDirectory, CharterReader
 from ..budget import BudgetQuery
-from ..kernel import ROOT, Message, OrgError, Provider, parent
+from ..kernel import ROOT, Message, OrgError, Provider
 from ..reflection import ServiceReports, ServiceSteps
-from ..services import BASE_HEADING, ServiceCatalog, ServiceCommands
+from ..services import BASE_HEADING, ServiceCatalog, ServiceCommands, playbook_reply
 from ._ports import ServiceRoles, SetupMode, ToolGroup
 
 if TYPE_CHECKING:
@@ -306,25 +306,43 @@ class ServiceTools(ToolGroup):
 
     def _register_owner_tools(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
-        def revise_playbook(service: str, content: str, reason: str, evidence: list[str]) -> str:
-            """Write the next version of the playbook of a service you offer: how your team delivers it.
+        def revise_playbook(
+            service: str,
+            reason: str,
+            op: str | None = None,
+            evidence: list[str] | None = None,
+            item: str | None = None,
+            kind: str | None = None,
+            text: str | None = None,
+            when: str | None = None,
+            then: str | None = None,
+            after: str | None = None,
+            version: int | None = None,
+            acknowledged: str | None = None,
+            content: str | None = None,
+        ) -> str:
+            """Change ONE item of the playbook of a service you offer, per call: how your team delivers it.
 
-        Only the owner can; refused when the contract is locked. content: the WHOLE new playbook in markdown (steps: who
-        does what, in which order, which check; budget plan; pitfalls), at most playbook_max_words (default 1000) words,
-        and different from the current one. reason: 1-400 characters naming the cases it rests on. evidence (required):
-        the ids it rests on, from the regression list and the digest in your prompt: "R<k>" (a rejection by the client),
-        "C<k>" (a contract criterion), verdict ids, case ids. It is admitted only when the same criterion or regression
-        assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the
-        contract by an amendment the client confirmed (your Reflect section and the amendment note name them); line by
-        line: under the first rule every line you add or change carries the id it rests on ("[C6]"), under the second it
-        is only that criterion's words ("- C<k>: <its text>"); a link note id counts as its criterion; your lessons,
-        relayed verdicts and an agent client's verdicts are not evidence. Pass evidence=[] only for the first playbook
-        (the steps your team followed, nothing more), or to restore unchanged a version your parent wrote. A refusal
-        writes nothing and gives you a question to send your parent once; do not wait for the answer (it reaches you as
-        a contract change or a criterion link). The old version is archived; your parent is told quietly. The playbook
-        may raise the bar, never lower it: the acceptance criteria come from the contract. Returns the new version,
-        which applies from now on.
+        Only the owner can; refused when the contract is locked. op: "first" (text: the whole first version in markdown, only before any
+        verdict or rework), "add" (kind "step" with text and optional after, or kind "rule" with then, optional when and optional after),
+        "edit" (item and its new text; a rule: then and/or when), "retire" (item), "restore" (item, optional version: an earlier text comes
+        back) or "move" (item, after: an item of its section, or "start"). Your playbook's items and their ids are in your prompt under
+        "# Playbook"; the first change of a free-text playbook makes its lines items (P1, P2, ...) without changing a word. content (the
+        whole text) is no longer taken.
+        reason: 1-400 characters naming the cases it rests on. evidence: the ids it rests on, from the regression list and the digest in
+        your prompt: "R<k>" (a rejection by the client), "C<k>" (a contract criterion), verdict ids, case ids. An add, an edit that changes
+        words and a restore of a text your parent did not write are admitted only when the same criterion or regression assertion failed in 2
+        different cases the client rejected (any words), or when the item is only the own words of a criterion your parent added to the
+        contract by an amendment the client confirmed (your Reflect section and the amendment note name them); a link note id counts as its
+        criterion; your lessons, relayed verdicts and an agent client's verdicts are not evidence. A change touching more than about 30% of
+        the playbook's words, or taking it over playbook_max_words (default 1000), is refused. A move, a retire, a formatting-only edit and
+        "first" need no evidence (pass []). acknowledged: ignored unless a refusal asks for it.
+        A refusal writes nothing and gives you a question to send your parent once; do not wait for the answer. The old version is
+        archived; your parent is told quietly. The playbook may raise the bar, never lower it: the acceptance criteria come from the
+        contract. Returns what was written.
         """
-            version = self._commands().revise_playbook(me, service, content, reason, evidence)
-            client = parent(me)
-            return f"playbook of `{service}` is now v{version}; {client} was told without being woken"
+            change = self._commands().revise_playbook(
+                me, service, op, reason, evidence or [], item=item, kind=kind, text=text, when=when, then=then, after=after, version=version,
+                acknowledged=acknowledged, content=content,
+            )
+            return playbook_reply(service, change)

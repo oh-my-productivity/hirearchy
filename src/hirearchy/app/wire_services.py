@@ -20,8 +20,8 @@ from ..services._define import RuleContractDefiner
 from ..services._feedback import RuleClientFeedback, SenderLinkNotes
 from ..services._hints import ServiceReportHints
 from ..services._normalizer import TextContractNormalizer
+from ..services._ops import RuleItemReviser
 from ..services._places import OrgServicePlaces
-from ..services._playbook import RulePlaybookReviser
 from ..services._request import RuleServiceRequester, TextRequestBodies
 from ..services._retire import RuleServiceRetirement
 from ..services._rework import ServiceReworkContext
@@ -58,7 +58,7 @@ def _commands(b: Builder) -> ServiceCommands:
             b.get(ServiceEvidence), SenderLinkNotes(sender), RecordedContinuations(places, b.get(RetiredArchive), mail, OsServiceFiles()), restorer,
         ),
         RuleServiceRetirement(agents, catalog, store, owners, delivery, clock, events, b.get(ServiceEvidence)),
-        RulePlaybookReviser(agents, catalog, texts, playbooks, delivery, b.get(ServiceEvidence)),
+        RuleItemReviser(agents, catalog, texts, playbooks, delivery, b.get(ServiceEvidence), mail),
         RuleServiceRequester(
             agents, catalog, mail, TextRequestBodies(), sender, b.get(JudgedVersions), b.get(CaseAllowance), b.get(ServiceEvidence), store,
         ),

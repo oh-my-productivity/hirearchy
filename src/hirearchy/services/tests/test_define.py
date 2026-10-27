@@ -190,7 +190,7 @@ def test_the_runtime_owns_the_services_directory(svc):
 
 def test_services_do_not_confuse_retire_or_run_counting(svc):
     org = svc
-    org.revise_playbook("ceo", "weekly-brief", "Steps.", "r", [])
+    org.revise_playbook("ceo", "weekly-brief", "first", "r", [], text="Steps.")
     org.delegate(ROOT, "ceo", "Plain", "g", "c", budget=2)
     work(org, "ceo")
     assert org.agents() == ["ceo", ENG] and org.runs_used("ceo") == 1
@@ -204,7 +204,7 @@ def test_a_service_retired_with_its_owner_continues_when_defined_again(svc):
     """The sibling of the one above for a service with a request that has a result: the owner is hired again and the definition continues the service
     it left in the retired tree (design 5.10), contract and playbook included."""
     org = svc
-    org.revise_playbook("ceo", "weekly-brief", "Steps.", "r", [])
+    org.revise_playbook("ceo", "weekly-brief", "first", "r", [], text="Steps.")
     task = request(org)
     deliver(org, "ceo", task)
     org.feedback(ROOT, task.id, "accept", "fine", source="human")

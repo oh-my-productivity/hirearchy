@@ -22,20 +22,18 @@ from hirearchy.services import Admission, ServiceEvidence
 
 # The suite that every ``ServiceEvidence`` passes: the same functions, run against this package's implementation.
 from hirearchy.services.tests.test_contract_service_evidence import (  # noqa: F401  (imported to be collected here)
-    test_admit_accepts_lines,
     test_admit_item_returns_rule_b_or_c_with_a_why_or_raises_an_org_error,
-    test_admit_returns_rule_b_or_c_or_raises_an_org_error,
-    test_an_exempt_admit_returns_the_exemption_with_normalized_ids,
+    test_admit_item_returns_the_ids_normalized,
+    test_admit_item_with_no_evidence_is_admitted_or_refused_never_exempt,
     test_a_basis_rejection_carries_its_case,
     test_amendment_basis_of_a_service_without_cases_is_empty,
-    test_an_exempt_admit_with_no_evidence_returns_the_exemption,
     test_links_accepts_none_alone,
     test_links_returns_normalized_ids_or_raises,
     test_watch_gives_one_item_watch_per_item,
     test_watch_of_a_service_without_a_playbook_is_empty,
 )
 
-from ._support import SERVICE, amend_legacy, ask, define, deliver, nested, note_on, populated, rate, revise, rework
+from ._support import SERVICE, amend_legacy, ask, define, deliver, legacy_playbook, nested, note_on, populated, rate, rework
 
 CASES = "cases the client rejected"
 
@@ -72,12 +70,24 @@ def amend(w: ReflectionWorld, **over: Any) -> None:
     amend_legacy(w, **over)
 
 
+def admit(
+    evidence: ServiceEvidence, ids: list[str], text: str = "Anything the team writes.", *, owner: str = "ceo", service: str = SERVICE, reason: str = "why",
+    kind: str = "step", when: str | None = None,
+) -> Admission:
+    """One item (design 6.2) offered to the gate: a step with these words, unless ``kind`` and ``when`` say a rule."""
+    return evidence.admit_item(owner, service, ids, reason, kind=kind, text=text, when=when)
+
+
 def refusal(
-    evidence: ServiceEvidence, ids: list[str], reason: str = "why", owner: str = "ceo", service: str = SERVICE, lines: Sequence[str] = (),
+    evidence: ServiceEvidence, ids: list[str], reason: str = "why", owner: str = "ceo", service: str = SERVICE, text: str = "Anything the team writes.",
 ) -> str:
     with pytest.raises(OrgError) as e:
-        evidence.admit(owner, service, ids, reason, lines=lines)
+        admit(evidence, ids, text, owner=owner, service=service, reason=reason)
     return str(e.value)
+
+
+def triple(got: Admission) -> tuple[str, tuple[str, ...], str]:
+    return got.rule, got.evidence, got.detail
 
 
 # ------------------------------------------------------------------------------ G0 and G3
@@ -95,9 +105,9 @@ def test_g0_names_every_kind_of_unknown_id_and_lists_the_valid_ones(w: Reflectio
     )
 
 
-def test_g0_comes_before_an_exemption(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+def test_g0_names_the_unknown_id_before_it_judges_the_item(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     with pytest.raises(OrgError, match="^unknown evidence for `weekly-brief`: R4"):
-        evidence.admit("ceo", SERVICE, ["R4"], "why", exempt="first")
+        admit(evidence, ["R4"])
 
 
 def test_g3_refuses_any_revision_for_an_agent_client(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
@@ -110,9 +120,8 @@ def test_g3_refuses_any_revision_for_an_agent_client(w: ReflectionWorld, evidenc
         "playbook must change, send ceo (`send`) what you would change and why."
     )
     assert refusal(cited, [], owner="ceo/eng", service="inner") == message
-    assert cited.admit("ceo/eng", "inner", ["C1"], "why", exempt="restore").rule == "restore"
     with pytest.raises(OrgError, match="^unknown evidence for `inner`: R1"):
-        cited.admit("ceo/eng", "inner", ["R1"], "why")
+        admit(cited, ["R1"], owner="ceo/eng", service="inner")
 
 
 # ------------------------------------------------------------------------------ rule (b)
@@ -122,28 +131,28 @@ def test_b_admits_two_human_rejections_in_two_cases_linked_to_one_criterion(w: R
     first, _ = rejected(w, "No source.", criterion="C2")
     second, _ = rejected(w, "Still no source.", topic="b", criterion="C2")
     expected = f"C2 failed in 2 {CASES}: {first.id}, {second.id}"
-    assert evidence.admit("ceo", SERVICE, ["c2"], "why") == Admission("b", ("C2",), expected)
-    assert evidence.admit("ceo", SERVICE, ["R1", "R2"], "why") == Admission("b", ("R1", "R2"), expected)
-    assert evidence.admit("ceo", SERVICE, ["R2"], "why") == Admission("b", ("R2",), expected)
+    assert triple(admit(evidence, ["c2"])) == ("b", ("C2",), expected)
+    assert triple(admit(evidence, ["R1", "R2"])) == ("b", ("R1", "R2"), expected)
+    assert triple(admit(evidence, ["R2"])) == ("b", ("R2",), expected)
 
 
 def test_b_admits_through_a_link_note_the_client_gave_later(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     first, no = rejected(w, "No source.")
     note_on(w, first, reply_to=no.id, criterion="C2", source="human")
     second, _ = rejected(w, "Still none.", topic="b", criterion="C2")
-    assert evidence.admit("ceo", SERVICE, ["C2"], "why").detail == f"C2 failed in 2 {CASES}: {first.id}, {second.id}"
+    assert admit(evidence, ["C2"]).detail == f"C2 failed in 2 {CASES}: {first.id}, {second.id}"
 
 
 def test_b_admits_through_the_same_as_rj(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     first, _ = rejected(w, "No source.")  # no link of its own
     second, _ = rejected(w, "Same as before.", topic="b", criterion="R1")
-    assert evidence.admit("ceo", SERVICE, ["R1"], "why") == Admission("b", ("R1",), f"R1 failed in 2 {CASES}: {first.id}, {second.id}")
+    assert triple(admit(evidence, ["R1"])) == ("b", ("R1",), f"R1 failed in 2 {CASES}: {first.id}, {second.id}")
 
 
 def test_b_resolves_the_same_as_rj_to_the_criterion_of_rj(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     first, _ = rejected(w, "No source.", criterion="C2")
     second, _ = rejected(w, "Same as before.", topic="b", criterion="R1")
-    assert evidence.admit("ceo", SERVICE, ["C2"], "why") == Admission("b", ("C2",), f"C2 failed in 2 {CASES}: {first.id}, {second.id}")
+    assert triple(admit(evidence, ["C2"])) == ("b", ("C2",), f"C2 failed in 2 {CASES}: {first.id}, {second.id}")
 
 
 def test_two_rejections_in_one_case_are_one_case_g2(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
@@ -222,25 +231,24 @@ def test_an_unconfirmed_link_weighs_nothing(w: ReflectionWorld, evidence: Servic
 def test_c_admits_a_cited_amended_criterion_the_client_confirmed(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     amend(w, add_acceptance=["Names the week it covers"])
     rejected(w, "No week.", criterion="C3")  # the user's yes to the new criterion: a confirms link
-    assert evidence.admit("ceo", SERVICE, ["c3"], "why") == Admission(
-        "c", ("C3",), "cites C3, which root added to the contract (v2) and the client confirmed",
-    )
+    assert triple(admit(evidence, ["c3"], WEEK)) == ("c", ("C3",), "cites C3, which root added to the contract (v2) and the client confirmed")
     amend(w, add_acceptance=["Ends with one open question"])
     rejected(w, "No question.", topic="b", criterion="C4")
-    assert evidence.admit("ceo", SERVICE, ["C3", "C4"], "why").detail == (
-        "cites C3, C4, which root added to the contract (v2, v3) and the client confirmed"
+    assert admit(evidence, ["C3", "C4"], WEEK).detail == "cites C3, which root added to the contract (v2) and the client confirmed"  # the item is C3's words
+    assert admit(evidence, ["C3", "C4"], "Ends with one open question").detail == (
+        "cites C4, which root added to the contract (v3) and the client confirmed"
     )
-    assert evidence.admit("ceo", SERVICE, ["C1", "C4"], "why").detail == "cites C4, which root added to the contract (v3) and the client confirmed"
+    assert admit(evidence, ["C1", "C4"], "Ends with one open question").detail == "cites C4, which root added to the contract (v3) and the client confirmed"
 
 
 def test_rule_c_admits_a_confirmed_amendment(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     amend(w, add_acceptance=["Names the week it covers", "Ends with one open question"])  # C3, C4
     rejected(w, "No week.", criterion="C3")
-    assert evidence.admit("ceo", SERVICE, ["C3"], "why").detail == "cites C3, which root added to the contract (v2) and the client confirmed"
+    assert admit(evidence, ["C3"], WEEK).detail == "cites C3, which root added to the contract (v2) and the client confirmed"
     assert "C4 was added to the contract by an amendment (v2), but the client's yes to it is not recorded (not confirmed)." in refusal(
         evidence, ["C4"],
     )  # only C3 is confirmed: citing C4 alone gets no admission
-    assert evidence.admit("ceo", SERVICE, ["C3", "C4"], "why").detail == "cites C3, which root added to the contract (v2) and the client confirmed"
+    assert admit(evidence, ["C3", "C4"], WEEK).detail == "cites C3, which root added to the contract (v2) and the client confirmed"
 
 
 def test_rule_c_refuses_an_amendment_without_a_confirmation(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
@@ -267,9 +275,7 @@ def test_a_user_initiated_amendment_is_never_rule_c_eligible(w: ReflectionWorld,
 def test_c_admits_an_amended_criterion_reached_through_an_assertion(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     amend(w, add_acceptance=["Names the week it covers"])
     rejected(w, "No week named.", criterion="C3")
-    assert evidence.admit("ceo", SERVICE, ["R1"], "why") == Admission(
-        "c", ("R1",), "cites C3, which root added to the contract (v2) and the client confirmed",
-    )
+    assert triple(admit(evidence, ["R1"], WEEK)) == ("c", ("R1",), "cites C3, which root added to the contract (v2) and the client confirmed")
 
 
 def test_c_refuses_a_v1_criterion_with_its_note(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
@@ -307,9 +313,9 @@ def link_note(w: ReflectionWorld, source: str, criterion: str = "C3") -> tuple[M
 def test_a_human_link_note_id_is_evidence_for_the_criteria_it_names(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     amend(w, add_acceptance=["Names the week it covers"])  # C3
     no, link = link_note(w, "human")
-    admitted = evidence.admit("ceo", SERVICE, [link.id], "why")
-    assert admitted == Admission("c", (link.id,), "cites C3, which root added to the contract (v2) and the client confirmed")
-    assert evidence.admit("ceo", SERVICE, [no.id], "why").rule == "c"  # the rejection itself resolves through its human link as before
+    admitted = admit(evidence, [link.id], WEEK)
+    assert triple(admitted) == ("c", (link.id,), "cites C3, which root added to the contract (v2) and the client confirmed")
+    assert admit(evidence, [no.id], WEEK).rule == "c"  # the rejection itself resolves through its human link as before
 
 
 def test_a_relayed_link_note_id_weighs_nothing_and_is_noted(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
@@ -326,10 +332,9 @@ def test_an_unknown_id_is_still_unknown_evidence(w: ReflectionWorld, evidence: S
     assert refusal(evidence, [other]).startswith(f"unknown evidence for `weekly-brief`: {other}. Evidence is a criterion (")
 
 
-# ------------------------------------------------------------------------------ line by line (P1, 4.1)
+# ------------------------------------------------------------------------------ item by item (design 5.4: P1's line stage, folded in)
 
 WEEK = "Names the week it covers"
-REFUSED_HEAD = "refused: every line a revision adds or changes must rest on the evidence it cites, and {n} line(s) do not:\n"
 
 
 def confirmed_c3(w: ReflectionWorld) -> None:
@@ -345,110 +350,45 @@ def failed_twice(w: ReflectionWorld, criterion: str = "C2") -> tuple[Message, Me
     return first, second
 
 
-def test_rule_c_admits_only_the_cited_criterions_words_one_line_each(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+def test_rule_c_admits_only_the_cited_criterions_words(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     confirmed_c3(w)
-    lines = [f"- C3: {WEEK}", f"2. C3: {WEEK}", f"{WEEK} (C3)"]
     detail = "cites C3, which root added to the contract (v2) and the client confirmed"
-    got = evidence.admit("ceo", SERVICE, ["C3"], "why", lines=lines)
-    assert got == Admission("c", ("C3",), detail, lines=tuple(("C3", line) for line in lines))
+    for words in (WEEK, f"C3: {WEEK}", f"{WEEK} (C3)", f"- C3: {WEEK}"):
+        assert triple(admit(evidence, ["C3"], words)) == ("c", ("C3",), detail)  # with or without its id: the item's WHY names it anyway
 
 
 def test_rule_c_refuses_an_elaboration_of_the_cited_criterion(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     confirmed_c3(w)
-    elaborated = f"- C3: {WEEK} and the year it falls in"
-    message = refusal(evidence, ["C3"], lines=[f"- C3: {WEEK}", elaborated])
-    assert message.startswith(REFUSED_HEAD.format(n=1) + f'- "{elaborated}"\n')
-    assert f"these lines are not C3's words. Write it as \"- C3: {WEEK}\". " in message
-    assert "Rule (b)" not in message  # nothing is tagged-eligible: no (b) evidence
+    message = refusal(evidence, ["C3"], text=f"{WEEK}, in ISO format")
+    assert message.startswith("refused: C3 is confirmed by the client, so an item citing it may be only its own words: this item is not.")
+    assert f'Write it as a step with text "{WEEK}" (or a rule with then "{WEEK}" and no when) to add C3.' in message
 
 
-def test_a_criterion_with_an_empty_key_admits_no_c_line(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    amend(w, add_acceptance=["???"])  # C3: no letter or digit, so a bare "C3" would be its "words"
+def test_a_criterion_with_an_empty_key_admits_no_c_item(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    amend(w, add_acceptance=["???"])  # C3: no letter or digit, so its key is empty
     rejected(w, "No marks.", criterion="C3")
-    message = refusal(evidence, ["C3"], lines=["C3", "- C3: ???", "???"])
-    assert message.startswith(REFUSED_HEAD.format(n=3) + '- "C3"\n- "- C3: ???"\n- "???"\n')
+    for words in ("C3", "???", "- C3: ???"):
+        message = refusal(evidence, ["C3"], text=words)
+        assert message.startswith("refused: C3 is confirmed by the client, so an item citing it may be only its own words: this item is not.")
+        assert "Write it as a step" not in message  # there is no way to write it: an empty key is no words
 
 
-def test_rule_b_admits_a_line_tagged_with_a_qualifying_id_and_refuses_an_untagged_one(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    first, second = failed_twice(w)
-    tagged = "Cite a URL for every claim [C2]"
-    detail = f"C2 failed in 2 {CASES}: {first.id}, {second.id}"
-    assert evidence.admit("ceo", SERVICE, ["C2"], "why", lines=[tagged]) == Admission("b", ("C2",), detail, lines=(("C2", tagged),))
-    message = refusal(evidence, ["C2"], lines=[tagged, "Cite a URL for every claim", "Cite a URL [C20]"])
-    assert message.startswith(REFUSED_HEAD.format(n=2) + '- "Cite a URL for every claim"\n- "Cite a URL [C20]"\n')
-    assert 'Rule (b) admits a line that carries the id it rests on ("[C2]"): these lines carry none. ' in message
-    assert "Rule (c)" not in message
-
-
-def test_a_cited_assertion_tags_through_its_about(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    failed_twice(w)  # R1 and R2 are both about C2
-    by_assertion = "Cite a source [R2]"
-    by_criterion = "Cite a source [C2]"
-    got = evidence.admit("ceo", SERVICE, ["R2"], "why", lines=[by_assertion, by_criterion])
-    assert (got.rule, got.lines) == ("b", (("R2", by_assertion), ("C2", by_criterion)))
-
-
-def test_a_revision_that_only_removes_or_reorders_lines_is_admitted_as_today(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+def test_rule_b_admits_any_words_the_runtime_writes_the_why(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     failed_twice(w)
-    today = evidence.admit("ceo", SERVICE, ["C2"], "why")
-    assert today.rule == "b" and today.lines == ()
-    assert evidence.admit("ceo", SERVICE, ["C2"], "why", lines=[]) == today
+    got = admit(evidence, ["C2"], "Cite a URL for every claim")
+    assert got.rule == "b" and got.why == ("R1", "R2", "C2")  # no tag in the words: the WHY is the runtime's
 
 
-def test_exempt_revisions_ignore_lines(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    for exempt in ("first", "restore"):
-        assert evidence.admit("ceo", SERVICE, [], "why", exempt=exempt, lines=["anything at all"]) == Admission(exempt, (), "no evidence needed")
+def test_a_cited_assertion_reaches_its_about_in_the_why(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    failed_twice(w)
+    assert admit(evidence, ["R2"], "Cite a URL for every claim").why == ("R1", "R2", "C2")  # R2 is about C2: C2 qualifies, and so do both rejections
 
 
-def test_g1_and_g2_are_unchanged_when_nothing_admits(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    assert refusal(evidence, ["C1"], lines=["a line"]) == refusal(evidence, ["C1"])  # G1: no client evidence
-    task, _ = rejected(w, "Too long.", criterion="C2")
+def test_g1_and_g2_are_the_same_whatever_the_words(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
+    assert refusal(evidence, ["C1"], text="a line") == refusal(evidence, ["C1"])  # G1: no client evidence
+    rejected(w, "First words.", criterion="C2")
     one_case = refusal(evidence, ["R1"])
-    assert one_case.startswith("refused: the client rejected this in one case only (") and refusal(evidence, ["R1"], lines=["a line"]) == one_case
-
-
-def test_the_refusal_lists_at_most_ten_lines_then_and_k_more(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    confirmed_c3(w)
-    for n in (1, 10, 11):
-        lines = [f"Offending line number {i}" for i in range(n)]
-        message = refusal(evidence, ["C3"], lines=lines)
-        assert message.startswith(REFUSED_HEAD.format(n=n))
-        listed = [x for x in message.splitlines() if x.startswith('- "Offending line number')]
-        assert listed == [f'- "Offending line number {i}"' for i in range(min(n, 10))]
-        assert ("- and 1 more" in message) == (n == 11) and "- and 0 more" not in message and "- and 10 more" not in message
-
-
-def test_each_listed_line_is_clipped_to_600_characters(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    confirmed_c3(w)
-    long = " ".join(["word"] * 200)  # 799 characters
-    message = refusal(evidence, ["C3"], lines=[long])
-    assert f'- "{clip_line(long, 600)}"\n' in message and long not in message and len(clip_line(long, 600)) == 600
-
-
-def test_the_question_quotes_the_first_offending_line_clipped_to_160(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    confirmed_c3(w)
-    first = " ".join(["first"] * 80)
-    message = refusal(evidence, ["C3"], lines=[first, "Second offending line"])
-    assert f'"We would add to how we deliver weekly-brief: {clip_line(first, 160)}. Is that what you want from now on? ' in message
-    assert "Second offending line. Is that" not in message
-
-
-def test_the_refusal_text_is_lines_refused(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    confirmed_c3(w)
-    failed_twice(w)
-    message = refusal(evidence, ["C3", "C2"], lines=["Add a footer", "Cut the intro"])
-    assert message == (
-        "refused: every line a revision adds or changes must rest on the evidence it cites, and 2 line(s) do not:\n"
-        '- "Add a footer"\n'
-        '- "Cut the intro"\n'
-        "Rule (c) admits only the cited confirmed criterion's own words, one line each with its id: these lines are not C3's words. "
-        f'Write it as "- C3: {WEEK}". '
-        'Rule (b) admits a line that carries the id it rests on ("[C2]"): these lines carry none. '
-        "A change of punctuation, spacing, list numbering or markdown alone needs nothing. Nothing was written: revise again without these "
-        "lines, or send root (`send`) this question once: "
-        '"We would add to how we deliver weekly-brief: Add a footer. Is that what you want from now on? '
-        'If yes, please add it to the contract as a criterion."'
-    )
+    assert one_case.startswith("refused: the client rejected this in one case only (") and refusal(evidence, ["R1"], text="a line") == one_case
 
 
 # ------------------------------------------------------------------------------ criteria the client removed
@@ -466,7 +406,7 @@ def test_two_rejections_linked_only_to_a_removed_criterion_do_not_admit(w: Refle
     amend(w, add_acceptance=["Names the week it covers"])
     rejected(w, "No week.", criterion="C3")
     rejected(w, "Still no week.", topic="b", criterion="C3")
-    assert evidence.admit("ceo", SERVICE, ["C3"], "why").rule == "c"  # while the criterion is in the contract, the amendment admits it
+    assert admit(evidence, ["C3"], WEEK).rule == "c"  # while the criterion is in the contract, the amendment admits it
     amend(w, remove_acceptance=["Names the week it covers"])
     assert "C3 is no longer in the contract" in refusal(evidence, ["C3"])
     message = refusal(evidence, ["R1", "R2"])
@@ -480,17 +420,15 @@ def test_two_rejections_linked_only_to_a_removed_criterion_do_not_admit(w: Refle
 def test_a_cited_case_resolves_to_its_human_rejections(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     first, _ = rejected(w, "No source.", criterion="C2")
     second, _ = rejected(w, "Still none.", topic="b", criterion="C2")
-    assert evidence.admit("ceo", SERVICE, [first.id, second.id], "why") == Admission(
-        "b", (first.id, second.id), f"C2 failed in 2 {CASES}: {first.id}, {second.id}",
-    )
+    assert triple(admit(evidence, [first.id, second.id])) == ("b", (first.id, second.id), f"C2 failed in 2 {CASES}: {first.id}, {second.id}")
     again = rework(w, second)  # any task of the chain names the case
-    assert evidence.admit("ceo", SERVICE, [first.id, again.id], "why").rule == "b"
+    assert admit(evidence, [first.id, again.id]).rule == "b"
 
 
 def test_a_cited_verdict_id_resolves_to_its_assertion(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
     _, one = rejected(w, "No source.", criterion="C2")
     _, two = rejected(w, "Still none.", topic="b", criterion="C2")
-    assert evidence.admit("ceo", SERVICE, [one.id, two.id], "why").rule == "b"
+    assert admit(evidence, [one.id, two.id]).rule == "b"
 
 
 def test_a_case_without_a_rejection_is_a_g1_note(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
@@ -751,7 +689,7 @@ def test_watch_reads_the_contract_versions_through_the_store(w: ReflectionWorld,
 
 
 def test_watch_gives_one_item_watch_per_item_of_a_legacy_playbook(w: ReflectionWorld, evidence: ServiceEvidence) -> None:
-    revise(w)  # the free text of three steps: it reads as it would migrate, every item kept
+    legacy_playbook(w)  # the free text of three steps: it reads as it would migrate, every item kept
     found = evidence.watch("ceo", SERVICE)
     assert [(i.id, i.state) for i in found] == [("P1", "kept"), ("P2", "kept"), ("P3", "kept")]
 

@@ -20,6 +20,8 @@ from testkit.e4_replay import EV, EV3, ReplayIds, delegation, evidence, lena_lin
 from testkit.services_world import call, contract_meta, fails, playbook_meta
 
 from hirearchy.core import ROOT, Org
+from hirearchy.kernel import strip_markers
+from hirearchy.services import changed_lines
 
 S1R = EV / "s1r"
 SERVICE = "weekly-memo"
@@ -32,6 +34,17 @@ RESULT_FA63 = "s1r/msgs/read/20261022T192346320735-lead-fa63.md"  # delivered 11
 MEMO_1 = "lead/writer/work/memo-2026-10-05.md"
 MEMO_2 = "lead/writer/work/memo-2026-10-12.md"
 REVIEW_2 = "lead/checker/work/review-memo-2026-10-12.md"
+
+
+def offered(w, v1_body: str, v2_body: str, evidence_ids: list[str], service: str = SERVICE) -> dict[str, str]:
+    """E4's whole-text v2 as the items it would be offered as now (design 5.4): every line it adds or changes, without its list marker, as one
+    ``add`` of a step citing ``evidence_ids``. Returns ``{the line: the refusal text}``; a line that is admitted fails the test (no E4 line is the
+    criterion's own words)."""
+    refusals: dict[str, str] = {}
+    for line in changed_lines(v1_body, v2_body):
+        words = strip_markers(line).strip()
+        refusals[line] = fails(w.lead, "revise_playbook", service=service, op="add", kind="step", text=words, reason="E4's v2", evidence=evidence_ids)
+    return refusals
 
 
 @pytest.fixture(autouse=True)
@@ -182,24 +195,31 @@ def test_s1r_playbook_v2_of_e4_is_refused_line_by_line(tmp_path):
     compliant_t5(w, task, n22)  # the end state of the first replay: C8 and C9 are the user's, confirmed by the product's link
     v2, v1 = evidence("s1r/playbook/PLAYBOOK.e9bd92f.md"), evidence("s1r/playbook/PLAYBOOK.4435fd0.md")
     cited = w.ids.map(v2[0]["evidence"])  # [C9, R1, the case ed94] in the ids of the replay
-    refused = fails(w.lead, "revise_playbook", service=SERVICE, content=v2[1], reason=v2[0]["reason"], evidence=cited)
-    assert "refused: every line a revision adds or changes must rest on the evidence it cites, and 3 line(s) do not:" in refused
+    refusals = offered(w, v1[1], v2[1], cited)
+    assert len(refusals) == 3  # the three lines of E4's v2 that P1 refused: none is left out
     for line in ("**C9 – Relative deadlines**:", "**C8 – Structure**:", "**Calendar arithmetic**:"):
-        assert f'- "- {line}' in refused or f'- "{line}' in refused
-    assert "- and " not in refused  # three lines: none is left out
-    # DR-42: R1 is about (C8, C9), so citing it brings C8 into the subjects; none of the three lines is either criterion's own words
-    assert "these lines are not C8's or C9's words" in refused
-    assert 'Write it as "- C8: The memo\'s very first line' in refused and 'Write it as "- C9: Every Due value is an ISO date' in refused
+        assert any(line in changed and strip_markers(changed).strip()[:150] in refused for changed, refused in refusals.items()), line
+    # DR-42: R1 is about (C8, C9), so citing it brings C8 into the subjects; none of the three lines is either criterion's own words (PB-C-WORDS)
+    for refused in refusals.values():
+        assert "refused: C8, C9 are confirmed by the client, so an item citing them may be only their own words: this item is not." in refused
+        assert 'to add C8.' in refused and 'to add C9.' in refused
+    for c in (c for c in w.org.runtime.service_catalog.criteria("lead", SERVICE) if c.id in ("C8", "C9")):  # one sentence per id, in id order
+        sentence = (
+            f'Write it as a step with text "{c.text}" (or a rule with then "{c.text}" and no when) to add {c.id}.' if len(c.text) <= 300
+            else f"Write it as a step whose text is {c.id}'s words exactly as `services` lists them (or a rule with those words as then and no when) to add {c.id}."
+        )
+        assert all(sentence in refused for refused in refusals.values()), c.id
     assert playbook_meta(w.org, "lead", SERVICE)[0]["version"] == 1
     c9 = next(c.text for c in w.org.runtime.service_catalog.criteria("lead", SERVICE) if c.id == "C9")
     none_yet = "none yet: add them from lessons and feedback"
     assert none_yet in v1[1]
-    admitted = v1[1].replace(none_yet, f"- C9: {c9}").strip()  # v1 with the one line replaced by the criterion's own words
-    assert "now v2" in call(w.lead, "revise_playbook", service=SERVICE, content=admitted, reason="C9 confirmed by the client", evidence=["C9"])
+    placeholder = next(i.id for i in w.org.runtime.service_catalog.read_playbook("lead", SERVICE).items or () if i.text.startswith(none_yet))
+    reply = call(w.lead, "revise_playbook", service=SERVICE, op="edit", item=placeholder, text=c9, reason="C9 confirmed by the client", evidence=["C9"])
+    assert "now v2" in reply  # the one line replaced by the criterion's own words
     meta, body = playbook_meta(w.org, "lead", SERVICE)
-    assert meta["version"] == 2 and meta["admitted"] == "c" and f"- C9: {c9}" in body
+    assert meta["version"] == 2 and meta["admitted"] == "c" and f"[{placeholder}] {c9}" in body
     note = next(m.body for m in w.org.received(ROOT) if "admitted:" in m.body)
-    assert f"[C9] - C9: {c9[:40]}" in note
+    assert "cites C9, which root added to the contract (v2) and the client confirmed" in note and c9[:40] not in note  # ids only for the human client (D12)
 
 
 # ------------------------------------------------------------------------------------------------------------------------ E3 T5
@@ -392,17 +412,20 @@ def test_s2r_the_wrong_rule_is_refused_and_the_human_rework_needs_a_base(tmp_pat
     assert (link.criterion, link.source) == ("C9", "human") and contract_meta(w.org, "lead", w.service)[0]["version"] == 2
     # (6) E4's playbook v2 rested on the wrong rule: it is refused line by line
     v2, v1 = evidence("s2r/playbook/PLAYBOOK.6b06123.md"), evidence("s2r/playbook/PLAYBOOK.2b6438a.md")
-    refused = fails(w.lead, "revise_playbook", service=w.service, content=v2[1], reason=v2[0]["reason"], evidence=["R1", "C9"])
-    assert "refused: every line a revision adds or changes must rest on the evidence it cites" in refused and "are not C9's words" in refused
-    assert "Flag any vague deadline as `none`" in refused and "Vague deadlines:" in refused
+    refusals = offered(w, v1[1], v2[1], ["R1", "C9"], service=w.service)
+    assert refusals and all("so an item citing it may be only its own words: this item is not." in r for r in refusals.values())  # PB-C-WORDS
+    for words in ("Flag any vague deadline as `none`", "Vague deadlines:"):
+        assert any(words in line and strip_markers(line).strip()[:150] in refused for line, refused in refusals.items()), words  # the wrong rule is refused
     assert playbook_meta(w.org, "lead", w.service)[0]["version"] == 1
     # (7) the criterion's own words, as one line with its id, are admitted
     c9 = next(c.text for c in w.org.runtime.service_catalog.criteria("lead", w.service) if c.id == "C9")
     none_yet = "none yet: add them from lessons and feedback"
-    assert "now v2" in call(w.lead, "revise_playbook", service=w.service, content=v1[1].strip().replace(none_yet, f"- C9: {c9}"), reason="C9 confirmed", evidence=["C9"])
+    placeholder = next(i.id for i in w.org.runtime.service_catalog.read_playbook("lead", w.service).items or () if i.text.startswith(none_yet))
+    assert "now v2" in call(w.lead, "revise_playbook", service=w.service, op="edit", item=placeholder, text=c9, reason="C9 confirmed", evidence=["C9"])
     meta, _ = playbook_meta(w.org, "lead", w.service)
     assert meta["version"] == 2 and meta["admitted"] == "c"
-    assert f"[C9] - C9: {c9[:40]}" in next(m.body for m in w.org.received(ROOT) if "admitted:" in m.body)
+    note = next(m.body for m in w.org.received(ROOT) if "admitted:" in m.body)
+    assert "cites C9, which root added to the contract" in note and c9[:40] not in note
 
 
 S3 = EV / "s3"
@@ -452,13 +475,14 @@ def test_s3_the_answered_amendment_is_admitted_and_only_its_words_enter_the_play
     assert (link.criterion, link.source) == ("C8", "human")
     # the lead's attempt 1: the link note's id is evidence (F-E4-7), and what it rests on is the criterion's own words, nothing else
     v2, v1 = evidence("s3/playbook/PLAYBOOK.dd2d1da.md"), evidence("s3/playbook/PLAYBOOK.f6d34a7.md")
-    refused = fails(w.lead, "revise_playbook", service=w.service, content=v2[1], reason=v2[0]["reason"], evidence=["C8", link.id, r88b2])
-    assert "unknown evidence" not in refused and "refused: every line a revision adds or changes must rest on the evidence it cites" in refused
+    refusals = offered(w, v1[1], v2[1], ["C8", link.id, r88b2], service=w.service)
+    assert refusals and all("unknown evidence" not in r and "so an item citing it may be only its own words: this item is not." in r for r in refusals.values())
     for rider in ("(d) a 'Next meeting' footer", "No other sections", "(C1\u2013C8) and the regression list verbatim", "<checker's task id>"):
-        assert rider in refused, rider
+        assert any(rider in line for line in refusals), rider  # the line that carries each rider was offered and refused
     assert playbook_meta(w.org, "lead", w.service)[0]["version"] == 1
     c8 = next(c.text for c in w.org.runtime.service_catalog.criteria("lead", w.service) if c.id == "C8")
     none_yet = "none yet: add them from lessons and feedback"
-    assert "now v2" in call(w.lead, "revise_playbook", service=w.service, content=v1[1].strip().replace(none_yet, f"- C8: {c8}"), reason="C8 confirmed", evidence=[link.id])
+    placeholder = next(i.id for i in w.org.runtime.service_catalog.read_playbook("lead", w.service).items or () if i.text.startswith(none_yet))
+    assert "now v2" in call(w.lead, "revise_playbook", service=w.service, op="edit", item=placeholder, text=c8, reason="C8 confirmed", evidence=[link.id])
     meta, _ = playbook_meta(w.org, "lead", w.service)
     assert meta["version"] == 2 and meta["admitted"] == "c"

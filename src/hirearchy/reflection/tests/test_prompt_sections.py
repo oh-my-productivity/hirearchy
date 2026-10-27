@@ -4,7 +4,7 @@
 import time
 
 from testkit.reach.hirearchy.core import ROOT
-from testkit.services_world import ENG, amend_legacy, confirmed_amendment, define, deliver, request_unheld, svc, work, write_version
+from testkit.services_world import ENG, amend_legacy, confirmed_amendment, define, deliver, legacy_playbook, request_unheld, svc, work, write_version
 from testkit.services_world import request_unheld as request  # a new request that clause 2 would hold: these tests are about other rules
 
 WEEKDAY = "weekly-brief"
@@ -88,7 +88,7 @@ def test_a_playbook_revised_after_the_rejection_leaves_no_reflect_section(svc):
     deliver(svc, "ceo", first)
     svc.feedback(ROOT, first.id, "reject", "Too long.")
     time.sleep(0.002)
-    svc.revise_playbook("ceo", WEEKDAY, "Steps.", "after the rejection", [])
+    legacy_playbook(svc, "Steps.", reason="after the rejection")  # after a verdict a free v1 is refused (PB-FIRST-LATE)
     svc.request(ROOT, WEEKDAY, {"topic": "ai"}, revises=first.id, budget=3)
     assert "# Reflect" not in svc.run_prompt("ceo", svc.begin_run("ceo"))
 
@@ -199,9 +199,9 @@ def test_the_reflect_section_comes_before_a_new_request_when_there_is_evidence(s
 
 def test_the_reflect_section_offers_restoring_an_older_version_from_v2_on(svc):
     org = svc
-    org.revise_playbook("ceo", "weekly-brief", "Steps one.", "first", [])
+    org.revise_playbook("ceo", "weekly-brief", "first", "first", [], text="Steps one.")
     c3 = confirmed_amendment(org, "Every claim names its source")  # the user's amendment and their yes: the evidence of v2
-    org.revise_playbook("ceo", "weekly-brief", "Steps one.\n- C3: Every claim names its source", "second", [c3])
+    org.revise_playbook("ceo", "weekly-brief", "add", "second", [c3], kind="step", text="Every claim names its source")
     time.sleep(0.002)
     first = request(org)
     deliver(org, "ceo", first)
@@ -220,7 +220,7 @@ def test_no_reflect_section_for_rework_old_evidence_or_a_locked_playbook_edit_st
     assert "# Reflect" not in prompt and "# Playbook: weekly-brief" in prompt
     org.end_run("ceo", ok=True)
     deliver(org, "ceo", rework)
-    org.revise_playbook("ceo", "weekly-brief", "Steps.", "after the rework", [])
+    legacy_playbook(org, "Steps.", reason="after the rework")  # after a rework a free v1 is refused (PB-FIRST-LATE)
     request(org)  # new request, but no evidence since v1
     assert "# Reflect" not in org.run_prompt("ceo", org.begin_run("ceo"))
 
@@ -380,9 +380,9 @@ def reflect_section_of(prompt, service):
 
 def test_the_restore_step_says_which_restore_needs_evidence(svc):
     org = svc
-    org.revise_playbook("ceo", "weekly-brief", "Steps one.", "first", evidence=[])
+    org.revise_playbook("ceo", "weekly-brief", "first", "first", [], text="Steps one.")
     c3 = confirmed_amendment(org, "Every claim names its source")
-    org.revise_playbook("ceo", "weekly-brief", "Steps one.\n- C3: Every claim names its source", "second", evidence=[c3])
+    org.revise_playbook("ceo", "weekly-brief", "add", "second", [c3], kind="step", text="Every claim names its source")
     time.sleep(0.002)
     first = request(org)
     deliver(org, "ceo", first)

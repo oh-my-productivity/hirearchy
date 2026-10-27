@@ -35,12 +35,21 @@ reason: 'Client rejected: too long.'
 evidence:
 - C1
 admitted: b
+item: P4
+items_max: 4
+rules: []
+why:
+  P4:
+  - R1
+  - R2
+  - C1
+op: add
 ---
 # Weekly brief
 1. [P1] Ask the researcher for sources on the topic.
 2. [P2] Have the writer draft at most 600 words.
 3. [P3] Have the fact-checker verify every claim before you report.
-4. Cut to 600 words before reporting [C1].
+4. [P4] Cut to 600 words before reporting. (WHY R1, R2; C1)
 
 ##### ceo/services/plain-brief/SERVICE.md
 ---

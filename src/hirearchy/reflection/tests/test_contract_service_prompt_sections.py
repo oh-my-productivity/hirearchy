@@ -12,7 +12,7 @@ from hirearchy.reflection.testing import IMPLEMENTATIONS, ReflectionWorld, fs_wo
 
 from . import _stories
 from ._golden import expected
-from ._support import SERVICE, STEPS, ask, define, deliver, implementations, populated, rate, revise
+from ._support import SERVICE, STEPS, ask, define, deliver, first_playbook, implementations, populated, rate
 
 
 @pytest.fixture(params=[fs_world, memory_world], ids=lambda f: f.__name__)
@@ -90,19 +90,19 @@ def test_a_rejection_of_another_owners_service_is_not_ours(w: ReflectionWorld) -
 def test_a_playbook_over_the_limit_is_cut_and_says_where_the_rest_is(w: ReflectionWorld) -> None:
     define(w)
     w.s.d.configure("---\nmission: test\nplaybook_max_words: 5000\n---\nrules\n")
-    revise(w, "## Steps\n" + "z" * (RENDER_BODY_CHARS + 100 - len("## Steps\n")), "long")
+    first_playbook(w, "## Steps\n" + "z" * (RENDER_BODY_CHARS + 100 - len("## Steps\n")), "long")
     ask(w)
     text = w.sections.prompt_sections("ceo", batch(w))
     assert text.rstrip().endswith(
-        '> [... playbook cut: 100 more characters. Read the rest with read(path="ceo/services/weekly-brief/PLAYBOOK.md").]'
+        '> [... playbook cut: 107 more characters. Read the rest with read(path="ceo/services/weekly-brief/PLAYBOOK.md").]'  # 100 and the item marker "- [P1] "
     )
 
 
 def test_the_headings_of_a_playbook_do_not_mix_with_those_of_the_prompt(w: ReflectionWorld) -> None:
     define(w)
-    revise(w, "# Title\n\n## Steps\n1. Go.\n", "headings")
+    first_playbook(w, "# Title\n\n## Steps\n1. Go.\n", "headings")
     ask(w)
-    assert "\n> # Title\n>\n> ## Steps\n> 1. Go.\n" in w.sections.prompt_sections("ceo", batch(w))
+    assert "\n> # Title\n>\n> ## Steps\n> 1. [P1] Go.\n" in w.sections.prompt_sections("ceo", batch(w))
 
 
 def test_the_longest_playbook_is_read_from_the_settings(w: ReflectionWorld) -> None:

@@ -12,50 +12,51 @@ from testkit.services_world import (  # noqa: F401  (svc is a fixture)
 )
 
 from hirearchy.kernel import ROOT, OrgError
+from hirearchy.services import playbook_reply
 
 SERVICE = "weekly-brief"
 STEPS = "## Steps\n1. Search.\n2. Write.\n3. Check every claim."
 CRITERION = "Every claim names its source"
 
 
-def revise(org, surface: str, content: str, evidence: list[str]) -> str:
-    """The lead's ``revise_playbook`` on ``surface``; returns the reply, or the refusal text."""
+def revise(org, surface: str, evidence: list[str], **item) -> str:
+    """The lead's ``revise_playbook`` of one item on ``surface`` (an ``add`` of ``item``); returns the reply, or the refusal text."""
     if surface == "mcp":
-        return call(build_server(org, "ceo"), "revise_playbook", service=SERVICE, content=content, reason="why", evidence=evidence)
-    return str(org.revise_playbook("ceo", SERVICE, content, "why", evidence))
+        return call(build_server(org, "ceo"), "revise_playbook", service=SERVICE, op="add", reason="why", evidence=evidence, **item)
+    return playbook_reply(SERVICE, org.revise_playbook("ceo", SERVICE, "add", "why", evidence, **item))
 
 
-def refused(org, surface: str, content: str, evidence: list[str]) -> str:
+def refused(org, surface: str, evidence: list[str], **item) -> str:
     """The refusal text of a ``revise_playbook`` that must be refused on ``surface`` (the CLI has no revise command)."""
     if surface == "mcp":
-        return fails(build_server(org, "ceo"), "revise_playbook", service=SERVICE, content=content, reason="why", evidence=evidence)
+        return fails(build_server(org, "ceo"), "revise_playbook", service=SERVICE, op="add", reason="why", evidence=evidence, **item)
     with pytest.raises(OrgError) as info:
-        org.revise_playbook("ceo", SERVICE, content, "why", evidence)
+        org.revise_playbook("ceo", SERVICE, "add", "why", evidence, **item)
     return str(info.value)
 
 
 @pytest.mark.parametrize("surface", ["mcp", "org"])
 def test_p1_refusal_on_every_surface(svc, surface):
-    """P1-REFUSED: a line that is neither the cited criterion's own words nor tagged is refused with the same text on both doors, and the playbook
-    stays at its version; the criterion's own words, as one line with its id, are admitted."""
-    svc.revise_playbook("ceo", SERVICE, STEPS, "first draft", [])
+    """PB-C-WORDS (P1-REFUSED's successor, design 5.4): an item that is not the cited confirmed criterion's own words is refused with the same text on
+    both doors, and the playbook stays at its version; the criterion's own words are admitted, as (c) with their WHY."""
+    svc.revise_playbook("ceo", SERVICE, "first", "first draft", [], text=STEPS)
     c3 = confirmed_amendment(svc, CRITERION)
-    offending = "4. Cite each source while drafting."
-    text = refused(svc, surface, STEPS + "\n" + offending, [c3])
+    offending = "Cite each source while drafting."
+    text = refused(svc, surface, [c3], kind="step", text=offending)
     assert c3 == "C3" and (
-        "refused: every line a revision adds or changes must rest on the evidence it cites, and 1 line(s) do not:\n"
-        f'- "{offending}"\n'
-        "Rule (c) admits only the cited confirmed criterion's own words, one line each with its id: these lines are not C3's words. "
-        f'Write it as "- C3: {CRITERION}". '
-        "A change of punctuation, spacing, list numbering or markdown alone needs nothing. Nothing was written: revise again without these "
-        "lines, or send root (`send`) this question once: "
+        "refused: C3 is confirmed by the client, so an item citing it may be only its own words: this item is not. "
+        f'Write it as a step with text "{CRITERION}" (or a rule with then "{CRITERION}" and no when) to add C3. '
+        "A different way of doing it needs a second case the client rejected on the same criterion (rule (b)). Nothing was written: change it "
+        "again with those words, or send root (`send`) this question once: "
         f'"We would add to how we deliver {SERVICE}: {offending}. Is that what you want from now on? '
         'If yes, please add it to the contract as a criterion."'
     ) in text
     assert playbook_meta(svc)[0]["version"] == 1
-    revise(svc, surface, STEPS + f"\n- C3: {CRITERION}", [c3])
+    reply = revise(svc, surface, [c3], kind="step", text=CRITERION)
     meta, body = playbook_meta(svc)
-    assert meta["version"] == 2 and meta["admitted"] == "c" and body.rstrip().endswith(f"- C3: {CRITERION}")
+    assert "added P4 (step), admitted (c) on R1, C3" in reply
+    assert meta["version"] == 2 and meta["admitted"] == "c" and meta["why"] == {"P4": ["R1", "C3"]}
+    assert body.rstrip().endswith(f"4. [P4] {CRITERION} (WHY R1; C3)")
 
 
 # ------------------------------------------------------------------------------------------------------------ P2: the answer path (plan 7.3, commit 11)

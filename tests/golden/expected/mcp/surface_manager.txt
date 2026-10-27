@@ -1009,27 +1009,149 @@ input: {
       "title": "Service",
       "type": "string"
     },
-    "content": {
-      "title": "Content",
-      "type": "string"
-    },
     "reason": {
       "title": "Reason",
       "type": "string"
     },
+    "op": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Op"
+    },
     "evidence": {
-      "items": {
-        "type": "string"
-      },
-      "title": "Evidence",
-      "type": "array"
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Evidence"
+    },
+    "item": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Item"
+    },
+    "kind": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Kind"
+    },
+    "text": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Text"
+    },
+    "when": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "When"
+    },
+    "then": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Then"
+    },
+    "after": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "After"
+    },
+    "version": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Version"
+    },
+    "acknowledged": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Acknowledged"
+    },
+    "content": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Content"
     }
   },
   "required": [
     "service",
-    "content",
-    "reason",
-    "evidence"
+    "reason"
   ],
   "title": "revise_playbookArguments",
   "type": "object"
@@ -1049,21 +1171,23 @@ output: {
 }
 other: {}
 description:
-Write the next version of the playbook of a service you offer: how your team delivers it.
+Change ONE item of the playbook of a service you offer, per call: how your team delivers it.
 
-        Only the owner can; refused when the contract is locked. content: the WHOLE new playbook in markdown (steps: who
-        does what, in which order, which check; budget plan; pitfalls), at most playbook_max_words (default 1000) words,
-        and different from the current one. reason: 1-400 characters naming the cases it rests on. evidence (required):
-        the ids it rests on, from the regression list and the digest in your prompt: "R<k>" (a rejection by the client),
-        "C<k>" (a contract criterion), verdict ids, case ids. It is admitted only when the same criterion or regression
-        assertion failed in 2 different cases the client rejected, or when it cites a criterion your parent added to the
-        contract by an amendment the client confirmed (your Reflect section and the amendment note name them); line by
-        line: under the first rule every line you add or change carries the id it rests on ("[C6]"), under the second it
-        is only that criterion's words ("- C<k>: <its text>"); a link note id counts as its criterion; your lessons,
-        relayed verdicts and an agent client's verdicts are not evidence. Pass evidence=[] only for the first playbook
-        (the steps your team followed, nothing more), or to restore unchanged a version your parent wrote. A refusal
-        writes nothing and gives you a question to send your parent once; do not wait for the answer (it reaches you as
-        a contract change or a criterion link). The old version is archived; your parent is told quietly. The playbook
-        may raise the bar, never lower it: the acceptance criteria come from the contract. Returns the new version,
-        which applies from now on.
+        Only the owner can; refused when the contract is locked. op: "first" (text: the whole first version in markdown, only before any
+        verdict or rework), "add" (kind "step" with text and optional after, or kind "rule" with then, optional when and optional after),
+        "edit" (item and its new text; a rule: then and/or when), "retire" (item), "restore" (item, optional version: an earlier text comes
+        back) or "move" (item, after: an item of its section, or "start"). Your playbook's items and their ids are in your prompt under
+        "# Playbook"; the first change of a free-text playbook makes its lines items (P1, P2, ...) without changing a word. content (the
+        whole text) is no longer taken.
+        reason: 1-400 characters naming the cases it rests on. evidence: the ids it rests on, from the regression list and the digest in
+        your prompt: "R<k>" (a rejection by the client), "C<k>" (a contract criterion), verdict ids, case ids. An add, an edit that changes
+        words and a restore of a text your parent did not write are admitted only when the same criterion or regression assertion failed in 2
+        different cases the client rejected (any words), or when the item is only the own words of a criterion your parent added to the
+        contract by an amendment the client confirmed (your Reflect section and the amendment note name them); a link note id counts as its
+        criterion; your lessons, relayed verdicts and an agent client's verdicts are not evidence. A change touching more than about 30% of
+        the playbook's words, or taking it over playbook_max_words (default 1000), is refused. A move, a retire, a formatting-only edit and
+        "first" need no evidence (pass []). acknowledged: ignored unless a refusal asks for it.
+        A refusal writes nothing and gives you a question to send your parent once; do not wait for the answer. The old version is
+        archived; your parent is told quietly. The playbook may raise the bar, never lower it: the acceptance criteria come from the
+        contract. Returns what was written.
         

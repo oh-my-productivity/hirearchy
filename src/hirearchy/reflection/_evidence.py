@@ -1,10 +1,10 @@
 """The evidence gate and the ids a verdict may name, judged from the cases of a service (``services``' ``ServiceEvidence`` port, implemented here).
 
 ``services`` cannot import ``reflection``, which derives the cases, so the gate behind ``revise_playbook`` lives here and ``app`` wires it into
-``services`` (the pattern of ``dispatch.ReworkContext``, which ``services`` implements). A revision is admitted by rule (b), the same criterion or
-regression assertion failed in two different cases the human client rejected, or by rule (c), it cites a criterion the human client added to the
-contract by an amendment and confirmed (a human ``confirms`` link names it: the user's recorded yes). Lessons, relayed verdicts and an agent
-client's verdicts weigh nothing.
+``services`` (the pattern of ``dispatch.ReworkContext``, which ``services`` implements). An item is admitted by rule (b), the same criterion or
+regression assertion failed in two different cases the human client rejected, or by rule (c), it is the own words of a criterion the human client
+added to the contract by an amendment and confirmed on a rejection of its own (a human ``confirms`` link names it: the user's recorded yes).
+Lessons, relayed verdicts and an agent client's verdicts weigh nothing.
 """
 
 from __future__ import annotations
@@ -16,8 +16,8 @@ from dataclasses import dataclass
 from ..kernel import ROOT, Message, OrgError, clip_line, link_ids, parent, verdict_tier
 from ..mail import MailboxReader
 from ..services import (
-    Admission, AmendmentBasis, Criterion, ItemWatch, Rejection, ServiceCatalog, ServiceEvidence, confirmed_amendments, contract_of, criterion_words,
-    item_words, line_key, normalize_evidence, normalize_links,
+    Admission, AmendmentBasis, Criterion, ItemWatch, Rejection, ServiceCatalog, ServiceEvidence, confirmed_amendments, contract_of, item_words,
+    line_key, normalize_evidence, normalize_links,
 )
 from ._ports import ContractVersions
 from ._steps import question_for
@@ -26,11 +26,8 @@ from .api import Assertion, Case, CaseHistory, Verdict, confirmed_criteria, deli
 
 REASON_CLIP = 200  # characters of the reason in the question of a refusal
 WORDS_CLIP = 300  # characters of the client's words in the question of a refusal
-EXEMPTION = "no evidence needed"
-LINES_LISTED = 10  # offending lines a refusal quotes
-LINE_CLIP = 600  # characters of one quoted line
 RULE_TEXT_CLIP = 300  # characters of a criterion's text in "Write it as ..."
-QUESTION_LINE_CLIP = 160  # characters of the first offending line in the question
+QUESTION_LINE_CLIP = 160  # characters of the item in the question
 PB_C_WORDS = (
     "refused: {ids} {be} confirmed by the client, so an item citing {them} may be only {their} own words: this item is not.{sentences} "
     "A different way of doing it needs a second case the client rejected on the same criterion (rule (b)). Nothing was written: change it again "
@@ -43,13 +40,6 @@ PB_C_WORDS_LONG = (
 )
 RELAYED_LINK = (
     "{id} was confirmed only by a link on a relayed rejection (the assistant's own reading): rule (c) needs a rejection of the client's own"
-)
-LINES_REFUSED = (
-    "refused: every line a revision adds or changes must rest on the evidence it cites, and {n} line(s) do not:\n"
-    "{listing}\n"
-    "{c_part}{b_part}A change of punctuation, spacing, list numbering or markdown alone needs nothing. Nothing was written: revise again "
-    "without these lines, or send {client} (`send`) this question once: "
-    '"We would add to how we deliver {service}: {first}. Is that what you want from now on? If yes, please add it to the contract as a criterion."'
 )
 
 
@@ -111,18 +101,6 @@ class CaseServiceEvidence(ServiceEvidence):
         contracts = [contract_of(owner, service, meta, body, None) for _, meta, body in self._versions.versions(owner, service, "SERVICE")]
         cases = self._history.chains(owner, service, since=contract.created, runs=False)
         return watch_states(playbooks, cases, results, self._catalog.criteria(owner, service), contracts)
-
-    def admit(
-        self, owner: str, service: str, evidence: Sequence[str], reason: str, *, exempt: str | None = None, lines: Sequence[str] = (),
-    ) -> Admission:
-        st = self._stage(owner, service, evidence)
-        if exempt:
-            return Admission(exempt, st.ids, EXEMPTION)
-        _human_client(service, st.client)
-        added, qualifying, cases_of = _judged(st)
-        if added or qualifying:
-            return self._admitted(service, st.client, st.ids, added, qualifying, {a.id: a for a in st.found}, lines, cases_of)
-        raise OrgError(_nothing_admits(service, st, reason, cases_of, st.notes))
 
     def admit_item(
         self, owner: str, service: str, evidence: Sequence[str], reason: str, *, kind: str, text: str, when: str | None,
@@ -228,33 +206,6 @@ class CaseServiceEvidence(ServiceEvidence):
             )
         return _Stage(ids, crit, cases, found, eligible, client, frozenset(subjects), frozenset(cited_cases), tuple(notes))
 
-    @staticmethod
-    def _admitted(
-        service: str, client: str, ids: tuple[str, ...], added: Sequence[Criterion], qualifying: Sequence[str], assertions: Mapping[str, Assertion],
-        lines: Sequence[str], cases_of: Callable[[str], list[str]],
-    ) -> Admission:
-        """The evidence stage found a rule; now every line the revision adds or changes must rest on it (4.1): under rule (c) it is the cited
-        criterion's own words with its id, under rule (b) it carries a qualifying id. Any other line refuses the whole revision."""
-        tags = [*qualifying, *(x for x in ids if x in assertions and not set(assertions[x].about).isdisjoint(qualifying) and x not in qualifying)]
-        admitted: list[tuple[str, str]] = []
-        offending: list[str] = []
-        tagged = False  # some admitted line rests on rule (b)
-        for line in lines:
-            words, tag = criterion_words(line, added), _tag_of(line, tags)
-            if words or tag:
-                admitted.append((words or tag or "", line))
-                tagged = tagged or not words
-            else:
-                offending.append(line)
-        if offending:
-            raise OrgError(_lines_refused(service, client, offending, added, tags))
-        if added and not tagged:
-            since = ", ".join(f"v{n}" for n in sorted({c.since for c in added}))
-            detail = f"cites {', '.join(c.id for c in added)}, which {client} added to the contract ({since}) and the client confirmed"
-            return Admission("c", ids, detail, lines=tuple(admitted))
-        failed = cases_of(qualifying[0])
-        return Admission("b", ids, f"{qualifying[0]} failed in {len(failed)} cases the client rejected: {', '.join(failed)}", lines=tuple(admitted))
-
 
 @dataclass(frozen=True)
 class _Stage:
@@ -320,33 +271,6 @@ def _c_words(service: str, client: str, added: Sequence[Criterion], item: str) -
     return PB_C_WORDS.format(
         ids=", ".join(c.id for c in added), be="are" if many else "is", them="them" if many else "it", their="their" if many else "its",
         sentences=sentences, client=client, service=service, first=clip_line(item, QUESTION_LINE_CLIP),
-    )
-
-
-def _tag_of(line: str, tags: Sequence[str]) -> str | None:
-    """The first of ``tags`` that ``line`` carries as a standalone token (``[C6]``; not ``C60`` or ``XC6``), else None."""
-    return next((x for x in tags if re.search(rf"(?<![A-Za-z0-9]){re.escape(x)}(?![0-9])", line, re.IGNORECASE)), None)
-
-
-def _lines_refused(service: str, client: str, offending: Sequence[str], added: Sequence[Criterion], tags: Sequence[str]) -> str:
-    """P1-REFUSED: the lines that rest on nothing, at most ``LINES_LISTED`` of them, and what each rule would have admitted."""
-    listing = [f'- "{clip_line(line, LINE_CLIP)}"' for line in offending[:LINES_LISTED]]
-    if len(offending) > LINES_LISTED:
-        listing.append(f"- and {len(offending) - LINES_LISTED} more")
-    c_part = b_part = ""
-    if added:
-        names = [f"{c.id}'s" for c in added]
-        whose = names[0] if len(names) == 1 else f"{', '.join(names[:-1])} or {names[-1]}"
-        c_part = (
-            "Rule (c) admits only the cited confirmed criterion's own words, one line each with its id: "
-            f"these lines are not {whose} words. "
-        ) + "".join(f'Write it as "- {c.id}: {clip_line(c.text, RULE_TEXT_CLIP)}". ' for c in added if line_key(c.text))
-    if tags:
-        shown = ", ".join(f'"[{x}]"' for x in tags)
-        b_part = f"Rule (b) admits a line that carries the id it rests on ({shown}): these lines carry none. "
-    return LINES_REFUSED.format(
-        n=len(offending), listing="\n".join(listing), c_part=c_part, b_part=b_part, client=client, service=service,
-        first=clip_line(offending[0], QUESTION_LINE_CLIP),
     )
 
 

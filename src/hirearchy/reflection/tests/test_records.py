@@ -23,7 +23,7 @@ from hirearchy.reflection.testing import FixedBarHistory, FixedDeliverableChecks
 from hirearchy.services import Criterion, Playbook, ServiceCatalog
 from hirearchy.services.api import Contract
 
-from ._support import SERVICE, ask, define, deliver, nested, note_on, populated, rate, revise, rework
+from ._support import SERVICE, add_step, ask, define, deliver, nested, note_on, populated, rate, rework
 
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 CONTRACT_PATH = f"ceo/services/{SERVICE}/SERVICE.md"
@@ -335,7 +335,7 @@ def story(w: ReflectionWorld, *, lessons: str = "") -> tuple[Message, Message]:
 
 def test_a_record_holds_the_cases_deliveries_assertions_escapes_and_the_versions(w: ReflectionWorld) -> None:
     task, verdict = story(w)
-    revise(w)
+    add_step(w, "Check every claim.")
     record = only(records_of(w).records())
     assert (record.owner, record.client, record.client_kind, record.unit, record.error, record.files_error) == ("ceo", ROOT, "human", "case", "", "")
     assert (record.contract, record.playbook, record.budget) == (1, 1, 10)
@@ -413,7 +413,7 @@ def test_lessons_and_result_bodies_change_no_count(tmp_path: Path) -> None:
 
 def test_the_timeline_holds_every_kind_of_mark_oldest_first_and_the_bars_of_the_owners_team(w: ReflectionWorld) -> None:
     story(w)
-    revise(w)
+    add_step(w, "Check every claim.")
     when = datetime(2026, 10, 20, tzinfo=timezone.utc)
     marks: list[CharterMark | ModelMark] = [
         CharterMark("ceo/eng", "a" * 40, when), CharterMark("ops", "b" * 40, when), ModelMark("ORG.md", "effort", "high", "xhigh", "c" * 40, when),
