@@ -44,3 +44,36 @@ def test_service_events(org):
     assert second["version"] == 2 and second["amendment"] is True
     (rev,) = read_events(org, "service.revise")
     assert rev["version"] == 1 and rev["by"] == "ceo" and rev["owner"] == "ceo" and rev["admitted"] == "first"
+
+
+# ---------------------------------------------------------------------------------------------------- the actor of a runtime write (design 4.2)
+def revise_event(by, version=1, archive=None):
+    from pathlib import Path
+
+    from hirearchy.kernel import OrgPaths
+    from hirearchy.kernel.testing import FakeClock, ListEventSink
+    from hirearchy.services._places import OrgServicePlaces
+    from hirearchy.services._texts import EventedPlaybookWriter
+    from hirearchy.services.testing import MemoryServiceStore
+
+    events = ListEventSink()
+    writer = EventedPlaybookWriter(MemoryServiceStore(OrgServicePlaces(OrgPaths(Path("/org")))), FakeClock(), events)
+    writer.write("ceo", "brief", version, "Steps.", by, "r", archive)
+    (event,) = events.events
+    return event
+
+
+def test_a_runtime_write_emits_service_revise_with_actor_runtime_and_the_label_in_by():
+    from hirearchy.services._items import RUNTIME_MIGRATION, RUNTIME_WATCH
+
+    assert (RUNTIME_WATCH, RUNTIME_MIGRATION) == ("runtime (watch)", "runtime (migration)")
+    for label in (RUNTIME_WATCH, RUNTIME_MIGRATION):
+        event = revise_event(label)
+        assert (event.kind, event.actor) == ("service.revise", "runtime")
+        assert event.fields == {"owner": "ceo", "service": "brief", "version": 1, "by": label, "admitted": "client"}  # the fields are unchanged
+
+
+def test_an_owners_and_roots_write_keep_actor_equal_to_by():
+    for by in ("ceo", "root", "ceo/eng"):
+        event = revise_event(by)
+        assert event.actor == by and event.fields["by"] == by

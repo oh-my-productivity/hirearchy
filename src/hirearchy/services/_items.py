@@ -17,6 +17,8 @@ STEPS_HEADING = "## Steps"
 RULES_HEADING = "## Rules"
 CONTINUATION = "   "  # what every further line of an item renders after
 _WHEN, _THEN = "WHEN ", " THEN "
+RUNTIME_WATCH = "runtime (watch)"  # `by` of a version the watch retire wrote
+RUNTIME_MIGRATION = "runtime (migration)"  # `by` of a version the migration wrote
 
 
 def default_numbered(heading: str) -> bool:

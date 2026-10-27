@@ -5,9 +5,10 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from ..agents import AgentDirectory
-from ..kernel import ROOT, Clock, EventSink, OrgError, child_addr, norm, split_frontmatter
+from ..kernel import ROOT, RUNTIME, Clock, EventSink, OrgError, child_addr, norm, split_frontmatter
 from ..settings import OrgSettings
 from ._cap import playbook_word_cap
+from ._items import RUNTIME_MIGRATION, RUNTIME_WATCH
 from ._protocols import OwnerAddresses, PlaybookTexts, PlaybookWriter
 from .api import ServiceStore
 
@@ -46,7 +47,8 @@ class CappedPlaybookTexts(PlaybookTexts):
 
 
 class EventedPlaybookWriter(PlaybookWriter):
-    """Writes a playbook version through the store and records ``service.revise``."""
+    """Writes a playbook version through the store and records ``service.revise``: its ``actor`` is ``by`` for an owner's or root's write and
+    ``kernel.RUNTIME`` for the runtime's (``by`` is then a label that is no address, ``RUNTIME_WATCH`` or ``RUNTIME_MIGRATION``)."""
 
     def __init__(self, store: ServiceStore, clock: Clock, events: EventSink) -> None:
         self._store = store
@@ -62,5 +64,6 @@ class EventedPlaybookWriter(PlaybookWriter):
             **(extra or {}),
         }
         path = self._store.write_playbook(owner, name, version, meta, body, archive_version)
-        self._events.emit("service.revise", actor=by, owner=owner, service=name, version=version, by=by, admitted=str((extra or {}).get("admitted", "client")))
+        actor = RUNTIME if by in (RUNTIME_WATCH, RUNTIME_MIGRATION) else by
+        self._events.emit("service.revise", actor=actor, owner=owner, service=name, version=version, by=by, admitted=str((extra or {}).get("admitted", "client")))
         return path
