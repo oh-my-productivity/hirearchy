@@ -23,6 +23,11 @@ def playbook_reply(service: str, change: PlaybookChange) -> str:
         done = f"fixed the formatting of {c.item} (no evidence needed; its state is unchanged)."
     elif c.op == "edit":
         done = f"edited {c.item}, admitted ({c.admission.rule}) on {on}. Its watch starts again."
+    elif c.op == "restore":
+        how = f" (written by {c.client}: no evidence needed)" if c.admission.rule == "restore" else f", admitted ({c.admission.rule}) on {on}"
+        done = f"restored {c.item} to the text of v{c.restored_from}{how}."
+    elif c.op == "move":
+        done = f"moved {c.item} after {c.after} (no evidence needed)."
     else:
         done = f"retired {c.item}."
     ack = ACK_IGNORED.format(id=c.ack_ignored) if c.ack_ignored else ""

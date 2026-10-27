@@ -14,7 +14,7 @@ from hirearchy.services import PlaybookChange, PlaybookItem, PlaybookRace, Servi
 from hirearchy.services._items import checked_body
 from hirearchy.services.testing import RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
 
-from ._support import answer, define, populated, request
+from ._support import STEPS, answer, define, populated, request
 
 SERVICE = "weekly-brief"
 PLAYBOOK = f"ceo/services/{SERVICE}/PLAYBOOK.md"
@@ -562,6 +562,192 @@ def test_a_concurrent_write_is_pb_race(tmp_path: Path) -> None:
     assert w.text(PLAYBOOK) is None
 
 
+# ============================================================================================== restore (5.1: an item's earlier text comes back)
+
+
+def owner_wrote(w: ServicesWorld, version: int, body: str, items_max: int, rules: tuple[str, ...] = (), why: dict[str, list[str]] | None = None, by: str = "ceo") -> None:
+    """The files hold an item-form version that `by` wrote (a change admitted earlier), whatever the gate says now."""
+    meta = {
+        "service": SERVICE, "version": version, "revised": f"2026-01-0{version}T00:00:00+00:00", "by": by, "reason": "earlier", "items_max": items_max,
+        "rules": list(rules), "why": why or {}, "op": "edit", "admitted": "b" if by == "ceo" else "first",
+    }
+    w.store.write_playbook("ceo", SERVICE, version, meta, body, version - 1 or None)
+
+
+def test_restore_brings_back_an_items_earlier_text_placed_by_4_1(w: ServicesWorld) -> None:
+    seeded(w)  # P1-P3, written by the owner
+    revise(w, "retire", item="P2")
+    change = revise(w, "restore", ("R1",), item="P2")
+    meta, body = meta_of(w)
+    assert body == "## Steps\n1. [P1] Search.\n2. [P2] Write. (WHY R1)\n3. [P3] Check every claim."  # back after its nearest live predecessor
+    assert (change.version, change.op, change.item, change.kind, change.restored_from, change.items) == (3, "restore", "P2", "step", 1, 3)
+    assert (meta["op"], meta["item"], meta["restores"], meta["admitted"], meta["evidence"], meta["why"], meta["items_max"]) == (
+        "restore", "P2", 1, "b", ["R1"], {"P2": ["R1"]}, 3,
+    )
+    revise(w, "edit", ("R1",), item="P1", text="Search twice.")
+    again = revise(w, "restore", ("R2",), item="P1")  # a live item: its latest text before the current one comes back, in place
+    assert again.restored_from == 3 and meta_of(w)[1].splitlines()[1] == "1. [P1] Search. (WHY R2)"  # v3 is the latest version that held it
+
+
+def test_restore_of_a_retired_item_takes_its_last_live_text(w: ServicesWorld) -> None:
+    seeded(w)
+    revise(w, "edit", ("R1",), item="P1", text="Search twice.")
+    revise(w, "edit", ("R1",), item="P1", text="Search three times.")
+    revise(w, "retire", item="P1")
+    change = revise(w, "restore", ("R1",), item="p1")
+    assert change.restored_from == 3 and meta_of(w)[1].splitlines()[1] == "1. [P1] Search three times. (WHY R1)"
+    assert change.item == "P1" and change.items == 3
+
+
+def test_restore_of_a_client_written_text_is_exempt_and_of_any_other_is_gated(refusing: ServicesWorld) -> None:
+    w = refusing
+    define(w, playbook=STEPS)  # v1 is root's: P1-P3
+    owner_wrote(w, 2, "## Steps\n1. [P1] Search.\n2. [P2] Write twice.\n3. [P3] Check every claim.", 3)
+    owner_wrote(w, 3, "## Steps\n1. [P1] Search.\n2. [P2] Write three times.\n3. [P3] Check every claim.", 3)
+    assert refusal(w, "restore", item="P2", version=2) == "refused by the stand-in for the gate"  # the owner's own text goes to the gate
+    change = revise(w, "restore", item="P2", version=1)  # the client's: no evidence needed
+    meta, body = meta_of(w)
+    assert (change.admission.rule, change.restored_from, meta["admitted"], meta["restores"]) == ("restore", 1, "restore", 1)
+    assert "evidence" not in meta and body.splitlines()[2] == "2. [P2] Write." and meta["version"] == 4
+    assert playbook_reply(SERVICE, change) == (
+        "playbook of weekly-brief is now v4: restored P2 to the text of v1 (written by root: no evidence needed). root was told without being woken."
+    )
+    (note,) = [m.body for m in w.d.inbox("root") if m.title == "playbook of weekly-brief revised to v4"]
+    assert "restored P2 to the text of v1.\nReason: because\nEvidence: none; restores the text of v1, which you wrote (no evidence needed)" in note
+
+
+def test_restore_writes_the_why_the_text_had_when_it_was_live(refusing: ServicesWorld) -> None:
+    w = refusing
+    define(w)
+    owner_wrote(w, 1, "## Steps\n1. [P1] Search. (WHY R1, R2; C2)", 1, why={"P1": ["R1", "R2", "C2"]}, by="root")  # a client-written version with its WHY
+    owner_wrote(w, 2, "## Steps\n1. [P1] Search twice.", 1)
+    change = revise(w, "restore", item="P1")
+    meta, body = meta_of(w)
+    assert change.restored_from == 1 and meta["why"] == {"P1": ["R1", "R2", "C2"]} and body == "## Steps\n1. [P1] Search. (WHY R1, R2; C2)"
+
+
+def test_a_gated_restore_writes_the_why_of_its_own_admission(w: ServicesWorld) -> None:
+    seeded(w)
+    revise(w, "edit", ("R1",), item="P2", text="Write twice.")
+    revise(w, "restore", ("R5", "C2"), item="P2")
+    assert meta_of(w)[0]["why"] == {"P2": ["R5", "C2"]}
+
+
+def test_restore_without_an_earlier_text_is_pb_args(w: ServicesWorld) -> None:
+    seeded(w)
+    revise(w, "edit", ("R1",), item="P3", text="Check twice.")
+    needed = "item, and optionally version and acknowledged"
+    assert refusal(w, "restore", item="P1") == (
+        f'refused: op="restore" takes {needed}; P1 has no earlier text: it has read so since v1, so there is nothing to restore. Nothing was written.'
+    )
+    assert refusal(w, "restore", item="P3", version=2).endswith("P3 already reads so. Change an item only when the evidence calls for a different way of working. Nothing was written.")
+
+
+def test_a_version_that_does_not_hold_the_item_is_pb_args(w: ServicesWorld) -> None:
+    seeded(w)
+    revise(w, "add", ("R1",), kind="step", text="Publish.")
+    needed = "item, and optionally version and acknowledged"
+    assert refusal(w, "restore", item="P4", version=1) == f'refused: op="restore" takes {needed}; version=1 does not hold P4. Nothing was written.'
+    assert refusal(w, "restore", item="P1", version=9) == f'refused: op="restore" takes {needed}; version=9 does not hold P1. Nothing was written.'
+
+
+def test_a_restore_to_the_current_text_is_pb_same(w: ServicesWorld) -> None:
+    seeded(w)
+    revise(w, "edit", ("R1",), item="P3", text="Check twice.")
+    assert refusal(w, "restore", item="P2", version=1) == (
+        "refused: no change: P2 already reads so. Change an item only when the evidence calls for a different way of working. Nothing was written."
+    )
+
+
+def test_restore_of_an_id_that_never_existed_is_pb_item(w: ServicesWorld) -> None:
+    seeded(w)
+    assert refusal(w, "restore", item="P9") == "refused: `weekly-brief` has no live item P9. Its items: P1, P2, P3. Nothing was written."
+
+
+def test_restore_of_a_rule_goes_back_to_the_rules_section(w: ServicesWorld) -> None:
+    define(w)
+    revise(w, "add", ("R1",), kind="rule", when="a claim has no source", then="say so")
+    revise(w, "retire", item="P1")
+    assert meta_of(w)[1] == ""
+    revise(w, "restore", ("R1",), item="P1")
+    meta, body = meta_of(w)
+    assert body == "## Rules\n- [P1] WHEN a claim has no source THEN say so WHY R1" and meta["rules"] == ["P1"]
+
+
+def test_restore_after_a_migration_restores_a_migrated_items_text(w: ServicesWorld) -> None:
+    define(w, playbook="## Steps\n1. Search.\n2. Write.")  # root's v1: items P1, P2 (by root)
+    revise(w, "edit", ("R1",), item="P1", text="Search twice.")
+    change = revise(w, "restore", item="P1")  # the text root wrote: exempt
+    assert change.admission.rule == "restore" and meta_of(w)[1].splitlines()[1] == "1. [P1] Search."
+
+
+# ============================================================================================== move
+
+
+def test_move_reorders_within_the_section_and_needs_no_evidence(refusing: ServicesWorld) -> None:
+    w = refusing
+    define(w, playbook=STEPS)
+    change = revise(w, "move", item="P3", after="P1")
+    meta, body = meta_of(w)
+    assert body == "## Steps\n1. [P1] Search.\n2. [P3] Check every claim.\n3. [P2] Write."
+    assert (change.op, change.item, change.after, change.admission.rule, meta["op"], meta["item"], meta["admitted"]) == ("move", "P3", "P1", "exempt", "move", "P3", "exempt")
+    assert "evidence" not in meta and playbook_reply(SERVICE, change) == (
+        "playbook of weekly-brief is now v2: moved P3 after P1 (no evidence needed). root was told without being woken."
+    )
+    revise(w, "move", item="P2", after="start")
+    assert meta_of(w)[1] == "## Steps\n1. [P2] Write.\n2. [P1] Search.\n3. [P3] Check every claim."
+    assert meta_of(w)[0]["items_max"] == 3 and meta_of(w)[0]["version"] == 3
+
+
+def test_a_move_inside_the_rules_section(w: ServicesWorld) -> None:
+    define(w)
+    revise(w, "add", ("R1",), kind="rule", then="one")
+    revise(w, "add", ("R1",), kind="rule", then="two")
+    revise(w, "move", item="P2", after="start")
+    assert meta_of(w)[1] == "## Rules\n- [P2] WHEN always THEN two WHY R1\n- [P1] WHEN always THEN one WHY R1" and meta_of(w)[0]["rules"] == ["P2", "P1"]
+
+
+def test_a_no_op_move_is_pb_same(w: ServicesWorld) -> None:
+    seeded(w)
+    same = "Change an item only when the evidence calls for a different way of working. Nothing was written."
+    assert refusal(w, "move", item="P2", after="P1") == f"refused: no change: P2 already comes after P1. {same}"
+    assert refusal(w, "move", item="P1", after="start") == f"refused: no change: P1 is already first in its section. {same}"
+    assert refusal(w, "move", item="P2", after="P2") == f"refused: no change: P2 already comes after P2. {same}"
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 1
+
+
+def test_move_after_an_item_of_another_section_is_pb_args(w: ServicesWorld) -> None:
+    define(w, playbook="## Steps\n1. Search.\n\n## Budget plan\n- 12 runs.")
+    needed = 'item and after (an item id of its section, or "start")'
+    assert refusal(w, "move", item="P1", after="P2") == f'refused: op="move" takes {needed}; after=P2 is not an item of P1\'s section. Nothing was written.'
+    assert refusal(w, "move", item="P1", after="P9") == f'refused: op="move" takes {needed}; after=P9 is not an item of P1\'s section. Nothing was written.'
+
+
+MOVE_ARGS = [
+    ("move", {"item": "P1"}, 'item and after (an item id of its section, or "start")', "after is missing"),
+    ("move", {"after": "P2"}, 'item and after (an item id of its section, or "start")', "item is missing"),
+    ("move", {"item": "P1", "after": "P2", "text": "x"}, 'item and after (an item id of its section, or "start")', 'text does not go with op="move"'),
+    ("restore", {}, "item, and optionally version and acknowledged", "item is missing"),
+    ("restore", {"item": "P1", "after": "P2"}, "item, and optionally version and acknowledged", 'after does not go with op="restore"'),
+    ("restore", {"item": "P1", "text": "x", "kind": "step"}, "item, and optionally version and acknowledged", 'kind does not go with op="restore"; text does not go with op="restore"'),
+]
+
+
+@pytest.mark.parametrize(("op", "kw", "needed", "wrong"), MOVE_ARGS)
+def test_pb_args_of_restore_and_move(w: ServicesWorld, op: str, kw: dict[str, Any], needed: str, wrong: str) -> None:
+    seeded(w)
+    assert refusal(w, op, **kw) == f'refused: op="{op}" takes {needed}; {wrong}. Nothing was written.'
+    assert w.catalog.read_playbook("ceo", SERVICE).version == 1
+
+
+def test_an_unneeded_acknowledged_is_ignored_for_a_restore_too(w: ServicesWorld) -> None:
+    seeded(w)
+    revise(w, "edit", ("R1",), item="P2", text="Write twice.")
+    ack = "20261024T000000000001-root-ab12"
+    change = revise(w, "restore", ("R1",), item="P2", acknowledged=ack)
+    assert change.ack_ignored == ack and "(acknowledged=" + ack + " was not needed for this change and is not recorded.)" in playbook_reply(SERVICE, change)
+
+
 # ============================================================================================== the replies of 5.2
 
 
@@ -586,6 +772,10 @@ def test_the_replies_of_5_2(w: ServicesWorld) -> None:
     )
     gone = revise(w, "retire", item="P5")
     assert playbook_reply(SERVICE, gone) == f"playbook of weekly-brief is now v6: retired P5. {told}"
+    back = revise(w, "restore", ("R3",), item="P4", version=2)
+    assert playbook_reply(SERVICE, back) == f"playbook of weekly-brief is now v7: restored P4 to the text of v2, admitted (b) on R3. {told}"
+    moved = revise(w, "move", item="P4", after="start")
+    assert playbook_reply(SERVICE, moved) == f"playbook of weekly-brief is now v8: moved P4 after start (no evidence needed). {told}"
 
 
 def test_an_unneeded_acknowledged_is_ignored_and_the_reply_says_so(w: ServicesWorld) -> None:

@@ -14,7 +14,7 @@ from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
 from ..kernel import NAME_RE, ROOT, OrgError, clip_line, parent, split_frontmatter
 from ..mail import MailboxReader
-from ._items import RUNTIME_MIGRATION, PlacementError, canonical_why, checked_body, item_extra, migrate_body, place_add, RULES_HEADING
+from ._items import RULES_HEADING, RUNTIME_MIGRATION, PlacementError, canonical_why, checked_body, item_extra, migrate_body, place_add, place_restore
 from ._protocols import PlaybookRevisions, PlaybookTexts, PlaybookWriter
 from .api import (
     REASON_MAX, Admission, Contract, Criterion, ItemWatch, PlaybookChange, PlaybookItem, PlaybookRace, PlaybookSection, ServiceCatalog, ServiceEvidence,
@@ -151,7 +151,6 @@ PB_FORM = (
     "version) or \"move\" (item, after). Your playbook's items and their ids are in your prompt under \"# Playbook\". Nothing was written."
 )
 PB_OP = "refused: op is one of first, add, edit, retire, restore, move: {op}. Nothing was written."
-PB_UNBUILT = "refused: op=\"{op}\" is not available yet. Nothing was written."
 PB_ARGS = "refused: op=\"{op}\" takes {needed}; {wrong}. Nothing was written."
 PB_FIRST_EXISTS = (
     "refused: `{service}` already has playbook v{n}: op=\"first\" writes only the first version. Change it one item at a time "
@@ -182,7 +181,6 @@ NOT_OWNER = (
 )
 
 OPS = ("first", "add", "edit", "retire", "restore", "move")
-BUILT = ("first", "add", "edit", "retire")
 KINDS = ("step", "rule")
 FIRST_NEEDED = "text (the whole first version, in markdown)"
 NEEDED = {
@@ -190,11 +188,15 @@ NEEDED = {
     "add": 'kind ("step" with text, or "rule" with then), and optionally when (a rule) and after (an item id)',
     "edit": "item and the new text (a step: text; a rule: then and/or when), and optionally acknowledged",
     "retire": "item, and optionally acknowledged",
+    "restore": "item, and optionally version and acknowledged",
+    "move": 'item and after (an item id of its section, or "start")',
 }
 ARG_ORDER = ("item", "kind", "text", "when", "then", "after", "version", "acknowledged")
 TAKES: dict[str, tuple[str, ...]] = {
     "first": ("text",), "edit": ("item", "text", "when", "then", "acknowledged"), "retire": ("item", "acknowledged"),
+    "restore": ("item", "version", "acknowledged"), "move": ("item", "after"),
 }
+REQUIRED: dict[str, tuple[str, ...]] = {"first": ("text",), "edit": ("item",), "retire": ("item",), "restore": ("item",), "move": ("item", "after")}
 STEP_LIMIT, THEN_LIMIT, WHEN_LIMIT, WORDS_LIMIT = 1200, 600, 300, 150  # characters of a step, a rule's then and when; words of an item with its when
 ITEM_ID = re.compile(r"\[P\d+\]", re.IGNORECASE)
 THEN_WORD = re.compile(r"\bTHEN\b")
@@ -219,6 +221,7 @@ class _Call:
     when: str | None = None
     then: str | None = None
     after: str = ""
+    version: int | None = None
     acknowledged: str | None = None
 
 
@@ -243,6 +246,18 @@ def _normal_when(when: str | None) -> str:
     """A rule's ``when`` as it is stored: ``always`` for none."""
     text = (when or "").strip()
     return "always" if not text or text.lower() == "always" else text
+
+
+def _rebuilt_in_order(items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection]) -> tuple[tuple[PlaybookItem, ...], tuple[PlaybookSection, ...]]:
+    """The items in the order of the sections (the body order), each carrying the heading of its section."""
+    by_id = {i.id: i for i in items}
+    return tuple(replace(by_id[i], section=s.heading) for s in sections for i in s.ids), tuple(sections)
+
+
+def _after(after: str | None) -> str:
+    """An ``after`` as an id (upper case), or ``start`` as it is."""
+    text = (after or "").strip()
+    return text.lower() if text.lower() == "start" else text.upper()
 
 
 def _heading_name(heading: str) -> str:
@@ -305,8 +320,6 @@ class RuleItemReviser(PlaybookRevisions):
         name = op.strip().lower()
         if name not in OPS:
             raise OrgError(PB_OP.format(op=op))
-        if name not in BUILT:
-            raise OrgError(PB_UNBUILT.format(op=name))
         given = {"item": item, "kind": kind, "text": text, "when": when, "then": then, "after": after, "version": version, "acknowledged": acknowledged}
         self._shaped(name, given)
         criteria = [c for c in self._read(service, lambda: self._catalog.criteria(actor, service)) if c.current]
@@ -314,7 +327,7 @@ class RuleItemReviser(PlaybookRevisions):
         call = _Call(
             actor, service, client, name, reason, ids, item=(item or "").strip().upper(), kind=(kind or "").strip().lower(),
             text=None if text is None else text.strip(), when=None if when is None else _normal_when(when), then=None if then is None else then.strip(),
-            after=(after or "").strip().upper(), acknowledged=acknowledged,
+            after=_after(after), version=version, acknowledged=acknowledged,
         )
         current = self._read(service, lambda: self._catalog.read_playbook(actor, service))
         if name == "first":
@@ -335,7 +348,7 @@ class RuleItemReviser(PlaybookRevisions):
         """PB-ARGS: which arguments go with ``op``, which one is missing, a ``kind`` that is neither step nor rule."""
         kind = str(given["kind"]).strip().lower() if given["kind"] is not None else None
         takes = set(TAKES.get(op, ()))
-        required: set[str] = {"text"} if op == "first" else {"item"} if op in ("edit", "retire") else set()
+        required = set(REQUIRED.get(op, ()))
         if op == "add":
             takes = {"kind", "after", *({"text"} if kind == "step" else {"then", "when"} if kind == "rule" else {"text", "then", "when"})}
             required = {"kind", *({"text"} if kind == "step" else {"then"} if kind == "rule" else set())}
@@ -490,11 +503,23 @@ class RuleItemReviser(PlaybookRevisions):
         live = {i.id: i for i in book.items}
         if call.op == "add":
             return self._add(call, book)
+        if call.op == "restore" and call.item not in live and self._retired(call.item, book):
+            return self._restore(call, book, None)
         if call.item not in live:
             raise OrgError(self._no_item(call, book))
         if call.op == "retire":
             return self._retire(call, book, live[call.item])
+        if call.op == "restore":
+            return self._restore(call, book, live[call.item])
+        if call.op == "move":
+            return self._move(call, book, live[call.item])
         return self._edit(call, book, live[call.item])
+
+    @staticmethod
+    def _retired(item_id: str, book: _Book) -> bool:
+        """Whether ``item_id`` is an id this playbook used and no longer holds (an id is never reused)."""
+        number = item_id[1:]
+        return item_id[:1] == "P" and number.isdigit() and 1 <= int(number) <= book.items_max and item_id not in {i.id for i in book.items}
 
     def _no_item(self, call: _Call, book: _Book) -> str:
         """PB-ITEM: the item is not live; the live and the retired ids are listed."""
@@ -556,12 +581,87 @@ class RuleItemReviser(PlaybookRevisions):
         change = PlaybookChange(book.version + 1, "retire", old.id, old.kind, admission, None, len(items), client=call.client)
         return self._told(call, book, path, change, f"retired {old.id}", _item_line(old))
 
+    # ------------------------------------------------------------------------------------------------------ restore and move
+
+    def _restore(self, call: _Call, book: _Book, live: PlaybookItem | None) -> PlaybookChange:
+        """``restore`` (5.1): the item's text of ``version`` comes back; by default its latest text before the current one, and for a retired item
+        its last live text. A live item keeps its place; a retired one goes back where 4.1 says. Exempt for a text the client wrote (its ``why`` is
+        the one the text had), else gated (the ``why`` of the new admission)."""
+        versions = self._read(call.service, lambda: self._catalog.playbook_versions(call.actor, call.service))
+        held = {p.version: i for p in versions if p.items is not None for i in p.items if i.id == call.item}
+        if call.version is not None:
+            if call.version not in held:
+                raise self._args_error(call, f"version={call.version} does not hold {call.item}")
+            source = call.version
+        elif live is None:
+            source = max(held, default=0)
+            if not source:
+                raise OrgError(self._no_item(call, book))
+        else:
+            earlier = [v for v, i in held.items() if v < book.version and (i.text, i.when) != (live.text, live.when)]
+            if not earlier:
+                since = min((v for v in held if all((held[u].text, held[u].when) == (live.text, live.when) for u in held if u >= v)), default=book.version)
+                raise self._args_error(call, f"{call.item} has no earlier text: it has read so since v{since}, so there is nothing to restore")
+            source = max(earlier)
+        old = held[source]
+        if live is not None and (old.text, old.when) == (live.text, live.when):
+            raise OrgError(PB_SAME.format(id=live.id, what="already reads so"))
+        if self._written_by(versions, held, source) == call.client:
+            admission = Admission("restore", (), EXEMPT)
+            restored = old
+        else:
+            admission = self._evidence.admit_item(call.actor, call.service, call.ids, call.reason, kind=old.kind, text=old.text, when=old.when or None)
+            restored = replace(old, why=canonical_why(admission.why))
+        if live is not None:
+            items = tuple(restored if i.id == live.id else i for i in book.items)
+            sections = book.sections
+        else:
+            layout = next(p.sections for p in versions if p.version == source)
+            items, sections = place_restore(book.items, book.sections, restored, layout)
+        path = self._write(call, book, items, sections, book.items_max, admission, item=call.item, restores=source)
+        change = PlaybookChange(
+            book.version + 1, "restore", call.item, old.kind, admission, None, len(items), restored_from=source, client=call.client,
+        )
+        return self._told(call, book, path, change, f"restored {call.item} to the text of v{source}", _item_line(restored))
+
+    @staticmethod
+    def _written_by(versions: Sequence[Playbook], held: Mapping[int, PlaybookItem], source: int) -> str:
+        """Who wrote the text the item had in version ``source``: the author of the first version of the unbroken run that holds exactly that text
+        (the version before it, when that one is the migration: the migration changed no word)."""
+        text = (held[source].text, held[source].when)
+        start = source
+        while start - 1 in held and (held[start - 1].text, held[start - 1].when) == text:
+            start -= 1
+        by = {p.version: p.by for p in versions}
+        return by.get(start - 1, "") if by.get(start) == RUNTIME_MIGRATION else by.get(start, "")
+
+    def _move(self, call: _Call, book: _Book, old: PlaybookItem) -> PlaybookChange:
+        """``move`` (5.1): the item goes right after ``after`` (an item of its section) or first (``start``); exempt. A move that changes nothing is
+        PB-SAME."""
+        at = next(k for k, s in enumerate(book.sections) if old.id in s.ids)
+        ids = list(book.sections[at].ids)
+        if call.after != "start" and call.after not in ids:
+            raise self._args_error(call, f"after={call.after} is not an item of {old.id}'s section")
+        before = list(ids)
+        if call.after != old.id:
+            ids.remove(old.id)
+            ids.insert(0 if call.after == "start" else ids.index(call.after) + 1, old.id)
+        if ids == before:  # after the item itself, or the item it already follows (``start``: it is already first)
+            what = "is already first in its section" if call.after == "start" else f"already comes after {call.after}"
+            raise OrgError(PB_SAME.format(id=old.id, what=what))
+        sections = tuple(replace(s, ids=tuple(ids)) if k == at else s for k, s in enumerate(book.sections))
+        admission = Admission("exempt", (), EXEMPT)
+        items, sections = _rebuilt_in_order(book.items, sections)
+        path = self._write(call, book, items, sections, book.items_max, admission, item=old.id)
+        change = PlaybookChange(book.version + 1, "move", old.id, old.kind, admission, None, len(items), client=call.client, after=call.after)
+        return self._told(call, book, path, change, f"moved {old.id} after {call.after}", "")
+
     def _write(
         self, call: _Call, book: _Book, items: Sequence[PlaybookItem], sections: Sequence[PlaybookSection], items_max: int, admission: Admission, *,
-        item: str = "", reason: str = "",
+        item: str = "", reason: str = "", restores: int = 0,
     ) -> str:
         """The round-trip assertion (4.1), then the write: a compare-and-swap against the version this call judged (4.3)."""
-        extra = item_extra(items, items_max, call.op, evidence=list(admission.evidence), admitted=admission.rule, item=item)
+        extra = item_extra(items, items_max, call.op, evidence=list(admission.evidence), admitted=admission.rule, item=item, restores=restores)
         body = checked_body(items, sections, extra)
         try:
             return self._playbooks.write(call.actor, call.service, book.version + 1, body, call.actor, reason or call.reason, book.version or None, extra)
@@ -574,8 +674,12 @@ class RuleItemReviser(PlaybookRevisions):
         a = change.admission
         if call.op == "first":
             how = "the first playbook (no evidence needed)"
-        elif a.rule in ("exempt", "restore"):
+        elif a.rule == "restore":
+            how = f"restores the text of v{change.restored_from}, which you wrote ({EXEMPT})"
+        elif a.rule == "exempt":
             how = EXEMPT
+        elif change.restored_from:
+            how = f"restores the text of v{change.restored_from}; admitted: {a.detail}"
         else:
             how = f"admitted: {a.detail}"
         lines = [
