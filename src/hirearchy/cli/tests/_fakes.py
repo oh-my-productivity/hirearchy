@@ -145,12 +145,14 @@ class FakeServices(Recording, ServiceCommands, ServiceCatalog, ContractNormalize
 
 
 class FakeSteps(Recording, ServiceSteps):
-    """What root is told to do next: ``rework`` is the text ``rework_step`` answers for a task, by its id ("" for any other); ``error`` is raised instead."""
+    """What root is told to do next: ``rework`` is the text ``rework_step`` answers for a task, by its id ("" for any other); ``watch`` the text
+    ``watch_step`` answers for a rejection, by its id; ``error`` is raised instead of ``rework_step``'s."""
 
-    def __init__(self, rework: Mapping[str, str] | None = None, error: Exception | None = None) -> None:
+    def __init__(self, rework: Mapping[str, str] | None = None, error: Exception | None = None, watch: Mapping[str, str] | None = None) -> None:
         super().__init__()
         self.rework = dict(rework or {})
         self.error = error
+        self.watch = dict(watch or {})
 
     def feedback_step(self, note: Message) -> str:
         self.note("feedback_step", note.id)
@@ -161,6 +163,10 @@ class FakeSteps(Recording, ServiceSteps):
         if self.error is not None:
             raise self.error
         return self.rework.get(task.id, "")
+
+    def watch_step(self, rejection: str) -> str:
+        self.note("watch_step", rejection)
+        return self.watch.get(rejection, "")
 
 
 class FakeReadings(Recording, OrgTree, TaskQuery, SchedulerStatus, HealthAnalyzer, HealthRenderer, ProgressReporter, ServiceReports, SnapshotRenderer):
@@ -356,8 +362,8 @@ def new_services(contracts: Mapping[tuple[str, str], Contract] | None = None) ->
     return FakeServices(contracts)  # type: ignore[abstract]
 
 
-def new_steps(rework: Mapping[str, str] | None = None, error: Exception | None = None) -> FakeSteps:
-    return FakeSteps(rework, error)
+def new_steps(rework: Mapping[str, str] | None = None, error: Exception | None = None, watch: Mapping[str, str] | None = None) -> FakeSteps:
+    return FakeSteps(rework, error, watch)
 
 
 def new_readings() -> FakeReadings:

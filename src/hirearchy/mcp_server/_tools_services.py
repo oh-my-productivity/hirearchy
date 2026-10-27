@@ -126,14 +126,17 @@ class ServiceTools(ToolGroup):
         CHANGING THE CRITERIA (you, root): only as the user's answer after a rejection: answers=<the rejection's
         message id>, about=<the C or R id your one question named>, words=<their answer, verbatim> (it records their yes
         as the link itself); or, for a change the user asks for on their own outside any rejection, words=<their
-        request, verbatim> alone (never admits a playbook revision). Every delivered request of the service needs its
-        verdict first.
+        request, verbatim> alone (never admits a playbook revision). An answer may retire a watched playbook rule; the
+        reply says so. Every delivered request of the service needs its verdict first.
         """
-            return self._commands().define_service(
+            reply = self._commands().define_service(
                 me, owner, name, description=description, inputs=inputs, acceptance=acceptance,
                 deliverable=deliverable, budget=budget, playbook=playbook, locked=locked, notes=notes,
                 add_acceptance=add_acceptance, remove_acceptance=remove_acceptance, answers=answers, about=about, words=words,
             )
+            if answers and answers.strip():  # the user's answer: what it did to the watch follows (design 8.5)
+                return reply + _step(lambda: self._steps().watch_step(answers.strip()))
+            return reply
 
     def _register_agent_define(self, mcp: FastMCP, me: str) -> None:
         @mcp.tool()
@@ -199,13 +202,14 @@ class ServiceTools(ToolGroup):
         the same task_id, verdict "reject", confirms=<the rejection's message id>, criterion ("none", "R<j>" or "C<k>"),
         source "human" and their answer verbatim as note; it records the link, not a new verdict. A yes that changes the
         contract is define_service(..., answers=<the rejection's message id>, about=<the id>, words=<their answer>), which
-        records the link itself; after it, that rejection takes no confirms. Feedback is for reflection only: it never
-        waives an acceptance criterion or changes the outcome of the request.
+        records the link itself; after it, that rejection takes no confirms. An answer may retire a watched playbook rule;
+        the reply says so. Feedback is for reflection only: it never waives an acceptance criterion or changes the outcome
+        of the request.
         """
             msg = self._commands().feedback(me, task_id, verdict, note, source=source, criterion=criterion, confirms=confirms)
             if confirms is not None:
                 return (f"recorded: rejection {confirms} is about {msg.criterion} (source {msg.source}; message {msg.id}); "
-                        f"it does not wake {msg.to}")
+                        f"it does not wake {msg.to}" + _step(lambda: self._steps().watch_step(confirms)))
             about = f", about {msg.criterion} (not confirmed)" if msg.criterion else ""
             return (f"feedback {verdict} recorded on {task_id} for {msg.to} (message {msg.id}, source {msg.source}{about}); "
                     f"it does not wake {msg.to}" + _step(lambda: self._steps().feedback_step(msg)))

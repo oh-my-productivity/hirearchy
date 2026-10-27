@@ -260,7 +260,31 @@ def test_the_confirmation_receipt_carries_no_step() -> None:
     steps = ScriptedSteps(feedback=FEEDBACK_STEP)
     group, _ = tools(steps=steps)
     out = call(serve(group, ROOT), "feedback", task_id="t1", verdict="reject", note="Yes.", source="human", criterion=["C1"], confirms="m-9")
-    assert out == "recorded: rejection m-9 is about C1 (source human; message fb-1); it does not wake ceo" and steps.asked == []
+    assert out == "recorded: rejection m-9 is about C1 (source human; message fb-1); it does not wake ceo"
+    assert steps.asked == [("watch", "m-9")]  # no next step to take; the only thing asked is what the answer did to the watch (8.5), which is "" here
+
+
+WATCH_STEP = "The watch retired P1 of brief (playbook v2) because rejections R2 and R3 are related to it; ceo was told."
+
+
+def test_the_watch_sentences_follow_the_receipt_of_an_answer() -> None:
+    """Design 8.5: ``feedback(confirms=)`` and ``define_service(answers=)`` append ``watch_step`` of the rejection they answer."""
+    steps = ScriptedSteps(watch=WATCH_STEP)
+    group, _ = tools(steps=steps)
+    server = serve(group, ROOT)
+    out = call(server, "feedback", task_id="t1", verdict="reject", note="Yes.", source="human", criterion=["C1"], confirms="m-9")
+    assert out == f"recorded: rejection m-9 is about C1 (source human; message fb-1); it does not wake ceo\n{WATCH_STEP}"
+    assert call(server, "define_service", owner="ceo", name="brief", add_acceptance=["x"], answers="m-9", about="C1", words="Yes.") == f"defined brief\n{WATCH_STEP}"
+    assert steps.asked == [("watch", "m-9"), ("watch", "m-9")]
+    call(server, "define_service", owner="ceo", name="brief", add_acceptance=["y"], words="On my own.")  # no rejection answered: no watch to read
+    assert len(steps.asked) == 2
+
+
+def test_a_failing_watch_step_never_fails_the_answer() -> None:
+    group, commands = tools(steps=ScriptedSteps(watch=WATCH_STEP, raises=OSError("disk")))
+    server = serve(group, ROOT)
+    assert call(server, "define_service", owner="ceo", name="brief", add_acceptance=["x"], answers="m-9", about="C1", words="Yes.") == "defined brief"
+    assert [c[0] for c in commands.calls] == ["define_service"]
 
 
 def test_root_define_service_reply_has_no_step() -> None:

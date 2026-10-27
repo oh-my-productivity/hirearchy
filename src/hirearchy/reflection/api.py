@@ -814,6 +814,14 @@ class ServiceSteps(Protocol):
         refused."""
         ...
 
+    def watch_step(self, rejection: str) -> str:
+        """What an answer did to the watch (design 8.5), for ``rejection``, the message id of the rejection a call just answered (``feedback(confirms=)``
+        or ``define_service(answers=)``): one sentence for each playbook item it warned, each ``op: watch`` version whose ``related`` holds it and each
+        item whose retire is due and not written, joined by newlines; "" when nothing changed or the rejection cannot be placed. Derived from the
+        files, never stored: the MCP reply and the CLI lines of root are built from it, so they can never disagree with the derived states. When the
+        watch cannot be read the one sentence is that it could not be checked (the only error text a reply carries)."""
+        ...
+
 
 @runtime_checkable
 class ServicePromptSections(Protocol):

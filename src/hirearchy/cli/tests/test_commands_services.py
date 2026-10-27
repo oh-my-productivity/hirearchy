@@ -20,7 +20,7 @@ TEXT = MemoryText({"criterion.md": "Has a title.\n", "notes.md": "For the owner.
 
 def define_world(tmp_path: Path, contracts: dict[tuple[str, str], Contract] | None = None) -> tuple[Fixture, FakeServices, FakeOffice, DefineServiceCommand]:
     f, services, office = Fixture(tmp_path), new_services(contracts), new_office()
-    return f, services, office, DefineServiceCommand(f.session, lambda: services, lambda: services, lambda: services, lambda: office, TEXT, f.out)
+    return f, services, office, DefineServiceCommand(f.session, lambda: services, lambda: services, lambda: services, lambda: office, lambda: new_steps(), TEXT, f.out)
 
 
 def test_services_lists_what_root_can_request(tmp_path: Path) -> None:
@@ -186,7 +186,7 @@ def test_an_input_without_an_equals_sign_is_refused_before_anything_is_asked(tmp
 
 def test_feedback_tells_the_owner_and_says_who(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "Too long.")
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "Too long.")
     assert f.session.calls == [("open", True)]
     assert services.last("feedback") == (("root", "r-1", "reject", "Too long."), {"source": "human", "criterion": None, "confirms": None})
     assert office.last("commit") == (("root: feedback f-1 -> ceo",), {})
@@ -195,7 +195,7 @@ def test_feedback_tells_the_owner_and_says_who(tmp_path: Path) -> None:
 
 def test_feedback_defaults_to_source_human(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    command = FeedbackCommand(f.session, lambda: services, lambda: office, f.out)
+    command = FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out)
     go(command, "feedback", "r-1", "accept")
     assert services.last("feedback")[1]["source"] == "human"  # the CLI is the human's own terminal
     go(command, "feedback", "r-1", "accept", "--source", "relayed")
@@ -210,7 +210,7 @@ def commits(office: FakeOffice) -> list[object]:
 
 def test_feedback_reply_shows_the_message_id(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "No.",
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "No.",
        "--criterion", "C1", "--criterion", "r2", "--source", "relayed")  # someone else's reading: the criterion stays on the verdict
     assert services.last("feedback") == (("root", "r-1", "reject", "No."), {"source": "relayed", "criterion": ["C1", "r2"], "confirms": None})
     assert f.out.stdout == "feedback reject on r-1 -> ceo (message f-1, source relayed, about C1, r2)\n"
@@ -220,7 +220,7 @@ def test_feedback_reply_shows_the_message_id(tmp_path: Path) -> None:
 def test_a_criterion_typed_with_a_rejection_is_recorded_as_the_users_link(tmp_path: Path) -> None:
     """The terminal is the user's own seat: a criterion typed with a rejection is their yes, so it is recorded as a `confirms` link."""
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "No.",
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "No.",
        "--criterion", "C1", "--criterion", "r2")
     first, second = [c for c in services.calls if c[0] == "feedback"]
     assert first == ("feedback", ("root", "r-1", "reject", "No."), {"source": "human", "criterion": ["C1", "r2"], "confirms": None})
@@ -236,21 +236,21 @@ def test_a_failing_confirmation_keeps_the_committed_verdict(tmp_path: Path) -> N
     f, services, office = Fixture(tmp_path), new_services(), new_office()
     services.refuse_confirmation = OrgError("the link cannot be written")
     with pytest.raises(OrgError, match="the link cannot be written"):
-        go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "No.", "--criterion", "C1")
+        go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "No.", "--criterion", "C1")
     assert commits(office) == ["root: feedback f-1 -> ceo"]  # the verdict is written and committed; rerun with --confirms f-1 --criterion ...
     assert f.out.stdout == "feedback reject on r-1 -> ceo (message f-1, source human, about C1)\n"
 
 
 def test_relayed_feedback_keeps_the_criterion_on_the_verdict(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "Maybe.",
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "Maybe.",
        "--criterion", "C1", "--source", "relayed")
     assert [c[2]["confirms"] for c in services.calls if c[0] == "feedback"] == [None] and commits(office) == ["root: feedback f-1 -> ceo"]
 
 
 def test_feedback_confirms_reply_names_the_link(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
-    go(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "reject", "--note", "Yes, always.",
+    go(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "reject", "--note", "Yes, always.",
        "--criterion", "C1", "--confirms", "m-9", "--source", "human")
     assert services.last("feedback") == (
         ("root", "r-1", "reject", "Yes, always."), {"source": "human", "criterion": ["C1"], "confirms": "m-9"},
@@ -261,7 +261,7 @@ def test_feedback_confirms_reply_names_the_link(tmp_path: Path) -> None:
 def test_feedback_accepts_only_a_verdict(tmp_path: Path) -> None:
     f, services, office = Fixture(tmp_path), new_services(), new_office()
     with pytest.raises(SystemExit):
-        parse(FeedbackCommand(f.session, lambda: services, lambda: office, f.out), "feedback", "r-1", "maybe")
+        parse(FeedbackCommand(f.session, lambda: services, lambda: office, lambda: new_steps(), f.out), "feedback", "r-1", "maybe")
 
 
 def test_retire_service_says_what_happened_before_it_snapshots(tmp_path: Path) -> None:
@@ -269,3 +269,24 @@ def test_retire_service_says_what_happened_before_it_snapshots(tmp_path: Path) -
     go(RetireServiceCommand(f.session, lambda: services, lambda: office, f.out), "retire-service", "ceo", "weekly", "--reason", "Not needed.")
     assert services.last("retire_service") == (("root", "ceo", "weekly", "Not needed."), {})
     assert f.out.stdout == "retired service `weekly` of ceo\n" and office.last("commit") == (("root: retired service weekly of ceo",), {})
+
+
+WATCH = "The watch retired P1 of weekly (playbook v2) because rejections R2 and R3 are related to it; ceo was told.\nAnother line."
+
+
+def test_the_watch_lines_follow_the_link_and_the_answer_line_by_line(tmp_path: Path) -> None:
+    """Design 8.5: each sentence of ``watch_step`` is a line after today's line, for ``--confirms``, the automatic link and ``--answers``."""
+    f, services, office = Fixture(tmp_path), new_services(), new_office()
+    steps = new_steps(watch={"r-9": WATCH, "f-2": WATCH})
+    feedback = FeedbackCommand(f.session, lambda: services, lambda: office, lambda: steps, f.out)
+    go(feedback, "feedback", "r-1", "reject", "--note", "Yes.", "--criterion", "C1", "--confirms", "r-9")
+    assert f.out.stdout.splitlines()[-2:] == WATCH.splitlines() and steps.names() == ["watch_step"] and steps.calls[0][1] == ("r-9",)
+    go(feedback, "feedback", "r-1", "reject", "--note", "No.", "--criterion", "C1")  # the automatic link: the rejection is the verdict just recorded (f-2)
+    assert f.out.stdout.splitlines()[-2:] == WATCH.splitlines() and steps.calls[1][1] == ("f-2",)
+    steps2 = new_steps(watch={"r-9": WATCH})
+    f2, services2, office2 = Fixture(tmp_path / "d"), new_services(), new_office()
+    command = DefineServiceCommand(f2.session, lambda: services2, lambda: services2, lambda: services2, lambda: office2, lambda: steps2, TEXT, f2.out)
+    go(command, "define-service", "ceo", "weekly", "--add-acceptance", "x", "--answers", "r-9", "--about", "C1", "--words", "Yes.")
+    assert f2.out.stdout.splitlines()[-2:] == WATCH.splitlines() and steps2.names() == ["watch_step"]
+    go(command, "define-service", "ceo", "weekly", "--add-acceptance", "y", "--words", "On my own.")
+    assert steps2.names() == ["watch_step"]  # no rejection answered: nothing to read

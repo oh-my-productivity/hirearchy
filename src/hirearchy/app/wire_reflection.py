@@ -62,7 +62,7 @@ def register(b: Builder) -> None:
     )
     b.provide(
         ServiceSteps,
-        lambda b: TextServiceSteps(b.get(AgentDirectory), b.get(ServiceCatalog), b.get(CaseHistory), b.get(MailboxReader)),
+        lambda b: TextServiceSteps(b.get(AgentDirectory), b.get(ServiceCatalog), b.get(CaseHistory), b.get(MailboxReader), b.get(ServiceEvidence)),
     )
     b.provide(ServicePromptSections, _sections)
     b.provide(

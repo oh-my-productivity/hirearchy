@@ -502,3 +502,41 @@ def test_root_feedback_docstring_says_an_accept_waits_for_the_cases_answers(svc)
     text = " ".join(described(svc, ROOT)["feedback"].description.split())
     assert "An accept waits while an earlier rejection of the same case has no answer from the user; the refusal gives the question." in text
     assert "waits" not in " ".join(described(svc, "ceo")["feedback"].description.split())  # the agents' tool is what it was
+
+
+# ----------------------------------------------------------------------------------------- an answer may retire a watched rule: the reply says so (design 8.5, 14.5)
+def watched_rule(org):
+    """ceo's rule P1 is the words of C3, which the user confirmed (rule (c)); its watch starts new."""
+    c3 = confirmed_amendment(org, "Names the week it covers")
+    org.revise_playbook("ceo", WEEKDAY, "add", "the client's rule", [c3], kind="rule", then="Names the week it covers")
+    return c3
+
+
+def test_the_feedback_and_define_service_docstrings_say_an_answer_may_retire_a_watched_rule(svc):
+    clause = "An answer may retire a watched playbook rule; the reply says so."
+    assert clause in " ".join(described(svc, ROOT)["feedback"].description.split())
+    assert clause in " ".join(described(svc, ROOT)["define_service"].description.split())
+    assert "watched" not in " ".join(described(svc, "ceo")["feedback"].description.split())  # the agents' tools are what they were
+    assert "watched" not in " ".join(described(svc, "ceo")["define_service"].description.split())
+
+
+def test_feedback_confirms_and_define_service_answers_append_the_watch_sentences(svc):
+    server = build_server(svc, ROOT)
+    watched_rule(svc)
+    second = request(svc, "again")
+    deliver(svc, "ceo", second)
+    no = svc.feedback(ROOT, second.id, "reject", "No week.", source="human")
+    reply = call(server, "feedback", task_id=second.id, verdict="reject", note="Yes, C3.", source="human", criterion=["C3"], confirms=no.id)
+    link = [m for m in svc.sent(ROOT) if m.criterion and not m.feedback][-1]
+    assert reply == (
+        f"recorded: rejection {no.id} is about C3 (source human; message {link.id}); it does not wake ceo\n"
+        "Rejection R2 is related to playbook item P1 of weekly-brief: P1 is in warning now (ceo was told); one more related rejection retires it."
+    )
+    third = request(svc, "again and again")
+    deliver(svc, "ceo", third)
+    no3 = svc.feedback(ROOT, third.id, "reject", "No week again.", source="human")
+    reply = call(server, "define_service", owner="ceo", name=WEEKDAY, add_acceptance=["Dates the memo"], answers=no3.id, about="C3", words="Yes, add it.")
+    assert reply.endswith(
+        "\nThe watch retired P1 of weekly-brief (playbook v2) because rejections R2 and R3 are related to it; ceo was told."
+    )
+    assert "P1" not in svc.runtime.service_catalog.read_playbook("ceo", WEEKDAY).body  # the rule is out (it had no text before its watch)

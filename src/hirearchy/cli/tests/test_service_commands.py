@@ -208,3 +208,37 @@ def test_cli_feedback_accept_is_human_by_default_and_waits_for_the_answer(svc, c
     cli(svc, "feedback", first.id, "reject", "--confirms", verdict.id, "--criterion", "none", "--note", "No: as it is.")  # the user's answer
     cli(svc, "feedback", first.id, "accept")
     assert [m.feedback for m in svc.sent(ROOT) if m.feedback][-1] == "accept"
+
+
+def test_feedback_confirms_the_automatic_link_and_define_service_answers_print_the_watch_lines(org, capsys):
+    """Design 8.5: the CLI prints each sentence of ``watch_step`` as a line after today's line: after ``feedback --confirms``, after the automatic link
+    of a human reject with ``--criterion`` and after ``define-service --answers``."""
+    from testkit.services_world import confirmed_amendment
+
+    define(org)  # no playbook yet, no lock
+    week = "Names the week it covers"
+    c3 = confirmed_amendment(org, week)  # R1 is answered and C3 is the user's
+    org.revise_playbook("ceo", "weekly-brief", "add", "the client's rule", [c3], kind="rule", then=week)  # P1, watched from now on
+    warned = "Rejection R{n} is related to playbook item P1 of weekly-brief: P1 is in warning now (ceo was told); one more related rejection retires it."
+    second = request(org, "again")
+    deliver(org, "ceo", second)
+    capsys.readouterr()
+    cli(org, "feedback", second.id, "reject", "--note", "No week.", "--criterion", "C3")  # the automatic link of a human reject
+    link = [m for m in org.sent(ROOT) if m.criterion and not m.feedback][-1]
+    lines = capsys.readouterr().out.splitlines()
+    assert lines[-2].startswith(f"link on {link.reply_to} -> ceo: C3 (message {link.id}, source human)")
+    assert lines[-1] == warned.format(n=2)  # the watch line follows today's line
+    third = request(org, "once more")
+    deliver(org, "ceo", third)
+    cli(org, "feedback", third.id, "reject", "--note", "No week still.")
+    no3 = [m for m in org.sent(ROOT) if m.feedback][-1]
+    capsys.readouterr()
+    cli(org, "define-service", "ceo", "weekly-brief", "--add-acceptance", "Dates the memo", "--answers", no3.id, "--about", "C3", "--words", "Yes, add it.")
+    lines = capsys.readouterr().out.splitlines()
+    assert lines[-1] == "The watch retired P1 of weekly-brief (playbook v2) because rejections R2 and R3 are related to it; ceo was told."
+    fourth = request(org, "and again")
+    deliver(org, "ceo", fourth)
+    no4 = org.feedback(ROOT, fourth.id, "reject", "Nope.", source="human")
+    capsys.readouterr()
+    cli(org, "feedback", fourth.id, "reject", "--note", "A one-off.", "--criterion", "none", "--confirms", no4.id)
+    assert capsys.readouterr().out.splitlines()[-1].startswith(f"link on {no4.id} -> ceo: none")  # nothing is related: no extra line

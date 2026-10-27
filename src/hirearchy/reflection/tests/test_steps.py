@@ -490,3 +490,84 @@ def test_a_human_rework_of_a_retired_service_has_no_top_up(w: ReflectionWorld) -
     again = w.s.commands.request("root", SERVICE, {"topic": "ai"}, revises=first.id, budget=1, source="human")
     w.s.commands.retire_service("root", "ceo", SERVICE, "obsolete")
     assert w.steps.rework_step(again) == ""
+
+
+# ----------------------------------------------------------------------------------------- watch_step: what an answer did to the watch (design 8.5)
+from datetime import datetime, timezone  # noqa: E402
+
+from hirearchy.kernel import OrgError  # noqa: E402
+from hirearchy.reflection._steps import TextServiceSteps  # noqa: E402
+from hirearchy.services import AmendmentBasis, ItemWatch, Rejection  # noqa: E402
+from hirearchy.services.testing import AdmittingServiceEvidence  # noqa: E402
+
+JAN2 = datetime(2026, 1, 2, tzinfo=timezone.utc)
+
+
+def watching(w: ReflectionWorld, *watch: ItemWatch, error: Exception | None = None) -> tuple[TextServiceSteps, str]:
+    """A rejection of the world (R1), and the steps over a stand-in whose watch is ``watch`` (or fails with ``error``); the playbooks are the world's."""
+    task, no = rejected(w)
+    basis = AmendmentBasis((Rejection(no.id, "R1", task.id, task.title, (), "Too long.", "", case=task.id),), ())
+
+    class Gate(AdmittingServiceEvidence):
+        def watch(self, owner: str, service: str) -> tuple[ItemWatch, ...]:
+            if error is not None:
+                raise error
+            return super().watch(owner, service)
+
+    return TextServiceSteps(w.s.d.agents, w.s.catalog, w.history, w.s.d.mail, Gate(basis=basis, watch=watch)), no.id
+
+
+def wrote(w: ReflectionWorld, version: int, body: str, items_max: int, **meta: Any) -> None:
+    given = {
+        "service": SERVICE, "version": version, "revised": f"2026-01-0{version}T00:00:00+00:00", "by": "ceo", "reason": "earlier", "items_max": items_max,
+        "rules": [], "why": {}, "op": "edit", "admitted": "b", **meta,
+    }
+    w.s.store.write_playbook("ceo", SERVICE, version, given, body, version - 1 or None)
+
+
+def test_watch_step_names_a_warned_item(w: ReflectionWorld) -> None:
+    steps, no = watching(w, ItemWatch("P3", "rule", "warning", 2, JAN2, related=("R1",)))
+    assert steps.watch_step(no) == (
+        "Rejection R1 is related to playbook item P3 of weekly-brief: P3 is in warning now (ceo was told); one more related rejection retires it."
+    )
+
+
+def test_watch_step_names_a_retire_and_the_restored_version(w: ReflectionWorld) -> None:
+    wrote(w, 1, "## Steps\n1. [P1] Search.", 1)
+    wrote(w, 2, "## Steps\n1. [P1] Search twice. (WHY R1)", 1, why={"P1": ["R1"]}, item="P1")
+    wrote(w, 3, "## Steps\n1. [P1] Search.", 1, op="watch", admitted="watch", item="P1", related=["R1", "R2"], restores=1, by="runtime (watch)")
+    steps, no = watching(w, ItemWatch("P1", "step", "restored", 3, JAN2, related=("R1", "R2"), restores=1))
+    assert steps.watch_step(no) == (
+        "The watch retired P1 of weekly-brief (playbook v3) because rejections R1 and R2 are related to it, and restored the text of v1; ceo was told."
+    )
+    wrote(w, 4, "## Steps", 1, op="watch", admitted="watch", item="P1", related=["R1", "R3"], by="runtime (watch)")  # a retire that put nothing back
+    assert steps.watch_step(no) == (  # the versions whose related holds R1: both, oldest first
+        "The watch retired P1 of weekly-brief (playbook v3) because rejections R1 and R2 are related to it, and restored the text of v1; ceo was told.\n"
+        "The watch retired P1 of weekly-brief (playbook v4) because rejections R1 and R3 are related to it; ceo was told."
+    )
+
+
+def test_watch_step_retire_due_with_and_without_the_owners_next_change(w: ReflectionWorld) -> None:
+    steps, no = watching(w, ItemWatch("P3", "rule", "warning", 2, JAN2, related=("R1", "R2"), retire_due=True))
+    assert steps.watch_step(no) == (
+        "The watch could not retire P3 of weekly-brief yet (retire due: R1 and R2 are related); it retries at the owner's next change of the playbook "
+        "or the next recorded answer."
+    )
+    w.s.commands.define_service("root", "ceo", SERVICE, locked=True)
+    assert steps.watch_step(no) == (  # the locked form: the owner cannot change the playbook
+        "The watch could not retire P3 of weekly-brief yet (retire due: R1 and R2 are related); it retries at the next recorded answer."
+    )
+
+
+def test_watch_step_is_empty_when_nothing_changed(w: ReflectionWorld) -> None:
+    steps, no = watching(w, ItemWatch("P3", "rule", "kept", 2, JAN2), ItemWatch("P4", "step", "new", 2, JAN2, related=("R7",)))
+    assert steps.watch_step(no) == ""  # no item is related to this rejection
+    assert steps.watch_step("20260101T000000000000-root-0001") == ""  # a rejection it cannot place
+    assert watching(w)[0].watch_step(no) == ""  # no playbook watch at all
+
+
+def test_watch_step_could_not_be_checked(w: ReflectionWorld) -> None:
+    steps, no = watching(w, error=OrgError("a mailbox cannot be read"))
+    assert steps.watch_step(no) == "The watch could not be checked (a mailbox cannot be read); it is checked again at the next change."
+    steps, no = watching(w, error=OSError("disk"))
+    assert steps.watch_step(no) == "The watch could not be checked (disk); it is checked again at the next change."

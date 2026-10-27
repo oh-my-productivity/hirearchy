@@ -929,8 +929,8 @@ Define a standing service of one of your direct reports (root: a top-level agent
         CHANGING THE CRITERIA (you, root): only as the user's answer after a rejection: answers=<the rejection's
         message id>, about=<the C or R id your one question named>, words=<their answer, verbatim> (it records their yes
         as the link itself); or, for a change the user asks for on their own outside any rejection, words=<their
-        request, verbatim> alone (never admits a playbook revision). Every delivered request of the service needs its
-        verdict first.
+        request, verbatim> alone (never admits a playbook revision). An answer may retire a watched playbook rule; the
+        reply says so. Every delivered request of the service needs its verdict first.
         
 
 ### tool: request
@@ -1159,8 +1159,9 @@ Record the user's verdict on a delivered task: one of your service requests (or 
         the same task_id, verdict "reject", confirms=<the rejection's message id>, criterion ("none", "R<j>" or "C<k>"),
         source "human" and their answer verbatim as note; it records the link, not a new verdict. A yes that changes the
         contract is define_service(..., answers=<the rejection's message id>, about=<the id>, words=<their answer>), which
-        records the link itself; after it, that rejection takes no confirms. Feedback is for reflection only: it never
-        waives an acceptance criterion or changes the outcome of the request.
+        records the link itself; after it, that rejection takes no confirms. An answer may retire a watched playbook rule;
+        the reply says so. Feedback is for reflection only: it never waives an acceptance criterion or changes the outcome
+        of the request.
         
 
 ### tool: observe

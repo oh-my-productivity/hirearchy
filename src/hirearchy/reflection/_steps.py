@@ -6,9 +6,9 @@ from collections.abc import Sequence
 
 from ..agents import AgentDirectory
 
-from ..kernel import Message, client_items, latest_results, link_ids, verdict_tier
+from ..kernel import ROOT, Message, OrgError, client_items, latest_results, link_ids, verdict_tier
 from ..mail import MailboxReader
-from ..services import ServiceCatalog
+from ..services import ServiceCatalog, ServiceEvidence
 from .api import CaseHistory, ServiceSteps, items_listing, regressions, user_approved, user_committed, user_held
 
 ASK_C = 'About {id}: add "<the rule, in their words>" as a lasting rule? Yes or no.'
@@ -65,6 +65,25 @@ DEFAULT_RUN_HELD = (  # D-E7-2 A1: after HELD, when the runs the team holds cove
 )
 
 
+WATCH_WARNED = (  # 8.5: the answer warned an item
+    "Rejection {rejection} is related to playbook item {id} of {service}: {id} is in warning now ({owner} was told); one more related rejection retires it."
+)
+WATCH_RETIRED = (  # 8.5: the watch retired an item (an `op: watch` version whose `related` holds the rejection)
+    "The watch retired {id} of {service} (playbook v{n}) because rejections {rejections} are related to it{restored}; {owner} was told."
+)
+WATCH_RESTORED = ", and restored the text of v{k}"
+WATCH_DUE = (  # 8.5: two related rejections and the retire could not be written yet
+    "The watch could not retire {id} of {service} yet (retire due: {rejections} are related); it retries at {owners}the next recorded answer."
+)
+WATCH_DUE_OWNER = "the owner's next change of the playbook or "  # left out when the contract is locked: the owner cannot change the playbook
+WATCH_UNREAD = "The watch could not be checked ({error}); it is checked again at the next change."
+
+
+def _and(ids: Sequence[str]) -> str:
+    """``R4``, ``R4 and R6``, ``R4, R5 and R6``."""
+    return ids[0] if len(ids) == 1 else ", ".join(ids[:-1]) + " and " + ids[-1]
+
+
 def client_round(agents: AgentDirectory, owner: str) -> int:
     """The runs one round of the client's questions or a rejection takes the team of ``owner``: the owner reads the client's rework (1), and each
     agent below it gets one rework or re-check delegation of about 2 runs (its run and the run of its manager that processes the result)."""
@@ -90,7 +109,10 @@ def question_for(note: Message, criteria: Sequence[str], earlier: Sequence[str])
 class TextServiceSteps(ServiceSteps):
     """Reads the rejection and the cases of its service; the rejections are numbered service-wide, as ``services`` numbers them."""
 
-    def __init__(self, agents: AgentDirectory, catalog: ServiceCatalog, history: CaseHistory, mail: MailboxReader) -> None:
+    def __init__(
+        self, agents: AgentDirectory, catalog: ServiceCatalog, history: CaseHistory, mail: MailboxReader, evidence: ServiceEvidence,
+    ) -> None:
+        self._evidence = evidence
         self._agents = agents
         self._catalog = catalog
         self._history = history
@@ -132,6 +154,44 @@ class TextServiceSteps(ServiceSteps):
         if tier == "human" and note.feedback == "reject":
             return ONE_OFF_REJECTED.format(to=task.to, task=task.id)
         return ""
+
+    def watch_step(self, rejection: str) -> str:
+        try:
+            return "\n".join(self._watch_lines(rejection))
+        except (OrgError, OSError) as error:  # the one error text a reply carries: its own read failing (19.1)
+            return WATCH_UNREAD.format(error=error)
+
+    def _watch_lines(self, rejection: str) -> list[str]:
+        """The sentences of 8.5 for ``rejection`` (the user's answer to it was just recorded): the items it warned, the watch's retires that rest on it,
+        and the items whose retire is due. Root's rejections only (the answer paths are root's)."""
+        sent = self._mail.sent(ROOT)
+        note = next((m for m in sent if m.id == rejection and m.feedback == "reject"), None)
+        task = next((m for m in sent if note is not None and m.id == note.reply_to and m.type == "task"), None)
+        if task is None or not task.service:
+            return []
+        owner, service = task.to, task.service
+        found = next((r for r in self._evidence.amendment_basis(owner, service).rejections if r.note == rejection), None)
+        if found is None:
+            return []
+        watch = self._evidence.watch(owner, service)
+        versions = self._catalog.playbook_versions(owner, service)
+        contract = self._catalog.read_contract(owner, service)
+        lines = [
+            WATCH_WARNED.format(rejection=found.assertion, id=w.id, service=service, owner=owner)
+            for w in watch if w.state == "warning" and w.related == (found.assertion,)
+        ]
+        lines += [
+            WATCH_RETIRED.format(
+                id=v.item, service=service, n=v.version, rejections=_and(v.related), owner=owner,
+                restored=WATCH_RESTORED.format(k=v.restores) if v.restores else "",
+            )
+            for v in versions if v.op == "watch" and found.assertion in v.related
+        ]
+        owners = "" if contract is not None and contract.locked else WATCH_DUE_OWNER
+        lines += [
+            WATCH_DUE.format(id=w.id, service=service, rejections=_and(w.related), owners=owners) for w in watch if w.retire_due
+        ]
+        return lines
 
     def rework_step(self, task: Message) -> str:
         if task.type != "task" or not task.revises:

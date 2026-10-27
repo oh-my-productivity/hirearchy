@@ -26,16 +26,28 @@ class ServicesCommand(Command):
         self._out.say(self._reports().services_text(ROOT))
 
 
+def say_watch(out: Output, steps: ServiceSteps, rejection: str) -> None:
+    """What an answer did to the watch (design 8.5), one line for each sentence of ``watch_step`` after today's line. It is advice about an answer
+    already recorded and committed, so it never fails the command."""
+    try:
+        text = steps.watch_step(rejection)
+    except (OrgError, OSError):
+        return
+    for line in text.splitlines():
+        out.say(line)
+
+
 class DefineServiceCommand(Command):
     def __init__(
         self, session: OrgSession, commands: Provider[ServiceCommands], catalog: Provider[ServiceCatalog], contracts: Provider[ContractNormalizer],
-        snapshots: Provider[OrgSnapshotter], text: TextSource, out: Output,
+        snapshots: Provider[OrgSnapshotter], steps: Provider[ServiceSteps], text: TextSource, out: Output,
     ) -> None:
         self._session = session
         self._commands = commands
         self._catalog = catalog
         self._contracts = contracts
         self._snapshots = snapshots
+        self._steps = steps
         self._text = text
         self._out = out
 
@@ -90,6 +102,8 @@ class DefineServiceCommand(Command):
         )
         self._snapshots().commit(f"root: service {args.name} of {args.owner}")
         self._out.say(text)
+        if args.answers and args.answers.strip():
+            say_watch(self._out, self._steps(), args.answers.strip())
 
 
 class RequestCommand(Command):
@@ -148,10 +162,13 @@ class RequestCommand(Command):
 
 
 class FeedbackCommand(Command):
-    def __init__(self, session: OrgSession, commands: Provider[ServiceCommands], snapshots: Provider[OrgSnapshotter], out: Output) -> None:
+    def __init__(
+        self, session: OrgSession, commands: Provider[ServiceCommands], snapshots: Provider[OrgSnapshotter], steps: Provider[ServiceSteps], out: Output,
+    ) -> None:
         self._session = session
         self._commands = commands
         self._snapshots = snapshots
+        self._steps = steps
         self._out = out
 
     def add_arguments(self, sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -176,6 +193,7 @@ class FeedbackCommand(Command):
         self._snapshots().commit(f"root: feedback {msg.id} -> {msg.to}")
         if args.confirms:
             self._out.say(f"link on {args.confirms} -> {msg.to}: {msg.criterion} (message {msg.id}, source {msg.source})")
+            say_watch(self._out, self._steps(), args.confirms)
             return
         about = f", about {msg.criterion}" if msg.criterion else ""
         self._out.say(f"feedback {args.verdict} on {args.task_id} -> {msg.to} (message {msg.id}, source {msg.source}{about})")
@@ -187,6 +205,7 @@ class FeedbackCommand(Command):
             )
             self._snapshots().commit(f"root: feedback {link.id} -> {link.to}")
             self._out.say(f"link on {msg.id} -> {link.to}: {link.criterion} (message {link.id}, source {link.source})")
+            say_watch(self._out, self._steps(), msg.id)
 
 
 class RetireServiceCommand(Command):

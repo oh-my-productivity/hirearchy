@@ -28,9 +28,9 @@ def test_a_note_it_cannot_place_has_no_feedback_step(steps: ServiceSteps) -> Non
     assert steps.feedback_step(lost) == ""
 
 
-def test_service_steps_offer_the_feedback_and_rework_steps_only(steps: ServiceSteps) -> None:
-    """An amendment can no longer precede the user's yes (the gate refuses it), so no step follows one."""
-    assert sorted(name for name in dir(ServiceSteps) if not name.startswith("_")) == ["feedback_step", "rework_step"]
+def test_service_steps_offer_the_feedback_rework_and_watch_steps_only(steps: ServiceSteps) -> None:
+    """An amendment can no longer precede the user's yes (the gate refuses it), so no step follows one; the watch step (8.5) is the third and last."""
+    assert sorted(name for name in dir(ServiceSteps) if not name.startswith("_")) == ["feedback_step", "rework_step", "watch_step"]
     assert not hasattr(steps, "amendment_step")
 
 
@@ -60,3 +60,9 @@ def test_a_human_rework_of_an_open_request_it_cannot_place_has_no_held_step(step
             sender="root", to="ceo", type="task", body="x", service=SERVICE, revises="20260101T000000000000-root-0001", source="human", budget=budget,
         )
         assert steps.rework_step(human) == ""
+
+
+def test_watch_step(steps: ServiceSteps) -> None:
+    """Design 8.5: the sentences of what an answer did to the watch; for a rejection it cannot place there are none, whatever the implementation."""
+    assert steps.watch_step("20260101T000000000000-root-0001") == ""
+    assert steps.watch_step("") == ""

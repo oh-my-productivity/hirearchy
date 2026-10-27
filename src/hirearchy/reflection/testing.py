@@ -281,9 +281,10 @@ def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder, char
         runs.put_log(addr, f"{d.clock.now():{STAMP_FORMAT}}.log", "# run\n")
 
     checks = FolderDeliverableChecks(s.catalog, history, d.mail, folders, FixedCheckedVersions(), HashBlobIds(), d.clock)
+    evidence = CaseServiceEvidence(history, s.catalog, s.store, d.mail)
     return ReflectionWorld(
         history=history, digest=digest, reports=TextServiceReports(d.agents, s.catalog, history, paths), sections=sections,
-        steps=TextServiceSteps(d.agents, s.catalog, history, d.mail), rejections=rejections, evidence=CaseServiceEvidence(history, s.catalog, s.store, d.mail), paths=paths, s=s, runs=runs.reader, use_run=use_run,
+        steps=TextServiceSteps(d.agents, s.catalog, history, d.mail, evidence), rejections=rejections, evidence=evidence, paths=paths, s=s, runs=runs.reader, use_run=use_run,
         deliverables=checks, records=DerivedCaseRecords(history, s.catalog, d.agents, d.mail, s.store, NoBarHistory(), checks),
     )
 
