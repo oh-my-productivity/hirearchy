@@ -27,7 +27,7 @@ from ._watch_kit import Watching, contract, rule, world
 from ._watch_stream import FULL_NAMES, INITIALS, NOTE, Stream
 
 SEEDS = (33, 53, 20, 21, 58, 81, 15, 25)  # the generated watches: 60 to 840 admissible orders each, 2 to 7 records
-CORRECTED_SEEDS = (5, 19, 64, 90)  # watches with one corrected link inserted
+CORRECTED_SEEDS = (5, 11, 37, 68, 90)  # watches with one corrected link inserted: the user's second link on a rejection
 B1_SEEDS = (1, 2)  # watches built around B1's second related rejection (the first with root's relayed verdict too: 7 records)
 MAX_RECORDS = 7
 ACCEPTANCE = ["a", "b", "c", "d", "f", "g"]  # the version an answer writes: it removes C5 ("e") and adds C7
@@ -174,17 +174,15 @@ def test_the_final_state_equals_the_derivation_from_scratch() -> None:
 
 
 def test_one_corrected_link_is_the_only_move_outside_the_paths() -> None:
-    corrected = 0
+    """The one exception to the monotonicity property (8.2): a corrected link can unrelate a related rejection or relate an unrelated one."""
+    outside: set[tuple[str, str]] = set()
     for seed in CORRECTED_SEEDS:
-        recs = scenario(seed, corrected=True)
-        fix = next((r for r in recs if r.key.startswith("c:")), None)
-        if fix is None:
-            continue
-        corrected += 1
+        fix = next(r for r in scenario(seed, corrected=True) if r.key.startswith("c:"))  # every seed holds one
         for order, states in runs(seed, "corrected"):
             position = [r.key for r in order].index(fix.key) + 1
             assert set(violations(states)) <= {position}, (seed, [r.key for r in order], states)
-    assert corrected >= 2
+            outside |= {(before, after) for before, after in zip(states, states[1:]) if after not in PATHS[before]}
+    assert {("kept", "warning"), ("warning", "new")} <= outside  # the exception does happen, and only there
 
 
 def test_a_second_related_rejection_recorded_after_d_retires_in_every_order() -> None:
