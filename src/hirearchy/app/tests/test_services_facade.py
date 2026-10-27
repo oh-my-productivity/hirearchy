@@ -122,6 +122,10 @@ class Commands(ServiceCommands):
         self.calls.append(("feedback", (actor, task_id, verdict, note), kw))
         return Message(sender=actor, to="ceo", type="note", body="b", id="RATED")
 
+    def acknowledge_playbook(self, actor: str, owner: str, service: str, item: str, op: str, **kw: Any) -> Message:
+        self.calls.append(("acknowledge_playbook", (actor, owner, service, item, op), kw))
+        return Message(sender=actor, to=owner, type="note", body="b", id="ACKNOWLEDGED")
+
 
 def test_service_names_come_from_the_catalog_of_the_runtime(org: Org) -> None:
     use(org, service_catalog=Catalog())
@@ -176,6 +180,17 @@ def test_the_other_commands_come_from_the_commands_of_the_runtime(org: Org) -> N
         ("feedback", ("root", "T1", "reject", "words"), {"source": None, "criterion": None, "confirms": None}),
         ("feedback", ("root", "T1", "accept", ""), {"source": None, "criterion": None, "confirms": None}),
         ("feedback", ("root", "T1", "reject", "yes"), {"source": "human", "criterion": ["C1"], "confirms": "M1"}),
+    ]
+
+
+def test_org_acknowledge_playbook_delegates(org: Org) -> None:
+    fake = Commands()
+    use(org, service_commands=fake)
+    assert org.acknowledge_playbook("root", "ceo", "x", "P1", "edit", text_hash="0123456789ab", words="Yes.").id == "ACKNOWLEDGED"
+    assert org.acknowledge_playbook("ceo", "eng", "x", "P2", "retire").id == "ACKNOWLEDGED"
+    assert fake.calls == [
+        ("acknowledge_playbook", ("root", "ceo", "x", "P1", "edit"), {"text_hash": "0123456789ab", "words": "Yes."}),
+        ("acknowledge_playbook", ("ceo", "eng", "x", "P2", "retire"), {"text_hash": None, "words": None}),
     ]
 
 

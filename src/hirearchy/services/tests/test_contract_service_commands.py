@@ -11,7 +11,7 @@ from typing import Any
 import pytest
 
 from hirearchy.kernel import Message, OrgError, split_frontmatter
-from hirearchy.services import FEEDBACK_HEADER, LINK_HEADER, AmendmentBasis, Rejection, ServiceCommands
+from hirearchy.services import FEEDBACK_HEADER, LINK_HEADER, AmendmentBasis, ItemWatch, Rejection, ServiceCommands
 from hirearchy.services.testing import IMPLEMENTATIONS, AdmittingServiceEvidence, RefusingServiceEvidence, ServicesWorld, fs_world, memory_world
 
 from ._support import BRIEF, STEPS, STEPS_ITEMS, amend, answer, define, grant, implementations, make, populated, request, write_version
@@ -1117,3 +1117,22 @@ def test_the_checks_before_the_gate_come_first(refusing: ServicesWorld) -> None:
         w.commands.revise_playbook("ceo", "weekly-brief", "add", "why", "not a list", kind="step", text="Cite.")
     with pytest.raises(OrgError, match="^refused: no change: P1 already reads so"):
         w.commands.revise_playbook("ceo", "weekly-brief", "edit", "why", ["R1"], item="P1", text="Search.")
+
+
+# ============================================================================================== acknowledge_playbook: the parent's note (design 9.2)
+
+
+@pytest.mark.parametrize("factory", [fs_world, memory_world], ids=lambda f: f.__name__)
+def test_acknowledge_playbook(factory: Any, tmp_path: Path) -> None:
+    w = populated(factory(tmp_path, AdmittingServiceEvidence(watch=(ItemWatch("P1", "step", "kept", 1, coverage=("C1",)),))))
+    define(w)
+    w.commands.revise_playbook("ceo", "weekly-brief", "first", "first draft", [], text=STEPS)
+    note = w.commands.acknowledge_playbook("root", "ceo", "weekly-brief", "p1", "edit", text_hash="0123456789ab", words="Yes, change it.")
+    assert (note.sender, note.to, note.type, note.wake, note.source) == ("root", "ceo", "note", False, "human")
+    assert (note.title, note.acknowledges, note.body) == (
+        "playbook acknowledgement: edit P1 of weekly-brief", "weekly-brief edit P1 0123456789ab", "Yes, change it.",
+    )
+    assert [m.acknowledges for m in w.d.inbox("ceo")] == ["weekly-brief edit P1 0123456789ab"]
+    with pytest.raises(OrgError, match="^refused: P2 covers no current criterion or confirmed assertion"):
+        w.commands.acknowledge_playbook("root", "ceo", "weekly-brief", "P2", "retire", words="Yes.")
+    assert len(w.d.inbox("ceo")) == 1  # a refusal writes nothing

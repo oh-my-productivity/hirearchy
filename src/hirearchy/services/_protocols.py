@@ -150,6 +150,15 @@ class PlaybookRevisions(Protocol):
         ...
 
 
+@runtime_checkable
+class PlaybookAcknowledgements(Protocol):
+    def acknowledge_playbook(
+        self, actor: str, owner: str, service: str, item: str, op: str, *, text_hash: str | None = None, words: str | None = None,
+    ) -> Message:
+        """Write the parent's acknowledgement of a playbook change (see ``ServiceCommands.acknowledge_playbook``)."""
+        ...
+
+
 @dataclass(frozen=True)
 class SettleReport:
     """What one settlement did (design 8.5): the ids it retired, the ids it warned, and the ``(id, error)`` of each retire (or note) it could not

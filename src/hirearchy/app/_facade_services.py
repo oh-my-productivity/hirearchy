@@ -1,6 +1,6 @@
 """Standing services: thin wrappers over the ports of the runtime (services).
 
-The bodies call the ports of ``self.runtime`` (step C-services; ARCHITECTURE.md 5.3 and 6.4): ``service_names`` is the catalog's, the five commands are
+The bodies call the ports of ``self.runtime`` (step C-services; ARCHITECTURE.md 5.3 and 6.4): ``service_names`` is the catalog's, the six commands are
 ``ServiceCommands``'."""
 
 from __future__ import annotations
@@ -68,3 +68,10 @@ class ServicesMixin:
     ) -> Message:
         """Tell the owner whether a delivered service request was accepted or rejected. See :meth:`hirearchy.services.ServiceCommands.feedback`."""
         return self.runtime.service_commands.feedback(actor, task_id, verdict, note, source=source, criterion=criterion, confirms=confirms)
+
+    def acknowledge_playbook(
+        self, actor: str, owner: str, service: str, item: str, op: str, *, text_hash: str | None = None, words: str | None = None,
+    ) -> Message:
+        """The parent of ``owner`` acknowledges a change of its playbook that lowers a bar; returns the note it wrote. See
+        :meth:`hirearchy.services.ServiceCommands.acknowledge_playbook`."""
+        return self.runtime.service_commands.acknowledge_playbook(actor, owner, service, item, op, text_hash=text_hash, words=words)

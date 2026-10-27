@@ -5,22 +5,23 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 from ..kernel import Message
-from ._protocols import ClientFeedback, ContractDefinitions, PlaybookRevisions, ServiceRequests, ServiceRetirement
+from ._protocols import ClientFeedback, ContractDefinitions, PlaybookAcknowledgements, PlaybookRevisions, ServiceRequests, ServiceRetirement
 from .api import PlaybookChange, ServiceCommands
 
 
 class RuleServiceCommands(ServiceCommands):
-    """Defining, retiring, requesting, revising and rating are separate rules; this is the one surface that offers them together."""
+    """Defining, retiring, requesting, revising, rating and acknowledging are separate rules; this is the one surface that offers them together."""
 
     def __init__(
         self, definitions: ContractDefinitions, retirement: ServiceRetirement, revisions: PlaybookRevisions, requests: ServiceRequests,
-        ratings: ClientFeedback,
+        ratings: ClientFeedback, acknowledgements: PlaybookAcknowledgements,
     ) -> None:
         self._definitions = definitions
         self._retirement = retirement
         self._revisions = revisions
         self._requests = requests
         self._ratings = ratings
+        self._acknowledgements = acknowledgements
 
     def define_service(
         self, actor: str, owner: str, name: str, *, description: str | None = None, inputs: object = None, acceptance: object = None,
@@ -62,3 +63,8 @@ class RuleServiceCommands(ServiceCommands):
         confirms: str | None = None,
     ) -> Message:
         return self._ratings.feedback(actor, task_id, verdict, note, source=source, criterion=criterion, confirms=confirms)
+
+    def acknowledge_playbook(
+        self, actor: str, owner: str, service: str, item: str, op: str, *, text_hash: str | None = None, words: str | None = None,
+    ) -> Message:
+        return self._acknowledgements.acknowledge_playbook(actor, owner, service, item, op, text_hash=text_hash, words=words)

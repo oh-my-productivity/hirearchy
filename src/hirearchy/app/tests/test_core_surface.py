@@ -32,7 +32,7 @@ def test_org_ids_and_files_follow_the_ports_of_the_runtime(tmp_path: Path) -> No
 def test_every_def_of_the_old_org_is_in_exactly_one_mixin() -> None:
     recorded = set(json.loads(_signatures.SIGNATURES.read_text(encoding="utf-8"))["Org"])
     held = [m for _, _, methods in MIXINS for m in methods.split()]
-    assert len(held) == len(set(held)) == len(recorded) == 98 and set(held) == recorded
+    assert len(held) == len(set(held)) == len(recorded) == 99 and set(held) == recorded
 
 
 def test_the_module_level_names_that_core_exported_are_still_there() -> None:

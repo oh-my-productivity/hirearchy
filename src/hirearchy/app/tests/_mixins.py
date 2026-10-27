@@ -23,7 +23,7 @@ MIXINS: list[tuple[str, str, str]] = [
     ("eligibility", "EligibilityMixin", "paused pause resume record_failure clear_failures state"),
     ("hierarchy", "HierarchyMixin", "hire retire retire_team"),
     ("dispatch", "DispatchMixin", "can_message _next_hops send delegate report _normalize_artifact _check_lessons"),
-    ("services", "ServicesMixin", "service_names define_service retire_service request revise_playbook feedback"),
+    ("services", "ServicesMixin", "service_names define_service retire_service request revise_playbook feedback acknowledge_playbook"),
     ("overview", "OverviewMixin", "tree"),
     ("prompts", "PromptsMixin", "_agent_line state_summary _indent _quote _render_in_context _upstream _files_lines whoami run_prompt"),
 ]

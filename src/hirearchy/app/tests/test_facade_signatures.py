@@ -16,8 +16,8 @@ EXPECTED = json.loads(_signatures.SIGNATURES.read_text(encoding="utf-8"))
 ACTUAL = _signatures.collect()
 
 
-def test_the_recorded_surface_is_the_98_methods_of_org_and_the_members_of_message() -> None:
-    assert len(EXPECTED["Org"]) == 98
+def test_the_recorded_surface_is_the_99_methods_of_org_and_the_members_of_message() -> None:
+    assert len(EXPECTED["Org"]) == 99
     assert set(EXPECTED["Message"]) == {"__init__", "cut_body", "from_parts", "meta", "parse", "render", "to_text"}  # (``load`` went with the file reader of the old facade: E2-compat)
 
 

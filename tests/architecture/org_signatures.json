@@ -332,6 +332,52 @@
    ],
    "annotated": "(path: 'Path') -> 'bool'"
   },
+  "acknowledge_playbook": {
+   "kind": "method",
+   "params": [
+    {
+     "name": "self",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "actor",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "owner",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "service",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "item",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "op",
+     "kind": "POSITIONAL_OR_KEYWORD",
+     "default": null
+    },
+    {
+     "name": "text_hash",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    },
+    {
+     "name": "words",
+     "kind": "KEYWORD_ONLY",
+     "default": "None"
+    }
+   ],
+   "annotated": "(self, actor: 'str', owner: 'str', service: 'str', item: 'str', op: 'str', *, text_hash: 'str | None' = None, words: 'str | None' = None) -> 'Message'"
+  },
   "agents": {
    "kind": "method",
    "params": [

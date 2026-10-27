@@ -76,6 +76,13 @@ class Commands(ServiceCommands):
         self.calls.append(("feedback", (actor, task_id, verdict, note), {k: v for k, v in given.items() if v is not None}))
         return Message(actor, "ceo", "note", "", id="fb-1", source=source, criterion=", ".join(criterion) if criterion else None)
 
+    def acknowledge_playbook(
+        self, actor: str, owner: str, service: str, item: str, op: str, *, text_hash: str | None = None, words: str | None = None,
+    ) -> Message:
+        given = {"text_hash": text_hash, "words": words}
+        self.calls.append(("acknowledge_playbook", (actor, owner, service, item, op), {k: v for k, v in given.items() if v is not None}))
+        return Message(actor, owner, "note", "", id="ack-1", acknowledges=f"{service} {op} {item}")
+
 
 def tools(agents: MemoryAgents | None = None, offered: dict[str, list[str]] | None = None, exists: bool = True,
           reports: ScriptedReports | None = None, steps: ScriptedSteps | None = None, needs_base: bool = False) -> tuple[ServiceTools, Commands]:

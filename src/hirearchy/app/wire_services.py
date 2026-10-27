@@ -12,6 +12,7 @@ from ..dispatch import MessageSender, ReworkContext
 from ..kernel import AtomicWriter, Clock, EventSink, OrgLayout
 from ..mail import MailboxReader
 from ..services import CaseAllowance, ContractNormalizer, JudgedVersions, ServiceCatalog, ServiceCommands, ServiceEvidence, ServiceHints, ServiceStore
+from ..services._acknowledge import RuleAcknowledger
 from ..services._amend import ContractAmender
 from ..services._catalog import ContractServiceCatalog
 from ..services._commands import RuleServiceCommands
@@ -65,4 +66,5 @@ def _commands(b: Builder) -> ServiceCommands:
             agents, catalog, mail, TextRequestBodies(), sender, b.get(JudgedVersions), b.get(CaseAllowance), b.get(ServiceEvidence), store,
         ),
         RuleClientFeedback(agents, mail, sender, b.get(ServiceEvidence), store, settler),
+        RuleAcknowledger(agents, catalog, owners, b.get(ServiceEvidence), sender),
     )

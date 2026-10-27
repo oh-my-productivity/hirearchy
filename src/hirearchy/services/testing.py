@@ -23,6 +23,7 @@ from ..dispatch.testing import memory_world as dispatch_memory_world
 from ..kernel import ROOT, AtomicWriter, JsonObject, Message, OrgError, OrgPaths, join_frontmatter, norm, split_frontmatter
 from ..kernel.testing import ListEventSink, fs_atomic_writer
 from ..mail import MailboxReader
+from ._acknowledge import RuleAcknowledger
 from ._amend import ContractAmender
 from ._catalog import ContractServiceCatalog
 from ._commands import RuleServiceCommands
@@ -408,6 +409,7 @@ def _world(
             d.agents, catalog, d.mail, TextRequestBodies(), d.sender, judged or NoJudgedVersions(), allowance or FixedAllowance({}), gate, store,
         ),
         RuleClientFeedback(d.agents, d.mail, d.sender, gate, store, watcher),
+        RuleAcknowledger(d.agents, catalog, owners, gate, d.sender),
     )
     return ServicesWorld(
         commands=commands, catalog=catalog, store=store, hints=ServiceReportHints(catalog), evidence=gate,

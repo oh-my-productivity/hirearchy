@@ -67,6 +67,7 @@ __all__ = [
     "ServiceStore",
     "TOKEN",
     "VERDICTS",
+    "acknowledge_reply",
     "amendment_ids",
     "changed_lines",
     "confirmed_amendments",
@@ -600,6 +601,19 @@ class ServiceCommands(Protocol):
         still exists, and ``criterion`` and ``confirms`` are refused (a one-off has no contract)."""
         ...
 
+    def acknowledge_playbook(
+        self, actor: str, owner: str, service: str, item: str, op: str, *, text_hash: str | None = None, words: str | None = None,
+    ) -> Message:
+        """The parent of ``owner`` (root, or the manager that hired it) acknowledges a change of the owner's playbook that lowers a bar: returns the
+        quiet note it wrote to ``owner`` (design 9).
+
+        ``item`` is a live item of ``owner``'s ``service`` that covers a current criterion or a confirmed assertion; ``op`` is ``retire`` or ``edit`` (a
+        restore to a weaker text is acknowledged as the ``edit`` to the restored text). An ``edit`` is acknowledged for one new text: ``text_hash`` is the
+        12 hex digits the owner's request named (the SHA-256 of that text); a ``retire`` takes none. Root passes ``words``, the user's yes verbatim (1 to
+        ``FEEDBACK_MAX`` characters), after it asked them; a manager passes none. The note carries the header ``acknowledges``; the owner applies it by
+        making the refused change again with ``acknowledged=<the note's id>``. A refusal writes nothing."""
+        ...
+
 
 @dataclass(frozen=True)
 class Admission:
@@ -756,6 +770,7 @@ class CaseAllowance(Protocol):
 
 
 # Pure rules re-exported from their modules; they import the types above, so these imports come last.
+from ._acknowledge import acknowledge_reply  # noqa: E402
 from ._criteria import amendment_ids, version_in_force  # noqa: E402
 from ._items import migrate_body  # noqa: E402
 from ._parse import contract_of  # noqa: E402

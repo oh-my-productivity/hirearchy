@@ -25,7 +25,7 @@ Method resolution order (the mixins define disjoint names and every method is a 
      EligibilityMixin   paused pause resume record_failure clear_failures state
      HierarchyMixin     hire retire retire_team
      DispatchMixin      can_message send delegate report ...
-     ServicesMixin      service_names define_service retire_service request revise_playbook feedback
+     ServicesMixin      service_names define_service retire_service request revise_playbook feedback acknowledge_playbook
      OverviewMixin      tree
      PromptsMixin       state_summary whoami run_prompt ...
      object

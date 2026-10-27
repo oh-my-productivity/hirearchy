@@ -1,6 +1,6 @@
 """The ``Org`` facade is a contract with three parts (ARCHITECTURE.md 6.4, step E2-facade).
 
-1. It is the whole recorded surface: one case for each of the 98 methods of ``tests/architecture/org_signatures.json`` (their names, kinds and
+1. It is the whole recorded surface: one case for each of the 99 methods of ``tests/architecture/org_signatures.json`` (their names, kinds and
    parameters are guarded by ``hirearchy/app/tests/test_facade_signatures.py``), grouped by the mixin that holds them.
 2. Every method does what its feature does: through a runtime of spy fakes (``open_runtime(root, overrides)``) it makes exactly one call of
    exactly one port, with the arguments it was given, and returns what the port returned; through the real runtime it returns, or raises, what the
@@ -48,7 +48,7 @@ def test_there_is_one_case_for_each_method_of_the_recorded_surface() -> None:
     names = [c.name for c in CASES]
     assert len(names) == len(set(names))
     assert set(names) == set(RECORDED) - {"__init__"}  # __init__ is the constructor of the facade: test_construction_*
-    assert len(names) + 1 == 98
+    assert len(names) + 1 == 99
 
 
 @pytest.mark.parametrize("name", sorted(set(RECORDED) - {"__init__"}))

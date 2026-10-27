@@ -275,6 +275,11 @@ class RecordingServiceCommands(ServiceCommands):
     ) -> Message:
         raise OrgError("an application gives no feedback")
 
+    def acknowledge_playbook(
+        self, actor: str, owner: str, service: str, item: str, op: str, *, text_hash: str | None = None, words: str | None = None,
+    ) -> Message:
+        raise OrgError("an application does not acknowledge playbook changes")
+
 
 class RecordingSnapshots(OrgSnapshotter):
     def __init__(self, log: CallRecording) -> None:
@@ -389,6 +394,11 @@ class FlakyServiceCommands(ServiceCommands):
         confirms: str | None = None,
     ) -> Message:
         return self._inner.feedback(actor, task_id, verdict, note, source=source, criterion=criterion, confirms=confirms)
+
+    def acknowledge_playbook(
+        self, actor: str, owner: str, service: str, item: str, op: str, *, text_hash: str | None = None, words: str | None = None,
+    ) -> Message:
+        return self._inner.acknowledge_playbook(actor, owner, service, item, op, text_hash=text_hash, words=words)
 
 
 # ------------------------------------------------------------------------------ the parts, made over fakes or over the real ports
