@@ -25,3 +25,9 @@ def test_the_needle_catches_each_word_in_an_identifier_and_in_a_string(tmp_path:
     docs = tmp_path / "docs.py"
     docs.write_text('"""A memo and a test."""\n\n\ndef contested() -> str:\n    """A meeting about code."""\n    return "contract"  # a ticket\n', encoding="utf-8")
     assert violations(docs) == []  # documentation is not read; "contested" and "contract" hold none of the words as whole words
+
+
+def test_the_watch_module_names_no_domain() -> None:
+    """The watch (design 8) is domain-agnostic: ``_watch.py`` holds no word of the work it was first measured on."""
+    found = violations(PACKAGE / "_watch.py")
+    assert found == [], "the core is domain-agnostic: " + "; ".join(found)

@@ -7,10 +7,10 @@ done, verdict=(tick, kind), link=(tick, ids))``. A rejection is related to P2 wh
 from __future__ import annotations
 
 from hirearchy.kernel import Message
-from hirearchy.reflection._watch import watch_states
+from hirearchy.reflection._watch import watch_k, watch_states
 from hirearchy.services import ItemWatch, Playbook
 
-from ._watch_kit import Watching, contract, playbook, rule, step, world
+from ._watch_kit import Watching, contract, playbook, rule, stamp, step, world
 
 
 def p2(w: Watching) -> ItemWatch:
@@ -547,3 +547,65 @@ def test_a_gated_change_of_a_kept_item_starts_a_new_watch_and_an_exempt_restore_
     fresh = p2(w)
     assert (fresh.state, fresh.clean, fresh.related, fresh.watch_start, fresh.text_version) == ("new", 0, (), w.versions[3].revised, 4)
     assert rule2.id == "P2"
+
+
+# ----------------------------------------------------------------------------------------------------------------------- 8.4: k and r
+
+
+def history(judged: int, failed: int, *, linked: bool = True) -> Watching:
+    """``judged`` cases judged before P2 goes on trial at tick 1000, ``failed`` of them rejected (R1 ...) and answered about C5 (P2 cites C5).
+    Case i: ask 10 i, done 10 i + 1, verdict 10 i + 2, link 10 i + 3."""
+    w = Watching()
+    w.contracts.append(contract(1, ["a", "b", "c", "d", "e", "f"], 0))
+    first = [step("P1", "Read the request.")]
+    w.versions.append(playbook(1, 0, first, op="first", admitted="first"))
+    for i in range(1, judged + 1):
+        bad = i <= failed
+        w.case(f"h{i}", 10 * i, 10 * i + 1, verdict=(10 * i + 2, "reject" if bad else "accept"), link=(10 * i + 3, ["C5"]) if bad and linked else None)
+    w.versions.append(playbook(2, 1000, [*first, rule("P2", "a date is relative", "convert it", why=("C5",))], op="add", item="P2", admitted="c"))
+    return w
+
+
+def test_k_is_3_while_r_is_unknown() -> None:
+    w = world()
+    found = p2(w)
+    assert (found.k, found.r) == (3, (1, 1))  # one judged case before the watch start (c0, rejected about C5): below 10, r is unknown
+    assert w.states()["P1"].k == 0  # never watched: no k
+
+
+def test_k_is_4_7_11_22_for_r_of_0_5_0_3_0_2_0_1() -> None:
+    for failed, expected in ((5, 4), (3, 7), (2, 11), (1, 22)):
+        found = history(10, failed).states()["P2"]
+        assert (found.k, found.r) == (expected, (failed, 10)), failed
+    assert watch_k(10, 10) == 3  # r = 1 gives 3
+    assert watch_k(9, 10) == 3  # ln 0.1 / ln 0.1 is 1: the floor of 3 holds
+    assert [watch_k(f, 1000) for f in (1, 10, 100)] == [2302, 230, 22]  # never capped
+
+
+def test_r_is_unknown_below_10_judged_cases_or_without_a_failure() -> None:
+    assert (lambda f: (f.k, f.r))(history(9, 3).states()["P2"]) == (3, (3, 9))  # a failure seen 3 times in 9 cases: noise
+    assert (lambda f: (f.k, f.r))(history(10, 0).states()["P2"]) == (3, (0, 10))  # 10 cases, none failed
+    assert (lambda f: (f.k, f.r))(history(12, 12).states()["P2"]) == (3, (12, 12))  # r = 1
+
+
+def test_a_link_note_recorded_after_the_watch_start_leaves_r_and_k() -> None:
+    w = history(10, 3, linked=False)  # three rejections nobody has answered at tick 1000
+    before = w.states()["P2"]
+    assert (before.k, before.r) == (3, (0, 10))
+    for i in (1, 2, 3):
+        w.bag.link(w.notes[f"h{i}"], 1100 + i, "C5")  # the user answers them after P2 went on trial
+    after = w.states()["P2"]
+    assert (after.k, after.r) == (3, (0, 10))  # the data as it stood at the watch start
+
+
+def test_an_answering_version_defined_after_the_watch_start_leaves_r_and_k() -> None:
+    """Row xxii (B3): the contract's ``created`` is v1's; only ``defined`` says when the answering version was written."""
+    w = history(10, 3, linked=False)
+    for i in (1, 2, 3):
+        w.contracts.append(contract(1 + i, ["a", "b", "c", "d", "e", "f", f"x{i}"], 1100 + i, answers=w.notes[f"h{i}"].id, about="C5", created=stamp(0)))
+    found = w.states()["P2"]
+    assert (found.k, found.r) == (3, (0, 10))
+    assert found.related == ()  # and the answers do not relate rejections that were outside the window
+    edited = rule("P2", "a date is relative", "convert it twice", why=("C5",))
+    w.versions.append(playbook(3, 1200, [step("P1", "Read the request."), edited], op="edit", item="P2", admitted="c"))
+    assert (w.states()["P2"].k, w.states()["P2"].r) == (3, (0, 10))  # an edit within the watch does not change r or k

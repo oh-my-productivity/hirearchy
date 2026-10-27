@@ -8,9 +8,11 @@ coverage and refs. Then the items' texts over time, the candidate cases and the 
 
 from __future__ import annotations
 
+import math
 import re
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
+from fractions import Fraction
 from datetime import datetime, timezone
 
 from ..kernel import Message, link_ids, msg_time, verdict_tier
@@ -532,12 +534,36 @@ def _carry(tr: _Tracking, item: PlaybookItem, v: Playbook, before_item: Playbook
     return None
 
 
-def _begin(track: _Track, change: _Change, seg: _Seg, carry: _Retired | None) -> None:
-    """A new watch of ``track`` starting at ``change``; it continues the watch of ``carry`` (same start, its related rejections counted)."""
+def watch_k(failed: int, judged: int) -> int:
+    """The clean cases a watch needs (8.4): 3, unless the recurrence rate ``r = failed / judged`` is known (at least 10 judged cases and 1 failure);
+    then ``max(3, ceil(ln 0.1 / ln(1 - r)))``, exactly (r = 0.5 gives 4, 0.3 gives 7, 0.2 gives 11, 0.1 gives 22). Never capped; r = 1 gives 3."""
+    if judged < 10 or failed < 1 or failed >= judged:
+        return K_DEFAULT
+    left = Fraction(judged - failed, judged)
+    n = max(1, math.ceil(math.log(0.1) / math.log(float(left))))
+    while left ** (n - 1) <= Fraction(1, 10) and n > 1:  # the least n with (1 - r) ** n <= 0.1, whatever the rounding of the logarithms
+        n -= 1
+    while left**n > Fraction(1, 10):
+        n += 1
+    return max(K_DEFAULT, n)
+
+
+def _rate(rec: Records, refs: frozenset[str], start: datetime) -> tuple[int, int]:
+    """``r`` (8.4) as the files stood at the watch start: ``(judged cases with a human rejection whose subjects meet the refs, judged cases)``, over the
+    cases with a result created before it and the verdicts, link notes and answering versions ``defined`` before it."""
+    view = until(rec, before(start))
+    judged = {c.id for c in view.cases if any(d.judged for d in deliveries_of(c, view.latest, {}))}
+    failed = {a.case for a in view.assertions if a.case in judged and subjects_of(view, a.id) & refs}
+    return len(failed), len(judged)
+
+
+def _begin(tr: _Tracking, track: _Track, change: _Change, seg: _Seg, carry: _Retired | None) -> None:
+    """A new watch of ``track`` starting at ``change``; it continues the watch of ``carry`` (same start, k, r and its related rejections counted)."""
     start = min(change.at, carry.watch.start) if carry is not None else change.at
+    r = carry.watch.r if carry is not None else _rate(tr.rec, seg.refs, change.at)
     track.watch = _Watch(
         start, [change], [seg], [carry.watch] if carry is not None else [], carry.item if carry is not None else "",
-        k=carry.watch.k if carry is not None else K_DEFAULT, r=carry.watch.r if carry is not None else (0, 0),
+        k=carry.watch.k if carry is not None else watch_k(*r), r=r,
     )
     track.restored = 0
 
@@ -607,7 +633,7 @@ def _changed(tr: _Tracking, v: Playbook, at: datetime, item: PlaybookItem, previ
             if in_watch and w is not None:
                 _restart(w, change, seg, carry)  # W2: a gated change, or an exempt restore, in the watch
             else:
-                _begin(track, change, seg, carry)
+                _begin(tr, track, change, seg, carry)
             return
     if previous is None:  # appears outside a watch: the first version, a migration, a restore of a client-written text
         track.watch = None
