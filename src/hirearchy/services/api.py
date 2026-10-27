@@ -655,7 +655,7 @@ class ServiceEvidence(Protocol):
         """The watch of every item of the playbook of ``owner``'s ``service`` (design 8.1): its state (``new``, ``warning``, ``kept``, ``restored``,
         ``retired``), k and r, the clean cases, the related and pending rejections and the rest of ``ItemWatch``, one per item, retired ones included,
         by number. Derived from the files once per call (mail, contract and playbook versions), never stored: every reader of a watch state goes
-        through this one method. ``()`` when the service has no playbook or no contract, or its client is not an agent of the organization."""
+        through this one method. ``()`` when the service has no contract or no playbook, or ``owner`` has no client (it is root)."""
         ...
 
 
