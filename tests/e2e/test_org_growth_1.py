@@ -377,3 +377,81 @@ def test_g2b_end_of_stream_check_lists_no_unanswered_human_rejection(svc):
     assert unanswered() == []
     assert [r.assertion for r in svc.runtime.service_evidence.amendment_basis("ceo", WEEK).rejections] == ["R1", "R2", "R3"]  # each has its R<k>
     assert request(svc, "four").type == "task"  # nothing is due: the request is sent
+
+
+WEEKS = "Names the week it covers"  # a correct rule: the own words of a criterion the client confirmed and never reverses
+
+
+def correct_rule(org):
+    """ceo's v1 and a correct (c) rule (P4: the words of a confirmed criterion, WEEKS); its watch starts ``new``. Returns the criterion's id."""
+    org.revise_playbook("ceo", WEEK, "first", "first draft", [], text=STEPS)
+    cid = confirmed_amendment(org, WEEKS)
+    org.revise_playbook("ceo", WEEK, "add", "the client's rule", [cid], kind="rule", then=WEEKS)
+    return cid
+
+
+def answered_none(org, server, task, note="Too long."):
+    """The client rejects ``task`` and answers the one question: no lasting rule. Returns the rejection's id."""
+    no = org.feedback(ROOT, task.id, "reject", note, source="human")
+    call(server, "feedback", task_id=task.id, verdict="reject", note="No, a one-off.", source="human", criterion=["none"], confirms=no.id)
+    return no.id
+
+
+def test_a_correct_c_rule_reaches_kept_at_k(svc):
+    """G1(a), design 8.1, 20 e2e (4): a correct rule is `new` with 0 of 3 clean cases; each judged case without a related rejection counts (a rejection the
+    client answers 'no lasting rule' leaves the case clean); a delivery with no verdict yet, or a rejection with no answer, holds it `new` and says what it
+    waits for; at the third clean case it is `kept`, and no reader lists it as watched any more."""
+    server = build_server(svc, ROOT)
+    correct_rule(svc)
+    rt = svc.runtime
+    start = watched(svc)
+    assert (start.state, start.k, start.clean, start.waiting) == ("new", 3, 0, 0)
+    accepted(svc, "one")
+    one = watched(svc)
+    assert (one.state, one.clean, one.waiting) == ("new", 1, 0)
+    second = delivered(svc, "two")  # delivered, not yet judged
+    assert (watched(svc).state, watched(svc).clean, watched(svc).waiting) == ("new", 1, 1)
+    no = svc.feedback(ROOT, second.id, "reject", "Too long.", source="human")  # judged, but the rejection has no answer
+    held = watched(svc)
+    assert (held.state, held.clean, held.pending) == ("new", 1, ("R2",))
+    listed = next(x for x in rt.service_reports.services_text(ROOT).splitlines() if x.startswith("  playbook v"))
+    assert listed.endswith("; 4 items (1 rule); watched: P4 new (1 of 3 clean cases, k 3; waiting for the user's answer to R2)")
+    call(server, "feedback", task_id=second.id, verdict="reject", note="No, a one-off.", source="human", criterion=["none"], confirms=no.id)
+    answered = watched(svc)
+    assert (answered.state, answered.clean, answered.pending, answered.related) == ("new", 2, (), ())
+    accepted(svc, "three")
+    kept = watched(svc)
+    assert (kept.state, kept.clean, kept.related, kept.retire_due) == ("kept", 3, (), False)
+    assert playbook_of(svc).version == 2 and WEEKS in playbook_of(svc).body  # a kept rule is untouched
+    listed = next(x for x in rt.service_reports.services_text(ROOT).splitlines() if x.startswith("  playbook v"))
+    assert listed.endswith("; 4 items (1 rule), none watched")  # nothing left to watch
+    record = [(w["item"], w["state"], w["clean"], w["related"]) for w in rt.quality_report.quality_data(WEEK)["services"][0]["watch"] if w["item"] == "P4"]
+    assert record == [("P4", "kept", 3, [])]
+    accepted(svc, "four")
+    assert watched(svc).state == "kept"  # later cases change nothing
+
+
+def test_a_corrected_link_after_k_warns_it_and_a_second_retires_it(svc):
+    """Design 8.1 (the one exception to monotonicity; row xix), 8.2, 20 e2e (4): the rule reached `kept` over two rejections the client answered 'no lasting
+    rule'. Her corrected link (a second link on the same rejection, which 0a.2 lets decide) makes R2 about the rule's criterion: the rule is `warning` again
+    (kept -> warning, the exception); a second corrected link, on R3, retires it in that call."""
+    server = build_server(svc, ROOT)
+    cid = correct_rule(svc)
+    accepted(svc, "one")
+    first = delivered(svc, "two")
+    r2 = answered_none(svc, server, first)
+    second = delivered(svc, "three")
+    r3 = answered_none(svc, server, second, "Still too long.")
+    kept = watched(svc)
+    assert (kept.state, kept.clean, kept.related) == ("kept", 3, ())
+    corrected = call(server, "feedback", task_id=first.id, verdict="reject", note="I meant the week, yes.", source="human", criterion=[cid], confirms=r2)
+    assert corrected.endswith("\n" + WARNED)  # kept -> warning
+    again = watched(svc)
+    assert (again.state, again.related, again.retire_due) == ("warning", ("R2",), False)
+    (told,) = notes_titled(svc, "ceo", "playbook item P4 of weekly-brief: warning")
+    assert "Rejection R2 (case " in told.body and playbook_of(svc).version == 2
+    retired = call(server, "feedback", task_id=second.id, verdict="reject", note="The week too.", source="human", criterion=[cid], confirms=r3)
+    assert retired.endswith("\n" + RETIRED)  # the runtime retires it in the call that records the second corrected link
+    assert playbook_of(svc).version == 3 and WEEKS not in playbook_of(svc).body
+    gone = watched(svc)
+    assert (gone.state, gone.related, gone.retire_due) == ("retired", ("R2", "R3"), False)
