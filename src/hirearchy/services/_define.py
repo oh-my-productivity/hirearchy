@@ -8,7 +8,7 @@ from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
 from ..kernel import NAME_RE, ROOT, Clock, EventSink, JsonObject, Message, OrgError, clip_line, parent, stamp_of
 from ._continue import copy_contracts, copy_playbook_version
-from ._criteria import amendment_ids, answering_version, in_force, stored_basis, stored_versions
+from ._criteria import amendment_ids, answering_version, in_force, stored_basis, stored_versions, unanswered
 from ._lines import criteria_lines
 from ._protocols import (
     ContinuedServices, ContractAmendment, ContractDefinitions, LinkNotes, OwnerAddresses, PlaybookTexts, PlaybookWriter, RetiredService,
@@ -369,7 +369,7 @@ class RuleContractDefiner(ContractDefinitions):
         """What is still open in the record of the continued service, or that nothing is. Advisory: a record that cannot be read says nothing."""
         try:
             basis = self._evidence.amendment_basis(owner, name)
-            waiting = [r for r in basis.rejections if not r.answered and answering_version(self._store, owner, name, r.note) == 0]
+            waiting = unanswered(basis, self._store, owner, name)
         except (OrgError, OSError):
             return ""
         parts = [f"rejection {r.assertion} (message {r.note}) has no answer" for r in waiting]
@@ -387,7 +387,7 @@ class RuleContractDefiner(ContractDefinitions):
             raise OrgError(UNREADABLE.format(name=name, error=error)) from error
         if basis.unrated:  # the verdicts come first, whatever else was passed
             raise OrgError(UNRATED.format(n=len(basis.unrated), name=name, tasks=", ".join(basis.unrated)))
-        waiting = [r for r in basis.rejections if not r.answered and answering_version(self._store, owner, name, r.note) == 0]
+        waiting = unanswered(basis, self._store, owner, name)
         if not words:
             open_ = f" (waiting for an answer: {'; '.join(f'{r.assertion}, message {r.note}' for r in waiting)})" if waiting else ""
             raise OrgError(NEEDS_WORDS.format(name=name, open=open_))

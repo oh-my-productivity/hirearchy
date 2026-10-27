@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from datetime import datetime
 
 from ._parse import contract_of
-from .api import Contract, Criterion, ServiceStore, criteria_of, number_criteria
+from .api import AmendmentBasis, Contract, Criterion, Rejection, ServiceStore, criteria_of, number_criteria
 
 
 def stored_versions(store: ServiceStore, owner: str, name: str) -> list[tuple[int, str, list[str]]]:
@@ -36,6 +36,13 @@ def answering_version(store: ServiceStore, owner: str, name: str, note: str) -> 
         if note and contract.answers == note:
             return contract.version
     return 0
+
+
+def unanswered(basis: AmendmentBasis, store: ServiceStore, owner: str, name: str) -> list[Rejection]:
+    """The rejections of ``basis`` that have no recorded answer, oldest first (the order of ``basis``): neither a human link note
+    (``Rejection.answered``) nor a stored contract version that answers them (:func:`answering_version`). The one rule of "answered" for the
+    retirement, the definer, the request and the client's accept: a rejection whose answering version exists but whose link write failed is answered."""
+    return [r for r in basis.rejections if not r.answered and answering_version(store, owner, name, r.note) == 0]
 
 
 def amendment_ids(versions: Sequence[tuple[int, str, Sequence[str]]], version: int) -> tuple[tuple[str, ...], tuple[str, ...]]:

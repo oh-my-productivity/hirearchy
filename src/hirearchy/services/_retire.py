@@ -5,7 +5,7 @@ from __future__ import annotations
 from ..agents import AgentDirectory
 from ..delivery import MessageDelivery
 from ..kernel import ROOT, Clock, EventSink, OrgError, parent
-from ._criteria import answering_version
+from ._criteria import unanswered
 from ._protocols import OwnerAddresses, ServiceRetirement
 from .api import Rejection, ServiceCatalog, ServiceEvidence, ServiceStore
 
@@ -70,7 +70,7 @@ class RuleServiceRetirement(ServiceRetirement):
         and nothing is moved. A record that cannot be read refuses too: a skipped check would keep an incomplete record."""
         try:
             basis = self._evidence.amendment_basis(owner, name)
-            waiting = [r for r in basis.rejections if not r.answered and answering_version(self._store, owner, name, r.note) == 0]
+            waiting = unanswered(basis, self._store, owner, name)
         except (OrgError, OSError) as error:
             raise OrgError(RETIRE_UNREADABLE.format(name=name, error=error)) from error
         if basis.unrated:

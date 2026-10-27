@@ -145,6 +145,51 @@ def test_answering_version_is_0_when_none(tmp_path: Path) -> None:
     assert answering_version(w.store, "ceo", "no-such-service", "N1") == 0
 
 
+def rejection(note: str, assertion: str, answered: str = "") -> services.Rejection:
+    return services.Rejection(note, assertion, f"T-{assertion}", "title", (), "words", answered)
+
+
+def test_unanswered_lists_rejections_with_neither_a_human_link_nor_an_answering_version_oldest_first(tmp_path: Path) -> None:
+    from hirearchy.services._criteria import unanswered
+
+    w = populated(fs_world(tmp_path))
+    define(w, acceptance=["A", "B"])
+    write_version(w, 2, ["A", "B", "C"], answers="N2", about="C1", words="Yes.")  # N2 is answered by contract v2
+    basis = services.AmendmentBasis(
+        (rejection("N1", "R1"), rejection("N2", "R2"), rejection("N3", "R3", answered="L3"), rejection("N4", "R4"), rejection("N5", "R5")), (),
+    )
+    assert [r.note for r in unanswered(basis, w.store, "ceo", "weekly-brief")] == ["N1", "N4", "N5"]  # the order of the basis; N3 has a link, N2 a version
+
+
+def test_a_rejection_whose_answering_version_exists_but_whose_link_write_failed_is_answered(tmp_path: Path) -> None:
+    from hirearchy.services._criteria import unanswered
+
+    w = populated(fs_world(tmp_path))
+    define(w, acceptance=["A"])
+    write_version(w, 2, ["A", "B"], answers="N1", about="C1", words="Yes.")  # the version is stored; the link note was never written
+    basis = services.AmendmentBasis((rejection("N1", "R1", answered=""),), ())
+    assert unanswered(basis, w.store, "ceo", "weekly-brief") == []
+
+
+def test_a_same_as_link_is_an_answer(tmp_path: Path) -> None:
+    from hirearchy.services._criteria import unanswered
+
+    w = populated(fs_world(tmp_path))
+    define(w, acceptance=["A"])
+    basis = services.AmendmentBasis((rejection("N1", "R1", answered="L1"),), ())  # a human link note that names `none` or an R id is an answer too
+    assert unanswered(basis, w.store, "ceo", "weekly-brief") == []
+    assert [r.assertion for r in unanswered(services.AmendmentBasis((rejection("N1", "R1"),), ()), w.store, "ceo", "weekly-brief")] == ["R1"]
+
+
+def test_unanswered_is_empty_for_a_service_without_rejections(tmp_path: Path) -> None:
+    from hirearchy.services._criteria import unanswered
+
+    w = populated(fs_world(tmp_path))
+    define(w, acceptance=["A"])
+    assert unanswered(services.AmendmentBasis((), ()), w.store, "ceo", "weekly-brief") == []
+    assert unanswered(services.AmendmentBasis((), ("T-x",)), w.store, "ceo", "no-such-service") == []  # unrated deliveries are not rejections
+
+
 def test_answer_ids_are_the_added_criteria_in_order(tmp_path: Path) -> None:
     from hirearchy.services._criteria import amendment_ids, answer_ids
 
