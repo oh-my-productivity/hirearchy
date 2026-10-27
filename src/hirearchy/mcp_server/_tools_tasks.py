@@ -47,9 +47,11 @@ class TaskTools(ToolGroup):
         Files in your workspace: the ABSOLUTE path (anything else outside the organization is refused). The runtime
         annotates each with its word count and whether it changed since the task was assigned.
         lessons: required when the task is a request for a service, whatever the status - done, failed or blocked
-        (1-3 lines, at most 800 characters: what worked or went wrong, what to change in the playbook, the evidence:
-        runs, rework, review findings); it is recorded in the result and reviewed before the next request. Optional
-        otherwise.
+        (at most 800 characters). Write an after-action review in labelled parts: Expected: <the criterion id or step it
+        concerns>. Happened: <what the work did>. Caught at: <where it should have been caught>. Cause: <the system
+        cause: a step, a check, a hand-off, an input; not a person>. Prevent: <what would have prevented it>. When
+        nothing went wrong: Near miss: <what almost went wrong, or none>. It is recorded in the result and shown to
+        the service's owner before the next request, as its team's view. Optional otherwise.
         """
             msg = self._reporter().report(me, task_id, status, summary, artifacts or [], lessons)
             returned = f"; returned {msg.budget} unspent run(s) of budget to {msg.to}" if msg.budget else ""

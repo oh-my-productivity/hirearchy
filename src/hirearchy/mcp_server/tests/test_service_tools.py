@@ -407,7 +407,7 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
     assert "No playbook yet" in prompt and "# Reflect" not in prompt
     assert "pass `lessons`" in fails(ceo, "report", task_id=task.id, status="done", summary="Delivered.")
     out = call(ceo, "report", task_id=task.id, status="done", summary="Delivered.", lessons="Used 2 runs; no checks.")
-    assert "reported done" in out and "This service has no playbook yet: write v1 now with revise_playbook" in out
+    assert "reported done" in out and 'This service has no playbook yet: write v1 now with revise_playbook(op="first", text=...)' in out
     org.end_run("ceo", ok=True)
     assert "now v1" in call(ceo, "revise_playbook", service="weekly-brief", op="first", text="## Steps\n1. Search.", reason="first draft")
     assert services.read_playbook(org, "ceo", "weekly-brief").version == 1
@@ -433,7 +433,8 @@ def test_define_request_report_reject_reflect_revise_and_compare_versions(org):
                reason=f"case {task.id} rejected: no changes", evidence=["C3"])
     assert "playbook of weekly-brief is now v2" in out
     out = call(ceo, "report", task_id=second.id, status="done", summary="Delivered again.", lessons="Step 2b worked.")
-    assert "Lessons recorded: they are your team's view and are shown before the next request. A playbook revision rests on the client's evidence" in out
+    assert "Lessons recorded: they are your team's view and are shown before the next request; give them as Expected / Happened" in out
+    assert "A playbook change rests on the client's evidence" in out
     org.end_run("ceo", ok=True)
     call(root, "feedback", task_id=second.id, verdict="accept")
 

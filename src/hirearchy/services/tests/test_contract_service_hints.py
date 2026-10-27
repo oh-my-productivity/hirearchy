@@ -42,7 +42,9 @@ def test_only_a_final_result_gets_a_hint(w: ServicesWorld, status: str) -> None:
 def test_an_owner_without_a_playbook_is_told_to_write_one(w: ServicesWorld) -> None:
     define(w)
     for status in ("done", "failed"):
-        assert w.hints.report_hint("ceo", request(w), status).startswith("This service has no playbook yet: write v1 now with revise_playbook:")
+        assert w.hints.report_hint("ceo", request(w), status).startswith(
+            'This service has no playbook yet: write v1 now with revise_playbook(op="first", text=...):'
+        )
 
 
 def test_an_owner_with_a_playbook_is_told_the_lessons_are_recorded(w: ServicesWorld) -> None:
@@ -87,11 +89,11 @@ def test_the_words_may_be_the_word_accepted_only_when_they_are_all_there_is(hint
     assert hints.feedback_text(note(FEEDBACK_HEADER + "\n\nnot accepted")) == "not accepted"
 
 
-def test_the_report_hint_says_a_revision_rests_on_the_clients_evidence(w: ServicesWorld) -> None:
+def test_the_report_hint_says_a_change_rests_on_the_clients_evidence(w: ServicesWorld) -> None:
     define(w, playbook=STEPS)
     assert w.hints.report_hint("ceo", request(w), "done") == (
-        "Lessons recorded: they are your team's view and are shown before the next request. A playbook revision rests on the client's evidence "
-        "(evidence: rejections R<k>, criteria C<k>), not on lessons."
+        "Lessons recorded: they are your team's view and are shown before the next request; give them as Expected / Happened / Caught at / Cause / "
+        "Prevent, or Near miss. A playbook change rests on the client's evidence (evidence: rejections R<k>, criteria C<k>), not on lessons."
     )
 
 
@@ -99,7 +101,15 @@ def test_the_no_playbook_hint_asks_for_the_steps_followed_only(w: ServicesWorld)
     define(w)
     for status in ("done", "failed"):
         assert w.hints.report_hint("ceo", request(w), status) == (
-            "This service has no playbook yet: write v1 now with revise_playbook: the steps your team followed, nothing more (the first version "
-            "needs no evidence: evidence=[]). A rule drawn from your lessons or from a relayed rework is not a step: it needs the client's "
-            "evidence in a later revision."
+            'This service has no playbook yet: write v1 now with revise_playbook(op="first", text=...): the steps your team followed, nothing more '
+            "(no evidence needed, and only until the client's first verdict or rework; after that, op=\"add\" with the client's evidence). A rule "
+            "drawn from your lessons or from a relayed rework is not a step: it needs the client's evidence."
         )
+
+
+def test_the_hint_with_a_playbook_names_the_aar_form(w: ServicesWorld) -> None:
+    define(w, playbook=STEPS)
+    for status in ("done", "failed"):
+        hint = w.hints.report_hint("ceo", request(w), status)
+        assert "give them as Expected / Happened / Caught at / Cause / Prevent, or Near miss." in hint
+    assert w.hints.report_hint("ceo", request(w), "blocked") == ""  # a blocked report gets no hint, as before

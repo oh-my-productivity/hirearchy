@@ -53,3 +53,10 @@ def svc(org):
 def test_the_report_tool_docstring_says_lessons_are_required_for_blocked(svc):
     tools = {t.name: t for t in asyncio.run(build_server(svc, "ceo").list_tools())}
     assert "whatever the status - done, failed or blocked" in tools["report"].description
+
+
+def test_lessons_asks_for_the_five_parts(org):
+    doc = " ".join(next(t for t in asyncio.run(build_server(org, "ceo").list_tools()) if t.name == "report").description.split())
+    for label in ("Expected:", "Happened:", "Caught at:", "Cause:", "Prevent:", "Near miss:"):
+        assert label in doc
+    assert "not a person" in doc and "1-3 lines" not in doc and "whatever the status - done, failed or blocked" in doc

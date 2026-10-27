@@ -146,12 +146,11 @@ def test_lessons_are_required_on_a_request_for_a_service(w: DispatchWorld, statu
     task = service_task(w)
     with pytest.raises(OrgError) as e:
         w.reporter.report("ceo", task.id, status, "Summary.")
-    assert str(e.value) == (
-        f"task {task.id} is a request for service `weekly-brief`: pass `lessons` - 1-3 lines for the next "
-        "request: what worked, what to change in the playbook, and the evidence (runs, rework, review "
-        "findings). Required for done, failed and blocked alike: a blocker is the most informative case, so "
-        "say what went wrong and what would have prevented it"
+    assert str(e.value).startswith(
+        f"task {task.id} is a request for service `weekly-brief`: pass `lessons` - an after-action review of the work, in these labelled parts: Expected: "
     )
+    assert "Prevent: <what would have prevented it>. When nothing went wrong: Near miss:" in str(e.value)
+    assert str(e.value).endswith("Required for done, failed and blocked alike: a blocker is the most informative case, so say what went wrong and what would have prevented it")
 
 
 def test_lessons_of_only_blanks_are_no_lessons(w: DispatchWorld) -> None:
@@ -175,10 +174,10 @@ def test_lessons_may_be_as_long_as_the_limit_and_no_longer(w: DispatchWorld) -> 
     assert w.reporter.report("ceo", first.id, "done", "Summary.", lessons="x" * LESSONS_MAX_CHARS).status == "done"
     with pytest.raises(OrgError) as e:
         w.reporter.report("ceo", second.id, "done", "Summary.", lessons="x" * (LESSONS_MAX_CHARS + 1))
-    assert str(e.value) == (
-        f"lessons are {LESSONS_MAX_CHARS + 1} characters; the limit is {LESSONS_MAX_CHARS}. Keep 1-3 lines: what worked, "
-        "what to change in the playbook, and the evidence; put detail in a file under your work/ directory."
+    assert str(e.value).startswith(
+        f"lessons are {LESSONS_MAX_CHARS + 1} characters; the limit is {LESSONS_MAX_CHARS}. Keep the after-action review short: Expected: "
     )
+    assert str(e.value).endswith("Put detail in a file under your work/ directory.")
 
 
 # ------------------------------------------------------------------------------ the budget travels with a final result
