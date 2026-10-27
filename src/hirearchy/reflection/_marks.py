@@ -19,6 +19,7 @@ LINE_CLIP = 600  # characters of one of them
 _EVIDENCE_ID = re.compile(r"C\d+|R\d+|\d{8}T\d{12}-[a-z0-9./-]+")  # the cited ids that are shown; any other is agent-written and only counted
 _CRITERION = re.compile(r"C\d+")
 _TAG = re.compile(r"(?<![A-Za-z0-9])[CR]\d+(?![0-9])")  # a line that carries a criterion or assertion id
+_BASES = ("c", "b", "first", "restore", "migrate", "exempt", "watch")  # the admissions a version can record (the last three: item form only)
 
 
 def contract_marks(owner: str, name: str, versions: Sequence[tuple[int, JsonObject, str]], cases: Sequence[Case]) -> tuple[ContractMark, ...]:
@@ -59,6 +60,15 @@ def contract_marks(owner: str, name: str, versions: Sequence[tuple[int, JsonObje
     return tuple(marks)
 
 
+def _item_kind(p: Playbook, before: Playbook | None) -> str:
+    """``step`` or ``rule`` for the item ``p`` changed: found in ``p`` or, for a retired one, in the version before; ``""`` when there is none."""
+    for version in (p, before):
+        for found in (version.items or ()) if version is not None else ():
+            if found.id == p.item:
+                return found.kind
+    return ""
+
+
 def playbook_marks(owner: str, playbooks: Sequence[Playbook], criteria: Sequence[Criterion], cases: Sequence[Case]) -> tuple[PlaybookMark, ...]:
     """One mark per stored version of the playbook (``playbooks``, oldest first), counted against the version before it. ``criteria`` are the
     service's, ``cases`` its cases (the user's link notes that a version may cite)."""
@@ -79,16 +89,23 @@ def playbook_marks(owner: str, playbooks: Sequence[Playbook], criteria: Sequence
                 cited.update({k: by_id[k] for k in link_ids(note) if k in by_id})
         own = [criterion_words(line, list(cited.values())) is not None for line in changed]
         tagged = [_TAG.search(line) is not None for line in changed]
-        basis = p.admitted if p.admitted in ("c", "b", "first", "restore") else "client" if p.by == client else "legacy"
+        basis = p.admitted if p.admitted in _BASES else "client" if p.by == client else "legacy"
+        if p.op:  # an item version says what it restores in its file
+            restores = p.restores or None
+        else:  # a legacy one by the text it came back to
+            restores = next((q.version for q in reversed(playbooks[:position]) if q.body == p.body), None) if basis == "restore" else None
         marks.append(PlaybookMark(
             p.version, p.revised, p.by, basis,
-            restores=next((q.version for q in reversed(playbooks[:position]) if q.body == p.body), None) if basis == "restore" else None,
+            restores=restores,
             evidence=shown, evidence_other=len(p.evidence) - len(shown), changed=len(changed), removed=len(removed),
             own_words=sum(own) if basis == "c" else None, beyond=len(own) - sum(own) if basis == "c" else None,
             tagged=sum(tagged) if basis == "b" else None, untagged=len(tagged) - sum(tagged) if basis == "b" else None,
             cited=tuple((c.id, c.text) for c in cited.values()),
             lines=tuple((clip_line(line, LINE_CLIP), is_own) for line, is_own in zip(changed[:LINES_LISTED], own)),
             lines_more=max(0, len(changed) - LINES_LISTED),
+            op=p.op, item=p.item, item_kind=_item_kind(p, playbooks[position - 1] if position else None) if p.item else "",
+            related=tuple(p.related), acknowledged=p.acknowledged, acknowledged_by=client if p.acknowledged else "",
+            items=len(p.items or ()) if p.op == "migrate" else 0,
         ))
     return tuple(marks)
 

@@ -20,8 +20,9 @@ from hirearchy.mail import MailboxReader
 from hirearchy.reflection._ports import ContractVersions
 from hirearchy.reflection._records import DerivedCaseRecords
 from hirearchy.reflection.testing import FixedBarHistory, FixedDeliverableChecks, NoBarHistory, ReflectionWorld, fs_world, memory_world
-from hirearchy.services import Criterion, Playbook, ServiceCatalog
+from hirearchy.services import Criterion, ItemWatch, Playbook, ServiceCatalog, ServiceEvidence
 from hirearchy.services.api import Contract
+from hirearchy.services.testing import AdmittingServiceEvidence
 
 from ._support import SERVICE, add_step, ask, define, deliver, nested, note_on, populated, rate, rework
 
@@ -178,10 +179,11 @@ class CountingChecks(DeliverableChecks):
 
 def records_of(
     w: ReflectionWorld, *, catalog: ServiceCatalog | None = None, history: CaseHistory | None = None, versions: ContractVersions | None = None,
-    bars: FixedBarHistory | NoBarHistory | None = None, checks: DeliverableChecks | None = None,
+    bars: FixedBarHistory | NoBarHistory | None = None, checks: DeliverableChecks | None = None, evidence: ServiceEvidence | None = None,
 ) -> DerivedCaseRecords:
     return DerivedCaseRecords(
         history or w.history, catalog or w.s.catalog, w.s.d.agents, w.s.d.mail, versions or w.s.store, bars or NoBarHistory(), checks or CountingChecks(),
+        evidence or w.evidence,
     )
 
 
@@ -289,7 +291,9 @@ def test_a_mailbox_that_cannot_be_read_sets_the_record_error_and_makes_deliverie
     define(w)
     deliver(w, ask(w))
     assert only(records_of(w).records()).error == ""  # the control: with a readable mailbox the record builds
-    records = DerivedCaseRecords(w.history, w.s.catalog, w.s.d.agents, UnreadableMail(w.s.d.mail), w.s.store, NoBarHistory(), CountingChecks())
+    records = DerivedCaseRecords(
+        w.history, w.s.catalog, w.s.d.agents, UnreadableMail(w.s.d.mail), w.s.store, NoBarHistory(), CountingChecks(), w.evidence,
+    )
     assert only(records.records()).error == "the mailboxes: [Errno 5] I/O error"
     with pytest.raises(OSError):
         records.deliveries("ceo")  # health's rule: a mailbox that cannot be read raises
@@ -317,6 +321,50 @@ def test_records_order_top_level_then_nested_by_owner_and_name(w: ReflectionWorl
     ]
     assert [(r.client, r.client_kind) for r in found] == [("root", "human")] * 3 + [("ceo", "agent")] * 3 + [("root", "human")]
     assert [(r.owner, r.service) for r in records_of(w).records("alpha")] == [("ops", "alpha"), ("ceo/eng", "alpha")]  # a name two agents offer; no one-off record
+
+
+# ------------------------------------------------------------------------------------------------------------------------ the playbook watch (design 14.4)
+
+
+class CountingWatch(AdmittingServiceEvidence):
+    """The watch of the items it says every service has, and the services it was asked for; it can raise instead."""
+
+    def __init__(self, watch: Sequence[ItemWatch] = (), raises: BaseException | None = None) -> None:
+        super().__init__(watch=watch)
+        self._raises = raises
+        self.asked: list[tuple[str, str]] = []
+
+    def watch(self, owner: str, service: str) -> tuple[ItemWatch, ...]:
+        self.asked.append((owner, service))
+        if self._raises is not None:
+            raise self._raises
+        return super().watch(owner, service)
+
+
+def test_a_records_watch_comes_from_evidence_watch(w: ReflectionWorld) -> None:
+    """The one derivation (design 14.4, 20): the record's `watch` is what `ServiceEvidence.watch` says, once per service record, in its order; the
+    one-off record has none."""
+    define(w)
+    define(w, "ops", "other-brief")
+    watch = (ItemWatch("P1", "step", "kept", 1), ItemWatch("P2", "rule", "warning", 2, related=("R1",)), ItemWatch("P3", "step", "new", 2, k=3, waiting=1))
+    evidence = CountingWatch(watch)
+    found = records_of(w, evidence=evidence).records()
+    assert only(found).watch == watch and only(found, "other-brief").watch == watch
+    assert one_off(found).watch == () and sorted(evidence.asked) == [("ceo", SERVICE), ("ops", "other-brief")]
+    assert only(records_of(w, evidence=CountingWatch()).records()).watch == ()  # an item-less service: `[]`
+
+
+def test_a_failed_watch_read_is_the_records_error_the_playbook_watch(w: ReflectionWorld) -> None:
+    define(w)
+    define(w, "ops", "other-brief")
+    broken = CountingWatch(raises=OrgError("the mailbox of root cannot be read"))
+    found = records_of(w, evidence=broken).records()
+    assert only(found).error == "the playbook watch: the mailbox of root cannot be read" and only(found).watch == ()
+    assert only(found, "other-brief").error == "the playbook watch: the mailbox of root cannot be read"  # each record reads its own
+    assert one_off(found).error == ""  # the one-off record has no watch to read
+    odd = records_of(w, evidence=CountingWatch(raises=OSError(5, "I/O error"))).records()
+    assert only(odd).error == "the playbook watch: [Errno 5] I/O error"
+    assert only(records_of(w, evidence=CountingWatch(raises=RuntimeError("bad"))).records()).error == "the playbook watch: cannot be read (RuntimeError: bad)"
 
 
 # ------------------------------------------------------------------------------------------------------------------------ the record

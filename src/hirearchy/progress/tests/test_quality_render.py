@@ -12,7 +12,7 @@ from hirearchy.kernel import ROOT, Message
 from hirearchy.progress._quality_facts import HeldTask, MovedPast, QualityView, RecordView
 from hirearchy.progress._quality_render import nested_line, one_off_block, quality_text, ratio, service_block
 from hirearchy.reflection import (
-    Assertion, BarChanges, Case, Cause, CharterMark, ContractMark, Delivery, ModelMark, PlaybookMark, QualityThresholds, ServiceRecord, TopUpMark,
+    Assertion, BarChanges, Case, Cause, CharterMark, ContractMark, Delivery, ItemWatch, ModelMark, PlaybookMark, QualityThresholds, ServiceRecord, TopUpMark,
     shown_name,
 )
 
@@ -737,6 +737,25 @@ def test_a_record_that_cannot_be_read_is_one_line() -> None:
     assert "One-off tasks you gave: cannot be read (the cases: boom)." in text.splitlines()
     assert "- draft (offered by lead/writer): cannot be read (the cases: boom)." in text.splitlines()
     assert "other (offered by ops; client: you, human;" in text  # the other blocks render
+
+
+def test_the_playbook_watch_line_only_when_an_item_is_not_kept() -> None:
+    """Design 14.4: one line `playbook watch: ...` in 14.3's words, ids and counts only, and only when the list holds an item that is not `kept`; a
+    corpus with no item-format playbook (or with every item kept) prints as it always did."""
+    kept = (ItemWatch("P1", "step", "kept", 1), ItemWatch("P2", "rule", "kept", 1))
+    assert not any("playbook watch" in x for x in block(record()))
+    assert not any("playbook watch" in x for x in block(record(watch=kept)))
+    watch = (
+        *kept, ItemWatch("P4", "rule", "warning", 2, related=("R4",)), ItemWatch("P5", "step", "new", 3, k=3, clean=1, waiting=1),
+        ItemWatch("P6", "step", "restored", 3, restores=1), ItemWatch("P7", "rule", "retired", 2, related=("R4", "R6")),
+    )
+    out = block(record(watch=watch))
+    assert line(out, "  playbook watch:") == (
+        "  playbook watch: P4 warning (R4; the next related rejection retires it), "
+        "P5 new (1 of 3 clean cases, k 3; waiting for the client's verdict on 1 case), P6 restored (the text of v1), P7 retired (R4, R6)"
+    )
+    assert out.index(line(out, "  playbook watch:")) > out.index(line(out, "  timeline")) and sum("playbook watch" in x for x in out) == 1
+    assert not any("playbook watch" in x for x in block(record(watch=(ItemWatch("P4", "rule", "kept", 2),))))
 
 
 def test_the_empty_org_sample_of_9_3() -> None:

@@ -78,7 +78,7 @@ def register(b: Builder) -> None:
         CaseRecords,
         lambda b: DerivedCaseRecords(
             b.get(CaseHistory), b.get(ServiceCatalog), b.get(AgentDirectory), b.get(MailboxReader), b.get(ServiceStore),
-            GitBarHistory(b.get(OrgHistory), b.get(Clock)), b.get(DeliverableChecks),
+            GitBarHistory(b.get(OrgHistory), b.get(Clock)), b.get(DeliverableChecks), b.get(ServiceEvidence),
         ),
     )
 

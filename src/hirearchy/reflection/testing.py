@@ -285,7 +285,7 @@ def _world(s: ServicesWorld, runs: RunsHarness, folders: DeliverableFolder, char
     return ReflectionWorld(
         history=history, digest=digest, reports=TextServiceReports(d.agents, s.catalog, history, paths, evidence), sections=sections,
         steps=TextServiceSteps(d.agents, s.catalog, history, d.mail, evidence), rejections=rejections, evidence=evidence, paths=paths, s=s, runs=runs.reader, use_run=use_run,
-        deliverables=checks, records=DerivedCaseRecords(history, s.catalog, d.agents, d.mail, s.store, NoBarHistory(), checks),
+        deliverables=checks, records=DerivedCaseRecords(history, s.catalog, d.agents, d.mail, s.store, NoBarHistory(), checks, evidence),
     )
 
 

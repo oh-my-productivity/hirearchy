@@ -242,6 +242,8 @@
           "cited": [],
           "evidence": [],
           "evidence_other": 0,
+          "item": "",
+          "item_kind": "",
           "kind": "playbook",
           "lines": [
             {
@@ -286,6 +288,7 @@
             }
           ],
           "lines_more": 5,
+          "op": "",
           "own_words": null,
           "removed": 0,
           "restores": null,
@@ -385,6 +388,184 @@
           ],
           "rechecks": 2,
           "rework_runs": 2
+        }
+      ],
+      "watch": [
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P1",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P2",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P3",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P4",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P5",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P6",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P7",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P8",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P9",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P10",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
+        },
+        {
+          "carried": "",
+          "clean": 0,
+          "item": "P11",
+          "k": 0,
+          "kind": "step",
+          "pending": [],
+          "r": [
+            0,
+            0
+          ],
+          "related": [],
+          "since": null,
+          "state": "kept",
+          "waiting": 0
         }
       ]
     }

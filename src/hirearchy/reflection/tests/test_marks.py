@@ -12,7 +12,7 @@ import pytest
 from hirearchy.kernel import JsonObject, Message, link_ids, msg_time, verdict_tier
 from hirearchy.reflection import Case, CharterMark, ModelMark, TopUp, TopUps, Verdict
 from hirearchy.reflection._marks import contract_marks, playbook_marks, top_up_marks
-from hirearchy.services import Criterion, Playbook, number_criteria
+from hirearchy.services import Criterion, Playbook, PlaybookItem, number_criteria
 
 OWNER = "lead"
 T0 = datetime(2026, 10, 21, 15, 0, tzinfo=timezone.utc)
@@ -256,6 +256,113 @@ def test_the_client_of_a_nested_owner_is_its_parent() -> None:
     assert marks_[0].basis == "client"
     again = playbook_marks("lead/writer", [playbook(1, "Original.", by="lead/writer")], [], [])
     assert again[0].basis == "legacy"
+
+
+# ------------------------------------------------------------------------------------------------------------------------ item versions (design 14.4)
+# A version in item form carries the op it wrote and the item it changed; the marks put `op`, `item` and `item_kind` beside the counts that are
+# computed as ever (`changed_lines`, `own_words`, `tagged`), and say the change in the words of 14.4. The keys of a legacy version are `""`.
+
+
+def item(item_id: str, kind: str = "step") -> PlaybookItem:
+    return PlaybookItem(item_id, kind, "## Steps" if kind == "step" else "## Rules", f"words of {item_id}", "" if kind == "step" else "always")
+
+
+def itemised(version: int, op: str, *, item_id: str = "", live: tuple[PlaybookItem, ...] = (), admitted: str = "", by: str = "lead", **more: object) -> Playbook:
+    """A version in item form: `live` are its items (the rule ones are in `rules`); `more` are `evidence`, `related`, `restores`, `acknowledged`."""
+    body = "\n".join(f"- [{i.id}] {i.text}" for i in live)
+    return Playbook(
+        version=version, revised=T0 + timedelta(minutes=10 + version), by=by, reason="because", body=body, admitted=admitted, items=live, op=op, item=item_id,
+        items_max=max((int(i.id[1:]) for i in live), default=0), rules=tuple(i.id for i in live if i.kind == "rule"), **more,  # type: ignore[arg-type]
+    )
+
+
+def test_an_item_versions_mark_has_op_item_and_item_kind() -> None:
+    steps = (item("P1"), item("P2"))
+    rule = item("P4", "rule")
+    versions = [
+        Playbook(version=1, revised=T0, by="lead", reason="r", body="Do the work.", admitted="first"),  # a legacy-format first version
+        itemised(2, "migrate", live=steps, admitted="migrate", by="runtime (migration)"),
+        itemised(3, "add", item_id="P4", live=(*steps, rule), admitted="b", evidence=["R1", "R2"]),
+        itemised(4, "add", item_id="P5", live=(*steps, rule, item("P5")), admitted="b", evidence=["R1", "R2"]),
+        itemised(5, "retire", item_id="P4", live=(*steps, item("P5")), admitted="exempt"),
+        itemised(6, "first", live=steps, admitted="first"),
+    ]
+    legacy, migrated, added_rule, added_step, retired, first = pmarks(versions)
+    assert [(m.op, m.item, m.item_kind) for m in (legacy, migrated, added_rule, added_step, retired, first)] == [
+        ("", "", ""), ("migrate", "", ""), ("add", "P4", "rule"), ("add", "P5", "step"), ("retire", "P4", "rule"),  # a retired rule is found in the version before
+        ("first", "", ""),
+    ]
+
+
+def test_the_item_mark_texts_of_14_4() -> None:
+    steps = (item("P1"), item("P2"))
+    rule = item("P4", "rule")
+    eleven = tuple(item(f"P{k}") for k in range(1, 12))
+    note = ident(80, "root")
+    versions = [
+        itemised(1, "migrate", live=eleven, admitted="migrate", by="runtime (migration)"),
+        itemised(2, "add", item_id="P12", live=(*eleven, item("P12", "rule")), admitted="c", evidence=["C9", "R1"]),
+        itemised(3, "watch", item_id="P12", live=eleven, admitted="watch", by="runtime (watch)", related=("R4", "R6"), restores=1),
+        itemised(4, "retire", item_id="P3", live=tuple(i for i in eleven if i.id != "P3"), admitted="exempt", acknowledged=note),
+        itemised(5, "watch", item_id="P4", live=steps, admitted="watch", by="runtime (watch)", related=("R4", "R6")),
+        itemised(6, "retire", item_id="P2", live=(steps[0],), admitted="exempt"),
+        itemised(7, "edit", item_id="P1", live=(steps[0],), admitted="b", evidence=["R1", "R2"], acknowledged=note),
+        itemised(8, "restore", item_id="P2", live=steps, admitted="restore", restores=2),
+        itemised(9, "move", item_id="P2", live=(steps[1], steps[0]), admitted="exempt"),
+        itemised(10, "add", item_id="P4", live=(*steps, rule), admitted="exempt"),
+    ]
+    marks_ = pmarks(versions)
+    assert [m.basis for m in marks_] == ["migrate", "c", "watch", "exempt", "watch", "exempt", "b", "restore", "exempt", "exempt"]
+    assert [m.text for m in marks_] == [
+        "playbook v1 (runtime (migration)): the free text as 11 items (no change of words)",
+        "playbook v2 (lead): add P12 (rule), admitted (c) on C9, R1",
+        "playbook v3 (runtime (watch)): retires P12 after R4, R6 and restores the text of v1",
+        f"playbook v4 (lead): retires P3, acknowledged by root (note {note})",
+        "playbook v5 (runtime (watch)): retires P4 after R4, R6",
+        "playbook v6 (lead): retires P2",
+        f"playbook v7 (lead): edit P1 (step), admitted (b) on R1, R2, acknowledged by root (note {note})",
+        "playbook v8 (lead): restores P2 (step) to the text of v2",
+        "playbook v9 (lead): move P2 (step)",
+        "playbook v10 (lead): add P4 (rule)",
+    ]
+    assert marks_[7].restores == 2 and marks_[2].restores == 1 and marks_[4].restores is None  # `restores` comes from the file for an item version
+
+
+def test_a_first_version_keeps_todays_text() -> None:
+    """PC-2 (a guard): an `op: first` version is not an item change. The owner's `op="first"` stores `admitted: first` and reads `first version`; root's
+    v1 stores no `admitted` and reads `written by the client`; neither moves with the item texts of 14.4. GREEN when written."""
+    steps = (item("P1"), item("P2"))
+    owner_first = itemised(1, "first", live=steps, admitted="first")
+    roots_first = itemised(1, "first", live=steps, by="root")
+    (mine,) = pmarks([owner_first])
+    (roots,) = pmarks([roots_first])
+    assert (mine.basis, mine.text) == ("first", "playbook v1 (lead): first version")
+    assert (roots.basis, roots.text) == ("client", "playbook v1 (root): written by the client (no admission needed)")
+
+
+def test_a_legacy_versions_mark_is_computed_as_today() -> None:
+    """A guard: a version without `op` (every playbook written before Phase 1) is counted by `changed_lines`, `own_words` and `tagged`, and worded, as
+    ever, whatever follows it. GREEN when written."""
+    crit = criteria("Summary line first")
+    versions = [
+        playbook(1, "Do the work.", admitted="first"),
+        playbook(2, "Do the work.\n- C1: Summary line first\nSign", admitted="c", evidence=("C1",)),
+        playbook(3, "Do the work.\n- R1: always check dates", admitted="b", evidence=("R1", "R2")),
+        playbook(4, "Do the work.", admitted="restore"),
+        playbook(5, "Edited without the gate."),
+    ]
+    marks_ = pmarks(versions, crit)
+    assert [(m.basis, m.changed, m.removed, m.own_words, m.beyond, m.tagged, m.untagged) for m in marks_] == [
+        ("first", 1, 0, None, None, None, None), ("c", 2, 0, 1, 1, None, None), ("b", 1, 2, None, None, 1, 0), ("restore", 0, 1, None, None, None, None),
+        ("legacy", 1, 1, None, None, None, None),
+    ]
+    assert [m.text for m in marks_] == [
+        "playbook v1 (lead): first version",
+        "playbook v2 (lead): admitted (c) on C1: 2 changed line(s): 1 the cited criteria's own words, 1 beyond them",
+        "playbook v3 (lead): admitted (b) on R1, R2: 1 changed line(s): 1 tagged with an id, 0 untagged; 2 line(s) removed",
+        "playbook v4 (lead): restores v1; 1 line(s) removed",
+        "playbook v5 (lead): no admission recorded (written before the evidence gate); 1 line(s) removed",
+    ]
 
 
 def test_removed_lines_are_counted() -> None:

@@ -16,7 +16,7 @@ from ..agents import AgentDirectory
 from ..kernel import ROOT, JsonObject, Message, OrgError, clip_line, latest_results, msg_time, parent
 from ..mail import MailboxReader
 from ..services import (
-    Contract, Criterion, ServiceCatalog, amendment_ids, contract_of, number_criteria, version_in_force,
+    Contract, Criterion, ServiceCatalog, ServiceEvidence, amendment_ids, contract_of, number_criteria, version_in_force,
 )
 from ._marks import contract_marks, playbook_marks, top_up_marks
 from ._ports import BarHistory, ContractVersions
@@ -174,7 +174,7 @@ def _when(mark: Mark) -> tuple[datetime, int]:
 class DerivedCaseRecords(CaseRecords):
     def __init__(
         self, history: CaseHistory, catalog: ServiceCatalog, agents: AgentDirectory, mail: MailboxReader, versions: ContractVersions, bars: BarHistory,
-        deliverables: DeliverableChecks,
+        deliverables: DeliverableChecks, evidence: ServiceEvidence,
     ) -> None:
         self._history = history
         self._catalog = catalog
@@ -183,6 +183,7 @@ class DerivedCaseRecords(CaseRecords):
         self._versions = versions
         self._bars = bars
         self._deliverables = deliverables
+        self._evidence = evidence
 
     # ---------------------------------------------------------------------------------------------------- records
 
@@ -223,6 +224,7 @@ class DerivedCaseRecords(CaseRecords):
             raw = _read("the stored contract versions", lambda: self._versions.versions(owner, name, "SERVICE"))
             facts = _read("the stored contract versions", lambda: _versions_of(owner, name, raw))
             playbooks = _read("the playbook versions", lambda: self._catalog.playbook_versions(owner, name))
+            watch = _read("the playbook watch", lambda: self._evidence.watch(owner, name))  # the one derivation every reader of a watch state shares
             cases = _read("the cases", lambda: self._history.cases(owner, name))  # the cases ``case_total`` reads: built with the contract's per-request budget
             deliveries = _attributed(_read("the mailboxes", lambda: self._all(mail, client, cases)), findings)
             assertions = regressions(cases)
@@ -238,7 +240,7 @@ class DerivedCaseRecords(CaseRecords):
         return ServiceRecord(
             owner, name, client, kind, contract=contract.version, playbook=playbooks[-1].version if playbooks else 0, budget=contract.budget,
             cases=tuple(cases), deliveries=deliveries, assertions=tuple(assertions), escapes=escapes,
-            timeline=tuple(sorted(marks, key=_when)), history=_scoped(bars, set(self._agents.subtree(owner))), files_error=files_error,
+            timeline=tuple(sorted(marks, key=_when)), history=_scoped(bars, set(self._agents.subtree(owner))), files_error=files_error, watch=watch,
         )
 
     def _one_off(self, mail: _Boxes, findings: Sequence[DeliverableFinding], files_error: str, bars: BarChanges) -> ServiceRecord:

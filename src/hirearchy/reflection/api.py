@@ -22,7 +22,7 @@ from types import MappingProxyType
 from typing import Protocol, TypeAlias, runtime_checkable
 
 from ..kernel import ClientItems, Message, client_items, clip_line, msg_time
-from ..services import Criterion
+from ..services import Criterion, ItemWatch
 from ._deliverables import FOLDER_SHOWN, NAME_SHOWN, shown_name
 from ._ports import BarChanges
 
@@ -44,6 +44,7 @@ __all__ = [
     "FAILURE_CLASSES",
     "ITEMS_SHOWN",
     "ITEM_CHARS",
+    "ItemWatch",
     "LASTING_WORDS",
     "Mark",
     "ModelMark",
@@ -94,6 +95,7 @@ __all__ = [
     "user_held",
     "user_spend",
     "version_at",
+    "watch_entry",
 ]
 
 
@@ -174,21 +176,29 @@ class ContractMark:
         return f"{head}: " + ", ".join(f"{i} confirmed (link {link})" if link else f"{i} not confirmed" for i, link in self.parts)
 
 
+ITEM_OPS = ("add", "edit", "retire", "restore", "move", "watch", "migrate")  # the ops whose marks speak of an item (``first`` keeps today's words)
+
+
 @dataclass(frozen=True)
 class PlaybookMark:
     """A mark of the timeline (0b 7): a stored version of the playbook. ``basis`` is the admission rule (``c``, ``b``, ``first``, ``restore``) or, for
-    a version with none, ``client`` (the client wrote it: no admission needed) or ``legacy`` (written by its owner before the evidence gate).
+    a version with none, ``client`` (the client wrote it: no admission needed) or ``legacy`` (written by its owner before the evidence gate); a version
+    in item form (design 14.4) also takes ``migrate``, ``exempt`` and ``watch``.
     ``evidence`` holds only the cited ids that are criteria, assertions or message ids; ``evidence_other`` counts the rest (agent-written, so never
     shown). ``changed`` and ``removed`` are the lines it adds or changes and the lines it drops, against the version before it (the first version
     against nothing). Rule (c): ``own_words`` of the changed lines are a cited criterion's own words, ``beyond`` are not; rule (b): ``tagged`` carry a
     ``C<k>`` or ``R<k>``, ``untagged`` do not; the others are ``None``. ``cited`` are the criteria the evidence names, directly or through the
     user's link notes. ``lines`` (at most 10, each clipped) and ``lines_more`` are the changed lines themselves, with whether each is a cited
-    criterion's own words: text an agent wrote (``agent_written``), for the JSON only."""
+    criterion's own words: text an agent wrote (``agent_written``), for the JSON only.
+    A version in item form names the ``op`` it wrote and the ``item`` it changed with its ``item_kind`` (``step`` or ``rule``); all three are ``""``
+    for a legacy version (and ``item`` and ``item_kind`` for ``first`` and ``migrate``). ``related`` are the rejections a watch retire rests on,
+    ``acknowledged`` the id of the parent's note (``acknowledged_by`` is the parent) and ``items`` the live items of a migrated version: they only
+    word the mark."""
 
     version: int
     when: datetime | None
     by: str
-    basis: str  # "c" | "b" | "first" | "restore" | "client" | "legacy"
+    basis: str  # "c" | "b" | "first" | "restore" | "migrate" | "exempt" | "watch" | "client" | "legacy"
     restores: int | None = None
     evidence: tuple[str, ...] = ()
     evidence_other: int = 0
@@ -202,21 +212,26 @@ class PlaybookMark:
     lines: tuple[tuple[str, bool], ...] = ()
     lines_more: int = 0
     agent_written: bool = True
+    op: str = ""  # first | migrate | add | edit | retire | restore | move | watch; "" for a legacy version
+    item: str = ""
+    item_kind: str = ""
+    related: tuple[str, ...] = ()
+    acknowledged: str = ""
+    acknowledged_by: str = ""
+    items: int = 0
 
     @property
     def text(self) -> str:
         """The words of the mark (design 7); the playbook's reason and lines are never in them."""
         head = f"playbook v{self.version} ({self.by})"
+        if self.op in ITEM_OPS:
+            return f"{head}: {_item_tail(self)}"
         if self.basis in ("c", "b"):
-            shown = _ids(self.evidence)
-            if self.evidence_other:
-                other = f"{self.evidence_other} other id(s)"
-                shown = f"{shown} and {other}" if shown else other
             parts = (
                 f"{self.own_words} the cited criteria's own words, {self.beyond} beyond them" if self.basis == "c"
                 else f"{self.tagged} tagged with an id, {self.untagged} untagged"
             )
-            tail = f"admitted ({self.basis}) on {shown}: {self.changed} changed line(s): {parts}"
+            tail = f"admitted ({self.basis}) on {_shown(self)}: {self.changed} changed line(s): {parts}"
         elif self.basis == "first":
             tail = "first version"
         elif self.basis == "restore":
@@ -226,6 +241,35 @@ class PlaybookMark:
         else:
             tail = "no admission recorded (written before the evidence gate)"
         return f"{head}: {tail}" + (f"; {self.removed} line(s) removed" if self.removed else "")
+
+
+def _shown(mark: PlaybookMark) -> str:
+    """The ids a version cites (those that are ids), and the count of the others."""
+    shown = _ids(mark.evidence)
+    if mark.evidence_other:
+        other = f"{mark.evidence_other} other id(s)"
+        shown = f"{shown} and {other}" if shown else other
+    return shown
+
+
+def _item_tail(mark: PlaybookMark) -> str:
+    """The words of a version in item form (design 14.4): the op, the item, how it was admitted and who acknowledged it."""
+    what = f"{mark.item} ({mark.item_kind})" if mark.item_kind else mark.item
+    if mark.op == "migrate":
+        return f"the free text as {mark.items} item{'' if mark.items == 1 else 's'} (no change of words)"
+    if mark.op == "watch":
+        tail = f"retires {mark.item} after {_ids(mark.related)}" + (f" and restores the text of v{mark.restores}" if mark.restores else "")
+    elif mark.op == "retire":
+        tail = f"retires {mark.item}"
+    elif mark.op == "restore":
+        tail = f"restores {what}" + (f" to the text of v{mark.restores}" if mark.restores else "")
+    else:
+        tail = f"{mark.op} {what}"  # add, edit, move
+    if mark.basis in ("c", "b"):
+        tail += f", admitted ({mark.basis}) on {_shown(mark)}"
+    if mark.acknowledged:
+        tail += f", acknowledged by {mark.acknowledged_by or 'root'} (note {mark.acknowledged})"
+    return tail
 
 
 @dataclass(frozen=True)
@@ -1019,6 +1063,7 @@ class ServiceRecord:
     timeline: tuple[Mark, ...] = ()  # oldest first
     history: BarChanges = BarChanges()
     files_error: str = ""
+    watch: tuple[ItemWatch, ...] = ()  # the watch of every item of the playbook, one derivation (``ServiceEvidence.watch``); () when none (design 14.4)
 
 
 @runtime_checkable
@@ -1043,3 +1088,4 @@ from ._causes import attribution, cause_of, failure_class  # noqa: E402
 from ._quality_rules import (  # noqa: E402
     cost_alarm, deliveries_of, judged_cases, not_on_a_delivery, over_cost, quality_thresholds, repeat_alarm, signer_of, unjudged_cases,
 )
+from ._watch_text import watch_entry  # noqa: E402

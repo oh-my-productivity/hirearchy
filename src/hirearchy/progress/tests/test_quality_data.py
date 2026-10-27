@@ -13,7 +13,7 @@ from hirearchy.kernel import ROOT, Message
 from hirearchy.progress._quality_facts import HeldTask, MovedPast, QualityView, RecordView
 from hirearchy.progress._quality_render import quality_data
 from hirearchy.reflection import (
-    Assertion, BarChanges, Case, Cause, CharterMark, ContractMark, Delivery, ModelMark, PlaybookMark, QualityThresholds, ServiceRecord, TopUpMark,
+    Assertion, BarChanges, Case, Cause, CharterMark, ContractMark, Delivery, ItemWatch, ModelMark, PlaybookMark, QualityThresholds, ServiceRecord, TopUpMark,
 )
 
 from ._quality_records import case, delivery, mid, record, request, top_ups, verdict
@@ -166,6 +166,45 @@ def test_null_rules_of_9_4() -> None:
     assert [t for t in titles.values() if t is None] and "AGENT TITLE" not in json.dumps(out)  # an agent's task title is never in the JSON
     assert view().records == () and data(view())["one_off"] is None
     assert data(view(record(), service="weekly-memo"))["one_off"] is None
+
+
+def test_playbook_marks_always_have_op_item_and_item_kind() -> None:
+    """Design 14.4: the three keys are always there, `""` for a legacy version (and for `first`/`migrate`, which change no one item), and `basis` takes
+    `migrate`, `exempt` and `watch`; the mark's own `kind` key still reads `playbook`."""
+    legacy = next(m for m in data(rich())["services"][0]["timeline"] if m["kind"] == "playbook")
+    assert (legacy["kind"], legacy["op"], legacy["item"], legacy["item_kind"]) == ("playbook", "", "", "")
+    marks = (
+        PlaybookMark(2, at(3), "lead", "b", evidence=("R1", "R2"), changed=1, tagged=1, untagged=0, op="add", item="P4", item_kind="rule"),
+        PlaybookMark(3, at(4), "runtime (watch)", "watch", restores=1, changed=1, op="watch", item="P4", item_kind="rule", related=("R4", "R6")),
+        PlaybookMark(4, at(5), "runtime (migration)", "migrate", op="migrate"),
+        PlaybookMark(5, at(6), "lead", "exempt", removed=1, op="retire", item="P2", item_kind="step", acknowledged="LINK"),
+    )
+    out = data(view(record(timeline=marks)))
+    assert problems(out) == []
+    assert [(m["op"], m["item"], m["item_kind"], m["basis"]) for m in out["services"][0]["timeline"]] == [
+        ("add", "P4", "rule", "b"), ("watch", "P4", "rule", "watch"), ("migrate", "", "", "migrate"), ("retire", "P2", "step", "exempt"),
+    ]
+    assert set(out["services"][0]["timeline"][0]) == set(legacy)  # one shape for every version
+
+
+def test_the_watch_list_has_every_key() -> None:
+    """Design 14.4: `watch` is a list of items with all eleven keys always present, `[]` when there is none (also in an error record)."""
+    watch = (
+        ItemWatch("P1", "step", "kept", 1),
+        ItemWatch("P4", "rule", "warning", 2, watch_start=at(3), k=3, r=(1, 4), clean=0, waiting=0, related=("R4",), pending=("R5",), carried="P9"),
+        ItemWatch("P5", "step", "new", 3, watch_start=at(9), k=3, r=(0, 2), clean=1, waiting=2),
+    )
+    out = data(view(record(watch=watch), record(service="other", watch=()), ServiceRecord("lead", "bad", ROOT, "human", error="the playbook watch: boom")))
+    assert problems(out) == []
+    first, second, broken = out["services"]
+    keys = {"item", "kind", "state", "k", "r", "clean", "waiting", "related", "pending", "since", "carried"}
+    assert all(set(entry) == keys for entry in first["watch"])
+    assert first["watch"][1] == {
+        "item": "P4", "kind": "rule", "state": "warning", "k": 3, "r": [1, 4], "clean": 0, "waiting": 0, "related": ["R4"], "pending": ["R5"],
+        "since": "2026-10-21T15:03:00Z", "carried": "P9",
+    }
+    assert first["watch"][0]["since"] is None and first["watch"][0]["related"] == [] and first["watch"][2]["waiting"] == 2
+    assert second["watch"] == [] and broken["watch"] == []
 
 
 def test_pass_precision_is_zero_zero_without_a_judged_delivery() -> None:

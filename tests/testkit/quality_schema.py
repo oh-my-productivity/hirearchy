@@ -93,7 +93,9 @@ CONTRACT_MARK = shape(
     answers=null(STR), confirmed=items(shape(id=STR, link=STR)), not_confirmed=IDS,
 )
 PLAYBOOK_MARK = shape(
-    kind=choice("playbook"), when=null(TIME), version=INT, by=STR, basis=choice("c", "b", "first", "restore", "client", "legacy"), restores=null(INT),
+    kind=choice("playbook"), when=null(TIME), version=INT, by=STR,
+    basis=choice("c", "b", "first", "restore", "migrate", "exempt", "watch", "client", "legacy"),
+    op=choice("", "first", "migrate", "add", "edit", "retire", "restore", "move", "watch"), item=STR, item_kind=choice("", "step", "rule"), restores=null(INT),
     evidence=IDS, evidence_other=INT, changed=INT, removed=INT, own_words=null(INT), beyond=null(INT), tagged=null(INT), untagged=null(INT),
     cited=items(shape(id=STR, text=STR)), lines=items(shape(text=STR, own_words=BOOL)), lines_more=INT, agent_written=TRUE,
 )
@@ -136,6 +138,10 @@ RECORD = shape(
     deliveries=DELIVERIES, escapes=items(ESCAPE), verifiers=items(VERIFIER),
     alarms=lambda value, path: [] if value == {} else shape(repeat=REPEAT, cost=COST)(value, path),  # an error record has {}
     timeline=items(MARK), history=null(shape(known=BOOL, truncated=BOOL, skipped=INT)),
+    watch=items(shape(
+        item=STR, kind=choice("step", "rule"), state=choice("new", "warning", "retired", "restored", "kept"), k=INT, r=pair(INT, INT), clean=INT, waiting=INT,
+        related=IDS, pending=IDS, since=null(TIME), carried=STR,
+    )),
 )
 HELD_TASK = shape(id=STR, sender=STR, title=null(STR), blocked=TIME, left_blocked=BOOL, sent_since=INT)
 DOCUMENT = shape(

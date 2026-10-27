@@ -13,8 +13,8 @@ from typing import TypeVar
 
 from ..kernel import ROOT, JsonObject, clip_line, msg_time
 from ..reflection import (
-    Case, Cause, CharterMark, ContractMark, Mark, ModelMark, PlaybookMark, QualityThresholds, ServiceRecord, TopUpMark, case_spend, cost_alarm,
-    attribution, failure_class, repeat_alarm, shown_name, user_cost,
+    Case, Cause, CharterMark, ContractMark, ItemWatch, Mark, ModelMark, PlaybookMark, QualityThresholds, ServiceRecord, TopUpMark, case_spend, cost_alarm,
+    attribution, failure_class, repeat_alarm, shown_name, user_cost, watch_entry,
 )
 from ._quality_facts import (
     EscapeRow, FirstLine, HeldTask, MovedPast, QualityView, RecordView, approved_of, delivery_facts, escape_rows, first_lines, verifiers,
@@ -324,6 +324,12 @@ def _timeline_lines(view: RecordView) -> list[str]:
     return lines
 
 
+def _watch_lines(view: RecordView) -> list[str]:
+    """One line, in 14.3's words, when the record's watch holds an item that is not ``kept`` (design 14.4): ids and counts, never an item's words."""
+    shown = [watch_entry(w) for w in view.record.watch if w.state != "kept"]
+    return [f"  playbook watch: {', '.join(shown)}"] if shown else []
+
+
 def _attribution_line(view: RecordView) -> str:
     cut = sum(1 for c in view.record.cases if c.cut)
     tail = "; their later runs count for that request" if cut else ""
@@ -337,7 +343,7 @@ def _block(view: RecordView, t: QualityThresholds, heading: str) -> list[str]:
     if more:
         lines.append(f"    and {more} earlier case(s), counted above")
     lines += [_judged_line(view), *_legacy_line(view), *_escape_lines(view), *_verifier_lines(view), *_runs_lines(view), *_alarm_lines(view, t)]
-    return lines + [*_timeline_lines(view), _attribution_line(view)]
+    return lines + [*_timeline_lines(view), *_watch_lines(view), _attribution_line(view)]
 
 
 def service_block(view: RecordView, t: QualityThresholds) -> list[str]:
@@ -451,7 +457,8 @@ def _mark_data(mark: Mark) -> JsonObject:
         }
     if isinstance(mark, PlaybookMark):
         return {
-            "kind": "playbook", "when": when, "version": mark.version, "by": mark.by, "basis": mark.basis, "restores": mark.restores,
+            "kind": "playbook", "when": when, "version": mark.version, "by": mark.by, "basis": mark.basis, "op": mark.op, "item": mark.item,
+            "item_kind": mark.item_kind, "restores": mark.restores,
             "evidence": list(mark.evidence), "evidence_other": mark.evidence_other, "changed": mark.changed, "removed": mark.removed,
             "own_words": mark.own_words, "beyond": mark.beyond, "tagged": mark.tagged, "untagged": mark.untagged,
             "cited": [{"id": i, "text": text} for i, text in mark.cited], "lines": [{"text": text, "own_words": own} for text, own in mark.lines],
@@ -463,6 +470,13 @@ def _mark_data(mark: Mark) -> JsonObject:
         return {"kind": "model", "when": when, "addr": mark.addr, "key": mark.key, "before": mark.before, "after": mark.after, "commit": mark.commit}
     assert isinstance(mark, TopUpMark)
     return {"kind": "top-up", "when": when, "case": mark.case, "id": mark.id, "source": mark.source, "amount": mark.amount}
+
+
+def _watch_data(w: ItemWatch) -> JsonObject:
+    return {
+        "item": w.id, "kind": w.kind, "state": w.state, "k": w.k, "r": list(w.r), "clean": w.clean, "waiting": w.waiting, "related": list(w.related),
+        "pending": list(w.pending), "since": _stamp(w.watch_start), "carried": w.carried,
+    }
 
 
 def _first_data(first: FirstLine) -> JsonObject | None:
@@ -537,7 +551,7 @@ def _record_data(view: RecordView, t: QualityThresholds) -> JsonObject:
         return {
             **head, "error": r.error, "files_error": "", "stalled_error": "", "contract": 0, "playbook": 0, "budget": None, "cases": [],
             "first_deliveries": {"accepted": 0, "rejected": 0, "no_verdict": 0, "superseded": 0, "neither": 0, "never_delivered": 0},
-            "deliveries": _deliveries_data(ServiceRecord("", "", ROOT, "human")), "escapes": [], "verifiers": [], "alarms": {}, "timeline": [], "history": None,
+            "deliveries": _deliveries_data(ServiceRecord("", "", ROOT, "human")), "escapes": [], "verifiers": [], "alarms": {}, "timeline": [], "watch": [], "history": None,
         }
     firsts = first_lines(r)
     count = {o: sum(1 for f in firsts if f.outcome == o) for o in ("accepted", "rejected", "none", "neither", "never")}
@@ -550,7 +564,7 @@ def _record_data(view: RecordView, t: QualityThresholds) -> JsonObject:
             "never_delivered": count["never"],
         },
         "deliveries": _deliveries_data(r), "escapes": [_escape_data(row) for row in escape_rows(r)], "verifiers": _verifier_data(view),
-        "alarms": _alarm_data(view, t), "timeline": [_mark_data(m) for m in r.timeline],
+        "alarms": _alarm_data(view, t), "timeline": [_mark_data(m) for m in r.timeline], "watch": [_watch_data(w) for w in r.watch],
         "history": {"known": r.history.known, "truncated": r.history.truncated, "skipped": r.history.skipped},
     }
 

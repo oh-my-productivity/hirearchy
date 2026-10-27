@@ -12,6 +12,7 @@ import subprocess
 
 import pytest
 from testkit.e7_replay import materialize
+from testkit.services_world import confirmed_amendment, deliver, request, svc  # noqa: F401  (svc is a fixture)
 
 from hirearchy.core import ROOT, Org
 from hirearchy.kernel import OrgError
@@ -83,3 +84,46 @@ def test_the_playbook_lock_file_is_never_committed(tmp_path):
     tracked = subprocess.run(["git", "ls-files"], cwd=org.root, check=True, capture_output=True, text=True, env=env).stdout.splitlines()
     assert f"lead/services/{SERVICE}/PLAYBOOK.md" in tracked
     assert not [path for path in tracked if path.endswith(".tmp-playbook.lock")]
+
+
+STEPS = "## Steps\n1. Search.\n2. Write.\n3. Check every claim."
+CRITERION = "Every claim names its source"
+
+
+def test_every_reader_names_the_same_watch_states(svc):
+    """Design 20, "one derivation path" (Mandatory check 3): for a service with a watched item, the settler's read (`ServiceEvidence.watch`), the
+    owner's states line, root's `services` suffix and the `quality` record's `watch` all name the state of the item `CaseServiceEvidence.watch`
+    derives, at each step of its life: `new` (the criterion's words, added on rule (c)), then `warning` (a related rejection of a later delivery,
+    answered by the user's link)."""
+    svc.revise_playbook("ceo", "weekly-brief", "first", "first draft", [], text=STEPS)
+    c3 = confirmed_amendment(svc, CRITERION)
+    svc.revise_playbook("ceo", "weekly-brief", "add", "the criterion's words", [c3], kind="step", text=CRITERION)
+    rt = svc.runtime
+
+    def readers():
+        """The four readers: (the settler's read, the owner's states line, root's playbook line, the quality record's watch)."""
+        derived = rt.service_evidence.watch("ceo", "weekly-brief")
+        owner = next((x for x in rt.service_prompt_sections.prompt_sections("ceo", []).splitlines() if x.startswith("Item states:")), "")
+        listed = next(x for x in rt.service_reports.services_text(ROOT).splitlines() if x.startswith("  playbook v"))
+        (record,) = [r for r in rt.case_records.records("weekly-brief")]
+        return derived, owner, listed, record.watch
+
+    task = request(svc, "ai")  # the first delivery after P4: its case is a candidate, waiting for the user's verdict
+    deliver(svc, "ceo", task)
+    request(svc, "chips")  # a request still open, so that the owner's prompt carries the playbook section
+    derived, owner, listed, recorded = readers()
+    p4 = next(w for w in derived if w.id == "P4")
+    assert (p4.state, p4.waiting) == ("new", 1) and recorded == derived
+    assert "P4 step, new since v2 (waiting for the client's verdict on 1 case)" in owner
+    assert listed.endswith("; 4 items (0 rules); watched: P4 new (0 of 3 clean cases, k 3; waiting for the client's verdict on 1 case)")
+
+    no = svc.feedback(ROOT, task.id, "reject", f"Missing again: {CRITERION}", source="human")
+    svc.feedback(ROOT, task.id, "reject", "Yes, it is about that.", source="human", criterion=[c3], confirms=no.id)
+    derived, owner, listed, recorded = readers()
+    p4 = next(w for w in derived if w.id == "P4")
+    assert p4.state == "warning" and p4.related == ("R2",) and recorded == derived
+    assert "P4 step, warning: rejection R2 (case " in owner and "is related; one more retires it" in owner
+    assert listed.endswith("; watched: P4 warning (R2; the next related rejection retires it)")
+    quality = rt.quality_report.quality_data("weekly-brief")["services"][0]["watch"]
+    assert [(e["item"], e["state"], e["related"]) for e in quality if e["item"] == "P4"] == [("P4", "warning", ["R2"])]
+    assert "playbook watch: P4 warning (R2; the next related rejection retires it)" in rt.quality_report.quality_text("weekly-brief")
